@@ -147,6 +147,69 @@ a.ready_cb = NULL;
 a.user_data = NULL;
 lv_style_anim_create(&a);
  */
+
+
+static inline void lv_style_anim_init(lv_style_anim_t * a)
+{
+    memset(a, 0, sizeof(lv_style_anim_t));
+}
+
+static inline void lv_style_anim_set_styles(lv_style_anim_t * a, lv_style_t * to_anim, const lv_style_t * start, const lv_style_t * end)
+{
+    a->style_anim = to_anim;
+    a->style_start = start;
+    a->style_end = end;
+}
+
+static inline void lv_style_anim_set_time(lv_style_anim_t * a, uint16_t duration, uint16_t delay)
+{
+    a->time = duration;
+    a->act_time = -delay;
+}
+
+static inline void lv_style_anim_set_ready_cb(lv_style_anim_t * a, lv_anim_ready_cb_t ready_cb)
+{
+    a->ready_cb = ready_cb;
+}
+
+static inline void lv_style_anim_set_playback(lv_style_anim_t * a, uint16_t wait_time)
+{
+    a->playback = 1;
+    a->playback_pause = wait_time;
+}
+
+static inline void lv_style_anim_clear_playback(lv_style_anim_t * a)
+{
+    a->playback = 0;
+}
+
+static inline void lv_style_anim_set_repeat(lv_style_anim_t * a, uint16_t wait_time)
+{
+    a->repeat = 1;
+    a->repeat_pause = wait_time;
+}
+
+static inline void lv_style_anim_clear_repeat(lv_style_anim_t * a)
+{
+    a->repeat = 0;
+}
+
+static inline void lv_style_anim_set_user_data(lv_style_anim_t * a, lv_anim_user_data_t user_data)
+{
+    memcpy(&a->user_data, &user_data, sizeof(user_data));
+}
+
+static inline lv_anim_user_data_t lv_style_anim_get_user_data(lv_style_anim_t * a)
+{
+    return a->user_data;
+}
+
+static inline lv_anim_user_data_t * lv_style_anim_get_user_data_ptr(lv_style_anim_t * a)
+{
+    return &a->user_data;
+}
+
+
 #endif
 
 /**********************

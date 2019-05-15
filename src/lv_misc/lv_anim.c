@@ -53,7 +53,7 @@ static bool anim_list_changed;
 /**
  * Init. the animation module
  */
-void lv_anim_init(void)
+void lv_anim_core_init(void)
 {
     lv_ll_init(&LV_GC_ROOT(_lv_anim_ll), sizeof(lv_anim_t));
     last_task_run = lv_tick_get();

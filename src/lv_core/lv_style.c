@@ -318,7 +318,7 @@ void * lv_style_anim_create(lv_style_anim_t * anim)
     a.playback_pause = anim->playback_pause;
     a.repeat         = anim->repeat;
     a.repeat_pause   = anim->repeat_pause;
-
+    a.user_data      = anim->user_data;
     lv_anim_create(&a);
 
     return dsc;

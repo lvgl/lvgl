@@ -98,7 +98,88 @@ lv_anim_create(&a);
 /**
  * Init. the animation module
  */
-void lv_anim_init(void);
+void lv_anim_core_init(void);
+
+
+/**
+ * Initialize an animation variable
+ * @param a pointer to animation
+ */
+static inline void lv_anim_init(lv_anim_t * a)
+{
+    memset(a, 0, sizeof(lv_anim_t));
+}
+
+
+static inline void lv_anim_set_var(lv_anim_t * a, void * var)
+{
+    a->var = var;
+}
+
+static inline void lv_anim_set_time(lv_anim_t * a, uint16_t duration, uint16_t delay)
+{
+    a->time = duration;
+    a->act_time = -delay;
+}
+
+static inline void lv_anim_set_values(lv_anim_t * a, lv_anim_value_t start, lv_anim_value_t end)
+{
+    a->start = start;
+    a->end = end;
+}
+
+static inline void lv_anim_set_exec_cb(lv_anim_t * a, lv_anim_exec_cb_t exec_cb)
+{
+    a->exec_cb = exec_cb;
+}
+
+static inline void lv_anim_set_path_cb(lv_anim_t * a, lv_anim_path_cb_t path_cb)
+{
+    a->path_cb = path_cb;
+}
+
+static inline void lv_anim_set_ready_cb(lv_anim_t * a, lv_anim_ready_cb_t ready_cb)
+{
+    a->ready_cb = ready_cb;
+}
+
+static inline void lv_anim_set_playback(lv_anim_t * a, uint16_t wait_time)
+{
+    a->playback = 1;
+    a->playback_pause = wait_time;
+}
+
+static inline void lv_anim_clear_playback(lv_anim_t * a)
+{
+    a->playback = 0;
+}
+
+static inline void lv_anim_set_repeat(lv_anim_t * a, uint16_t wait_time)
+{
+    a->repeat = 1;
+    a->repeat_pause = wait_time;
+}
+
+static inline void lv_anim_clear_repeat(lv_anim_t * a)
+{
+    a->repeat = 0;
+}
+
+static inline void lv_anim_set_user_data(lv_anim_t * a, lv_anim_user_data_t user_data)
+{
+    memcpy(&a->user_data, &user_data, sizeof(user_data));
+}
+
+static inline lv_anim_user_data_t lv_anim_get_user_data(lv_anim_t * a)
+{
+    return a->user_data;
+}
+
+static inline lv_anim_user_data_t * lv_anim_get_user_data_ptr(lv_anim_t * a)
+{
+    return &a->user_data;
+}
+
 
 /**
  * Create an animation

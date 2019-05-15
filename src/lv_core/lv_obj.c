@@ -90,7 +90,7 @@ void lv_init(void)
 
     lv_font_init();
 #if LV_USE_ANIMATION
-    lv_anim_init();
+    lv_anim_core_init();
 #endif
 
 #if LV_USE_GROUP
