@@ -27,7 +27,7 @@ extern "C" {
 /*Predefined keys to control the focused object via lv_group_send(group, c)*/
 /*For compatibility in signal function define the keys regardless to `LV_USE_GROUP`*/
 
-typedef enum {
+enum {
     LV_KEY_UP = 17,       /*0x11*/
     LV_KEY_DOWN = 18,     /*0x12*/
     LV_KEY_RIGHT = 19,    /*0x13*/
@@ -40,7 +40,8 @@ typedef enum {
     LV_KEY_PREV=11,       /*0x0B, '*/
     LV_KEY_HOME = 2,      /*0x02, STX*/
     LV_KEY_END = 3,       /*0x03, ETX*/
-} lv_key_t;
+};
+typedef uint8_t lv_key_t;
 
 #if LV_USE_GROUP != 0
 /**********************
