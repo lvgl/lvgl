@@ -53,7 +53,7 @@ static bool anim_list_changed;
 /**
  * Init. the animation module
  */
-void lv_anim_init(void)
+void lv_anim_core_init(void)
 {
     lv_ll_init(&LV_GC_ROOT(_lv_anim_ll), sizeof(lv_anim_t));
     last_task_run = lv_tick_get();
@@ -61,15 +61,30 @@ void lv_anim_init(void)
 }
 
 /**
- * Create an animation
- * @param anim_p an initialized 'anim_t' variable. Not required after call.
+ * Initialize an animation variable.
+ * E.g.:
+ * lv_anim_t a;
+ * lv_anim_init(&a);
+ * lv_anim_set_...(&a);
+ * lv_anim_craete(&a);
+ * @param a pointer to an `lv_anim_t` variable to initialize
  */
-void lv_anim_create(lv_anim_t * anim_p)
+void lv_anim_init(lv_anim_t * a)
+{
+    memset(a, 0, sizeof(lv_anim_t));
+    a->time = 500;
+    a->end = 100;
+}
+/**
+ * Create an animation
+ * @param a an initialized 'anim_t' variable. Not required after call.
+ */
+void lv_anim_create(lv_anim_t * a)
 {
     LV_LOG_TRACE("animation create started")
     /* Do not let two animations for the  same 'var' with the same 'fp'*/
-    if(anim_p->exec_cb != NULL)
-        lv_anim_del(anim_p->var, anim_p->exec_cb); /*fp == NULL would delete all animations of var*/
+    if(a->exec_cb != NULL)
+        lv_anim_del(a->var, a->exec_cb); /*fp == NULL would delete all animations of var*/
 
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = lv_ll_ins_head(&LV_GC_ROOT(_lv_anim_ll));
@@ -77,8 +92,8 @@ void lv_anim_create(lv_anim_t * anim_p)
     if(new_anim == NULL) return;
 
     /*Initialize the animation descriptor*/
-    anim_p->playback_now = 0;
-    memcpy(new_anim, anim_p, sizeof(lv_anim_t));
+    a->playback_now = 0;
+    memcpy(new_anim, a, sizeof(lv_anim_t));
 
     /*Set the start value*/
     if(new_anim->exec_cb != NULL) new_anim->exec_cb(new_anim->var, new_anim->start);
