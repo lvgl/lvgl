@@ -74,7 +74,7 @@ lv_group_t * lv_group_create(void)
     group->refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
     group->wrap           = 1;
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
     memset(&group->user_data, 0, sizeof(lv_group_user_data_t));
 #endif
 
@@ -403,7 +403,7 @@ lv_obj_t * lv_group_get_focused(const lv_group_t * group)
     return *group->obj_focus;
 }
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
 /**
  * Get a pointer to the group's user data
  * @param group pointer to an group

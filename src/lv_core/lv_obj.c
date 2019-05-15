@@ -185,7 +185,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->event_cb = NULL;
 
         /*Init. user date*/
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
         memset(&new_obj->user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
 
@@ -267,7 +267,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 #endif
 
         /*Init. user date*/
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
         memset(&new_obj->user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
 
@@ -306,7 +306,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 #endif
 
         /*Set free data*/
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
         memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
 #endif
         /*Copy realign*/
@@ -1958,7 +1958,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
     }
 }
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
 
 /**
  * Get the object's user data

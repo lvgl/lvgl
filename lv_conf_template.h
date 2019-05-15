@@ -149,7 +149,7 @@ typedef void * lv_group_user_data_t;
 typedef void * lv_img_decoder_user_data_t;
 
 /*1: Add a `user_data` to drivers and objects*/
-#define LV_USE_USER_DATA_SINGLE 1
+#define LV_USE_USER_DATA 1
 
 /*=====================
  *  Compiler settings

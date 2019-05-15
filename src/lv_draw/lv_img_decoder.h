@@ -155,7 +155,7 @@ typedef struct _lv_img_decoder {
     lv_img_decoder_read_line_f_t read_line_cb;
     lv_img_decoder_close_f_t close_cb;
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
     lv_img_decoder_user_data_t user_data;
 #endif
 }lv_img_decoder_t;
@@ -168,7 +168,7 @@ typedef struct _lv_img_decoder_dsc {
     lv_img_src_t src_type;
     lv_img_header_t header;
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
     void * user_data;
 #endif
 }lv_img_decoder_dsc_t;

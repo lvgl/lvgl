@@ -67,7 +67,7 @@ typedef struct _lv_anim_t
     int16_t act_time;        /*Current time in animation. Set to negative to make delay.*/
     uint16_t playback_pause; /*Wait before play back*/
     uint16_t repeat_pause;   /*Wait before repeat*/
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
     lv_anim_user_data_t user_data;  /*Custom user data*/
 #endif
 

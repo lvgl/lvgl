@@ -219,7 +219,7 @@ typedef struct _lv_obj_t
     lv_reailgn_t realign;
 #endif
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
     lv_obj_user_data_t user_data;
 #endif
 
@@ -896,7 +896,7 @@ void * lv_obj_get_ext_attr(const lv_obj_t * obj);
  */
 void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
 /**
  * Get the object's user data
  * @param obj pointer to an object

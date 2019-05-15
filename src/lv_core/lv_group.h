@@ -61,7 +61,7 @@ typedef struct _lv_group_t
     lv_group_style_mod_cb_t style_mod_edit_cb; /*A function which modifies the style of the edited object*/
     lv_group_focus_cb_t focus_cb; /*A function to call when a new object is focused (optional)*/
     lv_style_t style_tmp;         /*Stores the modified style of the focused object */
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
     lv_group_user_data_t user_data;
 #endif
 
@@ -211,7 +211,7 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style);
  */
 lv_obj_t * lv_group_get_focused(const lv_group_t * group);
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
 /**
  * Get a pointer to the group's user data
  * @param group pointer to an group

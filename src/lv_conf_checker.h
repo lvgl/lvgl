@@ -205,8 +205,8 @@
 #endif
 
 /*1: Add a `user_data` to drivers and objects*/
-#ifndef LV_USE_USER_DATA_SINGLE
-#define LV_USE_USER_DATA_SINGLE 1
+#ifndef LV_USE_USER_DATA
+#define LV_USE_USER_DATA 1
 #endif
 
 /*=====================

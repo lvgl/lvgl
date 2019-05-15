@@ -99,7 +99,7 @@ typedef struct _disp_drv_t
                         const lv_area_t * fill_area, lv_color_t color);
 #endif
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
     lv_disp_drv_user_data_t user_data;
 #endif
 
