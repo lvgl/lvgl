@@ -109,6 +109,8 @@ void lv_init(void)
     /*Init the input device handling*/
     lv_indev_init();
 
+    lv_img_decoder_init();
+
     lv_initialized = true;
     LV_LOG_INFO("lv_init ready");
 }
