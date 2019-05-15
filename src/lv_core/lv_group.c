@@ -78,12 +78,6 @@ lv_group_t * lv_group_create(void)
     memset(&group->user_data, 0, sizeof(lv_group_user_data_t));
 #endif
 
-#if LV_USE_USER_DATA_MULTI
-    memset(&group->focus_user_data, 0, sizeof(lv_group_user_data_t));
-    memset(&group->style_mod_user_data, 0, sizeof(lv_group_user_data_t));
-    memset(&group->style_mod_edit_user_data, 0, sizeof(lv_group_user_data_t));
-#endif
-
     /*Initialize style modification callbacks from current theme*/
     refresh_theme(group, lv_theme_get_current());
 

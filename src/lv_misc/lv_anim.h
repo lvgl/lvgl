@@ -71,12 +71,6 @@ typedef struct _lv_anim_t
     lv_anim_user_data_t user_data;  /*Custom user data*/
 #endif
 
-#if LV_USE_USER_DATA_MULTI
-    lv_anim_user_data_t exec_user_data;
-    lv_anim_user_data_t path_user_data;
-    lv_anim_user_data_t ready_user_data;
-#endif
-
     uint8_t playback : 1;    /*When the animation is ready play it back*/
     uint8_t repeat : 1;      /*Repeat the animation infinitely*/
     /*Animation system use these - user shouldn't set*/

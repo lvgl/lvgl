@@ -223,12 +223,6 @@ typedef struct _lv_obj_t
     lv_obj_user_data_t user_data;
 #endif
 
-#if LV_USE_USER_DATA_MULTI
-    lv_obj_user_data_t event_user_data;
-    lv_obj_user_data_t signal_user_data;
-    lv_obj_user_data_t design_user_data;
-#endif
-
 } lv_obj_t;
 
 /*Protect some attributes (max. 8 bit)*/

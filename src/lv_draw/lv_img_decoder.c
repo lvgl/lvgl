@@ -196,6 +196,8 @@ void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc)
 
 static lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
 {
+    (void)decoder;  /*Unused*/
+
     lv_img_src_t src_type = lv_img_src_get_type(src);
     if(src_type == LV_IMG_SRC_VARIABLE) {
         header->w  = ((lv_img_dsc_t *)src)->header.w;

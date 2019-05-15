@@ -151,9 +151,6 @@ typedef void * lv_img_decoder_user_data_t;
 /*1: Add a `user_data` to drivers and objects*/
 #define LV_USE_USER_DATA_SINGLE 1
 
-/*1: Add separate `user_data` for every callback*/
-#define LV_USE_USER_DATA_MULTI  0
-
 /*=====================
  *  Compiler settings
  *====================*/

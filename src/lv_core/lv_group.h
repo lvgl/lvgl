@@ -65,12 +65,6 @@ typedef struct _lv_group_t
     lv_group_user_data_t user_data;
 #endif
 
-#if LV_USE_USER_DATA_MULTI
-    lv_group_user_data_t focus_user_data;
-    lv_group_user_data_t style_mod_user_data;
-    lv_group_user_data_t style_mod_edit_user_data;
-#endif
-
     uint8_t frozen : 1;         /*1: can't focus to new object*/
     uint8_t editing : 1;        /*1: Edit mode, 0: Navigate mode*/
     uint8_t click_focus : 1;    /*1: If an object in a group is clicked by an indev then it will be

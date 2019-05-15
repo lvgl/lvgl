@@ -209,11 +209,6 @@
 #define LV_USE_USER_DATA_SINGLE 1
 #endif
 
-/*1: Add separate `user_data` for every callback*/
-#ifndef LV_USE_USER_DATA_MULTI
-#define LV_USE_USER_DATA_MULTI  0
-#endif
-
 /*=====================
  *  Compiler settings
  *====================*/
