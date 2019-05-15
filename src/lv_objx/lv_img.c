@@ -15,7 +15,7 @@
 #endif
 
 #include "../lv_themes/lv_theme.h"
-#include "../lv_misc/lv_img_decoder.h"
+#include "../lv_draw/lv_img_decoder.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_log.h"

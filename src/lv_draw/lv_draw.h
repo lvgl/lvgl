@@ -21,7 +21,7 @@ extern "C" {
 
 #include "../lv_core/lv_style.h"
 #include "../lv_misc/lv_txt.h"
-#include "../lv_misc/lv_img_decoder.h"
+#include "lv_img_decoder.h"
 
 /*********************
  *      DEFINES

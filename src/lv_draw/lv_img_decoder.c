@@ -8,9 +8,9 @@
  *********************/
 #include "lv_img_decoder.h"
 #include "../lv_draw/lv_draw_img.h"
-#include "lv_ll.h"
-#include "lv_color.h"
-#include "lv_gc.h"
+#include "../lv_misc/lv_ll.h"
+#include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
 #include LV_GC_INCLUDE

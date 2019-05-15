@@ -16,7 +16,6 @@
 #include "../lv_misc/lv_anim.h"
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_fs.h"
-#include "../lv_misc/lv_img_decoder.h"
 #include "../lv_hal/lv_hal.h"
 #include <stdint.h>
 #include <string.h>
