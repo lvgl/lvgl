@@ -360,7 +360,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 #endif
 
         /*Set the same coordinates for non screen objects*/
-        if(lv_obj_get_parent(copy) != NULL) {
+        if(lv_obj_get_parent(copy) != NULL && parent != NULL) {
             lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
         } else {
             lv_obj_set_pos(new_obj, 0, 0);
