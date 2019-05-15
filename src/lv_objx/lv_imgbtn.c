@@ -375,7 +375,7 @@ static void refr_img(lv_obj_t * imgbtn)
 #endif
 
     lv_res_t info_res;
-    info_res = lv_img_dsc_get_info(src, &header);
+    info_res = lv_img_decoder_get_info(src, &header);
     if(info_res == LV_RES_OK) {
         ext->act_cf = header.cf;
 #if LV_IMGBTN_TILED == 0

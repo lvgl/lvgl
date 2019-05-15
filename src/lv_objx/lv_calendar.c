@@ -487,6 +487,8 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
             }
 
             ext->pressed_date.year = 0;
+            ext->pressed_date.month = 0;
+			ext->pressed_date.day   = 0;
         } else if(calculate_touched_day(calendar, &p)) {
             if(ext->btn_pressing != 0) lv_obj_invalidate(calendar);
             ext->btn_pressing = 0;
@@ -494,10 +496,11 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
             if(ext->btn_pressing != 0) lv_obj_invalidate(calendar);
             ext->btn_pressing      = 0;
             ext->pressed_date.year = 0;
+            ext->pressed_date.month = 0;
+			ext->pressed_date.day   = 0;
         }
     } else if(sign == LV_SIGNAL_PRESS_LOST) {
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-        ext->pressed_date.year  = 0;
         ext->btn_pressing       = 0;
         lv_obj_invalidate(calendar);
 
@@ -522,7 +525,6 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
             if(res != LV_RES_OK) return res;
         }
 
-        ext->pressed_date.year = 0;
         ext->btn_pressing      = 0;
         lv_obj_invalidate(calendar);
     } else if(sign == LV_SIGNAL_CONTROL) {

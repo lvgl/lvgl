@@ -44,6 +44,31 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2);
 void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style,
                       lv_opa_t opa_scale)
 {
+    /*Return if the points are out of the mask*/
+    if(points[0].x < mask->x1 &&
+       points[1].x < mask->x1 &&
+       points[2].x < mask->x1) {
+        return;
+    }
+
+    if(points[0].x > mask->x2 &&
+       points[1].x > mask->x2 &&
+       points[2].x > mask->x2) {
+        return;
+    }
+
+    if(points[0].y < mask->y1 &&
+       points[1].y < mask->y1 &&
+       points[2].y < mask->y1) {
+        return;
+    }
+
+    if(points[0].y > mask->y2 &&
+       points[1].y > mask->y2 &&
+       points[2].y > mask->y2) {
+        return;
+    }
+
     lv_point_t tri[3];
 
     memcpy(tri, points, sizeof(tri));

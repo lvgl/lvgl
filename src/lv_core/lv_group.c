@@ -74,14 +74,8 @@ lv_group_t * lv_group_create(void)
     group->refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
     group->wrap           = 1;
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
     memset(&group->user_data, 0, sizeof(lv_group_user_data_t));
-#endif
-
-#if LV_USE_USER_DATA_MULTI
-    memset(&group->focus_user_data, 0, sizeof(lv_group_user_data_t));
-    memset(&group->style_mod_user_data, 0, sizeof(lv_group_user_data_t));
-    memset(&group->style_mod_edit_user_data, 0, sizeof(lv_group_user_data_t));
 #endif
 
     /*Initialize style modification callbacks from current theme*/
@@ -285,7 +279,15 @@ lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c)
     lv_obj_t * act = lv_group_get_focused(group);
     if(act == NULL) return LV_RES_OK;
 
-    return act->signal_cb(act, LV_SIGNAL_CONTROL, &c);
+    lv_res_t res;
+
+    res = act->signal_cb(act, LV_SIGNAL_CONTROL, &c);
+    if(res != LV_RES_OK) return res;
+
+    res = lv_event_send(act, LV_EVENT_KEY, &c);
+    if(res != LV_RES_OK) return res;
+
+    return res;
 }
 
 /**
@@ -401,7 +403,7 @@ lv_obj_t * lv_group_get_focused(const lv_group_t * group)
     return *group->obj_focus;
 }
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
 /**
  * Get a pointer to the group's user data
  * @param group pointer to an group

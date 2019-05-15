@@ -90,7 +90,7 @@ void lv_init(void)
 
     lv_font_init();
 #if LV_USE_ANIMATION
-    lv_anim_init();
+    lv_anim_core_init();
 #endif
 
 #if LV_USE_GROUP
@@ -108,6 +108,8 @@ void lv_init(void)
 
     /*Init the input device handling*/
     lv_indev_init();
+
+    lv_img_decoder_init();
 
     lv_initialized = true;
     LV_LOG_INFO("lv_init ready");
@@ -183,13 +185,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->event_cb = NULL;
 
         /*Init. user date*/
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
         memset(&new_obj->user_data, 0, sizeof(lv_obj_user_data_t));
-#endif
-#if LV_USE_USER_DATA_MULTI
-        memset(&new_obj->event_user_data, 0, sizeof(lv_obj_user_data_t));
-        memset(&new_obj->signal_user_data, 0, sizeof(lv_obj_user_data_t));
-        memset(&new_obj->design_user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
 
 #if LV_USE_GROUP
@@ -270,13 +267,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 #endif
 
         /*Init. user date*/
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
         memset(&new_obj->user_data, 0, sizeof(lv_obj_user_data_t));
-#endif
-#if LV_USE_USER_DATA_MULTI
-        memset(&new_obj->event_user_data, 0, sizeof(lv_obj_user_data_t));
-        memset(&new_obj->signal_user_data, 0, sizeof(lv_obj_user_data_t));
-        memset(&new_obj->design_user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
 
 #if LV_USE_GROUP
@@ -314,15 +306,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 #endif
 
         /*Set free data*/
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
         memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
 #endif
-#if LV_USE_USER_DATA_MULTI
-        memcpy(&new_obj->event_user_data, &copy->event_user_data, sizeof(lv_obj_user_data_t));
-        memcpy(&new_obj->signal_user_data, &copy->signal_user_data, sizeof(lv_obj_user_data_t));
-        memcpy(&new_obj->design_user_data, &copy->design_user_data, sizeof(lv_obj_user_data_t));
-#endif
-
         /*Copy realign*/
 #if LV_USE_OBJ_REALIGN
         new_obj->realign.align        = copy->realign.align;
@@ -359,7 +345,12 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         }
 #endif
 
-        lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
+        /*Set the same coordinates for non screen objects*/
+        if(lv_obj_get_parent(copy) != NULL && parent != NULL) {
+            lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
+        } else {
+            lv_obj_set_pos(new_obj, 0, 0);
+        }
 
         LV_LOG_INFO("Object create ready");
     }
@@ -573,6 +564,9 @@ void lv_obj_move_foreground(lv_obj_t * obj)
 {
     lv_obj_t * parent = lv_obj_get_parent(obj);
 
+    /*Do nothing of already in the foreground*/
+    if(lv_ll_get_head(&parent->child_ll) == obj) return;
+
     lv_obj_invalidate(parent);
 
     lv_ll_chg_list(&parent->child_ll, &parent->child_ll, obj, true);
@@ -590,6 +584,9 @@ void lv_obj_move_foreground(lv_obj_t * obj)
 void lv_obj_move_background(lv_obj_t * obj)
 {
     lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    /*Do nothing of already in the background*/
+    if(lv_ll_get_tail(&parent->child_ll) == obj) return;
 
     lv_obj_invalidate(parent);
 
@@ -1337,8 +1334,6 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
  */
 lv_res_t lv_event_send_func(lv_event_cb_t event_cb, lv_obj_t * obj, lv_event_t event, const void * data)
 {
-    if(event_cb == NULL) return LV_RES_OK;
-
     lv_event_temp_data_t event_temp_data;
     event_temp_data.obj = obj;
     event_temp_data.deleted = false;
@@ -1963,16 +1958,26 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
     }
 }
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
+
+/**
+ * Get the object's user data
+ * @param obj pointer to an object
+ * @return user data
+ */
+lv_obj_user_data_t lv_obj_get_user_data(lv_obj_t * obj)
+{
+    return obj->user_data;
+}
 
 /**
  * Get a pointer to the object's user data
  * @param obj pointer to an object
  * @return pointer to the user data
  */
-lv_obj_user_data_t lv_obj_get_user_data(lv_obj_t * obj)
+lv_obj_user_data_t *lv_obj_get_user_data_ptr(lv_obj_t * obj)
 {
-    return obj->user_data;
+    return &obj->user_data;
 }
 
 /**

@@ -206,10 +206,6 @@ lv_task_t * lv_task_create(void (*task)(lv_task_t *), uint32_t period, lv_task_p
 
     new_lv_task->user_data    = user_data;
 
-#if LV_USE_USER_DATA_MULTI
-    new_lv_task->task_user_data    = NULL;
-#endif
-
     task_created = true;
 
     return new_lv_task;

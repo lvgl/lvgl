@@ -59,10 +59,6 @@ typedef struct _lv_task_t
 
     void * user_data;
 
-#if LV_USE_USER_DATA_MULTI
-    void * task_user_data;
-#endif
-
     uint8_t prio : 3;
     uint8_t once : 1;
 } lv_task_t;

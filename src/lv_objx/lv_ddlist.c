@@ -791,6 +791,7 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
         /*Leave edit mode once a new item is selected*/
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
+            ext->sel_opt_id_ori = ext->sel_opt_id;
             lv_group_t * g = lv_obj_get_group(ddlist);
             if(lv_group_get_editing(g)) {
                 lv_group_set_editing(g, false);
@@ -820,9 +821,8 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
             }
 
             ext->sel_opt_id = new_opt;
+            ext->sel_opt_id_ori = ext->sel_opt_id;
         }
-
-        ext->sel_opt_id_ori = ext->sel_opt_id;
 
         lv_res_t res = lv_event_send(ddlist, LV_EVENT_VALUE_CHANGED, &ext->sel_opt_id);
         if(res != LV_RES_OK) return res;
@@ -883,25 +883,26 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
 
         /*Force animation complete to fix highlight selection*/
         lv_ddlist_anim_finish(ddlist);
-
-
     } else {
-        lv_anim_t a;
-        a.var            = ddlist;
-        a.start          = lv_obj_get_height(ddlist);
-        a.end            = new_height;
-        a.exec_cb         = (lv_anim_exec_cb_t)lv_ddlist_adjust_height;
-        a.path_cb        = lv_anim_path_linear;
-        a.ready_cb       = lv_ddlist_anim_ready_cb;
-        a.act_time       = 0;
-        a.time           = ext->anim_time;
-        a.playback       = 0;
-        a.playback_pause = 0;
-        a.repeat         = 0;
-        a.repeat_pause   = 0;
+        /*Run the animation only if the the size will be different*/
+        if(lv_obj_get_height(ddlist) != new_height) {
+            lv_anim_t a;
+            a.var            = ddlist;
+            a.start          = lv_obj_get_height(ddlist);
+            a.end            = new_height;
+            a.exec_cb         = (lv_anim_exec_cb_t)lv_ddlist_adjust_height;
+            a.path_cb        = lv_anim_path_linear;
+            a.ready_cb       = lv_ddlist_anim_ready_cb;
+            a.act_time       = 0;
+            a.time           = ext->anim_time;
+            a.playback       = 0;
+            a.playback_pause = 0;
+            a.repeat         = 0;
+            a.repeat_pause   = 0;
 
-        ext->force_sel = 1; /*Keep the list item selected*/
-        lv_anim_create(&a);
+            ext->force_sel = 1; /*Keep the list item selected*/
+            lv_anim_create(&a);
+        }
 #endif
     }
 }

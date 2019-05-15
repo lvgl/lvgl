@@ -205,13 +205,8 @@
 #endif
 
 /*1: Add a `user_data` to drivers and objects*/
-#ifndef LV_USE_USER_DATA_SINGLE
-#define LV_USE_USER_DATA_SINGLE 1
-#endif
-
-/*1: Add separate `user_data` for every callback*/
-#ifndef LV_USE_USER_DATA_MULTI
-#define LV_USE_USER_DATA_MULTI  0
+#ifndef LV_USE_USER_DATA
+#define LV_USE_USER_DATA 1
 #endif
 
 /*=====================

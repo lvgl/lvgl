@@ -86,6 +86,11 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_sty
         lv_draw_shadow(coords, mask, style, opa_scale);
     }
 #endif
+
+    /* If the object is out of the mask there is nothing to draw.
+     * Draw shadow before it because the shadow is out of `coords`*/
+    if(lv_area_is_on(coords, mask) == false) return;
+
     if(style->body.opa > LV_OPA_MIN) {
         lv_draw_rect_main_mid(coords, mask, style, opa_scale);
 
@@ -1476,7 +1481,7 @@ static void lv_draw_shadow_full_straight(const lv_area_t * coords, const lv_area
 {
     bool aa           = lv_disp_get_antialiasing(lv_refr_get_disp_refreshing());
     lv_coord_t radius = style->body.radius;
-    lv_coord_t swidth = style->body.shadow.width; // + LV_ANTIALIAS;
+    lv_coord_t swidth = style->body.shadow.width;
     lv_coord_t width  = lv_area_get_width(coords);
     lv_coord_t height = lv_area_get_height(coords);
 

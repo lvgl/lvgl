@@ -631,7 +631,7 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
         style_tmp.body.border.width = 0;
         lv_draw_rect(&page->coords, mask, &style_tmp, lv_obj_get_opa_scale(page));
 
-    } else if(mode == LV_DESIGN_DRAW_POST) { /*Draw the scroll bars finally*/
+    } else if(mode == LV_DESIGN_DRAW_POST) {
         /*Draw only a border*/
         style_tmp.body.shadow.width = 0;
         style_tmp.body.opa          = LV_OPA_TRANSP;

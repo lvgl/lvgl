@@ -510,11 +510,19 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         i->proc.types.keypad.last_state = LV_INDEV_STATE_REL; /*To skip the processing of release*/
     }
 
+    /* Save the last keys before anything else.
+     * They need to be already saved if the the function returns for any reason*/
+    lv_indev_state_t last_state = i->proc.types.keypad.last_state;
+    i->proc.types.keypad.last_state = data->state;
+    i->proc.types.keypad.last_key   = data->key;
+
     lv_group_t * g = i->group;
     if(g == NULL) return;
 
     lv_obj_t * focused = lv_group_get_focused(g);
     if(focused == NULL) return;
+
+
 
     /*Process the steps first. They are valid only with released button*/
     if(data->state == LV_INDEV_STATE_REL) {
@@ -543,7 +551,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     if(focused == NULL) return;
 
     /*Button press happened*/
-    if(data->state == LV_INDEV_STATE_PR && i->proc.types.keypad.last_state == LV_INDEV_STATE_REL) {
+    if(data->state == LV_INDEV_STATE_PR && last_state == LV_INDEV_STATE_REL) {
         bool editable = false;
         focused->signal_cb(focused, LV_SIGNAL_GET_EDITABLE, &editable);
 
@@ -558,7 +566,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PR &&
-            i->proc.types.keypad.last_state == LV_INDEV_STATE_PR) {
+            last_state == LV_INDEV_STATE_PR) {
         if(i->proc.long_pr_sent == 0 &&
            lv_tick_elaps(i->proc.pr_timestamp) > i->driver.long_press_time) {
             bool editable = false;
@@ -585,7 +593,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     /*Release happened*/
     else if(data->state == LV_INDEV_STATE_REL &&
-            i->proc.types.keypad.last_state == LV_INDEV_STATE_PR) {
+            last_state == LV_INDEV_STATE_PR) {
 
         bool editable = false;
         focused->signal_cb(focused, LV_SIGNAL_GET_EDITABLE, &editable);
@@ -633,8 +641,6 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         i->proc.long_pr_sent = 0;
     }
 
-    i->proc.types.keypad.last_state = data->state;
-    i->proc.types.keypad.last_key   = data->key;
 #else
     (void)data; /*Unused*/
     (void)i;    /*Unused*/
@@ -732,7 +738,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             lv_obj_t * i        = proc->types.pointer.act_obj;
             lv_obj_t * last_top = NULL;
             while(i != NULL) {
-                if(i->top != 0) last_top = i;
+                if(i->top) last_top = i;
                 i = lv_obj_get_parent(i);
             }
 
@@ -870,15 +876,13 @@ static void indev_proc_release(lv_indev_proc_t * proc)
 
         if(proc->reset_query != 0) return;
 
-            /*Handle click focus*/
+        /*Handle click focus*/
 #if LV_USE_GROUP
-        /*Edit mode is not used by POINTER devices. So leave edit mode if we are in it*/
         lv_group_t * g = lv_obj_get_group(proc->types.pointer.act_obj);
-        if(lv_group_get_editing(g)) lv_group_set_editing(g, false);
 
         /*Check, if the parent is in a group focus on it.*/
-        if(lv_obj_is_protected(proc->types.pointer.act_obj, LV_PROTECT_CLICK_FOCUS) ==
-           false) { /*Respect the click focus protection*/
+        /*Respect the click focus protection*/
+        if(lv_obj_is_protected(proc->types.pointer.act_obj, LV_PROTECT_CLICK_FOCUS) == false) {
             lv_obj_t * parent = proc->types.pointer.act_obj;
 
             while(g == NULL) {

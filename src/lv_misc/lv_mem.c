@@ -126,7 +126,9 @@ void * lv_mem_alloc(uint32_t size)
 #endif
     void * alloc = NULL;
 
-#if LV_MEM_CUSTOM == 0 /*Use the allocation from dyn_mem*/
+
+#if LV_MEM_CUSTOM == 0
+    /*Use the built-in allocators*/
     lv_mem_ent_t * e = NULL;
 
     // Search for a appropriate entry
@@ -141,7 +143,8 @@ void * lv_mem_alloc(uint32_t size)
         // End if there is not next entry OR the alloc. is successful
     } while(e != NULL && alloc == NULL);
 
-#else                 /*Use custom, user defined malloc function*/
+#else
+/*Use custom, user defined malloc function*/
 #if LV_ENABLE_GC == 1 /*gc must not include header*/
     alloc = LV_MEM_CUSTOM_ALLOC(size);
 #else                 /* LV_ENABLE_GC */
@@ -150,6 +153,7 @@ void * lv_mem_alloc(uint32_t size)
     if(alloc != NULL) {
         ((lv_mem_ent_t *)alloc)->header.s.d_size = size;
         ((lv_mem_ent_t *)alloc)->header.s.used   = 1;
+
         alloc                                    = &((lv_mem_ent_t *)alloc)->first_data;
     }
 #endif                /* LV_ENABLE_GC */
