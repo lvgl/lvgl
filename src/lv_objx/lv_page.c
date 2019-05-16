@@ -1124,15 +1124,16 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         return;
     }
 
-    /*Horizontal scrollbar*/
+    /*Full sized horizontal scrollbar*/
     if(scrl_w <=
-       obj_w - style->body.padding.left - style->body.padding.right) { /*Full sized scroll bar*/
+       obj_w - style->body.padding.left - style->body.padding.right) {
         lv_area_set_width(&ext->sb.hor_area, obj_w - 2 * sb_hor_pad);
         lv_area_set_pos(&ext->sb.hor_area, sb_hor_pad,
-                        obj_h - ext->sb.style->body.padding.inner -
-                            ext->sb.style->body.padding.bottom);
+                        obj_h - ext->sb.style->body.padding.inner - ext->sb.style->body.padding.bottom);
         if(ext->sb.mode == LV_SB_MODE_AUTO || ext->sb.mode == LV_SB_MODE_DRAG) ext->sb.hor_draw = 0;
-    } else {
+    }
+    /*Smaller horizontal scrollbar*/
+    else {
         size_tmp = (obj_w * (obj_w - (2 * sb_hor_pad))) /
                    (scrl_w + style->body.padding.left + style->body.padding.right);
         if(size_tmp < LV_PAGE_SB_MIN_SIZE) size_tmp = LV_PAGE_SB_MIN_SIZE;
@@ -1149,16 +1150,16 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         if(ext->sb.mode == LV_SB_MODE_AUTO || ext->sb.mode == LV_SB_MODE_DRAG) ext->sb.hor_draw = 1;
     }
 
-    /*Vertical scrollbar*/
-    if(scrl_h <=
-       obj_h - style->body.padding.top - style->body.padding.bottom) { /*Full sized scroll bar*/
+    /*Full sized vertical scroll bar*/
+    if(scrl_h <= obj_h - style->body.padding.top - style->body.padding.bottom) {
         lv_area_set_height(&ext->sb.ver_area, obj_h - 2 * sb_ver_pad);
         lv_area_set_pos(&ext->sb.ver_area,
-                        obj_w - ext->sb.style->body.padding.inner -
-                            ext->sb.style->body.padding.right,
+                        obj_w - ext->sb.style->body.padding.inner - ext->sb.style->body.padding.right,
                         sb_ver_pad);
         if(ext->sb.mode == LV_SB_MODE_AUTO || ext->sb.mode == LV_SB_MODE_DRAG) ext->sb.ver_draw = 0;
-    } else {
+    }
+    /*Smaller vertical scroll bar*/
+    else {
         size_tmp = (obj_h * (obj_h - (2 * sb_ver_pad))) /
                    (scrl_h + style->body.padding.top + style->body.padding.bottom);
         if(size_tmp < LV_PAGE_SB_MIN_SIZE) size_tmp = LV_PAGE_SB_MIN_SIZE;
@@ -1166,7 +1167,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
 
         lv_area_set_pos(
             &ext->sb.ver_area,
-            obj_w - ext->sb.style->body.padding.inner - ext->sb.style->body.padding.bottom,
+            obj_w - ext->sb.style->body.padding.inner - ext->sb.style->body.padding.right,
             sb_ver_pad +
                 (-(lv_obj_get_y(scrl) - ext->sb.style->body.padding.bottom) *
                  (obj_h - size_tmp - 2 * sb_ver_pad)) /
