@@ -281,7 +281,7 @@ static bool lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * mask, lv_desig
 
         src = ext->img_src_left[state];
         if(src) {
-            lv_img_dsc_get_info(src, &header);
+            lv_img_decoder_get_info(src, &header);
             left_w = header.w;
             coords.x1 = imgbtn->coords.x1;
             coords.y1 = imgbtn->coords.y1;
@@ -292,7 +292,7 @@ static bool lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * mask, lv_desig
 
         src = ext->img_src_right[state];
         if(src) {
-            lv_img_dsc_get_info(src, &header);
+            lv_img_decoder_get_info(src, &header);
             right_w = header.w;
             coords.x1 = imgbtn->coords.x2 - header.w + 1;
             coords.y1 = imgbtn->coords.y1;
@@ -305,7 +305,7 @@ static bool lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * mask, lv_desig
         if(src) {
             lv_coord_t obj_w = lv_obj_get_width(imgbtn);
             lv_coord_t i;
-            lv_img_dsc_get_info(src, &header);
+            lv_img_decoder_get_info(src, &header);
 
             coords.x1 = imgbtn->coords.x1 + left_w;
             coords.y1 = imgbtn->coords.y1;
