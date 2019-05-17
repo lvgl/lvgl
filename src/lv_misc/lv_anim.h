@@ -274,7 +274,7 @@ bool lv_anim_del(void * var, lv_anim_exec_cb_t exec_cb);
  *           or NULL to ignore it and delete all the animations of 'var
  * @return true: at least 1 animation is deleted, false: no animation is deleted
  */
-static inline bool lv_anim_del_custom(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
+static inline bool lv_anim_custom_del(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 {
     return lv_anim_del(a->var, (lv_anim_exec_cb_t)exec_cb);
 }
