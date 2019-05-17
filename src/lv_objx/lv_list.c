@@ -582,8 +582,8 @@ const lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type
 
     switch(type) {
         case LV_LIST_STYLE_BG: style = lv_page_get_style(list, LV_PAGE_STYLE_BG); break;
-        case LV_LIST_STYLE_SCRL: style = lv_page_get_style(list, LV_PAGE_STYLE_SB); break;
-        case LV_LIST_STYLE_SB: style = lv_page_get_style(list, LV_PAGE_STYLE_SCRL); break;
+        case LV_LIST_STYLE_SCRL: style = lv_page_get_style(list, LV_PAGE_STYLE_SCRL); break;
+        case LV_LIST_STYLE_SB: style = lv_page_get_style(list, LV_PAGE_STYLE_SB); break;
         case LV_LIST_STYLE_EDGE_FLASH:
             style = lv_page_get_style(list, LV_PAGE_STYLE_EDGE_FLASH);
             break;
