@@ -417,27 +417,29 @@ static lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder,  l
 
     lv_res_t res = LV_RES_INV;
 
-    if(dsc->src_type == LV_IMG_SRC_FILE) {
-        if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR ||
-                dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
-                dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
-        {
+    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR ||
+            dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
+            dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
+    {
+        /* For TRUE_COLOE images read line required only for files.
+         * For variables the image data was returned in `open`*/
+        if(dsc->src_type == LV_IMG_SRC_FILE) {
             res = lv_img_decoder_built_in_line_true_color(dsc, x, y, len, buf);
-        } else if(dsc->header.cf == LV_IMG_CF_ALPHA_1BIT ||
-                  dsc->header.cf == LV_IMG_CF_ALPHA_2BIT ||
-                  dsc->header.cf == LV_IMG_CF_ALPHA_4BIT ||
-                  dsc->header.cf == LV_IMG_CF_ALPHA_8BIT) {
-
-            res = lv_img_decoder_built_in_line_alpha(dsc, x, y, len, buf);
-        } else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT ||
-                dsc->header.cf == LV_IMG_CF_INDEXED_2BIT ||
-                dsc->header.cf == LV_IMG_CF_INDEXED_4BIT ||
-                dsc->header.cf == LV_IMG_CF_INDEXED_8BIT) {
-            res = lv_img_decoder_built_in_line_indexed(dsc, x, y, len, buf);
-        } else {
-            LV_LOG_WARN("Built-in image decoder read not supports the color format");
-            return false;
         }
+    } else if(dsc->header.cf == LV_IMG_CF_ALPHA_1BIT ||
+              dsc->header.cf == LV_IMG_CF_ALPHA_2BIT ||
+              dsc->header.cf == LV_IMG_CF_ALPHA_4BIT ||
+              dsc->header.cf == LV_IMG_CF_ALPHA_8BIT) {
+
+        res = lv_img_decoder_built_in_line_alpha(dsc, x, y, len, buf);
+    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT ||
+            dsc->header.cf == LV_IMG_CF_INDEXED_2BIT ||
+            dsc->header.cf == LV_IMG_CF_INDEXED_4BIT ||
+            dsc->header.cf == LV_IMG_CF_INDEXED_8BIT) {
+        res = lv_img_decoder_built_in_line_indexed(dsc, x, y, len, buf);
+    } else {
+        LV_LOG_WARN("Built-in image decoder read not supports the color format");
+        return false;
     }
 
     return res;
