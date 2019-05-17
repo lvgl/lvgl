@@ -50,18 +50,6 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
 lv_img_src_t lv_img_src_get_type(const void * src);
 
 /**
- * Set custom decoder functions. See the typdefs of the function typed above for more info about
- * them
- * @param info_fp info get function
- * @param open_fp open function
- * @param read_fp read line function
- * @param close_fp clode function
- */
-void lv_img_decoder_set_custom(lv_img_decoder_info_f_t info_fp, lv_img_decoder_open_f_t open_fp,
-                               lv_img_decoder_read_line_f_t read_fp,
-                               lv_img_decoder_close_f_t close_fp);
-
-/**
  * Get the color of an image's pixel
  * @param dsc an image descriptor
  * @param x x coordinate of the point to get
