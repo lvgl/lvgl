@@ -49,7 +49,7 @@ static bool task_created;
 /**
  * Init the lv_task module
  */
-void lv_task_init(void)
+void lv_task_core_init(void)
 {
     lv_ll_init(&LV_GC_ROOT(_lv_task_ll), sizeof(lv_task_t));
 
@@ -209,6 +209,16 @@ lv_task_t * lv_task_create(void (*task)(lv_task_t *), uint32_t period, lv_task_p
     task_created = true;
 
     return new_lv_task;
+}
+
+/**
+ * Set the callback the task (the function to call periodically)
+ * @param task pointer to a task
+ * @param task_cb teh function to call periodically
+ */
+void lv_task_set_cb(lv_task_t * task, lv_task_cb_t task_cb)
+{
+    task->task_cb = task_cb;
 }
 
 /**

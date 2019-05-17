@@ -34,6 +34,14 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+struct _lv_task_t;
+
+/**
+ * Tasks execte this type type of functions.
+ */
+typedef void (*lv_task_cb_t)(struct _lv_task_t *);
+
 /**
  * Possible priorities for lv_tasks
  */
@@ -55,7 +63,7 @@ typedef struct _lv_task_t
 {
     uint32_t period;
     uint32_t last_run;
-    void (*task_cb)(struct _lv_task_t *);
+    lv_task_cb_t task_cb;
 
     void * user_data;
 
@@ -70,7 +78,7 @@ typedef struct _lv_task_t
 /**
  * Init the lv_task module
  */
-void lv_task_init(void);
+void lv_task_core_init(void);
 
 /**
  * Call it  periodically to handle lv_tasks.
@@ -85,13 +93,20 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void);
  * @param user_data custom parameter
  * @return pointer to the new task_cb
  */
-lv_task_t * lv_task_create(void (*task)(lv_task_t *), uint32_t period, lv_task_prio_t prio, void *  user_data);
+lv_task_t * lv_task_create(lv_task_cb_t task_cb, uint32_t period, lv_task_prio_t prio, void *  user_data);
 
 /**
  * Delete a lv_task
  * @param lv_task_p pointer to task_cb created by lv_task_p
  */
 void lv_task_del(lv_task_t * lv_task_p);
+
+/**
+ * Set the callback the task (the function to call periodically)
+ * @param task pointer to a task
+ * @param taack_cb teh function to call periodically
+ */
+void lv_task_set_cb(lv_task_t * task, lv_task_cb_t taack_cb);
 
 /**
  * Set new priority for a lv_task

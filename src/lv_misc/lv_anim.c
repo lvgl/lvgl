@@ -106,10 +106,10 @@ void lv_anim_create(lv_anim_t * a)
 }
 
 /**
- * Delete an animation for a variable with a given animator function
+ * Delete an animation of a variable with a given animator function
  * @param var pointer to variable
- * @param fp a function pointer which is animating 'var',
- *           or NULL to delete all animations of 'var'
+ * @param exec_cb a function pointer which is animating 'var',
+ *           or NULL to delete all the animations of 'var'
  * @return true: at least 1 animation is deleted, false: no animation is deleted
  */
 bool lv_anim_del(void * var, lv_anim_exec_cb_t exec_cb)
