@@ -24,7 +24,9 @@
  *      TYPEDEFS
  **********************/
 typedef struct {
+#if LV_USE_FILESYSTEM
     lv_fs_file_t * f;
+#endif
     lv_color_t * palette;
 }lv_img_decoder_built_in_data_t;
 
@@ -92,7 +94,7 @@ lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header)
 {
     header->always_zero = 0;
 
-    lv_res_t res;
+    lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
     LV_LL_READ(LV_GC_ROOT(_lv_img_defoder_ll), d) {
         res = LV_RES_INV;
@@ -315,7 +317,7 @@ static const uint8_t * lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, 
         memcpy(user_data->f, &f, sizeof(f));
 
 #else
-        LV_LOG_WARN("Image built-in decoder can read file because LV_USE_FILESYSTEM = 0");
+        LV_LOG_WARN("Image built-in decoder cannot read file because LV_USE_FILESYSTEM = 0");
         return LV_IMG_DECODER_OPEN_FAIL;
 #endif
     }
@@ -355,7 +357,9 @@ static const uint8_t * lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, 
         user_data->palette = lv_mem_alloc(sizeof(palette_size * sizeof(lv_color_t)));
         if(user_data->palette == NULL) {
             LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
+#if LV_USE_FILESYSTEM
             lv_mem_assert(user_data->f);
+#endif
         }
 #if LV_USE_FILESYSTEM
         lv_color32_t palette_tmp[256];
@@ -451,7 +455,9 @@ static void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_dec
 
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
     if(user_data) {
+#if LV_USE_FILESYSTEM
         if(user_data->f) lv_mem_free(user_data->f);
+#endif
         if(user_data->palette) lv_mem_free(user_data->palette);
 
         lv_mem_free(user_data);
@@ -464,6 +470,7 @@ static void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_dec
 static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * dsc,
                                                         lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
+#if LV_USE_FILESYSTEM
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
     lv_fs_res_t res;
     uint8_t px_size = lv_img_color_format_get_px_size(dsc->header.cf);
@@ -484,6 +491,10 @@ static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * d
     }
 
     return LV_RES_OK;
+#else
+    LV_LOG_WARN("Image built-in decoder cannot read file because LV_USE_FILESYSTEM = 0");
+    return LV_RES_INV;
+#endif
 }
 
 static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_coord_t len,
