@@ -371,6 +371,9 @@ void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
 
     /*If `n_act` was moved before NULL then it become the new tail*/
     if(n_after == NULL) ll_p->tail = n_act;
+
+    /*If `n_act` was moved before `NULL` then it's the new head*/
+    if(n_before == NULL) ll_p->head = n_act;
 }
 
 /**

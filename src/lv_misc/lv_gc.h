@@ -37,6 +37,7 @@ extern "C" {
     prefix lv_ll_t _lv_file_ll;                                                                    \
     prefix lv_ll_t _lv_anim_ll;                                                                    \
     prefix lv_ll_t _lv_group_ll;                                                                   \
+    prefix lv_ll_t _lv_img_defoder_ll;                                                             \
     prefix void * _lv_task_act;
 
 #define LV_NO_PREFIX

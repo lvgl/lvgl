@@ -82,7 +82,7 @@ void lv_init(void)
 
     /*Initialize the lv_misc modules*/
     lv_mem_init();
-    lv_task_init();
+    lv_task_core_init();
 
 #if LV_USE_FILESYSTEM
     lv_fs_init();
@@ -90,7 +90,7 @@ void lv_init(void)
 
     lv_font_init();
 #if LV_USE_ANIMATION
-    lv_anim_init();
+    lv_anim_core_init();
 #endif
 
 #if LV_USE_GROUP
@@ -108,6 +108,8 @@ void lv_init(void)
 
     /*Init the input device handling*/
     lv_indev_init();
+
+    lv_img_decoder_init();
 
     lv_initialized = true;
     LV_LOG_INFO("lv_init ready");
@@ -183,13 +185,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->event_cb = NULL;
 
         /*Init. user date*/
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
         memset(&new_obj->user_data, 0, sizeof(lv_obj_user_data_t));
-#endif
-#if LV_USE_USER_DATA_MULTI
-        memset(&new_obj->event_user_data, 0, sizeof(lv_obj_user_data_t));
-        memset(&new_obj->signal_user_data, 0, sizeof(lv_obj_user_data_t));
-        memset(&new_obj->design_user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
 
 #if LV_USE_GROUP
@@ -271,13 +268,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 #endif
 
         /*Init. user date*/
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
         memset(&new_obj->user_data, 0, sizeof(lv_obj_user_data_t));
-#endif
-#if LV_USE_USER_DATA_MULTI
-        memset(&new_obj->event_user_data, 0, sizeof(lv_obj_user_data_t));
-        memset(&new_obj->signal_user_data, 0, sizeof(lv_obj_user_data_t));
-        memset(&new_obj->design_user_data, 0, sizeof(lv_obj_user_data_t));
 #endif
 
 #if LV_USE_GROUP
@@ -315,15 +307,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 #endif
 
         /*Set free data*/
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
         memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
 #endif
-#if LV_USE_USER_DATA_MULTI
-        memcpy(&new_obj->event_user_data, &copy->event_user_data, sizeof(lv_obj_user_data_t));
-        memcpy(&new_obj->signal_user_data, &copy->signal_user_data, sizeof(lv_obj_user_data_t));
-        memcpy(&new_obj->design_user_data, &copy->design_user_data, sizeof(lv_obj_user_data_t));
-#endif
-
         /*Copy realign*/
 #if LV_USE_OBJ_REALIGN
         new_obj->realign.align        = copy->realign.align;
@@ -360,7 +346,12 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         }
 #endif
 
-        lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
+        /*Set the same coordinates for non screen objects*/
+        if(lv_obj_get_parent(copy) != NULL && parent != NULL) {
+            lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
+        } else {
+            lv_obj_set_pos(new_obj, 0, 0);
+        }
 
         LV_LOG_INFO("Object create ready");
     }
@@ -1984,7 +1975,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
     }
 }
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
 
 /**
  * Get the object's user data

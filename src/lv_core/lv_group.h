@@ -25,19 +25,23 @@ extern "C" {
  *      DEFINES
  *********************/
 /*Predefined keys to control the focused object via lv_group_send(group, c)*/
-/*For compatibility in signal function define the keys regardless to LV_GROUP*/
-#define LV_KEY_UP 17       /*0x11*/
-#define LV_KEY_DOWN 18     /*0x12*/
-#define LV_KEY_RIGHT 19    /*0x13*/
-#define LV_KEY_LEFT 20     /*0x14*/
-#define LV_KEY_ESC 27      /*0x1B*/
-#define LV_KEY_DEL 127     /*0x7F*/
-#define LV_KEY_BACKSPACE 8 /*0x08*/
-#define LV_KEY_ENTER 10    /*0x0A, '\n'*/
-#define LV_KEY_NEXT 9      /*0x09, '\t'*/
-#define LV_KEY_PREV 11     /*0x0B, '*/
-#define LV_KEY_HOME 2      /*0x02, STX*/
-#define LV_KEY_END 3       /*0x03, ETX*/
+/*For compatibility in signal function define the keys regardless to `LV_USE_GROUP`*/
+
+enum {
+    LV_KEY_UP = 17,       /*0x11*/
+    LV_KEY_DOWN = 18,     /*0x12*/
+    LV_KEY_RIGHT = 19,    /*0x13*/
+    LV_KEY_LEFT = 20,     /*0x14*/
+    LV_KEY_ESC = 27,      /*0x1B*/
+    LV_KEY_DEL = 127,     /*0x7F*/
+    LV_KEY_BACKSPACE = 8, /*0x08*/
+    LV_KEY_ENTER = 10,    /*0x0A, '\n'*/
+    LV_KEY_NEXT = 9,      /*0x09, '\t'*/
+    LV_KEY_PREV=11,       /*0x0B, '*/
+    LV_KEY_HOME = 2,      /*0x02, STX*/
+    LV_KEY_END = 3,       /*0x03, ETX*/
+};
+typedef uint8_t lv_key_t;
 
 #if LV_USE_GROUP != 0
 /**********************
@@ -57,14 +61,8 @@ typedef struct _lv_group_t
     lv_group_style_mod_cb_t style_mod_edit_cb; /*A function which modifies the style of the edited object*/
     lv_group_focus_cb_t focus_cb; /*A function to call when a new object is focused (optional)*/
     lv_style_t style_tmp;         /*Stores the modified style of the focused object */
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
     lv_group_user_data_t user_data;
-#endif
-
-#if LV_USE_USER_DATA_MULTI
-    lv_group_user_data_t focus_user_data;
-    lv_group_user_data_t style_mod_user_data;
-    lv_group_user_data_t style_mod_edit_user_data;
 #endif
 
     uint8_t frozen : 1;         /*1: can't focus to new object*/
@@ -213,7 +211,7 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style);
  */
 lv_obj_t * lv_group_get_focused(const lv_group_t * group);
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
 /**
  * Get a pointer to the group's user data
  * @param group pointer to an group

@@ -22,6 +22,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 #include "lv_style.h"
+#include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_ll.h"
@@ -65,13 +66,6 @@ typedef bool (*lv_design_cb_t)(struct _lv_obj_t * obj, const lv_area_t * mask_p,
                                lv_design_mode_t mode);
 
 enum {
-    LV_RES_INV = 0, /*Typically indicates that the object is deleted (become invalid) in the action
-                       function or an operation was failed*/
-    LV_RES_OK,      /*The object is valid (no deleted) after the action*/
-};
-typedef uint8_t lv_res_t;
-
-enum {
     LV_EVENT_PRESSED,       /*The object has been pressed*/
     LV_EVENT_PRESSING,      /*The object is being pressed (called continuously while pressing)*/
     LV_EVENT_PRESS_LOST,    /*Still pressing but slid from the objects*/
@@ -84,6 +78,7 @@ enum {
     LV_EVENT_DRAG_BEGIN,
     LV_EVENT_DRAG_END,
     LV_EVENT_DRAG_THROW_BEGIN,
+    LV_EVENT_KEY,
     LV_EVENT_FOCUSED,
     LV_EVENT_DEFOCUSED,
     LV_EVENT_VALUE_CHANGED,
@@ -224,14 +219,8 @@ typedef struct _lv_obj_t
     lv_reailgn_t realign;
 #endif
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
     lv_obj_user_data_t user_data;
-#endif
-
-#if LV_USE_USER_DATA_MULTI
-    lv_obj_user_data_t event_user_data;
-    lv_obj_user_data_t signal_user_data;
-    lv_obj_user_data_t design_user_data;
 #endif
 
 } lv_obj_t;
@@ -913,7 +902,7 @@ void * lv_obj_get_ext_attr(const lv_obj_t * obj);
  */
 void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
 /**
  * Get the object's user data
  * @param obj pointer to an object
