@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_img.h"
+#include "lv_log.h"
 
 /*********************
  *      DEFINES
