@@ -112,7 +112,7 @@ void lv_anim_create(lv_anim_t * a)
  *           or NULL to delete all animations of 'var'
  * @return true: at least 1 animation is deleted, false: no animation is deleted
  */
-bool lv_anim_del(void * var, lv_anim_exec_cb_t fp)
+bool lv_anim_del(void * var, lv_anim_exec_cb_t exec_cb)
 {
     lv_anim_t * a;
     lv_anim_t * a_next;
@@ -122,7 +122,7 @@ bool lv_anim_del(void * var, lv_anim_exec_cb_t fp)
         /*'a' might be deleted, so get the next object while 'a' is valid*/
         a_next = lv_ll_get_next(&LV_GC_ROOT(_lv_anim_ll), a);
 
-        if(a->var == var && (a->exec_cb == fp || fp == NULL)) {
+        if(a->var == var && (a->exec_cb == exec_cb || exec_cb == NULL)) {
             lv_ll_rem(&LV_GC_ROOT(_lv_anim_ll), a);
             lv_mem_free(a);
             anim_list_changed = true; /*Read by `anim_task`. It need to know if a delete occurred in

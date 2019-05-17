@@ -255,13 +255,29 @@ static inline lv_anim_user_data_t * lv_anim_get_user_data_ptr(lv_anim_t * a)
 void lv_anim_create(lv_anim_t * a);
 
 /**
- * Delete an animation for a variable with a given animatior function
+ * Delete an animation of a variable with a given animator function
  * @param var pointer to variable
- * @param fp a function pointer which is animating 'var',
- *           or NULL to ignore it and delete all animation with 'var
+ * @param exec_cb a function pointer which is animating 'var',
+ *           or NULL to ignore it and delete all the animations of 'var
  * @return true: at least 1 animation is deleted, false: no animation is deleted
  */
-bool lv_anim_del(void * var, lv_anim_exec_cb_t fp);
+bool lv_anim_del(void * var, lv_anim_exec_cb_t exec_cb);
+
+/**
+ * Delete an aniamation by getting the animated variable from `a`.
+ * Only animations with `exec_cb` will be deleted.
+ * This function exist becasue it's logical that all anim functions receives an
+ * `lv_anim_t` as their first parameter. It's not practical in C but might makes
+ * the API more conequent and makes easier to genrate bindings.
+ * @param a pointer to an animation.
+ * @param exec_cb a function pointer which is animating 'var',
+ *           or NULL to ignore it and delete all the animations of 'var
+ * @return true: at least 1 animation is deleted, false: no animation is deleted
+ */
+static inline bool lv_anim_del_custom(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
+{
+    return lv_anim_del(a->var, (lv_anim_exec_cb_t)exec_cb);
+}
 
 /**
  * Get the number of currently running animations
