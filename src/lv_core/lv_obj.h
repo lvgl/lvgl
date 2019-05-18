@@ -941,6 +941,20 @@ bool lv_obj_is_focused(const lv_obj_t * obj);
  *      MACROS
  **********************/
 
+/**
+ * Helps to quickly declare an event callback function.
+ * Will be expanded to: `void <name> (lv_obj_t * obj, lv_event_t e)`
+ *
+ * Examples:
+ * static LV_EVENT_CB_DECLARE(my_event1);  //Protoype declaration
+ *
+ * static LV_EVENT_CB_DECLARE(my_event1)
+ * {
+ *   if(e == LV_EVENT_CLICKED) {
+ *      lv_obj_set_hidden(obj ,true);
+ *   }
+ * }
+ */
 #define LV_EVENT_CB_DECLARE(name) void name(lv_obj_t * obj, lv_event_t e)
 
 #ifdef __cplusplus
