@@ -203,6 +203,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale_en = 0;
         new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->parent_event = 0;
+        new_obj->reserved     = 0;
 
         new_obj->ext_attr = NULL;
 
@@ -1557,6 +1558,22 @@ uint16_t lv_obj_count_children(const lv_obj_t * obj)
     uint16_t cnt = 0;
 
     LV_LL_READ(obj->child_ll, i) cnt++;
+
+    return cnt;
+}
+
+/** Recursively count the children of an object
+ * @param obj pointer to an object
+ * @return children number of 'obj'
+ */
+uint16_t lv_obj_count_children_recursive(const lv_obj_t * obj){
+    lv_obj_t * i;
+    uint16_t cnt = 0;
+
+    LV_LL_READ(obj->child_ll, i) {
+        cnt++; // Count the child
+        cnt += lv_obj_count_children_recursive(i); // recursively count children's children
+    }
 
     return cnt;
 }
