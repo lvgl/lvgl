@@ -22,7 +22,7 @@
  *      DEFINES
  *********************/
 #if LV_USE_ANIMATION
-#ifndef LV_DDLIST_ANIM_TIME
+#ifndef LV_DDLIST_DEF_ANIM_TIME
 #define LV_DDLIST_DEF_ANIM_TIME 200 /*ms*/
 #endif
 #else
