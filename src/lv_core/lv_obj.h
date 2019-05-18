@@ -661,6 +661,12 @@ lv_obj_t * lv_obj_get_child_back(const lv_obj_t * obj, const lv_obj_t * child);
  */
 uint16_t lv_obj_count_children(const lv_obj_t * obj);
 
+/** Recursively count the children of an object
+ * @param obj pointer to an object
+ * @return children number of 'obj'
+ */
+uint16_t lv_obj_count_children_recursive(const lv_obj_t * obj);
+
 /*---------------------
  * Coordinate get
  *--------------------*/
