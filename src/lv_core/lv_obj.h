@@ -941,6 +941,8 @@ bool lv_obj_is_focused(const lv_obj_t * obj);
  *      MACROS
  **********************/
 
+#define LV_EVENT_CB_DECLARE(name) void name(lv_obj_t * obj, lv_event_t e)
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
