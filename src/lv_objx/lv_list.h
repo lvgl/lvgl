@@ -132,9 +132,10 @@ void lv_list_set_single_mode(lv_obj_t * list, bool mode);
 #if LV_USE_GROUP
 
 /**
- * Make a button selected. Can be used while navigating in the list with a keypad.
+ * Make a button selected
  * @param list pointer to a list object
  * @param btn pointer to a button to select
+ *            NULL to not select any buttons
  */
 void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn);
 #endif
