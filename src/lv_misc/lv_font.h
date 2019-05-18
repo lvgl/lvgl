@@ -42,14 +42,6 @@ extern "C" {
  * General types
  *-----------------*/
 
-/*One element of a kerning table*/
-typedef struct {
-    uint32_t next_unicode    :23;
-
-    uint32_t space           :8;       /*5 integer,  4 fractional*/
-    uint32_t space_sign      :1;       /*0: space positive; 1: space negative*/
-}lv_font_kern_t;
-
 /*Describe the properties of a glyph*/
 typedef struct
 {
@@ -59,7 +51,6 @@ typedef struct
     int8_t ofs_x;   /*x offset of the bounding box*/
     int8_t ofs_y;  /*y offset of the bounding box*/
     uint8_t bpp;   /*Bit-per-pixel: 1, 2, 4, 8*/
-    const lv_font_kern_t * kern_table;
 }lv_font_glyph_dsc_t;
 
 /*Describe the properties of a font*/
@@ -98,7 +89,6 @@ typedef struct
     int8_t ofs_x;                   /*x offset of the bounding box*/
     int8_t ofs_y;                   /*y offset of the bounding box*/
 
-    const lv_font_kern_t * kern_table;
 }lv_font_glyph_dsc_built_in_t;
 
 typedef struct {
@@ -117,6 +107,21 @@ typedef struct {
     uint16_t * unicode_list;
 }lv_font_cmap_built_in_t;
 
+typedef struct {
+    uint16_t * left_gylph_ids;
+    uint16_t * right_gylph_ids;
+    uint8_t * values;
+    uint16_t pair_num;
+}lv_font_kern_pair_t;
+
+typedef struct {
+    uint8_t left_class_num;
+    uint8_t right_class_num;
+    uint8_t * class_pair_values;    /*left_class_num * right_class_num value*/
+    uint8_t * left_class_mapping;   /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
+    uint8_t * right_class_mapping;  /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
+}lv_font_kern_classes_t;
+
 /*Describe store additional data for fonts */
 typedef struct {
     const uint8_t * glyph_bitmap;
@@ -128,6 +133,12 @@ typedef struct {
 
     /*Number of cmap tables*/
     uint8_t cmap_num;
+
+    /* Sotore kerning values. Only one oft hese pointer can have a valid values.
+     * to other should be `NULL` */
+    const lv_font_kern_pair_t * kern_table;
+    const lv_font_kern_classes_t * kern_classes;
+
 
     /*Bit per pixel: 1, 2, 4 or 8*/
     uint8_t bpp;
