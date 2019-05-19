@@ -2051,12 +2051,12 @@ static bool lv_obj_design(lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mo
 {
     if(mode == LV_DESIGN_COVER_CHK) {
 
-        /*Most trivial test. The mask is fully  IN the object? If no it surely not covers it*/
+        /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
         if(lv_area_is_in(mask_p, &obj->coords) == false) return false;
 
         /*Can cover the area only if fully solid (no opacity)*/
         const lv_style_t * style = lv_obj_get_style(obj);
-        if(style->body.opa != LV_OPA_COVER) return false;
+        if(style->body.opa < LV_OPA_MAX) return false;
 
         /* Because of the radius it is not sure the area is covered
          * Check the areas where there is no radius*/
