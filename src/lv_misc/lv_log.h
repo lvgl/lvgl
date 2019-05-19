@@ -40,9 +40,9 @@ typedef int8_t lv_log_level_t;
  **********************/
 
 /**
- * Log print function. Receives "File path", "Line number" and "Description".
+ * Log print function. Receives "Log Level", "File path", "Line number" and "Description".
  */
-typedef void (*lv_log_print_g_cb_t) (const char *, uint32_t, const char *);
+typedef void (*lv_log_print_g_cb_t) (lv_log_level_t level, const char *, uint32_t, const char *);
 
 /**********************
  * GLOBAL PROTOTYPES

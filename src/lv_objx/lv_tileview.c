@@ -17,7 +17,7 @@
  *      DEFINES
  *********************/
 #if LV_USE_ANIMATION
-#ifndef LV_TILEVIEW_ANIM_TIME
+#ifndef LV_TILEVIEW_DEF_ANIM_TIME
 #define LV_TILEVIEW_DEF_ANIM_TIME 300 /*Animation time loading a tile [ms] (0: no animation)  */
 #endif
 #else

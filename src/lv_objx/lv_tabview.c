@@ -18,7 +18,7 @@
  *      DEFINES
  *********************/
 #if LV_USE_ANIMATION
-#ifndef LV_TABVIEW_ANIM_TIME
+#ifndef LV_TABVIEW_DEF_ANIM_TIME
 #define LV_TABVIEW_DEF_ANIM_TIME                                                                   \
     300 /*Animation time of focusing to the a list element [ms] (0: no animation)  */
 #endif

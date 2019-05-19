@@ -17,7 +17,7 @@
  *      DEFINES
  *********************/
 #if LV_USE_ANIMATION
-#ifndef LV_ROLLER_ANIM_TIME
+#ifndef LV_ROLLER_DEF_ANIM_TIME
 #define LV_ROLLER_DEF_ANIM_TIME 200 /*ms*/
 #endif
 #else
