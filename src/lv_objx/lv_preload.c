@@ -127,7 +127,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param preload pointer to a preload object
  * @param deg length of the arc
  */
-void lv_preload_set_arc_length(lv_obj_t * preload, uint16_t deg)
+void lv_preload_set_arc_length(lv_obj_t * preload, int16_t deg)
 {
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
@@ -189,9 +189,9 @@ void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
                 a.start      = 0;
                 a.end        = 360;
             }
-            a.exec_cb             = (lv_anim_exec_cb_t)lv_preload_spinner_anim;
-            a.path_cb           = lv_anim_path_ease_in_out;
-            a.ready_cb         = NULL;
+            a.exec_cb        = (lv_anim_exec_cb_t)lv_preload_spinner_anim;
+            a.path_cb        = lv_anim_path_ease_in_out;
+            a.ready_cb       = NULL;
             a.act_time       = 0;
             a.time           = ext->time;
             a.playback       = 0;
@@ -211,9 +211,9 @@ void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
                 b.start      = ext->arc_length;
                 b.end        = 360 - ext->arc_length;
             }
-            b.exec_cb             = (lv_anim_exec_cb_t)lv_preload_set_arc_length;
-            b.path_cb           = lv_anim_path_ease_in_out;
-            b.ready_cb         = NULL;
+            b.exec_cb        = (lv_anim_exec_cb_t)lv_preload_set_arc_length;
+            b.path_cb        = lv_anim_path_ease_in_out;
+            b.ready_cb       = NULL;
             b.act_time       = 0;
             b.time           = ext->time;
             b.playback       = 1;
@@ -237,9 +237,9 @@ void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
                 a.start      = 0;
                 a.end        = 360;
             }
-            a.exec_cb             = (lv_anim_exec_cb_t)lv_preload_spinner_anim;
-            a.path_cb           = lv_anim_path_ease_in_out;
-            a.ready_cb         = NULL;
+            a.exec_cb        = (lv_anim_exec_cb_t)lv_preload_spinner_anim;
+            a.path_cb        = lv_anim_path_ease_in_out;
+            a.ready_cb       = NULL;
             a.act_time       = 0;
             a.time           = ext->time;
             a.playback       = 0;
@@ -328,7 +328,7 @@ lv_preload_dir_t lv_preload_get_anim_dir(lv_obj_t * preload) {
  * @param ptr pointer to preloader
  * @param val the current desired value [0..360]
  */
-void lv_preload_spinner_anim(void * ptr, int32_t val)
+void lv_preload_spinner_anim(void * ptr, int16_t val)
 {
     lv_obj_t * preload     = ptr;
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
