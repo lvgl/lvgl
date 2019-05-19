@@ -194,7 +194,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
 }
 
 /**
- * remove all objects from a group
+ * Remove all objects from a group
  * @param group pointer to a group
  */
 void lv_group_remove_all_objs(lv_group_t * group)
