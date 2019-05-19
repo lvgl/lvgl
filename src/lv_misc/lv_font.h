@@ -102,6 +102,23 @@ typedef struct {
     /* First glyph ID (array index of `glyph_dsc`) for this range */
     uint16_t glyph_id_start;
 
+    /* Format 0 tiny
+     * glyph_id = glyph_id_start + (codepoint - range_start) */
+
+    /* Format 0 full
+     * glyph_id = glyph_id_start + glyph_id_list[codepoint - range_start] */
+
+    /* Sparse tiny
+     * glyph_id = glyph_id_start + search(unicode_list, codepoint - range_start) */
+
+    /* Sparse full
+     * glyph_id = glyph_id_start + glyph_id_list[search(unicode_list, codepoint - range_start)] */
+
+    uint16_t * unicode_list;
+
+
+
+
     /* NULL: the range is mapped continuously from `glyph_id_start`
      * Else map the Unicode characters from `glyph_id_start` (relative to `range_start`)*/
     uint16_t * unicode_list;
