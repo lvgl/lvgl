@@ -45,7 +45,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
 static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
 static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 #if LV_USE_ANIMATION
-static void cursor_blink_anim(lv_obj_t * ta, uint8_t show);
+static void cursor_blink_anim(lv_obj_t * ta, lv_anim_value_t show);
 static void pwd_char_hider_anim(lv_obj_t * ta, lv_anim_value_t x);
 static void pwd_char_hider_anim_ready(lv_anim_t * a);
 #endif
