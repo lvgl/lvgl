@@ -73,101 +73,9 @@ typedef struct _lv_font_struct
     void * dsc;               /*Store implementation specific data here*/
 } lv_font_t;
 
-
-/*---------------------------------------------
- * Types for LittlevGL's internal font format
- *---------------------------------------------*/
-
-/*Describe a glyph in internal font format */
-typedef struct
-{
-    uint32_t bitmap_index : 20;     /* Start index of the bitmap. A font can be max 1 MB. */
-    uint32_t adv_w :12;             /*The glyph needs this space. Draw the next glyph after this width. 8 bit integer, 4 bit fractional */
-
-    uint8_t box_w;                  /*Width of the glyph's bounding box*/
-    uint8_t box_h;                  /*Height of the glyph's bounding box*/
-    int8_t ofs_x;                   /*x offset of the bounding box*/
-    int8_t ofs_y;                   /*y offset of the bounding box*/
-
-}lv_font_glyph_dsc_built_in_t;
-
-typedef struct {
-    /* First Unicode character for this range */
-    uint32_t range_start;
-
-    /* Number of Unicode characters related to this range.
-     * Last Unicode character = range_start + range_length - 1*/
-    uint16_t range_length;
-
-    /* First glyph ID (array index of `glyph_dsc`) for this range */
-    uint16_t glyph_id_start;
-
-    /* Format 0 tiny
-     * glyph_id = glyph_id_start + (codepoint - range_start) */
-
-    /* Format 0 full
-     * glyph_id = glyph_id_start + glyph_id_list[codepoint - range_start] */
-
-    /* Sparse tiny
-     * glyph_id = glyph_id_start + search(unicode_list, codepoint - range_start) */
-
-    /* Sparse full
-     * glyph_id = glyph_id_start + glyph_id_list[search(unicode_list, codepoint - range_start)] */
-
-    uint16_t * unicode_list;
-
-
-
-
-    /* NULL: the range is mapped continuously from `glyph_id_start`
-     * Else map the Unicode characters from `glyph_id_start` (relative to `range_start`)*/
-    uint16_t * unicode_list;
-}lv_font_cmap_built_in_t;
-
-typedef struct {
-    uint16_t * left_gylph_ids;
-    uint16_t * right_gylph_ids;
-    uint8_t * values;
-    uint16_t pair_num;
-}lv_font_kern_pair_t;
-
-typedef struct {
-    uint8_t left_class_num;
-    uint8_t right_class_num;
-    uint8_t * class_pair_values;    /*left_class_num * right_class_num value*/
-    uint8_t * left_class_mapping;   /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
-    uint8_t * right_class_mapping;  /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
-}lv_font_kern_classes_t;
-
-/*Describe store additional data for fonts */
-typedef struct {
-    const uint8_t * glyph_bitmap;
-    const lv_font_glyph_dsc_built_in_t * glyph_dsc;
-
-    /* Map the glyphs to Unicode characters.
-     * Array of `lv_font_cmap_built_in_t` variables*/
-    const lv_font_cmap_built_in_t * cmaps;
-
-    /*Number of cmap tables*/
-    uint8_t cmap_num;
-
-    /* Sotore kerning values. Only one oft hese pointer can have a valid values.
-     * to other should be `NULL` */
-    const lv_font_kern_pair_t * kern_table;
-    const lv_font_kern_classes_t * kern_classes;
-
-
-    /*Bit per pixel: 1, 2, 4 or 8*/
-    uint8_t bpp;
-}lv_font_dsc_built_in_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
-/*----------------
- * General API
- *---------------*/
 
 /**
  * Initialize the font module
@@ -224,28 +132,6 @@ static inline uint8_t lv_font_get_line_height(const lv_font_t * font_p)
 {
     return font_p->line_height;
 }
-
-/*----------------------------------
- * LittlevGL's internal font format
- *----------------------------------*/
-
-/**
- * Used as `get_glyph_bitmap` callback in LittelvGL's native font format if the font is uncompressed.
- * @param font pointer to font
- * @param unicode_letter an unicode letter which bitmap should be get
- * @return pointer to the bitmap or NULL if not found
- */
-const uint8_t * lv_font_get_glyph_bitmap_plain(const lv_font_t * font, uint32_t letter);
-
-/**
- * Used as `get_glyph_dsc` callback in LittelvGL's native font format if the font is uncompressed.
- * @param font_p pointer to font
- * @param dsc_out store the result descriptor here
- * @param letter an UNICODE letter code
- * @return true: descriptor is successfully loaded into `dsc_out`.
- *         false: the letter was not found, no data is loaded to `dsc_out`
- */
-bool lv_font_get_glyph_dsc_plain(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter);
 
 /**********************
  *      MACROS
