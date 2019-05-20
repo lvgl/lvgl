@@ -44,9 +44,11 @@ static lv_res_t release_handler(lv_obj_t * ddlist);
 static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en);
 static void lv_ddlist_pos_current_option(lv_obj_t * ddlist);
 static void lv_ddlist_refr_width(lv_obj_t* ddlist);
+#if LV_USE_ANIMATION
 static void lv_ddlist_anim_ready_cb(lv_anim_t * a);
 static void lv_ddlist_anim_finish(lv_obj_t* ddlist);
-static void lv_ddlist_adjust_height(lv_obj_t * ddlist, int16_t height);
+static void lv_ddlist_adjust_height(lv_obj_t * ddlist, lv_anim_value_t height);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -907,6 +909,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
     }
 }
 
+#if LV_USE_ANIMATION
 /**
  * Position the list and remove the selection highlight if it's closed.
  * Called at end of list animation.
@@ -930,6 +933,7 @@ static void lv_ddlist_anim_finish(lv_obj_t* ddlist)
     ext->force_sel = 0; /*Turn off drawing of selection*/
     if(ext->opened) lv_page_set_sb_mode(ddlist, LV_SB_MODE_UNHIDE);
 }
+#endif
 
 /**
  * Adjusts the ddlist's height and then positions the option within it's new height.
@@ -937,7 +941,7 @@ static void lv_ddlist_anim_finish(lv_obj_t* ddlist)
  * @param ddlist Drop down list object
  * @param height New drop down list height
  */
-static void lv_ddlist_adjust_height(lv_obj_t * ddlist, int16_t height)
+static void lv_ddlist_adjust_height(lv_obj_t * ddlist, lv_anim_value_t height)
 {
     lv_obj_set_height(ddlist, height);
     lv_ddlist_pos_current_option(ddlist);

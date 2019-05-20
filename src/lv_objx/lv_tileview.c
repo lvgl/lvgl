@@ -78,7 +78,9 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_tileview);
 
     /*Initialize the allocated 'ext' */
+#if LV_USE_ANIMATION
     ext->anim_time = LV_TILEVIEW_DEF_ANIM_TIME;
+#endif
     ext->act_id.x  = 0;
     ext->act_id.y  = 0;
     ext->valid_pos = NULL;
@@ -109,7 +111,9 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_tileview_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->act_id.x                = copy_ext->act_id.x;
         ext->act_id.y                = copy_ext->act_id.y;
+#if LV_USE_ANIMATION
         ext->anim_time               = copy_ext->anim_time;
+#endif
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_tileview);
@@ -211,9 +215,9 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, b
 
         lv_anim_t a;
         a.var            = scrl;
-        a.exec_cb             = (lv_anim_exec_cb_t)lv_obj_set_x;
-        a.path_cb           = lv_anim_path_linear;
-        a.ready_cb         = NULL;
+        a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_x;
+        a.path_cb        = lv_anim_path_linear;
+        a.ready_cb       = NULL;
         a.act_time       = 0;
         a.time           = ext->anim_time;
         a.playback       = 0;
@@ -228,9 +232,9 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, b
         }
 
         if(y_coord != y_act) {
-            a.start = y_act;
-            a.end   = y_coord;
-            a.exec_cb    = (lv_anim_exec_cb_t)lv_obj_set_y;
+            a.start   = y_act;
+            a.end     = y_coord;
+            a.exec_cb = (lv_anim_exec_cb_t)lv_obj_set_y;
             lv_anim_create(&a);
         }
 #endif

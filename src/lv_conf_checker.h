@@ -600,7 +600,7 @@
 #define LV_USE_PAGE     1
 #endif
 
-/*Preload (dependencies: lv_arc)*/
+/*Preload (dependencies: lv_arc, lv_anim)*/
 #ifndef LV_USE_PRELOAD
 #define LV_USE_PRELOAD      1
 #endif

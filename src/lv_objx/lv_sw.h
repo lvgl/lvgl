@@ -107,7 +107,6 @@ bool lv_sw_toggle(lv_obj_t * sw, bool anim);
  */
 void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, const lv_style_t * style);
 
-#if LV_USE_ANIMATION
 /**
  * Set the animation time of the switch
  * @param sw pointer to a  switch object
@@ -115,7 +114,6 @@ void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, const lv_style_t * style
  * @return style pointer to a style
  */
 void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time);
-#endif
 
 /*=====================
  * Getter functions

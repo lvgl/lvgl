@@ -28,6 +28,7 @@ extern "C" {
 
 #include "lv_cont.h"
 #include "../lv_core/lv_indev.h"
+#include "../lv_misc/lv_anim.h"
 
 /*********************
  *      DEFINES
@@ -78,7 +79,7 @@ typedef struct
     } sb;
     struct
     {
-        uint16_t state;      /*Store the current size of the edge flash effect*/
+        lv_anim_value_t state;      /*Store the current size of the edge flash effect*/
         const lv_style_t * style;  /*Style of edge flash effect (usually homogeneous circle)*/
         uint8_t enabled : 1; /*1: Show a flash animation on the edge*/
         uint8_t top_ip : 1; /*Used internally to show that top most position is reached (flash is In

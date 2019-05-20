@@ -40,9 +40,11 @@ static bool lv_page_design(lv_obj_t * page, const lv_area_t * mask, lv_design_mo
 static bool lv_scrl_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
 static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
-static void edge_flash_anim(void * page, int16_t v);
-static void edge_flash_anim_end(lv_anim_t * a);
 static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event);
+#if LV_USE_ANIMATION
+static void edge_flash_anim(void * page, lv_anim_value_t v);
+static void edge_flash_anim_end(lv_anim_t * a);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -428,15 +430,15 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
-#if LV_USE_ANIMATION == 0
-    anim_time = 0;
-#else
+#if LV_USE_ANIMATION
     /* Be sure there is no position changing animation in progress
      * because it can overide the current changes*/
     lv_anim_del(page, (lv_anim_exec_cb_t)lv_obj_set_x);
     lv_anim_del(page, (lv_anim_exec_cb_t)lv_obj_set_y);
     lv_anim_del(ext->scrl, (lv_anim_exec_cb_t)lv_obj_set_x);
     lv_anim_del(ext->scrl, (lv_anim_exec_cb_t)lv_obj_set_y);
+#else
+    anim_time = 0;
 #endif
 
     const lv_style_t * style      = lv_page_get_style(page, LV_PAGE_STYLE_BG);
@@ -528,9 +530,9 @@ void lv_page_scroll_hor(lv_obj_t * page, lv_coord_t dist)
     a.var            = scrl;
     a.start          = lv_obj_get_x(scrl);
     a.end            = a.start + dist;
-    a.exec_cb             = (lv_anim_exec_cb_t)lv_obj_set_x;
-    a.path_cb           = lv_anim_path_linear;
-    a.ready_cb         = NULL;
+    a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_x;
+    a.path_cb        = lv_anim_path_linear;
+    a.ready_cb       = NULL;
     a.act_time       = 0;
     a.time           = LV_PAGE_SCROLL_ANIM_TIME;
     a.playback       = 0;
@@ -557,9 +559,9 @@ void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
     a.var            = scrl;
     a.start          = lv_obj_get_y(scrl);
     a.end            = a.start + dist;
-    a.exec_cb             = (lv_anim_exec_cb_t)lv_obj_set_y;
-    a.path_cb           = lv_anim_path_linear;
-    a.ready_cb         = NULL;
+    a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_y;
+    a.path_cb        = lv_anim_path_linear;
+    a.ready_cb       = NULL;
     a.act_time       = 0;
     a.time           = LV_PAGE_SCROLL_ANIM_TIME;
     a.playback       = 0;
@@ -1193,7 +1195,8 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     }
 }
 
-static void edge_flash_anim(void * page, int16_t v)
+#if LV_USE_ANIMATION
+static void edge_flash_anim(void * page, lv_anim_value_t v)
 {
     lv_page_ext_t * ext   = lv_obj_get_ext_attr(page);
     ext->edge_flash.state = v;
@@ -1209,5 +1212,6 @@ static void edge_flash_anim_end(lv_anim_t * a)
     ext->edge_flash.right_ip  = 0;
     lv_obj_invalidate(a->var);
 }
+#endif
 
 #endif
