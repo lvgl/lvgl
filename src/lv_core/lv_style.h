@@ -264,7 +264,7 @@ static inline lv_anim_user_data_t * lv_style_anim_get_user_data_ptr(lv_anim_t * 
  */
 static inline void lv_style_anim_create(lv_anim_t * a)
 {
-    return lv_anim_create(a);
+    lv_anim_create(a);
 }
 
 #endif
