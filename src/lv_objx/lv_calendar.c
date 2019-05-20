@@ -430,7 +430,7 @@ static bool lv_calendar_design(lv_obj_t * calendar, const lv_area_t * mask, lv_d
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
-        return false;
+        return ancestor_design(calendar, mask, mode);
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {

@@ -114,6 +114,12 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj);
 void lv_group_remove_obj(lv_obj_t * obj);
 
 /**
+ * Remove all objects from a group
+ * @param group pointer to a group
+ */
+void lv_group_remove_all_objs(lv_group_t * group);
+    
+/**
  * Focus on an object (defocus the current)
  * @param obj pointer to an object to focus on
  */

@@ -661,6 +661,12 @@ lv_obj_t * lv_obj_get_child_back(const lv_obj_t * obj, const lv_obj_t * child);
  */
 uint16_t lv_obj_count_children(const lv_obj_t * obj);
 
+/** Recursively count the children of an object
+ * @param obj pointer to an object
+ * @return children number of 'obj'
+ */
+uint16_t lv_obj_count_children_recursive(const lv_obj_t * obj);
+
 /*---------------------
  * Coordinate get
  *--------------------*/
@@ -940,6 +946,22 @@ bool lv_obj_is_focused(const lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
+
+/**
+ * Helps to quickly declare an event callback function.
+ * Will be expanded to: `void <name> (lv_obj_t * obj, lv_event_t e)`
+ *
+ * Examples:
+ * static LV_EVENT_CB_DECLARE(my_event1);  //Protoype declaration
+ *
+ * static LV_EVENT_CB_DECLARE(my_event1)
+ * {
+ *   if(e == LV_EVENT_CLICKED) {
+ *      lv_obj_set_hidden(obj ,true);
+ *   }
+ * }
+ */
+#define LV_EVENT_CB_DECLARE(name) void name(lv_obj_t * obj, lv_event_t e)
 
 #ifdef __cplusplus
 } /* extern "C" */

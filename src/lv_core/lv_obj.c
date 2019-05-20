@@ -203,6 +203,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale_en = 0;
         new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->parent_event = 0;
+        new_obj->reserved     = 0;
 
         new_obj->ext_attr = NULL;
 
@@ -1561,6 +1562,22 @@ uint16_t lv_obj_count_children(const lv_obj_t * obj)
     return cnt;
 }
 
+/** Recursively count the children of an object
+ * @param obj pointer to an object
+ * @return children number of 'obj'
+ */
+uint16_t lv_obj_count_children_recursive(const lv_obj_t * obj){
+    lv_obj_t * i;
+    uint16_t cnt = 0;
+
+    LV_LL_READ(obj->child_ll, i) {
+        cnt++; // Count the child
+        cnt += lv_obj_count_children_recursive(i); // recursively count children's children
+    }
+
+    return cnt;
+}
+
 /*---------------------
  * Coordinate get
  *--------------------*/
@@ -2034,12 +2051,12 @@ static bool lv_obj_design(lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mo
 {
     if(mode == LV_DESIGN_COVER_CHK) {
 
-        /*Most trivial test. The mask is fully  IN the object? If no it surely not covers it*/
+        /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
         if(lv_area_is_in(mask_p, &obj->coords) == false) return false;
 
         /*Can cover the area only if fully solid (no opacity)*/
         const lv_style_t * style = lv_obj_get_style(obj);
-        if(style->body.opa != LV_OPA_COVER) return false;
+        if(style->body.opa < LV_OPA_MAX) return false;
 
         /* Because of the radius it is not sure the area is covered
          * Check the areas where there is no radius*/

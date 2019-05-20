@@ -58,8 +58,7 @@ typedef struct
     uint32_t size;                                   /*the number of items(buttons) in the list*/
     bool single_mode;                                /* whether single selected mode is enabled */
 #if LV_USE_GROUP
-    lv_obj_t *
-        last_sel; /* The last selected button. It will be reverted when the list is focused again */
+    lv_obj_t * last_sel; /* The last selected button. It will be reverted when the list is focused again */
     lv_obj_t * selected_btn; /* The button is currently being selected*/
 #endif
 } lv_list_ext_t;
@@ -133,9 +132,10 @@ void lv_list_set_single_mode(lv_obj_t * list, bool mode);
 #if LV_USE_GROUP
 
 /**
- * Make a button selected. Can be used while navigating in the list with a keypad.
+ * Make a button selected
  * @param list pointer to a list object
  * @param btn pointer to a button to select
+ *            NULL to not select any buttons
  */
 void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn);
 #endif

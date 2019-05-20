@@ -111,9 +111,9 @@ void lv_task_del(lv_task_t * task);
 /**
  * Set the callback the task (the function to call periodically)
  * @param task pointer to a task
- * @param taack_cb teh function to call periodically
+ * @param task_cb the function to call periodically
  */
-void lv_task_set_cb(lv_task_t * task, lv_task_cb_t taack_cb);
+void lv_task_set_cb(lv_task_t * task, lv_task_cb_t task_cb);
 
 /**
  * Set new priority for a lv_task
