@@ -427,7 +427,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         }
 
 #if LV_USE_GROUP
-        if(indev->group == group && obj == lv_indev_get_obj_focused() ) {
+        if(indev->group == group && obj == lv_indev_get_obj_act() ) {
             lv_indev_reset(indev);
         }
 #endif
@@ -2230,7 +2230,7 @@ static void delete_children(lv_obj_t * obj)
             indev->proc.types.pointer.last_pressed = NULL;
         }
 #if LV_USE_GROUP
-        if(indev->group == group && obj == lv_indev_get_obj_focused() ) {
+        if(indev->group == group && obj == lv_indev_get_obj_act() ) {
             lv_indev_reset(indev);
         }
 #endif
