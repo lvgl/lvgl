@@ -345,9 +345,9 @@ static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode
 #endif
         lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
-        if(ext->cur_value != ext->min_value || ext->sym ||
+        if(ext->cur_value != ext->min_value || ext->sym
 #if LV_USE_ANIMATION
-           ext->anim_start != LV_BAR_ANIM_STATE_INV
+           || ext->anim_start != LV_BAR_ANIM_STATE_INV
 #endif
            ) {
             const lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
