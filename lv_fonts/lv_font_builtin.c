@@ -125,7 +125,7 @@ void lv_font_builtin_init(void)
 #if USE_LV_FONT_DEJAVU_30 != 0
     lv_font_add(&lv_font_symbol_30, &lv_font_dejavu_30);
 #else
-    lv_font_add(&lv_font_symbol_30_basic, NULL);
+    lv_font_add(&lv_font_symbol_30, NULL);
 #endif
 #endif
 
