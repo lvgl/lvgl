@@ -860,12 +860,15 @@ static void lv_chart_draw_cols(lv_obj_t * chart, const lv_area_t * mask)
         LV_LL_READ_BACK(ext->series_ll, ser) {
             lv_coord_t start_point = ext->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
-            rects.body.main_color = ser->color;
-            rects.body.grad_color = lv_color_mix(LV_COLOR_BLACK, ser->color, ext->series.dark);
             col_a.x1              = x_act;
             col_a.x2              = col_a.x1 + col_w;
             x_act += col_w;
 
+            if(col_a.x2 < mask->x1) continue;
+            if(col_a.x1 > mask->x2) break;
+
+            rects.body.main_color = ser->color;
+            rects.body.grad_color = lv_color_mix(LV_COLOR_BLACK, ser->color, ext->series.dark);
 
             lv_coord_t p_act = (start_point + i) % ext->point_cnt;
             y_tmp = (int32_t)((int32_t) ser->points[p_act] - ext->ymin) * h;
