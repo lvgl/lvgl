@@ -421,7 +421,7 @@ static lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder,  l
             dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
             dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED)
     {
-        /* For TRUE_COLOE images read line required only for files.
+        /* For TRUE_COLOR images read line required only for files.
          * For variables the image data was returned in `open`*/
         if(dsc->src_type == LV_IMG_SRC_FILE) {
             res = lv_img_decoder_built_in_line_true_color(dsc, x, y, len, buf);
