@@ -194,6 +194,28 @@ void lv_group_remove_obj(lv_obj_t * obj)
 }
 
 /**
+ * Remove all objects from a group
+ * @param group pointer to a group
+ */
+void lv_group_remove_all_objs(lv_group_t * group)
+{
+	/*Defocus the the currently focused object*/
+	if(group->obj_focus != NULL) {
+		(*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+		lv_obj_invalidate(*group->obj_focus);
+		group->obj_focus = NULL;
+	}
+
+	/*Remove the objects from the group*/
+	lv_obj_t ** obj;
+	LV_LL_READ(group->obj_ll, obj) {
+		(*obj)->group_p = NULL;
+	}
+
+	lv_ll_clear(&(group->obj_ll));
+}
+
+/**
  * Focus on an object (defocus the current)
  * @param obj pointer to an object to focus on
  */
