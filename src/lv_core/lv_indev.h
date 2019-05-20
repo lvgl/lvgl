@@ -144,7 +144,7 @@ lv_task_t * lv_indev_get_read_task(lv_disp_t * indev);
 /**
  * Gets a pointer to the currently active object in indev proc functions.
  * NULL if no object is currently being handled or if groups aren't used.
- * @return pointer to currently focused object
+ * @return pointer to currently active object
  */
 lv_obj_t * lv_indev_get_obj_act( void );
 
