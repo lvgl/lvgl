@@ -46,7 +46,7 @@ static void lv_ddlist_pos_current_option(lv_obj_t * ddlist);
 static void lv_ddlist_refr_width(lv_obj_t* ddlist);
 static void lv_ddlist_anim_ready_cb(lv_anim_t * a);
 static void lv_ddlist_anim_finish(lv_obj_t* ddlist);
-static void lv_ddlist_adjust_height(lv_obj_t * ddlist, int32_t height);
+static void lv_ddlist_adjust_height(lv_obj_t * ddlist, int16_t height);
 
 /**********************
  *  STATIC VARIABLES
@@ -937,7 +937,7 @@ static void lv_ddlist_anim_finish(lv_obj_t* ddlist)
  * @param ddlist Drop down list object
  * @param height New drop down list height
  */
-static void lv_ddlist_adjust_height(lv_obj_t * ddlist, int32_t height)
+static void lv_ddlist_adjust_height(lv_obj_t * ddlist, int16_t height)
 {
     lv_obj_set_height(ddlist, height);
     lv_ddlist_pos_current_option(ddlist);

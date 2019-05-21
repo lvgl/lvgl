@@ -35,7 +35,7 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
 
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
-static void lv_btn_ink_effect_anim(lv_obj_t * btn, int32_t val);
+static void lv_btn_ink_effect_anim(lv_obj_t * btn, int16_t val);
 static void lv_btn_ink_effect_anim_ready(lv_anim_t * a);
 #endif
 
@@ -517,9 +517,9 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             a.var            = btn;
             a.start          = 0;
             a.end            = LV_BTN_INK_VALUE_MAX;
-            a.exec_cb             = (lv_anim_exec_cb_t)lv_btn_ink_effect_anim;
-            a.path_cb           = lv_anim_path_linear;
-            a.ready_cb         = lv_btn_ink_effect_anim_ready;
+            a.exec_cb        = (lv_anim_exec_cb_t)lv_btn_ink_effect_anim;
+            a.path_cb        = lv_anim_path_linear;
+            a.ready_cb       = lv_btn_ink_effect_anim_ready;
             a.act_time       = 0;
             a.time           = ext->ink_in_time;
             a.playback       = 0;
@@ -586,9 +586,9 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             a.var            = ink_obj;
             a.start          = LV_BTN_INK_VALUE_MAX;
             a.end            = 0;
-            a.exec_cb             = (lv_anim_exec_cb_t)lv_btn_ink_effect_anim;
-            a.path_cb           = lv_anim_path_linear;
-            a.ready_cb         = lv_btn_ink_effect_anim_ready;
+            a.exec_cb        = (lv_anim_exec_cb_t)lv_btn_ink_effect_anim;
+            a.path_cb        = lv_anim_path_linear;
+            a.ready_cb       = lv_btn_ink_effect_anim_ready;
             a.act_time       = 0;
             a.time           = ext->ink_out_time;
             a.playback       = 0;
@@ -632,7 +632,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
  * @param btn pointer to the animated button
  * @param val the new radius
  */
-static void lv_btn_ink_effect_anim(lv_obj_t * btn, int32_t val)
+static void lv_btn_ink_effect_anim(lv_obj_t * btn, int16_t val)
 {
     if(btn) {
         ink_act_value = val;
