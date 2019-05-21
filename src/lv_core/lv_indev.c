@@ -692,7 +692,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_proc_press(lv_indev_proc_t * proc)
 {
-    lv_obj_t * indev_obj_act = proc->types.pointer.act_obj;
+    indev_obj_act = proc->types.pointer.act_obj;
 
     if(proc->wait_until_release != 0) return;
 
