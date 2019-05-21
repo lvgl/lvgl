@@ -8,6 +8,7 @@
  *********************/
 #include "lv_obj.h"
 #include "../lv_misc/lv_mem.h"
+#include "../lv_misc/lv_anim.h"
 
 /*********************
  *      DEFINES
@@ -31,7 +32,7 @@
  *  STATIC PROTOTYPES
  **********************/
 #if LV_USE_ANIMATION
-static void style_animator(lv_style_anim_dsc_t * dsc, int16_t val);
+static void style_animator(lv_style_anim_dsc_t * dsc, lv_anim_value_t val);
 static void style_animation_common_end_cb(lv_anim_t * a);
 #endif
 
@@ -318,7 +319,7 @@ void lv_style_anim_set_styles(lv_anim_t * a, lv_style_t * to_anim, const lv_styl
  * @param dsc the 'animated variable' set by lv_style_anim_create()
  * @param val the current state of the animation between 0 and LV_ANIM_RESOLUTION
  */
-static void style_animator(lv_style_anim_dsc_t * dsc, int16_t val)
+static void style_animator(lv_style_anim_dsc_t * dsc, lv_anim_value_t val)
 {
     const lv_style_t * start = &dsc->style_start;
     const lv_style_t * end   = &dsc->style_end;
