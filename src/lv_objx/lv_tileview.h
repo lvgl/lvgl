@@ -37,7 +37,9 @@ typedef struct
     lv_page_ext_t page;
     /*New data for this type */
     const lv_point_t * valid_pos;
+#if LV_USE_ANIMATION
     uint16_t anim_time;
+#endif
     lv_point_t act_id;
     uint8_t drag_top_en : 1;
     uint8_t drag_bottom_en : 1;

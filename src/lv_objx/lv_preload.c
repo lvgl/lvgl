@@ -127,7 +127,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param preload pointer to a preload object
  * @param deg length of the arc
  */
-void lv_preload_set_arc_length(lv_obj_t * preload, int16_t deg)
+void lv_preload_set_arc_length(lv_obj_t * preload, lv_anim_value_t deg)
 {
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
@@ -170,7 +170,6 @@ void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, const lv_
  *  */
 void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
 {
-#if LV_USE_ANIMATION
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     /*delete previous animation*/
@@ -250,8 +249,6 @@ void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
             break;
         }
     }
-
-#endif // LV_USE_ANIMATION
 }
 
 void lv_preload_set_anim_dir(lv_obj_t * preload, lv_preload_dir_t dir) {
@@ -269,7 +266,7 @@ void lv_preload_set_anim_dir(lv_obj_t * preload, lv_preload_dir_t dir) {
  * Get the arc length [degree] of the a pre loader
  * @param preload pointer to a pre loader object
  */
-uint16_t lv_preload_get_arc_length(const lv_obj_t * preload)
+lv_anim_value_t lv_preload_get_arc_length(const lv_obj_t * preload)
 {
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
     return ext->arc_length;
@@ -328,7 +325,7 @@ lv_preload_dir_t lv_preload_get_anim_dir(lv_obj_t * preload) {
  * @param ptr pointer to preloader
  * @param val the current desired value [0..360]
  */
-void lv_preload_spinner_anim(void * ptr, int16_t val)
+void lv_preload_spinner_anim(void * ptr, lv_anim_value_t val)
 {
     lv_obj_t * preload     = ptr;
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);

@@ -321,6 +321,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         if(slider_w >= slider_h) {
             lv_coord_t indic_w = lv_area_get_width(&area_indic);
+#if LV_USE_ANIMATION
             if(ext->bar.anim_state != LV_BAR_ANIM_STATE_INV) {
                 /*Calculate the coordinates of anim. start and end*/
                 lv_coord_t anim_start_x =
@@ -334,7 +335,10 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
                  * `anim_end`)*/
                 area_indic.x2 =
                     anim_start_x + (((anim_end_x - anim_start_x) * ext->bar.anim_state) >> 8);
-            } else {
+            } 
+            else 
+#endif
+            {
                 area_indic.x2 =
                     (int32_t)((int32_t)indic_w * (cur_value - min_value)) / (max_value - min_value);
             }
@@ -347,6 +351,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         } else {
             lv_coord_t indic_h = lv_area_get_height(&area_indic);
+#if LV_USE_ANIMATION
             if(ext->bar.anim_state != LV_BAR_ANIM_STATE_INV) {
                 /*Calculate the coordinates of anim. start and end*/
                 lv_coord_t anim_start_y =
@@ -360,7 +365,10 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
                  * `anim_end`)*/
                 area_indic.y1 =
                     anim_start_y + (((anim_end_y - anim_start_y) * ext->bar.anim_state) >> 8);
-            } else {
+            } 
+            else 
+#endif
+            {
                 area_indic.y1 =
                     (int32_t)((int32_t)indic_h * (cur_value - min_value)) / (max_value - min_value);
             }
@@ -395,6 +403,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
                 knob_area.x1 = area_indic.x2 - slider_h / 2;
                 knob_area.x2 = knob_area.x1 + slider_h - 1;
             } else {
+#if LV_USE_ANIMATION
                 if(ext->bar.anim_state != LV_BAR_ANIM_STATE_INV) {
                     lv_coord_t w = slider_w - slider_h - 1;
                     lv_coord_t anim_start_x =
@@ -408,7 +417,9 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
                      * `anim_end`)*/
                     knob_area.x1 =
                         anim_start_x + (((anim_end_x - anim_start_x) * ext->bar.anim_state) >> 8);
-                } else {
+                } else 
+#endif
+                {
                     knob_area.x1 =
                         (int32_t)((int32_t)(slider_w - slider_h - 1) * (cur_value - min_value)) /
                         (max_value - min_value);
@@ -425,6 +436,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
                 knob_area.y1 = area_indic.y1 - slider_w / 2;
                 knob_area.y2 = knob_area.y1 + slider_w - 1;
             } else {
+#if LV_USE_ANIMATION
                 if(ext->bar.anim_state != LV_BAR_ANIM_STATE_INV) {
                     lv_coord_t h = slider_h - slider_w - 1;
                     lv_coord_t anim_start_x =
@@ -438,7 +450,9 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
                      * `anim_end`)*/
                     knob_area.y2 =
                         anim_start_x + (((anim_end_x - anim_start_x) * ext->bar.anim_state) >> 8);
-                } else {
+                } else 
+#endif
+                {
                     knob_area.y2 =
                         (int32_t)((int32_t)(slider_h - slider_w - 1) * (cur_value - min_value)) /
                         (max_value - min_value);

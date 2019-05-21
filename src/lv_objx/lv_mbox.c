@@ -36,7 +36,9 @@
  **********************/
 static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 static void mbox_realign(lv_obj_t * mbox);
+#if LV_USE_ANIMATION
 static void lv_mbox_close_ready_cb(lv_anim_t * a);
+#endif
 static void lv_mbox_default_event_cb(lv_obj_t * mbox, lv_event_t event);
 
 /**********************
@@ -77,7 +79,9 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->text      = NULL;
     ext->btnm      = NULL;
+#if LV_USE_ANIMATION
     ext->anim_time = LV_MBOX_CLOSE_ANIM_TIME;
+#endif
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_mbox, lv_mbox_signal);
@@ -182,12 +186,14 @@ void lv_mbox_set_text(lv_obj_t * mbox, const char * txt)
  */
 void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
 {
+#if LV_USE_ANIMATION
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-#if LV_USE_ANIMATION == 0
     anim_time = 0;
-#endif
-
     ext->anim_time = anim_time;
+#else
+    (void) mbox;
+    (void) anim_time;
+#endif
 }
 
 /**
@@ -198,9 +204,7 @@ void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
 void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
 {
 #if LV_USE_ANIMATION
-    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-
-    if(ext->anim_time != 0) {
+    if(lv_mbox_get_anim_time(mbox) != 0) {
         /*Add shrinking animations*/
         lv_anim_t a;
         a.var = mbox;
@@ -210,7 +214,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
         a.path_cb = lv_anim_path_linear;
         a.ready_cb = NULL;
         a.act_time = -delay;
-        a.time = ext->anim_time;
+        a.time = lv_mbox_get_anim_time(mbox);
         a.playback = 0;
         a.playback_pause = 0;
         a.repeat = 0;
@@ -356,8 +360,13 @@ const char * lv_mbox_get_active_btn_text(lv_obj_t * mbox)
  */
 uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox)
 {
+#if LV_USE_ANIMATION
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
     return ext->anim_time;
+#else
+    (void) mbox;
+    return 0;
+#endif
 }
 
 /**
@@ -521,10 +530,12 @@ static void mbox_realign(lv_obj_t * mbox)
     }
 }
 
+#if LV_USE_ANIMATION
 static void lv_mbox_close_ready_cb(lv_anim_t * a)
 {
     lv_obj_del(a->var);
 }
+#endif
 
 static void lv_mbox_default_event_cb(lv_obj_t * mbox, lv_event_t event)
 {

@@ -202,6 +202,9 @@ void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time)
 #if LV_USE_ANIMATION
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     ext->anim_time    = anim_time;
+#else
+    (void) sw;
+    (void) anim_time;
 #endif
 }
 

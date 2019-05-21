@@ -78,7 +78,9 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_tileview);
 
     /*Initialize the allocated 'ext' */
+#if LV_USE_ANIMATION
     ext->anim_time = LV_TILEVIEW_DEF_ANIM_TIME;
+#endif
     ext->act_id.x  = 0;
     ext->act_id.y  = 0;
     ext->valid_pos = NULL;
@@ -109,7 +111,9 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_tileview_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->act_id.x                = copy_ext->act_id.x;
         ext->act_id.y                = copy_ext->act_id.y;
+#if LV_USE_ANIMATION
         ext->anim_time               = copy_ext->anim_time;
+#endif
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_tileview);
@@ -211,9 +215,9 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, b
 
         lv_anim_t a;
         a.var            = scrl;
-        a.exec_cb             = (lv_anim_exec_cb_t)lv_obj_set_x;
-        a.path_cb           = lv_anim_path_linear;
-        a.ready_cb         = NULL;
+        a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_x;
+        a.path_cb        = lv_anim_path_linear;
+        a.ready_cb       = NULL;
         a.act_time       = 0;
         a.time           = ext->anim_time;
         a.playback       = 0;
@@ -228,9 +232,9 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, b
         }
 
         if(y_coord != y_act) {
-            a.start = y_act;
-            a.end   = y_coord;
-            a.exec_cb    = (lv_anim_exec_cb_t)lv_obj_set_y;
+            a.start   = y_act;
+            a.end     = y_coord;
+            a.exec_cb = (lv_anim_exec_cb_t)lv_obj_set_y;
             lv_anim_create(&a);
         }
 #endif
@@ -366,6 +370,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
                 ext->drag_ver = 1;
             }
 
+#if LV_USE_ANIMATION
             if(ext->drag_hor) {
                 ext->page.edge_flash.top_ip    = 0;
                 ext->page.edge_flash.bottom_ip = 0;
@@ -375,6 +380,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
                 ext->page.edge_flash.right_ip = 0;
                 ext->page.edge_flash.left_ip  = 0;
             }
+#endif
 
             lv_coord_t x = lv_obj_get_x(scrl);
             lv_coord_t y = lv_obj_get_y(scrl);
@@ -383,12 +389,14 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
             if(ext->drag_top_en == 0) {
                 if(y > -(ext->act_id.y * h) && indev->proc.types.pointer.vect.y > 0 &&
                    ext->drag_hor == 0) {
+#if LV_USE_ANIMATION
                     if(ext->page.edge_flash.enabled && ext->page.edge_flash.left_ip == 0 &&
                        ext->page.edge_flash.right_ip == 0 && ext->page.edge_flash.top_ip == 0 &&
                        ext->page.edge_flash.bottom_ip == 0) {
                         ext->page.edge_flash.top_ip = 1;
                         lv_page_start_edge_flash(tileview);
                     }
+#endif
 
                     lv_obj_set_y(scrl, -ext->act_id.y * h + style_bg->body.padding.top);
                 }
@@ -396,12 +404,14 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
             if(ext->drag_bottom_en == 0 && indev->proc.types.pointer.vect.y < 0 &&
                ext->drag_hor == 0) {
                 if(y < -(ext->act_id.y * h)) {
+#if LV_USE_ANIMATION
                     if(ext->page.edge_flash.enabled && ext->page.edge_flash.left_ip == 0 &&
                        ext->page.edge_flash.right_ip == 0 && ext->page.edge_flash.top_ip == 0 &&
                        ext->page.edge_flash.bottom_ip == 0) {
                         ext->page.edge_flash.bottom_ip = 1;
                         lv_page_start_edge_flash(tileview);
                     }
+#endif
                 }
 
                 lv_obj_set_y(scrl, -ext->act_id.y * h + style_bg->body.padding.top);
@@ -409,12 +419,14 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
             if(ext->drag_left_en == 0) {
                 if(x > -(ext->act_id.x * w) && indev->proc.types.pointer.vect.x > 0 &&
                    ext->drag_ver == 0) {
+#if LV_USE_ANIMATION
                     if(ext->page.edge_flash.enabled && ext->page.edge_flash.left_ip == 0 &&
                        ext->page.edge_flash.right_ip == 0 && ext->page.edge_flash.top_ip == 0 &&
                        ext->page.edge_flash.bottom_ip == 0) {
                         ext->page.edge_flash.left_ip = 1;
                         lv_page_start_edge_flash(tileview);
                     }
+#endif
 
                     lv_obj_set_x(scrl, -ext->act_id.x * w + style_bg->body.padding.left);
                 }
@@ -422,12 +434,14 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
             if(ext->drag_right_en == 0 && indev->proc.types.pointer.vect.x < 0 &&
                ext->drag_ver == 0) {
                 if(x < -(ext->act_id.x * w)) {
+#if LV_USE_ANIMATION
                     if(ext->page.edge_flash.enabled && ext->page.edge_flash.left_ip == 0 &&
                        ext->page.edge_flash.right_ip == 0 && ext->page.edge_flash.top_ip == 0 &&
                        ext->page.edge_flash.bottom_ip == 0) {
                         ext->page.edge_flash.right_ip = 1;
                         lv_page_start_edge_flash(tileview);
                     }
+#endif
                 }
 
                 lv_obj_set_x(scrl, -ext->act_id.x * w + style_bg->body.padding.top);
