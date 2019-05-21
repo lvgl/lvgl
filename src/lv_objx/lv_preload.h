@@ -92,7 +92,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param preload pointer to a preload object
  * @param deg length of the arc
  */
-void lv_preload_set_arc_length(lv_obj_t * preload, uint16_t deg);
+void lv_preload_set_arc_length(lv_obj_t * preload, int16_t deg);
 
 /**
  * Set the spin time of the arc
@@ -175,7 +175,7 @@ lv_preload_dir_t lv_preload_get_anim_dir(lv_obj_t * preload);
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-void lv_preload_spinner_anim(void * ptr, int32_t val);
+void lv_preload_spinner_anim(void * ptr, int16_t val);
 
 /**********************
  *      MACROS

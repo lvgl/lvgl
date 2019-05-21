@@ -30,7 +30,7 @@
 static bool lv_bar_design(lv_obj_t * bar, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 
-static void lv_bar_animate(void * bar, int32_t value);
+static void lv_bar_anim(void * bar, int16_t value);
 static void lv_bar_anim_ready(lv_anim_t * a);
 
 /**********************
@@ -158,9 +158,9 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value, bool anim)
         a.var            = bar;
         a.start          = LV_BAR_ANIM_STATE_START;
         a.end            = LV_BAR_ANIM_STATE_END;
-        a.exec_cb             = (lv_anim_exec_cb_t)lv_bar_animate;
-        a.path_cb           = lv_anim_path_linear;
-        a.ready_cb         = lv_bar_anim_ready;
+        a.exec_cb        = (lv_anim_exec_cb_t)lv_bar_anim;
+        a.path_cb        = lv_anim_path_linear;
+        a.ready_cb       = lv_bar_anim_ready;
         a.act_time       = 0;
         a.time           = ext->anim_time;
         a.playback       = 0;
@@ -475,7 +475,7 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     return res;
 }
 
-static void lv_bar_animate(void * bar, int32_t value)
+static void lv_bar_anim(void * bar, int16_t value)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     ext->anim_state    = value;
