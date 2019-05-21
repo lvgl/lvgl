@@ -62,7 +62,9 @@ typedef struct
     lv_point_t point_last;
     uint16_t tab_cur;
     uint16_t tab_cnt;
+#if LV_USE_ANIMATION
     uint16_t anim_time;
+#endif
     uint8_t slide_enable : 1; /*1: enable horizontal sliding by touch pad*/
     uint8_t draging : 1;
     uint8_t drag_hor : 1;

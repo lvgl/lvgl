@@ -90,7 +90,9 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->align           = LV_LABEL_ALIGN_LEFT;
     ext->dot_end         = LV_LABEL_DOT_END_INV;
     ext->long_mode       = LV_LABEL_LONG_EXPAND;
+#if LV_USE_ANIMATION
     ext->anim_speed      = LV_LABEL_DEF_SCROLL_SPEED;
+#endif
     ext->offset.x        = 0;
     ext->offset.y        = 0;
 #if LV_LABEL_TEXT_SEL
@@ -343,6 +345,7 @@ void lv_label_set_body_draw(lv_obj_t * label, bool en)
  */
 void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
 {
+#if LV_USE_ANIMATION
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if(ext->anim_speed == anim_speed) return;
 
@@ -351,6 +354,7 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
     if(ext->long_mode == LV_LABEL_LONG_ROLL || ext->long_mode == LV_LABEL_LONG_ROLL_CIRC) {
         lv_label_refr_text(label);
     }
+#endif
 }
 
 void lv_label_set_text_sel_start( lv_obj_t * label, uint16_t index ) {
@@ -437,8 +441,12 @@ bool lv_label_get_body_draw(const lv_obj_t * label)
  */
 uint16_t lv_label_get_anim_speed(const lv_obj_t * label)
 {
+#if LV_USE_ANIMATION
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->anim_speed;
+#else
+    return 0;
+#endif
 }
 
 /**

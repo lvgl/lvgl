@@ -394,7 +394,7 @@ typedef void * lv_obj_user_data_t;
 /*Page (dependencies: lv_cont)*/
 #define LV_USE_PAGE     1
 
-/*Preload (dependencies: lv_arc)*/
+/*Preload (dependencies: lv_arc, lv_anim)*/
 #define LV_USE_PRELOAD      1
 #if LV_USE_PRELOAD != 0
 #  define LV_PRELOAD_DEF_ARC_LENGTH   60      /*[deg]*/

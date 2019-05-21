@@ -94,7 +94,9 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_rel;
     ext->styles_btn[LV_BTN_STATE_TGL_PR]  = &lv_style_btn_tgl_pr;
     ext->styles_btn[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
+#if LV_USE_ANIMATION
     ext->anim_time                        = LV_LIST_DEF_ANIM_TIME;
+#endif
     ext->single_mode                      = false;
     ext->size                             = 0;
 
@@ -249,11 +251,11 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt,
  * lv_list_ext_t.size
  * @return true: successfully deleted
  */
-bool lv_list_remove(const lv_obj_t * list, uint32_t index)
+bool lv_list_remove(const lv_obj_t * list, uint16_t index)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
     if(index >= ext->size) return false;
-    uint32_t count = 0;
+    uint16_t count = 0;
     lv_obj_t * e   = lv_list_get_next_btn(list, NULL);
     while(e != NULL) {
         if(count == index) {
@@ -318,7 +320,7 @@ void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
         else if(s == LV_BTN_STATE_TGL_REL)
             lv_btn_set_state(ext->selected_btn, LV_BTN_STATE_TGL_PR);
 
-        lv_page_focus(list, ext->selected_btn, ext->anim_time);
+        lv_page_focus(list, ext->selected_btn, lv_list_get_anim_time(list) );
     }
 }
 
@@ -331,13 +333,13 @@ void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
  */
 void lv_list_set_anim_time(lv_obj_t * list, uint16_t anim_time)
 {
+#if LV_USE_ANIMATION
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-#if LV_USE_ANIMATION == 0
     anim_time = 0;
-#endif
 
     if(ext->anim_time == anim_time) return;
     ext->anim_time = anim_time;
+#endif
 }
 
 /**
@@ -542,7 +544,7 @@ int32_t lv_list_get_btn_index(const lv_obj_t * list, const lv_obj_t * btn)
  * @param list pointer to a list object
  * @return the number of buttons in the list
  */
-uint32_t lv_list_get_size(const lv_obj_t * list)
+uint16_t lv_list_get_size(const lv_obj_t * list)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
     return ext->size;
@@ -569,8 +571,12 @@ lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list)
  */
 uint16_t lv_list_get_anim_time(const lv_obj_t * list)
 {
+#if LV_USE_ANIMATION
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
     return ext->anim_time;
+#else
+    return 0;
+#endif
 }
 
 /**
@@ -622,8 +628,7 @@ void lv_list_up(const lv_obj_t * list)
             if(e_prev != NULL) {
                 lv_coord_t new_y =
                     lv_obj_get_height(list) - (lv_obj_get_y(e_prev) + lv_obj_get_height(e_prev));
-                lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-                if(ext->anim_time == 0) {
+                if(lv_list_get_anim_time(list) == 0) {
                     lv_obj_set_y(scrl, new_y);
                 } else {
 #if LV_USE_ANIMATION
@@ -631,9 +636,9 @@ void lv_list_up(const lv_obj_t * list)
                     a.var            = scrl;
                     a.start          = lv_obj_get_y(scrl);
                     a.end            = new_y;
-                    a.exec_cb             = (lv_anim_exec_cb_t)lv_obj_set_y;
-                    a.path_cb           = lv_anim_path_linear;
-                    a.ready_cb         = NULL;
+                    a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_y;
+                    a.path_cb        = lv_anim_path_linear;
+                    a.ready_cb       = NULL;
                     a.act_time       = 0;
                     a.time           = LV_LIST_DEF_ANIM_TIME;
                     a.playback       = 0;
@@ -665,8 +670,7 @@ void lv_list_down(const lv_obj_t * list)
     while(e != NULL) {
         if(e->coords.y1 < list->coords.y1) {
             lv_coord_t new_y    = -lv_obj_get_y(e);
-            lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-            if(ext->anim_time == 0) {
+            if(lv_list_get_anim_time(list) == 0) {
                 lv_obj_set_y(scrl, new_y);
             } else {
 #if LV_USE_ANIMATION
@@ -674,9 +678,9 @@ void lv_list_down(const lv_obj_t * list)
                 a.var            = scrl;
                 a.start          = lv_obj_get_y(scrl);
                 a.end            = new_y;
-                a.exec_cb             = (lv_anim_exec_cb_t)lv_obj_set_y;
-                a.path_cb           = lv_anim_path_linear;
-                a.ready_cb         = NULL;
+                a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_y;
+                a.path_cb        = lv_anim_path_linear;
+                a.ready_cb       = NULL;
                 a.act_time       = 0;
                 a.time           = LV_LIST_DEF_ANIM_TIME;
                 a.playback       = 0;
@@ -684,7 +688,6 @@ void lv_list_down(const lv_obj_t * list)
                 a.repeat         = 0;
                 a.repeat_pause   = 0;
                 lv_anim_create(&a);
-
 #endif
             }
             break;

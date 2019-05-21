@@ -45,10 +45,10 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
 static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
 static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 #if LV_USE_ANIMATION
-static void cursor_blink_anim(lv_obj_t * ta, uint8_t show);
-static void pwd_char_hider_anim(lv_obj_t * ta, int32_t x);
-#endif
+static void cursor_blink_anim(lv_obj_t * ta, lv_anim_value_t show);
+static void pwd_char_hider_anim(lv_obj_t * ta, lv_anim_value_t x);
 static void pwd_char_hider_anim_ready(lv_anim_t * a);
+#endif
 static void pwd_char_hider(lv_obj_t * ta);
 static bool char_is_accepted(lv_obj_t * ta, uint32_t c);
 static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res);
@@ -165,10 +165,10 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Create a cursor blinker animation*/
     lv_anim_t a;
     a.var            = new_ta;
-    a.exec_cb             = (lv_anim_exec_cb_t)cursor_blink_anim;
+    a.exec_cb        = (lv_anim_exec_cb_t)cursor_blink_anim;
     a.time           = LV_TA_CURSOR_BLINK_TIME;
     a.act_time       = 0;
-    a.ready_cb         = NULL;
+    a.ready_cb       = NULL;
     a.start          = 1;
     a.end            = 0;
     a.repeat         = 1;
@@ -250,10 +250,10 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
         /*Auto hide characters*/
         lv_anim_t a;
         a.var            = ta;
-        a.exec_cb             = (lv_anim_exec_cb_t)pwd_char_hider_anim;
+        a.exec_cb        = (lv_anim_exec_cb_t)pwd_char_hider_anim;
         a.time           = LV_TA_PWD_SHOW_TIME;
         a.act_time       = 0;
-        a.ready_cb         = pwd_char_hider_anim_ready;
+        a.ready_cb       = pwd_char_hider_anim_ready;
         a.start          = 0;
         a.end            = 1;
         a.repeat         = 0;
@@ -576,10 +576,10 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
     /*Reset cursor blink animation*/
     lv_anim_t a;
     a.var            = ta;
-    a.exec_cb             = (lv_anim_exec_cb_t)cursor_blink_anim;
+    a.exec_cb        = (lv_anim_exec_cb_t)cursor_blink_anim;
     a.time           = LV_TA_CURSOR_BLINK_TIME;
     a.act_time       = 0;
-    a.ready_cb         = NULL;
+    a.ready_cb       = NULL;
     a.start          = 1;
     a.end            = 0;
     a.repeat         = 1;
@@ -1386,7 +1386,7 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
  * @param ta pointer to a text area
  * @param hide 1: hide the cursor, 0: show it
  */
-static void cursor_blink_anim(lv_obj_t * ta, uint8_t show)
+static void cursor_blink_anim(lv_obj_t * ta, lv_anim_value_t show)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(show != ext->cursor.state) {
@@ -1411,14 +1411,11 @@ static void cursor_blink_anim(lv_obj_t * ta, uint8_t show)
  * @param ta unused
  * @param x unused
  */
-static void pwd_char_hider_anim(lv_obj_t * ta, int32_t x)
+static void pwd_char_hider_anim(lv_obj_t * ta, lv_anim_value_t x)
 {
     (void)ta;
     (void)x;
 }
-
-#endif
-
 
 /**
  * Call when an animation is ready to convert all characters to '*'
@@ -1429,6 +1426,7 @@ static void pwd_char_hider_anim_ready(lv_anim_t * a)
     lv_obj_t * ta = a->var;
     pwd_char_hider(ta);
 }
+#endif
 
 /**
  * Hide all characters (convert them to '*')

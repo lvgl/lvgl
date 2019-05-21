@@ -93,7 +93,9 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->indic        = NULL;
     ext->btns         = NULL;
     ext->btns_pos     = LV_TABVIEW_BTNS_POS_TOP;
+#if LV_USE_ANIMATION
     ext->anim_time    = LV_TABVIEW_DEF_ANIM_TIME;
+#endif
     ext->btns_hide    = 0;
 
     /*The signal and design functions are not copied so set them here*/
@@ -158,7 +160,9 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->btns                   = lv_btnm_create(new_tabview, copy_ext->btns);
         ext->indic                  = lv_obj_create(ext->btns, copy_ext->indic);
         ext->content                = lv_cont_create(new_tabview, copy_ext->content);
+#if LV_USE_ANIMATION
         ext->anim_time              = copy_ext->anim_time;
+#endif
 
         ext->tab_name_ptr = lv_mem_alloc(sizeof(char *));
         lv_mem_assert(ext->tab_name_ptr);
@@ -371,7 +375,11 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
             break;
     }
 
-    if(ext->anim_time == 0 || anim_en == false) {
+    if( anim_en == false
+#if LV_USE_ANIMATION
+            || ext->anim_time == 0
+#endif
+            ) {
         lv_obj_set_x(ext->content, cont_x);
     } else {
 #if LV_USE_ANIMATION
@@ -379,9 +387,9 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
         a.var            = ext->content;
         a.start          = lv_obj_get_x(ext->content);
         a.end            = cont_x;
-        a.exec_cb             = (lv_anim_exec_cb_t)lv_obj_set_x;
-        a.path_cb           = lv_anim_path_linear;
-        a.ready_cb         = NULL;
+        a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_x;
+        a.path_cb        = lv_anim_path_linear;
+        a.ready_cb       = NULL;
         a.act_time       = 0;
         a.time           = ext->anim_time;
         a.playback       = 0;
@@ -410,7 +418,11 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
             break;
     }
 
-    if(ext->anim_time == 0 || anim_en == false) {
+    if( anim_en == false
+#if LV_USE_ANIMATION
+            || ext->anim_time == 0
+#endif
+            ) {
         switch(ext->btns_pos) {
             case LV_TABVIEW_BTNS_POS_TOP:
             case LV_TABVIEW_BTNS_POS_BOTTOM:
@@ -431,18 +443,18 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
             case LV_TABVIEW_BTNS_POS_BOTTOM:
                 a.start          = lv_obj_get_x(ext->indic);
                 a.end            = indic_pos;
-                a.exec_cb             = (lv_anim_exec_cb_t)lv_obj_set_x;
+                a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_x;
                 break;
             case LV_TABVIEW_BTNS_POS_LEFT:
             case LV_TABVIEW_BTNS_POS_RIGHT:
                 a.start          = lv_obj_get_y(ext->indic);
                 a.end            = indic_pos;
-                a.exec_cb             = (lv_anim_exec_cb_t)lv_obj_set_y;
+                a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_y;
                 break;
         }
 
-        a.path_cb           = lv_anim_path_linear;
-        a.ready_cb         = NULL;
+        a.path_cb        = lv_anim_path_linear;
+        a.ready_cb       = NULL;
         a.act_time       = 0;
         a.time           = ext->anim_time;
         a.playback       = 0;
@@ -474,11 +486,13 @@ void lv_tabview_set_sliding(lv_obj_t * tabview, bool en)
  */
 void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time)
 {
+#if LV_USE_ANIMATION
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
-#if LV_USE_ANIMATION == 0
-    anim_time = 0;
-#endif
     ext->anim_time = anim_time;
+#else
+    (void) tabview;
+    (void) anim_time;
+#endif
 }
 
 /**
@@ -621,8 +635,13 @@ bool lv_tabview_get_sliding(const lv_obj_t * tabview)
  */
 uint16_t lv_tabview_get_anim_time(const lv_obj_t * tabview)
 {
+#if LV_USE_ANIMATION
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     return ext->anim_time;
+#else
+    (void) tabview;
+    return 0;
+#endif
 }
 
 /**
