@@ -375,9 +375,9 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
             break;
     }
 
-    if( anim_en == false ||
+    if( anim_en == false
 #if LV_USE_ANIMATION
-            ext->anim_time == 0
+            || ext->anim_time == 0
 #endif
             ) {
         lv_obj_set_x(ext->content, cont_x);
@@ -418,9 +418,9 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
             break;
     }
 
-    if( anim_en == false ||
+    if( anim_en == false
 #if LV_USE_ANIMATION
-            ext->anim_time == 0
+            || ext->anim_time == 0
 #endif
             ) {
         switch(ext->btns_pos) {

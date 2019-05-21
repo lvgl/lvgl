@@ -36,7 +36,9 @@
  **********************/
 static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 static void mbox_realign(lv_obj_t * mbox);
+#if LV_USE_ANIMATION
 static void lv_mbox_close_ready_cb(lv_anim_t * a);
+#endif
 static void lv_mbox_default_event_cb(lv_obj_t * mbox, lv_event_t event);
 
 /**********************
@@ -528,10 +530,12 @@ static void mbox_realign(lv_obj_t * mbox)
     }
 }
 
+#if LV_USE_ANIMATION
 static void lv_mbox_close_ready_cb(lv_anim_t * a)
 {
     lv_obj_del(a->var);
 }
+#endif
 
 static void lv_mbox_default_event_cb(lv_obj_t * mbox, lv_event_t event)
 {

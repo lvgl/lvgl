@@ -77,6 +77,7 @@ typedef struct
         uint8_t ver_draw : 1;  /*1: vertical scrollbar is visible now (Handled by the library)*/
         lv_sb_mode_t mode : 3; /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
     } sb;
+#if LV_USE_ANIMATION
     struct
     {
         lv_anim_value_t state;      /*Store the current size of the edge flash effect*/
@@ -91,6 +92,7 @@ typedef struct
         uint8_t left_ip : 1; /*Used internally to show that left most position is reached (flash is
                                 In Progress)*/
     } edge_flash;
+#endif
 
     uint8_t arrow_scroll : 1;   /*1: Enable scrolling with LV_KEY_LEFT/RIGHT/UP/DOWN*/
     uint8_t scroll_prop : 1;    /*1: Propagate the scrolling the the parent if the edge is reached*/

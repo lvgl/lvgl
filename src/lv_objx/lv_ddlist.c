@@ -933,7 +933,6 @@ static void lv_ddlist_anim_finish(lv_obj_t* ddlist)
     ext->force_sel = 0; /*Turn off drawing of selection*/
     if(ext->opened) lv_page_set_sb_mode(ddlist, LV_SB_MODE_UNHIDE);
 }
-#endif
 
 /**
  * Adjusts the ddlist's height and then positions the option within it's new height.
@@ -946,6 +945,7 @@ static void lv_ddlist_adjust_height(lv_obj_t * ddlist, lv_anim_value_t height)
     lv_obj_set_height(ddlist, height);
     lv_ddlist_pos_current_option(ddlist);
 }
+#endif
 
 /**
  * Set the position of list when it is closed to show the selected item
