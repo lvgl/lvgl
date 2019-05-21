@@ -210,7 +210,7 @@ lv_coord_t lv_cont_get_fit_height(lv_obj_t * cont)
 {
     lv_style_t * style = lv_cont_get_style(cont);
 
-    return lv_obj_get_width(cont) - 2 * style->body.padding.hor;
+    return lv_obj_get_height(cont) - 2 * style->body.padding.ver;
 }
 
 /**********************
