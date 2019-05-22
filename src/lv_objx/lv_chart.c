@@ -743,7 +743,6 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask)
         y_tmp  = y_tmp / (ext->ymax - ext->ymin);
         p2.y   = h - y_tmp + y_ofs;
 
-
         for(i = 1; i < ext->point_cnt; i++) {
             p1.x = p2.x;
             p1.y = p2.y;
@@ -976,10 +975,9 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
         lv_coord_t start_point = ext->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
         style.body.main_color = ser->color;
 
-        p1.x = 0 + x_ofs;
         p2.x = 0 + x_ofs;
 
-        p_prev = ser->start_point;
+        p_prev = start_point;
         y_tmp  = (int32_t)((int32_t)ser->points[p_prev] - ext->ymin) * h;
         y_tmp  = y_tmp / (ext->ymax - ext->ymin);
         p2.y   = h - y_tmp + y_ofs;
@@ -989,7 +987,7 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
             p1.y = p2.y;
 
             p_act = (start_point + i) % ext->point_cnt;
-            p2.x = ((w * p_act) / (ext->point_cnt - 1)) + x_ofs;
+            p2.x = ((w * i) / (ext->point_cnt - 1)) + x_ofs;
 
             y_tmp = (int32_t)((int32_t)ser->points[p_act] - ext->ymin) * h;
             y_tmp = y_tmp / (ext->ymax - ext->ymin);
@@ -999,12 +997,12 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
                ser->points[p_act] != LV_CHART_POINT_DEF) {
                 lv_point_t triangle_points[3];
                 triangle_points[0]   = p1;
-                triangle_points[1].x = p2.x;
-                triangle_points[1].y = y_ofs + h;
+                triangle_points[1]   = p2;
                 triangle_points[2].x = p1.x;
-                triangle_points[2].y = y_ofs + h;
+                triangle_points[2].y = chart->coords.y2;
                 lv_draw_triangle(triangle_points, mask, &style, opa_scale);
-                triangle_points[2] = p2;
+                triangle_points[2].x = p2.x;
+                triangle_points[0].y  =chart->coords.y2;
                 lv_draw_triangle(triangle_points, mask, &style, opa_scale);
             }
             p_prev = p_act;
