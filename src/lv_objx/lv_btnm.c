@@ -408,7 +408,7 @@ void lv_btnm_set_one_toggle(lv_obj_t * btnm, bool one_toggle)
 {
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     ext->one_toggle     = one_toggle;
-
+   lv_btnm_set_btn_ctrl_all(btnm,LV_BTNM_CTRL_TGL_ENABLE,1);
     /*If more than one button is toggled only the first one should be*/
     make_one_button_toggled(btnm, 0);
 }
