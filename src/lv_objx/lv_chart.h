@@ -61,7 +61,8 @@ typedef struct
 
 /*Data of axis */
 enum {
-    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01 /* draw the last tick */
+    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01, /* draw the last tick */
+    LV_CHART_AXIS_AUTO_MAX = 0x02 /* Auto-scale the axis to maximum value of the data series*/
 };
 typedef uint8_t lv_chart_axis_options_t;
 
@@ -72,6 +73,7 @@ typedef struct
     lv_chart_axis_options_t options;
     uint8_t major_tick_len;
     uint8_t minor_tick_len;
+    
 } lv_chart_axis_cfg_t;
 
 /*Data of chart */
@@ -82,6 +84,7 @@ typedef struct
     lv_ll_t series_ll;    /*Linked list for the data line pointers (stores lv_chart_dl_t)*/
     lv_coord_t ymin;      /*y min value (used to scale the data)*/
     lv_coord_t ymax;      /*y max value (used to scale the data)*/
+    lv_coord_t ymax_min;      /*The minimum value ymax can have when auto-scaling is used */
     uint8_t hdiv_cnt;     /*Number of horizontal division lines*/
     uint8_t vdiv_cnt;     /*Number of vertical division lines*/
     uint16_t point_cnt;   /*Point number in a data line*/
@@ -317,6 +320,20 @@ uint16_t lv_chart_get_margin(lv_obj_t * chart);
  * @param chart pointer to chart object
  */
 void lv_chart_refresh(lv_obj_t * chart);
+
+/**
+ * Enable y-axis autoscaling and set minimum value
+ * @param chart pointer to chart object
+ * @param en enable or disable
+ * @param ymax_min The minimum value ymax can have
+ */
+void lv_chart_set_yautoscale(const lv_obj_t * chart,bool en,lv_coord_t ymax_min);
+
+/**
+ * Find the maximum Y-value from all series and set as ymax
+ * @param chart pointer to chart object
+ */
+void lv_chart_calc_ymax_value(const lv_obj_t * chart);
 
 /**********************
  *      MACROS

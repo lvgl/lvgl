@@ -18,6 +18,7 @@
  *********************/
 #define LV_CHART_YMIN_DEF 0
 #define LV_CHART_YMAX_DEF 100
+#define LV_CHART_YMAX_MIN_DEF LV_CHART_YMAX_DEF
 #define LV_CHART_HDIV_DEF 3
 #define LV_CHART_VDIV_DEF 5
 #define LV_CHART_PNUM_DEF 10
@@ -87,6 +88,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->series.num = 0;
     ext->ymin = LV_CHART_YMIN_DEF;
     ext->ymax = LV_CHART_YMAX_DEF;
+    ext->ymax_min = LV_CHART_YMAX_MIN_DEF;
     ext->hdiv_cnt = LV_CHART_HDIV_DEF;
     ext->vdiv_cnt = LV_CHART_VDIV_DEF;
     ext->point_cnt = LV_CHART_PNUM_DEF;
@@ -122,6 +124,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->type                 = ext_copy->type;
         ext->ymin                 = ext_copy->ymin;
         ext->ymax                 = ext_copy->ymax;
+        ext->ymax_min                 = ext_copy->ymax_min;
         ext->hdiv_cnt             = ext_copy->hdiv_cnt;
         ext->vdiv_cnt             = ext_copy->vdiv_cnt;
         ext->point_cnt            = ext_copy->point_cnt;
@@ -489,6 +492,8 @@ lv_chart_type_t lv_chart_get_type(const lv_obj_t * chart)
     return ext->type;
 }
 
+
+
 /**
  * Get the data point number per data line on chart
  * @param chart pointer to chart object
@@ -765,6 +770,46 @@ static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask)
 }
 
 /**
+ * Enable y-axis autoscaling and set minimum value
+ * @param chart pointer to chart object
+ * @param en enable or disable
+ * @param ymax_min The minimum value ymax can have
+ */
+void lv_chart_set_yautoscale(const lv_obj_t * chart, bool en, lv_coord_t ymax_min)
+{
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    if(en) {
+    ext->y_axis.options|=LV_CHART_AXIS_AUTO_MAX;
+    } else {
+        ext->y_axis.options &= (~LV_CHART_AXIS_AUTO_MAX);
+    }
+    ext->ymax_min = ymax_min;
+}
+/**
+ * Find the maximum Y-value from all series and set as ymax
+ * @param chart pointer to chart object
+ */
+void lv_chart_calc_ymax_value(const lv_obj_t * chart)
+{
+    
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    ext->ymax_min=100;
+     uint16_t i;
+    int maxValue=0;
+    lv_coord_t p_act;
+    lv_chart_series_t * ser;
+    lv_coord_t start_point = ext->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
+    LV_LL_READ_BACK(ext->series_ll, ser) {
+        for(i = 0; i < ext->point_cnt; i++) {
+            p_act = (start_point + i) % ext->point_cnt;
+            if(ser->points[p_act]>maxValue) maxValue=ser->points[p_act];
+            
+        }
+    }
+    if(maxValue<ext->ymax_min) maxValue=ext->ymax_min;
+    ext->ymax=maxValue;
+}
+/**
  * Draw the data lines as points on a chart
  * @param chart pointer to chart object
  * @param mask mask, inherited from the design function
@@ -785,12 +830,13 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
     uint8_t series_cnt = 0;
     lv_style_t style_point;
     lv_style_copy(&style_point, &lv_style_plain);
-
+    
     style_point.body.border.width = 0;
     style_point.body.radius       = LV_RADIUS_CIRCLE;
     style_point.body.opa          = ext->series.opa;
     style_point.body.radius       = ext->series.width;
-
+    /* If enabled find the new ymax value*/
+    if(ext->y_axis.options & LV_CHART_AXIS_AUTO_MAX)    lv_chart_calc_ymax_value(chart);
     /*Go through all data lines*/
 
     LV_LL_READ_BACK(ext->series_ll, ser) {
@@ -1160,6 +1206,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
         /* count the '\n'-s to determine the number of options */
         list_index    = 0;
         num_of_labels = 0;
+
         if(ext->x_axis.list_of_values != NULL) {
             for(j = 0; ext->x_axis.list_of_values[j] != '\0'; j++) {
                 if(ext->x_axis.list_of_values[j] == '\n') num_of_labels++;
@@ -1177,6 +1224,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
         else
             num_scale_ticks = (ext->x_axis.num_tick_marks * (num_of_labels - 1));
 
+            
         for(i = 0; i < (num_scale_ticks + 1);
             i++) { /* one extra loop - it may not exist in the list, empty label */
                    /* first point of the tick */
@@ -1227,6 +1275,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
                     lv_area_t a = {(p2.x - size.x / 2), (p2.y + LV_CHART_AXIS_TO_LABEL_DISTANCE),
                                    (p2.x + size.x / 2),
                                    (p2.y + size.y + LV_CHART_AXIS_TO_LABEL_DISTANCE)};
+                                   
                     lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, -1,
                                   -1);
                 }
