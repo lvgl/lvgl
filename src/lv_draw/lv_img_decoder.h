@@ -149,6 +149,8 @@ typedef lv_res_t (*lv_img_decoder_read_line_f_t)(struct _lv_img_decoder * decode
  */
 typedef void (*lv_img_decoder_close_f_t)(struct _lv_img_decoder * decoder, struct _lv_img_decoder_dsc * dsc);
 
+typedef void * lv_img_decoder_user_data_t;
+
 typedef struct _lv_img_decoder {
     lv_img_decoder_info_f_t info_cb;
     lv_img_decoder_open_f_t open_cb;
