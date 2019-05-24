@@ -398,17 +398,6 @@ void lv_obj_realign(lv_obj_t * obj);
  */
 void lv_obj_set_auto_realign(lv_obj_t * obj, bool en);
 
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
-/**
- * Set the size of an extended clickable area
- * @param obj pointer to an object
- * @param w extended width to both sides
- * @param h extended height to both sides
- */
-void lv_obj_set_ext_click_area(lv_obj_t * obj, uint8_t w, uint8_t h);
-#endif
-
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
 /**
  * Set the size of an extended clickable area
  * @param obj pointer to an object
@@ -418,7 +407,6 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, uint8_t w, uint8_t h);
  * @param bottom extended clickable are on the bottom [px]
  */
 void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right, lv_coord_t top, lv_coord_t bottom);
-#endif
 
 /*---------------------
  * Appearance set
@@ -727,32 +715,33 @@ lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj);
  */
 bool lv_obj_get_auto_realign(lv_obj_t * obj);
 
-
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
 /**
- * Get the horizontal padding of extended clickable area
+ * Get the left padding of extended clickable area
  * @param obj pointer to an object
- * @return the horizontal padding
+ * @return the extended left padding
  */
-uint8_t lv_obj_get_ext_click_pad_hor(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_ext_click_pad_left(const lv_obj_t * obj);
 
 /**
- * Get the vertical padding of extended clickable area
+ * Get the right padding of extended clickable area
  * @param obj pointer to an object
- * @return the vertical padding
+ * @return the extended right padding
  */
-uint8_t lv_obj_get_ext_click_pad_ver(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_ext_click_pad_right(const lv_obj_t * obj);
 
-#endif
-
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
 /**
- * Get the horizontal padding of extended clickable area
+ * Get the top padding of extended clickable area
  * @param obj pointer to an object
- * @return the horizontal padding
+ * @return the extended top padding
  */
-const lv_area_t * lv_obj_get_ext_click_pad(const lv_obj_t * obj);
-#endif
+lv_coord_t lv_obj_get_ext_click_pad_top(const lv_obj_t * obj);
+
+/**
+ * Get the bottom padding of extended clickable area
+ * @param obj pointer to an object
+ * @return the extended bottom padding
+ */
+lv_coord_t lv_obj_get_ext_click_pad_bottom(const lv_obj_t * obj);
 
 /**
  * Get the extended size attribute of an object
