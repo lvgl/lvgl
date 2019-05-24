@@ -66,8 +66,6 @@ typedef struct _lv_font_struct
     const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_struct *, uint32_t);
 
     /*Pointer to the font in a font pack (must have the same line height)*/
-    struct _lv_font_struct * next_page;
-    uint8_t size;             /*The original size (height)*/
     uint8_t line_height;      /*The real line height where any text fits*/
     uint8_t base_line;        /*Base line measured from the top of the line_height*/
     void * dsc;               /*Store implementation specific data here*/

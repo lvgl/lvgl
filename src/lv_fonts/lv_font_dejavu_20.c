@@ -1,5 +1,5 @@
 
-#include "../lv_misc/lv_font.h"
+#include "../lv_misc/lv_font_fmt/lv_font_fmt_txt.h"
 
 #if LV_USE_FONT_DEJAVU_20 != 0  /*Can be enabled in lv_conf.h*/
 
@@ -8,7 +8,7 @@
 ***********************************************************************************/
 
 /*Store the image of the letters (glyph)*/
-static const uint8_t lv_font_dejavu_20_glyph_bitmap[] = {
+static const uint8_t gylph_bitmap[] = {
     /*Unicode: U+0020 ( ) , Width: 6 */
 
     /*Unicode: U+0031 (1) , Width: 8 */
@@ -81,45 +81,99 @@ static const uint8_t lv_font_dejavu_20_glyph_bitmap[] = {
     /*4 rows*/
 };
 
-
-static const lv_font_kern_t kern_0031[] = {
-        {.next_unicode = 0x0033, .space = LV_FONT_SET_WIDTH(8, 0), .space_sign = LV_FONT_KERN_POSITIVE},
-        {.next_unicode  = 0x0000}   /*Trailing*/
+static uint16_t kern_left_gylph_ids[] =
+{
+        1, 2, 3
 };
+
+static uint16_t kern_right_gylph_ids[] =
+{
+        1, 2, 3
+};
+static uint8_t kern_pair_values[] =
+{
+        15, 52, 73
+};
+
+static lv_font_kern_pair_fmt_txt_t kern_pairs =
+{
+    .left_gylph_ids = kern_left_gylph_ids,
+    .right_gylph_ids = kern_right_gylph_ids,
+    .values = kern_pair_values,
+    .pair_cnt = 3,
+};
+
+static uint8_t kern_left_class_mapping[] =
+{
+        1, 2, 1, 1, 1, 1, 1, 1
+};
+
+static uint8_t kern_right_class_mapping[] =
+{
+        1, 2, 3, 2, 2, 3, 3, 1
+};
+
+static uint8_t kern_class_values =
+{
+        32, 33, 22, 11, 55, 33, 22, 44
+};
+
+
+static lv_font_kern_classes_fmt_txt_t kern_classes =
+{
+        .class_pair_values = kern_class_values,
+        .left_class_mapping = kern_left_class_mapping,
+        .right_class_mapping = kern_right_class_mapping,
+        .left_class_cnt = 2,
+        .right_class_cnt = 3,
+};
+
+
+static uint16_t uniocde_list_1 = {0x234, 0x295, 0x456};
+static uint16_t glyph_id_ofs_list_1 = {232, 545, 1466};
+
+static uint8_t glyph_id_ofs_list_3 = {32, 45, 66};
+
 
 /*Store the glyph descriptions*/
-static const lv_font_glyph_dsc_built_in_t lv_font_dejavu_20_glyph_dsc[] = {
-    {.adv_w = LV_FONT_SET_WIDTH(6, 0),  .box_w = 6, .box_h = 0, .ofs_x = 0, .ofs_y = 0, .bitmap_index = 0, },  /*Unicode: U+0020 ( )*/
-    {.adv_w = LV_FONT_SET_WIDTH(8, 0),  .box_w = 8, .box_h = 13,.ofs_x = 0, .ofs_y = 3, .bitmap_index = 0, .kern_table = kern_0031},  /*Unicode: U+0031 (1)*/
-    {.adv_w = LV_FONT_SET_WIDTH(9, 0),  .box_w = 9, .box_h = 13,.ofs_x = 0, .ofs_y = 3, .bitmap_index = 13}, /*Unicode: U+0033 (3)*/
-    {.adv_w = LV_FONT_SET_WIDTH(12, 0), .box_w = 12,.box_h = 13,.ofs_x = 0, .ofs_y = 3, .bitmap_index = 39}, /*Unicode: U+0041 (A)*/
-    {.adv_w = LV_FONT_SET_WIDTH(8, 0),  .box_w = 8, .box_h = 10,.ofs_x = 0, .ofs_y = 6, .bitmap_index = 65}, /*Unicode: U+0061 (a)*/
+static const lv_font_cmap_fmt_txt_t cmaps[] = {
+        { .range_start = 0x280, .range_length = 124,  .glyph_id_start = 223, .unicode_list = uniocde_list_1,  .glyph_id_ofs_list = glyph_id_ofs_list_1},
+        { .range_start = 0x20,  .range_length = 112,  .glyph_id_start = 456, .unicode_list = NULL,            .glyph_id_ofs_list = NULL},
+        { .range_start = 0x560, .range_length = 7654, .glyph_id_start = 756, .unicode_list = NULL,            .glyph_id_ofs_list = glyph_id_ofs_list_3},
+
 };
 
-static const uint16_t lv_font_dejavu_20_unicode_list[] = {
-    32,   /*Unicode: U+0020 ( )*/
-    49,   /*Unicode: U+0031 (1)*/
-    51,   /*Unicode: U+0033 (3)*/
-    65,   /*Unicode: U+0041 (A)*/
-    97,   /*Unicode: U+0061 (a)*/
+static lv_font_glyph_dsc_fmt_txt_t glyph_dsc[] = {
+        {.bitmap_index = 0,     .adv_w = 123,   .box_h = 13, .box_w = 9, .ofs_x = 2, .ofs_y = 5},
+        {.bitmap_index = 32,    .adv_w = 234,   .box_h = 12, .box_w = 7, .ofs_x = 1, .ofs_y = 3},
+        {.bitmap_index = 55,    .adv_w = 98,    .box_h = 11, .box_w = 8, .ofs_x = 0, .ofs_y = 4},
 };
 
-static lv_font_dsc_built_in_t lv_font_dejavu_20_dsc = {
-    .glyph_cnt = 5,                                 /*Number of glyphs in the font*/
-    .glyph_bitmap = lv_font_dejavu_20_glyph_bitmap, /*Bitmap of glyphs*/
-    .glyph_dsc = lv_font_dejavu_20_glyph_dsc,       /*Description of glyphs*/
-    .unicode_list = lv_font_dejavu_20_unicode_list, /*Every character in the font from 'unicode_first' to 'unicode_last'*/
-    .bpp = 1,                                       /*Bit per pixel*/
+static lv_font_dsc_fmt_txt_t font_dsc = {
+        .glyph_bitmap = gylph_bitmap,
+        .glyph_dsc = glyph_dsc,
+        .cmaps = cmaps,
+        .cmap_num = 3,
+        .bpp = 4,
+
+        .kern_dsc = kern_classes,
+        .kern_classes = 1,
+        /*or*/
+        .kern_dsc = kern_pairs,
+        .kern_classes = 0,
+
+
 };
+
 
 lv_font_t lv_font_dejavu_20 = {
-    .unicode_first = 32,    /*First Unicode letter in this font*/
-    .unicode_last = 126,    /*Last Unicode letter in this font*/
-    .dsc = &lv_font_dejavu_20_dsc,
-    .get_glyph_bitmap = lv_font_get_glyph_bitmap_plain,    /*Function pointer to get glyph's bitmap*/
-    .get_glyph_dsc = lv_font_get_glyph_dsc_plain,  /*Function pointer to get glyph's width*/
-    .line_height = 20,             /*Font height in pixels*/
-    .next_page = NULL,      /*Pointer to a font extension*/
+    .unicode_first = 0x20,     /*First Unicode letter in this font*/
+    .unicode_last = 0x3F45,    /*Last Unicode letter in this font*/
+    .dsc = &font_dsc,
+    .get_glyph_bitmap = lv_font_get_bitmap_format_text_plain,    /*Function pointer to get glyph's bitmap*/
+    .get_glyph_dsc = lv_font_get_glyph_dsc_format_text_plain,    /*Function pointer to get glyph's data*/
+    .line_height = 20,          /*The maximum line height required by the font*/
+    .base_line = 9,             /*Baseline measured from the bottom of the line*/
 };
 
 #endif /*USE_LV_FONT_DEJAVU_20*/

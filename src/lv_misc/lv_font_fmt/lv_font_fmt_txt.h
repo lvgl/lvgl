@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_FONT_H
-#define LV_FONT_H
+#ifndef LV_FONT_FMT_TXT_H
+#define LV_FONT_FMT_TXT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -71,20 +71,20 @@ typedef struct {
         search a "value" in an "array" and returns the index of "value".
 
     Format 0 tiny
-        unicode_list == NULL && glyph_id_list == NULL
+        unicode_list == NULL && glyph_id_ofs_list == NULL
         glyph_id = glyph_id_start + rcp
 
     Format 0 full
-        unicode_list == NULL && glyph_id_list != NULL
-        glyph_id = glyph_id_start + glyph_id_list[rcp]
+        unicode_list == NULL && glyph_id_ofs_list != NULL
+        glyph_id = glyph_id_start + glyph_id_ofs_list[rcp]
 
     Sparse tiny
-        unicode_list != NULL && glyph_id_list == NULL
+        unicode_list != NULL && glyph_id_ofs_list == NULL
         glyph_id = glyph_id_start + search(unicode_list, rcp)
 
     Sparse full
-        unicode_list != NULL && glyph_id_list != NULL
-        glyph_id = glyph_id_start + glyph_id_list[search(unicode_list, rcp)]
+        unicode_list != NULL && glyph_id_ofs_list != NULL
+        glyph_id = glyph_id_start + glyph_id_ofs_list[search(unicode_list, rcp)]
     */
 
     uint16_t * unicode_list;
@@ -92,7 +92,7 @@ typedef struct {
     /* if unicode_list == NULL uint8_t *
      * else uint16_t *
      */
-    const void * glyph_id_list;
+    const void * glyph_id_ofs_list;
 }lv_font_cmap_fmt_txt_t;
 
 /*A simple mapping of kern values from pairs*/
@@ -190,4 +190,4 @@ bool lv_font_get_glyph_dsc_format_text_plain(const lv_font_t * font, lv_font_gly
 } /* extern "C" */
 #endif
 
-#endif /*USE_FONT*/
+#endif /*LV_FONT_FMT_TXT_H*/
