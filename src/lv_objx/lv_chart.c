@@ -586,7 +586,7 @@ static bool lv_chart_design(lv_obj_t * chart, const lv_area_t * mask, lv_design_
         lv_draw_rect(&chart->coords, mask, lv_obj_get_style(chart), lv_obj_get_opa_scale(chart));
 
         lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-
+        if(ext->y_axis.options & LV_CHART_AXIS_AUTO_MAX)    lv_chart_calc_ymax_value(chart);
         lv_chart_draw_div(chart, mask);
 
         if(ext->type & LV_CHART_TYPE_LINE) lv_chart_draw_lines(chart, mask);
@@ -836,7 +836,7 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
     style_point.body.opa          = ext->series.opa;
     style_point.body.radius       = ext->series.width;
     /* If enabled find the new ymax value*/
-    if(ext->y_axis.options & LV_CHART_AXIS_AUTO_MAX)    lv_chart_calc_ymax_value(chart);
+   
     /*Go through all data lines*/
 
     LV_LL_READ_BACK(ext->series_ll, ser) {
