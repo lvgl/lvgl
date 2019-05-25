@@ -96,10 +96,13 @@ void lv_indev_read_task(lv_task_t * task)
 
         indev_act->proc.state = data.state;
 
-
+        /*Save the last activity time*/
         if(indev_act->proc.state == LV_INDEV_STATE_PR) {
             indev_act->driver.disp->last_activity_time = lv_tick_get();
+        } else if(indev_act->driver.type == LV_INDEV_TYPE_ENCODER && data->enc_diff) {
+            indev_act->driver.disp->last_activity_time = lv_tick_get();
         }
+
         if(indev_act->driver.type == LV_INDEV_TYPE_POINTER) {
             indev_pointer_proc(indev_act, &data);
         } else if(indev_act->driver.type == LV_INDEV_TYPE_KEYPAD) {
