@@ -61,6 +61,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->ver_res  = LV_VER_RES_MAX;
     driver->buffer   = NULL;
     driver->rotated  = 0;
+    driver->color_chroma_key = LV_COLOR_TRANSP;
 
 #if LV_ANTIALIAS
     driver->antialiasing = true;
@@ -69,6 +70,10 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
 #if LV_USE_GPU
     driver->mem_blend_cb = NULL;
     driver->mem_fill_cb  = NULL;
+#endif
+
+#if LV_USE_USER_DATA
+    driver->user_data = NULL;
 #endif
 
     driver->set_px_cb = NULL;

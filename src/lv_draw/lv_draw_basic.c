@@ -462,7 +462,6 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p, const uint
 
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
-        lv_color_t chroma_key_color = LV_COLOR_TRANSP;
         lv_coord_t col;
         lv_color_t last_img_px  = LV_COLOR_BLACK;
         lv_color_t recolored_px = lv_color_mix(recolor, last_img_px, recolor_opa);
@@ -493,7 +492,7 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p, const uint
                 }
 
                 /*Handle chroma key*/
-                if(chroma_key && px_color.full == chroma_key_color.full) continue;
+                if(chroma_key && px_color.full == disp->driver.color_chroma_key.full) continue;
 
                 /*Re-color the pixel if required*/
                 if(recolor_opa != LV_OPA_TRANSP) {

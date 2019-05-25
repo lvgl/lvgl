@@ -424,8 +424,8 @@ typedef void * lv_obj_user_data_t;
 /*Text area (dependencies: lv_label, lv_page)*/
 #define LV_USE_TA       1
 #if LV_USE_TA != 0
-#  define LV_TA_CURSOR_BLINK_TIME 400     /*ms*/
-#  define LV_TA_PWD_SHOW_TIME     1500    /*ms*/
+#  define LV_TA_DEF_CURSOR_BLINK_TIME 400     /*ms*/
+#  define LV_TA_DEF_PWD_SHOW_TIME     1500    /*ms*/
 #endif
 
 /*Table (dependencies: lv_label)*/
