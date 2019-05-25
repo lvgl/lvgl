@@ -140,20 +140,32 @@ typedef struct {
      * Array of `lv_font_cmap_fmt_txt_t` variables*/
     const lv_font_cmap_fmt_txt_t * cmaps;
 
-    /* Sotore kerning values.
+    /* Store kerning values.
      * Can be  `lv_font_kern_pair_fmt_txt_t *  or `lv_font_kern_classes_fmt_txt_t *`
      * depending on `kern_classes`
-     * */
+     */
     const void * kern_dsc;
 
+    /*Scale kern values in 12.4 format*/
+    uint16_t kern_scale;
+
     /*Number of cmap tables*/
-    uint16_t cmap_num       :12;
+    uint16_t cmap_num       :10;
 
     /*Bit per pixel: 1, 2, 4 or 8*/
     uint16_t bpp            :3;
 
     /*Type of `kern_dsc`*/
     uint16_t kern_classes   :1;
+
+    /*
+     * storage format of the bitmap
+     * 0: plain
+     * 1: compressed: RLE with XOR pre-filter
+     * 2: reserved
+     * 3: reserved
+     */
+    uint16_t bitmap_format  :2;
 }lv_font_dsc_fmt_txt_t;
 
 /**********************

@@ -69,6 +69,44 @@ typedef struct _lv_font_struct
     uint8_t line_height;      /*The real line height where any text fits*/
     uint8_t base_line;        /*Base line measured from the top of the line_height*/
     void * dsc;               /*Store implementation specific data here*/
+
+
+
+/*
+    - Font size:
+        not required for calculations
+
+     - Ascent
+     - Descent
+     - typoAscent
+     - typoDescent
+     - typographic descent:
+        Better to skip them to avoid confusion. Only line height and baseline matter for rendering.
+     - typoLineGap
+        Will be overwritten by the style.
+
+     - min Y  (used to quick check line intersections with other objects)
+     - max Y
+        BBoxMinXofs and BBoxMaxXofs would be useful to handle
+        if the the lines first and last character is out of the object.
+        Y is not important becasue all glyphs will fit in line_height.
+
+    - default advanceWidth
+        Not supported in text format. glyph->advacedWidth is always present
+
+    - glyphIdFormat
+        Has foxed size on text format
+
+    - advanceWidthFormat
+        Fix 8.4 format
+
+   - Glyph BBox x/y bits length (signed value)
+   - Glyph BBox w/h bits length (unsigned)
+        Has fixed size
+
+   - Glyph advanceWidth bits length (unsigned, may be FP4)
+        Fix 8.4 format
+    */
 } lv_font_t;
 
 /**********************
