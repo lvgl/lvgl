@@ -106,7 +106,7 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
  * so the array can NOT be a local variable which will be destroyed
  * @param point_num number of points in 'point_a'
  */
-void lv_line_set_points(lv_obj_t * line, const lv_point_t * point_a, uint16_t point_num)
+void lv_line_set_points(lv_obj_t * line, const lv_point_t point_a[], uint16_t point_num)
 {
     lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
     ext->point_array    = point_a;
