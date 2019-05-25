@@ -200,7 +200,7 @@ void lv_chart_init_points(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t 
  * @param ser pointer to a data series on 'chart'
  * @param y_array array of 'lv_coord_t' points (with 'points count' elements )
  */
-void lv_chart_set_points(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t * y_array);
+void lv_chart_set_points(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y_array[]);
 
 /**
  * Shift all data right and set the most right data on a data line
