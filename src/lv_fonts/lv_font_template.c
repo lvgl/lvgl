@@ -42,9 +42,9 @@ static const uint8_t gylph_bitmap[] = {
  *--------------------*/
 
 static lv_font_glyph_dsc_fmt_txt_t glyph_dsc[] = {
-        {.bitmap_index = 0,     .adv_w = 123,   .box_h = 13, .box_w = 9, .ofs_x = 2, .ofs_y = 5},
-        {.bitmap_index = 32,    .adv_w = 234,   .box_h = 12, .box_w = 7, .ofs_x = 1, .ofs_y = 3},
-        {.bitmap_index = 55,    .adv_w = 98,    .box_h = 11, .box_w = 8, .ofs_x = 0, .ofs_y = 4},
+        {.bitmap_index = 0,     .adv_w = LV_FONT_X4_SET(12, 3), .box_h = 13, .box_w = 9, .ofs_x = 2, .ofs_y = 5},
+        {.bitmap_index = 32,    .adv_w = LV_FONT_X4_SET(8, 7),  .box_h = 12, .box_w = 7, .ofs_x = 1, .ofs_y = 3},
+        {.bitmap_index = 55,    .adv_w = LV_FONT_X4_SET(4, 11), .box_h = 11, .box_w = 8, .ofs_x = 0, .ofs_y = 4},
 };
 
 /*---------------------
@@ -113,7 +113,7 @@ static uint8_t kern_right_class_mapping[] =
 /*Kern values between classes*/
 static uint8_t kern_class_values =
 {
-        32, 33, 22, 11, 55, 33, 22, 44
+        LV_FONT_X4_SET(2, 7), LV_FONT_X4_SET(-1, 3), LV_FONT_X4_SET(0, 13), LV_FONT_X4_SET(5, 7)
 };
 
 
@@ -140,6 +140,7 @@ static lv_font_dsc_fmt_txt_t font_dsc = {
         .cmap_num = 3,
         .bpp = 4,
 
+        .kerning_scale = 324,
         .kern_dsc = kern_classes,
         .kern_classes = 1,
         /*** OR ***/

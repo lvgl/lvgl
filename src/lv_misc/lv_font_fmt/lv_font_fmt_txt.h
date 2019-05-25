@@ -193,6 +193,9 @@ bool lv_font_get_glyph_dsc_format_text_plain(const lv_font_t * font, lv_font_gly
 /**********************
  *      MACROS
  **********************/
+#define LV_FONT_X4_SET(_int, _fract)  ((_int << 4) + _fract)
+#define LV_FONT_X4_INT(_num)    (_num >> 4)
+#define LV_FONT_X4_FRACT(_num)  (_num & 0xF)
 
 /**********************
  * ADD BUILT IN FONTS
