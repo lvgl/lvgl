@@ -47,7 +47,7 @@ static int32_t lv_font_codeCompare(const void * pRef, const void * pElement);
  * @param unicode_letter an unicode letter which bitmap should be get
  * @return pointer to the bitmap or NULL if not found
  */
-const uint8_t * lv_font_get_bitmap_format_text_plain(const lv_font_t * font, uint32_t unicode_letter)
+const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter)
 {
     /*Check the range*/
     if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return NULL;
@@ -82,7 +82,7 @@ const uint8_t * lv_font_get_bitmap_format_text_plain(const lv_font_t * font, uin
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
  */
-bool lv_font_get_glyph_dsc_format_text_plain(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter)
+bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter)
 {
     /*Check the range*/
     if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return NULL;

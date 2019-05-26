@@ -68,9 +68,9 @@ typedef struct _lv_font_struct
     /*Pointer to the font in a font pack (must have the same line height)*/
     uint8_t line_height;      /*The real line height where any text fits*/
     uint8_t base_line;        /*Base line measured from the top of the line_height*/
+    int8_t  box_x_ofs_min;    /*Smallest glyph box X offset*/
+    int8_t  box_x_ofs_max;    /*Greatest glyph box X offset*/
     void * dsc;               /*Store implementation specific data here*/
-
-
 
 /*
     - Font size:
@@ -84,12 +84,6 @@ typedef struct _lv_font_struct
         Better to skip them to avoid confusion. Only line height and baseline matter for rendering.
      - typoLineGap
         Will be overwritten by the style.
-
-     - min Y  (used to quick check line intersections with other objects)
-     - max Y
-        BBoxMinXofs and BBoxMaxXofs would be useful to handle
-        if the the lines first and last character is out of the object.
-        Y is not important becasue all glyphs will fit in line_height.
 
     - default advanceWidth
         Not supported in text format. glyph->advacedWidth is always present

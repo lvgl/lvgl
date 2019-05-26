@@ -37,7 +37,7 @@ extern "C" {
 typedef struct
 {
     uint32_t bitmap_index : 20;     /* Start index of the bitmap. A font can be max 1 MB. */
-    uint32_t adv_w :12;             /*The glyph needs this space. Draw the next glyph after this width. 8.4 format. */
+    uint32_t adv_w :12;             /*Draw the next glyph after this width. 12.4 format (real_value * 16 is stored). */
 
     uint8_t box_w;                  /*Width of the glyph's bounding box*/
     uint8_t box_h;                  /*Height of the glyph's bounding box*/
@@ -178,7 +178,7 @@ typedef struct {
  * @param unicode_letter an unicode letter which bitmap should be get
  * @return pointer to the bitmap or NULL if not found
  */
-const uint8_t * lv_font_get_bitmap_format_text_plain(const lv_font_t * font, uint32_t letter);
+const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t letter);
 
 /**
  * Used as `get_glyph_dsc` callback in LittelvGL's native font format if the font is uncompressed.
@@ -188,14 +188,11 @@ const uint8_t * lv_font_get_bitmap_format_text_plain(const lv_font_t * font, uin
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
  */
-bool lv_font_get_glyph_dsc_format_text_plain(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter);
+bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter);
 
 /**********************
  *      MACROS
  **********************/
-#define LV_FONT_X4_SET(_int, _fract)  ((_int << 4) + _fract)
-#define LV_FONT_X4_INT(_num)    (_num >> 4)
-#define LV_FONT_X4_FRACT(_num)  (_num & 0xF)
 
 /**********************
  * ADD BUILT IN FONTS

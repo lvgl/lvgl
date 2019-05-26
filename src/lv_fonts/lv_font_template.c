@@ -42,9 +42,9 @@ static const uint8_t gylph_bitmap[] = {
  *--------------------*/
 
 static lv_font_glyph_dsc_fmt_txt_t glyph_dsc[] = {
-        {.bitmap_index = 0,     .adv_w = LV_FONT_X4_SET(12, 3), .box_h = 13, .box_w = 9, .ofs_x = 2, .ofs_y = 5},
-        {.bitmap_index = 32,    .adv_w = LV_FONT_X4_SET(8, 7),  .box_h = 12, .box_w = 7, .ofs_x = 1, .ofs_y = 3},
-        {.bitmap_index = 55,    .adv_w = LV_FONT_X4_SET(4, 11), .box_h = 11, .box_w = 8, .ofs_x = 0, .ofs_y = 4},
+        {.bitmap_index = 0,     .adv_w = 23,    .box_h = 13, .box_w = 9, .ofs_x = 2, .ofs_y = 5},
+        {.bitmap_index = 32,    .adv_w = 44,    .box_h = 12, .box_w = 7, .ofs_x = 1, .ofs_y = 3},
+        {.bitmap_index = 55,    .adv_w = 29,    .box_h = 11, .box_w = 8, .ofs_x = 0, .ofs_y = 4},
 };
 
 /*---------------------
@@ -81,10 +81,11 @@ static uint16_t kern_right_gylph_ids[] =
     0x41, 0x342, 0x333
 };
 
-/*Kerning between the respective left and right glyphs*/
+/* Kerning between the respective left and right glyphs
+ * 12.4 format. (rael_value * 16 is stored) */
 static uint8_t kern_pair_values[] =
 {
-    15, 52, 73
+    23, 33, 55
 };
 
 /*Collect the kern pair's data in one place*/
@@ -110,10 +111,11 @@ static uint8_t kern_right_class_mapping[] =
         1, 2, 3, 2, 2, 3, 3, 1
 };
 
-/*Kern values between classes*/
+/* Kern values between classes
+ * 12.4 format. (rael_value * 16 is stored)*/
 static uint8_t kern_class_values =
 {
-        LV_FONT_X4_SET(2, 7), LV_FONT_X4_SET(-1, 3), LV_FONT_X4_SET(0, 13), LV_FONT_X4_SET(5, 7)
+        44, 66, 24, 23, 56, 23
 };
 
 
@@ -158,8 +160,9 @@ lv_font_t font_name = {
     .unicode_first = 0x20,     /*First Unicode letter in this font*/
     .unicode_last = 0x3F45,    /*Last Unicode letter in this font*/
     .dsc = &font_dsc,          /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
-    .get_glyph_bitmap = lv_font_get_bitmap_format_text_plain,    /*Function pointer to get glyph's bitmap*/
-    .get_glyph_dsc = lv_font_get_glyph_dsc_format_text_plain,    /*Function pointer to get glyph's data*/
+    .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
+    .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt
+    ,    /*Function pointer to get glyph's data*/
     .line_height = 20,          /*The maximum line height required by the font*/
     .base_line = 9,             /*Baseline measured from the bottom of the line*/
 };
