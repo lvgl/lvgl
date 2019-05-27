@@ -68,8 +68,6 @@ typedef struct _lv_font_struct
     /*Pointer to the font in a font pack (must have the same line height)*/
     uint8_t line_height;      /*The real line height where any text fits*/
     uint8_t base_line;        /*Base line measured from the top of the line_height*/
-    int8_t  box_x_ofs_min;    /*Smallest glyph box X offset*/
-    int8_t  box_x_ofs_max;    /*Greatest glyph box X offset*/
     void * dsc;               /*Store implementation specific data here*/
 
 /*
