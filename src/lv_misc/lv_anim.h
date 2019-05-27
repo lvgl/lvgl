@@ -99,7 +99,7 @@ void lv_anim_core_init(void);
 void lv_anim_init(lv_anim_t * a);
 
 /**
- * Set a function to execute by the aniamtion
+ * Set a variable to animate function to execute on `var`
  * @param a pointer to an initialized `lv_anim_t` variable
  * @param var pointer to a variable to animate
  * @param exec_cb a function to execute.
