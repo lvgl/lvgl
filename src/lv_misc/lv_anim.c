@@ -96,7 +96,11 @@ void lv_anim_create(lv_anim_t * a)
     memcpy(new_anim, a, sizeof(lv_anim_t));
 
     /*Set the start value*/
-    if(new_anim->exec_cb != NULL) new_anim->exec_cb(new_anim->var, new_anim->start);
+    if(new_anim->exec_cb != NULL) {
+        /*Pass `new_anim` if `var` is not set*/
+        if(a->var) new_anim->exec_cb(new_anim->var, new_anim->start);
+        else new_anim->exec_cb(new_anim, new_anim->start);
+    }
 
     /* Creating an animation changed the linked list.
      * It's important if it happens in a ready callback. (see `anim_task`)*/
@@ -385,7 +389,8 @@ static void anim_task(lv_task_t * param)
     }
 
     uint32_t elaps = lv_tick_elaps(last_task_run);
-    a              = lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll));
+
+    a = lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll));
 
     while(a != NULL) {
         /*It can be set by `lv_anim_del()` typically in `end_cb`. If set then an animation delete
@@ -404,7 +409,15 @@ static void anim_task(lv_task_t * param)
                 int32_t new_value;
                 new_value = a->path_cb(a);
 
-                if(a->exec_cb != NULL) a->exec_cb(a->var, new_value); /*Apply the calculated value*/
+                /*Apply the calculated value*/
+                if(a->exec_cb != NULL) {
+                    /*Pass `a` as first parameter if `var` is not set*/
+                    if(a->var) {
+                        a->exec_cb(a->var, new_value);
+                    } else {
+                        a->exec_cb(a, new_value);
+                    }
+                }
 
                 /*If the time is elapsed the animation is ready*/
                 if(a->act_time >= a->time) {
