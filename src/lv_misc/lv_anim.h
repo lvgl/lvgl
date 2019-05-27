@@ -106,7 +106,7 @@ void lv_anim_init(lv_anim_t * a);
  *                LittelvGL's built-in functions can be used.
  *                E.g. lv_obj_set_x
  */
-static inline void lv_anim_set_var_and_cb(lv_anim_t * a, void * var, lv_anim_exec_cb_t exec_cb)
+static inline void lv_anim_set_exec_cb(lv_anim_t * a, void * var, lv_anim_exec_cb_t exec_cb)
 {
     a->var = var;
     a->exec_cb = exec_cb;
@@ -146,7 +146,7 @@ static inline void lv_anim_set_values(lv_anim_t * a, lv_anim_value_t start, lv_a
  */
 static inline void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 {
-    a->var = NULL;
+    a->var = a;
     a->exec_cb = (lv_anim_exec_cb_t)exec_cb;
 }
 
