@@ -99,13 +99,17 @@ void lv_anim_core_init(void);
 void lv_anim_init(lv_anim_t * a);
 
 /**
- * Set a variable to animate
+ * Set a function to execute by the aniamtion
  * @param a pointer to an initialized `lv_anim_t` variable
  * @param var pointer to a variable to animate
+ * @param exec_cb a function to execute.
+ *                LittelvGL's built-in functions can be used.
+ *                E.g. lv_obj_set_x
  */
-static inline void lv_anim_set_var(lv_anim_t * a, void * var)
+static inline void lv_anim_set_var_and_cb(lv_anim_t * a, void * var, lv_anim_exec_cb_t exec_cb)
 {
     a->var = var;
+    a->exec_cb = exec_cb;
 }
 
 /**
@@ -133,19 +137,7 @@ static inline void lv_anim_set_values(lv_anim_t * a, lv_anim_value_t start, lv_a
 }
 
 /**
- * Set a function to execute by the aniamtion
- * @param a pointer to an initialized `lv_anim_t` variable
- * @param exec_cb a function to execute.
- *                LittelvGL's built-in functions can be used.
- *                E.g. lv_obj_set_x
- */
-static inline void lv_anim_set_exec_cb(lv_anim_t * a, lv_anim_exec_cb_t exec_cb)
-{
-    a->exec_cb = exec_cb;
-}
-
-/**
- * The same as `lv_anim_set_exec_cb` but `lv_anim_custom_exec_cb_t` receives
+ * Similar to `lv_anim_set_var_and_cb` but `lv_anim_custom_exec_cb_t` receives
  * `lv_anim_t * ` as its first parameter instead of `void *`.
  * This function might be used when LittlevGL is binded to other languages because
  * it's more consistent to have `lv_anim_t *` as first parameter.
@@ -154,6 +146,7 @@ static inline void lv_anim_set_exec_cb(lv_anim_t * a, lv_anim_exec_cb_t exec_cb)
  */
 static inline void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 {
+    a->var = NULL;
     a->exec_cb = (lv_anim_exec_cb_t)exec_cb;
 }
 
