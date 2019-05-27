@@ -82,7 +82,7 @@ static uint16_t kern_right_gylph_ids[] =
 };
 
 /* Kerning between the respective left and right glyphs
- * 12.4 format which needs to scaled with `kern_scale`*/
+ * 4.4 format which needs to scaled with `kern_scale`*/
 static int8_t kern_pair_values[] =
 {
     23, -33, 55
@@ -112,7 +112,7 @@ static uint8_t kern_right_class_mapping[] =
 };
 
 /* Kern values between classes
- * 12.4 format which needs to scaled with `kern_scale`*/
+ * 4.4 format which needs to scaled with `kern_scale`*/
 static int8_t kern_class_values =
 {
         44, -66, 24, -23, 56, 23
