@@ -2,11 +2,7 @@
 #include "lvgl/lvgl.h"
 
 /***********************************************************************************
- * Size: 20 px
- * Bpp: 1 (or 2/4/8/compressed)
- * Fonts:
- *  DejaVuSans.ttf:     U+0020 ( ) .. U+007e (~) range
- *  FoneAwesome.ttf:    U+1e20 (?) .. U+1f22 (?), U+1f33 (?), U+1f66 (?)
+ * Copy/Paste the command line instruction
  **********************************************************************************/
 
 /*-----------------
@@ -59,9 +55,17 @@ static uint8_t glyph_id_ofs_list_3 = {32, 45, 66};
 
 /*Collect the unicode lists and glyph_id offsets*/
 static const lv_font_cmap_fmt_txt_t cmaps[] = {
-        { .range_start = 0x280, .range_length = 124,  .glyph_id_start = 223, .unicode_list = unicode_list_1,  .glyph_id_ofs_list = glyph_id_ofs_list_1},
-        { .range_start = 0x20,  .range_length = 112,  .glyph_id_start = 456, .unicode_list = NULL,            .glyph_id_ofs_list = NULL},
-        { .range_start = 0x560, .range_length = 7654, .glyph_id_start = 756, .unicode_list = NULL,            .glyph_id_ofs_list = glyph_id_ofs_list_3},
+        {
+            .range_start = 0x280,  .range_length = 124,   .type = LV_FONT_FMT_TXT_CMAP_SPARSE_FULL,
+            .glyph_id_start = 223, .unicode_list = unicode_list_1,  .glyph_id_ofs_list = glyph_id_ofs_list_1
+        },
+        {
+            .range_start = 0x20,  .range_length = 112,     .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY,
+            .glyph_id_start = 456, .unicode_list = NULL,   .glyph_id_ofs_list = NULL
+        },
+        {
+            .range_start = 0x560, .range_length = 7654,    .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL,
+            .glyph_id_start = 756, .unicode_list = NULL,   .glyph_id_ofs_list = glyph_id_ofs_list_3},
 
 };
 
