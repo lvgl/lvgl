@@ -56,9 +56,6 @@ typedef struct
 /*Describe the properties of a font*/
 typedef struct _lv_font_struct
 {
-    uint32_t unicode_first;
-    uint32_t unicode_last;
-
     /*Get a glyph's  descriptor from a font*/
     bool (*get_glyph_dsc)(const struct _lv_font_struct *, lv_font_glyph_dsc_t *, uint32_t letter);
 
