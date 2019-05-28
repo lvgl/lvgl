@@ -69,8 +69,6 @@ typedef struct {
     /* First glyph ID (array index of `glyph_dsc`) for this range */
     uint16_t glyph_id_start;
 
-    lv_font_fmt_txt_cmap_type_t type;
-
     /*
     According the specification there are 4 formats:
         https://github.com/littlevgl/lv_font_conv/blob/master/doc/font_spec.md
@@ -99,13 +97,17 @@ typedef struct {
     */
 
     uint16_t * unicode_list;
-    uint32_t unicode_list_length;
 
     /* if(type == LV_FONT_FMT_TXT_CMAP_FORMAT0_...) it's `uint8_t *`
      * if(type == LV_FONT_FMT_TXT_CMAP_SPARSE_...)  it's `uint16_t *`
      */
     const void * glyph_id_ofs_list;
-    uint32_t glyph_id_ofs_list_length;
+
+    /*Length of `unicode_list` and/or `glyph_id_ofs_list`*/
+    uint16_t list_length;
+
+    /*Type of this character map*/
+    lv_font_fmt_txt_cmap_type_t type   :2;
 }lv_font_fmt_txt_cmap_t;
 
 /*Describe glyph pairs for kerning*/
