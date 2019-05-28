@@ -43,7 +43,7 @@ typedef struct
     uint8_t box_h;                  /*Height of the glyph's bounding box*/
     int8_t ofs_x;                   /*x offset of the bounding box*/
     uint8_t ofs_y;                  /*y offset of the bounding box. Measured from the top of the line*/
-}lv_font_glyph_dsc_fmt_txt_t;
+}lv_font_fmt_txt_glyph_dsc_t;
 
 
 typedef enum {
@@ -100,31 +100,39 @@ typedef struct {
 
     uint16_t * unicode_list;
 
-    /* if unicode_list == NULL uint8_t *
-     * else uint16_t *
+    /* if(type == LV_FONT_FMT_TXT_CMAP_FORMAT0_...) it's `uint8_t *`
+     * if(type == LV_FONT_FMT_TXT_CMAP_SPARSE_...)  it's `uint16_t *`
      */
     const void * glyph_id_ofs_list;
-}lv_font_cmap_fmt_txt_t;
+}lv_font_fmt_txt_cmap_t;
+
+/*Describe glyph pairs for kerning*/
+typedef union {
+    struct {
+        uint16_t left;
+        uint16_t right;
+    }pair;
+    uint32_t both;
+}lv_font_fmt_txt_kern_pair_id_t;
 
 /*A simple mapping of kern values from pairs*/
 typedef struct {
     /*To get a kern value of two code points:
-       1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_cmap_built_in_t
+       1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_fmt_txt_cmap_t
        2  for(i = 0; i < pair_cnt; i++)
-             if(left_gylph_ids[i] == glyph_id_left &&
-                right_gylph_ids[i] == glyph_id_right)
+             if(gylph_ids[i].pair.left == glyph_id_left &&
+                gylph_ids[i].pair.right == glyph_id_right)
                  return values[i];
      */
-    uint16_t * left_gylph_ids;
-    uint16_t * right_gylph_ids;
+    lv_font_fmt_txt_kern_pair_id_t glyph_ids;
     uint8_t * values;
     uint16_t pair_cnt;
-}lv_font_kern_pair_fmt_txt_t;
+}lv_font_fmt_txt_kern_pair_t;
 
 /*More complex but more optimal class based kern value storage*/
 typedef struct {
     /*To get a kern value of two code points:
-          1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_cmap_built_in_t
+          1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_fmt_txt_cmap_t
           2  Get the class of the left and right glyphs as `left_class` and `right_class`
               for(i = 0; i < left_class_num; i++)
                 if(left_class_mapping[i] == glyph_id_left)
@@ -137,7 +145,15 @@ typedef struct {
     uint8_t * right_class_mapping;  /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
     uint8_t left_class_cnt;
     uint8_t right_class_cnt;
-}lv_font_kern_classes_fmt_txt_t;
+}lv_font_fmt_txt_kern_classes_t;
+
+
+/*Bitmap formats*/
+typedef enum {
+    LV_FONT_FMT_TXT_PLAIN      = 0,
+    LV_FONT_FMT_TXT_COMPRESSED = 1,
+}lv_font_fmt_txt_bitmap_format_t;
+
 
 /*Describe store additional data for fonts */
 typedef struct {
@@ -145,14 +161,14 @@ typedef struct {
     const uint8_t * glyph_bitmap;
 
     /*Describe the glyphs*/
-    const lv_font_glyph_dsc_fmt_txt_t * glyph_dsc;
+    const lv_font_fmt_txt_glyph_dsc_t * glyph_dsc;
 
     /* Map the glyphs to Unicode characters.
      * Array of `lv_font_cmap_fmt_txt_t` variables*/
-    const lv_font_cmap_fmt_txt_t * cmaps;
+    const lv_font_fmt_txt_cmap_t * cmaps;
 
     /* Store kerning values.
-     * Can be  `lv_font_kern_pair_fmt_txt_t *  or `lv_font_kern_classes_fmt_txt_t *`
+     * Can be  `lv_font_fmt_txt_kern_pair_t *  or `lv_font_kern_classes_fmt_txt_t *`
      * depending on `kern_classes`
      */
     const void * kern_dsc;
@@ -171,13 +187,10 @@ typedef struct {
 
     /*
      * storage format of the bitmap
-     * 0: plain
-     * 1: compressed: RLE with XOR pre-filter
-     * 2: reserved
-     * 3: reserved
+     * from `lv_font_fmt_txt_bitmap_format_t`
      */
     uint16_t bitmap_format  :2;
-}lv_font_dsc_fmt_txt_t;
+}lv_font_fmt_txt_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
