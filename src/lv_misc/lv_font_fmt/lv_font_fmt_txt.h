@@ -99,11 +99,13 @@ typedef struct {
     */
 
     uint16_t * unicode_list;
+    uint32_t unicode_list_length;
 
     /* if(type == LV_FONT_FMT_TXT_CMAP_FORMAT0_...) it's `uint8_t *`
      * if(type == LV_FONT_FMT_TXT_CMAP_SPARSE_...)  it's `uint16_t *`
      */
     const void * glyph_id_ofs_list;
+    uint32_t glyph_id_ofs_list_length;
 }lv_font_fmt_txt_cmap_t;
 
 /*Describe glyph pairs for kerning*/
