@@ -23,8 +23,6 @@
  *  STATIC PROTOTYPES
  **********************/
 
-static int32_t lv_font_codeCompare(const void * pRef, const void * pElement);
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -50,39 +48,6 @@ void lv_font_init(void)
 }
 
 /**
- * Add a font to an other to extend the character set.
- * @param child the font to add
- * @param parent this font will be extended. Using it later will contain the characters from `child`
- */
-void lv_font_add(lv_font_t * child, lv_font_t * parent)
-{
-    if(parent == NULL) return;
-
-    while(parent->next_page != NULL) {
-        parent = parent->next_page; /*Got to the last page and add the new font there*/
-    }
-
-    parent->next_page = child;
-}
-
-/**
- * Remove a font from a character set.
- * @param child the font to remove
- * @param parent remove `child` from here
- */
-void lv_font_remove(lv_font_t * child, lv_font_t * parent)
-{
-    if(parent == NULL) return;
-    if(child == NULL) return;
-
-    while(parent->next_page != child) {
-        parent = parent->next_page; /*Got to the last page and add the new font there*/
-    }
-
-    parent->next_page = child->next_page;
-}
-
-/**
  * Return with the bitmap of a font.
  * @param font_p pointer to a font
  * @param letter an UNICODE character code
@@ -90,15 +55,7 @@ void lv_font_remove(lv_font_t * child, lv_font_t * parent)
  */
 const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t letter)
 {
-    const lv_font_t * font_i = font_p;
-    while(font_i != NULL) {
-        const uint8_t * bitmap = font_i->get_glyph_bitmap(font_i, letter);
-        if(bitmap) return bitmap;
-
-        font_i = font_i->next_page;
-    }
-
-    return NULL;
+    return font_p->get_glyph_bitmap(font_p, letter);
 }
 
 /**
@@ -109,18 +66,25 @@ const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t lett
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
  */
-bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter)
+bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter, uint32_t letter_next)
 {
-    const lv_font_t * font_i = font_p;
+    return font_p->get_glyph_dsc(font_p, dsc_out, letter, letter_next);
+}
+
+/**
+ * Get the width of a glyph with kerning
+ * @param font pointer to a font
+ * @param letter an UNICODE letter
+ * @param letter_next the next letter after `letter`. Used for kerning
+ * @return the width of the glyph
+ */
+uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next)
+{
+    lv_font_glyph_dsc_t g;
     bool ret;
-    while(font_i != NULL) {
-        ret = font_i->get_glyph_dsc(font_i, dsc_out, letter);
-        if(ret) return ret;
-
-        font_i = font_i->next_page;
-    }
-
-    return false;
+    ret = lv_font_get_glyph_dsc(font, &g, letter, letter_next);
+    if(ret) return g.adv_w;
+    else return 0;
 }
 
 /**********************

@@ -16,7 +16,7 @@ extern "C" {
 #ifdef LV_CONF_INCLUDE_SIMPLE
 #include "lv_conf.h"
 #else
-#include "../../../lv_conf.h"
+#include "../../../../lv_conf.h"
 #endif
 
 #include <stdint.h>
@@ -128,8 +128,8 @@ typedef struct {
                 gylph_ids[i].pair.right == glyph_id_right)
                  return values[i];
      */
-    lv_font_fmt_txt_kern_pair_id_t glyph_ids;
-    uint8_t * values;
+    const lv_font_fmt_txt_kern_pair_id_t * glyph_ids;
+    const uint8_t * values;
     uint16_t pair_cnt;
 }lv_font_fmt_txt_kern_pair_t;
 
@@ -144,9 +144,9 @@ typedef struct {
           3. value = class_pair_values[(left_class-1)*right_class_cnt + (righ_class-1)]
         */
 
-    uint8_t * class_pair_values;    /*left_class_num * right_class_num value*/
-    uint8_t * left_class_mapping;   /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
-    uint8_t * right_class_mapping;  /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
+    const uint8_t * class_pair_values;    /*left_class_num * right_class_num value*/
+    const uint8_t * left_class_mapping;   /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
+    const uint8_t * right_class_mapping;  /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
     uint8_t left_class_cnt;
     uint8_t right_class_cnt;
 }lv_font_fmt_txt_kern_classes_t;
@@ -216,7 +216,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t lett
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
  */
-bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter);
+bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter, uint32_t unicode_letter_next);
 
 /**********************
  *      MACROS

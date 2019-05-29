@@ -57,7 +57,7 @@ typedef struct
 typedef struct _lv_font_struct
 {
     /*Get a glyph's  descriptor from a font*/
-    bool (*get_glyph_dsc)(const struct _lv_font_struct *, lv_font_glyph_dsc_t *, uint32_t letter);
+    bool (*get_glyph_dsc)(const struct _lv_font_struct *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
     /*Get a glyph's bitmap from a font*/
     const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_struct *, uint32_t);
@@ -66,36 +66,6 @@ typedef struct _lv_font_struct
     uint8_t line_height;      /*The real line height where any text fits*/
     uint8_t base_line;        /*Base line measured from the top of the line_height*/
     void * dsc;               /*Store implementation specific data here*/
-
-/*
-    - Font size:
-        not required for calculations
-
-     - Ascent
-     - Descent
-     - typoAscent
-     - typoDescent
-     - typographic descent:
-        Better to skip them to avoid confusion. Only line height and baseline matter for rendering.
-     - typoLineGap
-        Will be overwritten by the style.
-
-    - default advanceWidth
-        Not supported in text format. glyph->advacedWidth is always present
-
-    - glyphIdFormat
-        Has foxed size on text format
-
-    - advanceWidthFormat
-        Fix 8.4 format
-
-   - Glyph BBox x/y bits length (signed value)
-   - Glyph BBox w/h bits length (unsigned)
-        Has fixed size
-
-   - Glyph advanceWidth bits length (unsigned, may be FP4)
-        Fix 8.4 format
-    */
 } lv_font_t;
 
 /**********************
@@ -106,20 +76,6 @@ typedef struct _lv_font_struct
  * Initialize the font module
  */
 void lv_font_init(void);
-
-/**
- * Add a font to an other to extend the character set.
- * @param child the font to add
- * @param parent this font will be extended. Using it later will contain the characters from `child`
- */
-void lv_font_add(lv_font_t * child, lv_font_t * parent);
-
-/**
- * Remove a font from a character set.
- * @param child the font to remove
- * @param parent remove `child` from here
- */
-void lv_font_remove(lv_font_t * child, lv_font_t * parent);
 
 /**
  * Return with the bitmap of a font.
@@ -137,7 +93,7 @@ const uint8_t * lv_font_get_glyph_bitmap(const lv_font_t * font_p, uint32_t lett
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
  */
-bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter);
+bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_out, uint32_t letter, uint32_t letter_next);
 
 /**
  * Get the width of a glyph with kerning
@@ -146,7 +102,7 @@ bool lv_font_get_glyph_dsc(const lv_font_t * font_p, lv_font_glyph_dsc_t * dsc_o
  * @param letter_next the next letter after `letter`. Used for kerning
  * @return the width of the glyph
  */
-uint8_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next);
+uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32_t letter_next);
 
 /**
  * Get the line height of a font. All characters fit into this height

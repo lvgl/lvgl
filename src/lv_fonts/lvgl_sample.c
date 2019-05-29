@@ -374,15 +374,15 @@ static const uint8_t gylph_bitmap[] = {
 
     /* U+7E "~" */
     0x7, 0x66, 0xdc, 0x20, 0x0
-}
+};
 
 
 /*---------------------
  *  GLYPH DESCRIPTION
  *--------------------*/
 
-static lv_font_glyph_dsc_fmt_txt_t glyph_dsc[] = {
-    {.bitmap_index = 0, .adv_w = 0, .box_h = 0, .box_w = 0, .ofs_x = 0, .ofs_y = 0} // id = 0 reserved,
+static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
+    {.bitmap_index = 0, .adv_w = 0, .box_h = 0, .box_w = 0, .ofs_x = 0, .ofs_y = 0}, // id = 0 reserved,
     {.bitmap_index = 0, .adv_w = 64, .box_h = 0, .box_w = 0, .ofs_x = 0, .ofs_y = 0},
     {.bitmap_index = 0, .adv_w = 67, .box_h = 12, .box_w = 2, .ofs_x = 1, .ofs_y = 0},
     {.bitmap_index = 3, .adv_w = 92, .box_h = 5, .box_w = 5, .ofs_x = 0, .ofs_y = 7},
@@ -478,7 +478,7 @@ static lv_font_glyph_dsc_fmt_txt_t glyph_dsc[] = {
     {.bitmap_index = 1036, .adv_w = 63, .box_h = 15, .box_w = 2, .ofs_x = 1, .ofs_y = -3},
     {.bitmap_index = 1040, .adv_w = 87, .box_h = 16, .box_w = 5, .ofs_x = 0, .ofs_y = -3},
     {.bitmap_index = 1050, .adv_w = 174, .box_h = 4, .box_w = 9, .ofs_x = 1, .ofs_y = 3}
-}
+};
 
 
 /*---------------------
@@ -495,7 +495,7 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
         .range_start = 32, .range_length = 95, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY,
         .glyph_id_start = 1, .unicode_list = NULL, .glyph_id_ofs_list = NULL
     }
-}
+};
 
 
 /*-----------------
@@ -504,7 +504,7 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
 
 
 /*Pair left and right glyphs for kerning*/
-static lv_font_fmt_txt_kern_pair_id_t kern_pair_glyph_ids[] =
+static const lv_font_fmt_txt_kern_pair_id_t kern_pair_glyph_ids[] =
 {
     {.pair.left = 9, .pair.right = 43},
     {.pair.left = 9, .pair.right = 55},
@@ -994,7 +994,7 @@ static lv_font_fmt_txt_kern_pair_id_t kern_pair_glyph_ids[] =
 
 /* Kerning between the respective left and right glyphs
  * 4.4 format which needs to scaled with `kern_scale`*/
-static int8_t kern_pair_values[] =
+static const int8_t kern_pair_values[] =
 {
     -12, 5, 5, 6, 1, -4, 0, 1,
     0, 1, -5, 1, -1, -1, -1, 0,
@@ -1060,7 +1060,7 @@ static int8_t kern_pair_values[] =
 };
 
 /*Collect the kern pair's data in one place*/
-static lv_font_fmt_txt_kern_pair_t kern_pairs =
+static const lv_font_fmt_txt_kern_pair_t kern_pairs =
 {
     .glyph_ids = kern_pair_glyph_ids,
     .values = kern_pair_values,
@@ -1073,17 +1073,17 @@ static lv_font_fmt_txt_kern_pair_t kern_pairs =
  *--------------------*/
 
 /*Store all the custom data of the font*/
-static lv_font_dsc_fmt_txt_t font_dsc = {
+static const lv_font_fmt_txt_dsc_t font_dsc = {
     .glyph_bitmap = gylph_bitmap,
     .glyph_dsc = glyph_dsc,
     .cmaps = cmaps,
     .cmap_num = 1,
     .bpp = 1,
 
-    .kerning_scale = 16,
+    .kern_scale = 16,
     //.kern_dsc = kern_classes,
     //.kern_classes = 1,
-    .kern_dsc = kern_pairs,
+    .kern_dsc = &kern_pairs,
     .kern_classes = 0,
 };
 

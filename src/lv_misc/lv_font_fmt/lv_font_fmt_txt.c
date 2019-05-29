@@ -7,9 +7,10 @@
  *      INCLUDES
  *********************/
 
-#include "lv_font.h"
-#include "lv_log.h"
-#include "lv_utils.h"
+#include "../lv_font.h"
+#include "../lv_log.h"
+#include "../lv_utils.h"
+#include "lv_font_fmt_txt.h"
 
 /*********************
  *      DEFINES
@@ -22,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
+static lv_font_fmt_txt_glyph_dsc_t * get_glyph_dsc(const lv_font_t * font, uint32_t letter);
 static int32_t lv_font_codeCompare(const void * pRef, const void * pElement);
 
 /**********************
@@ -49,26 +50,10 @@ static int32_t lv_font_codeCompare(const void * pRef, const void * pElement);
  */
 const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unicode_letter)
 {
-    /*Check the range*/
-    if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return NULL;
+    lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *) font->dsc;
+    lv_font_fmt_txt_glyph_dsc_t * gdsc = get_glyph_dsc(font, unicode_letter);
 
-    lv_font_dsc_built_in_t * font_dsc = (lv_font_dsc_built_in_t *) font->dsc;
-
-    /*No Unicode list -> Continuous font*/
-    if(font_dsc->unicode_list == NULL) {
-        uint32_t index = (unicode_letter - font->unicode_first);
-        return &font_dsc->glyph_bitmap[font_dsc->glyph_dsc[index].bitmap_index];
-    }
-    /*Has Unicode list -> Sparse font */
-    else {
-        uint16_t * pUnicode;
-        pUnicode = lv_utils_bsearch(&unicode_letter, font_dsc->unicode_list, font_dsc->glyph_cnt,
-                                    sizeof(font_dsc->unicode_list[0]), lv_font_codeCompare);
-        if(pUnicode != NULL) {
-            uint32_t idx = (uint32_t)(pUnicode - font_dsc->unicode_list);
-            return &font_dsc->glyph_bitmap[font_dsc->glyph_dsc[idx].bitmap_index];
-        }
-    }
+    if(gdsc) return &fdsc->glyph_bitmap[gdsc->bitmap_index];
 
     /*If not returned earlier then the letter is not found in this font*/
     return NULL;
@@ -82,45 +67,67 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
  * @return true: descriptor is successfully loaded into `dsc_out`.
  *         false: the letter was not found, no data is loaded to `dsc_out`
  */
-bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter)
+bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter, uint32_t unicode_letter_next)
 {
-    /*Check the range*/
-    if(unicode_letter < font->unicode_first || unicode_letter > font->unicode_last) return NULL;
+    lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *) font->dsc;
+    lv_font_fmt_txt_glyph_dsc_t * gdsc = get_glyph_dsc(font, unicode_letter);
 
-    lv_font_dsc_built_in_t * font_dsc = (lv_font_dsc_built_in_t *) font->dsc;
-    int32_t index = -1;
-    /*No Unicode list -> Continuous font*/
-    if(font_dsc->unicode_list == NULL) {
-        index = (unicode_letter - font->unicode_first);
-    }
-    /*Has Unicode list -> Sparse font */
-    else {
-        uint16_t * pUnicode;
-        pUnicode = lv_utils_bsearch(&unicode_letter, font_dsc->unicode_list, font_dsc->glyph_cnt,
-                                    sizeof(font_dsc->unicode_list[0]), lv_font_codeCompare);
-
-        if(pUnicode != NULL) {
-            index = (uint16_t)(pUnicode - font_dsc->unicode_list);
+    if(gdsc) {
+        /*Get kerning value*/
+        uint32_t kvalue = 0;
+        uint32_t k;
+        if(fdsc->kern_classes == 0) {
+            const lv_font_fmt_txt_kern_pair_t * kdsc = fdsc->kern_dsc;
+            for(k = 0; k < kdsc->pair_cnt; k++) {
+                if(kdsc->glyph_ids[k].pair.left == unicode_letter &&
+                   kdsc->glyph_ids[k].pair.right == unicode_letter_next) {
+                    kvalue = kdsc->values[k];
+                    break;
+                }
+            }
         }
+
+        uint32_t adw_w = gdsc->adv_w + ((kvalue * fdsc->kern_scale) >> 4);
+        adw_w  =(adw_w + (1 << 3)) >> 4;
+
+        dsc_out->adv_w = adw_w;
+        dsc_out->box_h = gdsc->box_h;
+        dsc_out->box_w = gdsc->box_w;
+        dsc_out->ofs_x = gdsc->ofs_x;
+        dsc_out->ofs_y = gdsc->ofs_y;
+        dsc_out->bpp   = fdsc->bpp;
+
+        return true;
     }
 
-    if(index > 0) {
-        dsc_out->adv_w = font_dsc->glyph_dsc[index].adv_w;
-        dsc_out->box_h = font_dsc->glyph_dsc[index].box_h;
-        dsc_out->box_w = font_dsc->glyph_dsc[index].box_w;
-        dsc_out->ofs_x = font_dsc->glyph_dsc[index].ofs_x;
-        dsc_out->ofs_y = font_dsc->glyph_dsc[index].ofs_y;
-        dsc_out->kern_table = font_dsc->glyph_dsc[index].kern_table;
-        dsc_out->bpp   = font_dsc->bpp;
-        return true;
-    } else {
-        return false;
-    }
+    return false;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static lv_font_fmt_txt_glyph_dsc_t * get_glyph_dsc(const lv_font_t * font, uint32_t letter)
+{
+    lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *) font->dsc;
+
+    uint16_t i;
+    for(i = 0; i < fdsc->cmap_num; i++) {
+
+        /*Relative code point*/
+        uint32_t rcp = letter - fdsc->cmaps[i].range_start;
+        uint32_t glyph_id = 0;
+        if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY) {
+            glyph_id = fdsc->cmaps[i].glyph_id_start + rcp;
+        }
+
+        if(glyph_id) return &fdsc->glyph_dsc[glyph_id];
+    }
+
+    return NULL;
+
+}
+
 
 /** Code Comparator.
  *
