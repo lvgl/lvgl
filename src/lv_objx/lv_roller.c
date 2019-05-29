@@ -214,7 +214,7 @@ void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt)
     lv_roller_ext_t * ext          = lv_obj_get_ext_attr(roller);
     const lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
     uint8_t n_line_space           = (row_cnt > 1) ? row_cnt - 1 : 1;
-    lv_ddlist_set_fix_height(roller, lv_font_get_height(style_label->text.font) * row_cnt +
+    lv_ddlist_set_fix_height(roller, lv_font_get_line_height(style_label->text.font) * row_cnt +
                                          style_label->text.line_space * n_line_space);
 }
 
@@ -321,7 +321,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         lv_opa_t opa_scale       = lv_obj_get_opa_scale(roller);
         const lv_font_t * font   = style->text.font;
         lv_roller_ext_t * ext    = lv_obj_get_ext_attr(roller);
-        lv_coord_t font_h        = lv_font_get_height(font);
+        lv_coord_t font_h        = lv_font_get_line_height(font);
         lv_area_t rect_area;
         rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 -
                        style->text.line_space / 2;
@@ -338,7 +338,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         const lv_style_t * style = lv_roller_get_style(roller, LV_ROLLER_STYLE_BG);
         lv_roller_ext_t * ext    = lv_obj_get_ext_attr(roller);
         const lv_font_t * font   = style->text.font;
-        lv_coord_t font_h        = lv_font_get_height(font);
+        lv_coord_t font_h        = lv_font_get_line_height(font);
         lv_opa_t opa_scale       = lv_obj_get_opa_scale(roller);
 
         /*Redraw the text on the selected area with a different color*/
@@ -503,7 +503,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
 
     const lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
     const lv_font_t * font         = style_label->text.font;
-    lv_coord_t font_h              = lv_font_get_height(font);
+    lv_coord_t font_h              = lv_font_get_line_height(font);
 
     if(sign == LV_SIGNAL_DRAG_END) {
         /*If dragged then align the list to there be an element in the middle*/
@@ -615,7 +615,7 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
     lv_roller_ext_t * ext          = lv_obj_get_ext_attr(roller);
     const lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
     const lv_font_t * font         = style_label->text.font;
-    lv_coord_t font_h              = lv_font_get_height(font);
+    lv_coord_t font_h              = lv_font_get_line_height(font);
     lv_coord_t h                   = lv_obj_get_height(roller);
 
     /* Normally the animtaion's `end_cb` sets correct position of the roller is infinite.
@@ -705,7 +705,7 @@ static void inf_normalize(void * scrl)
         /*Move to the new id*/
         const lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
         const lv_font_t * font         = style_label->text.font;
-        lv_coord_t font_h              = lv_font_get_height(font);
+        lv_coord_t font_h              = lv_font_get_line_height(font);
         lv_coord_t h                   = lv_obj_get_height(roller);
 
         lv_coord_t line_y1 = ext->ddlist.sel_opt_id * (font_h + style_label->text.line_space) +
