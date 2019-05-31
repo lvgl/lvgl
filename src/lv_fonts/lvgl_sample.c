@@ -4265,7 +4265,7 @@ static lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
  *  CHARACTER MAPPING
  *--------------------*/
 
-static uint16_t unicode_list_2 = {
+static uint16_t unicode_list_2[] = {
     0x0, 0xe, 0xf, 0x1d, 0x1e, 0x5e, 0x68, 0x69,
     0x6a, 0x6b, 0x6c, 0x6d, 0x86, 0x87, 0x88, 0x89,
     0xa5, 0xc7, 0x12a, 0x134, 0x135, 0x137, 0x146, 0x147,
@@ -4274,16 +4274,16 @@ static uint16_t unicode_list_2 = {
     0x1f7, 0x1f8, 0x1fa
 };
 
-static uint8_t glyph_id_ofs_list_5 = {
+static uint8_t glyph_id_ofs_list_5[] = {
     0, 1, 0, 0, 0, 2
-}
+};
 
-static uint16_t unicode_list_8 = {
+static uint16_t unicode_list_8[] = {
     0x0, 0x1, 0x3e, 0x3f, 0x80, 0x81, 0x82, 0x83,
     0x84, 0x85
 };
 
-static uint16_t unicode_list_10 = {
+static uint16_t unicode_list_10[] = {
     0x0, 0xb3
 };
 
@@ -4556,7 +4556,7 @@ static uint8_t kern_right_class_mapping[] =
 };
 
 /*Kern values between classes*/
-static uint8_t kern_class_values =
+static uint8_t kern_class_values[] =
 {
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, -5, 0,
@@ -5565,7 +5565,7 @@ static uint8_t kern_class_values =
 
 
 /*Collect the kern class' data in one place*/
-static lv_font_kern_classes_fmt_txt_t kern_classes =
+static lv_font_fmt_txt_kern_classes_t kern_classes =
 {
     .class_pair_values   = kern_class_values,
     .left_class_mapping  = kern_left_class_mapping,
