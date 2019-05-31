@@ -109,7 +109,7 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h);
  * @param ddlist pointer to a drop down list
  * @param fit fit mode from `lv_fit_t` (Typically `LV_FIT_NONE` or `LV_FIT_TIGHT`)
  */
-void lv_ddlist_set_fit(lv_obj_t * ddlist, lv_fit_t fit);
+void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, lv_fit_t fit);
 
 /**
  * Set arrow draw in a drop down list

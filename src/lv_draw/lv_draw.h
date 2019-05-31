@@ -21,30 +21,16 @@ extern "C" {
 
 #include "../lv_core/lv_style.h"
 #include "../lv_misc/lv_txt.h"
+#include "lv_img_decoder.h"
 
 /*********************
  *      DEFINES
  *********************/
-/*If image pixels contains alpha we need to know how much byte is a pixel*/
-#if LV_COLOR_DEPTH == 1 || LV_COLOR_DEPTH == 8
-#define LV_IMG_PX_SIZE_ALPHA_BYTE 2
-#elif LV_COLOR_DEPTH == 16
-#define LV_IMG_PX_SIZE_ALPHA_BYTE 3
-#elif LV_COLOR_DEPTH == 32
-#define LV_IMG_PX_SIZE_ALPHA_BYTE 4
-#endif
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-enum {
-    LV_IMG_SRC_VARIABLE,
-    LV_IMG_SRC_FILE,
-    LV_IMG_SRC_SYMBOL,
-    LV_IMG_SRC_UNKNOWN,
-};
-typedef uint8_t lv_img_src_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -36,9 +36,9 @@ void lv_indev_init(void);
 
 /**
  * Called periodically to read the input devices
- * @param param pointer to and input device to read
+ * @param task pointer to the task itself
  */
-void lv_indev_read_task(void * param);
+void lv_indev_read_task(lv_task_t * task);
 
 /**
  * Get the currently processed input device. Can be used in action functions too.
@@ -98,13 +98,6 @@ void lv_indev_set_group(lv_indev_t * indev, lv_group_t * group);
 void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t * points);
 
 /**
- * Set feedback callback for indev.
- * @param indev pointer to an input device
- * @param feedback feedback callback
- */
-void lv_indev_set_feedback(lv_indev_t * indev, lv_indev_feedback_t feedback);
-
-/**
  * Get the last point of an input device (for LV_INDEV_TYPE_POINTER and LV_INDEV_TYPE_BUTTON)
  * @param indev pointer to an input device
  * @param point pointer to a point to store the result
@@ -135,13 +128,6 @@ bool lv_indev_is_dragging(const lv_indev_t * indev);
 void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point);
 
 /**
- * Get feedback callback for indev.
- * @param indev pointer to an input device
- * @return feedback callback
- */
-lv_indev_feedback_t lv_indev_get_feedback(const lv_indev_t * indev);
-
-/**
  * Do nothing until the next release
  * @param indev pointer to an input device
  */
@@ -154,6 +140,13 @@ void lv_indev_wait_release(lv_indev_t * indev);
  * @return pointer to the indev read refresher task. (NULL on error)
  */
 lv_task_t * lv_indev_get_read_task(lv_disp_t * indev);
+
+/**
+ * Gets a pointer to the currently active object in indev proc functions.
+ * NULL if no object is currently being handled or if groups aren't used.
+ * @return pointer to currently active object
+ */
+lv_obj_t * lv_indev_get_obj_act( void );
 
 /**********************
  *      MACROS

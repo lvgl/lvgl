@@ -22,6 +22,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 #include "lv_style.h"
+#include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_ll.h"
@@ -44,10 +45,6 @@ extern "C" {
 
 #define LV_MAX_ANCESTOR_NUM 8
 
-#define LV_ANIM_IN 0x00       /*Animation to show an object. 'OR' it with lv_anim_builtin_t*/
-#define LV_ANIM_OUT 0x80      /*Animation to hide an object. 'OR' it with lv_anim_builtin_t*/
-#define LV_ANIM_DIR_MASK 0x80 /*ANIM_IN/ANIM_OUT mask*/
-
 #define LV_EXT_CLICK_AREA_OFF   0
 #define LV_EXT_CLICK_AREA_TINY  1
 #define LV_EXT_CLICK_AREA_FULL  2
@@ -69,13 +66,6 @@ typedef bool (*lv_design_cb_t)(struct _lv_obj_t * obj, const lv_area_t * mask_p,
                                lv_design_mode_t mode);
 
 enum {
-    LV_RES_INV = 0, /*Typically indicates that the object is deleted (become invalid) in the action
-                       function or an operation was failed*/
-    LV_RES_OK,      /*The object is valid (no deleted) after the action*/
-};
-typedef uint8_t lv_res_t;
-
-enum {
     LV_EVENT_PRESSED,       /*The object has been pressed*/
     LV_EVENT_PRESSING,      /*The object is being pressed (called continuously while pressing)*/
     LV_EVENT_PRESS_LOST,    /*Still pressing but slid from the objects*/
@@ -85,11 +75,10 @@ enum {
                                      `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if dragged.*/
     LV_EVENT_CLICKED,             /*Called on release if not dragged (regardless to long press)*/
     LV_EVENT_RELEASED,            /*Called in every cases when the object has been released*/
-    LV_EVENT_LONG_HOVER_IN,       /*TODO*/
-    LV_EVENT_LONG_HOVER_OUT,      /*TODO*/
     LV_EVENT_DRAG_BEGIN,
     LV_EVENT_DRAG_END,
     LV_EVENT_DRAG_THROW_BEGIN,
+    LV_EVENT_KEY,
     LV_EVENT_FOCUSED,
     LV_EVENT_DEFOCUSED,
     LV_EVENT_VALUE_CHANGED,
@@ -98,6 +87,7 @@ enum {
     LV_EVENT_REFRESH,
     LV_EVENT_APPLY,  /*"Ok", "Apply" or similar specific button has clicked*/
     LV_EVENT_CANCEL, /*"Close", "Cancel" or similar specific button has clicked*/
+    LV_EVENT_DELETE,
 };
 typedef uint8_t lv_event_t;
 
@@ -209,32 +199,28 @@ typedef struct _lv_obj_t
 #endif
 
     /*Attributes and states*/
-    uint8_t click : 1;          /*1: Can be pressed by an input device*/
-    uint8_t drag : 1;           /*1: Enable the dragging*/
+    uint8_t click           :1; /*1: Can be pressed by an input device*/
+    uint8_t drag            :1; /*1: Enable the dragging*/
+    uint8_t drag_throw      :1; /*1: Enable throwing with drag*/
+    uint8_t drag_parent     :1; /*1: Parent will be dragged instead*/
+    uint8_t hidden          :1; /*1: Object is hidden*/
+    uint8_t top             :1; /*1: If the object or its children is clicked it goes to the foreground*/
+    uint8_t opa_scale_en    :1; /*1: opa_scale is set*/
+    uint8_t parent_event    :1; /*1: Send the object's events to the parent too. */
     lv_drag_dir_t drag_dir : 2; /* Which directions the object can be dragged in */
-    uint8_t drag_throw : 1;     /*1: Enable throwing with drag*/
-    uint8_t drag_parent : 1;    /*1: Parent will be dragged instead*/
-    uint8_t hidden : 1;         /*1: Object is hidden*/
-    uint8_t top : 1; /*1: If the object or its children is clicked it goes to the foreground*/
-    uint8_t opa_scale_en : 1; /*1: opa_scale is set*/
-    uint8_t parent_event : 1; /*1: Send the object's events to the parent too. */
+    uint8_t reserved        :6; /*Reserved for future use*/
     uint8_t protect;          /*Automatically happening actions can be prevented. 'OR'ed values from
                                  `lv_protect_t`*/
     lv_opa_t opa_scale; /*Scale down the opacity by this factor. Effects all children as well*/
 
     lv_coord_t ext_draw_pad; /*EXTtend the size in every direction for drawing. */
+    
 #if LV_USE_OBJ_REALIGN
     lv_reailgn_t realign;
 #endif
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
     lv_obj_user_data_t user_data;
-#endif
-
-#if LV_USE_USER_DATA_MULTI
-    lv_obj_user_data_t event_user_data;
-    lv_obj_user_data_t signal_user_data;
-    lv_obj_user_data_t design_user_data;
 #endif
 
 } lv_obj_t;
@@ -259,17 +245,6 @@ typedef struct
     const char * type[LV_MAX_ANCESTOR_NUM]; /*[0]: the actual type, [1]: ancestor, [2] #1's ancestor
                                                ... [x]: "lv_obj" */
 } lv_obj_type_t;
-
-enum {
-    LV_ANIM_NONE = 0,
-    LV_ANIM_FLOAT_TOP,    /*Float from/to the top*/
-    LV_ANIM_FLOAT_LEFT,   /*Float from/to the left*/
-    LV_ANIM_FLOAT_BOTTOM, /*Float from/to the bottom*/
-    LV_ANIM_FLOAT_RIGHT,  /*Float from/to the right*/
-    LV_ANIM_GROW_H,       /*Grow/shrink  horizontally*/
-    LV_ANIM_GROW_V,       /*Grow/shrink  vertically*/
-};
-typedef uint8_t lv_anim_builtin_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -326,6 +301,18 @@ void lv_obj_invalidate(const lv_obj_t * obj);
  * @param parent pointer to the new parent object. (Can't be NULL)
  */
 void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent);
+
+/**
+ * Move and object to the foreground
+ * @param obj pointer to an object
+ */
+void lv_obj_move_foreground(lv_obj_t * obj);
+
+/**
+ * Move and object to the background
+ * @param obj pointer to an object
+ */
+void lv_obj_move_background(lv_obj_t * obj);
 
 /*--------------------
  * Coordinate set
@@ -411,17 +398,6 @@ void lv_obj_realign(lv_obj_t * obj);
  */
 void lv_obj_set_auto_realign(lv_obj_t * obj, bool en);
 
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
-/**
- * Set the size of an extended clickable area
- * @param obj pointer to an object
- * @param w extended width to both sides
- * @param h extended height to both sides
- */
-void lv_obj_set_ext_click_area(lv_obj_t * obj, uint8_t w, uint8_t h);
-#endif
-
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
 /**
  * Set the size of an extended clickable area
  * @param obj pointer to an object
@@ -431,7 +407,6 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, uint8_t w, uint8_t h);
  * @param bottom extended clickable are on the bottom [px]
  */
 void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right, lv_coord_t top, lv_coord_t bottom);
-#endif
 
 /*---------------------
  * Appearance set
@@ -551,9 +526,9 @@ void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot);
  * Set a an event handler function for an object.
  * Used by the user to react on event which happens with the object.
  * @param obj pointer to an object
- * @param cb the new event function
+ * @param event_cb the new event function
  */
-void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb);
+void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
 
 /**
  * Send an event to the object
@@ -565,6 +540,16 @@ void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t cb);
 lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data);
 
 /**
+ * Call an event function with an object, event, and data.
+ * @param event_cb an event callback function
+ * @param obj pointer to an object to associate with the event (can be `NULL` to simply call the `event_cb`)
+ * @param event an event
+ * @param data pointer to a custom data
+ * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
+ */
+lv_res_t lv_event_send_func(lv_event_cb_t event_cb, lv_obj_t * obj, lv_event_t event, const void * data);
+
+/**
  * Get the `data` parameter of the current event
  * @return the `data` parameter
  */
@@ -574,9 +559,9 @@ const void * lv_event_get_data(void);
  * Set the a signal function of an object. Used internally by the library.
  * Always call the previous signal function in the new.
  * @param obj pointer to an object
- * @param cb the new signal function
+ * @param signal_cb the new signal function
  */
-void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t cb);
+void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb);
 
 /**
  * Send an event to the object
@@ -588,9 +573,9 @@ void lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param);
 /**
  * Set a new design function for an object
  * @param obj pointer to an object
- * @param cb the new design function
+ * @param design_cb the new design function
  */
-void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t cb);
+void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb);
 
 /*----------------
  * Other set
@@ -609,19 +594,6 @@ void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
  * @param obj pointer to an object
  */
 void lv_obj_refresh_ext_draw_pad(lv_obj_t * obj);
-
-#if LV_USE_ANIMATION
-/**
- * Animate an object
- * @param obj pointer to an object to animate
- * @param type type of animation from 'lv_anim_builtin_t'. 'OR' it with ANIM_IN or ANIM_OUT
- * @param time time of animation in milliseconds
- * @param delay delay before the animation in milliseconds
- * @param cb a function to call when the animation is ready
- */
-void lv_obj_animate(lv_obj_t * obj, lv_anim_builtin_t type, uint16_t time, uint16_t delay,
-                    void (*cb)(lv_obj_t *));
-#endif
 
 /*=======================
  * Getter functions
@@ -676,6 +648,12 @@ lv_obj_t * lv_obj_get_child_back(const lv_obj_t * obj, const lv_obj_t * child);
  * @return children number of 'obj'
  */
 uint16_t lv_obj_count_children(const lv_obj_t * obj);
+
+/** Recursively count the children of an object
+ * @param obj pointer to an object
+ * @return children number of 'obj'
+ */
+uint16_t lv_obj_count_children_recursive(const lv_obj_t * obj);
 
 /*---------------------
  * Coordinate get
@@ -737,32 +715,33 @@ lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj);
  */
 bool lv_obj_get_auto_realign(lv_obj_t * obj);
 
-
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
 /**
- * Get the horizontal padding of extended clickable area
+ * Get the left padding of extended clickable area
  * @param obj pointer to an object
- * @return the horizontal padding
+ * @return the extended left padding
  */
-uint8_t lv_obj_get_ext_click_pad_hor(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_ext_click_pad_left(const lv_obj_t * obj);
 
 /**
- * Get the vertical padding of extended clickable area
+ * Get the right padding of extended clickable area
  * @param obj pointer to an object
- * @return the vertical padding
+ * @return the extended right padding
  */
-uint8_t lv_obj_get_ext_click_pad_ver(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_ext_click_pad_right(const lv_obj_t * obj);
 
-#endif
-
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
 /**
- * Get the horizontal padding of extended clickable area
+ * Get the top padding of extended clickable area
  * @param obj pointer to an object
- * @return the horizontal padding
+ * @return the extended top padding
  */
-const lv_area_t * lv_obj_get_ext_click_pad(const lv_obj_t * obj);
-#endif
+lv_coord_t lv_obj_get_ext_click_pad_top(const lv_obj_t * obj);
+
+/**
+ * Get the bottom padding of extended clickable area
+ * @param obj pointer to an object
+ * @return the extended bottom padding
+ */
+lv_coord_t lv_obj_get_ext_click_pad_bottom(const lv_obj_t * obj);
 
 /**
  * Get the extended size attribute of an object
@@ -912,13 +891,28 @@ void * lv_obj_get_ext_attr(const lv_obj_t * obj);
  */
 void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
+/**
+ * Get the object's user data
+ * @param obj pointer to an object
+ * @return user data
+ */
+lv_obj_user_data_t lv_obj_get_user_data(lv_obj_t * obj);
+
 /**
  * Get a pointer to the object's user data
  * @param obj pointer to an object
  * @return pointer to the user data
  */
-lv_obj_user_data_t * lv_obj_get_user_data(lv_obj_t * obj);
+lv_obj_user_data_t *lv_obj_get_user_data_ptr(lv_obj_t * obj);
+
+/**
+ * Set the object's user data. The data will be copied.
+ * @param obj pointer to an object
+ * @param data user data
+ */
+void lv_obj_set_user_data(lv_obj_t * obj, lv_obj_user_data_t data);
+
 #endif
 
 #if LV_USE_GROUP
@@ -941,6 +935,22 @@ bool lv_obj_is_focused(const lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/
+
+/**
+ * Helps to quickly declare an event callback function.
+ * Will be expanded to: `void <name> (lv_obj_t * obj, lv_event_t e)`
+ *
+ * Examples:
+ * static LV_EVENT_CB_DECLARE(my_event1);  //Protoype declaration
+ *
+ * static LV_EVENT_CB_DECLARE(my_event1)
+ * {
+ *   if(e == LV_EVENT_CLICKED) {
+ *      lv_obj_set_hidden(obj ,true);
+ *   }
+ * }
+ */
+#define LV_EVENT_CB_DECLARE(name) void name(lv_obj_t * obj, lv_event_t e)
 
 #ifdef __cplusplus
 } /* extern "C" */

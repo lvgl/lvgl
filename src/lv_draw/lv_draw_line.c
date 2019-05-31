@@ -85,6 +85,12 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
     if(style->line.width == 0) return;
     if(point1->x == point2->x && point1->y == point2->y) return;
 
+    /*Return if the points are out of the mask*/
+    if(point1->x < mask->x1 && point2->x < mask->x1) return;
+    if(point1->x > mask->x2 && point2->x > mask->x2) return;
+    if(point1->y < mask->y1 && point2->y < mask->y1) return;
+    if(point1->y > mask->y2 && point2->y > mask->y2) return;
+
     line_draw_t main_line;
     lv_point_t p1;
     lv_point_t p2;
@@ -236,7 +242,9 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
     lv_opa_t opa = opa_scale == LV_OPA_COVER
                        ? style->line.opa
                        : (uint16_t)((uint16_t)style->line.opa * opa_scale) >> 8;
+#if LV_ANTIALIAS
     bool aa = lv_disp_get_antialiasing(lv_refr_get_disp_refreshing());
+#endif
     lv_point_t vect_main, vect_norm;
     vect_main.x = main_line->p2.x - main_line->p1.x;
     vect_main.y = main_line->p2.y - main_line->p1.y;

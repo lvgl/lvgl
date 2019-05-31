@@ -74,14 +74,8 @@ lv_group_t * lv_group_create(void)
     group->refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
     group->wrap           = 1;
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
     memset(&group->user_data, 0, sizeof(lv_group_user_data_t));
-#endif
-
-#if LV_USE_USER_DATA_MULTI
-    memset(&group->focus_user_data, 0, sizeof(lv_group_user_data_t));
-    memset(&group->style_mod_user_data, 0, sizeof(lv_group_user_data_t));
-    memset(&group->style_mod_edit_user_data, 0, sizeof(lv_group_user_data_t));
 #endif
 
     /*Initialize style modification callbacks from current theme*/
@@ -110,6 +104,7 @@ void lv_group_del(lv_group_t * group)
     }
 
     lv_ll_clear(&(group->obj_ll));
+    lv_ll_rem(&LV_GC_ROOT(_lv_group_ll), group);
     lv_mem_free(group);
 }
 
@@ -199,6 +194,28 @@ void lv_group_remove_obj(lv_obj_t * obj)
 }
 
 /**
+ * Remove all objects from a group
+ * @param group pointer to a group
+ */
+void lv_group_remove_all_objs(lv_group_t * group)
+{
+	/*Defocus the the currently focused object*/
+	if(group->obj_focus != NULL) {
+		(*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+		lv_obj_invalidate(*group->obj_focus);
+		group->obj_focus = NULL;
+	}
+
+	/*Remove the objects from the group*/
+	lv_obj_t ** obj;
+	LV_LL_READ(group->obj_ll, obj) {
+		(*obj)->group_p = NULL;
+	}
+
+	lv_ll_clear(&(group->obj_ll));
+}
+
+/**
  * Focus on an object (defocus the current)
  * @param obj pointer to an object to focus on
  */
@@ -284,17 +301,25 @@ lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c)
     lv_obj_t * act = lv_group_get_focused(group);
     if(act == NULL) return LV_RES_OK;
 
-    return act->signal_cb(act, LV_SIGNAL_CONTROL, &c);
+    lv_res_t res;
+
+    res = act->signal_cb(act, LV_SIGNAL_CONTROL, &c);
+    if(res != LV_RES_OK) return res;
+
+    res = lv_event_send(act, LV_EVENT_KEY, &c);
+    if(res != LV_RES_OK) return res;
+
+    return res;
 }
 
 /**
  * Set a function for a group which will modify the object's style if it is in focus
  * @param group pointer to a group
- * @param style_mod_func the style modifier function pointer
+ * @param style_mod_cb the style modifier function pointer
  */
-void lv_group_set_style_mod_cb(lv_group_t * group, lv_group_style_mod_func_t style_mod_func)
+void lv_group_set_style_mod_cb(lv_group_t * group, lv_group_style_mod_cb_t style_mod_cb)
 {
-    group->style_mod = style_mod_func;
+    group->style_mod_cb = style_mod_cb;
     if(group->obj_focus != NULL) lv_obj_invalidate(*group->obj_focus);
 }
 
@@ -303,9 +328,9 @@ void lv_group_set_style_mod_cb(lv_group_t * group, lv_group_style_mod_func_t sty
  * @param group pointer to a group
  * @param style_mod_func the style modifier function pointer
  */
-void lv_group_set_style_mod_edit_cb(lv_group_t * group, lv_group_style_mod_func_t style_mod_func)
+void lv_group_set_style_mod_edit_cb(lv_group_t * group, lv_group_style_mod_cb_t style_mod_edit_cb)
 {
-    group->style_mod_edit = style_mod_func;
+    group->style_mod_edit_cb = style_mod_edit_cb;
     if(group->obj_focus != NULL) lv_obj_invalidate(*group->obj_focus);
 }
 
@@ -380,9 +405,9 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style)
     lv_style_copy(&group->style_tmp, style);
 
     if(group->editing) {
-        if(group->style_mod_edit) group->style_mod_edit(group, &group->style_tmp);
+        if(group->style_mod_edit_cb) group->style_mod_edit_cb(group, &group->style_tmp);
     } else {
-        if(group->style_mod) group->style_mod(group, &group->style_tmp);
+        if(group->style_mod_cb) group->style_mod_cb(group, &group->style_tmp);
     }
     return &group->style_tmp;
 }
@@ -400,7 +425,7 @@ lv_obj_t * lv_group_get_focused(const lv_group_t * group)
     return *group->obj_focus;
 }
 
-#if LV_USE_USER_DATA_SINGLE
+#if LV_USE_USER_DATA
 /**
  * Get a pointer to the group's user data
  * @param group pointer to an group
@@ -417,10 +442,10 @@ lv_group_user_data_t * lv_group_get_user_data(lv_group_t * group)
  * @param group pointer to a group
  * @return pointer to the style modifier function
  */
-lv_group_style_mod_func_t lv_group_get_style_mod_cb(const lv_group_t * group)
+lv_group_style_mod_cb_t lv_group_get_style_mod_cb(const lv_group_t * group)
 {
     if(!group) return false;
-    return group->style_mod;
+    return group->style_mod_cb;
 }
 
 /**
@@ -428,10 +453,10 @@ lv_group_style_mod_func_t lv_group_get_style_mod_cb(const lv_group_t * group)
  * @param group pointer to a group
  * @return pointer to the style modifier function
  */
-lv_group_style_mod_func_t lv_group_get_style_mod_edit_cb(const lv_group_t * group)
+lv_group_style_mod_cb_t lv_group_get_style_mod_edit_cb(const lv_group_t * group)
 {
     if(!group) return false;
-    return group->style_mod_edit;
+    return group->style_mod_edit_cb;
 }
 
 /**
@@ -581,11 +606,11 @@ static void style_mod_edit_def(lv_group_t * group, lv_style_t * style)
 
 static void refresh_theme(lv_group_t * g, lv_theme_t * th)
 {
-    g->style_mod      = style_mod_def;
-    g->style_mod_edit = style_mod_edit_def;
+    g->style_mod_cb      = style_mod_def;
+    g->style_mod_edit_cb = style_mod_edit_def;
     if(th) {
-        if(th->group.style_mod) g->style_mod = th->group.style_mod;
-        if(th->group.style_mod_edit) g->style_mod_edit = th->group.style_mod_edit;
+        if(th->group.style_mod_cb) g->style_mod_cb = th->group.style_mod_cb;
+        if(th->group.style_mod_edit_cb) g->style_mod_edit_cb = th->group.style_mod_edit_cb;
     }
 }
 
@@ -668,10 +693,7 @@ static void obj_to_foreground(lv_obj_t * obj)
 
     if(last_top != NULL) {
         /*Move the last_top object to the foreground*/
-        lv_obj_t * par = lv_obj_get_parent(last_top);
-        /*After list change it will be the new head*/
-        lv_ll_chg_list(&par->child_ll, &par->child_ll, last_top);
-        lv_obj_invalidate(last_top);
+        lv_obj_move_foreground(last_top);
     }
 }
 

@@ -89,8 +89,10 @@ void lv_ll_clear(lv_ll_t * ll_p);
  * @param ll_ori_p pointer to the original (old) linked list
  * @param ll_new_p pointer to the new linked list
  * @param node pointer to a node
+ * @param head true: be the head in the new list
+ *             false be the head in the new list
  */
-void lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node);
+void lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool head);
 
 /**
  * Return with head node of the linked list
@@ -121,6 +123,13 @@ void * lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act);
  * @return pointer to the previous node
  */
 void * lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act);
+
+/**
+ * Return the length of the linked list.
+ * @param ll_p pointer to linked list
+ * @return length of the linked list
+ */
+uint32_t lv_ll_get_len(const lv_ll_t *ll_p);
 
 /**
  * Move a nodw before an other node in the same linked list

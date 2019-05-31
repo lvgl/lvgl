@@ -59,30 +59,32 @@ typedef struct
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * label;       /*Label of the text area*/
-    lv_obj_t * placeholder; /*Place holder label of the text area, only visible if text is an empty
-                               string*/
+    lv_obj_t * placeholder; /*Place holder label. only visible if text is an empty string*/
     char * pwd_tmp;         /*Used to store the original text in password mode*/
     const char * accapted_chars; /*Only these characters will be accepted. NULL: accept all*/
     uint16_t max_length;         /*The max. number of characters. 0: no limit*/
-    uint8_t pwd_mode : 1;        /*Replace characters with '*' */
-    uint8_t one_line : 1;        /*One line mode (ignore line breaks)*/
+    uint16_t pwd_show_time;      /*Time to show characters in password mode before change them to '*' */
     struct
     {
-        const lv_style_t * style; /*Style of the cursor (NULL to use label's style)*/
-        lv_coord_t valid_x;       /*Used when stepping up/down in text area when stepping to a shorter
-                                    line. (Handled by the library)*/
-        uint16_t
-            pos; /*The current cursor position (0: before 1. letter; 1: before 2. letter etc.)*/
-        lv_area_t area;            /*Cursor area relative to the Text Area*/
-        uint16_t txt_byte_pos;     /*Byte index of the letter after (on) the cursor*/
-        lv_cursor_type_t type : 4; /*Shape of the cursor*/
-        uint8_t
-            state : 1; /*Indicates that the cursor is visible now or not (Handled by the library)*/
+        const lv_style_t * style;   /* Style of the cursor (NULL to use label's style)*/
+        lv_coord_t valid_x;         /* Used when stepping up/down to a shorter line.
+                                     * (Used by the library)*/
+        uint16_t pos;               /* The current cursor position
+                                     * (0: before 1st letter; 1: before 2nd letter ...)*/
+        uint16_t blink_time;        /*Blink period*/
+        lv_area_t area;             /* Cursor area relative to the Text Area*/
+        uint16_t txt_byte_pos;      /* Byte index of the letter after (on) the cursor*/
+        lv_cursor_type_t type : 4;  /* Shape of the cursor*/
+        uint8_t state : 1;          /*Cursor is visible now or not (Handled by the library)*/
     } cursor;
-    int tmp_sel_start;     /*Temporary value*/
-    int tmp_sel_end;       /*Temporary value*/
-    uint8_t selecting : 1; /*User is in process of selecting */
-    uint8_t sel_mode : 1;  /*Text can be selected on this text area*/
+#if LV_LABEL_TEXT_SEL
+    uint16_t tmp_sel_start;     /*Temporary value*/
+    uint16_t tmp_sel_end;       /*Temporary value*/
+    uint8_t text_sel_in_prog : 1; /*User is in process of selecting */
+    uint8_t text_sel_en : 1;  /*Text can be selected on this text area*/
+#endif
+    uint8_t pwd_mode : 1;        /*Replace characters with '*' */
+    uint8_t one_line : 1;        /*One line mode (ignore line breaks)*/
 } lv_ta_ext_t;
 
 enum {
@@ -262,7 +264,21 @@ void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, const lv_style_t * style
  * @param ta pointer to a text area object
  * @param en true or false to enable/disable selection mode
  */
-void lv_ta_set_sel_mode(lv_obj_t * ta, bool en);
+void lv_ta_set_text_sel(lv_obj_t * ta, bool en);
+
+/**
+ * Set how long show the password before changing it to '*'
+ * @param ta pointer to Text area
+ * @param time show time in milliseconds. 0: hide immediately.
+ */
+void lv_ta_set_pwd_show_time(lv_obj_t * ta, uint16_t time);
+
+/**
+ * Set cursor blink animation time
+ * @param ta pointer to Text area
+ * @param time blink period. 0: disable blinking
+ */
+void lv_ta_set_cursor_blink_time(lv_obj_t * ta, uint16_t time);
 
 /*=====================
  * Getter functions
@@ -295,13 +311,6 @@ lv_obj_t * lv_ta_get_label(const lv_obj_t * ta);
  * @return the cursor position
  */
 uint16_t lv_ta_get_cursor_pos(const lv_obj_t * ta);
-
-/**
- * Get the current cursor visibility.
- * @param ta pointer to a text area object
- * @return true: the cursor is drawn, false: the cursor is hidden
- */
-// bool lv_ta_get_cursor_show(const lv_obj_t * ta);
 
 /**
  * Get the current cursor type.
@@ -377,18 +386,6 @@ static inline bool lv_ta_get_edge_flash(lv_obj_t * ta)
 const lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type);
 
 /**
- * Get the selection index of the text area.
- *
- * The last character is exclusive (i.e. if the API says that the selection
- * ranges from 6 to 7, only character 6 is selected).
- * @param ta Text area object
- * @param sel_start pointer to int used to hold first selected character
- * @param sel_end pointer to int used to hold last selected character
- */
-
-void lv_ta_get_selection(lv_obj_t * ta, int * sel_start, int * sel_end);
-
-/**
  * Find whether text is selected or not.
  * @param ta Text area object
  * @return whether text is selected or not
@@ -400,7 +397,21 @@ bool lv_ta_text_is_selected(const lv_obj_t * ta);
  * @param ta pointer to a text area object
  * @return true: selection mode is enabled, false: disabled
  */
-bool lv_ta_get_sel_mode(lv_obj_t * ta);
+bool lv_ta_get_text_sel_en(lv_obj_t * ta);
+
+/**
+ * Set how long show the password before changing it to '*'
+ * @param ta pointer to Text area
+ * @return show time in milliseconds. 0: hide immediately.
+ */
+uint16_t lv_ta_get_pwd_show_time(lv_obj_t * ta);
+
+/**
+ * Set cursor blink animation time
+ * @param ta pointer to Text area
+ * @return time blink period. 0: disable blinking
+ */
+uint16_t lv_ta_get_cursor_blink_time(lv_obj_t * ta);
 
 /*=====================
  * Other functions

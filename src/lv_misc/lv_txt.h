@@ -29,6 +29,9 @@ extern "C" {
  *********************/
 #define LV_TXT_COLOR_CMD "#"
 
+#define LV_TXT_ENC_UTF8       1
+#define LV_TXT_ENC_ASCII  2
+
 /**********************
  *      TYPEDEFS
  **********************/

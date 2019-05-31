@@ -61,6 +61,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->ver_res  = LV_VER_RES_MAX;
     driver->buffer   = NULL;
     driver->rotated  = 0;
+    driver->color_chroma_key = LV_COLOR_TRANSP;
 
 #if LV_ANTIALIAS
     driver->antialiasing = true;
@@ -69,6 +70,10 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
 #if LV_USE_GPU
     driver->mem_blend_cb = NULL;
     driver->mem_fill_cb  = NULL;
+#endif
+
+#if LV_USE_USER_DATA
+    driver->user_data = NULL;
 #endif
 
     driver->set_px_cb = NULL;
@@ -124,21 +129,20 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp_def = disp; /*Temporarily change the default screen to create the default screens on the
                         new display*/
 
+    disp->inv_p = 0;
+
     disp->act_scr   = lv_obj_create(NULL, NULL); /*Create a default screen on the display*/
     disp->top_layer = lv_obj_create(NULL, NULL); /*Create top layer on the display*/
     disp->sys_layer = lv_obj_create(NULL, NULL); /*Create top layer on the display*/
     lv_obj_set_style(disp->top_layer, &lv_style_transp);
     lv_obj_set_style(disp->sys_layer, &lv_style_transp);
 
-    disp->inv_p = 0;
-
     lv_obj_invalidate(disp->act_scr);
 
     disp_def = disp_def_tmp; /*Revert the default display*/
 
     /*Create a refresh task*/
-    disp->refr_task =
-        lv_task_create(lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, LV_TASK_PRIO_MID, disp);
+    disp->refr_task = lv_task_create(lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, LV_TASK_PRIO_MID, disp);
     lv_mem_assert(disp->refr_task);
     if(disp->refr_task == NULL) return NULL;
 

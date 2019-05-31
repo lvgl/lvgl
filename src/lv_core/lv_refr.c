@@ -14,6 +14,7 @@
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_gc.h"
+#include "../lv_draw/lv_draw_basic.h"
 
 #if defined(LV_GC_INCLUDE)
 #include LV_GC_INCLUDE
@@ -22,6 +23,8 @@
 /*********************
  *      DEFINES
  *********************/
+/* Draw translucent random colored areas on the invalidated (redrawn) areas*/
+#define MASK_AREA_DEBUG  0
 
 /**********************
  *      TYPEDEFS
@@ -69,7 +72,12 @@ void lv_refr_init(void)
  */
 void lv_refr_now(void)
 {
-    lv_disp_refr_task(NULL);
+    lv_disp_t * d;
+    d = lv_disp_get_next(NULL);
+    while(d) {
+        lv_disp_refr_task(d->refr_task);
+        d = lv_disp_get_next(d);
+    }
 }
 
 /**
@@ -132,15 +140,15 @@ lv_disp_t * lv_refr_get_disp_refreshing(void)
 
 /**
  * Called periodically to handle the refreshing
- * @param param point to a `lv_disp_t` to refresh
+ * @param task pointer to the task itself
  */
-void lv_disp_refr_task(void * param)
+void lv_disp_refr_task(lv_task_t * task)
 {
     LV_LOG_TRACE("lv_refr_task: started");
 
     uint32_t start = lv_tick_get();
 
-    disp_refr = param;
+    disp_refr = task->user_data;
 
     lv_refr_join_area();
 
@@ -359,8 +367,7 @@ static void lv_refr_area_part(const lv_area_t * area_p)
     /*In non double buffered mode, before rendering the next part wait until the previous image is
      * flushed*/
     if(lv_disp_is_double_buf(disp_refr) == false) {
-        while(vdb->flushing)
-            ;
+        while(vdb->flushing);
     }
 
     lv_obj_t * top_p;
@@ -457,6 +464,9 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
             i = lv_ll_get_prev(&(par->child_ll), i);
         }
 
+        /*Call the post draw design function of the parents of the to object*/
+        par->design_cb(par, mask_p, LV_DESIGN_DRAW_POST);
+
         /*The new border will be there last parents,
          *so the 'younger' brothers of parent will be refreshed*/
         border_p = par;
@@ -464,12 +474,6 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
         par = lv_obj_get_parent(par);
     }
 
-    /*Call the post draw design function of the parents of the to object*/
-    par = lv_obj_get_parent(top_p);
-    while(par != NULL) {
-        par->design_cb(par, mask_p, LV_DESIGN_DRAW_POST);
-        par = lv_obj_get_parent(par);
-    }
 }
 
 /**
@@ -501,8 +505,13 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
 
         /* Redraw the object */
         obj->design_cb(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
-        // usleep(5 * 1000);  /*DEBUG: Wait after every object draw to see the order of drawing*/
 
+#if MASK_AREA_DEBUG
+        static lv_color_t debug_color = LV_COLOR_RED;
+        lv_draw_fill(&obj_ext_mask, &obj_ext_mask, debug_color, LV_OPA_50);
+        debug_color.full *= 17;
+        debug_color.full += 0xA1;
+#endif
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
         lv_obj_get_coords(obj, &obj_area);
         union_ok = lv_area_intersect(&obj_mask, mask_ori_p, &obj_area);

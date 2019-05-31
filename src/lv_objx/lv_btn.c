@@ -35,8 +35,8 @@ static bool lv_btn_design(lv_obj_t * btn, const lv_area_t * mask, lv_design_mode
 static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
 
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
-static void lv_btn_ink_effect_anim(lv_obj_t * btn, int32_t val);
-static void lv_btn_ink_effect_anim_ready(void * p);
+static void lv_btn_ink_effect_anim(lv_obj_t * btn, lv_anim_value_t val);
+static void lv_btn_ink_effect_anim_ready(lv_anim_t * a);
 #endif
 
 /**********************
@@ -502,7 +502,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
         /*Forget the old inked button*/
         if(ink_obj != NULL && ink_obj != btn) {
-            lv_anim_del(ink_obj, (lv_anim_fp_t)lv_btn_ink_effect_anim);
+            lv_anim_del(ink_obj, (lv_anim_exec_cb_t)lv_btn_ink_effect_anim);
             lv_obj_invalidate(ink_obj);
             ink_obj = NULL;
         }
@@ -517,9 +517,9 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             a.var            = btn;
             a.start          = 0;
             a.end            = LV_BTN_INK_VALUE_MAX;
-            a.fp             = (lv_anim_fp_t)lv_btn_ink_effect_anim;
-            a.path           = lv_anim_path_linear;
-            a.end_cb         = lv_btn_ink_effect_anim_ready;
+            a.exec_cb        = (lv_anim_exec_cb_t)lv_btn_ink_effect_anim;
+            a.path_cb        = lv_anim_path_linear;
+            a.ready_cb       = lv_btn_ink_effect_anim_ready;
             a.act_time       = 0;
             a.time           = ext->ink_in_time;
             a.playback       = 0;
@@ -586,9 +586,9 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             a.var            = ink_obj;
             a.start          = LV_BTN_INK_VALUE_MAX;
             a.end            = 0;
-            a.fp             = (lv_anim_fp_t)lv_btn_ink_effect_anim;
-            a.path           = lv_anim_path_linear;
-            a.end_cb         = lv_btn_ink_effect_anim_ready;
+            a.exec_cb        = (lv_anim_exec_cb_t)lv_btn_ink_effect_anim;
+            a.path_cb        = lv_anim_path_linear;
+            a.ready_cb       = lv_btn_ink_effect_anim_ready;
             a.act_time       = 0;
             a.time           = ext->ink_out_time;
             a.playback       = 0;
@@ -606,25 +606,10 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         } else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
             if(lv_btn_get_toggle(btn)) lv_btn_set_state(btn, LV_BTN_STATE_REL);
         }
-        //        else if(c == LV_KEY_ENTER) {
-        //            if(lv_btn_get_toggle(btn)) {
-        //                if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR)
-        //                lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL); else if(state ==
-        //                LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR)
-        //                lv_btn_set_state(btn, LV_BTN_STATE_REL);
-        //            } else {
-        //                if(state == LV_BTN_STATE_REL || state == LV_BTN_STATE_PR)
-        //                lv_btn_set_state(btn, LV_BTN_STATE_REL); else if(state ==
-        //                LV_BTN_STATE_TGL_REL || state == LV_BTN_STATE_TGL_PR)
-        //                lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-        //            }
-        //            res = lv_obj_send_event(btn, LV_EVENT_VALUE_CHANGED);
-        //            if(res != LV_RES_OK) return res;
-        //        }
     } else if(sign == LV_SIGNAL_CLEANUP) {
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
         if(btn == ink_obj) {
-            lv_anim_del(ink_obj, (lv_anim_fp_t)lv_btn_ink_effect_anim);
+            lv_anim_del(ink_obj, (lv_anim_exec_cb_t)lv_btn_ink_effect_anim);
             ink_obj = NULL;
         }
 #endif
@@ -647,7 +632,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
  * @param btn pointer to the animated button
  * @param val the new radius
  */
-static void lv_btn_ink_effect_anim(lv_obj_t * btn, int32_t val)
+static void lv_btn_ink_effect_anim(lv_obj_t * btn, lv_anim_value_t val)
 {
     if(btn) {
         ink_act_value = val;
@@ -657,11 +642,11 @@ static void lv_btn_ink_effect_anim(lv_obj_t * btn, int32_t val)
 
 /**
  * Called to clean up when the ink animation is ready
- * @param p unused
+ * @param a unused
  */
-static void lv_btn_ink_effect_anim_ready(void * p)
+static void lv_btn_ink_effect_anim_ready(lv_anim_t * a)
 {
-    (void)p; /*Unused*/
+    (void) a;  /*Unused*/
 
     lv_btn_ext_t * ext   = lv_obj_get_ext_attr(ink_obj);
     lv_btn_state_t state = lv_btn_get_state(ink_obj);
@@ -671,20 +656,20 @@ static void lv_btn_ink_effect_anim_ready(void * p)
 
     if((state == LV_BTN_STATE_REL || state == LV_BTN_STATE_TGL_REL) && ext->toggle == 0 &&
        ink_playback == false) {
-        lv_anim_t a;
-        a.var            = ink_obj;
-        a.start          = LV_BTN_INK_VALUE_MAX;
-        a.end            = 0;
-        a.fp             = (lv_anim_fp_t)lv_btn_ink_effect_anim;
-        a.path           = lv_anim_path_linear;
-        a.end_cb         = lv_btn_ink_effect_anim_ready;
-        a.act_time       = -ext->ink_wait_time;
-        a.time           = ext->ink_out_time;
-        a.playback       = 0;
-        a.playback_pause = 0;
-        a.repeat         = 0;
-        a.repeat_pause   = 0;
-        lv_anim_create(&a);
+        lv_anim_t new_a;
+        new_a.var            = ink_obj;
+        new_a.start          = LV_BTN_INK_VALUE_MAX;
+        new_a.end            = 0;
+        new_a.exec_cb        = (lv_anim_exec_cb_t)lv_btn_ink_effect_anim;
+        new_a.path_cb        = lv_anim_path_linear;
+        new_a.ready_cb       = lv_btn_ink_effect_anim_ready;
+        new_a.act_time       = -ext->ink_wait_time;
+        new_a.time           = ext->ink_out_time;
+        new_a.playback       = 0;
+        new_a.playback_pause = 0;
+        new_a.repeat         = 0;
+        new_a.repeat_pause   = 0;
+        lv_anim_create(&new_a);
 
         ink_playback = true;
     } else {

@@ -31,6 +31,7 @@ extern "C" {
 #endif
 
 #include "../lv_core/lv_obj.h"
+#include "../lv_misc/lv_anim.h"
 #include "lv_arc.h"
 
 /*********************
@@ -58,7 +59,7 @@ typedef struct
 {
     lv_arc_ext_t arc; /*Ext. of ancestor*/
     /*New data for this type */
-    uint16_t arc_length;         /*Length of the spinning indicator in degree*/
+    lv_anim_value_t arc_length;         /*Length of the spinning indicator in degree*/
     uint16_t time;               /*Time of one round*/
     lv_preload_type_t anim_type:1; /*Type of the arc animation*/
     lv_preload_dir_t anim_dir:1;   /*Animation Direction*/
@@ -92,7 +93,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param preload pointer to a preload object
  * @param deg length of the arc
  */
-void lv_preload_set_arc_length(lv_obj_t * preload, uint16_t deg);
+void lv_preload_set_arc_length(lv_obj_t * preload, lv_anim_value_t deg);
 
 /**
  * Set the spin time of the arc
@@ -135,7 +136,7 @@ void lv_preload_set_anim_dir(lv_obj_t * preload, lv_preload_dir_t dir);
  * Get the arc length [degree] of the a pre loader
  * @param preload pointer to a pre loader object
  */
-uint16_t lv_preload_get_arc_length(const lv_obj_t * preload);
+lv_anim_value_t lv_preload_get_arc_length(const lv_obj_t * preload);
 
 /**
  * Get the spin time of the arc
@@ -175,7 +176,7 @@ lv_preload_dir_t lv_preload_get_anim_dir(lv_obj_t * preload);
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-void lv_preload_spinner_anim(void * ptr, int32_t val);
+void lv_preload_spinner_anim(void * ptr, lv_anim_value_t val);
 
 /**********************
  *      MACROS

@@ -20,6 +20,8 @@
  *      DEFINES
  *********************/
 #define IDLE_MEAS_PERIOD 500 /*[ms]*/
+#define DEF_PRIO         LV_TASK_PRIO_MID
+#define DEF_PERIOD       500
 
 /**********************
  *      TYPEDEFS
@@ -28,7 +30,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_task_exec(lv_task_t * lv_task_p);
+static bool lv_task_exec(lv_task_t * task);
 
 /**********************
  *  STATIC VARIABLES
@@ -49,7 +51,7 @@ static bool task_created;
 /**
  * Init the lv_task module
  */
-void lv_task_init(void)
+void lv_task_core_init(void)
 {
     lv_ll_init(&LV_GC_ROOT(_lv_task_ll), sizeof(lv_task_t));
 
@@ -138,7 +140,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
             if(task_deleted)
                 break; /*If a task was deleted then this or the next item might be corrupted*/
             if(task_created)
-                break; /*If a task was deleted then this or the next item might be corrupted*/
+                break; /*If a task was created then this or the next item might be corrupted*/
 
             LV_GC_ROOT(_lv_task_act) = next; /*Load the next task*/
         }
@@ -159,130 +161,168 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
 
     LV_LOG_TRACE("lv_task_handler ready");
 }
+/**
+ * Create an "empty" task. It needs to initialzed with at least
+ * `lv_task_set_cb` and `lv_task_set_period`
+ * @return pointer to the craeted task
+ */
+lv_task_t * lv_task_create_basic(void)
+{
+    lv_task_t * new_task = NULL;
+    lv_task_t * tmp;
+
+    /*Create task lists in order of priority from high to low*/
+    tmp = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
+
+    /*It's the first task*/
+    if(NULL == tmp) {
+        new_task = lv_ll_ins_head(&LV_GC_ROOT(_lv_task_ll));
+        lv_mem_assert(new_task);
+        if(new_task == NULL) return NULL;
+    }
+    /*Insert the new task to proper place according to its priority*/
+    else {
+        do {
+            if(tmp->prio <= DEF_PRIO) {
+                new_task = lv_ll_ins_prev(&LV_GC_ROOT(_lv_task_ll), tmp);
+                lv_mem_assert(new_task);
+                if(new_task == NULL) return NULL;
+                break;
+            }
+            tmp = lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), tmp);
+        } while(tmp != NULL);
+
+        /*Only too high priority tasks were found. Add the task to the end*/
+        if(tmp == NULL) {
+            new_task = lv_ll_ins_tail(&LV_GC_ROOT(_lv_task_ll));
+            lv_mem_assert(new_task);
+            if(new_task == NULL) return NULL;
+        }
+    }
+
+    new_task->period   = DEF_PERIOD;
+    new_task->task_cb  = NULL;
+    new_task->prio     = DEF_PRIO;
+
+    new_task->once     = 0;
+    new_task->last_run = lv_tick_get();
+
+    new_task->user_data= NULL;
+
+    task_created = true;
+
+    return new_task;
+}
+
 
 /**
  * Create a new lv_task
  * @param task a function which is the task itself
  * @param period call period in ms unit
  * @param prio priority of the task (LV_TASK_PRIO_OFF means the task is stopped)
- * @param param free parameter
+ * @param user_data custom parameter
  * @return pointer to the new task
  */
-lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t prio, void * param)
+lv_task_t * lv_task_create(lv_task_cb_t task_cb, uint32_t period, lv_task_prio_t prio, void * user_data)
 {
-    lv_task_t * new_lv_task = NULL;
-    lv_task_t * tmp;
+    lv_task_t * new_task = lv_task_create_basic();
+    lv_mem_assert(new_task);
+    if(new_task == NULL) return NULL;
 
-    /*Create task lists in order of priority from high to low*/
-    tmp = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
-    if(NULL == tmp) { /*First task*/
-        new_lv_task = lv_ll_ins_head(&LV_GC_ROOT(_lv_task_ll));
-        lv_mem_assert(new_lv_task);
-        if(new_lv_task == NULL) return NULL;
-    } else {
-        do {
-            if(tmp->prio <= prio) {
-                new_lv_task = lv_ll_ins_prev(&LV_GC_ROOT(_lv_task_ll), tmp);
-                lv_mem_assert(new_lv_task);
-                if(new_lv_task == NULL) return NULL;
-                break;
-            }
-            tmp = lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), tmp);
-        } while(tmp != NULL);
+    lv_task_set_cb(new_task, task_cb);
+    lv_task_set_period(new_task, period);
+    lv_task_set_prio(new_task, prio);
+    new_task->user_data = user_data;
 
-        if(tmp == NULL) { /*Only too high priority tasks were found*/
-            new_lv_task = lv_ll_ins_tail(&LV_GC_ROOT(_lv_task_ll));
-            lv_mem_assert(new_lv_task);
-            if(new_lv_task == NULL) return NULL;
-        }
-    }
+    return new_task;
+}
 
-    new_lv_task->period   = period;
-    new_lv_task->task     = task;
-    new_lv_task->prio     = prio;
-    new_lv_task->param    = param;
-    new_lv_task->once     = 0;
-    new_lv_task->last_run = lv_tick_get();
-
-    task_created = true;
-
-    return new_lv_task;
+/**
+ * Set the callback the task (the function to call periodically)
+ * @param task pointer to a task
+ * @param task_cb teh function to call periodically
+ */
+void lv_task_set_cb(lv_task_t * task, lv_task_cb_t task_cb)
+{
+    task->task_cb = task_cb;
 }
 
 /**
  * Delete a lv_task
- * @param lv_task_p pointer to task created by lv_task_p
+ * @param task pointer to task created by task
  */
-void lv_task_del(lv_task_t * lv_task_p)
+void lv_task_del(lv_task_t * task)
 {
-    lv_ll_rem(&LV_GC_ROOT(_lv_task_ll), lv_task_p);
+    lv_ll_rem(&LV_GC_ROOT(_lv_task_ll), task);
 
-    lv_mem_free(lv_task_p);
+    lv_mem_free(task);
 
-    if(LV_GC_ROOT(_lv_task_act) == lv_task_p) task_deleted = true; /*The active task was deleted*/
+    if(LV_GC_ROOT(_lv_task_act) == task) task_deleted = true; /*The active task was deleted*/
 }
 
 /**
  * Set new priority for a lv_task
- * @param lv_task_p pointer to a lv_task
+ * @param task pointer to a lv_task
  * @param prio the new priority
  */
-void lv_task_set_prio(lv_task_t * lv_task_p, lv_task_prio_t prio)
+void lv_task_set_prio(lv_task_t * task, lv_task_prio_t prio)
 {
+    if(task->prio == prio) return;
+
     /*Find the tasks with new priority*/
     lv_task_t * i;
     LV_LL_READ(LV_GC_ROOT(_lv_task_ll), i)
     {
         if(i->prio <= prio) {
-            if(i != lv_task_p) lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), lv_task_p, i);
+            if(i != task) lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), task, i);
             break;
         }
     }
 
     /*There was no such a low priority so far then add the node to the tail*/
     if(i == NULL) {
-        lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), lv_task_p, NULL);
+        lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), task, NULL);
     }
 
-    lv_task_p->prio = prio;
+    task->prio = prio;
 }
 
 /**
  * Set new period for a lv_task
- * @param lv_task_p pointer to a lv_task
+ * @param task pointer to a lv_task
  * @param period the new period
  */
-void lv_task_set_period(lv_task_t * lv_task_p, uint32_t period)
+void lv_task_set_period(lv_task_t * task, uint32_t period)
 {
-    lv_task_p->period = period;
+    task->period = period;
 }
 
 /**
  * Make a lv_task ready. It will not wait its period.
- * @param lv_task_p pointer to a lv_task.
+ * @param task pointer to a lv_task.
  */
-void lv_task_ready(lv_task_t * lv_task_p)
+void lv_task_ready(lv_task_t * task)
 {
-    lv_task_p->last_run = lv_tick_get() - lv_task_p->period - 1;
+    task->last_run = lv_tick_get() - task->period - 1;
 }
 
 /**
  * Delete the lv_task after one call
- * @param lv_task_p pointer to a lv_task.
+ * @param task pointer to a lv_task.
  */
-void lv_task_once(lv_task_t * lv_task_p)
+void lv_task_once(lv_task_t * task)
 {
-    lv_task_p->once = 1;
+    task->once = 1;
 }
 
 /**
  * Reset a lv_task.
  * It will be called the previously set period milliseconds later.
- * @param lv_task_p pointer to a lv_task.
+ * @param task pointer to a lv_task.
  */
-void lv_task_reset(lv_task_t * lv_task_p)
+void lv_task_reset(lv_task_t * task)
 {
-    lv_task_p->last_run = lv_tick_get();
+    task->last_run = lv_tick_get();
 }
 
 /**
@@ -309,25 +349,25 @@ uint8_t lv_task_get_idle(void)
 
 /**
  * Execute task if its the priority is appropriate
- * @param lv_task_p pointer to lv_task
+ * @param task pointer to lv_task
  * @return true: execute, false: not executed
  */
-static bool lv_task_exec(lv_task_t * lv_task_p)
+static bool lv_task_exec(lv_task_t * task)
 {
     bool exec = false;
 
     /*Execute if at least 'period' time elapsed*/
-    uint32_t elp = lv_tick_elaps(lv_task_p->last_run);
-    if(elp >= lv_task_p->period) {
-        lv_task_p->last_run = lv_tick_get();
+    uint32_t elp = lv_tick_elaps(task->last_run);
+    if(elp >= task->period) {
+        task->last_run = lv_tick_get();
         task_deleted        = false;
         task_created        = false;
-        lv_task_p->task(lv_task_p->param);
+        if(task->task_cb) task->task_cb(task);
 
         /*Delete if it was a one shot lv_task*/
         if(task_deleted == false) { /*The task might be deleted by itself as well*/
-            if(lv_task_p->once != 0) {
-                lv_task_del(lv_task_p);
+            if(task->once != 0) {
+                lv_task_del(task);
             }
         }
         exec = true;

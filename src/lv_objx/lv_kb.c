@@ -16,6 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_KB_CTRL_BTN_FLAGS (LV_BTNM_CTRL_NO_REPEAT | LV_BTNM_CTRL_CLICK_TRIG)
 
 /**********************
  *      TYPEDEFS
@@ -37,10 +38,10 @@ static const char * kb_map_lc[] = {"1#", "q", "w", "e", "r", "t", "y", "u", "i",
                                    LV_SYMBOL_CLOSE, LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_OK, ""};
 
 static const lv_btnm_ctrl_t kb_ctrl_lc_map[] = {
-    5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7, (6 | LV_BTNM_CTRL_NO_REPEAT),
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 7, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 6, 2,
-    2};
+    LV_KB_CTRL_BTN_FLAGS | 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7,
+    LV_KB_CTRL_BTN_FLAGS | 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 7,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    LV_KB_CTRL_BTN_FLAGS | 2, 2, 6, 2, LV_KB_CTRL_BTN_FLAGS | 2};
 
 static const char * kb_map_uc[] = {"1#", "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P", "Bksp", "\n",
                                    "abc", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Enter", "\n",
@@ -48,10 +49,10 @@ static const char * kb_map_uc[] = {"1#", "Q", "W", "E", "R", "T", "Y", "U", "I",
                                    LV_SYMBOL_CLOSE, LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_OK, ""};
 
 static const lv_btnm_ctrl_t kb_ctrl_uc_map[] = {
-    5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7, (6 | LV_BTNM_CTRL_NO_REPEAT),
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 7, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 6, 2,
-    2};
+    LV_KB_CTRL_BTN_FLAGS | 5, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 7,
+    LV_KB_CTRL_BTN_FLAGS | 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 7,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    LV_KB_CTRL_BTN_FLAGS | 2, 2, 6, 2, LV_KB_CTRL_BTN_FLAGS | 2};
 
 static const char * kb_map_spec[] = {"0", "1", "2", "3", "4" ,"5", "6", "7", "8", "9", "Bksp", "\n",
                                      "abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
@@ -59,17 +60,21 @@ static const char * kb_map_spec[] = {"0", "1", "2", "3", "4" ,"5", "6", "7", "8"
                                      LV_SYMBOL_CLOSE, LV_SYMBOL_LEFT, " ", LV_SYMBOL_RIGHT, LV_SYMBOL_OK, ""};
 
 static const lv_btnm_ctrl_t kb_ctrl_spec_map[] = {
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, (2 | LV_BTNM_CTRL_NO_REPEAT),
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2,
-    2, 6, 2, 2};
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, LV_KB_CTRL_BTN_FLAGS | 2,
+    LV_KB_CTRL_BTN_FLAGS | 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    LV_KB_CTRL_BTN_FLAGS | 2, LV_KB_CTRL_BTN_FLAGS | 2, 6, 2, 2};
 
 static const char * kb_map_num[] = {"1", "2", "3", LV_SYMBOL_CLOSE, "\n",
                                     "4", "5", "6", LV_SYMBOL_OK, "\n",
                                     "7", "8", "9", "Bksp", "\n",
                                     "+/-", "0", ".", LV_SYMBOL_LEFT, LV_SYMBOL_RIGHT, ""};
 
-static const lv_btnm_ctrl_t kb_ctrl_num_map[] = {1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1, 1, 1};
+static const lv_btnm_ctrl_t kb_ctrl_num_map[] = {
+        1, 1, 1, LV_KB_CTRL_BTN_FLAGS | 2,
+        1, 1, 1, LV_KB_CTRL_BTN_FLAGS | 2,
+        1, 1, 1, LV_KB_CTRL_BTN_FLAGS | 2,
+        LV_KB_CTRL_BTN_FLAGS | 1, 1, 1, LV_KB_CTRL_BTN_FLAGS | 1, LV_KB_CTRL_BTN_FLAGS | 1};
 /* clang-format on */
 
 /**********************
@@ -113,7 +118,12 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new keyboard keyboard*/
     if(copy == NULL) {
-        lv_obj_set_size(new_kb, LV_DPI * 3, LV_DPI * 2);
+        /* Set a size which fits into the parent.
+         * Don't use `par` directly because if the window is created on a page it is moved to the
+         * scrollable so the parent has changed */
+        lv_obj_set_size(new_kb, lv_obj_get_width_fit(lv_obj_get_parent(new_kb)),
+                        lv_obj_get_height_fit(lv_obj_get_parent(new_kb)) / 2);
+
         lv_obj_align(new_kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
         lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
         lv_btnm_set_map(new_kb, kb_map_lc);
@@ -317,7 +327,7 @@ const lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
  */
 void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
 {
-    if(event != LV_EVENT_PRESSED && event != LV_EVENT_LONG_PRESSED_REPEAT) return;
+    if(event != LV_EVENT_SELECTED && event != LV_EVENT_LONG_PRESSED_REPEAT) return;
 
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     uint16_t btn_id   = lv_btnm_get_active_btn(kb);
@@ -344,18 +354,23 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
         lv_btnm_set_ctrl_map(kb, kb_ctrl_spec_map);
         return;
     } else if(strcmp(txt, LV_SYMBOL_CLOSE) == 0) {
-        if(kb->event_cb) {
-            lv_event_send(kb, LV_EVENT_CANCEL, NULL);
+        if(kb->event_cb != lv_kb_def_event_cb) {
+            lv_res_t res = lv_event_send(kb, LV_EVENT_CANCEL, NULL);
+            if(res != LV_RES_OK) return;
         } else {
             lv_kb_set_ta(kb, NULL); /*De-assign the text area  to hide it cursor if needed*/
             lv_obj_del(kb);
+            return;
         }
         return;
     } else if(strcmp(txt, LV_SYMBOL_OK) == 0) {
-        if(kb->event_cb)
-            lv_event_send(kb, LV_EVENT_APPLY, NULL);
-        else
+        if(kb->event_cb != lv_kb_def_event_cb) {
+            lv_res_t res = lv_event_send(kb, LV_EVENT_APPLY, NULL);
+            if(res != LV_RES_OK) return;
+        }
+        else {
             lv_kb_set_ta(kb, NULL); /*De-assign the text area to hide it cursor if needed*/
+        }
         return;
     }
 

@@ -36,7 +36,9 @@
  **********************/
 static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 static void mbox_realign(lv_obj_t * mbox);
-static void lv_mbox_close_end_cb(lv_obj_t * mbox);
+#if LV_USE_ANIMATION
+static void lv_mbox_close_ready_cb(lv_anim_t * a);
+#endif
 static void lv_mbox_default_event_cb(lv_obj_t * mbox, lv_event_t event);
 
 /**********************
@@ -77,7 +79,9 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->text      = NULL;
     ext->btnm      = NULL;
+#if LV_USE_ANIMATION
     ext->anim_time = LV_MBOX_CLOSE_ANIM_TIME;
+#endif
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_mbox, lv_mbox_signal);
@@ -182,12 +186,14 @@ void lv_mbox_set_text(lv_obj_t * mbox, const char * txt)
  */
 void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
 {
+#if LV_USE_ANIMATION
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-#if LV_USE_ANIMATION == 0
     anim_time = 0;
-#endif
-
     ext->anim_time = anim_time;
+#else
+    (void) mbox;
+    (void) anim_time;
+#endif
 }
 
 /**
@@ -198,18 +204,46 @@ void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
 void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
 {
 #if LV_USE_ANIMATION
-    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-
-    if(ext->anim_time != 0) {
+    if(lv_mbox_get_anim_time(mbox) != 0) {
         /*Add shrinking animations*/
-        lv_obj_animate(mbox, LV_ANIM_GROW_H | LV_ANIM_OUT, ext->anim_time, delay, NULL);
-        lv_obj_animate(mbox, LV_ANIM_GROW_V | LV_ANIM_OUT, ext->anim_time, delay,
-                       lv_mbox_close_end_cb);
+        lv_anim_t a;
+        a.var = mbox;
+        a.start = lv_obj_get_height(mbox);
+        a.end = 0;
+        a.exec_cb = (lv_anim_exec_cb_t)lv_obj_set_height;
+        a.path_cb = lv_anim_path_linear;
+        a.ready_cb = NULL;
+        a.act_time = -delay;
+        a.time = lv_mbox_get_anim_time(mbox);
+        a.playback = 0;
+        a.playback_pause = 0;
+        a.repeat = 0;
+        a.repeat_pause = 0;
+        lv_anim_create(&a);
+
+        a.start = lv_obj_get_width(mbox);
+        a.exec_cb = (lv_anim_exec_cb_t)lv_obj_set_width;
+        a.ready_cb = lv_mbox_close_ready_cb;
+        lv_anim_create(&a);
 
         /*Disable fit to let shrinking work*/
         lv_cont_set_fit(mbox, LV_FIT_NONE);
     } else {
-        lv_obj_animate(mbox, LV_ANIM_NONE, ext->anim_time, delay, lv_mbox_close_end_cb);
+        /*Create an animation to delete the mbox `delay` ms later*/
+        lv_anim_t a;
+        a.var = mbox;
+        a.start = 0;
+        a.end = 1;
+        a.exec_cb = (lv_anim_exec_cb_t)NULL;
+        a.path_cb = lv_anim_path_linear;
+        a.ready_cb = lv_mbox_close_ready_cb;
+        a.act_time = -delay;
+        a.time = 0;
+        a.playback = 0;
+        a.playback_pause = 0;
+        a.repeat = 0;
+        a.repeat_pause = 0;
+        lv_anim_create(&a);
     }
 #else
     (void)delay; /*Unused*/
@@ -326,8 +360,13 @@ const char * lv_mbox_get_active_btn_text(lv_obj_t * mbox)
  */
 uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox)
 {
+#if LV_USE_ANIMATION
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
     return ext->anim_time;
+#else
+    (void) mbox;
+    return 0;
+#endif
 }
 
 /**
@@ -491,14 +530,16 @@ static void mbox_realign(lv_obj_t * mbox)
     }
 }
 
-static void lv_mbox_close_end_cb(lv_obj_t * mbox)
+#if LV_USE_ANIMATION
+static void lv_mbox_close_ready_cb(lv_anim_t * a)
 {
-    lv_obj_del(mbox);
+    lv_obj_del(a->var);
 }
+#endif
 
 static void lv_mbox_default_event_cb(lv_obj_t * mbox, lv_event_t event)
 {
-    if(event != LV_EVENT_CLICKED) return;
+    if(event != LV_EVENT_SELECTED) return;
 
     uint16_t btn_id = lv_mbox_get_active_btn(mbox);
     if(btn_id == LV_BTNM_BTN_NONE) return;

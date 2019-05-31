@@ -34,6 +34,14 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+struct _lv_task_t;
+
+/**
+ * Tasks execte this type type of functions.
+ */
+typedef void (*lv_task_cb_t)(struct _lv_task_t *);
+
 /**
  * Possible priorities for lv_tasks
  */
@@ -51,12 +59,14 @@ typedef uint8_t lv_task_prio_t;
 /**
  * Descriptor of a lv_task
  */
-typedef struct
+typedef struct _lv_task_t
 {
     uint32_t period;
     uint32_t last_run;
-    void (*task)(void *);
-    void * param;
+    lv_task_cb_t task_cb;
+
+    void * user_data;
+
     uint8_t prio : 3;
     uint8_t once : 1;
 } lv_task_t;
@@ -68,7 +78,7 @@ typedef struct
 /**
  * Init the lv_task module
  */
-void lv_task_init(void);
+void lv_task_core_init(void);
 
 /**
  * Call it  periodically to handle lv_tasks.
@@ -76,54 +86,67 @@ void lv_task_init(void);
 LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void);
 
 /**
+ * Create an "empty" task. It needs to initialzed with at least
+ * `lv_task_set_cb` and `lv_task_set_period`
+ * @return pointer to the craeted task
+ */
+lv_task_t * lv_task_create_basic(void);
+
+/**
  * Create a new lv_task
  * @param task a function which is the task itself
  * @param period call period in ms unit
  * @param prio priority of the task (LV_TASK_PRIO_OFF means the task is stopped)
- * @param param free parameter
+ * @param user_data custom parameter
  * @return pointer to the new task
  */
-lv_task_t * lv_task_create(void (*task)(void *), uint32_t period, lv_task_prio_t prio,
-                           void * param);
+lv_task_t * lv_task_create(lv_task_cb_t task_cb, uint32_t period, lv_task_prio_t prio, void * user_data);
 
 /**
  * Delete a lv_task
- * @param lv_task_p pointer to task created by lv_task_p
+ * @param task pointer to task_cb created by task
  */
-void lv_task_del(lv_task_t * lv_task_p);
+void lv_task_del(lv_task_t * task);
+
+/**
+ * Set the callback the task (the function to call periodically)
+ * @param task pointer to a task
+ * @param task_cb the function to call periodically
+ */
+void lv_task_set_cb(lv_task_t * task, lv_task_cb_t task_cb);
 
 /**
  * Set new priority for a lv_task
- * @param lv_task_p pointer to a lv_task
+ * @param task pointer to a lv_task
  * @param prio the new priority
  */
-void lv_task_set_prio(lv_task_t * lv_task_p, lv_task_prio_t prio);
+void lv_task_set_prio(lv_task_t * task, lv_task_prio_t prio);
 
 /**
  * Set new period for a lv_task
- * @param lv_task_p pointer to a lv_task
+ * @param task pointer to a lv_task
  * @param period the new period
  */
-void lv_task_set_period(lv_task_t * lv_task_p, uint32_t period);
+void lv_task_set_period(lv_task_t * task, uint32_t period);
 
 /**
  * Make a lv_task ready. It will not wait its period.
- * @param lv_task_p pointer to a lv_task.
+ * @param task pointer to a lv_task.
  */
-void lv_task_ready(lv_task_t * lv_task_p);
+void lv_task_ready(lv_task_t * task);
 
 /**
  * Delete the lv_task after one call
- * @param lv_task_p pointer to a lv_task.
+ * @param task pointer to a lv_task.
  */
-void lv_task_once(lv_task_t * lv_task_p);
+void lv_task_once(lv_task_t * task);
 
 /**
  * Reset a lv_task.
  * It will be called the previously set period milliseconds later.
- * @param lv_task_p pointer to a lv_task.
+ * @param task pointer to a lv_task.
  */
-void lv_task_reset(lv_task_t * lv_task_p);
+void lv_task_reset(lv_task_t * task);
 
 /**
  * Enable or disable the whole  lv_task handling

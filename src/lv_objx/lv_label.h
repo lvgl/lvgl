@@ -29,8 +29,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_LABEL_DOT_NUM 3
-#define LV_LABEL_POS_LAST 0xFFFF
+#define LV_LABEL_DOT_NUM      3
+#define LV_LABEL_POS_LAST     0xFFFF
+#define LV_LABEL_TEXT_SEL_OFF 0xFFFF
 
 /**********************
  *      TYPEDEFS
@@ -62,20 +63,29 @@ typedef struct
     /*Inherited from 'base_obj' so no inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
     char * text;                    /*Text of the label*/
-    lv_label_long_mode_t long_mode; /*Determinate what to do with the long texts*/
-    char dot_tmp[LV_LABEL_DOT_NUM * 4 +
-                 1]; /*Store the character which are replaced by dots (Handled by the library)*/
-
+    union{
+        char * tmp_ptr; /* Pointer to the allocated memory containing the character which are replaced by dots (Handled by the library)*/
+        char tmp[ sizeof(char *) ];    /* Directly store the characters if <=4 characters */
+    } dot;
     uint16_t dot_end;       /*The text end position in dot mode (Handled by the library)*/
-    uint16_t anim_speed;    /*Speed of scroll and roll animation in px/sec unit*/
     lv_point_t offset;      /*Text draw position offset*/
+
+#if LV_USE_ANIMATION
+    uint16_t anim_speed;    /*Speed of scroll and roll animation in px/sec unit*/
+#endif
+
+#if LV_LABEL_TEXT_SEL
+    uint16_t txt_sel_start;    /*Left-most selection character*/
+    uint16_t txt_sel_end;      /*Right-most selection character*/
+#endif
+
+    lv_label_long_mode_t long_mode : 3; /*Determinate what to do with the long texts*/
     uint8_t static_txt : 1; /*Flag to indicate the text is static*/
     uint8_t align : 2;      /*Align type from 'lv_label_align_t'*/
     uint8_t recolor : 1;    /*Enable in-line letter re-coloring*/
     uint8_t expand : 1;     /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
     uint8_t body_draw : 1;  /*Draw background body*/
-    int selection_start;    /*Left-most selection character*/
-    int selection_end;      /*Right-most selection character*/
+    uint8_t dot_tmp_alloc : 1; /*True if dot_tmp has been allocated. False if dot_tmp directly holds up to 4 bytes of characters */
 } lv_label_ext_t;
 
 /**********************
@@ -164,6 +174,21 @@ static inline void lv_label_set_style(lv_obj_t * label, const lv_style_t * style
 {
     lv_obj_set_style(label, style);
 }
+
+/**
+ * @brief Set the selection start index.
+ * @param label pointer to a label object.
+ * @param index index to set. `LV_LABEL_TXT_SEL_OFF` to select nothing.
+ */
+void lv_label_set_text_sel_start( lv_obj_t * label, uint16_t index );
+
+/**
+ * @brief Set the selection end index.
+ * @param label pointer to a label object.
+ * @param index index to set. `LV_LABEL_TXT_SEL_OFF` to select nothing.
+ */
+void lv_label_set_text_sel_end( lv_obj_t * label, uint16_t index );
+
 /*=====================
  * Getter functions
  *====================*/
@@ -245,6 +270,21 @@ static inline const lv_style_t * lv_label_get_style(const lv_obj_t * label)
 {
     return lv_obj_get_style(label);
 }
+
+/**
+ * @brief Get the selection start index.
+ * @param label pointer to a label object.
+ * @return selection start index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
+ */
+uint16_t lv_label_get_text_sel_start( const lv_obj_t * label );
+
+/**
+ * @brief Get the selection end index.
+ * @param label pointer to a label object.
+ * @return selection end index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
+ */
+uint16_t lv_label_get_text_sel_end( const lv_obj_t * label );
+
 
 /*=====================
  * Other functions

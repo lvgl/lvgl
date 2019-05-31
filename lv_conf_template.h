@@ -120,6 +120,9 @@
 
 /*1: Enable the Animations */
 #define LV_USE_ANIMATION        1
+#if LV_USE_ANIMATION
+typedef void * lv_anim_user_data_t;
+#endif
 
 /* 1: Enable shadow drawing*/
 #define LV_USE_SHADOW           1
@@ -142,11 +145,11 @@ typedef void * lv_group_user_data_t;
 /* 1: Enable alpha indexed images */
 #define LV_IMG_CF_ALPHA     1
 
-/*1: Add a `user_data` to drivers and objects*/
-#define LV_USE_USER_DATA_SINGLE 1
+/*Declare the type of the user data of image decoder (can be e.g. `void *`, `int`, `struct`)*/
+typedef void * lv_img_decoder_user_data_t;
 
-/*1: Add separate `user_data` for every callback*/
-#define LV_USE_USER_DATA_MULTI  0
+/*1: Add a `user_data` to drivers and objects*/
+#define LV_USE_USER_DATA 1
 
 /*=====================
  *  Compiler settings
@@ -156,6 +159,11 @@ typedef void * lv_group_user_data_t;
 
 /* Define a custom attribute to `lv_task_handler` function */
 #define LV_ATTRIBUTE_TASK_HANDLER
+
+/* With size optimization (-Os) the compiler might not align data to
+ * 4 or 8 byte boundary. This alignment will be explicitly applied where needed.
+ * E.g. __attribute__((aligned(4))) */
+#define LV_ATTRIBUTE_MEM_ALIGN
 
 /* 1: Variable length array is supported*/
 #define LV_COMPILER_VLA_SUPPORTED            1
@@ -176,7 +184,7 @@ typedef void * lv_group_user_data_t;
 #endif   /*LV_TICK_CUSTOM*/
 
 typedef void * lv_disp_drv_user_data_t;             /*Type of user data in the display driver*/
-typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the display driver*/
+typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the input device driver*/
 
 /*================
  * Log settings
@@ -254,6 +262,13 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the d
 /*=================
  *  Text settings
  *=================*/
+
+/* Select a character encoding for strings.
+ * Your IDE or editor should have the same character encoding
+ * - LV_TXT_ENC_UTF8
+ * - LV_TXT_ENC_ASCII
+ * */
+#define LV_TXT_ENC LV_TXT_ENC_UTF8
 
  /*Can break (wrap) texts on these chars*/
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
@@ -354,6 +369,7 @@ typedef void * lv_obj_user_data_t;
 /*Hor, or ver. scroll speed [px/sec] in 'LV_LABEL_LONG_ROLL/ROLL_CIRC' mode*/
 #  define LV_LABEL_DEF_SCROLL_SPEED       25
 #  define LV_LABEL_WAIT_CHAR_COUNT        3 /* Waiting period at beginning/end of animation cycle */
+#  define LV_LABEL_TEXT_SEL               1  /*Enable selecting text of the label */
 #endif
 
 /*LED (dependencies: -)*/
@@ -378,7 +394,7 @@ typedef void * lv_obj_user_data_t;
 /*Page (dependencies: lv_cont)*/
 #define LV_USE_PAGE     1
 
-/*Preload (dependencies: lv_arc)*/
+/*Preload (dependencies: lv_arc, lv_anim)*/
 #define LV_USE_PRELOAD      1
 #if LV_USE_PRELOAD != 0
 #  define LV_PRELOAD_DEF_ARC_LENGTH   60      /*[deg]*/
@@ -408,8 +424,8 @@ typedef void * lv_obj_user_data_t;
 /*Text area (dependencies: lv_label, lv_page)*/
 #define LV_USE_TA       1
 #if LV_USE_TA != 0
-#  define LV_TA_CURSOR_BLINK_TIME 400     /*ms*/
-#  define LV_TA_PWD_SHOW_TIME     1500    /*ms*/
+#  define LV_TA_DEF_CURSOR_BLINK_TIME 400     /*ms*/
+#  define LV_TA_DEF_PWD_SHOW_TIME     1500    /*ms*/
 #endif
 
 /*Table (dependencies: lv_label)*/

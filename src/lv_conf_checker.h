@@ -169,6 +169,8 @@
 #ifndef LV_USE_ANIMATION
 #define LV_USE_ANIMATION        1
 #endif
+#if LV_USE_ANIMATION
+#endif
 
 /* 1: Enable shadow drawing*/
 #ifndef LV_USE_SHADOW
@@ -202,14 +204,11 @@
 #define LV_IMG_CF_ALPHA     1
 #endif
 
-/*1: Add a `user_data` to drivers and objects*/
-#ifndef LV_USE_USER_DATA_SINGLE
-#define LV_USE_USER_DATA_SINGLE 1
-#endif
+/*Declare the type of the user data of image decoder (can be e.g. `void *`, `int`, `struct`)*/
 
-/*1: Add separate `user_data` for every callback*/
-#ifndef LV_USE_USER_DATA_MULTI
-#define LV_USE_USER_DATA_MULTI  0
+/*1: Add a `user_data` to drivers and objects*/
+#ifndef LV_USE_USER_DATA
+#define LV_USE_USER_DATA 1
 #endif
 
 /*=====================
@@ -223,6 +222,13 @@
 /* Define a custom attribute to `lv_task_handler` function */
 #ifndef LV_ATTRIBUTE_TASK_HANDLER
 #define LV_ATTRIBUTE_TASK_HANDLER
+#endif
+
+/* With size optimization (-Os) the compiler might not align data to
+ * 4 or 8 byte boundary. This alignment will be explicitly applied where needed.
+ * E.g. __attribute__((aligned(4))) */
+#ifndef LV_ATTRIBUTE_MEM_ALIGN
+#define LV_ATTRIBUTE_MEM_ALIGN
 #endif
 
 /* 1: Variable length array is supported*/
@@ -393,6 +399,15 @@
  *  Text settings
  *=================*/
 
+/* Select a character encoding for strings.
+ * Your IDE or editor should have the same character encoding
+ * - LV_TXT_ENC_UTF8
+ * - LV_TXT_ENC_ASCII
+ * */
+#ifndef LV_TXT_ENC
+#define LV_TXT_ENC LV_TXT_ENC_UTF8
+#endif
+
  /*Can break (wrap) texts on these chars*/
 #ifndef LV_TXT_BREAK_CHARS
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
@@ -545,6 +560,9 @@
 #ifndef LV_LABEL_WAIT_CHAR_COUNT
 #  define LV_LABEL_WAIT_CHAR_COUNT        3 /* Waiting period at beginning/end of animation cycle */
 #endif
+#ifndef LV_LABEL_TEXT_SEL
+#  define LV_LABEL_TEXT_SEL               1  /*Enable selecting text of the label */
+#endif
 #endif
 
 /*LED (dependencies: -)*/
@@ -583,7 +601,7 @@
 #define LV_USE_PAGE     1
 #endif
 
-/*Preload (dependencies: lv_arc)*/
+/*Preload (dependencies: lv_arc, lv_anim)*/
 #ifndef LV_USE_PRELOAD
 #define LV_USE_PRELOAD      1
 #endif
@@ -635,11 +653,11 @@
 #define LV_USE_TA       1
 #endif
 #if LV_USE_TA != 0
-#ifndef LV_TA_CURSOR_BLINK_TIME
-#  define LV_TA_CURSOR_BLINK_TIME 400     /*ms*/
+#ifndef LV_TA_DEF_CURSOR_BLINK_TIME
+#  define LV_TA_DEF_CURSOR_BLINK_TIME 400     /*ms*/
 #endif
-#ifndef LV_TA_PWD_SHOW_TIME
-#  define LV_TA_PWD_SHOW_TIME     1500    /*ms*/
+#ifndef LV_TA_DEF_PWD_SHOW_TIME
+#  define LV_TA_DEF_PWD_SHOW_TIME     1500    /*ms*/
 #endif
 #endif
 

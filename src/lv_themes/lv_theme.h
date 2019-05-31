@@ -328,8 +328,8 @@ typedef struct
 #if LV_USE_GROUP
     struct
     {
-        lv_group_style_mod_func_t style_mod;
-        lv_group_style_mod_func_t style_mod_edit;
+        lv_group_style_mod_cb_t style_mod_cb;
+        lv_group_style_mod_cb_t style_mod_edit_cb;
     } group;
 #endif
 } lv_theme_t;

@@ -17,7 +17,7 @@
  *      DEFINES
  *********************/
 #if LV_USE_ANIMATION
-#ifndef LV_ROLLER_ANIM_TIME
+#ifndef LV_ROLLER_DEF_ANIM_TIME
 #define LV_ROLLER_DEF_ANIM_TIME 200 /*ms*/
 #endif
 #else
@@ -36,7 +36,11 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
 static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param);
 static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * param);
 static void refr_position(lv_obj_t * roller, bool anim_en);
+static void refr_height(lv_obj_t * roller);
 static void inf_normalize(void * roller_scrl);
+#if LV_USE_ANIMATION
+static void scroll_anim_ready_cb(lv_anim_t * a);
+#endif
 static void draw_bg(lv_obj_t * roller, const lv_area_t * mask);
 
 /**********************
@@ -86,8 +90,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_roller);
         lv_obj_set_drag(scrl, true); /*In ddlist it might be disabled*/
-        lv_page_set_scrl_fit2(new_roller, LV_FIT_TIGHT,
-                              LV_FIT_NONE); /*Height is specified directly*/
+        lv_page_set_scrl_fit2(new_roller, LV_FIT_TIGHT, LV_FIT_NONE); /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
         lv_ddlist_set_anim_time(new_roller, LV_ROLLER_DEF_ANIM_TIME);
         lv_ddlist_set_stay_open(new_roller, true);
@@ -140,6 +143,11 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, bool inf)
     if(inf == false) {
         ext->inf = 0;
         lv_ddlist_set_options(roller, options);
+
+        /* Make sure the roller's height and the scrollable's height is refreshed.
+         * They are refreshed in `LV_SIGNAL_COORD_CHG` but if the new options has the same width
+         * that signal won't be called. (It called because LV_FIT_TIGHT hor fit)*/
+        refr_height(roller);
     } else {
         ext->inf = 1;
 
@@ -154,9 +162,13 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, bool inf)
         lv_ddlist_set_options(roller, opt_extra);
         lv_mem_free(opt_extra);
 
+        /* Make sure the roller's height and the scrollable's height is refreshed.
+         * They are refreshed in `LV_SIGNAL_COORD_CHG` but if the new options has the same width
+         * that signal won't be called. (It called because LV_FIT_TIGHT hor fit)*/
+        refr_height(roller);
+
         uint16_t real_id_cnt = ext->ddlist.option_cnt / LV_ROLLER_INF_PAGES;
-        ext->ddlist.sel_opt_id =
-            ((LV_ROLLER_INF_PAGES / 2) + 1) * real_id_cnt; /*Select the middle page*/
+        lv_roller_set_selected(roller, ((LV_ROLLER_INF_PAGES / 2) + 1) * real_id_cnt, false); /*Select the middle page*/
     }
 }
 
@@ -386,21 +398,9 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
     }
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-    lv_align_t obj_align  = LV_ALIGN_IN_LEFT_MID;
-    if(ext->ddlist.label) {
-        lv_label_align_t label_align = lv_label_get_align(ext->ddlist.label);
-        if(LV_LABEL_ALIGN_CENTER == label_align)
-            obj_align = LV_ALIGN_CENTER;
-        else if(LV_LABEL_ALIGN_RIGHT == label_align)
-            obj_align = LV_ALIGN_IN_RIGHT_MID;
-    }
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_obj_set_height(lv_page_get_scrl(roller),
-                          lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
-        lv_obj_align(ext->ddlist.label, NULL, obj_align, 0, 0);
-        lv_anim_del(lv_page_get_scrl(roller), (lv_anim_fp_t)lv_obj_set_y);
-        lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
+        refr_height(roller);
 
         refr_position(roller, false);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
@@ -408,12 +408,10 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         if(lv_obj_get_width(roller) != lv_area_get_width(param) ||
            lv_obj_get_height(roller) != lv_area_get_height(param)) {
 
-            lv_ddlist_set_fix_height(roller, lv_obj_get_height(roller));
-            lv_obj_set_height(lv_page_get_scrl(roller),
-                              lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
-
-            lv_obj_align(ext->ddlist.label, NULL, obj_align, 0, 0);
-            lv_anim_del(lv_page_get_scrl(roller), (lv_anim_fp_t)lv_obj_set_y);
+            refr_height(roller);
+#if LV_USE_ANIMATION
+            lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_cb_t)lv_obj_set_y);
+#endif
             lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
             refr_position(roller, false);
         }
@@ -512,7 +510,8 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
         lv_coord_t label_y1   = ext->ddlist.label->coords.y1 - roller->coords.y1;
         lv_coord_t label_unit = font_h + style_label->text.line_space;
         lv_coord_t mid        = (roller->coords.y2 - roller->coords.y1) / 2;
-        id                    = (mid - label_y1 + style_label->text.line_space / 2) / label_unit;
+
+        id = (mid - label_y1 + style_label->text.line_space / 2) / label_unit;
 
         if(id < 0) id = 0;
         if(id >= ext->ddlist.option_cnt) id = ext->ddlist.option_cnt - 1;
@@ -521,18 +520,24 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
         ext->ddlist.sel_opt_id_ori = id;
         res                        = lv_event_send(roller, LV_EVENT_VALUE_CHANGED, &id);
         if(res != LV_RES_OK) return res;
-    } else if(sign == LV_SIGNAL_RELEASED) {
-        /*If picked an option by clicking then set it*/
+    }
+    /*If picked an option by clicking then set it*/
+    else if(sign == LV_SIGNAL_RELEASED) {
         if(!lv_indev_is_dragging(indev)) {
             id = ext->ddlist.sel_opt_id;
 #if LV_USE_GROUP
+            /*In edit mode go to navigate mode if an option is selected*/
             lv_group_t * g = lv_obj_get_group(roller);
             bool editing   = lv_group_get_editing(g);
             if(editing)
-                lv_group_set_editing(
-                    g, false); /*In edit mode go to navigate mode if an option is selected*/
+                lv_group_set_editing(g, false);
 #endif
         }
+    }
+    else if(sign == LV_SIGNAL_PRESSED) {
+#if LV_USE_ANIMATION
+        lv_anim_del(roller_scrl, (lv_anim_exec_cb_t)lv_obj_set_y);
+#endif
     }
 
     /*Position the scrollable according to the new selected option*/
@@ -615,7 +620,11 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
 
     /* Normally the animtaion's `end_cb` sets correct position of the roller is infinite.
      * But without animations do it manually*/
-    if(anim_en == false || ext->ddlist.anim_time == 0) {
+    if(anim_en == false 
+#if LV_USE_ANIMATION
+            || ext->ddlist.anim_time == 0
+#endif
+            ) {
         inf_normalize(roller_scrl);
     }
 
@@ -624,7 +633,11 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
                          ext->ddlist.label->coords.y1 - roller_scrl->coords.y1;
     lv_coord_t new_y = -line_y1 + (h - font_h) / 2;
 
-    if(ext->ddlist.anim_time == 0 || anim_en == false) {
+    if( anim_en == false 
+#if LV_USE_ANIMATION
+            || ext->ddlist.anim_time == 0
+#endif
+            ) {
         lv_obj_set_y(roller_scrl, new_y);
     } else {
 #if LV_USE_ANIMATION
@@ -632,9 +645,9 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
         a.var            = roller_scrl;
         a.start          = lv_obj_get_y(roller_scrl);
         a.end            = new_y;
-        a.fp             = (lv_anim_fp_t)lv_obj_set_y;
-        a.path           = lv_anim_path_linear;
-        a.end_cb         = inf_normalize;
+        a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_y;
+        a.path_cb        = lv_anim_path_linear;
+        a.ready_cb       = scroll_anim_ready_cb;
         a.act_time       = 0;
         a.time           = ext->ddlist.anim_time;
         a.playback       = 0;
@@ -644,6 +657,31 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
         lv_anim_create(&a);
 #endif
     }
+}
+
+/**
+ * Refresh the height of the roller and the scrolable
+ * @param roller pointer to roller
+ */
+static void refr_height(lv_obj_t * roller)
+{
+    lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    lv_align_t obj_align  = LV_ALIGN_IN_LEFT_MID;
+    if(ext->ddlist.label) {
+        lv_label_align_t label_align = lv_label_get_align(ext->ddlist.label);
+        if(LV_LABEL_ALIGN_CENTER == label_align)
+            obj_align = LV_ALIGN_CENTER;
+        else if(LV_LABEL_ALIGN_RIGHT == label_align)
+            obj_align = LV_ALIGN_IN_RIGHT_MID;
+    }
+
+    lv_obj_set_height(lv_page_get_scrl(roller),
+            lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
+    lv_obj_align(ext->ddlist.label, NULL, obj_align, 0, 0);
+#if LV_USE_ANIMATION
+    lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_cb_t)lv_obj_set_y);
+#endif
+    lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
 }
 
 /**
@@ -676,5 +714,12 @@ static void inf_normalize(void * scrl)
         lv_obj_set_y(roller_scrl, new_y);
     }
 }
+
+#if LV_USE_ANIMATION
+static void scroll_anim_ready_cb(lv_anim_t * a)
+{
+    inf_normalize(a->var);
+}
+#endif
 
 #endif

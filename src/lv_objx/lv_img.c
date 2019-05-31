@@ -15,6 +15,7 @@
 #endif
 
 #include "../lv_themes/lv_theme.h"
+#include "../lv_draw/lv_img_decoder.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_log.h"
@@ -148,7 +149,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     }
 
     lv_img_header_t header;
-    lv_img_dsc_get_info(src_img, &header);
+    lv_img_decoder_get_info(src_img, &header);
 
     /*Save the source*/
     if(src_type == LV_IMG_SRC_VARIABLE) {
