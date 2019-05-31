@@ -78,17 +78,29 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
         uint32_t k;
         if(fdsc->kern_classes == 0) {
             const lv_font_fmt_txt_kern_pair_t * kdsc = fdsc->kern_dsc;
-            for(k = 0; k < kdsc->pair_cnt; k++) {
-                if(kdsc->glyph_ids[k].pair.left == unicode_letter &&
-                   kdsc->glyph_ids[k].pair.right == unicode_letter_next) {
-                    kvalue = kdsc->values[k];
-                    break;
+            if(kdsc->glyph_ids_size == 1) {
+                const uint8_t * g_ids = kdsc->glyph_ids;
+                for(k = 0; k < kdsc->pair_cnt * 2; k += 2) {
+                    if(g_ids[k] == unicode_letter &&
+                       g_ids[k+1] == unicode_letter_next) {
+                        kvalue = kdsc->values[k >> 1];
+                        break;
+                    }
+                }
+            } else {
+                const uint16_t * g_ids = kdsc->glyph_ids;
+                for(k = 0; k < kdsc->pair_cnt * 2; k += 2) {
+                    if(g_ids[k] == unicode_letter &&
+                       g_ids[k+1] == unicode_letter_next) {
+                        kvalue = kdsc->values[k >> 1];
+                        break;
+                    }
                 }
             }
         }
 
         uint32_t adw_w = gdsc->adv_w + ((kvalue * fdsc->kern_scale) >> 4);
-        adw_w  =(adw_w + (1 << 3)) >> 4;
+        adw_w  = (adw_w + (1 << 3)) >> 4;
 
         dsc_out->adv_w = adw_w;
         dsc_out->box_h = gdsc->box_h;
