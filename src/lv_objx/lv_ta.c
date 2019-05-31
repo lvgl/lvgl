@@ -115,7 +115,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->label          = NULL;
     ext->placeholder    = NULL;
 
-#if LV_USE_ANIMATION
+#if LV_USE_ANIMATION == 0
     ext->pwd_show_time = 0;
     ext->cursor.blink_time = 0;
 #endif
