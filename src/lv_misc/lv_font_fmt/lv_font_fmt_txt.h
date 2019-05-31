@@ -110,27 +110,19 @@ typedef struct {
     lv_font_fmt_txt_cmap_type_t type   :2;
 }lv_font_fmt_txt_cmap_t;
 
-/*Describe glyph pairs for kerning*/
-typedef union {
-    struct {
-        uint16_t left;
-        uint16_t right;
-    }pair;
-    uint32_t both;
-}lv_font_fmt_txt_kern_pair_id_t;
-
 /*A simple mapping of kern values from pairs*/
 typedef struct {
     /*To get a kern value of two code points:
        1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_fmt_txt_cmap_t
-       2  for(i = 0; i < pair_cnt; i++)
-             if(gylph_ids[i].pair.left == glyph_id_left &&
-                gylph_ids[i].pair.right == glyph_id_right)
-                 return values[i];
+       2  for(i = 0; i < pair_cnt; i+2)
+             if(gylph_ids[i] == glyph_id_left &&
+                gylph_ids[i+1] == glyph_id_right)
+                 return values[i / 2];
      */
-    const lv_font_fmt_txt_kern_pair_id_t * glyph_ids;
+    const void * glyph_ids;
     const uint8_t * values;
-    uint16_t pair_cnt;
+    uint32_t pair_cnt   :24;
+    uint32_t glyph_ids_size :2;     /*1: `glyph_ids` is stored as `uint8_t`; 2: as `uint16_t`*/
 }lv_font_fmt_txt_kern_pair_t;
 
 /*More complex but more optimal class based kern value storage*/
