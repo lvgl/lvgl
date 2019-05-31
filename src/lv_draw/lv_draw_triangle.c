@@ -12,13 +12,7 @@
 /*********************
  *      DEFINES
  *********************/
-/* Draw the tall rectangles from vertical lines
- * and from the flat triangles from horizontal lines
- * to minimize the number of lines.
- * It's still not perfect because some pixels on the edges are overdrawn.
- * (Looks fine LV_OPA_COVER)
- */
-#define FLAT_TALL_OPTIMIZED     0
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -26,15 +20,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+void tri_draw_flat(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa);
+void tri_draw_tall(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa);
+static void point_swap(lv_point_t * p1, lv_point_t * p2);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-#if FLAT_TALL_OPTIMIZED
-void tri_draw_flat(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa);
-#endif
-void tri_draw_tall(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa);
-static void point_swap(lv_point_t * p1, lv_point_t * p2);
+static uint8_t corr_value;
 
 /**********************
  *      MACROS
@@ -54,8 +47,6 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2);
 void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style,
         lv_opa_t opa_scale)
 {
-
-    opa_scale = LV_OPA_50;
     /*Return is the triangle is degenerated*/
     if(points[0].x == points[1].x && points[0].y == points[1].y) return;
     if(points[1].x == points[2].x && points[1].y == points[2].y) return;
@@ -68,32 +59,40 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
             ? style->body.opa
                     : (uint16_t)((uint16_t)style->body.opa * opa_scale) >> 8;
 
-#if FLAT_TALL_OPTIMIZED == 0
-    tri_draw_tall(points, mask, style, opa);
-#else
     /*Is the triangle flat or tall?*/
     lv_coord_t x_min = LV_MATH_MIN(LV_MATH_MIN(points[0].x, points[1].x), points[2].x);
     lv_coord_t x_max = LV_MATH_MAX(LV_MATH_MAX(points[0].x, points[1].x), points[2].x);
     lv_coord_t y_min = LV_MATH_MIN(LV_MATH_MIN(points[0].y, points[1].y), points[2].y);
     lv_coord_t y_max = LV_MATH_MAX(LV_MATH_MAX(points[0].y, points[1].y), points[2].y);
 
-    /* If smaller in x then it's tall.
-     * Draw from horizontal lines*/
-    if(x_max - x_min < y_max - y_min) {
+    if(opa < LV_OPA_MAX) {
+        /*Simply draw the triangles with opacity */
+        corr_value = 1;
         tri_draw_tall(points, mask, style, opa);
+    } else {
+        /* Draw the tall rectangles from vertical lines
+         * and from the flat triangles from horizontal lines
+         * to minimize the number of lines.
+         * Some pixels are overdrawn on the common edges of the triangles
+         * so use it only if the triangle has no opacity*/
+
+        corr_value = 0;
+
+         /* Draw from horizontal lines*/
+        if(x_max - x_min < y_max - y_min) {
+            tri_draw_tall(points, mask, style, opa);
+        }
+        /*Else flat so draw from vertical lines*/
+        else {
+            tri_draw_flat(points, mask, style, opa);
+        }
     }
-    /*Else flat so draw from vertical lines*/
-    else {
-        tri_draw_flat(points, mask, style, opa);
-    }
-#endif
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
 
-#if FLAT_TALL_OPTIMIZED
 void tri_draw_flat(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa)
 {
     /*Return if the points are out of the mask*/
@@ -166,7 +165,7 @@ void tri_draw_flat(const lv_point_t * points, const lv_area_t * mask, const lv_s
         /* Get the area of a line.
          * Adjust it a little bit to perfectly match (no redrawn pixels) with the adjacent triangles*/
         draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
-        draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2) - (FLAT_TALL_OPTIMIZED == 0 ? 1 : 0);
+        draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2) - corr_value;
         draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
         draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
 
@@ -212,7 +211,6 @@ void tri_draw_flat(const lv_point_t * points, const lv_area_t * mask, const lv_s
         } while(edge2.y == y2_tmp);
     }
 }
-#endif
 
 void tri_draw_tall(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa)
 {
@@ -271,7 +269,7 @@ void tri_draw_tall(const lv_point_t * points, const lv_area_t * mask, const lv_s
         draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
         draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2);
         draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
-        draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2) - (FLAT_TALL_OPTIMIZED == 0 ? 1 : 0);
+        draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2) - corr_value;
 
         lv_draw_fill(&draw_area, mask, style->body.main_color, opa);
 
