@@ -11,7 +11,7 @@
  *----------------*/
 
 /*Store the image of the glyphs*/
-static const uint8_t gylph_bitmap[] = {
+static LV_ATTRIBUTE_LARGE_CONST const uint8_t gylph_bitmap[] = {
     /* U+20 " " */
 
     /* U+21 "!" */
