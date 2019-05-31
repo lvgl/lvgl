@@ -23,7 +23,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_font_fmt_txt_glyph_dsc_t * get_glyph_dsc(const lv_font_t * font, uint32_t letter);
+static const lv_font_fmt_txt_glyph_dsc_t * get_glyph_dsc(const lv_font_t * font, uint32_t letter);
 static int32_t lv_font_codeCompare(const void * pRef, const void * pElement);
 
 /**********************
@@ -119,7 +119,7 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_font_fmt_txt_glyph_dsc_t * get_glyph_dsc(const lv_font_t * font, uint32_t letter)
+static const  lv_font_fmt_txt_glyph_dsc_t * get_glyph_dsc(const lv_font_t * font, uint32_t letter)
 {
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *) font->dsc;
 
