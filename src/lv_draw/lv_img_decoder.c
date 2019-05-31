@@ -354,7 +354,7 @@ static const uint8_t * lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, 
         }
 
         lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
-        user_data->palette = lv_mem_alloc(sizeof(palette_size * sizeof(lv_color_t)));
+        user_data->palette = lv_mem_alloc(palette_size * sizeof(lv_color_t));
         if(user_data->palette == NULL) {
             LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
 #if LV_USE_FILESYSTEM
