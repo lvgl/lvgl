@@ -974,6 +974,7 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
     LV_LL_READ_BACK(ext->series_ll, ser) {
         lv_coord_t start_point = ext->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
         style.body.main_color = ser->color;
+        style.body.opa   = ext->series.opa;
 
         p2.x = 0 + x_ofs;
 
