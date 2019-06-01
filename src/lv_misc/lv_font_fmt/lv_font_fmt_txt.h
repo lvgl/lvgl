@@ -130,9 +130,8 @@ typedef struct {
     /*To get a kern value of two code points:
           1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_fmt_txt_cmap_t
           2  Get the class of the left and right glyphs as `left_class` and `right_class`
-              for(i = 0; i < left_class_num; i++)
-                if(left_class_mapping[i] == glyph_id_left)
-                    return i;
+              left_class = left_class_mapping[glyph_id_left];
+              right_class = right_class_mapping[glyph_id_right];
           3. value = class_pair_values[(left_class-1)*right_class_cnt + (righ_class-1)]
         */
 

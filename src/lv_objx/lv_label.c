@@ -578,28 +578,30 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     uint32_t letter;
     uint32_t letter_next;
 
-    while(i <= new_line_start - 1) {
-        /* Get the current letter.
-         * Be careful 'i' already points to the next character*/
-        letter = lv_txt_encoded_next(txt, &i);
+    if(new_line_start > 0) {
+        while(i <= new_line_start - 1) {
+            /* Get the current letter.
+             * Be careful 'i' already points to the next character*/
+            letter = lv_txt_encoded_next(txt, &i);
 
-        /*Get the next letter too for kerning*/
-        letter_next = lv_txt_encoded_next(&txt[i], NULL);
+            /*Get the next letter too for kerning*/
+            letter_next = lv_txt_encoded_next(&txt[i], NULL);
 
-        /*Handle the recolor command*/
-        if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
-            if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
-                continue; /*Skip the letter is it is part of a command*/
+            /*Handle the recolor command*/
+            if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+                if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
+                    continue; /*Skip the letter is it is part of a command*/
+                }
             }
-        }
 
-        x += lv_font_get_glyph_width(font, letter, letter_next);
-        if(pos->x < x) {
-            i = i_current;
-            break;
+            x += lv_font_get_glyph_width(font, letter, letter_next);
+            if(pos->x < x) {
+                i = i_current;
+                break;
+            }
+            x += style->text.letter_space;
+            i_current = i;
         }
-        x += style->text.letter_space;
-        i_current = i;
     }
 
     return lv_encoded_get_char_id(txt, i);
@@ -692,28 +694,30 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
     uint32_t letter;
     uint32_t letter_next;
 
-    while(i <= new_line_start - 1) {
-        /* Get the current letter
-         * Be careful 'i' already points to the next character */
-        letter = lv_txt_encoded_next(txt, &i);
+    if(new_line_start > 0) {
+        while(i <= new_line_start - 1) {
+            /* Get the current letter
+             * Be careful 'i' already points to the next character */
+            letter = lv_txt_encoded_next(txt, &i);
 
-        /*Get the next letter for kerning*/
-        letter_next = lv_txt_encoded_next(&txt[i], NULL);
+            /*Get the next letter for kerning*/
+            letter_next = lv_txt_encoded_next(&txt[i], NULL);
 
-        /*Handle the recolor command*/
-        if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
-            if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
-                continue; /*Skip the letter is it is part of a command*/
+            /*Handle the recolor command*/
+            if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+                if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
+                    continue; /*Skip the letter is it is part of a command*/
+                }
             }
+            last_x = x;
+            x += lv_font_get_glyph_width(font, letter, letter_next);
+            if(pos->x < x) {
+                i = i_current;
+                break;
+            }
+            x += style->text.letter_space;
+            i_current = i;
         }
-        last_x = x;
-        x += lv_font_get_glyph_width(font, letter, letter_next);
-        if(pos->x < x) {
-            i = i_current;
-            break;
-        }
-        x += style->text.letter_space;
-        i_current = i;
     }
 
     int32_t max_diff = lv_font_get_glyph_width(font, letter, letter_next) + style->text.letter_space + 1;

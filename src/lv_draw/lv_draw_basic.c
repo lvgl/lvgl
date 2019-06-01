@@ -277,6 +277,10 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
         default: return; /*Invalid bpp. Can't render the letter*/
     }
 
+    if(letter == 0xf817) {
+        char x = 1;
+    }
+
     const uint8_t * map_p = lv_font_get_glyph_bitmap(font_p, letter);
 
     if(map_p == NULL) return;
@@ -292,13 +296,10 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     lv_coord_t vdb_width     = lv_area_get_width(&vdb->area);
     lv_color_t * vdb_buf_tmp = vdb->buf_act;
     lv_coord_t col, row;
-    uint8_t col_bit;
-    uint8_t col_byte_cnt;
 
     uint8_t width_byte_scr = g.box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
     if(g.box_w & 0x7) width_byte_scr++;
-    uint8_t width_byte_bpp = (g.box_w * g.bpp) >> 3; /*Letter width in byte. Real width in the font*/
-    if((g.box_w * g.bpp) & 0x7) width_byte_bpp++;
+    uint8_t width_bit = g.box_w * g.bpp; /*Letter width in bits*/
 
     /* Calculate the col/row start/end on the map*/
     lv_coord_t col_start = pos_x >= mask_p->x1 ? 0 : mask_p->x1 - pos_x;
@@ -313,13 +314,15 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     vdb_buf_tmp += (row_start * vdb_width) + col_start;
 
     /*Move on the map too*/
-    map_p += (row_start * width_byte_bpp) + ((col_start * g.bpp) >> 3);
+    uint32_t bit_ofs = (row_start * width_bit) + (col_start * g.bpp);
+    map_p +=  bit_ofs>> 3;
 
     uint8_t letter_px;
     lv_opa_t px_opa;
+    uint16_t col_bit;
+    col_bit      = bit_ofs & 0x7; /* "& 0x7" equals to "% 8" just faster */
+
     for(row = row_start; row < row_end; row++) {
-        col_byte_cnt = 0;
-        col_bit      = (col_start * g.bpp) % 8;
         bitmask         = bitmask_init >> col_bit;
         for(col = col_start; col < col_end; col++) {
             letter_px = (*map_p & bitmask) >> (8 - col_bit - g.bpp);
@@ -355,13 +358,14 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
                 bitmask = bitmask >> g.bpp;
             } else {
                 col_bit = 0;
-                col_byte_cnt++;
                 bitmask = bitmask_init;
                 map_p++;
             }
         }
+        col_bit += ((g.box_w - col_end) + col_start) * g.bpp;
 
-        map_p += (width_byte_bpp)-col_byte_cnt;
+        map_p += (col_bit >> 3);
+        col_bit = col_bit & 0x7;
         vdb_buf_tmp += vdb_width - (col_end - col_start); /*Next row in VDB*/
     }
 }
