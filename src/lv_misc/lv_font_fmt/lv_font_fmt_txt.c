@@ -127,7 +127,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY) {
             uint32_t u;
-            for(u = 0; u < 50 /*fdsc->cmaps[i].list_length*/; u++) {
+            for(u = 0; u < fdsc->cmaps[i].list_length; u++) {
                 if(fdsc->cmaps[i].unicode_list[u] == rcp) {
                     glyph_id = fdsc->cmaps[i].glyph_id_start + u;
                 }

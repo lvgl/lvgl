@@ -3,7 +3,7 @@
 /*******************************************************************************
  * Size: 18 px
  * Bpp: 4
- * Opts: --no-compress --no-prefilter --bpp 4 --size 18 --font ./Roboto-Regular.woff -r 0x20-0x7F --font FontAwesome.ttf -r 61441 -r 61448 -r 61451 -r 61452 -r 61453 -r 61457 -r 61459 -r 61460 -r 61461 -r 61465 -r 61468 -r 61473 -r 61478 -r 61479 -r 61480 -r 61502 -r 61504 -r 61512 -r 61515 -r 61516 -r 61517 -r 61521 -r 61522 -r 61523 -r 61524 -r 61543 -r 61544 -r 61553 -r 61556 -r 61559 -r 61560 -r 61561 -r 61563 -r 61587 -r 61589 -r 61636 -r 61637 -r 61639 -r 61671 -r 61683 -r 61724 -r 61732 -r 61787 -r 61931 -r 62016 -r 62017 -r 62018 -r 62019 -r 62020 -r 62099 --format lvgl -o lv_font_roboto_18.c
+ * Opts: --no-compress --no-prefilter --bpp 4 --size 18 --font ./Roboto-Regular.woff -r 0x20-0x7F --font FontAwesome.ttf -r 61441,61448,61451,61452,61453,61457,61459,61460,61461,61465,61468,61473,61478,61479,61480,61502,61504,61512,61515,61516,61517,61521,61522,61523,61524,61543,61544,61553,61556,61559,61560,61561,61563,61587,61589,61636,61637,61639,61671,61683,61724,61732,61787,61931,62016,62017,62018,62019,62020,62099 --format lvgl -o lv_font_roboto_18.c
  ******************************************************************************/
 
 /*-----------------
@@ -1946,11 +1946,11 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
 {
     {
         .range_start = 32, .range_length = 95, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY,
-        .glyph_id_start = 1, .unicode_list = NULL, .glyph_id_ofs_list = NULL
+        .glyph_id_start = 1, .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0
     },
     {
         .range_start = 61441, .range_length = 659, .type = LV_FONT_FMT_TXT_CMAP_SPARSE_TINY,
-        .glyph_id_start = 96, .unicode_list = unicode_list_1, .glyph_id_ofs_list = NULL
+        .glyph_id_start = 96, .unicode_list = unicode_list_1, .glyph_id_ofs_list = NULL, .list_length = 50
     }
 };
 
