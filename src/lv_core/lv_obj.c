@@ -1593,6 +1593,25 @@ void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * cords_p)
 }
 
 /**
+ * Adjust the coordinates retrieved from lv_obj_get_coords() according
+ * to the object's style.
+ */
+void lv_obj_adjust_coords(const lv_obj_t *obj, lv_area_t * cords_p)
+{
+	const lv_style_t *style = lv_obj_get_style(obj);
+	if(style->body.border.part & LV_BORDER_LEFT)
+		cords_p->x1 += style->body.border.width;
+
+	if(style->body.border.part & LV_BORDER_RIGHT)
+		cords_p->x2 -= style->body.border.width;
+	if(style->body.border.part & LV_BORDER_TOP)
+		cords_p->y1 += style->body.border.width;
+	if(style->body.border.part & LV_BORDER_BOTTOM)
+		cords_p->y2 -= style->body.border.width;
+}
+
+
+/**
  * Get the x coordinate of object
  * @param obj pointer to an object
  * @return distance of 'obj' from the left side of its parent

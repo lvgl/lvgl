@@ -667,6 +667,12 @@ uint16_t lv_obj_count_children_recursive(const lv_obj_t * obj);
 void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * cords_p);
 
 /**
+ * Adjust the coordinates retrieved from lv_obj_get_coords() according
+ * to the object's style.
+ */
+void lv_obj_adjust_coords(const lv_obj_t *obj, lv_area_t * cords_p);
+
+/**
  * Get the x coordinate of object
  * @param obj pointer to an object
  * @return distance of 'obj' from the left side of its parent
