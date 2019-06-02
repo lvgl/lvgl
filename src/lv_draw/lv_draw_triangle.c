@@ -47,6 +47,8 @@ static uint8_t corr_value;
 void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style,
         lv_opa_t opa_scale)
 {
+    opa_scale = LV_OPA_50;
+
     /*Return is the triangle is degenerated*/
     if(points[0].x == points[1].x && points[0].y == points[1].y) return;
     if(points[1].x == points[2].x && points[1].y == points[2].y) return;
@@ -65,11 +67,11 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
     lv_coord_t y_min = LV_MATH_MIN(LV_MATH_MIN(points[0].y, points[1].y), points[2].y);
     lv_coord_t y_max = LV_MATH_MAX(LV_MATH_MAX(points[0].y, points[1].y), points[2].y);
 
-    if(opa < LV_OPA_MAX) {
-        /*Simply draw the triangles with opacity */
-        corr_value = 1;
-        tri_draw_tall(points, mask, style, opa);
-    } else {
+//    if(opa < LV_OPA_MAX) {
+//        /*Simply draw the triangles with opacity */
+//        corr_value = 1;
+//        tri_draw_tall(points, mask, style, opa);
+//    } else {
         /* Draw the tall rectangles from vertical lines
          * and from the flat triangles from horizontal lines
          * to minimize the number of lines.
@@ -86,7 +88,7 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
         else {
             tri_draw_flat(points, mask, style, opa);
         }
-    }
+//    }
 }
 
 /**********************
