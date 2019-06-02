@@ -8,7 +8,7 @@ parser.add_argument('-s', '--size',
 					metavar = 'px', 
 					nargs='?', 
 					help='Size of the font in px')
-parser.add_argument('-bpp', 
+parser.add_argument('--bpp', 
 					type=int, 
 					metavar = '1,2,4', 
 					nargs='?', 
@@ -16,8 +16,13 @@ parser.add_argument('-bpp',
 parser.add_argument('-r', '--range', 
 					nargs='+', 
 					metavar = 'start-end', 
-					default=['0x20-0x7F'], 
-					help='Ranges and/or characters to include. Default is 0x20-7F (ASCII). E.g. -r 0x20-0x7F 0x200 324')
+					default='0x20-0x7F', 
+					help='Ranges and/or characters to include. Default is 0x20-7F (ASCII). E.g. -r 0x20-0x7F, 0x200, 324')
+parser.add_argument('--font', 
+					metavar = 'file', 
+					nargs='?', 
+					default='Roboto-Regular.woff', 
+					help='A TTF or WOFF file')
 parser.add_argument('-o', '--output', 
 					nargs='?', 
 					metavar='file', 
@@ -31,14 +36,10 @@ if args.compressed == False:
 	compr = "--no-compress --no-prefilter"
 else:
 	compr = ""
- 
-r_str = ""
-for r in args.range:
-	 r_str = r_str + "-r " + r + " ";
 
 #Built in symbols
-syms = "-r 61441  -r 61448 -r 61451 -r 61452 -r 61453 -r 61457 -r 61459 -r 61460 -r 61461 -r 61465 -r 61468 -r 61473 -r 61478 -r 61479 -r 61480 -r 61502 -r 61504 -r 61512 -r 61515 -r 61516 -r 61517 -r 61521 -r 61522 -r 61523 -r 61524 -r 61543 -r 61544 -r 61553 -r 61556 -r 61559 -r 61560 -r 61561 -r 61563 -r 61587 -r 61589 -r 61636 -r 61637 -r 61639 -r 61671 -r 61683 -r 61724 -r 61732 -r 61787 -r 61931 -r 62016 -r 62017 -r 62018 -r 62019 -r 62020 -r 62099"
+syms = "61441,61448,61451,61452,61453,61457,61459,61460,61461,61465,61468,61473,61478,61479,61480,61502,61504,61512,61515,61516,61517,61521,61522,61523,61524,61543,61544,61553,61556,61559,61560,61561,61563,61587,61589,61636,61637,61639,61671,61683,61724,61732,61787,61931,62016,62017,62018,62019,62020,62099"
 
 #Run the command
-cmd = "lv_font_conv {} --bpp {} --size {} --font ./Roboto-Regular.woff {} --font FontAwesome.ttf {} --format lvgl -o {}".format(compr, args.bpp, args.size, r_str, syms, args.output)
+cmd = "lv_font_conv {} --bpp {} --size {} --font ./Roboto-Regular.woff -r {} --font FontAwesome.ttf -r {} --format lvgl -o {}".format(compr, args.bpp, args.size, args.range, syms, args.output)
 os.system(cmd)
