@@ -73,11 +73,6 @@ typedef struct _lv_font_struct
  **********************/
 
 /**
- * Initialize the font module
- */
-void lv_font_init(void);
-
-/**
  * Return with the bitmap of a font.
  * @param font_p pointer to a font
  * @param letter an UNICODE character code
@@ -119,15 +114,6 @@ static inline uint8_t lv_font_get_line_height(const lv_font_t * font_p)
  **********************/
 
 #define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
-
-#define LV_FONT_SET_WIDTH(_integer, _fract) ((_integer << LV_FONT_WIDTH_FRACT_DIGIT) + _fract)
-#define LV_FONT_GET_WIDTH_INT(_w)       (_w >> LV_FONT_WIDTH_FRACT_DIGIT)
-#define LV_FONT_GET_WIDTH_FRACT(_w)     (_w & ((1 << LV_FONT_WIDTH_FRACT_DIGIT) -1))
-
-/**********************
- * ADD BUILT IN FONTS
- **********************/
-#include "../lv_fonts/lv_font_builtin.h"
 
 /*Declare the custom (user defined) fonts*/
 #ifdef LV_FONT_CUSTOM_DECLARE

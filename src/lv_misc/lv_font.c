@@ -40,14 +40,6 @@
  **********************/
 
 /**
- * Initialize the font module
- */
-void lv_font_init(void)
-{
-    lv_font_builtin_init();
-}
-
-/**
  * Return with the bitmap of a font.
  * @param font_p pointer to a font
  * @param letter an UNICODE character code

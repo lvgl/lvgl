@@ -88,7 +88,6 @@ void lv_init(void)
     lv_fs_init();
 #endif
 
-    lv_font_init();
 #if LV_USE_ANIMATION
     lv_anim_core_init();
 #endif
