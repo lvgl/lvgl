@@ -89,6 +89,7 @@ void lv_draw_aa_hor_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_
 #include "lv_draw_img.h"
 #include "lv_draw_line.h"
 #include "lv_draw_triangle.h"
+#include "lv_draw_arc.h"
 
 #ifdef __cplusplus
 } /* extern "C" */

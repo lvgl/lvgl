@@ -69,14 +69,19 @@ void lv_refr_init(void)
  * Normally the redrawing is periodically executed in `lv_task_handler` but a long blocking process
  * can prevent the call of `lv_task_handler`. In this case if the the GUI is updated in the process
  * (e.g. progress bar) this function can be called when the screen should be updated.
+ * @param disp pointer to display to refresh. NULL to refresh all displays.
  */
-void lv_refr_now(void)
+void lv_refr_now(lv_disp_t * disp)
 {
-    lv_disp_t * d;
-    d = lv_disp_get_next(NULL);
-    while(d) {
-        lv_disp_refr_task(d->refr_task);
-        d = lv_disp_get_next(d);
+    if(disp) {
+        lv_disp_refr_task(disp->refr_task);
+    } else {
+        lv_disp_t * d;
+        d = lv_disp_get_next(NULL);
+        while(d) {
+            lv_disp_refr_task(d->refr_task);
+            d = lv_disp_get_next(d);
+        }
     }
 }
 
@@ -137,6 +142,18 @@ lv_disp_t * lv_refr_get_disp_refreshing(void)
 {
     return disp_refr;
 }
+
+/**
+ * Set the display which is being refreshed.
+ * It shouldn1t be used directly by the user.
+ * It can be used to trick the drawing functions about there is an active display.
+ * @param the display being refreshed
+ */
+void lv_refr_set_disp_refreshing(lv_disp_t * disp)
+{
+    disp_refr = disp;
+}
+
 
 /**
  * Called periodically to handle the refreshing

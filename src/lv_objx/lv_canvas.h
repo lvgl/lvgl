@@ -140,18 +140,6 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, l
                         lv_coord_t x, lv_coord_t y);
 
 /**
- * Multiply a buffer with the canvas
- * @param canvas pointer to a canvas object
- * @param to_copy buffer to copy (multiply). LV_IMG_CF_TRUE_COLOR_ALPHA is not supported
- * @param w width of the buffer to copy
- * @param h height of the buffer to copy
- * @param x left side of the destination position
- * @param y top side of the destination position
- */
-void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x,
-                        lv_coord_t y);
-
-/**
  * Rotate and image and store the result on a canvas.
  * @param canvas pointer to a canvas object
  * @param img pointer to an image descriptor.
@@ -168,83 +156,64 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
                       lv_coord_t offset_y, int32_t pivot_x, int32_t pivot_y);
 
 /**
- * Draw circle function of the canvas
- * @param canvas pointer to a canvas object
- * @param x0 x coordinate of the circle
- * @param y0 y coordinate of the circle
- * @param radius radius of the circle
- * @param color border color of the circle
+ * Fill the canvas with color
+ * @param canvas pointer to a canvas
+ * @param color the background color
  */
-void lv_canvas_draw_circle(lv_obj_t * canvas, lv_coord_t x0, lv_coord_t y0, lv_coord_t radius,
-                           lv_color_t color);
+void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color);
 
 /**
- * Draw line function of the canvas
+ * Draw a rectangle on the canvas
  * @param canvas pointer to a canvas object
- * @param point1 start point of the line
- * @param point2 end point of the line
- * @param color color of the line
- *
- * NOTE: The lv_canvas_draw_line function originates from https://github.com/jb55/bresenham-line.c.
+ * @param x left coordinate of the rectangle
+ * @param y top coordinate of the rectangle
+ * @param w width of the rectangle
+ * @param h height of the rectangle
+ * @param style style of the rectangle (`body` properties are used except `padding`)
  */
-void lv_canvas_draw_line(lv_obj_t * canvas, lv_point_t point1, lv_point_t point2, lv_color_t color);
+void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const lv_style_t * style);
 
 /**
- * Draw triangle function of the canvas
+ * Draw a text on the canvas.
  * @param canvas pointer to a canvas object
- * @param points edge points of the triangle
- * @param color line color of the triangle
+ * @param x left coordinate of the text
+ * @param y top coordinate of the text
+ * @param max_w max width of the text. The text will be wrapped to fit into this size
+ * @param style style of the text (`text` properties are used)
+ * @param txt text to display
+ * @param align align of the text (`LV_LABEL_ALIGN_LEFT/RIGHT/CENTER`)
  */
-void lv_canvas_draw_triangle(lv_obj_t * canvas, lv_point_t * points, lv_color_t color);
+void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w, const lv_style_t * style, const char * txt, lv_label_align_t align);
 
 /**
- * Draw rectangle function of the canvas
+ * Draw a line on the canvas
  * @param canvas pointer to a canvas object
- * @param points edge points of the rectangle
- * @param color line color of the rectangle
+ * @param points point of the line
+ * @param point_cnt number of points
+ * @param style style of the line (`line` properties are used)
  */
-void lv_canvas_draw_rect(lv_obj_t * canvas, lv_point_t * points, lv_color_t color);
+void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt, const lv_style_t * style);
 
 /**
- * Draw polygon function of the canvas
+ * Draw a polygon on the canvas
  * @param canvas pointer to a canvas object
- * @param points edge points of the polygon
- * @param size edge count of the polygon
- * @param color line color of the polygon
+ * @param points point of the polygon
+ * @param point_cnt number of points
+ * @param style style of the polygon (`body.main_color` and `body.opa` is used)
  */
-void lv_canvas_draw_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t color);
+void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt, const lv_style_t * style);
 
 /**
- * Fill polygon function of the canvas
+ * Draw an arc on the canvas
  * @param canvas pointer to a canvas object
- * @param points edge points of the polygon
- * @param size edge count of the polygon
- * @param boundary_color line color of the polygon
- * @param fill_color fill color of the polygon
+ * @param x origo x  of the arc
+ * @param y origo y of the arc
+ * @param r radius of the arc
+ * @param start_angle start angle in degrees
+ * @param end_angle end angle in degrees
+ * @param style style of the polygon (`body.main_color` and `body.opa` is used)
  */
-void lv_canvas_fill_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size,
-                            lv_color_t boundary_color, lv_color_t fill_color);
-/**
- * Boundary fill function of the canvas
- * @param canvas pointer to a canvas object
- * @param x x coordinate of the start position (seed)
- * @param y y coordinate of the start position (seed)
- * @param boundary_color edge/boundary color of the area
- * @param fill_color fill color of the area
- */
-void lv_canvas_boundary_fill4(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y,
-                              lv_color_t boundary_color, lv_color_t fill_color);
-
-/**
- * Flood fill function of the canvas
- * @param canvas pointer to a canvas object
- * @param x x coordinate of the start position (seed)
- * @param y y coordinate of the start position (seed)
- * @param fill_color fill color of the area
- * @param bg_color background color of the area
- */
-void lv_canvas_flood_fill(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t fill_color,
-                          lv_color_t bg_color);
+void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t r, int32_t start_angle, int32_t end_angle, const lv_style_t * style);
 
 /**********************
  *      MACROS

@@ -9,7 +9,9 @@
 #include <stdlib.h>
 #include "lv_canvas.h"
 #include "../lv_misc/lv_math.h"
-#include "../lv_draw/lv_draw_img.h"
+#include "../lv_draw/lv_draw.h"
+#include "../lv_core/lv_refr.h"
+
 #if LV_USE_CANVAS != 0
 
 /*********************
@@ -233,79 +235,6 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, l
 }
 
 /**
- * Multiply a buffer with the canvas
- * @param canvas pointer to a canvas object
- * @param to_copy buffer to copy (multiply). LV_IMG_CF_TRUE_COLOR_ALPHA is not supported
- * @param w width of the buffer to copy
- * @param h height of the buffer to copy
- * @param x left side of the destination position
- * @param y top side of the destination position
- */
-void lv_canvas_mult_buf(lv_obj_t * canvas, void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x,
-                        lv_coord_t y)
-{
-    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-    if(x + w >= ext->dsc.header.w || y + h >= ext->dsc.header.h) {
-        LV_LOG_WARN("lv_canvas_mult_buf: x or y out of the canvas");
-        return;
-    }
-
-    if(ext->dsc.header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
-        LV_LOG_WARN("lv_canvas_mult_buf: LV_IMG_CF_TRUE_COLOR_ALPHA is not supported");
-        return;
-    }
-
-    uint32_t px_size              = lv_img_color_format_get_px_size(ext->dsc.header.cf) >> 3;
-    uint32_t px                   = ext->dsc.header.w * y * px_size + x * px_size;
-    lv_color_t * copy_buf_color   = (lv_color_t *)to_copy;
-    lv_color_t * canvas_buf_color = (lv_color_t *)&ext->dsc.data[px];
-
-    lv_coord_t i;
-    lv_coord_t j;
-    for(i = 0; i < h; i++) {
-        for(j = 0; j < w; j++) {
-#if LV_COLOR_DEPTH == 32
-            canvas_buf_color[j].ch.red =
-                (uint16_t)((uint16_t)canvas_buf_color[j].ch.red * copy_buf_color[j].ch.red) >> 8;
-            canvas_buf_color[j].ch.green =
-                (uint16_t)((uint16_t)canvas_buf_color[j].ch.green * copy_buf_color[j].ch.green) >>
-                8;
-            canvas_buf_color[j].ch.blue =
-                (uint16_t)((uint16_t)canvas_buf_color[j].ch.blue * copy_buf_color[j].ch.blue) >> 8;
-#elif LV_COLOR_DEPTH == 16
-
-            canvas_buf_color[j].ch.red =
-                (uint16_t)((uint16_t)canvas_buf_color[j].ch.red * copy_buf_color[j].ch.red) >> 5;
-            canvas_buf_color[j].ch.blue =
-                (uint16_t)((uint16_t)canvas_buf_color[j].ch.blue * copy_buf_color[j].ch.blue) >> 5;
-#if LV_COLOR_16_SWAP == 0
-            canvas_buf_color[j].ch.green =
-                (uint16_t)((uint16_t)canvas_buf_color[j].ch.green * copy_buf_color[j].ch.green) >>
-                6;
-#else
-            uint8_t green_canvas = (canvas_buf_color[j].ch.green_h << 3) + (canvas_buf_color[j].ch.green_l);
-            uint8_t green_buf = (copy_buf_color[j].ch.green_h << 3) + (copy_buf_color[j].ch.green_l);
-            uint8_t green_res = (uint16_t)((uint16_t)green_canvas * green_buf) >> 6;
-            canvas_buf_color[j].ch.green_h = (green_res >> 3) & 0x07;
-            canvas_buf_color[j].ch.green_l = green_res & 0x07;
-#endif /*LV_COLOR_16_SWAP*/
-
-#elif LV_COLOR_DEPTH == 8
-            canvas_buf_color[j].ch.red =
-                (uint16_t)((uint16_t)canvas_buf_color[j].ch.red * copy_buf_color[j].ch.red) >> 3;
-            canvas_buf_color[j].ch.green =
-                (uint16_t)((uint16_t)canvas_buf_color[j].ch.green * copy_buf_color[j].ch.green) >>
-                3;
-            canvas_buf_color[j].ch.blue =
-                (uint16_t)((uint16_t)canvas_buf_color[j].ch.blue * copy_buf_color[j].ch.blue) >> 2;
-#endif
-        }
-        copy_buf_color += w;
-        canvas_buf_color += ext->dsc.header.w;
-    }
-}
-
-/**
  * Rotate and image and store the result on a canvas.
  * @param canvas pointer to a canvas object
  * @param img pointer to an image descriptor.
@@ -488,193 +417,262 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
 }
 
 /**
- * Draw circle function of the canvas
- * @param canvas pointer to a canvas object
- * @param x0 x coordinate of the circle
- * @param y0 y coordinate of the circle
- * @param radius radius of the circle
- * @param color border color of the circle
+ * Fill the canvas with color
+ * @param canvas pointer to a canvas
+ * @param color the background color
  */
-void lv_canvas_draw_circle(lv_obj_t * canvas, lv_coord_t x0, lv_coord_t y0, lv_coord_t radius,
-                           lv_color_t color)
+void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color)
 {
-    int x   = radius;
-    int y   = 0;
-    int err = 0;
+    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
-    while(x >= y) {
-        lv_canvas_set_px(canvas, x0 + x, y0 + y, color);
-        lv_canvas_set_px(canvas, x0 + y, y0 + x, color);
-        lv_canvas_set_px(canvas, x0 - y, y0 + x, color);
-        lv_canvas_set_px(canvas, x0 - x, y0 + y, color);
-        lv_canvas_set_px(canvas, x0 - x, y0 - y, color);
-        lv_canvas_set_px(canvas, x0 - y, y0 - x, color);
-        lv_canvas_set_px(canvas, x0 + y, y0 - x, color);
-        lv_canvas_set_px(canvas, x0 + x, y0 - y, color);
-
-        if(err <= 0) {
-            y += 1;
-            err += 2 * y + 1;
-        }
-
-        if(err > 0) {
-            x -= 1;
-            err -= 2 * x + 1;
+    uint32_t x = dsc->header.w * dsc->header.h;
+    uint32_t y;
+    for(y = 0; y < dsc->header.h; y++) {
+        for(x = 0; x < dsc->header.w; x++) {
+            lv_img_buf_set_px_color(dsc, x, y, color);
         }
     }
+
 }
 
 /**
- * Draw line function of the canvas
+ * Draw a rectangle on the canvas
  * @param canvas pointer to a canvas object
- * @param point1 start point of the line
- * @param point2 end point of the line
- * @param color color of the line
- *
- * NOTE: The lv_canvas_draw_line function originates from https://github.com/jb55/bresenham-line.c.
+ * @param x left coordinate of the rectangle
+ * @param y top coordinate of the rectangle
+ * @param w width of the rectangle
+ * @param h height of the rectangle
+ * @param style style of the rectangle (`body` properties are used except `padding`)
  */
-void lv_canvas_draw_line(lv_obj_t * canvas, lv_point_t point1, lv_point_t point2, lv_color_t color)
+void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const lv_style_t * style)
 {
-    lv_coord_t x0, y0, x1, y1;
+    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
-    x0 = point1.x;
-    y0 = point1.y;
-    x1 = point2.x;
-    y1 = point2.y;
+    /* Create a dummy display to fool the lv_draw function.
+     * It will think it draws to real screen. */
+    lv_area_t mask;
+    mask.x1 = 0;
+    mask.x2 = dsc->header.w - 1;
+    mask.y1 = 0;
+    mask.y2 = dsc->header.h - 1;
 
-    int dx = abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-    int dy = abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-    int err = (dx > dy ? dx : -dy) / 2, e2;
+    lv_area_t coords;
+    coords.x1 = x;
+    coords.y1 = y;
+    coords.x2 = x + w - 1;
+    coords.y2 = y + h - 1;
 
-    for(;;) {
-        lv_canvas_set_px(canvas, x0, y0, color);
+    lv_disp_t disp;
+    memset(&disp, 0, sizeof(lv_disp_t));
 
-        if(x0 == x1 && y0 == y1) break;
-        e2 = err;
-        if(e2 > -dx) {
-            err -= dy;
-            x0 += sx;
-        }
-        if(e2 < dy) {
-            err += dx;
-            y0 += sy;
-        }
+    lv_disp_buf_t disp_buf;
+    lv_disp_buf_init(&disp_buf, (void*)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_area_copy(&disp_buf.area, &mask);
+
+    lv_disp_drv_init(&disp.driver);
+
+    disp.driver.buffer = &disp_buf;
+    disp.driver.hor_res = dsc->header.w;
+    disp.driver.ver_res = dsc->header.h;
+
+    lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
+    lv_refr_set_disp_refreshing(&disp);
+
+    lv_draw_rect(&coords, &mask, style, LV_OPA_COVER);
+
+    lv_refr_set_disp_refreshing(refr_ori);
+}
+
+/**
+ * Draw a text on the canvas.
+ * @param canvas pointer to a canvas object
+ * @param x left coordinate of the text
+ * @param y top coordinate of the text
+ * @param max_w max width of the text. The text will be wrapped to fit into this size
+ * @param style style of the text (`text` properties are used)
+ * @param txt text to display
+ * @param align align of the text (`LV_LABEL_ALIGN_LEFT/RIGHT/CENTER`)
+ */
+void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w, const lv_style_t * style, const char * txt, lv_label_align_t align)
+{
+    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
+
+    /* Create a dummy display to fool the lv_draw function.
+     * It will think it draws to real screen. */
+    lv_area_t mask;
+    mask.x1 = 0;
+    mask.x2 = dsc->header.w - 1;
+    mask.y1 = 0;
+    mask.y2 = dsc->header.h - 1;
+
+    lv_area_t coords;
+    coords.x1 = x;
+    coords.y1 = y;
+    coords.x2 = x + max_w - 1;
+    coords.y2 = dsc->header.h - 1;
+
+    lv_disp_t disp;
+    memset(&disp, 0, sizeof(lv_disp_t));
+
+    lv_disp_buf_t disp_buf;
+    lv_disp_buf_init(&disp_buf, (void*)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_area_copy(&disp_buf.area, &mask);
+
+    lv_disp_drv_init(&disp.driver);
+
+    disp.driver.buffer = &disp_buf;
+    disp.driver.hor_res = dsc->header.w;
+    disp.driver.ver_res = dsc->header.h;
+
+    lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
+    lv_refr_set_disp_refreshing(&disp);
+
+    lv_txt_flag_t flag;
+    switch(align) {
+    case LV_LABEL_ALIGN_LEFT:
+        flag = LV_TXT_FLAG_NONE;
+        break;
+    case LV_LABEL_ALIGN_RIGHT:
+        flag = LV_TXT_FLAG_RIGHT;
+        break;
+    case LV_LABEL_ALIGN_CENTER:
+        flag = LV_TXT_FLAG_CENTER;
+        break;
+    default:
+        flag = LV_TXT_FLAG_NONE;
+        break;
     }
+
+    lv_draw_label(&coords, &mask, style, LV_OPA_COVER, txt, flag, NULL, LV_LABEL_TEXT_SEL_OFF, LV_LABEL_TEXT_SEL_OFF);
+
+    lv_refr_set_disp_refreshing(refr_ori);
 }
 
 /**
- * Draw triangle function of the canvas
+ * Draw a line on the canvas
  * @param canvas pointer to a canvas object
- * @param points edge points of the triangle
- * @param color line color of the triangle
+ * @param points point of the line
+ * @param point_cnt number of points
+ * @param style style of the line (`line` properties are used)
  */
-void lv_canvas_draw_triangle(lv_obj_t * canvas, lv_point_t * points, lv_color_t color)
+void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt, const lv_style_t * style)
 {
-    lv_canvas_draw_polygon(canvas, points, 3, color);
-}
+    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
-/**
- * Draw rectangle function of the canvas
- * @param canvas pointer to a canvas object
- * @param points edge points of the rectangle
- * @param color line color of the rectangle
- */
-void lv_canvas_draw_rect(lv_obj_t * canvas, lv_point_t * points, lv_color_t color)
-{
-    lv_canvas_draw_polygon(canvas, points, 4, color);
-}
+    /* Create a dummy display to fool the lv_draw function.
+     * It will think it draws to real screen. */
+    lv_area_t mask;
+    mask.x1 = 0;
+    mask.x2 = dsc->header.w - 1;
+    mask.y1 = 0;
+    mask.y2 = dsc->header.h - 1;
 
-/**
- * Draw polygon function of the canvas
- * @param canvas pointer to a canvas object
- * @param points edge points of the polygon
- * @param size edge count of the polygon
- * @param color line color of the polygon
- */
-void lv_canvas_draw_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size, lv_color_t color)
-{
-    uint8_t i;
+    lv_disp_t disp;
+    memset(&disp, 0, sizeof(lv_disp_t));
 
-    for(i = 0; i < (size - 1); i++) {
-        lv_canvas_draw_line(canvas, points[i], points[i + 1], color);
+    lv_disp_buf_t disp_buf;
+    lv_disp_buf_init(&disp_buf, (void*)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_area_copy(&disp_buf.area, &mask);
+
+    lv_disp_drv_init(&disp.driver);
+
+    disp.driver.buffer = &disp_buf;
+    disp.driver.hor_res = dsc->header.w;
+    disp.driver.ver_res = dsc->header.h;
+
+    lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
+    lv_refr_set_disp_refreshing(&disp);
+
+    uint32_t i;
+    for(i = 0; i < point_cnt - 1; i++) {
+        lv_draw_line(&points[i], &points[i + 1], &mask, style, LV_OPA_COVER);
     }
 
-    lv_canvas_draw_line(canvas, points[size - 1], points[0], color);
+    lv_refr_set_disp_refreshing(refr_ori);
 }
 
 /**
- * Fill polygon function of the canvas
+ * Draw a polygon on the canvas
  * @param canvas pointer to a canvas object
- * @param points edge points of the polygon
- * @param size edge count of the polygon
- * @param boundary_color line color of the polygon
- * @param fill_color fill color of the polygon
+ * @param points point of the polygon
+ * @param point_cnt number of points
+ * @param style style of the polygon (`body.main_color` and `body.opa` is used)
  */
-void lv_canvas_fill_polygon(lv_obj_t * canvas, lv_point_t * points, size_t size,
-                            lv_color_t boundary_color, lv_color_t fill_color)
+void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt, const lv_style_t * style)
 {
-    uint32_t x = 0, y = 0;
-    uint8_t i;
+    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
-    for(i = 0; i < size; i++) {
-        x += points[i].x;
-        y += points[i].y;
-    }
+    /* Create a dummy display to fool the lv_draw function.
+     * It will think it draws to real screen. */
+    lv_area_t mask;
+    mask.x1 = 0;
+    mask.x2 = dsc->header.w - 1;
+    mask.y1 = 0;
+    mask.y2 = dsc->header.h - 1;
 
-    x = x / size;
-    y = y / size;
+    lv_disp_t disp;
+    memset(&disp, 0, sizeof(lv_disp_t));
 
-    lv_canvas_boundary_fill4(canvas, (lv_coord_t)x, (lv_coord_t)y, boundary_color, fill_color);
+    lv_disp_buf_t disp_buf;
+    lv_disp_buf_init(&disp_buf, (void*)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_area_copy(&disp_buf.area, &mask);
+
+    lv_disp_drv_init(&disp.driver);
+
+    disp.driver.buffer = &disp_buf;
+    disp.driver.hor_res = dsc->header.w;
+    disp.driver.ver_res = dsc->header.h;
+
+    lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
+    lv_refr_set_disp_refreshing(&disp);
+
+    lv_draw_polygon(points, point_cnt, &mask, style, LV_OPA_COVER);
+
+    lv_refr_set_disp_refreshing(refr_ori);
 }
 
-/**
- * Boundary fill function of the canvas
- * @param canvas pointer to a canvas object
- * @param x x coordinate of the start position (seed)
- * @param y y coordinate of the start position (seed)
- * @param boundary_color edge/boundary color of the area
- * @param fill_color fill color of the area
- */
-void lv_canvas_boundary_fill4(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y,
-                              lv_color_t boundary_color, lv_color_t fill_color)
-{
-    lv_color_t c;
-
-    c = lv_canvas_get_px(canvas, x, y);
-
-    if(c.full != boundary_color.full && c.full != fill_color.full) {
-        lv_canvas_set_px(canvas, x, y, fill_color);
-
-        lv_canvas_boundary_fill4(canvas, x + 1, y, boundary_color, fill_color);
-        lv_canvas_boundary_fill4(canvas, x, y + 1, boundary_color, fill_color);
-        lv_canvas_boundary_fill4(canvas, x - 1, y, boundary_color, fill_color);
-        lv_canvas_boundary_fill4(canvas, x, y - 1, boundary_color, fill_color);
-    }
-}
 
 /**
- * Flood fill function of the canvas
+ * Draw an arc on the canvas
  * @param canvas pointer to a canvas object
- * @param x x coordinate of the start position (seed)
- * @param y y coordinate of the start position (seed)
- * @param fill_color fill color of the area
- * @param bg_color background color of the area
+ * @param x origo x  of the arc
+ * @param y origo y of the arc
+ * @param r radius of the arc
+ * @param start_angle start angle in degrees
+ * @param end_angle end angle in degrees
+ * @param style style of the polygon (`body.main_color` and `body.opa` is used)
  */
-void lv_canvas_flood_fill(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t fill_color,
-                          lv_color_t bg_color)
+void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t r, int32_t start_angle, int32_t end_angle, const lv_style_t * style)
 {
-    lv_color_t c;
+    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
-    c = lv_canvas_get_px(canvas, x, y);
+    /* Create a dummy display to fool the lv_draw function.
+     * It will think it draws to real screen. */
+    lv_area_t mask;
+    mask.x1 = 0;
+    mask.x2 = dsc->header.w - 1;
+    mask.y1 = 0;
+    mask.y2 = dsc->header.h - 1;
 
-    if(c.full == bg_color.full) {
-        lv_canvas_set_px(canvas, x, y, fill_color);
+    lv_disp_t disp;
+    memset(&disp, 0, sizeof(lv_disp_t));
 
-        lv_canvas_flood_fill(canvas, x + 1, y, fill_color, bg_color);
-        lv_canvas_flood_fill(canvas, x, y + 1, fill_color, bg_color);
-        lv_canvas_flood_fill(canvas, x - 1, y, fill_color, bg_color);
-        lv_canvas_flood_fill(canvas, x, y - 1, fill_color, bg_color);
-    }
+    lv_disp_buf_t disp_buf;
+    lv_disp_buf_init(&disp_buf, (void*)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_area_copy(&disp_buf.area, &mask);
+
+    lv_disp_drv_init(&disp.driver);
+
+    disp.driver.buffer = &disp_buf;
+    disp.driver.hor_res = dsc->header.w;
+    disp.driver.ver_res = dsc->header.h;
+
+    lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
+    lv_refr_set_disp_refreshing(&disp);
+
+    lv_draw_arc(x, y, r, &mask, start_angle, end_angle, style, LV_OPA_COVER);
+
+    lv_refr_set_disp_refreshing(refr_ori);
 }
 
 /**********************
