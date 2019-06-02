@@ -66,6 +66,9 @@ typedef struct _lv_font_struct
     uint8_t line_height;      /*The real line height where any text fits*/
     uint8_t base_line;        /*Base line measured from the top of the line_height*/
     void * dsc;               /*Store implementation specific data here*/
+#if LV_USE_USER_DATA
+    lv_font_user_data_t user_data;
+#endif
 } lv_font_t;
 
 /**********************

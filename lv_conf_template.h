@@ -259,6 +259,9 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 
 #define LV_FONT_DEFAULT        &lv_font_dejavu_20     /*Always set a default font from the built-in fonts*/
 
+/*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
+typedef void * lv_font_user_data_t;
+
 /*=================
  *  Text settings
  *=================*/
