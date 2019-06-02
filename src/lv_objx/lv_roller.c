@@ -328,8 +328,12 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         if((font_h & 0x1) && (style->text.line_space & 0x1))
             rect_area.y1--; /*Compensate the two rounding error*/
         rect_area.y2 = rect_area.y1 + font_h + style->text.line_space - 1;
-        rect_area.x1 = roller->coords.x1;
-        rect_area.x2 = roller->coords.x2;
+	lv_area_t roller_coords;
+	lv_obj_get_coords(roller, &roller_coords);
+	lv_obj_adjust_coords(roller, &roller_coords);
+
+        rect_area.x1 = roller_coords.x1;
+        rect_area.x2 = roller_coords.x2;
 
         lv_draw_rect(&rect_area, mask, ext->ddlist.sel_style, opa_scale);
     }
