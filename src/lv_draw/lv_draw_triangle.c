@@ -78,7 +78,7 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
          * Some pixels are overdrawn on the common edges of the triangles
          * so use it only if the triangle has no opacity*/
 
-        corr_value = 0;
+        corr_value = 1;
 
          /* Draw from horizontal lines*/
         if(x_max - x_min < y_max - y_min) {
@@ -166,10 +166,10 @@ void tri_draw_flat(const lv_point_t * points, const lv_area_t * mask, const lv_s
 
         /* Get the area of a line.
          * Adjust it a little bit to perfectly match (no redrawn pixels) with the adjacent triangles*/
-        draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2);
-        draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2) - corr_value;
-        draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2);
-        draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2);
+        draw_area.x1 = LV_MATH_MIN(act_area.x1, act_area.x2) + 1;
+        draw_area.x2 = LV_MATH_MAX(act_area.x1, act_area.x2) - corr_value + 1;
+        draw_area.y1 = LV_MATH_MIN(act_area.y1, act_area.y2) - 1;
+        draw_area.y2 = LV_MATH_MAX(act_area.y1, act_area.y2) - 1;
 
         lv_draw_fill(&draw_area, mask, style->body.main_color, opa);
 
