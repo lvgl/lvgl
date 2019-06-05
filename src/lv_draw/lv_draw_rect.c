@@ -523,7 +523,7 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
 
     lv_coord_t width  = lv_area_get_width(coords);
     lv_coord_t height = lv_area_get_height(coords);
-    uint16_t bwidth   = style->body.border.width;
+    lv_coord_t bwidth   = style->body.border.width;
     lv_opa_t opa      = opa_scale == LV_OPA_COVER
                        ? style->body.border.opa
                        : (uint16_t)((uint16_t)style->body.border.opa * opa_scale) >> 8;
@@ -721,7 +721,7 @@ static void lv_draw_rect_border_corner(const lv_area_t * coords, const lv_area_t
 {
     uint16_t radius       = style->body.radius;
     bool aa               = lv_disp_get_antialiasing(lv_refr_get_disp_refreshing());
-    uint16_t bwidth       = style->body.border.width;
+    lv_coord_t bwidth       = style->body.border.width;
     lv_color_t color      = style->body.border.color;
     lv_border_part_t part = style->body.border.part;
     lv_opa_t opa          = opa_scale == LV_OPA_COVER
