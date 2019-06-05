@@ -78,9 +78,11 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     if(!gid) return false;
 
     int8_t kvalue = 0;
+    const lv_font_fmt_txt_glyph_dsc_t * gdsc_next = NULL;
     if(fdsc->kern_dsc) {
         uint32_t gid_next = get_glyph_dsc_id(font, unicode_letter_next);
         if(gid_next) {
+            gdsc_next = &fdsc->glyph_dsc[gid_next];
             kvalue = get_kern_value(font, gid, gid_next);
         }
     }
@@ -88,10 +90,10 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     /*Put together a glyph dsc*/
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
-    uint32_t adw_w = gdsc->adv_w + ((int32_t)((int32_t)kvalue * fdsc->kern_scale) >> 4);
-    adw_w  = (adw_w + (1 << 3)) >> 4;
+    uint32_t adv_w = gdsc->adv_w + ((int32_t)((int32_t)kvalue * fdsc->kern_scale) >> 4);
+    adv_w  = (adv_w + (1 << 3)) >> 4;
 
-    dsc_out->adv_w = adw_w;
+    dsc_out->adv_w = adv_w;
     dsc_out->box_h = gdsc->box_h;
     dsc_out->box_w = gdsc->box_w;
     dsc_out->ofs_x = gdsc->ofs_x;
