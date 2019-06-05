@@ -804,7 +804,7 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
     uint16_t row_start = row_id * ext->col_cnt;
     uint16_t cell;
     uint16_t col;
-    lv_coord_t h_max = lv_font_get_height(ext->cell_style[0]->text.font) +
+    lv_coord_t h_max = lv_font_get_line_height(ext->cell_style[0]->text.font) +
                        ext->cell_style[0]->body.padding.top +
                        ext->cell_style[0]->body.padding.bottom;
 
@@ -834,7 +834,7 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
             /*With text crop assume 1 line*/
             if(format.s.crop) {
                 h_max =
-                    LV_MATH_MAX(lv_font_get_height(cell_style->text.font) +
+                    LV_MATH_MAX(lv_font_get_line_height(cell_style->text.font) +
                                     cell_style->body.padding.top + cell_style->body.padding.bottom,
                                 h_max);
             }

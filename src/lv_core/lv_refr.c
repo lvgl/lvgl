@@ -184,8 +184,7 @@ void lv_disp_refr_task(lv_task_t * task)
             /* With true double buffering the flushing should be only the address change of the
              * current frame buffer. Wait until the address change is ready and copy the changed
              * content to the other frame buffer (new active VDB) to keep the buffers synchronized*/
-            while(vdb->flushing)
-                ;
+            while(vdb->flushing);
 
             uint8_t * buf_act = (uint8_t *)vdb->buf_act;
             uint8_t * buf_ina = (uint8_t *)vdb->buf_act == vdb->buf1 ? vdb->buf2 : vdb->buf1;

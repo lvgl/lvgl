@@ -1042,7 +1042,7 @@ static void tabview_realign(lv_obj_t * tabview)
         switch(ext->btns_pos) {
             case LV_TABVIEW_BTNS_POS_TOP:
             case LV_TABVIEW_BTNS_POS_BOTTOM:
-                btns_size = lv_font_get_height(style_btn_rel->text.font) +
+                btns_size = lv_font_get_line_height(style_btn_rel->text.font) +
                             style_btn_rel->body.padding.top +
                             style_btn_rel->body.padding.bottom +
                             style_btn_bg->body.padding.top + style_btn_bg->body.padding.bottom;
@@ -1050,7 +1050,7 @@ static void tabview_realign(lv_obj_t * tabview)
                 break;
             case LV_TABVIEW_BTNS_POS_LEFT:
             case LV_TABVIEW_BTNS_POS_RIGHT:
-                btns_size = lv_font_get_width(style_btn_rel->text.font, 0x0041) + // 'A'
+                btns_size = lv_font_get_glyph_width(style_btn_rel->text.font, 'A', '\0') +
                             style_btn_rel->body.padding.left +
                             style_btn_rel->body.padding.right +
                             style_btn_bg->body.padding.left + style_btn_bg->body.padding.right;

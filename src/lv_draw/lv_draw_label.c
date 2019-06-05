@@ -70,7 +70,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         w = p.x;
     }
 
-    lv_coord_t line_height = lv_font_get_height(font) + style->text.line_space;
+    lv_coord_t line_height = lv_font_get_line_height(font) + style->text.line_space;
 
     /*Init variables for the first line*/
     lv_coord_t line_width = 0;
@@ -136,8 +136,10 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         cmd_state = CMD_STATE_WAIT;
         i         = line_start;
         uint32_t letter;
+        uint32_t letter_next;
         while(i < line_end) {
             letter = lv_txt_encoded_next(txt, &i);
+            letter_next = lv_txt_encoded_next(&txt[i], NULL);
 
             /*Handle the re-color command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
@@ -181,7 +183,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 
             if(cmd_state == CMD_STATE_IN) color = recolor;
 
-            letter_w = lv_font_get_width(font, letter);
+            letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
                 int char_ind = lv_encoded_get_char_id(txt, i);
