@@ -122,7 +122,7 @@ typedef struct {
     const void * glyph_ids;
     const int8_t * values;
     uint32_t pair_cnt   :24;
-    uint32_t glyph_ids_size :2;     /*1: `glyph_ids` is stored as `uint8_t`; 2: as `uint16_t`*/
+    uint32_t glyph_ids_size :2;     /*0: `glyph_ids` is stored as `uint8_t`; 1: as `uint16_t`*/
 }lv_font_fmt_txt_kern_pair_t;
 
 /*More complex but more optimal class based kern value storage*/

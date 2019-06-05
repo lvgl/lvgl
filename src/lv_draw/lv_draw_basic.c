@@ -250,7 +250,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     bool g_ret = lv_font_get_glyph_dsc(font_p, &g, letter, '\0');
     if(g_ret == false) return;
 
-    lv_coord_t pos_x = pos_p->x;
+    lv_coord_t pos_x = pos_p->x + g.ofs_x;
     lv_coord_t pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - g.box_h - g.ofs_y;
 
     const uint8_t * bpp_opa_table;
