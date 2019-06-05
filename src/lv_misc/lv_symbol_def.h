@@ -71,7 +71,7 @@ extern "C" {
 
 /*
  * following list is generated using
- * cat lv_symbol_def.h | sed -E -n 's/^#define\s+(SYMBOL_\w+).*$/    _LV_STR_\1,/p'
+ * cat src/lv_misc/lv_symbol_def.h | sed -E -n 's/^#define\s+(LV_SYMBOL_\w+).*"$/    _LV_STR_\1,/p'
  */
 enum {
     _LV_STR_SYMBOL_AUDIO,
