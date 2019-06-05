@@ -160,7 +160,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
     if(fdsc->kern_classes == 0) {
         /*Kern pairs*/
         const lv_font_fmt_txt_kern_pair_t * kdsc = fdsc->kern_dsc;
-        if(kdsc->glyph_ids_size == 1) {
+        if(kdsc->glyph_ids_size == 0) {
             const uint8_t * g_ids = kdsc->glyph_ids;
             for(k = 0; k < (uint32_t)kdsc->pair_cnt * 2; k += 2) {
                 if(g_ids[k] == gid_left &&
@@ -169,7 +169,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
                     break;
                 }
             }
-        } else {
+        } else if(kdsc->glyph_ids_size == 1) {
             const uint16_t * g_ids = kdsc->glyph_ids;
             for(k = 0; k < (uint32_t)kdsc->pair_cnt * 2; k += 2) {
                 if(g_ids[k] == gid_left &&
@@ -178,6 +178,8 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
                     break;
                 }
             }
+        } else {
+            /*Invalid value*/
         }
     } else {
         /*Kern classes*/
