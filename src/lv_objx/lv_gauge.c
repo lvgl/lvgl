@@ -193,8 +193,6 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value)
  */
 void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint8_t label_cnt)
 {
-    /*TODO v6.0: change `line_cnt` to `subdiv_cnt`*/
-
     lv_lmeter_set_scale(gauge, angle, line_cnt);
 
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);

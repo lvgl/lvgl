@@ -66,6 +66,11 @@
 #define LV_DPI              100     /*[px]*/
 #endif
 
+/* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
+#ifndef LV_COORD_T
+#define LV_COORD_T int32_t
+#endif
+
 /*=========================
    Memory manager settings
  *=========================*/
@@ -196,19 +201,19 @@
 
 /* 1: Enable indexed (palette) images */
 #ifndef LV_IMG_CF_INDEXED
-#define LV_IMG_CF_INDEXED   1
+#define LV_IMG_CF_INDEXED       1
 #endif
 
 /* 1: Enable alpha indexed images */
 #ifndef LV_IMG_CF_ALPHA
-#define LV_IMG_CF_ALPHA     1
+#define LV_IMG_CF_ALPHA         1
 #endif
 
 /*Declare the type of the user data of image decoder (can be e.g. `void *`, `int`, `struct`)*/
 
 /*1: Add a `user_data` to drivers and objects*/
 #ifndef LV_USE_USER_DATA
-#define LV_USE_USER_DATA 1
+#define LV_USE_USER_DATA        1
 #endif
 
 /*=====================
@@ -229,6 +234,12 @@
  * E.g. __attribute__((aligned(4))) */
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #define LV_ATTRIBUTE_MEM_ALIGN
+#endif
+
+/* Attribute to mark large constant arrays for example
+ * font's bitmaps */
+#ifndef LV_ATTRIBUTE_LARGE_CONST
+#define LV_ATTRIBUTE_LARGE_CONST
 #endif
 
 /* 1: Variable length array is supported*/

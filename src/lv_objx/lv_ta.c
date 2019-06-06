@@ -235,7 +235,7 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
         return;
     }
 
-    /*Disable edge flash. If a new line was added it could show edge flash effect*/
+    /*If a new line was added it shouldn't show edge flash effect*/
     bool edge_flash_en = lv_ta_get_edge_flash(ta);
     lv_ta_set_edge_flash(ta, false);
 
@@ -318,7 +318,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
         return;
     }
 
-    /*Disable edge flash. If a new line was added it could show edge flash effect*/
+    /*If a new line was added it shouldn't show edge flash effect*/
     bool edge_flash_en = lv_ta_get_edge_flash(ta);
     lv_ta_set_edge_flash(ta, false);
 

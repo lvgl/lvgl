@@ -53,6 +53,9 @@
  * (Not so important, you can adjust it to modify default sizes and spaces)*/
 #define LV_DPI              100     /*[px]*/
 
+/* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
+#define LV_COORD_T int32_t
+
 /*=========================
    Memory manager settings
  *=========================*/
