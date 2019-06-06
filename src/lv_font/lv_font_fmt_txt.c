@@ -7,10 +7,10 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_font.h"
-#include "../lv_log.h"
-#include "../lv_utils.h"
+#include "lv_font.h"
 #include "lv_font_fmt_txt.h"
+#include "../lv_misc/lv_log.h"
+#include "../lv_misc/lv_utils.h"
 
 /*********************
  *      DEFINES
@@ -25,7 +25,7 @@
  **********************/
 static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter);
 static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t gid_right);
-static int32_t lv_font_codeCompare(const void * pRef, const void * pElement);
+//static int32_t lv_font_codeCompare(const void * pRef, const void * pElement);
 
 /**********************
  *  STATIC VARIABLES
@@ -78,11 +78,9 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     if(!gid) return false;
 
     int8_t kvalue = 0;
-    const lv_font_fmt_txt_glyph_dsc_t * gdsc_next = NULL;
     if(fdsc->kern_dsc) {
         uint32_t gid_next = get_glyph_dsc_id(font, unicode_letter_next);
         if(gid_next) {
-            gdsc_next = &fdsc->glyph_dsc[gid_next];
             kvalue = get_kern_value(font, gid, gid_next);
         }
     }
@@ -213,7 +211,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
  *  @retval > 0   Reference is less than element.
  *
  */
-static int32_t lv_font_codeCompare(const void * pRef, const void * pElement)
-{
-    return (*(uint16_t *)pRef) - (*(uint16_t *)pElement);
-}
+//static int32_t lv_font_codeCompare(const void * pRef, const void * pElement)
+//{
+//    return (*(uint16_t *)pRef) - (*(uint16_t *)pElement);
+//}

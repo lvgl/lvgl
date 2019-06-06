@@ -16,14 +16,13 @@ extern "C" {
 #ifdef LV_CONF_INCLUDE_SIMPLE
 #include "lv_conf.h"
 #else
-#include "../../../../lv_conf.h"
+#include "../../../lv_conf.h"
 #endif
 
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-
-#include "../lv_font.h"
+#include "lv_font.h"
 
 /*********************
  *      DEFINES

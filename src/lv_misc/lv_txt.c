@@ -191,8 +191,8 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord
         /*Check for new line chars*/
         if(letter == '\n' || letter == '\r') {
             uint32_t i_tmp       = i;
-            uint32_t letter_next = lv_txt_encoded_next(txt, &i_tmp);
-            if(letter == '\r' && letter_next == '\n') i = i_tmp;
+            uint32_t n = lv_txt_encoded_next(txt, &i_tmp);
+            if(letter == '\r' && n == '\n') i = i_tmp;
 
             return i; /*Return with the first letter of the next line*/
 

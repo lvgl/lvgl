@@ -21,8 +21,8 @@ extern "C" {
 
 #include <stdbool.h>
 #include "lv_area.h"
-#include "lv_font.h"
 #include "lv_area.h"
+#include "../lv_font/lv_font.h"
 
 /*********************
  *      DEFINES

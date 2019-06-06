@@ -22,9 +22,9 @@ extern "C" {
 #if LV_USE_LABEL != 0
 
 #include "../lv_core/lv_obj.h"
-#include "../lv_misc/lv_font.h"
+#include "../lv_font/lv_font.h"
+#include "../lv_font/lv_symbol_def.h"
 #include "../lv_misc/lv_txt.h"
-#include "../lv_misc/lv_symbol_def.h"
 
 /*********************
  *      DEFINES

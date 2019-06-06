@@ -8,8 +8,8 @@
  *********************/
 
 #include "lv_font.h"
-#include "lv_log.h"
-#include "lv_utils.h"
+#include "../lv_misc/lv_utils.h"
+#include "../lv_misc/lv_log.h"
 
 /*********************
  *      DEFINES

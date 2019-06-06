@@ -19,9 +19,9 @@ extern "C" {
 #include "../../../lv_conf.h"
 #endif
 
+#include "../lv_font/lv_font.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
-#include "../lv_misc/lv_font.h"
 
 /*********************
  *      DEFINES

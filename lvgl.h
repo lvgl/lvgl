@@ -30,8 +30,8 @@ extern "C" {
 
 #include "src/lv_themes/lv_theme.h"
 
-#include "src/lv_misc/lv_font.h"
-#include "src/lv_misc/lv_font_fmt/lv_font_fmt_txt.h"
+#include "src/lv_font/lv_font.h"
+#include "src/lv_font/lv_font_fmt_txt.h"
 
 #include "src/lv_objx/lv_btn.h"
 #include "src/lv_objx/lv_imgbtn.h"
