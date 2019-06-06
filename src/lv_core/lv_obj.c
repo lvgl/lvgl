@@ -1100,6 +1100,12 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     obj->ext_click_pad_hor = LV_MATH_MAX(left, right);
     obj->ext_click_pad_ver = LV_MATH_MAX(top, bottom);
+#else
+    (void) obj;      /*Unused*/
+    (void) left;     /*Unused*/
+    (void) right;    /*Unused*/
+    (void) top;      /*Unused*/
+    (void) bottom;   /*Unused*/
 #endif
 }
 
@@ -1690,6 +1696,7 @@ lv_coord_t lv_obj_get_ext_click_pad_left(const lv_obj_t * obj)
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
     return obj->ext_click_pad.x1;
 #else
+    (void) obj;     /*Unused*/
     return 0;
 #endif
 }
@@ -1706,6 +1713,7 @@ lv_coord_t lv_obj_get_ext_click_pad_right(const lv_obj_t * obj)
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
     return obj->ext_click_pad.x2;
 #else
+    (void) obj;     /*Unused*/
     return 0;
 #endif
 }
@@ -1722,6 +1730,7 @@ lv_coord_t lv_obj_get_ext_click_pad_top(const lv_obj_t * obj)
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
     return obj->ext_click_pad.y1;
 #else
+    (void) obj;     /*Unused*/
     return 0;
 #endif
 }
@@ -1738,6 +1747,7 @@ lv_coord_t lv_obj_get_ext_click_pad_bottom(const lv_obj_t * obj)
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
     return obj->ext_click_pad.y2;
 #else
+    (void) obj;     /*Unused*/
     return 0;
 #endif
 }
