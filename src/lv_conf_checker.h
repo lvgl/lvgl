@@ -8,6 +8,8 @@
 #define  LV_CONF_CHECKER_H
 /* clang-format off */
 
+#include <stdint.h>
+
 /*====================
    Graphical settings
  *====================*/
@@ -67,9 +69,6 @@
 #endif
 
 /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
-#ifndef LV_COORD_T
-#define LV_COORD_T int32_t
-#endif
 
 /*=========================
    Memory manager settings

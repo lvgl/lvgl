@@ -25,11 +25,13 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+/*To avoid overflow don't let the max ranges (reduce with 1000) */
+#define LV_COORD_MAX ((lv_coord_t)((uint32_t)((uint32_t)1 << (8 * sizeof(lv_coord_t) - 1)) - 1000))
+#define LV_COORD_MIN (-LV_COORD_MAX)
 
 /**********************
  *      TYPEDEFS
  **********************/
-typedef LV_COORD_T lv_coord_t;
 
 typedef struct
 {
@@ -162,10 +164,6 @@ bool lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p);
 /**********************
  *      MACROS
  **********************/
-
-/*To avoid overflow don't let the max ranges (reduce with 1000) */
-#define LV_COORD_MAX ((lv_coord_t)((uint32_t)((uint32_t)1 << (8 * sizeof(lv_coord_t) - 1)) - 1000))
-#define LV_COORD_MIN (-LV_COORD_MAX)
 
 #ifdef __cplusplus
 } /* extern "C" */

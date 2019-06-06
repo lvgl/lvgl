@@ -13,6 +13,8 @@
 #define LV_CONF_H
 /* clang-format off */
 
+#include <stdint.h>
+
 /*====================
    Graphical settings
  *====================*/
@@ -54,7 +56,7 @@
 #define LV_DPI              100     /*[px]*/
 
 /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
-#define LV_COORD_T int32_t
+typedef int16_t lv_coord_t;
 
 /*=========================
    Memory manager settings
