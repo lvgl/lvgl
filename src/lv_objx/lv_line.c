@@ -73,9 +73,8 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new line*/
     if(copy == NULL) {
-        lv_obj_set_size(
-            new_line, LV_DPI,
-            LV_DPI); /*Auto size is enables, but set default size until no points are added*/
+        lv_obj_set_size(new_line, LV_DPI,
+                        LV_DPI);          /*Auto size is enables, but set default size until no points are added*/
         lv_obj_set_style(new_line, NULL); /*Inherit parent's style*/
         lv_obj_set_click(new_line, false);
     }
@@ -215,7 +214,7 @@ static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mo
         if(ext->point_num == 0 || ext->point_array == NULL) return false;
 
         const lv_style_t * style = lv_obj_get_style(line);
-        lv_opa_t opa_scale = lv_obj_get_opa_scale(line);
+        lv_opa_t opa_scale       = lv_obj_get_opa_scale(line);
         lv_area_t area;
         lv_obj_get_coords(line, &area);
         lv_coord_t x_ofs = area.x1;
@@ -250,10 +249,8 @@ static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mo
 
             /*Draw circle on the joints if enabled*/
             if(style->line.rounded) {
-                circle_area.x1 =
-                    p1.x - ((style->line.width - 1) >> 1) - ((style->line.width - 1) & 0x1);
-                circle_area.y1 =
-                    p1.y - ((style->line.width - 1) >> 1) - ((style->line.width - 1) & 0x1);
+                circle_area.x1 = p1.x - ((style->line.width - 1) >> 1) - ((style->line.width - 1) & 0x1);
+                circle_area.y1 = p1.y - ((style->line.width - 1) >> 1) - ((style->line.width - 1) & 0x1);
                 circle_area.x2 = p1.x + ((style->line.width - 1) >> 1);
                 circle_area.y2 = p1.y + ((style->line.width - 1) >> 1);
                 lv_draw_rect(&circle_area, mask, &circle_style_tmp, opa_scale);
@@ -262,10 +259,8 @@ static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mo
 
         /*Draw circle on the last point too if enabled*/
         if(style->line.rounded) {
-            circle_area.x1 =
-                p2.x - ((style->line.width - 1) >> 1) - ((style->line.width - 1) & 0x1);
-            circle_area.y1 =
-                p2.y - ((style->line.width - 1) >> 1) - ((style->line.width - 1) & 0x1);
+            circle_area.x1 = p2.x - ((style->line.width - 1) >> 1) - ((style->line.width - 1) & 0x1);
+            circle_area.y1 = p2.y - ((style->line.width - 1) >> 1) - ((style->line.width - 1) & 0x1);
             circle_area.x2 = p2.x + ((style->line.width - 1) >> 1);
             circle_area.y2 = p2.y + ((style->line.width - 1) >> 1);
             lv_draw_rect(&circle_area, mask, &circle_style_tmp, opa_scale);

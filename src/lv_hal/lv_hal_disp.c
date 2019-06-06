@@ -56,11 +56,11 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
 {
     memset(driver, 0, sizeof(lv_disp_drv_t));
 
-    driver->flush_cb = NULL;
-    driver->hor_res  = LV_HOR_RES_MAX;
-    driver->ver_res  = LV_VER_RES_MAX;
-    driver->buffer   = NULL;
-    driver->rotated  = 0;
+    driver->flush_cb         = NULL;
+    driver->hor_res          = LV_HOR_RES_MAX;
+    driver->ver_res          = LV_VER_RES_MAX;
+    driver->buffer           = NULL;
+    driver->rotated          = 0;
     driver->color_chroma_key = LV_COLOR_TRANSP;
 
 #if LV_ANTIALIAS
@@ -126,8 +126,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     if(disp_def == NULL) disp_def = disp;
 
     lv_disp_t * disp_def_tmp = disp_def;
-    disp_def = disp; /*Temporarily change the default screen to create the default screens on the
-                        new display*/
+    disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
+                                        new display*/
 
     disp->inv_p = 0;
 

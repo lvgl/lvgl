@@ -146,8 +146,7 @@ void lv_cont_set_fit4(lv_obj_t * cont, lv_fit_t left, lv_fit_t right, lv_fit_t t
 {
     lv_obj_invalidate(cont);
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
-    if(ext->fit_left == left && ext->fit_right == right && ext->fit_top == top &&
-       ext->fit_bottom == bottom) {
+    if(ext->fit_left == left && ext->fit_right == right && ext->fit_top == top && ext->fit_bottom == bottom) {
         return;
     }
 
@@ -245,8 +244,7 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
         lv_cont_refr_layout(cont);
         lv_cont_refr_autofit(cont);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
-        if(lv_obj_get_width(cont) != lv_area_get_width(param) ||
-           lv_obj_get_height(cont) != lv_area_get_height(param)) {
+        if(lv_obj_get_width(cont) != lv_area_get_width(param) || lv_obj_get_height(cont) != lv_area_get_height(param)) {
             lv_cont_refr_layout(cont);
             lv_cont_refr_autofit(cont);
         }
@@ -332,8 +330,7 @@ static void lv_cont_layout_col(lv_obj_t * cont)
     lv_coord_t last_cord = style->body.padding.top;
     LV_LL_READ_BACK(cont->child_ll, child)
     {
-        if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false)
-            continue;
+        if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
         lv_obj_align(child, cont, align, hpad_corr, last_cord);
         last_cord += lv_obj_get_height(child) + style->body.padding.inner;
@@ -383,8 +380,7 @@ static void lv_cont_layout_row(lv_obj_t * cont)
     lv_coord_t last_cord = style->body.padding.left;
     LV_LL_READ_BACK(cont->child_ll, child)
     {
-        if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false)
-            continue;
+        if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
         lv_obj_align(child, cont, align, last_cord, vpad_corr);
         last_cord += lv_obj_get_width(child) + style->body.padding.inner;
@@ -406,8 +402,7 @@ static void lv_cont_layout_center(lv_obj_t * cont)
 
     LV_LL_READ(cont->child_ll, child)
     {
-        if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false)
-            continue;
+        if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
         h_tot += lv_obj_get_height(child) + style->body.padding.inner;
         obj_num++;
     }
@@ -424,8 +419,7 @@ static void lv_cont_layout_center(lv_obj_t * cont)
     lv_coord_t last_cord = -(h_tot / 2);
     LV_LL_READ_BACK(cont->child_ll, child)
     {
-        if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false)
-            continue;
+        if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
         lv_obj_align(child, cont, LV_ALIGN_CENTER, 0, last_cord + lv_obj_get_height(child) / 2);
         last_cord += lv_obj_get_height(child) + style->body.padding.inner;
@@ -458,14 +452,13 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
     child_rc = child_rs; /*Initially the the row starter and closer is the same*/
     while(child_rs != NULL) {
         lv_coord_t h_row = 0;
-        lv_coord_t w_row = style->body.padding.left +
-                           style->body.padding.right; /*The width is at least the left+right hpad*/
+        lv_coord_t w_row =
+            style->body.padding.left + style->body.padding.right; /*The width is at least the left+right hpad*/
         uint32_t obj_num = 0;
 
         /*Find the row closer object and collect some data*/
         do {
-            if(lv_obj_get_hidden(child_rc) == false &&
-               lv_obj_is_protected(child_rc, LV_PROTECT_POS) == false) {
+            if(lv_obj_get_hidden(child_rc) == false && lv_obj_is_protected(child_rc, LV_PROTECT_POS) == false) {
                 /*If this object is already not fit then break*/
                 if(w_row + lv_obj_get_width(child_rc) > w_obj) {
                     /*Step back one child because the last already not fit, so the previous is the
@@ -475,10 +468,8 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
                     }
                     break;
                 }
-                w_row += lv_obj_get_width(child_rc) +
-                         style->body.padding.inner; /*Add the object width + opad*/
-                h_row =
-                    LV_MATH_MAX(h_row, lv_obj_get_height(child_rc)); /*Search the highest object*/
+                w_row += lv_obj_get_width(child_rc) + style->body.padding.inner; /*Add the object width + opad*/
+                h_row = LV_MATH_MAX(h_row, lv_obj_get_height(child_rc));         /*Search the highest object*/
                 obj_num++;
                 if(lv_obj_is_protected(child_rc, LV_PROTECT_FOLLOW))
                     break; /*If can not be followed by an other object then break here*/
@@ -493,8 +484,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
         if(obj_num == 0) {
             if(child_rc != NULL) {
                 lv_obj_align(child_rc, cont, LV_ALIGN_IN_TOP_MID, 0, act_y);
-                h_row =
-                    lv_obj_get_height(child_rc); /*Not set previously because of the early break*/
+                h_row = lv_obj_get_height(child_rc); /*Not set previously because of the early break*/
             }
         }
         /*If there is only one object in the row then align it to the middle*/
@@ -507,10 +497,8 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
             lv_obj_t * obj2 = lv_ll_get_prev(&cont->child_ll, child_rs);
             w_row           = lv_obj_get_width(obj1) + lv_obj_get_width(obj2);
             lv_coord_t pad  = (w_obj - w_row) / 3;
-            lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad,
-                         act_y + (h_row - lv_obj_get_height(obj1)) / 2);
-            lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad,
-                         act_y + (h_row - lv_obj_get_height(obj2)) / 2);
+            lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y + (h_row - lv_obj_get_height(obj1)) / 2);
+            lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y + (h_row - lv_obj_get_height(obj2)) / 2);
         }
         /* Align the children (from child_rs to child_rc)*/
         else {
@@ -519,8 +507,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
             lv_coord_t act_x    = style->body.padding.left; /*x init*/
             child_tmp           = child_rs;
             while(child_tmp != NULL) {
-                if(lv_obj_get_hidden(child_tmp) == false &&
-                   lv_obj_is_protected(child_tmp, LV_PROTECT_POS) == false) {
+                if(lv_obj_get_hidden(child_tmp) == false && lv_obj_is_protected(child_tmp, LV_PROTECT_POS) == false) {
                     lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x,
                                  act_y + (h_row - lv_obj_get_height(child_tmp)) / 2);
                     act_x += lv_obj_get_width(child_tmp) + new_opad;
@@ -550,11 +537,10 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
     lv_coord_t w_obj         = lv_obj_get_width(lv_obj_get_child(cont, NULL));
     lv_coord_t h_obj         = lv_obj_get_height(lv_obj_get_child(cont, NULL));
     uint16_t obj_row         = (w_tot - style->body.padding.left - style->body.padding.right) /
-                               (w_obj + style->body.padding.inner); /*Obj. num. in a row*/
+                       (w_obj + style->body.padding.inner); /*Obj. num. in a row*/
     lv_coord_t x_ofs;
     if(obj_row > 1) {
-        x_ofs = (w_obj + (w_tot - style->body.padding.left - style->body.padding.right) -
-                 (obj_row * w_obj)) /
+        x_ofs = (w_obj + (w_tot - style->body.padding.left - style->body.padding.right) - (obj_row * w_obj)) /
                 (obj_row - 1);
     } else {
         x_ofs = w_tot / 2 - w_obj / 2;
@@ -571,8 +557,7 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
     uint16_t obj_cnt = 0;
     LV_LL_READ_BACK(cont->child_ll, child)
     {
-        if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false)
-            continue;
+        if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
         if(obj_row > 1) {
             lv_obj_set_pos(child, act_x, act_y);
@@ -600,8 +585,8 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
 {
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 
-    if(ext->fit_left == LV_FIT_NONE && ext->fit_right == LV_FIT_NONE &&
-       ext->fit_top == LV_FIT_NONE && ext->fit_bottom == LV_FIT_NONE) {
+    if(ext->fit_left == LV_FIT_NONE && ext->fit_right == LV_FIT_NONE && ext->fit_top == LV_FIT_NONE &&
+       ext->fit_bottom == LV_FIT_NONE) {
         return;
     }
 
@@ -652,42 +637,34 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
     switch(ext->fit_left) {
         case LV_FIT_TIGHT: new_area.x1 = tight_area.x1; break;
         case LV_FIT_FLOOD: new_area.x1 = flood_area.x1; break;
-        case LV_FIT_FILL:
-            new_area.x1 = has_children ? LV_MATH_MIN(tight_area.x1, flood_area.x1) : flood_area.x1;
-            break;
+        case LV_FIT_FILL: new_area.x1 = has_children ? LV_MATH_MIN(tight_area.x1, flood_area.x1) : flood_area.x1; break;
         default: break;
     }
 
     switch(ext->fit_right) {
         case LV_FIT_TIGHT: new_area.x2 = tight_area.x2; break;
         case LV_FIT_FLOOD: new_area.x2 = flood_area.x2; break;
-        case LV_FIT_FILL:
-            new_area.x2 = has_children ? LV_MATH_MAX(tight_area.x2, flood_area.x2) : flood_area.x2;
-            break;
+        case LV_FIT_FILL: new_area.x2 = has_children ? LV_MATH_MAX(tight_area.x2, flood_area.x2) : flood_area.x2; break;
         default: break;
     }
 
     switch(ext->fit_top) {
         case LV_FIT_TIGHT: new_area.y1 = tight_area.y1; break;
         case LV_FIT_FLOOD: new_area.y1 = flood_area.y1; break;
-        case LV_FIT_FILL:
-            new_area.y1 = has_children ? LV_MATH_MIN(tight_area.y1, flood_area.y1) : flood_area.y1;
-            break;
+        case LV_FIT_FILL: new_area.y1 = has_children ? LV_MATH_MIN(tight_area.y1, flood_area.y1) : flood_area.y1; break;
         default: break;
     }
 
     switch(ext->fit_bottom) {
         case LV_FIT_TIGHT: new_area.y2 = tight_area.y2; break;
         case LV_FIT_FLOOD: new_area.y2 = flood_area.y2; break;
-        case LV_FIT_FILL:
-            new_area.y2 = has_children ? LV_MATH_MAX(tight_area.y2, flood_area.y2) : flood_area.y2;
-            break;
+        case LV_FIT_FILL: new_area.y2 = has_children ? LV_MATH_MAX(tight_area.y2, flood_area.y2) : flood_area.y2; break;
         default: break;
     }
 
     /*Do nothing if the coordinates are not changed*/
-    if(cont->coords.x1 != new_area.x1 || cont->coords.y1 != new_area.y1 ||
-       cont->coords.x2 != new_area.x2 || cont->coords.y2 != new_area.y2) {
+    if(cont->coords.x1 != new_area.x1 || cont->coords.y1 != new_area.y1 || cont->coords.x2 != new_area.x2 ||
+       cont->coords.y2 != new_area.y2) {
 
         lv_obj_invalidate(cont);
         lv_area_copy(&cont->coords, &new_area);

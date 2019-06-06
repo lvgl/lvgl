@@ -58,33 +58,33 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * label;       /*Label of the text area*/
-    lv_obj_t * placeholder; /*Place holder label. only visible if text is an empty string*/
-    char * pwd_tmp;         /*Used to store the original text in password mode*/
+    lv_obj_t * label;            /*Label of the text area*/
+    lv_obj_t * placeholder;      /*Place holder label. only visible if text is an empty string*/
+    char * pwd_tmp;              /*Used to store the original text in password mode*/
     const char * accapted_chars; /*Only these characters will be accepted. NULL: accept all*/
     uint16_t max_length;         /*The max. number of characters. 0: no limit*/
     uint16_t pwd_show_time;      /*Time to show characters in password mode before change them to '*' */
     struct
     {
-        const lv_style_t * style;   /* Style of the cursor (NULL to use label's style)*/
-        lv_coord_t valid_x;         /* Used when stepping up/down to a shorter line.
-                                     * (Used by the library)*/
-        uint16_t pos;               /* The current cursor position
-                                     * (0: before 1st letter; 1: before 2nd letter ...)*/
-        uint16_t blink_time;        /*Blink period*/
-        lv_area_t area;             /* Cursor area relative to the Text Area*/
-        uint16_t txt_byte_pos;      /* Byte index of the letter after (on) the cursor*/
-        lv_cursor_type_t type : 4;  /* Shape of the cursor*/
-        uint8_t state : 1;          /*Cursor is visible now or not (Handled by the library)*/
+        const lv_style_t * style;  /* Style of the cursor (NULL to use label's style)*/
+        lv_coord_t valid_x;        /* Used when stepping up/down to a shorter line.
+                                    * (Used by the library)*/
+        uint16_t pos;              /* The current cursor position
+                                    * (0: before 1st letter; 1: before 2nd letter ...)*/
+        uint16_t blink_time;       /*Blink period*/
+        lv_area_t area;            /* Cursor area relative to the Text Area*/
+        uint16_t txt_byte_pos;     /* Byte index of the letter after (on) the cursor*/
+        lv_cursor_type_t type : 4; /* Shape of the cursor*/
+        uint8_t state : 1;         /*Cursor is visible now or not (Handled by the library)*/
     } cursor;
 #if LV_LABEL_TEXT_SEL
-    uint16_t tmp_sel_start;     /*Temporary value*/
-    uint16_t tmp_sel_end;       /*Temporary value*/
+    uint16_t tmp_sel_start;       /*Temporary value*/
+    uint16_t tmp_sel_end;         /*Temporary value*/
     uint8_t text_sel_in_prog : 1; /*User is in process of selecting */
-    uint8_t text_sel_en : 1;  /*Text can be selected on this text area*/
+    uint8_t text_sel_en : 1;      /*Text can be selected on this text area*/
 #endif
-    uint8_t pwd_mode : 1;        /*Replace characters with '*' */
-    uint8_t one_line : 1;        /*One line mode (ignore line breaks)*/
+    uint8_t pwd_mode : 1; /*Replace characters with '*' */
+    uint8_t one_line : 1; /*One line mode (ignore line breaks)*/
 } lv_ta_ext_t;
 
 enum {

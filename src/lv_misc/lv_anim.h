@@ -57,22 +57,22 @@ typedef void (*lv_anim_ready_cb_t)(struct _lv_anim_t *);
 /*Describe an animation*/
 typedef struct _lv_anim_t
 {
-    void * var;              /*Variable to animate*/
-    lv_anim_exec_cb_t exec_cb;     /*Function to execute to animate*/
-    lv_anim_path_cb_t path_cb;     /*An array with the steps of animations*/
-    lv_anim_ready_cb_t ready_cb;     /*Call it when the animation is ready*/
-    int32_t start;           /*Start value*/
-    int32_t end;             /*End value*/
-    uint16_t time;           /*Animation time in ms*/
-    int16_t act_time;        /*Current time in animation. Set to negative to make delay.*/
-    uint16_t playback_pause; /*Wait before play back*/
-    uint16_t repeat_pause;   /*Wait before repeat*/
+    void * var;                  /*Variable to animate*/
+    lv_anim_exec_cb_t exec_cb;   /*Function to execute to animate*/
+    lv_anim_path_cb_t path_cb;   /*An array with the steps of animations*/
+    lv_anim_ready_cb_t ready_cb; /*Call it when the animation is ready*/
+    int32_t start;               /*Start value*/
+    int32_t end;                 /*End value*/
+    uint16_t time;               /*Animation time in ms*/
+    int16_t act_time;            /*Current time in animation. Set to negative to make delay.*/
+    uint16_t playback_pause;     /*Wait before play back*/
+    uint16_t repeat_pause;       /*Wait before repeat*/
 #if LV_USE_USER_DATA
-    lv_anim_user_data_t user_data;  /*Custom user data*/
+    lv_anim_user_data_t user_data; /*Custom user data*/
 #endif
 
-    uint8_t playback : 1;    /*When the animation is ready play it back*/
-    uint8_t repeat : 1;      /*Repeat the animation infinitely*/
+    uint8_t playback : 1; /*When the animation is ready play it back*/
+    uint8_t repeat : 1;   /*Repeat the animation infinitely*/
     /*Animation system use these - user shouldn't set*/
     uint8_t playback_now : 1; /*Play back is in progress*/
     uint32_t has_run : 1;     /*Indicates the animation has run in this round*/
@@ -108,7 +108,7 @@ void lv_anim_init(lv_anim_t * a);
  */
 static inline void lv_anim_set_exec_cb(lv_anim_t * a, void * var, lv_anim_exec_cb_t exec_cb)
 {
-    a->var = var;
+    a->var     = var;
     a->exec_cb = exec_cb;
 }
 
@@ -120,7 +120,7 @@ static inline void lv_anim_set_exec_cb(lv_anim_t * a, void * var, lv_anim_exec_c
  */
 static inline void lv_anim_set_time(lv_anim_t * a, uint16_t duration, uint16_t delay)
 {
-    a->time = duration;
+    a->time     = duration;
     a->act_time = -delay;
 }
 
@@ -133,7 +133,7 @@ static inline void lv_anim_set_time(lv_anim_t * a, uint16_t duration, uint16_t d
 static inline void lv_anim_set_values(lv_anim_t * a, lv_anim_value_t start, lv_anim_value_t end)
 {
     a->start = start;
-    a->end = end;
+    a->end   = end;
 }
 
 /**
@@ -146,7 +146,7 @@ static inline void lv_anim_set_values(lv_anim_t * a, lv_anim_value_t start, lv_a
  */
 static inline void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 {
-    a->var = a;
+    a->var     = a;
     a->exec_cb = (lv_anim_exec_cb_t)exec_cb;
 }
 
@@ -178,7 +178,7 @@ static inline void lv_anim_set_ready_cb(lv_anim_t * a, lv_anim_ready_cb_t ready_
  */
 static inline void lv_anim_set_playback(lv_anim_t * a, uint16_t wait_time)
 {
-    a->playback = 1;
+    a->playback       = 1;
     a->playback_pause = wait_time;
 }
 
@@ -198,7 +198,7 @@ static inline void lv_anim_clear_playback(lv_anim_t * a)
  */
 static inline void lv_anim_set_repeat(lv_anim_t * a, uint16_t wait_time)
 {
-    a->repeat = 1;
+    a->repeat       = 1;
     a->repeat_pause = wait_time;
 }
 

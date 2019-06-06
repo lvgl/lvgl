@@ -21,10 +21,10 @@
  *  STATIC PROTOTYPES
  **********************/
 static uint16_t fast_atan2(int x, int y);
-static void ver_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len,
-                     lv_color_t color, lv_opa_t opa);
-static void hor_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len,
-                     lv_color_t color, lv_opa_t opa);
+static void ver_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color,
+                     lv_opa_t opa);
+static void hor_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color,
+                     lv_opa_t opa);
 static bool deg_test_norm(uint16_t deg, uint16_t start, uint16_t end);
 static bool deg_test_inv(uint16_t deg, uint16_t start, uint16_t end);
 
@@ -52,8 +52,7 @@ static bool deg_test_inv(uint16_t deg, uint16_t start, uint16_t end);
  * @param opa_scale scale down all opacities by the factor
  */
 void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, const lv_area_t * mask,
-                 uint16_t start_angle, uint16_t end_angle, const lv_style_t * style,
-                 lv_opa_t opa_scale)
+                 uint16_t start_angle, uint16_t end_angle, const lv_style_t * style, lv_opa_t opa_scale)
 {
     lv_coord_t thickness = style->line.width;
     if(thickness > radius) thickness = radius;
@@ -66,9 +65,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
     lv_coord_t x_end[4];
 
     lv_color_t color = style->line.color;
-    lv_opa_t opa     = opa_scale == LV_OPA_COVER
-                       ? style->body.opa
-                       : (uint16_t)((uint16_t)style->body.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.opa : (uint16_t)((uint16_t)style->body.opa * opa_scale) >> 8;
 
     bool (*deg_test)(uint16_t, uint16_t, uint16_t);
     if(start_angle <= end_angle)
@@ -150,14 +147,12 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
 
         if(x_start[2] != LV_COORD_MIN) {
             if(x_end[2] == LV_COORD_MIN) x_end[2] = xi - 1;
-            hor_line(center_x - x_end[2], center_y + yi, mask, LV_MATH_ABS(x_end[2] - x_start[2]),
-                     color, opa);
+            hor_line(center_x - x_end[2], center_y + yi, mask, LV_MATH_ABS(x_end[2] - x_start[2]), color, opa);
         }
 
         if(x_start[3] != LV_COORD_MIN) {
             if(x_end[3] == LV_COORD_MIN) x_end[3] = xi - 1;
-            hor_line(center_x - x_end[3], center_y - yi, mask, LV_MATH_ABS(x_end[3] - x_start[3]),
-                     color, opa);
+            hor_line(center_x - x_end[3], center_y - yi, mask, LV_MATH_ABS(x_end[3] - x_start[3]), color, opa);
         }
 
 #if LV_ANTIALIAS
@@ -245,8 +240,7 @@ static uint16_t fast_atan2(int x, int y)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-static void ver_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len,
-                     lv_color_t color, lv_opa_t opa)
+static void ver_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color, lv_opa_t opa)
 {
     lv_area_t area;
     lv_area_set(&area, x, y, x, y + len);
@@ -254,8 +248,7 @@ static void ver_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coor
     lv_draw_fill(&area, mask, color, opa);
 }
 
-static void hor_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len,
-                     lv_color_t color, lv_opa_t opa)
+static void hor_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color, lv_opa_t opa)
 {
     lv_area_t area;
     lv_area_set(&area, x, y, x + len, y);

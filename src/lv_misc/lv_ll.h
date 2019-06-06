@@ -129,7 +129,7 @@ void * lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act);
  * @param ll_p pointer to linked list
  * @return length of the linked list
  */
-uint32_t lv_ll_get_len(const lv_ll_t *ll_p);
+uint32_t lv_ll_get_len(const lv_ll_t * ll_p);
 
 /**
  * Move a nodw before an other node in the same linked list
@@ -151,8 +151,7 @@ bool lv_ll_is_empty(lv_ll_t * ll_p);
 
 #define LV_LL_READ(list, i) for(i = lv_ll_get_head(&list); i != NULL; i = lv_ll_get_next(&list, i))
 
-#define LV_LL_READ_BACK(list, i)                                                                   \
-    for(i = lv_ll_get_tail(&list); i != NULL; i = lv_ll_get_prev(&list, i))
+#define LV_LL_READ_BACK(list, i) for(i = lv_ll_get_tail(&list); i != NULL; i = lv_ll_get_prev(&list, i))
 
 #ifdef __cplusplus
 } /* extern "C" */

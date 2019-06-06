@@ -87,8 +87,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new gauge gauge*/
     if(copy == NULL) {
-        lv_gauge_set_scale(new_gauge, LV_GAUGE_DEF_ANGLE, LV_GAUGE_DEF_LINE_COUNT,
-                           LV_GAUGE_DEF_LABEL_COUNT);
+        lv_gauge_set_scale(new_gauge, LV_GAUGE_DEF_ANGLE, LV_GAUGE_DEF_LINE_COUNT, LV_GAUGE_DEF_LABEL_COUNT);
         lv_gauge_set_needle_count(new_gauge, 1, NULL);
         lv_gauge_set_critical_value(new_gauge, 80);
         lv_obj_set_size(new_gauge, 2 * LV_DPI, 2 * LV_DPI);
@@ -350,15 +349,14 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
     lv_gauge_ext_t * ext     = lv_obj_get_ext_attr(gauge);
     const lv_style_t * style = lv_obj_get_style(gauge);
     lv_opa_t opa_scale       = lv_obj_get_opa_scale(gauge);
-    lv_coord_t r =
-        lv_obj_get_width(gauge) / 2 - (3 * style->body.padding.left) - style->body.padding.inner;
-    lv_coord_t x_ofs    = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
-    lv_coord_t y_ofs    = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
-    int16_t scale_angle = lv_lmeter_get_scale_angle(gauge);
-    uint16_t label_num  = ext->label_count;
-    int16_t angle_ofs   = 90 + (360 - scale_angle) / 2;
-    int16_t min         = lv_gauge_get_min_value(gauge);
-    int16_t max         = lv_gauge_get_max_value(gauge);
+    lv_coord_t r             = lv_obj_get_width(gauge) / 2 - (3 * style->body.padding.left) - style->body.padding.inner;
+    lv_coord_t x_ofs         = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
+    lv_coord_t y_ofs         = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
+    int16_t scale_angle      = lv_lmeter_get_scale_angle(gauge);
+    uint16_t label_num       = ext->label_count;
+    int16_t angle_ofs        = 90 + (360 - scale_angle) / 2;
+    int16_t min              = lv_gauge_get_min_value(gauge);
+    int16_t max              = lv_gauge_get_max_value(gauge);
 
     uint8_t i;
     for(i = 0; i < label_num; i++) {
@@ -377,8 +375,8 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
 
         lv_area_t label_cord;
         lv_point_t label_size;
-        lv_txt_get_size(&label_size, scale_txt, style->text.font, style->text.letter_space,
-                        style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+        lv_txt_get_size(&label_size, scale_txt, style->text.font, style->text.letter_space, style->text.line_space,
+                        LV_COORD_MAX, LV_TXT_FLAG_NONE);
 
         /*Draw the label*/
         label_cord.x1 = x - label_size.x / 2;
@@ -386,8 +384,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
         label_cord.x2 = label_cord.x1 + label_size.x;
         label_cord.y2 = label_cord.y1 + label_size.y;
 
-        lv_draw_label(&label_cord, mask, style, opa_scale, scale_txt, LV_TXT_FLAG_NONE, NULL, -1,
-                      -1);
+        lv_draw_label(&label_cord, mask, style, opa_scale, scale_txt, LV_TXT_FLAG_NONE, NULL, -1, -1);
     }
 }
 /**
@@ -421,8 +418,8 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     p_mid.y = y_ofs;
     for(i = 0; i < ext->needle_count; i++) {
         /*Calculate the end point of a needle*/
-        int16_t needle_angle = (ext->values[i] - min) * angle * (1 << LV_GAUGE_INTERPOLATE_SHIFT) /
-                               (max - min); //+ angle_ofs;
+        int16_t needle_angle =
+            (ext->values[i] - min) * angle * (1 << LV_GAUGE_INTERPOLATE_SHIFT) / (max - min); //+ angle_ofs;
 
         int16_t needle_angle_low  = (needle_angle >> LV_GAUGE_INTERPOLATE_SHIFT) + angle_ofs;
         int16_t needle_angle_high = needle_angle_low + 1;
@@ -433,11 +430,9 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
         p_end_high.y = (lv_trigo_sin(needle_angle_high) * r) / LV_TRIGO_SIN_MAX + y_ofs;
         p_end_high.x = (lv_trigo_sin(needle_angle_high + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
 
-        uint16_t rem = needle_angle & ((1 << LV_GAUGE_INTERPOLATE_SHIFT) - 1);
-        int16_t x_mod =
-            ((LV_MATH_ABS(p_end_high.x - p_end_low.x)) * rem) >> LV_GAUGE_INTERPOLATE_SHIFT;
-        int16_t y_mod =
-            ((LV_MATH_ABS(p_end_high.y - p_end_low.y)) * rem) >> LV_GAUGE_INTERPOLATE_SHIFT;
+        uint16_t rem  = needle_angle & ((1 << LV_GAUGE_INTERPOLATE_SHIFT) - 1);
+        int16_t x_mod = ((LV_MATH_ABS(p_end_high.x - p_end_low.x)) * rem) >> LV_GAUGE_INTERPOLATE_SHIFT;
+        int16_t y_mod = ((LV_MATH_ABS(p_end_high.y - p_end_low.y)) * rem) >> LV_GAUGE_INTERPOLATE_SHIFT;
 
         if(p_end_high.x < p_end_low.x) x_mod = -x_mod;
         if(p_end_high.y < p_end_low.y) y_mod = -y_mod;

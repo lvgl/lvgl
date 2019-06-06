@@ -244,9 +244,7 @@ void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style
         case LV_KB_STYLE_BG: lv_btnm_set_style(kb, LV_BTNM_STYLE_BG, style); break;
         case LV_KB_STYLE_BTN_REL: lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_REL, style); break;
         case LV_KB_STYLE_BTN_PR: lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_PR, style); break;
-        case LV_KB_STYLE_BTN_TGL_REL:
-            lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_TGL_REL, style);
-            break;
+        case LV_KB_STYLE_BTN_TGL_REL: lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_TGL_REL, style); break;
         case LV_KB_STYLE_BTN_TGL_PR: lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_TGL_PR, style); break;
         case LV_KB_STYLE_BTN_INA: lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_INA, style); break;
     }
@@ -303,9 +301,7 @@ const lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
         case LV_KB_STYLE_BG: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BG); break;
         case LV_KB_STYLE_BTN_REL: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_REL); break;
         case LV_KB_STYLE_BTN_PR: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_PR); break;
-        case LV_KB_STYLE_BTN_TGL_REL:
-            style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_REL);
-            break;
+        case LV_KB_STYLE_BTN_TGL_REL: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_REL); break;
         case LV_KB_STYLE_BTN_TGL_PR: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_PR); break;
         case LV_KB_STYLE_BTN_INA: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_INA); break;
         default: style = NULL; break;
@@ -333,9 +329,7 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
     uint16_t btn_id   = lv_btnm_get_active_btn(kb);
     if(btn_id == LV_BTNM_BTN_NONE) return;
     if(lv_btnm_get_btn_ctrl(kb, btn_id, LV_BTNM_CTRL_HIDDEN | LV_BTNM_CTRL_INACTIVE)) return;
-    if(lv_btnm_get_btn_ctrl(kb, btn_id, LV_BTNM_CTRL_NO_REPEAT) &&
-       event == LV_EVENT_LONG_PRESSED_REPEAT)
-        return;
+    if(lv_btnm_get_btn_ctrl(kb, btn_id, LV_BTNM_CTRL_NO_REPEAT) && event == LV_EVENT_LONG_PRESSED_REPEAT) return;
 
     const char * txt = lv_btnm_get_active_btn_text(kb);
     if(txt == NULL) return;
@@ -367,8 +361,7 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
         if(kb->event_cb != lv_kb_def_event_cb) {
             lv_res_t res = lv_event_send(kb, LV_EVENT_APPLY, NULL);
             if(res != LV_RES_OK) return;
-        }
-        else {
+        } else {
             lv_kb_set_ta(kb, NULL); /*De-assign the text area to hide it cursor if needed*/
         }
         return;

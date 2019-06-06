@@ -203,8 +203,8 @@ void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time)
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     ext->anim_time    = anim_time;
 #else
-    (void) sw;
-    (void) anim_time;
+    (void)sw;
+    (void)anim_time;
 #endif
 }
 
@@ -221,7 +221,7 @@ void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time)
 const lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type)
 {
     const lv_style_t * style = NULL;
-    lv_sw_ext_t * ext  = lv_obj_get_ext_attr(sw);
+    lv_sw_ext_t * ext        = lv_obj_get_ext_attr(sw);
 
     switch(type) {
         case LV_SW_STYLE_BG: style = lv_slider_get_style(sw, LV_SLIDER_STYLE_BG); break;

@@ -112,20 +112,20 @@ uint32_t lv_mem_get_size(const void * data);
  * p pointer to a memory
  */
 #if LV_USE_LOG == 0
-#define lv_mem_assert(p)                                                                           \
-    {                                                                                              \
-        if(p == NULL)                                                                              \
-            while(1)                                                                               \
-                ;                                                                                  \
+#define lv_mem_assert(p)                                                                                               \
+    {                                                                                                                  \
+        if(p == NULL)                                                                                                  \
+            while(1)                                                                                                   \
+                ;                                                                                                      \
     }
 #else
-#define lv_mem_assert(p)                                                                           \
-    {                                                                                              \
-        if(p == NULL) {                                                                            \
-            LV_LOG_ERROR("Out of memory!");                                                        \
-            while(1)                                                                               \
-                ;                                                                                  \
-        }                                                                                          \
+#define lv_mem_assert(p)                                                                                               \
+    {                                                                                                                  \
+        if(p == NULL) {                                                                                                \
+            LV_LOG_ERROR("Out of memory!");                                                                            \
+            while(1)                                                                                                   \
+                ;                                                                                                      \
+        }                                                                                                              \
     }
 #endif
 #ifdef __cplusplus

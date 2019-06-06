@@ -138,16 +138,14 @@ void lv_spinbox_set_value(lv_obj_t * spinbox, int32_t i)
  * @param separator_position number of digit before the decimal point. If 0, decimal point is not
  * shown
  */
-void lv_spinbox_set_digit_format(lv_obj_t * spinbox, uint8_t digit_count,
-                                 uint8_t separator_position)
+void lv_spinbox_set_digit_format(lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     if(ext == NULL) return;
 
     if(digit_count > LV_SPINBOX_MAX_DIGIT_COUNT) digit_count = LV_SPINBOX_MAX_DIGIT_COUNT;
 
-    if(separator_position > LV_SPINBOX_MAX_DIGIT_COUNT)
-        separator_position = LV_SPINBOX_MAX_DIGIT_COUNT;
+    if(separator_position > LV_SPINBOX_MAX_DIGIT_COUNT) separator_position = LV_SPINBOX_MAX_DIGIT_COUNT;
 
     ext->digit_count   = digit_count;
     ext->dec_point_pos = separator_position;
@@ -249,8 +247,7 @@ void lv_spinbox_step_previous(lv_obj_t * spinbox)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     int32_t step_limit;
-    step_limit =
-        LV_MATH_MAX(ext->range_max, (ext->range_min < 0 ? (-ext->range_min) : ext->range_min));
+    step_limit       = LV_MATH_MAX(ext->range_max, (ext->range_min < 0 ? (-ext->range_min) : ext->range_min));
     int32_t new_step = ext->step * 10;
     if(new_step <= step_limit) ext->step = new_step;
 

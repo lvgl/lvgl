@@ -77,8 +77,8 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
 
-    ext->text      = NULL;
-    ext->btnm      = NULL;
+    ext->text = NULL;
+    ext->btnm = NULL;
 #if LV_USE_ANIMATION
     ext->anim_time = LV_MBOX_CLOSE_ANIM_TIME;
 #endif
@@ -188,11 +188,11 @@ void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time)
 {
 #if LV_USE_ANIMATION
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-    anim_time = 0;
-    ext->anim_time = anim_time;
+    anim_time           = 0;
+    ext->anim_time      = anim_time;
 #else
-    (void) mbox;
-    (void) anim_time;
+    (void)mbox;
+    (void)anim_time;
 #endif
 }
 
@@ -207,22 +207,22 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
     if(lv_mbox_get_anim_time(mbox) != 0) {
         /*Add shrinking animations*/
         lv_anim_t a;
-        a.var = mbox;
-        a.start = lv_obj_get_height(mbox);
-        a.end = 0;
-        a.exec_cb = (lv_anim_exec_cb_t)lv_obj_set_height;
-        a.path_cb = lv_anim_path_linear;
-        a.ready_cb = NULL;
-        a.act_time = -delay;
-        a.time = lv_mbox_get_anim_time(mbox);
-        a.playback = 0;
+        a.var            = mbox;
+        a.start          = lv_obj_get_height(mbox);
+        a.end            = 0;
+        a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_height;
+        a.path_cb        = lv_anim_path_linear;
+        a.ready_cb       = NULL;
+        a.act_time       = -delay;
+        a.time           = lv_mbox_get_anim_time(mbox);
+        a.playback       = 0;
         a.playback_pause = 0;
-        a.repeat = 0;
-        a.repeat_pause = 0;
+        a.repeat         = 0;
+        a.repeat_pause   = 0;
         lv_anim_create(&a);
 
-        a.start = lv_obj_get_width(mbox);
-        a.exec_cb = (lv_anim_exec_cb_t)lv_obj_set_width;
+        a.start    = lv_obj_get_width(mbox);
+        a.exec_cb  = (lv_anim_exec_cb_t)lv_obj_set_width;
         a.ready_cb = lv_mbox_close_ready_cb;
         lv_anim_create(&a);
 
@@ -231,18 +231,18 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
     } else {
         /*Create an animation to delete the mbox `delay` ms later*/
         lv_anim_t a;
-        a.var = mbox;
-        a.start = 0;
-        a.end = 1;
-        a.exec_cb = (lv_anim_exec_cb_t)NULL;
-        a.path_cb = lv_anim_path_linear;
-        a.ready_cb = lv_mbox_close_ready_cb;
-        a.act_time = -delay;
-        a.time = 0;
-        a.playback = 0;
+        a.var            = mbox;
+        a.start          = 0;
+        a.end            = 1;
+        a.exec_cb        = (lv_anim_exec_cb_t)NULL;
+        a.path_cb        = lv_anim_path_linear;
+        a.ready_cb       = lv_mbox_close_ready_cb;
+        a.act_time       = -delay;
+        a.time           = 0;
+        a.playback       = 0;
         a.playback_pause = 0;
-        a.repeat = 0;
-        a.repeat_pause = 0;
+        a.repeat         = 0;
+        a.repeat_pause   = 0;
         lv_anim_create(&a);
     }
 #else
@@ -277,19 +277,11 @@ void lv_mbox_set_style(lv_obj_t * mbox, lv_mbox_style_t type, const lv_style_t *
     switch(type) {
         case LV_MBOX_STYLE_BG: lv_obj_set_style(mbox, style); break;
         case LV_MBOX_STYLE_BTN_BG: lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BG, style); break;
-        case LV_MBOX_STYLE_BTN_REL:
-            lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_REL, style);
-            break;
+        case LV_MBOX_STYLE_BTN_REL: lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_REL, style); break;
         case LV_MBOX_STYLE_BTN_PR: lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_PR, style); break;
-        case LV_MBOX_STYLE_BTN_TGL_REL:
-            lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_REL, style);
-            break;
-        case LV_MBOX_STYLE_BTN_TGL_PR:
-            lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_PR, style);
-            break;
-        case LV_MBOX_STYLE_BTN_INA:
-            lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_INA, style);
-            break;
+        case LV_MBOX_STYLE_BTN_TGL_REL: lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_REL, style); break;
+        case LV_MBOX_STYLE_BTN_TGL_PR: lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_PR, style); break;
+        case LV_MBOX_STYLE_BTN_INA: lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_INA, style); break;
     }
 
     mbox_realign(mbox);
@@ -364,7 +356,7 @@ uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox)
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
     return ext->anim_time;
 #else
-    (void) mbox;
+    (void)mbox;
     return 0;
 #endif
 }
@@ -377,27 +369,17 @@ uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox)
  */
 const lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type)
 {
-    const lv_style_t * style  = NULL;
-    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    const lv_style_t * style = NULL;
+    lv_mbox_ext_t * ext      = lv_obj_get_ext_attr(mbox);
 
     switch(type) {
         case LV_MBOX_STYLE_BG: style = lv_obj_get_style(mbox); break;
         case LV_MBOX_STYLE_BTN_BG: style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BG); break;
-        case LV_MBOX_STYLE_BTN_REL:
-            style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_REL);
-            break;
-        case LV_MBOX_STYLE_BTN_PR:
-            style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_PR);
-            break;
-        case LV_MBOX_STYLE_BTN_TGL_REL:
-            style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_REL);
-            break;
-        case LV_MBOX_STYLE_BTN_TGL_PR:
-            style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_PR);
-            break;
-        case LV_MBOX_STYLE_BTN_INA:
-            style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_INA);
-            break;
+        case LV_MBOX_STYLE_BTN_REL: style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_REL); break;
+        case LV_MBOX_STYLE_BTN_PR: style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_PR); break;
+        case LV_MBOX_STYLE_BTN_TGL_REL: style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_REL); break;
+        case LV_MBOX_STYLE_BTN_TGL_PR: style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_PR); break;
+        case LV_MBOX_STYLE_BTN_INA: style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_INA); break;
         default: style = NULL; break;
     }
 
@@ -513,7 +495,7 @@ static void mbox_realign(lv_obj_t * mbox)
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
     const lv_style_t * style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BG);
-    lv_coord_t w = lv_obj_get_width(mbox) - style->body.padding.left - style->body.padding.right;
+    lv_coord_t w             = lv_obj_get_width(mbox) - style->body.padding.left - style->body.padding.right;
 
     if(ext->text) {
         lv_obj_set_width(ext->text, w);
@@ -524,9 +506,8 @@ static void mbox_realign(lv_obj_t * mbox)
         const lv_style_t * btn_rel_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_REL);
         lv_coord_t font_h                = lv_font_get_line_height(btn_rel_style->text.font);
         lv_obj_set_size(ext->btnm, w,
-                        font_h + btn_rel_style->body.padding.top +
-                            btn_rel_style->body.padding.bottom + btn_bg_style->body.padding.top +
-                            btn_bg_style->body.padding.bottom);
+                        font_h + btn_rel_style->body.padding.top + btn_rel_style->body.padding.bottom +
+                            btn_bg_style->body.padding.top + btn_bg_style->body.padding.bottom);
     }
 }
 

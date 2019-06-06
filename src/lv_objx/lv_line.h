@@ -35,10 +35,10 @@ extern "C" {
 typedef struct
 {
     /*Inherited from 'base_obj' so no inherited ext.*/ /*Ext. of ancestor*/
-    const lv_point_t * point_array; /*Pointer to an array with the points of the line*/
-    uint16_t point_num;             /*Number of points in 'point_array' */
-    uint8_t auto_size : 1;          /*1: set obj. width to x max and obj. height to y max */
-    uint8_t y_inv : 1;              /*1: y == 0 will be on the bottom*/
+    const lv_point_t * point_array;                    /*Pointer to an array with the points of the line*/
+    uint16_t point_num;                                /*Number of points in 'point_array' */
+    uint8_t auto_size : 1;                             /*1: set obj. width to x max and obj. height to y max */
+    uint8_t y_inv : 1;                                 /*1: y == 0 will be on the bottom*/
 } lv_line_ext_t;
 
 /**********************
@@ -82,8 +82,8 @@ void lv_line_set_auto_size(lv_obj_t * line, bool en);
  */
 void lv_line_set_y_invert(lv_obj_t * line, bool en);
 
-#define lv_line_set_y_inv                                                                          \
-    lv_line_set_y_invert /*The name was inconsistent. In v.6.0 only `lv_line_set_y_invert`will     \
+#define lv_line_set_y_inv                                                                                              \
+    lv_line_set_y_invert /*The name was inconsistent. In v.6.0 only `lv_line_set_y_invert`will                         \
                             work */
 
 /**

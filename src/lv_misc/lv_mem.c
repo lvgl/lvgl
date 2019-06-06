@@ -19,7 +19,7 @@
  *      DEFINES
  *********************/
 /*Add memory junk on alloc (0xaa) and free(0xbb) (just for testing purposes)*/
-#define LV_MEM_ADD_JUNK     1
+#define LV_MEM_ADD_JUNK 1
 
 #ifdef LV_MEM_ENV64
 #define MEM_UNIT uint64_t
@@ -126,7 +126,6 @@ void * lv_mem_alloc(uint32_t size)
 #endif
     void * alloc = NULL;
 
-
 #if LV_MEM_CUSTOM == 0
     /*Use the built-in allocators*/
     lv_mem_ent_t * e = NULL;
@@ -154,7 +153,7 @@ void * lv_mem_alloc(uint32_t size)
         ((lv_mem_ent_t *)alloc)->header.s.d_size = size;
         ((lv_mem_ent_t *)alloc)->header.s.used   = 1;
 
-        alloc                                    = &((lv_mem_ent_t *)alloc)->first_data;
+        alloc = &((lv_mem_ent_t *)alloc)->first_data;
     }
 #endif                /* LV_ENABLE_GC */
 #endif                /* LV_MEM_CUSTOM */

@@ -43,8 +43,7 @@ typedef struct
     lv_slider_ext_t slider; /*Ext. of ancestor*/
     /*New data for this type */
     const lv_style_t * style_knob_off; /*Style of the knob when the switch is OFF*/
-    const lv_style_t *
-        style_knob_on; /*Style of the knob when the switch is ON (NULL to use the same as OFF)*/
+    const lv_style_t * style_knob_on;  /*Style of the knob when the switch is ON (NULL to use the same as OFF)*/
     lv_coord_t start_x;
     uint8_t changed : 1; /*Indicates the switch state explicitly changed by drag*/
     uint8_t slided : 1;

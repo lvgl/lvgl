@@ -73,7 +73,7 @@ void lv_anim_init(lv_anim_t * a)
 {
     memset(a, 0, sizeof(lv_anim_t));
     a->time = 500;
-    a->end = 100;
+    a->end  = 100;
 }
 /**
  * Create an animation
@@ -83,8 +83,7 @@ void lv_anim_create(lv_anim_t * a)
 {
     LV_LOG_TRACE("animation create started")
     /* Do not let two animations for the  same 'var' with the same 'fp'*/
-    if(a->exec_cb != NULL)
-        lv_anim_del(a->var, a->exec_cb); /*fp == NULL would delete all animations of var*/
+    if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*fp == NULL would delete all animations of var*/
 
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = lv_ll_ins_head(&LV_GC_ROOT(_lv_anim_ll));
@@ -181,8 +180,7 @@ lv_anim_value_t lv_anim_path_linear(const lv_anim_t * a)
     uint32_t step;
     if(a->time == a->act_time) {
         step = LV_ANIM_RESOLUTION; /*Use the last value if the time fully elapsed*/
-    }
-    else {
+    } else {
         step = ((int32_t)a->act_time * LV_ANIM_RESOLUTION) / a->time;
     }
 
@@ -396,8 +394,7 @@ static void anim_task(lv_task_t * param)
         anim_list_changed = false;
 
         if(!a->has_run) {
-            a->has_run =
-                1; /*The list readying might be reseted so need to know which anim has run already*/
+            a->has_run = 1; /*The list readying might be reseted so need to know which anim has run already*/
             a->act_time += elaps;
             if(a->act_time >= 0) {
                 if(a->act_time > a->time) a->act_time = a->time;
@@ -438,8 +435,7 @@ static bool anim_ready_handler(lv_anim_t * a)
     /*Delete the animation if
      * - no repeat and no play back (simple one shot animation)
      * - no repeat, play back is enabled and play back is ready */
-    if((a->repeat == 0 && a->playback == 0) ||
-       (a->repeat == 0 && a->playback == 1 && a->playback_now == 1)) {
+    if((a->repeat == 0 && a->playback == 0) || (a->repeat == 0 && a->playback == 1 && a->playback_now == 1)) {
 
         /*Create copy from the animation and delete the animation from the list.
          * This way the `ready_cb` will see the animations like it's animation is ready deleted*/

@@ -37,7 +37,6 @@ extern "C" {
 #define LV_IMG_PX_SIZE_ALPHA_BYTE 4
 #endif
 
-
 #define LV_IMG_DECODER_OPEN_FAIL ((void *)(-1))
 
 /**********************
@@ -72,14 +71,14 @@ typedef struct
 enum {
     LV_IMG_CF_UNKNOWN = 0,
 
-    LV_IMG_CF_RAW,       /*Contains the file as it is. Needs custom decoder function*/
-    LV_IMG_CF_RAW_ALPHA, /*Contains the file as it is. The image has alpha. Needs custom decoder
-                            function*/
+    LV_IMG_CF_RAW,              /*Contains the file as it is. Needs custom decoder function*/
+    LV_IMG_CF_RAW_ALPHA,        /*Contains the file as it is. The image has alpha. Needs custom decoder
+                                   function*/
     LV_IMG_CF_RAW_CHROMA_KEYED, /*Contains the file as it is. The image is chroma keyed. Needs
                                    custom decoder function*/
 
-    LV_IMG_CF_TRUE_COLOR,       /*Color format and depth should match with LV_COLOR settings*/
-    LV_IMG_CF_TRUE_COLOR_ALPHA, /*Same as `LV_IMG_CF_TRUE_COLOR` but every pixel has an alpha byte*/
+    LV_IMG_CF_TRUE_COLOR,              /*Color format and depth should match with LV_COLOR settings*/
+    LV_IMG_CF_TRUE_COLOR_ALPHA,        /*Same as `LV_IMG_CF_TRUE_COLOR` but every pixel has an alpha byte*/
     LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED, /*Same as `LV_IMG_CF_TRUE_COLOR` but LV_COLOR_TRANSP pixels
                                           will be transparent*/
 
@@ -116,7 +115,8 @@ struct _lv_img_decoder_dsc;
  * @param header store the info here
  * @return LV_RES_OK: info written correctly; LV_RES_INV: failed
  */
-typedef lv_res_t (*lv_img_decoder_info_f_t)(struct _lv_img_decoder * decoder, const void * src, lv_img_header_t * header);
+typedef lv_res_t (*lv_img_decoder_info_f_t)(struct _lv_img_decoder * decoder, const void * src,
+                                            lv_img_header_t * header);
 
 /**
  * Open an image for decoding. Prepare it as it is required to read it later
@@ -149,7 +149,8 @@ typedef lv_res_t (*lv_img_decoder_read_line_f_t)(struct _lv_img_decoder * decode
  */
 typedef void (*lv_img_decoder_close_f_t)(struct _lv_img_decoder * decoder, struct _lv_img_decoder_dsc * dsc);
 
-typedef struct _lv_img_decoder {
+typedef struct _lv_img_decoder
+{
     lv_img_decoder_info_f_t info_cb;
     lv_img_decoder_open_f_t open_cb;
     lv_img_decoder_read_line_f_t read_line_cb;
@@ -158,10 +159,10 @@ typedef struct _lv_img_decoder {
 #if LV_USE_USER_DATA
     lv_img_decoder_user_data_t user_data;
 #endif
-}lv_img_decoder_t;
+} lv_img_decoder_t;
 
-
-typedef struct _lv_img_decoder_dsc {
+typedef struct _lv_img_decoder_dsc
+{
     lv_img_decoder_t * decoder;
     const lv_style_t * style;
     const void * src;
@@ -171,7 +172,7 @@ typedef struct _lv_img_decoder_dsc {
 #if LV_USE_USER_DATA
     void * user_data;
 #endif
-}lv_img_decoder_dsc_t;
+} lv_img_decoder_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -218,7 +219,8 @@ const uint8_t * lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src
  * @param buf store the data here
  * @return LV_RES_OK: success; LV_RES_INV: an error occurred
  */
-lv_res_t lv_img_decoder_read_line(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_coord_t len, uint8_t * buf);
+lv_res_t lv_img_decoder_read_line(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_coord_t len,
+                                  uint8_t * buf);
 
 /**
  * Close a decoding session

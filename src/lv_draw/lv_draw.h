@@ -31,7 +31,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -56,8 +55,8 @@ lv_opa_t lv_draw_aa_get_opa(lv_coord_t seg, lv_coord_t px_id, lv_opa_t base_opa)
  * @param color color of pixels
  * @param opa maximum opacity
  */
-void lv_draw_aa_ver_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask,
-                        lv_color_t color, lv_opa_t opa);
+void lv_draw_aa_ver_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask, lv_color_t color,
+                        lv_opa_t opa);
 
 /**
  * Add a horizontal anti-aliasing segment (pixels with decreasing opacity)
@@ -68,8 +67,8 @@ void lv_draw_aa_ver_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_
  * @param color color of pixels
  * @param opa maximum opacity
  */
-void lv_draw_aa_hor_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask,
-                        lv_color_t color, lv_opa_t opa);
+void lv_draw_aa_hor_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask, lv_color_t color,
+                        lv_opa_t opa);
 #endif
 
 /**********************

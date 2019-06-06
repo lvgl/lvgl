@@ -43,8 +43,7 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2);
  * @param style style for of the triangle
  * @param opa_scale scale down all opacities by the factor (0..255)
  */
-void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style,
-        lv_opa_t opa_scale)
+void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
 
     /*Return is the triangle is degenerated*/
@@ -55,9 +54,7 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
     if(points[0].x == points[1].x && points[1].x == points[2].x) return;
     if(points[0].y == points[1].y && points[1].y == points[2].y) return;
 
-    lv_opa_t opa = opa_scale == LV_OPA_COVER
-            ? style->body.opa
-                    : (uint16_t)((uint16_t)style->body.opa * opa_scale) >> 8;
+    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.opa : (uint16_t)((uint16_t)style->body.opa * opa_scale) >> 8;
 
     /*Is the triangle flat or tall?*/
     lv_coord_t x_min = LV_MATH_MIN(LV_MATH_MIN(points[0].x, points[1].x), points[2].x);
@@ -71,7 +68,7 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
      * Some pixels are overdrawn on the common edges of the triangles
      * so use it only if the triangle has no opacity*/
 
-     /* Draw from horizontal lines*/
+    /* Draw from horizontal lines*/
     if(x_max - x_min < y_max - y_min) {
         tri_draw_tall(points, mask, style, opa);
     }
@@ -90,7 +87,7 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
  * @param opa_scale scale down all opacities by the factor (0..255)
  */
 void lv_draw_polygon(const lv_point_t * points, uint32_t point_cnt, const lv_area_t * mask, const lv_style_t * style,
-        lv_opa_t opa_scale)
+                     lv_opa_t opa_scale)
 {
     if(point_cnt < 3) return;
     if(points == NULL) return;
@@ -102,8 +99,8 @@ void lv_draw_polygon(const lv_point_t * points, uint32_t point_cnt, const lv_are
     for(i = 0; i < point_cnt - 1; i++) {
         tri[1].x = points[i].x;
         tri[1].y = points[i].y;
-        tri[2].x = points[i+1].x;
-        tri[2].y = points[i+1].y;
+        tri[2].x = points[i + 1].x;
+        tri[2].y = points[i + 1].y;
         lv_draw_triangle(tri, mask, style, opa_scale);
     }
 }
@@ -112,31 +109,22 @@ void lv_draw_polygon(const lv_point_t * points, uint32_t point_cnt, const lv_are
  *   STATIC FUNCTIONS
  **********************/
 
-
 void tri_draw_flat(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa)
 {
     /*Return if the points are out of the mask*/
-    if(points[0].x < mask->x1 &&
-       points[1].x < mask->x1 &&
-       points[2].x < mask->x1) {
+    if(points[0].x < mask->x1 && points[1].x < mask->x1 && points[2].x < mask->x1) {
         return;
     }
 
-    if(points[0].x > mask->x2 &&
-       points[1].x > mask->x2 &&
-       points[2].x > mask->x2) {
+    if(points[0].x > mask->x2 && points[1].x > mask->x2 && points[2].x > mask->x2) {
         return;
     }
 
-    if(points[0].y < mask->y1 &&
-       points[1].y < mask->y1 &&
-       points[2].y < mask->y1) {
+    if(points[0].y < mask->y1 && points[1].y < mask->y1 && points[2].y < mask->y1) {
         return;
     }
 
-    if(points[0].y > mask->y2 &&
-       points[1].y > mask->y2 &&
-       points[2].y > mask->y2) {
+    if(points[0].y > mask->y2 && points[1].y > mask->y2 && points[2].y > mask->y2) {
         return;
     }
 
@@ -218,7 +206,7 @@ void tri_draw_flat(const lv_point_t * points, const lv_area_t * mask, const lv_s
         /*Calc. the next point of edge2*/
         y2_tmp = edge2.y;
         do {
-            if(edge2.x == tri[2].x  && edge2.y == tri[2].y) return;
+            if(edge2.x == tri[2].x && edge2.y == tri[2].y) return;
             err_tmp2 = err2;
             if(err_tmp2 > -dx2) {
                 err2 -= dy2;
@@ -336,7 +324,6 @@ void tri_draw_tall(const lv_point_t * points, const lv_area_t * mask, const lv_s
         } while(edge2.x == x2_tmp);
     }
 }
-
 
 /**
  * Swap two points

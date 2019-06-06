@@ -103,8 +103,8 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src
  * @param src_right pointer to an image source for the right side of the button (a C array or path
  * to a file)
  */
-void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src_left,
-                       const void * src_mid, const void * src_right);
+void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src_left, const void * src_mid,
+                       const void * src_right);
 
 #endif
 

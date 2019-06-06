@@ -310,10 +310,9 @@ static inline uint32_t lv_color_to32(lv_color_t color)
     return ret.full;
 #else
     lv_color32_t ret;
-    ret.ch.red = color.ch.red * 8; /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
-    ret.ch.green =
-        ((color.ch.green_h << 3) + color.ch.green_l) * 4; /*(2^8 - 1)/(2^6 - 1) = 255/63 = 4*/
-    ret.ch.blue  = color.ch.blue * 8;                     /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
+    ret.ch.red   = color.ch.red * 8;                                 /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
+    ret.ch.green = ((color.ch.green_h << 3) + color.ch.green_l) * 4; /*(2^8 - 1)/(2^6 - 1) = 255/63 = 4*/
+    ret.ch.blue  = color.ch.blue * 8;                                /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
     ret.ch.alpha = 0xFF;
     return ret.full;
 #endif
@@ -420,14 +419,12 @@ static inline lv_color_t lv_color_make(uint8_t r8, uint8_t g8, uint8_t b8)
 
 static inline lv_color_t lv_color_hex(uint32_t c)
 {
-    return lv_color_make((uint8_t)((c >> 16) & 0xFF), (uint8_t)((c >> 8) & 0xFF),
-                         (uint8_t)(c & 0xFF));
+    return lv_color_make((uint8_t)((c >> 16) & 0xFF), (uint8_t)((c >> 8) & 0xFF), (uint8_t)(c & 0xFF));
 }
 
 static inline lv_color_t lv_color_hex3(uint32_t c)
 {
-    return lv_color_make((uint8_t)(((c >> 4) & 0xF0) | ((c >> 8) & 0xF)),
-                         (uint8_t)((c & 0xF0) | ((c & 0xF0) >> 4)),
+    return lv_color_make((uint8_t)(((c >> 4) & 0xF0) | ((c >> 8) & 0xF)), (uint8_t)((c & 0xF0) | ((c & 0xF0) >> 4)),
                          (uint8_t)((c & 0xF) | ((c & 0xF) << 4)));
 }
 

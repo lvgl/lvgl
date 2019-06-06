@@ -270,9 +270,7 @@ void lv_win_set_style(lv_obj_t * win, lv_win_style_t type, const lv_style_t * st
             lv_win_realign(win);
             break;
         case LV_WIN_STYLE_CONTENT_BG: lv_page_set_style(ext->page, LV_PAGE_STYLE_BG, style); break;
-        case LV_WIN_STYLE_CONTENT_SCRL:
-            lv_page_set_style(ext->page, LV_PAGE_STYLE_SCRL, style);
-            break;
+        case LV_WIN_STYLE_CONTENT_SCRL: lv_page_set_style(ext->page, LV_PAGE_STYLE_SCRL, style); break;
         case LV_WIN_STYLE_SB: lv_page_set_style(ext->page, LV_PAGE_STYLE_SB, style); break;
         case LV_WIN_STYLE_HEADER:
             lv_obj_set_style(ext->header, style);
@@ -411,9 +409,7 @@ const lv_style_t * lv_win_get_style(const lv_obj_t * win, lv_win_style_t type)
     switch(type) {
         case LV_WIN_STYLE_BG: style = lv_obj_get_style(win); break;
         case LV_WIN_STYLE_CONTENT_BG: style = lv_page_get_style(ext->page, LV_PAGE_STYLE_BG); break;
-        case LV_WIN_STYLE_CONTENT_SCRL:
-            style = lv_page_get_style(ext->page, LV_PAGE_STYLE_SCRL);
-            break;
+        case LV_WIN_STYLE_CONTENT_SCRL: style = lv_page_get_style(ext->page, LV_PAGE_STYLE_SCRL); break;
         case LV_WIN_STYLE_SB: style = lv_page_get_style(ext->page, LV_PAGE_STYLE_SB); break;
         case LV_WIN_STYLE_HEADER: style = lv_obj_get_style(ext->header); break;
         case LV_WIN_STYLE_BTN_REL: style = ext->style_btn_rel; break;
@@ -468,7 +464,7 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
             while(child != NULL) {
                 if(lv_obj_is_protected(child, LV_PROTECT_PARENT) == false) {
                     lv_obj_t * tmp = child;
-                    child = lv_obj_get_child(win, child); /*Get the next child before move this*/
+                    child          = lv_obj_get_child(win, child); /*Get the next child before move this*/
                     lv_obj_set_parent(tmp, page);
                 } else {
                     child = lv_obj_get_child(win, child);
@@ -479,8 +475,7 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
         lv_win_realign(win);
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*If the size is changed refresh the window*/
-        if(lv_area_get_width(param) != lv_obj_get_width(win) ||
-           lv_area_get_height(param) != lv_obj_get_height(win)) {
+        if(lv_area_get_width(param) != lv_obj_get_width(win) || lv_area_get_height(param) != lv_obj_get_height(win)) {
             lv_win_realign(win);
         }
     } else if(sign == LV_SIGNAL_CLEANUP) {
@@ -514,8 +509,7 @@ static void lv_win_realign(lv_obj_t * win)
 
     const lv_style_t * header_style = lv_win_get_style(win, LV_WIN_STYLE_HEADER);
     lv_obj_set_size(ext->header, lv_obj_get_width(win),
-                    ext->btn_size + header_style->body.padding.top +
-                        header_style->body.padding.bottom);
+                    ext->btn_size + header_style->body.padding.top + header_style->body.padding.bottom);
 
     bool first_btn = true;
     lv_obj_t * btn;
@@ -526,24 +520,21 @@ static void lv_win_realign(lv_obj_t * win)
     while(btn != NULL) {
         lv_obj_set_size(btn, ext->btn_size, ext->btn_size);
         if(first_btn) {
-            lv_obj_align(btn, ext->header, LV_ALIGN_IN_RIGHT_MID, -header_style->body.padding.right,
-                         0);
+            lv_obj_align(btn, ext->header, LV_ALIGN_IN_RIGHT_MID, -header_style->body.padding.right, 0);
             first_btn = false;
         } else {
-            lv_obj_align(btn, btn_prev, LV_ALIGN_OUT_LEFT_MID, -header_style->body.padding.inner,
-                         0);
+            lv_obj_align(btn, btn_prev, LV_ALIGN_OUT_LEFT_MID, -header_style->body.padding.inner, 0);
         }
         btn_prev = btn;
         btn      = lv_obj_get_child_back(ext->header, btn);
     }
 
-    const   lv_style_t * style_header = lv_win_get_style(win, LV_WIN_STYLE_HEADER);
+    const lv_style_t * style_header = lv_win_get_style(win, LV_WIN_STYLE_HEADER);
     lv_obj_align(ext->title, NULL, LV_ALIGN_IN_LEFT_MID, style_header->body.padding.left, 0);
 
     lv_obj_set_pos(ext->header, 0, 0);
 
-    lv_obj_set_size(ext->page, lv_obj_get_width(win),
-                    lv_obj_get_height(win) - lv_obj_get_height(ext->header));
+    lv_obj_set_size(ext->page, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
     lv_obj_align(ext->page, ext->header, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
 }
 

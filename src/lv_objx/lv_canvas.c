@@ -214,8 +214,7 @@ const lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_
  * @param x left side of the destination position
  * @param y top side of the destination position
  */
-void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, lv_coord_t h,
-                        lv_coord_t x, lv_coord_t y)
+void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y)
 {
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
     if(x + w >= ext->dsc.header.w || y + h >= ext->dsc.header.h) {
@@ -247,8 +246,8 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, l
  * @param pivot_y pivot Y of rotation. Relative to the source canvas
  *                Set to `source height / 2` to rotate around the center
  */
-void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_coord_t offset_x,
-                      lv_coord_t offset_y, int32_t pivot_x, int32_t pivot_y)
+void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_coord_t offset_x, lv_coord_t offset_y,
+                      int32_t pivot_x, int32_t pivot_y)
 {
     lv_canvas_ext_t * ext_dst = lv_obj_get_ext_attr(canvas);
     const lv_style_t * style  = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
@@ -346,8 +345,7 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
             lv_color_t y_dest    = lv_color_mix(c_dest_int, c_dest_yn, yr);
             lv_color_t color_res = lv_color_mix(x_dest, y_dest, LV_OPA_50);
 
-            if(x + offset_x >= 0 && x + offset_x < dest_width && y + offset_y >= 0 &&
-               y + offset_y < dest_height) {
+            if(x + offset_x >= 0 && x + offset_x < dest_width && y + offset_y >= 0 && y + offset_y < dest_height) {
                 /*If the image has no alpha channel just simple set the result color on the canvas*/
                 if(lv_img_color_format_has_alpha(img->header.cf) == false) {
                     lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, color_res);
@@ -361,29 +359,23 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
                     lv_opa_t opa_res = (opa_x + opa_y) / 2;
                     if(opa_res <= LV_OPA_MIN) continue;
 
-                    lv_color_t bg_color =
-                        lv_img_buf_get_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, style);
+                    lv_color_t bg_color = lv_img_buf_get_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, style);
 
                     /*If the canvas has no alpha but the image has mix the image's color with
                      * canvas*/
                     if(lv_img_color_format_has_alpha(ext_dst->dsc.header.cf) == false) {
-                        if(opa_res < LV_OPA_MAX)
-                            color_res = lv_color_mix(color_res, bg_color, opa_res);
-                        lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y,
-                                                color_res);
+                        if(opa_res < LV_OPA_MAX) color_res = lv_color_mix(color_res, bg_color, opa_res);
+                        lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, color_res);
                     }
                     /*Both the image and canvas has alpha channel. Some extra calculation is
                        required*/
                     else {
-                        lv_opa_t bg_opa =
-                            lv_img_buf_get_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y);
+                        lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y);
                         /* Pick the foreground if it's fully opaque or the Background is fully
                          * transparent*/
                         if(opa_res >= LV_OPA_MAX || bg_opa <= LV_OPA_MIN) {
-                            lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y,
-                                                    color_res);
-                            lv_img_buf_set_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y,
-                                                    opa_res);
+                            lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, color_res);
+                            lv_img_buf_set_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y, opa_res);
                         }
                         /*Opaque background: use simple mix*/
                         else if(bg_opa >= LV_OPA_MAX) {
@@ -395,8 +387,7 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
 
                             /*Info:
                              * https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
-                            lv_opa_t opa_res_2 =
-                                255 - ((uint16_t)((uint16_t)(255 - opa_res) * (255 - bg_opa)) >> 8);
+                            lv_opa_t opa_res_2 = 255 - ((uint16_t)((uint16_t)(255 - opa_res) * (255 - bg_opa)) >> 8);
                             if(opa_res_2 == 0) {
                                 opa_res_2 = 1; /*never happens, just to be sure*/
                             }
@@ -404,8 +395,7 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
 
                             lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y,
                                                     lv_color_mix(color_res, bg_color, ratio));
-                            lv_img_buf_set_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y,
-                                                    opa_res_2);
+                            lv_img_buf_set_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y, opa_res_2);
                         }
                     }
                 }
@@ -432,7 +422,6 @@ void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color)
             lv_img_buf_set_px_color(dsc, x, y, color);
         }
     }
-
 }
 
 /**
@@ -444,7 +433,8 @@ void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color)
  * @param h height of the rectangle
  * @param style style of the rectangle (`body` properties are used except `padding`)
  */
-void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const lv_style_t * style)
+void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h,
+                         const lv_style_t * style)
 {
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
@@ -466,12 +456,12 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     memset(&disp, 0, sizeof(lv_disp_t));
 
     lv_disp_buf_t disp_buf;
-    lv_disp_buf_init(&disp_buf, (void*)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
     lv_area_copy(&disp_buf.area, &mask);
 
     lv_disp_drv_init(&disp.driver);
 
-    disp.driver.buffer = &disp_buf;
+    disp.driver.buffer  = &disp_buf;
     disp.driver.hor_res = dsc->header.w;
     disp.driver.ver_res = dsc->header.h;
 
@@ -493,7 +483,8 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
  * @param txt text to display
  * @param align align of the text (`LV_LABEL_ALIGN_LEFT/RIGHT/CENTER`)
  */
-void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w, const lv_style_t * style, const char * txt, lv_label_align_t align)
+void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w, const lv_style_t * style,
+                         const char * txt, lv_label_align_t align)
 {
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
@@ -515,12 +506,12 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     memset(&disp, 0, sizeof(lv_disp_t));
 
     lv_disp_buf_t disp_buf;
-    lv_disp_buf_init(&disp_buf, (void*)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
     lv_area_copy(&disp_buf.area, &mask);
 
     lv_disp_drv_init(&disp.driver);
 
-    disp.driver.buffer = &disp_buf;
+    disp.driver.buffer  = &disp_buf;
     disp.driver.hor_res = dsc->header.w;
     disp.driver.ver_res = dsc->header.h;
 
@@ -529,18 +520,10 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 
     lv_txt_flag_t flag;
     switch(align) {
-    case LV_LABEL_ALIGN_LEFT:
-        flag = LV_TXT_FLAG_NONE;
-        break;
-    case LV_LABEL_ALIGN_RIGHT:
-        flag = LV_TXT_FLAG_RIGHT;
-        break;
-    case LV_LABEL_ALIGN_CENTER:
-        flag = LV_TXT_FLAG_CENTER;
-        break;
-    default:
-        flag = LV_TXT_FLAG_NONE;
-        break;
+        case LV_LABEL_ALIGN_LEFT: flag = LV_TXT_FLAG_NONE; break;
+        case LV_LABEL_ALIGN_RIGHT: flag = LV_TXT_FLAG_RIGHT; break;
+        case LV_LABEL_ALIGN_CENTER: flag = LV_TXT_FLAG_CENTER; break;
+        default: flag = LV_TXT_FLAG_NONE; break;
     }
 
     lv_draw_label(&coords, &mask, style, LV_OPA_COVER, txt, flag, NULL, LV_LABEL_TEXT_SEL_OFF, LV_LABEL_TEXT_SEL_OFF);
@@ -571,12 +554,12 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t 
     memset(&disp, 0, sizeof(lv_disp_t));
 
     lv_disp_buf_t disp_buf;
-    lv_disp_buf_init(&disp_buf, (void*)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
     lv_area_copy(&disp_buf.area, &mask);
 
     lv_disp_drv_init(&disp.driver);
 
-    disp.driver.buffer = &disp_buf;
+    disp.driver.buffer  = &disp_buf;
     disp.driver.hor_res = dsc->header.w;
     disp.driver.ver_res = dsc->header.h;
 
@@ -614,12 +597,12 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32
     memset(&disp, 0, sizeof(lv_disp_t));
 
     lv_disp_buf_t disp_buf;
-    lv_disp_buf_init(&disp_buf, (void*)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
     lv_area_copy(&disp_buf.area, &mask);
 
     lv_disp_drv_init(&disp.driver);
 
-    disp.driver.buffer = &disp_buf;
+    disp.driver.buffer  = &disp_buf;
     disp.driver.hor_res = dsc->header.w;
     disp.driver.ver_res = dsc->header.h;
 
@@ -631,7 +614,6 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32
     lv_refr_set_disp_refreshing(refr_ori);
 }
 
-
 /**
  * Draw an arc on the canvas
  * @param canvas pointer to a canvas object
@@ -642,7 +624,8 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32
  * @param end_angle end angle in degrees
  * @param style style of the polygon (`body.main_color` and `body.opa` is used)
  */
-void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t r, int32_t start_angle, int32_t end_angle, const lv_style_t * style)
+void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t r, int32_t start_angle,
+                        int32_t end_angle, const lv_style_t * style)
 {
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
@@ -658,12 +641,12 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     memset(&disp, 0, sizeof(lv_disp_t));
 
     lv_disp_buf_t disp_buf;
-    lv_disp_buf_init(&disp_buf, (void*)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
     lv_area_copy(&disp_buf.area, &mask);
 
     lv_disp_drv_init(&disp.driver);
 
-    disp.driver.buffer = &disp_buf;
+    disp.driver.buffer  = &disp_buf;
     disp.driver.hor_res = dsc->header.w;
     disp.driver.ver_res = dsc->header.h;
 

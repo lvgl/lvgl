@@ -29,15 +29,15 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_GC_ROOTS(prefix)                                                                        \
-    prefix lv_ll_t _lv_task_ll;  /*Linked list to store the lv_tasks*/                             \
-    prefix lv_ll_t _lv_disp_ll;  /*Linked list of screens*/                                        \
-    prefix lv_ll_t _lv_indev_ll; /*Linked list of screens*/                                        \
-    prefix lv_ll_t _lv_drv_ll;                                                                     \
-    prefix lv_ll_t _lv_file_ll;                                                                    \
-    prefix lv_ll_t _lv_anim_ll;                                                                    \
-    prefix lv_ll_t _lv_group_ll;                                                                   \
-    prefix lv_ll_t _lv_img_defoder_ll;                                                             \
+#define LV_GC_ROOTS(prefix)                                                                                            \
+    prefix lv_ll_t _lv_task_ll;  /*Linked list to store the lv_tasks*/                                                 \
+    prefix lv_ll_t _lv_disp_ll;  /*Linked list of screens*/                                                            \
+    prefix lv_ll_t _lv_indev_ll; /*Linked list of screens*/                                                            \
+    prefix lv_ll_t _lv_drv_ll;                                                                                         \
+    prefix lv_ll_t _lv_file_ll;                                                                                        \
+    prefix lv_ll_t _lv_anim_ll;                                                                                        \
+    prefix lv_ll_t _lv_group_ll;                                                                                       \
+    prefix lv_ll_t _lv_img_defoder_ll;                                                                                 \
     prefix void * _lv_task_act;
 
 #define LV_NO_PREFIX

@@ -17,11 +17,11 @@
 #define STYLE_MIX_SHIFT 8 /*log2(STYLE_MIX_MAX)*/
 
 #define VAL_PROP(v1, v2, r) v1 + (((v2 - v1) * r) >> STYLE_MIX_SHIFT)
-#define STYLE_ATTR_MIX(attr, r)                                                                    \
-    if(start->attr != end->attr) {                                                                 \
-        res->attr = VAL_PROP(start->attr, end->attr, r);                                           \
-    } else {                                                                                       \
-        res->attr = start->attr;                                                                   \
+#define STYLE_ATTR_MIX(attr, r)                                                                                        \
+    if(start->attr != end->attr) {                                                                                     \
+        res->attr = VAL_PROP(start->attr, end->attr, r);                                                               \
+    } else {                                                                                                           \
+        res->attr = start->attr;                                                                                       \
     }
 
 /**********************
@@ -229,8 +229,7 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src)
  * @param res store the result style here
  * @param ratio the ratio of mix [0..256]; 0: `start` style; 256: `end` style
  */
-void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res,
-                  uint16_t ratio)
+void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res, uint16_t ratio)
 {
     STYLE_ATTR_MIX(body.opa, ratio);
     STYLE_ATTR_MIX(body.radius, ratio);
@@ -277,34 +276,32 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
 
 #if LV_USE_ANIMATION
 
-
 void lv_style_anim_init(lv_anim_t * a)
 {
     lv_anim_init(a);
-    a->start          = 0;
-    a->end            = STYLE_MIX_MAX;
-    a->exec_cb        = (lv_anim_exec_cb_t)style_animator;
-    a->path_cb        = lv_anim_path_linear;
-    a->ready_cb       = style_animation_common_end_cb;
+    a->start    = 0;
+    a->end      = STYLE_MIX_MAX;
+    a->exec_cb  = (lv_anim_exec_cb_t)style_animator;
+    a->path_cb  = lv_anim_path_linear;
+    a->ready_cb = style_animation_common_end_cb;
 
-   lv_style_anim_dsc_t * dsc;
-   dsc = lv_mem_alloc(sizeof(lv_style_anim_dsc_t));
-   lv_mem_assert(dsc);
-   if(dsc == NULL) return;
-   dsc->ready_cb = NULL;
-   dsc->style_anim = NULL;
-   lv_style_copy(&dsc->style_start, &lv_style_plain);
-   lv_style_copy(&dsc->style_end, &lv_style_plain);
+    lv_style_anim_dsc_t * dsc;
+    dsc = lv_mem_alloc(sizeof(lv_style_anim_dsc_t));
+    lv_mem_assert(dsc);
+    if(dsc == NULL) return;
+    dsc->ready_cb   = NULL;
+    dsc->style_anim = NULL;
+    lv_style_copy(&dsc->style_start, &lv_style_plain);
+    lv_style_copy(&dsc->style_end, &lv_style_plain);
 
-   a->var            = (void *)dsc;
-
+    a->var = (void *)dsc;
 }
 
 void lv_style_anim_set_styles(lv_anim_t * a, lv_style_t * to_anim, const lv_style_t * start, const lv_style_t * end)
 {
 
     lv_style_anim_dsc_t * dsc = a->var;
-    dsc->style_anim = to_anim;
+    dsc->style_anim           = to_anim;
     memcpy(&dsc->style_start, start, sizeof(lv_style_t));
     memcpy(&dsc->style_end, end, sizeof(lv_style_t));
     memcpy(dsc->style_anim, start, sizeof(lv_style_t));
@@ -338,7 +335,7 @@ static void style_animator(lv_style_anim_dsc_t * dsc, lv_anim_value_t val)
 static void style_animation_common_end_cb(lv_anim_t * a)
 {
 
-    (void) a;       /*Unused*/
+    (void)a;                            /*Unused*/
     lv_style_anim_dsc_t * dsc = a->var; /*To avoid casting*/
 
     if(dsc->ready_cb) dsc->ready_cb(a);

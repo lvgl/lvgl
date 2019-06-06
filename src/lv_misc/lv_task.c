@@ -20,8 +20,8 @@
  *      DEFINES
  *********************/
 #define IDLE_MEAS_PERIOD 500 /*[ms]*/
-#define DEF_PRIO         LV_TASK_PRIO_MID
-#define DEF_PERIOD       500
+#define DEF_PRIO LV_TASK_PRIO_MID
+#define DEF_PERIOD 500
 
 /**********************
  *      TYPEDEFS
@@ -119,8 +119,8 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
             else if(task_interrupter) {
                 if(((lv_task_t *)LV_GC_ROOT(_lv_task_act))->prio > task_interrupter->prio) {
                     if(lv_task_exec(LV_GC_ROOT(_lv_task_act))) {
-                        task_interrupter = LV_GC_ROOT(
-                            _lv_task_act); /*Check all tasks again from the highest priority */
+                        task_interrupter =
+                            LV_GC_ROOT(_lv_task_act); /*Check all tasks again from the highest priority */
                         end_flag = false;
                         break;
                     }
@@ -130,17 +130,14 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
              * Just run the remaining tasks*/
             else {
                 if(lv_task_exec(LV_GC_ROOT(_lv_task_act))) {
-                    task_interrupter = LV_GC_ROOT(
-                        _lv_task_act); /*Check all tasks again from the highest priority */
-                    end_flag = false;
+                    task_interrupter = LV_GC_ROOT(_lv_task_act); /*Check all tasks again from the highest priority */
+                    end_flag         = false;
                     break;
                 }
             }
 
-            if(task_deleted)
-                break; /*If a task was deleted then this or the next item might be corrupted*/
-            if(task_created)
-                break; /*If a task was created then this or the next item might be corrupted*/
+            if(task_deleted) break; /*If a task was deleted then this or the next item might be corrupted*/
+            if(task_created) break; /*If a task was created then this or the next item might be corrupted*/
 
             LV_GC_ROOT(_lv_task_act) = next; /*Load the next task*/
         }
@@ -150,9 +147,8 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
     uint32_t idle_period_time = lv_tick_elaps(idle_period_start);
     if(idle_period_time >= IDLE_MEAS_PERIOD) {
 
-        idle_last = (uint32_t)((uint32_t)busy_time * 100) /
-                    IDLE_MEAS_PERIOD;                              /*Calculate the busy percentage*/
-        idle_last         = idle_last > 100 ? 0 : 100 - idle_last; /*But we need idle time*/
+        idle_last         = (uint32_t)((uint32_t)busy_time * 100) / IDLE_MEAS_PERIOD; /*Calculate the busy percentage*/
+        idle_last         = idle_last > 100 ? 0 : 100 - idle_last;                    /*But we need idle time*/
         busy_time         = 0;
         idle_period_start = lv_tick_get();
     }
@@ -200,20 +196,19 @@ lv_task_t * lv_task_create_basic(void)
         }
     }
 
-    new_task->period   = DEF_PERIOD;
-    new_task->task_cb  = NULL;
-    new_task->prio     = DEF_PRIO;
+    new_task->period  = DEF_PERIOD;
+    new_task->task_cb = NULL;
+    new_task->prio    = DEF_PRIO;
 
     new_task->once     = 0;
     new_task->last_run = lv_tick_get();
 
-    new_task->user_data= NULL;
+    new_task->user_data = NULL;
 
     task_created = true;
 
     return new_task;
 }
-
 
 /**
  * Create a new lv_task
@@ -360,8 +355,8 @@ static bool lv_task_exec(lv_task_t * task)
     uint32_t elp = lv_tick_elaps(task->last_run);
     if(elp >= task->period) {
         task->last_run = lv_tick_get();
-        task_deleted        = false;
-        task_created        = false;
+        task_deleted   = false;
+        task_created   = false;
         if(task->task_cb) task->task_cb(task);
 
         /*Delete if it was a one shot lv_task*/

@@ -98,8 +98,7 @@ void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout);
  * @param top bottom fit policy from `lv_fit_t`
  * @param bottom bottom fit policy from `lv_fit_t`
  */
-void lv_cont_set_fit4(lv_obj_t * cont, lv_fit_t left, lv_fit_t right, lv_fit_t top,
-                      lv_fit_t bottom);
+void lv_cont_set_fit4(lv_obj_t * cont, lv_fit_t left, lv_fit_t right, lv_fit_t top, lv_fit_t bottom);
 
 /**
  * Set the fit policy horizontally and vertically separately.

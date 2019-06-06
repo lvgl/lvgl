@@ -40,11 +40,10 @@ extern "C" {
 
 /*Scrollbar modes: shows when should the scrollbars be visible*/
 enum {
-    LV_SB_MODE_OFF  = 0x0, /*Never show scrollbars*/
-    LV_SB_MODE_ON   = 0x1, /*Always show scrollbars*/
-    LV_SB_MODE_DRAG = 0x2, /*Show scrollbars when page is being dragged*/
-    LV_SB_MODE_AUTO =
-        0x3, /*Show scrollbars when the scrollable container is large enough to be scrolled*/
+    LV_SB_MODE_OFF    = 0x0, /*Never show scrollbars*/
+    LV_SB_MODE_ON     = 0x1, /*Always show scrollbars*/
+    LV_SB_MODE_DRAG   = 0x2, /*Show scrollbars when page is being dragged*/
+    LV_SB_MODE_AUTO   = 0x3, /*Show scrollbars when the scrollable container is large enough to be scrolled*/
     LV_SB_MODE_HIDE   = 0x4, /*Hide the scroll bar temporally*/
     LV_SB_MODE_UNHIDE = 0x5, /*Unhide the previously hidden scrollbar. Recover it's type too*/
 };
@@ -52,12 +51,7 @@ typedef uint8_t lv_sb_mode_t;
 
 /*Edges: describes the four edges of the page*/
 
-enum {
-    LV_PAGE_EDGE_LEFT   = 0x0,
-    LV_PAGE_EDGE_TOP    = 0x1,
-    LV_PAGE_EDGE_RIGHT  = 0x2,
-    LV_PAGE_EDGE_BOTTOM = 0x3
-};
+enum { LV_PAGE_EDGE_LEFT = 0x0, LV_PAGE_EDGE_TOP = 0x1, LV_PAGE_EDGE_RIGHT = 0x2, LV_PAGE_EDGE_BOTTOM = 0x3 };
 typedef uint8_t lv_page_edge_t;
 
 /*Data of page*/
@@ -69,28 +63,26 @@ typedef struct
     struct
     {
         const lv_style_t * style; /*Style of scrollbars*/
-        lv_area_t
-            hor_area; /*Horizontal scrollbar area relative to the page. (Handled by the library) */
-        lv_area_t
-            ver_area; /*Vertical scrollbar area relative to the page (Handled by the library)*/
-        uint8_t hor_draw : 1;  /*1: horizontal scrollbar is visible now (Handled by the library)*/
-        uint8_t ver_draw : 1;  /*1: vertical scrollbar is visible now (Handled by the library)*/
-        lv_sb_mode_t mode : 3; /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
+        lv_area_t hor_area;       /*Horizontal scrollbar area relative to the page. (Handled by the library) */
+        lv_area_t ver_area;       /*Vertical scrollbar area relative to the page (Handled by the library)*/
+        uint8_t hor_draw : 1;     /*1: horizontal scrollbar is visible now (Handled by the library)*/
+        uint8_t ver_draw : 1;     /*1: vertical scrollbar is visible now (Handled by the library)*/
+        lv_sb_mode_t mode : 3;    /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
     } sb;
 #if LV_USE_ANIMATION
     struct
     {
-        lv_anim_value_t state;      /*Store the current size of the edge flash effect*/
-        const lv_style_t * style;  /*Style of edge flash effect (usually homogeneous circle)*/
-        uint8_t enabled : 1; /*1: Show a flash animation on the edge*/
-        uint8_t top_ip : 1; /*Used internally to show that top most position is reached (flash is In
-                               Progress)*/
-        uint8_t bottom_ip : 1; /*Used internally to show that bottom most position is reached (flash
-                                  is In Progress)*/
-        uint8_t right_ip : 1;  /*Used internally to show that right most position is reached (flash
-                                  is In Progress)*/
-        uint8_t left_ip : 1; /*Used internally to show that left most position is reached (flash is
-                                In Progress)*/
+        lv_anim_value_t state;    /*Store the current size of the edge flash effect*/
+        const lv_style_t * style; /*Style of edge flash effect (usually homogeneous circle)*/
+        uint8_t enabled : 1;      /*1: Show a flash animation on the edge*/
+        uint8_t top_ip : 1;       /*Used internally to show that top most position is reached (flash is In
+                                     Progress)*/
+        uint8_t bottom_ip : 1;    /*Used internally to show that bottom most position is reached (flash
+                                     is In Progress)*/
+        uint8_t right_ip : 1;     /*Used internally to show that right most position is reached (flash
+                                     is In Progress)*/
+        uint8_t left_ip : 1;      /*Used internally to show that left most position is reached (flash is
+                                     In Progress)*/
     } edge_flash;
 #endif
 
@@ -175,8 +167,7 @@ void lv_page_set_edge_flash(lv_obj_t * page, bool en);
  * @param top bottom fit policy from `lv_fit_t`
  * @param bottom bottom fit policy from `lv_fit_t`
  */
-static inline void lv_page_set_scrl_fit4(lv_obj_t * page, lv_fit_t left, lv_fit_t right,
-                                         lv_fit_t top, lv_fit_t bottom)
+static inline void lv_page_set_scrl_fit4(lv_obj_t * page, lv_fit_t left, lv_fit_t right, lv_fit_t top, lv_fit_t bottom)
 {
     lv_cont_set_fit4(lv_page_get_scrl(page), left, right, top, bottom);
 }

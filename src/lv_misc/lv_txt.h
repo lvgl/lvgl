@@ -29,8 +29,8 @@ extern "C" {
  *********************/
 #define LV_TXT_COLOR_CMD "#"
 
-#define LV_TXT_ENC_UTF8       1
-#define LV_TXT_ENC_ASCII  2
+#define LV_TXT_ENC_UTF8 1
+#define LV_TXT_ENC_ASCII 2
 
 /**********************
  *      TYPEDEFS
@@ -66,9 +66,8 @@ typedef uint8_t lv_txt_cmd_state_t;
  * @param max_width max with of the text (break the lines to fit this size) Set CORD_MAX to avoid
  * line breaks
  */
-void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font,
-                     lv_coord_t letter_space, lv_coord_t line_space, lv_coord_t max_width,
-                     lv_txt_flag_t flag);
+void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
+                     lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag);
 
 /**
  * Get the next line of text. Check line length and break chars too.
@@ -81,8 +80,8 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8
  * they are different)
  */
-uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord_t letter_space,
-                              lv_coord_t max_width, lv_txt_flag_t flag);
+uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord_t letter_space, lv_coord_t max_width,
+                              lv_txt_flag_t flag);
 
 /**
  * Give the length of a text with a given font
@@ -94,8 +93,8 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord
  * @param flags settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
-lv_coord_t lv_txt_get_width(const char * txt, uint16_t length, const lv_font_t * font,
-                            lv_coord_t letter_space, lv_txt_flag_t flag);
+lv_coord_t lv_txt_get_width(const char * txt, uint16_t length, const lv_font_t * font, lv_coord_t letter_space,
+                            lv_txt_flag_t flag);
 
 /**
  * Check next character in a string and decide if te character is part of the command or not

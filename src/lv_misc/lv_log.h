@@ -42,7 +42,7 @@ typedef int8_t lv_log_level_t;
 /**
  * Log print function. Receives "Log Level", "File path", "Line number" and "Description".
  */
-typedef void (*lv_log_print_g_cb_t) (lv_log_level_t level, const char *, uint32_t, const char *);
+typedef void (*lv_log_print_g_cb_t)(lv_log_level_t level, const char *, uint32_t, const char *);
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -77,25 +77,25 @@ void lv_log_add(lv_log_level_t level, const char * file, int line, const char * 
 #else /*LV_USE_LOG*/
 
 /*Do nothing if `LV_USE_LOG  0`*/
-#define lv_log_add(level, file, line, dsc)                                                         \
-    {                                                                                              \
-        ;                                                                                          \
+#define lv_log_add(level, file, line, dsc)                                                                             \
+    {                                                                                                                  \
+        ;                                                                                                              \
     }
-#define LV_LOG_TRACE(dsc)                                                                          \
-    {                                                                                              \
-        ;                                                                                          \
+#define LV_LOG_TRACE(dsc)                                                                                              \
+    {                                                                                                                  \
+        ;                                                                                                              \
     }
-#define LV_LOG_INFO(dsc)                                                                           \
-    {                                                                                              \
-        ;                                                                                          \
+#define LV_LOG_INFO(dsc)                                                                                               \
+    {                                                                                                                  \
+        ;                                                                                                              \
     }
-#define LV_LOG_WARN(dsc)                                                                           \
-    {                                                                                              \
-        ;                                                                                          \
+#define LV_LOG_WARN(dsc)                                                                                               \
+    {                                                                                                                  \
+        ;                                                                                                              \
     }
-#define LV_LOG_ERROR(dsc)                                                                          \
-    {                                                                                              \
-        ;                                                                                          \
+#define LV_LOG_ERROR(dsc)                                                                                              \
+    {                                                                                                                  \
+        ;                                                                                                              \
     }
 #endif /*LV_USE_LOG*/
 

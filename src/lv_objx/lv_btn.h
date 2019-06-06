@@ -61,7 +61,7 @@ typedef struct
     uint16_t ink_out_time;  /*[ms] Time of ink disappearing*/
 #endif
     lv_btn_state_t state : 3; /*Current state of the button from 'lv_btn_state_t' enum*/
-    uint8_t toggle : 1; /*1: Toggle enabled*/
+    uint8_t toggle : 1;       /*1: Toggle enabled*/
 } lv_btn_ext_t;
 
 /*Styles*/
@@ -129,8 +129,7 @@ static inline void lv_btn_set_layout(lv_obj_t * btn, lv_layout_t layout)
  * @param top bottom fit policy from `lv_fit_t`
  * @param bottom bottom fit policy from `lv_fit_t`
  */
-static inline void lv_btn_set_fit4(lv_obj_t * btn, lv_fit_t left, lv_fit_t right, lv_fit_t top,
-                                   lv_fit_t bottom)
+static inline void lv_btn_set_fit4(lv_obj_t * btn, lv_fit_t left, lv_fit_t right, lv_fit_t top, lv_fit_t bottom)
 {
     lv_cont_set_fit4(btn, left, right, top, bottom);
 }

@@ -72,8 +72,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(new_roller);
     if(new_roller == NULL) return NULL;
 
-    if(ancestor_scrl_signal == NULL)
-        ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(new_roller));
+    if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(new_roller));
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_roller);
 
     /*Allocate the roller type specific extended data*/
@@ -89,7 +88,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new roller roller*/
     if(copy == NULL) {
         lv_obj_t * scrl = lv_page_get_scrl(new_roller);
-        lv_obj_set_drag(scrl, true); /*In ddlist it might be disabled*/
+        lv_obj_set_drag(scrl, true);                                  /*In ddlist it might be disabled*/
         lv_page_set_scrl_fit2(new_roller, LV_FIT_TIGHT, LV_FIT_NONE); /*Height is specified directly*/
         lv_ddlist_open(new_roller, false);
         lv_ddlist_set_anim_time(new_roller, LV_ROLLER_DEF_ANIM_TIME);
@@ -181,8 +180,7 @@ void lv_roller_set_align(lv_obj_t * roller, lv_label_align_t align)
 {
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_mem_assert(ext);
-    if(ext->ddlist.label == NULL)
-        return; /*Probably the roller is being deleted if the label is NULL.*/
+    if(ext->ddlist.label == NULL) return; /*Probably the roller is being deleted if the label is NULL.*/
     lv_label_set_align(ext->ddlist.label, align);
 }
 
@@ -323,10 +321,8 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         lv_roller_ext_t * ext    = lv_obj_get_ext_attr(roller);
         lv_coord_t font_h        = lv_font_get_line_height(font);
         lv_area_t rect_area;
-        rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 -
-                       style->text.line_space / 2;
-        if((font_h & 0x1) && (style->text.line_space & 0x1))
-            rect_area.y1--; /*Compensate the two rounding error*/
+        rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.line_space / 2;
+        if((font_h & 0x1) && (style->text.line_space & 0x1)) rect_area.y1--; /*Compensate the two rounding error*/
         rect_area.y2 = rect_area.y1 + font_h + style->text.line_space - 1;
         rect_area.x1 = roller->coords.x1;
         rect_area.x2 = roller->coords.x2;
@@ -343,10 +339,8 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
 
         /*Redraw the text on the selected area with a different color*/
         lv_area_t rect_area;
-        rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 -
-                       style->text.line_space / 2;
-        if((font_h & 0x1) && (style->text.line_space & 0x1))
-            rect_area.y1--; /*Compensate the two rounding error*/
+        rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.line_space / 2;
+        if((font_h & 0x1) && (style->text.line_space & 0x1)) rect_area.y1--; /*Compensate the two rounding error*/
         rect_area.y2 = rect_area.y1 + font_h + style->text.line_space - 1;
         rect_area.x1 = roller->coords.x1;
         rect_area.x2 = roller->coords.x2;
@@ -435,9 +429,8 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
                 ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id;
             }
         } else {
-            ext->ddlist.sel_opt_id_ori =
-                ext->ddlist.sel_opt_id; /*Save the current value. Used to revert this state if ENER
-                                           wont't be pressed*/
+            ext->ddlist.sel_opt_id_ori = ext->ddlist.sel_opt_id; /*Save the current value. Used to revert this state if
+                                                                    ENER wont't be pressed*/
         }
 #endif
     } else if(sign == LV_SIGNAL_DEFOCUS) {
@@ -452,15 +445,13 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(ext->ddlist.sel_opt_id + 1 < ext->ddlist.option_cnt) {
-                uint16_t ori_id =
-                    ext->ddlist.sel_opt_id_ori; /*lv_roller_set_selceted will overwrite this*/
+                uint16_t ori_id = ext->ddlist.sel_opt_id_ori; /*lv_roller_set_selceted will overwrite this*/
                 lv_roller_set_selected(roller, ext->ddlist.sel_opt_id + 1, true);
                 ext->ddlist.sel_opt_id_ori = ori_id;
             }
         } else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
             if(ext->ddlist.sel_opt_id > 0) {
-                uint16_t ori_id =
-                    ext->ddlist.sel_opt_id_ori; /*lv_roller_set_selceted will overwrite this*/
+                uint16_t ori_id = ext->ddlist.sel_opt_id_ori; /*lv_roller_set_selceted will overwrite this*/
                 lv_roller_set_selected(roller, ext->ddlist.sel_opt_id - 1, true);
                 ext->ddlist.sel_opt_id_ori = ori_id;
             }
@@ -529,12 +520,10 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
             /*In edit mode go to navigate mode if an option is selected*/
             lv_group_t * g = lv_obj_get_group(roller);
             bool editing   = lv_group_get_editing(g);
-            if(editing)
-                lv_group_set_editing(g, false);
+            if(editing) lv_group_set_editing(g, false);
 #endif
         }
-    }
-    else if(sign == LV_SIGNAL_PRESSED) {
+    } else if(sign == LV_SIGNAL_PRESSED) {
 #if LV_USE_ANIMATION
         lv_anim_del(roller_scrl, (lv_anim_exec_cb_t)lv_obj_set_y);
 #endif
@@ -582,8 +571,7 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * mask)
     half_roller.x2 += roller->ext_draw_pad;
     half_roller.y2 = roller->coords.y2 + roller->ext_draw_pad;
     half_roller.y1 = roller->coords.y1 + h / 2;
-    if((h & 0x1) == 0)
-        half_roller.y1++; /*With even height the pixels in the middle would be drawn twice*/
+    if((h & 0x1) == 0) half_roller.y1++; /*With even height the pixels in the middle would be drawn twice*/
 
     union_ok = lv_area_intersect(&half_mask, &half_roller, mask);
 
@@ -620,24 +608,24 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
 
     /* Normally the animtaion's `end_cb` sets correct position of the roller is infinite.
      * But without animations do it manually*/
-    if(anim_en == false 
+    if(anim_en == false
 #if LV_USE_ANIMATION
-            || ext->ddlist.anim_time == 0
+       || ext->ddlist.anim_time == 0
 #endif
-            ) {
+    ) {
         inf_normalize(roller_scrl);
     }
 
-    int32_t id         = ext->ddlist.sel_opt_id;
-    lv_coord_t line_y1 = id * (font_h + style_label->text.line_space) +
-                         ext->ddlist.label->coords.y1 - roller_scrl->coords.y1;
+    int32_t id = ext->ddlist.sel_opt_id;
+    lv_coord_t line_y1 =
+        id * (font_h + style_label->text.line_space) + ext->ddlist.label->coords.y1 - roller_scrl->coords.y1;
     lv_coord_t new_y = -line_y1 + (h - font_h) / 2;
 
-    if( anim_en == false 
+    if(anim_en == false
 #if LV_USE_ANIMATION
-            || ext->ddlist.anim_time == 0
+       || ext->ddlist.anim_time == 0
 #endif
-            ) {
+    ) {
         lv_obj_set_y(roller_scrl, new_y);
     } else {
 #if LV_USE_ANIMATION
@@ -675,8 +663,7 @@ static void refr_height(lv_obj_t * roller)
             obj_align = LV_ALIGN_IN_RIGHT_MID;
     }
 
-    lv_obj_set_height(lv_page_get_scrl(roller),
-            lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
+    lv_obj_set_height(lv_page_get_scrl(roller), lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
     lv_obj_align(ext->ddlist.label, NULL, obj_align, 0, 0);
 #if LV_USE_ANIMATION
     lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_cb_t)lv_obj_set_y);
@@ -699,8 +686,7 @@ static void inf_normalize(void * scrl)
 
         ext->ddlist.sel_opt_id = ext->ddlist.sel_opt_id % real_id_cnt;
 
-        ext->ddlist.sel_opt_id +=
-            (LV_ROLLER_INF_PAGES / 2) * real_id_cnt; /*Select the middle page*/
+        ext->ddlist.sel_opt_id += (LV_ROLLER_INF_PAGES / 2) * real_id_cnt; /*Select the middle page*/
 
         /*Move to the new id*/
         const lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);

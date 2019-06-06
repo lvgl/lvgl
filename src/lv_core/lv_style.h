@@ -143,8 +143,7 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
  * @param res store the result style here
  * @param ratio the ratio of mix [0..256]; 0: `start` style; 256: `end` style
  */
-void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res,
-                  uint16_t ratio);
+void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res, uint16_t ratio);
 
 #if LV_USE_ANIMATION
 
@@ -187,7 +186,7 @@ static inline void lv_style_anim_set_time(lv_anim_t * a, uint16_t duration, uint
 static inline void lv_style_anim_set_ready_cb(lv_anim_t * a, lv_anim_ready_cb_t ready_cb)
 {
     lv_style_anim_dsc_t * dsc = a->var;
-    dsc->ready_cb = ready_cb;
+    dsc->ready_cb             = ready_cb;
 }
 
 /**

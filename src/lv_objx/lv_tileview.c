@@ -73,11 +73,10 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_tileview);
-    if(ancestor_scrl_signal == NULL)
-        ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(new_tileview));
+    if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(new_tileview));
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_tileview);
 
-    /*Initialize the allocated 'ext' */
+        /*Initialize the allocated 'ext' */
 #if LV_USE_ANIMATION
     ext->anim_time = LV_TILEVIEW_DEF_ANIM_TIME;
 #endif
@@ -112,7 +111,7 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->act_id.x                = copy_ext->act_id.x;
         ext->act_id.y                = copy_ext->act_id.y;
 #if LV_USE_ANIMATION
-        ext->anim_time               = copy_ext->anim_time;
+        ext->anim_time = copy_ext->anim_time;
 #endif
 
         /*Refresh the style with new signal function*/
@@ -354,19 +353,16 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
             /*Set horizontal drag constraint if no vertical constraint an dragged to valid x
              * direction */
-            if(ext->drag_ver == 0 && ((ext->drag_right_en && indev->proc.types.pointer.drag_sum.x <=
-                                                                 -LV_INDEV_DEF_DRAG_LIMIT) ||
-                                      (ext->drag_left_en && indev->proc.types.pointer.drag_sum.x >=
-                                                                LV_INDEV_DEF_DRAG_LIMIT))) {
+            if(ext->drag_ver == 0 &&
+               ((ext->drag_right_en && indev->proc.types.pointer.drag_sum.x <= -LV_INDEV_DEF_DRAG_LIMIT) ||
+                (ext->drag_left_en && indev->proc.types.pointer.drag_sum.x >= LV_INDEV_DEF_DRAG_LIMIT))) {
                 ext->drag_hor = 1;
             }
             /*Set vertical drag constraint if no horizontal constraint an dragged to valid y
              * direction */
             if(ext->drag_hor == 0 &&
-               ((ext->drag_bottom_en &&
-                 indev->proc.types.pointer.drag_sum.y <= -LV_INDEV_DEF_DRAG_LIMIT) ||
-                (ext->drag_top_en &&
-                 indev->proc.types.pointer.drag_sum.y >= LV_INDEV_DEF_DRAG_LIMIT))) {
+               ((ext->drag_bottom_en && indev->proc.types.pointer.drag_sum.y <= -LV_INDEV_DEF_DRAG_LIMIT) ||
+                (ext->drag_top_en && indev->proc.types.pointer.drag_sum.y >= LV_INDEV_DEF_DRAG_LIMIT))) {
                 ext->drag_ver = 1;
             }
 
@@ -387,8 +383,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
             lv_coord_t h = lv_obj_get_height(tileview);
             lv_coord_t w = lv_obj_get_width(tileview);
             if(ext->drag_top_en == 0) {
-                if(y > -(ext->act_id.y * h) && indev->proc.types.pointer.vect.y > 0 &&
-                   ext->drag_hor == 0) {
+                if(y > -(ext->act_id.y * h) && indev->proc.types.pointer.vect.y > 0 && ext->drag_hor == 0) {
 #if LV_USE_ANIMATION
                     if(ext->page.edge_flash.enabled && ext->page.edge_flash.left_ip == 0 &&
                        ext->page.edge_flash.right_ip == 0 && ext->page.edge_flash.top_ip == 0 &&
@@ -401,8 +396,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
                     lv_obj_set_y(scrl, -ext->act_id.y * h + style_bg->body.padding.top);
                 }
             }
-            if(ext->drag_bottom_en == 0 && indev->proc.types.pointer.vect.y < 0 &&
-               ext->drag_hor == 0) {
+            if(ext->drag_bottom_en == 0 && indev->proc.types.pointer.vect.y < 0 && ext->drag_hor == 0) {
                 if(y < -(ext->act_id.y * h)) {
 #if LV_USE_ANIMATION
                     if(ext->page.edge_flash.enabled && ext->page.edge_flash.left_ip == 0 &&
@@ -417,8 +411,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
                 lv_obj_set_y(scrl, -ext->act_id.y * h + style_bg->body.padding.top);
             }
             if(ext->drag_left_en == 0) {
-                if(x > -(ext->act_id.x * w) && indev->proc.types.pointer.vect.x > 0 &&
-                   ext->drag_ver == 0) {
+                if(x > -(ext->act_id.x * w) && indev->proc.types.pointer.vect.x > 0 && ext->drag_ver == 0) {
 #if LV_USE_ANIMATION
                     if(ext->page.edge_flash.enabled && ext->page.edge_flash.left_ip == 0 &&
                        ext->page.edge_flash.right_ip == 0 && ext->page.edge_flash.top_ip == 0 &&
@@ -431,8 +424,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
                     lv_obj_set_x(scrl, -ext->act_id.x * w + style_bg->body.padding.left);
                 }
             }
-            if(ext->drag_right_en == 0 && indev->proc.types.pointer.vect.x < 0 &&
-               ext->drag_ver == 0) {
+            if(ext->drag_right_en == 0 && indev->proc.types.pointer.vect.x < 0 && ext->drag_ver == 0) {
                 if(x < -(ext->act_id.x * w)) {
 #if LV_USE_ANIMATION
                     if(ext->page.edge_flash.enabled && ext->page.edge_flash.left_ip == 0 &&
@@ -449,11 +441,9 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
             /*Apply the drag constraints*/
             if(ext->drag_ver == 0)
-                lv_obj_set_y(scrl, -ext->act_id.y * lv_obj_get_height(tileview) +
-                                       style_bg->body.padding.top);
+                lv_obj_set_y(scrl, -ext->act_id.y * lv_obj_get_height(tileview) + style_bg->body.padding.top);
             if(ext->drag_hor == 0)
-                lv_obj_set_x(scrl, -ext->act_id.x * lv_obj_get_width(tileview) +
-                                       style_bg->body.padding.left);
+                lv_obj_set_x(scrl, -ext->act_id.x * lv_obj_get_width(tileview) + style_bg->body.padding.left);
         }
     }
     return res;
@@ -554,14 +544,10 @@ static bool set_valid_drag_dirs(lv_obj_t * tileview)
 
     uint16_t i;
     for(i = 0; ext->valid_pos[i].x != LV_COORD_MIN; i++) {
-        if(ext->valid_pos[i].x == ext->act_id.x && ext->valid_pos[i].y == ext->act_id.y - 1)
-            ext->drag_top_en = 1;
-        if(ext->valid_pos[i].x == ext->act_id.x && ext->valid_pos[i].y == ext->act_id.y + 1)
-            ext->drag_bottom_en = 1;
-        if(ext->valid_pos[i].x == ext->act_id.x - 1 && ext->valid_pos[i].y == ext->act_id.y)
-            ext->drag_left_en = 1;
-        if(ext->valid_pos[i].x == ext->act_id.x + 1 && ext->valid_pos[i].y == ext->act_id.y)
-            ext->drag_right_en = 1;
+        if(ext->valid_pos[i].x == ext->act_id.x && ext->valid_pos[i].y == ext->act_id.y - 1) ext->drag_top_en = 1;
+        if(ext->valid_pos[i].x == ext->act_id.x && ext->valid_pos[i].y == ext->act_id.y + 1) ext->drag_bottom_en = 1;
+        if(ext->valid_pos[i].x == ext->act_id.x - 1 && ext->valid_pos[i].y == ext->act_id.y) ext->drag_left_en = 1;
+        if(ext->valid_pos[i].x == ext->act_id.x + 1 && ext->valid_pos[i].y == ext->act_id.y) ext->drag_right_en = 1;
     }
 
     return true;

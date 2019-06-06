@@ -152,9 +152,8 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
         format.s.crop        = 0;
     }
 
-    ext->cell_data[cell] =
-        lv_mem_realloc(ext->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
-    strcpy(ext->cell_data[cell] + 1, txt);                     /*Leave the format byte*/
+    ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
+    strcpy(ext->cell_data[cell] + 1, txt);                                        /*Leave the format byte*/
     ext->cell_data[cell][0] = format.format_byte;
     refr_size(table);
 }
@@ -171,15 +170,13 @@ void lv_table_set_row_cnt(lv_obj_t * table, uint16_t row_cnt)
     ext->row_cnt         = row_cnt;
 
     if(ext->row_cnt > 0 && ext->col_cnt > 0) {
-        ext->cell_data =
-            lv_mem_realloc(ext->cell_data, ext->row_cnt * ext->col_cnt * sizeof(char *));
+        ext->cell_data = lv_mem_realloc(ext->cell_data, ext->row_cnt * ext->col_cnt * sizeof(char *));
 
         /*Initilize the new fields*/
         if(old_row_cnt < row_cnt) {
             uint16_t old_cell_cnt = old_row_cnt * ext->col_cnt;
             uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
-            memset(&ext->cell_data[old_cell_cnt], 0,
-                   (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
+            memset(&ext->cell_data[old_cell_cnt], 0, (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
         }
     } else {
         lv_mem_free(ext->cell_data);
@@ -207,14 +204,12 @@ void lv_table_set_col_cnt(lv_obj_t * table, uint16_t col_cnt)
     ext->col_cnt         = col_cnt;
 
     if(ext->row_cnt > 0 && ext->col_cnt > 0) {
-        ext->cell_data =
-            lv_mem_realloc(ext->cell_data, ext->row_cnt * ext->col_cnt * sizeof(char *));
+        ext->cell_data = lv_mem_realloc(ext->cell_data, ext->row_cnt * ext->col_cnt * sizeof(char *));
         /*Initilize the new fields*/
         if(old_col_cnt < col_cnt) {
             uint16_t old_cell_cnt = old_col_cnt * ext->row_cnt;
             uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
-            memset(&ext->cell_data[old_cell_cnt], 0,
-                   (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
+            memset(&ext->cell_data[old_cell_cnt], 0, (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
         }
 
     } else {
@@ -567,8 +562,8 @@ bool lv_table_get_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col)
  */
 const lv_style_t * lv_table_get_style(const lv_obj_t * table, lv_table_style_t type)
 {
-    lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
-    const lv_style_t * style   = NULL;
+    lv_table_ext_t * ext     = lv_obj_get_ext_attr(table);
+    const lv_style_t * style = NULL;
 
     switch(type) {
         case LV_TABLE_STYLE_BG: style = lv_obj_get_style(table); break;
@@ -695,8 +690,8 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                     bool label_mask_ok;
                     label_mask_ok = lv_area_intersect(&label_mask, mask, &cell_area);
                     if(label_mask_ok) {
-                        lv_draw_label(&txt_area, &label_mask, cell_style, opa_scale,
-                                      ext->cell_data[cell] + 1, txt_flags, NULL, -1, -1);
+                        lv_draw_label(&txt_area, &label_mask, cell_style, opa_scale, ext->cell_data[cell] + 1,
+                                      txt_flags, NULL, -1, -1);
                     }
                     /*Draw lines after '\n's*/
                     lv_point_t p1;
@@ -707,9 +702,8 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                     for(i = 1; ext->cell_data[cell][i] != '\0'; i++) {
                         if(ext->cell_data[cell][i] == '\n') {
                             ext->cell_data[cell][i] = '\0';
-                            lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1,
-                                            cell_style->text.font, cell_style->text.letter_space,
-                                            cell_style->text.line_space,
+                            lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style->text.font,
+                                            cell_style->text.letter_space, cell_style->text.line_space,
                                             lv_area_get_width(&txt_area), txt_flags);
 
                             p1.y = txt_area.y1 + txt_size.y + cell_style->text.line_space / 2;
@@ -804,8 +798,7 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
     uint16_t row_start = row_id * ext->col_cnt;
     uint16_t cell;
     uint16_t col;
-    lv_coord_t h_max = lv_font_get_line_height(ext->cell_style[0]->text.font) +
-                       ext->cell_style[0]->body.padding.top +
+    lv_coord_t h_max = lv_font_get_line_height(ext->cell_style[0]->text.font) + ext->cell_style[0]->body.padding.top +
                        ext->cell_style[0]->body.padding.bottom;
 
     for(cell = row_start, col = 0; cell < row_start + ext->col_cnt; cell++, col++) {
@@ -833,22 +826,18 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
 
             /*With text crop assume 1 line*/
             if(format.s.crop) {
-                h_max =
-                    LV_MATH_MAX(lv_font_get_line_height(cell_style->text.font) +
-                                    cell_style->body.padding.top + cell_style->body.padding.bottom,
-                                h_max);
+                h_max = LV_MATH_MAX(lv_font_get_line_height(cell_style->text.font) + cell_style->body.padding.top +
+                                        cell_style->body.padding.bottom,
+                                    h_max);
             }
             /*Without text crop calculate the height of the text in the cell*/
             else {
                 txt_w -= cell_style->body.padding.left + cell_style->body.padding.right;
 
                 lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style->text.font,
-                                cell_style->text.letter_space, cell_style->text.line_space, txt_w,
-                                LV_TXT_FLAG_NONE);
+                                cell_style->text.letter_space, cell_style->text.line_space, txt_w, LV_TXT_FLAG_NONE);
 
-                h_max = LV_MATH_MAX(txt_size.y + cell_style->body.padding.top +
-                                        cell_style->body.padding.bottom,
-                                    h_max);
+                h_max = LV_MATH_MAX(txt_size.y + cell_style->body.padding.top + cell_style->body.padding.bottom, h_max);
                 cell += col_merge;
                 col += col_merge;
             }

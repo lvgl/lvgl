@@ -74,8 +74,7 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param cf color format. The following formats are supported:
  *      LV_IMG_CF_TRUE_COLOR, LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED, LV_IMG_CF_INDEXES_1/2/4/8BIT
  */
-void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_t h,
-                          lv_img_cf_t cf);
+void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_t h, lv_img_cf_t cf);
 
 /**
  * Set the color of a pixel on the canvas
@@ -136,8 +135,8 @@ const lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_
  * @param x left side of the destination position
  * @param y top side of the destination position
  */
-void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, lv_coord_t h,
-                        lv_coord_t x, lv_coord_t y);
+void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, lv_coord_t h, lv_coord_t x,
+                        lv_coord_t y);
 
 /**
  * Rotate and image and store the result on a canvas.
@@ -152,8 +151,8 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t w, l
  * @param pivot_y pivot Y of rotation. Relative to the source canvas
  *                Set to `source height / 2` to rotate around the center
  */
-void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_coord_t offset_x,
-                      lv_coord_t offset_y, int32_t pivot_x, int32_t pivot_y);
+void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_coord_t offset_x, lv_coord_t offset_y,
+                      int32_t pivot_x, int32_t pivot_y);
 
 /**
  * Fill the canvas with color
@@ -171,7 +170,8 @@ void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color);
  * @param h height of the rectangle
  * @param style style of the rectangle (`body` properties are used except `padding`)
  */
-void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h, const lv_style_t * style);
+void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h,
+                         const lv_style_t * style);
 
 /**
  * Draw a text on the canvas.
@@ -183,7 +183,8 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
  * @param txt text to display
  * @param align align of the text (`LV_LABEL_ALIGN_LEFT/RIGHT/CENTER`)
  */
-void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w, const lv_style_t * style, const char * txt, lv_label_align_t align);
+void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w, const lv_style_t * style,
+                         const char * txt, lv_label_align_t align);
 
 /**
  * Draw a line on the canvas
@@ -213,7 +214,8 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32
  * @param end_angle end angle in degrees
  * @param style style of the polygon (`body.main_color` and `body.opa` is used)
  */
-void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t r, int32_t start_angle, int32_t end_angle, const lv_style_t * style);
+void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t r, int32_t start_angle,
+                        int32_t end_angle, const lv_style_t * style);
 
 /**********************
  *      MACROS
@@ -222,27 +224,20 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
 #define LV_CANVAS_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h) ((LV_COLOR_SIZE / 8) * w * h)
 #define LV_CANVAS_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) (LV_IMG_PX_SIZE_ALPHA_BYTE * w * h)
 
-#define LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h)                                                        \
-    ((((w / 8) + 1) *                                                                              \
-      h)) /*(w / 8) + 1): to be sure no fractional row;  LV_COLOR_SIZE / 8) * 2: palette*/
-#define LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, h)                                                      \
-    (LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h) + 4 * 2) /*4 * 2: palette*/
+#define LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h)                                                                            \
+    ((((w / 8) + 1) * h)) /*(w / 8) + 1): to be sure no fractional row;  LV_COLOR_SIZE / 8) * 2: palette*/
+#define LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h) + 4 * 2) /*4 * 2: palette*/
 
-#define LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h)                                                        \
-    ((((w / 4) + 1) *                                                                              \
-      h)) /*(w / 8) + 1): to be sure no fractional row;  LV_COLOR_SIZE / 8) * 2: palette*/
-#define LV_CANVAS_BUF_SIZE_INDEXED_2BIT(w, h)                                                      \
-    (LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h) + 4 * 4) /*4 * 4: palette*/
+#define LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h)                                                                            \
+    ((((w / 4) + 1) * h)) /*(w / 8) + 1): to be sure no fractional row;  LV_COLOR_SIZE / 8) * 2: palette*/
+#define LV_CANVAS_BUF_SIZE_INDEXED_2BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h) + 4 * 4) /*4 * 4: palette*/
 
-#define LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h)                                                        \
-    ((((w / 2) + 1) *                                                                              \
-      h)) /*(w / 8) + 1): to be sure no fractional row;  LV_COLOR_SIZE / 8) * 2: palette*/
-#define LV_CANVAS_BUF_SIZE_INDEXED_4BIT(w, h)                                                      \
-    (LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h) + 4 * 16) /*4 * 16: palette*/
+#define LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h)                                                                            \
+    ((((w / 2) + 1) * h)) /*(w / 8) + 1): to be sure no fractional row;  LV_COLOR_SIZE / 8) * 2: palette*/
+#define LV_CANVAS_BUF_SIZE_INDEXED_4BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h) + 4 * 16) /*4 * 16: palette*/
 
 #define LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w, h) ((w * h))
-#define LV_CANVAS_BUF_SIZE_INDEXED_8BIT(w, h)                                                      \
-    (LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w, h) + 4 * 256) /*4 * 256: palette*/
+#define LV_CANVAS_BUF_SIZE_INDEXED_8BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w, h) + 4 * 256) /*4 * 256: palette*/
 
 #endif /*LV_USE_CANVAS*/
 

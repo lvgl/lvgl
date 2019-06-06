@@ -36,8 +36,8 @@ extern "C" {
  * @param style style of the image
  * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src,
-                 const lv_style_t * style, lv_opa_t opa_scale);
+void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src, const lv_style_t * style,
+                 lv_opa_t opa_scale);
 
 /**
  * Get the type of an image source
@@ -59,8 +59,7 @@ lv_img_src_t lv_img_src_get_type(const void * src);
  * used.
  * @return color of the point
  */
-lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
-                                   const lv_style_t * style);
+lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, const lv_style_t * style);
 /**
  * Get the alpha value of an image's pixel
  * @param dsc pointer to an image descriptor

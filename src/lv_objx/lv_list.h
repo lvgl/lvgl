@@ -56,13 +56,13 @@ typedef struct
     const lv_style_t * style_img;                    /*Style of the list element images on buttons*/
     uint16_t size;                                   /*the number of items(buttons) in the list*/
 #if LV_USE_ANIMATION
-    uint16_t anim_time;                              /*Scroll animation time*/
+    uint16_t anim_time; /*Scroll animation time*/
 #endif
 
-    uint8_t single_mode:1;                                /* whether single selected mode is enabled */
+    uint8_t single_mode : 1; /* whether single selected mode is enabled */
 
 #if LV_USE_GROUP
-    lv_obj_t * last_sel; /* The last selected button. It will be reverted when the list is focused again */
+    lv_obj_t * last_sel;     /* The last selected button. It will be reverted when the list is focused again */
     lv_obj_t * selected_btn; /* The button is currently being selected*/
 #endif
 } lv_list_ext_t;
@@ -110,8 +110,7 @@ void lv_list_clean(lv_obj_t * obj);
  * @param event_cb specify the an event handler function. NULL if unused
  * @return pointer to the new list element which can be customized (a button)
  */
-lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt,
-                       lv_event_cb_t event_cb);
+lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_event_cb_t event_cb);
 
 /**
  * Remove the index of the button in the list

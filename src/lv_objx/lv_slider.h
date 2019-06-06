@@ -42,8 +42,8 @@ typedef struct
     lv_bar_ext_t bar; /*Ext. of ancestor*/
     /*New data for this type */
     const lv_style_t * style_knob; /*Style of the knob*/
-    int16_t drag_value; /*Store a temporal value during press until release (Handled by the library)*/
-    uint8_t knob_in : 1; /*1: Draw the knob inside the bar*/
+    int16_t drag_value;            /*Store a temporal value during press until release (Handled by the library)*/
+    uint8_t knob_in : 1;           /*1: Draw the knob inside the bar*/
 } lv_slider_ext_t;
 
 /*Built-in styles of slider*/

@@ -167,8 +167,7 @@ bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p)
  */
 bool lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
-    if((a1_p->x1 <= a2_p->x2) && (a1_p->x2 >= a2_p->x1) && (a1_p->y1 <= a2_p->y2) &&
-       (a1_p->y2 >= a2_p->y1)) {
+    if((a1_p->x1 <= a2_p->x2) && (a1_p->x2 >= a2_p->x1) && (a1_p->y1 <= a2_p->y2) && (a1_p->y2 >= a2_p->y1)) {
         return true;
     } else {
         return false;

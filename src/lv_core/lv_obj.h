@@ -45,9 +45,9 @@ extern "C" {
 
 #define LV_MAX_ANCESTOR_NUM 8
 
-#define LV_EXT_CLICK_AREA_OFF   0
-#define LV_EXT_CLICK_AREA_TINY  1
-#define LV_EXT_CLICK_AREA_FULL  2
+#define LV_EXT_CLICK_AREA_OFF 0
+#define LV_EXT_CLICK_AREA_TINY 1
+#define LV_EXT_CLICK_AREA_FULL 2
 
 /**********************
  *      TYPEDEFS
@@ -62,15 +62,14 @@ enum {
 };
 typedef uint8_t lv_design_mode_t;
 
-typedef bool (*lv_design_cb_t)(struct _lv_obj_t * obj, const lv_area_t * mask_p,
-                               lv_design_mode_t mode);
+typedef bool (*lv_design_cb_t)(struct _lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
 
 enum {
-    LV_EVENT_PRESSED,       /*The object has been pressed*/
-    LV_EVENT_PRESSING,      /*The object is being pressed (called continuously while pressing)*/
-    LV_EVENT_PRESS_LOST,    /*Still pressing but slid from the objects*/
-    LV_EVENT_SHORT_CLICKED, /*Released before long press time. Not called if dragged.*/
-    LV_EVENT_LONG_PRESSED, /*Pressing for `LV_INDEV_LONG_PRESS_TIME` time.  Not called if dragged.*/
+    LV_EVENT_PRESSED,             /*The object has been pressed*/
+    LV_EVENT_PRESSING,            /*The object is being pressed (called continuously while pressing)*/
+    LV_EVENT_PRESS_LOST,          /*Still pressing but slid from the objects*/
+    LV_EVENT_SHORT_CLICKED,       /*Released before long press time. Not called if dragged.*/
+    LV_EVENT_LONG_PRESSED,        /*Pressing for `LV_INDEV_LONG_PRESS_TIME` time.  Not called if dragged.*/
     LV_EVENT_LONG_PRESSED_REPEAT, /*Called after `LV_INDEV_LONG_PRESS_TIME` in every
                                      `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if dragged.*/
     LV_EVENT_CLICKED,             /*Called on release if not dragged (regardless to long press)*/
@@ -182,7 +181,7 @@ typedef struct _lv_obj_t
     lv_signal_cb_t signal_cb; /*Object type specific signal function*/
     lv_design_cb_t design_cb; /*Object type specific design function*/
 
-    void * ext_attr;      /*Object type specific extended data*/
+    void * ext_attr;            /*Object type specific extended data*/
     const lv_style_t * style_p; /*Pointer to the object's style*/
 
 #if LV_USE_GROUP != 0
@@ -199,22 +198,22 @@ typedef struct _lv_obj_t
 #endif
 
     /*Attributes and states*/
-    uint8_t click           :1; /*1: Can be pressed by an input device*/
-    uint8_t drag            :1; /*1: Enable the dragging*/
-    uint8_t drag_throw      :1; /*1: Enable throwing with drag*/
-    uint8_t drag_parent     :1; /*1: Parent will be dragged instead*/
-    uint8_t hidden          :1; /*1: Object is hidden*/
-    uint8_t top             :1; /*1: If the object or its children is clicked it goes to the foreground*/
-    uint8_t opa_scale_en    :1; /*1: opa_scale is set*/
-    uint8_t parent_event    :1; /*1: Send the object's events to the parent too. */
+    uint8_t click : 1;          /*1: Can be pressed by an input device*/
+    uint8_t drag : 1;           /*1: Enable the dragging*/
+    uint8_t drag_throw : 1;     /*1: Enable throwing with drag*/
+    uint8_t drag_parent : 1;    /*1: Parent will be dragged instead*/
+    uint8_t hidden : 1;         /*1: Object is hidden*/
+    uint8_t top : 1;            /*1: If the object or its children is clicked it goes to the foreground*/
+    uint8_t opa_scale_en : 1;   /*1: opa_scale is set*/
+    uint8_t parent_event : 1;   /*1: Send the object's events to the parent too. */
     lv_drag_dir_t drag_dir : 2; /* Which directions the object can be dragged in */
-    uint8_t reserved        :6; /*Reserved for future use*/
-    uint8_t protect;          /*Automatically happening actions can be prevented. 'OR'ed values from
-                                 `lv_protect_t`*/
-    lv_opa_t opa_scale; /*Scale down the opacity by this factor. Effects all children as well*/
+    uint8_t reserved : 6;       /*Reserved for future use*/
+    uint8_t protect;            /*Automatically happening actions can be prevented. 'OR'ed values from
+                                   `lv_protect_t`*/
+    lv_opa_t opa_scale;         /*Scale down the opacity by this factor. Effects all children as well*/
 
     lv_coord_t ext_draw_pad; /*EXTtend the size in every direction for drawing. */
-    
+
 #if LV_USE_OBJ_REALIGN
     lv_reailgn_t realign;
 #endif
@@ -370,8 +369,7 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
  * @param x_mod x coordinate shift after alignment
  * @param y_mod y coordinate shift after alignment
  */
-void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod,
-                  lv_coord_t y_mod);
+void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
 
 /**
  * Align an object to an other object.
@@ -381,8 +379,7 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
  * @param x_mod x coordinate shift after alignment
  * @param y_mod y coordinate shift after alignment
  */
-void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod,
-                        lv_coord_t y_mod);
+void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
 
 /**
  * Realign the object based on the last `lv_obj_align` parameters.
@@ -904,7 +901,7 @@ lv_obj_user_data_t lv_obj_get_user_data(lv_obj_t * obj);
  * @param obj pointer to an object
  * @return pointer to the user data
  */
-lv_obj_user_data_t *lv_obj_get_user_data_ptr(lv_obj_t * obj);
+lv_obj_user_data_t * lv_obj_get_user_data_ptr(lv_obj_t * obj);
 
 /**
  * Set the object's user data. The data will be copied.

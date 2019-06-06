@@ -186,7 +186,7 @@ static bool lv_led_design(lv_obj_t * led, const lv_area_t * mask, lv_design_mode
         return ancestor_design_f(led, mask, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Make darker colors in a temporary style according to the brightness*/
-        lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
+        lv_led_ext_t * ext       = lv_obj_get_ext_attr(led);
         const lv_style_t * style = lv_obj_get_style(led);
 
         /* Store the real pointer because of 'lv_group'
@@ -199,18 +199,15 @@ static bool lv_led_design(lv_obj_t * led, const lv_area_t * mask, lv_design_mode
         memcpy(&leds_tmp, style, sizeof(leds_tmp));
 
         /*Mix. the color with black proportionally with brightness*/
-        leds_tmp.body.main_color =
-            lv_color_mix(leds_tmp.body.main_color, LV_COLOR_BLACK, ext->bright);
-        leds_tmp.body.grad_color =
-            lv_color_mix(leds_tmp.body.grad_color, LV_COLOR_BLACK, ext->bright);
-        leds_tmp.body.border.color =
-            lv_color_mix(leds_tmp.body.border.color, LV_COLOR_BLACK, ext->bright);
+        leds_tmp.body.main_color   = lv_color_mix(leds_tmp.body.main_color, LV_COLOR_BLACK, ext->bright);
+        leds_tmp.body.grad_color   = lv_color_mix(leds_tmp.body.grad_color, LV_COLOR_BLACK, ext->bright);
+        leds_tmp.body.border.color = lv_color_mix(leds_tmp.body.border.color, LV_COLOR_BLACK, ext->bright);
 
         /*Set the current swidth according to brightness proportionally between LV_LED_BRIGHT_OFF
          * and LV_LED_BRIGHT_ON*/
-        uint16_t bright_tmp        = ext->bright;
-        leds_tmp.body.shadow.width = ((bright_tmp - LV_LED_BRIGHT_OFF) * style->body.shadow.width) /
-                                     (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
+        uint16_t bright_tmp = ext->bright;
+        leds_tmp.body.shadow.width =
+            ((bright_tmp - LV_LED_BRIGHT_OFF) * style->body.shadow.width) / (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
 
         led->style_p = &leds_tmp;
         ancestor_design_f(led, mask, mode);

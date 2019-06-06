@@ -43,14 +43,13 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
  * @param style style of the image
  * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src,
-                 const lv_style_t * style, lv_opa_t opa_scale)
+void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src, const lv_style_t * style,
+                 lv_opa_t opa_scale)
 {
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
         lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE,
-                      NULL, -1, -1);
+        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL, -1, -1);
         return;
     }
 
@@ -60,8 +59,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
     if(res == LV_RES_INV) {
         LV_LOG_WARN("Image draw error");
         lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE,
-                      NULL, -1, -1);
+        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL, -1, -1);
         return;
     }
 }
@@ -76,8 +74,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
  * used.
  * @return color of the point
  */
-lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
-                                   const lv_style_t * style)
+lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, const lv_style_t * style)
 {
     lv_color_t p_color = LV_COLOR_BLACK;
     if(x >= dsc->header.w) {
@@ -98,8 +95,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
 
     uint8_t * buf_u8 = (uint8_t *)dsc->data;
 
-    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR ||
-       dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED ||
+    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR || dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED ||
        dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
         uint8_t px_size = lv_img_color_format_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
@@ -217,8 +213,7 @@ void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
 {
     uint8_t * buf_u8 = (uint8_t *)dsc->data;
 
-    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR ||
-       dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
+    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR || dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
         uint8_t px_size = lv_img_color_format_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
         memcpy(&buf_u8[px], &c, px_size);
@@ -447,9 +442,8 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
                              successfully.*/
     }
 
-    lv_opa_t opa = opa_scale == LV_OPA_COVER
-                       ? style->image.opa
-                       : (uint16_t)((uint16_t)style->image.opa * opa_scale) >> 8;
+    lv_opa_t opa =
+        opa_scale == LV_OPA_COVER ? style->image.opa : (uint16_t)((uint16_t)style->image.opa * opa_scale) >> 8;
 
     lv_img_header_t header;
     lv_res_t header_res;
@@ -473,8 +467,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
     /* The decoder open could open the image and gave the entire uncompressed image.
      * Just draw it!*/
     if(img_data) {
-        lv_draw_map(coords, mask, img_data, opa, chroma_keyed, alpha_byte, style->image.color,
-                    style->image.intense);
+        lv_draw_map(coords, mask, img_data, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
     }
     /* The whole uncompressed image is not available. Try to read it line-by-line*/
     else {
@@ -483,8 +476,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
 #if LV_COMPILER_VLA_SUPPORTED
         uint8_t buf[(lv_area_get_width(&mask_com) * ((LV_COLOR_DEPTH >> 3) + 1))];
 #else
-        uint8_t buf[LV_HOR_RES_MAX *
-                    ((LV_COLOR_DEPTH >> 3) + 1)]; /*+1 because of the possible alpha byte*/
+        uint8_t buf[LV_HOR_RES_MAX * ((LV_COLOR_DEPTH >> 3) + 1)]; /*+1 because of the possible alpha byte*/
 #endif
         lv_area_t line;
         lv_area_copy(&line, &mask_com);
@@ -500,8 +492,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
                 LV_LOG_WARN("Image draw can't read the line");
                 return LV_RES_INV;
             }
-            lv_draw_map(&line, mask, buf, opa, chroma_keyed, alpha_byte, style->image.color,
-                        style->image.intense);
+            lv_draw_map(&line, mask, buf, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
             line.y1++;
             line.y2++;
             y++;

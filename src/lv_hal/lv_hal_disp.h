@@ -83,8 +83,8 @@ typedef struct _disp_drv_t
     /* OPTIONAL: Set a pixel in a buffer according to the special requirements of the display
      * Can be used for color format not supported in LittelvGL. E.g. 2 bit -> 4 gray scales
      * Note: Much slower then drawing with supported color formats. */
-    void (*set_px_cb)(struct _disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x,
-                      lv_coord_t y, lv_color_t color, lv_opa_t opa);
+    void (*set_px_cb)(struct _disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+                      lv_color_t color, lv_opa_t opa);
 
     /* OPTIONAL: Called after every refresh cycle to tell the rendering and flushing time + the
      * number of flushed pixels */
@@ -92,7 +92,8 @@ typedef struct _disp_drv_t
 
 #if LV_USE_GPU
     /*OPTIONAL: Blend two memories using opacity (GPU only)*/
-    void (*mem_blend_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
+    void (*mem_blend_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length,
+                         lv_opa_t opa);
 
     /*OPTIONAL: Fill a memory with a color (GPU only)*/
     void (*mem_fill_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest_buf, const lv_area_t * dest_area,

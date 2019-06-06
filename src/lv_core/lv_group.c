@@ -157,14 +157,12 @@ void lv_group_remove_obj(lv_obj_t * obj)
 {
     lv_group_t * g = obj->group_p;
     if(g == NULL) return;
-    if(g->obj_focus == NULL)
-        return; /*Just to be sure (Not possible if there is at least one object in the group)*/
+    if(g->obj_focus == NULL) return; /*Just to be sure (Not possible if there is at least one object in the group)*/
 
     /*Focus on the next object*/
     if(*g->obj_focus == obj) {
         /*If this is the only object in the group then focus to nothing.*/
-        if(lv_ll_get_head(&g->obj_ll) == g->obj_focus &&
-           lv_ll_get_tail(&g->obj_ll) == g->obj_focus) {
+        if(lv_ll_get_head(&g->obj_ll) == g->obj_focus && lv_ll_get_tail(&g->obj_ll) == g->obj_focus) {
             (*g->obj_focus)->signal_cb(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
         }
         /*If there more objects in the group then focus to the next/prev object*/
@@ -199,20 +197,21 @@ void lv_group_remove_obj(lv_obj_t * obj)
  */
 void lv_group_remove_all_objs(lv_group_t * group)
 {
-	/*Defocus the the currently focused object*/
-	if(group->obj_focus != NULL) {
-		(*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
-		lv_obj_invalidate(*group->obj_focus);
-		group->obj_focus = NULL;
-	}
+    /*Defocus the the currently focused object*/
+    if(group->obj_focus != NULL) {
+        (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
+        lv_obj_invalidate(*group->obj_focus);
+        group->obj_focus = NULL;
+    }
 
-	/*Remove the objects from the group*/
-	lv_obj_t ** obj;
-	LV_LL_READ(group->obj_ll, obj) {
-		(*obj)->group_p = NULL;
-	}
+    /*Remove the objects from the group*/
+    lv_obj_t ** obj;
+    LV_LL_READ(group->obj_ll, obj)
+    {
+        (*obj)->group_p = NULL;
+    }
 
-	lv_ll_clear(&(group->obj_ll));
+    lv_ll_clear(&(group->obj_ll));
 }
 
 /**
@@ -359,8 +358,7 @@ void lv_group_set_editing(lv_group_t * group, bool edit)
     lv_obj_t * focused = lv_group_get_focused(group);
 
     if(focused) {
-        focused->signal_cb(focused, LV_SIGNAL_FOCUS,
-                           NULL); /*Focus again to properly leave/open edit/navigate mode*/
+        focused->signal_cb(focused, LV_SIGNAL_FOCUS, NULL); /*Focus again to properly leave/open edit/navigate mode*/
         lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
         if(res != LV_RES_OK) return;
     }
@@ -557,8 +555,7 @@ static void style_mod_def(lv_group_t * group, lv_style_t * style)
     style->body.border.color = LV_COLOR_ORANGE;
 
     /*If not empty or has border then emphasis the border*/
-    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0)
-        style->body.border.width = LV_DPI / 20;
+    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
 
     style->body.main_color   = lv_color_mix(style->body.main_color, LV_COLOR_ORANGE, LV_OPA_70);
     style->body.grad_color   = lv_color_mix(style->body.grad_color, LV_COLOR_ORANGE, LV_OPA_70);
@@ -588,8 +585,7 @@ static void style_mod_edit_def(lv_group_t * group, lv_style_t * style)
     style->body.border.color = LV_COLOR_GREEN;
 
     /*If not empty or has border then emphasis the border*/
-    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0)
-        style->body.border.width = LV_DPI / 20;
+    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
 
     style->body.main_color   = lv_color_mix(style->body.main_color, LV_COLOR_GREEN, LV_OPA_70);
     style->body.grad_color   = lv_color_mix(style->body.grad_color, LV_COLOR_GREEN, LV_OPA_70);
@@ -657,8 +653,7 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
         if(!lv_obj_get_hidden(*obj_next)) break;
     }
 
-    if(obj_next == group->obj_focus)
-        return; /*There's only one visible object and it's already focused*/
+    if(obj_next == group->obj_focus) return; /*There's only one visible object and it's already focused*/
 
     if(group->obj_focus) {
         (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);

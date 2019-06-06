@@ -95,10 +95,10 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_TGL_PR]  = &lv_style_btn_tgl_pr;
     ext->styles_btn[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
 #if LV_USE_ANIMATION
-    ext->anim_time                        = LV_LIST_DEF_ANIM_TIME;
+    ext->anim_time = LV_LIST_DEF_ANIM_TIME;
 #endif
-    ext->single_mode                      = false;
-    ext->size                             = 0;
+    ext->single_mode = false;
+    ext->size        = 0;
 
 #if LV_USE_GROUP
     ext->last_sel     = NULL;
@@ -145,10 +145,8 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_list_set_style(new_list, LV_LIST_STYLE_BTN_REL, copy_ext->styles_btn[LV_BTN_STATE_REL]);
         lv_list_set_style(new_list, LV_LIST_STYLE_BTN_PR, copy_ext->styles_btn[LV_BTN_STATE_PR]);
-        lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_REL,
-                          copy_ext->styles_btn[LV_BTN_STATE_TGL_REL]);
-        lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_PR,
-                          copy_ext->styles_btn[LV_BTN_STATE_TGL_REL]);
+        lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_REL, copy_ext->styles_btn[LV_BTN_STATE_TGL_REL]);
+        lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_PR, copy_ext->styles_btn[LV_BTN_STATE_TGL_REL]);
         lv_list_set_style(new_list, LV_LIST_STYLE_BTN_INA, copy_ext->styles_btn[LV_BTN_STATE_INA]);
 
         /*Refresh the style with new signal function*/
@@ -184,8 +182,7 @@ void lv_list_clean(lv_obj_t * obj)
  * @param event_cb specify the an event handler function. NULL if unused
  * @return pointer to the new list element which can be customized (a button)
  */
-lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt,
-                       lv_event_cb_t event_cb)
+lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_event_cb_t event_cb)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
     ext->size++;
@@ -320,7 +317,7 @@ void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
         else if(s == LV_BTN_STATE_TGL_REL)
             lv_btn_set_state(ext->selected_btn, LV_BTN_STATE_TGL_PR);
 
-        lv_page_focus(list, ext->selected_btn, lv_list_get_anim_time(list) );
+        lv_page_focus(list, ext->selected_btn, lv_list_get_anim_time(list));
     }
 }
 
@@ -335,7 +332,7 @@ void lv_list_set_anim_time(lv_obj_t * list, uint16_t anim_time)
 {
 #if LV_USE_ANIMATION
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-    anim_time = 0;
+    anim_time           = 0;
 
     if(ext->anim_time == anim_time) return;
     ext->anim_time = anim_time;
@@ -361,9 +358,7 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t *
             break;
         case LV_LIST_STYLE_SCRL: lv_page_set_style(list, LV_PAGE_STYLE_SCRL, style); break;
         case LV_LIST_STYLE_SB: lv_page_set_style(list, LV_PAGE_STYLE_SB, style); break;
-        case LV_LIST_STYLE_EDGE_FLASH:
-            lv_page_set_style(list, LV_PAGE_STYLE_EDGE_FLASH, style);
-            break;
+        case LV_LIST_STYLE_EDGE_FLASH: lv_page_set_style(list, LV_PAGE_STYLE_EDGE_FLASH, style); break;
         case LV_LIST_STYLE_BTN_REL:
             ext->styles_btn[LV_BTN_STATE_REL] = style;
             btn_style_refr                    = LV_BTN_STYLE_REL;
@@ -387,9 +382,8 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t *
     }
 
     /*Refresh existing buttons' style*/
-    if(type == LV_LIST_STYLE_BTN_PR || type == LV_LIST_STYLE_BTN_REL ||
-       type == LV_LIST_STYLE_BTN_TGL_REL || type == LV_LIST_STYLE_BTN_TGL_PR ||
-       type == LV_LIST_STYLE_BTN_INA) {
+    if(type == LV_LIST_STYLE_BTN_PR || type == LV_LIST_STYLE_BTN_REL || type == LV_LIST_STYLE_BTN_TGL_REL ||
+       type == LV_LIST_STYLE_BTN_TGL_PR || type == LV_LIST_STYLE_BTN_INA) {
         btn = lv_list_get_prev_btn(list, NULL);
         while(btn != NULL) {
             lv_btn_set_style(btn, btn_style_refr, ext->styles_btn[btn_style_refr]);
@@ -587,16 +581,14 @@ uint16_t lv_list_get_anim_time(const lv_obj_t * list)
  *  */
 const lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type)
 {
-    const lv_style_t * style  = NULL;
-    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+    const lv_style_t * style = NULL;
+    lv_list_ext_t * ext      = lv_obj_get_ext_attr(list);
 
     switch(type) {
         case LV_LIST_STYLE_BG: style = lv_page_get_style(list, LV_PAGE_STYLE_BG); break;
         case LV_LIST_STYLE_SCRL: style = lv_page_get_style(list, LV_PAGE_STYLE_SCRL); break;
         case LV_LIST_STYLE_SB: style = lv_page_get_style(list, LV_PAGE_STYLE_SB); break;
-        case LV_LIST_STYLE_EDGE_FLASH:
-            style = lv_page_get_style(list, LV_PAGE_STYLE_EDGE_FLASH);
-            break;
+        case LV_LIST_STYLE_EDGE_FLASH: style = lv_page_get_style(list, LV_PAGE_STYLE_EDGE_FLASH); break;
         case LV_LIST_STYLE_BTN_REL: style = ext->styles_btn[LV_BTN_STATE_REL]; break;
         case LV_LIST_STYLE_BTN_PR: style = ext->styles_btn[LV_BTN_STATE_PR]; break;
         case LV_LIST_STYLE_BTN_TGL_REL: style = ext->styles_btn[LV_BTN_STATE_TGL_REL]; break;
@@ -626,8 +618,7 @@ void lv_list_up(const lv_obj_t * list)
     while(e != NULL) {
         if(e->coords.y2 <= list->coords.y2) {
             if(e_prev != NULL) {
-                lv_coord_t new_y =
-                    lv_obj_get_height(list) - (lv_obj_get_y(e_prev) + lv_obj_get_height(e_prev));
+                lv_coord_t new_y = lv_obj_get_height(list) - (lv_obj_get_y(e_prev) + lv_obj_get_height(e_prev));
                 if(lv_list_get_anim_time(list) == 0) {
                     lv_obj_set_y(scrl, new_y);
                 } else {
@@ -669,7 +660,7 @@ void lv_list_down(const lv_obj_t * list)
     e = lv_list_get_prev_btn(list, NULL);
     while(e != NULL) {
         if(e->coords.y1 < list->coords.y1) {
-            lv_coord_t new_y    = -lv_obj_get_y(e);
+            lv_coord_t new_y = -lv_obj_get_y(e);
             if(lv_list_get_anim_time(list) == 0) {
                 lv_obj_set_y(scrl, new_y);
             } else {
@@ -837,9 +828,8 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             else {
                 lv_obj_t * btn = lv_list_get_next_btn(list, NULL);
                 if(btn)
-                    lv_list_set_btn_selected(
-                        list,
-                        btn); /*If there are no buttons on the list then there is no first button*/
+                    lv_list_set_btn_selected(list,
+                                             btn); /*If there are no buttons on the list then there is no first button*/
             }
         } else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
             lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
@@ -960,8 +950,7 @@ static bool lv_list_is_list_btn(lv_obj_t * list_btn)
     uint8_t cnt;
     for(cnt = 0; cnt < LV_MAX_ANCESTOR_NUM; cnt++) {
         if(type.type[cnt] == NULL) break;
-        if(!strcmp(type.type[cnt], "lv_btn"))
-            return true;
+        if(!strcmp(type.type[cnt], "lv_btn")) return true;
     }
     return false;
 }
@@ -978,8 +967,7 @@ static bool lv_list_is_list_label(lv_obj_t * list_label)
     uint8_t cnt;
     for(cnt = 0; cnt < LV_MAX_ANCESTOR_NUM; cnt++) {
         if(type.type[cnt] == NULL) break;
-        if(!strcmp(type.type[cnt], "lv_label"))
-            return true;
+        if(!strcmp(type.type[cnt], "lv_label")) return true;
     }
     return false;
 }
@@ -996,8 +984,7 @@ static bool lv_list_is_list_img(lv_obj_t * list_img)
     uint8_t cnt;
     for(cnt = 0; cnt < LV_MAX_ANCESTOR_NUM; cnt++) {
         if(type.type[cnt] == NULL) break;
-        if(!strcmp(type.type[cnt], "lv_img"))
-            return true;
+        if(!strcmp(type.type[cnt], "lv_img")) return true;
     }
     return false;
 }

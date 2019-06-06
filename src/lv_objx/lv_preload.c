@@ -80,7 +80,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Initialize the allocated 'ext' */
     ext->arc_length = LV_PRELOAD_DEF_ARC_LENGTH;
     ext->anim_type  = LV_PRELOAD_DEF_ANIM;
-    ext->anim_dir = LV_PRELOAD_DIR_FORWARD;
+    ext->anim_dir   = LV_PRELOAD_DIR_FORWARD;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_preload, lv_preload_signal);
@@ -178,15 +178,14 @@ void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
         case LV_PRELOAD_TYPE_FILLSPIN_ARC: {
             ext->anim_type = LV_PRELOAD_TYPE_FILLSPIN_ARC;
             lv_anim_t a;
-            a.var            = preload;
-            if( ext->anim_dir == LV_PRELOAD_DIR_FORWARD ) {
+            a.var = preload;
+            if(ext->anim_dir == LV_PRELOAD_DIR_FORWARD) {
                 /* Clockwise */
-                a.start      = 360;
-                a.end        = 0;
-            }
-            else {
-                a.start      = 0;
-                a.end        = 360;
+                a.start = 360;
+                a.end   = 0;
+            } else {
+                a.start = 0;
+                a.end   = 360;
             }
             a.exec_cb        = (lv_anim_exec_cb_t)lv_preload_spinner_anim;
             a.path_cb        = lv_anim_path_ease_in_out;
@@ -200,15 +199,14 @@ void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
             lv_anim_create(&a);
 
             lv_anim_t b;
-            b.var            = preload;
-            if( ext->anim_dir == LV_PRELOAD_DIR_FORWARD ) {
+            b.var = preload;
+            if(ext->anim_dir == LV_PRELOAD_DIR_FORWARD) {
                 /* Clockwise */
-                b.start      = 360 - ext->arc_length;
-                b.end        = ext->arc_length;
-            }
-            else {
-                b.start      = ext->arc_length;
-                b.end        = 360 - ext->arc_length;
+                b.start = 360 - ext->arc_length;
+                b.end   = ext->arc_length;
+            } else {
+                b.start = ext->arc_length;
+                b.end   = 360 - ext->arc_length;
             }
             b.exec_cb        = (lv_anim_exec_cb_t)lv_preload_set_arc_length;
             b.path_cb        = lv_anim_path_ease_in_out;
@@ -226,15 +224,14 @@ void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
         default: {
             ext->anim_type = LV_PRELOAD_TYPE_SPINNING_ARC;
             lv_anim_t a;
-            a.var            = preload;
-            if( ext->anim_dir == LV_PRELOAD_DIR_FORWARD ) {
+            a.var = preload;
+            if(ext->anim_dir == LV_PRELOAD_DIR_FORWARD) {
                 /* Clockwise */
-                a.start      = 360;
-                a.end        = 0;
-            }
-            else {
-                a.start      = 0;
-                a.end        = 360;
+                a.start = 360;
+                a.end   = 0;
+            } else {
+                a.start = 0;
+                a.end   = 360;
             }
             a.exec_cb        = (lv_anim_exec_cb_t)lv_preload_spinner_anim;
             a.path_cb        = lv_anim_path_ease_in_out;
@@ -251,7 +248,8 @@ void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
     }
 }
 
-void lv_preload_set_anim_dir(lv_obj_t * preload, lv_preload_dir_t dir) {
+void lv_preload_set_anim_dir(lv_obj_t * preload, lv_preload_dir_t dir)
+{
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     ext->anim_dir = dir;
@@ -311,7 +309,8 @@ lv_preload_type_t lv_preload_get_anim_type(lv_obj_t * preload)
     return ext->anim_type;
 }
 
-lv_preload_dir_t lv_preload_get_anim_dir(lv_obj_t * preload) {
+lv_preload_dir_t lv_preload_get_anim_dir(lv_obj_t * preload)
+{
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
     return ext->anim_dir;
 }
@@ -330,8 +329,8 @@ void lv_preload_spinner_anim(void * ptr, lv_anim_value_t val)
     lv_obj_t * preload     = ptr;
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
-    int16_t angle_start    = val - ext->arc_length / 2 + 180;
-    int16_t angle_end      = angle_start + ext->arc_length;
+    int16_t angle_start = val - ext->arc_length / 2 + 180;
+    int16_t angle_end   = angle_start + ext->arc_length;
 
     angle_start = angle_start % 360;
     angle_end   = angle_end % 360;

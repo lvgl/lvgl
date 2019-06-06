@@ -82,8 +82,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param type which style should be set
  * @param style pointer to a style
  */
-static inline void lv_spinbox_set_style(lv_obj_t * spinbox, lv_spinbox_style_t type,
-                                        lv_style_t * style)
+static inline void lv_spinbox_set_style(lv_obj_t * spinbox, lv_spinbox_style_t type, lv_style_t * style)
 {
     lv_ta_set_style(spinbox, type, style);
 }
@@ -102,8 +101,7 @@ void lv_spinbox_set_value(lv_obj_t * spinbox, int32_t i);
  * @param separator_position number of digit before the decimal point. If 0, decimal point is not
  * shown
  */
-void lv_spinbox_set_digit_format(lv_obj_t * spinbox, uint8_t digit_count,
-                                 uint8_t separator_position);
+void lv_spinbox_set_digit_format(lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position);
 
 /**
  * Set spinbox step

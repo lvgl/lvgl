@@ -42,7 +42,7 @@ enum {
     LV_BTNM_CTRL_INACTIVE   = 0x0020,
     LV_BTNM_CTRL_TGL_ENABLE = 0x0040,
     LV_BTNM_CTRL_TGL_STATE  = 0x0080,
-    LV_BTNM_CTRL_CLICK_TRIG = 0x0100,   /*1: Send LV_EVENT_SELECTED on CLICK, 0: Send LV_EVENT_SELECTED on PRESS*/
+    LV_BTNM_CTRL_CLICK_TRIG = 0x0100, /*1: Send LV_EVENT_SELECTED on CLICK, 0: Send LV_EVENT_SELECTED on PRESS*/
 };
 typedef uint16_t lv_btnm_ctrl_t;
 
@@ -51,14 +51,13 @@ typedef struct
 {
     /*No inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
-    const char ** map_p;                       /*Pointer to the current map*/
-    lv_area_t * button_areas;                  /*Array of areas of buttons*/
-    lv_btnm_ctrl_t * ctrl_bits;                /*Array of control bytes*/
+    const char ** map_p;                             /*Pointer to the current map*/
+    lv_area_t * button_areas;                        /*Array of areas of buttons*/
+    lv_btnm_ctrl_t * ctrl_bits;                      /*Array of control bytes*/
     const lv_style_t * styles_btn[LV_BTN_STATE_NUM]; /*Styles of buttons in each state*/
-    uint16_t btn_cnt;   /*Number of button in 'map_p'(Handled by the library)*/
-    uint16_t btn_id_pr; /*Index of the currently pressed button or LV_BTNM_BTN_NONE*/
-    uint16_t
-        btn_id_act; /*Index of the active button (being pressed/released etc) or LV_BTNM_BTN_NONE */
+    uint16_t btn_cnt;                                /*Number of button in 'map_p'(Handled by the library)*/
+    uint16_t btn_id_pr;                              /*Index of the currently pressed button or LV_BTNM_BTN_NONE*/
+    uint16_t btn_id_act;    /*Index of the active button (being pressed/released etc) or LV_BTNM_BTN_NONE */
     uint8_t recolor : 1;    /*Enable button recoloring*/
     uint8_t one_toggle : 1; /*Single button toggled at once*/
 } lv_btnm_ext_t;
@@ -171,7 +170,8 @@ void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width
 /**
  * Make the button matrix like a selector widget (only one button may be toggled at a time).
  *
- * Toggling must be enabled on the buttons you want to be selected with `lv_btnm_set_ctrl` or `lv_btnm_set_btn_ctrl_all`.
+ * Toggling must be enabled on the buttons you want to be selected with `lv_btnm_set_ctrl` or
+ * `lv_btnm_set_btn_ctrl_all`.
  *
  * @param btnm Button matrix object
  * @param one_toggle Whether "one toggle" mode is enabled

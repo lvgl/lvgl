@@ -249,9 +249,9 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-        const lv_style_t * style    = lv_obj_get_style(lmeter);
-        lv_opa_t opa_scale    = lv_obj_get_opa_scale(lmeter);
+        lv_lmeter_ext_t * ext    = lv_obj_get_ext_attr(lmeter);
+        const lv_style_t * style = lv_obj_get_style(lmeter);
+        lv_opa_t opa_scale       = lv_obj_get_opa_scale(lmeter);
         lv_style_t style_tmp;
         lv_style_copy(&style_tmp, style);
 
@@ -269,8 +269,8 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
         lv_coord_t x_ofs  = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
         lv_coord_t y_ofs  = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
         int16_t angle_ofs = 90 + (360 - ext->scale_angle) / 2;
-        int16_t level     = (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) /
-                        (ext->max_value - ext->min_value);
+        int16_t level =
+            (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
         uint8_t i;
 
         style_tmp.line.color = style->body.main_color;
@@ -284,10 +284,9 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
             int16_t angle = (i * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
 
             lv_coord_t y_out = (int32_t)((int32_t)lv_trigo_sin(angle) * r_out) >> LV_TRIGO_SHIFT;
-            lv_coord_t x_out =
-                (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_out) >> LV_TRIGO_SHIFT;
-            lv_coord_t y_in = (int32_t)((int32_t)lv_trigo_sin(angle) * r_in) >> LV_TRIGO_SHIFT;
-            lv_coord_t x_in = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_in) >> LV_TRIGO_SHIFT;
+            lv_coord_t x_out = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_out) >> LV_TRIGO_SHIFT;
+            lv_coord_t y_in  = (int32_t)((int32_t)lv_trigo_sin(angle) * r_in) >> LV_TRIGO_SHIFT;
+            lv_coord_t x_in  = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_in) >> LV_TRIGO_SHIFT;
 
             /*Rounding*/
             x_out = lv_lmeter_coord_round(x_out);
@@ -307,8 +306,8 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
             if(i >= level)
                 style_tmp.line.color = style->line.color;
             else {
-                style_tmp.line.color = lv_color_mix(style->body.grad_color, style->body.main_color,
-                                                    (255 * i) / ext->line_cnt);
+                style_tmp.line.color =
+                    lv_color_mix(style->body.grad_color, style->body.main_color, (255 * i) / ext->line_cnt);
             }
 
             lv_draw_line(&p1, &p2, mask, &style_tmp, opa_scale);
@@ -343,7 +342,7 @@ static lv_res_t lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * par
         lv_obj_refresh_ext_draw_pad(lmeter);
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         const lv_style_t * style = lv_lmeter_get_style(lmeter);
-        lmeter->ext_draw_pad   = LV_MATH_MAX(lmeter->ext_draw_pad, style->line.width);
+        lmeter->ext_draw_pad     = LV_MATH_MAX(lmeter->ext_draw_pad, style->line.width);
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
@@ -370,8 +369,7 @@ static lv_coord_t lv_lmeter_coord_round(int32_t x)
         x            = -x;
     }
 
-    x = (x >> LV_LMETER_LINE_UPSCALE) +
-        ((x & LV_LMETER_LINE_UPSCALE_MASK) >> (LV_LMETER_LINE_UPSCALE - 1));
+    x = (x >> LV_LMETER_LINE_UPSCALE) + ((x & LV_LMETER_LINE_UPSCALE_MASK) >> (LV_LMETER_LINE_UPSCALE - 1));
 
     if(was_negative) x = -x;
 

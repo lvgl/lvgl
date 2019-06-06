@@ -52,8 +52,8 @@ typedef struct
 {
     lv_cont_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_obj_t * text;    /*Text of the message box*/
-    lv_obj_t * btnm;    /*Button matrix for the buttons*/
+    lv_obj_t * text; /*Text of the message box*/
+    lv_obj_t * btnm; /*Button matrix for the buttons*/
 #if LV_USE_ANIMATION
     uint16_t anim_time; /*Duration of close animation [ms] (0: no animation)*/
 #endif

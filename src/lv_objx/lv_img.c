@@ -127,12 +127,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 #if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
     switch(src_type) {
         case LV_IMG_SRC_FILE: LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_FILE` type found"); break;
-        case LV_IMG_SRC_VARIABLE:
-            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_VARIABLE` type found");
-            break;
-        case LV_IMG_SRC_SYMBOL:
-            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_SYMBOL` type found");
-            break;
+        case LV_IMG_SRC_VARIABLE: LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_VARIABLE` type found"); break;
+        case LV_IMG_SRC_SYMBOL: LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_SYMBOL` type found"); break;
         default: LV_LOG_WARN("lv_img_set_src: unknown type");
     }
 #endif
@@ -179,8 +175,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
         /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
         const lv_style_t * style = lv_img_get_style(img);
         lv_point_t size;
-        lv_txt_get_size(&size, src_img, style->text.font, style->text.letter_space,
-                        style->text.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+        lv_txt_get_size(&size, src_img, style->text.font, style->text.letter_space, style->text.line_space,
+                        LV_COORD_MAX, LV_TXT_FLAG_NONE);
         header.w = size.x;
         header.h = size.y;
     }
@@ -344,14 +340,13 @@ lv_coord_t lv_img_get_offset_y(lv_obj_t * img)
 static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode_t mode)
 {
     const lv_style_t * style = lv_obj_get_style(img);
-    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+    lv_img_ext_t * ext       = lv_obj_get_ext_attr(img);
 
     if(mode == LV_DESIGN_COVER_CHK) {
         bool cover = false;
         if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL) return false;
 
-        if(ext->cf == LV_IMG_CF_TRUE_COLOR || ext->cf == LV_IMG_CF_RAW)
-            cover = lv_area_is_in(mask, &img->coords);
+        if(ext->cf == LV_IMG_CF_TRUE_COLOR || ext->cf == LV_IMG_CF_RAW) cover = lv_area_is_in(mask, &img->coords);
 
         return cover;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
@@ -382,8 +377,7 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
             lv_style_t style_mod;
             lv_style_copy(&style_mod, style);
             style_mod.text.color = style->image.color;
-            lv_draw_label(&coords, mask, &style_mod, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL,
-                          -1, -1);
+            lv_draw_label(&coords, mask, &style_mod, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL, -1, -1);
         } else {
             /*Trigger the error handler of image drawer*/
             LV_LOG_WARN("lv_img_design: image source type is unknown");

@@ -231,10 +231,8 @@ static bool lv_arc_design(lv_obj_t * arc, const lv_area_t * mask, lv_design_mode
         /*Draw circle on the ends if enabled */
         if(style->line.rounded) {
             lv_coord_t thick_half = style->line.width / 2;
-            lv_coord_t cir_x =
-                ((r - thick_half) * lv_trigo_sin(ext->angle_start) >> LV_TRIGO_SHIFT);
-            lv_coord_t cir_y =
-                ((r - thick_half) * lv_trigo_sin(ext->angle_start + 90) >> LV_TRIGO_SHIFT);
+            lv_coord_t cir_x      = ((r - thick_half) * lv_trigo_sin(ext->angle_start) >> LV_TRIGO_SHIFT);
+            lv_coord_t cir_y      = ((r - thick_half) * lv_trigo_sin(ext->angle_start + 90) >> LV_TRIGO_SHIFT);
 
             lv_style_t cir_style;
             lv_style_copy(&cir_style, &lv_style_plain);
