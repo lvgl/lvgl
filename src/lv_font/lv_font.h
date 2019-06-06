@@ -118,10 +118,21 @@ static inline uint8_t lv_font_get_line_height(const lv_font_t * font_p)
 
 #define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
 
+#if LV_FONT_ROBOTO_12
 LV_FONT_DECLARE(lv_font_roboto_12)
+#endif
+
+#if LV_FONT_ROBOTO_16
 LV_FONT_DECLARE(lv_font_roboto_16)
+#endif
+
+#if LV_FONT_ROBOTO_22
 LV_FONT_DECLARE(lv_font_roboto_22)
+#endif
+
+#if LV_FONT_ROBOTO_28
 LV_FONT_DECLARE(lv_font_roboto_28)
+#endif
 
 /*Declare the custom (user defined) fonts*/
 #ifdef LV_FONT_CUSTOM_DECLARE
