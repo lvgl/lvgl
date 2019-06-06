@@ -1331,29 +1331,38 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
  */
 lv_res_t lv_event_send_func(lv_event_cb_t event_cb, lv_obj_t * obj, lv_event_t event, const void * data)
 {
+    /* Build a simple linked list from the objects used in the events
+     * It's important to know if an this object was deleted by a nested event
+     * called from this `even_cb`. */
     lv_event_temp_data_t event_temp_data;
     event_temp_data.obj     = obj;
     event_temp_data.deleted = false;
     event_temp_data.prev    = NULL;
 
-    if(event_temp_data_head == NULL) {
-        event_temp_data_head = &event_temp_data;
-    } else {
+    if(event_temp_data_head) {
         event_temp_data.prev = event_temp_data_head;
-        event_temp_data_head = &event_temp_data;
     }
-
     event_temp_data_head = &event_temp_data;
 
+    const void * event_act_data_save = event_act_data;
     event_act_data = data;
 
+    /*Call the input device's feedback callback if set*/
+    lv_indev_t * indev_act = lv_indev_get_act();
+    if(indev_act) {
+        if(indev_act->driver.feedback_cb) indev_act->driver.feedback_cb(&indev_act->driver, event);
+    }
+
+    /*Call the event callback itself*/
     if(event_cb) event_cb(obj, event);
+
+    /*Restore the event data*/
+    event_act_data = event_act_data_save;
 
     /*Remove this element from the list*/
     event_temp_data_head = event_temp_data_head->prev;
 
     if(event_temp_data.deleted) {
-        event_act_data = NULL;
         return LV_RES_INV;
     }
 
@@ -1361,7 +1370,6 @@ lv_res_t lv_event_send_func(lv_event_cb_t event_cb, lv_obj_t * obj, lv_event_t e
         if(obj->parent_event && obj->par) {
             lv_res_t res = lv_event_send(obj->par, event, data);
             if(res != LV_RES_OK) {
-                event_act_data = NULL;
                 return LV_RES_INV;
             }
         }
@@ -2092,7 +2100,7 @@ static bool lv_obj_design(lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mo
 
         /* Because of the radius it is not sure the area is covered
          * Check the areas where there is no radius*/
-        uint16_t r = style->body.radius;
+        lv_coord_t r = style->body.radius;
 
         if(r == LV_RADIUS_CIRCLE) return false;
 
@@ -2132,14 +2140,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     lv_res_t res = LV_RES_OK;
 
     const lv_style_t * style = lv_obj_get_style(obj);
-
-    lv_indev_t * indev_act = lv_indev_get_act();
-
-    if(sign > _LV_SIGNAL_FEEDBACK_SECTION_START && sign < _LV_SIGNAL_FEEDBACK_SECTION_END) {
-        if(indev_act != NULL) {
-            if(indev_act->driver.feedback_cb) indev_act->driver.feedback_cb(&indev_act->driver, sign);
-        }
-    }
 
     if(sign == LV_SIGNAL_CHILD_CHG) {
         /*Return 'invalid' if the child change signal is not enabled*/
