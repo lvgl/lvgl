@@ -326,7 +326,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         rect_area.y2 = rect_area.y1 + font_h + style->text.line_space - 1;
 	lv_area_t roller_coords;
 	lv_obj_get_coords(roller, &roller_coords);
-	lv_obj_adjust_coords(roller, &roller_coords);
+	lv_obj_get_inner_coords(roller, &roller_coords);
 
         rect_area.x1 = roller_coords.x1;
         rect_area.x2 = roller_coords.x2;
