@@ -664,6 +664,13 @@ uint16_t lv_obj_count_children_recursive(const lv_obj_t * obj);
 void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * cords_p);
 
 /**
+ * Reduce area retried by `lv_obj_get_coords()` the get graphically usable area of an object.
+ * (Without the size of the border or other extra graphical elements)
+ * @param coords_p store the result area here
+ */
+void lv_obj_get_inner_coords(const lv_obj_t *obj, lv_area_t * coords_p);
+
+/**
  * Get the x coordinate of object
  * @param obj pointer to an object
  * @return distance of 'obj' from the left side of its parent

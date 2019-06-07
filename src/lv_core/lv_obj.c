@@ -1599,6 +1599,28 @@ void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * cords_p)
 }
 
 /**
+ * Reduce area retried by `lv_obj_get_coords()` the get graphically usable area of an object.
+ * (Without the size of the border or other extra graphical elements)
+ * @param coords_p store the result area here
+ */
+void lv_obj_get_inner_coords(const lv_obj_t *obj, lv_area_t * coords_p)
+{
+	const lv_style_t *style = lv_obj_get_style(obj);
+	if(style->body.border.part & LV_BORDER_LEFT)
+		coords_p->x1 += style->body.border.width;
+
+	if(style->body.border.part & LV_BORDER_RIGHT)
+		coords_p->x2 -= style->body.border.width;
+
+	if(style->body.border.part & LV_BORDER_TOP)
+		coords_p->y1 += style->body.border.width;
+
+	if(style->body.border.part & LV_BORDER_BOTTOM)
+		coords_p->y2 -= style->body.border.width;
+}
+
+
+/**
  * Get the x coordinate of object
  * @param obj pointer to an object
  * @return distance of 'obj' from the left side of its parent
