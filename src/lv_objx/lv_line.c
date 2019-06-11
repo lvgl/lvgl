@@ -120,7 +120,7 @@ void lv_line_set_points(lv_obj_t * line, const lv_point_t point_a[], uint16_t po
             ymax = LV_MATH_MAX(point_a[i].y, ymax);
         }
 
-        const lv_style_t * style = lv_line_get_style(line);
+        const lv_style_t * style = lv_line_get_style(line, LV_LINE_STYLE_MAIN);
         lv_obj_set_size(line, xmax + style->line.width, ymax + style->line.width);
     }
 
@@ -291,7 +291,7 @@ static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
         }
         buf->type[i] = "lv_line";
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        const lv_style_t * style = lv_line_get_style(line);
+        const lv_style_t * style = lv_line_get_style(line, LV_LINE_STYLE_MAIN);
         if(line->ext_draw_pad < style->line.width) line->ext_draw_pad = style->line.width;
     }
 

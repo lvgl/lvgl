@@ -85,9 +85,9 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_lmeter_set_style(new_lmeter, th->style.lmeter);
+            lv_lmeter_set_style(new_lmeter, LV_LMETER_STYLE_MAIN, th->style.lmeter);
         } else {
-            lv_lmeter_set_style(new_lmeter, &lv_style_pretty_color);
+            lv_lmeter_set_style(new_lmeter, LV_LMETER_STYLE_MAIN, &lv_style_pretty_color);
         }
     }
     /*Copy an existing line meter*/
@@ -341,7 +341,7 @@ static lv_res_t lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * par
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_refresh_ext_draw_pad(lmeter);
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        const lv_style_t * style = lv_lmeter_get_style(lmeter);
+        const lv_style_t * style = lv_lmeter_get_style(lmeter, LV_LMETER_STYLE_MAIN);
         lmeter->ext_draw_pad     = LV_MATH_MAX(lmeter->ext_draw_pad, style->line.width);
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;

@@ -791,7 +791,7 @@ void lv_ta_set_style(lv_obj_t * ta, lv_ta_style_t type, const lv_style_t * style
             refr_cursor_area(ta);
             break;
         case LV_TA_STYLE_PLACEHOLDER:
-            if(ext->placeholder) lv_label_set_style(ext->placeholder, style);
+            if(ext->placeholder) lv_label_set_style(ext->placeholder, LV_LABEL_STYLE_MAIN, style);
             break;
     }
 }
@@ -1003,7 +1003,7 @@ const lv_style_t * lv_ta_get_style(const lv_obj_t * ta, lv_ta_style_t type)
         case LV_TA_STYLE_EDGE_FLASH: style = lv_page_get_style(ta, LV_PAGE_STYLE_EDGE_FLASH); break;
         case LV_TA_STYLE_CURSOR: style = ext->cursor.style; break;
         case LV_TA_STYLE_PLACEHOLDER:
-            if(ext->placeholder) style = lv_label_get_style(ext->placeholder);
+            if(ext->placeholder) style = lv_label_get_style(ext->placeholder, LV_LABEL_STYLE_MAIN);
             break;
         default: style = NULL; break;
     }

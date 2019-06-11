@@ -90,9 +90,9 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_cont_set_style(new_cont, th->style.cont);
+            lv_cont_set_style(new_cont, LV_CONT_STYLE_MAIN, th->style.cont);
         } else {
-            lv_cont_set_style(new_cont, &lv_style_pretty);
+            lv_cont_set_style(new_cont, LV_CONT_STYLE_MAIN, &lv_style_pretty);
         }
     }
     /*Copy an existing object*/

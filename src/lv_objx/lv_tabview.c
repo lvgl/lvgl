@@ -128,7 +128,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_cont_set_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_NONE);
         lv_cont_set_layout(ext->content, LV_LAYOUT_ROW_T);
-        lv_cont_set_style(ext->content, &lv_style_transp_tight);
+        lv_cont_set_style(ext->content, LV_CONT_STYLE_MAIN, &lv_style_transp_tight);
         lv_obj_set_height(ext->content, lv_obj_get_height(new_tabview) - lv_obj_get_height(ext->btns));
         lv_obj_align(ext->content, ext->btns, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
 

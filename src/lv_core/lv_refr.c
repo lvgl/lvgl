@@ -413,11 +413,11 @@ static void lv_refr_area_part(const lv_area_t * area_p)
  */
 static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 {
-    lv_obj_t * i;
     lv_obj_t * found_p = NULL;
 
     /*If this object is fully cover the draw area check the children too */
     if(lv_area_is_in(area_p, &obj->coords) && obj->hidden == 0) {
+        lv_obj_t * i;
         LV_LL_READ(obj->child_ll, i)
         {
             found_p = lv_refr_get_top_obj(area_p, i);
@@ -458,7 +458,6 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
 
     /*Draw the 'younger' sibling objects because they can be on top_obj */
     lv_obj_t * par;
-    lv_obj_t * i;
     lv_obj_t * border_p = top_p;
 
     par = lv_obj_get_parent(top_p);
@@ -466,7 +465,7 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
     /*Do until not reach the screen*/
     while(par != NULL) {
         /*object before border_p has to be redrawn*/
-        i = lv_ll_get_prev(&(par->child_ll), border_p);
+        lv_obj_t * i = lv_ll_get_prev(&(par->child_ll), border_p);
 
         while(i != NULL) {
             /*Refresh the objects*/

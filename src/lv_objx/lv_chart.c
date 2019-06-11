@@ -112,9 +112,9 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_chart_set_style(new_chart, th->style.chart);
+            lv_chart_set_style(new_chart, LV_CHART_STYLE_MAIN, th->style.chart);
         } else {
-            lv_chart_set_style(new_chart, &lv_style_pretty);
+            lv_chart_set_style(new_chart, LV_CHART_STYLE_MAIN, &lv_style_pretty);
         }
 
     } else {

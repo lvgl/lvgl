@@ -91,6 +91,12 @@ typedef struct
                                   characters */
 } lv_label_ext_t;
 
+/*Styles*/
+enum {
+    LV_LABEL_STYLE_MAIN,
+};
+typedef uint8_t lv_label_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -171,10 +177,12 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed);
 /**
  * Set the style of an label
  * @param label pointer to an label object
+ * @param type which style should be get (can be only `LV_LABEL_STYLE_MAIN`)
  * @param style pointer to a style
  */
-static inline void lv_label_set_style(lv_obj_t * label, const lv_style_t * style)
+static inline void lv_label_set_style(lv_obj_t * label, lv_label_style_t type, const lv_style_t * style)
 {
+    (void) type; /*Unused*/
     lv_obj_set_style(label, style);
 }
 
@@ -267,10 +275,12 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos);
 /**
  * Get the style of an label object
  * @param label pointer to an label object
+ * @param type which style should be get (can be only `LV_LABEL_STYLE_MAIN`)
  * @return pointer to the label's style
  */
-static inline const lv_style_t * lv_label_get_style(const lv_obj_t * label)
+static inline const lv_style_t * lv_label_get_style(const lv_obj_t * label, lv_label_style_t type)
 {
+    (void) type;    /*Unused*/
     return lv_obj_get_style(label);
 }
 

@@ -173,7 +173,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 
     if(src_type == LV_IMG_SRC_SYMBOL) {
         /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
-        const lv_style_t * style = lv_img_get_style(img);
+        const lv_style_t * style = lv_img_get_style(img, LV_IMG_STYLE_MAIN);
         lv_point_t size;
         lv_txt_get_size(&size, src_img, style->text.font, style->text.letter_space, style->text.line_space,
                         LV_COORD_MAX, LV_TXT_FLAG_NONE);

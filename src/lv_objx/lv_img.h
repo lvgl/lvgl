@@ -47,6 +47,12 @@ typedef struct
     uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
 } lv_img_ext_t;
 
+/*Styles*/
+enum {
+    LV_IMG_STYLE_MAIN,
+};
+typedef uint8_t lv_img_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -118,22 +124,13 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y);
 /**
  * Set the style of an image
  * @param img pointer to an image object
+ * @param type which style should be set (can be only `LV_IMG_STYLE_MAIN`)
  * @param style pointer to a style
  */
-static inline void lv_img_set_style(lv_obj_t * img, const lv_style_t * style)
+static inline void lv_img_set_style(lv_obj_t * img, lv_img_style_t type, const lv_style_t * style)
 {
+    (void)type; /*Unused*/
     lv_obj_set_style(img, style);
-}
-
-/**
- * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
- * @param img -
- * @param upscale -
- */
-static inline void lv_img_set_upscale(lv_obj_t * img, bool upcale)
-{
-    (void)img;
-    (void)upcale;
 }
 
 /*=====================
@@ -178,22 +175,13 @@ lv_coord_t lv_img_get_offset_y(lv_obj_t * img);
 /**
  * Get the style of an image object
  * @param img pointer to an image object
+ * @param type which style should be get (can be only `LV_IMG_STYLE_MAIN`)
  * @return pointer to the image's style
  */
-static inline const lv_style_t * lv_img_get_style(const lv_obj_t * img)
+static inline const lv_style_t * lv_img_get_style(const lv_obj_t * img, lv_img_style_t type)
 {
+    (void)type;     /*Unused*/
     return lv_obj_get_style(img);
-}
-
-/**
- * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
- * @param img -
- * @return false
- */
-static inline bool lv_img_get_upscale(const lv_obj_t * img)
-{
-    (void)img;
-    return false;
 }
 
 /**********************

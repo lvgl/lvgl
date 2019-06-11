@@ -146,7 +146,7 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
 void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, const lv_style_t * style)
 {
     switch(type) {
-        case LV_CANVAS_STYLE_MAIN: lv_img_set_style(canvas, style); break;
+        case LV_CANVAS_STYLE_MAIN: lv_img_set_style(canvas, LV_IMG_STYLE_MAIN, style); break;
     }
 }
 
@@ -193,7 +193,7 @@ const lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_
     const lv_style_t * style = NULL;
 
     switch(type) {
-        case LV_CANVAS_STYLE_MAIN: style = lv_img_get_style(canvas); break;
+        case LV_CANVAS_STYLE_MAIN: style = lv_img_get_style(canvas, LV_IMG_STYLE_MAIN); break;
         default: style = NULL;
     }
 

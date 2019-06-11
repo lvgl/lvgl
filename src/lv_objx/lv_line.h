@@ -41,6 +41,12 @@ typedef struct
     uint8_t y_inv : 1;                                 /*1: y == 0 will be on the bottom*/
 } lv_line_ext_t;
 
+/*Styles*/
+enum {
+    LV_LINE_STYLE_MAIN,
+};
+typedef uint8_t lv_line_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -89,23 +95,15 @@ void lv_line_set_y_invert(lv_obj_t * line, bool en);
 /**
  * Set the style of a line
  * @param line pointer to a line object
+ * @param type which style should be set (can be only `LV_LINE_STYLE_MAIN`)
  * @param style pointer to a style
  */
-static inline void lv_line_set_style(lv_obj_t * line, const lv_style_t * style)
+static inline void lv_line_set_style(lv_obj_t * line, lv_line_style_t type, const lv_style_t * style)
 {
+    (void) type;    /*Unused*/
     lv_obj_set_style(line, style);
 }
 
-/**
- * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
- * @param line -
- * @param upscale -
- */
-static inline void lv_line_set_upscale(lv_obj_t * line, bool upcale)
-{
-    (void)line;
-    (void)upcale;
-}
 /*=====================
  * Getter functions
  *====================*/
@@ -127,22 +125,13 @@ bool lv_line_get_y_invert(const lv_obj_t * line);
 /**
  * Get the style of an line object
  * @param line pointer to an line object
+ * @param type which style should be get (can be only `LV_LINE_STYLE_MAIN`)
  * @return pointer to the line's style
  */
-static inline const lv_style_t * lv_line_get_style(const lv_obj_t * line)
+static inline const lv_style_t * lv_line_get_style(const lv_obj_t * line, lv_line_style_t type)
 {
+    (void) type;    /*Unused*/
     return lv_obj_get_style(line);
-}
-
-/**
- * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0
- * @param line -
- * @return false
- */
-static inline bool lv_line_get_upscale(const lv_obj_t * line)
-{
-    (void)line;
-    return false;
 }
 
 /**********************

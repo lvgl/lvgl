@@ -50,6 +50,12 @@ typedef struct
     uint8_t label_count;              /*Number of labels on the scale*/
 } lv_gauge_ext_t;
 
+/*Styles*/
+enum {
+    LV_GAUGE_STYLE_MAIN,
+};
+typedef uint8_t lv_gauge_style_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -117,11 +123,13 @@ void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint
 /**
  * Set the styles of a gauge
  * @param gauge pointer to a gauge object
- * @param bg set the style of the gauge
+ * @param type which style should be set (can be only `LV_GAUGE_STYLE_MAIN`)
+ * @param style set the style of the gauge
  *  */
-static inline void lv_gauge_set_style(lv_obj_t * gauge, lv_style_t * bg)
+static inline void lv_gauge_set_style(lv_obj_t * gauge, lv_gauge_style_t type, lv_style_t * style)
 {
-    lv_obj_set_style(gauge, bg);
+    (void) type; /*Unused*/
+    lv_obj_set_style(gauge, style);
 }
 
 /*=====================
@@ -203,10 +211,12 @@ static inline uint16_t lv_gauge_get_scale_angle(const lv_obj_t * gauge)
 /**
  * Get the style of a gauge
  * @param gauge pointer to a gauge object
+ * @param type which style should be get (can be only `LV_GAUGE_STYLE_MAIN`)
  * @return pointer to the gauge's style
  */
-static inline const lv_style_t * lv_gauge_get_style(const lv_obj_t * gauge)
+static inline const lv_style_t * lv_gauge_get_style(const lv_obj_t * gauge, lv_gauge_style_t type)
 {
+    (void) type; /*Unused*/
     return lv_obj_get_style(gauge);
 }
 

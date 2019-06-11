@@ -95,9 +95,9 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_gauge_set_style(new_gauge, th->style.gauge);
+            lv_gauge_set_style(new_gauge, LV_GAUGE_STYLE_MAIN, th->style.gauge);
         } else {
-            lv_gauge_set_style(new_gauge, &lv_style_pretty_color);
+            lv_gauge_set_style(new_gauge, LV_GAUGE_STYLE_MAIN, &lv_style_pretty_color);
         }
     }
     /*Copy an existing gauge*/
@@ -394,7 +394,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
 {
     lv_style_t style_needle;
     lv_gauge_ext_t * ext     = lv_obj_get_ext_attr(gauge);
-    const lv_style_t * style = lv_gauge_get_style(gauge);
+    const lv_style_t * style = lv_gauge_get_style(gauge, LV_GAUGE_STYLE_MAIN);
     lv_opa_t opa_scale       = lv_obj_get_opa_scale(gauge);
 
     lv_coord_t r      = lv_obj_get_width(gauge) / 2 - style->body.padding.left;

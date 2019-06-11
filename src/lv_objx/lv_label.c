@@ -110,7 +110,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_click(new_label, false);
         lv_label_set_long_mode(new_label, LV_LABEL_LONG_EXPAND);
         lv_label_set_text(new_label, "Text");
-        lv_label_set_style(new_label, NULL); /*Inherit parent's style*/
+        lv_label_set_style(new_label, LV_LABEL_STYLE_MAIN, NULL); /*Inherit parent's style*/
     }
     /*Copy 'copy' if not NULL*/
     else {
@@ -683,8 +683,8 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
 
     uint32_t i         = line_start;
     uint32_t i_current = i;
-    uint32_t letter;
-    uint32_t letter_next;
+    uint32_t letter = '\0';
+    uint32_t letter_next = '\0';
 
     if(new_line_start > 0) {
         while(i <= new_line_start - 1) {
@@ -911,7 +911,7 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         if(ext->body_draw) {
-            const lv_style_t * style = lv_label_get_style(label);
+            const lv_style_t * style = lv_label_get_style(label, LV_LABEL_STYLE_MAIN);
 
             label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, style->body.padding.left);
             label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, style->body.padding.right);
