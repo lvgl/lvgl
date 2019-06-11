@@ -1806,7 +1806,7 @@ const lv_style_t * lv_obj_get_style(const lv_obj_t * obj)
 #if LV_USE_GROUP == 0
                     style_act = par->style_p;
 #else
-                    /*Is a parent is focused then use then focused style*/
+                    /*If a parent is focused then use then focused style*/
                     lv_group_t * g = lv_obj_get_group(par);
                     if(lv_group_get_focused(g) == par) {
                         style_act = lv_group_mod_style(g, par->style_p);

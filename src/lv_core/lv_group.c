@@ -562,6 +562,12 @@ static void style_mod_def(lv_group_t * group, lv_style_t * style)
     style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_ORANGE, LV_OPA_60);
 
     style->text.color = lv_color_mix(style->text.color, LV_COLOR_ORANGE, LV_OPA_70);
+
+    /*Add some recolor to the images*/
+    if(style->image.intense < LV_OPA_MIN) {
+        style->image.color = LV_COLOR_ORANGE;
+        style->image.intense = LV_OPA_40;
+    }
 #else
     style->body.border.opa   = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;
@@ -592,6 +598,13 @@ static void style_mod_edit_def(lv_group_t * group, lv_style_t * style)
     style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_GREEN, LV_OPA_60);
 
     style->text.color = lv_color_mix(style->text.color, LV_COLOR_GREEN, LV_OPA_70);
+
+    /*Add some recolor to the images*/
+    if(style->image.intense < LV_OPA_MIN) {
+        style->image.color = LV_COLOR_GREEN;
+        style->image.intense = LV_OPA_40;
+    }
+
 #else
     style->body.border.opa   = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;

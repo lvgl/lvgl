@@ -79,24 +79,24 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy);
 /**
  * Turn ON the switch
  * @param sw pointer to a switch object
- * @param anim true: set the value with an animation; false: change the value immediatelly
+ * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-void lv_sw_on(lv_obj_t * sw, bool anim);
+void lv_sw_on(lv_obj_t * sw, lv_anim_enable_t anim);
 
 /**
  * Turn OFF the switch
  * @param sw pointer to a switch object
- * @param anim true: set the value with an animation; false: change the value immediatelly
+ * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-void lv_sw_off(lv_obj_t * sw, bool anim);
+void lv_sw_off(lv_obj_t * sw, lv_anim_enable_t anim);
 
 /**
  * Toggle the position of the switch
  * @param sw pointer to a switch object
- * @param anim true: set the value with an animation; false: change the value immediatelly
+ * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  * @return resulting state of the switch.
  */
-bool lv_sw_toggle(lv_obj_t * sw, bool anim);
+bool lv_sw_toggle(lv_obj_t * sw, lv_anim_enable_t anim);
 
 /**
  * Set a style of a switch

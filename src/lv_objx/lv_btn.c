@@ -354,14 +354,27 @@ const lv_style_t * lv_btn_get_style(const lv_obj_t * btn, lv_btn_style_t type)
 {
     const lv_style_t * style = NULL;
     lv_btn_ext_t * ext       = lv_obj_get_ext_attr(btn);
+    lv_btn_state_t state = lv_btn_get_state(btn);
 
-    switch(type) {
-        case LV_BTN_STYLE_REL: style = ext->styles[LV_BTN_STATE_REL]; break;
-        case LV_BTN_STYLE_PR: style = ext->styles[LV_BTN_STATE_PR]; break;
-        case LV_BTN_STYLE_TGL_REL: style = ext->styles[LV_BTN_STATE_TGL_REL]; break;
-        case LV_BTN_STYLE_TGL_PR: style = ext->styles[LV_BTN_STATE_TGL_PR]; break;
-        case LV_BTN_STYLE_INA: style = ext->styles[LV_BTN_STATE_INA]; break;
-        default: style = NULL; break;
+    /* If the style of the current state is asked then return object style.
+     * If the button is focused then this style is updated by the group's
+     * `style_mod_cb` function */
+    if((type == LV_BTN_STYLE_REL && state == LV_BTN_STATE_REL) ||
+        (type == LV_BTN_STYLE_PR && state == LV_BTN_STATE_PR) ||
+        (type == LV_BTN_STYLE_TGL_REL && state == LV_BTN_STATE_TGL_REL) ||
+        (type == LV_BTN_STYLE_TGL_PR && state == LV_BTN_STATE_TGL_PR) ||
+        (type == LV_BTN_STYLE_INA && state == LV_BTN_STATE_INA)) {
+
+        style = lv_obj_get_style(btn);
+    } else {
+        switch(type) {
+            case LV_BTN_STYLE_REL: style = ext->styles[LV_BTN_STATE_REL]; break;
+            case LV_BTN_STYLE_PR: style = ext->styles[LV_BTN_STATE_PR]; break;
+            case LV_BTN_STYLE_TGL_REL: style = ext->styles[LV_BTN_STATE_TGL_REL]; break;
+            case LV_BTN_STYLE_TGL_PR: style = ext->styles[LV_BTN_STATE_TGL_PR]; break;
+            case LV_BTN_STYLE_INA: style = ext->styles[LV_BTN_STATE_INA]; break;
+            default: style = NULL; break;
+        }
     }
 
     return style;

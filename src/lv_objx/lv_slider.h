@@ -74,9 +74,9 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy);
  * Set a new value on the slider
  * @param slider pointer to a slider object
  * @param value new value
- * @param anim true: set the value with an animation; false: change the value immediatelly
+ * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-static inline void lv_slider_set_value(lv_obj_t * slider, int16_t value, bool anim)
+static inline void lv_slider_set_value(lv_obj_t * slider, int16_t value, lv_anim_enable_t anim)
 {
     lv_bar_set_value(slider, value, anim);
 }

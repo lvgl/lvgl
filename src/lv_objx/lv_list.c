@@ -690,9 +690,9 @@ void lv_list_down(const lv_obj_t * list)
 /**
  * Focus on a list button. It ensures that the button will be visible on the list.
  * @param btn pointer to a list button to focus
- * @param anim_en true: scroll with animation, false: without animation
+ * @param anim_en LV_ANIM_ON: scroll with animation, LV_ANOM_OFF: without animation
  */
-void lv_list_focus(const lv_obj_t * btn, bool anim_en)
+void lv_list_focus(const lv_obj_t * btn, lv_anim_enable_t anim)
 {
 
 #if LV_USE_ANIMATION == 0
@@ -701,7 +701,7 @@ void lv_list_focus(const lv_obj_t * btn, bool anim_en)
 
     lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
 
-    lv_page_focus(list, btn, anim_en == false ? 0 : lv_list_get_anim_time(list));
+    lv_page_focus(list, btn, anim == LV_ANIM_OFF ? 0 : lv_list_get_anim_time(list));
 }
 
 /**********************

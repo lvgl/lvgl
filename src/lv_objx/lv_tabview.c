@@ -324,12 +324,12 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
  * Set a new tab
  * @param tabview pointer to Tab view object
  * @param id index of a tab to load
- * @param anim_en true: set with sliding animation; false: set immediately
+ * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
+void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t anim)
 {
 #if LV_USE_ANIMATION == 0
-    anim_en = false;
+    anim = LV_ANIM_OFF;
 #endif
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
 
@@ -363,11 +363,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
             break;
     }
 
-    if(anim_en == false
-#if LV_USE_ANIMATION
-       || ext->anim_time == 0
-#endif
-    ) {
+    if(anim == LV_ANIM_OFF || ext->anim_time == 0) {
         lv_obj_set_x(ext->content, cont_x);
     } else {
 #if LV_USE_ANIMATION
@@ -406,11 +402,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en)
             break;
     }
 
-    if(anim_en == false
-#if LV_USE_ANIMATION
-       || ext->anim_time == 0
-#endif
-    ) {
+    if(anim == LV_ANIM_OFF || ext->anim_time == 0) {
         switch(ext->btns_pos) {
             case LV_TABVIEW_BTNS_POS_TOP:
             case LV_TABVIEW_BTNS_POS_BOTTOM: lv_obj_set_x(ext->indic, indic_pos); break;

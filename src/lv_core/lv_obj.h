@@ -245,6 +245,7 @@ typedef struct
                                                ... [x]: "lv_obj" */
 } lv_obj_type_t;
 
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

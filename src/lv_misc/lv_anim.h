@@ -78,6 +78,14 @@ typedef struct _lv_anim_t
     uint32_t has_run : 1;     /*Indicates the animation has run in this round*/
 } lv_anim_t;
 
+/*Can be used to indicate if animations are enabled or disabled in a case*/
+enum {
+ LV_ANIM_OFF,
+ LV_ANIM_ON,
+};
+
+typedef uint8_t lv_anim_enable_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

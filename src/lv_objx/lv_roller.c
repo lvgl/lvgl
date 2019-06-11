@@ -35,7 +35,7 @@
 static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param);
 static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * param);
-static void refr_position(lv_obj_t * roller, bool anim_en);
+static void refr_position(lv_obj_t * roller, lv_anim_enable_t animen);
 static void refr_height(lv_obj_t * roller);
 static void inf_normalize(void * roller_scrl);
 #if LV_USE_ANIMATION
@@ -188,18 +188,18 @@ void lv_roller_set_align(lv_obj_t * roller, lv_label_align_t align)
  * Set the selected option
  * @param roller pointer to a roller object
  * @param sel_opt id of the selected option (0 ... number of option - 1);
- * @param anim_en true: set with animation; false set immediately
+ * @param anim_en LV_ANIM_ON: set with animation; LV_ANOM_OFF set immediately
  */
-void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, bool anim_en)
+void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, lv_anim_enable_t anim)
 {
 #if LV_USE_ANIMATION == 0
-    anim_en = false;
+    anim = LV_ANIM_OFF;
 #endif
 
     if(lv_roller_get_selected(roller) == sel_opt) return;
 
     lv_ddlist_set_selected(roller, sel_opt);
-    refr_position(roller, anim_en);
+    refr_position(roller, anim);
 }
 
 /**
@@ -596,12 +596,12 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * mask)
 /**
  * Refresh the position of the roller. It uses the id stored in: ext->ddlist.selected_option_id
  * @param roller pointer to a roller object
- * @param anim_en true: refresh with animation; false: without animation
+ * @param anim LV_ANIM_ON: refresh with animation; LV_ANOM_OFF: without animation
  */
-static void refr_position(lv_obj_t * roller, bool anim_en)
+static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim)
 {
 #if LV_USE_ANIMATION == 0
-    anim_en = false;
+    anim = LV_ANOM_OFF;
 #endif
     lv_obj_t * roller_scrl         = lv_page_get_scrl(roller);
     lv_roller_ext_t * ext          = lv_obj_get_ext_attr(roller);
@@ -612,11 +612,7 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
 
     /* Normally the animtaion's `end_cb` sets correct position of the roller is infinite.
      * But without animations do it manually*/
-    if(anim_en == false
-#if LV_USE_ANIMATION
-       || ext->ddlist.anim_time == 0
-#endif
-    ) {
+    if(anim == LV_ANIM_OFF || ext->ddlist.anim_time == 0) {
         inf_normalize(roller_scrl);
     }
 
@@ -625,11 +621,7 @@ static void refr_position(lv_obj_t * roller, bool anim_en)
         id * (font_h + style_label->text.line_space) + ext->ddlist.label->coords.y1 - roller_scrl->coords.y1;
     lv_coord_t new_y = -line_y1 + (h - font_h) / 2;
 
-    if(anim_en == false
-#if LV_USE_ANIMATION
-       || ext->ddlist.anim_time == 0
-#endif
-    ) {
+    if(anim == LV_ANIM_OFF || ext->ddlist.anim_time == 0) {
         lv_obj_set_y(roller_scrl, new_y);
     } else {
 #if LV_USE_ANIMATION

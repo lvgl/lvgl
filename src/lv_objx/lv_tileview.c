@@ -181,12 +181,12 @@ void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t * val
  * @param tileview pointer to a tileview object
  * @param x column id (0, 1, 2...)
  * @param y line id (0, 1, 2...)
- * @param anim_en true: move with animation
+ * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, bool anim_en)
+void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim)
 {
 #if LV_USE_ANIMATION == 0
-    anim_en = false;
+    anim = LV_ANIM_OFF;
 #endif
 
     lv_tileview_ext_t * ext = lv_obj_get_ext_attr(tileview);
@@ -207,7 +207,7 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, b
     lv_coord_t x_coord = -x * lv_obj_get_width(tileview);
     lv_coord_t y_coord = -y * lv_obj_get_height(tileview);
     lv_obj_t * scrl    = lv_page_get_scrl(tileview);
-    if(anim_en) {
+    if(anim) {
 #if LV_USE_ANIMATION
         lv_coord_t x_act = lv_obj_get_x(scrl);
         lv_coord_t y_act = lv_obj_get_y(scrl);

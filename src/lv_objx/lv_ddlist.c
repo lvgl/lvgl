@@ -41,7 +41,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
 static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param);
 static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 static lv_res_t release_handler(lv_obj_t * ddlist);
-static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en);
+static void lv_ddlist_refr_size(lv_obj_t * ddlist, lv_anim_enable_t anim);
 static void lv_ddlist_pos_current_option(lv_obj_t * ddlist);
 static void lv_ddlist_refr_width(lv_obj_t * ddlist);
 #if LV_USE_ANIMATION
@@ -452,9 +452,9 @@ lv_label_align_t lv_ddlist_get_align(const lv_obj_t * ddlist)
 /**
  * Open the drop down list with or without animation
  * @param ddlist pointer to drop down list object
- * @param anim_en true: use animation; false: not use animations
+ * @param anim_en LV_ANIM_EN: use animation; LV_ANIM_OFF: not use animations
  */
-void lv_ddlist_open(lv_obj_t * ddlist, bool anim_en)
+void lv_ddlist_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
 {
 #if LV_USE_ANIMATION == 0
     anim_en = false;
@@ -462,15 +462,15 @@ void lv_ddlist_open(lv_obj_t * ddlist, bool anim_en)
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     ext->opened           = 1;
     lv_obj_set_drag(lv_page_get_scrl(ddlist), true);
-    lv_ddlist_refr_size(ddlist, anim_en);
+    lv_ddlist_refr_size(ddlist, anim);
 }
 
 /**
  * Close (Collapse) the drop down list
  * @param ddlist pointer to drop down list object
- * @param anim_en true: use animation; false: not use animations
+ * @param anim_en LV_ANIM_ON: use animation; LV_ANIM_OFF: not use animations
  */
-void lv_ddlist_close(lv_obj_t * ddlist, bool anim_en)
+void lv_ddlist_close(lv_obj_t * ddlist, lv_anim_enable_t anim)
 {
 #if LV_USE_ANIMATION == 0
     anim_en = false;
@@ -478,7 +478,7 @@ void lv_ddlist_close(lv_obj_t * ddlist, bool anim_en)
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     ext->opened           = 0;
     lv_obj_set_drag(lv_page_get_scrl(ddlist), false);
-    lv_ddlist_refr_size(ddlist, anim_en);
+    lv_ddlist_refr_size(ddlist, anim);
 }
 
 /**********************
@@ -827,9 +827,9 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
 /**
  * Refresh the size of drop down list according to its status (open or closed)
  * @param ddlist pointer to a drop down list object
- * @param anim_en Change the size (open/close) with or without animation (true/false)
+ * @param anim Change the size (open/close) with or without animation (true/false)
  */
-static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
+static void lv_ddlist_refr_size(lv_obj_t * ddlist, lv_anim_enable_t anim)
 {
 #if LV_USE_ANIMATION == 0
     anim_en = false;
@@ -858,7 +858,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, bool anim_en)
         lv_page_set_sb_mode(ddlist, LV_SB_MODE_HIDE);
     }
 
-    if(anim_en == 0) {
+    if(anim == LV_ANIM_OFF) {
         lv_obj_set_height(ddlist, new_height);
         lv_ddlist_pos_current_option(ddlist);
         if(ext->opened) lv_page_set_sb_mode(ddlist, LV_SB_MODE_UNHIDE);

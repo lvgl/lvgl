@@ -117,9 +117,9 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name);
  * Set a new tab
  * @param tabview pointer to Tab view object
  * @param id index of a tab to load
- * @param anim_en true: set with sliding animation; false: set immediately
+ * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, bool anim_en);
+void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t anim);
 
 /**
  * Enable horizontal sliding with touch pad
