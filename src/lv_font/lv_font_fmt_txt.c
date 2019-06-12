@@ -25,7 +25,9 @@
  **********************/
 static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter);
 static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t gid_right);
-//static int32_t lv_font_codeCompare(const void * pRef, const void * pElement);
+static int32_t unicode_list_compare(const void * ref, const void * element);
+static int32_t kern_pair_8_compare(const void * ref, const void * element);
+static int32_t kern_pair_16_compare(const void * ref, const void * element);
 
 /**********************
  *  STATIC VARIABLES
@@ -126,21 +128,22 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
             glyph_id = fdsc->cmaps[i].glyph_id_start + gid_ofs_8[rcp];
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY) {
-            uint32_t u;
-            for(u = 0; u < fdsc->cmaps[i].list_length; u++) {
-                if(fdsc->cmaps[i].unicode_list[u] == rcp) {
-                    glyph_id = fdsc->cmaps[i].glyph_id_start + u;
-                }
+            uint8_t * p = lv_utils_bsearch(&rcp, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length, sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
+
+            if(p) {
+                uint32_t ofs = (uintptr_t)p - (uintptr_t) fdsc->cmaps[i].unicode_list;
+                ofs = ofs >> 1;     /*The list stores `uint16_t` so the get the index divide by 2*/
+                glyph_id = fdsc->cmaps[i].glyph_id_start + ofs;
             }
         }
-        else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY) {
-            const uint8_t * gid_ofs_16 = fdsc->cmaps[i].glyph_id_ofs_list;
-            uint32_t u;
-            for(u = 0; u < 50 /*fdsc->cmaps[i].list_length*/; u++) {
-                if(fdsc->cmaps[i].unicode_list[u] == rcp) {
-                    glyph_id = fdsc->cmaps[i].glyph_id_start + u;
-                }
-                glyph_id = fdsc->cmaps[i].glyph_id_start + gid_ofs_16[u];
+        else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
+            uint8_t * p = lv_utils_bsearch(&rcp, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length, sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
+
+            if(p) {
+                uint32_t ofs = (uintptr_t)p - (uintptr_t) fdsc->cmaps[i].unicode_list;
+                ofs = ofs >> 1;     /*The list stores `uint16_t` so the get the index divide by 2*/
+                const uint8_t * gid_ofs_16 = fdsc->cmaps[i].glyph_id_ofs_list;
+                glyph_id = fdsc->cmaps[i].glyph_id_start + gid_ofs_16[ofs];
             }
         }
 
@@ -156,28 +159,37 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
     lv_font_fmt_txt_dsc_t * fdsc = (lv_font_fmt_txt_dsc_t *) font->dsc;
 
     int8_t value = 0;
-    uint32_t k;
+
     if(fdsc->kern_classes == 0) {
         /*Kern pairs*/
         const lv_font_fmt_txt_kern_pair_t * kdsc = fdsc->kern_dsc;
         if(kdsc->glyph_ids_size == 0) {
+            /* Use binary search to find the kern value.
+             * The pairs are ordered left_id first, then right_id secondly. */
             const uint8_t * g_ids = kdsc->glyph_ids;
-            for(k = 0; k < (uint32_t)kdsc->pair_cnt * 2; k += 2) {
-                if(g_ids[k] == gid_left &&
-                        g_ids[k+1] == gid_right) {
-                    value = kdsc->values[k >> 1];
-                    break;
-                }
+            uint16_t g_id_both = (gid_right << 8) + gid_left; /*Create one number from the ids*/
+            uint8_t * kid_p = lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 2, kern_pair_8_compare);
+
+            /*If the `g_id_both` were found get its index from the pointer*/
+            if(kid_p) {
+                uintptr_t ofs = (uintptr_t)kid_p - (uintptr_t)g_ids;
+                ofs = ofs >> 1;     /*ofs is for pair, divide by 2 to refer as a single value*/
+                value = kdsc->values[ofs];
             }
         } else if(kdsc->glyph_ids_size == 1) {
+            /* Use binary search to find the kern value.
+             * The pairs are ordered left_id first, then right_id secondly. */
             const uint16_t * g_ids = kdsc->glyph_ids;
-            for(k = 0; k < (uint32_t)kdsc->pair_cnt * 2; k += 2) {
-                if(g_ids[k] == gid_left &&
-                        g_ids[k+1] == gid_right) {
-                    value = kdsc->values[k >> 1];
-                    break;
-                }
+            uint32_t g_id_both = (uint32_t)((uint32_t)gid_right << 8) + gid_left; /*Create one number from the ids*/
+            uint8_t * kid_p = lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 4, kern_pair_16_compare);
+
+            /*If the `g_id_both` were found get its index from the pointer*/
+            if(kid_p) {
+                uintptr_t ofs = (uintptr_t)kid_p - (uintptr_t)g_ids;
+                ofs = ofs >> 4;     /*ofs is 4 byte pairs, divide by 4 to refer as a single value*/
+                value = kdsc->values[ofs];
             }
+
         } else {
             /*Invalid value*/
         }
@@ -197,6 +209,26 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
     return value;
 }
 
+static int32_t kern_pair_8_compare(const void * ref, const void * element)
+{
+    const uint8_t * ref8_p = ref;
+    const uint8_t * element8_p = element;
+
+    /*If the MSB is different it will matter. If not return the diff. of the LSB*/
+    if(ref8_p[0] != element8_p[0]) return (int32_t)ref8_p[0] - element8_p[0];
+    else return (int32_t) ref8_p[1] - element8_p[1];
+
+}
+
+static int32_t kern_pair_16_compare(const void * ref, const void * element)
+{
+    const uint16_t * ref16_p = ref;
+    const uint16_t * element16_p = element;
+
+    /*If the MSB is different it will matter. If not return the diff. of the LSB*/
+    if(ref16_p[0] != element16_p[0]) return (int32_t)ref16_p[0] - element16_p[0];
+    else return (int32_t) ref16_p[1] - element16_p[1];
+}
 
 /** Code Comparator.
  *
@@ -211,7 +243,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
  *  @retval > 0   Reference is less than element.
  *
  */
-//static int32_t lv_font_codeCompare(const void * pRef, const void * pElement)
-//{
-//    return (*(uint16_t *)pRef) - (*(uint16_t *)pElement);
-//}
+static int32_t unicode_list_compare(const void * ref, const void * element)
+{
+    return (*(uint16_t *)ref) - (*(uint16_t *)element);
+}
