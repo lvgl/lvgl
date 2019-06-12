@@ -445,10 +445,10 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
 #if LV_USE_ANIMATION
     /* Be sure there is no position changing animation in progress
      * because it can overide the current changes*/
-    lv_anim_del(page, (lv_anim_exec_cb_t)lv_obj_set_x);
-    lv_anim_del(page, (lv_anim_exec_cb_t)lv_obj_set_y);
-    lv_anim_del(ext->scrl, (lv_anim_exec_cb_t)lv_obj_set_x);
-    lv_anim_del(ext->scrl, (lv_anim_exec_cb_t)lv_obj_set_y);
+    lv_anim_del(page, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_del(page, (lv_anim_exec_xcb_t)lv_obj_set_y);
+    lv_anim_del(ext->scrl, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_del(ext->scrl, (lv_anim_exec_xcb_t)lv_obj_set_y);
 #else
     anim_time = 0;
 #endif
@@ -517,12 +517,12 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
         a.repeat   = 0;
         a.var      = ext->scrl;
         a.path_cb  = lv_anim_path_linear;
-        a.exec_cb  = (lv_anim_exec_cb_t)lv_obj_set_y;
+        a.exec_cb  = (lv_anim_exec_xcb_t)lv_obj_set_y;
         lv_anim_create(&a);
 
         a.start   = lv_obj_get_x(ext->scrl);
         a.end     = scrlable_x;
-        a.exec_cb = (lv_anim_exec_cb_t)lv_obj_set_x;
+        a.exec_cb = (lv_anim_exec_xcb_t)lv_obj_set_x;
         lv_anim_create(&a);
 #endif
     }
@@ -542,7 +542,7 @@ void lv_page_scroll_hor(lv_obj_t * page, lv_coord_t dist)
     a.var            = scrl;
     a.start          = lv_obj_get_x(scrl);
     a.end            = a.start + dist;
-    a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_x;
+    a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_x;
     a.path_cb        = lv_anim_path_linear;
     a.ready_cb       = NULL;
     a.act_time       = 0;
@@ -571,7 +571,7 @@ void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
     a.var            = scrl;
     a.start          = lv_obj_get_y(scrl);
     a.end            = a.start + dist;
-    a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_y;
+    a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_y;
     a.path_cb        = lv_anim_path_linear;
     a.ready_cb       = NULL;
     a.act_time       = 0;
@@ -600,7 +600,7 @@ void lv_page_start_edge_flash(lv_obj_t * page)
         a.var            = page;
         a.start          = 0;
         a.end            = LV_PAGE_END_FLASH_SIZE;
-        a.exec_cb        = (lv_anim_exec_cb_t)edge_flash_anim;
+        a.exec_cb        = (lv_anim_exec_xcb_t)edge_flash_anim;
         a.path_cb        = lv_anim_path_linear;
         a.ready_cb       = edge_flash_anim_end;
         a.act_time       = 0;

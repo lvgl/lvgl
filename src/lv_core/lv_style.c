@@ -281,7 +281,7 @@ void lv_style_anim_init(lv_anim_t * a)
     lv_anim_init(a);
     a->start    = 0;
     a->end      = STYLE_MIX_MAX;
-    a->exec_cb  = (lv_anim_exec_cb_t)style_animator;
+    a->exec_cb  = (lv_anim_exec_xcb_t)style_animator;
     a->path_cb  = lv_anim_path_linear;
     a->ready_cb = style_animation_common_end_cb;
 

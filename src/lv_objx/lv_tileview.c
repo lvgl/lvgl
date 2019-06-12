@@ -214,7 +214,7 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
 
         lv_anim_t a;
         a.var            = scrl;
-        a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_x;
+        a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_x;
         a.path_cb        = lv_anim_path_linear;
         a.ready_cb       = NULL;
         a.act_time       = 0;
@@ -233,7 +233,7 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
         if(y_coord != y_act) {
             a.start   = y_act;
             a.end     = y_coord;
-            a.exec_cb = (lv_anim_exec_cb_t)lv_obj_set_y;
+            a.exec_cb = (lv_anim_exec_xcb_t)lv_obj_set_y;
             lv_anim_create(&a);
         }
 #endif

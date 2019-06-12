@@ -816,8 +816,8 @@ lv_theme_t * lv_theme_night_init(uint16_t hue, lv_font_t * font)
     win_init();
 
 #if LV_USE_GROUP
-    theme.group.style_mod_cb      = style_mod;
-    theme.group.style_mod_edit_cb = style_mod_edit;
+    theme.group.style_mod_xcb      = style_mod;
+    theme.group.style_mod_edit_xcb = style_mod_edit;
 #endif
 
     return &theme;

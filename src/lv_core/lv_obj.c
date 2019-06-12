@@ -1323,13 +1323,15 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
 
 /**
  * Call an event function with an object, event, and data.
- * @param event_cb an event callback function. If `NULL` `LV_RES_OK` will return without any actions.
+ * @param event_xcb an event callback function. If `NULL` `LV_RES_OK` will return without any actions.
+ *        (the 'x' in the argument name indicates that its not a fully generic function because it not follows
+ *         the `func_name(object, callback, ...)` convention)
  * @param obj pointer to an object to associate with the event (can be `NULL` to simply call the `event_cb`)
  * @param event an event
  * @param data pointer to a custom data
  * @return LV_RES_OK: `obj` was not deleted in the event; LV_RES_INV: `obj` was deleted in the event
  */
-lv_res_t lv_event_send_func(lv_event_cb_t event_cb, lv_obj_t * obj, lv_event_t event, const void * data)
+lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t event, const void * data)
 {
     /* Build a simple linked list from the objects used in the events
      * It's important to know if an this object was deleted by a nested event
@@ -1354,7 +1356,7 @@ lv_res_t lv_event_send_func(lv_event_cb_t event_cb, lv_obj_t * obj, lv_event_t e
     }
 
     /*Call the event callback itself*/
-    if(event_cb) event_cb(obj, event);
+    if(event_xcb) event_xcb(obj, event);
 
     /*Restore the event data*/
     event_act_data = event_act_data_save;

@@ -41,8 +41,10 @@ typedef int16_t lv_anim_value_t;
 /* Generic prototype of "animator" functions.
  * First parameter is the variable to animate.
  * Second parameter is the value to set.
- * Compatible with `lv_xxx_set_yyy(obj, value)` functions*/
-typedef void (*lv_anim_exec_cb_t)(void *, lv_anim_value_t);
+ * Compatible with `lv_xxx_set_yyy(obj, value)` functions
+ * The `x` in `_xcb_t` means its not a fully generic prototype because
+ * it doesn't receive `lv_anim_t *` as its first argument*/
+typedef void (*lv_anim_exec_xcb_t)(void *, lv_anim_value_t);
 
 /* Same as `lv_anim_exec_cb_t` but receives `lv_anim_t *` as the first parameter.
  * It's more consistent but less convenient. Might be used by binding generator functions.*/
@@ -58,7 +60,7 @@ typedef void (*lv_anim_ready_cb_t)(struct _lv_anim_t *);
 typedef struct _lv_anim_t
 {
     void * var;                  /*Variable to animate*/
-    lv_anim_exec_cb_t exec_cb;   /*Function to execute to animate*/
+    lv_anim_exec_xcb_t exec_cb;   /*Function to execute to animate*/
     lv_anim_path_cb_t path_cb;   /*An array with the steps of animations*/
     lv_anim_ready_cb_t ready_cb; /*Call it when the animation is ready*/
     int32_t start;               /*Start value*/
@@ -114,7 +116,7 @@ void lv_anim_init(lv_anim_t * a);
  *                LittelvGL's built-in functions can be used.
  *                E.g. lv_obj_set_x
  */
-static inline void lv_anim_set_exec_cb(lv_anim_t * a, void * var, lv_anim_exec_cb_t exec_cb)
+static inline void lv_anim_set_exec_cb(lv_anim_t * a, void * var, lv_anim_exec_xcb_t exec_cb)
 {
     a->var     = var;
     a->exec_cb = exec_cb;
@@ -155,7 +157,7 @@ static inline void lv_anim_set_values(lv_anim_t * a, lv_anim_value_t start, lv_a
 static inline void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 {
     a->var     = a;
-    a->exec_cb = (lv_anim_exec_cb_t)exec_cb;
+    a->exec_cb = (lv_anim_exec_xcb_t)exec_cb;
 }
 
 /**
@@ -262,7 +264,7 @@ void lv_anim_create(lv_anim_t * a);
  *           or NULL to ignore it and delete all the animations of 'var
  * @return true: at least 1 animation is deleted, false: no animation is deleted
  */
-bool lv_anim_del(void * var, lv_anim_exec_cb_t exec_cb);
+bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb);
 
 /**
  * Delete an aniamation by getting the animated variable from `a`.
@@ -277,7 +279,7 @@ bool lv_anim_del(void * var, lv_anim_exec_cb_t exec_cb);
  */
 static inline bool lv_anim_custom_del(lv_anim_t * a, lv_anim_custom_exec_cb_t exec_cb)
 {
-    return lv_anim_del(a->var, (lv_anim_exec_cb_t)exec_cb);
+    return lv_anim_del(a->var, (lv_anim_exec_xcb_t)exec_cb);
 }
 
 /**

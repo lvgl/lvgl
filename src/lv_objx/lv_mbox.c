@@ -210,7 +210,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
         a.var            = mbox;
         a.start          = lv_obj_get_height(mbox);
         a.end            = 0;
-        a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_height;
+        a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_height;
         a.path_cb        = lv_anim_path_linear;
         a.ready_cb       = NULL;
         a.act_time       = -delay;
@@ -222,7 +222,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
         lv_anim_create(&a);
 
         a.start    = lv_obj_get_width(mbox);
-        a.exec_cb  = (lv_anim_exec_cb_t)lv_obj_set_width;
+        a.exec_cb  = (lv_anim_exec_xcb_t)lv_obj_set_width;
         a.ready_cb = lv_mbox_close_ready_cb;
         lv_anim_create(&a);
 
@@ -234,7 +234,7 @@ void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
         a.var            = mbox;
         a.start          = 0;
         a.end            = 1;
-        a.exec_cb        = (lv_anim_exec_cb_t)NULL;
+        a.exec_cb        = (lv_anim_exec_xcb_t)NULL;
         a.path_cb        = lv_anim_path_linear;
         a.ready_cb       = lv_mbox_close_ready_cb;
         a.act_time       = -delay;

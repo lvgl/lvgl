@@ -187,7 +187,7 @@ void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
                 a.start = 0;
                 a.end   = 360;
             }
-            a.exec_cb        = (lv_anim_exec_cb_t)lv_preload_spinner_anim;
+            a.exec_cb        = (lv_anim_exec_xcb_t)lv_preload_spinner_anim;
             a.path_cb        = lv_anim_path_ease_in_out;
             a.ready_cb       = NULL;
             a.act_time       = 0;
@@ -208,7 +208,7 @@ void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
                 b.start = ext->arc_length;
                 b.end   = 360 - ext->arc_length;
             }
-            b.exec_cb        = (lv_anim_exec_cb_t)lv_preload_set_arc_length;
+            b.exec_cb        = (lv_anim_exec_xcb_t)lv_preload_set_arc_length;
             b.path_cb        = lv_anim_path_ease_in_out;
             b.ready_cb       = NULL;
             b.act_time       = 0;
@@ -233,7 +233,7 @@ void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
                 a.start = 0;
                 a.end   = 360;
             }
-            a.exec_cb        = (lv_anim_exec_cb_t)lv_preload_spinner_anim;
+            a.exec_cb        = (lv_anim_exec_xcb_t)lv_preload_spinner_anim;
             a.path_cb        = lv_anim_path_ease_in_out;
             a.ready_cb       = NULL;
             a.act_time       = 0;

@@ -160,7 +160,7 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
 
 /* If your MCU has hardware accelerator (GPU) then you can use it to blend to memories using opacity
  * It can be used only in buffered mode (LV_VDB_SIZE != 0 in lv_conf.h)*/
-static void mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
+static void mem_blend(lv_disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
 {
     /*It's an example code which should be done by your GPU*/
 
@@ -172,7 +172,8 @@ static void mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length
 
 /* If your MCU has hardware accelerator (GPU) then you can use it to fill a memory with a color
  * It can be used only in buffered mode (LV_VDB_SIZE != 0 in lv_conf.h)*/
-static void mem_fill(lv_color_t * dest, uint32_t length, lv_color_t color)
+static void mem_fill(lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, const lv_area_t * dest_area,
+                      const lv_area_t * fill_area, lv_color_t color);
 {
     /*It's an example code which should be done by your GPU*/
 

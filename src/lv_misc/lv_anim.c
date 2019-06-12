@@ -111,7 +111,7 @@ void lv_anim_create(lv_anim_t * a)
  *           or NULL to delete all the animations of 'var'
  * @return true: at least 1 animation is deleted, false: no animation is deleted
  */
-bool lv_anim_del(void * var, lv_anim_exec_cb_t exec_cb)
+bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
 {
     lv_anim_t * a;
     lv_anim_t * a_next;

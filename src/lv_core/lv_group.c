@@ -618,8 +618,8 @@ static void refresh_theme(lv_group_t * g, lv_theme_t * th)
     g->style_mod_cb      = style_mod_def;
     g->style_mod_edit_cb = style_mod_edit_def;
     if(th) {
-        if(th->group.style_mod_cb) g->style_mod_cb = th->group.style_mod_cb;
-        if(th->group.style_mod_edit_cb) g->style_mod_edit_cb = th->group.style_mod_edit_cb;
+        if(th->group.style_mod_xcb) g->style_mod_cb = th->group.style_mod_xcb;
+        if(th->group.style_mod_edit_xcb) g->style_mod_edit_cb = th->group.style_mod_edit_xcb;
     }
 }
 

@@ -627,7 +627,7 @@ void lv_list_up(const lv_obj_t * list)
                     a.var            = scrl;
                     a.start          = lv_obj_get_y(scrl);
                     a.end            = new_y;
-                    a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_y;
+                    a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_y;
                     a.path_cb        = lv_anim_path_linear;
                     a.ready_cb       = NULL;
                     a.act_time       = 0;
@@ -669,7 +669,7 @@ void lv_list_down(const lv_obj_t * list)
                 a.var            = scrl;
                 a.start          = lv_obj_get_y(scrl);
                 a.end            = new_y;
-                a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_y;
+                a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_y;
                 a.path_cb        = lv_anim_path_linear;
                 a.ready_cb       = NULL;
                 a.act_time       = 0;

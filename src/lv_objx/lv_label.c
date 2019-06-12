@@ -265,10 +265,10 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
 
 #if LV_USE_ANIMATION
     /*Delete the old animation (if exists)*/
-    lv_anim_del(label, (lv_anim_exec_cb_t)lv_obj_set_x);
-    lv_anim_del(label, (lv_anim_exec_cb_t)lv_obj_set_y);
-    lv_anim_del(label, (lv_anim_exec_cb_t)lv_label_set_offset_x);
-    lv_anim_del(label, (lv_anim_exec_cb_t)lv_label_set_offset_y);
+    lv_anim_del(label, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_del(label, (lv_anim_exec_xcb_t)lv_obj_set_y);
+    lv_anim_del(label, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
+    lv_anim_del(label, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
 #endif
     ext->offset.x = 0;
     ext->offset.y = 0;
@@ -980,25 +980,25 @@ static void lv_label_refr_text(lv_obj_t * label)
         bool hor_anim = false;
         if(size.x > lv_obj_get_width(label)) {
             anim.end     = lv_obj_get_width(label) - size.x;
-            anim.exec_cb = (lv_anim_exec_cb_t)lv_label_set_offset_x;
+            anim.exec_cb = (lv_anim_exec_xcb_t)lv_label_set_offset_x;
             anim.time    = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
             lv_anim_create(&anim);
             hor_anim = true;
         } else {
             /*Delete the offset animation if not required*/
-            lv_anim_del(label, (lv_anim_exec_cb_t)lv_label_set_offset_x);
+            lv_anim_del(label, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
             ext->offset.x = 0;
         }
 
         if(size.y > lv_obj_get_height(label) && hor_anim == false) {
             anim.end     = lv_obj_get_height(label) - size.y - (lv_font_get_line_height(font));
-            anim.exec_cb = (lv_anim_exec_cb_t)lv_label_set_offset_y;
+            anim.exec_cb = (lv_anim_exec_xcb_t)lv_label_set_offset_y;
 
             anim.time = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
             lv_anim_create(&anim);
         } else {
             /*Delete the offset animation if not required*/
-            lv_anim_del(label, (lv_anim_exec_cb_t)lv_label_set_offset_y);
+            lv_anim_del(label, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
             ext->offset.y = 0;
         }
 #endif
@@ -1022,24 +1022,24 @@ static void lv_label_refr_text(lv_obj_t * label)
         bool hor_anim = false;
         if(size.x > lv_obj_get_width(label)) {
             anim.end     = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
-            anim.exec_cb = (lv_anim_exec_cb_t)lv_label_set_offset_x;
+            anim.exec_cb = (lv_anim_exec_xcb_t)lv_label_set_offset_x;
             anim.time    = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
             lv_anim_create(&anim);
             hor_anim = true;
         } else {
             /*Delete the offset animation if not required*/
-            lv_anim_del(label, (lv_anim_exec_cb_t)lv_label_set_offset_x);
+            lv_anim_del(label, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
             ext->offset.x = 0;
         }
 
         if(size.y > lv_obj_get_height(label) && hor_anim == false) {
             anim.end     = -size.y - (lv_font_get_line_height(font));
-            anim.exec_cb = (lv_anim_exec_cb_t)lv_label_set_offset_y;
+            anim.exec_cb = (lv_anim_exec_xcb_t)lv_label_set_offset_y;
             anim.time    = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
             lv_anim_create(&anim);
         } else {
             /*Delete the offset animation if not required*/
-            lv_anim_del(label, (lv_anim_exec_cb_t)lv_label_set_offset_y);
+            lv_anim_del(label, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
             ext->offset.y = 0;
         }
 #endif

@@ -863,7 +863,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, lv_anim_enable_t anim)
         lv_ddlist_pos_current_option(ddlist);
         if(ext->opened) lv_page_set_sb_mode(ddlist, LV_SB_MODE_UNHIDE);
 #if LV_USE_ANIMATION
-        lv_anim_del(ddlist, (lv_anim_exec_cb_t)lv_ddlist_adjust_height); /*If an animation is in progress then
+        lv_anim_del(ddlist, (lv_anim_exec_xcb_t)lv_ddlist_adjust_height); /*If an animation is in progress then
                                                                  it will overwrite this changes*/
 
         /*Force animation complete to fix highlight selection*/
@@ -875,7 +875,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, lv_anim_enable_t anim)
             a.var            = ddlist;
             a.start          = lv_obj_get_height(ddlist);
             a.end            = new_height;
-            a.exec_cb        = (lv_anim_exec_cb_t)lv_ddlist_adjust_height;
+            a.exec_cb        = (lv_anim_exec_xcb_t)lv_ddlist_adjust_height;
             a.path_cb        = lv_anim_path_linear;
             a.ready_cb       = lv_ddlist_anim_ready_cb;
             a.act_time       = 0;

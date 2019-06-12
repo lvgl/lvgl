@@ -162,7 +162,7 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value, lv_anim_enable_t anim)
         a.var            = bar;
         a.start          = LV_BAR_ANIM_STATE_START;
         a.end            = LV_BAR_ANIM_STATE_END;
-        a.exec_cb        = (lv_anim_exec_cb_t)lv_bar_anim;
+        a.exec_cb        = (lv_anim_exec_xcb_t)lv_bar_anim;
         a.path_cb        = lv_anim_path_linear;
         a.ready_cb       = lv_bar_anim_ready;
         a.act_time       = 0;

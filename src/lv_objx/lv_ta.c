@@ -172,7 +172,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Create a cursor blinker animation*/
         lv_anim_t a;
         a.var            = new_ta;
-        a.exec_cb        = (lv_anim_exec_cb_t)cursor_blink_anim;
+        a.exec_cb        = (lv_anim_exec_xcb_t)cursor_blink_anim;
         a.time           = ext->cursor.blink_time;
         a.act_time       = 0;
         a.ready_cb       = NULL;
@@ -256,7 +256,7 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
         /*Auto hide characters*/
         lv_anim_t a;
         a.var            = ta;
-        a.exec_cb        = (lv_anim_exec_cb_t)pwd_char_hider_anim;
+        a.exec_cb        = (lv_anim_exec_xcb_t)pwd_char_hider_anim;
         a.time           = ext->pwd_show_time;
         a.act_time       = 0;
         a.ready_cb       = pwd_char_hider_anim_ready;
@@ -337,7 +337,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
         /*Auto hide characters*/
         lv_anim_t a;
         a.var            = ta;
-        a.exec_cb        = (lv_anim_exec_cb_t)pwd_char_hider_anim;
+        a.exec_cb        = (lv_anim_exec_xcb_t)pwd_char_hider_anim;
         a.time           = ext->pwd_show_time;
         a.act_time       = 0;
         a.ready_cb       = pwd_char_hider_anim_ready;
@@ -477,7 +477,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
         /*Auto hide characters*/
         lv_anim_t a;
         a.var            = ta;
-        a.exec_cb        = (lv_anim_exec_cb_t)pwd_char_hider_anim;
+        a.exec_cb        = (lv_anim_exec_xcb_t)pwd_char_hider_anim;
         a.time           = ext->pwd_show_time;
         a.act_time       = 0;
         a.ready_cb       = pwd_char_hider_anim_ready;
@@ -584,7 +584,7 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
         /*Reset cursor blink animation*/
         lv_anim_t a;
         a.var            = ta;
-        a.exec_cb        = (lv_anim_exec_cb_t)cursor_blink_anim;
+        a.exec_cb        = (lv_anim_exec_xcb_t)cursor_blink_anim;
         a.time           = ext->cursor.blink_time;
         a.act_time       = 0;
         a.ready_cb       = NULL;
@@ -849,7 +849,7 @@ void lv_ta_set_cursor_blink_time(lv_obj_t * ta, uint16_t time)
         /*Reset cursor blink animation*/
         lv_anim_t a;
         a.var            = ta;
-        a.exec_cb        = (lv_anim_exec_cb_t)cursor_blink_anim;
+        a.exec_cb        = (lv_anim_exec_xcb_t)cursor_blink_anim;
         a.time           = ext->cursor.blink_time;
         a.act_time       = 0;
         a.ready_cb       = NULL;

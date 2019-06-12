@@ -408,7 +408,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
 
             refr_height(roller);
 #if LV_USE_ANIMATION
-            lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_cb_t)lv_obj_set_y);
+            lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
             lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
             refr_position(roller, false);
@@ -529,7 +529,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
         }
     } else if(sign == LV_SIGNAL_PRESSED) {
 #if LV_USE_ANIMATION
-        lv_anim_del(roller_scrl, (lv_anim_exec_cb_t)lv_obj_set_y);
+        lv_anim_del(roller_scrl, (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
     }
 
@@ -629,7 +629,7 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim)
         a.var            = roller_scrl;
         a.start          = lv_obj_get_y(roller_scrl);
         a.end            = new_y;
-        a.exec_cb        = (lv_anim_exec_cb_t)lv_obj_set_y;
+        a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_y;
         a.path_cb        = lv_anim_path_linear;
         a.ready_cb       = scroll_anim_ready_cb;
         a.act_time       = 0;
@@ -662,7 +662,7 @@ static void refr_height(lv_obj_t * roller)
     lv_obj_set_height(lv_page_get_scrl(roller), lv_obj_get_height(ext->ddlist.label) + lv_obj_get_height(roller));
     lv_obj_align(ext->ddlist.label, NULL, obj_align, 0, 0);
 #if LV_USE_ANIMATION
-    lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_cb_t)lv_obj_set_y);
+    lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
     lv_ddlist_set_selected(roller, ext->ddlist.sel_opt_id);
 }
