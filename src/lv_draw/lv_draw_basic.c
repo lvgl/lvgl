@@ -42,7 +42,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void sw_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
-static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_t * fill_area, lv_color_t color,
+static void sw_color_fill(lv_color_t * mem, lv_coord_t mem_width, const lv_area_t * fill_area, lv_color_t color,
                           lv_opa_t opa);
 
 #if LV_COLOR_SCREEN_TRANSP
@@ -150,13 +150,13 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
     lv_coord_t w = lv_area_get_width(&vdb_rel_a);
     /*Don't use hw. acc. for every small fill (because of the init overhead)*/
     if(w < VFILL_HW_ACC_SIZE_LIMIT) {
-        sw_color_fill(&vdb->area, vdb->buf_act, &vdb_rel_a, color, opa);
+        sw_color_fill(vdb->buf_act, vdb_width, &vdb_rel_a, color, opa);
     }
     /*Not opaque fill*/
     else if(opa == LV_OPA_COVER) {
         /*Use hw fill if present*/
         if(disp->driver.mem_fill_cb) {
-            disp->driver.mem_fill_cb(&disp->driver, vdb->buf_act, &vdb->area, &vdb_rel_a, color);
+            disp->driver.mem_fill_cb(&disp->driver, vdb->buf_act, vdb_width, &vdb_rel_a, color);
         }
         /*Use hw blend if present and the area is not too small*/
         else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_SIZE_LIMIT && disp->driver.mem_blend_cb) {
@@ -179,7 +179,7 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
         }
         /*Else use sw fill if no better option*/
         else {
-            sw_color_fill(&vdb->area, vdb->buf_act, &vdb_rel_a, color, opa);
+            sw_color_fill(vdb->buf_act, vdb_width, &vdb_rel_a, color, opa);
         }
 
     }
@@ -204,11 +204,11 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
         }
         /*Use sw fill with opa if no better option*/
         else {
-            sw_color_fill(&vdb->area, vdb->buf_act, &vdb_rel_a, color, opa);
+            sw_color_fill(vdb->buf_act, vdb_width, &vdb_rel_a, color, opa);
         }
     }
 #else
-    sw_color_fill(&vdb->area, vdb->buf_act, &vdb_rel_a, color, opa);
+    sw_color_fill(vdb->buf_act, vdb_width, &vdb_rel_a, color, opa);
 #endif
 }
 
@@ -552,20 +552,19 @@ static void sw_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t len
 }
 
 /**
- *
- * @param mem_area coordinates of 'mem' memory area
+ * Fill an area with a color
  * @param mem a memory address. Considered to a rectangular window according to 'mem_area'
+ * @param mem_width width of the 'mem' buffer
  * @param fill_area coordinates of an area to fill. Relative to 'mem_area'.
  * @param color fill color
  * @param opa opacity (0, LV_OPA_TRANSP: transparent ... 255, LV_OPA_COVER, fully cover)
  */
-static void sw_color_fill(lv_area_t * mem_area, lv_color_t * mem, const lv_area_t * fill_area, lv_color_t color,
+static void sw_color_fill(lv_color_t * mem, lv_coord_t mem_width, const lv_area_t * fill_area, lv_color_t color,
                           lv_opa_t opa)
 {
     /*Set all row in vdb to the given color*/
     lv_coord_t row;
     lv_coord_t col;
-    lv_coord_t mem_width = lv_area_get_width(mem_area);
 
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
     if(disp->driver.set_px_cb) {

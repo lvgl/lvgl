@@ -172,10 +172,20 @@ static void mem_blend(lv_disp_drv_t * disp_drv, lv_color_t * dest, const lv_colo
 
 /* If your MCU has hardware accelerator (GPU) then you can use it to fill a memory with a color
  * It can be used only in buffered mode (LV_VDB_SIZE != 0 in lv_conf.h)*/
-static void mem_fill(lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, const lv_area_t * dest_area,
-                      const lv_area_t * fill_area, lv_color_t color);
+static void mem_fill_cb(lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
+                    const lv_area_t * fill_area, lv_color_t color);
 {
     /*It's an example code which should be done by your GPU*/
+    uint32_t x, y;
+    dest_buf += dest_widht * fill_area->y1; /*Go to the first line*/
+
+    for(y = fill_area->y1; y < fill_area->y2; y++) {
+        for(x = fill_area->x1; x < fill_area->x2; x++) {
+            dest_buf[x] = color;
+        }
+        dest_buf+=des_width;    /*Go to the next line*/
+    }
+
 
     uint32_t i;
     for(i = 0; i < length; i++) {

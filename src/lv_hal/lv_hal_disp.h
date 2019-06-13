@@ -96,7 +96,7 @@ typedef struct _disp_drv_t
                          lv_opa_t opa);
 
     /*OPTIONAL: Fill a memory with a color (GPU only)*/
-    void (*mem_fill_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest_buf, const lv_area_t * dest_area,
+    void (*mem_fill_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
                         const lv_area_t * fill_area, lv_color_t color);
 #endif
 
