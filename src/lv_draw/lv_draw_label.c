@@ -13,6 +13,7 @@
  *      DEFINES
  *********************/
 #define LABEL_RECOLOR_PAR_LENGTH 6
+#define LV_LABEL_HINT_UPDATE_TH		1024	/*Update the "hint" if the label's y coordinates have changed more then this*/
 
 /**********************
  *      TYPEDEFS
@@ -87,12 +88,17 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 
     uint32_t line_start = 0;
     int32_t last_line_start = -1;
-    if(hint) {
-        if(LV_MATH_ABS(hint->coord_y - coords->y1) > 50) {
+
+    /*Check the hint to use the cached info*/
+    if(hint && y_ofs == 0) {
+    	/*If the label changed too much recalculate the hint.*/
+        if(LV_MATH_ABS(hint->coord_y - coords->y1) > LV_LABEL_HINT_UPDATE_TH - 2 * line_height) {
             hint->line_start = -1;
         }
         last_line_start = hint->line_start;
     }
+
+    /*Use the hint if it's valid*/
     if(last_line_start >= 0) {
         line_start = last_line_start;
         pos.y += hint->y;
@@ -107,12 +113,11 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         line_end += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, w, flag);
         pos.y += line_height;
 
-//        if(pos.y + line_height <= 0 && pos.y + 2 * line_height > 0 && hint_saved == false) {
-        if(pos.y  >= -100 && hint->line_start < 0) {
+        /*Save at the threshold coordinate*/
+        if(pos.y  >= -LV_LABEL_HINT_UPDATE_TH && hint->line_start < 0) {
             hint->line_start = line_start;
             hint->y = pos.y - coords->y1;
             hint->coord_y = coords->y1;
-            printf("in : %d, %d, %d\n", hint->line_start, hint->y, hint->coord_y);
         }
 
         if(txt[line_start] == '\0') return;

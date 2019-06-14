@@ -11,7 +11,6 @@
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_group.h"
-#include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_math.h"
 
@@ -24,6 +23,7 @@
 #endif
 
 #define LV_LABEL_DOT_END_INV 0xFFFF
+#define LV_LABEL_HINT_HEIGHT_LIMIT	1024		/*Enable "hint" to buffer info about labels larger than this. (Speed up their drawing)*/
 
 /**********************
  *      TYPEDEFS
@@ -50,7 +50,6 @@ static void lv_label_dot_tmp_free(lv_obj_t * label);
  *  STATIC VARIABLES
  **********************/
 static lv_signal_cb_t ancestor_signal;
-lv_draw_label_hint_t hint = {.line_start = -1};
 
 /**********************
  *      MACROS
@@ -96,6 +95,11 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
     ext->offset.x = 0;
     ext->offset.y = 0;
+
+    ext->hint.line_start = -1;
+    ext->hint.coord_y = 0;
+    ext->hint.y = 0;
+
 #if LV_LABEL_TEXT_SEL
     ext->txt_sel_start = LV_LABEL_TEXT_SEL_OFF;
     ext->txt_sel_end   = LV_LABEL_TEXT_SEL_OFF;
@@ -845,8 +849,11 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
             }
         }
 
+        lv_draw_label_hint_t * hint = &ext->hint;
+        if(ext->long_mode == LV_LABEL_LONG_ROLL_CIRC || lv_obj_get_height(label) < LV_LABEL_HINT_HEIGHT_LIMIT) hint = NULL;
+
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset,
-                      lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), &hint);
+                      lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), hint);
 
         if(ext->long_mode == LV_LABEL_LONG_ROLL_CIRC) {
             lv_point_t size;
@@ -940,6 +947,8 @@ static void lv_label_refr_text(lv_obj_t * label)
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
     if(ext->text == NULL) return;
+
+    ext->hint.line_start = -1;	/*The hint is invalid if the text changes*/
 
     lv_coord_t max_w         = lv_obj_get_width(label);
     const lv_style_t * style = lv_obj_get_style(label);

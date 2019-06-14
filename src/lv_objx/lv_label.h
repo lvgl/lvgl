@@ -25,6 +25,7 @@ extern "C" {
 #include "../lv_font/lv_font.h"
 #include "../lv_font/lv_symbol_def.h"
 #include "../lv_misc/lv_txt.h"
+#include "../lv_draw/lv_draw.h"
 
 /*********************
  *      DEFINES
@@ -72,6 +73,7 @@ typedef struct
     uint16_t dot_end;  /*The text end position in dot mode (Handled by the library)*/
     lv_point_t offset; /*Text draw position offset*/
 
+    lv_draw_label_hint_t hint;	/*Used to buffer info about large text*/
 #if LV_USE_ANIMATION
     uint16_t anim_speed; /*Speed of scroll and roll animation in px/sec unit*/
 #endif

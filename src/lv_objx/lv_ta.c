@@ -107,6 +107,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cursor.style      = NULL;
     ext->cursor.blink_time = LV_TA_DEF_CURSOR_BLINK_TIME;
     ext->cursor.pos        = 0;
+    ext->cursor.click_pos  = 1;
     ext->cursor.type       = LV_CURSOR_LINE;
     ext->cursor.valid_x    = 0;
     ext->one_line          = 0;
@@ -618,6 +619,17 @@ void lv_ta_set_cursor_type(lv_obj_t * ta, lv_cursor_type_t cur_type)
 }
 
 /**
+ * Enable/Disable the positioning of the the cursor by clicking the text on the text area.
+ * @param ta pointer to a text area object
+ * @param en true: enable click positions; false: disable
+ */
+void lv_ta_set_cursor_click_pos(lv_obj_t * ta, bool en)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    ext->cursor.click_pos = en ? 1 : 0;
+}
+
+/**
  * Enable/Disable password mode
  * @param ta pointer to a text area object
  * @param en true: enable, false: disable
@@ -939,6 +951,17 @@ lv_cursor_type_t lv_ta_get_cursor_type(const lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     return ext->cursor.type;
+}
+
+/**
+ * Get whether the cursor click positioning is enabled or not.
+ * @param ta pointer to a text area object
+ * @return true: enable click positions; false: disable
+ */
+bool lv_ta_get_cursor_click_pos(lv_obj_t * ta)
+{
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    return ext->cursor.click_pos ? true : false;
 }
 
 /**
@@ -1586,6 +1609,8 @@ static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res)
 static void refr_cursor_area(lv_obj_t * ta)
 {
     lv_ta_ext_t * ext              = lv_obj_get_ext_attr(ta);
+
+
     const lv_style_t * label_style = lv_obj_get_style(ext->label);
 
     lv_style_t cur_style;
@@ -1707,14 +1732,18 @@ static void placeholder_update(lv_obj_t * ta)
 
 static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_indev_t * click_source)
 {
+
     if(click_source == NULL) return;
+
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    if(ext->cursor.click_pos == 0) return;
+	if(ext->cursor.type == LV_CURSOR_NONE) return;
 
     if(lv_indev_get_type(click_source) == LV_INDEV_TYPE_KEYPAD ||
        lv_indev_get_type(click_source) == LV_INDEV_TYPE_ENCODER) {
         return;
     }
 
-    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     lv_area_t label_coords;
     lv_obj_get_coords(ext->label, &label_coords);

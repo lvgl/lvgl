@@ -76,6 +76,7 @@ typedef struct
         uint16_t txt_byte_pos;     /* Byte index of the letter after (on) the cursor*/
         lv_cursor_type_t type : 4; /* Shape of the cursor*/
         uint8_t state : 1;         /*Cursor is visible now or not (Handled by the library)*/
+        uint8_t click_pos	:1;	   /*1: Enable positioning the cursor by clicking the text area*/
     } cursor;
 #if LV_LABEL_TEXT_SEL
     uint16_t tmp_sel_start;       /*Temporary value*/
@@ -172,6 +173,13 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos);
  * @param cur_type: element of 'lv_cursor_type_t'
  */
 void lv_ta_set_cursor_type(lv_obj_t * ta, lv_cursor_type_t cur_type);
+
+/**
+ * Enable/Disable the positioning of the the cursor by clicking the text on the text area.
+ * @param ta pointer to a text area object
+ * @param en true: enable click positions; false: disable
+ */
+void lv_ta_set_cursor_click_pos(lv_obj_t * ta, bool en);
 
 /**
  * Enable/Disable password mode
@@ -318,6 +326,13 @@ uint16_t lv_ta_get_cursor_pos(const lv_obj_t * ta);
  * @return element of 'lv_cursor_type_t'
  */
 lv_cursor_type_t lv_ta_get_cursor_type(const lv_obj_t * ta);
+
+/**
+ * Get whether the cursor click positioning is enabled or not.
+ * @param ta pointer to a text area object
+ * @return true: enable click positions; false: disable
+ */
+bool lv_ta_get_cursor_click_pos(lv_obj_t * ta);
 
 /**
  * Get the password mode attribute
