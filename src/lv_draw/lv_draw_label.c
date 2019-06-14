@@ -99,7 +99,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     }
 
     /*Use the hint if it's valid*/
-    if(last_line_start >= 0) {
+    if(hint && last_line_start >= 0) {
         line_start = last_line_start;
         pos.y += hint->y;
     }
@@ -114,7 +114,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         pos.y += line_height;
 
         /*Save at the threshold coordinate*/
-        if(pos.y  >= -LV_LABEL_HINT_UPDATE_TH && hint->line_start < 0) {
+        if(hint && pos.y  >= -LV_LABEL_HINT_UPDATE_TH && hint->line_start < 0) {
             hint->line_start = line_start;
             hint->y = pos.y - coords->y1;
             hint->coord_y = coords->y1;
