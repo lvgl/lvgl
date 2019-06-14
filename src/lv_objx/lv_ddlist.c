@@ -209,6 +209,8 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
     } else {
         lv_obj_invalidate(ddlist);
     }
+
+    lv_event_send(ddlist, LV_EVENT_VALUE_CHANGED, &ext->sel_opt_id);
 }
 
 /**

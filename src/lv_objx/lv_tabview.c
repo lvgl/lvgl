@@ -338,7 +338,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     lv_res_t res = LV_RES_OK;
     if(id >= ext->tab_cnt) id = ext->tab_cnt - 1;
 
-    if(id != ext->tab_cur) res = lv_event_send(tabview, LV_EVENT_SELECTED, &id);
+    if(id != ext->tab_cur) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id);
     if(res != LV_RES_OK) return;
 
     lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_TGL_STATE, false);

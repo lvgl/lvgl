@@ -82,7 +82,6 @@ enum {
     LV_EVENT_DEFOCUSED,
     LV_EVENT_VALUE_CHANGED,
     LV_EVENT_INSERT,
-    LV_EVENT_SELECTED,
     LV_EVENT_REFRESH,
     LV_EVENT_APPLY,  /*"Ok", "Apply" or similar specific button has clicked*/
     LV_EVENT_CANCEL, /*"Close", "Cancel" or similar specific button has clicked*/

@@ -323,7 +323,7 @@ const lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
  */
 void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
 {
-    if(event != LV_EVENT_SELECTED && event != LV_EVENT_LONG_PRESSED_REPEAT) return;
+    if(event != LV_EVENT_VALUE_CHANGED && event != LV_EVENT_LONG_PRESSED_REPEAT) return;
 
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     uint16_t btn_id   = lv_btnm_get_active_btn(kb);
