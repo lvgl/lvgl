@@ -138,6 +138,24 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
 }
 
 /**
+ * Set the palette color of a canvas with index format. Valid only for `LV_IMG_CF_INDEXED1/2/4/8`
+ * @param canvas pointer to canvas object
+ * @param id the palette color to set:
+ *   - for `LV_IMG_CF_INDEXED1`: 0..1
+ *   - for `LV_IMG_CF_INDEXED2`: 0..3
+ *   - for `LV_IMG_CF_INDEXED4`: 0..15
+ *   - for `LV_IMG_CF_INDEXED8`: 0..255
+ * @param c the color to set
+ */
+void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color_t c)
+{
+    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+
+    lv_img_buf_set_palette(&ext->dsc, id, c);
+    lv_obj_invalidate(canvas);
+}
+
+/**
  * Set a style of a canvas.
  * @param canvas pointer to canvas object
  * @param type which style should be set

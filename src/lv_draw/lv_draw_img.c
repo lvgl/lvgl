@@ -299,27 +299,27 @@ void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
 /**
  * Set the palette color of an indexed image. Valid only for `LV_IMG_CF_INDEXED1/2/4/8`
  * @param dsc pointer to an image descriptor
- * @param color_id the palette color to set:
+ * @param id the palette color to set:
  *   - for `LV_IMG_CF_INDEXED1`: 0..1
  *   - for `LV_IMG_CF_INDEXED2`: 0..3
  *   - for `LV_IMG_CF_INDEXED4`: 0..15
  *   - for `LV_IMG_CF_INDEXED8`: 0..255
- * @param color the color to set
+ * @param c the color to set
  */
-void lv_img_buf_set_palette(lv_img_dsc_t * dsc, int color_id, lv_color_t color)
+void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color_t c)
 {
-    if((dsc->header.cf == LV_IMG_CF_ALPHA_1BIT && color_id > 1) ||
-       (dsc->header.cf == LV_IMG_CF_ALPHA_2BIT && color_id > 3) ||
-       (dsc->header.cf == LV_IMG_CF_ALPHA_4BIT && color_id > 15) ||
-       (dsc->header.cf == LV_IMG_CF_ALPHA_8BIT && color_id > 255)) {
-        LV_LOG_WARN("lv_img_buf_set_px_alpha: invalid 'color_id'");
+    if((dsc->header.cf == LV_IMG_CF_ALPHA_1BIT && id > 1) ||
+       (dsc->header.cf == LV_IMG_CF_ALPHA_2BIT && id > 3) ||
+       (dsc->header.cf == LV_IMG_CF_ALPHA_4BIT && id > 15) ||
+       (dsc->header.cf == LV_IMG_CF_ALPHA_8BIT)) {
+        LV_LOG_WARN("lv_img_buf_set_px_alpha: invalid 'id'");
         return;
     }
 
     lv_color32_t c32;
-    c32.full       = lv_color_to32(color);
-    uint32_t * buf = (uint32_t *)dsc->data;
-    buf[color_id]  = c32.full;
+    c32.full       = lv_color_to32(c);
+    uint8_t * buf = (uint8_t *)dsc->data;
+    memcpy(&buf[id * sizeof(c32)], &c32, sizeof(c32));
 }
 
 /**

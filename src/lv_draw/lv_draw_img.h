@@ -90,14 +90,14 @@ void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
 /**
  * Set the palette color of an indexed image. Valid only for `LV_IMG_CF_INDEXED1/2/4/8`
  * @param dsc pointer to an image descriptor
- * @param color_id the palette color to set:
+ * @param id the palette color to set:
  *   - for `LV_IMG_CF_INDEXED1`: 0..1
  *   - for `LV_IMG_CF_INDEXED2`: 0..3
  *   - for `LV_IMG_CF_INDEXED4`: 0..15
  *   - for `LV_IMG_CF_INDEXED8`: 0..255
- * @param color the color to set
+ * @param c the color to set
  */
-void lv_img_buf_set_palette(lv_img_dsc_t * dsc, int color_id, lv_color_t color);
+void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color_t c);
 
 /**
  * Get the pixel size of a color format in bits
