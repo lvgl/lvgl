@@ -1430,7 +1430,7 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*Set the label width according to the text area width*/
         if(ext->label) {
-            if(lv_obj_get_width(ta) != lv_area_get_width(param) || lv_obj_get_height(ta) != lv_area_get_height(param)) {
+            if(lv_obj_get_width(scrl) != lv_area_get_width(param) || lv_obj_get_height(scrl) != lv_area_get_height(param)) {
 
                 const lv_style_t * style_scrl = lv_obj_get_style(scrl);
                 lv_obj_set_width(ext->label, lv_page_get_fit_width(ta));
