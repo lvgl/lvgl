@@ -184,6 +184,11 @@ typedef struct {
      * from `lv_font_fmt_txt_bitmap_format_t`
      */
     uint16_t bitmap_format  :2;
+
+    /*Cache the last letter and is glyph id*/
+    uint32_t last_letter;
+    uint32_t last_glyph_id;
+
 }lv_font_fmt_txt_dsc_t;
 
 /**********************
