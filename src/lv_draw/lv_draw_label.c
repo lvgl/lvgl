@@ -88,20 +88,19 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     uint32_t line_start = 0;
     int32_t last_line_start = -1;
     if(hint) {
-        if(LV_MATH_ABS(hint->coord_y - coords->y1) > 800) {
+        if(LV_MATH_ABS(hint->coord_y - coords->y1) > 50) {
             hint->line_start = -1;
-            last_line_start = hint->line_start;
         }
+        last_line_start = hint->line_start;
     }
     if(last_line_start >= 0) {
         line_start = last_line_start;
-        pos.y = hint->y;
+        pos.y += hint->y;
     }
 
     uint32_t line_end = line_start + lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, w, flag);
 
     /*Go the first visible line*/
-    bool hint_saved = false;
     while(pos.y + line_height < mask->y1) {
         /*Go to next line*/
         line_start = line_end;
@@ -109,11 +108,10 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         pos.y += line_height;
 
 //        if(pos.y + line_height <= 0 && pos.y + 2 * line_height > 0 && hint_saved == false) {
-        if(pos.y  >= -1000 && hint->line_start < 0) {
+        if(pos.y  >= -100 && hint->line_start < 0) {
             hint->line_start = line_start;
-            hint->y = pos.y;
+            hint->y = pos.y - coords->y1;
             hint->coord_y = coords->y1;
-            hint_saved = true;
             printf("in : %d, %d, %d\n", hint->line_start, hint->y, hint->coord_y);
         }
 
