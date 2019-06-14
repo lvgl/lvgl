@@ -49,7 +49,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
         lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL, -1, -1);
+        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL, -1, -1, NULL);
         return;
     }
 
@@ -59,7 +59,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
     if(res == LV_RES_INV) {
         LV_LOG_WARN("Image draw error");
         lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL, -1, -1);
+        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL, -1, -1, NULL);
         return;
     }
 }

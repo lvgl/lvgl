@@ -1107,7 +1107,7 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
                     /* set the area at some distance of the major tick len left of the tick */
                     lv_area_t a = {(p2.x - size.x - LV_CHART_AXIS_TO_LABEL_DISTANCE), (p2.y - size.y / 2),
                                    (p2.x - LV_CHART_AXIS_TO_LABEL_DISTANCE), (p2.y + size.y / 2)};
-                    lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, -1, -1);
+                    lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, -1, -1, NULL);
                 }
             }
         }
@@ -1215,7 +1215,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
                     /* set the area at some distance of the major tick len under of the tick */
                     lv_area_t a = {(p2.x - size.x / 2), (p2.y + LV_CHART_AXIS_TO_LABEL_DISTANCE), (p2.x + size.x / 2),
                                    (p2.y + size.y + LV_CHART_AXIS_TO_LABEL_DISTANCE)};
-                    lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, -1, -1);
+                    lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, -1, -1, NULL);
                 }
             }
         }

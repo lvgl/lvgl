@@ -1260,7 +1260,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
             cur_area.x1 += cur_style.body.padding.left;
             cur_area.y1 += cur_style.body.padding.top;
             lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0,
-                          LV_LABEL_TEXT_SEL_OFF, LV_LABEL_TEXT_SEL_OFF);
+                          LV_LABEL_TEXT_SEL_OFF, LV_LABEL_TEXT_SEL_OFF, NULL);
 
         } else if(ext->cursor.type == LV_CURSOR_OUTLINE) {
             cur_style.body.opa = LV_OPA_TRANSP;
