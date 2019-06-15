@@ -385,21 +385,6 @@
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 #endif
 
-/* If a character is at least this long, will break wherever "prettiest" */
-#ifndef LV_TXT_LINE_BREAK_LONG_LEN
-#define LV_TXT_LINE_BREAK_LONG_LEN          12
-#endif
-
-/* Minimum number of characters of a word to put on a line before a break */
-#ifndef LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
-#define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN  3
-#endif
-
-/* Minimum number of characters of a word to put on a line after a break */
-#ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
-#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 1
-#endif
-
 /*===================
  *  LV_OBJ SETTINGS
  *==================*/
@@ -529,11 +514,20 @@
 #ifndef LV_LABEL_DEF_SCROLL_SPEED
 #  define LV_LABEL_DEF_SCROLL_SPEED       25
 #endif
+
+/* Waiting period at beginning/end of animation cycle */
 #ifndef LV_LABEL_WAIT_CHAR_COUNT
-#  define LV_LABEL_WAIT_CHAR_COUNT        3 /* Waiting period at beginning/end of animation cycle */
+#  define LV_LABEL_WAIT_CHAR_COUNT        3
 #endif
+
+/*Enable selecting text of the label */
 #ifndef LV_LABEL_TEXT_SEL
-#  define LV_LABEL_TEXT_SEL               1  /*Enable selecting text of the label */
+#  define LV_LABEL_TEXT_SEL               0
+#endif
+
+/*Store extra some info in labels (12 bytes) to speed up drawing of very long texts*/
+#ifndef LV_LABEL_LONG_TXT_HINT
+#  define LV_LABEL_LONG_TXT_HINT          0
 #endif
 #endif
 

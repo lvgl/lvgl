@@ -1,8 +1,10 @@
 import argparse
+from argparse import RawTextHelpFormatter
 import os
 import sys
 
-parser = argparse.ArgumentParser(description='Create fonts for LittelvGL including the built-in symbols. lv_font_conv needs to be installed. See https://github.com/littlevgl/lv_font_conv')
+parser = argparse.ArgumentParser(description="""Create fonts for LittelvGL including the built-in symbols. lv_font_conv needs to be installed. See https://github.com/littlevgl/lv_font_conv
+Example: python built_in_font_gen.py --size 16 -o lv_font_roboto_16.c --bpp 4 -r 0x20-0x7F""", formatter_class=RawTextHelpFormatter)
 parser.add_argument('-s', '--size', 
 					type=int, 
 					metavar = 'px', 
@@ -41,5 +43,5 @@ else:
 syms = "61441,61448,61451,61452,61453,61457,61459,61460,61461,61465,61468,61473,61478,61479,61480,61502,61504,61512,61515,61516,61517,61521,61522,61523,61524,61543,61544,61553,61556,61559,61560,61561,61563,61587,61589,61636,61637,61639,61671,61683,61724,61732,61787,61931,62016,62017,62018,62019,62020,62099"
 
 #Run the command
-cmd = "lv_font_conv {} --bpp {} --size {} --font ./Roboto-Regular.woff -r {} --font FontAwesome.ttf -r {} --format lvgl -o {}".format(compr, args.bpp, args.size, args.range, syms, args.output)
+cmd = "lv_font_conv {} --bpp {} --size {} --font ./Roboto-Regular.woff -r {} --font FontAwesome.ttf -r {} --format lvgl -o {} --force-fast-kern-format".format(compr, args.bpp, args.size, args.range[0], syms, args.output)
 os.system(cmd)
