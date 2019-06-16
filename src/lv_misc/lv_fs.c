@@ -71,9 +71,9 @@ bool lv_fs_is_ready(char letter)
 
     if(drv == NULL) return false; /*An unknown driver in not ready*/
 
-    if(drv->ready == NULL) return true; /*Assume the driver is always ready if no handler provided*/
+    if(drv->ready_cb == NULL) return true; /*Assume the driver is always ready if no handler provided*/
 
-    return drv->ready(drv);
+    return drv->ready_cb(drv);
 }
 
 /**
@@ -99,8 +99,8 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         return LV_FS_RES_NOT_EX;
     }
 
-    if(file_p->drv->ready != NULL) {
-        if(file_p->drv->ready(file_p->drv) == false) {
+    if(file_p->drv->ready_cb != NULL) {
+        if(file_p->drv->ready_cb(file_p->drv) == false) {
             file_p->drv    = NULL;
             file_p->file_d = NULL;
             return LV_FS_RES_HW_ERR;
@@ -114,12 +114,12 @@ lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mo
         return LV_FS_RES_OUT_OF_MEM; /* Out of memory */
     }
 
-    if(file_p->drv->open == NULL) {
+    if(file_p->drv->open_cb == NULL) {
         return LV_FS_RES_NOT_IMP;
     }
 
     const char * real_path = lv_fs_get_real_path(path);
-    lv_fs_res_t res        = file_p->drv->open(file_p->drv, file_p->file_d, real_path, mode);
+    lv_fs_res_t res        = file_p->drv->open_cb(file_p->drv, file_p->file_d, real_path, mode);
 
     if(res != LV_FS_RES_OK) {
         lv_mem_free(file_p->file_d);
@@ -141,11 +141,11 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
         return LV_FS_RES_INV_PARAM;
     }
 
-    if(file_p->drv->close == NULL) {
+    if(file_p->drv->close_cb == NULL) {
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = file_p->drv->close(file_p->drv, file_p->file_d);
+    lv_fs_res_t res = file_p->drv->close_cb(file_p->drv, file_p->file_d);
 
     lv_mem_free(file_p->file_d); /*Clean up*/
     file_p->file_d = NULL;
@@ -169,14 +169,14 @@ lv_fs_res_t lv_fs_remove(const char * path)
 
     drv = lv_fs_get_drv(letter);
     if(drv == NULL) return LV_FS_RES_NOT_EX;
-    if(drv->ready != NULL) {
-        if(drv->ready(drv) == false) return LV_FS_RES_HW_ERR;
+    if(drv->ready_cb != NULL) {
+        if(drv->ready_cb(drv) == false) return LV_FS_RES_HW_ERR;
     }
 
-    if(drv->remove == NULL) return LV_FS_RES_NOT_IMP;
+    if(drv->remove_cb == NULL) return LV_FS_RES_NOT_IMP;
 
     const char * real_path = lv_fs_get_real_path(path);
-    lv_fs_res_t res        = drv->remove(drv, real_path);
+    lv_fs_res_t res        = drv->remove_cb(drv, real_path);
 
     return res;
 }
@@ -193,10 +193,10 @@ lv_fs_res_t lv_fs_read(lv_fs_file_t * file_p, void * buf, uint32_t btr, uint32_t
 {
     if(br != NULL) *br = 0;
     if(file_p->drv == NULL) return LV_FS_RES_INV_PARAM;
-    if(file_p->drv->read == NULL) return LV_FS_RES_NOT_IMP;
+    if(file_p->drv->read_cb == NULL) return LV_FS_RES_NOT_IMP;
 
     uint32_t br_tmp = 0;
-    lv_fs_res_t res = file_p->drv->read(file_p->drv, file_p->file_d, buf, btr, &br_tmp);
+    lv_fs_res_t res = file_p->drv->read_cb(file_p->drv, file_p->file_d, buf, btr, &br_tmp);
     if(br != NULL) *br = br_tmp;
 
     return res;
@@ -218,12 +218,12 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
         return LV_FS_RES_INV_PARAM;
     }
 
-    if(file_p->drv->write == NULL) {
+    if(file_p->drv->write_cb == NULL) {
         return LV_FS_RES_NOT_IMP;
     }
 
     uint32_t bw_tmp = 0;
-    lv_fs_res_t res = file_p->drv->write(file_p->drv, file_p->file_d, buf, btw, &bw_tmp);
+    lv_fs_res_t res = file_p->drv->write_cb(file_p->drv, file_p->file_d, buf, btw, &bw_tmp);
     if(bw != NULL) *bw = bw_tmp;
 
     return res;
@@ -241,11 +241,11 @@ lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos)
         return LV_FS_RES_INV_PARAM;
     }
 
-    if(file_p->drv->seek == NULL) {
+    if(file_p->drv->seek_cb == NULL) {
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = file_p->drv->seek(file_p->drv, file_p->file_d, pos);
+    lv_fs_res_t res = file_p->drv->seek_cb(file_p->drv, file_p->file_d, pos);
 
     return res;
 }
@@ -263,12 +263,12 @@ lv_fs_res_t lv_fs_tell(lv_fs_file_t * file_p, uint32_t * pos)
         return LV_FS_RES_INV_PARAM;
     }
 
-    if(file_p->drv->tell == NULL) {
+    if(file_p->drv->tell_cb == NULL) {
         pos = 0;
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = file_p->drv->tell(file_p->drv, file_p->file_d, pos);
+    lv_fs_res_t res = file_p->drv->tell_cb(file_p->drv, file_p->file_d, pos);
 
     return res;
 }
@@ -285,11 +285,11 @@ lv_fs_res_t lv_fs_trunc(lv_fs_file_t * file_p)
         return LV_FS_RES_INV_PARAM;
     }
 
-    if(file_p->drv->tell == NULL) {
+    if(file_p->drv->tell_cb == NULL) {
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = file_p->drv->trunc(file_p->drv, file_p->file_d);
+    lv_fs_res_t res = file_p->drv->trunc_cb(file_p->drv, file_p->file_d);
 
     return res;
 }
@@ -305,11 +305,11 @@ lv_fs_res_t lv_fs_size(lv_fs_file_t * file_p, uint32_t * size)
         return LV_FS_RES_INV_PARAM;
     }
 
-    if(file_p->drv->size == NULL) return LV_FS_RES_NOT_IMP;
+    if(file_p->drv->size_cb == NULL) return LV_FS_RES_NOT_IMP;
 
     if(size == NULL) return LV_FS_RES_INV_PARAM;
 
-    lv_fs_res_t res = file_p->drv->size(file_p->drv, file_p->file_d, size);
+    lv_fs_res_t res = file_p->drv->size_cb(file_p->drv, file_p->file_d, size);
 
     return res;
 }
@@ -332,17 +332,18 @@ lv_fs_res_t lv_fs_rename(const char * oldname, const char * newname)
         return LV_FS_RES_NOT_EX;
     }
 
-    if(drv->ready != NULL) {
-        if(drv->ready(drv) == false) {
+    if(drv->ready_cb != NULL) {
+        if(drv->ready_cb(drv) == false) {
             return LV_FS_RES_HW_ERR;
         }
     }
 
-    if(drv->rename == NULL) return LV_FS_RES_NOT_IMP;
+    if(drv->rename_cb == NULL) return LV_FS_RES_NOT_IMP;
 
     const char * old_real = lv_fs_get_real_path(oldname);
     const char * new_real = lv_fs_get_real_path(newname);
-    lv_fs_res_t res       = drv->rename(drv, old_real, new_real);
+
+    lv_fs_res_t res       = drv->rename_cb(drv, old_real, new_real);
 
     return res;
 }
@@ -373,12 +374,13 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
         return LV_FS_RES_OUT_OF_MEM; /* Out of memory */
     }
 
-    if(rddir_p->drv->dir_open == NULL) {
+    if(rddir_p->drv->dir_open_cb == NULL) {
         return LV_FS_RES_NOT_IMP;
     }
 
     const char * real_path = lv_fs_get_real_path(path);
-    lv_fs_res_t res        = rddir_p->drv->dir_open(rddir_p->drv, rddir_p->dir_d, real_path);
+
+    lv_fs_res_t res        = rddir_p->drv->dir_open_cb(rddir_p->drv, rddir_p->dir_d, real_path);
 
     return res;
 }
@@ -397,11 +399,11 @@ lv_fs_res_t lv_fs_dir_read(lv_fs_dir_t * rddir_p, char * fn)
         return LV_FS_RES_INV_PARAM;
     }
 
-    if(rddir_p->drv->dir_read == NULL) {
+    if(rddir_p->drv->dir_read_cb == NULL) {
         return LV_FS_RES_NOT_IMP;
     }
 
-    lv_fs_res_t res = rddir_p->drv->dir_read(rddir_p->drv, rddir_p->dir_d, fn);
+    lv_fs_res_t res = rddir_p->drv->dir_read_cb(rddir_p->drv, rddir_p->dir_d, fn);
 
     return res;
 }
@@ -419,10 +421,10 @@ lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
 
     lv_fs_res_t res;
 
-    if(rddir_p->drv->dir_close == NULL) {
+    if(rddir_p->drv->dir_close_cb == NULL) {
         res = LV_FS_RES_NOT_IMP;
     } else {
-        res = rddir_p->drv->dir_close(rddir_p->drv, rddir_p->dir_d);
+        res = rddir_p->drv->dir_close_cb(rddir_p->drv, rddir_p->dir_d);
     }
 
     lv_mem_free(rddir_p->dir_d); /*Clean up*/
@@ -437,7 +439,7 @@ lv_fs_res_t lv_fs_dir_close(lv_fs_dir_t * rddir_p)
  * Get the free and total size of a driver in kB
  * @param letter the driver letter
  * @param total_p pointer to store the total size [kB]
- * @param free_p pointer to store the free size [kB]
+ * @param free_p pointer to store the free size_cb [kB]
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 lv_fs_res_t lv_fs_free_space(char letter, uint32_t * total_p, uint32_t * free_p)
@@ -450,18 +452,29 @@ lv_fs_res_t lv_fs_free_space(char letter, uint32_t * total_p, uint32_t * free_p)
 
     lv_fs_res_t res;
 
-    if(drv->free_space == NULL) {
+    if(drv->free_space_cb == NULL) {
         res = LV_FS_RES_NOT_IMP;
     } else {
         uint32_t total_tmp = 0;
         uint32_t free_tmp  = 0;
-        res                = drv->free_space(drv, &total_tmp, &free_tmp);
+        res                = drv->free_space_cb(drv, &total_tmp, &free_tmp);
 
         if(total_p != NULL) *total_p = total_tmp;
         if(free_p != NULL) *free_p = free_tmp;
     }
 
     return res;
+}
+
+/**
+ * Initialize a file system driver with default values.
+ * It is used to surly have known values in the fields ant not memory junk.
+ * After it you can set the fields.
+ * @param drv pointer to driver variable to initialize
+ */
+void lv_fs_drv_init(lv_fs_drv_t * drv)
+{
+    memset(drv, 0, sizeof(lv_fs_drv_t));
 }
 
 /**
