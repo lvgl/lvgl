@@ -858,7 +858,7 @@ static void indev_proc_release(lv_indev_proc_t * proc)
             if(indev_reset_check(proc)) return;
         }
         /* The simple case: `act_obj` was not protected against press lost.
-         * If it is already not pressed then was `indev_proc_press` would set `act_obj = NULL`*/
+         * If it is already not pressed then `indev_proc_press` would set `indev_obj_act = NULL`*/
         else {
             indev_obj_act->signal_cb(indev_obj_act, LV_SIGNAL_RELEASED, indev_act);
             if(indev_reset_check(proc)) return;
@@ -922,6 +922,21 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         }
 
         if(indev_reset_check(proc)) return;
+
+        /*Send LV_EVENT_DRAG_THROW_BEGIN if required */
+        /*If drag parent is active check recursively the drag_parent attribute*/
+        lv_obj_t * drag_obj = indev_obj_act;
+        while(lv_obj_get_drag_parent(drag_obj) != false && drag_obj != NULL) {
+            drag_obj = lv_obj_get_parent(drag_obj);
+        }
+
+        if(drag_obj) {
+            if(lv_obj_get_drag_throw(drag_obj) && proc->types.pointer.drag_in_prog) {
+                lv_event_send(drag_obj, LV_EVENT_DRAG_THROW_BEGIN, NULL);
+                if(indev_reset_check(proc)) return;
+            }
+        }
+
         proc->types.pointer.act_obj = NULL;
         proc->pr_timestamp          = 0;
         proc->longpr_rep_timestamp  = 0;
@@ -1125,7 +1140,6 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
 {
     if(proc->types.pointer.drag_in_prog == 0) return;
 
-    /*Set new position if the vector is not zero*/
     lv_obj_t * drag_obj = proc->types.pointer.last_obj;
 
     /*If drag parent is active check recursively the drag_parent attribute*/

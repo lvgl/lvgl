@@ -25,9 +25,6 @@ extern "C" {
 #define LV_SYMBOL_DRIVE           "\xef\x80\x9c"
 #define LV_SYMBOL_REFRESH         "\xef\x80\xa1"
 #define LV_SYMBOL_MUTE            "\xef\x80\xa6"
-
-
-
 #define LV_SYMBOL_VOLUME_MID      "\xef\x80\xa7"
 #define LV_SYMBOL_VOLUME_MAX      "\xef\x80\xa8"
 #define LV_SYMBOL_IMAGE           "\xef\x80\xbe"

@@ -1073,7 +1073,7 @@ static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event)
     if(event == LV_EVENT_PRESSED || event == LV_EVENT_PRESSING || event == LV_EVENT_PRESS_LOST ||
        event == LV_EVENT_RELEASED || event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_CLICKED ||
        event == LV_EVENT_LONG_PRESSED || event == LV_EVENT_LONG_PRESSED_REPEAT || event == LV_EVENT_FOCUSED ||
-       event == LV_EVENT_DEFOCUSED) {
+       event == LV_EVENT_DEFOCUSED || event == LV_EVENT_DRAG_BEGIN || event == LV_EVENT_DRAG_END || event == LV_EVENT_DRAG_THROW_BEGIN) {
         lv_event_send(page, event, lv_event_get_data());
     }
     /*clang-format on*/
