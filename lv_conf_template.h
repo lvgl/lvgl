@@ -143,6 +143,10 @@ typedef void * lv_group_user_data_t;
 
 /* 1: Enable file system (might be required for images */
 #define LV_USE_FILESYSTEM       1
+#if LV_USE_FILESYSTEM
+/*Declare the type of the user data of file system drivers (can be e.g. `void *`, `int`, `struct`)*/
+typedef void * lv_fs_drv_user_data_t;
+#endif
 
 /* 1: Enable indexed (palette) images */
 #define LV_IMG_CF_INDEXED       1

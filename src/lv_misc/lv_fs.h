@@ -78,6 +78,10 @@ typedef struct _lv_fs_drv_t
     lv_fs_res_t (*dir_open)(struct _lv_fs_drv_t * drv, void * rddir_p, const char * path);
     lv_fs_res_t (*dir_read)(struct _lv_fs_drv_t * drv, void * rddir_p, char * fn);
     lv_fs_res_t (*dir_close)(struct _lv_fs_drv_t * drv, void * rddir_p);
+
+#if LV_USE_USER_DATA
+    lv_fs_drv_user_data_t user_data;
+#endif
 } lv_fs_drv_t;
 
 typedef struct
@@ -102,11 +106,19 @@ typedef struct
 void lv_fs_init(void);
 
 /**
+ * Initialize a file system driver with default values.
+ * It is used to surly have known values in the fields ant not memory junk.
+ * After it you can set the fields.
+ * @param drv pointer to driver variable to initialize
+ */
+void lv_fs_drv_init(lv_fs_drv_t * drv);
+
+/**
  * Add a new drive
  * @param drv_p pointer to an lv_fs_drv_t structure which is inited with the
  * corresponding function pointers. The data will be copied so the variable can be local.
  */
-void lv_fs_add_drv(lv_fs_drv_t * drv_p);
+void lv_fs_drv_register(lv_fs_drv_t * drv_p);
 
 /**
  * Test if a drive is rady or not. If the `ready` function was not initialized `true` will be

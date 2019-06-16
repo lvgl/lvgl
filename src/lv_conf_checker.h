@@ -197,6 +197,9 @@
 #ifndef LV_USE_FILESYSTEM
 #define LV_USE_FILESYSTEM       1
 #endif
+#if LV_USE_FILESYSTEM
+/*Declare the type of the user data of file system drivers (can be e.g. `void *`, `int`, `struct`)*/
+#endif
 
 /* 1: Enable indexed (palette) images */
 #ifndef LV_IMG_CF_INDEXED

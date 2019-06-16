@@ -469,7 +469,7 @@ lv_fs_res_t lv_fs_free_space(char letter, uint32_t * total_p, uint32_t * free_p)
  * @param drv_p pointer to an lv_fs_drv_t structure which is inited with the
  * corresponding function pointers. The data will be copied so the variable can be local.
  */
-void lv_fs_add_drv(lv_fs_drv_t * drv_p)
+void lv_fs_drv_register(lv_fs_drv_t * drv_p)
 {
     /*Save the new driver*/
     lv_fs_drv_t * new_drv;
