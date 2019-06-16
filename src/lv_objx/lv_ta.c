@@ -111,7 +111,9 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cursor.type       = LV_CURSOR_LINE;
     ext->cursor.valid_x    = 0;
     ext->one_line          = 0;
+#if LV_LABEL_TEXT_SEL
     ext->text_sel_en       = 0;
+#endif
     ext->label             = NULL;
     ext->placeholder       = NULL;
 
