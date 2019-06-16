@@ -101,7 +101,6 @@ enum {
     LV_SIGNAL_REFR_EXT_DRAW_PAD,
     LV_SIGNAL_GET_TYPE,
 
-    _LV_SIGNAL_FEEDBACK_SECTION_START,
     /*Input device related*/
     LV_SIGNAL_PRESSED,
     LV_SIGNAL_PRESSING,
@@ -116,7 +115,6 @@ enum {
     LV_SIGNAL_FOCUS,
     LV_SIGNAL_DEFOCUS,
     LV_SIGNAL_CONTROL,
-    _LV_SIGNAL_FEEDBACK_SECTION_END,
     LV_SIGNAL_GET_EDITABLE,
 };
 typedef uint8_t lv_signal_t;

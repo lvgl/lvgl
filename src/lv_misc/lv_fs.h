@@ -50,49 +50,47 @@ enum {
 };
 typedef uint8_t lv_fs_res_t;
 
-struct __lv_fs_drv_t;
-
-typedef struct
-{
-    void * file_d;
-    struct __lv_fs_drv_t * drv;
-} lv_fs_file_t;
-
-typedef struct
-{
-    void * dir_d;
-    struct __lv_fs_drv_t * drv;
-} lv_fs_dir_t;
-
 enum {
     LV_FS_MODE_WR = 0x01,
     LV_FS_MODE_RD = 0x02,
 };
 typedef uint8_t lv_fs_mode_t;
 
-typedef struct __lv_fs_drv_t
+typedef struct _lv_fs_drv_t
 {
     char letter;
     uint16_t file_size;
     uint16_t rddir_size;
-    bool (*ready)(void);
+    bool (*ready)(struct _lv_fs_drv_t * drv);
 
-    lv_fs_res_t (*open)(void * file_p, const char * path, lv_fs_mode_t mode);
-    lv_fs_res_t (*close)(void * file_p);
-    lv_fs_res_t (*remove)(const char * fn);
-    lv_fs_res_t (*read)(void * file_p, void * buf, uint32_t btr, uint32_t * br);
-    lv_fs_res_t (*write)(void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
-    lv_fs_res_t (*seek)(void * file_p, uint32_t pos);
-    lv_fs_res_t (*tell)(void * file_p, uint32_t * pos_p);
-    lv_fs_res_t (*trunc)(void * file_p);
-    lv_fs_res_t (*size)(void * file_p, uint32_t * size_p);
-    lv_fs_res_t (*rename)(const char * oldname, const char * newname);
-    lv_fs_res_t (*free_space)(uint32_t * total_p, uint32_t * free_p);
+    lv_fs_res_t (*open)(struct _lv_fs_drv_t * drv, void * file_p, const char * path, lv_fs_mode_t mode);
+    lv_fs_res_t (*close)(struct _lv_fs_drv_t * drv, void * file_p);
+    lv_fs_res_t (*remove)(struct _lv_fs_drv_t * drv, const char * fn);
+    lv_fs_res_t (*read)(struct _lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
+    lv_fs_res_t (*write)(struct _lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
+    lv_fs_res_t (*seek)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t pos);
+    lv_fs_res_t (*tell)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
+    lv_fs_res_t (*trunc)(struct _lv_fs_drv_t * drv, void * file_p);
+    lv_fs_res_t (*size)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * size_p);
+    lv_fs_res_t (*rename)(struct _lv_fs_drv_t * drv, const char * oldname, const char * newname);
+    lv_fs_res_t (*free_space)(struct _lv_fs_drv_t * drv, uint32_t * total_p, uint32_t * free_p);
 
-    lv_fs_res_t (*dir_open)(void * rddir_p, const char * path);
-    lv_fs_res_t (*dir_read)(void * rddir_p, char * fn);
-    lv_fs_res_t (*dir_close)(void * rddir_p);
+    lv_fs_res_t (*dir_open)(struct _lv_fs_drv_t * drv, void * rddir_p, const char * path);
+    lv_fs_res_t (*dir_read)(struct _lv_fs_drv_t * drv, void * rddir_p, char * fn);
+    lv_fs_res_t (*dir_close)(struct _lv_fs_drv_t * drv, void * rddir_p);
 } lv_fs_drv_t;
+
+typedef struct
+{
+    void * file_d;
+    lv_fs_drv_t * drv;
+} lv_fs_file_t;
+
+typedef struct
+{
+    void * dir_d;
+   lv_fs_drv_t * drv;
+} lv_fs_dir_t;
 
 /**********************
  * GLOBAL PROTOTYPES
