@@ -73,7 +73,9 @@ void lv_anim_init(lv_anim_t * a)
 {
     memset(a, 0, sizeof(lv_anim_t));
     a->time = 500;
+    a->start = 0;
     a->end  = 100;
+    a->path_cb = lv_anim_path_linear;
 }
 /**
  * Create an animation
