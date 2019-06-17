@@ -455,10 +455,10 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     style_neddle_mid.body.radius     = LV_RADIUS_CIRCLE;
 
     lv_area_t nm_cord;
-    nm_cord.x1 = x_ofs - style->body.padding.top;
-    nm_cord.y1 = y_ofs - style->body.padding.top;
-    nm_cord.x2 = x_ofs + style->body.padding.top;
-    nm_cord.y2 = y_ofs + style->body.padding.top;
+    nm_cord.x1 = x_ofs - style->body.radius;
+    nm_cord.y1 = y_ofs - style->body.radius;
+    nm_cord.x2 = x_ofs + style->body.radius;
+    nm_cord.y2 = y_ofs + style->body.radius;
 
     lv_draw_rect(&nm_cord, mask, &style_neddle_mid, lv_obj_get_opa_scale(gauge));
 }

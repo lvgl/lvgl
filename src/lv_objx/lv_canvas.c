@@ -550,6 +550,58 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 }
 
 /**
+ * Draw an image on the canvas
+ * @param canvas pointer to a canvas object
+ * @param src image source. Can be a pointer an `lv_img_dsc_t` variable or a path an image.
+ * @param style style of the image (`image` properties are used)
+ */
+void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src, const lv_style_t * style)
+{
+    lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
+
+    /* Create a dummy display to fool the lv_draw function.
+     * It will think it draws to real screen. */
+    lv_area_t mask;
+    mask.x1 = 0;
+    mask.x2 = dsc->header.w - 1;
+    mask.y1 = 0;
+    mask.y2 = dsc->header.h - 1;
+
+    lv_img_header_t header;
+    lv_res_t res = lv_img_decoder_get_info(src, &header);
+    if(res != LV_RES_OK) {
+        LV_LOG_WARN("lv_canvas_draw_img: Couldn't get the image data.");
+        return;
+    }
+
+    lv_area_t coords;
+    coords.x1 = x;
+    coords.y1 = y;
+    coords.x2 = x + header.w - 1;
+    coords.y2 = y + header.h - 1;
+
+    lv_disp_t disp;
+    memset(&disp, 0, sizeof(lv_disp_t));
+
+    lv_disp_buf_t disp_buf;
+    lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
+    lv_area_copy(&disp_buf.area, &mask);
+
+    lv_disp_drv_init(&disp.driver);
+
+    disp.driver.buffer  = &disp_buf;
+    disp.driver.hor_res = dsc->header.w;
+    disp.driver.ver_res = dsc->header.h;
+
+    lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
+    lv_refr_set_disp_refreshing(&disp);
+
+    lv_draw_img(&coords, &mask, src, style, LV_OPA_COVER);
+
+}
+
+
+/**
  * Draw a line on the canvas
  * @param canvas pointer to a canvas object
  * @param points point of the line

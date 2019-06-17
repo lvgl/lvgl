@@ -97,7 +97,7 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char * options);
 void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
 
 /**
- * Set the fix height for the drop down list
+ * Set a fix height for the drop down list
  * If 0 then the opened ddlist will be auto. sized else the set height will be applied.
  * @param ddlist pointer to a drop down list
  * @param h the height when the list is opened (0: auto size)
@@ -105,11 +105,11 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
 void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h);
 
 /**
- * Enable or disable the horizontal fit to the content
+ * Set a fix width for the drop down list
  * @param ddlist pointer to a drop down list
- * @param fit fit mode from `lv_fit_t` (Typically `LV_FIT_NONE` or `LV_FIT_TIGHT`)
+ * @param w the width when the list is opened (0: auto size)
  */
-void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, lv_fit_t fit);
+void lv_ddlist_set_fix_width(lv_obj_t * ddlist, lv_coord_t w);
 
 /**
  * Set arrow draw in a drop down list

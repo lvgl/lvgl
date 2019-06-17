@@ -466,6 +466,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         lv_point_t p;
         lv_indev_get_point(indev, &p);
 
+        /*If the header is pressed mark an arrow as pressed*/
         if(lv_area_is_point_on(&header_area, &p)) {
             if(p.x < header_area.x1 + lv_area_get_width(&header_area) / 2) {
                 if(ext->btn_pressing != -1) lv_obj_invalidate(calendar);
@@ -478,10 +479,14 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
             ext->pressed_date.year  = 0;
             ext->pressed_date.month = 0;
             ext->pressed_date.day   = 0;
-        } else if(calculate_touched_day(calendar, &p)) {
+        }
+        /*If a day is pressed save it*/
+        else if(calculate_touched_day(calendar, &p)) {
             if(ext->btn_pressing != 0) lv_obj_invalidate(calendar);
             ext->btn_pressing = 0;
-        } else {
+        }
+        /*ELse set a deafault state*/
+        else {
             if(ext->btn_pressing != 0) lv_obj_invalidate(calendar);
             ext->btn_pressing       = 0;
             ext->pressed_date.year  = 0;

@@ -210,11 +210,12 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
         lv_obj_invalidate(ddlist);
     }
 
-    lv_event_send(ddlist, LV_EVENT_VALUE_CHANGED, &ext->sel_opt_id);
+    uint32_t id = ext->sel_opt_id;  /*Just to use uint32_t in event data*/
+    lv_event_send(ddlist, LV_EVENT_VALUE_CHANGED, &id);
 }
 
 /**
- * Set the fix height for the drop down list
+ * Set a fix height for the drop down list
  * If 0 then the opened ddlist will be auto. sized else the set height will be applied.
  * @param ddlist pointer to a drop down list
  * @param h the height when the list is opened (0: auto size)
@@ -230,13 +231,18 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h)
 }
 
 /**
- * Enable or disable the horizontal fit to the content
+ * Set a fix width for the drop down list
  * @param ddlist pointer to a drop down list
- * @param fit fit mode from `lv_fit_t` (Typically `LV_FIT_NONE` or `LV_FIT_TIGHT`)
+ * @param w the width when the list is opened (0: auto size)
  */
-void lv_ddlist_set_hor_fit(lv_obj_t * ddlist, lv_fit_t fit)
+void lv_ddlist_set_fix_width(lv_obj_t * ddlist, lv_coord_t w)
 {
-    lv_cont_set_fit2(ddlist, fit, lv_cont_get_fit_bottom(ddlist));
+    if(w == 0) {
+        lv_cont_set_fit2(ddlist, LV_FIT_TIGHT, lv_cont_get_fit_bottom(ddlist));
+    } else {
+        lv_cont_set_fit2(ddlist, LV_FIT_NONE, lv_cont_get_fit_bottom(ddlist));
+        lv_obj_set_width(ddlist, w);
+    }
 
     lv_ddlist_refr_size(ddlist, false);
 }
@@ -811,7 +817,8 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
             ext->sel_opt_id_ori = ext->sel_opt_id;
         }
 
-        lv_res_t res = lv_event_send(ddlist, LV_EVENT_VALUE_CHANGED, &ext->sel_opt_id);
+        uint32_t id = ext->sel_opt_id;  /*Just to use uint32_t in event data*/
+        lv_res_t res = lv_event_send(ddlist, LV_EVENT_VALUE_CHANGED, &id);
         if(res != LV_RES_OK) return res;
 
         if(ext->stay_open == 0) {

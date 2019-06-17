@@ -274,7 +274,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     btnm_ext->map_p          = NULL;
 
     lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
-    lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_NO_REPEAT, true);
+    lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_NO_REPEAT);
 
     /*Modify the indicator size*/
     const lv_style_t * style_tabs = lv_obj_get_style(ext->btns);
@@ -341,7 +341,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     if(id != ext->tab_cur) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id);
     if(res != LV_RES_OK) return;
 
-    lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_TGL_STATE, false);
+    lv_btnm_clear_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_TGL_STATE);
 
     ext->tab_cur = id;
 
@@ -441,7 +441,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 #endif
     }
 
-    lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_TGL_STATE, true);
+    lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_TGL_STATE);
 }
 
 /**
@@ -935,8 +935,8 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
     uint16_t btn_id = lv_btnm_get_active_btn(tab_btnm);
     if(btn_id == LV_BTNM_BTN_NONE) return;
 
-    lv_btnm_set_btn_ctrl_all(tab_btnm, LV_BTNM_CTRL_TGL_STATE, false);
-    lv_btnm_set_btn_ctrl(tab_btnm, btn_id, LV_BTNM_CTRL_TGL_STATE, true);
+    lv_btnm_clear_btn_ctrl_all(tab_btnm, LV_BTNM_CTRL_TGL_STATE);
+    lv_btnm_set_btn_ctrl(tab_btnm, btn_id, LV_BTNM_CTRL_TGL_STATE);
 
     lv_obj_t * tab = lv_obj_get_parent(tab_btnm);
     lv_tabview_set_tab_act(tab, btn_id, true);

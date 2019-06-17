@@ -104,6 +104,13 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max);
 void lv_bar_set_sym(lv_obj_t * bar, bool en);
 
 /**
+ * Set the animation time of the bar
+ * @param bar pointer to a bar object
+ * @param anim_time the animation time in milliseconds.
+ */
+void lv_bar_set_anim_time(lv_obj_t * bar, uint16_t anim_time);
+
+/**
  * Set a style of a bar
  * @param bar pointer to a bar object
  * @param type which style should be set
@@ -142,6 +149,13 @@ int16_t lv_bar_get_max_value(const lv_obj_t * bar);
  * @return true: symmetric is enabled; false: disable
  */
 bool lv_bar_get_sym(lv_obj_t * bar);
+
+/**
+ * Get the animation time of the bar
+ * @param bar pointer to a bar object
+ * @return the animation time in milliseconds.
+ */
+uint16_t lv_bar_get_anim_time(lv_obj_t * bar, uint16_t anim_time);
 
 /**
  * Get a style of a bar

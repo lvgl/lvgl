@@ -107,12 +107,8 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[]);
  *                 length of the array and position of the elements must match
  *                 the number and order of the individual buttons (i.e. excludes
  *                 newline entries).
- *                 The control bits are:
- *                 - bit 5   : 1 = inactive (disabled)
- *                 - bit 4   : 1 = no repeat (on long press)
- *                 - bit 3   : 1 = hidden
- *                 - bit 2..0: Relative width compared to the buttons in the
- *                             same row. [1..7]
+ *                 An element of the map should look like e.g.:
+ *                 `ctrl_map[0] = width | LV_BTNM_CTRL_NO_REPEAT |  LV_BTNM_CTRL_TGL_ENABLE`
  */
 void lv_btnm_set_ctrl_map(const lv_obj_t * btnm, const lv_btnm_ctrl_t ctrl_map[]);
 
@@ -140,21 +136,33 @@ void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, const lv_style_t *
 void lv_btnm_set_recolor(const lv_obj_t * btnm, bool en);
 
 /**
- * Set/clear an attribute of a button of the button matrix
+ * Set the attributes of a button of the button matrix
  * @param btnm pointer to button matrix object
  * @param btn_id 0 based index of the button to modify. (Not counting new lines)
- * @param ctrl attribute(s) to change from `lv_btnm_ctrl_t`. Values can be ORed.
- * @param en true: set the attributes; false: clear the attributes
  */
-void lv_btnm_set_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl, bool en);
+void lv_btnm_set_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl);
+
+/**
+ * Clear the attributes of a button of the button matrix
+ * @param btnm pointer to button matrix object
+ * @param btn_id 0 based index of the button to modify. (Not counting new lines)
+ */
+void lv_btnm_clear_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl);
 
 /**
  * Set the attributes of all buttons of a button matrix
  * @param btnm pointer to a button matrix object
  * @param ctrl attribute(s) to set from `lv_btnm_ctrl_t`. Values can be ORed.
+ */
+void lv_btnm_set_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl);
+
+/**
+ * Clear the attributes of all buttons of a button matrix
+ * @param btnm pointer to a button matrix object
+ * @param ctrl attribute(s) to set from `lv_btnm_ctrl_t`. Values can be ORed.
  * @param en true: set the attributes; false: clear the attributes
  */
-void lv_btnm_set_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl, bool en);
+void lv_btnm_clear_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl);
 
 /**
  * Set a single buttons relative width.

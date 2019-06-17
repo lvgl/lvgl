@@ -98,13 +98,13 @@ void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, lv_anim_enable_
 void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt);
 
 /**
- * Enable or disable the horizontal fit to the content
- * @param roller pointer to a roller
- * @param fit fit mode from `lv_fit_t` (Typically `LV_FIT_NONE` or `LV_FIT_TIGHT`)
+ * Set a fix width for the drop down list
+ * @param roller pointer to a roller obejct
+ * @param w the width when the list is opened (0: auto size)
  */
-static inline void lv_roller_set_hor_fit(lv_obj_t * roller, lv_fit_t fit)
+static inline void lv_roller_set_fix_width(lv_obj_t * roller, lv_coord_t w)
 {
-    lv_ddlist_set_hor_fit(roller, fit);
+    lv_ddlist_set_fix_width(roller, w);
 }
 
 /**

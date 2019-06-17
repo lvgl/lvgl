@@ -142,6 +142,16 @@ static inline bool lv_cb_is_checked(const lv_obj_t * cb)
 }
 
 /**
+ * Get whether the check box is inactive or not.
+ * @param cb pointer to a check box object
+ * @return true: inactive; false: not inactive
+ */
+static inline bool lv_cb_is_inactive(const lv_obj_t * cb)
+{
+    return lv_btn_get_state(cb) == LV_BTN_STATE_INA ? false : true;
+}
+
+/**
  * Get a style of a button
  * @param cb pointer to check box object
  * @param type which style should be get

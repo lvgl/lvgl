@@ -214,6 +214,20 @@ void lv_bar_set_sym(lv_obj_t * bar, bool en)
 }
 
 /**
+ * Set the animation time of the bar
+ * @param bar pointer to a bar object
+ * @param anim_time the animation time in milliseconds.
+ */
+void lv_bar_set_anim_time(lv_obj_t * bar, uint16_t anim_time)
+{
+#if LV_USE_ANIMATION == 0
+    anim_time = 0;
+#endif
+    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
+    ext->anim_time = anim_time;
+}
+
+/**
  * Set a style of a bar
  * @param bar pointer to a bar object
  * @param type which style should be set
@@ -283,6 +297,21 @@ bool lv_bar_get_sym(lv_obj_t * bar)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     return ext->sym ? true : false;
+}
+
+/**
+ * Get the animation time of the bar
+ * @param bar pointer to a bar object
+ * @return the animation time in milliseconds.
+ */
+uint16_t lv_bar_get_anim_time(lv_obj_t * bar, uint16_t anim_time)
+{
+#if LV_USE_ANIMATION
+    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
+    return ext->anim_time;
+#else
+    return 0;
+#endif
 }
 
 /**

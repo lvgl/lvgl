@@ -93,6 +93,16 @@ static inline void lv_slider_set_range(lv_obj_t * slider, int16_t min, int16_t m
 }
 
 /**
+ * Set the animation time of the slider
+ * @param slider pointer to a bar object
+ * @param anim_time the animation time in milliseconds.
+ */
+static void lv_slider_set_anim_time(lv_obj_t * slider, uint16_t anim_time)
+{
+    lv_bar_set_anim_time(slider, anim_time);
+}
+
+/**
  * Set the 'knob in' attribute of a slider
  * @param slider pointer to slider object
  * @param in true: the knob is drawn always in the slider;
