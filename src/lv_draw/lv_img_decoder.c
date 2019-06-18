@@ -447,7 +447,10 @@ static void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_dec
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
     if(user_data) {
 #if LV_USE_FILESYSTEM
-        if(user_data->f) lv_mem_free(user_data->f);
+        if(user_data->f) {
+            lv_fs_close(user_data->f);
+            lv_mem_free(user_data->f);
+        }
 #endif
         if(user_data->palette) lv_mem_free(user_data->palette);
 
