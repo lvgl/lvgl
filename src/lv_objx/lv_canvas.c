@@ -598,6 +598,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
 
     lv_draw_img(&coords, &mask, src, style, LV_OPA_COVER);
 
+    lv_refr_set_disp_refreshing(refr_ori);
 }
 
 

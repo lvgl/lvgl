@@ -530,7 +530,7 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
         scrlable_x += page_w - obj_w;
     }
 
-    if(ext->anim_time == 0) {
+    if(anim_en == LV_ANIM_ON && lv_page_get_anim_time(page) != 0) {
         lv_obj_set_y(ext->scrl, scrlable_y);
         lv_obj_set_x(ext->scrl, scrlable_x);
     } else {
@@ -539,7 +539,7 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
         a.act_time = 0;
         a.start    = lv_obj_get_y(ext->scrl);
         a.end      = scrlable_y;
-        a.time     = ext->anim_time;
+        a.time     = lv_page_get_anim_time(page);
         a.ready_cb = NULL;
         a.playback = 0;
         a.repeat   = 0;
