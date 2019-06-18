@@ -56,6 +56,7 @@ lv_group_t * lv_group_create(void)
     group->focus_cb = NULL;
     group->click_focus = 1;
     group->editing = 0;
+	group->wrap = 1;
 
     return group;
 }
@@ -366,7 +367,7 @@ static void lv_group_refocus(lv_group_t *g) {
 /**
  * Set whether focus next/prev will allow wrapping from first->last or last->first.
  * @param group pointer to group
- * @param en: true: enable `click_focus`
+ * @param en: true: enable `wrap`
  */
 void lv_group_set_wrap(lv_group_t * group, bool en)
 {
