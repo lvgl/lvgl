@@ -384,7 +384,7 @@ void lv_group_set_refocus_policy(lv_group_t * group, lv_group_refocus_policy_t p
 /**
  * Set whether focus next/prev will allow wrapping from first->last or last->first.
  * @param group pointer to group
- * @param en: true: enable `click_focus`
+ * @param en: true: enable `wrap`
  */
 void lv_group_set_wrap(lv_group_t * group, bool en)
 {
