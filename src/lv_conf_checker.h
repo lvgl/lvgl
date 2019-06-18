@@ -2,6 +2,7 @@
  * GENERATED FILE, DO NOT EDIT IT!
  * @file lv_conf_checker.h
  * Make sure all the defines of lv_conf.h have a default value
+ * \internal
 **/
 
 #ifndef LV_CONF_CHECKER_H

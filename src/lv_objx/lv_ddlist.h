@@ -51,7 +51,6 @@ typedef struct
     uint16_t option_cnt;          /*Number of options*/
     uint16_t sel_opt_id;          /*Index of the current option*/
     uint16_t sel_opt_id_ori;      /*Store the original index on focus*/
-    uint16_t anim_time;           /*Open/Close animation time [ms]*/
     uint8_t opened : 1;           /*1: The list is opened (handled by the library)*/
     uint8_t force_sel : 1;        /*1: Keep the selection highlight even if the list is closed*/
     uint8_t draw_arrow : 1;       /*1: Draw arrow*/
@@ -134,6 +133,15 @@ static inline void lv_ddlist_set_sb_mode(lv_obj_t * ddlist, lv_sb_mode_t mode)
 {
     lv_page_set_sb_mode(ddlist, mode);
 }
+/**
+ * Set the open/close animation time.
+ * @param ddlist pointer to a drop down list
+ * @param anim_time: open/close animation time [ms]
+ */
+static inline void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time)
+{
+    lv_page_set_anim_time(ddlist, anim_time);
+}
 
 /**
  * Set the open/close animation time.
@@ -210,6 +218,16 @@ bool lv_ddlist_get_stay_open(lv_obj_t * ddlist);
 static inline lv_sb_mode_t lv_ddlist_get_sb_mode(const lv_obj_t * ddlist)
 {
     return lv_page_get_sb_mode(ddlist);
+}
+
+/**
+ * Get the open/close animation time.
+ * @param ddlist pointer to a drop down list
+ * @return open/close animation time [ms]
+ */
+static inline uint16_t lv_ddlist_get_anim_time(const lv_obj_t * ddlist)
+{
+    return lv_page_get_anim_time(ddlist);
 }
 
 /**

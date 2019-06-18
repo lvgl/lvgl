@@ -55,9 +55,6 @@ typedef struct
     const lv_style_t * styles_btn[LV_BTN_STATE_NUM]; /*Styles of the list element buttons*/
     const lv_style_t * style_img;                    /*Style of the list element images on buttons*/
     uint16_t size;                                   /*the number of items(buttons) in the list*/
-#if LV_USE_ANIMATION
-    uint16_t anim_time; /*Scroll animation time*/
-#endif
 
     uint8_t single_mode : 1; /* whether single selected mode is enabled */
 
@@ -128,7 +125,7 @@ bool lv_list_remove(const lv_obj_t * list, uint16_t index);
 /**
  * Set single button selected mode, only one button will be selected if enabled.
  * @param list pointer to the currently pressed list object
- * @param mode, enable(true)/disable(false) single selected mode.
+ * @param mode enable(true)/disable(false) single selected mode.
  */
 void lv_list_set_single_mode(lv_obj_t * list, bool mode);
 
@@ -142,13 +139,6 @@ void lv_list_set_single_mode(lv_obj_t * list, bool mode);
  */
 void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn);
 #endif
-
-/**
- * Set scroll animation duration on 'list_up()' 'list_down()' 'list_focus()'
- * @param list pointer to a list object
- * @param anim_time duration of animation [ms]
- */
-void lv_list_set_anim_time(lv_obj_t * list, uint16_t anim_time);
 
 /**
  * Set the scroll bar mode of a list
@@ -179,6 +169,16 @@ static inline void lv_list_set_scroll_propagation(lv_obj_t * list, bool en)
 static inline void lv_list_set_edge_flash(lv_obj_t * list, bool en)
 {
     lv_page_set_edge_flash(list, en);
+}
+
+/**
+ * Set scroll animation duration on 'list_up()' 'list_down()' 'list_focus()'
+ * @param list pointer to a list object
+ * @param anim_time duration of animation [ms]
+ */
+static inline void lv_list_set_anim_time(lv_obj_t * list, uint16_t anim_time)
+{
+    lv_page_set_anim_time(list, anim_time);
 }
 
 /**
@@ -260,13 +260,6 @@ lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list);
 #endif
 
 /**
- * Get scroll animation duration
- * @param list pointer to a list object
- * @return duration of animation [ms]
- */
-uint16_t lv_list_get_anim_time(const lv_obj_t * list);
-
-/**
  * Get the scroll bar mode of a list
  * @param list pointer to a list object
  * @return scrollbar mode from 'lv_page_sb_mode_t' enum
@@ -294,6 +287,16 @@ static inline bool lv_list_get_scroll_propagation(lv_obj_t * list)
 static inline bool lv_list_get_edge_flash(lv_obj_t * list)
 {
     return lv_page_get_edge_flash(list);
+}
+
+/**
+ * Get scroll animation duration
+ * @param list pointer to a list object
+ * @return duration of animation [ms]
+ */
+static inline uint16_t lv_list_get_anim_time(const lv_obj_t * list)
+{
+    return lv_page_get_anim_time(list);
 }
 
 /**

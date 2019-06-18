@@ -16,11 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#if LV_USE_ANIMATION
-#ifndef LV_ROLLER_DEF_ANIM_TIME
-#define LV_ROLLER_DEF_ANIM_TIME 200 /*ms*/
-#endif
-#else
+#if LV_USE_ANIMATION == 0
 #undef LV_ROLLER_DEF_ANIM_TIME
 #define LV_ROLLER_DEF_ANIM_TIME 0 /*No animation*/
 #endif
@@ -596,23 +592,25 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * mask)
 /**
  * Refresh the position of the roller. It uses the id stored in: ext->ddlist.selected_option_id
  * @param roller pointer to a roller object
- * @param anim LV_ANIM_ON: refresh with animation; LV_ANOM_OFF: without animation
+ * @param anim_en LV_ANIM_ON: refresh with animation; LV_ANOM_OFF: without animation
  */
-static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim)
+static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
 {
 #if LV_USE_ANIMATION == 0
-    anim = LV_ANOM_OFF;
+    anim_en = LV_ANIM_OFF;
 #endif
+
     lv_obj_t * roller_scrl         = lv_page_get_scrl(roller);
     lv_roller_ext_t * ext          = lv_obj_get_ext_attr(roller);
     const lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
     const lv_font_t * font         = style_label->text.font;
     lv_coord_t font_h              = lv_font_get_line_height(font);
     lv_coord_t h                   = lv_obj_get_height(roller);
+    uint16_t anim_time = lv_roller_get_anim_time(roller);
 
     /* Normally the animtaion's `end_cb` sets correct position of the roller is infinite.
      * But without animations do it manually*/
-    if(anim == LV_ANIM_OFF || ext->ddlist.anim_time == 0) {
+    if(anim_en == LV_ANIM_OFF || anim_time == 0) {
         inf_normalize(roller_scrl);
     }
 
@@ -621,7 +619,7 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim)
         id * (font_h + style_label->text.line_space) + ext->ddlist.label->coords.y1 - roller_scrl->coords.y1;
     lv_coord_t new_y = -line_y1 + (h - font_h) / 2;
 
-    if(anim == LV_ANIM_OFF || ext->ddlist.anim_time == 0) {
+    if(anim_en == LV_ANIM_OFF || anim_time == 0) {
         lv_obj_set_y(roller_scrl, new_y);
     } else {
 #if LV_USE_ANIMATION
@@ -633,7 +631,7 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim)
         a.path_cb        = lv_anim_path_linear;
         a.ready_cb       = scroll_anim_ready_cb;
         a.act_time       = 0;
-        a.time           = ext->ddlist.anim_time;
+        a.time           = anim_time;
         a.playback       = 0;
         a.playback_pause = 0;
         a.repeat         = 0;

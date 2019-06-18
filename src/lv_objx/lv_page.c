@@ -206,6 +206,20 @@ void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
 }
 
 /**
+ * Set the animation time for the page
+ * @param page pointer to a page object
+ * @param anim_time animation time in milliseconds
+ */
+void lv_page_set_anim_time(lv_obj_t * page, uint16_t anim_time)
+{
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+#if LV_USE_ANIMATION
+    ext->anim_time = anim_time;
+#endif
+
+}
+
+/**
  * Enable/Disable scrolling with arrows if the page is in group (arrows:
  * LV_KEY_LEFT/RIGHT/UP/DOWN)
  * @param page pointer to a page object
@@ -286,6 +300,21 @@ lv_obj_t * lv_page_get_scrl(const lv_obj_t * page)
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
     return ext->scrl;
+}
+
+/**
+ * Get the animation time
+ * @param page pointer to a page object
+ * @return the animation time in milliseconds
+ */
+uint16_t lv_page_get_anim_time(const lv_obj_t * page)
+{
+#if LV_USE_ANIMATION
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    return ext->anim_time;
+#else
+    return 0;
+#endif
 }
 
 /**
@@ -432,13 +461,14 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue)
     lv_obj_set_drag(obj, glue);
 }
 
+
 /**
  * Focus on an object. It ensures that the object will be visible on the page.
  * @param page pointer to a page object
  * @param obj pointer to an object to focus (must be on the page)
- * @param anim_time scroll animation time in milliseconds (0: no animation)
+ * @param anim_en LV_ANIM_ON to focus with animation; LV_ANIM_OFF to focus without animation
  */
-void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
+void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
@@ -449,8 +479,6 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
     lv_anim_del(page, (lv_anim_exec_xcb_t)lv_obj_set_y);
     lv_anim_del(ext->scrl, (lv_anim_exec_xcb_t)lv_obj_set_x);
     lv_anim_del(ext->scrl, (lv_anim_exec_xcb_t)lv_obj_set_y);
-#else
-    anim_time = 0;
 #endif
 
     const lv_style_t * style      = lv_page_get_style(page, LV_PAGE_STYLE_BG);
@@ -502,16 +530,16 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time)
         scrlable_x += page_w - obj_w;
     }
 
-    if(anim_time == 0) {
+    if(ext->anim_time == 0) {
         lv_obj_set_y(ext->scrl, scrlable_y);
         lv_obj_set_x(ext->scrl, scrlable_x);
-#if LV_USE_ANIMATION
     } else {
+#if LV_USE_ANIMATION
         lv_anim_t a;
         a.act_time = 0;
         a.start    = lv_obj_get_y(ext->scrl);
         a.end      = scrlable_y;
-        a.time     = anim_time;
+        a.time     = ext->anim_time;
         a.ready_cb = NULL;
         a.playback = 0;
         a.repeat   = 0;

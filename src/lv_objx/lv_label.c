@@ -278,7 +278,7 @@ void lv_label_set_long_mode(lv_obj_t * label, lv_label_long_mode_t long_mode)
     ext->offset.x = 0;
     ext->offset.y = 0;
 
-    if(long_mode == LV_LABEL_LONG_ROLL || long_mode == LV_LABEL_LONG_ROLL_CIRC || long_mode == LV_LABEL_LONG_CROP)
+    if(long_mode == LV_LABEL_LONG_SROLL || long_mode == LV_LABEL_LONG_SROLL_CIRC || long_mode == LV_LABEL_LONG_CROP)
         ext->expand = 1;
     else
         ext->expand = 0;
@@ -354,7 +354,7 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
 
     ext->anim_speed = anim_speed;
 
-    if(ext->long_mode == LV_LABEL_LONG_ROLL || ext->long_mode == LV_LABEL_LONG_ROLL_CIRC) {
+    if(ext->long_mode == LV_LABEL_LONG_SROLL || ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
         lv_label_refr_text(label);
     }
 #endif
@@ -838,7 +838,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
 
         /* In ROLL mode the CENTER and RIGHT are pointless so remove them.
          * (In addition they will result mis-alignment is this case)*/
-        if((ext->long_mode == LV_LABEL_LONG_ROLL || ext->long_mode == LV_LABEL_LONG_ROLL_CIRC) &&
+        if((ext->long_mode == LV_LABEL_LONG_SROLL || ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) &&
            (ext->align == LV_LABEL_ALIGN_CENTER || ext->align == LV_LABEL_ALIGN_RIGHT)) {
             lv_point_t size;
             lv_txt_get_size(&size, ext->text, style->text.font, style->text.letter_space, style->text.line_space,
@@ -850,12 +850,12 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         }
 
         lv_draw_label_hint_t * hint = &ext->hint;
-        if(ext->long_mode == LV_LABEL_LONG_ROLL_CIRC || lv_obj_get_height(label) < LV_LABEL_HINT_HEIGHT_LIMIT) hint = NULL;
+        if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC || lv_obj_get_height(label) < LV_LABEL_HINT_HEIGHT_LIMIT) hint = NULL;
 
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset,
                       lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), hint);
 
-        if(ext->long_mode == LV_LABEL_LONG_ROLL_CIRC) {
+        if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
             lv_point_t size;
             lv_txt_get_size(&size, ext->text, style->text.font, style->text.letter_space, style->text.line_space,
                             LV_COORD_MAX, flag);
@@ -971,7 +971,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         lv_obj_set_size(label, size.x, size.y);
     }
     /*In roll mode keep the size but start offset animations*/
-    else if(ext->long_mode == LV_LABEL_LONG_ROLL) {
+    else if(ext->long_mode == LV_LABEL_LONG_SROLL) {
 #if LV_USE_ANIMATION
         lv_anim_t anim;
         anim.var      = label;
@@ -1014,7 +1014,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 #endif
     }
     /*In roll inf. mode keep the size but start offset animations*/
-    else if(ext->long_mode == LV_LABEL_LONG_ROLL_CIRC) {
+    else if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
 #if LV_USE_ANIMATION
         lv_anim_t anim;
         anim.var      = label;

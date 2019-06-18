@@ -21,11 +21,7 @@
 /*********************
  *      DEFINES
  *********************/
-#if LV_USE_ANIMATION
-#ifndef LV_DDLIST_DEF_ANIM_TIME
-#define LV_DDLIST_DEF_ANIM_TIME 200 /*ms*/
-#endif
-#else
+#if LV_USE_ANIMATION == 0
 #undef LV_DDLIST_DEF_ANIM_TIME
 #define LV_DDLIST_DEF_ANIM_TIME 0 /*No animation*/
 #endif
@@ -97,7 +93,6 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->sel_opt_id     = 0;
     ext->sel_opt_id_ori = 0;
     ext->option_cnt     = 0;
-    ext->anim_time      = LV_DDLIST_DEF_ANIM_TIME;
     ext->sel_style      = &lv_style_plain_color;
     ext->draw_arrow     = 0; /*Do not draw arrow by default*/
     ext->stay_open      = 0;
@@ -109,6 +104,8 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new drop down list drop down list*/
     if(copy == NULL) {
+        lv_page_set_anim_time(new_ddlist, LV_DDLIST_DEF_ANIM_TIME);
+
         lv_obj_t * scrl = lv_page_get_scrl(new_ddlist);
         lv_obj_set_drag(scrl, false);
         lv_page_set_scrl_fit2(new_ddlist, LV_FIT_FILL, LV_FIT_TIGHT);
@@ -142,7 +139,6 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->fix_height     = copy_ext->fix_height;
         ext->option_cnt     = copy_ext->option_cnt;
         ext->sel_style      = copy_ext->sel_style;
-        ext->anim_time      = copy_ext->anim_time;
         ext->draw_arrow     = copy_ext->draw_arrow;
         ext->stay_open      = copy_ext->stay_open;
 
@@ -274,21 +270,6 @@ void lv_ddlist_set_stay_open(lv_obj_t * ddlist, bool en)
 }
 
 /**
- * Set the open/close animation time.
- * @param ddlist pointer to a drop down list
- * @param anim_time: open/close animation time [ms]
- */
-void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time)
-{
-    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-#if LV_USE_ANIMATION == 0
-    anim_time = 0;
-#endif
-
-    ext->anim_time = anim_time;
-}
-
-/**
  * Set a style of a drop down list
  * @param ddlist pointer to a drop down list object
  * @param type which style should be set
@@ -412,17 +393,6 @@ bool lv_ddlist_get_stay_open(lv_obj_t * ddlist)
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     return ext->stay_open ? true : false;
-}
-
-/**
- * Get the open/close animation time.
- * @param ddlist pointer to a drop down list
- * @return open/close animation time [ms]
- */
-uint16_t lv_ddlist_get_anim_time(const lv_obj_t * ddlist)
-{
-    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    return ext->anim_time;
 }
 
 /**
@@ -888,7 +858,7 @@ static void lv_ddlist_refr_size(lv_obj_t * ddlist, lv_anim_enable_t anim)
             a.path_cb        = lv_anim_path_linear;
             a.ready_cb       = lv_ddlist_anim_ready_cb;
             a.act_time       = 0;
-            a.time           = ext->anim_time;
+            a.time           = lv_ddlist_get_anim_time(ddlist);
             a.playback       = 0;
             a.playback_pause = 0;
             a.repeat         = 0;

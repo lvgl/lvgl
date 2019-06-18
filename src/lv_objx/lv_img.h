@@ -77,33 +77,12 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy);
 void lv_img_set_src(lv_obj_t * img, const void * src_img);
 
 /**
- * Obsolete since v5.1. Just for compatibility with v5.0. Will be removed in v6.0.
- * Use 'lv_img_set_src()' instead.
- * @param img -
- * @param fn -
- */
-static inline void lv_img_set_file(lv_obj_t * img, const char * fn)
-{
-    (void)img;
-    (void)fn;
-}
-
-/**
  * Enable the auto size feature.
  * If enabled the object size will be same as the picture size.
  * @param img pointer to an image
  * @param en true: auto size enable, false: auto size disable
  */
 void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en);
-
-/**
- * Set an offset for the source of an image.
- * so the image will be displayed from the new origin.
- * @param img pointer to an image
- * @param x: the new offset along x axis.
- * @param y: the new offset along y axis.
- */
-void lv_img_set_offset(lv_obj_t * img, lv_coord_t x, lv_coord_t y);
 
 /**
  * Set an offset for the source of an image.

@@ -253,6 +253,15 @@ void lv_win_set_sb_mode(lv_obj_t * win, lv_sb_mode_t sb_mode)
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     lv_page_set_sb_mode(ext->page, sb_mode);
 }
+/**
+ * Set focus animation duration on `lv_win_focus()`
+ * @param win pointer to a window object
+ * @param anim_time duration of animation [ms]
+ */
+void lv_win_set_anim_time(lv_obj_t * win, uint16_t anim_time)
+{
+    lv_page_set_anim_time(lv_win_get_content(win), anim_time);
+}
 
 /**
  * Set a style of a window
@@ -382,6 +391,16 @@ lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t * win)
 }
 
 /**
+ * Get focus animation duration
+ * @param win pointer to a window object
+ * @return duration of animation [ms]
+ */
+uint16_t lv_win_get_anim_time(const lv_obj_t * win)
+{
+    return lv_page_get_anim_time(lv_win_get_content(win));
+}
+
+/**
  * Get width of the content area (page scrollable) of the window
  * @param win pointer to a window object
  * @return the width of the content_bg area
@@ -428,12 +447,12 @@ const lv_style_t * lv_win_get_style(const lv_obj_t * win, lv_win_style_t type)
  * Focus on an object. It ensures that the object will be visible in the window.
  * @param win pointer to a window object
  * @param obj pointer to an object to focus (must be in the window)
- * @param anim_time scroll animation time in milliseconds (0: no animation)
+ * @param anim_en LV_ANIM_ON focus with an animation; LV_ANIM_OFF focus without animation
  */
-void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, uint16_t anim_time)
+void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
-    lv_page_focus(ext->page, obj, anim_time);
+    lv_page_focus(ext->page, obj, anim_en);
 }
 
 /**********************

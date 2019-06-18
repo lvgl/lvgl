@@ -19,13 +19,7 @@
  *********************/
 #define LV_LIST_LAYOUT_DEF LV_LAYOUT_COL_M
 
-#if LV_USE_ANIMATION
-/*Animation time of focusing to the a list element [ms] (0: no animation)  */
-#ifndef LV_LIST_DEF_ANIM_TIME
-#define LV_LIST_DEF_ANIM_TIME 100
-#endif
-#else
-/*No animations*/
+#if LV_USE_ANIMATION == 0
 #undef LV_LIST_DEF_ANIM_TIME
 #define LV_LIST_DEF_ANIM_TIME 0
 #endif
@@ -39,7 +33,7 @@
  **********************/
 static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
 static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
-static void lv_list_btn_single_selected(lv_obj_t * btn);
+static void lv_list_btn_single_select(lv_obj_t * btn);
 static bool lv_list_is_list_btn(lv_obj_t * list_btn);
 static bool lv_list_is_list_img(lv_obj_t * list_btn);
 static bool lv_list_is_list_label(lv_obj_t * list_btn);
@@ -94,9 +88,6 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_rel;
     ext->styles_btn[LV_BTN_STATE_TGL_PR]  = &lv_style_btn_tgl_pr;
     ext->styles_btn[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
-#if LV_USE_ANIMATION
-    ext->anim_time = LV_LIST_DEF_ANIM_TIME;
-#endif
     ext->single_mode = false;
     ext->size        = 0;
 
@@ -109,6 +100,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new list object*/
     if(copy == NULL) {
+        lv_page_set_anim_time(new_list, LV_LIST_DEF_ANIM_TIME);
         lv_page_set_scrl_fit2(new_list, LV_FIT_FLOOD, LV_FIT_TIGHT);
         lv_obj_set_size(new_list, 2 * LV_DPI, 3 * LV_DPI);
         lv_page_set_scrl_layout(new_list, LV_LIST_LAYOUT_DEF);
@@ -223,7 +215,7 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
         lv_obj_t * label = lv_label_create(liste, NULL);
         lv_label_set_text(label, txt);
         lv_obj_set_click(label, false);
-        lv_label_set_long_mode(label, LV_LABEL_LONG_ROLL_CIRC);
+        lv_label_set_long_mode(label, LV_LABEL_LONG_SROLL_CIRC);
         lv_obj_set_width(label, liste->coords.x2 - label->coords.x1 - btn_hor_pad);
         if(label_signal == NULL) label_signal = lv_obj_get_signal_cb(label);
     }
@@ -304,7 +296,7 @@ void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
 
     ext->selected_btn = btn;
 
-    /*Don't forgat whci hbutton was selected.
+    /*Don't forget which button was selected.
      * It will be restored when the list is focused.*/
     if(btn != NULL) {
         ext->last_sel = btn;
@@ -322,22 +314,6 @@ void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
 }
 
 #endif
-
-/**
- * Set scroll animation duration on 'list_up()' 'list_down()' 'list_focus()'
- * @param list pointer to a list object
- * @param anim_time duration of animation [ms]
- */
-void lv_list_set_anim_time(lv_obj_t * list, uint16_t anim_time)
-{
-#if LV_USE_ANIMATION
-    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-    anim_time           = 0;
-
-    if(ext->anim_time == anim_time) return;
-    ext->anim_time = anim_time;
-#endif
-}
 
 /**
  * Set a style of a list
@@ -557,21 +533,6 @@ lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list)
 }
 
 #endif
-
-/**
- * Get scroll animation duration
- * @param list pointer to a list object
- * @return duration of animation [ms]
- */
-uint16_t lv_list_get_anim_time(const lv_obj_t * list)
-{
-#if LV_USE_ANIMATION
-    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-    return ext->anim_time;
-#else
-    return 0;
-#endif
-}
 
 /**
  * Get a style of a list
@@ -900,7 +861,7 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
         last_clicked_btn = btn;
 #endif
         if(lv_indev_is_dragging(lv_indev_get_act()) == false && ext->single_mode) {
-            lv_list_btn_single_selected(btn);
+            lv_list_btn_single_select(btn);
         }
     } else if(sign == LV_SIGNAL_PRESS_LOST) {
         lv_obj_t * list          = lv_obj_get_parent(lv_obj_get_parent(btn));
@@ -919,11 +880,10 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
 }
 
 /**
- * Make a single button selected in the list, deselect others, should be called in list btns call
- * back.
+ * Make a single button selected in the list, deselect others.
  * @param btn pointer to the currently pressed list btn object
  */
-static void lv_list_btn_single_selected(lv_obj_t * btn)
+static void lv_list_btn_single_select(lv_obj_t * btn)
 {
     lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
 

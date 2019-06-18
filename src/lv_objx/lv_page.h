@@ -84,6 +84,8 @@ typedef struct
         uint8_t left_ip : 1;      /*Used internally to show that left most position is reached (flash is
                                      In Progress)*/
     } edge_flash;
+
+    uint16_t anim_time; /*Scroll animation time*/
 #endif
 
     uint8_t arrow_scroll : 1;   /*1: Enable scrolling with LV_KEY_LEFT/RIGHT/UP/DOWN*/
@@ -124,6 +126,13 @@ void lv_page_clean(lv_obj_t * obj);
  */
 lv_obj_t * lv_page_get_scrl(const lv_obj_t * page);
 
+/**
+ * Get the animation time
+ * @param page pointer to a page object
+ * @return the animation time in milliseconds
+ */
+uint16_t lv_page_get_anim_time(const lv_obj_t * page);
+
 /*=====================
  * Setter functions
  *====================*/
@@ -134,6 +143,13 @@ lv_obj_t * lv_page_get_scrl(const lv_obj_t * page);
  * @param sb_mode the new mode from 'lv_page_sb.mode_t' enum
  */
 void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode);
+
+/**
+ * Set the animation time for the page
+ * @param page pointer to a page object
+ * @param anim_time animation time in milliseconds
+ */
+void lv_page_set_anim_time(lv_obj_t * page, uint16_t anim_time);
 
 /**
  * Enable/Disable scrolling with arrows if the page is in group (arrows:
@@ -380,9 +396,9 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue);
  * Focus on an object. It ensures that the object will be visible on the page.
  * @param page pointer to a page object
  * @param obj pointer to an object to focus (must be on the page)
- * @param anim_time scroll animation time in milliseconds (0: no animation)
+ * @param anim_en LV_ANIM_ON to focus with animation; LV_ANIM_OFF to focus without animation
  */
-void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, uint16_t anim_time);
+void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_en);
 
 /**
  * Scroll the page horizontally

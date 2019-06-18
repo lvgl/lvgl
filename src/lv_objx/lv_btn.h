@@ -37,14 +37,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/* Button states
+/** Possible states of a button.
  * It can be used not only by buttons but other button-like objects too*/
 enum {
-    LV_BTN_STATE_REL,
-    LV_BTN_STATE_PR,
-    LV_BTN_STATE_TGL_REL,
-    LV_BTN_STATE_TGL_PR,
-    LV_BTN_STATE_INA,
+    LV_BTN_STATE_REL,       /**Released*/
+    LV_BTN_STATE_PR,        /**Pressed*/
+    LV_BTN_STATE_TGL_REL,   /**Toggled released*/
+    LV_BTN_STATE_TGL_PR,    /**Toggled pressed*/
+    LV_BTN_STATE_INA,       /**Inactive*/
     LV_BTN_STATE_NUM,
 };
 typedef uint8_t lv_btn_state_t;
