@@ -363,10 +363,14 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
             break;
     }
 
-    if(anim == LV_ANIM_OFF || ext->anim_time == 0) {
-        lv_obj_set_x(ext->content, cont_x);
-    } else {
 #if LV_USE_ANIMATION
+    if(anim == LV_ANIM_OFF || ext->anim_time == 0) 
+#endif
+    {
+        lv_obj_set_x(ext->content, cont_x);
+    } 
+#if LV_USE_ANIMATION
+    else {
         lv_anim_t a;
         a.var            = ext->content;
         a.start          = lv_obj_get_x(ext->content);
@@ -381,8 +385,8 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
         a.repeat         = 0;
         a.repeat_pause   = 0;
         lv_anim_create(&a);
-#endif
     }
+#endif
 
     /*Move the indicator*/
     const lv_style_t * tabs_style = lv_obj_get_style(ext->btns);
@@ -402,15 +406,19 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
             break;
     }
 
-    if(anim == LV_ANIM_OFF || ext->anim_time == 0) {
+#if LV_USE_ANIMATION
+    if(anim == LV_ANIM_OFF || ext->anim_time == 0) 
+#endif
+    {
         switch(ext->btns_pos) {
             case LV_TABVIEW_BTNS_POS_TOP:
             case LV_TABVIEW_BTNS_POS_BOTTOM: lv_obj_set_x(ext->indic, indic_pos); break;
             case LV_TABVIEW_BTNS_POS_LEFT:
             case LV_TABVIEW_BTNS_POS_RIGHT: lv_obj_set_y(ext->indic, indic_pos); break;
         }
-    } else {
+    } 
 #if LV_USE_ANIMATION
+    else {
         lv_anim_t a;
         a.var = ext->indic;
 
@@ -438,8 +446,8 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
         a.repeat         = 0;
         a.repeat_pause   = 0;
         lv_anim_create(&a);
-#endif
     }
+#endif
 
     lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_TGL_STATE);
 }

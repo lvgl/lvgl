@@ -435,7 +435,7 @@ lv_label_align_t lv_ddlist_get_align(const lv_obj_t * ddlist)
 void lv_ddlist_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
 {
 #if LV_USE_ANIMATION == 0
-    anim_en = false;
+    anim = false;
 #endif
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     ext->opened           = 1;
@@ -451,7 +451,7 @@ void lv_ddlist_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
 void lv_ddlist_close(lv_obj_t * ddlist, lv_anim_enable_t anim)
 {
 #if LV_USE_ANIMATION == 0
-    anim_en = false;
+    anim = false;
 #endif
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     ext->opened           = 0;
@@ -811,7 +811,7 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
 static void lv_ddlist_refr_size(lv_obj_t * ddlist, lv_anim_enable_t anim)
 {
 #if LV_USE_ANIMATION == 0
-    anim_en = false;
+    anim = false;
 #endif
     lv_ddlist_ext_t * ext    = lv_obj_get_ext_attr(ddlist);
     const lv_style_t * style = lv_obj_get_style(ddlist);
