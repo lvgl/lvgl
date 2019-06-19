@@ -450,7 +450,7 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
         mbox_realign(mbox);
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->btnm) {
-            uint16_t btn_id = lv_btnm_get_active_btn(ext->btnm);
+            uint32_t btn_id = lv_btnm_get_active_btn(ext->btnm);
             if(btn_id != LV_BTNM_BTN_NONE) lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
         }
     } else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROL ||
@@ -523,7 +523,7 @@ static void lv_mbox_default_event_cb(lv_obj_t * mbox, lv_event_t event)
 {
     if(event != LV_EVENT_VALUE_CHANGED) return;
 
-    uint16_t btn_id = lv_mbox_get_active_btn(mbox);
+    uint32_t btn_id = lv_mbox_get_active_btn(mbox);
     if(btn_id == LV_BTNM_BTN_NONE) return;
 
     lv_mbox_start_auto_close(mbox, 0);

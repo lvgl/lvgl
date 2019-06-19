@@ -96,6 +96,10 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->series.dark  = LV_OPA_50;
     ext->series.width = 2;
     ext->margin       = 0;
+    ext->x_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
+    ext->x_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
+    ext->y_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
+    ext->y_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     memset(&ext->x_axis, 0, sizeof(ext->x_axis));
     memset(&ext->y_axis, 0, sizeof(ext->y_axis));
 
@@ -119,6 +123,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
 
     } else {
         lv_chart_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
+
         ext->type                 = ext_copy->type;
         ext->ymin                 = ext_copy->ymin;
         ext->ymax                 = ext_copy->ymax;
@@ -431,46 +436,77 @@ void lv_chart_set_update_mode(lv_obj_t * chart, lv_chart_update_mode_t update_mo
 }
 
 /**
- * Set the margin around the chart, used for axes value and labels
- * @param margin	value of the margin
+ * Set the length of the tick marks on the x axis
+ * @param chart pointer to the chart
+ * @param major_tick_len the length of the major tick or `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where labels are added)
+ * @param minor_tick_len the length of the minor tick, `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where no labels are added)
  */
+void lv_chart_set_x_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len)
+{
+    lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
+    ext->x_axis.major_tick_len = major_tick_len;
+    ext->x_axis.minor_tick_len = minor_tick_len;
+}
+
+/**
+ * Set the length of the tick marks on the y axis
+ * @param chart pointer to the chart
+ * @param major_tick_len the length of the major tick or `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where labels are added)
+ * @param minor_tick_len the length of the minor tick, `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where no labels are added)
+ */
+void lv_chart_set_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len)
+{
+   lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
+   ext->y_axis.major_tick_len = major_tick_len;
+   ext->y_axis.minor_tick_len = minor_tick_len;
+}
+
+/**
+ * Set the x-axis tick count and labels of a chart
+ * @param chart 			pointer to a chart object
+ * @param list_of_values 	list of string values, terminated with \n, except the last
+ * @param num_tick_marks 	if list_of_values is NULL: total number of ticks per axis
+ * 							else number of ticks between two value labels
+ * @param options			extra options
+ */
+void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,  lv_chart_axis_options_t options)
+{
+    lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
+    ext->x_axis.num_tick_marks = num_tick_marks;
+    ext->x_axis.list_of_values = list_of_values;
+    ext->x_axis.options        = options;
+}
+
+/**
+ * Set the y-axis tick count and labels of a chart
+ * @param chart             pointer to a chart object
+ * @param list_of_values    list of string values, terminated with \n, except the last
+ * @param num_tick_marks    if list_of_values is NULL: total number of ticks per axis
+ *                          else number of ticks between two value labels
+ * @param options           extra options
+ */
+void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks, lv_chart_axis_options_t options)
+{
+    lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
+    ext->y_axis.num_tick_marks = num_tick_marks;
+    ext->y_axis.list_of_values = list_of_values;
+    ext->y_axis.options        = options;
+}
+
+/**
+* Set the margin around the chart, used for axes value and ticks
+* @param chart     pointer to an chart object
+* @param margin    value of the margin [px]
+*/
 void lv_chart_set_margin(lv_obj_t * chart, uint16_t margin)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     ext->margin          = margin;
     lv_obj_refresh_ext_draw_pad(chart);
-}
-
-/**
- * Set the x/y-axis ticks of a chart
- * @param chart 			pointer to a chart object
- * @param list_of_values 	list of string values, terminated with \n, except the last
- * @param num_tick_marks 	if list_of_values is NULL: total number of ticks per axis
- * 							else step in ticks between two value labels
- * @param major_tick_len	the length of the major tick, AUTO if 0
- * @param minor_tick_len	the length of the minor tick, AUTO if 0
- * @param options			extra options
- */
-void lv_chart_set_x_ticks(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks, uint8_t major_tick_len,
-                          uint8_t minor_tick_len, lv_chart_axis_options_t options)
-{
-    lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
-    ext->x_axis.num_tick_marks = num_tick_marks;
-    ext->x_axis.list_of_values = list_of_values;
-    ext->x_axis.major_tick_len = major_tick_len;
-    ext->x_axis.minor_tick_len = minor_tick_len;
-    ext->x_axis.options        = options;
-}
-
-void lv_chart_set_y_ticks(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks, uint8_t major_tick_len,
-                          uint8_t minor_tick_len, lv_chart_axis_options_t options)
-{
-    lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
-    ext->y_axis.num_tick_marks = num_tick_marks;
-    ext->y_axis.list_of_values = list_of_values;
-    ext->y_axis.major_tick_len = major_tick_len;
-    ext->y_axis.minor_tick_len = minor_tick_len;
-    ext->y_axis.options        = options;
 }
 
 /*=====================
@@ -1029,12 +1065,12 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
         char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN + 1]; /* up to N symbols per label + null terminator */
 
         /* calculate the size of tick marks */
-        if(ext->y_axis.major_tick_len == 0)
+        if(ext->y_axis.major_tick_len == LV_CHART_TICK_LENGTH_AUTO)
             major_tick_len = (int32_t)w * LV_CHART_AXIS_MAJOR_TICK_LEN_COE;
         else
             major_tick_len = ext->y_axis.major_tick_len;
 
-        if(ext->y_axis.minor_tick_len == 0)
+        if(ext->y_axis.minor_tick_len == LV_CHART_TICK_LENGTH_AUTO)
             minor_tick_len = major_tick_len * LV_CHART_AXIS_MINOR_TICK_LEN_COE;
         else
             minor_tick_len = ext->y_axis.minor_tick_len;
@@ -1116,7 +1152,6 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
 
 static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
 {
-
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
     if(ext->x_axis.list_of_values != NULL || ext->x_axis.num_tick_marks != 0) {
@@ -1138,12 +1173,12 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
         char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN + 1]; /* up to N symbols per label + null terminator */
 
         /* calculate the size of tick marks */
-        if(ext->x_axis.major_tick_len == 0)
+        if(ext->x_axis.major_tick_len == LV_CHART_TICK_LENGTH_AUTO)
             major_tick_len = (int32_t)w * LV_CHART_AXIS_MAJOR_TICK_LEN_COE;
         else
             major_tick_len = ext->x_axis.major_tick_len;
 
-        if(ext->x_axis.minor_tick_len == 0)
+        if(ext->x_axis.minor_tick_len == LV_CHART_TICK_LENGTH_AUTO)
             minor_tick_len = major_tick_len * LV_CHART_AXIS_MINOR_TICK_LEN_COE;
         else
             minor_tick_len = ext->x_axis.minor_tick_len;

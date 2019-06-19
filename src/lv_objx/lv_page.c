@@ -28,6 +28,11 @@
 #define LV_PAGE_END_ANIM_TIME 300
 #define LV_PAGE_END_ANIM_WAIT_TIME 300
 
+#if LV_USE_ANIMATION == 0
+#undef LV_PAGE_DEF_ANIM_TIME
+#define LV_PAGE_DEF_ANIM_TIME 0 /*No animation*/
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -96,6 +101,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->edge_flash.right_ip  = 0;
     ext->edge_flash.state     = 0;
     ext->edge_flash.style     = &lv_style_plain_color;
+    ext->anim_time = LV_PAGE_DEF_ANIM_TIME;
 #endif
     ext->arrow_scroll   = 0;
     ext->scroll_prop    = 0;

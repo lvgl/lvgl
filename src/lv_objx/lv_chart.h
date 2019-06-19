@@ -29,6 +29,9 @@ extern "C" {
  *********************/
 #define LV_CHART_POINT_DEF (LV_COORD_MIN)
 
+/**Automatically calculate the tick length*/
+#define LV_CHART_TICK_LENGTH_AUTO 255
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -60,15 +63,16 @@ typedef struct
 
 /*Data of axis */
 enum {
-    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01 /* draw the last tick */
+    LV_CHART_AXIS_SKIP_LAST_TICK = 0x00,    /* don't draw the last tick */
+    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01     /* draw the last tick */
 };
 typedef uint8_t lv_chart_axis_options_t;
 
 typedef struct
 {
     const char * list_of_values;
-    uint8_t num_tick_marks;
     lv_chart_axis_options_t options;
+    uint8_t num_tick_marks;
     uint8_t major_tick_len;
     uint8_t minor_tick_len;
 } lv_chart_axis_cfg_t;
@@ -234,37 +238,51 @@ static inline void lv_chart_set_style(lv_obj_t * chart, lv_chart_style_t type, c
 }
 
 /**
- * Set the margin around the chart, used for axes value and labels
- * @param chart 	pointer to an chart object
- * @param margin	value of the margin
+ * Set the length of the tick marks on the x axis
+ * @param chart pointer to the chart
+ * @param major_tick_len the length of the major tick or `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where labels are added)
+ * @param minor_tick_len the length of the minor tick, `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where no labels are added)
  */
-void lv_chart_set_margin(lv_obj_t * chart, uint16_t margin);
+void lv_chart_set_x_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len);
 
 /**
- * Set the y-axis ticks of a chart
- * @param chart 			pointer to a chart object
- * @param list_of_values 	list of string values, terminated with \n, except the last
- * @param num_tick_marks 	if list_of_values is NULL: total number of ticks per axis
- * 							else step in ticks between two value labels
- * @param major_tick_len	the length of the major tick, AUTO if 0
- * @param minor_tick_len	the length of the minor tick, AUTO if 0
- * @param options			extra options
+ * Set the length of the tick marks on the y axis
+ * @param chart pointer to the chart
+ * @param major_tick_len the length of the major tick or `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where labels are added)
+ * @param minor_tick_len the length of the minor tick, `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where no labels are added)
  */
-void lv_chart_set_x_ticks(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks, uint8_t major_tick_len,
-                          uint8_t minor_tick_len, lv_chart_axis_options_t options);
+void lv_chart_set_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len);
 
 /**
- * Set the y-axis ticks of a chart
+ * Set the x-axis tick count and labels of a chart
  * @param chart             pointer to a chart object
  * @param list_of_values    list of string values, terminated with \n, except the last
  * @param num_tick_marks    if list_of_values is NULL: total number of ticks per axis
- *                          else step in ticks between two value labels
- * @param major_tick_len    the length of the major tick, AUTO if 0
- * @param minor_tick_len    the length of the minor tick, AUTO if 0
+ *                          else number of ticks between two value labels
  * @param options           extra options
  */
-void lv_chart_set_y_ticks(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks, uint8_t major_tick_len,
-                          uint8_t minor_tick_len, lv_chart_axis_options_t options);
+void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,  lv_chart_axis_options_t options);
+
+/**
+ * Set the y-axis tick count and labels of a chart
+ * @param chart             pointer to a chart object
+ * @param list_of_values    list of string values, terminated with \n, except the last
+ * @param num_tick_marks    if list_of_values is NULL: total number of ticks per axis
+ *                          else number of ticks between two value labels
+ * @param options           extra options
+ */
+void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks, lv_chart_axis_options_t options);
+
+/**
+ * Set the margin around the chart, used for axes value and ticks
+ * @param chart     pointer to an chart object
+ * @param margin    value of the margin [px]
+ */
+void lv_chart_set_margin(lv_obj_t * chart, uint16_t margin);
 
 /*=====================
  * Getter functions

@@ -119,14 +119,14 @@ void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, const lv_
  * @param preload pointer to pre loader object
  * @param type animation type of the preload
  *  */
-void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type);
+void lv_preload_set_type(lv_obj_t * preload, lv_preload_type_t type);
 
 /**
  * Set the animation direction of a preloader
  * @param preload pointer to pre loader object
  * @param direction animation direction of the preload
  */
-void lv_preload_set_anim_dir(lv_obj_t * preload, lv_preload_dir_t dir);
+void lv_preload_set_dir(lv_obj_t * preload, lv_preload_dir_t dir);
 
 /*=====================
  * Getter functions
@@ -157,14 +157,14 @@ const lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_sty
  * @param preload pointer to pre loader object
  * @return animation type
  *  */
-lv_preload_type_t lv_preload_get_anim_type(lv_obj_t * preload);
+lv_preload_type_t lv_preload_get_type(lv_obj_t * preload);
 
 /**
  * Get the animation direction of a preloader
  * @param preload pointer to pre loader object
  * @return animation direction
  */
-lv_preload_dir_t lv_preload_get_anim_dir(lv_obj_t * preload);
+lv_preload_dir_t lv_preload_get_dir(lv_obj_t * preload);
 
 /*=====================
  * Other functions

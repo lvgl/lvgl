@@ -393,6 +393,10 @@ typedef void * lv_obj_user_data_t;
 
 /*Page (dependencies: lv_cont)*/
 #define LV_USE_PAGE     1
+#if LV_USE_PAGE != 0
+/*Focus default animation time [ms] (0: no animation)*/
+#  define LV_PAGE_DEF_ANIM_TIME     400
+#endif
 
 /*Preload (dependencies: lv_arc, lv_anim)*/
 #define LV_USE_PRELOAD      1

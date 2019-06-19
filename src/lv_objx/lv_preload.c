@@ -111,7 +111,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_refresh_style(new_preload);
     }
 
-    lv_preload_set_anim_type(new_preload, ext->anim_type);
+    lv_preload_set_type(new_preload, ext->anim_type);
 
     LV_LOG_INFO("preload created");
 
@@ -144,7 +144,7 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time)
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     ext->time = time;
-    lv_preload_set_anim_type(preload, ext->anim_type);
+    lv_preload_set_type(preload, ext->anim_type);
 }
 /*=====================
  * Setter functions
@@ -168,7 +168,7 @@ void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, const lv_
  * @param preload pointer to pre loader object
  * @param type animation type of the preload
  *  */
-void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
+void lv_preload_set_type(lv_obj_t * preload, lv_preload_type_t type)
 {
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
@@ -248,12 +248,12 @@ void lv_preload_set_anim_type(lv_obj_t * preload, lv_preload_type_t type)
     }
 }
 
-void lv_preload_set_anim_dir(lv_obj_t * preload, lv_preload_dir_t dir)
+void lv_preload_set_dir(lv_obj_t * preload, lv_preload_dir_t dir)
 {
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     ext->anim_dir = dir;
-    lv_preload_set_anim_type(preload, ext->anim_type);
+    lv_preload_set_type(preload, ext->anim_type);
 }
 
 /*=====================
@@ -303,13 +303,13 @@ const lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_sty
  * @param preload pointer to pre loader object
  * @return animation type
  *  */
-lv_preload_type_t lv_preload_get_anim_type(lv_obj_t * preload)
+lv_preload_type_t lv_preload_get_type(lv_obj_t * preload)
 {
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
     return ext->anim_type;
 }
 
-lv_preload_dir_t lv_preload_get_anim_dir(lv_obj_t * preload)
+lv_preload_dir_t lv_preload_get_dir(lv_obj_t * preload)
 {
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
     return ext->anim_dir;
