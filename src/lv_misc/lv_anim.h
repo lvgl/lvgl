@@ -23,6 +23,14 @@ extern "C" {
 #include <stdbool.h>
 #include <string.h>
 
+/*********************
+ *      DEFINES
+ *********************/
+
+/**********************
+ *      TYPEDEFS
+ **********************/
+
 /*Can be used to indicate if animations are enabled or disabled in a case*/
 enum {
  LV_ANIM_OFF,
@@ -32,14 +40,6 @@ enum {
 typedef uint8_t lv_anim_enable_t;
 
 #if LV_USE_ANIMATION
-
-/*********************
- *      DEFINES
- *********************/
-
-/**********************
- *      TYPEDEFS
- **********************/
 
 struct _lv_anim_t;
 
