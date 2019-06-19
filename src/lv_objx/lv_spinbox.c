@@ -223,7 +223,7 @@ int32_t lv_spinbox_get_value(lv_obj_t * spinbox)
  *====================*/
 
 /**
- * Select next lower digit for edition by dividing the step by 10
+ * Select next lower digit for edition
  * @param spinbox pointer to spinbox
  */
 void lv_spinbox_step_next(lv_obj_t * spinbox)
@@ -240,7 +240,7 @@ void lv_spinbox_step_next(lv_obj_t * spinbox)
 }
 
 /**
- * Select next higher digit for edition by multiplying the step by 10
+ * Select next higher digit for edition
  * @param spinbox pointer to spinbox
  */
 void lv_spinbox_step_previous(lv_obj_t * spinbox)
