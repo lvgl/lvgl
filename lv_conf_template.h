@@ -130,8 +130,6 @@ typedef int16_t lv_coord_t;
 /*Declare the type of the user data of animations (can be e.g. `void *`, `int`, `struct`)*/
 typedef void * lv_anim_user_data_t;
 
-/*Type of the animated value*/
-typedef int16_t lv_anim_value_t;
 #endif
 
 /* 1: Enable shadow drawing*/
