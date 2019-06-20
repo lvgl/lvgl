@@ -2,7 +2,6 @@
  * GENERATED FILE, DO NOT EDIT IT!
  * @file lv_conf_checker.h
  * Make sure all the defines of lv_conf.h have a default value
- * \internal
 **/
 
 #ifndef LV_CONF_CHECKER_H
@@ -210,6 +209,22 @@
 /* 1: Enable alpha indexed images */
 #ifndef LV_IMG_CF_ALPHA
 #define LV_IMG_CF_ALPHA         1
+#endif
+
+/* Default image cache size. Image caching keeps the images opened.
+ * If only built-in images are used there is no real advantage of caching.
+ * With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
+ * However the opened images might consume additional RAM.
+ * LV_IMG_CACHE_DEF_SIZE must be >= 1 */
+#ifndef LV_IMG_CACHE_DEF_SIZE
+#define LV_IMG_CACHE_DEF_SIZE       1
+#endif
+
+/* If an image wasn't used for this time consider it unused.
+ * It's more provable that "unused" images will be replaced by other in the cache
+ * The unit is [ms]*/
+#ifndef LV_IMG_CACHE_DEF_LIFE_TIME
+#define LV_IMG_CACHE_DEF_LIFE_TIME  10000
 #endif
 
 /*Declare the type of the user data of image decoder (can be e.g. `void *`, `int`, `struct`)*/
@@ -569,6 +584,12 @@
 /*Page (dependencies: lv_cont)*/
 #ifndef LV_USE_PAGE
 #define LV_USE_PAGE     1
+#endif
+#if LV_USE_PAGE != 0
+/*Focus default animation time [ms] (0: no animation)*/
+#ifndef LV_PAGE_DEF_ANIM_TIME
+#  define LV_PAGE_DEF_ANIM_TIME     400
+#endif
 #endif
 
 /*Preload (dependencies: lv_arc, lv_anim)*/

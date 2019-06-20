@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_img.h"
+#include "lv_img_cache.h"
 #include "../lv_misc/lv_log.h"
 
 /*********************
@@ -445,29 +446,22 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
     lv_opa_t opa =
         opa_scale == LV_OPA_COVER ? style->image.opa : (uint16_t)((uint16_t)style->image.opa * opa_scale) >> 8;
 
-    lv_img_header_t header;
-    lv_res_t header_res;
-    header_res = lv_img_decoder_get_info(src, &header);
-    if(header_res != LV_RES_OK) {
-        LV_LOG_WARN("Image draw can't get image info");
-        return LV_RES_INV;
-    }
 
-    bool chroma_keyed = lv_img_color_format_is_chroma_keyed(header.cf);
-    bool alpha_byte   = lv_img_color_format_has_alpha(header.cf);
+    lv_img_cache_t * cdsc = lv_img_cache_open(src, style);
 
-    lv_img_decoder_dsc_t dsc;
-    const uint8_t * img_data = lv_img_decoder_open(&dsc, src, style);
-    if(img_data == LV_IMG_DECODER_OPEN_FAIL) {
-        LV_LOG_WARN("Image draw cannot open the image resource");
-        lv_img_decoder_close(&dsc);
-        return LV_RES_INV;
-    }
+    if(cdsc == NULL) return LV_RES_INV;
+
+
+    bool chroma_keyed = lv_img_color_format_is_chroma_keyed(cdsc->dsc.header.cf);
+    bool alpha_byte   = lv_img_color_format_has_alpha(cdsc->dsc.header.cf);
+
+
+
 
     /* The decoder open could open the image and gave the entire uncompressed image.
      * Just draw it!*/
-    if(img_data) {
-        lv_draw_map(coords, mask, img_data, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
+    if(cdsc->img_data) {
+        lv_draw_map(coords, mask, cdsc->img_data, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
     }
     /* The whole uncompressed image is not available. Try to read it line-by-line*/
     else {
@@ -486,9 +480,9 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
         lv_coord_t row;
         lv_res_t read_res;
         for(row = mask_com.y1; row <= mask_com.y2; row++) {
-            read_res = lv_img_decoder_read_line(&dsc, x, y, width, buf);
+            read_res = lv_img_decoder_read_line(&cdsc->dsc, x, y, width, buf);
             if(read_res != LV_RES_OK) {
-                lv_img_decoder_close(&dsc);
+                lv_img_decoder_close(&cdsc->dsc);
                 LV_LOG_WARN("Image draw can't read the line");
                 return LV_RES_INV;
             }
@@ -498,8 +492,6 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
             y++;
         }
     }
-
-    lv_img_decoder_close(&dsc);
 
     return LV_RES_OK;
 }

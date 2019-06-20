@@ -109,6 +109,7 @@ void lv_init(void)
     lv_indev_init();
 
     lv_img_decoder_init();
+    lv_img_cache_set_size(LV_IMG_CACHE_DEF_SIZE);
 
     lv_initialized = true;
     LV_LOG_INFO("lv_init ready");
