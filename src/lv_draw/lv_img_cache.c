@@ -8,10 +8,27 @@
  *********************/
 #include "lv_img_cache.h"
 #include "../lv_hal/lv_hal_tick.h"
+#include "../lv_misc/lv_gc.h"
 
+#if defined(LV_GC_INCLUDE)
+#include LV_GC_INCLUDE
+#endif /* LV_ENABLE_GC */
 /*********************
  *      DEFINES
  *********************/
+/*Decrement life with this value in every open*/
+#define LV_IMG_CACHE_AGING      1
+
+/*Boost life by this factor (multiply time_to_open with this value)*/
+#define LV_IMG_CACHE_LIFE_GAIN  1
+
+/*Don't let life to be greater than this limit because it would require a lot of time to
+ * "die" from very high values */
+#define LV_IMG_CACHE_LIFE_LIMIT 1000
+
+#if LV_IMG_CACHE_DEF_SIZE < 1
+#error "LV_IMG_CACHE_DEF_SIZE must be >= 1. See lv_conf.h"
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -24,8 +41,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_img_cache_t * img_cache;
-static uint32_t life_time = LV_IMG_CACHE_DEF_LIFE_TIME;
 static uint16_t slot_num;
 
 /**********************
@@ -44,54 +59,52 @@ static uint16_t slot_num;
  * @param style style of the image
  * @return pointer to the cache entry or NULL if can open the image
  */
-lv_img_cache_t * lv_img_cache_open(const void * src, const lv_style_t * style)
+lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * style)
 {
     if(slot_num == 0) {
         LV_LOG_WARN("lv_img_cache_open: the cache size is 0");
         return NULL;
     }
 
-    /*Check if the image is already cached*/
-    lv_img_cache_t * cached_dsc = NULL;
-    lv_img_cache_t * cache_dsc_reuse = NULL;
+    lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
+
+    /*Decrement all lifes. Make the entries older*/
     uint16_t i;
     for(i = 0; i < slot_num; i++) {
-        if(img_cache[i].dsc.src == src) {
-            cached_dsc = &img_cache[i];
-            LV_LOG_TRACE("image draw: image found in the cache");
-            break;
-        }
-        /*Meanwhile check for a reusable slot in the cache. It will be required if `src` is not cached*/
-        else {
-
-            /*If there is no idea for `cache_dsc_reuse` then let's use this*/
-            if(cache_dsc_reuse == NULL) {
-                cache_dsc_reuse = &img_cache[i];
-            }
-
-            /*There won't be better option then an empty slot so keep it.*/
-            if(cache_dsc_reuse->dsc.src == NULL) continue;
-
-            /*If its an empty slot then its the best choice to use*/
-            if(img_cache[i].dsc.src == NULL) {
-                cache_dsc_reuse = &img_cache[i];
-            }
-            /*If this image wasn't used for while then reuse it*/
-            else if(lv_tick_elaps(img_cache[i].timestamp) > life_time) {
-                cache_dsc_reuse = &img_cache[i];
-            }
-            /* Drop the image which is the fastest to reopen */
-            else if(img_cache[i].open_duration < cache_dsc_reuse->open_duration) {
-                    cache_dsc_reuse = &img_cache[i];
-            }
+        if(cache[i].life > INT32_MIN + LV_IMG_CACHE_AGING) {
+            cache[i].life -= LV_IMG_CACHE_AGING;
         }
     }
 
+    /*Is the image cached?*/
+    lv_img_cache_entry_t * cached_src = NULL;
+    for(i = 0; i < slot_num; i++) {
+        if(cache[i].dsc.src == src) {
+            /* If opened increment its life.
+             * Image difficult to open should live longer to keep avoid frequent their recaching.
+             * Therefore increase `life` with `time_to_open`*/
+            cached_src = &cache[i];
+            cached_src->life += cached_src->time_to_open * LV_IMG_CACHE_LIFE_GAIN ;
+            if(cached_src->life > LV_IMG_CACHE_LIFE_LIMIT) cached_src->life = LV_IMG_CACHE_LIFE_LIMIT;
+            LV_LOG_TRACE("image draw: image found in the cache");
+            break;
+        }
+    }
+
+
     /*The image is not cached then cache it now*/
-    if(cached_dsc == NULL) {
+    if(cached_src == NULL) {
+        /*Find an entry to reuse. Select the entry with the least life*/
+        cached_src = &cache[0];
+        for(i = 1; i < slot_num; i++) {
+            if(cache[i].life < cached_src->life) {
+                cached_src = &cache[i];
+            }
+        }
+
         /*Close the slot to reuse if it was opened (has a valid source)*/
-        if(cache_dsc_reuse->dsc.src) {
-            lv_img_decoder_close(&cache_dsc_reuse->dsc);
+        if(cached_src->dsc.src) {
+            lv_img_decoder_close(&cached_src->dsc);
             LV_LOG_INFO("image draw: cache miss, close and reuse a slot");
         } else {
             LV_LOG_INFO("image draw: cache miss, cached in empty slot");
@@ -100,23 +113,23 @@ lv_img_cache_t * lv_img_cache_open(const void * src, const lv_style_t * style)
         /*Open the image and measure the time to open*/
         uint32_t t_start;
         t_start = lv_tick_get();
-        const uint8_t * img_data = lv_img_decoder_open(&cache_dsc_reuse->dsc, src, style);
+        const uint8_t * img_data = lv_img_decoder_open(&cached_src->dsc, src, style);
         if(img_data == LV_IMG_DECODER_OPEN_FAIL) {
             LV_LOG_WARN("Image draw cannot open the image resource");
-            lv_img_decoder_close(&cache_dsc_reuse->dsc);
-            memset(&cache_dsc_reuse->dsc, 0, sizeof(lv_img_decoder_dsc_t));
-            memset(&cache_dsc_reuse, 0, sizeof(lv_img_cache_t));
+            lv_img_decoder_close(&cached_src->dsc);
+            memset(&cached_src->dsc, 0, sizeof(lv_img_decoder_dsc_t));
+            memset(&cached_src, 0, sizeof(lv_img_cache_entry_t));
+            cached_src->life = INT32_MIN;       /*Make the empty entry very "weak" to force its use  */
             return NULL;
         }
 
-        cached_dsc = cache_dsc_reuse;
-        cached_dsc->img_data = img_data;
-        cached_dsc->open_duration = lv_tick_elaps(t_start);
+        cached_src->img_data = img_data;
+        cached_src->life = 0;
+        cached_src->time_to_open = lv_tick_elaps(t_start);
+        if(cached_src->time_to_open == 0) cached_src->time_to_open = 1;
     }
 
-    cached_dsc->timestamp = lv_tick_get();
-
-    return cached_dsc;
+    return cached_src;
 }
 
 /**
@@ -127,16 +140,16 @@ lv_img_cache_t * lv_img_cache_open(const void * src, const lv_style_t * style)
  */
 void lv_img_cache_set_size(uint16_t new_slot_num)
 {
-    if(img_cache != NULL) {
+    if(LV_GC_ROOT(_lv_img_cache_array) != NULL) {
         /*Clean the cache before free it*/
         lv_img_cache_invalidate_src(NULL);
-        lv_mem_free(img_cache);
+        lv_mem_free(LV_GC_ROOT(_lv_img_cache_array));
     }
 
     /*Reallocate the cache*/
-    img_cache = lv_mem_alloc(sizeof(lv_img_cache_t) * new_slot_num);
-    lv_mem_assert(img_cache);
-    if(img_cache == NULL) {
+    LV_GC_ROOT(_lv_img_cache_array) = lv_mem_alloc(sizeof(lv_img_cache_entry_t) * new_slot_num);
+    lv_mem_assert(LV_GC_ROOT(_lv_img_cache_array));
+    if(LV_GC_ROOT(_lv_img_cache_array) == NULL) {
         slot_num = 0;
         return;
     }
@@ -145,20 +158,9 @@ void lv_img_cache_set_size(uint16_t new_slot_num)
     /*Clean the cache*/
     uint16_t i;
     for(i = 0; i < slot_num; i++) {
-        memset(&img_cache[i].dsc, 0, sizeof(lv_img_decoder_dsc_t));
-        memset(&img_cache[i], 0, sizeof(lv_img_cache_t));
+        memset(&LV_GC_ROOT(_lv_img_cache_array)[i].dsc, 0, sizeof(lv_img_decoder_dsc_t));
+        memset(&LV_GC_ROOT(_lv_img_cache_array)[i], 0, sizeof(lv_img_cache_entry_t));
     }
-}
-
-
-/**
- * Set a life time for the cache entries.
- * After this time a cached image is considered unused and it's more probable the it will be replaced by a new image.
- * @param new_life_time the new life time in milliseconds
- */
-void lv_img_cache_set_life_time(uint32_t new_life_time)
-{
-    life_time = new_life_time;
 }
 
 /**
@@ -168,15 +170,18 @@ void lv_img_cache_set_life_time(uint32_t new_life_time)
  */
 void lv_img_cache_invalidate_src(const void * src)
 {
+
+    lv_img_cache_entry_t * cache = LV_GC_ROOT(_lv_img_cache_array);
+
     uint16_t i;
     for(i = 0; i < slot_num; i++) {
-        if(img_cache[i].dsc.src == src || src == NULL) {
-            if(img_cache[i].dsc.src != NULL) {
-                lv_img_decoder_close(&img_cache[i].dsc);
+        if(cache[i].dsc.src == src || src == NULL) {
+            if(cache[i].dsc.src != NULL) {
+                lv_img_decoder_close(&cache[i].dsc);
             }
 
-            memset(&img_cache[i].dsc, 0, sizeof(lv_img_decoder_dsc_t));
-            memset(&img_cache[i], 0, sizeof(lv_img_cache_t));
+            memset(&cache[i].dsc, 0, sizeof(lv_img_decoder_dsc_t));
+            memset(&cache[i], 0, sizeof(lv_img_cache_entry_t));
         }
     }
 }

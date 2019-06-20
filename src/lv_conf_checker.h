@@ -174,6 +174,9 @@
 #define LV_USE_ANIMATION        1
 #endif
 #if LV_USE_ANIMATION
+
+/*Declare the type of the user data of animations (can be e.g. `void *`, `int`, `struct`)*/
+
 #endif
 
 /* 1: Enable shadow drawing*/
@@ -201,6 +204,15 @@
 /*Declare the type of the user data of file system drivers (can be e.g. `void *`, `int`, `struct`)*/
 #endif
 
+/*1: Add a `user_data` to drivers and objects*/
+#ifndef LV_USE_USER_DATA
+#define LV_USE_USER_DATA        1
+#endif
+
+/*========================
+ * Image decoder and cache
+ *========================*/
+
 /* 1: Enable indexed (palette) images */
 #ifndef LV_IMG_CF_INDEXED
 #define LV_IMG_CF_INDEXED       1
@@ -212,7 +224,8 @@
 #endif
 
 /* Default image cache size. Image caching keeps the images opened.
- * If only built-in images are used there is no real advantage of caching.
+ * If only the built-in image formats are used there is no real advantage of caching.
+ * (I.e. no new image decoder is added)
  * With complex image decoders (e.g. PNG or JPG) caching can save the continuous open/decode of images.
  * However the opened images might consume additional RAM.
  * LV_IMG_CACHE_DEF_SIZE must be >= 1 */
@@ -220,19 +233,7 @@
 #define LV_IMG_CACHE_DEF_SIZE       1
 #endif
 
-/* If an image wasn't used for this time consider it unused.
- * It's more provable that "unused" images will be replaced by other in the cache
- * The unit is [ms]*/
-#ifndef LV_IMG_CACHE_DEF_LIFE_TIME
-#define LV_IMG_CACHE_DEF_LIFE_TIME  10000
-#endif
-
 /*Declare the type of the user data of image decoder (can be e.g. `void *`, `int`, `struct`)*/
-
-/*1: Add a `user_data` to drivers and objects*/
-#ifndef LV_USE_USER_DATA
-#define LV_USE_USER_DATA        1
-#endif
 
 /*=====================
  *  Compiler settings

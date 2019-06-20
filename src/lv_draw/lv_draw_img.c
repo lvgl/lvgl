@@ -447,7 +447,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
         opa_scale == LV_OPA_COVER ? style->image.opa : (uint16_t)((uint16_t)style->image.opa * opa_scale) >> 8;
 
 
-    lv_img_cache_t * cdsc = lv_img_cache_open(src, style);
+    lv_img_cache_entry_t * cdsc = lv_img_cache_open(src, style);
 
     if(cdsc == NULL) return LV_RES_INV;
 
