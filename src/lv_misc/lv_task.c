@@ -212,7 +212,9 @@ lv_task_t * lv_task_create_basic(void)
 
 /**
  * Create a new lv_task
- * @param task a function which is the task itself
+ * @param task_xcb a callback which is the task itself. It will be called periodically.
+ *                 (the 'x' in the argument name indicates that its not a fully generic function because it not follows
+ *                  the `func_name(object, callback, ...)` convention)
  * @param period call period in ms unit
  * @param prio priority of the task (LV_TASK_PRIO_OFF means the task is stopped)
  * @param user_data custom parameter

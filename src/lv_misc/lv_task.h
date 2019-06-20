@@ -92,15 +92,18 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void);
  */
 lv_task_t * lv_task_create_basic(void);
 
+
 /**
  * Create a new lv_task
- * @param task a function which is the task itself
+ * @param task_xcb a callback which is the task itself. It will be called periodically.
+ *                 (the 'x' in the argument name indicates that its not a fully generic function because it not follows
+ *                  the `func_name(object, callback, ...)` convention)
  * @param period call period in ms unit
  * @param prio priority of the task (LV_TASK_PRIO_OFF means the task is stopped)
  * @param user_data custom parameter
  * @return pointer to the new task
  */
-lv_task_t * lv_task_create(lv_task_cb_t task_cb, uint32_t period, lv_task_prio_t prio, void * user_data);
+lv_task_t * lv_task_create(lv_task_cb_t task_xcb, uint32_t period, lv_task_prio_t prio, void * user_data);
 
 /**
  * Delete a lv_task
