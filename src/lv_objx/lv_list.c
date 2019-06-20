@@ -657,7 +657,7 @@ void lv_list_focus(const lv_obj_t * btn, lv_anim_enable_t anim)
 {
 
 #if LV_USE_ANIMATION == 0
-    anim_en = false;
+    anim = false;
 #endif
 
     lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));

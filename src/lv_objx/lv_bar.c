@@ -220,11 +220,10 @@ void lv_bar_set_sym(lv_obj_t * bar, bool en)
  */
 void lv_bar_set_anim_time(lv_obj_t * bar, uint16_t anim_time)
 {
-#if LV_USE_ANIMATION == 0
-    anim_time = 0;
-#endif
+#if LV_USE_ANIMATION
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     ext->anim_time = anim_time;
+#endif
 }
 
 /**

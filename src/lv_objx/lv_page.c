@@ -218,9 +218,12 @@ void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
  */
 void lv_page_set_anim_time(lv_obj_t * page, uint16_t anim_time)
 {
-    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 #if LV_USE_ANIMATION
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     ext->anim_time = anim_time;
+#else
+    (void)page;       /*Unused*/
+    (void)anim_time;  /*Unused*/
 #endif
 
 }
