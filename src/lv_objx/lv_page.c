@@ -319,6 +319,7 @@ uint16_t lv_page_get_anim_time(const lv_obj_t * page)
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     return ext->anim_time;
 #else
+    (void) page;   /*Unused*/
     return 0;
 #endif
 }
@@ -645,6 +646,8 @@ void lv_page_start_edge_flash(lv_obj_t * page)
         a.repeat_pause   = 0;
         lv_anim_create(&a);
     }
+#else
+    (void) page;   /*Unused*/
 #endif
 }
 

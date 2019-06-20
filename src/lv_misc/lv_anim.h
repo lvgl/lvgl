@@ -35,9 +35,6 @@ extern "C" {
 
 struct _lv_anim_t;
 
-/*Type of the animated value*/
-typedef int16_t lv_anim_value_t;
-
 /* Generic prototype of "animator" functions.
  * First parameter is the variable to animate.
  * Second parameter is the value to set.

@@ -363,7 +363,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
             break;
     }
 
-    if(anim == LV_ANIM_OFF || ext->anim_time == 0) {
+    if(anim == LV_ANIM_OFF || lv_tabview_get_anim_time(tabview) == 0) {
         lv_obj_set_x(ext->content, cont_x);
     } else {
 #if LV_USE_ANIMATION

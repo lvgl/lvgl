@@ -310,6 +310,7 @@ uint16_t lv_bar_get_anim_time(lv_obj_t * bar)
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     return ext->anim_time;
 #else
+    (void) bar;   /*Unused*/
     return 0;
 #endif
 }

@@ -241,6 +241,7 @@ uint16_t lv_sw_get_anim_time(const lv_obj_t * sw)
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     return ext->anim_time;
 #else
+    (void) sw;   /*Unused*/
     return 0;
 #endif
 }

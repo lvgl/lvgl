@@ -320,7 +320,7 @@ lv_preload_dir_t lv_preload_get_dir(lv_obj_t * preload)
  *====================*/
 
 /**
- * Automatically in an animation to rotate the arc of spinner.
+ * Animator function  (exec_cb) to rotate the arc of spinner.
  * @param ptr pointer to preloader
  * @param val the current desired value [0..360]
  */

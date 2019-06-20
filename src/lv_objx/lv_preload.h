@@ -171,11 +171,10 @@ lv_preload_dir_t lv_preload_get_dir(lv_obj_t * preload);
  *====================*/
 
 /**
- * Get style of a pre loader.
- * @param preload pointer to pre loader object
- * @param type which style should be get
- * @return style pointer to the style
- *  */
+ * Animator function  (exec_cb) to rotate the arc of spinner.
+ * @param ptr pointer to preloader
+ * @param val the current desired value [0..360]
+ */
 void lv_preload_spinner_anim(void * ptr, lv_anim_value_t val);
 
 /**********************

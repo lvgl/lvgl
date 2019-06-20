@@ -342,7 +342,7 @@ void lv_label_set_body_draw(lv_obj_t * label, bool en)
 }
 
 /**
- * Set the label's animation speed in LV_LABEL_LONG_ROLL and SCROLL modes
+ * Set the label's animation speed in LV_LABEL_LONG_SROLL/SCROLL_CIRC modes
  * @param label pointer to a label object
  * @param anim_speed speed of animation in px/sec unit
  */
@@ -357,6 +357,9 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
     if(ext->long_mode == LV_LABEL_LONG_SROLL || ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
         lv_label_refr_text(label);
     }
+#else
+    (void) label;   /*Unused*/
+    (void) anim_speed;   /*Unused*/
 #endif
 }
 
@@ -449,6 +452,7 @@ uint16_t lv_label_get_anim_speed(const lv_obj_t * label)
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->anim_speed;
 #else
+    (void) label;   /*Unused*/
     return 0;
 #endif
 }

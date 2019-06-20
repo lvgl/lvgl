@@ -170,7 +170,7 @@ void lv_label_set_recolor(lv_obj_t * label, bool en);
 void lv_label_set_body_draw(lv_obj_t * label, bool en);
 
 /**
- * Set the label's animation speed in LV_LABEL_LONG_ROLL and SCROLL modes
+ * Set the label's animation speed in LV_LABEL_LONG_SROLL/SCROLL_CIRC modes
  * @param label pointer to a label object
  * @param anim_speed speed of animation in px/sec unit
  */
