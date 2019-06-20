@@ -205,9 +205,6 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
     } else {
         lv_obj_invalidate(ddlist);
     }
-
-    uint32_t id = ext->sel_opt_id;  /*Just to use uint32_t in event data*/
-    lv_event_send(ddlist, LV_EVENT_VALUE_CHANGED, &id);
 }
 
 /**
