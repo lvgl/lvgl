@@ -286,7 +286,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
 
     uint8_t width_byte_scr = g.box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
     if(g.box_w & 0x7) width_byte_scr++;
-    uint8_t width_bit = g.box_w * g.bpp; /*Letter width in bits*/
+    uint16_t width_bit = g.box_w * g.bpp; /*Letter width in bits*/
 
     /* Calculate the col/row start/end on the map*/
     lv_coord_t col_start = pos_x >= mask_p->x1 ? 0 : mask_p->x1 - pos_x;
