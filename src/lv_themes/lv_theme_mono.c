@@ -395,8 +395,7 @@ static void win_init(void)
     theme.style.win.bg           = &light_frame;
     theme.style.win.sb           = &dark_frame;
     theme.style.win.header       = &win_header;
-    theme.style.win.content.bg   = &lv_style_transp;
-    theme.style.win.content.scrl = &lv_style_transp;
+    theme.style.win.content = &lv_style_transp;
     theme.style.win.btn.rel      = &light_frame;
     theme.style.win.btn.pr       = &dark_frame;
 #endif

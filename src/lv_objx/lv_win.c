@@ -82,7 +82,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->page = lv_page_create(new_win, NULL);
         lv_obj_set_protect(ext->page, LV_PROTECT_PARENT);
         lv_page_set_sb_mode(ext->page, LV_SB_MODE_AUTO);
-        lv_page_set_arrow_scroll(ext->page, true);
+        lv_page_set_style(ext->page, LV_PAGE_STYLE_BG, &lv_style_transp_fit);
 
         /*Create a holder for the header*/
         ext->header = lv_obj_create(new_win, NULL);
@@ -94,20 +94,19 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->title = lv_label_create(ext->header, NULL);
         lv_label_set_text(ext->title, "My title");
 
+
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
             lv_win_set_style(new_win, LV_WIN_STYLE_BG, th->style.win.bg);
             lv_win_set_style(new_win, LV_WIN_STYLE_SB, th->style.win.sb);
             lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, th->style.win.header);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, th->style.win.content.bg);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, th->style.win.content.scrl);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT, th->style.win.content);
             lv_win_set_style(new_win, LV_WIN_STYLE_BTN_REL, th->style.win.btn.rel);
             lv_win_set_style(new_win, LV_WIN_STYLE_BTN_PR, th->style.win.btn.pr);
         } else {
             lv_win_set_style(new_win, LV_WIN_STYLE_BG, &lv_style_plain);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_BG, &lv_style_transp_fit);
-            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT_SCRL, &lv_style_transp);
+            lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT, &lv_style_transp);
             lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, &lv_style_plain_color);
         }
 
@@ -164,10 +163,9 @@ void lv_win_clean(lv_obj_t * obj)
  * Add control button to the header of the window
  * @param win pointer to a window object
  * @param img_src an image source ('lv_img_t' variable, path to file or a symbol)
- * @param event_cb specify the an event handler function. NULL if unused
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_event_cb_t event_cb)
+lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
@@ -175,7 +173,6 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_event_cb_t ev
     lv_btn_set_style(btn, LV_BTN_STYLE_REL, ext->style_btn_rel);
     lv_btn_set_style(btn, LV_BTN_STYLE_PR, ext->style_btn_pr);
     lv_obj_set_size(btn, ext->btn_size, ext->btn_size);
-    lv_obj_set_event_cb(btn, event_cb);
 
     lv_obj_t * img = lv_img_create(btn, NULL);
     lv_obj_set_click(img, false);
@@ -195,7 +192,7 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_event_cb_t ev
  * @param btn pointer to the control button on teh widows header
  * @param evet the event type
  */
-void lv_win_close_event(lv_obj_t * btn, lv_event_t event)
+void lv_win_close_event_cb(lv_obj_t * btn, lv_event_t event)
 {
     if(event == LV_EVENT_RELEASED) {
         lv_obj_t * win = lv_win_get_from_btn(btn);
@@ -278,8 +275,7 @@ void lv_win_set_style(lv_obj_t * win, lv_win_style_t type, const lv_style_t * st
             lv_obj_set_style(win, style);
             lv_win_realign(win);
             break;
-        case LV_WIN_STYLE_CONTENT_BG: lv_page_set_style(ext->page, LV_PAGE_STYLE_BG, style); break;
-        case LV_WIN_STYLE_CONTENT_SCRL: lv_page_set_style(ext->page, LV_PAGE_STYLE_SCRL, style); break;
+        case LV_WIN_STYLE_CONTENT: lv_page_set_style(ext->page, LV_PAGE_STYLE_SCRL, style); break;
         case LV_WIN_STYLE_SB: lv_page_set_style(ext->page, LV_PAGE_STYLE_SB, style); break;
         case LV_WIN_STYLE_HEADER:
             lv_obj_set_style(ext->header, style);
@@ -427,8 +423,7 @@ const lv_style_t * lv_win_get_style(const lv_obj_t * win, lv_win_style_t type)
 
     switch(type) {
         case LV_WIN_STYLE_BG: style = lv_obj_get_style(win); break;
-        case LV_WIN_STYLE_CONTENT_BG: style = lv_page_get_style(ext->page, LV_PAGE_STYLE_BG); break;
-        case LV_WIN_STYLE_CONTENT_SCRL: style = lv_page_get_style(ext->page, LV_PAGE_STYLE_SCRL); break;
+        case LV_WIN_STYLE_CONTENT: style = lv_page_get_style(ext->page, LV_PAGE_STYLE_SCRL); break;
         case LV_WIN_STYLE_SB: style = lv_page_get_style(ext->page, LV_PAGE_STYLE_SB); break;
         case LV_WIN_STYLE_HEADER: style = lv_obj_get_style(ext->header); break;
         case LV_WIN_STYLE_BTN_REL: style = ext->style_btn_rel; break;

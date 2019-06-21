@@ -131,7 +131,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_obj_t * copy_img = lv_list_get_btn_img(copy_btn);
             if(copy_img) img_src = lv_img_get_src(copy_img);
 #endif
-            lv_list_add(new_list, img_src, lv_list_get_btn_text(copy_btn), copy_btn->event_cb);
+            lv_list_add_btn(new_list, img_src, lv_list_get_btn_text(copy_btn));
             copy_btn = lv_list_get_next_btn(copy, copy_btn);
         }
 
@@ -171,10 +171,9 @@ void lv_list_clean(lv_obj_t * obj)
  * @param list pointer to list object
  * @param img_fn file name of an image before the text (NULL if unused)
  * @param txt text of the list element (NULL if unused)
- * @param event_cb specify the an event handler function. NULL if unused
  * @return pointer to the new list element which can be customized (a button)
  */
-lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_event_cb_t event_cb)
+lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * txt)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
     ext->size++;
@@ -192,7 +191,6 @@ lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, 
     lv_btn_set_style(liste, LV_BTN_STYLE_TGL_PR, ext->styles_btn[LV_BTN_STATE_TGL_PR]);
     lv_btn_set_style(liste, LV_BTN_STYLE_INA, ext->styles_btn[LV_BTN_STATE_INA]);
 
-    lv_obj_set_event_cb(liste, event_cb);
     lv_page_glue_obj(liste, true);
     lv_btn_set_layout(liste, LV_LAYOUT_ROW_M);
     lv_btn_set_fit2(liste, LV_FIT_FLOOD, LV_FIT_TIGHT);

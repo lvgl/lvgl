@@ -676,6 +676,10 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
         /*Inform the parent about the new coordinates*/
         par->signal_cb(par, LV_SIGNAL_CHILD_CHG, cont);
 
+        if(lv_obj_get_auto_realign(cont)) {
+            lv_obj_realign(cont);
+        }
+
         /*Tell the children the parent's size has changed*/
         LV_LL_READ(cont->child_ll, child_i)
         {

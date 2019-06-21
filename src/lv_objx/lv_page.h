@@ -92,7 +92,6 @@ typedef struct
     uint16_t anim_time; /*Scroll animation time*/
 #endif
 
-    uint8_t arrow_scroll : 1;   /*1: Enable scrolling with LV_KEY_LEFT/RIGHT/UP/DOWN*/
     uint8_t scroll_prop : 1;    /*1: Propagate the scrolling the the parent if the edge is reached*/
     uint8_t scroll_prop_ip : 1; /*1: Scroll propagation is in progress (used by the library)*/
 } lv_page_ext_t;
@@ -154,14 +153,6 @@ void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode);
  * @param anim_time animation time in milliseconds
  */
 void lv_page_set_anim_time(lv_obj_t * page, uint16_t anim_time);
-
-/**
- * Enable/Disable scrolling with arrows if the page is in group (arrows:
- * LV_KEY_LEFT/RIGHT/UP/DOWN)
- * @param page pointer to a page object
- * @param en true: enable scrolling with arrows
- */
-void lv_page_set_arrow_scroll(lv_obj_t * page, bool en);
 
 /**
  * Enable the scroll propagation feature. If enabled then the page will move its parent if there is
@@ -263,13 +254,6 @@ void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, const lv_style_t *
  * @return the mode from 'lv_page_sb.mode_t' enum
  */
 lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page);
-
-/**
- * Get the the scrolling with arrows (LV_KEY_LEFT/RIGHT/UP/DOWN) is enabled or not
- * @param page pointer to a page object
- * @return true: scrolling with arrows is enabled
- */
-bool lv_page_get_arrow_scroll(const lv_obj_t * page);
 
 /**
  * Get the scroll propagation property

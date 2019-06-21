@@ -763,8 +763,7 @@ static void win_init(void)
     theme.style.win.bg           = theme.style.panel;
     theme.style.win.sb           = &sb;
     theme.style.win.header       = &header;
-    theme.style.win.content.bg   = &lv_style_transp;
-    theme.style.win.content.scrl = &lv_style_transp;
+    theme.style.win.content = &lv_style_transp;
     theme.style.win.btn.rel      = &rel;
     theme.style.win.btn.pr       = &pr;
 #endif

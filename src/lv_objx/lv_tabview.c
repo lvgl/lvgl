@@ -335,11 +335,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 
     const lv_style_t * style = lv_obj_get_style(ext->content);
 
-    lv_res_t res = LV_RES_OK;
     if(id >= ext->tab_cnt) id = ext->tab_cnt - 1;
-
-    if(id != ext->tab_cur) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id);
-    if(res != LV_RES_OK) return;
 
     lv_btnm_clear_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_TGL_STATE);
 
@@ -889,7 +885,7 @@ static void tabpage_pressing_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
 }
 
 /**
- * Called when a tab's page or scrollable object is released or the press id lost
+ * Called when a tab's page or scrollable object is released or the press is lost
  * @param tabview pointer to the btn view object
  * @param tabpage pointer to the page of a btn
  */
@@ -925,7 +921,14 @@ static void tabpage_press_lost_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
         if(tab_cur < ext->tab_cnt - 1) tab_cur++;
     }
 
-    lv_tabview_set_tab_act(tabview, tab_cur, true);
+    uint32_t id_prev = lv_tabview_get_tab_act(tabview);
+    lv_tabview_set_tab_act(tabview, tab_cur, LV_ANIM_ON);
+    uint32_t id_new = lv_tabview_get_tab_act(tabview);
+
+    lv_res_t res = LV_RES_OK;
+    if(id_prev != id_prev) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
+
+    if(res != LV_RES_OK) return;
 }
 
 /**
@@ -943,8 +946,17 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
     lv_btnm_clear_btn_ctrl_all(tab_btnm, LV_BTNM_CTRL_TGL_STATE);
     lv_btnm_set_btn_ctrl(tab_btnm, btn_id, LV_BTNM_CTRL_TGL_STATE);
 
-    lv_obj_t * tab = lv_obj_get_parent(tab_btnm);
-    lv_tabview_set_tab_act(tab, btn_id, true);
+    lv_obj_t * tabview = lv_obj_get_parent(tab_btnm);
+
+    uint32_t id_prev = lv_tabview_get_tab_act(tabview);
+    lv_tabview_set_tab_act(tabview, btn_id, LV_ANIM_ON);
+    uint32_t id_new = lv_tabview_get_tab_act(tabview);
+
+    lv_res_t res = LV_RES_OK;
+    if(id_prev != id_prev) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
+
+    if(res != LV_RES_OK) return;
+
 }
 
 /**
@@ -1100,6 +1112,6 @@ static void tabview_realign(lv_obj_t * tabview)
         }
     }
 
-    lv_tabview_set_tab_act(tabview, ext->tab_cur, false);
+    lv_tabview_set_tab_act(tabview, ext->tab_cur, LV_ANIM_OFF);
 }
 #endif

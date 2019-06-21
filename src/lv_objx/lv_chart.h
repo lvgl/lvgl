@@ -27,6 +27,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+
+/**Default value of points. Can be used to not draw a point*/
 #define LV_CHART_POINT_DEF (LV_COORD_MIN)
 
 /**Automatically calculate the tick length*/
