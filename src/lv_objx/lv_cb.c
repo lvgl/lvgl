@@ -313,6 +313,7 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN || c == LV_KEY_LEFT || c == LV_KEY_UP) {
+            /*Follow the backgrounds state with the bullet*/
             lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
         }
     } else if(sign == LV_SIGNAL_GET_TYPE) {

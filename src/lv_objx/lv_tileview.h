@@ -37,6 +37,7 @@ typedef struct
     lv_page_ext_t page;
     /*New data for this type */
     const lv_point_t * valid_pos;
+    uint16_t valid_pos_cnt;
 #if LV_USE_ANIMATION
     uint16_t anim_time;
 #endif
@@ -51,7 +52,7 @@ typedef struct
 
 /*Styles*/
 enum {
-    LV_TILEVIEW_STYLE_BG,
+    LV_TILEVIEW_STYLE_MAIN,
 };
 typedef uint8_t lv_tileview_style_t;
 
@@ -82,14 +83,15 @@ void lv_tileview_add_element(lv_obj_t * tileview, lv_obj_t * element);
  * Setter functions
  *====================*/
 
+
 /**
  * Set the valid position's indices. The scrolling will be possible only to these positions.
  * @param tileview pointer to a Tileview object
- * @param valid_pos array width the indices. E.g. `lv_point_t p[] = {{0,0}, {1,0}, {1,1},
- * {LV_COORD_MIN, LV_COORD_MIN}};` Must be closed with `{LV_COORD_MIN, LV_COORD_MIN}`. Only the
+ * @param valid_pos array width the indices. E.g. `lv_point_t p[] = {{0,0}, {1,0}, {1,1}`. Only the
  * pointer is saved so can't be a local variable.
+ * @param valid_pos_cnt numner of elements in `valid_pos` array
  */
-void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t * valid_pos);
+void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t * valid_pos, uint16_t valid_pos_cnt);
 
 /**
  * Set the tile to be shown
@@ -108,6 +110,16 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
 static inline void lv_tileview_set_edge_flash(lv_obj_t * tileview, bool en)
 {
     lv_page_set_edge_flash(tileview, en);
+}
+
+/**
+ * Set the animation time for the Tile view
+ * @param tileview pointer to a page object
+ * @param anim_time animation time in milliseconds
+ */
+static inline void lv_tileview_set_anim_time(lv_obj_t * tileview, uint16_t anim_time)
+{
+    lv_page_set_anim_time(tileview, anim_time);
 }
 
 /**
@@ -130,6 +142,16 @@ void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, const 
 static inline bool lv_tileview_get_edge_flash(lv_obj_t * tileview)
 {
     return lv_page_get_edge_flash(tileview);
+}
+
+/**
+ * Get the animation time for the Tile view
+ * @param tileview pointer to a page object
+ * @return animation time in milliseconds
+ */
+static inline uint16_t lv_tileview_get_anim_time(lv_obj_t * tileview)
+{
+    return lv_page_get_anim_time(tileview);
 }
 
 /**

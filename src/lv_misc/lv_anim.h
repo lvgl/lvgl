@@ -39,6 +39,9 @@ enum {
 
 typedef uint8_t lv_anim_enable_t;
 
+/*Type of the animated value*/
+typedef lv_coord_t lv_anim_value_t;
+
 #if LV_USE_ANIMATION
 
 struct _lv_anim_t;

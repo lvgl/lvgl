@@ -331,6 +331,7 @@ static const uint8_t * lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, 
              * So simply give its pointer*/
             return ((lv_img_dsc_t *)dsc->src)->data;
         } else {
+
             /*If it's a file it need to be read line by line later*/
             return NULL;
         }

@@ -68,8 +68,7 @@ typedef struct
 
 enum {
     LV_WIN_STYLE_BG,
-    LV_WIN_STYLE_CONTENT_BG,
-    LV_WIN_STYLE_CONTENT_SCRL,
+    LV_WIN_STYLE_CONTENT,
     LV_WIN_STYLE_SB,
     LV_WIN_STYLE_HEADER,
     LV_WIN_STYLE_BTN_REL,
@@ -103,10 +102,9 @@ void lv_win_clean(lv_obj_t * obj);
  * Add control button to the header of the window
  * @param win pointer to a window object
  * @param img_src an image source ('lv_img_t' variable, path to file or a symbol)
- * @param event_cb specify the an event handler function. NULL if unused
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_event_cb_t event_cb);
+lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src);
 
 /*=====================
  * Setter functions
@@ -117,7 +115,7 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, lv_event_cb_t ev
  * @param btn pointer to the control button on teh widows header
  * @param evet the event type
  */
-void lv_win_close_event(lv_obj_t * btn, lv_event_t event);
+void lv_win_close_event_cb(lv_obj_t * btn, lv_event_t event);
 
 /**
  * Set the title of a window

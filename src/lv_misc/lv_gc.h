@@ -24,6 +24,7 @@ extern "C" {
 #include <stdbool.h>
 #include "lv_mem.h"
 #include "lv_ll.h"
+#include "../lv_draw/lv_img_cache.h"
 
 /*********************
  *      DEFINES
@@ -38,6 +39,7 @@ extern "C" {
     prefix lv_ll_t _lv_anim_ll;                                                                                        \
     prefix lv_ll_t _lv_group_ll;                                                                                       \
     prefix lv_ll_t _lv_img_defoder_ll;                                                                                 \
+    prefix lv_img_cache_entry_t * _lv_img_cache_array;                                                                 \
     prefix void * _lv_task_act;
 
 #define LV_NO_PREFIX

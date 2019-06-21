@@ -340,8 +340,7 @@ static void win_init(void)
     theme.style.win.bg           = &plain_bordered;
     theme.style.win.sb           = &sb;
     theme.style.win.header       = &lv_style_plain_color;
-    theme.style.win.content.bg   = &lv_style_transp;
-    theme.style.win.content.scrl = &lv_style_transp;
+    theme.style.win.content = &lv_style_transp;
     theme.style.win.btn.rel      = &lv_style_btn_rel;
     theme.style.win.btn.pr       = &lv_style_btn_pr;
 #endif

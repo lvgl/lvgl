@@ -335,8 +335,7 @@ static void win_init(void)
     theme.style.win.bg           = &def;
     theme.style.win.sb           = &def;
     theme.style.win.header       = &def;
-    theme.style.win.content.bg   = &def;
-    theme.style.win.content.scrl = &def;
+    theme.style.win.content   = &def;
     theme.style.win.btn.rel      = &def;
     theme.style.win.btn.pr       = &def;
 #endif

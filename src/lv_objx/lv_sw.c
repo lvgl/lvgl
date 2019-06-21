@@ -262,7 +262,7 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
     /*Save the current (old) value before slider signal modifies it. It will be required in the
-     * later colcualtions*/
+     * later calculations*/
     int16_t old_val;
     if(sign == LV_SIGNAL_PRESSING)
         old_val = ext->slider.drag_value;
@@ -321,46 +321,55 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_PRESS_LOST) {
         if(lv_sw_get_state(sw)) {
             lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_on);
-            lv_slider_set_value(sw, LV_SW_MAX_VALUE, true);
-            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
+            lv_slider_set_value(sw, LV_SW_MAX_VALUE, LV_ANIM_ON);
             if(res != LV_RES_OK) return res;
         } else {
             lv_slider_set_style(sw, LV_SLIDER_STYLE_KNOB, ext->style_knob_off);
-            lv_slider_set_value(sw, 0, true);
-            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
+            lv_slider_set_value(sw, 0, LV_ANIM_ON);
             if(res != LV_RES_OK) return res;
         }
     } else if(sign == LV_SIGNAL_RELEASED) {
         /*If not dragged then toggle the switch*/
         if(ext->changed == 0) {
-            if(lv_sw_get_state(sw))
-                lv_sw_off(sw, true);
-            else
-                lv_sw_on(sw, true);
+            int32_t state;
+            if(lv_sw_get_state(sw)) {
+                lv_sw_off(sw, LV_ANIM_ON);
+                state = 0;
+            }
+            else {
+                lv_sw_on(sw, LV_ANIM_ON);
+                state = 1;
+            }
 
-            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
+            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, &state);
             if(res != LV_RES_OK) return res;
         }
         /*If the switch was dragged then calculate the new state based on the current position*/
         else {
             int16_t v = lv_slider_get_value(sw);
-            if(v > LV_SW_MAX_VALUE / 2)
-                lv_sw_on(sw, true);
-            else
-                lv_sw_off(sw, true);
-
-            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
+            int32_t state;
+            if(v > LV_SW_MAX_VALUE / 2) {
+                lv_sw_on(sw, LV_ANIM_ON);
+                state = 1;
+            } else{
+                lv_sw_off(sw, LV_ANIM_ON);
+                state = 0;
+            }
+            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, &state);
             if(res != LV_RES_OK) return res;
         }
     } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
+        uint32_t state;
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             lv_slider_set_value(sw, LV_SW_MAX_VALUE, true);
-            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
+            state = 1;
+            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, &state);
             if(res != LV_RES_OK) return res;
         } else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
             lv_slider_set_value(sw, 0, true);
-            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
+            state = 0;
+            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, &state);
             if(res != LV_RES_OK) return res;
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {

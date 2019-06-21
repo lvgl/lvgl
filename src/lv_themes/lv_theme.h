@@ -311,11 +311,7 @@ typedef struct
             lv_style_t * bg;
             lv_style_t * sb;
             lv_style_t * header;
-            struct
-            {
-                lv_style_t * bg;
-                lv_style_t * scrl;
-            } content;
+            lv_style_t * content;
             struct
             {
                 lv_style_t * rel;

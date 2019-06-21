@@ -104,10 +104,9 @@ void lv_list_clean(lv_obj_t * obj);
  * @param list pointer to list object
  * @param img_fn file name of an image before the text (NULL if unused)
  * @param txt text of the list element (NULL if unused)
- * @param event_cb specify the an event handler function. NULL if unused
  * @return pointer to the new list element which can be customized (a button)
  */
-lv_obj_t * lv_list_add(lv_obj_t * list, const void * img_src, const char * txt, lv_event_cb_t event_cb);
+lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * txt);
 
 /**
  * Remove the index of the button in the list

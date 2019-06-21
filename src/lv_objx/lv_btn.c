@@ -551,18 +551,23 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         /*If not dragged and it was not long press action then
          *change state and run the action*/
         if(lv_indev_is_dragging(param) == false) {
+            uint32_t toggled = 0;
             if(ext->state == LV_BTN_STATE_PR && tgl == false) {
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                toggled = 0;
             } else if(ext->state == LV_BTN_STATE_TGL_PR && tgl == false) {
                 lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+                toggled = 1;
             } else if(ext->state == LV_BTN_STATE_PR && tgl == true) {
                 lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+                toggled = 1;
             } else if(ext->state == LV_BTN_STATE_TGL_PR && tgl == true) {
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
+                toggled = 0;
             }
 
             if(tgl) {
-                res = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, NULL);
+                res = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &toggled);
                 if(res != LV_RES_OK) return res;
             }
 
@@ -605,10 +610,22 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
-            if(lv_btn_get_toggle(btn)) lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+            if(lv_btn_get_toggle(btn)) {
+                lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+
+                uint32_t state = 1;
+                res = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &state);
+                if(res != LV_RES_OK) return res;
+            }
 
         } else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
-            if(lv_btn_get_toggle(btn)) lv_btn_set_state(btn, LV_BTN_STATE_REL);
+            if(lv_btn_get_toggle(btn)) {
+                lv_btn_set_state(btn, LV_BTN_STATE_REL);
+
+                uint32_t state = 0;
+                res = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &state);
+                if(res != LV_RES_OK) return res;
+            }
         }
     } else if(sign == LV_SIGNAL_CLEANUP) {
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
