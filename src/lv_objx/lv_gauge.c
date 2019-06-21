@@ -279,11 +279,10 @@ static bool lv_gauge_design(lv_obj_t * gauge, const lv_area_t * mask, lv_design_
         uint16_t line_cnt_tmp = ext->lmeter.line_cnt;
         ancestor_design(gauge, mask, mode); /*To draw lines*/
 
-        /*Temporally modify the line meter to draw thicker and longer lines where labels are*/
+        /*Temporally modify the line meter to draw longer lines where labels are*/
         lv_style_t style_tmp;
         lv_style_copy(&style_tmp, style);
         ext->lmeter.line_cnt         = ext->label_count;                 /*Only to labels*/
-        style_tmp.line.width         = style_tmp.line.width * 2;         /*Ticker lines*/
         style_tmp.body.padding.left  = style_tmp.body.padding.left * 2;  /*Longer lines*/
         style_tmp.body.padding.right = style_tmp.body.padding.right * 2; /*Longer lines*/
         gauge->style_p               = &style_tmp;
