@@ -926,7 +926,7 @@ static void tabpage_press_lost_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
     uint32_t id_new = lv_tabview_get_tab_act(tabview);
 
     lv_res_t res = LV_RES_OK;
-    if(id_prev != id_prev) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
+    if(id_prev != id_new) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
 
     if(res != LV_RES_OK) return;
 }
@@ -953,7 +953,7 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
     uint32_t id_new = lv_tabview_get_tab_act(tabview);
 
     lv_res_t res = LV_RES_OK;
-    if(id_prev != id_prev) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
+    if(id_prev != id_new) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
 
     if(res != LV_RES_OK) return;
 
