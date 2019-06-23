@@ -143,6 +143,16 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  *
  * If the first character is a break character, returns the next index.
  *
+ * Example calls from lv_txt_get_next_line() assuming sufficent max_width and
+ * txt = "Test text\n"
+ *        0123456789
+ *
+ * Calls would be as follows:
+ *     1. Return i=4, pointing at breakchar ' ', for the string "Test"
+ *     2. Return i=5, since i=4 was a breakchar.
+ *     3. Return i=9, pointing at breakchar '\n'
+ *     4. Parenting lv_txt_get_next_line() would detect subsequent '\0'
+ *
  * @param txt a '\0' terminated string
  * @param font pointer to a font
  * @param letter_space letter space
@@ -160,17 +170,15 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
 
     if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
-    uint32_t i = 0;                                        /* Iterating index into txt */
-    uint32_t i_next = 0;                                   /* */
-    uint32_t i_next_next = 0;                                   /* */
+    uint32_t i = 0, i_next = 0, i_next_next = 0;  /* Iterating index into txt */
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
-    uint32_t letter_w;
-    uint32_t letter = 0; /* Letter at i */
+    uint32_t letter = 0;      /* Letter at i */
     uint32_t letter_next = 0; /* Letter at i_next */
+    lv_coord_t letter_w;
+    lv_coord_t cur_w = 0;  /* Pixel Width of transversed string */
     uint32_t word_len = 0;   /* Number of characters in the transversed word */
-    uint32_t break_index = NO_BREAK_FOUND; // only used for "long" words
-    uint32_t break_letter_count = 0;
-    lv_coord_t cur_w = 0;                                  /* Pixel Width of transversed string */
+    uint32_t break_index = NO_BREAK_FOUND; /* only used for "long" words */
+    uint32_t break_letter_count = 0; /* Number of characters up to the long word break point */
 
     letter = lv_txt_encoded_next(txt, &i_next);
     i_next_next = i_next;
@@ -246,6 +254,7 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         for(;n_move>0; n_move--){
             lv_txt_encoded_prev(txt, &i);
             // todo: it would be appropriate to update the returned word width here
+            // However, in current usage, this doesn't impact anything.
         }
     }
 
@@ -273,8 +282,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
     while(txt[i] != '\0' && max_width > 0) {
         uint32_t word_w = 0;
-        uint32_t advance = lv_txt_get_next_word(&txt[i], font, letter_space, 
-                max_width, flag, &word_w);
+        uint32_t advance = lv_txt_get_next_word(&txt[i], font, letter_space, max_width, flag, &word_w);
         max_width -= word_w;
 
         if( advance == 0 ){
@@ -292,9 +300,9 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
     if(txt[i] != '\0'){
         uint32_t i_next = i;
         int tmp;
-        uint32_t letter_next = lv_txt_encoded_next(txt, &i_next); //Gets current letter
+        uint32_t letter_next = lv_txt_encoded_next(txt, &i_next); /*Gets current character*/
         tmp = i_next;
-        letter_next = lv_txt_encoded_next(txt, &i_next); // Gets subsequent
+        letter_next = lv_txt_encoded_next(txt, &i_next); /*Gets subsequent character*/
         if(letter_next == '\0') return tmp;
     }
 
