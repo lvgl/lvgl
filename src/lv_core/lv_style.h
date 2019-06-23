@@ -185,7 +185,7 @@ static inline void lv_style_anim_set_time(lv_anim_t * a, uint16_t duration, uint
  */
 static inline void lv_style_anim_set_ready_cb(lv_anim_t * a, lv_anim_ready_cb_t ready_cb)
 {
-    lv_style_anim_dsc_t * dsc = a->var;
+    lv_style_anim_dsc_t * dsc = (lv_style_anim_dsc_t *)a->var;
     dsc->ready_cb             = ready_cb;
 }
 
