@@ -9,10 +9,6 @@
 #include "lv_txt.h"
 #include "lv_math.h"
 
-// TODO: remove
-#include <stdio.h>
-#include <assert.h>
-
 /*********************
  *      DEFINES
  *********************/
