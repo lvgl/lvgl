@@ -175,16 +175,8 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
     letter = lv_txt_encoded_next(txt, &i_next);
     i_next_next = i_next;
 
-    if(letter == '\n' || letter == '\r' || is_break_char(letter)) {
-        //printf("pre_while_loop: %d\n", i_next);
-        return i_next;
-    }
-
     while(txt[i] != '\0') {
-        //printf("top of while %d\n", i);
         letter_next = lv_txt_encoded_next(txt, &i_next_next);
-        //printf("i: %d i_next: %d i_next_next: %d txt[i]:\"%c\" letter:\"%c\"\n", i, i_next, i_next_next, txt[i], letter);
-        //assert(txt[i]==letter);
         word_len++;
 
         /*Handle the recolor command*/
@@ -197,13 +189,12 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         /*Check the transversed string pixel width*/
         letter_w = lv_font_get_glyph_width(font, letter, letter_next);
         cur_w += letter_w;
-        //printf("%d BLOOP\n", __LINE__);
 
         /* Test if this character fits within max_width */
         if( break_index == NO_BREAK_FOUND && cur_w > max_width) {
-            // break_index is now pointing at the character that doesn't fit
+            /* break_index is now pointing at the character that doesn't fit */
             break_index = i; 
-            if(break_index > 0) { // zero is possible if first character doesn't fit in width
+            if(break_index > 0) { /* zero is possible if first character doesn't fit in width */
                 lv_txt_encoded_prev(txt, &break_index);
             }
             break_letter_count = word_len - 1;
@@ -217,13 +208,13 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         /*Check for new line chars and breakchars*/
         if(letter == '\n' || letter == '\r' || is_break_char(letter)) {
             word_len--;
-            //printf("meow %d %d\n", i, i_next);
             break;
         }
 
         if(letter_w > 0) {
             cur_w += letter_space;
         }
+
         i = i_next;
         i_next = i_next_next;
         letter = letter_next;
@@ -231,9 +222,7 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
 
     /* Entire Word fits in the provided space */
     if( break_index == NO_BREAK_FOUND ) {
-        //if( word_w_ptr != NULL && (letter == '\r' || letter == '\n')) *word_w_ptr = 0;
-        if(letter == '\r' && letter_next == '\n') return i_next;
-        //printf("(%d): txt[i] \"%c\"\n", __LINE__, txt[i]);
+        if( word_len == 0 || (letter == '\r' && letter_next == '\n') ) i = i_next;
         return i;
     }
 
@@ -249,25 +238,16 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         return 0;
     }
 
-    i = break_index;
-
     /* Word is a "long", but letters may need to be better distributed */
-#if 0
     {
-#if 1
-        printf("redistributing\n");
-        while(i!=break_index){
-            lv_txt_encoded_prev(txt, &i);
-        }
-#else
+        i = break_index;
         int32_t n_move = LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN - (word_len - break_letter_count);
+        /* Move pointer "i" backwards */
         for(;n_move>0; n_move--){
             lv_txt_encoded_prev(txt, &i);
             // todo: it would be appropriate to update the returned word width here
         }
-#endif
     }
-#endif
 
     return i;
 }
@@ -291,35 +271,33 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
     uint32_t i = 0;                                        /* Iterating index into txt */
 
-    //printf("\n\n(%d): FULL_TEXT (len %d) \"%s\"\n", __LINE__, strlen(txt), txt);
-
     while(txt[i] != '\0' && max_width > 0) {
-        //printf("(%d): MAX_WIDTH: %d\n", __LINE__, max_width);
         uint32_t word_w = 0;
         uint32_t advance = lv_txt_get_next_word(&txt[i], font, letter_space, 
                 max_width, flag, &word_w);
         max_width -= word_w;
 
-        { //debug
-            printf("Word is %d long: \"", advance);
-            for(uint32_t j = 0; j < advance; j++){
-                printf("%c", txt[i+j]);
-            }
-            printf("\"\n");
-        }
-
         if( advance == 0 ){
-            if(i == 0) {
-                lv_txt_encoded_next(txt, &i); // prevent inf loops
-                printf("inf loop prevented\n");
-            }
+            if(i == 0) lv_txt_encoded_next(txt, &i); // prevent inf loops
             break;
         }
 
         i += advance;
 
-        if(txt[i] == '\n') { printf("nl_break\n");break;}
+        if(txt[i] == '\n') break;
     }
+
+    /* If this is the last of the string, make sure pointer is at NULL-terminator.
+     * This catches the case, for example of a string ending in "\n" */
+    if(txt[i] != '\0'){
+        uint32_t i_next = i;
+        int tmp;
+        uint32_t letter_next = lv_txt_encoded_next(txt, &i_next); //Gets current letter
+        tmp = i_next;
+        letter_next = lv_txt_encoded_next(txt, &i_next); // Gets subsequent
+        if(letter_next == '\0') return tmp;
+    }
+
     return i;
 }
 
