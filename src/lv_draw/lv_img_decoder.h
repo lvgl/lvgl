@@ -37,8 +37,6 @@ extern "C" {
 #define LV_IMG_PX_SIZE_ALPHA_BYTE 4
 #endif
 
-#define LV_IMG_DECODER_OPEN_FAIL ((void *)(-1))
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -120,21 +118,16 @@ typedef lv_res_t (*lv_img_decoder_info_f_t)(struct _lv_img_decoder * decoder, co
 
 /**
  * Open an image for decoding. Prepare it as it is required to read it later
- * @param src the image source. Can be a pointer to a C array or a file name (Use
- * `lv_img_src_get_type` to determine the type)
- * @param style the style of image (maybe it will be required to determine a color or something)
- * @return there are 3 possible return values:
- *    1) buffer with the decoded image
- *    2) if can decode the whole image NULL. decoder_read_line will be called to read the image
- * line-by-line
- *    3) LV_IMG_DECODER_OPEN_FAIL if the image format is unknown to the decoder or an
- * error occurred
+ * @param decoder pointer to the decoder the function associated with
+ * @param dsc pointer to decoder descriptor. `src`, `style` are already initialized in it.
  */
-typedef const uint8_t * (*lv_img_decoder_open_f_t)(struct _lv_img_decoder * decoder, struct _lv_img_decoder_dsc * dsc);
+typedef lv_res_t (*lv_img_decoder_open_f_t)(struct _lv_img_decoder * decoder, struct _lv_img_decoder_dsc * dsc);
 
 /**
  * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
  * Required only if the "open" function can't return with the whole decoded pixel array.
+ * @param decoder pointer to the decoder the function associated with
+ * @param dsc pointer to decoder descriptor
  * @param x start x coordinate
  * @param y start y coordinate
  * @param len number of pixels to decode
@@ -146,6 +139,8 @@ typedef lv_res_t (*lv_img_decoder_read_line_f_t)(struct _lv_img_decoder * decode
 
 /**
  * Close the pending decoding. Free resources etc.
+ * @param decoder pointer to the decoder the function associated with
+ * @param dsc pointer to decoder descriptor
  */
 typedef void (*lv_img_decoder_close_f_t)(struct _lv_img_decoder * decoder, struct _lv_img_decoder_dsc * dsc);
 
@@ -161,15 +156,34 @@ typedef struct _lv_img_decoder
 #endif
 } lv_img_decoder_t;
 
+/**Describe an image decoding session. Stores data about the decoding*/
 typedef struct _lv_img_decoder_dsc
 {
+    /**The decoder which was able to open the image source*/
     lv_img_decoder_t * decoder;
-    const lv_style_t * style;
+
+    /**The image source. A file path like "S:my_img.png" or pointer to an `lv_img_dsc_t` variable*/
     const void * src;
+
+    /**Style to draw the image.*/
+    const lv_style_t * style;
+
+    /**Type of the source: file or variable. Can be set in `open` function if required*/
     lv_img_src_t src_type;
+
+    /**Info about the opened image: color format, size, etc. MUST be set in `open` function*/
     lv_img_header_t header;
 
+    /** Pointer to a buffer where the image's data (pixels) are stored in a decoded, plain format.
+     *  MUST be set in `open` function*/
+    const uint8_t * img_data;
+
+    /**A text to display instead of the image when the image can't be opened.
+     * Can be set in `open` function or set NULL. */
+    const char * error_msg;
+
 #if LV_USE_USER_DATA
+    /**Store any custom data here is required*/
     void * user_data;
 #endif
 } lv_img_decoder_dsc_t;
@@ -195,6 +209,7 @@ void lv_img_decoder_init(void);
  */
 lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header);
 
+
 /**
  * Open an image.
  * Try the created image decoder one by one. Once one is able to open the image that decoder is save in `dsc`
@@ -204,11 +219,10 @@ lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header);
  *  2) Variable: Pointer to an `lv_img_dsc_t` variable
  *  3) Symbol: E.g. `LV_SYMBOL_OK`
  * @param style the style of the image
- * @return LV_IMG_DECODER_OPEN_FAIL: can open the image
- *         NULL: the image is opened but `lv_img_decoder_read_line` needs to be used to get the info line by line
- *         Else: a pointer to a buffer which holds the uncompressed pixels of the image
+ * @return LV_RES_OK: opened the image. `dsc->img_data` and `dsc->header` are set.
+ *         LV_RES_INV: none of the registered image decoders were able to open the image.
  */
-const uint8_t * lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const lv_style_t * style);
+lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const lv_style_t * style);
 
 /**
  * Read a line from an opened image

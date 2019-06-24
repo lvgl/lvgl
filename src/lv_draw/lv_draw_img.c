@@ -456,12 +456,10 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
     bool alpha_byte   = lv_img_color_format_has_alpha(cdsc->dsc.header.cf);
 
 
-
-
     /* The decoder open could open the image and gave the entire uncompressed image.
      * Just draw it!*/
-    if(cdsc->img_data) {
-        lv_draw_map(coords, mask, cdsc->img_data, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
+    if(cdsc->dsc.img_data) {
+        lv_draw_map(coords, mask, cdsc->dsc.img_data, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
     }
     /* The whole uncompressed image is not available. Try to read it line-by-line*/
     else {

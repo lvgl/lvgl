@@ -113,8 +113,8 @@ lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * st
         /*Open the image and measure the time to open*/
         uint32_t t_start;
         t_start = lv_tick_get();
-        const uint8_t * img_data = lv_img_decoder_open(&cached_src->dsc, src, style);
-        if(img_data == LV_IMG_DECODER_OPEN_FAIL) {
+        lv_res_t open_res = lv_img_decoder_open(&cached_src->dsc, src, style);
+        if(open_res ==LV_RES_INV) {
             LV_LOG_WARN("Image draw cannot open the image resource");
             lv_img_decoder_close(&cached_src->dsc);
             memset(&cached_src->dsc, 0, sizeof(lv_img_decoder_dsc_t));
@@ -123,7 +123,6 @@ lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * st
             return NULL;
         }
 
-        cached_src->img_data = img_data;
         cached_src->life = 0;
         cached_src->time_to_open = lv_tick_elaps(t_start);
         if(cached_src->time_to_open == 0) cached_src->time_to_open = 1;

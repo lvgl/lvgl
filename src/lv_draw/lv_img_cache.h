@@ -25,7 +25,6 @@ extern "C" {
 typedef struct
 {
     lv_img_decoder_dsc_t dsc;
-    const uint8_t * img_data;
 
     /* How much time did it take to open the image.*/
     uint32_t time_to_open;
