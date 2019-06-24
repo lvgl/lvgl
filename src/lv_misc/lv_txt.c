@@ -190,23 +190,21 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
             }
         }
 
-        /*Check the transversed string pixel width*/
         letter_w = lv_font_get_glyph_width(font, letter, letter_next);
         cur_w += letter_w;
 
+        /* Always update the output width on the first character..
+         * Must do this here incase first letter is a break character. */
+        if( i == 0 && word_w_ptr != NULL) *word_w_ptr = cur_w;
+
         /* Test if this character fits within max_width */
         if( break_index == NO_BREAK_FOUND && cur_w > max_width) {
-            /* break_index is now pointing at the character that doesn't fit */
             break_index = i; 
             if(break_index > 0) { /* zero is possible if first character doesn't fit in width */
                 lv_txt_encoded_prev(txt, &break_index);
             }
+            /* break_index is now pointing at the character that doesn't fit */
             break_letter_count = word_len - 1;
-        }
-
-        /* Update the output width */
-        if( word_w_ptr != NULL && break_index == NO_BREAK_FOUND ) {
-            *word_w_ptr = cur_w;
         }
 
         /*Check for new line chars and breakchars*/
@@ -214,6 +212,9 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
             word_len--;
             break;
         }
+
+        /* Update the output width */
+        if( word_w_ptr != NULL && break_index == NO_BREAK_FOUND ) *word_w_ptr = cur_w;
 
         if(letter_w > 0) {
             cur_w += letter_space;
@@ -299,7 +300,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
         uint32_t letter_next = lv_txt_encoded_next(txt, &i_next); /*Gets current character*/
         tmp = i_next;
         letter_next = lv_txt_encoded_next(txt, &i_next); /*Gets subsequent character*/
-        if(letter_next == '\0') return tmp;
+        if(letter_next == '\0') i = tmp;
     }
 
     return i;
