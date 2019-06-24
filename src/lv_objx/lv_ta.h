@@ -91,8 +91,8 @@ typedef struct
 enum {
     LV_TA_STYLE_BG,
     LV_TA_STYLE_SB,
-    LV_TA_STYLE_EDGE_FLASH,
     LV_TA_STYLE_CURSOR,
+    LV_TA_STYLE_EDGE_FLASH,
     LV_TA_STYLE_PLACEHOLDER,
 };
 typedef uint8_t lv_ta_style_t;
