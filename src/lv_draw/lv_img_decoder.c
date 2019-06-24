@@ -372,30 +372,26 @@ static lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_
             lv_mem_assert(user_data->f);
 #endif
         }
-#if LV_USE_FILESYSTEM
-        lv_color32_t palette_tmp[256];
-#endif
-        lv_color32_t * palette_p;
 
         if(dsc->src_type == LV_IMG_SRC_FILE) {
             /*Read the palette from file*/
 #if LV_USE_FILESYSTEM
             lv_fs_seek(user_data->f, 4); /*Skip the header*/
-            lv_fs_read(user_data->f, palette_tmp, palette_size * sizeof(lv_color_t), NULL);
-            palette_p = palette_tmp;
+            lv_fs_read(user_data->f, user_data->palette, palette_size * sizeof(lv_color_t), NULL);
 #else
             LV_LOG_WARN("Image built-in decoder can read the palette because LV_USE_FILESYSTEM = 0");
             return LV_RES_INV;
 #endif
         } else {
             /*The palette begins in the beginning of the image data. Just point to it.*/
-            palette_p = (lv_color32_t *)((lv_img_dsc_t *)dsc->src)->data;
+            lv_color32_t * palette_p = (lv_color32_t *)((lv_img_dsc_t *)dsc->src)->data;
+
+            uint32_t i;
+            for(i = 0; i < palette_size; i++) {
+                user_data->palette[i] = lv_color_make(palette_p[i].ch.red, palette_p[i].ch.green, palette_p[i].ch.blue);
+            }
         }
 
-        uint32_t i;
-        for(i = 0; i < palette_size; i++) {
-            user_data->palette[i] = lv_color_make(palette_p[i].ch.red, palette_p[i].ch.green, palette_p[i].ch.blue);
-        }
         dsc->img_data = NULL;
         return LV_RES_OK;
 #else
