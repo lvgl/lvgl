@@ -30,19 +30,28 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+
+/** Bar animation start value. (Not the real value of the Bar just indicates process animation)*/
 #define LV_BAR_ANIM_STATE_START 0
+
+/** Bar animation end value.  (Not the real value of the Bar just indicates process animation)*/
 #define LV_BAR_ANIM_STATE_END 256
+
+/** Mark no animation is in progress */
 #define LV_BAR_ANIM_STATE_INV -1
-#define LV_BAR_ANIM_STATE_NORM 8 /*log2(LV_BAR_ANIM_STATE_END) used to normalize data*/
+
+/** log2(LV_BAR_ANIM_STATE_END) used to normalize data*/
+#define LV_BAR_ANIM_STATE_NORM 8
 
 /**********************
  *      TYPEDEFS
  **********************/
 
-/*Data of bar*/
+/** Data of bar*/
 typedef struct
 {
-    /*No inherited ext*/ /*Ext. of ancestor*/
+    /*No inherited ext, derived from the base object */
+
     /*New data for this type */
     int16_t cur_value; /*Current value of the bar*/
     int16_t min_value; /*Minimum value of the bar*/
