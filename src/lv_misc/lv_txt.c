@@ -193,9 +193,6 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         letter_w = lv_font_get_glyph_width(font, letter, letter_next);
         cur_w += letter_w;
 
-        /* Always update the output width on the first character..
-         * Must do this here incase first letter is a break character. */
-        if( i == 0 && word_w_ptr != NULL) *word_w_ptr = cur_w;
 
         /* Test if this character fits within max_width */
         if( break_index == NO_BREAK_FOUND && cur_w > max_width) {
@@ -209,6 +206,9 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
 
         /*Check for new line chars and breakchars*/
         if(letter == '\n' || letter == '\r' || is_break_char(letter)) {
+            /* Update the output width on the first character if it fits.
+             * Must do this here incase first letter is a break character. */
+            if(i == 0 && break_index == NO_BREAK_FOUND && word_w_ptr != NULL) *word_w_ptr = cur_w;
             word_len--;
             break;
         }
