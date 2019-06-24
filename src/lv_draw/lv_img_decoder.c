@@ -134,7 +134,10 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const
     LV_LL_READ(LV_GC_ROOT(_lv_img_defoder_ll), d)
     {
         res = LV_RES_INV;
+        dsc->error_msg = NULL;
+        dsc->img_data = NULL;
         dsc->decoder = d;
+
         if(d->open_cb) res = d->open_cb(d, dsc);
 
         if(res == LV_RES_OK) break;
