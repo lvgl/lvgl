@@ -705,6 +705,8 @@ static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
     (void)bg_opa;   /*Unused*/
     (void)fg_opa;   /*Unused*/
 
+    return LV_COLOR_BLACK;
+
 #endif /*LV_COLOR_SCREEN_TRANSP*/
 }
 

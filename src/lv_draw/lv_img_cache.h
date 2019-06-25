@@ -50,7 +50,7 @@ lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * st
  * Set the number of images to be cached.
  * More cached images mean more opened image at same time which might mean more memory usage.
  * E.g. if 20 PNG or JPG images are open in the RAM they consume memory while opened in the cache.
- * @param new_slot_num number of image to cache
+ * @param new_entry_cnt number of image to cache
  */
 void lv_img_cache_set_size(uint16_t new_slot_num);
 
