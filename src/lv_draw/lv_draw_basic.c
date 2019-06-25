@@ -105,7 +105,9 @@ void lv_draw_px(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t
                 *vdb_px_p = lv_color_mix(color, *vdb_px_p, opa);
             }
         } else {
+#if LV_COLOR_DEPTH == 32
             *vdb_px_p = color_mix_2_alpha(*vdb_px_p, (*vdb_px_p).ch.alpha, color, opa);
+#endif
         }
     }
 }
@@ -161,11 +163,11 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
     /*Not opaque fill*/
     else if(opa == LV_OPA_COVER) {
         /*Use hw fill if present*/
-        if(disp->driver.mem_fill_cb) {
-            disp->driver.mem_fill_cb(&disp->driver, vdb->buf_act, vdb_width, &vdb_rel_a, color);
+        if(disp->driver.gpu_fill_cb) {
+            disp->driver.gpu_fill_cb(&disp->driver, vdb->buf_act, vdb_width, &vdb_rel_a, color);
         }
         /*Use hw blend if present and the area is not too small*/
-        else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_SIZE_LIMIT && disp->driver.mem_blend_cb) {
+        else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_SIZE_LIMIT && disp->driver.gpu_blend_cb) {
             /*Fill a  one line sized buffer with a color and blend this later*/
             if(color_array_tmp[0].full != color.full || last_width != w) {
                 uint16_t i;
@@ -178,7 +180,7 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
             /*Blend the filled line to every line VDB line-by-line*/
             lv_coord_t row;
             for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
-                disp->driver.mem_blend_cb(&disp->driver, &vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
+                disp->driver.gpu_blend_cb(&disp->driver, &vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
                 vdb_buf_tmp += vdb_width;
             }
 
@@ -192,7 +194,7 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
     /*Fill with opacity*/
     else {
         /*Use hw blend if present*/
-        if(disp->driver.mem_blend_cb) {
+        if(disp->driver.gpu_blend_cb) {
             if(color_array_tmp[0].full != color.full || last_width != w) {
                 uint16_t i;
                 for(i = 0; i < w; i++) {
@@ -203,7 +205,7 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
             }
             lv_coord_t row;
             for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
-                disp->driver.mem_blend_cb(&disp->driver, &vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
+                disp->driver.gpu_blend_cb(&disp->driver, &vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
                 vdb_buf_tmp += vdb_width;
             }
 
@@ -342,7 +344,9 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
                         if(scr_transp == false) {
                             *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, px_opa);
                         } else {
+#if LV_COLOR_DEPTH == 32
                             *vdb_buf_tmp = color_mix_2_alpha(*vdb_buf_tmp, (*vdb_buf_tmp).ch.alpha, color, px_opa);
+#endif
                         }
                     }
                 }
@@ -451,10 +455,10 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p, const uint
         else {
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
 #if LV_USE_GPU
-                if(disp->driver.mem_blend_cb == false) {
+                if(disp->driver.gpu_blend_cb == false) {
                     sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
                 } else {
-                    disp->driver.mem_blend_cb(&disp->driver, vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
+                    disp->driver.gpu_blend_cb(&disp->driver, vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
                 }
 #else
                 sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
@@ -535,8 +539,10 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p, const uint
                             if(scr_transp == false) {
                                 vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
                             } else {
+#if LV_COLOR_DEPTH == 32
                                 vdb_buf_tmp[col] =
                                         color_mix_2_alpha(vdb_buf_tmp[col], vdb_buf_tmp[col].ch.alpha, px_color, opa_result);
+#endif
                             }
                         }
                     }
@@ -636,7 +642,9 @@ static void sw_color_fill(lv_color_t * mem, lv_coord_t mem_width, const lv_area_
                         mem[col] = opa_tmp;
 
                     } else {
+#if LV_COLOR_DEPTH == 32
                         mem[col] = color_mix_2_alpha(mem[col], mem[col].ch.alpha, color, opa);
+#endif
                     }
                 }
                 mem += mem_width;

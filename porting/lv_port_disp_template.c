@@ -26,8 +26,8 @@ static void disp_init(void);
 
 static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 #if LV_USE_GPU
-static void mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
-static void mem_fill(lv_color_t * dest, uint32_t length, lv_color_t color);
+static void gpu_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa);
+static void gpu_fill(lv_color_t * dest, uint32_t length, lv_color_t color);
 #endif
 
 /**********************
@@ -112,10 +112,10 @@ void lv_port_disp_init(void)
     /*Optionally add functions to access the GPU. (Only in buffered mode, LV_VDB_SIZE != 0)*/
 
     /*Blend two color array using opacity*/
-    disp_drv.mem_blend = mem_blend;
+    disp_drv.gpu_blend = gpu_blend;
 
     /*Fill a memory array with a color*/
-    disp_drv.mem_fill = mem_fill;
+    disp_drv.gpu_fill = gpu_fill;
 #endif
 
     /*Finally register the driver*/
@@ -160,7 +160,7 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
 
 /* If your MCU has hardware accelerator (GPU) then you can use it to blend to memories using opacity
  * It can be used only in buffered mode (LV_VDB_SIZE != 0 in lv_conf.h)*/
-static void mem_blend(lv_disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
+static void gpu_blend(lv_disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
 {
     /*It's an example code which should be done by your GPU*/
 
@@ -172,7 +172,7 @@ static void mem_blend(lv_disp_drv_t * disp_drv, lv_color_t * dest, const lv_colo
 
 /* If your MCU has hardware accelerator (GPU) then you can use it to fill a memory with a color
  * It can be used only in buffered mode (LV_VDB_SIZE != 0 in lv_conf.h)*/
-static void mem_fill_cb(lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
+static void gpu_fill_cb(lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
                     const lv_area_t * fill_area, lv_color_t color);
 {
     /*It's an example code which should be done by your GPU*/
