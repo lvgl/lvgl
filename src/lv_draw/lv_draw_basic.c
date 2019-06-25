@@ -163,11 +163,11 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
     /*Not opaque fill*/
     else if(opa == LV_OPA_COVER) {
         /*Use hw fill if present*/
-        if(disp->driver.mem_fill_cb) {
-            disp->driver.mem_fill_cb(&disp->driver, vdb->buf_act, vdb_width, &vdb_rel_a, color);
+        if(disp->driver.gpu_fill_cb) {
+            disp->driver.gpu_fill_cb(&disp->driver, vdb->buf_act, vdb_width, &vdb_rel_a, color);
         }
         /*Use hw blend if present and the area is not too small*/
-        else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_SIZE_LIMIT && disp->driver.mem_blend_cb) {
+        else if(lv_area_get_height(&vdb_rel_a) > VFILL_HW_ACC_SIZE_LIMIT && disp->driver.gpu_blend_cb) {
             /*Fill a  one line sized buffer with a color and blend this later*/
             if(color_array_tmp[0].full != color.full || last_width != w) {
                 uint16_t i;
@@ -180,7 +180,7 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
             /*Blend the filled line to every line VDB line-by-line*/
             lv_coord_t row;
             for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
-                disp->driver.mem_blend_cb(&disp->driver, &vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
+                disp->driver.gpu_blend_cb(&disp->driver, &vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
                 vdb_buf_tmp += vdb_width;
             }
 
@@ -194,7 +194,7 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
     /*Fill with opacity*/
     else {
         /*Use hw blend if present*/
-        if(disp->driver.mem_blend_cb) {
+        if(disp->driver.gpu_blend_cb) {
             if(color_array_tmp[0].full != color.full || last_width != w) {
                 uint16_t i;
                 for(i = 0; i < w; i++) {
@@ -205,7 +205,7 @@ void lv_draw_fill(const lv_area_t * cords_p, const lv_area_t * mask_p, lv_color_
             }
             lv_coord_t row;
             for(row = vdb_rel_a.y1; row <= vdb_rel_a.y2; row++) {
-                disp->driver.mem_blend_cb(&disp->driver, &vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
+                disp->driver.gpu_blend_cb(&disp->driver, &vdb_buf_tmp[vdb_rel_a.x1], color_array_tmp, w, opa);
                 vdb_buf_tmp += vdb_width;
             }
 
@@ -455,10 +455,10 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p, const uint
         else {
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
 #if LV_USE_GPU
-                if(disp->driver.mem_blend_cb == false) {
+                if(disp->driver.gpu_blend_cb == false) {
                     sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
                 } else {
-                    disp->driver.mem_blend_cb(&disp->driver, vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
+                    disp->driver.gpu_blend_cb(&disp->driver, vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
                 }
 #else
                 sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);

@@ -73,8 +73,8 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
 
 
 #if LV_USE_GPU
-    driver->mem_blend_cb = NULL;
-    driver->mem_fill_cb  = NULL;
+    driver->gpu_blend_cb = NULL;
+    driver->gpu_fill_cb  = NULL;
 #endif
 
 #if LV_USE_USER_DATA
