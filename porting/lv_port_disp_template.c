@@ -177,13 +177,13 @@ static void mem_fill_cb(lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coor
 {
     /*It's an example code which should be done by your GPU*/
     uint32_t x, y;
-    dest_buf += dest_widht * fill_area->y1; /*Go to the first line*/
+    dest_buf += dest_width * fill_area->y1; /*Go to the first line*/
 
     for(y = fill_area->y1; y < fill_area->y2; y++) {
         for(x = fill_area->x1; x < fill_area->x2; x++) {
             dest_buf[x] = color;
         }
-        dest_buf+=des_width;    /*Go to the next line*/
+        dest_buf+=dest_width;    /*Go to the next line*/
     }
 
 
