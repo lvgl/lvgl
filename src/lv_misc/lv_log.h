@@ -69,10 +69,30 @@ void lv_log_add(lv_log_level_t level, const char * file, int line, const char * 
  *      MACROS
  **********************/
 
-#define LV_LOG_TRACE(dsc) lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, dsc);
-#define LV_LOG_INFO(dsc) lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, dsc);
-#define LV_LOG_WARN(dsc) lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, dsc);
-#define LV_LOG_ERROR(dsc) lv_log_add(LV_LOG_LEVEL_ERROR, __FILE__, __LINE__, dsc);
+#if LV_LOG_LEVEL <= LV_LOG_LEVEL_TRACE
+#  define LV_LOG_TRACE(dsc)   lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, dsc);
+#else
+#  define LV_LOG_TRACE(dsc)   {;}
+#endif
+
+#if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
+#  define LV_LOG_INFO(dsc)    lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, dsc);
+#else
+#  define LV_LOG_INFO(dsc)    {;}
+#endif
+
+#if LV_LOG_LEVEL <= LV_LOG_LEVEL_WARN
+#  define LV_LOG_WARN(dsc)    lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, dsc);
+#else
+#  define LV_LOG_WARN(dsc)    {;}
+#endif
+
+#if LV_LOG_LEVEL <= LV_LOG_LEVEL_ERROR
+#  define LV_LOG_ERROR(dsc)   lv_log_add(LV_LOG_LEVEL_ERROR, __FILE__, __LINE__, dsc);
+#else
+#  define LV_LOG_ERROR(dsc)   {;}
+#endif
+
 
 #else /*LV_USE_LOG*/
 
