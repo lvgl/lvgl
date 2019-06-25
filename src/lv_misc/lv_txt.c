@@ -199,9 +199,12 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
             break_index = i; 
             if(break_index > 0) { /* zero is possible if first character doesn't fit in width */
                 lv_txt_encoded_prev(txt, &break_index);
+                break_letter_count = word_len - 2;
+            }
+            else{
+                break_letter_count = word_len - 1;
             }
             /* break_index is now pointing at the character that doesn't fit */
-            break_letter_count = word_len - 1;
         }
 
         /*Check for new line chars and breakchars*/
