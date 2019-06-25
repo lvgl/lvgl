@@ -105,7 +105,9 @@ void lv_draw_px(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t
                 *vdb_px_p = lv_color_mix(color, *vdb_px_p, opa);
             }
         } else {
+#if LV_COLOR_DEPTH == 32
             *vdb_px_p = color_mix_2_alpha(*vdb_px_p, (*vdb_px_p).ch.alpha, color, opa);
+#endif
         }
     }
 }
@@ -342,7 +344,9 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
                         if(scr_transp == false) {
                             *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, px_opa);
                         } else {
+#if LV_COLOR_DEPTH == 32
                             *vdb_buf_tmp = color_mix_2_alpha(*vdb_buf_tmp, (*vdb_buf_tmp).ch.alpha, color, px_opa);
+#endif
                         }
                     }
                 }
@@ -535,8 +539,10 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p, const uint
                             if(scr_transp == false) {
                                 vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
                             } else {
+#if LV_COLOR_DEPTH == 32
                                 vdb_buf_tmp[col] =
                                         color_mix_2_alpha(vdb_buf_tmp[col], vdb_buf_tmp[col].ch.alpha, px_color, opa_result);
+#endif
                             }
                         }
                     }
@@ -636,7 +642,9 @@ static void sw_color_fill(lv_color_t * mem, lv_coord_t mem_width, const lv_area_
                         mem[col] = opa_tmp;
 
                     } else {
+#if LV_COLOR_DEPTH == 32
                         mem[col] = color_mix_2_alpha(mem[col], mem[col].ch.alpha, color, opa);
+#endif
                     }
                 }
                 mem += mem_width;
