@@ -161,7 +161,7 @@ void lv_spinbox_step_next(lv_obj_t * spinbox);
  * Select next higher digit for edition by multiplying the step by 10
  * @param spinbox pointer to spinbox
  */
-void lv_spinbox_step_previous(lv_obj_t * spinbox);
+void lv_spinbox_step_prev(lv_obj_t * spinbox);
 
 /**
  * Increment spinbox value by one step

@@ -562,8 +562,7 @@ static void lv_refr_vdb_flush(void)
     /*In double buffered mode wait until the other buffer is flushed before flushing the current
      * one*/
     if(lv_disp_is_double_buf(disp_refr)) {
-        while(vdb->flushing)
-            ;
+        while(vdb->flushing);
     }
 
     vdb->flushing = 1;
@@ -573,14 +572,7 @@ static void lv_refr_vdb_flush(void)
     if(disp->driver.flush_cb) disp->driver.flush_cb(&disp->driver, &vdb->area, vdb->buf_act);
 
     if(vdb->buf1 && vdb->buf2) {
-        if(vdb->buf_act == vdb->buf1)
-            vdb->buf_act = vdb->buf2;
-        else
-            vdb->buf_act = vdb->buf1;
-
-            /*If the screen is transparent initialize it when the new VDB is selected*/
-#if LV_COLOR_SCREEN_TRANSP
-        memset(vdb[vdb_active].buf, 0x00, LV_VDB_SIZE_IN_BYTES);
-#endif /*LV_COLOR_SCREEN_TRANSP*/
+        if(vdb->buf_act == vdb->buf1) vdb->buf_act = vdb->buf2;
+        else vdb->buf_act = vdb->buf1;
     }
 }

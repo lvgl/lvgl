@@ -423,13 +423,13 @@ bool lv_page_on_edge(lv_obj_t * page, lv_page_edge_t edge)
     lv_obj_get_coords(scrl, &scrl_coords);
     lv_obj_get_coords(page, &page_coords);
 
-    if(edge == LV_PAGE_EDGE_TOP && scrl_coords.y1 == page_coords.y1 + page_style->body.padding.top)
+    if((edge & LV_PAGE_EDGE_TOP) && scrl_coords.y1 == page_coords.y1 + page_style->body.padding.top)
         return true;
-    else if(edge == LV_PAGE_EDGE_BOTTOM && scrl_coords.y2 == page_coords.y2 - page_style->body.padding.bottom)
+    if((edge & LV_PAGE_EDGE_BOTTOM) && scrl_coords.y2 == page_coords.y2 - page_style->body.padding.bottom)
         return true;
-    else if(edge == LV_PAGE_EDGE_LEFT && scrl_coords.x1 == page_coords.x1 + page_style->body.padding.left)
+    if((edge & LV_PAGE_EDGE_LEFT) && scrl_coords.x1 == page_coords.x1 + page_style->body.padding.left)
         return true;
-    else if(edge == LV_PAGE_EDGE_RIGHT && scrl_coords.x2 == page_coords.x2 - page_style->body.padding.right)
+    if((edge & LV_PAGE_EDGE_RIGHT) && scrl_coords.x2 == page_coords.x2 - page_style->body.padding.right)
         return true;
 
     return false;
@@ -940,6 +940,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
 
                 if(lv_obj_get_parent(page_parent) != NULL) { /*Do not propagate the scroll to a screen*/
                     page_ext->scroll_prop_ip = 1;
+
                 }
             }
         }

@@ -67,6 +67,11 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->antialiasing = true;
 #endif
 
+#if LV_COLOR_SCREEN_TRANSP
+    driver->screen_transp = 1;
+#endif
+
+
 #if LV_USE_GPU
     driver->mem_blend_cb = NULL;
     driver->mem_fill_cb  = NULL;
@@ -267,7 +272,9 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
 
     /*If the screen is transparent initialize it when the flushing is ready*/
 #if LV_COLOR_SCREEN_TRANSP
-    memset(vdb_buf, 0x00, LV_VDB_SIZE_IN_BYTES);
+    if(disp_drv->screen_transp) {
+        memset(disp_drv->buffer->buf_act, 0x00, disp_drv->buffer->size * sizeof(lv_color32_t));
+    }
 #endif
 }
 

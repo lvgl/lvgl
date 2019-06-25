@@ -72,8 +72,9 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->range_max          = 99999;
     ext->range_min          = -99999;
 
-    lv_ta_set_cursor_type(new_spinbox, LV_CURSOR_BLOCK | LV_CURSOR_HIDDEN); /*hidden by default*/
+    lv_ta_set_cursor_type(new_spinbox, LV_CURSOR_BLOCK);
     lv_ta_set_one_line(new_spinbox, true);
+    lv_ta_set_cursor_click_pos(new_spinbox, false);
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_spinbox, lv_spinbox_signal);
@@ -243,7 +244,7 @@ void lv_spinbox_step_next(lv_obj_t * spinbox)
  * Select next higher digit for edition
  * @param spinbox pointer to spinbox
  */
-void lv_spinbox_step_previous(lv_obj_t * spinbox)
+void lv_spinbox_step_prev(lv_obj_t * spinbox)
 {
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     int32_t step_limit;
@@ -342,7 +343,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
                         if(new_step >= ext->range_max) break;
                         ext->step = new_step;
                     }
-                    lv_spinbox_step_previous(spinbox);
+                    lv_spinbox_step_prev(spinbox);
                 }
             }
         }
@@ -359,7 +360,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
             if(indev_type == LV_INDEV_TYPE_ENCODER)
                 lv_spinbox_decrement(spinbox);
             else
-                lv_spinbox_step_previous(spinbox);
+                lv_spinbox_step_prev(spinbox);
         } else if(c == LV_KEY_UP) {
             lv_spinbox_increment(spinbox);
         } else if(c == LV_KEY_DOWN) {

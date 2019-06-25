@@ -40,7 +40,7 @@ lv_obj_t * lv_disp_get_scr_act(lv_disp_t * disp);
  * Make a screen active
  * @param scr pointer to a screen
  */
-void lv_disp_set_scr_act(lv_obj_t * scr);
+void lv_disp_load_scr(lv_obj_t * scr);
 
 /**
  * Return with the top layer. (Same on every screen and it is above the normal screen layer)
@@ -119,7 +119,7 @@ static inline lv_obj_t * lv_layer_sys(void)
 
 static inline void lv_scr_load(lv_obj_t * scr)
 {
-    lv_disp_set_scr_act(scr);
+    lv_disp_load_scr(scr);
 }
 
 /**********************

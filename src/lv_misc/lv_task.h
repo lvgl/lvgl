@@ -38,7 +38,7 @@ extern "C" {
 struct _lv_task_t;
 
 /**
- * Tasks execte this type type of functions.
+ * Tasks execute this type type of functions.
  */
 typedef void (*lv_task_cb_t)(struct _lv_task_t *);
 
@@ -80,10 +80,14 @@ typedef struct _lv_task_t
  */
 void lv_task_core_init(void);
 
+//! @cond Doxygen_Suppress
+
 /**
  * Call it  periodically to handle lv_tasks.
  */
 LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void);
+
+//! @endcond
 
 /**
  * Create an "empty" task. It needs to initialzed with at least

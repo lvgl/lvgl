@@ -72,6 +72,12 @@ typedef struct _disp_drv_t
 #endif
     uint32_t rotated : 1; /*1: turn the display by 90 degree.*/
 
+#if LV_COLOR_SCREEN_TRANSP
+    /**Handle if the the screen doesn't have a solid (opa == LV_OPA_COVER) background.
+     * Use only if required because it's slower.*/
+    uint32_t screen_transp : 1;
+#endif
+
     /* MANDATORY: Write the internal buffer (VDB) to the display. 'lv_disp_flush_ready()' has to be
      * called when finished */
     void (*flush_cb)(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
@@ -218,11 +224,15 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp);
  */
 bool lv_disp_get_antialiasing(lv_disp_t * disp);
 
+//! @cond Doxygen_Suppress
+
 /**
  * Call in the display driver's `flush_cb` function when the flushing is finished
  * @param disp_drv pointer to display driver in `flush_cb` where this function is called
  */
 LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv);
+
+//! @endcond
 
 /**
  * Get the next display.

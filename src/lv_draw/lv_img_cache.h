@@ -24,10 +24,7 @@ extern "C" {
  **********************/
 typedef struct
 {
-    lv_img_decoder_dsc_t dsc;
-
-    /* How much time did it take to open the image.*/
-    uint32_t time_to_open;
+    lv_img_decoder_dsc_t dec_dsc;
 
     /* Count the cache entries's life. Add `time_tio_open` to `life` when the entry is used.
      * Decrement all lifes by one every in every `lv_img_cache_open`.

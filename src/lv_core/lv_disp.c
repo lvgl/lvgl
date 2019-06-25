@@ -54,7 +54,7 @@ lv_obj_t * lv_disp_get_scr_act(lv_disp_t * disp)
  * Make a screen active
  * @param scr pointer to a screen
  */
-void lv_disp_set_scr_act(lv_obj_t * scr)
+void lv_disp_load_scr(lv_obj_t * scr)
 {
     lv_disp_t * d = lv_obj_get_disp(scr);
 

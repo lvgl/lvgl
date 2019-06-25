@@ -107,7 +107,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing roller*/
     else {
         lv_roller_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->inf                   = copy_ext->inf;
+        ext->mode                   = copy_ext->mode;
 
         lv_obj_t * scrl = lv_page_get_scrl(new_roller);
         lv_ddlist_open(new_roller, false);
@@ -130,13 +130,14 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
  * Set the options on a roller
  * @param roller pointer to roller object
  * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
+ * @param mode `LV_ROLLER_MODE_NORMAL` or `LV_ROLLER_MODE_INFINITE`
  */
-void lv_roller_set_options(lv_obj_t * roller, const char * options, bool inf)
+void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mode_t mode)
 {
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
 
-    if(inf == false) {
-        ext->inf = 0;
+    if(mode == LV_ROLLER_MODE_NORMAL) {
+        ext->mode = LV_ROLLER_MODE_NORMAL;
         lv_ddlist_set_options(roller, options);
 
         /* Make sure the roller's height and the scrollable's height is refreshed.
@@ -144,7 +145,7 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, bool inf)
          * that signal won't be called. (It called because LV_FIT_TIGHT hor fit)*/
         refr_height(roller);
     } else {
-        ext->inf = 1;
+        ext->mode = LV_ROLLER_MODE_INIFINITE;
 
         uint32_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
         char * opt_extra = lv_mem_alloc(opt_len * LV_ROLLER_INF_PAGES);
@@ -238,7 +239,7 @@ void lv_roller_set_style(lv_obj_t * roller, lv_roller_style_t type, const lv_sty
 uint16_t lv_roller_get_selected(const lv_obj_t * roller)
 {
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-    if(ext->inf) {
+    if(ext->mode == LV_ROLLER_MODE_INIFINITE) {
         uint16_t real_id_cnt = ext->ddlist.option_cnt / LV_ROLLER_INF_PAGES;
         return lv_ddlist_get_selected(roller) % real_id_cnt;
     } else {
@@ -675,7 +676,7 @@ static void inf_normalize(void * scrl)
     lv_obj_t * roller      = lv_obj_get_parent(roller_scrl);
     lv_roller_ext_t * ext  = lv_obj_get_ext_attr(roller);
 
-    if(ext->inf) {
+    if(ext->mode == LV_ROLLER_MODE_INIFINITE) {
         uint16_t real_id_cnt = ext->ddlist.option_cnt / LV_ROLLER_INF_PAGES;
 
         ext->ddlist.sel_opt_id = ext->ddlist.sel_opt_id % real_id_cnt;

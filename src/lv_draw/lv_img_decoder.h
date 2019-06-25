@@ -178,6 +178,10 @@ typedef struct _lv_img_decoder_dsc
      *  MUST be set in `open` function*/
     const uint8_t * img_data;
 
+    /** How much time did it take to open the image. [ms]
+     *  If not set `lv_img_cache` will measure and set the time to open*/
+    uint32_t time_to_open;
+
     /**A text to display instead of the image when the image can't be opened.
      * Can be set in `open` function or set NULL. */
     const char * error_msg;

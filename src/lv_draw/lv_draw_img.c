@@ -452,18 +452,18 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
     if(cdsc == NULL) return LV_RES_INV;
 
 
-    bool chroma_keyed = lv_img_color_format_is_chroma_keyed(cdsc->dsc.header.cf);
-    bool alpha_byte   = lv_img_color_format_has_alpha(cdsc->dsc.header.cf);
+    bool chroma_keyed = lv_img_color_format_is_chroma_keyed(cdsc->dec_dsc.header.cf);
+    bool alpha_byte   = lv_img_color_format_has_alpha(cdsc->dec_dsc.header.cf);
 
-    if(cdsc->dsc.error_msg != NULL) {
+    if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
         lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, cdsc->dsc.error_msg, LV_TXT_FLAG_NONE, NULL, -1, -1, NULL);
+        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, cdsc->dec_dsc.error_msg, LV_TXT_FLAG_NONE, NULL, -1, -1, NULL);
     }
     /* The decoder open could open the image and gave the entire uncompressed image.
      * Just draw it!*/
-    else if(cdsc->dsc.img_data) {
-        lv_draw_map(coords, mask, cdsc->dsc.img_data, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
+    else if(cdsc->dec_dsc.img_data) {
+        lv_draw_map(coords, mask, cdsc->dec_dsc.img_data, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
     }
     /* The whole uncompressed image is not available. Try to read it line-by-line*/
     else {
@@ -482,9 +482,9 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
         lv_coord_t row;
         lv_res_t read_res;
         for(row = mask_com.y1; row <= mask_com.y2; row++) {
-            read_res = lv_img_decoder_read_line(&cdsc->dsc, x, y, width, buf);
+            read_res = lv_img_decoder_read_line(&cdsc->dec_dsc, x, y, width, buf);
             if(read_res != LV_RES_OK) {
-                lv_img_decoder_close(&cdsc->dsc);
+                lv_img_decoder_close(&cdsc->dec_dsc);
                 LV_LOG_WARN("Image draw can't read the line");
                 return LV_RES_INV;
             }

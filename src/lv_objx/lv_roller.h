@@ -37,12 +37,23 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+
+enum {
+    LV_ROLLER_MODE_NORMAL,
+    LV_ROLLER_MODE_INIFINITE,
+};
+
+typedef uint8_t lv_roller_mode_t;
+
+
+
 /*Data of roller*/
 typedef struct
 {
     lv_ddlist_ext_t ddlist; /*Ext. of ancestor*/
     /*New data for this type */
-    uint8_t inf : 1; /*Infinite*/
+    lv_roller_mode_t mode : 1;
 } lv_roller_ext_t;
 
 enum {
@@ -71,9 +82,9 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy);
  * Set the options on a roller
  * @param roller pointer to roller object
  * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
- * @param inf True: Loop through the options
+ * @param mode `LV_ROLLER_MODE_NORMAL` or `LV_ROLLER_MODE_INFINITE`
  */
-void lv_roller_set_options(lv_obj_t * roller, const char * options, bool inf);
+void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mode_t mode);
 
 /**
  * Set the align of the roller's options (left, right or center[default])

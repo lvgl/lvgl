@@ -36,11 +36,15 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
+//! @cond Doxygen_Suppress
+
 /**
  * You have to call this function periodically
  * @param tick_period the call period of this function in milliseconds
  */
 LV_ATTRIBUTE_TICK_INC void lv_tick_inc(uint32_t tick_period);
+
+//! @endcond
 
 /**
  * Get the elapsed milliseconds since start up
