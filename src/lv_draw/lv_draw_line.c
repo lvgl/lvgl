@@ -15,9 +15,6 @@
 /*********************
  *      DEFINES
  *********************/
-#if LV_COMPILER_VLA_SUPPORTED == 0
-#define LINE_MAX_WIDTH 64
-#endif
 
 /**********************
  *      TYPEDEFS
