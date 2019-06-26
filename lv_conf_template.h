@@ -257,10 +257,17 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
  * More info about fonts: https://docs.littlevgl.com/#Fonts
  * To create a new font go to: https://littlevgl.com/ttf-font-to-c-array
  */
+
+/* Robot fonts with bpp = 4
+ * https://fonts.google.com/specimen/Roboto  */
 #define LV_FONT_ROBOTO_12    0
 #define LV_FONT_ROBOTO_16    1
 #define LV_FONT_ROBOTO_22    0
 #define LV_FONT_ROBOTO_28    0
+
+/*Pixel perfect monospace font
+ * http://pelulamu.net/unscii/ */
+#define LV_FONT_UNSCII_8     0
 
 /* Optionally declare your custom fonts here.
  * You can use these fonts as default font too

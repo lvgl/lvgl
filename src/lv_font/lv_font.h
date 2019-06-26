@@ -134,6 +134,10 @@ LV_FONT_DECLARE(lv_font_roboto_22)
 LV_FONT_DECLARE(lv_font_roboto_28)
 #endif
 
+#if LV_FONT_UNSCII_8
+LV_FONT_DECLARE(lv_font_unscii_8)
+#endif
+
 /*Declare the custom (user defined) fonts*/
 #ifdef LV_FONT_CUSTOM_DECLARE
 LV_FONT_CUSTOM_DECLARE
