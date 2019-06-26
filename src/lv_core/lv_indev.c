@@ -1118,6 +1118,7 @@ static void indev_drag(lv_indev_proc_t * state)
 
             /*If the object didn't moved then clear the invalidated areas*/
             if(drag_obj->coords.x1 == prev_x && drag_obj->coords.y1 == prev_y) {
+                state->types.pointer.drag_in_prog = 0;
                 /*In a special case if the object is moved on a page and
                  * the scrollable has fit == true and the object is dragged of the page then
                  * while its coordinate is not changing only the parent's size is reduced */
