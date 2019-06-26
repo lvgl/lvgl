@@ -174,7 +174,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            new_obj->style_p = th->style.bg;
+            new_obj->style_p = th->style.scr;
         } else {
             new_obj->style_p = &lv_style_scr;
         }

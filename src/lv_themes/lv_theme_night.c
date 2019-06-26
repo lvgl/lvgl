@@ -29,7 +29,7 @@ static lv_theme_t theme;
 static lv_style_t def;
 
 /*Static style definitions*/
-static lv_style_t bg, sb, panel;
+static lv_style_t scr, bg, sb, panel;
 static lv_style_t prim, sec, hint;
 static lv_style_t btn_rel, btn_pr, btn_tgl_rel, btn_tgl_pr, btn_ina;
 static lv_style_t bar_bg, bar_indic;
@@ -61,6 +61,12 @@ static void basic_init(void)
     bg.text.font       = _font;
     bg.image.color     = lv_color_hsv_to_rgb(_hue, 5, 95);
 
+    lv_style_copy(&scr, &bg);
+    scr.body.padding.bottom = 0;
+    scr.body.padding.top = 0;
+    scr.body.padding.left = 0;
+    scr.body.padding.right = 0;
+
     lv_style_copy(&sb, &def);
     sb.body.main_color     = lv_color_hsv_to_rgb(_hue, 30, 60);
     sb.body.grad_color     = lv_color_hsv_to_rgb(_hue, 30, 60);
@@ -86,6 +92,8 @@ static void basic_init(void)
     panel.body.padding.bottom = LV_DPI / 10;
     panel.line.color          = lv_color_hsv_to_rgb(_hue, 20, 40);
     panel.line.width          = 1;
+
+    theme.style.scr           = &scr;
     theme.style.bg            = &bg;
     theme.style.panel         = &def;
 }

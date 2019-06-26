@@ -27,6 +27,7 @@
  **********************/
 static lv_theme_t theme;
 static lv_style_t def;
+static lv_style_t scr;
 
 /*Static style definitions*/
 static lv_style_t light_plain;
@@ -75,6 +76,13 @@ static void basic_init(void)
     def.image.intense = LV_OPA_TRANSP;
     def.image.opa     = LV_OPA_COVER;
 
+
+    lv_style_copy(&scr, &light_plain);
+    scr.body.padding.bottom = 0;
+    scr.body.padding.top = 0;
+    scr.body.padding.left = 0;
+    scr.body.padding.right = 0;
+
     lv_style_copy(&light_plain, &def);
 
     lv_style_copy(&light_frame, &light_plain);
@@ -92,6 +100,7 @@ static void basic_init(void)
     dark_frame.body.radius = LV_DPI / 20;
 
     theme.style.bg    = &def;
+    theme.style.scr    = &scr;
     theme.style.panel = &light_frame;
 }
 

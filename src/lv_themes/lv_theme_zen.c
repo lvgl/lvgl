@@ -45,6 +45,7 @@ static lv_font_t * _font;
 static void basic_init(void)
 {
     static lv_style_t bg;
+    static lv_style_t scr;
     static lv_style_t panel;
 
     lv_style_copy(&def, &lv_style_pretty); /*Initialize the default style*/
@@ -59,6 +60,12 @@ static void basic_init(void)
     bg.body.radius       = 0;
     bg.body.border.width = 0;
     bg.body.shadow.width = 0;
+
+    lv_style_copy(&scr, &bg);
+    scr.body.padding.bottom = 0;
+    scr.body.padding.top = 0;
+    scr.body.padding.left = 0;
+    scr.body.padding.right = 0;
 
     lv_style_copy(&panel, &bg);
     panel.body.radius         = LV_DPI / 10;
@@ -80,6 +87,7 @@ static void basic_init(void)
     sb.body.radius        = LV_RADIUS_CIRCLE;
     sb.body.padding.inner = LV_DPI / 10;
 
+    theme.style.scr    = &scr;
     theme.style.bg    = &bg;
     theme.style.panel = &panel;
 }
