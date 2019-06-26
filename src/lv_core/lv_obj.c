@@ -13,7 +13,6 @@
 #include "lv_disp.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_draw.h"
-#include "../lv_draw/lv_img_cache.h"
 #include "../lv_misc/lv_anim.h"
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_fs.h"
