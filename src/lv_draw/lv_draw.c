@@ -27,6 +27,8 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
+static void * draw_buf = NULL;
+static uint32_t draw_buf_size = 0;
 
 /**********************
  *      MACROS
@@ -36,9 +38,26 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
+void * lv_draw_get_buf(uint32_t size)
+{
+    if(size <= draw_buf_size) return draw_buf;
+
+    LV_LOG_WARN("lv_draw_get_buf: allocate");
+    printf("size: %d\n", size);
+
+    draw_buf_size = size;
+
+    if(draw_buf == NULL) {
+        draw_buf = lv_mem_alloc(size);
+        lv_mem_assert(draw_buf);
+        return draw_buf;
+    }
+
+    draw_buf = lv_mem_realloc(draw_buf, size);
+    lv_mem_assert(draw_buf);
+    return draw_buf;
+}
+
 
 #if LV_ANTIALIAS
 
@@ -143,3 +162,7 @@ void lv_draw_aa_hor_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_
 }
 
 #endif
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
