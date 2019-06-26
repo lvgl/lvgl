@@ -38,6 +38,11 @@ static uint32_t draw_buf_size = 0;
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * Give a buffer with the given to use during drawing.
+ * Be careful to not use the buffer while other processes are using it.
+ * @param size the required size
+ */
 void * lv_draw_get_buf(uint32_t size)
 {
     if(size <= draw_buf_size) return draw_buf;
@@ -58,6 +63,9 @@ void * lv_draw_get_buf(uint32_t size)
     return draw_buf;
 }
 
+/**
+ * Free the draw buffer
+ */
 void lv_draw_free_buf(void)
 {
     if(draw_buf) {
