@@ -47,8 +47,7 @@ void * lv_draw_get_buf(uint32_t size)
 {
     if(size <= draw_buf_size) return draw_buf;
 
-    LV_LOG_WARN("lv_draw_get_buf: allocate");
-    printf("size: %d\n", size);
+    LV_LOG_TRACE("lv_draw_get_buf: allocate");
 
     draw_buf_size = size;
 
@@ -74,7 +73,6 @@ void lv_draw_free_buf(void)
         draw_buf_size = 0;
     }
 }
-
 
 #if LV_ANTIALIAS
 
