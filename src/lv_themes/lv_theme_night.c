@@ -65,7 +65,7 @@ static void basic_init(void)
     sb.body.main_color     = lv_color_hsv_to_rgb(_hue, 30, 60);
     sb.body.grad_color     = lv_color_hsv_to_rgb(_hue, 30, 60);
     sb.body.border.width   = 0;
-    sb.body.padding.inner  = LV_DPI / 10;
+    sb.body.padding.inner  = LV_DPI / 20;
     sb.body.padding.left   = 0;
     sb.body.padding.right  = 0;
     sb.body.padding.top    = 0;

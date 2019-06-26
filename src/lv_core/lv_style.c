@@ -79,7 +79,7 @@ void lv_style_init(void)
     lv_style_scr.body.padding.right  = 0;
     lv_style_scr.body.padding.top    = 0;
     lv_style_scr.body.padding.bottom = 0;
-    lv_style_scr.body.padding.inner  = LV_DPI / 12;
+    lv_style_scr.body.padding.inner  = LV_DPI / 20;
 
     lv_style_scr.body.border.color = LV_COLOR_BLACK;
     lv_style_scr.body.border.opa   = LV_OPA_COVER;
@@ -108,10 +108,10 @@ void lv_style_init(void)
 
     /*Plain style (by default near the same as the screen style)*/
     lv_style_copy(&lv_style_plain, &lv_style_scr);
-    lv_style_plain.body.padding.left   = LV_DPI / 12;
-    lv_style_plain.body.padding.right  = LV_DPI / 12;
-    lv_style_plain.body.padding.top    = LV_DPI / 12;
-    lv_style_plain.body.padding.bottom = LV_DPI / 12;
+    lv_style_plain.body.padding.left   = LV_DPI / 20;
+    lv_style_plain.body.padding.right  = LV_DPI / 20;
+    lv_style_plain.body.padding.top    = LV_DPI / 20;
+    lv_style_plain.body.padding.bottom = LV_DPI / 20;
 
     /*Plain color style*/
     lv_style_copy(&lv_style_plain_color, &lv_style_plain);
