@@ -58,6 +58,15 @@ void * lv_draw_get_buf(uint32_t size)
     return draw_buf;
 }
 
+void lv_draw_free_buf(void)
+{
+    if(draw_buf) {
+        lv_mem_free(draw_buf);
+        draw_buf = NULL;
+        draw_buf_size = 0;
+    }
+}
+
 
 #if LV_ANTIALIAS
 
