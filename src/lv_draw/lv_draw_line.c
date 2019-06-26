@@ -265,11 +265,8 @@ static void line_draw_skew(line_draw_t * main_line, bool dir_ori, const lv_area_
 
     /* The pattern stores the points of the line ending. It has the good direction and length.
      * The worth case is the 45° line where pattern can have 1.41 x `width` points*/
-#if LV_COMPILER_VLA_SUPPORTED
-    lv_point_t pattern[width * 2];
-#else
-    lv_point_t pattern[LINE_MAX_WIDTH];
-#endif
+
+    lv_point_t * pattern = lv_draw_get_buf(width * 2 * sizeof(lv_point_t));
     lv_coord_t i = 0;
 
     /*Create a perpendicular pattern (a small line)*/

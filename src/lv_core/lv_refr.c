@@ -14,7 +14,7 @@
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_gc.h"
-#include "../lv_draw/lv_draw_basic.h"
+#include "../lv_draw/lv_draw.h"
 
 #if defined(LV_GC_INCLUDE)
 #include LV_GC_INCLUDE
