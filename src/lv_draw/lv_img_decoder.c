@@ -127,19 +127,23 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const
     dsc->user_data = NULL;
 
     lv_res_t res;
-    res = lv_img_decoder_get_info(src, &dsc->header);
-    if(res != LV_RES_OK) return LV_RES_INV;
 
     lv_img_decoder_t * d;
     LV_LL_READ(LV_GC_ROOT(_lv_img_defoder_ll), d)
     {
-        res = LV_RES_INV;
+        /*Info an Open callbacks are required*/
+        if(d->info_cb == NULL || d->open_cb == NULL) continue;
+
+        res = d->info_cb(d, src, &dsc->header);
+        if(res != LV_RES_OK) continue;
+
         dsc->error_msg = NULL;
         dsc->img_data = NULL;
         dsc->decoder = d;
 
-        if(d->open_cb) res = d->open_cb(d, dsc);
+        res = d->open_cb(d, dsc);
 
+        /*Opened successfully. It is a good decoder to for this image source*/
         if(res == LV_RES_OK) break;
     }
 
