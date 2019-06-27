@@ -193,12 +193,6 @@ typedef void * lv_img_decoder_user_data_t;
  * font's bitmaps */
 #define LV_ATTRIBUTE_LARGE_CONST
 
-/* 1: Variable length array is supported*/
-#define LV_COMPILER_VLA_SUPPORTED            1
-
-/* 1: Initialization with non constant values are supported */
-#define LV_COMPILER_NON_CONST_INIT_SUPPORTED 1
-
 /*===================
  *  HAL settings
  *==================*/
