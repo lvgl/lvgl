@@ -242,7 +242,6 @@ typedef struct
                                                ... [x]: "lv_obj" */
 } lv_obj_type_t;
 
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -668,7 +667,7 @@ void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * cords_p);
  * (Without the size of the border or other extra graphical elements)
  * @param coords_p store the result area here
  */
-void lv_obj_get_inner_coords(const lv_obj_t *obj, lv_area_t * coords_p);
+void lv_obj_get_inner_coords(const lv_obj_t * obj, lv_area_t * coords_p);
 
 /**
  * Get the x coordinate of object

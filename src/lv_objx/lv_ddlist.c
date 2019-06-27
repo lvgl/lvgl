@@ -784,7 +784,7 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
             ext->sel_opt_id_ori = ext->sel_opt_id;
         }
 
-        uint32_t id = ext->sel_opt_id;  /*Just to use uint32_t in event data*/
+        uint32_t id  = ext->sel_opt_id; /*Just to use uint32_t in event data*/
         lv_res_t res = lv_event_send(ddlist, LV_EVENT_VALUE_CHANGED, &id);
         if(res != LV_RES_OK) return res;
 

@@ -130,7 +130,6 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
         size_res->y -= line_space;
 }
 
-
 /**
  * Get the next line of text. Check line length and break chars too.
  * @param txt a '\0' terminated string
@@ -140,42 +139,44 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  * @param flags settings for the text from 'txt_flag_type' enum
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8 they are different)
  */
-uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
-                              lv_coord_t letter_space, lv_coord_t max_width, lv_txt_flag_t flag)
+uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord_t letter_space, lv_coord_t max_width,
+                              lv_txt_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
     if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
-    uint32_t i = 0;
-    uint32_t i_next = 0;
-    lv_coord_t cur_w = 0;
-    uint32_t last_break = NO_BREAK_FOUND;
+    uint32_t i                   = 0;
+    uint32_t i_next              = 0;
+    lv_coord_t cur_w             = 0;
+    uint32_t last_break          = NO_BREAK_FOUND;
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
     uint32_t letter_w;
-    uint32_t letter = 0;
+    uint32_t letter      = 0;
     uint32_t letter_next = 0;
 
     letter_next = lv_txt_encoded_next(txt, &i_next);
 
     while(txt[i] != '\0') {
-        letter = letter_next;
-        i = i_next;
+        letter      = letter_next;
+        i           = i_next;
         letter_next = lv_txt_encoded_next(txt, &i_next);
 
         /*Handle the recolor command*/
         if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
             if(lv_txt_is_cmd(&cmd_state, letter) != false) {
-                continue;   /*Skip the letter is it is part of a command*/
+                continue; /*Skip the letter is it is part of a command*/
             }
         }
 
         /*Check for new line chars*/
         if(letter == '\n' || letter == '\r') {
             /*Return with the first letter of the next line*/
-            if(letter == '\r' &&  letter_next == '\n') return i_next;
-            else return i;
+            if(letter == '\r' && letter_next == '\n')
+                return i_next;
+            else
+                return i;
         } else { /*Check the actual length*/
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
             cur_w += letter_w;
@@ -711,7 +712,7 @@ static uint32_t lv_txt_iso8859_1_get_length(const char * txt)
  * @param letter a letter
  * @return false: 'letter' is not break char
  */
-static inline  bool is_break_char(uint32_t letter)
+static inline bool is_break_char(uint32_t letter)
 {
     uint8_t i;
     bool ret = false;

@@ -108,9 +108,9 @@ static void basic_init(void)
 
     lv_style_copy(&scr, &bg);
     scr.body.padding.bottom = 0;
-    scr.body.padding.top = 0;
-    scr.body.padding.left = 0;
-    scr.body.padding.right = 0;
+    scr.body.padding.top    = 0;
+    scr.body.padding.left   = 0;
+    scr.body.padding.right  = 0;
 
     /*Panel*/
     lv_style_copy(&panel, &def);
@@ -140,7 +140,7 @@ static void basic_init(void)
     sb.body.padding.inner  = LV_DPI / 15; /*Scrollbar width*/
 
     theme.style.bg    = &bg;
-    theme.style.scr    = &scr;
+    theme.style.scr   = &scr;
     theme.style.panel = &panel;
 }
 
@@ -828,12 +828,12 @@ static void win_init(void)
     header.text.color          = lv_color_hsv_to_rgb(_hue, 5, 100);
     header.image.color         = lv_color_hsv_to_rgb(_hue, 5, 100);
 
-    theme.style.win.bg           = &bg;
-    theme.style.win.sb           = &sb;
-    theme.style.win.header       = &header;
+    theme.style.win.bg      = &bg;
+    theme.style.win.sb      = &sb;
+    theme.style.win.header  = &header;
     theme.style.win.content = &lv_style_transp;
-    theme.style.win.btn.rel      = &btn_rel;
-    theme.style.win.btn.pr       = &btn_pr;
+    theme.style.win.btn.rel = &btn_rel;
+    theme.style.win.btn.pr  = &btn_pr;
 #endif
 }
 

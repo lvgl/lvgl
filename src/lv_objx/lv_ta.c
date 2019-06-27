@@ -112,10 +112,10 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cursor.valid_x    = 0;
     ext->one_line          = 0;
 #if LV_LABEL_TEXT_SEL
-    ext->text_sel_en       = 0;
+    ext->text_sel_en = 0;
 #endif
-    ext->label             = NULL;
-    ext->placeholder       = NULL;
+    ext->label       = NULL;
+    ext->placeholder = NULL;
 
 #if LV_USE_ANIMATION == 0
     ext->pwd_show_time     = 0;
@@ -627,7 +627,7 @@ void lv_ta_set_cursor_type(lv_obj_t * ta, lv_cursor_type_t cur_type)
  */
 void lv_ta_set_cursor_click_pos(lv_obj_t * ta, bool en)
 {
-    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+    lv_ta_ext_t * ext     = lv_obj_get_ext_attr(ta);
     ext->cursor.click_pos = en ? 1 : 0;
 }
 
@@ -1455,7 +1455,8 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*Set the label width according to the text area width*/
         if(ext->label) {
-            if(lv_obj_get_width(scrl) != lv_area_get_width(param) || lv_obj_get_height(scrl) != lv_area_get_height(param)) {
+            if(lv_obj_get_width(scrl) != lv_area_get_width(param) ||
+               lv_obj_get_height(scrl) != lv_area_get_height(param)) {
 
                 const lv_style_t * style_scrl = lv_obj_get_style(scrl);
                 lv_obj_set_width(ext->label, lv_page_get_fit_width(ta));
@@ -1610,8 +1611,7 @@ static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res)
 
 static void refr_cursor_area(lv_obj_t * ta)
 {
-    lv_ta_ext_t * ext              = lv_obj_get_ext_attr(ta);
-
+    lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     const lv_style_t * label_style = lv_obj_get_style(ext->label);
 
@@ -1739,13 +1739,12 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
 
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->cursor.click_pos == 0) return;
-	if(ext->cursor.type == LV_CURSOR_NONE) return;
+    if(ext->cursor.type == LV_CURSOR_NONE) return;
 
     if(lv_indev_get_type(click_source) == LV_INDEV_TYPE_KEYPAD ||
        lv_indev_get_type(click_source) == LV_INDEV_TYPE_ENCODER) {
         return;
     }
-
 
     lv_area_t label_coords;
     lv_obj_get_coords(ext->label, &label_coords);

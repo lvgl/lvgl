@@ -80,9 +80,9 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
 #if LV_USE_ANIMATION
     ext->anim_time = LV_TILEVIEW_DEF_ANIM_TIME;
 #endif
-    ext->act_id.x  = 0;
-    ext->act_id.y  = 0;
-    ext->valid_pos = NULL;
+    ext->act_id.x      = 0;
+    ext->act_id.y      = 0;
+    ext->valid_pos     = NULL;
     ext->valid_pos_cnt = 0;
 
     /*The signal and design functions are not copied so set them here*/
@@ -116,8 +116,8 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_tileview_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->act_id.x                = copy_ext->act_id.x;
         ext->act_id.y                = copy_ext->act_id.y;
-        ext->valid_pos = copy_ext->valid_pos;
-        ext->valid_pos_cnt = copy_ext->valid_pos_cnt;
+        ext->valid_pos               = copy_ext->valid_pos;
+        ext->valid_pos_cnt           = copy_ext->valid_pos_cnt;
 #if LV_USE_ANIMATION
         ext->anim_time = copy_ext->anim_time;
 #endif
@@ -169,7 +169,7 @@ void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t * val
 {
     lv_tileview_ext_t * ext = lv_obj_get_ext_attr(tileview);
     ext->valid_pos          = valid_pos;
-    ext->valid_pos_cnt = valid_pos_cnt;
+    ext->valid_pos_cnt      = valid_pos_cnt;
 
     /*If valid pos. is selected do nothing*/
     uint16_t i;

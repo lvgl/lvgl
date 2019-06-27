@@ -146,8 +146,8 @@ const lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_
  * @param w width of the buffer to copy
  * @param h height of the buffer to copy
  */
-void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x,
-                        lv_coord_t y, lv_coord_t w, lv_coord_t h);
+void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, lv_coord_t y, lv_coord_t w,
+                        lv_coord_t h);
 
 /**
  * Rotate and image and store the result on a canvas.
@@ -197,7 +197,6 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w, const lv_style_t * style,
                          const char * txt, lv_label_align_t align);
 
-
 /**
  * Draw an image on the canvas
  * @param canvas pointer to a canvas object
@@ -245,10 +244,10 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
 #define LV_CANVAS_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) (LV_IMG_PX_SIZE_ALPHA_BYTE * w * h)
 
 /*+ 1: to be sure no fractional row*/
-#define LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h)  ((((w / 8) + 1) * h))
-#define LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h)  ((((w / 4) + 1) * h))
-#define LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h)  ((((w / 2) + 1) * h))
-#define LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w, h)  ((w * h))
+#define LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h) ((((w / 8) + 1) * h))
+#define LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h) ((((w / 4) + 1) * h))
+#define LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h) ((((w / 2) + 1) * h))
+#define LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w, h) ((w * h))
 
 /*4 * X: for palette*/
 #define LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h) + 4 * 2)

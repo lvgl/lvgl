@@ -30,7 +30,7 @@ typedef struct
      * Decrement all lifes by one every in every `lv_img_cache_open`.
      * If life == 0 the entry can be reused,*/
     int32_t life;
-}lv_img_cache_entry_t;
+} lv_img_cache_entry_t;
 
 /**********************
  * GLOBAL PROTOTYPES

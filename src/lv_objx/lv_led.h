@@ -88,9 +88,9 @@ void lv_led_toggle(lv_obj_t * led);
  * @param type which style should be set (can be only `LV_LED_STYLE_MAIN`)
  * @param style pointer to a style
  */
-static inline void lv_led_set_style(lv_obj_t * led, lv_led_style_t type,  const lv_style_t * style)
+static inline void lv_led_set_style(lv_obj_t * led, lv_led_style_t type, const lv_style_t * style)
 {
-    (void) type; /*Unused*/
+    (void)type; /*Unused*/
     lv_obj_set_style(led, style);
 }
 
@@ -109,7 +109,7 @@ uint8_t lv_led_get_bright(const lv_obj_t * led);
  */
 static inline const lv_style_t * lv_led_get_style(const lv_obj_t * led, lv_led_style_t type)
 {
-    (void) type;    /*Unused*/
+    (void)type; /*Unused*/
     return lv_obj_get_style(led);
 }
 

@@ -381,7 +381,6 @@ void lv_btnm_set_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl)
     }
 }
 
-
 /**
  * Clear the attributes of all buttons of a button matrix
  * @param btnm pointer to a button matrix object

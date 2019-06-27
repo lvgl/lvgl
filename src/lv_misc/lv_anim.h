@@ -33,8 +33,8 @@ extern "C" {
 
 /*Can be used to indicate if animations are enabled or disabled in a case*/
 enum {
- LV_ANIM_OFF,
- LV_ANIM_ON,
+    LV_ANIM_OFF,
+    LV_ANIM_ON,
 };
 
 typedef uint8_t lv_anim_enable_t;
@@ -68,7 +68,7 @@ typedef void (*lv_anim_ready_cb_t)(struct _lv_anim_t *);
 typedef struct _lv_anim_t
 {
     void * var;                  /*Variable to animate*/
-    lv_anim_exec_xcb_t exec_cb;   /*Function to execute to animate*/
+    lv_anim_exec_xcb_t exec_cb;  /*Function to execute to animate*/
     lv_anim_path_cb_t path_cb;   /*An array with the steps of animations*/
     lv_anim_ready_cb_t ready_cb; /*Call it when the animation is ready*/
     int32_t start;               /*Start value*/
@@ -87,7 +87,6 @@ typedef struct _lv_anim_t
     uint8_t playback_now : 1; /*Play back is in progress*/
     uint32_t has_run : 1;     /*Indicates the animation has run in this round*/
 } lv_anim_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES

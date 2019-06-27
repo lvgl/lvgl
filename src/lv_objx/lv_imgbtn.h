@@ -43,11 +43,11 @@ typedef struct
     lv_btn_ext_t btn; /*Ext. of ancestor*/
     /*New data for this type */
 #if LV_IMGBTN_TILED == 0
-    const void * img_src[LV_BTN_STATE_NUM]; /*Store images to each state*/
+    const void * img_src[_LV_BTN_STATE_NUM]; /*Store images to each state*/
 #else
-    const void * img_src_left[LV_BTN_STATE_NUM];  /*Store left side images to each state*/
-    const void * img_src_mid[LV_BTN_STATE_NUM];   /*Store center images to each state*/
-    const void * img_src_right[LV_BTN_STATE_NUM]; /*Store right side images to each state*/
+    const void * img_src_left[_LV_BTN_STATE_NUM];  /*Store left side images to each state*/
+    const void * img_src_mid[_LV_BTN_STATE_NUM];   /*Store center images to each state*/
+    const void * img_src_right[_LV_BTN_STATE_NUM]; /*Store right side images to each state*/
 #endif
     lv_img_cf_t act_cf; /*Color format of the currently active image*/
 } lv_imgbtn_ext_t;

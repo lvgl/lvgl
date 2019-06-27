@@ -222,10 +222,10 @@ void lv_bar_set_anim_time(lv_obj_t * bar, uint16_t anim_time)
 {
 #if LV_USE_ANIMATION
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
-    ext->anim_time = anim_time;
+    ext->anim_time     = anim_time;
 #else
-    (void)bar;        /*Unused*/
-    (void)anim_time;  /*Unused*/
+    (void)bar;       /*Unused*/
+    (void)anim_time; /*Unused*/
 #endif
 }
 
@@ -312,7 +312,7 @@ uint16_t lv_bar_get_anim_time(lv_obj_t * bar)
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     return ext->anim_time;
 #else
-    (void) bar;   /*Unused*/
+    (void)bar;       /*Unused*/
     return 0;
 #endif
 }

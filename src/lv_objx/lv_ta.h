@@ -76,7 +76,7 @@ typedef struct
         uint16_t txt_byte_pos;     /* Byte index of the letter after (on) the cursor*/
         lv_cursor_type_t type : 4; /* Shape of the cursor*/
         uint8_t state : 1;         /*Cursor is visible now or not (Handled by the library)*/
-        uint8_t click_pos	:1;	   /*1: Enable positioning the cursor by clicking the text area*/
+        uint8_t click_pos : 1;     /*1: Enable positioning the cursor by clicking the text area*/
     } cursor;
 #if LV_LABEL_TEXT_SEL
     uint16_t tmp_sel_start;       /*Temporary value*/

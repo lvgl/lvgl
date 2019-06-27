@@ -159,7 +159,7 @@ lv_coord_t lv_img_get_offset_y(lv_obj_t * img);
  */
 static inline const lv_style_t * lv_img_get_style(const lv_obj_t * img, lv_img_style_t type)
 {
-    (void)type;     /*Unused*/
+    (void)type; /*Unused*/
     return lv_obj_get_style(img);
 }
 

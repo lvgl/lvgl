@@ -138,8 +138,8 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const
         if(res != LV_RES_OK) continue;
 
         dsc->error_msg = NULL;
-        dsc->img_data = NULL;
-        dsc->decoder = d;
+        dsc->img_data  = NULL;
+        dsc->decoder   = d;
 
         res = d->open_cb(d, dsc);
 

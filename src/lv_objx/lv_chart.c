@@ -84,18 +84,18 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
 
     lv_ll_init(&ext->series_ll, sizeof(lv_chart_series_t));
 
-    ext->series.num   = 0;
-    ext->ymin         = LV_CHART_YMIN_DEF;
-    ext->ymax         = LV_CHART_YMAX_DEF;
-    ext->hdiv_cnt     = LV_CHART_HDIV_DEF;
-    ext->vdiv_cnt     = LV_CHART_VDIV_DEF;
-    ext->point_cnt    = LV_CHART_PNUM_DEF;
-    ext->type         = LV_CHART_TYPE_LINE;
-    ext->update_mode  = LV_CHART_UPDATE_MODE_SHIFT;
-    ext->series.opa   = LV_OPA_COVER;
-    ext->series.dark  = LV_OPA_50;
-    ext->series.width = 2;
-    ext->margin       = 0;
+    ext->series.num            = 0;
+    ext->ymin                  = LV_CHART_YMIN_DEF;
+    ext->ymax                  = LV_CHART_YMAX_DEF;
+    ext->hdiv_cnt              = LV_CHART_HDIV_DEF;
+    ext->vdiv_cnt              = LV_CHART_VDIV_DEF;
+    ext->point_cnt             = LV_CHART_PNUM_DEF;
+    ext->type                  = LV_CHART_TYPE_LINE;
+    ext->update_mode           = LV_CHART_UPDATE_MODE_SHIFT;
+    ext->series.opa            = LV_OPA_COVER;
+    ext->series.dark           = LV_OPA_50;
+    ext->series.width          = 2;
+    ext->margin                = 0;
     ext->x_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->x_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->y_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
@@ -124,14 +124,14 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     } else {
         lv_chart_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
 
-        ext->type                 = ext_copy->type;
-        ext->ymin                 = ext_copy->ymin;
-        ext->ymax                 = ext_copy->ymax;
-        ext->hdiv_cnt             = ext_copy->hdiv_cnt;
-        ext->vdiv_cnt             = ext_copy->vdiv_cnt;
-        ext->point_cnt            = ext_copy->point_cnt;
-        ext->series.opa           = ext_copy->series.opa;
-        ext->margin               = ext_copy->margin;
+        ext->type       = ext_copy->type;
+        ext->ymin       = ext_copy->ymin;
+        ext->ymax       = ext_copy->ymax;
+        ext->hdiv_cnt   = ext_copy->hdiv_cnt;
+        ext->vdiv_cnt   = ext_copy->vdiv_cnt;
+        ext->point_cnt  = ext_copy->point_cnt;
+        ext->series.opa = ext_copy->series.opa;
+        ext->margin     = ext_copy->margin;
         memcpy(&ext->x_axis, &ext_copy->x_axis, sizeof(lv_chart_axis_cfg_t));
         memcpy(&ext->y_axis, &ext_copy->y_axis, sizeof(lv_chart_axis_cfg_t));
 
@@ -460,9 +460,9 @@ void lv_chart_set_x_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_
  */
 void lv_chart_set_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len)
 {
-   lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
-   ext->y_axis.major_tick_len = major_tick_len;
-   ext->y_axis.minor_tick_len = minor_tick_len;
+    lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
+    ext->y_axis.major_tick_len = major_tick_len;
+    ext->y_axis.minor_tick_len = minor_tick_len;
 }
 
 /**
@@ -473,7 +473,8 @@ void lv_chart_set_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_
  * 							else number of ticks between two value labels
  * @param options			extra options
  */
-void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,  lv_chart_axis_options_t options)
+void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
+                               lv_chart_axis_options_t options)
 {
     lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
     ext->x_axis.num_tick_marks = num_tick_marks;
@@ -489,7 +490,8 @@ void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, ui
  *                          else number of ticks between two value labels
  * @param options           extra options
  */
-void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks, lv_chart_axis_options_t options)
+void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
+                               lv_chart_axis_options_t options)
 {
     lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
     ext->y_axis.num_tick_marks = num_tick_marks;
@@ -498,10 +500,10 @@ void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, ui
 }
 
 /**
-* Set the margin around the chart, used for axes value and ticks
-* @param chart     pointer to an chart object
-* @param margin    value of the margin [px]
-*/
+ * Set the margin around the chart, used for axes value and ticks
+ * @param chart     pointer to an chart object
+ * @param margin    value of the margin [px]
+ */
 void lv_chart_set_margin(lv_obj_t * chart, uint16_t margin)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);

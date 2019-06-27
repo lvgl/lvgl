@@ -93,7 +93,7 @@ typedef struct
 typedef struct
 {
     void * dir_d;
-   lv_fs_drv_t * drv;
+    lv_fs_drv_t * drv;
 } lv_fs_dir_t;
 
 /**********************

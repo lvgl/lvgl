@@ -51,12 +51,12 @@ typedef struct
 {
     /*No inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
-    const char ** map_p;                             /*Pointer to the current map*/
-    lv_area_t * button_areas;                        /*Array of areas of buttons*/
-    lv_btnm_ctrl_t * ctrl_bits;                      /*Array of control bytes*/
-    const lv_style_t * styles_btn[LV_BTN_STATE_NUM]; /*Styles of buttons in each state*/
-    uint16_t btn_cnt;                                /*Number of button in 'map_p'(Handled by the library)*/
-    uint16_t btn_id_pr;                              /*Index of the currently pressed button or LV_BTNM_BTN_NONE*/
+    const char ** map_p;                              /*Pointer to the current map*/
+    lv_area_t * button_areas;                         /*Array of areas of buttons*/
+    lv_btnm_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
+    const lv_style_t * styles_btn[_LV_BTN_STATE_NUM]; /*Styles of buttons in each state*/
+    uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
+    uint16_t btn_id_pr;                               /*Index of the currently pressed button or LV_BTNM_BTN_NONE*/
     uint16_t btn_id_act;    /*Index of the active button (being pressed/released etc) or LV_BTNM_BTN_NONE */
     uint8_t recolor : 1;    /*Enable button recoloring*/
     uint8_t one_toggle : 1; /*Single button toggled at once*/

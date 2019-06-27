@@ -63,9 +63,9 @@ static void basic_init(void)
 
     lv_style_copy(&scr, &bg);
     scr.body.padding.bottom = 0;
-    scr.body.padding.top = 0;
-    scr.body.padding.left = 0;
-    scr.body.padding.right = 0;
+    scr.body.padding.top    = 0;
+    scr.body.padding.left   = 0;
+    scr.body.padding.right  = 0;
 
     lv_style_copy(&panel, &bg);
     panel.body.radius         = LV_DPI / 10;
@@ -87,7 +87,7 @@ static void basic_init(void)
     sb.body.radius        = LV_RADIUS_CIRCLE;
     sb.body.padding.inner = LV_DPI / 10;
 
-    theme.style.scr    = &scr;
+    theme.style.scr   = &scr;
     theme.style.bg    = &bg;
     theme.style.panel = &panel;
 }
@@ -768,12 +768,12 @@ static void win_init(void)
     pr.text.color  = lv_color_hex3(0x333);
     pr.image.color = lv_color_hex3(0x333);
 
-    theme.style.win.bg           = theme.style.panel;
-    theme.style.win.sb           = &sb;
-    theme.style.win.header       = &header;
+    theme.style.win.bg      = theme.style.panel;
+    theme.style.win.sb      = &sb;
+    theme.style.win.header  = &header;
     theme.style.win.content = &lv_style_transp;
-    theme.style.win.btn.rel      = &rel;
-    theme.style.win.btn.pr       = &pr;
+    theme.style.win.btn.rel = &rel;
+    theme.style.win.btn.pr  = &pr;
 #endif
 }
 

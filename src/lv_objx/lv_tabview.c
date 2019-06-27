@@ -361,7 +361,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 
     if(anim == LV_ANIM_OFF || lv_tabview_get_anim_time(tabview) == 0) {
         lv_obj_set_x(ext->content, cont_x);
-    } 
+    }
 #if LV_USE_ANIMATION
     else {
         lv_anim_t a;
@@ -400,7 +400,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     }
 
 #if LV_USE_ANIMATION
-    if(anim == LV_ANIM_OFF || ext->anim_time == 0) 
+    if(anim == LV_ANIM_OFF || ext->anim_time == 0)
 #endif
     {
         switch(ext->btns_pos) {
@@ -409,7 +409,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
             case LV_TABVIEW_BTNS_POS_LEFT:
             case LV_TABVIEW_BTNS_POS_RIGHT: lv_obj_set_y(ext->indic, indic_pos); break;
         }
-    } 
+    }
 #if LV_USE_ANIMATION
     else {
         lv_anim_t a;
@@ -956,7 +956,6 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
     if(id_prev != id_new) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
 
     if(res != LV_RES_OK) return;
-
 }
 
 /**

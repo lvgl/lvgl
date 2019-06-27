@@ -40,7 +40,7 @@ extern "C" {
 
 /*Chart types*/
 enum {
-    LV_CHART_TYPE_NONE           = 0x00, /*Don't draw the series*/
+    LV_CHART_TYPE_NONE          = 0x00, /*Don't draw the series*/
     LV_CHART_TYPE_LINE          = 0x01, /*Connect the points with lines*/
     LV_CHART_TYPE_COLUMN        = 0x02, /*Draw columns*/
     LV_CHART_TYPE_POINT         = 0x04, /*Draw circles on the points*/
@@ -51,8 +51,8 @@ typedef uint8_t lv_chart_type_t;
 
 /*Chart update mode for `lv_chart_set_next`*/
 enum {
-    LV_CHART_UPDATE_MODE_SHIFT,     /*Shift old data to the left and add the new one o the right*/
-    LV_CHART_UPDATE_MODE_CIRCULAR,  /*Add the new data in a circular way*/
+    LV_CHART_UPDATE_MODE_SHIFT,    /*Shift old data to the left and add the new one o the right*/
+    LV_CHART_UPDATE_MODE_CIRCULAR, /*Add the new data in a circular way*/
 };
 typedef uint8_t lv_chart_update_mode_t;
 
@@ -65,8 +65,8 @@ typedef struct
 
 /*Data of axis */
 enum {
-    LV_CHART_AXIS_SKIP_LAST_TICK = 0x00,    /* don't draw the last tick */
-    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01     /* draw the last tick */
+    LV_CHART_AXIS_SKIP_LAST_TICK = 0x00, /* don't draw the last tick */
+    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01  /* draw the last tick */
 };
 typedef uint8_t lv_chart_axis_options_t;
 
@@ -235,7 +235,7 @@ void lv_chart_set_update_mode(lv_obj_t * chart, lv_chart_update_mode_t update_mo
  */
 static inline void lv_chart_set_style(lv_obj_t * chart, lv_chart_style_t type, const lv_style_t * style)
 {
-    (void) type; /*Unused*/
+    (void)type; /*Unused*/
     lv_obj_set_style(chart, style);
 }
 
@@ -267,7 +267,8 @@ void lv_chart_set_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_
  *                          else number of ticks between two value labels
  * @param options           extra options
  */
-void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,  lv_chart_axis_options_t options);
+void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
+                               lv_chart_axis_options_t options);
 
 /**
  * Set the y-axis tick count and labels of a chart
@@ -277,7 +278,8 @@ void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, ui
  *                          else number of ticks between two value labels
  * @param options           extra options
  */
-void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks, lv_chart_axis_options_t options);
+void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
+                               lv_chart_axis_options_t options);
 
 /**
  * Set the margin around the chart, used for axes value and ticks
@@ -333,7 +335,7 @@ lv_opa_t lv_chart_get_series_darking(const lv_obj_t * chart);
  */
 static inline const lv_style_t * lv_chart_get_style(const lv_obj_t * chart, lv_chart_style_t type)
 {
-    (void) type; /*Unused*/
+    (void)type; /*Unused*/
     return lv_obj_get_style(chart);
 }
 

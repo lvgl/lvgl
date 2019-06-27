@@ -101,7 +101,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->edge_flash.right_ip  = 0;
     ext->edge_flash.state     = 0;
     ext->edge_flash.style     = &lv_style_plain_color;
-    ext->anim_time = LV_PAGE_DEF_ANIM_TIME;
+    ext->anim_time            = LV_PAGE_DEF_ANIM_TIME;
 #endif
     ext->scroll_prop    = 0;
     ext->scroll_prop_ip = 0;
@@ -218,12 +218,11 @@ void lv_page_set_anim_time(lv_obj_t * page, uint16_t anim_time)
 {
 #if LV_USE_ANIMATION
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    ext->anim_time = anim_time;
+    ext->anim_time      = anim_time;
 #else
-    (void)page;       /*Unused*/
-    (void)anim_time;  /*Unused*/
+    (void)page;      /*Unused*/
+    (void)anim_time; /*Unused*/
 #endif
-
 }
 
 /**
@@ -308,7 +307,7 @@ uint16_t lv_page_get_anim_time(const lv_obj_t * page)
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     return ext->anim_time;
 #else
-    (void) page;   /*Unused*/
+    (void)page; /*Unused*/
     return 0;
 #endif
 }
@@ -423,14 +422,10 @@ bool lv_page_on_edge(lv_obj_t * page, lv_page_edge_t edge)
     lv_obj_get_coords(scrl, &scrl_coords);
     lv_obj_get_coords(page, &page_coords);
 
-    if((edge & LV_PAGE_EDGE_TOP) && scrl_coords.y1 == page_coords.y1 + page_style->body.padding.top)
-        return true;
-    if((edge & LV_PAGE_EDGE_BOTTOM) && scrl_coords.y2 == page_coords.y2 - page_style->body.padding.bottom)
-        return true;
-    if((edge & LV_PAGE_EDGE_LEFT) && scrl_coords.x1 == page_coords.x1 + page_style->body.padding.left)
-        return true;
-    if((edge & LV_PAGE_EDGE_RIGHT) && scrl_coords.x2 == page_coords.x2 - page_style->body.padding.right)
-        return true;
+    if((edge & LV_PAGE_EDGE_TOP) && scrl_coords.y1 == page_coords.y1 + page_style->body.padding.top) return true;
+    if((edge & LV_PAGE_EDGE_BOTTOM) && scrl_coords.y2 == page_coords.y2 - page_style->body.padding.bottom) return true;
+    if((edge & LV_PAGE_EDGE_LEFT) && scrl_coords.x1 == page_coords.x1 + page_style->body.padding.left) return true;
+    if((edge & LV_PAGE_EDGE_RIGHT) && scrl_coords.x2 == page_coords.x2 - page_style->body.padding.right) return true;
 
     return false;
 }
@@ -445,7 +440,6 @@ void lv_page_glue_obj(lv_obj_t * obj, bool glue)
     lv_obj_set_drag_parent(obj, glue);
     lv_obj_set_drag(obj, glue);
 }
-
 
 /**
  * Focus on an object. It ensures that the object will be visible on the page.
@@ -625,7 +619,7 @@ void lv_page_start_edge_flash(lv_obj_t * page)
         lv_anim_create(&a);
     }
 #else
-    (void) page;   /*Unused*/
+    (void)page; /*Unused*/
 #endif
 }
 
@@ -940,7 +934,6 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
 
                 if(lv_obj_get_parent(page_parent) != NULL) { /*Do not propagate the scroll to a screen*/
                     page_ext->scroll_prop_ip = 1;
-
                 }
             }
         }

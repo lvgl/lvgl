@@ -228,7 +228,6 @@ uint16_t lv_win_get_anim_time(const lv_obj_t * win);
  */
 lv_coord_t lv_win_get_width(lv_obj_t * win);
 
-
 /**
  * Get a style of a window
  * @param win pointer to a button object

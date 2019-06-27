@@ -562,7 +562,8 @@ static void lv_refr_vdb_flush(void)
     /*In double buffered mode wait until the other buffer is flushed before flushing the current
      * one*/
     if(lv_disp_is_double_buf(disp_refr)) {
-        while(vdb->flushing);
+        while(vdb->flushing)
+            ;
     }
 
     vdb->flushing = 1;
@@ -572,7 +573,9 @@ static void lv_refr_vdb_flush(void)
     if(disp->driver.flush_cb) disp->driver.flush_cb(&disp->driver, &vdb->area, vdb->buf_act);
 
     if(vdb->buf1 && vdb->buf2) {
-        if(vdb->buf_act == vdb->buf1) vdb->buf_act = vdb->buf2;
-        else vdb->buf_act = vdb->buf1;
+        if(vdb->buf_act == vdb->buf1)
+            vdb->buf_act = vdb->buf2;
+        else
+            vdb->buf_act = vdb->buf1;
     }
 }

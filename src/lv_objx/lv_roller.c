@@ -107,7 +107,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing roller*/
     else {
         lv_roller_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->mode                   = copy_ext->mode;
+        ext->mode                  = copy_ext->mode;
 
         lv_obj_t * scrl = lv_page_get_scrl(new_roller);
         lv_ddlist_open(new_roller, false);
@@ -321,9 +321,9 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
         rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - style->text.line_space / 2;
         if((font_h & 0x1) && (style->text.line_space & 0x1)) rect_area.y1--; /*Compensate the two rounding error*/
         rect_area.y2 = rect_area.y1 + font_h + style->text.line_space - 1;
-	lv_area_t roller_coords;
-	lv_obj_get_coords(roller, &roller_coords);
-	lv_obj_get_inner_coords(roller, &roller_coords);
+        lv_area_t roller_coords;
+        lv_obj_get_coords(roller, &roller_coords);
+        lv_obj_get_inner_coords(roller, &roller_coords);
 
         rect_area.x1 = roller_coords.x1;
         rect_area.x2 = roller_coords.x2;
@@ -607,7 +607,7 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
     const lv_font_t * font         = style_label->text.font;
     lv_coord_t font_h              = lv_font_get_line_height(font);
     lv_coord_t h                   = lv_obj_get_height(roller);
-    uint16_t anim_time = lv_roller_get_anim_time(roller);
+    uint16_t anim_time             = lv_roller_get_anim_time(roller);
 
     /* Normally the animtaion's `end_cb` sets correct position of the roller is infinite.
      * But without animations do it manually*/

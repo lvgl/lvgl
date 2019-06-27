@@ -213,7 +213,6 @@ void lv_img_decoder_init(void);
  */
 lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header);
 
-
 /**
  * Open an image.
  * Try the created image decoder one by one. Once one is able to open the image that decoder is save in `dsc`

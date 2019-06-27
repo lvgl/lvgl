@@ -108,12 +108,11 @@ static void basic_init(void)
     bg.body.border.color = lv_color_hex3(0x666);
     bg.body.shadow.color = LV_COLOR_SILVER;
 
-
     lv_style_copy(&scr, &bg);
     scr.body.padding.bottom = 0;
-    scr.body.padding.top = 0;
-    scr.body.padding.left = 0;
-    scr.body.padding.right = 0;
+    scr.body.padding.top    = 0;
+    scr.body.padding.left   = 0;
+    scr.body.padding.right  = 0;
 
     /*Panel*/
     lv_style_copy(&panel, &def);
@@ -798,12 +797,12 @@ static void win_init(void)
     win_header.body.border.color   = lv_color_hsv_to_rgb(_hue, 20, 80);
     win_header.text.color          = lv_color_hsv_to_rgb(_hue, 5, 100);
 
-    theme.style.win.bg           = &bg;
-    theme.style.win.sb           = &sb;
-    theme.style.win.header       = &win_header;
+    theme.style.win.bg      = &bg;
+    theme.style.win.sb      = &sb;
+    theme.style.win.header  = &win_header;
     theme.style.win.content = &lv_style_transp;
-    theme.style.win.btn.rel      = &btn_rel;
-    theme.style.win.btn.pr       = &btn_pr;
+    theme.style.win.btn.rel = &btn_rel;
+    theme.style.win.btn.pr  = &btn_pr;
 #endif
 }
 

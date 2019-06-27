@@ -241,7 +241,7 @@ uint16_t lv_sw_get_anim_time(const lv_obj_t * sw)
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     return ext->anim_time;
 #else
-    (void) sw;   /*Unused*/
+    (void)sw; /*Unused*/
     return 0;
 #endif
 }
@@ -335,8 +335,7 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
             if(lv_sw_get_state(sw)) {
                 lv_sw_off(sw, LV_ANIM_ON);
                 state = 0;
-            }
-            else {
+            } else {
                 lv_sw_on(sw, LV_ANIM_ON);
                 state = 1;
             }
@@ -351,7 +350,7 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
             if(v > LV_SW_MAX_VALUE / 2) {
                 lv_sw_on(sw, LV_ANIM_ON);
                 state = 1;
-            } else{
+            } else {
                 lv_sw_off(sw, LV_ANIM_ON);
                 state = 0;
             }
@@ -364,12 +363,12 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             lv_slider_set_value(sw, LV_SW_MAX_VALUE, true);
             state = 1;
-            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, &state);
+            res   = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, &state);
             if(res != LV_RES_OK) return res;
         } else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
             lv_slider_set_value(sw, 0, true);
             state = 0;
-            res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, &state);
+            res   = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, &state);
             if(res != LV_RES_OK) return res;
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {

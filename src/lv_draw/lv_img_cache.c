@@ -17,10 +17,10 @@
  *      DEFINES
  *********************/
 /*Decrement life with this value in every open*/
-#define LV_IMG_CACHE_AGING      1
+#define LV_IMG_CACHE_AGING 1
 
 /*Boost life by this factor (multiply time_to_open with this value)*/
-#define LV_IMG_CACHE_LIFE_GAIN  1
+#define LV_IMG_CACHE_LIFE_GAIN 1
 
 /*Don't let life to be greater than this limit because it would require a lot of time to
  * "die" from very high values */
@@ -84,7 +84,7 @@ lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * st
              * Image difficult to open should live longer to keep avoid frequent their recaching.
              * Therefore increase `life` with `time_to_open`*/
             cached_src = &cache[i];
-            cached_src->life += cached_src->dec_dsc.time_to_open * LV_IMG_CACHE_LIFE_GAIN ;
+            cached_src->life += cached_src->dec_dsc.time_to_open * LV_IMG_CACHE_LIFE_GAIN;
             if(cached_src->life > LV_IMG_CACHE_LIFE_LIMIT) cached_src->life = LV_IMG_CACHE_LIFE_LIMIT;
             LV_LOG_TRACE("image draw: image found in the cache");
             break;
@@ -111,15 +111,15 @@ lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * st
 
         /*Open the image and measure the time to open*/
         uint32_t t_start;
-        t_start = lv_tick_get();
+        t_start                          = lv_tick_get();
         cached_src->dec_dsc.time_to_open = 0;
-        lv_res_t open_res = lv_img_decoder_open(&cached_src->dec_dsc, src, style);
-        if(open_res ==LV_RES_INV) {
+        lv_res_t open_res                = lv_img_decoder_open(&cached_src->dec_dsc, src, style);
+        if(open_res == LV_RES_INV) {
             LV_LOG_WARN("Image draw cannot open the image resource");
             lv_img_decoder_close(&cached_src->dec_dsc);
             memset(&cached_src->dec_dsc, 0, sizeof(lv_img_decoder_dsc_t));
             memset(&cached_src, 0, sizeof(lv_img_cache_entry_t));
-            cached_src->life = INT32_MIN;       /*Make the empty entry very "weak" to force its use  */
+            cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its use  */
             return NULL;
         }
 

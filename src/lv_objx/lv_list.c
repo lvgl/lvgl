@@ -88,8 +88,8 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_rel;
     ext->styles_btn[LV_BTN_STATE_TGL_PR]  = &lv_style_btn_tgl_pr;
     ext->styles_btn[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
-    ext->single_mode = false;
-    ext->size        = 0;
+    ext->single_mode                      = false;
+    ext->size                             = 0;
 
 #if LV_USE_GROUP
     ext->last_sel     = NULL;

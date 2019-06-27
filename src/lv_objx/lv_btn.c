@@ -354,16 +354,16 @@ const lv_style_t * lv_btn_get_style(const lv_obj_t * btn, lv_btn_style_t type)
 {
     const lv_style_t * style = NULL;
     lv_btn_ext_t * ext       = lv_obj_get_ext_attr(btn);
-    lv_btn_state_t state = lv_btn_get_state(btn);
+    lv_btn_state_t state     = lv_btn_get_state(btn);
 
     /* If the style of the current state is asked then return object style.
      * If the button is focused then this style is updated by the group's
      * `style_mod_cb` function */
     if((type == LV_BTN_STYLE_REL && state == LV_BTN_STATE_REL) ||
-        (type == LV_BTN_STYLE_PR && state == LV_BTN_STATE_PR) ||
-        (type == LV_BTN_STYLE_TGL_REL && state == LV_BTN_STATE_TGL_REL) ||
-        (type == LV_BTN_STYLE_TGL_PR && state == LV_BTN_STATE_TGL_PR) ||
-        (type == LV_BTN_STYLE_INA && state == LV_BTN_STATE_INA)) {
+       (type == LV_BTN_STYLE_PR && state == LV_BTN_STATE_PR) ||
+       (type == LV_BTN_STYLE_TGL_REL && state == LV_BTN_STATE_TGL_REL) ||
+       (type == LV_BTN_STYLE_TGL_PR && state == LV_BTN_STATE_TGL_PR) ||
+       (type == LV_BTN_STYLE_INA && state == LV_BTN_STATE_INA)) {
 
         style = lv_obj_get_style(btn);
     } else {
@@ -614,7 +614,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
 
                 uint32_t state = 1;
-                res = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &state);
+                res            = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &state);
                 if(res != LV_RES_OK) return res;
             }
 
@@ -623,7 +623,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
 
                 uint32_t state = 0;
-                res = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &state);
+                res            = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &state);
                 if(res != LV_RES_OK) return res;
             }
         }

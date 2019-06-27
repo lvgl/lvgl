@@ -38,15 +38,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-
 enum {
     LV_ROLLER_MODE_NORMAL,
     LV_ROLLER_MODE_INIFINITE,
 };
 
 typedef uint8_t lv_roller_mode_t;
-
-
 
 /*Data of roller*/
 typedef struct

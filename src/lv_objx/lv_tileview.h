@@ -83,7 +83,6 @@ void lv_tileview_add_element(lv_obj_t * tileview, lv_obj_t * element);
  * Setter functions
  *====================*/
 
-
 /**
  * Set the valid position's indices. The scrolling will be possible only to these positions.
  * @param tileview pointer to a Tileview object
