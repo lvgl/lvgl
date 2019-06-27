@@ -64,12 +64,13 @@ typedef struct
 #endif
 } lv_list_ext_t;
 
+/** List styles. */
 enum {
-    LV_LIST_STYLE_BG,
-    LV_LIST_STYLE_SCRL,
-    LV_LIST_STYLE_SB,
-    LV_LIST_STYLE_EDGE_FLASH,
-    LV_LIST_STYLE_BTN_REL,
+    LV_LIST_STYLE_BG, /**< List background style */
+    LV_LIST_STYLE_SCRL, /**< List scrollable area style. */
+    LV_LIST_STYLE_SB, /**< List scrollbar style. */
+    LV_LIST_STYLE_EDGE_FLASH, /**< List edge flash style. */
+    LV_LIST_STYLE_BTN_REL, /**< Same meaning as the ordinary button styles. */
     LV_LIST_STYLE_BTN_PR,
     LV_LIST_STYLE_BTN_TGL_REL,
     LV_LIST_STYLE_BTN_TGL_PR,

@@ -41,15 +41,19 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/**
+ * Source of image. */
 enum {
-    LV_IMG_SRC_VARIABLE,
-    LV_IMG_SRC_FILE,
-    LV_IMG_SRC_SYMBOL,
-    LV_IMG_SRC_UNKNOWN,
+    LV_IMG_SRC_VARIABLE, /** Binary/C variable */
+    LV_IMG_SRC_FILE, /** File in filesystem */
+    LV_IMG_SRC_SYMBOL, /** Symbol (@ref lv_symbol_def.h) */
+    LV_IMG_SRC_UNKNOWN, /** Unknown source */
 };
 
 typedef uint8_t lv_img_src_t;
-
+/**
+ * LittlevGL image header
+ */
 typedef struct
 {
 
@@ -69,31 +73,31 @@ typedef struct
 enum {
     LV_IMG_CF_UNKNOWN = 0,
 
-    LV_IMG_CF_RAW,              /*Contains the file as it is. Needs custom decoder function*/
-    LV_IMG_CF_RAW_ALPHA,        /*Contains the file as it is. The image has alpha. Needs custom decoder
+    LV_IMG_CF_RAW,              /**< Contains the file as it is. Needs custom decoder function*/
+    LV_IMG_CF_RAW_ALPHA,        /**< Contains the file as it is. The image has alpha. Needs custom decoder
                                    function*/
-    LV_IMG_CF_RAW_CHROMA_KEYED, /*Contains the file as it is. The image is chroma keyed. Needs
+    LV_IMG_CF_RAW_CHROMA_KEYED, /**< Contains the file as it is. The image is chroma keyed. Needs
                                    custom decoder function*/
 
-    LV_IMG_CF_TRUE_COLOR,              /*Color format and depth should match with LV_COLOR settings*/
-    LV_IMG_CF_TRUE_COLOR_ALPHA,        /*Same as `LV_IMG_CF_TRUE_COLOR` but every pixel has an alpha byte*/
-    LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED, /*Same as `LV_IMG_CF_TRUE_COLOR` but LV_COLOR_TRANSP pixels
+    LV_IMG_CF_TRUE_COLOR,              /**< Color format and depth should match with LV_COLOR settings*/
+    LV_IMG_CF_TRUE_COLOR_ALPHA,        /**< Same as `LV_IMG_CF_TRUE_COLOR` but every pixel has an alpha byte*/
+    LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED, /**< Same as `LV_IMG_CF_TRUE_COLOR` but LV_COLOR_TRANSP pixels
                                           will be transparent*/
 
-    LV_IMG_CF_INDEXED_1BIT, /*Can have 2 different colors in a palette (always chroma keyed)*/
-    LV_IMG_CF_INDEXED_2BIT, /*Can have 4 different colors in a palette (always chroma keyed)*/
-    LV_IMG_CF_INDEXED_4BIT, /*Can have 16 different colors in a palette (always chroma keyed)*/
-    LV_IMG_CF_INDEXED_8BIT, /*Can have 256 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_1BIT, /**< Can have 2 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_2BIT, /**< Can have 4 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_4BIT, /**< Can have 16 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_8BIT, /**< Can have 256 different colors in a palette (always chroma keyed)*/
 
-    LV_IMG_CF_ALPHA_1BIT, /*Can have one color and it can be drawn or not*/
-    LV_IMG_CF_ALPHA_2BIT, /*Can have one color but 4 different alpha value*/
-    LV_IMG_CF_ALPHA_4BIT, /*Can have one color but 16 different alpha value*/
-    LV_IMG_CF_ALPHA_8BIT, /*Can have one color but 256 different alpha value*/
+    LV_IMG_CF_ALPHA_1BIT, /**< Can have one color and it can be drawn or not*/
+    LV_IMG_CF_ALPHA_2BIT, /**< Can have one color but 4 different alpha value*/
+    LV_IMG_CF_ALPHA_4BIT, /**< Can have one color but 16 different alpha value*/
+    LV_IMG_CF_ALPHA_8BIT, /**< Can have one color but 256 different alpha value*/
 };
 typedef uint8_t lv_img_cf_t;
 
-/* Image header it is compatible with
- * the result image converter utility*/
+/** Image header it is compatible with
+ * the result from image converter utility*/
 typedef struct
 {
     lv_img_header_t header;

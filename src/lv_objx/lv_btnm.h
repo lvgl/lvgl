@@ -35,14 +35,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/* Type to store button control bits (disabled, hidden etc.) */
+/** Type to store button control bits (disabled, hidden etc.) */
 enum {
-    LV_BTNM_CTRL_HIDDEN     = 0x0008,
-    LV_BTNM_CTRL_NO_REPEAT  = 0x0010,
-    LV_BTNM_CTRL_INACTIVE   = 0x0020,
-    LV_BTNM_CTRL_TGL_ENABLE = 0x0040,
-    LV_BTNM_CTRL_TGL_STATE  = 0x0080,
-    LV_BTNM_CTRL_CLICK_TRIG = 0x0100, /*1: Send LV_EVENT_SELECTED on CLICK, 0: Send LV_EVENT_SELECTED on PRESS*/
+    LV_BTNM_CTRL_HIDDEN     = 0x0008, /**< Button hidden */
+    LV_BTNM_CTRL_NO_REPEAT  = 0x0010, /**< Do not repeat press this button. */
+    LV_BTNM_CTRL_INACTIVE   = 0x0020, /**< Disable this button. */
+    LV_BTNM_CTRL_TGL_ENABLE = 0x0040, /**< Button *can* be toggled. */
+    LV_BTNM_CTRL_TGL_STATE  = 0x0080, /**< Button is currently toggled (e.g. checked). */
+    LV_BTNM_CTRL_CLICK_TRIG = 0x0100, /**< 1: Send LV_EVENT_SELECTED on CLICK, 0: Send LV_EVENT_SELECTED on PRESS*/
 };
 typedef uint16_t lv_btnm_ctrl_t;
 

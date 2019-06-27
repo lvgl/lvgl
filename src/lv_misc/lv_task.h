@@ -61,14 +61,14 @@ typedef uint8_t lv_task_prio_t;
  */
 typedef struct _lv_task_t
 {
-    uint32_t period;
-    uint32_t last_run;
-    lv_task_cb_t task_cb;
+    uint32_t period; /**< How often the task should run */
+    uint32_t last_run; /**< Last time the task ran */
+    lv_task_cb_t task_cb; /**< Task function */
 
-    void * user_data;
+    void * user_data; /**< Custom user data */
 
-    uint8_t prio : 3;
-    uint8_t once : 1;
+    uint8_t prio : 3; /**< Task priority */
+    uint8_t once : 1; /**< 1: one shot task */
 } lv_task_t;
 
 /**********************

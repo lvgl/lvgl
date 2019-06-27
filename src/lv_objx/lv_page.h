@@ -38,18 +38,18 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Scrollbar modes: shows when should the scrollbars be visible*/
+/** Scrollbar modes: shows when should the scrollbars be visible*/
 enum {
-    LV_SB_MODE_OFF    = 0x0, /*Never show scrollbars*/
-    LV_SB_MODE_ON     = 0x1, /*Always show scrollbars*/
-    LV_SB_MODE_DRAG   = 0x2, /*Show scrollbars when page is being dragged*/
-    LV_SB_MODE_AUTO   = 0x3, /*Show scrollbars when the scrollable container is large enough to be scrolled*/
-    LV_SB_MODE_HIDE   = 0x4, /*Hide the scroll bar temporally*/
-    LV_SB_MODE_UNHIDE = 0x5, /*Unhide the previously hidden scrollbar. Recover it's type too*/
+    LV_SB_MODE_OFF    = 0x0, /**< Never show scrollbars*/
+    LV_SB_MODE_ON     = 0x1, /**< Always show scrollbars*/
+    LV_SB_MODE_DRAG   = 0x2, /**< Show scrollbars when page is being dragged*/
+    LV_SB_MODE_AUTO   = 0x3, /**< Show scrollbars when the scrollable container is large enough to be scrolled*/
+    LV_SB_MODE_HIDE   = 0x4, /**< Hide the scroll bar temporally*/
+    LV_SB_MODE_UNHIDE = 0x5, /**< Unhide the previously hidden scrollbar. Recover it's type too*/
 };
 typedef uint8_t lv_sb_mode_t;
 
-/*Edges: describes the four edges of the page*/
+/** Edges: describes the four edges of the page*/
 enum {
     LV_PAGE_EDGE_LEFT =   0x1,
     LV_PAGE_EDGE_TOP =    0x2,

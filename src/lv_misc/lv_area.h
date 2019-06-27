@@ -33,12 +33,16 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/**
+ * Represents a point on the screen.
+ */
 typedef struct
 {
     lv_coord_t x;
     lv_coord_t y;
 } lv_point_t;
 
+/** Represents an area of the screen. */
 typedef struct
 {
     lv_coord_t x1;

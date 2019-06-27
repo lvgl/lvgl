@@ -41,6 +41,11 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/**
+ * Internal table cell format structure.
+ * 
+ * Use the `lv_table` APIs instead.
+ */
 typedef union
 {
     struct

@@ -46,11 +46,11 @@ typedef struct
     uint8_t knob_in : 1;           /*1: Draw the knob inside the bar*/
 } lv_slider_ext_t;
 
-/*Built-in styles of slider*/
+/** Built-in styles of slider*/
 enum {
-    LV_SLIDER_STYLE_BG,
-    LV_SLIDER_STYLE_INDIC,
-    LV_SLIDER_STYLE_KNOB,
+    LV_SLIDER_STYLE_BG, /** Slider background style. */
+    LV_SLIDER_STYLE_INDIC, /** Slider indicator (filled area) style. */
+    LV_SLIDER_STYLE_KNOB, /** Slider knob style. */
 };
 typedef uint8_t lv_slider_style_t;
 

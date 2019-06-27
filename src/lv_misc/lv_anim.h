@@ -31,7 +31,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Can be used to indicate if animations are enabled or disabled in a case*/
+/** Can be used to indicate if animations are enabled or disabled in a case*/
 enum {
  LV_ANIM_OFF,
  LV_ANIM_ON,
@@ -39,14 +39,14 @@ enum {
 
 typedef uint8_t lv_anim_enable_t;
 
-/*Type of the animated value*/
+/** Type of the animated value*/
 typedef lv_coord_t lv_anim_value_t;
 
 #if LV_USE_ANIMATION
 
 struct _lv_anim_t;
 
-/* Generic prototype of "animator" functions.
+/** Generic prototype of "animator" functions.
  * First parameter is the variable to animate.
  * Second parameter is the value to set.
  * Compatible with `lv_xxx_set_yyy(obj, value)` functions
@@ -54,38 +54,38 @@ struct _lv_anim_t;
  * it doesn't receive `lv_anim_t *` as its first argument*/
 typedef void (*lv_anim_exec_xcb_t)(void *, lv_anim_value_t);
 
-/* Same as `lv_anim_exec_cb_t` but receives `lv_anim_t *` as the first parameter.
+/** Same as `lv_anim_exec_xcb_t` but receives `lv_anim_t *` as the first parameter.
  * It's more consistent but less convenient. Might be used by binding generator functions.*/
 typedef void (*lv_anim_custom_exec_cb_t)(struct _lv_anim_t *, lv_anim_value_t);
 
-/*Get the current value during an animation*/
+/** Get the current value during an animation*/
 typedef lv_anim_value_t (*lv_anim_path_cb_t)(const struct _lv_anim_t *);
 
-/*Callback to call when the animation is ready*/
+/** Callback to call when the animation is ready*/
 typedef void (*lv_anim_ready_cb_t)(struct _lv_anim_t *);
 
-/*Describe an animation*/
+/** Describes an animation*/
 typedef struct _lv_anim_t
 {
-    void * var;                  /*Variable to animate*/
-    lv_anim_exec_xcb_t exec_cb;   /*Function to execute to animate*/
-    lv_anim_path_cb_t path_cb;   /*An array with the steps of animations*/
-    lv_anim_ready_cb_t ready_cb; /*Call it when the animation is ready*/
-    int32_t start;               /*Start value*/
-    int32_t end;                 /*End value*/
-    uint16_t time;               /*Animation time in ms*/
-    int16_t act_time;            /*Current time in animation. Set to negative to make delay.*/
-    uint16_t playback_pause;     /*Wait before play back*/
-    uint16_t repeat_pause;       /*Wait before repeat*/
+    void * var;                  /**<Variable to animate*/
+    lv_anim_exec_xcb_t exec_cb;   /**< Function to execute to animate*/
+    lv_anim_path_cb_t path_cb;   /**< Function to get the steps of animations*/
+    lv_anim_ready_cb_t ready_cb; /**< Call it when the animation is ready*/
+    int32_t start;               /**< Start value*/
+    int32_t end;                 /**< End value*/
+    uint16_t time;               /**< Animation time in ms*/
+    int16_t act_time;            /**< Current time in animation. Set to negative to make delay.*/
+    uint16_t playback_pause;     /**< Wait before play back*/
+    uint16_t repeat_pause;       /**< Wait before repeat*/
 #if LV_USE_USER_DATA
-    lv_anim_user_data_t user_data; /*Custom user data*/
+    lv_anim_user_data_t user_data; /**< Custom user data*/
 #endif
 
-    uint8_t playback : 1; /*When the animation is ready play it back*/
-    uint8_t repeat : 1;   /*Repeat the animation infinitely*/
+    uint8_t playback : 1; /**< When the animation is ready play it back*/
+    uint8_t repeat : 1;   /**< Repeat the animation infinitely*/
     /*Animation system use these - user shouldn't set*/
-    uint8_t playback_now : 1; /*Play back is in progress*/
-    uint32_t has_run : 1;     /*Indicates the animation has run in this round*/
+    uint8_t playback_now : 1; /**< Play back is in progress*/
+    uint32_t has_run : 1;     /**< Indicates the animation has run in this round*/
 } lv_anim_t;
 
 

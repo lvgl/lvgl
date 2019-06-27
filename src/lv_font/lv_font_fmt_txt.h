@@ -32,19 +32,20 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Describe a glyph*/
+/** This describes a glyph. */
 typedef struct
 {
-    uint32_t bitmap_index : 20;     /* Start index of the bitmap. A font can be max 1 MB. */
-    uint32_t adv_w :12;             /*Draw the next glyph after this width. 12.4 format (real_value * 16 is stored). */
+    uint32_t bitmap_index : 20;     /**< Start index of the bitmap. A font can be max 1 MB. */
+    uint32_t adv_w :12;             /**< Draw the next glyph after this width. 12.4 format (real_value * 16 is stored). */
 
-    uint8_t box_w;                  /*Width of the glyph's bounding box*/
-    uint8_t box_h;                  /*Height of the glyph's bounding box*/
-    int8_t ofs_x;                   /*x offset of the bounding box*/
-    uint8_t ofs_y;                  /*y offset of the bounding box. Measured from the top of the line*/
+    uint8_t box_w;                  /**< Width of the glyph's bounding box*/
+    uint8_t box_h;                  /**< Height of the glyph's bounding box*/
+    int8_t ofs_x;                   /**< x offset of the bounding box*/
+    uint8_t ofs_y;                  /**< y offset of the bounding box. Measured from the top of the line*/
 }lv_font_fmt_txt_glyph_dsc_t;
 
 
+/** Format of font character map. */
 typedef enum {
     LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY,
     LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL,
@@ -58,14 +59,14 @@ typedef enum {
  * See https://github.com/littlevgl/lv_font_conv/blob/master/doc/font_spec.md
  */
 typedef struct {
-    /* First Unicode character for this range */
+    /** First Unicode character for this range */
     uint32_t range_start;
 
-    /* Number of Unicode characters related to this range.
+    /** Number of Unicode characters related to this range.
      * Last Unicode character = range_start + range_length - 1*/
     uint16_t range_length;
 
-    /* First glyph ID (array index of `glyph_dsc`) for this range */
+    /** First glyph ID (array index of `glyph_dsc`) for this range */
     uint16_t glyph_id_start;
 
     /*
@@ -97,19 +98,19 @@ typedef struct {
 
     uint16_t * unicode_list;
 
-    /* if(type == LV_FONT_FMT_TXT_CMAP_FORMAT0_...) it's `uint8_t *`
+    /** if(type == LV_FONT_FMT_TXT_CMAP_FORMAT0_...) it's `uint8_t *`
      * if(type == LV_FONT_FMT_TXT_CMAP_SPARSE_...)  it's `uint16_t *`
      */
     const void * glyph_id_ofs_list;
 
-    /*Length of `unicode_list` and/or `glyph_id_ofs_list`*/
+    /** Length of `unicode_list` and/or `glyph_id_ofs_list`*/
     uint16_t list_length;
 
-    /*Type of this character map*/
+    /** Type of this character map*/
     lv_font_fmt_txt_cmap_type_t type   :2;
 }lv_font_fmt_txt_cmap_t;
 
-/*A simple mapping of kern values from pairs*/
+/** A simple mapping of kern values from pairs*/
 typedef struct {
     /*To get a kern value of two code points:
        1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_fmt_txt_cmap_t
@@ -124,7 +125,7 @@ typedef struct {
     uint32_t glyph_ids_size :2;     /*0: `glyph_ids` is stored as `uint8_t`; 1: as `uint16_t`*/
 }lv_font_fmt_txt_kern_pair_t;
 
-/*More complex but more optimal class based kern value storage*/
+/** More complex but more optimal class based kern value storage*/
 typedef struct {
     /*To get a kern value of two code points:
           1. Get the `glyph_id_left` and `glyph_id_right` from `lv_font_fmt_txt_cmap_t
@@ -142,7 +143,7 @@ typedef struct {
 }lv_font_fmt_txt_kern_classes_t;
 
 
-/*Bitmap formats*/
+/** Bitmap formats*/
 typedef enum {
     LV_FONT_FMT_TXT_PLAIN      = 0,
     LV_FONT_FMT_TXT_COMPRESSED = 1,

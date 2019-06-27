@@ -42,8 +42,8 @@ typedef struct
 {
     lv_slider_ext_t slider; /*Ext. of ancestor*/
     /*New data for this type */
-    const lv_style_t * style_knob_off; /*Style of the knob when the switch is OFF*/
-    const lv_style_t * style_knob_on;  /*Style of the knob when the switch is ON (NULL to use the same as OFF)*/
+    const lv_style_t * style_knob_off; /**< Style of the knob when the switch is OFF*/
+    const lv_style_t * style_knob_on;  /**< Style of the knob when the switch is ON (NULL to use the same as OFF)*/
     lv_coord_t start_x;
     uint8_t changed : 1; /*Indicates the switch state explicitly changed by drag*/
     uint8_t slided : 1;
@@ -52,11 +52,14 @@ typedef struct
 #endif
 } lv_sw_ext_t;
 
+/**
+ * Switch styles.
+ */
 enum {
-    LV_SW_STYLE_BG,
-    LV_SW_STYLE_INDIC,
-    LV_SW_STYLE_KNOB_OFF,
-    LV_SW_STYLE_KNOB_ON,
+    LV_SW_STYLE_BG, /**< Switch background. */
+    LV_SW_STYLE_INDIC, /**< Switch fill area. */
+    LV_SW_STYLE_KNOB_OFF, /**< Switch knob (when off). */
+    LV_SW_STYLE_KNOB_ON, /**< Switch knob (when on). */
 };
 typedef uint8_t lv_sw_style_t;
 

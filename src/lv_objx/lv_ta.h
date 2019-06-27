@@ -43,13 +43,14 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/** Style of text area's cursor. */
 enum {
-    LV_CURSOR_NONE,
-    LV_CURSOR_LINE,
-    LV_CURSOR_BLOCK,
-    LV_CURSOR_OUTLINE,
-    LV_CURSOR_UNDERLINE,
-    LV_CURSOR_HIDDEN = 0x08, /*Or it to any value to hide the cursor temporally*/
+    LV_CURSOR_NONE, /**< No cursor */
+    LV_CURSOR_LINE, /**< Vertical line */
+    LV_CURSOR_BLOCK, /**< Rectangle */
+    LV_CURSOR_OUTLINE, /**< Outline around character */
+    LV_CURSOR_UNDERLINE, /**< Horizontal line under character */
+    LV_CURSOR_HIDDEN = 0x08, /**< This flag can be ORed to any of the other values to temporarily hide the cursor */
 };
 typedef uint8_t lv_cursor_type_t;
 
@@ -88,12 +89,13 @@ typedef struct
     uint8_t one_line : 1; /*One line mode (ignore line breaks)*/
 } lv_ta_ext_t;
 
+/** Possible text areas tyles. */
 enum {
-    LV_TA_STYLE_BG,
-    LV_TA_STYLE_SB,
-    LV_TA_STYLE_CURSOR,
-    LV_TA_STYLE_EDGE_FLASH,
-    LV_TA_STYLE_PLACEHOLDER,
+    LV_TA_STYLE_BG, /**< Text area background style */
+    LV_TA_STYLE_SB, /**< Scrollbar style */
+    LV_TA_STYLE_CURSOR, /**< Cursor style */
+    LV_TA_STYLE_EDGE_FLASH, /**< Edge flash style */
+    LV_TA_STYLE_PLACEHOLDER, /**< Placeholder style */
 };
 typedef uint8_t lv_ta_style_t;
 

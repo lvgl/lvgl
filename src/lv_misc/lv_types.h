@@ -22,6 +22,9 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/**
+ * LittlevGL error codes.
+ */
 enum {
     LV_RES_INV = 0, /*Typically indicates that the object is deleted (become invalid) in the action
                        function or an operation was failed*/
