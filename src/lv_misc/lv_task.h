@@ -52,7 +52,7 @@ enum {
     LV_TASK_PRIO_MID,
     LV_TASK_PRIO_HIGH,
     LV_TASK_PRIO_HIGHEST,
-    LV_TASK_PRIO_NUM,
+    _LV_TASK_PRIO_NUM,
 };
 typedef uint8_t lv_task_prio_t;
 
