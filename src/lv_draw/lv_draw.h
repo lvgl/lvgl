@@ -35,6 +35,18 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Give a buffer with the given to use during drawing.
+ * Be careful to not use the buffer while other processes are using it.
+ * @param size the required size
+ */
+void * lv_draw_get_buf(uint32_t size);
+
+/**
+ * Free the draw buffer
+ */
+void lv_draw_free_buf(void);
+
 #if LV_ANTIALIAS
 
 /**

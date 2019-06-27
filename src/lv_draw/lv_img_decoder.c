@@ -568,12 +568,9 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
 
 #if LV_USE_FILESYSTEM
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
-#if LV_COMPILER_VLA_SUPPORTED
-    uint8_t fs_buf[w];
-#else
     uint8_t fs_buf[LV_HOR_RES_MAX];
 #endif
-#endif
+
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = dsc->src;
@@ -658,11 +655,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
 
 #if LV_USE_FILESYSTEM
-#if LV_COMPILER_VLA_SUPPORTED
-    uint8_t fs_buf[w];
-#else
     uint8_t fs_buf[LV_HOR_RES_MAX];
-#endif
 #endif
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
