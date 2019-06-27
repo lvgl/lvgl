@@ -47,7 +47,7 @@ static lv_font_t * _font;
 
 static void basic_init(void)
 {
-    static lv_style_t bg, panel;
+    static lv_style_t bg, panel, scr;
 
     lv_style_copy(&def, &lv_style_plain); /*Initialize the default style*/
     def.text.font   = _font;
@@ -57,6 +57,12 @@ static void basic_init(void)
     bg.body.main_color = lv_color_hex(0xf0f0f0);
     bg.body.grad_color = bg.body.main_color;
     bg.body.radius     = 0;
+
+    lv_style_copy(&scr, &bg);
+    scr.body.padding.bottom = 0;
+    scr.body.padding.top    = 0;
+    scr.body.padding.left   = 0;
+    scr.body.padding.right  = 0;
 
     lv_style_copy(&panel, &def);
     panel.body.radius         = DEF_RADIUS;
@@ -84,6 +90,7 @@ static void basic_init(void)
     sb.body.padding.bottom = LV_DPI / 25;
 
     theme.style.bg    = &bg;
+    theme.style.scr   = &scr;
     theme.style.panel = &panel;
 }
 
@@ -785,12 +792,12 @@ static void win_init(void)
     pr.text.color        = lv_color_hex3(0x111);
     pr.image.color       = lv_color_hex3(0x111);
 
-    theme.style.win.bg           = theme.style.panel;
-    theme.style.win.sb           = &sb;
-    theme.style.win.header       = &header;
+    theme.style.win.bg      = theme.style.panel;
+    theme.style.win.sb      = &sb;
+    theme.style.win.header  = &header;
     theme.style.win.content = &lv_style_transp;
-    theme.style.win.btn.rel      = &lv_style_transp;
-    theme.style.win.btn.pr       = &pr;
+    theme.style.win.btn.rel = &lv_style_transp;
+    theme.style.win.btn.pr  = &pr;
 #endif
 }
 

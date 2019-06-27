@@ -309,16 +309,14 @@ void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
  */
 void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color_t c)
 {
-    if((dsc->header.cf == LV_IMG_CF_ALPHA_1BIT && id > 1) ||
-       (dsc->header.cf == LV_IMG_CF_ALPHA_2BIT && id > 3) ||
-       (dsc->header.cf == LV_IMG_CF_ALPHA_4BIT && id > 15) ||
-       (dsc->header.cf == LV_IMG_CF_ALPHA_8BIT)) {
+    if((dsc->header.cf == LV_IMG_CF_ALPHA_1BIT && id > 1) || (dsc->header.cf == LV_IMG_CF_ALPHA_2BIT && id > 3) ||
+       (dsc->header.cf == LV_IMG_CF_ALPHA_4BIT && id > 15) || (dsc->header.cf == LV_IMG_CF_ALPHA_8BIT)) {
         LV_LOG_WARN("lv_img_buf_set_px_alpha: invalid 'id'");
         return;
     }
 
     lv_color32_t c32;
-    c32.full       = lv_color_to32(c);
+    c32.full      = lv_color_to32(c);
     uint8_t * buf = (uint8_t *)dsc->data;
     memcpy(&buf[id * sizeof(c32)], &c32, sizeof(c32));
 }
@@ -446,11 +444,9 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
     lv_opa_t opa =
         opa_scale == LV_OPA_COVER ? style->image.opa : (uint16_t)((uint16_t)style->image.opa * opa_scale) >> 8;
 
-
     lv_img_cache_entry_t * cdsc = lv_img_cache_open(src, style);
 
     if(cdsc == NULL) return LV_RES_INV;
-
 
     bool chroma_keyed = lv_img_color_format_is_chroma_keyed(cdsc->dec_dsc.header.cf);
     bool alpha_byte   = lv_img_color_format_has_alpha(cdsc->dec_dsc.header.cf);
@@ -458,22 +454,21 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
     if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
         lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, cdsc->dec_dsc.error_msg, LV_TXT_FLAG_NONE, NULL, -1, -1, NULL);
+        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, cdsc->dec_dsc.error_msg, LV_TXT_FLAG_NONE, NULL, -1,
+                      -1, NULL);
     }
     /* The decoder open could open the image and gave the entire uncompressed image.
      * Just draw it!*/
     else if(cdsc->dec_dsc.img_data) {
-        lv_draw_map(coords, mask, cdsc->dec_dsc.img_data, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
+        lv_draw_map(coords, mask, cdsc->dec_dsc.img_data, opa, chroma_keyed, alpha_byte, style->image.color,
+                    style->image.intense);
     }
     /* The whole uncompressed image is not available. Try to read it line-by-line*/
     else {
         lv_coord_t width = lv_area_get_width(&mask_com);
 
-#if LV_COMPILER_VLA_SUPPORTED
-        uint8_t buf[(lv_area_get_width(&mask_com) * ((LV_COLOR_DEPTH >> 3) + 1))];
-#else
-        uint8_t buf[LV_HOR_RES_MAX * ((LV_COLOR_DEPTH >> 3) + 1)]; /*+1 because of the possible alpha byte*/
-#endif
+        uint8_t  * buf = lv_draw_get_buf(lv_area_get_width(&mask_com) * ((LV_COLOR_DEPTH >> 3) + 1));  /*+1 because of the possible alpha byte*/
+
         lv_area_t line;
         lv_area_copy(&line, &mask_com);
         lv_area_set_height(&line, 1);

@@ -361,7 +361,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 
     if(anim == LV_ANIM_OFF || lv_tabview_get_anim_time(tabview) == 0) {
         lv_obj_set_x(ext->content, cont_x);
-    } 
+    }
 #if LV_USE_ANIMATION
     else {
         lv_anim_t a;
@@ -400,7 +400,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     }
 
 #if LV_USE_ANIMATION
-    if(anim == LV_ANIM_OFF || ext->anim_time == 0) 
+    if(anim == LV_ANIM_OFF || ext->anim_time == 0)
 #endif
     {
         switch(ext->btns_pos) {
@@ -409,7 +409,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
             case LV_TABVIEW_BTNS_POS_LEFT:
             case LV_TABVIEW_BTNS_POS_RIGHT: lv_obj_set_y(ext->indic, indic_pos); break;
         }
-    } 
+    }
 #if LV_USE_ANIMATION
     else {
         lv_anim_t a;
@@ -691,6 +691,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
             tabview_realign(tabview);
         }
     } else if(sign == LV_SIGNAL_RELEASED) {
+#if LV_USE_GROUP
         /*If released by a KEYPAD or ENCODER then really the tab buttons should be released.
          * So simulate a CLICK on the tab buttons*/
         lv_indev_t * indev         = lv_indev_get_act();
@@ -699,6 +700,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
            (indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(tabview)))) {
             lv_event_send(ext->btns, LV_EVENT_CLICKED, lv_event_get_data());
         }
+#endif
     } else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROL) {
         /* The button matrix is not in a group (the tab view is in it) but it should handle the
          * group signals. So propagate the related signals to the button matrix manually*/
@@ -956,7 +958,6 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
     if(id_prev != id_new) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
 
     if(res != LV_RES_OK) return;
-
 }
 
 /**

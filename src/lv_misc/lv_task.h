@@ -96,7 +96,6 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void);
  */
 lv_task_t * lv_task_create_basic(void);
 
-
 /**
  * Create a new lv_task
  * @param task_xcb a callback which is the task itself. It will be called periodically.

@@ -52,9 +52,9 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    const lv_style_t * styles_btn[LV_BTN_STATE_NUM]; /*Styles of the list element buttons*/
-    const lv_style_t * style_img;                    /*Style of the list element images on buttons*/
-    uint16_t size;                                   /*the number of items(buttons) in the list*/
+    const lv_style_t * styles_btn[_LV_BTN_STATE_NUM]; /*Styles of the list element buttons*/
+    const lv_style_t * style_img;                     /*Style of the list element images on buttons*/
+    uint16_t size;                                    /*the number of items(buttons) in the list*/
 
     uint8_t single_mode : 1; /* whether single selected mode is enabled */
 

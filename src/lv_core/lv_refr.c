@@ -14,7 +14,7 @@
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_gc.h"
-#include "../lv_draw/lv_draw_basic.h"
+#include "../lv_draw/lv_draw.h"
 
 #if defined(LV_GC_INCLUDE)
 #include LV_GC_INCLUDE
@@ -216,6 +216,8 @@ void lv_disp_refr_task(lv_task_t * task)
             disp_refr->driver.monitor_cb(&disp_refr->driver, lv_tick_elaps(start), px_num);
         }
     }
+
+    lv_draw_free_buf();
 
     LV_LOG_TRACE("lv_refr_task: ready");
 }
@@ -562,7 +564,8 @@ static void lv_refr_vdb_flush(void)
     /*In double buffered mode wait until the other buffer is flushed before flushing the current
      * one*/
     if(lv_disp_is_double_buf(disp_refr)) {
-        while(vdb->flushing);
+        while(vdb->flushing)
+            ;
     }
 
     vdb->flushing = 1;
@@ -572,7 +575,9 @@ static void lv_refr_vdb_flush(void)
     if(disp->driver.flush_cb) disp->driver.flush_cb(&disp->driver, &vdb->area, vdb->buf_act);
 
     if(vdb->buf1 && vdb->buf2) {
-        if(vdb->buf_act == vdb->buf1) vdb->buf_act = vdb->buf2;
-        else vdb->buf_act = vdb->buf1;
+        if(vdb->buf_act == vdb->buf1)
+            vdb->buf_act = vdb->buf2;
+        else
+            vdb->buf_act = vdb->buf1;
     }
 }

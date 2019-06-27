@@ -565,7 +565,7 @@ static void style_mod_def(lv_group_t * group, lv_style_t * style)
 
     /*Add some recolor to the images*/
     if(style->image.intense < LV_OPA_MIN) {
-        style->image.color = LV_COLOR_ORANGE;
+        style->image.color   = LV_COLOR_ORANGE;
         style->image.intense = LV_OPA_40;
     }
 #else
@@ -601,7 +601,7 @@ static void style_mod_edit_def(lv_group_t * group, lv_style_t * style)
 
     /*Add some recolor to the images*/
     if(style->image.intense < LV_OPA_MIN) {
-        style->image.color = LV_COLOR_GREEN;
+        style->image.color   = LV_COLOR_GREEN;
         style->image.intense = LV_OPA_40;
     }
 

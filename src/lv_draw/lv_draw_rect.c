@@ -1168,16 +1168,23 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
 
     radius += aa;
 
-#if LV_COMPILER_VLA_SUPPORTED
-    lv_coord_t curve_x[radius + swidth + 1]; /*Stores the 'x' coordinates of a quarter circle.*/
-#else
-#if LV_HOR_RES_MAX > LV_VER_RES_MAX
-    lv_coord_t curve_x[LV_HOR_RES_MAX];
-#else
-    lv_coord_t curve_x[LV_VER_RES_MAX];
-#endif
-#endif
-    memset(curve_x, 0, sizeof(curve_x));
+    /*Allocate a draw buffer the buffer required to draw the shadow*/
+    int16_t filter_width = 2 * swidth + 1;
+    uint32_t curve_x_size = ((radius + swidth + 1) + 3) & ~0x3; /*Round to 4*/
+    curve_x_size *= sizeof(lv_coord_t);
+    uint32_t line_1d_blur_size = (filter_width + 3) & ~0x3;     /*Round to 4*/
+    line_1d_blur_size *= sizeof(uint32_t);
+    uint32_t line_2d_blur_size = ((radius + swidth + 1) + 3) & ~0x3;     /*Round to 4*/
+    line_2d_blur_size *= sizeof(lv_opa_t);
+
+    uint8_t * draw_buf = lv_draw_get_buf(curve_x_size + line_1d_blur_size + line_2d_blur_size);
+
+    /*Divide the draw buffer*/
+    lv_coord_t  * curve_x = (lv_coord_t *)&draw_buf[0]; /*Stores the 'x' coordinates of a quarter circle.*/
+    uint32_t * line_1d_blur = (uint32_t *)&draw_buf[curve_x_size];
+    lv_opa_t * line_2d_blur = (lv_opa_t *)&draw_buf[curve_x_size + line_1d_blur_size];
+
+    memset(curve_x, 0, curve_x_size);
     lv_point_t circ;
     lv_coord_t circ_tmp;
     lv_circ_init(&circ, &circ_tmp, radius);
@@ -1187,17 +1194,6 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
         lv_circ_next(&circ, &circ_tmp);
     }
     int16_t line;
-
-    int16_t filter_width = 2 * swidth + 1;
-#if LV_COMPILER_VLA_SUPPORTED
-    uint32_t line_1d_blur[filter_width];
-#else
-#if LV_HOR_RES_MAX > LV_VER_RES_MAX
-    uint32_t line_1d_blur[LV_HOR_RES_MAX];
-#else
-    uint32_t line_1d_blur[LV_VER_RES_MAX];
-#endif
-#endif
     /*1D Blur horizontally*/
     lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.opa : (uint16_t)((uint16_t)style->body.opa * opa_scale) >> 8;
     for(line = 0; line < filter_width; line++) {
@@ -1206,15 +1202,6 @@ static void lv_draw_shadow_full(const lv_area_t * coords, const lv_area_t * mask
     }
 
     uint16_t col;
-#if LV_COMPILER_VLA_SUPPORTED
-    lv_opa_t line_2d_blur[radius + swidth + 1];
-#else
-#if LV_HOR_RES_MAX > LV_VER_RES_MAX
-    lv_opa_t line_2d_blur[LV_HOR_RES_MAX];
-#else
-    lv_opa_t line_2d_blur[LV_VER_RES_MAX];
-#endif
-#endif
 
     lv_point_t point_rt;
     lv_point_t point_rb;
@@ -1332,15 +1319,18 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
     radius = lv_draw_cont_radius_corr(radius, width, height);
     radius += aa * SHADOW_BOTTOM_AA_EXTRA_RADIUS;
     swidth += aa;
-#if LV_COMPILER_VLA_SUPPORTED
-    lv_coord_t curve_x[radius + 1]; /*Stores the 'x' coordinates of a quarter circle.*/
-#else
-#if LV_HOR_RES_MAX > LV_VER_RES_MAX
-    lv_coord_t curve_x[LV_HOR_RES_MAX];
-#else
-    lv_coord_t curve_x[LV_VER_RES_MAX];
-#endif
-#endif
+
+    uint32_t curve_x_size = ((radius + 1) + 3) & ~0x3; /*Round to 4*/
+    curve_x_size *= sizeof(lv_coord_t);
+    lv_opa_t line_1d_blur_size = (swidth + 3) & ~0x3;     /*Round to 4*/
+    line_1d_blur_size *= sizeof(lv_opa_t);
+
+    uint8_t * draw_buf = lv_draw_get_buf(curve_x_size + line_1d_blur_size);
+
+    /*Divide the draw buffer*/
+    lv_coord_t  * curve_x = (lv_coord_t *)&draw_buf[0]; /*Stores the 'x' coordinates of a quarter circle.*/
+    lv_opa_t * line_1d_blur = (lv_opa_t *)&draw_buf[curve_x_size];
+
     lv_point_t circ;
     lv_coord_t circ_tmp;
     lv_circ_init(&circ, &circ_tmp, radius);
@@ -1351,15 +1341,6 @@ static void lv_draw_shadow_bottom(const lv_area_t * coords, const lv_area_t * ma
     }
 
     int16_t col;
-#if LV_COMPILER_VLA_SUPPORTED
-    lv_opa_t line_1d_blur[swidth];
-#else
-#if LV_HOR_RES_MAX > LV_VER_RES_MAX
-    lv_opa_t line_1d_blur[LV_HOR_RES_MAX];
-#else
-    lv_opa_t line_1d_blur[LV_VER_RES_MAX];
-#endif
-#endif
 
     lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.opa : (uint16_t)((uint16_t)style->body.opa * opa_scale) >> 8;
     for(col = 0; col < swidth; col++) {

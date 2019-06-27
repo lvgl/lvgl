@@ -328,7 +328,8 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
         }
         buf->type[i] = "lv_spinbox";
     } else if(sign == LV_SIGNAL_RELEASED) {
-        /*If released with an ENCODER then move to the nexxt digit*/
+        /*If released with an ENCODER then move to the next digit*/
+#if LV_USE_GROUP
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
             if(lv_group_get_editing(lv_obj_get_group(spinbox))) {
@@ -347,6 +348,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
                 }
             }
         }
+#endif
     } else if(sign == LV_SIGNAL_CONTROL) {
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 

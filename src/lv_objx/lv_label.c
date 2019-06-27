@@ -23,7 +23,8 @@
 #endif
 
 #define LV_LABEL_DOT_END_INV 0xFFFF
-#define LV_LABEL_HINT_HEIGHT_LIMIT	1024		/*Enable "hint" to buffer info about labels larger than this. (Speed up their drawing)*/
+#define LV_LABEL_HINT_HEIGHT_LIMIT                                                                                     \
+    1024 /*Enable "hint" to buffer info about labels larger than this. (Speed up their drawing)*/
 
 /**********************
  *      TYPEDEFS
@@ -97,8 +98,8 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->offset.y = 0;
 
     ext->hint.line_start = -1;
-    ext->hint.coord_y = 0;
-    ext->hint.y = 0;
+    ext->hint.coord_y    = 0;
+    ext->hint.y          = 0;
 
 #if LV_LABEL_TEXT_SEL
     ext->txt_sel_start = LV_LABEL_TEXT_SEL_OFF;
@@ -358,8 +359,8 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
         lv_label_refr_text(label);
     }
 #else
-    (void) label;   /*Unused*/
-    (void) anim_speed;   /*Unused*/
+    (void)label;      /*Unused*/
+    (void)anim_speed; /*Unused*/
 #endif
 }
 
@@ -452,7 +453,7 @@ uint16_t lv_label_get_anim_speed(const lv_obj_t * label)
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     return ext->anim_speed;
 #else
-    (void) label;   /*Unused*/
+    (void)label;      /*Unused*/
     return 0;
 #endif
 }
@@ -690,9 +691,9 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
 
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
 
-    uint32_t i         = line_start;
-    uint32_t i_current = i;
-    uint32_t letter = '\0';
+    uint32_t i           = line_start;
+    uint32_t i_current   = i;
+    uint32_t letter      = '\0';
     uint32_t letter_next = '\0';
 
     if(new_line_start > 0) {
@@ -854,7 +855,8 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         }
 
         lv_draw_label_hint_t * hint = &ext->hint;
-        if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC || lv_obj_get_height(label) < LV_LABEL_HINT_HEIGHT_LIMIT) hint = NULL;
+        if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC || lv_obj_get_height(label) < LV_LABEL_HINT_HEIGHT_LIMIT)
+            hint = NULL;
 
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset,
                       lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), hint);
@@ -952,7 +954,7 @@ static void lv_label_refr_text(lv_obj_t * label)
 
     if(ext->text == NULL) return;
 
-    ext->hint.line_start = -1;	/*The hint is invalid if the text changes*/
+    ext->hint.line_start = -1; /*The hint is invalid if the text changes*/
 
     lv_coord_t max_w         = lv_obj_get_width(label);
     const lv_style_t * style = lv_obj_get_style(label);

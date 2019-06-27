@@ -33,8 +33,8 @@ extern "C" {
 
 /** Can be used to indicate if animations are enabled or disabled in a case*/
 enum {
- LV_ANIM_OFF,
- LV_ANIM_ON,
+    LV_ANIM_OFF,
+    LV_ANIM_ON,
 };
 
 typedef uint8_t lv_anim_enable_t;

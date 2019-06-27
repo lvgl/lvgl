@@ -126,7 +126,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const
     dsc->src_type  = lv_img_src_get_type(src);
     dsc->user_data = NULL;
 
-    lv_res_t res;
+    lv_res_t res = LV_RES_INV;
 
     lv_img_decoder_t * d;
     LV_LL_READ(LV_GC_ROOT(_lv_img_defoder_ll), d)
@@ -138,8 +138,8 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const
         if(res != LV_RES_OK) continue;
 
         dsc->error_msg = NULL;
-        dsc->img_data = NULL;
-        dsc->decoder = d;
+        dsc->img_data  = NULL;
+        dsc->decoder   = d;
 
         res = d->open_cb(d, dsc);
 
@@ -568,12 +568,9 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
 
 #if LV_USE_FILESYSTEM
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
-#if LV_COMPILER_VLA_SUPPORTED
-    uint8_t fs_buf[w];
-#else
     uint8_t fs_buf[LV_HOR_RES_MAX];
 #endif
-#endif
+
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
         const lv_img_dsc_t * img_dsc = dsc->src;
@@ -658,11 +655,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
 
 #if LV_USE_FILESYSTEM
-#if LV_COMPILER_VLA_SUPPORTED
-    uint8_t fs_buf[w];
-#else
     uint8_t fs_buf[LV_HOR_RES_MAX];
-#endif
 #endif
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {

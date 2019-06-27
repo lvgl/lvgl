@@ -40,6 +40,7 @@ typedef struct
 {
     struct
     {
+        lv_style_t * scr;
         lv_style_t * bg;
         lv_style_t * panel;
 

@@ -190,10 +190,8 @@ typedef struct _lv_img_decoder_dsc
      * Can be set in `open` function or set NULL. */
     const char * error_msg;
 
-#if LV_USE_USER_DATA
     /**Store any custom data here is required*/
     void * user_data;
-#endif
 } lv_img_decoder_dsc_t;
 
 /**********************
@@ -216,7 +214,6 @@ void lv_img_decoder_init(void);
  * @return LV_RES_OK: success; LV_RES_INV: wasn't able to get info about the image
  */
 lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header);
-
 
 /**
  * Open an image.
@@ -289,36 +286,6 @@ void lv_img_decoder_set_read_line_cb(lv_img_decoder_t * decoder, lv_img_decoder_
  * @param close_cb a function to close a decoding session
  */
 void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_close_f_t close_cb);
-
-/**
- * Set a custom user data in an image decoder.
- * @param decoder pointer to an image decoder
- * @param user_data the user data to set
- */
-static inline void lv_img_decoder_set_user_data(lv_img_decoder_t * decoder, lv_img_decoder_t user_data)
-{
-    memcpy(&decoder->user_data, &user_data, sizeof(user_data));
-}
-
-/**
- * Get the user data
- * @param decoder pointer to an image decoder
- * @return the user data
- */
-static inline lv_img_decoder_user_data_t lv_img_decoder_get_user_data(lv_img_decoder_t * decoder)
-{
-    return decoder->user_data;
-}
-
-/**
- * Get a pointer to the user data
- * @param decoder pointer to an image decoder
- * @return pointer to the user data
- */
-static inline lv_img_decoder_user_data_t * lv_img_decoder_get_user_data_ptr(lv_img_decoder_t * decoder)
-{
-    return &decoder->user_data;
-}
 
 /**********************
  *      MACROS

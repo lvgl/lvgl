@@ -100,7 +100,7 @@ void lv_line_set_y_invert(lv_obj_t * line, bool en);
  */
 static inline void lv_line_set_style(lv_obj_t * line, lv_line_style_t type, const lv_style_t * style)
 {
-    (void) type;    /*Unused*/
+    (void)type; /*Unused*/
     lv_obj_set_style(line, style);
 }
 
@@ -130,7 +130,7 @@ bool lv_line_get_y_invert(const lv_obj_t * line);
  */
 static inline const lv_style_t * lv_line_get_style(const lv_obj_t * line, lv_line_style_t type)
 {
-    (void) type;    /*Unused*/
+    (void)type; /*Unused*/
     return lv_obj_get_style(line);
 }
 

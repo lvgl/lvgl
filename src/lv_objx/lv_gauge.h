@@ -128,7 +128,7 @@ void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint
  *  */
 static inline void lv_gauge_set_style(lv_obj_t * gauge, lv_gauge_style_t type, lv_style_t * style)
 {
-    (void) type; /*Unused*/
+    (void)type; /*Unused*/
     lv_obj_set_style(gauge, style);
 }
 
@@ -216,7 +216,7 @@ static inline uint16_t lv_gauge_get_scale_angle(const lv_obj_t * gauge)
  */
 static inline const lv_style_t * lv_gauge_get_style(const lv_obj_t * gauge, lv_gauge_style_t type)
 {
-    (void) type; /*Unused*/
+    (void)type; /*Unused*/
     return lv_obj_get_style(gauge);
 }
 

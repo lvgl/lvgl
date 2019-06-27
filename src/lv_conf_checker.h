@@ -261,16 +261,6 @@
 #define LV_ATTRIBUTE_LARGE_CONST
 #endif
 
-/* 1: Variable length array is supported*/
-#ifndef LV_COMPILER_VLA_SUPPORTED
-#define LV_COMPILER_VLA_SUPPORTED            1
-#endif
-
-/* 1: Initialization with non constant values are supported */
-#ifndef LV_COMPILER_NON_CONST_INIT_SUPPORTED
-#define LV_COMPILER_NON_CONST_INIT_SUPPORTED 1
-#endif
-
 /*===================
  *  HAL settings
  *==================*/
@@ -357,6 +347,9 @@
  * More info about fonts: https://docs.littlevgl.com/#Fonts
  * To create a new font go to: https://littlevgl.com/ttf-font-to-c-array
  */
+
+/* Robot fonts with bpp = 4
+ * https://fonts.google.com/specimen/Roboto  */
 #ifndef LV_FONT_ROBOTO_12
 #define LV_FONT_ROBOTO_12    0
 #endif
@@ -368,6 +361,12 @@
 #endif
 #ifndef LV_FONT_ROBOTO_28
 #define LV_FONT_ROBOTO_28    0
+#endif
+
+/*Pixel perfect monospace font
+ * http://pelulamu.net/unscii/ */
+#ifndef LV_FONT_UNSCII_8
+#define LV_FONT_UNSCII_8     0
 #endif
 
 /* Optionally declare your custom fonts here.

@@ -343,7 +343,7 @@ lv_fs_res_t lv_fs_rename(const char * oldname, const char * newname)
     const char * old_real = lv_fs_get_real_path(oldname);
     const char * new_real = lv_fs_get_real_path(newname);
 
-    lv_fs_res_t res       = drv->rename_cb(drv, old_real, new_real);
+    lv_fs_res_t res = drv->rename_cb(drv, old_real, new_real);
 
     return res;
 }
@@ -380,7 +380,7 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path)
 
     const char * real_path = lv_fs_get_real_path(path);
 
-    lv_fs_res_t res        = rddir_p->drv->dir_open_cb(rddir_p->drv, rddir_p->dir_d, real_path);
+    lv_fs_res_t res = rddir_p->drv->dir_open_cb(rddir_p->drv, rddir_p->dir_d, real_path);
 
     return res;
 }

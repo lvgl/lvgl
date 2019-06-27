@@ -40,36 +40,69 @@ extern "C" {
 /** Possible states of a button.
  * It can be used not only by buttons but other button-like objects too*/
 enum {
-    LV_BTN_STATE_REL,       /**Released*/
-    LV_BTN_STATE_PR,        /**Pressed*/
-    LV_BTN_STATE_TGL_REL,   /**Toggled released*/
-    LV_BTN_STATE_TGL_PR,    /**Toggled pressed*/
-    LV_BTN_STATE_INA,       /**Inactive*/
-    LV_BTN_STATE_NUM,
+    /**Released*/
+    LV_BTN_STATE_REL,
+
+    /**Pressed*/
+    LV_BTN_STATE_PR,
+
+    /**Toggled released*/
+    LV_BTN_STATE_TGL_REL,
+
+    /**Toggled pressed*/
+    LV_BTN_STATE_TGL_PR,
+
+    /**Inactive*/
+    LV_BTN_STATE_INA,
+
+    /**Number of states*/
+    _LV_BTN_STATE_NUM,
 };
 typedef uint8_t lv_btn_state_t;
 
-/*Data of button*/
+/** Extended data of button*/
 typedef struct
 {
-    lv_cont_ext_t cont; /*Ext. of ancestor*/
+    /** Ext. of ancestor*/
+    lv_cont_ext_t cont;
+
     /*New data for this type */
-    const lv_style_t * styles[LV_BTN_STATE_NUM]; /*Styles in each state*/
+
+    /**Styles in each state*/
+    const lv_style_t * styles[_LV_BTN_STATE_NUM];
 #if LV_BTN_INK_EFFECT
-    uint16_t ink_in_time;   /*[ms] Time of ink fill effect (0: disable ink effect)*/
-    uint16_t ink_wait_time; /*[ms] Wait before the ink disappears */
-    uint16_t ink_out_time;  /*[ms] Time of ink disappearing*/
+    /** [ms] Time of ink fill effect (0: disable ink effect)*/
+    uint16_t ink_in_time;
+
+    /** [ms] Wait before the ink disappears */
+    uint16_t ink_wait_time;
+
+    /** [ms] Time of ink disappearing*/
+    uint16_t ink_out_time;
 #endif
-    lv_btn_state_t state : 3; /*Current state of the button from 'lv_btn_state_t' enum*/
-    uint8_t toggle : 1;       /*1: Toggle enabled*/
+
+    /** Current state of the button from 'lv_btn_state_t' enum*/
+    lv_btn_state_t state : 3;
+
+    /** 1: Toggle enabled*/
+    uint8_t toggle : 1;
 } lv_btn_ext_t;
 
-/*Styles*/
+/**Styles*/
 enum {
+    /** Release style */
     LV_BTN_STYLE_REL,
+
+    /**Pressed style*/
     LV_BTN_STYLE_PR,
+
+    /** Toggle released style*/
     LV_BTN_STYLE_TGL_REL,
+
+    /** Toggle pressed style */
     LV_BTN_STYLE_TGL_PR,
+
+    /** Inactive style*/
     LV_BTN_STYLE_INA,
 };
 typedef uint8_t lv_btn_style_t;

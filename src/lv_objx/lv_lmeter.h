@@ -96,7 +96,7 @@ void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt);
  */
 static inline void lv_lmeter_set_style(lv_obj_t * lmeter, lv_lmeter_style_t type, lv_style_t * style)
 {
-    (void) type;    /*Unused*/
+    (void)type; /*Unused*/
     lv_obj_set_style(lmeter, style);
 }
 
@@ -147,7 +147,7 @@ uint16_t lv_lmeter_get_scale_angle(const lv_obj_t * lmeter);
  */
 static inline const lv_style_t * lv_lmeter_get_style(const lv_obj_t * lmeter, lv_lmeter_style_t type)
 {
-    (void) type;    /*Unused*/
+    (void)type; /*Unused*/
     return lv_obj_get_style(lmeter);
 }
 

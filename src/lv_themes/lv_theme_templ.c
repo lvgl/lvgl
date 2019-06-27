@@ -46,6 +46,7 @@ static void basic_init(void)
     lv_style_copy(&def, &lv_style_pretty); /*Initialize the default style*/
     def.text.font = _font;
 
+    theme.style.scr   = &def;
     theme.style.bg    = &def;
     theme.style.panel = &def;
 }
@@ -332,12 +333,12 @@ static void win_init(void)
 {
 #if LV_USE_WIN != 0
 
-    theme.style.win.bg           = &def;
-    theme.style.win.sb           = &def;
-    theme.style.win.header       = &def;
-    theme.style.win.content   = &def;
-    theme.style.win.btn.rel      = &def;
-    theme.style.win.btn.pr       = &def;
+    theme.style.win.bg      = &def;
+    theme.style.win.sb      = &def;
+    theme.style.win.header  = &def;
+    theme.style.win.content = &def;
+    theme.style.win.btn.rel = &def;
+    theme.style.win.btn.pr  = &def;
 #endif
 }
 

@@ -50,12 +50,7 @@ enum {
 typedef uint8_t lv_sb_mode_t;
 
 /** Edges: describes the four edges of the page*/
-enum {
-    LV_PAGE_EDGE_LEFT =   0x1,
-    LV_PAGE_EDGE_TOP =    0x2,
-    LV_PAGE_EDGE_RIGHT =  0x4,
-    LV_PAGE_EDGE_BOTTOM = 0x8
-};
+enum { LV_PAGE_EDGE_LEFT = 0x1, LV_PAGE_EDGE_TOP = 0x2, LV_PAGE_EDGE_RIGHT = 0x4, LV_PAGE_EDGE_BOTTOM = 0x8 };
 typedef uint8_t lv_page_edge_t;
 
 /*Data of page*/
