@@ -749,8 +749,9 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
         lv_ddlist_refr_size(ddlist, true);
     } else {
 
-        /*Leave edit mode once a new item is selected*/
         lv_indev_t * indev = lv_indev_get_act();
+#if LV_USE_GROUP
+        /*Leave edit mode once a new item is selected*/
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
             ext->sel_opt_id_ori = ext->sel_opt_id;
             lv_group_t * g      = lv_obj_get_group(ddlist);
@@ -758,6 +759,7 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
                 lv_group_set_editing(g, false);
             }
         }
+#endif
 
         /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
