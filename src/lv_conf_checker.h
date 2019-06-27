@@ -5,7 +5,7 @@
 **/
 
 #ifndef LV_CONF_CHECKER_H
-#define  LV_CONF_CHECKER_H
+#define LV_CONF_CHECKER_H
 /* clang-format off */
 
 #include <stdint.h>
@@ -314,28 +314,28 @@
 #endif
 
 #ifndef LV_USE_THEME_TEMPL
-#define LV_USE_THEME_TEMPL      1   /*Just for test*/
+#define LV_USE_THEME_TEMPL      0   /*Just for test*/
 #endif
 #ifndef LV_USE_THEME_DEFAULT
-#define LV_USE_THEME_DEFAULT    1   /*Built mainly from the built-in styles. Consumes very few RAM*/
+#define LV_USE_THEME_DEFAULT    0   /*Built mainly from the built-in styles. Consumes very few RAM*/
 #endif
 #ifndef LV_USE_THEME_ALIEN
-#define LV_USE_THEME_ALIEN      1   /*Dark futuristic theme*/
+#define LV_USE_THEME_ALIEN      0   /*Dark futuristic theme*/
 #endif
 #ifndef LV_USE_THEME_NIGHT
-#define LV_USE_THEME_NIGHT      1   /*Dark elegant theme*/
+#define LV_USE_THEME_NIGHT      0   /*Dark elegant theme*/
 #endif
 #ifndef LV_USE_THEME_MONO
-#define LV_USE_THEME_MONO       1   /*Mono color theme for monochrome displays*/
+#define LV_USE_THEME_MONO       0   /*Mono color theme for monochrome displays*/
 #endif
 #ifndef LV_USE_THEME_MATERIAL
-#define LV_USE_THEME_MATERIAL   1   /*Flat theme with bold colors and light shadows*/
+#define LV_USE_THEME_MATERIAL   0   /*Flat theme with bold colors and light shadows*/
 #endif
 #ifndef LV_USE_THEME_ZEN
-#define LV_USE_THEME_ZEN        1   /*Peaceful, mainly light theme */
+#define LV_USE_THEME_ZEN        0   /*Peaceful, mainly light theme */
 #endif
 #ifndef LV_USE_THEME_NEMO
-#define LV_USE_THEME_NEMO       1   /*Water-like theme based on the movie "Finding Nemo"*/
+#define LV_USE_THEME_NEMO       0   /*Water-like theme based on the movie "Finding Nemo"*/
 #endif
 
 /*==================
