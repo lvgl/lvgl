@@ -224,7 +224,7 @@ lv_coord_t lv_disp_get_hor_res(lv_disp_t * disp)
     if(disp == NULL) disp = lv_disp_get_default();
 
     if(disp == NULL)
-        return disp->driver.rotated == 0 ? LV_HOR_RES_MAX : LV_VER_RES_MAX;
+        return LV_HOR_RES_MAX;
     else
         return disp->driver.rotated == 0 ? disp->driver.hor_res : disp->driver.ver_res;
 }
@@ -239,7 +239,7 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
     if(disp == NULL) disp = lv_disp_get_default();
 
     if(disp == NULL)
-        return disp->driver.rotated == 0 ? LV_VER_RES_MAX : LV_HOR_RES_MAX;
+        return LV_VER_RES_MAX;
     else
         return disp->driver.rotated == 0 ? disp->driver.ver_res : disp->driver.hor_res;
 }

@@ -94,12 +94,12 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->series.dark           = LV_OPA_50;
     ext->series.width          = 2;
     ext->margin                = 0;
+    memset(&ext->x_axis, 0, sizeof(ext->x_axis));
+    memset(&ext->y_axis, 0, sizeof(ext->y_axis));
     ext->x_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->x_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->y_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->y_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
-    memset(&ext->x_axis, 0, sizeof(ext->x_axis));
-    memset(&ext->y_axis, 0, sizeof(ext->y_axis));
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_chart);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_chart);
@@ -1092,7 +1092,7 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
 
         for(i = 0; i < (num_scale_ticks + 1); i++) { /* one extra loop - it may not exist in the list, empty label */
                                                      /* first point of the tick */
-            p1.x = 0 + x_ofs;
+            p1.x = 0 + x_ofs - 1;
 
             /* second point of the tick */
             if((num_of_labels != 0) && (i == 0 || i % ext->y_axis.num_tick_marks == 0))
