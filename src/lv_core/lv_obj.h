@@ -121,10 +121,9 @@ enum {
     LV_SIGNAL_PRESS_LOST,        /**< User is still pressing but slid cursor/finger off of the object */
     LV_SIGNAL_RELEASED,          /**< User pressed object for a short period of time, then released it. Not called if dragged. */
     LV_SIGNAL_LONG_PRESS,        /**< Object has been pressed for at least `LV_INDEV_LONG_PRESS_TIME`.  Not called if dragged.*/
-    LV_SIGNAL_LONG_PRESS_REP,    /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every
-    LV_SIGNAL_DRAG_BEGIN,             `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if dragged.*/
-    LV_SIGNAL_DRAG_END,          /**< Called on release if not dragged (regardless to long press)*/
-                                 /**< Called in every cases when the object has been released*/                                    
+    LV_SIGNAL_LONG_PRESS_REP,    /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if dragged.*/
+    LV_SIGNAL_DRAG_BEGIN,	
+    LV_SIGNAL_DRAG_END,                                   
     /*Group related*/
     LV_SIGNAL_FOCUS,
     LV_SIGNAL_DEFOCUS,
