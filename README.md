@@ -203,7 +203,7 @@ lv.scr_load(scr)
 Check out the [Documentation](https://docs.littlevgl.com/) for more!
 
 ### Contributing
-To ask questions please use the [Forum](https://forumtest.littlevgl.com).
+To ask questions please use the [Forum](https://forum.littlevgl.com).
 FOr development related things (bug reports, feature suggestions) use [GitHub's Issue tracker](https://github.com/littlevgl/lvgl/issues). 
 You can contribute in several ways:
 - **Answer other's question** in the Forum
