@@ -41,12 +41,15 @@ extern "C" {
 struct _disp_t;
 struct _disp_drv_t;
 
+/**
+ * Structure for holding display buffer information.
+ */
 typedef struct
 {
-    void * buf1;
-    void * buf2;
+    void * buf1; /**< First display buffer. */
+    void * buf2; /**< Second display buffer. */
 
-    /*Used by the library*/
+    /*Internal, used by the library*/
     void * buf_act;
     uint32_t size; /*In pixel count*/
     lv_area_t area;
@@ -59,18 +62,17 @@ typedef struct
 typedef struct _disp_drv_t
 {
 
-    /*Horizontal and vertical resolution*/
-    lv_coord_t hor_res;
-    lv_coord_t ver_res;
+    lv_coord_t hor_res; /**< Horizontal resolution. */
+    lv_coord_t ver_res; /**< Vertical resolution. */
 
-    /* Pointer to a buffer initialized with `lv_disp_buf_init()`.
+    /** Pointer to a buffer initialized with `lv_disp_buf_init()`.
      * LittlevGL will use this buffer(s) to draw the screens contents */
     lv_disp_buf_t * buffer;
 
 #if LV_ANTIALIAS
-    uint32_t antialiasing : 1;
+    uint32_t antialiasing : 1; /**< 1: antialiasing is enabled on this display. */
 #endif
-    uint32_t rotated : 1; /*1: turn the display by 90 degree.*/
+    uint32_t rotated : 1; /**< 1: turn the display by 90 degree. @warning Does not update coordinates for you!*/
 
 #if LV_COLOR_SCREEN_TRANSP
     /**Handle if the the screen doesn't have a solid (opa == LV_OPA_COVER) background.
@@ -78,67 +80,71 @@ typedef struct _disp_drv_t
     uint32_t screen_transp : 1;
 #endif
 
-    /* MANDATORY: Write the internal buffer (VDB) to the display. 'lv_disp_flush_ready()' has to be
+    /** MANDATORY: Write the internal buffer (VDB) to the display. 'lv_disp_flush_ready()' has to be
      * called when finished */
     void (*flush_cb)(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
-    /* OPTIONAL: Extend the invalidated areas to match with the display drivers requirements
+    /** OPTIONAL: Extend the invalidated areas to match with the display drivers requirements
      * E.g. round `y` to, 8, 16 ..) on a monochrome display*/
     void (*rounder_cb)(struct _disp_drv_t * disp_drv, lv_area_t * area);
 
-    /* OPTIONAL: Set a pixel in a buffer according to the special requirements of the display
+    /** OPTIONAL: Set a pixel in a buffer according to the special requirements of the display
      * Can be used for color format not supported in LittelvGL. E.g. 2 bit -> 4 gray scales
-     * Note: Much slower then drawing with supported color formats. */
+     * @note Much slower then drawing with supported color formats. */
     void (*set_px_cb)(struct _disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
                       lv_color_t color, lv_opa_t opa);
 
-    /* OPTIONAL: Called after every refresh cycle to tell the rendering and flushing time + the
+    /** OPTIONAL: Called after every refresh cycle to tell the rendering and flushing time + the
      * number of flushed pixels */
     void (*monitor_cb)(struct _disp_drv_t * disp_drv, uint32_t time, uint32_t px);
 
 #if LV_USE_GPU
-    /*OPTIONAL: Blend two memories using opacity (GPU only)*/
+    /** OPTIONAL: Blend two memories using opacity (GPU only)*/
     void (*gpu_blend_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length,
                          lv_opa_t opa);
 
-    /*OPTIONAL: Fill a memory with a color (GPU only)*/
+    /** OPTIONAL: Fill a memory with a color (GPU only)*/
     void (*gpu_fill_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coord_t dest_width,
                         const lv_area_t * fill_area, lv_color_t color);
 #endif
 
-    /*On CHROMA_KEYED images this color will be transparent.
+    /** On CHROMA_KEYED images this color will be transparent.
      * `LV_COLOR_TRANSP` by default. (lv_conf.h)*/
     lv_color_t color_chroma_key;
 
 #if LV_USE_USER_DATA
-    lv_disp_drv_user_data_t user_data;
+    lv_disp_drv_user_data_t user_data; /**< Custom display driver user data */
 #endif
 
 } lv_disp_drv_t;
 
 struct _lv_obj_t;
 
+/**
+ * Display structure.
+ * ::lv_disp_drv_t is the first member of the structure.
+ */
 typedef struct _disp_t
 {
-    /*Driver to the display*/
+    /**< Driver to the display*/
     lv_disp_drv_t driver;
 
-    /*A task which periodically checks the dirty areas and refreshes them*/
+    /**< A task which periodically checks the dirty areas and refreshes them*/
     lv_task_t * refr_task;
 
-    /*Screens of the display*/
+    /** Screens of the display*/
     lv_ll_t scr_ll;
-    struct _lv_obj_t * act_scr;
-    struct _lv_obj_t * top_layer;
-    struct _lv_obj_t * sys_layer;
+    struct _lv_obj_t * act_scr; /**< Currently active screen on this display */
+    struct _lv_obj_t * top_layer; /**< @see lv_disp_get_layer_top */
+    struct _lv_obj_t * sys_layer; /**< @see lv_disp_get_layer_sys */
 
-    /*Invalidated (marked to redraw) areas*/
+    /** Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
     uint8_t inv_area_joined[LV_INV_BUF_SIZE];
     uint32_t inv_p : 10;
 
     /*Miscellaneous data*/
-    uint32_t last_activity_time;
+    uint32_t last_activity_time; /**< Last time there was activity on this display */
 } lv_disp_t;
 
 /**********************
@@ -147,8 +153,8 @@ typedef struct _disp_t
 
 /**
  * Initialize a display driver with default values.
- * It is used to surly have known values in the fields ant not memory junk.
- * After it you can set the fields.
+ * It is used to have known values in the fields and not junk in memory.
+ * After it you can safely set only the fields you need.
  * @param driver pointer to driver variable to initialize
  */
 void lv_disp_drv_init(lv_disp_drv_t * driver);

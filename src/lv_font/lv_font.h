@@ -42,32 +42,32 @@ extern "C" {
  * General types
  *-----------------*/
 
-/*Describe the properties of a glyph*/
+/** Describes the properties of a glyph. */
 typedef struct
 {
-    uint16_t adv_w; /*The glyph needs this space. Draw the next glyph after this width. 8 bit integer, 4 bit fractional */
-    uint8_t box_w;  /*Width of the glyph's bounding box*/
-    uint8_t box_h;  /*Height of the glyph's bounding box*/
-    int8_t ofs_x;   /*x offset of the bounding box*/
-    int8_t ofs_y;  /*y offset of the bounding box*/
-    uint8_t bpp;   /*Bit-per-pixel: 1, 2, 4, 8*/
+    uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width. 8 bit integer, 4 bit fractional */
+    uint8_t box_w;  /**< Width of the glyph's bounding box*/
+    uint8_t box_h;  /**< Height of the glyph's bounding box*/
+    int8_t ofs_x;   /**< x offset of the bounding box*/
+    int8_t ofs_y;  /**< y offset of the bounding box*/
+    uint8_t bpp;   /**< Bit-per-pixel: 1, 2, 4, 8*/
 }lv_font_glyph_dsc_t;
 
 /*Describe the properties of a font*/
 typedef struct _lv_font_struct
 {
-    /*Get a glyph's  descriptor from a font*/
+    /** Get a glyph's  descriptor from a font*/
     bool (*get_glyph_dsc)(const struct _lv_font_struct *, lv_font_glyph_dsc_t *, uint32_t letter, uint32_t letter_next);
 
-    /*Get a glyph's bitmap from a font*/
+    /** Get a glyph's bitmap from a font*/
     const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_struct *, uint32_t);
 
     /*Pointer to the font in a font pack (must have the same line height)*/
-    uint8_t line_height;      /*The real line height where any text fits*/
-    uint8_t base_line;        /*Base line measured from the top of the line_height*/
-    void * dsc;               /*Store implementation specific data here*/
+    uint8_t line_height;      /**< The real line height where any text fits*/
+    uint8_t base_line;        /**< Base line measured from the top of the line_height*/
+    void * dsc;               /**< Store implementation specific data here*/
 #if LV_USE_USER_DATA
-    lv_font_user_data_t user_data;
+    lv_font_user_data_t user_data; /**< Custom user data for font. */
 #endif
 } lv_font_t;
 

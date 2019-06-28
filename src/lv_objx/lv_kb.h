@@ -41,6 +41,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/** Current keyboard mode. */
 enum {
     LV_KB_MODE_TEXT,
     LV_KB_MODE_NUM,

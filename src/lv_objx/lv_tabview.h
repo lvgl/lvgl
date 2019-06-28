@@ -42,6 +42,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/** Position of tabview buttons. */
 enum { LV_TABVIEW_BTNS_POS_TOP, LV_TABVIEW_BTNS_POS_BOTTOM, LV_TABVIEW_BTNS_POS_LEFT, LV_TABVIEW_BTNS_POS_RIGHT };
 typedef uint8_t lv_tabview_btns_pos_t;
 

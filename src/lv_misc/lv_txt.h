@@ -35,19 +35,24 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+/**
+ * Options for text rendering.
+ */
 enum {
     LV_TXT_FLAG_NONE    = 0x00,
-    LV_TXT_FLAG_RECOLOR = 0x01, /*Enable parsing of recolor command*/
-    LV_TXT_FLAG_EXPAND  = 0x02, /*Ignore width to avoid automatic word wrapping*/
-    LV_TXT_FLAG_CENTER  = 0x04, /*Align the text to the middle*/
-    LV_TXT_FLAG_RIGHT   = 0x08, /*Align the text to the right*/
+    LV_TXT_FLAG_RECOLOR = 0x01, /**< Enable parsing of recolor command*/
+    LV_TXT_FLAG_EXPAND  = 0x02, /**< Ignore width to avoid automatic word wrapping*/
+    LV_TXT_FLAG_CENTER  = 0x04, /**< Align the text to the middle*/
+    LV_TXT_FLAG_RIGHT   = 0x08, /**< Align the text to the right*/
 };
 typedef uint8_t lv_txt_flag_t;
 
+/**
+ * State machine for text renderer. */
 enum {
-    LV_TXT_CMD_STATE_WAIT, /*Waiting for command*/
-    LV_TXT_CMD_STATE_PAR,  /*Processing the parameter*/
-    LV_TXT_CMD_STATE_IN,   /*Processing the command*/
+    LV_TXT_CMD_STATE_WAIT, /**< Waiting for command*/
+    LV_TXT_CMD_STATE_PAR,  /**< Processing the parameter*/
+    LV_TXT_CMD_STATE_IN,   /**< Processing the command*/
 };
 typedef uint8_t lv_txt_cmd_state_t;
 

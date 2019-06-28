@@ -38,27 +38,27 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Long mode behaviors. Used in 'lv_label_ext_t' */
+/** Long mode behaviors. Used in 'lv_label_ext_t' */
 enum {
-    LV_LABEL_LONG_EXPAND,     /*Expand the object size to the text size*/
-    LV_LABEL_LONG_BREAK,      /*Keep the object width, break the too long lines and expand the object
-                                 height*/
-    LV_LABEL_LONG_DOT,        /*Keep the size and write dots at the end if the text is too long*/
-    LV_LABEL_LONG_SROLL,      /*Keep the size and roll the text back and forth*/
-    LV_LABEL_LONG_SROLL_CIRC, /*Keep the size and roll the text circularly*/
-    LV_LABEL_LONG_CROP,       /*Keep the size and crop the text out of it*/
+    LV_LABEL_LONG_EXPAND,    /**< Expand the object size to the text size*/
+    LV_LABEL_LONG_BREAK,     /**< Keep the object width, break the too long lines and expand the object
+                                height*/
+    LV_LABEL_LONG_DOT,       /**< Keep the size and write dots at the end if the text is too long*/
+    LV_LABEL_LONG_SROLL,      /**< Keep the size and roll the text back and forth*/
+    LV_LABEL_LONG_SROLL_CIRC, /**< Keep the size and roll the text circularly*/
+    LV_LABEL_LONG_CROP,      /**< Keep the size and crop the text out of it*/
 };
 typedef uint8_t lv_label_long_mode_t;
 
-/*Label align policy*/
+/** Label align policy*/
 enum {
-    LV_LABEL_ALIGN_LEFT,
-    LV_LABEL_ALIGN_CENTER,
-    LV_LABEL_ALIGN_RIGHT,
+    LV_LABEL_ALIGN_LEFT, /**< Align text to left */
+    LV_LABEL_ALIGN_CENTER, /**< Align text to center */
+    LV_LABEL_ALIGN_RIGHT, /**< Align text to right */
 };
 typedef uint8_t lv_label_align_t;
 
-/*Data of label*/
+/** Data of label*/
 typedef struct
 {
     /*Inherited from 'base_obj' so no inherited ext.*/ /*Ext. of ancestor*/
@@ -93,7 +93,7 @@ typedef struct
                                   characters */
 } lv_label_ext_t;
 
-/*Styles*/
+/** Label styles*/
 enum {
     LV_LABEL_STYLE_MAIN,
 };

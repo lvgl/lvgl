@@ -22,7 +22,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_RADIUS_CIRCLE (LV_COORD_MAX) /*A very big radius to always draw as circle*/
+#define LV_RADIUS_CIRCLE (LV_COORD_MAX) /**< A very big radius to always draw as circle*/
 
 /**********************
  *      TYPEDEFS
@@ -36,41 +36,50 @@ enum {
     LV_BORDER_LEFT     = 0x04,
     LV_BORDER_RIGHT    = 0x08,
     LV_BORDER_FULL     = 0x0F,
-    LV_BORDER_INTERNAL = 0x10, /*FOR matrix-like objects (e.g. Button matrix)*/
+    LV_BORDER_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
 };
 typedef uint8_t lv_border_part_t;
 
 /*Shadow types*/
 enum {
-    LV_SHADOW_BOTTOM = 0,
-    LV_SHADOW_FULL,
+    LV_SHADOW_BOTTOM = 0, /**< Only draw bottom shadow */
+    LV_SHADOW_FULL,       /**< Draw shadow on all sides */
 };
 typedef uint8_t lv_shadow_type_t;
 
+/**
+ * Objects in LittlevGL can be assigned a style - which holds information about
+ * how the object should be drawn.
+ * 
+ * This allows for easy customization without having to modify the object's design
+ * function.
+ */
 typedef struct
 {
-    uint8_t glass : 1; /*1: Do not inherit this style*/
+    uint8_t glass : 1; /**< 1: Do not inherit this style*/
 
+    /** Object background. */
     struct
     {
-        lv_color_t main_color;
-        lv_color_t grad_color; /*`grad_color` will be removed in v6.0, use `aux_color` instead*/
-        lv_coord_t radius;
-        lv_opa_t opa;
+        lv_color_t main_color; /**< Object's main background color. */
+        lv_color_t grad_color; /**< Second color. If not equal to `main_color` a gradient will be drawn for the background. */
+        lv_coord_t radius; /**< Object's corner radius. You can use #LV_RADIUS_CIRCLE if you want to draw a circle. */
+        lv_opa_t opa; /**< Object's opacity (0-255). */
 
         struct
         {
-            lv_color_t color;
-            lv_coord_t width;
-            lv_border_part_t part;
-            lv_opa_t opa;
+            lv_color_t color; /**< Border color */
+            lv_coord_t width; /**< Border width */
+            lv_border_part_t part; /**< Which borders to draw */
+            lv_opa_t opa; /**< Border opacity. */
         } border;
 
+        
         struct
         {
             lv_color_t color;
             lv_coord_t width;
-            lv_shadow_type_t type;
+            lv_shadow_type_t type; /**< Which parts of the shadow to draw */
         } shadow;
 
         struct
@@ -83,33 +92,37 @@ typedef struct
         } padding;
     } body;
 
+    /** Style for text drawn by this object. */
     struct
     {
-        lv_color_t color;
-        lv_color_t sel_color;
+        lv_color_t color; /**< Text color */
+        lv_color_t sel_color; /**< Text selection background color. */
         const lv_font_t * font;
-        lv_coord_t letter_space;
-        lv_coord_t line_space;
-        lv_opa_t opa;
+        lv_coord_t letter_space; /**< Space between letters */
+        lv_coord_t line_space; /**< Space between lines (vertical) */
+        lv_opa_t opa; /**< Text opacity */
     } text;
 
+    /**< Style of images. */
     struct
     {
-        lv_color_t color;
-        lv_opa_t intense;
-        lv_opa_t opa;
+        lv_color_t color; /**< Color to recolor the image with */
+        lv_opa_t intense; /**< Opacity of recoloring (0 means no recoloring) */
+        lv_opa_t opa; /**< Opacity of whole image */
     } image;
 
+    /**< Style of lines (not borders). */
     struct
     {
         lv_color_t color;
         lv_coord_t width;
         lv_opa_t opa;
-        uint8_t rounded : 1; /*1: rounded line endings*/
+        uint8_t rounded : 1; /**< 1: rounded line endings*/
     } line;
 } lv_style_t;
 
 #if LV_USE_ANIMATION
+/** Data structure for style animations. */
 typedef struct
 {
     lv_style_t style_start; /*Save not only pointers because can be same as 'style_anim' then it

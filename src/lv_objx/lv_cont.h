@@ -31,28 +31,31 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Layout options*/
+/** Container layout options*/
 enum {
-    LV_LAYOUT_OFF = 0,
-    LV_LAYOUT_CENTER,
-    LV_LAYOUT_COL_L,  /*Column left align*/
-    LV_LAYOUT_COL_M,  /*Column middle align*/
-    LV_LAYOUT_COL_R,  /*Column right align*/
-    LV_LAYOUT_ROW_T,  /*Row top align*/
-    LV_LAYOUT_ROW_M,  /*Row middle align*/
-    LV_LAYOUT_ROW_B,  /*Row bottom align*/
-    LV_LAYOUT_PRETTY, /*Put as many object as possible in row and begin a new row*/
-    LV_LAYOUT_GRID,   /*Align same-sized object into a grid*/
+    LV_LAYOUT_OFF = 0, /**< No layout */
+    LV_LAYOUT_CENTER, /**< Center objects */
+    LV_LAYOUT_COL_L,  /**< Column left align*/
+    LV_LAYOUT_COL_M,  /**< Column middle align*/
+    LV_LAYOUT_COL_R,  /**< Column right align*/
+    LV_LAYOUT_ROW_T,  /**< Row top align*/
+    LV_LAYOUT_ROW_M,  /**< Row middle align*/
+    LV_LAYOUT_ROW_B,  /**< Row bottom align*/
+    LV_LAYOUT_PRETTY, /**< Put as many object as possible in row and begin a new row*/
+    LV_LAYOUT_GRID,   /**< Align same-sized object into a grid*/
     _LV_LAYOUT_NUM
 };
 typedef uint8_t lv_layout_t;
 
+/**
+ * How to resize the container around the children.
+ */
 enum {
-    LV_FIT_NONE,  /*Do not change the size automatically*/
-    LV_FIT_TIGHT, /*Involve the children*/
-    LV_FIT_FLOOD, /*Align the size to the parent's edge*/
-    LV_FIT_FILL,  /*Align the size to the parent's edge first but if there is an object out of it
-                     then involve it*/
+    LV_FIT_NONE,  /**< Do not change the size automatically*/
+    LV_FIT_TIGHT, /**< Shrink wrap around the children */
+    LV_FIT_FLOOD, /**< Align the size to the parent's edge*/
+    LV_FIT_FILL,  /**< Align the size to the parent's edge first but if there is an object out of it
+                     then get larger */
     _LV_FIT_NUM
 };
 typedef uint8_t lv_fit_t;

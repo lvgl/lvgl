@@ -35,7 +35,7 @@ extern "C" {
 /**********************
  *      MACROS
  **********************/
-/* Gives 1 if the x.y.z version is supported in the current version
+/** Gives 1 if the x.y.z version is supported in the current version
  * Usage:
  *
  * - Require v6

@@ -39,44 +39,45 @@ struct _disp_t;
 struct _lv_indev_t;
 struct _lv_indev_drv_t;
 
-/*Possible input device types*/
+/** Possible input device types*/
 enum {
-    LV_INDEV_TYPE_NONE,    /*Show uninitialized state*/
-    LV_INDEV_TYPE_POINTER, /*Touch pad, mouse, external button*/
-    LV_INDEV_TYPE_KEYPAD,  /*Keypad or keyboard*/
-    LV_INDEV_TYPE_BUTTON,  /*External (hardware button) which is assigned to a specific point of the
+    LV_INDEV_TYPE_NONE,    /**< Uninitialized state*/
+    LV_INDEV_TYPE_POINTER, /**< Touch pad, mouse, external button*/
+    LV_INDEV_TYPE_KEYPAD,  /**< Keypad or keyboard*/
+    LV_INDEV_TYPE_BUTTON,  /**< External (hardware button) which is assigned to a specific point of the
                               screen*/
-    LV_INDEV_TYPE_ENCODER, /*Encoder with only Left, Right turn and a Button*/
+    LV_INDEV_TYPE_ENCODER, /**< Encoder with only Left, Right turn and a Button*/
 };
 typedef uint8_t lv_indev_type_t;
 
-/*States for input devices*/
+/** States for input devices*/
 enum { LV_INDEV_STATE_REL = 0, LV_INDEV_STATE_PR };
 typedef uint8_t lv_indev_state_t;
 
-/*Data type when an input device is read */
+/** Data structure passed to an input driver to fill */
 typedef struct
 {
-    lv_point_t point; /*For LV_INDEV_TYPE_POINTER the currently pressed point*/
-    uint32_t key;     /*For LV_INDEV_TYPE_KEYPAD the currently pressed key*/
-    uint32_t btn_id;  /*For LV_INDEV_TYPE_BUTTON the currently pressed button*/
-    int16_t enc_diff; /*For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
+    lv_point_t point; /**< For LV_INDEV_TYPE_POINTER the currently pressed point*/
+    uint32_t key;     /**< For LV_INDEV_TYPE_KEYPAD the currently pressed key*/
+    uint32_t btn_id;  /**< For LV_INDEV_TYPE_BUTTON the currently pressed button*/
+    int16_t enc_diff; /**< For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/
 
-    lv_indev_state_t state; /*LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
+    lv_indev_state_t state; /**< LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
 } lv_indev_data_t;
 
-/*Initialized by the user and registered by 'lv_indev_add()'*/
+/** Initialized by the user and registered by 'lv_indev_add()'*/
 typedef struct _lv_indev_drv_t
 {
 
-    /*Input device type*/
+    /**< Input device type*/
     lv_indev_type_t type;
 
-    /*Function pointer to read input device data.
-     * Return 'true' if there is still data to be read (buffered)*/
+    /**< Function pointer to read input device data.
+     * Return 'true' if there is more data to be read (buffered).
+     * Most drivers can safely return 'false' */
     bool (*read_cb)(struct _lv_indev_drv_t * indev_drv, lv_indev_data_t * data);
 
-    /* Called when an action happened on the input device.
+    /** Called when an action happened on the input device.
      * The second parameter is the event from `lv_event_t`*/
     void (*feedback_cb)(struct _lv_indev_drv_t *, uint8_t);
 
@@ -84,36 +85,38 @@ typedef struct _lv_indev_drv_t
     lv_indev_drv_user_data_t user_data;
 #endif
 
-    /*Pointer to the assigned display*/
+    /**< Pointer to the assigned display*/
     struct _disp_t * disp;
 
-    /*Task to read the periodically read the input device*/
+    /**< Task to read the periodically read the input device*/
     lv_task_t * read_task;
 
-    /*Number of pixels to slide before actually drag the object*/
+    /**< Number of pixels to slide before actually drag the object*/
     uint8_t drag_limit;
 
-    /*Drag throw slow-down in [%]. Greater value means faster slow-down */
+    /**< Drag throw slow-down in [%]. Greater value means faster slow-down */
     uint8_t drag_throw;
 
-    /*Long press time in milliseconds*/
+    /**< Long press time in milliseconds*/
     uint16_t long_press_time;
 
-    /*Repeated trigger period in long press [ms] */
+    /**< Repeated trigger period in long press [ms] */
     uint16_t long_press_rep_time;
 } lv_indev_drv_t;
 
-/*Run time data of input devices*/
+/** Run time data of input devices
+ * Internally used by the library, you should not need to touch it.
+ */
 typedef struct _lv_indev_proc_t
 {
-    lv_indev_state_t state;
+    lv_indev_state_t state; /**< Current state of the input device. */
     union
     {
         struct
         { /*Pointer and button data*/
-            lv_point_t act_point;
-            lv_point_t last_point;
-            lv_point_t vect;
+            lv_point_t act_point; /**< Current point of input device. */
+            lv_point_t last_point; /**< Last point of input device. */
+            lv_point_t vect; /**< Difference between `act_point` and `last_point`. */
             lv_point_t drag_sum; /*Count the dragged pixels to check LV_INDEV_DEF_DRAG_LIMIT*/
             lv_point_t drag_throw_vect;
             struct _lv_obj_t * act_obj;      /*The object being pressed*/
@@ -132,8 +135,8 @@ typedef struct _lv_indev_proc_t
         } keypad;
     } types;
 
-    uint32_t pr_timestamp;         /*Pressed time stamp*/
-    uint32_t longpr_rep_timestamp; /*Long press repeat time stamp*/
+    uint32_t pr_timestamp;         /**< Pressed time stamp*/
+    uint32_t longpr_rep_timestamp; /**< Long press repeat time stamp*/
 
     /*Flags*/
     uint8_t long_pr_sent : 1;
@@ -145,15 +148,15 @@ typedef struct _lv_indev_proc_t
 struct _lv_obj_t;
 struct _lv_group_t;
 
-/*The main input device descriptor with driver, runtime data ('proc') and some additional
+/** The main input device descriptor with driver, runtime data ('proc') and some additional
  * information*/
 typedef struct _lv_indev_t
 {
     lv_indev_drv_t driver;
     lv_indev_proc_t proc;
-    struct _lv_obj_t * cursor;     /*Cursor for LV_INPUT_TYPE_POINTER*/
-    struct _lv_group_t * group;    /*Keypad destination group*/
-    const lv_point_t * btn_points; /*Array points assigned to the button ()screen will be pressed
+    struct _lv_obj_t * cursor;     /**< Cursor for LV_INPUT_TYPE_POINTER*/
+    struct _lv_group_t * group;    /**< Keypad destination group*/
+    const lv_point_t * btn_points; /**< Array points assigned to the button ()screen will be pressed
                                       here by the buttons*/
 } lv_indev_t;
 
