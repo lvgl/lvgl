@@ -42,12 +42,18 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/**
+ * Type of preloader.
+ */
 enum {
     LV_PRELOAD_TYPE_SPINNING_ARC,
     LV_PRELOAD_TYPE_FILLSPIN_ARC,
 };
 typedef uint8_t lv_preload_type_t;
 
+/**
+ * Direction the preloader should spin.
+ */
 enum {
     LV_PRELOAD_DIR_FORWARD,
     LV_PRELOAD_DIR_BACKWARD,

@@ -63,11 +63,11 @@ extern "C" {
 #define LV_SYMBOL_BATTERY_EMPTY   "\xef\x89\x84"
 #define LV_SYMBOL_BLUETOOTH       "\xef\x8a\x93"
 
-/*Invalid symbol at (U+F8FF). If written before a string then `lv_img` will show it as a label*/
+/** Invalid symbol at (U+F8FF). If written before a string then `lv_img` will show it as a label*/
 #define LV_SYMBOL_DUMMY           "\xEF\xA3\xBF"
 
 /*
- * following list is generated using
+ * The following list is generated using
  * cat src/lv_misc/lv_symbol_def.h | sed -E -n 's/^#define\s+(LV_SYMBOL_\w+).*"$/    _LV_STR_\1,/p'
  */
 enum {

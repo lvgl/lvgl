@@ -59,9 +59,10 @@ typedef struct
 #endif
 } lv_mbox_ext_t;
 
+/** Message box styles. */
 enum {
     LV_MBOX_STYLE_BG,
-    LV_MBOX_STYLE_BTN_BG,
+    LV_MBOX_STYLE_BTN_BG, /**< Same meaning as ordinary button styles. */
     LV_MBOX_STYLE_BTN_REL,
     LV_MBOX_STYLE_BTN_PR,
     LV_MBOX_STYLE_BTN_TGL_REL,

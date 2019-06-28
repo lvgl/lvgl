@@ -126,7 +126,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const
     dsc->src_type  = lv_img_src_get_type(src);
     dsc->user_data = NULL;
 
-    lv_res_t res;
+    lv_res_t res = LV_RES_INV;
 
     lv_img_decoder_t * d;
     LV_LL_READ(LV_GC_ROOT(_lv_img_defoder_ll), d)

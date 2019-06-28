@@ -26,10 +26,10 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Dummy type to make handling easier*/
+/** Dummy type to make handling easier*/
 typedef uint8_t lv_ll_node_t;
 
-/*Description of a linked list*/
+/** Description of a linked list*/
 typedef struct
 {
     uint32_t n_size;

@@ -38,12 +38,15 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/** Roller mode. */
 enum {
-    LV_ROLLER_MODE_NORMAL,
-    LV_ROLLER_MODE_INIFINITE,
+    LV_ROLLER_MODE_NORMAL, /**< Normal mode (roller ends at the end of the options). */
+    LV_ROLLER_MODE_INIFINITE, /**< Infinite mode (roller can be scrolled forever). */
 };
 
 typedef uint8_t lv_roller_mode_t;
+
+
 
 /*Data of roller*/
 typedef struct

@@ -24,8 +24,6 @@
 #define LV_CHART_AXIS_TO_LABEL_DISTANCE 4
 #define LV_CHART_AXIS_MAJOR_TICK_LEN_COE 1 / 15
 #define LV_CHART_AXIS_MINOR_TICK_LEN_COE 2 / 3
-#define LV_CHART_AXIS_X_TICK_OFFSET_FIX 1
-#define LV_CHART_AXIS_Y_TICK_OFFSET_FIX 0
 
 /**********************
  *      TYPEDEFS
@@ -96,12 +94,12 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->series.dark           = LV_OPA_50;
     ext->series.width          = 2;
     ext->margin                = 0;
+    memset(&ext->x_axis, 0, sizeof(ext->x_axis));
+    memset(&ext->y_axis, 0, sizeof(ext->y_axis));
     ext->x_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->x_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->y_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->y_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
-    memset(&ext->x_axis, 0, sizeof(ext->x_axis));
-    memset(&ext->y_axis, 0, sizeof(ext->y_axis));
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_chart);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_chart);
@@ -685,13 +683,13 @@ static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask)
     uint8_t div_i_start;
     lv_point_t p1;
     lv_point_t p2;
-    lv_coord_t w     = lv_obj_get_width(chart) - 1;
-    lv_coord_t h     = lv_obj_get_height(chart) - 1;
+    lv_coord_t w     = lv_obj_get_width(chart);
+    lv_coord_t h     = lv_obj_get_height(chart);
     lv_coord_t x_ofs = chart->coords.x1;
     lv_coord_t y_ofs = chart->coords.y1;
 
     if(ext->hdiv_cnt != 0) {
-        /*Draw slide lines if no border*/
+        /*Draw side lines if no border*/
         if(style->body.border.width != 0) {
             div_i_start = 1;
             div_i_end   = ext->hdiv_cnt;
@@ -703,18 +701,15 @@ static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask)
         p1.x = 0 + x_ofs;
         p2.x = w + x_ofs;
         for(div_i = div_i_start; div_i <= div_i_end; div_i++) {
-            p1.y = (int32_t)((int32_t)h * div_i) / (ext->hdiv_cnt + 1);
+            p1.y = (int32_t)((int32_t)(h - style->line.width) * div_i) / (ext->hdiv_cnt + 1);
             p1.y += y_ofs;
-            if(div_i == div_i_start) p1.y += (style->line.width >> 1) + 1; /*The first line might not be visible*/
-            if(div_i == div_i_end) p1.y -= (style->line.width >> 1) + 1;   /*The last line might not be visible*/
-
             p2.y = p1.y;
             lv_draw_line(&p1, &p2, mask, style, opa_scale);
         }
     }
 
     if(ext->vdiv_cnt != 0) {
-        /*Draw slide lines if no border*/
+        /*Draw side lines if no border*/
         if(style->body.border.width != 0) {
             div_i_start = 1;
             div_i_end   = ext->vdiv_cnt;
@@ -726,10 +721,8 @@ static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask)
         p1.y = 0 + y_ofs;
         p2.y = h + y_ofs;
         for(div_i = div_i_start; div_i <= div_i_end; div_i++) {
-            p1.x = (int32_t)((int32_t)w * div_i) / (ext->vdiv_cnt + 1);
+            p1.x = (int32_t)((int32_t)(w - style->line.width) * div_i) / (ext->vdiv_cnt + 1);
             p1.x += x_ofs;
-            if(div_i == div_i_start) p1.x += (style->line.width >> 1) + 1; /*The first line might not be visible*/
-            if(div_i == div_i_end) p1.x -= (style->line.width >> 1) + 1;   /*The last line might not be visible*/
             p2.x = p1.x;
             lv_draw_line(&p1, &p2, mask, style, opa_scale);
         }
@@ -1099,7 +1092,7 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
 
         for(i = 0; i < (num_scale_ticks + 1); i++) { /* one extra loop - it may not exist in the list, empty label */
                                                      /* first point of the tick */
-            p1.x = 0 + x_ofs;
+            p1.x = 0 + x_ofs - 1;
 
             /* second point of the tick */
             if((num_of_labels != 0) && (i == 0 || i % ext->y_axis.num_tick_marks == 0))
@@ -1109,7 +1102,7 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
 
             /* draw a line at moving y position */
             p2.y = p1.y =
-                y_ofs + h - (int32_t)(((int32_t)h * i) / num_scale_ticks + 1) - LV_CHART_AXIS_Y_TICK_OFFSET_FIX;
+                y_ofs + (int32_t)((int32_t)(h - style->line.width) * i) / num_scale_ticks;
 
             if(i != num_scale_ticks)
                 lv_draw_line(&p1, &p2, mask, style, opa_scale);
@@ -1148,6 +1141,7 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
                     lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, -1, -1, NULL);
                 }
             }
+
         }
     }
 }
@@ -1216,7 +1210,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
                 p2.y = p1.y + minor_tick_len; /* minor tick */
 
             /* draw a line at moving x position */
-            p2.x = p1.x = x_ofs + (int32_t)(((int32_t)w * i) / num_scale_ticks + 1) - LV_CHART_AXIS_X_TICK_OFFSET_FIX;
+            p2.x = p1.x = x_ofs + (int32_t)((int32_t)(w - style->line.width) * i) / num_scale_ticks;
 
             if(i != num_scale_ticks)
                 lv_draw_line(&p1, &p2, mask, style, opa_scale);

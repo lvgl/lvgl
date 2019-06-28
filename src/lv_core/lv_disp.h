@@ -132,10 +132,16 @@ static inline void lv_scr_load(lv_obj_t * scr)
  *------------------------------------------------*/
 
 #ifndef LV_HOR_RES
+/**
+ * The horizontal resolution of the currently active display.
+ */
 #define LV_HOR_RES lv_disp_get_hor_res(lv_disp_get_default())
 #endif
 
 #ifndef LV_VER_RES
+/**
+ * The vertical resolution of the currently active display.
+ */
 #define LV_VER_RES lv_disp_get_ver_res(lv_disp_get_default())
 #endif
 

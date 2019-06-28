@@ -38,21 +38,21 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Chart types*/
+/** Chart types*/
 enum {
-    LV_CHART_TYPE_NONE          = 0x00, /*Don't draw the series*/
-    LV_CHART_TYPE_LINE          = 0x01, /*Connect the points with lines*/
-    LV_CHART_TYPE_COLUMN        = 0x02, /*Draw columns*/
-    LV_CHART_TYPE_POINT         = 0x04, /*Draw circles on the points*/
-    LV_CHART_TYPE_VERTICAL_LINE = 0x08, /*Draw vertical lines on points (useful when chart width == point count)*/
-    LV_CHART_TYPE_AREA          = 0x10, /*Draw area chart*/
+    LV_CHART_TYPE_NONE           = 0x00, /**< Don't draw the series*/
+    LV_CHART_TYPE_LINE          = 0x01, /**< Connect the points with lines*/
+    LV_CHART_TYPE_COLUMN        = 0x02, /**< Draw columns*/
+    LV_CHART_TYPE_POINT         = 0x04, /**< Draw circles on the points*/
+    LV_CHART_TYPE_VERTICAL_LINE = 0x08, /**< Draw vertical lines on points (useful when chart width == point count)*/
+    LV_CHART_TYPE_AREA          = 0x10, /**< Draw area chart*/
 };
 typedef uint8_t lv_chart_type_t;
 
-/*Chart update mode for `lv_chart_set_next`*/
+/** Chart update mode for `lv_chart_set_next`*/
 enum {
-    LV_CHART_UPDATE_MODE_SHIFT,    /*Shift old data to the left and add the new one o the right*/
-    LV_CHART_UPDATE_MODE_CIRCULAR, /*Add the new data in a circular way*/
+    LV_CHART_UPDATE_MODE_SHIFT,     /**< Shift old data to the left and add the new one o the right*/
+    LV_CHART_UPDATE_MODE_CIRCULAR,  /**< Add the new data in a circular way*/
 };
 typedef uint8_t lv_chart_update_mode_t;
 
@@ -63,10 +63,10 @@ typedef struct
     uint16_t start_point;
 } lv_chart_series_t;
 
-/*Data of axis */
+/** Data of axis */
 enum {
-    LV_CHART_AXIS_SKIP_LAST_TICK = 0x00, /* don't draw the last tick */
-    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01  /* draw the last tick */
+    LV_CHART_AXIS_SKIP_LAST_TICK = 0x00,    /**< don't draw the last tick */
+    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01     /**< draw the last tick */
 };
 typedef uint8_t lv_chart_axis_options_t;
 

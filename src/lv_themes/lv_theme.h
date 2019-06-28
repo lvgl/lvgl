@@ -30,6 +30,12 @@ extern "C" {
  *    TYPEDEFS
  **********************/
 
+/**
+ * A theme in LittlevGL consists of many styles bound together.
+ * 
+ * There is a style for each object type, as well as a generic style for
+ * backgrounds and panels.
+ */
 typedef struct
 {
     struct

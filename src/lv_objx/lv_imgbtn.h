@@ -54,7 +54,7 @@ typedef struct
 
 /*Styles*/
 enum {
-    LV_IMGBTN_STYLE_REL,
+    LV_IMGBTN_STYLE_REL, /**< Same meaning as ordinary button styles. */
     LV_IMGBTN_STYLE_PR,
     LV_IMGBTN_STYLE_TGL_REL,
     LV_IMGBTN_STYLE_TGL_PR,

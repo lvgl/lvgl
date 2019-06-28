@@ -51,13 +51,14 @@ typedef struct
     lv_obj_t * label;  /*Pointer to label*/
 } lv_cb_ext_t;
 
+/** Checkbox styles. */
 enum {
-    LV_CB_STYLE_BG,
-    LV_CB_STYLE_BOX_REL,
-    LV_CB_STYLE_BOX_PR,
-    LV_CB_STYLE_BOX_TGL_REL,
-    LV_CB_STYLE_BOX_TGL_PR,
-    LV_CB_STYLE_BOX_INA,
+    LV_CB_STYLE_BG, /**< Style of object background. */
+    LV_CB_STYLE_BOX_REL, /**< Style of box (released). */
+    LV_CB_STYLE_BOX_PR, /**< Style of box (pressed). */
+    LV_CB_STYLE_BOX_TGL_REL, /**< Style of box (released but checked). */
+    LV_CB_STYLE_BOX_TGL_PR, /**< Style of box (pressed and checked). */
+    LV_CB_STYLE_BOX_INA, /**< Style of disabled box */
 };
 typedef uint8_t lv_cb_style_t;
 
