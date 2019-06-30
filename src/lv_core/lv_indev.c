@@ -877,11 +877,12 @@ static void indev_proc_release(lv_indev_proc_t * proc)
 
         if(indev_reset_check(proc)) return;
 
-            /*Handle click focus*/
+        /*Handle click focus*/
+        bool click_focus_sent = false;
 #if LV_USE_GROUP
         lv_group_t * g = lv_obj_get_group(indev_obj_act);
 
-        /*Check, if the parent is in a group focus on it.*/
+        /*Check, if the parent is in a group and focus on it.*/
         /*Respect the click focus protection*/
         if(lv_obj_is_protected(indev_obj_act, LV_PROTECT_CLICK_FOCUS) == false) {
             lv_obj_t * parent = indev_obj_act;
@@ -902,6 +903,7 @@ static void indev_proc_release(lv_indev_proc_t * proc)
              * `LV_EVENT_FOCUSED/DEFOCUSED` will be sent by `lv_group_focus_obj`*/
             if(g && parent) {
                 if(lv_group_get_click_focus(g)) {
+                    click_focus_sent = true;
                     lv_group_focus_obj(parent);
                 }
             }
@@ -909,9 +911,8 @@ static void indev_proc_release(lv_indev_proc_t * proc)
 #endif
 
         /* Send defocus to the lastly "active" object and foucus to the new one.
-         * If the one of them is in group then it possible that `lv_group_focus_obj` alraedy sent
-         * a focus/defucus signal because of `click focus`*/
-        if(proc->types.pointer.last_pressed != indev_obj_act) {
+         * DO not sent the events if they was sent by the click focus*/
+        if(proc->types.pointer.last_pressed != indev_obj_act && click_focus_sent == false) {
             lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_DEFOCUSED, NULL);
             if(indev_reset_check(proc)) return;
 

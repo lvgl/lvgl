@@ -233,7 +233,6 @@ void lv_group_focus_obj(lv_obj_t * obj)
     LV_LL_READ(g->obj_ll, i)
     {
         if(*i == obj) {
-            if(g->obj_focus == i) return; /*Don't focus the already focused object again*/
             if(g->obj_focus != NULL) {
                 (*g->obj_focus)->signal_cb(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
                 lv_res_t res = lv_event_send(*g->obj_focus, LV_EVENT_DEFOCUSED, NULL);
