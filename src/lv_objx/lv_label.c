@@ -370,6 +370,9 @@ void lv_label_set_text_sel_start(lv_obj_t * label, uint16_t index)
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     ext->txt_sel_start   = index;
     lv_obj_invalidate(label);
+#else
+    (void)label;    /*Unused*/
+    (void)index;    /*Unused*/
 #endif
 }
 
@@ -379,6 +382,9 @@ void lv_label_set_text_sel_end(lv_obj_t * label, uint16_t index)
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     ext->txt_sel_end     = index;
     lv_obj_invalidate(label);
+#else
+    (void)label;    /*Unused*/
+    (void)index;    /*Unused*/
 #endif
 }
 
@@ -622,6 +628,7 @@ uint16_t lv_label_get_text_sel_start(const lv_obj_t * label)
     return ext->txt_sel_start;
 
 #else
+    (void)label;    /*Unused*/
     return LV_LABEL_TEXT_SEL_OFF;
 #endif
 }
