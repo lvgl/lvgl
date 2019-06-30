@@ -1,7 +1,7 @@
 <h1 align="center"> LittlevGL - Open-source Embedded GUI Library</h1>
 <p align="center">
 <a href="https://github.com/littlevgl/lvgl/blob/master/LICENCE.txt"><img src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
-<a href="https://github.com/littlevgl/lvgl/releases/tag/v5.3"><img src="https://img.shields.io/badge/version-5.3-blue.svg"></a>
+<a href="https://github.com/littlevgl/lvgl/releases/tag/v6.0"><img src="https://img.shields.io/badge/version-6.0-blue.svg"></a>
 <br>
 <img src="https://littlevgl.com/github/cover_ori_reduced_2.gif">
 </p>
@@ -13,7 +13,7 @@ LittlevGL provides everything you need to create a Graphical User Interface (GUI
 <h4 align="center">
 <a href="https://littlevgl.com">Website </a> &middot; 
 <a href="https://littlevgl.com/live-demo">Live demo</a> &middot; 
-<a href="https://docs.littlevgl.com/#PC-simulator">Simulator</a> &middot; 
+<a href="https://docs.littlevgl.com/en/html/get-started/pc-simulator.html">Simulator</a> &middot; 
 <a href="https://docs.littlevgl.com/">Docs</a> &middot;
 <a href="https://blog.littlevgl.com/">Blog</a>
 </h4>
@@ -27,7 +27,8 @@ LittlevGL provides everything you need to create a Graphical User Interface (GUI
 ### Features
 * **Powerful building blocks** buttons, charts, lists, sliders, images, etc.
 * **Advanced graphics** with animations, anti-aliasing, opacity, smooth scrolling
-* **Various input devices** touch pad, mouse, keyboard, encoder, buttons, etc.
+* **Simultaneously use various input devices** touchscreen, mouse, keyboard, encoder, buttons, etc.
+* **Simultaneously use multiple displays** i.e. monochrome and color display
 * **Multi-language support** with UTF-8 encoding
 * **Fully customizable** graphical elements
 * **Hardware independent** to use with any microcontroller or display
@@ -128,7 +129,7 @@ bool my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
 ```
 6. Call `lv_task_handler()` periodically every few milliseconds in the main `while(1)` loop, in Timer interrupt or in an Operation system task. It will redraw the screen if required, handle input devices etc. **It's very important that you don't call `lv_tick_inc` in the same loop.**
 
-For a detailed description check the [Documentation](https://docs.littlevgl.com/#Porting) or the [Porting examples](https://github.com/littlevgl/lvgl/tree/multi-disp/lv_porting).
+For a detailed description check the [Documentation](https://docs.littlevgl.com/en/html/porting/index.html) or the [Porting examples](https://github.com/littlevgl/lvgl/tree/master/lv_porting).
  
  
 ### Code examples
