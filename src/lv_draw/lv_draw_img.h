@@ -120,6 +120,22 @@ bool lv_img_color_format_is_chroma_keyed(lv_img_cf_t cf);
  */
 bool lv_img_color_format_has_alpha(lv_img_cf_t cf);
 
+/**
+ * Allocate an image buffer in RAM
+ * @param w width of image
+ * @param h height of image
+ * @param cf a color format (`LV_IMG_CF_...`)
+ * @return an allocated image, or NULL on failure
+ */
+lv_img_dsc_t *lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf);
+
+/**
+ * Free an allocated image buffer
+ * @param dsc image buffer to free
+ */
+void lv_img_buf_free(lv_img_dsc_t *dsc);
+
+
 /**********************
  *      MACROS
  **********************/
