@@ -162,7 +162,7 @@ void lv_img_buf_free(lv_img_dsc_t *dsc);
  * @param cf color format
  * @return size in bytes
  */
-static inline size_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
+static inline uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
 {
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR: return LV_IMG_BUF_SIZE_TRUE_COLOR(w, h);
