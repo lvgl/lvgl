@@ -206,7 +206,7 @@
 
 /*1: Add a `user_data` to drivers and objects*/
 #ifndef LV_USE_USER_DATA
-#define LV_USE_USER_DATA        1
+#define LV_USE_USER_DATA        0
 #endif
 
 /*========================
@@ -448,7 +448,7 @@
 #if LV_USE_BTN != 0
 /*Enable button-state animations - draw a circle on click (dependencies: LV_USE_ANIMATION)*/
 #ifndef LV_BTN_INK_EFFECT
-#  define LV_BTN_INK_EFFECT   1
+#  define LV_BTN_INK_EFFECT   0
 #endif
 #endif
 

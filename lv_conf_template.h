@@ -152,7 +152,7 @@ typedef void * lv_fs_drv_user_data_t;
 #endif
 
 /*1: Add a `user_data` to drivers and objects*/
-#define LV_USE_USER_DATA        1
+#define LV_USE_USER_DATA        0
 
 /*========================
  * Image decoder and cache
@@ -325,7 +325,7 @@ typedef void * lv_obj_user_data_t;
 #define LV_USE_BTN      1
 #if LV_USE_BTN != 0
 /*Enable button-state animations - draw a circle on click (dependencies: LV_USE_ANIMATION)*/
-#  define LV_BTN_INK_EFFECT   1
+#  define LV_BTN_INK_EFFECT   0
 #endif
 
 /*Button matrix (dependencies: -)*/
