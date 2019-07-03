@@ -32,6 +32,8 @@ enum {
 };
 typedef uint8_t lv_res_t;
 
+typedef unsigned long int lv_uintptr_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
