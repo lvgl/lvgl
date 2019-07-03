@@ -223,36 +223,6 @@ static inline void lv_anim_clear_repeat(lv_anim_t * a)
 }
 
 /**
- * Set a user specific data for the animation
- * @param a pointer to an initialized `lv_anim_t` variable
- * @param user_data the user data
- */
-static inline void lv_anim_set_user_data(lv_anim_t * a, lv_anim_user_data_t user_data)
-{
-    memcpy(&a->user_data, &user_data, sizeof(user_data));
-}
-
-/**
- * Get the user data
- * @param a pointer to an initialized `lv_anim_t` variable
- * @return the user data
- */
-static inline lv_anim_user_data_t lv_anim_get_user_data(lv_anim_t * a)
-{
-    return a->user_data;
-}
-
-/**
- * Get pointer to the user data
- * @param a pointer to an initialized `lv_anim_t` variable
- * @return pointer to the user data
- */
-static inline lv_anim_user_data_t * lv_anim_get_user_data_ptr(lv_anim_t * a)
-{
-    return &a->user_data;
-}
-
-/**
  * Create an animation
  * @param a an initialized 'anim_t' variable. Not required after call.
  */

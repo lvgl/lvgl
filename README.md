@@ -40,9 +40,8 @@ LittlevGL provides everything you need to create a Graphical User Interface (GUI
 Basically, every modern controller - which is able to drive a display - is suitable to run LittlevGL. The minimal requirements:
 - **16, 32 or 64-bit** microcontroller or processor
 - **&gt; 16 MHz** clock speed
-- **&gt; 8 kB RAM for static data** and **&gt; 2 KB RAM for dynamic data** (graphical objects)
-- **&gt; 64 kB flash** program memory
-- **Optionally ~1/10 screen sized memory** for buffered drawing (on 240 × 320, 16-bit colors it's 15 kB)
+- **&gt; 16 kB RAM** for static data, dynamic data (heap), stack and display buffer (> 32 kB is recommended)
+- **&gt; 64 kB flash** program memory (> 180 kB is recommended)
 
 Just to mention some **platforms**:
 - STM32F1, STM32F3, [STM32F4](https://blog.littlevgl.com/2017-07-15/stm32f429_disco_port), [STM32F7](https://github.com/littlevgl/stm32f746_disco_no_os_sw4stm32)
@@ -200,7 +199,7 @@ Check out the [Documentation](https://docs.littlevgl.com/) for more!
 
 ### Contributing
 To ask questions please use the [Forum](https://forum.littlevgl.com).
-FOr development related things (bug reports, feature suggestions) use [GitHub's Issue tracker](https://github.com/littlevgl/lvgl/issues). 
+For development related things (bug reports, feature suggestions) use [GitHub's Issue tracker](https://github.com/littlevgl/lvgl/issues). 
 You can contribute in several ways:
 - **Answer other's question** in the Forum
 - **Report and/or fix bugs** using the issue tracker and in Pull-request

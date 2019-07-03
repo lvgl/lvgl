@@ -206,7 +206,7 @@
 
 /*1: Add a `user_data` to drivers and objects*/
 #ifndef LV_USE_USER_DATA
-#define LV_USE_USER_DATA        1
+#define LV_USE_USER_DATA        0
 #endif
 
 /*========================
@@ -286,7 +286,7 @@
 
 /*1: Enable the log module*/
 #ifndef LV_USE_LOG
-#define LV_USE_LOG      1
+#define LV_USE_LOG      0
 #endif
 #if LV_USE_LOG
 /* How important log should be added:
@@ -294,6 +294,7 @@
  * LV_LOG_LEVEL_INFO        Log important events
  * LV_LOG_LEVEL_WARN        Log if something unwanted happened but didn't cause a problem
  * LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
+ * LV_LOG_LEVEL_NONE        Do not log anything
  */
 #ifndef LV_LOG_LEVEL
 #  define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
@@ -448,7 +449,7 @@
 #if LV_USE_BTN != 0
 /*Enable button-state animations - draw a circle on click (dependencies: LV_USE_ANIMATION)*/
 #ifndef LV_BTN_INK_EFFECT
-#  define LV_BTN_INK_EFFECT   1
+#  define LV_BTN_INK_EFFECT   0
 #endif
 #endif
 
