@@ -83,10 +83,10 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
     if(point1->x == point2->x && point1->y == point2->y) return;
 
     /*Return if the points are out of the mask*/
-    if(point1->x < mask->x1 && point2->x < mask->x1) return;
-    if(point1->x > mask->x2 && point2->x > mask->x2) return;
-    if(point1->y < mask->y1 && point2->y < mask->y1) return;
-    if(point1->y > mask->y2 && point2->y > mask->y2) return;
+    if(point1->x < mask->x1 - style->line.width && point2->x < mask->x1 - style->line.width) return;
+    if(point1->x > mask->x2 + style->line.width && point2->x > mask->x2 + style->line.width) return;
+    if(point1->y < mask->y1 - style->line.width && point2->y < mask->y1 - style->line.width) return;
+    if(point1->y > mask->y2 + style->line.width && point2->y > mask->y2 + style->line.width) return;
 
     line_draw_t main_line;
     lv_point_t p1;
