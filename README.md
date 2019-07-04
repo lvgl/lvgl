@@ -133,14 +133,15 @@ lv_obj_t * btn = lv_btn_create(lv_scr_act(), NULL);     /*Add a button the curre
 lv_obj_set_pos(btn, 10, 10);                            /*Set its position*/
 lv_obj_set_size(btn, 100, 50);                          /*Set its size*/
 
-lv_btn_set_action(btn, LV_BTN_ACTION_CLICK, btn_action);/*Assign a callback to the button*/
+lv_obj_set_event_cb(btn, btn_event_cb);                 /*Assign a callback to the button*/
 lv_obj_t * label = lv_label_create(btn, NULL);          /*Add a label to the button*/
 lv_label_set_text(label, "Button");                     /*Set the labels text*/
 
-lv_res_t btn_action(lv_obj_t * btn)
+void btn_event_cb(lv_obj_t * btn, lv_event_t event)
 {
-    printf("Clicked\n");
-    return LV_RES_OK;
+    if(event == LV_EVENT_CLICKED) {
+        printf("Clicked\n");
+    }
 }
 ```
 ![Simple button with LittelvGL](https://littlevgl.com/github/btn1.gif)
