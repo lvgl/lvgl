@@ -40,6 +40,7 @@ static void mbox_realign(lv_obj_t * mbox);
 static void lv_mbox_close_ready_cb(lv_anim_t * a);
 #endif
 static void lv_mbox_default_event_cb(lv_obj_t * mbox, lv_event_t event);
+static void lv_mbox_btnm_event_cb(lv_obj_t * btnm, lv_event_t event);
 
 /**********************
  *  STATIC VARIABLES
@@ -157,7 +158,7 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char ** btn_map)
 
     lv_btnm_set_map(ext->btnm, btn_map);
     lv_btnm_set_btn_ctrl_all(ext->btnm, LV_BTNM_CTRL_CLICK_TRIG | LV_BTNM_CTRL_NO_REPEAT);
-    lv_obj_set_parent_event(ext->btnm, true);
+    lv_obj_set_event_cb(ext->btnm, lv_mbox_btnm_event_cb);
 
     mbox_realign(mbox);
 }
@@ -527,6 +528,20 @@ static void lv_mbox_default_event_cb(lv_obj_t * mbox, lv_event_t event)
     if(btn_id == LV_BTNM_BTN_NONE) return;
 
     lv_mbox_start_auto_close(mbox, 0);
+}
+
+static void lv_mbox_btnm_event_cb(lv_obj_t * btnm, lv_event_t event)
+{
+    lv_obj_t * mbox = lv_obj_get_parent(btnm);
+
+    /*clang-format off*/
+    if(event == LV_EVENT_PRESSED || event == LV_EVENT_PRESSING || event == LV_EVENT_PRESS_LOST ||
+       event == LV_EVENT_RELEASED || event == LV_EVENT_SHORT_CLICKED || event == LV_EVENT_CLICKED ||
+       event == LV_EVENT_LONG_PRESSED || event == LV_EVENT_LONG_PRESSED_REPEAT ||
+       event == LV_EVENT_VALUE_CHANGED) {
+        lv_event_send(mbox, event, lv_event_get_data());
+    }
+    /*clang-format on*/
 }
 
 #endif
