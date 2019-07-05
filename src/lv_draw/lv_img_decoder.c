@@ -35,11 +35,6 @@ typedef struct
  *  STATIC PROTOTYPES
  **********************/
 
-static lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
-static lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
-static lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
-                                                  lv_coord_t y, lv_coord_t len, uint8_t * buf);
-static void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
 static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                         lv_coord_t len, uint8_t * buf);
 static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
@@ -246,11 +241,9 @@ void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_clos
     decoder->close_cb = close_cb;
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
 
-static lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+
+lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
 {
     (void)decoder; /*Unused*/
 
@@ -295,7 +288,7 @@ static lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const v
     return LV_RES_OK;
 }
 
-static lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
     /*Open the file if it's a file*/
     if(dsc->src_type == LV_IMG_SRC_FILE) {
@@ -424,7 +417,7 @@ static lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_
     }
 }
 
-static lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
+lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
                                                   lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
     (void)decoder; /*Unused*/
@@ -453,7 +446,7 @@ static lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv
     return res;
 }
 
-static void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
     (void)decoder; /*Unused*/
 
@@ -473,6 +466,10 @@ static void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_dec
     }
 }
 
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                         lv_coord_t len, uint8_t * buf)
 {
