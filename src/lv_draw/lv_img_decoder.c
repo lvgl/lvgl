@@ -173,7 +173,9 @@ lv_res_t lv_img_decoder_read_line(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_c
  */
 void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc)
 {
-    if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
+    if(dsc->decoder) {
+        if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
+    }
 }
 
 /**
