@@ -385,6 +385,13 @@
 #define LV_FONT_DEFAULT        &lv_font_roboto_16
 #endif
 
+/* Enable it if you have fonts with a lot of characters.
+ * The limit depends on the font size, font face and bpp
+ * but with > 10,000 characters if you see issues probably you need to enable it.*/
+#ifndef LV_FONT_FMT_TXT_LARGE
+#define LV_FONT_FMT_TXT_LARGE   0
+#endif
+
 /*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
 
 /*=================
