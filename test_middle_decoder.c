@@ -6,8 +6,8 @@
  */
 
 
-#include "test_middle_decoder.h"
-
+#include <stdint.h>
+#include "lvgl.h"
 
 
 /* ****************************************************************************************** */
@@ -64,7 +64,7 @@ static const uint8_t numero_02_50[] = {
 };
 
 
-static const lv_img_dsc_t RLE_ICONS[2] = {
+const lv_img_dsc_t RLE_ICONS[2] = {
 
     { .header = { .cf = LV_IMG_CF_USER_ENCODED_0, .always_zero = 0, .w = 10,  .h = 30},  .data_size = 103,  .data = numero_01_50 },
     { .header = { .cf = LV_IMG_CF_USER_ENCODED_0, .always_zero = 0, .w = 20,  .h = 30},  .data_size = 173,  .data = numero_02_50 },
@@ -209,7 +209,7 @@ const LV_ATTRIBUTE_MEM_ALIGN uint8_t box_indexed_16_map[] = {
 };
 
 
-static const lv_img_dsc_t LVGL_GRADIENT_image[2] = {
+const lv_img_dsc_t LVGL_GRADIENT_image[2] = {
     { .header = { .cf = LV_IMG_CF_INDEXED_4BIT, .always_zero = 0, .w = 2, .h = 18, }, .data_size =  82, .data = header_indexed_16_map, },
 
     { .header = { .cf = LV_IMG_CF_INDEXED_4BIT, .always_zero = 0, .w = 4, .h = 74, }, .data_size = 212, .data = box_indexed_16_map, },
@@ -239,8 +239,7 @@ lv_res_t ICON_LVGL_runLength (lv_img_decoder_t * decoder, lv_img_decoder_dsc_t *
   if (pImg->header.cf == LV_IMG_CF_USER_ENCODED_0) {
     dsc->header.cf = LV_IMG_CF_ALPHA_4BIT;
   } else {
-    dsc->header.cf = LV_IMG_CF_INDEXED_4BIT;
-    return LV_RES_OK;
+    return LV_RES_INV;
   }
 
   /**************************************/
@@ -248,7 +247,7 @@ lv_res_t ICON_LVGL_runLength (lv_img_decoder_t * decoder, lv_img_decoder_dsc_t *
   /**************************************/
 
   /* Initialize decodedImage structure */
-  BU_memset(decodedImageBitmap, 0, sizeof(decodedImageBitmap));
+  memset(decodedImageBitmap, 0, sizeof(decodedImageBitmap));
   decodedImage.header = pImg->header;
   decodedImage.data = decodedImageBitmap;
 
@@ -261,59 +260,59 @@ lv_res_t ICON_LVGL_runLength (lv_img_decoder_t * decoder, lv_img_decoder_dsc_t *
   uint32_t        nibble2_input   = 0;
 
   uint32_t        zeroCount       = 0;
-  BOOL_E          upperNibble     = BOOL_TRUE;
-  BOOL_E          skip            = BOOL_FALSE;
+  bool          upperNibble     = true;
+  bool          skip            = false;
 
   for (uint32_t i = 0; i < pImg->data_size; i++){
     nibble1_input = (*pData & 0xF0) >> 4;
     nibble2_input = (*pData & 0X0F);
     zeroCount = 0;
 
-    if(skip == BOOL_FALSE){ //If last nibble_2 = 0
+    if(skip == false){ //If last nibble_2 = 0
       //MSN
       if (nibble1_input == 0 ) {
         zeroCount = nibble2_input;
       }else{
-        if(upperNibble == BOOL_TRUE){
+        if(upperNibble == true){
         *pIcon |= (nibble1_input << 4);
-        upperNibble = BOOL_FALSE;
+        upperNibble = false;
         }else {
           *pIcon |= nibble1_input;
           pIcon++;
           iconCount++;
-          upperNibble = BOOL_TRUE;
+          upperNibble = true;
         }
       }
     }
 
     //LSB
     if((nibble2_input != 0) && (zeroCount == 0)){
-      if(upperNibble == BOOL_TRUE){
+      if(upperNibble == true){
         *pIcon |= (nibble2_input << 4);
-        upperNibble = BOOL_FALSE;
+        upperNibble = false;
       }else {
         *pIcon |= nibble2_input;
         pIcon++;
         iconCount++;
-        upperNibble = BOOL_TRUE;
+        upperNibble = true;
       }
-      skip = BOOL_FALSE;
+      skip = false;
     }else if(zeroCount == 0){
       zeroCount = ((*(pData+1)) & 0xF0) >> 4;
-      skip = BOOL_TRUE;
+      skip = true;
     }
 
 
     //Write zeros
     for(uint32_t j = 0; j < zeroCount;j++){
-      if(upperNibble == BOOL_TRUE){
+      if(upperNibble == true){
         *pIcon &= 0x0F;
-        upperNibble = BOOL_FALSE;
+        upperNibble = false;
       }else {
         *pIcon &= 0xF0;
         pIcon++;
         iconCount++;
-        upperNibble = BOOL_TRUE;
+        upperNibble = true;
       }
     }
     pData++;
@@ -322,6 +321,9 @@ lv_res_t ICON_LVGL_runLength (lv_img_decoder_t * decoder, lv_img_decoder_dsc_t *
   decodedImage.data_size = iconCount;
 
   dsc->src = (const void*)&decodedImage;
+
+  lv_img_decoder_built_in_open(decoder, dsc);
+
   return LV_RES_OK;
 }
 
