@@ -53,15 +53,6 @@ struct _lv_obj_t;
  */
 lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data);
 
-/**
- * Helper function for asynchronously deleting objects.
- * 
- * Useful for cases where you can't delete an object directly in an `LV_EVENT_DELETE` handler (i.e. parent).
- * @param obj object to delete
- * @see lv_async_call
- */
-void lv_obj_del_async(struct _lv_obj_t *obj);
-
 /**********************
  *      MACROS
  **********************/
