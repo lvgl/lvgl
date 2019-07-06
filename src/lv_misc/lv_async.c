@@ -1,5 +1,5 @@
 /**
- * @file lv_templ.c
+ * @file lv_async.c
  *
  */
 

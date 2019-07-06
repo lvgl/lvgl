@@ -1,10 +1,10 @@
 /**
- * @file lv_templ.h
+ * @file lv_async.h
  *
  */
 
-#ifndef LV_TEMPL_H
-#define LV_TEMPL_H
+#ifndef LV_ASYNC_H
+#define LV_ASYNC_H
 
 #ifdef __cplusplus
 extern "C" {
