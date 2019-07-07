@@ -90,6 +90,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
     ext->single_mode                      = false;
     ext->size                             = 0;
+	ext->layout							  = LV_LIST_LAYOUT_VER;
 
 #if LV_USE_GROUP
     ext->last_sel     = NULL;
