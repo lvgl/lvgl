@@ -57,6 +57,7 @@ typedef struct
     uint16_t size;                                    /*the number of items(buttons) in the list*/
 
     uint8_t single_mode : 1; /* whether single selected mode is enabled */
+	uint8_t layout : 1; /* Layout of the list */
 
 #if LV_USE_GROUP
     lv_obj_t * last_sel;     /* The last selected button. It will be reverted when the list is focused again */
@@ -78,10 +79,10 @@ enum {
 };
 typedef uint8_t lv_list_style_t;
 
-/** List layouts. **/
+/** List layouts. */
 enum {
-	LV_LIST_LAYOUT_HOR,
-	LV_LIST_LAYOUT_VER
+	LV_LIST_LAYOUT_HOR, /*< List horizontal layout  */
+	LV_LIST_LAYOUT_VER /*< List vertical layout */
 }
 typedef uint8_t lv_list_layout_t;
 
@@ -276,7 +277,7 @@ lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list);
 /**
  * Get layout of a list
  * @param list pointer to a list object
- * @return layout which layout should be used
+ * @return layout of the list object
  */
 lv_list_layout_t lv_list_get_layout(lv_obj_t * list);
 
