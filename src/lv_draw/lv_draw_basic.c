@@ -45,7 +45,9 @@ static void sw_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t len
 static void sw_color_fill(lv_color_t * mem, lv_coord_t mem_width, const lv_area_t * fill_area, lv_color_t color,
                           lv_opa_t opa);
 
+#if LV_COLOR_SCREEN_TRANSP && LV_COLOR_DEPTH == 32
 static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -649,6 +651,7 @@ static void sw_color_fill(lv_color_t * mem, lv_coord_t mem_width, const lv_area_
     }
 }
 
+#if LV_COLOR_SCREEN_TRANSP && LV_COLOR_DEPTH == 32
 /**
  * Mix two colors. Both color can have alpha value. It requires ARGB888 colors.
  * @param bg_color background color
@@ -660,7 +663,6 @@ static void sw_color_fill(lv_color_t * mem, lv_coord_t mem_width, const lv_area_
 static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa)
 {
 
-#if LV_COLOR_SCREEN_TRANSP
     /* Pick the foreground if it's fully opaque or the Background is fully transparent*/
     if(fg_opa > LV_OPA_MAX || bg_opa <= LV_OPA_MIN) {
         fg_color.ch.alpha = fg_opa;
@@ -702,13 +704,5 @@ static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
         }
         return c;
     }
-#else
-    (void)bg_color; /*Unused*/
-    (void)fg_color; /*Unused*/
-    (void)bg_opa;   /*Unused*/
-    (void)fg_opa;   /*Unused*/
-
-    return LV_COLOR_BLACK;
-
-#endif /*LV_COLOR_SCREEN_TRANSP*/
 }
+#endif /*LV_COLOR_SCREEN_TRANSP*/
