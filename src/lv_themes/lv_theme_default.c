@@ -194,11 +194,11 @@ static void gauge_init(void)
 {
 #if LV_USE_GAUGE != 0
     static lv_style_t gauge;
-    lv_style_copy(&gauge, &lmeter);
-    gauge.line.color      = lmeter.body.grad_color;
+    lv_style_copy(&gauge, theme.style.lmeter);
+    gauge.line.color      = theme.style.lmeter->body.grad_color;
     gauge.line.width      = 2;
     gauge.body.main_color = lv_color_hex3(0x888);
-    gauge.body.grad_color = lmeter.body.main_color;
+    gauge.body.grad_color = theme.style.lmeter->body.main_color;
     gauge.text.color      = lv_color_hex3(0x888);
 
     theme.style.gauge = &gauge;

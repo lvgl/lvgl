@@ -450,7 +450,12 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     return LV_RES_INV;
 }
 
-
+/**
+ * Helper function for asynchronously deleting objects.
+ * Useful for cases where you can't delete an object directly in an `LV_EVENT_DELETE` handler (i.e. parent).
+ * @param obj object to delete
+ * @see lv_async_call
+ */
 void lv_obj_del_async(lv_obj_t * obj)
 {
     lv_async_call(lv_obj_del_async_cb, obj);
