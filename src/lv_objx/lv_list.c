@@ -90,7 +90,6 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
     ext->single_mode                      = false;
     ext->size                             = 0;
-	ext->layout							  = LV_LAYOUT_COL_M;
 
 #if LV_USE_GROUP
     ext->last_sel     = NULL;
@@ -374,29 +373,27 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t *
  */
  void lv_list_set_layout(lv_obj_t * list, lv_layout_t layout)
  {
-    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-	
 	/* Update list layout if necessary */
-	if (layout != lv_list_get_layout(list)) {
+	if (layout == lv_list_get_layout(list)) return;
 
-		/* Get the first button on the list */
-		lv_obj_t * btn = lv_list_get_prev_btn(list, NULL);
-		
-		/* Visit all buttons on the list and update their layout  */
-        while(btn != NULL) {
-			if (LV_LAYOUT_COL_M == layout) {
-				lv_btn_set_fit2(list, LV_FIT_FLOOD, LV_FIT_TIGHT);
-			} else { /* LV_LIST_LAYOUT_VER */
-				lv_btn_set_fit(list, LV_FIT_TIGHT);
-			}
+    /* Get the first button on the list */
+    lv_obj_t * btn = lv_list_get_prev_btn(list, NULL);
 
-            btn = lv_list_get_prev_btn(list, btn);
+    /* Visit all buttons on the list and update their layout  */
+    while(btn != NULL) {
+        /*If a column layout set the buttons' width to list width*/
+        if(layout == LV_LAYOUT_COL_M || layout == LV_LAYOUT_COL_L || layout == LV_LAYOUT_COL_R) {
+            lv_btn_set_fit2(list, LV_FIT_FLOOD, LV_FIT_TIGHT);
+        }
+        /*If a row layout set the buttons' width according to the content*/
+        else if (layout == LV_LAYOUT_ROW_M || layout == LV_LAYOUT_ROW_T || layout == LV_LAYOUT_ROW_B) {
+            lv_btn_set_fit(list, LV_FIT_TIGHT);
         }
 
-		lv_page_set_scr_layout(list, layout == LV_LAYOUT_COL_M ? LV_LAYOUT_COL_M : LV_LAYOUT_ROW_M);
+        btn = lv_list_get_prev_btn(list, btn);
+    }
 
-		ext->layout = layout;
-	}
+    lv_page_set_scrl_layout(list, layout);
  }
 
 /*=====================
@@ -571,8 +568,7 @@ lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list)
  */
 lv_layout_t lv_list_get_layout(lv_obj_t * list)
 {
-    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-	return ext->layout;
+    return lv_page_get_scrl_layout(list);
 }
 
 /**

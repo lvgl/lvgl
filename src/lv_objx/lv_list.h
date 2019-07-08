@@ -57,7 +57,6 @@ typedef struct
     uint16_t size;                                    /*the number of items(buttons) in the list*/
 
     uint8_t single_mode : 1; /* whether single selected mode is enabled */
-	uint8_t layout : 1; /* Layout of the list */
 
 #if LV_USE_GROUP
     lv_obj_t * last_sel;     /* The last selected button. It will be reverted when the list is focused again */
