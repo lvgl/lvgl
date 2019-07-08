@@ -90,6 +90,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
     ext->single_mode                      = false;
     ext->size                             = 0;
+	ext->layout							  = LV_LAYOUT_COL_M;
 
 #if LV_USE_GROUP
     ext->last_sel     = NULL;
@@ -366,6 +367,38 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t *
     }
 }
 
+/**
+ * Set layout of a list
+ * @param list pointer to a list object
+ * @param layout which layout should be used
+ */
+ void lv_list_set_layout(lv_obj_t * list, lv_layout_t layout)
+ {
+    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+	
+	/* Update list layout if necessary */
+	if (layout != lv_list_get_layout(list)) {
+
+		/* Get the first button on the list */
+		lv_obj_t * btn = lv_list_get_prev_btn(list, NULL);
+		
+		/* Visit all buttons on the list and update their layout  */
+        while(btn != NULL) {
+			if (LV_LAYOUT_COL_M == layout) {
+				lv_btn_set_fit2(list, LV_FIT_FLOOD, LV_FIT_TIGHT);
+			} else { /* LV_LIST_LAYOUT_VER */
+				lv_btn_set_fit(list, LV_FIT_TIGHT);
+			}
+
+            btn = lv_list_get_prev_btn(list, btn);
+        }
+
+		lv_page_set_scr_layout(list, layout == LV_LAYOUT_COL_M ? LV_LAYOUT_COL_M : LV_LAYOUT_ROW_M);
+
+		ext->layout = layout;
+	}
+ }
+
 /*=====================
  * Getter functions
  *====================*/
@@ -529,15 +562,25 @@ lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list)
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
     return ext->selected_btn;
 }
-
 #endif
+
+/**
+ * Get layout of a list
+ * @param list pointer to a list object
+ * @return layout of the list object
+ */
+lv_layout_t lv_list_get_layout(lv_obj_t * list)
+{
+    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+	return ext->layout;
+}
 
 /**
  * Get a style of a list
  * @param list pointer to a list object
  * @param type which style should be get
  * @return style pointer to a style
- *  */
+ */
 const lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type)
 {
     const lv_style_t * style = NULL;
@@ -558,6 +601,7 @@ const lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type
 
     return style;
 }
+
 /*=====================
  * Other functions
  *====================*/

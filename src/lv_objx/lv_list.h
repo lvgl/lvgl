@@ -57,6 +57,7 @@ typedef struct
     uint16_t size;                                    /*the number of items(buttons) in the list*/
 
     uint8_t single_mode : 1; /* whether single selected mode is enabled */
+	uint8_t layout : 1; /* Layout of the list */
 
 #if LV_USE_GROUP
     lv_obj_t * last_sel;     /* The last selected button. It will be reverted when the list is focused again */
@@ -189,6 +190,13 @@ static inline void lv_list_set_anim_time(lv_obj_t * list, uint16_t anim_time)
  */
 void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t * style);
 
+/**
+ * Set layout of a list
+ * @param list pointer to a list object
+ * @param layout which layout should be used
+ */
+void lv_list_set_layout(lv_obj_t * list, lv_layout_t layout);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -258,6 +266,13 @@ uint16_t lv_list_get_size(const lv_obj_t * list);
  */
 lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list);
 #endif
+
+/**
+ * Get layout of a list
+ * @param list pointer to a list object
+ * @return layout of the list object
+ */
+lv_layout_t lv_list_get_layout(lv_obj_t * list);
 
 /**
  * Get the scroll bar mode of a list
