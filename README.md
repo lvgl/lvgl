@@ -81,7 +81,7 @@ lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
 disp_drv.hor_res = 480;               /*Set the horizontal resolution*/
 disp_drv.ver_res = 320;               /*Set the vertical resolution*/
 disp_drv.flush_cb = my_disp_flush;    /*Set your driver function*/
-disp_drv.buffer = &disp_buf;          /*Assign the buffer to teh display*/
+disp_drv.buffer = &disp_buf;          /*Assign the buffer to the display*/
 lv_disp_drv_register(&disp_drv);      /*Finally register the driver*/
     
 void my_disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_p)
