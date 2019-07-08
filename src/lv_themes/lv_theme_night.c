@@ -31,11 +31,6 @@ static lv_style_t def;
 /*Static style definitions*/
 static lv_style_t scr, bg, sb, panel;
 static lv_style_t prim, sec, hint;
-static lv_style_t btn_rel, btn_pr, btn_tgl_rel, btn_tgl_pr, btn_ina;
-static lv_style_t bar_bg, bar_indic;
-static lv_style_t slider_knob;
-static lv_style_t ddlist_bg, ddlist_sel;
-static lv_style_t lmeter_bg;
 
 /*Saved input parameters*/
 static uint16_t _hue;
@@ -108,6 +103,7 @@ static void cont_init(void)
 static void btn_init(void)
 {
 #if LV_USE_BTN != 0
+	static lv_style_t btn_rel, btn_pr, btn_tgl_rel, btn_tgl_pr, btn_ina;
 
     lv_style_copy(&btn_rel, &def);
     btn_rel.body.main_color     = lv_color_hsv_to_rgb(_hue, 10, 40);
@@ -215,6 +211,7 @@ static void img_init(void)
 static void bar_init(void)
 {
 #if LV_USE_BAR
+	static lv_style_t bar_bg, bar_indic;
     lv_style_copy(&bar_bg, &panel);
     bar_bg.body.padding.left   = LV_DPI / 16;
     bar_bg.body.padding.right  = LV_DPI / 16;
@@ -242,7 +239,7 @@ static void bar_init(void)
 static void slider_init(void)
 {
 #if LV_USE_SLIDER != 0
-
+	static lv_style_t slider_knob;
     lv_style_copy(&slider_knob, &btn_rel);
     slider_knob.body.radius = LV_RADIUS_CIRCLE;
 
@@ -266,6 +263,7 @@ static void sw_init(void)
 static void lmeter_init(void)
 {
 #if LV_USE_LMETER != 0
+	static lv_style_t lmeter_bg;
     lv_style_copy(&lmeter_bg, &def);
     lmeter_bg.body.main_color    = lv_color_hsv_to_rgb(_hue, 10, 70);
     lmeter_bg.body.grad_color    = lv_color_hsv_to_rgb(_hue, 95, 90);
@@ -585,9 +583,9 @@ static void list_init(void)
     list_btn_rel.body.padding.left   = LV_DPI / 8;
     list_btn_rel.body.padding.right  = LV_DPI / 8;
 
-    lv_style_copy(&list_btn_pr, &btn_pr);
-    list_btn_pr.body.main_color     = btn_pr.body.grad_color;
-    list_btn_pr.body.grad_color     = btn_pr.body.main_color;
+    lv_style_copy(&list_btn_pr, theme.style.btn.pr);
+    list_btn_pr.body.main_color     = theme.style.btn.pr->body.grad_color;
+    list_btn_pr.body.grad_color     = theme.style.btn.pr->body.main_color;
     list_btn_pr.body.border.color   = lv_color_hsv_to_rgb(_hue, 10, 5);
     list_btn_pr.body.border.width   = 0;
     list_btn_pr.body.padding.top    = LV_DPI / 6;
@@ -603,8 +601,8 @@ static void list_init(void)
     list_btn_tgl_rel.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 8);
 
     lv_style_copy(&list_btn_tgl_pr, &list_btn_tgl_rel);
-    list_btn_tgl_pr.body.main_color = btn_tgl_pr.body.main_color;
-    list_btn_tgl_pr.body.grad_color = btn_tgl_pr.body.grad_color;
+    list_btn_tgl_pr.body.main_color = theme.style.btn.tgl_pr->body.main_color;
+    list_btn_tgl_pr.body.grad_color = theme.style.btn.tgl_pr->body.grad_color;
 
     theme.style.list.sb          = &sb;
     theme.style.list.bg          = &list_bg;
@@ -620,6 +618,7 @@ static void list_init(void)
 static void ddlist_init(void)
 {
 #if LV_USE_DDLIST != 0
+	static lv_style_t ddlist_bg, ddlist_sel;
     lv_style_copy(&ddlist_bg, &btn_rel);
     ddlist_bg.text.line_space     = LV_DPI / 8;
     ddlist_bg.body.padding.top    = LV_DPI / 8;
