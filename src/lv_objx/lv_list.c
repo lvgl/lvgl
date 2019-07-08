@@ -90,7 +90,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
     ext->single_mode                      = false;
     ext->size                             = 0;
-	ext->layout							  = LV_LIST_LAYOUT_VER;
+	ext->layout							  = LV_LAYOUT_COL_M;
 
 #if LV_USE_GROUP
     ext->last_sel     = NULL;
@@ -372,7 +372,7 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t *
  * @param list pointer to a list object
  * @param layout which layout should be used
  */
- void lv_list_set_layout(lv_obj_t * list, lv_list_layout_t layout)
+ void lv_list_set_layout(lv_obj_t * list, lv_layout_t layout)
  {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 	
@@ -384,7 +384,7 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t *
 		
 		/* Visit all buttons on the list and update their layout  */
         while(btn != NULL) {
-			if (LV_LIST_LAYOUT_HOR == layout) {
+			if (LV_LAYOUT_COL_M == layout) {
 				lv_btn_set_fit2(list, LV_FIT_FLOOD, LV_FIT_TIGHT);
 			} else { /* LV_LIST_LAYOUT_VER */
 				lv_btn_set_fit(list, LV_FIT_TIGHT);
@@ -392,6 +392,8 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t *
 
             btn = lv_list_get_prev_btn(list, btn);
         }
+
+		lv_page_set_scr_layout(list, layout == LV_LAYOUT_COL_M ? LV_LAYOUT_COL_M : LV_LAYOUT_ROW_M);
 
 		ext->layout = layout;
 	}
@@ -567,7 +569,7 @@ lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list)
  * @param list pointer to a list object
  * @return layout of the list object
  */
-lv_list_layout_t lv_list_get_layout(lv_obj_t * list)
+lv_layout_t lv_list_get_layout(lv_obj_t * list)
 {
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 	return ext->layout;

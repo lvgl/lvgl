@@ -79,13 +79,6 @@ enum {
 };
 typedef uint8_t lv_list_style_t;
 
-/** List layouts. */
-enum {
-	LV_LIST_LAYOUT_HOR, /*< List horizontal layout  */
-	LV_LIST_LAYOUT_VER /*< List vertical layout */
-}
-typedef uint8_t lv_list_layout_t;
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -202,7 +195,7 @@ void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t *
  * @param list pointer to a list object
  * @param layout which layout should be used
  */
-void lv_list_set_layout(lv_obj_t * list, lv_list_layout_t layout);
+void lv_list_set_layout(lv_obj_t * list, lv_layout_t layout);
 
 /*=====================
  * Getter functions
@@ -279,7 +272,7 @@ lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list);
  * @param list pointer to a list object
  * @return layout of the list object
  */
-lv_list_layout_t lv_list_get_layout(lv_obj_t * list);
+lv_layout_t lv_list_get_layout(lv_obj_t * list);
 
 /**
  * Get the scroll bar mode of a list
