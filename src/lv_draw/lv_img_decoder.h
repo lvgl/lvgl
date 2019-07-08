@@ -71,47 +71,47 @@ typedef struct
 
 /*Image color format*/
 enum {
-  LV_IMG_CF_UNKNOWN = 0,
+    LV_IMG_CF_UNKNOWN = 0,
 
-      LV_IMG_CF_RAW,                     /**< Contains the file as it is. Needs custom decoder function*/
-      LV_IMG_CF_RAW_ALPHA,               /**< Contains the file as it is. The image has alpha. Needs custom decoder
-                                            function*/
-      LV_IMG_CF_RAW_CHROMA_KEYED,        /**< Contains the file as it is. The image is chroma keyed. Needs
-                                            custom decoder function*/
+    LV_IMG_CF_RAW,              /**< Contains the file as it is. Needs custom decoder function*/
+    LV_IMG_CF_RAW_ALPHA,        /**< Contains the file as it is. The image has alpha. Needs custom decoder
+                                   function*/
+    LV_IMG_CF_RAW_CHROMA_KEYED, /**< Contains the file as it is. The image is chroma keyed. Needs
+                                   custom decoder function*/
 
-      LV_IMG_CF_TRUE_COLOR,              /**< Color format and depth should match with LV_COLOR settings*/
-      LV_IMG_CF_TRUE_COLOR_ALPHA,        /**< Same as `LV_IMG_CF_TRUE_COLOR` but every pixel has an alpha byte*/
-      LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED, /**< Same as `LV_IMG_CF_TRUE_COLOR` but LV_COLOR_TRANSP pixels
-                                            will be transparent*/
+    LV_IMG_CF_TRUE_COLOR,              /**< Color format and depth should match with LV_COLOR settings*/
+    LV_IMG_CF_TRUE_COLOR_ALPHA,        /**< Same as `LV_IMG_CF_TRUE_COLOR` but every pixel has an alpha byte*/
+    LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED, /**< Same as `LV_IMG_CF_TRUE_COLOR` but LV_COLOR_TRANSP pixels
+                                          will be transparent*/
 
-      LV_IMG_CF_INDEXED_1BIT,            /**< Can have 2 different colors in a palette (always chroma keyed)*/
-      LV_IMG_CF_INDEXED_2BIT,            /**< Can have 4 different colors in a palette (always chroma keyed)*/
-      LV_IMG_CF_INDEXED_4BIT,            /**< Can have 16 different colors in a palette (always chroma keyed)*/
-      LV_IMG_CF_INDEXED_8BIT,            /**< Can have 256 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_1BIT, /**< Can have 2 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_2BIT, /**< Can have 4 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_4BIT, /**< Can have 16 different colors in a palette (always chroma keyed)*/
+    LV_IMG_CF_INDEXED_8BIT, /**< Can have 256 different colors in a palette (always chroma keyed)*/
 
-      LV_IMG_CF_ALPHA_1BIT,              /**< Can have one color and it can be drawn or not*/
-      LV_IMG_CF_ALPHA_2BIT,              /**< Can have one color but 4 different alpha value*/
-      LV_IMG_CF_ALPHA_4BIT,              /**< Can have one color but 16 different alpha value*/
-      LV_IMG_CF_ALPHA_8BIT,              /**< Can have one color but 256 different alpha value*/
+    LV_IMG_CF_ALPHA_1BIT, /**< Can have one color and it can be drawn or not*/
+    LV_IMG_CF_ALPHA_2BIT, /**< Can have one color but 4 different alpha value*/
+    LV_IMG_CF_ALPHA_4BIT, /**< Can have one color but 16 different alpha value*/
+    LV_IMG_CF_ALPHA_8BIT, /**< Can have one color but 256 different alpha value*/
 
-      LV_IMG_CF_RESERVED_0,              /**< Reserved for further use. */
-      LV_IMG_CF_RESERVED_1,              /**< Reserved for further use. */
-      LV_IMG_CF_RESERVED_2,              /**< Reserved for further use. */
-      LV_IMG_CF_RESERVED_3,              /**< Reserved for further use. */
-      LV_IMG_CF_RESERVED_4,              /**< Reserved for further use. */
-      LV_IMG_CF_RESERVED_5,              /**< Reserved for further use. */
-      LV_IMG_CF_RESERVED_6,              /**< Reserved for further use. */
-      LV_IMG_CF_RESERVED_7,              /**< Reserved for further use. */
-      LV_IMG_CF_RESERVED_8,              /**< Reserved for further use. */
-      LV_IMG_CF_RESERVED_9,              /**< Reserved for further use. */
+    LV_IMG_CF_RESERVED_15,              /**< Reserved for further use. */
+    LV_IMG_CF_RESERVED_16,              /**< Reserved for further use. */
+    LV_IMG_CF_RESERVED_17,              /**< Reserved for further use. */
+    LV_IMG_CF_RESERVED_18,              /**< Reserved for further use. */
+    LV_IMG_CF_RESERVED_19,              /**< Reserved for further use. */
+    LV_IMG_CF_RESERVED_20,              /**< Reserved for further use. */
+    LV_IMG_CF_RESERVED_21,              /**< Reserved for further use. */
+    LV_IMG_CF_RESERVED_22,              /**< Reserved for further use. */
+    LV_IMG_CF_RESERVED_23,              /**< Reserved for further use. */
 
-      LV_IMG_CF_USER_ENCODED_0,          /**< User holder encoding format. */
-      LV_IMG_CF_USER_ENCODED_1,          /**< User holder encoding format. */
-      LV_IMG_CF_USER_ENCODED_2,          /**< User holder encoding format. */
-      LV_IMG_CF_USER_ENCODED_3,          /**< User holder encoding format. */
-      LV_IMG_CF_USER_ENCODED_4,          /**< User holder encoding format. */
-      LV_IMG_CF_USER_ENCODED_5,          /**< User holder encoding format. */
-      LV_IMG_CF_USER_ENCODED_6,          /**< User holder encoding format. */
+    LV_IMG_CF_USER_ENCODED_0,          /**< User holder encoding format. */
+    LV_IMG_CF_USER_ENCODED_1,          /**< User holder encoding format. */
+    LV_IMG_CF_USER_ENCODED_2,          /**< User holder encoding format. */
+    LV_IMG_CF_USER_ENCODED_3,          /**< User holder encoding format. */
+    LV_IMG_CF_USER_ENCODED_4,          /**< User holder encoding format. */
+    LV_IMG_CF_USER_ENCODED_5,          /**< User holder encoding format. */
+    LV_IMG_CF_USER_ENCODED_6,          /**< User holder encoding format. */
+    LV_IMG_CF_USER_ENCODED_7,          /**< User holder encoding format. */
 };
 typedef uint8_t lv_img_cf_t;
 
@@ -307,17 +307,43 @@ void lv_img_decoder_set_read_line_cb(lv_img_decoder_t * decoder, lv_img_decoder_
 void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_close_f_t close_cb);
 
 
-/** Missing comment. */
+
+/**
+ * Get info about a built-in image
+ * @param decoder the decoder where this function belongs
+ * @param src the image source: pointer to an `lv_img_dsc_t` variable, a file path or a symbol
+ * @param header store the image data here
+ * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
+ */
 lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
 
-/** Missing comment. */
+/**
+ * Open a built in image
+ * @param decoder the decoder where this function belongs
+ * @param dsc pointer to decoder descriptor. `src`, `style` are already initialized in it.
+ * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
+ */
 lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
 
-/** Missing comment. */
+/**
+ * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
+ * Required only if the "open" function can't return with the whole decoded pixel array.
+ * @param decoder pointer to the decoder the function associated with
+ * @param dsc pointer to decoder descriptor
+ * @param x start x coordinate
+ * @param y start y coordinate
+ * @param len number of pixels to decode
+ * @param buf a buffer to store the decoded pixels
+ * @return LV_RES_OK: ok; LV_RES_INV: failed
+ */
 lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
-                                           lv_coord_t y, lv_coord_t len, uint8_t * buf);
+                                                  lv_coord_t y, lv_coord_t len, uint8_t * buf);
 
-/** Missing comment. */
+/**
+ * Close the pending decoding. Free resources etc.
+ * @param decoder pointer to the decoder the function associated with
+ * @param dsc pointer to decoder descriptor
+ */
 void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
 
 /**********************
