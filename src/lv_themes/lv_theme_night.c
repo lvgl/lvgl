@@ -31,11 +31,6 @@ static lv_style_t def;
 /*Static style definitions*/
 static lv_style_t scr, bg, sb, panel;
 static lv_style_t prim, sec, hint;
-static lv_style_t btn_rel, btn_pr, btn_tgl_rel, btn_tgl_pr, btn_ina;
-static lv_style_t bar_bg, bar_indic;
-static lv_style_t slider_knob;
-static lv_style_t ddlist_bg, ddlist_sel;
-static lv_style_t lmeter_bg;
 
 /*Saved input parameters*/
 static uint16_t _hue;
@@ -108,6 +103,7 @@ static void cont_init(void)
 static void btn_init(void)
 {
 #if LV_USE_BTN != 0
+	static lv_style_t btn_rel, btn_pr, btn_tgl_rel, btn_tgl_pr, btn_ina;
 
     lv_style_copy(&btn_rel, &def);
     btn_rel.body.main_color     = lv_color_hsv_to_rgb(_hue, 10, 40);
@@ -215,6 +211,7 @@ static void img_init(void)
 static void bar_init(void)
 {
 #if LV_USE_BAR
+	static lv_style_t bar_bg, bar_indic;
     lv_style_copy(&bar_bg, &panel);
     bar_bg.body.padding.left   = LV_DPI / 16;
     bar_bg.body.padding.right  = LV_DPI / 16;
@@ -242,12 +239,12 @@ static void bar_init(void)
 static void slider_init(void)
 {
 #if LV_USE_SLIDER != 0
-
-    lv_style_copy(&slider_knob, &btn_rel);
+	static lv_style_t slider_knob;
+    lv_style_copy(&slider_knob, theme.style.btn.rel);
     slider_knob.body.radius = LV_RADIUS_CIRCLE;
 
-    theme.style.slider.bg    = &bar_bg;
-    theme.style.slider.indic = &bar_indic;
+    theme.style.slider.bg    = theme.style.bar.bg;
+    theme.style.slider.indic = theme.style.bar.indic;
     theme.style.slider.knob  = &slider_knob;
 #endif
 }
@@ -256,16 +253,17 @@ static void sw_init(void)
 {
 #if LV_USE_SW != 0
 
-    theme.style.sw.bg       = &bar_bg;
-    theme.style.sw.indic    = &bar_indic;
-    theme.style.sw.knob_off = &slider_knob;
-    theme.style.sw.knob_on  = &slider_knob;
+    theme.style.sw.bg       = theme.style.bar.bg;
+    theme.style.sw.indic    = theme.style.bar.indic;
+    theme.style.sw.knob_off = theme.style.slider.knob;
+    theme.style.sw.knob_on  = theme.style.slider.knob;
 #endif
 }
 
 static void lmeter_init(void)
 {
 #if LV_USE_LMETER != 0
+	static lv_style_t lmeter_bg;
     lv_style_copy(&lmeter_bg, &def);
     lmeter_bg.body.main_color    = lv_color_hsv_to_rgb(_hue, 10, 70);
     lmeter_bg.body.grad_color    = lv_color_hsv_to_rgb(_hue, 95, 90);
@@ -450,7 +448,7 @@ static void btnm_init(void)
 #if LV_USE_BTNM
     static lv_style_t btnm_bg, rel, pr, tgl_rel, tgl_pr, ina;
 
-    lv_style_copy(&btnm_bg, &btn_rel);
+    lv_style_copy(&btnm_bg, theme.style.btn.rel);
     btnm_bg.body.padding.left   = 2;
     btnm_bg.body.padding.right  = 2;
     btnm_bg.body.padding.top    = 2;
@@ -458,27 +456,27 @@ static void btnm_init(void)
     btnm_bg.body.padding.inner  = 0;
     btnm_bg.body.border.width   = 1;
 
-    lv_style_copy(&rel, &btn_rel);
+    lv_style_copy(&rel, theme.style.btn.rel);
     rel.body.border.part  = LV_BORDER_FULL | LV_BORDER_INTERNAL;
     rel.body.border.width = 1;
     rel.body.radius       = 2;
 
-    lv_style_copy(&pr, &btn_pr);
+    lv_style_copy(&pr, theme.style.btn.pr);
     pr.body.border.part  = rel.body.border.part;
     pr.body.border.width = rel.body.border.width;
     pr.body.radius       = rel.body.radius;
 
-    lv_style_copy(&tgl_rel, &btn_tgl_rel);
+    lv_style_copy(&tgl_rel, theme.style.btn.tgl_rel);
     tgl_rel.body.border.part  = rel.body.border.part;
     tgl_rel.body.border.width = rel.body.border.width;
     tgl_rel.body.radius       = rel.body.radius;
 
-    lv_style_copy(&tgl_pr, &btn_tgl_pr);
+    lv_style_copy(&tgl_pr, theme.style.btn.pr);
     tgl_pr.body.border.part  = rel.body.border.part;
     tgl_pr.body.border.width = rel.body.border.width;
     tgl_pr.body.radius       = rel.body.radius;
 
-    lv_style_copy(&ina, &btn_ina);
+    lv_style_copy(&ina, theme.style.btn.ina);
     ina.body.border.part  = rel.body.border.part;
     ina.body.border.width = rel.body.border.width;
     ina.body.radius       = rel.body.radius;
@@ -496,11 +494,11 @@ static void kb_init(void)
 {
 #if LV_USE_KB
     theme.style.kb.bg          = &bg;
-    theme.style.kb.btn.rel     = &btn_rel;
-    theme.style.kb.btn.pr      = &btn_pr;
-    theme.style.kb.btn.tgl_rel = &btn_tgl_rel;
-    theme.style.kb.btn.tgl_pr  = &btn_tgl_pr;
-    theme.style.kb.btn.ina     = &btn_ina;
+    theme.style.kb.btn.rel     = theme.style.btn.rel;
+    theme.style.kb.btn.pr      = theme.style.btn.pr;
+    theme.style.kb.btn.tgl_rel = theme.style.btn.tgl_rel;
+    theme.style.kb.btn.tgl_pr  = theme.style.btn.tgl_pr;
+    theme.style.kb.btn.ina     = theme.style.btn.ina;
 #endif
 }
 
@@ -518,8 +516,8 @@ static void mbox_init(void)
     mbox_bg.body.radius       = LV_DPI / 20;
     theme.style.mbox.bg       = &mbox_bg;
     theme.style.mbox.btn.bg   = &lv_style_transp;
-    theme.style.mbox.btn.rel  = &btn_rel;
-    theme.style.mbox.btn.pr   = &btn_pr;
+    theme.style.mbox.btn.rel  = theme.style.btn.rel;
+    theme.style.mbox.btn.pr   = theme.style.btn.pr;
 #endif
 }
 
@@ -585,9 +583,9 @@ static void list_init(void)
     list_btn_rel.body.padding.left   = LV_DPI / 8;
     list_btn_rel.body.padding.right  = LV_DPI / 8;
 
-    lv_style_copy(&list_btn_pr, &btn_pr);
-    list_btn_pr.body.main_color     = btn_pr.body.grad_color;
-    list_btn_pr.body.grad_color     = btn_pr.body.main_color;
+    lv_style_copy(&list_btn_pr, theme.style.btn.pr);
+    list_btn_pr.body.main_color     = theme.style.btn.pr->body.grad_color;
+    list_btn_pr.body.grad_color     = theme.style.btn.pr->body.main_color;
     list_btn_pr.body.border.color   = lv_color_hsv_to_rgb(_hue, 10, 5);
     list_btn_pr.body.border.width   = 0;
     list_btn_pr.body.padding.top    = LV_DPI / 6;
@@ -603,8 +601,8 @@ static void list_init(void)
     list_btn_tgl_rel.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 8);
 
     lv_style_copy(&list_btn_tgl_pr, &list_btn_tgl_rel);
-    list_btn_tgl_pr.body.main_color = btn_tgl_pr.body.main_color;
-    list_btn_tgl_pr.body.grad_color = btn_tgl_pr.body.grad_color;
+    list_btn_tgl_pr.body.main_color = theme.style.btn.tgl_pr->body.main_color;
+    list_btn_tgl_pr.body.grad_color = theme.style.btn.tgl_pr->body.grad_color;
 
     theme.style.list.sb          = &sb;
     theme.style.list.bg          = &list_bg;
@@ -620,7 +618,8 @@ static void list_init(void)
 static void ddlist_init(void)
 {
 #if LV_USE_DDLIST != 0
-    lv_style_copy(&ddlist_bg, &btn_rel);
+	static lv_style_t ddlist_bg, ddlist_sel;
+    lv_style_copy(&ddlist_bg, theme.style.btn.rel);
     ddlist_bg.text.line_space     = LV_DPI / 8;
     ddlist_bg.body.padding.top    = LV_DPI / 8;
     ddlist_bg.body.padding.bottom = LV_DPI / 8;
@@ -628,7 +627,7 @@ static void ddlist_init(void)
     ddlist_bg.body.padding.right  = LV_DPI / 8;
     ddlist_bg.body.radius         = LV_DPI / 30;
 
-    lv_style_copy(&ddlist_sel, &btn_rel);
+    lv_style_copy(&ddlist_sel, theme.style.btn.rel);
     ddlist_sel.body.main_color = lv_color_hsv_to_rgb(_hue, 20, 50);
     ddlist_sel.body.grad_color = lv_color_hsv_to_rgb(_hue, 20, 50);
     ddlist_sel.body.radius     = 0;
@@ -644,14 +643,14 @@ static void roller_init(void)
 #if LV_USE_ROLLER != 0
     static lv_style_t roller_bg;
 
-    lv_style_copy(&roller_bg, &ddlist_bg);
+    lv_style_copy(&roller_bg, theme.style.ddlist.bg);
     roller_bg.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 20);
     roller_bg.body.grad_color = lv_color_hsv_to_rgb(_hue, 10, 40);
     roller_bg.text.color      = lv_color_hsv_to_rgb(_hue, 5, 70);
     roller_bg.text.opa        = LV_OPA_60;
 
     theme.style.roller.bg  = &roller_bg;
-    theme.style.roller.sel = &ddlist_sel;
+    theme.style.roller.sel = theme.style.ddlist.sel;
 #endif
 }
 
@@ -661,10 +660,10 @@ static void tabview_init(void)
     theme.style.tabview.bg          = &bg;
     theme.style.tabview.indic       = &lv_style_transp;
     theme.style.tabview.btn.bg      = &lv_style_transp;
-    theme.style.tabview.btn.rel     = &btn_rel;
-    theme.style.tabview.btn.pr      = &btn_pr;
-    theme.style.tabview.btn.tgl_rel = &btn_tgl_rel;
-    theme.style.tabview.btn.tgl_pr  = &btn_tgl_pr;
+    theme.style.tabview.btn.rel     = theme.style.btn.rel;
+    theme.style.tabview.btn.pr      = theme.style.btn.pr;
+    theme.style.tabview.btn.tgl_rel = theme.style.btn.tgl_rel;
+    theme.style.tabview.btn.tgl_pr  = theme.style.btn.tgl_pr;
 #endif
 }
 

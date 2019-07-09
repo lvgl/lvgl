@@ -286,6 +286,14 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
 lv_res_t lv_obj_del(lv_obj_t * obj);
 
 /**
+ * Helper function for asynchronously deleting objects.
+ * Useful for cases where you can't delete an object directly in an `LV_EVENT_DELETE` handler (i.e. parent).
+ * @param obj object to delete
+ * @see lv_async_call
+ */
+void lv_obj_del_async(struct _lv_obj_t *obj);
+
+/**
  * Delete all children of an object
  * @param obj pointer to an object
  */

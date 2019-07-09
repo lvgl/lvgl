@@ -19,6 +19,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define CF_BUILT_IN_FIRST LV_IMG_CF_TRUE_COLOR
+#define CF_BUILT_IN_LAST LV_IMG_CF_ALPHA_8BIT
 
 /**********************
  *      TYPEDEFS
@@ -34,12 +36,6 @@ typedef struct
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-
-static lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header);
-static lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
-static lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
-                                                  lv_coord_t y, lv_coord_t len, uint8_t * buf);
-static void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc);
 static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                         lv_coord_t len, uint8_t * buf);
 static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
@@ -177,7 +173,9 @@ lv_res_t lv_img_decoder_read_line(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_c
  */
 void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc)
 {
-    if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
+    if(dsc->decoder) {
+        if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
+    }
 }
 
 /**
@@ -246,16 +244,22 @@ void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_clos
     decoder->close_cb = close_cb;
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-static lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
+/**
+ * Get info about a built-in image
+ * @param decoder the decoder where this function belongs
+ * @param src the image source: pointer to an `lv_img_dsc_t` variable, a file path or a symbol
+ * @param header store the image data here
+ * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
+ */
+lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * src, lv_img_header_t * header)
 {
     (void)decoder; /*Unused*/
 
     lv_img_src_t src_type = lv_img_src_get_type(src);
     if(src_type == LV_IMG_SRC_VARIABLE) {
+        lv_img_cf_t cf = ((lv_img_dsc_t *)src)->header.cf;
+        if(cf < CF_BUILT_IN_FIRST || cf > CF_BUILT_IN_LAST) return LV_RES_INV;
+
         header->w  = ((lv_img_dsc_t *)src)->header.w;
         header->h  = ((lv_img_dsc_t *)src)->header.h;
         header->cf = ((lv_img_dsc_t *)src)->header.cf;
@@ -271,13 +275,9 @@ static lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const v
             lv_fs_close(&file);
         }
 
-        /*Create a dummy header on fs error*/
-        if(res != LV_FS_RES_OK || rn != sizeof(lv_img_header_t)) {
-            header->w  = LV_DPI;
-            header->h  = LV_DPI;
-            header->cf = LV_IMG_CF_UNKNOWN;
-            return LV_RES_INV;
-        }
+        lv_img_cf_t cf = ((lv_img_dsc_t *)src)->header.cf;
+        if(cf < CF_BUILT_IN_FIRST || cf > CF_BUILT_IN_LAST) return LV_RES_INV;
+
     }
 #endif
     else if(src_type == LV_IMG_SRC_SYMBOL) {
@@ -295,7 +295,13 @@ static lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const v
     return LV_RES_OK;
 }
 
-static lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+/**
+ * Open a built in image
+ * @param decoder the decoder where this function belongs
+ * @param dsc pointer to decoder descriptor. `src`, `style` are already initialized in it.
+ * @return LV_RES_OK: the info is successfully stored in `header`; LV_RES_INV: unknown format or other error.
+ */
+lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
     /*Open the file if it's a file*/
     if(dsc->src_type == LV_IMG_SRC_FILE) {
@@ -424,7 +430,18 @@ static lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_
     }
 }
 
-static lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
+/**
+ * Decode `len` pixels starting from the given `x`, `y` coordinates and store them in `buf`.
+ * Required only if the "open" function can't return with the whole decoded pixel array.
+ * @param decoder pointer to the decoder the function associated with
+ * @param dsc pointer to decoder descriptor
+ * @param x start x coordinate
+ * @param y start y coordinate
+ * @param len number of pixels to decode
+ * @param buf a buffer to store the decoded pixels
+ * @return LV_RES_OK: ok; LV_RES_INV: failed
+ */
+lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
                                                   lv_coord_t y, lv_coord_t len, uint8_t * buf)
 {
     (void)decoder; /*Unused*/
@@ -453,7 +470,12 @@ static lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv
     return res;
 }
 
-static void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
+/**
+ * Close the pending decoding. Free resources etc.
+ * @param decoder pointer to the decoder the function associated with
+ * @param dsc pointer to decoder descriptor
+ */
+void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc)
 {
     (void)decoder; /*Unused*/
 
@@ -472,6 +494,11 @@ static void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_dec
         dsc->user_data = NULL;
     }
 }
+
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
                                                         lv_coord_t len, uint8_t * buf)

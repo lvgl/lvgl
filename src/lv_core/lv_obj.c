@@ -15,6 +15,7 @@
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_anim.h"
 #include "../lv_misc/lv_task.h"
+#include "../lv_misc/lv_async.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_hal/lv_hal.h"
 #include <stdint.h>
@@ -49,6 +50,7 @@ static void report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
 static void lv_event_mark_deleted(lv_obj_t * obj);
+static void lv_obj_del_async_cb(void * obj);
 static bool lv_obj_design(lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
@@ -446,6 +448,17 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     }
 
     return LV_RES_INV;
+}
+
+/**
+ * Helper function for asynchronously deleting objects.
+ * Useful for cases where you can't delete an object directly in an `LV_EVENT_DELETE` handler (i.e. parent).
+ * @param obj object to delete
+ * @see lv_async_call
+ */
+void lv_obj_del_async(lv_obj_t * obj)
+{
+    lv_async_call(lv_obj_del_async_cb, obj);
 }
 
 /**
@@ -2100,6 +2113,11 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void lv_obj_del_async_cb(void * obj)
+{
+    lv_obj_del(obj);
+}
 
 /**
  * Handle the drawing related tasks of the base objects.

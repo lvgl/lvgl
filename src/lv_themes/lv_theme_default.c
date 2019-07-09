@@ -35,9 +35,6 @@ static lv_style_t plain_bordered;
 static lv_style_t label_prim;
 static lv_style_t label_sec;
 static lv_style_t label_hint;
-static lv_style_t slider_bg;
-static lv_style_t sw_bg;
-static lv_style_t lmeter;
 
 /*Saved input parameters*/
 static uint16_t _hue;
@@ -149,6 +146,7 @@ static void bar_init(void)
 static void slider_init(void)
 {
 #if LV_USE_SLIDER != 0
+	static lv_style_t slider_bg;
     lv_style_copy(&slider_bg, &lv_style_pretty);
     slider_bg.body.padding.left   = LV_DPI / 20;
     slider_bg.body.padding.right  = LV_DPI / 20;
@@ -164,6 +162,7 @@ static void slider_init(void)
 static void sw_init(void)
 {
 #if LV_USE_SW != 0
+	static lv_style_t sw_bg;
     lv_style_copy(&sw_bg, &lv_style_pretty);
     sw_bg.body.padding.left   = 3;
     sw_bg.body.padding.right  = 3;
@@ -180,7 +179,7 @@ static void sw_init(void)
 static void lmeter_init(void)
 {
 #if LV_USE_LMETER != 0
-
+	static lv_style_t lmeter;
     lv_style_copy(&lmeter, &lv_style_pretty_color);
     lmeter.line.color      = lv_color_hex3(0xddd);
     lmeter.line.width      = 2;
@@ -195,11 +194,11 @@ static void gauge_init(void)
 {
 #if LV_USE_GAUGE != 0
     static lv_style_t gauge;
-    lv_style_copy(&gauge, &lmeter);
-    gauge.line.color      = lmeter.body.grad_color;
+    lv_style_copy(&gauge, theme.style.lmeter);
+    gauge.line.color      = theme.style.lmeter->body.grad_color;
     gauge.line.width      = 2;
     gauge.body.main_color = lv_color_hex3(0x888);
-    gauge.body.grad_color = lmeter.body.main_color;
+    gauge.body.grad_color = theme.style.lmeter->body.main_color;
     gauge.text.color      = lv_color_hex3(0x888);
 
     theme.style.gauge = &gauge;
