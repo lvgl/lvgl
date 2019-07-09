@@ -537,13 +537,12 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
     const lv_style_t * style = lv_obj_get_style(cont);
     lv_coord_t w_tot         = lv_obj_get_width(cont);
     lv_coord_t w_obj         = lv_obj_get_width(lv_obj_get_child(cont, NULL));
+    lv_coord_t w_fit         =  lv_obj_get_width_fit(cont);
     lv_coord_t h_obj         = lv_obj_get_height(lv_obj_get_child(cont, NULL));
-    uint16_t obj_row         = (w_tot - style->body.padding.left - style->body.padding.right) /
-                       (w_obj + style->body.padding.inner); /*Obj. num. in a row*/
+    uint16_t obj_row         = (w_fit) / (w_obj + style->body.padding.inner); /*Obj. num. in a row*/
     lv_coord_t x_ofs;
     if(obj_row > 1) {
-        x_ofs = (w_obj + (w_tot - style->body.padding.left - style->body.padding.right) - (obj_row * w_obj)) /
-                (obj_row - 1);
+        x_ofs = w_obj + (w_fit - (obj_row * w_obj)) / (obj_row - 1);
     } else {
         x_ofs = w_tot / 2 - w_obj / 2;
     }

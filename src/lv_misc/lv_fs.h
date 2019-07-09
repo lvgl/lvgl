@@ -127,6 +127,13 @@ void lv_fs_drv_init(lv_fs_drv_t * drv);
 void lv_fs_drv_register(lv_fs_drv_t * drv_p);
 
 /**
+ * Give a pointer to a driver from its letter
+ * @param letter the driver letter
+ * @return pointer to a driver or NULL if not found
+ */
+lv_fs_drv_t * lv_fs_get_drv(char letter);
+
+/**
  * Test if a drive is rady or not. If the `ready` function was not initialized `true` will be
  * returned.
  * @param letter letter of the drive
