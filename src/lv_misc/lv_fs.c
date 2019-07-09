@@ -37,7 +37,6 @@
  *  STATIC PROTOTYPES
  **********************/
 static const char * lv_fs_get_real_path(const char * path);
-static lv_fs_drv_t * lv_fs_get_drv(char letter);
 
 /**********************
  *  STATIC VARIABLES
@@ -494,6 +493,24 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p)
 }
 
 /**
+ * Give a pointer to a driver from its letter
+ * @param letter the driver letter
+ * @return pointer to a driver or NULL if not found
+ */
+lv_fs_drv_t * lv_fs_get_drv(char letter)
+{
+    lv_fs_drv_t * drv;
+
+    LV_LL_READ(LV_GC_ROOT(_lv_drv_ll), drv)
+    {
+        if(drv->letter == letter) {
+            return drv;
+        }
+    }
+
+    return NULL;
+}
+/**
  * Fill a buffer with the letters of existing drivers
  * @param buf buffer to store the letters ('\0' added after the last letter)
  * @return the buffer
@@ -619,25 +636,6 @@ static const char * lv_fs_get_real_path(const char * path)
     }
 
     return path;
-}
-
-/**
- * Give a pointer to a driver from its letter
- * @param letter the driver letter
- * @return pointer to a driver or NULL if not found
- */
-static lv_fs_drv_t * lv_fs_get_drv(char letter)
-{
-    lv_fs_drv_t * drv;
-
-    LV_LL_READ(LV_GC_ROOT(_lv_drv_ll), drv)
-    {
-        if(drv->letter == letter) {
-            return drv;
-        }
-    }
-
-    return NULL;
 }
 
 #endif /*LV_USE_FILESYSTEM*/
