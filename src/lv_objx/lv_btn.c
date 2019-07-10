@@ -64,7 +64,7 @@ static lv_point_t ink_point;
  **********************/
 
 /**
- * Create a button objects
+ * Create a button object
  * @param par pointer to an object, it will be the parent of the new button
  * @param copy pointer to a button object, if not NULL then the new object will be copied from it
  * @return pointer to the created button
@@ -288,7 +288,7 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn)
 /**
  * Get the toggle enable attribute of the button
  * @param btn pointer to a button object
- * @return ture: toggle enabled, false: disabled
+ * @return true: toggle enabled, false: disabled
  */
 bool lv_btn_get_toggle(const lv_obj_t * btn)
 {
