@@ -102,7 +102,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
         memcpy(&p_color, &buf_u8[px], sizeof(lv_color_t));
 #if LV_COLOR_SIZE == 32
-        p_color.ch.alpha = 0xFF; /*Only the color should be get so use a deafult alpha value*/
+        p_color.alpha = 0xFF; /*Only the color should be get so use a deafult alpha value*/
 #endif
     } else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
         buf_u8 += 4 * 2;
@@ -431,16 +431,16 @@ lv_img_dsc_t *lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
     lv_img_dsc_t *dsc = lv_mem_alloc(sizeof(lv_img_dsc_t));
     if(dsc == NULL)
         return NULL;
-    
+
     memset(dsc, 0, sizeof(lv_img_dsc_t));
-    
+
     /* Get image data size */
     dsc->data_size = lv_img_buf_get_img_size(w, h, cf);
     if(dsc->data_size == 0) {
         lv_mem_free(dsc);
         return NULL;
     }
-    
+
     /* Allocate raw buffer */
     dsc->data = lv_mem_alloc(dsc->data_size);
     if(dsc->data == NULL) {
@@ -448,7 +448,7 @@ lv_img_dsc_t *lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
         return NULL;
     }
     memset(dsc->data, 0, dsc->data_size);
-    
+
     /* Fill in header */
     dsc->header.always_zero = 0;
     dsc->header.w = w;
@@ -462,7 +462,7 @@ void lv_img_buf_free(lv_img_dsc_t *dsc)
     if(dsc != NULL) {
         if(dsc->data != NULL)
             lv_mem_free(dsc->data);
-        
+
         lv_mem_free(dsc);
     }
 }

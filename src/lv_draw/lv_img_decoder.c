@@ -398,7 +398,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
 
             uint32_t i;
             for(i = 0; i < palette_size; i++) {
-                user_data->palette[i] = lv_color_make(palette_p[i].ch.red, palette_p[i].ch.green, palette_p[i].ch.blue);
+                user_data->palette[i] = lv_color_make(palette_p[i].red, palette_p[i].green, palette_p[i].blue);
             }
         }
 

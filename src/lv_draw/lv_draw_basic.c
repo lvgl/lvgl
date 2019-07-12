@@ -107,7 +107,7 @@ void lv_draw_px(lv_coord_t x, lv_coord_t y, const lv_area_t * mask_p, lv_color_t
             }
         } else {
 #if LV_COLOR_DEPTH == 32 && LV_COLOR_SCREEN_TRANSP
-            *vdb_px_p = color_mix_2_alpha(*vdb_px_p, (*vdb_px_p).ch.alpha, color, opa);
+            *vdb_px_p = color_mix_2_alpha(*vdb_px_p, vdb_px_p->alpha, color, opa);
 #endif
         }
     }
@@ -346,7 +346,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
                             *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, px_opa);
                         } else {
 #if LV_COLOR_DEPTH == 32 && LV_COLOR_SCREEN_TRANSP
-                            *vdb_buf_tmp = color_mix_2_alpha(*vdb_buf_tmp, (*vdb_buf_tmp).ch.alpha, color, px_opa);
+                            *vdb_buf_tmp = color_mix_2_alpha(*vdb_buf_tmp, vdb_buf_tmp->alpha, color, px_opa);
 #endif
                         }
                     }
@@ -538,7 +538,7 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p, const uint
                                 vdb_buf_tmp[col] = lv_color_mix(px_color, vdb_buf_tmp[col], opa_result);
                             } else {
 #if LV_COLOR_DEPTH == 32 && LV_COLOR_SCREEN_TRANSP
-                                vdb_buf_tmp[col] = color_mix_2_alpha(vdb_buf_tmp[col], vdb_buf_tmp[col].ch.alpha,
+                                vdb_buf_tmp[col] = color_mix_2_alpha(vdb_buf_tmp[col], vdb_buf_tmp[col].alpha,
                                                                      px_color, opa_result);
 #endif
                             }
@@ -641,7 +641,7 @@ static void sw_color_fill(lv_color_t * mem, lv_coord_t mem_width, const lv_area_
 
                     } else {
 #if LV_COLOR_DEPTH == 32 && LV_COLOR_SCREEN_TRANSP
-                        mem[col] = color_mix_2_alpha(mem[col], mem[col].ch.alpha, color, opa);
+                        mem[col] = color_mix_2_alpha(mem[col], mem[col].alpha, color, opa);
 #endif
                     }
                 }
@@ -664,7 +664,7 @@ static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
 {
     /* Pick the foreground if it's fully opaque or the Background is fully transparent*/
     if(fg_opa > LV_OPA_MAX || bg_opa <= LV_OPA_MIN) {
-        fg_color.ch.alpha = fg_opa;
+        fg_color.alpha = fg_opa;
         return fg_color;
     }
     /*Transparent foreground: use the Background*/
@@ -699,7 +699,7 @@ static inline lv_color_t color_mix_2_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
             }
             lv_opa_t ratio = (uint16_t)((uint16_t)fg_opa * 255) / alpha_res;
             c              = lv_color_mix(fg_color, bg_color, ratio);
-            c.ch.alpha     = alpha_res;
+            c.alpha        = alpha_res;
         }
         return c;
     }
