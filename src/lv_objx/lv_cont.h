@@ -106,16 +106,16 @@ void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout);
  * @param cont pointer to a container object
  * @param left left fit policy from `lv_fit_t`
  * @param right right fit policy from `lv_fit_t`
- * @param top bottom fit policy from `lv_fit_t`
+ * @param top top fit policy from `lv_fit_t`
  * @param bottom bottom fit policy from `lv_fit_t`
  */
 void lv_cont_set_fit4(lv_obj_t * cont, lv_fit_t left, lv_fit_t right, lv_fit_t top, lv_fit_t bottom);
 
 /**
  * Set the fit policy horizontally and vertically separately.
- * It tell how to change the container's size automatically.
+ * It tells how to change the container's size automatically.
  * @param cont pointer to a container object
- * @param hot horizontal fit policy from `lv_fit_t`
+ * @param hor horizontal fit policy from `lv_fit_t`
  * @param ver vertical fit policy from `lv_fit_t`
  */
 static inline void lv_cont_set_fit2(lv_obj_t * cont, lv_fit_t hor, lv_fit_t ver)
@@ -124,8 +124,8 @@ static inline void lv_cont_set_fit2(lv_obj_t * cont, lv_fit_t hor, lv_fit_t ver)
 }
 
 /**
- * Set the fit policyin all 4 direction at once.
- * It tell how to change the container's size automatically.
+ * Set the fit policy in all 4 direction at once.
+ * It tells how to change the container's size automatically.
  * @param cont pointer to a container object
  * @param fit fit policy from `lv_fit_t`
  */
