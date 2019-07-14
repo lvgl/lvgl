@@ -275,8 +275,7 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
             lv_fs_close(&file);
         }
 
-        lv_img_cf_t cf = ((lv_img_dsc_t *)src)->header.cf;
-        if(cf < CF_BUILT_IN_FIRST || cf > CF_BUILT_IN_LAST) return LV_RES_INV;
+        if(header->cf < CF_BUILT_IN_FIRST || header->cf > CF_BUILT_IN_LAST) return LV_RES_INV;
 
     }
 #endif
