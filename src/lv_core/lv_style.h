@@ -272,6 +272,18 @@ extern lv_style_t lv_style_btn_ina;
  *      MACROS
  **********************/
 
+/**
+ * Create and initialize a `static` style
+ * Example:
+ *     LV_STYLE_CREATE(my_style, &lv_style_plain);
+ *   is equivalent to
+ *     static lv_style_t my_style;
+ *     lv_style_copy(my_style, &lv_style_plain);
+ *
+ * If the style to copy is `NULL` `lv_style_plain` will be used.
+ */
+#define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_copy(&name, copy_p == NULL ? &lv_style_plain : copy_p);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
