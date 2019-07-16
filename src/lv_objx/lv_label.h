@@ -140,6 +140,15 @@ void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size
 void lv_label_set_static_text(lv_obj_t * label, const char * text);
 
 /**
+ * Set a new text for a label from a printf compatible format with arguments.
+ * Memory will be allocated to store the text by the label.
+ * @param label pointer to a label object
+ * @param fmt '\0' terminated format string.
+ * @param ... variable argument list
+ */
+void lv_label_set_text_from_fmt(lv_obj_t * label, const char * fmt, ...);
+
+/**
  * Set the behavior of the label with longer text then the object size
  * @param label pointer to a label object
  * @param long_mode the new mode from 'lv_label_long_mode' enum.

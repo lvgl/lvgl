@@ -14,6 +14,10 @@
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_math.h"
 
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdio.h>
+
 /*********************
  *      DEFINES
  *********************/
@@ -254,6 +258,93 @@ void lv_label_set_static_text(lv_obj_t * label, const char * text)
         ext->static_txt = 1;
         ext->text       = (char *)text;
     }
+
+    lv_label_refr_text(label);
+}
+
+/**
+ * Set a new text for a label from a printf compatible format with arguments.
+ * Memory will be allocated to store the text by the label.
+ * @param label pointer to a label object
+ * @param fmt '\0' terminated format string.
+ * @param ... variable argument list
+ */
+void lv_label_set_text_from_fmt(lv_obj_t * label, const char * fmt, ...)
+{
+    lv_obj_invalidate(label);
+
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    uint32_t total_width = strlen(fmt) + 1;
+    const char * s_fmt   = fmt;
+
+    va_list ap;
+    va_start(ap, fmt);
+    while(*fmt != '\0') {
+        if(*fmt++ == '%') {
+            while (strchr("-+ #0", *fmt))
+            ++fmt;
+    	  if(*fmt == '*') {
+    	      ++fmt;
+    	      total_width += abs(va_arg(ap, int));
+    	  } else
+    	      total_width += strtoul(fmt, (char **) &fmt, 10);
+    	  if(*fmt == '.') {
+    	      ++fmt;
+    	      if(*fmt == '*') {
+    		      ++fmt;
+    		      total_width += abs(va_arg (ap, int));
+    		  } else
+                  total_width += strtoul(fmt, (char **) &fmt, 10);
+    	   }
+
+    	  while (strchr("hlL", *fmt))
+    	    ++fmt;
+
+    	  total_width += 30;
+    	  switch (*fmt) {
+    	    case 'd':
+    	    case 'i':
+    	    case 'o':
+    	    case 'u':
+    	    case 'x':
+    	    case 'X':
+    	    case 'c':
+    	       va_arg(ap, int);
+    	      break;
+    	    case 'f':
+    	    case 'e':
+    	    case 'E':
+    	    case 'g':
+    	    case 'G':
+    	       va_arg(ap, double);
+    	      /* Since an ieee double can have an exponent of 307, we'll
+    		 make the buffer wide enough to cover the gross case. */
+    	      total_width += 307;
+    	      break;
+    	    case 's':
+    	      total_width += strlen(va_arg(ap, char *));
+    	      break;
+    	    case 'p':
+    	    case 'n':
+    	       va_arg(ap, char *);
+    	      break;
+    	  }
+    	  fmt++;
+    	}
+    }
+    va_end(ap);
+
+    ext->text = (char *) lv_mem_alloc(total_width);
+    lv_mem_assert(ext->text);
+
+    if(ext->text == NULL) return;
+
+    va_list ap_2;
+    va_start(ap_2, fmt);
+    vsprintf(ext->text,s_fmt,ap_2);
+    va_end(ap_2);
+
+    ext->static_txt = 0;
 
     lv_label_refr_text(label);
 }
