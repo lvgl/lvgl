@@ -1106,20 +1106,12 @@ static void indev_drag(lv_indev_proc_t * state)
                 lv_obj_set_y(drag_obj, act_y + state->types.pointer.vect.y);
             }
 
-            /*Set the drag in progress flag*/
-            /*Send the drag begin signal on first move*/
-            if(state->types.pointer.drag_in_prog == 0) {
-                drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_BEGIN, indev_act);
-                if(indev_reset_check(state)) return;
-                lv_event_send(drag_obj, LV_EVENT_DRAG_BEGIN, NULL);
-                if(indev_reset_check(state)) return;
-            }
 
-            state->types.pointer.drag_in_prog = 1;
+
 
             /*If the object didn't moved then clear the invalidated areas*/
             if(drag_obj->coords.x1 == prev_x && drag_obj->coords.y1 == prev_y) {
-                state->types.pointer.drag_in_prog = 0;
+//                state->types.pointer.drag_in_prog = 0;
                 /*In a special case if the object is moved on a page and
                  * the scrollable has fit == true and the object is dragged of the page then
                  * while its coordinate is not changing only the parent's size is reduced */
@@ -1128,6 +1120,16 @@ static void indev_drag(lv_indev_proc_t * state)
                 if(act_par_w == prev_par_w && act_par_h == prev_par_h) {
                     uint16_t new_inv_buf_size = lv_disp_get_inv_buf_size(indev_act->driver.disp);
                     lv_disp_pop_from_inv_buf(indev_act->driver.disp, new_inv_buf_size - inv_buf_size);
+                }
+            } else {
+                state->types.pointer.drag_in_prog = 1;
+                /*Set the drag in progress flag*/
+                /*Send the drag begin signal on first move*/
+                if(drag_just_started) {
+                    drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_BEGIN, indev_act);
+                    if(indev_reset_check(state)) return;
+                    lv_event_send(drag_obj, LV_EVENT_DRAG_BEGIN, NULL);
+                    if(indev_reset_check(state)) return;
                 }
             }
         }
