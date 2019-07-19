@@ -247,7 +247,7 @@ void btn_event_cb(lv_obj_t * btn, lv_event_t event)
     }
 }
 ```
-![](/misc/simple_button_example.gif)
+![LittlevGL button with label example](https://docs.littlevgl.com/en/misc/simple_button_example.gif)
 
 ### Button with styles
 Add styles to the previously button from the previous example
@@ -275,7 +275,7 @@ lv_btn_set_style(btn, LV_BTN_STYLE_REL, &style_btn_rel);    /*Set the button's r
 lv_btn_set_style(btn, LV_BTN_STYLE_PR, &style_btn_pr);      /*Set the button's pressed style*/
 ```
 
-![](/misc/button_style_example.gif)
+![Stylsd button is LittelvGL](https://docs.littlevgl.com/en/misc/button_style_example.gif)
 
 ### Slider and object alignment
 ```c
@@ -307,7 +307,7 @@ void slider_event_cb(lv_obj_t * slider, lv_event_t event)
 }
 ```
 
-![](/misc/slider_example.gif)
+![Slider example with LittlevGL](https://docs.littlevgl.com/en/misc/slider_example.gif)
 
 ### List and themes
 ```c
@@ -358,7 +358,7 @@ static void list_event(lv_obj_t * btn, lv_event_t e)
 
 }
 ```
-![](https://docs.littlevgl.com/en/html/misc/list_theme_example.gif)
+![List and theme example with LittlevGL](https://docs.littlevgl.com/en/misc/list_theme_example.gif)
 
 ### Use LittlevGL from Micropython
 Learn more about [Micropython](https://docs.littlevgl.com/en/html/get-started/micropython).
