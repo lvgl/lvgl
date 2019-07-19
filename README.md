@@ -24,7 +24,7 @@ LittlevGL provides everything you need to create a Graphical User Interface (GUI
 - [Features](#features)
 - [Supported devices](#supported-devices)
 - [Quick start in a simulator](#quick-start-in-a-simulator)
-- [Add LittlevGL into your project](#add-littlevgl-into-your-project)
+- [Add LittlevGL to your project](#add-littlevgl-to-your-project)
 - [Learn the basics](#learn-the-basics)
 - [Examples](#examples)
 - [Contributing](#contributing)
@@ -84,7 +84,7 @@ Choose a project with your favourite IDE:
 | Cross-platform<br>with SDL | Native Windows | Cross-platform<br>with SDL | Cross-platform<br>with SDL | Cross-platform<br>with SDL |
 
 
-## Add LittlevGL into your project
+## Add LittlevGL to your project
 
 The steps below show how to setup LittlevGL on an embedded system with a display and a touchpad. 
 You can use the [Simulators](https://docs.littlevgl.com/en/html/get-started/pc-simulator) to get ready to use projects which can be run on your PC. 
