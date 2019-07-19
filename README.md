@@ -46,7 +46,7 @@ LittlevGL provides everything you need to create a Graphical User Interface (GUI
 * **Micropython Binding** exposes [LittlevGL API in Micropython](https://blog.littlevgl.com/2019-02-20/micropython-bindings)
 * **Simulator** to develop on PC without embedded hardware
 * **Tutorials, examples, themes** for rapid development
-* **Documentation** and API references online
+* **Documentation** and API references
 
 ## Supported devices
 Basically, every modern controller - which is able to drive a display - is suitable to run LittlevGL. The minimal requirements:
