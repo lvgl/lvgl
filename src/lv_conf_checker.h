@@ -412,6 +412,22 @@
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 #endif
 
+/*Change the built in (v)snprintf functions*/
+#ifndef LV_SPRINTF_CUSTOM
+#define LV_SPRINTF_CUSTOM   0
+#endif
+#if LV_SPRINTF_CUSTOM
+#ifndef LV_SPRINTF_INCLUDE
+#  define LV_SPRINTF_INCLUDE <stdio.h>
+#endif
+#ifndef lv_snprintf
+#  define lv_snprintf     snprintf
+#endif
+#ifndef lv_vsnprintf
+#  define lv_vsnprintf    vsnprintf
+#endif
+#endif  /*LV_SPRINTF_CUSTOM*/
+
 /*===================
  *  LV_OBJ SETTINGS
  *==================*/

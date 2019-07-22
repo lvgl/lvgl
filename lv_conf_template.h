@@ -297,6 +297,14 @@ typedef void * lv_font_user_data_t;
  /*Can break (wrap) texts on these chars*/
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 
+/*Change the built in (v)snprintf functions*/
+#define LV_SPRINTF_CUSTOM   0
+#if LV_SPRINTF_CUSTOM
+#  define LV_SPRINTF_INCLUDE <stdio.h>
+#  define lv_snprintf     snprintf
+#  define lv_vsnprintf    vsnprintf
+#endif  /*LV_SPRINTF_CUSTOM*/
+
 /*===================
  *  LV_OBJ SETTINGS
  *==================*/
