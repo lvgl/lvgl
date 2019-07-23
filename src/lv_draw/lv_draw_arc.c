@@ -216,7 +216,7 @@ static uint16_t fast_atan2(int x, int y)
         if(tempdegree >= 10) comp++;
         if(tempdegree >= 15) comp++; /*max is 4 degrees compensated*/
     }
-    degree += comp; /*degree is now accurate to +/- 1 degree!
+    degree += comp; /*degree is now accurate to +/- 1 degree!*/
 
     /*Invert degree if it was X>Y octant, makes 0-45 into 90-45*/
       if(negflag & 0x10) degree = (90 - degree);
