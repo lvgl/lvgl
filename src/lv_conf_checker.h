@@ -412,6 +412,21 @@
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 #endif
 
+/* If a character is at least this long, will break wherever "prettiest" */
+#ifndef LV_TXT_LINE_BREAK_LONG_LEN
+#define LV_TXT_LINE_BREAK_LONG_LEN          12
+#endif
+
+/* Minimum number of characters of a word to put on a line before a break */
+#ifndef LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
+#define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN  3
+#endif
+
+/* Minimum number of characters of a word to put on a line after a break */
+#ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
+#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
+#endif
+
 /*Change the built in (v)snprintf functions*/
 #ifndef LV_SPRINTF_CUSTOM
 #define LV_SPRINTF_CUSTOM   0
