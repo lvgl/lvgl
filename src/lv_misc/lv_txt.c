@@ -306,6 +306,11 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
         if(letter_next == '\0') i = tmp;
     }
 
+    /*Always step at least one to avoid infinite loops*/
+    if(i == 0) {
+        lv_txt_encoded_next(txt, &i);
+    }
+
     return i;
 }
 
