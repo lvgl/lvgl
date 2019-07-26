@@ -226,10 +226,10 @@ static void bar_init(void)
     bar_bg.body.grad_color     = bar_bg.body.main_color;
     bar_bg.body.radius         = 3;
     bar_bg.body.border.width   = 0;
-    bar_bg.body.padding.left   = LV_DPI / 12;
-    bar_bg.body.padding.right  = LV_DPI / 12;
-    bar_bg.body.padding.top    = LV_DPI / 12;
-    bar_bg.body.padding.bottom = LV_DPI / 12;
+    bar_bg.body.padding.left   = LV_DPI / 16;
+    bar_bg.body.padding.right  = LV_DPI / 16;
+    bar_bg.body.padding.top    = LV_DPI / 16;
+    bar_bg.body.padding.bottom = LV_DPI / 16;
 
     lv_style_copy(&bar_indic, &bar_bg);
     bar_indic.body.main_color     = lv_color_hsv_to_rgb(_hue, 85, 70);
