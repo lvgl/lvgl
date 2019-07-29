@@ -2993,7 +2993,7 @@ static const lv_font_fmt_txt_kern_pair_t kern_pairs =
  *--------------------*/
 
 /*Store all the custom data of the font*/
-static const lv_font_fmt_txt_dsc_t font_dsc = {
+static lv_font_fmt_txt_dsc_t font_dsc = {
     .glyph_bitmap = gylph_bitmap,
     .glyph_dsc = glyph_dsc,
     .cmaps = cmaps,
