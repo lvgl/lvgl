@@ -97,9 +97,11 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->offset.x = 0;
     ext->offset.y = 0;
 
+#if LV_LABEL_LONG_TXT_HINT
     ext->hint.line_start = -1;
     ext->hint.coord_y    = 0;
     ext->hint.y          = 0;
+#endif
 
 #if LV_LABEL_TEXT_SEL
     ext->txt_sel_start = LV_LABEL_TEXT_SEL_OFF;
@@ -860,13 +862,18 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
                 flag &= ~LV_TXT_FLAG_CENTER;
             }
         }
-
+#if LV_LABEL_LONG_TXT_HINT
         lv_draw_label_hint_t * hint = &ext->hint;
         if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC || lv_obj_get_height(label) < LV_LABEL_HINT_HEIGHT_LIMIT)
             hint = NULL;
 
+#else
+        /*Just for compatibility*/
+        lv_draw_label_hint_t * hint = NULL;
+#endif
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset,
-                      lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), hint);
+                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), hint);
+
 
         if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
             lv_point_t size;
@@ -960,8 +967,9 @@ static void lv_label_refr_text(lv_obj_t * label)
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
     if(ext->text == NULL) return;
-
+#if LV_LABEL_LONG_TXT_HINT
     ext->hint.line_start = -1; /*The hint is invalid if the text changes*/
+#endif
 
     lv_coord_t max_w         = lv_obj_get_width(label);
     const lv_style_t * style = lv_obj_get_style(label);
