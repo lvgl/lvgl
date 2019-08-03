@@ -286,6 +286,14 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
 lv_res_t lv_obj_del(lv_obj_t * obj);
 
 /**
+ * Helper function for asynchronously deleting objects.
+ * Useful for cases where you can't delete an object directly in an `LV_EVENT_DELETE` handler (i.e. parent).
+ * @param obj object to delete
+ * @see lv_async_call
+ */
+void lv_obj_del_async(struct _lv_obj_t *obj);
+
+/**
  * Delete all children of an object
  * @param obj pointer to an object
  */
@@ -510,7 +518,10 @@ void lv_obj_set_parent_event(lv_obj_t * obj, bool en);
 void lv_obj_set_opa_scale_enable(lv_obj_t * obj, bool en);
 
 /**
- * Set the opa scale of an object
+ * Set the opa scale of an object.
+ * The opacity of this object and all it's children will be scaled down with this factor.
+ * `lv_obj_set_opa_scale_enable(obj, true)` needs to be called to enable it.
+ * (not for all children just for the parent where to start the opa scaling)
  * @param obj pointer to an object
  * @param opa_scale a factor to scale down opacity [0..255]
  */

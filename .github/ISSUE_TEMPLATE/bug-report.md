@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+> # Important: issues that don't use this template will be ignored/closed.
+
 **Describe the bug**
 
 A clear and concise description of what the bug is.

@@ -152,7 +152,7 @@ typedef void * lv_fs_drv_user_data_t;
 #endif
 
 /*1: Add a `user_data` to drivers and objects*/
-#define LV_USE_USER_DATA        1
+#define LV_USE_USER_DATA        0
 
 /*========================
  * Image decoder and cache
@@ -213,13 +213,14 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
  *===============*/
 
 /*1: Enable the log module*/
-#define LV_USE_LOG      1
+#define LV_USE_LOG      0
 #if LV_USE_LOG
 /* How important log should be added:
  * LV_LOG_LEVEL_TRACE       A lot of logs to give detailed information
  * LV_LOG_LEVEL_INFO        Log important events
  * LV_LOG_LEVEL_WARN        Log if something unwanted happened but didn't cause a problem
  * LV_LOG_LEVEL_ERROR       Only critical issue, when the system may fail
+ * LV_LOG_LEVEL_NONE        Do not log anything
  */
 #  define LV_LOG_LEVEL    LV_LOG_LEVEL_WARN
 
@@ -274,6 +275,11 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 /*Always set a default font from the built-in fonts*/
 #define LV_FONT_DEFAULT        &lv_font_roboto_16
 
+/* Enable it if you have fonts with a lot of characters.
+ * The limit depends on the font size, font face and bpp
+ * but with > 10,000 characters if you see issues probably you need to enable it.*/
+#define LV_FONT_FMT_TXT_LARGE   0
+
 /*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
 typedef void * lv_font_user_data_t;
 
@@ -325,7 +331,7 @@ typedef void * lv_obj_user_data_t;
 #define LV_USE_BTN      1
 #if LV_USE_BTN != 0
 /*Enable button-state animations - draw a circle on click (dependencies: LV_USE_ANIMATION)*/
-#  define LV_BTN_INK_EFFECT   1
+#  define LV_BTN_INK_EFFECT   0
 #endif
 
 /*Button matrix (dependencies: -)*/

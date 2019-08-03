@@ -40,7 +40,8 @@ extern "C" {
     prefix lv_ll_t _lv_group_ll;                                                                                       \
     prefix lv_ll_t _lv_img_defoder_ll;                                                                                 \
     prefix lv_img_cache_entry_t * _lv_img_cache_array;                                                                 \
-    prefix void * _lv_task_act;
+    prefix void * _lv_task_act;                                                                                        \
+    prefix void * _lv_draw_buf; 
 
 #define LV_NO_PREFIX
 #define LV_ROOTS LV_GC_ROOTS(LV_NO_PREFIX)

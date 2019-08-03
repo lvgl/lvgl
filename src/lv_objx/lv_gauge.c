@@ -416,7 +416,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * mask)
     for(i = 0; i < ext->needle_count; i++) {
         /*Calculate the end point of a needle*/
         int16_t needle_angle =
-            (ext->values[i] - min) * angle * (1 << LV_GAUGE_INTERPOLATE_SHIFT) / (max - min); //+ angle_ofs;
+            (ext->values[i] - min) * angle * (1 << LV_GAUGE_INTERPOLATE_SHIFT) / (max - min);
 
         int16_t needle_angle_low  = (needle_angle >> LV_GAUGE_INTERPOLATE_SHIFT) + angle_ofs;
         int16_t needle_angle_high = needle_angle_low + 1;

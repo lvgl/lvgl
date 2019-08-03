@@ -35,9 +35,13 @@ extern "C" {
 /** This describes a glyph. */
 typedef struct
 {
+#if LV_FONT_FMT_TXT_LARGE == 0
     uint32_t bitmap_index : 20;     /**< Start index of the bitmap. A font can be max 1 MB. */
-    uint32_t adv_w :12;             /**< Draw the next glyph after this width. 12.4 format (real_value * 16 is stored). */
-
+    uint32_t adv_w :12;             /**< Draw the next glyph after this width. 8.4 format (real_value * 16 is stored). */
+#else
+    uint32_t bitmap_index;          /**< Start index of the bitmap. A font can be max 4 GB. */
+    uint32_t adv_w;                 /**< Draw the next glyph after this width. 28.4 format (real_value * 16 is stored). */
+#endif
     uint8_t box_w;                  /**< Width of the glyph's bounding box*/
     uint8_t box_h;                  /**< Height of the glyph's bounding box*/
     int8_t ofs_x;                   /**< x offset of the bounding box*/
@@ -46,12 +50,14 @@ typedef struct
 
 
 /** Format of font character map. */
-typedef enum {
+enum {
     LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY,
     LV_FONT_FMT_TXT_CMAP_FORMAT0_FULL,
     LV_FONT_FMT_TXT_CMAP_SPARSE_TINY,
     LV_FONT_FMT_TXT_CMAP_SPARSE_FULL,
-}lv_font_fmt_txt_cmap_type_t;
+};
+
+typedef uint8_t lv_font_fmt_txt_cmap_type_t;
 
 
 /* Map codepoints to a `glyph_dsc`s
@@ -96,7 +102,7 @@ typedef struct {
         glyph_id = glyph_id_start + glyph_id_ofs_list[search(unicode_list, rcp)]
     */
 
-    uint16_t * unicode_list;
+    const uint16_t * unicode_list;
 
     /** if(type == LV_FONT_FMT_TXT_CMAP_FORMAT0_...) it's `uint8_t *`
      * if(type == LV_FONT_FMT_TXT_CMAP_SPARSE_...)  it's `uint16_t *`

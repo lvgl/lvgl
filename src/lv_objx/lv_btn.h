@@ -112,7 +112,7 @@ typedef uint8_t lv_btn_style_t;
  **********************/
 
 /**
- * Create a button objects
+ * Create a button object
  * @param par pointer to an object, it will be the parent of the new button
  * @param copy pointer to a button object, if not NULL then the new object will be copied from it
  * @return pointer to the created button
@@ -155,11 +155,11 @@ static inline void lv_btn_set_layout(lv_obj_t * btn, lv_layout_t layout)
 
 /**
  * Set the fit policy in all 4 directions separately.
- * It tell how to change the button size automatically.
+ * It tells how to change the button size automatically.
  * @param btn pointer to a button object
  * @param left left fit policy from `lv_fit_t`
  * @param right right fit policy from `lv_fit_t`
- * @param top bottom fit policy from `lv_fit_t`
+ * @param top top fit policy from `lv_fit_t`
  * @param bottom bottom fit policy from `lv_fit_t`
  */
 static inline void lv_btn_set_fit4(lv_obj_t * btn, lv_fit_t left, lv_fit_t right, lv_fit_t top, lv_fit_t bottom)
@@ -169,9 +169,9 @@ static inline void lv_btn_set_fit4(lv_obj_t * btn, lv_fit_t left, lv_fit_t right
 
 /**
  * Set the fit policy horizontally and vertically separately.
- * It tell how to change the button size automatically.
+ * It tells how to change the button size automatically.
  * @param btn pointer to a button object
- * @param hot horizontal fit policy from `lv_fit_t`
+ * @param hor horizontal fit policy from `lv_fit_t`
  * @param ver vertical fit policy from `lv_fit_t`
  */
 static inline void lv_btn_set_fit2(lv_obj_t * btn, lv_fit_t hor, lv_fit_t ver)
@@ -181,13 +181,13 @@ static inline void lv_btn_set_fit2(lv_obj_t * btn, lv_fit_t hor, lv_fit_t ver)
 
 /**
  * Set the fit policy in all 4 direction at once.
- * It tell how to change the button size automatically.
+ * It tells how to change the button size automatically.
  * @param btn pointer to a button object
  * @param fit fit policy from `lv_fit_t`
  */
-static inline void lv_btn_set_fit(lv_obj_t * cont, lv_fit_t fit)
+static inline void lv_btn_set_fit(lv_obj_t * btn, lv_fit_t fit)
 {
-    lv_cont_set_fit(cont, fit);
+    lv_cont_set_fit(btn, fit);
 }
 
 /**
@@ -233,7 +233,7 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn);
 /**
  * Get the toggle enable attribute of the button
  * @param btn pointer to a button object
- * @return ture: toggle enabled, false: disabled
+ * @return true: toggle enabled, false: disabled
  */
 bool lv_btn_get_toggle(const lv_obj_t * btn);
 

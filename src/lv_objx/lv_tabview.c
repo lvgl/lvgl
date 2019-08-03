@@ -1045,10 +1045,6 @@ static void tabview_realign(lv_obj_t * tabview)
                 lv_cont_set_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_NONE);
                 lv_cont_set_layout(ext->content, LV_LAYOUT_ROW_T);
                 lv_obj_set_height(ext->content, lv_obj_get_height(tabview) - lv_obj_get_height(ext->btns));
-
-                // lv_obj_set_height(ext->btns, 3 * LV_DPI / 4);
-
-                // lv_obj_set_width(ext->indic, LV_DPI);
                 break;
             case LV_TABVIEW_BTNS_POS_BOTTOM:
                 lv_obj_align(ext->content, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);

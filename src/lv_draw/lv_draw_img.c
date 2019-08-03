@@ -109,21 +109,30 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
         uint8_t bit = x & 0x7;
         x           = x >> 3;
 
-        uint32_t px  = (dsc->header.w >> 3) * y + x;
+        /* Get the current pixel.
+         * dsc->header.w + 7 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 8, 16, 24 ...*/
+        uint32_t px  = ((dsc->header.w + 7) >> 3) * y + x;
         p_color.full = (buf_u8[px] & (1 << (7 - bit))) >> (7 - bit);
     } else if(dsc->header.cf == LV_IMG_CF_INDEXED_2BIT) {
         buf_u8 += 4 * 4;
         uint8_t bit = (x & 0x3) * 2;
         x           = x >> 2;
 
-        uint32_t px  = (dsc->header.w >> 2) * y + x;
+        /* Get the current pixel.
+         * dsc->header.w + 3 means rounding up to 4 because the lines are byte aligned
+         * so the possible real width are 4, 8, 12 ...*/
+        uint32_t px  = ((dsc->header.w + 3) >> 2) * y + x;
         p_color.full = (buf_u8[px] & (3 << (6 - bit))) >> (6 - bit);
     } else if(dsc->header.cf == LV_IMG_CF_INDEXED_4BIT) {
         buf_u8 += 4 * 16;
         uint8_t bit = (x & 0x1) * 4;
         x           = x >> 1;
 
-        uint32_t px  = (dsc->header.w >> 1) * y + x;
+        /* Get the current pixel.
+         * dsc->header.w + 1 means rounding up to 2 because the lines are byte aligned
+         * so the possible real width are 2, 4, 6 ...*/
+        uint32_t px  = ((dsc->header.w + 1) >> 1) * y + x;
         p_color.full = (buf_u8[px] & (0xF << (4 - bit))) >> (4 - bit);
     } else if(dsc->header.cf == LV_IMG_CF_INDEXED_8BIT) {
         buf_u8 += 4 * 256;
@@ -173,7 +182,10 @@ lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
         uint8_t bit = x & 0x7;
         x           = x >> 3;
 
-        uint32_t px    = (dsc->header.w >> 3) * y + x;
+        /* Get the current pixel.
+         * dsc->header.w + 7 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 8 ,16, 24 ...*/
+        uint32_t px    = ((dsc->header.w + 7) >> 3) * y + x;
         uint8_t px_opa = (buf_u8[px] & (1 << (7 - bit))) >> (7 - bit);
         return px_opa ? LV_OPA_TRANSP : LV_OPA_COVER;
     } else if(dsc->header.cf == LV_IMG_CF_ALPHA_2BIT) {
@@ -182,7 +194,10 @@ lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
         uint8_t bit = (x & 0x3) * 2;
         x           = x >> 2;
 
-        uint32_t px    = (dsc->header.w >> 2) * y + x;
+        /* Get the current pixel.
+         * dsc->header.w + 4 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 4 ,8, 12 ...*/
+        uint32_t px    = ((dsc->header.w + 3) >> 2) * y + x;
         uint8_t px_opa = (buf_u8[px] & (3 << (6 - bit))) >> (6 - bit);
         return opa_table[px_opa];
     } else if(dsc->header.cf == LV_IMG_CF_ALPHA_4BIT) {
@@ -192,7 +207,10 @@ lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
         uint8_t bit = (x & 0x1) * 4;
         x           = x >> 1;
 
-        uint32_t px    = (dsc->header.w >> 1) * y + x;
+        /* Get the current pixel.
+         * dsc->header.w + 1 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 2 ,4, 6 ...*/
+        uint32_t px    = ((dsc->header.w + 1) >> 1) * y + x;
         uint8_t px_opa = (buf_u8[px] & (0xF << (4 - bit))) >> (4 - bit);
         return opa_table[px_opa];
     } else if(dsc->header.cf == LV_IMG_CF_ALPHA_8BIT) {
@@ -227,7 +245,11 @@ void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
 
         uint8_t bit = x & 0x7;
         x           = x >> 3;
-        uint32_t px = (dsc->header.w >> 3) * y + x;
+
+        /* Get the current pixel.
+         * dsc->header.w + 7 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 8 ,16, 24 ...*/
+        uint32_t px = ((dsc->header.w + 7) >> 3) * y + x;
         buf_u8[px]  = buf_u8[px] & ~(1 << (7 - bit));
         buf_u8[px]  = buf_u8[px] | ((c.full & 0x1) << (7 - bit));
     } else if(dsc->header.cf == LV_IMG_CF_INDEXED_2BIT) {
@@ -235,7 +257,10 @@ void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
         uint8_t bit = (x & 0x3) * 2;
         x           = x >> 2;
 
-        uint32_t px = (dsc->header.w >> 2) * y + x;
+        /* Get the current pixel.
+         * dsc->header.w + 3 means rounding up to 4 because the lines are byte aligned
+         * so the possible real width are 4, 8 ,12 ...*/
+        uint32_t px = ((dsc->header.w + 3) >> 2) * y + x;
 
         buf_u8[px] = buf_u8[px] & ~(3 << (6 - bit));
         buf_u8[px] = buf_u8[px] | ((c.full & 0x3) << (6 - bit));
@@ -244,7 +269,10 @@ void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
         uint8_t bit = (x & 0x1) * 4;
         x           = x >> 1;
 
-        uint32_t px = (dsc->header.w >> 1) * y + x;
+        /* Get the current pixel.
+         * dsc->header.w + 1 means rounding up to 2 because the lines are byte aligned
+         * so the possible real width are 2 ,4, 6 ...*/
+        uint32_t px = ((dsc->header.w + 1) >> 1) * y + x;
         buf_u8[px]  = buf_u8[px] & ~(0xF << (4 - bit));
         buf_u8[px]  = buf_u8[px] | ((c.full & 0xF) << (4 - bit));
     } else if(dsc->header.cf == LV_IMG_CF_INDEXED_8BIT) {
@@ -273,14 +301,22 @@ void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
         opa         = opa >> 7; /*opa -> [0,1]*/
         uint8_t bit = x & 0x7;
         x           = x >> 3;
-        uint32_t px = (dsc->header.w >> 3) * y + x;
+
+        /* Get the current pixel.
+         * dsc->header.w + 7 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 8 ,16, 24 ...*/
+        uint32_t px = ((dsc->header.w + 7) >> 3) * y + x;
         buf_u8[px]  = buf_u8[px] & ~(1 << (7 - bit));
         buf_u8[px]  = buf_u8[px] | ((opa & 0x1) << (7 - bit));
     } else if(dsc->header.cf == LV_IMG_CF_ALPHA_2BIT) {
         opa         = opa >> 6; /*opa -> [0,3]*/
         uint8_t bit = (x & 0x3) * 2;
         x           = x >> 2;
-        uint32_t px = (dsc->header.w >> 2) * y + x;
+
+        /* Get the current pixel.
+         * dsc->header.w + 4 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 4 ,8, 12 ...*/
+        uint32_t px = ((dsc->header.w + 3) >> 2) * y + x;
         buf_u8[px]  = buf_u8[px] & ~(3 << (6 - bit));
         buf_u8[px]  = buf_u8[px] | ((opa & 0x3) << (6 - bit));
     } else if(dsc->header.cf == LV_IMG_CF_ALPHA_4BIT) {
@@ -288,7 +324,10 @@ void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
         uint8_t bit = (x & 0x1) * 4;
         x           = x >> 1;
 
-        uint32_t px = (dsc->header.w >> 1) * y + x;
+        /* Get the current pixel.
+         * dsc->header.w + 1 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 2 ,4, 6 ...*/
+        uint32_t px = ((dsc->header.w + 1) >> 1) * y + x;
         buf_u8[px]  = buf_u8[px] & ~(0xF << (4 - bit));
         buf_u8[px]  = buf_u8[px] | ((opa & 0xF) << (4 - bit));
     } else if(dsc->header.cf == LV_IMG_CF_ALPHA_8BIT) {

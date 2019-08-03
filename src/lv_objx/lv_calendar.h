@@ -172,6 +172,7 @@ lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar);
  * Get the the pressed date.
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` variable containing the pressed date.
+ *         `NULL` if not date pressed (e.g. the header)
  */
 lv_calendar_date_t * lv_calendar_get_pressed_date(const lv_obj_t * calendar);
 

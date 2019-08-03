@@ -38,10 +38,10 @@ typedef union
 {
     struct
     {
-        MEM_UNIT used : 1;    // 1: if the entry is used
-        MEM_UNIT d_size : 31; // Size off the data (1 means 4 bytes)
+        MEM_UNIT used : 1;    /* 1: if the entry is used*/
+        MEM_UNIT d_size : 31; /* Size off the data (1 means 4 bytes)*/
     } s;
-    MEM_UNIT header; // The header (used + d_size)
+    MEM_UNIT header; /* The header (used + d_size)*/
 } lv_mem_header_t;
 
 typedef struct
@@ -130,16 +130,16 @@ void * lv_mem_alloc(uint32_t size)
     /*Use the built-in allocators*/
     lv_mem_ent_t * e = NULL;
 
-    // Search for a appropriate entry
+    /* Search for a appropriate entry*/
     do {
-        // Get the next entry
+        /* Get the next entry*/
         e = ent_get_next(e);
 
         /*If there is next entry then try to allocate there*/
         if(e != NULL) {
             alloc = ent_alloc(e, size);
         }
-        // End if there is not next entry OR the alloc. is successful
+        /* End if there is not next entry OR the alloc. is successful*/
     } while(e != NULL && alloc == NULL);
 
 #else
