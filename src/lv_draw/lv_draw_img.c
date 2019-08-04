@@ -9,6 +9,7 @@
 #include "lv_draw_img.h"
 #include "lv_img_cache.h"
 #include "../lv_misc/lv_log.h"
+#include "../lv_misc/lv_mem.h"
 
 /*********************
  *      DEFINES
@@ -447,7 +448,7 @@ lv_img_dsc_t *lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
         lv_mem_free(dsc);
         return NULL;
     }
-    memset(dsc->data, 0, dsc->data_size);
+    memset((uint8_t *)dsc->data, 0, dsc->data_size);
     
     /* Fill in header */
     dsc->header.always_zero = 0;
