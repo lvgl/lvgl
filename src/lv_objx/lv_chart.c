@@ -619,11 +619,20 @@ static bool lv_chart_design(lv_obj_t * chart, const lv_area_t * mask, lv_design_
 
         lv_chart_draw_div(chart, mask);
 
-        if(ext->type & LV_CHART_TYPE_LINE) lv_chart_draw_lines(chart, mask);
-        if(ext->type & LV_CHART_TYPE_COLUMN) lv_chart_draw_cols(chart, mask);
-        if(ext->type & LV_CHART_TYPE_POINT) lv_chart_draw_points(chart, mask);
-        if(ext->type & LV_CHART_TYPE_VERTICAL_LINE) lv_chart_draw_vertical_lines(chart, mask);
-        if(ext->type & LV_CHART_TYPE_AREA) lv_chart_draw_areas(chart, mask);
+        /* Adjust the mask to remove the margin (clips chart contents to be within background) */
+
+        lv_area_t mask_tmp, adjusted_mask;
+        lv_obj_get_coords(chart, &mask_tmp);
+
+        bool union_ok = lv_area_intersect(&adjusted_mask, mask, &mask_tmp);
+
+        if(union_ok) {
+                if(ext->type & LV_CHART_TYPE_LINE) lv_chart_draw_lines(chart, &adjusted_mask);
+                if(ext->type & LV_CHART_TYPE_COLUMN) lv_chart_draw_cols(chart, &adjusted_mask);
+                if(ext->type & LV_CHART_TYPE_POINT) lv_chart_draw_points(chart, &adjusted_mask);
+                if(ext->type & LV_CHART_TYPE_VERTICAL_LINE) lv_chart_draw_vertical_lines(chart, &adjusted_mask);
+                if(ext->type & LV_CHART_TYPE_AREA) lv_chart_draw_areas(chart, &adjusted_mask);
+        }
 
         lv_chart_draw_axes(chart, mask);
     }
