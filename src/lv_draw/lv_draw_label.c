@@ -91,7 +91,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     int32_t last_line_start = -1;
 
     /*Check the hint to use the cached info*/
-    if(hint && y_ofs == 0) {
+    if(hint && y_ofs == 0 && coords->y1 < 0) {
         /*If the label changed too much recalculate the hint.*/
         if(LV_MATH_ABS(hint->coord_y - coords->y1) > LV_LABEL_HINT_UPDATE_TH - 2 * line_height) {
             hint->line_start = -1;

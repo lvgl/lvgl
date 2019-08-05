@@ -85,7 +85,7 @@ static void basic_init(void)
     sb.body.grad_color    = sb.body.main_color;
     sb.body.border.width  = 0;
     sb.body.radius        = LV_RADIUS_CIRCLE;
-    sb.body.padding.inner = LV_DPI / 10;
+    sb.body.padding.inner = LV_DPI / 15;
 
     theme.style.scr   = &scr;
     theme.style.bg    = &bg;

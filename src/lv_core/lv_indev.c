@@ -868,8 +868,10 @@ static void indev_proc_release(lv_indev_proc_t * proc)
                 if(indev_reset_check(proc)) return;
             }
 
-            lv_event_send(indev_obj_act, LV_EVENT_CLICKED, NULL);
-            if(indev_reset_check(proc)) return;
+            if(proc->types.pointer.drag_in_prog == 0) {
+                lv_event_send(indev_obj_act, LV_EVENT_CLICKED, NULL);
+                if(indev_reset_check(proc)) return;
+            }
 
             lv_event_send(indev_obj_act, LV_EVENT_RELEASED, NULL);
             if(indev_reset_check(proc)) return;

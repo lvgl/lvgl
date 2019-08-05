@@ -1596,8 +1596,8 @@ uint16_t lv_obj_count_children_recursive(const lv_obj_t * obj)
 
     LV_LL_READ(obj->child_ll, i)
     {
-        cnt++;                                     // Count the child
-        cnt += lv_obj_count_children_recursive(i); // recursively count children's children
+        cnt++;                                     /*Count the child*/
+        cnt += lv_obj_count_children_recursive(i); /*recursively count children's children*/
     }
 
     return cnt;
