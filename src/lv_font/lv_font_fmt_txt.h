@@ -102,7 +102,7 @@ typedef struct {
         glyph_id = glyph_id_start + glyph_id_ofs_list[search(unicode_list, rcp)]
     */
 
-    uint16_t * unicode_list;
+    const uint16_t * unicode_list;
 
     /** if(type == LV_FONT_FMT_TXT_CMAP_FORMAT0_...) it's `uint8_t *`
      * if(type == LV_FONT_FMT_TXT_CMAP_SPARSE_...)  it's `uint16_t *`

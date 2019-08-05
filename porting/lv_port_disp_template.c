@@ -163,7 +163,6 @@ static void disp_flush(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_colo
 static void gpu_blend(lv_disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
 {
     /*It's an example code which should be done by your GPU*/
-
     uint32_t i;
     for(i = 0; i < length; i++) {
         dest[i] = lv_color_mix(dest[i], src[i], opa);
@@ -184,12 +183,6 @@ static void gpu_fill_cb(lv_disp_drv_t * disp_drv, lv_color_t * dest_buf, lv_coor
             dest_buf[x] = color;
         }
         dest_buf+=dest_width;    /*Go to the next line*/
-    }
-
-
-    uint32_t i;
-    for(i = 0; i < length; i++) {
-        dest[i] = color;
     }
 }
 

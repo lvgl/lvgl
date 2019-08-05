@@ -72,8 +72,10 @@ typedef struct
     } dot;
     uint16_t dot_end;  /*The text end position in dot mode (Handled by the library)*/
     lv_point_t offset; /*Text draw position offset*/
-
+#if LV_LABEL_LONG_TXT_HINT
     lv_draw_label_hint_t hint; /*Used to buffer info about large text*/
+#endif
+
 #if LV_USE_ANIMATION
     uint16_t anim_speed; /*Speed of scroll and roll animation in px/sec unit*/
 #endif
