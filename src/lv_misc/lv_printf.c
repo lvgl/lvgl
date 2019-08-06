@@ -139,16 +139,6 @@ static inline void _out_null(char character, void* buffer, size_t idx, size_t ma
 }
 
 
-// internal _putchar wrapper
-static inline void _out_char(char character, void* buffer, size_t idx, size_t maxlen)
-{
-  (void)buffer; (void)idx; (void)maxlen;
-  if (character) {
-    _putchar(character);
-  }
-}
-
-
 // internal output function wrapper
 static inline void _out_fct(char character, void* buffer, size_t idx, size_t maxlen)
 {
