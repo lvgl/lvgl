@@ -7,12 +7,16 @@
 <h2 align="center">Shape the future of LittlevGL</h2>
 
 <p align="center">
-It takes only 5 minutes to tell some information about how you use LittlevGL, what you like about it, what should be improved and the future directions you find reasonable.
-<br>
-
 <a href="https://www.esurveycreator.com/s/littlevgl-2019">![](https://littlevgl.com/external/survey.png)</a>
-<br>
+</p>
 
+<p align="center">
+It takes only 5 minutes to tell some information about how you use LittlevGL, what you like about it, what should be improved and the future directions you find reasonable.
+</p>
+
+---
+
+<p align="center">
 <img src="https://littlevgl.com/github/cover_ori_reduced_2.gif">
 </p>
 
