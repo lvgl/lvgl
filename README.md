@@ -7,7 +7,7 @@
 <h2 align="center">Shape the future of LittlevGL</h2>
 
 <p align="center">
-<a href="https://www.esurveycreator.com/s/littlevgl-2019">![](https://littlevgl.com/external/survey.png)</a>
+<a href="https://www.esurveycreator.com/s/littlevgl-2019"><img src="https://littlevgl.com/external/survey.png"></a>
 </p>
 
 <p align="center">
