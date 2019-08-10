@@ -24,8 +24,8 @@
 #define LV_CHART_AXIS_TO_LABEL_DISTANCE 4
 #define LV_CHART_AXIS_MAJOR_TICK_LEN_COE 1 / 15
 #define LV_CHART_AXIS_MINOR_TICK_LEN_COE 2 / 3
-#define LV_CHART_PRIMARY_Y_AXIS 1
-#define LV_CHART_SECONDARY_Y_AXIS 0
+#define LV_CHART_AXIS_PRIMARY_Y 1
+#define LV_CHART_AXIS_SECONDARY_Y 0
 
 /**********************
  *      TYPEDEFS
@@ -470,6 +470,21 @@ void lv_chart_set_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_
 }
 
 /**
+ * Set the length of the tick marks on the secondary y axis
+ * @param chart pointer to the chart
+ * @param major_tick_len the length of the major tick or `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where labels are added)
+ * @param minor_tick_len the length of the minor tick, `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where no labels are added)
+ */
+void lv_chart_set_secondary_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len)
+{
+    lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
+    ext->secondary_y_axis.major_tick_len = major_tick_len;
+    ext->secondary_y_axis.minor_tick_len = minor_tick_len;
+}
+
+/**
  * Set the x-axis tick count and labels of a chart
  * @param chart 			pointer to a chart object
  * @param list_of_values 	list of string values, terminated with \n, except the last
@@ -501,6 +516,23 @@ void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, ui
     ext->y_axis.num_tick_marks = num_tick_marks;
     ext->y_axis.list_of_values = list_of_values;
     ext->y_axis.options        = options;
+}
+
+/**
+ * Set the secondary y-axis tick count and labels of a chart
+ * @param chart             pointer to a chart object
+ * @param list_of_values    list of string values, terminated with \n, except the last
+ * @param num_tick_marks    if list_of_values is NULL: total number of ticks per axis
+ *                          else number of ticks between two value labels
+ * @param options           extra options
+ */
+void lv_chart_set_secondary_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
+                                        lv_chart_axis_options_t options)
+{
+    lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
+    ext->secondary_y_axis.num_tick_marks = num_tick_marks;
+    ext->secondary_y_axis.list_of_values = list_of_values;
+    ext->secondary_y_axis.options        = options;
 }
 
 /**
@@ -1055,8 +1087,10 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
 static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint8_t which_axis)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    lv_chart_axis_cfg_t * y_axis = (which_axis == LV_CHART_AXIS_PRIMARY_Y) ?
+                                            &ext->y_axis : &ext->secondary_y_axis;
 
-    if(ext->y_axis.list_of_values != NULL || ext->y_axis.num_tick_marks != 0) {
+    if(y_axis->list_of_values != NULL || y_axis->num_tick_marks != 0) {
 
         const lv_style_t * style = lv_obj_get_style(chart);
         lv_opa_t opa_scale       = lv_obj_get_opa_scale(chart);
@@ -1075,24 +1109,24 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
         char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN + 1]; /* up to N symbols per label + null terminator */
 
         /* chose correct side of the chart */
-        if(which_axis == LV_CHART_PRIMARY_Y_AXIS)
+        if(which_axis == LV_CHART_AXIS_PRIMARY_Y)
             x_ofs = chart->coords.x1;
         else
             x_ofs = chart->coords.x2;
 
         /* calculate the size of tick marks */
-        if(ext->y_axis.major_tick_len == LV_CHART_TICK_LENGTH_AUTO)
+        if(y_axis->major_tick_len == LV_CHART_TICK_LENGTH_AUTO)
             major_tick_len = (int32_t)w * LV_CHART_AXIS_MAJOR_TICK_LEN_COE;
         else
-            major_tick_len = ext->y_axis.major_tick_len;
+            major_tick_len = y_axis->major_tick_len;
 
-        if(ext->y_axis.minor_tick_len == LV_CHART_TICK_LENGTH_AUTO)
+        if(y_axis->minor_tick_len == LV_CHART_TICK_LENGTH_AUTO)
             minor_tick_len = major_tick_len * LV_CHART_AXIS_MINOR_TICK_LEN_COE;
         else
-            minor_tick_len = ext->y_axis.minor_tick_len;
+            minor_tick_len = y_axis->minor_tick_len;
 
         /* tick lines on secondary y axis are drawn in other direction*/
-        if(which_axis == LV_CHART_SECONDARY_Y_AXIS) {
+        if(which_axis == LV_CHART_AXIS_SECONDARY_Y) {
             major_tick_len *= -1;
             minor_tick_len *= -1;
         }
@@ -1100,29 +1134,29 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
         /* count the '\n'-s to determine the number of options */
         list_index    = 0;
         num_of_labels = 0;
-        if(ext->y_axis.list_of_values != NULL) {
-            for(j = 0; ext->y_axis.list_of_values[j] != '\0'; j++) {
-                if(ext->y_axis.list_of_values[j] == '\n') num_of_labels++;
+        if(y_axis->list_of_values != NULL) {
+            for(j = 0; y_axis->list_of_values[j] != '\0'; j++) {
+                if(y_axis->list_of_values[j] == '\n') num_of_labels++;
             }
 
             num_of_labels++; /* last option in the at row*/
         }
 
         /* we can't have string labels without ticks step, set to 1 if not specified */
-        if(ext->y_axis.num_tick_marks == 0) ext->y_axis.num_tick_marks = 1;
+        if(y_axis->num_tick_marks == 0) y_axis->num_tick_marks = 1;
 
         /* calculate total number of ticks */
         if(num_of_labels < 2)
-            num_scale_ticks = ext->y_axis.num_tick_marks;
+            num_scale_ticks = y_axis->num_tick_marks;
         else
-            num_scale_ticks = (ext->y_axis.num_tick_marks * (num_of_labels - 1));
+            num_scale_ticks = (y_axis->num_tick_marks * (num_of_labels - 1));
 
         for(i = 0; i < (num_scale_ticks + 1); i++) { /* one extra loop - it may not exist in the list, empty label */
                                                      /* first point of the tick */
             p1.x = x_ofs - 1;
 
             /* second point of the tick */
-            if((num_of_labels != 0) && (i == 0 || i % ext->y_axis.num_tick_marks == 0))
+            if((num_of_labels != 0) && (i == 0 || i % y_axis->num_tick_marks == 0))
                 p2.x = p1.x - major_tick_len; /* major tick */
             else
                 p2.x = p1.x - minor_tick_len; /* minor tick */
@@ -1133,26 +1167,26 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
 
             if(i != num_scale_ticks)
                 lv_draw_line(&p1, &p2, mask, style, opa_scale);
-            else if((ext->y_axis.options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
+            else if((y_axis->options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
                 lv_draw_line(&p1, &p2, mask, style, opa_scale);
 
             /* draw values if available */
             if(num_of_labels != 0) {
                 /* add text only to major tick */
-                if(i == 0 || i % ext->y_axis.num_tick_marks == 0) {
+                if(i == 0 || i % y_axis->num_tick_marks == 0) {
                     /* search for tick string */
                     j = 0;
-                    while(ext->y_axis.list_of_values[list_index] != '\n' &&
-                          ext->y_axis.list_of_values[list_index] != '\0') {
+                    while(y_axis->list_of_values[list_index] != '\n' &&
+                          y_axis->list_of_values[list_index] != '\0') {
                         /* do not overflow the buffer, but move to the end of the current label */
                         if(j < LV_CHART_AXIS_TICK_LABEL_MAX_LEN)
-                            buf[j++] = ext->y_axis.list_of_values[list_index++];
+                            buf[j++] = y_axis->list_of_values[list_index++];
                         else
                             list_index++;
                     }
 
                     /* this was a string, but not end of the list, so jump to the next string */
-                    if(ext->y_axis.list_of_values[list_index] == '\n') list_index++;
+                    if(y_axis->list_of_values[list_index] == '\n') list_index++;
 
                     /* terminate the string */
                     buf[j] = '\0';
@@ -1165,7 +1199,7 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
                     /* set the area at some distance of the major tick len left of the tick */
                     lv_area_t a = {.y1 = p2.y - size.y / 2, .y2 = p2.y + size.y / 2};
 
-                    if(which_axis == LV_CHART_PRIMARY_Y_AXIS) {
+                    if(which_axis == LV_CHART_AXIS_PRIMARY_Y) {
                         a.x1 = p2.x - size.x - LV_CHART_AXIS_TO_LABEL_DISTANCE;
                         a.x2 = p2.x - LV_CHART_AXIS_TO_LABEL_DISTANCE;
                     } else {
@@ -1290,7 +1324,8 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
 
 static void lv_chart_draw_axes(lv_obj_t * chart, const lv_area_t * mask)
 {
-    lv_chart_draw_y_ticks(chart, mask, LV_CHART_PRIMARY_Y_AXIS);
+    lv_chart_draw_y_ticks(chart, mask, LV_CHART_AXIS_PRIMARY_Y);
+    lv_chart_draw_y_ticks(chart, mask, LV_CHART_AXIS_SECONDARY_Y);
     lv_chart_draw_x_ticks(chart, mask);
 }
 

@@ -261,6 +261,16 @@ void lv_chart_set_x_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_
 void lv_chart_set_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len);
 
 /**
+ * Set the length of the tick marks on the secondary y axis
+ * @param chart pointer to the chart
+ * @param major_tick_len the length of the major tick or `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where labels are added)
+ * @param minor_tick_len the length of the minor tick, `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where no labels are added)
+ */
+void lv_chart_set_secondary_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len);
+
+/**
  * Set the x-axis tick count and labels of a chart
  * @param chart             pointer to a chart object
  * @param list_of_values    list of string values, terminated with \n, except the last
@@ -270,6 +280,17 @@ void lv_chart_set_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_
  */
 void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
                                lv_chart_axis_options_t options);
+
+/**
+ * Set the secondary y-axis tick count and labels of a chart
+ * @param chart             pointer to a chart object
+ * @param list_of_values    list of string values, terminated with \n, except the last
+ * @param num_tick_marks    if list_of_values is NULL: total number of ticks per axis
+ *                          else number of ticks between two value labels
+ * @param options           extra options
+ */
+void lv_chart_set_secondary_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
+                                        lv_chart_axis_options_t options);
 
 /**
  * Set the y-axis tick count and labels of a chart
