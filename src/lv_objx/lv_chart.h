@@ -93,6 +93,7 @@ typedef struct
     lv_chart_type_t type; /*Line, column or point chart (from 'lv_chart_type_t')*/
     lv_chart_axis_cfg_t y_axis;
     lv_chart_axis_cfg_t x_axis;
+    lv_chart_axis_cfg_t secondary_y_axis;
     uint16_t margin;
     uint8_t update_mode : 1;
     struct

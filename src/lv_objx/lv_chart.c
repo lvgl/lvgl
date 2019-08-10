@@ -24,6 +24,8 @@
 #define LV_CHART_AXIS_TO_LABEL_DISTANCE 4
 #define LV_CHART_AXIS_MAJOR_TICK_LEN_COE 1 / 15
 #define LV_CHART_AXIS_MINOR_TICK_LEN_COE 2 / 3
+#define LV_CHART_PRIMARY_Y_AXIS 1
+#define LV_CHART_SECONDARY_Y_AXIS 0
 
 /**********************
  *      TYPEDEFS
@@ -96,10 +98,13 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->margin                = 0;
     memset(&ext->x_axis, 0, sizeof(ext->x_axis));
     memset(&ext->y_axis, 0, sizeof(ext->y_axis));
+    memset(&ext->secondary_y_axis, 0, sizeof(ext->secondary_y_axis));
     ext->x_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->x_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->y_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->y_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
+    ext->secondary_y_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
+    ext->secondary_y_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_chart);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_chart);
@@ -132,6 +137,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->margin     = ext_copy->margin;
         memcpy(&ext->x_axis, &ext_copy->x_axis, sizeof(lv_chart_axis_cfg_t));
         memcpy(&ext->y_axis, &ext_copy->y_axis, sizeof(lv_chart_axis_cfg_t));
+        memcpy(&ext->secondary_y_axis, &ext_copy->secondary_y_axis, sizeof(lv_chart_axis_cfg_t));
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_chart);
@@ -1046,7 +1052,7 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
     }
 }
 
-static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
+static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint8_t which_axis)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
@@ -1059,14 +1065,20 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
         uint8_t list_index;
         uint8_t num_of_labels;
         uint8_t num_scale_ticks;
-        uint8_t major_tick_len, minor_tick_len;
+        int16_t major_tick_len, minor_tick_len;
         lv_point_t p1;
         lv_point_t p2;
-        lv_coord_t x_ofs = chart->coords.x1;
+        lv_coord_t x_ofs;
         lv_coord_t y_ofs = chart->coords.y1;
         lv_coord_t h     = lv_obj_get_height(chart);
         lv_coord_t w     = lv_obj_get_width(chart);
         char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN + 1]; /* up to N symbols per label + null terminator */
+
+        /* chose correct side of the chart */
+        if(which_axis == LV_CHART_PRIMARY_Y_AXIS)
+            x_ofs = chart->coords.x1;
+        else
+            x_ofs = chart->coords.x2;
 
         /* calculate the size of tick marks */
         if(ext->y_axis.major_tick_len == LV_CHART_TICK_LENGTH_AUTO)
@@ -1078,6 +1090,12 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
             minor_tick_len = major_tick_len * LV_CHART_AXIS_MINOR_TICK_LEN_COE;
         else
             minor_tick_len = ext->y_axis.minor_tick_len;
+
+        /* tick lines on secondary y axis are drawn in other direction*/
+        if(which_axis == LV_CHART_SECONDARY_Y_AXIS) {
+            major_tick_len *= -1;
+            minor_tick_len *= -1;
+        }
 
         /* count the '\n'-s to determine the number of options */
         list_index    = 0;
@@ -1145,8 +1163,16 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
                                     LV_COORD_MAX, LV_TXT_FLAG_CENTER);
 
                     /* set the area at some distance of the major tick len left of the tick */
-                    lv_area_t a = {(p2.x - size.x - LV_CHART_AXIS_TO_LABEL_DISTANCE), (p2.y - size.y / 2),
-                                   (p2.x - LV_CHART_AXIS_TO_LABEL_DISTANCE), (p2.y + size.y / 2)};
+                    lv_area_t a = {.y1 = p2.y - size.y / 2, .y2 = p2.y + size.y / 2};
+
+                    if(which_axis == LV_CHART_PRIMARY_Y_AXIS) {
+                        a.x1 = p2.x - size.x - LV_CHART_AXIS_TO_LABEL_DISTANCE;
+                        a.x2 = p2.x - LV_CHART_AXIS_TO_LABEL_DISTANCE;
+                    } else {
+                        a.x1 = p2.x + LV_CHART_AXIS_TO_LABEL_DISTANCE;
+                        a.x2 = p2.x + size.x + LV_CHART_AXIS_TO_LABEL_DISTANCE;
+                    }
+
                     lv_draw_label(&a, mask, style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, -1, -1, NULL);
                 }
             }
@@ -1264,7 +1290,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
 
 static void lv_chart_draw_axes(lv_obj_t * chart, const lv_area_t * mask)
 {
-    lv_chart_draw_y_ticks(chart, mask);
+    lv_chart_draw_y_ticks(chart, mask, LV_CHART_PRIMARY_Y_AXIS);
     lv_chart_draw_x_ticks(chart, mask);
 }
 
