@@ -830,11 +830,10 @@ static void style_mod(lv_group_t * group, lv_style_t * style)
 
 static void style_mod_edit(lv_group_t * group, lv_style_t * style)
 {
-
-    uint16_t hue2 = (_hue + 300) % 360;
-
     (void)group; /*Unused*/
 #if LV_COLOR_DEPTH != 1
+    uint16_t hue2 = (_hue + 300) % 360;
+
     /*Make the style to be a little bit orange*/
     style->body.border.opa   = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_GREEN;
