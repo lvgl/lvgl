@@ -97,9 +97,8 @@ void lv_mask_line_left(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, 
         int32_t k = xei - abs_x;
 
         if(xef) {
-            if(p->steep > 0) k++;
-            if(k >= 0) mask_buf[k] = 255 - (((255-xef) * (255 - px_h)) >> 8);
-            if(p->steep < 0) k++;
+            if(k >= 0) mask_buf[k] = 255 - (((255-xef) * (255 - px_h)) >> 9);
+            k++;
         }
 
         while(px_h > sps) {
@@ -110,7 +109,8 @@ void lv_mask_line_left(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, 
         }
 
         if(k < len && k >= 0) {
-            mask_buf[k] = px_h  >> 1; /*Approximation*/
+            int32_t x_inters = (px_h << 10)/ p->steep;
+            mask_buf[k] = (x_inters * px_h) >> 9; //px_h  >> 1; /*Approximation*/
         }
 
         k++;
@@ -142,11 +142,7 @@ void lv_mask_line_left(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, 
         int32_t xqi = xq >> 8;
         int32_t xqf = xq & 0xFF;
 
-        printf("%d: %d.%d\n", abs_y, xei, xef * 100 / 255);
-
         int32_t k = xei - abs_x;
-
-
         if(xei != xqi && (p->steep < 0 && xef == 0)) {
             xef = 0xFF;
             xei = xqi;
@@ -169,7 +165,7 @@ void lv_mask_line_left(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, 
             if(p->steep < 0) {
                 y_inters = (xef << 10) / (-p->steep);
                 if(k >= 0 && k < len ) {
-                    mask_buf[k] = (y_inters * xef) >> 8;
+                    mask_buf[k] = (y_inters * xef) >> 9;
                 }
                 k--;
 
@@ -189,13 +185,12 @@ void lv_mask_line_left(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, 
             } else {
                 y_inters = ((255-xef) << 10) / p->steep;
                 if(k >= 0 && k < len ) {
-                    mask_buf[k] = 255 - ((y_inters * (255-xef)) >> 8);
+                    mask_buf[k] = 255 - ((y_inters * (255-xef)) >> 9);
                 }
 
                 k++;
 
                 int32_t x_inters = ((255-y_inters) * p->steep) >> 10;
-                printf("x_inters: %d\n", x_inters * 100 / 255);
 
 
                 if(k >= 0 && k < len ) {
