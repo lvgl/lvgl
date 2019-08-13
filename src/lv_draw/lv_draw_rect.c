@@ -98,10 +98,10 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
     lv_color_t line_buf[LV_HOR_RES_MAX];
     lv_opa_t mask_buf[LV_HOR_RES_MAX];
     lv_mask_line_param_t line_mask_param;
-    line_mask_param.origo.x = 100;
-    line_mask_param.origo.y = 0;
+    line_mask_param.origo.x = 150;
+    line_mask_param.origo.y = 100;
     line_mask_param.steep = -300;
-    line_mask_param.flat = 0;
+    line_mask_param.flat = 1;
 
 
     /*Fill with a color line-by-line*/
