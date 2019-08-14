@@ -33,8 +33,8 @@ extern "C" {
  **********************/
 
 typedef struct {
-     uint32_t f:8;
-     uint32_t i:16;
+     uint16_t i;
+     uint16_t f;
  }lv_sqrt_res_t;
 
 

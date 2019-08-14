@@ -9,6 +9,7 @@
 #include "lv_math.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*********************
  *      DEFINES
@@ -99,12 +100,17 @@ int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
 
 void lv_sqrt(uint32_t x, lv_sqrt_res_t * q)
 {
+    /*
+     * Source:
+     * http://web.archive.org/web/20080303101624/http://c.snippets.org/snip_lister.php?fname=isqrt.c
+     * https://stackoverflow.com/questions/1100090/looking-for-an-efficient-integer-square-root-algorithm-for-arm-thumb2
+     */
+
     uint32_t a = 0L;                   /* accumulator      */
     uint32_t r = 0L;                   /* remainder        */
     uint32_t e = 0L;                   /* trial product    */
 
-    int i;
-
+    uint32_t i;
     for (i = 0; i < BITSPERLONG / 2 + 8; i++) {
           r = (r << 2) + TOP2BITS(x); x <<= 2;
           a <<= 1;
@@ -115,7 +121,8 @@ void lv_sqrt(uint32_t x, lv_sqrt_res_t * q)
           }
     }
 
-    memcpy(q, &a, sizeof(lv_sqrt_res_t));
+    q->f = a & 0xFF;
+    q->i = a >> 8;
 }
 
 /**********************

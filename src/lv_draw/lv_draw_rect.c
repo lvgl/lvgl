@@ -108,7 +108,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 
     lv_mask_radius_param_t param1;
     lv_area_copy(&param1.rect, coords);
-    param1.radius = 8;
+    param1.radius = 20;
 
 
 //    line_mask_param1.origo.x = 0;

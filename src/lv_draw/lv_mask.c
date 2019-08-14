@@ -179,11 +179,107 @@ void lv_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_co
 }
 
 
-void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_radius_param_t * param)
+void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_radius_param_t * p)
 {
+    int32_t k = abs_x - p->rect.x1; /*First relevant coordinate on the of the mask*/
+    lv_coord_t w = lv_area_get_width(&p->rect);
+    lv_coord_t h = lv_area_get_height(&p->rect);
+    abs_x -= p->rect.x1;
+    abs_y -= p->rect.y1;
+
+    uint32_t r2 = p->radius * p->radius;
 
 
+    /*Handle upper corner area*/
+    if(abs_y < p->radius || abs_y > h - p->radius) {
+        /* y = 0 should mean the top of the circle */
+        lv_coord_t y;
+        if(abs_y < p->radius) {
+            y = p->radius - abs_y;
+        } else {
+            y = p->radius - (h - abs_y);
+        }
+        /* Get the x intersection points for `abs_y` and `abs_y+1`
+         * Use the circle's equation x = sqrt(r^2 - y^2) */
+        lv_sqrt_res_t x0;
+        lv_sqrt(r2 - (y * y), &x0);
 
+        lv_sqrt_res_t x1;
+        lv_sqrt(r2 - ((y-1) * (y-1)), &x1);
+
+        printf("y:%d, x0: %d.%02d, x1: %d.%02d\n", y, x0.i, x0.f * 100 / 255, x1.i, x1.f * 100 / 255);
+
+        /*If the two x intersections are on the same x then just get average of the fractionals*/
+        if(x0.i == x1.i) {
+            lv_opa_t m = (x0.f + x1.f) >> 1;
+            k += p->radius - x0.i - 1;
+            mask_buf[k] = m;    /*Left corner*/
+
+            memset(&mask_buf[0], 0x00, k);
+
+        }
+        /* If x1 is on the next round coordinate (e.g. x0: 3.5, x1:4.0)
+         * then treat x1 as x1: 3.99 to handle them as they were on the same pixel*/
+        else if(x0.i == x1.i - 1 && x1.f == 0) {
+            x1.f = 0xFF;
+            lv_opa_t m = (x0.f + x1.f) >> 1;
+            k += p->radius - x0.i - 1;
+            mask_buf[k] = m;
+
+            memset(&mask_buf[0], 0x00, k);
+        }
+        /*Multiple pixels are affected. Get y intersection of the pixels*/
+        else {
+            k += p->radius - (x0.i + 1);
+            uint32_t i = x0.i + 1;
+            lv_opa_t m;
+            lv_sqrt_res_t y_prev;
+            lv_sqrt_res_t y_next;
+
+            lv_sqrt(r2 - (x0.i * x0.i), &y_prev);
+
+            if(y_prev.f == 0) {
+                y_prev.i--;
+                y_prev.f = 0xFF;
+            }
+
+            /*The first y intersection is special as it might be in the previous line*/
+            if(y_prev.i >= y) {
+                lv_sqrt(r2 - (i * i), &y_next);
+                printf("x_first: %d, y_inters:%d.%02d\n", i, y_next.i, y_next.f * 100 / 255);
+
+                m = 255 - (((255-x0.f) * (255 - y_next.f)) >> 9);
+                mask_buf[k] = m;
+                k--;
+                y_prev.f = y_next.f;
+                i++;
+            }
+
+            /*Set all points which are crossed by the circle*/
+            for(; i <= x1.i; i++) {
+                lv_sqrt(r2 - (i * i), &y_next);
+
+                printf("x: %d, y_inters:%d.%02d\n", i, y_next.i, y_next.f * 100 / 255);
+
+                m = (y_prev.f + y_next.f) >> 1;
+                mask_buf[k] = m;
+                k--;
+                y_prev.f = y_next.f;
+            }
+
+            /*If the last pixel was left in its middle therefore
+             * the circle still has parts on the next one*/
+            if(y_prev.f) {
+                m = (y_prev.f * x1.f) >> 9;
+                mask_buf[k] = m;
+                k--;
+            }
+
+            memset(&mask_buf[0], 0x00, k+1);
+        }
+
+        return;
+    }
 }
 
 

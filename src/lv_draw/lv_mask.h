@@ -61,6 +61,9 @@ typedef struct {
 typedef struct {
     lv_area_t rect;
     lv_coord_t radius;
+
+    /* Invert the mask. The default is: Keep the are inside.*/
+    uint8_t inv:1;
 }lv_mask_radius_param_t;
 
 /**********************
