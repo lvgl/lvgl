@@ -32,6 +32,12 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef struct {
+     uint32_t f:8;
+     uint32_t i:16;
+ }lv_sqrt_res_t;
+
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -54,6 +60,7 @@ int16_t lv_trigo_sin(int16_t angle);
  */
 int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3);
 
+void lv_sqrt(uint32_t x, lv_sqrt_res_t * q);
 /**********************
  *      MACROS
  **********************/

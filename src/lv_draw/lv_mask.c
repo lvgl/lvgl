@@ -66,16 +66,40 @@ void lv_mask_line_points_init(lv_mask_line_param_t * p, lv_coord_t p1x, lv_coord
     p->origo.y = p1y;
     p->side = side;
     p->flat = (LV_MATH_ABS(p2x-p1x) > LV_MATH_ABS(p2y-p1y)) ? 1 : 0;
+    p->yx_steep = 0;
+    p->xy_steep = 0;
+
+    lv_coord_t dx = p2x-p1x;
+    lv_coord_t dy = p2y-p1y;
+
     if(p->flat) {
         /*Normalize the steep. Delta x should be relative to delta x = 1024*/
         int32_t m;
-        m = (1 << 20) / (p2x-p1x);  /*m is multiplier to normalize y (upscaled by 1024)*/
-        p->steep = (m * (p2y-p1y)) >> 10;
+
+        if(dx) {
+            m = (1 << 20) / dx;  /*m is multiplier to normalize y (upscaled by 1024)*/
+            p->yx_steep = (m * dy) >> 10;
+        }
+
+        if(dy) {
+            m = (1 << 20) / dy;  /*m is multiplier to normalize x (upscaled by 1024)*/
+            p->xy_steep = (m * dx) >> 10;
+        }
+        p->steep = p->yx_steep;
     } else {
         /*Normalize the steep. Delta y should be relative to delta x = 1024*/
         int32_t m;
-        m = (1 << 20) / (p2y-p1y);  /*m is multiplier to normalize x (upscaled by 1024)*/
-        p->steep = (m * (p2x-p1x)) >> 10;
+
+        if(dy) {
+            m = (1 << 20) / dy;  /*m is multiplier to normalize x (upscaled by 1024)*/
+            p->xy_steep = (m * dx) >> 10;
+        }
+
+        if(dx) {
+            m = (1 << 20) / dx;  /*m is multiplier to normalize x (upscaled by 1024)*/
+            p->yx_steep = (m * dy) >> 10;
+        }
+        p->steep = p->xy_steep;
     }
 
     if(p->side == LV_LINE_MASK_SIDE_LEFT) p->inv = 0;
@@ -88,6 +112,9 @@ void lv_mask_line_points_init(lv_mask_line_param_t * p, lv_coord_t p1x, lv_coord
         if(p->steep > 0) p->inv = 1;
         else p->inv = 0;
     }
+
+    p->spx = p->steep >> 2;
+    if(p->steep < 0) p->spx = -p->spx;
 }
 
 void lv_mask_line_angle_init(lv_mask_line_param_t * p, lv_coord_t p1x, lv_coord_t p1y, int16_t deg, lv_line_mask_side_t side)
@@ -155,6 +182,8 @@ void lv_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_co
 void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_radius_param_t * param)
 {
 
+
+
 }
 
 
@@ -169,9 +198,9 @@ static void line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs
 
     /* At the beginning of the mask if the limit line is greater then the mask's y.
      * Then the mask is in the "wrong" area*/
-    y_at_x = (int32_t)((int32_t)p->steep * abs_x) >> 10;
+    y_at_x = (int32_t)((int32_t)p->yx_steep * abs_x) >> 10;
 
-    if(p->steep > 0) {
+    if(p->yx_steep > 0) {
         if(y_at_x > abs_y) {
             if(p->inv) {
                 return;
@@ -193,8 +222,8 @@ static void line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs
 
     /* At the end of the mask if the limit line is smaller then the mask's y.
      * Then the mask is in the "good" area*/
-    y_at_x = (int32_t)((int32_t)p->steep * (abs_x + len)) >> 10;
-    if(p->steep > 0) {
+    y_at_x = (int32_t)((int32_t)p->yx_steep * (abs_x + len)) >> 10;
+    if(p->yx_steep > 0) {
         if(y_at_x < abs_y) {
             if(p->inv) {
                 memset(mask_buf, 0x00, len);
@@ -215,18 +244,15 @@ static void line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs
     }
 
     int32_t xe;
-    if(p->steep > 0) xe = ((abs_y << 18) / p->steep);
-    else xe = (((abs_y + 1) << 18) / p->steep);
+    if(p->yx_steep > 0) xe = ((abs_y << 8) * p->xy_steep) >> 10;
+    else xe = (((abs_y + 1) << 8) * p->xy_steep) >> 10;
 
     int32_t xei = xe >> 8;
     int32_t xef = xe & 0xFF;
 
-    int32_t sps = p->steep >> 2;
-    if(p->steep < 0) sps = -sps;
-
     int32_t px_h;
     if(xef == 0) px_h = 255;
-    else px_h = 255 - (((255 - xef) * sps) >> 8);
+    else px_h = 255 - (((255 - xef) * p->spx) >> 8);
     int32_t k = xei - abs_x;
     lv_opa_t m;
 
@@ -239,20 +265,19 @@ static void line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs
         k++;
     }
 
-    while(px_h > sps) {
+    while(px_h > p->spx) {
         if(k >= 0) {
-            m = px_h - (sps >> 1);
+            m = px_h - (p->spx >> 1);
             if(p->inv) m = 255 - m;
             mask_buf[k] = mask_mix(mask_buf[k], m);
         }
-        px_h -= sps;
+        px_h -= p->spx;
         k++;
         if(k >= len) break;
     }
-
     if(k < len && k >= 0) {
-        int32_t x_inters = (px_h << 10) / p->steep;
-        m =  (x_inters * px_h) >> 9;
+        int32_t x_inters = (px_h * p->xy_steep) >> 10;
+        m = (x_inters * px_h) >> 9;
         if(p->inv) m = 255 - m;
         mask_buf[k] = mask_mix(mask_buf[k], m);
     }
@@ -278,7 +303,7 @@ static void line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
     lv_coord_t x_at_y;
     /* At the beginning of the mask if the limit line is greater then the mask's y.
      * Then the mask is in the "wrong" area*/
-    x_at_y = (int32_t)((int32_t)p->steep * abs_y) >> 10;
+    x_at_y = (int32_t)((int32_t)p->xy_steep * abs_y) >> 10;
     if(x_at_y < abs_x) {
         if(p->inv) {
             return;
@@ -290,7 +315,7 @@ static void line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
 
     /* At the end of the mask if the limit line is smaller then the mask's y.
      * Then the mask is in the "good" area*/
-    x_at_y = (int32_t)((int32_t)p->steep * (abs_y)) >> 10;
+    x_at_y = (int32_t)((int32_t)p->xy_steep * (abs_y)) >> 10;
     if(x_at_y > abs_x + len) {
         if(p->inv) {
             memset(mask_buf, 0x00, len);
@@ -300,18 +325,18 @@ static void line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
         }
     }
 
-    int32_t xe = ((abs_y << 8) * p->steep) >> 10;
+    int32_t xe = ((abs_y << 8) * p->xy_steep) >> 10;
     int32_t xei = xe >> 8;
     int32_t xef = xe & 0xFF;
 
-    int32_t xq = (((abs_y + 1) << 8) * p->steep) >> 10;
+    int32_t xq = (((abs_y + 1) << 8) * p->xy_steep) >> 10;
     int32_t xqi = xq >> 8;
     int32_t xqf = xq & 0xFF;
 
     lv_opa_t m;
 
     k = xei - abs_x;
-    if(xei != xqi && (p->steep < 0 && xef == 0)) {
+    if(xei != xqi && (p->xy_steep < 0 && xef == 0)) {
         xef = 0xFF;
         xei = xqi;
         k--;
@@ -336,8 +361,8 @@ static void line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
 
     } else {
         int32_t y_inters;
-        if(p->steep < 0) {
-            y_inters = (xef << 10) / (-p->steep);
+        if(p->xy_steep < 0) {
+            y_inters = (xef * (-p->yx_steep)) >> 10;
             if(k >= 0 && k < len ) {
                 m = (y_inters * xef) >> 9;
                 if(p->inv) m = 255 - m;
@@ -345,7 +370,7 @@ static void line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
             }
             k--;
 
-            int32_t x_inters = ((255-y_inters) * (-p->steep)) >> 10;
+            int32_t x_inters = ((255-y_inters) * (-p->xy_steep)) >> 10;
 
             if(k >= 0 && k < len ) {
                 m = 255-(((255-y_inters) * x_inters) >> 9);
@@ -365,7 +390,7 @@ static void line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
             }
 
         } else {
-            y_inters = ((255-xef) << 10) / p->steep;
+            y_inters = ((255-xef) * p->yx_steep) >> 10;
             if(k >= 0 && k < len ) {
                 m = 255 - ((y_inters * (255-xef)) >> 9);
                 if(p->inv) m = 255 - m;
@@ -374,7 +399,7 @@ static void line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
 
             k++;
 
-            int32_t x_inters = ((255-y_inters) * p->steep) >> 10;
+            int32_t x_inters = ((255-y_inters) * p->xy_steep) >> 10;
             if(k >= 0 && k < len ) {
                 m = ((255-y_inters) * x_inters) >> 9;
                 if(p->inv) m = 255 - m;

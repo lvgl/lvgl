@@ -35,9 +35,26 @@ typedef uint8_t lv_line_mask_side_t;
 
 typedef struct {
     lv_point_t origo;
+    /* X / (1024*Y) steepness (X is 0..1023 range). What is the change of X in 1024 Y?*/
+    lv_coord_t xy_steep;
+
+    /* Y / (1024*X) steepness (Y is 0..1023 range). What is the change of Y in 1024 X?*/
+    lv_coord_t yx_steep;
+
+    /*Helper which stores yx_steep for flat lines and xy_steep for steep (non flat) lines */
     lv_coord_t steep;
+
+    /*Steepness in 1 px in 0..255 range. Used only by flat lines. */
+    int32_t spx;
+
+    /*1: It's a flat line? (Neare to horizontal)*/
     uint8_t flat :1;
+
+    /*Which side to keep?*/
     lv_line_mask_side_t side :2;
+
+    /* Invert the mask. The default is: Keep the left part.
+     * It is used to select left/right/top/bottom*/
     uint8_t inv:1;
 }lv_mask_line_param_t;
 
