@@ -65,8 +65,9 @@ typedef struct
 
 /** Data of axis */
 enum {
-    LV_CHART_AXIS_SKIP_LAST_TICK = 0x00,    /**< don't draw the last tick */
-    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01     /**< draw the last tick */
+    LV_CHART_AXIS_SKIP_LAST_TICK = 0x00,            /**< don't draw the last tick */
+    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01,            /**< draw the last tick */
+    LV_CHART_AXIS_INVERSE_LABELS_ORDER = 0x02       /**< draw tick labels in an inversed order*/
 };
 typedef uint8_t lv_chart_axis_options_t;
 

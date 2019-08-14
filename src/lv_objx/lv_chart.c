@@ -1084,6 +1084,61 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
     }
 }
 
+#define LABEL_ITERATOR_FORWARD 1
+#define LABEL_ITERATOR_REVERSE 0
+
+typedef struct {
+    const char * list_start;
+    const char * current_pos;
+    uint8_t items_left;
+    uint8_t is_reverse_iter;
+} label_iterator_t;
+
+static label_iterator_t lv_chart_create_label_iter(const char * list, uint8_t iterator_dir)
+{
+    label_iterator_t iterator = {0};
+    uint8_t j;
+    iterator.list_start = list;
+
+    for(j = 0; list[j] != '\0'; j++) {
+            if(list[j] == '\n')
+               iterator.items_left++;
+    }
+
+    if (iterator_dir == LABEL_ITERATOR_FORWARD) {
+        iterator.is_reverse_iter = 0;
+        iterator.current_pos = list;
+    } else {
+        iterator.is_reverse_iter = 1;
+        iterator.current_pos = list + j - 1;
+    }
+    return iterator;
+}
+
+static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf)
+{
+    uint8_t label_len = 0;
+    if (iterator->is_reverse_iter) {
+        //TODO:
+    } else {
+        /* search for tick string */
+        while(iterator->current_pos[label_len] != '\n' &&
+            iterator->current_pos[label_len] != '\0') {
+            /* do not overflow the buffer, but move to the end of the current label */
+            if(label_len < LV_CHART_AXIS_TICK_LABEL_MAX_LEN)
+                buf[label_len++] = iterator->current_pos[label_len];
+            else
+                label_len++;
+        }
+        iterator->current_pos += label_len;
+        //TODO: ugly 0
+        if(iterator->current_pos[0] == '\n') iterator->current_pos++;
+
+        /* terminate the string */
+        buf[label_len] = '\0';
+    }
+}
+
 static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint8_t which_axis)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
@@ -1133,14 +1188,8 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
 
         /* count the '\n'-s to determine the number of options */
         list_index    = 0;
-        num_of_labels = 0;
-        if(y_axis->list_of_values != NULL) {
-            for(j = 0; y_axis->list_of_values[j] != '\0'; j++) {
-                if(y_axis->list_of_values[j] == '\n') num_of_labels++;
-            }
-
-            num_of_labels++; /* last option in the at row*/
-        }
+        label_iterator_t iter = lv_chart_create_label_iter(y_axis->list_of_values, LABEL_ITERATOR_FORWARD);
+        num_of_labels = iter.items_left + 1;
 
         /* we can't have string labels without ticks step, set to 1 if not specified */
         if(y_axis->num_tick_marks == 0) y_axis->num_tick_marks = 1;
@@ -1174,22 +1223,8 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
             if(num_of_labels != 0) {
                 /* add text only to major tick */
                 if(i == 0 || i % y_axis->num_tick_marks == 0) {
-                    /* search for tick string */
-                    j = 0;
-                    while(y_axis->list_of_values[list_index] != '\n' &&
-                          y_axis->list_of_values[list_index] != '\0') {
-                        /* do not overflow the buffer, but move to the end of the current label */
-                        if(j < LV_CHART_AXIS_TICK_LABEL_MAX_LEN)
-                            buf[j++] = y_axis->list_of_values[list_index++];
-                        else
-                            list_index++;
-                    }
 
-                    /* this was a string, but not end of the list, so jump to the next string */
-                    if(y_axis->list_of_values[list_index] == '\n') list_index++;
-
-                    /* terminate the string */
-                    buf[j] = '\0';
+                    lv_chart_get_next_label(&iter, buf);
 
                     /* reserve appropriate area */
                     lv_point_t size;
