@@ -232,11 +232,18 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h)
  */
 void lv_ddlist_set_fix_width(lv_obj_t * ddlist, lv_coord_t w)
 {
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     if(w == 0) {
         lv_cont_set_fit2(ddlist, LV_FIT_TIGHT, lv_cont_get_fit_bottom(ddlist));
     } else {
         lv_cont_set_fit2(ddlist, LV_FIT_NONE, lv_cont_get_fit_bottom(ddlist));
         lv_obj_set_width(ddlist, w);
+    }
+
+    switch(lv_label_get_align(ext->label)) {
+        case LV_LABEL_ALIGN_LEFT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0); break;
+        case LV_LABEL_ALIGN_CENTER: lv_obj_align(ext->label, NULL, LV_ALIGN_CENTER, 0, 0); break;
+        case LV_LABEL_ALIGN_RIGHT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0); break;
     }
 
     lv_ddlist_refr_size(ddlist, false);
