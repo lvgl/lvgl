@@ -58,6 +58,17 @@ typedef struct {
     uint8_t inv:1;
 }lv_mask_line_param_t;
 
+
+typedef struct {
+    lv_point_t origo;
+    lv_coord_t start_angle;
+    lv_coord_t end_angle;
+    lv_mask_line_param_t start_line;
+    lv_mask_line_param_t end_line;
+    uint16_t delta_deg;
+}lv_mask_angle_param_t;
+
+
 typedef struct {
     lv_area_t rect;
     lv_coord_t radius;
@@ -74,6 +85,10 @@ void lv_mask_apply(lv_color_t * dest_buf, lv_color_t * src_buf, lv_opa_t * mask_
 void lv_mask_line_points_init(lv_mask_line_param_t * p, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_line_mask_side_t side);
 void lv_mask_line_angle_init(lv_mask_line_param_t * p, lv_coord_t p1x, lv_coord_t p1y, int16_t deg, lv_line_mask_side_t side);
 void lv_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, void * param);
+
+
+void lv_mask_angle_init(lv_mask_angle_param_t * p, lv_coord_t origio_x, lv_coord_t origo_y, lv_coord_t start_angle, lv_coord_t end_angle);
+void lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_angle_param_t * p);
 
 /**********************
  *      MACROS

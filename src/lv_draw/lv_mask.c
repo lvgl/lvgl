@@ -50,6 +50,7 @@ void lv_mask_apply(lv_color_t * dest_buf, lv_color_t * src_buf, lv_opa_t * mask_
 void lv_mask_line_points_init(lv_mask_line_param_t * p, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_line_mask_side_t side)
 {
     memset(p, 0x00, sizeof(lv_mask_line_param_t));
+
     if(p1y > p2y) {
         lv_coord_t t;
         t = p2x;
@@ -60,7 +61,6 @@ void lv_mask_line_points_init(lv_mask_line_param_t * p, lv_coord_t p1x, lv_coord
         p2y = p1y;
         p1y = t;
     }
-
 
     p->origo.x = p1x;
     p->origo.y = p1y;
@@ -117,12 +117,29 @@ void lv_mask_line_points_init(lv_mask_line_param_t * p, lv_coord_t p1x, lv_coord
     if(p->steep < 0) p->spx = -p->spx;
 }
 
+/**
+ *
+ * @param p
+ * @param p1x
+ * @param p1y
+ * @param deg right 0 deg, bottom: 90
+ * @param side
+ */
 void lv_mask_line_angle_init(lv_mask_line_param_t * p, lv_coord_t p1x, lv_coord_t p1y, int16_t deg, lv_line_mask_side_t side)
 {
+    /* Find an optimal degree.
+     * lv_mask_line_points_init will swap the points to keep the smaller y in p1
+     * Theoretically a line with `deg` or `deg+180` is the same only the points are swapped
+     * Find the degree which keeps the origo in place */
+
+//    deg = 360-deg;  /*To get clock-wise direction*/
+    if(deg > 180) deg -= 180; /*> 180 will swap the origo*/
+
+
     lv_coord_t p2x;
     lv_coord_t p2y;
 
-    p2x = (lv_trigo_sin(deg - 90) >> 5) + p1x;
+    p2x = (lv_trigo_sin(deg + 90) >> 5) + p1x;
     p2y = (lv_trigo_sin(deg) >> 5) + p1y;
 
     lv_mask_line_points_init(p, p1x, p1y, p2x, p2y, side);
@@ -170,12 +187,56 @@ void lv_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_co
         }
     }
 
-
     if(p->flat) {
         line_mask_flat(mask_buf, abs_x, abs_y, len, p);
     } else {
         line_mask_steep(mask_buf, abs_x, abs_y, len, p);
     }
+}
+
+void lv_mask_angle_init(lv_mask_angle_param_t * p, lv_coord_t origo_x, lv_coord_t origo_y, lv_coord_t start_angle, lv_coord_t end_angle)
+{
+    lv_line_mask_side_t start_side;
+    lv_line_mask_side_t end_side;
+
+    p->delta_deg = LV_MATH_ABS(start_angle - end_angle);
+    p->start_angle = start_angle;
+    p->end_angle = end_angle;
+    p->origo.x = origo_x;
+    p->origo.y = origo_y;
+
+    /*The most simple case the, */
+    if(p->delta_deg <= 180) {
+        if(start_angle > 0 && start_angle < 180) {
+            start_side = LV_LINE_MASK_SIDE_LEFT;
+        }
+        else if(start_angle > 180 && start_angle < 360) {
+            start_side = LV_LINE_MASK_SIDE_RIGHT;
+        }
+
+        if(end_angle > 0 && end_angle < 180) {
+            end_side = LV_LINE_MASK_SIDE_RIGHT;
+        }
+        else if(end_angle > 180 && end_angle < 360) {
+                end_side = LV_LINE_MASK_SIDE_LEFT;
+        }
+    }
+
+    lv_mask_line_angle_init(&p->start_line, origo_x, origo_y, start_angle, start_side);
+    lv_mask_line_angle_init(&p->end_line, origo_x, origo_y, end_angle, end_side);
+}
+
+
+void lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_angle_param_t * p)
+{
+    if(p->delta_deg <= 180) {
+        if((p->start_angle <= 180 && abs_y >= p->origo.y) ||
+           (p->start_angle >= 180 && abs_y <= p->origo.y)) {
+            lv_mask_line(mask_buf, abs_x, abs_y, len, &p->start_line);
+        }
+        lv_mask_line(mask_buf, abs_x, abs_y, len, &p->end_line);
+    }
+
 }
 
 
@@ -211,6 +272,13 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
 
         printf("y:%d, x0: %d.%02d, x1: %d.%02d\n", y, x0.i, x0.f * 100 / 255, x1.i, x1.f * 100 / 255);
 
+        /* If x1 is on the next round coordinate (e.g. x0: 3.5, x1:4.0)
+         * then treat x1 as x1: 3.99 to handle them as they were on the same pixel*/
+         if(x0.i == x1.i - 1 && x1.f == 0) {
+             x1.i--;
+             x1.f = 0xFF;
+         }
+
         /*If the two x intersections are on the same x then just get average of the fractionals*/
         if(x0.i == x1.i) {
             lv_opa_t m = (x0.f + x1.f) >> 1;
@@ -220,7 +288,8 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
             int32_t kl = k + ofs;
 
             if(kl >= 0 && kl < len) {
-                mask_buf[kl] = m;
+                if(p->inv) m = 255 - m;
+                mask_buf[kl] = mask_mix(mask_buf[kl], m);
             }
 
 
@@ -231,42 +300,17 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
 
             /*Right corner*/
             int32_t kr = k+(w-ofs-1);
-            if(kr >= 0 && kr < len) mask_buf[kr] = m;
+            if(kr >= 0 && kr < len) {
+                if(p->inv) m = 255 - m;
+                mask_buf[kr] = mask_mix(mask_buf[kr], m);
+            }
             kr++;
 
             if(kr < 0) kr = 0;
             if(kr <= len) memset(&mask_buf[kr], 0x00, len-kr);
 
         }
-        /* If x1 is on the next round coordinate (e.g. x0: 3.5, x1:4.0)
-         * then treat x1 as x1: 3.99 to handle them as they were on the same pixel*/
-        else if(x0.i == x1.i - 1 && x1.f == 0) {
-            x1.f = 0xFF;
-            lv_opa_t m = (x0.f + x1.f) >> 1;
-
-            int32_t ofs = p->radius - x0.i - 1;
-
-            /*Left corner*/
-            int32_t kl = k + ofs;
-
-            if(kl >= 0 && kl < len) {
-                mask_buf[kl] = m;
-            }
-
-            if(kl > len) kl  = len;
-            if(kl >= 0) {
-                memset(&mask_buf[0], 0x00, kl);
-            }
-
-            /*Right corner*/
-            int32_t kr = k+(w-ofs-1);
-            if(kr >= 0 && kr < len) mask_buf[kr] = m;
-            kr++;
-
-            if(kr < 0) kr = 0;
-            if( kr <= len) memset(&mask_buf[kr], 0x00, len-kr);
-        }
-        /*Multiple pixels are affected. Get y intersection of the pixels*/
+       /*Multiple pixels are affected. Get y intersection of the pixels*/
         else {
             int32_t ofs = p->radius - (x0.i + 1);
             int32_t kl = k+ofs;
@@ -290,8 +334,10 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
                 printf("x_first: %d, y_inters:%d.%02d\n", i, y_next.i, y_next.f * 100 / 255);
 
                 m = 255 - (((255-x0.f) * (255 - y_next.f)) >> 9);
-                if(kl >= 0 && kl < len) mask_buf[kl] = m;
-                if(kr >= 0 && kr < len) mask_buf[kr] = m;
+
+                if(p->inv) m = 255 - m;
+                if(kl >= 0 && kl < len) mask_buf[kl] = mask_mix(mask_buf[kl], m);
+                if(kr >= 0 && kr < len) mask_buf[kr] = mask_mix(mask_buf[kr], m);
                 kl--;
                 kr++;
                 y_prev.f = y_next.f;
@@ -305,8 +351,9 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
                 printf("x: %d, y_inters:%d.%02d\n", i, y_next.i, y_next.f * 100 / 255);
 
                 m = (y_prev.f + y_next.f) >> 1;
-                if(kl >= 0 && kl < len) mask_buf[kl] = m;
-                if(kr >= 0 && kr < len) mask_buf[kr] = m;
+                if(p->inv) m = 255 - m;
+                if(kl >= 0 && kl < len) mask_buf[kl] = mask_mix(mask_buf[kl], m);
+                if(kr >= 0 && kr < len) mask_buf[kr] = mask_mix(mask_buf[kr], m);
                 kl--;
                 kr++;
                 y_prev.f = y_next.f;
@@ -316,8 +363,9 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
              * the circle still has parts on the next one*/
             if(y_prev.f) {
                 m = (y_prev.f * x1.f) >> 9;
-                if(kl >= 0 && kl < len) mask_buf[kl] = m;
-                if(kr >= 0 && kr < len) mask_buf[kr] = m;
+                if(p->inv) m = 255 - m;
+                if(kl >= 0 && kl < len) mask_buf[kl] = mask_mix(mask_buf[kl], m);
+                if(kr >= 0 && kr < len) mask_buf[kr] = mask_mix(mask_buf[kr], m);
                 kl--;
                 kr++;
             }
@@ -442,7 +490,8 @@ static void line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs
         }
     } else {
         k++;
-        if(k <= len && k >= 0) {
+        if(k < 0) k = 0;
+        if(k <= len) {
             memset(&mask_buf[k], 0x00,  len - k);
         }
     }
@@ -455,6 +504,7 @@ static void line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
     /* At the beginning of the mask if the limit line is greater then the mask's y.
      * Then the mask is in the "wrong" area*/
     x_at_y = (int32_t)((int32_t)p->xy_steep * abs_y) >> 10;
+    if(p->xy_steep > 0) x_at_y++;
     if(x_at_y < abs_x) {
         if(p->inv) {
             return;
@@ -526,7 +576,8 @@ static void line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
 
             if(k >= 0 && k < len ) {
                 m = 255-(((255-y_inters) * x_inters) >> 9);
-                if(p->inv) mask_buf[k] = 255 - mask_buf[k];
+                if(p->inv) m = 255 - m;
+                mask_buf[k] = mask_mix(mask_buf[k], m);
             }
 
             k+=2;
