@@ -230,12 +230,37 @@ void lv_mask_angle_init(lv_mask_angle_param_t * p, lv_coord_t origo_x, lv_coord_
 
 void lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_angle_param_t * p)
 {
-    if(p->delta_deg <= 180) {
-        if((p->start_angle <= 180 && abs_y >= p->origo.y) ||
-           (p->start_angle >= 180 && abs_y <= p->origo.y)) {
-            lv_mask_line(mask_buf, abs_x, abs_y, len, &p->start_line);
-        }
-        lv_mask_line(mask_buf, abs_x, abs_y, len, &p->end_line);
+//    if(p->delta_deg <= 180) {
+//        if((p->start_angle <= 180 && abs_y >= p->origo.y) ||
+//           (p->start_angle >= 180 && abs_y <= p->origo.y)) {
+//        }
+
+    if(abs_y < p->origo.y) {
+//        memset(mask_buf, 0x00, len);
+        return;
+    }
+
+
+    lv_coord_t rel_y = abs_y - p->origo.y;
+    lv_coord_t rel_x = abs_x - p->origo.x;
+
+    /*Start angle mask can work only from the end of end angle mask */
+    lv_coord_t end_angle_first = (rel_y * p->end_line.xy_steep) >> 10;
+    lv_coord_t start_angle_last= ((rel_y+1) * p->start_line.xy_steep) >> 10;
+
+    int32_t dist = (end_angle_first - start_angle_last) >> 1;
+
+
+
+    int32_t tmp = start_angle_last + dist + p->origo.x;
+    if(tmp > len) tmp = len;
+    if(tmp > 0) {
+        lv_mask_line(&mask_buf[0], abs_x, abs_y, tmp, &p->start_line);
+    }
+
+    if(tmp > len) tmp = len;
+    if(tmp > 0) {
+        lv_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, &p->end_line);
     }
 
 }
