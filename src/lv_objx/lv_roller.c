@@ -498,7 +498,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     lv_coord_t font_h              = lv_font_get_line_height(font);
 
     if(sign == LV_SIGNAL_DRAG_END) {
-        /*If dragged then align the list to there be an element in the middle*/
+        /*If dragged then align the list to have an element in the middle*/
         lv_coord_t label_y1   = ext->ddlist.label->coords.y1 - roller->coords.y1;
         lv_coord_t label_unit = font_h + style_label->text.line_space;
         lv_coord_t mid        = (roller->coords.y2 - roller->coords.y1) / 2;

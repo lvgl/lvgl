@@ -585,14 +585,13 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
 
     uint32_t i         = line_start;
-    uint32_t i_current = i;
+    uint32_t i_act = i;
     uint32_t letter;
     uint32_t letter_next;
 
     if(new_line_start > 0) {
-        while(i <= new_line_start - 1) {
-            /* Get the current letter.
-             * Be careful 'i' already points to the next character*/
+        while(i < new_line_start) {
+            /* Get the current letter.*/
             letter = lv_txt_encoded_next(txt, &i);
 
             /*Get the next letter too for kerning*/
@@ -606,12 +605,14 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
             }
 
             x += lv_font_get_glyph_width(font, letter, letter_next);
-            if(pos->x < x) {
-                i = i_current;
+
+            /*Finish if the x position or the last char of the line is reached*/
+            if(pos->x < x || i == new_line_start) {
+                i = i_act;
                 break;
             }
             x += style->text.letter_space;
-            i_current = i;
+            i_act = i;
         }
     }
 
