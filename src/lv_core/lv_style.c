@@ -72,8 +72,8 @@ void lv_style_init(void)
     /*Screen style*/
     lv_style_scr.glass               = 0;
     lv_style_scr.body.opa            = LV_OPA_COVER;
-    lv_style_scr.body.main_color     = LV_COLOR_WHITE;
-    lv_style_scr.body.grad_color     = LV_COLOR_WHITE;
+    lv_style_scr.body.main_color     = LV_COLOR_GREEN;
+    lv_style_scr.body.grad_color     = LV_COLOR_GREEN;
     lv_style_scr.body.radius         = 0;
     lv_style_scr.body.padding.left   = 0;
     lv_style_scr.body.padding.right  = 0;
@@ -126,7 +126,7 @@ void lv_style_init(void)
     lv_style_pretty.text.color        = lv_color_make(0x20, 0x20, 0x20);
     lv_style_pretty.image.color       = lv_color_make(0x20, 0x20, 0x20);
     lv_style_pretty.line.color        = lv_color_make(0x20, 0x20, 0x20);
-    lv_style_pretty.body.main_color   = LV_COLOR_WHITE;
+    lv_style_pretty.body.main_color   = LV_COLOR_RED;
     lv_style_pretty.body.grad_color   = LV_COLOR_SILVER;
     lv_style_pretty.body.radius       = LV_DPI / 15;
     lv_style_pretty.body.border.color = lv_color_make(0x40, 0x40, 0x40);

@@ -23,7 +23,7 @@
 static void line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_line_param_t * p);
 static void line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_line_param_t * p);
 
-static lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_t mask_new);
+static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_t mask_new);
 
 /**********************
  *  STATIC VARIABLES
@@ -42,7 +42,8 @@ void lv_mask_apply(lv_color_t * dest_buf, lv_color_t * src_buf, lv_opa_t * mask_
 {
     lv_coord_t i;
     for(i = 0; i < len; i++) {
-        dest_buf[i] = lv_color_mix(src_buf[i], dest_buf[i], mask_buf[i]);
+    	if(mask_buf[i] > LV_OPA_MAX) dest_buf[i] = src_buf[i];
+    	else if(mask_buf[i] > LV_OPA_MIN) dest_buf[i] = lv_color_mix(src_buf[i], dest_buf[i], mask_buf[i]);
     }
 }
 
@@ -270,7 +271,7 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
         lv_sqrt_res_t x1;
         lv_sqrt(r2 - ((y-1) * (y-1)), &x1);
 
-        printf("y:%d, x0: %d.%02d, x1: %d.%02d\n", y, x0.i, x0.f * 100 / 255, x1.i, x1.f * 100 / 255);
+//        printf("y:%d, x0: %d.%02d, x1: %d.%02d\n", y, x0.i, x0.f * 100 / 255, x1.i, x1.f * 100 / 255);
 
         /* If x1 is on the next round coordinate (e.g. x0: 3.5, x1:4.0)
          * then treat x1 as x1: 3.99 to handle them as they were on the same pixel*/
@@ -331,7 +332,7 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
             /*The first y intersection is special as it might be in the previous line*/
             if(y_prev.i >= y) {
                 lv_sqrt(r2 - (i * i), &y_next);
-                printf("x_first: %d, y_inters:%d.%02d\n", i, y_next.i, y_next.f * 100 / 255);
+//                printf("x_first: %d, y_inters:%d.%02d\n", i, y_next.i, y_next.f * 100 / 255);
 
                 m = 255 - (((255-x0.f) * (255 - y_next.f)) >> 9);
 
@@ -348,7 +349,7 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
             for(; i <= x1.i; i++) {
                 lv_sqrt(r2 - (i * i), &y_next);
 
-                printf("x: %d, y_inters:%d.%02d\n", i, y_next.i, y_next.f * 100 / 255);
+//                printf("x: %d, y_inters:%d.%02d\n", i, y_next.i, y_next.f * 100 / 255);
 
                 m = (y_prev.f + y_next.f) >> 1;
                 if(p->inv) m = 255 - m;
@@ -625,7 +626,7 @@ static void line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
     }
 }
 
-static lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_t mask_new)
+static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_t mask_new)
 {
     if(mask_new > LV_OPA_MAX) return mask_act;
     if(mask_new < LV_OPA_MIN) return 0;
