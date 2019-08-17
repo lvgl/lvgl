@@ -42,8 +42,9 @@ void lv_mask_apply(lv_color_t * dest_buf, lv_color_t * src_buf, lv_opa_t * mask_
 {
     lv_coord_t i;
     for(i = 0; i < len; i++) {
-    	if(mask_buf[i] > LV_OPA_MAX) dest_buf[i] = src_buf[i];
-    	else if(mask_buf[i] > LV_OPA_MIN) dest_buf[i] = lv_color_mix(src_buf[i], dest_buf[i], mask_buf[i]);
+//    	if(mask_buf[i] > LV_OPA_MAX) dest_buf[i] = src_buf[i];
+//    	else if(mask_buf[i] > LV_OPA_MIN) dest_buf[i] = lv_color_mix(src_buf[i], dest_buf[i], mask_buf[i]);
+    	    dest_buf[i] = lv_color_mix(src_buf[i], dest_buf[i], mask_buf[i]);
     }
 }
 
@@ -252,26 +253,50 @@ void lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_c
 
 
 
-    int32_t tmp = start_angle_last + dist + p->origo.x;
+    int32_t tmp = start_angle_last + dist - rel_x;
     if(tmp > len) tmp = len;
     if(tmp > 0) {
         lv_mask_line(&mask_buf[0], abs_x, abs_y, tmp, &p->start_line);
     }
 
     if(tmp > len) tmp = len;
-    if(tmp > 0) {
-        lv_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, &p->end_line);
-    }
+    if(tmp < 0) tmp = 0;
+    lv_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, &p->end_line);
 
 }
 
 
 void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_radius_param_t * p)
 {
-
-    if(abs_x > p->rect.x1 + p->radius && abs_x + len < p->rect.x2 - p->radius) {
+    if(p->inv == 0) {
+        if(abs_y < p->rect.y1 || abs_y > p->rect.y2) {
+            memset(mask_buf, 0x00, len);
+            return;
+        }
+    } else {
+        if(abs_y < p->rect.y1 || abs_y > p->rect.y2) {
+            return;
+        }
+    }
+    if((abs_x >= p->rect.x1 + p->radius && abs_x + len <= p->rect.x2 - p->radius) ||
+       (abs_y >= p->rect.y1 + p->radius && abs_y <= p->rect.y2 - p->radius+1)) {
+        if(p->inv == 0) return;
+        else {
+            int32_t first = p->rect.x1 - abs_x;
+            if(first < 0) first = 0;
+            if(first <= len) {
+                int32_t last =  p->rect.x2 - abs_x - first + 1;
+                if(last > len) last = len;
+                if(last >= 0) {
+                    memset(&mask_buf[first], 0x00, last);
+                }
+            }
+        }
         return;
     }
+
+
+
 
     int32_t k = p->rect.x1 -abs_x; /*First relevant coordinate on the of the mask*/
     lv_coord_t w = lv_area_get_width(&p->rect);
@@ -281,7 +306,7 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
 
     uint32_t r2 = p->radius * p->radius;
 
-    /*Handle upper corner area*/
+    /*Handle corner areas*/
     if(abs_y < p->radius || abs_y > h - p->radius) {
         /* y = 0 should mean the top of the circle */
         lv_coord_t y;
@@ -296,8 +321,6 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
         lv_sqrt_res_t x1;
         lv_sqrt(r2 - ((y-1) * (y-1)), &x1);
 
-//        printf("y:%d, x0: %d.%02d, x1: %d.%02d\n", y, x0.i, x0.f * 100 / 255, x1.i, x1.f * 100 / 255);
-
         /* If x1 is on the next round coordinate (e.g. x0: 3.5, x1:4.0)
          * then treat x1 as x1: 3.99 to handle them as they were on the same pixel*/
          if(x0.i == x1.i - 1 && x1.f == 0) {
@@ -308,39 +331,61 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
         /*If the two x intersections are on the same x then just get average of the fractionals*/
         if(x0.i == x1.i) {
             lv_opa_t m = (x0.f + x1.f) >> 1;
+            if(p->inv) m = 255 - m;
             int32_t ofs = p->radius - x0.i - 1;
 
             /*Left corner*/
             int32_t kl = k + ofs;
 
             if(kl >= 0 && kl < len) {
-                if(p->inv) m = 255 - m;
                 mask_buf[kl] = mask_mix(mask_buf[kl], m);
-            }
-
-
-            if(kl > len) kl  = len;
-            if(kl >= 0) {
-                memset(&mask_buf[0], 0x00, kl);
             }
 
             /*Right corner*/
             int32_t kr = k+(w-ofs-1);
             if(kr >= 0 && kr < len) {
-                if(p->inv) m = 255 - m;
                 mask_buf[kr] = mask_mix(mask_buf[kr], m);
             }
-            kr++;
 
-            if(kr < 0) kr = 0;
-            if(kr <= len) memset(&mask_buf[kr], 0x00, len-kr);
+            /*Clear the unused parts*/
+            if(p->inv == 0) {
+                kr++;
+                if(kl > len) kl  = len;
+                if(kl >= 0 && p->inv == 0) {
+                    memset(&mask_buf[0], 0x00, kl);
+                }
+                if(kr < 0) kr = 0;
+                if(kr <= len && p->inv == 0) {
+                    memset(&mask_buf[kr], 0x00, len-kr);
+                }
+            } else {
+                kl++;
+                int32_t first = kl;
+                if(first < 0) first = 0;
 
+                int32_t len_tmp = kr-first;
+                if(len_tmp > len) len_tmp = len;
+                if(first < len && len_tmp >= 0) {
+                    memset(&mask_buf[first], 0x00, len_tmp);
+                }
+            }
         }
        /*Multiple pixels are affected. Get y intersection of the pixels*/
         else {
             int32_t ofs = p->radius - (x0.i + 1);
-            int32_t kl = k+ofs;
-            int32_t kr = k+(w-ofs-1);
+            int32_t kl = k + ofs;
+            int32_t kr = k + (w - ofs -1);
+
+            if(p->inv) {
+                int32_t first = kl + 1;
+                if(first < 0) first = 0;
+
+                int32_t len_tmp = kr-first;
+                if(len_tmp > len) len_tmp = len;
+                if(first < len && len_tmp >= 0) {
+                    memset(&mask_buf[first], 0x00, len_tmp);
+                }
+            }
 
             uint32_t i = x0.i + 1;
             lv_opa_t m;
@@ -357,8 +402,6 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
             /*The first y intersection is special as it might be in the previous line*/
             if(y_prev.i >= y) {
                 lv_sqrt(r2 - (i * i), &y_next);
-//                printf("x_first: %d, y_inters:%d.%02d\n", i, y_next.i, y_next.f * 100 / 255);
-
                 m = 255 - (((255-x0.f) * (255 - y_next.f)) >> 9);
 
                 if(p->inv) m = 255 - m;
@@ -373,8 +416,6 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
             /*Set all points which are crossed by the circle*/
             for(; i <= x1.i; i++) {
                 lv_sqrt(r2 - (i * i), &y_next);
-
-//                printf("x: %d, y_inters:%d.%02d\n", i, y_next.i, y_next.f * 100 / 255);
 
                 m = (y_prev.f + y_next.f) >> 1;
                 if(p->inv) m = 255 - m;
@@ -396,14 +437,14 @@ void lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_
                 kr++;
             }
 
+            if(p->inv == 0) {
+                kl++;
+                if(kl > len) kl = len;
+                if(kl >= 0) memset(&mask_buf[0], 0x00, kl);
 
-            kl++;
-            if(kl > len) kl = len;
-            if(kl >= 0) memset(&mask_buf[0], 0x00, kl);
-
-
-            if(kr < 0) kr = 0;
-            if(kr < len) memset(&mask_buf[kr], 0x00, len - kr);
+                if(kr < 0) kr = 0;
+                if(kr < len) memset(&mask_buf[kr], 0x00, len - kr);
+            }
         }
 
         return;

@@ -111,9 +111,20 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
     param1.radius = 50;
     param1.inv = 0;
 
+    lv_coord_t w = 20;
+    lv_mask_radius_param_t param2;
+    lv_area_copy(&param2.rect, coords);
+    param2.rect.x1 += w;
+    param2.rect.x2 -= w;
+    param2.rect.y1 += w;
+    param2.rect.y2 -= w;
+    param2.radius = param1.radius - w;
+    param2.inv = 1;
+
 
     lv_mask_angle_param_t pa;
-    lv_mask_angle_init(&pa, 50, 50, 60, 30);
+    lv_mask_angle_init(&pa, coords->x1 + lv_area_get_width(coords) / 2, coords->y1 + lv_area_get_height(coords) / 2, 60, 30);
+//    lv_mask_angle_init(&pa, 0, 0, 60, 30);
 
 //    line_mask_param1.origo.x = 0;
 //    line_mask_param1.origo.y = 0;
@@ -138,8 +149,9 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 
             //4
             lv_mask_radius(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width, &param1);
+            lv_mask_radius(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width, &param2);
 
-              lv_mask_angle(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width, &pa);
+            lv_mask_angle(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width, &pa);
 
             //9
             lv_mask_apply(&vdb_buf_tmp[draw_rel_a.x1], line_buf, mask_buf, draw_a_width);
