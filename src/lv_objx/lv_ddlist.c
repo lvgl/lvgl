@@ -142,8 +142,10 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->draw_arrow     = copy_ext->draw_arrow;
         ext->stay_open      = copy_ext->stay_open;
 
-        /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_ddlist);
+        lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_BG, lv_ddlist_get_style(copy, LV_DDLIST_STYLE_BG));
+        lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SB, lv_ddlist_get_style(copy, LV_DDLIST_STYLE_SB));
+        lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SEL, lv_ddlist_get_style(copy, LV_DDLIST_STYLE_SEL));
+
     }
 
     LV_LOG_INFO("drop down list created");
@@ -230,11 +232,18 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h)
  */
 void lv_ddlist_set_fix_width(lv_obj_t * ddlist, lv_coord_t w)
 {
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     if(w == 0) {
         lv_cont_set_fit2(ddlist, LV_FIT_TIGHT, lv_cont_get_fit_bottom(ddlist));
     } else {
         lv_cont_set_fit2(ddlist, LV_FIT_NONE, lv_cont_get_fit_bottom(ddlist));
         lv_obj_set_width(ddlist, w);
+    }
+
+    switch(lv_label_get_align(ext->label)) {
+        case LV_LABEL_ALIGN_LEFT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0); break;
+        case LV_LABEL_ALIGN_CENTER: lv_obj_align(ext->label, NULL, LV_ALIGN_CENTER, 0, 0); break;
+        case LV_LABEL_ALIGN_RIGHT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0); break;
     }
 
     lv_ddlist_refr_size(ddlist, false);
@@ -773,13 +782,16 @@ static lv_res_t release_handler(lv_obj_t * ddlist)
             uint16_t new_opt  = 0;
             const char * txt  = lv_label_get_text(ext->label);
             uint32_t i        = 0;
-            uint32_t line_cnt = 0;
+            uint32_t i_prev   = 0;
+
+            uint32_t letter_cnt = 0;
             uint32_t letter;
-            for(line_cnt = 0; line_cnt < letter_i; line_cnt++) {
+            for(letter_cnt = 0; letter_cnt < letter_i; letter_cnt++) {
                 letter = lv_txt_encoded_next(txt, &i);
                 /*Count he lines to reach the clicked letter. But ignore the last '\n' because it
                  * still belongs to the clicked line*/
-                if(letter == '\n' && i != letter_i) new_opt++;
+                if(letter == '\n' && i_prev != letter_i) new_opt++;
+                i_prev = i;
             }
 
             ext->sel_opt_id     = new_opt;

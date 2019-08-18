@@ -176,9 +176,17 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
 void lv_roller_set_align(lv_obj_t * roller, lv_label_align_t align)
 {
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-    lv_mem_assert(ext);
-    if(ext->ddlist.label == NULL) return; /*Probably the roller is being deleted if the label is NULL.*/
-    lv_label_set_align(ext->ddlist.label, align);
+
+    lv_obj_t * label = ext->ddlist.label;
+
+    if(label == NULL) return; /*Probably the roller is being deleted if the label is NULL.*/
+    lv_label_set_align(label, align);
+
+    switch(lv_label_get_align(label)) {
+        case LV_LABEL_ALIGN_LEFT: lv_obj_align(label, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0); break;
+        case LV_LABEL_ALIGN_CENTER: lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0); break;
+        case LV_LABEL_ALIGN_RIGHT: lv_obj_align(label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0); break;
+    }
 }
 
 /**
@@ -498,7 +506,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     lv_coord_t font_h              = lv_font_get_line_height(font);
 
     if(sign == LV_SIGNAL_DRAG_END) {
-        /*If dragged then align the list to there be an element in the middle*/
+        /*If dragged then align the list to have an element in the middle*/
         lv_coord_t label_y1   = ext->ddlist.label->coords.y1 - roller->coords.y1;
         lv_coord_t label_unit = font_h + style_label->text.line_space;
         lv_coord_t mid        = (roller->coords.y2 - roller->coords.y1) / 2;
