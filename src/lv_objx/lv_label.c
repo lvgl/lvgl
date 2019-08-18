@@ -241,7 +241,7 @@ void lv_label_set_text_fmt(lv_obj_t * label, const char * fmt, ...)
     if(ext->text == NULL) return;
     ext->text[len-1] = 0; /* Ensure NULL termination */
 
-    lv_vsnprintf(ext->text, len, fmt, ap2);
+    lv_vsnprintf(ext->text, len+1, fmt, ap2);
 
     va_end(ap2);
     ext->static_txt = 0; /*Now the text is dynamically allocated*/
