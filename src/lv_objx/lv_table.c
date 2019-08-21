@@ -752,6 +752,8 @@ static lv_res_t lv_table_signal(lv_obj_t * table, lv_signal_t sign, void * param
                 ext->cell_data[cell] = NULL;
             }
         }
+        if(ext->cell_data != NULL)
+            lv_mem_free(ext->cell_data);
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
