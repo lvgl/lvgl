@@ -75,8 +75,8 @@ enum {
     LV_OPA_COVER  = 255,
 };
 
-#define LV_OPA_MIN 16  /*Opacities below this will be transparent*/
-#define LV_OPA_MAX 251 /*Opacities above this will fully cover*/
+#define LV_OPA_MIN 5    /*Opacities below this will be transparent*/
+#define LV_OPA_MAX 250  /*Opacities above this will fully cover*/
 
 #if LV_COLOR_DEPTH == 1
 #define LV_COLOR_SIZE 8

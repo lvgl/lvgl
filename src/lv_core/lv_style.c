@@ -126,7 +126,7 @@ void lv_style_init(void)
     lv_style_pretty.text.color        = lv_color_make(0x20, 0x20, 0x20);
     lv_style_pretty.image.color       = lv_color_make(0x20, 0x20, 0x20);
     lv_style_pretty.line.color        = lv_color_make(0x20, 0x20, 0x20);
-    lv_style_pretty.body.main_color   = LV_COLOR_RED;
+    lv_style_pretty.body.main_color   = LV_COLOR_WHITE;
     lv_style_pretty.body.grad_color   = LV_COLOR_SILVER;
     lv_style_pretty.body.radius       = LV_DPI / 15;
     lv_style_pretty.body.border.color = lv_color_make(0x40, 0x40, 0x40);

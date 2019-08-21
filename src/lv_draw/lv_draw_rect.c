@@ -6,11 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <lvgl/src/lv_draw/lv_blend.h>
 #include "lv_draw_rect.h"
 #include "../lv_misc/lv_circ.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_core/lv_refr.h"
-#include "lv_blit.h"
 #include "lv_mask.h"
 
 /*********************
@@ -63,7 +63,6 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 {
     lv_opa_t opa = style->body.opa;
 
-    if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
     lv_area_t draw_a;
@@ -87,81 +86,97 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
     draw_rel_a.x2 = draw_a.x2 - vdb->area.x1;
     draw_rel_a.y2 = draw_a.y2 - vdb->area.y1;
 
-    lv_color_t * vdb_buf_tmp = vdb->buf_act;
     uint32_t vdb_width       = lv_area_get_width(&vdb->area);
     uint32_t draw_a_width    = lv_area_get_width(&draw_rel_a);
 
     /*Move the vdb_buf_tmp to the first row*/
+    lv_color_t * vdb_buf_tmp = vdb->buf_act;
     vdb_buf_tmp += vdb_width * draw_rel_a.y1;
 
-
-    lv_color_t line_buf[LV_HOR_RES_MAX];
     lv_opa_t mask_buf[LV_HOR_RES_MAX];
-    lv_mask_line_param_t line_mask_param1;
-//    lv_mask_line_points_init(&line_mask_param1, 100, 0, -50, 100, LV_LINE_MASK_SIDE_LEFT);
-    lv_mask_line_angle_init(&line_mask_param1, 0, 0, 60, LV_LINE_MASK_SIDE_LEFT);
+    lv_coord_t short_side = LV_MATH_MIN(lv_area_get_width(coords), lv_area_get_height(coords));
+    lv_coord_t rout = style->body.radius;
+    if(rout > short_side >> 1) rout = short_side >> 1;
 
-    lv_mask_line_param_t line_mask_param2;
-    lv_mask_line_points_init(&line_mask_param2, 100, 0, 0, 100, LV_LINE_MASK_SIDE_LEFT);
-//    lv_mask_line_angle_init(&line_mask_param2, 0, 0, 45, LV_LINE_MASK_SIDE_LEFT);
+    /*Create the outer mask*/
+    lv_mask_param_t mask_rout_param;
+    lv_mask_radius_init(&mask_rout_param, coords, rout, false);
+    int16_t mask_rout_id = lv_mask_add(lv_mask_radius, &mask_rout_param, NULL);
 
+    lv_area_t t;
+    t.x1 = 10;
+    t.y1 = 20;
+    t.x2 = 30;
+    t.y2 = 50;
+    lv_mask_param_t tp;
+    lv_mask_radius_init(&tp, &t, 5, false);
+//    int16_t tpid = lv_mask_add(lv_mask_radius, &tp, NULL);
 
-    lv_mask_radius_param_t param1;
-    lv_area_copy(&param1.rect, coords);
-    param1.radius = 50;
-    param1.inv = 0;
-
-    lv_coord_t w = 20;
-    lv_mask_radius_param_t param2;
-    lv_area_copy(&param2.rect, coords);
-    param2.rect.x1 += w;
-    param2.rect.x2 -= w;
-    param2.rect.y1 += w;
-    param2.rect.y2 -= w;
-    param2.radius = param1.radius - w;
-    param2.inv = 1;
-
-
-    lv_mask_angle_param_t pa;
-    lv_mask_angle_init(&pa, coords->x1 + lv_area_get_width(coords) / 2, coords->y1 + lv_area_get_height(coords) / 2, 60, 30);
-//    lv_mask_angle_init(&pa, 0, 0, 60, 30);
-
-//    line_mask_param1.origo.x = 0;
-//    line_mask_param1.origo.y = 0;
-//    line_mask_param1.steep = 300;
-//    line_mask_param1.flat = 1;
-//    line_mask_param1.side = LV_LINE_MASK_SIDE_RIGHT;
-//    line_mask_param1.inv = 0;
-
-
-    /*Fill with a color line-by-line*/
+    /*Draw the background line by line*/
     lv_coord_t h;
+    lv_mask_res_t mask_res;
+    lv_color_t grad_color;
+
 
     /*Fill the first row with 'color'*/
-    for(h = draw_rel_a.y1; h <= draw_rel_a.y2; h++) {
+    if(opa >= LV_OPA_MIN) {
+        for(h = draw_rel_a.y1; h <= draw_rel_a.y2; h++) {
 
-        if(style->body.main_color.full != style->body.grad_color.full) {
-    //    	3
-            lv_blit_color(line_buf, &vdb_buf_tmp[draw_rel_a.x1], draw_a_width, style->body.main_color, LV_BLIT_MODE_NORMAL);
+            lv_opa_t mix = ((uint32_t)((uint32_t)h + vdb->area.y1-coords->y1)*255) / lv_area_get_height(coords);
+            grad_color = lv_color_mix(style->body.grad_color, style->body.main_color, mix);
+
+            if(style->body.main_color.full != style->body.grad_color.full) {
+                memset(mask_buf, LV_OPA_COVER, draw_a_width);
+                mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width);
+
+                lv_blend_color(&vdb_buf_tmp[draw_rel_a.x1], LV_IMG_CF_TRUE_COLOR, draw_a_width,
+                        grad_color, LV_IMG_CF_TRUE_COLOR,
+                        mask_buf, mask_res, style->body.opa, LV_BLIT_MODE_NORMAL);
+            } else {
+                lv_blend_color(&vdb_buf_tmp[draw_rel_a.x1], LV_IMG_CF_TRUE_COLOR, draw_a_width,
+                                    style->body.main_color, LV_IMG_CF_TRUE_COLOR,
+                                    NULL, LV_MASK_RES_FULL_COVER, style->body.opa, LV_BLIT_MODE_NORMAL);
+            }
+
+            vdb_buf_tmp += vdb_width;
+        }
+    }
+
+
+    /*Draw the border if any*/
+    lv_coord_t border_width = style->body.border.width;
+    if(border_width) {
+        /*Move the vdb_buf_tmp to the first row*/
+        vdb_buf_tmp = vdb->buf_act;
+        vdb_buf_tmp += vdb_width * draw_rel_a.y1;
+
+        lv_mask_param_t mask_rsmall_param;
+        lv_coord_t rin = rout - border_width;
+        if(rin < 0) rin = 0;
+        lv_area_t area_small;
+        lv_area_copy(&area_small, coords);
+        area_small.x1 += border_width;
+        area_small.x2 -= border_width;
+        area_small.y1 += border_width;
+        area_small.y2 -= border_width;
+        lv_mask_radius_init(&mask_rsmall_param, &area_small, style->body.radius - border_width, true);
+        int16_t mask_rsmall_id = lv_mask_add(lv_mask_radius, &mask_rsmall_param, NULL);
+
+        /*Fill the first row with 'color'*/
+        for(h = draw_rel_a.y1; h <= draw_rel_a.y2; h++) {
             memset(mask_buf, LV_OPA_COVER, draw_a_width);
-//            lv_mask_line(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width, &line_mask_param1);
-//            lv_mask_line(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width, &line_mask_param2);
+            mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width);
 
-            //4
-            lv_mask_radius(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width, &param1);
-            lv_mask_radius(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width, &param2);
+            lv_blend_color(&vdb_buf_tmp[draw_rel_a.x1], LV_IMG_CF_TRUE_COLOR, draw_a_width,
+                    style->body.border.color, LV_IMG_CF_TRUE_COLOR,
+                    mask_buf, mask_res, style->body.border.opa, LV_BLIT_MODE_NORMAL);
 
-            lv_mask_angle(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width, &pa);
-
-            //9
-            lv_mask_apply(&vdb_buf_tmp[draw_rel_a.x1], line_buf, mask_buf, draw_a_width);
-//            memcpy(&vdb_buf_tmp[draw_rel_a.x1], line_buf, draw_a_width * sizeof(lv_color_t));
-        } else {
-        	//1
-			lv_blit_color(&vdb_buf_tmp[draw_rel_a.x1], &vdb_buf_tmp[draw_rel_a.x1], draw_a_width, style->body.main_color, LV_BLIT_MODE_NORMAL);
-//            memcpy(&vdb_buf_tmp[draw_rel_a.x1], line_buf, draw_a_width * sizeof(lv_color_t));
+            vdb_buf_tmp += vdb_width;
         }
 
-        vdb_buf_tmp += vdb_width;
+        lv_mask_remove_id(mask_rsmall_id);
     }
+
+    lv_mask_remove_id(mask_rout_id);
+//    lv_mask_remove_id(tpid);
 }
