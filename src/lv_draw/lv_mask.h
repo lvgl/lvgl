@@ -103,6 +103,7 @@ typedef lv_mask_res_t (*lv_mask_cb_t)(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_
 int16_t lv_mask_add(lv_mask_cb_t mask_cb, lv_mask_param_t * param, void * custom_id);
 void lv_mask_remove_id(int16_t id);
 void lv_mask_remove_custom(void * custom_id);
+uint8_t lv_mask_get_cnt(void);
 
 lv_mask_res_t lv_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len);
 

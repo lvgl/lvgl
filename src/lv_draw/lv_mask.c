@@ -72,7 +72,7 @@ lv_mask_res_t lv_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
 {
 
     bool changed = false;
-    lv_mask_res_t res;
+    lv_mask_res_t res = LV_MASK_RES_FULL_COVER;
     uint8_t i;
     for(i = 0; i < LV_MASK_MAX_NUM; i++) {
         if(mask_list[i].cb) {
@@ -100,6 +100,16 @@ void lv_mask_remove_custom(void * custom_id)
             mask_list[i].cb = NULL;
         }
     }
+}
+
+uint8_t lv_mask_get_cnt(void)
+{
+	uint8_t cnt = 0;
+	uint8_t i;
+	for(i = 0; i < LV_MASK_MAX_NUM; i++) {
+		if(mask_list[i].cb) cnt++;
+	}
+	return cnt;
 }
 
 void lv_mask_line_points_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_line_mask_side_t side)
@@ -372,8 +382,8 @@ lv_mask_res_t lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t a
             if(first < len) {
                 memset(&mask_buf[first], 0x00, len-first);
             }
-
-            return LV_MASK_RES_CHANGED;
+            if(last == 0 && first == len) return LV_MASK_RES_FULL_COVER;
+            else return LV_MASK_RES_CHANGED;
         }
         else {
             int32_t first = p->rect.x1 - abs_x;
