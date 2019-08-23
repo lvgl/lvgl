@@ -112,7 +112,7 @@ void lv_mask_line_angle_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t
 lv_mask_res_t lv_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param);
 
 
-void lv_mask_radius_init(lv_mask_param_t * param, lv_area_t * rect, lv_coord_t radius, bool inv);
+void lv_mask_radius_init(lv_mask_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv);
 lv_mask_res_t lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param);
 
 void lv_mask_angle_init(lv_mask_param_t * param, lv_coord_t origio_x, lv_coord_t origo_y, lv_coord_t start_angle, lv_coord_t end_angle);

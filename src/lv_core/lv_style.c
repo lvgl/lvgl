@@ -170,7 +170,7 @@ void lv_style_init(void)
     lv_style_btn_rel.body.padding.bottom = LV_DPI / 6;
     lv_style_btn_rel.body.padding.inner  = LV_DPI / 10;
     lv_style_btn_rel.body.border.color   = lv_color_make(0x0b, 0x19, 0x28);
-    lv_style_btn_rel.body.border.width   = 20;//LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
+    lv_style_btn_rel.body.border.width   = LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
     lv_style_btn_rel.body.border.opa     = LV_OPA_70;
     lv_style_btn_rel.body.shadow.color   = LV_COLOR_GRAY;
     lv_style_btn_rel.body.shadow.width   = 0;

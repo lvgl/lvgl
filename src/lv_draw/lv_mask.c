@@ -345,7 +345,7 @@ lv_mask_res_t lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
     else return LV_MASK_RES_CHANGED;
 }
 
-void lv_mask_radius_init(lv_mask_param_t * param, lv_area_t * rect, lv_coord_t radius, bool inv)
+void lv_mask_radius_init(lv_mask_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv)
 {
     lv_mask_radius_param_t * p = &param->radius;
 
