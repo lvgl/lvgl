@@ -87,12 +87,6 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 
     lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
 
-    /*Get the width of the `disp_area` it will be used to go to the next line*/
-    lv_coord_t disp_w = lv_area_get_width(disp_area);
-
-    /*Create a temp. disp_buf which always point to current line to draw*/
-    lv_color_t * disp_buf_tmp = disp_buf + disp_w * draw_area.y1;
-
     /*Create a mask if there is a radius*/
     lv_opa_t mask_buf[LV_HOR_RES_MAX];
 
@@ -108,8 +102,8 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 
     /*Most simple case: just a plain rectangle*/
     if(other_mask_cnt == 0 && rout == 0 && style->body.main_color.full == style->body.grad_color.full) {
-        lv_blend_fill(&vdb->area, clip, coords,
-                      vdb->buf_act, LV_IMG_CF_TRUE_COLOR, style->body.main_color,
+        lv_blend_fill(disp_area, clip, coords,
+                      disp_buf, LV_IMG_CF_TRUE_COLOR, style->body.main_color,
                       NULL, LV_MASK_RES_FULL_COVER, style->body.opa, LV_BLIT_MODE_NORMAL);
     }
     /*More complex case: there is a radius, gradient or mask.*/

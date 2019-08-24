@@ -73,73 +73,70 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
 {
     lv_opa_t opa = style->body.opa;
 
-    /*Keep the great y in p1*/
-    lv_point_t p1;
-    lv_point_t p2;
-    if(point1->y < point2->y) {
-        p1.y = point1->y;
-        p2.y = point2->y;
-        p1.x = point1->x;
-        p2.x = point2->x;
-    } else {
-        p1.y = point2->y;
-        p2.y = point1->y;
-        p1.x = point2->x;
-        p2.x = point1->x;
-    }
+    lv_disp_t * disp    = lv_refr_get_disp_refreshing();
+    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
 
-    lv_coord_t xdiff = p2.x - p1.x;
-    lv_coord_t ydiff = p2.y - p1.y;
+    const lv_area_t * disp_area = &vdb->area;
+    lv_color_t * disp_buf = vdb->buf_act;
 
     lv_coord_t w = style->line.width - 1;
     lv_coord_t w_half0 = w >> 1;
     lv_coord_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
-    lv_area_t draw_a;
-    draw_a.x1 = LV_MATH_MIN(p1.x, p2.x);
-    draw_a.x2 = LV_MATH_MAX(p1.x, p2.x);
-    draw_a.y1 = LV_MATH_MIN(p1.y, p2.y) - w_half1;
-    draw_a.y2 = LV_MATH_MAX(p1.y, p2.y) + w_half0;
 
-    /* Get the union of `coords` and `clip`*/
-    /* `clip` is already truncated to the `vdb` size
-     * in 'lv_refr_area' function */
-    bool union_ok = lv_area_intersect(&draw_a, &draw_a, clip);
+    int16_t other_mask_cnt = lv_mask_get_cnt();
 
-    /*If there are common part of `clip` and `vdb` then draw*/
-    if(union_ok == false) return;
+    lv_area_t draw_area;
+    draw_area.x1 = LV_MATH_MIN(point1->x, point2->x);
+    draw_area.x2 = LV_MATH_MAX(point1->x, point2->x)  - 1;
+    draw_area.y1 = point1->y - w_half1;
+    draw_area.y2 = point1->y + w_half0;
 
-    lv_disp_t * disp    = lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
-
-    /*Store the coordinates of the `draw_a` relative to the VDB */
-    lv_area_t draw_rel_a;
-    draw_rel_a.x1 = draw_a.x1 - vdb->area.x1;
-    draw_rel_a.y1 = draw_a.y1 - vdb->area.y1;
-    draw_rel_a.x2 = draw_a.x2 - vdb->area.x1;
-    draw_rel_a.y2 = draw_a.y2 - vdb->area.y1;
-
-    uint32_t vdb_width       = lv_area_get_width(&vdb->area);
-    uint32_t draw_a_width    = lv_area_get_width(&draw_rel_a);
-
-    /*Move the vdb_buf_tmp to the first row*/
-    lv_color_t * vdb_buf_tmp = vdb->buf_act;
-    vdb_buf_tmp += vdb_width * draw_rel_a.y1;
-
-    lv_opa_t mask_buf[LV_HOR_RES_MAX];
-
-    /*Draw line by line*/
-    lv_coord_t h;
-    lv_mask_res_t mask_res;
-    /*Fill the first row with 'color'*/
-    for(h = draw_rel_a.y1; h <= draw_rel_a.y2; h++) {
-        memset(mask_buf, LV_OPA_COVER, draw_a_width);
-        mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width);
-        lv_blend_color(&vdb_buf_tmp[draw_rel_a.x1], LV_IMG_CF_TRUE_COLOR, draw_a_width,
-                style->line.color, LV_IMG_CF_TRUE_COLOR,
-                mask_buf, mask_res, style->body.opa, LV_BLIT_MODE_NORMAL);
-        vdb_buf_tmp += vdb_width;
+    /*If there is no mask then simply draw a rectangle*/
+    if(other_mask_cnt == 20) {
+        lv_blend_fill(disp_area, clip, &draw_area,
+                disp_buf,  LV_IMG_CF_TRUE_COLOR, style->line.color,
+                NULL, LV_MASK_RES_FULL_COVER, style->line.opa, LV_BLIT_MODE_NORMAL);
     }
+    /*If there other mask apply it*/
+    else {
+        /* Get clipped fill area which is the real draw area.
+         * It is always the same or inside `fill_area` */
+        bool is_common;
+        is_common = lv_area_intersect(&draw_area, clip, &draw_area);
+        if(!is_common) return;
+
+        /* Now `draw_area` has absolute coordinates.
+         * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+        draw_area.x1 -= vdb->area.x1;
+        draw_area.y1 -= vdb->area.y1;
+        draw_area.x2 -= vdb->area.x1;
+        draw_area.y2 -= vdb->area.y1;
+
+        lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
+
+        lv_area_t fill_area;
+        fill_area.x1 = draw_area.x1 + disp_area->x1;
+        fill_area.x2 = draw_area.x2 + disp_area->x1;
+        fill_area.y1 = draw_area.y1 + disp_area->y1;
+        fill_area.y2 = fill_area.y1;
+
+        lv_opa_t mask_buf[LV_HOR_RES_MAX];
+        lv_coord_t h;
+        lv_mask_res_t mask_res;
+        for(h = draw_area.y1; h <= draw_area.y2; h++) {
+             memset(mask_buf, LV_OPA_COVER, draw_area_w);
+             mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+
+             lv_blend_fill(disp_area, clip, &fill_area,
+                     disp_buf,  LV_IMG_CF_TRUE_COLOR, style->line.color,
+                     mask_buf, mask_res, style->line.opa, LV_BLIT_MODE_NORMAL);
+
+             fill_area.y1++;
+             fill_area.y2++;
+         }
+    }
+
 }
 
 
@@ -148,69 +145,69 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
 {
     lv_opa_t opa = style->body.opa;
 
-    /*Keep the great y in p1*/
-    lv_point_t p1;
-    lv_point_t p2;
-    if(point1->y < point2->y) {
-        p1.y = point1->y;
-        p2.y = point2->y;
-        p1.x = point1->x;
-        p2.x = point2->x;
-    } else {
-        p1.y = point2->y;
-        p2.y = point1->y;
-        p1.x = point2->x;
-        p2.x = point1->x;
-    }
+    lv_disp_t * disp    = lv_refr_get_disp_refreshing();
+    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+
+    const lv_area_t * disp_area = &vdb->area;
+    lv_color_t * disp_buf = vdb->buf_act;
 
     lv_coord_t w = style->line.width - 1;
     lv_coord_t w_half0 = w >> 1;
     lv_coord_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
-    lv_area_t draw_a;
-    draw_a.x1 = LV_MATH_MIN(p1.x, p2.x) - w_half0;
-    draw_a.x2 = LV_MATH_MAX(p1.x, p2.x) + w_half1;
-    draw_a.y1 = LV_MATH_MIN(p1.y, p2.y);
-    draw_a.y2 = LV_MATH_MAX(p1.y, p2.y);
 
-    /* Get the union of `coords` and `clip`*/
-    /* `clip` is already truncated to the `vdb` size
-     * in 'lv_refr_area' function */
-    bool union_ok = lv_area_intersect(&draw_a, &draw_a, clip);
+    int16_t other_mask_cnt = lv_mask_get_cnt();
 
-    /*If there are common part of `clip` and `vdb` then draw*/
-    if(union_ok == false) return;
+    lv_area_t draw_area;
+    draw_area.x1 = point1->x - w_half1;
+    draw_area.x2 = point1->x + w_half0;
+    draw_area.y1 = LV_MATH_MIN(point1->y, point2->y);
+    draw_area.y2 = LV_MATH_MAX(point1->y, point2->y) - 1;
 
-    lv_disp_t * disp    = lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+    /*If there is no mask then simply draw a rectangle*/
+    if(other_mask_cnt == 0) {
 
-    /*Store the coordinates of the `draw_a` relative to the VDB */
-    lv_area_t draw_rel_a;
-    draw_rel_a.x1 = draw_a.x1 - vdb->area.x1;
-    draw_rel_a.y1 = draw_a.y1 - vdb->area.y1;
-    draw_rel_a.x2 = draw_a.x2 - vdb->area.x1;
-    draw_rel_a.y2 = draw_a.y2 - vdb->area.y1;
+        lv_blend_fill(disp_area, clip, &draw_area,
+                disp_buf,  LV_IMG_CF_TRUE_COLOR, style->line.color,
+                NULL, LV_MASK_RES_FULL_COVER, style->line.opa, LV_BLIT_MODE_NORMAL);
+    }
+    /*If there other mask apply it*/
+    else {
+        /* Get clipped fill area which is the real draw area.
+         * It is always the same or inside `fill_area` */
+        bool is_common;
+        is_common = lv_area_intersect(&draw_area, clip, &draw_area);
+        if(!is_common) return;
 
-    uint32_t vdb_width       = lv_area_get_width(&vdb->area);
-    uint32_t draw_a_width    = lv_area_get_width(&draw_rel_a);
+        /* Now `draw_area` has absolute coordinates.
+         * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+        draw_area.x1 -= vdb->area.x1;
+        draw_area.y1 -= vdb->area.y1;
+        draw_area.x2 -= vdb->area.x1;
+        draw_area.y2 -= vdb->area.y1;
 
-    /*Move the vdb_buf_tmp to the first row*/
-    lv_color_t * vdb_buf_tmp = vdb->buf_act;
-    vdb_buf_tmp += vdb_width * draw_rel_a.y1;
+        lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
 
-    lv_opa_t mask_buf[LV_HOR_RES_MAX];
+        lv_area_t fill_area;
+        fill_area.x1 = draw_area.x1 + disp_area->x1;
+        fill_area.x2 = draw_area.x2 + disp_area->x1;
+        fill_area.y1 = draw_area.y1 + disp_area->y1;
+        fill_area.y2 = fill_area.y1;
 
-    /*Draw the background line by line*/
-    lv_coord_t h;
-    lv_mask_res_t mask_res;
-    /*Fill the first row with 'color'*/
-    for(h = draw_rel_a.y1; h <= draw_rel_a.y2; h++) {
-        memset(mask_buf, LV_OPA_COVER, draw_a_width);
-        mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width);
-        lv_blend_color(&vdb_buf_tmp[draw_rel_a.x1], LV_IMG_CF_TRUE_COLOR, draw_a_width,
-                style->line.color, LV_IMG_CF_TRUE_COLOR,
-                mask_buf, mask_res, style->body.opa, LV_BLIT_MODE_NORMAL);
-        vdb_buf_tmp += vdb_width;
+        lv_opa_t mask_buf[LV_HOR_RES_MAX];
+        lv_coord_t h;
+        lv_mask_res_t mask_res;
+        for(h = draw_area.y1; h <= draw_area.y2; h++) {
+             memset(mask_buf, LV_OPA_COVER, draw_area_w);
+             mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+
+             lv_blend_fill(disp_area, clip, &fill_area,
+                     disp_buf,  LV_IMG_CF_TRUE_COLOR, style->line.color,
+                     mask_buf, mask_res, style->line.opa, LV_BLIT_MODE_NORMAL);
+
+             fill_area.y1++;
+             fill_area.y2++;
+         }
     }
 }
 
@@ -253,23 +250,20 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     else wcorr_i = (LV_MATH_ABS(xdiff) << 5) / LV_MATH_ABS(ydiff);
 
     w = (w * wcorr[wcorr_i]) >> 7;
-    printf("w:%d\n", w);
     lv_coord_t w_half0 = w >> 1;
     lv_coord_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
-    lv_area_t draw_a;
-    draw_a.x1 = LV_MATH_MIN(p1.x, p2.x) - w;
-    draw_a.x2 = LV_MATH_MAX(p1.x, p2.x) + w;
-    draw_a.y1 = LV_MATH_MIN(p1.y, p2.y) - w;
-    draw_a.y2 = LV_MATH_MAX(p1.y, p2.y) + w;
+    lv_area_t draw_area;
+    draw_area.x1 = LV_MATH_MIN(p1.x, p2.x) - w;
+    draw_area.x2 = LV_MATH_MAX(p1.x, p2.x) + w;
+    draw_area.y1 = LV_MATH_MIN(p1.y, p2.y) - w;
+    draw_area.y2 = LV_MATH_MAX(p1.y, p2.y) + w;
 
     /* Get the union of `coords` and `clip`*/
     /* `clip` is already truncated to the `vdb` size
      * in 'lv_refr_area' function */
-    bool union_ok = lv_area_intersect(&draw_a, &draw_a, clip);
-
-    /*If there are common part of `clip` and `vdb` then draw*/
-    if(union_ok == false) return;
+    bool is_common = lv_area_intersect(&draw_area, &draw_area, clip);
+    if(is_common == false) return;
 
     lv_mask_param_t mask_left_param;
     lv_mask_param_t mask_right_param;
@@ -301,33 +295,38 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     lv_disp_t * disp    = lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
 
+    const lv_area_t * disp_area = &vdb->area;
+    lv_color_t * disp_buf = vdb->buf_act;
+
     /*Store the coordinates of the `draw_a` relative to the VDB */
-    lv_area_t draw_rel_a;
-    draw_rel_a.x1 = draw_a.x1 - vdb->area.x1;
-    draw_rel_a.y1 = draw_a.y1 - vdb->area.y1;
-    draw_rel_a.x2 = draw_a.x2 - vdb->area.x1;
-    draw_rel_a.y2 = draw_a.y2 - vdb->area.y1;
+    draw_area.x1 -= disp_area->x1;
+    draw_area.y1 -= disp_area->y1;
+    draw_area.x2 -= disp_area->x1;
+    draw_area.y2 -= disp_area->y1;
 
-    uint32_t vdb_width       = lv_area_get_width(&vdb->area);
-    uint32_t draw_a_width    = lv_area_get_width(&draw_rel_a);
-
-    /*Move the vdb_buf_tmp to the first row*/
-    lv_color_t * vdb_buf_tmp = vdb->buf_act;
-    vdb_buf_tmp += vdb_width * draw_rel_a.y1;
-
-    lv_opa_t mask_buf[LV_HOR_RES_MAX];
+    lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
 
     /*Draw the background line by line*/
     lv_coord_t h;
     lv_mask_res_t mask_res;
+    lv_opa_t mask_buf[LV_HOR_RES_MAX];
+    lv_area_t fill_area;
+    fill_area.x1 = draw_area.x1 + disp_area->x1;
+    fill_area.x2 = draw_area.x2 + disp_area->x1;
+    fill_area.y1 = draw_area.y1 + disp_area->y1;
+    fill_area.y2 = fill_area.y1;
+
     /*Fill the first row with 'color'*/
-    for(h = draw_rel_a.y1; h <= draw_rel_a.y2; h++) {
-        memset(mask_buf, LV_OPA_COVER, draw_a_width);
-        mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_rel_a.x1, vdb->area.y1 + h, draw_a_width);
-        lv_blend_color(&vdb_buf_tmp[draw_rel_a.x1], LV_IMG_CF_TRUE_COLOR, draw_a_width,
-                style->line.color, LV_IMG_CF_TRUE_COLOR,
-                mask_buf, mask_res, style->body.opa, LV_BLIT_MODE_NORMAL);
-        vdb_buf_tmp += vdb_width;
+    for(h = draw_area.y1; h <= draw_area.y2; h++) {
+        memset(mask_buf, LV_OPA_COVER, draw_area_w);
+         mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+
+         lv_blend_fill(disp_area, clip, &fill_area,
+                 disp_buf,  LV_IMG_CF_TRUE_COLOR, style->line.color,
+                 mask_buf, mask_res, style->line.opa, LV_BLIT_MODE_NORMAL);
+
+         fill_area.y1++;
+         fill_area.y2++;
     }
 
     lv_mask_remove_id(mask_left_id);
