@@ -201,7 +201,7 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
 
         /*Make sure the last row is at the bottom of 'btnm'*/
         if(map_p_tmp[btn_cnt][0] == '\0') { /*Last row?*/
-            btn_h = max_h - act_y + style_bg->body.padding.bottom - 1;
+            btn_h = lv_obj_get_height(btnm)- act_y - style_bg->body.padding.bottom - 1;
         }
 
         /*Only deal with the non empty lines*/
