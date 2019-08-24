@@ -7,10 +7,13 @@
  *      INCLUDES
  *********************/
 #include "lv_blend.h"
+#include "../lv_misc/lv_math.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define FILL_DIRECT_LEN     32
+#define FILL_DIRECT_MASK    0x1F
 
 /**********************
  *      TYPEDEFS
@@ -50,7 +53,6 @@ void lv_blend_fill(const lv_area_t * disp_area, const lv_area_t * clip_area, con
         lv_color_t * disp_buf, lv_img_cf_t cf, lv_color_t color,
         lv_opa_t * mask, lv_mask_res_t mask_res, lv_opa_t opa, lv_blend_mode_t mode)
 {
-
     /*Do not draw transparent things*/
     if(opa < LV_OPA_MIN) return;
     if(mask_res == LV_MASK_RES_FULL_TRANSP) return;
@@ -81,17 +83,31 @@ void lv_blend_fill(const lv_area_t * disp_area, const lv_area_t * clip_area, con
     /*Simple fill (maybe with opacity), no masking*/
     if(mask_res == LV_MASK_RES_FULL_COVER) {
         if(opa > LV_OPA_MAX) {
-            for(y = draw_area.y1; y <= draw_area.y2; y++) {
-                for(x = draw_area.x1; x <= draw_area.x2; x++) {
-                    disp_buf_tmp[x].full = color.full;
-                }
+            lv_coord_t draw_area_w  = lv_area_get_width(&draw_area);
+            lv_color_t * disp_buf_tmp_ori =  disp_buf_tmp;
+
+            /*Fill the first line. Use `memcpy` because it's faster then simple value assignment*/
+            /*Set the first pixels manually*/
+            lv_coord_t direct_fill_end = LV_MATH_MIN(draw_area.x2, draw_area.x1 + FILL_DIRECT_LEN + (draw_area_w & FILL_DIRECT_MASK) - 1);
+            for(x = draw_area.x1; x <= direct_fill_end ; x++) {
+                disp_buf_tmp[x].full = color.full;
+            }
+
+            for(; x <= draw_area.x2; x += FILL_DIRECT_LEN) {
+                memcpy(&disp_buf_tmp[x], &disp_buf_tmp[draw_area.x1], FILL_DIRECT_LEN * sizeof(lv_color_t));
+            }
+
+            disp_buf_tmp += disp_w;
+
+            for(y = draw_area.y1 + 1; y <= draw_area.y2; y++) {
+                memcpy(&disp_buf_tmp[draw_area.x1], &disp_buf_tmp_ori[draw_area.x1], draw_area_w * sizeof(lv_color_t));
                 disp_buf_tmp += disp_w;
             }
         }
         else {
             for(y = draw_area.y1; y <= draw_area.y2; y++) {
                for(x = draw_area.x1; x <= draw_area.x2; x++) {
-                   disp_buf_tmp[x] = lv_color_mix(color, disp_buf[x], opa);
+                   disp_buf_tmp[x] = lv_color_mix(color, disp_buf_tmp[x], opa);
                }
                disp_buf_tmp += disp_w;
            }
@@ -99,13 +115,13 @@ void lv_blend_fill(const lv_area_t * disp_area, const lv_area_t * clip_area, con
     }
     /*Masked*/
     else {
-        /*Get the width of the `fill_area` it will be used to go to the next line of the mask*/
-        lv_coord_t fill_w = lv_area_get_width(fill_area);
+        /*Get the width of the `draw_area` it will be used to go to the next line of the mask*/
+        lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
 
-        /* The mask is relative to the original `fill_area`.
-         * If some lines and columns are clipped move on the mask accordingly.*/
-        lv_opa_t * mask_tmp = mask + fill_w * (draw_area.y1 - fill_area->y1 + disp_area->y1);
-        mask_tmp -= draw_area.x1;
+        /* The mask is relative to the clipped area.
+         * In the cycles below mask will be indexed from `draw_area.x1`
+         * but it corresponds to zero index. So prepare `mask_tmp` accordingly. */
+        lv_opa_t * mask_tmp = mask - draw_area.x1;
 
         /*Buffer the result color to avoid recalculating the same color*/
         lv_color_t last_dest_color;
@@ -118,6 +134,7 @@ void lv_blend_fill(const lv_area_t * disp_area, const lv_area_t * clip_area, con
         if(opa > LV_OPA_MAX) {
             for(y = draw_area.y1; y <= draw_area.y2; y++) {
                for(x = draw_area.x1; x <= draw_area.x2; x++) {
+                   if(mask_tmp[x] == 0) continue;
                     if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full) {
                         if(mask_tmp[x] > LV_OPA_MAX) last_res_color = color;
                         else if(mask_tmp[x] < LV_OPA_MIN) last_res_color = disp_buf_tmp[x];
@@ -128,14 +145,15 @@ void lv_blend_fill(const lv_area_t * disp_area, const lv_area_t * clip_area, con
                     disp_buf_tmp[x] = last_res_color;
                }
                disp_buf_tmp += disp_w;
-               mask_tmp += fill_w;
+               mask_tmp += draw_area_w;
             }
         }
         /*Handle opa and mask values too*/
         else {
             for(y = draw_area.y1; y <= draw_area.y2; y++) {
                for(x = draw_area.x1; x <= draw_area.x2; x++) {
-                    if(mask[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full) {
+                   if(mask_tmp[x] == 0) continue;
+                    if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full) {
                         lv_opa_t opa_tmp = (uint16_t)((uint16_t)mask_tmp[x] * opa) >> 8;
 
                         if(opa_tmp > LV_OPA_MAX) last_res_color = color;
@@ -147,7 +165,7 @@ void lv_blend_fill(const lv_area_t * disp_area, const lv_area_t * clip_area, con
                     disp_buf_tmp[x] = last_res_color;
                }
                disp_buf_tmp += disp_w;
-               mask_tmp += fill_w;
+               mask_tmp += draw_area_w;
             }
         }
     }
@@ -192,7 +210,7 @@ void lv_blend_color(lv_color_t * dest_buf, lv_img_cf_t dest_cf, lv_coord_t len,
                 last_res_color.full = dest_buf[0].full;
 
                 for(i = 0; i < len; i++) {
-                    //                    if(mask[i] == 0) continue;
+                    if(mask[i] == 0) continue;
 
                     if(mask[i] != last_mask || last_dest_color.full != dest_buf[i].full) {
                         if(mask[i] > LV_OPA_MAX) last_res_color = color;
@@ -210,7 +228,7 @@ void lv_blend_color(lv_color_t * dest_buf, lv_img_cf_t dest_cf, lv_coord_t len,
                 last_dest_color.full = dest_buf[0].full;
                 last_res_color.full = dest_buf[0].full;
                 for(i = 0; i < len; i++) {
-                    //                    if(mask[i] == 0) continue;
+                   if(mask[i] == 0) continue;
 
                     if(mask[i] != last_mask || last_dest_color.full != dest_buf[i].full) {
                         lv_opa_t tmp = (uint16_t)((uint16_t)mask[i] * opa) >> 8;

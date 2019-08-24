@@ -68,7 +68,6 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
     lv_disp_t * disp    = lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
 
-
     /* Get clipped fill area which is the real draw area.
      * It is always the same or inside `fill_area` */
     lv_area_t draw_area;
@@ -129,6 +128,12 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 
         /*Fill the first row with 'color'*/
         if(opa >= LV_OPA_MIN) {
+
+            lv_area_t fill_area;
+            fill_area.x1 = coords->x1;
+            fill_area.x2 = coords->x2;
+            fill_area.y1 = disp_area->y1 + draw_area.y1;
+            fill_area.y2 = fill_area.y1;
             for(h = draw_area.y1; h <= draw_area.y2; h++) {
                 lv_coord_t y = h + vdb->area.y1;
 
@@ -153,16 +158,12 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
                     grad_color = lv_color_mix(style->body.grad_color, style->body.main_color, mix);
                 }
 
-                /*Create a area for this line to fill*/
-                lv_area_t fill_area;
-                fill_area.x1 = coords->x1;
-                fill_area.x2 = coords->x2;
-                fill_area.y1 = disp_area->y1 + h;
-                fill_area.y2 = fill_area.y1;
-
                 lv_blend_fill(disp_area, clip, &fill_area,
                         disp_buf,  LV_IMG_CF_TRUE_COLOR, grad_color,
                         mask_buf, mask_res, style->body.opa, LV_BLIT_MODE_NORMAL);
+
+                fill_area.y1++;
+                fill_area.y2++;
             }
         }
     }
@@ -171,69 +172,103 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
     lv_coord_t border_width = style->body.border.width;
     if(border_width) {
         /*Move the vdb_buf_tmp to the first row*/
-
         lv_mask_param_t mask_rsmall_param;
+
+        /*Get the inner radius*/
         lv_coord_t rin = rout - border_width;
         if(rin < 0) rin = 0;
+
+        /*Get the inner area*/
         lv_area_t area_small;
         lv_area_copy(&area_small, coords);
         area_small.x1 += border_width;
         area_small.x2 -= border_width;
         area_small.y1 += border_width;
         area_small.y2 -= border_width;
+
+        /*Create the mask*/
         lv_mask_radius_init(&mask_rsmall_param, &area_small, style->body.radius - border_width, true);
         int16_t mask_rsmall_id = lv_mask_add(lv_mask_radius, &mask_rsmall_param, NULL);
 
-        lv_coord_t len_left = (coords->x1 + border_width) - (vdb->area.x1 + draw_area.x1);
-        if(draw_area.x1 + len_left > draw_area.x2) {
-            len_left = draw_area.x2 - draw_area.x1 + 1;
-        }
+        lv_coord_t corner_size = LV_MATH_MAX(rout, border_width);
 
-        lv_coord_t first_right = coords->x2 - (vdb->area.x1 + draw_area.x1 + border_width - 1);
-        if(first_right < 0) first_right = 0;
-        lv_coord_t len_right = draw_area_w - first_right;
-
-        lv_coord_t corner_size = LV_MATH_MAX(rout, border_width) + 1;
-
-        /*Fill the first row with 'color'*/
         lv_coord_t h;
         lv_mask_res_t mask_res;
-        for(h = draw_area.y1; h <= draw_area.y2; h++) {
-            /* Do not blend the large empty area in the middle.
-             * Truncate the mask to use only the very edges*/
-            lv_coord_t y = h + vdb->area.y1;
-            if(y > coords->y1 + corner_size &&
-               y < coords->y2 - corner_size) {
-                mask_res = LV_MASK_RES_FULL_COVER;
-                if(other_mask_cnt != 0) {
-                    memset(mask_buf, LV_OPA_COVER, draw_area_w);
-                    mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
-                }
+        lv_area_t fill_area;
 
-                /* It's sure that we don't need more then border_width pixels on the left.*/
-                if(len_left > 0) {
-                    lv_blend_color(&disp_buf_tmp[draw_area.x1], LV_IMG_CF_TRUE_COLOR, len_left,
-                                            style->body.border.color, LV_IMG_CF_TRUE_COLOR,
-                                            mask_buf, mask_res, style->body.border.opa, LV_BLIT_MODE_NORMAL);
-                }
-                /* Similarly we don't need more then border_width pixels on the right.*/
-                if(len_right > 0) {
-                    lv_blend_color(&disp_buf_tmp[draw_area.x1 + first_right], LV_IMG_CF_TRUE_COLOR, len_right,
-                                            style->body.border.color, LV_IMG_CF_TRUE_COLOR,
-                                            mask_buf + first_right, mask_res, style->body.border.opa, LV_BLIT_MODE_NORMAL);
-                }
-            }
-            else {
+        /*Apply some optimization if there is no other mask*/
+        if(other_mask_cnt == 0) {
+            /*Draw the upper corner area*/
+            lv_coord_t upper_corner_end = coords->y1 - disp_area->y1 + corner_size;
+            fill_area.x1 = coords->x1;
+            fill_area.x2 = coords->x2;
+            fill_area.y1 = disp_area->y1 + draw_area.y1;
+            fill_area.y2 = fill_area.y1;
+            for(h = draw_area.y1; h <= upper_corner_end; h++) {
                 memset(mask_buf, LV_OPA_COVER, draw_area_w);
                 mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
-                lv_blend_color(&disp_buf_tmp[draw_area.x1], LV_IMG_CF_TRUE_COLOR, draw_area_w,
-                        style->body.border.color, LV_IMG_CF_TRUE_COLOR,
+                lv_blend_fill(disp_area, clip, &fill_area,
+                        disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
                         mask_buf, mask_res, style->body.border.opa, LV_BLIT_MODE_NORMAL);
-            }
-            disp_buf_tmp += disp_w;
-        }
 
+                fill_area.y1++;
+                fill_area.y2++;
+
+            }
+
+            /*Draw the lowe corner area corner area*/
+            lv_coord_t lower_corner_end = coords->y2 - disp_area->y1 - corner_size;
+            fill_area.y1 = disp_area->y1 + lower_corner_end;
+            fill_area.y2 = fill_area.y1;
+            for(h = lower_corner_end; h <= draw_area.y2; h++) {
+               memset(mask_buf, LV_OPA_COVER, draw_area_w);
+               mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+
+               lv_blend_fill(disp_area, clip, &fill_area,
+                       disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
+                       mask_buf, mask_res, style->body.border.opa, LV_BLIT_MODE_NORMAL);
+
+               fill_area.y1++;
+               fill_area.y2++;
+           }
+
+           /*Draw the left vertical border part*/
+            fill_area.x1 = coords->x1;
+            fill_area.x2 = coords->x1 + border_width - 1;
+            fill_area.y1 = coords->y1 + corner_size + 1;
+            fill_area.y2 = coords->y2 - corner_size - 1;
+
+            lv_blend_fill(disp_area, clip, &fill_area,
+                    disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
+                    NULL, LV_MASK_RES_FULL_COVER, style->body.border.opa, LV_BLIT_MODE_NORMAL);
+
+            fill_area.x1 = coords->x2 - border_width + 1;
+            fill_area.x2 = coords->x2;
+
+            lv_blend_fill(disp_area, clip, &fill_area,
+                       disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
+                       NULL, LV_MASK_RES_FULL_COVER, style->body.border.opa, LV_BLIT_MODE_NORMAL);
+        }
+        /*Process line by line if there is other mask too*/
+        else {
+            fill_area.x1 = coords->x1;
+            fill_area.x2 = coords->x2;
+            fill_area.y1 = disp_area->y1 + draw_area.y1;
+            fill_area.y2 = fill_area.y1;
+            for(h = draw_area.y1; h <= draw_area.y2; h++) {
+                memset(mask_buf, LV_OPA_COVER, draw_area_w);
+                mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+
+                lv_blend_fill(disp_area, clip, &fill_area,
+                        disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
+                        mask_buf, mask_res, style->body.border.opa, LV_BLIT_MODE_NORMAL);
+
+                fill_area.y1++;
+                fill_area.y2++;
+
+            }
+        }
         lv_mask_remove_id(mask_rsmall_id);
     }
 
