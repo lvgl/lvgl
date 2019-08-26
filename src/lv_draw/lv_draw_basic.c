@@ -326,11 +326,16 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
     col_bit = bit_ofs & 0x7; /* "& 0x7" equals to "% 8" just faster */
 
     lv_opa_t mask_buf[LV_HOR_RES_MAX];
-    lv_coord_t mask_p;
+    lv_coord_t mask_p = 0;
+
+    lv_area_t fill_area;
+    fill_area.x1 = col_start + pos_x;
+    fill_area.x2 = col_end  + pos_x - 1;
+    fill_area.y1 = row_start + pos_y;
+    fill_area.y2 = fill_area.y1;
 
     for(row = row_start ; row < row_end; row++) {
         bitmask = bitmask_init >> col_bit;
-        mask_p = 0;
         for(col = col_start; col < col_end; col++) {
             letter_px = (*map_p & bitmask) >> (8 - col_bit - g.bpp);
             if(letter_px != 0) {
@@ -360,23 +365,33 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
             }
         }
 
+        if(mask_p + (row_end - row_start) < sizeof(mask_buf)) {
+            fill_area.y2 ++;
+        } else {
+            lv_blend_fill(&vdb->area, clip_area, &fill_area,
+                          vdb->buf_act, LV_IMG_CF_TRUE_COLOR, color,
+                          mask_buf, LV_MASK_RES_CHANGED, opa, LV_BLIT_MODE_NORMAL);
 
-        lv_area_t fill_area;
-        fill_area.x1 = col_start + pos_x;
-        fill_area.x2 = col_end  + pos_x - 1;
-        fill_area.y1 = row + pos_y;
-        fill_area.y2 = row + pos_y;
-
-        lv_blend_fill(&vdb->area, clip_area, &fill_area,
-                      vdb->buf_act, LV_IMG_CF_TRUE_COLOR, color,
-                      mask_buf, LV_MASK_RES_CHANGED, opa, LV_BLIT_MODE_NORMAL);
-
+            fill_area.y1 = fill_area.y2 + 1;
+            fill_area.y2 = fill_area.y1;
+            mask_p = 0;
+        }
 
 
         col_bit += ((g.box_w - col_end) + col_start) * g.bpp;
 
         map_p += (col_bit >> 3);
         col_bit = col_bit & 0x7;
+    }
+
+
+    /*Flush the last part*/
+    if(fill_area.y1 != fill_area.y2) {
+        fill_area.y2--;
+        lv_blend_fill(&vdb->area, clip_area, &fill_area,
+                      vdb->buf_act, LV_IMG_CF_TRUE_COLOR, color,
+                      mask_buf, LV_MASK_RES_CHANGED, opa, LV_BLIT_MODE_NORMAL);
+        mask_p = 0;
     }
 }
 
