@@ -93,7 +93,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
     draw_area.y2 = point1->y + w_half0;
 
     /*If there is no mask then simply draw a rectangle*/
-    if(other_mask_cnt == 20) {
+    if(other_mask_cnt == 0) {
         lv_blend_fill(disp_area, clip, &draw_area,
                 disp_buf,  LV_IMG_CF_TRUE_COLOR, style->line.color,
                 NULL, LV_MASK_RES_FULL_COVER, style->line.opa, LV_BLIT_MODE_NORMAL);
@@ -136,7 +136,6 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
              fill_area.y2++;
          }
     }
-
 }
 
 

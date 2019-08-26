@@ -95,10 +95,8 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 
     /*Get the real radius*/
     lv_coord_t rout = style->body.radius;
-    if(rout == LV_RADIUS_CIRCLE) {
-        lv_coord_t short_side = LV_MATH_MIN(lv_area_get_width(coords), lv_area_get_height(coords));
-        if(rout > short_side >> 1) rout = short_side >> 1;
-    }
+    lv_coord_t short_side = LV_MATH_MIN(lv_area_get_width(coords), lv_area_get_height(coords));
+    if(rout > short_side >> 1) rout = short_side >> 1;
 
     /*Most simple case: just a plain rectangle*/
     if(other_mask_cnt == 0 && rout == 0 && style->body.main_color.full == style->body.grad_color.full) {
@@ -181,7 +179,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
         area_small.y2 -= border_width;
 
         /*Create the mask*/
-        lv_mask_radius_init(&mask_rsmall_param, &area_small, style->body.radius - border_width, true);
+        lv_mask_radius_init(&mask_rsmall_param, &area_small, rout - border_width, true);
         int16_t mask_rsmall_id = lv_mask_add(lv_mask_radius, &mask_rsmall_param, NULL);
 
         lv_coord_t corner_size = LV_MATH_MAX(rout, border_width);

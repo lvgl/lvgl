@@ -159,7 +159,7 @@ void lv_blend_fill(const lv_area_t * disp_area, const lv_area_t * clip_area, con
                         if(opa_tmp > LV_OPA_MAX) last_res_color = color;
                         else if(opa_tmp < LV_OPA_MIN) last_res_color = disp_buf_tmp[x];
                         else last_res_color = lv_color_mix(color, disp_buf_tmp[x],opa_tmp);
-                        last_mask = mask[x];
+                        last_mask = mask_tmp[x];
                         last_dest_color.full = disp_buf_tmp[x].full;
                     }
                     disp_buf_tmp[x] = last_res_color;
