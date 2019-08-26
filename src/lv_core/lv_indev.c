@@ -182,7 +182,7 @@ void lv_indev_enable(lv_indev_t * indev, bool en)
 {
     if(!indev) return;
 
-    indev->proc.disabled = en ? 1 : 0;
+    indev->proc.disabled = en ? 0 : 1;
 }
 
 /**
