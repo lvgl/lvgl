@@ -478,6 +478,8 @@ void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const 
                     lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
                     mask_buf[px_i] = px_opa;
                     if(px_opa < LV_OPA_MIN) continue;
+                } else {
+                    mask_buf[px_i] = LV_OPA_COVER;
                 }
 
 #if LV_COLOR_DEPTH == 8
@@ -493,8 +495,6 @@ void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const 
                         mask_buf[px_i] = LV_OPA_TRANSP;
                         continue;
                     }
-                } else {
-                    mask_buf[px_i] = LV_OPA_COVER;
                 }
 
                 map2[px_i].full = c.full;

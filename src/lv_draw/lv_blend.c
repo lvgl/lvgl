@@ -107,9 +107,15 @@ void lv_blend_fill(const lv_area_t * disp_area, const lv_area_t * clip_area, con
             }
         }
         else {
+            lv_color_t last_dest_color = LV_COLOR_BLACK;
+            lv_color_t last_res_color = lv_color_mix(color, last_dest_color, opa);
             for(y = draw_area.y1; y <= draw_area.y2; y++) {
                for(x = draw_area.x1; x <= draw_area.x2; x++) {
-                   disp_buf_tmp[x] = lv_color_mix(color, disp_buf_tmp[x], opa);
+                   if(last_dest_color.full != disp_buf_tmp[x].full) {
+                       last_dest_color = disp_buf_tmp[x];
+                       last_res_color = lv_color_mix(color, disp_buf_tmp[x], opa);
+                   }
+                   disp_buf_tmp[x] = last_res_color;
                }
                disp_buf_tmp += disp_w;
            }
@@ -248,9 +254,11 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
 
           /*Buffer the result color to avoid recalculating the same color*/
           lv_color_t last_dest_color;
+          lv_color_t last_map_color;
           lv_color_t last_res_color;
           lv_opa_t last_mask = LV_OPA_TRANSP;
           last_dest_color.full = disp_buf_tmp[0].full;
+          last_map_color.full = disp_buf_tmp[0].full;
           last_res_color.full = disp_buf_tmp[0].full;
 
           /*Only the mask matters*/
@@ -258,15 +266,16 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
               map_buf_tmp += (draw_area.x1 - (map_area->x1 - disp_area->x1)) - draw_area.x1;
               for(y = draw_area.y1; y <= draw_area.y2; y++) {
                  for(x = draw_area.x1; x <= draw_area.x2; x++) {
-//                     if(mask_tmp[x] == 0) continue;
-//                      if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full) {
-//                          if(mask_tmp[x] > LV_OPA_MAX) last_res_color = map_buf_tmp[x];
-//                          else if(mask_tmp[x] < LV_OPA_MIN) last_res_color = disp_buf_tmp[x];
-//                          else last_res_color = lv_color_mix(map_buf_tmp[x], disp_buf_tmp[x], mask_tmp[x]);
-//                          last_mask = mask_tmp[x];
-//                          last_dest_color.full = disp_buf_tmp[x].full;
-//                      }
-                      disp_buf_tmp[x] =  lv_color_mix(map_buf_tmp[x], disp_buf_tmp[x], mask_tmp[x]); //map_buf_tmp[x]; //last_res_color;
+                     if(mask_tmp[x] == 0) continue;
+                      if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full || last_map_color.full != map_buf_tmp[x].full) {
+                          if(mask_tmp[x] > LV_OPA_MAX) last_res_color = map_buf_tmp[x];
+                          else if(mask_tmp[x] < LV_OPA_MIN) last_res_color = disp_buf_tmp[x];
+                          else last_res_color = lv_color_mix(map_buf_tmp[x], disp_buf_tmp[x], mask_tmp[x]);
+                          last_mask = mask_tmp[x];
+                          last_dest_color.full = disp_buf_tmp[x].full;
+                          last_map_color.full = map_buf_tmp[x].full;
+                      }
+                      disp_buf_tmp[x] = last_res_color;
                  }
                  disp_buf_tmp += disp_w;
                  mask_tmp += draw_area_w;
