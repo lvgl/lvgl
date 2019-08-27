@@ -163,7 +163,7 @@ void lv_style_init(void)
     lv_style_copy(&lv_style_btn_rel, &lv_style_plain);
     lv_style_btn_rel.body.main_color     = lv_color_make(0x76, 0xa2, 0xd0);
     lv_style_btn_rel.body.grad_color     = lv_color_make(0x19, 0x3a, 0x5d);
-    lv_style_btn_rel.body.radius         = LV_DPI / 15;
+    lv_style_btn_rel.body.radius         = 200;//LV_DPI / 15;
     lv_style_btn_rel.body.padding.left   = LV_DPI / 4;
     lv_style_btn_rel.body.padding.right  = LV_DPI / 4;
     lv_style_btn_rel.body.padding.top    = LV_DPI / 6;

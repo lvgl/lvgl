@@ -150,10 +150,44 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
                     grad_color = lv_color_mix(style->body.grad_color, style->body.main_color, mix);
                 }
 
-                lv_blend_fill(disp_area, clip, &fill_area,
-                        disp_buf,  LV_IMG_CF_TRUE_COLOR, grad_color,
-                        mask_buf, mask_res, style->body.opa, LV_BLIT_MODE_NORMAL);
+                /* If there is not other mask and drawing the corner area split the drawing to corners and middle area
+                 * because it the middle mask shuldn't be taken into account (therefore its faster)*/
+                if(other_mask_cnt == 0 &&
+                   (y < coords->y1 + rout + 1 ||
+                   y > coords->y2 - rout - 1)) {
 
+                    lv_area_t fill_area2;
+                    fill_area2.x1 = coords->x1;
+                    fill_area2.x2 = coords->x1 + rout;
+                    fill_area2.y1 = fill_area.y1;
+                    fill_area2.y2 = fill_area.y2;
+
+                    lv_blend_fill(disp_area, clip, &fill_area2,
+                                            disp_buf,  LV_IMG_CF_TRUE_COLOR, grad_color,
+                                            mask_buf, mask_res, style->body.opa, LV_BLIT_MODE_NORMAL);
+
+
+                    fill_area2.x1 = coords->x1 + rout + 1;
+                    fill_area2.x2 = coords->x2 - rout - 1;
+
+                    lv_blend_fill(disp_area, clip, &fill_area2,
+                                            disp_buf,  LV_IMG_CF_TRUE_COLOR, grad_color,
+                                            NULL, LV_MASK_RES_FULL_COVER, style->body.opa, LV_BLIT_MODE_NORMAL);
+
+                    fill_area2.x1 = coords->x2 - rout;
+                    fill_area2.x2 = coords->x2;
+
+                    lv_coord_t mask_ofs = (coords->x2 - rout) - (vdb->area.x1 + draw_area.x1);
+                    printf("mask_ofs:%d, draw_w:%d\n", mask_ofs, draw_area_w);
+                    if(mask_ofs < 0) mask_ofs = 0;
+                    lv_blend_fill(disp_area, clip, &fill_area2,
+                                            disp_buf,  LV_IMG_CF_TRUE_COLOR, grad_color,
+                                            mask_buf + mask_ofs, mask_res, style->body.opa, LV_BLIT_MODE_NORMAL);
+                } else {
+                    lv_blend_fill(disp_area, clip, &fill_area,
+                            disp_buf,  LV_IMG_CF_TRUE_COLOR, grad_color,
+                            mask_buf, mask_res, style->body.opa, LV_BLIT_MODE_NORMAL);
+                }
                 fill_area.y1++;
                 fill_area.y2++;
             }
@@ -210,6 +244,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 
             /*Draw the lower corner area corner area*/
             lv_coord_t lower_corner_end = coords->y2 - disp_area->y1 - corner_size;
+            if(lower_corner_end <= upper_corner_end) lower_corner_end = upper_corner_end + 1;
             fill_area.y1 = disp_area->y1 + lower_corner_end;
             fill_area.y2 = fill_area.y1;
             for(h = lower_corner_end; h <= draw_area.y2; h++) {

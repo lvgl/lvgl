@@ -250,7 +250,7 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
           /* The mask is relative to the clipped area.
            * In the cycles below mask will be indexed from `draw_area.x1`
            * but it corresponds to zero index. So prepare `mask_tmp` accordingly. */
-          lv_opa_t * mask_tmp = mask - draw_area.x1;
+          const lv_opa_t * mask_tmp = mask - draw_area.x1;
 
           /*Buffer the result color to avoid recalculating the same color*/
           lv_color_t last_dest_color;
@@ -284,23 +284,7 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
           }
           /*Handle opa and mask values too*/
           else {
-//              for(y = draw_area.y1; y <= draw_area.y2; y++) {
-//                 for(x = draw_area.x1; x <= draw_area.x2; x++) {
-//                     if(mask_tmp[x] == 0) continue;
-//                      if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full) {
-//                          lv_opa_t opa_tmp = (uint16_t)((uint16_t)mask_tmp[x] * opa) >> 8;
-//
-//                          if(opa_tmp > LV_OPA_MAX) last_res_color = color;
-//                          else if(opa_tmp < LV_OPA_MIN) last_res_color = disp_buf_tmp[x];
-//                          else last_res_color = lv_color_mix(color, disp_buf_tmp[x],opa_tmp);
-//                          last_mask = mask_tmp[x];
-//                          last_dest_color.full = disp_buf_tmp[x].full;
-//                      }
-//                      disp_buf_tmp[x] = last_res_color;
-//                 }
-//                 disp_buf_tmp += disp_w;
-//                 mask_tmp += draw_area_w;
-//              }
+
           }
       }
 

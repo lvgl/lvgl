@@ -19,6 +19,7 @@
 
 #include <stddef.h>
 #include "lv_draw.h"
+#include "lv_mask.h"
 
 /*********************
  *      INCLUDES
@@ -327,6 +328,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
 
     lv_opa_t mask_buf[LV_HOR_RES_MAX];
     lv_coord_t mask_p = 0;
+    lv_coord_t mask_p_start;
 
     lv_area_t fill_area;
     fill_area.x1 = col_start + pos_x;
@@ -334,9 +336,14 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
     fill_area.y1 = row_start + pos_y;
     fill_area.y2 = fill_area.y1;
 
+    uint8_t other_mask_cnt = lv_mask_get_cnt();
+
     for(row = row_start ; row < row_end; row++) {
         bitmask = bitmask_init >> col_bit;
+        mask_p_start = mask_p;
         for(col = col_start; col < col_end; col++) {
+
+            /*Load the pixel's opacity into the mask*/
             letter_px = (*map_p & bitmask) >> (8 - col_bit - g.bpp);
             if(letter_px != 0) {
                 if(opa == LV_OPA_COVER) {
@@ -352,9 +359,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
                 mask_buf[mask_p] = 0;
             }
 
-            mask_p++;
-
-
+            /*Go to the next column*/
             if(col_bit < 8 - g.bpp) {
                 col_bit += g.bpp;
                 bitmask = bitmask >> g.bpp;
@@ -362,6 +367,17 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
                 col_bit = 0;
                 bitmask = bitmask_init;
                 map_p++;
+            }
+
+            /*Next mask byte*/
+            mask_p++;
+        }
+
+        /*Apply masks if any*/
+        if(other_mask_cnt) {
+            lv_mask_res_t mask_res = lv_mask_apply(mask_buf + mask_p_start, fill_area.x1, fill_area.y2, lv_area_get_width(&fill_area));
+            if(mask_res == LV_MASK_RES_FULL_TRANSP) {
+                memset(mask_buf + mask_p_start, 0x00, lv_area_get_width(&fill_area));
             }
         }
 
@@ -383,7 +399,6 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
         map_p += (col_bit >> 3);
         col_bit = col_bit & 0x7;
     }
-
 
     /*Flush the last part*/
     if(fill_area.y1 != fill_area.y2) {
@@ -410,6 +425,7 @@ void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const 
         bool chroma_key, bool alpha_byte, lv_color_t recolor, lv_opa_t recolor_opa)
 {
 
+
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
@@ -434,15 +450,16 @@ void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const 
     draw_area.x2 -= disp_area->x1;
     draw_area.y2 -= disp_area->y1;
 
+    uint8_t other_mask_cnt = lv_mask_get_cnt();
+
     /*The simplest case just copy the pixels into the VDB*/
-    if(chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && recolor_opa == LV_OPA_TRANSP) {
+    if(other_mask_cnt == 0 && chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && recolor_opa == LV_OPA_TRANSP) {
         lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_MASK_RES_FULL_COVER, LV_OPA_COVER, LV_BLIT_MODE_NORMAL);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
-
         /*The pixel size in byte is different if an alpha byte is added too*/
-        uint8_t px_size_byte = alpha_byte ? LV_IMG_PX_SIZE_ALPHA_BYTE : LV_COLOR_SIZE;
+        uint8_t px_size_byte = alpha_byte ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
 
         /*Build the image and a mask line-by-line*/
         lv_color_t map2[LV_HOR_RES_MAX];
@@ -457,6 +474,7 @@ void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const 
         lv_color_t c;
         lv_color_t chroma_keyed_color = LV_COLOR_TRANSP;
         uint32_t px_i = 0;
+        uint32_t px_i_start;
 
         const uint8_t * map_px;
 
@@ -466,14 +484,20 @@ void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const 
         blend_area.y1 = disp_area->y1 + draw_area.y1;
         blend_area.y2 = blend_area.y1;
 
+        /*Prepare the `mask_buf`if there are other masks*/
+        if(other_mask_cnt) {
+            memset(mask_buf, 0xFF, sizeof(mask_buf));
+        }
 
+        lv_mask_res_t mask_res;
         lv_coord_t x;
         lv_coord_t y;
-
         for(y = 0; y < lv_area_get_height(&draw_area); y++) {
             map_px = map_buf_tmp;
-            for(x = 0; x < lv_area_get_width(&draw_area); x++, map_px += px_size_byte, px_i++) {
+            px_i_start = px_i;
 
+            mask_res = (alpha_byte || chroma_key) ? LV_MASK_RES_CHANGED : LV_MASK_RES_FULL_COVER;
+            for(x = 0; x < lv_area_get_width(&draw_area); x++, map_px += px_size_byte, px_i++) {
                 if(alpha_byte) {
                     lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
                     mask_buf[px_i] = px_opa;
@@ -497,25 +521,47 @@ void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const 
                     }
                 }
 
+                if(recolor_opa != 0) {
+                    c = lv_color_mix(recolor, c, recolor_opa);
+                }
+
                 map2[px_i].full = c.full;
+            }
+
+            /*Apply the masks if any*/
+            if(other_mask_cnt) {
+                lv_mask_res_t mask_res_sub = lv_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1, lv_area_get_width(&draw_area));
+                if(mask_res_sub == LV_MASK_RES_FULL_TRANSP) {
+                    memset(mask_buf + px_i_start, 0x00, lv_area_get_width(&draw_area));
+                    mask_res = LV_MASK_RES_CHANGED;
+                } else if(mask_res_sub == LV_MASK_RES_CHANGED) {
+                    mask_res = LV_MASK_RES_CHANGED;
+                }
             }
 
             map_buf_tmp += map_w * px_size_byte;
             if(px_i + lv_area_get_width(&draw_area) < sizeof(mask_buf)) {
                 blend_area.y2 ++;
             } else {
-                lv_blend_map(clip_area, &blend_area, map2, mask_buf, LV_MASK_RES_CHANGED, LV_OPA_COVER, LV_BLIT_MODE_NORMAL);
+                lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, LV_OPA_COVER, LV_BLIT_MODE_NORMAL);
 
                 blend_area.y1 = blend_area.y2 + 1;
                 blend_area.y2 = blend_area.y1;
+
                 px_i = 0;
+
+                /*Prepare the `mask_buf`if there are other masks*/
+                if(other_mask_cnt) {
+                    memset(mask_buf, 0xFF, sizeof(mask_buf));
+                }
             }
         }
         /*Flush the last part*/
         if(blend_area.y1 != blend_area.y2) {
             blend_area.y2--;
-            lv_blend_map(clip_area, &blend_area, map2, mask_buf, LV_MASK_RES_CHANGED, LV_OPA_COVER, LV_BLIT_MODE_NORMAL);
+            lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, LV_OPA_COVER, LV_BLIT_MODE_NORMAL);
         }
+
     }
 
 }
@@ -523,25 +569,6 @@ void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-/**
- * Blend pixels to destination memory using opacity
- * @param dest a memory address. Copy 'src' here.
- * @param src pointer to pixel map. Copy it to 'dest'.
- * @param length number of pixels in 'src'
- * @param opa opacity (0, LV_OPA_TRANSP: transparent ... 255, LV_OPA_COVER, fully cover)
- */
-static void sw_mem_blend(lv_color_t * dest, const lv_color_t * src, uint32_t length, lv_opa_t opa)
-{
-    if(opa == LV_OPA_COVER) {
-        memcpy(dest, src, length * sizeof(lv_color_t));
-    } else {
-        uint32_t col;
-        for(col = 0; col < length; col++) {
-            dest[col] = lv_color_mix(src[col], dest[col], opa);
-        }
-    }
-}
 
 /**
  * Fill an area with a color
