@@ -206,7 +206,6 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 
                 fill_area.y1++;
                 fill_area.y2++;
-
             }
 
             /*Draw the lower corner area corner area*/
