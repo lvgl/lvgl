@@ -401,7 +401,15 @@ bool lv_img_color_format_is_chroma_keyed(lv_img_cf_t cf)
 
     switch(cf) {
         case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
-        case LV_IMG_CF_RAW_CHROMA_KEYED: is_chroma_keyed = true; break;
+        case LV_IMG_CF_RAW_CHROMA_KEYED:
+#if LV_INDEXED_CHROMA
+        case LV_IMG_CF_INDEXED_1BIT:
+        case LV_IMG_CF_INDEXED_2BIT:
+        case LV_IMG_CF_INDEXED_4BIT:
+        case LV_IMG_CF_INDEXED_8BIT:
+#endif
+            is_chroma_keyed = true; break;
+
         default: is_chroma_keyed = false; break;
     }
 

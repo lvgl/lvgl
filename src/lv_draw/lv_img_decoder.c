@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_img_decoder.h"
-#include "../lv_core/lv_refr.h"
 #include "../lv_draw/lv_draw_img.h"
 #include "../lv_misc/lv_ll.h"
 #include "../lv_misc/lv_color.h"
@@ -411,17 +410,6 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             }
         }
 
-#if LV_INDEXED_CHROMA
-        /* Set the chroma color to transparent. */
-        lv_disp_t * disp = lv_refr_get_disp_refreshing();
-        uint32_t i;
-        for(i = 0; i < palette_size; i++) {
-            if(user_data->palette[i].full == disp->driver.color_chroma_key.full) {
-                user_data->opa[i] = 0;
-            }
-        }
-#endif
-
         dsc->img_data = NULL;
         return LV_RES_OK;
 #else
@@ -720,12 +708,10 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
 #endif
     }
 
-    uint8_t byte_act = 0;
     uint8_t val_act;
     lv_coord_t i;
-    lv_color_t * cbuf = (lv_color_t *)buf;
     for(i = 0; i < len; i++) {
-        val_act = (data_tmp[byte_act] & (mask << pos)) >> pos;
+        val_act = (*data_tmp & (mask << pos)) >> pos;
 
         lv_color_t color = user_data->palette[val_act];
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
