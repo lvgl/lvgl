@@ -50,6 +50,11 @@
 #define LV_COLOR_TRANSP    LV_COLOR_LIME         /*LV_COLOR_LIME: pure green*/
 #endif
 
+/* Enable chroma keying for indexed images. */
+#ifndef LV_INDEXED_CHROMA
+#define LV_INDEXED_CHROMA    1
+#endif
+
 /* Enable anti-aliasing (lines, and radiuses will be smoothed) */
 #ifndef LV_ANTIALIAS
 #define LV_ANTIALIAS        1
