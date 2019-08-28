@@ -580,9 +580,14 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
                 new_style.text.color = sel_style->text.color;
                 new_style.text.opa   = sel_style->text.opa;
                 lv_area_t area_arrow;
-                area_arrow.x2 = ddlist->coords.x2 - style->body.padding.right;
-                area_arrow.x1 = area_arrow.x2 -
-                                lv_txt_get_width(LV_SYMBOL_DOWN, strlen(LV_SYMBOL_DOWN), sel_style->text.font, 0, 0);
+                lv_coord_t arrow_width = lv_txt_get_width(LV_SYMBOL_DOWN, strlen(LV_SYMBOL_DOWN), sel_style->text.font, 0, 0);
+                if(lv_label_get_align(ext->label) != LV_LABEL_ALIGN_RIGHT) {
+                    area_arrow.x2 = ddlist->coords.x2 - style->body.padding.right;
+                    area_arrow.x1 = area_arrow.x2 - arrow_width;
+                } else {
+                    area_arrow.x1 = ddlist->coords.x1 + style->body.padding.left;
+                    area_arrow.x2 = area_arrow.x1 + arrow_width;
+                }
 
                 area_arrow.y1 = ddlist->coords.y1 + style->text.line_space;
                 area_arrow.y2 = area_arrow.y1 + font_h;
