@@ -393,7 +393,6 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
             mask_p = 0;
         }
 
-
         col_bit += ((g.box_w - col_end) + col_start) * g.bpp;
 
         map_p += (col_bit >> 3);
@@ -424,8 +423,6 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
 void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p, lv_opa_t opa,
         bool chroma_key, bool alpha_byte, lv_color_t recolor, lv_opa_t recolor_opa)
 {
-
-
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 

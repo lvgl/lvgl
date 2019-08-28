@@ -104,12 +104,12 @@ void lv_mask_remove_custom(void * custom_id)
 
 uint8_t lv_mask_get_cnt(void)
 {
-	uint8_t cnt = 0;
-	uint8_t i;
-	for(i = 0; i < LV_MASK_MAX_NUM; i++) {
-		if(mask_list[i].cb) cnt++;
-	}
-	return cnt;
+    uint8_t cnt = 0;
+    uint8_t i;
+    for(i = 0; i < LV_MASK_MAX_NUM; i++) {
+        if(mask_list[i].cb) cnt++;
+    }
+    return cnt;
 }
 
 void lv_mask_line_points_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_line_mask_side_t side)
@@ -201,7 +201,7 @@ void lv_mask_line_angle_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t
      * Theoretically a line with `deg` or `deg+180` is the same only the points are swapped
      * Find the degree which keeps the origo in place */
 
-//    deg = 360-deg;  /*To get clock-wise direction*/
+    //    deg = 360-deg;  /*To get clock-wise direction*/
     if(deg > 180) deg -= 180; /*> 180 will swap the origo*/
 
 
@@ -249,7 +249,13 @@ lv_mask_res_t lv_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs
                 }
             }
             else {
-                return LV_MASK_RES_FULL_TRANSP;
+                if(abs_x + len < 0) return LV_MASK_RES_FULL_TRANSP;
+                else {
+                    int32_t k = - abs_x;
+                    if(k < 0) k = 0;
+                    if(k >= 0 && k < len) memset(&mask_buf[00], 0x00,k);
+                    return  LV_MASK_RES_CHANGED;
+                }
             }
         }
     }
@@ -272,27 +278,29 @@ void lv_mask_angle_init(lv_mask_param_t * param, lv_coord_t origo_x, lv_coord_t 
     lv_line_mask_side_t start_side;
     lv_line_mask_side_t end_side;
 
-    p->delta_deg = LV_MATH_ABS(start_angle - end_angle);
+    if(end_angle < start_angle) {
+        p->delta_deg = 360 - start_angle + end_angle;
+    } else {
+        p->delta_deg = LV_MATH_ABS(end_angle - start_angle);
+    }
+
     p->start_angle = start_angle;
     p->end_angle = end_angle;
     p->origo.x = origo_x;
     p->origo.y = origo_y;
 
-    /*The most simple case the, */
-    if(p->delta_deg <= 180) {
-        if(start_angle > 0 && start_angle < 180) {
-            start_side = LV_LINE_MASK_SIDE_LEFT;
-        }
-        else if(start_angle > 180 && start_angle < 360) {
-            start_side = LV_LINE_MASK_SIDE_RIGHT;
-        }
+    if(start_angle > 0 && start_angle < 180) {
+        start_side = LV_LINE_MASK_SIDE_LEFT;
+    }
+    else if(start_angle > 180 && start_angle < 360) {
+        start_side = LV_LINE_MASK_SIDE_RIGHT;
+    }
 
-        if(end_angle > 0 && end_angle < 180) {
-            end_side = LV_LINE_MASK_SIDE_RIGHT;
-        }
-        else if(end_angle > 180 && end_angle < 360) {
-                end_side = LV_LINE_MASK_SIDE_LEFT;
-        }
+    if(end_angle > 0 && end_angle < 180) {
+        end_side = LV_LINE_MASK_SIDE_RIGHT;
+    }
+    else if(end_angle > 180 && end_angle < 360) {
+        end_side = LV_LINE_MASK_SIDE_LEFT;
     }
 
     lv_mask_line_angle_init((lv_mask_param_t*)&p->start_line, origo_x, origo_y, start_angle, start_side);
@@ -302,47 +310,129 @@ void lv_mask_angle_init(lv_mask_param_t * param, lv_coord_t origo_x, lv_coord_t 
 
 lv_mask_res_t lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param)
 {
-    lv_mask_angle_param_t * p = &param->line;
-//    if(p->delta_deg <= 180) {
-//        if((p->start_angle <= 180 && abs_y >= p->origo.y) ||
-//           (p->start_angle >= 180 && abs_y <= p->origo.y)) {
-//        }
-
-    if(abs_y < p->origo.y) {
-//        memset(mask_buf, 0x00, len);
-        return LV_MASK_RES_FULL_COVER;
-    }
-
+    lv_mask_angle_param_t * p = &param->angle;
 
     lv_coord_t rel_y = abs_y - p->origo.y;
     lv_coord_t rel_x = abs_x - p->origo.x;
 
-    /*Start angle mask can work only from the end of end angle mask */
-    lv_coord_t end_angle_first = (rel_y * p->end_line.xy_steep) >> 10;
-    lv_coord_t start_angle_last= ((rel_y+1) * p->start_line.xy_steep) >> 10;
 
-    int32_t dist = (end_angle_first - start_angle_last) >> 1;
+    if(p->start_angle < 180 && p->end_angle < 180 && p->start_angle != 0  && p->end_angle != 0 && p->start_angle > p->end_angle) {
 
-    lv_mask_res_t res1 = LV_MASK_RES_FULL_COVER;
-    lv_mask_res_t res2 = LV_MASK_RES_FULL_COVER;
-
-    int32_t tmp = start_angle_last + dist - rel_x;
-    if(tmp > len) tmp = len;
-    if(tmp > 0) {
-        res1 = lv_mask_line(&mask_buf[0], abs_x, abs_y, tmp, (lv_mask_param_t*)&p->start_line);
-        if(res1 == LV_MASK_RES_FULL_TRANSP) {
-            memset(&mask_buf[0], 0x00, tmp);
+        if(abs_y < p->origo.y) {
+            return LV_MASK_RES_FULL_COVER;
         }
-    }
 
-    if(tmp > len) tmp = len;
-    if(tmp < 0) tmp = 0;
-    res2 = lv_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, (lv_mask_param_t*)&p->end_line);
-    if(res2 == LV_MASK_RES_FULL_TRANSP) {
-        memset(&mask_buf[tmp], 0x00, len-tmp);
+        /*Start angle mask can work only from the end of end angle mask */
+        lv_coord_t end_angle_first = (rel_y * p->end_line.xy_steep) >> 10;
+        lv_coord_t start_angle_last= ((rel_y+1) * p->start_line.xy_steep) >> 10;
+
+        int32_t dist = (end_angle_first - start_angle_last) >> 1;
+
+        lv_mask_res_t res1 = LV_MASK_RES_FULL_COVER;
+        lv_mask_res_t res2 = LV_MASK_RES_FULL_COVER;
+
+        int32_t tmp = start_angle_last + dist - rel_x;
+        if(tmp > len) tmp = len;
+        if(tmp > 0) {
+            res1 = lv_mask_line(&mask_buf[0], abs_x, abs_y, tmp, (lv_mask_param_t*)&p->start_line);
+            if(res1 == LV_MASK_RES_FULL_TRANSP) {
+                memset(&mask_buf[0], 0x00, tmp);
+            }
+        }
+
+        if(tmp > len) tmp = len;
+        if(tmp < 0) tmp = 0;
+        res2 = lv_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, (lv_mask_param_t*)&p->end_line);
+        if(res2 == LV_MASK_RES_FULL_TRANSP) {
+            memset(&mask_buf[tmp], 0x00, len-tmp);
+        }
+        if(res1 == res2) return res1;
+        else return LV_MASK_RES_CHANGED;
     }
-    if(res1 == res2) return res1;
-    else return LV_MASK_RES_CHANGED;
+    else if(p->start_angle > 180 && p->end_angle > 180 && p->start_angle > p->end_angle) {
+
+        if(abs_y > p->origo.y) {
+            return LV_MASK_RES_FULL_COVER;
+        }
+
+        /*Start angle mask can work only from the end of end angle mask */
+        lv_coord_t end_angle_first = (rel_y * p->end_line.xy_steep) >> 10;
+        lv_coord_t start_angle_last= ((rel_y+1) * p->start_line.xy_steep) >> 10;
+
+        /*Do not let the line end cross the origo else it will affect the opposite part*/
+        if(p->start_angle > 270 && p->start_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->start_angle > 0 && p->start_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->start_angle > 90 && p->start_angle < 270 && start_angle_last > 0) start_angle_last = 0;
+
+        if(p->end_angle > 270 && p->end_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->end_angle > 0 &&   p->end_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->end_angle > 90 &&  p->end_angle < 270 && start_angle_last > 0) start_angle_last = 0;
+
+        int32_t dist = (end_angle_first - start_angle_last) >> 1;
+
+        lv_mask_res_t res1 = LV_MASK_RES_FULL_COVER;
+        lv_mask_res_t res2 = LV_MASK_RES_FULL_COVER;
+
+        int32_t tmp = start_angle_last + dist - rel_x;
+        if(tmp > len) tmp = len;
+        if(tmp > 0) {
+            res1 = lv_mask_line(&mask_buf[0], abs_x, abs_y, tmp, (lv_mask_param_t*)&p->end_line);
+            if(res1 == LV_MASK_RES_FULL_TRANSP) {
+                memset(&mask_buf[0], 0x00, tmp);
+            }
+        }
+
+        if(tmp > len) tmp = len;
+        if(tmp < 0) tmp = 0;
+        res2 = lv_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, (lv_mask_param_t*)&p->start_line);
+        if(res2 == LV_MASK_RES_FULL_TRANSP) {
+            memset(&mask_buf[tmp], 0x00, len-tmp);
+        }
+        if(res1 == res2) return res1;
+        else return LV_MASK_RES_CHANGED;
+    }
+    else  {
+
+        lv_mask_res_t res1 = LV_MASK_RES_FULL_COVER;
+        lv_mask_res_t res2 = LV_MASK_RES_FULL_COVER;
+
+        if(p->start_angle == 180) {
+            if(abs_y < p->origo.y) res1 = LV_MASK_RES_FULL_COVER;
+            else res1 = LV_MASK_RES_UNKNOWN;
+        }
+        else if(p->start_angle == 0) {
+            if(abs_y < p->origo.y) res1 = LV_MASK_RES_UNKNOWN;
+            else res1 = LV_MASK_RES_FULL_COVER;
+        }
+        else if((p->start_angle < 180 && abs_y < p->origo.y) ||
+                (p->start_angle > 180 && abs_y >= p->origo.y)) {
+            res1 = LV_MASK_RES_UNKNOWN;
+        }
+        else  {
+            res1 = lv_mask_line(mask_buf, abs_x, abs_y, len, (lv_mask_param_t*)&p->start_line);
+        }
+
+        if(p->end_angle == 180) {
+            if(abs_y < p->origo.y) res2 = LV_MASK_RES_UNKNOWN;
+            else res2 = LV_MASK_RES_FULL_COVER;
+        }
+        else if(p->end_angle == 0) {
+            if(abs_y < p->origo.y) res2 = LV_MASK_RES_FULL_COVER;
+            else res2 = LV_MASK_RES_UNKNOWN;
+        }
+        else if((p->end_angle < 180 && abs_y < p->origo.y) ||
+                (p->end_angle > 180 && abs_y >= p->origo.y)) {
+            res2 = LV_MASK_RES_UNKNOWN;
+        }
+        else {
+            res2 = lv_mask_line(mask_buf, abs_x, abs_y, len, (lv_mask_param_t*)&p->end_line);
+        }
+
+        if(res1 == LV_MASK_RES_FULL_TRANSP || res2 == LV_MASK_RES_FULL_TRANSP) return LV_MASK_RES_FULL_TRANSP;
+        else if(res1 == LV_MASK_RES_UNKNOWN && res2 == LV_MASK_RES_UNKNOWN) return LV_MASK_RES_FULL_TRANSP;
+        else if(res1 == LV_MASK_RES_FULL_COVER &&  res2 == LV_MASK_RES_FULL_COVER) return LV_MASK_RES_FULL_COVER;
+        else return LV_MASK_RES_CHANGED;
+    }
 }
 
 void lv_mask_radius_init(lv_mask_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv)
@@ -369,7 +459,7 @@ lv_mask_res_t lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t a
     }
 
     if((abs_x >= p->rect.x1 + p->radius && abs_x + len <= p->rect.x2 - p->radius) ||
-       (abs_y >= p->rect.y1 + p->radius && abs_y <= p->rect.y2 - p->radius+1)) {
+            (abs_y >= p->rect.y1 + p->radius && abs_y <= p->rect.y2 - p->radius+1)) {
         if(p->inv == 0) {
             /*Remove the edges*/
             int32_t last =  p->rect.x1 - abs_x;
@@ -424,10 +514,10 @@ lv_mask_res_t lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t a
 
         /* If x1 is on the next round coordinate (e.g. x0: 3.5, x1:4.0)
          * then treat x1 as x1: 3.99 to handle them as they were on the same pixel*/
-         if(x0.i == x1.i - 1 && x1.f == 0) {
-             x1.i--;
-             x1.f = 0xFF;
-         }
+        if(x0.i == x1.i - 1 && x1.f == 0) {
+            x1.i--;
+            x1.f = 0xFF;
+        }
 
         /*If the two x intersections are on the same x then just get average of the fractionals*/
         if(x0.i == x1.i) {
@@ -471,7 +561,7 @@ lv_mask_res_t lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t a
                 }
             }
         }
-       /*Multiple pixels are affected. Get y intersection of the pixels*/
+        /*Multiple pixels are affected. Get y intersection of the pixels*/
         else {
             int32_t ofs = p->radius - (x0.i + 1);
             int32_t kl = k + ofs;

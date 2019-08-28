@@ -27,9 +27,10 @@ extern "C" {
  **********************/
 
 enum {
-    LV_MASK_RES_FULL_COVER,
     LV_MASK_RES_FULL_TRANSP,
+    LV_MASK_RES_FULL_COVER,
     LV_MASK_RES_CHANGED,
+    LV_MASK_RES_UNKNOWN
 };
 
 typedef uint8_t lv_mask_res_t;
