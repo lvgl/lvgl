@@ -178,7 +178,6 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
                     fill_area2.x2 = coords->x2;
 
                     lv_coord_t mask_ofs = (coords->x2 - rout) - (vdb->area.x1 + draw_area.x1);
-                    printf("mask_ofs:%d, draw_w:%d\n", mask_ofs, draw_area_w);
                     if(mask_ofs < 0) mask_ofs = 0;
                     lv_blend_fill(disp_area, clip, &fill_area2,
                                             disp_buf,  LV_IMG_CF_TRUE_COLOR, grad_color,
@@ -216,7 +215,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
         lv_mask_radius_init(&mask_rsmall_param, &area_small, rout - border_width, true);
         int16_t mask_rsmall_id = lv_mask_add(lv_mask_radius, &mask_rsmall_param, NULL);
 
-        lv_coord_t corner_size = LV_MATH_MAX(rout, border_width);
+        lv_coord_t corner_size = LV_MATH_MAX(rout, border_width - 1);
 
         lv_coord_t h;
         lv_mask_res_t mask_res;
@@ -234,9 +233,33 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
                 memset(mask_buf, LV_OPA_COVER, draw_area_w);
                 mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
-                lv_blend_fill(disp_area, clip, &fill_area,
+                lv_area_t fill_area2;
+                fill_area2.x1 = coords->x1;
+                fill_area2.x2 = coords->x1 + rout;
+                fill_area2.y1 = fill_area.y1;
+                fill_area2.y2 = fill_area.y2;
+
+                lv_blend_fill(disp_area, clip, &fill_area2,
                         disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
                         mask_buf, mask_res, style->body.border.opa, LV_BLIT_MODE_NORMAL);
+
+
+                if(fill_area2.y2 < coords->y1 + style->body.border.width) {
+                    fill_area2.x1 = coords->x1 + rout + 1;
+                    fill_area2.x2 = coords->x2 - rout - 1;
+
+                    lv_blend_fill(disp_area, clip, &fill_area2,
+                            disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
+                            NULL, LV_MASK_RES_FULL_COVER, style->body.border.opa, LV_BLIT_MODE_NORMAL);
+                }
+                fill_area2.x1 = coords->x2 - rout;
+                fill_area2.x2 = coords->x2;
+
+                lv_coord_t mask_ofs = (coords->x2 - rout) - (vdb->area.x1 + draw_area.x1);
+                if(mask_ofs < 0) mask_ofs = 0;
+                lv_blend_fill(disp_area, clip, &fill_area2,
+                        disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
+                        mask_buf + mask_ofs, mask_res, style->body.border.opa, LV_BLIT_MODE_NORMAL);
 
                 fill_area.y1++;
                 fill_area.y2++;
@@ -251,9 +274,34 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
                memset(mask_buf, LV_OPA_COVER, draw_area_w);
                mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
-               lv_blend_fill(disp_area, clip, &fill_area,
-                       disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
-                       mask_buf, mask_res, style->body.border.opa, LV_BLIT_MODE_NORMAL);
+               lv_area_t fill_area2;
+                fill_area2.x1 = coords->x1;
+                fill_area2.x2 = coords->x1 + rout;
+                fill_area2.y1 = fill_area.y1;
+                fill_area2.y2 = fill_area.y2;
+
+                lv_blend_fill(disp_area, clip, &fill_area2,
+                        disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
+                        mask_buf, mask_res, style->body.border.opa, LV_BLIT_MODE_NORMAL);
+
+
+                if(fill_area2.y2 > coords->y2 - style->body.border.width) {
+                    fill_area2.x1 = coords->x1 + rout + 1;
+                    fill_area2.x2 = coords->x2 - rout - 1;
+
+                    lv_blend_fill(disp_area, clip, &fill_area2,
+                            disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
+                            NULL, LV_MASK_RES_FULL_COVER, style->body.border.opa, LV_BLIT_MODE_NORMAL);
+                }
+                fill_area2.x1 = coords->x2 - rout;
+                fill_area2.x2 = coords->x2;
+
+                lv_coord_t mask_ofs = (coords->x2 - rout) - (vdb->area.x1 + draw_area.x1);
+                if(mask_ofs < 0) mask_ofs = 0;
+                lv_blend_fill(disp_area, clip, &fill_area2,
+                        disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
+                        mask_buf + mask_ofs, mask_res, style->body.border.opa, LV_BLIT_MODE_NORMAL);
+
 
                fill_area.y1++;
                fill_area.y2++;
@@ -269,6 +317,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
                     disp_buf,  LV_IMG_CF_TRUE_COLOR, style->body.border.color,
                     NULL, LV_MASK_RES_FULL_COVER, style->body.border.opa, LV_BLIT_MODE_NORMAL);
 
+            /*Draw the right vertical border*/
             fill_area.x1 = coords->x2 - border_width + 1;
             fill_area.x2 = coords->x2;
 
