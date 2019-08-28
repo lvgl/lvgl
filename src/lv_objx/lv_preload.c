@@ -220,9 +220,10 @@ void lv_preload_set_type(lv_obj_t * preload, lv_preload_type_t type)
             lv_anim_create(&b);
             break;
         }
+        case LV_PRELOAD_TYPE_CONSTANT_ARC:
         case LV_PRELOAD_TYPE_SPINNING_ARC:
         default: {
-            ext->anim_type = LV_PRELOAD_TYPE_SPINNING_ARC;
+            ext->anim_type = type;
             lv_anim_t a;
             a.var = preload;
             if(ext->anim_dir == LV_PRELOAD_DIR_FORWARD) {
@@ -234,7 +235,8 @@ void lv_preload_set_type(lv_obj_t * preload, lv_preload_type_t type)
                 a.end   = 360;
             }
             a.exec_cb        = (lv_anim_exec_xcb_t)lv_preload_spinner_anim;
-            a.path_cb        = lv_anim_path_ease_in_out;
+            a.path_cb        = (LV_PRELOAD_TYPE_CONSTANT_ARC == type ?
+                                lv_anim_path_linear : lv_anim_path_ease_in_out);
             a.ready_cb       = NULL;
             a.act_time       = 0;
             a.time           = ext->time;
