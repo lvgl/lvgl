@@ -392,7 +392,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     if(rout > short_side >> 1) rout = short_side >> 1;
 
 
-    lv_coord_t corner_size = rout + 2 * style->body.shadow.width;
+    lv_coord_t corner_size = style->body.shadow.width  + rout;
 
 
     lv_opa_t sh_buf[corner_size * corner_size];
@@ -421,28 +421,27 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
 }
 
-#define SHADOW_UPSACALE_SHIFT   10
+#define SHADOW_UPSACALE_SHIFT   0
 
 static void shadow_draw_corner_buf(lv_opa_t * sh_buf, lv_coord_t sw, lv_coord_t r)
 {
-    lv_coord_t size = sw + sw + r;
+    lv_coord_t size = sw  + r;
 
     lv_area_t sh_area;
     sh_area.x1 = -100;
-    sh_area.y1 = sw;
-    sh_area.x2 = sw+r-1;  /*make the end far to not draw the other radius*/
+    sh_area.y1 = sw / 2 + 1;
+    sh_area.x2 = sw / 2 + 1 + r - 1;  /*make the end far to not draw the other radius*/
     sh_area.y2 = 100;
 
     lv_mask_param_t mask_param;
     lv_mask_radius_init(&mask_param, &sh_area, r, false);
     int16_t mask_id = lv_mask_add(lv_mask_radius, &mask_param, NULL);
 
-    /*Initialize the shadow buffer*/
-
     lv_mask_res_t mask_res;
-    lv_opa_t * sh_buf_tmp = sh_buf;
     lv_coord_t y;
     lv_opa_t mask_line[size];
+    uint32_t sh_ups_buf[size*size];
+    uint32_t * sh_ups_tmp_buf = sh_ups_buf;
     lv_coord_t s_left = sw >> 1;
     lv_coord_t s_right = (sw >> 1);
     if((sw & 1) == 0) s_left--;
@@ -450,36 +449,86 @@ static void shadow_draw_corner_buf(lv_opa_t * sh_buf, lv_coord_t sw, lv_coord_t 
         memset(mask_line, 0xFF, size);
         mask_res = lv_mask_apply(mask_line, 0, y, size);
         if(mask_res == LV_MASK_RES_FULL_TRANSP) {
-            memset(sh_buf_tmp, 0x00, size);
-        }
-        /*Horizontal blur*/
-        else {
-            lv_coord_t x;
-            int32_t last_val = 255 << SHADOW_UPSACALE_SHIFT;
-            int32_t chg = 0;
-            for(x = 0; x < size; x++) {
-
-                if(chg) last_val += chg/sw;
-                sh_buf_tmp[x] = last_val >> SHADOW_UPSACALE_SHIFT;
-
-                /*Forget the left pixel*/
-                chg = 0;
-                uint32_t left_val;
-                if(x - s_left <= 0) left_val = 255;
-                else left_val = mask_line[x - s_left];
-                chg -= (left_val << SHADOW_UPSACALE_SHIFT);
-
-                /*Add the right pixel*/
-                uint32_t right_val = 0;
-                if(x + s_right + 1 < size) right_val = mask_line[x + s_right + 1];
-                chg += (right_val << SHADOW_UPSACALE_SHIFT);
-
+            memset(sh_ups_tmp_buf, 0x00, size * sizeof(sh_ups_buf[0]));
+        } else {
+            uint32_t i;
+            sh_ups_tmp_buf[0] = (mask_line[0] << SHADOW_UPSACALE_SHIFT) / sw;
+            for(i = 1; i < size; i++) {
+                if(mask_line[i] == mask_line[i-1]) sh_ups_tmp_buf[i] = sh_ups_tmp_buf[i-1];
+                else  sh_ups_tmp_buf[i] = (mask_line[i] << SHADOW_UPSACALE_SHIFT) / sw;
             }
         }
-        sh_buf_tmp += size;
+
+        sh_ups_tmp_buf += size;
     }
 
     lv_mask_remove_id(mask_id);
+
+    /*Horizontal blur*/
+    uint32_t sh_ups_hor_buf[size*size];
+    sh_ups_tmp_buf = sh_ups_buf + (size*0);
+    uint32_t * sh_ups_hor_buf_tmp = sh_ups_hor_buf + (size*0);
+
+    lv_coord_t x;
+    for(y = 0; y < size; y++) {
+        int32_t v = sh_ups_tmp_buf[0] * sw;
+        for(x = 0; x < size; x++) {
+            sh_ups_hor_buf_tmp[x] = v;
+
+            /*Forget the left pixel*/
+            uint32_t left_val;
+            if(x - s_left <= 0) left_val = sh_ups_tmp_buf[0];//25<< SHADOW_UPSACALE_SHIFT;
+            else left_val = sh_ups_tmp_buf[x - s_left];
+            v -= left_val;
+
+            /*Add the right pixel*/
+            uint32_t right_val = 0;
+            if(x + s_right + 1 < size) right_val = sh_ups_tmp_buf[x + s_right + 1];
+            v += right_val;
+        }
+        sh_ups_tmp_buf += size;
+        sh_ups_hor_buf_tmp += size;
+    }
+//
+//
+//    uint32_t i;
+//    for(i = 0; i < size * size; i++) {
+//        sh_buf[i] = (sh_ups_hor_buf[i] >> SHADOW_UPSACALE_SHIFT) ;
+//    }
+//
+//    return;
+
+
+
+    /*Vertical blur*/
+    uint32_t i;
+   sh_ups_hor_buf[0] = sh_ups_hor_buf[0] / sw;
+   for(i = 1; i < size * size; i++) {
+       if(sh_ups_hor_buf[i] == sh_ups_hor_buf[i-1]) sh_ups_hor_buf[i] = sh_ups_hor_buf[i-1];
+       else  sh_ups_hor_buf[i] = sh_ups_hor_buf[i] / sw;
+   }
+
+    for(x = 0; x < size; x++) {
+        sh_ups_hor_buf_tmp = &sh_ups_hor_buf[x];
+        lv_opa_t * sh_buf_tmp = &sh_buf[x];
+        int32_t v = sh_ups_hor_buf_tmp[0] * sw;
+        for(y = 0; y < size; y++, sh_ups_hor_buf_tmp += size, sh_buf_tmp += size) {
+            sh_buf_tmp[0] = v >> SHADOW_UPSACALE_SHIFT;
+
+            /*Forget the top pixel*/
+            uint32_t top_val;
+            if(y - s_left <= 0) top_val = sh_ups_hor_buf_tmp[0];//25<< SHADOW_UPSACALE_SHIFT;
+            else top_val = sh_ups_hor_buf[(y - s_left) * size + x];
+            v -= top_val;
+
+            /*Add the bottom pixel*/
+            uint32_t bottom_val;
+            if(y + s_right + 1 < size) bottom_val = sh_ups_hor_buf[(y + s_right + 1) * size + x];
+            else bottom_val = sh_ups_hor_buf[(size - 1) * size + x];
+            v += bottom_val;
+        }
+    }
+
 
 }
 
