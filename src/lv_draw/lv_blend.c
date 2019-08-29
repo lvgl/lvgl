@@ -51,13 +51,20 @@
  * @param opa
  * @param mode
  */
-void lv_blend_fill(const lv_area_t * disp_area, const lv_area_t * clip_area, const lv_area_t * fill_area,
-        lv_color_t * disp_buf, lv_img_cf_t cf, lv_color_t color,
-        lv_opa_t * mask, lv_mask_res_t mask_res, lv_opa_t opa, lv_blend_mode_t mode)
+void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
+        lv_color_t color, lv_opa_t * mask, lv_mask_res_t mask_res, lv_opa_t opa,
+        lv_blend_mode_t mode)
 {
     /*Do not draw transparent things*/
     if(opa < LV_OPA_MIN) return;
     if(mask_res == LV_MASK_RES_FULL_TRANSP) return;
+
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+    const lv_area_t * disp_area = &vdb->area;
+    lv_color_t * disp_buf = vdb->buf_act;
+    lv_img_cf_t cf = LV_IMG_CF_TRUE_COLOR;
+
 
     /* Get clipped fill area which is the real draw area.
      * It is always the same or inside `fill_area` */

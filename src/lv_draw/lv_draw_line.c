@@ -94,9 +94,9 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
 
     /*If there is no mask then simply draw a rectangle*/
     if(other_mask_cnt == 0) {
-        lv_blend_fill(disp_area, clip, &draw_area,
-                disp_buf,  LV_IMG_CF_TRUE_COLOR, style->line.color,
-                NULL, LV_MASK_RES_FULL_COVER, style->line.opa, LV_BLIT_MODE_NORMAL);
+        lv_blend_fill(clip, &draw_area,
+                style->line.color, NULL, LV_MASK_RES_FULL_COVER, style->line.opa,
+                LV_BLIT_MODE_NORMAL);
     }
     /*If there other mask apply it*/
     else {
@@ -128,9 +128,9 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
              memset(mask_buf, LV_OPA_COVER, draw_area_w);
              mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
-             lv_blend_fill(disp_area, clip, &fill_area,
-                     disp_buf,  LV_IMG_CF_TRUE_COLOR, style->line.color,
-                     mask_buf, mask_res, style->line.opa, LV_BLIT_MODE_NORMAL);
+             lv_blend_fill(clip, &fill_area,
+                      style->line.color, mask_buf, mask_res, style->line.opa,
+                      LV_BLIT_MODE_NORMAL);
 
              fill_area.y1++;
              fill_area.y2++;
@@ -166,9 +166,9 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
     /*If there is no mask then simply draw a rectangle*/
     if(other_mask_cnt == 0) {
 
-        lv_blend_fill(disp_area, clip, &draw_area,
-                disp_buf,  LV_IMG_CF_TRUE_COLOR, style->line.color,
-                NULL, LV_MASK_RES_FULL_COVER, style->line.opa, LV_BLIT_MODE_NORMAL);
+        lv_blend_fill(clip, &draw_area,
+                style->line.color,  NULL, LV_MASK_RES_FULL_COVER, style->line.opa,
+                LV_BLIT_MODE_NORMAL);
     }
     /*If there other mask apply it*/
     else {
@@ -200,9 +200,9 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
              memset(mask_buf, LV_OPA_COVER, draw_area_w);
              mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
-             lv_blend_fill(disp_area, clip, &fill_area,
-                     disp_buf,  LV_IMG_CF_TRUE_COLOR, style->line.color,
-                     mask_buf, mask_res, style->line.opa, LV_BLIT_MODE_NORMAL);
+             lv_blend_fill(clip, &fill_area,
+                     style->line.color, mask_buf, mask_res, style->line.opa,
+                     LV_BLIT_MODE_NORMAL);
 
              fill_area.y1++;
              fill_area.y2++;
@@ -320,9 +320,9 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
         memset(mask_buf, LV_OPA_COVER, draw_area_w);
          mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
-         lv_blend_fill(disp_area, clip, &fill_area,
-                 disp_buf,  LV_IMG_CF_TRUE_COLOR, style->line.color,
-                 mask_buf, mask_res, style->line.opa, LV_BLIT_MODE_NORMAL);
+         lv_blend_fill(clip, &fill_area,
+                 style->line.color, mask_buf, mask_res, style->line.opa,
+                 LV_BLIT_MODE_NORMAL);
 
          fill_area.y1++;
          fill_area.y2++;

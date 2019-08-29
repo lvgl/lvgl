@@ -384,9 +384,9 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
         if(mask_p + (row_end - row_start) < sizeof(mask_buf)) {
             fill_area.y2 ++;
         } else {
-            lv_blend_fill(&vdb->area, clip_area, &fill_area,
-                    vdb->buf_act, LV_IMG_CF_TRUE_COLOR, color,
-                    mask_buf, LV_MASK_RES_CHANGED, opa, LV_BLIT_MODE_NORMAL);
+            lv_blend_fill(clip_area, &fill_area,
+                    color, mask_buf, LV_MASK_RES_CHANGED, opa,
+                    LV_BLIT_MODE_NORMAL);
 
             fill_area.y1 = fill_area.y2 + 1;
             fill_area.y2 = fill_area.y1;
@@ -402,9 +402,9 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
     /*Flush the last part*/
     if(fill_area.y1 != fill_area.y2) {
         fill_area.y2--;
-        lv_blend_fill(&vdb->area, clip_area, &fill_area,
-                vdb->buf_act, LV_IMG_CF_TRUE_COLOR, color,
-                mask_buf, LV_MASK_RES_CHANGED, opa, LV_BLIT_MODE_NORMAL);
+        lv_blend_fill(clip_area, &fill_area,
+                color, mask_buf, LV_MASK_RES_CHANGED, opa,
+                LV_BLIT_MODE_NORMAL);
         mask_p = 0;
     }
 }
