@@ -1110,7 +1110,7 @@ static label_iterator_t lv_chart_create_label_iter(const char * list, uint8_t it
         iterator.current_pos = list;
     } else {
         iterator.is_reverse_iter = 1;
-        iterator.current_pos = list + j - 1;
+        iterator.current_pos = list + j - 2;
     }
     return iterator;
 }
@@ -1119,23 +1119,46 @@ static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf)
 {
     uint8_t label_len = 0;
     if (iterator->is_reverse_iter) {
-        //TODO:
+        if (iterator->items_left > 1) {
+            while (*(iterator->current_pos - label_len) != '\n') {
+                label_len++;
+            }
+            iterator->current_pos -= label_len;
+            strncpy(buf, iterator->current_pos + 1, label_len);
+            iterator->current_pos--;
+        } else {
+            label_len = iterator->current_pos - iterator->list_start;
+            label_len++;;
+            strncpy(buf, iterator->list_start, label_len);
+        }
     } else {
         /* search for tick string */
         while(iterator->current_pos[label_len] != '\n' &&
             iterator->current_pos[label_len] != '\0') {
             /* do not overflow the buffer, but move to the end of the current label */
-            if(label_len < LV_CHART_AXIS_TICK_LABEL_MAX_LEN)
-                buf[label_len++] = iterator->current_pos[label_len];
-            else
+            if(label_len < LV_CHART_AXIS_TICK_LABEL_MAX_LEN) {
+                buf[label_len] = iterator->current_pos[label_len];
                 label_len++;
+            } else {
+                label_len++;
+            }
         }
         iterator->current_pos += label_len;
         //TODO: ugly 0
         if(iterator->current_pos[0] == '\n') iterator->current_pos++;
+    }
 
-        /* terminate the string */
-        buf[label_len] = '\0';
+    /* terminate the string */
+    buf[label_len] = '\0';
+    iterator->items_left--;
+}
+
+static bool lv_chart_is_tick_with_label(uint8_t label_num, lv_chart_axis_cfg_t* axis)
+{
+    if (axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) {
+        return ((label_num != 0) && ((label_num % axis->num_tick_marks) == 0));
+    } else {
+        return ((label_num == 0) || ((label_num % axis->num_tick_marks) == 0));
     }
 }
 
@@ -1151,7 +1174,6 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
         lv_opa_t opa_scale       = lv_obj_get_opa_scale(chart);
 
         uint8_t i, j;
-        uint8_t list_index;
         uint8_t num_of_labels;
         uint8_t num_scale_ticks;
         int16_t major_tick_len, minor_tick_len;
@@ -1185,10 +1207,9 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
             major_tick_len *= -1;
             minor_tick_len *= -1;
         }
-
         /* count the '\n'-s to determine the number of options */
-        list_index    = 0;
-        label_iterator_t iter = lv_chart_create_label_iter(y_axis->list_of_values, LABEL_ITERATOR_FORWARD);
+        uint8_t iter_dir = (y_axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) ? LABEL_ITERATOR_REVERSE : LABEL_ITERATOR_FORWARD;
+        label_iterator_t iter = lv_chart_create_label_iter(y_axis->list_of_values, iter_dir);
         num_of_labels = iter.items_left + 1;
 
         /* we can't have string labels without ticks step, set to 1 if not specified */
@@ -1214,15 +1235,22 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
             p2.y = p1.y =
                 y_ofs + (int32_t)((int32_t)(h - style->line.width) * i) / num_scale_ticks;
 
-            if(i != num_scale_ticks)
-                lv_draw_line(&p1, &p2, mask, style, opa_scale);
-            else if((y_axis->options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
-                lv_draw_line(&p1, &p2, mask, style, opa_scale);
+            if (y_axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) {
+                if (i != 0)
+                    lv_draw_line(&p1, &p2, mask, style, opa_scale);
+                else if ((y_axis->options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
+                    lv_draw_line(&p1, &p2, mask, style, opa_scale);
+            } else {
+                if (i != num_scale_ticks)
+                    lv_draw_line(&p1, &p2, mask, style, opa_scale);
+                else if ((y_axis->options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
+                    lv_draw_line(&p1, &p2, mask, style, opa_scale);
+            }
 
             /* draw values if available */
             if(num_of_labels != 0) {
                 /* add text only to major tick */
-                if(i == 0 || i % y_axis->num_tick_marks == 0) {
+                if(lv_chart_is_tick_with_label(i, y_axis)) {
 
                     lv_chart_get_next_label(&iter, buf);
 
