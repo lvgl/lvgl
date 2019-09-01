@@ -1223,7 +1223,11 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
 
         for(i = 0; i < (num_scale_ticks + 1); i++) { /* one extra loop - it may not exist in the list, empty label */
                                                      /* first point of the tick */
-            p1.x = x_ofs - 1;
+            p1.x = x_ofs;
+            if (which_axis == LV_CHART_AXIS_PRIMARY_Y)
+                p1.x--;
+            else
+                p1.x++;
 
             /* second point of the tick */
             if((num_of_labels != 0) && (i == 0 || i % y_axis->num_tick_marks == 0))
