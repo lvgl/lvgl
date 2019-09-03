@@ -575,7 +575,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
     else {
         lv_coord_t width = lv_area_get_width(&mask_com);
 
-        uint8_t  * buf = lv_draw_get_buf(lv_area_get_width(&mask_com) * ((LV_COLOR_DEPTH >> 3) + 1));  /*+1 because of the possible alpha byte*/
+        uint8_t  * buf = lv_draw_get_buf(lv_area_get_width(&mask_com) * LV_IMG_PX_SIZE_ALPHA_BYTE);  /*space for the possible alpha byte*/
 
         lv_area_t line;
         lv_area_copy(&line, &mask_com);
