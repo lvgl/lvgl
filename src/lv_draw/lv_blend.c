@@ -153,6 +153,7 @@ void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
                     if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full) {
                         if(mask_tmp[x] > LV_OPA_MAX) last_res_color = color;
                         else if(mask_tmp[x] < LV_OPA_MIN) last_res_color = disp_buf_tmp[x];
+                        else if(disp_buf_tmp[x].full == color.full) last_res_color = disp_buf_tmp[x];
                         else last_res_color = lv_color_mix(color, disp_buf_tmp[x], mask_tmp[x]);
                         last_mask = mask_tmp[x];
                         last_dest_color.full = disp_buf_tmp[x].full;
@@ -171,8 +172,9 @@ void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
                     if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full) {
                         lv_opa_t opa_tmp = (uint16_t)((uint16_t)mask_tmp[x] * opa) >> 8;
 
-                        if(opa_tmp > LV_OPA_MAX) last_res_color = color;
+                        if(opa_tmp > LV_OPA_MAX) last_res_color = lv_color_mix(color, disp_buf_tmp[x], mask_tmp[x]);
                         else if(opa_tmp < LV_OPA_MIN) last_res_color = disp_buf_tmp[x];
+                        else if(disp_buf_tmp[x].full == color.full) last_res_color = disp_buf_tmp[x];
                         else last_res_color = lv_color_mix(color, disp_buf_tmp[x],opa_tmp);
                         last_mask = mask_tmp[x];
                         last_dest_color.full = disp_buf_tmp[x].full;
