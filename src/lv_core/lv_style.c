@@ -163,17 +163,18 @@ void lv_style_init(void)
     lv_style_copy(&lv_style_btn_rel, &lv_style_plain);
     lv_style_btn_rel.body.main_color     = lv_color_make(0x76, 0xa2, 0xd0);
     lv_style_btn_rel.body.grad_color     = lv_color_make(0x19, 0x3a, 0x5d);
-    lv_style_btn_rel.body.radius         = LV_DPI / 15;
+    lv_style_btn_rel.body.radius         = LV_RADIUS_CIRCLE; //LV_DPI / 15;
+    lv_style_btn_rel.body.opa         = 200;
     lv_style_btn_rel.body.padding.left   = LV_DPI / 4;
     lv_style_btn_rel.body.padding.right  = LV_DPI / 4;
     lv_style_btn_rel.body.padding.top    = LV_DPI / 6;
     lv_style_btn_rel.body.padding.bottom = LV_DPI / 6;
     lv_style_btn_rel.body.padding.inner  = LV_DPI / 10;
     lv_style_btn_rel.body.border.color   = lv_color_make(0x0b, 0x19, 0x28);
-    lv_style_btn_rel.body.border.width   = LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
+    lv_style_btn_rel.body.border.width   = 2;//LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
     lv_style_btn_rel.body.border.opa     = LV_OPA_70;
     lv_style_btn_rel.body.shadow.color   = LV_COLOR_BLACK;
-    lv_style_btn_rel.body.shadow.width   = 10;
+    lv_style_btn_rel.body.shadow.width   = 5;
     lv_style_btn_rel.text.color          = lv_color_make(0xff, 0xff, 0xff);
     lv_style_btn_rel.image.color         = lv_color_make(0xff, 0xff, 0xff);
 
