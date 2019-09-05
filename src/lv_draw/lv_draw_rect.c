@@ -352,11 +352,17 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
     lv_coord_t sw = style->body.shadow.width;
 
+    lv_area_t sh_rect_area;
+    sh_rect_area.x1 = coords->x1  + style->body.shadow.offset.x - style->body.shadow.spread;
+    sh_rect_area.x2 = coords->x2  + style->body.shadow.offset.x + style->body.shadow.spread;
+    sh_rect_area.y1 = coords->y1  + style->body.shadow.offset.y - style->body.shadow.spread;
+    sh_rect_area.y2 = coords->y2  + style->body.shadow.offset.y + style->body.shadow.spread;
+
     lv_area_t sh_area;
-    sh_area.x1 = coords->x1 - sw / 2 - 1 + style->body.shadow.offset.x - style->body.shadow.spread;
-    sh_area.x2 = coords->x2 + sw / 2 + 1 + style->body.shadow.offset.x + style->body.shadow.spread;
-    sh_area.y1 = coords->y1 - sw / 2 - 1 + style->body.shadow.offset.y - style->body.shadow.spread;
-    sh_area.y2 = coords->y2 + sw / 2 + 1 + style->body.shadow.offset.y + style->body.shadow.spread;
+    sh_area.x1 = sh_rect_area.x1 - sw / 2 - 1;
+    sh_area.x2 = sh_rect_area.x2 + sw / 2 + 1;
+    sh_area.y1 = sh_rect_area.y1 - sw / 2 - 1;
+    sh_area.y2 = sh_rect_area.y2 + sw / 2 + 1;
 
     lv_opa_t opa = style->body.shadow.opa;
 
@@ -387,15 +393,20 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
 
     /*Get the real radius*/
-    lv_mask_res_t mask_res;
-    lv_coord_t rout = style->body.radius;
+    lv_coord_t r_bg = style->body.radius;
     lv_coord_t short_side = LV_MATH_MIN(lv_area_get_width(coords), lv_area_get_height(coords));
-    if(rout > short_side >> 1) rout = short_side >> 1;
+    if(r_bg > short_side >> 1) r_bg = short_side >> 1;
 
-    lv_coord_t corner_size = sw  + rout;
+
+    lv_coord_t r_sh = style->body.radius;
+    short_side = LV_MATH_MIN(lv_area_get_width(&sh_rect_area), lv_area_get_height(&sh_rect_area));
+    if(r_sh > short_side >> 1) r_sh = short_side >> 1;
+
+
+    lv_coord_t corner_size = sw  + r_sh;
 
     lv_opa_t sh_buf[corner_size * corner_size];
-    shadow_draw_corner_buf(coords, sh_buf, style->body.shadow.width, rout);
+    shadow_draw_corner_buf(&sh_rect_area, sh_buf, style->body.shadow.width, r_sh);
 
     bool simple_mode = true;
     if(lv_mask_get_cnt() > 0) simple_mode = false;
@@ -404,11 +415,12 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
     lv_coord_t y_max;
 
-    /*Create a mask if there is a radius*/
+    /*Create a mask*/
+    lv_mask_res_t mask_res;
     lv_opa_t mask_buf[LV_HOR_RES_MAX];
 
     lv_mask_param_t mask_rout_param;
-    lv_mask_radius_init(&mask_rout_param, coords, rout, true);
+    lv_mask_radius_init(&mask_rout_param, coords, r_bg, true);
 
     /*Draw a radius into the shadow buffer*/
     int16_t mask_rout_id = LV_MASK_ID_INV;
@@ -714,7 +726,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
     if(sw == 0) sw = 1; /*To avoid divide by zero*/
     lv_area_t sh_area;
     lv_area_copy(&sh_area, coords);
-    sh_area.x2 = sw / 2 + r -1  - (sw & 1 ? 0 : 1); //-1
+    sh_area.x2 = sw / 2 + r -1  - (sw & 1 ? 0 : 1);
     sh_area.y1 = sw / 2 + 1;
 
     sh_area.x1 = sh_area.x2 - lv_area_get_width(coords);
