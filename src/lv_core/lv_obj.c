@@ -2189,7 +2189,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         lv_coord_t shadow = (style->body.shadow.width >> 1) + 1;
         shadow += style->body.shadow.spread;
-        shadow += LV_MATH_MAX(style->body.shadow.offset.x, style->body.shadow.offset.y);
+        shadow += LV_MATH_MAX(LV_MATH_ABS(style->body.shadow.offset.x), LV_MATH_ABS(style->body.shadow.offset.y));
 
         if(shadow > obj->ext_draw_pad) obj->ext_draw_pad = shadow;
     } else if(sign == LV_SIGNAL_STYLE_CHG) {

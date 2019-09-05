@@ -177,11 +177,11 @@ void lv_style_init(void)
     lv_style_btn_rel.body.border.width   = 2;//LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
     lv_style_btn_rel.body.border.opa     = LV_OPA_10;
     lv_style_btn_rel.body.shadow.color   = LV_COLOR_BLACK;
-    lv_style_btn_rel.body.shadow.width   = 20;
-    lv_style_btn_rel.body.shadow.spread = 10;
+    lv_style_btn_rel.body.shadow.width   = 0;
+    lv_style_btn_rel.body.shadow.spread = 6;
     lv_style_btn_rel.body.shadow.opa = LV_OPA_50;
-    lv_style_btn_rel.body.shadow.offset.x = 5;
-    lv_style_btn_rel.body.shadow.offset.y = 20;
+    lv_style_btn_rel.body.shadow.offset.x = 8;
+    lv_style_btn_rel.body.shadow.offset.y = 10;
     lv_style_btn_rel.text.color          = lv_color_make(0xff, 0xff, 0xff);
     lv_style_btn_rel.image.color         = lv_color_make(0xff, 0xff, 0xff);
 
