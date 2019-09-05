@@ -18,9 +18,10 @@
 #include "../lv_misc/lv_async.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_hal/lv_hal.h"
+#include "../lv_misc/lv_gc.h"
+#include "../lv_misc/lv_math.h"
 #include <stdint.h>
 #include <string.h>
-#include "../lv_misc/lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
 #include LV_GC_INCLUDE
@@ -2186,7 +2187,11 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         /*Return 'invalid' if the child change signal is not enabled*/
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        if(style->body.shadow.width > obj->ext_draw_pad) obj->ext_draw_pad = style->body.shadow.width;
+        lv_coord_t shadow = (style->body.shadow.width >> 1) + 1;
+        shadow += style->body.shadow.spread;
+        shadow += LV_MATH_MAX(style->body.shadow.offset.x, style->body.shadow.offset.y);
+
+        if(shadow > obj->ext_draw_pad) obj->ext_draw_pad = shadow;
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_refresh_ext_draw_pad(obj);
     } else if(sign == LV_SIGNAL_GET_TYPE) {

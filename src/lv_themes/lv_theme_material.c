@@ -72,7 +72,6 @@ static void basic_init(void)
     panel.body.border.color   = lv_color_hex3(0xbbb);
     panel.body.border.opa     = LV_OPA_COVER;
     panel.body.shadow.color   = DEF_SHADOW_COLOR;
-    panel.body.shadow.type    = LV_SHADOW_BOTTOM;
     panel.body.shadow.width   = 4;
     panel.body.padding.left   = LV_DPI / 8;
     panel.body.padding.right  = LV_DPI / 8;
@@ -117,7 +116,6 @@ static void btn_init(void)
     rel.body.padding.bottom = LV_DPI / 8;
     rel.body.padding.inner  = LV_DPI / 10;
     rel.body.shadow.color   = DEF_SHADOW_COLOR;
-    rel.body.shadow.type    = LV_SHADOW_BOTTOM;
     rel.body.shadow.width   = 6;
     rel.text.color          = lv_color_hsv_to_rgb(_hue, 5, 95);
     rel.image.color         = lv_color_hsv_to_rgb(_hue, 5, 95);
@@ -273,7 +271,6 @@ static void sw_init(void)
 
     lv_style_copy(&sw_knob_on, theme.style.slider.knob);
     sw_knob_on.body.shadow.width = 3;
-    sw_knob_on.body.shadow.type  = LV_SHADOW_BOTTOM;
     sw_knob_on.body.shadow.color = DEF_SHADOW_COLOR;
 
     lv_style_copy(&sw_knob_off, &sw_knob_on);
@@ -406,7 +403,6 @@ static void cb_init(void)
 #if LV_USE_CB != 0
     static lv_style_t rel, pr, tgl_rel, tgl_pr, ina;
     lv_style_copy(&rel, theme.style.panel);
-    rel.body.shadow.type  = LV_SHADOW_BOTTOM;
     rel.body.shadow.width = 3;
 
     lv_style_copy(&pr, &rel);
@@ -417,7 +413,6 @@ static void cb_init(void)
     lv_style_copy(&tgl_rel, &rel);
     tgl_rel.body.main_color   = lv_color_hsv_to_rgb(_hue, 75, 85);
     tgl_rel.body.grad_color   = tgl_rel.body.main_color;
-    tgl_rel.body.shadow.type  = LV_SHADOW_FULL;
     tgl_rel.body.shadow.width = 0;
 
     lv_style_copy(&tgl_pr, &tgl_rel);
@@ -688,7 +683,6 @@ static void tabview_init(void)
     btn_bg.body.border.opa     = LV_OPA_COVER;
     btn_bg.body.shadow.width   = 5;
     btn_bg.body.shadow.color   = DEF_SHADOW_COLOR;
-    btn_bg.body.shadow.type    = LV_SHADOW_BOTTOM;
     btn_bg.body.padding.inner  = 0;
     btn_bg.body.padding.left   = 0;
     btn_bg.body.padding.right  = 0;

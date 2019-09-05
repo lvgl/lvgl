@@ -157,7 +157,6 @@ static void led_init(void)
     led.body.radius       = LV_RADIUS_CIRCLE;
     led.body.shadow.width = LV_DPI / 8;
     led.body.shadow.color = LV_COLOR_BLACK;
-    led.body.shadow.type  = LV_SHADOW_FULL;
 
     theme.style.led = &led;
 #endif

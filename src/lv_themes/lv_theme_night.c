@@ -115,7 +115,6 @@ static void btn_init(void)
     btn_rel.body.padding.right  = LV_DPI / 4;
     btn_rel.body.padding.top    = LV_DPI / 8;
     btn_rel.body.padding.bottom = LV_DPI / 8;
-    btn_rel.body.shadow.type    = LV_SHADOW_BOTTOM;
     btn_rel.body.shadow.color   = lv_color_hex3(0x111);
     btn_rel.body.shadow.width   = LV_DPI / 30;
     btn_rel.text.color          = lv_color_hex3(0xeee);

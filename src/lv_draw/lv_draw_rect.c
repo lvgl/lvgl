@@ -344,18 +344,19 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 
 static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const lv_style_t * style, lv_opa_t opa_scale)
 {
-    if(style->body.shadow.width == 0) return;
+    /*Check whether the shadow is visible*/
+    if(style->body.shadow.width == 0 && style->body.shadow.offset.x == 0 &&
+            style->body.shadow.offset.y == 0 && style->body.shadow.spread <= 0) {
+        return;
+    }
 
     lv_coord_t sw = style->body.shadow.width;
 
-    lv_coord_t x_ofs = 0;
-    lv_coord_t y_ofs = 0;
-
     lv_area_t sh_area;
-    sh_area.x1 = coords->x1 - sw / 2 - 1 + x_ofs;
-    sh_area.x2 = coords->x2 + sw / 2 + 1 + x_ofs;
-    sh_area.y1 = coords->y1 - sw / 2 - 1 + y_ofs;
-    sh_area.y2 = coords->y2 + sw / 2 + 1 + y_ofs;
+    sh_area.x1 = coords->x1 - sw / 2 - 1 + style->body.shadow.offset.x - style->body.shadow.spread;
+    sh_area.x2 = coords->x2 + sw / 2 + 1 + style->body.shadow.offset.x + style->body.shadow.spread;
+    sh_area.y1 = coords->y1 - sw / 2 - 1 + style->body.shadow.offset.y - style->body.shadow.spread;
+    sh_area.y2 = coords->y2 + sw / 2 + 1 + style->body.shadow.offset.y + style->body.shadow.spread;
 
 
     lv_opa_t opa = style->body.opa;
@@ -540,7 +541,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     }
 
     first_px = 0;
-    if(disp_area->x1 > a.x1) {
+    if(disp_area->x1 >= a.x1) {
         first_px = disp_area->x1 - a.x1;
         a.x1 += first_px;
     }
@@ -621,7 +622,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
         sh_buf_tmp = sh_buf + corner_size - 1;
 
         y_max = corner_size;
-        if(other_mask_cnt == 0)  y_max = sw / 2 + 1 - y_ofs;
+        if(other_mask_cnt == 0)  y_max = sw / 2 + 1 - style->body.shadow.offset.y;
 
         for(y = 0; y < y_max; y++) {
             if(other_mask_cnt != 0) {
@@ -672,10 +673,13 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 }
 
 #define SHADOW_UPSACALE_SHIFT   6
-#define SHADOW_ENHANCE          0
+#define SHADOW_ENHANCE          1
 
 static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, lv_coord_t sw, lv_coord_t r)
 {
+
+
+    if(sw == 0) sw = 1;
     lv_coord_t size = sw  + r;
 
     lv_area_t sh_area;
@@ -692,6 +696,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
 
 #if SHADOW_ENHANCE
     sw = sw/2;
+    if(sw == 0) sw = 1;
 #endif
 
     lv_mask_res_t mask_res;
@@ -726,6 +731,14 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
 //        }
 //        return;
 
+
+    if(sw == 1) {
+        lv_coord_t i;
+        for(i = 0; i < size * size; i++) {
+            sh_buf[i] = (sh_ups_buf[i] >> SHADOW_UPSACALE_SHIFT);
+        }
+        return;
+    }
 
     shadow_blur_corner(size, sw, sh_buf, sh_ups_buf);
 

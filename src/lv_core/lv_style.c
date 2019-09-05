@@ -87,8 +87,11 @@ void lv_style_init(void)
     lv_style_scr.body.border.part  = LV_BORDER_FULL;
 
     lv_style_scr.body.shadow.color = LV_COLOR_GRAY;
-    lv_style_scr.body.shadow.type  = LV_SHADOW_FULL;
     lv_style_scr.body.shadow.width = 0;
+    lv_style_scr.body.shadow.opa = LV_OPA_COVER;
+    lv_style_scr.body.shadow.offset.x = 0;
+    lv_style_scr.body.shadow.offset.y = 0;
+    lv_style_scr.body.shadow.spread = 0;
 
     lv_style_scr.text.opa          = LV_OPA_COVER;
     lv_style_scr.text.color        = lv_color_make(0x30, 0x30, 0x30);
@@ -163,7 +166,7 @@ void lv_style_init(void)
     lv_style_copy(&lv_style_btn_rel, &lv_style_plain);
     lv_style_btn_rel.body.main_color     = lv_color_make(0x76, 0xa2, 0xd0);
     lv_style_btn_rel.body.grad_color     = lv_color_make(0x19, 0x3a, 0x5d);
-    lv_style_btn_rel.body.radius         = LV_RADIUS_CIRCLE; //LV_DPI / 15;
+    lv_style_btn_rel.body.radius         = 5;//LV_RADIUS_CIRCLE; //LV_DPI / 15;
     lv_style_btn_rel.body.opa         = 200;
     lv_style_btn_rel.body.padding.left   = LV_DPI / 4;
     lv_style_btn_rel.body.padding.right  = LV_DPI / 4;
@@ -174,7 +177,10 @@ void lv_style_init(void)
     lv_style_btn_rel.body.border.width   = 2;//LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
     lv_style_btn_rel.body.border.opa     = LV_OPA_10;
     lv_style_btn_rel.body.shadow.color   = LV_COLOR_BLACK;
-    lv_style_btn_rel.body.shadow.width   = 40;
+    lv_style_btn_rel.body.shadow.width   = 6;
+//    lv_style_btn_rel.body.shadow.spread = 15;
+    lv_style_btn_rel.body.shadow.offset.x = -5;
+    lv_style_btn_rel.body.shadow.offset.y = 5;
     lv_style_btn_rel.text.color          = lv_color_make(0xff, 0xff, 0xff);
     lv_style_btn_rel.image.color         = lv_color_make(0xff, 0xff, 0xff);
 
@@ -237,6 +243,9 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
     STYLE_ATTR_MIX(body.border.width, ratio);
     STYLE_ATTR_MIX(body.border.opa, ratio);
     STYLE_ATTR_MIX(body.shadow.width, ratio);
+    STYLE_ATTR_MIX(body.shadow.offset.x, ratio);
+    STYLE_ATTR_MIX(body.shadow.offset.y, ratio);
+    STYLE_ATTR_MIX(body.shadow.spread, ratio);
     STYLE_ATTR_MIX(body.padding.left, ratio);
     STYLE_ATTR_MIX(body.padding.right, ratio);
     STYLE_ATTR_MIX(body.padding.top, ratio);
@@ -264,13 +273,11 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
         res->body.border.part = start->body.border.part;
         res->glass            = start->glass;
         res->text.font        = start->text.font;
-        res->body.shadow.type = start->body.shadow.type;
         res->line.rounded     = start->line.rounded;
     } else {
         res->body.border.part = end->body.border.part;
         res->glass            = end->glass;
         res->text.font        = end->text.font;
-        res->body.shadow.type = end->body.shadow.type;
         res->line.rounded     = end->line.rounded;
     }
 }

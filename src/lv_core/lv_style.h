@@ -40,15 +40,8 @@ enum {
 };
 typedef uint8_t lv_border_part_t;
 
-/*Shadow types*/
-enum {
-    LV_SHADOW_BOTTOM = 0, /**< Only draw bottom shadow */
-    LV_SHADOW_FULL,       /**< Draw shadow on all sides */
-};
-typedef uint8_t lv_shadow_type_t;
-
 /**
- * Objects in LittlevGL can be assigned a style - which holds information about
+ * Styles can be assigned to objects - which holds information about
  * how the object should be drawn.
  * 
  * This allows for easy customization without having to modify the object's design
@@ -79,7 +72,9 @@ typedef struct
         {
             lv_color_t color;
             lv_coord_t width;
-            lv_shadow_type_t type; /**< Which parts of the shadow to draw */
+            lv_coord_t spread;
+            lv_point_t offset;
+            lv_opa_t opa;
         } shadow;
 
         struct
