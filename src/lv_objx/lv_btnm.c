@@ -27,7 +27,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param);
-static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_area, lv_design_mode_t mode);
 static uint8_t get_button_width(lv_btnm_ctrl_t ctrl_bits);
 static bool button_is_hidden(lv_btnm_ctrl_t ctrl_bits);
 static bool button_is_repeat_disabled(lv_btnm_ctrl_t ctrl_bits);
@@ -588,23 +588,22 @@ bool lv_btnm_get_one_toggle(const lv_obj_t * btnm)
 /**
  * Handle the drawing related tasks of the button matrixs
  * @param btnm pointer to a button matrix object
- * @param mask the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @param return an element of `lv_design_res_t`
  */
-static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-        return ancestor_design_f(btnm, mask, mode);
-        /*Return false if the object is not covers the mask_p area*/
+        return ancestor_design_f(btnm, clip_area, mode);
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
 
-        ancestor_design_f(btnm, mask, mode);
+        ancestor_design_f(btnm, clip_area, mode);
 
         lv_btnm_ext_t * ext         = lv_obj_get_ext_attr(btnm);
         const lv_style_t * bg_style = lv_obj_get_style(btnm);
@@ -679,7 +678,7 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
                     style_tmp.body.border.part &= ~LV_BORDER_RIGHT;
                 }
             }
-            lv_draw_rect(&area_tmp, mask, &style_tmp, opa_scale);
+            lv_draw_rect(&area_tmp, clip_area, &style_tmp, opa_scale);
 
             /*Calculate the size of the text*/
             if(btn_style->glass) btn_style = bg_style;
@@ -693,10 +692,10 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
             area_tmp.x2 = area_tmp.x1 + txt_size.x;
             area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
-            lv_draw_label(&area_tmp, mask, btn_style, opa_scale, ext->map_p[txt_i], txt_flag, NULL, -1, -1, NULL);
+            lv_draw_label(&area_tmp, clip_area, btn_style, opa_scale, ext->map_p[txt_i], txt_flag, NULL, -1, -1, NULL);
         }
     }
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**

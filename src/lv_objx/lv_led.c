@@ -27,13 +27,13 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_led_design(lv_obj_t * led, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_design_res_t lv_led_design(lv_obj_t * led, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_cb_t ancestor_design_f;
+static lv_design_cb_t ancestor_design;
 static lv_signal_cb_t ancestor_signal;
 
 /**********************
@@ -60,7 +60,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
     if(new_led == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_led);
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_led);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_led);
 
     /*Allocate the object type specific extended data*/
     lv_led_ext_t * ext = lv_obj_allocate_ext_attr(new_led, sizeof(lv_led_ext_t));
@@ -172,18 +172,18 @@ uint8_t lv_led_get_bright(const lv_obj_t * led)
 /**
  * Handle the drawing related tasks of the leds
  * @param led pointer to an object
- * @param mask the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @param return an element of `lv_design_res_t`
  */
-static bool lv_led_design(lv_obj_t * led, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_led_design(lv_obj_t * led, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-        /*Return false if the object is not covers the mask area*/
-        return ancestor_design_f(led, mask, mode);
+        /*Return false if the object is not covers the clip_area area*/
+        return ancestor_design(led, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Make darker colors in a temporary style according to the brightness*/
         lv_led_ext_t * ext       = lv_obj_get_ext_attr(led);
@@ -210,10 +210,10 @@ static bool lv_led_design(lv_obj_t * led, const lv_area_t * mask, lv_design_mode
             ((bright_tmp - LV_LED_BRIGHT_OFF) * style->body.shadow.width) / (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
 
         led->style_p = &leds_tmp;
-        ancestor_design_f(led, mask, mode);
+        ancestor_design(led, clip_area, mode);
         led->style_p = style_ori_p; /*Restore the ORIGINAL style pointer*/
     }
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**

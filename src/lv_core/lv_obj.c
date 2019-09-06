@@ -52,7 +52,7 @@ static void refresh_children_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static void lv_obj_del_async_cb(void * obj);
-static bool lv_obj_design(lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
+static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 
 /**********************
@@ -2123,28 +2123,28 @@ static void lv_obj_del_async_cb(void * obj)
 /**
  * Handle the drawing related tasks of the base objects.
  * @param obj pointer to an object
- * @param mask the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
- * @param return true/false, depends on 'mode'
+ * @param return an element of `lv_design_res_t`
  */
-static bool lv_obj_design(lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode)
+static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
 
         /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
-        if(lv_area_is_in(mask_p, &obj->coords) == false) return false;
+        if(lv_area_is_in(clip_area, &obj->coords) == false) return LV_DESIGN_RES_NOT_COVER;
 
         /*Can cover the area only if fully solid (no opacity)*/
         const lv_style_t * style = lv_obj_get_style(obj);
-        if(style->body.opa < LV_OPA_MAX) return false;
+        if(style->body.opa < LV_OPA_MAX) return LV_DESIGN_RES_NOT_COVER;
 
         /* Because of the radius it is not sure the area is covered
          * Check the areas where there is no radius*/
         lv_coord_t r = style->body.radius;
 
-        if(r == LV_RADIUS_CIRCLE) return false;
+        if(r == LV_RADIUS_CIRCLE) return LV_DESIGN_RES_NOT_COVER;
 
         lv_area_t area_tmp;
 
@@ -2152,20 +2152,22 @@ static bool lv_obj_design(lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mo
         lv_obj_get_coords(obj, &area_tmp);
         area_tmp.x1 += r;
         area_tmp.x2 -= r;
-        if(lv_area_is_in(mask_p, &area_tmp) == false) return false;
+        if(lv_area_is_in(clip_area, &area_tmp) == false) return LV_DESIGN_RES_NOT_COVER;
 
         /*Check vertically without radius*/
         lv_obj_get_coords(obj, &area_tmp);
         area_tmp.y1 += r;
         area_tmp.y2 -= r;
-        if(lv_area_is_in(mask_p, &area_tmp) == false) return false;
+        if(lv_area_is_in(clip_area, &area_tmp) == false) return LV_DESIGN_RES_NOT_COVER;
+
+        return  LV_DESIGN_RES_COVER;
 
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         const lv_style_t * style = lv_obj_get_style(obj);
-        lv_draw_rect(&obj->coords, mask_p, style, lv_obj_get_opa_scale(obj));
+        lv_draw_rect(&obj->coords, clip_area, style, lv_obj_get_opa_scale(obj));
     }
 
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**

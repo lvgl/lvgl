@@ -26,7 +26,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_design_res_t lv_line_design(lv_obj_t * line, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param);
 
 /**********************
@@ -196,18 +196,18 @@ bool lv_line_get_y_invert(const lv_obj_t * line)
 /**
  * Handle the drawing related tasks of the lines
  * @param line pointer to an object
- * @param mask the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @param return an element of `lv_design_res_t`
  */
-static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_line_design(lv_obj_t * line, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     /*A line never covers an area*/
     if(mode == LV_DESIGN_COVER_CHK)
-        return false;
+        return LV_DESIGN_RES_NOT_COVER;
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
@@ -245,7 +245,7 @@ static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mo
                 p1.y = h - ext->point_array[i].y + y_ofs;
                 p2.y = h - ext->point_array[i + 1].y + y_ofs;
             }
-            lv_draw_line(&p1, &p2, mask, style, opa_scale);
+            lv_draw_line(&p1, &p2, clip_area, style, opa_scale);
 
             /*Draw circle on the joints if enabled*/
             if(style->line.rounded) {
@@ -253,7 +253,7 @@ static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mo
                 circle_area.y1 = p1.y - ((style->line.width - 1) >> 1) - ((style->line.width - 1) & 0x1);
                 circle_area.x2 = p1.x + ((style->line.width - 1) >> 1);
                 circle_area.y2 = p1.y + ((style->line.width - 1) >> 1);
-                lv_draw_rect(&circle_area, mask, &circle_style_tmp, opa_scale);
+                lv_draw_rect(&circle_area, clip_area, &circle_style_tmp, opa_scale);
             }
         }
 
@@ -263,10 +263,10 @@ static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mo
             circle_area.y1 = p2.y - ((style->line.width - 1) >> 1) - ((style->line.width - 1) & 0x1);
             circle_area.x2 = p2.x + ((style->line.width - 1) >> 1);
             circle_area.y2 = p2.y + ((style->line.width - 1) >> 1);
-            lv_draw_rect(&circle_area, mask, &circle_style_tmp, opa_scale);
+            lv_draw_rect(&circle_area, clip_area, &circle_style_tmp, opa_scale);
         }
     }
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**

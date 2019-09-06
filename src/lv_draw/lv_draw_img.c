@@ -7,9 +7,10 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_img.h"
-#include "../lv_hal/lv_hal_disp.h"
 #include "lv_img_cache.h"
+#include "../lv_hal/lv_hal_disp.h"
 #include "../lv_misc/lv_log.h"
+#include "../lv_core/lv_refr.h"
 
 /*********************
  *      DEFINES
@@ -578,7 +579,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
     /*The simplest case just copy the pixels into the VDB*/
     if(other_mask_cnt == 0 && chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && recolor_opa == LV_OPA_TRANSP) {
-        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_MASK_RES_FULL_COVER, LV_OPA_COVER, LV_BLEND_MODE_NORMAL);
+        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, LV_OPA_COVER, LV_BLEND_MODE_NORMAL);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
@@ -613,14 +614,14 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             memset(mask_buf, 0xFF, sizeof(mask_buf));
         }
 
-        lv_mask_res_t mask_res;
+        lv_draw_mask_res_t mask_res;
         lv_coord_t x;
         lv_coord_t y;
         for(y = 0; y < lv_area_get_height(&draw_area); y++) {
             map_px = map_buf_tmp;
             px_i_start = px_i;
 
-            mask_res = (alpha_byte || chroma_key) ? LV_MASK_RES_CHANGED : LV_MASK_RES_FULL_COVER;
+            mask_res = (alpha_byte || chroma_key) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
             for(x = 0; x < lv_area_get_width(&draw_area); x++, map_px += px_size_byte, px_i++) {
                 if(alpha_byte) {
                     lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
@@ -654,12 +655,12 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
             /*Apply the masks if any*/
             if(other_mask_cnt) {
-                lv_mask_res_t mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1, lv_area_get_width(&draw_area));
-                if(mask_res_sub == LV_MASK_RES_FULL_TRANSP) {
+                lv_draw_mask_res_t mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1, lv_area_get_width(&draw_area));
+                if(mask_res_sub == LV_DRAW_MASK_RES_FULL_TRANSP) {
                     memset(mask_buf + px_i_start, 0x00, lv_area_get_width(&draw_area));
-                    mask_res = LV_MASK_RES_CHANGED;
-                } else if(mask_res_sub == LV_MASK_RES_CHANGED) {
-                    mask_res = LV_MASK_RES_CHANGED;
+                    mask_res = LV_DRAW_MASK_RES_CHANGED;
+                } else if(mask_res_sub == LV_DRAW_MASK_RES_CHANGED) {
+                    mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
             }
 

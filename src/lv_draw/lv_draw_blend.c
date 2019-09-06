@@ -28,11 +28,11 @@
 
 static void fill_true_color_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
         lv_color_t color, lv_opa_t opa,
-        const lv_opa_t * mask, lv_mask_res_t mask_res);
+        const lv_opa_t * mask, lv_draw_mask_res_t mask_res);
 
 static void fill_true_color_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
         lv_color_t color, lv_opa_t opa,
-        const lv_opa_t * mask, lv_mask_res_t mask_res, lv_blend_mode_t mode);
+        const lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_blend_mode_t mode);
 
 
 
@@ -66,12 +66,12 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
  * @param mode
  */
 void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
-        lv_color_t color, lv_opa_t * mask, lv_mask_res_t mask_res, lv_opa_t opa,
+        lv_color_t color, lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_opa_t opa,
         lv_blend_mode_t mode)
 {
     /*Do not draw transparent things*/
     if(opa < LV_OPA_MIN) return;
-    if(mask_res == LV_MASK_RES_FULL_TRANSP) return;
+    if(mask_res == LV_DRAW_MASK_RES_FULL_TRANSP) return;
 
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
@@ -109,12 +109,12 @@ void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
 
 
 void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const lv_color_t * map_buf,
-        const lv_opa_t * mask, lv_mask_res_t mask_res,
+        const lv_opa_t * mask, lv_draw_mask_res_t mask_res,
         lv_opa_t opa, lv_blend_mode_t mode)
 {
     /*Do not draw transparent things*/
     if(opa < LV_OPA_MIN) return;
-    if(mask_res == LV_MASK_RES_FULL_TRANSP) return;
+    if(mask_res == LV_DRAW_MASK_RES_FULL_TRANSP) return;
 
     /* Get clipped fill area which is the real draw area.
      * It is always the same or inside `fill_area` */
@@ -152,7 +152,7 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
     lv_coord_t y;
 
     /*Simple fill (maybe with opacity), no masking*/
-    if(mask_res == LV_MASK_RES_FULL_COVER) {
+    if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
         /*Go to the first px of the map*/
         map_buf_tmp += (draw_area.x1 - (map_area->x1 - disp_area->x1));
         if(opa > LV_OPA_MAX) {
@@ -224,7 +224,7 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
 
 static void fill_true_color_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
         lv_color_t color, lv_opa_t opa,
-        const lv_opa_t * mask, lv_mask_res_t mask_res)
+        const lv_opa_t * mask, lv_draw_mask_res_t mask_res)
 {
 
     /*Get the width of the `disp_area` it will be used to go to the next line*/
@@ -237,7 +237,7 @@ static void fill_true_color_normal(const lv_area_t * disp_area, lv_color_t * dis
     lv_coord_t y;
 
     /*Simple fill (maybe with opacity), no masking*/
-    if(mask_res == LV_MASK_RES_FULL_COVER) {
+    if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
         if(opa > LV_OPA_MAX) {
             lv_coord_t draw_area_w  = lv_area_get_width(draw_area);
             lv_color_t * disp_buf_tmp_ori =  disp_buf_tmp;
@@ -338,7 +338,7 @@ static void fill_true_color_normal(const lv_area_t * disp_area, lv_color_t * dis
 
 static void fill_true_color_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
         lv_color_t color, lv_opa_t opa,
-        const lv_opa_t * mask, lv_mask_res_t mask_res, lv_blend_mode_t mode)
+        const lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_blend_mode_t mode)
 {
     /*Get the width of the `disp_area` it will be used to go to the next line*/
     lv_coord_t disp_w = lv_area_get_width(disp_area);
@@ -365,7 +365,7 @@ static void fill_true_color_blended(const lv_area_t * disp_area, lv_color_t * di
     lv_coord_t y;
 
     /*Simple fill (maybe with opacity), no masking*/
-    if(mask_res == LV_MASK_RES_FULL_COVER) {
+    if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
         lv_color_t last_dest_color = LV_COLOR_BLACK;
         lv_color_t last_res_color = lv_color_mix(color, last_dest_color, opa);
         for(y = draw_area->y1; y <= draw_area->y2; y++) {

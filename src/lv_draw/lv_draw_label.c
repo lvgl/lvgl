@@ -9,6 +9,7 @@
 #include "lv_draw_label.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_hal/lv_hal_disp.h"
+#include "../lv_core/lv_refr.h"
 
 /*********************
  *      DEFINES
@@ -337,10 +338,6 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
     lv_disp_t * disp    = lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
 
-
-    lv_area_t * disp_area = &vdb->area;
-    lv_color_t * disp_buf = &vdb->buf_act;
-
     lv_coord_t col, row;
 
     uint8_t width_byte_scr = g.box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
@@ -411,8 +408,8 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
 
         /*Apply masks if any*/
         if(other_mask_cnt) {
-            lv_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, fill_area.x1, fill_area.y2, lv_area_get_width(&fill_area));
-            if(mask_res == LV_MASK_RES_FULL_TRANSP) {
+            lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, fill_area.x1, fill_area.y2, lv_area_get_width(&fill_area));
+            if(mask_res == LV_DRAW_MASK_RES_FULL_TRANSP) {
                 memset(mask_buf + mask_p_start, 0x00, lv_area_get_width(&fill_area));
             }
         }
@@ -421,7 +418,7 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
             fill_area.y2 ++;
         } else {
             lv_blend_fill(clip_area, &fill_area,
-                    color, mask_buf, LV_MASK_RES_CHANGED, opa,
+                    color, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa,
                     LV_BLEND_MODE_NORMAL);
 
             fill_area.y1 = fill_area.y2 + 1;
@@ -439,7 +436,7 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
     if(fill_area.y1 != fill_area.y2) {
         fill_area.y2--;
         lv_blend_fill(clip_area, &fill_area,
-                color, mask_buf, LV_MASK_RES_CHANGED, opa,
+                color, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa,
                 LV_BLEND_MODE_NORMAL);
         mask_p = 0;
     }

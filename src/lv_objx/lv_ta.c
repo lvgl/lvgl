@@ -40,8 +40,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_ta_design(lv_obj_t * ta, const lv_area_t * mask, lv_design_mode_t mode);
-static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_design_res_t lv_ta_design(lv_obj_t * ta, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_design_res_t lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
 static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 #if LV_USE_ANIMATION
@@ -1207,48 +1207,48 @@ void lv_ta_cursor_up(lv_obj_t * ta)
 /**
  * Handle the drawing related tasks of the text areas
  * @param ta pointer to an object
- * @param mask the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW_MAIN: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @param return an element of `lv_design_res_t`
  */
-static bool lv_ta_design(lv_obj_t * ta, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_ta_design(lv_obj_t * ta, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
         /*Return false if the object is not covers the mask_p area*/
-        return ancestor_design(ta, mask, mode);
+        return ancestor_design(ta, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Draw the object*/
-        ancestor_design(ta, mask, mode);
+        ancestor_design(ta, clip_area, mode);
 
     } else if(mode == LV_DESIGN_DRAW_POST) {
-        ancestor_design(ta, mask, mode);
+        ancestor_design(ta, clip_area, mode);
     }
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**
  * An extended scrollable design of the page. Calls the normal design function and draws a cursor.
  * @param scrl pointer to the scrollable part of the Text area
- * @param mask  the object will be drawn only in this area
+ * @param clip_area  the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW_MAIN: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @return return true/false, depends on 'mode'
  */
-static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
         /*Return false if the object is not covers the mask_p area*/
-        return scrl_design(scrl, mask, mode);
+        return scrl_design(scrl, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Draw the object*/
-        scrl_design(scrl, mask, mode);
+        scrl_design(scrl, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_POST) {
-        scrl_design(scrl, mask, mode);
+        scrl_design(scrl, clip_area, mode);
 
         /*Draw the cursor*/
         lv_obj_t * ta     = lv_obj_get_parent(scrl);
@@ -1275,28 +1275,28 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
         lv_opa_t opa_scale = lv_obj_get_opa_scale(ta);
 
         if(ext->cursor.type == LV_CURSOR_LINE) {
-            lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
+            lv_draw_rect(&cur_area, clip_area, &cur_style, opa_scale);
         } else if(ext->cursor.type == LV_CURSOR_BLOCK) {
-            lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
+            lv_draw_rect(&cur_area, clip_area, &cur_style, opa_scale);
 
             char letter_buf[8] = {0};
             memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
 
             cur_area.x1 += cur_style.body.padding.left;
             cur_area.y1 += cur_style.body.padding.top;
-            lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0,
+            lv_draw_label(&cur_area, clip_area, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0,
                           LV_LABEL_TEXT_SEL_OFF, LV_LABEL_TEXT_SEL_OFF, NULL);
 
         } else if(ext->cursor.type == LV_CURSOR_OUTLINE) {
             cur_style.body.opa = LV_OPA_TRANSP;
             if(cur_style.body.border.width == 0) cur_style.body.border.width = 1; /*Be sure the border will be drawn*/
-            lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
+            lv_draw_rect(&cur_area, clip_area, &cur_style, opa_scale);
         } else if(ext->cursor.type == LV_CURSOR_UNDERLINE) {
-            lv_draw_rect(&cur_area, mask, &cur_style, opa_scale);
+            lv_draw_rect(&cur_area, clip_area, &cur_style, opa_scale);
         }
     }
 
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**

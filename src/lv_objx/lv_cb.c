@@ -23,8 +23,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t mode);
-static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_design_res_t lv_cb_design(lv_obj_t * cb, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_design_res_t lv_bullet_design(lv_obj_t * bullet, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
 
 /**********************
@@ -213,20 +213,20 @@ const lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type)
 /**
  * Handle the drawing related tasks of the check boxes
  * @param cb pointer to an object
- * @param mask the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @param return an element of `lv_design_res_t`
  */
-static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_cb_design(lv_obj_t * cb, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     bool result = true;
 
     if(mode == LV_DESIGN_COVER_CHK) {
         /*Return false if the object is not covers the mask_p area*/
-        result = ancestor_bg_design(cb, mask, mode);
+        result = ancestor_bg_design(cb, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN || mode == LV_DESIGN_DRAW_POST) {
         lv_cb_ext_t * cb_ext      = lv_obj_get_ext_attr(cb);
         lv_btn_ext_t * bullet_ext = lv_obj_get_ext_attr(cb_ext->bullet);
@@ -234,10 +234,10 @@ static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t
         /*Be sure the state of the bullet is the same as the parent button*/
         bullet_ext->state = cb_ext->bg_btn.state;
 
-        result = ancestor_bg_design(cb, mask, mode);
+        result = ancestor_bg_design(cb, clip_area, mode);
 
     } else {
-        result = ancestor_bg_design(cb, mask, mode);
+        result = ancestor_bg_design(cb, clip_area, mode);
     }
 
     return result;
@@ -246,17 +246,17 @@ static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t
 /**
  * Handle the drawing related tasks of the check boxes
  * @param bullet pointer to an object
- * @param mask the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @param return element of `lv_design_res_t`
  */
-static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_bullet_design(lv_obj_t * bullet, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-        return ancestor_bullet_design(bullet, mask, mode);
+        return ancestor_bullet_design(bullet, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 #if LV_USE_GROUP
         /* If the check box is the active in a group and
@@ -274,16 +274,16 @@ static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_desig
             }
         }
 #endif
-        ancestor_bullet_design(bullet, mask, mode);
+        ancestor_bullet_design(bullet, clip_area, mode);
 
 #if LV_USE_GROUP
         bullet->style_p = style_ori; /*Revert the style*/
 #endif
     } else if(mode == LV_DESIGN_DRAW_POST) {
-        ancestor_bullet_design(bullet, mask, mode);
+        ancestor_bullet_design(bullet, clip_area, mode);
     }
 
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**

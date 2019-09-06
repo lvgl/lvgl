@@ -28,7 +28,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param);
 
 /**********************
@@ -215,18 +215,18 @@ const lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_
 /**
  * Handle the drawing related tasks of the sliders
  * @param slider pointer to an object
- * @param mask the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @param return an element of `lv_design_res_t`
  */
-static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
-        return false;
+        return LV_DESIGN_RES_NOT_COVER;
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
@@ -272,7 +272,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
         }
 
 #if LV_USE_GROUP == 0
-        lv_draw_rect(&area_bg, mask, style_bg, lv_obj_get_opa_scale(slider));
+        lv_draw_rect(&area_bg, clip_area, style_bg, lv_obj_get_opa_scale(slider));
 #else
         /* Draw the borders later if the slider is focused.
          * At value = 100% the indicator can cover to whole background and the focused style won't
@@ -281,9 +281,9 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             lv_style_t style_tmp;
             lv_style_copy(&style_tmp, style_bg);
             style_tmp.body.border.width = 0;
-            lv_draw_rect(&area_bg, mask, &style_tmp, opa_scale);
+            lv_draw_rect(&area_bg, clip_area, &style_tmp, opa_scale);
         } else {
-            lv_draw_rect(&area_bg, mask, style_bg, opa_scale);
+            lv_draw_rect(&area_bg, clip_area, style_bg, opa_scale);
         }
 #endif
 
@@ -339,7 +339,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
             /*Draw the indicator but don't draw an ugly 1px wide rectangle on the left on min.
              * value*/
-            if(area_indic.x1 != area_indic.x2) lv_draw_rect(&area_indic, mask, style_indic, opa_scale);
+            if(area_indic.x1 != area_indic.x2) lv_draw_rect(&area_indic, clip_area, style_indic, opa_scale);
 
         } else {
             lv_coord_t indic_h = lv_area_get_height(&area_indic);
@@ -363,7 +363,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
             /*Draw the indicator but don't draw an ugly 1px height rectangle on the bottom on min.
              * value*/
-            if(area_indic.x1 != area_indic.x2) lv_draw_rect(&area_indic, mask, style_indic, opa_scale);
+            if(area_indic.x1 != area_indic.x2) lv_draw_rect(&area_indic, clip_area, style_indic, opa_scale);
         }
 
         /*Before the knob add the border if required*/
@@ -376,7 +376,7 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             lv_style_copy(&style_tmp, style_bg);
             style_tmp.body.opa          = LV_OPA_TRANSP;
             style_tmp.body.shadow.width = 0;
-            lv_draw_rect(&area_bg, mask, &style_tmp, opa_scale);
+            lv_draw_rect(&area_bg, clip_area, &style_tmp, opa_scale);
         }
 #endif
 
@@ -442,13 +442,13 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             knob_area.x1 = slider->coords.x1;
             knob_area.x2 = slider->coords.x2;
         }
-        lv_draw_rect(&knob_area, mask, style_knob, opa_scale);
+        lv_draw_rect(&knob_area, clip_area, style_knob, opa_scale);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
     }
 
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**

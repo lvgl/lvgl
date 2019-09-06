@@ -32,7 +32,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_chart_design(lv_obj_t * chart, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_design_res_t lv_chart_design(lv_obj_t * chart, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param);
 static void lv_chart_draw_div(lv_obj_t * chart, const lv_area_t * mask);
 static void lv_chart_draw_lines(lv_obj_t * chart, const lv_area_t * mask);
@@ -599,35 +599,34 @@ uint16_t lv_chart_get_margin(lv_obj_t * chart)
 /**
  * Handle the drawing related tasks of the chart backgrounds
  * @param chart pointer to an object
- * @param mask the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @param return an element of `lv_design_res_t`
  */
-static bool lv_chart_design(lv_obj_t * chart, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_chart_design(lv_obj_t * chart, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-        /*Return false if the object is not covers the mask_p area*/
-        return ancestor_design_f(chart, mask, mode);
+        return ancestor_design_f(chart, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Draw the background*/
-        lv_draw_rect(&chart->coords, mask, lv_obj_get_style(chart), lv_obj_get_opa_scale(chart));
+        lv_draw_rect(&chart->coords, clip_area, lv_obj_get_style(chart), lv_obj_get_opa_scale(chart));
 
         lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
-        lv_chart_draw_div(chart, mask);
+        lv_chart_draw_div(chart, clip_area);
 
-        if(ext->type & LV_CHART_TYPE_LINE) lv_chart_draw_lines(chart, mask);
-        if(ext->type & LV_CHART_TYPE_COLUMN) lv_chart_draw_cols(chart, mask);
-        if(ext->type & LV_CHART_TYPE_POINT) lv_chart_draw_points(chart, mask);
-        if(ext->type & LV_CHART_TYPE_VERTICAL_LINE) lv_chart_draw_vertical_lines(chart, mask);
-        if(ext->type & LV_CHART_TYPE_AREA) lv_chart_draw_areas(chart, mask);
+        if(ext->type & LV_CHART_TYPE_LINE) lv_chart_draw_lines(chart, clip_area);
+        if(ext->type & LV_CHART_TYPE_COLUMN) lv_chart_draw_cols(chart, clip_area);
+        if(ext->type & LV_CHART_TYPE_POINT) lv_chart_draw_points(chart, clip_area);
+        if(ext->type & LV_CHART_TYPE_VERTICAL_LINE) lv_chart_draw_vertical_lines(chart, clip_area);
+        if(ext->type & LV_CHART_TYPE_AREA) lv_chart_draw_areas(chart, clip_area);
 
-        lv_chart_draw_axes(chart, mask);
+        lv_chart_draw_axes(chart, clip_area);
     }
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**

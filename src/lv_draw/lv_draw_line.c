@@ -95,7 +95,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
     /*If there is no mask then simply draw a rectangle*/
     if(other_mask_cnt == 0) {
         lv_blend_fill(clip, &draw_area,
-                style->line.color, NULL, LV_MASK_RES_FULL_COVER, style->line.opa,
+                style->line.color, NULL, LV_DRAW_MASK_RES_FULL_COVER, style->line.opa,
                 LV_BLEND_MODE_NORMAL);
     }
     /*If there other mask apply it*/
@@ -123,7 +123,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
 
         lv_opa_t mask_buf[LV_HOR_RES_MAX];
         lv_coord_t h;
-        lv_mask_res_t mask_res;
+        lv_draw_mask_res_t mask_res;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
              memset(mask_buf, LV_OPA_COVER, draw_area_w);
              mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
@@ -167,7 +167,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
     if(other_mask_cnt == 0) {
 
         lv_blend_fill(clip, &draw_area,
-                style->line.color,  NULL, LV_MASK_RES_FULL_COVER, style->line.opa,
+                style->line.color,  NULL, LV_DRAW_MASK_RES_FULL_COVER, style->line.opa,
                 LV_BLEND_MODE_NORMAL);
     }
     /*If there other mask apply it*/
@@ -195,7 +195,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
 
         lv_opa_t mask_buf[LV_HOR_RES_MAX];
         lv_coord_t h;
-        lv_mask_res_t mask_res;
+        lv_draw_mask_res_t mask_res;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
              memset(mask_buf, LV_OPA_COVER, draw_area_w);
              mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
@@ -264,27 +264,27 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     bool is_common = lv_area_intersect(&draw_area, &draw_area, clip);
     if(is_common == false) return;
 
-    lv_mask_param_t mask_left_param;
-    lv_mask_param_t mask_right_param;
-    lv_mask_param_t mask_top_param;
-    lv_mask_param_t mask_bottom_param;
+    lv_draw_mask_param_t mask_left_param;
+    lv_draw_mask_param_t mask_right_param;
+    lv_draw_mask_param_t mask_top_param;
+    lv_draw_mask_param_t mask_bottom_param;
 
     if(flat) {
         if(xdiff > 0) {
-            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0, LV_LINE_MASK_SIDE_LEFT);
-            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1, LV_LINE_MASK_SIDE_RIGHT);
+            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0, LV_DRAW_MASK_LINE_SIDE_LEFT);
+            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1, LV_DRAW_MASK_LINE_SIDE_RIGHT);
         } else {
-            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y + w_half0, p2.x, p2.y + w_half0, LV_LINE_MASK_SIDE_LEFT);
-            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y - w_half1, p2.x, p2.y - w_half1, LV_LINE_MASK_SIDE_RIGHT);
+            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y + w_half0, p2.x, p2.y + w_half0, LV_DRAW_MASK_LINE_SIDE_LEFT);
+            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y - w_half1, p2.x, p2.y - w_half1, LV_DRAW_MASK_LINE_SIDE_RIGHT);
         }
     } else {
-        lv_draw_mask_line_points_init(&mask_left_param, p1.x + w_half0, p1.y, p2.x + w_half0, p2.y, LV_LINE_MASK_SIDE_LEFT);
-        lv_draw_mask_line_points_init(&mask_right_param, p1.x - w_half1, p1.y, p2.x - w_half1, p2.y, LV_LINE_MASK_SIDE_RIGHT);
+        lv_draw_mask_line_points_init(&mask_left_param, p1.x + w_half0, p1.y, p2.x + w_half0, p2.y, LV_DRAW_MASK_LINE_SIDE_LEFT);
+        lv_draw_mask_line_points_init(&mask_right_param, p1.x - w_half1, p1.y, p2.x - w_half1, p2.y, LV_DRAW_MASK_LINE_SIDE_RIGHT);
 
     }
     /*Use the normal vector for the endings*/
-    lv_draw_mask_line_points_init(&mask_top_param, p1.x, p1.y, p1.x - ydiff, p1.y + xdiff, LV_LINE_MASK_SIDE_BOTTOM);
-    lv_draw_mask_line_points_init(&mask_bottom_param, p2.x, p2.y,p2.x - ydiff, p2.y + xdiff,  LV_LINE_MASK_SIDE_TOP);
+    lv_draw_mask_line_points_init(&mask_top_param, p1.x, p1.y, p1.x - ydiff, p1.y + xdiff, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
+    lv_draw_mask_line_points_init(&mask_bottom_param, p2.x, p2.y,p2.x - ydiff, p2.y + xdiff,  LV_DRAW_MASK_LINE_SIDE_TOP);
 
     int16_t mask_left_id = lv_draw_mask_add(lv_draw_mask_line, &mask_left_param, NULL);
     int16_t mask_right_id = lv_draw_mask_add(lv_draw_mask_line, &mask_right_param, NULL);
@@ -307,7 +307,7 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
 
     /*Draw the background line by line*/
     lv_coord_t h;
-    lv_mask_res_t mask_res;
+    lv_draw_mask_res_t mask_res;
     lv_opa_t mask_buf[LV_HOR_RES_MAX];
     lv_area_t fill_area;
     fill_area.x1 = draw_area.x1 + disp_area->x1;

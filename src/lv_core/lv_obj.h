@@ -64,11 +64,21 @@ enum {
 };
 typedef uint8_t lv_design_mode_t;
 
+
+/** Design results */
+enum {
+    LV_DESIGN_RES_OK,          /**< Draw ready */
+    LV_DESIGN_RES_COVER,       /**< Returned on `LV_DESIGN_COVER_CHK` if the areas is fully covered*/
+    LV_DESIGN_RES_NOT_COVER,   /**< Returned on `LV_DESIGN_COVER_CHK` if the areas is not covered*/
+    LV_DESIGN_RES_MASKED,      /**< Returned on `LV_DESIGN_COVER_CHK` if the areas is masked out (children also not cover)*/
+};
+typedef uint8_t lv_design_res_t;
+
 /**
  * The design callback is used to draw the object on the screen.
  * It accepts the object, a mask area, and the mode in which to draw the object.
  */
-typedef bool (*lv_design_cb_t)(struct _lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
+typedef lv_design_res_t (*lv_design_cb_t)(struct _lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
 
 enum {
     LV_EVENT_PRESSED,             /**< The object has been pressed*/
@@ -218,7 +228,7 @@ typedef struct _lv_obj_t
     uint8_t opa_scale_en : 1;   /**< 1: opa_scale is set*/
     uint8_t parent_event : 1;   /**< 1: Send the object's events to the parent too. */
     lv_drag_dir_t drag_dir : 2; /**<  Which directions the object can be dragged in */
-    uint8_t reserved : 6;       /**<  Reserved for future use*/
+    uint8_t reserved    : 6;    /**<  Reserved for future use */
     uint8_t protect;            /**< Automatically happening actions can be prevented. 'OR'ed values from
                                    `lv_protect_t`*/
     lv_opa_t opa_scale;         /**< Scale down the opacity by this factor. Effects all children as well*/

@@ -27,23 +27,23 @@ extern "C" {
  **********************/
 
 enum {
-    LV_MASK_RES_FULL_TRANSP,
-    LV_MASK_RES_FULL_COVER,
-    LV_MASK_RES_CHANGED,
-    LV_MASK_RES_UNKNOWN
+    LV_DRAW_MASK_RES_FULL_TRANSP,
+    LV_DRAW_MASK_RES_FULL_COVER,
+    LV_DRAW_MASK_RES_CHANGED,
+    LV_DRAW_MASK_RES_UNKNOWN
 };
 
-typedef uint8_t lv_mask_res_t;
+typedef uint8_t lv_draw_mask_res_t;
 
 
 enum {
-    LV_LINE_MASK_SIDE_LEFT = 0,
-    LV_LINE_MASK_SIDE_RIGHT,
-    LV_LINE_MASK_SIDE_TOP,
-    LV_LINE_MASK_SIDE_BOTTOM,
+    LV_DRAW_MASK_LINE_SIDE_LEFT = 0,
+    LV_DRAW_MASK_LINE_SIDE_RIGHT,
+    LV_DRAW_MASK_LINE_SIDE_TOP,
+    LV_DRAW_MASK_LINE_SIDE_BOTTOM,
 };
 
-typedef uint8_t lv_line_mask_side_t;
+typedef uint8_t lv_draw_mask_line_side_t;
 
 typedef struct {
     lv_point_t origo;
@@ -63,22 +63,22 @@ typedef struct {
     uint8_t flat :1;
 
     /*Which side to keep?*/
-    lv_line_mask_side_t side :2;
+    lv_draw_mask_line_side_t side :2;
 
     /* Invert the mask. The default is: Keep the left part.
      * It is used to select left/right/top/bottom*/
     uint8_t inv:1;
-}lv_mask_line_param_t;
+}lv_draw_mask_line_param_t;
 
 
 typedef struct {
     lv_point_t origo;
     lv_coord_t start_angle;
     lv_coord_t end_angle;
-    lv_mask_line_param_t start_line;
-    lv_mask_line_param_t end_line;
+    lv_draw_mask_line_param_t start_line;
+    lv_draw_mask_line_param_t end_line;
     uint16_t delta_deg;
-}lv_mask_angle_param_t;
+}lv_draw_mask_angle_param_t;
 
 typedef struct {
     lv_area_t rect;
@@ -86,38 +86,38 @@ typedef struct {
 
     /* Invert the mask. The default is: Keep the are inside.*/
     uint8_t inv:1;
-}lv_mask_radius_param_t;
+}lv_draw_mask_radius_param_t;
 
 
 typedef union {
-    lv_mask_line_param_t line;
-    lv_mask_radius_param_t radius;
-    lv_mask_angle_param_t angle;
-}lv_mask_param_t;
+    lv_draw_mask_line_param_t line;
+    lv_draw_mask_radius_param_t radius;
+    lv_draw_mask_angle_param_t angle;
+}lv_draw_mask_param_t;
 
-typedef lv_mask_res_t (*lv_mask_cb_t)(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * p);
+typedef lv_draw_mask_res_t (*lv_draw_mask_cb_t)(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * p);
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-int16_t lv_draw_mask_add(lv_mask_cb_t mask_cb, lv_mask_param_t * param, void * custom_id);
+int16_t lv_draw_mask_add(lv_draw_mask_cb_t mask_cb, lv_draw_mask_param_t * param, void * custom_id);
 void lv_draw_mask_remove_id(int16_t id);
 void lv_draw_mask_remove_custom(void * custom_id);
 uint8_t lv_draw_mask_get_cnt(void);
 
-lv_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len);
+lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len);
 
-void lv_draw_mask_line_points_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_line_mask_side_t side);
-void lv_draw_mask_line_angle_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, int16_t deg, lv_line_mask_side_t side);
-lv_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param);
+void lv_draw_mask_line_points_init(lv_draw_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_draw_mask_line_side_t side);
+void lv_draw_mask_line_angle_init(lv_draw_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, int16_t deg, lv_draw_mask_line_side_t side);
+lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param);
 
 
-void lv_draw_mask_radius_init(lv_mask_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv);
-lv_mask_res_t lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param);
+void lv_draw_mask_radius_init(lv_draw_mask_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv);
+lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param);
 
-void lv_draw_mask_angle_init(lv_mask_param_t * param, lv_coord_t origio_x, lv_coord_t origo_y, lv_coord_t start_angle, lv_coord_t end_angle);
-lv_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param);
+void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t origio_x, lv_coord_t origo_y, lv_coord_t start_angle, lv_coord_t end_angle);
+lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param);
 
 
 /**********************
