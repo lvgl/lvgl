@@ -177,8 +177,8 @@ void lv_style_init(void)
     lv_style_btn_rel.body.border.width   = 2;//LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
     lv_style_btn_rel.body.border.opa     = LV_OPA_10;
     lv_style_btn_rel.body.shadow.color   = LV_COLOR_BLACK;
-    lv_style_btn_rel.body.shadow.width   = 20;
-    lv_style_btn_rel.body.shadow.spread = -10;
+    lv_style_btn_rel.body.shadow.width   = 17;
+    lv_style_btn_rel.body.shadow.spread =  5;
     lv_style_btn_rel.body.shadow.opa = LV_OPA_COVER;
     lv_style_btn_rel.body.shadow.offset.x = 18;
     lv_style_btn_rel.body.shadow.offset.y = 20;

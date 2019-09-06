@@ -345,7 +345,9 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const lv_style_t * style, lv_opa_t opa_scale)
 {
     /*Check whether the shadow is visible*/
-    if(style->body.shadow.width == 0 && style->body.shadow.offset.x == 0 &&
+    if(style->body.shadow.width == 0) return;
+
+    if(style->body.shadow.width == 1 && style->body.shadow.offset.x == 0 &&
             style->body.shadow.offset.y == 0 && style->body.shadow.spread <= 0) {
         return;
     }
@@ -721,9 +723,10 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
 static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, lv_coord_t sw, lv_coord_t r)
 {
-    lv_coord_t size = sw  + r;
 
-    if(sw == 0) sw = 1; /*To avoid divide by zero*/
+    lv_coord_t sw_ori = sw;
+    lv_coord_t size = sw_ori  + r;
+
     lv_area_t sh_area;
     lv_area_copy(&sh_area, coords);
     sh_area.x2 = sw / 2 + r -1  - (sw & 1 ? 0 : 1);
@@ -737,8 +740,11 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
     int16_t mask_id = lv_mask_add(lv_mask_radius, &mask_param, NULL);
 
 #if SHADOW_ENHANCE
-    sw = sw/2;
-    if(sw == 0) sw = 1;
+    /*Set half shadow width width because blur will be repeated*/
+    if(sw_ori == 1) sw = 1;
+    else if(sw_ori == 2) sw = 2;
+    else if(sw_ori == 3) sw = 2;
+    else sw = sw_ori >> 1;
 #endif
 
     lv_mask_res_t mask_res;
@@ -787,14 +793,17 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
 
 
 #if SHADOW_ENHANCE
-        lv_coord_t i;
-        sh_ups_buf[0] = (sh_buf[0] << SHADOW_UPSACALE_SHIFT) / sw;
-        for(i = 1; i < size * size; i++) {
-            if(sh_buf[i] == sh_buf[i-1]) sh_ups_buf[i] = sh_ups_buf[i-1];
-            else  sh_ups_buf[i] = (sh_buf[i] << SHADOW_UPSACALE_SHIFT) / sw;
-        }
+    sw = sw_ori - sw;
+    if(sw <= 1) return;
 
-        shadow_blur_corner(size, sw, sh_buf, sh_ups_buf);
+    uint32_t i;
+    sh_ups_buf[0] = (sh_buf[0] << SHADOW_UPSACALE_SHIFT) / sw;
+    for(i = 1; i < (uint32_t) size * size; i++) {
+        if(sh_buf[i] == sh_buf[i-1]) sh_ups_buf[i] = sh_ups_buf[i-1];
+        else  sh_ups_buf[i] = (sh_buf[i] << SHADOW_UPSACALE_SHIFT) / sw;
+    }
+
+    shadow_blur_corner(size, sw, sh_buf, sh_ups_buf);
 #endif
 
 }
