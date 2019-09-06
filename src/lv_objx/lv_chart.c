@@ -11,6 +11,7 @@
 
 #include "../lv_core/lv_refr.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_misc/lv_math.h"
 #include "../lv_themes/lv_theme.h"
 
 /*********************
@@ -414,6 +415,7 @@ void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y)
         if(ext->type & LV_CHART_TYPE_POINT) lv_chart_inv_points(chart, ser->start_point);
         if(ext->type & LV_CHART_TYPE_VERTICAL_LINE) lv_chart_inv_lines(chart, ser->start_point);
         if(ext->type & LV_CHART_TYPE_AREA) lv_chart_inv_lines(chart, ser->start_point);
+        if(ext->type & LV_CHART_TYPE_AREA_FADED) lv_chart_inv_lines(chart, ser->start_point);
 
         ser->start_point = (ser->start_point + 1) % ext->point_cnt; /*update the x for next incoming y*/
     }
@@ -622,7 +624,7 @@ static lv_design_res_t lv_chart_design(lv_obj_t * chart, const lv_area_t * clip_
         if(ext->type & LV_CHART_TYPE_COLUMN) lv_chart_draw_cols(chart, clip_area);
         if(ext->type & LV_CHART_TYPE_POINT) lv_chart_draw_points(chart, clip_area);
         if(ext->type & LV_CHART_TYPE_VERTICAL_LINE) lv_chart_draw_vertical_lines(chart, clip_area);
-        if(ext->type & LV_CHART_TYPE_AREA) lv_chart_draw_areas(chart, clip_area);
+        if((ext->type & LV_CHART_TYPE_AREA) || (ext->type & LV_CHART_TYPE_AREA_FADED)) lv_chart_draw_areas(chart, clip_area);
 
         lv_chart_draw_axes(chart, clip_area);
     }
@@ -801,8 +803,8 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
     lv_area_t cir_a;
     lv_coord_t w     = lv_obj_get_width(chart);
     lv_coord_t h     = lv_obj_get_height(chart);
-    lv_coord_t x_ofs = chart->coords.x1;
-    lv_coord_t y_ofs = chart->coords.y1;
+    lv_coord_t x_ofs = chart->coords.x1 - (ext->series.width & 0x1);
+    lv_coord_t y_ofs = chart->coords.y1 - (ext->series.width & 0x1 ? 0 : 1);
     int32_t y_tmp;
     lv_coord_t p_act;
     lv_chart_series_t * ser;
@@ -995,11 +997,19 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
     lv_style_t style;
     lv_style_copy(&style, &lv_style_plain);
 
+   int16_t mask_fade_id = LV_MASK_ID_INV;
+   if(ext->type & LV_CHART_TYPE_AREA_FADED) {
+       lv_draw_mask_param_t mask_fade_p;
+       lv_draw_mask_fade_init(&mask_fade_p, &chart->coords, LV_OPA_COVER, chart->coords.y1 + (h >> 2), LV_OPA_TRANSP, chart->coords.y2 - (h >> 2));
+       mask_fade_id = lv_draw_mask_add(lv_draw_mask_fade, &mask_fade_p, NULL);
+   }
+
     /*Go through all data lines*/
     LV_LL_READ_BACK(ext->series_ll, ser)
     {
         lv_coord_t start_point = ext->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
         style.body.main_color  = ser->color;
+        style.body.grad_color  = ser->color;
         style.body.opa         = ext->series.opa;
 
         p2.x = 0 + x_ofs;
@@ -1020,20 +1030,26 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
             y_tmp = y_tmp / (ext->ymax - ext->ymin);
             p2.y  = h - y_tmp + y_ofs;
 
+
             if(ser->points[p_prev] != LV_CHART_POINT_DEF && ser->points[p_act] != LV_CHART_POINT_DEF) {
-                lv_point_t triangle_points[3];
-                triangle_points[0]   = p1;
-                triangle_points[1]   = p2;
-                triangle_points[2].x = p1.x;
-                triangle_points[2].y = chart->coords.y2;
-                lv_draw_triangle(triangle_points, mask, &style, opa_scale);
-                triangle_points[2].x = p2.x;
-                triangle_points[0].y = chart->coords.y2;
-                lv_draw_triangle(triangle_points, mask, &style, opa_scale);
+                int16_t mask_line_id;
+                lv_draw_mask_param_t mask_line_p;
+                lv_draw_mask_line_points_init(&mask_line_p, p1.x, p1.y, p2.x, p2.y, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
+                mask_line_id = lv_draw_mask_add(lv_draw_mask_line, &mask_line_p, NULL);
+
+                lv_area_t a;
+                a.x1 = p1.x;
+                a.x2 = p2.x - 1;
+                a.y1 = LV_MATH_MIN(p1.y, p2.y);
+                a.y2 = chart->coords.y2;
+                lv_draw_rect(&a, mask, &style, opa_scale);
+
+                lv_draw_mask_remove_id(mask_line_id);
             }
             p_prev = p_act;
         }
     }
+    lv_draw_mask_remove_id(mask_fade_id);
 }
 
 static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask)
