@@ -18,6 +18,7 @@ extern "C" {
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_anim.h"
+#include "../lv_draw/lv_blend.h"
 
 /*********************
  *      DEFINES
@@ -58,6 +59,7 @@ typedef struct
         lv_color_t grad_color; /**< Second color. If not equal to `main_color` a gradient will be drawn for the background. */
         lv_coord_t radius; /**< Object's corner radius. You can use #LV_RADIUS_CIRCLE if you want to draw a circle. */
         lv_opa_t opa; /**< Object's opacity (0-255). */
+        lv_blend_mode_t blend_mode :3;
 
         struct
         {
@@ -65,6 +67,7 @@ typedef struct
             lv_coord_t width; /**< Border width */
             lv_border_part_t part; /**< Which borders to draw */
             lv_opa_t opa; /**< Border opacity. */
+            lv_blend_mode_t blend_mode :3;
         } border;
 
         
@@ -75,6 +78,7 @@ typedef struct
             lv_coord_t spread;
             lv_point_t offset;
             lv_opa_t opa;
+            lv_blend_mode_t blend_mode :3;
         } shadow;
 
         struct
@@ -96,6 +100,7 @@ typedef struct
         lv_coord_t letter_space; /**< Space between letters */
         lv_coord_t line_space; /**< Space between lines (vertical) */
         lv_opa_t opa; /**< Text opacity */
+        lv_blend_mode_t blend_mode :3;
     } text;
 
     /**< Style of images. */
@@ -104,6 +109,7 @@ typedef struct
         lv_color_t color; /**< Color to recolor the image with */
         lv_opa_t intense; /**< Opacity of recoloring (0 means no recoloring) */
         lv_opa_t opa; /**< Opacity of whole image */
+        lv_blend_mode_t blend_mode :3;
     } image;
 
     /**< Style of lines (not borders). */
@@ -113,6 +119,7 @@ typedef struct
         lv_coord_t width;
         lv_opa_t opa;
         uint8_t rounded : 1; /**< 1: rounded line endings*/
+        lv_blend_mode_t blend_mode :3;
     } line;
 } lv_style_t;
 

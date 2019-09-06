@@ -386,7 +386,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
         } else {
             lv_blend_fill(clip_area, &fill_area,
                     color, mask_buf, LV_MASK_RES_CHANGED, opa,
-                    LV_BLIT_MODE_NORMAL);
+                    LV_BLEND_MODE_NORMAL);
 
             fill_area.y1 = fill_area.y2 + 1;
             fill_area.y2 = fill_area.y1;
@@ -404,7 +404,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const
         fill_area.y2--;
         lv_blend_fill(clip_area, &fill_area,
                 color, mask_buf, LV_MASK_RES_CHANGED, opa,
-                LV_BLIT_MODE_NORMAL);
+                LV_BLEND_MODE_NORMAL);
         mask_p = 0;
     }
 }
@@ -451,7 +451,7 @@ void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const 
 
     /*The simplest case just copy the pixels into the VDB*/
     if(other_mask_cnt == 0 && chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && recolor_opa == LV_OPA_TRANSP) {
-        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_MASK_RES_FULL_COVER, LV_OPA_COVER, LV_BLIT_MODE_NORMAL);
+        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_MASK_RES_FULL_COVER, LV_OPA_COVER, LV_BLEND_MODE_NORMAL);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
@@ -540,7 +540,7 @@ void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const 
             if(px_i + lv_area_get_width(&draw_area) < sizeof(mask_buf)) {
                 blend_area.y2 ++;
             } else {
-                lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, LV_OPA_COVER, LV_BLIT_MODE_NORMAL);
+                lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, LV_OPA_COVER, LV_BLEND_MODE_NORMAL);
 
                 blend_area.y1 = blend_area.y2 + 1;
                 blend_area.y2 = blend_area.y1;
@@ -556,7 +556,7 @@ void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const 
         /*Flush the last part*/
         if(blend_area.y1 != blend_area.y2) {
             blend_area.y2--;
-            lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, LV_OPA_COVER, LV_BLIT_MODE_NORMAL);
+            lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, LV_OPA_COVER, LV_BLEND_MODE_NORMAL);
         }
 
     }

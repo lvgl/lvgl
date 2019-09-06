@@ -75,6 +75,7 @@ void lv_style_init(void)
     lv_style_scr.body.main_color     = LV_COLOR_WHITE;
     lv_style_scr.body.grad_color     = LV_COLOR_WHITE;
     lv_style_scr.body.radius         = 0;
+    lv_style_scr.body.blend_mode = LV_BLEND_MODE_NORMAL;
     lv_style_scr.body.padding.left   = 0;
     lv_style_scr.body.padding.right  = 0;
     lv_style_scr.body.padding.top    = 0;
@@ -85,6 +86,7 @@ void lv_style_init(void)
     lv_style_scr.body.border.opa   = LV_OPA_COVER;
     lv_style_scr.body.border.width = 0;
     lv_style_scr.body.border.part  = LV_BORDER_FULL;
+    lv_style_scr.body.border.blend_mode = LV_BLEND_MODE_NORMAL;
 
     lv_style_scr.body.shadow.color = LV_COLOR_GRAY;
     lv_style_scr.body.shadow.width = 0;
@@ -92,6 +94,7 @@ void lv_style_init(void)
     lv_style_scr.body.shadow.offset.x = 0;
     lv_style_scr.body.shadow.offset.y = 0;
     lv_style_scr.body.shadow.spread = 0;
+    lv_style_scr.body.shadow.blend_mode = LV_BLEND_MODE_NORMAL;
 
     lv_style_scr.text.opa          = LV_OPA_COVER;
     lv_style_scr.text.color        = lv_color_make(0x30, 0x30, 0x30);
@@ -99,15 +102,18 @@ void lv_style_init(void)
     lv_style_scr.text.font         = LV_FONT_DEFAULT;
     lv_style_scr.text.letter_space = 0;
     lv_style_scr.text.line_space   = 2;
+    lv_style_scr.text.blend_mode = LV_BLEND_MODE_NORMAL;
 
     lv_style_scr.image.opa     = LV_OPA_COVER;
     lv_style_scr.image.color   = lv_color_make(0x20, 0x20, 0x20);
     lv_style_scr.image.intense = LV_OPA_TRANSP;
+    lv_style_scr.image.blend_mode = LV_BLEND_MODE_NORMAL;
 
     lv_style_scr.line.opa     = LV_OPA_COVER;
     lv_style_scr.line.color   = lv_color_make(0x20, 0x20, 0x20);
     lv_style_scr.line.width   = 2;
     lv_style_scr.line.rounded = 0;
+    lv_style_scr.line.blend_mode = LV_BLEND_MODE_NORMAL;
 
     /*Plain style (by default near the same as the screen style)*/
     lv_style_copy(&lv_style_plain, &lv_style_scr);
@@ -167,18 +173,20 @@ void lv_style_init(void)
     lv_style_btn_rel.body.main_color     = lv_color_make(0x76, 0xa2, 0xd0);
     lv_style_btn_rel.body.grad_color     = lv_color_make(0x19, 0x3a, 0x5d);
     lv_style_btn_rel.body.radius         = LV_RADIUS_CIRCLE; //LV_DPI / 15;
-    lv_style_btn_rel.body.opa         = 200;
+    lv_style_btn_rel.body.opa         = 200;//LV_OPA_COVER;
+    lv_style_btn_rel.body.blend_mode = LV_BLEND_MODE_ADDITIVE;
     lv_style_btn_rel.body.padding.left   = LV_DPI / 4;
     lv_style_btn_rel.body.padding.right  = LV_DPI / 4;
     lv_style_btn_rel.body.padding.top    = LV_DPI / 6;
     lv_style_btn_rel.body.padding.bottom = LV_DPI / 6;
     lv_style_btn_rel.body.padding.inner  = LV_DPI / 10;
     lv_style_btn_rel.body.border.color   = lv_color_make(0x0b, 0x19, 0x28);
-    lv_style_btn_rel.body.border.width   = 2;//LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
-    lv_style_btn_rel.body.border.opa     = LV_OPA_10;
-    lv_style_btn_rel.body.shadow.color   = LV_COLOR_BLACK;
+    lv_style_btn_rel.body.border.width   = 0;//LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
+    lv_style_btn_rel.body.border.opa     = LV_OPA_70;
+    lv_style_btn_rel.body.shadow.color   = LV_COLOR_WHITE;
     lv_style_btn_rel.body.shadow.width   = 17;
     lv_style_btn_rel.body.shadow.spread =  5;
+    lv_style_btn_rel.body.shadow.blend_mode =  LV_BLEND_MODE_SUBTRACTIVE;
     lv_style_btn_rel.body.shadow.opa = LV_OPA_COVER;
     lv_style_btn_rel.body.shadow.offset.x = 18;
     lv_style_btn_rel.body.shadow.offset.y = 20;

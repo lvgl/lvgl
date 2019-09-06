@@ -96,7 +96,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
     if(other_mask_cnt == 0) {
         lv_blend_fill(clip, &draw_area,
                 style->line.color, NULL, LV_MASK_RES_FULL_COVER, style->line.opa,
-                LV_BLIT_MODE_NORMAL);
+                LV_BLEND_MODE_NORMAL);
     }
     /*If there other mask apply it*/
     else {
@@ -130,7 +130,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
 
              lv_blend_fill(clip, &fill_area,
                       style->line.color, mask_buf, mask_res, style->line.opa,
-                      LV_BLIT_MODE_NORMAL);
+                      LV_BLEND_MODE_NORMAL);
 
              fill_area.y1++;
              fill_area.y2++;
@@ -168,7 +168,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
 
         lv_blend_fill(clip, &draw_area,
                 style->line.color,  NULL, LV_MASK_RES_FULL_COVER, style->line.opa,
-                LV_BLIT_MODE_NORMAL);
+                LV_BLEND_MODE_NORMAL);
     }
     /*If there other mask apply it*/
     else {
@@ -202,7 +202,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
 
              lv_blend_fill(clip, &fill_area,
                      style->line.color, mask_buf, mask_res, style->line.opa,
-                     LV_BLIT_MODE_NORMAL);
+                     LV_BLEND_MODE_NORMAL);
 
              fill_area.y1++;
              fill_area.y2++;
@@ -322,7 +322,7 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
 
          lv_blend_fill(clip, &fill_area,
                  style->line.color, mask_buf, mask_res, style->line.opa,
-                 LV_BLIT_MODE_NORMAL);
+                 LV_BLEND_MODE_NORMAL);
 
          fill_area.y1++;
          fill_area.y2++;
