@@ -94,13 +94,14 @@ void lv_draw_aa_hor_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_
 /**********************
  *   POST INCLUDES
  *********************/
-#include "lv_draw_basic.h"
 #include "lv_draw_rect.h"
 #include "lv_draw_label.h"
 #include "lv_draw_img.h"
 #include "lv_draw_line.h"
 #include "lv_draw_triangle.h"
 #include "lv_draw_arc.h"
+#include "lv_draw_blend.h"
+#include "lv_draw_mask.h"
 
 #ifdef __cplusplus
 } /* extern "C" */

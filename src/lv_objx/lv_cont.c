@@ -15,7 +15,6 @@
 #include <string.h>
 
 #include "../lv_draw/lv_draw.h"
-#include "../lv_draw/lv_draw_basic.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"

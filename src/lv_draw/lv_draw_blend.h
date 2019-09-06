@@ -1,10 +1,10 @@
 /**
- * @file lv_blit.h
+ * @file lv_draw_blend.h
  *
  */
 
-#ifndef LV_BLIT_H
-#define LV_BLIT_H
+#ifndef LV_DRAW_BLEND_H
+#define LV_DRAW_BLEND_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
-#include "lv_mask.h"
+#include "lv_draw_mask.h"
 
 /*********************
  *      DEFINES
@@ -52,4 +52,4 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
 } /* extern "C" */
 #endif
 
-#endif /*LV_BLIT_H*/
+#endif /*LV_DRAW_BLEND_H*/

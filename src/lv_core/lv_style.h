@@ -18,7 +18,7 @@ extern "C" {
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_anim.h"
-#include "../lv_draw/lv_blend.h"
+#include "../lv_draw/lv_draw_blend.h"
 
 /*********************
  *      DEFINES

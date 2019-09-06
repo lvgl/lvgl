@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_mask.h"
+#include "lv_draw_mask.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
 
@@ -47,7 +47,7 @@ static lv_mask_saved_t mask_list[LV_MASK_MAX_NUM];
  *   GLOBAL FUNCTIONS
  **********************/
 
-int16_t lv_mask_add(lv_mask_cb_t mask_cb, lv_mask_param_t * param, void * custom_id)
+int16_t lv_draw_mask_add(lv_mask_cb_t mask_cb, lv_mask_param_t * param, void * custom_id)
 {
     /*Search a free entry*/
     uint8_t i;
@@ -68,9 +68,8 @@ int16_t lv_mask_add(lv_mask_cb_t mask_cb, lv_mask_param_t * param, void * custom
 }
 
 
-lv_mask_res_t lv_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len)
+lv_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len)
 {
-
     bool changed = false;
     lv_mask_res_t res = LV_MASK_RES_FULL_COVER;
     uint8_t i;
@@ -85,14 +84,14 @@ lv_mask_res_t lv_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
     return changed ? LV_MASK_RES_CHANGED : LV_MASK_RES_FULL_COVER;
 }
 
-void lv_mask_remove_id(int16_t id)
+void lv_draw_mask_remove_id(int16_t id)
 {
     if(id != LV_MASK_ID_INV) {
         mask_list[id].cb = NULL;
     }
 }
 
-void lv_mask_remove_custom(void * custom_id)
+void lv_draw_mask_remove_custom(void * custom_id)
 {
     uint8_t i;
     for(i = 0; i < LV_MASK_MAX_NUM; i++) {
@@ -102,7 +101,7 @@ void lv_mask_remove_custom(void * custom_id)
     }
 }
 
-uint8_t lv_mask_get_cnt(void)
+uint8_t lv_draw_mask_get_cnt(void)
 {
     uint8_t cnt = 0;
     uint8_t i;
@@ -112,7 +111,7 @@ uint8_t lv_mask_get_cnt(void)
     return cnt;
 }
 
-void lv_mask_line_points_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_line_mask_side_t side)
+void lv_draw_mask_line_points_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_line_mask_side_t side)
 {
     lv_mask_line_param_t * p = &param->line;
     memset(p, 0x00, sizeof(lv_mask_line_param_t));
@@ -191,7 +190,7 @@ void lv_mask_line_points_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_
  * @param deg right 0 deg, bottom: 90
  * @param side
  */
-void lv_mask_line_angle_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, int16_t deg, lv_line_mask_side_t side)
+void lv_draw_mask_line_angle_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, int16_t deg, lv_line_mask_side_t side)
 {
 
     lv_mask_angle_param_t * p = &param->angle;
@@ -211,10 +210,10 @@ void lv_mask_line_angle_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t
     p2x = (lv_trigo_sin(deg + 90) >> 5) + p1x;
     p2y = (lv_trigo_sin(deg) >> 5) + p1y;
 
-    lv_mask_line_points_init(p, p1x, p1y, p2x, p2y, side);
+    lv_draw_mask_line_points_init(p, p1x, p1y, p2x, p2y, side);
 }
 
-lv_mask_res_t lv_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param)
+lv_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param)
 {
     lv_mask_line_param_t * p = &param->line;
 
@@ -271,7 +270,7 @@ lv_mask_res_t lv_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs
 }
 
 
-void lv_mask_angle_init(lv_mask_param_t * param, lv_coord_t origo_x, lv_coord_t origo_y, lv_coord_t start_angle, lv_coord_t end_angle)
+void lv_draw_mask_angle_init(lv_mask_param_t * param, lv_coord_t origo_x, lv_coord_t origo_y, lv_coord_t start_angle, lv_coord_t end_angle)
 {
     lv_mask_angle_param_t * p = &param->line;
 
@@ -303,12 +302,12 @@ void lv_mask_angle_init(lv_mask_param_t * param, lv_coord_t origo_x, lv_coord_t 
         end_side = LV_LINE_MASK_SIDE_LEFT;
     }
 
-    lv_mask_line_angle_init((lv_mask_param_t*)&p->start_line, origo_x, origo_y, start_angle, start_side);
-    lv_mask_line_angle_init((lv_mask_param_t*)&p->end_line, origo_x, origo_y, end_angle, end_side);
+    lv_draw_mask_line_angle_init((lv_mask_param_t*)&p->start_line, origo_x, origo_y, start_angle, start_side);
+    lv_draw_mask_line_angle_init((lv_mask_param_t*)&p->end_line, origo_x, origo_y, end_angle, end_side);
 }
 
 
-lv_mask_res_t lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param)
+lv_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param)
 {
     lv_mask_angle_param_t * p = &param->angle;
 
@@ -334,7 +333,7 @@ lv_mask_res_t lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
         int32_t tmp = start_angle_last + dist - rel_x;
         if(tmp > len) tmp = len;
         if(tmp > 0) {
-            res1 = lv_mask_line(&mask_buf[0], abs_x, abs_y, tmp, (lv_mask_param_t*)&p->start_line);
+            res1 = lv_draw_mask_line(&mask_buf[0], abs_x, abs_y, tmp, (lv_mask_param_t*)&p->start_line);
             if(res1 == LV_MASK_RES_FULL_TRANSP) {
                 memset(&mask_buf[0], 0x00, tmp);
             }
@@ -342,7 +341,7 @@ lv_mask_res_t lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
 
         if(tmp > len) tmp = len;
         if(tmp < 0) tmp = 0;
-        res2 = lv_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, (lv_mask_param_t*)&p->end_line);
+        res2 = lv_draw_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, (lv_mask_param_t*)&p->end_line);
         if(res2 == LV_MASK_RES_FULL_TRANSP) {
             memset(&mask_buf[tmp], 0x00, len-tmp);
         }
@@ -376,7 +375,7 @@ lv_mask_res_t lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
         int32_t tmp = start_angle_last + dist - rel_x;
         if(tmp > len) tmp = len;
         if(tmp > 0) {
-            res1 = lv_mask_line(&mask_buf[0], abs_x, abs_y, tmp, (lv_mask_param_t*)&p->end_line);
+            res1 = lv_draw_mask_line(&mask_buf[0], abs_x, abs_y, tmp, (lv_mask_param_t*)&p->end_line);
             if(res1 == LV_MASK_RES_FULL_TRANSP) {
                 memset(&mask_buf[0], 0x00, tmp);
             }
@@ -384,7 +383,7 @@ lv_mask_res_t lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
 
         if(tmp > len) tmp = len;
         if(tmp < 0) tmp = 0;
-        res2 = lv_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, (lv_mask_param_t*)&p->start_line);
+        res2 = lv_draw_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, (lv_mask_param_t*)&p->start_line);
         if(res2 == LV_MASK_RES_FULL_TRANSP) {
             memset(&mask_buf[tmp], 0x00, len-tmp);
         }
@@ -409,7 +408,7 @@ lv_mask_res_t lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
             res1 = LV_MASK_RES_UNKNOWN;
         }
         else  {
-            res1 = lv_mask_line(mask_buf, abs_x, abs_y, len, (lv_mask_param_t*)&p->start_line);
+            res1 = lv_draw_mask_line(mask_buf, abs_x, abs_y, len, (lv_mask_param_t*)&p->start_line);
         }
 
         if(p->end_angle == 180) {
@@ -425,7 +424,7 @@ lv_mask_res_t lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
             res2 = LV_MASK_RES_UNKNOWN;
         }
         else {
-            res2 = lv_mask_line(mask_buf, abs_x, abs_y, len, (lv_mask_param_t*)&p->end_line);
+            res2 = lv_draw_mask_line(mask_buf, abs_x, abs_y, len, (lv_mask_param_t*)&p->end_line);
         }
 
         if(res1 == LV_MASK_RES_FULL_TRANSP || res2 == LV_MASK_RES_FULL_TRANSP) return LV_MASK_RES_FULL_TRANSP;
@@ -435,7 +434,7 @@ lv_mask_res_t lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t ab
     }
 }
 
-void lv_mask_radius_init(lv_mask_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv)
+void lv_draw_mask_radius_init(lv_mask_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv)
 {
     lv_mask_radius_param_t * p = &param->radius;
 
@@ -649,9 +648,6 @@ lv_mask_res_t lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t a
 static lv_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_line_param_t * p)
 {
     lv_coord_t y_at_x;
-
-    /* At the beginning of the mask if the limit line is greater then the mask's y.
-     * Then the mask is in the "wrong" area*/
     y_at_x = (int32_t)((int32_t)p->yx_steep * abs_x) >> 10;
 
     if(p->yx_steep > 0) {

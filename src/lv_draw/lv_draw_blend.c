@@ -1,12 +1,12 @@
 /**
- * @file lv_blend.c
+ * @file lv_draw_blend.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_blend.h"
+#include "lv_draw_blend.h"
 #include "lv_img_decoder.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_hal/lv_hal_disp.h"
@@ -413,6 +413,60 @@ static void fill_true_color_blended(const lv_area_t * disp_area, lv_color_t * di
         }
     }
 }
+#if 0
+/**
+ * Mix two colors. Both color can have alpha value. It requires ARGB888 colors.
+ * @param bg_color background color
+ * @param bg_opa alpha of the background color
+ * @param fg_color foreground color
+ * @param fg_opa alpha of the foreground color
+ * @return the mixed color. the alpha channel (color.alpha) contains the result alpha
+ */
+static inline lv_color_t color_mix_with_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa)
+{
+    /* Pick the foreground if it's fully opaque or the Background is fully transparent*/
+    if(fg_opa > LV_OPA_MAX || bg_opa <= LV_OPA_MIN) {
+        fg_color.ch.alpha = fg_opa;
+        return fg_color;
+    }
+    /*Transparent foreground: use the Background*/
+    else if(fg_opa <= LV_OPA_MIN) {
+        return bg_color;
+    }
+    /*Opaque background: use simple mix*/
+    else if(bg_opa >= LV_OPA_MAX) {
+        return lv_color_mix(fg_color, bg_color, fg_opa);
+    }
+    /*Both colors have alpha. Expensive calculation need to be applied*/
+    else {
+        /*Save the parameters and the result. If they will be asked again don't compute again*/
+        static lv_opa_t fg_opa_save     = 0;
+        static lv_opa_t bg_opa_save     = 0;
+        static lv_color_t fg_color_save = {{0}};
+        static lv_color_t bg_color_save = {{0}};
+        static lv_color_t c             = {{0}};
+
+        if(fg_opa != fg_opa_save || bg_opa != bg_opa_save || fg_color.full != fg_color_save.full ||
+                bg_color.full != bg_color_save.full) {
+            fg_opa_save        = fg_opa;
+            bg_opa_save        = bg_opa;
+            fg_color_save.full = fg_color.full;
+            bg_color_save.full = bg_color.full;
+            /*Info:
+             * https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
+            lv_opa_t alpha_res = 255 - ((uint16_t)((uint16_t)(255 - fg_opa) * (255 - bg_opa)) >> 8);
+            if(alpha_res == 0) {
+                while(1)
+                    ;
+            }
+            lv_opa_t ratio = (uint16_t)((uint16_t)fg_opa * 255) / alpha_res;
+            c              = lv_color_mix(fg_color, bg_color, ratio);
+            c.ch.alpha     = alpha_res;
+        }
+        return c;
+    }
+}
+#endif
 
 static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa)
 {

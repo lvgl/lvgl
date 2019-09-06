@@ -6,12 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/src/lv_draw/lv_blend.h>
 #include "lv_draw_rect.h"
+#include "lv_draw_blend.h"
+#include "lv_draw_mask.h"
 #include "../lv_misc/lv_circ.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_core/lv_refr.h"
-#include "lv_mask.h"
 
 /*********************
  *      DEFINES
@@ -93,7 +93,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
     /*Create a mask if there is a radius*/
     lv_opa_t mask_buf[LV_HOR_RES_MAX];
 
-    uint8_t other_mask_cnt = lv_mask_get_cnt();
+    uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
     int16_t mask_rout_id = LV_MASK_ID_INV;
 
     /*Get the real radius*/
@@ -112,8 +112,8 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 
         lv_mask_param_t mask_rout_param;
         if(rout > 0) {
-            lv_mask_radius_init(&mask_rout_param, coords, rout, false);
-            mask_rout_id = lv_mask_add(lv_mask_radius, &mask_rout_param, NULL);
+            lv_draw_mask_radius_init(&mask_rout_param, coords, rout, false);
+            mask_rout_id = lv_draw_mask_add(lv_mask_radius, &mask_rout_param, NULL);
         }
 
         /*Draw the background line by line*/
@@ -136,13 +136,13 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
                     mask_res = LV_MASK_RES_FULL_COVER;
                     if(other_mask_cnt != 0) {
                         memset(mask_buf, LV_OPA_COVER, draw_area_w);
-                        mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+                        mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
                     }
                 }
                 /*In corner areas apply the mask anyway*/
                 else {
                     memset(mask_buf, LV_OPA_COVER, draw_area_w);
-                    mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+                    mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
                 }
 
                 /*Get the current line color*/
@@ -211,8 +211,8 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
         area_small.y2 -= border_width;
 
         /*Create the mask*/
-        lv_mask_radius_init(&mask_rsmall_param, &area_small, rout - border_width, true);
-        int16_t mask_rsmall_id = lv_mask_add(lv_mask_radius, &mask_rsmall_param, NULL);
+        lv_draw_mask_radius_init(&mask_rsmall_param, &area_small, rout - border_width, true);
+        int16_t mask_rsmall_id = lv_draw_mask_add(lv_mask_radius, &mask_rsmall_param, NULL);
 
         lv_coord_t corner_size = LV_MATH_MAX(rout, border_width - 1);
 
@@ -230,7 +230,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
             fill_area.y2 = fill_area.y1;
             for(h = draw_area.y1; h <= upper_corner_end; h++) {
                 memset(mask_buf, LV_OPA_COVER, draw_area_w);
-                mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+                mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
                 lv_area_t fill_area2;
                 fill_area2.x1 = coords->x1;
@@ -268,7 +268,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
             fill_area.y2 = fill_area.y1;
             for(h = lower_corner_end; h <= draw_area.y2; h++) {
                 memset(mask_buf, LV_OPA_COVER, draw_area_w);
-                mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+                mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
                 lv_area_t fill_area2;
                 fill_area2.x1 = coords->x1;
@@ -324,7 +324,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
             fill_area.y2 = fill_area.y1;
             for(h = draw_area.y1; h <= draw_area.y2; h++) {
                 memset(mask_buf, LV_OPA_COVER, draw_area_w);
-                mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+                mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
                 lv_blend_fill( clip, &fill_area,
                         style->body.border.color, mask_buf, mask_res, style->body.border.opa, style->body.border.blend_mode);
@@ -334,10 +334,10 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
 
             }
         }
-        lv_mask_remove_id(mask_rsmall_id);
+        lv_draw_mask_remove_id(mask_rsmall_id);
     }
 
-    lv_mask_remove_id(mask_rout_id);
+    lv_draw_mask_remove_id(mask_rout_id);
 }
 
 
@@ -411,7 +411,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     shadow_draw_corner_buf(&sh_rect_area, sh_buf, style->body.shadow.width, r_sh);
 
     bool simple_mode = true;
-    if(lv_mask_get_cnt() > 0) simple_mode = false;
+    if(lv_draw_mask_get_cnt() > 0) simple_mode = false;
     else if(style->body.shadow.offset.x != 0 || style->body.shadow.offset.y != 0) simple_mode = false;
     else if(style->body.shadow.spread != 0) simple_mode = false;
 
@@ -422,12 +422,12 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     lv_opa_t mask_buf[LV_HOR_RES_MAX];
 
     lv_mask_param_t mask_rout_param;
-    lv_mask_radius_init(&mask_rout_param, coords, r_bg, true);
+    lv_draw_mask_radius_init(&mask_rout_param, coords, r_bg, true);
 
     /*Draw a radius into the shadow buffer*/
     int16_t mask_rout_id = LV_MASK_ID_INV;
 
-    mask_rout_id = lv_mask_add(lv_mask_radius, &mask_rout_param, NULL);
+    mask_rout_id = lv_draw_mask_add(lv_mask_radius, &mask_rout_param, NULL);
 
     lv_area_t a;
 
@@ -461,7 +461,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     lv_coord_t y;
     for(y = 0; y < corner_size - ver_mid_dist + ver_mid_corr; y++) {
         memcpy(mask_buf, sh_buf_tmp, corner_size);
-        mask_res = lv_mask_apply(mask_buf + first_px, a.x1, a.y1, lv_area_get_width(&a));
+        mask_res = lv_draw_mask_apply(mask_buf + first_px, a.x1, a.y1, lv_area_get_width(&a));
         if(mask_res == LV_MASK_RES_FULL_COVER) mask_res = LV_MASK_RES_CHANGED;
 
         lv_blend_fill(clip, &a,
@@ -479,7 +479,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
     for(y = 0; y < corner_size - ver_mid_dist; y++) {
         memcpy(mask_buf, sh_buf_tmp, corner_size);
-        mask_res = lv_mask_apply(mask_buf + first_px, a.x1, a.y1, lv_area_get_width(&a));
+        mask_res = lv_draw_mask_apply(mask_buf + first_px, a.x1, a.y1, lv_area_get_width(&a));
         if(mask_res == LV_MASK_RES_FULL_COVER) mask_res = LV_MASK_RES_CHANGED;
 
         lv_blend_fill(clip, &a,
@@ -520,7 +520,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     else {
         for(y = corner_size; y < lv_area_get_height(&sh_area) - corner_size; y++) {
             memcpy(mask_buf, sh_buf_tmp, corner_size);
-            mask_res = lv_mask_apply(mask_buf + first_px, a.x1, a.y1, lv_area_get_width(&a));
+            mask_res = lv_draw_mask_apply(mask_buf + first_px, a.x1, a.y1, lv_area_get_width(&a));
             if(mask_res == LV_MASK_RES_FULL_COVER) mask_res = LV_MASK_RES_CHANGED;
 
             lv_blend_fill(clip, &a,
@@ -561,7 +561,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
     for(y = 0; y < corner_size - ver_mid_dist + ver_mid_corr; y++) {
         memcpy(mask_buf, sh_buf_tmp, corner_size);
-        mask_res = lv_mask_apply(mask_buf + first_px, a.x1, a.y1, lv_area_get_width(&a));
+        mask_res = lv_draw_mask_apply(mask_buf + first_px, a.x1, a.y1, lv_area_get_width(&a));
         if(mask_res == LV_MASK_RES_FULL_COVER) mask_res = LV_MASK_RES_CHANGED;
 
         lv_blend_fill(clip, &a,
@@ -579,7 +579,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
     for(y = 0; y < corner_size - ver_mid_dist; y++) {
         memcpy(mask_buf, sh_buf_tmp, corner_size);
-        mask_res = lv_mask_apply(mask_buf + first_px, a.x1, a.y1, lv_area_get_width(&a));
+        mask_res = lv_draw_mask_apply(mask_buf + first_px, a.x1, a.y1, lv_area_get_width(&a));
         if(mask_res == LV_MASK_RES_FULL_COVER) mask_res = LV_MASK_RES_CHANGED;
 
         lv_blend_fill(clip, &a,
@@ -615,7 +615,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     else {
         for(y = corner_size; y < lv_area_get_height(&sh_area) - corner_size; y++) {
             memcpy(mask_buf, sh_buf_tmp, corner_size);
-            mask_res = lv_mask_apply(mask_buf + first_px, a.x1, a.y1, lv_area_get_width(&a));
+            mask_res = lv_draw_mask_apply(mask_buf + first_px, a.x1, a.y1, lv_area_get_width(&a));
             if(mask_res == LV_MASK_RES_FULL_COVER) mask_res = LV_MASK_RES_CHANGED;
 
             lv_blend_fill(clip, &a,
@@ -649,7 +649,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
         for(y = 0; y < y_max; y++) {
             if(simple_mode == false) {
                 memset(mask_buf, sh_buf_tmp[0], lv_area_get_width(&a));
-                mask_res = lv_mask_apply(mask_buf, a.x1, a.y1, lv_area_get_width(&a));
+                mask_res = lv_draw_mask_apply(mask_buf, a.x1, a.y1, lv_area_get_width(&a));
                 if(mask_res == LV_MASK_RES_FULL_COVER) mask_res = LV_MASK_RES_CHANGED;
 
                 lv_blend_fill(clip, &a,
@@ -678,7 +678,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
         for(y = y_min; y < corner_size; y++) {
             if(simple_mode == false) {
                 memset(mask_buf, sh_buf_tmp[0], lv_area_get_width(&a));
-                mask_res = lv_mask_apply(mask_buf, a.x1, a.y1, lv_area_get_width(&a));
+                mask_res = lv_draw_mask_apply(mask_buf, a.x1, a.y1, lv_area_get_width(&a));
                 if(mask_res == LV_MASK_RES_FULL_COVER) mask_res = LV_MASK_RES_CHANGED;
                 lv_blend_fill(clip, &a,
                         style->body.shadow.color, mask_buf, mask_res, opa, LV_BLEND_MODE_NORMAL);
@@ -704,7 +704,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
         if(a.x1 <= a.x2) {
             for(y = 0; y < lv_area_get_height(&sh_area) - corner_size * 2; y++) {
                 memset(mask_buf, 0xFF, lv_area_get_width(&a));
-                mask_res = lv_mask_apply(mask_buf, a.x1, a.y1, lv_area_get_width(&a));
+                mask_res = lv_draw_mask_apply(mask_buf, a.x1, a.y1, lv_area_get_width(&a));
                 lv_blend_fill(clip, &a,
                         style->body.shadow.color, mask_buf, mask_res, opa, style->body.shadow.blend_mode);
 
@@ -714,7 +714,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
         }
     }
 
-    lv_mask_remove_id(mask_rout_id);
+    lv_draw_mask_remove_id(mask_rout_id);
 
 }
 
@@ -736,8 +736,8 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
     sh_area.y2 = sh_area.y1 + lv_area_get_height(coords);
 
     lv_mask_param_t mask_param;
-    lv_mask_radius_init(&mask_param, &sh_area, r, false);
-    int16_t mask_id = lv_mask_add(lv_mask_radius, &mask_param, NULL);
+    lv_draw_mask_radius_init(&mask_param, &sh_area, r, false);
+    int16_t mask_id = lv_draw_mask_add(lv_mask_radius, &mask_param, NULL);
 
 #if SHADOW_ENHANCE
     /*Set half shadow width width because blur will be repeated*/
@@ -754,7 +754,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
     uint16_t * sh_ups_tmp_buf = sh_ups_buf;
     for(y = 0; y < size; y++) {
         memset(mask_line, 0xFF, size);
-        mask_res = lv_mask_apply(mask_line, 0, y, size);
+        mask_res = lv_draw_mask_apply(mask_line, 0, y, size);
         if(mask_res == LV_MASK_RES_FULL_TRANSP) {
             memset(sh_ups_tmp_buf, 0x00, size * sizeof(sh_ups_buf[0]));
         } else {
@@ -769,7 +769,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
         sh_ups_tmp_buf += size;
     }
 
-    lv_mask_remove_id(mask_id);
+    lv_draw_mask_remove_id(mask_id);
 
 
 
@@ -845,16 +845,6 @@ static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, lv_opa_t * res_bu
         sh_ups_tmp_buf += size;
         sh_ups_hor_buf_tmp += size;
     }
-
-
-//        uint32_t z;
-//        for(z = 0; z < size * size; z++) {
-//            res_buf[z] = (sh_ups_hor_buf[z] >> SHADOW_UPSACALE_SHIFT) ;
-//        }
-//
-//        return;
-
-
 
     /*Vertical blur*/
     uint32_t i;

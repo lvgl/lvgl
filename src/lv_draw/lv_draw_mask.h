@@ -101,23 +101,23 @@ typedef lv_mask_res_t (*lv_mask_cb_t)(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_
  * GLOBAL PROTOTYPES
  **********************/
 
-int16_t lv_mask_add(lv_mask_cb_t mask_cb, lv_mask_param_t * param, void * custom_id);
-void lv_mask_remove_id(int16_t id);
-void lv_mask_remove_custom(void * custom_id);
-uint8_t lv_mask_get_cnt(void);
+int16_t lv_draw_mask_add(lv_mask_cb_t mask_cb, lv_mask_param_t * param, void * custom_id);
+void lv_draw_mask_remove_id(int16_t id);
+void lv_draw_mask_remove_custom(void * custom_id);
+uint8_t lv_draw_mask_get_cnt(void);
 
-lv_mask_res_t lv_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len);
+lv_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len);
 
-void lv_mask_line_points_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_line_mask_side_t side);
-void lv_mask_line_angle_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, int16_t deg, lv_line_mask_side_t side);
-lv_mask_res_t lv_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param);
+void lv_draw_mask_line_points_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_line_mask_side_t side);
+void lv_draw_mask_line_angle_init(lv_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, int16_t deg, lv_line_mask_side_t side);
+lv_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param);
 
 
-void lv_mask_radius_init(lv_mask_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv);
+void lv_draw_mask_radius_init(lv_mask_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv);
 lv_mask_res_t lv_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param);
 
-void lv_mask_angle_init(lv_mask_param_t * param, lv_coord_t origio_x, lv_coord_t origo_y, lv_coord_t start_angle, lv_coord_t end_angle);
-lv_mask_res_t lv_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param);
+void lv_draw_mask_angle_init(lv_mask_param_t * param, lv_coord_t origio_x, lv_coord_t origo_y, lv_coord_t start_angle, lv_coord_t end_angle);
+lv_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_mask_param_t * param);
 
 
 /**********************

@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_arc.h"
-#include "lv_mask.h"
+#include "lv_draw_mask.h"
 
 /*********************
  *      DEFINES
@@ -57,9 +57,9 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
 
 
     lv_mask_param_t mask_angle_param;
-    lv_mask_angle_init(&mask_angle_param, center_x, center_y, start_angle, end_angle);
+    lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, start_angle, end_angle);
 
-    int16_t mask_angle_id = lv_mask_add(lv_mask_angle, &mask_angle_param, NULL);
+    int16_t mask_angle_id = lv_draw_mask_add(lv_draw_mask_angle, &mask_angle_param, NULL);
 
 
     printf("s:%d, e:%d\n", start_angle, end_angle);
@@ -73,7 +73,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
 
     lv_draw_rect(&area, clip_area, &circle_style, LV_OPA_COVER);
 
-    lv_mask_remove_id(mask_angle_id);
+    lv_draw_mask_remove_id(mask_angle_id);
 
 }
 

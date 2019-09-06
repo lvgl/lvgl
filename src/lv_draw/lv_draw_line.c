@@ -9,8 +9,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "lv_draw.h"
-#include "lv_mask.h"
-#include "lv_blend.h"
+#include "lv_draw_mask.h"
+#include "lv_draw_blend.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_math.h"
 
@@ -84,7 +84,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
     lv_coord_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
 
-    int16_t other_mask_cnt = lv_mask_get_cnt();
+    int16_t other_mask_cnt = lv_draw_mask_get_cnt();
 
     lv_area_t draw_area;
     draw_area.x1 = LV_MATH_MIN(point1->x, point2->x);
@@ -126,7 +126,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
         lv_mask_res_t mask_res;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
              memset(mask_buf, LV_OPA_COVER, draw_area_w);
-             mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+             mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
              lv_blend_fill(clip, &fill_area,
                       style->line.color, mask_buf, mask_res, style->line.opa,
@@ -155,7 +155,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
     lv_coord_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
 
-    int16_t other_mask_cnt = lv_mask_get_cnt();
+    int16_t other_mask_cnt = lv_draw_mask_get_cnt();
 
     lv_area_t draw_area;
     draw_area.x1 = point1->x - w_half1;
@@ -198,7 +198,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
         lv_mask_res_t mask_res;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
              memset(mask_buf, LV_OPA_COVER, draw_area_w);
-             mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+             mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
              lv_blend_fill(clip, &fill_area,
                      style->line.color, mask_buf, mask_res, style->line.opa,
@@ -271,25 +271,25 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
 
     if(flat) {
         if(xdiff > 0) {
-            lv_mask_line_points_init(&mask_left_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0, LV_LINE_MASK_SIDE_LEFT);
-            lv_mask_line_points_init(&mask_right_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1, LV_LINE_MASK_SIDE_RIGHT);
+            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0, LV_LINE_MASK_SIDE_LEFT);
+            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1, LV_LINE_MASK_SIDE_RIGHT);
         } else {
-            lv_mask_line_points_init(&mask_left_param, p1.x, p1.y + w_half0, p2.x, p2.y + w_half0, LV_LINE_MASK_SIDE_LEFT);
-            lv_mask_line_points_init(&mask_right_param, p1.x, p1.y - w_half1, p2.x, p2.y - w_half1, LV_LINE_MASK_SIDE_RIGHT);
+            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y + w_half0, p2.x, p2.y + w_half0, LV_LINE_MASK_SIDE_LEFT);
+            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y - w_half1, p2.x, p2.y - w_half1, LV_LINE_MASK_SIDE_RIGHT);
         }
     } else {
-        lv_mask_line_points_init(&mask_left_param, p1.x + w_half0, p1.y, p2.x + w_half0, p2.y, LV_LINE_MASK_SIDE_LEFT);
-        lv_mask_line_points_init(&mask_right_param, p1.x - w_half1, p1.y, p2.x - w_half1, p2.y, LV_LINE_MASK_SIDE_RIGHT);
+        lv_draw_mask_line_points_init(&mask_left_param, p1.x + w_half0, p1.y, p2.x + w_half0, p2.y, LV_LINE_MASK_SIDE_LEFT);
+        lv_draw_mask_line_points_init(&mask_right_param, p1.x - w_half1, p1.y, p2.x - w_half1, p2.y, LV_LINE_MASK_SIDE_RIGHT);
 
     }
     /*Use the normal vector for the endings*/
-    lv_mask_line_points_init(&mask_top_param, p1.x, p1.y, p1.x - ydiff, p1.y + xdiff, LV_LINE_MASK_SIDE_BOTTOM);
-    lv_mask_line_points_init(&mask_bottom_param, p2.x, p2.y,p2.x - ydiff, p2.y + xdiff,  LV_LINE_MASK_SIDE_TOP);
+    lv_draw_mask_line_points_init(&mask_top_param, p1.x, p1.y, p1.x - ydiff, p1.y + xdiff, LV_LINE_MASK_SIDE_BOTTOM);
+    lv_draw_mask_line_points_init(&mask_bottom_param, p2.x, p2.y,p2.x - ydiff, p2.y + xdiff,  LV_LINE_MASK_SIDE_TOP);
 
-    int16_t mask_left_id = lv_mask_add(lv_mask_line, &mask_left_param, NULL);
-    int16_t mask_right_id = lv_mask_add(lv_mask_line, &mask_right_param, NULL);
-    int16_t mask_top_id = lv_mask_add(lv_mask_line, &mask_top_param, NULL);
-    int16_t mask_bottom_id = lv_mask_add(lv_mask_line, &mask_bottom_param, NULL);
+    int16_t mask_left_id = lv_draw_mask_add(lv_draw_mask_line, &mask_left_param, NULL);
+    int16_t mask_right_id = lv_draw_mask_add(lv_draw_mask_line, &mask_right_param, NULL);
+    int16_t mask_top_id = lv_draw_mask_add(lv_draw_mask_line, &mask_top_param, NULL);
+    int16_t mask_bottom_id = lv_draw_mask_add(lv_draw_mask_line, &mask_bottom_param, NULL);
 
     lv_disp_t * disp    = lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
@@ -318,7 +318,7 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     /*Fill the first row with 'color'*/
     for(h = draw_area.y1; h <= draw_area.y2; h++) {
         memset(mask_buf, LV_OPA_COVER, draw_area_w);
-         mask_res = lv_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+         mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
          lv_blend_fill(clip, &fill_area,
                  style->line.color, mask_buf, mask_res, style->line.opa,
@@ -328,8 +328,8 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
          fill_area.y2++;
     }
 
-    lv_mask_remove_id(mask_left_id);
-    lv_mask_remove_id(mask_right_id);
-    lv_mask_remove_id(mask_top_id);
-    lv_mask_remove_id(mask_bottom_id);
+    lv_draw_mask_remove_id(mask_left_id);
+    lv_draw_mask_remove_id(mask_right_id);
+    lv_draw_mask_remove_id(mask_top_id);
+    lv_draw_mask_remove_id(mask_bottom_id);
 }
