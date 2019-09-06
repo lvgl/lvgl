@@ -58,7 +58,7 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_objmask);
-    if(ancestor_design == NULL) ancestor_design= lv_obj_get_design_cb(new_objmask);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_objmask);
 
     /*Initialize the allocated 'ext' */
     lv_ll_init(&ext->mask_ll, sizeof(lv_objmask_mask_t));
@@ -69,7 +69,7 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new object mask object mask*/
     if(copy == NULL) {
-        lv_objmask_set_style(new_objmask, LV_OBJMASK_STYLE_BG, &lv_style_plain_color);
+        lv_objmask_set_style(new_objmask, LV_OBJMASK_STYLE_BG, &lv_style_plain);
 
     }
     /*Copy an existing object mask*/
@@ -158,7 +158,7 @@ static lv_design_res_t lv_objmask_design(lv_obj_t * objmask, const lv_area_t * c
         lv_draw_mask_remove_custom(objmask);
     }
 
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**

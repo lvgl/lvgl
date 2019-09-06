@@ -615,13 +615,13 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         }
 
         lv_draw_mask_res_t mask_res;
+        mask_res = (alpha_byte || chroma_key) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
         lv_coord_t x;
         lv_coord_t y;
         for(y = 0; y < lv_area_get_height(&draw_area); y++) {
             map_px = map_buf_tmp;
             px_i_start = px_i;
 
-            mask_res = (alpha_byte || chroma_key) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
             for(x = 0; x < lv_area_get_width(&draw_area); x++, map_px += px_size_byte, px_i++) {
                 if(alpha_byte) {
                     lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
@@ -636,7 +636,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 #elif LV_COLOR_DEPTH == 16
                 c.full =  map_px[0] + (map_px[1] << 8);
 #elif LV_COLOR_DEPTH == 32
-                c.full =  map_px[0] + (map_px[1] << 8) + (map_px[2] << 16);
+                c.full =  *((uint32_t*)map_px);
 #endif
 
                 if (chroma_key) {
@@ -674,6 +674,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                 blend_area.y2 = blend_area.y1;
 
                 px_i = 0;
+                mask_res = (alpha_byte || chroma_key) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
 
                 /*Prepare the `mask_buf`if there are other masks*/
                 if(other_mask_cnt) {

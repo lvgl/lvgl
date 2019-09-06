@@ -54,8 +54,6 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_sty
 
     draw_bg(coords, clip, style, opa_scale);
     draw_shadow(coords, clip, style, opa_scale);
-
-
 }
 
 /**********************

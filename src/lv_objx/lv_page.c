@@ -108,7 +108,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new page object*/
     if(copy == NULL) {
-        ext->bg.masked = 1;
+        ext->bg.masked = 0;
         ext->scrl = lv_cont_create(new_page, NULL);
         lv_obj_set_signal_cb(ext->scrl, lv_page_scrollable_signal);
         lv_obj_set_design_cb(ext->scrl, lv_scrl_design);
