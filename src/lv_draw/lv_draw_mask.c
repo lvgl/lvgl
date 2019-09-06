@@ -224,8 +224,8 @@ lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_c
         if(p->flat) {
             /*Non sense: Can't be on the right/left of a horizontal line*/
             if(p->side == LV_DRAW_MASK_LINE_SIDE_LEFT || p->side == LV_DRAW_MASK_LINE_SIDE_RIGHT) return LV_DRAW_MASK_RES_FULL_COVER;
-            else if(p->side == LV_DRAW_MASK_LINE_SIDE_TOP && abs_y+1 < p->origo.y) return LV_DRAW_MASK_RES_FULL_COVER;
-            else if(p->side == LV_DRAW_MASK_LINE_SIDE_BOTTOM && abs_y > p->origo.y) return LV_DRAW_MASK_RES_FULL_COVER;
+            else if(p->side == LV_DRAW_MASK_LINE_SIDE_TOP && abs_y+1 < 0) return LV_DRAW_MASK_RES_FULL_COVER;
+            else if(p->side == LV_DRAW_MASK_LINE_SIDE_BOTTOM && abs_y > 0) return LV_DRAW_MASK_RES_FULL_COVER;
             else {
                 return LV_DRAW_MASK_RES_FULL_TRANSP;
             }
@@ -639,6 +639,70 @@ lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv
     }
 
     return LV_DRAW_MASK_RES_CHANGED;
+}
+
+
+void lv_draw_mask_fade_init(lv_draw_mask_param_t * param, lv_area_t * rect, lv_opa_t opa_top, lv_coord_t y_top, lv_opa_t opa_bottom, lv_coord_t y_bottom)
+{
+    lv_draw_mask_fade_param_t * p = &param->fade;
+
+    lv_area_copy(&p->rect, rect);
+    p->opa_top= opa_top;
+    p->opa_bottom = opa_bottom;
+    p->y_top= y_top;
+    p->y_bottom = y_bottom;
+}
+
+lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param)
+{
+    lv_draw_mask_fade_param_t * p = &param->fade;
+
+    if(abs_y < p->rect.y1) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_y > p->rect.y2) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_x + len < p->rect.x1) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_x > p->rect.x2) return LV_DRAW_MASK_RES_FULL_COVER;
+
+    if(abs_x + len > p->rect.x2) len -= abs_x + len - p->rect.x2 - 1;
+
+    if(abs_x < p->rect.x1) {
+        lv_coord_t x_ofs = 0;
+        x_ofs = p->rect.x1 - abs_x;
+        len -= x_ofs;
+        mask_buf += x_ofs;
+    }
+
+    lv_coord_t i;
+
+    if(abs_y <= p->y_top) {
+        for(i = 0; i < len; i++) {
+            mask_buf[i] = mask_mix(mask_buf[i], p->opa_top);
+        }
+        return LV_DRAW_MASK_RES_CHANGED;
+    } else if(abs_y >= p->y_bottom) {
+        for(i = 0; i < len; i++) {
+            mask_buf[i] = mask_mix(mask_buf[i], p->opa_bottom);
+        }
+        return LV_DRAW_MASK_RES_CHANGED;
+    } else {
+        /*Calculate the opa proportionally*/
+        int16_t opa_diff = p->opa_bottom - p->opa_top;
+        lv_coord_t y_diff = p->y_bottom - p->y_top + 1;
+        lv_opa_t opa_act = (int32_t)((int32_t)(abs_y - p->y_top) * opa_diff) / y_diff;
+        opa_act += p->opa_top;
+
+        for(i = 0; i < len; i++) {
+            mask_buf[i] = mask_mix(mask_buf[i], opa_act);
+        }
+        return LV_DRAW_MASK_RES_CHANGED;
+
+
+    }
+
+    return LV_DRAW_MASK_RES_FULL_COVER;
+
+
+
+
 }
 
 /**********************
