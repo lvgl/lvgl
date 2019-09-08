@@ -26,10 +26,19 @@
 #define LV_CHART_AXIS_MINOR_TICK_LEN_COE 2 / 3
 #define LV_CHART_AXIS_PRIMARY_Y 1
 #define LV_CHART_AXIS_SECONDARY_Y 0
+#define LV_CHART_LABEL_ITERATOR_FORWARD 1
+#define LV_CHART_LABEL_ITERATOR_REVERSE 0
 
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef struct {
+    const char * list_start;
+    const char * current_pos;
+    uint8_t items_left;
+    uint8_t is_reverse_iter;
+} label_iterator_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -46,6 +55,9 @@ static void lv_chart_draw_axes(lv_obj_t * chart, const lv_area_t * mask);
 static void lv_chart_inv_lines(lv_obj_t * chart, uint16_t i);
 static void lv_chart_inv_points(lv_obj_t * chart, uint16_t i);
 static void lv_chart_inv_cols(lv_obj_t * chart, uint16_t i);
+static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf);
+static bool lv_chart_is_tick_with_label(uint8_t tick_num, lv_chart_axis_cfg_t * axis);
+static label_iterator_t lv_chart_create_label_iter(const char * list, uint8_t iterator_dir);
 
 /**********************
  *  STATIC VARIABLES
@@ -1084,51 +1096,63 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
     }
 }
 
-#define LABEL_ITERATOR_FORWARD 1
-#define LABEL_ITERATOR_REVERSE 0
-
-typedef struct {
-    const char * list_start;
-    const char * current_pos;
-    uint8_t items_left;
-    uint8_t is_reverse_iter;
-} label_iterator_t;
-
+/**
+ * Create iterator for newline-separated list
+ * @param list pointer to newline-separated labels list
+ * @param iterator_dir LV_CHART_ITERATOR_FORWARD or LV_CHART_LABEL_ITERATOR_REVERSE
+ * @return label_iterator_t
+ */
 static label_iterator_t lv_chart_create_label_iter(const char * list, uint8_t iterator_dir)
 {
     label_iterator_t iterator = {0};
     uint8_t j;
+
     iterator.list_start = list;
 
+    /* count number of list items */
     for(j = 0; list[j] != '\0'; j++) {
             if(list[j] == '\n')
                iterator.items_left++;
     }
 
-    if (iterator_dir == LABEL_ITERATOR_FORWARD) {
+    if(iterator_dir == LV_CHART_LABEL_ITERATOR_FORWARD) {
         iterator.is_reverse_iter = 0;
         iterator.current_pos = list;
     } else {
         iterator.is_reverse_iter = 1;
-        iterator.current_pos = list + j - 2;
+        // -1 to skip '\0' at the end of the string
+        iterator.current_pos = list + j - 1;
+
+        if(*iterator.current_pos == '\n'){
+            iterator.current_pos--;
+        }
     }
     return iterator;
 }
 
+/**
+ * Get next label from iterator created by lv_chart_create_label_iter()
+ * @param iterator iterator to get label from
+ * @param[out] buf buffer to point next label to
+ */
 static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf)
 {
     uint8_t label_len = 0;
     if (iterator->is_reverse_iter) {
         if (iterator->items_left > 1) {
+            /* count the length of the current label*/
             while (*(iterator->current_pos - label_len) != '\n') {
                 label_len++;
             }
+            /* advance iterator to the next label */
             iterator->current_pos -= label_len;
+            /* iterator points to \n symbol, +1 to skip it*/
             strncpy(buf, iterator->current_pos + 1, label_len);
+            /* minus one symbol to skip newline*/
             iterator->current_pos--;
         } else {
             label_len = iterator->current_pos - iterator->list_start;
-            label_len++;;
+            label_len++;
             strncpy(buf, iterator->list_start, label_len);
         }
     } else {
@@ -1144,8 +1168,7 @@ static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf)
             }
         }
         iterator->current_pos += label_len;
-        //TODO: ugly 0
-        if(iterator->current_pos[0] == '\n') iterator->current_pos++;
+        if(*(iterator->current_pos) == '\n') iterator->current_pos++;
     }
 
     /* terminate the string */
@@ -1153,12 +1176,19 @@ static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf)
     iterator->items_left--;
 }
 
-static bool lv_chart_is_tick_with_label(uint8_t label_num, lv_chart_axis_cfg_t* axis)
+/**
+ * Check whether there should be a label next to tick with given
+ * number
+ * @param tick_num number of the tick to check
+ * @param axis pointer to struct containing info on the axis
+ * @return true if label should be located next to current tick
+ */
+static bool lv_chart_is_tick_with_label(uint8_t tick_num, lv_chart_axis_cfg_t * axis)
 {
-    if (axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) {
-        return ((label_num != 0) && ((label_num % axis->num_tick_marks) == 0));
+    if(axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) {
+        return ((tick_num != 0) && ((tick_num % axis->num_tick_marks) == 0));
     } else {
-        return ((label_num == 0) || ((label_num % axis->num_tick_marks) == 0));
+        return ((tick_num == 0) || ((tick_num % axis->num_tick_marks) == 0));
     }
 }
 
@@ -1176,10 +1206,13 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
         uint8_t i, j;
         uint8_t num_of_labels;
         uint8_t num_scale_ticks;
-        int16_t major_tick_len, minor_tick_len;
+        int8_t major_tick_len, minor_tick_len;
+        uint8_t iter_dir;
+
         lv_point_t p1;
         lv_point_t p2;
         lv_coord_t x_ofs;
+        label_iterator_t iter;
         lv_coord_t y_ofs = chart->coords.y1;
         lv_coord_t h     = lv_obj_get_height(chart);
         lv_coord_t w     = lv_obj_get_width(chart);
@@ -1207,9 +1240,11 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
             major_tick_len *= -1;
             minor_tick_len *= -1;
         }
-        /* count the '\n'-s to determine the number of options */
-        uint8_t iter_dir = (y_axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) ? LABEL_ITERATOR_REVERSE : LABEL_ITERATOR_FORWARD;
-        label_iterator_t iter = lv_chart_create_label_iter(y_axis->list_of_values, iter_dir);
+
+        iter_dir = (y_axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) ? LV_CHART_LABEL_ITERATOR_REVERSE : LV_CHART_LABEL_ITERATOR_FORWARD;
+        iter = lv_chart_create_label_iter(y_axis->list_of_values, iter_dir);
+
+        /*determine the number of options */
         num_of_labels = iter.items_left + 1;
 
         /* we can't have string labels without ticks step, set to 1 if not specified */
@@ -1224,6 +1259,8 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
         for(i = 0; i < (num_scale_ticks + 1); i++) { /* one extra loop - it may not exist in the list, empty label */
                                                      /* first point of the tick */
             p1.x = x_ofs;
+
+            /* move extra pixel out of chart boundary */
             if (which_axis == LV_CHART_AXIS_PRIMARY_Y)
                 p1.x--;
             else
@@ -1239,15 +1276,16 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
             p2.y = p1.y =
                 y_ofs + (int32_t)((int32_t)(h - style->line.width) * i) / num_scale_ticks;
 
-            if (y_axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) {
-                if (i != 0)
+            if(y_axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) {
+                /*if label order is inversed last tick have number 0*/
+                if(i != 0)
                     lv_draw_line(&p1, &p2, mask, style, opa_scale);
-                else if ((y_axis->options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
+                else if((y_axis->options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
                     lv_draw_line(&p1, &p2, mask, style, opa_scale);
             } else {
-                if (i != num_scale_ticks)
+                if(i != num_scale_ticks)
                     lv_draw_line(&p1, &p2, mask, style, opa_scale);
-                else if ((y_axis->options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
+                else if((y_axis->options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
                     lv_draw_line(&p1, &p2, mask, style, opa_scale);
             }
 
