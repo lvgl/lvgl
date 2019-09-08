@@ -137,8 +137,9 @@ void lv_style_init(void)
     lv_style_pretty.image.color       = lv_color_make(0x20, 0x20, 0x20);
     lv_style_pretty.line.color        = lv_color_make(0x20, 0x20, 0x20);
     lv_style_pretty.body.main_color   = LV_COLOR_WHITE;
-    lv_style_pretty.body.grad_color   = LV_COLOR_SILVER;
+    lv_style_pretty.body.grad_color   = LV_COLOR_BLACK;
     lv_style_pretty.body.radius       = LV_DPI / 5;
+//    lv_style_pretty.body.opa       = LV_OPA_40;//LV_DPI / 5;
     lv_style_pretty.body.border.color = lv_color_make(0x40, 0x40, 0x40);
     lv_style_pretty.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
     lv_style_pretty.body.border.opa   = LV_OPA_30;
@@ -174,7 +175,7 @@ void lv_style_init(void)
     lv_style_btn_rel.body.main_color     = lv_color_make(0x76, 0xa2, 0xd0);
     lv_style_btn_rel.body.grad_color     = lv_color_make(0x19, 0x3a, 0x5d);
     lv_style_btn_rel.body.radius         = LV_DPI / 15;
-    lv_style_btn_rel.body.opa         = LV_OPA_50;
+    lv_style_btn_rel.body.opa         = LV_OPA_COVER;
 //    lv_style_btn_rel.body.blend_mode = LV_BLEND_MODE_ADDITIVE;
     lv_style_btn_rel.body.padding.left   = LV_DPI / 4;
     lv_style_btn_rel.body.padding.right  = LV_DPI / 4;
@@ -184,7 +185,7 @@ void lv_style_init(void)
     lv_style_btn_rel.body.border.color   = lv_color_make(0x0b, 0x19, 0x28);
     lv_style_btn_rel.body.border.width   = LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
     lv_style_btn_rel.body.border.opa     = LV_OPA_70;
-    lv_style_btn_rel.body.shadow.color   = LV_COLOR_WHITE;
+    lv_style_btn_rel.body.shadow.color   = LV_COLOR_BLACK;
     lv_style_btn_rel.body.shadow.width   = 0;
     lv_style_btn_rel.body.shadow.spread =  0;
 //    lv_style_btn_rel.body.shadow.blend_mode =  LV_BLEND_MODE_SUBTRACTIVE;

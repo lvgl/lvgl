@@ -36,9 +36,6 @@ static void fill_true_color_blended(const lv_area_t * disp_area, lv_color_t * di
         const lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_blend_mode_t mode);
 
 
-
-static inline lv_color_t color_mix_with_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa);
-
 static inline lv_color_t color_blend_true_color_additive(lv_color_t bg, lv_color_t fg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 
@@ -96,7 +93,37 @@ void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
     draw_area.x2 -= disp_area->x1;
     draw_area.y2 -= disp_area->y1;
 
-    if(mode == LV_BLEND_MODE_NORMAL) {
+    if(disp->driver.set_px_cb) {
+        lv_coord_t x;
+        lv_coord_t y;
+
+        /*Get the width of the `disp_area` it will be used to go to the next line*/
+        lv_coord_t disp_w = lv_area_get_width(disp_area);
+
+        if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
+            for(y = draw_area.y1; y <= draw_area.y2; y++) {
+                for(x = draw_area.x1; x <= draw_area.x2; x++) {
+                    disp->driver.set_px_cb(&disp->driver, (void*)disp_buf, disp_w, x, y, color, opa);
+                }
+            }
+        } else {
+            /* The mask is relative to the clipped area.
+             * In the cycles below mask will be indexed from `draw_area.x1`
+             * but it corresponds to zero index. So prepare `mask_tmp` accordingly. */
+            const lv_opa_t * mask_tmp = mask - draw_area.x1;
+
+            /*Get the width of the `draw_area` it will be used to go to the next line of the mask*/
+            lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
+
+            for(y = draw_area.y1; y <= draw_area.y2; y++) {
+                for(x = draw_area.x1; x <= draw_area.x2; x++) {
+                    disp->driver.set_px_cb(&disp->driver, (void*)disp_buf, disp_w, x, y, color, (uint16_t)((uint16_t)opa * mask_tmp[x]) >> 8);
+                }
+                mask_tmp += draw_area_w;
+            }
+        }
+    }
+    else if(mode == LV_BLEND_MODE_NORMAL) {
         fill_true_color_normal(disp_area, disp_buf, &draw_area, color, opa, mask, mask_res);
     }
     else {
@@ -146,6 +173,11 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
 
     /*Create a temp. map_buf which always point to current line to draw*/
     const lv_color_t * map_buf_tmp = map_buf + map_w * (draw_area.y1 - (map_area->y1 - disp_area->y1));
+
+
+#if LV_COLOR_SCREEN_TRANSP
+    lv_opa_t opa_composed;
+#endif
 
     lv_coord_t x;
     lv_coord_t y;
@@ -207,7 +239,8 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
                     if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full || last_map_color.full != map_buf_tmp[x].full) {
 #if LV_COLOR_SCREEN_TRANSP
                         if(disp->driver.screen_transp) {
-                            last_res_color = color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[x].ch.alpha, map_buf_tmp[x], mask_tmp[x]);
+                            lv_color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[x].ch.alpha, map_buf_tmp[x], mask_tmp[x], &last_res_color, &opa_composed);
+                            last_res_color.ch.alpha = opa_composed;
                         } else
 #endif
                         {
@@ -311,7 +344,7 @@ static void fill_true_color_normal(const lv_area_t * disp_area, lv_color_t * dis
 
 #if LV_COLOR_SCREEN_TRANSP
                         if(disp->driver.screen_transp) {
-                            last_res_color = color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[x].ch.alpha, color, opa);
+                            lv_color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[x].ch.alpha, color, opa, &last_res_color, &last_res_color.ch.alpha);
                         } else
 #endif
                         {
@@ -343,10 +376,11 @@ static void fill_true_color_normal(const lv_area_t * disp_area, lv_color_t * dis
             for(y = draw_area->y1; y <= draw_area->y2; y++) {
                 for(x = draw_area->x1; x <= draw_area->x2; x++) {
                     if(mask_tmp[x] == 0) continue;
-                    if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full) {
+                    if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full)
+                    {
 #if LV_COLOR_SCREEN_TRANSP
                         if(disp->driver.screen_transp) {
-                            last_res_color = color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[x].ch.alpha, color, mask_tmp[x]);
+                            lv_color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[x].ch.alpha, color, mask_tmp[x], &last_res_color, &last_res_color.ch.alpha);
                         } else
 #endif
                         {
@@ -373,7 +407,7 @@ static void fill_true_color_normal(const lv_area_t * disp_area, lv_color_t * dis
                         lv_opa_t opa_tmp = (uint16_t)((uint16_t)mask_tmp[x] * opa) >> 8;
 #if LV_COLOR_SCREEN_TRANSP
                         if(disp->driver.screen_transp) {
-                            last_res_color = color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[x].ch.alpha, color, opa_tmp);
+                            lv_color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[x].ch.alpha, color, opa_tmp, &last_res_color, &last_res_color.ch.alpha);
                         } else
 #endif
                         {
@@ -470,59 +504,6 @@ static void fill_true_color_blended(const lv_area_t * disp_area, lv_color_t * di
             disp_buf_tmp += disp_w;
             mask_tmp += draw_area_w;
         }
-    }
-}
-
-/**
- * Mix two colors. Both color can have alpha value. It requires ARGB888 colors.
- * @param bg_color background color
- * @param bg_opa alpha of the background color
- * @param fg_color foreground color
- * @param fg_opa alpha of the foreground color
- * @return the mixed color. the alpha channel (color.alpha) contains the result alpha
- */
-static inline lv_color_t color_mix_with_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa)
-{
-    /* Pick the foreground if it's fully opaque or the Background is fully transparent*/
-    if(fg_opa > LV_OPA_MAX || bg_opa <= LV_OPA_MIN) {
-        fg_color.ch.alpha = fg_opa;
-        return fg_color;
-    }
-    /*Transparent foreground: use the Background*/
-    else if(fg_opa <= LV_OPA_MIN) {
-        return bg_color;
-    }
-    /*Opaque background: use simple mix*/
-    else if(bg_opa >= LV_OPA_MAX) {
-        return lv_color_mix(fg_color, bg_color, fg_opa);
-    }
-    /*Both colors have alpha. Expensive calculation need to be applied*/
-    else {
-        /*Save the parameters and the result. If they will be asked again don't compute again*/
-        static lv_opa_t fg_opa_save     = 0;
-        static lv_opa_t bg_opa_save     = 0;
-        static lv_color_t fg_color_save = {{0}};
-        static lv_color_t bg_color_save = {{0}};
-        static lv_color_t c             = {{0}};
-
-        if(fg_opa != fg_opa_save || bg_opa != bg_opa_save || fg_color.full != fg_color_save.full ||
-                bg_color.full != bg_color_save.full) {
-            fg_opa_save        = fg_opa;
-            bg_opa_save        = bg_opa;
-            fg_color_save.full = fg_color.full;
-            bg_color_save.full = bg_color.full;
-            /*Info:
-             * https://en.wikipedia.org/wiki/Alpha_compositing#Analytical_derivation_of_the_over_operator*/
-            lv_opa_t alpha_res = 255 - ((uint16_t)((uint16_t)(255 - fg_opa) * (255 - bg_opa)) >> 8);
-            if(alpha_res == 0) {
-                while(1)
-                    ;
-            }
-            lv_opa_t ratio = (uint16_t)((uint16_t)fg_opa * 255) / alpha_res;
-            c              = lv_color_mix(fg_color, bg_color, ratio);
-            c.ch.alpha     = alpha_res;
-        }
-        return c;
     }
 }
 
