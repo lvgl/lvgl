@@ -1334,6 +1334,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
         uint8_t num_of_labels;
         uint8_t num_scale_ticks;
         uint8_t major_tick_len, minor_tick_len;
+        label_iterator_t iter;
         lv_point_t p1;
         lv_point_t p2;
         lv_coord_t x_ofs = chart->coords.x1;
@@ -1353,16 +1354,9 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
         else
             minor_tick_len = ext->x_axis.minor_tick_len;
 
-        /* count the '\n'-s to determine the number of options */
-        list_index    = 0;
-        num_of_labels = 0;
-        if(ext->x_axis.list_of_values != NULL) {
-            for(j = 0; ext->x_axis.list_of_values[j] != '\0'; j++) {
-                if(ext->x_axis.list_of_values[j] == '\n') num_of_labels++;
-            }
-
-            num_of_labels++; /* last option in the at row*/
-        }
+        /*determine the number of options */
+        iter = lv_chart_create_label_iter(ext->x_axis.list_of_values, LV_CHART_LABEL_ITERATOR_FORWARD);
+        num_of_labels = iter.items_left + 1;
 
         /* we can't have string labels without ticks step, set to 1 if not specified */
         if(ext->x_axis.num_tick_marks == 0) ext->x_axis.num_tick_marks = 1;
@@ -1394,23 +1388,8 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
             /* draw values if available */
             if(num_of_labels != 0) {
                 /* add text only to major tick */
-                if(i == 0 || i % ext->x_axis.num_tick_marks == 0) {
-                    /* search for tick string */
-                    j = 0;
-                    while(ext->x_axis.list_of_values[list_index] != '\n' &&
-                          ext->x_axis.list_of_values[list_index] != '\0') {
-                        /* do not overflow the buffer, but move to the end of the current label */
-                        if(j < LV_CHART_AXIS_TICK_LABEL_MAX_LEN)
-                            buf[j++] = ext->x_axis.list_of_values[list_index++];
-                        else
-                            list_index++;
-                    }
-
-                    /* this was a string, but not end of the list, so jump to the next string */
-                    if(ext->x_axis.list_of_values[list_index] == '\n') list_index++;
-
-                    /* terminate the string */
-                    buf[j] = '\0';
+                if(lv_chart_is_tick_with_label(i, &(ext->x_axis))) {
+                    lv_chart_get_next_label(&iter, buf);
 
                     /* reserve appropriate area */
                     lv_point_t size;
