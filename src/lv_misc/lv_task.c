@@ -291,7 +291,7 @@ void lv_task_set_prio(lv_task_t * task, lv_task_prio_t prio)
  */
 void lv_task_set_period(lv_task_t * task, uint32_t period)
 {     
-    task->last_run = lv_tick_get();
+    lv_task_reset(task);
     task->period = period;
 }
 
