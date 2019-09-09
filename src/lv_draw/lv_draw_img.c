@@ -485,8 +485,8 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
                              successfully.*/
     }
 
-    lv_opa_t opa =
-        opa_scale == LV_OPA_COVER ? style->image.opa : (uint16_t)((uint16_t)style->image.opa * opa_scale) >> 8;
+    lv_opa_t opa = style->image.opa;
+    if(opa_scale != LV_OPA_COVER) opa = (opa * opa_scale) >> 8;
 
     lv_img_cache_entry_t * cdsc = lv_img_cache_open(src, style);
 
@@ -655,7 +655,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
             /*Apply the masks if any*/
             if(other_mask_cnt) {
-                lv_draw_mask_res_t mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1, lv_area_get_width(&draw_area));
+                lv_draw_mask_res_t mask_res_sub;
+                mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1, lv_area_get_width(&draw_area));
                 if(mask_res_sub == LV_DRAW_MASK_RES_FULL_TRANSP) {
                     memset(mask_buf + px_i_start, 0x00, lv_area_get_width(&draw_area));
                     mask_res = LV_DRAW_MASK_RES_CHANGED;
@@ -668,7 +669,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             if(px_i + lv_area_get_width(&draw_area) < sizeof(mask_buf)) {
                 blend_area.y2 ++;
             } else {
-                lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, LV_OPA_COVER, LV_BLEND_MODE_NORMAL);
+                lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, LV_BLEND_MODE_NORMAL);
 
                 blend_area.y1 = blend_area.y2 + 1;
                 blend_area.y2 = blend_area.y1;
@@ -685,7 +686,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         /*Flush the last part*/
         if(blend_area.y1 != blend_area.y2) {
             blend_area.y2--;
-            lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, LV_OPA_COVER, LV_BLEND_MODE_NORMAL);
+            lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, LV_BLEND_MODE_NORMAL);
         }
 
     }

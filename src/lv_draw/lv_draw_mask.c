@@ -249,7 +249,7 @@ lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_c
                 else {
                     int32_t k = - abs_x;
                     if(k < 0) k = 0;
-                    if(k >= 0 && k < len) memset(&mask_buf[00], 0x00,k);
+                    if(k >= 0 && k < len) memset(&mask_buf[0], 0x00,k);
                     return  LV_DRAW_MASK_RES_CHANGED;
                 }
             }
@@ -479,7 +479,7 @@ lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv
             if(first < 0) first = 0;
             if(first <= len) {
                 int32_t last =  p->rect.x2 - abs_x - first + 1;
-                if(last > len) last = len;
+                if(first + last > len) last = len - first;
                 if(last >= 0) {
                     memset(&mask_buf[first], 0x00, last);
                 }
@@ -541,11 +541,11 @@ lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv
             if(p->inv == 0) {
                 kr++;
                 if(kl > len) kl  = len;
-                if(kl >= 0 && p->inv == 0) {
+                if(kl >= 0) {
                     memset(&mask_buf[0], 0x00, kl);
                 }
                 if(kr < 0) kr = 0;
-                if(kr <= len && p->inv == 0) {
+                if(kr <= len) {
                     memset(&mask_buf[kr], 0x00, len-kr);
                 }
             } else {
@@ -554,7 +554,7 @@ lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv
                 if(first < 0) first = 0;
 
                 int32_t len_tmp = kr-first;
-                if(len_tmp > len) len_tmp = len;
+                if(len_tmp + first > len) len_tmp = len - first;
                 if(first < len && len_tmp >= 0) {
                     memset(&mask_buf[first], 0x00, len_tmp);
                 }
@@ -571,7 +571,7 @@ lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv
                 if(first < 0) first = 0;
 
                 int32_t len_tmp = kr-first;
-                if(len_tmp > len) len_tmp = len;
+                if(len_tmp + first > len) len_tmp = len - first;
                 if(first < len && len_tmp >= 0) {
                     memset(&mask_buf[first], 0x00, len_tmp);
                 }

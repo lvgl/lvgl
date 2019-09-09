@@ -16,6 +16,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define SHADOW_UPSACALE_SHIFT   6
+#define SHADOW_ENHANCE          1
 
 /**********************
  *      TYPEDEFS
@@ -63,6 +65,7 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_sty
 static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_style_t * style, lv_opa_t opa_scale)
 {
     lv_opa_t opa = style->body.opa;
+    if(opa_scale != LV_OPA_COVER) opa = (opa * opa_scale) >> 8;
 
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
@@ -193,6 +196,9 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
     /*Draw the border if any*/
     lv_coord_t border_width = style->body.border.width;
     if(border_width) {
+        opa = style->body.border.opa;
+        if(opa_scale != LV_OPA_COVER) opa = (opa * opa_scale) >> 8;
+
         /*Move the vdb_buf_tmp to the first row*/
         lv_draw_mask_param_t mask_rsmall_param;
 
@@ -641,8 +647,11 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
         sh_buf_tmp = sh_buf + corner_size - 1;
 
-        y_max = corner_size;
-        if(simple_mode)  y_max = sw / 2 + 1;
+        y_max = corner_size - ver_mid_dist;
+        if(simple_mode) {
+            y_max = sw / 2 + 1;
+            if(y_max > corner_size - ver_mid_dist) y_max = corner_size - ver_mid_dist;
+        }
 
         for(y = 0; y < y_max; y++) {
             if(simple_mode == false) {
@@ -666,7 +675,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
         }
 
         /*Fill the bottom side*/
-        lv_coord_t y_min = simple_mode ? (corner_size - (sh_area.y2 - coords->y2)) : 0;
+        lv_coord_t y_min = simple_mode ? (corner_size - (sh_area.y2 - coords->y2)) : ver_mid_dist;
         if(y_min < 0) y_min = 0;
         sh_buf_tmp = sh_buf + corner_size * (corner_size - y_min - 1 ) + corner_size - 1;
 
@@ -695,8 +704,6 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
     /*Finally fill the middle area*/
     if(simple_mode == false) {
-//        a.x1 = sh_area.x1 + corner_size + first_px;
-//        a.x2 = sh_area.x2 - corner_size;
         a.y1 = sh_area.y1 + corner_size;
         a.y2 = a.y1;
         if(a.x1 <= a.x2) {
@@ -715,9 +722,6 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     lv_draw_mask_remove_id(mask_rout_id);
 
 }
-
-#define SHADOW_UPSACALE_SHIFT   6
-#define SHADOW_ENHANCE          1
 
 static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, lv_coord_t sw, lv_coord_t r)
 {
