@@ -611,6 +611,17 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         lv_coord_t end_angle_first = (rel_y * p->end_line.xy_steep) >> 10;
         lv_coord_t start_angle_last= ((rel_y+1) * p->start_line.xy_steep) >> 10;
 
+
+        /*Do not let the line end cross the origo else it will affect the opposite part*/
+        if(p->start_angle > 270 && p->start_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->start_angle > 0 && p->start_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->start_angle > 90 && p->start_angle < 270 && start_angle_last > 0) start_angle_last = 0;
+
+        if(p->end_angle > 270 && p->end_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->end_angle > 0 &&   p->end_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->end_angle > 90 &&  p->end_angle < 270 && start_angle_last > 0) start_angle_last = 0;
+
+
         int32_t dist = (end_angle_first - start_angle_last) >> 1;
 
         lv_draw_mask_res_t res1 = LV_DRAW_MASK_RES_FULL_COVER;
