@@ -98,11 +98,18 @@ typedef struct {
 }lv_draw_mask_fade_param_t;
 
 
+typedef struct {
+    lv_area_t coords;
+    const lv_opa_t * map;
+}lv_draw_mask_map_param_t;
+
+
 typedef union {
     lv_draw_mask_line_param_t line;
     lv_draw_mask_radius_param_t radius;
     lv_draw_mask_angle_param_t angle;
     lv_draw_mask_fade_param_t fade;
+    lv_draw_mask_map_param_t map;
 }lv_draw_mask_param_t;
 
 typedef lv_draw_mask_res_t (*lv_draw_mask_cb_t)(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * p);
@@ -132,6 +139,9 @@ lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_
 
 void lv_draw_mask_fade_init(lv_draw_mask_param_t * param, lv_area_t * rect, lv_opa_t opa_top, lv_coord_t y_top, lv_opa_t opa_bottom, lv_coord_t y_bottom);
 lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param);
+
+void lv_draw_mask_map_init(lv_draw_mask_param_t * param, lv_area_t * coords, const lv_opa_t * map);
+lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param);
 
 /**********************
  *      MACROS

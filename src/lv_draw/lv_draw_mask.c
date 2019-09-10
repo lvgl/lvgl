@@ -711,12 +711,49 @@ lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_c
 
 
     }
-
     return LV_DRAW_MASK_RES_FULL_COVER;
+}
+
+void lv_draw_mask_map_init(lv_draw_mask_param_t * param, lv_area_t * coords, const lv_opa_t * map)
+{
+    lv_draw_mask_map_param_t * p = &param->fade;
+
+    lv_area_copy(&p->coords, coords);
+    p->map = map;
+}
+
+lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param)
+{
+    lv_draw_mask_map_param_t * p = &param->map;
+
+    /*Handle out of the mask cases*/
+    if(abs_y < p->coords.y1) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_y > p->coords.y2) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_x + len < p->coords.x1) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_x > p->coords.x2) return LV_DRAW_MASK_RES_FULL_COVER;
+
+    /*Got to the current row in the map*/
+    const lv_opa_t * map_tmp = p->map;
+    map_tmp += (abs_y - p->coords.y1) * lv_area_get_width(&p-> coords);
 
 
+    if(abs_x + len > p->coords.x2) len -= abs_x + len - p->coords.x2 - 1;
 
+    if(abs_x < p->coords.x1) {
+        lv_coord_t x_ofs = 0;
+        x_ofs = p->coords.x1 - abs_x;
+        len -= x_ofs;
+        mask_buf += x_ofs;
+    } else {
+        map_tmp += (abs_x - p->coords.x1);
+    }
 
+    lv_coord_t i;
+    for(i = 0; i < len; i++) {
+        mask_buf[i] = mask_mix(mask_buf[i], map_tmp[i]);
+    }
+
+    return LV_DRAW_MASK_RES_CHANGED;
 }
 
 /**********************
