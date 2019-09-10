@@ -438,7 +438,10 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
         if(found_p == NULL) {
             const lv_style_t * style = lv_obj_get_style(obj);
             if(style->body.opa == LV_OPA_COVER && design_res == LV_DESIGN_RES_COVER &&
-               lv_obj_get_opa_scale(obj) == LV_OPA_COVER) {
+               lv_obj_get_opa_scale(obj) == LV_OPA_COVER &&
+               style->body.blend_mode == LV_BLEND_MODE_NORMAL &&
+               style->body.border.blend_mode == LV_BLEND_MODE_NORMAL &&
+               style->image.blend_mode == LV_BLEND_MODE_NORMAL) {
                 found_p = obj;
             }
         }

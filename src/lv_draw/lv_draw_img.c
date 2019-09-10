@@ -27,7 +27,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
                                  const lv_style_t * style, lv_opa_t opa_scale);
 
 static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p, lv_opa_t opa,
-        bool chroma_key, bool alpha_byte, lv_color_t recolor, lv_opa_t recolor_opa);
+        bool chroma_key, bool alpha_byte, const lv_style_t * style);
 
 /**********************
  *  STATIC VARIABLES
@@ -504,8 +504,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
     /* The decoder open could open the image and gave the entire uncompressed image.
      * Just draw it!*/
     else if(cdsc->dec_dsc.img_data) {
-        lv_draw_map(coords, mask, cdsc->dec_dsc.img_data, opa, chroma_keyed, alpha_byte, style->image.color,
-                    style->image.intense);
+        lv_draw_map(coords, mask, cdsc->dec_dsc.img_data, opa, chroma_keyed, alpha_byte, style);
     }
     /* The whole uncompressed image is not available. Try to read it line-by-line*/
     else {
@@ -527,7 +526,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
                 LV_LOG_WARN("Image draw can't read the line");
                 return LV_RES_INV;
             }
-            lv_draw_map(&line, mask, buf, opa, chroma_keyed, alpha_byte, style->image.color, style->image.intense);
+            lv_draw_map(&line, mask, buf, opa, chroma_keyed, alpha_byte, style);
             line.y1++;
             line.y2++;
             y++;
@@ -545,11 +544,10 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
  * @param opa opacity of the map
  * @param chroma_keyed true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
  * @param alpha_byte true: extra alpha byte is inserted for every pixel
- * @param recolor mix the pixels with this color
- * @param recolor_opa the intense of recoloring
+ * @param style style of the image
  */
 static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p, lv_opa_t opa,
-        bool chroma_key, bool alpha_byte, lv_color_t recolor, lv_opa_t recolor_opa)
+        bool chroma_key, bool alpha_byte, const lv_style_t * style)
 {
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
@@ -578,8 +576,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
 
     /*The simplest case just copy the pixels into the VDB*/
-    if(other_mask_cnt == 0 && chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && recolor_opa == LV_OPA_TRANSP) {
-        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, LV_OPA_COVER, LV_BLEND_MODE_NORMAL);
+    if(other_mask_cnt == 0 && chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && style->image.intense == LV_OPA_TRANSP) {
+        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, LV_OPA_COVER, style->image.blend_mode);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
@@ -646,8 +644,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                     }
                 }
 
-                if(recolor_opa != 0) {
-                    c = lv_color_mix(recolor, c, recolor_opa);
+                if(style->image.intense != 0) {
+                    c = lv_color_mix(style->image.color, c, style->image.intense);
                 }
 
                 map2[px_i].full = c.full;
@@ -669,7 +667,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             if(px_i + lv_area_get_width(&draw_area) < sizeof(mask_buf)) {
                 blend_area.y2 ++;
             } else {
-                lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, LV_BLEND_MODE_NORMAL);
+                lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, style->image.blend_mode);
 
                 blend_area.y1 = blend_area.y2 + 1;
                 blend_area.y2 = blend_area.y1;
@@ -686,7 +684,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         /*Flush the last part*/
         if(blend_area.y1 != blend_area.y2) {
             blend_area.y2--;
-            lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, LV_BLEND_MODE_NORMAL);
+            lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, style->image.blend_mode);
         }
 
     }

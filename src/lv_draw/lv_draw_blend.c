@@ -47,6 +47,10 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
         const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
         const lv_opa_t * mask, lv_draw_mask_res_t mask_res);
 
+static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
+        const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
+        const lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_blend_mode_t mode);
+
 static inline lv_color_t color_blend_true_color_additive(lv_color_t bg, lv_color_t fg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 
@@ -151,8 +155,9 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
     }
     else if(mode == LV_BLEND_MODE_NORMAL) {
         map_normal(disp_area, disp_buf, &draw_area, map_area, map_buf, opa, mask, mask_res);
+    } else {
+        map_blended(disp_area, disp_buf, &draw_area, map_area, map_buf, opa, mask, mask_res, mode);
     }
-
 }
 
 
@@ -419,7 +424,7 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
                 if(mask_tmp[x] == 0) continue;
                 if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full) {
-                    lv_opa_t opa_tmp = (uint16_t)((uint16_t)mask_tmp[x] * opa) >> 8;
+                    lv_opa_t opa_tmp = mask_tmp[x] >= LV_OPA_MAX ? opa : (uint16_t)((uint16_t)mask_tmp[x] * opa) >> 8;
 
                     last_res_color = blend_fp(color, disp_buf_tmp[x], opa_tmp);
                     last_mask = mask_tmp[x];
@@ -621,6 +626,80 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
                 mask_tmp += draw_area_w;
                 map_buf_tmp += map_w;
             }
+        }
+    }
+}
+
+static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
+        const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
+        const lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_blend_mode_t mode)
+{
+
+    /*Get the width of the `disp_area` it will be used to go to the next line*/
+    lv_coord_t disp_w = lv_area_get_width(disp_area);
+
+    /*Get the width of the `draw_area` it will be used to go to the next line of the mask*/
+    lv_coord_t draw_area_w = lv_area_get_width(draw_area);
+
+    /*Get the width of the `mask_area` it will be used to go to the next line*/
+    lv_coord_t map_w = lv_area_get_width(map_area);
+
+    /*Create a temp. disp_buf which always point to current line to draw*/
+    lv_color_t * disp_buf_tmp = disp_buf + disp_w * draw_area->y1;
+
+    /*Create a temp. map_buf which always point to current line to draw*/
+    const lv_color_t * map_buf_tmp = map_buf + map_w * (draw_area->y1 - (map_area->y1 - disp_area->y1));
+
+    lv_color_t (*blend_fp)(lv_color_t, lv_color_t, lv_opa_t);
+    switch (mode) {
+    case LV_BLEND_MODE_ADDITIVE:
+        blend_fp = color_blend_true_color_additive;
+        break;
+    case LV_BLEND_MODE_SUBTRACTIVE:
+        blend_fp = color_blend_true_color_subtractive;
+        break;
+    default:
+        LV_LOG_WARN("fill_blended: unsupported blend mode");
+        return;
+        break;
+    }
+
+    lv_coord_t x;
+    lv_coord_t y;
+
+    /*Simple fill (maybe with opacity), no masking*/
+    if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
+        /*Go to the first px of the row*/
+        map_buf_tmp += (draw_area->x1 - (map_area->x1 - disp_area->x1));
+
+        /*The map will be indexed from `draw_area->x1` so compensate it.*/
+        map_buf_tmp -= draw_area->x1;
+
+        for(y = draw_area->y1; y <= draw_area->y2; y++) {
+            for(x = draw_area->x1; x <= draw_area->x2; x++) {
+                disp_buf_tmp[x] = blend_fp(map_buf_tmp[x], disp_buf_tmp[x], opa);
+            }
+            disp_buf_tmp += disp_w;
+            map_buf_tmp += map_w;
+        }
+    }
+    /*Masked*/
+    else {
+        /* The mask is relative to the clipped area.
+         * In the cycles below mask will be indexed from `draw_area.x1`
+         * but it corresponds to zero index. So prepare `mask_tmp` accordingly. */
+        const lv_opa_t * mask_tmp = mask - draw_area->x1;
+
+        map_buf_tmp -= draw_area->x1;
+        for(y = draw_area->y1; y <= draw_area->y2; y++) {
+            for(x = draw_area->x1; x <= draw_area->x2; x++) {
+                if(mask_tmp[x] == 0) continue;
+                lv_opa_t opa_tmp = mask_tmp[x] >= LV_OPA_MAX ? opa : ((opa * mask_tmp[x]) >> 8);
+                disp_buf_tmp[x] = blend_fp(map_buf_tmp[x], disp_buf_tmp[x], opa_tmp);
+            }
+            disp_buf_tmp += disp_w;
+            mask_tmp += draw_area_w;
+            map_buf_tmp += map_w;
         }
     }
 }

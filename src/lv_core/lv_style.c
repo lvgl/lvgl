@@ -71,7 +71,7 @@ void lv_style_init(void)
 
     /*Screen style*/
     lv_style_scr.glass               = 0;
-    lv_style_scr.body.opa            = LV_OPA_TRANSP;
+    lv_style_scr.body.opa            = LV_OPA_COVER;
     lv_style_scr.body.main_color     = LV_COLOR_WHITE;
     lv_style_scr.body.grad_color     = LV_COLOR_WHITE;
     lv_style_scr.body.radius         = 0;
@@ -107,7 +107,7 @@ void lv_style_init(void)
     lv_style_scr.image.opa     = LV_OPA_COVER;
     lv_style_scr.image.color   = lv_color_make(0x20, 0x20, 0x20);
     lv_style_scr.image.intense = LV_OPA_TRANSP;
-    lv_style_scr.image.blend_mode = LV_BLEND_MODE_NORMAL;
+    lv_style_scr.image.blend_mode = LV_BLEND_MODE_SUBTRACTIVE;
 
     lv_style_scr.line.opa     = LV_OPA_COVER;
     lv_style_scr.line.color   = lv_color_make(0x20, 0x20, 0x20);
@@ -127,9 +127,11 @@ void lv_style_init(void)
     lv_style_copy(&lv_style_plain_color, &lv_style_plain);
     lv_style_plain_color.text.color      = lv_color_make(0xf0, 0xf0, 0xf0);
     lv_style_plain_color.image.color     = lv_color_make(0xf0, 0xf0, 0xf0);
+//    lv_style_plain_color.image.blend_mode = LV_BLEND_MODE_SUBTRACTIVE;
     lv_style_plain_color.line.color      = lv_color_make(0xf0, 0xf0, 0xf0);
     lv_style_plain_color.body.main_color = lv_color_make(0x55, 0x96, 0xd8);
     lv_style_plain_color.body.grad_color = lv_style_plain_color.body.main_color;
+
 
     /*Pretty style */
     lv_style_copy(&lv_style_pretty, &lv_style_plain);
@@ -137,9 +139,8 @@ void lv_style_init(void)
     lv_style_pretty.image.color       = lv_color_make(0x20, 0x20, 0x20);
     lv_style_pretty.line.color        = lv_color_make(0x20, 0x20, 0x20);
     lv_style_pretty.body.main_color   = LV_COLOR_WHITE;
-    lv_style_pretty.body.grad_color   = LV_COLOR_BLACK;
+    lv_style_pretty.body.grad_color   = LV_COLOR_SILVER;
     lv_style_pretty.body.radius       = LV_DPI / 5;
-//    lv_style_pretty.body.opa       = LV_OPA_40;//LV_DPI / 5;
     lv_style_pretty.body.border.color = lv_color_make(0x40, 0x40, 0x40);
     lv_style_pretty.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
     lv_style_pretty.body.border.opa   = LV_OPA_30;
