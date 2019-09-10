@@ -252,7 +252,7 @@ static lv_design_res_t lv_cont_design(lv_obj_t * cont, const lv_area_t * clip_ar
             const lv_style_t * style = lv_cont_get_style(cont, LV_CONT_STYLE_MAIN);
             lv_draw_mask_param_t mp;
             lv_draw_mask_radius_init(&mp, &cont->coords, style->body.radius, false);
-            lv_draw_mask_add(lv_draw_mask_radius, &mp, cont + 4);
+            lv_draw_mask_add(&mp, cont + 4);
         }
     } else if(mode == LV_DESIGN_DRAW_POST) {
         lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);

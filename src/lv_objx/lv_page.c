@@ -658,7 +658,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
             const lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
             lv_draw_mask_param_t mp;
             lv_draw_mask_radius_init(&mp, &page->coords, style->body.radius, false);
-            lv_draw_mask_add(lv_draw_mask_radius, &mp, page + 4);
+            lv_draw_mask_add(&mp, page + 4);
         }
     } else if(mode == LV_DESIGN_DRAW_POST) {
         /*Draw only a border*/

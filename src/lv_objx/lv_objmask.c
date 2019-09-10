@@ -89,14 +89,13 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
  * Add/remove functions
  *=====================*/
 
-void lv_objmask_add_mask(lv_obj_t * objmask, lv_draw_mask_param_t * param, lv_draw_mask_cb_t mask_cb, uint8_t id)
+void lv_objmask_add_mask(lv_obj_t * objmask, lv_draw_mask_param_t * param, uint8_t id)
 {
     lv_objmask_ext_t * ext = lv_obj_get_ext_attr(objmask);
 
     lv_objmask_mask_t * m = lv_ll_ins_head(&ext->mask_ll);
 
     memcpy(&m->param, param, sizeof(lv_draw_mask_param_t));
-    m->mask_cb = mask_cb;
     m->id = id;
 }
 
@@ -148,14 +147,15 @@ static lv_design_res_t lv_objmask_design(lv_obj_t * objmask, const lv_area_t * c
         lv_objmask_mask_t * m;
 
         LV_LL_READ(ext->mask_ll, m) {
-            lv_draw_mask_add(m->mask_cb, &m->param, objmask);
+            lv_draw_mask_add(&m->param, &ext->mask_ll);
         }
 
 
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
-        lv_draw_mask_remove_custom(objmask);
+        lv_objmask_ext_t * ext = lv_obj_get_ext_attr(objmask);
+        lv_draw_mask_remove_custom(&ext->mask_ll);
     }
 
     return LV_DESIGN_RES_OK;

@@ -286,10 +286,10 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     lv_draw_mask_line_points_init(&mask_top_param, p1.x, p1.y, p1.x - ydiff, p1.y + xdiff, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
     lv_draw_mask_line_points_init(&mask_bottom_param, p2.x, p2.y,p2.x - ydiff, p2.y + xdiff,  LV_DRAW_MASK_LINE_SIDE_TOP);
 
-    int16_t mask_left_id = lv_draw_mask_add(lv_draw_mask_line, &mask_left_param, NULL);
-    int16_t mask_right_id = lv_draw_mask_add(lv_draw_mask_line, &mask_right_param, NULL);
-    int16_t mask_top_id = lv_draw_mask_add(lv_draw_mask_line, &mask_top_param, NULL);
-    int16_t mask_bottom_id = lv_draw_mask_add(lv_draw_mask_line, &mask_bottom_param, NULL);
+    int16_t mask_left_id = lv_draw_mask_add(&mask_left_param, NULL);
+    int16_t mask_right_id = lv_draw_mask_add(&mask_right_param, NULL);
+    int16_t mask_top_id = lv_draw_mask_add(&mask_top_param, NULL);
+    int16_t mask_bottom_id = lv_draw_mask_add(&mask_bottom_param, NULL);
 
     lv_disp_t * disp    = lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);

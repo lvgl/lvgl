@@ -107,7 +107,7 @@ void lv_style_init(void)
     lv_style_scr.image.opa     = LV_OPA_COVER;
     lv_style_scr.image.color   = lv_color_make(0x20, 0x20, 0x20);
     lv_style_scr.image.intense = LV_OPA_TRANSP;
-    lv_style_scr.image.blend_mode = LV_BLEND_MODE_SUBTRACTIVE;
+    lv_style_scr.image.blend_mode = LV_BLEND_MODE_NORMAL;
 
     lv_style_scr.line.opa     = LV_OPA_COVER;
     lv_style_scr.line.color   = lv_color_make(0x20, 0x20, 0x20);
