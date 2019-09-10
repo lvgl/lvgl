@@ -39,6 +39,10 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
         lv_color_t color, lv_opa_t opa,
         const lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_blend_mode_t mode);
 
+static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
+        const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
+        const lv_opa_t * mask, lv_draw_mask_res_t mask_res);
+
 static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
         const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
         const lv_opa_t * mask, lv_draw_mask_res_t mask_res);
@@ -142,7 +146,10 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
 
 //    printf("blend: %d,%d,%d,%d\n", draw_area.x1, draw_area.y1, draw_area.x2, draw_area.y2);
 
-    if(mode == LV_BLEND_MODE_NORMAL) {
+    if(disp->driver.set_px_cb) {
+        map_set_px(disp_area, disp_buf, &draw_area, map_area, map_buf, opa, mask, mask_res);
+    }
+    else if(mode == LV_BLEND_MODE_NORMAL) {
         map_normal(disp_area, disp_buf, &draw_area, map_area, map_buf, opa, mask, mask_res);
     }
 
@@ -426,6 +433,54 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
     }
 }
 
+static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
+        const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
+        const lv_opa_t * mask, lv_draw_mask_res_t mask_res)
+
+{
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+
+    /*Get the width of the `disp_area` it will be used to go to the next line*/
+    lv_coord_t disp_w = lv_area_get_width(disp_area);
+
+    /*Get the width of the `draw_area` it will be used to go to the next line of the mask*/
+    lv_coord_t draw_area_w = lv_area_get_width(draw_area);
+
+    /*Get the width of the `mask_area` it will be used to go to the next line*/
+    lv_coord_t map_w = lv_area_get_width(map_area);
+
+    /*Create a temp. map_buf which always point to current line to draw*/
+    const lv_color_t * map_buf_tmp = map_buf + map_w * (draw_area->y1 - (map_area->y1 - disp_area->y1));
+
+    map_buf_tmp += (draw_area->x1 - (map_area->x1 - disp_area->x1));
+    map_buf_tmp -= draw_area->x1;
+    lv_coord_t x;
+    lv_coord_t y;
+
+    if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
+        for(y = draw_area->y1; y <= draw_area->y2; y++) {
+            for(x = draw_area->x1; x <= draw_area->x2; x++) {
+                disp->driver.set_px_cb(&disp->driver, (void*)disp_buf, disp_w, x, y, map_buf_tmp[x], opa);
+            }
+            map_buf_tmp += map_w;
+        }
+    } else {
+        /* The mask is relative to the clipped area.
+         * In the cycles below mask will be indexed from `draw_area.x1`
+         * but it corresponds to zero index. So prepare `mask_tmp` accordingly. */
+        const lv_opa_t * mask_tmp = mask - draw_area->x1;
+
+        for(y = draw_area->y1; y <= draw_area->y2; y++) {
+            for(x = draw_area->x1; x <= draw_area->x2; x++) {
+                disp->driver.set_px_cb(&disp->driver, (void*)disp_buf, disp_w, x, y, map_buf_tmp[x], (uint16_t)((uint16_t)opa * mask_tmp[x]) >> 8);
+            }
+            mask_tmp += draw_area_w;
+            map_buf_tmp += map_w;
+        }
+    }
+}
+
+
 static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
         const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
         const lv_opa_t * mask, lv_draw_mask_res_t mask_res)
@@ -456,7 +511,7 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
 
     /*Simple fill (maybe with opacity), no masking*/
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
-        /*Go to the first px of the map*/
+        /*Go to the first px of the row*/
         map_buf_tmp += (draw_area->x1 - (map_area->x1 - disp_area->x1));
 #if LV_USE_GPU
         lv_disp_t * disp = lv_refr_get_disp_refreshing();
@@ -516,7 +571,10 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
 
         /*Only the mask matters*/
         if(opa > LV_OPA_MAX) {
-            map_buf_tmp += (draw_area->x1 - (map_area->x1 - disp_area->x1)) - draw_area->x1;
+            /*Go to the first pixel of the row */
+            map_buf_tmp += (draw_area->x1 - (map_area->x1 - disp_area->x1));
+            map_buf_tmp -= draw_area->x1;
+
             for(y = draw_area->y1; y <= draw_area->y2; y++) {
                 for(x = draw_area->x1; x <= draw_area->x2; x++) {
                     if(mask_tmp[x] == 0) continue;
@@ -548,7 +606,8 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
             map_buf_tmp -= draw_area->x1;
             for(y = draw_area->y1; y <= draw_area->y2; y++) {
                 for(x = draw_area->x1; x <= draw_area->x2; x++) {
-                    lv_opa_t opa_tmp = (opa * mask_tmp[x]) >> 8;
+                    if(mask_tmp[x] == 0) continue;
+                    lv_opa_t opa_tmp = mask_tmp[x] >= LV_OPA_MAX ? opa : ((opa * mask_tmp[x]) >> 8);
 #if LV_COLOR_SCREEN_TRANSP
                     if(disp->driver.screen_transp) {
                         lv_color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[x].ch.alpha, map_buf_tmp[x], opa_tmp, &disp_buf_tmp[x], &disp_buf_tmp[x].ch.alpha);
