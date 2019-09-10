@@ -72,7 +72,7 @@ void lv_style_init(void)
     /*Screen style*/
     lv_style_scr.glass               = 0;
     lv_style_scr.body.opa            = LV_OPA_COVER;
-    lv_style_scr.body.main_color     = LV_COLOR_WHITE;
+    lv_style_scr.body.main_color     = LV_COLOR_RED;
     lv_style_scr.body.grad_color     = LV_COLOR_WHITE;
     lv_style_scr.body.radius         = 0;
     lv_style_scr.body.blend_mode = LV_BLEND_MODE_NORMAL;

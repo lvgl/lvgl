@@ -756,7 +756,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
     uint16_t * sh_ups_tmp_buf = sh_ups_buf;
     for(y = 0; y < size; y++) {
         memset(mask_line, 0xFF, size);
-        mask_res = mask_param.cb(mask_line, 0, y, size, &mask_param);
+        mask_res = mask_param.radius.cb(mask_line, 0, y, size, &mask_param);
         if(mask_res == LV_DRAW_MASK_RES_FULL_TRANSP) {
             memset(sh_ups_tmp_buf, 0x00, size * sizeof(sh_ups_buf[0]));
         } else {

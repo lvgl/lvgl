@@ -43,9 +43,17 @@ enum {
     LV_DRAW_MASK_LINE_SIDE_BOTTOM,
 };
 
+union _lv_draw_mask_param_t;
+
+
+typedef lv_draw_mask_res_t (*lv_draw_mask_cb_t)(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, union _lv_draw_mask_param_t * p);
+
 typedef uint8_t lv_draw_mask_line_side_t;
 
 typedef struct {
+    /*The first element must be the callback*/
+    lv_draw_mask_cb_t cb;
+
     lv_point_t origo;
     /* X / (1024*Y) steepness (X is 0..1023 range). What is the change of X in 1024 Y?*/
     int32_t xy_steep;
@@ -70,8 +78,8 @@ typedef struct {
     uint8_t inv:1;
 }lv_draw_mask_line_param_t;
 
-
 typedef struct {
+    lv_draw_mask_cb_t cb;   /*The first element must be the callback*/
     lv_point_t origo;
     lv_coord_t start_angle;
     lv_coord_t end_angle;
@@ -81,6 +89,8 @@ typedef struct {
 }lv_draw_mask_angle_param_t;
 
 typedef struct {
+    lv_draw_mask_cb_t cb;   /*The first element must be the callback*/
+
     lv_area_t rect;
     lv_coord_t radius;
 
@@ -89,6 +99,8 @@ typedef struct {
 }lv_draw_mask_radius_param_t;
 
 typedef struct {
+    lv_draw_mask_cb_t cb;   /*The first element must be the callback*/
+
     lv_area_t rect;
     lv_coord_t y_top;
     lv_coord_t y_bottom;
@@ -97,25 +109,20 @@ typedef struct {
 
 }lv_draw_mask_fade_param_t;
 
+typedef struct _lv_draw_mask_map_param_t {
+    lv_draw_mask_cb_t cb;   /*The first element must be the callback*/
 
-typedef struct {
     lv_area_t coords;
     const lv_opa_t * map;
 }lv_draw_mask_map_param_t;
 
-struct _lv_draw_mask_param_t;
 
-typedef lv_draw_mask_res_t (*lv_draw_mask_cb_t)(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, struct _lv_draw_mask_param_t * p);
-
-typedef struct _lv_draw_mask_param_t {
-    union {
-    lv_draw_mask_line_param_t line;
-    lv_draw_mask_radius_param_t radius;
-    lv_draw_mask_angle_param_t angle;
-    lv_draw_mask_fade_param_t fade;
-    lv_draw_mask_map_param_t map;
-    }p;
-    lv_draw_mask_cb_t cb;
+typedef union _lv_draw_mask_param_t {
+        lv_draw_mask_line_param_t line;
+        lv_draw_mask_radius_param_t radius;
+        lv_draw_mask_angle_param_t angle;
+        lv_draw_mask_fade_param_t fade;
+        lv_draw_mask_map_param_t map;
 }lv_draw_mask_param_t;
 
 /**********************
