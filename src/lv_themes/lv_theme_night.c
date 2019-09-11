@@ -456,7 +456,7 @@ static void btnm_init(void)
     btnm_bg.body.border.width   = 1;
 
     lv_style_copy(&rel, theme.style.btn.rel);
-    rel.body.border.part  = LV_BORDER_FULL | LV_BORDER_INTERNAL;
+    rel.body.border.part  = LV_BORDER_PART_FULL | LV_BORDER_PART_INTERNAL;
     rel.body.border.width = 1;
     rel.body.radius       = 2;
 
@@ -571,7 +571,7 @@ static void list_init(void)
 
     lv_style_copy(&list_btn_rel, &bg);
     list_btn_rel.body.opa            = LV_OPA_TRANSP;
-    list_btn_rel.body.border.part    = LV_BORDER_BOTTOM;
+    list_btn_rel.body.border.part    = LV_BORDER_PART_BOTTOM;
     list_btn_rel.body.border.color   = lv_color_hsv_to_rgb(_hue, 10, 5);
     list_btn_rel.body.border.width   = 1;
     list_btn_rel.body.radius         = LV_DPI / 10;

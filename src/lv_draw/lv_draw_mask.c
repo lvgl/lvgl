@@ -513,7 +513,7 @@ static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x,
 
         if(p->inv) {
             k = xei - abs_x;
-            if(k > len) {
+            if(k >= len) {
                 return LV_DRAW_MASK_RES_FULL_TRANSP;
             }
             if(k >= 0) memset(&mask_buf[0], 0x00,  k);
@@ -548,12 +548,11 @@ static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x,
             if(p->inv) {
                 k = xei - abs_x - 1;
 
-                if(k > len) k= len;
-                if(k == 0) return LV_DRAW_MASK_RES_FULL_TRANSP;
-                else if(k >= 0) memset(&mask_buf[0], 0x00,  k);
+                if(k > len) k = len;
+                else if(k > 0) memset(&mask_buf[0], 0x00,  k);
 
             } else {
-                if(k > len) return LV_DRAW_MASK_RES_FULL_TRANSP;
+                if(k > len) return LV_DRAW_MASK_RES_FULL_COVER;
                 if(k >= 0) memset(&mask_buf[k] ,0x00,  len - k);
             }
 

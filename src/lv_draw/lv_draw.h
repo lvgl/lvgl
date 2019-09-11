@@ -26,10 +26,16 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define LV_DRAW_BUF_MAX_NUM    6
 
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    void * p;
+    uint16_t size;
+    uint8_t used    :1;
+}lv_draw_buf_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -40,48 +46,19 @@ extern "C" {
  * Be careful to not use the buffer while other processes are using it.
  * @param size the required size
  */
-void * lv_draw_get_buf(uint32_t size);
+void * lv_draw_buf_get(uint32_t size);
 
 /**
- * Free the draw buffer
+ * Release the draw buffer
+ * @param p buffer to release
  */
-void lv_draw_free_buf(void);
-
-#if LV_ANTIALIAS
-
-/**
- * Get the opacity of a pixel based it's position in a line segment
- * @param seg segment length
- * @param px_id position of  of a pixel which opacity should be get [0..seg-1]
- * @param base_opa the base opacity
- * @return the opacity of the given pixel
- */
-lv_opa_t lv_draw_aa_get_opa(lv_coord_t seg, lv_coord_t px_id, lv_opa_t base_opa);
+void lv_draw_buf_release(void * p);
 
 /**
- * Add a vertical  anti-aliasing segment (pixels with decreasing opacity)
- * @param x start point x coordinate
- * @param y start point y coordinate
- * @param length length of segment (negative value to start from 0 opacity)
- * @param mask draw only in this area
- * @param color color of pixels
- * @param opa maximum opacity
+ * Free all draw buffers
  */
-void lv_draw_aa_ver_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask, lv_color_t color,
-                        lv_opa_t opa);
+void lv_draw_buf_free_all(void);
 
-/**
- * Add a horizontal anti-aliasing segment (pixels with decreasing opacity)
- * @param x start point x coordinate
- * @param y start point y coordinate
- * @param length length of segment (negative value to start from 0 opacity)
- * @param mask draw only in this area
- * @param color color of pixels
- * @param opa maximum opacity
- */
-void lv_draw_aa_hor_seg(lv_coord_t x, lv_coord_t y, lv_coord_t length, const lv_area_t * mask, lv_color_t color,
-                        lv_opa_t opa);
-#endif
 
 /**********************
  *  GLOBAL VARIABLES

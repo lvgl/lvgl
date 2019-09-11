@@ -217,7 +217,7 @@ void lv_disp_refr_task(lv_task_t * task)
         }
     }
 
-    lv_draw_free_buf();
+    lv_draw_buf_free_all();
 
     LV_LOG_TRACE("lv_refr_task: ready");
 }

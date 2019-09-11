@@ -378,7 +378,7 @@ static void calendar_init(void)
     week_box.body.padding.right  = theme.style.panel->body.padding.right;
     week_box.body.border.color   = theme.style.panel->body.border.color;
     week_box.body.border.width   = theme.style.panel->body.border.width;
-    week_box.body.border.part    = LV_BORDER_LEFT | LV_BORDER_RIGHT;
+    week_box.body.border.part    = LV_BORDER_PART_LEFT | LV_BORDER_PART_RIGHT;
     week_box.body.radius         = 0;
 
     static lv_style_t today_box;
@@ -445,7 +445,7 @@ static void btnm_init(void)
     bg.text.color          = lv_color_hex3(0x555);
 
     lv_style_copy(&rel, theme.style.panel);
-    rel.body.border.part  = LV_BORDER_FULL | LV_BORDER_INTERNAL;
+    rel.body.border.part  = LV_BORDER_PART_FULL | LV_BORDER_PART_INTERNAL;
     rel.body.border.width = 1;
     rel.body.border.color = lv_color_hex3(0xbbb);
     rel.body.opa          = LV_OPA_TRANSP;
@@ -536,7 +536,7 @@ static void ta_init(void)
     lv_style_copy(&oneline, &def);
     oneline.body.opa          = LV_OPA_TRANSP;
     oneline.body.radius       = 0;
-    oneline.body.border.part  = LV_BORDER_BOTTOM;
+    oneline.body.border.part  = LV_BORDER_PART_BOTTOM;
     oneline.body.border.width = 3;
     oneline.body.border.color = lv_color_hex3(0x333);
     oneline.body.border.opa   = LV_OPA_COVER;
@@ -579,7 +579,7 @@ static void list_init(void)
     rel.body.radius         = 10;
     rel.body.border.color   = lv_color_hex3(0xbbb);
     rel.body.border.width   = 1;
-    rel.body.border.part    = LV_BORDER_BOTTOM;
+    rel.body.border.part    = LV_BORDER_PART_BOTTOM;
 
     lv_style_copy(&pr, &rel);
     pr.glass             = 0;
@@ -679,7 +679,7 @@ static void tabview_init(void)
     btn_bg.body.radius         = 0;
     btn_bg.body.border.width   = 1;
     btn_bg.body.border.color   = lv_color_hex3(0x888);
-    btn_bg.body.border.part    = LV_BORDER_BOTTOM;
+    btn_bg.body.border.part    = LV_BORDER_PART_BOTTOM;
     btn_bg.body.border.opa     = LV_OPA_COVER;
     btn_bg.body.shadow.width   = 5;
     btn_bg.body.shadow.color   = DEF_SHADOW_COLOR;
@@ -703,7 +703,7 @@ static void tabview_init(void)
     pr.body.radius       = 0;
     pr.body.border.width = 1;
     pr.body.border.color = lv_color_hex3(0x888);
-    pr.body.border.part  = LV_BORDER_BOTTOM;
+    pr.body.border.part  = LV_BORDER_PART_BOTTOM;
     pr.body.border.opa   = LV_OPA_COVER;
     pr.text.color        = lv_color_hex3(0x111);
 
@@ -767,7 +767,7 @@ static void win_init(void)
     header.body.radius         = 0;
     header.body.border.width   = 1;
     header.body.border.color   = lv_color_hex3(0xbbb);
-    header.body.border.part    = LV_BORDER_BOTTOM;
+    header.body.border.part    = LV_BORDER_PART_BOTTOM;
     header.body.border.opa     = LV_OPA_COVER;
     header.body.padding.inner  = 0;
     header.body.padding.left   = 0;

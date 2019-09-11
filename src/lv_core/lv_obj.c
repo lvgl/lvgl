@@ -1626,13 +1626,13 @@ void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * cords_p)
 void lv_obj_get_inner_coords(const lv_obj_t * obj, lv_area_t * coords_p)
 {
     const lv_style_t * style = lv_obj_get_style(obj);
-    if(style->body.border.part & LV_BORDER_LEFT) coords_p->x1 += style->body.border.width;
+    if(style->body.border.part & LV_BORDER_PART_LEFT) coords_p->x1 += style->body.border.width;
 
-    if(style->body.border.part & LV_BORDER_RIGHT) coords_p->x2 -= style->body.border.width;
+    if(style->body.border.part & LV_BORDER_PART_RIGHT) coords_p->x2 -= style->body.border.width;
 
-    if(style->body.border.part & LV_BORDER_TOP) coords_p->y1 += style->body.border.width;
+    if(style->body.border.part & LV_BORDER_PART_TOP) coords_p->y1 += style->body.border.width;
 
-    if(style->body.border.part & LV_BORDER_BOTTOM) coords_p->y2 -= style->body.border.width;
+    if(style->body.border.part & LV_BORDER_PART_BOTTOM) coords_p->y2 -= style->body.border.width;
 }
 
 /**

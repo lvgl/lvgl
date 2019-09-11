@@ -660,22 +660,22 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             lv_style_copy(&style_tmp, btn_style);
 
             /*Remove borders on the edges if `LV_BORDER_INTERNAL`*/
-            if(style_tmp.body.border.part & LV_BORDER_INTERNAL) {
+            if(style_tmp.body.border.part & LV_BORDER_PART_INTERNAL) {
                 if(area_tmp.y1 == btnm->coords.y1 + bg_style->body.padding.top) {
-                    style_tmp.body.border.part &= ~LV_BORDER_TOP;
+                    style_tmp.body.border.part &= ~LV_BORDER_PART_TOP;
                 }
                 if(area_tmp.y2 == btnm->coords.y2 - bg_style->body.padding.bottom) {
-                    style_tmp.body.border.part &= ~LV_BORDER_BOTTOM;
+                    style_tmp.body.border.part &= ~LV_BORDER_PART_BOTTOM;
                 }
 
                 if(txt_i == 0) {
-                    style_tmp.body.border.part &= ~LV_BORDER_LEFT;
+                    style_tmp.body.border.part &= ~LV_BORDER_PART_LEFT;
                 } else if(strcmp(ext->map_p[txt_i - 1], "\n") == 0) {
-                    style_tmp.body.border.part &= ~LV_BORDER_LEFT;
+                    style_tmp.body.border.part &= ~LV_BORDER_PART_LEFT;
                 }
 
                 if(ext->map_p[txt_i + 1][0] == '\0' || strcmp(ext->map_p[txt_i + 1], "\n") == 0) {
-                    style_tmp.body.border.part &= ~LV_BORDER_RIGHT;
+                    style_tmp.body.border.part &= ~LV_BORDER_PART_RIGHT;
                 }
             }
             lv_draw_rect(&area_tmp, clip_area, &style_tmp, opa_scale);

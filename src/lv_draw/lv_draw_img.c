@@ -510,7 +510,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
     else {
         lv_coord_t width = lv_area_get_width(&mask_com);
 
-        uint8_t  * buf = lv_draw_get_buf(lv_area_get_width(&mask_com) * ((LV_COLOR_DEPTH >> 3) + 1));  /*+1 because of the possible alpha byte*/
+        uint8_t  * buf = lv_draw_buf_get(lv_area_get_width(&mask_com) * ((LV_COLOR_DEPTH >> 3) + 1));  /*+1 because of the possible alpha byte*/
 
         lv_area_t line;
         lv_area_copy(&line, &mask_com);
@@ -524,6 +524,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
             if(read_res != LV_RES_OK) {
                 lv_img_decoder_close(&cdsc->dec_dsc);
                 LV_LOG_WARN("Image draw can't read the line");
+                lv_draw_buf_release(buf);
                 return LV_RES_INV;
             }
             lv_draw_map(&line, mask, buf, opa, chroma_keyed, alpha_byte, style);
@@ -531,6 +532,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
             line.y2++;
             y++;
         }
+        lv_draw_buf_release(buf);
     }
 
     return LV_RES_OK;
@@ -584,9 +586,12 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         /*The pixel size in byte is different if an alpha byte is added too*/
         uint8_t px_size_byte = alpha_byte ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
 
+
+
         /*Build the image and a mask line-by-line*/
-        lv_color_t map2[LV_HOR_RES_MAX];
-        lv_opa_t mask_buf[LV_HOR_RES_MAX];
+        uint32_t mask_buf_size = lv_area_get_size(&draw_area) > LV_HOR_RES_MAX ? lv_area_get_size(&draw_area) : LV_HOR_RES_MAX;
+        lv_color_t * map2 = lv_draw_buf_get(mask_buf_size * sizeof(lv_color_t));
+        lv_opa_t * mask_buf = lv_draw_buf_get(mask_buf_size);
 
         /*Go to the first displayed pixel of the map*/
         lv_coord_t map_w = lv_area_get_width(map_area);
@@ -609,7 +614,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
         /*Prepare the `mask_buf`if there are other masks*/
         if(other_mask_cnt) {
-            memset(mask_buf, 0xFF, sizeof(mask_buf));
+            memset(mask_buf, 0xFF, mask_buf_size);
         }
 
         lv_draw_mask_res_t mask_res;
@@ -664,7 +669,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             }
 
             map_buf_tmp += map_w * px_size_byte;
-            if(px_i + lv_area_get_width(&draw_area) < sizeof(mask_buf)) {
+            if(px_i + lv_area_get_width(&draw_area) < mask_buf_size) {
                 blend_area.y2 ++;
             } else {
                 lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, style->image.blend_mode);
@@ -677,7 +682,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
                 /*Prepare the `mask_buf`if there are other masks*/
                 if(other_mask_cnt) {
-                    memset(mask_buf, 0xFF, sizeof(mask_buf));
+                    memset(mask_buf, 0xFF, mask_buf_size);
                 }
             }
         }
@@ -687,6 +692,9 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, style->image.blend_mode);
         }
 
+        lv_draw_buf_release(mask_buf);
+        lv_draw_buf_release(map2);
     }
+
 
 }

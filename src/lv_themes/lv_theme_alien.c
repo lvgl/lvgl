@@ -823,7 +823,7 @@ static void win_init(void)
     header.body.border.opa     = panel.body.border.opa;
     header.body.border.width   = panel.body.border.width;
     header.body.border.color   = lv_color_hsv_to_rgb(_hue, 20, 80);
-    header.body.border.part    = LV_BORDER_BOTTOM;
+    header.body.border.part    = LV_BORDER_PART_BOTTOM;
     header.text.color          = lv_color_hsv_to_rgb(_hue, 5, 100);
     header.image.color         = lv_color_hsv_to_rgb(_hue, 5, 100);
 

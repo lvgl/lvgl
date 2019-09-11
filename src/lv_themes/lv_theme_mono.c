@@ -61,7 +61,7 @@ static void basic_init(void)
     def.body.border.color   = LV_COLOR_BLACK;
     def.body.border.width   = 1;
     def.body.border.opa     = LV_OPA_COVER;
-    def.body.border.part    = LV_BORDER_FULL;
+    def.body.border.part    = LV_BORDER_PART_FULL;
 
     def.text.font         = _font;
     def.text.color        = LV_COLOR_BLACK;

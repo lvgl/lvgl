@@ -17,6 +17,7 @@
 #define LABEL_RECOLOR_PAR_LENGTH 6
 #define LV_LABEL_HINT_UPDATE_TH 1024 /*Update the "hint" if the label's y coordinates have changed more then this*/
 
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -290,7 +291,11 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
     lv_font_glyph_dsc_t g;
     bool g_ret = lv_font_get_glyph_dsc(font_p, &g, letter, '\0');
     if(g_ret == false)  {
-        LV_LOG_WARN("lv_draw_letter: glyph dsc. not found");
+        /* Add waring if the dsc is not found
+         * but do not print warning for non printable ASCII chars (e.g. '\n')*/
+        if(letter >= 0x20) {
+            LV_LOG_WARN("lv_draw_letter: glyph dsc. not found");
+        }
         return;
     }
 
@@ -335,9 +340,6 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
             pos_y + g.box_h < clip_area->y1 ||
             pos_y > clip_area->y2) return;
 
-    lv_disp_t * disp    = lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
-
     lv_coord_t col, row;
 
     uint8_t width_byte_scr = g.box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
@@ -359,7 +361,8 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
     uint16_t col_bit;
     col_bit = bit_ofs & 0x7; /* "& 0x7" equals to "% 8" just faster */
 
-    lv_opa_t mask_buf[LV_HOR_RES_MAX];
+    uint32_t mask_buf_size = g.box_w * g.box_h > LV_HOR_RES_MAX ? g.box_w * g.box_h : LV_HOR_RES_MAX;
+    lv_opa_t * mask_buf = lv_draw_buf_get(mask_buf_size);
     lv_coord_t mask_p = 0;
     lv_coord_t mask_p_start;
 
@@ -414,7 +417,7 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
             }
         }
 
-        if(mask_p + (row_end - row_start) < sizeof(mask_buf)) {
+        if((uint32_t) mask_p + (row_end - row_start) < mask_buf_size) {
             fill_area.y2 ++;
         } else {
             lv_blend_fill(clip_area, &fill_area,
@@ -440,6 +443,8 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
                 LV_BLEND_MODE_NORMAL);
         mask_p = 0;
     }
+
+    lv_draw_buf_release(mask_buf);
 }
 
 

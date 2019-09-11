@@ -35,7 +35,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static uint32_t draw_buf_size = 0;
 
 /**********************
  *      MACROS
@@ -50,34 +49,63 @@ static uint32_t draw_buf_size = 0;
  * Be careful to not use the buffer while other processes are using it.
  * @param size the required size
  */
-void * lv_draw_get_buf(uint32_t size)
+void * lv_draw_buf_get(uint32_t size)
 {
-    if(size <= draw_buf_size) return LV_GC_ROOT(_lv_draw_buf);
-
-    LV_LOG_TRACE("lv_draw_get_buf: allocate");
-
-    draw_buf_size = size;
-
-    if(LV_GC_ROOT(_lv_draw_buf) == NULL) {
-        LV_GC_ROOT(_lv_draw_buf) = lv_mem_alloc(size);
-        lv_mem_assert(LV_GC_ROOT(_lv_draw_buf));
-        return LV_GC_ROOT(_lv_draw_buf);
+    /*Try to find a free buffer with suitable size */
+    uint8_t i;
+    for(i = 0; i < LV_DRAW_BUF_MAX_NUM; i++) {
+        if(_lv_draw_buf[i].used == 0 && _lv_draw_buf[i].size >= size) {
+            _lv_draw_buf[i].used = 1;
+            return  _lv_draw_buf[i].p;
+        }
     }
 
-    LV_GC_ROOT(_lv_draw_buf) = lv_mem_realloc(LV_GC_ROOT(_lv_draw_buf), size);
-    lv_mem_assert(LV_GC_ROOT(_lv_draw_buf));
-    return LV_GC_ROOT(_lv_draw_buf);
+    /*Reallocate a free buffer*/
+    for(i = 0; i < LV_DRAW_BUF_MAX_NUM; i++) {
+        if(_lv_draw_buf[i].used == 0) {
+            _lv_draw_buf[i].used = 1;
+            _lv_draw_buf[i].size = size;
+            _lv_draw_buf[i].p = lv_mem_realloc(_lv_draw_buf[i].p, size);
+            lv_mem_assert(_lv_draw_buf[i].p);
+            return  _lv_draw_buf[i].p;
+        }
+    }
+
+    LV_LOG_ERROR("lv_draw_buf_get: no free buffer. Increase LV_DRAW_BUF_MAX_NUM.");
+
+    return NULL;
 }
 
 /**
- * Free the draw buffer
+ * Release the draw buffer
+ * @param p buffer to release
  */
-void lv_draw_free_buf(void)
+void lv_draw_buf_release(void * p)
 {
-    if(LV_GC_ROOT(_lv_draw_buf)) {
-        lv_mem_free(LV_GC_ROOT(_lv_draw_buf));
-        LV_GC_ROOT(_lv_draw_buf) = NULL;
-        draw_buf_size = 0;
+    uint8_t i;
+    for(i = 0; i < LV_DRAW_BUF_MAX_NUM; i++) {
+        if(_lv_draw_buf[i].p == p) {
+            _lv_draw_buf[i].used = 0;
+            return;
+        }
+    }
+
+    LV_LOG_ERROR("lv_draw_buf_release: p is not a known buffer")
+}
+
+/**
+ * Free all draw buffers
+ */
+void lv_draw_buf_free_all(void)
+{
+    uint8_t i;
+    for(i = 0; i < LV_DRAW_BUF_MAX_NUM; i++) {
+        if(_lv_draw_buf[i].p) {
+            lv_mem_free(_lv_draw_buf[i].p);
+            _lv_draw_buf[i].p = NULL;
+            _lv_draw_buf[i].used = 0;
+            _lv_draw_buf[i].size = 0;
+        }
     }
 }
 
