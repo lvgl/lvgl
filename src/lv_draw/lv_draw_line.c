@@ -274,14 +274,14 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
             lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0, LV_DRAW_MASK_LINE_SIDE_LEFT);
             lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1, LV_DRAW_MASK_LINE_SIDE_RIGHT);
         } else {
-            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y + w_half0, p2.x, p2.y + w_half0, LV_DRAW_MASK_LINE_SIDE_LEFT);
-            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y - w_half1, p2.x, p2.y - w_half1, LV_DRAW_MASK_LINE_SIDE_RIGHT);
+            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1, LV_DRAW_MASK_LINE_SIDE_LEFT);
+            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0, LV_DRAW_MASK_LINE_SIDE_RIGHT);
         }
     } else {
-        lv_draw_mask_line_points_init(&mask_left_param, p1.x + w_half0, p1.y, p2.x + w_half0, p2.y, LV_DRAW_MASK_LINE_SIDE_LEFT);
-        lv_draw_mask_line_points_init(&mask_right_param, p1.x - w_half1, p1.y, p2.x - w_half1, p2.y, LV_DRAW_MASK_LINE_SIDE_RIGHT);
-
+        lv_draw_mask_line_points_init(&mask_left_param, p1.x + w_half1, p1.y, p2.x + w_half1, p2.y, LV_DRAW_MASK_LINE_SIDE_LEFT);
+        lv_draw_mask_line_points_init(&mask_right_param, p1.x - w_half0, p1.y, p2.x - w_half0, p2.y, LV_DRAW_MASK_LINE_SIDE_RIGHT);
     }
+
     /*Use the normal vector for the endings*/
     lv_draw_mask_line_points_init(&mask_top_param, p1.x, p1.y, p1.x - ydiff, p1.y + xdiff, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
     lv_draw_mask_line_points_init(&mask_bottom_param, p2.x, p2.y,p2.x - ydiff, p2.y + xdiff,  LV_DRAW_MASK_LINE_SIDE_TOP);

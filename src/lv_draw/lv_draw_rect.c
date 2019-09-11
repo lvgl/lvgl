@@ -451,7 +451,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
     lv_coord_t corner_size = sw  + r_sh;
 
-    lv_opa_t sh_buf[corner_size * corner_size];
+    lv_opa_t * sh_buf = lv_draw_buf_get(corner_size * corner_size);
     shadow_draw_corner_buf(&sh_rect_area, sh_buf, style->body.shadow.width, r_sh);
 
     bool simple_mode = true;
@@ -761,6 +761,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
     lv_draw_mask_remove_id(mask_rout_id);
     lv_draw_buf_release(mask_buf);
+    lv_draw_buf_release(sh_buf);
 }
 
 static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, lv_coord_t sw, lv_coord_t r)
