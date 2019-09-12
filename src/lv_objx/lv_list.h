@@ -61,6 +61,9 @@ typedef struct
 #if LV_USE_GROUP
     lv_obj_t * last_sel;     /* The last selected button. It will be reverted when the list is focused again */
     lv_obj_t * selected_btn; /* The button is currently being selected*/
+    /*Used to make the last clicked button pressed (selected) when the list become focused and
+     * `click_focus == 1`*/
+    lv_obj_t * last_clicked_btn;
 #endif
 } lv_list_ext_t;
 

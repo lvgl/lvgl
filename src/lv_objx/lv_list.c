@@ -47,11 +47,7 @@ static lv_signal_cb_t img_signal;
 static lv_signal_cb_t label_signal;
 static lv_signal_cb_t ancestor_page_signal;
 static lv_signal_cb_t ancestor_btn_signal;
-#if LV_USE_GROUP
-/*Used to make the last clicked button pressed (selected) when the list become focused and
- * `click_focus == 1`*/
-static lv_obj_t * last_clicked_btn;
-#endif
+
 
 /**********************
  *      MACROS
@@ -94,6 +90,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
 #if LV_USE_GROUP
     ext->last_sel     = NULL;
     ext->selected_btn = NULL;
+    ext->last_clicked_btn = NULL;
 #endif
 
     lv_obj_set_signal_cb(new_list, lv_list_signal);
@@ -751,10 +748,12 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         /*Else select the clicked button*/
         else {
             /*Mark the last clicked button (if any) as selected because it triggered the focus*/
-            if(last_clicked_btn) {
-                lv_list_set_btn_selected(list, last_clicked_btn);
+            lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+            if(ext->last_clicked_btn) {
+                lv_list_set_btn_selected(list, ext->last_clicked_btn);
+                ext->last_clicked_btn = NULL;
+
             } else {
-                lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
                 if(ext->last_sel) {
                     /* Select the last used button */
                     lv_list_set_btn_selected(list, ext->last_sel);
@@ -770,8 +769,8 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 #if LV_USE_GROUP
         /*De-select the selected btn*/
         lv_list_set_btn_selected(list, NULL);
-        last_clicked_btn    = NULL; /*button click will be set if click happens before focus*/
         lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+        ext->last_clicked_btn    = NULL; /*button click will be set if click happens before focus*/
         ext->selected_btn   = NULL;
 #endif
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
@@ -861,7 +860,7 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
 
         /* If `click_focus == 1` then LV_SIGNAL_FOCUS need to know which button triggered the focus
          * to mark it as selected (pressed state)*/
-        last_clicked_btn = btn;
+        ext->last_clicked_btn = btn;
 #endif
         if(lv_indev_is_dragging(lv_indev_get_act()) == false && ext->single_mode) {
             lv_list_btn_single_select(btn);
