@@ -316,6 +316,8 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         /*If dragged draw to the drag position*/
         if(ext->drag_value != LV_SLIDER_NOT_PRESSED) cur_value = ext->drag_value;
+        bool sym = false;
+        if(ext->bar.sym && ext->bar.min_value < 0 && ext->bar.max_value > 0) sym = true;
 
         if(slider_w >= slider_h) {
             lv_coord_t indic_w = lv_area_get_width(&area_indic);
@@ -335,7 +337,19 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             {
                 area_indic.x2 = (int32_t)((int32_t)indic_w * (cur_value - min_value)) / (max_value - min_value);
             }
+
             area_indic.x2 = area_indic.x1 + area_indic.x2 - 1;
+            if(sym) {
+                /*Calculate the coordinate of the zero point*/
+                lv_coord_t zero;
+                zero = area_indic.x1 + (-ext->bar.min_value * slider_w) / (ext->bar.max_value - ext->bar.min_value);
+                if(area_indic.x2 > zero)
+                    area_indic.x1 = zero;
+                else {
+                    area_indic.x1 = area_indic.x2;
+                    area_indic.x2 = zero;
+                }
+            }
 
             /*Draw the indicator but don't draw an ugly 1px wide rectangle on the left on min.
              * value*/
@@ -359,7 +373,20 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             {
                 area_indic.y1 = (int32_t)((int32_t)indic_h * (cur_value - min_value)) / (max_value - min_value);
             }
+
             area_indic.y1 = area_indic.y2 - area_indic.y1 + 1;
+
+            if(sym) {
+                /*Calculate the coordinate of the zero point*/
+                lv_coord_t zero;
+                zero = area_indic.y2 - (-ext->bar.min_value * slider_h) / (ext->bar.max_value - ext->bar.min_value);
+                if(area_indic.y1 < zero)
+                    area_indic.y2 = zero;
+                else {
+                    area_indic.y2 = area_indic.y1;
+                    area_indic.y1 = zero;
+                }
+            }
 
             /*Draw the indicator but don't draw an ugly 1px height rectangle on the bottom on min.
              * value*/
@@ -386,7 +413,12 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         if(slider_w >= slider_h) {
             if(ext->knob_in == 0) {
-                knob_area.x1 = area_indic.x2 - slider_h / 2;
+                if(sym == false) {
+                    knob_area.x1 = area_indic.x2 - slider_h / 2;
+                } else {
+                    if(cur_value > 0) knob_area.x1 = area_indic.x2 - slider_h / 2;
+                    else knob_area.x1 = area_indic.x1 - slider_h / 2;
+                }
                 knob_area.x2 = knob_area.x1 + slider_h - 1;
             } else {
 #if LV_USE_ANIMATION
@@ -415,7 +447,12 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             knob_area.y2 = slider->coords.y2;
         } else {
             if(ext->knob_in == 0) {
-                knob_area.y1 = area_indic.y1 - slider_w / 2;
+                if(sym == false) {
+                    knob_area.y1 = area_indic.y1 - slider_w / 2;
+                } else {
+                    if(cur_value > 0)  knob_area.y1 = area_indic.y1 - slider_w / 2;
+                    else  knob_area.y1 = area_indic.y2 - slider_w / 2;
+                }
                 knob_area.y2 = knob_area.y1 + slider_w - 1;
             } else {
 #if LV_USE_ANIMATION
