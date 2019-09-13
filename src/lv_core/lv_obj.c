@@ -319,7 +319,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->realign.auto_realign = copy->realign.auto_realign;
 #endif
 
-        /*Only copy the `event_cb`. `signal_cb` and `design_cb` will be copied the the derived
+        /*Only copy the `event_cb`. `signal_cb` and `design_cb` will be copied in the derived
          * object type (e.g. `lv_btn`)*/
         new_obj->event_cb = copy->event_cb;
 

@@ -8,6 +8,7 @@
  *********************/
 #include "lv_font.h"
 #include "lv_font_fmt_txt.h"
+#include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_log.h"
 #include "../lv_misc/lv_utils.h"
@@ -20,6 +21,11 @@
 /**********************
  *      TYPEDEFS
  **********************/
+typedef enum {
+    RLE_STATE_SINGLE = 0,
+    RLE_STATE_REPEATE,
+    RLE_STATE_COUNTER,
+}rle_state_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -29,11 +35,25 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
 static int32_t unicode_list_compare(const void * ref, const void * element);
 static int32_t kern_pair_8_compare(const void * ref, const void * element);
 static int32_t kern_pair_16_compare(const void * ref, const void * element);
-static void decompress(const uint8_t * in, uint8_t * out, uint16_t px_num, uint8_t bpp);
+
+static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp);
+static void decompress_line(uint8_t * out, lv_coord_t w);
+static uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len);
+static void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len);
+static void rle_init(const uint8_t * in,  uint8_t bpp);
+static uint8_t rle_next(void);
+
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+
+static uint32_t rle_rdp;
+static const uint8_t * rle_in;
+static uint8_t rle_bpp;
+static uint8_t rle_prev_v;
+static uint8_t rle_cnt;
+static rle_state_t rle_state;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -61,11 +81,11 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
 
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
-//    if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
-//        if(gdsc) return &fdsc->glyph_bitmap[gdsc->bitmap_index];
-//    }
-//    /*Handle compressed bitmap*/
-//    else
+    if(fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN) {
+        if(gdsc) return &fdsc->glyph_bitmap[gdsc->bitmap_index];
+    }
+    /*Handle compressed bitmap*/
+    else
     {
         static uint8_t * buf = NULL;
 
@@ -84,7 +104,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
             if(buf == NULL) return NULL;
         }
 
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], buf, gdsc->box_w * gdsc->box_h, fdsc->bpp);
+        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], buf, gdsc->box_w , gdsc->box_h, fdsc->bpp);
         return buf;
     }
 
@@ -265,7 +285,57 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element)
     else return (int32_t) ref16_p[1] - element16_p[1];
 }
 
+/**
+ * The compress a glyph's bitmap
+ * @param in the compressed bitmap
+ * @param out buffer to store the result
+ * @param px_num number of pixels in the glyph (width * height)
+ * @param bpp bit per pixel (bpp = 3 will be converted to bpp = 4)
+ */
+static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp)
+{
+    uint32_t wrp = 0;
+    uint8_t wr_size = bpp;
+    if(bpp == 3) wr_size = 4;
 
+    rle_init(in, bpp);
+
+    uint8_t * line_buf = lv_draw_get_buf(w * 2);
+    uint8_t * line_buf1 = line_buf;
+    uint8_t * line_buf2 = line_buf + w;
+
+    decompress_line(line_buf1, w);
+
+    lv_coord_t y;
+    lv_coord_t x;
+    for(x = 0; x < w; x++) {
+        bits_write(out,wrp, line_buf1[x], bpp);
+        wrp += wr_size;
+    }
+
+    for(y = 1; y < h; y++) {
+        decompress_line(line_buf2, w);
+
+        for(x = 0; x < w; x++) {
+            line_buf1[x] = line_buf2[x] ^ line_buf1[x];
+            bits_write(out,wrp, line_buf1[x], bpp);
+            wrp += wr_size;
+        }
+    }
+}
+
+/**
+ * Decompress one line. Store one pixel per byte
+ * @param out output buffer
+ * @param w width of the line in pixel count
+ */
+static void decompress_line(uint8_t * out, lv_coord_t w)
+{
+    lv_coord_t i;
+    for(i = 0; i < w; i++) {
+        out[i] = rle_next();
+    }
+}
 
 /**
  * Read bits from an input buffer. The read can cross byte boundary.
@@ -319,77 +389,70 @@ static void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len
     out[byte_pos] |= (val << bit_pos);
 }
 
-/**
- * The compress a glyph's bitmap
- * @param in the compressed bitmap
- * @param out buffer to store the result
- * @param px_num number of pixels in the glyph (width * height)
- * @param bpp bit per pixel (bpp = 3 will be converted to bpp = 4)
- */
-static void decompress(const uint8_t * in, uint8_t * out, uint16_t px_num, uint8_t bpp)
+static void rle_init(const uint8_t * in,  uint8_t bpp)
 {
-    uint32_t rdp = 0;
-    uint32_t wrp = 0;
-    uint16_t px_cnt = 0;
-    uint8_t wr_size = bpp;
-    if(bpp == 3) wr_size = 4;
+    rle_in = in;
+    rle_bpp = bpp;
+    rle_state = RLE_STATE_SINGLE;
+    rle_rdp = 0;
+    rle_prev_v = 0;
+    rle_cnt = 0;
+}
 
-    uint8_t act_val = get_bits(in, rdp, bpp);
-    rdp += bpp;
+static uint8_t rle_next(void)
+{
+    uint8_t v = 0;
+    uint8_t ret = 0;
 
-    while(px_cnt < px_num) {
-
-        bits_write(out, wrp, act_val, bpp);
-        wrp += wr_size;
-        px_cnt ++;
-
-        uint8_t next_val = get_bits(in, rdp, bpp);
-        rdp += bpp;
-
-        /*If the new value is different the it's simply the next pixel*/
-        if(act_val != next_val) {
-            act_val = next_val;
+    if(rle_state == RLE_STATE_SINGLE) {
+        ret = get_bits(rle_in, rle_rdp, rle_bpp);
+        if(rle_rdp != 0 && rle_prev_v == ret) {
+            rle_cnt = 0;
+            rle_state = RLE_STATE_REPEATE;
         }
-        /*If the next px is the same the this pixel will be repeated */
-        else {
-            bits_write(out, wrp, next_val, bpp);
-            wrp += wr_size;
-            px_cnt ++;
 
-            uint8_t i;
-            for(i = 0; i < 11; i++) {
-                uint8_t r;
-                r = get_bits(in, rdp, 1);
-                rdp++;
-
-                if(r == 1) {
-                    if(i != 10) {   /*Ignore the 11th '1'*/
-                        bits_write(out, wrp, next_val, bpp);
-                        wrp += wr_size;
-                        px_cnt++;
-                    }
-                }
-                else break; /*Zero closes the repeats*/
-            }
-
-            /*After 11 repeats a 6 bit counter comes*/
-            if(i == 11) {
-                uint8_t cnt = get_bits(in, rdp, 6);
-                rdp += 6;
-
-                uint8_t i;
-                for(i = 0; i < cnt; i++) {
-                    bits_write(out, wrp, next_val, bpp);
-                    wrp += wr_size;
-                    px_cnt ++;
+        rle_prev_v = ret;
+        rle_rdp += rle_bpp;
+    }
+    else if(rle_state == RLE_STATE_REPEATE) {
+        v = get_bits(rle_in, rle_rdp, 1);
+        rle_cnt++;
+        rle_rdp += 1;
+        if(v == 1) {
+            ret = rle_prev_v;
+            if(rle_cnt == 11) {
+                rle_cnt = get_bits(rle_in, rle_rdp, 6);
+                rle_rdp += 6;
+                if(rle_cnt != 0) {
+                    rle_state = RLE_STATE_COUNTER;
+                } else {
+                    ret = get_bits(rle_in, rle_rdp, rle_bpp);
+                    rle_prev_v = ret;
+                    rle_rdp += rle_bpp;
+                    rle_state = RLE_STATE_SINGLE;
                 }
             }
+        } else {
+            ret = get_bits(rle_in, rle_rdp, rle_bpp);
+            rle_prev_v = ret;
+            rle_rdp += rle_bpp;
+            rle_state = RLE_STATE_SINGLE;
+        }
 
-            /*Preload the next pixel*/
-            act_val = get_bits(in, rdp, bpp);
-            rdp += bpp;
+
+    }
+    else if(rle_state == RLE_STATE_COUNTER) {
+        ret = rle_prev_v;
+        rle_cnt--;
+        if(rle_cnt == 0) {
+            ret = get_bits(rle_in, rle_rdp, rle_bpp);
+            rle_prev_v = ret;
+            rle_rdp += rle_bpp;
+            rle_state = RLE_STATE_SINGLE;
         }
     }
+
+    return ret;
 }
 
 /** Code Comparator.
