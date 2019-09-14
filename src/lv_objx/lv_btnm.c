@@ -863,7 +863,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 for(area_below = ext->btn_id_pr; area_below < ext->btn_cnt; area_below++) {
                     if(ext->button_areas[area_below].y1 > ext->button_areas[ext->btn_id_pr].y1 &&
                        pr_center >= ext->button_areas[area_below].x1 &&
-                       pr_center <= ext->button_areas[area_below].x2 + style->body.padding.left) {
+                       pr_center <= ext->button_areas[area_below].x2 + style->body.padding.inner) {
                         break;
                     }
                 }
@@ -884,7 +884,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
                 for(area_above = ext->btn_id_pr; area_above >= 0; area_above--) {
                     if(ext->button_areas[area_above].y1 < ext->button_areas[ext->btn_id_pr].y1 &&
-                       pr_center >= ext->button_areas[area_above].x1 - style->body.padding.left &&
+                       pr_center >= ext->button_areas[area_above].x1 - style->body.padding.inner &&
                        pr_center <= ext->button_areas[area_above].x2) {
                         break;
                     }
