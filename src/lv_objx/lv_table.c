@@ -106,8 +106,8 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->cell_style[1]        = copy_ext->cell_style[1];
         ext->cell_style[2]        = copy_ext->cell_style[2];
         ext->cell_style[3]        = copy_ext->cell_style[3];
-        ext->col_cnt              = copy_ext->col_cnt;
-        ext->row_cnt              = copy_ext->row_cnt;
+        lv_table_set_row_cnt(new_table, copy_ext->row_cnt);
+        lv_table_set_col_cnt(new_table, copy_ext->col_cnt);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_table);
