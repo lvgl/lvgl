@@ -108,6 +108,13 @@ void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
     draw_area.x2 -= disp_area->x1;
     draw_area.y2 -= disp_area->y1;
 
+    /*Round the values in the mask if anti-aliasing is disabled*/
+    if(mask && disp->driver.antialiasing == 0) {
+        lv_coord_t mask_w = lv_area_get_width(&draw_area);
+        lv_coord_t i;
+        for (i = 0; i < mask_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
+    }
+
     if(disp->driver.set_px_cb) {
         fill_set_px(disp_area, disp_buf, &draw_area, color, opa, mask, mask_res);
     }
@@ -121,7 +128,7 @@ void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
 
 
 void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const lv_color_t * map_buf,
-        const lv_opa_t * mask, lv_draw_mask_res_t mask_res,
+        lv_opa_t * mask, lv_draw_mask_res_t mask_res,
         lv_opa_t opa, lv_blend_mode_t mode)
 {
     /*Do not draw transparent things*/
@@ -147,9 +154,12 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
     draw_area.x2 -= disp_area->x1;
     draw_area.y2 -= disp_area->y1;
 
-
-//    printf("blend: %d,%d,%d,%d\n", draw_area.x1, draw_area.y1, draw_area.x2, draw_area.y2);
-
+    /*Round the values in the mask if anti-aliasing is disabled*/
+    if(mask && disp->driver.antialiasing == 0) {
+        lv_coord_t mask_w = lv_area_get_width(&draw_area);
+        lv_coord_t i;
+        for (i = 0; i < mask_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
+    }
     if(disp->driver.set_px_cb) {
         map_set_px(disp_area, disp_buf, &draw_area, map_area, map_buf, opa, mask, mask_res);
     }
