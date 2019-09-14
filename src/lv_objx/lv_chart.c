@@ -1122,11 +1122,8 @@ static label_iterator_t lv_chart_create_label_iter(const char * list, uint8_t it
         iterator.is_reverse_iter = 1;
         // -1 to skip '\0' at the end of the string
         iterator.current_pos = list + j - 1;
-
-        if(*iterator.current_pos == '\n'){
-            iterator.current_pos--;
-        }
     }
+    iterator.items_left++;
     return iterator;
 }
 
@@ -1172,7 +1169,7 @@ static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf)
     }
 
     /* terminate the string */
-    buf[label_len] = '\0';
+    buf[label_len] = '\0'; //TODO: in case with forward iterator will cause UB
     iterator->items_left--;
 }
 
@@ -1185,11 +1182,7 @@ static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf)
  */
 static bool lv_chart_is_tick_with_label(uint8_t tick_num, lv_chart_axis_cfg_t * axis)
 {
-    if(axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) {
-        return ((tick_num != 0) && ((tick_num % axis->num_tick_marks) == 0));
-    } else {
-        return ((tick_num == 0) || ((tick_num % axis->num_tick_marks) == 0));
-    }
+    return ((tick_num == 0) || ((tick_num % axis->num_tick_marks) == 0));
 }
 
 static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint8_t which_axis)
@@ -1245,7 +1238,7 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
         iter = lv_chart_create_label_iter(y_axis->list_of_values, iter_dir);
 
         /*determine the number of options */
-        num_of_labels = iter.items_left + 1;
+        num_of_labels = iter.items_left;
 
         /* we can't have string labels without ticks step, set to 1 if not specified */
         if(y_axis->num_tick_marks == 0) y_axis->num_tick_marks = 1;
@@ -1356,7 +1349,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
 
         /*determine the number of options */
         iter = lv_chart_create_label_iter(ext->x_axis.list_of_values, LV_CHART_LABEL_ITERATOR_FORWARD);
-        num_of_labels = iter.items_left + 1;
+        num_of_labels = iter.items_left;
 
         /* we can't have string labels without ticks step, set to 1 if not specified */
         if(ext->x_axis.num_tick_marks == 0) ext->x_axis.num_tick_marks = 1;
