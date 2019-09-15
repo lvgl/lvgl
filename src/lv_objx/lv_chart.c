@@ -56,7 +56,7 @@ static void lv_chart_inv_lines(lv_obj_t * chart, uint16_t i);
 static void lv_chart_inv_points(lv_obj_t * chart, uint16_t i);
 static void lv_chart_inv_cols(lv_obj_t * chart, uint16_t i);
 static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf);
-static bool lv_chart_is_tick_with_label(uint8_t tick_num, lv_chart_axis_cfg_t * axis);
+static inline bool lv_chart_is_tick_with_label(uint8_t tick_num, lv_chart_axis_cfg_t * axis);
 static label_iterator_t lv_chart_create_label_iter(const char * list, uint8_t iterator_dir);
 
 /**********************
@@ -1136,22 +1136,32 @@ static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf)
 {
     uint8_t label_len = 0;
     if (iterator->is_reverse_iter) {
-        if (iterator->items_left > 1) {
-            /* count the length of the current label*/
-            while (*(iterator->current_pos - label_len) != '\n') {
-                label_len++;
-            }
-            /* advance iterator to the next label */
-            iterator->current_pos -= label_len;
-            /* iterator points to \n symbol, +1 to skip it*/
-            strncpy(buf, iterator->current_pos + 1, label_len);
-            /* minus one symbol to skip newline*/
+        const char * label_start;
+        /* count the length of the current label*/
+        while ((*iterator->current_pos != '\n') &&
+                (iterator->current_pos != iterator->list_start)) {
+            iterator->current_pos--;
+            label_len++;
+        }
+
+        label_start = iterator->current_pos;
+
+        if (*iterator->current_pos == '\n') {
+            /* do not copy \n symbol, +1 to skip it*/
+            label_start++;
+            /* skip newline*/
             iterator->current_pos--;
         } else {
-            label_len = iterator->current_pos - iterator->list_start;
+            /* it is last label in list (first one from the beginning )*/
             label_len++;
-            strncpy(buf, iterator->list_start, label_len);
         }
+
+        /* do not allow output buffer overflow */
+        if (label_len > LV_CHART_AXIS_TICK_LABEL_MAX_LEN) {
+            label_len = LV_CHART_AXIS_TICK_LABEL_MAX_LEN;
+        }
+
+        strncpy(buf, label_start, label_len);
     } else {
         /* search for tick string */
         while(iterator->current_pos[label_len] != '\n' &&
@@ -1164,13 +1174,19 @@ static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf)
                 label_len++;
             }
         }
+
         iterator->current_pos += label_len;
+
+        /* do not allow output buffer overflow */
+        if (label_len > LV_CHART_AXIS_TICK_LABEL_MAX_LEN) {
+            label_len = LV_CHART_AXIS_TICK_LABEL_MAX_LEN;
+        }
+
         if(*(iterator->current_pos) == '\n') iterator->current_pos++;
     }
 
     /* terminate the string */
-    buf[label_len] = '\0'; //TODO: in case with forward iterator will cause UB
-    iterator->items_left--;
+    buf[label_len] = '\0';
 }
 
 /**
@@ -1180,7 +1196,7 @@ static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf)
  * @param axis pointer to struct containing info on the axis
  * @return true if label should be located next to current tick
  */
-static bool lv_chart_is_tick_with_label(uint8_t tick_num, lv_chart_axis_cfg_t * axis)
+static inline bool lv_chart_is_tick_with_label(uint8_t tick_num, lv_chart_axis_cfg_t * axis)
 {
     return ((tick_num == 0) || ((tick_num % axis->num_tick_marks) == 0));
 }
