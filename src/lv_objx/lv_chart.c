@@ -38,7 +38,7 @@ typedef struct {
     const char * current_pos;
     uint8_t items_left;
     uint8_t is_reverse_iter;
-} label_iterator_t;
+} lv_chart_label_iterator_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -55,9 +55,9 @@ static void lv_chart_draw_axes(lv_obj_t * chart, const lv_area_t * mask);
 static void lv_chart_inv_lines(lv_obj_t * chart, uint16_t i);
 static void lv_chart_inv_points(lv_obj_t * chart, uint16_t i);
 static void lv_chart_inv_cols(lv_obj_t * chart, uint16_t i);
-static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf);
+static void lv_chart_get_next_label(lv_chart_label_iterator_t * iterator, char * buf);
 static inline bool lv_chart_is_tick_with_label(uint8_t tick_num, lv_chart_axis_cfg_t * axis);
-static label_iterator_t lv_chart_create_label_iter(const char * list, uint8_t iterator_dir);
+static lv_chart_label_iterator_t lv_chart_create_label_iter(const char * list, uint8_t iterator_dir);
 
 /**********************
  *  STATIC VARIABLES
@@ -1100,11 +1100,11 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
  * Create iterator for newline-separated list
  * @param list pointer to newline-separated labels list
  * @param iterator_dir LV_CHART_ITERATOR_FORWARD or LV_CHART_LABEL_ITERATOR_REVERSE
- * @return label_iterator_t
+ * @return lv_chart_label_iterator_t
  */
-static label_iterator_t lv_chart_create_label_iter(const char * list, uint8_t iterator_dir)
+static lv_chart_label_iterator_t lv_chart_create_label_iter(const char * list, uint8_t iterator_dir)
 {
-    label_iterator_t iterator = {0};
+    lv_chart_label_iterator_t iterator = {0};
     uint8_t j;
 
     iterator.list_start = list;
@@ -1132,7 +1132,7 @@ static label_iterator_t lv_chart_create_label_iter(const char * list, uint8_t it
  * @param iterator iterator to get label from
  * @param[out] buf buffer to point next label to
  */
-static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf)
+static void lv_chart_get_next_label(lv_chart_label_iterator_t * iterator, char * buf)
 {
     uint8_t label_len = 0;
     if (iterator->is_reverse_iter) {
@@ -1182,7 +1182,7 @@ static void lv_chart_get_next_label(label_iterator_t * iterator, char * buf)
             label_len = LV_CHART_AXIS_TICK_LABEL_MAX_LEN;
         }
 
-        if(*(iterator->current_pos) == '\n') iterator->current_pos++;
+        if(*iterator->current_pos == '\n') iterator->current_pos++;
     }
 
     /* terminate the string */
@@ -1221,7 +1221,7 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
         lv_point_t p1;
         lv_point_t p2;
         lv_coord_t x_ofs;
-        label_iterator_t iter;
+        lv_chart_label_iterator_t iter;
         lv_coord_t y_ofs = chart->coords.y1;
         lv_coord_t h     = lv_obj_get_height(chart);
         lv_coord_t w     = lv_obj_get_width(chart);
@@ -1343,7 +1343,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
         uint8_t num_of_labels;
         uint8_t num_scale_ticks;
         uint8_t major_tick_len, minor_tick_len;
-        label_iterator_t iter;
+        lv_chart_label_iterator_t iter;
         lv_point_t p1;
         lv_point_t p2;
         lv_coord_t x_ofs = chart->coords.x1;
