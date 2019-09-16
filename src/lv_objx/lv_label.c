@@ -13,6 +13,7 @@
 #include "../lv_core/lv_group.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_printf.h"
 
 /*********************
  *      DEFINES
@@ -199,6 +200,51 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
         strcpy(ext->text, text);
         ext->static_txt = 0; /*Now the text is dynamically allocated*/
     }
+
+    lv_label_refr_text(label);
+}
+
+/**
+ * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
+ * @param label pointer to a label object
+ * @param fmt `printf`-like format
+ */
+void lv_label_set_text_fmt(lv_obj_t * label, const char * fmt, ...)
+{
+    lv_obj_invalidate(label);
+
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+
+    /*If text is NULL then refresh */
+    if(fmt == NULL) {
+        lv_label_refr_text(label);
+        return;
+    }
+
+    if(ext->text != NULL && ext->static_txt == 0) {
+            lv_mem_free(ext->text);
+            ext->text = NULL;
+    }
+
+    va_list ap, ap2;
+    va_start(ap, fmt);
+    va_copy(ap2, ap);
+
+    /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12 */
+    uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
+
+    va_end(ap);
+    
+
+    ext->text = lv_mem_alloc(len+1);
+    lv_mem_assert(ext->text);
+    if(ext->text == NULL) return;
+    ext->text[len-1] = 0; /* Ensure NULL termination */
+
+    lv_vsnprintf(ext->text, len+1, fmt, ap2);
+
+    va_end(ap2);
+    ext->static_txt = 0; /*Now the text is dynamically allocated*/
 
     lv_label_refr_text(label);
 }
@@ -585,14 +631,13 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
 
     uint32_t i         = line_start;
-    uint32_t i_current = i;
+    uint32_t i_act = i;
     uint32_t letter;
     uint32_t letter_next;
 
     if(new_line_start > 0) {
-        while(i <= new_line_start - 1) {
-            /* Get the current letter.
-             * Be careful 'i' already points to the next character*/
+        while(i < new_line_start) {
+            /* Get the current letter.*/
             letter = lv_txt_encoded_next(txt, &i);
 
             /*Get the next letter too for kerning*/
@@ -606,12 +651,14 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
             }
 
             x += lv_font_get_glyph_width(font, letter, letter_next);
-            if(pos->x < x) {
-                i = i_current;
+
+            /*Finish if the x position or the last char of the line is reached*/
+            if(pos->x < x || i == new_line_start) {
+                i = i_act;
                 break;
             }
             x += style->text.letter_space;
-            i_current = i;
+            i_act = i;
         }
     }
 

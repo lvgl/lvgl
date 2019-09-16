@@ -99,17 +99,14 @@ void lv_draw_buf_release(void * p)
 void lv_draw_buf_free_all(void)
 {
     uint8_t i;
-    uint32_t s = 0;
     for(i = 0; i < LV_DRAW_BUF_MAX_NUM; i++) {
         if(_lv_draw_buf[i].p) {
-            s+= _lv_draw_buf[i].size;
             lv_mem_free(_lv_draw_buf[i].p);
             _lv_draw_buf[i].p = NULL;
             _lv_draw_buf[i].used = 0;
             _lv_draw_buf[i].size = 0;
         }
     }
-    if(s) printf("draf_buf free %d bytes\n", s);
 }
 
 /**********************

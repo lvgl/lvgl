@@ -306,6 +306,8 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
     uint8_t bitmask_init;
     uint8_t bitmask;
 
+    if(g.bpp == 3) g.bpp = 4;
+
     switch(g.bpp) {
     case 1:
         bpp_opa_table = bpp1_opa_table;

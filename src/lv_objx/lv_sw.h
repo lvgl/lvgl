@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 #include "../lv_core/lv_obj.h"
-#include "lv_slider.h"
+#include "lv_bar.h"
 
 /*********************
  *      DEFINES
@@ -40,13 +40,14 @@ extern "C" {
 /*Data of switch*/
 typedef struct
 {
-    lv_slider_ext_t slider; /*Ext. of ancestor*/
+    lv_bar_ext_t bar; /*Ext. of ancestor*/
     /*New data for this type */
     const lv_style_t * style_knob_off; /**< Style of the knob when the switch is OFF*/
     const lv_style_t * style_knob_on;  /**< Style of the knob when the switch is ON (NULL to use the same as OFF)*/
     lv_coord_t start_x;
-    uint8_t changed : 1; /*Indicates the switch state explicitly changed by drag*/
-    uint8_t slided : 1;
+    uint8_t changed :1; /*Indicates the switch state explicitly changed by drag*/
+    uint8_t slided  :1;
+    uint8_t state   :1; /*The current state*/
 #if LV_USE_ANIMATION
     uint16_t anim_time; /*switch animation time */
 #endif
@@ -128,7 +129,8 @@ void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time);
  */
 static inline bool lv_sw_get_state(const lv_obj_t * sw)
 {
-    return lv_bar_get_value(sw) < LV_SW_MAX_VALUE / 2 ? false : true;
+    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
+    return ext->state ? true : false;
 }
 
 /**

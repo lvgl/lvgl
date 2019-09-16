@@ -29,6 +29,7 @@ extern "C" {
  *      DEFINES
  *********************/
 #define LV_FS_MAX_FN_LENGTH 64
+#define LV_FS_MAX_PATH_LENGTH 256
 
 /**********************
  *      TYPEDEFS

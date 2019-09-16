@@ -201,7 +201,7 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
 
         /*Make sure the last row is at the bottom of 'btnm'*/
         if(map_p_tmp[btn_cnt][0] == '\0') { /*Last row?*/
-            btn_h = max_h - act_y + style_bg->body.padding.bottom - 1;
+            btn_h = lv_obj_get_height(btnm)- act_y - style_bg->body.padding.bottom - 1;
         }
 
         /*Only deal with the non empty lines*/
@@ -862,7 +862,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 for(area_below = ext->btn_id_pr; area_below < ext->btn_cnt; area_below++) {
                     if(ext->button_areas[area_below].y1 > ext->button_areas[ext->btn_id_pr].y1 &&
                        pr_center >= ext->button_areas[area_below].x1 &&
-                       pr_center <= ext->button_areas[area_below].x2 + style->body.padding.left) {
+                       pr_center <= ext->button_areas[area_below].x2 + style->body.padding.inner) {
                         break;
                     }
                 }
@@ -883,7 +883,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
                 for(area_above = ext->btn_id_pr; area_above >= 0; area_above--) {
                     if(ext->button_areas[area_above].y1 < ext->button_areas[ext->btn_id_pr].y1 &&
-                       pr_center >= ext->button_areas[area_above].x1 - style->body.padding.left &&
+                       pr_center >= ext->button_areas[area_above].x1 - style->body.padding.inner &&
                        pr_center <= ext->button_areas[area_above].x2) {
                         break;
                     }

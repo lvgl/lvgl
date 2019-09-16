@@ -620,11 +620,20 @@ static lv_design_res_t lv_chart_design(lv_obj_t * chart, const lv_area_t * clip_
 
         lv_chart_draw_div(chart, clip_area);
 
-        if(ext->type & LV_CHART_TYPE_LINE) lv_chart_draw_lines(chart, clip_area);
-        if(ext->type & LV_CHART_TYPE_COLUMN) lv_chart_draw_cols(chart, clip_area);
-        if(ext->type & LV_CHART_TYPE_POINT) lv_chart_draw_points(chart, clip_area);
-        if(ext->type & LV_CHART_TYPE_VERTICAL_LINE) lv_chart_draw_vertical_lines(chart, clip_area);
-        if((ext->type & LV_CHART_TYPE_AREA) || (ext->type & LV_CHART_TYPE_AREA_FADED)) lv_chart_draw_areas(chart, clip_area);
+        /* Adjust the mask to remove the margin (clips chart contents to be within background) */
+
+        lv_area_t mask_tmp, adjusted_mask;
+        lv_obj_get_coords(chart, &mask_tmp);
+
+        bool union_ok = lv_area_intersect(&adjusted_mask, clip_area, &mask_tmp);
+
+        if(union_ok) {
+            if(ext->type & LV_CHART_TYPE_LINE) lv_chart_draw_lines(chart, clip_area);
+            if(ext->type & LV_CHART_TYPE_COLUMN) lv_chart_draw_cols(chart, clip_area);
+            if(ext->type & LV_CHART_TYPE_POINT) lv_chart_draw_points(chart, clip_area);
+            if(ext->type & LV_CHART_TYPE_VERTICAL_LINE) lv_chart_draw_vertical_lines(chart, clip_area);
+            if((ext->type & LV_CHART_TYPE_AREA) || (ext->type & LV_CHART_TYPE_AREA_FADED)) lv_chart_draw_areas(chart, clip_area);
+        }
 
         lv_chart_draw_axes(chart, clip_area);
     }

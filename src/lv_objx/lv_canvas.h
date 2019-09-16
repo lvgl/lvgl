@@ -23,6 +23,7 @@ extern "C" {
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_objx/lv_img.h"
+#include "../lv_draw/lv_draw_img.h"
 
 /*********************
  *      DEFINES
@@ -239,21 +240,21 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
 /**********************
  *      MACROS
  **********************/
-#define LV_CANVAS_BUF_SIZE_TRUE_COLOR(w, h) ((LV_COLOR_SIZE / 8) * w * h)
-#define LV_CANVAS_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h) ((LV_COLOR_SIZE / 8) * w * h)
-#define LV_CANVAS_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) (LV_IMG_PX_SIZE_ALPHA_BYTE * w * h)
+#define LV_CANVAS_BUF_SIZE_TRUE_COLOR(w, h) LV_IMG_BUF_SIZE_TRUE_COLOR(w, h)
+#define LV_CANVAS_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h) LV_IMG_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h)
+#define LV_CANVAS_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) LV_IMG_BUF_SIZE_TRUE_COLOR_ALPHA(w, h)
 
 /*+ 1: to be sure no fractional row*/
-#define LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h) ((((w / 8) + 1) * h))
-#define LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h) ((((w / 4) + 1) * h))
-#define LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h) ((((w / 2) + 1) * h))
-#define LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w, h) ((w * h))
+#define LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h) LV_IMG_BUF_SIZE_ALPHA_1BIT(w, h)
+#define LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h) LV_IMG_BUF_SIZE_ALPHA_2BIT(w, h)
+#define LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h) LV_IMG_BUF_SIZE_ALPHA_4BIT(w, h)
+#define LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w, h) LV_IMG_BUF_SIZE_ALPHA_8BIT(w, h)
 
 /*4 * X: for palette*/
-#define LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h) + 4 * 2)
-#define LV_CANVAS_BUF_SIZE_INDEXED_2BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h) + 4 * 4)
-#define LV_CANVAS_BUF_SIZE_INDEXED_4BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h) + 4 * 16)
-#define LV_CANVAS_BUF_SIZE_INDEXED_8BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w, h) + 4 * 256)
+#define LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, h) LV_IMG_BUF_SIZE_INDEXED_1BIT(w, h)
+#define LV_CANVAS_BUF_SIZE_INDEXED_2BIT(w, h) LV_IMG_BUF_SIZE_INDEXED_2BIT(w, h)
+#define LV_CANVAS_BUF_SIZE_INDEXED_4BIT(w, h) LV_IMG_BUF_SIZE_INDEXED_4BIT(w, h)
+#define LV_CANVAS_BUF_SIZE_INDEXED_8BIT(w, h) LV_IMG_BUF_SIZE_INDEXED_8BIT(w, h)
 
 #endif /*LV_USE_CANVAS*/
 

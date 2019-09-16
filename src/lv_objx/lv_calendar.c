@@ -787,7 +787,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
             }
 
             label_area.x1 =
-                calendar->coords.x1 + (w * day) / 7 + style_bg->body.padding.left + style_bg->body.padding.right;
+                calendar->coords.x1 + (w * day) / 7 + style_bg->body.padding.left;
             label_area.x2 = label_area.x1 + box_w - 1;
 
             /*Draw the "today box"*/
