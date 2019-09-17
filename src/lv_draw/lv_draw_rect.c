@@ -438,9 +438,17 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     draw_area.x2 -= disp_area->x1;
     draw_area.y2 -= disp_area->y1;
 
+    /*Consider 1 px smaller bg to be sure the edge will be covered by the shadow*/
+    lv_area_t bg_coords;
+    lv_area_copy(&bg_coords, coords);
+    bg_coords.x1 += 1;
+    bg_coords.y1 += 1;
+    bg_coords.x2 -= 1;
+    bg_coords.y2 -= 1;
+
     /*Get the real radius*/
     lv_coord_t r_bg = style->body.radius;
-    lv_coord_t short_side = LV_MATH_MIN(lv_area_get_width(coords), lv_area_get_height(coords));
+    lv_coord_t short_side = LV_MATH_MIN(lv_area_get_width(&bg_coords), lv_area_get_height(&bg_coords));
     if(r_bg > short_side >> 1) r_bg = short_side >> 1;
 
     lv_coord_t r_sh = style->body.radius;
@@ -465,7 +473,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     lv_opa_t * mask_buf = lv_draw_buf_get(lv_area_get_width(&sh_rect_area));
 
     lv_draw_mask_param_t mask_rout_param;
-    lv_draw_mask_radius_init(&mask_rout_param, coords, r_bg, true);
+    lv_draw_mask_radius_init(&mask_rout_param, &bg_coords, r_bg, true);
 
     /*Draw a radius into the shadow buffer*/
     int16_t mask_rout_id = LV_MASK_ID_INV;
