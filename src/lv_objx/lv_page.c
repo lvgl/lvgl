@@ -103,8 +103,8 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->edge_flash.style     = &lv_style_plain_color;
     ext->anim_time            = LV_PAGE_DEF_ANIM_TIME;
 #endif
-    ext->scroll_prop    = 0;
-    ext->scroll_prop_ip = 0;
+    ext->scroll_prop_dir    = 0;
+    ext->scroll_prop_obj = NULL;
 
     /*Init the new page object*/
     if(copy == NULL) {
@@ -232,10 +232,10 @@ void lv_page_set_anim_time(lv_obj_t * page, uint16_t anim_time)
  * @param page pointer to a Page
  * @param en true or false to enable/disable scroll propagation
  */
-void lv_page_set_scroll_propagation(lv_obj_t * page, bool en)
+void lv_page_set_scroll_propagation(lv_obj_t * page, lv_drag_dir_t dir)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    ext->scroll_prop    = en ? 1 : 0;
+    ext->scroll_prop_dir    = dir;
 }
 
 /**
@@ -329,10 +329,10 @@ lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page)
  * @param page pointer to a Page
  * @return true or false
  */
-bool lv_page_get_scroll_propagation(lv_obj_t * page)
+lv_drag_dir_t lv_page_get_scroll_propagation(lv_obj_t * page)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    return ext->scroll_prop == 0 ? false : true;
+    return ext->scroll_prop_dir;
 }
 
 /**
@@ -931,21 +931,34 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         lv_coord_t vpad        = page_style->body.padding.top + page_style->body.padding.bottom;
         lv_obj_t * page_parent = lv_obj_get_parent(page);
 
+        /*Handle scroll propagation*/
         lv_indev_t * indev = lv_indev_get_act();
-        lv_point_t drag_vect;
-        lv_indev_get_vect(indev, &drag_vect);
-
-        /* Start the scroll propagation if there is drag vector on the indev, but the drag is not
-         * started yet and the scrollable is in a corner. It will enable the scroll propagation only
-         * when a new scroll begins and not when the scrollable is already being scrolled.*/
-        if(page_ext->scroll_prop && page_ext->scroll_prop_ip == 0 && lv_indev_is_dragging(indev) == false) {
-            if(((drag_vect.y > 0 && scrl_coords.y1 == page_coords.y1 + page_style->body.padding.top) ||
-                (drag_vect.y < 0 && scrl_coords.y2 == page_coords.y2 - page_style->body.padding.bottom)) &&
-               ((drag_vect.x > 0 && scrl_coords.x1 == page_coords.x1 + page_style->body.padding.left) ||
-                (drag_vect.x < 0 && scrl_coords.x2 == page_coords.x2 - page_style->body.padding.right))) {
-
-                if(lv_obj_get_parent(page_parent) != NULL) { /*Do not propagate the scroll to a screen*/
-                    page_ext->scroll_prop_ip = 1;
+        if(page_ext->scroll_prop_dir != LV_DRAG_DIR_NONE && indev) {
+            lv_point_t * drag_sum = &indev->proc.types.pointer.drag_sum;
+            lv_page_ext_t * parent_ext = lv_obj_get_ext_attr(lv_obj_get_parent(page_parent));
+            if(parent_ext->scroll_prop_obj == NULL) {
+                /*If the dragging just started enable the scroll propagation if the conditions are met*/
+                if(lv_indev_is_dragging(indev) == false && (drag_sum->y || drag_sum->x)) {
+                    /*Propagate vertically?*/
+                    if(page_ext->scroll_prop_dir == LV_DRAG_DIR_ALL || page_ext->scroll_prop_dir == LV_DRAG_DIR_VER || page_ext->scroll_prop_dir == LV_DRAG_DIR_ONE) {
+                        if((drag_sum->y > 0 && lv_page_on_edge(page, LV_PAGE_EDGE_TOP)) ||
+                            (drag_sum->y < 0 && lv_page_on_edge(page, LV_PAGE_EDGE_BOTTOM))) {
+                            lv_obj_set_drag_parent(page, true);
+                            lv_obj_set_drag_parent(scrl, true);
+                            parent_ext->scroll_prop_obj = page;
+                            printf("prop_start ver\n");
+                        }
+                    }
+                    /*Propagate horizontally?*/
+                    if(page_ext->scroll_prop_dir == LV_DRAG_DIR_ALL || page_ext->scroll_prop_dir == LV_DRAG_DIR_HOR || page_ext->scroll_prop_dir == LV_DRAG_DIR_ONE) {
+                        if((drag_sum->x > 0 && lv_page_on_edge(page, LV_PAGE_EDGE_LEFT)) ||
+                            (drag_sum->x < 0 && lv_page_on_edge(page, LV_PAGE_EDGE_RIGHT))) {
+                            lv_obj_set_drag_parent(page, true);
+                            lv_obj_set_drag_parent(scrl, true);
+                            parent_ext->scroll_prop_obj = page;
+                            printf("prop_start hor\n");
+                        }
+                    }
                 }
             }
         }
@@ -957,17 +970,8 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 refr_x = true;
             }
         } else {
-            /*If the scroll propagation is in progress revert the original coordinates (don't let
-             * the page scroll)*/
-            if(page_ext->scroll_prop_ip) {
-                if(drag_vect.x == diff_x) { /*`scrl` is bouncing: drag pos. it somewhere and here it
-                                               is reverted. Handle only the pos. because of drag*/
-                    new_x  = ori_coords->x1 - page_coords.x1;
-                    refr_x = true;
-                }
-            }
             /*The edges of the scrollable can not be in the page (minus hpad) */
-            else if(scrl_coords.x2 < page_coords.x2 - page_style->body.padding.right) {
+            if(scrl_coords.x2 < page_coords.x2 - page_style->body.padding.right) {
                 new_x = lv_area_get_width(&page_coords) - lv_area_get_width(&scrl_coords) -
                         page_style->body.padding.right; /* Right align */
                 refr_x = true;
@@ -1000,17 +1004,8 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 refr_y = true;
             }
         } else {
-            /*If the scroll propagation is in progress revert the original coordinates (don't let
-             * the page scroll)*/
-            if(page_ext->scroll_prop_ip) {
-                if(drag_vect.y == diff_y) { /*`scrl` is bouncing: drag pos. it somewhere and here it
-                                               is reverted. Handle only the pos. because of drag*/
-                    new_y  = ori_coords->y1 - page_coords.y1;
-                    refr_y = true;
-                }
-            }
             /*The edges of the scrollable can not be in the page (minus vpad) */
-            else if(scrl_coords.y2 < page_coords.y2 - page_style->body.padding.bottom) {
+            if(scrl_coords.y2 < page_coords.y2 - page_style->body.padding.bottom) {
                 new_y = lv_area_get_height(&page_coords) - lv_area_get_height(&scrl_coords) -
                         page_style->body.padding.bottom; /* Bottom align */
                 refr_y = true;
@@ -1039,17 +1034,30 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         if(refr_x || refr_y) {
             lv_obj_set_pos(scrl, new_x, new_y);
 
-            if(page_ext->scroll_prop_ip) {
-                if(refr_y) lv_obj_set_y(page_parent, lv_obj_get_y(page_parent) + diff_y);
-                if(refr_x) lv_obj_set_x(page_parent, lv_obj_get_x(page_parent) + diff_x);
+            /* If an object is propagating scroll to this object but
+             * it can scroll further to the desired direction
+             * stop scroll propagation*/
+            if(page_ext->scroll_prop_obj) {
+//                if(refr_y && ) {
+//                    lv_obj_set_drag_parent(page_ext->scroll_prop_obj, false);
+//                    lv_obj_set_drag_parent(lv_page_get_scrl(page_ext->scroll_prop_obj), false);
+//                    page_ext->scroll_prop_obj = NULL;
+//                    printf("remove prop\n");
+//                }
             }
         }
 
         lv_page_sb_refresh(page);
     } else if(sign == LV_SIGNAL_DRAG_END) {
 
+        printf("drag_end\n");
         /*Scroll propagation is finished on drag end*/
-        page_ext->scroll_prop_ip = 0;
+        if(page_ext->scroll_prop_obj) {
+            printf("prop_end\n");
+            lv_obj_set_drag_parent(page_ext->scroll_prop_obj, false);
+            lv_obj_set_drag_parent(lv_page_get_scrl(page_ext->scroll_prop_obj), false);
+            page_ext->scroll_prop_obj = NULL;
+        }
 
         /*Hide scrollbars if required*/
         if(page_ext->sb.mode == LV_SB_MODE_DRAG) {

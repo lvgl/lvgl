@@ -159,9 +159,9 @@ static inline void lv_list_set_sb_mode(lv_obj_t * list, lv_sb_mode_t mode)
  * @param list pointer to a List
  * @param en true or false to enable/disable scroll propagation
  */
-static inline void lv_list_set_scroll_propagation(lv_obj_t * list, bool en)
+static inline void lv_list_set_scroll_propagation(lv_obj_t * list, lv_drag_dir_t dir)
 {
-    lv_page_set_scroll_propagation(list, en);
+    lv_page_set_scroll_propagation(list, dir);
 }
 
 /**

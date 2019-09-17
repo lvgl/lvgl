@@ -184,9 +184,11 @@ typedef struct
 #endif
 
 enum {
+    LV_DRAG_DIR_NONE = 0x0, /**< Both directions are disabled */
     LV_DRAG_DIR_HOR = 0x1, /**< Object can be dragged horizontally. */
     LV_DRAG_DIR_VER = 0x2, /**< Object can be dragged vertically. */
     LV_DRAG_DIR_ALL = 0x3, /**< Object can be dragged in all directions. */
+    LV_DRAG_DIR_ONE = 0x4, /**< Object can be dragged only one direction (the first move). */
 };
 
 typedef uint8_t lv_drag_dir_t;
@@ -227,8 +229,10 @@ typedef struct _lv_obj_t
     uint8_t top : 1;            /**< 1: If the object or its children is clicked it goes to the foreground*/
     uint8_t opa_scale_en : 1;   /**< 1: opa_scale is set*/
     uint8_t parent_event : 1;   /**< 1: Send the object's events to the parent too. */
-    lv_drag_dir_t drag_dir : 2; /**<  Which directions the object can be dragged in */
-    uint8_t reserved    : 6;    /**<  Reserved for future use */
+
+    lv_drag_dir_t drag_dir : 3; /**<  Which directions the object can be dragged in */
+    uint8_t reserved    : 5;    /**<  Reserved for future use */
+
     uint8_t protect;            /**< Automatically happening actions can be prevented. 'OR'ed values from
                                    `lv_protect_t`*/
     lv_opa_t opa_scale;         /**< Scale down the opacity by this factor. Effects all children as well*/

@@ -86,9 +86,8 @@ typedef struct
 
     uint16_t anim_time; /*Scroll animation time*/
 #endif
-
-    uint8_t scroll_prop : 1;    /*1: Propagate the scrolling the the parent if the edge is reached*/
-    uint8_t scroll_prop_ip : 1; /*1: Scroll propagation is in progress (used by the library)*/
+    lv_obj_t * scroll_prop_obj;          /*Pointer to child page from where the scroll is being propagated */
+    lv_drag_dir_t scroll_prop_dir :3;    /*The direction of the scroll propagation*/
 } lv_page_ext_t;
 
 enum {
@@ -155,7 +154,7 @@ void lv_page_set_anim_time(lv_obj_t * page, uint16_t anim_time);
  * @param page pointer to a Page
  * @param en true or false to enable/disable scroll propagation
  */
-void lv_page_set_scroll_propagation(lv_obj_t * page, bool en);
+void lv_page_set_scroll_propagation(lv_obj_t * page, lv_drag_dir_t dir);
 
 /**
  * Enable the edge flash effect. (Show an arc when the an edge is reached)
@@ -255,7 +254,7 @@ lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page);
  * @param page pointer to a Page
  * @return true or false
  */
-bool lv_page_get_scroll_propagation(lv_obj_t * page);
+lv_drag_dir_t lv_page_get_scroll_propagation(lv_obj_t * page);
 
 /**
  * Get the edge flash effect property.
