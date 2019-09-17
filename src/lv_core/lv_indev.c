@@ -40,7 +40,7 @@ static void indev_proc_press(lv_indev_proc_t * proc);
 static void indev_proc_release(lv_indev_proc_t * proc);
 static void indev_proc_reset_query_handler(lv_indev_t * indev);
 static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj);
-static void indev_drag(lv_indev_proc_t * state);
+static void indev_drag(lv_indev_proc_t * proc);
 static void indev_drag_throw(lv_indev_proc_t * proc);
 static lv_obj_t * get_dragged_obj(lv_obj_t * obj);
 static bool indev_reset_check(lv_indev_proc_t * proc);
@@ -744,6 +744,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             proc->types.pointer.drag_in_prog   = 0;
             proc->types.pointer.drag_sum.x     = 0;
             proc->types.pointer.drag_sum.y     = 0;
+            proc->types.pointer.drag_dir = LV_DRAG_DIR_NONE;
             proc->types.pointer.vect.x         = 0;
             proc->types.pointer.vect.y         = 0;
 
@@ -981,6 +982,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
         indev->proc.longpr_rep_timestamp            = 0;
         indev->proc.types.pointer.drag_sum.x        = 0;
         indev->proc.types.pointer.drag_sum.y        = 0;
+        indev->proc.types.pointer.drag_dir = LV_DRAG_DIR_NONE;
         indev->proc.types.pointer.drag_throw_vect.x = 0;
         indev->proc.types.pointer.drag_throw_vect.y = 0;
         indev->proc.reset_query                     = 0;
@@ -1049,9 +1051,9 @@ static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj)
  * Handle the dragging of indev_proc_p->types.pointer.act_obj
  * @param indev pointer to a input device state
  */
-static void indev_drag(lv_indev_proc_t * state)
+static void indev_drag(lv_indev_proc_t * proc)
 {
-    lv_obj_t * drag_obj    = get_dragged_obj(state->types.pointer.act_obj);
+    lv_obj_t * drag_obj    = get_dragged_obj(proc->types.pointer.act_obj);
     bool drag_just_started = false;
 
     if(drag_obj == NULL) return;
@@ -1061,25 +1063,25 @@ static void indev_drag(lv_indev_proc_t * state)
     lv_drag_dir_t allowed_dirs = lv_obj_get_drag_dir(drag_obj);
 
     /*Count the movement by drag*/
-    if(state->types.pointer.drag_limit_out == 0) {
-        state->types.pointer.drag_sum.x += state->types.pointer.vect.x;
-        state->types.pointer.drag_sum.y += state->types.pointer.vect.y;
+    if(proc->types.pointer.drag_limit_out == 0) {
+        proc->types.pointer.drag_sum.x += proc->types.pointer.vect.x;
+        proc->types.pointer.drag_sum.y += proc->types.pointer.vect.y;
     }
 
     /*Enough move?*/
-    if(state->types.pointer.drag_limit_out == 0) {
+    if(proc->types.pointer.drag_limit_out == 0) {
         bool hor_en = false;
         bool ver_en = false;
-        if(allowed_dirs == LV_DRAG_DIR_HOR || allowed_dirs == LV_DRAG_DIR_ALL) {
+        if(allowed_dirs == LV_DRAG_DIR_HOR || allowed_dirs == LV_DRAG_DIR_BOTH) {
             hor_en = true;
         }
 
-        if(allowed_dirs == LV_DRAG_DIR_VER || allowed_dirs == LV_DRAG_DIR_ALL) {
+        if(allowed_dirs == LV_DRAG_DIR_VER || allowed_dirs == LV_DRAG_DIR_BOTH) {
             ver_en = true;
         }
 
         if(allowed_dirs == LV_DRAG_DIR_ONE) {
-            if(LV_MATH_ABS(state->types.pointer.drag_sum.x) > LV_MATH_ABS(state->types.pointer.drag_sum.y)) {
+            if(LV_MATH_ABS(proc->types.pointer.drag_sum.x) > LV_MATH_ABS(proc->types.pointer.drag_sum.y)) {
                 hor_en = true;
             } else {
                 ver_en = true;
@@ -1087,17 +1089,17 @@ static void indev_drag(lv_indev_proc_t * state)
         }
 
         /*If a move is greater then LV_DRAG_LIMIT then begin the drag*/
-        if((hor_en && LV_MATH_ABS(state->types.pointer.drag_sum.x) >= indev_act->driver.drag_limit) ||
-           (ver_en && LV_MATH_ABS(state->types.pointer.drag_sum.y) >= indev_act->driver.drag_limit)) {
-            state->types.pointer.drag_limit_out = 1;
+        if((hor_en && LV_MATH_ABS(proc->types.pointer.drag_sum.x) >= indev_act->driver.drag_limit) ||
+           (ver_en && LV_MATH_ABS(proc->types.pointer.drag_sum.y) >= indev_act->driver.drag_limit)) {
+            proc->types.pointer.drag_limit_out = 1;
             drag_just_started                   = true;
         }
     }
 
     /*If the drag limit is exceeded handle the dragging*/
-    if(state->types.pointer.drag_limit_out != 0) {
+    if(proc->types.pointer.drag_limit_out != 0) {
         /*Set new position if the vector is not zero*/
-        if(state->types.pointer.vect.x != 0 || state->types.pointer.vect.y != 0) {
+        if(proc->types.pointer.vect.x != 0 || proc->types.pointer.vect.y != 0) {
 
             uint16_t inv_buf_size =
                 lv_disp_get_inv_buf_size(indev_act->driver.disp); /*Get the number of currently invalidated areas*/
@@ -1111,49 +1113,54 @@ static void indev_drag(lv_indev_proc_t * state)
             lv_coord_t act_x = lv_obj_get_x(drag_obj);
             lv_coord_t act_y = lv_obj_get_y(drag_obj);
 
-            if(allowed_dirs == LV_DRAG_DIR_ALL) {
+            if(allowed_dirs == LV_DRAG_DIR_BOTH) {
                 if(drag_just_started) {
-                    act_x += state->types.pointer.drag_sum.x;
-                    act_y += state->types.pointer.drag_sum.y;
+                    proc->types.pointer.drag_dir = LV_DRAG_DIR_BOTH;
+                    act_x += proc->types.pointer.drag_sum.x;
+                    act_y += proc->types.pointer.drag_sum.y;
                 }
-                lv_obj_set_pos(drag_obj, act_x + state->types.pointer.vect.x, act_y + state->types.pointer.vect.y);
+                lv_obj_set_pos(drag_obj, act_x + proc->types.pointer.vect.x, act_y + proc->types.pointer.vect.y);
             } else if(allowed_dirs == LV_DRAG_DIR_HOR) {
                 if(drag_just_started) {
-                    state->types.pointer.drag_sum.y = 0;
-                    act_x += state->types.pointer.drag_sum.x;
+                    proc->types.pointer.drag_dir = LV_DRAG_DIR_HOR;
+                    proc->types.pointer.drag_sum.y = 0;
+                    act_x += proc->types.pointer.drag_sum.x;
                 }
-                lv_obj_set_x(drag_obj, act_x + state->types.pointer.vect.x);
+                lv_obj_set_x(drag_obj, act_x + proc->types.pointer.vect.x);
             } else if(allowed_dirs == LV_DRAG_DIR_VER) {
                 if(drag_just_started) {
-                    state->types.pointer.drag_sum.x = 0;
-                    act_y += state->types.pointer.drag_sum.y;
+                    proc->types.pointer.drag_dir = LV_DRAG_DIR_VER;
+                    proc->types.pointer.drag_sum.x = 0;
+                    act_y += proc->types.pointer.drag_sum.y;
                 }
-                lv_obj_set_y(drag_obj, act_y + state->types.pointer.vect.y);
+                lv_obj_set_y(drag_obj, act_y + proc->types.pointer.vect.y);
             } else if(allowed_dirs == LV_DRAG_DIR_ONE) {
                 if(drag_just_started) {
-                    if(LV_MATH_ABS(state->types.pointer.drag_sum.x) > LV_MATH_ABS(state->types.pointer.drag_sum.y)) {
-                        state->types.pointer.drag_sum.y = 0;
+                    if(LV_MATH_ABS(proc->types.pointer.drag_sum.x) > LV_MATH_ABS(proc->types.pointer.drag_sum.y)) {
+                        proc->types.pointer.drag_dir = LV_DRAG_DIR_HOR;
+                        proc->types.pointer.drag_sum.y = 0;
+                        act_x += proc->types.pointer.drag_sum.x;
                     } else {
-                        state->types.pointer.drag_sum.x = 0;
+                        proc->types.pointer.drag_dir = LV_DRAG_DIR_VER;
+                        proc->types.pointer.drag_sum.x = 0;
+                        act_y += proc->types.pointer.drag_sum.y;
                     }
-                    act_x += state->types.pointer.drag_sum.x;
-                    act_y += state->types.pointer.drag_sum.y;
                 }
 
-                /*The inactive direction in drag_sum is kept zero*/
-                if(state->types.pointer.drag_sum.x) act_x += state->types.pointer.vect.x;
-                if(state->types.pointer.drag_sum.y) act_y += state->types.pointer.vect.y;
+                /*In the inactive direction `drag_sum` is kept zero*/
+                if(proc->types.pointer.drag_sum.x) act_x += proc->types.pointer.vect.x;
+                if(proc->types.pointer.drag_sum.y) act_y += proc->types.pointer.vect.y;
                 lv_obj_set_pos(drag_obj, act_x, act_y);
-                state->types.pointer.drag_in_prog = 1;
+                proc->types.pointer.drag_in_prog = 1;
 
                 /*Set the drag in progress flag*/
                 /*Send the drag begin signal on first move*/
                 if(drag_just_started) {
                     drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_BEGIN, indev_act);
-                    if(indev_reset_check(state)) return;
+                    if(indev_reset_check(proc)) return;
 
                     lv_event_send(drag_obj, LV_EVENT_DRAG_BEGIN, NULL);
-                    if(indev_reset_check(state)) return;
+                    if(indev_reset_check(proc)) return;
                 }
             }
 
@@ -1211,7 +1218,7 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
         lv_coord_t act_x = lv_obj_get_x(drag_obj) + proc->types.pointer.drag_throw_vect.x;
         lv_coord_t act_y = lv_obj_get_y(drag_obj) + proc->types.pointer.drag_throw_vect.y;
 
-        if(allowed_dirs == LV_DRAG_DIR_ALL) lv_obj_set_pos(drag_obj, act_x, act_y);
+        if(allowed_dirs == LV_DRAG_DIR_BOTH) lv_obj_set_pos(drag_obj, act_x, act_y);
         else if(allowed_dirs == LV_DRAG_DIR_HOR) lv_obj_set_x(drag_obj, act_x);
         else if(allowed_dirs == LV_DRAG_DIR_VER) lv_obj_set_y(drag_obj, act_y);
         else if(allowed_dirs == LV_DRAG_DIR_ONE) {

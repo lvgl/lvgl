@@ -280,7 +280,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         /*Set attributes*/
         new_obj->click        = 1;
         new_obj->drag         = 0;
-        new_obj->drag_dir     = LV_DRAG_DIR_ALL;
+        new_obj->drag_dir     = LV_DRAG_DIR_BOTH;
         new_obj->drag_throw   = 0;
         new_obj->drag_parent  = 0;
         new_obj->hidden       = 0;

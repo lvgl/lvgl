@@ -46,8 +46,6 @@ typedef struct
     uint8_t drag_bottom_en : 1;
     uint8_t drag_left_en : 1;
     uint8_t drag_right_en : 1;
-    uint8_t drag_hor : 1;
-    uint8_t drag_ver : 1;
 } lv_tileview_ext_t;
 
 /*Styles*/
