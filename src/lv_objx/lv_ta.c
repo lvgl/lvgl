@@ -162,11 +162,11 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->cursor.pos        = copy_ext->cursor.pos;
         ext->cursor.valid_x    = copy_ext->cursor.valid_x;
         ext->cursor.type       = copy_ext->cursor.type;
-        if(copy_ext->one_line) lv_ta_set_one_line(new_ta, true);
         if(copy_ext->placeholder != NULL)
             ext->placeholder = lv_label_create(new_ta, copy_ext->placeholder);
         else
             ext->placeholder = NULL;
+        if(copy_ext->one_line) lv_ta_set_one_line(new_ta, true);
 
         lv_ta_set_style(new_ta, LV_TA_STYLE_CURSOR, lv_ta_get_style(copy, LV_TA_STYLE_CURSOR));
 
