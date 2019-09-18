@@ -1060,6 +1060,7 @@ static void indev_drag(lv_indev_proc_t * proc)
 
     if(lv_obj_get_drag(drag_obj) == false) return;
 
+
     lv_drag_dir_t allowed_dirs = lv_obj_get_drag_dir(drag_obj);
 
     /*Count the movement by drag*/

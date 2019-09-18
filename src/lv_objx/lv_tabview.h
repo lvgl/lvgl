@@ -53,7 +53,7 @@ typedef struct
     /*New data for this type */
     lv_obj_t * btns;
     lv_obj_t * indic;
-    lv_obj_t * content; /*A rectangle to show the current tab*/
+    lv_obj_t * content; /*A background page which holds tab's pages*/
     const char ** tab_name_ptr;
     lv_point_t point_last;
     uint16_t tab_cur;
@@ -61,10 +61,6 @@ typedef struct
 #if LV_USE_ANIMATION
     uint16_t anim_time;
 #endif
-    uint8_t slide_enable : 1; /*1: enable horizontal sliding by touch pad*/
-    uint8_t draging : 1;
-    uint8_t drag_hor : 1;
-    uint8_t scroll_ver : 1;
     uint8_t btns_hide : 1;
     lv_tabview_btns_pos_t btns_pos : 2;
 } lv_tabview_ext_t;
@@ -123,13 +119,6 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name);
 void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t anim);
 
 /**
- * Enable horizontal sliding with touch pad
- * @param tabview pointer to Tab view object
- * @param en true: enable sliding; false: disable sliding
- */
-void lv_tabview_set_sliding(lv_obj_t * tabview, bool en);
-
-/**
  * Set the animation time of tab view when a new tab is loaded
  * @param tabview pointer to Tab view object
  * @param anim_time time of animation in milliseconds
@@ -182,13 +171,6 @@ uint16_t lv_tabview_get_tab_count(const lv_obj_t * tabview);
  * @return pointer to page (lv_page) object
  */
 lv_obj_t * lv_tabview_get_tab(const lv_obj_t * tabview, uint16_t id);
-
-/**
- * Get horizontal sliding is enabled or not
- * @param tabview pointer to Tab view object
- * @return true: enable sliding; false: disable sliding
- */
-bool lv_tabview_get_sliding(const lv_obj_t * tabview);
 
 /**
  * Get the animation time of tab view when a new tab is loaded

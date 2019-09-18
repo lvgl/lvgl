@@ -961,8 +961,9 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
             lv_point_t * drag_sum = &indev->proc.types.pointer.drag_sum;
             lv_page_ext_t * parent_ext = lv_obj_get_ext_attr(lv_obj_get_parent(page_parent));
             if(parent_ext->scroll_prop_obj == NULL) {
-                /*If the dragging just started enable the scroll propagation if the conditions are met*/
-                if(lv_indev_is_dragging(indev) == false && (drag_sum->y || drag_sum->x)) {
+                /*If the dragging just started or scroll is already propagated to this object
+                 *  enable the scroll propagation if the conditions are met*/
+                if((lv_indev_is_dragging(indev) == false || page_ext->scroll_prop_obj) && (drag_sum->y || drag_sum->x)) {
                     /*Propagate vertically?*/
                     if((drag_sum->y > 0 && lv_page_on_edge(page, LV_PAGE_EDGE_TOP)) ||
                         (drag_sum->y < 0 && lv_page_on_edge(page, LV_PAGE_EDGE_BOTTOM))) {
@@ -1030,7 +1031,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
 
         /*Scroll propagation is finished on drag end*/
         if(page_ext->scroll_prop_obj) {
-
+            printf("prop_end\n");
 
             lv_obj_t * scroller_page = page_ext->scroll_prop_obj;
             page_ext->scroll_prop_obj = NULL;

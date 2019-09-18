@@ -81,10 +81,6 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
-    ext->drag_hor     = 0;
-    ext->draging      = 0;
-    ext->scroll_ver   = 0;
-    ext->slide_enable = 1;
     ext->tab_cur      = 0;
     ext->point_last.x = 0;
     ext->point_last.y = 0;
@@ -114,7 +110,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_size(new_tabview, lv_obj_get_width_fit(lv_obj_get_parent(new_tabview)),
                         lv_obj_get_height_fit(lv_obj_get_parent(new_tabview)));
 
-        ext->content = lv_cont_create(new_tabview, NULL);
+        ext->content = lv_page_create(new_tabview, NULL);
         ext->btns    = lv_btnm_create(new_tabview, NULL);
         ext->indic   = lv_obj_create(ext->btns, NULL);
 
@@ -126,11 +122,14 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
         lv_obj_set_click(ext->indic, false);
 
-        lv_cont_set_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_NONE);
-        lv_cont_set_layout(ext->content, LV_LAYOUT_ROW_T);
-        lv_cont_set_style(ext->content, LV_CONT_STYLE_MAIN, &lv_style_transp_tight);
+        lv_cont_set_fit2(ext->content, LV_FIT_NONE, LV_FIT_NONE);
+        lv_page_set_scrl_fit(ext->content, LV_FIT_TIGHT);
+        lv_page_set_scrl_layout(ext->content, LV_LAYOUT_ROW_T);
+        lv_page_set_style(ext->content, LV_PAGE_STYLE_BG, &lv_style_transp_tight);
+        lv_page_set_style(ext->content, LV_PAGE_STYLE_SCRL, &lv_style_pretty);
         lv_obj_set_height(ext->content, lv_obj_get_height(new_tabview) - lv_obj_get_height(ext->btns));
         lv_obj_align(ext->content, ext->btns, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+        lv_obj_set_drag_dir(lv_page_get_scrl(ext->content), LV_DRAG_DIR_ONE);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
@@ -155,7 +154,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->point_last.y           = 0;
         ext->btns                   = lv_btnm_create(new_tabview, copy_ext->btns);
         ext->indic                  = lv_obj_create(ext->btns, copy_ext->indic);
-        ext->content                = lv_cont_create(new_tabview, copy_ext->content);
+        ext->content                = lv_page_create(new_tabview, copy_ext->content);
 #if LV_USE_ANIMATION
         ext->anim_time = copy_ext->anim_time;
 #endif
@@ -214,8 +213,10 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_obj_t * h = lv_page_create(ext->content, NULL);
     lv_obj_set_size(h, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
     lv_page_set_sb_mode(h, LV_SB_MODE_AUTO);
-    lv_page_set_style(h, LV_PAGE_STYLE_BG, &lv_style_transp);
-    lv_page_set_style(h, LV_PAGE_STYLE_SCRL, &lv_style_transp);
+    lv_page_set_style(h, LV_PAGE_STYLE_BG, &lv_style_plain_color);
+    lv_page_set_style(h, LV_PAGE_STYLE_SCRL, &lv_style_plain);
+    lv_page_set_scroll_propagation(h, true);
+    lv_obj_set_drag_dir(lv_page_get_scrl(h), LV_DRAG_DIR_ONE);
 
     if(page_signal == NULL) page_signal = lv_obj_get_signal_cb(h);
     if(page_scrl_signal == NULL) page_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(h));
@@ -360,13 +361,13 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     }
 
     if(anim == LV_ANIM_OFF || lv_tabview_get_anim_time(tabview) == 0) {
-        lv_obj_set_x(ext->content, cont_x);
+        lv_obj_set_x(lv_page_get_scrl(ext->content), cont_x);
     }
 #if LV_USE_ANIMATION
     else {
         lv_anim_t a;
-        a.var            = ext->content;
-        a.start          = lv_obj_get_x(ext->content);
+        a.var            = lv_page_get_scrl(ext->content);
+        a.start          = lv_obj_get_x(lv_page_get_scrl(ext->content));
         a.end            = cont_x;
         a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_x;
         a.path_cb        = lv_anim_path_linear;
@@ -443,17 +444,6 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 #endif
 
     lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_TGL_STATE);
-}
-
-/**
- * Enable horizontal sliding with touch pad
- * @param tabview pointer to Tab view object
- * @param en true: enable sliding; false: disable sliding
- */
-void lv_tabview_set_sliding(lv_obj_t * tabview, bool en)
-{
-    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
-    ext->slide_enable      = en == false ? 0 : 1;
 }
 
 /**
@@ -571,28 +561,18 @@ uint16_t lv_tabview_get_tab_count(const lv_obj_t * tabview)
 lv_obj_t * lv_tabview_get_tab(const lv_obj_t * tabview, uint16_t id)
 {
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
+    lv_obj_t * content_scrl = lv_page_get_scrl(ext->content);
     uint16_t i             = 0;
-    lv_obj_t * page        = lv_obj_get_child_back(ext->content, NULL);
+    lv_obj_t * page        = lv_obj_get_child_back(content_scrl, NULL);
 
     while(page != NULL && i != id) {
         i++;
-        page = lv_obj_get_child_back(ext->content, page);
+        page = lv_obj_get_child_back(content_scrl, page);
     }
 
     if(i == id) return page;
 
     return NULL;
-}
-
-/**
- * Get horizontal sliding is enabled or not
- * @param tabview pointer to Tab view object
- * @return true: enable sliding; false: disable sliding
- */
-bool lv_tabview_get_sliding(const lv_obj_t * tabview)
-{
-    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
-    return ext->slide_enable ? true : false;
 }
 
 /**
@@ -759,7 +739,7 @@ static lv_res_t tabpage_signal(lv_obj_t * tab_page, lv_signal_t sign, void * par
     lv_obj_t * cont    = lv_obj_get_parent(tab_page);
     lv_obj_t * tabview = lv_obj_get_parent(cont);
 
-    if(lv_tabview_get_sliding(tabview) == false) return res;
+//    if(lv_tabview_get_sliding(tabview) == false) return res;
 
     if(sign == LV_SIGNAL_PRESSED) {
         tabpage_pressed_handler(tabview, tab_page);
@@ -787,10 +767,10 @@ static lv_res_t tabpage_scrl_signal(lv_obj_t * tab_scrl, lv_signal_t sign, void 
     if(res != LV_RES_OK) return res;
 
     lv_obj_t * tab_page = lv_obj_get_parent(tab_scrl);
-    lv_obj_t * cont     = lv_obj_get_parent(tab_page);
+    lv_obj_t * cont     = lv_obj_get_parent(lv_obj_get_parent(tab_page));
     lv_obj_t * tabview  = lv_obj_get_parent(cont);
 
-    if(lv_tabview_get_sliding(tabview) == false) return res;
+//    if(lv_tabview_get_sliding(tabview) == false) return res;
 
     if(sign == LV_SIGNAL_PRESSED) {
         tabpage_pressed_handler(tabview, tab_page);
@@ -810,11 +790,11 @@ static lv_res_t tabpage_scrl_signal(lv_obj_t * tab_scrl, lv_signal_t sign, void 
  */
 static void tabpage_pressed_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
 {
-    (void)tabpage;
-
-    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
-    lv_indev_t * indev     = lv_indev_get_act();
-    lv_indev_get_point(indev, &ext->point_last);
+//    (void)tabpage;
+//
+//    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
+//    lv_indev_t * indev     = lv_indev_get_act();
+//    lv_indev_get_point(indev, &ext->point_last);
 }
 
 /**
@@ -824,66 +804,66 @@ static void tabpage_pressed_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
  */
 static void tabpage_pressing_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
 {
-    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
-    lv_indev_t * indev     = lv_indev_get_act();
-    lv_point_t point_act;
-    lv_indev_get_point(indev, &point_act);
-    lv_coord_t x_diff = point_act.x - ext->point_last.x;
-    lv_coord_t y_diff = point_act.y - ext->point_last.y;
-
-    if(!ext->scroll_ver && (x_diff >= LV_INDEV_DEF_DRAG_LIMIT || x_diff <= -LV_INDEV_DEF_DRAG_LIMIT)) {
-        ext->draging = 1;
-        /*Check if the page is on the edge */
-        if((lv_page_on_edge(tabpage, LV_PAGE_EDGE_LEFT) && x_diff > 0) ||
-           (lv_page_on_edge(tabpage, LV_PAGE_EDGE_RIGHT) && x_diff < 0)) {
-            if(ext->drag_hor == 0) {
-                ext->point_last.x = point_act.x;
-                ext->point_last.y = point_act.y;
-            }
-            ext->drag_hor = 1;
-            lv_obj_set_drag(lv_page_get_scrl(tabpage), false);
-
-        } else if(ext->drag_hor == 0) {
-            ext->drag_hor = 0;
-        }
-    } else if(y_diff >= LV_INDEV_DEF_DRAG_LIMIT || y_diff <= -LV_INDEV_DEF_DRAG_LIMIT) {
-        ext->drag_hor   = 0;
-        ext->draging    = 1;
-        ext->scroll_ver = 1;
-    } else
-        ext->draging = 0;
-
-    if(ext->drag_hor) {
-        lv_obj_set_x(ext->content, lv_obj_get_x(ext->content) + point_act.x - ext->point_last.x);
-        ext->point_last.x = point_act.x;
-        ext->point_last.y = point_act.y;
-
-        /*Move the indicator*/
-        const lv_style_t * tabs_style = lv_obj_get_style(ext->btns);
-        lv_coord_t indic_size;
-        lv_coord_t p;
-        lv_coord_t indic_y;
-        const lv_style_t * indic_style;
-
-        switch(ext->btns_pos) {
-            case LV_TABVIEW_BTNS_POS_TOP:
-            case LV_TABVIEW_BTNS_POS_BOTTOM:
-                indic_size  = lv_obj_get_width(ext->indic);
-                indic_style = lv_obj_get_style(ext->indic);
-                p = ((tabpage->coords.x1 - tabview->coords.x1) * (indic_size + tabs_style->body.padding.inner)) /
-                    lv_obj_get_width(tabview);
-
-                lv_obj_set_x(ext->indic, indic_size * ext->tab_cur + tabs_style->body.padding.inner * ext->tab_cur +
-                                             indic_style->body.padding.left - p);
-                break;
-            case LV_TABVIEW_BTNS_POS_LEFT:
-            case LV_TABVIEW_BTNS_POS_RIGHT:
-                indic_size = lv_obj_get_height(ext->indic);
-                indic_y = tabs_style->body.padding.top + ext->tab_cur * (indic_size + tabs_style->body.padding.inner);
-                lv_obj_set_y(ext->indic, indic_y);
-                break;
-        }
-    }
+//    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
+//    lv_indev_t * indev     = lv_indev_get_act();
+//    lv_point_t point_act;
+//    lv_indev_get_point(indev, &point_act);
+//    lv_coord_t x_diff = point_act.x - ext->point_last.x;
+//    lv_coord_t y_diff = point_act.y - ext->point_last.y;
+//
+//    if(!ext->scroll_ver && (x_diff >= LV_INDEV_DEF_DRAG_LIMIT || x_diff <= -LV_INDEV_DEF_DRAG_LIMIT)) {
+//        ext->draging = 1;
+//        /*Check if the page is on the edge */
+//        if((lv_page_on_edge(tabpage, LV_PAGE_EDGE_LEFT) && x_diff > 0) ||
+//           (lv_page_on_edge(tabpage, LV_PAGE_EDGE_RIGHT) && x_diff < 0)) {
+//            if(ext->drag_hor == 0) {
+//                ext->point_last.x = point_act.x;
+//                ext->point_last.y = point_act.y;
+//            }
+//            ext->drag_hor = 1;
+//            lv_obj_set_drag(lv_page_get_scrl(tabpage), false);
+//
+//        } else if(ext->drag_hor == 0) {
+//            ext->drag_hor = 0;
+//        }
+//    } else if(y_diff >= LV_INDEV_DEF_DRAG_LIMIT || y_diff <= -LV_INDEV_DEF_DRAG_LIMIT) {
+//        ext->drag_hor   = 0;
+//        ext->draging    = 1;
+//        ext->scroll_ver = 1;
+//    } else
+//        ext->draging = 0;
+//
+//    if(ext->drag_hor) {
+//        lv_obj_set_x(ext->content, lv_obj_get_x(ext->content) + point_act.x - ext->point_last.x);
+//        ext->point_last.x = point_act.x;
+//        ext->point_last.y = point_act.y;
+//
+//        /*Move the indicator*/
+//        const lv_style_t * tabs_style = lv_obj_get_style(ext->btns);
+//        lv_coord_t indic_size;
+//        lv_coord_t p;
+//        lv_coord_t indic_y;
+//        const lv_style_t * indic_style;
+//
+//        switch(ext->btns_pos) {
+//            case LV_TABVIEW_BTNS_POS_TOP:
+//            case LV_TABVIEW_BTNS_POS_BOTTOM:
+//                indic_size  = lv_obj_get_width(ext->indic);
+//                indic_style = lv_obj_get_style(ext->indic);
+//                p = ((tabpage->coords.x1 - tabview->coords.x1) * (indic_size + tabs_style->body.padding.inner)) /
+//                    lv_obj_get_width(tabview);
+//
+//                lv_obj_set_x(ext->indic, indic_size * ext->tab_cur + tabs_style->body.padding.inner * ext->tab_cur +
+//                                             indic_style->body.padding.left - p);
+//                break;
+//            case LV_TABVIEW_BTNS_POS_LEFT:
+//            case LV_TABVIEW_BTNS_POS_RIGHT:
+//                indic_size = lv_obj_get_height(ext->indic);
+//                indic_y = tabs_style->body.padding.top + ext->tab_cur * (indic_size + tabs_style->body.padding.inner);
+//                lv_obj_set_y(ext->indic, indic_y);
+//                break;
+//        }
+//    }
 }
 
 /**
@@ -893,44 +873,44 @@ static void tabpage_pressing_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
  */
 static void tabpage_press_lost_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
 {
-    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
-    ext->drag_hor          = 0;
-    ext->draging           = 0;
-    ext->scroll_ver        = 0;
-
-    lv_obj_set_drag(lv_page_get_scrl(tabpage), true);
-
-    lv_indev_t * indev = lv_indev_get_act();
-    lv_point_t point_act;
-    lv_indev_get_point(indev, &point_act);
-    lv_point_t vect;
-    lv_indev_get_vect(indev, &vect);
-    lv_coord_t x_predict = 0;
-
-    while(vect.x != 0) {
-        x_predict += vect.x;
-        vect.x = vect.x * (100 - LV_INDEV_DEF_DRAG_THROW) / 100;
-    }
-
-    lv_coord_t page_x1  = tabpage->coords.x1 - tabview->coords.x1 + x_predict;
-    lv_coord_t page_x2  = page_x1 + lv_obj_get_width(tabpage);
-    lv_coord_t treshold = lv_obj_get_width(tabview) / 2;
-
-    uint16_t tab_cur = ext->tab_cur;
-    if(page_x1 > treshold) {
-        if(tab_cur != 0) tab_cur--;
-    } else if(page_x2 < treshold) {
-        if(tab_cur < ext->tab_cnt - 1) tab_cur++;
-    }
-
-    uint32_t id_prev = lv_tabview_get_tab_act(tabview);
-    lv_tabview_set_tab_act(tabview, tab_cur, LV_ANIM_ON);
-    uint32_t id_new = lv_tabview_get_tab_act(tabview);
-
-    lv_res_t res = LV_RES_OK;
-    if(id_prev != id_new) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
-
-    if(res != LV_RES_OK) return;
+//    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
+//    ext->drag_hor          = 0;
+//    ext->draging           = 0;
+//    ext->scroll_ver        = 0;
+//
+//    lv_obj_set_drag(lv_page_get_scrl(tabpage), true);
+//
+//    lv_indev_t * indev = lv_indev_get_act();
+//    lv_point_t point_act;
+//    lv_indev_get_point(indev, &point_act);
+//    lv_point_t vect;
+//    lv_indev_get_vect(indev, &vect);
+//    lv_coord_t x_predict = 0;
+//
+//    while(vect.x != 0) {
+//        x_predict += vect.x;
+//        vect.x = vect.x * (100 - LV_INDEV_DEF_DRAG_THROW) / 100;
+//    }
+//
+//    lv_coord_t page_x1  = tabpage->coords.x1 - tabview->coords.x1 + x_predict;
+//    lv_coord_t page_x2  = page_x1 + lv_obj_get_width(tabpage);
+//    lv_coord_t treshold = lv_obj_get_width(tabview) / 2;
+//
+//    uint16_t tab_cur = ext->tab_cur;
+//    if(page_x1 > treshold) {
+//        if(tab_cur != 0) tab_cur--;
+//    } else if(page_x2 < treshold) {
+//        if(tab_cur < ext->tab_cnt - 1) tab_cur++;
+//    }
+//
+//    uint32_t id_prev = lv_tabview_get_tab_act(tabview);
+//    lv_tabview_set_tab_act(tabview, tab_cur, LV_ANIM_ON);
+//    uint32_t id_new = lv_tabview_get_tab_act(tabview);
+//
+//    lv_res_t res = LV_RES_OK;
+//    if(id_prev != id_new) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
+//
+//    if(res != LV_RES_OK) return;
 }
 
 /**
@@ -1042,8 +1022,9 @@ static void tabview_realign(lv_obj_t * tabview)
                 lv_obj_align(ext->content, ext->btns, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
                 lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
 
-                lv_cont_set_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_NONE);
-                lv_cont_set_layout(ext->content, LV_LAYOUT_ROW_T);
+//                lv_cont_set_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_NONE);
+//                lv_cont_set_layout(ext->content, LV_LAYOUT_ROW_T);
+                lv_obj_set_width(ext->content, lv_obj_get_width(tabview));
                 lv_obj_set_height(ext->content, lv_obj_get_height(tabview) - lv_obj_get_height(ext->btns));
                 break;
             case LV_TABVIEW_BTNS_POS_BOTTOM:
@@ -1082,7 +1063,8 @@ static void tabview_realign(lv_obj_t * tabview)
         }
     }
 
-    lv_obj_t * pages = lv_obj_get_child(ext->content, NULL);
+    lv_obj_t * content_scrl = lv_page_get_scrl(ext->content);
+    lv_obj_t * pages = lv_obj_get_child(content_scrl, NULL);
     while(pages != NULL) {
         if(lv_obj_get_signal_cb(pages) == tabpage_signal) { /*Be sure adjust only the pages (user can other things)*/
             switch(ext->btns_pos) {
@@ -1097,7 +1079,7 @@ static void tabview_realign(lv_obj_t * tabview)
                     break;
             }
         }
-        pages = lv_obj_get_child(ext->content, pages);
+        pages = lv_obj_get_child(content_scrl, pages);
     }
 
     if(!ext->btns_hide) {
