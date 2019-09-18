@@ -53,7 +53,6 @@ typedef struct {
     lv_color_t ring_color;
 } lv_cpicker_ext_t;
 
-
 /*Styles*/
 enum {
     LV_CPICKER_STYLE_MAIN,
@@ -82,8 +81,6 @@ enum {
 };
 typedef uint8_t lv_cpicker_wheel_mode_t;
 
-
-
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -95,11 +92,6 @@ typedef uint8_t lv_cpicker_wheel_mode_t;
  * @return pointer to the created colorpicker
  */
 lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy);
-
-/*======================
- * Add/remove functions
- *=====================*/
-
 
 /*=====================
  * Setter functions
@@ -224,7 +216,7 @@ lv_color_t lv_cpicker_get_color(lv_obj_t * cpicker);
  *      MACROS
  **********************/
 
-#endif  /*USE_LV_CPICKER*/
+#endif  /*LV_USE_CPICKER*/
 
 #ifdef __cplusplus
 } /* extern "C" */

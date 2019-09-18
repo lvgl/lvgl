@@ -3,24 +3,17 @@
  *
  */
 
-/* TODO Remove these instructions
- * Search an replace: color_picker -> object normal name with lower case (e.g. button, label etc.)
- *                    cpicker -> object short name with lower case(e.g. btn, label etc)
- *                    CPICKER -> object short name with upper case (e.g. BTN, LABEL etc.)
- *
- */
-
 /*********************
  *      INCLUDES
  *********************/
 #include "lv_cpicker.h"
-#include "../lv_misc/lv_math.h"
+#if LV_USE_CPICKER != 0
+
 #include "../lv_draw/lv_draw_arc.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_core/lv_refr.h"
-
-#if LV_USE_CPICKER != 0
+#include "../lv_misc/lv_math.h"
 
 /*********************
  *      DEFINES
@@ -82,8 +75,8 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker);
 /**********************
  *  STATIC VARIABLES
  **********************/
-//LVGLv5 static lv_signal_func_t ancestor_signal;
-//LVGLv5 static lv_design_func_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -103,18 +96,19 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("color_picker create started");
 
-    /*Create the ancestor of color_picker*/
-    /*TODO modify it to the ancestor create function */
-    lv_obj_t * new_cpicker = lv_obj_create(par, copy);
+    lv_obj_t * new_cpicker;
+    
+    new_cpicker = lv_obj_create(par, copy);
     lv_mem_assert(new_cpicker);
     if(new_cpicker == NULL) return NULL;
 
-    /*Allocate the colorpicker type specific extended data*/
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_cpicker);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_cpicker);
+
+    /*Allocate the extended data*/
     lv_cpicker_ext_t * ext = lv_obj_allocate_ext_attr(new_cpicker, sizeof(lv_cpicker_ext_t));
     lv_mem_assert(ext);
     if(ext == NULL) return NULL;
-    //LVGLv5 if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_cpicker);
-    //LVGLv5 if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_cpicker);
 
     /*Initialize the allocated 'ext' */
     ext->hue = LV_CPICKER_DEF_HUE;
@@ -132,19 +126,18 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     /*The signal and design functions are not copied so set them here*/
     if(ext->type == LV_CPICKER_TYPE_DISC)
     {
-        //LVGLv5 lv_obj_set_signal_func(new_cpicker, lv_cpicker_disc_signal);
-        //LVGLv5 lv_obj_set_design_func(new_cpicker, lv_cpicker_disc_design);
+        lv_obj_set_signal_cb(new_cpicker, lv_cpicker_disc_signal);
+        lv_obj_set_design_cb(new_cpicker, lv_cpicker_disc_design);
     }
     else if(ext->type == LV_CPICKER_TYPE_RECT)
     {
-        //LVGLv5 lv_obj_set_signal_func(new_cpicker, lv_cpicker_rect_signal);
-        //LVGLv5 lv_obj_set_design_func(new_cpicker, lv_cpicker_rect_design);
+        lv_obj_set_signal_cb(new_cpicker, lv_cpicker_rect_signal);
+        lv_obj_set_design_cb(new_cpicker, lv_cpicker_rect_design);
     }
 
-    /*Init the new cpicker color_picker*/
+    /*If no copy do the basic initialization*/
     if(copy == NULL) {
 
-        /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
             lv_cpicker_set_style(new_cpicker, LV_CPICKER_STYLE_MAIN, th->style.bg);
@@ -152,8 +145,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_cpicker_set_style(new_cpicker, LV_CPICKER_STYLE_MAIN, &lv_style_plain);
         }
     }
-
-    /*Copy an existing color_picker*/
+    /*Copy 'copy'*/
     else {
         lv_cpicker_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
@@ -161,19 +153,10 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_refresh_style(new_cpicker);
     }
 
-    LV_LOG_INFO("colorpicker created");
+    LV_LOG_INFO("color_picker created");
 
     return new_cpicker;
 }
-
-/*======================
- * Add/remove functions
- *=====================*/
-
-/*
- * New object specific "add" or "remove" functions come here
- */
-
 
 /*=====================
  * Setter functions
@@ -182,7 +165,6 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
 /*
  * New object specific "set" functions come here
  */
-
 
 /**
  * Set a style of a color_picker.
@@ -641,7 +623,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         center_area.y1 = y - wradius;
         center_area.x2 = x + wradius;
         center_area.y2 = y + wradius;
-	styleCopy.body.grad_color = styleCopy.body.main_color;
+	    styleCopy.body.grad_color = styleCopy.body.main_color;
         styleCopy.body.radius = LV_RADIUS_CIRCLE;
         lv_draw_rect(&center_area, mask, &styleCopy, opa_scale);
 
@@ -779,8 +761,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             lv_draw_rect(&circle_area, mask, ext->ind.style, opa_scale);
             break;
         }
-        }
-
+        } // switch
 
         /*
         //code to color the drawn area
@@ -791,7 +772,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         style2.body.grad_color.full = c;
         c += 0x123445678;
         lv_draw_rect(mask, mask, &style2, opa_scale);
-         */
+        */
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
@@ -837,7 +818,6 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         lv_coord_t x2 = cpicker->coords.x2;
         lv_coord_t y2 = cpicker->coords.y2;
         lv_opa_t opa_scale = lv_obj_get_opa_scale(cpicker);
-
 
         /* prepare the color preview area */
         uint16_t preview_offset = style->line.width;
