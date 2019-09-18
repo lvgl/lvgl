@@ -162,6 +162,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->cursor.pos        = copy_ext->cursor.pos;
         ext->cursor.valid_x    = copy_ext->cursor.valid_x;
         ext->cursor.type       = copy_ext->cursor.type;
+        if(ext->pwd_mode != 0) pwd_char_hider( new_ta);
         if(copy_ext->placeholder != NULL)
             ext->placeholder = lv_label_create(new_ta, copy_ext->placeholder);
         else
