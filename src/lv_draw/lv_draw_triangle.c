@@ -136,7 +136,21 @@ void tri_draw_flat(const lv_point_t * points, const lv_area_t * mask, const lv_s
     if(tri[1].y < tri[0].y) point_swap(&tri[1], &tri[0]);
     if(tri[2].y < tri[1].y) point_swap(&tri[2], &tri[1]);
     if(tri[1].y < tri[0].y) point_swap(&tri[1], &tri[0]);
+/* LVGLv5 
+    /*Return is the triangle is degenerated* /
+    if(tri[0].x == tri[1].x && tri[0].y == tri[1].y) return;
+    if(tri[1].x == tri[2].x && tri[1].y == tri[2].y) return;
+    if(tri[0].x == tri[2].x && tri[0].y == tri[2].y) return;
 
+    if(tri[0].x == tri[1].x && tri[1].x == tri[2].x) return;
+    if(tri[0].y == tri[1].y && tri[1].y == tri[2].y) return;
+
+    /*Chech out of mask* /
+    if(tri[0].x < mask->x1 && tri[1].x < mask->x1 && tri[2].x < mask->x1) return;   /*Out of the mask on the left* /
+    if(tri[0].x > mask->x2 && tri[1].x > mask->x2 && tri[2].x > mask->x2) return;   /*Out of the mask on the right* /
+    if(tri[0].y < mask->y1 && tri[1].y < mask->y1 && tri[2].y < mask->y1) return;   /*Out of the mask on the top* /
+    if(tri[0].y > mask->y2 && tri[1].y > mask->y2 && tri[2].y > mask->y2) return;   /*Out of the mask on the bottom* /
+*/
     /*Draw the triangle*/
     lv_point_t edge1;
     lv_coord_t dx1  = LV_MATH_ABS(tri[0].x - tri[1].x);
