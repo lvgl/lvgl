@@ -917,7 +917,7 @@ const char * lv_ta_get_placeholder_text(lv_obj_t * ta)
 
     const char * txt = NULL;
 
-    if(ext->placeholder) txt = lv_label_get_text(ext->label);
+    if(ext->placeholder) txt = lv_label_get_text(ext->placeholder);
 
     return txt;
 }
