@@ -32,7 +32,6 @@ extern "C" {
  **********************/
 /*Data of colorpicker*/
 typedef struct {
-    /*New data for this type */
     uint16_t hue;
     uint8_t saturation;
     uint8_t value;
@@ -40,33 +39,31 @@ typedef struct {
     {
         lv_style_t * style;
         uint8_t type;
-    }ind;
-    //LVGLv5 lv_action_t value_changed;
+    } indicator;
     uint16_t prev_hue;
-    uint16_t prev_saturation;
-    uint16_t prev_value;
+    uint8_t prev_saturation;
+    uint8_t prev_value;
     uint16_t prev_pos;
-    uint8_t wheel_mode:2;
-    uint8_t wheel_fixed:1;
+    uint8_t color_mode:2;
+    uint8_t color_mode_fixed:1;
     uint8_t type:1;
-    uint32_t last_clic;
-    lv_color_t ring_color;
+    uint32_t last_click;
 } lv_cpicker_ext_t;
 
 /*Styles*/
 enum {
     LV_CPICKER_STYLE_MAIN,
-    LV_CPICKER_STYLE_IND,
+    LV_CPICKER_STYLE_INDICATOR,
 };
 typedef uint8_t lv_cpicker_style_t;
 
 enum {
-    LV_CPICKER_IND_NONE,
-    LV_CPICKER_IND_LINE,
-    LV_CPICKER_IND_CIRCLE,
-    LV_CPICKER_IND_IN
+    LV_CPICKER_INDICATOR_NONE,
+    LV_CPICKER_INDICATOR_LINE,
+    LV_CPICKER_INDICATOR_CIRCLE,
+    LV_CPICKER_INDICATOR_IN
 };
-typedef uint8_t lv_cpicker_ind_type_t;
+typedef uint8_t lv_cpicker_indicator_type_t;
 
 enum {
     LV_CPICKER_TYPE_RECT,
@@ -75,11 +72,11 @@ enum {
 typedef uint8_t lv_cpicker_type_t;
 
 enum {
-    LV_CPICKER_WHEEL_HUE,
-    LV_CPICKER_WHEEL_SAT,
-    LV_CPICKER_WHEEL_VAL
+    LV_CPICKER_COLOR_MODE_HUE,
+    LV_CPICKER_COLOR_MODE_SATURATION,
+    LV_CPICKER_COLOR_MODE_VALUE
 };
-typedef uint8_t lv_cpicker_wheel_mode_t;
+typedef uint8_t lv_cpicker_color_mode_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -110,7 +107,7 @@ void lv_cpicker_set_style(lv_obj_t * cpicker, lv_cpicker_style_t type, lv_style_
  * @param cpicker pointer to colorpicker object
  * @param type indicator type
  */
-void lv_cpicker_set_ind_type(lv_obj_t * cpicker, lv_cpicker_ind_type_t type);
+void lv_cpicker_set_indicator_type(lv_obj_t * cpicker, lv_cpicker_indicator_type_t type);
 
 /**
  * Set the current hue of a colorpicker.
@@ -120,25 +117,18 @@ void lv_cpicker_set_ind_type(lv_obj_t * cpicker, lv_cpicker_ind_type_t type);
 void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue);
 
 /**
- * Set the ring color of a colorpicker.
- * @param cpicker pointer to colorpicker object
- * @param ring_color new ring color
- */
-void lv_cpicker_set_ring_color(lv_obj_t * cpicker, lv_color_t ring_color);
-
-/**
  * Set the current saturation of a colorpicker.
  * @param cpicker pointer to colorpicker object
- * @param sat current selected saturation
+ * @param saturation current selected saturation
  */
-void lv_cpicker_set_saturation(lv_obj_t * cpicker, uint16_t sat);
+void lv_cpicker_set_saturation(lv_obj_t * cpicker, uint8_t saturation);
 
 /**
  * Set the current value of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param val current selected value
  */
-void lv_cpicker_set_value(lv_obj_t * cpicker, uint16_t val);
+void lv_cpicker_set_value(lv_obj_t * cpicker, uint8_t val);
 
 /**
  * Set the current color of a colorpicker.
@@ -148,29 +138,36 @@ void lv_cpicker_set_value(lv_obj_t * cpicker, uint16_t val);
 void lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color);
 
 /**
- * Set the action callback on value change event.
+ * Set the current color mode.
  * @param cpicker pointer to colorpicker object
- * @param action callback function
+ * @param mode color mode (hue/sat/val)
  */
-//LVGLv5 void lv_cpicker_set_action(lv_obj_t * cpicker, lv_action_t action);
+void lv_cpicker_set_color_mode(lv_obj_t * cpicker, lv_cpicker_color_mode_t mode);
 
 /**
- * Set the current wheel mode.
+ * Set if the color mode is changed on long press on center
  * @param cpicker pointer to colorpicker object
- * @param mode wheel mode (hue/sat/val)
+ * @param fixed color mode cannot be changed on long press
  */
-void lv_cpicker_set_wheel_mode(lv_obj_t * cpicker, lv_cpicker_wheel_mode_t mode);
-
-/**
- * Set if the wheel mode is changed on long press on center
- * @param cpicker pointer to colorpicker object
- * @param fixed_mode mode cannot be changed if set
- */
-void lv_cpicker_set_wheel_fixed(lv_obj_t * cpicker, bool fixed_mode);
+void lv_cpicker_set_color_mode_fixed(lv_obj_t * cpicker, bool fixed);
 
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get the current color mode.
+ * @param cpicker pointer to colorpicker object
+ * @return color mode (hue/sat/val)
+ */
+lv_cpicker_color_mode_t lv_cpicker_get_color_mode(lv_obj_t * cpicker);
+
+/**
+ * Get if the color mode is changed on long press on center
+ * @param cpicker pointer to colorpicker object
+ * @return mode cannot be changed on long press
+ */
+bool lv_cpicker_get_color_mode_fixed(lv_obj_t * cpicker);
 
 /**
  * Get style of a colorpicker.
@@ -181,13 +178,6 @@ void lv_cpicker_set_wheel_fixed(lv_obj_t * cpicker, bool fixed_mode);
 lv_style_t * lv_cpicker_get_style(const lv_obj_t * cpicker, lv_cpicker_style_t type);
 
 /**
- * Get the ring color of a colorpicker.
- * @param cpicker pointer to colorpicker object
- * @return current ring color
- */
-lv_color_t lv_cpicker_get_ring_color(const lv_obj_t * cpicker);
-
-/**
  * Get the current hue of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @return hue current selected hue
@@ -195,18 +185,25 @@ lv_color_t lv_cpicker_get_ring_color(const lv_obj_t * cpicker);
 uint16_t lv_cpicker_get_hue(lv_obj_t * cpicker);
 
 /**
+ * Get the current saturation of a colorpicker.
+ * @param cpicker pointer to colorpicker object
+ * @return current selected saturation
+ */
+uint8_t lv_cpicker_get_saturation(lv_obj_t * cpicker);
+
+/**
+ * Get the current hue of a colorpicker.
+ * @param cpicker pointer to colorpicker object
+ * @return current selected value
+ */
+uint8_t lv_cpicker_get_value(lv_obj_t * cpicker);
+
+/**
  * Get the current selected color of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @return color current selected color
  */
 lv_color_t lv_cpicker_get_color(lv_obj_t * cpicker);
-
-/**
- * Get the action callback called on value change event.
- * @param cpicker pointer to colorpicker object
- * @return action callback function
- */
-//LVGLv5 lv_action_t lv_cpicker_get_action(lv_obj_t * cpicker);
 
 /*=====================
  * Other functions
