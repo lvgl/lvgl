@@ -1637,6 +1637,8 @@ static lv_res_t lv_cpicker_rect_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
 
 static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
 {
+    lv_disp_t * disp = lv_disp_get_default();
+
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
     lv_style_t * style = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
 
@@ -1661,7 +1663,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
         center_col_area.x2 = x + radius;
         center_col_area.y2 = y + radius;
 
-        lv_inv_area(&center_col_area, NULL);
+        lv_inv_area(disp, &center_col_area);
 
         switch(ext->indicator.type)
         {
@@ -1730,7 +1732,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
             line_area.x2 += 2*ext->indicator.style->line.width;
             line_area.y2 += 2*ext->indicator.style->line.width;
 
-            lv_inv_area(&line_area, NULL);
+            lv_inv_area(disp, &line_area);
 
             angle = ext->prev_pos;
 
@@ -1779,7 +1781,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
             line_area.x2 += 2*ext->indicator.style->line.width;
             line_area.y2 += 2*ext->indicator.style->line.width;
 
-            lv_inv_area(&line_area, NULL);
+            lv_inv_area(disp, &line_area);
 
             break;
         }
@@ -1812,7 +1814,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
             circle_ind_area.x2 = cx + style->line.width/2;
             circle_ind_area.y2 = cy + style->line.width/2;
 
-            lv_inv_area(&circle_ind_area, NULL);
+            lv_inv_area(disp, &circle_ind_area);
 
             /* invalidate last position*/
             angle = ext->prev_pos;
@@ -1825,7 +1827,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
             circle_ind_area.x2 = cx + style->line.width/2;
             circle_ind_area.y2 = cy + style->line.width/2;
 
-            lv_inv_area(&circle_ind_area, NULL);
+            lv_inv_area(disp, &circle_ind_area);
             break;
         }
         case LV_CPICKER_INDICATOR_IN:
@@ -1860,7 +1862,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
             circle_ind_area.x2 = cx + ext->indicator.style->line.width/2;
             circle_ind_area.y2 = cy + ext->indicator.style->line.width/2;
 
-            lv_inv_area(&circle_ind_area, NULL);
+            lv_inv_area(disp, &circle_ind_area);
 
             /* invalidate last position*/
             angle = ext->prev_pos;
@@ -1873,7 +1875,7 @@ static void lv_cpicker_invalidate_indicator(lv_obj_t * cpicker)
             circle_ind_area.x2 = cx + ext->indicator.style->line.width/2;
             circle_ind_area.y2 = cy + ext->indicator.style->line.width/2;
 
-            lv_inv_area(&circle_ind_area, NULL);
+            lv_inv_area(disp, &circle_ind_area);
             break;
         }
         }
