@@ -293,6 +293,34 @@ void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point)
 }
 
 /**
+ * Manually finish dragging.
+ * `LV_SIGNAL_DRAG_END` and `LV_EVENT_DRAG_END` will be sent.
+ * @param indev pointer to an input device
+ * @return `LV_RES_INV` if the object being dragged was deleted. Else `LV_RES_OK`.
+ */
+lv_res_t lv_indev_finish_drag(lv_indev_t * indev)
+{
+    if(indev == NULL) return LV_RES_OK;
+    if(indev->driver.type != LV_INDEV_TYPE_POINTER) return LV_RES_OK;
+    if(indev->proc.types.pointer.drag_in_prog == 0) return LV_RES_OK;
+
+    indev->proc.types.pointer.drag_in_prog = 0;
+    indev->proc.types.pointer.drag_throw_vect.x = 0;
+    indev->proc.types.pointer.drag_throw_vect.y = 0;
+
+    lv_obj_t * drag_obj;
+    drag_obj = get_dragged_obj(indev->proc.types.pointer.act_obj);
+    if(drag_obj == NULL) return LV_RES_OK;
+
+    lv_res_t res;
+    res = drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, NULL);
+    if(res != LV_RES_OK) return res;
+
+    res = lv_event_send(drag_obj, LV_EVENT_DRAG_END, NULL);
+    if(res != LV_RES_OK) return res;
+}
+
+/**
  * Do nothing until the next release
  * @param indev pointer to an input device
  */
@@ -925,7 +953,7 @@ static void indev_proc_release(lv_indev_proc_t * proc)
 #endif
 
         /* Send defocus to the lastly "active" object and foucus to the new one.
-         * DO not sent the events if they was sent by the click focus*/
+         * Do not send the events if they was sent by the click focus*/
         if(proc->types.pointer.last_pressed != indev_obj_act && click_focus_sent == false) {
             lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_DEFOCUSED, NULL);
             if(indev_reset_check(proc)) return;
@@ -944,6 +972,9 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         lv_obj_t * drag_obj = get_dragged_obj(indev_obj_act);
         if(drag_obj) {
             if(lv_obj_get_drag_throw(drag_obj) && proc->types.pointer.drag_in_prog) {
+                if(drag_obj->signal_cb) drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_THROW_BEGIN, NULL);
+                if(indev_reset_check(proc)) return;
+
                 lv_event_send(drag_obj, LV_EVENT_DRAG_THROW_BEGIN, NULL);
                 if(indev_reset_check(proc)) return;
             }
@@ -1263,6 +1294,7 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
  */
 static lv_obj_t * get_dragged_obj(lv_obj_t * obj)
 {
+    if(obj == NULL) return NULL;
     lv_obj_t * drag_obj = obj;
     while(lv_obj_get_drag_parent(drag_obj) != false && drag_obj != NULL) {
         drag_obj = lv_obj_get_parent(drag_obj);

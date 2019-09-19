@@ -229,12 +229,17 @@ void lv_page_set_anim_time(lv_obj_t * page, uint16_t anim_time)
 /**
  * Enable the scroll propagation feature. If enabled then the page will move its parent if there is
  * no more space to scroll.
+ * The page needs to have a page-like parent (e.g. `lv_page`, `lv_tabview` tab, `lv_win` content area etc)
+ * If enabled drag direction will be changed `LV_DRAG_DIR_ONE` automatically to allow scrolling only in one direction at one time.
  * @param page pointer to a Page
  * @param en true or false to enable/disable scroll propagation
  */
 void lv_page_set_scroll_propagation(lv_obj_t * page, bool en)
 {
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    if(en) lv_obj_set_drag_dir(ext->scrl, LV_DRAG_DIR_ONE);
+    else lv_obj_set_drag_dir(ext->scrl, LV_DRAG_DIR_BOTH);
+
     ext->scroll_prop    = en ? 1 : 0;
 }
 
@@ -1031,8 +1036,6 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
 
         /*Scroll propagation is finished on drag end*/
         if(page_ext->scroll_prop_obj) {
-            printf("prop_end\n");
-
             lv_obj_t * scroller_page = page_ext->scroll_prop_obj;
             page_ext->scroll_prop_obj = NULL;
             lv_obj_set_drag_parent(scroller_page, false);

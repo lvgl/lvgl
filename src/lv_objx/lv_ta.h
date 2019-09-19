@@ -246,9 +246,9 @@ static inline void lv_ta_set_sb_mode(lv_obj_t * ta, lv_sb_mode_t mode)
  * @param ta pointer to a Text area
  * @param en true or false to enable/disable scroll propagation
  */
-static inline void lv_ta_set_scroll_propagation(lv_obj_t * ta, lv_drag_dir_t dir)
+static inline void lv_ta_set_scroll_propagation(lv_obj_t * ta, bool en)
 {
-    lv_page_set_scroll_propagation(ta, dir);
+    lv_page_set_scroll_propagation(ta, en);
 }
 
 /**

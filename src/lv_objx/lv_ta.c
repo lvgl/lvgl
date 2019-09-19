@@ -139,7 +139,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_click(ext->label, false);
         lv_obj_set_size(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
         lv_ta_set_sb_mode(new_ta, LV_SB_MODE_DRAG);
-        lv_page_set_style(new_ta, LV_PAGE_STYLE_SCRL, &lv_style_plain);
+        lv_page_set_style(new_ta, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();

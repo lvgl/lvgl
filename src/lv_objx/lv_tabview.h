@@ -43,7 +43,13 @@ extern "C" {
  **********************/
 
 /** Position of tabview buttons. */
-enum { LV_TABVIEW_BTNS_POS_TOP, LV_TABVIEW_BTNS_POS_BOTTOM, LV_TABVIEW_BTNS_POS_LEFT, LV_TABVIEW_BTNS_POS_RIGHT };
+enum {
+    LV_TABVIEW_BTNS_POS_NONE,
+    LV_TABVIEW_BTNS_POS_TOP,
+    LV_TABVIEW_BTNS_POS_BOTTOM,
+    LV_TABVIEW_BTNS_POS_LEFT,
+    LV_TABVIEW_BTNS_POS_RIGHT
+};
 typedef uint8_t lv_tabview_btns_pos_t;
 
 /*Data of tab*/
@@ -61,8 +67,7 @@ typedef struct
 #if LV_USE_ANIMATION
     uint16_t anim_time;
 #endif
-    uint8_t btns_hide : 1;
-    lv_tabview_btns_pos_t btns_pos : 2;
+    lv_tabview_btns_pos_t btns_pos : 3;
 } lv_tabview_ext_t;
 
 enum {
@@ -140,13 +145,6 @@ void lv_tabview_set_style(lv_obj_t * tabview, lv_tabview_style_t type, const lv_
  */
 void lv_tabview_set_btns_pos(lv_obj_t * tabview, lv_tabview_btns_pos_t btns_pos);
 
-/**
- * Set whether tab buttons are hidden
- * @param tabview pointer to a tab view object
- * @param en whether tab buttons are hidden
- */
-void lv_tabview_set_btns_hidden(lv_obj_t * tabview, bool en);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -192,13 +190,6 @@ const lv_style_t * lv_tabview_get_style(const lv_obj_t * tabview, lv_tabview_sty
  * @param tabview pointer to a ab view object
  */
 lv_tabview_btns_pos_t lv_tabview_get_btns_pos(const lv_obj_t * tabview);
-
-/**
- * Get whether tab buttons are hidden
- * @param tabview pointer to a tab view object
- * @return whether tab buttons are hidden
- */
-bool lv_tabview_get_btns_hidden(const lv_obj_t * tabview);
 
 /**********************
  *      MACROS

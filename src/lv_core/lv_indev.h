@@ -128,6 +128,14 @@ bool lv_indev_is_dragging(const lv_indev_t * indev);
 void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point);
 
 /**
+ * Manually finish dragging.
+ * `LV_SIGNAL_DRAG_END` and `LV_EVENT_DRAG_END` will be sent.
+ * @param indev pointer to an input device
+ * @return `LV_RES_INV` if the object being dragged was deleted. Else `LV_RES_OK`.
+ */
+lv_res_t lv_indev_finish_drag(lv_indev_t * indev);
+
+/**
  * Do nothing until the next release
  * @param indev pointer to an input device
  */

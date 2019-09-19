@@ -96,7 +96,7 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_size(new_tileview, lv_obj_get_width_fit(lv_obj_get_parent(new_tileview)),
                 lv_obj_get_height_fit(lv_obj_get_parent(new_tileview)));
 
-        lv_obj_set_drag_throw(lv_page_get_scrl(new_tileview), false);
+        lv_obj_set_drag_throw(lv_page_get_scrl(new_tileview), true);
         lv_page_set_scrl_fit(new_tileview, LV_FIT_TIGHT);
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
@@ -352,7 +352,13 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
         set_valid_drag_dirs(tileview);
     }
     else if(sign == LV_SIGNAL_DRAG_END) {
+//        drag_end_handler(tileview);
+    }
+    else if(sign == LV_SIGNAL_DRAG_THROW_BEGIN) {
         drag_end_handler(tileview);
+
+        lv_res_t res = lv_indev_finish_drag(lv_indev_get_act());
+        if(res != LV_RES_OK) return res;
     }
     /*Apply constraint on moving of the tileview*/
     else if(sign == LV_SIGNAL_CORD_CHG) {
@@ -423,6 +429,7 @@ static void drag_end_handler(lv_obj_t * tileview)
         }
 
         p.x -= predict;
+
     } else if(drag_dir & LV_DRAG_DIR_VER) {
         lv_point_t vect;
         lv_indev_get_vect(indev, &vect);
