@@ -162,7 +162,9 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->cursor.pos        = copy_ext->cursor.pos;
         ext->cursor.valid_x    = copy_ext->cursor.valid_x;
         ext->cursor.type       = copy_ext->cursor.type;
+
         if(ext->pwd_mode != 0) pwd_char_hider( new_ta);
+
         if(copy_ext->placeholder != NULL)
             ext->placeholder = lv_label_create(new_ta, copy_ext->placeholder);
         else
@@ -667,7 +669,8 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en)
         strcpy(ext->pwd_tmp, txt);
 
         uint16_t i;
-        for(i = 0; i < len; i++) {
+        uint16_t encoded_len = lv_txt_get_encoded_length(txt); 
+        for(i = 0; i < encoded_len; i++) {
             txt[i] = '*'; /*All char to '*'*/
         }
         txt[i] = '\0';
@@ -932,7 +935,7 @@ const char * lv_ta_get_placeholder_text(lv_obj_t * ta)
 
     const char * txt = NULL;
 
-    if(ext->placeholder) txt = lv_label_get_text(ext->label);
+    if(ext->placeholder) txt = lv_label_get_text(ext->placeholder);
 
     return txt;
 }
