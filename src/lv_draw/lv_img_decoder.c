@@ -31,6 +31,7 @@ typedef struct
     lv_fs_file_t * f;
 #endif
     lv_color_t * palette;
+    lv_opa_t * opa;
 } lv_img_decoder_built_in_data_t;
 
 /**********************
@@ -375,7 +376,8 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
 
         lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
         user_data->palette                         = lv_mem_alloc(palette_size * sizeof(lv_color_t));
-        if(user_data->palette == NULL) {
+        user_data->opa                             = lv_mem_alloc(palette_size * sizeof(lv_opa_t));
+        if(user_data->palette == NULL || user_data->opa == NULL) {
             LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
 #if LV_USE_FILESYSTEM
             lv_mem_assert(user_data->f);
@@ -386,7 +388,13 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             /*Read the palette from file*/
 #if LV_USE_FILESYSTEM
             lv_fs_seek(user_data->f, 4); /*Skip the header*/
-            lv_fs_read(user_data->f, user_data->palette, palette_size * sizeof(lv_color_t), NULL);
+            lv_color32_t cur_color;
+            uint32_t i;
+            for(i = 0; i < palette_size; i++) {
+                lv_fs_read(user_data->f, &cur_color, sizeof(lv_color32_t), NULL);
+                user_data->palette[i] = lv_color_make(cur_color.ch.red, cur_color.ch.green, cur_color.ch.blue);
+                user_data->opa[i]     = cur_color.ch.alpha;
+            }
 #else
             LV_LOG_WARN("Image built-in decoder can read the palette because LV_USE_FILESYSTEM = 0");
             return LV_RES_INV;
@@ -398,6 +406,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             uint32_t i;
             for(i = 0; i < palette_size; i++) {
                 user_data->palette[i] = lv_color_make(palette_p[i].ch.red, palette_p[i].ch.green, palette_p[i].ch.blue);
+                user_data->opa[i]     = palette_p[i].ch.alpha;
             }
         }
 
@@ -699,13 +708,24 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
 #endif
     }
 
-    uint8_t byte_act = 0;
     uint8_t val_act;
     lv_coord_t i;
-    lv_color_t * cbuf = (lv_color_t *)buf;
     for(i = 0; i < len; i++) {
-        val_act = (data_tmp[byte_act] & (mask << pos)) >> pos;
-        cbuf[i] = user_data->palette[val_act];
+        val_act = (*data_tmp & (mask << pos)) >> pos;
+
+        lv_color_t color = user_data->palette[val_act];
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = color.full;
+#elif LV_COLOR_DEPTH == 16
+        /*Because of Alpha byte 16 bit color can start on odd address which can cause crash*/
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE] = color.full & 0xFF;
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + 1] = (color.full >> 8) & 0xFF;
+#elif LV_COLOR_DEPTH == 32
+        *((uint32_t *)&buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE]) = color.full;
+#else
+#error "Invalid LV_COLOR_DEPTH. Check it in lv_conf.h"
+#endif
+        buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + LV_IMG_PX_SIZE_ALPHA_BYTE - 1] = user_data->opa[val_act];
 
         pos -= px_size;
         if(pos < 0) {

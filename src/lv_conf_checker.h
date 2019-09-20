@@ -50,6 +50,11 @@
 #define LV_COLOR_TRANSP    LV_COLOR_LIME         /*LV_COLOR_LIME: pure green*/
 #endif
 
+/* Enable chroma keying for indexed images. */
+#ifndef LV_INDEXED_CHROMA
+#define LV_INDEXED_CHROMA    1
+#endif
+
 /* Enable anti-aliasing (lines, and radiuses will be smoothed) */
 #ifndef LV_ANTIALIAS
 #define LV_ANTIALIAS        1
@@ -411,6 +416,37 @@
 #ifndef LV_TXT_BREAK_CHARS
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 #endif
+
+/* If a character is at least this long, will break wherever "prettiest" */
+#ifndef LV_TXT_LINE_BREAK_LONG_LEN
+#define LV_TXT_LINE_BREAK_LONG_LEN          12
+#endif
+
+/* Minimum number of characters of a word to put on a line before a break */
+#ifndef LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
+#define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN  3
+#endif
+
+/* Minimum number of characters of a word to put on a line after a break */
+#ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
+#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
+#endif
+
+/*Change the built in (v)snprintf functions*/
+#ifndef LV_SPRINTF_CUSTOM
+#define LV_SPRINTF_CUSTOM   0
+#endif
+#if LV_SPRINTF_CUSTOM
+#ifndef LV_SPRINTF_INCLUDE
+#  define LV_SPRINTF_INCLUDE <stdio.h>
+#endif
+#ifndef lv_snprintf
+#  define lv_snprintf     snprintf
+#endif
+#ifndef lv_vsnprintf
+#  define lv_vsnprintf    vsnprintf
+#endif
+#endif  /*LV_SPRINTF_CUSTOM*/
 
 /*===================
  *  LV_OBJ SETTINGS
