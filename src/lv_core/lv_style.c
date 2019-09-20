@@ -135,7 +135,6 @@ void lv_style_init(void)
     lv_style_plain_color.body.main_color = lv_color_make(0x55, 0x96, 0xd8);
     lv_style_plain_color.body.grad_color = lv_style_plain_color.body.main_color;
 
-
     /*Pretty style */
     lv_style_copy(&lv_style_pretty, &lv_style_plain);
     lv_style_pretty.text.color        = lv_color_make(0x20, 0x20, 0x20);
