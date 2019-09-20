@@ -523,8 +523,9 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mo
 
     /*If the indicator has a gradient along the longed side,
      * mask out only the current indicator area from the big gradient.*/
-    if((objw > objh && style_indic->body.grad_dir == LV_GRAD_DIR_HOR) ||
-       (objh > objw && style_indic->body.grad_dir == LV_GRAD_DIR_VER)) {
+    if((style_indic->body.main_color.full != style_indic->body.grad_color.full)  &&
+       ((objw > objh && style_indic->body.grad_dir == LV_GRAD_DIR_HOR) ||
+       (objh > objw && style_indic->body.grad_dir == LV_GRAD_DIR_VER))) {
 
         lv_style_t style_indic_tmp;
         lv_style_copy(&style_indic_tmp, style_indic);
