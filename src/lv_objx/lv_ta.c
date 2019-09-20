@@ -167,6 +167,16 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
             ext->placeholder = lv_label_create(new_ta, copy_ext->placeholder);
         else
             ext->placeholder = NULL;
+
+        if(copy_ext->pwd_tmp) {
+            uint16_t len = copy_ext->pwd_tmp;
+            ext->pwd_tmp = lv_mem_alloc(lv_mem_get_size(len));
+            lv_mem_assert(ext->pwd_tmp);
+            if(ext->pwd_tmp == NULL) return NULL;
+
+            memcpy(ext->pwd_tmp, copy_ext->pwd_tmp, len);
+        }
+
         if(copy_ext->one_line) lv_ta_set_one_line(new_ta, true);
 
         lv_ta_set_style(new_ta, LV_TA_STYLE_CURSOR, lv_ta_get_style(copy, LV_TA_STYLE_CURSOR));
