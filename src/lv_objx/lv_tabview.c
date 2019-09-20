@@ -121,8 +121,8 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_obj_set_click(ext->indic, false);
 
-        lv_page_set_style(ext->content, LV_PAGE_STYLE_BG, &lv_style_transp_tight);
-        lv_page_set_style(ext->content, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
+        lv_page_set_style(ext->content, LV_PAGE_STYLE_BG, &lv_style_plain_color);//transp_tight);
+        lv_page_set_style(ext->content, LV_PAGE_STYLE_SCRL, &lv_style_transp_fit);
         lv_page_set_scrl_fit(ext->content, LV_FIT_TIGHT);
         lv_page_set_scrl_layout(ext->content, LV_LAYOUT_ROW_T);
         lv_obj_set_drag_dir(lv_page_get_scrl(ext->content), LV_DRAG_DIR_ONE);
@@ -211,7 +211,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_obj_t * h = lv_page_create(ext->content, NULL);
     lv_obj_set_size(h, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
     lv_page_set_sb_mode(h, LV_SB_MODE_AUTO);
-    lv_page_set_style(h, LV_PAGE_STYLE_BG, &lv_style_transp_tight);
+    lv_page_set_style(h, LV_PAGE_STYLE_BG, &lv_style_plain);
     lv_page_set_style(h, LV_PAGE_STYLE_SCRL, &lv_style_transp);
     lv_page_set_scroll_propagation(h, true);
 
@@ -300,7 +300,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 #endif
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
 
-    const lv_style_t * style = lv_obj_get_style(ext->content);
+    const lv_style_t * cont_style = lv_obj_get_style(ext->content);
 
     if(id >= ext->tab_cnt) id = ext->tab_cnt - 1;
 
@@ -314,14 +314,16 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     case LV_TABVIEW_BTNS_POS_NONE:
     case LV_TABVIEW_BTNS_POS_TOP:
     case LV_TABVIEW_BTNS_POS_BOTTOM:
-        cont_x = -(lv_obj_get_width(tabview) * id + style->body.padding.inner * id + style->body.padding.left);
+        cont_x = -(lv_obj_get_width(tabview) * id + cont_style->body.padding.inner * id + cont_style->body.padding.left);
         break;
     case LV_TABVIEW_BTNS_POS_LEFT:
     case LV_TABVIEW_BTNS_POS_RIGHT:
-        cont_x = -((lv_obj_get_width(tabview) - lv_obj_get_width(ext->btns)) * id + style->body.padding.inner * id +
-                style->body.padding.left);
+        cont_x = -((lv_obj_get_width(tabview) - lv_obj_get_width(ext->btns)) * id + cont_style->body.padding.inner * id +
+                cont_style->body.padding.left);
         break;
     }
+
+    cont_x += cont_style->body.padding.left;
 
     if(anim == LV_ANIM_OFF || lv_tabview_get_anim_time(tabview) == 0) {
         lv_obj_set_x(lv_page_get_scrl(ext->content), cont_x);
@@ -857,6 +859,7 @@ static void refr_btns_size(lv_obj_t * tabview)
 static void refr_content_size(lv_obj_t * tabview)
 {
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
+    const lv_style_t * style_cont = lv_obj_get_style(ext->content);
     lv_coord_t cont_w;
     lv_coord_t cont_h;
 
@@ -879,7 +882,9 @@ static void refr_content_size(lv_obj_t * tabview)
 
     lv_obj_set_size(ext->content, cont_w, cont_h);
 
+
     /*Refresh the size of the tab pages too. `ext->content` has a layout to align the pages*/
+    cont_h -= style_cont->body.padding.top + style_cont->body.padding.bottom;
     lv_obj_t * content_scrl = lv_page_get_scrl(ext->content);
     lv_obj_t * pages = lv_obj_get_child(content_scrl, NULL);
     while(pages != NULL) {
