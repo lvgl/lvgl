@@ -171,8 +171,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
             ext->placeholder = NULL;
 
         if(copy_ext->pwd_tmp) {
-            uint16_t len = copy_ext->pwd_tmp;
-            ext->pwd_tmp = lv_mem_alloc(lv_mem_get_size(len));
+            uint16_t len = lv_mem_get_size(copy_ext->pwd_tmp);
+            ext->pwd_tmp = lv_mem_alloc(len);
             lv_mem_assert(ext->pwd_tmp);
             if(ext->pwd_tmp == NULL) return NULL;
 
