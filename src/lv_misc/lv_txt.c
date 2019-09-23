@@ -346,14 +346,6 @@ void lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
     }
 }
 
-typedef enum
-{
-    LV_TXT_DIR_LTR,
-    LV_TXT_DIR_RTL,
-    LV_TXT_DIR_NEUTRAL,
-    LV_TXT_DIR_WEAK,
-}lv_txt_dir_t;
-
 lv_txt_dir_t lv_txt_get_letter_dir(uint32_t letter)
 {
 
@@ -423,7 +415,7 @@ lv_txt_dir_t lv_txt_rtl_next_run(const char * txt, lv_txt_dir_t base_dir, uint32
 
 
 
-bool lv_txt_rtl_proc(const char * str_in, char * str_out)
+bool lv_txt_rtl_proc(const char * str_in, char * str_out, lv_txt_dir_t base_dir)
 {
 
     uint32_t run_len = 0;
@@ -431,7 +423,7 @@ bool lv_txt_rtl_proc(const char * str_in, char * str_out)
     uint32_t rd = 0;
 
     while(str_in[rd] != '\0') {
-        run_dir = lv_txt_rtl_next_run(&str_in[rd], LV_TXT_DIR_LTR, &run_len);
+        run_dir = lv_txt_rtl_next_run(&str_in[rd], base_dir, &run_len);
 
         memcpy(str_out, &str_in[rd], run_len);
         str_out[run_len] = '\0';

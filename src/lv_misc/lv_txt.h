@@ -56,6 +56,15 @@ enum {
 };
 typedef uint8_t lv_txt_cmd_state_t;
 
+
+typedef enum
+{
+    LV_TXT_DIR_LTR,
+    LV_TXT_DIR_RTL,
+    LV_TXT_DIR_NEUTRAL,
+    LV_TXT_DIR_WEAK,
+}lv_txt_dir_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -129,7 +138,7 @@ void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt);
 void lv_txt_cut(char * txt, uint32_t pos, uint32_t len);
 
 
-bool lv_txt_rtl_proc(const char * str_in, char * str_out);
+bool lv_txt_rtl_proc(const char * str_in, char * str_out, lv_txt_dir_t base_dir);
 
 /***************************************************************
  *  GLOBAL FUNCTION POINTERS FOR CAHRACTER ENCODING INTERFACE
