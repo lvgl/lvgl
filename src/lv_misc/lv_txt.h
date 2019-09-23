@@ -128,6 +128,9 @@ void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt);
  */
 void lv_txt_cut(char * txt, uint32_t pos, uint32_t len);
 
+
+bool lv_txt_rtl_proc(const char * str_in, char * str_out);
+
 /***************************************************************
  *  GLOBAL FUNCTION POINTERS FOR CAHRACTER ENCODING INTERFACE
  ***************************************************************/

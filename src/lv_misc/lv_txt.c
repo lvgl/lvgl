@@ -346,6 +346,102 @@ void lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
     }
 }
 
+typedef enum
+{
+    LV_TXT_DIR_LTR,
+    LV_TXT_DIR_RTL,
+    LV_TXT_DIR_NEUTRAL,
+    LV_TXT_DIR_WEAK,
+}lv_txt_dir_t;
+
+lv_txt_dir_t lv_txt_get_letter_dir(uint32_t letter)
+{
+
+    if(letter >= 'a' && letter <= 'z') return LV_TXT_DIR_RTL;
+
+    uint16_t i;
+
+    static const char neutrals[] = " \t\n\r";
+    for(i = 0; neutrals[i] != '\0'; i++) {
+        if(letter == neutrals[i]) return LV_TXT_DIR_NEUTRAL;
+    }
+
+    static const char weaks[] = "0123456789'\"`!?%/\\=()[]{}<>@#&|";
+    for(i = 0; weaks[i] != '\0'; i++) {
+        if(letter == weaks[i]) return LV_TXT_DIR_WEAK;
+    }
+
+    return LV_TXT_DIR_LTR;
+}
+
+
+lv_txt_dir_t lv_txt_rtl_next_run(const char * txt, lv_txt_dir_t base_dir, uint32_t * len)
+{
+    uint32_t i = 0;
+    uint32_t letter;
+
+    letter = lv_txt_encoded_next(txt, &i);
+
+    lv_txt_dir_t dir = lv_txt_get_letter_dir(letter);
+
+    /*Find the first strong char. Skip the neutrals.*/
+    while(dir == LV_TXT_DIR_NEUTRAL || dir == LV_TXT_DIR_WEAK) {
+        letter = lv_txt_encoded_next(txt, &i);
+        dir = lv_txt_get_letter_dir(letter);
+        if(txt[i] == '\0') return base_dir;
+    }
+
+    lv_txt_dir_t run_dir = dir;
+
+    uint32_t i_prev = i;
+    uint32_t i_last_strong = 1;
+
+    /*Find the next char which has different direction*/
+    while(txt[i] != '\0') {
+        letter = lv_txt_encoded_next(txt, &i);
+        lv_txt_dir_t next_dir = lv_txt_get_letter_dir(letter);
+
+        /*New dir found?*/
+        if((next_dir == LV_TXT_DIR_RTL || next_dir == LV_TXT_DIR_LTR) && next_dir != run_dir) {
+            /*Include neutrals if `run_dir == base_dir` */
+            if(run_dir == base_dir) *len = i_prev;
+            /*Exclude neutrals if `run_dir != base_dir` */
+            else *len = i_last_strong;
+
+            return run_dir;
+        }
+
+        if(next_dir != LV_TXT_DIR_NEUTRAL) i_last_strong = i;
+
+        i_prev = i;
+    }
+
+    *len = i;
+
+    return run_dir;
+}
+
+
+
+bool lv_txt_rtl_proc(const char * str_in, char * str_out)
+{
+
+    uint32_t run_len = 0;
+    lv_txt_dir_t run_dir;
+    uint32_t rd = 0;
+
+    while(str_in[rd] != '\0') {
+        run_dir = lv_txt_rtl_next_run(&str_in[rd], LV_TXT_DIR_LTR, &run_len);
+
+        memcpy(str_out, &str_in[rd], run_len);
+        str_out[run_len] = '\0';
+        printf("%s: \"%s\"\n", run_dir == LV_TXT_DIR_LTR ? "LTR" : "RTL", str_out);
+        rd += run_len;
+    }
+
+    return true;
+}
+
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8
 /*******************************
  *   UTF-8 ENCODER/DECOER
