@@ -353,12 +353,12 @@ lv_txt_dir_t lv_txt_get_letter_dir(uint32_t letter)
 
     uint16_t i;
 
-    static const char neutrals[] = " \t\n\r.,:;";
+    static const char neutrals[] = " \t\n\r.,:;'\"`!?%/\\=()[]{}<>@#&|";
     for(i = 0; neutrals[i] != '\0'; i++) {
         if(letter == neutrals[i]) return LV_TXT_DIR_NEUTRAL;
     }
 
-    static const char weaks[] = "0123456789'\"`!?%/\\=()[]{}<>@#&|";
+    static const char weaks[] = "0123456789";
     for(i = 0; weaks[i] != '\0'; i++) {
         if(letter == weaks[i]) return LV_TXT_DIR_WEAK;
     }
