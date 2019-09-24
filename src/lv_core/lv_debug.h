@@ -28,11 +28,13 @@ extern "C" {
  **********************/
 bool lv_debug_check_null(const void * p);
 
-bool lv_debug_check_obj_type(lv_obj_t * obj, const char * obj_type);
+bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
 
-bool lv_debug_check_obj_valid(lv_obj_t * obj);
+bool lv_debug_check_obj_valid(const lv_obj_t * obj);
 
-bool lv_debug_check_malloc(void * p);
+bool lv_debug_check_style(const void * str);
+
+bool lv_debug_check_str(const void * str);
 
 void lv_debug_log_error(const char * msg, uint64_t value);
 
@@ -40,42 +42,61 @@ void lv_debug_log_error(const char * msg, uint64_t value);
  *      MACROS
  **********************/
 
-#define LV_DEBUG_HALT(msg, value)              \
-    {                                          \
-        lv_debug_log_error(msg, value);        \
-        while(1);                              \
-    }                                          \
+#ifndef LV_DEBUG_ASSERT
+#define LV_DEBUG_ASSERT(expr, msg, value)       \
+{                                               \
+    if(!(expr)) {                               \
+        LV_LOG_ERROR(__func__);                 \
+        lv_debug_log_error(msg, (unsigned long int)value);         \
+        while(1);                               \
+    }                                           \
+}
+#endif
+
+/*----------------
+ * CHECKS
+ *----------------*/
+
+#ifndef LV_DEBUG_IS_NULL
+#define LV_DEBUG_IS_NULL(p)    (lv_debug_check_null(p))
+#endif
+
+#ifndef LV_DEBUG_IS_STR
+#define LV_DEBUG_IS_STR(str)   (lv_debug_check_str(str))
+#endif
+
+#ifndef LV_DEBUG_IS_OBJ
+#define LV_DEBUG_IS_OBJ(obj_p, obj_type) (lv_debug_check_null(obj_p) &&      \
+                                          lv_debug_check_obj_valid(obj_p) && \
+                                          lv_debug_check_obj_type(obj_p, obj_type))
+#endif
+
+#ifndef LV_DEBUG_IS_STYLE
+#define LV_DEBUG_IS_STYLE(style_p) (lv_debug_check_style(style_p))
+#endif
+
+/*-----------------
+ * ASSERTS
+ *-----------------*/
 
 #ifndef LV_ASSERT_NULL
-#define LV_ASSERT_NULL(p)                                                \
-        if(lv_debug_check_null(p) == false) {                            \
-            LV_LOG_ERROR(__func__);                                      \
-            LV_DEBUG_HALT("NULL obj. found", (lv_uintptr_t)p);           \
-        }
+#define LV_ASSERT_NULL(p) LV_DEBUG_ASSERT(LV_DEBUG_IS_NULL(p), "NULL pointer", p);
 #endif
 
-#ifndef LV_ASSERT_OBJ_NOT_EXISTS
-#define LV_ASSERT_OBJ_NOT_EXISTS(obj)                                    \
-        if(lv_debug_check_obj_valid(obj) == false) {                     \
-            LV_LOG_ERROR(__func__);                                      \
-            LV_DEBUG_HALT("Invalid obj, found", (lv_uintptr_t)obj);      \
-        }
+#ifndef LV_ASSERT_MEM
+#define LV_ASSERT_MEM(p) LV_DEBUG_ASSERT(LV_DEBUG_IS_NULL(p), "Out of memory", p);
 #endif
 
-#ifndef LV_ASSERT_OBJ_TYPE_ERROR
-#define LV_ASSERT_OBJ_TYPE_ERROR(obj, type)                              \
-        if(lv_debug_check_obj_type(obj, __LV_OBJX_TYPE) == false) {      \
-            LV_LOG_ERROR(__func__);                                      \
-            LV_DEBUG_HALT("Obj. type mismatch", (lv_uintptr_t)obj);      \
-        }
+#ifndef LV_ASSERT_STR
+#define LV_ASSERT_STR(p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STR(p), "Strange or invalid string", p);
 #endif
 
-#ifndef LV_ASSERT_NO_MEM
-#define LV_ASSERT_NO_MEM(p)                                              \
-        if(lv_debug_check_malloc(p) == false) {                          \
-            LV_LOG_ERROR(__func__);                                      \
-            LV_DEBUG_HALT("Out of memory", (lv_uintptr_t)p);      \
-        }
+#ifndef LV_ASSERT_OBJ
+#define LV_ASSERT_OBJ(obj_p, obj_type) LV_DEBUG_ASSERT(LV_DEBUG_IS_OBJ(obj_p, obj_type), "Invalid object", obj_p);
+#endif
+
+#ifndef LV_ASSERT_STYLE
+#define LV_ASSERT_STYLE(style_p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STYLE(style_p, obj_type), "Invalid style", style_p);
 #endif
 
 #ifdef __cplusplus

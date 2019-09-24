@@ -57,14 +57,14 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of switch*/
     lv_obj_t * new_sw = lv_slider_create(par, copy);
-    LV_ASSERT_NO_MEM(new_sw);
+    LV_ASSERT_MEM(new_sw);
     if(new_sw == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_sw);
 
     /*Allocate the switch type specific extended data*/
     lv_sw_ext_t * ext = lv_obj_allocate_ext_attr(new_sw, sizeof(lv_sw_ext_t));
-    LV_ASSERT_NO_MEM(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */

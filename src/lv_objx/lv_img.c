@@ -62,14 +62,14 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create a basic object*/
     new_img = lv_obj_create(par, copy);
-    LV_ASSERT_NO_MEM(new_img);
+    LV_ASSERT_MEM(new_img);
     if(new_img == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_img);
 
     /*Extend the basic object to image object*/
     lv_img_ext_t * ext = lv_obj_allocate_ext_attr(new_img, sizeof(lv_img_ext_t));
-    LV_ASSERT_NO_MEM(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->src       = NULL;
@@ -165,7 +165,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
                 lv_mem_free(ext->src);
             }
             char * new_str = lv_mem_alloc(strlen(src_img) + 1);
-            LV_ASSERT_NO_MEM(new_str);
+            LV_ASSERT_MEM(new_str);
             if(new_str == NULL) return;
             strcpy(new_str, src_img);
             ext->src = new_str;

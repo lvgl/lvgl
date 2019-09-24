@@ -86,7 +86,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor object*/
     lv_obj_t * new_ta = lv_page_create(par, copy);
-    LV_ASSERT_NO_MEM(new_ta);
+    LV_ASSERT_MEM(new_ta);
     if(new_ta == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_ta);
@@ -96,7 +96,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the object type specific extended data*/
     lv_ta_ext_t * ext = lv_obj_allocate_ext_attr(new_ta, sizeof(lv_ta_ext_t));
-    LV_ASSERT_NO_MEM(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->cursor.state      = 1;
@@ -174,7 +174,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         if(copy_ext->pwd_tmp) {
             uint16_t len = lv_mem_get_size(copy_ext->pwd_tmp);
             ext->pwd_tmp = lv_mem_alloc(len);
-            LV_ASSERT_NO_MEM(ext->pwd_tmp);
+            LV_ASSERT_MEM(ext->pwd_tmp);
             if(ext->pwd_tmp == NULL) return NULL;
 
             memcpy(ext->pwd_tmp, copy_ext->pwd_tmp, len);
@@ -268,7 +268,7 @@ void lv_ta_add_char(lv_obj_t * ta, uint32_t c)
     if(ext->pwd_mode != 0) {
 
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 2); /*+2: the new char + \0 */
-        LV_ASSERT_NO_MEM(ext->pwd_tmp);
+        LV_ASSERT_MEM(ext->pwd_tmp);
         if(ext->pwd_tmp == NULL) return;
 
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, (const char *)letter_buf);
@@ -349,7 +349,7 @@ void lv_ta_add_text(lv_obj_t * ta, const char * txt)
 
     if(ext->pwd_mode != 0) {
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + strlen(txt) + 1);
-        LV_ASSERT_NO_MEM(ext->pwd_tmp);
+        LV_ASSERT_MEM(ext->pwd_tmp);
         if(ext->pwd_tmp == NULL) return;
 
         lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, txt);
@@ -428,7 +428,7 @@ void lv_ta_del_char(lv_obj_t * ta)
         lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, lv_txt_encoded_size(&label_txt[byte_pos]));
 
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 1);
-        LV_ASSERT_NO_MEM(ext->pwd_tmp);
+        LV_ASSERT_MEM(ext->pwd_tmp);
         if(ext->pwd_tmp == NULL) return;
     }
 
@@ -490,7 +490,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 
     if(ext->pwd_mode != 0) {
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(txt) + 1);
-        LV_ASSERT_NO_MEM(ext->pwd_tmp);
+        LV_ASSERT_MEM(ext->pwd_tmp);
         if(ext->pwd_tmp == NULL) return;
         strcpy(ext->pwd_tmp, txt);
 
@@ -664,7 +664,7 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en)
         char * txt   = lv_label_get_text(ext->label);
         uint16_t len = strlen(txt);
         ext->pwd_tmp = lv_mem_alloc(len + 1);
-        LV_ASSERT_NO_MEM(ext->pwd_tmp);
+        LV_ASSERT_MEM(ext->pwd_tmp);
         if(ext->pwd_tmp == NULL) return;
 
         strcpy(ext->pwd_tmp, txt);

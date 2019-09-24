@@ -288,7 +288,7 @@ void lv_style_anim_init(lv_anim_t * a)
 
     lv_style_anim_dsc_t * dsc;
     dsc = lv_mem_alloc(sizeof(lv_style_anim_dsc_t));
-    LV_ASSERT_NO_MEM(dsc);
+    LV_ASSERT_MEM(dsc);
     if(dsc == NULL) return;
     dsc->ready_cb   = NULL;
     dsc->style_anim = NULL;

@@ -57,12 +57,12 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of table*/
     lv_obj_t * new_table = lv_obj_create(par, copy);
-    LV_ASSERT_NO_MEM(new_table);
+    LV_ASSERT_MEM(new_table);
     if(new_table == NULL) return NULL;
 
     /*Allocate the table type specific extended data*/
     lv_table_ext_t * ext = lv_obj_allocate_ext_attr(new_table, sizeof(lv_table_ext_t));
-    LV_ASSERT_NO_MEM(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_table);
     if(ancestor_scrl_design == NULL) ancestor_scrl_design = lv_obj_get_design_cb(new_table);

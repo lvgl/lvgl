@@ -101,7 +101,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
 
         if(lv_mem_get_size(buf) < buf_size) {
             buf = lv_mem_realloc(buf, buf_size);
-            LV_ASSERT_NO_MEM(buf);
+            LV_ASSERT_MEM(buf);
             if(buf == NULL) return NULL;
         }
 

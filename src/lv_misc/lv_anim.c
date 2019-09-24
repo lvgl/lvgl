@@ -90,7 +90,7 @@ void lv_anim_create(lv_anim_t * a)
 
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = lv_ll_ins_head(&LV_GC_ROOT(_lv_anim_ll));
-    LV_ASSERT_NO_MEM(new_anim);
+    LV_ASSERT_MEM(new_anim);
     if(new_anim == NULL) return;
 
     /*Initialize the animation descriptor*/

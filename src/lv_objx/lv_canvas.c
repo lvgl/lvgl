@@ -54,12 +54,12 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of canvas*/
     lv_obj_t * new_canvas = lv_img_create(par, copy);
-    LV_ASSERT_NO_MEM(new_canvas);
+    LV_ASSERT_MEM(new_canvas);
     if(new_canvas == NULL) return NULL;
 
     /*Allocate the canvas type specific extended data*/
     lv_canvas_ext_t * ext = lv_obj_allocate_ext_attr(new_canvas, sizeof(lv_canvas_ext_t));
-    LV_ASSERT_NO_MEM(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_canvas);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_canvas);

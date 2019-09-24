@@ -61,12 +61,12 @@ void * lv_draw_get_buf(uint32_t size)
 
     if(LV_GC_ROOT(_lv_draw_buf) == NULL) {
         LV_GC_ROOT(_lv_draw_buf) = lv_mem_alloc(size);
-        LV_ASSERT_NO_MEM(LV_GC_ROOT(_lv_draw_buf));
+        LV_ASSERT_MEM(LV_GC_ROOT(_lv_draw_buf));
         return LV_GC_ROOT(_lv_draw_buf);
     }
 
     LV_GC_ROOT(_lv_draw_buf) = lv_mem_realloc(LV_GC_ROOT(_lv_draw_buf), size);
-    LV_ASSERT_NO_MEM(LV_GC_ROOT(_lv_draw_buf));
+    LV_ASSERT_MEM(LV_GC_ROOT(_lv_draw_buf));
     return LV_GC_ROOT(_lv_draw_buf);
 }
 

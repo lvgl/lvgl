@@ -58,7 +58,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor slider*/
     lv_obj_t * new_slider = lv_bar_create(par, copy);
-    LV_ASSERT_NO_MEM(new_slider);
+    LV_ASSERT_MEM(new_slider);
     if(new_slider == NULL) return NULL;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_slider);
@@ -66,7 +66,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the slider type specific extended data*/
     lv_slider_ext_t * ext = lv_obj_allocate_ext_attr(new_slider, sizeof(lv_slider_ext_t));
-    LV_ASSERT_NO_MEM(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */

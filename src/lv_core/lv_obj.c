@@ -143,7 +143,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         }
 
         new_obj = lv_ll_ins_head(&disp->scr_ll);
-        LV_ASSERT_NO_MEM(new_obj);
+        LV_ASSERT_MEM(new_obj);
         if(new_obj == NULL) return NULL;
 
         new_obj->par = NULL; /*Screens has no a parent*/
@@ -216,7 +216,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         LV_LOG_TRACE("Object create started");
 
         new_obj = lv_ll_ins_head(&parent->child_ll);
-        LV_ASSERT_NO_MEM(new_obj);
+        LV_ASSERT_MEM(new_obj);
         if(new_obj == NULL) return NULL;
 
         new_obj->par = parent; /*Set the parent*/

@@ -54,12 +54,12 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of image button*/
     lv_obj_t * new_imgbtn = lv_btn_create(par, copy);
-    LV_ASSERT_NO_MEM(new_imgbtn);
+    LV_ASSERT_MEM(new_imgbtn);
     if(new_imgbtn == NULL) return NULL;
 
     /*Allocate the image button type specific extended data*/
     lv_imgbtn_ext_t * ext = lv_obj_allocate_ext_attr(new_imgbtn, sizeof(lv_imgbtn_ext_t));
-    LV_ASSERT_NO_MEM(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_imgbtn);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_imgbtn);

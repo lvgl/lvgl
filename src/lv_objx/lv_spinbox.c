@@ -54,12 +54,12 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of spinbox*/
     lv_obj_t * new_spinbox = lv_ta_create(par, copy);
-    LV_ASSERT_NO_MEM(new_spinbox);
+    LV_ASSERT_MEM(new_spinbox);
     if(new_spinbox == NULL) return NULL;
 
     /*Allocate the spinbox type specific extended data*/
     lv_spinbox_ext_t * ext = lv_obj_allocate_ext_attr(new_spinbox, sizeof(lv_spinbox_ext_t));
-    LV_ASSERT_NO_MEM(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_spinbox);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_spinbox);

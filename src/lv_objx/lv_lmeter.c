@@ -58,14 +58,14 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of line meter*/
     lv_obj_t * new_lmeter = lv_obj_create(par, copy);
-    LV_ASSERT_NO_MEM(new_lmeter);
+    LV_ASSERT_MEM(new_lmeter);
     if(new_lmeter == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_lmeter);
 
     /*Allocate the line meter type specific extended data*/
     lv_lmeter_ext_t * ext = lv_obj_allocate_ext_attr(new_lmeter, sizeof(lv_lmeter_ext_t));
-    LV_ASSERT_NO_MEM(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */

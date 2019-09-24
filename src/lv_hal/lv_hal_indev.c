@@ -78,7 +78,7 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
 
     lv_indev_t * indev = lv_ll_ins_head(&LV_GC_ROOT(_lv_indev_ll));
     if(!indev) {
-        LV_ASSERT_NO_MEM(indev);
+        LV_ASSERT_MEM(indev);
         return NULL;
     }
 

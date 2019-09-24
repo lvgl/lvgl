@@ -77,7 +77,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_obj_t * new_btn;
 
     new_btn = lv_cont_create(par, copy);
-    LV_ASSERT_NO_MEM(new_btn);
+    LV_ASSERT_MEM(new_btn);
     if(new_btn == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_btn);
@@ -85,7 +85,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the extended data*/
     lv_btn_ext_t * ext = lv_obj_allocate_ext_attr(new_btn, sizeof(lv_btn_ext_t));
-    LV_ASSERT_NO_MEM(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->state = LV_BTN_STATE_REL;
