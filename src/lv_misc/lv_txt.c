@@ -353,7 +353,7 @@ lv_txt_dir_t lv_txt_get_letter_dir(uint32_t letter)
 
     uint16_t i;
 
-    static const char neutrals[] = " \t\n\r";
+    static const char neutrals[] = " \t\n\r.,:;";
     for(i = 0; neutrals[i] != '\0'; i++) {
         if(letter == neutrals[i]) return LV_TXT_DIR_NEUTRAL;
     }
@@ -372,26 +372,29 @@ lv_txt_dir_t lv_txt_rtl_next_run(const char * txt, lv_txt_dir_t base_dir, uint32
     uint32_t i = 0;
     uint32_t letter;
 
-    letter = lv_txt_encoded_next(txt, &i);
-
+    letter = lv_txt_encoded_next(txt, NULL);
     lv_txt_dir_t dir = lv_txt_get_letter_dir(letter);
 
     /*Find the first strong char. Skip the neutrals.*/
     while(dir == LV_TXT_DIR_NEUTRAL || dir == LV_TXT_DIR_WEAK) {
         letter = lv_txt_encoded_next(txt, &i);
         dir = lv_txt_get_letter_dir(letter);
-        if(txt[i] == '\0') return base_dir;
+        if(txt[i] == '\0') {
+            *len = i;
+            return base_dir;
+        }
     }
 
     lv_txt_dir_t run_dir = dir;
 
     uint32_t i_prev = i;
-    uint32_t i_last_strong = 1;
+    uint32_t i_last_strong = i;
 
     /*Find the next char which has different direction*/
+    lv_txt_dir_t next_dir = base_dir;
     while(txt[i] != '\0') {
         letter = lv_txt_encoded_next(txt, &i);
-        lv_txt_dir_t next_dir = lv_txt_get_letter_dir(letter);
+        next_dir  = lv_txt_get_letter_dir(letter);
 
         /*New dir found?*/
         if((next_dir == LV_TXT_DIR_RTL || next_dir == LV_TXT_DIR_LTR) && next_dir != run_dir) {
@@ -408,9 +411,16 @@ lv_txt_dir_t lv_txt_rtl_next_run(const char * txt, lv_txt_dir_t base_dir, uint32
         i_prev = i;
     }
 
-    *len = i;
+
+    /*Handle end of of string. Apply `base_dir` on trailing neutrals*/
+
+    /*Include neutrals if `run_dir == base_dir` */
+    if(run_dir == base_dir) *len = i_prev;
+    /*Exclude neutrals if `run_dir != base_dir` */
+    else *len = i_last_strong;
 
     return run_dir;
+
 }
 
 
@@ -422,6 +432,25 @@ bool lv_txt_rtl_proc(const char * str_in, char * str_out, lv_txt_dir_t base_dir)
     lv_txt_dir_t run_dir;
     uint32_t rd = 0;
 
+    lv_txt_dir_t dir = base_dir;
+
+    /*Process neutral chars in the beginning*/
+    while(str_in[rd] != '\0') {
+        uint32_t letter = lv_txt_encoded_next(str_in, &rd);
+        dir = lv_txt_get_letter_dir(letter);
+        if(dir != LV_TXT_DIR_NEUTRAL) break;
+    }
+
+    /*if there were neutrals in the beginning apply `base_dir` on them */
+    if(rd && str_in[rd] != '\0') lv_txt_encoded_prev(str_in, &rd);
+
+    if(rd) {
+        memcpy(str_out, str_in, rd);
+        str_out[rd] = '\0';
+        printf("%s: \"%s\"\n", base_dir == LV_TXT_DIR_LTR ? "LTR" : "RTL", str_out);
+    }
+
+    /*Get and process the runs*/
     while(str_in[rd] != '\0') {
         run_dir = lv_txt_rtl_next_run(&str_in[rd], base_dir, &run_len);
 
