@@ -48,6 +48,8 @@ typedef struct {
     uint8_t color_mode_fixed:1;
     uint8_t type:1;
     uint32_t last_click;
+    lv_area_t rect_preview_area;
+    lv_area_t rect_gradient_area;
 } lv_cpicker_ext_t;
 
 /*Styles*/

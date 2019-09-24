@@ -826,7 +826,6 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         lv_coord_t h = lv_obj_get_height(cpicker);
 
         lv_coord_t gradient_w, gradient_h;
-        lv_area_t gradient_area;
 
         lv_coord_t x1 = cpicker->coords.x1;
         lv_coord_t y1 = cpicker->coords.y1;
@@ -836,7 +835,6 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
 
         /* prepare the color preview area */
         uint16_t preview_offset = style->line.width;
-        lv_area_t preview_area;
         uint16_t style_body_padding_ver = style->body.padding.top + style->body.padding.bottom;
         uint16_t style_body_padding_hor = style->body.padding.left + style->body.padding.right;
         if(style_body_padding_ver == 0)
@@ -847,30 +845,30 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
                 /*draw the preview to the right*/
                 gradient_w = w - preview_offset - (LV_MATH_ABS(style_body_padding_hor) - 1);
                 gradient_h = y2 - y1;
-                gradient_area.x1 = x1;
-                gradient_area.x2 = gradient_area.x1 + gradient_w;
-                gradient_area.y1 = y1;
-                gradient_area.y2 = y2;
+                ext->rect_gradient_area.x1 = x1;
+                ext->rect_gradient_area.x2 = ext->rect_gradient_area.x1 + gradient_w;
+                ext->rect_gradient_area.y1 = y1;
+                ext->rect_gradient_area.y2 = y2;
 
-                preview_area.x1 = x2 - preview_offset;
-                preview_area.y1 = y1;
-                preview_area.x2 = x2 ;
-                preview_area.y2 = y2;
+                ext->rect_preview_area.x1 = x2 - preview_offset;
+                ext->rect_preview_area.y1 = y1;
+                ext->rect_preview_area.x2 = x2 ;
+                ext->rect_preview_area.y2 = y2;
             }
             else
             {
                 /*draw the preview to the left*/
                 gradient_w = w - preview_offset - (LV_MATH_ABS(style_body_padding_hor) - 1);
                 gradient_h = y2 - y1;
-                gradient_area.x1 = x2 - gradient_w;
-                gradient_area.x2 = x2;
-                gradient_area.y1 = y1;
-                gradient_area.y2 = y2;
+                ext->rect_gradient_area.x1 = x2 - gradient_w;
+                ext->rect_gradient_area.x2 = x2;
+                ext->rect_gradient_area.y1 = y1;
+                ext->rect_gradient_area.y2 = y2;
 
-                preview_area.x1 = x1;
-                preview_area.y1 = y1;
-                preview_area.x2 = x1 + preview_offset;
-                preview_area.y2 = y2;
+                ext->rect_preview_area.x1 = x1;
+                ext->rect_preview_area.y1 = y1;
+                ext->rect_preview_area.x2 = x1 + preview_offset;
+                ext->rect_preview_area.y2 = y2;
             }
         }
         else
@@ -881,30 +879,30 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
                 /*draw the preview on top*/
                 gradient_w = w;
                 gradient_h = (y2 - y1) - preview_offset - (LV_MATH_ABS(style_body_padding_ver) - 1);
-                gradient_area.x1 = x1;
-                gradient_area.x2 = x2;
-                gradient_area.y1 = y2 - gradient_h;
-                gradient_area.y2 = y2;
+                ext->rect_gradient_area.x1 = x1;
+                ext->rect_gradient_area.x2 = x2;
+                ext->rect_gradient_area.y1 = y2 - gradient_h;
+                ext->rect_gradient_area.y2 = y2;
 
-                preview_area.x1 = x1;
-                preview_area.y1 = y1;
-                preview_area.x2 = x2;
-                preview_area.y2 = y1 + preview_offset;
+                ext->rect_preview_area.x1 = x1;
+                ext->rect_preview_area.y1 = y1;
+                ext->rect_preview_area.x2 = x2;
+                ext->rect_preview_area.y2 = y1 + preview_offset;
             }
             else
             {
                 /*draw the preview below the gradient*/
                 gradient_w = w;
                 gradient_h = (y2 - y1) - preview_offset - (LV_MATH_ABS(style_body_padding_ver) - 1);
-                gradient_area.x1 = x1;
-                gradient_area.x2 = x2;
-                gradient_area.y1 = y1;
-                gradient_area.y2 = y1 + gradient_h;
+                ext->rect_gradient_area.x1 = x1;
+                ext->rect_gradient_area.x2 = x2;
+                ext->rect_gradient_area.y1 = y1;
+                ext->rect_gradient_area.y2 = y1 + gradient_h;
 
-                preview_area.x1 = x1;
-                preview_area.y1 = y2 - preview_offset;
-                preview_area.x2 = x2;
-                preview_area.y2 = y2;
+                ext->rect_preview_area.x1 = x1;
+                ext->rect_preview_area.y1 = y2 - preview_offset;
+                ext->rect_preview_area.x2 = x2;
+                ext->rect_preview_area.y2 = y2;
             }
         }
 
@@ -913,13 +911,13 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
 
             /*draw rounded edges to the gradient*/
             lv_area_t rounded_edge_area;
-            rounded_edge_area.x1 = gradient_area.x1;
-            rounded_edge_area.x2 = gradient_area.x1 + gradient_h;
-            rounded_edge_area.y1 = gradient_area.y1;
-            rounded_edge_area.y2 = gradient_area.y2;
+            rounded_edge_area.x1 = ext->rect_gradient_area.x1;
+            rounded_edge_area.x2 = ext->rect_gradient_area.x1 + gradient_h;
+            rounded_edge_area.y1 = ext->rect_gradient_area.y1;
+            rounded_edge_area.y2 = ext->rect_gradient_area.y2;
 
-            gradient_area.x1 += gradient_h/2;
-            gradient_area.x2 -= gradient_h/2;
+            ext->rect_gradient_area.x1 += gradient_h/2;
+            ext->rect_gradient_area.x2 -= gradient_h/2;
             gradient_w -= gradient_h;
 
             switch(ext->color_mode)
@@ -991,10 +989,10 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             /*scale angle (hue/sat/val) to linear coordinate*/
             lv_coord_t xi = i*gradient_w/360;
 
-            rect_area.x1 = LV_MATH_MIN(gradient_area.x1 + xi, gradient_area.x1 + gradient_w - LV_MATH_MAX(LV_CPICKER_DEF_QF, 360/gradient_w));
-            rect_area.y1 = gradient_area.y1;
+            rect_area.x1 = LV_MATH_MIN(ext->rect_gradient_area.x1 + xi, ext->rect_gradient_area.x1 + gradient_w - LV_MATH_MAX(LV_CPICKER_DEF_QF, 360/gradient_w));
+            rect_area.y1 = ext->rect_gradient_area.y1;
             rect_area.x2 = rect_area.x1 + LV_MATH_MAX(LV_CPICKER_DEF_QF, 360/gradient_w);
-            rect_area.y2 = gradient_area.y2;
+            rect_area.y2 = ext->rect_gradient_area.y2;
 
             lv_draw_rect(&rect_area, mask, &styleCopy, opa_scale);
         }
@@ -1002,8 +1000,8 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         if(style->line.rounded)
         {
             /*Restore gradient area to take rounded end in account*/
-            gradient_area.x1 -= gradient_h/2;
-            gradient_area.x2 += gradient_h/2;
+            ext->rect_gradient_area.x1 -= gradient_h/2;
+            ext->rect_gradient_area.x2 += gradient_h/2;
             //gradient_w += gradient_h;
         }
 
@@ -1014,7 +1012,7 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         {
             styleCopy.body.radius = gradient_h;
         }
-        lv_draw_rect(&preview_area, mask, &styleCopy, opa_scale);
+        lv_draw_rect(&(ext->rect_preview_area), mask, &styleCopy, opa_scale);
 
         /*
         styleCopy.line.width = 10;
@@ -1028,10 +1026,10 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         {
         default:
         case LV_CPICKER_COLOR_MODE_HUE:
-            ind_pos += ext->hue * gradient_w /360;
+            ind_pos += ext->hue * gradient_w / 360;
             break;
         case LV_CPICKER_COLOR_MODE_SATURATION:
-            ind_pos += ext->saturation * gradient_w / 100 ;
+            ind_pos += ext->saturation * gradient_w / 100;
             break;
         case LV_CPICKER_COLOR_MODE_VALUE:
             ind_pos += ext->value * gradient_w / 100;
@@ -1046,21 +1044,21 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         case LV_CPICKER_INDICATOR_LINE:
         {
             lv_point_t p1, p2;
-            p1.x = gradient_area.x1 + ind_pos;
+            p1.x = ext->rect_gradient_area.x1 + ind_pos;
             p2.x = p1.x;
-            p1.y = gradient_area.y1;
-            p2.y = gradient_area.y2;
+            p1.y = ext->rect_gradient_area.y1;
+            p2.y = ext->rect_gradient_area.y2;
 
-            lv_draw_line(&p1, &p2, &gradient_area, ext->indicator.style, opa_scale);
+            lv_draw_line(&p1, &p2, &(ext->rect_gradient_area), ext->indicator.style, opa_scale);
             break;
         }
         case LV_CPICKER_INDICATOR_CIRCLE:
         {
             lv_area_t circle_ind_area;
-            circle_ind_area.x1 = gradient_area.x1 + ind_pos - gradient_h/2;
+            circle_ind_area.x1 = ext->rect_gradient_area.x1 + ind_pos - gradient_h/2;
             circle_ind_area.x2 = circle_ind_area.x1 + gradient_h;
-            circle_ind_area.y1 = gradient_area.y1;
-            circle_ind_area.y2 = gradient_area.y2;
+            circle_ind_area.y1 = ext->rect_gradient_area.y1;
+            circle_ind_area.y2 = ext->rect_gradient_area.y2;
 
             lv_style_copy(&styleCopy, ext->indicator.style);
             styleCopy.body.radius = LV_RADIUS_CIRCLE;
@@ -1073,21 +1071,21 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             /*draw triangle under the gradient*/
             lv_point_t triangle_points[3];
 
-            triangle_points[0].x = ind_pos + gradient_area.x1;
-            triangle_points[0].y = gradient_area.y2 - (gradient_h/3);
+            triangle_points[0].x = ind_pos + ext->rect_gradient_area.x1;
+            triangle_points[0].y = ext->rect_gradient_area.y2 - (gradient_h/3);
 
             triangle_points[1].x = triangle_points[0].x - ext->indicator.style->line.width / 3;
-            triangle_points[1].y = gradient_area.y2;
+            triangle_points[1].y = ext->rect_gradient_area.y2;
 
             triangle_points[2].x = triangle_points[0].x + ext->indicator.style->line.width / 3;
-            triangle_points[2].y = gradient_area.y2;
+            triangle_points[2].y = ext->rect_gradient_area.y2;
 
-            lv_draw_triangle(triangle_points, &gradient_area, ext->indicator.style, LV_OPA_COVER);
+            lv_draw_triangle(triangle_points, &(ext->rect_gradient_area), ext->indicator.style, LV_OPA_COVER);
 
-            triangle_points[0].y = gradient_area.y1 + (gradient_h/3);
-            triangle_points[1].y = gradient_area.y1 - 1;
-            triangle_points[2].y = gradient_area.y1 - 1;
-            lv_draw_triangle(triangle_points, &gradient_area, ext->indicator.style, LV_OPA_COVER);
+            triangle_points[0].y = ext->rect_gradient_area.y1 + (gradient_h/3);
+            triangle_points[1].y = ext->rect_gradient_area.y1 - 1;
+            triangle_points[2].y = ext->rect_gradient_area.y1 - 1;
+            lv_draw_triangle(triangle_points, &(ext->rect_gradient_area), ext->indicator.style, LV_OPA_COVER);
             break;
         }
         default:
@@ -1388,12 +1386,6 @@ static lv_res_t lv_cpicker_rect_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
 
     lv_style_t * style = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
 
-    lv_coord_t r_out = (LV_MATH_MIN(lv_obj_get_width(cpicker), lv_obj_get_height(cpicker))) / 2;
-    lv_coord_t r_in = r_out - style->line.width - style->body.padding.inner;
-
-    lv_coord_t x = cpicker->coords.x1 + lv_obj_get_width(cpicker) / 2;
-    lv_coord_t y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
-
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     } else if(sign == LV_SIGNAL_GET_TYPE) {
@@ -1420,12 +1412,8 @@ static lv_res_t lv_cpicker_rect_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
         }
 
         lv_indev_t * indev = param;
-        lv_coord_t xp = indev->proc.types.pointer.act_point.x - x;
-        lv_coord_t yp = indev->proc.types.pointer.act_point.y - y;
 
-        lv_area_t colorIndArea;
-        //todo : set the area to the color indicator area
-        if(lv_area_is_point_on(&colorIndArea, &indev->proc.types.pointer.act_point))
+        if(lv_area_is_point_on(&(ext->rect_preview_area), &indev->proc.types.pointer.act_point))
         {
             if(lv_tick_elaps(ext->last_click) < 400)
             {
@@ -1452,25 +1440,24 @@ static lv_res_t lv_cpicker_rect_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
     else if(sign == LV_SIGNAL_PRESSING)
     {
         lv_indev_t * indev = param;
-        lv_coord_t xp = indev->proc.types.pointer.act_point.x - x;
-        lv_coord_t yp = indev->proc.types.pointer.act_point.y - y;
 
-        lv_area_t colorGradientArea;
-        //todo : set the area to the color gradient area
-        if(lv_area_is_point_on(&colorGradientArea, &indev->proc.types.pointer.act_point))
+        if(lv_area_is_point_on(&(ext->rect_gradient_area), &indev->proc.types.pointer.act_point))
         {
+            uint16_t width = ext->rect_gradient_area.x2 - ext->rect_gradient_area.x1;
+            uint16_t distance = indev->proc.types.pointer.act_point.x - ext->rect_gradient_area.x1;
+            float percent = distance / (float) width;
             switch(ext->color_mode)
             {
             case LV_CPICKER_COLOR_MODE_HUE:
-                ext->hue = lv_atan2(xp, yp);
+                ext->hue = percent * 360;
                 ext->prev_hue = ext->hue;
                 break;
             case LV_CPICKER_COLOR_MODE_SATURATION:
-                ext->saturation = lv_atan2(xp, yp) * 100.0 / 360.0;
+                ext->saturation = percent * 100.0;
                 ext->prev_saturation = ext->saturation;
                 break;
             case LV_CPICKER_COLOR_MODE_VALUE:
-                ext->value = lv_atan2(xp, yp) * 100.0 / 360.0;
+                ext->value = percent * 100.0;
                 ext->prev_value = ext->value;
                 break;
             }
@@ -1496,25 +1483,24 @@ static lv_res_t lv_cpicker_rect_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
     else if(sign == LV_SIGNAL_RELEASED)
     {
         lv_indev_t * indev = param;
-        lv_coord_t xp = indev->proc.types.pointer.act_point.x - x;
-        lv_coord_t yp = indev->proc.types.pointer.act_point.y - y;
 
-        lv_area_t colorGradientArea;
-        //todo : set th area to the color gradient area
-        if(lv_area_is_point_on(&colorGradientArea, &indev->proc.types.pointer.act_point))
+        if(lv_area_is_point_on(&(ext->rect_gradient_area), &indev->proc.types.pointer.act_point))
         {
+            uint16_t width = ext->rect_gradient_area.x2 - ext->rect_gradient_area.x1;
+            uint16_t distance = indev->proc.types.pointer.act_point.x - ext->rect_gradient_area.x1;
+            float percent = distance / (float) width;
             switch(ext->color_mode)
             {
             case LV_CPICKER_COLOR_MODE_HUE:
-                ext->hue = lv_atan2(xp, yp);
+                ext->hue = percent * 360;
                 ext->prev_hue = ext->hue;
                 break;
             case LV_CPICKER_COLOR_MODE_SATURATION:
-                ext->saturation = lv_atan2(xp, yp) * 100.0 / 360.0;
+                ext->saturation = percent * 100;
                 ext->prev_saturation = ext->saturation;
                 break;
             case LV_CPICKER_COLOR_MODE_VALUE:
-                ext->value = lv_atan2(xp, yp) * 100.0 / 360.0;
+                ext->value = percent * 100;
                 ext->prev_value = ext->value;
                 break;
             }
@@ -1530,12 +1516,8 @@ static lv_res_t lv_cpicker_rect_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
         if(!ext->color_mode_fixed)
         {
             lv_indev_t * indev = param;
-            lv_coord_t xp = indev->proc.types.pointer.act_point.x - x;
-            lv_coord_t yp = indev->proc.types.pointer.act_point.y - y;
 
-            lv_area_t colorIndArea;
-            //todo : set the area to the color indicator area
-            if(lv_area_is_point_on(&colorIndArea, &indev->proc.types.pointer.act_point))
+            if(lv_area_is_point_on(&(ext->rect_preview_area), &indev->proc.types.pointer.act_point))
             {
                 switch(ext->color_mode)
                 {
