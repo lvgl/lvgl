@@ -9,6 +9,7 @@
 #include "lv_chart.h"
 #if LV_USE_CHART != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
@@ -86,12 +87,12 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_chart = lv_obj_create(par, copy);
-    lv_mem_assert(new_chart);
+    LV_ASSERT_NO_MEM(new_chart);
     if(new_chart == NULL) return NULL;
 
     /*Allocate the object type specific extended data*/
     lv_chart_ext_t * ext = lv_obj_allocate_ext_attr(new_chart, sizeof(lv_chart_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
 
     lv_ll_init(&ext->series_ll, sizeof(lv_chart_series_t));
@@ -174,7 +175,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 {
     lv_chart_ext_t * ext    = lv_obj_get_ext_attr(chart);
     lv_chart_series_t * ser = lv_ll_ins_head(&ext->series_ll);
-    lv_mem_assert(ser);
+    LV_ASSERT_NO_MEM(ser);
     if(ser == NULL) return NULL;
 
     lv_coord_t def = LV_CHART_POINT_DEF;
@@ -183,7 +184,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 
     ser->color  = color;
     ser->points = lv_mem_alloc(sizeof(lv_coord_t) * ext->point_cnt);
-    lv_mem_assert(ser->points);
+    LV_ASSERT_NO_MEM(ser->points);
     if(ser->points == NULL) {
         lv_ll_rem(&ext->series_ll, ser);
         lv_mem_free(ser);
@@ -297,7 +298,7 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
     {
         if(ser->start_point != 0) {
             lv_coord_t * new_points = lv_mem_alloc(sizeof(lv_coord_t) * point_cnt);
-            lv_mem_assert(new_points);
+            LV_ASSERT_NO_MEM(new_points);
             if(new_points == NULL) return;
 
             if(point_cnt >= point_cnt_old) {
@@ -320,7 +321,7 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
             ser->points = new_points;
         } else {
             ser->points = lv_mem_realloc(ser->points, sizeof(lv_coord_t) * point_cnt);
-            lv_mem_assert(ser->points);
+            LV_ASSERT_NO_MEM(ser->points);
             if(ser->points == NULL) return;
             /*Initialize the new points*/
             if(point_cnt > point_cnt_old) {

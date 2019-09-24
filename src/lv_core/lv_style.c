@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_anim.h"
 
@@ -287,7 +288,7 @@ void lv_style_anim_init(lv_anim_t * a)
 
     lv_style_anim_dsc_t * dsc;
     dsc = lv_mem_alloc(sizeof(lv_style_anim_dsc_t));
-    lv_mem_assert(dsc);
+    LV_ASSERT_NO_MEM(dsc);
     if(dsc == NULL) return;
     dsc->ready_cb   = NULL;
     dsc->style_anim = NULL;

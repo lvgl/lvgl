@@ -9,6 +9,7 @@
 #include "lv_mbox.h"
 #if LV_USE_MBOX != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_anim.h"
@@ -68,14 +69,14 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor message box*/
     lv_obj_t * new_mbox = lv_cont_create(par, copy);
-    lv_mem_assert(new_mbox);
+    LV_ASSERT_NO_MEM(new_mbox);
     if(new_mbox == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_mbox);
 
     /*Allocate the message box type specific extended data*/
     lv_mbox_ext_t * ext = lv_obj_allocate_ext_attr(new_mbox, sizeof(lv_mbox_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->text = NULL;

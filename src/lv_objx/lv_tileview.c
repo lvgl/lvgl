@@ -11,6 +11,7 @@
 
 #include <stdbool.h>
 #include "lv_cont.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 
 /*********************
@@ -65,12 +66,12 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of tileview*/
     lv_obj_t * new_tileview = lv_page_create(par, copy);
-    lv_mem_assert(new_tileview);
+    LV_ASSERT_NO_MEM(new_tileview);
     if(new_tileview == NULL) return NULL;
 
     /*Allocate the tileview type specific extended data*/
     lv_tileview_ext_t * ext = lv_obj_allocate_ext_attr(new_tileview, sizeof(lv_tileview_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_tileview);
     if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(new_tileview));

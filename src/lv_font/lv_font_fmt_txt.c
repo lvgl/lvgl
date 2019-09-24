@@ -8,6 +8,7 @@
  *********************/
 #include "lv_font.h"
 #include "lv_font_fmt_txt.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_log.h"
@@ -100,7 +101,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
 
         if(lv_mem_get_size(buf) < buf_size) {
             buf = lv_mem_realloc(buf, buf_size);
-            lv_mem_assert(buf);
+            LV_ASSERT_NO_MEM(buf);
             if(buf == NULL) return NULL;
         }
 

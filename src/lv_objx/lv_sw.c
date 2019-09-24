@@ -15,6 +15,7 @@
 #error "lv_sw: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER  1) "
 #endif
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_math.h"
 
@@ -56,14 +57,14 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of switch*/
     lv_obj_t * new_sw = lv_slider_create(par, copy);
-    lv_mem_assert(new_sw);
+    LV_ASSERT_NO_MEM(new_sw);
     if(new_sw == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_sw);
 
     /*Allocate the switch type specific extended data*/
     lv_sw_ext_t * ext = lv_obj_allocate_ext_attr(new_sw, sizeof(lv_sw_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */

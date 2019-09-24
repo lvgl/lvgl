@@ -9,6 +9,7 @@
 #include "lv_lmeter.h"
 #if LV_USE_LMETER != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_core/lv_group.h"
@@ -57,14 +58,14 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of line meter*/
     lv_obj_t * new_lmeter = lv_obj_create(par, copy);
-    lv_mem_assert(new_lmeter);
+    LV_ASSERT_NO_MEM(new_lmeter);
     if(new_lmeter == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_lmeter);
 
     /*Allocate the line meter type specific extended data*/
     lv_lmeter_ext_t * ext = lv_obj_allocate_ext_attr(new_lmeter, sizeof(lv_lmeter_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */

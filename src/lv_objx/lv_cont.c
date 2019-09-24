@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_draw/lv_draw_basic.h"
 #include "../lv_themes/lv_theme.h"
@@ -67,7 +68,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create a basic object*/
     lv_obj_t * new_cont = lv_obj_create(par, copy);
-    lv_mem_assert(new_cont);
+    LV_ASSERT_NO_MEM(new_cont);
     if(new_cont == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_cont);
@@ -76,7 +77,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(new_cont);
     if(ext == NULL) return NULL;
 
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     ext->fit_left   = LV_FIT_NONE;
     ext->fit_right  = LV_FIT_NONE;
     ext->fit_top    = LV_FIT_NONE;

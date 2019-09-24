@@ -11,6 +11,7 @@
 #include "lv_bar.h"
 #if LV_USE_BAR != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_anim.h"
@@ -61,7 +62,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_bar = lv_obj_create(par, copy);
-    lv_mem_assert(new_bar);
+    LV_ASSERT_NO_MEM(new_bar);
     if(new_bar == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_bar);
@@ -69,7 +70,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the object type specific extended data*/
     lv_bar_ext_t * ext = lv_obj_allocate_ext_attr(new_bar, sizeof(lv_bar_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->min_value = 0;

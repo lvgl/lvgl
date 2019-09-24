@@ -9,6 +9,7 @@
 #include "lv_calendar.h"
 #if LV_USE_CALENDAR != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_hal/lv_hal_indev.h"
 #include "../lv_misc/lv_utils.h"
@@ -77,12 +78,12 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of calendar*/
     lv_obj_t * new_calendar = lv_obj_create(par, copy);
-    lv_mem_assert(new_calendar);
+    LV_ASSERT_NO_MEM(new_calendar);
     if(new_calendar == NULL) return NULL;
 
     /*Allocate the calendar type specific extended data*/
     lv_calendar_ext_t * ext = lv_obj_allocate_ext_attr(new_calendar, sizeof(lv_calendar_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_calendar);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_calendar);

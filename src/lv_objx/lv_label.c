@@ -10,6 +10,7 @@
 #if LV_USE_LABEL != 0
 
 #include "../lv_core/lv_obj.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_math.h"
@@ -18,6 +19,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define __LV_OBJX_TYPE "lv_label"
+
 /*Test configurations*/
 #ifndef LV_LABEL_DEF_SCROLL_SPEED
 #define LV_LABEL_DEF_SCROLL_SPEED (25)
@@ -73,7 +76,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create a basic object*/
     lv_obj_t * new_label = lv_obj_create(par, copy);
-    lv_mem_assert(new_label);
+    LV_ASSERT_NO_MEM(new_label);
     if(new_label == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_label);
@@ -82,7 +85,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_obj_allocate_ext_attr(new_label, sizeof(lv_label_ext_t));
 
     lv_label_ext_t * ext = lv_obj_get_ext_attr(new_label);
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->text       = NULL;
@@ -136,7 +139,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
         /*In DOT mode save the text byte-to-byte because a '\0' can be in the middle*/
         if(copy_ext->long_mode == LV_LABEL_LONG_DOT) {
             ext->text = lv_mem_realloc(ext->text, lv_mem_get_size(copy_ext->text));
-            lv_mem_assert(ext->text);
+            LV_ASSERT_NO_MEM(ext->text);
             if(ext->text == NULL) return NULL;
             memcpy(ext->text, copy_ext->text, lv_mem_get_size(copy_ext->text));
         }
@@ -170,6 +173,10 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_label_set_text(lv_obj_t * label, const char * text)
 {
+    LV_ASSERT_NULL(label);
+    LV_ASSERT_OBJ_NOT_EXISTS(label);
+    LV_ASSERT_OBJ_TYPE_ERROR(label, __LV_OBJX_TYPE);
+
     lv_obj_invalidate(label);
 
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
@@ -183,7 +190,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     if(ext->text == text) {
         /*If set its own text then reallocate it (maybe its size changed)*/
         ext->text = lv_mem_realloc(ext->text, strlen(ext->text) + 1);
-        lv_mem_assert(ext->text);
+        LV_ASSERT_NO_MEM(ext->text);
         if(ext->text == NULL) return;
     } else {
         /*Allocate space for the new text*/
@@ -194,7 +201,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
         }
 
         ext->text = lv_mem_alloc(len);
-        lv_mem_assert(ext->text);
+        LV_ASSERT_NO_MEM(ext->text);
         if(ext->text == NULL) return;
 
         strcpy(ext->text, text);
@@ -237,7 +244,7 @@ void lv_label_set_text_fmt(lv_obj_t * label, const char * fmt, ...)
     
 
     ext->text = lv_mem_alloc(len+1);
-    lv_mem_assert(ext->text);
+    LV_ASSERT_NO_MEM(ext->text);
     if(ext->text == NULL) return;
     ext->text[len-1] = 0; /* Ensure NULL termination */
 
@@ -274,7 +281,7 @@ void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size
         ext->text = NULL;
     }
     ext->text = lv_mem_alloc(size + 1);
-    lv_mem_assert(ext->text);
+    LV_ASSERT_NO_MEM(ext->text);
     if(ext->text == NULL) return;
 
     memcpy(ext->text, array, size);
@@ -807,7 +814,7 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt)
     uint32_t ins_len = strlen(txt);
     uint32_t new_len = ins_len + old_len;
     ext->text        = lv_mem_realloc(ext->text, new_len + 1);
-    lv_mem_assert(ext->text);
+    LV_ASSERT_NO_MEM(ext->text);
     if(ext->text == NULL) return;
 
     if(pos == LV_LABEL_POS_LAST) {

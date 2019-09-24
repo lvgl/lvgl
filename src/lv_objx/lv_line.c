@@ -9,6 +9,7 @@
 #include "lv_line.h"
 
 #if LV_USE_LINE != 0
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_math.h"
 #include <stdbool.h>
@@ -53,14 +54,14 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create a basic object*/
     lv_obj_t * new_line = lv_obj_create(par, copy);
-    lv_mem_assert(new_line);
+    LV_ASSERT_NO_MEM(new_line);
     if(new_line == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_line);
 
     /*Extend the basic object to line object*/
     lv_line_ext_t * ext = lv_obj_allocate_ext_attr(new_line, sizeof(lv_line_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->point_num   = 0;

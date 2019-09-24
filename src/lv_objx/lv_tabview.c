@@ -10,6 +10,7 @@
 #if LV_USE_TABVIEW != 0
 
 #include "lv_btnm.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_anim.h"
 #include "../lv_core/lv_disp.h"
@@ -71,13 +72,13 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of tab*/
     lv_obj_t * new_tabview = lv_obj_create(par, copy);
-    lv_mem_assert(new_tabview);
+    LV_ASSERT_NO_MEM(new_tabview);
     if(new_tabview == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_tabview);
 
     /*Allocate the tab type specific extended data*/
     lv_tabview_ext_t * ext = lv_obj_allocate_ext_attr(new_tabview, sizeof(lv_tabview_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
@@ -103,7 +104,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new tab tab*/
     if(copy == NULL) {
         ext->tab_name_ptr = lv_mem_alloc(sizeof(char *));
-        lv_mem_assert(ext->tab_name_ptr);
+        LV_ASSERT_NO_MEM(ext->tab_name_ptr);
         if(ext->tab_name_ptr == NULL) return NULL;
         ext->tab_name_ptr[0] = "";
         ext->tab_cnt         = 0;
@@ -161,7 +162,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
 
         ext->tab_name_ptr = lv_mem_alloc(sizeof(char *));
-        lv_mem_assert(ext->tab_name_ptr);
+        LV_ASSERT_NO_MEM(ext->tab_name_ptr);
         if(ext->tab_name_ptr == NULL) return NULL;
         ext->tab_name_ptr[0] = "";
         lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
@@ -225,7 +226,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     /*Extend the button matrix map with the new name*/
     char * name_dm;
     name_dm = lv_mem_alloc(strlen(name) + 1); /*+1 for the the closing '\0' */
-    lv_mem_assert(name_dm);
+    LV_ASSERT_NO_MEM(name_dm);
     if(name_dm == NULL) return NULL;
     strcpy(name_dm, name);
 
@@ -242,7 +243,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
             break;
     }
 
-    lv_mem_assert(ext->tab_name_ptr);
+    LV_ASSERT_NO_MEM(ext->tab_name_ptr);
     if(ext->tab_name_ptr == NULL) return NULL;
 
     /* FIXME: It is not possible yet to switch tab button position from/to top/bottom from/to left/right at runtime.

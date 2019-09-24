@@ -9,6 +9,7 @@
 #include "lv_win.h"
 #if LV_USE_WIN != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_core/lv_disp.h"
 
@@ -51,14 +52,14 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor object*/
     lv_obj_t * new_win = lv_obj_create(par, copy);
-    lv_mem_assert(new_win);
+    LV_ASSERT_NO_MEM(new_win);
     if(new_win == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_win);
 
     /*Allocate the object type specific extended data*/
     lv_win_ext_t * ext = lv_obj_allocate_ext_attr(new_win, sizeof(lv_win_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->page          = NULL;

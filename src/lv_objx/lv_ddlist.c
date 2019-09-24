@@ -9,6 +9,7 @@
 #include "lv_ddlist.h"
 #if LV_USE_DDLIST != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_indev.h"
@@ -74,7 +75,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor drop down list*/
     lv_obj_t * new_ddlist = lv_page_create(par, copy);
-    lv_mem_assert(new_ddlist);
+    LV_ASSERT_NO_MEM(new_ddlist);
     if(new_ddlist == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_ddlist);
@@ -83,7 +84,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the drop down list type specific extended data*/
     lv_ddlist_ext_t * ext = lv_obj_allocate_ext_attr(new_ddlist, sizeof(lv_ddlist_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */

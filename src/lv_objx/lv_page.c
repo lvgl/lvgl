@@ -9,6 +9,7 @@
 #include "../lv_objx/lv_page.h"
 #if LV_USE_PAGE != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
@@ -77,7 +78,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor object*/
     lv_obj_t * new_page = lv_cont_create(par, copy);
-    lv_mem_assert(new_page);
+    LV_ASSERT_NO_MEM(new_page);
     if(new_page == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_page);
@@ -85,7 +86,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the object type specific extended data*/
     lv_page_ext_t * ext = lv_obj_allocate_ext_attr(new_page, sizeof(lv_page_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->scrl        = NULL;

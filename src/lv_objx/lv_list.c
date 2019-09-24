@@ -9,6 +9,7 @@
 #include "lv_list.h"
 #if LV_USE_LIST != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_anim.h"
@@ -69,13 +70,13 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_list = lv_page_create(par, copy);
-    lv_mem_assert(new_list);
+    LV_ASSERT_NO_MEM(new_list);
     if(new_list == NULL) return NULL;
 
     if(ancestor_page_signal == NULL) ancestor_page_signal = lv_obj_get_signal_cb(new_list);
 
     lv_list_ext_t * ext = lv_obj_allocate_ext_attr(new_list, sizeof(lv_list_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->style_img                        = NULL;

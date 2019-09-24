@@ -9,6 +9,7 @@
 #include "lv_roller.h"
 #if LV_USE_ROLLER != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"
@@ -65,7 +66,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of roller*/
     lv_obj_t * new_roller = lv_ddlist_create(par, copy);
-    lv_mem_assert(new_roller);
+    LV_ASSERT_NO_MEM(new_roller);
     if(new_roller == NULL) return NULL;
 
     if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(new_roller));
@@ -73,7 +74,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the roller type specific extended data*/
     lv_roller_ext_t * ext = lv_obj_allocate_ext_attr(new_roller, sizeof(lv_roller_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_NO_MEM(ext);
     if(ext == NULL) return NULL;
     ext->ddlist.draw_arrow = 0; /*Do not draw arrow by default*/
 
@@ -263,8 +264,8 @@ uint16_t lv_roller_get_selected(const lv_obj_t * roller)
 lv_label_align_t lv_roller_get_align(const lv_obj_t * roller)
 {
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-    lv_mem_assert(ext);
-    lv_mem_assert(ext->ddlist.label);
+    LV_ASSERT_NO_MEM(ext);
+    LV_ASSERT_NO_MEM(ext->ddlist.label);
     return lv_label_get_align(ext->ddlist.label);
 }
 
