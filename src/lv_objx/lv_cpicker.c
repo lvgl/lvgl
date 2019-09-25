@@ -120,7 +120,16 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->last_click = 0;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_cpicker_set_type(new_cpicker, LV_CPICKER_DEF_TYPE);
+    if(ext->type == LV_CPICKER_TYPE_DISC)
+    {
+        lv_obj_set_signal_cb(new_cpicker, lv_cpicker_disc_signal);
+        lv_obj_set_design_cb(new_cpicker, lv_cpicker_disc_design);
+    }
+    else if(ext->type == LV_CPICKER_TYPE_RECT)
+    {
+        lv_obj_set_signal_cb(new_cpicker, lv_cpicker_rect_signal);
+        lv_obj_set_design_cb(new_cpicker, lv_cpicker_rect_design);
+    }
 
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
