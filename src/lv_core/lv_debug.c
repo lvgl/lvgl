@@ -47,7 +47,7 @@ bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type)
     if(obj_type[0] == '\0') return true;
 
     lv_obj_type_t types;
-    lv_obj_get_type(obj, &types);
+    lv_obj_get_type((lv_obj_t *)obj, &types);
 
     uint8_t i;
     for(i = 0; i < LV_MAX_ANCESTOR_NUM; i++) {

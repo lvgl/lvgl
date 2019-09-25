@@ -79,25 +79,51 @@ void lv_debug_log_error(const char * msg, uint64_t value);
  * ASSERTS
  *-----------------*/
 
-#ifndef LV_ASSERT_NULL
-#define LV_ASSERT_NULL(p) LV_DEBUG_ASSERT(LV_DEBUG_IS_NULL(p), "NULL pointer", p);
+/*clang-format off*/
+
+#if LV_USE_ASSERT_NULL
+# ifndef LV_ASSERT_NULL
+#  define LV_ASSERT_NULL(p) LV_DEBUG_ASSERT(LV_DEBUG_IS_NULL(p), "NULL pointer", p);
+# endif
+#else
+# define LV_ASSERT_NULL(p) true
 #endif
 
-#ifndef LV_ASSERT_MEM
-#define LV_ASSERT_MEM(p) LV_DEBUG_ASSERT(LV_DEBUG_IS_NULL(p), "Out of memory", p);
+#if LV_USE_ASSERT_MEM
+# ifndef LV_ASSERT_MEM
+#  define LV_ASSERT_MEM(p) LV_DEBUG_ASSERT(LV_DEBUG_IS_NULL(p), "Out of memory", p);
+# endif
+#else
+# define LV_ASSERT_MEM(p) true
 #endif
 
-#ifndef LV_ASSERT_STR
-#define LV_ASSERT_STR(p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STR(p), "Strange or invalid string", p);
+#if LV_USE_ASSERT_STR
+# ifndef LV_ASSERT_STR
+#  define LV_ASSERT_STR(str) LV_DEBUG_ASSERT(LV_DEBUG_IS_STR(str), "Strange or invalid string", p);
+# endif
+#else
+# define LV_ASSERT_STR(p) true
 #endif
 
-#ifndef LV_ASSERT_OBJ
-#define LV_ASSERT_OBJ(obj_p, obj_type) LV_DEBUG_ASSERT(LV_DEBUG_IS_OBJ(obj_p, obj_type), "Invalid object", obj_p);
+
+#if LV_USE_ASSERT_OBJ
+# ifndef LV_ASSERT_OBJ
+#  define LV_ASSERT_OBJ(obj_p, obj_type) LV_DEBUG_ASSERT(LV_DEBUG_IS_OBJ(obj_p, obj_type), "Invalid object", obj_p);
+# endif
+#else
+# define LV_ASSERT_OBJ(obj_p, obj_type) true
 #endif
 
-#ifndef LV_ASSERT_STYLE
-#define LV_ASSERT_STYLE(style_p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STYLE(style_p, obj_type), "Invalid style", style_p);
+
+#if LV_USE_ASSERT_STYLE
+# ifndef LV_ASSERT_STYLE
+#  define LV_ASSERT_STYLE(style_p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STYLE(style_p, obj_type), "Invalid style", style_p);
+# endif
+#else
+#  define LV_ASSERT_STYLE(style) true
 #endif
+
+/*clang-format on*/
 
 #ifdef __cplusplus
 } /* extern "C" */
