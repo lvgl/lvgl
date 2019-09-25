@@ -97,6 +97,13 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy);
  *====================*/
 
 /**
+ * Set a new type for a colorpicker
+ * @param cpicker pointer to a colorpicker object
+ * @param type new type of the colorpicker (from 'lv_cpicker_type_t' enum)
+ */
+void lv_cpicker_set_type(lv_obj_t * chart, lv_cpicker_type_t type);
+
+/**
  * Set a style of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param type which style should be set

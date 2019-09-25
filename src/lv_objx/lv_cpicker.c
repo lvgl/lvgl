@@ -118,19 +118,9 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->color_mode = LV_CPICKER_COLOR_MODE_HUE;
     ext->color_mode_fixed = 0;
     ext->last_click = 0;
-    ext->type = LV_CPICKER_DEF_TYPE;
 
     /*The signal and design functions are not copied so set them here*/
-    if(ext->type == LV_CPICKER_TYPE_DISC)
-    {
-        lv_obj_set_signal_cb(new_cpicker, lv_cpicker_disc_signal);
-        lv_obj_set_design_cb(new_cpicker, lv_cpicker_disc_design);
-    }
-    else if(ext->type == LV_CPICKER_TYPE_RECT)
-    {
-        lv_obj_set_signal_cb(new_cpicker, lv_cpicker_rect_signal);
-        lv_obj_set_design_cb(new_cpicker, lv_cpicker_rect_design);
-    }
+    lv_cpicker_set_type(new_cpicker, LV_CPICKER_DEF_TYPE);
 
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
@@ -157,6 +147,32 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
 /*=====================
  * Setter functions
  *====================*/
+
+/**
+ * Set a new type for a cpicker
+ * @param cpicker pointer to a cpicker object
+ * @param type new type of the cpicker (from 'lv_cpicker_type_t' enum)
+ */
+void lv_cpicker_set_type(lv_obj_t * cpicker, lv_cpicker_type_t type)
+{
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+    if(ext->type == type) return;
+
+    ext->type = type;
+
+    if(ext->type == LV_CPICKER_TYPE_DISC)
+    {
+        lv_obj_set_signal_cb(cpicker, lv_cpicker_disc_signal);
+        lv_obj_set_design_cb(cpicker, lv_cpicker_disc_design);
+    }
+    else if(ext->type == LV_CPICKER_TYPE_RECT)
+    {
+        lv_obj_set_signal_cb(cpicker, lv_cpicker_rect_signal);
+        lv_obj_set_design_cb(cpicker, lv_cpicker_rect_design);
+    }
+
+    lv_obj_invalidate(cpicker);
+}
 
 /**
  * Set a style of a colorpicker.
