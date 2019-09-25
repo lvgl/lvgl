@@ -43,7 +43,7 @@ typedef struct {
     uint16_t prev_hue;
     uint8_t prev_saturation;
     uint8_t prev_value;
-    uint16_t prev_angle;
+    uint16_t prev_pos;
     uint8_t color_mode:2;
     uint8_t color_mode_fixed:1;
     uint8_t type:1;

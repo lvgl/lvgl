@@ -675,7 +675,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             }
 
             /*save the angle to refresh the area later*/
-            ext->prev_angle = angle;
+            ext->prev_pos = angle;
 
             start.x = x + ((r - style->line.width + ext->indicator.style->body.padding.inner + ext->indicator.style->line.width/2) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
             start.y = y + ((r - style->line.width + ext->indicator.style->body.padding.inner + ext->indicator.style->line.width/2) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
@@ -723,7 +723,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             }
 
             /*save the angle to refresh the area later*/
-            ext->prev_angle = angle;
+            ext->prev_pos = angle;
 
             cx = x + ((r - style->line.width/2) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
             cy = y + ((r - style->line.width/2) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
@@ -761,7 +761,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             }
 
             /*save the angle to refresh the area later*/
-            ext->prev_angle = angle;
+            ext->prev_pos = angle;
 
             uint16_t ind_radius = lv_sqrt((4*rin*rin)/2)/2 + 1 - style->body.padding.inner;
             ind_radius = (ind_radius + rin) / 2;
@@ -1039,6 +1039,9 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             break;
         }
 
+        /*save to refresh the area later*/
+        ext->prev_pos = ind_pos;
+
         switch(ext->indicator.type)
         {
         case LV_CPICKER_INDICATOR_NONE:
@@ -1075,18 +1078,18 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             lv_point_t triangle_points[3];
 
             triangle_points[0].x = ext->rect_gradient_area.x1 + ind_pos;
-            triangle_points[0].y = ext->rect_gradient_area.y2 - (gradient_h/3);
+            triangle_points[0].y = ext->rect_gradient_area.y1 + (gradient_h/3);
 
             triangle_points[1].x = triangle_points[0].x - ext->indicator.style->line.width * 3;
-            triangle_points[1].y = ext->rect_gradient_area.y2;
+            triangle_points[1].y = ext->rect_gradient_area.y1 - 1;
 
             triangle_points[2].x = triangle_points[0].x + ext->indicator.style->line.width * 3;
             triangle_points[2].y = triangle_points[1].y;
 
             lv_draw_triangle(triangle_points, mask, ext->indicator.style, LV_OPA_COVER);
 
-            triangle_points[0].y = ext->rect_gradient_area.y1 + (gradient_h/3);
-            triangle_points[1].y = ext->rect_gradient_area.y1 - 1;
+            triangle_points[0].y = ext->rect_gradient_area.y2 - (gradient_h/3);
+            triangle_points[1].y = ext->rect_gradient_area.y2;
             triangle_points[2].y = triangle_points[1].y;
             lv_draw_triangle(triangle_points, mask, ext->indicator.style, LV_OPA_COVER);
             break;
@@ -1744,7 +1747,7 @@ static void lv_cpicker_invalidate(lv_obj_t * cpicker, bool all)
             lv_inv_area(disp, &line_area);
 
             /* invalidate last postion */
-            angle = ext->prev_angle;
+            angle = ext->prev_pos;
 
             x1 = x + ((r - style->line.width + ext->indicator.style->body.padding.inner + ext->indicator.style->line.width/2) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
             y1 = y + ((r - style->line.width + ext->indicator.style->body.padding.inner + ext->indicator.style->line.width/2) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
@@ -1811,7 +1814,7 @@ static void lv_cpicker_invalidate(lv_obj_t * cpicker, bool all)
             lv_inv_area(disp, &circle_ind_area);
 
             /* invalidate last position*/
-            angle = ext->prev_angle;
+            angle = ext->prev_pos;
 
             cx = x + ((r - style->line.width/2) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
             cy = y + ((r - style->line.width/2) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
@@ -1845,7 +1848,7 @@ static void lv_cpicker_invalidate(lv_obj_t * cpicker, bool all)
             lv_inv_area(disp, &circle_ind_area);
 
             /* invalidate last position*/
-            angle = ext->prev_angle;
+            angle = ext->prev_pos;
 
             cx = x + ((ind_radius) * lv_trigo_sin(angle) >> LV_TRIGO_SHIFT);
             cy = y + ((ind_radius) * lv_trigo_sin(angle + 90) >> LV_TRIGO_SHIFT);
@@ -1862,7 +1865,148 @@ static void lv_cpicker_invalidate(lv_obj_t * cpicker, bool all)
     }
     else if(ext->type == LV_CPICKER_TYPE_RECT)
     {
-        lv_obj_invalidate(cpicker);
+        /*invalidate color preview area*/
+        lv_inv_area(disp, &ext->rect_preview_area);
+
+        lv_coord_t gradient_w, gradient_h;
+
+        lv_coord_t x1 = cpicker->coords.x1;
+        lv_coord_t y1 = cpicker->coords.y1;
+        lv_coord_t x2 = cpicker->coords.x2;
+        lv_coord_t y2 = cpicker->coords.y2;
+
+        uint16_t preview_offset = style->line.width;
+
+        uint16_t style_body_padding_ver = style->body.padding.top + style->body.padding.bottom;
+        uint16_t style_body_padding_hor = style->body.padding.left + style->body.padding.right;
+        if(style_body_padding_ver == 0)
+        {
+            if(style_body_padding_hor >= 0)
+            {
+                gradient_w = w - preview_offset - (LV_MATH_ABS(style_body_padding_hor) - 1);
+                gradient_h = y2 - y1;
+            }
+            else
+            {
+                gradient_w = w - preview_offset - (LV_MATH_ABS(style_body_padding_hor) - 1);
+                gradient_h = y2 - y1;
+            }
+        }
+        else
+        {
+            if(style_body_padding_ver >= 0)
+            {
+                gradient_w = w;
+                gradient_h = (y2 - y1) - preview_offset - (LV_MATH_ABS(style_body_padding_ver) - 1);
+            }
+            else
+            {
+                gradient_w = w;
+                gradient_h = (y2 - y1) - preview_offset - (LV_MATH_ABS(style_body_padding_ver) - 1);
+            }
+        }
+
+        lv_coord_t ind_pos = style->line.rounded ? gradient_h / 2 : 0;
+        switch(ext->color_mode)
+        {
+        default:
+        case LV_CPICKER_COLOR_MODE_HUE:
+            ind_pos += ext->hue * gradient_w / 360;
+            break;
+        case LV_CPICKER_COLOR_MODE_SATURATION:
+            ind_pos += ext->saturation * gradient_w / 100;
+            break;
+        case LV_CPICKER_COLOR_MODE_VALUE:
+            ind_pos += ext->value * gradient_w / 100;
+            break;
+        }
+        lv_coord_t prev_pos = ext->prev_pos;
+
+        switch(ext->indicator.type)
+        {
+        case LV_CPICKER_INDICATOR_LINE:
+        {
+            lv_area_t line_area;
+
+            lv_point_t p1, p2;
+            p1.x = ext->rect_gradient_area.x1 + ind_pos;
+            p1.y = ext->rect_gradient_area.y1;
+            p2.x = p1.x;
+            p2.y = ext->rect_gradient_area.y2;
+
+            line_area.x1 = p1.x;
+            line_area.y1 = p1.y;
+            line_area.x2 = p2.x;
+            line_area.y2 = p2.x;
+
+            line_area.x1 -= 2*ext->indicator.style->line.width;
+            line_area.y1 -= 2*ext->indicator.style->line.width;
+            line_area.x2 += 2*ext->indicator.style->line.width;
+            line_area.y2 += 2*ext->indicator.style->line.width;
+
+            lv_inv_area(disp, &line_area);
+
+            /* invalidate last postion */
+            p1.x = ext->rect_gradient_area.x1 + prev_pos;
+            //p1.y = ext->rect_gradient_area.y1;
+            p2.x = p1.x;
+            //p2.y = ext->rect_gradient_area.y2;
+
+            line_area.x1 = p1.x;
+            line_area.y1 = p1.y;
+            line_area.x2 = p2.x;
+            line_area.y2 = p2.x;
+
+            line_area.x1 -= 2*ext->indicator.style->line.width;
+            line_area.y1 -= 2*ext->indicator.style->line.width;
+            line_area.x2 += 2*ext->indicator.style->line.width;
+            line_area.y2 += 2*ext->indicator.style->line.width;
+
+            lv_inv_area(disp, &line_area);
+            break;
+        }
+        case LV_CPICKER_INDICATOR_CIRCLE:
+        {
+            lv_area_t circle_ind_area;
+
+            circle_ind_area.x1 = ext->rect_gradient_area.x1 + ind_pos - gradient_h/2;
+            circle_ind_area.x2 = circle_ind_area.x1 + gradient_h;
+            circle_ind_area.y1 = ext->rect_gradient_area.y1;
+            circle_ind_area.y2 = ext->rect_gradient_area.y2;
+
+            lv_inv_area(disp, &circle_ind_area);
+
+            /* invalidate last postion */
+            circle_ind_area.x1 = ext->rect_gradient_area.x1 + prev_pos - gradient_h/2;
+            circle_ind_area.x2 = circle_ind_area.x1 + gradient_h;
+            //circle_ind_area.y1 = ext->rect_gradient_area.y1;
+            //circle_ind_area.y2 = ext->rect_gradient_area.y2;
+
+            lv_inv_area(disp, &circle_ind_area);
+            break;
+        }
+        case LV_CPICKER_INDICATOR_IN:
+        {
+            lv_coord_t center;
+            lv_area_t ind_area;
+            
+            center = ext->rect_gradient_area.x1 + ind_pos;
+            ind_area.x1 = center - ext->indicator.style->line.width * 3;
+            ind_area.y1 = ext->rect_gradient_area.y1 - 1;
+            ind_area.x2 = center + ext->indicator.style->line.width * 3;
+            ind_area.y2 = ext->rect_gradient_area.y2;
+            lv_inv_area(disp, &ind_area);
+
+            /* invalidate last postion */
+            center = ext->rect_gradient_area.x1 + prev_pos;
+            ind_area.x1 = center - ext->indicator.style->line.width * 3;
+            //ind_area.y1 = ext->rect_gradient_area.y1 - 1;
+            ind_area.x2 = center + ext->indicator.style->line.width * 3;
+            //ind_area.y2 = ext->rect_gradient_area.y2;
+            lv_inv_area(disp, &ind_area);
+            break;
+        }
+        }
     }
 }
 
