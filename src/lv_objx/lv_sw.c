@@ -131,6 +131,8 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_sw_on(lv_obj_t * sw, lv_anim_enable_t anim)
 {
+    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION == 0
     anim = LV_ANIM_OFF;
 #endif
@@ -146,6 +148,8 @@ void lv_sw_on(lv_obj_t * sw, lv_anim_enable_t anim)
  */
 void lv_sw_off(lv_obj_t * sw, lv_anim_enable_t anim)
 {
+    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION == 0
     anim = LV_ANIM_OFF;
 #endif
@@ -162,6 +166,8 @@ void lv_sw_off(lv_obj_t * sw, lv_anim_enable_t anim)
  */
 bool lv_sw_toggle(lv_obj_t * sw, lv_anim_enable_t anim)
 {
+    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION == 0
     anim = LV_ANIM_OFF;
 #endif
@@ -183,6 +189,8 @@ bool lv_sw_toggle(lv_obj_t * sw, lv_anim_enable_t anim)
  */
 void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
+
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
     switch(type) {
@@ -201,6 +209,8 @@ void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, const lv_style_t * style
 
 void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time)
 {
+    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     ext->anim_time    = anim_time;
@@ -222,6 +232,8 @@ void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time)
  */
 const lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type)
 {
+    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_sw_ext_t * ext        = lv_obj_get_ext_attr(sw);
 
@@ -238,6 +250,7 @@ const lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type)
 
 uint16_t lv_sw_get_anim_time(const lv_obj_t * sw)
 {
+    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
 
 #if LV_USE_ANIMATION
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
@@ -280,7 +293,7 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 
     res = ancestor_signal(sw, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(sw, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     sw->event_cb = event_cb;
 

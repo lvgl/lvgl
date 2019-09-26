@@ -175,6 +175,8 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext    = lv_obj_get_ext_attr(chart);
     lv_chart_series_t * ser = lv_ll_ins_head(&ext->series_ll);
     LV_ASSERT_MEM(ser);
@@ -214,6 +216,9 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
  */
 void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(serie);
+
     if(chart == NULL || serie == NULL) return;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext == NULL) return;
@@ -238,6 +243,8 @@ void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie)
  */
 void lv_chart_set_div_line_count(lv_obj_t * chart, uint8_t hdiv, uint8_t vdiv)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext->hdiv_cnt == hdiv && ext->vdiv_cnt == vdiv) return;
 
@@ -255,6 +262,8 @@ void lv_chart_set_div_line_count(lv_obj_t * chart, uint8_t hdiv, uint8_t vdiv)
  */
 void lv_chart_set_range(lv_obj_t * chart, lv_coord_t ymin, lv_coord_t ymax)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext->ymin == ymin && ext->ymax == ymax) return;
 
@@ -271,6 +280,8 @@ void lv_chart_set_range(lv_obj_t * chart, lv_coord_t ymin, lv_coord_t ymax)
  */
 void lv_chart_set_type(lv_obj_t * chart, lv_chart_type_t type)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext->type == type) return;
 
@@ -286,6 +297,8 @@ void lv_chart_set_type(lv_obj_t * chart, lv_chart_type_t type)
  */
 void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext->point_cnt == point_cnt) return;
 
@@ -348,6 +361,8 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
  */
 void lv_chart_set_series_opa(lv_obj_t * chart, lv_opa_t opa)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext->series.opa == opa) return;
 
@@ -362,6 +377,8 @@ void lv_chart_set_series_opa(lv_obj_t * chart, lv_opa_t opa)
  */
 void lv_chart_set_series_width(lv_obj_t * chart, lv_coord_t width)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext->series.width == width) return;
 
@@ -375,6 +392,8 @@ void lv_chart_set_series_width(lv_obj_t * chart, lv_coord_t width)
  */
 void lv_chart_set_series_darking(lv_obj_t * chart, lv_opa_t dark_eff)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext->series.dark == dark_eff) return;
 
@@ -390,6 +409,9 @@ void lv_chart_set_series_darking(lv_obj_t * chart, lv_opa_t dark_eff)
  */
 void lv_chart_init_points(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(ser);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     uint16_t i;
     for(i = 0; i < ext->point_cnt; i++) {
@@ -407,6 +429,9 @@ void lv_chart_init_points(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t 
  */
 void lv_chart_set_points(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y_array[])
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(ser);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     memcpy(ser->points, y_array, ext->point_cnt * (sizeof(lv_coord_t)));
     ser->start_point = 0;
@@ -421,6 +446,9 @@ void lv_chart_set_points(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y
  */
 void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(ser);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext->update_mode == LV_CHART_UPDATE_MODE_SHIFT) {
         ser->points[ser->start_point] =
@@ -447,6 +475,8 @@ void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y)
  */
 void lv_chart_set_update_mode(lv_obj_t * chart, lv_chart_update_mode_t update_mode)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext->update_mode == update_mode) return;
 
@@ -464,6 +494,8 @@ void lv_chart_set_update_mode(lv_obj_t * chart, lv_chart_update_mode_t update_mo
  */
 void lv_chart_set_x_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
     ext->x_axis.major_tick_len = major_tick_len;
     ext->x_axis.minor_tick_len = minor_tick_len;
@@ -479,6 +511,8 @@ void lv_chart_set_x_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_
  */
 void lv_chart_set_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
     ext->y_axis.major_tick_len = major_tick_len;
     ext->y_axis.minor_tick_len = minor_tick_len;
@@ -494,6 +528,8 @@ void lv_chart_set_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_
  */
 void lv_chart_set_secondary_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
     ext->secondary_y_axis.major_tick_len = major_tick_len;
     ext->secondary_y_axis.minor_tick_len = minor_tick_len;
@@ -510,6 +546,9 @@ void lv_chart_set_secondary_y_tick_length(lv_obj_t * chart, uint8_t major_tick_l
 void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
                                lv_chart_axis_options_t options)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(list_of_values);
+
     lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
     ext->x_axis.num_tick_marks = num_tick_marks;
     ext->x_axis.list_of_values = list_of_values;
@@ -527,6 +566,9 @@ void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, ui
 void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
                                lv_chart_axis_options_t options)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(list_of_values);
+
     lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
     ext->y_axis.num_tick_marks = num_tick_marks;
     ext->y_axis.list_of_values = list_of_values;
@@ -544,6 +586,9 @@ void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, ui
 void lv_chart_set_secondary_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
                                         lv_chart_axis_options_t options)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(list_of_values);
+
     lv_chart_ext_t * ext       = lv_obj_get_ext_attr(chart);
     ext->secondary_y_axis.num_tick_marks = num_tick_marks;
     ext->secondary_y_axis.list_of_values = list_of_values;
@@ -557,6 +602,8 @@ void lv_chart_set_secondary_y_tick_texts(lv_obj_t * chart, const char * list_of_
  */
 void lv_chart_set_margin(lv_obj_t * chart, uint16_t margin)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     ext->margin          = margin;
     lv_obj_refresh_ext_draw_pad(chart);
@@ -573,6 +620,8 @@ void lv_chart_set_margin(lv_obj_t * chart, uint16_t margin)
  */
 lv_chart_type_t lv_chart_get_type(const lv_obj_t * chart)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->type;
 }
@@ -584,6 +633,8 @@ lv_chart_type_t lv_chart_get_type(const lv_obj_t * chart)
  */
 uint16_t lv_chart_get_point_cnt(const lv_obj_t * chart)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->point_cnt;
 }
@@ -595,6 +646,8 @@ uint16_t lv_chart_get_point_cnt(const lv_obj_t * chart)
  */
 lv_opa_t lv_chart_get_series_opa(const lv_obj_t * chart)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->series.opa;
 }
@@ -606,6 +659,8 @@ lv_opa_t lv_chart_get_series_opa(const lv_obj_t * chart)
  */
 lv_coord_t lv_chart_get_series_width(const lv_obj_t * chart)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->series.width;
 }
@@ -617,6 +672,8 @@ lv_coord_t lv_chart_get_series_width(const lv_obj_t * chart)
  */
 lv_opa_t lv_chart_get_series_darking(const lv_obj_t * chart)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->series.dark;
 }
@@ -631,6 +688,8 @@ lv_opa_t lv_chart_get_series_darking(const lv_obj_t * chart)
  */
 void lv_chart_refresh(lv_obj_t * chart)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_obj_invalidate(chart);
 }
 
@@ -641,6 +700,8 @@ void lv_chart_refresh(lv_obj_t * chart)
  */
 uint16_t lv_chart_get_margin(lv_obj_t * chart)
 {
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     return ext->margin;
 }
@@ -704,7 +765,7 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
     lv_res_t res;
     res = ancestor_signal(chart, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(chart, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 

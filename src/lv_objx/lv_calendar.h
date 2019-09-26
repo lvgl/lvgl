@@ -136,11 +136,11 @@ void lv_calendar_set_day_names(lv_obj_t * calendar, const char ** day_names);
 /**
  * Set the name of the month
  * @param calendar pointer to a calendar object
- * @param day_names pointer to an array with the names. E.g. `const char * days[12] = {"Jan", "Feb",
+ * @param month_names pointer to an array with the names. E.g. `const char * days[12] = {"Jan", "Feb",
  * ...}` Only the pointer will be saved so this variable can't be local which will be destroyed
  * later.
  */
-void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** day_names);
+void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** month_names);
 
 /**
  * Set a style of a calendar.

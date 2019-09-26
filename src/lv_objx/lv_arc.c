@@ -121,6 +121,8 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
 {
+    LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
+
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     if(start > 360) start = 360;
@@ -140,6 +142,8 @@ void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
  *  */
 void lv_arc_set_style(lv_obj_t * arc, lv_arc_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
+
     switch(type) {
         case LV_ARC_STYLE_MAIN: lv_obj_set_style(arc, style); break;
     }
@@ -156,6 +160,8 @@ void lv_arc_set_style(lv_obj_t * arc, lv_arc_style_t type, const lv_style_t * st
  */
 uint16_t lv_arc_get_angle_start(lv_obj_t * arc)
 {
+    LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
+
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     return ext->angle_start;
@@ -168,6 +174,8 @@ uint16_t lv_arc_get_angle_start(lv_obj_t * arc)
  */
 uint16_t lv_arc_get_angle_end(lv_obj_t * arc)
 {
+    LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
+
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     return ext->angle_end;
@@ -181,6 +189,8 @@ uint16_t lv_arc_get_angle_end(lv_obj_t * arc)
  *  */
 const lv_style_t * lv_arc_get_style(const lv_obj_t * arc, lv_arc_style_t type)
 {
+    LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
 
     switch(type) {
@@ -283,7 +293,7 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
     res = ancestor_signal(arc, sign, param);
     if(res != LV_RES_OK) return res;
 
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(arc, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/

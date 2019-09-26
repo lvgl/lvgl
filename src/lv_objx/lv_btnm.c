@@ -103,8 +103,8 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new button matrix object*/
     if(copy == NULL) {
-        lv_obj_set_size(new_btnm, LV_DPI * 3, LV_DPI * 2);
         lv_btnm_set_map(new_btnm, lv_btnm_def_map);
+        lv_obj_set_size(new_btnm, LV_DPI * 3, LV_DPI * 2);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
@@ -144,7 +144,8 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
 {
-    if(map == NULL) return;
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+    LV_ASSERT_NULL(map);
 
     /*
      * lv_btnm_set_map is called on receipt of signals such as
@@ -267,6 +268,8 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
  */
 void lv_btnm_set_ctrl_map(const lv_obj_t * btnm, const lv_btnm_ctrl_t ctrl_map[])
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     memcpy(ext->ctrl_bits, ctrl_map, sizeof(lv_btnm_ctrl_t) * ext->btn_cnt);
 
@@ -281,6 +284,8 @@ void lv_btnm_set_ctrl_map(const lv_obj_t * btnm, const lv_btnm_ctrl_t ctrl_map[]
  */
 void lv_btnm_set_pressed(const lv_obj_t * btnm, uint16_t id)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     if(id >= ext->btn_cnt && id != LV_BTNM_BTN_NONE) return;
@@ -299,6 +304,8 @@ void lv_btnm_set_pressed(const lv_obj_t * btnm, uint16_t id)
  */
 void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     switch(type) {
@@ -333,6 +340,8 @@ void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, const lv_style_t *
  */
 void lv_btnm_set_recolor(const lv_obj_t * btnm, bool en)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     ext->recolor = en;
@@ -346,6 +355,8 @@ void lv_btnm_set_recolor(const lv_obj_t * btnm, bool en)
  */
 void lv_btnm_set_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     if(btn_id >= ext->btn_cnt) return;
@@ -361,6 +372,8 @@ void lv_btnm_set_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t
  */
 void lv_btnm_clear_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     if(btn_id >= ext->btn_cnt) return;
@@ -376,6 +389,8 @@ void lv_btnm_clear_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl
  */
 void lv_btnm_set_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     uint16_t i;
     for(i = 0; i < ext->btn_cnt; i++) {
@@ -391,6 +406,8 @@ void lv_btnm_set_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl)
  */
 void lv_btnm_clear_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     uint16_t i;
     for(i = 0; i < ext->btn_cnt; i++) {
@@ -409,6 +426,8 @@ void lv_btnm_clear_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl)
  */
 void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
 
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     if(btn_id >= ext->btn_cnt) return;
@@ -429,6 +448,8 @@ void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width
  */
 void lv_btnm_set_one_toggle(lv_obj_t * btnm, bool one_toggle)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     ext->one_toggle     = one_toggle;
 
@@ -447,6 +468,8 @@ void lv_btnm_set_one_toggle(lv_obj_t * btnm, bool one_toggle)
  */
 const char ** lv_btnm_get_map_array(const lv_obj_t * btnm)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     return ext->map_p;
 }
@@ -458,6 +481,8 @@ const char ** lv_btnm_get_map_array(const lv_obj_t * btnm)
  */
 bool lv_btnm_get_recolor(const lv_obj_t * btnm)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     return ext->recolor;
@@ -471,6 +496,8 @@ bool lv_btnm_get_recolor(const lv_obj_t * btnm)
  */
 uint16_t lv_btnm_get_active_btn(const lv_obj_t * btnm)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     return ext->btn_id_act;
 }
@@ -483,6 +510,8 @@ uint16_t lv_btnm_get_active_btn(const lv_obj_t * btnm)
  */
 const char * lv_btnm_get_active_btn_text(const lv_obj_t * btnm)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     if(ext->btn_id_act != LV_BTNM_BTN_NONE) {
         return lv_btnm_get_btn_text(btnm, ext->btn_id_act);
@@ -499,6 +528,8 @@ const char * lv_btnm_get_active_btn_text(const lv_obj_t * btnm)
  */
 uint16_t lv_btnm_get_pressed_btn(const lv_obj_t * btnm)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     return ext->btn_id_pr;
 }
@@ -512,6 +543,8 @@ uint16_t lv_btnm_get_pressed_btn(const lv_obj_t * btnm)
  */
 const char * lv_btnm_get_btn_text(const lv_obj_t * btnm, uint16_t btn_id)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     if(btn_id > ext->btn_cnt) return NULL;
 
@@ -541,6 +574,8 @@ const char * lv_btnm_get_btn_text(const lv_obj_t * btnm, uint16_t btn_id)
  */
 bool lv_btnm_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     if(btn_id >= ext->btn_cnt) return false;
 
@@ -555,6 +590,8 @@ bool lv_btnm_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
  */
 const lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_btnm_ext_t * ext      = lv_obj_get_ext_attr(btnm);
 
@@ -578,6 +615,8 @@ const lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type
  */
 bool lv_btnm_get_one_toggle(const lv_obj_t * btnm)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     return ext->one_toggle;
@@ -715,7 +754,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(btnm, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(btnm, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     lv_point_t p;

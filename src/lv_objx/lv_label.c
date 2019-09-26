@@ -1024,7 +1024,7 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
     /* Include the ancient signal function */
     res = ancestor_signal(label, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(label, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if(sign == LV_SIGNAL_CLEANUP) {

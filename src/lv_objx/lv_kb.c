@@ -173,6 +173,9 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+    if(ta) LV_ASSERT_OBJ(ta, "lv_ta");
+
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     lv_cursor_type_t cur_type;
 
@@ -198,6 +201,8 @@ void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta)
  */
 void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     if(ext->mode == mode) return;
 
@@ -218,6 +223,8 @@ void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
  */
 void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     if(ext->cursor_mng == en) return;
 
@@ -243,6 +250,8 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
  */
 void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     switch(type) {
         case LV_KB_STYLE_BG: lv_btnm_set_style(kb, LV_BTNM_STYLE_BG, style); break;
         case LV_KB_STYLE_BTN_REL: lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_REL, style); break;
@@ -264,6 +273,8 @@ void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style
  */
 lv_obj_t * lv_kb_get_ta(const lv_obj_t * kb)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->ta;
 }
@@ -275,6 +286,8 @@ lv_obj_t * lv_kb_get_ta(const lv_obj_t * kb)
  */
 lv_kb_mode_t lv_kb_get_mode(const lv_obj_t * kb)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->mode;
 }
@@ -286,6 +299,8 @@ lv_kb_mode_t lv_kb_get_mode(const lv_obj_t * kb)
  */
 bool lv_kb_get_cursor_manage(const lv_obj_t * kb)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->cursor_mng == 0 ? false : true;
 }
@@ -298,6 +313,8 @@ bool lv_kb_get_cursor_manage(const lv_obj_t * kb)
  */
 const lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
 
     switch(type) {
@@ -326,6 +343,8 @@ const lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
  */
 void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     if(event != LV_EVENT_VALUE_CHANGED) return;
 
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
@@ -422,7 +441,7 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(kb, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(kb, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/

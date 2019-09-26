@@ -128,6 +128,8 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_cb_set_text(lv_obj_t * cb, const char * txt)
 {
+    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
+
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     lv_label_set_text(ext->label, txt);
 }
@@ -140,6 +142,8 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt)
  */
 void lv_cb_set_static_text(lv_obj_t * cb, const char * txt)
 {
+    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
+
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     lv_label_set_static_text(ext->label, txt);
 }
@@ -152,6 +156,8 @@ void lv_cb_set_static_text(lv_obj_t * cb, const char * txt)
  *  */
 void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
+
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 
     switch(type) {
@@ -181,6 +187,8 @@ void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, const lv_style_t * style
  */
 const char * lv_cb_get_text(const lv_obj_t * cb)
 {
+    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
+
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     return lv_label_get_text(ext->label);
 }
@@ -193,6 +201,8 @@ const char * lv_cb_get_text(const lv_obj_t * cb)
  *  */
 const lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type)
 {
+    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_cb_ext_t * ext        = lv_obj_get_ext_attr(cb);
 
@@ -302,7 +312,7 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(cb, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(cb, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 

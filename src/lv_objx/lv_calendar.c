@@ -197,6 +197,9 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_calendar_set_today_date(lv_obj_t * calendar, lv_calendar_date_t * today)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+    LV_ASSERT_NULL(today);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     ext->today.year         = today->year;
     ext->today.month        = today->month;
@@ -213,6 +216,9 @@ void lv_calendar_set_today_date(lv_obj_t * calendar, lv_calendar_date_t * today)
  */
 void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showed)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+    LV_ASSERT_NULL(showed);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     ext->showed_date.year   = showed->year;
     ext->showed_date.month  = showed->month;
@@ -230,6 +236,9 @@ void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showe
  */
 void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t date_num)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+    LV_ASSERT_NULL(highlighted);
+
     lv_calendar_ext_t * ext    = lv_obj_get_ext_attr(calendar);
     ext->highlighted_dates     = highlighted;
     ext->highlighted_dates_num = date_num;
@@ -246,6 +255,9 @@ void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t *
  */
 void lv_calendar_set_day_names(lv_obj_t * calendar, const char ** day_names)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+    LV_ASSERT_NULL(day_names);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     ext->day_names          = day_names;
     lv_obj_invalidate(calendar);
@@ -254,14 +266,17 @@ void lv_calendar_set_day_names(lv_obj_t * calendar, const char ** day_names)
 /**
  * Set the name of the month
  * @param calendar pointer to a calendar object
- * @param day_names pointer to an array with the names. E.g. `const char * days[12] = {"Jan", "Feb",
+ * @param month_names pointer to an array with the names. E.g. `const char * days[12] = {"Jan", "Feb",
  * ...}` Only the pointer will be saved so this variable can't be local which will be destroyed
  * later.
  */
-void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** day_names)
+void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** month_names)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+    LV_ASSERT_NULL(month_names);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-    ext->month_names        = day_names;
+    ext->month_names        = month_names;
     lv_obj_invalidate(calendar);
 }
 
@@ -273,6 +288,8 @@ void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** day_names)
  *  */
 void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
     switch(type) {
@@ -300,6 +317,8 @@ void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, const 
  */
 lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return &ext->today;
 }
@@ -311,6 +330,8 @@ lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * calendar)
  */
 lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return &ext->showed_date;
 }
@@ -323,6 +344,8 @@ lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar)
  */
 lv_calendar_date_t * lv_calendar_get_pressed_date(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->pressed_date.year != 0 ? &ext->pressed_date : NULL;
 }
@@ -334,6 +357,8 @@ lv_calendar_date_t * lv_calendar_get_pressed_date(const lv_obj_t * calendar)
  */
 lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->highlighted_dates;
 }
@@ -345,6 +370,8 @@ lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * calendar
  */
 uint16_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->highlighted_dates_num;
 }
@@ -356,6 +383,8 @@ uint16_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar)
  */
 const char ** lv_calendar_get_day_names(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->day_names;
 }
@@ -367,6 +396,8 @@ const char ** lv_calendar_get_day_names(const lv_obj_t * calendar)
  */
 const char ** lv_calendar_get_month_names(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->month_names;
 }
@@ -379,6 +410,8 @@ const char ** lv_calendar_get_month_names(const lv_obj_t * calendar)
  *  */
 const lv_style_t * lv_calendar_get_style(const lv_obj_t * calendar, lv_calendar_style_t type)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_calendar_ext_t * ext  = lv_obj_get_ext_attr(calendar);
 
@@ -456,7 +489,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
     /* Include the ancient signal function */
     res = ancestor_signal(calendar, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(calendar, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/

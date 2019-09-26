@@ -132,6 +132,8 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_preload_set_arc_length(lv_obj_t * preload, lv_anim_value_t deg)
 {
+    LV_ASSERT_OBJ(preload, LV_OBJX_NAME);
+
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     ext->arc_length = deg;
@@ -144,6 +146,8 @@ void lv_preload_set_arc_length(lv_obj_t * preload, lv_anim_value_t deg)
  */
 void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time)
 {
+    LV_ASSERT_OBJ(preload, LV_OBJX_NAME);
+
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     ext->time = time;
@@ -161,6 +165,8 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time)
  *  */
 void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(preload, LV_OBJX_NAME);
+
     switch(type) {
         case LV_PRELOAD_STYLE_MAIN: lv_arc_set_style(preload, LV_ARC_STYLE_MAIN, style); break;
     }
@@ -173,6 +179,8 @@ void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, const lv_
  *  */
 void lv_preload_set_type(lv_obj_t * preload, lv_preload_type_t type)
 {
+    LV_ASSERT_OBJ(preload, LV_OBJX_NAME);
+
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     /*delete previous animation*/
@@ -255,6 +263,8 @@ void lv_preload_set_type(lv_obj_t * preload, lv_preload_type_t type)
 
 void lv_preload_set_dir(lv_obj_t * preload, lv_preload_dir_t dir)
 {
+    LV_ASSERT_OBJ(preload, LV_OBJX_NAME);
+
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
     ext->anim_dir = dir;
@@ -271,6 +281,8 @@ void lv_preload_set_dir(lv_obj_t * preload, lv_preload_dir_t dir)
  */
 lv_anim_value_t lv_preload_get_arc_length(const lv_obj_t * preload)
 {
+    LV_ASSERT_OBJ(preload, LV_OBJX_NAME);
+
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
     return ext->arc_length;
 }
@@ -281,6 +293,8 @@ lv_anim_value_t lv_preload_get_arc_length(const lv_obj_t * preload)
  */
 uint16_t lv_preload_get_spin_time(const lv_obj_t * preload)
 {
+    LV_ASSERT_OBJ(preload, LV_OBJX_NAME);
+
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
     return ext->time;
 }
@@ -293,6 +307,8 @@ uint16_t lv_preload_get_spin_time(const lv_obj_t * preload)
  *  */
 const lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_style_t type)
 {
+    LV_ASSERT_OBJ(preload, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
 
     switch(type) {
@@ -310,6 +326,8 @@ const lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_sty
  *  */
 lv_preload_type_t lv_preload_get_type(lv_obj_t * preload)
 {
+    LV_ASSERT_OBJ(preload, LV_OBJX_NAME);
+
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
     return ext->anim_type;
 }
@@ -414,7 +432,7 @@ static lv_res_t lv_preload_signal(lv_obj_t * preload, lv_signal_t sign, void * p
     /* Include the ancient signal function */
     res = ancestor_signal(preload, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(preload, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/

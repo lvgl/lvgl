@@ -2302,7 +2302,7 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
  * @param name name of the object. E.g. "lv_btn". (Only teh pointer is saved)
  * @return LV_RES_OK
  */
-lv_res_t lv_obj_handle_get_type_signal(lv_obj_t * obj, lv_obj_type_t * buf, const char * name)
+lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name)
 {
     uint8_t i;
     for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
@@ -2381,7 +2381,7 @@ static bool lv_obj_design(lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mo
  */
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(obj, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_res_t res = LV_RES_OK;
 

@@ -121,6 +121,8 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_slider_set_knob_in(lv_obj_t * slider, bool in)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     if(ext->knob_in == in) return;
 
@@ -136,6 +138,8 @@ void lv_slider_set_knob_in(lv_obj_t * slider, bool in)
  */
 void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
     switch(type) {
@@ -159,6 +163,8 @@ void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, const lv_sty
  */
 int16_t lv_slider_get_value(const lv_obj_t * slider)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
     if(ext->drag_value != LV_SLIDER_NOT_PRESSED)
@@ -174,6 +180,8 @@ int16_t lv_slider_get_value(const lv_obj_t * slider)
  */
 bool lv_slider_is_dragged(const lv_obj_t * slider)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     return ext->drag_value == LV_SLIDER_NOT_PRESSED ? false : true;
 }
@@ -186,6 +194,8 @@ bool lv_slider_is_dragged(const lv_obj_t * slider)
  */
 bool lv_slider_get_knob_in(const lv_obj_t * slider)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     return ext->knob_in == 0 ? false : true;
 }
@@ -198,6 +208,8 @@ bool lv_slider_get_knob_in(const lv_obj_t * slider)
  */
 const lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_slider_ext_t * ext    = lv_obj_get_ext_attr(slider);
 
@@ -505,7 +517,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     /* Include the ancient signal function */
     res = ancestor_signal(slider, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(slider, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     lv_point_t p;

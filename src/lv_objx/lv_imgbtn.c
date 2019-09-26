@@ -116,6 +116,8 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src)
 {
+    LV_ASSERT_OBJ(imgbtn, LV_OBJX_NAME);
+
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 
     ext->img_src[state] = src;
@@ -138,6 +140,8 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src
 void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src_left, const void * src_mid,
                        const void * src_right)
 {
+    LV_ASSERT_OBJ(imgbtn, LV_OBJX_NAME);
+
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 
     ext->img_src_left[state] = src_left;
@@ -157,6 +161,8 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src
  */
 void lv_imgbtn_set_style(lv_obj_t * imgbtn, lv_imgbtn_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(imgbtn, LV_OBJX_NAME);
+
     lv_btn_set_style(imgbtn, type, style);
 }
 
@@ -173,6 +179,8 @@ void lv_imgbtn_set_style(lv_obj_t * imgbtn, lv_imgbtn_style_t type, const lv_sty
  */
 const void * lv_imgbtn_get_src(lv_obj_t * imgbtn, lv_btn_state_t state)
 {
+    LV_ASSERT_OBJ(imgbtn, LV_OBJX_NAME);
+
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 
     return ext->img_src[state];
@@ -187,6 +195,8 @@ const void * lv_imgbtn_get_src(lv_obj_t * imgbtn, lv_btn_state_t state)
  */
 const void * lv_imgbtn_get_src_left(lv_obj_t * imgbtn, lv_btn_state_t state)
 {
+    LV_ASSERT_OBJ(imgbtn, LV_OBJX_NAME);
+
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 
     return ext->img_src_left[state];
@@ -200,6 +210,8 @@ const void * lv_imgbtn_get_src_left(lv_obj_t * imgbtn, lv_btn_state_t state)
  */
 const void * lv_imgbtn_get_src_middle(lv_obj_t * imgbtn, lv_btn_state_t state)
 {
+    LV_ASSERT_OBJ(imgbtn, LV_OBJX_NAME);
+
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 
     return ext->img_src_mid[state];
@@ -213,6 +225,8 @@ const void * lv_imgbtn_get_src_middle(lv_obj_t * imgbtn, lv_btn_state_t state)
  */
 const void * lv_imgbtn_get_src_right(lv_obj_t * imgbtn, lv_btn_state_t state)
 {
+    LV_ASSERT_OBJ(imgbtn, LV_OBJX_NAME);
+
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 
     return ext->img_src_right[state];
@@ -228,6 +242,8 @@ const void * lv_imgbtn_get_src_right(lv_obj_t * imgbtn, lv_btn_state_t state)
  */
 const lv_style_t * lv_imgbtn_get_style(const lv_obj_t * imgbtn, lv_imgbtn_style_t type)
 {
+    LV_ASSERT_OBJ(imgbtn, LV_OBJX_NAME);
+
     return lv_btn_get_style(imgbtn, type);
 }
 
@@ -347,7 +363,7 @@ static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * par
     /* Include the ancient signal function */
     res = ancestor_signal(imgbtn, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(imgbtn, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
         /* If the style changed then the button was clicked, released etc. so probably the state was

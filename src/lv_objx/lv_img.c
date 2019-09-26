@@ -123,6 +123,8 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_img_set_src(lv_obj_t * img, const void * src_img)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_src_t src_type = lv_img_src_get_type(src_img);
     lv_img_ext_t * ext    = lv_obj_get_ext_attr(img);
 
@@ -203,6 +205,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
  */
 void lv_img_set_auto_size(lv_obj_t * img, bool en)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     ext->auto_size = (en == false ? 0 : 1);
@@ -216,6 +220,8 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en)
  */
 void lv_img_set_offset_x(lv_obj_t * img, lv_coord_t x)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     if(x < ext->w - 1) {
@@ -232,6 +238,8 @@ void lv_img_set_offset_x(lv_obj_t * img, lv_coord_t x)
  */
 void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     if(y < ext->h - 1) {
@@ -251,6 +259,8 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y)
  */
 const void * lv_img_get_src(lv_obj_t * img)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->src;
@@ -263,6 +273,8 @@ const void * lv_img_get_src(lv_obj_t * img)
  */
 const char * lv_img_get_file_name(const lv_obj_t * img)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     if(ext->src_type == LV_IMG_SRC_FILE)
@@ -278,6 +290,8 @@ const char * lv_img_get_file_name(const lv_obj_t * img)
  */
 bool lv_img_get_auto_size(const lv_obj_t * img)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->auto_size == 0 ? false : true;
@@ -290,6 +304,8 @@ bool lv_img_get_auto_size(const lv_obj_t * img)
  */
 lv_coord_t lv_img_get_offset_x(lv_obj_t * img)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->offset.x;
@@ -302,6 +318,8 @@ lv_coord_t lv_img_get_offset_x(lv_obj_t * img)
  */
 lv_coord_t lv_img_get_offset_y(lv_obj_t * img)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->offset.y;
@@ -387,7 +405,7 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     res = ancestor_signal(img, sign, param);
     if(res != LV_RES_OK) return res;
 
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(img, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     if(sign == LV_SIGNAL_CLEANUP) {

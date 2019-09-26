@@ -128,6 +128,8 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     if(ext->layout == layout) return;
 
@@ -148,6 +150,8 @@ void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout)
  */
 void lv_cont_set_fit4(lv_obj_t * cont, lv_fit_t left, lv_fit_t right, lv_fit_t top, lv_fit_t bottom)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_obj_invalidate(cont);
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     if(ext->fit_left == left && ext->fit_right == right && ext->fit_top == top && ext->fit_bottom == bottom) {
@@ -174,6 +178,8 @@ void lv_cont_set_fit4(lv_obj_t * cont, lv_fit_t left, lv_fit_t right, lv_fit_t t
  */
 lv_layout_t lv_cont_get_layout(const lv_obj_t * cont)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->layout;
 }
@@ -185,6 +191,8 @@ lv_layout_t lv_cont_get_layout(const lv_obj_t * cont)
  */
 lv_fit_t lv_cont_get_fit_left(const lv_obj_t * cont)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->fit_left;
 }
@@ -196,6 +204,8 @@ lv_fit_t lv_cont_get_fit_left(const lv_obj_t * cont)
  */
 lv_fit_t lv_cont_get_fit_right(const lv_obj_t * cont)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->fit_right;
 }
@@ -207,6 +217,8 @@ lv_fit_t lv_cont_get_fit_right(const lv_obj_t * cont)
  */
 lv_fit_t lv_cont_get_fit_top(const lv_obj_t * cont)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->fit_top;
 }
@@ -218,6 +230,8 @@ lv_fit_t lv_cont_get_fit_top(const lv_obj_t * cont)
  */
 lv_fit_t lv_cont_get_fit_bottom(const lv_obj_t * cont)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->fit_bottom;
 }
@@ -240,7 +254,7 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(cont, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(cont, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_STYLE_CHG) { /*Recalculate the padding if the style changed*/
         lv_cont_refr_layout(cont);

@@ -160,6 +160,8 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_btn_set_toggle(lv_obj_t * btn, bool tgl)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
     ext->toggle = tgl != false ? 1 : 0;
@@ -172,6 +174,8 @@ void lv_btn_set_toggle(lv_obj_t * btn, bool tgl)
  */
 void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     if(ext->state != state) {
         ext->state = state;
@@ -185,6 +189,8 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
  */
 void lv_btn_toggle(lv_obj_t * btn)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     switch(ext->state) {
         case LV_BTN_STATE_REL: lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL); break;
@@ -202,6 +208,8 @@ void lv_btn_toggle(lv_obj_t * btn)
  */
 void lv_btn_set_ink_in_time(lv_obj_t * btn, uint16_t time)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     ext->ink_in_time   = time;
@@ -220,6 +228,8 @@ void lv_btn_set_ink_in_time(lv_obj_t * btn, uint16_t time)
  */
 void lv_btn_set_ink_wait_time(lv_obj_t * btn, uint16_t time)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
 
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
@@ -239,6 +249,8 @@ void lv_btn_set_ink_wait_time(lv_obj_t * btn, uint16_t time)
  */
 void lv_btn_set_ink_out_time(lv_obj_t * btn, uint16_t time)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     ext->ink_out_time  = time;
@@ -258,6 +270,8 @@ void lv_btn_set_ink_out_time(lv_obj_t * btn, uint16_t time)
  */
 void lv_btn_set_style(lv_obj_t * btn, lv_btn_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
     switch(type) {
@@ -283,6 +297,8 @@ void lv_btn_set_style(lv_obj_t * btn, lv_btn_style_t type, const lv_style_t * st
  */
 lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     return ext->state;
 }
@@ -294,6 +310,8 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn)
  */
 bool lv_btn_get_toggle(const lv_obj_t * btn)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
     return ext->toggle != 0 ? true : false;
@@ -306,6 +324,8 @@ bool lv_btn_get_toggle(const lv_obj_t * btn)
  */
 uint16_t lv_btn_get_ink_in_time(const lv_obj_t * btn)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     return ext->ink_in_time;
@@ -322,6 +342,8 @@ uint16_t lv_btn_get_ink_in_time(const lv_obj_t * btn)
  */
 uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     return ext->ink_wait_time;
@@ -337,6 +359,8 @@ uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn)
  */
 uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     return ext->ink_in_time;
@@ -354,6 +378,8 @@ uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn)
  */
 const lv_style_t * lv_btn_get_style(const lv_obj_t * btn, lv_btn_style_t type)
 {
+    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_btn_ext_t * ext       = lv_obj_get_ext_attr(btn);
     lv_btn_state_t state     = lv_btn_get_state(btn);
@@ -485,7 +511,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(btn, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(btn, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     bool tgl           = lv_btn_get_toggle(btn);

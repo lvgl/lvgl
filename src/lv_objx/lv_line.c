@@ -109,6 +109,8 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_line_set_points(lv_obj_t * line, const lv_point_t point_a[], uint16_t point_num)
 {
+    LV_ASSERT_OBJ(line, LV_OBJX_NAME);
+
     lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
     ext->point_array    = point_a;
     ext->point_num      = point_num;
@@ -137,6 +139,8 @@ void lv_line_set_points(lv_obj_t * line, const lv_point_t point_a[], uint16_t po
  */
 void lv_line_set_auto_size(lv_obj_t * line, bool en)
 {
+    LV_ASSERT_OBJ(line, LV_OBJX_NAME);
+
     lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
     if(ext->auto_size == en) return;
 
@@ -155,6 +159,8 @@ void lv_line_set_auto_size(lv_obj_t * line, bool en)
  */
 void lv_line_set_y_invert(lv_obj_t * line, bool en)
 {
+    LV_ASSERT_OBJ(line, LV_OBJX_NAME);
+
     lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
     if(ext->y_inv == en) return;
 
@@ -174,6 +180,8 @@ void lv_line_set_y_invert(lv_obj_t * line, bool en)
  */
 bool lv_line_get_auto_size(const lv_obj_t * line)
 {
+    LV_ASSERT_OBJ(line, LV_OBJX_NAME);
+
     lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
     return ext->auto_size == 0 ? false : true;
@@ -186,6 +194,8 @@ bool lv_line_get_auto_size(const lv_obj_t * line)
  */
 bool lv_line_get_y_invert(const lv_obj_t * line)
 {
+    LV_ASSERT_OBJ(line, LV_OBJX_NAME);
+
     lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
 
     return ext->y_inv == 0 ? false : true;
@@ -284,7 +294,7 @@ static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(line, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(line, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         const lv_style_t * style = lv_line_get_style(line, LV_LINE_STYLE_MAIN);

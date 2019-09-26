@@ -123,6 +123,8 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_spinbox_set_value(lv_obj_t * spinbox, int32_t i)
 {
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     if(ext == NULL) return;
 
@@ -143,6 +145,8 @@ void lv_spinbox_set_value(lv_obj_t * spinbox, int32_t i)
  */
 void lv_spinbox_set_digit_format(lv_obj_t * spinbox, uint8_t digit_count, uint8_t separator_position)
 {
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     if(ext == NULL) return;
 
@@ -163,6 +167,8 @@ void lv_spinbox_set_digit_format(lv_obj_t * spinbox, uint8_t digit_count, uint8_
  */
 void lv_spinbox_set_step(lv_obj_t * spinbox, uint32_t step)
 {
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     if(ext == NULL) return;
 
@@ -177,6 +183,8 @@ void lv_spinbox_set_step(lv_obj_t * spinbox, uint32_t step)
  */
 void lv_spinbox_set_range(lv_obj_t * spinbox, int32_t range_min, int32_t range_max)
 {
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     if(ext == NULL) return;
 
@@ -200,6 +208,8 @@ void lv_spinbox_set_range(lv_obj_t * spinbox, int32_t range_min, int32_t range_m
  */
 void lv_spinbox_set_padding_left(lv_obj_t * spinbox, uint8_t padding)
 {
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
     lv_spinbox_ext_t * ext  = lv_obj_get_ext_attr(spinbox);
     ext->digit_padding_left = padding;
     lv_spinbox_updatevalue(spinbox);
@@ -216,6 +226,8 @@ void lv_spinbox_set_padding_left(lv_obj_t * spinbox, uint8_t padding)
  */
 int32_t lv_spinbox_get_value(lv_obj_t * spinbox)
 {
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
 
     return ext->value;
@@ -231,6 +243,8 @@ int32_t lv_spinbox_get_value(lv_obj_t * spinbox)
  */
 void lv_spinbox_step_next(lv_obj_t * spinbox)
 {
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
 
     int32_t new_step = ext->step / 10;
@@ -248,6 +262,8 @@ void lv_spinbox_step_next(lv_obj_t * spinbox)
  */
 void lv_spinbox_step_prev(lv_obj_t * spinbox)
 {
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     int32_t step_limit;
     step_limit       = LV_MATH_MAX(ext->range_max, (ext->range_min < 0 ? (-ext->range_min) : ext->range_min));
@@ -263,6 +279,8 @@ void lv_spinbox_step_prev(lv_obj_t * spinbox)
  */
 void lv_spinbox_increment(lv_obj_t * spinbox)
 {
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
 
     if(ext->value + ext->step <= ext->range_max) {
@@ -283,6 +301,8 @@ void lv_spinbox_increment(lv_obj_t * spinbox)
  */
 void lv_spinbox_decrement(lv_obj_t * spinbox)
 {
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
 
     if(ext->value - ext->step >= ext->range_min) {
@@ -319,7 +339,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
         res = ancestor_signal(spinbox, sign, param);
         if(res != LV_RES_OK) return res;
     }
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(spinbox, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/

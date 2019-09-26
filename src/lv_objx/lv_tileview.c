@@ -145,6 +145,9 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_tileview_add_element(lv_obj_t * tileview, lv_obj_t * element)
 {
+    LV_ASSERT_OBJ(tileview, LV_OBJX_NAME);
+    LV_ASSERT_NULL(tileview);
+
     /* Let the objects event to propagate to the scrollable part of the tileview.
      * It is required the handle dargging of the tileview with the element.*/
     element->parent_event = 1;
@@ -170,6 +173,9 @@ void lv_tileview_add_element(lv_obj_t * tileview, lv_obj_t * element)
  */
 void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t * valid_pos, uint16_t valid_pos_cnt)
 {
+    LV_ASSERT_OBJ(tileview, LV_OBJX_NAME);
+    LV_ASSERT_NULL(valid_pos);
+
     lv_tileview_ext_t * ext = lv_obj_get_ext_attr(tileview);
     ext->valid_pos          = valid_pos;
     ext->valid_pos_cnt      = valid_pos_cnt;
@@ -197,6 +203,8 @@ void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t * val
  */
 void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim)
 {
+    LV_ASSERT_OBJ(tileview, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION == 0
     anim = LV_ANIM_OFF;
 #endif
@@ -266,6 +274,7 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
  */
 void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(tileview, LV_OBJX_NAME);
 
     switch(type) {
         case LV_TILEVIEW_STYLE_MAIN: lv_obj_set_style(tileview, style); break;
@@ -288,6 +297,8 @@ void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, const 
  */
 const lv_style_t * lv_tileview_get_style(const lv_obj_t * tileview, lv_tileview_style_t type)
 {
+    LV_ASSERT_OBJ(tileview, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     switch(type) {
         case LV_TILEVIEW_STYLE_MAIN: style = lv_obj_get_style(tileview); break;
@@ -323,7 +334,7 @@ static lv_res_t lv_tileview_signal(lv_obj_t * tileview, lv_signal_t sign, void *
     /* Include the ancient signal function */
     res = ancestor_signal(tileview, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(tileview, param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
