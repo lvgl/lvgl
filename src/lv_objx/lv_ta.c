@@ -162,6 +162,23 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->cursor.pos        = copy_ext->cursor.pos;
         ext->cursor.valid_x    = copy_ext->cursor.valid_x;
         ext->cursor.type       = copy_ext->cursor.type;
+
+        if(ext->pwd_mode != 0) pwd_char_hider( new_ta);
+
+        if(copy_ext->placeholder != NULL)
+            ext->placeholder = lv_label_create(new_ta, copy_ext->placeholder);
+        else
+            ext->placeholder = NULL;
+
+        if(copy_ext->pwd_tmp) {
+            uint16_t len = lv_mem_get_size(copy_ext->pwd_tmp);
+            ext->pwd_tmp = lv_mem_alloc(len);
+            lv_mem_assert(ext->pwd_tmp);
+            if(ext->pwd_tmp == NULL) return NULL;
+
+            memcpy(ext->pwd_tmp, copy_ext->pwd_tmp, len);
+        }
+
         if(copy_ext->one_line) lv_ta_set_one_line(new_ta, true);
 
         lv_ta_set_style(new_ta, LV_TA_STYLE_CURSOR, lv_ta_get_style(copy, LV_TA_STYLE_CURSOR));
@@ -652,7 +669,8 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en)
         strcpy(ext->pwd_tmp, txt);
 
         uint16_t i;
-        for(i = 0; i < len; i++) {
+        uint16_t encoded_len = lv_txt_get_encoded_length(txt); 
+        for(i = 0; i < encoded_len; i++) {
             txt[i] = '*'; /*All char to '*'*/
         }
         txt[i] = '\0';
@@ -917,7 +935,7 @@ const char * lv_ta_get_placeholder_text(lv_obj_t * ta)
 
     const char * txt = NULL;
 
-    if(ext->placeholder) txt = lv_label_get_text(ext->label);
+    if(ext->placeholder) txt = lv_label_get_text(ext->placeholder);
 
     return txt;
 }

@@ -132,6 +132,15 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
  */
 void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size);
 
+
+/**
+ * Set the size of the content area.
+ * @param win pointer to a window object
+ * @param w width
+ * @param h height (the window will be higher with the height of the header)
+ */
+void lv_win_set_content_size(lv_obj_t * win, lv_coord_t w, lv_coord_t h);
+
 /**
  * Set the layout of the window
  * @param win pointer to a window object

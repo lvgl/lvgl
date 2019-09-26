@@ -60,6 +60,13 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 {
     const lv_font_t * font = style->text.font;
     lv_coord_t w;
+
+    /*No need to waste processor time if string is empty*/
+    if (txt[0] == '\0')
+    {
+        return;
+    }
+
     if((flag & LV_TXT_FLAG_EXPAND) == 0) {
         /*Normally use the label's width as width*/
         w = lv_area_get_width(coords);
