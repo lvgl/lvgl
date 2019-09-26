@@ -50,6 +50,8 @@ typedef struct {
     uint32_t last_click;
     lv_area_t rect_preview_area;
     lv_area_t rect_gradient_area;
+    lv_coord_t rect_gradient_w;
+    lv_coord_t rect_gradient_h;
 } lv_cpicker_ext_t;
 
 /*Styles*/
