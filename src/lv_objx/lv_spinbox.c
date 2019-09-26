@@ -17,6 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_spinbox"
 
 /**********************
  *      TYPEDEFS
@@ -318,6 +319,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
         res = ancestor_signal(spinbox, sign, param);
         if(res != LV_RES_OK) return res;
     }
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(spinbox, param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/

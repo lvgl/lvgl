@@ -164,15 +164,13 @@ void lv_debug_log_error(const char * msg, unsigned long int  value)
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
 {
     /*Check all children of `parent`*/
-    lv_obj_t * child = lv_obj_get_child(parent, NULL);
-    while(child) {
+    lv_obj_t * child;
+    LV_LL_READ(parent->child_ll, child) {
         if(child == obj_to_find) return true;
 
         /*Check the children*/
         bool found = obj_valid_child(child, obj_to_find);
         if(found) return true;
-
-        child = lv_obj_get_child(parent, child);
     }
 
     return false;

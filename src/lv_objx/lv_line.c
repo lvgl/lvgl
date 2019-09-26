@@ -19,6 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_line"
 
 /**********************
  *      TYPEDEFS
@@ -283,15 +284,9 @@ static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(line, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(line, param, LV_OBJX_NAME);
 
-    if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_line";
-    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+   if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         const lv_style_t * style = lv_line_get_style(line, LV_LINE_STYLE_MAIN);
         if(line->ext_draw_pad < style->line.width) line->ext_draw_pad = style->line.width;
     }

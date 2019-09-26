@@ -22,6 +22,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_btn"
 #define LV_BTN_INK_VALUE_MAX 256
 #define LV_BTN_INK_VALUE_MAX_SHIFT 8
 
@@ -484,6 +485,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(btn, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(btn, param, LV_OBJX_NAME);
 
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     bool tgl           = lv_btn_get_toggle(btn);
@@ -635,13 +637,6 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             ink_obj = NULL;
         }
 #endif
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_btn";
     }
 
     return res;

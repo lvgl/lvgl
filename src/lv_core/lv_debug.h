@@ -99,7 +99,7 @@ void lv_debug_log_error(const char * msg, uint64_t value);
 
 #if LV_USE_ASSERT_STR
 # ifndef LV_ASSERT_STR
-#  define LV_ASSERT_STR(str) LV_DEBUG_ASSERT(LV_DEBUG_IS_STR(str), "Strange or invalid string", p);
+#  define LV_ASSERT_STR(str) LV_DEBUG_ASSERT(LV_DEBUG_IS_STR(str), "Strange or invalid string", str);
 # endif
 #else
 # define LV_ASSERT_STR(p) true
@@ -117,7 +117,7 @@ void lv_debug_log_error(const char * msg, uint64_t value);
 
 #if LV_USE_ASSERT_STYLE
 # ifndef LV_ASSERT_STYLE
-#  define LV_ASSERT_STYLE(style_p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STYLE(style_p, obj_type), "Invalid style", style_p);
+#  define LV_ASSERT_STYLE(style_p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STYLE(style_p), "Invalid style", style_p);
 # endif
 #else
 #  define LV_ASSERT_STYLE(style) true

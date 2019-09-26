@@ -25,6 +25,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_cont"
 
 /**********************
  *      TYPEDEFS
@@ -239,6 +240,7 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(cont, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(cont, param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_STYLE_CHG) { /*Recalculate the padding if the style changed*/
         lv_cont_refr_layout(cont);
@@ -255,13 +257,6 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
         /*FLOOD and FILL fit needs to be refreshed if the parent size has changed*/
         lv_cont_refr_autofit(cont);
 
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_cont";
     }
 
     return res;

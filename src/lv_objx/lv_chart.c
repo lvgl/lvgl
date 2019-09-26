@@ -17,6 +17,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_chart"
+
 #define LV_CHART_YMIN_DEF 0
 #define LV_CHART_YMAX_DEF 100
 #define LV_CHART_HDIV_DEF 3
@@ -698,12 +700,13 @@ static bool lv_chart_design(lv_obj_t * chart, const lv_area_t * mask, lv_design_
  */
 static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param)
 {
-    lv_res_t res;
-    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-
     /* Include the ancient signal function */
+    lv_res_t res;
     res = ancestor_signal(chart, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(chart, param, LV_OBJX_NAME);
+
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_coord_t ** datal;
@@ -712,13 +715,6 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
             lv_mem_free(*datal);
         }
         lv_ll_clear(&ext->series_ll);
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_chart";
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*Provide extra px draw area around the chart*/
         chart->ext_draw_pad = ext->margin;

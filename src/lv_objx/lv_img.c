@@ -24,6 +24,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_img"
 
 /**********************
  *      TYPEDEFS
@@ -386,6 +387,8 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     res = ancestor_signal(img, sign, param);
     if(res != LV_RES_OK) return res;
 
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(img, param, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     if(sign == LV_SIGNAL_CLEANUP) {
         if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_SYMBOL) {
@@ -398,13 +401,6 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         if(ext->src_type == LV_IMG_SRC_SYMBOL) {
             lv_img_set_src(img, ext->src);
         }
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_img";
     }
 
     return res;

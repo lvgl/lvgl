@@ -17,6 +17,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_roller"
+
 #if LV_USE_ANIMATION == 0
 #undef LV_ROLLER_DEF_ANIM_TIME
 #define LV_ROLLER_DEF_ANIM_TIME 0 /*No animation*/
@@ -400,6 +402,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         res = ancestor_signal(roller, sign, param);
         if(res != LV_RES_OK) return res;
     }
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(roller, param, LV_OBJX_NAME);
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
 
@@ -466,13 +469,6 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
                 ext->ddlist.sel_opt_id_ori = ori_id;
             }
         }
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_roller";
     }
 
     return res;

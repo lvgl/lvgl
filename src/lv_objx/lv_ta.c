@@ -21,8 +21,9 @@
 /*********************
  *      DEFINES
  *********************/
-/*Test configuration*/
+#define LV_OBJX_NAME "lv_ta"
 
+/*Test configuration*/
 #ifndef LV_TA_DEF_CURSOR_BLINK_TIME
 #define LV_TA_DEF_CURSOR_BLINK_TIME 400 /*ms*/
 #endif
@@ -1332,6 +1333,7 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(ta, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(ta, param, LV_OBJX_NAME);
 
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(sign == LV_SIGNAL_CLEANUP) {
@@ -1412,13 +1414,6 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable       = true;
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_ta";
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         lv_cursor_type_t cur_type;
         cur_type = lv_ta_get_cursor_type(ta);
@@ -1462,6 +1457,7 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     /* Include the ancient signal function */
     res = scrl_signal(scrl, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(scrl, param, "");
 
     lv_obj_t * ta     = lv_obj_get_parent(scrl);
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
