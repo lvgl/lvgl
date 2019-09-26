@@ -39,7 +39,7 @@
 #endif
 
 #ifndef LV_CPICKER_DEF_QF /*quantization factor*/
-#define LV_CPICKER_DEF_QF 1
+#define LV_CPICKER_DEF_QF 3
 #endif
 
 /*for rectangular mode the QF can be down to 1*/
