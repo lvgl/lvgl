@@ -446,6 +446,63 @@ static uint16_t mode_color_to_angle(lv_cpicker_ext_t * ext)
     return angle;
 }
 
+static void draw_disk_indicator_line(lv_cpicker_ext_t * ext, lv_style_t * style, lv_area_t * mask, lv_opa_t opa_scale,
+                                     lv_coord_t r, lv_coord_t x, lv_coord_t y)
+{
+}
+
+static void draw_disk_indicator_circle(lv_cpicker_ext_t * ext, lv_style_t * style, lv_area_t * mask, lv_opa_t opa_scale,
+                                       lv_coord_t r, lv_coord_t x, lv_coord_t y)
+{
+}
+
+static void draw_disk_indicator_in(lv_cpicker_ext_t * ext, lv_style_t * style, lv_area_t * mask, lv_opa_t opa_scale,
+                                   lv_coord_t rin, lv_coord_t x, lv_coord_t y)
+{
+}
+
+static void draw_disk_indicator(lv_cpicker_ext_t * ext, lv_style_t * style, lv_area_t * mask, lv_opa_t opa_scale,
+                                lv_coord_t r, lv_coord_t x, lv_coord_t y, uint32_t rin)
+{
+}
+
+static void draw_disk_spectrum(lv_cpicker_ext_t * ext, lv_style_t * style, lv_area_t * mask, lv_opa_t opa_scale,
+                               lv_coord_t r, lv_coord_t x, lv_coord_t y)
+{
+}
+
+static void draw_rect_indicator_line(lv_cpicker_ext_t * ext, lv_style_t * style, lv_area_t * mask, lv_opa_t opa_scale,
+                                     lv_coord_t gradient_w, lv_coord_t gradient_h, lv_area_t gradient_area, lv_coord_t ind_pos)
+{
+}
+
+static void draw_rect_indicator_circle(lv_cpicker_ext_t * ext, lv_style_t * style, lv_area_t * mask, lv_opa_t opa_scale,
+                                       lv_coord_t gradient_w, lv_coord_t gradient_h, lv_area_t gradient_area, lv_coord_t ind_pos)
+{
+}
+
+static void draw_rect_indicator_in(lv_cpicker_ext_t * ext, lv_style_t * style, lv_area_t * mask, lv_opa_t opa_scale,
+                                   lv_coord_t gradient_w, lv_coord_t gradient_h, lv_area_t gradient_area, lv_coord_t ind_pos)
+{
+}
+
+static void draw_rect_indicator(lv_cpicker_ext_t * ext, lv_style_t * style, lv_area_t * mask, lv_opa_t opa_scale,
+                                lv_coord_t gradient_w, lv_coord_t gradient_h, lv_area_t gradient_area)
+{
+}
+
+static void calculate_preview_area(lv_style_t * style,
+                                   lv_coord_t * gradient_w, lv_coord_t * gradient_h, lv_area_t * gradient_area, lv_area_t * preview_area,
+                                   uint16_t * style_body_padding_ver, uint16_t * style_body_padding_hor,
+                                   lv_coord_t w, lv_coord_t h, lv_coord_t x1, lv_coord_t y1, lv_coord_t x2, lv_coord_t y2)
+{
+}
+
+static void draw_rect_spectrum(lv_cpicker_ext_t * ext, lv_style_t * style, lv_area_t * mask, lv_opa_t opa_scale,
+                               lv_coord_t w, lv_coord_t h, lv_coord_t x1, lv_coord_t y1, lv_coord_t x2, lv_coord_t y2)
+{
+}
+
 /**
  * Handle the drawing related tasks of the color_pickerwhen when wheel type
  * @param cpicker pointer to an object
