@@ -64,11 +64,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode);
-static lv_res_t lv_cpicker_disc_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param);
-
-static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode);
-static lv_res_t lv_cpicker_rect_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param);
+static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param);
 
 static void lv_cpicker_invalidate(lv_obj_t * cpicker, bool all);
 
@@ -120,16 +117,8 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->last_click = 0;
 
     /*The signal and design functions are not copied so set them here*/
-    if(ext->type == LV_CPICKER_TYPE_DISC)
-    {
-        lv_obj_set_signal_cb(new_cpicker, lv_cpicker_disc_signal);
-        lv_obj_set_design_cb(new_cpicker, lv_cpicker_disc_design);
-    }
-    else if(ext->type == LV_CPICKER_TYPE_RECT)
-    {
-        lv_obj_set_signal_cb(new_cpicker, lv_cpicker_rect_signal);
-        lv_obj_set_design_cb(new_cpicker, lv_cpicker_rect_design);
-    }
+    lv_obj_set_signal_cb(new_cpicker, lv_cpicker_signal);
+    lv_obj_set_design_cb(new_cpicker, lv_cpicker_design);
 
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
@@ -168,17 +157,6 @@ void lv_cpicker_set_type(lv_obj_t * cpicker, lv_cpicker_type_t type)
     if(ext->type == type) return;
 
     ext->type = type;
-
-    if(ext->type == LV_CPICKER_TYPE_DISC)
-    {
-        lv_obj_set_signal_cb(cpicker, lv_cpicker_disc_signal);
-        lv_obj_set_design_cb(cpicker, lv_cpicker_disc_design);
-    }
-    else if(ext->type == LV_CPICKER_TYPE_RECT)
-    {
-        lv_obj_set_signal_cb(cpicker, lv_cpicker_rect_signal);
-        lv_obj_set_design_cb(cpicker, lv_cpicker_rect_design);
-    }
 
     lv_obj_invalidate(cpicker);
 }
@@ -503,17 +481,22 @@ static void draw_rect_spectrum(lv_cpicker_ext_t * ext, lv_style_t * style, lv_ar
 {
 }
 
+static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode,
+                                   lv_cpicker_ext_t * ext, lv_style_t * style);
+static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode,
+                                   lv_cpicker_ext_t * ext, lv_style_t * style);
+
 /**
- * Handle the drawing related tasks of the color_pickerwhen when wheel type
+ * Handle the drawing related tasks of the color_picker
  * @param cpicker pointer to an object
  * @param mask the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @return true/false, depends on 'mode'
  */
-static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode)
+static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
@@ -528,27 +511,47 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         static lv_style_t styleCopy;
         lv_style_copy(&styleCopy, style);
 
-        static lv_style_t styleCenterBackground;
-        lv_theme_t * th = lv_theme_get_current();
-        if (th) {
-            lv_style_copy(&styleCenterBackground, th->style.bg);
-        } else {
-            lv_style_copy(&styleCenterBackground, &lv_style_plain);
+        if(ext->type == LV_CPICKER_TYPE_DISC)
+        {
+            return lv_cpicker_disc_design(cpicker, mask, mode, ext, &styleCopy);
         }
+        else if(ext->type == LV_CPICKER_TYPE_RECT)
+        {
+            return lv_cpicker_rect_design(cpicker, mask, mode, ext, &styleCopy);
+        }
+    }
+    /*Post draw when the children are drawn*/
+    else if(mode == LV_DESIGN_DRAW_POST) {
 
-        lv_coord_t r = (LV_MATH_MIN(lv_obj_get_width(cpicker), lv_obj_get_height(cpicker))) / 2;
-        lv_coord_t x = cpicker->coords.x1 + lv_obj_get_width(cpicker) / 2;
-        lv_coord_t y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
-        lv_opa_t opa_scale = lv_obj_get_opa_scale(cpicker);
+    }
 
-        uint8_t redraw_wheel = 0;
+    return true;
+}
 
-        lv_area_t center_ind_area;
+static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode,
+                                   lv_cpicker_ext_t * ext, lv_style_t * style)
+{
+    static lv_style_t styleCenterBackground;
+    lv_theme_t * th = lv_theme_get_current();
+    if (th) {
+        lv_style_copy(&styleCenterBackground, th->style.bg);
+    } else {
+        lv_style_copy(&styleCenterBackground, &lv_style_plain);
+    }
 
-        uint32_t rin = r - styleCopy.line.width;
-        //the square area (a and b being sides) should fit into the center of diameter d
-        //we have:
-        //a^2+b^2<=d^2
+    lv_coord_t r = (LV_MATH_MIN(lv_obj_get_width(cpicker), lv_obj_get_height(cpicker))) / 2;
+    lv_coord_t x = cpicker->coords.x1 + lv_obj_get_width(cpicker) / 2;
+    lv_coord_t y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
+    lv_opa_t opa_scale = lv_obj_get_opa_scale(cpicker);
+
+    uint8_t redraw_wheel = 0;
+
+    lv_area_t center_ind_area;
+
+    uint32_t rin = r - style->line.width;
+    //the square area (a and b being sides) should fit into the center of diameter d
+    //we have:
+    //a^2+b^2<=d^2
         //2a^2 <= d^2
         //a^2<=(d^2)/2
         //a <= sqrt((d^2)/2)
@@ -666,14 +669,14 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             }
 
             if(ext->color_mode == LV_CPICKER_COLOR_MODE_HUE)
+        {
+            for(uint16_t i = start_angle; i <= end_angle; i+= LV_CPICKER_DEF_QF)
             {
-                for(uint16_t i = start_angle; i <= end_angle; i+= LV_CPICKER_DEF_QF)
-                {
-                    styleCopy.body.main_color = angle_to_mode_color(ext, i);
-                    styleCopy.body.grad_color = styleCopy.body.main_color;
+                style->body.main_color = angle_to_mode_color(ext, i);
+                style->body.grad_color = style->body.main_color;
 
-                    triangle_points[0].x = x;
-                    triangle_points[0].y = y;
+                triangle_points[0].x = x;
+                triangle_points[0].y = y;
 
                     triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
                     triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
@@ -691,88 +694,88 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
                         triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
                         triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
 
-                    }
-
-                    lv_draw_triangle(triangle_points, mask, &styleCopy, LV_OPA_COVER);
                 }
-            }
-            else if(ext->color_mode == LV_CPICKER_COLOR_MODE_SATURATION)
-            {
-                for(uint16_t i = start_angle; i <= end_angle; i += LV_CPICKER_DEF_QF)
-                {
-                    styleCopy.body.main_color = angle_to_mode_color(ext, i);
-                    styleCopy.body.grad_color = styleCopy.body.main_color;
 
-                    triangle_points[0].x = x;
-                    triangle_points[0].y = y;
-
-                    triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-                    triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
-
-                    if(i == end_angle || i == (360 - LV_CPICKER_DEF_QF))
-                    {
-                        /*the last triangle is drawn without additional overlapping pixels*/
-                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
-                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
-                    }
-                    else
-                    {
-                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
-                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
-                    }
-
-                    lv_draw_triangle(triangle_points, mask, &styleCopy, LV_OPA_COVER);
-                }
-            }
-            else if(ext->color_mode == LV_CPICKER_COLOR_MODE_VALUE)
-            {
-                for(uint16_t i = start_angle; i <= end_angle; i += LV_CPICKER_DEF_QF)
-                {
-                    styleCopy.body.main_color = angle_to_mode_color(ext, i);
-                    styleCopy.body.grad_color = styleCopy.body.main_color;
-
-                    triangle_points[0].x = x;
-                    triangle_points[0].y = y;
-
-                    triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-                    triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
-
-                    if(i == end_angle || i == (360 - LV_CPICKER_DEF_QF))
-                    {
-                        /*the last triangle is drawn without additional overlapping pixels*/
-                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
-                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
-
-                    }
-                    else
-                    {
-                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
-                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
-                    }
-
-                    lv_draw_triangle(triangle_points, mask, &styleCopy, LV_OPA_COVER);
-                }
+                lv_draw_triangle(triangle_points, mask, style, LV_OPA_COVER);
             }
         }
+        else if(ext->color_mode == LV_CPICKER_COLOR_MODE_SATURATION)
+        {
+            for(uint16_t i = start_angle; i <= end_angle; i += LV_CPICKER_DEF_QF)
+            {
+                style->body.main_color = angle_to_mode_color(ext, i);
+                style->body.grad_color = style->body.main_color;
 
-        //draw center background
-        lv_area_t center_area;
-        uint16_t wradius = r - styleCopy.line.width;
-        center_area.x1 = x - wradius;
-        center_area.y1 = y - wradius;
-        center_area.x2 = x + wradius;
+                triangle_points[0].x = x;
+                triangle_points[0].y = y;
+
+                    triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+                    triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+
+                    if(i == end_angle || i == (360 - LV_CPICKER_DEF_QF))
+                    {
+                        /*the last triangle is drawn without additional overlapping pixels*/
+                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
+                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
+                    }
+                    else
+                    {
+                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
+                    triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
+                }
+
+                lv_draw_triangle(triangle_points, mask, style, LV_OPA_COVER);
+            }
+        }
+        else if(ext->color_mode == LV_CPICKER_COLOR_MODE_VALUE)
+        {
+            for(uint16_t i = start_angle; i <= end_angle; i += LV_CPICKER_DEF_QF)
+            {
+                style->body.main_color = angle_to_mode_color(ext, i);
+                style->body.grad_color = style->body.main_color;
+
+                triangle_points[0].x = x;
+                triangle_points[0].y = y;
+
+                    triangle_points[1].x = x + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+                    triangle_points[1].y = y + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+
+                    if(i == end_angle || i == (360 - LV_CPICKER_DEF_QF))
+                    {
+                        /*the last triangle is drawn without additional overlapping pixels*/
+                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
+                        triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
+
+                    }
+                    else
+                    {
+                        triangle_points[2].x = x + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
+                    triangle_points[2].y = y + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
+                }
+
+                lv_draw_triangle(triangle_points, mask, style, LV_OPA_COVER);
+            }
+        }
+    }
+
+    //draw center background
+    lv_area_t center_area;
+    uint16_t wradius = r - style->line.width;
+    center_area.x1 = x - wradius;
+    center_area.y1 = y - wradius;
+    center_area.x2 = x + wradius;
         center_area.y2 = y + wradius;
         styleCenterBackground.body.radius = LV_RADIUS_CIRCLE;
-        lv_draw_rect(&center_area, mask, &styleCenterBackground, opa_scale);
+    lv_draw_rect(&center_area, mask, &styleCenterBackground, opa_scale);
 
-        //draw the center color indicator
-        styleCopy.body.main_color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, ext->value);
-        styleCopy.body.grad_color = styleCopy.body.main_color;
-        styleCopy.body.radius = LV_RADIUS_CIRCLE;
-        lv_draw_rect(&center_ind_area, mask, &styleCopy, opa_scale);
+    //draw the center color indicator
+    style->body.main_color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, ext->value);
+    style->body.grad_color = style->body.main_color;
+    style->body.radius = LV_RADIUS_CIRCLE;
+    lv_draw_rect(&center_ind_area, mask, style, opa_scale);
 
-        //Draw the current hue indicator
-        switch(ext->indicator.type)
+    //Draw the current hue indicator
+    switch(ext->indicator.type)
         {
         case LV_CPICKER_INDICATOR_NONE:
             break;
@@ -825,11 +828,12 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
 
             circle_ind_area.x1 = cx - style->line.width/2;
             circle_ind_area.y1 = cy - style->line.width/2;
-            circle_ind_area.x2 = cx + style->line.width/2;
-            circle_ind_area.y2 = cy + style->line.width/2;
+        circle_ind_area.x2 = cx + style->line.width/2;
+        circle_ind_area.y2 = cy + style->line.width/2;
 
-            lv_style_copy(&styleCopy, ext->indicator.style);
-            styleCopy.body.radius = LV_RADIUS_CIRCLE;
+        lv_style_t styleCopy;
+        lv_style_copy(&styleCopy, ext->indicator.style);
+        styleCopy.body.radius = LV_RADIUS_CIRCLE;
 
             lv_draw_rect(&circle_ind_area, mask, &styleCopy, opa_scale);
             break;
@@ -852,11 +856,12 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
 
             circle_ind_area.x1 = cx - ((wradius - radius) / 3);
             circle_ind_area.y1 = cy - ((wradius - radius) / 3);
-            circle_ind_area.x2 = cx + ((wradius - radius) / 3);
-            circle_ind_area.y2 = cy + ((wradius - radius) / 3);
+        circle_ind_area.x2 = cx + ((wradius - radius) / 3);
+        circle_ind_area.y2 = cy + ((wradius - radius) / 3);
 
-            lv_style_copy(&styleCopy, ext->indicator.style);
-            styleCopy.body.radius = LV_RADIUS_CIRCLE;
+        lv_style_t styleCopy;
+        lv_style_copy(&styleCopy, ext->indicator.style);
+        styleCopy.body.radius = LV_RADIUS_CIRCLE;
 
             lv_draw_rect(&circle_ind_area, mask, &styleCopy, opa_scale);
             break;
@@ -870,45 +875,18 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         lv_style_copy(&style2, &lv_style_plain);
         style2.body.main_color.full = c;
         style2.body.grad_color.full = c;
-        c += 0x123445678;
-        lv_draw_rect(mask, mask, &style2, opa_scale);
-         */
-    }
-    /*Post draw when the children are drawn*/
-    else if(mode == LV_DESIGN_DRAW_POST) {
-
-    }
-
+    c += 0x123445678;
+    lv_draw_rect(mask, mask, &style2, opa_scale);
+        */
+ 
     return true;
 }
 
-/**
- * Handle the drawing related tasks of the color_pickerwhen of rectangle type
- * @param cpicker pointer to an object
- * @param mask the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
- */
-static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode)
+static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode,
+                                   lv_cpicker_ext_t * ext, lv_style_t * style)
 {
-    /*Return false if the object is not covers the mask_p area*/
-    if(mode == LV_DESIGN_COVER_CHK) {
-        return false;
-    }
-    /*Draw the object*/
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
-
-        lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
-        lv_style_t * style = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
-
-        static lv_style_t styleCopy;
-        lv_style_copy(&styleCopy, style);
-
-        lv_coord_t w = lv_obj_get_width(cpicker);
-        lv_coord_t h = lv_obj_get_height(cpicker);
+    lv_coord_t w = lv_obj_get_width(cpicker);
+    lv_coord_t h = lv_obj_get_height(cpicker);
 
         lv_coord_t x1 = cpicker->coords.x1;
         lv_coord_t y1 = cpicker->coords.y1;
@@ -999,68 +977,68 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             rounded_edge_area.y2 = ext->rect_gradient_area.y2;
 
             ext->rect_gradient_area.x1 += ext->rect_gradient_h/2;
-            ext->rect_gradient_area.x2 -= ext->rect_gradient_h/2;
-            ext->rect_gradient_w -= ext->rect_gradient_h;
+        ext->rect_gradient_area.x2 -= ext->rect_gradient_h/2;
+        ext->rect_gradient_w -= ext->rect_gradient_h;
 
-            styleCopy.body.main_color = angle_to_mode_color(ext, 0);
-            styleCopy.body.grad_color = styleCopy.body.main_color;
+        style->body.main_color = angle_to_mode_color(ext, 0);
+        style->body.grad_color = style->body.main_color;
 
-            styleCopy.body.radius = LV_RADIUS_CIRCLE;
+        style->body.radius = LV_RADIUS_CIRCLE;
 
-            lv_draw_rect(&rounded_edge_area, mask, &styleCopy, opa_scale);
+        lv_draw_rect(&rounded_edge_area, mask, style, opa_scale);
 
-            rounded_edge_area.x1 += ext->rect_gradient_w - 1;
-            rounded_edge_area.x2 += ext->rect_gradient_w - 1;
+        rounded_edge_area.x1 += ext->rect_gradient_w - 1;
+        rounded_edge_area.x2 += ext->rect_gradient_w - 1;
 
-            styleCopy.body.main_color = angle_to_mode_color(ext, 360);
-            styleCopy.body.grad_color = styleCopy.body.main_color;
+        style->body.main_color = angle_to_mode_color(ext, 360);
+        style->body.grad_color = style->body.main_color;
 
-            lv_draw_rect(&rounded_edge_area, mask, &styleCopy, opa_scale);
-        }
+        lv_draw_rect(&rounded_edge_area, mask, style, opa_scale);
+    }
 
-        for(uint16_t i = 0; i < 360; i += LV_MATH_MAX(LV_CPICKER_DEF_QF, 360/ext->rect_gradient_w))
-        {
-            styleCopy.body.main_color = angle_to_mode_color(ext, i);
-            styleCopy.body.grad_color = styleCopy.body.main_color;
+    for(uint16_t i = 0; i < 360; i += LV_MATH_MAX(LV_CPICKER_DEF_QF, 360/ext->rect_gradient_w))
+    {
+        style->body.main_color = angle_to_mode_color(ext, i);
+        style->body.grad_color = style->body.main_color;
 
-            /*the following attribute might need changing between index to add border, shadow, radius etc*/
-            styleCopy.body.radius = 0;
-            styleCopy.body.border.width = 0;
-            styleCopy.body.shadow.width = 0;
-            styleCopy.body.opa = LV_OPA_COVER;
+        /*the following attribute might need changing between index to add border, shadow, radius etc*/
+        style->body.radius = 0;
+        style->body.border.width = 0;
+        style->body.shadow.width = 0;
+        style->body.opa = LV_OPA_COVER;
 
-            lv_area_t rect_area;
+        lv_area_t rect_area;
 
             /*scale angle (hue/sat/val) to linear coordinate*/
             lv_coord_t xi = i / 360.0 * ext->rect_gradient_w;
 
             rect_area.x1 = LV_MATH_MIN(ext->rect_gradient_area.x1 + xi, ext->rect_gradient_area.x1 + ext->rect_gradient_w - LV_MATH_MAX(LV_CPICKER_DEF_QF, 360/ext->rect_gradient_w));
             rect_area.y1 = ext->rect_gradient_area.y1;
-            rect_area.x2 = rect_area.x1 + LV_MATH_MAX(LV_CPICKER_DEF_QF, 360/ext->rect_gradient_w);
-            rect_area.y2 = ext->rect_gradient_area.y2;
+        rect_area.x2 = rect_area.x1 + LV_MATH_MAX(LV_CPICKER_DEF_QF, 360/ext->rect_gradient_w);
+        rect_area.y2 = ext->rect_gradient_area.y2;
 
-            lv_draw_rect(&rect_area, mask, &styleCopy, opa_scale);
-        }
+        lv_draw_rect(&rect_area, mask, style, opa_scale);
+    }
 
-        if(style->line.rounded)
+    if(style->line.rounded)
         {
             /*Restore gradient area to take rounded end in account*/
             ext->rect_gradient_area.x1 -= ext->rect_gradient_h/2;
             ext->rect_gradient_area.x2 += ext->rect_gradient_h/2;
             //ext->rect_gradient_w += ext->rect_gradient_h;
-        }
+    }
 
-        /*draw the color preview indicator*/
-        styleCopy.body.main_color = lv_cpicker_get_color(cpicker);
-        styleCopy.body.grad_color = styleCopy.body.main_color;
-        if(style->line.rounded && style_body_padding_hor == 0)
-        {
-            styleCopy.body.radius = ext->rect_gradient_h;
-        }
-        lv_draw_rect(&(ext->rect_preview_area), mask, &styleCopy, opa_scale);
+    /*draw the color preview indicator*/
+    style->body.main_color = lv_cpicker_get_color(cpicker);
+    style->body.grad_color = style->body.main_color;
+    if(style->line.rounded && style_body_padding_hor == 0)
+    {
+        style->body.radius = ext->rect_gradient_h;
+    }
+    lv_draw_rect(&(ext->rect_preview_area), mask, style, opa_scale);
 
-        /*
-        styleCopy.line.width = 10;
+    /*
+    styleCopy.line.width = 10;
         lv_draw_arc(cpicker->coords.x1 + 3*ext->rect_gradient_h/2, cpicker->coords.y1 + ext->rect_gradient_h/2, ext->rect_gradient_h / 2 + styleCopy.line.width + 2, mask, 180, 360, &styleCopy, opa_scale);
         //lv_draw_arc(cpicker->coords.x1 + ext->rect_gradient_w - ext->rect_gradient_h/2, cpicker->coords.y1 + ext->rect_gradient_h/2, ext->rect_gradient_h / 2 + styleCopy.line.width + 2, mask, 0, 180, &styleCopy, opa_scale);
          */
@@ -1105,16 +1083,16 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             lv_area_t circle_ind_area;
             circle_ind_area.x1 = ext->rect_gradient_area.x1 + ind_pos - ext->rect_gradient_h/2;
             circle_ind_area.x2 = circle_ind_area.x1 + ext->rect_gradient_h;
-            circle_ind_area.y1 = ext->rect_gradient_area.y1;
-            circle_ind_area.y2 = ext->rect_gradient_area.y2;
+        circle_ind_area.y1 = ext->rect_gradient_area.y1;
+        circle_ind_area.y2 = ext->rect_gradient_area.y2;
 
-            lv_style_copy(&styleCopy, ext->indicator.style);
-            styleCopy.body.radius = LV_RADIUS_CIRCLE;
+        lv_style_copy(style, ext->indicator.style);
+        style->body.radius = LV_RADIUS_CIRCLE;
 
-            lv_draw_rect(&circle_ind_area, mask, &styleCopy, opa_scale);
-            break;
-        }
-        case LV_CPICKER_INDICATOR_IN:
+        lv_draw_rect(&circle_ind_area, mask, style, opa_scale);
+        break;
+    }
+    case LV_CPICKER_INDICATOR_IN:
         {
             /*draw triangle under the gradient*/
             lv_point_t triangle_points[3];
@@ -1138,40 +1116,27 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         }
         default:
             break;
-        }
-    }
-    /*Post draw when the children are drawn*/
-    else if(mode == LV_DESIGN_DRAW_POST) {
-
     }
 
     return true;
 }
 
+
+static lv_res_t lv_cpicker_disc_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param);
+static lv_res_t lv_cpicker_rect_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param);
+
 /**
- * Signal function of the color_picker of wheel type
+ * Signal function of the color_picker
  * @param cpicker pointer to a color_picker object
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static lv_res_t lv_cpicker_disc_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param)
+static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param)
 {
-    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
-
-    lv_res_t res;
-
     /* Include the ancient signal function */
-    res = ancestor_signal(cpicker, sign, param);
+    lv_res_t res = ancestor_signal(cpicker, sign, param);
     if(res != LV_RES_OK) return res;
-
-    lv_style_t * style = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
-
-    lv_coord_t r_out = (LV_MATH_MIN(lv_obj_get_width(cpicker), lv_obj_get_height(cpicker))) / 2;
-    lv_coord_t r_in = r_out - style->line.width - style->body.padding.inner;
-
-    lv_coord_t x = cpicker->coords.x1 + lv_obj_get_width(cpicker) / 2;
-    lv_coord_t y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
@@ -1182,8 +1147,40 @@ static lv_res_t lv_cpicker_disc_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_cpicker";
+    } else {
+        lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+        lv_style_t * style = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
+
+        if(ext->type == LV_CPICKER_TYPE_DISC)
+        {
+            res = lv_cpicker_disc_signal(cpicker, sign, param);
+            if(res != LV_RES_OK) return res;
+        }
+        else if(ext->type == LV_CPICKER_TYPE_RECT)
+        {
+            res = lv_cpicker_rect_signal(cpicker, sign, param);
+            if(res != LV_RES_OK) return res;
+        }
     }
-    else if(sign == LV_SIGNAL_PRESSED)
+
+    return res;
+}
+
+static lv_res_t lv_cpicker_disc_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param)
+{
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+
+    lv_res_t res;
+
+    lv_style_t * style = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
+
+    lv_coord_t r_out = (LV_MATH_MIN(lv_obj_get_width(cpicker), lv_obj_get_height(cpicker))) / 2;
+    lv_coord_t r_in = r_out - style->line.width - style->body.padding.inner;
+
+    lv_coord_t x = cpicker->coords.x1 + lv_obj_get_width(cpicker) / 2;
+    lv_coord_t y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
+
+    if(sign == LV_SIGNAL_PRESSED)
     {
         switch(ext->color_mode)
         {
@@ -1452,23 +1449,9 @@ static lv_res_t lv_cpicker_rect_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
 
     lv_res_t res;
 
-    /* Include the ancient signal function */
-    res = ancestor_signal(cpicker, sign, param);
-    if(res != LV_RES_OK) return res;
-
     lv_style_t * style = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
 
-    if(sign == LV_SIGNAL_CLEANUP) {
-        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_cpicker";
-    }
-    else if(sign == LV_SIGNAL_PRESSED)
+    if(sign == LV_SIGNAL_PRESSED)
     {
         switch(ext->color_mode)
         {
