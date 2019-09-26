@@ -7,12 +7,14 @@
  *      INCLUDES
  *********************/
 #include "lv_objmask.h"
+#include "../lv_core/lv_debug.h"
 
 #if defined(LV_USE_OBJMASK) && LV_USE_OBJMASK != 0
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_objmask"
 
 /**********************
  *      TYPEDEFS
@@ -50,12 +52,12 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of object mask*/
     lv_obj_t * new_objmask = lv_cont_create(par, copy);
-    lv_mem_assert(new_objmask);
+    LV_ASSERT_MEM(new_objmask);
     if(new_objmask == NULL) return NULL;
 
     /*Allocate the object mask type specific extended data*/
     lv_objmask_ext_t * ext = lv_obj_allocate_ext_attr(new_objmask, sizeof(lv_objmask_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_objmask);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_objmask);
@@ -175,6 +177,7 @@ static lv_res_t lv_objmask_signal(lv_obj_t * objmask, lv_signal_t sign, void * p
     /* Include the ancient signal function */
     res = ancestor_signal(objmask, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/

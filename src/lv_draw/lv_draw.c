@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "lv_draw.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
 #include "../lv_misc/lv_math.h"
@@ -66,7 +67,7 @@ void * lv_draw_buf_get(uint32_t size)
             _lv_draw_buf[i].used = 1;
             _lv_draw_buf[i].size = size;
             _lv_draw_buf[i].p = lv_mem_realloc(_lv_draw_buf[i].p, size);
-            lv_mem_assert(_lv_draw_buf[i].p);
+            LV_ASSERT_MEM(_lv_draw_buf[i].p);
             return  _lv_draw_buf[i].p;
         }
     }

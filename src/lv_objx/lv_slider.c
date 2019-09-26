@@ -10,6 +10,7 @@
 #include "lv_slider.h"
 #if LV_USE_SLIDER != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
@@ -18,6 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_slider"
 
 /**********************
  *      TYPEDEFS
@@ -55,7 +57,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor slider*/
     lv_obj_t * new_slider = lv_bar_create(par, copy);
-    lv_mem_assert(new_slider);
+    LV_ASSERT_MEM(new_slider);
     if(new_slider == NULL) return NULL;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_slider);
@@ -63,7 +65,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the slider type specific extended data*/
     lv_slider_ext_t * ext = lv_obj_allocate_ext_attr(new_slider, sizeof(lv_slider_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
@@ -113,6 +115,8 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
     switch(type) {
@@ -136,6 +140,7 @@ void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, const lv_sty
  */
 int16_t lv_slider_get_value(const lv_obj_t * slider)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
     return lv_bar_get_value(slider);
 }
 
@@ -146,6 +151,8 @@ int16_t lv_slider_get_value(const lv_obj_t * slider)
  */
 bool lv_slider_is_dragged(const lv_obj_t * slider)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     return ext->dragging ? true : false;
 }
@@ -158,6 +165,8 @@ bool lv_slider_is_dragged(const lv_obj_t * slider)
  */
 const lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_slider_ext_t * ext    = lv_obj_get_ext_attr(slider);
 
@@ -273,6 +282,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     /* Include the ancient signal function */
     res = ancestor_signal(slider, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     lv_point_t p;
@@ -369,13 +379,6 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable       = true;
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_slider";
     }
 
     return res;

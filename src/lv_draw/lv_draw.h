@@ -26,7 +26,9 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_DRAW_BUF_MAX_NUM    6
+#ifndef LV_DRAW_BUF_MAX_NUM
+#define LV_DRAW_BUF_MAX_NUM    8
+#endif
 
 /**********************
  *      TYPEDEFS
