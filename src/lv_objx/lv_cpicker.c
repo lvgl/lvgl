@@ -408,6 +408,44 @@ lv_color_t lv_cpicker_get_color(lv_obj_t * cpicker)
  *   STATIC FUNCTIONS
  **********************/
 
+static lv_color_t angle_to_mode_color(lv_cpicker_ext_t * ext, uint16_t angle)
+{
+    lv_color_t color;
+    switch(ext->color_mode)
+    {
+    default:
+    case LV_CPICKER_COLOR_MODE_HUE:
+        color = lv_color_hsv_to_rgb(angle%360, ext->saturation, ext->value);
+        break;
+    case LV_CPICKER_COLOR_MODE_SATURATION:
+        color = lv_color_hsv_to_rgb(ext->hue, (angle%360)/360.0*100.0, ext->value);
+        break;
+    case LV_CPICKER_COLOR_MODE_VALUE:
+        color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, (angle%360)/360.0*100.0);
+        break;
+    }
+    return color;
+}
+
+static uint16_t mode_color_to_angle(lv_cpicker_ext_t * ext)
+{
+    uint16_t angle;
+    switch(ext->color_mode)
+    {
+    default:
+    case LV_CPICKER_COLOR_MODE_HUE:
+        angle = ext->hue;
+        break;
+    case LV_CPICKER_COLOR_MODE_SATURATION:
+        angle = ext->saturation / 100.0 * 360.0;
+        break;
+    case LV_CPICKER_COLOR_MODE_VALUE:
+        angle = ext->value / 100.0 * 360.0;
+        break;
+    }
+    return angle;
+}
+
 /**
  * Handle the drawing related tasks of the color_pickerwhen when wheel type
  * @param cpicker pointer to an object
@@ -574,7 +612,8 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             {
                 for(uint16_t i = start_angle; i <= end_angle; i+= LV_CPICKER_DEF_QF)
                 {
-                    styleCopy.body.main_color = lv_color_hsv_to_rgb(i%360, ext->saturation, ext->value);
+                    styleCopy.body.main_color = angle_to_mode_color(ext, i);
+                    styleCopy.body.grad_color = styleCopy.body.main_color;
 
                     triangle_points[0].x = x;
                     triangle_points[0].y = y;
@@ -604,7 +643,8 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             {
                 for(uint16_t i = start_angle; i <= end_angle; i += LV_CPICKER_DEF_QF)
                 {
-                    styleCopy.body.main_color = lv_color_hsv_to_rgb(ext->hue, (i%360)*100/360, ext->value);
+                    styleCopy.body.main_color = angle_to_mode_color(ext, i);
+                    styleCopy.body.grad_color = styleCopy.body.main_color;
 
                     triangle_points[0].x = x;
                     triangle_points[0].y = y;
@@ -631,7 +671,8 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             {
                 for(uint16_t i = start_angle; i <= end_angle; i += LV_CPICKER_DEF_QF)
                 {
-                    styleCopy.body.main_color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, (i%360)*100/360);
+                    styleCopy.body.main_color = angle_to_mode_color(ext, i);
+                    styleCopy.body.grad_color = styleCopy.body.main_color;
 
                     triangle_points[0].x = x;
                     triangle_points[0].y = y;
@@ -683,21 +724,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             lv_point_t start;
             lv_point_t end;
 
-            uint16_t angle;
-
-            switch(ext->color_mode)
-            {
-            default:
-            case LV_CPICKER_COLOR_MODE_HUE:
-                angle = ext->hue;
-                break;
-            case LV_CPICKER_COLOR_MODE_SATURATION:
-                angle = ext->saturation / 100.0 * 360.0;
-                break;
-            case LV_CPICKER_COLOR_MODE_VALUE:
-                angle = ext->value / 100.0 * 360.0;
-                break;
-            }
+            uint16_t angle = mode_color_to_angle(ext);
 
             /*save the angle to refresh the area later*/
             ext->prev_pos = angle;
@@ -731,21 +758,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             lv_area_t circle_ind_area;
             uint32_t cx, cy;
 
-            uint16_t angle;
-
-            switch(ext->color_mode)
-            {
-            default:
-            case LV_CPICKER_COLOR_MODE_HUE:
-                angle = ext->hue;
-                break;
-            case LV_CPICKER_COLOR_MODE_SATURATION:
-                angle = ext->saturation / 100.0 * 360.0;
-                break;
-            case LV_CPICKER_COLOR_MODE_VALUE:
-                angle = ext->value / 100.0 * 360.0;
-                break;
-            }
+            uint16_t angle = mode_color_to_angle(ext);
 
             /*save the angle to refresh the area later*/
             ext->prev_pos = angle;
@@ -769,21 +782,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             lv_area_t circle_ind_area;
             uint32_t cx, cy;
 
-            uint16_t angle;
-
-            switch(ext->color_mode)
-            {
-            default:
-            case LV_CPICKER_COLOR_MODE_HUE:
-                angle = ext->hue;
-                break;
-            case LV_CPICKER_COLOR_MODE_SATURATION:
-                angle = ext->saturation / 100.0 * 360.0;
-                break;
-            case LV_CPICKER_COLOR_MODE_VALUE:
-                angle = ext->value / 100.0 * 360.0;
-                break;
-            }
+            uint16_t angle = mode_color_to_angle(ext);
 
             /*save the angle to refresh the area later*/
             ext->prev_pos = angle;
@@ -946,19 +945,7 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             ext->rect_gradient_area.x2 -= ext->rect_gradient_h/2;
             ext->rect_gradient_w -= ext->rect_gradient_h;
 
-            switch(ext->color_mode)
-            {
-            default:
-            case LV_CPICKER_COLOR_MODE_HUE:
-                styleCopy.body.main_color = lv_color_hsv_to_rgb(0, ext->saturation, ext->value);
-                break;
-            case LV_CPICKER_COLOR_MODE_SATURATION:
-                styleCopy.body.main_color = lv_color_hsv_to_rgb(ext->hue, 0, ext->value);
-                break;
-            case LV_CPICKER_COLOR_MODE_VALUE:
-                styleCopy.body.main_color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, 0);
-                break;
-            }
+            styleCopy.body.main_color = angle_to_mode_color(ext, 0);
             styleCopy.body.grad_color = styleCopy.body.main_color;
 
             styleCopy.body.radius = LV_RADIUS_CIRCLE;
@@ -968,19 +955,7 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
             rounded_edge_area.x1 += ext->rect_gradient_w - 1;
             rounded_edge_area.x2 += ext->rect_gradient_w - 1;
 
-            switch(ext->color_mode)
-            {
-            default:
-            case LV_CPICKER_COLOR_MODE_HUE:
-                styleCopy.body.main_color = lv_color_hsv_to_rgb(360, ext->saturation, ext->value);
-                break;
-            case LV_CPICKER_COLOR_MODE_SATURATION:
-                styleCopy.body.main_color = lv_color_hsv_to_rgb(ext->hue, 100, ext->value);
-                break;
-            case LV_CPICKER_COLOR_MODE_VALUE:
-                styleCopy.body.main_color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, 100);
-                break;
-            }
+            styleCopy.body.main_color = angle_to_mode_color(ext, 360);
             styleCopy.body.grad_color = styleCopy.body.main_color;
 
             lv_draw_rect(&rounded_edge_area, mask, &styleCopy, opa_scale);
@@ -988,20 +963,7 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
 
         for(uint16_t i = 0; i < 360; i += LV_MATH_MAX(LV_CPICKER_DEF_QF, 360/ext->rect_gradient_w))
         {
-            switch(ext->color_mode)
-            {
-            default:
-            case LV_CPICKER_COLOR_MODE_HUE:
-                styleCopy.body.main_color = lv_color_hsv_to_rgb(i%360, ext->saturation, ext->value);
-                break;
-            case LV_CPICKER_COLOR_MODE_SATURATION:
-                styleCopy.body.main_color = lv_color_hsv_to_rgb(ext->hue, (i%360)*100/360, ext->value);
-                break;
-            case LV_CPICKER_COLOR_MODE_VALUE:
-                styleCopy.body.main_color = lv_color_hsv_to_rgb(ext->hue, ext->saturation, (i%360)*100/360);
-                break;
-            }
-
+            styleCopy.body.main_color = angle_to_mode_color(ext, i);
             styleCopy.body.grad_color = styleCopy.body.main_color;
 
             /*the following attribute might need changing between index to add border, shadow, radius etc*/
@@ -1727,21 +1689,7 @@ static void lv_cpicker_invalidate(lv_obj_t * cpicker, bool all)
 
         /*invalidate indicator*/
 
-        uint16_t angle;
-
-        switch(ext->color_mode)
-            {
-            default:
-            case LV_CPICKER_COLOR_MODE_HUE:
-            angle = ext->hue;
-            break;
-        case LV_CPICKER_COLOR_MODE_SATURATION:
-            angle = ext->saturation / 100.0 * 360.0;
-            break;
-        case LV_CPICKER_COLOR_MODE_VALUE:
-            angle = ext->value / 100.0 * 360.0;
-            break;
-        }
+        uint16_t angle = mode_color_to_angle(ext);
 
         switch(ext->indicator.type)
         {
