@@ -815,7 +815,7 @@ static bool lv_cpicker_disc_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         style2.body.grad_color.full = c;
         c += 0x123445678;
         lv_draw_rect(mask, mask, &style2, opa_scale);
-        */
+         */
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
@@ -1006,7 +1006,7 @@ static bool lv_cpicker_rect_design(lv_obj_t * cpicker, const lv_area_t * mask, l
         styleCopy.line.width = 10;
         lv_draw_arc(cpicker->coords.x1 + 3*ext->rect_gradient_h/2, cpicker->coords.y1 + ext->rect_gradient_h/2, ext->rect_gradient_h / 2 + styleCopy.line.width + 2, mask, 180, 360, &styleCopy, opa_scale);
         //lv_draw_arc(cpicker->coords.x1 + ext->rect_gradient_w - ext->rect_gradient_h/2, cpicker->coords.y1 + ext->rect_gradient_h/2, ext->rect_gradient_h / 2 + styleCopy.line.width + 2, mask, 0, 180, &styleCopy, opa_scale);
-        */
+         */
 
         /*draw the color position indicator*/
         lv_coord_t ind_pos = style->line.rounded ? ext->rect_gradient_h / 2 : 0;
@@ -1212,12 +1212,12 @@ static lv_res_t lv_cpicker_disc_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
 
             if (changed)
             {
-            lv_cpicker_invalidate(cpicker, false);
+                lv_cpicker_invalidate(cpicker, false);
 
                 res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return res;
+            }
         }
-    }
     }
     else if(sign == LV_SIGNAL_PRESS_LOST)
     {
@@ -1672,7 +1672,7 @@ static void lv_cpicker_invalidate(lv_obj_t * cpicker, bool all)
         lv_coord_t r = LV_MATH_MIN(w, h) / 2;
         lv_coord_t x = cpicker->coords.x1 + w / 2;
         lv_coord_t y = cpicker->coords.y1 + h / 2;
-        
+
         /*invalidate center color area*/
         lv_area_t center_color_area;
 
@@ -1889,39 +1889,17 @@ static void lv_cpicker_invalidate(lv_obj_t * cpicker, bool all)
         {
             lv_area_t line_area;
 
-            lv_point_t p1, p2;
-            p1.x = ext->rect_gradient_area.x1 + ind_pos;
-            p1.y = ext->rect_gradient_area.y1;
-            p2.x = p1.x;
-            p2.y = ext->rect_gradient_area.y2;
-
-            line_area.x1 = p1.x;
-            line_area.y1 = p1.y;
-            line_area.x2 = p2.x;
-            line_area.y2 = p2.x;
-
-            line_area.x1 -= 2*ext->indicator.style->line.width;
-            line_area.y1 -= 2*ext->indicator.style->line.width;
-            line_area.x2 += 2*ext->indicator.style->line.width;
-            line_area.y2 += 2*ext->indicator.style->line.width;
+            /*Invalidate the current position*/
+            line_area.x1 = ext->rect_gradient_area.x1 + ind_pos - ext->indicator.style->line.width;
+            line_area.x2 = ext->rect_gradient_area.x1 + ind_pos + ext->indicator.style->line.width;
+            line_area.y1 = ext->rect_gradient_area.y1;
+            line_area.y2 = ext->rect_gradient_area.y2;
 
             lv_inv_area(disp, &line_area);
 
-            /* invalidate last postion */
-            p1.x = ext->rect_gradient_area.x1 + prev_pos;
-            //p1.y = ext->rect_gradient_area.y1;
-            p2.x = p1.x;
-            //p2.y = ext->rect_gradient_area.y2;
-
-            line_area.x1 = p1.x;
-            line_area.y1 = p1.y;
-            line_area.x2 = p2.x;
-            line_area.y2 = p2.x;
-
-            line_area.x1 -= 2*ext->indicator.style->line.width;
-            line_area.y1 -= 2*ext->indicator.style->line.width;
-            line_area.x2 += 2*ext->indicator.style->line.width;
-            line_area.y2 += 2*ext->indicator.style->line.width;
+            /* Invalidate last position */
+            line_area.x1 = ext->rect_gradient_area.x1 + prev_pos - ext->indicator.style->line.width;
+            line_area.x2 = ext->rect_gradient_area.x1 + prev_pos + ext->indicator.style->line.width;
 
             lv_inv_area(disp, &line_area);
             break;
@@ -1950,7 +1928,7 @@ static void lv_cpicker_invalidate(lv_obj_t * cpicker, bool all)
         {
             lv_coord_t center;
             lv_area_t ind_area;
-            
+
             center = ext->rect_gradient_area.x1 + ind_pos;
             ind_area.x1 = center - ext->indicator.style->line.width * 3;
             ind_area.y1 = ext->rect_gradient_area.y1 - 1;
