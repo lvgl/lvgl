@@ -9,6 +9,7 @@
 
 #include "../lv_core/lv_debug.h"
 #include "lv_imgbtn.h"
+#include "lv_label.h"
 
 #if LV_USE_IMGBTN != 0
 
@@ -141,6 +142,15 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src
                        const void * src_right)
 {
     LV_ASSERT_OBJ(imgbtn, LV_OBJX_NAME);
+
+
+    if(lv_img_src_get_type(src_left) == LV_IMG_SRC_SYMBOL ||
+        lv_img_src_get_type(src_mid) == LV_IMG_SRC_SYMBOL ||
+        lv_img_src_get_type(src_right) == LV_IMG_SRC_SYMBOL )
+    {
+        LV_LOG_WARN("lv_imgbtn_set_src: symbols are not supported in tiled mode");
+        return;
+    }
 
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
 
@@ -289,10 +299,21 @@ static bool lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * mask, lv_desig
         const lv_style_t * style = lv_imgbtn_get_style(imgbtn, state);
         lv_opa_t opa_scale       = lv_obj_get_opa_scale(imgbtn);
 
+
+
 #if LV_IMGBTN_TILED == 0
         const void * src = ext->img_src[state];
-        lv_draw_img(&imgbtn->coords, mask, src, style, opa_scale);
+        if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
+            lv_draw_label(&imgbtn->coords, mask, style, opa_scale, src, LV_TXT_FLAG_NONE, NULL, LV_LABEL_TEXT_SEL_OFF, LV_LABEL_TEXT_SEL_OFF, NULL);
+        } else {
+            lv_draw_img(&imgbtn->coords, mask, src, style, opa_scale);
+        }
 #else
+        if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
+            LV_LOG_WARN("lv_imgbtn_design: SYMBOLS are not supported in tiled mode")
+            return;
+        }
+
         const void * src;
         lv_img_header_t header;
         lv_area_t coords;
@@ -388,8 +409,17 @@ static void refr_img(lv_obj_t * imgbtn)
     const void * src = ext->img_src_mid[state];
 #endif
 
-    lv_res_t info_res;
-    info_res = lv_img_decoder_get_info(src, &header);
+    lv_res_t info_res = LV_RES_OK;
+    if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
+        const lv_style_t * style = ext->btn.styles[state];
+        header.h = lv_font_get_line_height(style->text.font);
+        header.w = lv_txt_get_width(src, strlen(src), style->text.font, style->text.letter_space, LV_TXT_FLAG_NONE);
+        header.always_zero = 0;
+        header.cf = LV_IMG_CF_ALPHA_1BIT;
+    } else {
+        info_res = lv_img_decoder_get_info(src, &header);
+    }
+
     if(info_res == LV_RES_OK) {
         ext->act_cf = header.cf;
 #if LV_IMGBTN_TILED == 0
