@@ -113,9 +113,9 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Delete all children of the scrl object, without deleting scrl child.
- * @param obj pointer to an object
+ * @param page pointer to an object
  */
-void lv_page_clean(lv_obj_t * obj);
+void lv_page_clean(lv_obj_t * page);
 
 /**
  * Get the scrollable object of a page

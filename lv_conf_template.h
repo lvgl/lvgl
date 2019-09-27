@@ -232,6 +232,42 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 #  define LV_LOG_PRINTF   0
 #endif  /*LV_USE_LOG*/
 
+/*=================
+ * Debug settings
+ *================*/
+
+/* If Debug is enabled LittelvGL validates the parameters of the functions.
+ * If an invalid parameter is found an error log message is printed and
+ * the MCU halts at the error. (`LV_USE_LOG` should be enabled)
+ * If you are debugging the MCU you can pause
+ * the debugger to see exactly where  the issue is.
+ *
+ * The behavior of asserts can be overwritten by redefining them here.
+ * E.g. #define LV_ASSERT_MEM(p)  <my_assert_code>
+ */
+#define LV_USE_DEBUG        1
+#if LV_USE_DEBUG
+
+/*Check if the parameter is NULL. (Quite fast) */
+#define LV_USE_ASSERT_NULL      1
+
+/*Checks is the memory is successfully allocated or no. (Quite fast)*/
+#define LV_USE_ASSERT_MEM       1
+
+/* Check the strings.
+ * Search for NULL, very long strings, invalid characters, and unnatural repetitions. (Slow)
+ * If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled) */
+#define LV_USE_ASSERT_STR       0
+
+/* Check NULL, the object's type and existence (e.g. not deleted). (Quite slow)
+ * If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled) */
+#define LV_USE_ASSERT_OBJ       0
+
+/*Check if the styles are properly initialized. (Fast)*/
+#define LV_USE_ASSERT_STYLE     1
+
+#endif /*LV_USE_DEBUG*/
+
 /*================
  *  THEME USAGE
  *================*/

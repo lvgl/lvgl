@@ -9,12 +9,14 @@
 #include "lv_win.h"
 #if LV_USE_WIN != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_core/lv_disp.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_win"
 
 /**********************
  *      TYPEDEFS
@@ -51,14 +53,14 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor object*/
     lv_obj_t * new_win = lv_obj_create(par, copy);
-    lv_mem_assert(new_win);
+    LV_ASSERT_MEM(new_win);
     if(new_win == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_win);
 
     /*Allocate the object type specific extended data*/
     lv_win_ext_t * ext = lv_obj_allocate_ext_attr(new_win, sizeof(lv_win_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->page          = NULL;
@@ -94,6 +96,8 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->title = lv_label_create(ext->header, NULL);
         lv_label_set_text(ext->title, "My title");
 
+        lv_obj_set_signal_cb(new_win, lv_win_signal);
+
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
@@ -108,8 +112,6 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT, &lv_style_transp);
             lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, &lv_style_plain_color);
         }
-
-        lv_obj_set_signal_cb(new_win, lv_win_signal);
     }
     /*Copy an existing object*/
     else {
@@ -146,11 +148,13 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
 /**
  * Delete all children of the scrl object, without deleting scrl child.
- * @param obj pointer to an object
+ * @param win pointer to an object
  */
-void lv_win_clean(lv_obj_t * obj)
+void lv_win_clean(lv_obj_t * win)
 {
-    lv_obj_t * scrl = lv_page_get_scrl(obj);
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
+    lv_obj_t * scrl = lv_page_get_scrl(win);
     lv_obj_clean(scrl);
 }
 
@@ -166,6 +170,9 @@ void lv_win_clean(lv_obj_t * obj)
  */
 lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+    LV_ASSERT_NULL(img_src);
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
     lv_obj_t * btn = lv_btn_create(ext->header, NULL);
@@ -193,6 +200,8 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src)
  */
 void lv_win_close_event_cb(lv_obj_t * btn, lv_event_t event)
 {
+    LV_ASSERT_OBJ(btn, "lv_btn");
+
     if(event == LV_EVENT_RELEASED) {
         lv_obj_t * win = lv_win_get_from_btn(btn);
 
@@ -207,6 +216,9 @@ void lv_win_close_event_cb(lv_obj_t * btn, lv_event_t event)
  */
 void lv_win_set_title(lv_obj_t * win, const char * title)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+    LV_ASSERT_STR(title);
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
     lv_label_set_text(ext->title, title);
@@ -220,6 +232,8 @@ void lv_win_set_title(lv_obj_t * win, const char * title)
  */
 void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     if(ext->btn_size == size) return;
 
@@ -236,6 +250,8 @@ void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size)
  */
 void lv_win_set_content_size(lv_obj_t * win, lv_coord_t w, lv_coord_t h)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     h += lv_obj_get_height(ext->header);
 }
@@ -247,6 +263,8 @@ void lv_win_set_content_size(lv_obj_t * win, lv_coord_t w, lv_coord_t h)
  */
 void lv_win_set_layout(lv_obj_t * win, lv_layout_t layout)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     lv_page_set_scrl_layout(ext->page, layout);
 }
@@ -258,6 +276,8 @@ void lv_win_set_layout(lv_obj_t * win, lv_layout_t layout)
  */
 void lv_win_set_sb_mode(lv_obj_t * win, lv_sb_mode_t sb_mode)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     lv_page_set_sb_mode(ext->page, sb_mode);
 }
@@ -268,6 +288,8 @@ void lv_win_set_sb_mode(lv_obj_t * win, lv_sb_mode_t sb_mode)
  */
 void lv_win_set_anim_time(lv_obj_t * win, uint16_t anim_time)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_page_set_anim_time(lv_win_get_content(win), anim_time);
 }
 
@@ -279,6 +301,8 @@ void lv_win_set_anim_time(lv_obj_t * win, uint16_t anim_time)
  */
 void lv_win_set_style(lv_obj_t * win, lv_win_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
     switch(type) {
@@ -318,6 +342,8 @@ void lv_win_set_style(lv_obj_t * win, lv_win_style_t type, const lv_style_t * st
  */
 void lv_win_set_drag(lv_obj_t * win, bool en)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_win_ext_t * ext    = lv_obj_get_ext_attr(win);
     lv_obj_t * win_header = ext->header;
     lv_obj_set_drag_parent(win_header, en);
@@ -335,6 +361,8 @@ void lv_win_set_drag(lv_obj_t * win, bool en)
  */
 const char * lv_win_get_title(const lv_obj_t * win)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return lv_label_get_text(ext->title);
 }
@@ -346,6 +374,8 @@ const char * lv_win_get_title(const lv_obj_t * win)
  */
 lv_obj_t * lv_win_get_content(const lv_obj_t * win)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return ext->page;
 }
@@ -357,6 +387,8 @@ lv_obj_t * lv_win_get_content(const lv_obj_t * win)
  */
 lv_coord_t lv_win_get_btn_size(const lv_obj_t * win)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return ext->btn_size;
 }
@@ -369,6 +401,8 @@ lv_coord_t lv_win_get_btn_size(const lv_obj_t * win)
  */
 lv_obj_t * lv_win_get_from_btn(const lv_obj_t * ctrl_btn)
 {
+    LV_ASSERT_OBJ(ctrl_btn, "lv_btn");
+
     lv_obj_t * header = lv_obj_get_parent(ctrl_btn);
     lv_obj_t * win    = lv_obj_get_parent(header);
 
@@ -382,6 +416,8 @@ lv_obj_t * lv_win_get_from_btn(const lv_obj_t * ctrl_btn)
  */
 lv_layout_t lv_win_get_layout(lv_obj_t * win)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return lv_page_get_scrl_layout(ext->page);
 }
@@ -393,6 +429,8 @@ lv_layout_t lv_win_get_layout(lv_obj_t * win)
  */
 lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t * win)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return lv_page_get_sb_mode(ext->page);
 }
@@ -404,6 +442,8 @@ lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t * win)
  */
 uint16_t lv_win_get_anim_time(const lv_obj_t * win)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     return lv_page_get_anim_time(lv_win_get_content(win));
 }
 
@@ -414,6 +454,8 @@ uint16_t lv_win_get_anim_time(const lv_obj_t * win)
  */
 lv_coord_t lv_win_get_width(lv_obj_t * win)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     lv_win_ext_t * ext            = lv_obj_get_ext_attr(win);
     lv_obj_t * scrl               = lv_page_get_scrl(ext->page);
     const lv_style_t * style_scrl = lv_obj_get_style(scrl);
@@ -429,6 +471,8 @@ lv_coord_t lv_win_get_width(lv_obj_t * win)
  */
 const lv_style_t * lv_win_get_style(const lv_obj_t * win, lv_win_style_t type)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_win_ext_t * ext       = lv_obj_get_ext_attr(win);
 
@@ -457,6 +501,10 @@ const lv_style_t * lv_win_get_style(const lv_obj_t * win, lv_win_style_t type)
  */
 void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, "");
+
+
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     lv_page_focus(ext->page, obj, anim_en);
 }
@@ -479,6 +527,7 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(win, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     if(sign == LV_SIGNAL_CHILD_CHG) { /*Move children to the page*/
@@ -510,13 +559,6 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_CONTROL) {
         /*Forward all the control signals to the page*/
         ext->page->signal_cb(ext->page, sign, param);
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_win";
     }
 
     return res;
