@@ -241,7 +241,7 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
                 btn_i++;
             }
         }
-        act_y += btn_h + style_bg->body.padding.inner;
+        act_y += btn_h + style_bg->body.padding.inner + 1;
 
         if(strlen(map_p_tmp[btn_cnt]) == 0) break; /*Break on end of map*/
         map_p_tmp = &map_p_tmp[btn_cnt + 1];       /*Set the map to the next line*/
