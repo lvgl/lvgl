@@ -1321,15 +1321,15 @@ static void lv_cpicker_reset_hsv_if_double_clicked(lv_obj_t * cpicker,
         switch(ext->color_mode)
         {
         case LV_CPICKER_COLOR_MODE_HUE:
-            ext->hue = 0;
+            ext->hue = LV_CPICKER_DEF_HUE;
             ext->prev_hue = ext->hue;
             break;
         case LV_CPICKER_COLOR_MODE_SATURATION:
-            ext->saturation = 100;
+            ext->saturation = LV_CPICKER_DEF_SATURATION;
             ext->prev_saturation = ext->saturation;
             break;
         case LV_CPICKER_COLOR_MODE_VALUE:
-            ext->value = 100;
+            ext->value = LV_CPICKER_DEF_VALUE;
             ext->prev_value = ext->value;
             break;
         }
