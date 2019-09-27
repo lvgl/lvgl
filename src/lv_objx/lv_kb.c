@@ -213,6 +213,9 @@ void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
     } else if(mode == LV_KB_MODE_NUM) {
         lv_btnm_set_map(kb, kb_map_num);
         lv_btnm_set_ctrl_map(kb, kb_ctrl_num_map);
+    } else if(mode == LV_KB_MODE_TEXT_UPPER) {
+        lv_btnm_set_map(kb, kb_map_uc);
+        lv_btnm_set_ctrl_map(kb, kb_ctrl_uc_map);
     }
 }
 
