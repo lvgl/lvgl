@@ -366,7 +366,7 @@ static uint8_t lv_txt_utf8_size(const char * str)
         return 3;
     else if((str[0] & 0xF8) == 0xF0)
         return 4;
-    return 1; /*If the char was invalid step tell it's 1 byte long*/
+    return 0; /*If the char was invalid tell it's 1 byte long*/
 }
 
 /**
@@ -543,7 +543,8 @@ static uint32_t lv_txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id)
     uint32_t i;
     uint32_t byte_cnt = 0;
     for(i = 0; i < utf8_id; i++) {
-        byte_cnt += lv_txt_encoded_size(&txt[byte_cnt]);
+        uint8_t c_size = lv_txt_encoded_size(&txt[byte_cnt]);
+        byte_cnt += c_size > 0 ? c_size : 1;
     }
 
     return byte_cnt;

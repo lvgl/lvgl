@@ -38,6 +38,8 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len);
 
 void lv_bidi_process(const char * str_in, char * str_out, lv_bidi_dir_t base_dir)
 {
+    printf("Input str: \"%s\"\n", str_in);
+
     uint32_t run_len = 0;
     lv_bidi_dir_t run_dir;
     uint32_t rd = 0;
@@ -107,7 +109,9 @@ bool lv_bidi_letter_is_weak(uint32_t letter)
 
 bool lv_bidi_letter_is_rtl(uint32_t letter)
 {
-    if(letter >= 'a' && letter <= 'z') return true;
+//     if(letter >= 0x7f && letter <= 0x2000) return true;
+     if(letter >= 0x5d0 && letter <= 0x5ea) return true;
+//    if(letter >= 'a' && letter <= 'z') return true;
 
     return false;
 }
@@ -212,7 +216,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len)
         }
         /*Simply store in reversed order*/
         else {
-            uint32_t letter_size = lv_txt_encoded_size((const char *)&letter);
+            uint32_t letter_size = lv_txt_encoded_size((const char *)&src[i]);
             memcpy(&dest[wr], &src[i], letter_size);
             wr += letter_size;
         }
