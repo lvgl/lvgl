@@ -15,6 +15,8 @@ extern "C" {
  *********************/
 #include "lv_obj.h"
 
+#if LV_USE_DEBUG
+
 /*********************
  *      DEFINES
  *********************/
@@ -62,7 +64,8 @@ void lv_debug_log_error(const char * msg, uint64_t value);
 #endif
 
 #ifndef LV_DEBUG_IS_STR
-#define LV_DEBUG_IS_STR(str)   (lv_debug_check_str(str))
+#define LV_DEBUG_IS_STR(str)   (lv_debug_check_null(str) &&      \
+                                lv_debug_check_str(str))
 #endif
 
 #ifndef LV_DEBUG_IS_OBJ
@@ -101,8 +104,12 @@ void lv_debug_log_error(const char * msg, uint64_t value);
 # ifndef LV_ASSERT_STR
 #  define LV_ASSERT_STR(str) LV_DEBUG_ASSERT(LV_DEBUG_IS_STR(str), "Strange or invalid string", str);
 # endif
-#else
-# define LV_ASSERT_STR(p) true
+#else /* LV_USE_ASSERT_OBJ == 0 */
+# if LV_USE_ASSERT_NULL /*Use at least LV_ASSERT_NULL if enabled*/
+#   define LV_ASSERT_STR(str) LV_ASSERT_NULL(str)
+# else
+#   define LV_ASSERT_STR(str) true
+# endif
 #endif
 
 
@@ -110,8 +117,12 @@ void lv_debug_log_error(const char * msg, uint64_t value);
 # ifndef LV_ASSERT_OBJ
 #  define LV_ASSERT_OBJ(obj_p, obj_type) LV_DEBUG_ASSERT(LV_DEBUG_IS_OBJ(obj_p, obj_type), "Invalid object", obj_p);
 # endif
-#else
-# define LV_ASSERT_OBJ(obj_p, obj_type) true
+#else /* LV_USE_ASSERT_OBJ == 0 */
+# if LV_USE_ASSERT_NULL /*Use at least LV_ASSERT_NULL if enabled*/
+#   define LV_ASSERT_OBJ(obj_p, obj_type) LV_ASSERT_NULL(obj_p)
+# else
+#   define LV_ASSERT_OBJ(obj_p, obj_type) true
+# endif
 #endif
 
 
@@ -123,6 +134,15 @@ void lv_debug_log_error(const char * msg, uint64_t value);
 #  define LV_ASSERT_STYLE(style) true
 #endif
 
+#else /* LV_USE_DEBUG == 0 */
+
+#define LV_ASSERT_NULL(p) true
+#define LV_ASSERT_MEM(p) true
+#define LV_ASSERT_STR(p) true
+#define LV_ASSERT_OBJ(obj, obj_type) true
+#define LV_ASSERT_STYLE(p) true
+
+#endif /* LV_USE_DEBUG */
 /*clang-format on*/
 
 #ifdef __cplusplus

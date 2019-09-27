@@ -107,6 +107,12 @@ void lv_style_init(void)
     lv_style_scr.line.width   = 2;
     lv_style_scr.line.rounded = 0;
 
+#if LV_USE_DEBUG
+#if LV_USE_ASSERT_STYLE
+    lv_style_scr.debug_sentinel = LV_STYLE_DEGUG_SENTINEL_VALUE;
+#endif
+#endif
+
     /*Plain style (by default near the same as the screen style)*/
     lv_style_copy(&lv_style_plain, &lv_style_scr);
     lv_style_plain.body.padding.left   = LV_DPI / 20;

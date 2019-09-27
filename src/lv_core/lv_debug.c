@@ -8,12 +8,18 @@
  *********************/
 #include "lv_obj.h"
 
+#if LV_USE_DEBUG
+
 /*********************
  *      DEFINES
  *********************/
+#ifndef LV_DEBUG_STR_MAX_LENGTH
 #define LV_DEBUG_STR_MAX_LENGTH  (1024 * 8)
-#define LV_DEBUG_STR_MAX_REPEAT  8
+#endif
 
+#ifndef LV_DEBUG_STR_MAX_REPEAT
+#define LV_DEBUG_STR_MAX_REPEAT  8
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
@@ -75,12 +81,18 @@ bool lv_debug_check_obj_valid(const lv_obj_t * obj)
     return false;
 }
 
-bool lv_debug_check_style(const void * str)
+bool lv_debug_check_style(const lv_style_t * style)
 {
-    return true;
+    if(style == NULL) return true;  /*NULL style is still valid*/
 
-    LV_LOG_WARN("Invalid style (local variable or not initialized?)");
-    return false;
+#if LV_USE_ASSERT_STYLE
+    if(style->debug_sentinel != LV_STYLE_DEGUG_SENTINEL_VALUE) {
+        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
+        return false;
+    }
+#endif
+
+    return true;
 }
 
 bool lv_debug_check_str(const void * str)
@@ -94,10 +106,10 @@ bool lv_debug_check_str(const void * str)
         if(s[i] != last_byte) {
             last_byte = s[i];
             rep = 1;
-        } else {
+        } else if(s[i] > 0x7F){
             rep++;
             if(rep > LV_DEBUG_STR_MAX_REPEAT) {
-                LV_LOG_WARN("lv_debug_check_str: a char has repeated more than LV_DEBUG_STR_MAX_REPEAT times)");
+                LV_LOG_WARN("lv_debug_check_str: a non-ASCII char has repeated more than LV_DEBUG_STR_MAX_REPEAT times)");
                 return false;
             }
         }
@@ -175,3 +187,6 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
 
     return false;
 }
+
+#endif /*LV_USE_DEBUG*/
+
