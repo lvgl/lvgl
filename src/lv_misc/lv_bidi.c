@@ -119,7 +119,7 @@ bool lv_bidi_letter_is_rtl(uint32_t letter)
 bool lv_bidi_letter_is_neutral(uint32_t letter)
 {
     uint16_t i;
-    static const char neutrals[] = " \t\n\r.,:;'\"`!?%/\\=()[]{}<>@#&|";
+    static const char neutrals[] = " \t\n\r.,:;'\"`!?%/\\=()[]{}<>@#&$|";
     for(i = 0; neutrals[i] != '\0'; i++) {
         if(letter == (uint32_t)neutrals[i]) return true;
     }
@@ -202,7 +202,9 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len)
             uint32_t first_weak = i;
             while(i) {
                 letter = lv_txt_encoded_prev(src, &i);
-                if(lv_bidi_letter_is_weak(letter) == false) {
+                /*Finish on non-weak char */
+                /*but treat number and currency related chars as weak*/
+                if(lv_bidi_letter_is_weak(letter) == false && letter != '.' && letter != ',' && letter != '$') {
                     lv_txt_encoded_next(src, &i);   /*Rewind one letter*/
                     first_weak = i;
                     break;
