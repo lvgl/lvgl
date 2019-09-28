@@ -1303,9 +1303,11 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     return res;
 }
 
-static void lv_cpicker_reset_hsv_if_double_clicked(lv_obj_t * cpicker,
-                                                   lv_cpicker_ext_t * ext)
+static lv_res_t lv_cpicker_reset_hsv_if_double_clicked(lv_obj_t * cpicker,
+                                                       lv_cpicker_ext_t * ext)
 {
+    lv_res_t res;
+
     if(lv_tick_elaps(ext->last_click) < 400)
     {
         switch(ext->color_mode)
@@ -1322,8 +1324,12 @@ static void lv_cpicker_reset_hsv_if_double_clicked(lv_obj_t * cpicker,
         }
         ext->prev_hsv = ext->hsv;
         lv_cpicker_invalidate(cpicker, false);
+
+        res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
     }
     ext->last_click = lv_tick_get();
+
+    return res;
 }
 
 static void lv_cpicker_set_next_color_mode(lv_obj_t * cpicker,
@@ -1398,7 +1404,8 @@ static lv_res_t lv_cpicker_disc_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
         lv_coord_t yp = indev->proc.types.pointer.act_point.y - y;
         if((xp*xp + yp*yp) < (r_in*r_in))
         {
-            lv_cpicker_reset_hsv_if_double_clicked(cpicker, ext);
+            res = lv_cpicker_reset_hsv_if_double_clicked(cpicker, ext);
+            if(res != LV_RES_OK) return res;
         }
     }
     else if(sign == LV_SIGNAL_PRESSING)
@@ -1465,7 +1472,8 @@ static lv_res_t lv_cpicker_rect_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
 
         if(lv_area_is_point_on(&(ext->rect_preview_area), &indev->proc.types.pointer.act_point))
         {
-            lv_cpicker_reset_hsv_if_double_clicked(cpicker, ext);
+            res = lv_cpicker_reset_hsv_if_double_clicked(cpicker, ext);
+            if(res != LV_RES_OK) return res;
         }
     }
     else if(sign == LV_SIGNAL_PRESSING)
