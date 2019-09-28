@@ -32,17 +32,13 @@ extern "C" {
  **********************/
 /*Data of colorpicker*/
 typedef struct {
-    uint16_t hue;
-    uint8_t saturation;
-    uint8_t value;
+    lv_color_hsv_t hsv;
     struct
     {
         lv_style_t * style;
         uint8_t type;
     } indicator;
-    uint16_t prev_hue;
-    uint8_t prev_saturation;
-    uint8_t prev_value;
+    lv_color_hsv_t prev_hsv;
     uint16_t prev_pos;
     uint8_t color_mode:2;
     uint8_t color_mode_fixed:1;
@@ -142,6 +138,13 @@ void lv_cpicker_set_saturation(lv_obj_t * cpicker, uint8_t saturation);
 void lv_cpicker_set_value(lv_obj_t * cpicker, uint8_t val);
 
 /**
+ * Set the current hsv of a colorpicker.
+ * @param cpicker pointer to colorpicker object
+ * @param hsv current selected hsv
+ */
+void lv_cpicker_set_hsv(lv_obj_t * cpicker, lv_color_hsv_t hsv);
+
+/**
  * Set the current color of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param color current selected color
@@ -184,14 +187,14 @@ bool lv_cpicker_get_color_mode_fixed(lv_obj_t * cpicker);
  * Get style of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param type which style should be get
- * @return style pointer to the style
+ * @return pointer to the style
  */
 lv_style_t * lv_cpicker_get_style(const lv_obj_t * cpicker, lv_cpicker_style_t type);
 
 /**
  * Get the current hue of a colorpicker.
  * @param cpicker pointer to colorpicker object
- * @return hue current selected hue
+ * @return current selected hue
  */
 uint16_t lv_cpicker_get_hue(lv_obj_t * cpicker);
 
@@ -210,9 +213,16 @@ uint8_t lv_cpicker_get_saturation(lv_obj_t * cpicker);
 uint8_t lv_cpicker_get_value(lv_obj_t * cpicker);
 
 /**
+ * Get the current selected hsv of a colorpicker.
+ * @param cpicker pointer to colorpicker object
+ * @return current selected hsv
+ */
+lv_color_hsv_t lv_cpicker_get_hsv(lv_obj_t * cpicker);
+
+/**
  * Get the current selected color of a colorpicker.
  * @param cpicker pointer to colorpicker object
- * @return color current selected color
+ * @return current selected color
  */
 lv_color_t lv_cpicker_get_color(lv_obj_t * cpicker);
 
