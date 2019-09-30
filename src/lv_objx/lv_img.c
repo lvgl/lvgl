@@ -159,15 +159,20 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     } else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
         /* If the new and the old src are the same then it was only a refresh.*/
         if(ext->src != src_img) {
-            /*If memory was allocated because of the previous `src_type` then free it*/
+            const void * old_src = NULL;
+            /* If memory was allocated because of the previous `src_type` then save its pointer and free after allocation.
+             * It's important to allocate first to be sure the new data will be on a new address.
+             * Else `img_cache` wouldn't see the change in source.*/
             if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_SYMBOL) {
-                lv_mem_free(ext->src);
+                old_src = ext->src;
             }
             char * new_str = lv_mem_alloc(strlen(src_img) + 1);
             lv_mem_assert(new_str);
             if(new_str == NULL) return;
             strcpy(new_str, src_img);
             ext->src = new_str;
+
+            if(old_src) lv_mem_free(old_src);
         }
     }
 
