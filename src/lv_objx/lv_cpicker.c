@@ -1200,7 +1200,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
 
         if(sign == LV_SIGNAL_CONTROL) {
             uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
-            if(c == LV_KEY_RIGHT)
+            if(c == LV_KEY_RIGHT || c == LV_KEY_UP)
             {
                 switch(ext->color_mode)
                 {
@@ -1220,47 +1220,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
                 res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return res;
             }
-            else if(c == LV_KEY_LEFT)
-            {
-                switch(ext->color_mode)
-                {
-                case LV_CPICKER_COLOR_MODE_HUE:
-                    ext->hsv.h = ext->hsv.h > 0?(ext->hsv.h - 1):360;
-                    break;
-                case LV_CPICKER_COLOR_MODE_SATURATION:
-                    ext->hsv.s = ext->hsv.s > 0?(ext->hsv.s - 1):100;
-                    break;
-                case LV_CPICKER_COLOR_MODE_VALUE:
-                    ext->hsv.v = ext->hsv.v > 0?(ext->hsv.v - 1):100;
-                    break;
-                }
-
-                lv_cpicker_invalidate(cpicker, false);
-
-                res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
-                if(res != LV_RES_OK) return res;
-            }
-            else if(c == LV_KEY_UP)
-            {
-                switch(ext->color_mode)
-                {
-                case LV_CPICKER_COLOR_MODE_HUE:
-                    ext->hsv.h = (ext->hsv.h + 1) % 360;
-                    break;
-                case LV_CPICKER_COLOR_MODE_SATURATION:
-                    ext->hsv.s = (ext->hsv.s + 1) % 100;
-                    break;
-                case LV_CPICKER_COLOR_MODE_VALUE:
-                    ext->hsv.v = (ext->hsv.v + 1) % 100;
-                    break;
-                }
-
-                lv_cpicker_invalidate(cpicker, false);
-
-                res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
-                if(res != LV_RES_OK) return res;
-            }
-            else if(c == LV_KEY_DOWN)
+            else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN)
             {
                 switch(ext->color_mode)
                 {
