@@ -118,9 +118,16 @@ lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header)
 lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const lv_style_t * style)
 {
     dsc->style     = style;
-    dsc->src       = src;
     dsc->src_type  = lv_img_src_get_type(src);
     dsc->user_data = NULL;
+
+    if(dsc->src_type == LV_IMG_SRC_FILE) {
+        uint16_t fnlen = strlen(src);
+        dsc->src = lv_mem_alloc(fnlen + 1);
+        strcpy((char *)dsc->src, src);
+    } else {
+        dsc->src       = src;
+    }
 
     lv_res_t res = LV_RES_INV;
 
@@ -175,6 +182,11 @@ void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc)
 {
     if(dsc->decoder) {
         if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
+
+        if(dsc->src_type == LV_IMG_SRC_FILE) {
+            lv_mem_free(dsc->src);
+            dsc->src = NULL;
+        }
     }
 }
 
