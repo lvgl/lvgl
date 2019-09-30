@@ -1427,14 +1427,6 @@ static lv_res_t lv_cpicker_reset_hsv_if_double_clicked(lv_obj_t * cpicker,
     return res;
 }
 
-static void lv_cpicker_set_next_color_mode(lv_obj_t * cpicker,
-                                           lv_cpicker_ext_t * ext)
-{
-    ext->prev_hsv = ext->hsv;
-    ext->color_mode = (ext->color_mode + 1) % 3;
-    lv_cpicker_invalidate(cpicker, true);
-}
-
 static lv_res_t lv_cpicker_set_hsv_percent(lv_obj_t * cpicker,
                                            lv_cpicker_ext_t * ext,
                                            float percent)
@@ -1481,6 +1473,14 @@ static lv_res_t lv_cpicker_set_hsv_percent(lv_obj_t * cpicker,
     }
 
     return res;
+}
+
+static void lv_cpicker_set_next_color_mode(lv_obj_t * cpicker,
+                                           lv_cpicker_ext_t * ext)
+{
+    ext->prev_hsv = ext->hsv;
+    ext->color_mode = (ext->color_mode + 1) % 3;
+    lv_cpicker_invalidate(cpicker, true);
 }
 
 
