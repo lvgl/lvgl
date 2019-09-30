@@ -1280,29 +1280,46 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
 static lv_res_t lv_cpicker_reset_hsv_if_double_clicked(lv_obj_t * cpicker,
                                                        lv_cpicker_ext_t * ext)
 {
-    lv_res_t res;
+    bool changed = false;
 
     if(lv_tick_elaps(ext->last_click) < 400)
     {
         switch(ext->color_mode)
         {
         case LV_CPICKER_COLOR_MODE_HUE:
-            ext->hsv.h = LV_CPICKER_DEF_HSV.h;
+            changed = ext->hsv.h != LV_CPICKER_DEF_HSV.h;
+            if (changed)
+            {
+                ext->hsv.h = LV_CPICKER_DEF_HSV.h;
+            }
             break;
         case LV_CPICKER_COLOR_MODE_SATURATION:
-            ext->hsv.s = LV_CPICKER_DEF_HSV.s;
+            changed = ext->hsv.s != LV_CPICKER_DEF_HSV.s;
+            if (changed)
+            {
+                ext->hsv.s = LV_CPICKER_DEF_HSV.s;
+            }
             break;
         case LV_CPICKER_COLOR_MODE_VALUE:
-            ext->hsv.v = LV_CPICKER_DEF_HSV.v;
+            changed = ext->hsv.v != LV_CPICKER_DEF_HSV.v;
+            if (changed)
+            {
+                ext->hsv.v = LV_CPICKER_DEF_HSV.v;
+            }
             break;
         }
         ext->prev_hsv = ext->hsv;
-        lv_cpicker_invalidate(cpicker, false);
-
-        res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
     }
     ext->last_click = lv_tick_get();
 
+    lv_res_t res = LV_RES_OK;
+    if (changed)
+    {
+        lv_cpicker_invalidate(cpicker, false);
+
+        res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
+        if(res != LV_RES_OK) return res;
+    }
     return res;
 }
 
