@@ -1186,19 +1186,26 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     lv_res_t res = ancestor_signal(cpicker, sign, param);
     if(res != LV_RES_OK) return res;
 
-    if(sign == LV_SIGNAL_CLEANUP) {
+    if(sign == LV_SIGNAL_CLEANUP)
+    {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
+    }
+    else if(sign == LV_SIGNAL_GET_TYPE)
+    {
         lv_obj_type_t * buf = param;
         uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) {  /*Find the last set data*/
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) /*Find the last set data*/
+        {  
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_cpicker";
-    } else {
+    }
+    else
+    {
         lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
-        if(sign == LV_SIGNAL_CONTROL) {
+        if(sign == LV_SIGNAL_CONTROL)
+        {
             uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
             if(c == LV_KEY_RIGHT || c == LV_KEY_UP)
             {
@@ -1240,10 +1247,14 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
                 res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return res;
             }
-        } else if(sign == LV_SIGNAL_PRESS_LOST) {
+        }
+        else if(sign == LV_SIGNAL_PRESS_LOST)
+        {
             ext->prev_hsv = ext->hsv;
             lv_cpicker_invalidate(cpicker, false);
-        } else {
+        }
+        else
+        {
             lv_style_t * style = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
 
             if(ext->type == LV_CPICKER_TYPE_DISC)
