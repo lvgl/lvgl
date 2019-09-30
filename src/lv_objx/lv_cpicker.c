@@ -1280,6 +1280,9 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
                 res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return res;
             }
+        } else if(sign == LV_SIGNAL_PRESS_LOST) {
+            ext->prev_hsv = ext->hsv;
+            lv_cpicker_invalidate(cpicker, false);
         } else {
             lv_style_t * style = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
 
@@ -1422,11 +1425,6 @@ static lv_res_t lv_cpicker_disc_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
             if(res != LV_RES_OK) return res;
         }
     }
-    else if(sign == LV_SIGNAL_PRESS_LOST)
-    {
-        ext->prev_hsv = ext->hsv;
-        lv_cpicker_invalidate(cpicker, false);
-    }
     else if(sign == LV_SIGNAL_RELEASED)
     {
         lv_indev_t * indev = param;
@@ -1489,11 +1487,6 @@ static lv_res_t lv_cpicker_rect_signal(lv_obj_t * cpicker, lv_signal_t sign, voi
             res = lv_cpicker_set_hsv_percent(cpicker, ext, percent);
             if(res != LV_RES_OK) return res;
         }
-    }
-    else if(sign == LV_SIGNAL_PRESS_LOST)
-    {
-        ext->prev_hsv = ext->hsv;
-        lv_cpicker_invalidate(cpicker, false);
     }
     else if(sign == LV_SIGNAL_RELEASED)
     {
