@@ -23,6 +23,7 @@
  **********************/
 static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint32_t * len);
 static void rtl_reverse(char * dest, const char * src, uint32_t len);
+static uint32_t char_change_to_pair(uint32_t letter);
 
 /**********************
  *  STATIC VARIABLES
@@ -40,9 +41,17 @@ void lv_bidi_process(const char * str_in, char * str_out, lv_bidi_dir_t base_dir
 {
     printf("Input str: \"%s\"\n", str_in);
 
+    char print_buf[256];
+
     uint32_t run_len = 0;
     lv_bidi_dir_t run_dir;
     uint32_t rd = 0;
+    uint32_t wr;
+    uint32_t in_len = strlen(str_in);
+    if(base_dir == LV_BIDI_DIR_RTL) wr = in_len;
+    else wr = 0;
+
+    str_out[in_len] = '\0';
 
     lv_bidi_dir_t dir = base_dir;
 
@@ -57,29 +66,48 @@ void lv_bidi_process(const char * str_in, char * str_out, lv_bidi_dir_t base_dir
     if(rd && str_in[rd] != '\0') lv_txt_encoded_prev(str_in, &rd);
 
     if(rd) {
-        memcpy(str_out, str_in, rd);
-        str_out[rd] = '\0';
-        printf("%s: \"%s\"\n", base_dir == LV_BIDI_DIR_LTR ? "LTR" : "RTL", str_out);
+        if(base_dir == LV_BIDI_DIR_LTR) {
+            memcpy(&str_out[wr], str_in, rd);
+            wr += rd;
+        } else {
+            wr -= rd;
+            memcpy(&str_out[wr], str_in, rd);
+        }
+        memcpy(print_buf, str_in, rd);
+        print_buf[rd] = '\0';
+        printf("%s: \"%s\"\n", base_dir == LV_BIDI_DIR_LTR ? "LTR" : "RTL", print_buf);
     }
 
     /*Get and process the runs*/
     while(str_in[rd] != '\0') {
         run_dir = get_next_run(&str_in[rd], base_dir, &run_len);
 
-        memcpy(str_out, &str_in[rd], run_len);
-        str_out[run_len] = '\0';
+        memcpy(print_buf, &str_in[rd], run_len);
+        print_buf[run_len] = '\0';
         if(run_dir == LV_BIDI_DIR_LTR) {
-            printf("%s: \"%s\"\n", "LTR" , str_out);
+            printf("%s: \"%s\"\n", "LTR" , print_buf);
         } else {
-            printf("%s: \"%s\" -> ", "RTL" , str_out);
+            printf("%s: \"%s\" -> ", "RTL" , print_buf);
 
-            rtl_reverse(str_out, &str_in[rd], run_len);
-            printf("\"%s\"\n", str_out);
-
+            rtl_reverse(print_buf, &str_in[rd], run_len);
+            printf("\"%s\"\n", print_buf);
         }
+
+        if(base_dir == LV_BIDI_DIR_LTR) {
+            if(run_dir == LV_BIDI_DIR_LTR)  memcpy(&str_out[wr], &str_in[rd], run_len);
+            else rtl_reverse(&str_out[wr], &str_in[rd], run_len);
+           wr += run_len;
+       } else {
+           wr -= run_len;
+           if(run_dir == LV_BIDI_DIR_LTR)  memcpy(&str_out[wr], &str_in[rd], run_len);
+           else rtl_reverse(&str_out[wr], &str_in[rd], run_len);
+       }
 
         rd += run_len;
     }
+
+    printf("result: %s\n", str_out);
+
 }
 
 
@@ -196,12 +224,14 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len)
     while(i) {
         uint32_t letter = lv_txt_encoded_prev(src, &i);
 
-        /*Keep weak letters as LTR*/
+        /*Keep weak letters (numbers) as LTR*/
         if(lv_bidi_letter_is_weak(letter)) {
             uint32_t last_weak = i;
             uint32_t first_weak = i;
             while(i) {
                 letter = lv_txt_encoded_prev(src, &i);
+                /*No need to call `char_change_to_pair` because there not such chars here*/
+
                 /*Finish on non-weak char */
                 /*but treat number and currency related chars as weak*/
                 if(lv_bidi_letter_is_weak(letter) == false && letter != '.' && letter != ',' && letter != '$') {
@@ -219,9 +249,37 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len)
         /*Simply store in reversed order*/
         else {
             uint32_t letter_size = lv_txt_encoded_size((const char *)&src[i]);
-            memcpy(&dest[wr], &src[i], letter_size);
-            wr += letter_size;
+            /*Swap arithmetical symbols*/
+            if(letter_size == 1) {
+                uint32_t new_letter = letter = char_change_to_pair(letter);
+                dest[wr] = (uint8_t)new_letter;
+                wr += 1;
+            }
+            /*Just store the letter*/
+            else {
+                memcpy(&dest[wr], &src[i], letter_size);
+                wr += letter_size;
+            }
         }
     }
+}
+
+static uint32_t char_change_to_pair(uint32_t letter)
+{
+    static uint8_t left[] = {"<({["};
+    static uint8_t right[] = {">)}]"};
+
+    uint8_t i;
+    for(i = 0; left[i] != '\0'; i++) {
+        if(letter == left[i]) return right[i];
+    }
+
+    for(i = 0; right[i] != '\0'; i++) {
+        if(letter == right[i]) return left[i];
+    }
+
+    return letter;
+
+
 }
 
