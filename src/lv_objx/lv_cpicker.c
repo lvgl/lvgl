@@ -107,7 +107,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Initialize the allocated 'ext' */
     ext->hsv = LV_CPICKER_DEF_HSV;
     ext->indic.style = &lv_style_plain;
-    ext->indic.colored = 1;
+    ext->indic.colored = 0;
     ext->color_mode = LV_CPICKER_COLOR_MODE_HUE;
     ext->color_mode_fixed = 0;
     ext->last_click_time = 0;
@@ -807,13 +807,24 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         }
     }
     else if(sign == LV_SIGNAL_PRESSED) {
-        res = double_click_reset(cpicker);
         ext->last_change_time = lv_tick_get();
+        lv_indev_get_point(lv_indev_get_act(), &ext->last_press_point);
+        res = double_click_reset(cpicker);
         if(res != LV_RES_OK) return res;
     } else if(sign == LV_SIGNAL_PRESSING){
         lv_indev_t * indev = lv_indev_get_act();
+        if(indev == NULL) return res;
+
         lv_point_t p;
         lv_indev_get_point(indev, &p);
+
+        if((LV_MATH_ABS(p.x - ext->last_press_point.x) > indev->driver.drag_limit / 2) ||
+           (LV_MATH_ABS(p.y - ext->last_press_point.y) > indev->driver.drag_limit / 2)) {
+            ext->last_change_time = lv_tick_get();
+            ext->last_press_point.x = p.x;
+            ext->last_press_point.y = p.y;
+        }
+
         p.x -= cpicker->coords.x1;
         p.y -= cpicker->coords.y1;
 
@@ -823,56 +834,53 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         int16_t angle = 0;
 
         if(ext->type == LV_CPICKER_TYPE_RECT) {
+            /*If pressed long enough without change go to next color mode*/
+            uint32_t diff = lv_tick_elaps(ext->last_change_time);
+            if(diff > indev->driver.long_press_time * 2 && !ext->color_mode_fixed) {
+                next_color_mode(cpicker);
+                lv_indev_wait_release(lv_indev_get_act());
+                return res;
+            }
+
             angle = (p.x * 360) / w;
             if(angle < 0) angle = 0;
             if(angle >= 360) angle = 359;
 
         } else if(ext->type == LV_CPICKER_TYPE_DISC) {
             const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
-            lv_coord_t r = w / 2;
-            p.x -= r;
-            p.y -= r;
-            r -= style_main->line.width;
-            if(p.x * p.x + p.y * p.y < r * r) return res;
+            lv_coord_t r_in = w / 2;
+            p.x -= r_in;
+            p.y -= r_in;
+            r_in -= style_main->line.width * 2; /* *2 to let some sensitive space inside*/
+
+            /*If the inner area is being pressed, go to the next color mode on long press*/
+            if(p.x * p.x + p.y * p.y < r_in * r_in) {
+                uint32_t diff = lv_tick_elaps(ext->last_change_time);
+                if(diff > indev->driver.long_press_time * 2 && !ext->color_mode_fixed) {
+                    next_color_mode(cpicker);
+                    lv_indev_wait_release(lv_indev_get_act());
+                }
+                return res;
+            }
 
             angle = lv_atan2(p.x, p.y) % 360;
         }
 
-        bool changed = false;
         switch(ext->color_mode) {
         case LV_CPICKER_COLOR_MODE_HUE:
-            if(ext->hsv.h != angle) {
-                lv_cpicker_set_hue(cpicker, angle);
-                changed = true;
-            }
+            if(ext->hsv.h != angle) lv_cpicker_set_hue(cpicker, angle);
             break;
         case LV_CPICKER_COLOR_MODE_SATURATION:
             angle = (angle * 100) / 360;
-            if(ext->hsv.s != angle) {
-                lv_cpicker_set_saturation(cpicker, angle);
-                changed = true;
-            }
+            if(ext->hsv.s != angle) lv_cpicker_set_saturation(cpicker, angle);
             break;
         case LV_CPICKER_COLOR_MODE_VALUE:
             angle = (angle * 100) / 360;
-            if(ext->hsv.v != angle) {
-                lv_cpicker_set_value(cpicker, angle);
-                changed = true;
-            }
+            if(ext->hsv.v != angle) lv_cpicker_set_value(cpicker, angle);
             break;
         }
 
         refr_indic_pos(cpicker);
-
-        uint32_t diff = lv_tick_elaps(ext->last_change_time);
-        if(diff > indev->driver.long_press_time * 2 && !ext->color_mode_fixed) {
-            next_color_mode(cpicker);
-            lv_indev_wait_release(lv_indev_get_act());
-        }
-
-        if(changed) {
-            ext->last_change_time = lv_tick_get();
-        }
 
         res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RES_OK) return res;
@@ -895,6 +903,7 @@ static void next_color_mode(lv_obj_t * cpicker )
  */ 
 static void invalidate_indic(lv_obj_t * cpicker)
 {
+
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
     const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
     const lv_style_t * style_indic = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_INDICATOR);
@@ -907,7 +916,7 @@ static void invalidate_indic(lv_obj_t * cpicker)
 
     lv_area_t indic_area;
     indic_area.x1 = cpicker->coords.x1 + ext->indic.pos.x - r - style_indic->body.padding.left;
-    indic_area.y1 = cpicker->coords.x1 + ext->indic.pos.y - r - style_indic->body.padding.top;
+    indic_area.y1 = cpicker->coords.y1 + ext->indic.pos.y - r - style_indic->body.padding.top;
     indic_area.x2 = cpicker->coords.x1 + ext->indic.pos.x + r + style_indic->body.padding.right;
     indic_area.y2 = cpicker->coords.y1 + ext->indic.pos.y + r + style_indic->body.padding.bottom;
 

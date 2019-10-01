@@ -57,6 +57,7 @@ typedef struct {
     } indic;
     uint32_t last_click_time;
     uint32_t last_change_time;
+    lv_point_t last_press_point;
     lv_cpicker_color_mode_t color_mode  :2;
     uint8_t color_mode_fixed            :1;
     lv_cpicker_type_t type              :1;
