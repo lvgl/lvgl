@@ -20,9 +20,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-void tri_draw_flat(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa);
-void tri_draw_tall(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa);
-static void point_swap(lv_point_t * p1, lv_point_t * p2);
 
 /**********************
  *  STATIC VARIABLES
@@ -65,22 +62,3 @@ void lv_draw_polygon(const lv_point_t * points, uint32_t point_cnt, const lv_are
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-
-/**
- * Swap two points
- * p1 pointer to the first point
- * p2 pointer to the second point
- */
-static void point_swap(lv_point_t * p1, lv_point_t * p2)
-{
-    lv_point_t tmp;
-    tmp.x = p1->x;
-    tmp.y = p1->y;
-
-    p1->x = p2->x;
-    p1->y = p2->y;
-
-    p2->x = tmp.x;
-    p2->y = tmp.y;
-}

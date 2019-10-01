@@ -61,7 +61,6 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
 
     int16_t mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);
 
-
     lv_area_t area;
     area.x1 = center_x - radius;
     area.y1 = center_y - radius;

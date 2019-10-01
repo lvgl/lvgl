@@ -1,6 +1,7 @@
 CSRCS += lv_arc.c
 CSRCS += lv_bar.c
 CSRCS += lv_cb.c
+CSRCS += lv_cpicker.c
 CSRCS += lv_ddlist.c
 CSRCS += lv_kb.c
 CSRCS += lv_line.c
