@@ -851,12 +851,18 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
             lv_coord_t r_in = w / 2;
             p.x -= r_in;
             p.y -= r_in;
-            r_in -= style_main->line.width * 2; /* *2 to let some sensitive space inside*/
+            r_in -= style_main->line.width;
+
+            if(r_in > LV_DPI / 2) {
+            	r_in -= style_main->line.width; /* to let some sensitive space inside*/
+
+            	if(r_in < LV_DPI / 2) r_in = LV_DPI / 2;
+            }
 
             /*If the inner area is being pressed, go to the next color mode on long press*/
             if(p.x * p.x + p.y * p.y < r_in * r_in) {
                 uint32_t diff = lv_tick_elaps(ext->last_change_time);
-                if(diff > indev->driver.long_press_time * 2 && !ext->color_mode_fixed) {
+                if(diff > indev->driver.long_press_time && !ext->color_mode_fixed) {
                     next_color_mode(cpicker);
                     lv_indev_wait_release(lv_indev_get_act());
                 }
