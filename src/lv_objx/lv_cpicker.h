@@ -30,33 +30,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-/*Data of colorpicker*/
-typedef struct {
-    lv_color_hsv_t hsv;
-    struct
-    {
-        lv_style_t * style;
-        uint8_t type;
-    } indicator;
-    lv_color_hsv_t prev_hsv;
-    uint16_t prev_pos;
-    uint8_t color_mode:2;
-    uint8_t color_mode_fixed:1;
-    uint8_t type:1;
-    uint32_t last_click;
-    lv_area_t rect_preview_area;
-    lv_area_t rect_gradient_area;
-    lv_coord_t rect_gradient_w;
-    lv_coord_t rect_gradient_h;
-} lv_cpicker_ext_t;
-
-/*Styles*/
-enum {
-    LV_CPICKER_STYLE_MAIN,
-    LV_CPICKER_STYLE_INDICATOR,
-};
-typedef uint8_t lv_cpicker_style_t;
-
 enum {
     LV_CPICKER_INDICATOR_NONE,
     LV_CPICKER_INDICATOR_LINE,
@@ -77,6 +50,36 @@ enum {
     LV_CPICKER_COLOR_MODE_VALUE
 };
 typedef uint8_t lv_cpicker_color_mode_t;
+
+
+
+/*Data of colorpicker*/
+typedef struct {
+    lv_color_hsv_t hsv;
+    lv_color_hsv_t prev_hsv;
+    struct
+    {
+        lv_style_t * style;
+        lv_cpicker_indicator_type_t type;
+    } indicator;
+    uint32_t last_click_time;
+    lv_area_t rect_preview_area;
+    lv_area_t rect_gradient_area;
+    lv_coord_t rect_gradient_w;
+    lv_coord_t rect_gradient_h;
+    uint16_t prev_pos;
+    lv_cpicker_color_mode_t color_mode:2;
+    uint8_t color_mode_fixed:1;
+    lv_cpicker_type_t type:1;
+} lv_cpicker_ext_t;
+
+/*Styles*/
+enum {
+    LV_CPICKER_STYLE_MAIN,
+    LV_CPICKER_STYLE_INDICATOR,
+};
+typedef uint8_t lv_cpicker_style_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
