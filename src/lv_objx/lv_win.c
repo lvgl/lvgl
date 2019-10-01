@@ -96,6 +96,8 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->title = lv_label_create(ext->header, NULL);
         lv_label_set_text(ext->title, "My title");
 
+        lv_obj_set_signal_cb(new_win, lv_win_signal);
+
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
@@ -110,8 +112,6 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_win_set_style(new_win, LV_WIN_STYLE_CONTENT, &lv_style_transp);
             lv_win_set_style(new_win, LV_WIN_STYLE_HEADER, &lv_style_plain_color);
         }
-
-        lv_obj_set_signal_cb(new_win, lv_win_signal);
     }
     /*Copy an existing object*/
     else {

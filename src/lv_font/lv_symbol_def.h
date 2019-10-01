@@ -12,12 +12,12 @@ extern "C" {
 #endif
 
 /* In the font converter use this list as range:
-  61441, 61448, 61451, 61452, 61452, 61457, 61459, 61461, 61465, 61468,
-  61473, 61478, 61479, 61480, 61502, 61508, 61512, 61515, 61516, 61517,
-  61521, 61522, 61523, 61524, 61543, 61544, 61553, 61556, 61559, 61560,
-  61561, 61563, 61587, 61589, 61636, 61637, 61639, 61671, 61674, 61683,
-  61724, 61732, 61787, 61931, 62016, 62017, 62018, 62019, 62020, 62099,
-  62189, 62810
+      61441, 61448, 61451, 61452, 61452, 61453, 61457, 61459, 61461, 61465,
+      61468, 61473, 61478, 61479, 61480, 61502, 61512, 61515, 61516, 61517,
+      61521, 61522, 61523, 61524, 61543, 61544, 61550, 61552, 61553, 61556,
+      61559, 61560, 61561, 61563, 61587, 61589, 61636, 61637, 61639, 61671,
+      61674, 61683, 61724, 61732, 61787, 61931, 62016, 62017, 62018, 62019,
+      62020, 62087, 62099, 62212, 62189, 62810, 63426, 63650
 */
 
 #define LV_SYMBOL_AUDIO           "\xef\x80\x81" /*61441, 0xF001*/
@@ -35,7 +35,7 @@ extern "C" {
 #define LV_SYMBOL_VOLUME_MID      "\xef\x80\xa7" /*61479, 0xF027*/
 #define LV_SYMBOL_VOLUME_MAX      "\xef\x80\xa8" /*61480, 0xF028*/
 #define LV_SYMBOL_IMAGE           "\xef\x80\xbe" /*61502, 0xF03E*/
-#define LV_SYMBOL_EDIT            "\xef\x81\x84" /*61508, 0xF044*/
+#define LV_SYMBOL_EDIT            "\xef\x8C\x84" /*62212, 0xF304*/
 #define LV_SYMBOL_PREV            "\xef\x81\x88" /*61512, 0xF048*/
 #define LV_SYMBOL_PLAY            "\xef\x81\x8b" /*61515, 0xF04B*/
 #define LV_SYMBOL_PAUSE           "\xef\x81\x8c" /*61516, 0xF04C*/
@@ -46,6 +46,8 @@ extern "C" {
 #define LV_SYMBOL_RIGHT           "\xef\x81\x94" /*61524, 0xF054*/
 #define LV_SYMBOL_PLUS            "\xef\x81\xa7" /*61543, 0xF067*/
 #define LV_SYMBOL_MINUS           "\xef\x81\xa8" /*61544, 0xF068*/
+#define LV_SYMBOL_EYE_OPEN        "\xef\x81\xae" /*61550, 0xF06E*/
+#define LV_SYMBOL_EYE_CLOSE       "\xef\x81\xb0" /*61552, 0xF070*/
 #define LV_SYMBOL_WARNING         "\xef\x81\xb1" /*61553, 0xF071*/
 #define LV_SYMBOL_SHUFFLE         "\xef\x81\xb4" /*61556, 0xF074*/
 #define LV_SYMBOL_UP              "\xef\x81\xb7" /*61559, 0xF077*/
@@ -69,9 +71,12 @@ extern "C" {
 #define LV_SYMBOL_BATTERY_2       "\xef\x89\x82" /*62018, 0xF242*/
 #define LV_SYMBOL_BATTERY_1       "\xef\x89\x83" /*62019, 0xF243*/
 #define LV_SYMBOL_BATTERY_EMPTY   "\xef\x89\x84" /*62020, 0xF244*/
+#define LV_SYMBOL_USB             "\xef\x8a\x87" /*62087, 0xF287*/
 #define LV_SYMBOL_BLUETOOTH       "\xef\x8a\x93" /*62099, 0xF293*/
 #define LV_SYMBOL_TRASH           "\xef\x8B\xAD" /*62189, 0xF2ED*/
 #define LV_SYMBOL_BACKSPACE       "\xef\x95\x9A" /*62810, 0xF55A*/
+#define LV_SYMBOL_SD_CARD         "\xef\x9F\x82" /*63426, 0xF7C2*/
+#define LV_SYMBOL_NEW_LINE        "\xef\xA2\xA2" /*63650, 0xF8A2*/
 
 /** Invalid symbol at (U+F8FF). If written before a string then `lv_img` will show it as a label*/
 #define LV_SYMBOL_DUMMY           "\xEF\xA3\xBF"

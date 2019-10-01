@@ -24,6 +24,7 @@ extern "C" {
  *      DEFINES
  *********************/
 #define LV_RADIUS_CIRCLE (LV_COORD_MAX) /**< A very big radius to always draw as circle*/
+#define LV_STYLE_DEGUG_SENTINEL_VALUE 0x12345678
 
 /**********************
  *      TYPEDEFS
@@ -135,6 +136,13 @@ typedef struct
         uint8_t rounded : 1; /**< 1: rounded line endings*/
         lv_blend_mode_t blend_mode :3;
     } line;
+
+#if LV_USE_DEBUG
+#if LV_USE_ASSERT_STYLE
+    uint32_t debug_sentinel; /**<Should `LV_STYLE_DEGUG_SENTINEL_VALUE` to indicate that the style is valid*/
+#endif
+#endif
+
 } lv_style_t;
 
 #if LV_USE_ANIMATION
