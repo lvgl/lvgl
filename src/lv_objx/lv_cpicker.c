@@ -209,7 +209,11 @@ void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue)
 
     ext->hsv.h = hue % 360;
 
-    if(ext->color_mode_fixed == LV_CPICKER_COLOR_MODE_HUE) refr_indic_pos(cpicker);
+    if(ext->color_mode == LV_CPICKER_COLOR_MODE_HUE) refr_indic_pos(cpicker);
+
+    if(ext->preview && ext->type == LV_CPICKER_TYPE_DISC) {
+        lv_obj_invalidate(cpicker);
+    }
 }
 
 /**
@@ -223,9 +227,13 @@ void lv_cpicker_set_saturation(lv_obj_t * cpicker, uint8_t saturation)
 
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
-    ext->hsv.s = saturation % 100;
+    ext->hsv.s = saturation > 100 ? 100 : saturation;
 
-    if(ext->color_mode_fixed == LV_CPICKER_COLOR_MODE_SATURATION) refr_indic_pos(cpicker);
+    if(ext->color_mode == LV_CPICKER_COLOR_MODE_SATURATION) refr_indic_pos(cpicker);
+
+    if(ext->preview && ext->type == LV_CPICKER_TYPE_DISC) {
+        lv_obj_invalidate(cpicker);
+    }
 }
 
 /**
@@ -239,9 +247,13 @@ void lv_cpicker_set_value(lv_obj_t * cpicker, uint8_t val)
 
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
-    ext->hsv.v = val % 100;
+    ext->hsv.v = val > 100 ? 100 : val;
 
-    if(ext->color_mode_fixed == LV_CPICKER_COLOR_MODE_VALUE) refr_indic_pos(cpicker);
+    if(ext->color_mode == LV_CPICKER_COLOR_MODE_VALUE) refr_indic_pos(cpicker);
+
+    if(ext->preview && ext->type == LV_CPICKER_TYPE_DISC) {
+        lv_obj_invalidate(cpicker);
+    }
 }
 
 /**
@@ -256,7 +268,6 @@ void lv_cpicker_set_hsv(lv_obj_t * cpicker, lv_color_hsv_t hsv)
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
     ext->hsv = hsv;
-
     refr_indic_pos(cpicker);
     lv_obj_invalidate(cpicker);
 }
@@ -1022,10 +1033,10 @@ static lv_res_t double_click_reset(lv_obj_t * cpicker)
             lv_cpicker_set_hue(cpicker, LV_CPICKER_DEF_HUE);
             break;
         case LV_CPICKER_COLOR_MODE_SATURATION:
-            lv_cpicker_set_hue(cpicker, LV_CPICKER_DEF_SATURATION);
+            lv_cpicker_set_saturation(cpicker, LV_CPICKER_DEF_SATURATION);
             break;
         case LV_CPICKER_COLOR_MODE_VALUE:
-            lv_cpicker_set_hue(cpicker, LV_CPICKER_DEF_VALUE);
+            lv_cpicker_set_value(cpicker, LV_CPICKER_DEF_VALUE);
             break;
         }
 
