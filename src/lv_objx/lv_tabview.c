@@ -37,7 +37,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * param);
-static lv_res_t tabview_scrl_signal(lv_obj_t * tab_page, lv_signal_t sign, void * param);
+static lv_res_t tabview_scrl_signal(lv_obj_t * tabview_scrl, lv_signal_t sign, void * param);
 
 static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event);
 static void tabview_realign(lv_obj_t * tabview);
@@ -124,10 +124,11 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_obj_set_click(ext->indic, false);
 
-        lv_page_set_style(ext->content, LV_PAGE_STYLE_BG, &lv_style_plain_color);//transp_tight);
-        lv_page_set_style(ext->content, LV_PAGE_STYLE_SCRL, &lv_style_transp_fit);
-        lv_page_set_scrl_fit(ext->content, LV_FIT_TIGHT);
+        lv_page_set_style(ext->content, LV_PAGE_STYLE_BG, &lv_style_transp_tight);
+        lv_page_set_style(ext->content, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
+        lv_page_set_scrl_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_FLOOD);
         lv_page_set_scrl_layout(ext->content, LV_LAYOUT_ROW_T);
+        lv_page_set_sb_mode(ext->content, LV_SB_MODE_OFF);
         lv_obj_set_drag_dir(lv_page_get_scrl(ext->content), LV_DRAG_DIR_ONE);
 
         /*Set the default styles*/
@@ -310,6 +311,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
 
     const lv_style_t * cont_style = lv_obj_get_style(ext->content);
+    const lv_style_t * cont_scrl_style = lv_obj_get_style(lv_page_get_scrl(ext->content));
 
     if(id >= ext->tab_cnt) id = ext->tab_cnt - 1;
 
@@ -323,12 +325,12 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     case LV_TABVIEW_BTNS_POS_NONE:
     case LV_TABVIEW_BTNS_POS_TOP:
     case LV_TABVIEW_BTNS_POS_BOTTOM:
-        cont_x = -(lv_obj_get_width(tabview) * id + cont_style->body.padding.inner * id + cont_style->body.padding.left);
+        cont_x = -(lv_obj_get_width(tabview) * id + cont_scrl_style->body.padding.inner * id + cont_scrl_style->body.padding.left);
         break;
     case LV_TABVIEW_BTNS_POS_LEFT:
     case LV_TABVIEW_BTNS_POS_RIGHT:
-        cont_x = -((lv_obj_get_width(tabview) - lv_obj_get_width(ext->btns)) * id + cont_style->body.padding.inner * id +
-                cont_style->body.padding.left);
+        cont_x = -((lv_obj_get_width(tabview) - lv_obj_get_width(ext->btns)) * id + cont_scrl_style->body.padding.inner * id +
+                cont_scrl_style->body.padding.left);
         break;
     }
 
@@ -539,7 +541,7 @@ lv_obj_t * lv_tabview_get_tab(const lv_obj_t * tabview, uint16_t id)
     lv_obj_t * page        = lv_obj_get_child_back(content_scrl, NULL);
 
     while(page != NULL && i != id) {
-        i++;
+        if(lv_obj_get_signal_cb(page) == page_signal) i++;
         page = lv_obj_get_child_back(content_scrl, page);
     }
 
@@ -690,16 +692,16 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
  * @param param pointer to a signal specific variable
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static lv_res_t tabview_scrl_signal(lv_obj_t * tab_page, lv_signal_t sign, void * param)
+static lv_res_t tabview_scrl_signal(lv_obj_t * tabview_scrl, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
     /* Include the ancient signal function */
-    res = ancestor_scrl_signal(tab_page, sign, param);
+    res = ancestor_scrl_signal(tabview_scrl, sign, param);
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, "");
 
-    lv_obj_t * cont    = lv_obj_get_parent(tab_page);
+    lv_obj_t * cont    = lv_obj_get_parent(tabview_scrl);
     lv_obj_t * tabview = lv_obj_get_parent(cont);
 
     if(sign == LV_SIGNAL_DRAG_THROW_BEGIN) {
@@ -719,10 +721,9 @@ static lv_res_t tabview_scrl_signal(lv_obj_t * tab_page, lv_signal_t sign, void 
 
         lv_res_t res = lv_indev_finish_drag(indev);
         if(res != LV_RES_OK) return res;
-
-        lv_obj_t * tabpage = lv_tabview_get_tab(tabview, ext->tab_cur);
-        lv_coord_t page_x1  = tabpage->coords.x1 - tabview->coords.x1 + x_predict;
-        lv_coord_t page_x2  = page_x1 + lv_obj_get_width(tabpage);
+        lv_obj_t * tab_page = lv_tabview_get_tab(tabview, ext->tab_cur);
+        lv_coord_t page_x1  = tab_page->coords.x1 - tabview->coords.x1 + x_predict;
+        lv_coord_t page_x2  = page_x1 + lv_obj_get_width(tabview);
         lv_coord_t treshold = lv_obj_get_width(tabview) / 2;
 
         uint16_t tab_cur = ext->tab_cur;
