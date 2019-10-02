@@ -973,7 +973,17 @@ static lv_res_t double_click_reset(lv_obj_t * cpicker)
     lv_indev_t * indev = lv_indev_get_act();
     /*Double clicked? Use long press time as double click time out*/
     if(lv_tick_elaps(ext->last_click_time) < indev->driver.long_press_time) {
-        lv_cpicker_set_hsv(cpicker, LV_CPICKER_DEF_HSV);
+        switch(ext->color_mode) {
+        case LV_CPICKER_COLOR_MODE_HUE:
+            lv_cpicker_set_hue(cpicker, LV_CPICKER_DEF_HUE);
+            break;
+        case LV_CPICKER_COLOR_MODE_SATURATION:
+            lv_cpicker_set_hue(cpicker, LV_CPICKER_DEF_SATURATION);
+            break;
+        case LV_CPICKER_COLOR_MODE_VALUE:
+            lv_cpicker_set_hue(cpicker, LV_CPICKER_DEF_VALUE);
+            break;
+        }
 
         lv_res_t res;
         res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
