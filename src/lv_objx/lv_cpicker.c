@@ -110,7 +110,9 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->indic.colored = 0;
     ext->color_mode = LV_CPICKER_COLOR_MODE_HUE;
     ext->color_mode_fixed = 0;
+    ext->preview = 0;
     ext->last_click_time = 0;
+    ext->last_change_time = 0;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_cpicker, lv_cpicker_signal);
@@ -133,6 +135,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->type = copy_ext->type;
         ext->color_mode = copy_ext->color_mode;
         ext->color_mode_fixed = copy_ext->color_mode_fixed;
+        ext->preview = copy_ext->preview;
         ext->hsv = copy_ext->hsv;
         ext->indic.colored = copy_ext->indic.colored;
         ext->indic.style = copy_ext->indic.style;
@@ -314,6 +317,19 @@ void lv_cpicker_set_indic_colored(lv_obj_t * cpicker, bool en)
     invalidate_indic(cpicker);
 }
 
+/**
+ * Add a color preview in the middle of the DISC type color picker
+ * @param cpicker pointer to colorpicker object
+ * @param en true: enable preview; false: disable preview
+ */
+void lv_cpicker_set_preview(lv_obj_t * cpicker, bool en)
+{
+    LV_ASSERT_OBJ(cpicker, LV_OBJX_NAME);
+
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+    ext->preview = en ? 1 : 0;
+    lv_obj_invalidate(cpicker);
+}
 /*=====================
  * Getter functions
  *====================*/
@@ -455,6 +471,21 @@ bool lv_cpicker_get_indic_colored(lv_obj_t * cpicker)
     return ext->indic.colored ? true : false;
 }
 
+/**
+ *  Whether the preview is enabled or not
+ * @param cpicker pointer to colorpicker object
+ * @return en true: preview is enabled; false: preview is disabled
+ */
+bool lv_cpicker_get_preview(lv_obj_t * cpicker)
+{
+    LV_ASSERT_OBJ(cpicker, LV_OBJX_NAME);
+
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+
+    return ext->preview ? true : false;
+}
+
+
 /*=====================
  * Other functions
  *====================*/
@@ -502,54 +533,68 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
 
 static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale)
 {
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
-        lv_coord_t w = lv_obj_get_width(cpicker);
-        lv_coord_t h = lv_obj_get_height(cpicker);
-        lv_coord_t cx = cpicker->coords.x1 + w / 2;
-        lv_coord_t cy = cpicker->coords.y1 + h / 2;
-        lv_coord_t r = w / 2;
+    lv_coord_t w = lv_obj_get_width(cpicker);
+    lv_coord_t h = lv_obj_get_height(cpicker);
+    lv_coord_t cx = cpicker->coords.x1 + w / 2;
+    lv_coord_t cy = cpicker->coords.y1 + h / 2;
+    lv_coord_t r = w / 2;
 
-        const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
-        lv_style_t style;
-        lv_style_copy(&style, style_main);
-        style.line.width = (r * 628 / (360 / LV_CPICKER_DEF_QF)) / 100;
-        style.line.width += 3;
+    const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
+    lv_style_t style;
+    lv_style_copy(&style, style_main);
+    style.line.width = (r * 628 / (360 / LV_CPICKER_DEF_QF)) / 100;
+    style.line.width += 3;
 
-        lv_coord_t cir_w = style_main->line.width;
+    lv_coord_t cir_w = style_main->line.width;
 
-        for(uint16_t i = 0; i <= 360; i+= LV_CPICKER_DEF_QF) {
+    for(uint16_t i = 0; i <= 360; i+= LV_CPICKER_DEF_QF) {
 
-          style.line.color = angle_to_mode_color(cpicker, i);
+        style.line.color = angle_to_mode_color(cpicker, i);
 
-          lv_point_t p[2];
-          p[0].x = cx + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-          p[0].y = cy + (r * lv_trigo_sin(i+ 90) >> LV_TRIGO_SHIFT);
-          p[1].x = cx + ((r-cir_w) * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-          p[1].y = cy + ((r-cir_w) * lv_trigo_sin(i+ 90) >> LV_TRIGO_SHIFT);
+        lv_point_t p[2];
+        p[0].x = cx + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+        p[0].y = cy + (r * lv_trigo_sin(i+ 90) >> LV_TRIGO_SHIFT);
+        p[1].x = cx + ((r-cir_w) * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+        p[1].y = cy + ((r-cir_w) * lv_trigo_sin(i+ 90) >> LV_TRIGO_SHIFT);
 
-          lv_area_t mask_sub;
-          mask_sub.x1 = LV_MATH_MIN(p[0].x, p[1].x) - style.line.width/2;
-          mask_sub.x2 = LV_MATH_MAX(p[0].x, p[1].x) + style.line.width/2;
-          mask_sub.y1 = LV_MATH_MIN(p[0].y, p[1].y) - style.line.width/2;
-          mask_sub.y2 = LV_MATH_MAX(p[0].y, p[1].y) + style.line.width/2;
+        lv_area_t mask_sub;
+        mask_sub.x1 = LV_MATH_MIN(p[0].x, p[1].x) - style.line.width/2;
+        mask_sub.x2 = LV_MATH_MAX(p[0].x, p[1].x) + style.line.width/2;
+        mask_sub.y1 = LV_MATH_MIN(p[0].y, p[1].y) - style.line.width/2;
+        mask_sub.y2 = LV_MATH_MAX(p[0].y, p[1].y) + style.line.width/2;
 
-          if(lv_area_intersect(&mask_sub, mask, &mask_sub)) {
-              lv_draw_line(&p[0], &p[1], &mask_sub, &style, opa_scale);
-          }
+        if(lv_area_intersect(&mask_sub, mask, &mask_sub)) {
+            lv_draw_line(&p[0], &p[1], &mask_sub, &style, opa_scale);
         }
+    }
 
-//        /*Mask out the center area*/
-//        const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
-//        lv_style_copy(&style, style_main);
-//        style.body.radius = LV_RADIUS_CIRCLE;
-//        lv_area_t area_mid;
-//        lv_area_copy(&area_mid, &cpicker->coords);
-//        area_mid.x1 += style_main->line.width;
-//        area_mid.y1 += style_main->line.width;
-//        area_mid.x2 -= style_main->line.width;
-//        area_mid.y2 -= style_main->line.width;
-//
-//        lv_draw_rect(&area_mid, mask, &style, opa_scale);
+
+    if(ext->preview) {
+
+        /*Mask out the center area*/
+        const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
+        lv_style_copy(&style, style_main);
+        style.body.radius = LV_RADIUS_CIRCLE;
+        lv_area_t area_mid;
+        lv_area_copy(&area_mid, &cpicker->coords);
+        area_mid.x1 += style_main->line.width;
+        area_mid.y1 += style_main->line.width;
+        area_mid.x2 -= style_main->line.width;
+        area_mid.y2 -= style_main->line.width;
+
+        lv_draw_rect(&area_mid, mask, &style, opa_scale);
+        lv_color_t color = lv_cpicker_get_color(cpicker);
+        style.body.main_color = color;
+        style.body.grad_color = color;
+        area_mid.x1 += style_main->line.width;
+        area_mid.y1 += style_main->line.width;
+        area_mid.x2 -= style_main->line.width;
+        area_mid.y2 -= style_main->line.width;
+
+        lv_draw_rect(&area_mid, mask, &style, opa_scale);
+    }
 }
 
 static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale)
@@ -676,7 +721,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*Refresh extended draw area to make knob visible*/
         if(lv_obj_get_width(cpicker) != lv_area_get_width(param) ||
-           lv_obj_get_height(cpicker) != lv_area_get_height(param))
+                lv_obj_get_height(cpicker) != lv_area_get_height(param))
         {
             lv_obj_refresh_ext_draw_pad(cpicker);
             refr_indic_pos(cpicker);
@@ -744,7 +789,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         lv_indev_get_point(indev, &p);
 
         if((LV_MATH_ABS(p.x - ext->last_press_point.x) > indev->driver.drag_limit / 2) ||
-           (LV_MATH_ABS(p.y - ext->last_press_point.y) > indev->driver.drag_limit / 2)) {
+                (LV_MATH_ABS(p.y - ext->last_press_point.y) > indev->driver.drag_limit / 2)) {
             ext->last_change_time = lv_tick_get();
             ext->last_press_point.x = p.x;
             ext->last_press_point.y = p.y;
@@ -898,7 +943,17 @@ static lv_res_t double_click_reset(lv_obj_t * cpicker)
     lv_indev_t * indev = lv_indev_get_act();
     /*Double clicked? Use long press time as double click time out*/
     if(lv_tick_elaps(ext->last_click_time) < indev->driver.long_press_time) {
-        lv_cpicker_set_hsv(cpicker, LV_CPICKER_DEF_HSV);
+        switch(ext->color_mode) {
+        case LV_CPICKER_COLOR_MODE_HUE:
+            lv_cpicker_set_hue(cpicker, LV_CPICKER_DEF_HUE);
+            break;
+        case LV_CPICKER_COLOR_MODE_SATURATION:
+            lv_cpicker_set_hue(cpicker, LV_CPICKER_DEF_SATURATION);
+            break;
+        case LV_CPICKER_COLOR_MODE_VALUE:
+            lv_cpicker_set_hue(cpicker, LV_CPICKER_DEF_VALUE);
+            break;
+        }
 
         lv_res_t res;
         res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
