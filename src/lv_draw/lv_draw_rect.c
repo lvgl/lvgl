@@ -27,6 +27,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_style_t * style, lv_opa_t opa_scale);
+static void draw_border(const lv_area_t * coords, const lv_area_t * clip, const lv_style_t * style, lv_opa_t opa_scale);
 static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const lv_style_t * style, lv_opa_t opa_scale);
 static lv_color_t grad_get(const lv_style_t * style, lv_coord_t s, lv_coord_t i);
 static void shadow_draw_corner_buf(const lv_area_t * coords,  lv_opa_t * sh_buf, lv_coord_t s, lv_coord_t r);
@@ -55,8 +56,9 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_sty
 {
     if(lv_area_get_height(coords) < 1 || lv_area_get_width(coords) < 1) return;
 
-    draw_bg(coords, clip, style, opa_scale);
     draw_shadow(coords, clip, style, opa_scale);
+    draw_bg(coords, clip, style, opa_scale);
+    draw_border(coords, clip, style, opa_scale);
 }
 
 /**********************
@@ -65,7 +67,181 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_sty
 
 static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_style_t * style, lv_opa_t opa_scale)
 {
+    lv_area_t coords_bg;
+    lv_area_copy(&coords_bg, coords);
+
+    /*If the border fully covers make the bg area 1px smaller to avoid artifacts on the corners*/
+    if(style->body.border.width > 1 && style->body.border.opa >= LV_OPA_MAX && style->body.radius != 0) {
+        coords_bg.x1++;
+        coords_bg.y1++;
+        coords_bg.x2--;
+        coords_bg.y2--;
+    }
+
     lv_opa_t opa = style->body.opa;
+    if(opa_scale != LV_OPA_COVER) opa = (opa * opa_scale) >> 8;
+
+    if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
+
+    lv_disp_t * disp    = lv_refr_get_disp_refreshing();
+    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+
+    /* Get clipped fill area which is the real draw area.
+     * It is always the same or inside `fill_area` */
+    lv_area_t draw_area;
+    bool is_common;
+    is_common = lv_area_intersect(&draw_area, &coords_bg, clip);
+    if(is_common == false) return;
+
+    const lv_area_t * disp_area = &vdb->area;
+
+    /* Now `draw_area` has absolute coordinates.
+     * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+    draw_area.x1 -= disp_area->x1;
+    draw_area.y1 -= disp_area->y1;
+    draw_area.x2 -= disp_area->x1;
+    draw_area.y2 -= disp_area->y1;
+
+    lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
+
+    /*Create a mask if there is a radius*/
+    lv_opa_t * mask_buf = lv_draw_buf_get(draw_area_w);
+
+    bool simple_mode = true;
+    if(lv_draw_mask_get_cnt()!= 0) simple_mode = false;
+    else if(style->body.border.part != LV_BORDER_PART_FULL) simple_mode = false;
+    else if(style->body.grad_dir == LV_GRAD_DIR_HOR) simple_mode = false;
+
+    int16_t mask_rout_id = LV_MASK_ID_INV;
+
+    lv_coord_t coords_w = lv_area_get_width(&coords_bg);
+    lv_coord_t coords_h = lv_area_get_height(&coords_bg);
+
+    /*Get the real radius*/
+    lv_coord_t rout = style->body.radius;
+    lv_coord_t short_side = LV_MATH_MIN(coords_w, coords_h);
+    if(rout > short_side >> 1) rout = short_side >> 1;
+
+    /*Most simple case: just a plain rectangle*/
+    if(simple_mode && rout == 0 && style->body.main_color.full == style->body.grad_color.full) {
+        lv_blend_fill(clip, &coords_bg,
+                style->body.main_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
+                style->body.blend_mode);
+    }
+    /*More complex case: there is a radius, gradient or mask.*/
+    else {
+        lv_draw_mask_param_t mask_rout_param;
+        if(rout > 0) {
+            lv_draw_mask_radius_init(&mask_rout_param, &coords_bg, rout, false);
+            mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
+        }
+
+        if(opa >= LV_OPA_MIN) {
+            /*Draw the background line by line*/
+            lv_coord_t h;
+            lv_draw_mask_res_t mask_res = LV_DRAW_MASK_RES_FULL_COVER;
+            lv_color_t grad_color = style->body.main_color;
+
+
+            lv_color_t * grad_map = NULL;
+            /*In case of horizontal gradient pre-compute a line with a gradient*/
+            if(style->body.grad_dir == LV_GRAD_DIR_HOR && style->body.main_color.full != style->body.grad_color.full) {
+                grad_map = lv_draw_buf_get(coords_w * sizeof(lv_color_t));
+
+                lv_coord_t i;
+                for(i = 0; i < coords_w; i++) {
+                    grad_map[i] = grad_get(style, coords_w, i);
+                }
+            }
+
+            lv_area_t fill_area;
+            fill_area.x1 = coords_bg.x1;
+            fill_area.x2 = coords_bg.x2;
+            fill_area.y1 = disp_area->y1 + draw_area.y1;
+            fill_area.y2 = fill_area.y1;
+            for(h = draw_area.y1; h <= draw_area.y2; h++) {
+                lv_coord_t y = h + vdb->area.y1;
+
+                /*In not corner areas apply the mask only if required*/
+                if(y > coords_bg.y1 + rout + 1 &&
+                        y < coords_bg.y2 - rout - 1) {
+                    mask_res = LV_DRAW_MASK_RES_FULL_COVER;
+                    if(simple_mode == false) {
+                        memset(mask_buf, LV_OPA_COVER, draw_area_w);
+                        mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+                    }
+                }
+                /*In corner areas apply the mask anyway*/
+                else {
+                    memset(mask_buf, LV_OPA_COVER, draw_area_w);
+                    mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+                }
+
+                /*Get the current line color*/
+                if(style->body.grad_dir == LV_GRAD_DIR_VER && style->body.main_color.full != style->body.grad_color.full) {
+                    grad_color = grad_get(style, lv_area_get_height(&coords_bg), y - coords_bg.y1);
+                }
+
+                /* If there is not other mask and drawing the corner area split the drawing to corner and middle areas
+                 * because it the middle mask shuldn't be taken into account (therefore its faster)*/
+                if(simple_mode &&
+                        (y < coords_bg.y1 + rout + 1 ||
+                                y > coords_bg.y2 - rout - 1)) {
+
+                    /*Left part*/
+                    lv_area_t fill_area2;
+                    fill_area2.x1 = coords_bg.x1;
+                    fill_area2.x2 = coords_bg.x1 + rout - 1;
+                    fill_area2.y1 = fill_area.y1;
+                    fill_area2.y2 = fill_area.y2;
+
+                    lv_blend_fill(clip, &fill_area2,
+                            grad_color, mask_buf, mask_res, opa, style->body.blend_mode);
+
+
+                    /*Central part*/
+                    fill_area2.x1 = coords_bg.x1 + rout;
+                    fill_area2.x2 = coords_bg.x2 - rout;
+
+                    lv_blend_fill(clip, &fill_area2,
+                            grad_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, style->body.blend_mode);
+
+                    fill_area2.x1 = coords_bg.x2 - rout + 1;
+                    fill_area2.x2 = coords_bg.x2;
+
+                    lv_coord_t mask_ofs = (coords_bg.x2 - rout + 1) - (vdb->area.x1 + draw_area.x1);
+                    if(mask_ofs < 0) mask_ofs = 0;
+                    lv_blend_fill(clip, &fill_area2,
+                            grad_color, mask_buf + mask_ofs, mask_res, opa, style->body.blend_mode);
+                } else {
+                    if(grad_map == NULL) {
+                        lv_blend_fill(clip, &fill_area,
+                                grad_color,mask_buf, mask_res, opa, style->body.blend_mode);
+                    } else {
+                        lv_blend_map(clip, &fill_area, grad_map, mask_buf, mask_res, opa, style->body.blend_mode);
+                    }
+
+                }
+                fill_area.y1++;
+                fill_area.y2++;
+            }
+
+            if(grad_map) lv_draw_buf_release(grad_map);
+        }
+
+        lv_draw_mask_remove_id(mask_rout_id);
+    }
+
+    lv_draw_buf_release(mask_buf);
+
+}
+
+static void draw_border(const lv_area_t * coords, const lv_area_t * clip, const lv_style_t * style, lv_opa_t opa_scale)
+{
+    lv_coord_t border_width = style->body.border.width;
+    if(border_width == 0) return;
+
+    lv_opa_t opa = style->body.border.opa;
     if(opa_scale != LV_OPA_COVER) opa = (opa * opa_scale) >> 8;
 
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
@@ -109,176 +285,108 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
     lv_coord_t short_side = LV_MATH_MIN(coords_w, coords_h);
     if(rout > short_side >> 1) rout = short_side >> 1;
 
-    /*Most simple case: just a plain rectangle*/
-    if(simple_mode && rout == 0 && style->body.main_color.full == style->body.grad_color.full) {
-        lv_blend_fill(clip, coords,
-                style->body.main_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
-                style->body.blend_mode);
-    }
-    /*More complex case: there is a radius, gradient or mask.*/
-    else {
-        lv_draw_mask_param_t mask_rout_param;
-        if(rout > 0) {
-            lv_draw_mask_radius_init(&mask_rout_param, coords, rout, false);
-            mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
-        }
-
-        if(opa >= LV_OPA_MIN) {
-            /*Draw the background line by line*/
-            lv_coord_t h;
-            lv_draw_mask_res_t mask_res = LV_DRAW_MASK_RES_FULL_COVER;
-            lv_color_t grad_color = style->body.main_color;
-
-
-            lv_color_t * grad_map = NULL;
-            /*In case of horizontal gradient pre-compute a line with a gradient*/
-            if(style->body.grad_dir == LV_GRAD_DIR_HOR && style->body.main_color.full != style->body.grad_color.full) {
-                grad_map = lv_draw_buf_get(coords_w * sizeof(lv_color_t));
-
-                lv_coord_t i;
-                for(i = 0; i < coords_w; i++) {
-                    grad_map[i] = grad_get(style, coords_w, i);
-                }
-            }
-
-            lv_area_t fill_area;
-            fill_area.x1 = coords->x1;
-            fill_area.x2 = coords->x2;
-            fill_area.y1 = disp_area->y1 + draw_area.y1;
-            fill_area.y2 = fill_area.y1;
-            for(h = draw_area.y1; h <= draw_area.y2; h++) {
-                lv_coord_t y = h + vdb->area.y1;
-
-                /*In not corner areas apply the mask only if required*/
-                if(y > coords->y1 + rout + 1 &&
-                        y < coords->y2 - rout - 1) {
-                    mask_res = LV_DRAW_MASK_RES_FULL_COVER;
-                    if(simple_mode == false) {
-                        memset(mask_buf, LV_OPA_COVER, draw_area_w);
-                        mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
-                    }
-                }
-                /*In corner areas apply the mask anyway*/
-                else {
-                    memset(mask_buf, LV_OPA_COVER, draw_area_w);
-                    mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
-                }
-
-                /*Get the current line color*/
-                if(style->body.grad_dir == LV_GRAD_DIR_VER && style->body.main_color.full != style->body.grad_color.full) {
-                    grad_color = grad_get(style, lv_area_get_height(coords), y - coords->y1);
-                }
-
-                /* If there is not other mask and drawing the corner area split the drawing to corner and middle areas
-                 * because it the middle mask shuldn't be taken into account (therefore its faster)*/
-                if(simple_mode &&
-                    (y < coords->y1 + rout + 1 ||
-                    y > coords->y2 - rout - 1)) {
-
-                    /*Left part*/
-                    lv_area_t fill_area2;
-                    fill_area2.x1 = coords->x1;
-                    fill_area2.x2 = coords->x1 + rout - 1;
-                    fill_area2.y1 = fill_area.y1;
-                    fill_area2.y2 = fill_area.y2;
-
-                    lv_blend_fill(clip, &fill_area2,
-                            grad_color, mask_buf, mask_res, opa, style->body.blend_mode);
-
-
-                    /*Central part*/
-                    fill_area2.x1 = coords->x1 + rout;
-                    fill_area2.x2 = coords->x2 - rout;
-
-                    lv_blend_fill(clip, &fill_area2,
-                            grad_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, style->body.blend_mode);
-
-                    fill_area2.x1 = coords->x2 - rout + 1;
-                    fill_area2.x2 = coords->x2;
-
-                    lv_coord_t mask_ofs = (coords->x2 - rout + 1) - (vdb->area.x1 + draw_area.x1);
-                    if(mask_ofs < 0) mask_ofs = 0;
-                    lv_blend_fill(clip, &fill_area2,
-                            grad_color, mask_buf + mask_ofs, mask_res, opa, style->body.blend_mode);
-                } else {
-                    if(grad_map == NULL) {
-                        lv_blend_fill(clip, &fill_area,
-                                grad_color,mask_buf, mask_res, opa, style->body.blend_mode);
-                    } else {
-                        lv_blend_map(clip, &fill_area, grad_map, mask_buf, mask_res, opa, style->body.blend_mode);
-                    }
-
-                }
-                fill_area.y1++;
-                fill_area.y2++;
-            }
-
-            if(grad_map) lv_draw_buf_release(grad_map);
-        }
+    /*Get the outer area*/
+    lv_draw_mask_param_t mask_rout_param;
+    if(rout > 0) {
+        lv_draw_mask_radius_init(&mask_rout_param, coords, rout, false);
+        mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
     }
 
-    /*Draw the border if any*/
-    lv_coord_t border_width = style->body.border.width;
-    if(border_width) {
-        opa = style->body.border.opa;
-        if(opa_scale != LV_OPA_COVER) opa = (opa * opa_scale) >> 8;
+    /*Move the vdb_buf_tmp to the first row*/
+    lv_draw_mask_param_t mask_rin_param;
 
-        /*Move the vdb_buf_tmp to the first row*/
-        lv_draw_mask_param_t mask_rsmall_param;
+    /*Get the inner radius*/
+    lv_coord_t rin = rout - border_width;
+    if(rin < 0) rin = 0;
 
-        /*Get the inner radius*/
-        lv_coord_t rin = rout - border_width;
-        if(rin < 0) rin = 0;
+    /*Get the inner area*/
+    lv_area_t area_small;
+    lv_area_copy(&area_small, coords);
+    area_small.x1 += ((style->body.border.part & LV_BORDER_PART_LEFT) ? border_width : 0);
+    area_small.x2 -= ((style->body.border.part & LV_BORDER_PART_RIGHT) ? border_width : 0);
+    area_small.y1 += ((style->body.border.part & LV_BORDER_PART_TOP) ? border_width : 0);
+    area_small.y2 -= ((style->body.border.part & LV_BORDER_PART_BOTTOM) ? border_width : 0);
 
-        /*Get the inner area*/
-        lv_area_t area_small;
-        lv_area_copy(&area_small, coords);
-        area_small.x1 += ((style->body.border.part & LV_BORDER_PART_LEFT) ? border_width : 0);
-        area_small.x2 -= ((style->body.border.part & LV_BORDER_PART_RIGHT) ? border_width : 0);
-        area_small.y1 += ((style->body.border.part & LV_BORDER_PART_TOP) ? border_width : 0);
-        area_small.y2 -= ((style->body.border.part & LV_BORDER_PART_BOTTOM) ? border_width : 0);
+    /*Create inner the mask*/
+    lv_draw_mask_radius_init(&mask_rin_param, &area_small, rout - border_width, true);
+    int16_t mask_rin_id = lv_draw_mask_add(&mask_rin_param, NULL);
 
-        /*Create the mask*/
-        lv_draw_mask_radius_init(&mask_rsmall_param, &area_small, rout - border_width, true);
-        int16_t mask_rsmall_id = lv_draw_mask_add(&mask_rsmall_param, NULL);
+    lv_coord_t corner_size = LV_MATH_MAX(rout, border_width - 1);
 
-        lv_coord_t corner_size = LV_MATH_MAX(rout, border_width - 1);
+    lv_coord_t h;
+    lv_draw_mask_res_t mask_res;
+    lv_area_t fill_area;
 
-        lv_coord_t h;
-        lv_draw_mask_res_t mask_res;
-        lv_area_t fill_area;
+    /*Apply some optimization if there is no other mask*/
+    if(simple_mode) {
+        /*Draw the upper corner area*/
+        lv_coord_t upper_corner_end = coords->y1 - disp_area->y1 + corner_size;
 
-        /*Apply some optimization if there is no other mask*/
-        if(simple_mode) {
-            /*Draw the upper corner area*/
-            lv_coord_t upper_corner_end = coords->y1 - disp_area->y1 + corner_size;
+        fill_area.x1 = coords->x1;
+        fill_area.x2 = coords->x2;
+        fill_area.y1 = disp_area->y1 + draw_area.y1;
+        fill_area.y2 = fill_area.y1;
+        for(h = draw_area.y1; h <= upper_corner_end; h++) {
+            memset(mask_buf, LV_OPA_COVER, draw_area_w);
+            mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
-            fill_area.x1 = coords->x1;
-            fill_area.x2 = coords->x2;
-            fill_area.y1 = disp_area->y1 + draw_area.y1;
+            lv_area_t fill_area2;
+            fill_area2.y1 = fill_area.y1;
+            fill_area2.y2 = fill_area.y2;
+
+            fill_area2.x1 = coords->x1;
+            fill_area2.x2 = coords->x1 + rout - 1;
+
+            lv_blend_fill(clip, &fill_area2,
+                    style->body.border.color, mask_buf, mask_res, opa, style->body.border.blend_mode);
+
+            if(fill_area2.y2 < coords->y1 + style->body.border.width) {
+                fill_area2.x1 = coords->x1 + rout;
+                fill_area2.x2 = coords->x2 - rout;
+
+                lv_blend_fill(clip, &fill_area2,
+                        style->body.border.color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, style->body.border.blend_mode);
+            }
+
+            fill_area2.x1 = coords->x2 - rout + 1;
+            fill_area2.x2 = coords->x2;
+
+            lv_coord_t mask_ofs = (coords->x2 - rout + 1) - (vdb->area.x1 + draw_area.x1);
+            if(mask_ofs < 0) mask_ofs = 0;
+            lv_blend_fill(clip, &fill_area2,
+                    style->body.border.color, mask_buf + mask_ofs, mask_res, opa, style->body.border.blend_mode);
+
+            fill_area.y1++;
+            fill_area.y2++;
+        }
+
+        /*Draw the lower corner area corner area*/
+        if(style->body.border.part & LV_BORDER_PART_BOTTOM) {
+            lv_coord_t lower_corner_end = coords->y2 - disp_area->y1 - corner_size;
+            if(lower_corner_end <= upper_corner_end) lower_corner_end = upper_corner_end + 1;
+            fill_area.y1 = disp_area->y1 + lower_corner_end;
             fill_area.y2 = fill_area.y1;
-            for(h = draw_area.y1; h <= upper_corner_end; h++) {
+            for(h = lower_corner_end; h <= draw_area.y2; h++) {
                 memset(mask_buf, LV_OPA_COVER, draw_area_w);
                 mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
                 lv_area_t fill_area2;
-                fill_area2.y1 = fill_area.y1;
-                fill_area2.y2 = fill_area.y2;
-
                 fill_area2.x1 = coords->x1;
                 fill_area2.x2 = coords->x1 + rout - 1;
+                fill_area2.y1 = fill_area.y1;
+                fill_area2.y2 = fill_area.y2;
 
                 lv_blend_fill(clip, &fill_area2,
                         style->body.border.color, mask_buf, mask_res, opa, style->body.border.blend_mode);
 
-                if(fill_area2.y2 < coords->y1 + style->body.border.width) {
+
+                if(fill_area2.y2 > coords->y2 - style->body.border.width ) {
                     fill_area2.x1 = coords->x1 + rout;
                     fill_area2.x2 = coords->x2 - rout;
 
                     lv_blend_fill(clip, &fill_area2,
                             style->body.border.color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, style->body.border.blend_mode);
                 }
-
                 fill_area2.x1 = coords->x2 - rout + 1;
                 fill_area2.x2 = coords->x2;
 
@@ -287,92 +395,50 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
                 lv_blend_fill(clip, &fill_area2,
                         style->body.border.color, mask_buf + mask_ofs, mask_res, opa, style->body.border.blend_mode);
 
-                fill_area.y1++;
-                fill_area.y2++;
-            }
-
-            /*Draw the lower corner area corner area*/
-            if(style->body.border.part & LV_BORDER_PART_BOTTOM) {
-                lv_coord_t lower_corner_end = coords->y2 - disp_area->y1 - corner_size;
-                if(lower_corner_end <= upper_corner_end) lower_corner_end = upper_corner_end + 1;
-                fill_area.y1 = disp_area->y1 + lower_corner_end;
-                fill_area.y2 = fill_area.y1;
-                for(h = lower_corner_end; h <= draw_area.y2; h++) {
-                    memset(mask_buf, LV_OPA_COVER, draw_area_w);
-                    mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
-
-                    lv_area_t fill_area2;
-                    fill_area2.x1 = coords->x1;
-                    fill_area2.x2 = coords->x1 + rout - 1;
-                    fill_area2.y1 = fill_area.y1;
-                    fill_area2.y2 = fill_area.y2;
-
-                    lv_blend_fill(clip, &fill_area2,
-                            style->body.border.color, mask_buf, mask_res, opa, style->body.border.blend_mode);
-
-
-                    if(fill_area2.y2 > coords->y2 - style->body.border.width ) {
-                        fill_area2.x1 = coords->x1 + rout;
-                        fill_area2.x2 = coords->x2 - rout;
-
-                        lv_blend_fill(clip, &fill_area2,
-                                style->body.border.color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, style->body.border.blend_mode);
-                    }
-                    fill_area2.x1 = coords->x2 - rout + 1;
-                    fill_area2.x2 = coords->x2;
-
-                    lv_coord_t mask_ofs = (coords->x2 - rout + 1) - (vdb->area.x1 + draw_area.x1);
-                    if(mask_ofs < 0) mask_ofs = 0;
-                    lv_blend_fill(clip, &fill_area2,
-                            style->body.border.color, mask_buf + mask_ofs, mask_res, opa, style->body.border.blend_mode);
-
-
-                    fill_area.y1++;
-                    fill_area.y2++;
-                }
-            }
-
-            /*Draw the left vertical border part*/
-            fill_area.y1 = coords->y1 + corner_size + 1;
-            fill_area.y2 = coords->y2 - corner_size - 1;
-
-            fill_area.x1 = coords->x1;
-            fill_area.x2 = coords->x1 + border_width - 1;
-            lv_blend_fill(clip, &fill_area,
-                    style->body.border.color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, style->body.border.blend_mode);
-
-            /*Draw the right vertical border*/
-            fill_area.x1 = coords->x2 - border_width + 1;
-            fill_area.x2 = coords->x2;
-
-            lv_blend_fill(clip, &fill_area,
-                    style->body.border.color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, style->body.border.blend_mode);
-        }
-        /*Process line by line if there is other mask too*/
-        else {
-            fill_area.x1 = coords->x1;
-            fill_area.x2 = coords->x2;
-            fill_area.y1 = disp_area->y1 + draw_area.y1;
-            fill_area.y2 = fill_area.y1;
-            for(h = draw_area.y1; h <= draw_area.y2; h++) {
-                memset(mask_buf, LV_OPA_COVER, draw_area_w);
-                mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
-
-                lv_blend_fill( clip, &fill_area,
-                        style->body.border.color, mask_buf, mask_res, opa, style->body.border.blend_mode);
 
                 fill_area.y1++;
                 fill_area.y2++;
-
             }
         }
-        lv_draw_mask_remove_id(mask_rsmall_id);
+
+        /*Draw the left vertical border part*/
+        fill_area.y1 = coords->y1 + corner_size + 1;
+        fill_area.y2 = coords->y2 - corner_size - 1;
+
+        fill_area.x1 = coords->x1;
+        fill_area.x2 = coords->x1 + border_width - 1;
+        lv_blend_fill(clip, &fill_area,
+                style->body.border.color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, style->body.border.blend_mode);
+
+        /*Draw the right vertical border*/
+        fill_area.x1 = coords->x2 - border_width + 1;
+        fill_area.x2 = coords->x2;
+
+        lv_blend_fill(clip, &fill_area,
+                style->body.border.color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, style->body.border.blend_mode);
     }
+    /*Process line by line if there is other mask too*/
+    else {
+        fill_area.x1 = coords->x1;
+        fill_area.x2 = coords->x2;
+        fill_area.y1 = disp_area->y1 + draw_area.y1;
+        fill_area.y2 = fill_area.y1;
+        for(h = draw_area.y1; h <= draw_area.y2; h++) {
+            memset(mask_buf, LV_OPA_COVER, draw_area_w);
+            mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
+            lv_blend_fill( clip, &fill_area,
+                    style->body.border.color, mask_buf, mask_res, opa, style->body.border.blend_mode);
+
+            fill_area.y1++;
+            fill_area.y2++;
+
+        }
+    }
+    lv_draw_mask_remove_id(mask_rin_id);
     lv_draw_mask_remove_id(mask_rout_id);
     lv_draw_buf_release(mask_buf);
 }
-
 
 static lv_color_t grad_get(const lv_style_t * style, lv_coord_t s, lv_coord_t i)
 {
@@ -819,11 +885,11 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
     }
     lv_draw_buf_release(mask_line);
 
-//        uint32_t k;
-//        for(k = 0; k < size * size; k++) {
-//            sh_buf[k] = (sh_ups_buf[k] * sw)  >> SHADOW_UPSACALE_SHIFT ;
-//        }
-//        return;
+    //        uint32_t k;
+    //        for(k = 0; k < size * size; k++) {
+    //            sh_buf[k] = (sh_ups_buf[k] * sw)  >> SHADOW_UPSACALE_SHIFT ;
+    //        }
+    //        return;
 
     if(sw == 1) {
         lv_coord_t i;
