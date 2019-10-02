@@ -106,37 +106,42 @@ void lv_cpicker_set_style(lv_obj_t * cpicker, lv_cpicker_style_t type, lv_style_
 /**
  * Set the current hue of a colorpicker.
  * @param cpicker pointer to colorpicker object
- * @param hue current selected hue
+ * @param hue current selected hue [0..360]
+ * @return true if changed, otherwise false
  */
-void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue);
+bool lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue);
 
 /**
  * Set the current saturation of a colorpicker.
  * @param cpicker pointer to colorpicker object
- * @param saturation current selected saturation
+ * @param saturation current selected saturation [0..100]
+ * @return true if changed, otherwise false
  */
-void lv_cpicker_set_saturation(lv_obj_t * cpicker, uint8_t saturation);
+bool lv_cpicker_set_saturation(lv_obj_t * cpicker, uint8_t saturation);
 
 /**
  * Set the current value of a colorpicker.
  * @param cpicker pointer to colorpicker object
- * @param val current selected value
+ * @param val current selected value [0..100]
+ * @return true if changed, otherwise false
  */
-void lv_cpicker_set_value(lv_obj_t * cpicker, uint8_t val);
+bool lv_cpicker_set_value(lv_obj_t * cpicker, uint8_t val);
 
 /**
  * Set the current hsv of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param hsv current selected hsv
+ * @return true if changed, otherwise false
  */
-void lv_cpicker_set_hsv(lv_obj_t * cpicker, lv_color_hsv_t hsv);
+bool lv_cpicker_set_hsv(lv_obj_t * cpicker, lv_color_hsv_t hsv);
 
 /**
  * Set the current color of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param color current selected color
+ * @return true if changed, otherwise false
  */
-void lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color);
+bool lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color);
 
 /**
  * Set the current color mode.
