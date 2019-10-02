@@ -70,9 +70,9 @@ typedef uint8_t lv_kb_style_t;
 
 
 enum {
-    LC_KB_SHIFT_LOWER = 0,
-    LC_KB_SHIFT_UPPER,
-    LC_KB_SHIFT_SYMBOL,
+    LV_KB_SHIFT_LOWER = 0,
+    LV_KB_SHIFT_UPPER,
+    LV_KB_SHIFT_SYMBOL,
 };
 typedef uint8_t lv_kb_shift_t;
 
