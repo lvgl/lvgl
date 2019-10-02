@@ -323,23 +323,31 @@ static inline uint32_t lv_color_to32(lv_color_t color)
 #endif
 }
 
+/**
+ * Mix two colors with a given ratio.
+ * @param c1
+ * @param c2
+ * @param mix The ratio of the colors. 0: full `c2`, 255: full `c1`, 127: half `c1` and half`c2`
+ * @return the mixed color
+ * @note 255 won't give clearly `c1`.
+ */
 static inline lv_color_t lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
 {
     lv_color_t ret;
 #if LV_COLOR_DEPTH != 1
     /*LV_COLOR_DEPTH == 8, 16 or 32*/
-    ret.ch.red = (uint16_t)((uint16_t)c1.ch.red * mix + (c2.ch.red * (255 - mix))) >> 8;
+    ret.ch.red = (uint16_t)((uint16_t)c1.ch.red * mix + (c2.ch.red * (256 - mix))) >> 8;
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
     /*If swapped Green is in 2 parts*/
     uint16_t g_1   = (c1.ch.green_h << 3) + c1.ch.green_l;
     uint16_t g_2   = (c2.ch.green_h << 3) + c2.ch.green_l;
-    uint16_t g_out = (uint16_t)((uint16_t)g_1 * mix + (g_2 * (255 - mix))) >> 8;
+    uint16_t g_out = (uint16_t)((uint16_t)g_1 * mix + (g_2 * (256 - mix))) >> 8;
     ret.ch.green_h = g_out >> 3;
     ret.ch.green_l = g_out & 0x7;
 #else
-    ret.ch.green = (uint16_t)((uint16_t)c1.ch.green * mix + (c2.ch.green * (255 - mix))) >> 8;
+    ret.ch.green = (uint16_t)((uint16_t)c1.ch.green * mix + (c2.ch.green * (256 - mix))) >> 8;
 #endif
-    ret.ch.blue = (uint16_t)((uint16_t)c1.ch.blue * mix + (c2.ch.blue * (255 - mix))) >> 8;
+    ret.ch.blue = (uint16_t)((uint16_t)c1.ch.blue * mix + (c2.ch.blue * (256 - mix))) >> 8;
 #if LV_COLOR_DEPTH == 32
     ret.ch.alpha = 0xFF;
 #endif
