@@ -411,7 +411,7 @@ static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, 
     lv_opa_t m;
 
     if(xef) {
-        if(k >= 0) {
+        if(k >= 0 && k < len) {
             m = 255 - (((255-xef) * (255 - px_h)) >> 9);
             if(p->inv) m = 255 - m;
             mask_buf[k] = mask_mix(mask_buf[k], m);
@@ -420,7 +420,7 @@ static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, 
     }
 
     while(px_h > p->spx) {
-        if(k >= 0) {
+        if(k >= 0 && k < len) {
             m = px_h - (p->spx >> 1);
             if(p->inv) m = 255 - m;
             mask_buf[k] = mask_mix(mask_buf[k], m);
@@ -429,6 +429,8 @@ static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, 
         k++;
         if(k >= len) break;
     }
+
+
     if(k < len && k >= 0) {
         int32_t x_inters = (px_h * p->xy_steep) >> 10;
         m = (x_inters * px_h) >> 9;
@@ -436,6 +438,7 @@ static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, 
         if(p->inv) m = 255 - m;
         mask_buf[k] = mask_mix(mask_buf[k], m);
     }
+
 
     if(p->inv) {
         k = xei - abs_x;
