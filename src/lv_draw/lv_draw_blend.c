@@ -327,7 +327,6 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
                         {
                             if(mask_tmp[x] > LV_OPA_MAX) last_res_color = color;
                             else if(mask_tmp[x] < LV_OPA_MIN) last_res_color = disp_buf_tmp[x];
-                            else if(disp_buf_tmp[x].full == color.full) last_res_color = disp_buf_tmp[x];
                             else last_res_color = lv_color_mix(color, disp_buf_tmp[x], mask_tmp[x]);
                         }
                         last_mask = mask_tmp[x];
@@ -354,7 +353,6 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
                         {
                             if(opa_tmp > LV_OPA_MAX) last_res_color = lv_color_mix(color, disp_buf_tmp[x], mask_tmp[x]);
                             else if(opa_tmp < LV_OPA_MIN) last_res_color = disp_buf_tmp[x];
-                            else if(disp_buf_tmp[x].full == color.full) last_res_color = disp_buf_tmp[x];
                             else last_res_color = lv_color_mix(color, disp_buf_tmp[x],opa_tmp);
                         }
                         last_mask = mask_tmp[x];
