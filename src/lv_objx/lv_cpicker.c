@@ -544,142 +544,142 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
 
 static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale)
 {
-        lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
-        int16_t start_angle = 0; /*Default*/
-        int16_t end_angle = 360 - LV_CPICKER_DEF_QF; /*Default*/
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+    int16_t start_angle = 0; /*Default*/
+    int16_t end_angle = 360 - LV_CPICKER_DEF_QF; /*Default*/
 
-        lv_coord_t w = lv_obj_get_width(cpicker);
-        lv_coord_t h = lv_obj_get_height(cpicker);
-        lv_coord_t cx = cpicker->coords.x1 + w / 2;
-        lv_coord_t cy = cpicker->coords.y1 + h / 2;
-        lv_coord_t r = w / 2;
+    lv_coord_t w = lv_obj_get_width(cpicker);
+    lv_coord_t h = lv_obj_get_height(cpicker);
+    lv_coord_t cx = cpicker->coords.x1 + w / 2;
+    lv_coord_t cy = cpicker->coords.y1 + h / 2;
+    lv_coord_t r = w / 2;
 
-        /*if the mask does not include the center of the object
-         * redrawing all the wheel is not necessary;
-         * only a given angular range
-         */
-        lv_point_t center = {cx, cy};
-        if(!lv_area_is_point_on(mask, &center))
-        {
-            /*get angle from center of object to each corners of the area*/
-            int16_t dr, ur, ul, dl;
-            dr = lv_atan2(mask->x2 - cx, mask->y2 - cy);
-            ur = lv_atan2(mask->x2 - cx, mask->y1 - cy);
-            ul = lv_atan2(mask->x1 - cx, mask->y1 - cy);
-            dl = lv_atan2(mask->x1 - cx, mask->y2 - cy);
+    /*if the mask does not include the center of the object
+        * redrawing all the wheel is not necessary;
+        * only a given angular range
+        */
+    lv_point_t center = {cx, cy};
+    if(!lv_area_is_point_on(mask, &center))
+    {
+        /*get angle from center of object to each corners of the area*/
+        int16_t dr, ur, ul, dl;
+        dr = lv_atan2(mask->x2 - cx, mask->y2 - cy);
+        ur = lv_atan2(mask->x2 - cx, mask->y1 - cy);
+        ul = lv_atan2(mask->x1 - cx, mask->y1 - cy);
+        dl = lv_atan2(mask->x1 - cx, mask->y2 - cy);
 
-            /*check area position from object axis*/
-            bool left = (mask->x2 < cx && mask->x1 < cx) ? true : false;
-            bool onYaxis = (mask->x2 > cx && mask->x1 < cx) ? true : false;
-            bool right = (mask->x2 > cx && mask->x1 > cx) ? true : false;
-            bool top = (mask->y2 < cy && mask->y1 < cy) ? true : false;
-            bool onXaxis = (mask->y2 > cy && mask->y1 < cy) ? true : false;
-            bool bottom = (mask->y2 > cy && mask->y1 > cy) ? true : false;
+        /*check area position from object axis*/
+        bool left = (mask->x2 < cx && mask->x1 < cx) ? true : false;
+        bool onYaxis = (mask->x2 > cx && mask->x1 < cx) ? true : false;
+        bool right = (mask->x2 > cx && mask->x1 > cx) ? true : false;
+        bool top = (mask->y2 < cy && mask->y1 < cy) ? true : false;
+        bool onXaxis = (mask->y2 > cy && mask->y1 < cy) ? true : false;
+        bool bottom = (mask->y2 > cy && mask->y1 > cy) ? true : false;
 
-            /*store angular range*/
-            if(right && bottom) {
-                start_angle = dl;
-                end_angle = ur;
-            }
-            else if(right && onXaxis) {
-                start_angle = dl;
-                end_angle = ul;
-            }
-            else if(right && top)  {
-                start_angle = dr;
-                end_angle = ul;
-            }
-            else if(onYaxis && top) {
-                start_angle = dr;
-                end_angle = dl;
-            }
-            else if(left && top)  {
-                start_angle = ur;
-                end_angle = dl;
-            }
-            else if(left && onXaxis) {
-                start_angle = ur;
-                end_angle = dr;
-            }
-            else if(left && bottom) {
-                start_angle = ul;
-                end_angle = dr;
-            }
-            else if(onYaxis && bottom) {
-                start_angle = ul;
-                end_angle = ur;
-            }
-
-            /*rollover angle*/
-            if(start_angle > end_angle) end_angle +=  360;
-
-            /*round to QF factor*/
-            start_angle = (start_angle/LV_CPICKER_DEF_QF) * LV_CPICKER_DEF_QF;
-            end_angle = (end_angle / LV_CPICKER_DEF_QF) * LV_CPICKER_DEF_QF;
-
-            /*shift angle if necessary before adding offset*/
-            if((start_angle - LV_CPICKER_DEF_QF) < 0)
-            {
-                start_angle += 360;
-                end_angle += 360;
-            }
-
-            /*ensure overlapping by adding offset*/
-            start_angle -= LV_CPICKER_DEF_QF;
-            end_angle += LV_CPICKER_DEF_QF;
+        /*store angular range*/
+        if(right && bottom) {
+            start_angle = dl;
+            end_angle = ur;
+        }
+        else if(right && onXaxis) {
+            start_angle = dl;
+            end_angle = ul;
+        }
+        else if(right && top)  {
+            start_angle = dr;
+            end_angle = ul;
+        }
+        else if(onYaxis && top) {
+            start_angle = dr;
+            end_angle = dl;
+        }
+        else if(left && top)  {
+            start_angle = ur;
+            end_angle = dl;
+        }
+        else if(left && onXaxis) {
+            start_angle = ur;
+            end_angle = dr;
+        }
+        else if(left && bottom) {
+            start_angle = ul;
+            end_angle = dr;
+        }
+        else if(onYaxis && bottom) {
+            start_angle = ul;
+            end_angle = ur;
         }
 
-        lv_point_t triangle_points[3];
-        lv_style_t style;
-        lv_style_copy(&style, &lv_style_plain);
-        for(uint16_t i = start_angle; i <= end_angle; i+= LV_CPICKER_DEF_QF)
+        /*rollover angle*/
+        if(start_angle > end_angle) end_angle +=  360;
+
+        /*round to QF factor*/
+        start_angle = (start_angle/LV_CPICKER_DEF_QF) * LV_CPICKER_DEF_QF;
+        end_angle = (end_angle / LV_CPICKER_DEF_QF) * LV_CPICKER_DEF_QF;
+
+        /*shift angle if necessary before adding offset*/
+        if((start_angle - LV_CPICKER_DEF_QF) < 0)
         {
-            style.body.main_color = angle_to_mode_color(cpicker, i);
-            style.body.grad_color = style.body.main_color;
-
-            triangle_points[0].x = cx;
-            triangle_points[0].y = cy;
-
-            triangle_points[1].x = cx + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-            triangle_points[1].y = cy + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
-
-            if(i == end_angle || i == (360 - LV_CPICKER_DEF_QF)) {
-                /*the last triangle is drawn without additional overlapping pixels*/
-                triangle_points[2].x = cx + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
-                triangle_points[2].y = cy + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
-            }
-            else {
-                triangle_points[2].x = cx + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
-                triangle_points[2].y = cy + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
-            }
-
-            lv_draw_triangle(triangle_points, mask, &style, LV_OPA_COVER);
+            start_angle += 360;
+            end_angle += 360;
         }
 
-        /*Mask out the center area*/
-        const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
-        lv_style_copy(&style, style_main);
-        style.body.radius = LV_RADIUS_CIRCLE;
-        lv_area_t area_mid;
-        lv_area_copy(&area_mid, &cpicker->coords);
+        /*ensure overlapping by adding offset*/
+        start_angle -= LV_CPICKER_DEF_QF;
+        end_angle += LV_CPICKER_DEF_QF;
+    }
+
+    lv_point_t triangle_points[3];
+    lv_style_t style;
+    lv_style_copy(&style, &lv_style_plain);
+    for(uint16_t i = start_angle; i <= end_angle; i+= LV_CPICKER_DEF_QF)
+    {
+        style.body.main_color = angle_to_mode_color(cpicker, i);
+        style.body.grad_color = style.body.main_color;
+
+        triangle_points[0].x = cx;
+        triangle_points[0].y = cy;
+
+        triangle_points[1].x = cx + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+        triangle_points[1].y = cy + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+
+        if(i == end_angle || i == (360 - LV_CPICKER_DEF_QF)) {
+            /*the last triangle is drawn without additional overlapping pixels*/
+            triangle_points[2].x = cx + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
+            triangle_points[2].y = cy + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
+        }
+        else {
+            triangle_points[2].x = cx + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
+            triangle_points[2].y = cy + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
+        }
+
+        lv_draw_triangle(triangle_points, mask, &style, LV_OPA_COVER);
+    }
+
+    /*Mask out the center area*/
+    const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
+    lv_style_copy(&style, style_main);
+    style.body.radius = LV_RADIUS_CIRCLE;
+    lv_area_t area_mid;
+    lv_area_copy(&area_mid, &cpicker->coords);
+    area_mid.x1 += style_main->line.width;
+    area_mid.y1 += style_main->line.width;
+    area_mid.x2 -= style_main->line.width;
+    area_mid.y2 -= style_main->line.width;
+
+    lv_draw_rect(&area_mid, mask, &style, opa_scale);
+
+    if(ext->preview) {
+        lv_color_t color = lv_cpicker_get_color(cpicker);
+        style.body.main_color = color;
+        style.body.grad_color = color;
         area_mid.x1 += style_main->line.width;
         area_mid.y1 += style_main->line.width;
         area_mid.x2 -= style_main->line.width;
         area_mid.y2 -= style_main->line.width;
 
         lv_draw_rect(&area_mid, mask, &style, opa_scale);
-
-        if(ext->preview) {
-            lv_color_t color = lv_cpicker_get_color(cpicker);
-            style.body.main_color = color;
-            style.body.grad_color = color;
-            area_mid.x1 += style_main->line.width;
-            area_mid.y1 += style_main->line.width;
-            area_mid.x2 -= style_main->line.width;
-            area_mid.y2 -= style_main->line.width;
-
-            lv_draw_rect(&area_mid, mask, &style, opa_scale);
-        }
+    }
 }
 
 static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale)
