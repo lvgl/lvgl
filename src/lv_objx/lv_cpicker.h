@@ -30,40 +30,6 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-/*Data of colorpicker*/
-typedef struct {
-    lv_color_hsv_t hsv;
-    struct
-    {
-        lv_style_t * style;
-        uint8_t type;
-    } indicator;
-    lv_color_hsv_t prev_hsv;
-    uint16_t prev_pos;
-    uint8_t color_mode:2;
-    uint8_t color_mode_fixed:1;
-    uint8_t type:1;
-    uint32_t last_click;
-    lv_area_t rect_preview_area;
-    lv_area_t rect_gradient_area;
-    lv_coord_t rect_gradient_w;
-    lv_coord_t rect_gradient_h;
-} lv_cpicker_ext_t;
-
-/*Styles*/
-enum {
-    LV_CPICKER_STYLE_MAIN,
-    LV_CPICKER_STYLE_INDICATOR,
-};
-typedef uint8_t lv_cpicker_style_t;
-
-enum {
-    LV_CPICKER_INDICATOR_NONE,
-    LV_CPICKER_INDICATOR_LINE,
-    LV_CPICKER_INDICATOR_CIRCLE,
-    LV_CPICKER_INDICATOR_IN
-};
-typedef uint8_t lv_cpicker_indicator_type_t;
 
 enum {
     LV_CPICKER_TYPE_RECT,
@@ -77,6 +43,33 @@ enum {
     LV_CPICKER_COLOR_MODE_VALUE
 };
 typedef uint8_t lv_cpicker_color_mode_t;
+
+
+
+/*Data of colorpicker*/
+typedef struct {
+    lv_color_hsv_t hsv;
+    struct {
+        lv_style_t * style;
+        lv_point_t pos;
+        uint8_t colored     :1;
+
+    } indic;
+    uint32_t last_click_time;
+    uint32_t last_change_time;
+    lv_point_t last_press_point;
+    lv_cpicker_color_mode_t color_mode  :2;
+    uint8_t color_mode_fixed            :1;
+    lv_cpicker_type_t type              :1;
+} lv_cpicker_ext_t;
+
+/*Styles*/
+enum {
+    LV_CPICKER_STYLE_MAIN,
+    LV_CPICKER_STYLE_INDICATOR,
+};
+typedef uint8_t lv_cpicker_style_t;
+
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -108,13 +101,6 @@ void lv_cpicker_set_type(lv_obj_t * chart, lv_cpicker_type_t type);
  * @param style pointer to a style
  */
 void lv_cpicker_set_style(lv_obj_t * cpicker, lv_cpicker_style_t type, lv_style_t *style);
-
-/**
- * Set a type of a colorpicker indicator.
- * @param cpicker pointer to colorpicker object
- * @param type indicator type
- */
-void lv_cpicker_set_indicator_type(lv_obj_t * cpicker, lv_cpicker_indicator_type_t type);
 
 /**
  * Set the current hue of a colorpicker.
@@ -165,6 +151,13 @@ void lv_cpicker_set_color_mode(lv_obj_t * cpicker, lv_cpicker_color_mode_t mode)
  */
 void lv_cpicker_set_color_mode_fixed(lv_obj_t * cpicker, bool fixed);
 
+/**
+ * Make the indicator to be colored to the current color
+ * @param cpicker pointer to colorpicker object
+ * @param en true: color the indicator; false: not color the indicator
+ */
+void lv_cpicker_set_indic_colored(lv_obj_t * cpicker, bool en);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -189,7 +182,7 @@ bool lv_cpicker_get_color_mode_fixed(lv_obj_t * cpicker);
  * @param type which style should be get
  * @return pointer to the style
  */
-lv_style_t * lv_cpicker_get_style(const lv_obj_t * cpicker, lv_cpicker_style_t type);
+const lv_style_t * lv_cpicker_get_style(const lv_obj_t * cpicker, lv_cpicker_style_t type);
 
 /**
  * Get the current hue of a colorpicker.
@@ -225,6 +218,13 @@ lv_color_hsv_t lv_cpicker_get_hsv(lv_obj_t * cpicker);
  * @return current selected color
  */
 lv_color_t lv_cpicker_get_color(lv_obj_t * cpicker);
+
+/**
+ * Whether the indicator is colored to the current color or not
+ * @param cpicker pointer to colorpicker object
+ * @return true: color the indicator; false: not color the indicator
+ */
+bool lv_cpicker_get_indic_colored(lv_obj_t * cpicker);
 
 /*=====================
  * Other functions
