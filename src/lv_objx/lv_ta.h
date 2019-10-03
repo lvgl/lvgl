@@ -39,6 +39,8 @@ extern "C" {
  *********************/
 #define LV_TA_CURSOR_LAST (0x7FFF) /*Put the cursor after the last character*/
 
+LV_EXPORT_CONST_INT(LV_TA_CURSOR_LAST);
+
 /**********************
  *      TYPEDEFS
  **********************/
