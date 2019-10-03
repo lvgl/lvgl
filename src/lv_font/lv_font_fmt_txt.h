@@ -45,7 +45,7 @@ typedef struct
     uint8_t box_w;                  /**< Width of the glyph's bounding box*/
     uint8_t box_h;                  /**< Height of the glyph's bounding box*/
     int8_t ofs_x;                   /**< x offset of the bounding box*/
-    uint8_t ofs_y;                  /**< y offset of the bounding box. Measured from the top of the line*/
+    int8_t ofs_y;                  /**< y offset of the bounding box. Measured from the top of the line*/
 }lv_font_fmt_txt_glyph_dsc_t;
 
 
@@ -141,7 +141,7 @@ typedef struct {
           3. value = class_pair_values[(left_class-1)*right_class_cnt + (righ_class-1)]
         */
 
-    const uint8_t * class_pair_values;    /*left_class_num * right_class_num value*/
+    const int8_t * class_pair_values;    /*left_class_num * right_class_num value*/
     const uint8_t * left_class_mapping;   /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
     const uint8_t * right_class_mapping;  /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
     uint8_t left_class_cnt;
