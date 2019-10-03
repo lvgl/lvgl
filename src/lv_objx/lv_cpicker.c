@@ -571,46 +571,38 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
         if(right && bottom) {
             start_angle = dl;
             end_angle = ur;
-        }
-        else if(right && onXaxis) {
+        } else if(right && onXaxis) {
             start_angle = dl;
             end_angle = ul;
-        }
-        else if(right && top)  {
+        } else if(right && top)  {
             start_angle = dr;
             end_angle = ul;
-        }
-        else if(onYaxis && top) {
+        } else if(onYaxis && top) {
             start_angle = dr;
             end_angle = dl;
-        }
-        else if(left && top)  {
+        } else if(left && top)  {
             start_angle = ur;
             end_angle = dl;
-        }
-        else if(left && onXaxis) {
+        } else if(left && onXaxis) {
             start_angle = ur;
             end_angle = dr;
-        }
-        else if(left && bottom) {
+        } else if(left && bottom) {
             start_angle = ul;
             end_angle = dr;
-        }
-        else if(onYaxis && bottom) {
+        } else if(onYaxis && bottom) {
             start_angle = ul;
             end_angle = ur;
         }
 
         /*rollover angle*/
-        if(start_angle > end_angle) end_angle +=  360;
+        if(start_angle > end_angle) end_angle += 360;
 
         /*round to QF factor*/
         start_angle = (start_angle/LV_CPICKER_DEF_QF) * LV_CPICKER_DEF_QF;
         end_angle = (end_angle / LV_CPICKER_DEF_QF) * LV_CPICKER_DEF_QF;
 
         /*shift angle if necessary before adding offset*/
-        if((start_angle - LV_CPICKER_DEF_QF) < 0)
-        {
+        if((start_angle - LV_CPICKER_DEF_QF) < 0) {
             start_angle += 360;
             end_angle += 360;
         }
@@ -623,8 +615,7 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
     lv_point_t triangle_points[3];
     lv_style_t style;
     lv_style_copy(&style, &lv_style_plain);
-    for(uint16_t i = start_angle; i <= end_angle; i+= LV_CPICKER_DEF_QF)
-    {
+    for(uint16_t i = start_angle; i <= end_angle; i+= LV_CPICKER_DEF_QF) {
         style.body.main_color = angle_to_mode_color(cpicker, i);
         style.body.grad_color = style.body.main_color;
 
@@ -638,8 +629,7 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
             /*the last triangle is drawn without additional overlapping pixels*/
             triangle_points[2].x = cx + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF) >> LV_TRIGO_SHIFT);
             triangle_points[2].y = cy + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + 90) >> LV_TRIGO_SHIFT);
-        }
-        else {
+        } else {
             triangle_points[2].x = cx + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET) >> LV_TRIGO_SHIFT);
             triangle_points[2].y = cy + (r * lv_trigo_sin(i + LV_CPICKER_DEF_QF + TRI_OFFSET + 90) >> LV_TRIGO_SHIFT);
         }
@@ -728,8 +718,9 @@ static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
         lv_draw_rect(&rect_area, mask, &style, opa_scale);
     }
 }
+
 /**
- * Should roughly match up with `lv_cpicker_invalidate_disc_indicator_circle`
+ * Should roughly match up with `invalidate_indic`
  */
 static void draw_indic(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale)
 {
@@ -756,7 +747,6 @@ static void draw_indic(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_
         style_cir.body.main_color = lv_cpicker_get_color(cpicker);
         style_cir.body.grad_color = style_cir.body.main_color;
     }
-
 
     lv_draw_rect(&ind_area, mask, &style_cir, opa_scale);
 }
@@ -791,8 +781,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*Refresh extended draw area to make knob visible*/
         if(lv_obj_get_width(cpicker) != lv_area_get_width(param) ||
-           lv_obj_get_height(cpicker) != lv_area_get_height(param))
-        {
+           lv_obj_get_height(cpicker) != lv_area_get_height(param)) {
             lv_obj_refresh_ext_draw_pad(cpicker);
             refr_indic_pos(cpicker);
         }
@@ -851,7 +840,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         lv_indev_get_point(lv_indev_get_act(), &ext->last_press_point);
         res = double_click_reset(cpicker);
         if(res != LV_RES_OK) return res;
-    } else if(sign == LV_SIGNAL_PRESSING){
+    } else if(sign == LV_SIGNAL_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
         if(indev == NULL) return res;
 
@@ -936,7 +925,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     return res;
 }
 
-static void next_color_mode(lv_obj_t * cpicker )
+static void next_color_mode(lv_obj_t * cpicker)
 {
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
     ext->color_mode = (ext->color_mode + 1) % 3;
@@ -946,11 +935,10 @@ static void next_color_mode(lv_obj_t * cpicker )
 
 
 /**
- * Indicator points need to match those set in lv_cpicker_disc_design/lv_cpicker_rect_design
+ * Should roughly match up with `draw_indic`
  */ 
 static void invalidate_indic(lv_obj_t * cpicker)
 {
-
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
     const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
     const lv_style_t * style_indic = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_INDICATOR);
@@ -994,8 +982,7 @@ static void refr_indic_pos(lv_obj_t * cpicker)
 
         ext->indic.pos.x = ind_pos;
         ext->indic.pos.y = h / 2;
-    }
-    if(ext->type == LV_CPICKER_TYPE_DISC) {
+    } else if(ext->type == LV_CPICKER_TYPE_DISC) {
         const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
         lv_coord_t r = w / 2 - style_main->line.width / 2;
         uint16_t angle = get_angle(cpicker);
