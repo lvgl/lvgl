@@ -57,10 +57,11 @@
 static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode);
 static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param);
 
-static void invalidate_indic(lv_obj_t * cpicker);
 static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale);
 static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale);
 static void draw_indic(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale);
+static void invalidate_indic(lv_obj_t * cpicker);
+static lv_area_t get_indic_area(lv_obj_t * cpicker, const lv_style_t * style_main, const lv_style_t * style_indic, lv_cpicker_ext_t * ext);
 
 static void next_color_mode(lv_obj_t * cpicker);
 static lv_res_t double_click_reset(lv_obj_t * cpicker);
@@ -719,25 +720,13 @@ static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
     }
 }
 
-/**
- * Should roughly match up with `invalidate_indic`
- */
 static void draw_indic(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale)
 {
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
     const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
     const lv_style_t * style_indic = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_INDICATOR);
 
-    lv_coord_t h = lv_obj_get_height(cpicker);
-    uint16_t r;
-    if(ext->type == LV_CPICKER_TYPE_DISC) r = style_main->line.width / 2;
-    else if(ext->type == LV_CPICKER_TYPE_RECT) r = h / 2;
-
-    lv_area_t ind_area;
-    ind_area.x1 = cpicker->coords.x1 + ext->indic.pos.x - r - style_indic->body.padding.left;
-    ind_area.y1 = cpicker->coords.y1 + ext->indic.pos.y - r - style_indic->body.padding.right;
-    ind_area.x2 = cpicker->coords.x1 + ext->indic.pos.x + r + style_indic->body.padding.top;
-    ind_area.y2 = cpicker->coords.y1 + ext->indic.pos.y + r + style_indic->body.padding.bottom;
+    lv_area_t indic_area = get_indic_area(cpicker, style_main, style_indic, ext);
 
     lv_style_t style_cir;
     lv_style_copy(&style_cir, ext->indic.style);
@@ -748,7 +737,39 @@ static void draw_indic(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_
         style_cir.body.grad_color = style_cir.body.main_color;
     }
 
-    lv_draw_rect(&ind_area, mask, &style_cir, opa_scale);
+    lv_draw_rect(&indic_area, mask, &style_cir, opa_scale);
+}
+
+static void invalidate_indic(lv_obj_t * cpicker)
+{
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+    const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
+    const lv_style_t * style_indic = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_INDICATOR);
+
+    lv_area_t indic_area = get_indic_area(cpicker, style_main, style_indic, ext);
+
+    lv_inv_area(lv_obj_get_disp(cpicker), &indic_area);
+}
+
+static lv_area_t get_indic_area(lv_obj_t * cpicker,
+                                const lv_style_t * style_main,
+                                const lv_style_t * style_indic,
+                                const lv_cpicker_ext_t * ext)
+{
+    uint16_t r;
+    if(ext->type == LV_CPICKER_TYPE_DISC) r = style_main->line.width / 2;
+    else if(ext->type == LV_CPICKER_TYPE_RECT) {
+        lv_coord_t h = lv_obj_get_height(cpicker);
+        r = h / 2;
+    }
+
+    lv_area_t indic_area;
+    indic_area.x1 = cpicker->coords.x1 + ext->indic.pos.x - r - style_indic->body.padding.left;
+    indic_area.y1 = cpicker->coords.y1 + ext->indic.pos.y - r - style_indic->body.padding.right;
+    indic_area.x2 = cpicker->coords.x1 + ext->indic.pos.x + r + style_indic->body.padding.top;
+    indic_area.y2 = cpicker->coords.y1 + ext->indic.pos.y + r + style_indic->body.padding.bottom;
+
+    return indic_area;
 }
 
 /**
@@ -933,31 +954,6 @@ static void next_color_mode(lv_obj_t * cpicker)
     lv_obj_invalidate(cpicker);
 }
 
-
-/**
- * Should roughly match up with `draw_indic`
- */ 
-static void invalidate_indic(lv_obj_t * cpicker)
-{
-    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
-    const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
-    const lv_style_t * style_indic = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_INDICATOR);
-
-    lv_coord_t h = lv_obj_get_height(cpicker);
-
-    uint16_t r;
-    if(ext->type == LV_CPICKER_TYPE_DISC) r = style_main->line.width / 2;
-    else if(ext->type == LV_CPICKER_TYPE_RECT) r = h / 2;
-
-    lv_area_t indic_area;
-    indic_area.x1 = cpicker->coords.x1 + ext->indic.pos.x - r - style_indic->body.padding.left;
-    indic_area.y1 = cpicker->coords.y1 + ext->indic.pos.y - r - style_indic->body.padding.top;
-    indic_area.x2 = cpicker->coords.x1 + ext->indic.pos.x + r + style_indic->body.padding.right;
-    indic_area.y2 = cpicker->coords.y1 + ext->indic.pos.y + r + style_indic->body.padding.bottom;
-
-    lv_inv_area(lv_obj_get_disp(cpicker), &indic_area);
-}
-
 static void refr_indic_pos(lv_obj_t * cpicker)
 {
     invalidate_indic(cpicker);
@@ -989,7 +985,7 @@ static void refr_indic_pos(lv_obj_t * cpicker)
         ext->indic.pos.x = (((int32_t)r * lv_trigo_sin(angle)) >> LV_TRIGO_SHIFT);
         ext->indic.pos.y = (((int32_t)r * lv_trigo_sin(angle + 90)) >> LV_TRIGO_SHIFT);
         ext->indic.pos.x = ext->indic.pos.x + w / 2;
-        ext->indic.pos.y = ext->indic.pos.y + w / 2;
+        ext->indic.pos.y = ext->indic.pos.y + h / 2;
     }
 
     invalidate_indic(cpicker);
