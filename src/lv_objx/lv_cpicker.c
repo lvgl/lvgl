@@ -653,10 +653,7 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
     style.body.radius = LV_RADIUS_CIRCLE;
     lv_area_t area_mid;
     lv_area_copy(&area_mid, &cpicker->coords);
-    area_mid.x1 += style_main->line.width;
-    area_mid.y1 += style_main->line.width;
-    area_mid.x2 -= style_main->line.width;
-    area_mid.y2 -= style_main->line.width;
+    lv_area_increment(&area_mid, -style_main->line.width);
 
     lv_draw_rect(&area_mid, mask, &style, opa_scale);
 
@@ -664,10 +661,7 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
         lv_color_t color = lv_cpicker_get_color(cpicker);
         style.body.main_color = color;
         style.body.grad_color = color;
-        area_mid.x1 += style_main->line.width;
-        area_mid.y1 += style_main->line.width;
-        area_mid.x2 -= style_main->line.width;
-        area_mid.y2 -= style_main->line.width;
+        lv_area_increment(&area_mid, -style_main->line.width / 2);
 
         lv_draw_rect(&area_mid, mask, &style, opa_scale);
     }
