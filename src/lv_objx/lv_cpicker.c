@@ -61,7 +61,10 @@ static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
 static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale);
 static void draw_indic(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale);
 static void invalidate_indic(lv_obj_t * cpicker);
-static lv_area_t get_indic_area(lv_obj_t * cpicker, const lv_style_t * style_main, const lv_style_t * style_indic, lv_cpicker_ext_t * ext);
+static lv_area_t get_indic_area(lv_obj_t * cpicker,
+                                const lv_style_t * style_main,
+                                const lv_style_t * style_indic,
+                                const lv_cpicker_ext_t * ext);
 
 static void next_color_mode(lv_obj_t * cpicker);
 static lv_res_t double_click_reset(lv_obj_t * cpicker);
