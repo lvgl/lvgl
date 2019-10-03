@@ -1270,7 +1270,7 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
         const lv_style_t * style = lv_obj_get_style(chart);
         lv_opa_t opa_scale       = lv_obj_get_opa_scale(chart);
 
-        uint8_t i, j;
+        uint8_t i;
         uint8_t num_of_labels;
         uint8_t num_scale_ticks;
         int8_t major_tick_len, minor_tick_len;
@@ -1396,8 +1396,7 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
         const lv_style_t * style = lv_obj_get_style(chart);
         lv_opa_t opa_scale       = lv_obj_get_opa_scale(chart);
 
-        uint8_t i, j;
-        uint8_t list_index;
+        uint8_t i;
         uint8_t num_of_labels;
         uint8_t num_scale_ticks;
         uint8_t major_tick_len, minor_tick_len;
