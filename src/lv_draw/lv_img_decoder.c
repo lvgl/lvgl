@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_img_decoder.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw_img.h"
 #include "../lv_misc/lv_ll.h"
 #include "../lv_misc/lv_color.h"
@@ -69,7 +70,7 @@ void lv_img_decoder_init(void)
     decoder = lv_img_decoder_create();
     if(decoder == NULL) {
         LV_LOG_WARN("lv_img_decoder_init: out of memory");
-        lv_mem_assert(decoder);
+        LV_ASSERT_MEM(decoder);
         return;
     }
 
@@ -119,9 +120,16 @@ lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header)
 lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const lv_style_t * style)
 {
     dsc->style     = style;
-    dsc->src       = src;
     dsc->src_type  = lv_img_src_get_type(src);
     dsc->user_data = NULL;
+
+    if(dsc->src_type == LV_IMG_SRC_FILE) {
+        uint16_t fnlen = strlen(src);
+        dsc->src = lv_mem_alloc(fnlen + 1);
+        strcpy((char *)dsc->src, src);
+    } else {
+        dsc->src       = src;
+    }
 
     lv_res_t res = LV_RES_INV;
 
@@ -176,6 +184,11 @@ void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc)
 {
     if(dsc->decoder) {
         if(dsc->decoder->close_cb) dsc->decoder->close_cb(dsc->decoder, dsc);
+
+        if(dsc->src_type == LV_IMG_SRC_FILE) {
+            lv_mem_free(dsc->src);
+            dsc->src = NULL;
+        }
     }
 }
 
@@ -187,7 +200,7 @@ lv_img_decoder_t * lv_img_decoder_create(void)
 {
     lv_img_decoder_t * decoder;
     decoder = lv_ll_ins_head(&LV_GC_ROOT(_lv_img_defoder_ll));
-    lv_mem_assert(decoder);
+    LV_ASSERT_MEM(decoder);
     if(decoder == NULL) return NULL;
 
     memset(decoder, 0, sizeof(lv_img_decoder_t));
@@ -322,7 +335,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             dsc->user_data = lv_mem_alloc(sizeof(lv_img_decoder_built_in_data_t));
             if(dsc->user_data == NULL) {
                 LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
-                lv_mem_assert(dsc->user_data);
+                LV_ASSERT_MEM(dsc->user_data);
             }
             memset(dsc->user_data, 0, sizeof(lv_img_decoder_built_in_data_t));
         }
@@ -331,7 +344,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         user_data->f                               = lv_mem_alloc(sizeof(f));
         if(user_data->f == NULL) {
             LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
-            lv_mem_assert(user_data->f);
+            LV_ASSERT_MEM(user_data->f);
         }
 
         memcpy(user_data->f, &f, sizeof(f));
@@ -369,7 +382,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             dsc->user_data = lv_mem_alloc(sizeof(lv_img_decoder_built_in_data_t));
             if(dsc->user_data == NULL) {
                 LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
-                lv_mem_assert(dsc->user_data);
+                LV_ASSERT_MEM(dsc->user_data);
             }
             memset(dsc->user_data, 0, sizeof(lv_img_decoder_built_in_data_t));
         }
@@ -380,7 +393,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         if(user_data->palette == NULL || user_data->opa == NULL) {
             LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
 #if LV_USE_FILESYSTEM
-            lv_mem_assert(user_data->f);
+            LV_ASSERT_MEM(user_data->f);
 #endif
         }
 

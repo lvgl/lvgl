@@ -8,6 +8,7 @@
  *********************/
 #include <stdlib.h>
 #include "lv_canvas.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_refr.h"
@@ -17,6 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_canvas"
 
 /**********************
  *      TYPEDEFS
@@ -53,12 +55,12 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of canvas*/
     lv_obj_t * new_canvas = lv_img_create(par, copy);
-    lv_mem_assert(new_canvas);
+    LV_ASSERT_MEM(new_canvas);
     if(new_canvas == NULL) return NULL;
 
     /*Allocate the canvas type specific extended data*/
     lv_canvas_ext_t * ext = lv_obj_allocate_ext_attr(new_canvas, sizeof(lv_canvas_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_canvas);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_canvas);
@@ -111,6 +113,9 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_NULL(buf);
+
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
 
     ext->dsc.header.cf = cf;
@@ -131,6 +136,8 @@ void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_
  */
 void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t c)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
 
     lv_img_buf_set_px_color(&ext->dsc, x, y, c);
@@ -149,6 +156,8 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
  */
 void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color_t c)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
 
     lv_img_buf_set_palette(&ext->dsc, id, c);
@@ -163,6 +172,8 @@ void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color_t c)
  */
 void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+
     switch(type) {
         case LV_CANVAS_STYLE_MAIN: lv_img_set_style(canvas, LV_IMG_STYLE_MAIN, style); break;
     }
@@ -181,6 +192,8 @@ void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, const lv_sty
  */
 lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+
     lv_canvas_ext_t * ext    = lv_obj_get_ext_attr(canvas);
     const lv_style_t * style = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
 
@@ -194,6 +207,8 @@ lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y)
  */
 lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * canvas)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
 
     return &ext->dsc;
@@ -207,6 +222,8 @@ lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * canvas)
  */
 const lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
 
     switch(type) {
@@ -233,6 +250,9 @@ const lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_
  */
 void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_NULL(to_copy);
+
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
     if(x + w >= ext->dsc.header.w || y + h >= ext->dsc.header.h) {
         LV_LOG_WARN("lv_canvas_copy_buf: x or y out of the canvas");
@@ -266,6 +286,9 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, l
 void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_coord_t offset_x, lv_coord_t offset_y,
                       int32_t pivot_x, int32_t pivot_y)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_NULL(img);
+
     lv_canvas_ext_t * ext_dst = lv_obj_get_ext_attr(canvas);
     const lv_style_t * style  = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
     int32_t sinma             = lv_trigo_sin(-angle);
@@ -430,6 +453,8 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
  */
 void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     uint32_t x = dsc->header.w * dsc->header.h;
@@ -453,6 +478,9 @@ void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color)
 void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t w, lv_coord_t h,
                          const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_NULL(style);
+
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     /* Create a dummy display to fool the lv_draw function.
@@ -514,6 +542,9 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w, const lv_style_t * style,
                          const char * txt, lv_label_align_t align)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_NULL(style);
+
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     /* Create a dummy display to fool the lv_draw function.
@@ -568,6 +599,9 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
  */
 void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_NULL(style);
+
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     /* Create a dummy display to fool the lv_draw function.
@@ -621,6 +655,9 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
  */
 void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_NULL(style);
+
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     /* Create a dummy display to fool the lv_draw function.
@@ -675,6 +712,9 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t 
  */
 void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_NULL(style);
+
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     /* Create a dummy display to fool the lv_draw function.
@@ -730,6 +770,9 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32
 void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t r, int32_t start_angle,
                         int32_t end_angle, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+    LV_ASSERT_NULL(style);
+
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     /* Create a dummy display to fool the lv_draw function.
@@ -790,16 +833,10 @@ static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * par
     /* Include the ancient signal function */
     res = ancestor_signal(canvas, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_canvas";
     }
 
     return res;

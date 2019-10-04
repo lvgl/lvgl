@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "lv_hal.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_refr.h"
@@ -118,7 +119,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 {
     lv_disp_t * disp = lv_ll_ins_head(&LV_GC_ROOT(_lv_disp_ll));
     if(!disp) {
-        lv_mem_assert(disp);
+        LV_ASSERT_MEM(disp);
         return NULL;
     }
 
@@ -137,7 +138,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
     disp->act_scr   = lv_obj_create(NULL, NULL); /*Create a default screen on the display*/
     disp->top_layer = lv_obj_create(NULL, NULL); /*Create top layer on the display*/
-    disp->sys_layer = lv_obj_create(NULL, NULL); /*Create top layer on the display*/
+    disp->sys_layer = lv_obj_create(NULL, NULL); /*Create sys layer on the display*/
     lv_obj_set_style(disp->top_layer, &lv_style_transp);
     lv_obj_set_style(disp->sys_layer, &lv_style_transp);
 
@@ -147,7 +148,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
     /*Create a refresh task*/
     disp->refr_task = lv_task_create(lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, LV_TASK_PRIO_MID, disp);
-    lv_mem_assert(disp->refr_task);
+    LV_ASSERT_MEM(disp->refr_task);
     if(disp->refr_task == NULL) return NULL;
 
     lv_task_ready(disp->refr_task); /*Be sure the screen will be refreshed immediately on start up*/

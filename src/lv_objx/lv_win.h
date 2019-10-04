@@ -91,9 +91,9 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Delete all children of the scrl object, without deleting scrl child.
- * @param obj pointer to an object
+ * @param win pointer to an object
  */
-void lv_win_clean(lv_obj_t * obj);
+void lv_win_clean(lv_obj_t * win);
 
 /*======================
  * Add/remove functions

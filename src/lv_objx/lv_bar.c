@@ -11,6 +11,7 @@
 #include "lv_bar.h"
 #if LV_USE_BAR != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_anim.h"
@@ -19,6 +20,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_bar"
 
 /**********************
  *      TYPEDEFS
@@ -61,7 +63,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_bar = lv_obj_create(par, copy);
-    lv_mem_assert(new_bar);
+    LV_ASSERT_MEM(new_bar);
     if(new_bar == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_bar);
@@ -69,7 +71,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the object type specific extended data*/
     lv_bar_ext_t * ext = lv_obj_allocate_ext_attr(new_bar, sizeof(lv_bar_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->min_value = 0;
@@ -130,6 +132,8 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_bar_set_value(lv_obj_t * bar, int16_t value, lv_anim_enable_t anim)
 {
+    LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION == 0
     anim = false;
 #endif
@@ -185,6 +189,8 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value, lv_anim_enable_t anim)
  */
 void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
 {
+    LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
+
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     if(ext->min_value == min && ext->max_value == max) return;
 
@@ -209,6 +215,8 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
  */
 void lv_bar_set_sym(lv_obj_t * bar, bool en)
 {
+    LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
+
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     ext->sym           = en ? 1 : 0;
 }
@@ -220,6 +228,8 @@ void lv_bar_set_sym(lv_obj_t * bar, bool en)
  */
 void lv_bar_set_anim_time(lv_obj_t * bar, uint16_t anim_time)
 {
+    LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     ext->anim_time     = anim_time;
@@ -237,6 +247,8 @@ void lv_bar_set_anim_time(lv_obj_t * bar, uint16_t anim_time)
  */
 void lv_bar_set_style(lv_obj_t * bar, lv_bar_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
+
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
 
     switch(type) {
@@ -259,6 +271,8 @@ void lv_bar_set_style(lv_obj_t * bar, lv_bar_style_t type, const lv_style_t * st
  */
 int16_t lv_bar_get_value(const lv_obj_t * bar)
 {
+    LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
+
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     /*If animated tell that it's already at the end value*/
 #if LV_USE_ANIMATION
@@ -275,6 +289,8 @@ int16_t lv_bar_get_value(const lv_obj_t * bar)
  */
 int16_t lv_bar_get_min_value(const lv_obj_t * bar)
 {
+    LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
+
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     return ext->min_value;
 }
@@ -286,6 +302,8 @@ int16_t lv_bar_get_min_value(const lv_obj_t * bar)
  */
 int16_t lv_bar_get_max_value(const lv_obj_t * bar)
 {
+    LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
+
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     return ext->max_value;
 }
@@ -297,6 +315,8 @@ int16_t lv_bar_get_max_value(const lv_obj_t * bar)
  */
 bool lv_bar_get_sym(lv_obj_t * bar)
 {
+    LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
+
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     return ext->sym ? true : false;
 }
@@ -308,6 +328,8 @@ bool lv_bar_get_sym(lv_obj_t * bar)
  */
 uint16_t lv_bar_get_anim_time(lv_obj_t * bar)
 {
+    LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
     return ext->anim_time;
@@ -325,6 +347,8 @@ uint16_t lv_bar_get_anim_time(lv_obj_t * bar)
  */
 const lv_style_t * lv_bar_get_style(const lv_obj_t * bar, lv_bar_style_t type)
 {
+    LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_bar_ext_t * ext       = lv_obj_get_ext_attr(bar);
 
@@ -495,17 +519,11 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(bar, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         const lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
         if(style_indic->body.shadow.width > bar->ext_draw_pad) bar->ext_draw_pad = style_indic->body.shadow.width;
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_bar";
     }
 
     return res;

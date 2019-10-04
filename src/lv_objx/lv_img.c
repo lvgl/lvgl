@@ -14,6 +14,7 @@
 #error "lv_img: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_img_decoder.h"
 #include "../lv_misc/lv_fs.h"
@@ -23,6 +24,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_img"
 
 /**********************
  *      TYPEDEFS
@@ -61,14 +63,14 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create a basic object*/
     new_img = lv_obj_create(par, copy);
-    lv_mem_assert(new_img);
+    LV_ASSERT_MEM(new_img);
     if(new_img == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_img);
 
     /*Extend the basic object to image object*/
     lv_img_ext_t * ext = lv_obj_allocate_ext_attr(new_img, sizeof(lv_img_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->src       = NULL;
@@ -121,6 +123,8 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_img_set_src(lv_obj_t * img, const void * src_img)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_src_t src_type = lv_img_src_get_type(src_img);
     lv_img_ext_t * ext    = lv_obj_get_ext_attr(img);
 
@@ -159,15 +163,20 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     } else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
         /* If the new and the old src are the same then it was only a refresh.*/
         if(ext->src != src_img) {
-            /*If memory was allocated because of the previous `src_type` then free it*/
+            const void * old_src = NULL;
+            /* If memory was allocated because of the previous `src_type` then save its pointer and free after allocation.
+             * It's important to allocate first to be sure the new data will be on a new address.
+             * Else `img_cache` wouldn't see the change in source.*/
             if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_SYMBOL) {
-                lv_mem_free(ext->src);
+                old_src = ext->src;
             }
             char * new_str = lv_mem_alloc(strlen(src_img) + 1);
-            lv_mem_assert(new_str);
+            LV_ASSERT_MEM(new_str);
             if(new_str == NULL) return;
             strcpy(new_str, src_img);
             ext->src = new_str;
+
+            if(old_src) lv_mem_free(old_src);
         }
     }
 
@@ -201,6 +210,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
  */
 void lv_img_set_auto_size(lv_obj_t * img, bool en)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     ext->auto_size = (en == false ? 0 : 1);
@@ -214,6 +225,8 @@ void lv_img_set_auto_size(lv_obj_t * img, bool en)
  */
 void lv_img_set_offset_x(lv_obj_t * img, lv_coord_t x)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     if(x < ext->w - 1) {
@@ -230,6 +243,8 @@ void lv_img_set_offset_x(lv_obj_t * img, lv_coord_t x)
  */
 void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     if(y < ext->h - 1) {
@@ -249,6 +264,8 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y)
  */
 const void * lv_img_get_src(lv_obj_t * img)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->src;
@@ -261,6 +278,8 @@ const void * lv_img_get_src(lv_obj_t * img)
  */
 const char * lv_img_get_file_name(const lv_obj_t * img)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     if(ext->src_type == LV_IMG_SRC_FILE)
@@ -276,6 +295,8 @@ const char * lv_img_get_file_name(const lv_obj_t * img)
  */
 bool lv_img_get_auto_size(const lv_obj_t * img)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->auto_size == 0 ? false : true;
@@ -288,6 +309,8 @@ bool lv_img_get_auto_size(const lv_obj_t * img)
  */
 lv_coord_t lv_img_get_offset_x(lv_obj_t * img)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->offset.x;
@@ -300,6 +323,8 @@ lv_coord_t lv_img_get_offset_x(lv_obj_t * img)
  */
 lv_coord_t lv_img_get_offset_y(lv_obj_t * img)
 {
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->offset.y;
@@ -385,6 +410,8 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     res = ancestor_signal(img, sign, param);
     if(res != LV_RES_OK) return res;
 
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
+
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     if(sign == LV_SIGNAL_CLEANUP) {
         if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_SYMBOL) {
@@ -397,13 +424,6 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         if(ext->src_type == LV_IMG_SRC_SYMBOL) {
             lv_img_set_src(img, ext->src);
         }
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_img";
     }
 
     return res;
