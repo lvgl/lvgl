@@ -98,12 +98,6 @@ typedef int16_t lv_coord_t;
 #  define LV_MEM_CUSTOM_GET_SIZE  your_mem_get_size      /*Wrapper to lv_mem_get_size*/
 #endif /* LV_ENABLE_GC */
 
-/* Export integer constant to binding.
- * This macro is used with constants in the form of LV_<CONST> that
- * should also appear on lvgl binding API such as Micropython
- */
-#define LV_EXPORT_CONST_INT(int_value)
-
 /*=======================
    Input device settings
  *=======================*/
@@ -201,6 +195,12 @@ typedef void * lv_img_decoder_user_data_t;
 /* Attribute to mark large constant arrays for example
  * font's bitmaps */
 #define LV_ATTRIBUTE_LARGE_CONST
+
+/* Export integer constant to binding.
+ * This macro is used with constants in the form of LV_<CONST> that
+ * should also appear on lvgl binding API such as Micropython
+ */
+#define LV_EXPORT_CONST_INT(int_value)
 
 /*===================
  *  HAL settings
