@@ -305,9 +305,14 @@ static inline uint32_t lv_color_to32(lv_color_t color)
 #elif LV_COLOR_DEPTH == 16
 #if LV_COLOR_16_SWAP == 0
     lv_color32_t ret;
-    ret.ch.red   = color.ch.red * 8;   /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
-    ret.ch.green = color.ch.green * 4; /*(2^8 - 1)/(2^6 - 1) = 255/63 = 4*/
-    ret.ch.blue  = color.ch.blue * 8;  /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
+    /**
+     * Per https://docs.google.com/spreadsheets/d/1PppX8FJpddauAPasHwlNgIPGIuPGPNvRbhilIQ8w-7g/edit#gid=0
+     * Truly any of the listed multipliers and adders would work.
+     * The below numbers seem the most precise.
+     */    
+    ret.ch.red   = ( color.ch.red * 33 - 3 ) >> 2; 
+    ret.ch.green = ( color.ch.green * 4 + 3 );
+    ret.ch.blue  = ( color.ch.blue * 33 - 3 ) >> 2;
     ret.ch.alpha = 0xFF;
     return ret.full;
 #else
