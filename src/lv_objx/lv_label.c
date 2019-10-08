@@ -182,7 +182,16 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 
     /*If text is NULL then refresh */
     if(text == NULL) {
+#if LV_USE_BIDI == 0
         lv_label_refr_text(label);
+#else
+        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
+        if(base_dir == LV_BIDI_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(text);
+
+        lv_bidi_process(ext->text_ori, ext->text, base_dir);
+        lv_label_refr_text(label);
+#endif
+
         return;
     }
 
@@ -214,7 +223,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
         strcpy(ext->text, text);
 #else
         ext->text_ori = lv_mem_alloc(len);
-        lv_mem_assert(ext->text_ori);
+        LV_ASSERT_MEM(ext->text_ori);
         if(ext->text_ori == NULL) return;
 
         strcpy(ext->text_ori, text);
@@ -1089,7 +1098,9 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
         }
     }
     else if(sign == LV_SIGNAL_BASE_DIR_CHG) {
+#if LV_USE_BIDI
         if(ext->static_txt == 0) lv_label_set_text(label, NULL);
+#endif
     } else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
