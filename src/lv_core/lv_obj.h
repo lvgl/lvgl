@@ -968,6 +968,18 @@ bool lv_obj_is_focused(const lv_obj_t * obj);
 
 #endif
 
+/*-------------------
+ * OTHER FUNCTIONS
+ *------------------*/
+
+/**
+ * Used in the signal callback to handle `LV_SIGNAL_GET_TYPE` signal
+ * @param buf pointer to `lv_obj_type_t`. (`param` i nteh signal callback)
+ * @param name name of the object. E.g. "lv_btn". (Only teh pointer is saved)
+ * @return LV_RES_OK
+ */
+lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name);
+
 /**********************
  *      MACROS
  **********************/

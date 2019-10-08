@@ -95,9 +95,9 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Delete all children of the scrl object, without deleting scrl child.
- * @param obj pointer to an object
+ * @param list pointer to an object
  */
-void lv_list_clean(lv_obj_t * obj);
+void lv_list_clean(lv_obj_t * list);
 
 /*======================
  * Add/remove functions
@@ -192,6 +192,13 @@ static inline void lv_list_set_anim_time(lv_obj_t * list, uint16_t anim_time)
  */
 void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t * style);
 
+/**
+ * Set layout of a list
+ * @param list pointer to a list object
+ * @param layout which layout should be used
+ */
+void lv_list_set_layout(lv_obj_t * list, lv_layout_t layout);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -261,6 +268,13 @@ uint16_t lv_list_get_size(const lv_obj_t * list);
  */
 lv_obj_t * lv_list_get_btn_selected(const lv_obj_t * list);
 #endif
+
+/**
+ * Get layout of a list
+ * @param list pointer to a list object
+ * @return layout of the list object
+ */
+lv_layout_t lv_list_get_layout(lv_obj_t * list);
 
 /**
  * Get the scroll bar mode of a list

@@ -50,6 +50,11 @@
 #define LV_COLOR_TRANSP    LV_COLOR_LIME         /*LV_COLOR_LIME: pure green*/
 #endif
 
+/* Enable chroma keying for indexed images. */
+#ifndef LV_INDEXED_CHROMA
+#define LV_INDEXED_CHROMA    1
+#endif
+
 /* Enable anti-aliasing (lines, and radiuses will be smoothed) */
 #ifndef LV_ANTIALIAS
 #define LV_ANTIALIAS        1
@@ -261,6 +266,14 @@
 #define LV_ATTRIBUTE_LARGE_CONST
 #endif
 
+/* Export integer constant to binding.
+ * This macro is used with constants in the form of LV_<CONST> that
+ * should also appear on lvgl binding API such as Micropython
+ */
+#ifndef LV_EXPORT_CONST_INT(int_value)
+#define LV_EXPORT_CONST_INT(int_value)
+#endif
+
 /*===================
  *  HAL settings
  *==================*/
@@ -306,6 +319,54 @@
 #  define LV_LOG_PRINTF   0
 #endif
 #endif  /*LV_USE_LOG*/
+
+/*=================
+ * Debug settings
+ *================*/
+
+/* If Debug is enabled LittelvGL validates the parameters of the functions.
+ * If an invalid parameter is found an error log message is printed and
+ * the MCU halts at the error. (`LV_USE_LOG` should be enabled)
+ * If you are debugging the MCU you can pause
+ * the debugger to see exactly where  the issue is.
+ *
+ * The behavior of asserts can be overwritten by redefining them here.
+ * E.g. #define LV_ASSERT_MEM(p)  <my_assert_code>
+ */
+#ifndef LV_USE_DEBUG
+#define LV_USE_DEBUG        1
+#endif
+#if LV_USE_DEBUG
+
+/*Check if the parameter is NULL. (Quite fast) */
+#ifndef LV_USE_ASSERT_NULL
+#define LV_USE_ASSERT_NULL      1
+#endif
+
+/*Checks is the memory is successfully allocated or no. (Quite fast)*/
+#ifndef LV_USE_ASSERT_MEM
+#define LV_USE_ASSERT_MEM       1
+#endif
+
+/* Check the strings.
+ * Search for NULL, very long strings, invalid characters, and unnatural repetitions. (Slow)
+ * If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled) */
+#ifndef LV_USE_ASSERT_STR
+#define LV_USE_ASSERT_STR       0
+#endif
+
+/* Check NULL, the object's type and existence (e.g. not deleted). (Quite slow)
+ * If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled) */
+#ifndef LV_USE_ASSERT_OBJ
+#define LV_USE_ASSERT_OBJ       0
+#endif
+
+/*Check if the styles are properly initialized. (Fast)*/
+#ifndef LV_USE_ASSERT_STYLE
+#define LV_USE_ASSERT_STYLE     1
+#endif
+
+#endif /*LV_USE_DEBUG*/
 
 /*================
  *  THEME USAGE
@@ -412,6 +473,21 @@
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 #endif
 
+ /* If a character is at least this long, will break wherever "prettiest" */
+#ifndef LV_TXT_LINE_BREAK_LONG_LEN
+ #define LV_TXT_LINE_BREAK_LONG_LEN          12
+#endif
+
+ /* Minimum number of characters of a word to put on a line before a break */
+#ifndef LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
+ #define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN  3
+#endif
+
+ /* Minimum number of characters of a word to put on a line after a break */
+#ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
+ #define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
+#endif
+
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
  * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
@@ -428,6 +504,22 @@
 #define LV_BIDI_BASE_DIR_DEF  LV_BIDI_DIR_AUTO
 #endif
 #endif
+
+/*Change the built in (v)snprintf functions*/
+#ifndef LV_SPRINTF_CUSTOM
+#define LV_SPRINTF_CUSTOM   0
+#endif
+#if LV_SPRINTF_CUSTOM
+#ifndef LV_SPRINTF_INCLUDE
+#  define LV_SPRINTF_INCLUDE <stdio.h>
+#endif
+#ifndef lv_snprintf
+#  define lv_snprintf     snprintf
+#endif
+#ifndef lv_vsnprintf
+#  define lv_vsnprintf    vsnprintf
+#endif
+#endif  /*LV_SPRINTF_CUSTOM*/
 
 /*===================
  *  LV_OBJ SETTINGS

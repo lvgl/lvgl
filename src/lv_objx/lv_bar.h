@@ -43,6 +43,11 @@ extern "C" {
 /** log2(LV_BAR_ANIM_STATE_END) used to normalize data*/
 #define LV_BAR_ANIM_STATE_NORM 8
 
+LV_EXPORT_CONST_INT(LV_BAR_ANIM_STATE_START);
+LV_EXPORT_CONST_INT(LV_BAR_ANIM_STATE_END);
+LV_EXPORT_CONST_INT(LV_BAR_ANIM_STATE_INV);
+LV_EXPORT_CONST_INT(LV_BAR_ANIM_STATE_NORM);
+
 /**********************
  *      TYPEDEFS
  **********************/

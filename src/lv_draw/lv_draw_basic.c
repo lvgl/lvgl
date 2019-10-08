@@ -259,6 +259,9 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     uint8_t bitmask_init;
     uint8_t bitmask;
 
+    /*bpp = 3 should be converted to bpp = 4 in lv_font_get_glyph_bitmap */
+    if(g.bpp == 3) g.bpp = 4;
+
     switch(g.bpp) {
         case 1:
             bpp_opa_table = bpp1_opa_table;

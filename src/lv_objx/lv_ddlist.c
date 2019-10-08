@@ -9,6 +9,7 @@
 #include "lv_ddlist.h"
 #if LV_USE_DDLIST != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_indev.h"
@@ -21,6 +22,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_ddlist"
+
 #if LV_USE_ANIMATION == 0
 #undef LV_DDLIST_DEF_ANIM_TIME
 #define LV_DDLIST_DEF_ANIM_TIME 0 /*No animation*/
@@ -74,7 +77,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor drop down list*/
     lv_obj_t * new_ddlist = lv_page_create(par, copy);
-    lv_mem_assert(new_ddlist);
+    LV_ASSERT_MEM(new_ddlist);
     if(new_ddlist == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_ddlist);
@@ -83,7 +86,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the drop down list type specific extended data*/
     lv_ddlist_ext_t * ext = lv_obj_allocate_ext_attr(new_ddlist, sizeof(lv_ddlist_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
@@ -164,6 +167,9 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_ddlist_set_options(lv_obj_t * ddlist, const char * options)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_STR(options);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     /*Count the '\n'-s to determine the number of options*/
@@ -197,6 +203,8 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char * options)
  */
 void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     if(ext->sel_opt_id == sel_opt) return;
 
@@ -218,6 +226,8 @@ void lv_ddlist_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
  */
 void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     if(ext->fix_height == h) return;
 
@@ -233,6 +243,8 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h)
  */
 void lv_ddlist_set_fix_width(lv_obj_t * ddlist, lv_coord_t w)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     if(w == 0) {
         lv_cont_set_fit2(ddlist, LV_FIT_TIGHT, lv_cont_get_fit_bottom(ddlist));
@@ -257,6 +269,8 @@ void lv_ddlist_set_fix_width(lv_obj_t * ddlist, lv_coord_t w)
  */
 void lv_ddlist_set_draw_arrow(lv_obj_t * ddlist, bool en)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     /*Set the flag*/
@@ -270,6 +284,8 @@ void lv_ddlist_set_draw_arrow(lv_obj_t * ddlist, bool en)
  */
 void lv_ddlist_set_stay_open(lv_obj_t * ddlist, bool en)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     /*Set the flag*/
@@ -284,6 +300,8 @@ void lv_ddlist_set_stay_open(lv_obj_t * ddlist, bool en)
  */
 void lv_ddlist_set_style(lv_obj_t * ddlist, lv_ddlist_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     switch(type) {
@@ -302,6 +320,8 @@ void lv_ddlist_set_style(lv_obj_t * ddlist, lv_ddlist_style_t type, const lv_sty
 
 void lv_ddlist_set_align(lv_obj_t * ddlist, lv_label_align_t align)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     lv_label_set_align(ext->label, align);
@@ -322,6 +342,8 @@ void lv_ddlist_set_align(lv_obj_t * ddlist, lv_label_align_t align)
  */
 const char * lv_ddlist_get_options(const lv_obj_t * ddlist)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     return lv_label_get_text(ext->label);
 }
@@ -333,6 +355,8 @@ const char * lv_ddlist_get_options(const lv_obj_t * ddlist)
  */
 uint16_t lv_ddlist_get_selected(const lv_obj_t * ddlist)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     return ext->sel_opt_id;
@@ -346,6 +370,8 @@ uint16_t lv_ddlist_get_selected(const lv_obj_t * ddlist)
  */
 void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf, uint16_t buf_size)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     uint16_t i;
@@ -376,6 +402,8 @@ void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf, uint16_t bu
  */
 lv_coord_t lv_ddlist_get_fix_height(const lv_obj_t * ddlist)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     return ext->fix_height;
 }
@@ -386,6 +414,8 @@ lv_coord_t lv_ddlist_get_fix_height(const lv_obj_t * ddlist)
  */
 bool lv_ddlist_get_draw_arrow(lv_obj_t * ddlist)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     return ext->draw_arrow ? true : false;
@@ -397,6 +427,8 @@ bool lv_ddlist_get_draw_arrow(lv_obj_t * ddlist)
  */
 bool lv_ddlist_get_stay_open(lv_obj_t * ddlist)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     return ext->stay_open ? true : false;
@@ -410,6 +442,8 @@ bool lv_ddlist_get_stay_open(lv_obj_t * ddlist)
  */
 const lv_style_t * lv_ddlist_get_style(const lv_obj_t * ddlist, lv_ddlist_style_t type)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     switch(type) {
@@ -581,9 +615,14 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
                 new_style.text.color = sel_style->text.color;
                 new_style.text.opa   = sel_style->text.opa;
                 lv_area_t area_arrow;
-                area_arrow.x2 = ddlist->coords.x2 - style->body.padding.right;
-                area_arrow.x1 = area_arrow.x2 -
-                                lv_txt_get_width(LV_SYMBOL_DOWN, strlen(LV_SYMBOL_DOWN), sel_style->text.font, 0, 0);
+                lv_coord_t arrow_width = lv_txt_get_width(LV_SYMBOL_DOWN, strlen(LV_SYMBOL_DOWN), sel_style->text.font, 0, 0);
+                if(lv_label_get_align(ext->label) != LV_LABEL_ALIGN_RIGHT) {
+                    area_arrow.x2 = ddlist->coords.x2 - style->body.padding.right;
+                    area_arrow.x1 = area_arrow.x2 - arrow_width;
+                } else {
+                    area_arrow.x1 = ddlist->coords.x1 + style->body.padding.left;
+                    area_arrow.x2 = area_arrow.x1 + arrow_width;
+                }
 
                 area_arrow.y1 = ddlist->coords.y1 + style->text.line_space;
                 area_arrow.y2 = area_arrow.y1 + font_h;
@@ -618,6 +657,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
     /* Include the ancient signal function */
     res = ancestor_signal(ddlist, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
@@ -705,13 +745,6 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable       = true;
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_ddlist";
     }
 
     return res;

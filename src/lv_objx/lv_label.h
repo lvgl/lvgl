@@ -21,6 +21,7 @@ extern "C" {
 
 #if LV_USE_LABEL != 0
 
+#include <stdarg.h>
 #include "../lv_core/lv_obj.h"
 #include "../lv_font/lv_font.h"
 #include "../lv_font/lv_symbol_def.h"
@@ -33,6 +34,10 @@ extern "C" {
 #define LV_LABEL_DOT_NUM 3
 #define LV_LABEL_POS_LAST 0xFFFF
 #define LV_LABEL_TEXT_SEL_OFF 0xFFFF
+
+LV_EXPORT_CONST_INT(LV_LABEL_DOT_NUM);
+LV_EXPORT_CONST_INT(LV_LABEL_POS_LAST);
+LV_EXPORT_CONST_INT(LV_LABEL_TEXT_SEL_OFF);
 
 /**********************
  *      TYPEDEFS
@@ -129,6 +134,13 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param text '\0' terminated character string. NULL to refresh with the current text.
  */
 void lv_label_set_text(lv_obj_t * label, const char * text);
+
+/**
+ * Set a new formatted text for a label. Memory will be allocated to store the text by the label.
+ * @param label pointer to a label object
+ * @param fmt `printf`-like format
+ */
+void lv_label_set_text_fmt(lv_obj_t * label, const char * fmt, ...);
 
 /**
  * Set a new text for a label from a character array. The array don't has to be '\0' terminated.
