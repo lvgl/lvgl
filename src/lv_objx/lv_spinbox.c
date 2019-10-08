@@ -381,20 +381,19 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
 
     char buf[LV_SPINBOX_MAX_DIGIT_COUNT + 8];
     memset(buf, 0, sizeof(buf));
-    char* buf_p = buf;
-    int i;
-    
+    char * buf_p = buf;
+
     if (ext->range_min < 0) { // hide sign if there are only positive values
-       
         /*Add the sign*/
         (*buf_p) = ext->value >= 0 ? '+' : '-';
         buf_p++;
+    }
 
-        /*padding left*/
-        for (i = 0; i < ext->digit_padding_left; i++) {
-            (*buf_p) = ' ';
-            buf_p++;
-        }
+    int i;
+    /*padding left*/
+    for(i = 0; i < ext->digit_padding_left; i++) {
+        (*buf_p) = ' ';
+        buf_p++;
     }
 
     char digits[64];
