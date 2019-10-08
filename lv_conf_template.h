@@ -297,6 +297,19 @@ typedef void * lv_font_user_data_t;
  /*Can break (wrap) texts on these chars*/
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 
+/* Support bidirectional texts.
+ * Allows mixing Left-to-Right and Right-to-Left texts.
+ * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
+ * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
+#define LV_USE_BIDI     1
+#if LV_USE_BIDI
+/* Set the default direction. Supported values:
+ * `LV_BIDI_DIR_LTR` Left-to-Right
+ * `LV_BIDI_DIR_RTL` Right-to-Left
+ * `LV_BIDI_DIR_AUTO` detect texts base direction */
+#define LV_BIDI_BASE_DIR_DEF  LV_BIDI_DIR_AUTO
+#endif
+
 /*===================
  *  LV_OBJ SETTINGS
  *==================*/

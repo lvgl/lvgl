@@ -10,6 +10,8 @@
 #include <stddef.h>
 #include "lv_txt.h"
 
+#if LV_USE_BIDI
+
 /*********************
  *      DEFINES
  *********************/
@@ -62,7 +64,6 @@ void lv_bidi_process(const char * str_in, char * str_out, lv_bidi_dir_t base_dir
         if(dir != LV_BIDI_DIR_NEUTRAL) break;
     }
 
-    /*if there were neutrals in the beginning apply `base_dir` on them */
     if(rd && str_in[rd] != '\0') lv_txt_encoded_prev(str_in, &rd);
 
     if(rd) {
@@ -110,6 +111,21 @@ void lv_bidi_process(const char * str_in, char * str_out, lv_bidi_dir_t base_dir
 
 }
 
+lv_bidi_dir_t lv_bidi_detect_base_dir(const char * txt)
+{
+    uint32_t i = 0;
+    uint32_t letter;
+    while(txt[i] != '\0') {
+        letter = lv_txt_encoded_next(txt, &i);
+
+        lv_bidi_dir_t dir;
+        dir = lv_bidi_get_letter_dir(letter);
+        if(dir == LV_BIDI_DIR_RTL || dir == LV_BIDI_DIR_LTR) return dir;
+    }
+
+    /*If there were no strong char earlier return with the default base dir */
+    return LV_BIDI_BASE_DIR_DEF;
+}
 
 lv_bidi_dir_t lv_bidi_get_letter_dir(uint32_t letter)
 {
@@ -279,7 +295,6 @@ static uint32_t char_change_to_pair(uint32_t letter)
     }
 
     return letter;
-
-
 }
 
+#endif /*LV_USE_BIDI*/

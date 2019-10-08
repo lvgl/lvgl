@@ -49,6 +49,7 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
 static void report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
+static void base_dir_refr_children(lv_obj_t * obj);
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static void lv_obj_del_async_cb(void * obj);
 static bool lv_obj_design(lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
@@ -204,6 +205,16 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale_en = 0;
         new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->parent_event = 0;
+#if LV_USE_BIDI
+#if LV_BIDI_BASE_DIR_DEF == LV_BIDI_DIR_LTR || LV_BIDI_BASE_DIR_DEF == LV_BIDI_DIR_RTL || LV_BIDI_BASE_DIR_DEF == LV_BIDI_DIR_AUTO
+        new_obj->base_dir     = LV_BIDI_BASE_DIR_DEF;
+#else
+#error "`LV_BIDI_BASE_DIR_DEF` should be `LV_BASE_DIR_LTR` or `LV_BASE_DIR_RTL` (See lv_conf.h)"
+#endif
+#else
+        new_obj->base_dir     = LV_BIDI_DIR_LTR;
+#endif
+
         new_obj->reserved     = 0;
 
         new_obj->ext_attr = NULL;
@@ -288,6 +299,12 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->opa_scale_en = 0;
         new_obj->parent_event = 0;
+#if LV_USE_BIDI
+        new_obj->base_dir     = LV_BIDI_DIR_INHERIT;
+#else
+        new_obj->base_dir     = LV_BIDI_DIR_LTR;
+#endif
+        new_obj->reserved     = 0;
 
         new_obj->ext_attr = NULL;
     }
@@ -1266,6 +1283,23 @@ void lv_obj_set_parent_event(lv_obj_t * obj, bool en)
     obj->parent_event = (en == true ? 1 : 0);
 }
 
+void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
+{
+    if(dir != LV_BIDI_DIR_LTR && dir != LV_BIDI_DIR_RTL &&
+       dir != LV_BIDI_DIR_AUTO && dir != LV_BIDI_DIR_INHERIT) {
+
+        LV_LOG_WARN("lv_obj_set_base_dir: invalid base dir");
+        return;
+    }
+
+    obj->base_dir = dir;
+    lv_signal_send(obj, LV_SIGNAL_BASE_DIR_CHG, NULL);
+
+    /* Notify the children about the parent base dir has changed.
+     * (The children might have `LV_BIDI_DIR_INHERIT`)*/
+    base_dir_refr_children(obj);
+}
+
 /**
  * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
  * @param obj pointer to an object
@@ -1931,6 +1965,25 @@ bool lv_obj_get_parent_event(const lv_obj_t * obj)
     return obj->parent_event == 0 ? false : true;
 }
 
+
+lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
+{
+#if LV_USE_BIDI
+    const lv_obj_t * parent = obj;
+
+    while(parent) {
+        if(parent->base_dir != LV_BIDI_DIR_INHERIT) return parent->base_dir;
+
+        parent = lv_obj_get_parent(parent);
+    }
+
+    return LV_BIDI_BASE_DIR_DEF;
+#else
+    return LV_BIDI_DIR_LTR;
+#endif
+}
+
+
 /**
  * Get the opa scale enable parameter
  * @param obj pointer to an object
@@ -2325,6 +2378,22 @@ static void delete_children(lv_obj_t * obj)
     if(obj->ext_attr != NULL) lv_mem_free(obj->ext_attr);
     lv_mem_free(obj); /*Free the object itself*/
 }
+
+static void base_dir_refr_children(lv_obj_t * obj)
+{
+    lv_obj_t * child;
+    child = lv_obj_get_child(obj, NULL);
+
+    while(child) {
+        if(child->base_dir == LV_BIDI_DIR_INHERIT) {
+            lv_signal_send(child, LV_SIGNAL_BASE_DIR_CHG, NULL);
+            base_dir_refr_children(child);
+        }
+
+        child = lv_obj_get_child(obj, child);
+    }
+}
+
 
 static void lv_event_mark_deleted(lv_obj_t * obj)
 {

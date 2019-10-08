@@ -55,6 +55,7 @@ enum {
     LV_LABEL_ALIGN_LEFT, /**< Align text to left */
     LV_LABEL_ALIGN_CENTER, /**< Align text to center */
     LV_LABEL_ALIGN_RIGHT, /**< Align text to right */
+    LV_LABEL_ALIGN_AUTO, /**< Use LEFT or RIGHT depending on the direction of the text (LTR/RTL)*/
 };
 typedef uint8_t lv_label_align_t;
 
@@ -63,12 +64,17 @@ typedef struct
 {
     /*Inherited from 'base_obj' so no inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
-    char * text; /*Text of the label*/
+    char * text;        /*Text of the label*/
+
+#if LV_USE_BIDI
+    char * text_ori;    /*The original text. With BiDi `text` stores the characters in "bidi" ordered text*/
+#endif
+
     union
     {
         char * tmp_ptr; /* Pointer to the allocated memory containing the character which are replaced by dots (Handled
                            by the library)*/
-        char tmp[sizeof(char *)]; /* Directly store the characters if <=4 characters */
+        char tmp[LV_LABEL_DOT_NUM + 1]; /* Directly store the characters if <=4 characters */
     } dot;
     uint16_t dot_end;  /*The text end position in dot mode (Handled by the library)*/
     lv_point_t offset; /*Text draw position offset*/

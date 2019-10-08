@@ -180,7 +180,8 @@ void lv_ddlist_set_options(lv_obj_t * ddlist, const char * options)
 
     lv_ddlist_refr_width(ddlist);
 
-    switch(lv_label_get_align(ext->label)) {
+    lv_label_align_t align = lv_label_get_align(ext->label);
+    switch(align) {
         case LV_LABEL_ALIGN_LEFT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0); break;
         case LV_LABEL_ALIGN_CENTER: lv_obj_align(ext->label, NULL, LV_ALIGN_CENTER, 0, 0); break;
         case LV_LABEL_ALIGN_RIGHT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0); break;
@@ -621,6 +622,15 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
+        lv_ddlist_refr_size(ddlist, 0);
+    } else if(sign == LV_SIGNAL_BASE_DIR_CHG) {
+        lv_label_align_t align = lv_label_get_align(ext->label);
+        switch(align) {
+            case LV_LABEL_ALIGN_LEFT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0); break;
+            case LV_LABEL_ALIGN_CENTER: lv_obj_align(ext->label, NULL, LV_ALIGN_CENTER, 0, 0); break;
+            case LV_LABEL_ALIGN_RIGHT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0); break;
+        }
+
         lv_ddlist_refr_size(ddlist, 0);
     } else if(sign == LV_SIGNAL_CLEANUP) {
         ext->label = NULL;
