@@ -493,7 +493,7 @@
  * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
  * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
 #ifndef LV_USE_BIDI
-#define LV_USE_BIDI     1
+#define LV_USE_BIDI     0
 #endif
 #if LV_USE_BIDI
 /* Set the default direction. Supported values:
