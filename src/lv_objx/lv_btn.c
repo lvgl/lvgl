@@ -337,7 +337,7 @@ uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn)
 {
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-    return ext->ink_in_time;
+    return ext->ink_out_time;
 #else
     (void)btn; /*Unused*/
     return 0;
