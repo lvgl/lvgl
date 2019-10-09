@@ -115,8 +115,8 @@ bool lv_bidi_letter_is_weak(uint32_t letter)
 
 bool lv_bidi_letter_is_rtl(uint32_t letter)
 {
-//     if(letter >= 0x7f && letter <= 0x2000) return true;
      if(letter >= 0x5d0 && letter <= 0x5ea) return true;
+    if(letter == 0x202E) return true;               /*Unicode of LV_BIDI_RLO*/
 //    if(letter >= 'a' && letter <= 'z') return true;
 
     return false;
@@ -159,7 +159,7 @@ static void process_paragraph(const char * str_in, char * str_out, uint32_t len,
     while(rd < len) {
         uint32_t letter = lv_txt_encoded_next(str_in, &rd);
         dir = lv_bidi_get_letter_dir(letter);
-        if(dir != LV_BIDI_DIR_NEUTRAL) break;
+        if(dir != LV_BIDI_DIR_NEUTRAL && dir != LV_BIDI_DIR_WEAK) break;
     }
 
     if(rd && str_in[rd] != '\0') lv_txt_encoded_prev(str_in, &rd);
@@ -170,7 +170,7 @@ static void process_paragraph(const char * str_in, char * str_out, uint32_t len,
             wr += rd;
         } else {
             wr -= rd;
-            memcpy(&str_out[wr], str_in, rd);
+            rtl_reverse(&str_out[wr], str_in, rd);
         }
         memcpy(print_buf, str_in, rd);
         print_buf[rd] = '\0';
@@ -230,7 +230,7 @@ static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint
     letter = lv_txt_encoded_next(txt, NULL);
     lv_bidi_dir_t dir = lv_bidi_get_letter_dir(letter);
 
-    /*Find the first strong char. Skip the neutrals.*/
+    /*Find the first strong char. Skip the neutrals*/
     while(dir == LV_BIDI_DIR_NEUTRAL || dir == LV_BIDI_DIR_WEAK) {
         letter = lv_txt_encoded_next(txt, &i);
         dir = lv_bidi_get_letter_dir(letter);

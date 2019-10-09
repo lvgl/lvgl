@@ -186,7 +186,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
         lv_label_refr_text(label);
 #else
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
-        if(base_dir == LV_BIDI_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(text);
+        if(base_dir == LV_BIDI_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(ext->text_ori);
 
         lv_bidi_process(ext->text_ori, ext->text, base_dir);
         lv_label_refr_text(label);
