@@ -225,11 +225,13 @@ static bool lv_line_design(lv_obj_t * line, const lv_area_t * mask, lv_design_mo
         uint16_t i;
 
         lv_style_t circle_style_tmp; /*If rounded...*/
-        lv_style_copy(&circle_style_tmp, style);
-        circle_style_tmp.body.radius     = LV_RADIUS_CIRCLE;
-        circle_style_tmp.body.main_color = style->line.color;
-        circle_style_tmp.body.grad_color = style->line.color;
-        circle_style_tmp.body.opa        = style->line.opa;
+        if(style->line.rounded) {
+            lv_style_copy(&circle_style_tmp, style);
+            circle_style_tmp.body.radius     = LV_RADIUS_CIRCLE;
+            circle_style_tmp.body.main_color = style->line.color;
+            circle_style_tmp.body.grad_color = style->line.color;
+            circle_style_tmp.body.opa        = style->line.opa;
+        }
         lv_area_t circle_area;
 
         /*Read all points and draw the lines*/
