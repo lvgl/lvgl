@@ -23,6 +23,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_bidi_dir_t base_dir);
+static uint32_t get_next_paragraph(const char * txt);
 static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint32_t * len);
 static void rtl_reverse(char * dest, const char * src, uint32_t len);
 static uint32_t char_change_to_pair(uint32_t letter);
@@ -41,73 +43,33 @@ static uint32_t char_change_to_pair(uint32_t letter);
 
 void lv_bidi_process(const char * str_in, char * str_out, lv_bidi_dir_t base_dir)
 {
-    printf("Input str: \"%s\"\n", str_in);
+    printf("\nInput str: \"%s\"\n", str_in);
 
-    char print_buf[256];
 
-    uint32_t run_len = 0;
-    lv_bidi_dir_t run_dir;
-    uint32_t rd = 0;
-    uint32_t wr;
-    uint32_t in_len = strlen(str_in);
-    if(base_dir == LV_BIDI_DIR_RTL) wr = in_len;
-    else wr = 0;
+    uint32_t par_start = 0;
+    uint32_t par_len;
 
-    str_out[in_len] = '\0';
-
-    lv_bidi_dir_t dir = base_dir;
-
-    /*Process neutral chars in the beginning*/
-    while(str_in[rd] != '\0') {
-        uint32_t letter = lv_txt_encoded_next(str_in, &rd);
-        dir = lv_bidi_get_letter_dir(letter);
-        if(dir != LV_BIDI_DIR_NEUTRAL) break;
+    while(str_in[par_start] == '\n' || str_in[par_start] == '\r') {
+        str_out[par_start] = str_in[par_start];
+        par_start ++;
     }
 
-    if(rd && str_in[rd] != '\0') lv_txt_encoded_prev(str_in, &rd);
+    while(str_in[par_start] != '\0') {
+        par_len = get_next_paragraph(&str_in[par_start]);
+        process_paragraph(&str_in[par_start], &str_out[par_start], par_len, base_dir);
+        par_start += par_len;
 
-    if(rd) {
-        if(base_dir == LV_BIDI_DIR_LTR) {
-            memcpy(&str_out[wr], str_in, rd);
-            wr += rd;
-        } else {
-            wr -= rd;
-            memcpy(&str_out[wr], str_in, rd);
+        while(str_in[par_start] == '\n' || str_in[par_start] == '\r') {
+            str_out[par_start] = str_in[par_start];
+            par_start ++;
         }
-        memcpy(print_buf, str_in, rd);
-        print_buf[rd] = '\0';
-        printf("%s: \"%s\"\n", base_dir == LV_BIDI_DIR_LTR ? "LTR" : "RTL", print_buf);
     }
 
-    /*Get and process the runs*/
-    while(str_in[rd] != '\0') {
-        run_dir = get_next_run(&str_in[rd], base_dir, &run_len);
+    str_out[par_start] = '\0';
 
-        memcpy(print_buf, &str_in[rd], run_len);
-        print_buf[run_len] = '\0';
-        if(run_dir == LV_BIDI_DIR_LTR) {
-            printf("%s: \"%s\"\n", "LTR" , print_buf);
-        } else {
-            printf("%s: \"%s\" -> ", "RTL" , print_buf);
+    printf("\nOutput str: \"%s\"\n", str_out);
 
-            rtl_reverse(print_buf, &str_in[rd], run_len);
-            printf("\"%s\"\n", print_buf);
-        }
 
-        if(base_dir == LV_BIDI_DIR_LTR) {
-            if(run_dir == LV_BIDI_DIR_LTR)  memcpy(&str_out[wr], &str_in[rd], run_len);
-            else rtl_reverse(&str_out[wr], &str_in[rd], run_len);
-           wr += run_len;
-       } else {
-           wr -= run_len;
-           if(run_dir == LV_BIDI_DIR_LTR)  memcpy(&str_out[wr], &str_in[rd], run_len);
-           else rtl_reverse(&str_out[wr], &str_in[rd], run_len);
-       }
-
-        rd += run_len;
-    }
-
-    printf("result: %s\n", str_out);
 
 }
 
@@ -176,6 +138,90 @@ bool lv_bidi_letter_is_neutral(uint32_t letter)
  *   STATIC FUNCTIONS
  **********************/
 
+static void process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_bidi_dir_t base_dir)
+{
+    printf("new paragraph\n");
+
+    char print_buf[256];
+
+    uint32_t run_len = 0;
+    lv_bidi_dir_t run_dir;
+    uint32_t rd = 0;
+    uint32_t wr;
+    if(base_dir == LV_BIDI_DIR_RTL) wr = len;
+    else wr = 0;
+
+    str_out[len] = '\0';
+
+    lv_bidi_dir_t dir = base_dir;
+
+    /*Process neutral chars in the beginning*/
+    while(rd < len) {
+        uint32_t letter = lv_txt_encoded_next(str_in, &rd);
+        dir = lv_bidi_get_letter_dir(letter);
+        if(dir != LV_BIDI_DIR_NEUTRAL) break;
+    }
+
+    if(rd && str_in[rd] != '\0') lv_txt_encoded_prev(str_in, &rd);
+
+    if(rd) {
+        if(base_dir == LV_BIDI_DIR_LTR) {
+            memcpy(&str_out[wr], str_in, rd);
+            wr += rd;
+        } else {
+            wr -= rd;
+            memcpy(&str_out[wr], str_in, rd);
+        }
+        memcpy(print_buf, str_in, rd);
+        print_buf[rd] = '\0';
+        printf("%s: \"%s\"\n", base_dir == LV_BIDI_DIR_LTR ? "LTR" : "RTL", print_buf);
+    }
+
+    /*Get and process the runs*/
+    while(rd < len) {
+        run_dir = get_next_run(&str_in[rd], base_dir, &run_len);
+
+        memcpy(print_buf, &str_in[rd], run_len);
+        print_buf[run_len] = '\0';
+        if(run_dir == LV_BIDI_DIR_LTR) {
+            printf("%s: \"%s\"\n", "LTR" , print_buf);
+        } else {
+            printf("%s: \"%s\" -> ", "RTL" , print_buf);
+
+            rtl_reverse(print_buf, &str_in[rd], run_len);
+            printf("\"%s\"\n", print_buf);
+        }
+
+        if(base_dir == LV_BIDI_DIR_LTR) {
+            if(run_dir == LV_BIDI_DIR_LTR)  memcpy(&str_out[wr], &str_in[rd], run_len);
+            else rtl_reverse(&str_out[wr], &str_in[rd], run_len);
+           wr += run_len;
+       } else {
+           wr -= run_len;
+           if(run_dir == LV_BIDI_DIR_LTR)  memcpy(&str_out[wr], &str_in[rd], run_len);
+           else rtl_reverse(&str_out[wr], &str_in[rd], run_len);
+       }
+
+        rd += run_len;
+    }
+
+    printf("result: %s\n", str_out);
+
+}
+
+static uint32_t get_next_paragraph(const char * txt)
+{
+    uint32_t i = 0;
+
+    lv_txt_encoded_next(txt, &i);
+
+    while(txt[i] != '\0' && txt[i] != '\n' && txt[i] != '\r') {
+        lv_txt_encoded_next(txt, &i);
+    }
+
+    return i;
+}
+
 static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint32_t * len)
 {
     uint32_t i = 0;
@@ -188,7 +234,7 @@ static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint
     while(dir == LV_BIDI_DIR_NEUTRAL || dir == LV_BIDI_DIR_WEAK) {
         letter = lv_txt_encoded_next(txt, &i);
         dir = lv_bidi_get_letter_dir(letter);
-        if(txt[i] == '\0') {
+        if(txt[i] == '\0' || txt[i] == '\n' || txt[i] == '\r') {
             *len = i;
             return base_dir;
         }
@@ -201,7 +247,7 @@ static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint
 
     /*Find the next char which has different direction*/
     lv_bidi_dir_t next_dir = base_dir;
-    while(txt[i] != '\0') {
+    while(txt[i] != '\0'&& txt[i] != '\n' && txt[i] != '\r') {
         letter = lv_txt_encoded_next(txt, &i);
         next_dir  = lv_bidi_get_letter_dir(letter);
 
