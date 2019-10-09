@@ -659,13 +659,14 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t 
     lv_refr_set_disp_refreshing(&disp);
 
     lv_style_t circle_style_tmp; /*If rounded...*/
-    lv_style_copy(&circle_style_tmp, style);
-    circle_style_tmp.body.radius     = LV_RADIUS_CIRCLE;
-    circle_style_tmp.body.main_color = style->line.color;
-    circle_style_tmp.body.grad_color = style->line.color;
-    circle_style_tmp.body.opa        = style->line.opa;
+    if(style->line.rounded) {
+        lv_style_copy(&circle_style_tmp, style);
+        circle_style_tmp.body.radius     = LV_RADIUS_CIRCLE;
+        circle_style_tmp.body.main_color = style->line.color;
+        circle_style_tmp.body.grad_color = style->line.color;
+        circle_style_tmp.body.opa        = style->line.opa;
+    }
     lv_area_t circle_area;
-
     uint32_t i;
     for(i = 0; i < point_cnt - 1; i++) {
         lv_draw_line(&points[i], &points[i + 1], &mask, style, LV_OPA_COVER);
