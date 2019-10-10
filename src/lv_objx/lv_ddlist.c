@@ -131,6 +131,11 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SEL, &lv_style_plain_color);
             lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SB, &lv_style_pretty_color);
         }
+
+        if(lv_obj_get_base_dir(new_ddlist) == LV_BIDI_DIR_RTL) {
+            lv_obj_set_x(new_ddlist, lv_obj_get_width(par) - lv_obj_get_width(new_ddlist));
+        }
+
     }
     /*Copy an existing drop down list*/
     else {

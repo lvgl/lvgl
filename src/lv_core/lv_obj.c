@@ -1800,8 +1800,11 @@ lv_coord_t lv_obj_get_x(const lv_obj_t * obj)
 
     lv_coord_t rel_x;
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    rel_x             = obj->coords.x1 - parent->coords.x1;
-
+    if(parent) {
+        rel_x             = obj->coords.x1 - parent->coords.x1;
+    } else {
+        rel_x = obj->coords.x1;
+    }
     return rel_x;
 }
 
@@ -1816,8 +1819,11 @@ lv_coord_t lv_obj_get_y(const lv_obj_t * obj)
 
     lv_coord_t rel_y;
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    rel_y             = obj->coords.y1 - parent->coords.y1;
-
+   if(parent) {
+       rel_y             = obj->coords.y1 - parent->coords.y1;
+   } else {
+       rel_y = obj->coords.y1;
+   }
     return rel_y;
 }
 
