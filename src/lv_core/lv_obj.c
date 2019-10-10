@@ -235,11 +235,22 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->par = parent; /*Set the parent*/
         lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
 
+#if LV_USE_BIDI
+        new_obj->base_dir     = LV_BIDI_DIR_INHERIT;
+#else
+        new_obj->base_dir     = LV_BIDI_DIR_LTR;
+#endif
+
         /*Set coordinates left top corner of parent*/
-        new_obj->coords.x1    = parent->coords.x1;
         new_obj->coords.y1    = parent->coords.y1;
-        new_obj->coords.x2    = parent->coords.x1 + LV_OBJ_DEF_WIDTH;
         new_obj->coords.y2    = parent->coords.y1 + LV_OBJ_DEF_HEIGHT;
+        if(lv_obj_get_base_dir(new_obj) == LV_BIDI_DIR_RTL) {
+            new_obj->coords.x2    = parent->coords.x2;
+            new_obj->coords.x1    = parent->coords.x2 - LV_OBJ_DEF_WIDTH;
+        } else {
+            new_obj->coords.x1    = parent->coords.x1;
+            new_obj->coords.x2    = parent->coords.x1 + LV_OBJ_DEF_WIDTH;
+        }
         new_obj->ext_draw_pad = 0;
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
@@ -302,11 +313,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->opa_scale_en = 0;
         new_obj->parent_event = 0;
-#if LV_USE_BIDI
-        new_obj->base_dir     = LV_BIDI_DIR_INHERIT;
-#else
-        new_obj->base_dir     = LV_BIDI_DIR_LTR;
-#endif
         new_obj->reserved     = 0;
 
         new_obj->ext_attr = NULL;
@@ -741,8 +747,12 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     lv_obj_get_coords(obj, &ori);
 
     /*Set the length and height*/
-    obj->coords.x2 = obj->coords.x1 + w - 1;
     obj->coords.y2 = obj->coords.y1 + h - 1;
+    if(lv_obj_get_base_dir(obj) == LV_BIDI_DIR_RTL) {
+        obj->coords.x1 = obj->coords.x2 - w + 1;
+    } else {
+        obj->coords.x2 = obj->coords.x1 + w - 1;
+    }
 
     /*Send a signal to the object with its new coordinates*/
     obj->signal_cb(obj, LV_SIGNAL_CORD_CHG, &ori);
