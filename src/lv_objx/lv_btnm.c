@@ -644,7 +644,6 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-
         ancestor_design_f(btnm, mask, mode);
 
         lv_btnm_ext_t * ext         = lv_obj_get_ext_attr(btnm);
@@ -665,6 +664,10 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
         lv_txt_flag_t txt_flag = LV_TXT_FLAG_NONE;
 
         if(ext->recolor) txt_flag = LV_TXT_FLAG_RECOLOR;
+#if LV_USE_BIDI
+        char * bidi_buf = lv_mem_alloc(64);
+        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(btnm);
+#endif
 
         for(btn_i = 0; btn_i < ext->btn_cnt; btn_i++, txt_i++) {
             /*Search the next valid text in the map*/
@@ -734,9 +737,24 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
             area_tmp.x2 = area_tmp.x1 + txt_size.x;
             area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
+#if LV_USE_BIDI == 0
             lv_draw_label(&area_tmp, mask, btn_style, opa_scale, ext->map_p[txt_i], txt_flag, NULL, -1, -1, NULL);
+#else
+            uint32_t txt_len = strlen(ext->map_p[txt_i]) + 1;
+            if(txt_len > lv_mem_get_size(bidi_buf)) {
+                bidi_buf = lv_mem_realloc(bidi_buf, txt_len);
+            }
+
+            lv_bidi_process(ext->map_p[txt_i], bidi_buf, base_dir);
+            lv_draw_label(&area_tmp, mask, btn_style, opa_scale, bidi_buf, txt_flag, NULL, -1, -1, NULL);
+#endif
         }
+
+#if LV_USE_BIDI
+        lv_mem_free(bidi_buf);
+#endif
     }
+
     return true;
 }
 

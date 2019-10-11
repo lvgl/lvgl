@@ -71,10 +71,6 @@ typedef struct
     /*New data for this type */
     char * text;        /*Text of the label*/
 
-#if LV_USE_BIDI
-    char * text_ori;    /*The original text. With BiDi `text` stores the characters in "bidi" ordered text*/
-#endif
-
     union
     {
         char * tmp_ptr; /* Pointer to the allocated memory containing the character which are replaced by dots (Handled

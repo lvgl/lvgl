@@ -43,8 +43,10 @@ static uint32_t char_change_to_pair(uint32_t letter);
 
 void lv_bidi_process(const char * str_in, char * str_out, lv_bidi_dir_t base_dir)
 {
-    printf("\nInput str: \"%s\"\n", str_in);
 
+    if(base_dir == LV_BIDI_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(str_in);
+
+    printf("\nInput str: \"%s\"\n", str_in);
 
     uint32_t par_start = 0;
     uint32_t par_len;
@@ -68,9 +70,6 @@ void lv_bidi_process(const char * str_in, char * str_out, lv_bidi_dir_t base_dir
     str_out[par_start] = '\0';
 
     printf("\nOutput str: \"%s\"\n", str_out);
-
-
-
 }
 
 lv_bidi_dir_t lv_bidi_detect_base_dir(const char * txt)
@@ -86,7 +85,8 @@ lv_bidi_dir_t lv_bidi_detect_base_dir(const char * txt)
     }
 
     /*If there were no strong char earlier return with the default base dir */
-    return LV_BIDI_BASE_DIR_DEF;
+    if(LV_BIDI_BASE_DIR_DEF == LV_BIDI_DIR_AUTO) return LV_BIDI_DIR_LTR;
+    else return LV_BIDI_BASE_DIR_DEF;
 }
 
 lv_bidi_dir_t lv_bidi_get_letter_dir(uint32_t letter)

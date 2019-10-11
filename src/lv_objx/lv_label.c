@@ -182,16 +182,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 
     /*If text is NULL then refresh */
     if(text == NULL) {
-#if LV_USE_BIDI == 0
         lv_label_refr_text(label);
-#else
-        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
-        if(base_dir == LV_BIDI_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(ext->text_ori);
-
-        lv_bidi_process(ext->text_ori, ext->text, base_dir);
-        lv_label_refr_text(label);
-#endif
-
         return;
     }
 
@@ -208,11 +199,6 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
         if(ext->text != NULL && ext->static_txt == 0) {
             lv_mem_free(ext->text);
             ext->text = NULL;
-
-#if LV_USE_BIDI
-            lv_mem_free(ext->text_ori);
-            ext->text_ori = NULL;
-#endif
         }
 
         ext->text = lv_mem_alloc(len);
@@ -222,16 +208,8 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 #if LV_USE_BIDI == 0
         strcpy(ext->text, text);
 #else
-        ext->text_ori = lv_mem_alloc(len);
-        LV_ASSERT_MEM(ext->text_ori);
-        if(ext->text_ori == NULL) return;
-
-        strcpy(ext->text_ori, text);
-
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
-        if(base_dir == LV_BIDI_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(text);
-
-        lv_bidi_process(ext->text_ori, ext->text, base_dir);
+        lv_bidi_process(text, ext->text, base_dir);
 #endif
         /*Now the text is dynamically allocated*/
         ext->static_txt = 0;
@@ -622,7 +600,10 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
-    if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
+
+    lv_label_align_t align = lv_label_get_align(label);
+    if(align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
+    if(align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
 
     /*If the width will be expanded  the set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND) {
@@ -654,12 +635,12 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
 
     if(index != line_start) x += style->text.letter_space;
 
-    if(ext->align == LV_LABEL_ALIGN_CENTER) {
+    if(align == LV_LABEL_ALIGN_CENTER) {
         lv_coord_t line_w;
         line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, style->text.letter_space, flag);
         x += lv_obj_get_width(label) / 2 - line_w / 2;
 
-    } else if(ext->align == LV_LABEL_ALIGN_RIGHT) {
+    } else if(align == LV_LABEL_ALIGN_RIGHT) {
         lv_coord_t line_w;
         line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, style->text.letter_space, flag);
 
@@ -694,7 +675,10 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
-    if(ext->align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
+
+    lv_label_align_t align = lv_label_get_align(label);
+    if(align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
+    if(align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND) {
@@ -713,10 +697,15 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 
     /*Calculate the x coordinate*/
     lv_coord_t x = 0;
-    if(ext->align == LV_LABEL_ALIGN_CENTER) {
+    if(align == LV_LABEL_ALIGN_CENTER) {
         lv_coord_t line_w;
         line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, style->text.letter_space, flag);
         x += lv_obj_get_width(label) / 2 - line_w / 2;
+    }
+    else if(align == LV_LABEL_ALIGN_RIGHT) {
+        lv_coord_t line_w;
+        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, style->text.letter_space, flag);
+        x += lv_obj_get_width(label) - line_w;
     }
 
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
@@ -1192,11 +1181,12 @@ static void lv_label_refr_text(lv_obj_t * label)
     /*In roll inf. mode keep the size but start offset animations*/
     else if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
 #if LV_USE_ANIMATION
+        lv_label_align_t align = lv_label_get_align(label);
+
         lv_anim_t anim;
         anim.var      = label;
         anim.repeat   = 1;
         anim.playback = 0;
-        anim.start    = 0;
         anim.act_time = -(((lv_font_get_glyph_width(style->text.font, ' ', ' ') + style->text.letter_space) * 1000) /
                           ext->anim_speed) *
                         LV_LABEL_WAIT_CHAR_COUNT;
@@ -1207,7 +1197,14 @@ static void lv_label_refr_text(lv_obj_t * label)
 
         bool hor_anim = false;
         if(size.x > lv_obj_get_width(label)) {
-            anim.end     = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+            if(align == LV_LABEL_ALIGN_RIGHT) {
+                anim.end    = 0;
+                anim.start     = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+            } else {
+                anim.start    = 0;
+                anim.end     = -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+            }
+
             anim.exec_cb = (lv_anim_exec_xcb_t)lv_label_set_offset_x;
             anim.time    = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
             lv_anim_create(&anim);
@@ -1219,7 +1216,14 @@ static void lv_label_refr_text(lv_obj_t * label)
         }
 
         if(size.y > lv_obj_get_height(label) && hor_anim == false) {
-            anim.end     = -size.y - (lv_font_get_line_height(font));
+            if(align == LV_LABEL_ALIGN_RIGHT) {
+                  anim.end    = 0;
+                  anim.start     = -size.y - (lv_font_get_line_height(font));
+              } else {
+                  anim.start    = 0;
+                  anim.end     = -size.y - (lv_font_get_line_height(font));
+              }
+
             anim.exec_cb = (lv_anim_exec_xcb_t)lv_label_set_offset_y;
             anim.time    = lv_anim_speed_to_time(ext->anim_speed, anim.start, anim.end);
             lv_anim_create(&anim);
