@@ -196,6 +196,12 @@ typedef void * lv_img_decoder_user_data_t;
  * font's bitmaps */
 #define LV_ATTRIBUTE_LARGE_CONST
 
+/* Export integer constant to binding.
+ * This macro is used with constants in the form of LV_<CONST> that
+ * should also appear on lvgl binding API such as Micropython
+ */
+#define LV_EXPORT_CONST_INT(int_value)
+
 /*===================
  *  HAL settings
  *==================*/

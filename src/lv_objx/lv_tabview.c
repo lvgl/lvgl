@@ -746,21 +746,19 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         }
 
         if(sign == LV_SIGNAL_FOCUS) {
+
+
             lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
             /*With ENCODER select the first button only in edit mode*/
             if(indev_type == LV_INDEV_TYPE_ENCODER) {
 #if LV_USE_GROUP
                 lv_group_t * g = lv_obj_get_group(tabview);
                 if(lv_group_get_editing(g)) {
-                    lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
-                    btnm_ext->btn_id_pr      = 0;
-                    lv_obj_invalidate(ext->btns);
+                    lv_btnm_set_pressed(ext->btns, ext->tab_cur);
                 }
 #endif
             } else {
-                lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
-                btnm_ext->btn_id_pr      = 0;
-                lv_obj_invalidate(ext->btns);
+                lv_btnm_set_pressed(ext->btns, ext->tab_cur);
             }
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {

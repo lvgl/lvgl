@@ -34,6 +34,9 @@ extern "C" {
 /**Automatically calculate the tick length*/
 #define LV_CHART_TICK_LENGTH_AUTO 255
 
+LV_EXPORT_CONST_INT(LV_CHART_POINT_DEF);
+LV_EXPORT_CONST_INT(LV_CHART_TICK_LENGTH_AUTO);
+
 /**********************
  *      TYPEDEFS
  **********************/
