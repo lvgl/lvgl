@@ -29,6 +29,9 @@ extern "C" {
 #define LV_COORD_MAX ((lv_coord_t)((uint32_t)((uint32_t)1 << (8 * sizeof(lv_coord_t) - 1)) - 1000))
 #define LV_COORD_MIN (-LV_COORD_MAX)
 
+LV_EXPORT_CONST_INT(LV_COORD_MAX);
+LV_EXPORT_CONST_INT(LV_COORD_MIN);
+
 /**********************
  *      TYPEDEFS
  **********************/

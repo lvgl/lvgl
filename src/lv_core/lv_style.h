@@ -25,6 +25,8 @@ extern "C" {
 #define LV_RADIUS_CIRCLE (LV_COORD_MAX) /**< A very big radius to always draw as circle*/
 #define LV_STYLE_DEGUG_SENTINEL_VALUE 0x12345678
 
+LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
+
 /**********************
  *      TYPEDEFS
  **********************/

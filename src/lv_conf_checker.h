@@ -266,6 +266,14 @@
 #define LV_ATTRIBUTE_LARGE_CONST
 #endif
 
+/* Export integer constant to binding.
+ * This macro is used with constants in the form of LV_<CONST> that
+ * should also appear on lvgl binding API such as Micropython
+ */
+#ifndef LV_EXPORT_CONST_INT
+#define LV_EXPORT_CONST_INT(int_value)
+#endif
+
 /*===================
  *  HAL settings
  *==================*/

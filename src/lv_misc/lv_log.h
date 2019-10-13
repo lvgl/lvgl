@@ -26,13 +26,14 @@ extern "C" {
 
 /*Possible log level. For compatibility declare it independently from `LV_USE_LOG`*/
 
-#define LV_LOG_LEVEL_TRACE 0 /**< A lot of logs to give detailed information*/
-#define LV_LOG_LEVEL_INFO 1  /**< Log important events*/
-#define LV_LOG_LEVEL_WARN 2  /**< Log if something unwanted happened but didn't caused problem*/
-#define LV_LOG_LEVEL_ERROR 3 /**< Only critical issue, when the system may fail*/
-#define LV_LOG_LEVEL_NONE 4 /**< Do not log anything*/
-#define _LV_LOG_LEVEL_NUM 5 /**< Number of log levels */
-
+enum {
+    LV_LOG_LEVEL_TRACE = 0,  /**< A lot of logs to give detailed information*/
+    LV_LOG_LEVEL_INFO  = 1,   /**< Log important events*/
+    LV_LOG_LEVEL_WARN  = 2,   /**< Log if something unwanted happened but didn't caused problem*/
+    LV_LOG_LEVEL_ERROR = 3,  /**< Only critical issue, when the system may fail*/
+    LV_LOG_LEVEL_NONE  = 4,   /**< Do not log anything*/
+    _LV_LOG_LEVEL_NUM  = 5    /**< Number of log levels */
+};
 typedef int8_t lv_log_level_t;
 
 #if LV_USE_LOG
