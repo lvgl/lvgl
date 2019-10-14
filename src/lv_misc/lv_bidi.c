@@ -46,8 +46,6 @@ void lv_bidi_process(const char * str_in, char * str_out, lv_bidi_dir_t base_dir
 
     if(base_dir == LV_BIDI_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(str_in);
 
-    printf("\nInput str: \"%s\"\n", str_in);
-
     uint32_t par_start = 0;
     uint32_t par_len;
 
@@ -68,8 +66,6 @@ void lv_bidi_process(const char * str_in, char * str_out, lv_bidi_dir_t base_dir
     }
 
     str_out[par_start] = '\0';
-
-    printf("\nOutput str: \"%s\"\n", str_out);
 }
 
 lv_bidi_dir_t lv_bidi_detect_base_dir(const char * txt)
@@ -140,10 +136,6 @@ bool lv_bidi_letter_is_neutral(uint32_t letter)
 
 static void process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_bidi_dir_t base_dir)
 {
-    printf("new paragraph\n");
-
-    char print_buf[256];
-
     uint32_t run_len = 0;
     lv_bidi_dir_t run_dir;
     uint32_t rd = 0;
@@ -172,25 +164,11 @@ static void process_paragraph(const char * str_in, char * str_out, uint32_t len,
             wr -= rd;
             rtl_reverse(&str_out[wr], str_in, rd);
         }
-        memcpy(print_buf, str_in, rd);
-        print_buf[rd] = '\0';
-        printf("%s: \"%s\"\n", base_dir == LV_BIDI_DIR_LTR ? "LTR" : "RTL", print_buf);
     }
 
     /*Get and process the runs*/
     while(rd < len) {
         run_dir = get_next_run(&str_in[rd], base_dir, &run_len);
-
-        memcpy(print_buf, &str_in[rd], run_len);
-        print_buf[run_len] = '\0';
-        if(run_dir == LV_BIDI_DIR_LTR) {
-            printf("%s: \"%s\"\n", "LTR" , print_buf);
-        } else {
-            printf("%s: \"%s\" -> ", "RTL" , print_buf);
-
-            rtl_reverse(print_buf, &str_in[rd], run_len);
-            printf("\"%s\"\n", print_buf);
-        }
 
         if(base_dir == LV_BIDI_DIR_LTR) {
             if(run_dir == LV_BIDI_DIR_LTR)  memcpy(&str_out[wr], &str_in[rd], run_len);
@@ -204,9 +182,6 @@ static void process_paragraph(const char * str_in, char * str_out, uint32_t len,
 
         rd += run_len;
     }
-
-    printf("result: %s\n", str_out);
-
 }
 
 static uint32_t get_next_paragraph(const char * txt)
