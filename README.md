@@ -396,3 +396,4 @@ It should be useful to read the
 If you are pleased with the library, found it useful, or you are happy with the support you got, please help its further development:
 
 [![Donate](https://littlevgl.com/donate_dir/donate_btn.png)](https://littlevgl.com/donate)
+final
