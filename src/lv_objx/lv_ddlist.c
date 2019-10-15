@@ -113,12 +113,20 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_drag(scrl, false);
         lv_page_set_scrl_fit2(new_ddlist, LV_FIT_FILL, LV_FIT_TIGHT);
 
+        lv_coord_t x;
+        if(lv_obj_get_base_dir(new_ddlist) == LV_BIDI_DIR_RTL) x = lv_obj_get_x(new_ddlist) + lv_obj_get_width(new_ddlist);
+        else x = lv_obj_get_x(new_ddlist);
+
         ext->label = lv_label_create(new_ddlist, NULL);
         lv_cont_set_fit2(new_ddlist, LV_FIT_TIGHT, LV_FIT_NONE);
         lv_page_set_sb_mode(new_ddlist, LV_SB_MODE_HIDE);
         lv_page_set_style(new_ddlist, LV_PAGE_STYLE_SCRL, &lv_style_transp_tight);
 
         lv_ddlist_set_options(new_ddlist, "Option 1\nOption 2\nOption 3");
+
+
+        if(lv_obj_get_base_dir(new_ddlist) == LV_BIDI_DIR_RTL) lv_obj_set_x(new_ddlist, x - lv_obj_get_width(new_ddlist));
+        else lv_obj_set_x(new_ddlist, x);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
@@ -132,9 +140,6 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_SB, &lv_style_pretty_color);
         }
 
-        if(lv_obj_get_base_dir(new_ddlist) == LV_BIDI_DIR_RTL) {
-            lv_obj_set_x(new_ddlist, lv_obj_get_width(par) - lv_obj_get_width(new_ddlist));
-        }
 
     }
     /*Copy an existing drop down list*/
@@ -995,11 +1000,20 @@ static void lv_ddlist_pos_current_option(lv_obj_t * ddlist)
  */
 static void lv_ddlist_refr_width(lv_obj_t * ddlist)
 {
+
+    /*Save the current x coordinate because it should be kept after the refrsh*/
+    lv_coord_t x;
+    if(lv_obj_get_base_dir(ddlist) == LV_BIDI_DIR_RTL) x = lv_obj_get_x(ddlist) + lv_obj_get_width(ddlist);
+    else x = lv_obj_get_x(ddlist);
+
     /*Set the TIGHT fit horizontally the set the width to the content*/
     lv_page_set_scrl_fit2(ddlist, LV_FIT_TIGHT, lv_page_get_scrl_fit_bottom(ddlist));
 
     /*Revert FILL fit to fill the parent with the options area. It allows to RIGHT/CENTER align the text*/
     lv_page_set_scrl_fit2(ddlist, LV_FIT_FILL, lv_page_get_scrl_fit_bottom(ddlist));
+
+    if(lv_obj_get_base_dir(ddlist) == LV_BIDI_DIR_RTL) lv_obj_set_x(ddlist, x - lv_obj_get_width(ddlist));
+    else lv_obj_set_x(ddlist, x);
 }
 
 #endif

@@ -147,7 +147,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_TGL_PR, th->style.tabview.btn.tgl_pr);
         } else {
             lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BG, &lv_style_plain);
-            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_BG, &lv_style_transp);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_BG, &lv_style_pretty);//transp);
             lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_INDIC, &lv_style_plain_color);
         }
     }
@@ -222,8 +222,8 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_obj_t * h = lv_page_create(ext->content, NULL);
     lv_obj_set_size(h, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
     lv_page_set_sb_mode(h, LV_SB_MODE_AUTO);
-    lv_page_set_style(h, LV_PAGE_STYLE_BG, &lv_style_transp);
-    lv_page_set_style(h, LV_PAGE_STYLE_SCRL, &lv_style_transp);
+    lv_page_set_style(h, LV_PAGE_STYLE_BG, &lv_style_transp_tight);
+    lv_page_set_style(h, LV_PAGE_STYLE_SCRL, &lv_style_transp);//plain_color);
 
     if(page_signal == NULL) page_signal = lv_obj_get_signal_cb(h);
     if(page_scrl_signal == NULL) page_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(h));
@@ -400,7 +400,13 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
         case LV_TABVIEW_BTNS_POS_TOP:
         case LV_TABVIEW_BTNS_POS_BOTTOM:
             indic_size = lv_obj_get_width(ext->indic);
-            indic_pos  = indic_size * id + tabs_style->body.padding.inner * id + tabs_style->body.padding.left;
+            if(lv_obj_get_base_dir(tabview) == LV_BIDI_DIR_RTL) {
+                uint16_t id_rtl = (ext->tab_cnt - (id + 1));
+                printf("id:%d, id_Rtl:%d\n", id, id_rtl);
+                indic_pos  = indic_size * id_rtl  + tabs_style->body.padding.inner * id_rtl + tabs_style->body.padding.left;
+            } else {
+                indic_pos  = indic_size * id + tabs_style->body.padding.inner * id + tabs_style->body.padding.left;
+            }
             break;
         case LV_TABVIEW_BTNS_POS_LEFT:
         case LV_TABVIEW_BTNS_POS_RIGHT:

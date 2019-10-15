@@ -846,8 +846,8 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                     tmp->coords.x2 += style_scrl->body.padding.left;
                 }
                 else if((tmp->coords.x2 == page->coords.x2) && (fit_right == LV_FIT_TIGHT || fit_right == LV_FIT_FILL)) {
-                    tmp->coords.x1 -= style_scrl->body.padding.right * 2 + style_bg->body.padding.right;
-                    tmp->coords.x2 -= style_scrl->body.padding.right * 2 + style_bg->body.padding.right;
+                    tmp->coords.x1 -= style_scrl->body.padding.right + style_bg->body.padding.right;
+                    tmp->coords.x2 -= style_scrl->body.padding.right + style_bg->body.padding.right;
                 }
                 if((tmp->coords.y1 == page->coords.y1) && (fit_top == LV_FIT_TIGHT || fit_top == LV_FIT_FILL)) {
                     tmp->coords.y1 += style_scrl->body.padding.top;
