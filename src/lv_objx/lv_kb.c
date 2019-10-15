@@ -131,6 +131,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
         lv_btnm_set_map(new_kb, kb_map_lc);
         lv_btnm_set_ctrl_map(new_kb, kb_ctrl_lc_map);
+        lv_obj_set_base_dir(new_kb, LV_BIDI_DIR_LTR);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();

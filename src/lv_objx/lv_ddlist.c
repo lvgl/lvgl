@@ -113,6 +113,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_drag(scrl, false);
         lv_page_set_scrl_fit2(new_ddlist, LV_FIT_FILL, LV_FIT_TIGHT);
 
+        /*Save (a later restore) the original X coordinate because it changes as the FITs applies*/
         lv_coord_t x;
         if(lv_obj_get_base_dir(new_ddlist) == LV_BIDI_DIR_RTL) x = lv_obj_get_x(new_ddlist) + lv_obj_get_width(new_ddlist);
         else x = lv_obj_get_x(new_ddlist);
@@ -124,7 +125,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_ddlist_set_options(new_ddlist, "Option 1\nOption 2\nOption 3");
 
-
+        /*Restore the original X coordinate*/
         if(lv_obj_get_base_dir(new_ddlist) == LV_BIDI_DIR_RTL) lv_obj_set_x(new_ddlist, x - lv_obj_get_width(new_ddlist));
         else lv_obj_set_x(new_ddlist, x);
 

@@ -207,6 +207,8 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
             btn_h = lv_obj_get_height(btnm)- act_y - style_bg->body.padding.bottom - 1;
         }
 
+        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(btnm);
+
         /*Only deal with the non empty lines*/
         if(btn_cnt != 0) {
             /*Calculate the width of all units*/
@@ -214,7 +216,8 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
 
             /*Set the button size and positions and set the texts*/
             uint16_t i;
-            lv_coord_t act_x = style_bg->body.padding.left;
+            lv_coord_t act_x;
+
             lv_coord_t act_unit_w;
             unit_act_cnt = 0;
             for(i = 0; i < btn_cnt; i++) {
@@ -225,9 +228,13 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
                 act_unit_w--; /*-1 because e.g. width = 100 means 101 pixels (0..100)*/
 
                 /*Always recalculate act_x because of rounding errors */
-                act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner +
-                        style_bg->body.padding.left;
-
+                if(base_dir == LV_BIDI_DIR_RTL)  {
+                    act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner;
+                    act_x = lv_obj_get_width(btnm) - style_bg->body.padding.right - act_x - act_unit_w - 1;
+                } else {
+                    act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner +
+                            style_bg->body.padding.left;
+                }
                 /* Set the button's area.
                  * If inner padding is zero then use the prev. button x2 as x1 to avoid rounding
                  * errors*/
