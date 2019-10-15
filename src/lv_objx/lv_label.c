@@ -904,7 +904,18 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt)
         pos = lv_txt_get_encoded_length(ext->text);
     }
 
+#if LV_USE_BIDI
+    char * bidi_buf = lv_mem_alloc(ins_len) + 1;
+    LV_ASSERT_MEM(bidi_buf);
+    if(bidi_buf == NULL) return;
+
+    lv_bidi_process(txt, bidi_buf, lv_obj_get_base_dir(label));
+    lv_txt_ins(ext->text, pos, bidi_buf);
+
+    lv_mem_free(bidi_buf);
+#else
     lv_txt_ins(ext->text, pos, txt);
+#endif
 
     lv_label_refr_text(label);
 }
