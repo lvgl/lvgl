@@ -1,4 +1,4 @@
-/**
+/**lip
  * @file lv_draw_line.c
  *
  */
@@ -59,9 +59,19 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
     if(style->line.width == 0) return;
     if(point1->x == point2->x && point1->y == point2->y) return;
 
-    if(point1->y == point2->y) draw_line_hor(point1, point2, clip, style, opa_scale);
-    else if(point1->x == point2->x) draw_line_ver(point1, point2, clip, style, opa_scale);
-    else draw_line_skew(point1, point2, clip, style, opa_scale);
+    lv_area_t clip_line;
+    clip_line.x1 = LV_MATH_MIN(point1->x, point2->x) - style->line.width/2;
+    clip_line.x2 = LV_MATH_MAX(point1->x, point2->x) + style->line.width/2;
+    clip_line.y1 = LV_MATH_MIN(point1->y, point2->y) - style->line.width/2;
+    clip_line.y2 = LV_MATH_MAX(point1->y, point2->y) + style->line.width/2;
+
+    bool is_common;
+    is_common = lv_area_intersect(&clip_line, &clip_line, clip);
+    if(!is_common) return;
+
+    if(point1->y == point2->y) draw_line_hor(point1, point2, &clip_line, style, opa_scale);
+    else if(point1->x == point2->x) draw_line_ver(point1, point2, &clip_line, style, opa_scale);
+    else draw_line_skew(point1, point2, &clip_line, style, opa_scale);
 }
 
 /**********************
@@ -71,13 +81,13 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
 static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
         const lv_style_t * style, lv_opa_t opa_scale)
 {
-    lv_opa_t opa = style->body.opa;
+    lv_opa_t opa = style->line.opa;
+    if(opa_scale != LV_OPA_COVER) opa = (opa * opa_scale) >> 8;
 
     lv_disp_t * disp    = lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
 
     const lv_area_t * disp_area = &vdb->area;
-    lv_color_t * disp_buf = vdb->buf_act;
 
     lv_coord_t w = style->line.width - 1;
     lv_coord_t w_half0 = w >> 1;
@@ -95,7 +105,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
     /*If there is no mask then simply draw a rectangle*/
     if(other_mask_cnt == 0) {
         lv_blend_fill(clip, &draw_area,
-                style->line.color, NULL, LV_DRAW_MASK_RES_FULL_COVER, style->line.opa,
+                style->line.color, NULL, LV_DRAW_MASK_RES_FULL_COVER,opa,
                 LV_BLEND_MODE_NORMAL);
     }
     /*If there other mask apply it*/
@@ -130,7 +140,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
 
              lv_blend_fill(clip, &fill_area,
                       style->line.color, mask_buf, mask_res, style->line.opa,
-                      LV_BLEND_MODE_NORMAL);
+                      style->line.blend_mode);
 
              fill_area.y1++;
              fill_area.y2++;
@@ -142,13 +152,13 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
 static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
         const lv_style_t * style, lv_opa_t opa_scale)
 {
-    lv_opa_t opa = style->body.opa;
+    lv_opa_t opa = style->line.opa;
+    if(opa_scale != LV_OPA_COVER) opa = (opa * opa_scale) >> 8;
 
     lv_disp_t * disp    = lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
 
     const lv_area_t * disp_area = &vdb->area;
-    lv_color_t * disp_buf = vdb->buf_act;
 
     lv_coord_t w = style->line.width - 1;
     lv_coord_t w_half0 = w >> 1;
@@ -167,8 +177,8 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
     if(other_mask_cnt == 0) {
 
         lv_blend_fill(clip, &draw_area,
-                style->line.color,  NULL, LV_DRAW_MASK_RES_FULL_COVER, style->line.opa,
-                LV_BLEND_MODE_NORMAL);
+                style->line.color,  NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
+                style->line.blend_mode);
     }
     /*If there other mask apply it*/
     else {
@@ -214,7 +224,8 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
 static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
         const lv_style_t * style, lv_opa_t opa_scale)
 {
-    lv_opa_t opa = style->body.opa;
+    lv_opa_t opa = style->line.opa;
+    if(opa_scale != LV_OPA_COVER) opa = (opa * opa_scale) >> 8;
 
     /*Keep the great y in p1*/
     lv_point_t p1;
@@ -295,7 +306,6 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
 
     const lv_area_t * disp_area = &vdb->area;
-    lv_color_t * disp_buf = vdb->buf_act;
 
     /*Store the coordinates of the `draw_a` relative to the VDB */
     draw_area.x1 -= disp_area->x1;
@@ -321,8 +331,8 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
          mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
          lv_blend_fill(clip, &fill_area,
-                 style->line.color, mask_buf, mask_res, style->line.opa,
-                 LV_BLEND_MODE_NORMAL);
+                 style->line.color, mask_buf, mask_res, opa,
+                 style->line.blend_mode);
 
          fill_area.y1++;
          fill_area.y2++;

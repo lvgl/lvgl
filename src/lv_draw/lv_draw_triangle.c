@@ -36,16 +36,26 @@
 /**
  *
  * @param points pointer to an array with 3 points
- * @param mask the triangle will be drawn only in this mask
+ * @param clip the triangle will be drawn only in this mask
  * @param style style for of the triangle
  * @param opa_scale scale down all opacities by the factor (0..255)
  */
-void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
+void lv_draw_triangle(const lv_point_t * points, const lv_area_t * clip, const lv_style_t * style, lv_opa_t opa_scale)
 {
+
+    lv_area_t clip_tri;
+    clip_tri.x1 = LV_MATH_MIN(LV_MATH_MIN(points[0].x, points[1].x), points[2].x);
+    clip_tri.x2 = LV_MATH_MAX(LV_MATH_MAX(points[0].x, points[1].x), points[2].x);
+    clip_tri.y1 = LV_MATH_MIN(LV_MATH_MIN(points[0].y, points[1].y), points[2].y);
+    clip_tri.y2 = LV_MATH_MAX(LV_MATH_MAX(points[0].y, points[1].y), points[2].y);
+
+    bool is_common;
+    is_common = lv_area_intersect(&clip_tri, &clip_tri, clip);
+    if(!is_common) return;
+
     lv_draw_mask_line_side_t side_right;
     lv_draw_mask_line_side_t side_left;
     lv_draw_mask_line_side_t side_bottom;
-
 
     /*Find the lowest point*/
     lv_coord_t y_min = points[0].y;
@@ -111,7 +121,7 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
     int16_t id_bottom = lv_draw_mask_add(&p_bottom, NULL);
 
 
-    lv_draw_rect(mask, mask, style, opa_scale);
+    lv_draw_rect(&clip_tri, &clip_tri, style, opa_scale);
 
     lv_draw_mask_remove_id(id_right);
     lv_draw_mask_remove_id(id_left);
@@ -130,7 +140,20 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
 void lv_draw_polygon(const lv_point_t * points, uint32_t point_cnt, const lv_area_t * mask, const lv_style_t * style,
                      lv_opa_t opa_scale)
 {
+    if(point_cnt < 3) return;
+    if(points == NULL) return;
 
+    uint32_t i;
+    lv_point_t tri[3];
+    tri[0].x = points[0].x;
+    tri[0].y = points[0].y;
+    for(i = 0; i < point_cnt - 1; i++) {
+        tri[1].x = points[i].x;
+        tri[1].y = points[i].y;
+        tri[2].x = points[i + 1].x;
+        tri[2].y = points[i + 1].y;
+        lv_draw_triangle(tri, mask, style, opa_scale);
+    }
 }
 
 /**********************

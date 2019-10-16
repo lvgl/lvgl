@@ -570,15 +570,7 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
         p[1].x = cx + ((r-cir_w) * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
         p[1].y = cy + ((r-cir_w) * lv_trigo_sin(i+ 90) >> LV_TRIGO_SHIFT);
 
-        lv_area_t mask_sub;
-        mask_sub.x1 = LV_MATH_MIN(p[0].x, p[1].x) - style.line.width/2;
-        mask_sub.x2 = LV_MATH_MAX(p[0].x, p[1].x) + style.line.width/2;
-        mask_sub.y1 = LV_MATH_MIN(p[0].y, p[1].y) - style.line.width/2;
-        mask_sub.y2 = LV_MATH_MAX(p[0].y, p[1].y) + style.line.width/2;
-
-        if(lv_area_intersect(&mask_sub, mask, &mask_sub)) {
-            lv_draw_line(&p[0], &p[1], &mask_sub, &style, opa_scale);
-        }
+        lv_draw_line(&p[0], &p[1], mask, &style, opa_scale);
     }
 
 

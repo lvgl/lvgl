@@ -30,11 +30,11 @@ extern "C" {
 /**
  *
  * @param points pointer to an array with 3 points
- * @param mask the triangle will be drawn only in this mask
+ * @param clip the triangle will be drawn only in this mask
  * @param style style for of the triangle
  * @param opa_scale scale down all opacities by the factor (0..255)
  */
-void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
+void lv_draw_triangle(const lv_point_t * points, const lv_area_t * clip, const lv_style_t * style, lv_opa_t opa_scale);
 
 /**
  * Draw a polygon from triangles. Only convex polygons are supported
