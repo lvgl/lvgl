@@ -143,7 +143,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_TGL_PR, th->style.tabview.btn.tgl_pr);
         } else {
             lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BG, &lv_style_plain);
-            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_BG, &lv_style_transp);
+            lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_BTN_BG, &lv_style_pretty);//transp);
             lv_tabview_set_style(new_tabview, LV_TABVIEW_STYLE_INDIC, &lv_style_plain_color);
         }
     }
@@ -319,6 +319,10 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 
     ext->tab_cur = id;
 
+    if(lv_obj_get_base_dir(tabview) == LV_BIDI_DIR_RTL) {
+        id = (ext->tab_cnt - (id + 1));
+    }
+
     lv_coord_t cont_x;
 
     switch(ext->btns_pos) {
@@ -357,6 +361,11 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
         lv_anim_create(&a);
     }
 #endif
+
+    lv_bidi_dir_t base_dir = lv_obj_get_base_dir(tabview);
+
+    if(base_dir == LV_BIDI_DIR_RTL) id = ext->tab_cnt - id - 1;
+
 
     /*Move the indicator*/
     const lv_style_t * tabs_style = lv_obj_get_style(ext->btns);
@@ -741,7 +750,6 @@ static lv_res_t tabview_scrl_signal(lv_obj_t * tabview_scrl, lv_signal_t sign, v
         if(res != LV_RES_OK) return res;
 
     }
-
     return res;
 }
 

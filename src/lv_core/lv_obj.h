@@ -28,6 +28,7 @@ extern "C" {
 #include "../lv_misc/lv_ll.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_log.h"
+#include "../lv_misc/lv_bidi.h"
 #include "../lv_hal/lv_hal.h"
 
 /*********************
@@ -121,7 +122,8 @@ enum {
     LV_SIGNAL_CHILD_CHG, /**< Child was removed/added */
     LV_SIGNAL_CORD_CHG, /**< Object coordinates/size have changed */
     LV_SIGNAL_PARENT_SIZE_CHG, /**< Parent's size has changed */
-    LV_SIGNAL_STYLE_CHG, /**< Object's style has changed */
+    LV_SIGNAL_STYLE_CHG,    /**< Object's style has changed */
+    LV_SIGNAL_BASE_DIR_CHG, /**<The base dir has changed*/
     LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
     LV_SIGNAL_GET_TYPE, /**< LittlevGL needs to retrieve the object's type */
 
@@ -135,6 +137,7 @@ enum {
     LV_SIGNAL_DRAG_BEGIN,	
     LV_SIGNAL_DRAG_THROW_BEGIN,
     LV_SIGNAL_DRAG_END,                                   
+
     /*Group related*/
     LV_SIGNAL_FOCUS,
     LV_SIGNAL_DEFOCUS,
@@ -220,10 +223,9 @@ typedef struct _lv_obj_t
     uint8_t top : 1;            /**< 1: If the object or its children is clicked it goes to the foreground*/
     uint8_t opa_scale_en : 1;   /**< 1: opa_scale is set*/
     uint8_t parent_event : 1;   /**< 1: Send the object's events to the parent too. */
-
     lv_drag_dir_t drag_dir : 3; /**<  Which directions the object can be dragged in */
-    uint8_t reserved    : 5;    /**<  Reserved for future use */
-
+    lv_bidi_dir_t base_dir : 2; /**< Base direction of texts related to this object */
+    uint8_t reserved : 3;       /**<  Reserved for future use*/
     uint8_t protect;            /**< Automatically happening actions can be prevented. 'OR'ed values from
                                    `lv_protect_t`*/
     lv_opa_t opa_scale;         /**< Scale down the opacity by this factor. Effects all children as well*/
@@ -515,6 +517,7 @@ void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
  */
 void lv_obj_set_parent_event(lv_obj_t * obj, bool en);
 
+void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir);
 /**
  * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
  * @param obj pointer to an object
@@ -853,6 +856,9 @@ bool lv_obj_get_drag_parent(const lv_obj_t * obj);
  * @return true: drag parent is enabled
  */
 bool lv_obj_get_parent_event(const lv_obj_t * obj);
+
+
+lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj);
 
 /**
  * Get the opa scale enable parameter

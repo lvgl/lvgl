@@ -131,6 +131,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
         lv_btnm_set_map(new_kb, kb_map_lc);
         lv_btnm_set_ctrl_map(new_kb, kb_ctrl_lc_map);
+        lv_obj_set_base_dir(new_kb, LV_BIDI_DIR_LTR);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
@@ -395,7 +396,7 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
     /*Add the characters to the text area if set*/
     if(ext->ta == NULL) return;
 
-    if(strcmp(txt, "Enter") == 0)
+    if(strcmp(txt, LV_SYMBOL_NEW_LINE) == 0)
         lv_ta_add_char(ext->ta, '\n');
     else if(strcmp(txt, LV_SYMBOL_LEFT) == 0)
         lv_ta_cursor_left(ext->ta);
