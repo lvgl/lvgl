@@ -33,6 +33,12 @@ extern "C" {
 #define LV_LOG_LEVEL_NONE 4 /**< Do not log anything*/
 #define _LV_LOG_LEVEL_NUM 5 /**< Number of log levels */
 
+LV_EXPORT_CONST_INT(LV_LOG_LEVEL_TRACE);
+LV_EXPORT_CONST_INT(LV_LOG_LEVEL_INFO);
+LV_EXPORT_CONST_INT(LV_LOG_LEVEL_WARN);
+LV_EXPORT_CONST_INT(LV_LOG_LEVEL_ERROR);
+LV_EXPORT_CONST_INT(LV_LOG_LEVEL_NONE);
+
 typedef int8_t lv_log_level_t;
 
 #if LV_USE_LOG
