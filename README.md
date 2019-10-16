@@ -93,7 +93,7 @@ You can use the [Simulators](https://docs.littlevgl.com/en/html/get-started/pc-s
 
 1. [Download](https://littlevgl.com/download) or [Clone](https://github.com/littlevgl/lvgl) the library
 2. Copy the `lvgl` folder into your project
-3. Copy `lvgl/lv_conf_templ.h` as `lv_conf.h` next to the `lvgl` folder and set at least `LV_HOR_RES_MAX`, `LV_VER_RES_MAX` and `LV_COLOR_DEPTH`. 
+3. Copy `lvgl/lv_conf_template.h` as `lv_conf.h` next to the `lvgl` folder and set at least `LV_HOR_RES_MAX`, `LV_VER_RES_MAX` and `LV_COLOR_DEPTH`.
 4. Include `lvgl/lvgl.h` where you need to use LittlevGL related functions.
 5. Call `lv_tick_inc(x)` every `x` milliseconds **in a Timer or Task** (`x` should be between 1 and 10). It is required for the internal timing of LittlevGL.
 6. Call `lv_init()`

@@ -254,6 +254,8 @@ void lv_win_set_content_size(lv_obj_t * win, lv_coord_t w, lv_coord_t h)
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     h += lv_obj_get_height(ext->header);
+
+    lv_obj_set_size(win, w, h);
 }
 
 /**
