@@ -73,7 +73,9 @@ typedef struct
         lv_opa_t main_color_stop;
         lv_opa_t grad_color_stop;
         lv_blend_mode_t blend_mode :3;
-        lv_grad_dir_t grad_dir;
+        lv_grad_dir_t grad_dir     :2;
+        uint8_t corner_mask        :1;
+
 
 
         struct

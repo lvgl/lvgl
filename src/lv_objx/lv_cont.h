@@ -69,7 +69,6 @@ typedef struct
     lv_fit_t fit_right : 2;  /*A fit type from `lv_fit_t` enum */
     lv_fit_t fit_top : 2;    /*A fit type from `lv_fit_t` enum */
     lv_fit_t fit_bottom : 2; /*A fit type from `lv_fit_t` enum */
-    uint8_t masked  :1;       /*Automatically a draw mask to to mask out the corners*/
 } lv_cont_ext_t;
 
 /*Styles*/

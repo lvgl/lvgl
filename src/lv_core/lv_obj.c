@@ -2337,12 +2337,15 @@ static void lv_obj_del_async_cb(void * obj)
 static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-
         /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
         if(lv_area_is_in(clip_area, &obj->coords) == false) return LV_DESIGN_RES_NOT_COVER;
 
-        /*Can cover the area only if fully solid (no opacity)*/
+
         const lv_style_t * style = lv_obj_get_style(obj);
+        if(style->body.corner_mask) return LV_DESIGN_RES_MASKED;
+
+
+        /*Can cover the area only if fully solid (no opacity)*/
         if(style->body.opa < LV_OPA_MAX) return LV_DESIGN_RES_NOT_COVER;
 
         /* Because of the radius it is not sure the area is covered
@@ -2367,9 +2370,22 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 
         return  LV_DESIGN_RES_COVER;
 
-    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+    }
+    else if(mode == LV_DESIGN_DRAW_MAIN) {
         const lv_style_t * style = lv_obj_get_style(obj);
         lv_draw_rect(&obj->coords, clip_area, style, lv_obj_get_opa_scale(obj));
+
+        if(style->body.corner_mask) {
+            lv_draw_mask_param_t mp;
+            lv_draw_mask_radius_init(&mp, &obj->coords, style->body.radius, false);
+            lv_draw_mask_add(&mp, obj + 4);
+        }
+    }
+    else if(mode == LV_DESIGN_DRAW_POST) {
+        const lv_style_t * style = lv_obj_get_style(obj);
+        if(style->body.corner_mask) {
+            lv_draw_mask_remove_custom(obj+ 4);
+        }
     }
 
     return LV_DESIGN_RES_OK;

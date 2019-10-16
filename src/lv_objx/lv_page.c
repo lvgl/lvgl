@@ -111,7 +111,6 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new page object*/
     if(copy == NULL) {
-        ext->bg.masked = 0;
         ext->scrl = lv_cont_create(new_page, NULL);
         lv_obj_set_signal_cb(ext->scrl, lv_page_scrollable_signal);
         lv_obj_set_design_cb(ext->scrl, lv_scrl_design);
@@ -706,7 +705,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
         lv_draw_rect(&page->coords, clip_area, &style_tmp, lv_obj_get_opa_scale(page));
 
         lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-        if(ext->bg.masked) {
+        if(style->body.corner_mask) {
             const lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
             lv_draw_mask_param_t mp;
             lv_draw_mask_radius_init(&mp, &page->coords, style->body.radius, false);
@@ -782,7 +781,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
             }
         }
 
-        if(ext->bg.masked) {
+        if(style->body.corner_mask) {
             lv_draw_mask_remove_custom(page + 4);
         }
 #endif
