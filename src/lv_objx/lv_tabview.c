@@ -220,8 +220,8 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_obj_t * h = lv_page_create(ext->content, NULL);
     lv_obj_set_size(h, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
     lv_page_set_sb_mode(h, LV_SB_MODE_AUTO);
-    lv_page_set_style(h, LV_PAGE_STYLE_BG, &lv_style_plain);
-    lv_page_set_style(h, LV_PAGE_STYLE_SCRL, &lv_style_transp);
+    lv_page_set_style(h, LV_PAGE_STYLE_BG, &lv_style_pretty);
+    lv_page_set_style(h, LV_PAGE_STYLE_SCRL, &lv_style_pretty_color);
     lv_page_set_scroll_propagation(h, true);
 
     if(page_signal == NULL) page_signal = lv_obj_get_signal_cb(h);
@@ -239,9 +239,6 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
      * Method: clean extra \n when switch from LV_TABVIEW_BTNS_POS_LEFT or LV_TABVIEW_BTNS_POS_RIGHT
      * to LV_TABVIEW_BTNS_POS_TOP or LV_TABVIEW_BTNS_POS_BOTTOM.
      */
-    const lv_style_t * style_tabs = lv_obj_get_style(ext->btns);
-    lv_coord_t indic_size;
-
     switch(ext->btns_pos) {
     case LV_TABVIEW_BTNS_POS_NONE:
     case LV_TABVIEW_BTNS_POS_TOP:
@@ -361,11 +358,6 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
         lv_anim_create(&a);
     }
 #endif
-
-    lv_bidi_dir_t base_dir = lv_obj_get_base_dir(tabview);
-
-    if(base_dir == LV_BIDI_DIR_RTL) id = ext->tab_cnt - id - 1;
-
 
     /*Move the indicator*/
     const lv_style_t * tabs_style = lv_obj_get_style(ext->btns);
@@ -735,12 +727,18 @@ static lv_res_t tabview_scrl_signal(lv_obj_t * tabview_scrl, lv_signal_t sign, v
         lv_coord_t page_x2  = page_x1 + lv_obj_get_width(tabview);
         lv_coord_t treshold = lv_obj_get_width(tabview) / 2;
 
-        uint16_t tab_cur = ext->tab_cur;
+        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(tabview);
+        int16_t tab_cur = ext->tab_cur;
         if(page_x1 > treshold) {
-            if(tab_cur != 0) tab_cur--;
+            if(base_dir != LV_BIDI_DIR_RTL) tab_cur--;
+            else tab_cur ++;
         } else if(page_x2 < treshold) {
-            if(tab_cur < ext->tab_cnt - 1) tab_cur++;
+            if(base_dir != LV_BIDI_DIR_RTL) tab_cur++;
+            else tab_cur --;
         }
+
+        if(tab_cur > ext->tab_cnt - 1) tab_cur = ext->tab_cnt - 1;
+        if(tab_cur < 0) tab_cur = 0;
 
         uint32_t id_prev = lv_tabview_get_tab_act(tabview);
         lv_tabview_set_tab_act(tabview, tab_cur, LV_ANIM_ON);

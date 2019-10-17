@@ -876,7 +876,9 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         lv_fit_t fit_left        = lv_page_get_scrl_fit_left(page);
         lv_fit_t fit_right        = lv_page_get_scrl_fit_right(page);
         lv_fit_t fit_top         = lv_page_get_scrl_fit_top(page);
-        child                    = lv_obj_get_child(page, NULL);
+        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(page);
+
+        child = lv_obj_get_child(page, NULL);
         while(child != NULL) {
             if(lv_obj_is_protected(child, LV_PROTECT_PARENT) == false) {
                 lv_obj_t * tmp = child;
@@ -884,13 +886,17 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
 
                 /* Reposition the child to take padding into account (Only if it's on (0;0) or (widht;height) coordinates now)
                  * It's required to keep new the object on the same coordinate if FIT is enabled.*/
-                if((tmp->coords.x1 == page->coords.x1) && (fit_left == LV_FIT_TIGHT || fit_left == LV_FIT_FILL)) {
+                if((tmp->coords.x1 == page->coords.x1)  &&
+                        (fit_right == LV_FIT_TIGHT || fit_right == LV_FIT_FILL) &&
+                        base_dir != LV_BIDI_DIR_RTL) {
                     tmp->coords.x1 += style_scrl->body.padding.left;
                     tmp->coords.x2 += style_scrl->body.padding.left;
                 }
-                else if((tmp->coords.x2 == page->coords.x2) && (fit_right == LV_FIT_TIGHT || fit_right == LV_FIT_FILL)) {
-                    tmp->coords.x1 -= style_scrl->body.padding.right + style_bg->body.padding.right;
-                    tmp->coords.x2 -= style_scrl->body.padding.right + style_bg->body.padding.right;
+                else if((tmp->coords.x2 == page->coords.x2) &&
+                        (fit_right == LV_FIT_TIGHT || fit_right == LV_FIT_FILL)
+                        && base_dir == LV_BIDI_DIR_RTL) {
+                    tmp->coords.x1 -= style_scrl->body.padding.right;
+                    tmp->coords.x2 -= style_scrl->body.padding.right;
                 }
                 if((tmp->coords.y1 == page->coords.y1) && (fit_top == LV_FIT_TIGHT || fit_top == LV_FIT_FILL)) {
                     tmp->coords.y1 += style_scrl->body.padding.top;
