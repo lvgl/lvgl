@@ -310,9 +310,9 @@ static inline uint32_t lv_color_to32(lv_color_t color)
      * Truly any of the listed multipliers and adders would work.
      * The below numbers seem the most precise.
      */    
-    ret.ch.red   = ( color.ch.red * 33 ) >> 2; 
-    ret.ch.green = ( color.ch.green * 4 );
-    ret.ch.blue  = ( color.ch.blue * 33 ) >> 2;
+    ret.ch.red   = ( color.ch.red * 8423 + 7 ) >> 10; 
+    ret.ch.green = ( color.ch.green * 259 + 3 ) >> 6;
+    ret.ch.blue  = ( color.ch.blue * 8423 + 7 ) >> 10;
     ret.ch.alpha = 0xFF;
     return ret.full;
 #else
