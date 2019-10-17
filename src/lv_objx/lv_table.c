@@ -163,12 +163,7 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
     }
 
     ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
-
-#if LV_USE_BIDI == 0
     strcpy(ext->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
-#else
-    lv_bidi_process(txt, ext->cell_data[cell] + 1, base_dir);
-#endif
 
     ext->cell_data[cell][0] = format.format_byte;
     refr_size(table);
