@@ -162,6 +162,7 @@ void lv_style_init(void)
     lv_style_pretty_color.body.main_color   = lv_color_make(0x6b, 0x9a, 0xc7);
     lv_style_pretty_color.body.grad_color   = lv_color_make(0x2b, 0x59, 0x8b);
     lv_style_pretty_color.body.border.color = lv_color_make(0x15, 0x2c, 0x42);
+//    lv_style_pretty_color.body.padding.right  = LV_DPI /2;
 
     /*Transparent style*/
     lv_style_copy(&lv_style_transp, &lv_style_plain);

@@ -579,15 +579,29 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 
     lv_obj_invalidate(obj);
 
+    lv_obj_t * old_par = obj->par;
     lv_point_t old_pos;
-    old_pos.x = lv_obj_get_x(obj);
     old_pos.y = lv_obj_get_y(obj);
 
-    lv_obj_t * old_par = obj->par;
+    lv_bidi_dir_t new_base_dir = lv_obj_get_base_dir(parent);
+
+    if(new_base_dir != LV_BIDI_DIR_RTL) {
+        old_pos.x = lv_obj_get_x(obj);
+    } else {
+        old_pos.x = old_par->coords.x2 - obj->coords.x2;
+    }
 
     lv_ll_chg_list(&obj->par->child_ll, &parent->child_ll, obj, true);
     obj->par = parent;
-    lv_obj_set_pos(obj, old_pos.x, old_pos.y);
+
+
+    if(new_base_dir != LV_BIDI_DIR_RTL) {
+        lv_obj_set_pos(obj, old_pos.x, old_pos.y);
+    } else {
+        /*Align to the right in case of RTL base dir*/
+        lv_coord_t new_x = lv_obj_get_width(parent) - old_pos.x - lv_obj_get_width(obj);
+        lv_obj_set_pos(obj, new_x , old_pos.y);
+    }
 
     /*Notify the original parent because one of its children is lost*/
     old_par->signal_cb(old_par, LV_SIGNAL_CHILD_CHG, NULL);
