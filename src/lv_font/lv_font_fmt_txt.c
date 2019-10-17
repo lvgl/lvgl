@@ -91,6 +91,8 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
         static uint8_t * buf = NULL;
 
         uint32_t gsize = gdsc->box_w * gdsc->box_h;
+        if(gsize == 0) return NULL;
+
         uint32_t buf_size = gsize;
         switch(fdsc->bpp) {
         case 1: buf_size = gsize >> 3;  break;

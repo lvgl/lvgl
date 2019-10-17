@@ -405,7 +405,11 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
         case LV_TABVIEW_BTNS_POS_LEFT:
         case LV_TABVIEW_BTNS_POS_RIGHT:
             indic_size = lv_obj_get_height(ext->indic);
-            indic_pos  = tabs_style->body.padding.top + id * (indic_size + tabs_style->body.padding.inner);
+            const lv_style_t * style_tabs = lv_tabview_get_style(tabview, LV_TABVIEW_STYLE_BTN_BG);
+            lv_coord_t max_h = lv_obj_get_height(ext->btns) - style_tabs->body.padding.top - style_tabs->body.padding.bottom;
+
+            if(ext->tab_cnt) indic_pos = (max_h * ext->tab_cur) / ext->tab_cnt;
+            else  indic_pos = 0;
             break;
     }
 
