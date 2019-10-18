@@ -252,6 +252,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     bool g_ret = lv_font_get_glyph_dsc(font_p, &g, letter, '\0');
     if(g_ret == false) return;
 
+
     lv_coord_t pos_x = pos_p->x + g.ofs_x;
     lv_coord_t pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - g.box_h - g.ofs_y;
 
@@ -300,17 +301,32 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     if(g.box_w & 0x7) width_byte_scr++;
     uint16_t width_bit = g.box_w * g.bpp; /*Letter width in bits*/
 
+    bool subpx = font_p->subpx == LV_FONT_SUBPX_NONE ? false : true;
+
     /* Calculate the col/row start/end on the map*/
-    lv_coord_t col_start = pos_x >= mask_p->x1 ? 0 : mask_p->x1 - pos_x;
-    lv_coord_t col_end   = pos_x + g.box_w <= mask_p->x2 ? g.box_w : mask_p->x2 - pos_x + 1;
-    lv_coord_t row_start = pos_y >= mask_p->y1 ? 0 : mask_p->y1 - pos_y;
-    lv_coord_t row_end   = pos_y + g.box_h <= mask_p->y2 ? g.box_h : mask_p->y2 - pos_y + 1;
+    lv_coord_t col_start;
+    lv_coord_t col_end;
+    lv_coord_t row_start;
+    lv_coord_t row_end;
+
+    if(subpx == false) {
+        col_start = pos_x >= mask_p->x1 ? 0 : mask_p->x1 - pos_x;
+        col_end   = pos_x + g.box_w <= mask_p->x2 ? g.box_w : mask_p->x2 - pos_x + 1;
+        row_start = pos_y >= mask_p->y1 ? 0 : mask_p->y1 - pos_y;
+        row_end   = pos_y + g.box_h <= mask_p->y2 ? g.box_h : mask_p->y2 - pos_y + 1;
+    } else {
+        col_start = pos_x >= mask_p->x1 ? 0 : (mask_p->x1 - pos_x) * 3;
+        col_end   = pos_x + g.box_w / 3 <= mask_p->x2 ? g.box_w : (mask_p->x2 - pos_x + 1) * 3;
+        row_start = pos_y >= mask_p->y1 ? 0 : mask_p->y1 - pos_y;
+        row_end   = pos_y + g.box_h <= mask_p->y2 ? g.box_h : mask_p->y2 - pos_y + 1;
+    }
 
     /*Set a pointer on VDB to the first pixel of the letter*/
     vdb_buf_tmp += ((pos_y - vdb->area.y1) * vdb_width) + pos_x - vdb->area.x1;
 
     /*If the letter is partially out of mask the move there on VDB*/
-    vdb_buf_tmp += (row_start * vdb_width) + col_start;
+    if(subpx) vdb_buf_tmp += (row_start * vdb_width) + col_start / 3;
+    else vdb_buf_tmp += (row_start * vdb_width) + col_start;
 
     /*Move on the map too*/
     uint32_t bit_ofs = (row_start * width_bit) + (col_start * g.bpp);
@@ -326,37 +342,85 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     scr_transp = disp->driver.screen_transp;
 #endif
 
+    uint8_t font_rgb[3];
+    uint8_t txt_rgb[3] = {color.ch.red, color.ch.green, color.ch.blue};
+
     for(row = row_start; row < row_end; row++) {
         bitmask = bitmask_init >> col_bit;
+        uint8_t sub_px_cnt = 0;
         for(col = col_start; col < col_end; col++) {
             letter_px = (*map_p & bitmask) >> (8 - col_bit - g.bpp);
-            if(letter_px != 0) {
-                if(opa == LV_OPA_COVER) {
-                    px_opa = g.bpp == 8 ? letter_px : bpp_opa_table[letter_px];
-                } else {
-                    px_opa = g.bpp == 8 ? (uint16_t)((uint16_t)letter_px * opa) >> 8
-                                        : (uint16_t)((uint16_t)bpp_opa_table[letter_px] * opa) >> 8;
-                }
 
-                if(disp->driver.set_px_cb) {
-                    disp->driver.set_px_cb(&disp->driver, (uint8_t *)vdb->buf_act, vdb_width,
-                                           (col + pos_x) - vdb->area.x1, (row + pos_y) - vdb->area.y1, color, px_opa);
-                } else if(vdb_buf_tmp->full != color.full) {
-                    if(px_opa > LV_OPA_MAX)
-                        *vdb_buf_tmp = color;
-                    else if(px_opa > LV_OPA_MIN) {
-                        if(scr_transp == false) {
-                            *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, px_opa);
-                        } else {
+            /*subpx == 0*/
+            if(subpx == false) {
+                if(letter_px != 0) {
+                    if(opa == LV_OPA_COVER) {
+                        px_opa = g.bpp == 8 ? letter_px : bpp_opa_table[letter_px];
+                    } else {
+                        px_opa = g.bpp == 8 ? (uint16_t)((uint16_t)letter_px * opa) >> 8
+                                : (uint16_t)((uint16_t)bpp_opa_table[letter_px] * opa) >> 8;
+                    }
+
+                    if(disp->driver.set_px_cb) {
+                        disp->driver.set_px_cb(&disp->driver, (uint8_t *)vdb->buf_act, vdb_width,
+                                (col + pos_x) - vdb->area.x1, (row + pos_y) - vdb->area.y1, color, px_opa);
+                    } else if(vdb_buf_tmp->full != color.full) {
+                        if(px_opa > LV_OPA_MAX) {
+                            *vdb_buf_tmp = color;
+                        } else if(px_opa > LV_OPA_MIN) {
+                            if(scr_transp == false) {
+                                *vdb_buf_tmp = lv_color_mix(color, *vdb_buf_tmp, px_opa);
+                            } else {
 #if LV_COLOR_DEPTH == 32 && LV_COLOR_SCREEN_TRANSP
-                            *vdb_buf_tmp = color_mix_2_alpha(*vdb_buf_tmp, (*vdb_buf_tmp).ch.alpha, color, px_opa);
+        *vdb_buf_tmp = color_mix_2_alpha(*vdb_buf_tmp, (*vdb_buf_tmp).ch.alpha, color, px_opa);
 #endif
+                            }
                         }
                     }
                 }
+                vdb_buf_tmp++;
+            }
+            /*Handle subpx drawing*/
+            else {
+                if(letter_px != 0) {
+                    if(opa == LV_OPA_COVER) {
+                        px_opa = g.bpp == 8 ? letter_px : bpp_opa_table[letter_px];
+                    } else {
+                        px_opa = g.bpp == 8 ? (uint16_t)((uint16_t)letter_px * opa) >> 8
+                                : (uint16_t)((uint16_t)bpp_opa_table[letter_px] * opa) >> 8;
+                    }
+
+                    font_rgb[sub_px_cnt] = px_opa;
+                } else {
+                    font_rgb[sub_px_cnt] = 0;
+                }
+                sub_px_cnt ++;
+
+                if(sub_px_cnt == 3) {
+                    lv_color_t res_color;
+                    uint8_t bg_rgb[3] = {vdb_buf_tmp->ch.red, vdb_buf_tmp->ch.green, vdb_buf_tmp->ch.blue};
+
+#if LV_SUBPX_BGR
+                    res_color.ch.blue = (uint16_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
+                    res_color.ch.green = (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
+                    res_color.ch.red = (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
+#else
+                    res_color.ch.red = (uint16_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
+                    res_color.ch.green = (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
+                    res_color.ch.blue = (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
+#endif
+                    if(scr_transp == false) {
+                        vdb_buf_tmp->full = res_color.full;
+#if LV_COLOR_DEPTH == 32 && LV_COLOR_SCREEN_TRANSP
+                    } else {
+                        *vdb_buf_tmp = color_mix_2_alpha(*vdb_buf_tmp, (*vdb_buf_tmp).ch.alpha, color, px_opa);
+#endif
+                    }
+                    sub_px_cnt = 0;
+                    vdb_buf_tmp++;
+                }
             }
 
-            vdb_buf_tmp++;
 
             if(col_bit < 8 - g.bpp) {
                 col_bit += g.bpp;
@@ -367,11 +431,15 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
                 map_p++;
             }
         }
+
         col_bit += ((g.box_w - col_end) + col_start) * g.bpp;
 
         map_p += (col_bit >> 3);
         col_bit = col_bit & 0x7;
-        vdb_buf_tmp += vdb_width - (col_end - col_start); /*Next row in VDB*/
+
+        /*Next row in VDB*/
+        if(subpx) vdb_buf_tmp += vdb_width - (col_end - col_start) / 3;
+        else vdb_buf_tmp += vdb_width - (col_end - col_start);
     }
 }
 
