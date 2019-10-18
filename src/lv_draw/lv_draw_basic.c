@@ -301,7 +301,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     if(g.box_w & 0x7) width_byte_scr++;
     uint16_t width_bit = g.box_w * g.bpp; /*Letter width in bits*/
 
-    bool subpx = true;
+    bool subpx = font_p->subpx == LV_FONT_SUBPX_NONE ? false : true;
 
     /* Calculate the col/row start/end on the map*/
     lv_coord_t col_start;
