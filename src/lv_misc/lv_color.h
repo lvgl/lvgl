@@ -303,26 +303,19 @@ static inline uint32_t lv_color_to32(lv_color_t color)
     ret.ch.alpha = 0xFF;
     return ret.full;
 #elif LV_COLOR_DEPTH == 16
-#if LV_COLOR_16_SWAP == 0
-    lv_color32_t ret;
     /**
      * Per https://docs.google.com/spreadsheets/d/1PppX8FJpddauAPasHwlNgIPGIuPGPNvRbhilIQ8w-7g/edit#gid=0
-     * Truly any of the listed multipliers and adders would work.
-     * The below numbers seem the most precise.
      */    
-    ret.ch.red   = ( color.ch.red * 8423 + 7 ) >> 10; 
-    ret.ch.green = ( color.ch.green * 259 + 3 ) >> 6;
-    ret.ch.blue  = ( color.ch.blue * 8423 + 7 ) >> 10;
-    ret.ch.alpha = 0xFF;
-    return ret.full;
-#else
     lv_color32_t ret;
-    ret.ch.red   = color.ch.red * 8;                                 /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
-    ret.ch.green = ((color.ch.green_h << 3) + color.ch.green_l) * 4; /*(2^8 - 1)/(2^6 - 1) = 255/63 = 4*/
-    ret.ch.blue  = color.ch.blue * 8;                                /*(2^8 - 1)/(2^5 - 1) = 255/31 = 8*/
+    ret.ch.red   = ( color.ch.red * 263 + 7 ) >> 5;
+#if LV_COLOR_16_SWAP == 0
+    ret.ch.green = ( color.ch.green * 259 + 3 ) >> 6;
+#else
+    ret.ch.green = (((color.ch.green_h << 3) + color.ch.green_l) * 259 + 3 ) >> 6;
+#endif
+    ret.ch.blue  = ( color.ch.blue * 263 + 7 ) >> 5;
     ret.ch.alpha = 0xFF;
     return ret.full;
-#endif
 #elif LV_COLOR_DEPTH == 32
     return color.full;
 #endif
