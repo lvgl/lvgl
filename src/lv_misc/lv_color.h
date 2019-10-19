@@ -304,8 +304,33 @@ static inline uint32_t lv_color_to32(lv_color_t color)
     return ret.full;
 #elif LV_COLOR_DEPTH == 16
     /**
-     * Per https://docs.google.com/spreadsheets/d/1PppX8FJpddauAPasHwlNgIPGIuPGPNvRbhilIQ8w-7g/edit#gid=0
-     */    
+     * The floating point math for conversion is:
+     *  valueto = valuefrom * ( (2^bitsto - 1) / (float)(2^bitsfrom - 1) )
+     * The faster integer math for conversion is:
+     *  valueto = ( valuefrom * multiplier + adder ) >> divisor
+     *   multiplier = FLOOR( ( (2^bitsto - 1) << divisor ) / (float)(2^bitsfrom - 1) )
+     * 
+     * Find the smallest divisor where min and max valuefrom convert.
+     * 
+     * 5-bit to 8-bit: ( 31 * multiplier + adder ) >> divisor = 255
+     * divisor  multiplier  adder  min (0)  max (31)
+     *       0           8      7        7       255
+     *       1          16     14        7       255
+     *       2          32     28        7       255
+     *       3          65     25        3       255
+     *       4         131     19        1       255
+     *       5         263      7        0       255
+     * 
+     * 6-bit to 8-bit: 255 = ( 63 * multiplier + adder ) >> divisor
+     * divisor  multiplier  adder  min (0)  max (63)
+     *       0           4      3        3       255
+     *       1           8      6        3       255
+     *       2          16     12        3       255
+     *       3          32     24        3       255
+     *       4          64     48        3       255
+     *       5         129     33        1       255
+     *       6         259      3        0       255
+     */
     lv_color32_t ret;
     ret.ch.red   = ( color.ch.red * 263 + 7 ) >> 5;
 #if LV_COLOR_16_SWAP == 0
