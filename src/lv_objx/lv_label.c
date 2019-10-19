@@ -1005,7 +1005,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         lv_draw_label_hint_t * hint = NULL;
 #endif
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset,
-                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), hint);
+                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), hint, lv_obj_get_base_dir(label));
 
 
         if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
@@ -1022,7 +1022,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
                 ofs.y = ext->offset.y;
 
                 lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs,
-                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), NULL);
+                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), NULL, lv_obj_get_base_dir(label));
             }
 
             /*Draw the text again below the original to make an circular effect */
@@ -1030,7 +1030,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
                 ofs.x = ext->offset.x;
                 ofs.y = ext->offset.y + size.y + lv_font_get_line_height(style->text.font);
                 lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs,
-                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), NULL);
+                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), NULL, lv_obj_get_base_dir(label));
             }
         }
     }

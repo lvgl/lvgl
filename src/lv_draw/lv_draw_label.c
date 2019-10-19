@@ -57,7 +57,7 @@ static uint8_t hex_char_to_num(char hex);
  */
 void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
                    const char * txt, lv_txt_flag_t flag, lv_point_t * offset, uint16_t sel_start, uint16_t sel_end,
-                   lv_draw_label_hint_t * hint)
+                   lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir)
 {
     const lv_font_t * font = style->text.font;
     lv_coord_t w;
@@ -167,10 +167,12 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         uint32_t letter;
         uint32_t letter_next;
         while(i < line_end - line_start) {
-            // TODO handle bidi conditionally on ifdef
-            static char bidi_txt[1000]; // TODO: allocate dynamically once (gloablly?), according to max label size
-            lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, LV_BIDI_DIR_RTL /* lv_obj_get_base_dir(label) */ ); // TODO: pass base dir as paramter
-
+#if LV_USE_BIDI
+            char *bidi_txt = lv_draw_get_buf(line_end - line_start + 1);
+            lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, bidi_dir);
+#else
+            const char *bidi_txt = txt + line_start;
+#endif
             letter      = lv_txt_encoded_next(bidi_txt, &i);
             letter_next = lv_txt_encoded_next(&bidi_txt[i], NULL);
 

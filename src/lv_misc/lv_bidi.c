@@ -269,7 +269,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len)
 
                 /*Finish on non-weak char */
                 /*but treat number and currency related chars as weak*/
-                if(lv_bidi_letter_is_weak(letter) == false && letter != '.' && letter != ',' && letter != '$') {
+                if(lv_bidi_letter_is_weak(letter) == false && letter != '.' && letter != ',' && letter != '$' && letter != '%') {
                     lv_txt_encoded_next(src, &i);   /*Rewind one letter*/
                     first_weak = i;
                     break;

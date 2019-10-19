@@ -14,6 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_draw.h"
+#include "../lv_misc/lv_bidi.h"
 
 /*********************
  *      DEFINES
@@ -58,7 +59,7 @@ typedef struct {
  */
 void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
                    const char * txt, lv_txt_flag_t flag, lv_point_t * offset, uint16_t sel_start, uint16_t sel_end,
-                   lv_draw_label_hint_t * hint);
+                   lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir);
 
 /**********************
  *      MACROS
