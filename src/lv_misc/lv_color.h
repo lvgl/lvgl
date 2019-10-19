@@ -310,7 +310,7 @@ static inline uint32_t lv_color_to32(lv_color_t color)
      *  valueto = ( valuefrom * multiplier + adder ) >> divisor
      *   multiplier = FLOOR( ( (2^bitsto - 1) << divisor ) / (float)(2^bitsfrom - 1) )
      * 
-     * Find the first divisor where ( adder >> divisor ) > 0
+     * Find the first divisor where ( adder >> divisor ) <= 0
      * 
      * 5-bit to 8-bit: ( 31 * multiplier + adder ) >> divisor = 255
      * divisor  multiplier  adder  min (0)  max (31)
