@@ -119,7 +119,7 @@ bool lv_bidi_letter_is_rtl(uint32_t letter)
 bool lv_bidi_letter_is_neutral(uint32_t letter)
 {
     uint16_t i;
-    static const char neutrals[] = " \t\n\r.,:;'\"`!?%/\\=()[]{}<>@#&$|";
+    static const char neutrals[] = " \t\n\r.,:;'\"`!?%/\\-=()[]{}<>@#&$|";
     for(i = 0; neutrals[i] != '\0'; i++) {
         if(letter == (uint32_t)neutrals[i]) return true;
     }
