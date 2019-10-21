@@ -196,6 +196,14 @@ typedef void * lv_img_decoder_user_data_t;
  * font's bitmaps */
 #define LV_ATTRIBUTE_LARGE_CONST
 
+/* Export integer constant to binding.
+ * This macro is used with constants in the form of LV_<CONST> that
+ * should also appear on lvgl binding API such as Micropython
+ *
+ * The default value just prevents a GCC warning.
+ */
+#define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning
+
 /*===================
  *  HAL settings
  *==================*/
@@ -352,6 +360,12 @@ typedef void * lv_font_user_data_t;
 #  define lv_snprintf     snprintf
 #  define lv_vsnprintf    vsnprintf
 #endif  /*LV_SPRINTF_CUSTOM*/
+
+ /* Set the pixel order of the display.
+  * Important only if "subpx fonts" are used.
+  * With "normal" font it doesn't matter.
+  */
+ #define LV_SUBPX_BGR    0
 
 /*===================
  *  LV_OBJ SETTINGS

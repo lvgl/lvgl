@@ -244,7 +244,7 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
                 btn_i++;
             }
         }
-        act_y += btn_h + style_bg->body.padding.inner;
+        act_y += btn_h + style_bg->body.padding.inner + 1;
 
         if(strlen(map_p_tmp[btn_cnt]) == 0) break; /*Break on end of map*/
         map_p_tmp = &map_p_tmp[btn_cnt + 1];       /*Set the map to the next line*/
@@ -855,6 +855,12 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 #if LV_USE_GROUP
         lv_indev_t * indev         = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
+
+        /*If not focused by an input device assume the last input device*/
+       if(indev_type == LV_INDEV_TYPE_NONE) {
+           indev_type = lv_indev_get_type(lv_indev_get_next(NULL));
+       }
+
         if(indev_type == LV_INDEV_TYPE_POINTER) {
             /*Select the clicked button*/
             lv_point_t p1;
