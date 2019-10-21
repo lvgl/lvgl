@@ -94,6 +94,29 @@ int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
     return v1 + v2 + v3 + v4;
 }
 
+/**
+ * Calculate the integer square root of a number.
+ * @param num
+ * @return square root of 'num'
+ */
+uint32_t lv_sqrt(uint32_t num)
+{
+    // http://www.codecodex.com/wiki/Calculate_an_integer_square_root#C
+    uint32_t root  = 0;
+    uint32_t place = 0x40000000;
+
+    while(place > num) place >>= 2;
+    while(place) {
+        if(num >= root + place) {
+            num -= root + place;
+            root += (place << 1);
+        }
+        root >>= 1;
+        place >>= 2;
+    }
+    return root;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
