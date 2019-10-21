@@ -950,6 +950,8 @@ static void next_color_mode(lv_obj_t * cpicker)
 
 static void refr_indic_pos(lv_obj_t * cpicker)
 {
+    invalidate_indic(cpicker);
+
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
     lv_coord_t w = lv_obj_get_width(cpicker);
     lv_coord_t h = lv_obj_get_height(cpicker);
