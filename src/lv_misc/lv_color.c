@@ -117,15 +117,15 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8)
     float g = g8 / 255.0;
     float b = b8 / 255.0;
 
-    float min = r < g ? (r < b ? r : b) : (g < b ? g : b);
-    float max = r > g ? (r > b ? r : b) : (g > b ? g : b);
+    float rgbMin = r < g ? (r < b ? r : b) : (g < b ? g : b);
+    float rgbMax = r > g ? (r > b ? r : b) : (g > b ? g : b);
 
     lv_color_hsv_t hsv;
 
     // https://en.wikipedia.org/wiki/HSL_and_HSV#Lightness
-    hsv.v = max * 100 + 0.5;
+    hsv.v = rgbMax * 100 + 0.5;
 
-    float delta = max - min;
+    float delta = rgbMax - rgbMin;
     if (fabs(delta) < 0.009) {
         hsv.h = 0;
         hsv.s = 0;
@@ -133,7 +133,7 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8)
     }
 
     // https://en.wikipedia.org/wiki/HSL_and_HSV#Saturation
-    hsv.s = delta / max * 100 + 0.5;
+    hsv.s = delta / rgbMax * 100 + 0.5;
     if(hsv.s == 0) {
         hsv.h = 0;
         return hsv;
@@ -141,11 +141,11 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8)
 
     // https://en.wikipedia.org/wiki/HSL_and_HSV#Hue_and_chroma
     float h;
-    if(max == r)
+    if(rgbMax == r)
         h = (g - b) / delta + (g < b ? 6 : 0); // between yellow & magenta
-    else if(max == g)
+    else if(rgbMax == g)
         h = (b - r) / delta + 2; // between cyan & yellow
-    else if(max == b)
+    else if(rgbMax == b)
         h = (r - g) / delta + 4; // between magenta & cyan
     else
         h = 0;
