@@ -141,10 +141,14 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8)
 
     // https://en.wikipedia.org/wiki/HSL_and_HSV#Hue_and_chroma
     float h;
-    if(max == r) h = (g - b) / delta + (g < b ? 6 : 0); // between yellow & magenta
-    else if(max == g) h = (b - r) / delta + 2; // between cyan & yellow
-    else if(max == b) h = (r - g) / delta + 4; // between magenta & cyan
-    else h = 0;
+    if(max == r)
+        h = (g - b) / delta + (g < b ? 6 : 0); // between yellow & magenta
+    else if(max == g)
+        h = (b - r) / delta + 2; // between cyan & yellow
+    else if(max == b)
+        h = (r - g) / delta + 4; // between magenta & cyan
+    else
+        h = 0;
     h *= 60;
     if (h < 0) h += 360;
 
