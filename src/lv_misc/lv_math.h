@@ -54,6 +54,13 @@ int16_t lv_trigo_sin(int16_t angle);
  */
 int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3);
 
+/**
+ * Calculate the integer square root of a number.
+ * @param num
+ * @return square root of 'num'
+ */
+uint32_t lv_sqrt(uint32_t num);
+
 /**********************
  *      MACROS
  **********************/

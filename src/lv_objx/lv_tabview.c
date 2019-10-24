@@ -409,7 +409,11 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
         case LV_TABVIEW_BTNS_POS_LEFT:
         case LV_TABVIEW_BTNS_POS_RIGHT:
             indic_size = lv_obj_get_height(ext->indic);
-            indic_pos  = tabs_style->body.padding.top + id * (indic_size + tabs_style->body.padding.inner);
+            const lv_style_t * style_tabs = lv_tabview_get_style(tabview, LV_TABVIEW_STYLE_BTN_BG);
+            lv_coord_t max_h = lv_obj_get_height(ext->btns) - style_tabs->body.padding.top - style_tabs->body.padding.bottom;
+
+            if(ext->tab_cnt) indic_pos = (max_h * ext->tab_cur) / ext->tab_cnt;
+            else  indic_pos = 0;
             break;
     }
 
@@ -751,20 +755,21 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
 
         if(sign == LV_SIGNAL_FOCUS) {
             lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+            /*If not focused by an input device assume the last input device*/
+            if(indev_type == LV_INDEV_TYPE_NONE) {
+                indev_type = lv_indev_get_type(lv_indev_get_next(NULL));
+            }
+
             /*With ENCODER select the first button only in edit mode*/
             if(indev_type == LV_INDEV_TYPE_ENCODER) {
 #if LV_USE_GROUP
                 lv_group_t * g = lv_obj_get_group(tabview);
                 if(lv_group_get_editing(g)) {
-                    lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
-                    btnm_ext->btn_id_pr      = 0;
-                    lv_obj_invalidate(ext->btns);
+                    lv_btnm_set_pressed(ext->btns, ext->tab_cur);
                 }
 #endif
             } else {
-                lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
-                btnm_ext->btn_id_pr      = 0;
-                lv_obj_invalidate(ext->btns);
+                lv_btnm_set_pressed(ext->btns, ext->tab_cur);
             }
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {

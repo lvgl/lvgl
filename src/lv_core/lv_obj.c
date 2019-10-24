@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "../lv_misc/lv_gc.h"
+#include "../lv_misc/lv_math.h"
 
 #if defined(LV_GC_INCLUDE)
 #include LV_GC_INCLUDE
@@ -1142,21 +1143,6 @@ void lv_obj_set_auto_realign(lv_obj_t * obj, bool en)
 #endif
 }
 
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
-/**
- * Set the size of an extended clickable area
- * @param obj pointer to an object
- * @param w extended width to both sides
- * @param h extended height to both sides
- */
-void lv_obj_set_ext_click_area(lv_obj_t * obj, uint8_t w, uint8_t h)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    obj->ext_click_pad_hor = w;
-    obj->ext_click_pad_ver = h;
-}
-#endif
 
 /**
  * Set the size of an extended clickable area
@@ -1963,7 +1949,7 @@ lv_coord_t lv_obj_get_ext_click_pad_bottom(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
-    return obj->ext_click_pad_ver
+    return obj->ext_click_pad_ver;
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
     return obj->ext_click_pad.y2;
 #else

@@ -1001,6 +1001,7 @@ static void lv_ddlist_pos_current_option(lv_obj_t * ddlist)
  */
 static void lv_ddlist_refr_width(lv_obj_t * ddlist)
 {
+    lv_ddlist_ext_t * ext          = lv_obj_get_ext_attr(ddlist);
 
     /*Save the current x coordinate because it should be kept after the refrsh*/
     lv_coord_t x;
@@ -1015,6 +1016,12 @@ static void lv_ddlist_refr_width(lv_obj_t * ddlist)
 
     if(lv_obj_get_base_dir(ddlist) == LV_BIDI_DIR_RTL) lv_obj_set_x(ddlist, x - lv_obj_get_width(ddlist));
     else lv_obj_set_x(ddlist, x);
+
+    switch(lv_label_get_align(ext->label)) {
+        case LV_LABEL_ALIGN_LEFT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0); break;
+        case LV_LABEL_ALIGN_CENTER: lv_obj_align(ext->label, NULL, LV_ALIGN_CENTER, 0, 0); break;
+        case LV_LABEL_ALIGN_RIGHT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0); break;
+    }
 }
 
 #endif

@@ -880,6 +880,12 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 #if LV_USE_GROUP
         lv_indev_t * indev         = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
+
+        /*If not focused by an input device assume the last input device*/
+       if(indev_type == LV_INDEV_TYPE_NONE) {
+           indev_type = lv_indev_get_type(lv_indev_get_next(NULL));
+       }
+
         if(indev_type == LV_INDEV_TYPE_POINTER) {
             /*Select the clicked button*/
             lv_point_t p1;
