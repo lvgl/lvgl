@@ -163,7 +163,7 @@ typedef uint8_t lv_opa_t;
 
 typedef struct
 {
-    uint16_t h;
+    uint8_t h;
     uint8_t s;
     uint8_t v;
 } lv_color_hsv_t;
@@ -455,12 +455,12 @@ static inline lv_color_t lv_color_hex3(uint32_t c)
 
 /**
  * Convert a HSV color to RGB
- * @param h hue [0..359]
- * @param s saturation [0..100]
- * @param v value [0..100]
+ * @param h hue [0..255]
+ * @param s saturation [0..255]
+ * @param v value [0..255]
  * @return the given RGB color in RGB (with LV_COLOR_DEPTH depth)
  */
-lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v);
+lv_color_t lv_color_hsv_to_rgb(uint8_t h, uint8_t s, uint8_t v);
 
 /**
  * Convert an RGB color to HSV

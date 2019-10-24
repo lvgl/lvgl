@@ -38,17 +38,13 @@
 
 /**
  * Convert a HSV color to RGB
- * @param h hue [0..359]
- * @param s saturation [0..100]
- * @param v value [0..100]
+ * @param h hue [0..255]
+ * @param s saturation [0..255]
+ * @param v value [0..255]
  * @return the given RGB color in RGB (with LV_COLOR_DEPTH depth)
  */
-lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
+lv_color_t lv_color_hsv_to_rgb(uint8_t h, uint8_t s, uint8_t v)
 {
-    h = (uint32_t)((uint32_t)h * 255) / 360;
-    s = (uint16_t)((uint16_t)s * 255) / 100;
-    v = (uint16_t)((uint16_t)v * 255) / 100;
-
     uint8_t r, g, b;
 
     uint8_t region, remainder, p, q, t;
@@ -126,7 +122,7 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r, uint8_t g, uint8_t b)
         return hsv;
     }
 
-    hsv.s = 255 * (long)(rgbMax - rgbMin) / hsv.v;
+    hsv.s = 255 * (rgbMax - rgbMin) / rgbMax;
     if(hsv.s == 0) {
         hsv.h = 0;
         return hsv;
