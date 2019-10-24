@@ -113,46 +113,47 @@ lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
  */
 lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8)
 {
-    float r = r8 / 255.0;
-    float g = g8 / 255.0;
-    float b = b8 / 255.0;
+    uint16_t r = ((uint32_t)r8 << 10) / 255;
+    uint16_t g = ((uint32_t)g8 << 10) / 255;
+    uint16_t b = ((uint32_t)b8 << 10) / 255;
 
-    float rgbMin = r < g ? (r < b ? r : b) : (g < b ? g : b);
-    float rgbMax = r > g ? (r > b ? r : b) : (g > b ? g : b);
+    uint16_t rgbMin = r < g ? (r < b ? r : b) : (g < b ? g : b);
+    uint16_t rgbMax = r > g ? (r > b ? r : b) : (g > b ? g : b);
 
     lv_color_hsv_t hsv;
 
     // https://en.wikipedia.org/wiki/HSL_and_HSV#Lightness
-    hsv.v = rgbMax * 100 + 0.5;
+    hsv.v = (100 * rgbMax) >> 10;
 
-    float delta = rgbMax - rgbMin;
-    if (fabs(delta) < 0.009) {
+    int32_t delta = rgbMax - rgbMin;
+    if (abs(delta) < 3) {
         hsv.h = 0;
         hsv.s = 0;
         return hsv;
     }
 
     // https://en.wikipedia.org/wiki/HSL_and_HSV#Saturation
-    hsv.s = delta / rgbMax * 100 + 0.5;
-    if(hsv.s == 0) {
+    hsv.s = 100 * delta / rgbMax;
+    if(hsv.s < 3) {
         hsv.h = 0;
         return hsv;
     }
 
     // https://en.wikipedia.org/wiki/HSL_and_HSV#Hue_and_chroma
-    float h;
+    int32_t h;
     if(rgbMax == r)
-        h = (g - b) / delta + (g < b ? 6 : 0); // between yellow & magenta
+        h = (((g - b) << 10) / delta) + (g < b ? (6 << 10) : 0); // between yellow & magenta
     else if(rgbMax == g)
-        h = (b - r) / delta + 2; // between cyan & yellow
+        h = (((b - r) << 10) / delta) + (2 << 10); // between cyan & yellow
     else if(rgbMax == b)
-        h = (r - g) / delta + 4; // between magenta & cyan
+        h = (((r - g) << 10) / delta) + (4 << 10); // between magenta & cyan
     else
         h = 0;
     h *= 60;
+    h >>= 10;
     if (h < 0) h += 360;
 
-    hsv.h = h + 0.5;
+    hsv.h = h;
     return hsv;
 }
 
