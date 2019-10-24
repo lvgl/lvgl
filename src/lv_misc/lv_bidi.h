@@ -53,6 +53,8 @@ typedef uint8_t lv_bidi_dir_t;
 #if LV_USE_BIDI
 
 void lv_bidi_process(const char * str_in, char * str_out, lv_bidi_dir_t base_dir);
+void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_bidi_dir_t base_dir);
+uint32_t lv_bidi_get_next_paragraph(const char * txt);
 lv_bidi_dir_t lv_bidi_detect_base_dir(const char * txt);
 lv_bidi_dir_t lv_bidi_get_letter_dir(uint32_t letter);
 bool lv_bidi_letter_is_weak(uint32_t letter);

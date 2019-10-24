@@ -390,7 +390,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
         label_cord.x2 = label_cord.x1 + label_size.x;
         label_cord.y2 = label_cord.y1 + label_size.y;
 
-        lv_draw_label(&label_cord, mask, style, opa_scale, scale_txt, LV_TXT_FLAG_NONE, NULL, -1, -1, NULL);
+        lv_draw_label(&label_cord, mask, style, opa_scale, scale_txt, LV_TXT_FLAG_NONE, NULL, -1, -1, NULL, lv_obj_get_base_dir(gauge));
     }
 }
 /**
