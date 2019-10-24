@@ -138,6 +138,8 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
     lv_bidi_dir_t run_dir;
     uint32_t rd = 0;
     uint32_t wr;
+
+    if(base_dir == LV_BIDI_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(str_in);
     if(base_dir == LV_BIDI_DIR_RTL) wr = len;
     else wr = 0;
 
