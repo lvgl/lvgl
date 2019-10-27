@@ -205,12 +205,8 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
         LV_ASSERT_MEM(ext->text);
         if(ext->text == NULL) return;
 
-#if LV_USE_BIDI == 0
         strcpy(ext->text, text);
-#else
-        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
-        lv_bidi_process(text, ext->text, base_dir);
-#endif
+
         /*Now the text is dynamically allocated*/
         ext->static_txt = 0;
     }
@@ -904,19 +900,7 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt)
         pos = lv_txt_get_encoded_length(ext->text);
     }
 
-#if LV_USE_BIDI
-    char * bidi_buf = lv_mem_alloc(ins_len) + 1;
-    LV_ASSERT_MEM(bidi_buf);
-    if(bidi_buf == NULL) return;
-
-    lv_bidi_process(txt, bidi_buf, lv_obj_get_base_dir(label));
-    lv_txt_ins(ext->text, pos, bidi_buf);
-
-    lv_mem_free(bidi_buf);
-#else
     lv_txt_ins(ext->text, pos, txt);
-#endif
-
     lv_label_refr_text(label);
 }
 
@@ -1021,7 +1005,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         lv_draw_label_hint_t * hint = NULL;
 #endif
         lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset,
-                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), hint);
+                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), hint, lv_obj_get_base_dir(label));
 
 
         if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
@@ -1038,7 +1022,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
                 ofs.y = ext->offset.y;
 
                 lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs,
-                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), NULL);
+                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), NULL, lv_obj_get_base_dir(label));
             }
 
             /*Draw the text again below the original to make an circular effect */
@@ -1046,7 +1030,7 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
                 ofs.x = ext->offset.x;
                 ofs.y = ext->offset.y + size.y + lv_font_get_line_height(style->text.font);
                 lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs,
-                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), NULL);
+                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), NULL, lv_obj_get_base_dir(label));
             }
         }
     }

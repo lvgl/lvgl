@@ -8,6 +8,7 @@
  *********************/
 #include "lv_draw_label.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_bidi.h"
 
 /*********************
  *      DEFINES
@@ -56,7 +57,7 @@ static uint8_t hex_char_to_num(char hex);
  */
 void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
                    const char * txt, lv_txt_flag_t flag, lv_point_t * offset, uint16_t sel_start, uint16_t sel_end,
-                   lv_draw_label_hint_t * hint)
+                   lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir)
 {
     const lv_font_t * font = style->text.font;
     lv_coord_t w;
@@ -162,12 +163,18 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         }
         /*Write all letter of a line*/
         cmd_state = CMD_STATE_WAIT;
-        i         = line_start;
+        i         = 0;
         uint32_t letter;
         uint32_t letter_next;
-        while(i < line_end) {
-            letter      = lv_txt_encoded_next(txt, &i);
-            letter_next = lv_txt_encoded_next(&txt[i], NULL);
+        while(i < line_end - line_start) {
+#if LV_USE_BIDI
+            char *bidi_txt = lv_draw_get_buf(line_end - line_start + 1);
+            lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, bidi_dir);
+#else
+            const char *bidi_txt = txt + line_start;
+#endif
+            letter      = lv_txt_encoded_next(bidi_txt, &i);
+            letter_next = lv_txt_encoded_next(&bidi_txt[i], NULL);
 
             /*Handle the re-color command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
@@ -190,7 +197,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
                         /*Get the parameter*/
                         if(i - par_start == LABEL_RECOLOR_PAR_LENGTH + 1) {
                             char buf[LABEL_RECOLOR_PAR_LENGTH + 1];
-                            memcpy(buf, &txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
+                            memcpy(buf, &bidi_txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
                             buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
                             int r, g, b;
                             r       = (hex_char_to_num(buf[0]) << 4) + hex_char_to_num(buf[1]);
@@ -213,7 +220,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
-                int char_ind = lv_encoded_get_char_id(txt, i);
+                int char_ind = lv_encoded_get_char_id(bidi_txt, i);
                 /*Do not draw the rectangle on the character at `sel_start`.*/
                 if(char_ind > sel_start && char_ind <= sel_end) {
                     lv_area_t sel_coords;

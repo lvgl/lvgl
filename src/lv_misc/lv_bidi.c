@@ -29,9 +29,7 @@ typedef struct
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_bidi_dir_t base_dir);
-static uint32_t get_next_paragraph(const char * txt);
-static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint32_t * len);
+static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint32_t max_len, uint32_t * len);
 static void rtl_reverse(char * dest, const char * src, uint32_t len);
 static uint32_t char_change_to_pair(uint32_t letter);
 static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32_t len, uint32_t letter, lv_bidi_dir_t base_dir);
@@ -65,8 +63,8 @@ void lv_bidi_process(const char * str_in, char * str_out, lv_bidi_dir_t base_dir
     }
 
     while(str_in[par_start] != '\0') {
-        par_len = get_next_paragraph(&str_in[par_start]);
-        process_paragraph(&str_in[par_start], &str_out[par_start], par_len, base_dir);
+        par_len = lv_bidi_get_next_paragraph(&str_in[par_start]);
+        lv_bidi_process_paragraph(&str_in[par_start], &str_out[par_start], par_len, base_dir);
         par_start += par_len;
 
         while(str_in[par_start] == '\n' || str_in[par_start] == '\r') {
@@ -131,7 +129,7 @@ bool lv_bidi_letter_is_rtl(uint32_t letter)
 bool lv_bidi_letter_is_neutral(uint32_t letter)
 {
     uint16_t i;
-    static const char neutrals[] = " \t\n\r.,:;'\"`!?%/\\=()[]{}<>@#&$|";
+    static const char neutrals[] = " \t\n\r.,:;'\"`!?%/\\-=()[]{}<>@#&$|";
     for(i = 0; neutrals[i] != '\0'; i++) {
         if(letter == (uint32_t)neutrals[i]) return true;
     }
@@ -144,12 +142,14 @@ bool lv_bidi_letter_is_neutral(uint32_t letter)
  *   STATIC FUNCTIONS
  **********************/
 
-static void process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_bidi_dir_t base_dir)
+void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_bidi_dir_t base_dir)
 {
     uint32_t run_len = 0;
     lv_bidi_dir_t run_dir;
     uint32_t rd = 0;
     uint32_t wr;
+
+    if(base_dir == LV_BIDI_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(str_in);
     if(base_dir == LV_BIDI_DIR_RTL) wr = len;
     else wr = 0;
 
@@ -183,7 +183,7 @@ static void process_paragraph(const char * str_in, char * str_out, uint32_t len,
 
     /*Get and process the runs*/
     while(rd < len) {
-        run_dir = get_next_run(&str_in[rd], base_dir, &run_len);
+        run_dir = get_next_run(&str_in[rd], base_dir, len - rd, &run_len);
 
         if(base_dir == LV_BIDI_DIR_LTR) {
             if(run_dir == LV_BIDI_DIR_LTR)  memcpy(&str_out[wr], &str_in[rd], run_len);
@@ -199,7 +199,7 @@ static void process_paragraph(const char * str_in, char * str_out, uint32_t len,
     }
 }
 
-static uint32_t get_next_paragraph(const char * txt)
+uint32_t lv_bidi_get_next_paragraph(const char * txt)
 {
     uint32_t i = 0;
 
@@ -212,7 +212,7 @@ static uint32_t get_next_paragraph(const char * txt)
     return i;
 }
 
-static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint32_t * len)
+static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint32_t max_len, uint32_t * len)
 {
     uint32_t i = 0;
     uint32_t letter;
@@ -228,7 +228,7 @@ static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint
         dir = lv_bidi_get_letter_dir(letter);
         if(dir == LV_BIDI_DIR_NEUTRAL)  dir = bracket_process(txt, i, *len, letter, base_dir);
 
-        if(txt[i] == '\0' || txt[i] == '\n' || txt[i] == '\r') {
+        if(i >= max_len || txt[i] == '\0' || txt[i] == '\n' || txt[i] == '\r') {
             *len = i;
             return base_dir;
         }
@@ -241,7 +241,7 @@ static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint
 
     /*Find the next char which has different direction*/
     lv_bidi_dir_t next_dir = base_dir;
-    while(txt[i] != '\0'&& txt[i] != '\n' && txt[i] != '\r') {
+    while(i_prev < max_len && txt[i] != '\0' && txt[i] != '\n' && txt[i] != '\r') {
         letter = lv_txt_encoded_next(txt, &i);
         next_dir  = lv_bidi_get_letter_dir(letter);
         if(dir == LV_BIDI_DIR_NEUTRAL)  dir = bracket_process(txt, i, *len, letter, base_dir);
@@ -291,7 +291,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len)
 
                 /*Finish on non-weak char */
                 /*but treat number and currency related chars as weak*/
-                if(lv_bidi_letter_is_weak(letter) == false && letter != '.' && letter != ',' && letter != '$') {
+                if(lv_bidi_letter_is_weak(letter) == false && letter != '.' && letter != ',' && letter != '$' && letter != '%') {
                     lv_txt_encoded_next(src, &i);   /*Rewind one letter*/
                     first_weak = i;
                     break;
