@@ -361,6 +361,12 @@ typedef void * lv_font_user_data_t;
 #  define lv_vsnprintf    vsnprintf
 #endif  /*LV_SPRINTF_CUSTOM*/
 
+ /* Set the pixel order of the display.
+  * Important only if "subpx fonts" are used.
+  * With "normal" font it doesn't matter.
+  */
+ #define LV_SUBPX_BGR    0
+
 /*===================
  *  LV_OBJ SETTINGS
  *==================*/

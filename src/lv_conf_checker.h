@@ -504,6 +504,14 @@
 #endif
 #endif  /*LV_SPRINTF_CUSTOM*/
 
+ /* Set the pixel order of the display.
+  * Important only if "subpx fonts" are used.
+  * With "normal" font it doesn't matter.
+  */
+#ifndef LV_SUBPX_BGR
+ #define LV_SUBPX_BGR    0
+#endif
+
 /*===================
  *  LV_OBJ SETTINGS
  *==================*/

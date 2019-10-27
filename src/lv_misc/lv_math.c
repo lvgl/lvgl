@@ -176,26 +176,26 @@ uint16_t lv_atan2(int x, int y)
 }
 
 /**
- * Calculate the sqrt of an integer.
- * @param x
- * @return the sqrt of x
+ * Calculate the integer square root of a number.
+ * @param num
+ * @return square root of 'num'
  */
-uint16_t lv_sqrt(uint32_t x)
+uint32_t lv_sqrt(uint32_t num)
 {
-    uint16_t res=0;
-    uint16_t add= 0x8000;
-    int i;
-    for(i=0;i<16;i++)
-    {
-        uint16_t temp=res | add;
-        uint32_t g2=temp*temp;
-        if (x>=g2)
-        {
-            res=temp;
+    // http://www.codecodex.com/wiki/Calculate_an_integer_square_root#C
+    uint32_t root  = 0;
+    uint32_t place = 0x40000000;
+
+    while(place > num) place >>= 2;
+    while(place) {
+        if(num >= root + place) {
+            num -= root + place;
+            root += (place << 1);
         }
-        add>>=1;
+        root >>= 1;
+        place >>= 2;
     }
-    return res;
+    return root;
 }
 
 /**********************

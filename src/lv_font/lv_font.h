@@ -53,7 +53,18 @@ typedef struct
     uint8_t bpp;   /**< Bit-per-pixel: 1, 2, 4, 8*/
 }lv_font_glyph_dsc_t;
 
-/*Describe the properties of a font*/
+
+/** The bitmaps might be upscaled by 3 to achieve subpixel rendering. */
+enum {
+    LV_FONT_SUBPX_NONE,
+    LV_FONT_SUBPX_HOR,
+    LV_FONT_SUBPX_VER,
+    LV_FONT_SUBPX_BOTH,
+};
+
+typedef uint8_t lv_font_subpx_t;
+
+/** Describe the properties of a font*/
 typedef struct _lv_font_struct
 {
     /** Get a glyph's  descriptor from a font*/
@@ -65,10 +76,13 @@ typedef struct _lv_font_struct
     /*Pointer to the font in a font pack (must have the same line height)*/
     uint8_t line_height;      /**< The real line height where any text fits*/
     uint8_t base_line;        /**< Base line measured from the top of the line_height*/
+    uint8_t subpx  :2;        /**< An element of `lv_font_subpx_t`*/
     void * dsc;               /**< Store implementation specific data here*/
 #if LV_USE_USER_DATA
     lv_font_user_data_t user_data; /**< Custom user data for font. */
 #endif
+
+
 } lv_font_t;
 
 /**********************

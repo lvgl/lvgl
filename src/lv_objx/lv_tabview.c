@@ -750,9 +750,12 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         }
 
         if(sign == LV_SIGNAL_FOCUS) {
-
-
             lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+            /*If not focused by an input device assume the last input device*/
+            if(indev_type == LV_INDEV_TYPE_NONE) {
+                indev_type = lv_indev_get_type(lv_indev_get_next(NULL));
+            }
+
             /*With ENCODER select the first button only in edit mode*/
             if(indev_type == LV_INDEV_TYPE_ENCODER) {
 #if LV_USE_GROUP
