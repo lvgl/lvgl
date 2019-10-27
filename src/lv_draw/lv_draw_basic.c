@@ -417,10 +417,12 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
 
 #if LV_SUBPX_BGR
                         res_color.ch.blue = (uint16_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[2] * (255 - font_rgb[0]))) >> 8;
-                        res_color.ch.green = (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
                         res_color.ch.red = (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[0] * (255 - font_rgb[2]))) >> 8;
 #else
                         res_color.ch.red = (uint16_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
+                        res_color.ch.blue = (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
+#endif
+
 #if LV_COLOR_16_SWAP == 0
                         res_color.ch.green = (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
 #else
@@ -428,8 +430,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
                         res_color.ch.green_h = green >> 3;
                         res_color.ch.green_l = green & 0x7;
 #endif
-                        res_color.ch.blue = (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
-#endif
+
                     }
                     if(scr_transp == false) {
                         vdb_buf_tmp->full = res_color.full;
