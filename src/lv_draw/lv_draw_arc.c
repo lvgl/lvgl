@@ -47,14 +47,12 @@
 void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, const lv_area_t * clip_area,
                  uint16_t start_angle, uint16_t end_angle, const lv_style_t * style, lv_opa_t opa_scale)
 {
-
     lv_style_t circle_style;
     lv_style_copy(&circle_style, style);
     circle_style.body.radius = LV_RADIUS_CIRCLE;
     circle_style.body.opa = LV_OPA_TRANSP;
     circle_style.body.border.width = style->line.width;
     circle_style.body.border.color = style->line.color;
-
 
     lv_draw_mask_param_t mask_angle_param;
     lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, start_angle, end_angle);
@@ -70,6 +68,10 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
     lv_draw_rect(&area, clip_area, &circle_style, LV_OPA_COVER);
 
     lv_draw_mask_remove_id(mask_angle_id);
+
+    if(style->line.rounded) {
+        /*TODO*/
+    }
 
 }
 
