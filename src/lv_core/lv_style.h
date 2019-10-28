@@ -72,13 +72,11 @@ typedef struct
         lv_color_t grad_color; /**< Second color. If not equal to `main_color` a gradient will be drawn for the background. */
         lv_coord_t radius; /**< Object's corner radius. You can use #LV_RADIUS_CIRCLE if you want to draw a circle. */
         lv_opa_t opa; /**< Object's opacity (0-255). */
-        lv_opa_t main_color_stop;
-        lv_opa_t grad_color_stop;
+        uint8_t main_color_stop;    /**< 0..255 proportionally where should the gradient start (the main color stop)*/
+        uint8_t grad_color_stop;    /**< 0..255 proportionally where should the gradient stop (the grad_color start) */
         lv_blend_mode_t blend_mode :3;
-        lv_grad_dir_t grad_dir     :2;
-        uint8_t corner_mask        :1;
-
-
+        lv_grad_dir_t grad_dir     :2; /**< LV_GRAD_DIR_NONE/VER/HOR*/
+        uint8_t corner_mask        :1; /**< Crop the overflowing content from the rounded corners */
 
         struct
         {
