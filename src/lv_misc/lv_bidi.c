@@ -338,8 +338,6 @@ static uint32_t char_change_to_pair(uint32_t letter)
 
 static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32_t len, uint32_t letter, lv_bidi_dir_t base_dir)
 {
-    if(br_stack_p >= LV_BIDI_BRACKLET_DEPTH) return LV_BIDI_DIR_NEUTRAL;
-
     lv_bidi_dir_t bracket_dir = LV_BIDI_DIR_NEUTRAL;
 
     uint8_t i;
@@ -396,7 +394,7 @@ static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32
     /*The letter was an opening bracket*/
     if(bracket_left[i] != '\0') {
 
-        if(bracket_dir == LV_BIDI_DIR_NEUTRAL) return bracket_dir;
+        if(bracket_dir == LV_BIDI_DIR_NEUTRAL || br_stack_p == LV_BIDI_BRACKLET_DEPTH) return LV_BIDI_DIR_NEUTRAL;
 
         br_stack[br_stack_p].bracklet_pos = i;
         br_stack[br_stack_p].dir = bracket_dir;
