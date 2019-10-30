@@ -306,7 +306,7 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
             lv_draw_img(&imgbtn->coords, clip_area, src, style, opa_scale);
         }
 #else
-        const void * src = ext->img_src_mid[state];
+        const void * src = ext->img_src_left[state];
         if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
             LV_LOG_WARN("lv_imgbtn_design: SYMBOLS are not supported in tiled mode")
             return LV_DESIGN_RES_OK;
