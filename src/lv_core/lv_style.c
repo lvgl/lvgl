@@ -209,6 +209,7 @@ void lv_style_init(void)
     lv_style_btn_rel.body.shadow.offset.y = 0;
     lv_style_btn_rel.text.color          = lv_color_make(0xff, 0xff, 0xff);
     lv_style_btn_rel.image.color         = lv_color_make(0xff, 0xff, 0xff);
+    lv_style_btn_rel.image.intense       = LV_OPA_COVER;
 
     /*Button pressed style*/
     lv_style_copy(&lv_style_btn_pr, &lv_style_btn_rel);
