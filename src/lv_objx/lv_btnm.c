@@ -744,7 +744,7 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
 #if LV_USE_BIDI == 0
-            lv_draw_label(&area_tmp, clip_area, btn_style, opa_scale, ext->map_p[txt_i], txt_flag, NULL, -1, -1, NULL);
+            lv_draw_label(&area_tmp, clip_area, btn_style, opa_scale, ext->map_p[txt_i], txt_flag, NULL, NULL, NULL);
 #else
             uint32_t txt_len = strlen(ext->map_p[txt_i]) + 1;
             if(txt_len > lv_mem_get_size(bidi_buf)) {
@@ -752,7 +752,7 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             }
 
             lv_bidi_process(ext->map_p[txt_i], bidi_buf, base_dir);
-            lv_draw_label(&area_tmp, clip_area, btn_style, opa_scale, bidi_buf, txt_flag, NULL, -1, -1, NULL);
+            lv_draw_label(&area_tmp, clip_area, btn_style, opa_scale, bidi_buf, txt_flag, NULL, NULL, NULL);
 #endif
         }
 

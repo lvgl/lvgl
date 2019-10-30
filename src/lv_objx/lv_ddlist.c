@@ -609,7 +609,7 @@ static lv_design_res_t lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * cli
                 new_style.text.opa   = sel_style->text.opa;
                 lv_txt_flag_t flag   = lv_ddlist_get_txt_flag(ddlist);
                 lv_draw_label(&ext->label->coords, &mask_sel, &new_style, opa_scale, lv_label_get_text(ext->label),
-                              flag, NULL, -1, -1, NULL);
+                              flag, NULL, NULL, NULL);
             }
         }
 
@@ -643,7 +643,7 @@ static lv_design_res_t lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * cli
                 area_ok = lv_area_intersect(&mask_arrow, clip_area, &area_arrow);
                 if(area_ok) {
                     lv_draw_label(&area_arrow, &mask_arrow, &new_style, opa_scale, LV_SYMBOL_DOWN, LV_TXT_FLAG_NONE,
-                                  NULL, -1, -1, NULL); /*Use a down arrow in ddlist, you can replace it with your
+                                  NULL, NULL, NULL); /*Use a down arrow in ddlist, you can replace it with your
                                                     custom symbol*/
                 }
             }
@@ -1001,15 +1001,12 @@ static void lv_ddlist_pos_current_option(lv_obj_t * ddlist)
  */
 static void lv_ddlist_refr_width(lv_obj_t * ddlist)
 {
-<<<<<<< HEAD
-
     /*Save the current x coordinate because it should be kept after the refrsh*/
     lv_coord_t x;
     if(lv_obj_get_base_dir(ddlist) == LV_BIDI_DIR_RTL) x = lv_obj_get_x(ddlist) + lv_obj_get_width(ddlist);
     else x = lv_obj_get_x(ddlist);
-=======
+
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
->>>>>>> dev-6.1
 
     /*Set the TIGHT fit horizontally the set the width to the content*/
     lv_page_set_scrl_fit2(ddlist, LV_FIT_TIGHT, lv_page_get_scrl_fit_bottom(ddlist));
@@ -1017,16 +1014,14 @@ static void lv_ddlist_refr_width(lv_obj_t * ddlist)
     /*Revert FILL fit to fill the parent with the options area. It allows to RIGHT/CENTER align the text*/
     lv_page_set_scrl_fit2(ddlist, LV_FIT_FILL, lv_page_get_scrl_fit_bottom(ddlist));
 
-<<<<<<< HEAD
     if(lv_obj_get_base_dir(ddlist) == LV_BIDI_DIR_RTL) lv_obj_set_x(ddlist, x - lv_obj_get_width(ddlist));
     else lv_obj_set_x(ddlist, x);
-=======
+
     switch(lv_label_get_align(ext->label)) {
         case LV_LABEL_ALIGN_LEFT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0); break;
         case LV_LABEL_ALIGN_CENTER: lv_obj_align(ext->label, NULL, LV_ALIGN_CENTER, 0, 0); break;
         case LV_LABEL_ALIGN_RIGHT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0); break;
     }
->>>>>>> dev-6.1
 }
 
 #endif

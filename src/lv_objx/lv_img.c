@@ -386,7 +386,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             lv_style_t style_mod;
             lv_style_copy(&style_mod, style);
             style_mod.text.color = style->image.color;
-            lv_draw_label(&coords, clip_area, &style_mod, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL, -1, -1, NULL);
+            lv_draw_label(&coords, clip_area, &style_mod, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL, NULL, NULL);
         } else {
             /*Trigger the error handler of image drawer*/
             LV_LOG_WARN("lv_img_design: image source type is unknown");
