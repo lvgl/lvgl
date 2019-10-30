@@ -186,6 +186,9 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         /*Handle the recolor command*/
         if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
             if(lv_txt_is_cmd(&cmd_state, letter) != false) {
+                i = i_next;
+                i_next = i_next_next;
+                letter = letter_next;
                 continue;   /*Skip the letter is it is part of a command*/
             }
         }
