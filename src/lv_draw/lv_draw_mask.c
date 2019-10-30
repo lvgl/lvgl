@@ -748,7 +748,7 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
     }
 
     if((abs_x >= p->rect.x1 + p->radius && abs_x + len <= p->rect.x2 - p->radius) ||
-            (abs_y >= p->rect.y1 + p->radius && abs_y <= p->rect.y2 - p->radius+1)) {
+            (abs_y >= p->rect.y1 + p->radius && abs_y <= p->rect.y2 - p->radius)) {
         if(p->inv == 0) {
             /*Remove the edges*/
             int32_t last =  p->rect.x1 - abs_x;
@@ -788,7 +788,7 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
     uint32_t r2 = p->radius * p->radius;
 
     /*Handle corner areas*/
-    if(abs_y < p->radius || abs_y > h - p->radius) {
+    if(abs_y < p->radius || abs_y > h - p->radius - 1) {
         /* y = 0 should mean the top of the circle */
         lv_coord_t y;
         if(abs_y < p->radius)  y = p->radius - abs_y;
