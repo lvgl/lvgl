@@ -406,9 +406,11 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
     memset(buf, 0, sizeof(buf));
     char * buf_p = buf;
 
-    /*Add the sign*/
-    (*buf_p) = ext->value >= 0 ? '+' : '-';
-    buf_p++;
+    if (ext->range_min < 0) { // hide sign if there are only positive values
+        /*Add the sign*/
+        (*buf_p) = ext->value >= 0 ? '+' : '-';
+        buf_p++;
+    }
 
     int i;
     /*padding left*/

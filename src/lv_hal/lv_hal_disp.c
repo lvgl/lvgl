@@ -268,14 +268,14 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp)
  */
 LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
 {
-    disp_drv->buffer->flushing = 0;
-
     /*If the screen is transparent initialize it when the flushing is ready*/
 #if LV_COLOR_SCREEN_TRANSP
     if(disp_drv->screen_transp) {
         memset(disp_drv->buffer->buf_act, 0x00, disp_drv->buffer->size * sizeof(lv_color32_t));
     }
 #endif
+
+    disp_drv->buffer->flushing = 0;
 }
 
 /**

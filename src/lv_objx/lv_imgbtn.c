@@ -317,7 +317,6 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
         lv_coord_t left_w = 0;
         lv_coord_t right_w = 0;
 
-        src = ext->img_src_left[state];
         if(src) {
             lv_img_decoder_get_info(src, &header);
             left_w = header.w;

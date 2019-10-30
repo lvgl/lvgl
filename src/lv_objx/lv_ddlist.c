@@ -1001,11 +1001,15 @@ static void lv_ddlist_pos_current_option(lv_obj_t * ddlist)
  */
 static void lv_ddlist_refr_width(lv_obj_t * ddlist)
 {
+<<<<<<< HEAD
 
     /*Save the current x coordinate because it should be kept after the refrsh*/
     lv_coord_t x;
     if(lv_obj_get_base_dir(ddlist) == LV_BIDI_DIR_RTL) x = lv_obj_get_x(ddlist) + lv_obj_get_width(ddlist);
     else x = lv_obj_get_x(ddlist);
+=======
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+>>>>>>> dev-6.1
 
     /*Set the TIGHT fit horizontally the set the width to the content*/
     lv_page_set_scrl_fit2(ddlist, LV_FIT_TIGHT, lv_page_get_scrl_fit_bottom(ddlist));
@@ -1013,8 +1017,16 @@ static void lv_ddlist_refr_width(lv_obj_t * ddlist)
     /*Revert FILL fit to fill the parent with the options area. It allows to RIGHT/CENTER align the text*/
     lv_page_set_scrl_fit2(ddlist, LV_FIT_FILL, lv_page_get_scrl_fit_bottom(ddlist));
 
+<<<<<<< HEAD
     if(lv_obj_get_base_dir(ddlist) == LV_BIDI_DIR_RTL) lv_obj_set_x(ddlist, x - lv_obj_get_width(ddlist));
     else lv_obj_set_x(ddlist, x);
+=======
+    switch(lv_label_get_align(ext->label)) {
+        case LV_LABEL_ALIGN_LEFT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0); break;
+        case LV_LABEL_ALIGN_CENTER: lv_obj_align(ext->label, NULL, LV_ALIGN_CENTER, 0, 0); break;
+        case LV_LABEL_ALIGN_RIGHT: lv_obj_align(ext->label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0); break;
+    }
+>>>>>>> dev-6.1
 }
 
 #endif
