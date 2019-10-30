@@ -281,7 +281,10 @@ void lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color)
 {
     LV_ASSERT_OBJ(cpicker, LV_OBJX_NAME);
 
-    lv_cpicker_set_hsv(cpicker, lv_color_rgb_to_hsv(color.ch.red, color.ch.green, color.ch.blue));
+    lv_color32_t c32;
+    c32.full = lv_color_to32(color);
+
+    lv_cpicker_set_hsv(cpicker, lv_color_rgb_to_hsv(c32.ch.red, c32.ch.green, c32.ch.blue));
 }
 
 /**

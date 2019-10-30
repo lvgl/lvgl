@@ -325,8 +325,11 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
         return;
     }
 
-//    draw_letter_normal(pos_x, pos_y, &g, clip_area, map_p, color, opa);
-    draw_letter_subpx(pos_x, pos_y, &g, clip_area, map_p, color, opa);
+    if(font_p->subpx) {
+        draw_letter_subpx(pos_x, pos_y, &g, clip_area, map_p, color, opa);
+    } else {
+        draw_letter_normal(pos_x, pos_y, &g, clip_area, map_p, color, opa);
+    }
 }
 
 
@@ -549,7 +552,12 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
 
     uint8_t font_rgb[3];
+
+#if LV_COLOR_16_SWAP == 0
     uint8_t txt_rgb[3] = {color.ch.red, color.ch.green, color.ch.blue};
+#else
+    uint8_t txt_rgb[3] = {color.ch.red, (color.ch.green_h << 3) + color.ch.green_l, color.ch.blue};
+#endif
 
     for(row = row_start ; row < row_end; row++) {
         uint8_t subpx_cnt = 0;
@@ -576,16 +584,28 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
                 subpx_cnt = 0;
 
                 lv_color_t res_color;
-                uint8_t bg_rgb[3] = {vdb_buf_tmp->ch.red, vdb_buf_tmp->ch.green, vdb_buf_tmp->ch.blue};
+#if LV_COLOR_16_SWAP == 0
+                        uint8_t bg_rgb[3] = {vdb_buf_tmp->ch.red, vdb_buf_tmp->ch.green, vdb_buf_tmp->ch.blue};
+#else
+                        uint8_t bg_rgb[3] = {vdb_buf_tmp->ch.red,
+                                             (vdb_buf_tmp->ch.green_h << 3) + vdb_buf_tmp->ch.green_l,
+                                             vdb_buf_tmp->ch.blue};
+#endif
 
 #if LV_SUBPX_BGR
                 res_color.ch.blue = (uint16_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
-                res_color.ch.green = (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
                 res_color.ch.red = (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
 #else
                 res_color.ch.red = (uint16_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
-                res_color.ch.green = (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
                 res_color.ch.blue = (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
+#endif
+
+#if LV_COLOR_16_SWAP == 0
+                        res_color.ch.green = (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
+#else
+                        uint8_t green = (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
+                        res_color.ch.green_h = green >> 3;
+                        res_color.ch.green_l = green & 0x7;
 #endif
 
                 if(font_rgb[0] == 0 && font_rgb[1] == 0 && font_rgb[2] == 0) mask_buf[mask_p] = LV_OPA_TRANSP;

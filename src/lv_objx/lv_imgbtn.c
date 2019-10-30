@@ -298,9 +298,6 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
         lv_btn_state_t state     = lv_imgbtn_get_state(imgbtn);
         const lv_style_t * style = lv_imgbtn_get_style(imgbtn, state);
         lv_opa_t opa_scale       = lv_obj_get_opa_scale(imgbtn);
-
-
-
 #if LV_IMGBTN_TILED == 0
         const void * src = ext->img_src[state];
         if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
@@ -309,12 +306,12 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
             lv_draw_img(&imgbtn->coords, clip_area, src, style, opa_scale);
         }
 #else
+        const void * src = ext->img_src_mid[state];
         if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
             LV_LOG_WARN("lv_imgbtn_design: SYMBOLS are not supported in tiled mode")
-            return;
+            return LV_DESIGN_RES_OK;
         }
 
-        const void * src;
         lv_img_header_t header;
         lv_area_t coords;
         lv_coord_t left_w = 0;
