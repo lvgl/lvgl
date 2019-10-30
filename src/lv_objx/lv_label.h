@@ -33,6 +33,7 @@ extern "C" {
  *********************/
 #define LV_LABEL_DOT_NUM 3
 #define LV_LABEL_POS_LAST 0xFFFF
+#define LV_LABEL_TEXT_SEL_OFF 0
 
 LV_EXPORT_CONST_INT(LV_LABEL_DOT_NUM);
 LV_EXPORT_CONST_INT(LV_LABEL_POS_LAST);
