@@ -137,7 +137,6 @@ void lv_style_init(void)
     lv_style_copy(&lv_style_plain_color, &lv_style_plain);
     lv_style_plain_color.text.color      = lv_color_make(0xf0, 0xf0, 0xf0);
     lv_style_plain_color.image.color     = lv_color_make(0xf0, 0xf0, 0xf0);
-//    lv_style_plain_color.image.blend_mode = LV_BLEND_MODE_SUBTRACTIVE;
     lv_style_plain_color.line.color      = lv_color_make(0xf0, 0xf0, 0xf0);
     lv_style_plain_color.body.main_color = lv_color_make(0x55, 0x96, 0xd8);
     lv_style_plain_color.body.grad_color = lv_style_plain_color.body.main_color;
@@ -162,7 +161,6 @@ void lv_style_init(void)
     lv_style_pretty_color.body.main_color   = lv_color_make(0x6b, 0x9a, 0xc7);
     lv_style_pretty_color.body.grad_color   = lv_color_make(0x2b, 0x59, 0x8b);
     lv_style_pretty_color.body.border.color = lv_color_make(0x15, 0x2c, 0x42);
-//    lv_style_pretty_color.body.padding.right  = LV_DPI /2;
 
     /*Transparent style*/
     lv_style_copy(&lv_style_transp, &lv_style_plain);
@@ -190,7 +188,6 @@ void lv_style_init(void)
     lv_style_btn_rel.body.grad_dir = LV_GRAD_DIR_VER;
     lv_style_btn_rel.body.radius         = LV_DPI / 15;
     lv_style_btn_rel.body.opa         = LV_OPA_COVER;
-//    lv_style_btn_rel.body.blend_mode = LV_BLEND_MODE_ADDITIVE;
     lv_style_btn_rel.body.padding.left   = LV_DPI / 4;
     lv_style_btn_rel.body.padding.right  = LV_DPI / 4;
     lv_style_btn_rel.body.padding.top    = LV_DPI / 6;
@@ -199,11 +196,9 @@ void lv_style_init(void)
     lv_style_btn_rel.body.border.color   = lv_color_make(0x0b, 0x19, 0x28);
     lv_style_btn_rel.body.border.width   = LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
     lv_style_btn_rel.body.border.opa     = LV_OPA_70;
-//    lv_style_btn_rel.body.border.part    = LV_BORDER_PART_LEFT | LV_BORDER_PART_TOP;
+    lv_style_btn_rel.body.border.part    = LV_BORDER_PART_BOTTOM;
     lv_style_btn_rel.body.shadow.color   = LV_COLOR_BLACK;
     lv_style_btn_rel.body.shadow.width   = 0;
-//    lv_style_btn_rel.body.shadow.spread =  5;
-//    lv_style_btn_rel.body.shadow.blend_mode =  LV_BLEND_MODE_SUBTRACTIVE;
     lv_style_btn_rel.body.shadow.opa = LV_OPA_COVER;
     lv_style_btn_rel.body.shadow.offset.x = 0;
     lv_style_btn_rel.body.shadow.offset.y = 0;
