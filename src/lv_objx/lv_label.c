@@ -108,8 +108,8 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
 
 #if LV_LABEL_TEXT_SEL
-    ext->txt_sel_start = LV_LABEL_TEXT_SEL_OFF;
-    ext->txt_sel_end   = LV_LABEL_TEXT_SEL_OFF;
+    ext->txt_sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
+    ext->txt_sel_end   = LV_DRAW_LABEL_NO_TXT_SEL;
 #endif
     ext->dot.tmp_ptr   = NULL;
     ext->dot_tmp_alloc = 0;
@@ -977,8 +977,11 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
         /*Just for compatibility*/
         lv_draw_label_hint_t * hint = NULL;
 #endif
-        lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset,
-                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), hint);
+        lv_draw_label_txt_sel_t sel;
+
+        sel.start = lv_label_get_text_sel_start(label);
+        sel.end = lv_label_get_text_sel_end(label);
+        lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset, &sel, hint);
 
 
         if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
@@ -994,16 +997,14 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
                         lv_font_get_glyph_width(style->text.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
                 ofs.y = ext->offset.y;
 
-                lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs,
-                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), NULL);
+                lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs, &sel, NULL);
             }
 
             /*Draw the text again below the original to make an circular effect */
             if(size.y > lv_obj_get_height(label)) {
                 ofs.x = ext->offset.x;
                 ofs.y = ext->offset.y + size.y + lv_font_get_line_height(style->text.font);
-                lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs,
-                              lv_label_get_text_sel_start(label), lv_label_get_text_sel_end(label), NULL);
+                lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs, &sel, NULL);
             }
         }
     }

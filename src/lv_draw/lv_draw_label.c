@@ -51,11 +51,10 @@ static uint8_t hex_char_to_num(char hex);
  * @param txt 0 terminated text to write
  * @param flag settings for the text from 'txt_flag_t' enum
  * @param offset text offset in x and y direction (NULL if unused)
- * @param sel_start start index of selected area (`LV_LABEL_TXT_SEL_OFF` if none)
- * @param sel_end end index of selected area (`LV_LABEL_TXT_SEL_OFF` if none)
+ * @param sel make the text selected in the range by drawing a background there
  */
 void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
-                   const char * txt, lv_txt_flag_t flag, lv_point_t * offset, uint16_t sel_start, uint16_t sel_end,
+                   const char * txt, lv_txt_flag_t flag, lv_point_t * offset, lv_draw_label_txt_sel_t * sel,
                    lv_draw_label_hint_t * hint)
 {
     const lv_font_t * font = style->text.font;
@@ -212,18 +211,21 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
-            if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
-                int char_ind = lv_encoded_get_char_id(txt, i);
-                /*Do not draw the rectangle on the character at `sel_start`.*/
-                if(char_ind > sel_start && char_ind <= sel_end) {
-                    lv_area_t sel_coords;
-                    sel_coords.x1 = pos.x;
-                    sel_coords.y1 = pos.y;
-                    sel_coords.x2 = pos.x + letter_w + style->text.letter_space - 1;
-                    sel_coords.y2 = pos.y + line_height - 1;
-                    lv_draw_rect(&sel_coords, mask, &sel_style, opa);
+            if(sel) {
+                if(sel->start != 0xFFFF && sel->end != 0xFFFF) {
+                    int char_ind = lv_encoded_get_char_id(txt, i);
+                    /*Do not draw the rectangle on the character at `sel_start`.*/
+                    if(char_ind > sel->start && char_ind <= sel->end) {
+                        lv_area_t sel_coords;
+                        sel_coords.x1 = pos.x;
+                        sel_coords.y1 = pos.y;
+                        sel_coords.x2 = pos.x + letter_w + style->text.letter_space - 1;
+                        sel_coords.y2 = pos.y + line_height - 1;
+                        lv_draw_rect(&sel_coords, mask, &sel_style, opa);
+                    }
                 }
             }
+
             lv_draw_letter(&pos, mask, font, letter, color, opa);
 
             if(letter_w > 0) {

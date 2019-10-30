@@ -729,7 +729,7 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                     label_mask_ok = lv_area_intersect(&label_mask, mask, &cell_area);
                     if(label_mask_ok) {
                         lv_draw_label(&txt_area, &label_mask, cell_style, opa_scale, ext->cell_data[cell] + 1,
-                                      txt_flags, NULL, -1, -1, NULL);
+                                      txt_flags, NULL, NULL, NULL);
                     }
                     /*Draw lines after '\n's*/
                     lv_point_t p1;
