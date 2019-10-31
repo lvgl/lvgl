@@ -14,7 +14,7 @@
  *      DEFINES
  *********************/
 #define DEF_RADIUS 4
-#define DEF_SHADOW_COLOR lv_color_hex3(0xaaa)
+#define DEF_SHADOW_COLOR lv_color_hex3(0x888)
 
 /**********************
  *      TYPEDEFS
@@ -117,6 +117,7 @@ static void btn_init(void)
     rel.body.padding.inner  = LV_DPI / 10;
     rel.body.shadow.color   = DEF_SHADOW_COLOR;
     rel.body.shadow.width   = 6;
+    rel.body.shadow.offset.y = 2;
     rel.text.color          = lv_color_hsv_to_rgb(_hue, 5, 95);
     rel.image.color         = lv_color_hsv_to_rgb(_hue, 5, 95);
 
@@ -268,10 +269,13 @@ static void sw_init(void)
 
     lv_style_copy(&sw_indic, theme.style.slider.bg);
     sw_indic.body.radius = LV_RADIUS_CIRCLE;
+    sw_indic.body.padding.left = 0;
+    sw_indic.body.padding.right = 0;
 
     lv_style_copy(&sw_knob_on, theme.style.slider.knob);
-    sw_knob_on.body.shadow.width = 3;
+    sw_knob_on.body.shadow.width = 5;
     sw_knob_on.body.shadow.color = DEF_SHADOW_COLOR;
+    sw_knob_on.body.shadow.offset.y= 3;
 
     lv_style_copy(&sw_knob_off, &sw_knob_on);
     sw_knob_off.body.main_color   = lv_color_hex(0xfafafa);
@@ -671,6 +675,7 @@ static void tabview_init(void)
     indic.body.grad_color    = indic.body.main_color;
     indic.body.radius        = 0;
     indic.body.border.width  = 0;
+    indic.body.padding.inner = LV_DPI / 20;
     indic.body.padding.inner = LV_DPI / 20;
 
     lv_style_copy(&btn_bg, &def);

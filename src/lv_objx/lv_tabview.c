@@ -468,14 +468,6 @@ void lv_tabview_set_style(lv_obj_t * tabview, lv_tabview_style_t type, const lv_
     case LV_TABVIEW_STYLE_BTN_TGL_PR: lv_btnm_set_style(ext->btns, LV_BTNM_STYLE_BTN_TGL_PR, style); break;
     case LV_TABVIEW_STYLE_INDIC:
         lv_obj_set_style(ext->indic, style);
-
-        switch(ext->btns_pos) {
-        case LV_TABVIEW_BTNS_POS_TOP:
-        case LV_TABVIEW_BTNS_POS_BOTTOM: lv_obj_set_height(ext->indic, style->body.padding.inner); break;
-        case LV_TABVIEW_BTNS_POS_LEFT:
-        case LV_TABVIEW_BTNS_POS_RIGHT: lv_obj_set_width(ext->indic, style->body.padding.inner); break;
-        }
-
         tabview_realign(tabview);
         break;
     }
@@ -803,6 +795,10 @@ static void refr_indic_size(lv_obj_t * tabview)
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
 
     const lv_style_t * style_btn_bg  = lv_tabview_get_style(tabview, LV_TABVIEW_STYLE_BTN_BG);
+    const lv_style_t * style_indic  = lv_tabview_get_style(tabview, LV_TABVIEW_STYLE_INDIC);
+
+    if(style_indic == NULL) style_indic = &lv_style_plain_color;
+
 
     /*Set the indicator width/height*/
     lv_coord_t indic_w;
@@ -817,7 +813,7 @@ static void refr_indic_size(lv_obj_t * tabview)
     case LV_TABVIEW_BTNS_POS_BOTTOM:
         lv_obj_set_hidden(ext->indic, false);
         if(ext->tab_cnt) {
-            indic_h = style_btn_bg->body.padding.inner;
+            indic_h = style_indic->body.padding.inner;
             indic_w = (lv_obj_get_width(tabview) - style_btn_bg->body.padding.inner * (ext->tab_cnt - 1) -
                     style_btn_bg->body.padding.left - style_btn_bg->body.padding.right) /
                             ext->tab_cnt;
@@ -830,7 +826,7 @@ static void refr_indic_size(lv_obj_t * tabview)
     case LV_TABVIEW_BTNS_POS_RIGHT:
         lv_obj_set_hidden(ext->indic, false);
         if(ext->tab_cnt) {
-            indic_w = style_btn_bg->body.padding.inner;
+            indic_w = style_indic->body.padding.inner;
             max_h = lv_obj_get_height(ext->btns) - style_btn_bg->body.padding.top - style_btn_bg->body.padding.bottom;
             indic_h= max_h - ((ext->tab_cnt - 1) * style_btn_bg->body.padding.inner);
             indic_h = indic_h / ext->tab_cnt;

@@ -318,6 +318,8 @@ lv_res_t lv_indev_finish_drag(lv_indev_t * indev)
 
     res = lv_event_send(drag_obj, LV_EVENT_DRAG_END, NULL);
     if(res != LV_RES_OK) return res;
+
+    return res;
 }
 
 /**
@@ -1178,22 +1180,22 @@ static void indev_drag(lv_indev_proc_t * proc)
                         act_y += proc->types.pointer.drag_sum.y;
                     }
                 }
+            }
 
-                /*In the inactive direction `drag_sum` is kept zero*/
-                if(proc->types.pointer.drag_sum.x) act_x += proc->types.pointer.vect.x;
-                if(proc->types.pointer.drag_sum.y) act_y += proc->types.pointer.vect.y;
-                lv_obj_set_pos(drag_obj, act_x, act_y);
-                proc->types.pointer.drag_in_prog = 1;
+            /*In the inactive direction `drag_sum` is kept zero*/
+            if(proc->types.pointer.drag_sum.x) act_x += proc->types.pointer.vect.x;
+            if(proc->types.pointer.drag_sum.y) act_y += proc->types.pointer.vect.y;
+            lv_obj_set_pos(drag_obj, act_x, act_y);
+            proc->types.pointer.drag_in_prog = 1;
 
-                /*Set the drag in progress flag*/
-                /*Send the drag begin signal on first move*/
-                if(drag_just_started) {
-                    drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_BEGIN, indev_act);
-                    if(indev_reset_check(proc)) return;
+            /*Set the drag in progress flag*/
+            /*Send the drag begin signal on first move*/
+            if(drag_just_started) {
+                drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_BEGIN, indev_act);
+                if(indev_reset_check(proc)) return;
 
-                    lv_event_send(drag_obj, LV_EVENT_DRAG_BEGIN, NULL);
-                    if(indev_reset_check(proc)) return;
-                }
+                lv_event_send(drag_obj, LV_EVENT_DRAG_BEGIN, NULL);
+                if(indev_reset_check(proc)) return;
             }
 
             /*If the object didn't moved then clear the invalidated areas*/
@@ -1228,7 +1230,6 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
     if(lv_obj_get_drag_throw(drag_obj) == false) {
         proc->types.pointer.drag_in_prog = 0;
         drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
-        lv_event_send(drag_obj, LV_EVENT_DRAG_END, NULL);
         if(indev_reset_check(proc)) return;
 
         lv_event_send(drag_obj, LV_EVENT_DRAG_END, NULL);

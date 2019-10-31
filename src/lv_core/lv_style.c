@@ -196,7 +196,6 @@ void lv_style_init(void)
     lv_style_btn_rel.body.border.color   = lv_color_make(0x0b, 0x19, 0x28);
     lv_style_btn_rel.body.border.width   = LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
     lv_style_btn_rel.body.border.opa     = LV_OPA_70;
-    lv_style_btn_rel.body.border.part    = LV_BORDER_PART_BOTTOM;
     lv_style_btn_rel.body.shadow.color   = LV_COLOR_BLACK;
     lv_style_btn_rel.body.shadow.width   = 0;
     lv_style_btn_rel.body.shadow.opa = LV_OPA_COVER;
