@@ -302,10 +302,10 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, const 
     /*Get the inner area*/
     lv_area_t area_small;
     lv_area_copy(&area_small, coords);
-    area_small.x1 = ((style->body.border.part & LV_BORDER_PART_LEFT) ? area_small.x1 + border_width : coords->x1);
-    area_small.x2 = ((style->body.border.part & LV_BORDER_PART_RIGHT) ? area_small.x2 - border_width : coords->y1);
-    area_small.y1 = ((style->body.border.part & LV_BORDER_PART_TOP) ? area_small.y1 + border_width : coords->x2);
-    area_small.y2 = ((style->body.border.part & LV_BORDER_PART_BOTTOM) ? area_small.y2 - border_width : coords->y2);
+    area_small.x1 += ((style->body.border.part & LV_BORDER_PART_LEFT) ? border_width : - (border_width + rout));
+    area_small.x2 -= ((style->body.border.part & LV_BORDER_PART_RIGHT) ? border_width : - (border_width + rout));
+    area_small.y1 += ((style->body.border.part & LV_BORDER_PART_TOP) ? border_width : - (border_width + rout));
+    area_small.y2 -= ((style->body.border.part & LV_BORDER_PART_BOTTOM) ? border_width : - (border_width + rout));
 
     /*Create inner the mask*/
     lv_draw_mask_radius_init(&mask_rin_param, &area_small, rout - border_width, true);
