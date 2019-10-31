@@ -155,8 +155,12 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
     else {
         if(base_dir == LV_BIDI_DIR_LTR) format.s.align = LV_LABEL_ALIGN_LEFT;
         else if(base_dir == LV_BIDI_DIR_RTL) format.s.align = LV_LABEL_ALIGN_RIGHT;
-        else if(base_dir == LV_BIDI_DIR_AUTO) format.s.align = lv_bidi_detect_base_dir(txt);
-
+        else if(base_dir == LV_BIDI_DIR_AUTO)
+#if LV_USE_BIDI
+        	format.s.align = lv_bidi_detect_base_dir(txt);
+#else
+        	format.s.align = LV_LABEL_ALIGN_LEFT;
+#endif
         format.s.right_merge = 0;
         format.s.type        = 0;
         format.s.crop        = 0;
