@@ -284,7 +284,7 @@ void lv_draw_mask_fade_init(lv_draw_mask_param_t * param, lv_area_t * rect, lv_o
 
 void lv_draw_mask_map_init(lv_draw_mask_param_t * param, lv_area_t * coords, const lv_opa_t * map)
 {
-    lv_draw_mask_map_param_t * p = &param->fade;
+    lv_draw_mask_map_param_t * p = &param->map;
 
     lv_area_copy(&p->coords, coords);
     p->map = map;
