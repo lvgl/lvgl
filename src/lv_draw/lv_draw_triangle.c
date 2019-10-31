@@ -85,6 +85,10 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * clip, const l
         i_left = 0;
         i_right = 1;
         break;
+    default:
+        /*Shouldn't happen, but GCC will complain if we don't handle it*/
+        LV_LOG_WARN("lv_draw_triangle: unexpected condition for y_min_i");
+        return; /*Bail here*/
     }
 
     if(points[i_right].x < points[i_left].x) {
