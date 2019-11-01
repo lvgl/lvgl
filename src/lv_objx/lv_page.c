@@ -704,7 +704,6 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
         style_tmp.body.border.width = 0;
         lv_draw_rect(&page->coords, clip_area, &style_tmp, lv_obj_get_opa_scale(page));
 
-        lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
         if(style->body.corner_mask) {
             const lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
             lv_draw_mask_param_t mp;
@@ -871,7 +870,6 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     /*Automatically move children to the scrollable object*/
     else if(sign == LV_SIGNAL_CHILD_CHG) {
         lv_obj_t * child;
-        const lv_style_t * style_bg = lv_page_get_style(page, LV_PAGE_STYLE_BG);
         const lv_style_t * style_scrl = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
         lv_fit_t fit_left        = lv_page_get_scrl_fit_left(page);
         lv_fit_t fit_right        = lv_page_get_scrl_fit_right(page);
@@ -887,7 +885,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                 /* Reposition the child to take padding into account (Only if it's on (0;0) or (widht;height) coordinates now)
                  * It's required to keep new the object on the same coordinate if FIT is enabled.*/
                 if((tmp->coords.x1 == page->coords.x1)  &&
-                        (fit_right == LV_FIT_TIGHT || fit_right == LV_FIT_FILL) &&
+                        (fit_left == LV_FIT_TIGHT || fit_left == LV_FIT_FILL) &&
                         base_dir != LV_BIDI_DIR_RTL) {
                     tmp->coords.x1 += style_scrl->body.padding.left;
                     tmp->coords.x2 += style_scrl->body.padding.left;
