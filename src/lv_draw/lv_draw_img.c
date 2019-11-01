@@ -416,6 +416,7 @@ bool lv_img_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord_t y
     } else {
         xn = xs_int;
         xr = 0xFF;
+        c_dest_xn.full = c_dest_int.full;
     }
 
     int yn;      /*y neightboor*/
@@ -434,6 +435,7 @@ bool lv_img_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord_t y
     } else {
         yn = ys_int;
         yr = 0xFF;
+        c_dest_yn.full = c_dest_int.full;
     }
 
 
