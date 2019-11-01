@@ -354,7 +354,6 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
     lv_obj_t * tileview         = lv_obj_get_parent(scrl);
     const lv_style_t * style_bg = lv_tileview_get_style(tileview, LV_TILEVIEW_STYLE_MAIN);
-    lv_tileview_ext_t * ext = lv_obj_get_ext_attr(tileview);
 
     if(sign == LV_SIGNAL_DRAG_BEGIN) {
         set_valid_drag_dirs(tileview);
