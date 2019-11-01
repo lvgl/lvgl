@@ -393,47 +393,66 @@ bool lv_img_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord_t y
      * In the 0x70..0x90 range use the unchanged source pixel */
 
     lv_color_t c_dest_int;
-    lv_color_t c_dest_xn;
-    lv_color_t c_dest_yn;
 
     uint8_t px_size = LV_COLOR_SIZE >> 3;
     uint32_t px     = dsc->src_w * ys_int * px_size + xs_int * px_size;
     memcpy(&c_dest_int, &src_u8[px], px_size);
 
-    int xn;      /*x neightboor*/
-    lv_opa_t xr; /*x mix ratio*/
+
+    lv_color_t x_dest;
+    lv_color_t y_dest;
+
     if(xs_fract < 0x70) {
+        int32_t xn;      /*x neightboor*/
         xn = xs_int - 1;
         if(xn < 0) return false;
+
+        lv_color_t c_dest_xn;
         memcpy(&c_dest_xn, &src_u8[px - px_size], px_size);
+
+        lv_opa_t xr; /*x mix ratio*/
         xr = xs_fract + 0x80;
+        x_dest = lv_color_mix(c_dest_int, c_dest_xn, xr);
+
     } else if(xs_fract > 0x90) {
+        int32_t xn;      /*x neightboor*/
         xn = xs_int + 1;
         if(xn >= dsc->src_w) return false;
+
+        lv_color_t c_dest_xn;
         memcpy(&c_dest_xn, &src_u8[px + px_size], px_size);
 
+        lv_opa_t xr; /*x mix ratio*/
         xr = (0xFF - xs_fract) + 0x80;
+        x_dest = lv_color_mix(c_dest_int, c_dest_xn, xr);
     } else {
-        xn = xs_int;
-        xr = 0xFF;
+        x_dest.full = c_dest_int.full;
     }
 
-    int yn;      /*y neightboor*/
-    lv_opa_t yr; /*y mix ratio*/
     if(ys_fract < 0x70) {
+        int32_t yn;      /*y neightboor*/
         yn = ys_int - 1;
         if(yn < 0) return false;
+        lv_color_t c_dest_yn;
         memcpy(&c_dest_yn, &src_u8[px - px_size * dsc->src_w], px_size);
 
+        lv_opa_t yr; /*y mix ratio*/
         yr = ys_fract + 0x80;
+        y_dest = lv_color_mix(c_dest_int, c_dest_yn, yr);
+
     } else if(ys_fract > 0x90) {
+        int32_t yn;      /*y neightboor*/
         yn = ys_int + 1;
         if(yn >= dsc->src_h) return false;
+
+        lv_color_t c_dest_yn;
         memcpy(&c_dest_yn, &src_u8[px + px_size * dsc->src_w], px_size);
+
+        lv_opa_t yr; /*y mix ratio*/
         yr = (0xFF - ys_fract) + 0x80;
+        y_dest = lv_color_mix(c_dest_int, c_dest_yn, yr);
     } else {
-        yn = ys_int;
-        yr = 0xFF;
+        y_dest.full = c_dest_int.full;
     }
 
 
@@ -444,9 +463,6 @@ bool lv_img_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord_t y
         if(c_dest_int.full == ct.full) return false;
     }
 
-
-    lv_color_t x_dest    = lv_color_mix(c_dest_int, c_dest_xn, xr);
-    lv_color_t y_dest    = lv_color_mix(c_dest_int, c_dest_yn, yr);
     dsc->res_color = lv_color_mix(x_dest, y_dest, LV_OPA_50);
 
     /*Get result pixel opacity*/
