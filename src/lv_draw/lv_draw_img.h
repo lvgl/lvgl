@@ -69,17 +69,19 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
  */
 lv_img_src_t lv_img_src_get_type(const void * src);
 
+
 /**
  * Get the color of an image's pixel
  * @param dsc an image descriptor
  * @param x x coordinate of the point to get
  * @param y x coordinate of the point to get
- * @param style style of the image. In case of `LV_IMG_CF_ALPHA_1/2/4/8` `style->image.color` shows
- * the color. Can be `NULL` but for `ALPHA` images black will be returned. In other cases it is not
- * used.
+ * @param color the color of the image. In case of `LV_IMG_CF_ALPHA_1/2/4/8` this color is used.
+ * Not used in other cases.
  * @return color of the point
  */
-lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, const lv_style_t * style);
+lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t color);
+
+
 /**
  * Get the alpha value of an image's pixel
  * @param dsc pointer to an image descriptor
@@ -88,6 +90,9 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
  * @return alpha value of the point
  */
 lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y);
+
+
+bool lv_img_get_px_rotated(lv_img_dsc_t * img, uint16_t angle, lv_color_t color, lv_point_t * point, lv_point_t * pivot, lv_color_t * res_color, lv_opa_t * res_opa);
 
 /**
  * Set the color of a pixel of an image. The alpha channel won't be affected.
