@@ -740,7 +740,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
 
     /*The simplest case just copy the pixels into the VDB*/
-    if(other_mask_cnt == 0 && chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && style->image.intense == LV_OPA_TRANSP) {
+    if(0 && other_mask_cnt == 0 && chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && style->image.intense == LV_OPA_TRANSP) {
         lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, LV_OPA_COVER, style->image.blend_mode);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
@@ -748,10 +748,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         /*The pixel size in byte is different if an alpha byte is added too*/
         uint8_t px_size_byte = alpha_byte ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
 
-
-
         /*Build the image and a mask line-by-line*/
-        uint32_t mask_buf_size = lv_area_get_size(&draw_area) > LV_HOR_RES_MAX ? lv_area_get_size(&draw_area) : LV_HOR_RES_MAX;
+        uint32_t mask_buf_size = lv_area_get_size(&draw_area) > LV_HOR_RES_MAX ? LV_HOR_RES_MAX : lv_area_get_size(&draw_area);
         lv_color_t * map2 = lv_draw_buf_get(mask_buf_size * sizeof(lv_color_t));
         lv_opa_t * mask_buf = lv_draw_buf_get(mask_buf_size);
 
@@ -779,8 +777,10 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             memset(mask_buf, 0xFF, mask_buf_size);
         }
 
+        uint16_t angle = 30;
+
         lv_draw_mask_res_t mask_res;
-        mask_res = (alpha_byte || chroma_key) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+        mask_res = (alpha_byte || chroma_key || angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
         lv_coord_t x;
         lv_coord_t y;
         for(y = 0; y < lv_area_get_height(&draw_area); y++) {
@@ -803,6 +803,20 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 #elif LV_COLOR_DEPTH == 32
                 c.full =  *((uint32_t*)map_px);
 #endif
+
+                lv_img_dsc_t img;
+                img.data = map_p;
+                img.header.w = lv_area_get_width(map_area);
+                img.header.h = lv_area_get_height(map_area);
+                img.header.cf = LV_IMG_CF_TRUE_COLOR;
+                lv_point_t p = {x + disp_area->x1 - map_area->x1 ,y + disp_area->y1 - map_area->y1};
+                lv_point_t piv = {img.header.w / 2 ,img.header.h / 2};
+                bool ret;
+                ret = lv_img_get_px_rotated(&img, angle, LV_COLOR_BLACK, &p, &piv, &c, NULL);
+                if(ret == false) {
+                    mask_buf[px_i] = LV_OPA_TRANSP;
+                    continue;
+                }
 
                 if (chroma_key) {
                     if(c.full == chroma_keyed_color.full) {
@@ -840,7 +854,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                 blend_area.y2 = blend_area.y1;
 
                 px_i = 0;
-                mask_res = (alpha_byte || chroma_key) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+                mask_res = (alpha_byte || chroma_key || angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
 
                 /*Prepare the `mask_buf`if there are other masks*/
                 if(other_mask_cnt) {
@@ -857,6 +871,4 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         lv_draw_buf_release(mask_buf);
         lv_draw_buf_release(map2);
     }
-
-
 }

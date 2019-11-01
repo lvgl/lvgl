@@ -78,6 +78,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cf        = LV_IMG_CF_UNKNOWN;
     ext->w         = lv_obj_get_width(new_img);
     ext->h         = lv_obj_get_height(new_img);
+    ext->angle = 30;
     ext->auto_size = 1;
     ext->offset.x  = 0;
     ext->offset.y  = 0;
@@ -351,7 +352,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
 
     if(mode == LV_DESIGN_COVER_CHK) {
         lv_design_res_t cover = LV_DESIGN_RES_NOT_COVER;
-        if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL) return LV_DESIGN_RES_NOT_COVER;
+        if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL || ext->angle != 0) return LV_DESIGN_RES_NOT_COVER;
 
         if(ext->cf == LV_IMG_CF_TRUE_COLOR || ext->cf == LV_IMG_CF_RAW) {
             cover = lv_area_is_in(clip_area, &img->coords) ? LV_DESIGN_RES_COVER : LV_DESIGN_RES_NOT_COVER;
