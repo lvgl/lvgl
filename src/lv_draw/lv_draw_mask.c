@@ -234,17 +234,17 @@ void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t origo_x, l
     p->origo.y = origo_y;
     p->cb = lv_draw_mask_angle;
 
-    if(start_angle > 0 && start_angle < 180) {
+    if(start_angle >= 0 && start_angle < 180) {
         start_side = LV_DRAW_MASK_LINE_SIDE_LEFT;
     }
-    else if(start_angle > 180 && start_angle < 360) {
+    else if(start_angle >= 180 && start_angle < 360) {
         start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT;
     }
 
-    if(end_angle > 0 && end_angle < 180) {
+    if(end_angle >= 0 && end_angle < 180) {
         end_side = LV_DRAW_MASK_LINE_SIDE_RIGHT;
     }
-    else if(end_angle > 180 && end_angle < 360) {
+    else if(end_angle >= 180 && end_angle < 360) {
         end_side = LV_DRAW_MASK_LINE_SIDE_LEFT;
     }
 
