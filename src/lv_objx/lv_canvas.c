@@ -30,7 +30,7 @@
 static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * param);
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf);
 
-static void set_px_true_color_alpa(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
                       lv_color_t color, lv_opa_t opa);
 
 static void set_px_cb_alpha1(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
@@ -828,7 +828,7 @@ static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * par
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf)
 {
     switch(cf) {
-        case LV_IMG_CF_TRUE_COLOR_ALPHA: disp_drv->set_px_cb = set_px_true_color_alpa; break;
+        case LV_IMG_CF_TRUE_COLOR_ALPHA: disp_drv->set_px_cb = set_px_true_color_alpha; break;
         case LV_IMG_CF_ALPHA_1BIT: disp_drv->set_px_cb = set_px_cb_alpha1; break;
         case LV_IMG_CF_ALPHA_2BIT: disp_drv->set_px_cb = set_px_cb_alpha2; break;
         case LV_IMG_CF_ALPHA_4BIT: disp_drv->set_px_cb = set_px_cb_alpha4; break;
@@ -901,7 +901,7 @@ void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, lv_color
 }
 
 
-static void set_px_true_color_alpa(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
                       lv_color_t color, lv_opa_t opa)
 {
     if(opa <= LV_OPA_MIN) return;
@@ -912,7 +912,7 @@ static void set_px_true_color_alpa(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_c
     d.header.w = buf_w;
     d.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
 
-    lv_color_t bg_color = lv_img_buf_get_px_color(&d, x, y, &lv_style_plain);
+    lv_color_t bg_color = lv_img_buf_get_px_color(&d, x, y, LV_COLOR_BLACK);
     lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&d, x, y);
 
     lv_opa_t res_opa;
