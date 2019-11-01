@@ -30,7 +30,7 @@
 static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * param);
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf);
 
-static void set_px_true_color_alpa(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
                       lv_color_t color, lv_opa_t opa);
 
 static void set_px_cb_alpha1(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
@@ -218,7 +218,9 @@ lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y)
     lv_canvas_ext_t * ext    = lv_obj_get_ext_attr(canvas);
     const lv_style_t * style = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
 
-    return lv_img_buf_get_px_color(&ext->dsc, x, y, style);
+    if(style == NULL) style = &lv_style_scr;
+
+    return lv_img_buf_get_px_color(&ext->dsc, x, y, style->image.color);
 }
 
 /**
@@ -312,115 +314,37 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
 
     lv_canvas_ext_t * ext_dst = lv_obj_get_ext_attr(canvas);
     const lv_style_t * style  = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
-    int32_t sinma             = lv_trigo_sin(-angle);
-    int32_t cosma             = lv_trigo_sin(-angle + 90); /* cos */
 
-    int32_t img_width   = img->header.w;
-    int32_t img_height  = img->header.h;
     int32_t dest_width  = ext_dst->dsc.header.w;
     int32_t dest_height = ext_dst->dsc.header.h;
 
     int32_t x;
     int32_t y;
+    lv_point_t point_p;
+
+    lv_point_t pivot_p;
+    pivot_p.x = pivot_x;
+    pivot_p.y = pivot_y;
+
+    lv_color_t color_res;
+    lv_opa_t opa_res;
+
+    bool ret;
+
     for(x = -offset_x; x < dest_width - offset_x; x++) {
         for(y = -offset_y; y < dest_height - offset_y; y++) {
-            /*Get the target point relative coordinates to the pivot*/
-            int32_t xt = x - pivot_x;
-            int32_t yt = y - pivot_y;
+            point_p.x = x;
+            point_p.y = y;
 
-            /*Get the source pixel from the upscaled image*/
-            int32_t xs = ((cosma * xt - sinma * yt) >> (LV_TRIGO_SHIFT - 8)) + pivot_x * 256;
-            int32_t ys = ((sinma * xt + cosma * yt) >> (LV_TRIGO_SHIFT - 8)) + pivot_y * 256;
-
-            /*Get the integer part of the source pixel*/
-            int xs_int = xs >> 8;
-            int ys_int = ys >> 8;
-
-            if(xs_int >= img_width)
-                continue;
-            else if(xs_int < 0)
-                continue;
-
-            if(ys_int >= img_height)
-                continue;
-            else if(ys_int < 0)
-                continue;
-
-            /*Get the fractional part of the source pixel*/
-            int xs_fract = xs & 0xff;
-            int ys_fract = ys & 0xff;
-
-            /* If the fractional < 0x70 mix the source pixel with the left/top pixel
-             * If the fractional > 0x90 mix the source pixel with the right/bottom pixel
-             * In the 0x70..0x90 range use the unchanged source pixel */
-
-            int xn;      /*x neightboor*/
-            lv_opa_t xr; /*x mix ratio*/
-            if(xs_fract < 0x70) {
-                xn = xs_int - 1;
-                xr = xs_fract * 2;
-            } else if(xs_fract > 0x90) {
-                xn = xs_int + 1;
-                xr = (0xFF - xs_fract) * 2;
-            } else {
-                xn = xs_int;
-                xr = 0xFF;
-            }
-
-            /*Handle under/overflow*/
-            if(xn >= img_width)
-                continue;
-            else if(xn < 0)
-                continue;
-
-            int yn;      /*y neightboor*/
-            lv_opa_t yr; /*y mix ratio*/
-            if(ys_fract < 0x70) {
-                yn = ys_int - 1;
-                yr = ys_fract * 2;
-            } else if(ys_fract > 0x90) {
-                yn = ys_int + 1;
-                yr = (0xFF - ys_fract) * 2;
-            } else {
-                yn = ys_int;
-                yr = 0xFF;
-            }
-
-            /*Handle under/overflow*/
-            if(yn >= img_height)
-                continue;
-            else if(yn < 0)
-                continue;
-
-            /*Get the mixture of the original source and the neightboor pixels in both directions*/
-            lv_color_t c_dest_int = lv_img_buf_get_px_color(img, xs_int, ys_int, style);
-
-            if(lv_img_color_format_is_chroma_keyed(img->header.cf)) {
-                lv_color_t ct = LV_COLOR_TRANSP;
-                if(c_dest_int.full == ct.full) continue;
-            }
-
-            lv_color_t c_dest_xn = lv_img_buf_get_px_color(img, xn, ys_int, style);
-            lv_color_t c_dest_yn = lv_img_buf_get_px_color(img, xs_int, yn, style);
-            lv_color_t x_dest    = lv_color_mix(c_dest_int, c_dest_xn, xr);
-            lv_color_t y_dest    = lv_color_mix(c_dest_int, c_dest_yn, yr);
-            lv_color_t color_res = lv_color_mix(x_dest, y_dest, LV_OPA_50);
+            ret = lv_img_get_px_rotated(img, angle, style->image.color, &point_p, &pivot_p, &color_res, &opa_res);
+            if(ret == false) continue;
 
             if(x + offset_x >= 0 && x + offset_x < dest_width && y + offset_y >= 0 && y + offset_y < dest_height) {
                 /*If the image has no alpha channel just simple set the result color on the canvas*/
                 if(lv_img_color_format_has_alpha(img->header.cf) == false) {
                     lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, color_res);
                 } else {
-                    /*Get result pixel opacity*/
-                    lv_opa_t opa_int = lv_img_buf_get_px_alpha(img, xs_int, ys_int);
-                    lv_opa_t opa_xn  = lv_img_buf_get_px_alpha(img, xn, ys_int);
-                    lv_opa_t opa_yn  = lv_img_buf_get_px_alpha(img, xs_int, yn);
-                    lv_opa_t opa_x   = (opa_int * xr + (opa_xn * (255 - xr))) >> 8;
-                    lv_opa_t opa_y   = (opa_int * yr + (opa_yn * (255 - yr))) >> 8;
-                    lv_opa_t opa_res = (opa_x + opa_y) / 2;
-                    if(opa_res <= LV_OPA_MIN) continue;
-
-                    lv_color_t bg_color = lv_img_buf_get_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, style);
+                    lv_color_t bg_color = lv_img_buf_get_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, style->image.color);
 
                     /*If the canvas has no alpha but the image has mix the image's color with
                      * canvas*/
@@ -904,7 +828,7 @@ static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * par
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf)
 {
     switch(cf) {
-        case LV_IMG_CF_TRUE_COLOR_ALPHA: disp_drv->set_px_cb = set_px_true_color_alpa; break;
+        case LV_IMG_CF_TRUE_COLOR_ALPHA: disp_drv->set_px_cb = set_px_true_color_alpha; break;
         case LV_IMG_CF_ALPHA_1BIT: disp_drv->set_px_cb = set_px_cb_alpha1; break;
         case LV_IMG_CF_ALPHA_2BIT: disp_drv->set_px_cb = set_px_cb_alpha2; break;
         case LV_IMG_CF_ALPHA_4BIT: disp_drv->set_px_cb = set_px_cb_alpha4; break;
@@ -977,7 +901,7 @@ void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, lv_color
 }
 
 
-static void set_px_true_color_alpa(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
+static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
                       lv_color_t color, lv_opa_t opa)
 {
     if(opa <= LV_OPA_MIN) return;
@@ -988,7 +912,7 @@ static void set_px_true_color_alpa(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_c
     d.header.w = buf_w;
     d.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
 
-    lv_color_t bg_color = lv_img_buf_get_px_color(&d, x, y, &lv_style_plain);
+    lv_color_t bg_color = lv_img_buf_get_px_color(&d, x, y, LV_COLOR_BLACK);
     lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&d, x, y);
 
     lv_opa_t res_opa;
