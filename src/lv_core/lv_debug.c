@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
+#include "lv_debug.h"
 
 #if LV_USE_DEBUG
 
@@ -126,7 +127,7 @@ bool lv_debug_check_str(const void * str)
     return false;
 }
 
-void lv_debug_log_error(const char * msg, unsigned long int  value)
+void lv_debug_log_error(const char * msg, uint64_t value)
 {
     static const char hex[] = "0123456789ABCDEF";
 
