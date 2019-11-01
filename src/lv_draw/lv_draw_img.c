@@ -339,28 +339,49 @@ void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
     }
 }
 
-bool lv_img_get_px_rotated(lv_img_dsc_t * img, uint16_t angle, lv_color_t color, lv_point_t * point, lv_point_t * pivot, lv_color_t * res_color, lv_opa_t * res_opa)
-{
 
-    int32_t sinma             = lv_trigo_sin(-angle);
-    int32_t cosma             = lv_trigo_sin(-angle + 90); /* cos */
+void lv_img_rotate_init(lv_img_rotate_dsc_t * dsc, int16_t angle, const void * src, lv_coord_t src_w, lv_coord_t src_h,
+                        lv_img_cf_t cf, lv_coord_t pivot_x, lv_coord_t pivot_y, lv_color_t color)
+{
+    memset(dsc, 0x00, sizeof(lv_img_rotate_dsc_t));
+
+    dsc->angle = angle;
+    dsc->src = src;
+    dsc->src_w = src_w;
+    dsc->src_h = src_h;
+    dsc->cf = cf;
+    dsc->color = color;
+    dsc->pivot_x = pivot_x;
+    dsc->pivot_y = pivot_y;
+    dsc->pivot_x_256 = pivot_x * 256;
+    dsc->pivot_y_256 = pivot_y * 256;
+    dsc->sinma = lv_trigo_sin(-angle);
+    dsc->cosma = lv_trigo_sin(-angle + 90);
+
+    dsc->chroma_keyed = lv_img_color_format_is_chroma_keyed(cf) ? 1 : 0;
+    dsc->has_alpha = lv_img_color_format_has_alpha(cf) ? 1 : 0;
+}
+
+bool lv_img_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
+{
+    const uint8_t * src_u8 = dsc->src;
 
     /*Get the target point relative coordinates to the pivot*/
-    int32_t xt = point->x - pivot->x;
-    int32_t yt = point->y - pivot->y;
+    int32_t xt = x - dsc->pivot_x;
+    int32_t yt = y - dsc->pivot_y;
 
     /*Get the source pixel from the upscaled image*/
-    int32_t xs = ((cosma * xt - sinma * yt) >> (LV_TRIGO_SHIFT - 8)) + pivot->x * 256;
-    int32_t ys = ((sinma * xt + cosma * yt) >> (LV_TRIGO_SHIFT - 8)) + pivot->y * 256;
+    int32_t xs = ((dsc->cosma * xt - dsc->sinma * yt) >> (LV_TRIGO_SHIFT - 8)) + dsc->pivot_x_256;
+    int32_t ys = ((dsc->sinma * xt + dsc->cosma * yt) >> (LV_TRIGO_SHIFT - 8)) + dsc->pivot_y_256;
 
     /*Get the integer part of the source pixel*/
     int xs_int = xs >> 8;
     int ys_int = ys >> 8;
 
-    if(xs_int >= img->header.w) return false;
+    if(xs_int >= dsc->src_w) return false;
     else if(xs_int < 0) return false;
 
-    if(ys_int >= img->header.h) return false;
+    if(ys_int >= dsc->src_h) return false;
     else if(ys_int < 0) return false;
 
     /*Get the fractional part of the source pixel*/
@@ -371,66 +392,73 @@ bool lv_img_get_px_rotated(lv_img_dsc_t * img, uint16_t angle, lv_color_t color,
      * If the fractional > 0x90 mix the source pixel with the right/bottom pixel
      * In the 0x70..0x90 range use the unchanged source pixel */
 
+    lv_color_t c_dest_int;
+    lv_color_t c_dest_xn;
+    lv_color_t c_dest_yn;
+
+    uint8_t px_size = LV_COLOR_SIZE >> 3;
+    uint32_t px     = dsc->src_w * ys_int * px_size + xs_int * px_size;
+    memcpy(&c_dest_int, &src_u8[px], px_size);
+
     int xn;      /*x neightboor*/
     lv_opa_t xr; /*x mix ratio*/
     if(xs_fract < 0x70) {
         xn = xs_int - 1;
-        xr = xs_fract * 2;
+        if(xn < 0) return false;
+        memcpy(&c_dest_xn, &src_u8[px - px_size], px_size);
+        xr = xs_fract + 0x80;
     } else if(xs_fract > 0x90) {
         xn = xs_int + 1;
-        xr = (0xFF - xs_fract) * 2;
+        if(xn >= dsc->src_w) return false;
+        memcpy(&c_dest_xn, &src_u8[px + px_size], px_size);
+
+        xr = (0xFF - xs_fract) + 0x80;
     } else {
         xn = xs_int;
         xr = 0xFF;
     }
 
-    /*Handle under/overflow*/
-    if(xn >= img->header.w) return false;
-    else if(xn < 0) return false;
-
     int yn;      /*y neightboor*/
     lv_opa_t yr; /*y mix ratio*/
     if(ys_fract < 0x70) {
         yn = ys_int - 1;
-        yr = ys_fract * 2;
+        if(yn < 0) return false;
+        memcpy(&c_dest_yn, &src_u8[px - px_size * dsc->src_w], px_size);
+
+        yr = ys_fract + 0x80;
     } else if(ys_fract > 0x90) {
         yn = ys_int + 1;
-        yr = (0xFF - ys_fract) * 2;
+        if(yn >= dsc->src_h) return false;
+        memcpy(&c_dest_yn, &src_u8[px + px_size * dsc->src_w], px_size);
+        yr = (0xFF - ys_fract) + 0x80;
     } else {
         yn = ys_int;
         yr = 0xFF;
     }
 
-    /*Handle under/overflow*/
-    if(yn >= img->header.h) return false;
-    else if(yn < 0) return false;
 
     /*Get the mixture of the original source and the neightboor pixels in both directions*/
-    /*Get the mixture of the original source and the neightboor pixels in both directions*/
-    lv_color_t c_dest_int = lv_img_buf_get_px_color(img, xs_int, ys_int, color);
 
-    if(lv_img_color_format_is_chroma_keyed(img->header.cf)) {
+    if(dsc->chroma_keyed) {
         lv_color_t ct = LV_COLOR_TRANSP;
         if(c_dest_int.full == ct.full) return false;
     }
 
-    lv_color_t c_dest_xn = lv_img_buf_get_px_color(img, xn, ys_int, color);
-    lv_color_t c_dest_yn = lv_img_buf_get_px_color(img, xs_int, yn, color);
 
     lv_color_t x_dest    = lv_color_mix(c_dest_int, c_dest_xn, xr);
     lv_color_t y_dest    = lv_color_mix(c_dest_int, c_dest_yn, yr);
-    *res_color = lv_color_mix(x_dest, y_dest, LV_OPA_50);
+    dsc->res_color = lv_color_mix(x_dest, y_dest, LV_OPA_50);
 
     /*Get result pixel opacity*/
-    if(lv_img_color_format_has_alpha(img->header.cf)) {
-        lv_opa_t opa_int = lv_img_buf_get_px_alpha(img, xs_int, ys_int);
-        lv_opa_t opa_xn  = lv_img_buf_get_px_alpha(img, xn, ys_int);
-        lv_opa_t opa_yn  = lv_img_buf_get_px_alpha(img, xs_int, yn);
-        lv_opa_t opa_x   = (opa_int * xr + (opa_xn * (255 - xr))) >> 8;
-        lv_opa_t opa_y   = (opa_int * yr + (opa_yn * (255 - yr))) >> 8;
-
-        *res_opa = (opa_x + opa_y) / 2;
-        if(*res_opa <= LV_OPA_MIN) return false;
+    if(dsc->has_alpha) {
+//        lv_opa_t opa_int = lv_img_buf_get_px_alpha(img, xs_int, ys_int);
+//        lv_opa_t opa_xn  = lv_img_buf_get_px_alpha(img, xn, ys_int);
+//        lv_opa_t opa_yn  = lv_img_buf_get_px_alpha(img, xs_int, yn);
+//        lv_opa_t opa_x   = (opa_int * xr + (opa_xn * (255 - xr))) >> 8;
+//        lv_opa_t opa_y   = (opa_int * yr + (opa_yn * (255 - yr))) >> 8;
+//
+//        dsc->res_opa = (opa_x + opa_y) / 2;
+//        if(dsc->res_opa <= LV_OPA_MIN) return false;
     }
 
     return true;
@@ -804,19 +832,19 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                 c.full =  *((uint32_t*)map_px);
 #endif
 
-                lv_img_dsc_t img;
-                img.data = map_p;
-                img.header.w = lv_area_get_width(map_area);
-                img.header.h = lv_area_get_height(map_area);
-                img.header.cf = LV_IMG_CF_TRUE_COLOR;
-                lv_point_t p = {x + disp_area->x1 - map_area->x1 ,y + disp_area->y1 - map_area->y1};
-                lv_point_t piv = {img.header.w / 2 ,img.header.h / 2};
-                bool ret;
-                ret = lv_img_get_px_rotated(&img, angle, LV_COLOR_BLACK, &p, &piv, &c, NULL);
-                if(ret == false) {
-                    mask_buf[px_i] = LV_OPA_TRANSP;
-                    continue;
-                }
+//                lv_img_dsc_t img;
+//                img.data = map_p;
+//                img.header.w = lv_area_get_width(map_area);
+//                img.header.h = lv_area_get_height(map_area);
+//                img.header.cf = LV_IMG_CF_TRUE_COLOR;
+//                lv_point_t p = {x + disp_area->x1 - map_area->x1 ,y + disp_area->y1 - map_area->y1};
+//                lv_point_t piv = {img.header.w / 2 ,img.header.h / 2};
+//                bool ret;
+//                ret = lv_img_get_px_rotated(&img, angle, LV_COLOR_BLACK, &p, &piv, &c, NULL);
+//                if(ret == false) {
+//                    mask_buf[px_i] = LV_OPA_TRANSP;
+//                    continue;
+//                }
 
                 if (chroma_key) {
                     if(c.full == chroma_keyed_color.full) {

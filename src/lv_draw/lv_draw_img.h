@@ -43,6 +43,27 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    lv_color_t res_color;
+    lv_opa_t res_opa;
+
+    const void * src;
+    lv_coord_t src_w;
+    lv_coord_t src_h;
+    lv_coord_t pivot_x;
+    lv_coord_t pivot_y;
+    lv_coord_t pivot_x_256;
+    lv_coord_t pivot_y_256;
+    int32_t sinma;
+    int32_t cosma;
+    int16_t angle;
+    lv_color_t color;
+    lv_img_cf_t cf;
+
+    uint8_t chroma_keyed :1;
+    uint8_t has_alpha :1;
+
+}lv_img_rotate_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -92,7 +113,10 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
 lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y);
 
 
-bool lv_img_get_px_rotated(lv_img_dsc_t * img, uint16_t angle, lv_color_t color, lv_point_t * point, lv_point_t * pivot, lv_color_t * res_color, lv_opa_t * res_opa);
+void lv_img_rotate_init(lv_img_rotate_dsc_t * dsc, int16_t angle, const void * src, lv_coord_t src_w, lv_coord_t src_h,
+                        lv_img_cf_t cf, lv_coord_t pivot_x, lv_coord_t pivot_y, lv_color_t color);
+
+bool lv_img_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord_t y);
 
 /**
  * Set the color of a pixel of an image. The alpha channel won't be affected.
