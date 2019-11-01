@@ -331,7 +331,7 @@ lv_chart_type_t lv_chart_get_type(const lv_obj_t * chart);
  * @param chart pointer to chart object
  * @return point number on each data line
  */
-uint16_t lv_chart_get_point_cnt(const lv_obj_t * chart);
+uint16_t lv_chart_get_point_count(const lv_obj_t * chart);
 
 /**
  * Get the opacity of the data series
