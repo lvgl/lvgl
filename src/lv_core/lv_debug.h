@@ -34,7 +34,7 @@ bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
 
 bool lv_debug_check_obj_valid(const lv_obj_t * obj);
 
-bool lv_debug_check_style(const void * str);
+bool lv_debug_check_style(const lv_style_t * style);
 
 bool lv_debug_check_str(const void * str);
 
