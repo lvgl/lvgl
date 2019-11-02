@@ -19,6 +19,7 @@
 #include "../lv_draw/lv_img_decoder.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_txt.h"
+#include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
 
 /*********************
@@ -200,6 +201,9 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
         lv_obj_set_size(img, ext->w, ext->h);
     }
 
+    /*Provide enough room for the rotated corners*/
+    if(ext->angle) lv_obj_refresh_ext_draw_pad(img);
+
     lv_obj_invalidate(img);
 }
 
@@ -252,6 +256,17 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y)
         ext->offset.y = y;
         lv_obj_invalidate(img);
     }
+}
+
+void lv_img_set_angle(lv_obj_t * img, int16_t angle)
+{
+    if(angle < 0 || angle >= 360) angle = angle % 360;
+
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+    ext->angle = angle;
+    lv_obj_refresh_ext_draw_pad(img);
+    lv_obj_invalidate(img);
+
 }
 
 /*=====================
@@ -426,6 +441,17 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         /*Refresh the file name to refresh the symbol text size*/
         if(ext->src_type == LV_IMG_SRC_SYMBOL) {
             lv_img_set_src(img, ext->src);
+        }
+    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+        /*If the image has angle provide enough room for the rotated corners */
+        if(ext->angle) {
+            lv_sqrt_res_t ds;
+            lv_sqrt(ext->w * ext->w + ext->h * ext->h, &ds);
+            printf("%d %d %d\n", ext->w, ext->h, ds.i);
+
+            lv_coord_t d = (ds.i - LV_MATH_MIN(ext->w, ext->h)) / 2;
+
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, d);
         }
     }
 
