@@ -757,15 +757,25 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
 static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p, lv_opa_t opa,
         bool chroma_key, bool alpha_byte, const lv_style_t * style)
 {
+
+    uint16_t angle = 30;
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
     lv_area_t draw_area;
     bool union_ok;
 
+    lv_area_t map_area_rot;
+    lv_area_copy(&map_area_rot, map_area);
+    if(angle) {
+        map_area_rot.x1 -= 50;
+        map_area_rot.y1 -= 50;
+        map_area_rot.x2 += 50;
+        map_area_rot.y2 += 50;
+    }
     /* Get clipped map area which is the real draw area.
      * It is always the same or inside `map_area` */
-    union_ok = lv_area_intersect(&draw_area, map_area, clip_area);
+    union_ok = lv_area_intersect(&draw_area, &map_area_rot, clip_area);
 
     /*If there are common part of the three area then draw to the vdb*/
     if(union_ok == false) return;
@@ -784,7 +794,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
 
     /*The simplest case just copy the pixels into the VDB*/
-    if(0 && other_mask_cnt == 0 && chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && style->image.intense == LV_OPA_TRANSP) {
+    if(angle == 0 && other_mask_cnt == 0 && chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && style->image.intense == LV_OPA_TRANSP) {
         lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, LV_OPA_COVER, style->image.blend_mode);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
@@ -799,6 +809,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
         /*Go to the first displayed pixel of the map*/
         lv_coord_t map_w = lv_area_get_width(map_area);
+        lv_coord_t map_h = lv_area_get_height(map_area);
         const uint8_t * map_buf_tmp = map_p;
         map_buf_tmp += map_w * (draw_area.y1 - (map_area->y1 - disp_area->y1)) * px_size_byte;
         map_buf_tmp += (draw_area.x1 - (map_area->x1 - disp_area->x1)) * px_size_byte;
@@ -821,7 +832,9 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             memset(mask_buf, 0xFF, mask_buf_size);
         }
 
-        uint16_t angle = 30;
+
+        lv_img_rotate_dsc_t rotate_dsc;
+        lv_img_rotate_init(&rotate_dsc, angle, map_p, map_w, map_h, LV_IMG_CF_TRUE_COLOR, map_w/2, map_h / 2, LV_COLOR_BLACK);
 
         lv_draw_mask_res_t mask_res;
         mask_res = (alpha_byte || chroma_key || angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
@@ -848,19 +861,17 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                 c.full =  *((uint32_t*)map_px);
 #endif
 
-//                lv_img_dsc_t img;
-//                img.data = map_p;
-//                img.header.w = lv_area_get_width(map_area);
-//                img.header.h = lv_area_get_height(map_area);
-//                img.header.cf = LV_IMG_CF_TRUE_COLOR;
-//                lv_point_t p = {x + disp_area->x1 - map_area->x1 ,y + disp_area->y1 - map_area->y1};
-//                lv_point_t piv = {img.header.w / 2 ,img.header.h / 2};
-//                bool ret;
-//                ret = lv_img_get_px_rotated(&img, angle, LV_COLOR_BLACK, &p, &piv, &c, NULL);
-//                if(ret == false) {
-//                    mask_buf[px_i] = LV_OPA_TRANSP;
-//                    continue;
-//                }
+                bool ret;
+                lv_coord_t rot_x = x + (disp_area->x1 + draw_area.x1) - map_area->x1;
+                lv_coord_t rot_y = y + (disp_area->y1 + draw_area.y1) - map_area->y1;
+                ret = lv_img_get_px_rotated(&rotate_dsc, rot_x, rot_y);
+                if(ret == false) {
+                    mask_buf[px_i] = LV_OPA_TRANSP;
+                    continue;
+                } else {
+//                    mask_buf[px_i] = rotate_dsc.res_opa;
+                    c.full = rotate_dsc.res_color.full;
+                }
 
                 if (chroma_key) {
                     if(c.full == chroma_keyed_color.full) {
