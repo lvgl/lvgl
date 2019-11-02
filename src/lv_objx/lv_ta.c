@@ -558,6 +558,9 @@ void lv_ta_set_placeholder_text(lv_obj_t * ta, const char * txt)
 
     lv_label_set_text(ext->placeholder, txt);
 
+    /*Refresh the placeholder's align*/
+    lv_ta_set_text_align(ta, lv_label_get_align(ext->label));
+
     placeholder_update(ta);
 }
 
