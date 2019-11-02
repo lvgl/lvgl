@@ -184,7 +184,6 @@ void lv_mbox_set_text(lv_obj_t * mbox, const char * txt)
 
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
     lv_label_set_text(ext->text, txt);
-    lv_label_set_align(ext->text, LV_LABEL_ALIGN_LEFT);
 
     mbox_realign(mbox);
 }
