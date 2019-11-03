@@ -54,6 +54,7 @@ typedef struct {
     lv_coord_t pivot_y;
     lv_coord_t pivot_x_256;
     lv_coord_t pivot_y_256;
+    lv_img_dsc_t img_dsc;
     int32_t sinma;
     int32_t cosma;
     int16_t angle;
@@ -62,6 +63,7 @@ typedef struct {
 
     uint8_t chroma_keyed :1;
     uint8_t has_alpha :1;
+    uint8_t native_color :1;
 
 }lv_img_rotate_dsc_t;
 
@@ -78,7 +80,7 @@ typedef struct {
  * @param opa_scale scale down all opacities by the factor
  */
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src, const lv_style_t * style,
-                 lv_opa_t opa_scale);
+                 uint16_t angle, lv_opa_t opa_scale);
 
 /**
  * Get the type of an image source

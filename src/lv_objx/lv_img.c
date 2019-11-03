@@ -394,7 +394,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
                 cords_tmp.x1 = coords.x1;
                 cords_tmp.x2 = coords.x1 + ext->w - 1;
                 for(; cords_tmp.x1 < coords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
-                    lv_draw_img(&cords_tmp, clip_area, ext->src, style, opa_scale);
+                    lv_draw_img(&cords_tmp, clip_area, ext->src, style, ext->angle, opa_scale);
                 }
             }
         } else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
@@ -406,7 +406,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         } else {
             /*Trigger the error handler of image drawer*/
             LV_LOG_WARN("lv_img_design: image source type is unknown");
-            lv_draw_img(&img->coords, clip_area, NULL, style, opa_scale);
+            lv_draw_img(&img->coords, clip_area, NULL, style, 0, opa_scale);
         }
     }
 
