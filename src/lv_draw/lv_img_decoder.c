@@ -374,7 +374,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             cf == LV_IMG_CF_INDEXED_8BIT) {
 
 #if LV_IMG_CF_INDEXED
-        uint8_t px_size       = lv_img_color_format_get_px_size(cf);
+        uint8_t px_size       = lv_img_cf_get_px_size(cf);
         uint32_t palette_size = 1 << px_size;
 
         /*Allocate the palette*/
@@ -527,7 +527,7 @@ static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * d
 #if LV_USE_FILESYSTEM
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
     lv_fs_res_t res;
-    uint8_t px_size = lv_img_color_format_get_px_size(dsc->header.cf);
+    uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf);
 
     uint32_t pos = ((y * dsc->header.w + x) * px_size) >> 3;
     pos += 4; /*Skip the header*/
@@ -579,7 +579,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
     }
 
     const lv_opa_t * opa_table = NULL;
-    uint8_t px_size            = lv_img_color_format_get_px_size(dsc->header.cf);
+    uint8_t px_size            = lv_img_cf_get_px_size(dsc->header.cf);
     uint16_t mask              = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
 
     lv_coord_t w = 0;
@@ -665,7 +665,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
 {
 
 #if LV_IMG_CF_INDEXED
-    uint8_t px_size = lv_img_color_format_get_px_size(dsc->header.cf);
+    uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf);
     uint16_t mask   = (1 << px_size) - 1; /*E.g. px_size = 2; mask = 0x03*/
 
     lv_coord_t w = 0;

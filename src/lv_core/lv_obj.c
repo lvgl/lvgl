@@ -204,6 +204,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->drag         = 0;
         new_obj->drag_throw   = 0;
         new_obj->drag_parent  = 0;
+        new_obj->drag_dir     = 0;
         new_obj->hidden       = 0;
         new_obj->top          = 0;
         new_obj->protect      = LV_PROTECT_NONE;

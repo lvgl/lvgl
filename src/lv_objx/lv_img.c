@@ -19,6 +19,7 @@
 #include "../lv_draw/lv_img_decoder.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_txt.h"
+#include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
 
 /*********************
@@ -78,6 +79,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cf        = LV_IMG_CF_UNKNOWN;
     ext->w         = lv_obj_get_width(new_img);
     ext->h         = lv_obj_get_height(new_img);
+    ext->angle = 0;
     ext->auto_size = 1;
     ext->offset.x  = 0;
     ext->offset.y  = 0;
@@ -199,6 +201,9 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
         lv_obj_set_size(img, ext->w, ext->h);
     }
 
+    /*Provide enough room for the rotated corners*/
+    if(ext->angle) lv_obj_refresh_ext_draw_pad(img);
+
     lv_obj_invalidate(img);
 }
 
@@ -251,6 +256,17 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y)
         ext->offset.y = y;
         lv_obj_invalidate(img);
     }
+}
+
+void lv_img_set_angle(lv_obj_t * img, int16_t angle)
+{
+    if(angle < 0 || angle >= 360) angle = angle % 360;
+
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+    ext->angle = angle;
+    lv_obj_refresh_ext_draw_pad(img);
+    lv_obj_invalidate(img);
+
 }
 
 /*=====================
@@ -351,7 +367,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
 
     if(mode == LV_DESIGN_COVER_CHK) {
         lv_design_res_t cover = LV_DESIGN_RES_NOT_COVER;
-        if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL) return LV_DESIGN_RES_NOT_COVER;
+        if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL || ext->angle != 0) return LV_DESIGN_RES_NOT_COVER;
 
         if(ext->cf == LV_IMG_CF_TRUE_COLOR || ext->cf == LV_IMG_CF_RAW) {
             cover = lv_area_is_in(clip_area, &img->coords) ? LV_DESIGN_RES_COVER : LV_DESIGN_RES_NOT_COVER;
@@ -378,7 +394,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
                 cords_tmp.x1 = coords.x1;
                 cords_tmp.x2 = coords.x1 + ext->w - 1;
                 for(; cords_tmp.x1 < coords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
-                    lv_draw_img(&cords_tmp, clip_area, ext->src, style, opa_scale);
+                    lv_draw_img(&cords_tmp, clip_area, ext->src, style, ext->angle, opa_scale);
                 }
             }
         } else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
@@ -390,7 +406,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         } else {
             /*Trigger the error handler of image drawer*/
             LV_LOG_WARN("lv_img_design: image source type is unknown");
-            lv_draw_img(&img->coords, clip_area, NULL, style, opa_scale);
+            lv_draw_img(&img->coords, clip_area, NULL, style, 0, opa_scale);
         }
     }
 
@@ -425,6 +441,15 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         /*Refresh the file name to refresh the symbol text size*/
         if(ext->src_type == LV_IMG_SRC_SYMBOL) {
             lv_img_set_src(img, ext->src);
+        }
+    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+        /*If the image has angle provide enough room for the rotated corners */
+        if(ext->angle) {
+            lv_sqrt_res_t ds;
+            lv_sqrt(ext->w * ext->w + ext->h * ext->h, &ds);
+
+            lv_coord_t d = (ds.i - LV_MATH_MIN(ext->w, ext->h)) / 2;
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, d);
         }
     }
 
