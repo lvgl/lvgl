@@ -169,7 +169,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         while(i < line_end - line_start) {
 #if LV_USE_BIDI
             char *bidi_txt = lv_draw_get_buf(line_end - line_start + 1);
-            lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, bidi_dir);
+            lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, bidi_dir, NULL, 0);
 #else
             const char *bidi_txt = txt + line_start;
 #endif
