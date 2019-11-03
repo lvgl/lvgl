@@ -79,7 +79,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cf        = LV_IMG_CF_UNKNOWN;
     ext->w         = lv_obj_get_width(new_img);
     ext->h         = lv_obj_get_height(new_img);
-    ext->angle = 30;
+    ext->angle = 0;
     ext->auto_size = 1;
     ext->offset.x  = 0;
     ext->offset.y  = 0;

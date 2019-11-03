@@ -52,8 +52,8 @@ typedef struct {
     lv_coord_t src_h;
     lv_coord_t pivot_x;
     lv_coord_t pivot_y;
-    lv_coord_t pivot_x_256;
-    lv_coord_t pivot_y_256;
+    int32_t pivot_x_256;
+    int32_t pivot_y_256;
     lv_img_dsc_t img_dsc;
     int32_t sinma;
     int32_t cosma;

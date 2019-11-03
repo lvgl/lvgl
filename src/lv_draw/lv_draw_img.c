@@ -735,14 +735,42 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
 static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
         const lv_style_t * style, uint16_t angle, lv_opa_t opa_scale)
 {
-
     lv_area_t map_area_rot;
     lv_area_copy(&map_area_rot, coords);
     if(angle) {
-        map_area_rot.x1 -= 50;
-        map_area_rot.y1 -= 50;
-        map_area_rot.x2 += 50;
-        map_area_rot.y2 += 50;
+        /*Get the exact area which is required to show the rotated image*/
+        lv_coord_t pivot_x = lv_area_get_width(coords) / 2 + coords->x1;
+        lv_coord_t pivot_y = lv_area_get_height(coords) / 2 + coords->y1;
+
+        lv_area_t norm;
+        norm.x1 = + coords->x1 - pivot_x;
+        norm.y1 = + coords->y1 - pivot_y;
+        norm.x2 = + coords->x2 - pivot_x;
+        norm.y2 = + coords->y2 - pivot_y;
+
+        int16_t sinma = lv_trigo_sin(-angle);
+        int16_t cosma = lv_trigo_sin(-angle + 90);
+
+        lv_point_t lt;
+        lv_point_t rt;
+        lv_point_t lb;
+        lv_point_t rb;
+        lt.x = ((cosma * norm.x1 - sinma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_x;
+        lt.y = ((sinma * norm.x1 + cosma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_y;
+
+        rt.x = ((cosma * norm.x2 - sinma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_x;
+        rt.y = ((sinma * norm.x2 + cosma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_y;
+
+        lb.x = ((cosma * norm.x1 - sinma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_x;
+        lb.y = ((sinma * norm.x1 + cosma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_y;
+
+        rb.x = ((cosma * norm.x2 - sinma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_x;
+        rb.y = ((sinma * norm.x2 + cosma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_y;
+
+        map_area_rot.x1 = LV_MATH_MIN(LV_MATH_MIN(LV_MATH_MIN(lb.x, lt.x), rb.x), rt.x);
+        map_area_rot.x2 = LV_MATH_MAX(LV_MATH_MAX(LV_MATH_MAX(lb.x, lt.x), rb.x), rt.x);
+        map_area_rot.y1 = LV_MATH_MIN(LV_MATH_MIN(LV_MATH_MIN(lb.y, lt.y), rb.y), rt.y);
+        map_area_rot.y2 = LV_MATH_MAX(LV_MATH_MAX(LV_MATH_MAX(lb.y, lt.y), rb.y), rt.y);
     }
 
     lv_area_t mask_com; /*Common area of mask and coords*/
@@ -765,13 +793,13 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
 
     if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
-        lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, cdsc->dec_dsc.error_msg, LV_TXT_FLAG_NONE, NULL, NULL, NULL);
+        lv_draw_rect(coords, &mask_com, &lv_style_plain, LV_OPA_COVER);
+        lv_draw_label(coords, &mask_com, &lv_style_plain, LV_OPA_COVER, cdsc->dec_dsc.error_msg, LV_TXT_FLAG_NONE, NULL, NULL, NULL);
     }
     /* The decoder open could open the image and gave the entire uncompressed image.
      * Just draw it!*/
     else if(cdsc->dec_dsc.img_data) {
-        lv_draw_map(coords, mask, cdsc->dec_dsc.img_data, opa, chroma_keyed, alpha_byte, style, angle);
+        lv_draw_map(coords, &mask_com, cdsc->dec_dsc.img_data, opa, chroma_keyed, alpha_byte, style, angle);
     }
     /* The whole uncompressed image is not available. Try to read it line-by-line*/
     else {
@@ -794,7 +822,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
                 lv_draw_buf_release(buf);
                 return LV_RES_INV;
             }
-            lv_draw_map(&line, mask, buf, opa, chroma_keyed, alpha_byte, style, 0);
+            lv_draw_map(&line, &mask_com, buf, opa, chroma_keyed, alpha_byte, style, 0);
             line.y1++;
             line.y2++;
             y++;
@@ -822,24 +850,9 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
 
-    lv_area_t map_area_rot;
-    lv_area_copy(&map_area_rot, map_area);
-    if(angle) {
-        map_area_rot.x1 -= 50;
-        map_area_rot.y1 -= 50;
-        map_area_rot.x2 += 50;
-        map_area_rot.y2 += 50;
-    }
-
+    /* Use the clip area as draw area*/
     lv_area_t draw_area;
-    bool union_ok;
-
-    /* Get clipped map area which is the real draw area.
-     * It is always the same or inside `map_area` */
-    union_ok = lv_area_intersect(&draw_area, &map_area_rot, clip_area);
-
-    /*If there are common part of the three area then draw to the vdb*/
-    if(union_ok == false) return;
+    lv_area_copy(&draw_area, clip_area);
 
     lv_disp_t * disp    = lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
