@@ -258,6 +258,12 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y)
     }
 }
 
+/**
+ * Set the rotation angle of the image.
+ * The image will be rotated around its middle point
+ * @param img pointer to an image object
+ * @param angle rotation angle in degree (> 0: clock wise)
+ */
 void lv_img_set_angle(lv_obj_t * img, int16_t angle)
 {
     if(angle < 0 || angle >= 360) angle = angle % 360;
@@ -344,6 +350,20 @@ lv_coord_t lv_img_get_offset_y(lv_obj_t * img)
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->offset.y;
+}
+
+/**
+ * Get the rotation angle of the image.
+ * @param img pointer to an image object
+ * @return rotation angle in degree (0..359)
+ */
+uint16_t lv_img_get_angle(lv_obj_t * img)
+{
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    return ext->angle;
 }
 
 /**********************
