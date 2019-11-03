@@ -143,7 +143,7 @@ void lv_canvas_set_buffer(lv_obj_t * canvas, void * buf, lv_coord_t w, lv_coord_
     ext->dsc.header.w  = w;
     ext->dsc.header.h  = h;
     ext->dsc.data      = buf;
-    ext->dsc.data_size = (lv_img_color_format_get_px_size(cf) * w * h) / 8;
+    ext->dsc.data_size = (lv_img_cf_get_px_size(cf) * w * h) / 8;
 
     lv_img_set_src(canvas, &ext->dsc);
 }
@@ -282,7 +282,7 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, l
         return;
     }
 
-    uint32_t px_size   = lv_img_color_format_get_px_size(ext->dsc.header.cf) >> 3;
+    uint32_t px_size   = lv_img_cf_get_px_size(ext->dsc.header.cf) >> 3;
     uint32_t px        = ext->dsc.header.w * y * px_size + x * px_size;
     uint8_t * to_copy8 = (uint8_t *)to_copy;
     lv_coord_t i;
@@ -325,24 +325,24 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
     bool ret;
 
     lv_img_rotate_dsc_t dsc;
-    lv_img_rotate_init(&dsc, angle, img->data, img->header.w, img->header.h, img->header.cf, pivot_x, pivot_y, style->image.color);
+    lv_img_buf_rotate_init(&dsc, angle, img->data, img->header.w, img->header.h, img->header.cf, pivot_x, pivot_y, style->image.color);
 
     for(x = -offset_x; x < dest_width - offset_x; x++) {
         for(y = -offset_y; y < dest_height - offset_y; y++) {
 
-            ret = lv_img_get_px_rotated(&dsc, x, y);
+            ret = lv_img_buf_get_px_rotated(&dsc, x, y);
             if(ret == false) continue;
 
             if(x + offset_x >= 0 && x + offset_x < dest_width && y + offset_y >= 0 && y + offset_y < dest_height) {
                 /*If the image has no alpha channel just simple set the result color on the canvas*/
-                if(lv_img_color_format_has_alpha(img->header.cf) == false) {
+                if(lv_img_cf_has_alpha(img->header.cf) == false) {
                     lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res_color);
                 } else {
                     lv_color_t bg_color = lv_img_buf_get_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, style->image.color);
 
                     /*If the canvas has no alpha but the image has mix the image's color with
                      * canvas*/
-                    if(lv_img_color_format_has_alpha(ext_dst->dsc.header.cf) == false) {
+                    if(lv_img_cf_has_alpha(ext_dst->dsc.header.cf) == false) {
                         if(dsc.res_opa < LV_OPA_MAX) dsc.res_color = lv_color_mix(dsc.res_color, bg_color, dsc.res_opa);
                         lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res_color);
                     }

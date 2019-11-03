@@ -447,10 +447,8 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         if(ext->angle) {
             lv_sqrt_res_t ds;
             lv_sqrt(ext->w * ext->w + ext->h * ext->h, &ds);
-            printf("%d %d %d\n", ext->w, ext->h, ds.i);
 
             lv_coord_t d = (ds.i - LV_MATH_MIN(ext->w, ext->h)) / 2;
-
             img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, d);
         }
     }
