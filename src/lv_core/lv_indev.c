@@ -1100,10 +1100,8 @@ static void indev_drag(lv_indev_proc_t * proc)
     if(proc->types.pointer.drag_limit_out == 0) {
         proc->types.pointer.drag_sum.x += proc->types.pointer.vect.x;
         proc->types.pointer.drag_sum.y += proc->types.pointer.vect.y;
-    }
 
-    /*Enough move?*/
-    if(proc->types.pointer.drag_limit_out == 0) {
+        /*Enough move?*/
         bool hor_en = false;
         bool ver_en = false;
         if(allowed_dirs == LV_DRAG_DIR_HOR || allowed_dirs == LV_DRAG_DIR_BOTH) {
@@ -1182,9 +1180,20 @@ static void indev_drag(lv_indev_proc_t * proc)
                 }
             }
 
-            /*In the inactive direction `drag_sum` is kept zero*/
-            if(proc->types.pointer.drag_sum.x) act_x += proc->types.pointer.vect.x;
-            if(proc->types.pointer.drag_sum.y) act_y += proc->types.pointer.vect.y;
+            /*Move the object*/
+            if(allowed_dirs == LV_DRAG_DIR_HOR ||
+               allowed_dirs == LV_DRAG_DIR_BOTH ||
+               (allowed_dirs == LV_DRAG_DIR_ONE &&
+                LV_MATH_ABS(proc->types.pointer.drag_sum.x) > LV_MATH_ABS(proc->types.pointer.drag_sum.y))) {
+                act_x += proc->types.pointer.vect.x;
+            }
+            if(allowed_dirs == LV_DRAG_DIR_VER ||
+               allowed_dirs == LV_DRAG_DIR_BOTH ||
+               (allowed_dirs == LV_DRAG_DIR_ONE &&
+                LV_MATH_ABS(proc->types.pointer.drag_sum.x) < LV_MATH_ABS(proc->types.pointer.drag_sum.y))) {
+                act_y += proc->types.pointer.vect.y;
+            }
+
             lv_obj_set_pos(drag_obj, act_x, act_y);
             proc->types.pointer.drag_in_prog = 1;
 
