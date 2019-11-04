@@ -7,7 +7,9 @@
  *      INCLUDES
  *********************/
 #include <stddef.h>
+#include <string.h>
 #include "lv_img_buf.h"
+#include "lv_draw_img.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
 
@@ -459,7 +461,7 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
 
         if(dsc->native_color) {
             memcpy(&c_dest_yn, &src_u8[px - px_size * dsc->src_w], sizeof(lv_color_t));
-            if(dsc->has_alpha) opa_dest_yn =  src_u8[px - px_size * dsc->src_w - 1];
+            if(dsc->has_alpha) opa_dest_yn =  src_u8[px - px_size * dsc->src_w + px_size- 1];
         } else {
             c_dest_yn = lv_img_buf_get_px_color(&dsc->img_dsc, yn, y, dsc->color);
             if(dsc->has_alpha) opa_dest_yn = lv_img_buf_get_px_alpha(&dsc->img_dsc, yn, y);

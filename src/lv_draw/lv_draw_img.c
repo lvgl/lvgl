@@ -191,52 +191,6 @@ lv_img_src_t lv_img_src_get_type(const void * src)
 static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
         const lv_style_t * style, uint16_t angle, lv_opa_t opa_scale)
 {
-    lv_area_t map_area_rot;
-    lv_area_copy(&map_area_rot, coords);
-    if(angle) {
-        /*Get the exact area which is required to show the rotated image*/
-        lv_coord_t pivot_x = lv_area_get_width(coords) / 2 + coords->x1;
-        lv_coord_t pivot_y = lv_area_get_height(coords) / 2 + coords->y1;
-
-        lv_area_t norm;
-        norm.x1 = + coords->x1 - pivot_x;
-        norm.y1 = + coords->y1 - pivot_y;
-        norm.x2 = + coords->x2 - pivot_x;
-        norm.y2 = + coords->y2 - pivot_y;
-
-        int16_t sinma = lv_trigo_sin(-angle);
-        int16_t cosma = lv_trigo_sin(-angle + 90);
-
-        lv_point_t lt;
-        lv_point_t rt;
-        lv_point_t lb;
-        lv_point_t rb;
-        lt.x = ((cosma * norm.x1 - sinma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_x;
-        lt.y = ((sinma * norm.x1 + cosma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_y;
-
-        rt.x = ((cosma * norm.x2 - sinma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_x;
-        rt.y = ((sinma * norm.x2 + cosma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_y;
-
-        lb.x = ((cosma * norm.x1 - sinma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_x;
-        lb.y = ((sinma * norm.x1 + cosma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_y;
-
-        rb.x = ((cosma * norm.x2 - sinma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_x;
-        rb.y = ((sinma * norm.x2 + cosma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_y;
-
-        map_area_rot.x1 = LV_MATH_MIN(LV_MATH_MIN(LV_MATH_MIN(lb.x, lt.x), rb.x), rt.x);
-        map_area_rot.x2 = LV_MATH_MAX(LV_MATH_MAX(LV_MATH_MAX(lb.x, lt.x), rb.x), rt.x);
-        map_area_rot.y1 = LV_MATH_MIN(LV_MATH_MIN(LV_MATH_MIN(lb.y, lt.y), rb.y), rt.y);
-        map_area_rot.y2 = LV_MATH_MAX(LV_MATH_MAX(LV_MATH_MAX(lb.y, lt.y), rb.y), rt.y);
-    }
-
-    lv_area_t mask_com; /*Common area of mask and coords*/
-    bool union_ok;
-    union_ok = lv_area_intersect(&mask_com, mask, &map_area_rot);
-    if(union_ok == false) {
-        return LV_RES_OK; /*Out of mask. There is nothing to draw so the image is drawn
-                             successfully.*/
-    }
-
     lv_opa_t opa =
             opa_scale == LV_OPA_COVER ? style->image.opa : (uint16_t)((uint16_t)style->image.opa * opa_scale) >> 8;
 
@@ -249,16 +203,70 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
 
     if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
-        lv_draw_rect(coords, &mask_com, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, &mask_com, &lv_style_plain, LV_OPA_COVER, cdsc->dec_dsc.error_msg, LV_TXT_FLAG_NONE, NULL, NULL, NULL);
+        lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
+        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, cdsc->dec_dsc.error_msg, LV_TXT_FLAG_NONE, NULL, NULL, NULL);
     }
     /* The decoder open could open the image and gave the entire uncompressed image.
      * Just draw it!*/
     else if(cdsc->dec_dsc.img_data) {
+        lv_area_t map_area_rot;
+        lv_area_copy(&map_area_rot, coords);
+        if(angle) {
+            /*Get the exact area which is required to show the rotated image*/
+            lv_coord_t pivot_x = lv_area_get_width(coords) / 2 + coords->x1;
+            lv_coord_t pivot_y = lv_area_get_height(coords) / 2 + coords->y1;
+
+            lv_area_t norm;
+            norm.x1 = + coords->x1 - pivot_x;
+            norm.y1 = + coords->y1 - pivot_y;
+            norm.x2 = + coords->x2 - pivot_x;
+            norm.y2 = + coords->y2 - pivot_y;
+
+            int16_t sinma = lv_trigo_sin(-angle);
+            int16_t cosma = lv_trigo_sin(-angle + 90);
+
+            lv_point_t lt;
+            lv_point_t rt;
+            lv_point_t lb;
+            lv_point_t rb;
+            lt.x = ((cosma * norm.x1 - sinma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_x;
+            lt.y = ((sinma * norm.x1 + cosma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_y;
+
+            rt.x = ((cosma * norm.x2 - sinma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_x;
+            rt.y = ((sinma * norm.x2 + cosma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_y;
+
+            lb.x = ((cosma * norm.x1 - sinma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_x;
+            lb.y = ((sinma * norm.x1 + cosma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_y;
+
+            rb.x = ((cosma * norm.x2 - sinma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_x;
+            rb.y = ((sinma * norm.x2 + cosma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_y;
+
+            map_area_rot.x1 = LV_MATH_MIN(LV_MATH_MIN(LV_MATH_MIN(lb.x, lt.x), rb.x), rt.x);
+            map_area_rot.x2 = LV_MATH_MAX(LV_MATH_MAX(LV_MATH_MAX(lb.x, lt.x), rb.x), rt.x);
+            map_area_rot.y1 = LV_MATH_MIN(LV_MATH_MIN(LV_MATH_MIN(lb.y, lt.y), rb.y), rt.y);
+            map_area_rot.y2 = LV_MATH_MAX(LV_MATH_MAX(LV_MATH_MAX(lb.y, lt.y), rb.y), rt.y);
+        }
+
+        lv_area_t mask_com; /*Common area of mask and coords*/
+        bool union_ok;
+        union_ok = lv_area_intersect(&mask_com, mask, &map_area_rot);
+        if(union_ok == false) {
+            return LV_RES_OK; /*Out of mask. There is nothing to draw so the image is drawn
+                                 successfully.*/
+        }
+
         lv_draw_map(coords, &mask_com, cdsc->dec_dsc.img_data, opa, chroma_keyed, alpha_byte, style, angle);
     }
     /* The whole uncompressed image is not available. Try to read it line-by-line*/
     else {
+        lv_area_t mask_com; /*Common area of mask and coords*/
+        bool union_ok;
+        union_ok = lv_area_intersect(&mask_com, mask, coords);
+        if(union_ok == false) {
+            return LV_RES_OK; /*Out of mask. There is nothing to draw so the image is drawn
+                                 successfully.*/
+        }
+
         lv_coord_t width = lv_area_get_width(&mask_com);
 
         uint8_t  * buf = lv_draw_buf_get(lv_area_get_width(&mask_com) * LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
@@ -271,6 +279,10 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
         lv_coord_t row;
         lv_res_t read_res;
         for(row = mask_com.y1; row <= mask_com.y2; row++) {
+            lv_area_t mask_line;
+            union_ok = lv_area_intersect(&mask_line, mask, &line);
+            if(union_ok == false) continue;
+
             read_res = lv_img_decoder_read_line(&cdsc->dec_dsc, x, y, width, buf);
             if(read_res != LV_RES_OK) {
                 lv_img_decoder_close(&cdsc->dec_dsc);
@@ -278,7 +290,9 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
                 lv_draw_buf_release(buf);
                 return LV_RES_INV;
             }
-            lv_draw_map(&line, &mask_com, buf, opa, chroma_keyed, alpha_byte, style, 0);
+
+
+            lv_draw_map(&line, &mask_line, buf, opa, chroma_keyed, alpha_byte, style, 0);
             line.y1++;
             line.y2++;
             y++;
