@@ -9,6 +9,7 @@
 #include "lv_draw_mask.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
+#include "../lv_core/lv_debug.h"
 
 /*********************
  *      DEFINES
@@ -222,6 +223,17 @@ void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t origo_x, l
     lv_draw_mask_line_side_t start_side;
     lv_draw_mask_line_side_t end_side;
 
+    /* Constrain the input angles */
+    if(start_angle < 0)
+        start_angle = 0;
+    else if(start_angle > 359)
+        start_angle = 359;
+    
+    if(end_angle < 0)
+        end_angle = 0;
+    else if(end_angle > 359)
+        end_angle = 359;
+
     if(end_angle < start_angle) {
         p->delta_deg = 360 - start_angle + end_angle;
     } else {
@@ -239,6 +251,8 @@ void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t origo_x, l
     }
     else if(start_angle >= 180 && start_angle < 360) {
         start_side = LV_DRAW_MASK_LINE_SIDE_RIGHT;
+    } else {
+        LV_DEBUG_ASSERT(false, "Unexpected start_angle", start_angle);
     }
 
     if(end_angle >= 0 && end_angle < 180) {
@@ -246,6 +260,8 @@ void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t origo_x, l
     }
     else if(end_angle >= 180 && end_angle < 360) {
         end_side = LV_DRAW_MASK_LINE_SIDE_LEFT;
+    } else {
+        LV_DEBUG_ASSERT(false, "Unexpected end_angle", end_angle);
     }
 
     lv_draw_mask_line_angle_init((lv_draw_mask_param_t*)&p->start_line, origo_x, origo_y, start_angle, start_side);

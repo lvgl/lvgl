@@ -154,7 +154,14 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-
+/**
+ * Allocate an image buffer in RAM
+ * @param w width of image
+ * @param h height of image
+ * @param cf a color format (`LV_IMG_CF_...`)
+ * @return an allocated image, or NULL on failure
+ */
+lv_img_dsc_t *lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf);
 
 /**
  * Get the color of an image's pixel
