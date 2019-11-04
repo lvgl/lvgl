@@ -14,8 +14,6 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "src/lv_version.h"
-
 #include "src/lv_misc/lv_log.h"
 #include "src/lv_misc/lv_task.h"
 #include "src/lv_misc/lv_math.h"
