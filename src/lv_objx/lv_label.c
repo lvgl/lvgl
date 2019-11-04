@@ -905,7 +905,7 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt)
     }
 
 #if LV_USE_BIDI
-    char * bidi_buf = lv_mem_alloc(ins_len) + 1;
+    char * bidi_buf = lv_mem_alloc(ins_len + 1);
     LV_ASSERT_MEM(bidi_buf);
     if(bidi_buf == NULL) return;
 
