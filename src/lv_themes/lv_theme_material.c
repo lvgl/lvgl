@@ -14,7 +14,7 @@
  *      DEFINES
  *********************/
 #define DEF_RADIUS 4
-#define DEF_SHADOW_COLOR lv_color_hex3(0x888)
+#define DEF_SHADOW_COLOR lv_color_hex3(0xaaa)
 
 /**********************
  *      TYPEDEFS
@@ -72,7 +72,8 @@ static void basic_init(void)
     panel.body.border.color   = lv_color_hex3(0xbbb);
     panel.body.border.opa     = LV_OPA_COVER;
     panel.body.shadow.color   = DEF_SHADOW_COLOR;
-    panel.body.shadow.width   = 4;
+    panel.body.shadow.width   = 6;
+    panel.body.shadow.offset.y = 2;
     panel.body.padding.left   = LV_DPI / 8;
     panel.body.padding.right  = LV_DPI / 8;
     panel.body.padding.top    = LV_DPI / 8;
@@ -687,6 +688,8 @@ static void tabview_init(void)
     btn_bg.body.border.part    = LV_BORDER_PART_BOTTOM;
     btn_bg.body.border.opa     = LV_OPA_COVER;
     btn_bg.body.shadow.width   = 5;
+    btn_bg.body.shadow.spread = 2;
+    btn_bg.body.shadow.offset.y = 1;
     btn_bg.body.shadow.color   = DEF_SHADOW_COLOR;
     btn_bg.body.padding.inner  = 0;
     btn_bg.body.padding.left   = 0;
