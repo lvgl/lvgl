@@ -593,6 +593,8 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
     uint8_t letter_height    = lv_font_get_line_height(font);
     lv_coord_t y             = 0;
     lv_txt_flag_t flag       = LV_TXT_FLAG_NONE;
+    uint16_t visual_pos;
+    char *bidi_txt;
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
@@ -626,19 +628,27 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
         }
     }
 
+#if LV_USE_BIDI
+    /*Handle Bidi*/
+    visual_pos = lv_bidi_get_visual_pos(&txt[line_start], &bidi_txt, new_line_start - line_start, lv_obj_get_base_dir(label), index - line_start);
+#else
+    visual_pos = index - line_start;
+    bidi_txt = &txt[line_start];
+#endif
+
     /*Calculate the x coordinate*/
-    lv_coord_t x = lv_txt_get_width(&txt[line_start], index - line_start, font, style->text.letter_space, flag);
+    lv_coord_t x = lv_txt_get_width(bidi_txt, visual_pos, font, style->text.letter_space, flag);
 
     if(index != line_start) x += style->text.letter_space;
 
     if(align == LV_LABEL_ALIGN_CENTER) {
         lv_coord_t line_w;
-        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, style->text.letter_space, flag);
+        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, style->text.letter_space, flag);
         x += lv_obj_get_width(label) / 2 - line_w / 2;
 
     } else if(align == LV_LABEL_ALIGN_RIGHT) {
         lv_coord_t line_w;
-        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, style->text.letter_space, flag);
+        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, style->text.letter_space, flag);
 
         x += lv_obj_get_width(label) - line_w;
     }
@@ -668,6 +678,8 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     uint8_t letter_height    = lv_font_get_line_height(font);
     lv_coord_t y             = 0;
     lv_txt_flag_t flag       = LV_TXT_FLAG_NONE;
+    uint16_t logical_pos;
+    char *bidi_txt;
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
@@ -691,37 +703,44 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
         line_start = new_line_start;
     }
 
+#if LV_USE_BIDI
+    bidi_txt = lv_draw_get_buf(new_line_start - line_start + 1);
+    lv_bidi_process_paragraph(txt + line_start, bidi_txt, new_line_start - line_start, lv_obj_get_base_dir(label), NULL, 0);
+#else
+    bidi_txt = txt + line_start;
+#endif
+
     /*Calculate the x coordinate*/
     lv_coord_t x = 0;
     if(align == LV_LABEL_ALIGN_CENTER) {
         lv_coord_t line_w;
-        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, style->text.letter_space, flag);
+        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, style->text.letter_space, flag);
         x += lv_obj_get_width(label) / 2 - line_w / 2;
     }
     else if(align == LV_LABEL_ALIGN_RIGHT) {
         lv_coord_t line_w;
-        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, style->text.letter_space, flag);
+        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, style->text.letter_space, flag);
         x += lv_obj_get_width(label) - line_w;
     }
 
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
 
-    uint32_t i         = line_start;
+    uint32_t i = 0;
     uint32_t i_act = i;
     uint32_t letter;
     uint32_t letter_next;
 
     if(new_line_start > 0) {
-        while(i < new_line_start) {
+        while(i + line_start < new_line_start) {
             /* Get the current letter.*/
-            letter = lv_txt_encoded_next(txt, &i);
+            letter = lv_txt_encoded_next(bidi_txt, &i);
 
             /*Get the next letter too for kerning*/
-            letter_next = lv_txt_encoded_next(&txt[i], NULL);
+            letter_next = lv_txt_encoded_next(&bidi_txt[i], NULL);
 
             /*Handle the recolor command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
-                if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
+                if(lv_txt_is_cmd(&cmd_state, bidi_txt[i]) != false) {
                     continue; /*Skip the letter is it is part of a command*/
                 }
             }
@@ -729,7 +748,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
             x += lv_font_get_glyph_width(font, letter, letter_next);
 
             /*Finish if the x position or the last char of the line is reached*/
-            if(pos->x < x || i == new_line_start) {
+            if(pos->x < x || i + line_start == new_line_start) {
                 i = i_act;
                 break;
             }
@@ -738,7 +757,14 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
         }
     }
 
-    return lv_encoded_get_char_id(txt, i);
+#if LV_USE_BIDI
+    /*Handle Bidi*/
+    logical_pos = lv_bidi_get_logical_pos(&txt[line_start], NULL, new_line_start - line_start, lv_obj_get_base_dir(label), lv_encoded_get_char_id(bidi_txt, i));
+#else
+    logical_pos = lv_encoded_get_char_id(bidi_txt, i);
+#endif
+
+    return logical_pos;
 }
 
 /**

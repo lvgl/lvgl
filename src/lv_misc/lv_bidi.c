@@ -140,17 +140,28 @@ bool lv_bidi_letter_is_neutral(uint32_t letter)
     return false;
 }
 
-uint16_t lv_bidi_get_logical_pos(const char * str_in, uint16_t len, lv_bidi_dir_t base_dir, uint32_t visual_pos)
+uint16_t lv_bidi_get_logical_pos(const char * str_in, char **bidi_txt, uint32_t len, lv_bidi_dir_t base_dir, uint32_t visual_pos)
 {
-    return 0; // TODO
+    uint32_t pos_conv_len = get_txt_len(str_in, len);
+    void *buf = lv_draw_get_buf(len + pos_conv_len * sizeof(uint16_t));
+    if (bidi_txt) *bidi_txt = buf;
+    uint16_t *pos_conv_buf = (uint16_t*) ((char*)buf + len);
+    lv_bidi_process_paragraph(str_in, bidi_txt? *bidi_txt: NULL, len, base_dir, pos_conv_buf, pos_conv_len);
+    return pos_conv_buf[visual_pos];
 }
 
-uint16_t lv_bidi_get_visual_pos(const char * str_in, uint16_t len, lv_bidi_dir_t base_dir, uint32_t logical_pos)
+uint16_t lv_bidi_get_visual_pos(const char * str_in, char **bidi_txt, uint16_t len, lv_bidi_dir_t base_dir, uint32_t logical_pos)
 {
-    uint32_t pos_conv_len = get_txt_len(str_in, len) * sizeof(uint16_t);
-    uint16_t *pos_conv_buf = lv_draw_get_buf(pos_conv_len);
-    lv_bidi_process_paragraph(str_in, NULL, len, base_dir, pos_conv_buf, pos_conv_len);
-    return pos_conv_buf[logical_pos];
+    uint32_t pos_conv_len = get_txt_len(str_in, len);
+    void *buf = lv_draw_get_buf(len + pos_conv_len * sizeof(uint16_t));
+    if (bidi_txt) *bidi_txt = buf;
+    uint16_t *pos_conv_buf = (uint16_t*) ((char*)buf + len);
+    lv_bidi_process_paragraph(str_in, bidi_txt? *bidi_txt: NULL, len, base_dir, pos_conv_buf, pos_conv_len);
+    for (uint16_t i = 0; i < pos_conv_len; i++){
+        if (pos_conv_buf[i] == logical_pos)
+            return i;
+    }
+    return (uint16_t) -1;
 }
 
 void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_bidi_dir_t base_dir, uint16_t *pos_conv_out, uint16_t pos_conv_len)
@@ -207,7 +218,7 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
         } else {
             wr -= rd;
             pos_conv_wr -= pos_conv_rd;
-            rtl_reverse(str_out? &str_out[wr]: NULL, str_in, rd, pos_conv_out? &pos_conv_out[pos_conv_rd]: NULL, 0, pos_conv_rd);
+            rtl_reverse(str_out? &str_out[wr]: NULL, str_in, rd, pos_conv_out? &pos_conv_out[pos_conv_wr]: NULL, 0, pos_conv_rd);
         }
     }
 
@@ -221,7 +232,7 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
                 if (str_out) memcpy(&str_out[wr], &str_in[rd], run_len);
                 if (pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_run_len, pos_conv_rd);
             }
-            else rtl_reverse(str_out? &str_out[wr]: NULL, &str_in[rd], run_len, pos_conv_out? &pos_conv_out[pos_conv_rd] : NULL, pos_conv_rd, pos_conv_run_len);
+            else rtl_reverse(str_out? &str_out[wr]: NULL, &str_in[rd], run_len, pos_conv_out? &pos_conv_out[pos_conv_wr] : NULL, pos_conv_rd, pos_conv_run_len);
            wr += run_len;
            pos_conv_wr += pos_conv_run_len;
        } else {
@@ -231,7 +242,7 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
                if (str_out) memcpy(&str_out[wr], &str_in[rd], run_len);
                if (pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_run_len, pos_conv_rd);
            }
-           else rtl_reverse(str_out? &str_out[wr]: NULL, &str_in[rd], run_len, pos_conv_out? &pos_conv_out[pos_conv_rd] : NULL, pos_conv_rd, pos_conv_run_len);
+           else rtl_reverse(str_out? &str_out[wr]: NULL, &str_in[rd], run_len, pos_conv_out? &pos_conv_out[pos_conv_wr] : NULL, pos_conv_rd, pos_conv_run_len);
        }
 
         rd += run_len;
@@ -411,8 +422,8 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t *p
                 uint32_t new_letter = letter = char_change_to_pair(letter);
                 if (dest) dest[wr] = (uint8_t)new_letter;
                 if (pos_conv_out) pos_conv_out[pos_conv_wr] = pos_conv_rd_base + pos_conv_letter;
-                wr += 1;
-                pos_conv_wr += 1;
+                wr++;
+                pos_conv_wr++;
             }
             /*Just store the letter*/
             else {
