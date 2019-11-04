@@ -6,9 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_bidi.h"
 #include <stddef.h>
+#include "lv_bidi.h"
 #include "lv_txt.h"
+#include "../lv_draw/lv_draw.h"
 
 #if LV_USE_BIDI
 
@@ -34,6 +35,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t *p
 static uint32_t char_change_to_pair(uint32_t letter);
 static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32_t len, uint32_t letter, lv_bidi_dir_t base_dir);
 static void fill_pos_conv(uint16_t * out, uint16_t len, uint16_t index);
+static uint32_t get_txt_len(const char * txt, uint32_t max_len);
 
 /**********************
  *  STATIC VARIABLES
@@ -138,6 +140,19 @@ bool lv_bidi_letter_is_neutral(uint32_t letter)
     return false;
 }
 
+uint16_t lv_bidi_get_logical_pos(const char * str_in, uint16_t len, lv_bidi_dir_t base_dir, uint32_t visual_pos)
+{
+    return 0; // TODO
+}
+
+uint16_t lv_bidi_get_visual_pos(const char * str_in, uint16_t len, lv_bidi_dir_t base_dir, uint32_t logical_pos)
+{
+    uint32_t pos_conv_len = get_txt_len(str_in, len) * sizeof(uint16_t);
+    uint16_t *pos_conv_buf = lv_draw_get_buf(pos_conv_len);
+    lv_bidi_process_paragraph(str_in, NULL, len, base_dir, pos_conv_buf, pos_conv_len);
+    return pos_conv_buf[logical_pos];
+}
+
 void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_bidi_dir_t base_dir, uint16_t *pos_conv_out, uint16_t pos_conv_len)
 {
     uint32_t run_len = 0;
@@ -192,7 +207,7 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
         } else {
             wr -= rd;
             pos_conv_wr -= pos_conv_rd;
-            rtl_reverse(str_out? &str_out[wr]: NULL, str_in, rd, pos_conv_out? &pos_conv_out[pos_conv_wr]: NULL, 0, pos_conv_rd);
+            rtl_reverse(str_out? &str_out[wr]: NULL, str_in, rd, pos_conv_out? &pos_conv_out[pos_conv_rd]: NULL, 0, pos_conv_rd);
         }
     }
 
@@ -206,7 +221,7 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
                 if (str_out) memcpy(&str_out[wr], &str_in[rd], run_len);
                 if (pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_run_len, pos_conv_rd);
             }
-            else rtl_reverse(str_out? &str_out[wr]: NULL, &str_in[rd], run_len, pos_conv_out? &pos_conv_out[pos_conv_wr] : NULL, pos_conv_rd, pos_conv_run_len);
+            else rtl_reverse(str_out? &str_out[wr]: NULL, &str_in[rd], run_len, pos_conv_out? &pos_conv_out[pos_conv_rd] : NULL, pos_conv_rd, pos_conv_run_len);
            wr += run_len;
            pos_conv_wr += pos_conv_run_len;
        } else {
@@ -216,7 +231,7 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
                if (str_out) memcpy(&str_out[wr], &str_in[rd], run_len);
                if (pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_run_len, pos_conv_rd);
            }
-           else rtl_reverse(str_out? &str_out[wr]: NULL, &str_in[rd], run_len, pos_conv_out? &pos_conv_out[pos_conv_wr] : NULL, pos_conv_rd, pos_conv_run_len);
+           else rtl_reverse(str_out? &str_out[wr]: NULL, &str_in[rd], run_len, pos_conv_out? &pos_conv_out[pos_conv_rd] : NULL, pos_conv_rd, pos_conv_run_len);
        }
 
         rd += run_len;
@@ -240,6 +255,19 @@ uint32_t lv_bidi_get_next_paragraph(const char * txt)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static uint32_t get_txt_len(const char * txt, uint32_t max_len)
+{
+    uint32_t len = 0;
+    uint32_t i   = 0;
+
+    while(i < max_len && txt[i] != '\0') {
+        lv_txt_encoded_next(txt, &i);
+        len++;
+    }
+
+    return len;
+}
 
 static void fill_pos_conv(uint16_t * out, uint16_t len, uint16_t index)
 {
