@@ -136,6 +136,8 @@ void lv_debug_log_error(const char * msg, uint64_t value);
 
 #else /* LV_USE_DEBUG == 0 */
 
+#define LV_DEBUG_ASSERT(expr, msg, value) do{}while(0)
+
 #define LV_ASSERT_NULL(p) true
 #define LV_ASSERT_MEM(p) true
 #define LV_ASSERT_STR(p) true
