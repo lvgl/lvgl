@@ -395,7 +395,6 @@ static lv_design_res_t lv_bar_design(lv_obj_t * bar, const lv_area_t * clip_area
 #if LV_USE_GROUP
         /*Draw the border*/
         if(lv_obj_is_focused(bar)) {
-            lv_opa_t opa_scale          = lv_obj_get_opa_scale(bar);
             const lv_style_t * style_bg = lv_bar_get_style(bar, LV_BAR_STYLE_BG);
             lv_style_t style_tmp;
             lv_style_copy(&style_tmp, style_bg);

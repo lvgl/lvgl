@@ -705,7 +705,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
         lv_draw_rect(&page->coords, clip_area, &style_tmp, lv_obj_get_opa_scale(page));
 
         if(style->body.corner_mask) {
-            const lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
+            style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
             lv_draw_mask_param_t mp;
             lv_draw_mask_radius_init(&mp, &page->coords, style->body.radius, false);
             lv_draw_mask_add(&mp, page + 4);

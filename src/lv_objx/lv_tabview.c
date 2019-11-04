@@ -731,7 +731,7 @@ static lv_res_t tabview_scrl_signal(lv_obj_t * tabview_scrl, lv_signal_t sign, v
             vect.x = vect.x * (100 - LV_INDEV_DEF_DRAG_THROW) / 100;
         }
 
-        lv_res_t res = lv_indev_finish_drag(indev);
+        res = lv_indev_finish_drag(indev);
         if(res != LV_RES_OK) return res;
         lv_obj_t * tab_page = lv_tabview_get_tab(tabview, ext->tab_cur);
         lv_coord_t page_x1  = tab_page->coords.x1 - tabview->coords.x1 + x_predict;

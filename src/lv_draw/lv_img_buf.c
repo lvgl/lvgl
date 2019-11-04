@@ -369,7 +369,7 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
      * In the 0x70..0x90 range use the unchanged source pixel */
 
     lv_color_t c_dest_int;
-    lv_opa_t opa_dest_int;
+    lv_opa_t opa_dest_int = 0;
 
     uint8_t px_size;
     uint32_t px;
@@ -386,6 +386,8 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
             opa_dest_int = src_u8[px + px_size - 1];
         }
     } else {
+        px = 0; /*unused*/
+        px_size = 0;    /*unused*/
         c_dest_int = lv_img_buf_get_px_color(&dsc->img_dsc, x, y, dsc->color);
         opa_dest_int = lv_img_buf_get_px_alpha(&dsc->img_dsc, x, y);
     }
@@ -399,13 +401,13 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
     /*Get the mixture of the original source and the neightboor pixels in both directions*/
     lv_color_t c_x_dest;
     lv_color_t c_y_dest;
-    lv_opa_t opa_x_dest;
-    lv_opa_t opa_y_dest;
+    lv_opa_t opa_x_dest = 0;
+    lv_opa_t opa_y_dest = 0;
 
     int32_t xn;      /*x neightboor*/
     lv_opa_t xr; /*x mix ratio*/
     lv_color_t c_dest_xn;
-    lv_opa_t opa_dest_xn;
+    lv_opa_t opa_dest_xn = 0;
 
     if(xs_fract < 0x70) {
         xn = xs_int - 1;
@@ -450,13 +452,12 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
     int32_t yn;      /*x neightboor*/
     lv_opa_t yr; /*x mix ratio*/
     lv_color_t c_dest_yn;
-    lv_opa_t opa_dest_yn;
+    lv_opa_t opa_dest_yn = 0;
 
     if(ys_fract < 0x70) {
         yn = ys_int - 1;
         if(yn < 0) return false;
 
-        lv_opa_t yr; /*y mix ratio*/
         yr = ys_fract + 0x80;
 
         if(dsc->native_color) {

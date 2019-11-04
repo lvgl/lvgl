@@ -71,6 +71,8 @@ extern "C" {
 
 #include "src/lv_draw/lv_img_cache.h"
 
+#include "src/lv_api_map.h"
+
 /*********************
  *      DEFINES
  *********************/

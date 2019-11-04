@@ -54,7 +54,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_design_res_t lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param);
 
 static void invalidate_indic(lv_obj_t * cpicker);
@@ -517,13 +517,13 @@ bool lv_cpicker_get_preview(lv_obj_t * cpicker)
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @return true/false, depends on 'mode'
+ * @return return an element of `lv_design_res_t`
  */
-static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK)  {
-        return false;
+        return LV_DESIGN_RES_NOT_COVER;
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
@@ -531,18 +531,18 @@ static bool lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * mask, lv_des
         lv_opa_t opa_scale = lv_obj_get_opa_scale(cpicker);
 
         if(ext->type == LV_CPICKER_TYPE_DISC) {
-            draw_disc_grad(cpicker, mask, opa_scale);
+            draw_disc_grad(cpicker, clip_area, opa_scale);
         } else if(ext->type == LV_CPICKER_TYPE_RECT) {
-            draw_rect_grad(cpicker, mask, opa_scale);
+            draw_rect_grad(cpicker, clip_area, opa_scale);
         }
 
-        draw_indic(cpicker, mask, opa_scale);
+        draw_indic(cpicker, clip_area, opa_scale);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
     }
 
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale)
@@ -578,9 +578,7 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
 
 
     if(ext->preview) {
-
         /*Mask out the center area*/
-        const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
         lv_style_copy(&style, style_main);
         style.body.radius = LV_RADIUS_CIRCLE;
         lv_area_t area_mid;

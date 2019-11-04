@@ -364,7 +364,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     else if(sign == LV_SIGNAL_DRAG_THROW_BEGIN) {
         drag_end_handler(tileview);
 
-        lv_res_t res = lv_indev_finish_drag(lv_indev_get_act());
+        res = lv_indev_finish_drag(lv_indev_get_act());
         if(res != LV_RES_OK) return res;
     }
     /*Apply constraint on moving of the tileview*/

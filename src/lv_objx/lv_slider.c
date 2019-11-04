@@ -299,7 +299,6 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         int16_t new_value = 0;
         if(w >= h) {
             lv_coord_t indic_w = w - indic_style->body.padding.left - indic_style->body.padding.right;
-            int32_t range = ext->bar.max_value - ext->bar.min_value;
             new_value = p.x - (slider->coords.x1 + indic_style->body.padding.left); /*Make the point relative to the indicator*/
             new_value = (new_value * range) / indic_w;
             new_value += ext->bar.min_value;

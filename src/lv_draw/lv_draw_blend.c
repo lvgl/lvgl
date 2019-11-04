@@ -237,7 +237,6 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
             lv_color_t * disp_buf_tmp_ori =  disp_buf_tmp;
 
 #if LV_USE_GPU
-            lv_disp_t * disp = lv_refr_get_disp_refreshing();
             if(disp->driver.gpu_fill_cb && draw_area_w > GPU_WIDTH_LIMIT) {
                 disp->driver.gpu_fill_cb(&disp->driver, disp_buf, disp_w, draw_area, color);
                 return;

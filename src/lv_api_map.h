@@ -29,7 +29,7 @@ extern "C" {
 /*---------------------
  * V6.0 COMPATIBILITY
  *--------------------*/
-#define lv_chart_get_point_count lv_chart_get_point_cnt
+#define lv_chart_get_point_cnt lv_chart_get_point_count
 
 
 /**********************

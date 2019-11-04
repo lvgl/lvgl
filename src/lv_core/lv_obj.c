@@ -18,13 +18,13 @@
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_async.h"
 #include "../lv_misc/lv_fs.h"
-#include "../lv_hal/lv_hal.h"
 #include "../lv_misc/lv_gc.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_gc.h"
+#include "../lv_misc/lv_math.h"
+#include "../lv_hal/lv_hal.h"
 #include <stdint.h>
 #include <string.h>
-#include "../lv_misc/lv_gc.h"
-#include "../lv_misc/lv_math.h"
 
 #if defined(LV_GC_INCLUDE)
 #include LV_GC_INCLUDE
@@ -212,11 +212,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->parent_event = 0;
 #if LV_USE_BIDI
-#if LV_BIDI_BASE_DIR_DEF == LV_BIDI_DIR_LTR || LV_BIDI_BASE_DIR_DEF == LV_BIDI_DIR_RTL || LV_BIDI_BASE_DIR_DEF == LV_BIDI_DIR_AUTO
         new_obj->base_dir     = LV_BIDI_BASE_DIR_DEF;
-#else
-#error "`LV_BIDI_BASE_DIR_DEF` should be `LV_BASE_DIR_LTR` or `LV_BASE_DIR_RTL` (See lv_conf.h)"
-#endif
 #else
         new_obj->base_dir     = LV_BIDI_DIR_LTR;
 #endif
@@ -2411,10 +2407,8 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
         if(lv_area_is_in(clip_area, &obj->coords) == false) return LV_DESIGN_RES_NOT_COVER;
 
-
         const lv_style_t * style = lv_obj_get_style(obj);
         if(style->body.corner_mask) return LV_DESIGN_RES_MASKED;
-
 
         /*Can cover the area only if fully solid (no opacity)*/
         if(style->body.opa < LV_OPA_MAX) return LV_DESIGN_RES_NOT_COVER;
