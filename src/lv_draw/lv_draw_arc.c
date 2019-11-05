@@ -8,6 +8,7 @@
  *********************/
 #include "lv_draw_arc.h"
 #include "lv_draw_mask.h"
+#include "../lv_misc/lv_math.h"  // LV_TRIGO_SHIFT
 
 /*********************
  *      DEFINES
@@ -69,7 +70,6 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
 
     lv_draw_mask_remove_id(mask_angle_id);
 
-    // draw rounded-ending
     if(style->line.rounded) {
       circle_style.body.main_color = style->line.color;
       circle_style.body.grad_color = style->line.color;
