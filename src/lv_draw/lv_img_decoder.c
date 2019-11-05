@@ -353,6 +353,11 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         LV_LOG_WARN("Image built-in decoder cannot read file because LV_USE_FILESYSTEM = 0");
         return LV_RES_INV;
 #endif
+    } else if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
+    	/*The variables should have valid data*/
+        if(((lv_img_dsc_t *)dsc->src)->data == NULL) {
+        	return LV_RES_INV;
+        }
     }
 
     lv_img_cf_t cf = dsc->header.cf;
@@ -415,6 +420,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         } else {
             /*The palette begins in the beginning of the image data. Just point to it.*/
             lv_color32_t * palette_p = (lv_color32_t *)((lv_img_dsc_t *)dsc->src)->data;
+
 
             uint32_t i;
             for(i = 0; i < palette_size; i++) {

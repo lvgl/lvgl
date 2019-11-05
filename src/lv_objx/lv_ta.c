@@ -1788,6 +1788,11 @@ static void refr_cursor_area(lv_obj_t * ta)
         cur_area.x2 = letter_pos.x + cur_style.body.padding.right + letter_w;
         cur_area.y2 = letter_pos.y + cur_style.body.padding.bottom + letter_h + (cur_style.line.width >> 1) +
                       (cur_style.line.width & 0x1);
+    } else if(ext->cursor.type == LV_CURSOR_NONE) {
+    	cur_area.x1 = letter_pos.x;
+    	cur_area.y1 = letter_pos.y;
+    	lv_area_set_width(&cur_area, 0);
+    	lv_area_set_height(&cur_area, 0);
     }
 
     /*Save the new area*/
