@@ -631,10 +631,15 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
 #if LV_USE_BIDI
     /*Handle Bidi*/
     visual_pos = lv_bidi_get_visual_pos(&txt[line_start], &bidi_txt, new_line_start - line_start, lv_obj_get_base_dir(label), index - line_start);
+
+    printf("vp:%d, ", visual_pos);
+    visual_pos = lv_txt_encoded_get_byte_id(bidi_txt, visual_pos);
+    printf("vpb:%d, ", visual_pos);
 #else
     visual_pos = index - line_start;
     bidi_txt = &txt[line_start];
 #endif
+
 
     /*Calculate the x coordinate*/
     lv_coord_t x = lv_txt_get_width(bidi_txt, visual_pos, font, style->text.letter_space, flag);
