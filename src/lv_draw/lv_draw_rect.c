@@ -61,6 +61,38 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_sty
     draw_border(coords, clip, style, opa_scale);
 }
 
+/**
+ * Draw a pixel
+ * @param point the coordinates of the point to draw
+ * @param mask the pixel will be drawn only in this mask
+ * @param style pointer to a style
+ * @param opa_scale scale down the opacity by the factor
+ */
+void lv_draw_px(const lv_point_t * point, const lv_area_t * clip_area, const lv_style_t * style, lv_opa_t opa_scale)
+{
+    lv_opa_t opa = style->body.opa;
+    if(opa_scale != LV_OPA_COVER) opa = (opa * opa_scale) >> 8;
+
+    if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
+
+    lv_area_t fill_area;
+    fill_area.x1 = point->x;
+    fill_area.y1 = point->y;
+    fill_area.x2 = point->x;
+    fill_area.y2 = point->y;
+
+    uint8_t mask_cnt = lv_draw_mask_get_cnt();
+
+    if(mask_cnt == 0) {
+        lv_blend_fill(clip_area, &fill_area, style->body.main_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, style->body.blend_mode);
+    } else {
+        uint8_t mask_buf;
+        lv_draw_mask_res_t mask_res;
+        mask_res = lv_draw_mask_apply(&mask_buf, point->x, point->y, 1);
+        lv_blend_fill(clip_area, &fill_area, style->body.main_color, &mask_buf, mask_res, opa, style->body.blend_mode);
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
