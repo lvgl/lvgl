@@ -340,20 +340,31 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
 
         src = ext->img_src_mid[state];
         if(src) {
-            lv_coord_t obj_w = lv_obj_get_width(imgbtn);
-            lv_coord_t i;
-            lv_img_decoder_get_info(src, &header);
+        	lv_area_t clip_center_area;
+        	clip_center_area.x1 = imgbtn->coords.x1 + left_w;
+        	clip_center_area.x2 = imgbtn->coords.x2 - right_w;
+        	clip_center_area.y1 = imgbtn->coords.y1;
+        	clip_center_area.y2 = imgbtn->coords.y2;
 
-            coords.x1 = imgbtn->coords.x1 + left_w;
-            coords.y1 = imgbtn->coords.y1;
-            coords.x2 = coords.x1 + header.w - 1;
-            coords.y2 = imgbtn->coords.y1 + header.h - 1;
+        	bool comm_res;
+        	comm_res = lv_area_intersect(&clip_center_area, &clip_center_area, clip_area);
+        	if(comm_res) {
 
-            for(i = 0; i < obj_w - right_w - left_w; i += header.w) {
-                lv_draw_img(&coords, clip_area, src, style, 0, opa_scale);
-                coords.x1 = coords.x2 + 1;
-                coords.x2 += header.w;
-            }
+				lv_coord_t obj_w = lv_obj_get_width(imgbtn);
+				lv_coord_t i;
+				lv_img_decoder_get_info(src, &header);
+
+				coords.x1 = imgbtn->coords.x1 + left_w;
+				coords.y1 = imgbtn->coords.y1;
+				coords.x2 = coords.x1 + header.w - 1;
+				coords.y2 = imgbtn->coords.y1 + header.h - 1;
+
+				for(i = 0; i < obj_w - right_w - left_w; i += header.w) {
+					lv_draw_img(&coords, &clip_center_area, src, style, 0, opa_scale);
+					coords.x1 = coords.x2 + 1;
+					coords.x2 += header.w;
+				}
+        	}
         }
 
 #endif

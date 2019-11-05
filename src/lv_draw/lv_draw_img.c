@@ -338,8 +338,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
 
     /*The simplest case just copy the pixels into the VDB*/
-    if(angle == 0 && other_mask_cnt == 0 && chroma_key == false && alpha_byte == false && opa == LV_OPA_COVER && style->image.intense == LV_OPA_TRANSP) {
-        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, LV_OPA_COVER, style->image.blend_mode);
+    if(other_mask_cnt == 0 && angle == 0 && chroma_key == false && alpha_byte == false && style->image.intense == LV_OPA_TRANSP) {
+        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, style->image.blend_mode);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
