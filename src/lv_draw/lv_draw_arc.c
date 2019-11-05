@@ -69,8 +69,34 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
 
     lv_draw_mask_remove_id(mask_angle_id);
 
+    // draw rounded-ending
     if(style->line.rounded) {
-        /*TODO*/
+      circle_style.body.main_color = style->line.color;
+      circle_style.body.grad_color = style->line.color;
+      circle_style.body.opa        = LV_OPA_COVER;
+      circle_style.body.border.width = 0;
+
+      lv_coord_t thick_half = style->line.width / 2;
+      lv_coord_t cir_x      = ((radius - thick_half + 1) * lv_trigo_sin(90 - start_angle) >> LV_TRIGO_SHIFT);
+      lv_coord_t cir_y      = ((radius - thick_half + 1) * lv_trigo_sin(start_angle) >> LV_TRIGO_SHIFT);
+  
+      lv_area_t round_area;
+        round_area.x1 = cir_x + center_x - thick_half + 1;
+        round_area.y1 = cir_y + center_y - thick_half + 1;
+        round_area.x2 = cir_x + center_x + thick_half;
+        round_area.y2 = cir_y + center_y + thick_half;
+      
+      lv_draw_rect(&round_area, clip_area, &circle_style, LV_OPA_COVER);
+ 
+      cir_x      = ((radius - thick_half + 1) * lv_trigo_sin(90 - end_angle) >> LV_TRIGO_SHIFT);
+      cir_y      = ((radius - thick_half + 1) * lv_trigo_sin(end_angle) >> LV_TRIGO_SHIFT);
+  
+        round_area.x1 = cir_x + center_x - thick_half + 1;
+        round_area.y1 = cir_y + center_y - thick_half + 1;
+        round_area.x2 = cir_x + center_x + thick_half;
+        round_area.y2 = cir_y + center_y + thick_half;
+  
+      lv_draw_rect(&round_area, clip_area, &circle_style, LV_OPA_COVER);
     }
 
 }
