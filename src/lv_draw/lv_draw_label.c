@@ -220,7 +220,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
-                int char_ind = lv_encoded_get_char_id(bidi_txt, i);
+                int char_ind = lv_txt_encoded_get_char_id(bidi_txt, i);
                 /*Do not draw the rectangle on the character at `sel_start`.*/
                 if(char_ind > sel_start && char_ind <= sel_end) {
                     lv_area_t sel_coords;
