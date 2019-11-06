@@ -400,8 +400,8 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
         lv_area_copy(&a, area);
         if(a.x1 < 0) a.x1 = 0;
         if(a.y1 < 0) a.y1 = 0;
-        if(a.x2 < 0) a.x2 = ext->dsc.header.w - 1;
-        if(a.y2 < 0) a.y2 = ext->dsc.header.h - 1;
+        if(a.x2 > ext->dsc.header.w - 1) a.x2 = ext->dsc.header.w - 1;
+        if(a.y2 > ext->dsc.header.h - 1) a.y2 = ext->dsc.header.h - 1;
     } else {
         a.x1 = 0;
         a.y1 = 0;
@@ -530,8 +530,8 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
         lv_area_copy(&a, area);
         if(a.x1 < 0) a.x1 = 0;
         if(a.y1 < 0) a.y1 = 0;
-        if(a.x2 < 0) a.x2 = ext->dsc.header.w - 1;
-        if(a.y2 < 0) a.y2 = ext->dsc.header.h - 1;
+        if(a.x2 > ext->dsc.header.w - 1) a.x2 = ext->dsc.header.w - 1;
+        if(a.y2 > ext->dsc.header.h - 1) a.y2 = ext->dsc.header.h - 1;
     } else {
         a.x1 = 0;
         a.y1 = 0;
