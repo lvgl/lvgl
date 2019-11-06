@@ -382,6 +382,181 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
     lv_obj_invalidate(canvas);
 }
 
+
+/**
+ * Apply horizontal blur on the canvas
+ * @param canvas pointer to a canvas object
+ * @param r radius of the blur
+ */
+void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r)
+{
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+
+    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+
+    uint16_t r_back = r / 2;
+    uint16_t r_front = r / 2;
+
+    if(r & 0x1 == 0) r_back--;
+
+    uint8_t line_buf[10000];
+    lv_img_dsc_t line_img;
+    line_img.data = line_buf;
+    line_img.header.always_zero = 0;
+    line_img.header.w = ext->dsc.header.w;
+    line_img.header.h = 1;
+    line_img.header.cf = ext->dsc.header.cf;
+
+    lv_coord_t x;
+    lv_coord_t y;
+    lv_coord_t x_safe;
+    lv_coord_t line_w = lv_img_buf_get_img_size(ext->dsc.header.w, 1, ext->dsc.header.cf);
+
+    for(y = 0; y < ext->dsc.header.h; y++) {
+        uint32_t asum = 0;
+        uint32_t rsum = 0;
+        uint32_t gsum = 0;
+        uint32_t bsum = 0;
+
+        lv_color_t c;
+        lv_opa_t opa;
+        memcpy(line_buf, &ext->dsc.data[y * line_w], line_w);
+
+
+        for(x = -r_back; x <= r_front; x++) {
+            x_safe = x < 0 ? 0 : x;
+
+            c = lv_img_buf_get_px_color(&line_img, x_safe, 0, LV_COLOR_RED);
+            opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
+
+            rsum += c.ch.red;
+            gsum += c.ch.green;
+            bsum += c.ch.blue;
+            asum += opa;
+        }
+
+        for(x = 0; x < ext->dsc.header.w; x++) {
+            c.ch.red = rsum / r;
+            c.ch.green = gsum / r;
+            c.ch.blue = bsum / r;
+            opa = asum / r;
+
+            lv_img_buf_set_px_color(&ext->dsc, x, y, c);
+            lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa);
+
+
+            x_safe = x - r_back;
+            x_safe = x_safe < 0 ? 0 : x_safe;
+            c = lv_img_buf_get_px_color(&line_img, x_safe, 0, LV_COLOR_RED);
+            opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
+
+            rsum -= c.ch.red;
+            gsum -= c.ch.green;
+            bsum -= c.ch.blue;
+            asum -= opa;
+
+            x_safe = x + 1 + r_front;
+            x_safe = x_safe > ext->dsc.header.w - 1 ? ext->dsc.header.w - 1 : x_safe;
+            c = lv_img_buf_get_px_color(&line_img, x_safe, 0, LV_COLOR_RED);
+            opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
+
+            rsum += c.ch.red;
+            gsum += c.ch.green;
+            bsum += c.ch.blue;
+            asum += opa;
+        }
+    }
+}
+
+
+/**
+ * Apply vertical blur on the canvas
+ * @param canvas pointer to a canvas object
+ * @param r radius of the blur
+ */
+void lv_canvas_blur_ver(lv_obj_t * canvas, uint16_t r)
+{
+    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+
+    lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+
+    uint16_t r_back = r / 2;
+    uint16_t r_front = r / 2;
+
+    if(r & 0x1 == 0) r_back--;
+
+    uint8_t col_buf[10000];
+    lv_img_dsc_t line_img;
+    line_img.data = col_buf;
+    line_img.header.always_zero = 0;
+    line_img.header.w = 1;
+    line_img.header.h = ext->dsc.header.h;
+    line_img.header.cf = ext->dsc.header.cf;
+
+    lv_coord_t x;
+    lv_coord_t y;
+    lv_coord_t y_safe;
+
+    for(x = 0; x < ext->dsc.header.w; x++) {
+        uint32_t asum = 0;
+        uint32_t rsum = 0;
+        uint32_t gsum = 0;
+        uint32_t bsum = 0;
+
+        lv_color_t c;
+        lv_opa_t opa;
+
+        for(y = -r_back; y <= r_front; y++) {
+            y_safe = y < 0 ? 0 : y;
+
+            c = lv_img_buf_get_px_color(&ext->dsc, x, y_safe, LV_COLOR_RED);
+            opa = lv_img_buf_get_px_alpha(&ext->dsc, x, y_safe);
+
+            lv_img_buf_set_px_color(&line_img, 0, y_safe, c);
+            lv_img_buf_set_px_alpha(&line_img, 0, y_safe, opa);
+
+            rsum += c.ch.red;
+            gsum += c.ch.green;
+            bsum += c.ch.blue;
+            asum += opa;
+        }
+
+        for(y = 0; y < ext->dsc.header.h; y++) {
+            c.ch.red = rsum / r;
+            c.ch.green = gsum / r;
+            c.ch.blue = bsum / r;
+            opa = asum / r;
+
+            lv_img_buf_set_px_color(&ext->dsc, x, y, c);
+            lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa);
+
+            y_safe = y - r_back;
+            y_safe = y_safe < 0 ? 0 : y_safe;
+            c = lv_img_buf_get_px_color(&line_img, 0, y_safe, LV_COLOR_RED);
+            opa = lv_img_buf_get_px_alpha(&line_img, 0, y_safe);
+
+            rsum -= c.ch.red;
+            gsum -= c.ch.green;
+            bsum -= c.ch.blue;
+            asum -= opa;
+
+            y_safe = y + 1 + r_front;
+            y_safe = y_safe > ext->dsc.header.h - 1 ? ext->dsc.header.h - 1 : y_safe;
+
+            c = lv_img_buf_get_px_color(&ext->dsc, x, y_safe, LV_COLOR_RED);
+            opa = lv_img_buf_get_px_alpha(&ext->dsc, x, y_safe);
+
+            lv_img_buf_set_px_color(&line_img, 0, y_safe, c);
+            lv_img_buf_set_px_alpha(&line_img, 0, y_safe, opa);
+
+            rsum += c.ch.red;
+            gsum += c.ch.green;
+            bsum += c.ch.blue;
+            asum += opa;
+        }
+    }
+}
+
 /**
  * Fill the canvas with color
  * @param canvas pointer to a canvas
