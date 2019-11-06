@@ -400,7 +400,9 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r)
 
     if((r & 0x1) == 0) r_back--;
 
-    uint8_t line_buf[10000];
+    lv_coord_t line_w = lv_img_buf_get_img_size(ext->dsc.header.w, 1, ext->dsc.header.cf);
+    uint8_t * line_buf = lv_draw_buf_get(line_w);
+
     lv_img_dsc_t line_img;
     line_img.data = line_buf;
     line_img.header.always_zero = 0;
@@ -411,7 +413,6 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r)
     lv_coord_t x;
     lv_coord_t y;
     lv_coord_t x_safe;
-    lv_coord_t line_w = lv_img_buf_get_img_size(ext->dsc.header.w, 1, ext->dsc.header.cf);
 
     for(y = 0; y < ext->dsc.header.h; y++) {
         uint32_t asum = 0;
@@ -420,7 +421,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r)
         uint32_t bsum = 0;
 
         lv_color_t c;
-        lv_opa_t opa;
+        lv_opa_t opa = LV_OPA_TRANSP;
         memcpy(line_buf, &ext->dsc.data[y * line_w], line_w);
 
 
@@ -445,8 +446,8 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r)
 				opa = asum / r;
 
 				lv_img_buf_set_px_color(&ext->dsc, x, y, c, false);
-				lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa, false);
         	}
+			lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa, false);
 
             x_safe = x - r_back;
             x_safe = x_safe < 0 ? 0 : x_safe;
@@ -469,6 +470,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r)
             asum += opa;
         }
     }
+    lv_draw_buf_release(line_buf);
 }
 
 
@@ -489,8 +491,10 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, uint16_t r)
 
     if((r & 0x1) == 0) r_back--;
 
-    uint8_t col_buf[10000];
+    lv_coord_t col_w = lv_img_buf_get_img_size(1, ext->dsc.header.h, ext->dsc.header.cf);
+    uint8_t * col_buf = lv_draw_buf_get(col_w);
     lv_img_dsc_t line_img;
+
     line_img.data = col_buf;
     line_img.header.always_zero = 0;
     line_img.header.w = 1;
@@ -508,7 +512,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, uint16_t r)
         uint32_t bsum = 0;
 
         lv_color_t c;
-        lv_opa_t opa;
+        lv_opa_t opa = LV_OPA_TRANSP;
 
         for(y = -r_back; y <= r_front; y++) {
             y_safe = y < 0 ? 0 : y;
@@ -533,8 +537,8 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, uint16_t r)
 				opa = asum / r;
 
 				lv_img_buf_set_px_color(&ext->dsc, x, y, c, false);
-				lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa, false);
         	}
+			lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa, false);
 
             y_safe = y - r_back;
             y_safe = y_safe < 0 ? 0 : y_safe;
@@ -561,6 +565,8 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, uint16_t r)
             asum += opa;
         }
     }
+
+    lv_draw_buf_release(col_buf);
 }
 
 /**
