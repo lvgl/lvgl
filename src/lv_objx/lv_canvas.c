@@ -386,13 +386,29 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
 /**
  * Apply horizontal blur on the canvas
  * @param canvas pointer to a canvas object
+ * @param area the area to blur. If `NULL` the whole canvas will be blurred.
  * @param r radius of the blur
  */
-void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r)
+void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
 
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+
+    lv_area_t a;
+    if(area) {
+        lv_area_copy(&a, area);
+        if(a.x1 < 0) a.x1 = 0;
+        if(a.y1 < 0) a.y1 = 0;
+        if(a.x2 < 0) a.x2 = ext->dsc.header.w - 1;
+        if(a.y2 < 0) a.y2 = ext->dsc.header.h - 1;
+    } else {
+        a.x1 = 0;
+        a.y1 = 0;
+        a.x2 = ext->dsc.header.w - 1;
+        a.y2 = ext->dsc.header.h - 1;
+    }
+
     const lv_style_t * style = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
 
     uint16_t r_back = r / 2;
@@ -416,7 +432,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r)
     lv_coord_t y;
     lv_coord_t x_safe;
 
-    for(y = 0; y < ext->dsc.header.h; y++) {
+    for(y = a.y1; y <= a.y2; y++) {
         uint32_t asum = 0;
         uint32_t rsum = 0;
         uint32_t gsum = 0;
@@ -427,7 +443,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r)
         memcpy(line_buf, &ext->dsc.data[y * line_w], line_w);
 
 
-        for(x = -r_back; x <= r_front; x++) {
+        for(x = a.x1 -r_back; x <= a.x1 + r_front; x++) {
             x_safe = x < 0 ? 0 : x;
 
             c = lv_img_buf_get_px_color(&line_img, x_safe, 0, style->image.color, false);
@@ -446,7 +462,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r)
         /*Just to indicate that the px is visible*/
         if(has_alpha == false) asum = LV_OPA_COVER;
 
-        for(x = 0; x < ext->dsc.header.w; x++) {
+        for(x = a.x1; x <= a.x2; x++) {
 
         	if(asum) {
 				c.ch.red = rsum / r;
@@ -500,13 +516,29 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r)
 /**
  * Apply vertical blur on the canvas
  * @param canvas pointer to a canvas object
+ * @param area the area to blur. If `NULL` the whole canvas will be blurred.
  * @param r radius of the blur
  */
-void lv_canvas_blur_ver(lv_obj_t * canvas, uint16_t r)
+void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
 
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
+
+    lv_area_t a;
+    if(area) {
+        lv_area_copy(&a, area);
+        if(a.x1 < 0) a.x1 = 0;
+        if(a.y1 < 0) a.y1 = 0;
+        if(a.x2 < 0) a.x2 = ext->dsc.header.w - 1;
+        if(a.y2 < 0) a.y2 = ext->dsc.header.h - 1;
+    } else {
+        a.x1 = 0;
+        a.y1 = 0;
+        a.x2 = ext->dsc.header.w - 1;
+        a.y2 = ext->dsc.header.h - 1;
+    }
+
     const lv_style_t * style = lv_canvas_get_style(canvas, LV_CANVAS_STYLE_MAIN);
 
     uint16_t r_back = r / 2;
@@ -529,7 +561,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, uint16_t r)
     lv_coord_t y;
     lv_coord_t y_safe;
 
-    for(x = 0; x < ext->dsc.header.w; x++) {
+    for(x = a.x1; x <= a.x2; x++) {
         uint32_t asum = 0;
         uint32_t rsum = 0;
         uint32_t gsum = 0;
@@ -538,7 +570,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, uint16_t r)
         lv_color_t c;
         lv_opa_t opa = LV_OPA_COVER;
 
-        for(y = -r_back; y <= r_front; y++) {
+        for(y = a.y1 -r_back; y <= a.y1 + r_front; y++) {
             y_safe = y < 0 ? 0 : y;
 
             c = lv_img_buf_get_px_color(&ext->dsc, x, y_safe, style->image.color, false);
@@ -560,7 +592,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, uint16_t r)
         /*Just to indicate that the px is visible*/
         if(has_alpha == false) asum = LV_OPA_COVER;
 
-        for(y = 0; y < ext->dsc.header.h; y++) {
+        for(y = a.y1; y <= a.y2; y++) {
         	if(asum) {
 				c.ch.red = rsum / r;
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP

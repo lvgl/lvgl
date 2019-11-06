@@ -173,14 +173,15 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
  * @param canvas pointer to a canvas object
  * @param r radius of the blur
  */
-void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r);
+void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r);
 
 /**
  * Apply vertical blur on the canvas
  * @param canvas pointer to a canvas object
+ * @param area the area to blur. If `NULL` the whole canvas will be blurred.
  * @param r radius of the blur
  */
-void lv_canvas_blur_ver(lv_obj_t * canvas, uint16_t r);
+void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r);
 
 /**
  * Fill the canvas with color
