@@ -106,6 +106,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
+    ext->type = LV_CPICKER_DEF_TYPE;
     ext->hsv = LV_CPICKER_DEF_HSV;
     ext->indic.style = &lv_style_plain;
     ext->indic.colored = 0;
@@ -121,6 +122,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
+        lv_obj_set_size(new_cpicker, LV_DPI * 2, LV_DPI * 2);
         lv_obj_set_protect(new_cpicker, LV_PROTECT_PRESS_LOST);
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
