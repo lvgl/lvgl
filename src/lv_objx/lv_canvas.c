@@ -397,7 +397,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, uint16_t r)
     uint16_t r_back = r / 2;
     uint16_t r_front = r / 2;
 
-    if(r & 0x1 == 0) r_back--;
+    if((r & 0x1) == 0) r_back--;
 
     uint8_t line_buf[10000];
     lv_img_dsc_t line_img;
@@ -483,7 +483,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, uint16_t r)
     uint16_t r_back = r / 2;
     uint16_t r_front = r / 2;
 
-    if(r & 0x1 == 0) r_back--;
+    if((r & 0x1) == 0) r_back--;
 
     uint8_t col_buf[10000];
     lv_img_dsc_t line_img;
