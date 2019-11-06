@@ -530,7 +530,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, uint16_t r)
         }
 
         for(y = 0; y < ext->dsc.header.h; y++) {
-        	if(opa) {
+        	if(asum) {
 				c.ch.red = rsum / r;
 				c.ch.green = gsum / r;
 				c.ch.blue = bsum / r;
