@@ -337,6 +337,7 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
 
 static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area, const uint8_t * map_p, lv_color_t color, lv_opa_t opa)
 {
+
     const uint8_t * bpp_opa_table;
     uint8_t bitmask_init;
     uint8_t bitmask;

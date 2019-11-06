@@ -378,7 +378,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
 
         lv_img_rotate_dsc_t rotate_dsc;
-	memset(&rotate_dsc, 0, sizeof(lv_img_rotate_dsc_t));
+        memset(&rotate_dsc, 0, sizeof(lv_img_rotate_dsc_t));
         if(angle) {
             lv_img_cf_t cf = LV_IMG_CF_TRUE_COLOR;
             if(alpha_byte) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
