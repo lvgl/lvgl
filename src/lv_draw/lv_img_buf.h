@@ -170,25 +170,20 @@ lv_img_dsc_t *lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf);
  * @param y x coordinate of the point to get
  * @param color the color of the image. In case of `LV_IMG_CF_ALPHA_1/2/4/8` this color is used.
  * Not used in other cases.
+ * @param safe true: check out of bounds
  * @return color of the point
  */
-lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t color);
-
+lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t color, bool safe);
 
 /**
  * Get the alpha value of an image's pixel
  * @param dsc pointer to an image descriptor
  * @param x x coordinate of the point to set
  * @param y x coordinate of the point to set
+ * @param safe true: check out of bounds
  * @return alpha value of the point
  */
-lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y);
-
-
-void lv_img_buf_rotate_init(lv_img_rotate_dsc_t * dsc, int16_t angle, const void * src, lv_coord_t src_w, lv_coord_t src_h,
-                        lv_img_cf_t cf, lv_coord_t pivot_x, lv_coord_t pivot_y, lv_color_t color);
-
-bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord_t y);
+lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, bool safe);
 
 /**
  * Set the color of a pixel of an image. The alpha channel won't be affected.
@@ -196,8 +191,9 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
  * @param x x coordinate of the point to set
  * @param y x coordinate of the point to set
  * @param c color of the point
+ * @param safe true: check out of bounds
  */
-void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t c);
+void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t c, bool safe);
 
 /**
  * Set the alpha value of a pixel of an image. The color won't be affected
@@ -205,8 +201,9 @@ void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
  * @param x x coordinate of the point to set
  * @param y x coordinate of the point to set
  * @param opa the desired opacity
+ * @param safe true: check out of bounds
  */
-void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_opa_t opa);
+void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_opa_t opa, bool safe);
 
 /**
  * Set the palette color of an indexed image. Valid only for `LV_IMG_CF_INDEXED1/2/4/8`
@@ -235,6 +232,30 @@ void lv_img_buf_free(lv_img_dsc_t *dsc);
  */
 uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf);
 
+/**
+ * Initialize a descriptor to rotate an image
+ * @param dsc pointer to an `lv_img_rotate_dsc_t` variable
+ * @param angle angle to rotate
+ * @param src image source (array of pixels)
+ * @param src_w width of the image to rotate
+ * @param src_h height of the image to rotate
+ * @param cf color format of the image to rotate
+ * @param pivot_x pivot x
+ * @param pivot_y pivot y
+ * @param color a color used for `LV_IMG_CF_INDEXED_1/2/4/8BIT` color formats
+ */
+void lv_img_buf_rotate_init(lv_img_rotate_dsc_t * dsc, int16_t angle, const void * src, lv_coord_t src_w, lv_coord_t src_h,
+                        lv_img_cf_t cf, lv_coord_t pivot_x, lv_coord_t pivot_y, lv_color_t color);
+
+/**
+ * Get which color and opa would come to a pixel if it were rotated
+ * @param dsc a descriptor initialized by `lv_img_buf_rotate_init`
+ * @param x the coordinate which color and opa should be get
+ * @param y the coordinate which color and opa should be get
+ * @return true: there is valid pixel on these x/y coordinates; false: the rotated pixel was out of the image
+ * @note the result is written back to `dsc->res_color` and `dsc->res_opa`
+ */
+bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord_t y);
 
 
 /**********************
