@@ -466,13 +466,20 @@ static inline lv_color_t lv_color_hex3(uint32_t c)
 lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v);
 
 /**
- * Convert an RGB color to HSV
- * @param r red
- * @param g green
- * @param b blue
- * @return the given RGB color n HSV
+ * Convert a 32-bit RGB color to HSV
+ * @param r8 8-bit red
+ * @param g8 8-bit green
+ * @param b8 8-bit blue
+ * @return the given RGB color in HSV
  */
-lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r, uint8_t g, uint8_t b);
+lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8);
+
+/**
+ * Convert a color to HSV
+ * @param color color
+ * @return the given color in HSV
+ */
+lv_color_hsv_t lv_color_to_hsv(lv_color_t color);
 
 /**********************
  *      MACROS
