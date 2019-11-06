@@ -393,6 +393,8 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
 
+    if(r == 0) return;
+
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
 
     lv_area_t a;
@@ -445,6 +447,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 
         for(x = a.x1 -r_back; x <= a.x1 + r_front; x++) {
             x_safe = x < 0 ? 0 : x;
+            x_safe = x_safe > ext->dsc.header.w - 1 ? ext->dsc.header.w - 1 : x_safe;
 
             c = lv_img_buf_get_px_color(&line_img, x_safe, 0, style->image.color, false);
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0, false);
@@ -509,6 +512,8 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
             if(has_alpha) asum += opa;
         }
     }
+    lv_obj_invalidate(canvas);
+
     lv_draw_buf_release(line_buf);
 }
 
@@ -522,6 +527,8 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
+
+    if(r == 0) return;
 
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
 
@@ -572,6 +579,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 
         for(y = a.y1 -r_back; y <= a.y1 + r_front; y++) {
             y_safe = y < 0 ? 0 : y;
+            y_safe = y_safe > ext->dsc.header.h - 1 ? ext->dsc.header.h - 1 : y_safe;
 
             c = lv_img_buf_get_px_color(&ext->dsc, x, y_safe, style->image.color, false);
             if(has_alpha) opa = lv_img_buf_get_px_alpha(&ext->dsc, x, y_safe, false);
@@ -643,6 +651,8 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
         }
     }
 
+    lv_obj_invalidate(canvas);
+
     lv_draw_buf_release(col_buf);
 }
 
@@ -682,6 +692,11 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     LV_ASSERT_NULL(style);
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
+
+    if(dsc->header.cf >= LV_IMG_CF_INDEXED_1BIT && dsc->header.cf <= LV_IMG_CF_INDEXED_8BIT) {
+        LV_LOG_WARN("lv_canvas_draw_rect: can't raw to LV_IMG_CF_INDEXED canvas");
+        return;
+    }
 
     /* Create a dummy display to fool the lv_draw function.
      * It will think it draws to real screen. */
@@ -750,6 +765,11 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
+    if(dsc->header.cf >= LV_IMG_CF_INDEXED_1BIT && dsc->header.cf <= LV_IMG_CF_INDEXED_8BIT) {
+        LV_LOG_WARN("lv_canvas_draw_text: can't raw to LV_IMG_CF_INDEXED canvas");
+        return;
+    }
+
     /* Create a dummy display to fool the lv_draw function.
      * It will think it draws to real screen. */
     lv_area_t mask;
@@ -807,6 +827,11 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     LV_ASSERT_NULL(style);
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
+
+    if(dsc->header.cf >= LV_IMG_CF_INDEXED_1BIT && dsc->header.cf <= LV_IMG_CF_INDEXED_8BIT) {
+        LV_LOG_WARN("lv_canvas_draw_img: can't raw to LV_IMG_CF_INDEXED canvas");
+        return;
+    }
 
     /* Create a dummy display to fool the lv_draw function.
      * It will think it draws to real screen. */
@@ -866,6 +891,10 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t 
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
+    if(dsc->header.cf >= LV_IMG_CF_INDEXED_1BIT && dsc->header.cf <= LV_IMG_CF_INDEXED_8BIT) {
+        LV_LOG_WARN("lv_canvas_draw_line: can't raw to LV_IMG_CF_INDEXED canvas");
+        return;
+    }
     /* Create a dummy display to fool the lv_draw function.
      * It will think it draws to real screen. */
     lv_area_t mask;
@@ -951,6 +980,11 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
+    if(dsc->header.cf >= LV_IMG_CF_INDEXED_1BIT && dsc->header.cf <= LV_IMG_CF_INDEXED_8BIT) {
+        LV_LOG_WARN("lv_canvas_draw_polygon: can't raw to LV_IMG_CF_INDEXED canvas");
+        return;
+    }
+
     /* Create a dummy display to fool the lv_draw function.
      * It will think it draws to real screen. */
     lv_area_t mask;
@@ -1010,6 +1044,11 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     LV_ASSERT_NULL(style);
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
+
+    if(dsc->header.cf >= LV_IMG_CF_INDEXED_1BIT && dsc->header.cf <= LV_IMG_CF_INDEXED_8BIT) {
+        LV_LOG_WARN("lv_canvas_draw_arc: can't raw to LV_IMG_CF_INDEXED canvas");
+        return;
+    }
 
     /* Create a dummy display to fool the lv_draw function.
      * It will think it draws to real screen. */

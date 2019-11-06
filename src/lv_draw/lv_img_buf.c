@@ -553,8 +553,8 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
     } else {
         px = 0; /*unused*/
         px_size = 0;    /*unused*/
-        c_dest_int = lv_img_buf_get_px_color(&dsc->img_dsc, x, y, dsc->color, false);
-        opa_dest_int = lv_img_buf_get_px_alpha(&dsc->img_dsc, x, y, false);
+        c_dest_int = lv_img_buf_get_px_color(&dsc->img_dsc, xs_int, ys_int, dsc->color, false);
+        opa_dest_int = lv_img_buf_get_px_alpha(&dsc->img_dsc, xs_int, ys_int, false);
     }
 
 
@@ -584,8 +584,8 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
             memcpy(&c_dest_xn, &src_u8[px - px_size], sizeof(lv_color_t));
             if(dsc->has_alpha) opa_dest_xn =  src_u8[px - 1];
         } else {
-            c_dest_xn = lv_img_buf_get_px_color(&dsc->img_dsc, xn, y, dsc->color, false);
-            if(dsc->has_alpha) opa_dest_xn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xn, y, false);
+            c_dest_xn = lv_img_buf_get_px_color(&dsc->img_dsc, xn, ys_int, dsc->color, false);
+            if(dsc->has_alpha) opa_dest_xn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xn, ys_int, false);
         }
 
         c_x_dest = lv_color_mix(c_dest_int, c_dest_xn, xr);
@@ -601,8 +601,8 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
             memcpy(&c_dest_xn, &src_u8[px + px_size], sizeof(lv_color_t));
             if(dsc->has_alpha) opa_dest_xn =  src_u8[px + 2 * px_size - 1];
         } else {
-            c_dest_xn = lv_img_buf_get_px_color(&dsc->img_dsc, xn, y, dsc->color, false);
-            if(dsc->has_alpha) opa_dest_xn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xn, y, false);
+            c_dest_xn = lv_img_buf_get_px_color(&dsc->img_dsc, xn, ys_int, dsc->color, false);
+            if(dsc->has_alpha) opa_dest_xn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xn, ys_int, false);
         }
 
         c_x_dest = lv_color_mix(c_dest_int, c_dest_xn, xr);
@@ -629,8 +629,8 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
             memcpy(&c_dest_yn, &src_u8[px - px_size * dsc->src_w], sizeof(lv_color_t));
             if(dsc->has_alpha) opa_dest_yn =  src_u8[px - px_size * dsc->src_w + px_size- 1];
         } else {
-            c_dest_yn = lv_img_buf_get_px_color(&dsc->img_dsc, yn, y, dsc->color, false);
-            if(dsc->has_alpha) opa_dest_yn = lv_img_buf_get_px_alpha(&dsc->img_dsc, yn, y, false);
+            c_dest_yn = lv_img_buf_get_px_color(&dsc->img_dsc, xs_int, yn, dsc->color, false);
+            if(dsc->has_alpha) opa_dest_yn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xs_int, yn, false);
         }
 
         c_y_dest = lv_color_mix(c_dest_int, c_dest_yn, yr);
@@ -646,8 +646,8 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
             memcpy(&c_dest_yn, &src_u8[px + px_size * dsc->src_w], sizeof(lv_color_t));
             if(dsc->has_alpha) opa_dest_yn =  src_u8[px + px_size * dsc->src_w + 2 * px_size - 1];
         } else {
-            c_dest_yn = lv_img_buf_get_px_color(&dsc->img_dsc, yn, y, dsc->color, false);
-            if(dsc->has_alpha) opa_dest_yn = lv_img_buf_get_px_alpha(&dsc->img_dsc, yn, y, false);
+            c_dest_yn = lv_img_buf_get_px_color(&dsc->img_dsc, xs_int, yn, dsc->color, false);
+            if(dsc->has_alpha) opa_dest_yn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xs_int, yn, false);
         }
 
         c_y_dest = lv_color_mix(c_dest_int, c_dest_yn, yr);
