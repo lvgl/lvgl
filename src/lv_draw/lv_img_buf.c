@@ -37,6 +37,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
+
 /**
  * Get the color of an image's pixel
  * @param dsc an image descriptor
@@ -47,26 +48,8 @@
  * @param safe true: check out of bounds
  * @return color of the point
  */
-lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t color, bool safe)
+lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t color)
 {
-	if(safe) {
-		if(x >= dsc->header.w) {
-			x = dsc->header.w - 1;
-			LV_LOG_WARN("lv_img_buf_get_px_color: x is too large");
-		} else if(x < 0) {
-			x = 0;
-			LV_LOG_WARN("lv_img_buf_get_px_color: x is < 0");
-		}
-
-		if(y >= dsc->header.h) {
-			y = dsc->header.h - 1;
-			LV_LOG_WARN("lv_img_buf_get_px_color: y is too large");
-		} else if(y < 0) {
-			y = 0;
-			LV_LOG_WARN("lv_img_buf_get_px_color: y is < 0");
-		}
-	}
-
     lv_color_t p_color = LV_COLOR_BLACK;
     uint8_t * buf_u8 = (uint8_t *)dsc->data;
 
@@ -114,7 +97,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
         p_color.full = buf_u8[px];
     } else if(dsc->header.cf == LV_IMG_CF_ALPHA_1BIT || dsc->header.cf == LV_IMG_CF_ALPHA_2BIT ||
             dsc->header.cf == LV_IMG_CF_ALPHA_4BIT || dsc->header.cf == LV_IMG_CF_ALPHA_8BIT) {
-            p_color = color;
+        p_color = color;
     }
     return p_color;
 }
@@ -127,26 +110,8 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
  * @param safe true: check out of bounds
  * @return alpha value of the point
  */
-lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, bool safe)
+lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
 {
-	if(safe) {
-		if(x >= dsc->header.w) {
-			x = dsc->header.w - 1;
-			LV_LOG_WARN("lv_img_buf_get_px_alpha: x is too large");
-		} else if(x < 0) {
-			x = 0;
-			LV_LOG_WARN("lv_img_buf_get_px_alpha: x is < 0");
-		}
-
-		if(y >= dsc->header.h) {
-			y = dsc->header.h - 1;
-			LV_LOG_WARN("lv_img_buf_get_px_alpha: y is too large");
-		} else if(y < 0) {
-			y = 0;
-			LV_LOG_WARN("lv_img_buf_get_px_alpha: y is < 0");
-		}
-	}
-
     uint8_t * buf_u8 = (uint8_t *)dsc->data;
 
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
@@ -196,6 +161,118 @@ lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
 }
 
 /**
+ * Get the color of an image's pixel
+ * @param dsc an image descriptor
+ * @param x x coordinate of the point to get
+ * @param y x coordinate of the point to get
+ * @param color the color of the image. In case of `LV_IMG_CF_ALPHA_1/2/4/8` this color is used.
+ * Not used in other cases.
+ * @param safe true: check out of bounds
+ * @return color of the point
+ */
+void lv_img_buf_get_px(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_color_t * px_color, lv_opa_t * px_opa)
+{
+    uint8_t * buf_u8 = (uint8_t *)dsc->data;
+
+    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR || dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
+        uint32_t px     = dsc->header.w * y * sizeof(lv_color_t) + x * sizeof(lv_color_t);
+        memcpy(px_color, &buf_u8[px], sizeof(lv_color_t));
+        *px_opa = LV_OPA_COVER;
+    } else if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
+        uint32_t px     = dsc->header.w * y * LV_IMG_PX_SIZE_ALPHA_BYTE + x * LV_IMG_PX_SIZE_ALPHA_BYTE;
+        memcpy(px_color, &buf_u8[px], sizeof(lv_color_t));
+        *px_opa = buf_u8[px + LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
+#if LV_COLOR_SIZE == 32
+        p_color.ch.alpha = 0xFF; /*Only the color should be get so use a default alpha value*/
+#endif
+    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
+        buf_u8 += 4 * 2;
+        uint8_t bit = x & 0x7;
+        x           = x >> 3;
+
+        /* Get the current pixel.
+         * dsc->header.w + 7 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 8, 16, 24 ...*/
+        uint32_t px  = ((dsc->header.w + 7) >> 3) * y + x;
+        px_color->full = (buf_u8[px] & (1 << (7 - bit))) >> (7 - bit);
+        *px_opa = LV_OPA_COVER;
+    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_2BIT) {
+        buf_u8 += 4 * 4;
+        uint8_t bit = (x & 0x3) * 2;
+        x           = x >> 2;
+
+        /* Get the current pixel.
+         * dsc->header.w + 3 means rounding up to 4 because the lines are byte aligned
+         * so the possible real width are 4, 8, 12 ...*/
+        uint32_t px  = ((dsc->header.w + 3) >> 2) * y + x;
+        px_color->full = (buf_u8[px] & (3 << (6 - bit))) >> (6 - bit);
+        *px_opa = LV_OPA_COVER;
+    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_4BIT) {
+        buf_u8 += 4 * 16;
+        uint8_t bit = (x & 0x1) * 4;
+        x           = x >> 1;
+
+        /* Get the current pixel.
+         * dsc->header.w + 1 means rounding up to 2 because the lines are byte aligned
+         * so the possible real width are 2, 4, 6 ...*/
+        uint32_t px  = ((dsc->header.w + 1) >> 1) * y + x;
+        px_color->full = (buf_u8[px] & (0xF << (4 - bit))) >> (4 - bit);
+        *px_opa = LV_OPA_COVER;
+    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_8BIT) {
+        buf_u8 += 4 * 256;
+        uint32_t px  = dsc->header.w * y + x;
+        px_color->full = buf_u8[px];
+    } else if(dsc->header.cf == LV_IMG_CF_ALPHA_1BIT || dsc->header.cf == LV_IMG_CF_ALPHA_2BIT ||
+            dsc->header.cf == LV_IMG_CF_ALPHA_4BIT || dsc->header.cf == LV_IMG_CF_ALPHA_8BIT) {
+        *px_color = color;
+        *px_opa = LV_OPA_COVER;
+    } else if(dsc->header.cf == LV_IMG_CF_ALPHA_1BIT) {
+        uint8_t bit = x & 0x7;
+        x           = x >> 3;
+
+        /* Get the current pixel.
+         * dsc->header.w + 7 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 8 ,16, 24 ...*/
+        uint32_t px    = ((dsc->header.w + 7) >> 3) * y + x;
+        uint8_t tmp = (buf_u8[px] & (1 << (7 - bit))) >> (7 - bit);
+        *px_opa = tmp ? LV_OPA_TRANSP : LV_OPA_COVER;
+        *px_color = color;
+    } else if(dsc->header.cf == LV_IMG_CF_ALPHA_2BIT) {
+        const uint8_t opa_table[4] = {0, 85, 170, 255}; /*Opacity mapping with bpp = 2*/
+
+        uint8_t bit = (x & 0x3) * 2;
+        x           = x >> 2;
+
+        /* Get the current pixel.
+         * dsc->header.w + 4 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 4 ,8, 12 ...*/
+        uint32_t px    = ((dsc->header.w + 3) >> 2) * y + x;
+        uint8_t tmp = (buf_u8[px] & (3 << (6 - bit))) >> (6 - bit);
+        *px_opa = opa_table[tmp];
+        *px_color = color;
+    } else if(dsc->header.cf == LV_IMG_CF_ALPHA_4BIT) {
+        const uint8_t opa_table[16] = {0,  17, 34,  51, /*Opacity mapping with bpp = 4*/
+                68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255};
+
+        uint8_t bit = (x & 0x1) * 4;
+        x           = x >> 1;
+
+        /* Get the current pixel.
+         * dsc->header.w + 1 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 2 ,4, 6 ...*/
+        uint32_t px    = ((dsc->header.w + 1) >> 1) * y + x;
+        uint8_t tmp = (buf_u8[px] & (0xF << (4 - bit))) >> (4 - bit);
+        *px_opa = opa_table[tmp];
+        *px_color = color;
+    } else if(dsc->header.cf == LV_IMG_CF_ALPHA_8BIT) {
+        uint32_t px = dsc->header.w * y + x;
+        *px_opa =  buf_u8[px];
+        *px_color = color;
+    }
+}
+
+
+/**
  * Set the color of a pixel of an image. The alpha channel won't be affected.
  * @param dsc pointer to an image descriptor
  * @param x x coordinate of the point to set
@@ -203,26 +280,8 @@ lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y,
  * @param c color of the point
  * @param safe true: check out of bounds
  */
-void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t c, bool safe)
+void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t c)
 {
-	if(safe) {
-		if(x >= dsc->header.w) {
-			x = dsc->header.w - 1;
-			LV_LOG_WARN("lv_img_buf_set_px_color: x is too large");
-		} else if(x < 0) {
-			x = 0;
-			LV_LOG_WARN("lv_img_buf_set_px_color: x is < 0");
-		}
-
-		if(y >= dsc->header.h) {
-			y = dsc->header.h - 1;
-			LV_LOG_WARN("lv_img_buf_set_px_color: y is too large");
-		} else if(y < 0) {
-			y = 0;
-			LV_LOG_WARN("lv_img_buf_set_px_color: y is < 0");
-		}
-	}
-
     uint8_t * buf_u8 = (uint8_t *)dsc->data;
 
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR || dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
@@ -283,26 +342,8 @@ void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
  * @param opa the desired opacity
  * @param safe true: check out of bounds
  */
-void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_opa_t opa, bool safe)
+void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_opa_t opa)
 {
-	if(safe) {
-		if(x >= dsc->header.w) {
-			x = dsc->header.w - 1;
-			LV_LOG_WARN("lv_img_buf_set_px_alpha: x is too large");
-		} else if(x < 0) {
-			x = 0;
-			LV_LOG_WARN("lv_img_buf_set_px_alpha: x is < 0");
-		}
-
-		if(y >= dsc->header.h) {
-			y = dsc->header.h - 1;
-			LV_LOG_WARN("lv_img_buf_set_px_alpha: y is too large");
-		} else if(y < 0) {
-			y = 0;
-			LV_LOG_WARN("lv_img_buf_set_px_alpha: y is < 0");
-		}
-	}
-
     uint8_t * buf_u8 = (uint8_t *)dsc->data;
 
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
@@ -463,7 +504,7 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
  * @param color a color used for `LV_IMG_CF_INDEXED_1/2/4/8BIT` color formats
  */
 void lv_img_buf_rotate_init(lv_img_rotate_dsc_t * dsc, int16_t angle, const void * src, lv_coord_t src_w, lv_coord_t src_h,
-                        lv_img_cf_t cf, lv_coord_t pivot_x, lv_coord_t pivot_y, lv_color_t color)
+        lv_img_cf_t cf, lv_coord_t pivot_x, lv_coord_t pivot_y, lv_color_t color)
 {
     memset(dsc, 0x00, sizeof(lv_img_rotate_dsc_t));
 
@@ -505,11 +546,14 @@ void lv_img_buf_rotate_init(lv_img_rotate_dsc_t * dsc, int16_t angle, const void
  */
 bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
 {
-    const uint8_t * src_u8 = dsc->src;
 
     /*Get the target point relative coordinates to the pivot*/
     int32_t xt = x - dsc->pivot_x;
     int32_t yt = y - dsc->pivot_y;
+
+
+    //    xt = xt / 2;
+    //    yt = yt / 2;
 
     /*Get the source pixel from the upscaled image*/
     int32_t xs = ((dsc->cosma * xt - dsc->sinma * yt) >> (LV_TRIGO_SHIFT - 8)) + dsc->pivot_x_256;
@@ -536,27 +580,7 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
     lv_color_t c_dest_int;
     lv_opa_t opa_dest_int = 0;
 
-    uint8_t px_size;
-    uint32_t px;
-    if(dsc->native_color) {
-        if(dsc->has_alpha == 0) {
-            px_size = LV_COLOR_SIZE >> 3;
-
-            px     = dsc->src_w * ys_int * px_size + xs_int * px_size;
-            memcpy(&c_dest_int, &src_u8[px], px_size);
-        } else {
-            px_size = LV_IMG_PX_SIZE_ALPHA_BYTE;
-            px     = dsc->src_w * ys_int * px_size + xs_int * px_size;
-            memcpy(&c_dest_int, &src_u8[px], px_size - 1);
-            opa_dest_int = src_u8[px + px_size - 1];
-        }
-    } else {
-        px = 0; /*unused*/
-        px_size = 0;    /*unused*/
-        c_dest_int = lv_img_buf_get_px_color(&dsc->img_dsc, xs_int, ys_int, dsc->color, false);
-        opa_dest_int = lv_img_buf_get_px_alpha(&dsc->img_dsc, xs_int, ys_int, false);
-    }
-
+    lv_img_buf_get_px(&dsc->img_dsc, xs_int, ys_int, dsc->color, &c_dest_int, &opa_dest_int);
 
     if(dsc->chroma_keyed) {
         lv_color_t ct = LV_COLOR_TRANSP;
@@ -579,14 +603,7 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
         if(xn < 0) return false;
 
         xr = xs_fract + 0x80;
-
-        if(dsc->native_color) {
-            memcpy(&c_dest_xn, &src_u8[px - px_size], sizeof(lv_color_t));
-            if(dsc->has_alpha) opa_dest_xn =  src_u8[px - 1];
-        } else {
-            c_dest_xn = lv_img_buf_get_px_color(&dsc->img_dsc, xn, ys_int, dsc->color, false);
-            if(dsc->has_alpha) opa_dest_xn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xn, ys_int, false);
-        }
+        lv_img_buf_get_px(&dsc->img_dsc, xn, ys_int, dsc->color, &c_dest_xn, &opa_dest_xn);
 
         c_x_dest = lv_color_mix(c_dest_int, c_dest_xn, xr);
         if(dsc->has_alpha) opa_x_dest = (opa_dest_int * xr + (opa_dest_xn * (255 - xr))) >> 8;
@@ -597,13 +614,7 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
 
         xr = (0xFF - xs_fract) + 0x80;
 
-        if(dsc->native_color) {
-            memcpy(&c_dest_xn, &src_u8[px + px_size], sizeof(lv_color_t));
-            if(dsc->has_alpha) opa_dest_xn =  src_u8[px + 2 * px_size - 1];
-        } else {
-            c_dest_xn = lv_img_buf_get_px_color(&dsc->img_dsc, xn, ys_int, dsc->color, false);
-            if(dsc->has_alpha) opa_dest_xn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xn, ys_int, false);
-        }
+        lv_img_buf_get_px(&dsc->img_dsc, xn, ys_int, dsc->color, &c_dest_xn, &opa_dest_xn);
 
         c_x_dest = lv_color_mix(c_dest_int, c_dest_xn, xr);
         if(dsc->has_alpha) opa_x_dest = (opa_dest_int * xr + (opa_dest_xn * (255 - xr))) >> 8;
@@ -625,13 +636,7 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
 
         yr = ys_fract + 0x80;
 
-        if(dsc->native_color) {
-            memcpy(&c_dest_yn, &src_u8[px - px_size * dsc->src_w], sizeof(lv_color_t));
-            if(dsc->has_alpha) opa_dest_yn =  src_u8[px - px_size * dsc->src_w + px_size- 1];
-        } else {
-            c_dest_yn = lv_img_buf_get_px_color(&dsc->img_dsc, xs_int, yn, dsc->color, false);
-            if(dsc->has_alpha) opa_dest_yn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xs_int, yn, false);
-        }
+        lv_img_buf_get_px(&dsc->img_dsc, xs_int, yn, dsc->color, &c_dest_yn, &opa_dest_yn);
 
         c_y_dest = lv_color_mix(c_dest_int, c_dest_yn, yr);
         if(dsc->has_alpha) opa_y_dest = (opa_dest_int * yr + (opa_dest_yn * (255 - yr))) >> 8;
@@ -642,13 +647,7 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
 
         yr = (0xFF - ys_fract) + 0x80;
 
-        if(dsc->native_color) {
-            memcpy(&c_dest_yn, &src_u8[px + px_size * dsc->src_w], sizeof(lv_color_t));
-            if(dsc->has_alpha) opa_dest_yn =  src_u8[px + px_size * dsc->src_w + 2 * px_size - 1];
-        } else {
-            c_dest_yn = lv_img_buf_get_px_color(&dsc->img_dsc, xs_int, yn, dsc->color, false);
-            if(dsc->has_alpha) opa_dest_yn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xs_int, yn, false);
-        }
+        lv_img_buf_get_px(&dsc->img_dsc, xs_int, yn, dsc->color, &c_dest_yn, &opa_dest_yn);
 
         c_y_dest = lv_color_mix(c_dest_int, c_dest_yn, yr);
         if(dsc->has_alpha) opa_y_dest = (opa_dest_int * yr + (opa_dest_yn * (255 - yr))) >> 8;
