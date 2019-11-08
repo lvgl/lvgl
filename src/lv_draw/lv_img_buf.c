@@ -24,6 +24,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static inline bool transform_anti_alias(lv_img_rotate_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -483,7 +484,7 @@ void lv_img_buf_rotate_init(lv_img_rotate_dsc_t * dsc, int16_t angle, const void
     dsc->chroma_keyed = lv_img_cf_is_chroma_keyed(cf) ? 1 : 0;
     dsc->has_alpha = lv_img_cf_has_alpha(cf) ? 1 : 0;
     if(cf == LV_IMG_CF_TRUE_COLOR || cf == LV_IMG_CF_TRUE_COLOR_ALPHA || cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
-        dsc->native_color = 1;
+        dsc->native_color = 0;
     }
 
     dsc->img_dsc.data = src;
@@ -511,9 +512,23 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
     int32_t xt = x - dsc->pivot_x;
     int32_t yt = y - dsc->pivot_y;
 
-    /*Get the source pixel from the upscaled image*/
-    int32_t xs = ((dsc->cosma * xt - dsc->sinma * yt) >> (LV_TRIGO_SHIFT - 8)) + dsc->pivot_x_256;
-    int32_t ys = ((dsc->sinma * xt + dsc->cosma * yt) >> (LV_TRIGO_SHIFT - 8)) + dsc->pivot_y_256;
+    bool fast = false;
+    bool zoomed = false;
+    uint16_t zoom = 128;
+    uint16_t zoom_inv = (256 / zoom) * 256;;
+    int32_t xs;
+    int32_t ys;
+    if(!zoomed) {
+        /*Get the source pixel from the upscaled image*/
+        xs = ((dsc->cosma * xt - dsc->sinma * yt) >> (LV_TRIGO_SHIFT - 8)) + dsc->pivot_x_256;
+        ys = ((dsc->sinma * xt + dsc->cosma * yt) >> (LV_TRIGO_SHIFT - 8)) + dsc->pivot_y_256;
+    } else {
+        xt *= zoom_inv;
+        yt *= zoom_inv;
+        xs = ((dsc->cosma * xt - dsc->sinma * yt) >> (LV_TRIGO_SHIFT)) + dsc->pivot_x_256;
+        ys = ((dsc->sinma * xt + dsc->cosma * yt) >> (LV_TRIGO_SHIFT)) + dsc->pivot_y_256;
+
+    }
 
     /*Get the integer part of the source pixel*/
     int xs_int = xs >> 8;
@@ -525,144 +540,149 @@ bool lv_img_buf_get_px_rotated(lv_img_rotate_dsc_t * dsc, lv_coord_t x, lv_coord
     if(ys_int >= dsc->src_h) return false;
     else if(ys_int < 0) return false;
 
-    /*Get the fractional part of the source pixel*/
-    int xs_fract = xs & 0xff;
-    int ys_fract = ys & 0xff;
-
     /* If the fractional < 0x70 mix the source pixel with the left/top pixel
      * If the fractional > 0x90 mix the source pixel with the right/bottom pixel
      * In the 0x70..0x90 range use the unchanged source pixel */
 
-    lv_color_t c_dest_int;
-    lv_opa_t opa_dest_int = 0;
-
     uint8_t px_size;
-    uint32_t px;
+    uint32_t pxi;
     if(dsc->native_color) {
         if(dsc->has_alpha == 0) {
             px_size = LV_COLOR_SIZE >> 3;
 
-            px     = dsc->src_w * ys_int * px_size + xs_int * px_size;
-            memcpy(&c_dest_int, &src_u8[px], px_size);
+            pxi     = dsc->src_w * ys_int * px_size + xs_int * px_size;
+            memcpy(&dsc->res_color, &src_u8[pxi], px_size);
         } else {
             px_size = LV_IMG_PX_SIZE_ALPHA_BYTE;
-            px     = dsc->src_w * ys_int * px_size + xs_int * px_size;
-            memcpy(&c_dest_int, &src_u8[px], px_size - 1);
-            opa_dest_int = src_u8[px + px_size - 1];
+            pxi     = dsc->src_w * ys_int * px_size + xs_int * px_size;
+            memcpy(&dsc->res_color, &src_u8[pxi], px_size - 1);
+            dsc->res_opa = src_u8[pxi + px_size - 1];
         }
     } else {
-        px = 0; /*unused*/
+        pxi = 0; /*unused*/
         px_size = 0;    /*unused*/
-        c_dest_int = lv_img_buf_get_px_color(&dsc->img_dsc, xs_int, ys_int, dsc->color, false);
-        opa_dest_int = lv_img_buf_get_px_alpha(&dsc->img_dsc, xs_int, ys_int, false);
+        dsc->res_color = lv_img_buf_get_px_color(&dsc->img_dsc, xs_int, ys_int, dsc->color, false);
+        dsc->res_opa = lv_img_buf_get_px_alpha(&dsc->img_dsc, xs_int, ys_int, false);
     }
 
 
     if(dsc->chroma_keyed) {
         lv_color_t ct = LV_COLOR_TRANSP;
-        if(c_dest_int.full == ct.full) return false;
-    }
-
-    /*Get the mixture of the original source and the neightboor pixels in both directions*/
-    lv_color_t c_x_dest;
-    lv_color_t c_y_dest;
-    lv_opa_t opa_x_dest = 0;
-    lv_opa_t opa_y_dest = 0;
-
-    int32_t xn;      /*x neightboor*/
-    lv_opa_t xr; /*x mix ratio*/
-    lv_color_t c_dest_xn;
-    lv_opa_t opa_dest_xn = 0;
-
-    if(xs_fract < 0x70) {
-        xn = xs_int - 1;
-        if(xn < 0) return false;
-
-        xr = xs_fract + 0x80;
-
-        if(dsc->native_color) {
-            memcpy(&c_dest_xn, &src_u8[px - px_size], sizeof(lv_color_t));
-            if(dsc->has_alpha) opa_dest_xn =  src_u8[px - 1];
-        } else {
-            c_dest_xn = lv_img_buf_get_px_color(&dsc->img_dsc, xn, ys_int, dsc->color, false);
-            if(dsc->has_alpha) opa_dest_xn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xn, ys_int, false);
-        }
-
-        c_x_dest = lv_color_mix(c_dest_int, c_dest_xn, xr);
-        if(dsc->has_alpha) opa_x_dest = (opa_dest_int * xr + (opa_dest_xn * (255 - xr))) >> 8;
-
-    } else if(xs_fract > 0x90) {
-        xn = xs_int + 1;
-        if(xn >= dsc->src_w) return false;
-
-        xr = (0xFF - xs_fract) + 0x80;
-
-        if(dsc->native_color) {
-            memcpy(&c_dest_xn, &src_u8[px + px_size], sizeof(lv_color_t));
-            if(dsc->has_alpha) opa_dest_xn =  src_u8[px + 2 * px_size - 1];
-        } else {
-            c_dest_xn = lv_img_buf_get_px_color(&dsc->img_dsc, xn, ys_int, dsc->color, false);
-            if(dsc->has_alpha) opa_dest_xn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xn, ys_int, false);
-        }
-
-        c_x_dest = lv_color_mix(c_dest_int, c_dest_xn, xr);
-        if(dsc->has_alpha) opa_x_dest = (opa_dest_int * xr + (opa_dest_xn * (255 - xr))) >> 8;
-
-    } else {
-        c_x_dest.full = c_dest_int.full;
-        opa_x_dest = opa_dest_int;
+        if(dsc->res_color.full == ct.full) return false;
     }
 
 
-    int32_t yn;      /*x neightboor*/
-    lv_opa_t yr; /*x mix ratio*/
-    lv_color_t c_dest_yn;
-    lv_opa_t opa_dest_yn = 0;
+    if(fast) return true;
 
-    if(ys_fract < 0x70) {
-        yn = ys_int - 1;
-        if(yn < 0) return false;
+    dsc->xs = xs;
+    dsc->ys = ys;
+    dsc->xs_int = xs_int;
+    dsc->ys_int = ys_int;
+    dsc->pxi = pxi;
+    dsc->px_size = px_size;
 
-        yr = ys_fract + 0x80;
+    bool ret;
 
-        if(dsc->native_color) {
-            memcpy(&c_dest_yn, &src_u8[px - px_size * dsc->src_w], sizeof(lv_color_t));
-            if(dsc->has_alpha) opa_dest_yn =  src_u8[px - px_size * dsc->src_w + px_size- 1];
-        } else {
-            c_dest_yn = lv_img_buf_get_px_color(&dsc->img_dsc, xs_int, yn, dsc->color, false);
-            if(dsc->has_alpha) opa_dest_yn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xs_int, yn, false);
-        }
+    ret = transform_anti_alias(dsc);
 
-        c_y_dest = lv_color_mix(c_dest_int, c_dest_yn, yr);
-        if(dsc->has_alpha) opa_y_dest = (opa_dest_int * yr + (opa_dest_yn * (255 - yr))) >> 8;
-
-    } else if(ys_fract > 0x90) {
-        yn = ys_int + 1;
-        if(yn >= dsc->src_h) return false;
-
-        yr = (0xFF - ys_fract) + 0x80;
-
-        if(dsc->native_color) {
-            memcpy(&c_dest_yn, &src_u8[px + px_size * dsc->src_w], sizeof(lv_color_t));
-            if(dsc->has_alpha) opa_dest_yn =  src_u8[px + px_size * dsc->src_w + 2 * px_size - 1];
-        } else {
-            c_dest_yn = lv_img_buf_get_px_color(&dsc->img_dsc, xs_int, yn, dsc->color, false);
-            if(dsc->has_alpha) opa_dest_yn = lv_img_buf_get_px_alpha(&dsc->img_dsc, xs_int, yn, false);
-        }
-
-        c_y_dest = lv_color_mix(c_dest_int, c_dest_yn, yr);
-        if(dsc->has_alpha) opa_y_dest = (opa_dest_int * yr + (opa_dest_yn * (255 - yr))) >> 8;
-    } else {
-        c_y_dest.full = c_dest_int.full;
-        opa_y_dest = opa_dest_int;
-    }
-
-    dsc->res_color = lv_color_mix(c_x_dest, c_y_dest, LV_OPA_50);
-    if(dsc->has_alpha) dsc->res_opa = (opa_x_dest + opa_y_dest) >> 1;
-
-    return true;
+    return ret;
 }
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+static inline bool transform_anti_alias(lv_img_rotate_dsc_t * dsc)
+{
+    const uint8_t * src_u8 = dsc->src;
+
+    /*Get the fractional part of the source pixel*/
+    int xs_fract = dsc->xs & 0xff;
+    int ys_fract = dsc->ys & 0xff;
+    int32_t xn;      /*x neightboor*/
+    lv_opa_t xr; /*x mix ratio*/
+
+    if(xs_fract < 0x70) {
+          xn = - 1;
+          if(dsc->xs_int + xn < 0) return false;
+          xr = xs_fract + 0x80;
+    } else if(xs_fract > 0x90) {
+        xn =  1;
+        if(dsc->xs_int + xn >= dsc->src_w) return false;
+        xr = (0xFF - xs_fract) + 0x80;
+    } else {
+        xn = 0;
+        xr = 0xFF;
+    }
+
+    int32_t yn;      /*x neightboor*/
+    lv_opa_t yr; /*x mix ratio*/
+
+    if(ys_fract < 0x70) {
+          yn = - 1;
+          if(dsc->ys_int + yn < 0) return false;
+
+          yr = ys_fract + 0x80;
+    } else if(ys_fract > 0x90) {
+        yn =  1;
+        if(dsc->ys_int + yn >= dsc->src_h) return false;
+
+        yr = (0xFF - ys_fract) + 0x80;
+    } else {
+        yn = 0;
+        yr = 0xFF;
+    }
+
+
+    lv_color_t c00 = dsc->res_color;
+    lv_color_t c01;
+    lv_color_t c10;
+    lv_color_t c11;
+
+    lv_opa_t a00 = dsc->res_opa;
+    lv_opa_t a10;
+    lv_opa_t a01;
+    lv_opa_t a11;
+
+    if(dsc->native_color) {
+        memcpy(&c01, &src_u8[dsc->pxi + dsc->px_size * xn], sizeof(lv_color_t));
+        memcpy(&c10, &src_u8[dsc->pxi + dsc->src_w * dsc->px_size * yn], sizeof(lv_color_t));
+        memcpy(&c11, &src_u8[dsc->pxi + dsc->src_w * dsc->px_size * yn + dsc->px_size * xn], sizeof(lv_color_t));
+        if(dsc->has_alpha) {
+            a10 = src_u8[dsc->pxi + dsc->px_size * xn + dsc->px_size - 1];
+            a01 = src_u8[dsc->pxi + dsc->src_w * dsc->px_size * yn + dsc->px_size - 1];
+            a11 = src_u8[dsc->pxi + dsc->src_w * dsc->px_size * yn + dsc->px_size * xn + dsc->px_size - 1];
+        }
+    } else {
+        c01 = lv_img_buf_get_px_color(&dsc->img_dsc, dsc->xs_int + xn, dsc->ys_int, dsc->color, false);
+        c10 = lv_img_buf_get_px_color(&dsc->img_dsc, dsc->xs_int, dsc->ys_int + yn, dsc->color, false);
+        c11 = lv_img_buf_get_px_color(&dsc->img_dsc, dsc->xs_int + xn, dsc->ys_int + yn, dsc->color, false);
+
+        if(dsc->has_alpha) {
+            a10 = lv_img_buf_get_px_alpha(&dsc->img_dsc, dsc->xs_int + xn, dsc->ys_int, false);
+            a01 = lv_img_buf_get_px_alpha(&dsc->img_dsc, dsc->xs_int, dsc->ys_int + yn, false);
+            a11 = lv_img_buf_get_px_alpha(&dsc->img_dsc, dsc->xs_int + xn, dsc->ys_int + yn, false);
+        }
+
+    }
+
+    lv_opa_t a0;
+    lv_opa_t a1;
+    lv_opa_t xr0 = xr;
+    lv_opa_t xr1 = xr;
+    if(dsc->has_alpha) {
+        a0 = (a00 * xr + (a10 * (255 - xr))) >> 8;
+        a1 = (a01 * xr + (a11 * (255 - xr))) >> 8;
+        dsc->res_opa = (a0 * yr + (a1 * (255 - yr))) >> 8;
+    } else {
+        xr0 = xr;
+        xr1 = xr;
+        dsc->res_opa = LV_OPA_COVER;
+    }
+
+    lv_color_t c0 = lv_color_mix(c00, c01, xr0);
+    lv_color_t c1 = lv_color_mix(c10, c11, xr1);
+
+    dsc->res_color = lv_color_mix(c0, c1, yr);
+
+    return true;
+}
