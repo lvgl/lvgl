@@ -159,7 +159,7 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
 
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
 
-    lv_img_buf_set_px_color(&ext->dsc, x, y, c, true);
+    lv_img_buf_set_px_color(&ext->dsc, x, y, c);
     lv_obj_invalidate(canvas);
 }
 
@@ -218,7 +218,7 @@ lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y)
 
     if(style == NULL) style = &lv_style_scr;
 
-    return lv_img_buf_get_px_color(&ext->dsc, x, y, style->image.color, true);
+    return lv_img_buf_get_px_color(&ext->dsc, x, y, style->image.color);
 }
 
 /**
@@ -333,30 +333,30 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
             if(x + offset_x >= 0 && x + offset_x < dest_width && y + offset_y >= 0 && y + offset_y < dest_height) {
                 /*If the image has no alpha channel just simple set the result color on the canvas*/
                 if(lv_img_cf_has_alpha(img->header.cf) == false) {
-                    lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res_color, false);
+                    lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res_color);
                 } else {
-                    lv_color_t bg_color = lv_img_buf_get_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, style->image.color, false);
+                    lv_color_t bg_color = lv_img_buf_get_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, style->image.color);
 
                     /*If the canvas has no alpha but the image has mix the image's color with
                      * canvas*/
                     if(lv_img_cf_has_alpha(ext_dst->dsc.header.cf) == false) {
                         if(dsc.res_opa < LV_OPA_MAX) dsc.res_color = lv_color_mix(dsc.res_color, bg_color, dsc.res_opa);
-                        lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res_color, false);
+                        lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res_color);
                     }
                     /*Both the image and canvas has alpha channel. Some extra calculation is
                        required*/
                     else {
-                        lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y, false);
+                        lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y);
                         /* Pick the foreground if it's fully opaque or the Background is fully
                          * transparent*/
                         if(dsc.res_opa >= LV_OPA_MAX || bg_opa <= LV_OPA_MIN) {
-                            lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res_color, false);
-                            lv_img_buf_set_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res_opa, false);
+                            lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res_color);
+                            lv_img_buf_set_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res_opa);
                         }
                         /*Opaque background: use simple mix*/
                         else if(bg_opa >= LV_OPA_MAX) {
                             lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y,
-                                                    lv_color_mix(dsc.res_color, bg_color, dsc.res_opa), false);
+                                                    lv_color_mix(dsc.res_color, bg_color, dsc.res_opa));
                         }
                         /*Both colors have alpha. Expensive calculation need to be applied*/
                         else {
@@ -370,8 +370,8 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
                             lv_opa_t ratio = (uint16_t)((uint16_t)dsc.res_opa * 255) / opa_res_2;
 
                             lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y,
-                                                    lv_color_mix(dsc.res_color, bg_color, ratio), false);
-                            lv_img_buf_set_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y, opa_res_2, false);
+                                                    lv_color_mix(dsc.res_color, bg_color, ratio));
+                            lv_img_buf_set_px_alpha(&ext_dst->dsc, x + offset_x, y + offset_y, opa_res_2);
                         }
                     }
                 }
@@ -449,8 +449,8 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
             x_safe = x < 0 ? 0 : x;
             x_safe = x_safe > ext->dsc.header.w - 1 ? ext->dsc.header.w - 1 : x_safe;
 
-            c = lv_img_buf_get_px_color(&line_img, x_safe, 0, style->image.color, false);
-            if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0, false);
+            c = lv_img_buf_get_px_color(&line_img, x_safe, 0, style->image.color);
+            if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
 
             rsum += c.ch.red;
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
@@ -479,14 +479,14 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 				c.ch.blue = bsum / r;
 				if(has_alpha) opa = asum / r;
 
-				lv_img_buf_set_px_color(&ext->dsc, x, y, c, false);
+				lv_img_buf_set_px_color(&ext->dsc, x, y, c);
         	}
-        	if(has_alpha) lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa, false);
+        	if(has_alpha) lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa);
 
             x_safe = x - r_back;
             x_safe = x_safe < 0 ? 0 : x_safe;
-            c = lv_img_buf_get_px_color(&line_img, x_safe, 0, style->image.color, false);
-            if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0, false);
+            c = lv_img_buf_get_px_color(&line_img, x_safe, 0, style->image.color);
+            if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
 
             rsum -= c.ch.red;
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
@@ -499,8 +499,8 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 
             x_safe = x + 1 + r_front;
             x_safe = x_safe > ext->dsc.header.w - 1 ? ext->dsc.header.w - 1 : x_safe;
-            c = lv_img_buf_get_px_color(&line_img, x_safe, 0, LV_COLOR_RED, false);
-            if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0, false);
+            c = lv_img_buf_get_px_color(&line_img, x_safe, 0, LV_COLOR_RED);
+            if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, x_safe, 0);
 
             rsum += c.ch.red;
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
@@ -581,11 +581,11 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
             y_safe = y < 0 ? 0 : y;
             y_safe = y_safe > ext->dsc.header.h - 1 ? ext->dsc.header.h - 1 : y_safe;
 
-            c = lv_img_buf_get_px_color(&ext->dsc, x, y_safe, style->image.color, false);
-            if(has_alpha) opa = lv_img_buf_get_px_alpha(&ext->dsc, x, y_safe, false);
+            c = lv_img_buf_get_px_color(&ext->dsc, x, y_safe, style->image.color);
+            if(has_alpha) opa = lv_img_buf_get_px_alpha(&ext->dsc, x, y_safe);
 
-            lv_img_buf_set_px_color(&line_img, 0, y_safe, c, false);
-            if(has_alpha) lv_img_buf_set_px_alpha(&line_img, 0, y_safe, opa, false);
+            lv_img_buf_set_px_color(&line_img, 0, y_safe, c);
+            if(has_alpha) lv_img_buf_set_px_alpha(&line_img, 0, y_safe, opa);
 
             rsum += c.ch.red;
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
@@ -613,14 +613,14 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 				c.ch.blue = bsum / r;
 				if(has_alpha) opa = asum / r;
 
-				lv_img_buf_set_px_color(&ext->dsc, x, y, c, false);
+				lv_img_buf_set_px_color(&ext->dsc, x, y, c);
         	}
-        	if(has_alpha) lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa, false);
+        	if(has_alpha) lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa);
 
             y_safe = y - r_back;
             y_safe = y_safe < 0 ? 0 : y_safe;
-            c = lv_img_buf_get_px_color(&line_img, 0, y_safe, style->image.color, false);
-            if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, 0, y_safe, false);
+            c = lv_img_buf_get_px_color(&line_img, 0, y_safe, style->image.color);
+            if(has_alpha) opa = lv_img_buf_get_px_alpha(&line_img, 0, y_safe);
 
             rsum -= c.ch.red;
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
@@ -634,11 +634,11 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
             y_safe = y + 1 + r_front;
             y_safe = y_safe > ext->dsc.header.h - 1 ? ext->dsc.header.h - 1 : y_safe;
 
-            c = lv_img_buf_get_px_color(&ext->dsc, x, y_safe, style->image.color, false);
-            if(has_alpha) opa = lv_img_buf_get_px_alpha(&ext->dsc, x, y_safe, false);
+            c = lv_img_buf_get_px_color(&ext->dsc, x, y_safe, style->image.color);
+            if(has_alpha) opa = lv_img_buf_get_px_alpha(&ext->dsc, x, y_safe);
 
-            lv_img_buf_set_px_color(&line_img, 0, y_safe, c, false);
-            if(has_alpha) lv_img_buf_set_px_alpha(&line_img, 0, y_safe, opa, false);
+            lv_img_buf_set_px_color(&line_img, 0, y_safe, c);
+            if(has_alpha) lv_img_buf_set_px_alpha(&line_img, 0, y_safe, opa);
 
             rsum += c.ch.red;
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
@@ -671,8 +671,8 @@ void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color, lv_opa_t opa)
     uint32_t y;
     for(y = 0; y < dsc->header.h; y++) {
         for(x = 0; x < dsc->header.w; x++) {
-            lv_img_buf_set_px_color(dsc, x, y, color, false);
-            lv_img_buf_set_px_alpha(dsc, x, y, opa, false);
+            lv_img_buf_set_px_color(dsc, x, y, color);
+            lv_img_buf_set_px_alpha(dsc, x, y, opa);
         }
     }
 }
@@ -1195,11 +1195,11 @@ static void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, l
 
     uint8_t br = lv_color_brightness(color);
     if(opa < LV_OPA_MAX) {
-        uint8_t bg = lv_img_buf_get_px_alpha(d, x, y, false);
+        uint8_t bg = lv_img_buf_get_px_alpha(d, x, y);
         br = (uint16_t)((uint16_t)br * opa + (bg * (255 - opa))) >> 8;
     }
 
-    lv_img_buf_set_px_alpha(d, x, y, br, false);
+    lv_img_buf_set_px_alpha(d, x, y, br);
 }
 
 
@@ -1216,8 +1216,8 @@ static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_
     d.header.w = buf_w;
     d.header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
 
-    lv_color_t bg_color = lv_img_buf_get_px_color(&d, x, y, LV_COLOR_BLACK, false);
-    lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&d, x, y, false);
+    lv_color_t bg_color = lv_img_buf_get_px_color(&d, x, y, LV_COLOR_BLACK);
+    lv_opa_t bg_opa = lv_img_buf_get_px_alpha(&d, x, y);
 
     lv_opa_t res_opa;
     lv_color_t res_color;
@@ -1225,8 +1225,8 @@ static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_
     lv_color_mix_with_alpha(bg_color, bg_opa, color, opa, &res_color, &res_opa);
 
 
-    lv_img_buf_set_px_alpha(&d, x, y, res_opa, false);
-    lv_img_buf_set_px_color(&d, x, y, res_color, false);
+    lv_img_buf_set_px_alpha(&d, x, y, res_opa);
+    lv_img_buf_set_px_color(&d, x, y, res_color);
 }
 
 #endif
