@@ -18,6 +18,11 @@
  *********************/
 #define LV_BIDI_BRACKLET_DEPTH   4
 
+// Highest bit of the 16-bit pos_conv value specifies whether this pos is RTL or not
+#define GET_POS(x) ((x) & 0x7FFF)
+#define IS_RTL_POS(x) (((x) & 0x8000) != 0)
+#define SET_RTL_POS(x, is_rtl) (GET_POS(x) | ((is_rtl)? 0x8000: 0))
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -140,17 +145,18 @@ bool lv_bidi_letter_is_neutral(uint32_t letter)
     return false;
 }
 
-uint16_t lv_bidi_get_logical_pos(const char * str_in, char **bidi_txt, uint32_t len, lv_bidi_dir_t base_dir, uint32_t visual_pos)
+uint16_t lv_bidi_get_logical_pos(const char * str_in, char **bidi_txt, uint32_t len, lv_bidi_dir_t base_dir, uint32_t visual_pos, bool *is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
     void *buf = lv_draw_get_buf(len + pos_conv_len * sizeof(uint16_t));
     if (bidi_txt) *bidi_txt = buf;
     uint16_t *pos_conv_buf = (uint16_t*) ((char*)buf + len);
     lv_bidi_process_paragraph(str_in, bidi_txt? *bidi_txt: NULL, len, base_dir, pos_conv_buf, pos_conv_len);
-    return pos_conv_buf[visual_pos];
+    if (is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[visual_pos]);
+    return GET_POS(pos_conv_buf[visual_pos]);
 }
 
-uint16_t lv_bidi_get_visual_pos(const char * str_in, char **bidi_txt, uint16_t len, lv_bidi_dir_t base_dir, uint32_t logical_pos)
+uint16_t lv_bidi_get_visual_pos(const char * str_in, char **bidi_txt, uint16_t len, lv_bidi_dir_t base_dir, uint32_t logical_pos, bool *is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
     void *buf = lv_draw_get_buf(len + pos_conv_len * sizeof(uint16_t));
@@ -158,8 +164,10 @@ uint16_t lv_bidi_get_visual_pos(const char * str_in, char **bidi_txt, uint16_t l
     uint16_t *pos_conv_buf = (uint16_t*) ((char*)buf + len);
     lv_bidi_process_paragraph(str_in, bidi_txt? *bidi_txt: NULL, len, base_dir, pos_conv_buf, pos_conv_len);
     for (uint16_t i = 0; i < pos_conv_len; i++){
-        if (pos_conv_buf[i] == logical_pos)
+        if (GET_POS(pos_conv_buf[i]) == logical_pos){
+            if (is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[i]);
             return i;
+        }
     }
     return (uint16_t) -1;
 }
@@ -284,7 +292,7 @@ static void fill_pos_conv(uint16_t * out, uint16_t len, uint16_t index)
 {
     for (uint16_t i = 0; i < len; i++)
     {
-        out[i] = index;
+        out[i] = SET_RTL_POS(index, false);
         index++;
     }
 } 
@@ -421,14 +429,14 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t *p
             if(letter_size == 1) {
                 uint32_t new_letter = letter = char_change_to_pair(letter);
                 if (dest) dest[wr] = (uint8_t)new_letter;
-                if (pos_conv_out) pos_conv_out[pos_conv_wr] = pos_conv_rd_base + pos_conv_letter;
+                if (pos_conv_out) pos_conv_out[pos_conv_wr] = SET_RTL_POS(pos_conv_rd_base + pos_conv_letter, true);
                 wr++;
                 pos_conv_wr++;
             }
             /*Just store the letter*/
             else {
                 if (dest) memcpy(&dest[wr], &src[i], letter_size);
-                if (pos_conv_out) pos_conv_out[pos_conv_wr] = pos_conv_rd_base + pos_conv_i;
+                if (pos_conv_out) pos_conv_out[pos_conv_wr] = SET_RTL_POS(pos_conv_rd_base + pos_conv_i, true);
                 wr += letter_size;
                 pos_conv_wr++;
             }
