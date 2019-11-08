@@ -406,7 +406,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             trans_dsc.cfg.pivot_x = map_w / 2;
             trans_dsc.cfg.pivot_y = map_h / 2;
             trans_dsc.cfg.color = style->image.color;
-            trans_dsc.cfg.antialias = true;
+            trans_dsc.cfg.antialias = antialaias;
 
             lv_img_buf_transform_init(&trans_dsc);
         }
