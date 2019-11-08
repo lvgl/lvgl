@@ -273,6 +273,7 @@ void lv_img_set_angle(lv_obj_t * img, int16_t angle)
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     if(angle == ext->angle) return;
 
+    lv_obj_invalidate(img);
     ext->angle = angle;
     lv_obj_refresh_ext_draw_pad(img);
     lv_obj_invalidate(img);
@@ -295,6 +296,7 @@ void lv_img_set_zoom(lv_obj_t * img, uint16_t zoom)
 
     if(zoom == 0) zoom = 1;
 
+    lv_obj_invalidate(img);
     ext->zoom = zoom;
     lv_obj_refresh_ext_draw_pad(img);
     lv_obj_invalidate(img);
@@ -531,7 +533,7 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*If the image has angle provide enough room for the rotated corners */
-        if(ext->angle && ext->zoom) {
+        if(ext->angle || ext->zoom != LV_IMG_ZOOM_NONE) {
             lv_sqrt_res_t ds;
             lv_sqrt(ext->w * ext->w + ext->h * ext->h, &ds);
             ds.i = (ds.i * ext->zoom + 0) >> 8;        /*+10 to be sure anything won't be clipped*/
