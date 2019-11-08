@@ -525,7 +525,7 @@ void lv_img_buf_rotate_init(lv_img_rotate_dsc_t * dsc, int16_t angle, const void
     dsc->chroma_keyed = lv_img_cf_is_chroma_keyed(cf) ? 1 : 0;
     dsc->has_alpha = lv_img_cf_has_alpha(cf) ? 1 : 0;
     if(cf == LV_IMG_CF_TRUE_COLOR || cf == LV_IMG_CF_TRUE_COLOR_ALPHA || cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
-        dsc->native_color = 0;
+        dsc->native_color = 1;
     }
 
     dsc->img_dsc.data = src;
@@ -715,6 +715,16 @@ static inline bool transform_anti_alias(lv_img_rotate_dsc_t * dsc)
         a0 = (a00 * xr + (a10 * (255 - xr))) >> 8;
         a1 = (a01 * xr + (a11 * (255 - xr))) >> 8;
         dsc->res_opa = (a0 * yr + (a1 * (255 - yr))) >> 8;
+
+
+        if(a0 <= LV_OPA_MIN && a1 <= LV_OPA_MIN) return false;
+        if(a0 <= LV_OPA_MIN) yr = LV_OPA_TRANSP;
+        if(a1 <= LV_OPA_MIN) yr = LV_OPA_COVER;
+        if(a00 <= LV_OPA_MIN) xr0 = LV_OPA_TRANSP;
+        if(a10 <= LV_OPA_MIN) xr0 = LV_OPA_COVER;
+        if(a01 <= LV_OPA_MIN) xr1 = LV_OPA_TRANSP;
+        if(a11 <= LV_OPA_MIN) xr1 = LV_OPA_COVER;
+
     } else {
         xr0 = xr;
         xr1 = xr;
