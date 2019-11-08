@@ -188,7 +188,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r);
  * @param canvas pointer to a canvas
  * @param color the background color
  */
-void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color);
+void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color, lv_opa_t opa);
 
 /**
  * Draw a rectangle on the canvas
