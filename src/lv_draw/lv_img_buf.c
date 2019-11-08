@@ -217,6 +217,68 @@ void lv_img_buf_set_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
 }
 
 /**
+ * Set the color of a pixel of an image. The alpha channel won't be affected.
+ * @param dsc pointer to an image descriptor
+ * @param x x coordinate of the point to set
+ * @param y x coordinate of the point to set
+ * @param c color of the point
+ * @param safe true: check out of bounds
+ */
+void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t c)
+{
+    uint8_t * buf_u8 = (uint8_t *)dsc->data;
+
+    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR || dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
+        uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
+        uint32_t px     = dsc->header.w * y * px_size + x * px_size;
+        memcpy(&buf_u8[px], &c, px_size);
+    } else if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
+        uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
+        uint32_t px     = dsc->header.w * y * px_size + x * px_size;
+        memcpy(&buf_u8[px], &c, px_size - 1); /*-1 to not overwrite the alpha value*/
+    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
+        buf_u8 += sizeof(lv_color32_t) * 2; /*Skip the palette*/
+
+        uint8_t bit = x & 0x7;
+        x           = x >> 3;
+
+        /* Get the current pixel.
+         * dsc->header.w + 7 means rounding up to 8 because the lines are byte aligned
+         * so the possible real width are 8 ,16, 24 ...*/
+        uint32_t px = ((dsc->header.w + 7) >> 3) * y + x;
+        buf_u8[px]  = buf_u8[px] & ~(1 << (7 - bit));
+        buf_u8[px]  = buf_u8[px] | ((c.full & 0x1) << (7 - bit));
+    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_2BIT) {
+        buf_u8 += sizeof(lv_color32_t) * 4; /*Skip the palette*/
+        uint8_t bit = (x & 0x3) * 2;
+        x           = x >> 2;
+
+        /* Get the current pixel.
+         * dsc->header.w + 3 means rounding up to 4 because the lines are byte aligned
+         * so the possible real width are 4, 8 ,12 ...*/
+        uint32_t px = ((dsc->header.w + 3) >> 2) * y + x;
+
+        buf_u8[px] = buf_u8[px] & ~(3 << (6 - bit));
+        buf_u8[px] = buf_u8[px] | ((c.full & 0x3) << (6 - bit));
+    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_4BIT) {
+        buf_u8 += sizeof(lv_color32_t) * 16; /*Skip the palette*/
+        uint8_t bit = (x & 0x1) * 4;
+        x           = x >> 1;
+
+        /* Get the current pixel.
+         * dsc->header.w + 1 means rounding up to 2 because the lines are byte aligned
+         * so the possible real width are 2 ,4, 6 ...*/
+        uint32_t px = ((dsc->header.w + 1) >> 1) * y + x;
+        buf_u8[px]  = buf_u8[px] & ~(0xF << (4 - bit));
+        buf_u8[px]  = buf_u8[px] | ((c.full & 0xF) << (4 - bit));
+    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_8BIT) {
+        buf_u8 += sizeof(lv_color32_t) * 256; /*Skip the palette*/
+        uint32_t px = dsc->header.w * y + x;
+        buf_u8[px]  = c.full;
+    }
+}
+
+/**
  * Set the palette color of an indexed image. Valid only for `LV_IMG_CF_INDEXED1/2/4/8`
  * @param dsc pointer to an image descriptor
  * @param id the palette color to set:
