@@ -84,6 +84,7 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->arc_length = LV_PRELOAD_DEF_ARC_LENGTH;
     ext->anim_type  = LV_PRELOAD_DEF_ANIM;
     ext->anim_dir   = LV_PRELOAD_DIR_FORWARD;
+    ext->time = LV_PRELOAD_DEF_SPIN_TIME;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_preload, lv_preload_signal);
@@ -101,7 +102,6 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_obj_set_style(new_preload, &lv_style_pretty_color);
         }
 
-        ext->time = LV_PRELOAD_DEF_SPIN_TIME;
 
     }
     /*Copy an existing pre loader*/
@@ -352,7 +352,8 @@ void lv_preload_spinner_anim(void * ptr, lv_anim_value_t val)
     lv_obj_t * preload     = ptr;
     lv_preload_ext_t * ext = lv_obj_get_ext_attr(preload);
 
-    int16_t angle_start = val - ext->arc_length / 2 + 180;
+    int16_t angle_start = val - ext->arc_length / 2 - 90;
+    if(angle_start < 0) angle_start += 360;
     int16_t angle_end   = angle_start + ext->arc_length;
 
     angle_start = angle_start % 360;
