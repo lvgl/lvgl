@@ -148,6 +148,14 @@ typedef struct {
     uint8_t has_alpha :1;
     uint8_t native_color :1;
 
+    /*Runtime data*/
+    lv_coord_t xs;
+    lv_coord_t ys;
+    lv_coord_t xs_int;
+    lv_coord_t ys_int;
+    uint32_t pxi;
+    uint8_t px_size;
+
 }lv_img_rotate_dsc_t;
 
 /**********************

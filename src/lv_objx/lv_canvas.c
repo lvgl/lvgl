@@ -323,8 +323,8 @@ void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_c
     lv_img_rotate_dsc_t dsc;
     lv_img_buf_rotate_init(&dsc, angle, img->data, img->header.w, img->header.h, img->header.cf, pivot_x, pivot_y, style->image.color);
 
-    for(x = -offset_x; x < dest_width - offset_x; x++) {
-        for(y = -offset_y; y < dest_height - offset_y; y++) {
+    for(y = -offset_y; y < dest_height - offset_y; y++) {
+        for(x = -offset_x; x < dest_width - offset_x; x++) {
 
             ret = lv_img_buf_get_px_rotated(&dsc, x, y);
 
@@ -661,7 +661,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
  * @param canvas pointer to a canvas
  * @param color the background color
  */
-void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color)
+void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color, lv_opa_t opa)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
 
@@ -672,6 +672,7 @@ void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color)
     for(y = 0; y < dsc->header.h; y++) {
         for(x = 0; x < dsc->header.w; x++) {
             lv_img_buf_set_px_color(dsc, x, y, color);
+            lv_img_buf_set_px_alpha(dsc, x, y, opa);
         }
     }
 }
