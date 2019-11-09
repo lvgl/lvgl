@@ -166,13 +166,14 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         i         = 0;
         uint32_t letter;
         uint32_t letter_next;
-        while(i < line_end - line_start) {
 #if LV_USE_BIDI
             char *bidi_txt = lv_draw_get_buf(line_end - line_start + 1);
             lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, bidi_dir, NULL, 0);
 #else
             const char *bidi_txt = txt + line_start;
 #endif
+        while(i < line_end - line_start) {
+
             letter      = lv_txt_encoded_next(bidi_txt, &i);
             letter_next = lv_txt_encoded_next(&bidi_txt[i], NULL);
 
@@ -220,7 +221,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
-                int char_ind = lv_txt_encoded_get_char_id(bidi_txt, i);
+                int char_ind = lv_txt_encoded_get_char_id(bidi_txt, i + line_start);
                 /*Do not draw the rectangle on the character at `sel_start`.*/
                 if(char_ind > sel_start && char_ind <= sel_end) {
                     lv_area_t sel_coords;

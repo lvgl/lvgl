@@ -767,10 +767,10 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     logical_pos = lv_bidi_get_logical_pos(&txt[line_start], NULL, new_line_start - line_start, lv_obj_get_base_dir(label), lv_txt_encoded_get_char_id(bidi_txt, i), &is_rtl);
     if (is_rtl) logical_pos++;
 #else
-    logical_pos = lv_encoded_get_char_id(bidi_txt, i);
+    logical_pos = lv_txt_encoded_get_char_id(bidi_txt, i);
 #endif
 
-    return logical_pos + line_start;
+    return  logical_pos + lv_txt_encoded_get_char_id(txt, line_start) ;
 }
 
 /**
