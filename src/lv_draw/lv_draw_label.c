@@ -113,6 +113,24 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         pos.y += hint->y;
     }
 
+    if(sel_start != 0xFFFF) {
+        sel_start = lv_bidi_get_visual_pos(txt, NULL, strlen(txt), bidi_dir, sel_start, NULL);
+        sel_start = lv_txt_encoded_get_byte_id(txt, sel_start);
+    }
+
+    if(sel_end != 0xFFFF) {
+        sel_end = lv_bidi_get_visual_pos(txt, NULL, strlen(txt), bidi_dir, sel_end, NULL);
+        sel_end = lv_txt_encoded_get_byte_id(txt, sel_end);
+    }
+
+    if(sel_start > sel_end) {
+        uint16_t tmp = sel_start;
+        sel_start = sel_end;
+        sel_end = tmp;
+    }
+
+
+
     uint32_t line_end = line_start + lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, w, flag);
 
     /*Go the first visible line*/
@@ -221,9 +239,8 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
-                int char_ind = lv_txt_encoded_get_char_id(bidi_txt, i + line_start);
                 /*Do not draw the rectangle on the character at `sel_start`.*/
-                if(char_ind > sel_start && char_ind <= sel_end) {
+                if(i + line_start > sel_start && i + line_start <= sel_end) {
                     lv_area_t sel_coords;
                     sel_coords.x1 = pos.x;
                     sel_coords.y1 = pos.y;

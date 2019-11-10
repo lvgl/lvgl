@@ -770,7 +770,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     logical_pos = lv_txt_encoded_get_char_id(bidi_txt, i);
 #endif
 
-    return  logical_pos + lv_txt_encoded_get_char_id(txt, line_start) ;
+    return  logical_pos + lv_txt_encoded_get_char_id(txt, line_start);
 }
 
 /**
