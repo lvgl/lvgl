@@ -123,6 +123,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
                         task_interrupter =
                             LV_GC_ROOT(_lv_task_act); /*Check all tasks again from the highest priority */
                         end_flag = false;
+                        if(task_deleted) task_interrupter = NULL;
                         break;
                     }
                 }
@@ -133,6 +134,7 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
                 if(lv_task_exec(LV_GC_ROOT(_lv_task_act))) {
                     task_interrupter = LV_GC_ROOT(_lv_task_act); /*Check all tasks again from the highest priority */
                     end_flag         = false;
+                    if(task_deleted) task_interrupter = NULL;
                     break;
                 }
             }
