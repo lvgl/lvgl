@@ -392,10 +392,10 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 
 /* The most simple macro to create a color from R,G and B values */
 #if LV_COLOR_DEPTH == 1
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){(b8 >> 7 | g8 >> 7 | r8 >> 7)})
+#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){.full = (b8 >> 7 | g8 >> 7 | r8 >> 7)})
 static inline lv_color_t lv_color_make(int r8, int g8, int b8)
 {
-    lv_color_t color;
+    lv_color_t color = { 0 };
     color.full = (b8 >> 7 | g8 >> 7 | r8 >> 7);
     return color;
 }
