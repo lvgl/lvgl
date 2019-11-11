@@ -232,7 +232,7 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
 
     /*Get and process the runs*/
 
-    while(rd < len) {
+    while(rd < len && str_in[rd]) {
         run_dir = get_next_run(&str_in[rd], base_dir, len - rd, &run_len, &pos_conv_run_len);
 
         if(base_dir == LV_BIDI_DIR_LTR) {
