@@ -661,7 +661,15 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     while(txt[line_start] != '\0') {
         new_line_start += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, max_w, flag);
 
-        if(pos->y <= y + letter_height) break; /*The line is found (stored in 'line_start')*/
+        if(pos->y <= y + letter_height) {
+            /*The line is found (stored in 'line_start')*/
+            /* Include the NULL terminator in the last line */
+            uint32_t tmp = new_line_start;
+            uint32_t letter;
+            letter = lv_txt_encoded_prev(txt, &tmp);
+            if(letter != '\n' && txt[new_line_start] == '\0' ) new_line_start++;
+            break;
+        }
         y += letter_height + style->text.line_space;
 
         line_start = new_line_start;
@@ -682,31 +690,29 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     uint32_t letter;
     uint32_t letter_next;
 
-    if(new_line_start > 0) {
-        while(i < new_line_start) {
-            /* Get the current letter.*/
-            letter = lv_txt_encoded_next(txt, &i);
+    while(i < new_line_start) {
+        /* Get the current letter.*/
+        letter = lv_txt_encoded_next(txt, &i);
 
-            /*Get the next letter too for kerning*/
-            letter_next = lv_txt_encoded_next(&txt[i], NULL);
+        /*Get the next letter too for kerning*/
+        letter_next = lv_txt_encoded_next(&txt[i], NULL);
 
-            /*Handle the recolor command*/
-            if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
-                if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
-                    continue; /*Skip the letter is it is part of a command*/
-                }
+        /*Handle the recolor command*/
+        if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
+            if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
+                continue; /*Skip the letter is it is part of a command*/
             }
-
-            x += lv_font_get_glyph_width(font, letter, letter_next);
-
-            /*Finish if the x position or the last char of the line is reached*/
-            if(pos->x < x || i == new_line_start) {
-                i = i_act;
-                break;
-            }
-            x += style->text.letter_space;
-            i_act = i;
         }
+
+        x += lv_font_get_glyph_width(font, letter, letter_next);
+
+        /*Finish if the x position or the last char of the line is reached*/
+        if(pos->x < x || i == new_line_start) {
+            i = i_act;
+            break;
+        }
+        x += style->text.letter_space;
+        i_act = i;
     }
 
     return lv_encoded_get_char_id(txt, i);

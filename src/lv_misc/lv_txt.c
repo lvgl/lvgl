@@ -266,6 +266,9 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
 
 /**
  * Get the next line of text. Check line length and break chars too.
+ *
+ * A line of txt includes the \n character.
+ *
  * @param txt a '\0' terminated string
  * @param font pointer to a font
  * @param letter_space letter space
@@ -295,18 +298,13 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
         i += advance;
 
-        if(txt[i] == '\n') break;
-    }
+        if(txt[0] == '\n') break;
 
-    /* If this is the last of the string, make sure pointer is at NULL-terminator.
-     * This catches the case, for example of a string ending in "\n" */
-    if(txt[i] != '\0'){
-        uint32_t i_next = i;
-        int tmp;
-        uint32_t letter_next = lv_txt_encoded_next(txt, &i_next); /*Gets current character*/
-        tmp = i_next;
-        letter_next = lv_txt_encoded_next(txt, &i_next); /*Gets subsequent character*/
-        if(letter_next == '\0') i = tmp;
+        if(txt[i] == '\n'){
+            i++;  /* Include the following newline in the current line */
+            break;
+        }
+
     }
 
     /*Always step at least one to avoid infinite loops*/
