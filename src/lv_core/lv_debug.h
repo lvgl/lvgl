@@ -34,7 +34,7 @@ bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
 
 bool lv_debug_check_obj_valid(const lv_obj_t * obj);
 
-bool lv_debug_check_style(const void * str);
+bool lv_debug_check_style(const lv_style_t * style);
 
 bool lv_debug_check_str(const void * str);
 
@@ -135,6 +135,8 @@ void lv_debug_log_error(const char * msg, uint64_t value);
 #endif
 
 #else /* LV_USE_DEBUG == 0 */
+
+#define LV_DEBUG_ASSERT(expr, msg, value) do{}while(0)
 
 #define LV_ASSERT_NULL(p) true
 #define LV_ASSERT_MEM(p) true

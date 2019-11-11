@@ -96,10 +96,13 @@ enum {
 
 typedef union
 {
-    uint8_t blue : 1;
-    uint8_t green : 1;
-    uint8_t red : 1;
-    uint8_t full : 1;
+    struct
+    {
+        uint8_t blue : 1;
+        uint8_t green : 1;
+        uint8_t red : 1;
+    } ch;
+    uint8_t full;
 } lv_color1_t;
 
 typedef union
@@ -389,10 +392,10 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 
 /* The most simple macro to create a color from R,G and B values */
 #if LV_COLOR_DEPTH == 1
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){(b8 >> 7 | g8 >> 7 | r8 >> 7)})
+#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){.full = (b8 >> 7 | g8 >> 7 | r8 >> 7)})
 static inline lv_color_t lv_color_make(int r8, int g8, int b8)
 {
-    lv_color_t color;
+    lv_color_t color = { 0 };
     color.full = (b8 >> 7 | g8 >> 7 | r8 >> 7);
     return color;
 }
@@ -463,13 +466,20 @@ static inline lv_color_t lv_color_hex3(uint32_t c)
 lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v);
 
 /**
- * Convert an RGB color to HSV
- * @param r red
- * @param g green
- * @param b blue
- * @return the given RGB color n HSV
+ * Convert a 32-bit RGB color to HSV
+ * @param r8 8-bit red
+ * @param g8 8-bit green
+ * @param b8 8-bit blue
+ * @return the given RGB color in HSV
  */
-lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r, uint8_t g, uint8_t b);
+lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8);
+
+/**
+ * Convert a color to HSV
+ * @param color color
+ * @return the given color in HSV
+ */
+lv_color_hsv_t lv_color_to_hsv(lv_color_t color);
 
 /**********************
  *      MACROS

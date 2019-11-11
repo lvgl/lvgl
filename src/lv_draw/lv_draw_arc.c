@@ -20,7 +20,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static uint16_t fast_atan2(int x, int y);
 static void ver_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color,
                      lv_opa_t opa);
 static void hor_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color,
@@ -121,7 +120,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
             if(r_act_sqr > r_out_sqr) continue;
 #endif
 
-            deg_base = fast_atan2(xi, yi) - 180;
+            deg_base = lv_atan2(xi, yi) - 180;
 
 #if LV_ANTIALIAS
             int opa = -1;

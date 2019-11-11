@@ -51,7 +51,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
         lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL, -1, -1, NULL, LV_BIDI_DIR_LTR);
+        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL, NULL, NULL, LV_BIDI_DIR_LTR);
         return;
     }
 
@@ -61,7 +61,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
     if(res == LV_RES_INV) {
         LV_LOG_WARN("Image draw error");
         lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL, -1, -1, NULL, LV_BIDI_DIR_LTR);
+        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL,  NULL, NULL, LV_BIDI_DIR_LTR);
         return;
     }
 }
@@ -562,8 +562,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
     if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
         lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, cdsc->dec_dsc.error_msg, LV_TXT_FLAG_NONE, NULL, -1,
-                      -1, NULL, LV_BIDI_DIR_LTR);
+        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, cdsc->dec_dsc.error_msg, LV_TXT_FLAG_NONE, NULL, NULL, NULL, LV_BIDI_DIR_LTR);
     }
     /* The decoder open could open the image and gave the entire uncompressed image.
      * Just draw it!*/

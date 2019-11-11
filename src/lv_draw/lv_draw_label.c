@@ -52,21 +52,17 @@ static uint8_t hex_char_to_num(char hex);
  * @param txt 0 terminated text to write
  * @param flag settings for the text from 'txt_flag_t' enum
  * @param offset text offset in x and y direction (NULL if unused)
- * @param sel_start start index of selected area (`LV_LABEL_TXT_SEL_OFF` if none)
- * @param sel_end end index of selected area (`LV_LABEL_TXT_SEL_OFF` if none)
+ * @param sel make the text selected in the range by drawing a background there
  */
 void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
-        const char * txt, lv_txt_flag_t flag, lv_point_t * offset, uint16_t sel_start, uint16_t sel_end,
-        lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir)
+                   const char * txt, lv_txt_flag_t flag, lv_point_t * offset, lv_draw_label_txt_sel_t * sel,
+                   lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir)
 {
     const lv_font_t * font = style->text.font;
     lv_coord_t w;
 
     /*No need to waste processor time if string is empty*/
-    if (txt[0] == '\0')
-    {
-        return;
-    }
+    if (txt[0] == '\0')  return;
 
     if((flag & LV_TXT_FLAG_EXPAND) == 0) {
         /*Normally use the label's width as width*/
@@ -148,10 +144,16 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 
     lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->text.opa : (uint16_t)((uint16_t)style->text.opa * opa_scale) >> 8;
 
-    if(sel_start > sel_end) {
-        uint16_t tmp = sel_start;
-        sel_start = sel_end;
-        sel_end = tmp;
+    uint16_t sel_start = 0xFFFF;
+    uint16_t sel_end = 0xFFFF;
+    if(sel) {
+        sel_start = sel->start;
+        sel_end = sel->end;
+        if(sel_start > sel_end) {
+            uint16_t tmp = sel_start;
+            sel_start = sel_end;
+            sel_end = tmp;
+        }
     }
 
     cmd_state_t cmd_state = CMD_STATE_WAIT;
@@ -183,9 +185,13 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         while(i < line_end - line_start) {
             uint16_t logical_char_pos = 0;
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
+#if LV_USE_BIDI
                 logical_char_pos = lv_txt_encoded_get_char_id(txt, line_start);
                 uint16_t t = lv_txt_encoded_get_char_id(bidi_txt, i);
                 logical_char_pos += lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, bidi_dir, t, NULL);
+#else
+                logical_char_pos = lv_txt_encoded_get_char_id(txt, line_start + i);
+#endif
             }
 
             letter      = lv_txt_encoded_next(bidi_txt, &i);
@@ -236,8 +242,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
-                /*Do not draw the rectangle on the character at `sel_start`.*/
-                if(logical_char_pos > sel_start && logical_char_pos <= sel_end) {
+                if(logical_char_pos >= sel_start && logical_char_pos < sel_end) {
                     lv_area_t sel_coords;
                     sel_coords.x1 = pos.x;
                     sel_coords.y1 = pos.y;
@@ -246,6 +251,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
                     lv_draw_rect(&sel_coords, mask, &sel_style, opa);
                 }
             }
+
             lv_draw_letter(&pos, mask, font, letter, color, opa);
 
             if(letter_w > 0) {
