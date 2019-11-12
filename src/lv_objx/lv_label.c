@@ -731,7 +731,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     if(bidi_txt[new_line_start] == '\0') txt_len--;
     lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_base_dir(label), NULL, 0);
 #else
-    bidi_txt = txt + line_start;
+    bidi_txt = (char*)txt + line_start;
 #endif
 
     /*Calculate the x coordinate*/
