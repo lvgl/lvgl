@@ -475,7 +475,7 @@
 
 /* If a character is at least this long, will break wherever "prettiest" */
 #ifndef LV_TXT_LINE_BREAK_LONG_LEN
-#define LV_TXT_LINE_BREAK_LONG_LEN          12
+#define LV_TXT_LINE_BREAK_LONG_LEN          120
 #endif
 
 /* Minimum number of characters of a word to put on a line before a break */

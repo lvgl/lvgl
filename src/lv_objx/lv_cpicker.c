@@ -275,12 +275,8 @@ bool lv_cpicker_set_hsv(lv_obj_t * cpicker, lv_color_hsv_t hsv)
  */
 bool lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color)
 {
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP != 0
-    uint8_t green = (color.ch.green_h << 3) + color.ch.green_l;
-    return lv_cpicker_set_hsv(cpicker, lv_color_rgb_to_hsv(color.ch.red, green, color.ch.blue));
-#else
-    return lv_cpicker_set_hsv(cpicker, lv_color_rgb_to_hsv(color.ch.red, color.ch.green, color.ch.blue));
-#endif
+    return lv_cpicker_set_hsv(cpicker,
+            lv_color_rgb_to_hsv(LV_COLOR_GET_R(color), LV_COLOR_GET_G(color), LV_COLOR_GET_B(color)));
 }
 
 /**
