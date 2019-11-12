@@ -307,7 +307,7 @@ void lv_img_set_zoom(lv_obj_t * img, uint16_t zoom)
  * @param img pointer to an image object
  * @param antialias true: anti-aliased; false: not anti-aliased
  */
-void lv_img_set_antialais(lv_obj_t * img, bool antialias)
+void lv_img_set_antialias(lv_obj_t * img, bool antialias)
 {
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     if(antialias == ext->antialias) return;
@@ -426,7 +426,7 @@ uint16_t lv_img_get_zoom(lv_obj_t * img)
  * @param img pointer to an image object
  * @return true: anti-aliased; false: not anti-aliased
  */
-bool lv_img_get_antialais(lv_obj_t * img)
+bool lv_img_get_antialias(lv_obj_t * img)
 {
     LV_ASSERT_OBJ(img, LV_OBJX_NAME);
 
