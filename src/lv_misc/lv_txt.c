@@ -149,6 +149,9 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  *     3. Return i=9, pointing at breakchar '\n'
  *     4. Parenting lv_txt_get_next_line() would detect subsequent '\0'
  *
+ * TODO: Returned word_w_ptr may overestimate the returned word's width when 
+ * max_width is reached. In current usage, this has no impact.
+ *
  * @param txt a '\0' terminated string
  * @param font pointer to a font
  * @param letter_space letter space
@@ -232,19 +235,17 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         return i;
     }
 
-    if( force ) {
-        return break_index;
-    }
-
 #if LV_TXT_LINE_BREAK_LONG_LEN > 0
     /* Word doesn't fit in provided space, but isn't "long" */
     if(word_len < LV_TXT_LINE_BREAK_LONG_LEN) {
+        if( force ) return break_index;
         if(word_w_ptr != NULL) *word_w_ptr = 0; /* Return no word */
         return 0;
     }
 
     /* Word is "long," but insufficient amounts can fit in provided space */
     if(break_letter_count < LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN) {
+        if( force ) return break_index;
         if(word_w_ptr != NULL) *word_w_ptr = 0;
         return 0;
     }
@@ -262,8 +263,9 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
     }
     return i;
 #else
-    (void) break_letter_count;
+    if( force ) return break_index;
     if(word_w_ptr != NULL) *word_w_ptr = 0; /* Return no word */
+    (void) break_letter_count;
     return 0;
 #endif
 }
