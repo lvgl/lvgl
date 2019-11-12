@@ -263,6 +263,7 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
     return i;
 #else
     (void) break_letter_count;
+    if(word_w_ptr != NULL) *word_w_ptr = 0; /* Return no word */
     return 0;
 #endif
 }
