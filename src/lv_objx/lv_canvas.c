@@ -585,7 +585,7 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
         default: flag = LV_TXT_FLAG_NONE; break;
     }
 
-    lv_draw_label(&coords, &mask, style, LV_OPA_COVER, txt, flag, NULL,  NULL, NULL);
+    lv_draw_label(&coords, &mask, style, LV_OPA_COVER, txt, flag, NULL,  NULL, NULL, lv_obj_get_base_dir(canvas));
 
     lv_refr_set_disp_refreshing(refr_ori);
 }
