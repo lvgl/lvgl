@@ -14,14 +14,23 @@ extern "C" {
  *      INCLUDES
  *********************/
 #include "lv_draw.h"
+#include "../lv_misc/lv_bidi.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_DRAW_LABEL_NO_TXT_SEL (0xFFFF)
 
 /**********************
  *      TYPEDEFS
  **********************/
+
+typedef struct
+{
+    uint16_t start;
+    uint16_t end;
+}lv_draw_label_txt_sel_t;
+
 
 /** Store some info to speed up drawing of very large texts
  * It takes a lot of time to get the first visible character because
@@ -54,11 +63,11 @@ typedef struct {
  * @param flag settings for the text from 'txt_flag_t' enum
  * @param offset text offset in x and y direction (NULL if unused)
  * @param sel_start start index of selected area (`LV_LABEL_TXT_SEL_OFF` if none)
- * @param sel_end end index of selected area (`LV_LABEL_TXT_SEL_OFF` if none)
+ * @param bidi_dir base direction of the text
  */
 void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
-                   const char * txt, lv_txt_flag_t flag, lv_point_t * offset, uint16_t sel_start, uint16_t sel_end,
-                   lv_draw_label_hint_t * hint);
+                   const char * txt, lv_txt_flag_t flag, lv_point_t * offset, lv_draw_label_txt_sel_t * sel,
+                   lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir);
 
 /**********************
  *      MACROS

@@ -14,16 +14,19 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_draw/lv_draw_basic.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_bidi.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_cont"
 
 /**********************
  *      TYPEDEFS
@@ -67,7 +70,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create a basic object*/
     lv_obj_t * new_cont = lv_obj_create(par, copy);
-    lv_mem_assert(new_cont);
+    LV_ASSERT_MEM(new_cont);
     if(new_cont == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_cont);
@@ -76,7 +79,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(new_cont);
     if(ext == NULL) return NULL;
 
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     ext->fit_left   = LV_FIT_NONE;
     ext->fit_right  = LV_FIT_NONE;
     ext->fit_top    = LV_FIT_NONE;
@@ -126,6 +129,8 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     if(ext->layout == layout) return;
 
@@ -146,6 +151,8 @@ void lv_cont_set_layout(lv_obj_t * cont, lv_layout_t layout)
  */
 void lv_cont_set_fit4(lv_obj_t * cont, lv_fit_t left, lv_fit_t right, lv_fit_t top, lv_fit_t bottom)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_obj_invalidate(cont);
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     if(ext->fit_left == left && ext->fit_right == right && ext->fit_top == top && ext->fit_bottom == bottom) {
@@ -172,6 +179,8 @@ void lv_cont_set_fit4(lv_obj_t * cont, lv_fit_t left, lv_fit_t right, lv_fit_t t
  */
 lv_layout_t lv_cont_get_layout(const lv_obj_t * cont)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->layout;
 }
@@ -183,6 +192,8 @@ lv_layout_t lv_cont_get_layout(const lv_obj_t * cont)
  */
 lv_fit_t lv_cont_get_fit_left(const lv_obj_t * cont)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->fit_left;
 }
@@ -194,6 +205,8 @@ lv_fit_t lv_cont_get_fit_left(const lv_obj_t * cont)
  */
 lv_fit_t lv_cont_get_fit_right(const lv_obj_t * cont)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->fit_right;
 }
@@ -205,6 +218,8 @@ lv_fit_t lv_cont_get_fit_right(const lv_obj_t * cont)
  */
 lv_fit_t lv_cont_get_fit_top(const lv_obj_t * cont)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->fit_top;
 }
@@ -216,6 +231,8 @@ lv_fit_t lv_cont_get_fit_top(const lv_obj_t * cont)
  */
 lv_fit_t lv_cont_get_fit_bottom(const lv_obj_t * cont)
 {
+    LV_ASSERT_OBJ(cont, LV_OBJX_NAME);
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     return ext->fit_bottom;
 }
@@ -238,6 +255,7 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(cont, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_STYLE_CHG) { /*Recalculate the padding if the style changed*/
         lv_cont_refr_layout(cont);
@@ -254,13 +272,6 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
         /*FLOOD and FILL fit needs to be refreshed if the parent size has changed*/
         lv_cont_refr_autofit(cont);
 
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_cont";
     }
 
     return res;
@@ -354,23 +365,23 @@ static void lv_cont_layout_row(lv_obj_t * cont)
     lv_align_t align;
     const lv_style_t * style = lv_obj_get_style(cont);
     lv_coord_t vpad_corr;
-
+    lv_bidi_dir_t base_dir = lv_obj_get_base_dir(cont);
     switch(type) {
         case LV_LAYOUT_ROW_T:
             vpad_corr = style->body.padding.top;
-            align     = LV_ALIGN_IN_TOP_LEFT;
+            align     = base_dir == LV_BIDI_DIR_RTL ? LV_ALIGN_IN_TOP_RIGHT : LV_ALIGN_IN_TOP_LEFT;
             break;
         case LV_LAYOUT_ROW_M:
             vpad_corr = 0;
-            align     = LV_ALIGN_IN_LEFT_MID;
+            align     = base_dir == LV_BIDI_DIR_RTL ? LV_ALIGN_IN_RIGHT_MID: LV_ALIGN_IN_LEFT_MID;
             break;
         case LV_LAYOUT_ROW_B:
             vpad_corr = -style->body.padding.bottom;
-            align     = LV_ALIGN_IN_BOTTOM_LEFT;
+            align     = base_dir == LV_BIDI_DIR_RTL ? LV_ALIGN_IN_BOTTOM_RIGHT: LV_ALIGN_IN_BOTTOM_LEFT;
             break;
         default:
             vpad_corr = 0;
-            align     = LV_ALIGN_IN_TOP_LEFT;
+            align     = base_dir == LV_BIDI_DIR_RTL ? LV_ALIGN_IN_TOP_RIGHT : LV_ALIGN_IN_TOP_LEFT;
             break;
     }
 
@@ -379,12 +390,19 @@ static void lv_cont_layout_row(lv_obj_t * cont)
     lv_obj_set_protect(cont, LV_PROTECT_CHILD_CHG);
 
     /* Align the children */
-    lv_coord_t last_cord = style->body.padding.left;
+    lv_coord_t last_cord;
+    if(base_dir == LV_BIDI_DIR_RTL) last_cord = style->body.padding.right;
+    else last_cord = style->body.padding.left;
+
     LV_LL_READ_BACK(cont->child_ll, child)
     {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
-        lv_obj_align(child, cont, align, last_cord, vpad_corr);
+//        last_cord -= lv_obj_get_width(child);
+
+        if(base_dir == LV_BIDI_DIR_RTL) lv_obj_align(child, cont, align, -last_cord, vpad_corr);
+        else lv_obj_align(child, cont, align, last_cord, vpad_corr);
+
         last_cord += lv_obj_get_width(child) + style->body.padding.inner;
     }
 

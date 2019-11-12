@@ -8,6 +8,7 @@
  *********************/
 #include "lv_font.h"
 #include "lv_font_fmt_txt.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_log.h"
@@ -90,6 +91,8 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
         static uint8_t * buf = NULL;
 
         uint32_t gsize = gdsc->box_w * gdsc->box_h;
+        if(gsize == 0) return NULL;
+
         uint32_t buf_size = gsize;
         switch(fdsc->bpp) {
         case 1: buf_size = gsize >> 3;  break;
@@ -100,7 +103,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
 
         if(lv_mem_get_size(buf) < buf_size) {
             buf = lv_mem_realloc(buf, buf_size);
-            lv_mem_assert(buf);
+            LV_ASSERT_MEM(buf);
             if(buf == NULL) return NULL;
         }
 
@@ -137,7 +140,9 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     /*Put together a glyph dsc*/
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
-    uint32_t adv_w = gdsc->adv_w + ((int32_t)((int32_t)kvalue * fdsc->kern_scale) >> 4);
+    int32_t kv = ((int32_t)((int32_t)kvalue * fdsc->kern_scale) >> 4);
+
+    uint32_t adv_w = gdsc->adv_w + kv;
     adv_w  = (adv_w + (1 << 3)) >> 4;
 
     dsc_out->adv_w = adv_w;

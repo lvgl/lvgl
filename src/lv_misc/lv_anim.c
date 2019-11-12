@@ -11,6 +11,7 @@
 #if LV_USE_ANIMATION
 #include <stddef.h>
 #include <string.h>
+#include "../lv_core/lv_debug.h"
 #include "../lv_hal/lv_hal_tick.h"
 #include "lv_task.h"
 #include "lv_math.h"
@@ -89,7 +90,7 @@ void lv_anim_create(lv_anim_t * a)
 
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = lv_ll_ins_head(&LV_GC_ROOT(_lv_anim_ll));
-    lv_mem_assert(new_anim);
+    LV_ASSERT_MEM(new_anim);
     if(new_anim == NULL) return;
 
     /*Initialize the animation descriptor*/

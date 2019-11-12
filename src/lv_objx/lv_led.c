@@ -9,12 +9,15 @@
 #include "lv_led.h"
 #if LV_USE_LED != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_draw.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_led"
+
 #define LV_LED_WIDTH_DEF (LV_DPI / 3)
 #define LV_LED_HEIGHT_DEF (LV_DPI / 3)
 #define LV_LED_BRIGHT_OFF 100
@@ -56,7 +59,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_led = lv_obj_create(par, copy);
-    lv_mem_assert(new_led);
+    LV_ASSERT_MEM(new_led);
     if(new_led == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_led);
@@ -64,7 +67,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the object type specific extended data*/
     lv_led_ext_t * ext = lv_obj_allocate_ext_attr(new_led, sizeof(lv_led_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->bright = LV_LED_BRIGHT_ON;
@@ -109,6 +112,8 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_led_set_bright(lv_obj_t * led, uint8_t bright)
 {
+    LV_ASSERT_OBJ(led, LV_OBJX_NAME);
+
     /*Set the brightness*/
     lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
     if(ext->bright == bright) return;
@@ -125,6 +130,8 @@ void lv_led_set_bright(lv_obj_t * led, uint8_t bright)
  */
 void lv_led_on(lv_obj_t * led)
 {
+    LV_ASSERT_OBJ(led, LV_OBJX_NAME);
+
     lv_led_set_bright(led, LV_LED_BRIGHT_ON);
 }
 
@@ -134,6 +141,8 @@ void lv_led_on(lv_obj_t * led)
  */
 void lv_led_off(lv_obj_t * led)
 {
+    LV_ASSERT_OBJ(led, LV_OBJX_NAME);
+
     lv_led_set_bright(led, LV_LED_BRIGHT_OFF);
 }
 
@@ -143,6 +152,8 @@ void lv_led_off(lv_obj_t * led)
  */
 void lv_led_toggle(lv_obj_t * led)
 {
+    LV_ASSERT_OBJ(led, LV_OBJX_NAME);
+
     uint8_t bright = lv_led_get_bright(led);
     if(bright > (LV_LED_BRIGHT_OFF + LV_LED_BRIGHT_ON) >> 1)
         lv_led_off(led);
@@ -161,6 +172,8 @@ void lv_led_toggle(lv_obj_t * led)
  */
 uint8_t lv_led_get_bright(const lv_obj_t * led)
 {
+    LV_ASSERT_OBJ(led, LV_OBJX_NAME);
+
     lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
     return ext->bright;
 }

@@ -10,12 +10,15 @@
 #include "lv_kb.h"
 #if LV_USE_KB != 0
 
-#include "lv_ta.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
+#include "lv_ta.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_kb"
+
 #define LV_KB_CTRL_BTN_FLAGS (LV_BTNM_CTRL_NO_REPEAT | LV_BTNM_CTRL_CLICK_TRIG)
 
 /**********************
@@ -97,14 +100,14 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of keyboard*/
     lv_obj_t * new_kb = lv_btnm_create(par, copy);
-    lv_mem_assert(new_kb);
+    LV_ASSERT_MEM(new_kb);
     if(new_kb == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_kb);
 
     /*Allocate the keyboard type specific extended data*/
     lv_kb_ext_t * ext = lv_obj_allocate_ext_attr(new_kb, sizeof(lv_kb_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
@@ -128,6 +131,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
         lv_btnm_set_map(new_kb, kb_map_lc);
         lv_btnm_set_ctrl_map(new_kb, kb_ctrl_lc_map);
+        lv_obj_set_base_dir(new_kb, LV_BIDI_DIR_LTR);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
@@ -170,6 +174,9 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+    if(ta) LV_ASSERT_OBJ(ta, "lv_ta");
+
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     lv_cursor_type_t cur_type;
 
@@ -195,6 +202,8 @@ void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta)
  */
 void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     if(ext->mode == mode) return;
 
@@ -218,6 +227,8 @@ void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
  */
 void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     if(ext->cursor_mng == en) return;
 
@@ -243,6 +254,8 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
  */
 void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     switch(type) {
         case LV_KB_STYLE_BG: lv_btnm_set_style(kb, LV_BTNM_STYLE_BG, style); break;
         case LV_KB_STYLE_BTN_REL: lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_REL, style); break;
@@ -264,6 +277,8 @@ void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style
  */
 lv_obj_t * lv_kb_get_ta(const lv_obj_t * kb)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->ta;
 }
@@ -275,6 +290,8 @@ lv_obj_t * lv_kb_get_ta(const lv_obj_t * kb)
  */
 lv_kb_mode_t lv_kb_get_mode(const lv_obj_t * kb)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->mode;
 }
@@ -286,6 +303,8 @@ lv_kb_mode_t lv_kb_get_mode(const lv_obj_t * kb)
  */
 bool lv_kb_get_cursor_manage(const lv_obj_t * kb)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->cursor_mng == 0 ? false : true;
 }
@@ -298,6 +317,8 @@ bool lv_kb_get_cursor_manage(const lv_obj_t * kb)
  */
 const lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
 
     switch(type) {
@@ -326,6 +347,8 @@ const lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
  */
 void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
 {
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
     if(event != LV_EVENT_VALUE_CHANGED) return;
 
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
@@ -373,7 +396,7 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
     /*Add the characters to the text area if set*/
     if(ext->ta == NULL) return;
 
-    if(strcmp(txt, "Enter") == 0)
+    if(strcmp(txt, "Enter") == 0 || strcmp(txt, LV_SYMBOL_NEW_LINE) == 0)
         lv_ta_add_char(ext->ta, '\n');
     else if(strcmp(txt, LV_SYMBOL_LEFT) == 0)
         lv_ta_cursor_left(ext->ta);
@@ -422,6 +445,7 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(kb, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
@@ -439,13 +463,6 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
             lv_cursor_type_t cur_type = lv_ta_get_cursor_type(ext->ta);
             lv_ta_set_cursor_type(ext->ta, cur_type | LV_CURSOR_HIDDEN);
         }
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_kb";
     }
 
     return res;

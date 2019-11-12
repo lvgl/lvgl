@@ -95,9 +95,9 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Delete all children of the scrl object, without deleting scrl child.
- * @param obj pointer to an object
+ * @param list pointer to an object
  */
-void lv_list_clean(lv_obj_t * obj);
+void lv_list_clean(lv_obj_t * list);
 
 /*======================
  * Add/remove functions

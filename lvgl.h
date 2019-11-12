@@ -28,11 +28,13 @@ extern "C" {
 
 #include "src/lv_core/lv_refr.h"
 #include "src/lv_core/lv_disp.h"
+#include "src/lv_core/lv_debug.h"
 
 #include "src/lv_themes/lv_theme.h"
 
 #include "src/lv_font/lv_font.h"
 #include "src/lv_font/lv_font_fmt_txt.h"
+#include "src/lv_misc/lv_bidi.h"
 
 #include "src/lv_objx/lv_btn.h"
 #include "src/lv_objx/lv_imgbtn.h"
@@ -45,6 +47,7 @@ extern "C" {
 #include "src/lv_objx/lv_chart.h"
 #include "src/lv_objx/lv_table.h"
 #include "src/lv_objx/lv_cb.h"
+#include "src/lv_objx/lv_cpicker.h"
 #include "src/lv_objx/lv_bar.h"
 #include "src/lv_objx/lv_slider.h"
 #include "src/lv_objx/lv_led.h"
