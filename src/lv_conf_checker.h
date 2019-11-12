@@ -612,6 +612,11 @@
 #define LV_USE_CONT     1
 #endif
 
+/*Color picker (dependencies: -*/
+#ifndef LV_USE_CPICKER
+#define LV_USE_CPICKER   1
+#endif
+
 /*Drop down list (dependencies: lv_page, lv_label, lv_symbol_def.h)*/
 #ifndef LV_USE_DDLIST
 #define LV_USE_DDLIST    1

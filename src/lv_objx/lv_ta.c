@@ -558,6 +558,9 @@ void lv_ta_set_placeholder_text(lv_obj_t * ta, const char * txt)
 
     lv_label_set_text(ext->placeholder, txt);
 
+    /*Refresh the placeholder's align*/
+    lv_ta_set_text_align(ta, lv_label_get_align(ext->label));
+
     placeholder_update(ta);
 }
 
@@ -773,12 +776,14 @@ void lv_ta_set_text_align(lv_obj_t * ta, lv_label_align_t align)
     lv_obj_t * label  = lv_ta_get_label(ta);
     if(!ext->one_line) {
         lv_label_set_align(label, align);
+        if(ext->placeholder) lv_label_set_align(ext->placeholder, align);
     } else {
         /*Normal left align. Just let the text expand*/
         if(align == LV_LABEL_ALIGN_LEFT) {
             lv_label_set_long_mode(label, LV_LABEL_LONG_EXPAND);
             lv_page_set_scrl_fit2(ta, LV_FIT_TIGHT, LV_FIT_FLOOD);
             lv_label_set_align(label, align);
+            if(ext->placeholder) lv_label_set_align(ext->placeholder, align);
 
         }
         /*Else use fix label width equal to the Text area width*/
@@ -786,6 +791,7 @@ void lv_ta_set_text_align(lv_obj_t * ta, lv_label_align_t align)
             lv_label_set_long_mode(label, LV_LABEL_LONG_CROP);
             lv_page_set_scrl_fit2(ta, LV_FIT_FLOOD, LV_FIT_FLOOD);
             lv_label_set_align(label, align);
+            if(ext->placeholder) lv_label_set_align(ext->placeholder, align);
 
             lv_obj_set_width(label, lv_page_get_fit_width(ta));
         }
@@ -1131,8 +1137,8 @@ bool lv_ta_text_is_selected(const lv_obj_t * ta)
 #if LV_LABEL_TEXT_SEL
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    if((lv_label_get_text_sel_start(ext->label) == LV_LABEL_TEXT_SEL_OFF ||
-        lv_label_get_text_sel_end(ext->label) == LV_LABEL_TEXT_SEL_OFF)) {
+    if((lv_label_get_text_sel_start(ext->label) == LV_DRAW_LABEL_NO_TXT_SEL ||
+        lv_label_get_text_sel_end(ext->label) == LV_DRAW_LABEL_NO_TXT_SEL)) {
         return true;
     } else {
         return false;
@@ -1203,10 +1209,10 @@ void lv_ta_clear_selection(lv_obj_t * ta)
 #if LV_LABEL_TEXT_SEL
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    if(lv_label_get_text_sel_start(ext->label) != LV_LABEL_TEXT_SEL_OFF ||
-       lv_label_get_text_sel_end(ext->label) != LV_LABEL_TEXT_SEL_OFF) {
-        lv_label_set_text_sel_start(ext->label, LV_LABEL_TEXT_SEL_OFF);
-        lv_label_set_text_sel_end(ext->label, LV_LABEL_TEXT_SEL_OFF);
+    if(lv_label_get_text_sel_start(ext->label) != LV_DRAW_LABEL_NO_TXT_SEL ||
+       lv_label_get_text_sel_end(ext->label) != LV_DRAW_LABEL_NO_TXT_SEL) {
+        lv_label_set_text_sel_start(ext->label, LV_DRAW_LABEL_NO_TXT_SEL);
+        lv_label_set_text_sel_end(ext->label, LV_DRAW_LABEL_NO_TXT_SEL);
     }
 #else
     (void)ta; /*Unused*/
@@ -1385,8 +1391,7 @@ static bool lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * mask, lv_
 
             cur_area.x1 += cur_style.body.padding.left;
             cur_area.y1 += cur_style.body.padding.top;
-            lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, 0,
-                          LV_LABEL_TEXT_SEL_OFF, LV_LABEL_TEXT_SEL_OFF, NULL, lv_obj_get_base_dir(ta));
+            lv_draw_label(&cur_area, mask, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, NULL, NULL, NULL, lv_obj_get_base_dir(ta));
 
         } else if(ext->cursor.type == LV_CURSOR_OUTLINE) {
             cur_style.body.opa = LV_OPA_TRANSP;
@@ -1878,13 +1883,13 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
     if(ext->text_sel_en) {
         if(!ext->text_sel_in_prog && !click_outside_label && sign == LV_SIGNAL_PRESSED) {
             /*Input device just went down. Store the selection start position*/
-            ext->tmp_sel_start    = char_id_at_click;
-            ext->tmp_sel_end      = LV_LABEL_TEXT_SEL_OFF;
+            ext->sel.start    = char_id_at_click;
+            ext->sel.end      = LV_LABEL_TEXT_SEL_OFF;
             ext->text_sel_in_prog = 1;
             lv_obj_set_drag(lv_page_get_scrl(ta), false);
         } else if(ext->text_sel_in_prog && sign == LV_SIGNAL_PRESSING) {
             /*Input device may be moving. Store the end position */
-            ext->tmp_sel_end = char_id_at_click;
+            ext->sel.end = char_id_at_click;
         } else if(ext->text_sel_in_prog && (sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED)) {
             /*Input device is released. Check if anything was selected.*/
             lv_obj_set_drag(lv_page_get_scrl(ta), true);
@@ -1897,22 +1902,22 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
         /*If the selected area has changed then update the real values and*/
 
         /*Invalidate the text area.*/
-        if(ext->tmp_sel_start > ext->tmp_sel_end) {
-            if(ext_label->txt_sel_start != ext->tmp_sel_end || ext_label->txt_sel_end != ext->tmp_sel_start) {
-                ext_label->txt_sel_start = ext->tmp_sel_end;
-                ext_label->txt_sel_end   = ext->tmp_sel_start;
+        if(ext->sel.start > ext->sel.end) {
+            if(ext_label->txt_sel_start != ext->sel.end || ext_label->txt_sel_end != ext->sel.start) {
+                ext_label->txt_sel_start = ext->sel.end;
+                ext_label->txt_sel_end   = ext->sel.start;
                 lv_obj_invalidate(ta);
             }
-        } else if(ext->tmp_sel_start < ext->tmp_sel_end) {
-            if(ext_label->txt_sel_start != ext->tmp_sel_start || ext_label->txt_sel_end != ext->tmp_sel_end) {
-                ext_label->txt_sel_start = ext->tmp_sel_start;
-                ext_label->txt_sel_end   = ext->tmp_sel_end;
+        } else if(ext->sel.start < ext->sel.end) {
+            if(ext_label->txt_sel_start != ext->sel.start || ext_label->txt_sel_end != ext->sel.end) {
+                ext_label->txt_sel_start = ext->sel.start;
+                ext_label->txt_sel_end   = ext->sel.end;
                 lv_obj_invalidate(ta);
             }
         } else {
-            if(ext_label->txt_sel_start != LV_LABEL_TEXT_SEL_OFF || ext_label->txt_sel_end != LV_LABEL_TEXT_SEL_OFF) {
-                ext_label->txt_sel_start = LV_LABEL_TEXT_SEL_OFF;
-                ext_label->txt_sel_end   = LV_LABEL_TEXT_SEL_OFF;
+            if(ext_label->txt_sel_start != LV_DRAW_LABEL_NO_TXT_SEL || ext_label->txt_sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
+                ext_label->txt_sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
+                ext_label->txt_sel_end   = LV_DRAW_LABEL_NO_TXT_SEL;
                 lv_obj_invalidate(ta);
             }
         }

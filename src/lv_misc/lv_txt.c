@@ -56,7 +56,7 @@ uint32_t (*lv_txt_encoded_conv_wc)(uint32_t)                   = lv_txt_utf8_con
 uint32_t (*lv_txt_encoded_next)(const char *, uint32_t *)      = lv_txt_utf8_next;
 uint32_t (*lv_txt_encoded_prev)(const char *, uint32_t *)      = lv_txt_utf8_prev;
 uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t) = lv_txt_utf8_get_byte_id;
-uint32_t (*lv_encoded_get_char_id)(const char *, uint32_t)     = lv_txt_utf8_get_char_id;
+uint32_t (*lv_txt_encoded_get_char_id)(const char *, uint32_t) = lv_txt_utf8_get_char_id;
 uint32_t (*lv_txt_get_encoded_length)(const char *)            = lv_txt_utf8_get_length;
 #elif LV_TXT_ENC == LV_TXT_ENC_ASCII
 uint8_t (*lv_txt_encoded_size)(const char *)                   = lv_txt_iso8859_1_size;
@@ -65,7 +65,7 @@ uint32_t (*lv_txt_encoded_conv_wc)(uint32_t)                   = lv_txt_iso8859_
 uint32_t (*lv_txt_encoded_next)(const char *, uint32_t *)      = lv_txt_iso8859_1_next;
 uint32_t (*lv_txt_encoded_prev)(const char *, uint32_t *)      = lv_txt_iso8859_1_prev;
 uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t) = lv_txt_iso8859_1_get_byte_id;
-uint32_t (*lv_encoded_get_char_id)(const char *, uint32_t)     = lv_txt_iso8859_1_get_char_id;
+uint32_t (*lv_txt_encoded_get_char_id)(const char *, uint32_t)     = lv_txt_iso8859_1_get_char_id;
 uint32_t (*lv_txt_get_encoded_length)(const char *)            = lv_txt_iso8859_1_get_length;
 
 #endif
@@ -186,6 +186,9 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         /*Handle the recolor command*/
         if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
             if(lv_txt_is_cmd(&cmd_state, letter) != false) {
+                i = i_next;
+                i_next = i_next_next;
+                letter = letter_next;
                 continue;   /*Skip the letter is it is part of a command*/
             }
         }
@@ -263,6 +266,9 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
 
 /**
  * Get the next line of text. Check line length and break chars too.
+ *
+ * A line of txt includes the \n character.
+ *
  * @param txt a '\0' terminated string
  * @param font pointer to a font
  * @param letter_space letter space
@@ -292,18 +298,13 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
         i += advance;
 
-        if(txt[i] == '\n') break;
-    }
+        if(txt[0] == '\n') break;
 
-    /* If this is the last of the string, make sure pointer is at NULL-terminator.
-     * This catches the case, for example of a string ending in "\n" */
-    if(txt[i] != '\0'){
-        uint32_t i_next = i;
-        int tmp;
-        uint32_t letter_next = lv_txt_encoded_next(txt, &i_next); /*Gets current character*/
-        tmp = i_next;
-        letter_next = lv_txt_encoded_next(txt, &i_next); /*Gets subsequent character*/
-        if(letter_next == '\0') i = tmp;
+        if(txt[i] == '\n'){
+            i++;  /* Include the following newline in the current line */
+            break;
+        }
+
     }
 
     /*Always step at least one to avoid infinite loops*/

@@ -396,7 +396,7 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
     /*Add the characters to the text area if set*/
     if(ext->ta == NULL) return;
 
-    if(strcmp(txt, LV_SYMBOL_NEW_LINE) == 0)
+    if(strcmp(txt, "Enter") == 0 || strcmp(txt, LV_SYMBOL_NEW_LINE) == 0)
         lv_ta_add_char(ext->ta, '\n');
     else if(strcmp(txt, LV_SYMBOL_LEFT) == 0)
         lv_ta_cursor_left(ext->ta);
