@@ -169,16 +169,16 @@ void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt)
 }
 
 /**
- * Set the rotation settings of a line meter
+ * Set the angle settings of a line meter
  * @param lmeter pointer to a line meter object
- * @param angle angle of rotation (relative to the northen axis)
+ * @param angle angle where the meter will be facing (with its center)
  */
-void lv_lmeter_set_rotation(lv_obj_t * lmeter, uint16_t angle)
+void lv_lmeter_set_angle(lv_obj_t * lmeter, uint16_t angle)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    if(ext->rotation == angle) return;
+    if(ext->angle == angle) return;
 
-    ext->rotation = angle;
+    ext->angle = angle;
 
     lv_obj_invalidate(lmeter);
 }
@@ -283,7 +283,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
 
         lv_coord_t x_ofs  = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
         lv_coord_t y_ofs  = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
-        int16_t angle_ofs = ext->rotation + 90 + (360 - ext->scale_angle) / 2;
+        int16_t angle_ofs = ext->angle + 90 + (360 - ext->scale_angle) / 2;
         int16_t level =
             (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
         uint8_t i;
