@@ -14,15 +14,14 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_MASK_MAX_NUM     8
+#define LV_MASK_MAX_NUM     16
 
 /**********************
  *      TYPEDEFS
  **********************/
 typedef struct
 {
-    lv_draw_mask_param_t param;
-    lv_draw_mask_cb_t cb;
+    lv_draw_mask_param_t * param;
     void * custom_id;
 }lv_mask_saved_t;
 
@@ -54,12 +53,18 @@ static lv_mask_saved_t mask_list[LV_MASK_MAX_NUM];
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * Add a draw mask. Everything drawn after it (until removing the mask) will be affected by the mask.
+ * @param param an initialized mask parameter. Only the pointer is saved.
+ * @param custom_id a custom pointer to identify the mask. Used in `lv_draw_mask_remove_custom`.
+ * @return the an integer, the ID of the mask. Can be used in `lv_draw_mask_remove_id`.
+ */
 int16_t lv_draw_mask_add(lv_draw_mask_param_t * param, void * custom_id)
 {
     /*Search a free entry*/
     uint8_t i;
     for(i = 0; i < LV_MASK_MAX_NUM; i++) {
-        if(mask_list[i].param.line.cb == NULL) break;
+        if(mask_list[i].param == NULL) break;
     }
 
     if(i >= LV_MASK_MAX_NUM) {
@@ -67,21 +72,31 @@ int16_t lv_draw_mask_add(lv_draw_mask_param_t * param, void * custom_id)
         return LV_MASK_ID_INV;
     }
 
-    memcpy(&mask_list[i].param, param, sizeof(lv_draw_mask_param_t));
+    mask_list[i].param = param;
     mask_list[i].custom_id = custom_id;
 
     return i;
 }
 
-
+/**
+ * Apply the added buffers on a line. Used internally by the library's drawing routins.
+ * @param mask_buf store the result mask here. Has to be `len` byte long. Should be initialized with `0xFF`.
+ * @param abs_x absolute X coordinate where the line to calculate start
+ * @param abs_y absolute Y coordinate where the line to calculate start
+ * @param len length of the line to calculate (in pixel count)
+ * @return Oneof these values:
+ * - `LV_DRAW_MASK_RES_FULL_TRANSP`: the whole line is transparent. `mask_buf` is not set to zero
+ * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
+ * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
+ */
 lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len)
 {
     bool changed = false;
     lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;
     uint8_t i;
     for(i = 0; i < LV_MASK_MAX_NUM; i++) {
-        if(mask_list[i].param.line.cb) {
-            res = mask_list[i].param.line.cb(mask_buf, abs_x, abs_y, len, (void*)&mask_list[i].param);
+        if(mask_list[i].param) {
+            res = mask_list[i].param->line.cb(mask_buf, abs_x, abs_y, len, (void*)mask_list[i].param);
             if(res == LV_DRAW_MASK_RES_FULL_TRANSP) return LV_DRAW_MASK_RES_FULL_TRANSP;
             else if(res == LV_DRAW_MASK_RES_CHANGED) changed = true;
         }
@@ -90,33 +105,70 @@ lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_
     return changed ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
 }
 
-void lv_draw_mask_remove_id(int16_t id)
+/**
+ * Remove a mask with a given ID
+ * @param id the ID of the mask.  Returned by `lv_draw_mask_add`
+ * @return the parameter of the removed mask.
+ * If more masks have `custom_id` ID then the last mask's parameter will be returned
+ */
+lv_draw_mask_param_t * lv_draw_mask_remove_id(int16_t id)
 {
+    lv_draw_mask_param_t * p = NULL;
+
     if(id != LV_MASK_ID_INV) {
-        mask_list[id].param.line.cb = NULL;
+        p = mask_list[id].param;
+        mask_list[id].param = NULL;
+        mask_list[id].custom_id = NULL;
     }
+
+    return NULL;
 }
 
-void lv_draw_mask_remove_custom(void * custom_id)
+/**
+ * Remove all mask with a given custom ID
+ * @param custom_id a pointer used in `lv_draw_mask_add`
+ * @return return the parameter of the removed mask.
+ * If more masks have `custom_id` ID then the last mask's parameter will be returned
+ */
+lv_draw_mask_param_t * lv_draw_mask_remove_custom(void * custom_id)
 {
+    lv_draw_mask_param_t * p = NULL;
     uint8_t i;
     for(i = 0; i < LV_MASK_MAX_NUM; i++) {
         if(mask_list[i].custom_id == custom_id) {
-            mask_list[i].param.line.cb = NULL;
+            p = mask_list[i].param;
+            mask_list[i].param = NULL;
+            mask_list[i].custom_id = NULL;
         }
     }
+    return p;
 }
 
+/**
+ * Count the currently added masks
+ * @return number of active masks
+ */
 uint8_t lv_draw_mask_get_cnt(void)
 {
     uint8_t cnt = 0;
     uint8_t i;
     for(i = 0; i < LV_MASK_MAX_NUM; i++) {
-        if(mask_list[i].param.line.cb) cnt++;
+        if(mask_list[i].param) cnt++;
     }
     return cnt;
 }
 
+/**
+ *Initialize a line mask from two points.
+ * @param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param p1x X coordinate of the first point of the line
+ * @param p1y Y coordinate of the first point of the line
+ * @param p2x X coordinate of the second point of the line
+ * @param p2y y coordinate of the second point of the line
+ * @param side and element of `lv_draw_mask_line_side_t` to describe which side to keep.
+ * With `LV_DRAW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
+ * With `LV_DRAW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
+ */
 void lv_draw_mask_line_points_init(lv_draw_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_draw_mask_line_side_t side)
 {
     lv_draw_mask_line_param_t * p = &param->line;
@@ -190,33 +242,43 @@ void lv_draw_mask_line_points_init(lv_draw_mask_param_t * param, lv_coord_t p1x,
 }
 
 /**
- *
- * @param p
- * @param p1x
- * @param p1y
- * @param deg right 0 deg, bottom: 90
- * @param side
+ *Initialize a line mask from a point and an angle.
+ * @param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param px X coordiante of a point of the line
+ * @param py X coordiante of a point of the line
+ * @param angle right 0 deg, bottom: 90
+ * @param side and element of `lv_draw_mask_line_side_t` to describe which side to keep.
+ * With `LV_DRAW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
+ * With `LV_DRAW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
  */
-void lv_draw_mask_line_angle_init(lv_draw_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, int16_t deg, lv_draw_mask_line_side_t side)
+void lv_draw_mask_line_angle_init(lv_draw_mask_param_t * param, lv_coord_t p1x, lv_coord_t py, int16_t angle, lv_draw_mask_line_side_t side)
 {
     /* Find an optimal degree.
      * lv_mask_line_points_init will swap the points to keep the smaller y in p1
-     * Theoretically a line with `deg` or `deg+180` is the same only the points are swapped
+     * Theoretically a line with `angle` or `angle+180` is the same only the points are swapped
      * Find the degree which keeps the origo in place */
-    if(deg > 180) deg -= 180; /*> 180 will swap the origo*/
+    if(angle > 180) angle -= 180; /*> 180 will swap the origo*/
 
 
     lv_coord_t p2x;
     lv_coord_t p2y;
 
-    p2x = (lv_trigo_sin(deg + 90) >> 5) + p1x;
-    p2y = (lv_trigo_sin(deg) >> 5) + p1y;
+    p2x = (lv_trigo_sin(angle + 90) >> 5) + p1x;
+    p2y = (lv_trigo_sin(angle) >> 5) + py;
 
-    lv_draw_mask_line_points_init(param, p1x, p1y, p2x, p2y, side);
+    lv_draw_mask_line_points_init(param, p1x, py, p2x, p2y, side);
 }
 
 
-void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t origo_x, lv_coord_t origo_y, lv_coord_t start_angle, lv_coord_t end_angle)
+/**
+ * Initialize an angle mask.
+ * @param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param vertex_x X coordinate of the angle vertex (absolute coordinates)
+ * @param vertex_y Y coordinate of the angle vertex (absolute coordinates)
+ * @param start_angle start angle in degrees. 0 deg on the right, 90 deg, on the bottom
+ * @param end_angle end angle
+ */
+void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t vertex_x, lv_coord_t vertex_y, lv_coord_t start_angle, lv_coord_t end_angle)
 {
     lv_draw_mask_angle_param_t * p = &param->angle;
 
@@ -242,8 +304,8 @@ void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t origo_x, l
 
     p->start_angle = start_angle;
     p->end_angle = end_angle;
-    p->origo.x = origo_x;
-    p->origo.y = origo_y;
+    p->vertex.x = vertex_x;
+    p->vertex.y = vertex_y;
     p->cb = lv_draw_mask_angle;
 
     if(start_angle >= 0 && start_angle < 180) {
@@ -264,12 +326,18 @@ void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t origo_x, l
         LV_DEBUG_ASSERT(false, "Unexpected end_angle", end_angle);
     }
 
-    lv_draw_mask_line_angle_init((lv_draw_mask_param_t*)&p->start_line, origo_x, origo_y, start_angle, start_side);
-    lv_draw_mask_line_angle_init((lv_draw_mask_param_t*)&p->end_line, origo_x, origo_y, end_angle, end_side);
+    lv_draw_mask_line_angle_init((lv_draw_mask_param_t*)&p->start_line, vertex_x, vertex_y, start_angle, start_side);
+    lv_draw_mask_line_angle_init((lv_draw_mask_param_t*)&p->end_line, vertex_x, vertex_y, end_angle, end_side);
 }
 
 
-
+/**
+ * Initialize a fade mask.
+ * @param param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param rect coordinates of the rectangle to affect (absolute coordinates)
+ * @param radius radius of the rectangle
+ * @param inv: true: keep the pixels inside teh rectangle; keep teh pixels outside of the rectangle
+ */
 void lv_draw_mask_radius_init(lv_draw_mask_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv)
 {
     lv_draw_mask_radius_param_t * p = &param->radius;
@@ -284,12 +352,20 @@ void lv_draw_mask_radius_init(lv_draw_mask_param_t * param, const lv_area_t * re
 }
 
 
-
-void lv_draw_mask_fade_init(lv_draw_mask_param_t * param, lv_area_t * rect, lv_opa_t opa_top, lv_coord_t y_top, lv_opa_t opa_bottom, lv_coord_t y_bottom)
+/**
+ * Initialize a fade mask.
+ * @param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param coords coordinates of the area to affect (absolute coordinates)
+ * @param opa_top opacity on the top
+ * @param y_top at which coordinate start to change to opacity to `opa_bottom`
+ * @param opa_bottom opacity at the bottom
+ * @param y_bottom at which coordinate reach `opa_bottom`.
+ */
+void lv_draw_mask_fade_init(lv_draw_mask_param_t * param, lv_area_t * coords, lv_opa_t opa_top, lv_coord_t y_top, lv_opa_t opa_bottom, lv_coord_t y_bottom)
 {
     lv_draw_mask_fade_param_t * p = &param->fade;
 
-    lv_area_copy(&p->rect, rect);
+    lv_area_copy(&p->coords, coords);
     p->opa_top= opa_top;
     p->opa_bottom = opa_bottom;
     p->y_top= y_top;
@@ -298,6 +374,12 @@ void lv_draw_mask_fade_init(lv_draw_mask_param_t * param, lv_area_t * rect, lv_o
 }
 
 
+/**
+ * Initialize a map mask.
+ * @param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param coords coordinates of the map (absolute coordinates)
+ * @param map array of bytes with the mask values
+ */
 void lv_draw_mask_map_init(lv_draw_mask_param_t * param, lv_area_t * coords, const lv_opa_t * map)
 {
     lv_draw_mask_map_param_t * p = &param->map;
@@ -316,7 +398,7 @@ static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_
 {
     lv_draw_mask_line_param_t * p = &param->line;
 
-    /*Make to points relative to the origo*/
+    /*Make to points relative to the vertex*/
     abs_y -= p->origo.y;
     abs_x -= p->origo.x;
 
@@ -615,13 +697,13 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
 {
     lv_draw_mask_angle_param_t * p = &param->angle;
 
-    lv_coord_t rel_y = abs_y - p->origo.y;
-    lv_coord_t rel_x = abs_x - p->origo.x;
+    lv_coord_t rel_y = abs_y - p->vertex.y;
+    lv_coord_t rel_x = abs_x - p->vertex.x;
 
 
     if(p->start_angle < 180 && p->end_angle < 180 && p->start_angle != 0  && p->end_angle != 0 && p->start_angle > p->end_angle) {
 
-        if(abs_y < p->origo.y) {
+        if(abs_y < p->vertex.y) {
             return LV_DRAW_MASK_RES_FULL_COVER;
         }
 
@@ -630,7 +712,7 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         lv_coord_t start_angle_last= ((rel_y+1) * p->start_line.xy_steep) >> 10;
 
 
-        /*Do not let the line end cross the origo else it will affect the opposite part*/
+        /*Do not let the line end cross the vertex else it will affect the opposite part*/
         if(p->start_angle > 270 && p->start_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
         else if(p->start_angle > 0 && p->start_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
         else if(p->start_angle > 90 && p->start_angle < 270 && start_angle_last > 0) start_angle_last = 0;
@@ -665,7 +747,7 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
     }
     else if(p->start_angle > 180 && p->end_angle > 180 && p->start_angle > p->end_angle) {
 
-        if(abs_y > p->origo.y) {
+        if(abs_y > p->vertex.y) {
             return LV_DRAW_MASK_RES_FULL_COVER;
         }
 
@@ -673,7 +755,7 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         lv_coord_t end_angle_first = (rel_y * p->end_line.xy_steep) >> 10;
         lv_coord_t start_angle_last= ((rel_y+1) * p->start_line.xy_steep) >> 10;
 
-        /*Do not let the line end cross the origo else it will affect the opposite part*/
+        /*Do not let the line end cross the vertex else it will affect the opposite part*/
         if(p->start_angle > 270 && p->start_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
         else if(p->start_angle > 0 && p->start_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
         else if(p->start_angle > 90 && p->start_angle < 270 && start_angle_last > 0) start_angle_last = 0;
@@ -711,15 +793,15 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         lv_draw_mask_res_t res2 = LV_DRAW_MASK_RES_FULL_COVER;
 
         if(p->start_angle == 180) {
-            if(abs_y < p->origo.y) res1 = LV_DRAW_MASK_RES_FULL_COVER;
+            if(abs_y < p->vertex.y) res1 = LV_DRAW_MASK_RES_FULL_COVER;
             else res1 = LV_DRAW_MASK_RES_UNKNOWN;
         }
         else if(p->start_angle == 0) {
-            if(abs_y < p->origo.y) res1 = LV_DRAW_MASK_RES_UNKNOWN;
+            if(abs_y < p->vertex.y) res1 = LV_DRAW_MASK_RES_UNKNOWN;
             else res1 = LV_DRAW_MASK_RES_FULL_COVER;
         }
-        else if((p->start_angle < 180 && abs_y < p->origo.y) ||
-                (p->start_angle > 180 && abs_y >= p->origo.y)) {
+        else if((p->start_angle < 180 && abs_y < p->vertex.y) ||
+                (p->start_angle > 180 && abs_y >= p->vertex.y)) {
             res1 = LV_DRAW_MASK_RES_UNKNOWN;
         }
         else  {
@@ -727,15 +809,15 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         }
 
         if(p->end_angle == 180) {
-            if(abs_y < p->origo.y) res2 = LV_DRAW_MASK_RES_UNKNOWN;
+            if(abs_y < p->vertex.y) res2 = LV_DRAW_MASK_RES_UNKNOWN;
             else res2 = LV_DRAW_MASK_RES_FULL_COVER;
         }
         else if(p->end_angle == 0) {
-            if(abs_y < p->origo.y) res2 = LV_DRAW_MASK_RES_FULL_COVER;
+            if(abs_y < p->vertex.y) res2 = LV_DRAW_MASK_RES_FULL_COVER;
             else res2 = LV_DRAW_MASK_RES_UNKNOWN;
         }
-        else if((p->end_angle < 180 && abs_y < p->origo.y) ||
-                (p->end_angle > 180 && abs_y >= p->origo.y)) {
+        else if((p->end_angle < 180 && abs_y < p->vertex.y) ||
+                (p->end_angle > 180 && abs_y >= p->vertex.y)) {
             res2 = LV_DRAW_MASK_RES_UNKNOWN;
         }
         else {
@@ -961,16 +1043,16 @@ static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_
 {
     lv_draw_mask_fade_param_t * p = &param->fade;
 
-    if(abs_y < p->rect.y1) return LV_DRAW_MASK_RES_FULL_COVER;
-    if(abs_y > p->rect.y2) return LV_DRAW_MASK_RES_FULL_COVER;
-    if(abs_x + len < p->rect.x1) return LV_DRAW_MASK_RES_FULL_COVER;
-    if(abs_x > p->rect.x2) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_y < p->coords.y1) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_y > p->coords.y2) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_x + len < p->coords.x1) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_x > p->coords.x2) return LV_DRAW_MASK_RES_FULL_COVER;
 
-    if(abs_x + len > p->rect.x2) len -= abs_x + len - p->rect.x2 - 1;
+    if(abs_x + len > p->coords.x2) len -= abs_x + len - p->coords.x2 - 1;
 
-    if(abs_x < p->rect.x1) {
+    if(abs_x < p->coords.x1) {
         lv_coord_t x_ofs = 0;
-        x_ofs = p->rect.x1 - abs_x;
+        x_ofs = p->coords.x1 - abs_x;
         len -= x_ofs;
         mask_buf += x_ofs;
     }

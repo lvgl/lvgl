@@ -80,7 +80,7 @@ typedef struct {
 
 typedef struct {
     lv_draw_mask_cb_t cb;   /*The first element must be the callback*/
-    lv_point_t origo;
+    lv_point_t vertex;
     lv_coord_t start_angle;
     lv_coord_t end_angle;
     lv_draw_mask_line_param_t start_line;
@@ -101,7 +101,7 @@ typedef struct {
 typedef struct {
     lv_draw_mask_cb_t cb;   /*The first element must be the callback*/
 
-    lv_area_t rect;
+    lv_area_t coords;
     lv_coord_t y_top;
     lv_coord_t y_bottom;
     lv_opa_t opa_top;
@@ -129,22 +129,110 @@ typedef union _lv_draw_mask_param_t {
  * GLOBAL PROTOTYPES
  **********************/
 
+/**
+ * Add a draw mask. Everything drawn after it (until removing the mask) will be affected by the mask.
+ * @param param an initialized mask parameter. Only the pointer is saved.
+ * @param custom_id a custom pointer to identify the mask. Used in `lv_draw_mask_remove_custom`.
+ * @return the an integer, the ID of the mask. Can be used in `lv_draw_mask_remove_id`.
+ */
 int16_t lv_draw_mask_add(lv_draw_mask_param_t * param, void * custom_id);
-void lv_draw_mask_remove_id(int16_t id);
-void lv_draw_mask_remove_custom(void * custom_id);
-uint8_t lv_draw_mask_get_cnt(void);
 
+/**
+ * Apply the added buffers on a line. Used internally by the library's drawing routins.
+ * @param mask_buf store the result mask here. Has to be `len` byte long. Should be initialized with `0xFF`.
+ * @param abs_x absolute X coordinate where the line to calculate start
+ * @param abs_y absolute Y coordinate where the line to calculate start
+ * @param len length of the line to calculate (in pixel count)
+ * @return Oneof these values:
+ * - `LV_DRAW_MASK_RES_FULL_TRANSP`: the whole line is transparent. `mask_buf` is not set to zero
+ * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
+ * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
+ */
 lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len);
 
-void lv_draw_mask_line_points_init(lv_draw_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_draw_mask_line_side_t side);
-void lv_draw_mask_line_angle_init(lv_draw_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, int16_t deg, lv_draw_mask_line_side_t side);
+/**
+ * Remove a mask with a given ID
+ * @param id the ID of the mask.  Returned by `lv_draw_mask_add`
+ * @return the parameter of the removed mask.
+ * If more masks have `custom_id` ID then the last mask's parameter will be returned
+ */
+lv_draw_mask_param_t * lv_draw_mask_remove_id(int16_t id);
 
+/**
+ * Remove all mask with a given custom ID
+ * @param custom_id a pointer used in `lv_draw_mask_add`
+ * @return return the parameter of the removed mask.
+ * If more masks have `custom_id` ID then the last mask's parameter will be returned
+ */
+lv_draw_mask_param_t * lv_draw_mask_remove_custom(void * custom_id);
+
+/**
+ * Count the currently added masks
+ * @return number of active masks
+ */
+uint8_t lv_draw_mask_get_cnt(void);
+
+/**
+ *Initialize a line mask from two points.
+ * @param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param p1x X coordinate of the first point of the line
+ * @param p1y Y coordinate of the first point of the line
+ * @param p2x X coordinate of the second point of the line
+ * @param p2y y coordinate of the second point of the line
+ * @param side and element of `lv_draw_mask_line_side_t` to describe which side to keep.
+ * With `LV_DRAW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
+ * With `LV_DRAW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
+ */
+void lv_draw_mask_line_points_init(lv_draw_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_draw_mask_line_side_t side);
+
+/**
+ *Initialize a line mask from a point and an angle.
+ * @param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param px X coordiante of a point of the line
+ * @param py X coordiante of a point of the line
+ * @param angle right 0 deg, bottom: 90
+ * @param side and element of `lv_draw_mask_line_side_t` to describe which side to keep.
+ * With `LV_DRAW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
+ * With `LV_DRAW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
+ */
+void lv_draw_mask_line_angle_init(lv_draw_mask_param_t * param, lv_coord_t p1x, lv_coord_t py, int16_t angle, lv_draw_mask_line_side_t side);
+
+/**
+ * Initialize an angle mask.
+ * @param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param vertex_x X coordinate of the angle vertex (absolute coordinates)
+ * @param vertex_y Y coordinate of the angle vertex (absolute coordinates)
+ * @param start_angle start angle in degrees. 0 deg on the right, 90 deg, on the bottom
+ * @param end_angle end angle
+ */
+void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t vertex_x, lv_coord_t vertex_y, lv_coord_t start_angle, lv_coord_t end_angle);
+
+/**
+ * Initialize a fade mask.
+ * @param param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param rect coordinates of the rectangle to affect (absolute coordinates)
+ * @param radius radius of the rectangle
+ * @param inv: true: keep the pixels inside teh rectangle; keep teh pixels outside of the rectangle
+ */
 void lv_draw_mask_radius_init(lv_draw_mask_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv);
 
-void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t origio_x, lv_coord_t origo_y, lv_coord_t start_angle, lv_coord_t end_angle);
+/**
+ * Initialize a fade mask.
+ * @param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param coords coordinates of the area to affect (absolute coordinates)
+ * @param opa_top opacity on the top
+ * @param y_top at which coordinate start to change to opacity to `opa_bottom`
+ * @param opa_bottom opacity at the bottom
+ * @param y_bottom at which coordinate reach `opa_bottom`.
+ */
+void lv_draw_mask_fade_init(lv_draw_mask_param_t * param, lv_area_t * coords, lv_opa_t opa_top, lv_coord_t y_top, lv_opa_t opa_bottom, lv_coord_t y_bottom);
 
-void lv_draw_mask_fade_init(lv_draw_mask_param_t * param, lv_area_t * rect, lv_opa_t opa_top, lv_coord_t y_top, lv_opa_t opa_bottom, lv_coord_t y_bottom);
-
+/**
+ * Initialize a map mask.
+ * @param param pointer to a `lv_draw_mask_param_t` to initialize
+ * @param coords coordinates of the map (absolute coordinates)
+ * @param map array of bytes with the mask values
+ */
 void lv_draw_mask_map_init(lv_draw_mask_param_t * param, lv_area_t * coords, const lv_opa_t * map);
 
 /**********************

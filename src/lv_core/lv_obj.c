@@ -2439,15 +2439,17 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         lv_draw_rect(&obj->coords, clip_area, style, lv_obj_get_opa_scale(obj));
 
         if(style->body.corner_mask) {
-            lv_draw_mask_param_t mp;
-            lv_draw_mask_radius_init(&mp, &obj->coords, style->body.radius, false);
-            lv_draw_mask_add(&mp, obj + 4);
+            lv_draw_mask_param_t * mp = lv_draw_buf_get(sizeof(lv_draw_mask_param_t));
+
+            lv_draw_mask_radius_init(mp, &obj->coords, style->body.radius, false);
+            lv_draw_mask_add(mp, obj + 4);
         }
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
         const lv_style_t * style = lv_obj_get_style(obj);
         if(style->body.corner_mask) {
-            lv_draw_mask_remove_custom(obj+ 4);
+            lv_draw_mask_param_t * mp = lv_draw_mask_remove_custom(obj + 4);
+            lv_draw_buf_release(mp);
         }
     }
 

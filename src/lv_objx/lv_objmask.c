@@ -151,8 +151,6 @@ static lv_design_res_t lv_objmask_design(lv_obj_t * objmask, const lv_area_t * c
         LV_LL_READ(ext->mask_ll, m) {
             lv_draw_mask_add(&m->param, &ext->mask_ll);
         }
-
-
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {

@@ -526,25 +526,6 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mo
     /*Do not draw a zero length indicator*/
     if(!sym && indic_length == 0) return;
 
-    /* Create a mask to the background.
-     * It would look ugly if the indicator overflows on the rounded corners */
-    lv_area_t mask_bg_area;
-    lv_area_copy(&mask_bg_area, &bar->coords);
-    mask_bg_area.x1 -= style_indic->body.shadow.width;
-    mask_bg_area.y1 -= style_indic->body.shadow.width;
-    mask_bg_area.x2 += style_indic->body.shadow.width;
-    mask_bg_area.y2 += style_indic->body.shadow.width;
-
-    if(style_indic->body.shadow.offset.x > 0) mask_bg_area.x1 += style_indic->body.shadow.offset.x;
-    else mask_bg_area.x2 -= style_indic->body.shadow.offset.x;
-
-    if(style_indic->body.shadow.offset.y > 0) mask_bg_area.y1 += style_indic->body.shadow.offset.y;
-    else mask_bg_area.y2 -= style_indic->body.shadow.offset.y;
-
-    lv_draw_mask_param_t mask_bg_param;
-    lv_draw_mask_radius_init(&mask_bg_param, &mask_bg_area,style_indic->body.radius, false);
-    int16_t mask_bg_id = lv_draw_mask_add(&mask_bg_param, NULL);
-
     /*If the indicator has a gradient along the longed side,
      * mask out only the current indicator area from the big gradient.*/
     if((style_indic->body.main_color.full != style_indic->body.grad_color.full)  &&
@@ -589,11 +570,6 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mo
     else {
         lv_draw_rect(&ext->indic_area, clip_area, style_indic, opa);
     }
-
-    lv_draw_mask_remove_id(mask_bg_id);
-
-
-
 }
 
 /**

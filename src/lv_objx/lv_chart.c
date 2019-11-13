@@ -1115,8 +1115,8 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
     lv_style_copy(&style, &lv_style_plain);
 
    int16_t mask_fade_id = LV_MASK_ID_INV;
+   lv_draw_mask_param_t mask_fade_p;
    if(ext->type & LV_CHART_TYPE_AREA_FADED) {
-       lv_draw_mask_param_t mask_fade_p;
        lv_draw_mask_fade_init(&mask_fade_p, &chart->coords, LV_OPA_COVER, chart->coords.y1 + (h >> 2), LV_OPA_TRANSP, chart->coords.y2 - (h >> 2));
        mask_fade_id = lv_draw_mask_add(&mask_fade_p, NULL);
    }

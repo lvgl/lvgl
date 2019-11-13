@@ -324,8 +324,6 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, const 
         mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
     }
 
-    /*Move the vdb_buf_tmp to the first row*/
-    lv_draw_mask_param_t mask_rin_param;
 
     /*Get the inner radius*/
     lv_coord_t rin = rout - border_width;
@@ -340,6 +338,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, const 
     area_small.y2 -= ((style->body.border.part & LV_BORDER_PART_BOTTOM) ? border_width : - (border_width + rout));
 
     /*Create inner the mask*/
+    lv_draw_mask_param_t mask_rin_param;
     lv_draw_mask_radius_init(&mask_rin_param, &area_small, rout - border_width, true);
     int16_t mask_rin_id = lv_draw_mask_add(&mask_rin_param, NULL);
 
@@ -573,9 +572,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     lv_draw_mask_param_t mask_rout_param;
     lv_draw_mask_radius_init(&mask_rout_param, &bg_coords, r_bg, true);
 
-    /*Draw a radius into the shadow buffer*/
     int16_t mask_rout_id = LV_MASK_ID_INV;
-
     mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
 
     lv_area_t a;
@@ -597,7 +594,6 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
         first_px += hor_mid_dist;
     }
     a.x1 += first_px;
-
 
     lv_coord_t ver_mid_dist = (a.y1 + corner_size) - (sh_area.y1 + lv_area_get_height(&sh_area) / 2);
     lv_coord_t ver_mid_corr = 0;
