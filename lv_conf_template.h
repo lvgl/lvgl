@@ -344,15 +344,19 @@ typedef void * lv_font_user_data_t;
  /*Can break (wrap) texts on these chars*/
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 
- /* If a character is at least this long, will break wherever "prettiest" */
- #define LV_TXT_LINE_BREAK_LONG_LEN          12
 
- /* Minimum number of characters of a word to put on a line before a break */
- #define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN  3
+/* If a word is at least this long, will break wherever "prettiest"
+ * To disable, set to a value <= 0 */
+#define LV_TXT_LINE_BREAK_LONG_LEN          12
 
- /* Minimum number of characters of a word to put on a line after a break */
- #define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
+/* Minimum number of characters in a long word to put on a line before a break.
+ * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
+#define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN  3
 
+/* Minimum number of characters in a long word to put on a line after a break.
+ * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
+#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
+ 
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
  * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
