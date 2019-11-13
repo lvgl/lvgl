@@ -372,10 +372,10 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
             cords_tmp.y1 = coords.y1;
             cords_tmp.y2 = coords.y1 + ext->h - 1;
 
-            for(; cords_tmp.y1 < coords.y2; cords_tmp.y1 += ext->h, cords_tmp.y2 += ext->h) {
+            for(; cords_tmp.y1 <= coords.y2; cords_tmp.y1 += ext->h, cords_tmp.y2 += ext->h) {
                 cords_tmp.x1 = coords.x1;
                 cords_tmp.x2 = coords.x1 + ext->w - 1;
-                for(; cords_tmp.x1 < coords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
+                for(; cords_tmp.x1 <= coords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
                     lv_draw_img(&cords_tmp, mask, ext->src, style, opa_scale);
                 }
             }
