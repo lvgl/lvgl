@@ -151,14 +151,23 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
     }
     /*Initialize the format byte*/
     else {
-        format.s.align       = LV_LABEL_ALIGN_LEFT;
+#if LV_USE_BIDI
+        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(table);
+        if(base_dir == LV_BIDI_DIR_LTR) format.s.align = LV_LABEL_ALIGN_LEFT;
+        else if(base_dir == LV_BIDI_DIR_RTL) format.s.align = LV_LABEL_ALIGN_RIGHT;
+        else if(base_dir == LV_BIDI_DIR_AUTO) format.s.align = lv_bidi_detect_base_dir(txt);
+#else
+        format.s.align = LV_LABEL_ALIGN_LEFT;
+#endif
+
         format.s.right_merge = 0;
         format.s.type        = 0;
         format.s.crop        = 0;
     }
 
     ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
-    strcpy(ext->cell_data[cell] + 1, txt);                                        /*Leave the format byte*/
+    strcpy(ext->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
+
     ext->cell_data[cell][0] = format.format_byte;
     refr_size(table);
 }
@@ -729,7 +738,7 @@ static bool lv_table_design(lv_obj_t * table, const lv_area_t * mask, lv_design_
                     label_mask_ok = lv_area_intersect(&label_mask, mask, &cell_area);
                     if(label_mask_ok) {
                         lv_draw_label(&txt_area, &label_mask, cell_style, opa_scale, ext->cell_data[cell] + 1,
-                                      txt_flags, NULL, NULL, NULL);
+                                      txt_flags, NULL, NULL, NULL, lv_obj_get_base_dir(table));
                     }
                     /*Draw lines after '\n's*/
                     lv_point_t p1;

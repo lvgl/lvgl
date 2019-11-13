@@ -343,11 +343,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
 #endif
 
     uint8_t font_rgb[3];
-#if LV_COLOR_16_SWAP == 0
-    uint8_t txt_rgb[3] = {color.ch.red, color.ch.green, color.ch.blue};
-#else
-    uint8_t txt_rgb[3] = {color.ch.red, (color.ch.green_h << 3) + color.ch.green_l, color.ch.blue};
-#endif
+    uint8_t txt_rgb[3] = {LV_COLOR_GET_R(color), LV_COLOR_GET_G(color), LV_COLOR_GET_B(color)};
 
     for(row = row_start; row < row_end; row++) {
         bitmask = bitmask_init >> col_bit;
@@ -407,30 +403,16 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
                         res_color = *vdb_buf_tmp;
                     } else {
 
-#if LV_COLOR_16_SWAP == 0
-                        uint8_t bg_rgb[3] = {vdb_buf_tmp->ch.red, vdb_buf_tmp->ch.green, vdb_buf_tmp->ch.blue};
-#else
-                        uint8_t bg_rgb[3] = {vdb_buf_tmp->ch.red,
-                                             (vdb_buf_tmp->ch.green_h << 3) + vdb_buf_tmp->ch.green_l,
-                                             vdb_buf_tmp->ch.blue};
-#endif
+                        uint8_t bg_rgb[3] = {LV_COLOR_GET_R(*vdb_buf_tmp), LV_COLOR_GET_G(*vdb_buf_tmp), LV_COLOR_GET_B(*vdb_buf_tmp)};
 
 #if LV_SUBPX_BGR
-                        res_color.ch.blue = (uint16_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[2] * (255 - font_rgb[0]))) >> 8;
-                        res_color.ch.red = (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[0] * (255 - font_rgb[2]))) >> 8;
+                        LV_COLOR_SET_B(res_color, (uint16_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[2] * (255 - font_rgb[0]))) >> 8);
+                        LV_COLOR_SET_R(res_color, (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[0] * (255 - font_rgb[2]))) >> 8);
 #else
-                        res_color.ch.red = (uint16_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
-                        res_color.ch.blue = (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
+                        LV_COLOR_SET_R(res_color, (uint16_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8);
+                        LV_COLOR_SET_B(res_color, (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8);
 #endif
-
-#if LV_COLOR_16_SWAP == 0
-                        res_color.ch.green = (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
-#else
-                        uint8_t green = (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
-                        res_color.ch.green_h = green >> 3;
-                        res_color.ch.green_l = green & 0x7;
-#endif
-
+                        LV_COLOR_SET_G(res_color, (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8);
                     }
                     if(scr_transp == false) {
                         vdb_buf_tmp->full = res_color.full;

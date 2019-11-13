@@ -473,19 +473,36 @@
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 #endif
 
-/* If a character is at least this long, will break wherever "prettiest" */
+ /* If a character is at least this long, will break wherever "prettiest" */
 #ifndef LV_TXT_LINE_BREAK_LONG_LEN
 #define LV_TXT_LINE_BREAK_LONG_LEN          12
 #endif
 
-/* Minimum number of characters of a word to put on a line before a break */
+ /* Minimum number of characters of a word to put on a line before a break */
 #ifndef LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
-#define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN  3
+ #define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN  3
 #endif
 
-/* Minimum number of characters of a word to put on a line after a break */
+ /* Minimum number of characters of a word to put on a line after a break */
 #ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
-#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
+ #define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
+#endif
+
+/* Support bidirectional texts.
+ * Allows mixing Left-to-Right and Right-to-Left texts.
+ * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
+ * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
+#ifndef LV_USE_BIDI
+#define LV_USE_BIDI     0
+#endif
+#if LV_USE_BIDI
+/* Set the default direction. Supported values:
+ * `LV_BIDI_DIR_LTR` Left-to-Right
+ * `LV_BIDI_DIR_RTL` Right-to-Left
+ * `LV_BIDI_DIR_AUTO` detect texts base direction */
+#ifndef LV_BIDI_BASE_DIR_DEF
+#define LV_BIDI_BASE_DIR_DEF  LV_BIDI_DIR_AUTO
+#endif
 #endif
 
 /*Change the built in (v)snprintf functions*/

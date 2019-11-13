@@ -207,6 +207,8 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
             btn_h = lv_obj_get_height(btnm)- act_y - style_bg->body.padding.bottom - 1;
         }
 
+        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(btnm);
+
         /*Only deal with the non empty lines*/
         if(btn_cnt != 0) {
             /*Calculate the width of all units*/
@@ -214,7 +216,8 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
 
             /*Set the button size and positions and set the texts*/
             uint16_t i;
-            lv_coord_t act_x = style_bg->body.padding.left;
+            lv_coord_t act_x;
+
             lv_coord_t act_unit_w;
             unit_act_cnt = 0;
             for(i = 0; i < btn_cnt; i++) {
@@ -225,9 +228,13 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
                 act_unit_w--; /*-1 because e.g. width = 100 means 101 pixels (0..100)*/
 
                 /*Always recalculate act_x because of rounding errors */
-                act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner +
-                        style_bg->body.padding.left;
-
+                if(base_dir == LV_BIDI_DIR_RTL)  {
+                    act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner;
+                    act_x = lv_obj_get_width(btnm) - style_bg->body.padding.right - act_x - act_unit_w - 1;
+                } else {
+                    act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner +
+                            style_bg->body.padding.left;
+                }
                 /* Set the button's area.
                  * If inner padding is zero then use the prev. button x2 as x1 to avoid rounding
                  * errors*/
@@ -644,7 +651,6 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-
         ancestor_design_f(btnm, mask, mode);
 
         lv_btnm_ext_t * ext         = lv_obj_get_ext_attr(btnm);
@@ -665,7 +671,6 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
         lv_txt_flag_t txt_flag = LV_TXT_FLAG_NONE;
 
         if(ext->recolor) txt_flag = LV_TXT_FLAG_RECOLOR;
-
         for(btn_i = 0; btn_i < ext->btn_cnt; btn_i++, txt_i++) {
             /*Search the next valid text in the map*/
             while(strcmp(ext->map_p[txt_i], "\n") == 0) {
@@ -734,9 +739,10 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
             area_tmp.x2 = area_tmp.x1 + txt_size.x;
             area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
-            lv_draw_label(&area_tmp, mask, btn_style, opa_scale, ext->map_p[txt_i], txt_flag, NULL, NULL, NULL);
+            lv_draw_label(&area_tmp, mask, btn_style, opa_scale, ext->map_p[txt_i], txt_flag, NULL, NULL, NULL, lv_obj_get_base_dir(btnm));
         }
     }
+
     return true;
 }
 
