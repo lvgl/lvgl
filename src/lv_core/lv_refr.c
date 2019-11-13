@@ -318,19 +318,19 @@ static void lv_refr_area(const lv_area_t * area_p)
             tmp.x2 = 0;
             tmp.y1 = 0;
 
-            lv_coord_t y_tmp = max_row - 1;
+            lv_coord_t h_tmp = max_row;
             do {
-                tmp.y2 = y_tmp;
+                tmp.y2 = h_tmp - 1;
                 disp_refr->driver.rounder_cb(&disp_refr->driver, &tmp);
 
                 /*If this height fits into `max_row` then fine*/
                 if(lv_area_get_height(&tmp) <= max_row) break;
 
                 /*Decrement the height of the area until it fits into `max_row` after rounding*/
-                y_tmp--;
-            } while(y_tmp != 0);
+                h_tmp--;
+            } while(h_tmp > 0);
 
-            if(y_tmp == 0) {
+            if(h_tmp <= 0) {
                 LV_LOG_WARN("Can't set VDB height using the round function. (Wrong round_cb or to "
                             "small VDB)");
                 return;
