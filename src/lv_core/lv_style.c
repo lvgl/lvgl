@@ -90,11 +90,11 @@ void lv_style_init(void)
     lv_style_scr.body.shadow.color = LV_COLOR_GRAY;
     lv_style_scr.body.shadow.type  = LV_SHADOW_FULL;
     lv_style_scr.body.shadow.width = 0;
-    LV_FONT_DECLARE(lv_font_heb_16);
+
     lv_style_scr.text.opa          = LV_OPA_COVER;
     lv_style_scr.text.color        = lv_color_make(0x30, 0x30, 0x30);
     lv_style_scr.text.sel_color    = lv_color_make(0x55, 0x96, 0xd8);
-    lv_style_scr.text.font         = &lv_font_heb_16;//LV_FONT_DEFAULT;
+    lv_style_scr.text.font         = LV_FONT_DEFAULT;
     lv_style_scr.text.letter_space = 0;
     lv_style_scr.text.line_space   = 2;
 
