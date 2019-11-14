@@ -26,6 +26,7 @@
  **********************/
 static lv_design_res_t lv_objmask_design(lv_obj_t * objmask, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_objmask_signal(lv_obj_t * objmask, lv_signal_t sign, void * param);
+static uint16_t get_param_size(lv_draw_mask_type_t type);
 
 /**********************
  *  STATIC VARIABLES
@@ -92,34 +93,67 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
  * Add/remove functions
  *=====================*/
 
-void lv_objmask_add_mask(lv_obj_t * objmask, void * param, uint8_t id)
+/**
+ * Add a mask
+ * @param objmask pointer to an Object mask object
+ * @param param an initialized mask parameter
+ * @return pointer to the added mask
+ */
+lv_objmask_mask_t * lv_objmask_add_mask(lv_obj_t * objmask, void * param)
 {
+    LV_ASSERT_OBJ(objmask, LV_OBJX_NAME);
+    LV_ASSERT_NULL(param)
+
     lv_objmask_ext_t * ext = lv_obj_get_ext_attr(objmask);
 
     lv_draw_mask_common_dsc_t * dsc = param;
-    uint16_t param_size;
-    switch(dsc->type) {
-        case LV_DRAW_MASK_TYPE_LINE: param_size = sizeof(lv_draw_mask_line_param_t); break;
-        case LV_DRAW_MASK_TYPE_ANGLE: param_size = sizeof(lv_draw_mask_angle_param_t); break;
-        case LV_DRAW_MASK_TYPE_RADIUS: param_size = sizeof(lv_draw_mask_radius_param_t); break;
-        case LV_DRAW_MASK_TYPE_FADE: param_size = sizeof(lv_draw_mask_fade_param_t); break;
-        case LV_DRAW_MASK_TYPE_MAP: param_size = sizeof(lv_draw_mask_map_param_t); break;
-        default: param_size = 0;
-    }
-
+    uint16_t param_size = get_param_size(dsc->type);
 
     lv_objmask_mask_t * m = lv_ll_ins_head(&ext->mask_ll);
     m->param = lv_mem_alloc(param_size);
     LV_ASSERT_MEM(m->param);
-    if(m == NULL) return;
+    if(m == NULL) return NULL;
 
     memcpy(m->param, param, param_size);
 
-    m->id = id;
+    lv_obj_invalidate(objmask);
 
+    return m;
+}
 
+/**
+ * Update an already created mask
+ * @param objmask pointer to an Object mask object
+ * @param mask pointer to created mask (returned by `lv_objmask_add_mask`)
+ * @param param an initialized mask parameter (initialized by `lv_draw_mask_line/angle/.../_init`)
+ */
+void lv_objmask_upadte_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask, void * param)
+{
+    LV_ASSERT_OBJ(objmask, LV_OBJX_NAME);
+    LV_ASSERT_NULL(mask);
+    LV_ASSERT_NULL(param);
+    lv_draw_mask_common_dsc_t * dsc = param;
 
+    memcpy(mask->param, param, get_param_size(dsc->type));
 
+    lv_obj_invalidate(objmask);
+}
+
+/**
+ * Remove a mask
+ * @param objmask pointer to an Object mask object
+ * @param mask pointer to created mask (returned by `lv_objmask_add_mask`)
+ */
+void lv_objmask_remove_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask)
+{
+    LV_ASSERT_OBJ(objmask, LV_OBJX_NAME);
+    LV_ASSERT_NULL(mask);
+
+    lv_objmask_ext_t * ext = lv_obj_get_ext_attr(objmask);
+    lv_mem_free(mask->param);
+    lv_ll_rem(&ext->mask_ll, mask);
+
+    lv_obj_invalidate(objmask);
 }
 
 /*=====================
@@ -135,10 +169,6 @@ void lv_objmask_add_mask(lv_obj_t * objmask, void * param, uint8_t id)
 /*=====================
  * Other functions
  *====================*/
-
-/*
- * New object specific "other" functions come here
- */
 
 /**********************
  *   STATIC FUNCTIONS
@@ -280,13 +310,28 @@ static lv_res_t lv_objmask_signal(lv_obj_t * objmask, lv_signal_t sign, void * p
                 i->param = NULL;
             }
         }
+
+        lv_ll_clear(&ext->mask_ll);
     }
 
     return res;
 }
 
+static uint16_t get_param_size(lv_draw_mask_type_t type)
+{
+    uint16_t param_size;
+    switch(type) {
+        case LV_DRAW_MASK_TYPE_LINE: param_size = sizeof(lv_draw_mask_line_param_t); break;
+        case LV_DRAW_MASK_TYPE_ANGLE: param_size = sizeof(lv_draw_mask_angle_param_t); break;
+        case LV_DRAW_MASK_TYPE_RADIUS: param_size = sizeof(lv_draw_mask_radius_param_t); break;
+        case LV_DRAW_MASK_TYPE_FADE: param_size = sizeof(lv_draw_mask_fade_param_t); break;
+        case LV_DRAW_MASK_TYPE_MAP: param_size = sizeof(lv_draw_mask_map_param_t); break;
+        default: param_size = 0;
+    }
+
+    return param_size;
+}
+
 #else /* Enable this file at the top */
 
-/* This dummy typedef exists purely to silence -Wpedantic. */
-typedef int keep_pedantic_happy;
 #endif

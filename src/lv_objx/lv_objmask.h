@@ -34,7 +34,6 @@ extern "C" {
 
 typedef struct {
     void * param;
-    uint8_t id;
 }lv_objmask_mask_t;
 
 /*Data of object mask*/
@@ -67,7 +66,29 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy);
 /*======================
  * Add/remove functions
  *=====================*/
-void lv_objmask_add_mask(lv_obj_t * objmask, void * param,  uint8_t id);
+
+/**
+ * Add a mask
+ * @param objmask pointer to an Object mask object
+ * @param param an initialized mask parameter
+ * @return pointer to the added mask
+ */
+lv_objmask_mask_t * lv_objmask_add_mask(lv_obj_t * objmask, void * param);
+
+/**
+ * Update an already created mask
+ * @param objmask pointer to an Object mask object
+ * @param mask pointer to created mask (returned by `lv_objmask_add_mask`)
+ * @param param an initialized mask parameter (initialized by `lv_draw_mask_line/angle/.../_init`)
+ */
+void lv_objmask_upadte_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask, void * param);
+
+/**
+ * Remove a mask
+ * @param objmask pointer to an Object mask object
+ * @param mask pointer to created mask (returned by `lv_objmask_add_mask`)
+ */
+void lv_objmask_remove_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask);
 
 /*=====================
  * Setter functions
