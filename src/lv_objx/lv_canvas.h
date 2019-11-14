@@ -151,20 +151,22 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, l
                         lv_coord_t h);
 
 /**
- * Rotate and image and store the result on a canvas.
+ * Transform and image and store the result on a canvas.
  * @param canvas pointer to a canvas object
  * @param img pointer to an image descriptor.
  *             Can be the image descriptor of an other canvas too (`lv_canvas_get_img()`).
  * @param angle the angle of rotation (0..360);
+ * @param zoom zoom factor (256 no zoom);
  * @param offset_x offset X to tell where to put the result data on destination canvas
  * @param offset_y offset X to tell where to put the result data on destination canvas
  * @param pivot_x pivot X of rotation. Relative to the source canvas
  *                Set to `source width / 2` to rotate around the center
  * @param pivot_y pivot Y of rotation. Relative to the source canvas
  *                Set to `source height / 2` to rotate around the center
+ * @param antialias apply anti-aliasing during the transformation. Looks better but slower.
  */
-void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_coord_t offset_x, lv_coord_t offset_y,
-                      int32_t pivot_x, int32_t pivot_y);
+void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, uint16_t zoom, lv_coord_t offset_x, lv_coord_t offset_y,
+                      int32_t pivot_x, int32_t pivot_y, bool antialias);
 
 
 
@@ -188,7 +190,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r);
  * @param canvas pointer to a canvas
  * @param color the background color
  */
-void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color);
+void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color, lv_opa_t opa);
 
 /**
  * Draw a rectangle on the canvas

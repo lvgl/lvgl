@@ -80,6 +80,8 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->w         = lv_obj_get_width(new_img);
     ext->h         = lv_obj_get_height(new_img);
     ext->angle = 0;
+    ext->zoom = LV_IMG_ZOOM_NONE;
+    ext->antialias = LV_ANTIALIAS ? 1 : 0;
     ext->auto_size = 1;
     ext->offset.x  = 0;
     ext->offset.y  = 0;
@@ -269,10 +271,49 @@ void lv_img_set_angle(lv_obj_t * img, int16_t angle)
     if(angle < 0 || angle >= 360) angle = angle % 360;
 
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+    if(angle == ext->angle) return;
+
+    lv_obj_invalidate(img);
     ext->angle = angle;
     lv_obj_refresh_ext_draw_pad(img);
     lv_obj_invalidate(img);
+}
 
+/**
+ * Set the zoom factor of the image.
+ * @param img pointer to an image object
+ * @param zoom the zoom factor.
+ * - 256 or LV_ZOOM_IMG_NONE for no zoom
+ * - <256: scale down
+ * - >256 scale up
+ * - 128 half size
+ * - 512 double size
+ */
+void lv_img_set_zoom(lv_obj_t * img, uint16_t zoom)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+    if(zoom == ext->zoom) return;
+
+    if(zoom == 0) zoom = 1;
+
+    lv_obj_invalidate(img);
+    ext->zoom = zoom;
+    lv_obj_refresh_ext_draw_pad(img);
+    lv_obj_invalidate(img);
+}
+
+/**
+ * Enable/disable anti-aliasing for the transformations (rotate, zoom) or not
+ * @param img pointer to an image object
+ * @param antialias true: anti-aliased; false: not anti-aliased
+ */
+void lv_img_set_antialias(lv_obj_t * img, bool antialias)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+    if(antialias == ext->antialias) return;
+
+    ext->antialias = antialias;
+    lv_obj_invalidate(img);
 }
 
 /*=====================
@@ -366,6 +407,34 @@ uint16_t lv_img_get_angle(lv_obj_t * img)
     return ext->angle;
 }
 
+/**
+ * Get the zoom factor of the image.
+ * @param img pointer to an image object
+ * @return zoom factor (256: no zoom)
+ */
+uint16_t lv_img_get_zoom(lv_obj_t * img)
+{
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    return ext->zoom;
+}
+
+/**
+ * Get whether the transformations (rotate, zoom) are anti-aliased or not
+ * @param img pointer to an image object
+ * @return true: anti-aliased; false: not anti-aliased
+ */
+bool lv_img_get_antialias(lv_obj_t * img)
+{
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    return ext->antialias ? true : false;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -414,7 +483,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
                 cords_tmp.x1 = coords.x1;
                 cords_tmp.x2 = coords.x1 + ext->w - 1;
                 for(; cords_tmp.x1 < coords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
-                    lv_draw_img(&cords_tmp, clip_area, ext->src, style, ext->angle, opa_scale);
+                    lv_draw_img(&cords_tmp, clip_area, ext->src, style, ext->angle, ext->zoom, ext->antialias, opa_scale);
                 }
             }
         } else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
@@ -426,7 +495,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         } else {
             /*Trigger the error handler of image drawer*/
             LV_LOG_WARN("lv_img_design: image source type is unknown");
-            lv_draw_img(&img->coords, clip_area, NULL, style, 0, opa_scale);
+            lv_draw_img(&img->coords, clip_area, NULL, style, 0, LV_IMG_ZOOM_NONE, false, opa_scale);
         }
     }
 
@@ -464,9 +533,10 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*If the image has angle provide enough room for the rotated corners */
-        if(ext->angle) {
+        if(ext->angle || ext->zoom != LV_IMG_ZOOM_NONE) {
             lv_sqrt_res_t ds;
             lv_sqrt(ext->w * ext->w + ext->h * ext->h, &ds);
+            ds.i = (ds.i * ext->zoom + 0) >> 8;        /*+10 to be sure anything won't be clipped*/
 
             lv_coord_t d = (ds.i - LV_MATH_MIN(ext->w, ext->h)) / 2;
             img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, d);

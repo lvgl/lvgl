@@ -26,10 +26,10 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
-        const lv_style_t * style, uint16_t angle, lv_opa_t opa_scale);
+        const lv_style_t * style, uint16_t angle, uint16_t zoom, bool antialaias, lv_opa_t opa_scale);
 
 static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p, lv_opa_t opa,
-        bool chroma_key, bool alpha_byte, const lv_style_t * style, uint16_t angle);
+        bool chroma_key, bool alpha_byte, const lv_style_t * style, uint16_t angle, uint16_t zoom, bool antialaias);
 
 /**********************
  *  STATIC VARIABLES
@@ -49,10 +49,11 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
  * @param mask the image will be drawn only in this area
  * @param src pointer to a lv_color_t array which contains the pixels of the image
  * @param style style of the image
+ * @param antialias anti-alias transformations (rotate, zoom) or not
  * @param opa_scale scale down all opacities by the factor
  */
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src, const lv_style_t * style,
-        uint16_t angle, lv_opa_t opa_scale)
+        uint16_t angle, uint16_t zoom, bool antialias, lv_opa_t opa_scale)
 {
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
@@ -62,7 +63,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
     }
 
     lv_res_t res;
-    res = lv_img_draw_core(coords, mask, src, style, angle, opa_scale);
+    res = lv_img_draw_core(coords, mask, src, style, angle, zoom, antialias, opa_scale);
 
     if(res == LV_RES_INV) {
         LV_LOG_WARN("Image draw error");
@@ -189,7 +190,7 @@ lv_img_src_t lv_img_src_get_type(const void * src)
  **********************/
 
 static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
-        const lv_style_t * style, uint16_t angle, lv_opa_t opa_scale)
+        const lv_style_t * style, uint16_t angle, uint16_t zoom, bool antialias, lv_opa_t opa_scale)
 {
     lv_opa_t opa =
             opa_scale == LV_OPA_COVER ? style->image.opa : (uint16_t)((uint16_t)style->image.opa * opa_scale) >> 8;
@@ -211,16 +212,21 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
     else if(cdsc->dec_dsc.img_data) {
         lv_area_t map_area_rot;
         lv_area_copy(&map_area_rot, coords);
-        if(angle) {
+        if(angle || zoom != LV_IMG_ZOOM_NONE) {
             /*Get the exact area which is required to show the rotated image*/
             lv_coord_t pivot_x = lv_area_get_width(coords) / 2 + coords->x1;
             lv_coord_t pivot_y = lv_area_get_height(coords) / 2 + coords->y1;
 
+            lv_coord_t w = lv_area_get_width(coords);
+            lv_coord_t w_zoom = (((w * zoom) >> 8) - w) / 2;
+            lv_coord_t h = lv_area_get_height(coords);
+            lv_coord_t h_zoom = (((h * zoom) >> 8) - h) / 2;
+
             lv_area_t norm;
-            norm.x1 = + coords->x1 - pivot_x;
-            norm.y1 = + coords->y1 - pivot_y;
-            norm.x2 = + coords->x2 - pivot_x;
-            norm.y2 = + coords->y2 - pivot_y;
+            norm.x1 = coords->x1 - pivot_x - w_zoom;
+            norm.y1 = coords->y1 - pivot_y - h_zoom;
+            norm.x2 = coords->x2 - pivot_x + w_zoom;
+            norm.y2 = coords->y2 - pivot_y + h_zoom;
 
             int16_t sinma = lv_trigo_sin(-angle);
             int16_t cosma = lv_trigo_sin(-angle + 90);
@@ -255,7 +261,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
                                  successfully.*/
         }
 
-        lv_draw_map(coords, &mask_com, cdsc->dec_dsc.img_data, opa, chroma_keyed, alpha_byte, style, angle);
+        lv_draw_map(coords, &mask_com, cdsc->dec_dsc.img_data, opa, chroma_keyed, alpha_byte, style, angle, zoom, antialias);
     }
     /* The whole uncompressed image is not available. Try to read it line-by-line*/
     else {
@@ -292,7 +298,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
             }
 
 
-            lv_draw_map(&line, &mask_line, buf, opa, chroma_keyed, alpha_byte, style, 0);
+            lv_draw_map(&line, &mask_line, buf, opa, chroma_keyed, alpha_byte, style, 0, LV_IMG_ZOOM_NONE, false);
             line.y1++;
             line.y2++;
             y++;
@@ -312,9 +318,12 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
  * @param chroma_keyed true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
  * @param alpha_byte true: extra alpha byte is inserted for every pixel
  * @param style style of the image
+ * @param angle angle in degree
+ * @param zoom zoom factor
+ * @param antialias anti-alias transformations (rotate, zoom) or not
  */
 static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p, lv_opa_t opa,
-        bool chroma_key, bool alpha_byte, const lv_style_t * style, uint16_t angle)
+        bool chroma_key, bool alpha_byte, const lv_style_t * style, uint16_t angle, uint16_t zoom, bool antialaias)
 {
 
     if(opa < LV_OPA_MIN) return;
@@ -338,8 +347,10 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
 
     /*The simplest case just copy the pixels into the VDB*/
-    if(other_mask_cnt == 0 && angle == 0 && chroma_key == false && alpha_byte == false && style->image.intense == LV_OPA_TRANSP) {
-        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, style->image.blend_mode);
+    if(other_mask_cnt == 0 && angle == 0 && zoom == LV_IMG_ZOOM_NONE &&
+       chroma_key == false && alpha_byte == false &&
+       opa == LV_OPA_COVER && style->image.intense == LV_OPA_TRANSP) {
+        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, LV_OPA_COVER, style->image.blend_mode);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
@@ -377,14 +388,30 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         }
 
 
-        lv_img_rotate_dsc_t rotate_dsc;
-        memset(&rotate_dsc, 0, sizeof(lv_img_rotate_dsc_t));
-        if(angle) {
+        bool transform = angle != 0 || zoom != LV_IMG_ZOOM_NONE ? true : false;
+        lv_img_transform_dsc_t trans_dsc;
+        memset(&trans_dsc, 0, sizeof(lv_img_transform_dsc_t));
+        if(transform) {
             lv_img_cf_t cf = LV_IMG_CF_TRUE_COLOR;
             if(alpha_byte) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
             else if(chroma_key) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
-            lv_img_buf_rotate_init(&rotate_dsc, angle, map_p, map_w, map_h, cf, map_w/2, map_h / 2, LV_COLOR_BLACK);
+
+
+            trans_dsc.cfg.angle = angle;
+            trans_dsc.cfg.zoom = zoom;
+            trans_dsc.cfg.src = map_p;
+            trans_dsc.cfg.src_w = map_w;
+            trans_dsc.cfg.src_h = map_h;
+            trans_dsc.cfg.cf = cf;
+            trans_dsc.cfg.pivot_x = map_w / 2;
+            trans_dsc.cfg.pivot_y = map_h / 2;
+            trans_dsc.cfg.color = style->image.color;
+            trans_dsc.cfg.antialias = antialaias;
+
+            lv_img_buf_transform_init(&trans_dsc);
         }
+
+
         lv_draw_mask_res_t mask_res;
         mask_res = (alpha_byte || chroma_key || angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
         lv_coord_t x;
@@ -395,7 +422,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
             for(x = 0; x < lv_area_get_width(&draw_area); x++, map_px += px_size_byte, px_i++) {
 
-                if(angle == 0) {
+                if(transform == false) {
                     if(alpha_byte) {
                         lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
                         mask_buf[px_i] = px_opa;
@@ -422,13 +449,13 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                     bool ret;
                     lv_coord_t rot_x = x + (disp_area->x1 + draw_area.x1) - map_area->x1;
                     lv_coord_t rot_y = y + (disp_area->y1 + draw_area.y1) - map_area->y1;
-                    ret = lv_img_buf_get_px_rotated(&rotate_dsc, rot_x, rot_y);
+                    ret = lv_img_buf_transform(&trans_dsc, rot_x, rot_y);
                     if(ret == false) {
                         mask_buf[px_i] = LV_OPA_TRANSP;
                         continue;
                     } else {
-                        mask_buf[px_i] = rotate_dsc.res_opa;
-                        c.full = rotate_dsc.res_color.full;
+                        mask_buf[px_i] = trans_dsc.res.opa;
+                        c.full = trans_dsc.res.color.full;
                     }
                 }
 
