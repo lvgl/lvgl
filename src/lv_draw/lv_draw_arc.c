@@ -55,7 +55,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
     circle_style.body.border.width = style->line.width;
     circle_style.body.border.color = style->line.color;
 
-    lv_draw_mask_param_t mask_angle_param;
+    lv_draw_mask_angle_param_t mask_angle_param;
     lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, start_angle, end_angle);
 
     int16_t mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);

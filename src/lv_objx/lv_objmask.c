@@ -8,6 +8,7 @@
  *********************/
 #include "lv_objmask.h"
 #include "../lv_core/lv_debug.h"
+#include "../lv_draw/lv_draw.h"
 
 #if defined(LV_USE_OBJMASK) && LV_USE_OBJMASK != 0
 
@@ -91,14 +92,34 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
  * Add/remove functions
  *=====================*/
 
-void lv_objmask_add_mask(lv_obj_t * objmask, lv_draw_mask_param_t * param, uint8_t id)
+void lv_objmask_add_mask(lv_obj_t * objmask, void * param, uint8_t id)
 {
     lv_objmask_ext_t * ext = lv_obj_get_ext_attr(objmask);
 
-    lv_objmask_mask_t * m = lv_ll_ins_head(&ext->mask_ll);
+    lv_draw_mask_common_dsc_t * dsc = param;
+    uint16_t param_size;
+    switch(dsc->type) {
+        case LV_DRAW_MASK_TYPE_LINE: param_size = sizeof(lv_draw_mask_line_param_t); break;
+        case LV_DRAW_MASK_TYPE_ANGLE: param_size = sizeof(lv_draw_mask_angle_param_t); break;
+        case LV_DRAW_MASK_TYPE_RADIUS: param_size = sizeof(lv_draw_mask_radius_param_t); break;
+        case LV_DRAW_MASK_TYPE_FADE: param_size = sizeof(lv_draw_mask_fade_param_t); break;
+        case LV_DRAW_MASK_TYPE_MAP: param_size = sizeof(lv_draw_mask_map_param_t); break;
+        default: param_size = 0;
+    }
 
-    memcpy(&m->param, param, sizeof(lv_draw_mask_param_t));
+
+    lv_objmask_mask_t * m = lv_ll_ins_head(&ext->mask_ll);
+    m->param = lv_mem_alloc(param_size);
+    LV_ASSERT_MEM(m->param);
+    if(m == NULL) return;
+
+    memcpy(m->param, param, param_size);
+
     m->id = id;
+
+
+
+
 }
 
 /*=====================
@@ -146,16 +167,89 @@ static lv_design_res_t lv_objmask_design(lv_obj_t * objmask, const lv_area_t * c
         ancestor_design(objmask, clip_area, mode);
 
         lv_objmask_ext_t * ext = lv_obj_get_ext_attr(objmask);
+
+        lv_coord_t xofs = objmask->coords.x1;
+        lv_coord_t yofs = objmask->coords.y1;
+
         lv_objmask_mask_t * m;
 
         LV_LL_READ(ext->mask_ll, m) {
-            lv_draw_mask_add(&m->param, &ext->mask_ll);
+            lv_draw_mask_common_dsc_t * dsc = m->param;
+
+            if(dsc->type == LV_DRAW_MASK_TYPE_LINE) {
+                lv_draw_mask_line_param_t * p_ori = m->param;
+                lv_draw_mask_line_param_t * p_new = lv_draw_buf_get(sizeof(lv_draw_mask_line_param_t));
+
+                lv_draw_mask_line_points_init(p_new, p_ori->cfg.p1.x + xofs, p_ori->cfg.p1.y + yofs,
+                                                     p_ori->cfg.p2.x + xofs, p_ori->cfg.p2.y + yofs,
+                                                     p_ori->cfg.side);
+                lv_draw_mask_add(p_new, m->param);
+            }
+            else if(dsc->type == LV_DRAW_MASK_TYPE_ANGLE) {
+                lv_draw_mask_angle_param_t * p_ori = m->param;
+                lv_draw_mask_angle_param_t * p_new = lv_draw_buf_get(sizeof(lv_draw_mask_angle_param_t));
+
+                lv_draw_mask_angle_init(p_new, p_ori->cfg.vertex_p.x + xofs, p_ori->cfg.vertex_p.y + yofs,
+                                                     p_ori->cfg.start_angle, p_ori->cfg.end_angle);
+                lv_draw_mask_add(p_new, m->param);
+            }
+            else if(dsc->type == LV_DRAW_MASK_TYPE_RADIUS) {
+                lv_draw_mask_radius_param_t * p_ori = m->param;
+                lv_draw_mask_radius_param_t * p_new = lv_draw_buf_get(sizeof(lv_draw_mask_radius_param_t));
+
+                lv_area_t rect;
+                rect.x1 = p_ori->cfg.rect.x1 + xofs;
+                rect.y1 = p_ori->cfg.rect.y1 + yofs;
+                rect.x2 = p_ori->cfg.rect.x2 + xofs;
+                rect.y2 = p_ori->cfg.rect.y2 + yofs;
+
+                lv_draw_mask_radius_init(p_new, &rect, p_ori->cfg.radius, p_ori->cfg.outer);
+                lv_draw_mask_add(p_new, m->param);
+            }
+            else if(dsc->type == LV_DRAW_MASK_TYPE_FADE) {
+                lv_draw_mask_fade_param_t * p_ori = m->param;
+                lv_draw_mask_fade_param_t * p_new = lv_draw_buf_get(sizeof(lv_draw_mask_fade_param_t));
+
+                lv_area_t rect;
+                rect.x1 = p_ori->cfg.coords.x1 + xofs;
+                rect.y1 = p_ori->cfg.coords.y1 + yofs;
+                rect.x2 = p_ori->cfg.coords.x2 + xofs;
+                rect.y2 = p_ori->cfg.coords.y2 + yofs;
+
+                lv_draw_mask_fade_init(p_new, &rect, p_ori->cfg.opa_top, p_ori->cfg.y_top + yofs,
+                                                     p_ori->cfg.opa_bottom, p_ori->cfg.y_bottom + yofs);
+                lv_draw_mask_add(p_new, m->param);
+            }
+            else if(dsc->type == LV_DRAW_MASK_TYPE_MAP) {
+                lv_draw_mask_map_param_t * p_ori = m->param;
+                lv_draw_mask_map_param_t * p_new = lv_draw_buf_get(sizeof(lv_draw_mask_map_param_t));
+
+                lv_area_t rect;
+                rect.x1 = p_ori->cfg.coords.x1 + xofs;
+                rect.y1 = p_ori->cfg.coords.y1 + yofs;
+                rect.x2 = p_ori->cfg.coords.x2 + xofs;
+                rect.y2 = p_ori->cfg.coords.y2 + yofs;
+
+                lv_draw_mask_map_init(p_new, &rect, p_ori->cfg.map);
+                lv_draw_mask_add(p_new, m->param);
+            }
+
+
         }
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
         lv_objmask_ext_t * ext = lv_obj_get_ext_attr(objmask);
-        lv_draw_mask_remove_custom(&ext->mask_ll);
+
+
+        lv_objmask_mask_t * m;
+
+        LV_LL_READ(ext->mask_ll, m) {
+            void * param;
+            param = lv_draw_mask_remove_custom(m->param);
+            lv_draw_buf_release(param);
+        }
+
     }
 
     return LV_DESIGN_RES_OK;
@@ -178,14 +272,14 @@ static lv_res_t lv_objmask_signal(lv_obj_t * objmask, lv_signal_t sign, void * p
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
-        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
+        lv_objmask_ext_t * ext = lv_obj_get_ext_attr(objmask);
+        lv_objmask_mask_t * i;
+        LV_LL_READ(ext->mask_ll, i) {
+            if(i->param) {
+                lv_mem_free(i->param);
+                i->param = NULL;
+            }
         }
-        buf->type[i] = "lv_objmask";
     }
 
     return res;

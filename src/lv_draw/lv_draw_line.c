@@ -275,10 +275,10 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     bool is_common = lv_area_intersect(&draw_area, &draw_area, clip);
     if(is_common == false) return;
 
-    lv_draw_mask_param_t mask_left_param;
-    lv_draw_mask_param_t mask_right_param;
-    lv_draw_mask_param_t mask_top_param;
-    lv_draw_mask_param_t mask_bottom_param;
+    lv_draw_mask_line_param_t mask_left_param;
+    lv_draw_mask_line_param_t mask_right_param;
+    lv_draw_mask_line_param_t mask_top_param;
+    lv_draw_mask_line_param_t mask_bottom_param;
 
     if(flat) {
         if(xdiff > 0) {

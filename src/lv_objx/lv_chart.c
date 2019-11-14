@@ -1115,7 +1115,7 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
     lv_style_copy(&style, &lv_style_plain);
 
    int16_t mask_fade_id = LV_MASK_ID_INV;
-   lv_draw_mask_param_t mask_fade_p;
+   lv_draw_mask_fade_param_t mask_fade_p;
    if(ext->type & LV_CHART_TYPE_AREA_FADED) {
        lv_draw_mask_fade_init(&mask_fade_p, &chart->coords, LV_OPA_COVER, chart->coords.y1 + (h >> 2), LV_OPA_TRANSP, chart->coords.y2 - (h >> 2));
        mask_fade_id = lv_draw_mask_add(&mask_fade_p, NULL);
@@ -1150,7 +1150,7 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
 
             if(ser->points[p_prev] != LV_CHART_POINT_DEF && ser->points[p_act] != LV_CHART_POINT_DEF) {
                 int16_t mask_line_id;
-                lv_draw_mask_param_t mask_line_p;
+                lv_draw_mask_line_param_t mask_line_p;
                 lv_draw_mask_line_points_init(&mask_line_p, p1.x, p1.y, p2.x, p2.y, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
                 mask_line_id = lv_draw_mask_add(&mask_line_p, NULL);
 

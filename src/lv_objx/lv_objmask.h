@@ -33,8 +33,7 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_draw_mask_param_t param;
-    lv_draw_mask_cb_t mask_cb;
+    void * param;
     uint8_t id;
 }lv_objmask_mask_t;
 
@@ -68,7 +67,7 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy);
 /*======================
  * Add/remove functions
  *=====================*/
-void lv_objmask_add_mask(lv_obj_t * objmask, lv_draw_mask_param_t * param,  uint8_t id);
+void lv_objmask_add_mask(lv_obj_t * objmask, void * param,  uint8_t id);
 
 /*=====================
  * Setter functions

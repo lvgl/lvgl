@@ -21,19 +21,18 @@
  **********************/
 typedef struct
 {
-    lv_draw_mask_param_t * param;
+    void * param;
     void * custom_id;
 }lv_mask_saved_t;
-
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param);
-static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param);
-static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param);
-static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param);
-static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param);
+static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_line_param_t * param);
+static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_radius_param_t * param);
+static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_angle_param_t * param);
+static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_fade_param_t * param);
+static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_map_param_t * param);
 
 static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_line_param_t * p);
 static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_line_param_t * p);
@@ -59,9 +58,9 @@ static lv_mask_saved_t mask_list[LV_MASK_MAX_NUM];
  * @param custom_id a custom pointer to identify the mask. Used in `lv_draw_mask_remove_custom`.
  * @return the an integer, the ID of the mask. Can be used in `lv_draw_mask_remove_id`.
  */
-int16_t lv_draw_mask_add(lv_draw_mask_param_t * param, void * custom_id)
+int16_t lv_draw_mask_add(void * param, void * custom_id)
 {
-    /*Search a free entry*/
+    /*Look for a free entry*/
     uint8_t i;
     for(i = 0; i < LV_MASK_MAX_NUM; i++) {
         if(mask_list[i].param == NULL) break;
@@ -92,11 +91,14 @@ int16_t lv_draw_mask_add(lv_draw_mask_param_t * param, void * custom_id)
 lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len)
 {
     bool changed = false;
+    lv_draw_mask_common_dsc_t * dsc;
+
     lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;
     uint8_t i;
     for(i = 0; i < LV_MASK_MAX_NUM; i++) {
         if(mask_list[i].param) {
-            res = mask_list[i].param->line.cb(mask_buf, abs_x, abs_y, len, (void*)mask_list[i].param);
+            dsc = mask_list[i].param;
+            res = dsc->cb(mask_buf, abs_x, abs_y, len, (void*)mask_list[i].param);
             if(res == LV_DRAW_MASK_RES_FULL_TRANSP) return LV_DRAW_MASK_RES_FULL_TRANSP;
             else if(res == LV_DRAW_MASK_RES_CHANGED) changed = true;
         }
@@ -111,9 +113,9 @@ lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_
  * @return the parameter of the removed mask.
  * If more masks have `custom_id` ID then the last mask's parameter will be returned
  */
-lv_draw_mask_param_t * lv_draw_mask_remove_id(int16_t id)
+void * lv_draw_mask_remove_id(int16_t id)
 {
-    lv_draw_mask_param_t * p = NULL;
+    void * p = NULL;
 
     if(id != LV_MASK_ID_INV) {
         p = mask_list[id].param;
@@ -121,7 +123,7 @@ lv_draw_mask_param_t * lv_draw_mask_remove_id(int16_t id)
         mask_list[id].custom_id = NULL;
     }
 
-    return NULL;
+    return p;
 }
 
 /**
@@ -130,9 +132,9 @@ lv_draw_mask_param_t * lv_draw_mask_remove_id(int16_t id)
  * @return return the parameter of the removed mask.
  * If more masks have `custom_id` ID then the last mask's parameter will be returned
  */
-lv_draw_mask_param_t * lv_draw_mask_remove_custom(void * custom_id)
+void * lv_draw_mask_remove_custom(void * custom_id)
 {
-    lv_draw_mask_param_t * p = NULL;
+    void * p = NULL;
     uint8_t i;
     for(i = 0; i < LV_MASK_MAX_NUM; i++) {
         if(mask_list[i].custom_id == custom_id) {
@@ -169,10 +171,9 @@ uint8_t lv_draw_mask_get_cnt(void)
  * With `LV_DRAW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
  * With `LV_DRAW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
  */
-void lv_draw_mask_line_points_init(lv_draw_mask_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_draw_mask_line_side_t side)
+void lv_draw_mask_line_points_init(lv_draw_mask_line_param_t * param, lv_coord_t p1x, lv_coord_t p1y, lv_coord_t p2x, lv_coord_t p2y, lv_draw_mask_line_side_t side)
 {
-    lv_draw_mask_line_param_t * p = &param->line;
-    memset(p, 0x00, sizeof(lv_draw_mask_line_param_t));
+    memset(param, 0x00, sizeof(lv_draw_mask_line_param_t));
 
     if(p1y > p2y) {
         lv_coord_t t;
@@ -185,60 +186,66 @@ void lv_draw_mask_line_points_init(lv_draw_mask_param_t * param, lv_coord_t p1x,
         p1y = t;
     }
 
-    p->origo.x = p1x;
-    p->origo.y = p1y;
-    p->side = side;
-    p->flat = (LV_MATH_ABS(p2x-p1x) > LV_MATH_ABS(p2y-p1y)) ? 1 : 0;
-    p->yx_steep = 0;
-    p->xy_steep = 0;
-    p->cb = lv_draw_mask_line;
+    param->cfg.p1.x = p1x;
+    param->cfg.p1.y = p1y;
+    param->cfg.p2.x = p1x;
+    param->cfg.p2.y = p1y;
+    param->cfg.side = side;
+
+    param->origo.x = p1x;
+    param->origo.y = p1y;
+    param->flat = (LV_MATH_ABS(p2x-p1x) > LV_MATH_ABS(p2y-p1y)) ? 1 : 0;
+    param->yx_steep = 0;
+    param->xy_steep = 0;
+    param->dsc.cb = (lv_draw_mask_cb_t)lv_draw_mask_line;
+    param->dsc.type = LV_DRAW_MASK_TYPE_LINE;
 
     lv_coord_t dx = p2x-p1x;
     lv_coord_t dy = p2y-p1y;
 
-    if(p->flat) {
+    if(param->flat) {
         /*Normalize the steep. Delta x should be relative to delta x = 1024*/
         int32_t m;
 
         if(dx) {
             m = (1 << 20) / dx;  /*m is multiplier to normalize y (upscaled by 1024)*/
-            p->yx_steep = (m * dy) >> 10;
+            param->yx_steep = (m * dy) >> 10;
         }
 
         if(dy) {
             m = (1 << 20) / dy;  /*m is multiplier to normalize x (upscaled by 1024)*/
-            p->xy_steep = (m * dx) >> 10;
+            param->xy_steep = (m * dx) >> 10;
         }
-        p->steep = p->yx_steep;
+        param->steep = param->yx_steep;
     } else {
         /*Normalize the steep. Delta y should be relative to delta x = 1024*/
         int32_t m;
 
         if(dy) {
             m = (1 << 20) / dy;  /*m is multiplier to normalize x (upscaled by 1024)*/
-            p->xy_steep = (m * dx) >> 10;
+            param->xy_steep = (m * dx) >> 10;
         }
 
         if(dx) {
             m = (1 << 20) / dx;  /*m is multiplier to normalize x (upscaled by 1024)*/
-            p->yx_steep = (m * dy) >> 10;
+            param->yx_steep = (m * dy) >> 10;
         }
-        p->steep = p->xy_steep;
+        param->steep = param->xy_steep;
     }
 
-    if(p->side == LV_DRAW_MASK_LINE_SIDE_LEFT) p->inv = 0;
-    else if(p->side == LV_DRAW_MASK_LINE_SIDE_RIGHT) p->inv = 1;
-    else if(p->side == LV_DRAW_MASK_LINE_SIDE_TOP) {
-        if(p->steep > 0) p->inv = 1;
-        else p->inv = 0;
+    if(param->cfg.side == LV_DRAW_MASK_LINE_SIDE_LEFT) param->inv = 0;
+    else if(param->cfg.side == LV_DRAW_MASK_LINE_SIDE_RIGHT) param->inv = 1;
+    else if(param->cfg.side == LV_DRAW_MASK_LINE_SIDE_TOP) {
+        if(param->steep > 0) param->inv = 1;
+        else param->inv = 0;
     }
-    else if(p->side == LV_DRAW_MASK_LINE_SIDE_BOTTOM) {
-        if(p->steep > 0) p->inv = 0;
-        else p->inv = 1;
+    else if(param->cfg.side == LV_DRAW_MASK_LINE_SIDE_BOTTOM) {
+        if(param->steep > 0) param->inv = 0;
+        else param->inv = 1;
     }
 
-    p->spx = p->steep >> 2;
-    if(p->steep < 0) p->spx = -p->spx;
+    param->spx = param->steep >> 2;
+    if(param->steep < 0) param->spx = -param->spx;
 }
 
 /**
@@ -251,7 +258,7 @@ void lv_draw_mask_line_points_init(lv_draw_mask_param_t * param, lv_coord_t p1x,
  * With `LV_DRAW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
  * With `LV_DRAW_MASK_LINE_SIDE_TOP/BOTTOM` and vertical line all pixels are kept
  */
-void lv_draw_mask_line_angle_init(lv_draw_mask_param_t * param, lv_coord_t p1x, lv_coord_t py, int16_t angle, lv_draw_mask_line_side_t side)
+void lv_draw_mask_line_angle_init(lv_draw_mask_line_param_t* param, lv_coord_t p1x, lv_coord_t py, int16_t angle, lv_draw_mask_line_side_t side)
 {
     /* Find an optimal degree.
      * lv_mask_line_points_init will swap the points to keep the smaller y in p1
@@ -278,10 +285,8 @@ void lv_draw_mask_line_angle_init(lv_draw_mask_param_t * param, lv_coord_t p1x, 
  * @param start_angle start angle in degrees. 0 deg on the right, 90 deg, on the bottom
  * @param end_angle end angle
  */
-void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t vertex_x, lv_coord_t vertex_y, lv_coord_t start_angle, lv_coord_t end_angle)
+void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vertex_x, lv_coord_t vertex_y, lv_coord_t start_angle, lv_coord_t end_angle)
 {
-    lv_draw_mask_angle_param_t * p = &param->angle;
-
     lv_draw_mask_line_side_t start_side;
     lv_draw_mask_line_side_t end_side;
 
@@ -297,16 +302,17 @@ void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t vertex_x, 
         end_angle = 359;
 
     if(end_angle < start_angle) {
-        p->delta_deg = 360 - start_angle + end_angle;
+        param->delta_deg = 360 - start_angle + end_angle;
     } else {
-        p->delta_deg = LV_MATH_ABS(end_angle - start_angle);
+        param->delta_deg = LV_MATH_ABS(end_angle - start_angle);
     }
 
-    p->start_angle = start_angle;
-    p->end_angle = end_angle;
-    p->vertex.x = vertex_x;
-    p->vertex.y = vertex_y;
-    p->cb = lv_draw_mask_angle;
+    param->cfg.start_angle = start_angle;
+    param->cfg.end_angle = end_angle;
+    param->cfg.vertex_p.x = vertex_x;
+    param->cfg.vertex_p.y = vertex_y;
+    param->dsc.cb = (lv_draw_mask_cb_t)lv_draw_mask_angle;
+    param->dsc.type = LV_DRAW_MASK_TYPE_ANGLE;
 
     if(start_angle >= 0 && start_angle < 180) {
         start_side = LV_DRAW_MASK_LINE_SIDE_LEFT;
@@ -326,8 +332,8 @@ void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t vertex_x, 
         LV_DEBUG_ASSERT(false, "Unexpected end_angle", end_angle);
     }
 
-    lv_draw_mask_line_angle_init((lv_draw_mask_param_t*)&p->start_line, vertex_x, vertex_y, start_angle, start_side);
-    lv_draw_mask_line_angle_init((lv_draw_mask_param_t*)&p->end_line, vertex_x, vertex_y, end_angle, end_side);
+    lv_draw_mask_line_angle_init(&param->start_line, vertex_x, vertex_y, start_angle, start_side);
+    lv_draw_mask_line_angle_init(&param->end_line, vertex_x, vertex_y, end_angle, end_side);
 }
 
 
@@ -338,17 +344,17 @@ void lv_draw_mask_angle_init(lv_draw_mask_param_t * param, lv_coord_t vertex_x, 
  * @param radius radius of the rectangle
  * @param inv: true: keep the pixels inside teh rectangle; keep teh pixels outside of the rectangle
  */
-void lv_draw_mask_radius_init(lv_draw_mask_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv)
+void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv)
 {
-    lv_draw_mask_radius_param_t * p = &param->radius;
 
     lv_coord_t short_side = LV_MATH_MIN(lv_area_get_width(rect), lv_area_get_height(rect));
     if(radius > short_side >> 1) radius = short_side >> 1;
 
-    lv_area_copy(&p->rect, rect);
-    p->radius = radius;
-    p->inv = inv ? 1 : 0;
-    p->cb = lv_draw_mask_radius;
+    lv_area_copy(&param->cfg.rect, rect);
+    param->cfg.radius = radius;
+    param->cfg.outer = inv ? 1 : 0;
+    param->dsc.cb = (lv_draw_mask_cb_t)lv_draw_mask_radius;
+    param->dsc.type = LV_DRAW_MASK_TYPE_RADIUS;
 }
 
 
@@ -361,16 +367,15 @@ void lv_draw_mask_radius_init(lv_draw_mask_param_t * param, const lv_area_t * re
  * @param opa_bottom opacity at the bottom
  * @param y_bottom at which coordinate reach `opa_bottom`.
  */
-void lv_draw_mask_fade_init(lv_draw_mask_param_t * param, lv_area_t * coords, lv_opa_t opa_top, lv_coord_t y_top, lv_opa_t opa_bottom, lv_coord_t y_bottom)
+void lv_draw_mask_fade_init(lv_draw_mask_fade_param_t * param, lv_area_t * coords, lv_opa_t opa_top, lv_coord_t y_top, lv_opa_t opa_bottom, lv_coord_t y_bottom)
 {
-    lv_draw_mask_fade_param_t * p = &param->fade;
-
-    lv_area_copy(&p->coords, coords);
-    p->opa_top= opa_top;
-    p->opa_bottom = opa_bottom;
-    p->y_top= y_top;
-    p->y_bottom = y_bottom;
-    p->cb = lv_draw_mask_fade;
+    lv_area_copy(&param->cfg.coords, coords);
+    param->cfg.opa_top= opa_top;
+    param->cfg.opa_bottom = opa_bottom;
+    param->cfg.y_top= y_top;
+    param->cfg.y_bottom = y_bottom;
+    param->dsc.cb = (lv_draw_mask_cb_t)lv_draw_mask_fade;
+    param->dsc.type = LV_DRAW_MASK_TYPE_FADE;
 }
 
 
@@ -380,13 +385,12 @@ void lv_draw_mask_fade_init(lv_draw_mask_param_t * param, lv_area_t * coords, lv
  * @param coords coordinates of the map (absolute coordinates)
  * @param map array of bytes with the mask values
  */
-void lv_draw_mask_map_init(lv_draw_mask_param_t * param, lv_area_t * coords, const lv_opa_t * map)
+void lv_draw_mask_map_init(lv_draw_mask_map_param_t * param, lv_area_t * coords, const lv_opa_t * map)
 {
-    lv_draw_mask_map_param_t * p = &param->map;
-
-    lv_area_copy(&p->coords, coords);
-    p->map = map;
-    p->cb = lv_draw_mask_map;
+    lv_area_copy(&param->cfg.coords, coords);
+    param->cfg.map = map;
+    param->dsc.cb = (lv_draw_mask_cb_t)lv_draw_mask_map;
+    param->dsc.type = LV_DRAW_MASK_TYPE_MAP;
 }
 
 
@@ -394,10 +398,8 @@ void lv_draw_mask_map_init(lv_draw_mask_param_t * param, lv_area_t * coords, con
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param)
+static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_line_param_t * p)
 {
-    lv_draw_mask_line_param_t * p = &param->line;
-
     /*Make to points relative to the vertex*/
     abs_y -= p->origo.y;
     abs_x -= p->origo.x;
@@ -407,9 +409,9 @@ static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_
         /*Horizontal*/
         if(p->flat) {
             /*Non sense: Can't be on the right/left of a horizontal line*/
-            if(p->side == LV_DRAW_MASK_LINE_SIDE_LEFT || p->side == LV_DRAW_MASK_LINE_SIDE_RIGHT) return LV_DRAW_MASK_RES_FULL_COVER;
-            else if(p->side == LV_DRAW_MASK_LINE_SIDE_TOP && abs_y+1 < 0) return LV_DRAW_MASK_RES_FULL_COVER;
-            else if(p->side == LV_DRAW_MASK_LINE_SIDE_BOTTOM && abs_y > 0) return LV_DRAW_MASK_RES_FULL_COVER;
+            if(p->cfg.side == LV_DRAW_MASK_LINE_SIDE_LEFT || p->cfg.side == LV_DRAW_MASK_LINE_SIDE_RIGHT) return LV_DRAW_MASK_RES_FULL_COVER;
+            else if(p->cfg.side == LV_DRAW_MASK_LINE_SIDE_TOP && abs_y+1 < 0) return LV_DRAW_MASK_RES_FULL_COVER;
+            else if(p->cfg.side == LV_DRAW_MASK_LINE_SIDE_BOTTOM && abs_y > 0) return LV_DRAW_MASK_RES_FULL_COVER;
             else {
                 return LV_DRAW_MASK_RES_FULL_TRANSP;
             }
@@ -417,9 +419,9 @@ static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_
         /*Vertical*/
         else {
             /*Non sense: Can't be on the top/bottom of a vertical line*/
-            if(p->side == LV_DRAW_MASK_LINE_SIDE_TOP || p->side == LV_DRAW_MASK_LINE_SIDE_BOTTOM) return LV_DRAW_MASK_RES_FULL_COVER;
-            else if(p->side == LV_DRAW_MASK_LINE_SIDE_RIGHT && abs_x > 0) return LV_DRAW_MASK_RES_FULL_COVER;
-            else if(p->side == LV_DRAW_MASK_LINE_SIDE_LEFT) {
+            if(p->cfg.side == LV_DRAW_MASK_LINE_SIDE_TOP || p->cfg.side == LV_DRAW_MASK_LINE_SIDE_BOTTOM) return LV_DRAW_MASK_RES_FULL_COVER;
+            else if(p->cfg.side == LV_DRAW_MASK_LINE_SIDE_RIGHT && abs_x > 0) return LV_DRAW_MASK_RES_FULL_COVER;
+            else if(p->cfg.side == LV_DRAW_MASK_LINE_SIDE_LEFT) {
                 if(abs_x + len < 0) return LV_DRAW_MASK_RES_FULL_COVER;
                 else {
                     int32_t k = - abs_x;
@@ -693,17 +695,17 @@ static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x,
 }
 
 
-static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param)
+static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_angle_param_t * p)
 {
-    lv_draw_mask_angle_param_t * p = &param->angle;
-
-    lv_coord_t rel_y = abs_y - p->vertex.y;
-    lv_coord_t rel_x = abs_x - p->vertex.x;
+    lv_coord_t rel_y = abs_y - p->cfg.vertex_p.y;
+    lv_coord_t rel_x = abs_x - p->cfg.vertex_p.x;
 
 
-    if(p->start_angle < 180 && p->end_angle < 180 && p->start_angle != 0  && p->end_angle != 0 && p->start_angle > p->end_angle) {
+    if(p->cfg.start_angle < 180 && p->cfg.end_angle < 180 &&
+       p->cfg.start_angle != 0  && p->cfg.end_angle != 0 &&
+       p->cfg.start_angle > p->cfg.end_angle) {
 
-        if(abs_y < p->vertex.y) {
+        if(abs_y < p->cfg.vertex_p.y) {
             return LV_DRAW_MASK_RES_FULL_COVER;
         }
 
@@ -713,13 +715,13 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
 
 
         /*Do not let the line end cross the vertex else it will affect the opposite part*/
-        if(p->start_angle > 270 && p->start_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
-        else if(p->start_angle > 0 && p->start_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
-        else if(p->start_angle > 90 && p->start_angle < 270 && start_angle_last > 0) start_angle_last = 0;
+        if(p->cfg.start_angle > 270 && p->cfg.start_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->cfg.start_angle > 0 && p->cfg.start_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->cfg.start_angle > 90 && p->cfg.start_angle < 270 && start_angle_last > 0) start_angle_last = 0;
 
-        if(p->end_angle > 270 && p->end_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
-        else if(p->end_angle > 0 &&   p->end_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
-        else if(p->end_angle > 90 &&  p->end_angle < 270 && start_angle_last > 0) start_angle_last = 0;
+        if(p->cfg.end_angle > 270 && p->cfg.end_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->cfg.end_angle > 0 &&   p->cfg.end_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->cfg.end_angle > 90 &&  p->cfg.end_angle < 270 && start_angle_last > 0) start_angle_last = 0;
 
 
         int32_t dist = (end_angle_first - start_angle_last) >> 1;
@@ -730,7 +732,7 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         int32_t tmp = start_angle_last + dist - rel_x;
         if(tmp > len) tmp = len;
         if(tmp > 0) {
-            res1 = lv_draw_mask_line(&mask_buf[0], abs_x, abs_y, tmp, (lv_draw_mask_param_t*)&p->start_line);
+            res1 = lv_draw_mask_line(&mask_buf[0], abs_x, abs_y, tmp, &p->start_line);
             if(res1 == LV_DRAW_MASK_RES_FULL_TRANSP) {
                 memset(&mask_buf[0], 0x00, tmp);
             }
@@ -738,16 +740,16 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
 
         if(tmp > len) tmp = len;
         if(tmp < 0) tmp = 0;
-        res2 = lv_draw_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, (lv_draw_mask_param_t*)&p->end_line);
+        res2 = lv_draw_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, &p->end_line);
         if(res2 == LV_DRAW_MASK_RES_FULL_TRANSP) {
             memset(&mask_buf[tmp], 0x00, len-tmp);
         }
         if(res1 == res2) return res1;
         else return LV_DRAW_MASK_RES_CHANGED;
     }
-    else if(p->start_angle > 180 && p->end_angle > 180 && p->start_angle > p->end_angle) {
+    else if(p->cfg.start_angle > 180 && p->cfg.end_angle > 180 && p->cfg.start_angle > p->cfg.end_angle) {
 
-        if(abs_y > p->vertex.y) {
+        if(abs_y > p->cfg.vertex_p.y) {
             return LV_DRAW_MASK_RES_FULL_COVER;
         }
 
@@ -756,13 +758,13 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         lv_coord_t start_angle_last= ((rel_y+1) * p->start_line.xy_steep) >> 10;
 
         /*Do not let the line end cross the vertex else it will affect the opposite part*/
-        if(p->start_angle > 270 && p->start_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
-        else if(p->start_angle > 0 && p->start_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
-        else if(p->start_angle > 90 && p->start_angle < 270 && start_angle_last > 0) start_angle_last = 0;
+        if(p->cfg.start_angle > 270 && p->cfg.start_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->cfg.start_angle > 0 && p->cfg.start_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->cfg.start_angle > 90 && p->cfg.start_angle < 270 && start_angle_last > 0) start_angle_last = 0;
 
-        if(p->end_angle > 270 && p->end_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
-        else if(p->end_angle > 0 &&   p->end_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
-        else if(p->end_angle > 90 &&  p->end_angle < 270 && start_angle_last > 0) start_angle_last = 0;
+        if(p->cfg.end_angle > 270 && p->cfg.end_angle <= 359 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->cfg.end_angle > 0 &&   p->cfg.end_angle <= 90 && start_angle_last < 0) start_angle_last = 0;
+        else if(p->cfg.end_angle > 90 &&  p->cfg.end_angle < 270 && start_angle_last > 0) start_angle_last = 0;
 
         int32_t dist = (end_angle_first - start_angle_last) >> 1;
 
@@ -772,7 +774,7 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         int32_t tmp = start_angle_last + dist - rel_x;
         if(tmp > len) tmp = len;
         if(tmp > 0) {
-            res1 = lv_draw_mask_line(&mask_buf[0], abs_x, abs_y, tmp, (lv_draw_mask_param_t*)&p->end_line);
+            res1 = lv_draw_mask_line(&mask_buf[0], abs_x, abs_y, tmp, (lv_draw_mask_line_param_t*)&p->end_line);
             if(res1 == LV_DRAW_MASK_RES_FULL_TRANSP) {
                 memset(&mask_buf[0], 0x00, tmp);
             }
@@ -780,7 +782,7 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
 
         if(tmp > len) tmp = len;
         if(tmp < 0) tmp = 0;
-        res2 = lv_draw_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, (lv_draw_mask_param_t*)&p->start_line);
+        res2 = lv_draw_mask_line(&mask_buf[tmp], abs_x+tmp, abs_y, len-tmp, (lv_draw_mask_line_param_t*)&p->start_line);
         if(res2 == LV_DRAW_MASK_RES_FULL_TRANSP) {
             memset(&mask_buf[tmp], 0x00, len-tmp);
         }
@@ -792,36 +794,36 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         lv_draw_mask_res_t res1 = LV_DRAW_MASK_RES_FULL_COVER;
         lv_draw_mask_res_t res2 = LV_DRAW_MASK_RES_FULL_COVER;
 
-        if(p->start_angle == 180) {
-            if(abs_y < p->vertex.y) res1 = LV_DRAW_MASK_RES_FULL_COVER;
+        if(p->cfg.start_angle == 180) {
+            if(abs_y < p->cfg.vertex_p.y) res1 = LV_DRAW_MASK_RES_FULL_COVER;
             else res1 = LV_DRAW_MASK_RES_UNKNOWN;
         }
-        else if(p->start_angle == 0) {
-            if(abs_y < p->vertex.y) res1 = LV_DRAW_MASK_RES_UNKNOWN;
+        else if(p->cfg.start_angle == 0) {
+            if(abs_y < p->cfg.vertex_p.y) res1 = LV_DRAW_MASK_RES_UNKNOWN;
             else res1 = LV_DRAW_MASK_RES_FULL_COVER;
         }
-        else if((p->start_angle < 180 && abs_y < p->vertex.y) ||
-                (p->start_angle > 180 && abs_y >= p->vertex.y)) {
+        else if((p->cfg.start_angle < 180 && abs_y < p->cfg.vertex_p.y) ||
+                (p->cfg.start_angle > 180 && abs_y >= p->cfg.vertex_p.y)) {
             res1 = LV_DRAW_MASK_RES_UNKNOWN;
         }
         else  {
-            res1 = lv_draw_mask_line(mask_buf, abs_x, abs_y, len, (lv_draw_mask_param_t*)&p->start_line);
+            res1 = lv_draw_mask_line(mask_buf, abs_x, abs_y, len, &p->start_line);
         }
 
-        if(p->end_angle == 180) {
-            if(abs_y < p->vertex.y) res2 = LV_DRAW_MASK_RES_UNKNOWN;
+        if(p->cfg.end_angle == 180) {
+            if(abs_y < p->cfg.vertex_p.y) res2 = LV_DRAW_MASK_RES_UNKNOWN;
             else res2 = LV_DRAW_MASK_RES_FULL_COVER;
         }
-        else if(p->end_angle == 0) {
-            if(abs_y < p->vertex.y) res2 = LV_DRAW_MASK_RES_FULL_COVER;
+        else if(p->cfg.end_angle == 0) {
+            if(abs_y < p->cfg.vertex_p.y) res2 = LV_DRAW_MASK_RES_FULL_COVER;
             else res2 = LV_DRAW_MASK_RES_UNKNOWN;
         }
-        else if((p->end_angle < 180 && abs_y < p->vertex.y) ||
-                (p->end_angle > 180 && abs_y >= p->vertex.y)) {
+        else if((p->cfg.end_angle < 180 && abs_y < p->cfg.vertex_p.y) ||
+                (p->cfg.end_angle > 180 && abs_y >= p->cfg.vertex_p.y)) {
             res2 = LV_DRAW_MASK_RES_UNKNOWN;
         }
         else {
-            res2 = lv_draw_mask_line(mask_buf, abs_x, abs_y, len, (lv_draw_mask_param_t*)&p->end_line);
+            res2 = lv_draw_mask_line(mask_buf, abs_x, abs_y, len, &p->end_line);
         }
 
         if(res1 == LV_DRAW_MASK_RES_FULL_TRANSP || res2 == LV_DRAW_MASK_RES_FULL_TRANSP) return LV_DRAW_MASK_RES_FULL_TRANSP;
@@ -831,31 +833,29 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
     }
 }
 
-static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param)
+static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_radius_param_t * p)
 {
-    lv_draw_mask_radius_param_t * p = &param->radius;
-
-    if(p->inv == 0) {
-        if(abs_y < p->rect.y1 || abs_y > p->rect.y2) {
+    if(p->cfg.outer == 0) {
+        if(abs_y < p->cfg.rect.y1 || abs_y > p->cfg.rect.y2) {
             return LV_DRAW_MASK_RES_FULL_TRANSP;
         }
     } else {
-        if(abs_y < p->rect.y1 || abs_y > p->rect.y2) {
+        if(abs_y < p->cfg.rect.y1 || abs_y > p->cfg.rect.y2) {
             return LV_DRAW_MASK_RES_FULL_COVER;
         }
     }
 
-    if((abs_x >= p->rect.x1 + p->radius && abs_x + len <= p->rect.x2 - p->radius) ||
-            (abs_y >= p->rect.y1 + p->radius && abs_y <= p->rect.y2 - p->radius)) {
-        if(p->inv == 0) {
+    if((abs_x >= p->cfg.rect.x1 + p->cfg.radius && abs_x + len <= p->cfg.rect.x2 - p->cfg.radius) ||
+            (abs_y >= p->cfg.rect.y1 + p->cfg.radius && abs_y <= p->cfg.rect.y2 - p->cfg.radius)) {
+        if(p->cfg.outer == 0) {
             /*Remove the edges*/
-            int32_t last =  p->rect.x1 - abs_x;
+            int32_t last =  p->cfg.rect.x1 - abs_x;
             if(last > len) return LV_DRAW_MASK_RES_FULL_TRANSP;
             if(last >= 0) {
                 memset(&mask_buf[0], 0x00, last);
             }
 
-            int32_t first = p->rect.x2 - abs_x + 1;
+            int32_t first = p->cfg.rect.x2 - abs_x + 1;
             if(first <= 0) return LV_DRAW_MASK_RES_FULL_TRANSP;
             else if(first < len) {
                 memset(&mask_buf[first], 0x00, len-first);
@@ -864,10 +864,10 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
             else return LV_DRAW_MASK_RES_CHANGED;
         }
         else {
-            int32_t first = p->rect.x1 - abs_x;
+            int32_t first = p->cfg.rect.x1 - abs_x;
             if(first < 0) first = 0;
             if(first <= len) {
-                int32_t last =  p->rect.x2 - abs_x - first + 1;
+                int32_t last =  p->cfg.rect.x2 - abs_x - first + 1;
                 if(first + last > len) last = len - first;
                 if(last >= 0) {
                     memset(&mask_buf[first], 0x00, last);
@@ -877,20 +877,20 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
         return LV_DRAW_MASK_RES_CHANGED;
     }
 
-    int32_t k = p->rect.x1 -abs_x; /*First relevant coordinate on the of the mask*/
-    lv_coord_t w = lv_area_get_width(&p->rect);
-    lv_coord_t h = lv_area_get_height(&p->rect);
-    abs_x -= p->rect.x1;
-    abs_y -= p->rect.y1;
+    int32_t k = p->cfg.rect.x1 -abs_x; /*First relevant coordinate on the of the mask*/
+    lv_coord_t w = lv_area_get_width(&p->cfg.rect);
+    lv_coord_t h = lv_area_get_height(&p->cfg.rect);
+    abs_x -= p->cfg.rect.x1;
+    abs_y -= p->cfg.rect.y1;
 
-    uint32_t r2 = p->radius * p->radius;
+    uint32_t r2 = p->cfg.radius * p->cfg.radius;
 
     /*Handle corner areas*/
-    if(abs_y < p->radius || abs_y > h - p->radius - 1) {
+    if(abs_y < p->cfg.radius || abs_y > h - p->cfg.radius - 1) {
         /* y = 0 should mean the top of the circle */
         lv_coord_t y;
-        if(abs_y < p->radius)  y = p->radius - abs_y;
-        else y = p->radius - (h - abs_y) + 1;
+        if(abs_y < p->cfg.radius)  y = p->cfg.radius - abs_y;
+        else y = p->cfg.radius - (h - abs_y) + 1;
 
         /* Get the x intersection points for `abs_y` and `abs_y+1`
          * Use the circle's equation x = sqrt(r^2 - y^2) */
@@ -910,8 +910,8 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
         /*If the two x intersections are on the same x then just get average of the fractionals*/
         if(x0.i == x1.i) {
             lv_opa_t m = (x0.f + x1.f) >> 1;
-            if(p->inv) m = 255 - m;
-            int32_t ofs = p->radius - x0.i - 1;
+            if(p->cfg.outer) m = 255 - m;
+            int32_t ofs = p->cfg.radius - x0.i - 1;
 
             /*Left corner*/
             int32_t kl = k + ofs;
@@ -927,7 +927,7 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
             }
 
             /*Clear the unused parts*/
-            if(p->inv == 0) {
+            if(p->cfg.outer == 0) {
                 kr++;
                 if(kl > len)  {
                     return LV_DRAW_MASK_RES_FULL_TRANSP;
@@ -955,11 +955,11 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
         }
         /*Multiple pixels are affected. Get y intersection of the pixels*/
         else {
-            int32_t ofs = p->radius - (x0.i + 1);
+            int32_t ofs = p->cfg.radius - (x0.i + 1);
             int32_t kl = k + ofs;
             int32_t kr = k + (w - ofs -1);
 
-            if(p->inv) {
+            if(p->cfg.outer) {
                 int32_t first = kl + 1;
                 if(first < 0) first = 0;
 
@@ -987,7 +987,7 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
                 lv_sqrt(r2 - (i * i), &y_next);
                 m = 255 - (((255-x0.f) * (255 - y_next.f)) >> 9);
 
-                if(p->inv) m = 255 - m;
+                if(p->cfg.outer) m = 255 - m;
                 if(kl >= 0 && kl < len) mask_buf[kl] = mask_mix(mask_buf[kl], m);
                 if(kr >= 0 && kr < len) mask_buf[kr] = mask_mix(mask_buf[kr], m);
                 kl--;
@@ -1001,7 +1001,7 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
                 lv_sqrt(r2 - (i * i), &y_next);
 
                 m = (y_prev.f + y_next.f) >> 1;
-                if(p->inv) m = 255 - m;
+                if(p->cfg.outer) m = 255 - m;
                 if(kl >= 0 && kl < len) mask_buf[kl] = mask_mix(mask_buf[kl], m);
                 if(kr >= 0 && kr < len) mask_buf[kr] = mask_mix(mask_buf[kr], m);
                 kl--;
@@ -1013,14 +1013,14 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
              * the circle still has parts on the next one*/
             if(y_prev.f) {
                 m = (y_prev.f * x1.f) >> 9;
-                if(p->inv) m = 255 - m;
+                if(p->cfg.outer) m = 255 - m;
                 if(kl >= 0 && kl < len) mask_buf[kl] = mask_mix(mask_buf[kl], m);
                 if(kr >= 0 && kr < len) mask_buf[kr] = mask_mix(mask_buf[kr], m);
                 kl--;
                 kr++;
             }
 
-            if(p->inv == 0) {
+            if(p->cfg.outer == 0) {
                 kl++;
                 if(kl > len) {
                     return LV_DRAW_MASK_RES_FULL_TRANSP;
@@ -1039,42 +1039,40 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
 }
 
 
-static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param)
+static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_fade_param_t * p)
 {
-    lv_draw_mask_fade_param_t * p = &param->fade;
+    if(abs_y < p->cfg.coords.y1) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_y > p->cfg.coords.y2) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_x + len < p->cfg.coords.x1) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_x > p->cfg.coords.x2) return LV_DRAW_MASK_RES_FULL_COVER;
 
-    if(abs_y < p->coords.y1) return LV_DRAW_MASK_RES_FULL_COVER;
-    if(abs_y > p->coords.y2) return LV_DRAW_MASK_RES_FULL_COVER;
-    if(abs_x + len < p->coords.x1) return LV_DRAW_MASK_RES_FULL_COVER;
-    if(abs_x > p->coords.x2) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_x + len > p->cfg.coords.x2) len -= abs_x + len - p->cfg.coords.x2 - 1;
 
-    if(abs_x + len > p->coords.x2) len -= abs_x + len - p->coords.x2 - 1;
-
-    if(abs_x < p->coords.x1) {
+    if(abs_x < p->cfg.coords.x1) {
         lv_coord_t x_ofs = 0;
-        x_ofs = p->coords.x1 - abs_x;
+        x_ofs = p->cfg.coords.x1 - abs_x;
         len -= x_ofs;
         mask_buf += x_ofs;
     }
 
     lv_coord_t i;
 
-    if(abs_y <= p->y_top) {
+    if(abs_y <= p->cfg.y_top) {
         for(i = 0; i < len; i++) {
-            mask_buf[i] = mask_mix(mask_buf[i], p->opa_top);
+            mask_buf[i] = mask_mix(mask_buf[i], p->cfg.opa_top);
         }
         return LV_DRAW_MASK_RES_CHANGED;
-    } else if(abs_y >= p->y_bottom) {
+    } else if(abs_y >= p->cfg.y_bottom) {
         for(i = 0; i < len; i++) {
-            mask_buf[i] = mask_mix(mask_buf[i], p->opa_bottom);
+            mask_buf[i] = mask_mix(mask_buf[i], p->cfg.opa_bottom);
         }
         return LV_DRAW_MASK_RES_CHANGED;
     } else {
         /*Calculate the opa proportionally*/
-        int16_t opa_diff = p->opa_bottom - p->opa_top;
-        lv_coord_t y_diff = p->y_bottom - p->y_top + 1;
-        lv_opa_t opa_act = (int32_t)((int32_t)(abs_y - p->y_top) * opa_diff) / y_diff;
-        opa_act += p->opa_top;
+        int16_t opa_diff = p->cfg.opa_bottom - p->cfg.opa_top;
+        lv_coord_t y_diff = p->cfg.y_bottom - p->cfg.y_top + 1;
+        lv_opa_t opa_act = (int32_t)((int32_t)(abs_y - p->cfg.y_top) * opa_diff) / y_diff;
+        opa_act += p->cfg.opa_top;
 
         for(i = 0; i < len; i++) {
             mask_buf[i] = mask_mix(mask_buf[i], opa_act);
@@ -1086,30 +1084,28 @@ static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_
     return LV_DRAW_MASK_RES_FULL_COVER;
 }
 
-static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_param_t * param)
+static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len, lv_draw_mask_map_param_t * p)
 {
-    lv_draw_mask_map_param_t * p = &param->map;
-
     /*Handle out of the mask cases*/
-    if(abs_y < p->coords.y1) return LV_DRAW_MASK_RES_FULL_COVER;
-    if(abs_y > p->coords.y2) return LV_DRAW_MASK_RES_FULL_COVER;
-    if(abs_x + len < p->coords.x1) return LV_DRAW_MASK_RES_FULL_COVER;
-    if(abs_x > p->coords.x2) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_y < p->cfg.coords.y1) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_y > p->cfg.coords.y2) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_x + len < p->cfg.coords.x1) return LV_DRAW_MASK_RES_FULL_COVER;
+    if(abs_x > p->cfg.coords.x2) return LV_DRAW_MASK_RES_FULL_COVER;
 
     /*Got to the current row in the map*/
-    const lv_opa_t * map_tmp = p->map;
-    map_tmp += (abs_y - p->coords.y1) * lv_area_get_width(&p-> coords);
+    const lv_opa_t * map_tmp = p->cfg.map;
+    map_tmp += (abs_y - p->cfg.coords.y1) * lv_area_get_width(&p->cfg.coords);
 
 
-    if(abs_x + len > p->coords.x2) len -= abs_x + len - p->coords.x2 - 1;
+    if(abs_x + len > p->cfg.coords.x2) len -= abs_x + len - p->cfg.coords.x2 - 1;
 
-    if(abs_x < p->coords.x1) {
+    if(abs_x < p->cfg.coords.x1) {
         lv_coord_t x_ofs = 0;
-        x_ofs = p->coords.x1 - abs_x;
+        x_ofs = p->cfg.coords.x1 - abs_x;
         len -= x_ofs;
         mask_buf += x_ofs;
     } else {
-        map_tmp += (abs_x - p->coords.x1);
+        map_tmp += (abs_x - p->cfg.coords.x1);
     }
 
     lv_coord_t i;

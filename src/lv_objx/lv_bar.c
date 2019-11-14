@@ -550,7 +550,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mo
         mask_indic_max_area.y2 -= style_indic->body.padding.bottom;
 
         /*Create a mask to the current indicator area. This is see only this part from the whole gradient.*/
-        lv_draw_mask_param_t mask_indic_param;
+        lv_draw_mask_radius_param_t mask_indic_param;
         lv_draw_mask_radius_init(&mask_indic_param, &ext->indic_area, style_indic->body.radius, false);
         int16_t mask_indic_id = lv_draw_mask_add(&mask_indic_param, NULL);
 
