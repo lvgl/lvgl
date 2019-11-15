@@ -281,7 +281,7 @@ bool lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color)
     c32.full = lv_color_to32(color);
 
     return lv_cpicker_set_hsv(cpicker,
-            lv_color_rgb_to_hsv(LV_COLOR_GET_R(color), LV_COLOR_GET_G(color), LV_COLOR_GET_B(color)));
+            lv_color_rgb_to_hsv(c32.ch.red, c32.ch.green, c32.ch.blue));
 }
 
 /**
@@ -556,11 +556,11 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
     lv_style_t style;
     lv_style_copy(&style, style_main);
     style.line.width = (r * 628 / (360 / LV_CPICKER_DEF_QF)) / 100;
-    style.line.width += 3;
-
+    style.line.width += 2;
+    uint16_t i;
     lv_coord_t cir_w = style_main->line.width;
 
-    for(uint16_t i = 0; i <= 360; i+= LV_CPICKER_DEF_QF) {
+    for(i = 0; i <= 360; i+= LV_CPICKER_DEF_QF) {
 
         style.line.color = angle_to_mode_color(cpicker, i);
 
@@ -641,7 +641,8 @@ static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
     style.body.shadow.width = 0;
     style.body.opa = LV_OPA_COVER;
 
-    for(uint16_t i = 0; i < 360; i += i_step) {
+    uint16_t i;
+    for(i = 0; i < 360; i += i_step) {
         style.body.main_color = angle_to_mode_color(cpicker, i);
         style.body.grad_color = style.body.main_color;
 
