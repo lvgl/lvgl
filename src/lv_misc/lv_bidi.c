@@ -9,7 +9,7 @@
 #include <stddef.h>
 #include "lv_bidi.h"
 #include "lv_txt.h"
-#include "../lv_draw/lv_draw.h"
+#include "../lv_misc/lv_mem.h"
 
 #if LV_USE_BIDI
 
@@ -221,7 +221,7 @@ uint16_t lv_bidi_get_visual_pos(const char * str_in, char **bidi_txt, uint16_t l
     if (bidi_txt) *bidi_txt = buf;
 
     uint16_t *pos_conv_buf = (uint16_t*) ((char*)buf + len);
-    lv_bidi_process_paragraph(str_in, bidi_txt? *bidi_txt: NULL, len, base_dir, pos_conv_buf, pos_conv_len);
+    lv_bidi_process_paragraph(str_in, bidi_txt ? *bidi_txt: NULL, len, base_dir, pos_conv_buf, pos_conv_len);
     for (uint16_t i = 0; i < pos_conv_len; i++){
         if (GET_POS(pos_conv_buf[i]) == logical_pos){
             if (is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[i]);
