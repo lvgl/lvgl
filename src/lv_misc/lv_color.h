@@ -94,9 +94,9 @@ enum {
  * Macros for all existing  color depths
  * to set/get values of the color channels
  *------------------------------------------*/
-# define LV_COLOR_SET_R1(c, v) (c).ch.red = (v) & 0x1;
-# define LV_COLOR_SET_G1(c, v) (c).ch.green = (v) & 0x1;
-# define LV_COLOR_SET_B1(c, v) (c).ch.blue = (v) & 0x1;
+# define LV_COLOR_SET_R1(c, v) (c).ch.red = (uint8_t)((v) & 0x1);
+# define LV_COLOR_SET_G1(c, v) (c).ch.green = (uint8_t)((v) & 0x1);
+# define LV_COLOR_SET_B1(c, v) (c).ch.blue = (uint8_t)((v) & 0x1);
 # define LV_COLOR_SET_A1(c, v)
 
 # define LV_COLOR_GET_R1(c) (c).ch.red
@@ -104,21 +104,21 @@ enum {
 # define LV_COLOR_GET_B1(c) (c).ch.blue
 # define LV_COLOR_GET_A1(c) 1
 
-# define LV_COLOR_SET_R8(c, v) (c).ch.red = (v) & 0x7;
-# define LV_COLOR_SET_G8(c, v) (c).ch.green = (v) & 0x7;
-# define LV_COLOR_SET_B8(c, v) (c).ch.blue = (v) & 0x3;
-# define LV_COLOR_SET_A8(c, v)
+# define LV_COLOR_SET_R8(c, v) (c).ch.red = (uint8_t)((v) & 0x7);
+# define LV_COLOR_SET_G8(c, v) (c).ch.green = (uint8_t)((v) & 0x7);
+# define LV_COLOR_SET_B8(c, v) (c).ch.blue = (uint8_t)((v) & 0x3);
+# define LV_COLOR_SET_A8(c, v) do {} while(0)
 
 # define LV_COLOR_GET_R8(c) (c).ch.red
 # define LV_COLOR_GET_G8(c) (c).ch.green
 # define LV_COLOR_GET_B8(c) (c).ch.blue
 # define LV_COLOR_GET_A8(c) 0xFF
 
-# define LV_COLOR_SET_R16(c, v) (c).ch.red = (v) & 0x1F;
-# define LV_COLOR_SET_G16(c, v) (c).ch.green = (v) & 0x3F;
-# define LV_COLOR_SET_G16_SWAP(c, v) {(c).ch.green_h = ((v) >> 3) & 0x7; (c).ch.green_l = (v) & 0x7;}
-# define LV_COLOR_SET_B16(c, v) (c).ch.blue = (v) & 0x1F;
-# define LV_COLOR_SET_A16(c, v)
+# define LV_COLOR_SET_R16(c, v) (c).ch.red = (uint16_t)((v) & 0x1F);
+# define LV_COLOR_SET_G16(c, v) (c).ch.green = (uint16_t)((v) & 0x3F);
+# define LV_COLOR_SET_G16_SWAP(c, v) {(c).ch.green_h = (uint16_t)(((v) >> 3) & 0x7); (c).ch.green_l = (uint16_t)((v) & 0x7);}
+# define LV_COLOR_SET_B16(c, v) (c).ch.blue = (uint16_t)((v) & 0x1F);
+# define LV_COLOR_SET_A16(c, v) do {} while(0)
 
 # define LV_COLOR_GET_R16(c) (c).ch.red
 # define LV_COLOR_GET_G16(c) (c).ch.green
@@ -126,10 +126,10 @@ enum {
 # define LV_COLOR_GET_B16(c) (c).ch.blue
 # define LV_COLOR_GET_A16(c) 0xFF
 
-# define LV_COLOR_SET_R32(c, v) (c).ch.red = (v) & 0xFF;
-# define LV_COLOR_SET_G32(c, v) (c).ch.green = (v) & 0xFF;
-# define LV_COLOR_SET_B32(c, v) (c).ch.blue = (v) & 0xFF;
-# define LV_COLOR_SET_A32(c, v) (c).ch.alpha = (v) & 0xFF;
+# define LV_COLOR_SET_R32(c, v) (c).ch.red = (uint32_t)((v) & 0xFF);
+# define LV_COLOR_SET_G32(c, v) (c).ch.green = (uint32_t)((v) & 0xFF);
+# define LV_COLOR_SET_B32(c, v) (c).ch.blue = (uint32_t)((v) & 0xFF);
+# define LV_COLOR_SET_A32(c, v) (c).ch.alpha = (uint32_t)((v) & 0xFF);
 
 # define LV_COLOR_GET_R32(c) (c).ch.red
 # define LV_COLOR_GET_G32(c) (c).ch.green
@@ -458,8 +458,8 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 {
     lv_color32_t c32;
     c32.full        = lv_color_to32(color);
-    uint16_t bright = 3 * LV_COLOR_GET_R32(c32) + LV_COLOR_GET_B32(c32) + 4 * LV_COLOR_GET_G32(c32);
-    return (uint16_t)bright >> 3;
+    uint16_t bright = (uint16_t)(3u * LV_COLOR_GET_R32(c32) + LV_COLOR_GET_B32(c32) + 4u * LV_COLOR_GET_G32(c32));
+    return (uint8_t)(bright >> 3);
 }
 
 /* The most simple macro to create a color from R,G and B values */

@@ -85,7 +85,7 @@ inline static void lv_area_copy(lv_area_t * dest, const lv_area_t * src)
  */
 static inline lv_coord_t lv_area_get_width(const lv_area_t * area_p)
 {
-    return area_p->x2 - area_p->x1 + 1;
+    return (lv_coord_t)(area_p->x2 - area_p->x1 + 1);
 }
 
 /**
@@ -95,7 +95,7 @@ static inline lv_coord_t lv_area_get_width(const lv_area_t * area_p)
  */
 static inline lv_coord_t lv_area_get_height(const lv_area_t * area_p)
 {
-    return area_p->y2 - area_p->y1 + 1;
+    return (lv_coord_t)(area_p->y2 - area_p->y1 + 1);
 }
 
 /**
