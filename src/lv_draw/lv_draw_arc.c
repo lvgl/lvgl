@@ -98,7 +98,6 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
   
       lv_draw_rect(&round_area, clip_area, &circle_style, LV_OPA_COVER);
     }
-
 }
 
 

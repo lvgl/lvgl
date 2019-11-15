@@ -70,7 +70,6 @@ void lv_sqrt(uint32_t x, lv_sqrt_res_t * q);
  */
 uint16_t lv_atan2(int x, int y);
 
-
 /**********************
  *      MACROS
  **********************/

@@ -312,7 +312,6 @@ uint16_t lv_atan2(int x, int y)
     return degree;
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

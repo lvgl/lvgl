@@ -1391,7 +1391,7 @@ static lv_design_res_t lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t 
 
             cur_area.x1 += cur_style.body.padding.left;
             cur_area.y1 += cur_style.body.padding.top;
-            lv_draw_label(&cur_area, clip_area, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, NULL, NULL, NULL);
+            lv_draw_label(&cur_area, clip_area, &cur_style, opa_scale, letter_buf, LV_TXT_FLAG_NONE, NULL, NULL, NULL, lv_obj_get_base_dir(ta));
 
         } else if(ext->cursor.type == LV_CURSOR_OUTLINE) {
             cur_style.body.opa = LV_OPA_TRANSP;
@@ -1889,7 +1889,7 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
         if(!ext->text_sel_in_prog && !click_outside_label && sign == LV_SIGNAL_PRESSED) {
             /*Input device just went down. Store the selection start position*/
             ext->sel.start    = char_id_at_click;
-            ext->sel.end      = LV_DRAW_LABEL_NO_TXT_SEL;
+            ext->sel.end      = LV_LABEL_TEXT_SEL_OFF;
             ext->text_sel_in_prog = 1;
             lv_obj_set_drag(lv_page_get_scrl(ta), false);
         } else if(ext->text_sel_in_prog && sign == LV_SIGNAL_PRESSING) {

@@ -12,6 +12,7 @@
 
 #include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_group.h"
+#include "../lv_core/lv_indev.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_math.h"

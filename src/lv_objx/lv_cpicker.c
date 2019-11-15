@@ -1,6 +1,7 @@
 /**
  * @file lv_cpicker.c
  *
+ * From @AloyseTech and @paulpv.
  */
 
 /*********************
@@ -57,10 +58,11 @@
 static lv_design_res_t lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param);
 
-static void invalidate_indic(lv_obj_t * cpicker);
 static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale);
 static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale);
 static void draw_indic(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale);
+static void invalidate_indic(lv_obj_t * cpicker);
+static lv_area_t get_indic_area(lv_obj_t * cpicker);
 
 static void next_color_mode(lv_obj_t * cpicker);
 static lv_res_t double_click_reset(lv_obj_t * cpicker);
@@ -105,6 +107,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
+    ext->type = LV_CPICKER_DEF_TYPE;
     ext->hsv = LV_CPICKER_DEF_HSV;
     ext->indic.style = &lv_style_plain;
     ext->indic.colored = 0;
@@ -120,8 +123,8 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
+        lv_obj_set_size(new_cpicker, LV_DPI * 2, LV_DPI * 2);
         lv_obj_set_protect(new_cpicker, LV_PROTECT_PRESS_LOST);
-        refr_indic_pos(new_cpicker);
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
             lv_cpicker_set_style(new_cpicker, LV_CPICKER_STYLE_MAIN, th->style.bg);
@@ -200,91 +203,85 @@ void lv_cpicker_set_style(lv_obj_t * cpicker, lv_cpicker_style_t type, lv_style_
  * Set the current hue of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param hue current selected hue [0..360]
+ * @return true if changed, otherwise false
  */
-void lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue)
+bool lv_cpicker_set_hue(lv_obj_t * cpicker, uint16_t hue)
 {
-    LV_ASSERT_OBJ(cpicker, LV_OBJX_NAME);
-
-    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
-
-    ext->hsv.h = hue % 360;
-
-    if(ext->color_mode == LV_CPICKER_COLOR_MODE_HUE) refr_indic_pos(cpicker);
-
-    if(ext->preview && ext->type == LV_CPICKER_TYPE_DISC) {
-        lv_obj_invalidate(cpicker);
-    }
+    lv_color_hsv_t hsv = lv_cpicker_get_hsv(cpicker);
+    hsv.h = hue;
+    return lv_cpicker_set_hsv(cpicker, hsv);
 }
 
 /**
  * Set the current saturation of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param saturation current selected saturation [0..100]
+ * @return true if changed, otherwise false
  */
-void lv_cpicker_set_saturation(lv_obj_t * cpicker, uint8_t saturation)
+bool lv_cpicker_set_saturation(lv_obj_t * cpicker, uint8_t saturation)
 {
-    LV_ASSERT_OBJ(cpicker, LV_OBJX_NAME);
-
-    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
-
-    ext->hsv.s = saturation > 100 ? 100 : saturation;
-
-    if(ext->color_mode == LV_CPICKER_COLOR_MODE_SATURATION) refr_indic_pos(cpicker);
-
-    if(ext->preview && ext->type == LV_CPICKER_TYPE_DISC) {
-        lv_obj_invalidate(cpicker);
-    }
+    lv_color_hsv_t hsv = lv_cpicker_get_hsv(cpicker);
+    hsv.s = saturation;
+    return lv_cpicker_set_hsv(cpicker, hsv);
 }
 
 /**
  * Set the current value of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param val current selected value [0..100]
+ * @return true if changed, otherwise false
  */
-void lv_cpicker_set_value(lv_obj_t * cpicker, uint8_t val)
+bool lv_cpicker_set_value(lv_obj_t * cpicker, uint8_t val)
 {
-    LV_ASSERT_OBJ(cpicker, LV_OBJX_NAME);
-
-    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
-
-    ext->hsv.v = val > 100 ? 100 : val;
-
-    if(ext->color_mode == LV_CPICKER_COLOR_MODE_VALUE) refr_indic_pos(cpicker);
-
-    if(ext->preview && ext->type == LV_CPICKER_TYPE_DISC) {
-        lv_obj_invalidate(cpicker);
-    }
+    lv_color_hsv_t hsv = lv_cpicker_get_hsv(cpicker);
+    hsv.v = val;
+    return lv_cpicker_set_hsv(cpicker, hsv);
 }
 
 /**
  * Set the current hsv of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param color current selected hsv
+ * @return true if changed, otherwise false
  */
-void lv_cpicker_set_hsv(lv_obj_t * cpicker, lv_color_hsv_t hsv)
+bool lv_cpicker_set_hsv(lv_obj_t * cpicker, lv_color_hsv_t hsv)
 {
     LV_ASSERT_OBJ(cpicker, LV_OBJX_NAME);
 
+    if (hsv.h > 360) hsv.h %= 360;
+    if (hsv.s > 100) hsv.s = 100;
+    if (hsv.v > 100) hsv.v = 100;
+
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
+    if (ext->hsv.h == hsv.h && ext->hsv.s == hsv.s && ext->hsv.v == hsv.v) return false;
+
     ext->hsv = hsv;
+
     refr_indic_pos(cpicker);
-    lv_obj_invalidate(cpicker);
+
+    if (ext->preview && ext->type == LV_CPICKER_TYPE_DISC) {
+        lv_obj_invalidate(cpicker);
+    }
+
+    return true;
 }
 
 /**
  * Set the current color of a colorpicker.
  * @param cpicker pointer to colorpicker object
  * @param color current selected color
+ * @return true if changed, otherwise false
  */
-void lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color)
+bool lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color)
 {
     LV_ASSERT_OBJ(cpicker, LV_OBJX_NAME);
 
     lv_color32_t c32;
     c32.full = lv_color_to32(color);
 
-    lv_cpicker_set_hsv(cpicker, lv_color_rgb_to_hsv(c32.ch.red, c32.ch.green, c32.ch.blue));
+    return lv_cpicker_set_hsv(cpicker,
+            lv_color_rgb_to_hsv(LV_COLOR_GET_R(color), LV_COLOR_GET_G(color), LV_COLOR_GET_B(color)));
 }
 
 /**
@@ -662,25 +659,10 @@ static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
         lv_draw_rect(&rect_area, mask, &style, opa_scale);
     }
 }
-/**
- * Should roughly match up with `lv_cpicker_invalidate_disc_indicator_circle`
- */
+
 static void draw_indic(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale)
 {
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
-    const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
-    const lv_style_t * style_indic = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_INDICATOR);
-
-    lv_coord_t h = lv_obj_get_height(cpicker);
-    uint16_t r;
-    if(ext->type == LV_CPICKER_TYPE_DISC) r = style_main->line.width / 2;
-    else if(ext->type == LV_CPICKER_TYPE_RECT) r = h / 2;
-
-    lv_area_t ind_area;
-    ind_area.x1 = cpicker->coords.x1 + ext->indic.pos.x - r - style_indic->body.padding.left;
-    ind_area.y1 = cpicker->coords.y1 + ext->indic.pos.y - r - style_indic->body.padding.right;
-    ind_area.x2 = cpicker->coords.x1 + ext->indic.pos.x + r + style_indic->body.padding.top;
-    ind_area.y2 = cpicker->coords.y1 + ext->indic.pos.y + r + style_indic->body.padding.bottom;
 
     lv_style_t style_cir;
     lv_style_copy(&style_cir, ext->indic.style);
@@ -691,8 +673,38 @@ static void draw_indic(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_
         style_cir.body.grad_color = style_cir.body.main_color;
     }
 
+    lv_area_t indic_area = get_indic_area(cpicker);
 
-    lv_draw_rect(&ind_area, mask, &style_cir, opa_scale);
+    lv_draw_rect(&indic_area, mask, &style_cir, opa_scale);
+}
+
+static void invalidate_indic(lv_obj_t * cpicker)
+{
+    lv_area_t indic_area = get_indic_area(cpicker);
+
+    lv_inv_area(lv_obj_get_disp(cpicker), &indic_area);
+}
+
+static lv_area_t get_indic_area(lv_obj_t * cpicker)
+{
+    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+    const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
+    const lv_style_t * style_indic = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_INDICATOR);
+
+    uint16_t r;
+    if(ext->type == LV_CPICKER_TYPE_DISC) r = style_main->line.width / 2;
+    else if(ext->type == LV_CPICKER_TYPE_RECT) {
+        lv_coord_t h = lv_obj_get_height(cpicker);
+        r = h / 2;
+    }
+
+    lv_area_t indic_area;
+    indic_area.x1 = cpicker->coords.x1 + ext->indic.pos.x - r - style_indic->body.padding.left;
+    indic_area.y1 = cpicker->coords.y1 + ext->indic.pos.y - r - style_indic->body.padding.right;
+    indic_area.x2 = cpicker->coords.x1 + ext->indic.pos.x + r + style_indic->body.padding.top;
+    indic_area.y2 = cpicker->coords.y1 + ext->indic.pos.y + r + style_indic->body.padding.bottom;
+
+    return indic_area;
 }
 
 /**
@@ -725,8 +737,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     } else if(sign == LV_SIGNAL_CORD_CHG) {
         /*Refresh extended draw area to make knob visible*/
         if(lv_obj_get_width(cpicker) != lv_area_get_width(param) ||
-                lv_obj_get_height(cpicker) != lv_area_get_height(param))
-        {
+           lv_obj_get_height(cpicker) != lv_area_get_height(param)) {
             lv_obj_refresh_ext_draw_pad(cpicker);
             refr_indic_pos(cpicker);
         }
@@ -753,10 +764,10 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
                 break;
             }
 
-            lv_cpicker_set_hsv(cpicker, hsv_cur);
-
-            res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return res;
+            if (lv_cpicker_set_hsv(cpicker, hsv_cur)) {
+                res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
+                if(res != LV_RES_OK) return res;
+            }
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN)  {
             lv_color_hsv_t hsv_cur;
@@ -774,10 +785,10 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
                 break;
             }
 
-            lv_cpicker_set_hsv(cpicker, hsv_cur);
-
-            res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return res;
+            if (lv_cpicker_set_hsv(cpicker, hsv_cur)) {
+                res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
+                if(res != LV_RES_OK) return res;
+            }
         }
     }
     else if(sign == LV_SIGNAL_PRESSED) {
@@ -785,7 +796,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         lv_indev_get_point(lv_indev_get_act(), &ext->last_press_point);
         res = double_click_reset(cpicker);
         if(res != LV_RES_OK) return res;
-    } else if(sign == LV_SIGNAL_PRESSING){
+    } else if(sign == LV_SIGNAL_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
         if(indev == NULL) return res;
 
@@ -846,61 +857,36 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
             angle = lv_atan2(p.x, p.y) % 360;
         }
 
+        lv_color_hsv_t hsv_cur;
+        hsv_cur = ext->hsv;
+
         switch(ext->color_mode) {
         case LV_CPICKER_COLOR_MODE_HUE:
-            if(ext->hsv.h != angle) lv_cpicker_set_hue(cpicker, angle);
+            hsv_cur.h = angle;
             break;
         case LV_CPICKER_COLOR_MODE_SATURATION:
-            angle = (angle * 100) / 360;
-            if(ext->hsv.s != angle) lv_cpicker_set_saturation(cpicker, angle);
+            hsv_cur.s = (angle * 100) / 360;
             break;
         case LV_CPICKER_COLOR_MODE_VALUE:
-            angle = (angle * 100) / 360;
-            if(ext->hsv.v != angle) lv_cpicker_set_value(cpicker, angle);
+            hsv_cur.v = (angle * 100) / 360;
             break;
         }
 
-        refr_indic_pos(cpicker);
-
-        res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
-        if(res != LV_RES_OK) return res;
+        if (lv_cpicker_set_hsv(cpicker, hsv_cur)) {
+            res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
+            if(res != LV_RES_OK) return res;
+        }
     }
 
     return res;
 }
 
-static void next_color_mode(lv_obj_t * cpicker )
+static void next_color_mode(lv_obj_t * cpicker)
 {
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
     ext->color_mode = (ext->color_mode + 1) % 3;
     refr_indic_pos(cpicker);
     lv_obj_invalidate(cpicker);
-}
-
-
-/**
- * Indicator points need to match those set in lv_cpicker_disc_design/lv_cpicker_rect_design
- */ 
-static void invalidate_indic(lv_obj_t * cpicker)
-{
-
-    lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
-    const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
-    const lv_style_t * style_indic = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_INDICATOR);
-
-    lv_coord_t h = lv_obj_get_height(cpicker);
-
-    uint16_t r;
-    if(ext->type == LV_CPICKER_TYPE_DISC) r = style_main->line.width / 2;
-    else if(ext->type == LV_CPICKER_TYPE_RECT) r = h / 2;
-
-    lv_area_t indic_area;
-    indic_area.x1 = cpicker->coords.x1 + ext->indic.pos.x - r - style_indic->body.padding.left;
-    indic_area.y1 = cpicker->coords.y1 + ext->indic.pos.y - r - style_indic->body.padding.top;
-    indic_area.x2 = cpicker->coords.x1 + ext->indic.pos.x + r + style_indic->body.padding.right;
-    indic_area.y2 = cpicker->coords.y1 + ext->indic.pos.y + r + style_indic->body.padding.bottom;
-
-    lv_inv_area(lv_obj_get_disp(cpicker), &indic_area);
 }
 
 static void refr_indic_pos(lv_obj_t * cpicker)
@@ -927,15 +913,14 @@ static void refr_indic_pos(lv_obj_t * cpicker)
 
         ext->indic.pos.x = ind_pos;
         ext->indic.pos.y = h / 2;
-    }
-    if(ext->type == LV_CPICKER_TYPE_DISC) {
+    } else if(ext->type == LV_CPICKER_TYPE_DISC) {
         const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
         lv_coord_t r = w / 2 - style_main->line.width / 2;
         uint16_t angle = get_angle(cpicker);
         ext->indic.pos.x = (((int32_t)r * lv_trigo_sin(angle)) >> LV_TRIGO_SHIFT);
         ext->indic.pos.y = (((int32_t)r * lv_trigo_sin(angle + 90)) >> LV_TRIGO_SHIFT);
         ext->indic.pos.x = ext->indic.pos.x + w / 2;
-        ext->indic.pos.y = ext->indic.pos.y + w / 2;
+        ext->indic.pos.y = ext->indic.pos.y + h / 2;
     }
 
     invalidate_indic(cpicker);
@@ -947,21 +932,25 @@ static lv_res_t double_click_reset(lv_obj_t * cpicker)
     lv_indev_t * indev = lv_indev_get_act();
     /*Double clicked? Use long press time as double click time out*/
     if(lv_tick_elaps(ext->last_click_time) < indev->driver.long_press_time) {
+        lv_color_hsv_t hsv_cur;
+        hsv_cur = ext->hsv;
+
         switch(ext->color_mode) {
         case LV_CPICKER_COLOR_MODE_HUE:
-            lv_cpicker_set_hue(cpicker, LV_CPICKER_DEF_HUE);
+            hsv_cur.h = LV_CPICKER_DEF_HUE;
             break;
         case LV_CPICKER_COLOR_MODE_SATURATION:
-            lv_cpicker_set_saturation(cpicker, LV_CPICKER_DEF_SATURATION);
+            hsv_cur.s = LV_CPICKER_DEF_SATURATION;
             break;
         case LV_CPICKER_COLOR_MODE_VALUE:
-            lv_cpicker_set_value(cpicker, LV_CPICKER_DEF_VALUE);
+            hsv_cur.v = LV_CPICKER_DEF_VALUE;
             break;
         }
 
-        lv_res_t res;
-        res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
-        if(res != LV_RES_OK) return res;
+        if (lv_cpicker_set_hsv(cpicker, hsv_cur)) {
+            lv_res_t res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
+            if(res != LV_RES_OK) return res;
+        }
     }
     ext->last_click_time = lv_tick_get();
 

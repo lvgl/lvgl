@@ -301,7 +301,7 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
 #if LV_IMGBTN_TILED == 0
         const void * src = ext->img_src[state];
         if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
-            lv_draw_label(&imgbtn->coords, clip_area, style, opa_scale, src, LV_TXT_FLAG_NONE, NULL, NULL, NULL);
+            lv_draw_label(&imgbtn->coords, clip_area, style, opa_scale, src, LV_TXT_FLAG_NONE, NULL, NULL, NULL,  lv_obj_get_base_dir(imgbtn));
         } else {
             lv_draw_img(&imgbtn->coords, clip_area, src, style, 0, LV_IMG_ZOOM_NONE, false, opa_scale);
         }

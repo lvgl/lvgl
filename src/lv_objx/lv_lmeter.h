@@ -36,6 +36,7 @@ typedef struct
     /*No inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
     uint16_t scale_angle; /*Angle of the scale in deg. (0..360)*/
+    uint16_t angle;
     uint8_t line_cnt;     /*Count of lines */
     int16_t cur_value;
     int16_t min_value;
@@ -87,6 +88,13 @@ void lv_lmeter_set_range(lv_obj_t * lmeter, int16_t min, int16_t max);
  * @param line_cnt number of lines
  */
 void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt);
+
+/**
+ * Set the rotation settings of a line meter
+ * @param lmeter pointer to a line meter object
+ * @param angle angle of rotation (relative to the northen axis)
+ */
+void lv_lmeter_set_angle(lv_obj_t * lmeter, uint16_t angle);
 
 /**
  * Set the styles of a line meter
