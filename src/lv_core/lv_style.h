@@ -196,7 +196,7 @@ void lv_style_anim_set_styles(lv_anim_t * a, lv_style_t * to_anim, const lv_styl
  * @param duration duration of the animation in milliseconds
  * @param delay delay before the animation in milliseconds
  */
-static inline void lv_style_anim_set_time(lv_anim_t * a, uint16_t duration, uint16_t delay)
+static inline void lv_style_anim_set_time(lv_anim_t * a, uint16_t duration, int16_t delay)
 {
     lv_anim_set_time(a, duration, delay);
 }
