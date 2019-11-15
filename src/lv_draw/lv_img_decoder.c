@@ -656,8 +656,9 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
             data_tmp++;
         }
     }
-
+#if LV_USE_FILESYSTEM
     lv_draw_buf_release(fs_buf);
+#endif
     return LV_RES_OK;
 
 #else
@@ -753,7 +754,9 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
             data_tmp++;
         }
     }
+#if LV_USE_FILESYSTEM
     lv_draw_buf_release(fs_buf);
+#endif
     return LV_RES_OK;
 #else
     LV_LOG_WARN("Image built-in indexed line reader failed because LV_IMG_CF_INDEXED is 0 in lv_conf.h");
