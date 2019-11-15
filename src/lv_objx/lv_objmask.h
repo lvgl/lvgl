@@ -81,12 +81,13 @@ lv_objmask_mask_t * lv_objmask_add_mask(lv_obj_t * objmask, void * param);
  * @param mask pointer to created mask (returned by `lv_objmask_add_mask`)
  * @param param an initialized mask parameter (initialized by `lv_draw_mask_line/angle/.../_init`)
  */
-void lv_objmask_upadte_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask, void * param);
+void lv_objmask_update_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask, void * param);
 
 /**
  * Remove a mask
  * @param objmask pointer to an Object mask object
  * @param mask pointer to created mask (returned by `lv_objmask_add_mask`)
+ * If `NULL` passed all masks will be deleted.
  */
 void lv_objmask_remove_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask);
 

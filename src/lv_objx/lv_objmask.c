@@ -127,7 +127,7 @@ lv_objmask_mask_t * lv_objmask_add_mask(lv_obj_t * objmask, void * param)
  * @param mask pointer to created mask (returned by `lv_objmask_add_mask`)
  * @param param an initialized mask parameter (initialized by `lv_draw_mask_line/angle/.../_init`)
  */
-void lv_objmask_upadte_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask, void * param)
+void lv_objmask_update_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask, void * param)
 {
     LV_ASSERT_OBJ(objmask, LV_OBJX_NAME);
     LV_ASSERT_NULL(mask);
@@ -143,18 +143,33 @@ void lv_objmask_upadte_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask, void *
  * Remove a mask
  * @param objmask pointer to an Object mask object
  * @param mask pointer to created mask (returned by `lv_objmask_add_mask`)
+ * If `NULL` passed all masks will be deleted.
  */
 void lv_objmask_remove_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask)
 {
     LV_ASSERT_OBJ(objmask, LV_OBJX_NAME);
-    LV_ASSERT_NULL(mask);
 
     lv_objmask_ext_t * ext = lv_obj_get_ext_attr(objmask);
-    lv_mem_free(mask->param);
-    lv_ll_rem(&ext->mask_ll, mask);
+
+    /*Remove all masks*/
+    if(mask == NULL) {
+        lv_objmask_mask_t * m;
+        LV_LL_READ(ext->mask_ll, m) {
+            lv_mem_free(m->param);
+        }
+
+        lv_ll_clear(&ext->mask_ll);
+    }
+    /*Remove only the specified mask*/
+    else {
+        lv_mem_free(mask->param);
+        lv_ll_remove(&ext->mask_ll, mask);
+    }
 
     lv_obj_invalidate(objmask);
 }
+
+
 
 /*=====================
  * Setter functions
