@@ -139,16 +139,6 @@ static inline void _out_null(char character, void* buffer, size_t idx, size_t ma
 }
 
 
-// internal output function wrapper
-static inline void _out_fct(char character, void* buffer, size_t idx, size_t maxlen)
-{
-  (void)idx; (void)maxlen;
-  if (character) {
-    // buffer is the output fct pointer
-    ((out_fct_wrap_type*)buffer)->fct(character, ((out_fct_wrap_type*)buffer)->arg);
-  }
-}
-
 
 // internal secure strlen
 // \return The length of the string (excluding the terminating 0) limited by 'maxsize'
@@ -186,7 +176,8 @@ static size_t _out_rev(out_fct_type out, char* buffer, size_t idx, size_t maxlen
 
   // pad spaces up to given width
   if (!(flags & FLAGS_LEFT) && !(flags & FLAGS_ZEROPAD)) {
-    for (size_t i = len; i < width; i++) {
+      size_t i;
+      for (i = len; i < width; i++) {
       out(' ', buffer, idx++, maxlen);
     }
   }

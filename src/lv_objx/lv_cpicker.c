@@ -275,8 +275,11 @@ bool lv_cpicker_set_hsv(lv_obj_t * cpicker, lv_color_hsv_t hsv)
  */
 bool lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color)
 {
+    lv_color32_t c32;
+    c32 = lv_color_to32(color);
+
     return lv_cpicker_set_hsv(cpicker,
-            lv_color_rgb_to_hsv(LV_COLOR_GET_R(color), LV_COLOR_GET_G(color), LV_COLOR_GET_B(color)));
+            lv_color_rgb_to_hsv(c32.ch.red, c32.ch.green, c32.ch.blue));
 }
 
 /**
@@ -619,7 +622,8 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
     lv_point_t triangle_points[3];
     lv_style_t style;
     lv_style_copy(&style, &lv_style_plain);
-    for(uint16_t i = start_angle; i <= end_angle; i+= LV_CPICKER_DEF_QF) {
+    uint16_t i;
+    for(i = start_angle; i <= end_angle; i+= LV_CPICKER_DEF_QF) {
         style.body.main_color = angle_to_mode_color(cpicker, i);
         style.body.grad_color = style.body.main_color;
 
@@ -704,7 +708,8 @@ static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t 
     style.body.shadow.width = 0;
     style.body.opa = LV_OPA_COVER;
 
-    for(uint16_t i = 0; i < 360; i += i_step) {
+    uint16_t i;
+    for(i = 0; i < 360; i += i_step) {
         style.body.main_color = angle_to_mode_color(cpicker, i);
         style.body.grad_color = style.body.main_color;
 
