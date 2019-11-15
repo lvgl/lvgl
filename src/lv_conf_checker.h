@@ -269,9 +269,11 @@
 /* Export integer constant to binding.
  * This macro is used with constants in the form of LV_<CONST> that
  * should also appear on lvgl binding API such as Micropython
+ *
+ * The default value just prevents a GCC warning.
  */
 #ifndef LV_EXPORT_CONST_INT
-#define LV_EXPORT_CONST_INT(int_value)
+#define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning
 #endif
 
 /*===================
@@ -314,7 +316,7 @@
 #endif
 
 /* 1: Print the log with 'printf';
- * 0: user need to register a callback with `lv_log_register_print`*/
+ * 0: user need to register a callback with `lv_log_register_print_cb`*/
 #ifndef LV_LOG_PRINTF
 #  define LV_LOG_PRINTF   0
 #endif
@@ -473,21 +475,25 @@
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 #endif
 
- /* If a character is at least this long, will break wherever "prettiest" */
+
+/* If a word is at least this long, will break wherever "prettiest"
+ * To disable, set to a value <= 0 */
 #ifndef LV_TXT_LINE_BREAK_LONG_LEN
 #define LV_TXT_LINE_BREAK_LONG_LEN          12
 #endif
 
- /* Minimum number of characters of a word to put on a line before a break */
+/* Minimum number of characters in a long word to put on a line before a break.
+ * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
 #ifndef LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
- #define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN  3
+#define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN  3
 #endif
 
- /* Minimum number of characters of a word to put on a line after a break */
+/* Minimum number of characters in a long word to put on a line after a break.
+ * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
 #ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
- #define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
+#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
 #endif
-
+ 
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
  * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
