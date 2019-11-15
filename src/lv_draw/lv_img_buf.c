@@ -547,9 +547,9 @@ static inline bool transform_anti_alias(lv_img_transform_dsc_t * dsc)
     lv_color_t c11;
 
     lv_opa_t a00 = dsc->res.opa;
-    lv_opa_t a10;
-    lv_opa_t a01;
-    lv_opa_t a11;
+    lv_opa_t a10 = 0;
+    lv_opa_t a01 = 0;
+    lv_opa_t a11 = 0;
 
     if(dsc->tmp.native_color) {
         memcpy(&c01, &src_u8[dsc->tmp.pxi + dsc->tmp.px_size * xn], sizeof(lv_color_t));

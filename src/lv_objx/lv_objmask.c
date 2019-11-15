@@ -76,9 +76,9 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_objmask_set_style(new_objmask, LV_OBJMASK_STYLE_BG, &lv_style_transp);
 
     }
-    /*Copy an existing object mask*/
+    /*TODO: Copy an existing object mask*/
     else {
-        lv_objmask_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        /* lv_objmask_ext_t * copy_ext = lv_obj_get_ext_attr(copy); */
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_objmask);

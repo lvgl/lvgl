@@ -574,7 +574,6 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
 
         /*Buffer the result color to avoid recalculating the same color*/
         lv_color_t res_color;
-        lv_opa_t last_mask = LV_OPA_TRANSP;
         res_color.full = disp_buf_tmp[0].full;
 
         /*Only the mask matters*/
