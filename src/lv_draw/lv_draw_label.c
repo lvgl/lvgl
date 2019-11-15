@@ -183,16 +183,15 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 
     /*Write out all lines*/
     while(txt[line_start] != '\0') {
-        if(offset != NULL) {
-            pos.x += x_ofs;
-        }
+        if(offset != NULL) pos.x += x_ofs;
+
         /*Write all letter of a line*/
         cmd_state = CMD_STATE_WAIT;
         i         = 0;
         uint32_t letter;
         uint32_t letter_next;
 #if LV_USE_BIDI
-        char *bidi_txt = lv_draw_get_buf(line_end - line_start + 1);
+        char *bidi_txt = lv_draw_buf_get(line_end - line_start + 1);
         lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, bidi_dir, NULL, 0);
 #else
         const char *bidi_txt = txt + line_start;
@@ -274,6 +273,11 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
                 pos.x += letter_w + style->text.letter_space;
             }
         }
+
+#if LV_USE_BIDI
+        lv_draw_buf_release(bidi_txt);
+        bidi_txt = NULL;
+#endif
         /*Go to next line*/
         line_start = line_end;
         line_end += lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, w, flag);
@@ -293,6 +297,9 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
                     lv_txt_get_width(&txt[line_start], line_end - line_start, font, style->text.letter_space, flag);
             pos.x += lv_area_get_width(coords) - line_width;
         }
+
+
+
 
         /*Go the next line position*/
         pos.y += line_height;

@@ -151,7 +151,6 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
     }
     /*Initialize the format byte*/
     else {
-#if LV_USE_BIDI
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(table);
         if(base_dir == LV_BIDI_DIR_LTR) format.s.align = LV_LABEL_ALIGN_LEFT;
         else if(base_dir == LV_BIDI_DIR_RTL) format.s.align = LV_LABEL_ALIGN_RIGHT;
