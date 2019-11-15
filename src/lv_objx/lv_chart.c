@@ -191,7 +191,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     ser->points = lv_mem_alloc(sizeof(lv_coord_t) * ext->point_cnt);
     LV_ASSERT_MEM(ser->points);
     if(ser->points == NULL) {
-        lv_ll_rem(&ext->series_ll, ser);
+        lv_ll_remove(&ext->series_ll, ser);
         lv_mem_free(ser);
         return NULL;
     }

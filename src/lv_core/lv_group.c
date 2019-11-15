@@ -105,7 +105,7 @@ void lv_group_del(lv_group_t * group)
     }
 
     lv_ll_clear(&(group->obj_ll));
-    lv_ll_rem(&LV_GC_ROOT(_lv_group_ll), group);
+    lv_ll_remove(&LV_GC_ROOT(_lv_group_ll), group);
     lv_mem_free(group);
 }
 
@@ -184,7 +184,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
     LV_LL_READ(g->obj_ll, i)
     {
         if(*i == obj) {
-            lv_ll_rem(&g->obj_ll, i);
+            lv_ll_remove(&g->obj_ll, i);
             lv_mem_free(i);
             obj->group_p = NULL;
             break;

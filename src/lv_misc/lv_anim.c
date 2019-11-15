@@ -125,7 +125,7 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
         a_next = lv_ll_get_next(&LV_GC_ROOT(_lv_anim_ll), a);
 
         if(a->var == var && (a->exec_cb == exec_cb || exec_cb == NULL)) {
-            lv_ll_rem(&LV_GC_ROOT(_lv_anim_ll), a);
+            lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
             lv_mem_free(a);
             anim_list_changed = true; /*Read by `anim_task`. It need to know if a delete occurred in
                                          the linked list*/
@@ -444,7 +444,7 @@ static bool anim_ready_handler(lv_anim_t * a)
          * This way the `ready_cb` will see the animations like it's animation is ready deleted*/
         lv_anim_t a_tmp;
         memcpy(&a_tmp, a, sizeof(lv_anim_t));
-        lv_ll_rem(&LV_GC_ROOT(_lv_anim_ll), a);
+        lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
         lv_mem_free(a);
         anim_list_changed = true;
 

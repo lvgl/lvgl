@@ -461,9 +461,9 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     lv_obj_t * par = lv_obj_get_parent(obj);
     if(par == NULL) { /*It is a screen*/
         lv_disp_t * d = lv_obj_get_disp(obj);
-        lv_ll_rem(&d->scr_ll, obj);
+        lv_ll_remove(&d->scr_ll, obj);
     } else {
-        lv_ll_rem(&(par->child_ll), obj);
+        lv_ll_remove(&(par->child_ll), obj);
     }
 
     /*Delete the base objects*/
@@ -2608,7 +2608,7 @@ static void delete_children(lv_obj_t * obj)
 
     /*Remove the object from parent's children list*/
     lv_obj_t * par = lv_obj_get_parent(obj);
-    lv_ll_rem(&(par->child_ll), obj);
+    lv_ll_remove(&(par->child_ll), obj);
 
     /*Delete the base objects*/
     if(obj->ext_attr != NULL) lv_mem_free(obj->ext_attr);

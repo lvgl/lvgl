@@ -214,7 +214,7 @@ lv_img_decoder_t * lv_img_decoder_create(void)
  */
 void lv_img_decoder_delete(lv_img_decoder_t * decoder)
 {
-    lv_ll_rem(&LV_GC_ROOT(_lv_img_defoder_ll), decoder);
+    lv_ll_remove(&LV_GC_ROOT(_lv_img_defoder_ll), decoder);
     lv_mem_free(decoder);
 }
 
