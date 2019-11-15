@@ -23,7 +23,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJ_X_NAME "lv_templ"
+#define LV_OBJX_NAME "lv_templ"
 
 /**********************
  *      TYPEDEFS
