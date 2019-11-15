@@ -83,7 +83,7 @@ Choose a project with your favourite IDE:
 |   Eclipse   |  CodeBlocks | Visual Studio | PlatformIO | Qt Creator |
 |-------------|-------------|---------------|-----------|------------|
 |  [![Eclipse](https://littlevgl.com/logo/ide/eclipse.jpg)](https://github.com/littlevgl/pc_simulator_sdl_eclipse) | [![CodeBlocks](https://littlevgl.com/logo/ide/codeblocks.jpg)](https://github.com/littlevgl/pc_simulator_win_codeblocks) | [![VisualStudio](https://littlevgl.com/logo/ide/visualstudio.jpg)](https://github.com/littlevgl/visual_studio_2017_sdl_x64)   |   [![PlatformIO](https://littlevgl.com/logo/ide/platformio.jpg)](https://github.com/littlevgl/pc_simulator_sdl_platformio) | [![QtCreator](https://littlevgl.com/logo/ide/qtcreator.jpg)](https://blog.littlevgl.com/2019-01-03/qt-creator) |
-| Cross-platform<br>with SDL | Native Windows | Cross-platform<br>with SDL | Cross-platform<br>with SDL | Cross-platform<br>with SDL |
+| Cross-platform<br>with SDL<br>(Recommended on<br>Linux and Mac) | Native Windows | Windows<br>with SDL | Cross-platform<br>with SDL | Cross-platform<br>with SDL |
 
 
 ## Add LittlevGL to your project

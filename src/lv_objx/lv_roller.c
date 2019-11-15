@@ -79,6 +79,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
     ext->ddlist.draw_arrow = 0; /*Do not draw arrow by default*/
+    ext->mode = LV_ROLLER_MODE_NORMAL;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_roller, lv_roller_signal);
