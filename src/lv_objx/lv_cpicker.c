@@ -276,7 +276,7 @@ bool lv_cpicker_set_hsv(lv_obj_t * cpicker, lv_color_hsv_t hsv)
 bool lv_cpicker_set_color(lv_obj_t * cpicker, lv_color_t color)
 {
     lv_color32_t c32;
-    c32 = lv_color_to32(color);
+    c32.full = lv_color_to32(color);
 
     return lv_cpicker_set_hsv(cpicker,
             lv_color_rgb_to_hsv(c32.ch.red, c32.ch.green, c32.ch.blue));
