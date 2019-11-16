@@ -36,6 +36,13 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+enum {
+	LV_SLIDER_TYPE_NORMAL,
+	LV_SLIDER_TYPE_SYM,
+	LV_SLIDER_TYPE_RANGE
+};
+typedef uint8_t lv_slider_type_t;
 /*Data of slider*/
 typedef struct
 {
@@ -107,9 +114,14 @@ static inline void lv_slider_set_anim_time(lv_obj_t * slider, uint16_t anim_time
  * @param slider pointer to a bar object
  * @param anim_time the animation time in milliseconds.
  */
-static inline void lv_slider_set_sym(lv_obj_t * slider, bool en)
+static inline void lv_slider_set_type(lv_obj_t * slider, lv_slider_type_t type)
 {
-    lv_bar_set_sym(slider, en);
+	if(type == LV_SLIDER_TYPE_NORMAL)
+		lv_bar_set_type(slider, LV_BAR_TYPE_NORMAL);
+	else if(type == LV_SLIDER_TYPE_SYM)
+		lv_bar_set_type(slider, LV_BAR_TYPE_SYM);
+	else if(type == LV_SLIDER_TYPE_RANGE)
+		lv_bar_set_type(slider, LV_BAR_TYPE_CUSTOM);
 }
 
 /**
@@ -173,9 +185,15 @@ static inline uint16_t lv_slider_get_anim_time(lv_obj_t * slider)
  * @param slider pointer to a bar object
  * @return true: symmetric is enabled; false: disable
  */
-static inline bool lv_slider_get_sym(lv_obj_t * slider)
+static inline lv_slider_type_t lv_slider_get_type(lv_obj_t * slider)
 {
-    return lv_bar_get_sym(slider);
+	lv_bar_type_t type = lv_bar_get_type(slider);
+	if(type == LV_BAR_TYPE_NORMAL)
+		return LV_SLIDER_TYPE_NORMAL;
+	else if(type == LV_BAR_TYPE_SYM)
+		return LV_SLIDER_TYPE_SYM;
+	else if(type == LV_BAR_TYPE_CUSTOM)
+		return LV_SLIDER_TYPE_RANGE;
 }
 
 /**
