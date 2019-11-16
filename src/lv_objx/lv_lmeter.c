@@ -76,6 +76,7 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cur_value   = 0;
     ext->line_cnt    = 21;  /*Odd scale number looks better*/
     ext->scale_angle = 240; /*(scale_num - 1) * N looks better */
+    ext->angle_ofs = 0;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_lmeter, lv_lmeter_signal);
@@ -178,16 +179,16 @@ void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt)
 }
 
 /**
- * Set the angle settings of a line meter
+ * Set the set an offset for the line meter's angles to rotate it.
  * @param lmeter pointer to a line meter object
  * @param angle angle where the meter will be facing (with its center)
  */
-void lv_lmeter_set_angle(lv_obj_t * lmeter, uint16_t angle)
+void lv_lmeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
-    if(ext->angle == angle) return;
+    if(ext->angle_ofs == angle) return;
 
-    ext->angle = angle;
+    ext->angle_ofs = angle;
 
     lv_obj_invalidate(lmeter);
 }
@@ -251,7 +252,7 @@ uint8_t lv_lmeter_get_line_count(const lv_obj_t * lmeter)
 /**
  * Get the scale angle of a line meter
  * @param lmeter pointer to a line meter object
- * @return angle of the scale
+ * @return angle_ofs of the scale
  */
 uint16_t lv_lmeter_get_scale_angle(const lv_obj_t * lmeter)
 {
@@ -261,6 +262,17 @@ uint16_t lv_lmeter_get_scale_angle(const lv_obj_t * lmeter)
     return ext->scale_angle;
 }
 
+/**
+ * get the set an offset for the line meter.
+ * @param lmeter pointer to a line meter object
+ * @return angle offset (0..360)
+ */
+uint16_t lv_lmeter_get_angle_offset(lv_obj_t * lmeter)
+{
+    lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+
+    return ext->angle_ofs;
+}
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -302,7 +314,7 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
 
         lv_coord_t x_ofs  = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
         lv_coord_t y_ofs  = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
-        int16_t angle_ofs = ext->angle + 90 + (360 - ext->scale_angle) / 2;
+        int16_t angle_ofs = ext->angle_ofs + 90 + (360 - ext->scale_angle) / 2;
         int16_t level =
             (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
         uint8_t i;
