@@ -255,14 +255,12 @@ void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style
 
 void lv_kb_set_map(lv_obj_t * kb, lv_kb_shift_t shift, const char * map[])
 {
-		kb_map[shift] = map;
-		lv_btnm_set_map(kb, map);
+    kb_map[shift] = map;
 }
 
 void lv_kb_set_ctrl_map(lv_obj_t * kb, lv_kb_shift_t shift, const lv_btnm_ctrl_t ctrl_map[])
 {
     kb_ctrl[shift] = ctrl_map;
-		lv_btnm_set_ctrl_map(kb, ctrl_map);
 }
 
 /*=====================
