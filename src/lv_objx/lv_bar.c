@@ -453,6 +453,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mo
     /*Calculate the indicator area*/
     lv_area_copy(&ext->indic_area, &bar->coords);
     const lv_style_t * style_indic = lv_bar_get_style(bar, LV_BAR_STYLE_INDIC);
+    const lv_style_t * style_bg = lv_bar_get_style(bar, LV_BAR_STYLE_BG);
 
     /*Respect padding and minimum width/height too*/
     ext->indic_area.x1 += style_indic->body.padding.left;
@@ -526,18 +527,26 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mo
     /*Do not draw a zero length indicator*/
     if(!sym && indic_length == 0) return;
 
-
     lv_style_t style_indic_tmp;
     lv_style_copy(&style_indic_tmp, style_indic);
-
+    uint16_t bg_radius = style_bg->body.radius;
+    lv_coord_t short_side = LV_MATH_MIN(objw, objh);
+    if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
     /*Draw only the shadow*/
-    style_indic_tmp.body.opa = LV_OPA_TRANSP;
-    style_indic_tmp.body.border.width = 0;
-    lv_draw_rect(&ext->indic_area, clip_area, &style_indic_tmp, opa);
+    if((hor && lv_area_get_width(&ext->indic_area) > bg_radius * 2) ||
+      (!hor && lv_area_get_height(&ext->indic_area) > bg_radius * 2)) {
+        style_indic_tmp.body.opa = LV_OPA_TRANSP;
+        style_indic_tmp.body.border.width = 0;
+        lv_draw_rect(&ext->indic_area, clip_area, &style_indic_tmp, opa);
+    }
+
+
+    lv_draw_mask_radius_param_t mask_bg_param;
+    lv_draw_mask_radius_init(&mask_bg_param, &bar->coords, style_bg->body.radius, false);
+    int16_t mask_bg_id = lv_draw_mask_add(&mask_bg_param, NULL);
 
     /*Draw_only the background*/
     style_indic_tmp.body.shadow.width = 0;
-    style_indic_tmp.body.border.width = style_indic->body.border.width;
     style_indic_tmp.body.opa = style_indic->body.opa;
 
     /*Get the max possible indicator area. The gradient should be applied on this*/
@@ -548,12 +557,20 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mo
     mask_indic_max_area.x2 -= style_indic->body.padding.right;
     mask_indic_max_area.y2 -= style_indic->body.padding.bottom;
 
-    /*Create a mask to the current indicator area. This is see only this part from the whole gradient.*/
+    /*Create a mask to the current indicator area to see only this part from the whole gradient.*/
     lv_draw_mask_radius_param_t mask_indic_param;
     lv_draw_mask_radius_init(&mask_indic_param, &ext->indic_area, style_indic->body.radius, false);
     int16_t mask_indic_id = lv_draw_mask_add(&mask_indic_param, NULL);
     lv_draw_rect(&mask_indic_max_area, clip_area, &style_indic_tmp, opa);
+
+    /*Draw the border*/
+    style_indic_tmp.body.border.width = style_indic->body.border.width;
+    style_indic_tmp.body.opa = LV_OPA_TRANSP;
+    lv_draw_rect(&ext->indic_area, clip_area, &style_indic_tmp, opa);
+
     lv_draw_mask_remove_id(mask_indic_id);
+    lv_draw_mask_remove_id(mask_bg_id);
+
 }
 
 /**
