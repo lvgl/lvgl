@@ -264,6 +264,7 @@ static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * cli
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
+        return ancestor_design_f(slider, clip_area, mode);
     }
 
     return LV_DESIGN_RES_OK;

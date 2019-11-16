@@ -254,6 +254,10 @@ static void slider_init(void)
     knob.body.border.width = 0;
     knob.body.main_color   = theme.style.bar.indic->body.main_color;
     knob.body.grad_color   = knob.body.main_color;
+    knob.body.padding.left = LV_DPI/25;
+    knob.body.padding.right = LV_DPI/25;
+    knob.body.padding.top = LV_DPI/25;
+    knob.body.padding.bottom = LV_DPI/25;
 
     theme.style.slider.bg    = theme.style.bar.bg;
     theme.style.slider.indic = theme.style.bar.indic;
@@ -758,6 +762,7 @@ static void table_init(void)
     cell.body.padding.right  = LV_DPI / 12;
     cell.body.padding.top    = LV_DPI / 12;
     cell.body.padding.bottom = LV_DPI / 12;
+    cell.body.shadow.width = 0;
 
     theme.style.table.bg   = &lv_style_transp_tight;
     theme.style.table.cell = &cell;

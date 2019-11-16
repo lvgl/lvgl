@@ -311,10 +311,16 @@ static lv_design_res_t lv_sw_design(lv_obj_t * sw, const lv_area_t * clip_area, 
         knob_area.y1 = sw->coords.y1;
         knob_area.y2 = sw->coords.y2;
 
+        knob_area.x1 -= style_knob->body.padding.left;
+        knob_area.x2 += style_knob->body.padding.right;
+        knob_area.y1 -= style_knob->body.padding.top;
+        knob_area.y2 += style_knob->body.padding.bottom;
+
         lv_draw_rect(&knob_area, clip_area, style_knob, opa_scale);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
+        return ancestor_design(sw, clip_area, mode);
     }
 
     return LV_DESIGN_RES_OK;

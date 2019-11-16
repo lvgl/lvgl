@@ -217,6 +217,7 @@ static void bar_init(void)
     bar_bg.body.padding.top    = LV_DPI / 16;
     bar_bg.body.padding.bottom = LV_DPI / 16;
     bar_bg.body.radius         = LV_RADIUS_CIRCLE;
+    bar_bg.body.corner_mask = 1;
 
     lv_style_copy(&bar_indic, &def);
     bar_indic.body.main_color     = lv_color_hsv_to_rgb(_hue, 80, 70);
@@ -241,6 +242,10 @@ static void slider_init(void)
 	static lv_style_t slider_knob;
     lv_style_copy(&slider_knob, theme.style.btn.rel);
     slider_knob.body.radius = LV_RADIUS_CIRCLE;
+    slider_knob.body.padding.left = LV_DPI/25;
+    slider_knob.body.padding.right = LV_DPI/25;
+    slider_knob.body.padding.top = LV_DPI/25;
+    slider_knob.body.padding.bottom = LV_DPI/25;
 
     theme.style.slider.bg    = theme.style.bar.bg;
     theme.style.slider.indic = theme.style.bar.indic;
