@@ -131,6 +131,7 @@ void lv_bar_set_type(lv_obj_t * bar, lv_bar_type_t type);
  * position.
  * @param bar pointer to a bar object
  * @param en true: enable disable symmetric behavior; false: disable
+ * @deprecated As of v7.0, you should use `lv_bar_set_type` instead.
  */
 static inline void lv_bar_set_sym(lv_obj_t * bar, bool en)
 {
@@ -198,6 +199,7 @@ lv_bar_type_t lv_bar_get_type(lv_obj_t * bar);
  * Get whether the bar is symmetric or not.
  * @param bar pointer to a bar object
  * @return true: symmetric is enabled; false: disable
+ * @deprecated As of v7.0, you should use `lv_bar_get_type` instead.
  */
 static inline bool lv_bar_get_sym(lv_obj_t * bar) {
 	return lv_bar_get_type(bar) == LV_BAR_TYPE_SYM;

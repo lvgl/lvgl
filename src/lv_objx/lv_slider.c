@@ -297,12 +297,23 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         ext->dragging = true;
 		if(lv_slider_get_type(slider) == LV_SLIDER_TYPE_RANGE) {
 			lv_indev_get_point(param, &p);
-			if(lv_area_is_point_on(&ext->left_knob_area, &p))
+			bool hor = lv_obj_get_width(slider) >= lv_obj_get_height(slider);
+
+			/* Calculate the distance from each knob */
+			lv_coord_t dist_left, dist_right;
+			if(hor) {
+				dist_left = LV_MATH_ABS((ext->left_knob_area.x1+(ext->left_knob_area.x2 - ext->left_knob_area.x1)/2) - p.x);
+				dist_right = LV_MATH_ABS((ext->right_knob_area.x1+(ext->right_knob_area.x2 - ext->right_knob_area.x1)/2) - p.x);
+			} else {
+				dist_left = LV_MATH_ABS((ext->left_knob_area.y1+(ext->left_knob_area.y2 - ext->left_knob_area.y1)/2) - p.y);
+				dist_right = LV_MATH_ABS((ext->right_knob_area.y1+(ext->right_knob_area.y2 - ext->right_knob_area.y1)/2) - p.y);
+			}
+
+			/* Use whichever one is closer */
+			if(dist_right > dist_left)
 				ext->value_to_set = &ext->bar.cur_value;
-			else if(lv_area_is_point_on(&ext->right_knob_area, &p))
-				ext->value_to_set = &ext->bar.start_value;
 			else
-				ext->value_to_set = NULL;
+				ext->value_to_set = &ext->bar.start_value;
 		} else
 			ext->value_to_set = &ext->bar.cur_value;
     } else if(sign == LV_SIGNAL_PRESSING && ext->value_to_set != NULL) {
