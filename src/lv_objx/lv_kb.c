@@ -26,6 +26,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param);
+static void lv_kb_updatemap(lv_obj_t * kb);
 
 /**********************
  *  STATIC VARIABLES
@@ -114,6 +115,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->ta         = NULL;
     ext->mode       = LV_KB_MODE_TEXT;
+    ext->shift      = LV_KB_SHIFT_LOWER;
     ext->cursor_mng = 0;
 
     /*The signal and design functions are not copied so set them here*/
@@ -151,6 +153,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->ta                = NULL;
         ext->ta                = copy_ext->ta;
         ext->mode              = copy_ext->mode;
+        ext->shift             = copy_ext->shift;
         ext->cursor_mng        = copy_ext->cursor_mng;
 
         /*Refresh the style with new signal function*/
@@ -256,11 +259,13 @@ void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style
 void lv_kb_set_map(lv_obj_t * kb, lv_kb_shift_t shift, const char * map[])
 {
     kb_map[shift] = map;
+    lv_kb_updatemap(kb);
 }
 
 void lv_kb_set_ctrl_map(lv_obj_t * kb, lv_kb_shift_t shift, const lv_btnm_ctrl_t ctrl_map[])
 {
     kb_ctrl[shift] = ctrl_map;
+    lv_kb_updatemap(kb);
 }
 
 /*=====================
@@ -349,14 +354,17 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
 
     /*Do the corresponding action according to the text of the button*/
     if(strcmp(txt, "abc") == 0) {
+        ext->shift = LV_KB_SHIFT_LOWER;
         lv_btnm_set_map(kb, kb_map[LV_KB_SHIFT_LOWER]);
         lv_btnm_set_ctrl_map(kb, kb_ctrl[LV_KB_SHIFT_LOWER]);
         return;
     } else if(strcmp(txt, "ABC") == 0) {
+        ext->shift = LV_KB_SHIFT_UPPER;
         lv_btnm_set_map(kb, kb_map[LV_KB_SHIFT_UPPER]);
         lv_btnm_set_ctrl_map(kb, kb_ctrl[LV_KB_SHIFT_UPPER]);
         return;
     } else if(strcmp(txt, "1#") == 0) {
+        ext->shift = LV_KB_SHIFT_SYMBOL;
         lv_btnm_set_map(kb, kb_map[LV_KB_SHIFT_SYMBOL]);
         lv_btnm_set_ctrl_map(kb, kb_ctrl[LV_KB_SHIFT_SYMBOL]);
         return;
@@ -459,6 +467,17 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
     }
 
     return res;
+}
+
+/**
+ * Update the key map for the current shift state
+ * @param kb pointer to a keyboard object
+ */
+static void lv_kb_updatemap(lv_obj_t * kb)
+{
+	lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
+	lv_btnm_set_map(kb, kb_map[ext->shift]);
+	lv_btnm_set_ctrl_map(kb, kb_ctrl[ext->shift]);
 }
 
 #endif
