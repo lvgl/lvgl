@@ -48,6 +48,14 @@ enum {
 };
 typedef uint8_t lv_kb_mode_t;
 
+/** Shift states */
+enum {
+    LV_KB_SHIFT_LOWER = 0,
+    LV_KB_SHIFT_UPPER,
+    LV_KB_SHIFT_SYMBOL,
+};
+typedef uint8_t lv_kb_shift_t;
+    
 /*Data of keyboard*/
 typedef struct
 {
@@ -55,6 +63,7 @@ typedef struct
     /*New data for this type */
     lv_obj_t * ta;          /*Pointer to the assigned text area*/
     lv_kb_mode_t mode;      /*Key map type*/
+    lv_kb_shift_t shift;    /*Shift state*/
     uint8_t cursor_mng : 1; /*1: automatically show/hide cursor when a text area is assigned or left*/
 } lv_kb_ext_t;
 
@@ -67,14 +76,6 @@ enum {
     LV_KB_STYLE_BTN_INA,
 };
 typedef uint8_t lv_kb_style_t;
-
-
-enum {
-    LV_KB_SHIFT_LOWER = 0,
-    LV_KB_SHIFT_UPPER,
-    LV_KB_SHIFT_SYMBOL,
-};
-typedef uint8_t lv_kb_shift_t;
 
 /**********************
  * GLOBAL PROTOTYPES
