@@ -327,6 +327,10 @@ static void slider_init(void)
     slider_knob.body.border.width = 1;
     slider_knob.body.border.color = LV_COLOR_GRAY;
     slider_knob.body.border.opa   = LV_OPA_50;
+    slider_knob.body.padding.left = LV_DPI/25;
+    slider_knob.body.padding.right = LV_DPI/25;
+    slider_knob.body.padding.top = LV_DPI/25;
+    slider_knob.body.padding.bottom = LV_DPI/25;
 
     theme.style.slider.bg    = &bar_bg;
     theme.style.slider.indic = &bar_indic;

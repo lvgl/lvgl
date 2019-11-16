@@ -217,7 +217,7 @@ static void bar_init(void)
     bar_bg.body.padding.top    = LV_DPI / 16;
     bar_bg.body.padding.bottom = LV_DPI / 16;
     bar_bg.body.radius         = LV_RADIUS_CIRCLE;
-    bar_bg.body.corner_mask = 1;
+//    bar_bg.body.corner_mask = 1;
 
     lv_style_copy(&bar_indic, &def);
     bar_indic.body.main_color     = lv_color_hsv_to_rgb(_hue, 80, 70);
