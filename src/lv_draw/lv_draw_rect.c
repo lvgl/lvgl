@@ -830,7 +830,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
                 mask_res = lv_draw_mask_apply(mask_buf, a.x1, a.y1, lv_area_get_width(&a));
                 if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
                 lv_blend_fill(clip, &a,
-                        style->body.shadow.color, mask_buf, mask_res, opa, LV_BLEND_MODE_NORMAL);
+                        style->body.shadow.color, mask_buf, mask_res, opa, style->body.shadow.blend_mode);
             } else {
                 lv_opa_t opa_tmp = sh_buf_tmp[0];
                 if(opa_tmp != LV_OPA_COVER || opa != LV_OPA_COVER) opa_tmp = (opa * opa_tmp) >> 8;
