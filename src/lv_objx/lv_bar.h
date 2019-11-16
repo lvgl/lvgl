@@ -31,23 +31,6 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/** Bar animation start value. (Not the real value of the Bar just indicates process animation)*/
-#define LV_BAR_ANIM_STATE_START 0
-
-/** Bar animation end value.  (Not the real value of the Bar just indicates process animation)*/
-#define LV_BAR_ANIM_STATE_END 256
-
-/** Mark no animation is in progress */
-#define LV_BAR_ANIM_STATE_INV -1
-
-/** log2(LV_BAR_ANIM_STATE_END) used to normalize data*/
-#define LV_BAR_ANIM_STATE_NORM 8
-
-LV_EXPORT_CONST_INT(LV_BAR_ANIM_STATE_START);
-LV_EXPORT_CONST_INT(LV_BAR_ANIM_STATE_END);
-LV_EXPORT_CONST_INT(LV_BAR_ANIM_STATE_INV);
-LV_EXPORT_CONST_INT(LV_BAR_ANIM_STATE_NORM);
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -64,7 +47,8 @@ typedef struct {
     lv_obj_t * bar;
 	lv_anim_value_t anim_start;
     lv_anim_value_t anim_end;
-    lv_anim_value_t anim_state;
+    lv_anim_value_t anim_val;
+	uint8_t is_animating : 1;
 } lv_bar_anim_t;
 #endif
 
@@ -82,7 +66,7 @@ typedef struct
 #if LV_USE_ANIMATION
     lv_anim_value_t anim_time;
     lv_bar_anim_t cur_value_anim;
-	/* lv_bar_anim_t start_value_anim; */
+	lv_bar_anim_t start_value_anim;
 #endif
 	uint8_t type : 2;			/*Type of bar*/
     const lv_style_t * style_indic; /*Style of the indicator*/
