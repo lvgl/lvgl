@@ -66,6 +66,7 @@ void * lv_draw_buf_get(uint32_t size)
         if(_lv_draw_buf[i].used == 0) {
             _lv_draw_buf[i].used = 1;
             _lv_draw_buf[i].size = size;
+            /*if this fails you probably need to increase your LV_MEM_SIZE/heap size*/
             _lv_draw_buf[i].p = lv_mem_realloc(_lv_draw_buf[i].p, size);
             LV_ASSERT_MEM(_lv_draw_buf[i].p);
             return  _lv_draw_buf[i].p;
