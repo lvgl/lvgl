@@ -127,9 +127,9 @@ static void label_init(void)
 {
 #if LV_USE_LABEL != 0
 
-    theme.style.label.prim = NULL;
-    theme.style.label.sec  = NULL;
-    theme.style.label.hint = NULL;
+    theme.style.label.prim = &light_plain;
+    theme.style.label.sec  = &light_plain;
+    theme.style.label.hint = &light_plain;
 #endif
 }
 
@@ -145,7 +145,7 @@ static void img_init(void)
 static void line_init(void)
 {
 #if LV_USE_LINE != 0
-    theme.style.line.decor = NULL;
+    theme.style.line.decor = &light_plain;
 #endif
 }
 

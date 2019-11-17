@@ -1200,7 +1200,9 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
 void lv_obj_set_style(lv_obj_t * obj, const lv_style_t * style)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    LV_ASSERT_STYLE(style);
+    if(style) {
+        LV_ASSERT_STYLE(style);
+    }
 
     obj->style_p = style;
 
