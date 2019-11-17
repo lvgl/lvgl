@@ -591,7 +591,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
     lv_coord_t max_w         = lv_obj_get_width(label);
     const lv_style_t * style = lv_obj_get_style(label);
     const lv_font_t * font   = style->text.font;
-    uint8_t letter_height    = lv_font_get_line_height(font);
+    lv_coord_t letter_height    = lv_font_get_line_height(font);
     lv_coord_t y             = 0;
     lv_txt_flag_t flag       = LV_TXT_FLAG_NONE;
 
@@ -694,7 +694,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     lv_coord_t max_w         = lv_obj_get_width(label);
     const lv_style_t * style = lv_obj_get_style(label);
     const lv_font_t * font   = style->text.font;
-    uint8_t letter_height    = lv_font_get_line_height(font);
+    lv_coord_t letter_height    = lv_font_get_line_height(font);
     lv_coord_t y             = 0;
     lv_txt_flag_t flag       = LV_TXT_FLAG_NONE;
     uint16_t logical_pos;
@@ -854,7 +854,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
     lv_coord_t max_w         = lv_obj_get_width(label);
     const lv_style_t * style = lv_obj_get_style(label);
     const lv_font_t * font   = style->text.font;
-    uint8_t letter_height    = lv_font_get_line_height(font);
+    lv_coord_t letter_height    = lv_font_get_line_height(font);
     lv_coord_t y             = 0;
     lv_txt_flag_t flag       = LV_TXT_FLAG_NONE;
     lv_label_align_t align = lv_label_get_align(label);

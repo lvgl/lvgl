@@ -127,8 +127,6 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
  */
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter, uint32_t unicode_letter_next)
 {
-
-
 	bool is_tab = false;
 	if(unicode_letter == '\t') {
 		unicode_letter = ' ';
@@ -150,8 +148,6 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     const lv_font_fmt_txt_glyph_dsc_t * gdsc = &fdsc->glyph_dsc[gid];
 
     int32_t kv = ((int32_t)((int32_t)kvalue * fdsc->kern_scale) >> 4);
-
-
 
     uint32_t adv_w = gdsc->adv_w;
     if(is_tab) adv_w *= 2;
