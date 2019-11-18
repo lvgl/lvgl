@@ -356,7 +356,10 @@ typedef void * lv_font_user_data_t;
 /* Minimum number of characters in a long word to put on a line after a break.
  * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
 #define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
- 
+
+/* The control character to use for signalling text recoloring. */
+#define LV_TXT_COLOR_CMD "#"
+
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
  * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
