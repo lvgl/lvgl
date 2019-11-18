@@ -116,14 +116,16 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
             if(((lv_task_t *)LV_GC_ROOT(_lv_task_act))->prio == LV_TASK_PRIO_HIGHEST) {
                 lv_task_exec(LV_GC_ROOT(_lv_task_act));
             }
-            /*Tasks with higher priority then the interrupted shall be run in every case*/
+            /*Tasks with higher priority than the interrupted shall be run in every case*/
             else if(task_interrupter) {
                 if(((lv_task_t *)LV_GC_ROOT(_lv_task_act))->prio > task_interrupter->prio) {
                     if(lv_task_exec(LV_GC_ROOT(_lv_task_act))) {
-                        task_interrupter =
-                            LV_GC_ROOT(_lv_task_act); /*Check all tasks again from the highest priority */
-                        end_flag = false;
-                        break;
+                        if(!task_created && !task_deleted) {
+                            /*Check all tasks again from the highest priority */
+                            task_interrupter = LV_GC_ROOT(_lv_task_act);
+                            end_flag = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -131,14 +133,19 @@ LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void)
              * Just run the remaining tasks*/
             else {
                 if(lv_task_exec(LV_GC_ROOT(_lv_task_act))) {
-                    task_interrupter = LV_GC_ROOT(_lv_task_act); /*Check all tasks again from the highest priority */
-                    end_flag         = false;
-                    break;
+                    if(!task_created && !task_deleted) {
+                        task_interrupter = LV_GC_ROOT(_lv_task_act); /*Check all tasks again from the highest priority */
+                        end_flag         = false;
+                        break;
+                    }
                 }
             }
 
-            if(task_deleted) break; /*If a task was deleted then this or the next item might be corrupted*/
-            if(task_created) break; /*If a task was created then this or the next item might be corrupted*/
+            /*If a task was created or deleted then this or the next item might be corrupted*/
+            if(task_created || task_deleted) {
+                task_interrupter = NULL;
+                break;
+            }
 
             LV_GC_ROOT(_lv_task_act) = next; /*Load the next task*/
         }

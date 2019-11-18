@@ -1435,6 +1435,7 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
                 /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
                 const lv_style_t * style_label = lv_obj_get_style(ext->label);
                 lv_coord_t font_h              = lv_font_get_line_height(style_label->text.font);
+                lv_obj_set_height(ext->label, font_h);
                 lv_obj_set_height(ta, font_h + style_ta->body.padding.top + style_ta->body.padding.bottom +
                                           style_scrl->body.padding.top + style_scrl->body.padding.bottom);
             } else {
