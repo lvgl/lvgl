@@ -834,26 +834,33 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
 
         } else if(ext->type == LV_CPICKER_TYPE_DISC) {
             const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
+
             lv_coord_t r_in = w / 2;
             p.x -= r_in;
             p.y -= r_in;
+            bool on_ring = true;
             r_in -= style_main->line.width;
-
             if(r_in > LV_DPI / 2) {
                 r_in -= style_main->line.width; /* to let some sensitive space inside*/
 
                 if(r_in < LV_DPI / 2) r_in = LV_DPI / 2;
             }
 
-            /*If the inner area is being pressed, go to the next color mode on long press*/
             if(p.x * p.x + p.y * p.y < r_in * r_in) {
-                uint32_t diff = lv_tick_elaps(ext->last_change_time);
-                if(diff > indev->driver.long_press_time && !ext->color_mode_fixed) {
-                    next_color_mode(cpicker);
-                    lv_indev_wait_release(lv_indev_get_act());
-                }
+                on_ring = false;
+            }
+
+            /*If the inner area is being pressed, go to the next color mode on long press*/
+            uint32_t diff = lv_tick_elaps(ext->last_change_time);
+            if(((!ext->preview && on_ring) || (ext->preview))
+                    && diff > indev->driver.long_press_time && !ext->color_mode_fixed) {
+                next_color_mode(cpicker);
+                lv_indev_wait_release(lv_indev_get_act());
                 return res;
             }
+
+            /*Set the angle only if pressed on the ring*/
+            if(!on_ring) return res;
 
             angle = lv_atan2(p.x, p.y) % 360;
         }
@@ -947,6 +954,8 @@ static lv_res_t double_click_reset(lv_obj_t * cpicker)
             hsv_cur.v = LV_CPICKER_DEF_VALUE;
             break;
         }
+
+        lv_indev_wait_release(indev);
 
         if (lv_cpicker_set_hsv(cpicker, hsv_cur)) {
             lv_res_t res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
