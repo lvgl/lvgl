@@ -207,6 +207,7 @@ const lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type)
     lv_cb_ext_t * ext        = lv_obj_get_ext_attr(cb);
 
     switch(type) {
+        case LV_CB_STYLE_BG: style = lv_btn_get_style(cb, LV_BTN_STYLE_REL); break;
         case LV_CB_STYLE_BOX_REL: style = lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL); break;
         case LV_CB_STYLE_BOX_PR: style = lv_btn_get_style(ext->bullet, LV_BTN_STYLE_PR); break;
         case LV_CB_STYLE_BOX_TGL_REL: style = lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_REL); break;
