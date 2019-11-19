@@ -965,14 +965,14 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt)
     }
 
 #if LV_USE_BIDI
-    char * bidi_buf = lv_mem_alloc(ins_len + 1);
+    char * bidi_buf = lv_mem_buf_get(ins_len + 1);
     LV_ASSERT_MEM(bidi_buf);
     if(bidi_buf == NULL) return;
 
     lv_bidi_process(txt, bidi_buf, lv_obj_get_base_dir(label));
     lv_txt_ins(ext->text, pos, bidi_buf);
 
-    lv_mem_free(bidi_buf);
+    lv_mem_buf_release(bidi_buf);
 #else
     lv_txt_ins(ext->text, pos, txt);
     lv_label_refr_text(label);
