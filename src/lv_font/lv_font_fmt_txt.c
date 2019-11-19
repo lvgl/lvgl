@@ -317,8 +317,8 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
 
     rle_init(in, bpp);
 
-    uint8_t * line_buf1 = lv_draw_buf_get(w);
-    uint8_t * line_buf2 = lv_draw_buf_get(w);
+    uint8_t * line_buf1 = lv_mem_buf_get(w);
+    uint8_t * line_buf2 = lv_mem_buf_get(w);
 
     decompress_line(line_buf1, w);
 
@@ -339,8 +339,8 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
         }
     }
 
-    lv_draw_buf_release(line_buf1);
-    lv_draw_buf_release(line_buf2);
+    lv_mem_buf_release(line_buf1);
+    lv_mem_buf_release(line_buf2);
 }
 
 /**

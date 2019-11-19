@@ -2441,7 +2441,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         lv_draw_rect(&obj->coords, clip_area, style, lv_obj_get_opa_scale(obj));
 
         if(style->body.corner_mask) {
-            lv_draw_mask_radius_param_t * mp = lv_draw_buf_get(sizeof(lv_draw_mask_radius_param_t));
+            lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
 
             lv_draw_mask_radius_init(mp, &obj->coords, style->body.radius, false);
             /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
@@ -2452,7 +2452,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         const lv_style_t * style = lv_obj_get_style(obj);
         if(style->body.corner_mask) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
-            lv_draw_buf_release(param);
+            lv_mem_buf_release(param);
         }
     }
 

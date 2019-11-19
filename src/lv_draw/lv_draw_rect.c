@@ -137,7 +137,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
     lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
 
     /*Create a mask if there is a radius*/
-    lv_opa_t * mask_buf = lv_draw_buf_get(draw_area_w);
+    lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
 
     bool simple_mode = true;
     if(lv_draw_mask_get_cnt()!= 0) simple_mode = false;
@@ -178,7 +178,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
             lv_color_t * grad_map = NULL;
             /*In case of horizontal gradient pre-compute a line with a gradient*/
             if(style->body.grad_dir == LV_GRAD_DIR_HOR && style->body.main_color.full != style->body.grad_color.full) {
-                grad_map = lv_draw_buf_get(coords_w * sizeof(lv_color_t));
+                grad_map = lv_mem_buf_get(coords_w * sizeof(lv_color_t));
 
                 lv_coord_t i;
                 for(i = 0; i < coords_w; i++) {
@@ -258,13 +258,13 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, const lv_s
                 fill_area.y2++;
             }
 
-            if(grad_map) lv_draw_buf_release(grad_map);
+            if(grad_map) lv_mem_buf_release(grad_map);
         }
 
         lv_draw_mask_remove_id(mask_rout_id);
     }
 
-    lv_draw_buf_release(mask_buf);
+    lv_mem_buf_release(mask_buf);
 
 }
 
@@ -300,7 +300,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, const 
     lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
 
     /*Create a mask if there is a radius*/
-    lv_opa_t * mask_buf = lv_draw_buf_get(draw_area_w);
+    lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
 
     bool simple_mode = true;
     if(lv_draw_mask_get_cnt()!= 0) simple_mode = false;
@@ -468,7 +468,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, const 
     }
     lv_draw_mask_remove_id(mask_rin_id);
     lv_draw_mask_remove_id(mask_rout_id);
-    lv_draw_buf_release(mask_buf);
+    lv_mem_buf_release(mask_buf);
 }
 
 static lv_color_t grad_get(const lv_style_t * style, lv_coord_t s, lv_coord_t i)
@@ -555,7 +555,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
     lv_coord_t corner_size = sw  + r_sh;
 
-    lv_opa_t * sh_buf = lv_draw_buf_get(corner_size * corner_size);
+    lv_opa_t * sh_buf = lv_mem_buf_get(corner_size * corner_size);
     shadow_draw_corner_buf(&sh_rect_area, sh_buf, style->body.shadow.width, r_sh);
 
     bool simple_mode = true;
@@ -567,7 +567,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
 
     /*Create a mask*/
     lv_draw_mask_res_t mask_res;
-    lv_opa_t * mask_buf = lv_draw_buf_get(lv_area_get_width(&sh_rect_area));
+    lv_opa_t * mask_buf = lv_mem_buf_get(lv_area_get_width(&sh_rect_area));
 
     lv_draw_mask_radius_param_t mask_rout_param;
     lv_draw_mask_radius_init(&mask_rout_param, &bg_coords, r_bg, true);
@@ -862,8 +862,8 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, const 
     }
 
     lv_draw_mask_remove_id(mask_rout_id);
-    lv_draw_buf_release(mask_buf);
-    lv_draw_buf_release(sh_buf);
+    lv_mem_buf_release(mask_buf);
+    lv_mem_buf_release(sh_buf);
 }
 
 static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, lv_coord_t sw, lv_coord_t r)
@@ -892,8 +892,8 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
 
     lv_draw_mask_res_t mask_res;
     lv_coord_t y;
-    lv_opa_t * mask_line = lv_draw_buf_get(size);
-    uint16_t * sh_ups_buf = lv_draw_buf_get(size * size * sizeof(uint16_t));
+    lv_opa_t * mask_line = lv_mem_buf_get(size);
+    uint16_t * sh_ups_buf = lv_mem_buf_get(size * size * sizeof(uint16_t));
     uint16_t * sh_ups_tmp_buf = sh_ups_buf;
     for(y = 0; y < size; y++) {
         memset(mask_line, 0xFF, size);
@@ -911,7 +911,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
 
         sh_ups_tmp_buf += size;
     }
-    lv_draw_buf_release(mask_line);
+    lv_mem_buf_release(mask_line);
 
     //        uint32_t k;
     //        for(k = 0; k < size * size; k++) {
@@ -924,7 +924,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
         for(i = 0; i < size * size; i++) {
             sh_buf[i] = (sh_ups_buf[i] >> SHADOW_UPSACALE_SHIFT);
         }
-        lv_draw_buf_release(sh_ups_buf);
+        lv_mem_buf_release(sh_ups_buf);
         return;
     }
 
@@ -933,7 +933,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
 #if SHADOW_ENHANCE
     sw = sw_ori - sw;
     if(sw <= 1) {
-        lv_draw_buf_release(sh_ups_buf);
+        lv_mem_buf_release(sh_ups_buf);
         return;
     }
 
@@ -947,7 +947,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
     shadow_blur_corner(size, sw, sh_buf, sh_ups_buf);
 #endif
 
-    lv_draw_buf_release(sh_ups_buf);
+    lv_mem_buf_release(sh_ups_buf);
 
 }
 
@@ -958,7 +958,7 @@ static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, lv_opa_t * res_bu
     if((sw & 1) == 0) s_left--;
 
     /*Horizontal blur*/
-    uint16_t * sh_ups_hor_buf = lv_draw_buf_get(size * size * sizeof(uint16_t));
+    uint16_t * sh_ups_hor_buf = lv_mem_buf_get(size * size * sizeof(uint16_t));
     uint16_t * sh_ups_hor_buf_tmp;
 
     lv_coord_t x;
@@ -1019,6 +1019,6 @@ static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, lv_opa_t * res_bu
         }
     }
 
-    lv_draw_buf_release(sh_ups_hor_buf);
+    lv_mem_buf_release(sh_ups_hor_buf);
 }
 

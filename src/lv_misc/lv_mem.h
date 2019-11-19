@@ -38,6 +38,10 @@ extern "C" {
 #endif
 #endif
 
+#ifndef LV_MEM_BUF_MAX_NUM
+#define LV_MEM_BUF_MAX_NUM    16
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -55,6 +59,12 @@ typedef struct
     uint8_t used_pct; /**< Percentage used */
     uint8_t frag_pct; /**< Amount of fragmentation */
 } lv_mem_monitor_t;
+
+typedef struct {
+    void * p;
+    uint16_t size;
+    uint8_t used    :1;
+}lv_mem_buf_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -105,6 +115,23 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p);
  * @return the size of data memory in bytes
  */
 uint32_t lv_mem_get_size(const void * data);
+
+/**
+ * Get a temporal buffer with the given size.
+ * @param size the required size
+ */
+void * lv_mem_buf_get(uint32_t size);
+
+/**
+ * Release a memory buffer
+ * @param p buffer to release
+ */
+void lv_mem_buf_release(void * p);
+
+/**
+ * Free all memory buffers
+ */
+void lv_mem_buf_free_all(void);
 
 /**********************
  *      MACROS

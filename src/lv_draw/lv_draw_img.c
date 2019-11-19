@@ -275,7 +275,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
 
         lv_coord_t width = lv_area_get_width(&mask_com);
 
-        uint8_t  * buf = lv_draw_buf_get(lv_area_get_width(&mask_com) * LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
+        uint8_t  * buf = lv_mem_buf_get(lv_area_get_width(&mask_com) * LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
 
         lv_area_t line;
         lv_area_copy(&line, &mask_com);
@@ -293,7 +293,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
             if(read_res != LV_RES_OK) {
                 lv_img_decoder_close(&cdsc->dec_dsc);
                 LV_LOG_WARN("Image draw can't read the line");
-                lv_draw_buf_release(buf);
+                lv_mem_buf_release(buf);
                 return LV_RES_INV;
             }
 
@@ -303,7 +303,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
             line.y2++;
             y++;
         }
-        lv_draw_buf_release(buf);
+        lv_mem_buf_release(buf);
     }
 
     return LV_RES_OK;
@@ -359,8 +359,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
         /*Build the image and a mask line-by-line*/
         uint32_t mask_buf_size = lv_area_get_size(&draw_area) > LV_HOR_RES_MAX ? LV_HOR_RES_MAX : lv_area_get_size(&draw_area);
-        lv_color_t * map2 = lv_draw_buf_get(mask_buf_size * sizeof(lv_color_t));
-        lv_opa_t * mask_buf = lv_draw_buf_get(mask_buf_size);
+        lv_color_t * map2 = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
+        lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
 
         /*Go to the first displayed pixel of the map*/
         lv_coord_t map_w = lv_area_get_width(map_area);
@@ -502,7 +502,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, style->image.blend_mode);
         }
 
-        lv_draw_buf_release(mask_buf);
-        lv_draw_buf_release(map2);
+        lv_mem_buf_release(mask_buf);
+        lv_mem_buf_release(map2);
     }
 }

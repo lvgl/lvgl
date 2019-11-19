@@ -731,7 +731,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     }
 
 #if LV_USE_BIDI
-    bidi_txt = lv_draw_buf_get(new_line_start - line_start + 1);
+    bidi_txt = lv_mem_buf_get(new_line_start - line_start + 1);
     uint16_t txt_len = new_line_start - line_start;
     if(bidi_txt[new_line_start] == '\0') txt_len--;
     lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_base_dir(label), NULL, 0);
@@ -787,7 +787,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     }
 
 #if LV_USE_BIDI
-    lv_draw_buf_release(bidi_txt);
+    lv_mem_buf_release(bidi_txt);
     /*Handle Bidi*/
     bool is_rtl;
     logical_pos = lv_bidi_get_logical_pos(&txt[line_start], NULL, txt_len, lv_obj_get_base_dir(label), lv_txt_encoded_get_char_id(bidi_txt, i), &is_rtl);

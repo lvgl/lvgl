@@ -85,7 +85,7 @@ void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_are
         }
     }
 
-    lv_draw_mask_line_param_t * mp = lv_draw_buf_get(sizeof(lv_draw_mask_line_param_t) * point_cnt);
+    lv_draw_mask_line_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_line_param_t) * point_cnt);
     lv_draw_mask_line_param_t * mp_next = mp;
 
     int32_t i_prev_left = y_min_i;
@@ -157,7 +157,7 @@ void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_are
 
     lv_draw_mask_remove_custom(mp);
 
-    lv_draw_buf_release(mp);
+    lv_mem_buf_release(mp);
 
 }
 
