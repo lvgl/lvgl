@@ -66,20 +66,30 @@ static const lv_btnm_ctrl_t default_kb_ctrl_spec_map[] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     LV_KB_CTRL_BTN_FLAGS | 2, 2, 6, 2, LV_KB_CTRL_BTN_FLAGS | 2};
 
-static const char * const kb_map_num[] = {"1", "2", "3", LV_SYMBOL_CLOSE, "\n",
+static const char * const default_kb_map_num[] = {"1", "2", "3", LV_SYMBOL_CLOSE, "\n",
                                     "4", "5", "6", LV_SYMBOL_OK, "\n",
                                     "7", "8", "9", "Bksp", "\n",
                                     "+/-", "0", ".", LV_SYMBOL_LEFT, LV_SYMBOL_RIGHT, ""};
 
-static const lv_btnm_ctrl_t kb_ctrl_num_map[] = {
+static const lv_btnm_ctrl_t default_kb_ctrl_num_map[] = {
         1, 1, 1, LV_KB_CTRL_BTN_FLAGS | 2,
         1, 1, 1, LV_KB_CTRL_BTN_FLAGS | 2,
         1, 1, 1, 2,
         1, 1, 1, 1, 1};
 /* clang-format on */
 
-static const char * * kb_map[3] = { (const char * *)default_kb_map_lc, (const char * *)default_kb_map_uc, (const char * *)default_kb_map_spec };
-static const lv_btnm_ctrl_t * kb_ctrl[3] = { default_kb_ctrl_lc_map, default_kb_ctrl_uc_map, default_kb_ctrl_spec_map };
+static const char * * kb_map[4] = { 
+    (const char * *)default_kb_map_lc, 
+    (const char * *)default_kb_map_uc, 
+    (const char * *)default_kb_map_spec,
+    (const char * *)default_kb_map_num
+};
+static const lv_btnm_ctrl_t * kb_ctrl[4] = { 
+    default_kb_ctrl_lc_map, 
+    default_kb_ctrl_uc_map, 
+    default_kb_ctrl_spec_map,
+    default_kb_ctrl_num_map
+};
 
 /**********************
  *      MACROS
@@ -114,8 +124,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Initialize the allocated 'ext' */
 
     ext->ta         = NULL;
-    ext->mode       = LV_KB_MODE_TEXT;
-    ext->shift      = LV_KB_SHIFT_LOWER;
+    ext->mode       = LV_KB_MODE_TEXT_LOWER;
     ext->cursor_mng = 0;
 
     /*The signal and design functions are not copied so set them here*/
@@ -127,12 +136,11 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
          * Don't use `par` directly because if the window is created on a page it is moved to the
          * scrollable so the parent has changed */
         lv_obj_set_size(new_kb, lv_obj_get_width_fit(lv_obj_get_parent(new_kb)),
-                        lv_obj_get_height_fit(lv_obj_get_parent(new_kb)) / 2);
-
+        lv_obj_get_height_fit(lv_obj_get_parent(new_kb)) / 2);
         lv_obj_align(new_kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
         lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
-        lv_btnm_set_map(new_kb, kb_map[LV_KB_SHIFT_LOWER]);
-        lv_btnm_set_ctrl_map(new_kb, kb_ctrl[LV_KB_SHIFT_LOWER]);
+        lv_btnm_set_map(new_kb, kb_map[LV_KB_MODE_TEXT_LOWER]);
+        lv_btnm_set_ctrl_map(new_kb, kb_ctrl[LV_KB_MODE_TEXT_LOWER]);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
@@ -153,7 +161,6 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->ta                = NULL;
         ext->ta                = copy_ext->ta;
         ext->mode              = copy_ext->mode;
-        ext->shift             = copy_ext->shift;
         ext->cursor_mng        = copy_ext->cursor_mng;
 
         /*Refresh the style with new signal function*/
@@ -205,13 +212,8 @@ void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode)
     if(ext->mode == mode) return;
 
     ext->mode = mode;
-    if(mode == LV_KB_MODE_TEXT) {
-        lv_btnm_set_map(kb, kb_map[LV_KB_SHIFT_LOWER]);
-        lv_btnm_set_ctrl_map(kb, kb_ctrl[LV_KB_SHIFT_LOWER]);
-		} else if(mode == LV_KB_MODE_NUM) {
-        lv_btnm_set_map(kb, (const char * *)kb_map_num);
-        lv_btnm_set_ctrl_map(kb, kb_ctrl_num_map);
-    }
+    lv_btnm_set_map(kb, kb_map[mode]);
+    lv_btnm_set_ctrl_map(kb, kb_ctrl[mode]);
 }
 
 /**
@@ -256,15 +258,15 @@ void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style
     }
 }
 
-void lv_kb_set_map(lv_obj_t * kb, lv_kb_shift_t shift, const char * map[])
+void lv_kb_set_map(lv_obj_t * kb, lv_kb_mode_t mode, const char * map[])
 {
-    kb_map[shift] = map;
+    kb_map[mode] = map;
     lv_kb_updatemap(kb);
 }
 
-void lv_kb_set_ctrl_map(lv_obj_t * kb, lv_kb_shift_t shift, const lv_btnm_ctrl_t ctrl_map[])
+void lv_kb_set_ctrl_map(lv_obj_t * kb, lv_kb_mode_t mode, const lv_btnm_ctrl_t ctrl_map[])
 {
-    kb_ctrl[shift] = ctrl_map;
+    kb_ctrl[mode] = ctrl_map;
     lv_kb_updatemap(kb);
 }
 
@@ -354,19 +356,19 @@ void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event)
 
     /*Do the corresponding action according to the text of the button*/
     if(strcmp(txt, "abc") == 0) {
-        ext->shift = LV_KB_SHIFT_LOWER;
-        lv_btnm_set_map(kb, kb_map[LV_KB_SHIFT_LOWER]);
-        lv_btnm_set_ctrl_map(kb, kb_ctrl[LV_KB_SHIFT_LOWER]);
+				ext->mode = LV_KB_MODE_TEXT_LOWER;
+				lv_btnm_set_map(kb, kb_map[LV_KB_MODE_TEXT_LOWER]);
+				lv_btnm_set_ctrl_map(kb, kb_ctrl[LV_KB_MODE_TEXT_LOWER]);
         return;
     } else if(strcmp(txt, "ABC") == 0) {
-        ext->shift = LV_KB_SHIFT_UPPER;
-        lv_btnm_set_map(kb, kb_map[LV_KB_SHIFT_UPPER]);
-        lv_btnm_set_ctrl_map(kb, kb_ctrl[LV_KB_SHIFT_UPPER]);
+				ext->mode = LV_KB_MODE_TEXT_UPPER;
+				lv_btnm_set_map(kb, kb_map[LV_KB_MODE_TEXT_UPPER]);
+				lv_btnm_set_ctrl_map(kb, kb_ctrl[LV_KB_MODE_TEXT_UPPER]);
         return;
     } else if(strcmp(txt, "1#") == 0) {
-        ext->shift = LV_KB_SHIFT_SYMBOL;
-        lv_btnm_set_map(kb, kb_map[LV_KB_SHIFT_SYMBOL]);
-        lv_btnm_set_ctrl_map(kb, kb_ctrl[LV_KB_SHIFT_SYMBOL]);
+				ext->mode = LV_KB_MODE_SPECIAL;
+				lv_btnm_set_map(kb, kb_map[LV_KB_MODE_SPECIAL]);
+				lv_btnm_set_ctrl_map(kb, kb_ctrl[LV_KB_MODE_SPECIAL]);
         return;
     } else if(strcmp(txt, LV_SYMBOL_CLOSE) == 0) {
         if(kb->event_cb != lv_kb_def_event_cb) {
@@ -476,8 +478,8 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
 static void lv_kb_updatemap(lv_obj_t * kb)
 {
 	lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-	lv_btnm_set_map(kb, kb_map[ext->shift]);
-	lv_btnm_set_ctrl_map(kb, kb_ctrl[ext->shift]);
+	lv_btnm_set_map(kb, kb_map[ext->mode]);
+	lv_btnm_set_ctrl_map(kb, kb_ctrl[ext->mode]);
 }
 
 #endif
