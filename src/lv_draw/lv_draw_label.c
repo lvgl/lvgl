@@ -172,6 +172,15 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         }
     }
 
+    lv_style_t line_style;
+    if(style->text.underline || style->text.strikethrough) {
+        lv_style_copy(&line_style, style);
+        line_style.line.color = style->text.color;
+        line_style.line.width = (style->text.font->line_height + 5) / 10;    /*+5 for rounding*/
+        line_style.line.opa = style->text.opa;
+        line_style.line.blend_mode = style->text.blend_mode;
+    }
+
     cmd_state_t cmd_state = CMD_STATE_WAIT;
     uint32_t i;
     uint16_t par_start = 0;
@@ -180,7 +189,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
     lv_style_t sel_style;
     lv_style_copy(&sel_style, &lv_style_plain_color);
     sel_style.body.main_color = sel_style.body.grad_color = style->text.sel_color;
-
+    lv_coord_t pos_x_start = pos.x;
     /*Write out all lines*/
     while(txt[line_start] != '\0') {
         if(offset != NULL) pos.x += x_ofs;
@@ -274,6 +283,26 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             }
         }
 
+        if(style->text.strikethrough) {
+            lv_point_t p1;
+            lv_point_t p2;
+            p1.x = pos_x_start;
+            p1.y = pos.y + (style->text.font->line_height / 2)  + style->line.width / 2;
+            p2.x = pos.x;
+            p2.y = p1.y;
+            lv_draw_line(&p1, &p2, mask, &line_style, opa_scale);
+        }
+
+        if(style->text.underline) {
+            lv_point_t p1;
+            lv_point_t p2;
+            p1.x = pos_x_start;
+            p1.y = pos.y + style->text.font->line_height - style->text.font->base_line + style->line.width / 2 + 1;
+            p2.x = pos.x;
+            p2.y = p1.y;
+            lv_draw_line(&p1, &p2, mask, &line_style, opa_scale);
+        }
+
 #if LV_USE_BIDI
         lv_mem_buf_release(bidi_txt);
         bidi_txt = NULL;
@@ -297,9 +326,6 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
                     lv_txt_get_width(&txt[line_start], line_end - line_start, font, style->text.letter_space, flag);
             pos.x += lv_area_get_width(coords) - line_width;
         }
-
-
-
 
         /*Go the next line position*/
         pos.y += line_height;

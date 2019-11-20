@@ -118,6 +118,8 @@ typedef struct
         lv_coord_t line_space; /**< Space between lines (vertical) */
         lv_opa_t opa; /**< Text opacity */
         lv_blend_mode_t blend_mode :3;
+        uint8_t underline :1;
+        uint8_t strikethrough :1;
     } text;
 
     /**< Style of images. */
