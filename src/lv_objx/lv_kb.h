@@ -43,18 +43,12 @@ extern "C" {
 
 /** Current keyboard mode. */
 enum {
-    LV_KB_MODE_TEXT,
+    LV_KB_MODE_TEXT_LOWER,
+    LV_KB_MODE_TEXT_UPPER,
+    LV_KB_MODE_SPECIAL,
     LV_KB_MODE_NUM,
 };
 typedef uint8_t lv_kb_mode_t;
-
-/** Shift states */
-enum {
-    LV_KB_SHIFT_LOWER = 0,
-    LV_KB_SHIFT_UPPER,
-    LV_KB_SHIFT_SYMBOL,
-};
-typedef uint8_t lv_kb_shift_t;
     
 /*Data of keyboard*/
 typedef struct
@@ -63,7 +57,6 @@ typedef struct
     /*New data for this type */
     lv_obj_t * ta;          /*Pointer to the assigned text area*/
     lv_kb_mode_t mode;      /*Key map type*/
-    lv_kb_shift_t shift;    /*Shift state*/
     uint8_t cursor_mng : 1; /*1: automatically show/hide cursor when a text area is assigned or left*/
 } lv_kb_ext_t;
 
@@ -121,7 +114,7 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en);
  * @param map pointer to a string array to describe the map.
  *            See 'lv_btnm_set_map()' for more info.
  */
-void lv_kb_set_map(lv_obj_t * kb, lv_kb_shift_t shift, const char * map[]);
+void lv_kb_set_map(lv_obj_t * kb, lv_kb_mode_t mode, const char * map[]);
 
 /**
  * Set the button control map (hidden, disabled etc.) for the keyboard. The
@@ -132,7 +125,7 @@ void lv_kb_set_map(lv_obj_t * kb, lv_kb_shift_t shift, const char * map[]);
  * @param ctrl_map pointer to an array of `lv_btn_ctrl_t` control bytes.
  *                 See: `lv_btnm_set_ctrl_map` for more details.
  */
-void lv_kb_set_ctrl_map(lv_obj_t * kb, lv_kb_shift_t shift, const lv_btnm_ctrl_t ctrl_map[]);
+void lv_kb_set_ctrl_map(lv_obj_t * kb, lv_kb_mode_t mode, const lv_btnm_ctrl_t ctrl_map[]);
 
 /**
  * Set a style of a keyboard
