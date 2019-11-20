@@ -91,13 +91,13 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->label          = NULL;
+    ext->symbol         = NULL;
     ext->opened         = 0;
     ext->fix_height     = 0;
     ext->sel_opt_id     = 0;
     ext->sel_opt_id_ori = 0;
     ext->option_cnt     = 0;
     ext->sel_style      = &lv_style_plain_color;
-    ext->draw_arrow     = 0; /*Do not draw arrow by default*/
     ext->stay_open      = 0;
 
     /*The signal and design functions are not copied so set them here*/
@@ -153,7 +153,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->fix_height     = copy_ext->fix_height;
         ext->option_cnt     = copy_ext->option_cnt;
         ext->sel_style      = copy_ext->sel_style;
-        ext->draw_arrow     = copy_ext->draw_arrow;
+        ext->symbol           = copy_ext->symbol;
         ext->stay_open      = copy_ext->stay_open;
 
         lv_ddlist_set_style(new_ddlist, LV_DDLIST_STYLE_BG, lv_ddlist_get_style(copy, LV_DDLIST_STYLE_BG));
@@ -274,18 +274,17 @@ void lv_ddlist_set_fix_width(lv_obj_t * ddlist, lv_coord_t w)
 }
 
 /**
- * Set arrow draw in a drop down list
+ * Set an arrow or other symbol to display when the drop-down list is closed.
  * @param ddlist pointer to drop down list object
- * @param en enable/disable a arrow draw. E.g. "true" for draw.
+ * @param symbol a text like `LV_SYMBOL_DOWN` or NULL to not draw icon
  */
-void lv_ddlist_set_draw_arrow(lv_obj_t * ddlist, bool en)
+void lv_ddlist_set_symbol(lv_obj_t * ddlist, const char * symbol)
 {
     LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
 
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-
-    /*Set the flag*/
-    ext->draw_arrow = en ? 1 : 0;
+    ext->symbol = symbol;
+    lv_obj_invalidate(ddlist);
 }
 
 /**
@@ -420,16 +419,17 @@ lv_coord_t lv_ddlist_get_fix_height(const lv_obj_t * ddlist)
 }
 
 /**
- * Get arrow draw in a drop down list
+ * Get the symbol to draw when the drop-down list is closed
  * @param ddlist pointer to drop down list object
+ * @return the symbol or NULL if not enabled
  */
-bool lv_ddlist_get_draw_arrow(lv_obj_t * ddlist)
+const char * lv_ddlist_get_symbol(lv_obj_t * ddlist)
 {
     LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
 
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
-    return ext->draw_arrow ? true : false;
+    return ext->symbol;
 }
 
 /**
@@ -613,10 +613,10 @@ static lv_design_res_t lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * cli
             }
         }
 
-        /*Add a down symbol in ddlist when closed*/
+        /*Closed...*/
         else {
-            /*Draw a arrow in ddlist if enabled*/
-            if(ext->draw_arrow) {
+            /*Draw the symbol if enabled*/
+            if(ext->symbol) {
                 const lv_style_t * style     = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
                 const lv_font_t * font       = style->text.font;
                 const lv_style_t * sel_style = lv_ddlist_get_style(ddlist, LV_DDLIST_STYLE_BG);
@@ -625,25 +625,24 @@ static lv_design_res_t lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * cli
                 lv_style_copy(&new_style, style);
                 new_style.text.color = sel_style->text.color;
                 new_style.text.opa   = sel_style->text.opa;
-                lv_area_t area_arrow;
-                lv_coord_t arrow_width = lv_txt_get_width(LV_SYMBOL_DOWN, strlen(LV_SYMBOL_DOWN), sel_style->text.font, 0, 0);
+                lv_area_t area_icon;
+                lv_coord_t icon_width = lv_txt_get_width(ext->symbol, strlen(ext->symbol), sel_style->text.font, 0, 0);
                 if(lv_label_get_align(ext->label) != LV_LABEL_ALIGN_RIGHT) {
-                    area_arrow.x2 = ddlist->coords.x2 - style->body.padding.right;
-                    area_arrow.x1 = area_arrow.x2 - arrow_width;
+                    area_icon.x2 = ddlist->coords.x2 - style->body.padding.right;
+                    area_icon.x1 = area_icon.x2 - icon_width;
                 } else {
-                    area_arrow.x1 = ddlist->coords.x1 + style->body.padding.left;
-                    area_arrow.x2 = area_arrow.x1 + arrow_width;
+                    area_icon.x1 = ddlist->coords.x1 + style->body.padding.left;
+                    area_icon.x2 = area_icon.x1 + icon_width;
                 }
 
-                area_arrow.y1 = ddlist->coords.y1 + style->text.line_space;
-                area_arrow.y2 = area_arrow.y1 + font_h;
+                area_icon.y1 = ddlist->coords.y1 + style->text.line_space;
+                area_icon.y2 = area_icon.y1 + font_h;
 
-                lv_area_t mask_arrow;
+                lv_area_t mask_icon;
                 bool area_ok;
-                area_ok = lv_area_intersect(&mask_arrow, clip_area, &area_arrow);
+                area_ok = lv_area_intersect(&mask_icon, clip_area, &area_icon);
                 if(area_ok) {
-                    /*Use a down arrow in ddlist, you can replace it with yourcustom symbol*/
-                    lv_draw_label(&area_arrow, &mask_arrow, &new_style, opa_scale, LV_SYMBOL_DOWN, LV_TXT_FLAG_NONE,
+                    lv_draw_label(&area_icon, &mask_icon, &new_style, opa_scale, ext->symbol, LV_TXT_FLAG_NONE,
                                   NULL, NULL, NULL, lv_obj_get_base_dir(ddlist));
                 }
             }
