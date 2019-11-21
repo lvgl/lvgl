@@ -1909,21 +1909,21 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
 
         /*Invalidate the text area.*/
         if(ext->sel.start > ext->sel.end) {
-            if(ext_label->txt_sel_start != ext->sel.end || ext_label->txt_sel_end != ext->sel.start) {
-                ext_label->txt_sel_start = ext->sel.end;
-                ext_label->txt_sel_end   = ext->sel.start;
+            if(ext_label->txt_sel.start != ext->sel.end || ext_label->txt_sel.end != ext->sel.start) {
+                ext_label->txt_sel.start = ext->sel.end;
+                ext_label->txt_sel.end   = ext->sel.start;
                 lv_obj_invalidate(ta);
             }
         } else if(ext->sel.start < ext->sel.end) {
-            if(ext_label->txt_sel_start != ext->sel.start || ext_label->txt_sel_end != ext->sel.end) {
-                ext_label->txt_sel_start = ext->sel.start;
-                ext_label->txt_sel_end   = ext->sel.end;
+            if(ext_label->txt_sel.start != ext->sel.start || ext_label->txt_sel.end != ext->sel.end) {
+                ext_label->txt_sel.start = ext->sel.start;
+                ext_label->txt_sel.end   = ext->sel.end;
                 lv_obj_invalidate(ta);
             }
         } else {
-            if(ext_label->txt_sel_start != LV_DRAW_LABEL_NO_TXT_SEL || ext_label->txt_sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
-                ext_label->txt_sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
-                ext_label->txt_sel_end   = LV_DRAW_LABEL_NO_TXT_SEL;
+            if(ext_label->txt_sel.start != LV_DRAW_LABEL_NO_TXT_SEL || ext_label->txt_sel.end != LV_DRAW_LABEL_NO_TXT_SEL) {
+                ext_label->txt_sel.start = LV_DRAW_LABEL_NO_TXT_SEL;
+                ext_label->txt_sel.end   = LV_DRAW_LABEL_NO_TXT_SEL;
                 lv_obj_invalidate(ta);
             }
         }

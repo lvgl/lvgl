@@ -110,8 +110,8 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
 
 #if LV_LABEL_TEXT_SEL
-    ext->txt_sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
-    ext->txt_sel_end   = LV_DRAW_LABEL_NO_TXT_SEL;
+    ext->txt_sel.start = LV_DRAW_LABEL_NO_TXT_SEL;
+    ext->txt_sel.end   = LV_DRAW_LABEL_NO_TXT_SEL;
 #endif
     ext->dot.tmp_ptr   = NULL;
     ext->dot_tmp_alloc = 0;
@@ -447,7 +447,7 @@ void lv_label_set_text_sel_start(lv_obj_t * label, uint16_t index)
 
 #if LV_LABEL_TEXT_SEL
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    ext->txt_sel_start   = index;
+    ext->txt_sel.start   = index;
     lv_obj_invalidate(label);
 #else
     (void)label;    /*Unused*/
@@ -461,7 +461,7 @@ void lv_label_set_text_sel_end(lv_obj_t * label, uint16_t index)
 
 #if LV_LABEL_TEXT_SEL
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    ext->txt_sel_end     = index;
+    ext->txt_sel.end     = index;
     lv_obj_invalidate(label);
 #else
     (void)label;    /*Unused*/
@@ -810,7 +810,7 @@ uint16_t lv_label_get_text_sel_start(const lv_obj_t * label)
 
 #if LV_LABEL_TEXT_SEL
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    return ext->txt_sel_start;
+    return ext->txt_sel.start;
 
 #else
     (void)label;    /*Unused*/
@@ -829,7 +829,7 @@ uint16_t lv_label_get_text_sel_end(const lv_obj_t * label)
 
 #if LV_LABEL_TEXT_SEL
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    return ext->txt_sel_end;
+    return ext->txt_sel.end;
 #else
     (void)label; /*Unused*/
     return LV_LABEL_TEXT_SEL_OFF;
