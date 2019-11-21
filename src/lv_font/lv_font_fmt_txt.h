@@ -113,7 +113,7 @@ typedef struct {
     uint16_t list_length;
 
     /** Type of this character map*/
-    lv_font_fmt_txt_cmap_type_t type   :2;
+    lv_font_fmt_txt_cmap_type_t type;
 }lv_font_fmt_txt_cmap_t;
 
 /** A simple mapping of kern values from pairs*/
