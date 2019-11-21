@@ -122,7 +122,7 @@ void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showe
  * WILL BE SAVED! CAN'T BE LOCAL ARRAY.
  * @param date_num number of dates in the array
  */
-void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t date_num);
+void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t highlighted[], uint16_t date_num);
 
 /**
  * Set the name of the days

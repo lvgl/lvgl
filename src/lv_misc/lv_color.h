@@ -114,7 +114,7 @@ enum {
 # define LV_COLOR_GET_B8(c) (c).ch.blue
 # define LV_COLOR_GET_A8(c) 0xFF
 
-# define LV_COLOR_SET_R16(c, v) (c).ch.red = (uint8_t)((v) & 0x1F);
+# define LV_COLOR_SET_R16(c, v) (c).ch.red = (uint8_t)(((uint8_t)(v)) & 0x1F);
 # define LV_COLOR_SET_G16(c, v) (c).ch.green = (uint8_t)((v) & 0x3F);
 # define LV_COLOR_SET_G16_SWAP(c, v) {(c).ch.green_h = (uint8_t)(((v) >> 3) & 0x7); (c).ch.green_l = (uint8_t)((v) & 0x7);}
 # define LV_COLOR_SET_B16(c, v) (c).ch.blue = (uint8_t)((v) & 0x1F);

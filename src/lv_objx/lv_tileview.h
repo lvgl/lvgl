@@ -86,11 +86,11 @@ void lv_tileview_add_element(lv_obj_t * tileview, lv_obj_t * element);
 /**
  * Set the valid position's indices. The scrolling will be possible only to these positions.
  * @param tileview pointer to a Tileview object
- * @param valid_pos array width the indices. E.g. `lv_point_t p[] = {{0,0}, {1,0}, {1,1}`. Only the
- * pointer is saved so can't be a local variable.
+ * @param valid_pos array width the indices. E.g. `lv_point_t p[] = {{0,0}, {1,0}, {1,1}`.
+ *  Only the pointer is saved so can't be a local variable.
  * @param valid_pos_cnt numner of elements in `valid_pos` array
  */
-void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t * valid_pos, uint16_t valid_pos_cnt);
+void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t valid_pos[], uint16_t valid_pos_cnt);
 
 /**
  * Set the tile to be shown
