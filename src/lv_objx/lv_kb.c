@@ -258,12 +258,28 @@ void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style
     }
 }
 
+/**
+ * Set a new map for the keyboard
+ * @param kb pointer to a Keyboard object
+ * @param mode keyboard map to alter 'lv_kb_mode_t'
+ * @param map pointer to a string array to describe the map.
+ *            See 'lv_btnm_set_map()' for more info.
+ */
 void lv_kb_set_map(lv_obj_t * kb, lv_kb_mode_t mode, const char * map[])
 {
     kb_map[mode] = map;
     lv_kb_updatemap(kb);
 }
 
+/**
+ * Set the button control map (hidden, disabled etc.) for the keyboard. The
+ * control map array will be copied and so may be deallocated after this
+ * function returns.
+ * @param kb pointer to a keyboard object
+ * @param mode keyboard ctrl map to alter 'lv_kb_mode_t'
+ * @param ctrl_map pointer to an array of `lv_btn_ctrl_t` control bytes.
+ *                 See: `lv_btnm_set_ctrl_map` for more details.
+ */
 void lv_kb_set_ctrl_map(lv_obj_t * kb, lv_kb_mode_t mode, const lv_btnm_ctrl_t ctrl_map[])
 {
     kb_ctrl[mode] = ctrl_map;
