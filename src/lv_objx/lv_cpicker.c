@@ -759,7 +759,7 @@ static lv_area_t get_indic_area(lv_obj_t * cpicker)
     const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
     const lv_style_t * style_indic = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_INDICATOR);
 
-    uint16_t r;
+    uint16_t r = 0;
     if(ext->type == LV_CPICKER_TYPE_DISC) r = style_main->line.width / 2;
     else if(ext->type == LV_CPICKER_TYPE_RECT) {
         lv_coord_t h = lv_obj_get_height(cpicker);
