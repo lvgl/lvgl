@@ -163,7 +163,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  */
 static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
                               lv_coord_t letter_space, lv_coord_t max_width,
-                              lv_txt_flag_t flag, uint32_t *word_w_ptr, bool force)
+                              lv_txt_flag_t flag, uint32_t *word_w_ptr, lv_txt_cmd_state_t * cmd_state, bool force)
 {
     if(txt == NULL || txt[0] == '\0') return 0;
     if(font == NULL) return 0;
@@ -171,7 +171,6 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
     if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
 
     uint32_t i = 0, i_next = 0, i_next_next = 0;  /* Iterating index into txt */
-    lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
     uint32_t letter = 0;      /* Letter at i */
     uint32_t letter_next = 0; /* Letter at i_next */
     lv_coord_t letter_w;
@@ -190,7 +189,7 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
 
         /*Handle the recolor command*/
         if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
-            if(lv_txt_is_cmd(&cmd_state, letter) != false) {
+            if(lv_txt_is_cmd(cmd_state, letter) != false) {
                 i = i_next;
                 i_next = i_next_next;
                 letter = letter_next;
@@ -289,12 +288,12 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
     if(font == NULL) return 0;
 
     if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
-
+    lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
     uint32_t i = 0;                                        /* Iterating index into txt */
 
     while(txt[i] != '\0' && max_width > 0) {
         uint32_t word_w = 0;
-        uint32_t advance = lv_txt_get_next_word(&txt[i], font, letter_space, max_width, flag, &word_w, i==0);
+        uint32_t advance = lv_txt_get_next_word(&txt[i], font, letter_space, max_width, flag, &word_w, &cmd_state, i==0);
         max_width -= word_w;
 
         if( advance == 0 ){
