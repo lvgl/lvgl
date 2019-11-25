@@ -29,6 +29,9 @@ extern "C" {
 #define LV_COORD_MAX ((lv_coord_t)((uint32_t)((uint32_t)1 << (8 * sizeof(lv_coord_t) - 1)) - 1000))
 #define LV_COORD_MIN (-LV_COORD_MAX)
 
+LV_EXPORT_CONST_INT(LV_COORD_MAX);
+LV_EXPORT_CONST_INT(LV_COORD_MIN);
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -82,7 +85,7 @@ inline static void lv_area_copy(lv_area_t * dest, const lv_area_t * src)
  */
 static inline lv_coord_t lv_area_get_width(const lv_area_t * area_p)
 {
-    return area_p->x2 - area_p->x1 + 1;
+    return (lv_coord_t)(area_p->x2 - area_p->x1 + 1);
 }
 
 /**
@@ -92,7 +95,7 @@ static inline lv_coord_t lv_area_get_width(const lv_area_t * area_p)
  */
 static inline lv_coord_t lv_area_get_height(const lv_area_t * area_p)
 {
-    return area_p->y2 - area_p->y1 + 1;
+    return (lv_coord_t)(area_p->y2 - area_p->y1 + 1);
 }
 
 /**
@@ -164,6 +167,13 @@ bool lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p);
  * @return
  */
 bool lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p);
+
+/**
+ * Increment or decrement an area's size by a single amount
+ * @param a_p pointer to an area to grow
+ * @param amount amount to increment the area, or negative to decrement
+ */
+void lv_area_increment(lv_area_t * a_p, const lv_coord_t amount);
 
 /**********************
  *      MACROS

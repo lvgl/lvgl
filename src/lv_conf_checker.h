@@ -50,6 +50,11 @@
 #define LV_COLOR_TRANSP    LV_COLOR_LIME         /*LV_COLOR_LIME: pure green*/
 #endif
 
+/* Enable chroma keying for indexed images. */
+#ifndef LV_INDEXED_CHROMA
+#define LV_INDEXED_CHROMA    1
+#endif
+
 /* Enable anti-aliasing (lines, and radiuses will be smoothed) */
 #ifndef LV_ANTIALIAS
 #define LV_ANTIALIAS        1
@@ -261,6 +266,16 @@
 #define LV_ATTRIBUTE_LARGE_CONST
 #endif
 
+/* Export integer constant to binding.
+ * This macro is used with constants in the form of LV_<CONST> that
+ * should also appear on lvgl binding API such as Micropython
+ *
+ * The default value just prevents a GCC warning.
+ */
+#ifndef LV_EXPORT_CONST_INT
+#define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning
+#endif
+
 /*===================
  *  HAL settings
  *==================*/
@@ -301,11 +316,59 @@
 #endif
 
 /* 1: Print the log with 'printf';
- * 0: user need to register a callback with `lv_log_register_print`*/
+ * 0: user need to register a callback with `lv_log_register_print_cb`*/
 #ifndef LV_LOG_PRINTF
 #  define LV_LOG_PRINTF   0
 #endif
 #endif  /*LV_USE_LOG*/
+
+/*=================
+ * Debug settings
+ *================*/
+
+/* If Debug is enabled LittelvGL validates the parameters of the functions.
+ * If an invalid parameter is found an error log message is printed and
+ * the MCU halts at the error. (`LV_USE_LOG` should be enabled)
+ * If you are debugging the MCU you can pause
+ * the debugger to see exactly where  the issue is.
+ *
+ * The behavior of asserts can be overwritten by redefining them here.
+ * E.g. #define LV_ASSERT_MEM(p)  <my_assert_code>
+ */
+#ifndef LV_USE_DEBUG
+#define LV_USE_DEBUG        1
+#endif
+#if LV_USE_DEBUG
+
+/*Check if the parameter is NULL. (Quite fast) */
+#ifndef LV_USE_ASSERT_NULL
+#define LV_USE_ASSERT_NULL      1
+#endif
+
+/*Checks is the memory is successfully allocated or no. (Quite fast)*/
+#ifndef LV_USE_ASSERT_MEM
+#define LV_USE_ASSERT_MEM       1
+#endif
+
+/* Check the strings.
+ * Search for NULL, very long strings, invalid characters, and unnatural repetitions. (Slow)
+ * If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled) */
+#ifndef LV_USE_ASSERT_STR
+#define LV_USE_ASSERT_STR       0
+#endif
+
+/* Check NULL, the object's type and existence (e.g. not deleted). (Quite slow)
+ * If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled) */
+#ifndef LV_USE_ASSERT_OBJ
+#define LV_USE_ASSERT_OBJ       0
+#endif
+
+/*Check if the styles are properly initialized. (Fast)*/
+#ifndef LV_USE_ASSERT_STYLE
+#define LV_USE_ASSERT_STYLE     1
+#endif
+
+#endif /*LV_USE_DEBUG*/
 
 /*================
  *  THEME USAGE
@@ -364,6 +427,14 @@
 #define LV_FONT_ROBOTO_28    0
 #endif
 
+/* Demonstrate special features */
+#ifndef LV_FONT_ROBOTO_12_SUBPX
+#define LV_FONT_ROBOTO_12_SUBPX 1
+#endif
+#ifndef LV_FONT_ROBOTO_28_COMPRESSED
+#define LV_FONT_ROBOTO_28_COMPRESSED 1  /*bpp = 3*/
+#endif
+
 /*Pixel perfect monospace font
  * http://pelulamu.net/unscii/ */
 #ifndef LV_FONT_UNSCII_8
@@ -392,6 +463,14 @@
 #define LV_FONT_FMT_TXT_LARGE   0
 #endif
 
+/* Set the pixel order of the display.
+ * Important only if "subpx fonts" are used.
+ * With "normal" font it doesn't matter.
+ */
+#ifndef LV_FONT_SUBPX_BGR
+#define LV_FONT_SUBPX_BGR    0
+#endif
+
 /*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
 
 /*=================
@@ -411,6 +490,62 @@
 #ifndef LV_TXT_BREAK_CHARS
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 #endif
+
+/* If a word is at least this long, will break wherever "prettiest"
+ * To disable, set to a value <= 0 */
+#ifndef LV_TXT_LINE_BREAK_LONG_LEN
+#define LV_TXT_LINE_BREAK_LONG_LEN          12
+#endif
+
+/* Minimum number of characters in a long word to put on a line before a break.
+ * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
+#ifndef LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
+#define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN  3
+#endif
+
+/* Minimum number of characters in a long word to put on a line after a break.
+ * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
+#ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
+#define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
+#endif
+
+/* The control character to use for signalling text recoloring. */
+#ifndef LV_TXT_COLOR_CMD
+#define LV_TXT_COLOR_CMD "#"
+#endif
+
+/* Support bidirectional texts.
+ * Allows mixing Left-to-Right and Right-to-Left texts.
+ * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
+ * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
+#ifndef LV_USE_BIDI
+#define LV_USE_BIDI     0
+#endif
+#if LV_USE_BIDI
+/* Set the default direction. Supported values:
+ * `LV_BIDI_DIR_LTR` Left-to-Right
+ * `LV_BIDI_DIR_RTL` Right-to-Left
+ * `LV_BIDI_DIR_AUTO` detect texts base direction */
+#ifndef LV_BIDI_BASE_DIR_DEF
+#define LV_BIDI_BASE_DIR_DEF  LV_BIDI_DIR_AUTO
+#endif
+#endif
+
+/*Change the built in (v)snprintf functions*/
+#ifndef LV_SPRINTF_CUSTOM
+#define LV_SPRINTF_CUSTOM   0
+#endif
+#if LV_SPRINTF_CUSTOM
+#ifndef LV_SPRINTF_INCLUDE
+#  define LV_SPRINTF_INCLUDE <stdio.h>
+#endif
+#ifndef lv_snprintf
+#  define lv_snprintf     snprintf
+#endif
+#ifndef lv_vsnprintf
+#  define lv_vsnprintf    vsnprintf
+#endif
+#endif  /*LV_SPRINTF_CUSTOM*/
 
 /*===================
  *  LV_OBJ SETTINGS
@@ -493,6 +628,11 @@
 /*Container (dependencies: -*/
 #ifndef LV_USE_CONT
 #define LV_USE_CONT     1
+#endif
+
+/*Color picker (dependencies: -*/
+#ifndef LV_USE_CPICKER
+#define LV_USE_CPICKER   1
 #endif
 
 /*Drop down list (dependencies: lv_page, lv_label, lv_symbol_def.h)*/

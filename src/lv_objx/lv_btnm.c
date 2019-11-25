@@ -9,6 +9,7 @@
 #include "lv_btnm.h"
 #if LV_USE_BTNM != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_refr.h"
@@ -18,6 +19,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_btnm"
 
 /**********************
  *      TYPEDEFS
@@ -70,14 +72,14 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor object*/
     lv_obj_t * new_btnm = lv_obj_create(par, copy);
-    lv_mem_assert(new_btnm);
+    LV_ASSERT_MEM(new_btnm);
     if(new_btnm == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_btnm);
 
     /*Allocate the object type specific extended data*/
     lv_btnm_ext_t * ext = lv_obj_allocate_ext_attr(new_btnm, sizeof(lv_btnm_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->btn_cnt                          = 0;
@@ -101,8 +103,8 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new button matrix object*/
     if(copy == NULL) {
-        lv_obj_set_size(new_btnm, LV_DPI * 3, LV_DPI * 2);
         lv_btnm_set_map(new_btnm, lv_btnm_def_map);
+        lv_obj_set_size(new_btnm, LV_DPI * 3, LV_DPI * 2);
 
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
@@ -142,7 +144,8 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
 {
-    if(map == NULL) return;
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+    LV_ASSERT_NULL(map);
 
     /*
      * lv_btnm_set_map is called on receipt of signals such as
@@ -204,6 +207,8 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
             btn_h = lv_obj_get_height(btnm)- act_y - style_bg->body.padding.bottom - 1;
         }
 
+        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(btnm);
+
         /*Only deal with the non empty lines*/
         if(btn_cnt != 0) {
             /*Calculate the width of all units*/
@@ -211,7 +216,8 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
 
             /*Set the button size and positions and set the texts*/
             uint16_t i;
-            lv_coord_t act_x = style_bg->body.padding.left;
+            lv_coord_t act_x;
+
             lv_coord_t act_unit_w;
             unit_act_cnt = 0;
             for(i = 0; i < btn_cnt; i++) {
@@ -222,9 +228,13 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
                 act_unit_w--; /*-1 because e.g. width = 100 means 101 pixels (0..100)*/
 
                 /*Always recalculate act_x because of rounding errors */
-                act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner +
-                        style_bg->body.padding.left;
-
+                if(base_dir == LV_BIDI_DIR_RTL)  {
+                    act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner;
+                    act_x = lv_obj_get_width(btnm) - style_bg->body.padding.right - act_x - act_unit_w - 1;
+                } else {
+                    act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * style_bg->body.padding.inner +
+                            style_bg->body.padding.left;
+                }
                 /* Set the button's area.
                  * If inner padding is zero then use the prev. button x2 as x1 to avoid rounding
                  * errors*/
@@ -265,6 +275,8 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
  */
 void lv_btnm_set_ctrl_map(const lv_obj_t * btnm, const lv_btnm_ctrl_t ctrl_map[])
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     memcpy(ext->ctrl_bits, ctrl_map, sizeof(lv_btnm_ctrl_t) * ext->btn_cnt);
 
@@ -279,6 +291,8 @@ void lv_btnm_set_ctrl_map(const lv_obj_t * btnm, const lv_btnm_ctrl_t ctrl_map[]
  */
 void lv_btnm_set_pressed(const lv_obj_t * btnm, uint16_t id)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     if(id >= ext->btn_cnt && id != LV_BTNM_BTN_NONE) return;
@@ -297,6 +311,8 @@ void lv_btnm_set_pressed(const lv_obj_t * btnm, uint16_t id)
  */
 void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     switch(type) {
@@ -331,6 +347,8 @@ void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, const lv_style_t *
  */
 void lv_btnm_set_recolor(const lv_obj_t * btnm, bool en)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     ext->recolor = en;
@@ -344,6 +362,8 @@ void lv_btnm_set_recolor(const lv_obj_t * btnm, bool en)
  */
 void lv_btnm_set_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     if(btn_id >= ext->btn_cnt) return;
@@ -359,6 +379,8 @@ void lv_btnm_set_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t
  */
 void lv_btnm_clear_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     if(btn_id >= ext->btn_cnt) return;
@@ -374,6 +396,8 @@ void lv_btnm_clear_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl
  */
 void lv_btnm_set_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     uint16_t i;
     for(i = 0; i < ext->btn_cnt; i++) {
@@ -389,6 +413,8 @@ void lv_btnm_set_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl)
  */
 void lv_btnm_clear_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     uint16_t i;
     for(i = 0; i < ext->btn_cnt; i++) {
@@ -407,6 +433,8 @@ void lv_btnm_clear_btn_ctrl_all(lv_obj_t * btnm, lv_btnm_ctrl_t ctrl)
  */
 void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
 
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     if(btn_id >= ext->btn_cnt) return;
@@ -427,6 +455,8 @@ void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width
  */
 void lv_btnm_set_one_toggle(lv_obj_t * btnm, bool one_toggle)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     ext->one_toggle     = one_toggle;
 
@@ -445,6 +475,8 @@ void lv_btnm_set_one_toggle(lv_obj_t * btnm, bool one_toggle)
  */
 const char ** lv_btnm_get_map_array(const lv_obj_t * btnm)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     return ext->map_p;
 }
@@ -456,6 +488,8 @@ const char ** lv_btnm_get_map_array(const lv_obj_t * btnm)
  */
 bool lv_btnm_get_recolor(const lv_obj_t * btnm)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     return ext->recolor;
@@ -469,6 +503,8 @@ bool lv_btnm_get_recolor(const lv_obj_t * btnm)
  */
 uint16_t lv_btnm_get_active_btn(const lv_obj_t * btnm)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     return ext->btn_id_act;
 }
@@ -481,6 +517,8 @@ uint16_t lv_btnm_get_active_btn(const lv_obj_t * btnm)
  */
 const char * lv_btnm_get_active_btn_text(const lv_obj_t * btnm)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     if(ext->btn_id_act != LV_BTNM_BTN_NONE) {
         return lv_btnm_get_btn_text(btnm, ext->btn_id_act);
@@ -497,6 +535,8 @@ const char * lv_btnm_get_active_btn_text(const lv_obj_t * btnm)
  */
 uint16_t lv_btnm_get_pressed_btn(const lv_obj_t * btnm)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     return ext->btn_id_pr;
 }
@@ -510,6 +550,8 @@ uint16_t lv_btnm_get_pressed_btn(const lv_obj_t * btnm)
  */
 const char * lv_btnm_get_btn_text(const lv_obj_t * btnm, uint16_t btn_id)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     if(btn_id > ext->btn_cnt) return NULL;
 
@@ -539,6 +581,8 @@ const char * lv_btnm_get_btn_text(const lv_obj_t * btnm, uint16_t btn_id)
  */
 bool lv_btnm_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     if(btn_id >= ext->btn_cnt) return false;
 
@@ -553,6 +597,8 @@ bool lv_btnm_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
  */
 const lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_btnm_ext_t * ext      = lv_obj_get_ext_attr(btnm);
 
@@ -576,6 +622,8 @@ const lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type
  */
 bool lv_btnm_get_one_toggle(const lv_obj_t * btnm)
 {
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     return ext->one_toggle;
@@ -603,7 +651,6 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-
         ancestor_design_f(btnm, mask, mode);
 
         lv_btnm_ext_t * ext         = lv_obj_get_ext_attr(btnm);
@@ -624,7 +671,6 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
         lv_txt_flag_t txt_flag = LV_TXT_FLAG_NONE;
 
         if(ext->recolor) txt_flag = LV_TXT_FLAG_RECOLOR;
-
         for(btn_i = 0; btn_i < ext->btn_cnt; btn_i++, txt_i++) {
             /*Search the next valid text in the map*/
             while(strcmp(ext->map_p[txt_i], "\n") == 0) {
@@ -693,9 +739,10 @@ static bool lv_btnm_design(lv_obj_t * btnm, const lv_area_t * mask, lv_design_mo
             area_tmp.x2 = area_tmp.x1 + txt_size.x;
             area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
-            lv_draw_label(&area_tmp, mask, btn_style, opa_scale, ext->map_p[txt_i], txt_flag, NULL, -1, -1, NULL);
+            lv_draw_label(&area_tmp, mask, btn_style, opa_scale, ext->map_p[txt_i], txt_flag, NULL, NULL, NULL, lv_obj_get_base_dir(btnm));
         }
     }
+
     return true;
 }
 
@@ -713,6 +760,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(btnm, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
     lv_point_t p;
@@ -813,6 +861,12 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 #if LV_USE_GROUP
         lv_indev_t * indev         = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
+
+        /*If not focused by an input device assume the last input device*/
+       if(indev_type == LV_INDEV_TYPE_NONE) {
+           indev_type = lv_indev_get_type(lv_indev_get_next(NULL));
+       }
+
         if(indev_type == LV_INDEV_TYPE_POINTER) {
             /*Select the clicked button*/
             lv_point_t p1;
@@ -897,15 +951,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable       = true;
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_btnm";
     }
-
     return res;
 }
 
@@ -938,9 +984,9 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char **
     }
 
     ext->button_areas = lv_mem_alloc(sizeof(lv_area_t) * btn_cnt);
-    lv_mem_assert(ext->button_areas);
+    LV_ASSERT_MEM(ext->button_areas);
     ext->ctrl_bits = lv_mem_alloc(sizeof(lv_btnm_ctrl_t) * btn_cnt);
-    lv_mem_assert(ext->ctrl_bits);
+    LV_ASSERT_MEM(ext->ctrl_bits);
     if(ext->button_areas == NULL || ext->ctrl_bits == NULL) btn_cnt = 0;
 
     memset(ext->ctrl_bits, 0, sizeof(lv_btnm_ctrl_t) * btn_cnt);

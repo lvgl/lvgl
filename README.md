@@ -188,8 +188,8 @@ Styles can be assigned to the objects to changed their appearance. A style descr
 
 You can create a new style like this:
 ```c
-static lv_style_t style1;                 /*Declare a new style. Should be `static`*/
-lv_style_copy(&style1, &lv_style_plain);  /*Copy a buil-in style*/
+static lv_style_t style1;                       /*Declare a new style. Should be `static`*/
+lv_style_copy(&style1, &lv_style_plain);        /*Copy a built-in style*/
 style1.body.main_color = LV_COLOR_RED;          /*Main color*/
 style1.body.grad_color = lv_color_hex(0xffd83c) /*Gradient color (orange)*/
 style1.body.radius = 3;

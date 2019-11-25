@@ -9,6 +9,7 @@
 #include "lv_gauge.h"
 #if LV_USE_GAUGE != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_txt.h"
@@ -20,6 +21,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_gauge"
+
 #define LV_GAUGE_DEF_NEEDLE_COLOR LV_COLOR_RED
 #define LV_GAUGE_DEF_LABEL_COUNT 6
 #define LV_GAUGE_DEF_LINE_COUNT 21 /*Should be: ((label_cnt - 1) * internal_lines) + 1*/
@@ -65,12 +68,12 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor gauge*/
     lv_obj_t * new_gauge = lv_lmeter_create(par, copy);
-    lv_mem_assert(new_gauge);
+    LV_ASSERT_MEM(new_gauge);
     if(new_gauge == NULL) return NULL;
 
     /*Allocate the gauge type specific extended data*/
     lv_gauge_ext_t * ext = lv_obj_allocate_ext_attr(new_gauge, sizeof(lv_gauge_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
@@ -131,6 +134,8 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, const lv_color_t colors[])
 {
+    LV_ASSERT_OBJ(gauge, LV_OBJX_NAME);
+
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
 
     if(ext->needle_count != needle_cnt) {
@@ -140,7 +145,7 @@ void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, const lv_co
         }
 
         ext->values = lv_mem_realloc(ext->values, needle_cnt * sizeof(int16_t));
-        lv_mem_assert(ext->values);
+        LV_ASSERT_MEM(ext->values);
         if(ext->values == NULL) return;
 
         int16_t min = lv_gauge_get_min_value(gauge);
@@ -164,6 +169,8 @@ void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, const lv_co
  */
 void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value)
 {
+    LV_ASSERT_OBJ(gauge, LV_OBJX_NAME);
+
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
 
     if(needle_id >= ext->needle_count) return;
@@ -193,6 +200,8 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value)
  */
 void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint8_t label_cnt)
 {
+    LV_ASSERT_OBJ(gauge, LV_OBJX_NAME);
+
     lv_lmeter_set_scale(gauge, angle, line_cnt);
 
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
@@ -212,6 +221,8 @@ void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint
  */
 int16_t lv_gauge_get_value(const lv_obj_t * gauge, uint8_t needle)
 {
+    LV_ASSERT_OBJ(gauge, LV_OBJX_NAME);
+
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     int16_t min          = lv_gauge_get_min_value(gauge);
 
@@ -227,6 +238,8 @@ int16_t lv_gauge_get_value(const lv_obj_t * gauge, uint8_t needle)
  */
 uint8_t lv_gauge_get_needle_count(const lv_obj_t * gauge)
 {
+    LV_ASSERT_OBJ(gauge, LV_OBJX_NAME);
+
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     return ext->needle_count;
 }
@@ -238,6 +251,8 @@ uint8_t lv_gauge_get_needle_count(const lv_obj_t * gauge)
  */
 uint8_t lv_gauge_get_label_count(const lv_obj_t * gauge)
 {
+    LV_ASSERT_OBJ(gauge, LV_OBJX_NAME);
+
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     return ext->label_count;
 }
@@ -258,7 +273,6 @@ uint8_t lv_gauge_get_label_count(const lv_obj_t * gauge)
  */
 static bool lv_gauge_design(lv_obj_t * gauge, const lv_area_t * mask, lv_design_mode_t mode)
 {
-
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
         return false;
@@ -317,18 +331,12 @@ static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param
     /* Include the ancient signal function */
     res = ancestor_signal(gauge, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_mem_free(ext->values);
         ext->values = NULL;
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_gauge";
     }
 
     return res;
@@ -381,7 +389,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
         label_cord.x2 = label_cord.x1 + label_size.x;
         label_cord.y2 = label_cord.y1 + label_size.y;
 
-        lv_draw_label(&label_cord, mask, style, opa_scale, scale_txt, LV_TXT_FLAG_NONE, NULL, -1, -1, NULL);
+        lv_draw_label(&label_cord, mask, style, opa_scale, scale_txt, LV_TXT_FLAG_NONE, NULL, NULL, NULL, lv_obj_get_base_dir(gauge));
     }
 }
 /**

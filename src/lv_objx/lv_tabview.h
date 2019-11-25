@@ -94,9 +94,9 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Delete all children of the scrl object, without deleting scrl child.
- * @param obj pointer to an object
+ * @param tabview pointer to an object
  */
-void lv_tabview_clean(lv_obj_t * obj);
+void lv_tabview_clean(lv_obj_t * tabview);
 
 /*======================
  * Add/remove functions

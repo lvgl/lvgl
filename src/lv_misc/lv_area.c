@@ -192,6 +192,19 @@ bool lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p)
     return is_in;
 }
 
+/**
+ * Increment or decrement an area's size by a single amount
+ * @param a_p pointer to an area to grow
+ * @param amount amount to increment the area, or negative to decrement
+ */
+void lv_area_increment(lv_area_t * a_p, const lv_coord_t amount)
+{
+    a_p->x1 -= amount;
+    a_p->y1 -= amount;
+    a_p->x2 += amount;
+    a_p->y2 += amount;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

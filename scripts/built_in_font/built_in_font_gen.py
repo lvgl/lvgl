@@ -40,8 +40,8 @@ else:
 	compr = ""
 
 #Built in symbols
-syms = "61441,61448,61451,61452,61453,61457,61459,61460,61461,61465,61468,61473,61478,61479,61480,61502,61504,61512,61515,61516,61517,61521,61522,61523,61524,61543,61544,61553,61556,61559,61560,61561,61563,61587,61589,61636,61637,61639,61671,61683,61724,61732,61787,61931,62016,62017,62018,62019,62020,62099"
+syms = "61441,61448,61451,61452,61452,61453,61457,61459,61461,61465,61468,61473,61478,61479,61480,61502,61512,61515,61516,61517,61521,61522,61523,61524,61543,61544,61550,61552,61553,61556,61559,61560,61561,61563,61587,61589,61636,61637,61639,61671,61674,61683,61724,61732,61787,61931,62016,62017,62018,62019,62020,62087,62099,62212,62189,62810,63426,63650"
 
 #Run the command
-cmd = "lv_font_conv {} --bpp {} --size {} --font ./Roboto-Regular.woff -r {} --font FontAwesome.ttf -r {} --format lvgl -o {} --force-fast-kern-format".format(compr, args.bpp, args.size, args.range[0], syms, args.output)
+cmd = "lv_font_conv {} --bpp {} --size {} --font Roboto-Regular.woff -r {} --font FontAwesome5-Solid+Brands+Regular.woff -r {} --format lvgl -o {} --force-fast-kern-format".format(compr, args.bpp, args.size, args.range[0], syms, args.output)
 os.system(cmd)

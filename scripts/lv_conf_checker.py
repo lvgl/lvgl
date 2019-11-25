@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.6
+
 '''
 Generates a checker file for lv_conf.h from lv_conf_templ.h define all the not defined values
 '''
@@ -34,9 +36,11 @@ for i in fin.read().splitlines():
   if '/*--END OF LV_CONF_H--*/' in i: break
 
   r = re.search(r'^ *# *define ([^\s]+).*$', i)
+  
   if r:
+    line = re.sub('\(.*?\)', '', r[1], 1)    #remove parentheses from macros
     fout.write(
-      f'#ifndef {r[1]}\n'
+      f'#ifndef {line}\n'
       f'{i}\n'
       '#endif\n'
     )

@@ -45,8 +45,7 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2);
  */
 void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
-
-    /*Return is the triangle is degenerated*/
+    /*Return if the triangle is degenerated*/
     if(points[0].x == points[1].x && points[0].y == points[1].y) return;
     if(points[1].x == points[2].x && points[1].y == points[2].y) return;
     if(points[0].x == points[2].x && points[0].y == points[2].y) return;

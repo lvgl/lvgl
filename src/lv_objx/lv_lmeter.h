@@ -36,6 +36,7 @@ typedef struct
     /*No inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
     uint16_t scale_angle; /*Angle of the scale in deg. (0..360)*/
+    uint16_t angle_ofs;
     uint8_t line_cnt;     /*Count of lines */
     int16_t cur_value;
     int16_t min_value;
@@ -89,6 +90,13 @@ void lv_lmeter_set_range(lv_obj_t * lmeter, int16_t min, int16_t max);
 void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt);
 
 /**
+ * Set the set an offset for the line meter's angles to rotate it.
+ * @param lmeter pointer to a line meter object
+ * @param angle angle offset (0..360), rotates clockwise
+ */
+void lv_lmeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle);
+
+/**
  * Set the styles of a line meter
  * @param lmeter pointer to a line meter object
  * @param type which style should be set (can be only `LV_LMETER_STYLE_MAIN`)
@@ -138,6 +146,13 @@ uint8_t lv_lmeter_get_line_count(const lv_obj_t * lmeter);
  * @return angle of the scale
  */
 uint16_t lv_lmeter_get_scale_angle(const lv_obj_t * lmeter);
+
+/**
+ * get the set an offset for the line meter.
+ * @param lmeter pointer to a line meter object
+ * @return angle offset (0..360)
+ */
+uint16_t lv_lmeter_get_angle_offset(lv_obj_t * lmeter);
 
 /**
  * Get the style of a line meter
