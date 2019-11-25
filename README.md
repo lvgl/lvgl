@@ -2,7 +2,9 @@
 <p align="center">
 <a href="https://github.com/littlevgl/lvgl/blob/master/LICENCE.txt"><img src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
 <a href="https://github.com/littlevgl/lvgl/releases/tag/v6.0"><img src="https://img.shields.io/badge/version-6.0-blue.svg"></a>
-<br>
+</p>
+
+<p align="center">
 <img src="https://littlevgl.com/github/cover_ori_reduced_2.gif">
 </p>
 
@@ -81,7 +83,7 @@ Choose a project with your favourite IDE:
 |   Eclipse   |  CodeBlocks | Visual Studio | PlatformIO | Qt Creator |
 |-------------|-------------|---------------|-----------|------------|
 |  [![Eclipse](https://littlevgl.com/logo/ide/eclipse.jpg)](https://github.com/littlevgl/pc_simulator_sdl_eclipse) | [![CodeBlocks](https://littlevgl.com/logo/ide/codeblocks.jpg)](https://github.com/littlevgl/pc_simulator_win_codeblocks) | [![VisualStudio](https://littlevgl.com/logo/ide/visualstudio.jpg)](https://github.com/littlevgl/visual_studio_2017_sdl_x64)   |   [![PlatformIO](https://littlevgl.com/logo/ide/platformio.jpg)](https://github.com/littlevgl/pc_simulator_sdl_platformio) | [![QtCreator](https://littlevgl.com/logo/ide/qtcreator.jpg)](https://blog.littlevgl.com/2019-01-03/qt-creator) |
-| Cross-platform<br>with SDL | Native Windows | Cross-platform<br>with SDL | Cross-platform<br>with SDL | Cross-platform<br>with SDL |
+| Cross-platform<br>with SDL<br>(Recommended on<br>Linux and Mac) | Native Windows | Windows<br>with SDL | Cross-platform<br>with SDL | Cross-platform<br>with SDL |
 
 
 ## Add LittlevGL to your project
@@ -91,7 +93,7 @@ You can use the [Simulators](https://docs.littlevgl.com/en/html/get-started/pc-s
 
 1. [Download](https://littlevgl.com/download) or [Clone](https://github.com/littlevgl/lvgl) the library
 2. Copy the `lvgl` folder into your project
-3. Copy `lvgl/lv_conf_templ.h` as `lv_conf.h` next to the `lvgl` folder and set at least `LV_HOR_RES_MAX`, `LV_VER_RES_MAX` and `LV_COLOR_DEPTH`. 
+3. Copy `lvgl/lv_conf_template.h` as `lv_conf.h` next to the `lvgl` folder and set at least `LV_HOR_RES_MAX`, `LV_VER_RES_MAX` and `LV_COLOR_DEPTH`.
 4. Include `lvgl/lvgl.h` where you need to use LittlevGL related functions.
 5. Call `lv_tick_inc(x)` every `x` milliseconds **in a Timer or Task** (`x` should be between 1 and 10). It is required for the internal timing of LittlevGL.
 6. Call `lv_init()`
@@ -130,7 +132,7 @@ indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*
 indev_drv.read_cb = my_touchpad_read;      /*Set your driver function*/
 lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
-bool my_touchpad_read(lv_indev_t * indev, lv_indev_data_t * data)
+bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
 {
     static lv_coord_t last_x = 0;
     static lv_coord_t last_y = 0;
@@ -186,8 +188,8 @@ Styles can be assigned to the objects to changed their appearance. A style descr
 
 You can create a new style like this:
 ```c
-static lv_style_t style1;                 /*Declare a new style. Should be `static`*/
-lv_style_copy(&style1, &lv_style_plain);  /*Copy a buil-in style*/
+static lv_style_t style1;                       /*Declare a new style. Should be `static`*/
+lv_style_copy(&style1, &lv_style_plain);        /*Copy a built-in style*/
 style1.body.main_color = LV_COLOR_RED;          /*Main color*/
 style1.body.grad_color = lv_color_hex(0xffd83c) /*Gradient color (orange)*/
 style1.body.radius = 3;

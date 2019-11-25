@@ -10,7 +10,9 @@
 #include "lv_slider.h"
 #if LV_USE_SLIDER != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_group.h"
+#include "../lv_core/lv_indev.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_math.h"
@@ -18,6 +20,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_slider"
+
 #define LV_SLIDER_SIZE_MIN 4 /*hor. pad and ver. pad cannot make the bar or indicator smaller then this [px]*/
 #define LV_SLIDER_NOT_PRESSED INT16_MIN
 
@@ -57,7 +61,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor slider*/
     lv_obj_t * new_slider = lv_bar_create(par, copy);
-    lv_mem_assert(new_slider);
+    LV_ASSERT_MEM(new_slider);
     if(new_slider == NULL) return NULL;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_slider);
@@ -65,7 +69,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the slider type specific extended data*/
     lv_slider_ext_t * ext = lv_obj_allocate_ext_attr(new_slider, sizeof(lv_slider_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     /*Initialize the allocated 'ext' */
@@ -118,6 +122,8 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_slider_set_knob_in(lv_obj_t * slider, bool in)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     if(ext->knob_in == in) return;
 
@@ -133,6 +139,8 @@ void lv_slider_set_knob_in(lv_obj_t * slider, bool in)
  */
 void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
     switch(type) {
@@ -156,6 +164,8 @@ void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, const lv_sty
  */
 int16_t lv_slider_get_value(const lv_obj_t * slider)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
     if(ext->drag_value != LV_SLIDER_NOT_PRESSED)
@@ -171,6 +181,8 @@ int16_t lv_slider_get_value(const lv_obj_t * slider)
  */
 bool lv_slider_is_dragged(const lv_obj_t * slider)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     return ext->drag_value == LV_SLIDER_NOT_PRESSED ? false : true;
 }
@@ -183,6 +195,8 @@ bool lv_slider_is_dragged(const lv_obj_t * slider)
  */
 bool lv_slider_get_knob_in(const lv_obj_t * slider)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     return ext->knob_in == 0 ? false : true;
 }
@@ -195,6 +209,8 @@ bool lv_slider_get_knob_in(const lv_obj_t * slider)
  */
 const lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type)
 {
+    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_slider_ext_t * ext    = lv_obj_get_ext_attr(slider);
 
@@ -316,6 +332,8 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         /*If dragged draw to the drag position*/
         if(ext->drag_value != LV_SLIDER_NOT_PRESSED) cur_value = ext->drag_value;
+        bool sym = false;
+        if(ext->bar.sym && ext->bar.min_value < 0 && ext->bar.max_value > 0) sym = true;
 
         if(slider_w >= slider_h) {
             lv_coord_t indic_w = lv_area_get_width(&area_indic);
@@ -335,7 +353,19 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             {
                 area_indic.x2 = (int32_t)((int32_t)indic_w * (cur_value - min_value)) / (max_value - min_value);
             }
+
             area_indic.x2 = area_indic.x1 + area_indic.x2 - 1;
+            if(sym) {
+                /*Calculate the coordinate of the zero point*/
+                lv_coord_t zero;
+                zero = area_indic.x1 + (-ext->bar.min_value * slider_w) / (ext->bar.max_value - ext->bar.min_value);
+                if(area_indic.x2 > zero)
+                    area_indic.x1 = zero;
+                else {
+                    area_indic.x1 = area_indic.x2;
+                    area_indic.x2 = zero;
+                }
+            }
 
             /*Draw the indicator but don't draw an ugly 1px wide rectangle on the left on min.
              * value*/
@@ -359,7 +389,20 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             {
                 area_indic.y1 = (int32_t)((int32_t)indic_h * (cur_value - min_value)) / (max_value - min_value);
             }
+
             area_indic.y1 = area_indic.y2 - area_indic.y1 + 1;
+
+            if(sym) {
+                /*Calculate the coordinate of the zero point*/
+                lv_coord_t zero;
+                zero = area_indic.y2 - (-ext->bar.min_value * slider_h) / (ext->bar.max_value - ext->bar.min_value);
+                if(area_indic.y1 < zero)
+                    area_indic.y2 = zero;
+                else {
+                    area_indic.y2 = area_indic.y1;
+                    area_indic.y1 = zero;
+                }
+            }
 
             /*Draw the indicator but don't draw an ugly 1px height rectangle on the bottom on min.
              * value*/
@@ -386,7 +429,12 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
 
         if(slider_w >= slider_h) {
             if(ext->knob_in == 0) {
-                knob_area.x1 = area_indic.x2 - slider_h / 2;
+                if(sym == false) {
+                    knob_area.x1 = area_indic.x2 - slider_h / 2;
+                } else {
+                    if(cur_value > 0) knob_area.x1 = area_indic.x2 - slider_h / 2;
+                    else knob_area.x1 = area_indic.x1 - slider_h / 2;
+                }
                 knob_area.x2 = knob_area.x1 + slider_h - 1;
             } else {
 #if LV_USE_ANIMATION
@@ -415,7 +463,12 @@ static bool lv_slider_design(lv_obj_t * slider, const lv_area_t * mask, lv_desig
             knob_area.y2 = slider->coords.y2;
         } else {
             if(ext->knob_in == 0) {
-                knob_area.y1 = area_indic.y1 - slider_w / 2;
+                if(sym == false) {
+                    knob_area.y1 = area_indic.y1 - slider_w / 2;
+                } else {
+                    if(cur_value > 0)  knob_area.y1 = area_indic.y1 - slider_w / 2;
+                    else  knob_area.y1 = area_indic.y2 - slider_w / 2;
+                }
                 knob_area.y2 = knob_area.y1 + slider_w - 1;
             } else {
 #if LV_USE_ANIMATION
@@ -465,6 +518,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     /* Include the ancient signal function */
     res = ancestor_signal(slider, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     lv_point_t p;
@@ -559,13 +613,6 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable       = true;
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_slider";
     }
 
     return res;

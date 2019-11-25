@@ -1,6 +1,6 @@
 
 ## File format
-Use [lv_misc/lv_templ.c](https://github.com/littlevgl/lvgl/blob/master/lv_misc/lv_templ.c) and [lv_misc/lv_templ.h](https://github.com/littlevgl/lvgl/blob/master/lv_misc/lv_templ.h)
+Use [lv_misc/lv_templ.c](https://github.com/littlevgl/lvgl/blob/master/src/lv_misc/lv_templ.c) and [lv_misc/lv_templ.h](https://github.com/littlevgl/lvgl/blob/master/src/lv_misc/lv_templ.h)
 
 ## Naming conventions
 * Words are separated by '_'

@@ -9,6 +9,7 @@
 #include "../lv_objx/lv_page.h"
 #if LV_USE_PAGE != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
@@ -19,6 +20,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_page"
+
 #define LV_PAGE_SB_MIN_SIZE (LV_DPI / 8)
 
 /*[ms] Scroll anim time on `lv_page_scroll_up/down/left/rigth`*/
@@ -77,7 +80,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor object*/
     lv_obj_t * new_page = lv_cont_create(par, copy);
-    lv_mem_assert(new_page);
+    LV_ASSERT_MEM(new_page);
     if(new_page == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_page);
@@ -85,7 +88,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the object type specific extended data*/
     lv_page_ext_t * ext = lv_obj_allocate_ext_attr(new_page, sizeof(lv_page_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
 
     ext->scrl        = NULL;
@@ -171,11 +174,13 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
 /**
  * Delete all children of the scrl object, without deleting scrl child.
- * @param obj pointer to an object
+ * @param page pointer to an object
  */
-void lv_page_clean(lv_obj_t * obj)
+void lv_page_clean(lv_obj_t * page)
 {
-    lv_obj_t * scrl = lv_page_get_scrl(obj);
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
+    lv_obj_t * scrl = lv_page_get_scrl(page);
     lv_obj_clean(scrl);
 }
 
@@ -190,6 +195,8 @@ void lv_page_clean(lv_obj_t * obj)
  */
 void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     if(ext->sb.mode == sb_mode) return;
 
@@ -216,6 +223,8 @@ void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
  */
 void lv_page_set_anim_time(lv_obj_t * page, uint16_t anim_time)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     ext->anim_time      = anim_time;
@@ -233,6 +242,8 @@ void lv_page_set_anim_time(lv_obj_t * page, uint16_t anim_time)
  */
 void lv_page_set_scroll_propagation(lv_obj_t * page, bool en)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     ext->scroll_prop    = en ? 1 : 0;
 }
@@ -244,6 +255,8 @@ void lv_page_set_scroll_propagation(lv_obj_t * page, bool en)
  */
 void lv_page_set_edge_flash(lv_obj_t * page, bool en)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION
     lv_page_ext_t * ext     = lv_obj_get_ext_attr(page);
     ext->edge_flash.enabled = en ? 1 : 0;
@@ -261,6 +274,8 @@ void lv_page_set_edge_flash(lv_obj_t * page, bool en)
  *  */
 void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
     switch(type) {
@@ -291,6 +306,8 @@ void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, const lv_style_t *
  */
 lv_obj_t * lv_page_get_scrl(const lv_obj_t * page)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
     return ext->scrl;
@@ -303,6 +320,8 @@ lv_obj_t * lv_page_get_scrl(const lv_obj_t * page)
  */
 uint16_t lv_page_get_anim_time(const lv_obj_t * page)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     return ext->anim_time;
@@ -319,6 +338,8 @@ uint16_t lv_page_get_anim_time(const lv_obj_t * page)
  */
 lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     return ext->sb.mode;
 }
@@ -330,6 +351,8 @@ lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page)
  */
 bool lv_page_get_scroll_propagation(lv_obj_t * page)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     return ext->scroll_prop == 0 ? false : true;
 }
@@ -341,6 +364,8 @@ bool lv_page_get_scroll_propagation(lv_obj_t * page)
  */
 bool lv_page_get_edge_flash(lv_obj_t * page)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     return ext->edge_flash.enabled == 0 ? false : true;
@@ -357,6 +382,8 @@ bool lv_page_get_edge_flash(lv_obj_t * page)
  */
 lv_coord_t lv_page_get_fit_width(lv_obj_t * page)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
     const lv_style_t * bg_style   = lv_page_get_style(page, LV_PAGE_STYLE_BG);
     const lv_style_t * scrl_style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
 
@@ -371,6 +398,8 @@ lv_coord_t lv_page_get_fit_width(lv_obj_t * page)
  */
 lv_coord_t lv_page_get_fit_height(lv_obj_t * page)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
     const lv_style_t * bg_style   = lv_page_get_style(page, LV_PAGE_STYLE_BG);
     const lv_style_t * scrl_style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
 
@@ -386,6 +415,8 @@ lv_coord_t lv_page_get_fit_height(lv_obj_t * page)
  *  */
 const lv_style_t * lv_page_get_style(const lv_obj_t * page, lv_page_style_t type)
 {
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_page_ext_t * ext      = lv_obj_get_ext_attr(page);
 
@@ -792,12 +823,15 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(page, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     lv_obj_t * child;
     if(sign == LV_SIGNAL_CHILD_CHG) { /*Automatically move children to the scrollable object*/
-        const lv_style_t * style = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
+        const lv_style_t * style_bg = lv_page_get_style(page, LV_PAGE_STYLE_BG);
+        const lv_style_t * style_scrl = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
         lv_fit_t fit_left        = lv_page_get_scrl_fit_left(page);
+        lv_fit_t fit_right        = lv_page_get_scrl_fit_right(page);
         lv_fit_t fit_top         = lv_page_get_scrl_fit_top(page);
         child                    = lv_obj_get_child(page, NULL);
         while(child != NULL) {
@@ -805,15 +839,19 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                 lv_obj_t * tmp = child;
                 child          = lv_obj_get_child(page, child); /*Get the next child before move this*/
 
-                /* Reposition the child to take padding into account (Only if it's on (0;0) now)
+                /* Reposition the child to take padding into account (Only if it's on (0;0) or (widht;height) coordinates now)
                  * It's required to keep new the object on the same coordinate if FIT is enabled.*/
                 if((tmp->coords.x1 == page->coords.x1) && (fit_left == LV_FIT_TIGHT || fit_left == LV_FIT_FILL)) {
-                    tmp->coords.x1 += style->body.padding.left;
-                    tmp->coords.x2 += style->body.padding.left;
+                    tmp->coords.x1 += style_scrl->body.padding.left;
+                    tmp->coords.x2 += style_scrl->body.padding.left;
+                }
+                else if((tmp->coords.x2 == page->coords.x2) && (fit_right == LV_FIT_TIGHT || fit_right == LV_FIT_FILL)) {
+                    tmp->coords.x1 -= style_scrl->body.padding.right + style_bg->body.padding.right;
+                    tmp->coords.x2 -= style_scrl->body.padding.right + style_bg->body.padding.right;
                 }
                 if((tmp->coords.y1 == page->coords.y1) && (fit_top == LV_FIT_TIGHT || fit_top == LV_FIT_FILL)) {
-                    tmp->coords.y1 += style->body.padding.top;
-                    tmp->coords.y2 += style->body.padding.top;
+                    tmp->coords.y1 += style_scrl->body.padding.top;
+                    tmp->coords.y2 += style_scrl->body.padding.top;
                 }
                 lv_obj_set_parent(tmp, ext->scrl);
             } else {
@@ -869,13 +907,6 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable       = true;
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_page";
     }
 
     return res;
@@ -895,6 +926,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
     /* Include the ancient signal function */
     res = ancestor_signal(scrl, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, "");
 
     lv_obj_t * page               = lv_obj_get_parent(scrl);
     const lv_style_t * page_style = lv_obj_get_style(page);

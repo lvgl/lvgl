@@ -8,6 +8,7 @@
  *********************/
 #include "lv_draw_label.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_bidi.h"
 
 /*********************
  *      DEFINES
@@ -51,15 +52,18 @@ static uint8_t hex_char_to_num(char hex);
  * @param txt 0 terminated text to write
  * @param flag settings for the text from 'txt_flag_t' enum
  * @param offset text offset in x and y direction (NULL if unused)
- * @param sel_start start index of selected area (`LV_LABEL_TXT_SEL_OFF` if none)
- * @param sel_end end index of selected area (`LV_LABEL_TXT_SEL_OFF` if none)
+ * @param sel make the text selected in the range by drawing a background there
  */
 void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
-                   const char * txt, lv_txt_flag_t flag, lv_point_t * offset, uint16_t sel_start, uint16_t sel_end,
-                   lv_draw_label_hint_t * hint)
+                   const char * txt, lv_txt_flag_t flag, lv_point_t * offset, lv_draw_label_txt_sel_t * sel,
+                   lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir)
 {
     const lv_font_t * font = style->text.font;
     lv_coord_t w;
+
+    /*No need to waste processor time if string is empty*/
+    if (txt[0] == '\0')  return;
+
     if((flag & LV_TXT_FLAG_EXPAND) == 0) {
         /*Normally use the label's width as width*/
         w = lv_area_get_width(coords);
@@ -67,7 +71,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         /*If EXAPND is enabled then not limit the text's width to the object's width*/
         lv_point_t p;
         lv_txt_get_size(&p, txt, style->text.font, style->text.letter_space, style->text.line_space, LV_COORD_MAX,
-                        flag);
+                flag);
         w = p.x;
     }
 
@@ -105,6 +109,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         pos.y += hint->y;
     }
 
+
     uint32_t line_end = line_start + lv_txt_get_next_line(&txt[line_start], font, style->text.letter_space, w, flag);
 
     /*Go the first visible line*/
@@ -139,6 +144,18 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
 
     lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->text.opa : (uint16_t)((uint16_t)style->text.opa * opa_scale) >> 8;
 
+    uint16_t sel_start = 0xFFFF;
+    uint16_t sel_end = 0xFFFF;
+    if(sel) {
+        sel_start = sel->start;
+        sel_end = sel->end;
+        if(sel_start > sel_end) {
+            uint16_t tmp = sel_start;
+            sel_start = sel_end;
+            sel_end = tmp;
+        }
+    }
+
     cmd_state_t cmd_state = CMD_STATE_WAIT;
     uint32_t i;
     uint16_t par_start = 0;
@@ -155,12 +172,31 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         }
         /*Write all letter of a line*/
         cmd_state = CMD_STATE_WAIT;
-        i         = line_start;
+        i         = 0;
         uint32_t letter;
         uint32_t letter_next;
-        while(i < line_end) {
-            letter      = lv_txt_encoded_next(txt, &i);
-            letter_next = lv_txt_encoded_next(&txt[i], NULL);
+#if LV_USE_BIDI
+        char *bidi_txt = lv_draw_get_buf(line_end - line_start + 1);
+        lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, bidi_dir, NULL, 0);
+#else
+        const char *bidi_txt = txt + line_start;
+#endif
+
+        while(i < line_end - line_start) {
+            uint16_t logical_char_pos = 0;
+            if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
+#if LV_USE_BIDI
+                logical_char_pos = lv_txt_encoded_get_char_id(txt, line_start);
+                uint16_t t = lv_txt_encoded_get_char_id(bidi_txt, i);
+                logical_char_pos += lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, bidi_dir, t, NULL);
+#else
+                logical_char_pos = lv_txt_encoded_get_char_id(txt, line_start + i);
+#endif
+            }
+
+            letter      = lv_txt_encoded_next(bidi_txt, &i);
+            letter_next = lv_txt_encoded_next(&bidi_txt[i], NULL);
+
 
             /*Handle the re-color command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
@@ -183,7 +219,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
                         /*Get the parameter*/
                         if(i - par_start == LABEL_RECOLOR_PAR_LENGTH + 1) {
                             char buf[LABEL_RECOLOR_PAR_LENGTH + 1];
-                            memcpy(buf, &txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
+                            memcpy(buf, &bidi_txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
                             buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
                             int r, g, b;
                             r       = (hex_char_to_num(buf[0]) << 4) + hex_char_to_num(buf[1]);
@@ -206,9 +242,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
-                int char_ind = lv_encoded_get_char_id(txt, i);
-                /*Do not draw the rectangle on the character at `sel_start`.*/
-                if(char_ind > sel_start && char_ind <= sel_end) {
+                if(logical_char_pos >= sel_start && logical_char_pos < sel_end) {
                     lv_area_t sel_coords;
                     sel_coords.x1 = pos.x;
                     sel_coords.y1 = pos.y;
@@ -217,6 +251,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
                     lv_draw_rect(&sel_coords, mask, &sel_style, opa);
                 }
             }
+
             lv_draw_letter(&pos, mask, font, letter, color, opa);
 
             if(letter_w > 0) {
@@ -231,7 +266,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         /*Align to middle*/
         if(flag & LV_TXT_FLAG_CENTER) {
             line_width =
-                lv_txt_get_width(&txt[line_start], line_end - line_start, font, style->text.letter_space, flag);
+                    lv_txt_get_width(&txt[line_start], line_end - line_start, font, style->text.letter_space, flag);
 
             pos.x += (lv_area_get_width(coords) - line_width) / 2;
 
@@ -239,7 +274,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_st
         /*Align to the right*/
         else if(flag & LV_TXT_FLAG_RIGHT) {
             line_width =
-                lv_txt_get_width(&txt[line_start], line_end - line_start, font, style->text.letter_space, flag);
+                    lv_txt_get_width(&txt[line_start], line_end - line_start, font, style->text.letter_space, flag);
             pos.x += lv_area_get_width(coords) - line_width;
         }
 
@@ -269,13 +304,13 @@ static uint8_t hex_char_to_num(char hex)
         if(hex >= 'a') hex -= 'a' - 'A'; /*Convert to upper case*/
 
         switch(hex) {
-            case 'A': result = 10; break;
-            case 'B': result = 11; break;
-            case 'C': result = 12; break;
-            case 'D': result = 13; break;
-            case 'E': result = 14; break;
-            case 'F': result = 15; break;
-            default: result = 0; break;
+        case 'A': result = 10; break;
+        case 'B': result = 11; break;
+        case 'C': result = 12; break;
+        case 'D': result = 13; break;
+        case 'E': result = 14; break;
+        case 'F': result = 15; break;
+        default: result = 0; break;
         }
     }
 

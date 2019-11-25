@@ -9,6 +9,7 @@
 #include "lv_roller.h"
 #if LV_USE_ROLLER != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"
@@ -16,6 +17,8 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_roller"
+
 #if LV_USE_ANIMATION == 0
 #undef LV_ROLLER_DEF_ANIM_TIME
 #define LV_ROLLER_DEF_ANIM_TIME 0 /*No animation*/
@@ -65,7 +68,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of roller*/
     lv_obj_t * new_roller = lv_ddlist_create(par, copy);
-    lv_mem_assert(new_roller);
+    LV_ASSERT_MEM(new_roller);
     if(new_roller == NULL) return NULL;
 
     if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(new_roller));
@@ -73,9 +76,10 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Allocate the roller type specific extended data*/
     lv_roller_ext_t * ext = lv_obj_allocate_ext_attr(new_roller, sizeof(lv_roller_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
     ext->ddlist.draw_arrow = 0; /*Do not draw arrow by default*/
+    ext->mode = LV_ROLLER_MODE_NORMAL;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_roller, lv_roller_signal);
@@ -134,6 +138,9 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mode_t mode)
 {
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+    LV_ASSERT_STR(options);
+
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
 
     if(mode == LV_ROLLER_MODE_NORMAL) {
@@ -175,10 +182,20 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
  */
 void lv_roller_set_align(lv_obj_t * roller, lv_label_align_t align)
 {
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-    lv_mem_assert(ext);
-    if(ext->ddlist.label == NULL) return; /*Probably the roller is being deleted if the label is NULL.*/
-    lv_label_set_align(ext->ddlist.label, align);
+
+    lv_obj_t * label = ext->ddlist.label;
+
+    if(label == NULL) return; /*Probably the roller is being deleted if the label is NULL.*/
+    lv_label_set_align(label, align);
+
+    switch(lv_label_get_align(label)) {
+        case LV_LABEL_ALIGN_LEFT: lv_obj_align(label, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0); break;
+        case LV_LABEL_ALIGN_CENTER: lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0); break;
+        case LV_LABEL_ALIGN_RIGHT: lv_obj_align(label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0); break;
+    }
 }
 
 /**
@@ -189,6 +206,8 @@ void lv_roller_set_align(lv_obj_t * roller, lv_label_align_t align)
  */
 void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, lv_anim_enable_t anim)
 {
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+
 #if LV_USE_ANIMATION == 0
     anim = LV_ANIM_OFF;
 #endif
@@ -206,6 +225,8 @@ void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, lv_anim_enable_
  */
 void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt)
 {
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+
     lv_roller_ext_t * ext          = lv_obj_get_ext_attr(roller);
     const lv_style_t * style_label = lv_obj_get_style(ext->ddlist.label);
     uint8_t n_line_space           = (row_cnt > 1) ? row_cnt - 1 : 1;
@@ -221,6 +242,8 @@ void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt)
  */
 void lv_roller_set_style(lv_obj_t * roller, lv_roller_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+
     switch(type) {
         case LV_ROLLER_STYLE_BG: lv_obj_set_style(roller, style); break;
         case LV_ROLLER_STYLE_SEL: lv_ddlist_set_style(roller, LV_DDLIST_STYLE_SEL, style); break;
@@ -238,6 +261,8 @@ void lv_roller_set_style(lv_obj_t * roller, lv_roller_style_t type, const lv_sty
  */
 uint16_t lv_roller_get_selected(const lv_obj_t * roller)
 {
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     if(ext->mode == LV_ROLLER_MODE_INIFINITE) {
         uint16_t real_id_cnt = ext->ddlist.option_cnt / LV_ROLLER_INF_PAGES;
@@ -254,9 +279,11 @@ uint16_t lv_roller_get_selected(const lv_obj_t * roller)
  */
 lv_label_align_t lv_roller_get_align(const lv_obj_t * roller)
 {
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-    lv_mem_assert(ext);
-    lv_mem_assert(ext->ddlist.label);
+    LV_ASSERT_MEM(ext);
+    LV_ASSERT_MEM(ext->ddlist.label);
     return lv_label_get_align(ext->ddlist.label);
 }
 
@@ -267,6 +294,8 @@ lv_label_align_t lv_roller_get_align(const lv_obj_t * roller)
  */
 bool lv_roller_get_hor_fit(const lv_obj_t * roller)
 {
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+
     return lv_page_get_scrl_fit_left(roller);
 }
 
@@ -278,6 +307,8 @@ bool lv_roller_get_hor_fit(const lv_obj_t * roller)
  *  */
 const lv_style_t * lv_roller_get_style(const lv_obj_t * roller, lv_roller_style_t type)
 {
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+
     switch(type) {
         case LV_ROLLER_STYLE_BG: return lv_obj_get_style(roller);
         case LV_ROLLER_STYLE_SEL: return lv_ddlist_get_style(roller, LV_DDLIST_STYLE_SEL);
@@ -367,7 +398,7 @@ static bool lv_roller_design(lv_obj_t * roller, const lv_area_t * mask, lv_desig
             new_style.text.color = sel_style->text.color;
             new_style.text.opa   = sel_style->text.opa;
             lv_draw_label(&ext->ddlist.label->coords, &mask_sel, &new_style, opa_scale,
-                          lv_label_get_text(ext->ddlist.label), txt_align, NULL, -1, -1, NULL);
+                          lv_label_get_text(ext->ddlist.label), txt_align, NULL, NULL, NULL, lv_obj_get_base_dir(ext->ddlist.label));
         }
     }
 
@@ -391,6 +422,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         res = ancestor_signal(roller, sign, param);
         if(res != LV_RES_OK) return res;
     }
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
 
@@ -457,13 +489,6 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
                 ext->ddlist.sel_opt_id_ori = ori_id;
             }
         }
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_roller";
     }
 
     return res;
@@ -498,7 +523,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     lv_coord_t font_h              = lv_font_get_line_height(font);
 
     if(sign == LV_SIGNAL_DRAG_END) {
-        /*If dragged then align the list to there be an element in the middle*/
+        /*If dragged then align the list to have an element in the middle*/
         lv_coord_t label_y1   = ext->ddlist.label->coords.y1 - roller->coords.y1;
         lv_coord_t label_unit = font_h + style_label->text.line_space;
         lv_coord_t mid        = (roller->coords.y2 - roller->coords.y1) / 2;

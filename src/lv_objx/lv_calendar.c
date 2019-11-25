@@ -9,6 +9,7 @@
 #include "lv_calendar.h"
 #if LV_USE_CALENDAR != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_hal/lv_hal_indev.h"
 #include "../lv_misc/lv_utils.h"
@@ -19,6 +20,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_calendar"
 
 /**********************
  *      TYPEDEFS
@@ -77,12 +79,12 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor of calendar*/
     lv_obj_t * new_calendar = lv_obj_create(par, copy);
-    lv_mem_assert(new_calendar);
+    LV_ASSERT_MEM(new_calendar);
     if(new_calendar == NULL) return NULL;
 
     /*Allocate the calendar type specific extended data*/
     lv_calendar_ext_t * ext = lv_obj_allocate_ext_attr(new_calendar, sizeof(lv_calendar_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_calendar);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_calendar);
@@ -195,6 +197,9 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_calendar_set_today_date(lv_obj_t * calendar, lv_calendar_date_t * today)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+    LV_ASSERT_NULL(today);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     ext->today.year         = today->year;
     ext->today.month        = today->month;
@@ -211,6 +216,9 @@ void lv_calendar_set_today_date(lv_obj_t * calendar, lv_calendar_date_t * today)
  */
 void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showed)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+    LV_ASSERT_NULL(showed);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     ext->showed_date.year   = showed->year;
     ext->showed_date.month  = showed->month;
@@ -226,8 +234,11 @@ void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showe
  * WILL BE SAVED! CAN'T BE LOCAL ARRAY.
  * @param date_num number of dates in the array
  */
-void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t date_num)
+void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t highlighted[], uint16_t date_num)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+    LV_ASSERT_NULL(highlighted);
+
     lv_calendar_ext_t * ext    = lv_obj_get_ext_attr(calendar);
     ext->highlighted_dates     = highlighted;
     ext->highlighted_dates_num = date_num;
@@ -244,6 +255,9 @@ void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t *
  */
 void lv_calendar_set_day_names(lv_obj_t * calendar, const char ** day_names)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+    LV_ASSERT_NULL(day_names);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     ext->day_names          = day_names;
     lv_obj_invalidate(calendar);
@@ -252,14 +266,17 @@ void lv_calendar_set_day_names(lv_obj_t * calendar, const char ** day_names)
 /**
  * Set the name of the month
  * @param calendar pointer to a calendar object
- * @param day_names pointer to an array with the names. E.g. `const char * days[12] = {"Jan", "Feb",
+ * @param month_names pointer to an array with the names. E.g. `const char * days[12] = {"Jan", "Feb",
  * ...}` Only the pointer will be saved so this variable can't be local which will be destroyed
  * later.
  */
-void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** day_names)
+void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** month_names)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+    LV_ASSERT_NULL(month_names);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-    ext->month_names        = day_names;
+    ext->month_names        = month_names;
     lv_obj_invalidate(calendar);
 }
 
@@ -271,6 +288,8 @@ void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** day_names)
  *  */
 void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
     switch(type) {
@@ -298,6 +317,8 @@ void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, const 
  */
 lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return &ext->today;
 }
@@ -309,6 +330,8 @@ lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * calendar)
  */
 lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return &ext->showed_date;
 }
@@ -321,6 +344,8 @@ lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar)
  */
 lv_calendar_date_t * lv_calendar_get_pressed_date(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->pressed_date.year != 0 ? &ext->pressed_date : NULL;
 }
@@ -332,6 +357,8 @@ lv_calendar_date_t * lv_calendar_get_pressed_date(const lv_obj_t * calendar)
  */
 lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->highlighted_dates;
 }
@@ -343,6 +370,8 @@ lv_calendar_date_t * lv_calendar_get_highlighted_dates(const lv_obj_t * calendar
  */
 uint16_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->highlighted_dates_num;
 }
@@ -354,6 +383,8 @@ uint16_t lv_calendar_get_highlighted_dates_num(const lv_obj_t * calendar)
  */
 const char ** lv_calendar_get_day_names(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->day_names;
 }
@@ -365,6 +396,8 @@ const char ** lv_calendar_get_day_names(const lv_obj_t * calendar)
  */
 const char ** lv_calendar_get_month_names(const lv_obj_t * calendar)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
     return ext->month_names;
 }
@@ -377,6 +410,8 @@ const char ** lv_calendar_get_month_names(const lv_obj_t * calendar)
  *  */
 const lv_style_t * lv_calendar_get_style(const lv_obj_t * calendar, lv_calendar_style_t type)
 {
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_calendar_ext_t * ext  = lv_obj_get_ext_attr(calendar);
 
@@ -454,6 +489,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
     /* Include the ancient signal function */
     res = ancestor_signal(calendar, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
@@ -542,13 +578,6 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
             }
             lv_obj_invalidate(calendar);
         }
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set date*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_calendar";
     }
 
     return res;
@@ -641,6 +670,9 @@ static lv_coord_t get_day_names_height(lv_obj_t * calendar)
 static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+
+    lv_bidi_dir_t bidi_dir = lv_obj_get_base_dir(calendar);
+
     lv_opa_t opa_scale      = lv_obj_get_opa_scale(calendar);
 
     lv_area_t header_area;
@@ -658,19 +690,19 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     txt_buf[5] = '\0';
     strcpy(&txt_buf[5], get_month_name(calendar, ext->showed_date.month));
     header_area.y1 += ext->style_header->body.padding.top;
-    lv_draw_label(&header_area, mask, ext->style_header, opa_scale, txt_buf, LV_TXT_FLAG_CENTER, NULL, -1, -1, NULL);
+    lv_draw_label(&header_area, mask, ext->style_header, opa_scale, txt_buf, LV_TXT_FLAG_CENTER, NULL, NULL, NULL, bidi_dir);
 
     /*Add the left arrow*/
     const lv_style_t * arrow_style = ext->btn_pressing < 0 ? ext->style_header_pr : ext->style_header;
     header_area.x1 += ext->style_header->body.padding.left;
-    lv_draw_label(&header_area, mask, arrow_style, opa_scale, LV_SYMBOL_LEFT, LV_TXT_FLAG_NONE, NULL, -1, -1, NULL);
+    lv_draw_label(&header_area, mask, arrow_style, opa_scale, LV_SYMBOL_LEFT, LV_TXT_FLAG_NONE, NULL, NULL, NULL, bidi_dir);
 
     /*Add the right arrow*/
     arrow_style    = ext->btn_pressing > 0 ? ext->style_header_pr : ext->style_header;
     header_area.x1 = header_area.x2 - ext->style_header->body.padding.right -
                      lv_txt_get_width(LV_SYMBOL_RIGHT, strlen(LV_SYMBOL_RIGHT), arrow_style->text.font,
                                       arrow_style->text.line_space, LV_TXT_FLAG_NONE);
-    lv_draw_label(&header_area, mask, arrow_style, opa_scale, LV_SYMBOL_RIGHT, LV_TXT_FLAG_NONE, NULL, -1, -1, NULL);
+    lv_draw_label(&header_area, mask, arrow_style, opa_scale, LV_SYMBOL_RIGHT, LV_TXT_FLAG_NONE, NULL, NULL, NULL, bidi_dir);
 }
 
 /**
@@ -681,6 +713,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
 static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+    lv_bidi_dir_t bidi_dir = lv_obj_get_base_dir(calendar);
     lv_opa_t opa_scale      = lv_obj_get_opa_scale(calendar);
 
     lv_coord_t l_pad = ext->style_day_names->body.padding.left;
@@ -695,7 +728,7 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
         label_area.x1 = calendar->coords.x1 + (w * i) / 7 + l_pad;
         label_area.x2 = label_area.x1 + box_w - 1;
         lv_draw_label(&label_area, mask, ext->style_day_names, opa_scale, get_day_name(calendar, i), LV_TXT_FLAG_CENTER,
-                      NULL, -1, -1, NULL);
+                      NULL, NULL, NULL, bidi_dir);
     }
 }
 
@@ -707,6 +740,7 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
 static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 {
     lv_calendar_ext_t * ext     = lv_obj_get_ext_attr(calendar);
+    lv_bidi_dir_t bidi_dir = lv_obj_get_base_dir(calendar);
     const lv_style_t * style_bg = lv_calendar_get_style(calendar, LV_CALENDAR_STYLE_BG);
     lv_area_t label_area;
     lv_opa_t opa_scale = lv_obj_get_opa_scale(calendar);
@@ -824,7 +858,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 
             /*Write the day's number*/
             lv_utils_num_to_str(day_cnt, buf);
-            lv_draw_label(&label_area, mask, final_style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, -1, -1, NULL);
+            lv_draw_label(&label_area, mask, final_style, opa_scale, buf, LV_TXT_FLAG_CENTER, NULL, NULL, NULL, bidi_dir);
 
             /*Go to the next day*/
             day_cnt++;

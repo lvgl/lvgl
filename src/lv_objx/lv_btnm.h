@@ -31,6 +31,8 @@ extern "C" {
 #define LV_BTNM_WIDTH_MASK 0x0007
 #define LV_BTNM_BTN_NONE 0xFFFF
 
+LV_EXPORT_CONST_INT(LV_BTNM_BTN_NONE);
+
 /**********************
  *      TYPEDEFS
  **********************/

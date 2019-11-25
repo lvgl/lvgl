@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_anim.h"
 
@@ -105,6 +106,12 @@ void lv_style_init(void)
     lv_style_scr.line.color   = lv_color_make(0x20, 0x20, 0x20);
     lv_style_scr.line.width   = 2;
     lv_style_scr.line.rounded = 0;
+
+#if LV_USE_DEBUG
+#if LV_USE_ASSERT_STYLE
+    lv_style_scr.debug_sentinel = LV_STYLE_DEGUG_SENTINEL_VALUE;
+#endif
+#endif
 
     /*Plain style (by default near the same as the screen style)*/
     lv_style_copy(&lv_style_plain, &lv_style_scr);
@@ -287,7 +294,7 @@ void lv_style_anim_init(lv_anim_t * a)
 
     lv_style_anim_dsc_t * dsc;
     dsc = lv_mem_alloc(sizeof(lv_style_anim_dsc_t));
-    lv_mem_assert(dsc);
+    LV_ASSERT_MEM(dsc);
     if(dsc == NULL) return;
     dsc->ready_cb   = NULL;
     dsc->style_anim = NULL;

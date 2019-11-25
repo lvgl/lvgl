@@ -23,6 +23,9 @@ extern "C" {
  *      DEFINES
  *********************/
 #define LV_RADIUS_CIRCLE (LV_COORD_MAX) /**< A very big radius to always draw as circle*/
+#define LV_STYLE_DEGUG_SENTINEL_VALUE 0x12345678
+
+LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
 /**********************
  *      TYPEDEFS
@@ -119,6 +122,13 @@ typedef struct
         lv_opa_t opa;
         uint8_t rounded : 1; /**< 1: rounded line endings*/
     } line;
+
+#if LV_USE_DEBUG
+#if LV_USE_ASSERT_STYLE
+    uint32_t debug_sentinel; /**<Should `LV_STYLE_DEGUG_SENTINEL_VALUE` to indicate that the style is valid*/
+#endif
+#endif
+
 } lv_style_t;
 
 #if LV_USE_ANIMATION
@@ -186,7 +196,7 @@ void lv_style_anim_set_styles(lv_anim_t * a, lv_style_t * to_anim, const lv_styl
  * @param duration duration of the animation in milliseconds
  * @param delay delay before the animation in milliseconds
  */
-static inline void lv_style_anim_set_time(lv_anim_t * a, uint16_t duration, uint16_t delay)
+static inline void lv_style_anim_set_time(lv_anim_t * a, uint16_t duration, int16_t delay)
 {
     lv_anim_set_time(a, duration, delay);
 }
@@ -271,6 +281,18 @@ extern lv_style_t lv_style_btn_ina;
 /**********************
  *      MACROS
  **********************/
+
+/**
+ * Create and initialize a `static` style
+ * Example:
+ *     LV_STYLE_CREATE(my_style, &lv_style_plain);
+ *   is equivalent to
+ *     static lv_style_t my_style;
+ *     lv_style_copy(my_style, &lv_style_plain);
+ *
+ * If the style to copy is `NULL` `lv_style_plain` will be used.
+ */
+#define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_copy(&name, copy_p == NULL ? &lv_style_plain : copy_p);
 
 #ifdef __cplusplus
 } /* extern "C" */
