@@ -30,6 +30,7 @@ CSRCS += lv_lmeter.c
 CSRCS += lv_page.c
 CSRCS += lv_sw.c
 CSRCS += lv_win.c
+CSRCS += lv_objmask.c
 
 DEPPATH += --dep-path $(LVGL_DIR)/lvgl/src/lv_objx
 VPATH += :$(LVGL_DIR)/lvgl/src/lv_objx

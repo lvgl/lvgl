@@ -110,8 +110,8 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
 
 #if LV_LABEL_TEXT_SEL
-    ext->txt_sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
-    ext->txt_sel_end   = LV_DRAW_LABEL_NO_TXT_SEL;
+    ext->txt_sel.start = LV_DRAW_LABEL_NO_TXT_SEL;
+    ext->txt_sel.end   = LV_DRAW_LABEL_NO_TXT_SEL;
 #endif
     ext->dot.tmp_ptr   = NULL;
     ext->dot_tmp_alloc = 0;
@@ -447,7 +447,7 @@ void lv_label_set_text_sel_start(lv_obj_t * label, uint16_t index)
 
 #if LV_LABEL_TEXT_SEL
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    ext->txt_sel_start   = index;
+    ext->txt_sel.start   = index;
     lv_obj_invalidate(label);
 #else
     (void)label;    /*Unused*/
@@ -461,7 +461,7 @@ void lv_label_set_text_sel_end(lv_obj_t * label, uint16_t index)
 
 #if LV_LABEL_TEXT_SEL
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    ext->txt_sel_end     = index;
+    ext->txt_sel.end     = index;
     lv_obj_invalidate(label);
 #else
     (void)label;    /*Unused*/
@@ -731,7 +731,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     }
 
 #if LV_USE_BIDI
-    bidi_txt = lv_draw_buf_get(new_line_start - line_start + 1);
+    bidi_txt = lv_mem_buf_get(new_line_start - line_start + 1);
     uint16_t txt_len = new_line_start - line_start;
     if(bidi_txt[new_line_start] == '\0') txt_len--;
     lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_base_dir(label), NULL, 0);
@@ -787,7 +787,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     }
 
 #if LV_USE_BIDI
-    lv_draw_buf_release(bidi_txt);
+    lv_mem_buf_release(bidi_txt);
     /*Handle Bidi*/
     bool is_rtl;
     logical_pos = lv_bidi_get_logical_pos(&txt[line_start], NULL, txt_len, lv_obj_get_base_dir(label), lv_txt_encoded_get_char_id(bidi_txt, i), &is_rtl);
@@ -810,7 +810,7 @@ uint16_t lv_label_get_text_sel_start(const lv_obj_t * label)
 
 #if LV_LABEL_TEXT_SEL
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    return ext->txt_sel_start;
+    return ext->txt_sel.start;
 
 #else
     (void)label;    /*Unused*/
@@ -829,7 +829,7 @@ uint16_t lv_label_get_text_sel_end(const lv_obj_t * label)
 
 #if LV_LABEL_TEXT_SEL
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    return ext->txt_sel_end;
+    return ext->txt_sel.end;
 #else
     (void)label; /*Unused*/
     return LV_LABEL_TEXT_SEL_OFF;
@@ -965,14 +965,14 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt)
     }
 
 #if LV_USE_BIDI
-    char * bidi_buf = lv_mem_alloc(ins_len + 1);
+    char * bidi_buf = lv_mem_buf_get(ins_len + 1);
     LV_ASSERT_MEM(bidi_buf);
     if(bidi_buf == NULL) return;
 
     lv_bidi_process(txt, bidi_buf, lv_obj_get_base_dir(label));
     lv_txt_ins(ext->text, pos, bidi_buf);
 
-    lv_mem_free(bidi_buf);
+    lv_mem_buf_release(bidi_buf);
 #else
     lv_txt_ins(ext->text, pos, txt);
     lv_label_refr_text(label);

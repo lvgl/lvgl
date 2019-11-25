@@ -188,7 +188,7 @@ bool lv_bidi_letter_is_neutral(uint32_t letter)
 uint16_t lv_bidi_get_logical_pos(const char * str_in, char **bidi_txt, uint32_t len, lv_bidi_dir_t base_dir, uint32_t visual_pos, bool *is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
-    void *buf = lv_mem_alloc(len + pos_conv_len * sizeof(uint16_t));
+    void *buf = lv_mem_buf_get(len + pos_conv_len * sizeof(uint16_t));
     if(buf == NULL) return (uint16_t) -1;
     if (bidi_txt) *bidi_txt = buf;
 
@@ -197,7 +197,7 @@ uint16_t lv_bidi_get_logical_pos(const char * str_in, char **bidi_txt, uint32_t 
 
     if (is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[visual_pos]);
 
-    if(bidi_txt == NULL) lv_mem_free(buf);
+    if(bidi_txt == NULL) lv_mem_buf_release(buf);
     return GET_POS(pos_conv_buf[visual_pos]);
 }
 
@@ -216,7 +216,7 @@ uint16_t lv_bidi_get_logical_pos(const char * str_in, char **bidi_txt, uint32_t 
 uint16_t lv_bidi_get_visual_pos(const char * str_in, char **bidi_txt, uint16_t len, lv_bidi_dir_t base_dir, uint32_t logical_pos, bool *is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
-    void *buf = lv_mem_alloc(len + pos_conv_len * sizeof(uint16_t));
+    void *buf = lv_mem_buf_get(len + pos_conv_len * sizeof(uint16_t));
     if(buf == NULL) return (uint16_t) -1;
     if (bidi_txt) *bidi_txt = buf;
 
@@ -225,11 +225,11 @@ uint16_t lv_bidi_get_visual_pos(const char * str_in, char **bidi_txt, uint16_t l
     for (uint16_t i = 0; i < pos_conv_len; i++){
         if (GET_POS(pos_conv_buf[i]) == logical_pos){
             if (is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[i]);
-            if(bidi_txt == NULL) lv_mem_free(buf);
+            if(bidi_txt == NULL) lv_mem_buf_release(buf);
             return i;
         }
     }
-    if(bidi_txt == NULL) lv_mem_free(buf);
+    if(bidi_txt == NULL) lv_mem_buf_release(buf);
     return (uint16_t) -1;
 }
 

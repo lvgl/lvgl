@@ -48,12 +48,12 @@ typedef struct
     /*New data for this type */
     lv_obj_t * label;             /*Label for the options*/
     const lv_style_t * sel_style; /*Style of the selected option*/
+    const char * symbol;            /*Arrow or other icon when the drop-down list is closed*/
     uint16_t option_cnt;          /*Number of options*/
     uint16_t sel_opt_id;          /*Index of the current option*/
     uint16_t sel_opt_id_ori;      /*Store the original index on focus*/
     uint8_t opened : 1;           /*1: The list is opened (handled by the library)*/
     uint8_t force_sel : 1;        /*1: Keep the selection highlight even if the list is closed*/
-    uint8_t draw_arrow : 1;       /*1: Draw arrow*/
     uint8_t stay_open : 1;        /*1: Don't close the list when a new item is selected*/
     lv_coord_t fix_height;        /*Height of the ddlist when opened. (0: auto-size)*/
 } lv_ddlist_ext_t;
@@ -110,13 +110,13 @@ void lv_ddlist_set_fix_height(lv_obj_t * ddlist, lv_coord_t h);
  */
 void lv_ddlist_set_fix_width(lv_obj_t * ddlist, lv_coord_t w);
 
-/**
- * Set arrow draw in a drop down list
- * @param ddlist pointer to drop down list object
- * @param en enable/disable a arrow draw. E.g. "true" for draw.
- */
-void lv_ddlist_set_draw_arrow(lv_obj_t * ddlist, bool en);
 
+/**
+ * Set an arrow or other symbol to display when the drop-down list is closed.
+ * @param ddlist pointer to drop down list object
+ * @param symbol a text like `LV_SYMBOL_DOWN` or NULL to not draw icon
+ */
+void lv_ddlist_set_symbol(lv_obj_t * ddlist, const char * symbol);
 /**
  * Leave the list opened when a new value is selected
  * @param ddlist pointer to drop down list object
@@ -192,10 +192,11 @@ void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf, uint16_t bu
 lv_coord_t lv_ddlist_get_fix_height(const lv_obj_t * ddlist);
 
 /**
- * Get arrow draw in a drop down list
+ * Get the symbol to draw when the drop-down list is closed
  * @param ddlist pointer to drop down list object
+ * @return the symbol or NULL if not enabled
  */
-bool lv_ddlist_get_draw_arrow(lv_obj_t * ddlist);
+const char * lv_ddlist_get_symbol(lv_obj_t * ddlist);
 
 /**
  * Get whether the drop down list stay open after selecting a  value or not

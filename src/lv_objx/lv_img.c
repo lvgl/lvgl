@@ -236,10 +236,10 @@ void lv_img_set_offset_x(lv_obj_t * img, lv_coord_t x)
 
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-    if(x < ext->w - 1) {
-        ext->offset.x = x;
-        lv_obj_invalidate(img);
-    }
+    x = x % ext->w;
+
+    ext->offset.x = x;
+    lv_obj_invalidate(img);
 }
 
 /**
@@ -254,10 +254,10 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y)
 
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-    if(y < ext->h - 1) {
-        ext->offset.y = y;
-        lv_obj_invalidate(img);
-    }
+    y = y % ext->h;
+
+    ext->offset.y = y;
+    lv_obj_invalidate(img);
 }
 
 /**
@@ -471,8 +471,11 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         lv_obj_get_coords(img, &coords);
 
         if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_VARIABLE) {
-            coords.x1 -= ext->offset.x;
-            coords.y1 -= ext->offset.y;
+            coords.x1 += ext->offset.x;
+            coords.y1 += ext->offset.y;
+
+            if(coords.x1 > img->coords.x1) coords.x1 -= ext->w;
+            if(coords.y1 > img->coords.y1) coords.y1 -= ext->h;
 
             LV_LOG_TRACE("lv_img_design: start to draw image");
             lv_area_t cords_tmp;

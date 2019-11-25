@@ -77,19 +77,21 @@ typedef struct
                            by the library)*/
         char tmp[LV_LABEL_DOT_NUM + 1]; /* Directly store the characters if <=4 characters */
     } dot;
+
     uint16_t dot_end;  /*The text end position in dot mode (Handled by the library)*/
-    lv_point_t offset; /*Text draw position offset*/
-#if LV_LABEL_LONG_TXT_HINT
-    lv_draw_label_hint_t hint; /*Used to buffer info about large text*/
-#endif
 
 #if LV_USE_ANIMATION
     uint16_t anim_speed; /*Speed of scroll and roll animation in px/sec unit*/
 #endif
 
+    lv_point_t offset; /*Text draw position offset*/
+
+#if LV_LABEL_LONG_TXT_HINT
+    lv_draw_label_hint_t hint; /*Used to buffer info about large text*/
+#endif
+
 #if LV_LABEL_TEXT_SEL
-    uint16_t txt_sel_start; /*Left-most selection character*/
-    uint16_t txt_sel_end;   /*Right-most selection character*/
+    lv_draw_label_txt_sel_t txt_sel;
 #endif
 
     lv_label_long_mode_t long_mode : 3; /*Determinate what to do with the long texts*/

@@ -42,7 +42,7 @@ extern "C" {
     prefix lv_ll_t _lv_img_defoder_ll;                                                                                 \
     prefix lv_img_cache_entry_t * _lv_img_cache_array;                                                                 \
     prefix void * _lv_task_act;                                                                                        \
-    prefix lv_draw_buf_t _lv_draw_buf[LV_DRAW_BUF_MAX_NUM];                                                            \
+    prefix lv_mem_buf_t _lv_mem_buf[LV_MEM_BUF_MAX_NUM];                                                            \
 
 #define LV_NO_PREFIX
 #define LV_ROOTS LV_GC_ROOTS(LV_NO_PREFIX)

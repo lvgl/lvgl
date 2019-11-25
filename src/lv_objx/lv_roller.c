@@ -78,7 +78,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_roller_ext_t * ext = lv_obj_allocate_ext_attr(new_roller, sizeof(lv_roller_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
-    ext->ddlist.draw_arrow = 0; /*Do not draw arrow by default*/
+
     ext->mode = LV_ROLLER_MODE_NORMAL;
 
     /*The signal and design functions are not copied so set them here*/
@@ -93,6 +93,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_ddlist_open(new_roller, false);
         lv_ddlist_set_anim_time(new_roller, LV_ROLLER_DEF_ANIM_TIME);
         lv_ddlist_set_stay_open(new_roller, true);
+        lv_ddlist_set_symbol(new_roller, NULL);
         lv_roller_set_visible_row_count(new_roller, 3);
         lv_label_set_align(ext->ddlist.label, LV_LABEL_ALIGN_CENTER);
 
