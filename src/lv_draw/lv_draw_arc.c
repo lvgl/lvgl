@@ -123,36 +123,36 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
             deg_base = lv_atan2(xi, yi) - 180;
 
 #if LV_ANTIALIAS
-            int opa = -1;
+            int opa2 = -1;
             if(r_act_sqr > r_out_sqr) {
-                opa = LV_OPA_100 * (r_out + 1) - lv_sqrt(LV_OPA_100 * LV_OPA_100 * r_act_sqr);
-                if(opa < LV_OPA_0)
-                    opa = LV_OPA_0;
-                else if(opa > LV_OPA_100)
-                    opa = LV_OPA_100;
+                opa2 = LV_OPA_100 * (r_out + 1) - lv_sqrt(LV_OPA_100 * LV_OPA_100 * r_act_sqr);
+                if(opa2 < LV_OPA_0)
+                    opa2 = LV_OPA_0;
+                else if(opa2 > LV_OPA_100)
+                    opa2 = LV_OPA_100;
             } else if(r_act_sqr < r_in_sqr) {
                 if(xe == 0) xe = xi;
-                opa = lv_sqrt(LV_OPA_100 * LV_OPA_100 * r_act_sqr) - LV_OPA_100 * (r_in - 1);
-                if(opa < LV_OPA_0)
-                    opa = LV_OPA_0;
-                else if(opa > LV_OPA_100)
-                    opa = LV_OPA_100;
+                opa2 = lv_sqrt(LV_OPA_100 * LV_OPA_100 * r_act_sqr) - LV_OPA_100 * (r_in - 1);
+                if(opa2 < LV_OPA_0)
+                    opa2 = LV_OPA_0;
+                else if(opa2 > LV_OPA_100)
+                    opa2 = LV_OPA_100;
                 if(r_act_sqr < r_in_aa_sqr)
                     break; /*No need to continue the iteration in x once we found the inner edge of the
                               arc*/
             }
-            if(opa != -1) {
+            if(opa2 != -1) {
                 if(deg_test(180 + deg_base, start_angle, end_angle)) {
-                    lv_draw_px(center_x + xi, center_y + yi, mask, color, opa);
+                    lv_draw_px(center_x + xi, center_y + yi, mask, color, opa2);
                 }
                 if(deg_test(360 - deg_base, start_angle, end_angle)) {
-                    lv_draw_px(center_x + xi, center_y - yi, mask, color, opa);
+                    lv_draw_px(center_x + xi, center_y - yi, mask, color, opa2);
                 }
                 if(deg_test(180 - deg_base, start_angle, end_angle)) {
-                    lv_draw_px(center_x - xi, center_y + yi, mask, color, opa);
+                    lv_draw_px(center_x - xi, center_y + yi, mask, color, opa2);
                 }
                 if(deg_test(deg_base, start_angle, end_angle)) {
-                    lv_draw_px(center_x - xi, center_y - yi, mask, color, opa);
+                    lv_draw_px(center_x - xi, center_y - yi, mask, color, opa2);
                 }
                 continue;
             }

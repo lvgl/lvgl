@@ -210,11 +210,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->parent_event = 0;
 #if LV_USE_BIDI
-#if LV_BIDI_BASE_DIR_DEF == LV_BIDI_DIR_LTR || LV_BIDI_BASE_DIR_DEF == LV_BIDI_DIR_RTL || LV_BIDI_BASE_DIR_DEF == LV_BIDI_DIR_AUTO
         new_obj->base_dir     = LV_BIDI_BASE_DIR_DEF;
-#else
-#error "`LV_BIDI_BASE_DIR_DEF` should be `LV_BASE_DIR_LTR` or `LV_BASE_DIR_RTL` (See lv_conf.h)"
-#endif
 #else
         new_obj->base_dir     = LV_BIDI_DIR_LTR;
 #endif

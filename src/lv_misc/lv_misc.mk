@@ -13,6 +13,8 @@ CSRCS += lv_gc.c
 CSRCS += lv_utils.c
 CSRCS += lv_async.c
 CSRCS += lv_printf.c
+CSRCS += lv_bidi.c
+
 
 DEPPATH += --dep-path $(LVGL_DIR)/lvgl/src/lv_misc
 VPATH += :$(LVGL_DIR)/lvgl/src/lv_misc
