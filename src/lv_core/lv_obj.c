@@ -2132,6 +2132,7 @@ lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
 
     return LV_BIDI_BASE_DIR_DEF;
 #else
+    (void) obj;  /*Unused*/
     return LV_BIDI_DIR_LTR;
 #endif
 }
