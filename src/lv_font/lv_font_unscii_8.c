@@ -1,8 +1,4 @@
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+#include "../../lvgl.h"
 
 /*******************************************************************************
  * Size: 8 px

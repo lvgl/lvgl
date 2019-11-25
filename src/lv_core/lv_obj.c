@@ -152,6 +152,11 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->par = NULL; /*Screens has no a parent*/
         lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
 
+        /*Set the callbacks*/
+        new_obj->signal_cb = lv_obj_signal;
+        new_obj->design_cb = lv_obj_design;
+        new_obj->event_cb = NULL;
+
         /*Set coordinates to full screen size*/
         new_obj->coords.x1    = 0;
         new_obj->coords.y1    = 0;
@@ -184,10 +189,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         } else {
             new_obj->style_p = &lv_style_scr;
         }
-        /*Set the callbacks*/
-        new_obj->signal_cb = lv_obj_signal;
-        new_obj->design_cb =  lv_obj_design;
-        new_obj->event_cb = NULL;
 
         /*Init. user date*/
 #if LV_USE_USER_DATA
@@ -236,6 +237,11 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->par = parent; /*Set the parent*/
         lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
 
+        /*Set the callbacks*/
+        new_obj->signal_cb = lv_obj_signal;
+        new_obj->design_cb = lv_obj_design;
+        new_obj->event_cb = NULL;
+
 #if LV_USE_BIDI
         new_obj->base_dir     = LV_BIDI_DIR_INHERIT;
 #else
@@ -278,11 +284,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         } else {
             new_obj->style_p = &lv_style_plain_color;
         }
-
-        /*Set the callbacks*/
-        new_obj->signal_cb = lv_obj_signal;
-        new_obj->design_cb = lv_obj_design;
-        new_obj->event_cb = NULL;
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
         memset(&new_obj->ext_click_pad, 0, sizeof(new_obj->ext_click_pad));
