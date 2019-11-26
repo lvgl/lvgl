@@ -31,6 +31,18 @@ extern "C" {
  * V6.0 COMPATIBILITY
  *--------------------*/
 
+
+#if LV_USE_ARC
+
+
+static inline void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
+{
+    lv_arc_set_start_angle(arc, start);
+    lv_arc_set_end_angle(arc, end);
+}
+
+#endif
+
 #if LV_USE_CHART
 
 #define lv_chart_get_point_cnt lv_chart_get_point_count
