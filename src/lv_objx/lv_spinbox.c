@@ -330,8 +330,6 @@ void lv_spinbox_decrement(lv_obj_t * spinbox)
 static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * param)
 {
 
-    lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
-
     lv_res_t res = LV_RES_OK;
 
     /* Include the ancient signal function */
@@ -341,6 +339,8 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
     }
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
+
+    lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     } else if(sign == LV_SIGNAL_GET_TYPE) {
