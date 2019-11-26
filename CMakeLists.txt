@@ -21,6 +21,7 @@ zephyr_library_sources(
     src/lv_core/lv_obj.c
     src/lv_core/lv_refr.c
     src/lv_core/lv_style.c
+    src/lv_core/lv_debug.c
 
     src/lv_draw/lv_draw_basic.c
     src/lv_draw/lv_draw.c
@@ -50,6 +51,7 @@ zephyr_library_sources(
     src/lv_misc/lv_log.c
     src/lv_misc/lv_gc.c
     src/lv_misc/lv_utils.c
+    src/lv_misc/lv_bidi.c
 
     src/lv_objx/lv_arc.c
     src/lv_objx/lv_bar.c
@@ -82,6 +84,7 @@ zephyr_library_sources(
     src/lv_objx/lv_page.c
     src/lv_objx/lv_sw.c
     src/lv_objx/lv_win.c
+    src/lv_objx/lv_cpicker.c
 
     src/lv_themes/lv_theme_alien.c
     src/lv_themes/lv_theme.c
@@ -100,6 +103,8 @@ zephyr_library_sources(
     src/lv_font/lv_font_roboto_22.c
     src/lv_font/lv_font_roboto_28.c
     src/lv_font/lv_font_unscii_8.c
+    src/lv_font/lv_font_roboto_12_subpx.c
+    src/lv_font/lv_font_roboto_28_compressed.c
 
 )
 
