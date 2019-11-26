@@ -473,7 +473,6 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 #else
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{g8 >> 5, r8 >> 3, b8 >> 3, (g8 >> 2) & 0x7}})
 #endif
-static inline lv_color_t lv_color_make(uint8_t r8, uint8_t g8, uint8_t b8)
 #elif LV_COLOR_DEPTH == 32
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8, g8, r8, 0xff}}) /*Fix 0xff alpha*/
 #endif
