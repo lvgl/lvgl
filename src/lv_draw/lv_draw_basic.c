@@ -333,7 +333,7 @@ void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * mask_p, const lv
     map_p += bit_ofs >> 3;
 
     uint8_t letter_px;
-    lv_opa_t px_opa;
+    lv_opa_t px_opa = 0;
     uint16_t col_bit;
     col_bit = bit_ofs & 0x7; /* "& 0x7" equals to "% 8" just faster */
 
