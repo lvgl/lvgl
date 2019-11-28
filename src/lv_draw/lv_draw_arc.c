@@ -104,6 +104,9 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
 
 static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness, lv_area_t * res_area)
 {
+    const uint8_t ps = 8;
+    const uint8_t pa = 127;
+
     lv_coord_t thick_half = tickness / 2;
     lv_coord_t thick_corr = tickness & 0x01 ? 0 : 1;
 
@@ -119,28 +122,28 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness,
     lv_coord_t cir_x;
     lv_coord_t cir_y;
 
-    cir_x = ((radius - rx_corr - thick_half) * lv_trigo_sin(90 - angle)) >> (LV_TRIGO_SHIFT - 4);
-    cir_y = ((radius - ry_corr - thick_half) * lv_trigo_sin(angle)) >> (LV_TRIGO_SHIFT - 4);
+    cir_x = ((radius - rx_corr - thick_half) * lv_trigo_sin(90 - angle)) >> (LV_TRIGO_SHIFT - ps);
+    cir_y = ((radius - ry_corr - thick_half) * lv_trigo_sin(angle)) >> (LV_TRIGO_SHIFT - ps);
 
     /* Actually the center of the pixel need to be calculated so apply 1/2 px offset*/
     if(cir_x > 0) {
-        cir_x = (cir_x - 8) >> 4;
+        cir_x = (cir_x - pa) >> ps;
         res_area->x1 = cir_x - thick_half + thick_corr;
         res_area->x2 = cir_x + thick_half;
     }
     else {
-        cir_x = (cir_x + 2) >> 4;
+        cir_x = (cir_x + pa) >> ps;
         res_area->x1 = cir_x - thick_half;
         res_area->x2 = cir_x + thick_half - thick_corr;
     }
 
     if(cir_y > 0) {
-        cir_y = (cir_y - 8) >> 4;
+        cir_y = (cir_y - pa) >> ps;
         res_area->y1 = cir_y - thick_half + thick_corr;
         res_area->y2 = cir_y + thick_half;
     }
     else {
-        cir_y = (cir_y + 8) >> 4;
+        cir_y = (cir_y + pa) >> ps;
         res_area->y1 = cir_y - thick_half;
         res_area->y2 = cir_y + thick_half - thick_corr;
     }
