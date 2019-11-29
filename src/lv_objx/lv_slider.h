@@ -42,7 +42,7 @@ typedef struct
     lv_bar_ext_t bar; /*Ext. of ancestor*/
     /*New data for this type */
     const lv_style_t * style_knob; /*Style of the knob*/
-    const void * knob_img;
+    const void * img_knob;
     uint8_t dragging :1;        /*1: the slider is being dragged*/
 } lv_slider_ext_t;
 

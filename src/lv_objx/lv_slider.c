@@ -72,7 +72,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->style_knob = &lv_style_pretty;
-    ext->knob_img = NULL;
+    ext->img_knob = NULL;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_slider, lv_slider_signal);
@@ -121,7 +121,7 @@ void lv_slider_set_knob_img(lv_obj_t * slider, const void * img_src)
 
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
-    ext->knob_img = img_src;
+    ext->img_knob = img_src;
     lv_obj_refresh_ext_draw_pad(slider);
     lv_obj_invalidate(slider);
 }
@@ -144,6 +144,7 @@ void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, const lv_sty
         case LV_SLIDER_STYLE_KNOB:
             ext->style_knob = style;
             lv_obj_refresh_ext_draw_pad(slider);
+            lv_obj_invalidate(slider);
             break;
     }
 }
@@ -187,7 +188,7 @@ const void * lv_slider_get_knob_img(lv_obj_t * slider, const void * img_src)
 
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
 
-    return ext->knob_img;
+    return ext->img_knob;
 }
 
 /**
@@ -294,10 +295,10 @@ static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * cli
 
         lv_draw_rect(&knob_area, clip_area, style_knob, opa_scale);
 
-        if(ext->knob_img) {
+        if(ext->img_knob) {
             lv_res_t res;
             lv_img_header_t info;
-            res = lv_img_decoder_get_info(ext->knob_img, &info);
+            res = lv_img_decoder_get_info(ext->img_knob, &info);
             if(res == LV_RES_OK) {
                 lv_coord_t x_ofs = knob_area.x1 + (lv_area_get_width(&knob_area) - info.w) / 2;
                 lv_coord_t y_ofs = knob_area.y1 + (lv_area_get_height(&knob_area) - info.h) / 2;
@@ -307,7 +308,7 @@ static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * cli
                 a.x2 = info.w - 1 + x_ofs;
                 a.y2 = info.h - 1 + y_ofs;
 
-                lv_draw_img(&a, clip_area, ext->knob_img, style_knob, 0, LV_IMG_ZOOM_NONE, false, opa_scale);
+                lv_draw_img(&a, clip_area, ext->img_knob, style_knob, 0, LV_IMG_ZOOM_NONE, false, opa_scale);
             } else {
                 LV_LOG_WARN("lv_slider_design: can't get knob image info")
             }
@@ -406,13 +407,13 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         knob_size += knob_style->body.shadow.width + knob_style->body.shadow.spread;
         knob_size += LV_MATH_MAX(LV_MATH_ABS(knob_style->body.shadow.offset.x), LV_MATH_ABS(knob_style->body.shadow.offset.y));
 
-        if(ext->knob_img) {
+        if(ext->img_knob) {
             lv_img_header_t info;
             lv_res_t res;
-            res = lv_img_decoder_get_info(ext->knob_img, &info);
+            res = lv_img_decoder_get_info(ext->img_knob, &info);
             if(res == LV_RES_OK) {
-                knob_size = LV_MATH_MAX(knob_size, info.w);
-                knob_size = LV_MATH_MAX(knob_size, info.h);
+                knob_size = LV_MATH_MAX(knob_size, info.w / 2);
+                knob_size = LV_MATH_MAX(knob_size, info.h / 2);
             } else {
                 LV_LOG_WARN("slider signal (LV_SIGNAL_REFR_EXT_DRAW_PAD): can't get knob image info")
             }

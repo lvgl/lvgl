@@ -19,6 +19,7 @@
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_core/lv_indev.h"
+#include "lv_img.h"
 
 /*********************
  *      DEFINES
@@ -75,11 +76,10 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->changed = 0;
-#if LV_USE_ANIMATION
-    ext->anim_time = 0;
-#endif
     ext->style_knob_off = &lv_style_pretty;
     ext->style_knob_on  = &lv_style_pretty;
+    ext->img_knob_off = NULL;
+    ext->img_knob_on = NULL;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_sw, lv_sw_signal);
@@ -108,13 +108,10 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_sw_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->style_knob_off    = copy_ext->style_knob_off;
         ext->style_knob_on     = copy_ext->style_knob_on;
-#if LV_USE_ANIMATION
-        ext->anim_time = copy_ext->anim_time;
-#endif
-
-        /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_sw);
     }
+
+    /*Refresh the style with new signal function*/
+    lv_obj_refresh_style(new_sw);
 
     LV_LOG_INFO("switch created");
 
@@ -185,6 +182,38 @@ bool lv_sw_toggle(lv_obj_t * sw, lv_anim_enable_t anim)
 }
 
 /**
+ * Set an image to display on the knob of the switch when it's in OFF state
+ * @param sw pointer to a switch object
+ * @param img_src pointer to an `lv_img_dsc_t` variable or a path to an image  (not an `lv_img` object)
+ */
+void lv_sw_set_knob_off_img(lv_obj_t * sw, const void * img_src)
+{
+    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
+
+    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
+
+    ext->img_knob_off = img_src;
+    lv_obj_refresh_ext_draw_pad(sw);
+    lv_obj_invalidate(sw);
+}
+
+/**
+ * Set an image to display on the knob of the switch when it's in ON state
+ * @param sw pointer to a switch object
+ * @param img_src pointer to an `lv_img_dsc_t` variable or a path to an image  (not an `lv_img` object)
+ */
+void lv_sw_set_knob_on_img(lv_obj_t * sw, const void * img_src)
+{
+    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
+
+    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
+
+    ext->img_knob_on = img_src;
+    lv_obj_refresh_ext_draw_pad(sw);
+    lv_obj_invalidate(sw);
+}
+
+/**
  * Set a style of a switch
  * @param sw pointer to a switch object
  * @param type which style should be set
@@ -201,31 +230,48 @@ void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, const lv_style_t * style
         case LV_SW_STYLE_INDIC: lv_bar_set_style(sw, LV_BAR_STYLE_INDIC, style); break;
         case LV_SW_STYLE_KNOB_OFF:
             ext->style_knob_off = style;
+            lv_obj_refresh_ext_draw_pad(sw);
             lv_obj_invalidate(sw);
             break;
         case LV_SW_STYLE_KNOB_ON:
             ext->style_knob_on = style;
+            lv_obj_refresh_ext_draw_pad(sw);
             lv_obj_invalidate(sw);
             break;
     }
 }
 
-void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time)
-{
-    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
-
-#if LV_USE_ANIMATION
-    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
-    ext->anim_time    = anim_time;
-#else
-    (void)sw;
-    (void)anim_time;
-#endif
-}
-
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get an image to display on the knob of the switch when it's in OFF state
+ * @param sw pointer to a switch object
+ * @return the image source: pointer to an `lv_img_dsc_t` variable or a path to an image  (not an `lv_img` object)
+ */
+const void * lv_slider_get_knob_off_img(lv_obj_t * sw, const void * img_src)
+{
+    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
+
+    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
+
+    return ext->img_knob_off;
+}
+
+/**
+ * Get an image to display on the knob of the switch when it's in ON state
+ * @param sw pointer to a switch object
+ * @return the image source: pointer to an `lv_img_dsc_t` variable or a path to an image  (not an `lv_img` object)
+ */
+const void * lv_slider_get_knob_on_img(lv_obj_t * sw, const void * img_src)
+{
+    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
+
+    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
+
+    return ext->img_knob_on;
+}
 
 /**
  * Get a style of a switch
@@ -249,19 +295,6 @@ const lv_style_t * lv_sw_get_style(const lv_obj_t * sw, lv_sw_style_t type)
     }
 
     return style;
-}
-
-uint16_t lv_sw_get_anim_time(const lv_obj_t * sw)
-{
-    LV_ASSERT_OBJ(sw, LV_OBJX_NAME);
-
-#if LV_USE_ANIMATION
-    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
-    return ext->anim_time;
-#else
-    (void)sw; /*Unused*/
-    return 0;
-#endif
 }
 
 /**********************
@@ -317,6 +350,27 @@ static lv_design_res_t lv_sw_design(lv_obj_t * sw, const lv_area_t * clip_area, 
         knob_area.y2 += style_knob->body.padding.bottom;
 
         lv_draw_rect(&knob_area, clip_area, style_knob, opa_scale);
+
+        const void * img = ext->state ? ext->img_knob_on : ext->img_knob_off;
+
+        if(img) {
+             lv_res_t res;
+             lv_img_header_t info;
+             res = lv_img_decoder_get_info(img, &info);
+             if(res == LV_RES_OK) {
+                 lv_coord_t x_ofs = knob_area.x1 + (lv_area_get_width(&knob_area) - info.w) / 2;
+                 lv_coord_t y_ofs = knob_area.y1 + (lv_area_get_height(&knob_area) - info.h) / 2;
+                 lv_area_t a;
+                 a.x1 = x_ofs;
+                 a.y1 = y_ofs;
+                 a.x2 = info.w - 1 + x_ofs;
+                 a.y2 = info.h - 1 + y_ofs;
+
+                 lv_draw_img(&a, clip_area, img, style_knob, 0, LV_IMG_ZOOM_NONE, false, opa_scale);
+             } else {
+                 LV_LOG_WARN("lv_slider_design: can't get knob image info")
+             }
+         }
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
@@ -454,6 +508,18 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         knob_on_size += knob_on_style->body.shadow.width + knob_on_style->body.shadow.spread;
         knob_on_size += LV_MATH_MAX(LV_MATH_ABS(knob_on_style->body.shadow.offset.x), LV_MATH_ABS(knob_on_style->body.shadow.offset.y));
 
+        if(ext->img_knob_on) {
+            lv_img_header_t info;
+            lv_res_t res;
+            res = lv_img_decoder_get_info(ext->img_knob_on, &info);
+            if(res == LV_RES_OK) {
+                knob_on_size = LV_MATH_MAX(knob_on_size, info.w / 2);
+                knob_on_size = LV_MATH_MAX(knob_on_size, info.h / 2);
+            } else {
+                LV_LOG_WARN("slider signal (LV_SIGNAL_REFR_EXT_DRAW_PAD): can't get knob image info")
+            }
+        }
+
         lv_coord_t knob_off_size = LV_MATH_MIN(lv_obj_get_width(sw), lv_obj_get_height(sw)) >> 1;
         knob_off_size += LV_MATH_MAX(
                        LV_MATH_MAX(knob_off_style->body.padding.left, knob_off_style->body.padding.right),
@@ -461,6 +527,18 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 
         knob_off_size += knob_off_style->body.shadow.width + knob_off_style->body.shadow.spread;
         knob_off_size += LV_MATH_MAX(LV_MATH_ABS(knob_off_style->body.shadow.offset.x), LV_MATH_ABS(knob_off_style->body.shadow.offset.y));
+
+        if(ext->img_knob_off) {
+            lv_img_header_t info;
+            lv_res_t res;
+            res = lv_img_decoder_get_info(ext->img_knob_off, &info);
+            if(res == LV_RES_OK) {
+                knob_off_size = LV_MATH_MAX(knob_on_size, info.w / 2);
+                knob_off_size = LV_MATH_MAX(knob_on_size, info.h / 2);
+            } else {
+                LV_LOG_WARN("slider signal (LV_SIGNAL_REFR_EXT_DRAW_PAD): can't get knob image info")
+            }
+        }
 
         lv_coord_t bg_size = bg_style->body.shadow.width + bg_style->body.shadow.spread;
         bg_size += LV_MATH_MAX(LV_MATH_ABS(bg_style->body.shadow.offset.x), LV_MATH_ABS(bg_style->body.shadow.offset.y));
