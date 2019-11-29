@@ -308,7 +308,7 @@ static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * cli
                 a.x2 = info.w - 1 + x_ofs;
                 a.y2 = info.h - 1 + y_ofs;
 
-                lv_draw_img(&a, clip_area, ext->img_knob, style_knob, 0, LV_IMG_ZOOM_NONE, false, opa_scale);
+                lv_draw_img(&a, clip_area, ext->img_knob, style_knob, 0, NULL, LV_IMG_ZOOM_NONE, false, opa_scale);
             } else {
                 LV_LOG_WARN("lv_slider_design: can't get knob image info")
             }

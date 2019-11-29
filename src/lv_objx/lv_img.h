@@ -43,7 +43,7 @@ typedef struct
     lv_coord_t w;          /*Width of the image (Handled by the library)*/
     lv_coord_t h;          /*Height of the image (Handled by the library)*/
     uint16_t angle;	   /*rotation angle of the image*/
-    lv_point_t center;     /*rotation center of the image*/
+    lv_point_t pivot;     /*rotation center of the image*/
     uint16_t zoom;         /*256 means no zoom, 512 double size, 128 hasl size*/
     uint8_t src_type : 2;  /*See: lv_img_src_t*/
     uint8_t auto_size : 1; /*1: automatically set the object size to the image size*/
@@ -106,12 +106,12 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y);
 
 /**
  * Set the rotation center of the image.
- * The image will be rotated around its middle point
+ * The image will be rotated around this point
  * @param img pointer to an image object
- * @param center_x rotation center x of the image
- * @param center_y rotation center y of the image
+ * @param pivot_x rotation center x of the image
+ * @param pivot_y rotation center y of the image
  */
-void lv_img_set_center(lv_obj_t * img, lv_coord_t center_x, lv_coord_t center_y);
+void lv_img_set_pivot(lv_obj_t * img, lv_coord_t pivot_x, lv_coord_t pivot_y);
 
 /**
  * Set the rotation angle of the image.
@@ -203,7 +203,7 @@ uint16_t lv_img_get_angle(lv_obj_t * img);
  * @param img pointer to an image object
  * @param center rotation center of the image
  */
-void lv_img_get_center(lv_obj_t * img, lv_point_t *center);
+void lv_img_get_pivot(lv_obj_t * img, lv_point_t *center);
 
 /**
  * Get the zoom factor of the image.
