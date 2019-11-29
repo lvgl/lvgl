@@ -98,8 +98,8 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
          * Don't use `par` directly because if the tileview is created on a page it is moved to the
          * scrollable so the parent has changed */
         lv_obj_set_size(new_tileview, lv_obj_get_width_fit(lv_obj_get_parent(new_tileview)),
-                lv_obj_get_height_fit(lv_obj_get_parent(new_tileview)));
-
+        lv_obj_get_height_fit(lv_obj_get_parent(new_tileview)));
+        lv_obj_set_drag_dir(lv_page_get_scrl(new_tileview), LV_DRAG_DIR_ONE);
         lv_obj_set_drag_throw(lv_page_get_scrl(new_tileview), true);
         lv_page_set_scrl_fit(new_tileview, LV_FIT_TIGHT);
         /*Set the default styles*/
@@ -372,9 +372,6 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     if(sign == LV_SIGNAL_DRAG_BEGIN) {
         set_valid_drag_dirs(tileview);
     }
-    else if(sign == LV_SIGNAL_DRAG_END) {
-//        drag_end_handler(tileview);
-    }
     else if(sign == LV_SIGNAL_DRAG_THROW_BEGIN) {
         drag_end_handler(tileview);
 
@@ -412,15 +409,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
             /*Apply the drag constraints*/
             lv_drag_dir_t drag_dir = indev->proc.types.pointer.drag_dir;
-            if (drag_dir == LV_DRAG_DIR_BOTH){
-                if ((ext->drag_right_en && indev->proc.types.pointer.drag_sum.x <= -LV_INDEV_DEF_DRAG_LIMIT) ||
-                     (ext->drag_left_en && indev->proc.types.pointer.drag_sum.x >= LV_INDEV_DEF_DRAG_LIMIT))
-                    lv_obj_set_y(scrl, -ext->act_id.y * lv_obj_get_height(tileview) + style_bg->body.padding.top);
-                else if ((ext->drag_bottom_en && indev->proc.types.pointer.drag_sum.y <= -LV_INDEV_DEF_DRAG_LIMIT) ||
-                     (ext->drag_top_en && indev->proc.types.pointer.drag_sum.y >= LV_INDEV_DEF_DRAG_LIMIT))
-                    lv_obj_set_x(scrl, -ext->act_id.x * lv_obj_get_width(tileview) + style_bg->body.padding.left);
-            }
-            else if(drag_dir == LV_DRAG_DIR_HOR)
+            if(drag_dir == LV_DRAG_DIR_HOR)
                 lv_obj_set_y(scrl, -ext->act_id.y * lv_obj_get_height(tileview) + style_bg->body.padding.top);
             else if(drag_dir == LV_DRAG_DIR_VER)
                 lv_obj_set_x(scrl, -ext->act_id.x * lv_obj_get_width(tileview) + style_bg->body.padding.left);
