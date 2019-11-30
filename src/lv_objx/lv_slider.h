@@ -107,6 +107,7 @@ static inline void lv_slider_set_anim_time(lv_obj_t * slider, uint16_t anim_time
  * Set an image to display on the knob of the slider
  * @param slider pointer to a slider object
  * @param img_src pointer to an `lv_img_dsc_t` variable or a path to an image
+ *        (not an `lv_img` object)
  */
 void lv_slider_set_knob_img(lv_obj_t * slider, const void * img_src);
 
