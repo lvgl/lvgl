@@ -404,7 +404,6 @@ void lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
     dsc->tmp.img_dsc.header.w = dsc->cfg.src_w;
     dsc->tmp.img_dsc.header.h = dsc->cfg.src_h;
 
-
     dsc->tmp.zoom_inv = (256 * 256) / dsc->cfg.zoom;
 
     dsc->res.opa = LV_OPA_COVER;
