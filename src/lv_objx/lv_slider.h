@@ -125,18 +125,6 @@ static inline void lv_slider_set_anim_time(lv_obj_t * slider, uint16_t anim_time
 }
 
 /**
- * Make the slider symmetric to zero. The indicator will grow from zero instead of the minimum
- * position.
- * @param slider pointer to a bar object
- * @param en true: enable disable symmetric behavior; false: disable
- * @deprecated As of v7.0, you should use `lv_slider_set_type` instead.
- */
-static inline void lv_slider_set_sym(lv_obj_t * slider, bool en)
-{
-	lv_bar_set_sym(slider, en);
-}
-
-/**
  * Set an image to display on the knob of the slider
  * @param slider pointer to a slider object
  * @param img_src pointer to an `lv_img_dsc_t` variable or a path to an image
@@ -247,17 +235,6 @@ static inline lv_slider_type_t lv_slider_get_type(lv_obj_t * slider)
 	else
 		return LV_SLIDER_TYPE_NORMAL;
 }
-
-/**
- * Get whether the slider is symmetric or not.
- * @param slider pointer to a slider object
- * @return true: symmetric is enabled; false: disable
- * @deprecated As of v7.0, you should use `lv_slider_get_type` instead.
- */
-static inline bool lv_slider_get_sym(lv_obj_t * slider) {
-	return lv_bar_get_sym(slider);
-}
-
 
 /**
  * Get a style of a slider
