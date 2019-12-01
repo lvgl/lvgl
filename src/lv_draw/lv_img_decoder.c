@@ -515,6 +515,7 @@ void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_ds
         }
 #endif
         if(user_data->palette) lv_mem_free(user_data->palette);
+        if(user_data->opa) lv_mem_free(user_data->opa);
 
         lv_mem_free(user_data);
 
@@ -622,7 +623,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
 
 #if LV_USE_FILESYSTEM
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
-    uint8_t * fs_buf = lv_draw_buf_get(w);
+    uint8_t * fs_buf = lv_mem_buf_get(w);
 #endif
 
     const uint8_t * data_tmp = NULL;
@@ -657,7 +658,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
         }
     }
 #if LV_USE_FILESYSTEM
-    lv_draw_buf_release(fs_buf);
+    lv_mem_buf_release(fs_buf);
 #endif
     return LV_RES_OK;
 
@@ -711,7 +712,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
 
 #if LV_USE_FILESYSTEM
-    uint8_t * fs_buf = lv_draw_buf_get(w);
+    uint8_t * fs_buf = lv_mem_buf_get(w);
 #endif
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
@@ -755,7 +756,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
         }
     }
 #if LV_USE_FILESYSTEM
-    lv_draw_buf_release(fs_buf);
+    lv_mem_buf_release(fs_buf);
 #endif
     return LV_RES_OK;
 #else

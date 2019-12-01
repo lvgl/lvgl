@@ -24,6 +24,7 @@ extern "C" {
 #include <stdbool.h>
 
 #include "lv_symbol_def.h"
+#include "../lv_misc/lv_area.h"
 
 /*********************
  *      DEFINES
@@ -46,10 +47,10 @@ extern "C" {
 typedef struct
 {
     uint16_t adv_w; /**< The glyph needs this space. Draw the next glyph after this width. 8 bit integer, 4 bit fractional */
-    uint8_t box_w;  /**< Width of the glyph's bounding box*/
-    uint8_t box_h;  /**< Height of the glyph's bounding box*/
-    int8_t ofs_x;   /**< x offset of the bounding box*/
-    int8_t ofs_y;  /**< y offset of the bounding box*/
+    uint16_t box_w;  /**< Width of the glyph's bounding box*/
+    uint16_t box_h;  /**< Height of the glyph's bounding box*/
+    int16_t ofs_x;   /**< x offset of the bounding box*/
+    int16_t ofs_y;  /**< y offset of the bounding box*/
     uint8_t bpp;   /**< Bit-per-pixel: 1, 2, 4, 8*/
 }lv_font_glyph_dsc_t;
 
@@ -74,8 +75,8 @@ typedef struct _lv_font_struct
     const uint8_t * (*get_glyph_bitmap)(const struct _lv_font_struct *, uint32_t);
 
     /*Pointer to the font in a font pack (must have the same line height)*/
-    uint8_t line_height;      /**< The real line height where any text fits*/
-    uint8_t base_line;        /**< Base line measured from the top of the line_height*/
+    lv_coord_t line_height;      /**< The real line height where any text fits*/
+    lv_coord_t base_line;        /**< Base line measured from the top of the line_height*/
     uint8_t subpx  :2;        /**< An element of `lv_font_subpx_t`*/
     void * dsc;               /**< Store implementation specific data here*/
 #if LV_USE_USER_DATA
@@ -121,7 +122,7 @@ uint16_t lv_font_get_glyph_width(const lv_font_t * font, uint32_t letter, uint32
  * @param font_p pointer to a font
  * @return the height of a font
  */
-static inline uint8_t lv_font_get_line_height(const lv_font_t * font_p)
+static inline lv_coord_t lv_font_get_line_height(const lv_font_t * font_p)
 {
     return font_p->line_height;
 }

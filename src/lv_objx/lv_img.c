@@ -85,6 +85,8 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->auto_size = 1;
     ext->offset.x  = 0;
     ext->offset.y  = 0;
+    ext->pivot.x = 0;
+    ext->pivot.y = 0;
 
     /*Init the new object*/
     lv_obj_set_signal_cb(new_img, lv_img_signal);
@@ -198,6 +200,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     ext->w        = header.w;
     ext->h        = header.h;
     ext->cf       = header.cf;
+    ext->pivot.x = header.w / 2;
+    ext->pivot.y = header.h / 2;
 
     if(lv_img_get_auto_size(img) != false) {
         lv_obj_set_size(img, ext->w, ext->h);
@@ -236,10 +240,10 @@ void lv_img_set_offset_x(lv_obj_t * img, lv_coord_t x)
 
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-    if(x < ext->w - 1) {
-        ext->offset.x = x;
-        lv_obj_invalidate(img);
-    }
+    x = x % ext->w;
+
+    ext->offset.x = x;
+    lv_obj_invalidate(img);
 }
 
 /**
@@ -254,10 +258,29 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y)
 
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
-    if(y < ext->h - 1) {
-        ext->offset.y = y;
-        lv_obj_invalidate(img);
-    }
+    y = y % ext->h;
+
+    ext->offset.y = y;
+    lv_obj_invalidate(img);
+}
+
+/**
+ * Set the rotation center of the image.
+ * The image will be rotated around this point
+ * @param img pointer to an image object
+ * @param pivot_x rotation center x of the image
+ * @param pivot_y rotation center y of the image
+ */
+void lv_img_set_pivot(lv_obj_t * img, lv_coord_t pivot_x, lv_coord_t pivot_y)
+{
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+	if (ext->pivot.x == pivot_x && ext->pivot.y == pivot_y) return;
+
+    lv_obj_invalidate(img);
+    ext->pivot.x = pivot_x;
+    ext->pivot.y = pivot_y;
+    lv_obj_refresh_ext_draw_pad(img);
+    lv_obj_invalidate(img);
 }
 
 /**
@@ -394,6 +417,20 @@ lv_coord_t lv_img_get_offset_y(lv_obj_t * img)
 }
 
 /**
+ * Get the rotation center of the image.
+ * @param img pointer to an image object
+ * @param center rotation center of the image
+ */
+void lv_img_get_pivot(lv_obj_t * img, lv_point_t *pivot)
+{
+    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
+    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+
+    *pivot = ext->pivot;
+}
+
+/**
  * Get the rotation angle of the image.
  * @param img pointer to an image object
  * @return rotation angle in degree (0..359)
@@ -471,8 +508,11 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         lv_obj_get_coords(img, &coords);
 
         if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_VARIABLE) {
-            coords.x1 -= ext->offset.x;
-            coords.y1 -= ext->offset.y;
+            coords.x1 += ext->offset.x;
+            coords.y1 += ext->offset.y;
+
+            if(coords.x1 > img->coords.x1) coords.x1 -= ext->w;
+            if(coords.y1 > img->coords.y1) coords.y1 -= ext->h;
 
             LV_LOG_TRACE("lv_img_design: start to draw image");
             lv_area_t cords_tmp;
@@ -483,7 +523,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
                 cords_tmp.x1 = coords.x1;
                 cords_tmp.x2 = coords.x1 + ext->w - 1;
                 for(; cords_tmp.x1 <= coords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
-                    lv_draw_img(&cords_tmp, clip_area, ext->src, style, ext->angle, ext->zoom, ext->antialias, opa_scale);
+                    lv_draw_img(&cords_tmp, clip_area, ext->src, style, ext->angle, &ext->pivot, ext->zoom, ext->antialias, opa_scale);
                 }
             }
         } else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
@@ -495,7 +535,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         } else {
             /*Trigger the error handler of image drawer*/
             LV_LOG_WARN("lv_img_design: image source type is unknown");
-            lv_draw_img(&img->coords, clip_area, NULL, style, 0, LV_IMG_ZOOM_NONE, false, opa_scale);
+            lv_draw_img(&img->coords, clip_area, NULL, style, 0, NULL, LV_IMG_ZOOM_NONE, false, opa_scale);
         }
     }
 
@@ -535,10 +575,13 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         /*If the image has angle provide enough room for the rotated corners */
         if(ext->angle || ext->zoom != LV_IMG_ZOOM_NONE) {
             lv_sqrt_res_t ds;
-            lv_sqrt(ext->w * ext->w + ext->h * ext->h, &ds);
-            ds.i = (ds.i * ext->zoom + 0) >> 8;        /*+10 to be sure anything won't be clipped*/
+            lv_coord_t max_w = ext->w + LV_MATH_ABS(ext->pivot.x + ext->w / 2);
+            lv_coord_t max_h = ext->h + LV_MATH_ABS(ext->pivot.y + ext->h / 2);
+			lv_sqrt(max_w * max_w + max_h * max_h, &ds);/*Maximum diagonal length*/
+			lv_sqrt(ds.i * ds.i + ds.i * ds.i, &ds);    /*Maximum side length of external rectangle*/
+            ds.i = (ds.i * ext->zoom ) >> 8;         /*+10 to be sure anything won't be clipped*/
 
-            lv_coord_t d = (ds.i - LV_MATH_MIN(ext->w, ext->h)) / 2;
+            lv_coord_t d = ds.i / 2;
             img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, d);
         }
     }

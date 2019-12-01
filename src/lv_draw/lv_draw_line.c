@@ -131,7 +131,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
         fill_area.y1 = draw_area.y1 + disp_area->y1;
         fill_area.y2 = fill_area.y1;
 
-        lv_opa_t mask_buf[LV_HOR_RES_MAX];
+        lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
         lv_coord_t h;
         lv_draw_mask_res_t mask_res;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
@@ -145,6 +145,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
              fill_area.y1++;
              fill_area.y2++;
          }
+        lv_mem_buf_release(mask_buf);
     }
 }
 
@@ -203,7 +204,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
         fill_area.y1 = draw_area.y1 + disp_area->y1;
         fill_area.y2 = fill_area.y1;
 
-        lv_opa_t mask_buf[LV_HOR_RES_MAX];
+        lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
         lv_coord_t h;
         lv_draw_mask_res_t mask_res;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
@@ -217,6 +218,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
              fill_area.y1++;
              fill_area.y2++;
          }
+        lv_mem_buf_release(mask_buf);
     }
 }
 
@@ -318,7 +320,7 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     /*Draw the background line by line*/
     lv_coord_t h;
     lv_draw_mask_res_t mask_res;
-    lv_opa_t mask_buf[LV_HOR_RES_MAX];
+    lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
     lv_area_t fill_area;
     fill_area.x1 = draw_area.x1 + disp_area->x1;
     fill_area.x2 = draw_area.x2 + disp_area->x1;
@@ -337,6 +339,8 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
          fill_area.y1++;
          fill_area.y2++;
     }
+
+    lv_mem_buf_release(mask_buf);
 
     lv_draw_mask_remove_id(mask_left_id);
     lv_draw_mask_remove_id(mask_right_id);

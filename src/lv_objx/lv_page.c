@@ -706,7 +706,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
 
         if(style->body.corner_mask) {
             style = lv_page_get_style(page, LV_PAGE_STYLE_BG);
-            lv_draw_mask_radius_param_t * mp = lv_draw_buf_get(sizeof(lv_draw_mask_radius_param_t));;
+            lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));;
             lv_draw_mask_radius_init(mp, &page->coords, style->body.radius, false);
             /*Add the mask and use `page+8` as custom id. Don't use `page` directly because it might be sued by the user*/
             lv_draw_mask_add(mp, page + 8);
@@ -783,7 +783,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
 
         if(style->body.corner_mask) {
             void * param = lv_draw_mask_remove_custom(page + 8);
-            lv_draw_buf_release(param);
+            lv_mem_buf_release(param);
         }
 #endif
     }

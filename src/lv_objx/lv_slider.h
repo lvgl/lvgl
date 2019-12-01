@@ -52,6 +52,7 @@ typedef struct
 	lv_area_t left_knob_area;
 	lv_area_t right_knob_area;
 	int16_t *value_to_set; /* Which bar value to set */
+    const void * img_knob;
     uint8_t dragging :1;        /*1: the slider is being dragged*/
 } lv_slider_ext_t;
 
@@ -136,6 +137,14 @@ static inline void lv_slider_set_sym(lv_obj_t * slider, bool en)
 }
 
 /**
+ * Set an image to display on the knob of the slider
+ * @param slider pointer to a slider object
+ * @param img_src pointer to an `lv_img_dsc_t` variable or a path to an image
+ *        (not an `lv_img` object)
+ */
+void lv_slider_set_knob_img(lv_obj_t * slider, const void * img_src);
+
+/**
  * Set the animation time of the slider
  * @param slider pointer to a bar object
  * @param anim_time the animation time in milliseconds.
@@ -205,6 +214,13 @@ static inline int16_t lv_slider_get_max_value(const lv_obj_t * slider)
  * @return true: drag in progress false: not dragged
  */
 bool lv_slider_is_dragged(const lv_obj_t * slider);
+
+/**
+ * Get an image to display on the knob of the slider
+ * @param slider pointer to a slider object
+ * @return the image source: pointer to an `lv_img_dsc_t` variable or a path to an image  (not an `lv_img` object)
+ */
+const void * lv_slider_get_knob_img(lv_obj_t * slider, const void * img_src);
 
 /**
  * Get the animation time of the slider

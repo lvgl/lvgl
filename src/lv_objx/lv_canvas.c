@@ -433,7 +433,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
     bool has_alpha = lv_img_cf_has_alpha(ext->dsc.header.cf);
 
     lv_coord_t line_w = lv_img_buf_get_img_size(ext->dsc.header.w, 1, ext->dsc.header.cf);
-    uint8_t * line_buf = lv_draw_buf_get(line_w);
+    uint8_t * line_buf = lv_mem_buf_get(line_w);
 
     lv_img_dsc_t line_img;
     line_img.data = line_buf;
@@ -526,7 +526,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
     }
     lv_obj_invalidate(canvas);
 
-    lv_draw_buf_release(line_buf);
+    lv_mem_buf_release(line_buf);
 }
 
 
@@ -567,7 +567,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 
     bool has_alpha = lv_img_cf_has_alpha(ext->dsc.header.cf);
     lv_coord_t col_w = lv_img_buf_get_img_size(1, ext->dsc.header.h, ext->dsc.header.cf);
-    uint8_t * col_buf = lv_draw_buf_get(col_w);
+    uint8_t * col_buf = lv_mem_buf_get(col_w);
     lv_img_dsc_t line_img;
 
     line_img.data = col_buf;
@@ -665,7 +665,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 
     lv_obj_invalidate(canvas);
 
-    lv_draw_buf_release(col_buf);
+    lv_mem_buf_release(col_buf);
 }
 
 /**
@@ -885,7 +885,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
     lv_refr_set_disp_refreshing(&disp);
 
-    lv_draw_img(&coords, &mask, src, style, 0, LV_IMG_ZOOM_NONE, false, LV_OPA_COVER);
+    lv_draw_img(&coords, &mask, src, style, 0, NULL, LV_IMG_ZOOM_NONE, false, LV_OPA_COVER);
 
     lv_refr_set_disp_refreshing(refr_ori);
 }

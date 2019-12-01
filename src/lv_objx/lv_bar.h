@@ -210,7 +210,7 @@ static inline bool lv_bar_get_sym(lv_obj_t * bar) {
  * @param bar pointer to a bar object
  * @return the animation time in milliseconds.
  */
-uint16_t lv_bar_get_anim_time(lv_obj_t * bar);
+uint16_t lv_bar_get_anim_time(const lv_obj_t * bar);
 
 /**
  * Get a style of a bar

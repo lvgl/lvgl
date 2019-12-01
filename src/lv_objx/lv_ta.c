@@ -1435,6 +1435,7 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
                 /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
                 const lv_style_t * style_label = lv_obj_get_style(ext->label);
                 lv_coord_t font_h              = lv_font_get_line_height(style_label->text.font);
+                lv_obj_set_height(ext->label, font_h);
                 lv_obj_set_height(ta, font_h + style_ta->body.padding.top + style_ta->body.padding.bottom +
                                           style_scrl->body.padding.top + style_scrl->body.padding.bottom);
             } else {
@@ -1908,21 +1909,21 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
 
         /*Invalidate the text area.*/
         if(ext->sel.start > ext->sel.end) {
-            if(ext_label->txt_sel_start != ext->sel.end || ext_label->txt_sel_end != ext->sel.start) {
-                ext_label->txt_sel_start = ext->sel.end;
-                ext_label->txt_sel_end   = ext->sel.start;
+            if(ext_label->txt_sel.start != ext->sel.end || ext_label->txt_sel.end != ext->sel.start) {
+                ext_label->txt_sel.start = ext->sel.end;
+                ext_label->txt_sel.end   = ext->sel.start;
                 lv_obj_invalidate(ta);
             }
         } else if(ext->sel.start < ext->sel.end) {
-            if(ext_label->txt_sel_start != ext->sel.start || ext_label->txt_sel_end != ext->sel.end) {
-                ext_label->txt_sel_start = ext->sel.start;
-                ext_label->txt_sel_end   = ext->sel.end;
+            if(ext_label->txt_sel.start != ext->sel.start || ext_label->txt_sel.end != ext->sel.end) {
+                ext_label->txt_sel.start = ext->sel.start;
+                ext_label->txt_sel.end   = ext->sel.end;
                 lv_obj_invalidate(ta);
             }
         } else {
-            if(ext_label->txt_sel_start != LV_DRAW_LABEL_NO_TXT_SEL || ext_label->txt_sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
-                ext_label->txt_sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
-                ext_label->txt_sel_end   = LV_DRAW_LABEL_NO_TXT_SEL;
+            if(ext_label->txt_sel.start != LV_DRAW_LABEL_NO_TXT_SEL || ext_label->txt_sel.end != LV_DRAW_LABEL_NO_TXT_SEL) {
+                ext_label->txt_sel.start = LV_DRAW_LABEL_NO_TXT_SEL;
+                ext_label->txt_sel.end   = LV_DRAW_LABEL_NO_TXT_SEL;
                 lv_obj_invalidate(ta);
             }
         }

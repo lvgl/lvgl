@@ -100,7 +100,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new  bar object*/
     if(copy == NULL) {
         lv_obj_set_click(new_bar, false);
-        lv_obj_set_size(new_bar, LV_DPI * 2, LV_DPI / 3);
+        lv_obj_set_size(new_bar, LV_DPI * 2, LV_DPI / 4);
         lv_bar_set_value(new_bar, ext->cur_value, false);
 
         lv_theme_t * th = lv_theme_get_current();
@@ -356,7 +356,7 @@ lv_bar_type_t lv_bar_get_type(lv_obj_t * bar) {
  * @param bar pointer to a bar object
  * @return the animation time in milliseconds.
  */
-uint16_t lv_bar_get_anim_time(lv_obj_t * bar)
+uint16_t lv_bar_get_anim_time(const lv_obj_t * bar)
 {
     LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
 

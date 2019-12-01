@@ -359,7 +359,8 @@ void lv_preload_spinner_anim(void * ptr, lv_anim_value_t val)
     angle_start = angle_start % 360;
     angle_end   = angle_end % 360;
 
-    lv_arc_set_angles(preload, angle_start, angle_end);
+    lv_arc_set_start_angle(preload, angle_start);
+    lv_arc_set_end_angle(preload, angle_end);
 }
 
 /**********************
@@ -400,6 +401,7 @@ static lv_design_res_t lv_preload_design(lv_obj_t * preload, const lv_area_t * c
             bg_style.body.radius       = LV_RADIUS_CIRCLE;
             bg_style.body.border.color = style->body.border.color;
             bg_style.body.border.width = style->body.border.width;
+            bg_style.body.border.opa = style->body.border.opa;
 
             lv_area_t bg_area;
             bg_area.x1 = x - r;

@@ -11,6 +11,7 @@
 
 #include <stdbool.h>
 #include "lv_cont.h"
+#include "../lv_misc/lv_math.h"
 #include "../lv_core/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 
@@ -97,8 +98,8 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
          * Don't use `par` directly because if the tileview is created on a page it is moved to the
          * scrollable so the parent has changed */
         lv_obj_set_size(new_tileview, lv_obj_get_width_fit(lv_obj_get_parent(new_tileview)),
-                lv_obj_get_height_fit(lv_obj_get_parent(new_tileview)));
-
+        lv_obj_get_height_fit(lv_obj_get_parent(new_tileview)));
+        lv_obj_set_drag_dir(lv_page_get_scrl(new_tileview), LV_DRAG_DIR_ONE);
         lv_obj_set_drag_throw(lv_page_get_scrl(new_tileview), true);
         lv_page_set_scrl_fit(new_tileview, LV_FIT_TIGHT);
         /*Set the default styles*/
@@ -281,6 +282,19 @@ void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, const 
 /*
  * New object specific "get" functions come here
  */
+/**
+* Get the tile to be shown
+* @param tileview pointer to a tileview object
+* @param x column id (0, 1, 2...)
+* @param y line id (0, 1, 2...)
+*/
+void lv_tileview_get_tile_act(lv_obj_t * tileview, lv_coord_t *x, lv_coord_t *y)
+{
+    lv_tileview_ext_t * ext = lv_obj_get_ext_attr(tileview);
+
+    *x = ext->act_id.x;
+    *y = ext->act_id.y;
+}
 
 /**
  * Get style of a tileview.
@@ -358,9 +372,6 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     if(sign == LV_SIGNAL_DRAG_BEGIN) {
         set_valid_drag_dirs(tileview);
     }
-    else if(sign == LV_SIGNAL_DRAG_END) {
-//        drag_end_handler(tileview);
-    }
     else if(sign == LV_SIGNAL_DRAG_THROW_BEGIN) {
         drag_end_handler(tileview);
 
@@ -398,9 +409,9 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
             /*Apply the drag constraints*/
             lv_drag_dir_t drag_dir = indev->proc.types.pointer.drag_dir;
-            if(drag_dir & LV_DRAG_DIR_HOR)
+            if(drag_dir == LV_DRAG_DIR_HOR)
                 lv_obj_set_y(scrl, -ext->act_id.y * lv_obj_get_height(tileview) + style_bg->body.padding.top);
-            if(drag_dir & LV_DRAG_DIR_VER)
+            else if(drag_dir == LV_DRAG_DIR_VER)
                 lv_obj_set_x(scrl, -ext->act_id.x * lv_obj_get_width(tileview) + style_bg->body.padding.left);
         }
     }

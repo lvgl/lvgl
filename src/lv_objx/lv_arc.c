@@ -114,22 +114,39 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
  *====================*/
 
 /**
- * Set the start and end angles of an arc. 0 deg: bottom, 90 deg: right etc.
+ * Set the start angle of an arc. 0 deg: right, 90 bottom: right etc.
  * @param arc pointer to an arc object
  * @param start the start angle [0..360]
- * @param end the end angle [0..360]
  */
-void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
+void lv_arc_set_start_angle(lv_obj_t * arc, int16_t start)
 {
     LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
 
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
-    if(start > 360) start = 360;
-    if(end > 360) end = 360;
+    if(start > 360) start -= 360;
+    if(start < 0) start += 360;
 
     ext->angle_start = start;
-    ext->angle_end   = end;
+
+    lv_obj_invalidate(arc);
+}
+
+/**
+ * Set the start angle of an arc. 0 deg: right, 90 bottom: right etc.
+ * @param arc pointer to an arc object
+ * @param start the start angle [0..360]
+ */
+void lv_arc_set_end_angle(lv_obj_t * arc, int16_t end)
+{
+    LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
+
+    lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
+
+    if(end > 360) end -= 360;
+    if(end < 0) end += 360;
+
+    ext->angle_end= end;
 
     lv_obj_invalidate(arc);
 }
