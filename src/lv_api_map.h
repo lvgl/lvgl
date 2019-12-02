@@ -66,6 +66,35 @@ static inline bool lv_ddlist_get_draw_arrow(lv_obj_t * ddlist)
 
 #endif
 
+#if LV_USE_BAR
+
+/**
+ * Make the bar symmetric to zero. The indicator will grow from zero instead of the minimum
+ * position.
+ * @param bar pointer to a bar object
+ * @param en true: enable disable symmetric behavior; false: disable
+ * @deprecated As of v7.0, you should use `lv_bar_set_type` instead.
+ */
+static inline void lv_bar_set_sym(lv_obj_t * bar, bool en)
+{
+    if(en)
+        lv_bar_set_type(bar, LV_BAR_TYPE_SYM);
+    else
+        lv_bar_set_type(bar, LV_BAR_TYPE_NORMAL);
+}
+
+/**
+ * Get whether the bar is symmetric or not.
+ * @param bar pointer to a bar object
+ * @return true: symmetric is enabled; false: disable
+ * @deprecated As of v7.0, you should use `lv_bar_get_type` instead.
+ */
+static inline bool lv_bar_get_sym(lv_obj_t * bar) {
+    return lv_bar_get_type(bar) == LV_BAR_TYPE_SYM;
+}
+
+#endif
+
 #if LV_USE_SLIDER
 
 /**
@@ -88,35 +117,6 @@ static inline void lv_slider_set_sym(lv_obj_t * slider, bool en)
  */
 static inline bool lv_slider_get_sym(lv_obj_t * slider) {
 	return lv_bar_get_sym(slider);
-}
-
-#endif
-
-#if LV_USE_BAR
-
-/**
- * Make the bar symmetric to zero. The indicator will grow from zero instead of the minimum
- * position.
- * @param bar pointer to a bar object
- * @param en true: enable disable symmetric behavior; false: disable
- * @deprecated As of v7.0, you should use `lv_bar_set_type` instead.
- */
-static inline void lv_bar_set_sym(lv_obj_t * bar, bool en)
-{
-	if(en)
-		lv_bar_set_type(bar, LV_BAR_TYPE_SYM);
-	else
-		lv_bar_set_type(bar, LV_BAR_TYPE_NORMAL);
-}
-
-/**
- * Get whether the bar is symmetric or not.
- * @param bar pointer to a bar object
- * @return true: symmetric is enabled; false: disable
- * @deprecated As of v7.0, you should use `lv_bar_get_type` instead.
- */
-static inline bool lv_bar_get_sym(lv_obj_t * bar) {
-	return lv_bar_get_type(bar) == LV_BAR_TYPE_SYM;
 }
 
 #endif

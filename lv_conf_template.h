@@ -307,6 +307,10 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 #define LV_FONT_ROBOTO_22    0
 #define LV_FONT_ROBOTO_28    0
 
+/* Demonstrate special features */
+#define LV_FONT_ROBOTO_12_SUBPX 1
+#define LV_FONT_ROBOTO_28_COMPRESSED 1  /*bpp = 3*/
+
 /*Pixel perfect monospace font
  * http://pelulamu.net/unscii/ */
 #define LV_FONT_UNSCII_8     0
@@ -327,6 +331,12 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
  * but with > 10,000 characters if you see issues probably you need to enable it.*/
 #define LV_FONT_FMT_TXT_LARGE   0
 
+/* Set the pixel order of the display.
+ * Important only if "subpx fonts" are used.
+ * With "normal" font it doesn't matter.
+ */
+#define LV_FONT_SUBPX_BGR    0
+
 /*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
 typedef void * lv_font_user_data_t;
 
@@ -344,7 +354,6 @@ typedef void * lv_font_user_data_t;
  /*Can break (wrap) texts on these chars*/
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 
-
 /* If a word is at least this long, will break wherever "prettiest"
  * To disable, set to a value <= 0 */
 #define LV_TXT_LINE_BREAK_LONG_LEN          12
@@ -356,7 +365,10 @@ typedef void * lv_font_user_data_t;
 /* Minimum number of characters in a long word to put on a line after a break.
  * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
 #define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
- 
+
+/* The control character to use for signalling text recoloring. */
+#define LV_TXT_COLOR_CMD "#"
+
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
  * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
@@ -377,12 +389,6 @@ typedef void * lv_font_user_data_t;
 #  define lv_snprintf     snprintf
 #  define lv_vsnprintf    vsnprintf
 #endif  /*LV_SPRINTF_CUSTOM*/
-
- /* Set the pixel order of the display.
-  * Important only if "subpx fonts" are used.
-  * With "normal" font it doesn't matter.
-  */
- #define LV_SUBPX_BGR    0
 
 /*===================
  *  LV_OBJ SETTINGS

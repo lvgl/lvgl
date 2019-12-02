@@ -692,7 +692,7 @@ static lv_area_t get_indic_area(lv_obj_t * cpicker)
     const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
     const lv_style_t * style_indic = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_INDICATOR);
 
-    uint16_t r;
+    uint16_t r = 0;
     if(ext->type == LV_CPICKER_TYPE_DISC) r = style_main->line.width / 2;
     else if(ext->type == LV_CPICKER_TYPE_RECT) {
         lv_coord_t h = lv_obj_get_height(cpicker);
@@ -822,7 +822,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         if(ext->type == LV_CPICKER_TYPE_RECT) {
             /*If pressed long enough without change go to next color mode*/
             uint32_t diff = lv_tick_elaps(ext->last_change_time);
-            if(diff > indev->driver.long_press_time * 2 && !ext->color_mode_fixed) {
+            if(diff > (uint32_t)indev->driver.long_press_time * 2 && !ext->color_mode_fixed) {
                 next_color_mode(cpicker);
                 lv_indev_wait_release(lv_indev_get_act());
                 return res;

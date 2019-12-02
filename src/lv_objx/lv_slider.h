@@ -97,7 +97,7 @@ static inline void lv_slider_set_value(lv_obj_t * slider, int16_t value, lv_anim
  * @param left_value new value
  * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-static inline void lv_slider_set_left_value(const lv_obj_t * slider, int16_t left_value, lv_anim_enable_t anim)
+static inline void lv_slider_set_left_value(lv_obj_t * slider, int16_t left_value, lv_anim_enable_t anim)
 {
     lv_bar_set_start_value(slider, left_value, anim);
 }

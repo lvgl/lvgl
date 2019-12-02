@@ -319,7 +319,7 @@ void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
         else if(s == LV_BTN_STATE_TGL_REL)
             lv_btn_set_state(ext->selected_btn, LV_BTN_STATE_TGL_PR);
 
-        lv_page_focus(list, ext->selected_btn, lv_list_get_anim_time(list));
+        lv_page_focus(list, ext->selected_btn, LV_ANIM_ON);
     }
 }
 

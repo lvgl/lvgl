@@ -78,7 +78,7 @@ typedef struct _lv_font_struct
     lv_coord_t line_height;      /**< The real line height where any text fits*/
     lv_coord_t base_line;        /**< Base line measured from the top of the line_height*/
     uint8_t subpx  :2;        /**< An element of `lv_font_subpx_t`*/
-    void * dsc;               /**< Store implementation specific data here*/
+    void * dsc;               /**< Store implementation specific or run_time data or caching here*/
 #if LV_USE_USER_DATA
     lv_font_user_data_t user_data; /**< Custom user data for font. */
 #endif

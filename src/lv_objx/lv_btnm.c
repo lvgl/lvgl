@@ -122,7 +122,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing object*/
     else {
         lv_btnm_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        memcpy(ext->styles_btn, copy_ext->styles_btn, sizeof(ext->styles_btn));
+        memcpy((void*)ext->styles_btn, copy_ext->styles_btn, sizeof(ext->styles_btn));
         lv_btnm_set_map(new_btnm, lv_btnm_get_map_array(copy));
     }
 
