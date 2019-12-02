@@ -50,8 +50,8 @@ typedef struct
     lv_calendar_date_t showed_date;         /*Currently visible month (day is ignored)*/
     lv_calendar_date_t * highlighted_dates; /*Apply different style on these days (pointer to an
                                                array defined by the user)*/
-    uint8_t highlighted_dates_num;          /*Number of elements in `highlighted_days`*/
     int8_t btn_pressing;                    /*-1: prev month pressing, +1 next month pressing on the header*/
+    uint16_t highlighted_dates_num;          /*Number of elements in `highlighted_days`*/
     lv_calendar_date_t pressed_date;
     const char ** day_names;   /*Pointer to an array with the name of the days (NULL: use default names)*/
     const char ** month_names; /*Pointer to an array with the name of the month (NULL. use default names)*/

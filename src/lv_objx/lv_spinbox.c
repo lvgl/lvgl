@@ -412,7 +412,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
         buf_p++;
     }
 
-    int i;
+    int32_t i;
     /*padding left*/
     for(i = 0; i < ext->digit_padding_left; i++) {
         (*buf_p) = ' ';
@@ -426,7 +426,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
     /*Add leading zeros*/
     int lz_cnt = ext->digit_count - (int)strlen(digits);
     if(lz_cnt > 0) {
-        for(i = strlen(digits); i >= 0; i--) {
+        for(i = (uint16_t)strlen(digits); i >= 0; i--) {
             digits[i + lz_cnt] = digits[i];
         }
         for(i = 0; i < lz_cnt; i++) {
@@ -459,7 +459,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
 
     /*Set the cursor position*/
     int32_t step    = ext->step;
-    uint8_t cur_pos = ext->digit_count;
+    uint8_t cur_pos = (uint8_t)ext->digit_count;
     while(step >= 10) {
         step /= 10;
         cur_pos--;

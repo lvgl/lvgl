@@ -79,7 +79,7 @@ void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * 
 lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, const lv_style_t * style)
 {
     lv_color_t p_color = LV_COLOR_BLACK;
-    if(x >= dsc->header.w) {
+    if(x >= (lv_coord_t)dsc->header.w) {
         x = dsc->header.w - 1;
         LV_LOG_WARN("lv_canvas_get_px: x is too large (out of canvas)");
     } else if(x < 0) {
@@ -87,7 +87,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
         LV_LOG_WARN("lv_canvas_get_px: x is < 0 (out of canvas)");
     }
 
-    if(y >= dsc->header.h) {
+    if(y >= (lv_coord_t)dsc->header.h) {
         y = dsc->header.h - 1;
         LV_LOG_WARN("lv_canvas_get_px: y is too large (out of canvas)");
     } else if(y < 0) {
@@ -158,7 +158,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
  */
 lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
 {
-    if(x >= dsc->header.w) {
+    if(x >= (lv_coord_t)dsc->header.w) {
         x = dsc->header.w - 1;
         LV_LOG_WARN("lv_canvas_get_px: x is too large (out of canvas)");
     } else if(x < 0) {
@@ -166,7 +166,7 @@ lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
         LV_LOG_WARN("lv_canvas_get_px: x is < 0 (out of canvas)");
     }
 
-    if(y >= dsc->header.h) {
+    if(y >= (lv_coord_t)dsc->header.h) {
         y = dsc->header.h - 1;
         LV_LOG_WARN("lv_canvas_get_px: y is too large (out of canvas)");
     } else if(y < 0) {

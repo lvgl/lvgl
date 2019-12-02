@@ -416,8 +416,8 @@ bool lv_txt_is_cmd(lv_txt_cmd_state_t * state, uint32_t c)
  */
 void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
 {
-    uint32_t old_len = strlen(txt_buf);
-    uint32_t ins_len = strlen(ins_txt);
+    size_t old_len = strlen(txt_buf);
+    size_t ins_len = strlen(ins_txt);
     uint32_t new_len = ins_len + old_len;
     pos              = lv_txt_encoded_get_byte_id(txt_buf, pos); /*Convert to byte index instead of letter index*/
 
@@ -441,7 +441,7 @@ void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
 void lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
 {
 
-    uint32_t old_len = strlen(txt);
+    size_t old_len = strlen(txt);
 
     pos = lv_txt_encoded_get_byte_id(txt, pos); /*Convert to byte index instead of letter index*/
     len = lv_txt_encoded_get_byte_id(&txt[pos], len);

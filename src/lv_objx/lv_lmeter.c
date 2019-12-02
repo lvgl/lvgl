@@ -165,7 +165,7 @@ void lv_lmeter_set_range(lv_obj_t * lmeter, int16_t min, int16_t max)
  * @param angle angle of the scale (0..360)
  * @param line_cnt number of lines
  */
-void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint8_t line_cnt)
+void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint16_t line_cnt)
 {
     LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
 

@@ -242,11 +242,11 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     switch(ext->btns_pos) {
         case LV_TABVIEW_BTNS_POS_TOP:
         case LV_TABVIEW_BTNS_POS_BOTTOM:
-            ext->tab_name_ptr = lv_mem_realloc(ext->tab_name_ptr, sizeof(char *) * (ext->tab_cnt + 1));
+            ext->tab_name_ptr = lv_mem_realloc((void*)ext->tab_name_ptr, sizeof(char *) * (ext->tab_cnt + 1));
             break;
         case LV_TABVIEW_BTNS_POS_LEFT:
         case LV_TABVIEW_BTNS_POS_RIGHT:
-            ext->tab_name_ptr = lv_mem_realloc(ext->tab_name_ptr, sizeof(char *) * (ext->tab_cnt * 2));
+            ext->tab_name_ptr = lv_mem_realloc((void*)ext->tab_name_ptr, sizeof(char *) * (ext->tab_cnt * 2));
             break;
     }
 

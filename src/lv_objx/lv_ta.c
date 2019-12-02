@@ -689,7 +689,7 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en)
     /*Pwd mode is now enabled*/
     if(ext->pwd_mode == 0 && en != false) {
         char * txt   = lv_label_get_text(ext->label);
-        uint16_t len = strlen(txt);
+        size_t len = strlen(txt);
         ext->pwd_tmp = lv_mem_alloc(len + 1);
         LV_ASSERT_MEM(ext->pwd_tmp);
         if(ext->pwd_tmp == NULL) return;
