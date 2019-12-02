@@ -183,7 +183,7 @@ void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t valid
     /*If valid pos. is selected do nothing*/
     uint16_t i;
     for(i = 0; i < valid_pos_cnt; i++) {
-        if(valid_pos->x == ext->act_id.x && valid_pos->y == ext->act_id.y) {
+        if(valid_pos[i].x == ext->act_id.x && valid_pos[i].y == ext->act_id.y) {
             return;
         }
     }
