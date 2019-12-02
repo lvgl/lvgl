@@ -22,21 +22,11 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 #include "lv_log.h"
+#include "lv_types.h"
 
 /*********************
  *      DEFINES
  *********************/
-// Check windows
-#ifdef __WIN64
-#define LV_MEM_ENV64
-#endif
-
-// Check GCC
-#ifdef __GNUC__
-#if defined(__x86_64__) || defined(__ppc64__)
-#define LV_MEM_ENV64
-#endif
-#endif
 
 /**********************
  *      TYPEDEFS
