@@ -72,7 +72,10 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Extend the basic object to image object*/
     lv_img_ext_t * ext = lv_obj_allocate_ext_attr(new_img, sizeof(lv_img_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_img);
+        return NULL;
+    }
 
     ext->src       = NULL;
     ext->src_type  = LV_IMG_SRC_UNKNOWN;

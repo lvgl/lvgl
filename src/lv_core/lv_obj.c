@@ -1578,14 +1578,17 @@ void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb)
  * Allocate a new ext. data for an object
  * @param obj pointer to an object
  * @param ext_size the size of the new ext. data
- * @return Normal pointer to the allocated ext
+ * @return pointer to the allocated ext.
+ * If out of memory NULL is returned and the original ext is preserved
  */
 void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    obj->ext_attr = lv_mem_realloc(obj->ext_attr, ext_size);
+    void * new_ext = lv_mem_realloc(obj->ext_attr, ext_size);
+    if(new_ext == NULL) return NULL;
 
+    obj->ext_attr = new_ext;
     return (void *)obj->ext_attr;
 }
 

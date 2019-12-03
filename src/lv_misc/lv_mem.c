@@ -247,8 +247,12 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
 
     void * new_p;
     new_p = lv_mem_alloc(new_size);
+    if(new_p == NULL) {
+        LV_LOG_WARN("Couldn't allocate memory");
+        return NULL;
+    }
 
-    if(new_p != NULL && data_p != NULL) {
+    if(data_p != NULL) {
         /*Copy the old data to the new. Use the smaller size*/
         if(old_size != 0) {
             memcpy(new_p, data_p, LV_MATH_MIN(new_size, old_size));
@@ -256,7 +260,6 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
         }
     }
 
-    if(new_p == NULL) LV_LOG_WARN("Couldn't allocate memory");
 
     return new_p;
 }

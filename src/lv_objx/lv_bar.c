@@ -80,7 +80,10 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_bar_ext_t * ext = lv_obj_allocate_ext_attr(new_bar, sizeof(lv_bar_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_bar);
+        return NULL;
+    }
 
     ext->min_value = 0;
 	ext->start_value = 0;

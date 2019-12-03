@@ -80,7 +80,10 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_btnm_ext_t * ext = lv_obj_allocate_ext_attr(new_btnm, sizeof(lv_btnm_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_btnm);
+        return NULL;
+    }
 
     ext->btn_cnt                          = 0;
     ext->btn_id_pr                        = LV_BTNM_BTN_NONE;

@@ -63,7 +63,10 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Extend the basic object to line object*/
     lv_line_ext_t * ext = lv_obj_allocate_ext_attr(new_line, sizeof(lv_line_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_line);
+        return NULL;
+    }
 
     ext->point_num   = 0;
     ext->point_array = NULL;

@@ -65,7 +65,10 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
 
     lv_cb_ext_t * ext = lv_obj_allocate_ext_attr(new_cb, sizeof(lv_cb_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_cb);
+        return NULL;
+    }
 
     ext->bullet = NULL;
     ext->label  = NULL;

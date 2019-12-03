@@ -77,7 +77,10 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the roller type specific extended data*/
     lv_roller_ext_t * ext = lv_obj_allocate_ext_attr(new_roller, sizeof(lv_roller_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_roller);
+        return NULL;
+    }
 
     ext->mode = LV_ROLLER_MODE_NORMAL;
 

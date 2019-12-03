@@ -72,7 +72,10 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the switch type specific extended data*/
     lv_sw_ext_t * ext = lv_obj_allocate_ext_attr(new_sw, sizeof(lv_sw_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_sw);
+        return NULL;
+    }
 
     /*Initialize the allocated 'ext' */
     ext->changed = 0;

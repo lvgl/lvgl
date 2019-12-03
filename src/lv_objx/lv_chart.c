@@ -96,7 +96,10 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_chart_ext_t * ext = lv_obj_allocate_ext_attr(new_chart, sizeof(lv_chart_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_chart);
+        return NULL;
+    }
 
     lv_ll_init(&ext->series_ll, sizeof(lv_chart_series_t));
 

@@ -79,7 +79,10 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
 
     lv_obj_allocate_ext_attr(new_cont, sizeof(lv_cont_ext_t));
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(new_cont);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_cont);
+        return NULL;
+    }
 
     LV_ASSERT_MEM(ext);
     ext->fit_left   = LV_FIT_NONE;

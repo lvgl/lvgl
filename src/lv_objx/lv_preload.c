@@ -75,7 +75,10 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the pre loader type specific extended data*/
     lv_preload_ext_t * ext = lv_obj_allocate_ext_attr(new_preload, sizeof(lv_preload_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_preload);
+        return NULL;
+    }
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_preload);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_preload);

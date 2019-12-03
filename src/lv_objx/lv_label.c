@@ -88,7 +88,10 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
 
     lv_label_ext_t * ext = lv_obj_get_ext_attr(new_label);
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_label);
+        return NULL;
+    }
 
     ext->text       = NULL;
     ext->static_txt = 0;

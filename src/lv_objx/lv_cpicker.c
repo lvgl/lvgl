@@ -104,7 +104,10 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the extended data*/
     lv_cpicker_ext_t * ext = lv_obj_allocate_ext_attr(new_cpicker, sizeof(lv_cpicker_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_cpicker);
+        return NULL;
+    }
 
     /*Initialize the allocated 'ext' */
     ext->type = LV_CPICKER_DEF_TYPE;
