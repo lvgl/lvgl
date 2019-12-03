@@ -147,7 +147,7 @@ void lv_sw_set_style(lv_obj_t * sw, lv_sw_style_t type, const lv_style_t * style
  */
 static inline bool lv_sw_get_state(const lv_obj_t * sw)
 {
-    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
+    lv_sw_ext_t * ext = (lv_sw_ext_t *)lv_obj_get_ext_attr(sw);
     return ext->state ? true : false;
 }
 /**
