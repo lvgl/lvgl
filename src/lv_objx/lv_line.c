@@ -246,7 +246,7 @@ static lv_design_res_t lv_line_design(lv_obj_t * line, const lv_area_t * clip_ar
         }
         lv_area_t circle_area;
         lv_coord_t r = (style->line.width >> 1);
-        lv_coord_t r_corr = style->line.width & 1 ? 0 : 1;
+        lv_coord_t r_corr = (style->line.width & 1) ? 0 : 1;
 
         /*Read all points and draw the lines*/
         for(i = 0; i < ext->point_num - 1; i++) {

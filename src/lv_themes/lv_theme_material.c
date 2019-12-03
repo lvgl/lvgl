@@ -681,7 +681,6 @@ static void tabview_init(void)
     indic.body.radius        = 0;
     indic.body.border.width  = 0;
     indic.body.padding.inner = LV_DPI / 20;
-    indic.body.padding.inner = LV_DPI / 20;
 
     lv_style_copy(&btn_bg, &def);
     btn_bg.body.main_color     = lv_color_hex3(0xccc);

@@ -310,14 +310,19 @@ const lv_style_t * lv_roller_get_style(const lv_obj_t * roller, lv_roller_style_
 {
     LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
 
+    const lv_style_t * style;
     switch(type) {
-        case LV_ROLLER_STYLE_BG: return lv_obj_get_style(roller);
-        case LV_ROLLER_STYLE_SEL: return lv_ddlist_get_style(roller, LV_DDLIST_STYLE_SEL);
-        default: return NULL;
+        case LV_ROLLER_STYLE_BG:
+            style = lv_obj_get_style(roller);
+            break;
+        case LV_ROLLER_STYLE_SEL:
+            style = lv_ddlist_get_style(roller, LV_DDLIST_STYLE_SEL);
+            break;
+        default:
+            style = NULL;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**********************

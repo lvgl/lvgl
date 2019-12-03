@@ -456,16 +456,23 @@ const lv_style_t * lv_ddlist_get_style(const lv_obj_t * ddlist, lv_ddlist_style_
     LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
 
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    const lv_style_t * style;
 
     switch(type) {
-        case LV_DDLIST_STYLE_BG: return lv_page_get_style(ddlist, LV_PAGE_STYLE_BG);
-        case LV_DDLIST_STYLE_SB: return lv_page_get_style(ddlist, LV_PAGE_STYLE_SB);
-        case LV_DDLIST_STYLE_SEL: return ext->sel_style;
-        default: return NULL;
+        case LV_DDLIST_STYLE_BG:
+            style = lv_page_get_style(ddlist, LV_PAGE_STYLE_BG);
+            break;
+        case LV_DDLIST_STYLE_SB:
+            style = lv_page_get_style(ddlist, LV_PAGE_STYLE_SB);
+            break;
+        case LV_DDLIST_STYLE_SEL:
+            style = ext->sel_style;
+            break;
+        default:
+            style = NULL;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 lv_label_align_t lv_ddlist_get_align(const lv_obj_t * ddlist)

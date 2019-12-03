@@ -384,18 +384,20 @@ const lv_style_t * lv_cpicker_get_style(const lv_obj_t * cpicker, lv_cpicker_sty
     LV_ASSERT_OBJ(cpicker, LV_OBJX_NAME);
 
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+    const lv_style_t * style;
 
     switch(type) {
     case LV_CPICKER_STYLE_MAIN:
-        return lv_obj_get_style(cpicker);
+        style = lv_obj_get_style(cpicker);
+        break;
     case LV_CPICKER_STYLE_INDICATOR:
-        return ext->indic.style;
+        style = ext->indic.style;
+        break;
     default:
-        return NULL;
+        style = NULL;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**
