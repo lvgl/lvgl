@@ -186,7 +186,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
             uint8_t * p = lv_utils_bsearch(&rcp, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length, sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
 
             if(p) {
-                lv_uintptr_t ofs = (lv_uintptr_t)p - (lv_uintptr_t) fdsc->cmaps[i].unicode_list;
+                lv_uintptr_t ofs = (lv_uintptr_t)(p - (uint8_t *) fdsc->cmaps[i].unicode_list);
                 ofs = ofs >> 1;     /*The list stores `uint16_t` so the get the index divide by 2*/
                 glyph_id = fdsc->cmaps[i].glyph_id_start + ofs;
             }
@@ -195,7 +195,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
             uint8_t * p = lv_utils_bsearch(&rcp, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length, sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
 
             if(p) {
-                lv_uintptr_t ofs = (lv_uintptr_t)p - (lv_uintptr_t) fdsc->cmaps[i].unicode_list;
+                lv_uintptr_t ofs = (lv_uintptr_t)(p - (uint8_t*) fdsc->cmaps[i].unicode_list);
                 ofs = ofs >> 1;     /*The list stores `uint16_t` so the get the index divide by 2*/
                 const uint8_t * gid_ofs_16 = fdsc->cmaps[i].glyph_id_ofs_list;
                 glyph_id = fdsc->cmaps[i].glyph_id_start + gid_ofs_16[ofs];
@@ -232,7 +232,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
 
             /*If the `g_id_both` were found get its index from the pointer*/
             if(kid_p) {
-                lv_uintptr_t ofs = (lv_uintptr_t)kid_p - (lv_uintptr_t)g_ids;
+                lv_uintptr_t ofs = (lv_uintptr_t)(kid_p - g_ids);
                 ofs = ofs >> 1;     /*ofs is for pair, divide by 2 to refer as a single value*/
                 value = kdsc->values[ofs];
             }
@@ -245,7 +245,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
 
             /*If the `g_id_both` were found get its index from the pointer*/
             if(kid_p) {
-                lv_uintptr_t ofs = (lv_uintptr_t)kid_p - (lv_uintptr_t)g_ids;
+                lv_uintptr_t ofs = (lv_uintptr_t) (kid_p - (const uint8_t *)g_ids);
                 ofs = ofs >> 4;     /*ofs is 4 byte pairs, divide by 4 to refer as a single value*/
                 value = kdsc->values[ofs];
             }
