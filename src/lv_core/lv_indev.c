@@ -1048,6 +1048,64 @@ static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj)
 }
 
 /**
+ * Get the most top, clickable object by a point
+ * @param obj pointer to a start object, typically the screen
+ * @param point pointer to a point for searhing the most top child
+ * @return pointer to the found object or NULL if there was no suitable object
+ */
+lv_obj_t * lv_indev_get_obj(lv_obj_t * obj, lv_point_t *point)
+{
+    lv_obj_t * found_p = NULL;
+
+    /*If the point is on this object check its children too*/
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+    lv_area_t ext_area;
+    ext_area.x1 = obj->coords.x1 - obj->ext_click_pad_hor;
+    ext_area.x2 = obj->coords.x2 + obj->ext_click_pad_hor;
+    ext_area.y1 = obj->coords.y1 - obj->ext_click_pad_ver;
+    ext_area.y2 = obj->coords.y2 + obj->ext_click_pad_ver;
+
+    if(lv_area_is_point_on(&ext_area, point)) {
+#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+    lv_area_t ext_area;
+    ext_area.x1 = obj->coords.x1 - obj->ext_click_pad.x1;
+    ext_area.x2 = obj->coords.x2 + obj->ext_click_pad.x2;
+    ext_area.y1 = obj->coords.y1 - obj->ext_click_pad.y1;
+    ext_area.y2 = obj->coords.y2 + obj->ext_click_pad.y2;
+
+    if(lv_area_is_point_on(&ext_area, point)) {
+#else
+    if(lv_area_is_point_on(&obj->coords, point)) {
+#endif
+        lv_obj_t * i;
+
+        LV_LL_READ(obj->child_ll, i)
+        {
+            found_p = lv_indev_get_obj(i, point);
+
+            /*If a child was found then break*/
+            if(found_p != NULL) {
+                break;
+            }
+        }
+
+        /*If then the children was not ok, and this obj is clickable
+         * and it or its parent is not hidden then save this object*/
+        if(found_p == NULL && lv_obj_get_click(obj) != false) {
+            lv_obj_t * hidden_i = obj;
+            while(hidden_i != NULL) {
+                if(lv_obj_get_hidden(hidden_i) == true) break;
+                hidden_i = lv_obj_get_parent(hidden_i);
+            }
+            /*No parent found with hidden == true*/
+            if(hidden_i == NULL) found_p = obj;
+        }
+    }
+
+    return found_p;
+}
+
+/**
  * Handle the dragging of indev_proc_p->types.pointer.act_obj
  * @param indev pointer to a input device state
  */
