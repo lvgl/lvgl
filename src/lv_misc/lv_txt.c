@@ -303,9 +303,9 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
         i += advance;
 
-        if(txt[0] == '\n') break;
+        if(txt[0] == '\n' || txt[0] == '\r') break;
 
-        if(txt[i] == '\n'){
+        if(txt[i] == '\n' || txt[i] == '\r'){
             i++;  /* Include the following newline in the current line */
             break;
         }
