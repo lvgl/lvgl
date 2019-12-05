@@ -241,7 +241,7 @@ int16_t lv_lmeter_get_max_value(const lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return number of the scale units
  */
-uint8_t lv_lmeter_get_line_count(const lv_obj_t * lmeter)
+uint16_t lv_lmeter_get_line_count(const lv_obj_t * lmeter)
 {
     LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
 
