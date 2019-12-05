@@ -218,6 +218,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->base_dir     = LV_BIDI_DIR_LTR;
 #endif
 
+	new_obj->gesture      = 0;
+	new_obj->gesture_parent = 0;
         new_obj->reserved     = 0;
 
         new_obj->ext_attr = NULL;
@@ -314,6 +316,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->opa_scale_en = 0;
         new_obj->parent_event = 0;
+	new_obj->gesture = 0;
+	new_obj->gesture_parent = 0;
         new_obj->reserved     = 0;
 
         new_obj->ext_attr = NULL;
@@ -364,6 +368,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale_en = copy->opa_scale_en;
         new_obj->protect      = copy->protect;
         new_obj->opa_scale    = copy->opa_scale;
+        new_obj->gesture = copy->gesture;
+        new_obj->gesture_parent = copy->gesture_parent;
 
         new_obj->style_p = copy->style_p;
 
@@ -1353,6 +1359,28 @@ void lv_obj_set_drag_parent(lv_obj_t * obj, bool en)
 }
 
 /**
+* Enable the gesture of an object
+* @param obj pointer to an object
+* @param en true: make the object gesture
+*/
+void lv_obj_set_gesture(lv_obj_t * obj, bool en)
+{
+    if (en == true) lv_obj_set_click(obj, true); /*gesture is useless without enabled clicking*/
+    obj->gesture = (en == true ? 1 : 0);
+}
+
+/**
+* Enable to use parent for gesture related operations.
+* If trying to gesture the object the parent will be moved instead
+* @param obj pointer to an object
+* @param en true: enable the 'gesture parent' for the object
+*/
+void lv_obj_set_gesture_parent(lv_obj_t * obj, bool en)
+{
+    obj->gesture_parent = (en == true ? 1 : 0);
+}
+
+/**
  * Propagate the events to the parent too
  * @param obj pointer to an object
  * @param en true: enable the event propagation
@@ -2121,6 +2149,26 @@ bool lv_obj_get_drag_throw(const lv_obj_t * obj)
 bool lv_obj_get_drag_parent(const lv_obj_t * obj)
 {
     return obj->drag_parent == 0 ? false : true;
+}
+
+/**
+* Get the gesture enable attribute of an object
+* @param obj pointer to an object
+* @return true: the object is gesture
+*/
+bool lv_obj_get_gesture(const lv_obj_t * obj)
+{
+    return obj->gesture == 0 ? false : true;
+}
+
+/**
+* Get the gesture parent attribute of an object
+* @param obj pointer to an object
+* @return true: gesture parent is enabled
+*/
+bool lv_obj_get_gesture_parent(const lv_obj_t * obj)
+{
+    return obj->gesture_parent == 0 ? false : true;
 }
 
 /**

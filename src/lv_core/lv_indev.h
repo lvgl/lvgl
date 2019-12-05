@@ -105,6 +105,13 @@ void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t * points);
 void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point);
 
 /**
+* Get the current gesture direct
+* @param indev pointer to an input device
+* @return current gesture direct
+*/
+lv_gesture_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev);
+
+/**
  * Get the last pressed key of an input device (for LV_INDEV_TYPE_KEYPAD)
  * @param indev pointer to an input device
  * @return the last pressed key (0 on error)

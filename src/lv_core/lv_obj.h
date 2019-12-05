@@ -94,6 +94,7 @@ enum {
     LV_EVENT_DRAG_BEGIN,		  
     LV_EVENT_DRAG_END,
     LV_EVENT_DRAG_THROW_BEGIN,
+    LV_EVENT_GESTURE,			/**< The object has been getture*/
     LV_EVENT_KEY,
     LV_EVENT_FOCUSED,
     LV_EVENT_DEFOCUSED,
@@ -137,6 +138,7 @@ enum {
     LV_SIGNAL_DRAG_BEGIN,	
     LV_SIGNAL_DRAG_THROW_BEGIN,
     LV_SIGNAL_DRAG_END,                                   
+    LV_SIGNAL_GESTURE,			/**< The object has been getture*/
 
     /*Group related*/
     LV_SIGNAL_FOCUS,
@@ -225,7 +227,9 @@ typedef struct _lv_obj_t
     uint8_t parent_event : 1;   /**< 1: Send the object's events to the parent too. */
     lv_drag_dir_t drag_dir : 3; /**<  Which directions the object can be dragged in */
     lv_bidi_dir_t base_dir : 2; /**< Base direction of texts related to this object */
-    uint8_t reserved : 3;       /**<  Reserved for future use*/
+    uint8_t gesture : 1;        /**< 1: Enable the gesture*/
+    uint8_t gesture_parent : 1; /**< 1: Parent will be gesture instead*/
+    uint8_t reserved : 1;       /**<  Reserved for future use*/
     uint8_t protect;            /**< Automatically happening actions can be prevented. 'OR'ed values from
                                    `lv_protect_t`*/
     lv_opa_t opa_scale;         /**< Scale down the opacity by this factor. Effects all children as well*/
@@ -509,6 +513,21 @@ void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
  * @param en true: enable the 'drag parent' for the object
  */
 void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
+
+/**
+* Enable the gusture of an object
+* @param obj pointer to an object
+* @param en true: make the object gusture
+*/
+void lv_obj_set_gusture(lv_obj_t * obj, bool en);
+
+/**
+* Enable to use parent for gusture related operations.
+* If trying to gusture the object the parent will be moved instead
+* @param obj pointer to an object
+* @param en true: enable the 'gusture parent' for the object
+*/
+void lv_obj_set_gusture_parent(lv_obj_t * obj, bool en);
 
 /**
  * Propagate the events to the parent too
@@ -849,6 +868,20 @@ bool lv_obj_get_drag_throw(const lv_obj_t * obj);
  * @return true: drag parent is enabled
  */
 bool lv_obj_get_drag_parent(const lv_obj_t * obj);
+
+/**
+* Get the gesture enable attribute of an object
+* @param obj pointer to an object
+* @return true: the object is gesture
+*/
+bool lv_obj_get_gesture(const lv_obj_t * obj);
+
+/**
+* Get the gesture parent attribute of an object
+* @param obj pointer to an object
+* @return true: gesture parent is enabled
+*/
+bool lv_obj_get_gesture_parent(const lv_obj_t * obj);
 
 /**
  * Get the drag parent attribute of an object

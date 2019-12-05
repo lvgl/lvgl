@@ -65,6 +65,13 @@ enum {
 
 typedef uint8_t lv_drag_dir_t;
 
+enum {
+	LV_GESTURE_DIR_TOP,		/**< Gesture dir up. */
+	LV_GESTURE_DIR_BOTTOM,	/**< Gesture dir down. */
+	LV_GESTURE_DIR_LEFT,	/**< Gesture dir left. */
+	LV_GESTURE_DIR_RIGHT,	/**< Gesture dir right. */
+};
+typedef uint8_t lv_gesture_dir_t;
 
 /** Data structure passed to an input driver to fill */
 typedef struct
@@ -137,10 +144,13 @@ typedef struct _lv_indev_proc_t
                                                 other post-release event)*/
             struct _lv_obj_t * last_pressed; /*The lastly pressed object*/
 
+	    lv_gesture_dir_t gesture_dir;
+	    lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
             /*Flags*/
             uint8_t drag_limit_out : 1;
             uint8_t drag_in_prog : 1;
             lv_drag_dir_t drag_dir  : 3;
+	    uint8_t gesture_in_prog : 1;
         } pointer;
         struct
         { /*Keypad data*/
