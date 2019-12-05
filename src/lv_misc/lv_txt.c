@@ -418,11 +418,11 @@ void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
 {
     size_t old_len = strlen(txt_buf);
     size_t ins_len = strlen(ins_txt);
-    uint32_t new_len = ins_len + old_len;
+    size_t new_len = ins_len + old_len;
     pos              = lv_txt_encoded_get_byte_id(txt_buf, pos); /*Convert to byte index instead of letter index*/
 
     /*Copy the second part into the end to make place to text to insert*/
-    uint32_t i;
+    size_t i;
     for(i = new_len; i >= pos + ins_len; i--) {
         txt_buf[i] = txt_buf[i - ins_len];
     }
