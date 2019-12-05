@@ -576,6 +576,12 @@ typedef void * lv_obj_user_data_t;
 /*Window (dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page)*/
 #define LV_USE_WIN      1
 
+/*Tab (dependencies: lv_page, lv_btnm)*/
+#define LV_USE_PULL_WIN      1
+#  if LV_USE_PULL_WIN != 0
+/*Time of slide animation [ms] (0: no animation)*/
+#  define LV_PULL_WIN_DEF_ANIM_TIME    300
+#endif
 /*==================
  * Non-user section
  *==================*/

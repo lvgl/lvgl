@@ -326,6 +326,15 @@ typedef struct
             } btn;
         } win;
 #endif
+
+#if LV_USE_PULL_WIN != 0
+		struct
+		{
+			lv_style_t * bg;
+			lv_style_t * scrl;
+			lv_style_t * sb;
+		} pull_win;
+#endif
     } style;
 
 #if LV_USE_GROUP
