@@ -19,7 +19,7 @@
 *********************/
 #if LV_USE_ANIMATION
 #ifndef LV_PULL_WIN_DEF_ANIM_TIME
-#define LV_PULL_WIN_DEF_ANIM_TIME 300 /*Animation time loading a tile [ms] (0: no animation)  */
+#define LV_PULL_WIN_DEF_ANIM_TIME 300 /*Animation time loading a pull window [ms] (0: no animation)  */
 #endif
 #else
 #undef LV_PULL_WIN_DEF_ANIM_TIME
@@ -257,7 +257,7 @@ void lv_pull_win_set_align(lv_obj_t * pull_win)
 	}
 }
 /**
-* Set the tile to be shown
+* Set the pull window to be shown
 * @param pull_win pointer to a pull_win object
 * @param isShow show or not show
 * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
@@ -272,7 +272,7 @@ void lv_pull_win_set_show(lv_obj_t * pull_win, bool isShow, lv_anim_enable_t ani
 		lv_pull_win_set_tile_act(pull_win, ext->valid_pos[0].x, ext->valid_pos[0].y, anim);
 }
 /**
-* Set the tile to be shown
+* Set the pull window to be action
 * @param pull_win pointer to a pull_win object
 * @param x column id (0, 1, 2...)
 * @param y line id (0, 1, 2...)
