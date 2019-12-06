@@ -877,19 +877,18 @@ bool lv_obj_get_drag_parent(const lv_obj_t * obj);
 bool lv_obj_get_gesture(const lv_obj_t * obj);
 
 /**
-* Get the gesture parent attribute of an object
-* @param obj pointer to an object
-* @return true: gesture parent is enabled
-*/
-bool lv_obj_get_gesture_parent(const lv_obj_t * obj);
-
-/**
  * Get the drag parent attribute of an object
  * @param obj pointer to an object
  * @return true: drag parent is enabled
  */
 bool lv_obj_get_parent_event(const lv_obj_t * obj);
 
+/**
+* Get the gesture parent attribute of an object
+* @param obj pointer to an object
+* @return true: gesture parent is enabled
+*/
+bool lv_obj_get_gesture_parent(const lv_obj_t * obj);
 
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj);
 
