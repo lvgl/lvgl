@@ -358,6 +358,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     /* Include the ancient signal function */
     res = ancestor_scrl_signal(scrl, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, "");
 
     lv_obj_t * tileview         = lv_obj_get_parent(scrl);
     const lv_style_t * style_bg = lv_tileview_get_style(tileview, LV_TILEVIEW_STYLE_MAIN);
