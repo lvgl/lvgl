@@ -262,7 +262,7 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
 
 #else /* LV_ENABLE_GC */
 
-void * lv_mem_realloc(void * data_p, uint32_t new_size)
+void * lv_mem_realloc(void * data_p, size_t new_size)
 {
     void * new_p = LV_MEM_CUSTOM_REALLOC(data_p, new_size);
     if(new_p == NULL) LV_LOG_WARN("Couldn't allocate memory");
