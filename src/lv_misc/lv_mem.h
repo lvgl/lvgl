@@ -22,21 +22,11 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 #include "lv_log.h"
+#include "lv_types.h"
 
 /*********************
  *      DEFINES
  *********************/
-// Check windows
-#ifdef __WIN64
-#define LV_MEM_ENV64
-#endif
-
-// Check GCC
-#ifdef __GNUC__
-#if defined(__x86_64__) || defined(__ppc64__)
-#define LV_MEM_ENV64
-#endif
-#endif
 
 /**********************
  *      TYPEDEFS
@@ -70,7 +60,7 @@ void lv_mem_init(void);
  * @param size size of the memory to allocate in bytes
  * @return pointer to the allocated memory
  */
-void * lv_mem_alloc(uint32_t size);
+void * lv_mem_alloc(size_t size);
 
 /**
  * Free an allocated data
@@ -85,7 +75,7 @@ void lv_mem_free(const void * data);
  * @param new_size the desired new size in byte
  * @return pointer to the new memory
  */
-void * lv_mem_realloc(void * data_p, uint32_t new_size);
+void * lv_mem_realloc(void * data_p, size_t new_size);
 
 /**
  * Join the adjacent free memory blocks

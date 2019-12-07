@@ -388,7 +388,7 @@ void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf, uint16_t bu
     uint16_t i;
     uint16_t line        = 0;
     const char * opt_txt = lv_label_get_text(ext->label);
-    uint16_t txt_len     = strlen(opt_txt);
+    size_t txt_len     = strlen(opt_txt);
 
     for(i = 0; i < txt_len && line != ext->sel_opt_id; i++) {
         if(opt_txt[i] == '\n') line++;
@@ -626,7 +626,7 @@ static bool lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * mask, lv_desig
                 new_style.text.color = sel_style->text.color;
                 new_style.text.opa   = sel_style->text.opa;
                 lv_area_t area_arrow;
-                lv_coord_t arrow_width = lv_txt_get_width(LV_SYMBOL_DOWN, strlen(LV_SYMBOL_DOWN), sel_style->text.font, 0, 0);
+                lv_coord_t arrow_width = lv_txt_get_width(LV_SYMBOL_DOWN, (uint16_t)strlen(LV_SYMBOL_DOWN), sel_style->text.font, 0, 0);
                 if(lv_label_get_align(ext->label) != LV_LABEL_ALIGN_RIGHT) {
                     area_arrow.x2 = ddlist->coords.x2 - style->body.padding.right;
                     area_arrow.x1 = area_arrow.x2 - arrow_width;

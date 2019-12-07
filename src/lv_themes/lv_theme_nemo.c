@@ -620,7 +620,6 @@ static void list_init(void)
     list_rel.text.font         = _font;
 
     lv_style_copy(&list_pr, &list_rel);
-    list_pr.body.opa        = LV_OPA_TRANSP;
     list_pr.body.opa        = LV_OPA_COVER;
     list_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 34, 41);
     list_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 34, 41);

@@ -109,7 +109,7 @@ static inline lv_obj_t * lv_layer_top(void)
 }
 
 /**
- * Get the active screen of the deafult display
+ * Get the active screen of the default display
  * @return  pointer to the sys layer
  */
 static inline lv_obj_t * lv_layer_sys(void)

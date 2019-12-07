@@ -1839,7 +1839,7 @@ lv_coord_t lv_obj_get_height(const lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the width which still fits into the container
  */
-lv_coord_t lv_obj_get_width_fit(lv_obj_t * obj)
+lv_coord_t lv_obj_get_width_fit(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1853,7 +1853,7 @@ lv_coord_t lv_obj_get_width_fit(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the height which still fits into the container
  */
-lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj)
+lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1867,7 +1867,7 @@ lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return  true: auto realign is enabled; false: auto realign is disabled
  */
-bool lv_obj_get_auto_realign(lv_obj_t * obj)
+bool lv_obj_get_auto_realign(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -2250,7 +2250,7 @@ void * lv_obj_get_ext_attr(const lv_obj_t * obj)
  * @param obj pointer to an object which type should be get
  * @param buf pointer to an `lv_obj_type_t` buffer to store the types
  */
-void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
+void lv_obj_get_type(const lv_obj_t * obj, lv_obj_type_t * buf)
 {
     LV_ASSERT_NULL(buf);
     LV_ASSERT_NULL(obj);
@@ -2260,7 +2260,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
     memset(buf, 0, sizeof(lv_obj_type_t));
     memset(&tmp, 0, sizeof(lv_obj_type_t));
 
-    obj->signal_cb(obj, LV_SIGNAL_GET_TYPE, &tmp);
+    obj->signal_cb((lv_obj_t *)obj, LV_SIGNAL_GET_TYPE, &tmp);
 
     uint8_t cnt;
     for(cnt = 0; cnt < LV_MAX_ANCESTOR_NUM; cnt++) {
@@ -2281,7 +2281,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
  * @param obj pointer to an object
  * @return user data
  */
-lv_obj_user_data_t lv_obj_get_user_data(lv_obj_t * obj)
+lv_obj_user_data_t lv_obj_get_user_data(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -2293,11 +2293,11 @@ lv_obj_user_data_t lv_obj_get_user_data(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return pointer to the user data
  */
-lv_obj_user_data_t * lv_obj_get_user_data_ptr(lv_obj_t * obj)
+lv_obj_user_data_t * lv_obj_get_user_data_ptr(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    return &obj->user_data;
+    return (lv_obj_user_data_t *)&obj->user_data;
 }
 
 /**
@@ -2351,8 +2351,8 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
 /**
  * Used in the signal callback to handle `LV_SIGNAL_GET_TYPE` signal
  * @param obj pointer to an object
- * @param buf pointer to `lv_obj_type_t`. (`param` i nteh signal callback)
- * @param name name of the object. E.g. "lv_btn". (Only teh pointer is saved)
+ * @param buf pointer to `lv_obj_type_t`. (`param` in the signal callback)
+ * @param name name of the object. E.g. "lv_btn". (Only the pointer is saved)
  * @return LV_RES_OK
  */
 lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name)

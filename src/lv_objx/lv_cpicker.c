@@ -889,7 +889,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         if(ext->type == LV_CPICKER_TYPE_RECT) {
             /*If pressed long enough without change go to next color mode*/
             uint32_t diff = lv_tick_elaps(ext->last_change_time);
-            if(diff > indev->driver.long_press_time * 2 && !ext->color_mode_fixed) {
+            if(diff > (uint32_t)indev->driver.long_press_time * 2 && !ext->color_mode_fixed) {
                 next_color_mode(cpicker);
                 lv_indev_wait_release(lv_indev_get_act());
                 return res;

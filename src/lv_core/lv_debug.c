@@ -131,7 +131,7 @@ void lv_debug_log_error(const char * msg, uint64_t value)
 {
     static const char hex[] = "0123456789ABCDEF";
 
-    uint32_t msg_len = strlen(msg);
+    size_t msg_len = strlen(msg);
     uint32_t value_len = sizeof(unsigned long int);
 
     if(msg_len < 230) {

@@ -183,7 +183,7 @@ void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t valid
     /*If valid pos. is selected do nothing*/
     uint16_t i;
     for(i = 0; i < valid_pos_cnt; i++) {
-        if(valid_pos->x == ext->act_id.x && valid_pos->y == ext->act_id.y) {
+        if(valid_pos[i].x == ext->act_id.x && valid_pos[i].y == ext->act_id.y) {
             return;
         }
     }
@@ -358,6 +358,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     /* Include the ancient signal function */
     res = ancestor_scrl_signal(scrl, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, "");
 
     lv_obj_t * tileview         = lv_obj_get_parent(scrl);
     const lv_style_t * style_bg = lv_tileview_get_style(tileview, LV_TILEVIEW_STYLE_MAIN);

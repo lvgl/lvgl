@@ -154,7 +154,7 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
     } else {
         ext->mode = LV_ROLLER_MODE_INIFINITE;
 
-        uint32_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
+        size_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
         char * opt_extra = lv_mem_alloc(opt_len * LV_ROLLER_INF_PAGES);
         uint8_t i;
         for(i = 0; i < LV_ROLLER_INF_PAGES; i++) {

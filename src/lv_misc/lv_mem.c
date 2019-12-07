@@ -59,8 +59,8 @@ typedef struct
  **********************/
 #if LV_MEM_CUSTOM == 0
 static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e);
-static void * ent_alloc(lv_mem_ent_t * e, uint32_t size);
-static void ent_trunc(lv_mem_ent_t * e, uint32_t size);
+static void * ent_alloc(lv_mem_ent_t * e, size_t size);
+static void ent_trunc(lv_mem_ent_t * e, size_t size);
 #endif
 
 /**********************
@@ -107,7 +107,7 @@ void lv_mem_init(void)
  * @param size size of the memory to allocate in bytes
  * @return pointer to the allocated memory
  */
-void * lv_mem_alloc(uint32_t size)
+void * lv_mem_alloc(size_t size)
 {
     if(size == 0) {
         return &zero_mem;
@@ -222,7 +222,7 @@ void lv_mem_free(const void * data)
 
 #if LV_ENABLE_GC == 0
 
-void * lv_mem_realloc(void * data_p, uint32_t new_size)
+void * lv_mem_realloc(void * data_p, size_t new_size)
 {
     /*data_p could be previously freed pointer (in this case it is invalid)*/
     if(data_p != NULL) {
@@ -407,7 +407,7 @@ static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e)
  * @param size size of the new memory in bytes
  * @return pointer to the allocated memory or NULL if not enough memory in the entry
  */
-static void * ent_alloc(lv_mem_ent_t * e, uint32_t size)
+static void * ent_alloc(lv_mem_ent_t * e, size_t size)
 {
     void * alloc = NULL;
 
@@ -430,7 +430,7 @@ static void * ent_alloc(lv_mem_ent_t * e, uint32_t size)
  * @param e Pointer to an entry
  * @param size new size in bytes
  */
-static void ent_trunc(lv_mem_ent_t * e, uint32_t size)
+static void ent_trunc(lv_mem_ent_t * e, size_t size)
 {
 #ifdef LV_MEM_ENV64
     /*Round the size up to 8*/
