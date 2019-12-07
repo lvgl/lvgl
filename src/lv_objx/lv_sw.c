@@ -275,6 +275,13 @@ uint16_t lv_sw_get_anim_time(const lv_obj_t * sw)
  */
 static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 {
+    lv_res_t res;
+    if(sign == LV_SIGNAL_GET_TYPE) {
+        res = ancestor_signal(sw, sign, param);
+        if(res != LV_RES_OK) return res;
+        return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
+    }
+
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
     /*Save the current (old) value before slider signal modifies it. It will be required in the
@@ -289,12 +296,9 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     lv_event_cb_t event_cb = sw->event_cb;
     sw->event_cb           = NULL;
 
-    lv_res_t res;
     /* Include the ancient signal function */
-
     res = ancestor_signal(sw, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     sw->event_cb = event_cb;
 

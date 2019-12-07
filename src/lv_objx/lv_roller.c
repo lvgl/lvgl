@@ -508,6 +508,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     /* Include the ancient signal function */
     res = ancestor_scrl_signal(roller_scrl, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_indev_t * indev    = lv_indev_get_act();
     int32_t id            = -1;
