@@ -156,6 +156,14 @@ lv_task_t * lv_indev_get_read_task(lv_disp_t * indev);
  */
 lv_obj_t * lv_indev_get_obj_act(void);
 
+/**
+ * Search the most top, clickable object by a point
+ * @param obj pointer to a start object, typically the screen
+ * @param point pointer to a point for searhing the most top child
+ * @return pointer to the found object or NULL if there was no suitable object
+ */
+lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t *point);
+
 /**********************
  *      MACROS
  **********************/
