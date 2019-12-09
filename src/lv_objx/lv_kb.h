@@ -47,7 +47,6 @@ enum {
     LV_KB_MODE_TEXT_UPPER,
     LV_KB_MODE_SPECIAL,
     LV_KB_MODE_NUM,
-    LV_KB_MODE_TEXT_UPPER,
 };
 typedef uint8_t lv_kb_mode_t;
     

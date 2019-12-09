@@ -506,7 +506,7 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
 }
 
 /**
- * Update the key map for the current shift state
+ * Update the key map for the current mode
  * @param kb pointer to a keyboard object
  */
 static void lv_kb_updatemap(lv_obj_t * kb)
