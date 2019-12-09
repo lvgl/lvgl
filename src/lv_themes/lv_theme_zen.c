@@ -681,7 +681,7 @@ static void tabview_init(void)
     lv_style_copy(&btn_bg, &def);
     btn_bg.body.opa          = LV_OPA_TRANSP;
     btn_bg.body.border.width = 2;
-    btn_bg.body.border.part  = LV_BORDER_BOTTOM;
+    btn_bg.body.border.part  = LV_BORDER_PART_BOTTOM;
     btn_bg.body.border.color = lv_color_hsv_to_rgb(_hue, 10, 90);
 
     lv_style_copy(&indic, &def);
@@ -750,7 +750,7 @@ static void win_init(void)
     lv_style_copy(&header, &def);
     header.body.opa            = LV_OPA_TRANSP;
     header.body.border.width   = 2;
-    header.body.border.part    = LV_BORDER_BOTTOM;
+    header.body.border.part    = LV_BORDER_PART_BOTTOM;
     header.body.border.color   = lv_color_hsv_to_rgb(_hue, 10, 90);
     header.text.color          = lv_color_hex3(0x666);
     header.image.color         = lv_color_hex3(0x666);

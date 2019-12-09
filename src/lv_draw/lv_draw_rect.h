@@ -36,6 +36,15 @@ extern "C" {
  */
 void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 
+/**
+ * Draw a pixel
+ * @param point the coordinates of the point to draw
+ * @param mask the pixel will be drawn only in this mask
+ * @param style pointer to a style
+ * @param opa_scale scale down the opacity by the factor
+ */
+void lv_draw_px(const lv_point_t * point, const lv_area_t * clip_area, const lv_style_t * style, lv_opa_t opa_scale);
+
 /**********************
  *      MACROS
  **********************/

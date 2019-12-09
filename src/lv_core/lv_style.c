@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_anim.h"
 
@@ -74,7 +75,11 @@ void lv_style_init(void)
     lv_style_scr.body.opa            = LV_OPA_COVER;
     lv_style_scr.body.main_color     = LV_COLOR_WHITE;
     lv_style_scr.body.grad_color     = LV_COLOR_WHITE;
+    lv_style_scr.body.main_color_stop = 0;
+    lv_style_scr.body.grad_color_stop = 255;
+    lv_style_scr.body.grad_dir = LV_GRAD_DIR_VER;
     lv_style_scr.body.radius         = 0;
+    lv_style_scr.body.blend_mode = LV_BLEND_MODE_NORMAL;
     lv_style_scr.body.padding.left   = 0;
     lv_style_scr.body.padding.right  = 0;
     lv_style_scr.body.padding.top    = 0;
@@ -84,11 +89,16 @@ void lv_style_init(void)
     lv_style_scr.body.border.color = LV_COLOR_BLACK;
     lv_style_scr.body.border.opa   = LV_OPA_COVER;
     lv_style_scr.body.border.width = 0;
-    lv_style_scr.body.border.part  = LV_BORDER_FULL;
+    lv_style_scr.body.border.part  = LV_BORDER_PART_FULL;
+    lv_style_scr.body.border.blend_mode = LV_BLEND_MODE_NORMAL;
 
     lv_style_scr.body.shadow.color = LV_COLOR_GRAY;
-    lv_style_scr.body.shadow.type  = LV_SHADOW_FULL;
     lv_style_scr.body.shadow.width = 0;
+    lv_style_scr.body.shadow.opa = LV_OPA_COVER;
+    lv_style_scr.body.shadow.offset.x = 0;
+    lv_style_scr.body.shadow.offset.y = 0;
+    lv_style_scr.body.shadow.spread = 0;
+    lv_style_scr.body.shadow.blend_mode = LV_BLEND_MODE_NORMAL;
 
     lv_style_scr.text.opa          = LV_OPA_COVER;
     lv_style_scr.text.color        = lv_color_make(0x30, 0x30, 0x30);
@@ -96,18 +106,30 @@ void lv_style_init(void)
     lv_style_scr.text.font         = LV_FONT_DEFAULT;
     lv_style_scr.text.letter_space = 0;
     lv_style_scr.text.line_space   = 2;
+    lv_style_scr.text.blend_mode = LV_BLEND_MODE_NORMAL;
+    lv_style_scr.text.underline = 0;
+    lv_style_scr.text.strikethrough = 0;
 
     lv_style_scr.image.opa     = LV_OPA_COVER;
     lv_style_scr.image.color   = lv_color_make(0x20, 0x20, 0x20);
     lv_style_scr.image.intense = LV_OPA_TRANSP;
+    lv_style_scr.image.blend_mode = LV_BLEND_MODE_NORMAL;
 
     lv_style_scr.line.opa     = LV_OPA_COVER;
     lv_style_scr.line.color   = lv_color_make(0x20, 0x20, 0x20);
     lv_style_scr.line.width   = 2;
     lv_style_scr.line.rounded = 0;
+    lv_style_scr.line.blend_mode = LV_BLEND_MODE_NORMAL;
+
+#if LV_USE_DEBUG
+#if LV_USE_ASSERT_STYLE
+    lv_style_scr.debug_sentinel = LV_STYLE_DEGUG_SENTINEL_VALUE;
+#endif
+#endif
 
     /*Plain style (by default near the same as the screen style)*/
     lv_style_copy(&lv_style_plain, &lv_style_scr);
+    lv_style_plain.body.opa            = LV_OPA_COVER;
     lv_style_plain.body.padding.left   = LV_DPI / 20;
     lv_style_plain.body.padding.right  = LV_DPI / 20;
     lv_style_plain.body.padding.top    = LV_DPI / 20;
@@ -163,7 +185,11 @@ void lv_style_init(void)
     lv_style_copy(&lv_style_btn_rel, &lv_style_plain);
     lv_style_btn_rel.body.main_color     = lv_color_make(0x76, 0xa2, 0xd0);
     lv_style_btn_rel.body.grad_color     = lv_color_make(0x19, 0x3a, 0x5d);
+    lv_style_btn_rel.body.main_color_stop = 0x00;
+    lv_style_btn_rel.body.grad_color_stop = 0xff;;
+    lv_style_btn_rel.body.grad_dir = LV_GRAD_DIR_VER;
     lv_style_btn_rel.body.radius         = LV_DPI / 15;
+    lv_style_btn_rel.body.opa         = LV_OPA_COVER;
     lv_style_btn_rel.body.padding.left   = LV_DPI / 4;
     lv_style_btn_rel.body.padding.right  = LV_DPI / 4;
     lv_style_btn_rel.body.padding.top    = LV_DPI / 6;
@@ -172,8 +198,11 @@ void lv_style_init(void)
     lv_style_btn_rel.body.border.color   = lv_color_make(0x0b, 0x19, 0x28);
     lv_style_btn_rel.body.border.width   = LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
     lv_style_btn_rel.body.border.opa     = LV_OPA_70;
-    lv_style_btn_rel.body.shadow.color   = LV_COLOR_GRAY;
+    lv_style_btn_rel.body.shadow.color   = LV_COLOR_BLACK;
     lv_style_btn_rel.body.shadow.width   = 0;
+    lv_style_btn_rel.body.shadow.opa = LV_OPA_COVER;
+    lv_style_btn_rel.body.shadow.offset.x = 0;
+    lv_style_btn_rel.body.shadow.offset.y = 0;
     lv_style_btn_rel.text.color          = lv_color_make(0xff, 0xff, 0xff);
     lv_style_btn_rel.image.color         = lv_color_make(0xff, 0xff, 0xff);
 
@@ -236,6 +265,9 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
     STYLE_ATTR_MIX(body.border.width, ratio);
     STYLE_ATTR_MIX(body.border.opa, ratio);
     STYLE_ATTR_MIX(body.shadow.width, ratio);
+    STYLE_ATTR_MIX(body.shadow.offset.x, ratio);
+    STYLE_ATTR_MIX(body.shadow.offset.y, ratio);
+    STYLE_ATTR_MIX(body.shadow.spread, ratio);
     STYLE_ATTR_MIX(body.padding.left, ratio);
     STYLE_ATTR_MIX(body.padding.right, ratio);
     STYLE_ATTR_MIX(body.padding.top, ratio);
@@ -263,13 +295,11 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
         res->body.border.part = start->body.border.part;
         res->glass            = start->glass;
         res->text.font        = start->text.font;
-        res->body.shadow.type = start->body.shadow.type;
         res->line.rounded     = start->line.rounded;
     } else {
         res->body.border.part = end->body.border.part;
         res->glass            = end->glass;
         res->text.font        = end->text.font;
-        res->body.shadow.type = end->body.shadow.type;
         res->line.rounded     = end->line.rounded;
     }
 }
@@ -287,7 +317,7 @@ void lv_style_anim_init(lv_anim_t * a)
 
     lv_style_anim_dsc_t * dsc;
     dsc = lv_mem_alloc(sizeof(lv_style_anim_dsc_t));
-    lv_mem_assert(dsc);
+    LV_ASSERT_MEM(dsc);
     if(dsc == NULL) return;
     dsc->ready_cb   = NULL;
     dsc->style_anim = NULL;

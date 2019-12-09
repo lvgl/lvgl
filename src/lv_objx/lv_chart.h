@@ -34,6 +34,9 @@ extern "C" {
 /**Automatically calculate the tick length*/
 #define LV_CHART_TICK_LENGTH_AUTO 255
 
+LV_EXPORT_CONST_INT(LV_CHART_POINT_DEF);
+LV_EXPORT_CONST_INT(LV_CHART_TICK_LENGTH_AUTO);
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -46,6 +49,7 @@ enum {
     LV_CHART_TYPE_POINT         = 0x04, /**< Draw circles on the points*/
     LV_CHART_TYPE_VERTICAL_LINE = 0x08, /**< Draw vertical lines on points (useful when chart width == point count)*/
     LV_CHART_TYPE_AREA          = 0x10, /**< Draw area chart*/
+    LV_CHART_TYPE_AREA_FADED    = 0x20, /**< Draw area chart by fading out the bottom of the area*/
 };
 typedef uint8_t lv_chart_type_t;
 
@@ -65,8 +69,9 @@ typedef struct
 
 /** Data of axis */
 enum {
-    LV_CHART_AXIS_SKIP_LAST_TICK = 0x00,    /**< don't draw the last tick */
-    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01     /**< draw the last tick */
+    LV_CHART_AXIS_SKIP_LAST_TICK = 0x00,            /**< don't draw the last tick */
+    LV_CHART_AXIS_DRAW_LAST_TICK = 0x01,            /**< draw the last tick */
+    LV_CHART_AXIS_INVERSE_LABELS_ORDER = 0x02       /**< draw tick labels in an inversed order*/
 };
 typedef uint8_t lv_chart_axis_options_t;
 
@@ -93,6 +98,7 @@ typedef struct
     lv_chart_type_t type; /*Line, column or point chart (from 'lv_chart_type_t')*/
     lv_chart_axis_cfg_t y_axis;
     lv_chart_axis_cfg_t x_axis;
+    lv_chart_axis_cfg_t secondary_y_axis;
     uint16_t margin;
     uint8_t update_mode : 1;
     struct
@@ -260,6 +266,16 @@ void lv_chart_set_x_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_
 void lv_chart_set_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len);
 
 /**
+ * Set the length of the tick marks on the secondary y axis
+ * @param chart pointer to the chart
+ * @param major_tick_len the length of the major tick or `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where labels are added)
+ * @param minor_tick_len the length of the minor tick, `LV_CHART_TICK_LENGTH_AUTO` to set automatically
+ *                       (where no labels are added)
+ */
+void lv_chart_set_secondary_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_t minor_tick_len);
+
+/**
  * Set the x-axis tick count and labels of a chart
  * @param chart             pointer to a chart object
  * @param list_of_values    list of string values, terminated with \n, except the last
@@ -269,6 +285,17 @@ void lv_chart_set_y_tick_length(lv_obj_t * chart, uint8_t major_tick_len, uint8_
  */
 void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
                                lv_chart_axis_options_t options);
+
+/**
+ * Set the secondary y-axis tick count and labels of a chart
+ * @param chart             pointer to a chart object
+ * @param list_of_values    list of string values, terminated with \n, except the last
+ * @param num_tick_marks    if list_of_values is NULL: total number of ticks per axis
+ *                          else number of ticks between two value labels
+ * @param options           extra options
+ */
+void lv_chart_set_secondary_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
+                                        lv_chart_axis_options_t options);
 
 /**
  * Set the y-axis tick count and labels of a chart
@@ -304,7 +331,7 @@ lv_chart_type_t lv_chart_get_type(const lv_obj_t * chart);
  * @param chart pointer to chart object
  * @return point number on each data line
  */
-uint16_t lv_chart_get_point_cnt(const lv_obj_t * chart);
+uint16_t lv_chart_get_point_count(const lv_obj_t * chart);
 
 /**
  * Get the opacity of the data series

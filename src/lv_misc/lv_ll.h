@@ -76,7 +76,7 @@ void * lv_ll_ins_tail(lv_ll_t * ll_p);
  * @param ll_p pointer to the linked list of 'node_p'
  * @param node_p pointer to node in 'll_p' linked list
  */
-void lv_ll_rem(lv_ll_t * ll_p, void * node_p);
+void lv_ll_remove(lv_ll_t * ll_p, void * node_p);
 
 /**
  * Remove and free all elements from a linked list. The list remain valid but become empty.
@@ -130,6 +130,14 @@ void * lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act);
  * @return length of the linked list
  */
 uint32_t lv_ll_get_len(const lv_ll_t * ll_p);
+
+/**
+ * TODO
+ * @param ll_p
+ * @param n1_p
+ * @param n2_p
+ */
+void lv_ll_swap(lv_ll_t * ll_p, void * n1_p, void * n2_p);
 
 /**
  * Move a nodw before an other node in the same linked list

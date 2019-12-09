@@ -28,6 +28,7 @@ extern "C" {
 #include "../lv_misc/lv_ll.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_log.h"
+#include "../lv_misc/lv_bidi.h"
 #include "../lv_hal/lv_hal.h"
 
 /*********************
@@ -64,11 +65,21 @@ enum {
 };
 typedef uint8_t lv_design_mode_t;
 
+
+/** Design results */
+enum {
+    LV_DESIGN_RES_OK,          /**< Draw ready */
+    LV_DESIGN_RES_COVER,       /**< Returned on `LV_DESIGN_COVER_CHK` if the areas is fully covered*/
+    LV_DESIGN_RES_NOT_COVER,   /**< Returned on `LV_DESIGN_COVER_CHK` if the areas is not covered*/
+    LV_DESIGN_RES_MASKED,      /**< Returned on `LV_DESIGN_COVER_CHK` if the areas is masked out (children also not cover)*/
+};
+typedef uint8_t lv_design_res_t;
+
 /**
  * The design callback is used to draw the object on the screen.
  * It accepts the object, a mask area, and the mode in which to draw the object.
  */
-typedef bool (*lv_design_cb_t)(struct _lv_obj_t * obj, const lv_area_t * mask_p, lv_design_mode_t mode);
+typedef lv_design_res_t (*lv_design_cb_t)(struct _lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
 
 enum {
     LV_EVENT_PRESSED,             /**< The object has been pressed*/
@@ -111,7 +122,8 @@ enum {
     LV_SIGNAL_CHILD_CHG, /**< Child was removed/added */
     LV_SIGNAL_CORD_CHG, /**< Object coordinates/size have changed */
     LV_SIGNAL_PARENT_SIZE_CHG, /**< Parent's size has changed */
-    LV_SIGNAL_STYLE_CHG, /**< Object's style has changed */
+    LV_SIGNAL_STYLE_CHG,    /**< Object's style has changed */
+    LV_SIGNAL_BASE_DIR_CHG, /**<The base dir has changed*/
     LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
     LV_SIGNAL_GET_TYPE, /**< LittlevGL needs to retrieve the object's type */
 
@@ -123,7 +135,9 @@ enum {
     LV_SIGNAL_LONG_PRESS,        /**< Object has been pressed for at least `LV_INDEV_LONG_PRESS_TIME`.  Not called if dragged.*/
     LV_SIGNAL_LONG_PRESS_REP,    /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if dragged.*/
     LV_SIGNAL_DRAG_BEGIN,	
+    LV_SIGNAL_DRAG_THROW_BEGIN,
     LV_SIGNAL_DRAG_END,                                   
+
     /*Group related*/
     LV_SIGNAL_FOCUS,
     LV_SIGNAL_DEFOCUS,
@@ -173,14 +187,6 @@ typedef struct
 } lv_reailgn_t;
 #endif
 
-enum {
-    LV_DRAG_DIR_HOR = 0x1, /**< Object can be dragged horizontally. */
-    LV_DRAG_DIR_VER = 0x2, /**< Object can be dragged vertically. */
-    LV_DRAG_DIR_ALL = 0x3, /**< Object can be dragged in all directions. */
-};
-
-typedef uint8_t lv_drag_dir_t;
-
 typedef struct _lv_obj_t
 {
     struct _lv_obj_t * par; /**< Pointer to the parent object*/
@@ -217,8 +223,9 @@ typedef struct _lv_obj_t
     uint8_t top : 1;            /**< 1: If the object or its children is clicked it goes to the foreground*/
     uint8_t opa_scale_en : 1;   /**< 1: opa_scale is set*/
     uint8_t parent_event : 1;   /**< 1: Send the object's events to the parent too. */
-    lv_drag_dir_t drag_dir : 2; /**<  Which directions the object can be dragged in */
-    uint8_t reserved : 6;       /**<  Reserved for future use*/
+    lv_drag_dir_t drag_dir : 3; /**<  Which directions the object can be dragged in */
+    lv_bidi_dir_t base_dir : 2; /**< Base direction of texts related to this object */
+    uint8_t reserved : 3;       /**<  Reserved for future use*/
     uint8_t protect;            /**< Automatically happening actions can be prevented. 'OR'ed values from
                                    `lv_protect_t`*/
     lv_opa_t opa_scale;         /**< Scale down the opacity by this factor. Effects all children as well*/
@@ -510,6 +517,7 @@ void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
  */
 void lv_obj_set_parent_event(lv_obj_t * obj, bool en);
 
+void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir);
 /**
  * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
  * @param obj pointer to an object
@@ -727,21 +735,21 @@ lv_coord_t lv_obj_get_height(const lv_obj_t * obj);
  * @param obj pointer to an object
  * @return the width which still fits into the container
  */
-lv_coord_t lv_obj_get_width_fit(lv_obj_t * obj);
+lv_coord_t lv_obj_get_width_fit(const lv_obj_t * obj);
 
 /**
  * Get that height reduced by the top an bottom padding.
  * @param obj pointer to an object
  * @return the height which still fits into the container
  */
-lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj);
+lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj);
 
 /**
  * Get the automatic realign property of the object.
  * @param obj pointer to an object
  * @return  true: auto realign is enabled; false: auto realign is disabled
  */
-bool lv_obj_get_auto_realign(lv_obj_t * obj);
+bool lv_obj_get_auto_realign(const lv_obj_t * obj);
 
 /**
  * Get the left padding of extended clickable area
@@ -849,6 +857,9 @@ bool lv_obj_get_drag_parent(const lv_obj_t * obj);
  */
 bool lv_obj_get_parent_event(const lv_obj_t * obj);
 
+
+lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj);
+
 /**
  * Get the opa scale enable parameter
  * @param obj pointer to an object
@@ -917,7 +928,7 @@ void * lv_obj_get_ext_attr(const lv_obj_t * obj);
  * @param obj pointer to an object which type should be get
  * @param buf pointer to an `lv_obj_type_t` buffer to store the types
  */
-void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
+void lv_obj_get_type(const lv_obj_t * obj, lv_obj_type_t * buf);
 
 #if LV_USE_USER_DATA
 /**
@@ -925,14 +936,14 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf);
  * @param obj pointer to an object
  * @return user data
  */
-lv_obj_user_data_t lv_obj_get_user_data(lv_obj_t * obj);
+lv_obj_user_data_t lv_obj_get_user_data(const lv_obj_t * obj);
 
 /**
  * Get a pointer to the object's user data
  * @param obj pointer to an object
  * @return pointer to the user data
  */
-lv_obj_user_data_t * lv_obj_get_user_data_ptr(lv_obj_t * obj);
+lv_obj_user_data_t * lv_obj_get_user_data_ptr(const lv_obj_t * obj);
 
 /**
  * Set the object's user data. The data will be copied.
@@ -959,6 +970,18 @@ void * lv_obj_get_group(const lv_obj_t * obj);
 bool lv_obj_is_focused(const lv_obj_t * obj);
 
 #endif
+
+/*-------------------
+ * OTHER FUNCTIONS
+ *------------------*/
+
+/**
+ * Used in the signal callback to handle `LV_SIGNAL_GET_TYPE` signal
+ * @param buf pointer to `lv_obj_type_t`. (`param` in the signal callback)
+ * @param name name of the object. E.g. "lv_btn". (Only the pointer is saved)
+ * @return LV_RES_OK
+ */
+lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name);
 
 /**********************
  *      MACROS

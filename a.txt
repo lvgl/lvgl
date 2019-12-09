@@ -1,0 +1,127 @@
+diff --git a/src/lv_draw/lv_draw_img.c b/src/lv_draw/lv_draw_img.c
+index f28c47eb..74f73686 100644
+--- a/src/lv_draw/lv_draw_img.c
++++ b/src/lv_draw/lv_draw_img.c
+@@ -406,7 +406,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
+             trans_dsc.cfg.pivot_x = map_w / 2;
+             trans_dsc.cfg.pivot_y = map_h / 2;
+             trans_dsc.cfg.color = style->image.color;
+-            trans_dsc.cfg.antialias = antialaias;
++            trans_dsc.cfg.antialias = true;
+ 
+             lv_img_buf_transform_init(&trans_dsc);
+         }
+diff --git a/src/lv_draw/lv_img_buf.c b/src/lv_draw/lv_img_buf.c
+index 2b79c7b1..89a57708 100644
+--- a/src/lv_draw/lv_img_buf.c
++++ b/src/lv_draw/lv_img_buf.c
+@@ -161,6 +161,68 @@ lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
+     return LV_OPA_COVER;
+ }
+ 
++/**
++ * Set the color of a pixel of an image. The alpha channel won't be affected.
++ * @param dsc pointer to an image descriptor
++ * @param x x coordinate of the point to set
++ * @param y x coordinate of the point to set
++ * @param c color of the point
++ * @param safe true: check out of bounds
++ */
++void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_color_t c)
++{
++    uint8_t * buf_u8 = (uint8_t *)dsc->data;
++
++    if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR || dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
++        uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
++        uint32_t px     = dsc->header.w * y * px_size + x * px_size;
++        memcpy(&buf_u8[px], &c, px_size);
++    } else if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
++        uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
++        uint32_t px     = dsc->header.w * y * px_size + x * px_size;
++        memcpy(&buf_u8[px], &c, px_size - 1); /*-1 to not overwrite the alpha value*/
++    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
++        buf_u8 += sizeof(lv_color32_t) * 2; /*Skip the palette*/
++
++        uint8_t bit = x & 0x7;
++        x           = x >> 3;
++
++        /* Get the current pixel.
++         * dsc->header.w + 7 means rounding up to 8 because the lines are byte aligned
++         * so the possible real width are 8 ,16, 24 ...*/
++        uint32_t px = ((dsc->header.w + 7) >> 3) * y + x;
++        buf_u8[px]  = buf_u8[px] & ~(1 << (7 - bit));
++        buf_u8[px]  = buf_u8[px] | ((c.full & 0x1) << (7 - bit));
++    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_2BIT) {
++        buf_u8 += sizeof(lv_color32_t) * 4; /*Skip the palette*/
++        uint8_t bit = (x & 0x3) * 2;
++        x           = x >> 2;
++
++        /* Get the current pixel.
++         * dsc->header.w + 3 means rounding up to 4 because the lines are byte aligned
++         * so the possible real width are 4, 8 ,12 ...*/
++        uint32_t px = ((dsc->header.w + 3) >> 2) * y + x;
++
++        buf_u8[px] = buf_u8[px] & ~(3 << (6 - bit));
++        buf_u8[px] = buf_u8[px] | ((c.full & 0x3) << (6 - bit));
++    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_4BIT) {
++        buf_u8 += sizeof(lv_color32_t) * 16; /*Skip the palette*/
++        uint8_t bit = (x & 0x1) * 4;
++        x           = x >> 1;
++
++        /* Get the current pixel.
++         * dsc->header.w + 1 means rounding up to 2 because the lines are byte aligned
++         * so the possible real width are 2 ,4, 6 ...*/
++        uint32_t px = ((dsc->header.w + 1) >> 1) * y + x;
++        buf_u8[px]  = buf_u8[px] & ~(0xF << (4 - bit));
++        buf_u8[px]  = buf_u8[px] | ((c.full & 0xF) << (4 - bit));
++    } else if(dsc->header.cf == LV_IMG_CF_INDEXED_8BIT) {
++        buf_u8 += sizeof(lv_color32_t) * 256; /*Skip the palette*/
++        uint32_t px = dsc->header.w * y + x;
++        buf_u8[px]  = c.full;
++    }
++}
++
+ /**
+  * Set the alpha value of a pixel of an image. The color won't be affected
+  * @param dsc pointer to an image descriptor
+diff --git a/src/lv_draw/lv_img_buf.h b/src/lv_draw/lv_img_buf.h
+index 2629b465..3c1d8273 100644
+--- a/src/lv_draw/lv_img_buf.h
++++ b/src/lv_draw/lv_img_buf.h
+@@ -205,6 +205,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t
+  */
+ lv_opa_t lv_img_buf_get_px_alpha(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y);
+ 
++
+ /**
+  * Set the color of a pixel of an image. The alpha channel won't be affected.
+  * @param dsc pointer to an image descriptor
+diff --git a/src/lv_objx/lv_img.c b/src/lv_objx/lv_img.c
+index 982bb8d9..f792867a 100644
+--- a/src/lv_objx/lv_img.c
++++ b/src/lv_objx/lv_img.c
+@@ -273,7 +273,6 @@ void lv_img_set_angle(lv_obj_t * img, int16_t angle)
+     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
+     if(angle == ext->angle) return;
+ 
+-    lv_obj_invalidate(img);
+     ext->angle = angle;
+     lv_obj_refresh_ext_draw_pad(img);
+     lv_obj_invalidate(img);
+@@ -296,7 +295,6 @@ void lv_img_set_zoom(lv_obj_t * img, uint16_t zoom)
+ 
+     if(zoom == 0) zoom = 1;
+ 
+-    lv_obj_invalidate(img);
+     ext->zoom = zoom;
+     lv_obj_refresh_ext_draw_pad(img);
+     lv_obj_invalidate(img);
+@@ -533,7 +531,7 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
+         }
+     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+         /*If the image has angle provide enough room for the rotated corners */
+-        if(ext->angle || ext->zoom != LV_IMG_ZOOM_NONE) {
++        if(ext->angle && ext->zoom) {
+             lv_sqrt_res_t ds;
+             lv_sqrt(ext->w * ext->w + ext->h * ext->h, &ds);
+             ds.i = (ds.i * ext->zoom + 0) >> 8;        /*+10 to be sure anything won't be clipped*/

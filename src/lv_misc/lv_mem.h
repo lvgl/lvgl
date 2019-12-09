@@ -22,20 +22,14 @@ extern "C" {
 #include <stdint.h>
 #include <stddef.h>
 #include "lv_log.h"
+#include "lv_types.h"
 
 /*********************
  *      DEFINES
  *********************/
-// Check windows
-#ifdef __WIN64
-#define LV_MEM_ENV64
-#endif
 
-// Check GCC
-#ifdef __GNUC__
-#if defined(__x86_64__) || defined(__ppc64__)
-#define LV_MEM_ENV64
-#endif
+#ifndef LV_MEM_BUF_MAX_NUM
+#define LV_MEM_BUF_MAX_NUM    16
 #endif
 
 /**********************
@@ -56,6 +50,12 @@ typedef struct
     uint8_t frag_pct; /**< Amount of fragmentation */
 } lv_mem_monitor_t;
 
+typedef struct {
+    void * p;
+    uint16_t size;
+    uint8_t used    :1;
+}lv_mem_buf_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -70,7 +70,7 @@ void lv_mem_init(void);
  * @param size size of the memory to allocate in bytes
  * @return pointer to the allocated memory
  */
-void * lv_mem_alloc(uint32_t size);
+void * lv_mem_alloc(size_t size);
 
 /**
  * Free an allocated data
@@ -85,7 +85,7 @@ void lv_mem_free(const void * data);
  * @param new_size the desired new size in byte
  * @return pointer to the new memory
  */
-void * lv_mem_realloc(void * data_p, uint32_t new_size);
+void * lv_mem_realloc(void * data_p, size_t new_size);
 
 /**
  * Join the adjacent free memory blocks
@@ -106,31 +106,27 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p);
  */
 uint32_t lv_mem_get_size(const void * data);
 
+/**
+ * Get a temporal buffer with the given size.
+ * @param size the required size
+ */
+void * lv_mem_buf_get(uint32_t size);
+
+/**
+ * Release a memory buffer
+ * @param p buffer to release
+ */
+void lv_mem_buf_release(void * p);
+
+/**
+ * Free all memory buffers
+ */
+void lv_mem_buf_free_all(void);
+
 /**********************
  *      MACROS
  **********************/
 
-/**
- * Halt on NULL pointer
- * p pointer to a memory
- */
-#if LV_USE_LOG == 0
-#define lv_mem_assert(p)                                                                                               \
-    {                                                                                                                  \
-        if(p == NULL)                                                                                                  \
-            while(1)                                                                                                   \
-                ;                                                                                                      \
-    }
-#else
-#define lv_mem_assert(p)                                                                                               \
-    {                                                                                                                  \
-        if(p == NULL) {                                                                                                \
-            LV_LOG_ERROR("Out of memory!");                                                                            \
-            while(1)                                                                                                   \
-                ;                                                                                                      \
-        }                                                                                                              \
-    }
-#endif
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

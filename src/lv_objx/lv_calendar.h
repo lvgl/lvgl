@@ -50,8 +50,8 @@ typedef struct
     lv_calendar_date_t showed_date;         /*Currently visible month (day is ignored)*/
     lv_calendar_date_t * highlighted_dates; /*Apply different style on these days (pointer to an
                                                array defined by the user)*/
-    uint8_t highlighted_dates_num;          /*Number of elements in `highlighted_days`*/
     int8_t btn_pressing;                    /*-1: prev month pressing, +1 next month pressing on the header*/
+    uint16_t highlighted_dates_num;          /*Number of elements in `highlighted_days`*/
     lv_calendar_date_t pressed_date;
     const char ** day_names;   /*Pointer to an array with the name of the days (NULL: use default names)*/
     const char ** month_names; /*Pointer to an array with the name of the month (NULL. use default names)*/
@@ -122,7 +122,7 @@ void lv_calendar_set_showed_date(lv_obj_t * calendar, lv_calendar_date_t * showe
  * WILL BE SAVED! CAN'T BE LOCAL ARRAY.
  * @param date_num number of dates in the array
  */
-void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t * highlighted, uint16_t date_num);
+void lv_calendar_set_highlighted_dates(lv_obj_t * calendar, lv_calendar_date_t highlighted[], uint16_t date_num);
 
 /**
  * Set the name of the days
@@ -136,11 +136,11 @@ void lv_calendar_set_day_names(lv_obj_t * calendar, const char ** day_names);
 /**
  * Set the name of the month
  * @param calendar pointer to a calendar object
- * @param day_names pointer to an array with the names. E.g. `const char * days[12] = {"Jan", "Feb",
+ * @param month_names pointer to an array with the names. E.g. `const char * days[12] = {"Jan", "Feb",
  * ...}` Only the pointer will be saved so this variable can't be local which will be destroyed
  * later.
  */
-void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** day_names);
+void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** month_names);
 
 /**
  * Set a style of a calendar.

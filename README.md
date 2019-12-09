@@ -83,7 +83,7 @@ Choose a project with your favourite IDE:
 |   Eclipse   |  CodeBlocks | Visual Studio | PlatformIO | Qt Creator |
 |-------------|-------------|---------------|-----------|------------|
 |  [![Eclipse](https://littlevgl.com/logo/ide/eclipse.jpg)](https://github.com/littlevgl/pc_simulator_sdl_eclipse) | [![CodeBlocks](https://littlevgl.com/logo/ide/codeblocks.jpg)](https://github.com/littlevgl/pc_simulator_win_codeblocks) | [![VisualStudio](https://littlevgl.com/logo/ide/visualstudio.jpg)](https://github.com/littlevgl/visual_studio_2017_sdl_x64)   |   [![PlatformIO](https://littlevgl.com/logo/ide/platformio.jpg)](https://github.com/littlevgl/pc_simulator_sdl_platformio) | [![QtCreator](https://littlevgl.com/logo/ide/qtcreator.jpg)](https://blog.littlevgl.com/2019-01-03/qt-creator) |
-| Cross-platform<br>with SDL | Native Windows | Cross-platform<br>with SDL | Cross-platform<br>with SDL | Cross-platform<br>with SDL |
+| Cross-platform<br>with SDL<br>(Recommended on<br>Linux and Mac) | Native Windows | Windows<br>with SDL | Cross-platform<br>with SDL | Cross-platform<br>with SDL |
 
 
 ## Add LittlevGL to your project
@@ -188,8 +188,8 @@ Styles can be assigned to the objects to changed their appearance. A style descr
 
 You can create a new style like this:
 ```c
-static lv_style_t style1;                 /*Declare a new style. Should be `static`*/
-lv_style_copy(&style1, &lv_style_plain);  /*Copy a buil-in style*/
+static lv_style_t style1;                       /*Declare a new style. Should be `static`*/
+lv_style_copy(&style1, &lv_style_plain);        /*Copy a built-in style*/
 style1.body.main_color = LV_COLOR_RED;          /*Main color*/
 style1.body.grad_color = lv_color_hex(0xffd83c) /*Gradient color (orange)*/
 style1.body.radius = 3;

@@ -86,9 +86,8 @@ typedef struct
 
     uint16_t anim_time; /*Scroll animation time*/
 #endif
-
-    uint8_t scroll_prop : 1;    /*1: Propagate the scrolling the the parent if the edge is reached*/
-    uint8_t scroll_prop_ip : 1; /*1: Scroll propagation is in progress (used by the library)*/
+    lv_obj_t * scroll_prop_obj;          /*Pointer to child page from where the scroll is being propagated */
+    uint8_t scroll_prop :1;    /*The direction of the scroll propagation*/
 } lv_page_ext_t;
 
 enum {
@@ -113,9 +112,9 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Delete all children of the scrl object, without deleting scrl child.
- * @param obj pointer to an object
+ * @param page pointer to an object
  */
-void lv_page_clean(lv_obj_t * obj);
+void lv_page_clean(lv_obj_t * page);
 
 /**
  * Get the scrollable object of a page
@@ -152,6 +151,8 @@ void lv_page_set_anim_time(lv_obj_t * page, uint16_t anim_time);
 /**
  * Enable the scroll propagation feature. If enabled then the page will move its parent if there is
  * no more space to scroll.
+ * The page needs to have a page-like parent (e.g. `lv_page`, `lv_tabview` tab, `lv_win` content area etc)
+ * If enabled drag direction will be changed `LV_DRAG_DIR_ONE` automatically to allow scrolling only in one direction at one time.
  * @param page pointer to a Page
  * @param en true or false to enable/disable scroll propagation
  */
@@ -399,10 +400,12 @@ void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist);
 
 /**
  * Not intended to use directly by the user but by other object types internally.
- * Start an edge flash animation. Exactly one `ext->edge_flash.xxx_ip` should be set
+ * Start an edge flash animation.
  * @param page
+ * @param edge the edge to flash. Can be `LV_PAGE_EDGE_LEFT/RIGHT/TOP/BOTTOM`
  */
-void lv_page_start_edge_flash(lv_obj_t * page);
+void lv_page_start_edge_flash(lv_obj_t * page, lv_page_edge_t edge);
+
 /**********************
  *      MACROS
  **********************/

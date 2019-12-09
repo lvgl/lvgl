@@ -9,12 +9,15 @@
 #include "lv_led.h"
 #if LV_USE_LED != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_draw.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_led"
+
 #define LV_LED_WIDTH_DEF (LV_DPI / 3)
 #define LV_LED_HEIGHT_DEF (LV_DPI / 3)
 #define LV_LED_BRIGHT_OFF 100
@@ -27,13 +30,13 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_led_design(lv_obj_t * led, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_design_res_t lv_led_design(lv_obj_t * led, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_led_signal(lv_obj_t * led, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_cb_t ancestor_design_f;
+static lv_design_cb_t ancestor_design;
 static lv_signal_cb_t ancestor_signal;
 
 /**********************
@@ -56,16 +59,19 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_led = lv_obj_create(par, copy);
-    lv_mem_assert(new_led);
+    LV_ASSERT_MEM(new_led);
     if(new_led == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_led);
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_led);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_led);
 
     /*Allocate the object type specific extended data*/
     lv_led_ext_t * ext = lv_obj_allocate_ext_attr(new_led, sizeof(lv_led_ext_t));
-    lv_mem_assert(ext);
-    if(ext == NULL) return NULL;
+    LV_ASSERT_MEM(ext);
+    if(ext == NULL) {
+        lv_obj_del(new_led);
+        return NULL;
+    }
 
     ext->bright = LV_LED_BRIGHT_ON;
 
@@ -109,6 +115,8 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_led_set_bright(lv_obj_t * led, uint8_t bright)
 {
+    LV_ASSERT_OBJ(led, LV_OBJX_NAME);
+
     /*Set the brightness*/
     lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
     if(ext->bright == bright) return;
@@ -125,6 +133,8 @@ void lv_led_set_bright(lv_obj_t * led, uint8_t bright)
  */
 void lv_led_on(lv_obj_t * led)
 {
+    LV_ASSERT_OBJ(led, LV_OBJX_NAME);
+
     lv_led_set_bright(led, LV_LED_BRIGHT_ON);
 }
 
@@ -134,6 +144,8 @@ void lv_led_on(lv_obj_t * led)
  */
 void lv_led_off(lv_obj_t * led)
 {
+    LV_ASSERT_OBJ(led, LV_OBJX_NAME);
+
     lv_led_set_bright(led, LV_LED_BRIGHT_OFF);
 }
 
@@ -143,6 +155,8 @@ void lv_led_off(lv_obj_t * led)
  */
 void lv_led_toggle(lv_obj_t * led)
 {
+    LV_ASSERT_OBJ(led, LV_OBJX_NAME);
+
     uint8_t bright = lv_led_get_bright(led);
     if(bright > (LV_LED_BRIGHT_OFF + LV_LED_BRIGHT_ON) >> 1)
         lv_led_off(led);
@@ -161,6 +175,8 @@ void lv_led_toggle(lv_obj_t * led)
  */
 uint8_t lv_led_get_bright(const lv_obj_t * led)
 {
+    LV_ASSERT_OBJ(led, LV_OBJX_NAME);
+
     lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
     return ext->bright;
 }
@@ -172,18 +188,18 @@ uint8_t lv_led_get_bright(const lv_obj_t * led)
 /**
  * Handle the drawing related tasks of the leds
  * @param led pointer to an object
- * @param mask the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @param return an element of `lv_design_res_t`
  */
-static bool lv_led_design(lv_obj_t * led, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_led_design(lv_obj_t * led, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-        /*Return false if the object is not covers the mask area*/
-        return ancestor_design_f(led, mask, mode);
+        /*Return false if the object is not covers the clip_area area*/
+        return ancestor_design(led, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Make darker colors in a temporary style according to the brightness*/
         lv_led_ext_t * ext       = lv_obj_get_ext_attr(led);
@@ -210,10 +226,10 @@ static bool lv_led_design(lv_obj_t * led, const lv_area_t * mask, lv_design_mode
             ((bright_tmp - LV_LED_BRIGHT_OFF) * style->body.shadow.width) / (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
 
         led->style_p = &leds_tmp;
-        ancestor_design_f(led, mask, mode);
+        ancestor_design(led, clip_area, mode);
         led->style_p = style_ori_p; /*Restore the ORIGINAL style pointer*/
     }
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**

@@ -9,12 +9,14 @@
 #include "lv_cb.h"
 #if LV_USE_CB != 0
 
+#include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_cb"
 
 /**********************
  *      TYPEDEFS
@@ -23,8 +25,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t mode);
-static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_design_res_t lv_cb_design(lv_obj_t * cb, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_design_res_t lv_bullet_design(lv_obj_t * bullet, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
 
 /**********************
@@ -55,15 +57,18 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Create the ancestor basic object*/
     lv_obj_t * new_cb = lv_btn_create(par, copy);
-    lv_mem_assert(new_cb);
+    LV_ASSERT_MEM(new_cb);
     if(new_cb == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_cb);
     if(ancestor_bg_design == NULL) ancestor_bg_design = lv_obj_get_design_cb(new_cb);
 
     lv_cb_ext_t * ext = lv_obj_allocate_ext_attr(new_cb, sizeof(lv_cb_ext_t));
-    lv_mem_assert(ext);
-    if(ext == NULL) return NULL;
+    LV_ASSERT_MEM(ext);
+    if(ext == NULL) {
+        lv_obj_del(new_cb);
+        return NULL;
+    }
 
     ext->bullet = NULL;
     ext->label  = NULL;
@@ -126,6 +131,8 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_cb_set_text(lv_obj_t * cb, const char * txt)
 {
+    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
+
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     lv_label_set_text(ext->label, txt);
 }
@@ -138,6 +145,8 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt)
  */
 void lv_cb_set_static_text(lv_obj_t * cb, const char * txt)
 {
+    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
+
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     lv_label_set_static_text(ext->label, txt);
 }
@@ -150,6 +159,8 @@ void lv_cb_set_static_text(lv_obj_t * cb, const char * txt)
  *  */
 void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
+
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 
     switch(type) {
@@ -179,6 +190,8 @@ void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, const lv_style_t * style
  */
 const char * lv_cb_get_text(const lv_obj_t * cb)
 {
+    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
+
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     return lv_label_get_text(ext->label);
 }
@@ -191,10 +204,13 @@ const char * lv_cb_get_text(const lv_obj_t * cb)
  *  */
 const lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type)
 {
+    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
+
     const lv_style_t * style = NULL;
     lv_cb_ext_t * ext        = lv_obj_get_ext_attr(cb);
 
     switch(type) {
+        case LV_CB_STYLE_BG: style = lv_btn_get_style(cb, LV_BTN_STYLE_REL); break;
         case LV_CB_STYLE_BOX_REL: style = lv_btn_get_style(ext->bullet, LV_BTN_STYLE_REL); break;
         case LV_CB_STYLE_BOX_PR: style = lv_btn_get_style(ext->bullet, LV_BTN_STYLE_PR); break;
         case LV_CB_STYLE_BOX_TGL_REL: style = lv_btn_get_style(ext->bullet, LV_BTN_STYLE_TGL_REL); break;
@@ -213,20 +229,20 @@ const lv_style_t * lv_cb_get_style(const lv_obj_t * cb, lv_cb_style_t type)
 /**
  * Handle the drawing related tasks of the check boxes
  * @param cb pointer to an object
- * @param mask the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @param return an element of `lv_design_res_t`
  */
-static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_cb_design(lv_obj_t * cb, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     bool result = true;
 
     if(mode == LV_DESIGN_COVER_CHK) {
         /*Return false if the object is not covers the mask_p area*/
-        result = ancestor_bg_design(cb, mask, mode);
+        result = ancestor_bg_design(cb, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN || mode == LV_DESIGN_DRAW_POST) {
         lv_cb_ext_t * cb_ext      = lv_obj_get_ext_attr(cb);
         lv_btn_ext_t * bullet_ext = lv_obj_get_ext_attr(cb_ext->bullet);
@@ -234,10 +250,10 @@ static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t
         /*Be sure the state of the bullet is the same as the parent button*/
         bullet_ext->state = cb_ext->bg_btn.state;
 
-        result = ancestor_bg_design(cb, mask, mode);
+        result = ancestor_bg_design(cb, clip_area, mode);
 
     } else {
-        result = ancestor_bg_design(cb, mask, mode);
+        result = ancestor_bg_design(cb, clip_area, mode);
     }
 
     return result;
@@ -246,17 +262,17 @@ static bool lv_cb_design(lv_obj_t * cb, const lv_area_t * mask, lv_design_mode_t
 /**
  * Handle the drawing related tasks of the check boxes
  * @param bullet pointer to an object
- * @param mask the object will be drawn only in this area
+ * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @param return element of `lv_design_res_t`
  */
-static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_bullet_design(lv_obj_t * bullet, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     if(mode == LV_DESIGN_COVER_CHK) {
-        return ancestor_bullet_design(bullet, mask, mode);
+        return ancestor_bullet_design(bullet, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
 #if LV_USE_GROUP
         /* If the check box is the active in a group and
@@ -274,16 +290,16 @@ static bool lv_bullet_design(lv_obj_t * bullet, const lv_area_t * mask, lv_desig
             }
         }
 #endif
-        ancestor_bullet_design(bullet, mask, mode);
+        ancestor_bullet_design(bullet, clip_area, mode);
 
 #if LV_USE_GROUP
         bullet->style_p = style_ori; /*Revert the style*/
 #endif
     } else if(mode == LV_DESIGN_DRAW_POST) {
-        ancestor_bullet_design(bullet, mask, mode);
+        ancestor_bullet_design(bullet, clip_area, mode);
     }
 
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**
@@ -300,6 +316,7 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(cb, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
 
@@ -316,13 +333,6 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
             /*Follow the backgrounds state with the bullet*/
             lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
         }
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_cb";
     }
 
     return res;

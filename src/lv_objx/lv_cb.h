@@ -149,7 +149,7 @@ static inline bool lv_cb_is_checked(const lv_obj_t * cb)
  */
 static inline bool lv_cb_is_inactive(const lv_obj_t * cb)
 {
-    return lv_btn_get_state(cb) == LV_BTN_STATE_INA ? false : true;
+    return lv_btn_get_state(cb) == LV_BTN_STATE_INA ? true :false;
 }
 
 /**

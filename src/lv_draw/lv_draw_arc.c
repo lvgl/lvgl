@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_arc.h"
+#include "lv_draw_mask.h"
 #include "../lv_misc/lv_math.h"
 
 /*********************
@@ -20,13 +21,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static uint16_t fast_atan2(int x, int y);
-static void ver_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color,
-                     lv_opa_t opa);
-static void hor_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color,
-                     lv_opa_t opa);
-static bool deg_test_norm(uint16_t deg, uint16_t start, uint16_t end);
-static bool deg_test_inv(uint16_t deg, uint16_t start, uint16_t end);
+static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness, lv_area_t * res_area);
 
 /**********************
  *  STATIC VARIABLES
@@ -51,221 +46,105 @@ static bool deg_test_inv(uint16_t deg, uint16_t start, uint16_t end);
  * @param style style of the arc (`body.thickness`, `body.main_color`, `body.opa` is used)
  * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, const lv_area_t * mask,
-                 uint16_t start_angle, uint16_t end_angle, const lv_style_t * style, lv_opa_t opa_scale)
+void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, const lv_area_t * clip_area,
+        uint16_t start_angle, uint16_t end_angle, const lv_style_t * style, lv_opa_t opa_scale)
 {
-    lv_coord_t thickness = style->line.width;
-    if(thickness > radius) thickness = radius;
+    lv_style_t circle_style;
+    lv_style_copy(&circle_style, style);
+    circle_style.body.radius = LV_RADIUS_CIRCLE;
+    circle_style.body.opa = LV_OPA_TRANSP;
+    circle_style.body.border.width = style->line.width;
+    circle_style.body.border.color = style->line.color;
+    circle_style.body.border.opa = style->line.opa;
 
-    lv_coord_t r_out = radius;
-    lv_coord_t r_in  = r_out - thickness;
-    int16_t deg_base;
-    int16_t deg;
-    lv_coord_t x_start[4];
-    lv_coord_t x_end[4];
+    lv_draw_mask_angle_param_t mask_angle_param;
+    lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, start_angle, end_angle);
 
-    lv_color_t color = style->line.color;
-    lv_opa_t opa = opa_scale == LV_OPA_COVER ? style->body.opa : (uint16_t)((uint16_t)style->body.opa * opa_scale) >> 8;
+    int16_t mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);
 
-    bool (*deg_test)(uint16_t, uint16_t, uint16_t);
-    if(start_angle <= end_angle)
-        deg_test = deg_test_norm;
-    else
-        deg_test = deg_test_inv;
+    lv_area_t area;
+    area.x1 = center_x - radius;
+    area.y1 = center_y - radius;
+    area.x2 = center_x + radius - 1;  /*-1 because the center already belongs to the left/bottom part*/
+    area.y2 = center_y + radius - 1;
 
-    if(deg_test(270, start_angle, end_angle))
-        hor_line(center_x - r_out + 1, center_y, mask, thickness - 1, color, opa); /*Left Middle*/
-    if(deg_test(90, start_angle, end_angle))
-        hor_line(center_x + r_in, center_y, mask, thickness - 1, color, opa); /*Right Middle*/
-    if(deg_test(180, start_angle, end_angle))
-        ver_line(center_x, center_y - r_out + 1, mask, thickness - 1, color, opa); /*Top Middle*/
-    if(deg_test(0, start_angle, end_angle))
-        ver_line(center_x, center_y + r_in, mask, thickness - 1, color, opa); /*Bottom middle*/
+    lv_draw_rect(&area, clip_area, &circle_style, LV_OPA_COVER);
 
-    uint32_t r_out_sqr = r_out * r_out;
-    uint32_t r_in_sqr  = r_in * r_in;
-    int16_t xi;
-    int16_t yi;
-    for(yi = -r_out; yi < 0; yi++) {
-        x_start[0] = LV_COORD_MIN;
-        x_start[1] = LV_COORD_MIN;
-        x_start[2] = LV_COORD_MIN;
-        x_start[3] = LV_COORD_MIN;
-        x_end[0]   = LV_COORD_MIN;
-        x_end[1]   = LV_COORD_MIN;
-        x_end[2]   = LV_COORD_MIN;
-        x_end[3]   = LV_COORD_MIN;
-        for(xi = -r_out; xi < 0; xi++) {
+    lv_draw_mask_remove_id(mask_angle_id);
 
-            uint32_t r_act_sqr = xi * xi + yi * yi;
-            if(r_act_sqr > r_out_sqr) continue;
+    if(style->line.rounded) {
+        circle_style.body.main_color = style->line.color;
+        circle_style.body.grad_color = style->line.color;
+        circle_style.body.opa        = LV_OPA_COVER;
+        circle_style.body.border.width = 0;
 
-            deg_base = fast_atan2(xi, yi) - 180;
+        lv_area_t round_area;
+        get_rounded_area(start_angle, radius, style->line.width, &round_area);
+        round_area.x1 += center_x;
+        round_area.x2 += center_x;
+        round_area.y1 += center_y;
+        round_area.y2 += center_y;
 
-            deg = 180 + deg_base;
-            if(deg_test(deg, start_angle, end_angle)) {
-                if(x_start[0] == LV_COORD_MIN) x_start[0] = xi;
-            } else if(x_start[0] != LV_COORD_MIN && x_end[0] == LV_COORD_MIN) {
-                x_end[0] = xi - 1;
-            }
+        lv_draw_rect(&round_area, clip_area, &circle_style, opa_scale);
 
-            deg = 360 - deg_base;
-            if(deg_test(deg, start_angle, end_angle)) {
-                if(x_start[1] == LV_COORD_MIN) x_start[1] = xi;
-            } else if(x_start[1] != LV_COORD_MIN && x_end[1] == LV_COORD_MIN) {
-                x_end[1] = xi - 1;
-            }
+        get_rounded_area(end_angle, radius, style->line.width, &round_area);
+        round_area.x1 += center_x;
+        round_area.x2 += center_x;
+        round_area.y1 += center_y;
+        round_area.y2 += center_y;
 
-            deg = 180 - deg_base;
-            if(deg_test(deg, start_angle, end_angle)) {
-                if(x_start[2] == LV_COORD_MIN) x_start[2] = xi;
-            } else if(x_start[2] != LV_COORD_MIN && x_end[2] == LV_COORD_MIN) {
-                x_end[2] = xi - 1;
-            }
-
-            deg = deg_base;
-            if(deg_test(deg, start_angle, end_angle)) {
-                if(x_start[3] == LV_COORD_MIN) x_start[3] = xi;
-            } else if(x_start[3] != LV_COORD_MIN && x_end[3] == LV_COORD_MIN) {
-                x_end[3] = xi - 1;
-            }
-
-            if(r_act_sqr < r_in_sqr)
-                break; /*No need to continue the iteration in x once we found the inner edge of the
-                          arc*/
-        }
-
-        if(x_start[0] != LV_COORD_MIN) {
-            if(x_end[0] == LV_COORD_MIN) x_end[0] = xi - 1;
-            hor_line(center_x + x_start[0], center_y + yi, mask, x_end[0] - x_start[0], color, opa);
-        }
-
-        if(x_start[1] != LV_COORD_MIN) {
-            if(x_end[1] == LV_COORD_MIN) x_end[1] = xi - 1;
-            hor_line(center_x + x_start[1], center_y - yi, mask, x_end[1] - x_start[1], color, opa);
-        }
-
-        if(x_start[2] != LV_COORD_MIN) {
-            if(x_end[2] == LV_COORD_MIN) x_end[2] = xi - 1;
-            hor_line(center_x - x_end[2], center_y + yi, mask, LV_MATH_ABS(x_end[2] - x_start[2]), color, opa);
-        }
-
-        if(x_start[3] != LV_COORD_MIN) {
-            if(x_end[3] == LV_COORD_MIN) x_end[3] = xi - 1;
-            hor_line(center_x - x_end[3], center_y - yi, mask, LV_MATH_ABS(x_end[3] - x_start[3]), color, opa);
-        }
-
-#if LV_ANTIALIAS
-        /*TODO*/
-
-#endif
+        lv_draw_rect(&round_area, clip_area, &circle_style, opa_scale);
     }
 }
 
-static uint16_t fast_atan2(int x, int y)
-{
-    // Fast XY vector to integer degree algorithm - Jan 2011 www.RomanBlack.com
-    // Converts any XY values including 0 to a degree value that should be
-    // within +/- 1 degree of the accurate value without needing
-    // large slow trig functions like ArcTan() or ArcCos().
-    // NOTE! at least one of the X or Y values must be non-zero!
-    // This is the full version, for all 4 quadrants and will generate
-    // the angle in integer degrees from 0-360.
-    // Any values of X and Y are usable including negative values provided
-    // they are between -1456 and 1456 so the 16bit multiply does not overflow.
-
-    unsigned char negflag;
-    unsigned char tempdegree;
-    unsigned char comp;
-    unsigned int degree; /*this will hold the result*/
-    unsigned int ux;
-    unsigned int uy;
-
-    /*Save the sign flags then remove signs and get XY as unsigned ints*/
-    negflag = 0;
-    if(x < 0) {
-        negflag += 0x01; /*x flag bit*/
-        x = (0 - x);     /*is now +*/
-    }
-    ux = x; /*copy to unsigned var before multiply*/
-    if(y < 0) {
-        negflag += 0x02; /*y flag bit*/
-        y = (0 - y);     /*is now +*/
-    }
-    uy = y; /*copy to unsigned var before multiply*/
-
-    /*1. Calc the scaled "degrees"*/
-    if(ux > uy) {
-        degree = (uy * 45) / ux; /*degree result will be 0-45 range*/
-        negflag += 0x10;         /*octant flag bit*/
-    } else {
-        degree = (ux * 45) / uy; /*degree result will be 0-45 range*/
-    }
-
-    /*2. Compensate for the 4 degree error curve*/
-    comp       = 0;
-    tempdegree = degree;  /*use an unsigned char for speed!*/
-    if(tempdegree > 22) { /*if top half of range*/
-        if(tempdegree <= 44) comp++;
-        if(tempdegree <= 41) comp++;
-        if(tempdegree <= 37) comp++;
-        if(tempdegree <= 32) comp++; /*max is 4 degrees compensated*/
-    } else {                         /*else is lower half of range*/
-        if(tempdegree >= 2) comp++;
-        if(tempdegree >= 6) comp++;
-        if(tempdegree >= 10) comp++;
-        if(tempdegree >= 15) comp++; /*max is 4 degrees compensated*/
-    }
-    degree += comp; /*degree is now accurate to +/- 1 degree!*/
-
-    /*Invert degree if it was X>Y octant, makes 0-45 into 90-45*/
-      if(negflag & 0x10) degree = (90 - degree);
-
-    /*3. Degree is now 0-90 range for this quadrant,*/
-    /*need to invert it for whichever quadrant it was in*/
-    if(negflag & 0x02) {   /*if -Y*/
-        if(negflag & 0x01) /*if -Y -X*/
-            degree = (180 + degree);
-        else /*else is -Y +X*/
-            degree = (180 - degree);
-    } else {               /*else is +Y*/
-        if(negflag & 0x01) /*if +Y -X*/
-            degree = (360 - degree);
-    }
-    return degree;
-}
 
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-static void ver_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color, lv_opa_t opa)
+
+static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness, lv_area_t * res_area)
 {
-    lv_area_t area;
-    lv_area_set(&area, x, y, x, y + len);
+    const uint8_t ps = 8;
+    const uint8_t pa = 127;
 
-    lv_draw_fill(&area, mask, color, opa);
-}
+    lv_coord_t thick_half = tickness / 2;
+    lv_coord_t thick_corr = tickness & 0x01 ? 0 : 1;
 
-static void hor_line(lv_coord_t x, lv_coord_t y, const lv_area_t * mask, lv_coord_t len, lv_color_t color, lv_opa_t opa)
-{
-    lv_area_t area;
-    lv_area_set(&area, x, y, x + len, y);
+    lv_coord_t rx_corr;
+    lv_coord_t ry_corr;
 
-    lv_draw_fill(&area, mask, color, opa);
-}
+    if(angle > 90 && angle < 270) rx_corr = 0;
+    else  rx_corr = 0;
 
-static bool deg_test_norm(uint16_t deg, uint16_t start, uint16_t end)
-{
-    if(deg >= start && deg <= end)
-        return true;
-    else
-        return false;
-}
+    if(angle > 0 && angle < 180) ry_corr = 0;
+    else  ry_corr = 0;
 
-static bool deg_test_inv(uint16_t deg, uint16_t start, uint16_t end)
-{
-    if(deg >= start || deg <= end) {
-        return true;
-    } else
-        return false;
+    lv_coord_t cir_x;
+    lv_coord_t cir_y;
+
+    cir_x = ((radius - rx_corr - thick_half) * lv_trigo_sin(90 - angle)) >> (LV_TRIGO_SHIFT - ps);
+    cir_y = ((radius - ry_corr - thick_half) * lv_trigo_sin(angle)) >> (LV_TRIGO_SHIFT - ps);
+
+    /* Actually the center of the pixel need to be calculated so apply 1/2 px offset*/
+    if(cir_x > 0) {
+        cir_x = (cir_x - pa) >> ps;
+        res_area->x1 = cir_x - thick_half + thick_corr;
+        res_area->x2 = cir_x + thick_half;
+    }
+    else {
+        cir_x = (cir_x + pa) >> ps;
+        res_area->x1 = cir_x - thick_half;
+        res_area->x2 = cir_x + thick_half - thick_corr;
+    }
+
+    if(cir_y > 0) {
+        cir_y = (cir_y - pa) >> ps;
+        res_area->y1 = cir_y - thick_half + thick_corr;
+        res_area->y2 = cir_y + thick_half;
+    }
+    else {
+        cir_y = (cir_y + pa) >> ps;
+        res_area->y1 = cir_y - thick_half;
+        res_area->y2 = cir_y + thick_half - thick_corr;
+    }
 }

@@ -87,7 +87,6 @@ static void basic_init(void)
     def.body.border.opa     = LV_OPA_COVER;
     def.body.shadow.color   = LV_COLOR_SILVER;
     def.body.shadow.width   = 0;
-    def.body.shadow.type    = LV_SHADOW_FULL;
 
     def.text.color        = lv_color_hex3(0xDDD);
     def.text.font         = _font;
@@ -620,7 +619,6 @@ static void list_init(void)
     list_rel.text.font         = _font;
 
     lv_style_copy(&list_pr, &list_rel);
-    list_pr.body.opa        = LV_OPA_TRANSP;
     list_pr.body.opa        = LV_OPA_COVER;
     list_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 34, 41);
     list_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 34, 41);

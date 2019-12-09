@@ -23,6 +23,7 @@ extern "C" {
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_objx/lv_img.h"
+#include "../lv_draw/lv_draw_img.h"
 
 /*********************
  *      DEFINES
@@ -150,27 +151,46 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, l
                         lv_coord_t h);
 
 /**
- * Rotate and image and store the result on a canvas.
+ * Transform and image and store the result on a canvas.
  * @param canvas pointer to a canvas object
  * @param img pointer to an image descriptor.
  *             Can be the image descriptor of an other canvas too (`lv_canvas_get_img()`).
  * @param angle the angle of rotation (0..360);
+ * @param zoom zoom factor (256 no zoom);
  * @param offset_x offset X to tell where to put the result data on destination canvas
  * @param offset_y offset X to tell where to put the result data on destination canvas
  * @param pivot_x pivot X of rotation. Relative to the source canvas
  *                Set to `source width / 2` to rotate around the center
  * @param pivot_y pivot Y of rotation. Relative to the source canvas
  *                Set to `source height / 2` to rotate around the center
+ * @param antialias apply anti-aliasing during the transformation. Looks better but slower.
  */
-void lv_canvas_rotate(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, lv_coord_t offset_x, lv_coord_t offset_y,
-                      int32_t pivot_x, int32_t pivot_y);
+void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, uint16_t zoom, lv_coord_t offset_x, lv_coord_t offset_y,
+                      int32_t pivot_x, int32_t pivot_y, bool antialias);
+
+
+
+/**
+ * Apply horizontal blur on the canvas
+ * @param canvas pointer to a canvas object
+ * @param r radius of the blur
+ */
+void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r);
+
+/**
+ * Apply vertical blur on the canvas
+ * @param canvas pointer to a canvas object
+ * @param area the area to blur. If `NULL` the whole canvas will be blurred.
+ * @param r radius of the blur
+ */
+void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r);
 
 /**
  * Fill the canvas with color
  * @param canvas pointer to a canvas
  * @param color the background color
  */
-void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color);
+void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color, lv_opa_t opa);
 
 /**
  * Draw a rectangle on the canvas
@@ -239,21 +259,21 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
 /**********************
  *      MACROS
  **********************/
-#define LV_CANVAS_BUF_SIZE_TRUE_COLOR(w, h) ((LV_COLOR_SIZE / 8) * w * h)
-#define LV_CANVAS_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h) ((LV_COLOR_SIZE / 8) * w * h)
-#define LV_CANVAS_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) (LV_IMG_PX_SIZE_ALPHA_BYTE * w * h)
+#define LV_CANVAS_BUF_SIZE_TRUE_COLOR(w, h) LV_IMG_BUF_SIZE_TRUE_COLOR(w, h)
+#define LV_CANVAS_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h) LV_IMG_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h)
+#define LV_CANVAS_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) LV_IMG_BUF_SIZE_TRUE_COLOR_ALPHA(w, h)
 
 /*+ 1: to be sure no fractional row*/
-#define LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h) ((((w / 8) + 1) * h))
-#define LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h) ((((w / 4) + 1) * h))
-#define LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h) ((((w / 2) + 1) * h))
-#define LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w, h) ((w * h))
+#define LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h) LV_IMG_BUF_SIZE_ALPHA_1BIT(w, h)
+#define LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h) LV_IMG_BUF_SIZE_ALPHA_2BIT(w, h)
+#define LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h) LV_IMG_BUF_SIZE_ALPHA_4BIT(w, h)
+#define LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w, h) LV_IMG_BUF_SIZE_ALPHA_8BIT(w, h)
 
 /*4 * X: for palette*/
-#define LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_1BIT(w, h) + 4 * 2)
-#define LV_CANVAS_BUF_SIZE_INDEXED_2BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_2BIT(w, h) + 4 * 4)
-#define LV_CANVAS_BUF_SIZE_INDEXED_4BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_4BIT(w, h) + 4 * 16)
-#define LV_CANVAS_BUF_SIZE_INDEXED_8BIT(w, h) (LV_CANVAS_BUF_SIZE_ALPHA_8BIT(w, h) + 4 * 256)
+#define LV_CANVAS_BUF_SIZE_INDEXED_1BIT(w, h) LV_IMG_BUF_SIZE_INDEXED_1BIT(w, h)
+#define LV_CANVAS_BUF_SIZE_INDEXED_2BIT(w, h) LV_IMG_BUF_SIZE_INDEXED_2BIT(w, h)
+#define LV_CANVAS_BUF_SIZE_INDEXED_4BIT(w, h) LV_IMG_BUF_SIZE_INDEXED_4BIT(w, h)
+#define LV_CANVAS_BUF_SIZE_INDEXED_8BIT(w, h) LV_IMG_BUF_SIZE_INDEXED_8BIT(w, h)
 
 #endif /*LV_USE_CANVAS*/
 

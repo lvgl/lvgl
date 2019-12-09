@@ -8,8 +8,9 @@
  *********************/
 #include "lv_group.h"
 #if LV_USE_GROUP != 0
-#include "../lv_themes/lv_theme.h"
 #include <stddef.h>
+#include "../lv_core/lv_debug.h"
+#include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
@@ -62,7 +63,7 @@ void lv_group_init(void)
 lv_group_t * lv_group_create(void)
 {
     lv_group_t * group = lv_ll_ins_head(&LV_GC_ROOT(_lv_group_ll));
-    lv_mem_assert(group);
+    LV_ASSERT_MEM(group);
     if(group == NULL) return NULL;
     lv_ll_init(&group->obj_ll, sizeof(lv_obj_t *));
 
@@ -104,7 +105,7 @@ void lv_group_del(lv_group_t * group)
     }
 
     lv_ll_clear(&(group->obj_ll));
-    lv_ll_rem(&LV_GC_ROOT(_lv_group_ll), group);
+    lv_ll_remove(&LV_GC_ROOT(_lv_group_ll), group);
     lv_mem_free(group);
 }
 
@@ -138,7 +139,7 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 
     obj->group_p     = group;
     lv_obj_t ** next = lv_ll_ins_tail(&group->obj_ll);
-    lv_mem_assert(next);
+    LV_ASSERT_MEM(next);
     if(next == NULL) return;
     *next = obj;
 
@@ -183,7 +184,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
     LV_LL_READ(g->obj_ll, i)
     {
         if(*i == obj) {
-            lv_ll_rem(&g->obj_ll, i);
+            lv_ll_remove(&g->obj_ll, i);
             lv_mem_free(i);
             obj->group_p = NULL;
             break;

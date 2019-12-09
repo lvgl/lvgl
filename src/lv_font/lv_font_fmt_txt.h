@@ -38,14 +38,18 @@ typedef struct
 #if LV_FONT_FMT_TXT_LARGE == 0
     uint32_t bitmap_index : 20;     /**< Start index of the bitmap. A font can be max 1 MB. */
     uint32_t adv_w :12;             /**< Draw the next glyph after this width. 8.4 format (real_value * 16 is stored). */
-#else
-    uint32_t bitmap_index;          /**< Start index of the bitmap. A font can be max 4 GB. */
-    uint32_t adv_w;                 /**< Draw the next glyph after this width. 28.4 format (real_value * 16 is stored). */
-#endif
     uint8_t box_w;                  /**< Width of the glyph's bounding box*/
     uint8_t box_h;                  /**< Height of the glyph's bounding box*/
     int8_t ofs_x;                   /**< x offset of the bounding box*/
-    uint8_t ofs_y;                  /**< y offset of the bounding box. Measured from the top of the line*/
+    int8_t ofs_y;                  /**< y offset of the bounding box. Measured from the top of the line*/
+#else
+    uint32_t bitmap_index;          /**< Start index of the bitmap. A font can be max 4 GB. */
+    uint32_t adv_w;                 /**< Draw the next glyph after this width. 28.4 format (real_value * 16 is stored). */
+    uint16_t box_w;                  /**< Width of the glyph's bounding box*/
+    uint16_t box_h;                  /**< Height of the glyph's bounding box*/
+    int16_t ofs_x;                   /**< x offset of the bounding box*/
+    int16_t ofs_y;                  /**< y offset of the bounding box. Measured from the top of the line*/
+#endif
 }lv_font_fmt_txt_glyph_dsc_t;
 
 
@@ -113,7 +117,7 @@ typedef struct {
     uint16_t list_length;
 
     /** Type of this character map*/
-    lv_font_fmt_txt_cmap_type_t type   :2;
+    lv_font_fmt_txt_cmap_type_t type;
 }lv_font_fmt_txt_cmap_t;
 
 /** A simple mapping of kern values from pairs*/
@@ -141,7 +145,7 @@ typedef struct {
           3. value = class_pair_values[(left_class-1)*right_class_cnt + (righ_class-1)]
         */
 
-    const uint8_t * class_pair_values;    /*left_class_num * right_class_num value*/
+    const int8_t * class_pair_values;    /*left_class_num * right_class_num value*/
     const uint8_t * left_class_mapping;   /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
     const uint8_t * right_class_mapping;  /*Map the glyph_ids to classes: index -> glyph_id -> class_id*/
     uint8_t left_class_cnt;
@@ -180,7 +184,7 @@ typedef struct {
     /*Number of cmap tables*/
     uint16_t cmap_num       :10;
 
-    /*Bit per pixel: 1, 2, 4 or 8*/
+    /*Bit per pixel: 1, 2, 3, 4*/
     uint16_t bpp            :3;
 
     /*Type of `kern_dsc`*/

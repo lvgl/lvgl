@@ -15,6 +15,7 @@
 /*********************
  *      INCLUDES
  *********************/
+#include "../lv_core/lv_debug.h"
 //#include "lv_templ.h" /*TODO uncomment this*/
 
 #if defined(LV_USE_TEMPL) && LV_USE_TEMPL != 0
@@ -22,6 +23,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_templ"
 
 /**********************
  *      TYPEDEFS
@@ -30,14 +32,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool lv_templ_design(lv_obj_t * templ, const lv_area_t * mask, lv_design_mode_t mode);
+static lv_design_res_t lv_templ_design(lv_obj_t * templ, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_func_t ancestor_signal;
-static lv_design_func_t ancestor_design;
+static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -66,16 +68,20 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the template type specific extended data*/
     lv_templ_ext_t * ext = lv_obj_allocate_ext_attr(new_templ, sizeof(lv_templ_ext_t));
     lv_mem_assert(ext);
-    if(ext == NULL) return NULL;
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_templ);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_templ);
+    if(ext == NULL) {
+        lv_obj_del(new_templ);
+        return NULL;
+    }
+
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_templ);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_templ);
 
     /*Initialize the allocated 'ext' */
     ext->xyz = 0;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_func(new_templ, lv_templ_signal);
-    lv_obj_set_design_func(new_templ, lv_templ_design);
+    lv_obj_set_signal_cb(new_templ, lv_templ_signal);
+    lv_obj_set_design_cb(new_templ, lv_templ_design);
 
     /*Init the new template template*/
     if(copy == NULL) {
@@ -118,6 +124,8 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
  */
 void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, const lv_style_t * style)
 {
+    LV_ASSERT_OBJ(templ, LV_OBJX_NAME);
+
     lv_templ_ext_t * ext = lv_obj_get_ext_attr(templ);
 
     switch(type) {
@@ -142,6 +150,8 @@ void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, const lv_style_
  */
 lv_style_t * lv_templ_get_style(const lv_obj_t * templ, lv_templ_style_t type)
 {
+    LV_ASSERT_OBJ(templ, LV_OBJX_NAME);
+
     lv_templ_ext_t * ext = lv_obj_get_ext_attr(templ);
     lv_style_t * style   = NULL;
 
@@ -174,13 +184,13 @@ lv_style_t * lv_templ_get_style(const lv_obj_t * templ, lv_templ_style_t type)
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return true/false, depends on 'mode'
+ * @param return an element of `lv_design_res_t`
  */
-static bool lv_templ_design(lv_obj_t * templ, const lv_area_t * mask, lv_design_mode_t mode)
+static lv_design_res_t lv_templ_design(lv_obj_t * templ, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
-        return false;
+        return LV_DESIGN_RES_NOT_COVER;
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
@@ -190,7 +200,7 @@ static bool lv_templ_design(lv_obj_t * templ, const lv_area_t * mask, lv_design_
     else if(mode == LV_DESIGN_DRAW_POST) {
     }
 
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**
@@ -207,16 +217,10 @@ static lv_res_t lv_templ_signal(lv_obj_t * templ, lv_signal_t sign, void * param
     /* Include the ancient signal function */
     res = ancestor_signal(templ, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_templ";
     }
 
     return res;

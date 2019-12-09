@@ -18,11 +18,15 @@ extern "C" {
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_anim.h"
+#include "../lv_draw/lv_draw_blend.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define LV_RADIUS_CIRCLE (LV_COORD_MAX) /**< A very big radius to always draw as circle*/
+#define LV_STYLE_DEGUG_SENTINEL_VALUE 0x12345678
+
+LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
 /**********************
  *      TYPEDEFS
@@ -30,25 +34,28 @@ extern "C" {
 
 /*Border types (Use 'OR'ed values)*/
 enum {
-    LV_BORDER_NONE     = 0x00,
-    LV_BORDER_BOTTOM   = 0x01,
-    LV_BORDER_TOP      = 0x02,
-    LV_BORDER_LEFT     = 0x04,
-    LV_BORDER_RIGHT    = 0x08,
-    LV_BORDER_FULL     = 0x0F,
-    LV_BORDER_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
+    LV_BORDER_PART_NONE     = 0x00,
+    LV_BORDER_PART_BOTTOM   = 0x01,
+    LV_BORDER_PART_TOP      = 0x02,
+    LV_BORDER_PART_LEFT     = 0x04,
+    LV_BORDER_PART_RIGHT    = 0x08,
+    LV_BORDER_PART_FULL     = 0x0F,
+    LV_BORDER_PART_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
 };
 typedef uint8_t lv_border_part_t;
 
-/*Shadow types*/
+
+
 enum {
-    LV_SHADOW_BOTTOM = 0, /**< Only draw bottom shadow */
-    LV_SHADOW_FULL,       /**< Draw shadow on all sides */
+    LV_GRAD_DIR_NONE,
+    LV_GRAD_DIR_VER,
+    LV_GRAD_DIR_HOR,
 };
-typedef uint8_t lv_shadow_type_t;
+
+typedef uint8_t lv_grad_dir_t;
 
 /**
- * Objects in LittlevGL can be assigned a style - which holds information about
+ * Styles can be assigned to objects - which holds information about
  * how the object should be drawn.
  * 
  * This allows for easy customization without having to modify the object's design
@@ -65,6 +72,11 @@ typedef struct
         lv_color_t grad_color; /**< Second color. If not equal to `main_color` a gradient will be drawn for the background. */
         lv_coord_t radius; /**< Object's corner radius. You can use #LV_RADIUS_CIRCLE if you want to draw a circle. */
         lv_opa_t opa; /**< Object's opacity (0-255). */
+        uint8_t main_color_stop;    /**< 0..255 proportionally where should the gradient start (the main color stop)*/
+        uint8_t grad_color_stop;    /**< 0..255 proportionally where should the gradient stop (the grad_color start) */
+        lv_blend_mode_t blend_mode :3;
+        lv_grad_dir_t grad_dir     :2; /**< LV_GRAD_DIR_NONE/VER/HOR*/
+        uint8_t corner_mask        :1; /**< Crop the overflowing content from the rounded corners */
 
         struct
         {
@@ -72,6 +84,7 @@ typedef struct
             lv_coord_t width; /**< Border width */
             lv_border_part_t part; /**< Which borders to draw */
             lv_opa_t opa; /**< Border opacity. */
+            lv_blend_mode_t blend_mode :3;
         } border;
 
         
@@ -79,7 +92,10 @@ typedef struct
         {
             lv_color_t color;
             lv_coord_t width;
-            lv_shadow_type_t type; /**< Which parts of the shadow to draw */
+            lv_coord_t spread;
+            lv_point_t offset;
+            lv_opa_t opa;
+            lv_blend_mode_t blend_mode :3;
         } shadow;
 
         struct
@@ -101,6 +117,9 @@ typedef struct
         lv_coord_t letter_space; /**< Space between letters */
         lv_coord_t line_space; /**< Space between lines (vertical) */
         lv_opa_t opa; /**< Text opacity */
+        lv_blend_mode_t blend_mode :3;
+        uint8_t underline :1;
+        uint8_t strikethrough :1;
     } text;
 
     /**< Style of images. */
@@ -109,6 +128,7 @@ typedef struct
         lv_color_t color; /**< Color to recolor the image with */
         lv_opa_t intense; /**< Opacity of recoloring (0 means no recoloring) */
         lv_opa_t opa; /**< Opacity of whole image */
+        lv_blend_mode_t blend_mode :3;
     } image;
 
     /**< Style of lines (not borders). */
@@ -118,7 +138,15 @@ typedef struct
         lv_coord_t width;
         lv_opa_t opa;
         uint8_t rounded : 1; /**< 1: rounded line endings*/
+        lv_blend_mode_t blend_mode :3;
     } line;
+
+#if LV_USE_DEBUG
+#if LV_USE_ASSERT_STYLE
+    uint32_t debug_sentinel; /**<Should `LV_STYLE_DEGUG_SENTINEL_VALUE` to indicate that the style is valid*/
+#endif
+#endif
+
 } lv_style_t;
 
 #if LV_USE_ANIMATION
@@ -186,7 +214,7 @@ void lv_style_anim_set_styles(lv_anim_t * a, lv_style_t * to_anim, const lv_styl
  * @param duration duration of the animation in milliseconds
  * @param delay delay before the animation in milliseconds
  */
-static inline void lv_style_anim_set_time(lv_anim_t * a, uint16_t duration, uint16_t delay)
+static inline void lv_style_anim_set_time(lv_anim_t * a, uint16_t duration, int16_t delay)
 {
     lv_anim_set_time(a, duration, delay);
 }
@@ -271,6 +299,18 @@ extern lv_style_t lv_style_btn_ina;
 /**********************
  *      MACROS
  **********************/
+
+/**
+ * Create and initialize a `static` style
+ * Example:
+ *     LV_STYLE_CREATE(my_style, &lv_style_plain);
+ *   is equivalent to
+ *     static lv_style_t my_style;
+ *     lv_style_copy(my_style, &lv_style_plain);
+ *
+ * If the style to copy is `NULL` `lv_style_plain` will be used.
+ */
+#define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_copy(&name, copy_p == NULL ? &lv_style_plain : copy_p);
 
 #ifdef __cplusplus
 } /* extern "C" */

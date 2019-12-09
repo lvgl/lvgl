@@ -39,6 +39,8 @@ extern "C" {
  *********************/
 #define LV_TA_CURSOR_LAST (0x7FFF) /*Put the cursor after the last character*/
 
+LV_EXPORT_CONST_INT(LV_TA_CURSOR_LAST);
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -80,8 +82,7 @@ typedef struct
         uint8_t click_pos : 1;     /*1: Enable positioning the cursor by clicking the text area*/
     } cursor;
 #if LV_LABEL_TEXT_SEL
-    uint16_t tmp_sel_start;       /*Temporary value*/
-    uint16_t tmp_sel_end;         /*Temporary value*/
+    lv_draw_label_txt_sel_t sel;  /*Temporary values for text selection*/
     uint8_t text_sel_in_prog : 1; /*User is in process of selecting */
     uint8_t text_sel_en : 1;      /*Text can be selected on this text area*/
 #endif

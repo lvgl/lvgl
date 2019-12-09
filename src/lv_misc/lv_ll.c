@@ -160,7 +160,7 @@ void * lv_ll_ins_tail(lv_ll_t * ll_p)
  * @param ll_p pointer to the linked list of 'node_p'
  * @param node_p pointer to node in 'll_p' linked list
  */
-void lv_ll_rem(lv_ll_t * ll_p, void * node_p)
+void lv_ll_remove(lv_ll_t * ll_p, void * node_p)
 {
     if(lv_ll_get_head(ll_p) == node_p) {
         /*The new head will be the node after 'n_act'*/
@@ -202,7 +202,7 @@ void lv_ll_clear(lv_ll_t * ll_p)
     while(i != NULL) {
         i_next = lv_ll_get_next(ll_p, i);
 
-        lv_ll_rem(ll_p, i);
+        lv_ll_remove(ll_p, i);
         lv_mem_free(i);
 
         i = i_next;
@@ -219,7 +219,7 @@ void lv_ll_clear(lv_ll_t * ll_p)
  */
 void lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool head)
 {
-    lv_ll_rem(ll_ori_p, node);
+    lv_ll_remove(ll_ori_p, node);
 
     if(head) {
         /*Set node as head*/
@@ -362,7 +362,7 @@ void lv_ll_move_before(lv_ll_t * ll_p, void * n_act, void * n_after)
     if(n_act == n_before) return; /*Already before `n_after`*/
 
     /*It's much easier to remove from the list and add again*/
-    lv_ll_rem(ll_p, n_act);
+    lv_ll_remove(ll_p, n_act);
 
     /*Add again by setting the prev. and next nodes*/
     node_set_next(ll_p, n_before, n_act);
