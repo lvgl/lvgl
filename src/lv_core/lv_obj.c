@@ -218,8 +218,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->base_dir     = LV_BIDI_DIR_LTR;
 #endif
 
-	new_obj->gesture      = 0;
-	new_obj->gesture_parent = 0;
+        new_obj->gesture      = 0;
+        new_obj->gesture_parent = 0;
         new_obj->reserved     = 0;
 
         new_obj->ext_attr = NULL;
@@ -316,8 +316,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->opa_scale    = LV_OPA_COVER;
         new_obj->opa_scale_en = 0;
         new_obj->parent_event = 0;
-	new_obj->gesture = 0;
-	new_obj->gesture_parent = 0;
+        new_obj->gesture = 0;
+        new_obj->gesture_parent = 1;
         new_obj->reserved     = 0;
 
         new_obj->ext_attr = NULL;

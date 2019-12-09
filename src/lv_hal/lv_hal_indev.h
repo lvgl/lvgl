@@ -150,7 +150,7 @@ typedef struct _lv_indev_proc_t
             uint8_t drag_limit_out : 1;
             uint8_t drag_in_prog : 1;
             lv_drag_dir_t drag_dir  : 3;
-	    uint8_t gesture_in_prog : 1;
+	    uint8_t gesture_sent : 1;
         } pointer;
         struct
         { /*Keypad data*/

@@ -170,6 +170,17 @@
 #define LV_INDEV_DEF_LONG_PRESS_REP_TIME  100
 #endif
 
+
+/* Gesture threshold in pixels */
+#ifndef LV_INDEV_DEF_GESTURE_LIMIT
+#define LV_INDEV_DEF_GESTURE_LIMIT        50
+#endif
+
+/* Gesture min velocity at release before swipe (pixels)*/
+#ifndef LV_INDEV_DEF_GESTURE_MIN_VELOCITY
+#define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
+#endif
+
 /*==================
  * Feature usage
  *==================*/
@@ -722,6 +733,11 @@
 /*Line meter (dependencies: *;)*/
 #ifndef LV_USE_LMETER
 #define LV_USE_LMETER   1
+#endif
+
+/*Mask (dependencies: -)*/
+#ifndef LV_USE_OBJMASK
+#define LV_USE_OBJMASK  0
 #endif
 
 /*Message box (dependencies: lv_rect, lv_btnm, lv_label)*/
