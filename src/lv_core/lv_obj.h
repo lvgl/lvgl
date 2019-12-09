@@ -227,9 +227,8 @@ typedef struct _lv_obj_t
     uint8_t parent_event : 1;   /**< 1: Send the object's events to the parent too. */
     lv_drag_dir_t drag_dir : 3; /**<  Which directions the object can be dragged in */
     lv_bidi_dir_t base_dir : 2; /**< Base direction of texts related to this object */
-    uint8_t gesture : 1;        /**< 1: Enable the gesture*/
     uint8_t gesture_parent : 1; /**< 1: Parent will be gesture instead*/
-    uint8_t reserved : 1;       /**<  Reserved for future use*/
+    uint8_t reserved : 2;       /**<  Reserved for future use*/
     uint8_t protect;            /**< Automatically happening actions can be prevented. 'OR'ed values from
                                    `lv_protect_t`*/
     lv_opa_t opa_scale;         /**< Scale down the opacity by this factor. Effects all children as well*/
@@ -515,13 +514,6 @@ void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
 
 /**
-* Enable the gusture of an object
-* @param obj pointer to an object
-* @param en true: make the object gusture
-*/
-void lv_obj_set_gusture(lv_obj_t * obj, bool en);
-
-/**
 * Enable to use parent for gusture related operations.
 * If trying to gusture the object the parent will be moved instead
 * @param obj pointer to an object
@@ -536,7 +528,9 @@ void lv_obj_set_gusture_parent(lv_obj_t * obj, bool en);
  */
 void lv_obj_set_parent_event(lv_obj_t * obj, bool en);
 
+
 void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir);
+
 /**
  * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
  * @param obj pointer to an object
@@ -868,13 +862,6 @@ bool lv_obj_get_drag_throw(const lv_obj_t * obj);
  * @return true: drag parent is enabled
  */
 bool lv_obj_get_drag_parent(const lv_obj_t * obj);
-
-/**
-* Get the gesture enable attribute of an object
-* @param obj pointer to an object
-* @return true: the object is gesture
-*/
-bool lv_obj_get_gesture(const lv_obj_t * obj);
 
 /**
  * Get the drag parent attribute of an object

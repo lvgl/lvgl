@@ -1352,8 +1352,8 @@ static void indev_gesture(lv_indev_proc_t * proc)
 
 	if (gesture_obj == NULL) return;
 
-	if ((LV_MATH_ABS(proc->types.pointer.vect.x) < LV_INDEV_DEF_GESTURE_MIN_VELOCITY) &&
-		(LV_MATH_ABS(proc->types.pointer.vect.y) < LV_INDEV_DEF_GESTURE_MIN_VELOCITY)) {
+	if ((LV_MATH_ABS(proc->types.pointer.vect.x) < indev_act->driver.gesture_min_velocity) &&
+		(LV_MATH_ABS(proc->types.pointer.vect.y) < indev_act->driver.gesture_min_velocity)) {
 		proc->types.pointer.gesture_sum.x = 0;
 		proc->types.pointer.gesture_sum.y = 0;
 	}
@@ -1362,8 +1362,8 @@ static void indev_gesture(lv_indev_proc_t * proc)
 	proc->types.pointer.gesture_sum.x += proc->types.pointer.vect.x;
 	proc->types.pointer.gesture_sum.y += proc->types.pointer.vect.y;
 
-	if ((LV_MATH_ABS(proc->types.pointer.gesture_sum.x) > LV_INDEV_DEF_GESTURE_LIMIT) ||
-	    (LV_MATH_ABS(proc->types.pointer.gesture_sum.y) > LV_INDEV_DEF_GESTURE_LIMIT)){
+	if ((LV_MATH_ABS(proc->types.pointer.gesture_sum.x) > indev_act->driver.gesture_limit) ||
+	    (LV_MATH_ABS(proc->types.pointer.gesture_sum.y) > indev_act->driver.gesture_limit)){
 
 	    proc->types.pointer.gesture_sent = 1;
 

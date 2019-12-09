@@ -117,6 +117,12 @@ typedef struct _lv_indev_drv_t
     /**< Drag throw slow-down in [%]. Greater value means faster slow-down */
     uint8_t drag_throw;
 
+    /**< At least this difference should between two points to evaluate as gesture */
+    uint8_t gesture_min_velocity;
+
+    /**< At least this difference should be to send a gesture */
+    uint8_t gesture_limit;
+
     /**< Long press time in milliseconds*/
     uint16_t long_press_time;
 
