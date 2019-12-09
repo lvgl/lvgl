@@ -654,7 +654,6 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
         lv_table_ext_t * ext        = lv_obj_get_ext_attr(table);
         const lv_style_t * bg_style = lv_obj_get_style(table);
-        const lv_style_t * cell_style;
         lv_coord_t h_row;
         lv_point_t txt_size;
         lv_area_t cell_area;
@@ -670,8 +669,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
         for(row = 0; row < ext->row_cnt; row++) {
             h_row = get_row_height(table, row);
 
-            cell_area.y1 = cell_area.y2;
-            cell_area.y2 = cell_area.y1 + h_row;
+            cell_area.y1 = cell_area.y2 + 1;
+            cell_area.y2 = cell_area.y1 + h_row - 1;
 
             cell_area.x2 = table->coords.x1 + bg_style->body.padding.left;
 
@@ -687,9 +686,11 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     format.s.crop        = 1;
                 }
 
-                cell_style   = ext->cell_style[format.s.type];
-                cell_area.x1 = cell_area.x2;
-                cell_area.x2 = cell_area.x1 + ext->col_w[col];
+
+                lv_style_t cell_style;
+                lv_style_copy(&cell_style, ext->cell_style[format.s.type]);
+                cell_area.x1 = cell_area.x2 + 1;
+                cell_area.x2 = cell_area.x1 + ext->col_w[col] - 1;
 
                 uint16_t col_merge = 0;
                 for(col_merge = 0; col_merge + col < ext->col_cnt - 1; col_merge++) {
@@ -705,14 +706,14 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     }
                 }
 
-                lv_draw_rect(&cell_area, clip_area, cell_style, opa_scale);
+                lv_draw_rect(&cell_area, clip_area, &cell_style, opa_scale);
 
                 if(ext->cell_data[cell]) {
 
-                    txt_area.x1 = cell_area.x1 + cell_style->body.padding.left;
-                    txt_area.x2 = cell_area.x2 - cell_style->body.padding.right;
-                    txt_area.y1 = cell_area.y1 + cell_style->body.padding.top;
-                    txt_area.y2 = cell_area.y2 - cell_style->body.padding.bottom;
+                    txt_area.x1 = cell_area.x1 + cell_style.body.padding.left;
+                    txt_area.x2 = cell_area.x2 - cell_style.body.padding.right;
+                    txt_area.y1 = cell_area.y1 + cell_style.body.padding.top;
+                    txt_area.y2 = cell_area.y2 - cell_style.body.padding.bottom;
                     /*Align the content to the middle if not cropped*/
                     if(format.s.crop == 0) {
                         txt_flags = LV_TXT_FLAG_NONE;
@@ -720,8 +721,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                         txt_flags = LV_TXT_FLAG_EXPAND;
                     }
 
-                    lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style->text.font,
-                                    cell_style->text.letter_space, cell_style->text.line_space,
+                    lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style.text.font,
+                                    cell_style.text.letter_space, cell_style.text.line_space,
                                     lv_area_get_width(&txt_area), txt_flags);
 
                     /*Align the content to the middle if not cropped*/
@@ -741,7 +742,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     bool label_mask_ok;
                     label_mask_ok = lv_area_intersect(&label_mask, clip_area, &cell_area);
                     if(label_mask_ok) {
-                        lv_draw_label(&txt_area, &label_mask, cell_style, opa_scale, ext->cell_data[cell] + 1,
+                        lv_draw_label(&txt_area, &label_mask, &cell_style, opa_scale, ext->cell_data[cell] + 1,
                                       txt_flags, NULL, NULL, NULL, lv_obj_get_base_dir(table));
                     }
                     /*Draw lines after '\n's*/
@@ -753,13 +754,13 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     for(i = 1; ext->cell_data[cell][i] != '\0'; i++) {
                         if(ext->cell_data[cell][i] == '\n') {
                             ext->cell_data[cell][i] = '\0';
-                            lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style->text.font,
-                                            cell_style->text.letter_space, cell_style->text.line_space,
+                            lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, cell_style.text.font,
+                                            cell_style.text.letter_space, cell_style.text.line_space,
                                             lv_area_get_width(&txt_area), txt_flags);
 
-                            p1.y = txt_area.y1 + txt_size.y + cell_style->text.line_space / 2;
-                            p2.y = txt_area.y1 + txt_size.y + cell_style->text.line_space / 2;
-                            lv_draw_line(&p1, &p2, clip_area, cell_style, opa_scale);
+                            p1.y = txt_area.y1 + txt_size.y + cell_style.text.line_space / 2;
+                            p2.y = txt_area.y1 + txt_size.y + cell_style.text.line_space / 2;
+                            lv_draw_line(&p1, &p2, clip_area, &cell_style, opa_scale);
 
                             ext->cell_data[cell][i] = '\n';
                         }

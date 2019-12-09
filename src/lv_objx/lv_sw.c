@@ -397,13 +397,18 @@ static lv_design_res_t lv_sw_design(lv_obj_t * sw, const lv_area_t * clip_area, 
  */
 static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 {
+    lv_res_t res;
+    if(sign == LV_SIGNAL_GET_TYPE) {
+        res = ancestor_signal(sw, sign, param);
+        if(res != LV_RES_OK) return res;
+        return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
+    }
+
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
-    lv_res_t res;
     /* Include the ancient signal function */
     res = ancestor_signal(sw, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/

@@ -572,7 +572,7 @@ char * lv_fs_up(char * path)
             return path;
     }
 
-    uint16_t i;
+    size_t i;
     for(i = len; i > 0; i--) {
         if(path[i] == '/' || path[i] == '\\') break;
     }
@@ -602,7 +602,7 @@ const char * lv_fs_get_last(const char * path)
             return path;
     }
 
-    uint16_t i;
+    size_t i;
     for(i = len; i > 0; i--) {
         if(path[i] == '/' || path[i] == '\\') break;
     }
