@@ -167,6 +167,7 @@ void lv_cb_set_style(lv_obj_t * cb, lv_cb_style_t type, const lv_style_t * style
             lv_btn_set_style(cb, LV_BTN_STYLE_TGL_REL, style);
             lv_btn_set_style(cb, LV_BTN_STYLE_TGL_PR, style);
             lv_btn_set_style(cb, LV_BTN_STYLE_INA, style);
+            lv_label_set_style (ext->label, LV_LABEL_STYLE_MAIN, style);
             break;
         case LV_CB_STYLE_BOX_REL: lv_btn_set_style(ext->bullet, LV_BTN_STYLE_REL, style); break;
         case LV_CB_STYLE_BOX_PR: lv_btn_set_style(ext->bullet, LV_BTN_STYLE_PR, style); break;
