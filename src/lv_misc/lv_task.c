@@ -168,9 +168,12 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
 	time_till_next = LV_NO_TASK_READY;
 	next = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
 	while(next) {
-		uint32_t delay = lv_task_time_remaining(next);
-		if(delay < time_till_next)
-			time_till_next = delay;
+		if(next->prio != LV_TASK_PRIO_OFF) {
+			uint32_t delay = lv_task_time_remaining(next);
+			if(delay < time_till_next)
+				time_till_next = delay;
+		}
+		
 		next = lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), next); /*Find the next task*/
 	}
     already_running = false; /*Release the mutex*/
