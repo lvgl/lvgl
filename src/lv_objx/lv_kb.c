@@ -147,6 +147,9 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
         lv_obj_set_base_dir(new_kb, LV_BIDI_DIR_LTR);
 
+        lv_btnm_set_map(new_kb, kb_map[ext->mode]);
+        lv_btnm_set_ctrl_map(new_kb, kb_ctrl[ext->mode]);
+
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
@@ -167,6 +170,9 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->ta                = copy_ext->ta;
         ext->mode              = copy_ext->mode;
         ext->cursor_mng        = copy_ext->cursor_mng;
+
+        lv_btnm_set_map(new_kb, kb_map[ext->mode]);
+        lv_btnm_set_ctrl_map(new_kb, kb_ctrl[ext->mode]);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_kb);
