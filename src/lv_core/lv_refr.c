@@ -131,6 +131,8 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
             lv_area_copy(&disp->inv_areas[disp->inv_p], &scr_area);
         }
         disp->inv_p++;
+		lv_task_set_prio(disp->refr_task, LV_REFR_TASK_PRIO);
+		dprintf("refr task enabled\n");
     }
 }
 
@@ -163,6 +165,12 @@ void lv_disp_refr_task(lv_task_t * task)
     LV_LOG_TRACE("lv_refr_task: started");
 
     uint32_t start = lv_tick_get();
+
+	/* Ensure the task does not run again automatically.
+     * This is done before refreshing in case refreshing invalidates something else.
+     */
+	lv_task_set_prio(task, LV_TASK_PRIO_OFF);
+	dprintf("refr task disabled\n");
 
     disp_refr = task->user_data;
 

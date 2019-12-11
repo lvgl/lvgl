@@ -20,6 +20,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define LV_REFR_TASK_PRIO LV_TASK_PRIO_MID
+
 /**********************
  *      TYPEDEFS
  **********************/
