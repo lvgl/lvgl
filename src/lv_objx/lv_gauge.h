@@ -193,7 +193,7 @@ uint8_t lv_gauge_get_label_count(const lv_obj_t * gauge);
  * @param gauge pointer to a gauge object
  * @return number of the scale units
  */
-static inline uint8_t lv_gauge_get_line_count(const lv_obj_t * gauge)
+static inline uint16_t lv_gauge_get_line_count(const lv_obj_t * gauge)
 {
     return lv_lmeter_get_line_count(gauge);
 }

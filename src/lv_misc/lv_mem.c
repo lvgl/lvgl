@@ -456,11 +456,11 @@ static void ent_trunc(lv_mem_ent_t * e, size_t size)
         uint8_t * e_data             = &e->first_data;
         lv_mem_ent_t * after_new_e   = (lv_mem_ent_t *)&e_data[size];
         after_new_e->header.s.used   = 0;
-        after_new_e->header.s.d_size = e->header.s.d_size - size - sizeof(lv_mem_header_t);
+        after_new_e->header.s.d_size = (uint32_t)e->header.s.d_size - size - sizeof(lv_mem_header_t);
     }
 
     /* Set the new size for the original entry */
-    e->header.s.d_size = size;
+    e->header.s.d_size = (uint32_t)size;
 }
 
 #endif
