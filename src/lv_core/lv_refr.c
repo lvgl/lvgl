@@ -132,7 +132,6 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
         }
         disp->inv_p++;
 		lv_task_set_prio(disp->refr_task, LV_REFR_TASK_PRIO);
-		dprintf("refr task enabled\n");
     }
 }
 
@@ -170,7 +169,6 @@ void lv_disp_refr_task(lv_task_t * task)
      * This is done before refreshing in case refreshing invalidates something else.
      */
 	lv_task_set_prio(task, LV_TASK_PRIO_OFF);
-	dprintf("refr task disabled\n");
 
     disp_refr = task->user_data;
 
