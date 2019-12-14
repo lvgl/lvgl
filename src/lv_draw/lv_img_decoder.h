@@ -110,7 +110,7 @@ typedef struct _lv_img_decoder_dsc
     const void * src;
 
     /**Style to draw the image.*/
-    const lv_style_t * style;
+    lv_color_t color;
 
     /**Type of the source: file or variable. Can be set in `open` function if required*/
     lv_img_src_t src_type;
@@ -167,7 +167,7 @@ lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header);
  * @return LV_RES_OK: opened the image. `dsc->img_data` and `dsc->header` are set.
  *         LV_RES_INV: none of the registered image decoders were able to open the image.
  */
-lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const lv_style_t * style);
+lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_color_t color);
 
 /**
  * Read a line from an opened image

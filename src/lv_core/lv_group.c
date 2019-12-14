@@ -550,24 +550,24 @@ static void style_mod_def(lv_group_t * group, lv_style_t * style)
     (void)group; /*Unused*/
 #if LV_COLOR_DEPTH != 1
 
-    /*Make the style to be a little bit orange*/
-    style->body.border.opa   = LV_OPA_COVER;
-    style->body.border.color = LV_COLOR_ORANGE;
-
-    /*If not transparent or has border then emphasis the border*/
-    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
-
-    style->body.main_color   = lv_color_mix(style->body.main_color, LV_COLOR_ORANGE, LV_OPA_70);
-    style->body.grad_color   = lv_color_mix(style->body.grad_color, LV_COLOR_ORANGE, LV_OPA_70);
-    style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_ORANGE, LV_OPA_60);
-
-    style->text.color = lv_color_mix(style->text.color, LV_COLOR_ORANGE, LV_OPA_70);
-
-    /*Add some recolor to the images*/
-    if(style->image.intense < LV_OPA_MIN) {
-        style->image.color   = LV_COLOR_ORANGE;
-        style->image.intense = LV_OPA_40;
-    }
+//    /*Make the style to be a little bit orange*/
+//    style->body.border.opa   = LV_OPA_COVER;
+//    style->body.border.color = LV_COLOR_ORANGE;
+//
+//    /*If not transparent or has border then emphasis the border*/
+//    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+//
+//    style->body.main_color   = lv_color_mix(style->body.main_color, LV_COLOR_ORANGE, LV_OPA_70);
+//    style->body.grad_color   = lv_color_mix(style->body.grad_color, LV_COLOR_ORANGE, LV_OPA_70);
+//    style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_ORANGE, LV_OPA_60);
+//
+//    style->text.color = lv_color_mix(style->text.color, LV_COLOR_ORANGE, LV_OPA_70);
+//
+//    /*Add some recolor to the images*/
+//    if(style->image.intense < LV_OPA_MIN) {
+//        style->image.color   = LV_COLOR_ORANGE;
+//        style->image.intense = LV_OPA_40;
+//    }
 #else
     style->body.border.opa   = LV_OPA_COVER;
     style->body.border.color = LV_COLOR_BLACK;
@@ -586,24 +586,24 @@ static void style_mod_edit_def(lv_group_t * group, lv_style_t * style)
     (void)group; /*Unused*/
 #if LV_COLOR_DEPTH != 1
 
-    /*Make the style to be a little bit orange*/
-    style->body.border.opa   = LV_OPA_COVER;
-    style->body.border.color = LV_COLOR_GREEN;
-
-    /*If not empty or has border then emphasis the border*/
-    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
-
-    style->body.main_color   = lv_color_mix(style->body.main_color, LV_COLOR_GREEN, LV_OPA_70);
-    style->body.grad_color   = lv_color_mix(style->body.grad_color, LV_COLOR_GREEN, LV_OPA_70);
-    style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_GREEN, LV_OPA_60);
-
-    style->text.color = lv_color_mix(style->text.color, LV_COLOR_GREEN, LV_OPA_70);
-
-    /*Add some recolor to the images*/
-    if(style->image.intense < LV_OPA_MIN) {
-        style->image.color   = LV_COLOR_GREEN;
-        style->image.intense = LV_OPA_40;
-    }
+//    /*Make the style to be a little bit orange*/
+//    style->body.border.opa   = LV_OPA_COVER;
+//    style->body.border.color = LV_COLOR_GREEN;
+//
+//    /*If not empty or has border then emphasis the border*/
+//    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
+//
+//    style->body.main_color   = lv_color_mix(style->body.main_color, LV_COLOR_GREEN, LV_OPA_70);
+//    style->body.grad_color   = lv_color_mix(style->body.grad_color, LV_COLOR_GREEN, LV_OPA_70);
+//    style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_GREEN, LV_OPA_60);
+//
+//    style->text.color = lv_color_mix(style->text.color, LV_COLOR_GREEN, LV_OPA_70);
+//
+//    /*Add some recolor to the images*/
+//    if(style->image.intense < LV_OPA_MIN) {
+//        style->image.color   = LV_COLOR_GREEN;
+//        style->image.intense = LV_OPA_40;
+//    }
 
 #else
     style->body.border.opa   = LV_OPA_COVER;

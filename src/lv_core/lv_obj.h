@@ -187,6 +187,11 @@ typedef struct
 } lv_reailgn_t;
 #endif
 
+typedef struct _lv_obj_style_chian_t {
+    lv_style_t * style;
+    struct _lv_obj_style_chian_t * next;
+}lv_obj_style_chian_t;
+
 typedef struct _lv_obj_t
 {
     struct _lv_obj_t * par; /**< Pointer to the parent object*/
@@ -199,7 +204,8 @@ typedef struct _lv_obj_t
     lv_design_cb_t design_cb; /**< Object type specific design function*/
 
     void * ext_attr;            /**< Object type specific extended data*/
-    const lv_style_t * style_p; /**< Pointer to the object's style*/
+    lv_style_t  style_local;
+    lv_obj_style_chian_t style_chain;
 
 #if LV_USE_GROUP != 0
     void * group_p; /**< Pointer to the group of the object*/
@@ -441,6 +447,12 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
  * @param style_p pointer to the new style
  */
 void lv_obj_set_style(lv_obj_t * obj, const lv_style_t * style);
+
+void lv_obj_set_style_color(lv_obj_t * obj, lv_style_property_t prop, lv_color_t color);
+
+void lv_obj_set_style_value(lv_obj_t * obj, lv_style_property_t prop, lv_style_value_t value);
+
+void lv_obj_set_style_opa(lv_obj_t * obj, lv_style_property_t prop, lv_opa_t opa);
 
 /**
  * Notify an object about its style is modified
@@ -790,12 +802,18 @@ lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj);
  * Appearance get
  *---------------*/
 
-/**
- * Get the style pointer of an object (if NULL get style of the parent)
- * @param obj pointer to an object
- * @return pointer to a style
- */
-const lv_style_t * lv_obj_get_style(const lv_obj_t * obj);
+lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, lv_style_property_t prop);
+
+lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, lv_style_property_t prop);
+
+lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, lv_style_property_t prop);
+
+///**
+// * Get the style pointer of an object (if NULL get style of the parent)
+// * @param obj pointer to an object
+// * @return pointer to a style
+// */
+//const lv_style_t * lv_obj_get_style(const lv_obj_t * obj);
 
 /*-----------------
  * Attribute get

@@ -57,22 +57,22 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src, const lv_style_t * style,
 	uint16_t angle, lv_point_t * center, uint16_t zoom, bool antialias, lv_opa_t opa_scale)
 {
-    if(src == NULL) {
-        LV_LOG_WARN("Image draw: src is NULL");
-        lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL, NULL, NULL, LV_BIDI_DIR_LTR);
-        return;
-    }
-
-    lv_res_t res;
-    res = lv_img_draw_core(coords, mask, src, style, angle, center, zoom, antialias, opa_scale);
-
-    if(res == LV_RES_INV) {
-        LV_LOG_WARN("Image draw error");
-        lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL,  NULL, NULL, LV_BIDI_DIR_LTR);
-        return;
-    }
+//    if(src == NULL) {
+//        LV_LOG_WARN("Image draw: src is NULL");
+//        lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
+//        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL, NULL, NULL, LV_BIDI_DIR_LTR);
+//        return;
+//    }
+//
+//    lv_res_t res;
+//    res = lv_img_draw_core(coords, mask, src, style, angle, center, zoom, antialias, opa_scale);
+//
+//    if(res == LV_RES_INV) {
+//        LV_LOG_WARN("Image draw error");
+//        lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
+//        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, "No\ndata", LV_TXT_FLAG_NONE, NULL,  NULL, NULL, LV_BIDI_DIR_LTR);
+//        return;
+//    }
 }
 
 /**
@@ -194,124 +194,124 @@ lv_img_src_t lv_img_src_get_type(const void * src)
 static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
 	const lv_style_t * style, uint16_t angle, lv_point_t * pivot, uint16_t zoom, bool antialias, lv_opa_t opa_scale)
 {
-    lv_opa_t opa =
-            opa_scale == LV_OPA_COVER ? style->image.opa : (uint16_t)((uint16_t)style->image.opa * opa_scale) >> 8;
-
-    lv_img_cache_entry_t * cdsc = lv_img_cache_open(src, style);
-
-    if(cdsc == NULL) return LV_RES_INV;
-
-    bool chroma_keyed = lv_img_cf_is_chroma_keyed(cdsc->dec_dsc.header.cf);
-    bool alpha_byte   = lv_img_cf_has_alpha(cdsc->dec_dsc.header.cf);
-
-    if(cdsc->dec_dsc.error_msg != NULL) {
-        LV_LOG_WARN("Image draw error");
-        lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
-        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, cdsc->dec_dsc.error_msg, LV_TXT_FLAG_NONE, NULL, NULL, NULL, LV_BIDI_DIR_LTR);
-    }
-    /* The decoder open could open the image and gave the entire uncompressed image.
-     * Just draw it!*/
-    else if(cdsc->dec_dsc.img_data) {
-        lv_area_t map_area_rot;
-        lv_area_copy(&map_area_rot, coords);
-        if(angle || zoom != LV_IMG_ZOOM_NONE) {
-            /*Get the exact area which is required to show the rotated image*/
-            lv_coord_t pivot_x = lv_area_get_width(coords) / 2 + coords->x1;
-            lv_coord_t pivot_y = lv_area_get_height(coords) / 2 + coords->y1;
-
-            if (pivot){
-                pivot_x = pivot->x + coords->x1;
-                pivot_y = pivot->y + coords->y1;
-            }
-            lv_coord_t w = lv_area_get_width(coords);
-            lv_coord_t w_zoom = (((w * zoom) >> 8) - w) / 2;
-            lv_coord_t h = lv_area_get_height(coords);
-            lv_coord_t h_zoom = (((h * zoom) >> 8) - h) / 2;
-
-            lv_area_t norm;
-            norm.x1 = coords->x1 - pivot_x - w_zoom;
-            norm.y1 = coords->y1 - pivot_y - h_zoom;
-            norm.x2 = coords->x2 - pivot_x + w_zoom;
-            norm.y2 = coords->y2 - pivot_y + h_zoom;
-
-            int16_t sinma = lv_trigo_sin(angle);
-            int16_t cosma = lv_trigo_sin(angle + 90);
-
-            lv_point_t lt;
-            lv_point_t rt;
-            lv_point_t lb;
-            lv_point_t rb;
-            lt.x = ((cosma * norm.x1 - sinma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_x;
-            lt.y = ((sinma * norm.x1 + cosma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_y;
-
-            rt.x = ((cosma * norm.x2 - sinma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_x;
-            rt.y = ((sinma * norm.x2 + cosma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_y;
-
-            lb.x = ((cosma * norm.x1 - sinma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_x;
-            lb.y = ((sinma * norm.x1 + cosma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_y;
-
-            rb.x = ((cosma * norm.x2 - sinma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_x;
-            rb.y = ((sinma * norm.x2 + cosma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_y;
-
-            map_area_rot.x1 = LV_MATH_MIN(LV_MATH_MIN(LV_MATH_MIN(lb.x, lt.x), rb.x), rt.x);
-            map_area_rot.x2 = LV_MATH_MAX(LV_MATH_MAX(LV_MATH_MAX(lb.x, lt.x), rb.x), rt.x);
-            map_area_rot.y1 = LV_MATH_MIN(LV_MATH_MIN(LV_MATH_MIN(lb.y, lt.y), rb.y), rt.y);
-            map_area_rot.y2 = LV_MATH_MAX(LV_MATH_MAX(LV_MATH_MAX(lb.y, lt.y), rb.y), rt.y);
-        }
-
-        lv_area_t mask_com; /*Common area of mask and coords*/
-        bool union_ok;
-        union_ok = lv_area_intersect(&mask_com, mask, &map_area_rot);
-        if(union_ok == false) {
-            return LV_RES_OK; /*Out of mask. There is nothing to draw so the image is drawn
-                                 successfully.*/
-        }
-
-        lv_draw_map(coords, &mask_com, cdsc->dec_dsc.img_data, opa, chroma_keyed, alpha_byte, style, angle, pivot, zoom, antialias);
-    }
-    /* The whole uncompressed image is not available. Try to read it line-by-line*/
-    else {
-        lv_area_t mask_com; /*Common area of mask and coords*/
-        bool union_ok;
-        union_ok = lv_area_intersect(&mask_com, mask, coords);
-        if(union_ok == false) {
-            return LV_RES_OK; /*Out of mask. There is nothing to draw so the image is drawn
-                                 successfully.*/
-        }
-
-        lv_coord_t width = lv_area_get_width(&mask_com);
-
-        uint8_t  * buf = lv_mem_buf_get(lv_area_get_width(&mask_com) * LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
-
-        lv_area_t line;
-        lv_area_copy(&line, &mask_com);
-        lv_area_set_height(&line, 1);
-        lv_coord_t x = mask_com.x1 - coords->x1;
-        lv_coord_t y = mask_com.y1 - coords->y1;
-        lv_coord_t row;
-        lv_res_t read_res;
-        for(row = mask_com.y1; row <= mask_com.y2; row++) {
-            lv_area_t mask_line;
-            union_ok = lv_area_intersect(&mask_line, mask, &line);
-            if(union_ok == false) continue;
-
-            read_res = lv_img_decoder_read_line(&cdsc->dec_dsc, x, y, width, buf);
-            if(read_res != LV_RES_OK) {
-                lv_img_decoder_close(&cdsc->dec_dsc);
-                LV_LOG_WARN("Image draw can't read the line");
-                lv_mem_buf_release(buf);
-                return LV_RES_INV;
-            }
-
-
-            lv_draw_map(&line, &mask_line, buf, opa, chroma_keyed, alpha_byte, style, 0, NULL, LV_IMG_ZOOM_NONE, false);
-            line.y1++;
-            line.y2++;
-            y++;
-        }
-        lv_mem_buf_release(buf);
-    }
-
+//    lv_opa_t opa =
+//            opa_scale == LV_OPA_COVER ? style->image.opa : (uint16_t)((uint16_t)style->image.opa * opa_scale) >> 8;
+//
+//    lv_img_cache_entry_t * cdsc = lv_img_cache_open(src, style);
+//
+//    if(cdsc == NULL) return LV_RES_INV;
+//
+//    bool chroma_keyed = lv_img_cf_is_chroma_keyed(cdsc->dec_dsc.header.cf);
+//    bool alpha_byte   = lv_img_cf_has_alpha(cdsc->dec_dsc.header.cf);
+//
+//    if(cdsc->dec_dsc.error_msg != NULL) {
+//        LV_LOG_WARN("Image draw error");
+//        lv_draw_rect(coords, mask, &lv_style_plain, LV_OPA_COVER);
+//        lv_draw_label(coords, mask, &lv_style_plain, LV_OPA_COVER, cdsc->dec_dsc.error_msg, LV_TXT_FLAG_NONE, NULL, NULL, NULL, LV_BIDI_DIR_LTR);
+//    }
+//    /* The decoder open could open the image and gave the entire uncompressed image.
+//     * Just draw it!*/
+//    else if(cdsc->dec_dsc.img_data) {
+//        lv_area_t map_area_rot;
+//        lv_area_copy(&map_area_rot, coords);
+//        if(angle || zoom != LV_IMG_ZOOM_NONE) {
+//            /*Get the exact area which is required to show the rotated image*/
+//            lv_coord_t pivot_x = lv_area_get_width(coords) / 2 + coords->x1;
+//            lv_coord_t pivot_y = lv_area_get_height(coords) / 2 + coords->y1;
+//
+//            if (pivot){
+//                pivot_x = pivot->x + coords->x1;
+//                pivot_y = pivot->y + coords->y1;
+//            }
+//            lv_coord_t w = lv_area_get_width(coords);
+//            lv_coord_t w_zoom = (((w * zoom) >> 8) - w) / 2;
+//            lv_coord_t h = lv_area_get_height(coords);
+//            lv_coord_t h_zoom = (((h * zoom) >> 8) - h) / 2;
+//
+//            lv_area_t norm;
+//            norm.x1 = coords->x1 - pivot_x - w_zoom;
+//            norm.y1 = coords->y1 - pivot_y - h_zoom;
+//            norm.x2 = coords->x2 - pivot_x + w_zoom;
+//            norm.y2 = coords->y2 - pivot_y + h_zoom;
+//
+//            int16_t sinma = lv_trigo_sin(angle);
+//            int16_t cosma = lv_trigo_sin(angle + 90);
+//
+//            lv_point_t lt;
+//            lv_point_t rt;
+//            lv_point_t lb;
+//            lv_point_t rb;
+//            lt.x = ((cosma * norm.x1 - sinma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_x;
+//            lt.y = ((sinma * norm.x1 + cosma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_y;
+//
+//            rt.x = ((cosma * norm.x2 - sinma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_x;
+//            rt.y = ((sinma * norm.x2 + cosma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_y;
+//
+//            lb.x = ((cosma * norm.x1 - sinma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_x;
+//            lb.y = ((sinma * norm.x1 + cosma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_y;
+//
+//            rb.x = ((cosma * norm.x2 - sinma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_x;
+//            rb.y = ((sinma * norm.x2 + cosma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_y;
+//
+//            map_area_rot.x1 = LV_MATH_MIN(LV_MATH_MIN(LV_MATH_MIN(lb.x, lt.x), rb.x), rt.x);
+//            map_area_rot.x2 = LV_MATH_MAX(LV_MATH_MAX(LV_MATH_MAX(lb.x, lt.x), rb.x), rt.x);
+//            map_area_rot.y1 = LV_MATH_MIN(LV_MATH_MIN(LV_MATH_MIN(lb.y, lt.y), rb.y), rt.y);
+//            map_area_rot.y2 = LV_MATH_MAX(LV_MATH_MAX(LV_MATH_MAX(lb.y, lt.y), rb.y), rt.y);
+//        }
+//
+//        lv_area_t mask_com; /*Common area of mask and coords*/
+//        bool union_ok;
+//        union_ok = lv_area_intersect(&mask_com, mask, &map_area_rot);
+//        if(union_ok == false) {
+//            return LV_RES_OK; /*Out of mask. There is nothing to draw so the image is drawn
+//                                 successfully.*/
+//        }
+//
+//        lv_draw_map(coords, &mask_com, cdsc->dec_dsc.img_data, opa, chroma_keyed, alpha_byte, style, angle, pivot, zoom, antialias);
+//    }
+//    /* The whole uncompressed image is not available. Try to read it line-by-line*/
+//    else {
+//        lv_area_t mask_com; /*Common area of mask and coords*/
+//        bool union_ok;
+//        union_ok = lv_area_intersect(&mask_com, mask, coords);
+//        if(union_ok == false) {
+//            return LV_RES_OK; /*Out of mask. There is nothing to draw so the image is drawn
+//                                 successfully.*/
+//        }
+//
+//        lv_coord_t width = lv_area_get_width(&mask_com);
+//
+//        uint8_t  * buf = lv_mem_buf_get(lv_area_get_width(&mask_com) * LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
+//
+//        lv_area_t line;
+//        lv_area_copy(&line, &mask_com);
+//        lv_area_set_height(&line, 1);
+//        lv_coord_t x = mask_com.x1 - coords->x1;
+//        lv_coord_t y = mask_com.y1 - coords->y1;
+//        lv_coord_t row;
+//        lv_res_t read_res;
+//        for(row = mask_com.y1; row <= mask_com.y2; row++) {
+//            lv_area_t mask_line;
+//            union_ok = lv_area_intersect(&mask_line, mask, &line);
+//            if(union_ok == false) continue;
+//
+//            read_res = lv_img_decoder_read_line(&cdsc->dec_dsc, x, y, width, buf);
+//            if(read_res != LV_RES_OK) {
+//                lv_img_decoder_close(&cdsc->dec_dsc);
+//                LV_LOG_WARN("Image draw can't read the line");
+//                lv_mem_buf_release(buf);
+//                return LV_RES_INV;
+//            }
+//
+//
+//            lv_draw_map(&line, &mask_line, buf, opa, chroma_keyed, alpha_byte, style, 0, NULL, LV_IMG_ZOOM_NONE, false);
+//            line.y1++;
+//            line.y2++;
+//            y++;
+//        }
+//        lv_mem_buf_release(buf);
+//    }
+//
     return LV_RES_OK;
 }
 
@@ -332,187 +332,187 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
 static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p, lv_opa_t opa,
 	bool chroma_key, bool alpha_byte, const lv_style_t * style, uint16_t angle, lv_point_t * pivot, uint16_t zoom, bool antialaias)
 {
-
-    if(opa < LV_OPA_MIN) return;
-    if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
-
-    /* Use the clip area as draw area*/
-    lv_area_t draw_area;
-    lv_area_copy(&draw_area, clip_area);
-
-    lv_disp_t * disp    = lv_refr_get_disp_refreshing();
-    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
-    const lv_area_t * disp_area = &vdb->area;
-
-    /* Now `draw_area` has absolute coordinates.
-     * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
-    draw_area.x1 -= disp_area->x1;
-    draw_area.y1 -= disp_area->y1;
-    draw_area.x2 -= disp_area->x1;
-    draw_area.y2 -= disp_area->y1;
-
-    uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
-
-    /*The simplest case just copy the pixels into the VDB*/
-    if(other_mask_cnt == 0 && angle == 0 && zoom == LV_IMG_ZOOM_NONE &&
-       chroma_key == false && alpha_byte == false &&
-       opa == LV_OPA_COVER && style->image.intense == LV_OPA_TRANSP) {
-        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, LV_OPA_COVER, style->image.blend_mode);
-    }
-    /*In the other cases every pixel need to be checked one-by-one*/
-    else {
-        /*The pixel size in byte is different if an alpha byte is added too*/
-        uint8_t px_size_byte = alpha_byte ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
-
-        /*Build the image and a mask line-by-line*/
-        uint32_t mask_buf_size = lv_area_get_size(&draw_area) > LV_HOR_RES_MAX ? LV_HOR_RES_MAX : lv_area_get_size(&draw_area);
-        lv_color_t * map2 = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
-        lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
-
-        /*Go to the first displayed pixel of the map*/
-        lv_coord_t map_w = lv_area_get_width(map_area);
-        lv_coord_t map_h = lv_area_get_height(map_area);
-        const uint8_t * map_buf_tmp = map_p;
-        map_buf_tmp += map_w * (draw_area.y1 - (map_area->y1 - disp_area->y1)) * px_size_byte;
-        map_buf_tmp += (draw_area.x1 - (map_area->x1 - disp_area->x1)) * px_size_byte;
-
-        lv_color_t c;
-        lv_color_t chroma_keyed_color = LV_COLOR_TRANSP;
-        uint32_t px_i = 0;
-        uint32_t px_i_start;
-
-        const uint8_t * map_px;
-
-        lv_area_t blend_area;
-        blend_area.x1 = draw_area.x1 + disp_area->x1;
-        blend_area.x2 = blend_area.x1 + lv_area_get_width(&draw_area) - 1;
-        blend_area.y1 = disp_area->y1 + draw_area.y1;
-        blend_area.y2 = blend_area.y1;
-
-        /*Prepare the `mask_buf`if there are other masks*/
-        if(other_mask_cnt) {
-            memset(mask_buf, 0xFF, mask_buf_size);
-        }
-
-
-        bool transform = angle != 0 || zoom != LV_IMG_ZOOM_NONE ? true : false;
-        lv_img_transform_dsc_t trans_dsc;
-        memset(&trans_dsc, 0, sizeof(lv_img_transform_dsc_t));
-        if(transform) {
-            lv_img_cf_t cf = LV_IMG_CF_TRUE_COLOR;
-            if(alpha_byte) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
-            else if(chroma_key) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
-
-
-            trans_dsc.cfg.angle = angle;
-            trans_dsc.cfg.zoom = zoom;
-            trans_dsc.cfg.src = map_p;
-            trans_dsc.cfg.src_w = map_w;
-            trans_dsc.cfg.src_h = map_h;
-            trans_dsc.cfg.cf = cf;
-            trans_dsc.cfg.pivot_x = map_w / 2;
-            trans_dsc.cfg.pivot_y = map_h / 2;
-            if (pivot){
-                trans_dsc.cfg.pivot_x = pivot->x;
-                trans_dsc.cfg.pivot_y = pivot->y;
-            }
-            trans_dsc.cfg.color = style->image.color;
-            trans_dsc.cfg.antialias = antialaias;
-
-            lv_img_buf_transform_init(&trans_dsc);
-        }
-
-        lv_draw_mask_res_t mask_res;
-        mask_res = (alpha_byte || chroma_key || angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
-        lv_coord_t x;
-        lv_coord_t y;
-        for(y = 0; y < lv_area_get_height(&draw_area); y++) {
-            map_px = map_buf_tmp;
-            px_i_start = px_i;
-
-            for(x = 0; x < lv_area_get_width(&draw_area); x++, map_px += px_size_byte, px_i++) {
-
-                if(transform == false) {
-                    if(alpha_byte) {
-                        lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
-                        mask_buf[px_i] = px_opa;
-                        if(px_opa < LV_OPA_MIN) continue;
-                    } else {
-                        mask_buf[px_i] = LV_OPA_COVER;
-                    }
-
-#if LV_COLOR_DEPTH == 8
-                    c.full =  map_px[0];
-#elif LV_COLOR_DEPTH == 16
-                    c.full =  map_px[0] + (map_px[1] << 8);
-#elif LV_COLOR_DEPTH == 32
-                    c.full =  *((uint32_t*)map_px);
-#endif
-                    if (chroma_key) {
-                        if(c.full == chroma_keyed_color.full) {
-                            mask_buf[px_i] = LV_OPA_TRANSP;
-                            continue;
-                        }
-                    }
-                } else {
-                    /*Rotate*/
-                    bool ret;
-                    lv_coord_t rot_x = x + (disp_area->x1 + draw_area.x1) - map_area->x1;
-                    lv_coord_t rot_y = y + (disp_area->y1 + draw_area.y1) - map_area->y1;
-                    ret = lv_img_buf_transform(&trans_dsc, rot_x, rot_y);
-                    if(ret == false) {
-                        mask_buf[px_i] = LV_OPA_TRANSP;
-                        continue;
-                    } else {
-                        mask_buf[px_i] = trans_dsc.res.opa;
-                        c.full = trans_dsc.res.color.full;
-                    }
-                }
-
-                if(style->image.intense != 0) {
-                    c = lv_color_mix(style->image.color, c, style->image.intense);
-                }
-
-                map2[px_i].full = c.full;
-            }
-
-            /*Apply the masks if any*/
-            if(other_mask_cnt) {
-                lv_draw_mask_res_t mask_res_sub;
-                mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1, lv_area_get_width(&draw_area));
-                if(mask_res_sub == LV_DRAW_MASK_RES_FULL_TRANSP) {
-                    memset(mask_buf + px_i_start, 0x00, lv_area_get_width(&draw_area));
-                    mask_res = LV_DRAW_MASK_RES_CHANGED;
-                } else if(mask_res_sub == LV_DRAW_MASK_RES_CHANGED) {
-                    mask_res = LV_DRAW_MASK_RES_CHANGED;
-                }
-            }
-
-            map_buf_tmp += map_w * px_size_byte;
-            if(px_i + lv_area_get_width(&draw_area) < mask_buf_size) {
-                blend_area.y2 ++;
-            } else {
-                lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, style->image.blend_mode);
-
-                blend_area.y1 = blend_area.y2 + 1;
-                blend_area.y2 = blend_area.y1;
-
-                px_i = 0;
-                mask_res = (alpha_byte || chroma_key || angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
-
-                /*Prepare the `mask_buf`if there are other masks*/
-                if(other_mask_cnt) {
-                    memset(mask_buf, 0xFF, mask_buf_size);
-                }
-            }
-        }
-        /*Flush the last part*/
-        if(blend_area.y1 != blend_area.y2) {
-            blend_area.y2--;
-            lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, style->image.blend_mode);
-        }
-
-        lv_mem_buf_release(mask_buf);
-        lv_mem_buf_release(map2);
-    }
+//
+//    if(opa < LV_OPA_MIN) return;
+//    if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
+//
+//    /* Use the clip area as draw area*/
+//    lv_area_t draw_area;
+//    lv_area_copy(&draw_area, clip_area);
+//
+//    lv_disp_t * disp    = lv_refr_get_disp_refreshing();
+//    lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
+//    const lv_area_t * disp_area = &vdb->area;
+//
+//    /* Now `draw_area` has absolute coordinates.
+//     * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
+//    draw_area.x1 -= disp_area->x1;
+//    draw_area.y1 -= disp_area->y1;
+//    draw_area.x2 -= disp_area->x1;
+//    draw_area.y2 -= disp_area->y1;
+//
+//    uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
+//
+//    /*The simplest case just copy the pixels into the VDB*/
+//    if(other_mask_cnt == 0 && angle == 0 && zoom == LV_IMG_ZOOM_NONE &&
+//       chroma_key == false && alpha_byte == false &&
+//       opa == LV_OPA_COVER && style->image.intense == LV_OPA_TRANSP) {
+//        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, LV_OPA_COVER, style->image.blend_mode);
+//    }
+//    /*In the other cases every pixel need to be checked one-by-one*/
+//    else {
+//        /*The pixel size in byte is different if an alpha byte is added too*/
+//        uint8_t px_size_byte = alpha_byte ? LV_IMG_PX_SIZE_ALPHA_BYTE : sizeof(lv_color_t);
+//
+//        /*Build the image and a mask line-by-line*/
+//        uint32_t mask_buf_size = lv_area_get_size(&draw_area) > LV_HOR_RES_MAX ? LV_HOR_RES_MAX : lv_area_get_size(&draw_area);
+//        lv_color_t * map2 = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
+//        lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
+//
+//        /*Go to the first displayed pixel of the map*/
+//        lv_coord_t map_w = lv_area_get_width(map_area);
+//        lv_coord_t map_h = lv_area_get_height(map_area);
+//        const uint8_t * map_buf_tmp = map_p;
+//        map_buf_tmp += map_w * (draw_area.y1 - (map_area->y1 - disp_area->y1)) * px_size_byte;
+//        map_buf_tmp += (draw_area.x1 - (map_area->x1 - disp_area->x1)) * px_size_byte;
+//
+//        lv_color_t c;
+//        lv_color_t chroma_keyed_color = LV_COLOR_TRANSP;
+//        uint32_t px_i = 0;
+//        uint32_t px_i_start;
+//
+//        const uint8_t * map_px;
+//
+//        lv_area_t blend_area;
+//        blend_area.x1 = draw_area.x1 + disp_area->x1;
+//        blend_area.x2 = blend_area.x1 + lv_area_get_width(&draw_area) - 1;
+//        blend_area.y1 = disp_area->y1 + draw_area.y1;
+//        blend_area.y2 = blend_area.y1;
+//
+//        /*Prepare the `mask_buf`if there are other masks*/
+//        if(other_mask_cnt) {
+//            memset(mask_buf, 0xFF, mask_buf_size);
+//        }
+//
+//
+//        bool transform = angle != 0 || zoom != LV_IMG_ZOOM_NONE ? true : false;
+//        lv_img_transform_dsc_t trans_dsc;
+//        memset(&trans_dsc, 0, sizeof(lv_img_transform_dsc_t));
+//        if(transform) {
+//            lv_img_cf_t cf = LV_IMG_CF_TRUE_COLOR;
+//            if(alpha_byte) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
+//            else if(chroma_key) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
+//
+//
+//            trans_dsc.cfg.angle = angle;
+//            trans_dsc.cfg.zoom = zoom;
+//            trans_dsc.cfg.src = map_p;
+//            trans_dsc.cfg.src_w = map_w;
+//            trans_dsc.cfg.src_h = map_h;
+//            trans_dsc.cfg.cf = cf;
+//            trans_dsc.cfg.pivot_x = map_w / 2;
+//            trans_dsc.cfg.pivot_y = map_h / 2;
+//            if (pivot){
+//                trans_dsc.cfg.pivot_x = pivot->x;
+//                trans_dsc.cfg.pivot_y = pivot->y;
+//            }
+//            trans_dsc.cfg.color = style->image.color;
+//            trans_dsc.cfg.antialias = antialaias;
+//
+//            lv_img_buf_transform_init(&trans_dsc);
+//        }
+//
+//        lv_draw_mask_res_t mask_res;
+//        mask_res = (alpha_byte || chroma_key || angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+//        lv_coord_t x;
+//        lv_coord_t y;
+//        for(y = 0; y < lv_area_get_height(&draw_area); y++) {
+//            map_px = map_buf_tmp;
+//            px_i_start = px_i;
+//
+//            for(x = 0; x < lv_area_get_width(&draw_area); x++, map_px += px_size_byte, px_i++) {
+//
+//                if(transform == false) {
+//                    if(alpha_byte) {
+//                        lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
+//                        mask_buf[px_i] = px_opa;
+//                        if(px_opa < LV_OPA_MIN) continue;
+//                    } else {
+//                        mask_buf[px_i] = LV_OPA_COVER;
+//                    }
+//
+//#if LV_COLOR_DEPTH == 8
+//                    c.full =  map_px[0];
+//#elif LV_COLOR_DEPTH == 16
+//                    c.full =  map_px[0] + (map_px[1] << 8);
+//#elif LV_COLOR_DEPTH == 32
+//                    c.full =  *((uint32_t*)map_px);
+//#endif
+//                    if (chroma_key) {
+//                        if(c.full == chroma_keyed_color.full) {
+//                            mask_buf[px_i] = LV_OPA_TRANSP;
+//                            continue;
+//                        }
+//                    }
+//                } else {
+//                    /*Rotate*/
+//                    bool ret;
+//                    lv_coord_t rot_x = x + (disp_area->x1 + draw_area.x1) - map_area->x1;
+//                    lv_coord_t rot_y = y + (disp_area->y1 + draw_area.y1) - map_area->y1;
+//                    ret = lv_img_buf_transform(&trans_dsc, rot_x, rot_y);
+//                    if(ret == false) {
+//                        mask_buf[px_i] = LV_OPA_TRANSP;
+//                        continue;
+//                    } else {
+//                        mask_buf[px_i] = trans_dsc.res.opa;
+//                        c.full = trans_dsc.res.color.full;
+//                    }
+//                }
+//
+//                if(style->image.intense != 0) {
+//                    c = lv_color_mix(style->image.color, c, style->image.intense);
+//                }
+//
+//                map2[px_i].full = c.full;
+//            }
+//
+//            /*Apply the masks if any*/
+//            if(other_mask_cnt) {
+//                lv_draw_mask_res_t mask_res_sub;
+//                mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1, lv_area_get_width(&draw_area));
+//                if(mask_res_sub == LV_DRAW_MASK_RES_FULL_TRANSP) {
+//                    memset(mask_buf + px_i_start, 0x00, lv_area_get_width(&draw_area));
+//                    mask_res = LV_DRAW_MASK_RES_CHANGED;
+//                } else if(mask_res_sub == LV_DRAW_MASK_RES_CHANGED) {
+//                    mask_res = LV_DRAW_MASK_RES_CHANGED;
+//                }
+//            }
+//
+//            map_buf_tmp += map_w * px_size_byte;
+//            if(px_i + lv_area_get_width(&draw_area) < mask_buf_size) {
+//                blend_area.y2 ++;
+//            } else {
+//                lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, style->image.blend_mode);
+//
+//                blend_area.y1 = blend_area.y2 + 1;
+//                blend_area.y2 = blend_area.y1;
+//
+//                px_i = 0;
+//                mask_res = (alpha_byte || chroma_key || angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+//
+//                /*Prepare the `mask_buf`if there are other masks*/
+//                if(other_mask_cnt) {
+//                    memset(mask_buf, 0xFF, mask_buf_size);
+//                }
+//            }
+//        }
+//        /*Flush the last part*/
+//        if(blend_area.y1 != blend_area.y2) {
+//            blend_area.y2--;
+//            lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, opa, style->image.blend_mode);
+//        }
+//
+//        lv_mem_buf_release(mask_buf);
+//        lv_mem_buf_release(map2);
+//    }
 }

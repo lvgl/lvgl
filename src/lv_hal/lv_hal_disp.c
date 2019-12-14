@@ -139,8 +139,10 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp->act_scr   = lv_obj_create(NULL, NULL); /*Create a default screen on the display*/
     disp->top_layer = lv_obj_create(NULL, NULL); /*Create top layer on the display*/
     disp->sys_layer = lv_obj_create(NULL, NULL); /*Create sys layer on the display*/
-    lv_obj_set_style(disp->top_layer, &lv_style_transp);
-    lv_obj_set_style(disp->sys_layer, &lv_style_transp);
+//    lv_obj_set_style(disp->top_layer, &lv_style_transp);
+//    lv_obj_set_style(disp->sys_layer, &lv_style_transp);
+    lv_obj_set_hidden(disp->top_layer, true);
+    lv_obj_set_hidden(disp->sys_layer, true);
 
     lv_obj_invalidate(disp->act_scr);
 

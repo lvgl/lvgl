@@ -18,6 +18,7 @@ extern "C" {
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_anim.h"
+#include "../lv_misc/lv_types.h"
 #include "../lv_draw/lv_draw_blend.h"
 
 /*********************
@@ -44,8 +45,6 @@ enum {
 };
 typedef uint8_t lv_border_part_t;
 
-
-
 enum {
     LV_GRAD_DIR_NONE,
     LV_GRAD_DIR_VER,
@@ -54,100 +53,63 @@ enum {
 
 typedef uint8_t lv_grad_dir_t;
 
-/**
- * Styles can be assigned to objects - which holds information about
- * how the object should be drawn.
- * 
- * This allows for easy customization without having to modify the object's design
- * function.
- */
-typedef struct
-{
-    uint8_t glass : 1; /**< 1: Do not inherit this style*/
+#define LV_STYLE_PROP_INIT(name, id, attr)  name = (id | ((attr) << 8))
 
-    /** Object background. */
-    struct
-    {
-        lv_color_t main_color; /**< Object's main background color. */
-        lv_color_t grad_color; /**< Second color. If not equal to `main_color` a gradient will be drawn for the background. */
-        lv_coord_t radius; /**< Object's corner radius. You can use #LV_RADIUS_CIRCLE if you want to draw a circle. */
-        lv_opa_t opa; /**< Object's opacity (0-255). */
-        uint8_t main_color_stop;    /**< 0..255 proportionally where should the gradient start (the main color stop)*/
-        uint8_t grad_color_stop;    /**< 0..255 proportionally where should the gradient stop (the grad_color start) */
-        lv_blend_mode_t blend_mode :3;
-        lv_grad_dir_t grad_dir     :2; /**< LV_GRAD_DIR_NONE/VER/HOR*/
-        uint8_t corner_mask        :1; /**< Crop the overflowing content from the rounded corners */
+#define LV_STYLE_ID_MASK 0x00FF
 
-        struct
-        {
-            lv_color_t color; /**< Border color */
-            lv_coord_t width; /**< Border width */
-            lv_border_part_t part; /**< Which borders to draw */
-            lv_opa_t opa; /**< Border opacity. */
-            lv_blend_mode_t blend_mode :3;
-        } border;
+#define LV_STYLE_ATTR_TYPE_OPA      (0 << 0)
+#define LV_STYLE_ATTR_TYPE_VALUE    (1 << 0)
+#define LV_STYLE_ATTR_TYPE_COLOR    (2 << 0)
+#define LV_STYLE_ATTR_TYPE_PTR      (3 << 0)
+#define LV_STYLE_ATTR_INHERIT       (1 << 3)
 
-        
-        struct
-        {
-            lv_color_t color;
-            lv_coord_t width;
-            lv_coord_t spread;
-            lv_point_t offset;
-            lv_opa_t opa;
-            lv_blend_mode_t blend_mode :3;
-        } shadow;
+#define LV_STYLE_ATTR_FLAGS_MASK    (0x7 << 5)
 
-        struct
-        {
-            lv_coord_t top;
-            lv_coord_t bottom;
-            lv_coord_t left;
-            lv_coord_t right;
-            lv_coord_t inner;
-        } padding;
-    } body;
+typedef union {
+    struct {
+        uint8_t type        :3;
+        uint8_t inherit     :1; /*1: The property can be inherited*/
+        uint8_t cached      :1; /*1: Not a real property of this style  just cached from an other style*/
+        uint8_t reserved    :3;
+    }bits;
+    uint8_t full;
+}lv_style_attr_t;
 
-    /** Style for text drawn by this object. */
-    struct
-    {
-        lv_color_t color; /**< Text color */
-        lv_color_t sel_color; /**< Text selection background color. */
-        const lv_font_t * font;
-        lv_coord_t letter_space; /**< Space between letters */
-        lv_coord_t line_space; /**< Space between lines (vertical) */
-        lv_opa_t opa; /**< Text opacity */
-        lv_blend_mode_t blend_mode :3;
-        uint8_t underline :1;
-        uint8_t strikethrough :1;
-    } text;
+enum {
+    LV_STYLE_PROP_INIT(LV_STYLE_RADIUS,             0x01, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PAD_TOP,            0x04, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PAD_BOTTOM,         0x05, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PAD_LEFT,           0x06, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PAD_RIGHT,          0x07, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_COLOR,           0x10, LV_STYLE_ATTR_TYPE_COLOR),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_OPA,             0x11, LV_STYLE_ATTR_TYPE_OPA),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_CLIP_CORNER,     0x12, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_BLEND_MODE,      0x13, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BORDER_COLOR,       0x20, LV_STYLE_ATTR_TYPE_COLOR),
+    LV_STYLE_PROP_INIT(LV_STYLE_BORDER_OPA,         0x21, LV_STYLE_ATTR_TYPE_OPA),
+    LV_STYLE_PROP_INIT(LV_STYLE_BORDER_WIDTH,       0x22, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BORDER_PART,        0x23, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BORDER_BLEND_MODE,  0x24, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_WIDTH,       0x30, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_COLOR,       0x31, LV_STYLE_ATTR_TYPE_COLOR),
+    LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_OFFSET_X,    0x32, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_OFFSET_Y,    0x33, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_SPREAD,      0x34, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_OPA,         0x35, LV_STYLE_ATTR_TYPE_OPA),
+    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_COLOR,         0x40, LV_STYLE_ATTR_TYPE_COLOR),
+    LV_STYLE_PROP_INIT(LV_STYLE_LINE_COLOR,         0x50, LV_STYLE_ATTR_TYPE_COLOR),
+    LV_STYLE_PROP_INIT(LV_STYLE_IMG_COLOR,          0x60, LV_STYLE_ATTR_TYPE_COLOR),
+};
 
-    /**< Style of images. */
-    struct
-    {
-        lv_color_t color; /**< Color to recolor the image with */
-        lv_opa_t intense; /**< Opacity of recoloring (0 means no recoloring) */
-        lv_opa_t opa; /**< Opacity of whole image */
-        lv_blend_mode_t blend_mode :3;
-    } image;
+typedef uint16_t lv_style_property_t;
 
-    /**< Style of lines (not borders). */
-    struct
-    {
-        lv_color_t color;
-        lv_coord_t width;
-        lv_opa_t opa;
-        uint8_t rounded : 1; /**< 1: rounded line endings*/
-        lv_blend_mode_t blend_mode :3;
-    } line;
+typedef struct {
+    uint8_t * map;
+    uint16_t used_groups;
+    uint16_t size;
+}lv_style_t;
 
-#if LV_USE_DEBUG
-#if LV_USE_ASSERT_STYLE
-    uint32_t debug_sentinel; /**<Should `LV_STYLE_DEGUG_SENTINEL_VALUE` to indicate that the style is valid*/
-#endif
-#endif
-
-} lv_style_t;
+typedef int16_t lv_style_value_t;
 
 #if LV_USE_ANIMATION
 /** Data structure for style animations. */
@@ -165,10 +127,13 @@ typedef struct
  * GLOBAL PROTOTYPES
  **********************/
 
+
 /**
- *  Init the basic styles
+ *  Init. the built-in styles
  */
-void lv_style_init(void);
+void lv_style_built_in_init(void);
+
+void lv_style_init(lv_style_t * style);
 
 /**
  * Copy a style to an other
@@ -185,6 +150,14 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
  * @param ratio the ratio of mix [0..256]; 0: `start` style; 256: `end` style
  */
 void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res, uint16_t ratio);
+
+void lv_style_set_value(lv_style_t * style, lv_style_property_t prop, lv_style_value_t value);
+void lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_t color);
+void lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa);
+
+lv_res_t lv_style_get_value(const lv_style_t * style, lv_style_property_t prop, lv_style_value_t * res);
+lv_res_t lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res);
+lv_res_t lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res);
 
 #if LV_USE_ANIMATION
 
@@ -282,19 +255,19 @@ static inline void lv_style_anim_create(lv_anim_t * a)
 /*************************
  *    GLOBAL VARIABLES
  *************************/
-extern lv_style_t lv_style_scr;
-extern lv_style_t lv_style_transp;
-extern lv_style_t lv_style_transp_fit;
-extern lv_style_t lv_style_transp_tight;
-extern lv_style_t lv_style_plain;
-extern lv_style_t lv_style_plain_color;
-extern lv_style_t lv_style_pretty;
-extern lv_style_t lv_style_pretty_color;
-extern lv_style_t lv_style_btn_rel;
-extern lv_style_t lv_style_btn_pr;
-extern lv_style_t lv_style_btn_tgl_rel;
-extern lv_style_t lv_style_btn_tgl_pr;
-extern lv_style_t lv_style_btn_ina;
+//extern lv_style_t lv_style_scr;
+//extern lv_style_t lv_style_transp;
+//extern lv_style_t lv_style_transp_fit;
+//extern lv_style_t lv_style_transp_tight;
+//extern lv_style_t lv_style_plain;
+//extern lv_style_t lv_style_plain_color;
+//extern lv_style_t lv_style_pretty;
+//extern lv_style_t lv_style_pretty_color;
+//extern lv_style_t lv_style_btn_rel;
+//extern lv_style_t lv_style_btn_pr;
+//extern lv_style_t lv_style_btn_tgl_rel;
+//extern lv_style_t lv_style_btn_tgl_pr;
+//extern lv_style_t lv_style_btn_ina;
 
 /**********************
  *      MACROS

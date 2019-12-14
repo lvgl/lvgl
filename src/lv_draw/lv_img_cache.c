@@ -62,7 +62,7 @@ static uint16_t entry_cnt;
  * @param style style of the image
  * @return pointer to the cache entry or NULL if can open the image
  */
-lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * style)
+lv_img_cache_entry_t * lv_img_cache_open(const void * src, lv_color_t color)
 {
     if(entry_cnt == 0) {
         LV_LOG_WARN("lv_img_cache_open: the cache size is 0");
@@ -124,7 +124,7 @@ lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * st
         uint32_t t_start;
         t_start                          = lv_tick_get();
         cached_src->dec_dsc.time_to_open = 0;
-        lv_res_t open_res                = lv_img_decoder_open(&cached_src->dec_dsc, src, style);
+        lv_res_t open_res                = lv_img_decoder_open(&cached_src->dec_dsc, src, color);
         if(open_res == LV_RES_INV) {
             LV_LOG_WARN("Image draw cannot open the image resource");
             lv_img_decoder_close(&cached_src->dec_dsc);
