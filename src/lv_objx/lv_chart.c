@@ -188,8 +188,6 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 
     lv_coord_t def = LV_CHART_POINT_DEF;
 
-    if(ser == NULL) return NULL;
-
     ser->color  = color;
     ser->points = lv_mem_alloc(sizeof(lv_coord_t) * ext->point_cnt);
     LV_ASSERT_MEM(ser->points);
