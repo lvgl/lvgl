@@ -205,7 +205,7 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         }
 
         /* Test if this character fits within max_width */
-        if(break_index == NO_BREAK_FOUND && cur_w > max_width) {
+        if(break_index == NO_BREAK_FOUND && (cur_w - letter_space) > max_width) {
             break_index = i; 
             break_letter_count = word_len - 1;
             /* break_index is now pointing at the character that doesn't fit */
