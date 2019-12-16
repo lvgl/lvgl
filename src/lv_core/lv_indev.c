@@ -1366,7 +1366,6 @@ static void indev_gesture(lv_indev_proc_t * proc)
 	    (LV_MATH_ABS(proc->types.pointer.gesture_sum.y) > indev_act->driver.gesture_limit)){
 
 	    proc->types.pointer.gesture_sent = 1;
-	    proc->wait_until_release = 1;
 
 	    if (LV_MATH_ABS(proc->types.pointer.gesture_sum.x) > LV_MATH_ABS(proc->types.pointer.gesture_sum.y)){
 	        if (proc->types.pointer.gesture_sum.x > 0)
