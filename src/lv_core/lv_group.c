@@ -442,7 +442,7 @@ lv_group_user_data_t * lv_group_get_user_data(lv_group_t * group)
  */
 lv_group_style_mod_cb_t lv_group_get_style_mod_cb(const lv_group_t * group)
 {
-    if(!group) return false;
+    if(!group) return NULL;
     return group->style_mod_cb;
 }
 
@@ -453,7 +453,7 @@ lv_group_style_mod_cb_t lv_group_get_style_mod_cb(const lv_group_t * group)
  */
 lv_group_style_mod_cb_t lv_group_get_style_mod_edit_cb(const lv_group_t * group)
 {
-    if(!group) return false;
+    if(!group) return NULL;
     return group->style_mod_edit_cb;
 }
 
@@ -464,7 +464,7 @@ lv_group_style_mod_cb_t lv_group_get_style_mod_edit_cb(const lv_group_t * group)
  */
 lv_group_focus_cb_t lv_group_get_focus_cb(const lv_group_t * group)
 {
-    if(!group) return false;
+    if(!group) return NULL;
     return group->focus_cb;
 }
 

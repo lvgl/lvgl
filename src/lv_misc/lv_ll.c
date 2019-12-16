@@ -136,7 +136,6 @@ void * lv_ll_ins_tail(lv_ll_t * ll_p)
     lv_ll_node_t * n_new;
 
     n_new = lv_mem_alloc(ll_p->n_size + LL_NODE_META_SIZE);
-    if(n_new == NULL) return NULL;
 
     if(n_new != NULL) {
         node_set_next(ll_p, n_new, NULL);       /*No next after the new tail*/
