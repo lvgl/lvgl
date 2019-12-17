@@ -81,6 +81,12 @@ void lv_style_init(lv_style_t * style)
     style->used_groups = 0;
 }
 
+void lv_style_dsc_init(lv_style_dsc_t * style_dsc)
+{
+    lv_style_init(&style_dsc->local);
+    style_dsc->classes = NULL;
+}
+
 /**
  * Copy a style to an other
  * @param dest pointer to the destination style

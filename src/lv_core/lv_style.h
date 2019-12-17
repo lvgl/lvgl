@@ -81,6 +81,7 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_BOTTOM,         0x05, LV_STYLE_ATTR_TYPE_VALUE),
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_LEFT,           0x06, LV_STYLE_ATTR_TYPE_VALUE),
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_RIGHT,          0x07, LV_STYLE_ATTR_TYPE_VALUE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PAD_INNER,          0x09, LV_STYLE_ATTR_TYPE_VALUE),
     LV_STYLE_PROP_INIT(LV_STYLE_BG_COLOR,           0x10, LV_STYLE_ATTR_TYPE_COLOR),
     LV_STYLE_PROP_INIT(LV_STYLE_BG_OPA,             0x11, LV_STYLE_ATTR_TYPE_OPA),
     LV_STYLE_PROP_INIT(LV_STYLE_BG_CLIP_CORNER,     0x12, LV_STYLE_ATTR_TYPE_VALUE),
@@ -109,6 +110,17 @@ typedef struct {
     uint16_t size;
 }lv_style_t;
 
+typedef struct _lv_style_class_list_t {
+    lv_style_t * style;
+    struct _lv_style_class_list_t * next;
+}lv_style_class_list_t;
+
+typedef struct {
+    lv_style_t  local;
+    lv_style_class_list_t * classes;
+}lv_style_dsc_t;
+
+
 typedef int16_t lv_style_value_t;
 
 #if LV_USE_ANIMATION
@@ -134,6 +146,8 @@ typedef struct
 void lv_style_built_in_init(void);
 
 void lv_style_init(lv_style_t * style);
+
+void lv_style_dsc_init(lv_style_dsc_t * style_dsc);
 
 /**
  * Copy a style to an other
