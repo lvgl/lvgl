@@ -35,6 +35,7 @@ extern "C" {
 #include "src/lv_font/lv_font_fmt_txt.h"
 #include "src/lv_misc/lv_bidi.h"
 #include "src/lv_misc/lv_printf.h"
+#include "src/lv_misc/lv_point.h"
 
 #include "src/lv_objx/lv_btn.h"
 #include "src/lv_objx/lv_imgbtn.h"

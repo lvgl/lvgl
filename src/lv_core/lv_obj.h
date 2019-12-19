@@ -147,6 +147,7 @@ enum {
 typedef uint8_t lv_signal_t;
 
 typedef lv_res_t (*lv_signal_cb_t)(struct _lv_obj_t * obj, lv_signal_t sign, void * param);
+typedef bool (*lv_hittest_cb_t)(struct _lv_obj_t * obj, const lv_point_t * point);
 
 /** Object alignment. */
 enum {
@@ -197,6 +198,7 @@ typedef struct _lv_obj_t
     lv_event_cb_t event_cb; /**< Event callback function */
     lv_signal_cb_t signal_cb; /**< Object type specific signal function*/
     lv_design_cb_t design_cb; /**< Object type specific design function*/
+    lv_hittest_cb_t hit_cb;   /**< Object type specific advanced hit-test function */
 
     void * ext_attr;            /**< Object type specific extended data*/
     const lv_style_t * style_p; /**< Pointer to the object's style*/
@@ -225,7 +227,8 @@ typedef struct _lv_obj_t
     uint8_t parent_event : 1;   /**< 1: Send the object's events to the parent too. */
     lv_drag_dir_t drag_dir : 3; /**<  Which directions the object can be dragged in */
     lv_bidi_dir_t base_dir : 2; /**< Base direction of texts related to this object */
-    uint8_t reserved : 3;       /**<  Reserved for future use*/
+    uint8_t adv_hittest : 1;    /**< 1: Use advanced hit-testing (slower) */
+    uint8_t reserved : 2;       /**<  Reserved for future use*/
     uint8_t protect;            /**< Automatically happening actions can be prevented. 'OR'ed values from
                                    `lv_protect_t`*/
     lv_opa_t opa_scale;         /**< Scale down the opacity by this factor. Effects all children as well*/
@@ -467,6 +470,13 @@ void lv_obj_report_style_mod(lv_style_t * style);
 void lv_obj_set_hidden(lv_obj_t * obj, bool en);
 
 /**
+ * Set whether advanced hit-testing is enabled on an object
+ * @param obj pointer to an object
+ * @param en true: advanced hit-testing is enabled
+ */
+void lv_obj_set_adv_hittest(lv_obj_t * obj, bool en);
+
+/**
  * Enable or disable the clicking of an object
  * @param obj pointer to an object
  * @param en true: make the object clickable
@@ -591,6 +601,13 @@ const void * lv_event_get_data(void);
  * @param signal_cb the new signal function
  */
 void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb);
+
+/**
+ * Set the advanced hit-test callback of an object. Used internally by the library.
+ * @param obj pointer to an object
+ * @param cb the new signal function
+ */
+void lv_obj_set_hit_test_cb(lv_obj_t * obj, lv_hittest_cb_t hit_cb);
 
 /**
  * Send an event to the object
@@ -809,6 +826,13 @@ const lv_style_t * lv_obj_get_style(const lv_obj_t * obj);
 bool lv_obj_get_hidden(const lv_obj_t * obj);
 
 /**
+ * Get whether advanced hit-testing is enabled on an object
+ * @param obj pointer to an object
+ * @return true: advanced hit-testing is enabled
+ */
+bool lv_obj_get_adv_hittest(const lv_obj_t * obj);
+
+/**
  * Get the click enable attribute of an object
  * @param obj pointer to an object
  * @return true: the object is clickable
@@ -897,6 +921,13 @@ bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
 lv_signal_cb_t lv_obj_get_signal_cb(const lv_obj_t * obj);
 
 /**
+ * Get the hit test function of an object
+ * @param obj pointer to an object
+ * @return the hit test function
+ */
+lv_hittest_cb_t lv_obj_get_hit_test_cb(const lv_obj_t * obj);
+
+/**
  * Get the design function of an object
  * @param obj pointer to an object
  * @return the design function
@@ -913,6 +944,8 @@ lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj);
 /*------------------
  * Other get
  *-----------------*/
+
+bool lv_obj_hittest(lv_obj_t * obj, lv_point_t * point);
 
 /**
  * Get the ext pointer

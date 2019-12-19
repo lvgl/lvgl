@@ -201,6 +201,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->group_p = NULL;
 #endif
         /*Set attributes*/
+        new_obj->adv_hittest  = 0;
         new_obj->click        = 0;
         new_obj->drag         = 0;
         new_obj->drag_throw   = 0;
@@ -239,6 +240,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         /*Set the callbacks*/
         new_obj->signal_cb = lv_obj_signal;
         new_obj->design_cb = lv_obj_design;
+        new_obj->hit_cb = NULL;
         new_obj->event_cb = NULL;
 
 #if LV_USE_BIDI
@@ -1276,6 +1278,17 @@ void lv_obj_set_hidden(lv_obj_t * obj, bool en)
 }
 
 /**
+ * Set whether advanced hit-testing is enabled on an object
+ * @param obj pointer to an object
+ * @param en true: advanced hit-testing is enabled
+ */
+void lv_obj_set_adv_hittest(lv_obj_t * obj, bool en) {
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    obj->adv_hittest = en == false ? 0 : 1;
+}
+
+/**
  * Enable or disable the clicking of an object
  * @param obj pointer to an object
  * @param en true: make the object clickable
@@ -1544,6 +1557,18 @@ void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     obj->signal_cb = signal_cb;
+}
+
+/**
+ * Set the advanced hit-test callback of an object. Used internally by the library.
+ * @param obj pointer to an object
+ * @param cb the new signal function
+ */
+void lv_obj_set_hit_test_cb(lv_obj_t * obj, lv_hittest_cb_t hit_cb)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    obj->hit_cb = hit_cb;
 }
 
 /**
@@ -2054,6 +2079,18 @@ bool lv_obj_get_hidden(const lv_obj_t * obj)
 }
 
 /**
+ * Get whether advanced hit-testing is enabled on an object
+ * @param obj pointer to an object
+ * @return true: advanced hit-testing is enabled
+ */
+bool lv_obj_get_adv_hittest(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    return obj->adv_hittest == 0 ? false : true;
+}
+
+/**
  * Get the click enable attribute of an object
  * @param obj pointer to an object
  * @return true: the object is clickable
@@ -2224,6 +2261,18 @@ lv_signal_cb_t lv_obj_get_signal_cb(const lv_obj_t * obj)
 }
 
 /**
+ * Get the hit test function of an object
+ * @param obj pointer to an object
+ * @return the hit test function
+ */
+lv_hittest_cb_t lv_obj_get_hit_test_cb(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    return obj->hit_cb;
+}
+
+/**
  * Get the design function of an object
  * @param obj pointer to an object
  * @return the design function
@@ -2367,6 +2416,41 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
 /*-------------------
  * OTHER FUNCTIONS
  *------------------*/
+
+/**
+ * Hit-test an object given a particular point in screen space.
+ * @param obj object to hit-test
+ * @param point screen-space point
+ * @return true if the object is considered under the point
+ */
+bool lv_obj_hittest(lv_obj_t * obj, lv_point_t * point) {
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+    lv_area_t ext_area;
+    ext_area.x1 = obj->coords.x1 - obj->ext_click_pad_hor;
+    ext_area.x2 = obj->coords.x2 + obj->ext_click_pad_hor;
+    ext_area.y1 = obj->coords.y1 - obj->ext_click_pad_ver;
+    ext_area.y2 = obj->coords.y2 + obj->ext_click_pad_ver;
+
+    if(!lv_area_is_point_on(&ext_area, point)) {
+#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+    lv_area_t ext_area;
+    ext_area.x1 = obj->coords.x1 - obj->ext_click_pad.x1;
+    ext_area.x2 = obj->coords.x2 + obj->ext_click_pad.x2;
+    ext_area.y1 = obj->coords.y1 - obj->ext_click_pad.y1;
+    ext_area.y2 = obj->coords.y2 + obj->ext_click_pad.y2;
+
+    if(!lv_area_is_point_on(&ext_area, point)) {
+#else
+    if(!lv_area_is_point_on(&obj->coords, point)) {
+#endif
+        return false;
+    }
+    if(obj->adv_hittest && obj->hit_cb != NULL) {
+        if(!obj->hit_cb(obj, point))
+            return false;
+    }
+    return true;
+}
 
 /**
  * Used in the signal callback to handle `LV_SIGNAL_GET_TYPE` signal

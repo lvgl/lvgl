@@ -57,6 +57,7 @@
  **********************/
 static lv_design_res_t lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param);
+static bool lv_cpicker_hit(lv_obj_t * cpicker, const lv_point_t * p);
 
 static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale);
 static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale);
@@ -123,6 +124,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_cpicker, lv_cpicker_signal);
     lv_obj_set_design_cb(new_cpicker, lv_cpicker_design);
+    lv_obj_set_hit_test_cb(new_cpicker, lv_cpicker_hit);
 
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
@@ -892,6 +894,25 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     }
 
     return res;
+}
+
+static bool lv_cpicker_hit(lv_obj_t * cpicker, const lv_point_t * p)
+{
+    lv_cpicker_ext_t * ext = (lv_cpicker_ext_t *)lv_obj_get_ext_attr(cpicker);
+    if(ext->type != LV_CPICKER_TYPE_DISC || ext->preview)
+        return true;
+    const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
+    lv_area_t area_mid;
+    lv_area_copy(&area_mid, &cpicker->coords);
+    area_mid.x1 += style_main->line.width;
+    area_mid.y1 += style_main->line.width;
+    area_mid.x2 -= style_main->line.width;
+    area_mid.y2 -= style_main->line.width;
+    
+    if(lv_point_within_ellipse(&area_mid, p))
+        return false;
+    
+    return true;
 }
 
 static void next_color_mode(lv_obj_t * cpicker)
