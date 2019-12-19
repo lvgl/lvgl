@@ -58,7 +58,7 @@ typedef uint8_t lv_grad_dir_t;
 #define LV_STYLE_ID_MASK 0x00FF
 
 #define LV_STYLE_ATTR_NONE          0
-#define LV_STYLE_ATTR_INHERIT       (1 << 8)
+#define LV_STYLE_ATTR_INHERIT       (1 << 7)
 
 typedef union {
     struct {
@@ -104,8 +104,14 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_COLOR,       0x4, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_OPA,         0x4, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
 
-//    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_COLOR,         0x40, LV_STYLE_ATTR_TYPE_COLOR),
-//    LV_STYLE_PROP_INIT(LV_STYLE_LINE_COLOR,         0x50, LV_STYLE_ATTR_TYPE_COLOR),
+    LV_STYLE_PROP_INIT(LV_STYLE_LETTER_SPACE,       0x5, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_LINE_SPACE,         0x5, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_BLEND_MODE,         0x5, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_COLOR,         0x5, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_INHERIT),
+    LV_STYLE_PROP_INIT(LV_STYLE_TEXT_OPA,           0x5, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_FONT,               0x5, LV_STYLE_ID_PTR   + 0, LV_STYLE_ATTR_INHERIT),
+
+    //    LV_STYLE_PROP_INIT(LV_STYLE_LINE_COLOR,         0x50, LV_STYLE_ATTR_TYPE_COLOR),
 //    LV_STYLE_PROP_INIT(LV_STYLE_IMG_COLOR,          0x60, LV_STYLE_ATTR_TYPE_COLOR),
 };
 
@@ -191,11 +197,13 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
 void lv_style_set_value(lv_style_t * style, lv_style_property_t prop, lv_style_value_t value);
 void lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_t color);
 void lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa);
+void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, void * p);
 
 
 int16_t lv_style_get_value(const lv_style_t * style, lv_style_property_t prop, lv_style_value_t * res);
 int16_t lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res);
 int16_t lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res);
+int16_t lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void ** res);
 
 
 #if LV_USE_ANIMATION

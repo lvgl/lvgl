@@ -452,9 +452,10 @@ static lv_design_res_t lv_btn_design(lv_obj_t * btn, const lv_area_t * clip_area
         }
 #else
         lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-        lv_draw_rect_dsc_t draw_dsc;
         lv_obj_state_t state = lv_obj_get_state(btn);
 
+        lv_draw_rect_dsc_t draw_dsc;
+        lv_draw_rect_dsc_init(&draw_dsc);
         lv_obj_init_draw_rect_dsc(btn, LV_OBJ_STYLE_MAIN, state, &draw_dsc);
 
         lv_draw_rect(&btn->coords, clip_area, &draw_dsc, lv_obj_get_opa_scale(btn));

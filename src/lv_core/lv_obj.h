@@ -470,6 +470,8 @@ void lv_obj_set_style_value(lv_obj_t * obj, lv_style_property_t prop, lv_style_v
 
 void lv_obj_set_style_opa(lv_obj_t * obj, lv_style_property_t prop, lv_opa_t opa);
 
+void lv_obj_set_style_ptr(lv_obj_t * obj, lv_style_property_t prop, void * p);
+
 void lv_obj_add_style_class(lv_obj_t * obj, uint8_t type, lv_style_t * style);
 /**
  * Notify an object about its style is modified
@@ -829,6 +831,7 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t type, lv_style_p
 
 lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 
+void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 ///**
 // * Get the style pointer of an object (if NULL get style of the parent)
 // * @param obj pointer to an object
@@ -1035,6 +1038,8 @@ lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name);
  * E.g. if `border width == 0` the other border properties won't be evaluated.
  */
 void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_obj_state_t state, lv_draw_rect_dsc_t * draw_dsc);
+
+void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t type, lv_obj_state_t state, lv_draw_label_dsc_t * draw_dsc);
 
 /**********************
  *      MACROS

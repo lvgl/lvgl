@@ -165,6 +165,34 @@ void lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa
     memcpy(style->map + style->size - sizeof(lv_opa_t), &opa, sizeof(lv_opa_t));
 }
 
+void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, void * p)
+{
+    int32_t id = get_property_index(style, prop);
+    /*The property already exists but not sure it's state is the same*/
+    if(id >= 0) {
+        lv_style_attr_t attr_found;
+        lv_style_attr_t attr_goal;
+
+        attr_found.full = *(style->map + id + 1);
+        attr_goal.full = (prop >> 8) & 0xFFU;
+
+        if(attr_found.bits.state == attr_goal.bits.state) {
+            memcpy(style->map + id + sizeof(lv_style_property_t), &p, sizeof(void *));
+            return;
+        }
+    }
+
+    /*Add new property if not exists yet*/
+    style->size += sizeof(lv_style_property_t) + sizeof(void *);
+    style->map = lv_mem_realloc(style->map, style->size);
+    LV_ASSERT_MEM(style->map);
+    if(style == NULL) return;
+
+    memcpy(style->map + style->size - (sizeof(lv_style_property_t) + sizeof(void *)), &prop, sizeof(lv_style_property_t));
+    memcpy(style->map + style->size - sizeof(void *), &p, sizeof(void *));
+}
+
+
 /**
  * Get the a property from a style.
  * Take into account the style state and return the property which matches the best.
@@ -217,6 +245,25 @@ int16_t lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, l
         return -1;
     } else {
         memcpy(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(lv_color_t));
+        lv_style_attr_t attr_act;
+        attr_act.full = style->map[id + 1];
+
+        lv_style_attr_t attr_goal;
+        attr_goal.full = (prop >> 8) & 0xFF;
+
+        return attr_act.bits.state & attr_goal.bits.state;
+    }
+}
+
+
+
+int16_t lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void ** res)
+{
+    int32_t id = get_property_index(style, prop);
+    if(id < 0) {
+        return -1;
+    } else {
+        memcpy(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(void*));
         lv_style_attr_t attr_act;
         attr_act.full = style->map[id + 1];
 

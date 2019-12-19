@@ -25,12 +25,20 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct
-{
-    uint16_t start;
-    uint16_t end;
-}lv_draw_label_txt_sel_t;
-
+typedef struct {
+    lv_color_t color;
+    lv_color_t sel_color;
+    const lv_font_t * font;
+    lv_opa_t opa;
+    lv_style_value_t line_space;
+    lv_style_value_t letter_space;
+    uint16_t sel_start;
+    uint16_t sel_end;
+    lv_coord_t ofs_x;
+    lv_coord_t ofs_y;
+    lv_bidi_dir_t bidi_dir;
+    lv_txt_flag_t flag;
+}lv_draw_label_dsc_t;
 
 /** Store some info to speed up drawing of very large texts
  * It takes a lot of time to get the first visible character because
@@ -53,6 +61,8 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
+void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
+
 /**
  * Write a text
  * @param coords coordinates of the label
@@ -65,9 +75,8 @@ typedef struct {
  * @param sel_start start index of selected area (`LV_LABEL_TXT_SEL_OFF` if none)
  * @param bidi_dir base direction of the text
  */
-void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
-                   const char * txt, lv_txt_flag_t flag, lv_point_t * offset, lv_draw_label_txt_sel_t * sel,
-                   lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir);
+void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
+                   const char * txt, lv_opa_t opa_scale, lv_draw_label_hint_t * hint);
 
 /**********************
  *      MACROS
