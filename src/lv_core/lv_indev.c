@@ -39,7 +39,6 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_proc_press(lv_indev_proc_t * proc);
 static void indev_proc_release(lv_indev_proc_t * proc);
 static void indev_proc_reset_query_handler(lv_indev_t * indev);
-static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj);
 static void indev_drag(lv_indev_proc_t * proc);
 static void indev_drag_throw(lv_indev_proc_t * proc);
 static lv_obj_t * get_dragged_obj(lv_obj_t * obj);

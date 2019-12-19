@@ -33,7 +33,7 @@
 static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param);
 static void lv_slider_position_knob(lv_obj_t * slider, lv_area_t * knob_area, lv_coord_t knob_size, bool hor);
-static void lv_slider_draw_knob(lv_obj_t * slider, lv_area_t * knob_area, lv_area_t * clip_area);
+static void lv_slider_draw_knob(lv_obj_t * slider, const lv_area_t * knob_area, const lv_area_t * clip_area);
 
 /**********************
  *  STATIC VARIABLES
@@ -491,7 +491,7 @@ static void lv_slider_position_knob(lv_obj_t * slider, lv_area_t * knob_area, lv
     knob_area->y2 += style_knob->body.padding.bottom;
 }
 
-static void lv_slider_draw_knob(lv_obj_t * slider, lv_area_t * knob_area, lv_area_t * clip_area) {
+static void lv_slider_draw_knob(lv_obj_t * slider, const lv_area_t * knob_area, const lv_area_t * clip_area) {
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     const lv_style_t * style_knob  = lv_slider_get_style(slider, LV_SLIDER_STYLE_KNOB);
     lv_opa_t opa_scale = lv_obj_get_opa_scale(slider);
