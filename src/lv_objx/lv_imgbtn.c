@@ -328,7 +328,7 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
             coords.y1 = imgbtn->coords.y1;
             coords.x2 = coords.x1 + header.w - 1;
             coords.y2 = coords.y1 + header.h - 1;
-            lv_draw_img(&coords, clip_area, src, style, 0, LV_IMG_ZOOM_NONE, false, opa_scale);
+            lv_draw_img(&coords, clip_area, src, style, 0, NULL, LV_IMG_ZOOM_NONE, false, opa_scale);
         }
 
         src = ext->img_src_right[state];
@@ -339,7 +339,7 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
             coords.y1 = imgbtn->coords.y1;
             coords.x2 = imgbtn->coords.x2;
             coords.y2 = imgbtn->coords.y1 + header.h - 1;
-            lv_draw_img(&coords, clip_area, src, style, 0, LV_IMG_ZOOM_NONE, false, opa_scale);
+            lv_draw_img(&coords, clip_area, src, style, 0, NULL, LV_IMG_ZOOM_NONE, false, opa_scale);
         }
 
         src = ext->img_src_mid[state];
@@ -364,7 +364,7 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
 				coords.y2 = imgbtn->coords.y1 + header.h - 1;
 
 				for(i = 0; i < obj_w - right_w - left_w; i += header.w) {
-					lv_draw_img(&coords, &clip_center_area, src, style, 0, LV_IMG_ZOOM_NONE, false, opa_scale);
+					lv_draw_img(&coords, &clip_center_area, src, style, 0, NULL, LV_IMG_ZOOM_NONE, false, opa_scale);
 					coords.x1 = coords.x2 + 1;
 					coords.x2 += header.w;
 				}
