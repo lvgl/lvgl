@@ -545,8 +545,8 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
             lv_res_t res;
             res = lv_img_decoder_get_info(ext->img_knob_off, &info);
             if(res == LV_RES_OK) {
-                knob_off_size = LV_MATH_MAX(knob_on_size, info.w / 2);
-                knob_off_size = LV_MATH_MAX(knob_on_size, info.h / 2);
+                knob_off_size = LV_MATH_MAX(knob_off_size, info.w / 2);
+                knob_off_size = LV_MATH_MAX(knob_off_size, info.h / 2);
             } else {
                 LV_LOG_WARN("slider signal (LV_SIGNAL_REFR_EXT_DRAW_PAD): can't get knob image info")
             }
