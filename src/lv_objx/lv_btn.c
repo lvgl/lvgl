@@ -92,15 +92,8 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
         return NULL;
     }
 
-    ext->state = LV_BTN_STATE_REL;
-
-    ext->styles[LV_BTN_STATE_REL]     = &lv_style_btn_rel;
-    ext->styles[LV_BTN_STATE_PR]      = &lv_style_btn_pr;
-    ext->styles[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_rel;
-    ext->styles[LV_BTN_STATE_TGL_PR]  = &lv_style_btn_tgl_pr;
-    ext->styles[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
-
     ext->toggle = 0;
+
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
     ext->ink_in_time   = 0;
     ext->ink_wait_time = 0;
@@ -122,29 +115,28 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles*/
         lv_theme_t * th = lv_theme_get_current();
         if(th) {
-            lv_btn_set_style(new_btn, LV_BTN_STYLE_REL, th->style.btn.rel);
-            lv_btn_set_style(new_btn, LV_BTN_STYLE_PR, th->style.btn.pr);
-            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_REL, th->style.btn.tgl_rel);
-            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_PR, th->style.btn.tgl_pr);
-            lv_btn_set_style(new_btn, LV_BTN_STYLE_INA, th->style.btn.ina);
+//            lv_btn_set_style(new_btn, LV_BTN_STYLE_REL, th->style.btn.rel);
+//            lv_btn_set_style(new_btn, LV_BTN_STYLE_PR, th->style.btn.pr);
+//            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_REL, th->style.btn.tgl_rel);
+//            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_PR, th->style.btn.tgl_pr);
+//            lv_btn_set_style(new_btn, LV_BTN_STYLE_INA, th->style.btn.ina);
         } else {
-            lv_obj_set_style(new_btn, ext->styles[LV_BTN_STATE_REL]);
+//            lv_obj_set_style(new_btn, ext->styles[LV_BTN_STATE_REL]);
         }
     }
     /*Copy 'copy'*/
     else {
         lv_btn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->state              = copy_ext->state;
         ext->toggle             = copy_ext->toggle;
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
         ext->ink_in_time   = copy_ext->ink_in_time;
         ext->ink_wait_time = copy_ext->ink_wait_time;
         ext->ink_out_time  = copy_ext->ink_out_time;
 #endif
-        memcpy((void*) ext->styles, copy_ext->styles, sizeof(ext->styles));
+//        memcpy((void*) ext->styles, copy_ext->styles, sizeof(ext->styles));
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_btn);
+        lv_obj_refresh_style(new_btn,LV_BTN_STYLE_MAIN);
     }
 
     LV_LOG_INFO("button created");
@@ -179,10 +171,21 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
 {
     LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
 
-    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-    if(ext->state != state) {
-        ext->state = state;
-        lv_obj_set_style(btn, ext->styles[state]);
+    switch(state) {
+        case LV_BTN_STATE_REL:
+            lv_obj_clear_state(btn, LV_OBJ_STATE_PRESSED | LV_OBJ_STATE_CHECKED);
+            break;
+        case LV_BTN_STATE_PR:
+            lv_obj_clear_state(btn, LV_OBJ_STATE_CHECKED);
+            lv_obj_set_state(btn, LV_OBJ_STATE_PRESSED);
+            break;
+        case LV_BTN_STATE_TGL_REL:
+            lv_obj_set_state(btn, LV_OBJ_STATE_CHECKED);
+            lv_obj_clear_state(btn, LV_OBJ_STATE_PRESSED);
+            break;
+        case LV_BTN_STATE_TGL_PR:
+            lv_obj_set_state(btn, LV_OBJ_STATE_PRESSED | LV_OBJ_STATE_CHECKED);
+            break;
     }
 }
 
@@ -194,13 +197,10 @@ void lv_btn_toggle(lv_obj_t * btn)
 {
     LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
 
-    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-    switch(ext->state) {
-        case LV_BTN_STATE_REL: lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL); break;
-        case LV_BTN_STATE_PR: lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR); break;
-        case LV_BTN_STATE_TGL_REL: lv_btn_set_state(btn, LV_BTN_STATE_REL); break;
-        case LV_BTN_STATE_TGL_PR: lv_btn_set_state(btn, LV_BTN_STATE_PR); break;
-        default: break;
+    if(lv_obj_get_state(btn) & LV_OBJ_STATE_CHECKED) {
+        lv_obj_clear_state(btn, LV_OBJ_STATE_CHECKED);
+    } else {
+        lv_obj_set_state(btn, LV_OBJ_STATE_CHECKED);
     }
 }
 
@@ -265,30 +265,6 @@ void lv_btn_set_ink_out_time(lv_obj_t * btn, uint16_t time)
 #endif
 }
 
-/**
- * Set a style of a button
- * @param btn pointer to a button object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_btn_set_style(lv_obj_t * btn, lv_btn_style_t type, const lv_style_t * style)
-{
-    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
-
-    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-
-    switch(type) {
-        case LV_BTN_STYLE_REL: ext->styles[LV_BTN_STATE_REL] = style; break;
-        case LV_BTN_STYLE_PR: ext->styles[LV_BTN_STATE_PR] = style; break;
-        case LV_BTN_STYLE_TGL_REL: ext->styles[LV_BTN_STATE_TGL_REL] = style; break;
-        case LV_BTN_STYLE_TGL_PR: ext->styles[LV_BTN_STATE_TGL_PR] = style; break;
-        case LV_BTN_STYLE_INA: ext->styles[LV_BTN_STATE_INA] = style; break;
-    }
-
-    /*Refresh the object with the new style*/
-    lv_obj_set_style(btn, ext->styles[ext->state]);
-}
-
 /*=====================
  * Getter functions
  *====================*/
@@ -302,8 +278,16 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn)
 {
     LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
 
-    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
-    return ext->state;
+    lv_obj_state_t state = lv_obj_get_state(btn);
+
+    if(state & LV_OBJ_STATE_CHECKED) {
+        if(state & LV_OBJ_STATE_PRESSED) return LV_BTN_STATE_TGL_PR;
+        else return LV_BTN_STATE_TGL_REL;
+    } else {
+        if(state & LV_OBJ_STATE_PRESSED) return LV_BTN_STATE_PR;
+        else return LV_BTN_STATE_REL;
+    }
+
 }
 
 /**
@@ -373,42 +357,18 @@ uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn)
 #endif
 }
 
-/**
- * Get a style of a button
- * @param btn pointer to a button object
- * @param type which style should be get
- * @return style pointer to a style
- */
-const lv_style_t * lv_btn_get_style(const lv_obj_t * btn, lv_btn_style_t type)
+lv_style_dsc_t * lv_btn_get_style(lv_obj_t * cont, uint8_t type)
 {
-    LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
-
-    const lv_style_t * style = NULL;
-    lv_btn_ext_t * ext       = lv_obj_get_ext_attr(btn);
-    lv_btn_state_t state     = lv_btn_get_state(btn);
-
-    /* If the style of the current state is asked then return object style.
-     * If the button is focused then this style is updated by the group's
-     * `style_mod_cb` function */
-    if((type == LV_BTN_STYLE_REL && state == LV_BTN_STATE_REL) ||
-       (type == LV_BTN_STYLE_PR && state == LV_BTN_STATE_PR) ||
-       (type == LV_BTN_STYLE_TGL_REL && state == LV_BTN_STATE_TGL_REL) ||
-       (type == LV_BTN_STYLE_TGL_PR && state == LV_BTN_STATE_TGL_PR) ||
-       (type == LV_BTN_STYLE_INA && state == LV_BTN_STATE_INA)) {
-
-        style = lv_obj_get_style(btn);
-    } else {
-        switch(type) {
-            case LV_BTN_STYLE_REL: style = ext->styles[LV_BTN_STATE_REL]; break;
-            case LV_BTN_STYLE_PR: style = ext->styles[LV_BTN_STATE_PR]; break;
-            case LV_BTN_STYLE_TGL_REL: style = ext->styles[LV_BTN_STATE_TGL_REL]; break;
-            case LV_BTN_STYLE_TGL_PR: style = ext->styles[LV_BTN_STATE_TGL_PR]; break;
-            case LV_BTN_STYLE_INA: style = ext->styles[LV_BTN_STATE_INA]; break;
-            default: style = NULL; break;
-        }
+    lv_style_dsc_t * style_dsc_p;
+    switch(type) {
+    case LV_BTN_STYLE_MAIN:
+        style_dsc_p = &cont->style_dsc;
+        break;
+    default:
+        style_dsc_p = NULL;
     }
 
-    return style;
+    return style_dsc_p;
 }
 
 /**********************
@@ -491,7 +451,23 @@ static lv_design_res_t lv_btn_design(lv_obj_t * btn, const lv_area_t * clip_area
             }
         }
 #else
-        ancestor_design(btn, clip_area, mode);
+        lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
+        lv_draw_rect_dsc_t draw_dsc;
+        lv_obj_state_t state = lv_obj_get_state(btn);
+
+        lv_obj_init_draw_rect_dsc(btn, LV_OBJ_STYLE_MAIN, state, &draw_dsc);
+
+        lv_draw_rect(&btn->coords, clip_area, &draw_dsc, lv_obj_get_opa_scale(btn));
+
+        if(lv_obj_get_style_value(btn, LV_OBJ_STYLE_MAIN, LV_STYLE_BG_CLIP_CORNER)) {
+            lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
+
+            lv_coord_t r = lv_obj_get_style_value(btn, LV_OBJ_STYLE_MAIN, LV_STYLE_RADIUS);
+
+            lv_draw_mask_radius_init(mp, &btn->coords, r, false);
+            /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
+            lv_draw_mask_add(mp, btn + 8);
+        }
 #endif
     } else if(mode == LV_DESIGN_DRAW_POST) {
         ancestor_design(btn, clip_area, mode);
@@ -518,16 +494,16 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     bool tgl           = lv_btn_get_toggle(btn);
-
+    lv_btn_state_t state = lv_btn_get_state(btn);
     if(sign == LV_SIGNAL_PRESSED) {
         /*Refresh the state*/
-        if(ext->state == LV_BTN_STATE_REL) {
+        if(state == LV_BTN_STATE_REL) {
             lv_btn_set_state(btn, LV_BTN_STATE_PR);
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
             ink_bg_state  = LV_BTN_STATE_REL;
             ink_top_state = LV_BTN_STATE_PR;
 #endif
-        } else if(ext->state == LV_BTN_STATE_TGL_REL) {
+        } else if(state == LV_BTN_STATE_TGL_REL) {
             lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR);
 #if LV_USE_ANIMATION && LV_BTN_INK_EFFECT
             ink_bg_state  = LV_BTN_STATE_TGL_REL;
@@ -567,16 +543,16 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
 #endif
     } else if(sign == LV_SIGNAL_PRESS_LOST) {
         /*Refresh the state*/
-        if(ext->state == LV_BTN_STATE_PR)
+        if(state == LV_BTN_STATE_PR)
             lv_btn_set_state(btn, LV_BTN_STATE_REL);
-        else if(ext->state == LV_BTN_STATE_TGL_PR)
+        else if(state == LV_BTN_STATE_TGL_PR)
             lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
     } else if(sign == LV_SIGNAL_PRESSING) {
         /*When the button begins to drag revert pressed states to released*/
         if(lv_indev_is_dragging(param) != false) {
-            if(ext->state == LV_BTN_STATE_PR)
+            if(state == LV_BTN_STATE_PR)
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
-            else if(ext->state == LV_BTN_STATE_TGL_PR)
+            else if(state == LV_BTN_STATE_TGL_PR)
                 lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
         }
     } else if(sign == LV_SIGNAL_RELEASED) {
@@ -584,16 +560,16 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
          *change state and run the action*/
         if(lv_indev_is_dragging(param) == false) {
             uint32_t toggled = 0;
-            if(ext->state == LV_BTN_STATE_PR && tgl == false) {
+            if(state == LV_BTN_STATE_PR && tgl == false) {
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
                 toggled = 0;
-            } else if(ext->state == LV_BTN_STATE_TGL_PR && tgl == false) {
+            } else if(state == LV_BTN_STATE_TGL_PR && tgl == false) {
                 lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
                 toggled = 1;
-            } else if(ext->state == LV_BTN_STATE_PR && tgl == true) {
+            } else if(state == LV_BTN_STATE_PR && tgl == true) {
                 lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
                 toggled = 1;
-            } else if(ext->state == LV_BTN_STATE_TGL_PR && tgl == true) {
+            } else if(state == LV_BTN_STATE_TGL_PR && tgl == true) {
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
                 toggled = 0;
             }
@@ -602,11 +578,10 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 res = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &toggled);
                 if(res != LV_RES_OK) return res;
             }
-
         } else { /*If dragged change back the state*/
-            if(ext->state == LV_BTN_STATE_PR) {
+            if(ext == LV_BTN_STATE_PR) {
                 lv_btn_set_state(btn, LV_BTN_STATE_REL);
-            } else if(ext->state == LV_BTN_STATE_TGL_PR) {
+            } else if(state == LV_BTN_STATE_TGL_PR) {
                 lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
             }
         }

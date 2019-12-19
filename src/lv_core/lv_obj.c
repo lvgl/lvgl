@@ -1231,7 +1231,7 @@ void lv_obj_set_style_opa(lv_obj_t * obj, lv_style_property_t prop, lv_opa_t opa
 
 void lv_obj_add_style_class(lv_obj_t * obj, uint8_t type, lv_style_t * style)
 {
-    lv_style_class_list_t * class = lv_mem_alloc(sizeof(lv_style_class_list_t));
+    lv_style_classes_t * class = lv_mem_alloc(sizeof(lv_style_classes_t));
 
     lv_style_dsc_t * style_dsc = lv_obj_get_style(obj, type);
     if(style_dsc == NULL) {
@@ -1465,6 +1465,23 @@ void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot)
 
     prot = (~prot) & 0xFF;
     obj->protect &= prot;
+}
+
+void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t state)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    obj->state |= state;
+    lv_obj_refresh_style(obj, LV_OBJ_STYLE_ALL);
+}
+
+void lv_obj_clear_state(lv_obj_t * obj, lv_obj_state_t state)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    state = (~state) & 0xFF;
+    obj->state &= state;
+    lv_obj_refresh_style(obj, LV_OBJ_STYLE_ALL);
 }
 
 /**
@@ -2046,17 +2063,58 @@ lv_style_dsc_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t type)
 
 lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop)
 {
-    lv_style_value_t value;
-    lv_res_t found;
-    found = get_style_prop_core(obj, type, prop, &value);
+    lv_style_attr_t attr;
+    attr.full = prop >> 8;
 
-    if(found == LV_RES_OK) return value;
-    else {
-        /*Default value*/
-        switch(prop) {
-        case LV_STYLE_BORDER_PART:
-            return LV_BORDER_PART_FULL;
+    int16_t weight_goal = attr.bits.state;
+    int16_t weight = -1;
+    lv_style_value_t value;
+
+    const lv_obj_t * parent = obj;
+    while(parent) {
+        lv_style_dsc_t * dsc = lv_obj_get_style(obj, type);
+        if(dsc == NULL) continue;
+
+        int16_t weight_act;
+        lv_style_value_t value_act;
+        weight_act = lv_style_get_value(&dsc->local, prop, &value_act);
+
+        /*On perfect match return the value immediately*/
+        if(weight_act == weight_goal) {
+            return value_act;
         }
+        /*If the found ID is better the current candidate then use it*/
+        else if(weight_act >= weight) {
+            weight =  weight_act;
+            value = value_act;
+        }
+
+        const lv_style_classes_t * classes = obj->style_dsc.classes;
+        while(classes) {
+            weight_act = lv_style_get_value(classes->style, prop, &value_act);
+            /*On perfect match return the value immediately*/
+            if(weight_act == weight_goal) {
+                return value_act;
+            }
+            /*If the found ID is better the current candidate then use it*/
+            else if(weight_act >= weight) {
+                weight =  weight_act;
+                value = value_act;
+            }
+
+            classes = classes->next;
+        }
+
+        if(attr.bits.inherit == 0) break;
+        parent = lv_obj_get_parent(parent);
+    }
+
+    if(weight >= 0) return value;
+
+    prop = prop & (~LV_STYLE_STATE_MASK);
+    switch(prop) {
+    case LV_STYLE_BORDER_PART:
+        return LV_BORDER_PART_FULL;
     }
 
     return 0;
@@ -2064,78 +2122,108 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_s
 
 lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop)
 {
-    lv_color_t color;
-    lv_res_t found;
-    found = get_style_prop_core(obj, type, prop, &color);
+    lv_style_attr_t attr;
+    attr.full = prop >> 8;
 
-    if(found == LV_RES_OK) return color;
-    else {
-       /*Default colors*/
+    int16_t weight_goal = attr.bits.state;
+    int16_t weight = -1;
+    lv_color_t value;
+
+    const lv_obj_t * parent = obj;
+    while(parent) {
+        lv_style_dsc_t * dsc = lv_obj_get_style(obj, type);
+        if(dsc == NULL) continue;
+        int16_t weight_act;
+        lv_color_t value_act;
+        weight_act = lv_style_get_color(&dsc->local, prop, &value_act);
+
+        /*On perfect match return the value immediately*/
+        if(weight_act == weight_goal) {
+            return value_act;
+        }
+        /*If the found ID is better the current candidate then use it*/
+        else if(weight_act >= weight) {
+            weight =  weight_act;
+            value = value_act;
+        }
+
+        const lv_style_classes_t * classes = obj->style_dsc.classes;
+        while(classes) {
+            weight_act = lv_style_get_color(classes->style, prop, &value_act);
+            /*On perfect match return the value immediately*/
+            if(weight_act == weight_goal) {
+                return value_act;
+            }
+            /*If the found ID is better the current candidate then use it*/
+            else if(weight_act >= weight) {
+                weight =  weight_act;
+                value = value_act;
+            }
+
+            classes = classes->next;
+        }
+
+        if(attr.bits.inherit == 0) break;
+        parent = lv_obj_get_parent(parent);
     }
+
+    if(weight >= 0) return value;
 
     return LV_COLOR_WHITE;
 }
 
 lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop)
 {
-    lv_opa_t opa;
-    lv_res_t found;
-    found = get_style_prop_core(obj, type, prop, &opa);
+    lv_style_attr_t attr;
+    attr.full = prop >> 8;
 
-    if(found == LV_RES_OK) return opa;
-    else {
-        /*Default opa*/
+    int16_t weight_goal = attr.bits.state;
+    int16_t weight = -1;
+    lv_opa_t value;
+
+    const lv_obj_t * parent = obj;
+    while(parent) {
+        lv_style_dsc_t * dsc = lv_obj_get_style(obj, type);
+        if(dsc == NULL) continue;
+
+        int16_t weight_act;
+        lv_opa_t value_act;
+        weight_act = lv_style_get_opa(&dsc->local, prop, &value_act);
+
+        /*On perfect match return the value immediately*/
+        if(weight_act == weight_goal) {
+            return value_act;
+        }
+        /*If the found ID is better the current candidate then use it*/
+        else if(weight_act >= weight) {
+            weight =  weight_act;
+            value = value_act;
+        }
+
+        const lv_style_classes_t * classes = obj->style_dsc.classes;
+        while(classes) {
+            weight_act = lv_style_get_opa(classes->style, prop, &value_act);
+            /*On perfect match return the value immediately*/
+            if(weight_act == weight_goal) {
+                return weight_act;
+            }
+            /*If the found ID is better the current candidate then use it*/
+            else if(weight_act >= weight) {
+                weight =  weight_act;
+                value = value_act;
+            }
+
+            classes = classes->next;
+        }
+
+        if(attr.bits.inherit == 0) break;
+        parent = lv_obj_get_parent(parent);
     }
+
+    if(weight >= 0) return value;
 
     return LV_OPA_COVER;
 }
-
-//
-///**
-// * Get the style pointer of an object (if NULL get style of the parent)
-// * @param obj pointer to an object
-// * @return pointer to a style
-// */
-//const lv_style_t * lv_obj_get_style(const lv_obj_t * obj)
-//{
-//    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-//
-//    const lv_style_t * style_act = obj->style_p;
-//    if(style_act == NULL) {
-//        lv_obj_t * par = obj->par;
-//
-//        while(par) {
-//            if(par->style_p) {
-//                if(par->style_p->glass == 0) {
-//#if LV_USE_GROUP == 0
-//                    style_act = par->style_p;
-//#else
-//                    /*If a parent is focused then use then focused style*/
-//                    lv_group_t * g = lv_obj_get_group(par);
-//                    if(lv_group_get_focused(g) == par) {
-//                        style_act = lv_group_mod_style(g, par->style_p);
-//                    } else {
-//                        style_act = par->style_p;
-//                    }
-//#endif
-//                    break;
-//                }
-//            }
-//            par = par->par;
-//        }
-//    }
-//#if LV_USE_GROUP
-//    if(obj->group_p) {
-//        if(lv_group_get_focused(obj->group_p) == obj) {
-//            style_act = lv_group_mod_style(obj->group_p, style_act);
-//        }
-//    }
-//#endif
-//
-//    if(style_act == NULL) style_act = &lv_style_plain;
-//
-//    return style_act;
-//}
 
 /*-----------------
  * Attribute get
@@ -2309,6 +2397,12 @@ bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     return (obj->protect & prot) == 0 ? false : true;
+}
+
+lv_obj_state_t lv_obj_get_state(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    return obj->state;
 }
 
 /**
@@ -2505,20 +2599,22 @@ static void lv_obj_del_async_cb(void * obj)
  * @note Only the relevant fields will be set.
  * E.g. if `border width == 0` the other border properties won't be evaluated.
  */
-void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_draw_rect_dsc_t * draw_dsc)
+void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_obj_state_t state, lv_draw_rect_dsc_t * draw_dsc)
 {
 
+    lv_style_state_t style_state = state << LV_STYLE_STATE_POS;
+
     lv_draw_rect_dsc_init(draw_dsc);
-    draw_dsc->radius = lv_obj_get_style_value(obj, type, LV_STYLE_RADIUS);
+    draw_dsc->radius = lv_obj_get_style_value(obj, type, LV_STYLE_RADIUS | style_state);
 
-    draw_dsc->bg_color = lv_obj_get_style_color(obj, type, LV_STYLE_BG_COLOR);
+    draw_dsc->bg_color = lv_obj_get_style_color(obj, type, LV_STYLE_BG_COLOR | style_state);
 
-    draw_dsc->border_width = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_WIDTH);
+    draw_dsc->border_width = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_WIDTH | style_state);
     if(draw_dsc->border_width) {
-        draw_dsc->border_opa = lv_obj_get_style_opa(obj, type, LV_STYLE_BORDER_OPA);
+        draw_dsc->border_opa = lv_obj_get_style_opa(obj, type, LV_STYLE_BORDER_OPA | style_state);
         if(draw_dsc->border_opa >= LV_OPA_MIN) {
-            draw_dsc->border_part = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_PART);
-            draw_dsc->border_color = lv_obj_get_style_color(obj, type, LV_STYLE_BORDER_COLOR);
+            draw_dsc->border_part = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_PART | style_state);
+            draw_dsc->border_color = lv_obj_get_style_color(obj, type, LV_STYLE_BORDER_COLOR | style_state);
         }
     }
 }
@@ -2571,7 +2667,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
     }
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_draw_rect_dsc_t draw_dsc;
-        lv_obj_init_draw_rect_dsc(obj, LV_OBJ_STYLE_MAIN, &draw_dsc);
+        lv_obj_init_draw_rect_dsc(obj, LV_OBJ_STYLE_MAIN, lv_obj_get_state(obj), &draw_dsc);
         lv_draw_rect(&obj->coords, clip_area, &draw_dsc, lv_obj_get_opa_scale(obj));
 
         if(lv_obj_get_style_value(obj, LV_OBJ_STYLE_MAIN, LV_STYLE_BG_CLIP_CORNER)) {
@@ -2625,7 +2721,18 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(shadow > obj->ext_draw_pad) obj->ext_draw_pad = shadow;
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_refresh_ext_draw_pad(obj);
+    } else if(sign == LV_SIGNAL_FOCUS) {
+        if(lv_group_get_editing(lv_obj_get_group(obj))) {
+            uint8_t state = LV_OBJ_STATE_FOCUS;
+            state |= LV_OBJ_STATE_EDIT;
+        } else {
+            lv_obj_set_state(obj, LV_OBJ_STATE_FOCUS);
+            lv_obj_clear_state(obj, LV_OBJ_STATE_EDIT);
+        }
+    } else if(sign == LV_SIGNAL_DEFOCUS) {
+        lv_obj_clear_state(obj, LV_OBJ_STATE_FOCUS | LV_OBJ_STATE_EDIT);
     }
+
     return res;
 }
 
@@ -2647,37 +2754,6 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
 
         refresh_children_position(i, x_diff, y_diff);
     }
-}
-
-static inline lv_res_t get_style_prop_core(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop, void * out)
-{
-    lv_style_dsc_t * dsc = lv_obj_get_style(obj, type);
-
-    if(dsc == NULL) return LV_RES_INV;
-
-    lv_res_t found = LV_RES_INV;
-
-    lv_style_attr_t attr;
-    attr.full= prop >> 8;
-
-    const lv_obj_t * parent = obj;
-    while(parent) {
-        found = lv_style_get_color(&dsc->local, prop, out);
-        if(found == LV_RES_OK) return LV_RES_OK;
-
-         const lv_style_class_list_t * classes = obj->style_dsc.classes;
-         while(classes) {
-             found = lv_style_get_color(classes->style, prop, out);
-             if(found == LV_RES_OK) return LV_RES_OK;
-
-             classes = classes->next;
-         }
-
-        if(attr.bits.inherit == 0) break;
-        parent = lv_obj_get_parent(parent);
-    }
-
-    return LV_RES_INV;
 }
 
 /**

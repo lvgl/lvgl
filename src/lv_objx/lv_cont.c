@@ -255,7 +255,6 @@ lv_style_dsc_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type)
     }
 
     return style_dsc_p;
-
 }
 
 /**********************

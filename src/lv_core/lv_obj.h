@@ -128,6 +128,7 @@ enum {
     LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
     LV_SIGNAL_GET_TYPE, /**< LittlevGL needs to retrieve the object's type */
     LV_SIGNAL_GET_STYLE, /**<Get the style of an object*/
+    LV_SIGNAL_GET_STATE, /**<Get the state of the object*/
 
     /*Input device related*/
     LV_SIGNAL_PRESSED,           /**< The object has been pressed*/
@@ -189,6 +190,31 @@ typedef struct
 } lv_reailgn_t;
 #endif
 
+/*Protect some attributes (max. 8 bit)*/
+enum {
+    LV_PROTECT_NONE      = 0x00,
+    LV_PROTECT_CHILD_CHG = 0x01,   /**< Disable the child change signal. Used by the library*/
+    LV_PROTECT_PARENT    = 0x02,   /**< Prevent automatic parent change (e.g. in lv_page)*/
+    LV_PROTECT_POS       = 0x04,   /**< Prevent automatic positioning (e.g. in lv_cont layout)*/
+    LV_PROTECT_FOLLOW    = 0x08,   /**< Prevent the object be followed in automatic ordering (e.g. in
+                                      lv_cont PRETTY layout)*/
+    LV_PROTECT_PRESS_LOST = 0x10,  /**< If the `indev` was pressing this object but swiped out while
+                                      pressing do not search other object.*/
+    LV_PROTECT_CLICK_FOCUS = 0x20, /**< Prevent focusing the object by clicking on it*/
+};
+typedef uint8_t lv_protect_t;
+
+enum {
+    LV_OBJ_STATE_CHECKED  =  (LV_STYLE_STATE_CHECKED >> LV_STYLE_STATE_POS),
+    LV_OBJ_STATE_FOCUS  =    (LV_STYLE_STATE_FOCUS >> LV_STYLE_STATE_POS),
+    LV_OBJ_STATE_EDIT  =     (LV_STYLE_STATE_EDIT >> LV_STYLE_STATE_POS),
+    LV_OBJ_STATE_HOVER  =    (LV_STYLE_STATE_HOVER >> LV_STYLE_STATE_POS),
+    LV_OBJ_STATE_PRESSED  =  (LV_STYLE_STATE_PRESSED >> LV_STYLE_STATE_POS),
+    LV_OBJ_STATE_DISABLED =  (LV_STYLE_STATE_DISABLED >> LV_STYLE_STATE_POS),
+};
+
+typedef uint8_t lv_obj_state_t;
+
 typedef struct _lv_obj_t
 {
     struct _lv_obj_t * par; /**< Pointer to the parent object*/
@@ -230,6 +256,7 @@ typedef struct _lv_obj_t
     uint8_t reserved : 3;       /**<  Reserved for future use*/
     uint8_t protect;            /**< Automatically happening actions can be prevented. 'OR'ed values from
                                    `lv_protect_t`*/
+    uint8_t state;
     lv_opa_t opa_scale;         /**< Scale down the opacity by this factor. Effects all children as well*/
 
     lv_coord_t ext_draw_pad; /**< EXTtend the size in every direction for drawing. */
@@ -245,24 +272,11 @@ typedef struct _lv_obj_t
 } lv_obj_t;
 
 enum {
-    LV_OBJ_STYLE_MAIN
+    LV_OBJ_STYLE_MAIN,
+    LV_OBJ_STYLE_ALL = 0xFF,
 };
 
 typedef uint8_t lv_obj_style_t;
-
-/*Protect some attributes (max. 8 bit)*/
-enum {
-    LV_PROTECT_NONE      = 0x00,
-    LV_PROTECT_CHILD_CHG = 0x01,   /**< Disable the child change signal. Used by the library*/
-    LV_PROTECT_PARENT    = 0x02,   /**< Prevent automatic parent change (e.g. in lv_page)*/
-    LV_PROTECT_POS       = 0x04,   /**< Prevent automatic positioning (e.g. in lv_cont layout)*/
-    LV_PROTECT_FOLLOW    = 0x08,   /**< Prevent the object be followed in automatic ordering (e.g. in
-                                      lv_cont PRETTY layout)*/
-    LV_PROTECT_PRESS_LOST = 0x10,  /**< If the `indev` was pressing this object but swiped out while
-                                      pressing do not search other object.*/
-    LV_PROTECT_CLICK_FOCUS = 0x20, /**< Prevent focusing the object by clicking on it*/
-};
-typedef uint8_t lv_protect_t;
 
 /** Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
 typedef struct
@@ -914,6 +928,8 @@ uint8_t lv_obj_get_protect(const lv_obj_t * obj);
  */
 bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
 
+lv_obj_state_t lv_obj_get_state(const lv_obj_t * obj);
+
 /**
  * Get the signal function of an object
  * @param obj pointer to an object
@@ -1018,7 +1034,7 @@ lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name);
  * @note Only the relevant fields will be set.
  * E.g. if `border width == 0` the other border properties won't be evaluated.
  */
-void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_draw_rect_dsc_t * draw_dsc);
+void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_obj_state_t state, lv_draw_rect_dsc_t * draw_dsc);
 
 /**********************
  *      MACROS
