@@ -79,7 +79,10 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
 
     lv_list_ext_t * ext = lv_obj_allocate_ext_attr(new_list, sizeof(lv_list_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_list);
+        return NULL;
+    }
 
     ext->style_img                        = NULL;
     ext->styles_btn[LV_BTN_STATE_REL]     = &lv_style_btn_rel;
@@ -319,7 +322,7 @@ void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
         else if(s == LV_BTN_STATE_TGL_REL)
             lv_btn_set_state(ext->selected_btn, LV_BTN_STATE_TGL_PR);
 
-        lv_page_focus(list, ext->selected_btn, lv_list_get_anim_time(list));
+        lv_page_focus(list, ext->selected_btn, LV_ANIM_ON);
     }
 }
 

@@ -104,7 +104,10 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the extended data*/
     lv_cpicker_ext_t * ext = lv_obj_allocate_ext_attr(new_cpicker, sizeof(lv_cpicker_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_cpicker);
+        return NULL;
+    }
 
     /*Initialize the allocated 'ext' */
     ext->type = LV_CPICKER_DEF_TYPE;
@@ -384,18 +387,20 @@ const lv_style_t * lv_cpicker_get_style(const lv_obj_t * cpicker, lv_cpicker_sty
     LV_ASSERT_OBJ(cpicker, LV_OBJX_NAME);
 
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
+    const lv_style_t * style;
 
     switch(type) {
     case LV_CPICKER_STYLE_MAIN:
-        return lv_obj_get_style(cpicker);
+        style = lv_obj_get_style(cpicker);
+        break;
     case LV_CPICKER_STYLE_INDICATOR:
-        return ext->indic.style;
+        style = ext->indic.style;
+        break;
     default:
-        return NULL;
+        style = NULL;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**
@@ -692,7 +697,7 @@ static lv_area_t get_indic_area(lv_obj_t * cpicker)
     const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
     const lv_style_t * style_indic = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_INDICATOR);
 
-    uint16_t r;
+    uint16_t r = 0;
     if(ext->type == LV_CPICKER_TYPE_DISC) r = style_main->line.width / 2;
     else if(ext->type == LV_CPICKER_TYPE_RECT) {
         lv_coord_t h = lv_obj_get_height(cpicker);
@@ -822,7 +827,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         if(ext->type == LV_CPICKER_TYPE_RECT) {
             /*If pressed long enough without change go to next color mode*/
             uint32_t diff = lv_tick_elaps(ext->last_change_time);
-            if(diff > indev->driver.long_press_time * 2 && !ext->color_mode_fixed) {
+            if(diff > (uint32_t)indev->driver.long_press_time * 2 && !ext->color_mode_fixed) {
                 next_color_mode(cpicker);
                 lv_indev_wait_release(lv_indev_get_act());
                 return res;

@@ -96,7 +96,10 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_chart_ext_t * ext = lv_obj_allocate_ext_attr(new_chart, sizeof(lv_chart_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_chart);
+        return NULL;
+    }
 
     lv_ll_init(&ext->series_ll, sizeof(lv_chart_series_t));
 
@@ -184,8 +187,6 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     if(ser == NULL) return NULL;
 
     lv_coord_t def = LV_CHART_POINT_DEF;
-
-    if(ser == NULL) return NULL;
 
     ser->color  = color;
     ser->points = lv_mem_alloc(sizeof(lv_coord_t) * ext->point_cnt);
@@ -930,7 +931,6 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
     lv_style_copy(&style_point, &lv_style_plain);
 
     style_point.body.border.width = 0;
-    style_point.body.radius       = LV_RADIUS_CIRCLE;
     style_point.body.opa          = ext->series.opa;
     style_point.body.radius       = ext->series.width;
 
@@ -1117,7 +1117,7 @@ static void lv_chart_draw_areas(lv_obj_t * chart, const lv_area_t * mask)
    int16_t mask_fade_id = LV_MASK_ID_INV;
    lv_draw_mask_fade_param_t mask_fade_p;
    if(ext->type & LV_CHART_TYPE_AREA_FADED) {
-       lv_draw_mask_fade_init(&mask_fade_p, &chart->coords, LV_OPA_COVER, chart->coords.y1 + (h >> 2), LV_OPA_TRANSP, chart->coords.y2 - (h >> 2));
+       lv_draw_mask_fade_init(&mask_fade_p, &chart->coords, LV_OPA_90, chart->coords.y1 + (h >> 2), LV_OPA_10, chart->coords.y2 - (h >> 2));
        mask_fade_id = lv_draw_mask_add(&mask_fade_p, NULL);
    }
 

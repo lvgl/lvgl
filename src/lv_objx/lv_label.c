@@ -88,7 +88,10 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
 
     lv_label_ext_t * ext = lv_obj_get_ext_attr(new_label);
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_label);
+        return NULL;
+    }
 
     ext->text       = NULL;
     ext->static_txt = 0;
@@ -147,7 +150,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         if(copy_ext->dot_tmp_alloc && copy_ext->dot.tmp_ptr) {
-            int len = strlen(copy_ext->dot.tmp_ptr);
+            uint16_t len = (uint16_t    )strlen(copy_ext->dot.tmp_ptr);
             lv_label_set_dot_tmp(new_label, ext->dot.tmp_ptr, len);
         } else {
             memcpy(ext->dot.tmp, copy_ext->dot.tmp, sizeof(ext->dot.tmp));
@@ -196,7 +199,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
         if(ext->text == NULL) return;
     } else {
         /*Allocate space for the new text*/
-        uint32_t len = strlen(text) + 1;
+        size_t len = strlen(text) + 1;
         if(ext->text != NULL && ext->static_txt == 0) {
             lv_mem_free(ext->text);
             ext->text = NULL;
@@ -953,9 +956,9 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt)
     lv_obj_invalidate(label);
 
     /*Allocate space for the new text*/
-    uint32_t old_len = strlen(ext->text);
-    uint32_t ins_len = strlen(txt);
-    uint32_t new_len = ins_len + old_len;
+    size_t old_len = strlen(ext->text);
+    size_t ins_len = strlen(txt);
+    size_t new_len = ins_len + old_len;
     ext->text        = lv_mem_realloc(ext->text, new_len + 1);
     LV_ASSERT_MEM(ext->text);
     if(ext->text == NULL) return;

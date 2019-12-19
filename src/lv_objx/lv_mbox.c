@@ -78,7 +78,10 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the message box type specific extended data*/
     lv_mbox_ext_t * ext = lv_obj_allocate_ext_attr(new_mbox, sizeof(lv_mbox_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_mbox);
+        return NULL;
+    }
 
     ext->text = NULL;
     ext->btnm = NULL;
@@ -139,7 +142,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param btn_map button descriptor (button matrix map).
  *                E.g.  a const char *txt[] = {"ok", "close", ""} (Can not be local variable)
  */
-void lv_mbox_add_btns(lv_obj_t * mbox, const char ** btn_map)
+void lv_mbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
 {
     LV_ASSERT_OBJ(mbox, LV_OBJX_NAME);
     LV_ASSERT_NULL(btn_map);

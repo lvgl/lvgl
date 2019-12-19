@@ -43,12 +43,13 @@ extern "C" {
 
 /** Current keyboard mode. */
 enum {
-    LV_KB_MODE_TEXT,
-    LV_KB_MODE_NUM,
+    LV_KB_MODE_TEXT_LOWER,
     LV_KB_MODE_TEXT_UPPER,
+    LV_KB_MODE_SPECIAL,
+    LV_KB_MODE_NUM,
 };
 typedef uint8_t lv_kb_mode_t;
-
+    
 /*Data of keyboard*/
 typedef struct
 {
@@ -109,26 +110,22 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en);
 /**
  * Set a new map for the keyboard
  * @param kb pointer to a Keyboard object
+ * @param mode keyboard map to alter 'lv_kb_mode_t'
  * @param map pointer to a string array to describe the map.
  *            See 'lv_btnm_set_map()' for more info.
  */
-static inline void lv_kb_set_map(lv_obj_t * kb, const char * map[])
-{
-    lv_btnm_set_map(kb, map);
-}
+void lv_kb_set_map(lv_obj_t * kb, lv_kb_mode_t mode, const char * map[]);
 
 /**
  * Set the button control map (hidden, disabled etc.) for the keyboard. The
  * control map array will be copied and so may be deallocated after this
  * function returns.
  * @param kb pointer to a keyboard object
+ * @param mode keyboard ctrl map to alter 'lv_kb_mode_t'
  * @param ctrl_map pointer to an array of `lv_btn_ctrl_t` control bytes.
  *                 See: `lv_btnm_set_ctrl_map` for more details.
  */
-static inline void lv_kb_set_ctrl_map(lv_obj_t * kb, const lv_btnm_ctrl_t ctrl_map[])
-{
-    lv_btnm_set_ctrl_map(kb, ctrl_map);
-}
+void lv_kb_set_ctrl_map(lv_obj_t * kb, lv_kb_mode_t mode, const lv_btnm_ctrl_t ctrl_map[]);
 
 /**
  * Set a style of a keyboard

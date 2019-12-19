@@ -8,7 +8,7 @@
  *********************/
 #include "lv_draw_arc.h"
 #include "lv_draw_mask.h"
-#include "../lv_misc/lv_math.h"  // LV_TRIGO_SHIFT
+#include "../lv_misc/lv_math.h"
 
 /*********************
  *      DEFINES
@@ -21,6 +21,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness, lv_area_t * res_area);
 
 /**********************
  *  STATIC VARIABLES
@@ -46,7 +47,7 @@
  * @param opa_scale scale down all opacities by the factor
  */
 void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, const lv_area_t * clip_area,
-                 uint16_t start_angle, uint16_t end_angle, const lv_style_t * style, lv_opa_t opa_scale)
+        uint16_t start_angle, uint16_t end_angle, const lv_style_t * style, lv_opa_t opa_scale)
 {
     lv_style_t circle_style;
     lv_style_copy(&circle_style, style);
@@ -64,40 +65,35 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
     lv_area_t area;
     area.x1 = center_x - radius;
     area.y1 = center_y - radius;
-    area.x2 = center_x + radius;
-    area.y2 = center_y + radius;
+    area.x2 = center_x + radius - 1;  /*-1 because the center already belongs to the left/bottom part*/
+    area.y2 = center_y + radius - 1;
 
     lv_draw_rect(&area, clip_area, &circle_style, LV_OPA_COVER);
 
     lv_draw_mask_remove_id(mask_angle_id);
 
     if(style->line.rounded) {
-      circle_style.body.main_color = style->line.color;
-      circle_style.body.grad_color = style->line.color;
-      circle_style.body.opa        = LV_OPA_COVER;
-      circle_style.body.border.width = 0;
+        circle_style.body.main_color = style->line.color;
+        circle_style.body.grad_color = style->line.color;
+        circle_style.body.opa        = LV_OPA_COVER;
+        circle_style.body.border.width = 0;
 
-      lv_coord_t thick_half = style->line.width / 2;
-      lv_coord_t cir_x      = ((radius - thick_half + 1) * lv_trigo_sin(90 - start_angle) >> LV_TRIGO_SHIFT);
-      lv_coord_t cir_y      = ((radius - thick_half + 1) * lv_trigo_sin(start_angle) >> LV_TRIGO_SHIFT);
-  
-      lv_area_t round_area;
-        round_area.x1 = cir_x + center_x - thick_half + 1;
-        round_area.y1 = cir_y + center_y - thick_half + 1;
-        round_area.x2 = cir_x + center_x + thick_half;
-        round_area.y2 = cir_y + center_y + thick_half;
-      
-      lv_draw_rect(&round_area, clip_area, &circle_style, LV_OPA_COVER);
- 
-      cir_x      = ((radius - thick_half + 1) * lv_trigo_sin(90 - end_angle) >> LV_TRIGO_SHIFT);
-      cir_y      = ((radius - thick_half + 1) * lv_trigo_sin(end_angle) >> LV_TRIGO_SHIFT);
-  
-        round_area.x1 = cir_x + center_x - thick_half + 1;
-        round_area.y1 = cir_y + center_y - thick_half + 1;
-        round_area.x2 = cir_x + center_x + thick_half;
-        round_area.y2 = cir_y + center_y + thick_half;
-  
-      lv_draw_rect(&round_area, clip_area, &circle_style, LV_OPA_COVER);
+        lv_area_t round_area;
+        get_rounded_area(start_angle, radius, style->line.width, &round_area);
+        round_area.x1 += center_x;
+        round_area.x2 += center_x;
+        round_area.y1 += center_y;
+        round_area.y2 += center_y;
+
+        lv_draw_rect(&round_area, clip_area, &circle_style, opa_scale);
+
+        get_rounded_area(end_angle, radius, style->line.width, &round_area);
+        round_area.x1 += center_x;
+        round_area.x2 += center_x;
+        round_area.y1 += center_y;
+        round_area.y2 += center_y;
+
+        lv_draw_rect(&round_area, clip_area, &circle_style, opa_scale);
     }
 }
 
@@ -106,3 +102,49 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
  *   STATIC FUNCTIONS
  **********************/
 
+static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness, lv_area_t * res_area)
+{
+    const uint8_t ps = 8;
+    const uint8_t pa = 127;
+
+    lv_coord_t thick_half = tickness / 2;
+    lv_coord_t thick_corr = tickness & 0x01 ? 0 : 1;
+
+    lv_coord_t rx_corr;
+    lv_coord_t ry_corr;
+
+    if(angle > 90 && angle < 270) rx_corr = 0;
+    else  rx_corr = 0;
+
+    if(angle > 0 && angle < 180) ry_corr = 0;
+    else  ry_corr = 0;
+
+    lv_coord_t cir_x;
+    lv_coord_t cir_y;
+
+    cir_x = ((radius - rx_corr - thick_half) * lv_trigo_sin(90 - angle)) >> (LV_TRIGO_SHIFT - ps);
+    cir_y = ((radius - ry_corr - thick_half) * lv_trigo_sin(angle)) >> (LV_TRIGO_SHIFT - ps);
+
+    /* Actually the center of the pixel need to be calculated so apply 1/2 px offset*/
+    if(cir_x > 0) {
+        cir_x = (cir_x - pa) >> ps;
+        res_area->x1 = cir_x - thick_half + thick_corr;
+        res_area->x2 = cir_x + thick_half;
+    }
+    else {
+        cir_x = (cir_x + pa) >> ps;
+        res_area->x1 = cir_x - thick_half;
+        res_area->x2 = cir_x + thick_half - thick_corr;
+    }
+
+    if(cir_y > 0) {
+        cir_y = (cir_y - pa) >> ps;
+        res_area->y1 = cir_y - thick_half + thick_corr;
+        res_area->y2 = cir_y + thick_half;
+    }
+    else {
+        cir_y = (cir_y + pa) >> ps;
+        res_area->y1 = cir_y - thick_half;
+        res_area->y2 = cir_y + thick_half - thick_corr;
+    }
+}

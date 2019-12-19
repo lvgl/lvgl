@@ -154,6 +154,11 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->par = NULL; /*Screens has no a parent*/
         lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
 
+        /*Set the callbacks*/
+        new_obj->signal_cb = lv_obj_signal;
+        new_obj->design_cb = lv_obj_design;
+        new_obj->event_cb = NULL;
+
         /*Set coordinates to full screen size*/
         new_obj->coords.x1    = 0;
         new_obj->coords.y1    = 0;
@@ -186,10 +191,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         } else {
             new_obj->style_p = &lv_style_scr;
         }
-        /*Set the callbacks*/
-        new_obj->signal_cb = lv_obj_signal;
-        new_obj->design_cb =  lv_obj_design;
-        new_obj->event_cb = NULL;
 
         /*Init. user date*/
 #if LV_USE_USER_DATA
@@ -235,6 +236,11 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->par = parent; /*Set the parent*/
         lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
 
+        /*Set the callbacks*/
+        new_obj->signal_cb = lv_obj_signal;
+        new_obj->design_cb = lv_obj_design;
+        new_obj->event_cb = NULL;
+
 #if LV_USE_BIDI
         new_obj->base_dir     = LV_BIDI_DIR_INHERIT;
 #else
@@ -277,11 +283,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         } else {
             new_obj->style_p = &lv_style_plain_color;
         }
-
-        /*Set the callbacks*/
-        new_obj->signal_cb = lv_obj_signal;
-        new_obj->design_cb = lv_obj_design;
-        new_obj->event_cb = NULL;
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
         memset(&new_obj->ext_click_pad, 0, sizeof(new_obj->ext_click_pad));
@@ -1577,14 +1578,17 @@ void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb)
  * Allocate a new ext. data for an object
  * @param obj pointer to an object
  * @param ext_size the size of the new ext. data
- * @return Normal pointer to the allocated ext
+ * @return pointer to the allocated ext.
+ * If out of memory NULL is returned and the original ext is preserved
  */
 void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    obj->ext_attr = lv_mem_realloc(obj->ext_attr, ext_size);
+    void * new_ext = lv_mem_realloc(obj->ext_attr, ext_size);
+    if(new_ext == NULL) return NULL;
 
+    obj->ext_attr = new_ext;
     return (void *)obj->ext_attr;
 }
 
@@ -1855,7 +1859,7 @@ lv_coord_t lv_obj_get_height(const lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the width which still fits into the container
  */
-lv_coord_t lv_obj_get_width_fit(lv_obj_t * obj)
+lv_coord_t lv_obj_get_width_fit(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1869,7 +1873,7 @@ lv_coord_t lv_obj_get_width_fit(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the height which still fits into the container
  */
-lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj)
+lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1883,7 +1887,7 @@ lv_coord_t lv_obj_get_height_fit(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return  true: auto realign is enabled; false: auto realign is disabled
  */
-bool lv_obj_get_auto_realign(lv_obj_t * obj)
+bool lv_obj_get_auto_realign(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -2145,6 +2149,7 @@ lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
 
     return LV_BIDI_BASE_DIR_DEF;
 #else
+    (void) obj;  /*Unused*/
     return LV_BIDI_DIR_LTR;
 #endif
 }
@@ -2265,7 +2270,7 @@ void * lv_obj_get_ext_attr(const lv_obj_t * obj)
  * @param obj pointer to an object which type should be get
  * @param buf pointer to an `lv_obj_type_t` buffer to store the types
  */
-void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
+void lv_obj_get_type(const lv_obj_t * obj, lv_obj_type_t * buf)
 {
     LV_ASSERT_NULL(buf);
     LV_ASSERT_NULL(obj);
@@ -2275,7 +2280,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
     memset(buf, 0, sizeof(lv_obj_type_t));
     memset(&tmp, 0, sizeof(lv_obj_type_t));
 
-    obj->signal_cb(obj, LV_SIGNAL_GET_TYPE, &tmp);
+    obj->signal_cb((lv_obj_t *)obj, LV_SIGNAL_GET_TYPE, &tmp);
 
     uint8_t cnt;
     for(cnt = 0; cnt < LV_MAX_ANCESTOR_NUM; cnt++) {
@@ -2296,7 +2301,7 @@ void lv_obj_get_type(lv_obj_t * obj, lv_obj_type_t * buf)
  * @param obj pointer to an object
  * @return user data
  */
-lv_obj_user_data_t lv_obj_get_user_data(lv_obj_t * obj)
+lv_obj_user_data_t lv_obj_get_user_data(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -2308,11 +2313,11 @@ lv_obj_user_data_t lv_obj_get_user_data(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return pointer to the user data
  */
-lv_obj_user_data_t * lv_obj_get_user_data_ptr(lv_obj_t * obj)
+lv_obj_user_data_t * lv_obj_get_user_data_ptr(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    return &obj->user_data;
+    return (lv_obj_user_data_t *)&obj->user_data;
 }
 
 /**
@@ -2366,8 +2371,8 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
 /**
  * Used in the signal callback to handle `LV_SIGNAL_GET_TYPE` signal
  * @param obj pointer to an object
- * @param buf pointer to `lv_obj_type_t`. (`param` i nteh signal callback)
- * @param name name of the object. E.g. "lv_btn". (Only teh pointer is saved)
+ * @param buf pointer to `lv_obj_type_t`. (`param` in the signal callback)
+ * @param name name of the object. E.g. "lv_btn". (Only the pointer is saved)
  * @return LV_RES_OK
  */
 lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name)

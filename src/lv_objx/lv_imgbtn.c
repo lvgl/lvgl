@@ -62,13 +62,17 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the image button type specific extended data*/
     lv_imgbtn_ext_t * ext = lv_obj_allocate_ext_attr(new_imgbtn, sizeof(lv_imgbtn_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_imgbtn);
+        return NULL;
+    }
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_imgbtn);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_imgbtn);
 
         /*Initialize the allocated 'ext' */
 #if LV_IMGBTN_TILED == 0
-    memset(ext->img_src, 0, sizeof(ext->img_src));
+    memset((void*)ext->img_src, 0, sizeof(ext->img_src));
 #else
     memset(ext->img_src_left, 0, sizeof(ext->img_src_left));
     memset(ext->img_src_mid, 0, sizeof(ext->img_src_mid));
@@ -89,11 +93,11 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     else {
         lv_imgbtn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 #if LV_IMGBTN_TILED == 0
-        memcpy(ext->img_src, copy_ext->img_src, sizeof(ext->img_src));
+        memcpy((void*)ext->img_src, copy_ext->img_src, sizeof(ext->img_src));
 #else
-        memcpy(ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
-        memcpy(ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
-        memcpy(ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
+        memcpy((void*)ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
+        memcpy((void*)ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
+        memcpy((void*)ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
 #endif
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_imgbtn);
@@ -303,7 +307,7 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
         if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
             lv_draw_label(&imgbtn->coords, clip_area, style, opa_scale, src, LV_TXT_FLAG_NONE, NULL, NULL, NULL,  lv_obj_get_base_dir(imgbtn));
         } else {
-            lv_draw_img(&imgbtn->coords, clip_area, src, style, 0, LV_IMG_ZOOM_NONE, false, opa_scale);
+            lv_draw_img(&imgbtn->coords, clip_area, src, style, 0, NULL, LV_IMG_ZOOM_NONE, false, opa_scale);
         }
 #else
         const void * src = ext->img_src_left[state];
@@ -420,7 +424,7 @@ static void refr_img(lv_obj_t * imgbtn)
     if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
         const lv_style_t * style = ext->btn.styles[state];
         header.h = lv_font_get_line_height(style->text.font);
-        header.w = lv_txt_get_width(src, strlen(src), style->text.font, style->text.letter_space, LV_TXT_FLAG_NONE);
+        header.w = lv_txt_get_width(src, (uint16_t)strlen(src), style->text.font, style->text.letter_space, LV_TXT_FLAG_NONE);
         header.always_zero = 0;
         header.cf = LV_IMG_CF_ALPHA_1BIT;
     } else {

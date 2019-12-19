@@ -98,7 +98,10 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_ta_ext_t * ext = lv_obj_allocate_ext_attr(new_ta, sizeof(lv_ta_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_ta);
+        return NULL;
+    }
 
     ext->cursor.state      = 1;
     ext->pwd_mode          = 0;
@@ -689,7 +692,7 @@ void lv_ta_set_pwd_mode(lv_obj_t * ta, bool en)
     /*Pwd mode is now enabled*/
     if(ext->pwd_mode == 0 && en != false) {
         char * txt   = lv_label_get_text(ext->label);
-        uint16_t len = strlen(txt);
+        size_t len = strlen(txt);
         ext->pwd_tmp = lv_mem_alloc(len + 1);
         LV_ASSERT_MEM(ext->pwd_tmp);
         if(ext->pwd_tmp == NULL) return;
@@ -1707,7 +1710,6 @@ static void get_cursor_style(lv_obj_t * ta, lv_style_t * style_res)
         style_res->body.padding.top    = 0;
         style_res->body.padding.bottom = 0;
         style_res->line.width          = 1;
-        style_res->body.opa            = LV_OPA_COVER;
     }
 }
 

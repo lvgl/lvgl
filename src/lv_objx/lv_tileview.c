@@ -11,6 +11,7 @@
 
 #include <stdbool.h>
 #include "lv_cont.h"
+#include "../lv_misc/lv_math.h"
 #include "../lv_core/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 
@@ -73,7 +74,11 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the tileview type specific extended data*/
     lv_tileview_ext_t * ext = lv_obj_allocate_ext_attr(new_tileview, sizeof(lv_tileview_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_tileview);
+        return NULL;
+    }
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_tileview);
     if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(new_tileview));
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_tileview);
@@ -97,8 +102,8 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
          * Don't use `par` directly because if the tileview is created on a page it is moved to the
          * scrollable so the parent has changed */
         lv_obj_set_size(new_tileview, lv_obj_get_width_fit(lv_obj_get_parent(new_tileview)),
-                lv_obj_get_height_fit(lv_obj_get_parent(new_tileview)));
-
+        lv_obj_get_height_fit(lv_obj_get_parent(new_tileview)));
+        lv_obj_set_drag_dir(lv_page_get_scrl(new_tileview), LV_DRAG_DIR_ONE);
         lv_obj_set_drag_throw(lv_page_get_scrl(new_tileview), true);
         lv_page_set_scrl_fit(new_tileview, LV_FIT_TIGHT);
         /*Set the default styles*/
@@ -156,11 +161,11 @@ void lv_tileview_add_element(lv_obj_t * tileview, lv_obj_t * element)
 /**
  * Set the valid position's indices. The scrolling will be possible only to these positions.
  * @param tileview pointer to a Tileview object
- * @param valid_pos array width the indices. E.g. `lv_point_t p[] = {{0,0}, {1,0}, {1,1}`. Only the
- * pointer is saved so can't be a local variable.
+ * @param valid_pos array width the indices. E.g. `lv_point_t p[] = {{0,0}, {1,0}, {1,1}`.
+ * Only the pointer is saved so can't be a local variable.
  * @param valid_pos_cnt numner of elements in `valid_pos` array
  */
-void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t * valid_pos, uint16_t valid_pos_cnt)
+void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t valid_pos[], uint16_t valid_pos_cnt)
 {
     LV_ASSERT_OBJ(tileview, LV_OBJX_NAME);
     LV_ASSERT_NULL(valid_pos);
@@ -174,7 +179,7 @@ void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t * val
     /*If valid pos. is selected do nothing*/
     uint16_t i;
     for(i = 0; i < valid_pos_cnt; i++) {
-        if(valid_pos->x == ext->act_id.x && valid_pos->y == ext->act_id.y) {
+        if(valid_pos[i].x == ext->act_id.x && valid_pos[i].y == ext->act_id.y) {
             return;
         }
     }
@@ -281,6 +286,19 @@ void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, const 
 /*
  * New object specific "get" functions come here
  */
+/**
+* Get the tile to be shown
+* @param tileview pointer to a tileview object
+* @param x column id (0, 1, 2...)
+* @param y line id (0, 1, 2...)
+*/
+void lv_tileview_get_tile_act(lv_obj_t * tileview, lv_coord_t *x, lv_coord_t *y)
+{
+    lv_tileview_ext_t * ext = lv_obj_get_ext_attr(tileview);
+
+    *x = ext->act_id.x;
+    *y = ext->act_id.y;
+}
 
 /**
  * Get style of a tileview.
@@ -351,15 +369,13 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
     /* Include the ancient signal function */
     res = ancestor_scrl_signal(scrl, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, "");
 
     lv_obj_t * tileview         = lv_obj_get_parent(scrl);
     const lv_style_t * style_bg = lv_tileview_get_style(tileview, LV_TILEVIEW_STYLE_MAIN);
 
     if(sign == LV_SIGNAL_DRAG_BEGIN) {
         set_valid_drag_dirs(tileview);
-    }
-    else if(sign == LV_SIGNAL_DRAG_END) {
-//        drag_end_handler(tileview);
     }
     else if(sign == LV_SIGNAL_DRAG_THROW_BEGIN) {
         drag_end_handler(tileview);
@@ -398,9 +414,9 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
             /*Apply the drag constraints*/
             lv_drag_dir_t drag_dir = indev->proc.types.pointer.drag_dir;
-            if(drag_dir & LV_DRAG_DIR_HOR)
+            if(drag_dir == LV_DRAG_DIR_HOR)
                 lv_obj_set_y(scrl, -ext->act_id.y * lv_obj_get_height(tileview) + style_bg->body.padding.top);
-            if(drag_dir & LV_DRAG_DIR_VER)
+            else if(drag_dir == LV_DRAG_DIR_VER)
                 lv_obj_set_x(scrl, -ext->act_id.x * lv_obj_get_width(tileview) + style_bg->body.padding.left);
         }
     }

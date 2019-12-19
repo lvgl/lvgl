@@ -124,7 +124,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, const
     dsc->user_data = NULL;
 
     if(dsc->src_type == LV_IMG_SRC_FILE) {
-        uint16_t fnlen = strlen(src);
+        size_t fnlen = strlen(src);
         dsc->src = lv_mem_alloc(fnlen + 1);
         strcpy((char *)dsc->src, src);
     } else {

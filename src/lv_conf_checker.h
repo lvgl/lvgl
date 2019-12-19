@@ -427,6 +427,14 @@
 #define LV_FONT_ROBOTO_28    0
 #endif
 
+/* Demonstrate special features */
+#ifndef LV_FONT_ROBOTO_12_SUBPX
+#define LV_FONT_ROBOTO_12_SUBPX 1
+#endif
+#ifndef LV_FONT_ROBOTO_28_COMPRESSED
+#define LV_FONT_ROBOTO_28_COMPRESSED 1  /*bpp = 3*/
+#endif
+
 /*Pixel perfect monospace font
  * http://pelulamu.net/unscii/ */
 #ifndef LV_FONT_UNSCII_8
@@ -455,6 +463,14 @@
 #define LV_FONT_FMT_TXT_LARGE   0
 #endif
 
+/* Set the pixel order of the display.
+ * Important only if "subpx fonts" are used.
+ * With "normal" font it doesn't matter.
+ */
+#ifndef LV_FONT_SUBPX_BGR
+#define LV_FONT_SUBPX_BGR    0
+#endif
+
 /*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
 
 /*=================
@@ -475,7 +491,6 @@
 #define LV_TXT_BREAK_CHARS                  " ,.;:-_"
 #endif
 
-
 /* If a word is at least this long, will break wherever "prettiest"
  * To disable, set to a value <= 0 */
 #ifndef LV_TXT_LINE_BREAK_LONG_LEN
@@ -493,7 +508,12 @@
 #ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
 #define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
 #endif
- 
+
+/* The control character to use for signalling text recoloring. */
+#ifndef LV_TXT_COLOR_CMD
+#define LV_TXT_COLOR_CMD "#"
+#endif
+
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
  * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
@@ -526,14 +546,6 @@
 #  define lv_vsnprintf    vsnprintf
 #endif
 #endif  /*LV_SPRINTF_CUSTOM*/
-
- /* Set the pixel order of the display.
-  * Important only if "subpx fonts" are used.
-  * With "normal" font it doesn't matter.
-  */
-#ifndef LV_SUBPX_BGR
- #define LV_SUBPX_BGR    0
-#endif
 
 /*===================
  *  LV_OBJ SETTINGS

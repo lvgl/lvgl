@@ -51,7 +51,7 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
         const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
         const lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_blend_mode_t mode);
 
-static inline lv_color_t color_blend_true_color_additive(lv_color_t bg, lv_color_t fg, lv_opa_t opa);
+static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 
 /**********************

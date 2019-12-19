@@ -39,7 +39,6 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_proc_press(lv_indev_proc_t * proc);
 static void indev_proc_release(lv_indev_proc_t * proc);
 static void indev_proc_reset_query_handler(lv_indev_t * indev);
-static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj);
 static void indev_drag(lv_indev_proc_t * proc);
 static void indev_drag_throw(lv_indev_proc_t * proc);
 static lv_obj_t * get_dragged_obj(lv_obj_t * obj);
@@ -722,17 +721,17 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 
     /*If there is no last object then search*/
     if(indev_obj_act == NULL) {
-        indev_obj_act = indev_search_obj(proc, lv_disp_get_layer_sys(disp));
-        if(indev_obj_act == NULL) indev_obj_act = indev_search_obj(proc, lv_disp_get_layer_top(disp));
-        if(indev_obj_act == NULL) indev_obj_act = indev_search_obj(proc, lv_disp_get_scr_act(disp));
+        indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_sys(disp), &proc->types.pointer.act_point);
+        if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_top(disp), &proc->types.pointer.act_point);
+        if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(lv_disp_get_scr_act(disp), &proc->types.pointer.act_point);
         new_obj_searched = true;
     }
     /*If there is last object but it is not dragged and not protected also search*/
     else if(proc->types.pointer.drag_in_prog == 0 &&
             lv_obj_is_protected(indev_obj_act, LV_PROTECT_PRESS_LOST) == false) {
-        indev_obj_act = indev_search_obj(proc, lv_disp_get_layer_sys(disp));
-        if(indev_obj_act == NULL) indev_obj_act = indev_search_obj(proc, lv_disp_get_layer_top(disp));
-        if(indev_obj_act == NULL) indev_obj_act = indev_search_obj(proc, lv_disp_get_scr_act(disp));
+        indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_sys(disp), &proc->types.pointer.act_point);
+        if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_top(disp), &proc->types.pointer.act_point);
+        if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(lv_disp_get_scr_act(disp), &proc->types.pointer.act_point);
         new_obj_searched = true;
     }
     /*If a dragable or a protected object was the last then keep it*/
@@ -1025,12 +1024,12 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
     }
 }
 /**
- * Search the most top, clickable object on the last point of an input device
- * @param proc pointer to  the `lv_indev_proc_t` part of the input device
+ * Search the most top, clickable object by a point
  * @param obj pointer to a start object, typically the screen
+ * @param point pointer to a point for searhing the most top child
  * @return pointer to the found object or NULL if there was no suitable object
  */
-static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj)
+lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t *point)
 {
     lv_obj_t * found_p = NULL;
 
@@ -1042,7 +1041,7 @@ static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj)
     ext_area.y1 = obj->coords.y1 - obj->ext_click_pad_ver;
     ext_area.y2 = obj->coords.y2 + obj->ext_click_pad_ver;
 
-    if(lv_area_is_point_on(&ext_area, &proc->types.pointer.act_point)) {
+    if(lv_area_is_point_on(&ext_area, point)) {
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
     lv_area_t ext_area;
     ext_area.x1 = obj->coords.x1 - obj->ext_click_pad.x1;
@@ -1050,15 +1049,15 @@ static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj)
     ext_area.y1 = obj->coords.y1 - obj->ext_click_pad.y1;
     ext_area.y2 = obj->coords.y2 + obj->ext_click_pad.y2;
 
-    if(lv_area_is_point_on(&ext_area, &proc->types.pointer.act_point)) {
+    if(lv_area_is_point_on(&ext_area, point)) {
 #else
-    if(lv_area_is_point_on(&obj->coords, &proc->types.pointer.act_point)) {
+    if(lv_area_is_point_on(&obj->coords, point)) {
 #endif
         lv_obj_t * i;
 
         LV_LL_READ(obj->child_ll, i)
         {
-            found_p = indev_search_obj(proc, i);
+            found_p = lv_indev_search_obj(i, point);
 
             /*If a child was found then break*/
             if(found_p != NULL) {

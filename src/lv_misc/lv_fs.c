@@ -539,7 +539,7 @@ char * lv_fs_get_letters(char * buf)
  */
 const char * lv_fs_get_ext(const char * fn)
 {
-    uint16_t i;
+    size_t i;
     for(i = strlen(fn); i > 0; i--) {
         if(fn[i] == '.') {
             return &fn[i + 1];
@@ -558,7 +558,7 @@ const char * lv_fs_get_ext(const char * fn)
  */
 char * lv_fs_up(char * path)
 {
-    uint16_t len = strlen(path);
+    size_t len = strlen(path);
     if(len == 0) return path;
 
     len--; /*Go before the trailing '\0'*/
@@ -572,7 +572,7 @@ char * lv_fs_up(char * path)
             return path;
     }
 
-    uint16_t i;
+    size_t i;
     for(i = len; i > 0; i--) {
         if(path[i] == '/' || path[i] == '\\') break;
     }
@@ -589,7 +589,7 @@ char * lv_fs_up(char * path)
  */
 const char * lv_fs_get_last(const char * path)
 {
-    uint16_t len = strlen(path);
+    size_t len = strlen(path);
     if(len == 0) return path;
 
     len--; /*Go before the trailing '\0'*/
@@ -602,7 +602,7 @@ const char * lv_fs_get_last(const char * path)
             return path;
     }
 
-    uint16_t i;
+    size_t i;
     for(i = len; i > 0; i--) {
         if(path[i] == '/' || path[i] == '\\') break;
     }

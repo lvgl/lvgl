@@ -80,7 +80,11 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the canvas type specific extended data*/
     lv_canvas_ext_t * ext = lv_obj_allocate_ext_attr(new_canvas, sizeof(lv_canvas_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_canvas);
+        return NULL;
+    }
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_canvas);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_canvas);
 
@@ -275,7 +279,7 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, l
     LV_ASSERT_NULL(to_copy);
 
     lv_canvas_ext_t * ext = lv_obj_get_ext_attr(canvas);
-    if(x + w >= ext->dsc.header.w || y + h >= ext->dsc.header.h) {
+    if(x + w >= (lv_coord_t)ext->dsc.header.w || y + h >= (lv_coord_t)ext->dsc.header.h) {
         LV_LOG_WARN("lv_canvas_copy_buf: x or y out of the canvas");
         return;
     }
@@ -885,7 +889,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
     lv_refr_set_disp_refreshing(&disp);
 
-    lv_draw_img(&coords, &mask, src, style, 0, LV_IMG_ZOOM_NONE, false, LV_OPA_COVER);
+    lv_draw_img(&coords, &mask, src, style, 0, NULL, LV_IMG_ZOOM_NONE, false, LV_OPA_COVER);
 
     lv_refr_set_disp_refreshing(refr_ori);
 }

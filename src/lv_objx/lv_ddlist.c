@@ -87,7 +87,10 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the drop down list type specific extended data*/
     lv_ddlist_ext_t * ext = lv_obj_allocate_ext_attr(new_ddlist, sizeof(lv_ddlist_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_ddlist);
+        return NULL;
+    }
 
     /*Initialize the allocated 'ext' */
     ext->label          = NULL;
@@ -387,7 +390,7 @@ void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf, uint16_t bu
     uint16_t i;
     uint16_t line        = 0;
     const char * opt_txt = lv_label_get_text(ext->label);
-    uint16_t txt_len     = strlen(opt_txt);
+    size_t txt_len     = strlen(opt_txt);
 
     for(i = 0; i < txt_len && line != ext->sel_opt_id; i++) {
         if(opt_txt[i] == '\n') line++;
@@ -456,16 +459,23 @@ const lv_style_t * lv_ddlist_get_style(const lv_obj_t * ddlist, lv_ddlist_style_
     LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
 
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    const lv_style_t * style;
 
     switch(type) {
-        case LV_DDLIST_STYLE_BG: return lv_page_get_style(ddlist, LV_PAGE_STYLE_BG);
-        case LV_DDLIST_STYLE_SB: return lv_page_get_style(ddlist, LV_PAGE_STYLE_SB);
-        case LV_DDLIST_STYLE_SEL: return ext->sel_style;
-        default: return NULL;
+        case LV_DDLIST_STYLE_BG:
+            style = lv_page_get_style(ddlist, LV_PAGE_STYLE_BG);
+            break;
+        case LV_DDLIST_STYLE_SB:
+            style = lv_page_get_style(ddlist, LV_PAGE_STYLE_SB);
+            break;
+        case LV_DDLIST_STYLE_SEL:
+            style = ext->sel_style;
+            break;
+        default:
+            style = NULL;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 lv_label_align_t lv_ddlist_get_align(const lv_obj_t * ddlist)
@@ -626,7 +636,8 @@ static lv_design_res_t lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * cli
                 new_style.text.color = sel_style->text.color;
                 new_style.text.opa   = sel_style->text.opa;
                 lv_area_t area_icon;
-                lv_coord_t icon_width = lv_txt_get_width(ext->symbol, strlen(ext->symbol), sel_style->text.font, 0, 0);
+                lv_coord_t icon_width = lv_txt_get_width(ext->symbol, (uint16_t)strlen(ext->symbol), sel_style->text.font, 0, 0);
+
                 if(lv_label_get_align(ext->label) != LV_LABEL_ALIGN_RIGHT) {
                     area_icon.x2 = ddlist->coords.x2 - style->body.padding.right;
                     area_icon.x1 = area_icon.x2 - icon_width;
@@ -774,6 +785,7 @@ static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * 
     /* Include the ancient signal function */
     res = ancestor_scrl_signal(scrl, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, "");
 
     lv_obj_t * ddlist = lv_obj_get_parent(scrl);
 

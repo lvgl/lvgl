@@ -77,7 +77,10 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the roller type specific extended data*/
     lv_roller_ext_t * ext = lv_obj_allocate_ext_attr(new_roller, sizeof(lv_roller_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_roller);
+        return NULL;
+    }
 
     ext->mode = LV_ROLLER_MODE_NORMAL;
 
@@ -155,7 +158,7 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
     } else {
         ext->mode = LV_ROLLER_MODE_INIFINITE;
 
-        uint32_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
+        size_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
         char * opt_extra = lv_mem_alloc(opt_len * LV_ROLLER_INF_PAGES);
         uint8_t i;
         for(i = 0; i < LV_ROLLER_INF_PAGES; i++) {
@@ -310,14 +313,19 @@ const lv_style_t * lv_roller_get_style(const lv_obj_t * roller, lv_roller_style_
 {
     LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
 
+    const lv_style_t * style;
     switch(type) {
-        case LV_ROLLER_STYLE_BG: return lv_obj_get_style(roller);
-        case LV_ROLLER_STYLE_SEL: return lv_ddlist_get_style(roller, LV_DDLIST_STYLE_SEL);
-        default: return NULL;
+        case LV_ROLLER_STYLE_BG:
+            style = lv_obj_get_style(roller);
+            break;
+        case LV_ROLLER_STYLE_SEL:
+            style = lv_ddlist_get_style(roller, LV_DDLIST_STYLE_SEL);
+            break;
+        default:
+            style = NULL;
     }
 
-    /*To avoid warning*/
-    return NULL;
+    return style;
 }
 
 /**********************
@@ -509,6 +517,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     /* Include the ancient signal function */
     res = ancestor_scrl_signal(roller_scrl, sign, param);
     if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_indev_t * indev    = lv_indev_get_act();
     int32_t id            = -1;

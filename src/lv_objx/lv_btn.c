@@ -87,7 +87,10 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the extended data*/
     lv_btn_ext_t * ext = lv_obj_allocate_ext_attr(new_btn, sizeof(lv_btn_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_btn);
+        return NULL;
+    }
 
     ext->state = LV_BTN_STATE_REL;
 
@@ -138,7 +141,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->ink_wait_time = copy_ext->ink_wait_time;
         ext->ink_out_time  = copy_ext->ink_out_time;
 #endif
-        memcpy(ext->styles, copy_ext->styles, sizeof(ext->styles));
+        memcpy((void*) ext->styles, copy_ext->styles, sizeof(ext->styles));
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_btn);

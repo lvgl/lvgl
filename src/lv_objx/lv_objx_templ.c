@@ -68,7 +68,11 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the template type specific extended data*/
     lv_templ_ext_t * ext = lv_obj_allocate_ext_attr(new_templ, sizeof(lv_templ_ext_t));
     lv_mem_assert(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_templ);
+        return NULL;
+    }
+
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_templ);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_templ);
 

@@ -89,7 +89,10 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Allocate the object type specific extended data*/
     lv_page_ext_t * ext = lv_obj_allocate_ext_attr(new_page, sizeof(lv_page_ext_t));
     LV_ASSERT_MEM(ext);
-    if(ext == NULL) return NULL;
+    if(ext == NULL) {
+        lv_obj_del(new_page);
+        return NULL;
+    }
 
     ext->scrl        = NULL;
     ext->sb.hor_draw = 0;
