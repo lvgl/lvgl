@@ -203,9 +203,8 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
     ext->max_value = max;
     ext->min_value = min;
 
-    dprintf("bar type %u\n", lv_bar_get_type(bar));
-	if(lv_bar_get_type(bar) != LV_BAR_TYPE_CUSTOM)
-		ext->start_value = min;
+    if(lv_bar_get_type(bar) != LV_BAR_TYPE_CUSTOM)
+        ext->start_value = min;
 
     if(ext->cur_value > max) {
         ext->cur_value = max;
