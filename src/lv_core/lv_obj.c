@@ -53,7 +53,7 @@ typedef struct _lv_event_temp_data
 static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 static inline lv_res_t get_style_prop_core(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop, void * out);
 static void report_style_mod_core(void * style_p, lv_obj_t * obj);
-static void refresh_children_style(lv_obj_t * obj);
+static void refresh_children_style(lv_obj_t * obj, uint8_t type);
 static void delete_children(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
 static void lv_event_mark_deleted(lv_obj_t * obj);
@@ -1253,7 +1253,7 @@ void lv_obj_add_style_class(lv_obj_t * obj, uint8_t type, lv_style_t * style)
 }
 
 /**
- * Notify an object about its style is modified
+ * Notify an object (and its children) about its style is modified
  * @param obj pointer to an object
  */
 void lv_obj_refresh_style(lv_obj_t * obj, uint8_t type)
@@ -1264,7 +1264,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, uint8_t type)
     obj->signal_cb(obj, LV_SIGNAL_STYLE_CHG, &type);
     lv_obj_invalidate(obj);
 
-    refresh_children_style(obj, type)
+    refresh_children_style(obj, type);
 }
 
 /**
@@ -2070,6 +2070,9 @@ lv_style_dsc_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t type)
 
 lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop)
 {
+    uint8_t state = lv_obj_get_state(obj);
+    prop = (uint16_t)prop + ((uint16_t)state << LV_STYLE_STATE_POS);
+
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
@@ -2129,6 +2132,9 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_s
 
 lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop)
 {
+    uint8_t state = lv_obj_get_state(obj);
+    prop = (uint16_t)prop + ((uint16_t)state << LV_STYLE_STATE_POS);
+
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
@@ -2187,6 +2193,9 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t type, lv_style_p
 
 lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop)
 {
+    uint8_t state = lv_obj_get_state(obj);
+    prop = (uint16_t)prop + ((uint16_t)state << LV_STYLE_STATE_POS);
+
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
@@ -2241,6 +2250,9 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_prope
 
 void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop)
 {
+    uint8_t state = lv_obj_get_state(obj);
+    prop = (uint16_t)prop + ((uint16_t)state << LV_STYLE_STATE_POS);
+
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
@@ -2680,32 +2692,27 @@ static void lv_obj_del_async_cb(void * obj)
  * @note Only the relevant fields will be set.
  * E.g. if `border width == 0` the other border properties won't be evaluated.
  */
-void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_obj_state_t state, lv_draw_rect_dsc_t * draw_dsc)
+void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_draw_rect_dsc_t * draw_dsc)
 {
-    lv_style_state_t style_state = state << LV_STYLE_STATE_POS;
+    draw_dsc->radius = lv_obj_get_style_value(obj, type, LV_STYLE_RADIUS);
 
-    draw_dsc->radius = lv_obj_get_style_value(obj, type, LV_STYLE_RADIUS | style_state);
+    draw_dsc->bg_color = lv_obj_get_style_color(obj, type, LV_STYLE_BG_COLOR);
 
-    draw_dsc->bg_color = lv_obj_get_style_color(obj, type, LV_STYLE_BG_COLOR | style_state);
-
-    draw_dsc->border_width = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_WIDTH | style_state);
+    draw_dsc->border_width = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_WIDTH);
     if(draw_dsc->border_width) {
-        draw_dsc->border_opa = lv_obj_get_style_opa(obj, type, LV_STYLE_BORDER_OPA | style_state);
+        draw_dsc->border_opa = lv_obj_get_style_opa(obj, type, LV_STYLE_BORDER_OPA);
         if(draw_dsc->border_opa >= LV_OPA_MIN) {
-            draw_dsc->border_part = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_PART | style_state);
-            draw_dsc->border_color = lv_obj_get_style_color(obj, type, LV_STYLE_BORDER_COLOR | style_state);
+            draw_dsc->border_part = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_PART);
+            draw_dsc->border_color = lv_obj_get_style_color(obj, type, LV_STYLE_BORDER_COLOR);
         }
     }
 }
 
-void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t type, lv_obj_state_t state, lv_draw_label_dsc_t * draw_dsc)
+void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t type, lv_draw_label_dsc_t * draw_dsc)
 {
+    draw_dsc->color = lv_obj_get_style_color(obj, type, LV_STYLE_TEXT_COLOR);
 
-    lv_style_state_t style_state = state << LV_STYLE_STATE_POS;
-
-    draw_dsc->color = lv_obj_get_style_color(obj, type, LV_STYLE_TEXT_COLOR| style_state);
-
-    draw_dsc->font = lv_obj_get_style_ptr(obj, type, LV_STYLE_FONT | style_state);
+    draw_dsc->font = lv_obj_get_style_ptr(obj, type, LV_STYLE_FONT);
 }
 
 /**
@@ -2757,7 +2764,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
-        lv_obj_init_draw_rect_dsc(obj, LV_OBJ_STYLE_MAIN, lv_obj_get_state(obj), &draw_dsc);
+        lv_obj_init_draw_rect_dsc(obj, LV_OBJ_STYLE_MAIN, &draw_dsc);
         lv_draw_rect(&obj->coords, clip_area, &draw_dsc, lv_obj_get_opa_scale(obj));
 
         if(lv_obj_get_style_value(obj, LV_OBJ_STYLE_MAIN, LV_STYLE_BG_CLIP_CORNER)) {
@@ -2874,8 +2881,10 @@ static void refresh_children_style(lv_obj_t * obj, uint8_t type)
 {
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
     while(child != NULL) {
-        refresh_children_style(child); /*Check children too*/
-        lv_obj_refresh_style(child);   /*Notify the child about the style change*/
+        refresh_children_style(child, type); /*Check children too*/
+        lv_obj_invalidate(child);
+        child->signal_cb(child, LV_SIGNAL_STYLE_CHG, &type);
+        lv_obj_invalidate(child);
         child = lv_obj_get_child(obj, child);
     }
 }

@@ -1037,9 +1037,9 @@ lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name);
  * @note Only the relevant fields will be set.
  * E.g. if `border width == 0` the other border properties won't be evaluated.
  */
-void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_obj_state_t state, lv_draw_rect_dsc_t * draw_dsc);
+void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_draw_rect_dsc_t * draw_dsc);
 
-void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t type, lv_obj_state_t state, lv_draw_label_dsc_t * draw_dsc);
+void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t type, lv_draw_label_dsc_t * draw_dsc);
 
 /**********************
  *      MACROS

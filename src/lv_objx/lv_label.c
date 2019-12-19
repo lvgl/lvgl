@@ -1051,7 +1051,6 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         lv_obj_get_coords(label, &coords);
 
         lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-        lv_obj_state_t state = lv_obj_get_state(label);
         if(ext->body_draw) {
             lv_area_t bg;
             lv_obj_get_coords(label, &bg);
@@ -1067,7 +1066,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
 
             lv_draw_rect_dsc_t draw_rect_dsc;
             lv_draw_rect_dsc_init(&draw_rect_dsc);
-            lv_obj_init_draw_rect_dsc(label, LV_LABEL_STYLE_MAIN, state, &draw_rect_dsc);
+            lv_obj_init_draw_rect_dsc(label, LV_LABEL_STYLE_MAIN, &draw_rect_dsc);
 
             lv_draw_rect(&bg, clip_area, &draw_rect_dsc, lv_obj_get_opa_scale(label));
         }
@@ -1110,7 +1109,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         label_draw_dsc.ofs_x = ext->offset.x;
         label_draw_dsc.ofs_y = ext->offset.y;
         label_draw_dsc.flag = flag;
-        lv_obj_init_draw_label_dsc(label, LV_LABEL_STYLE_MAIN, state, &label_draw_dsc);
+        lv_obj_init_draw_label_dsc(label, LV_LABEL_STYLE_MAIN, &label_draw_dsc);
 
         lv_draw_label(&coords, clip_area, &label_draw_dsc, ext->text, opa_scale, hint);
 
