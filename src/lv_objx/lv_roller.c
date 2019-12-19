@@ -277,6 +277,24 @@ uint16_t lv_roller_get_selected(const lv_obj_t * roller)
 }
 
 /**
+ * Get the total number of options
+ * @param roller pointer to a roller object
+ * @return the total number of options
+ */
+uint16_t lv_roller_get_option_cnt(const lv_obj_t * roller)
+{
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+
+    lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    if(ext->mode == LV_ROLLER_MODE_INIFINITE) {
+        uint16_t real_id_cnt = ext->ddlist.option_cnt / LV_ROLLER_INF_PAGES;
+        return real_id_cnt;
+    } else {
+        return ext->ddlist.option_cnt;
+    }
+}
+
+/**
  * Get the align attribute. Default alignment after _create is LV_LABEL_ALIGN_CENTER
  * @param roller pointer to a roller object
  * @return LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER

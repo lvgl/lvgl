@@ -376,6 +376,20 @@ uint16_t lv_ddlist_get_selected(const lv_obj_t * ddlist)
 }
 
 /**
+ * Get the total number of options
+ * @param ddlist pointer to drop down list object
+ * @return the total number of options in the list
+ */
+uint16_t lv_ddlist_get_option_cnt(const lv_obj_t * ddlist)
+{
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
+    lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+    return ext->option_cnt;
+}
+
+/**
  * Get the current selected option as a string
  * @param ddlist pointer to ddlist object
  * @param buf pointer to an array to store the string
