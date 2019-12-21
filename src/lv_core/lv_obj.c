@@ -121,6 +121,16 @@ void lv_init(void)
     LV_LOG_INFO("lv_init ready");
 }
 
+
+void lv_deinit(void)
+{
+    lv_gc_clear_roots();
+    lv_log_register_print_cb(NULL);
+    lv_disp_set_default(NULL);
+    lv_initialized = false;
+    LV_LOG_INFO("lv_deinit done");
+}
+
 /*--------------------
  * Create and delete
  *-------------------*/

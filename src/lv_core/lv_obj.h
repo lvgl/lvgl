@@ -269,6 +269,12 @@ typedef struct
  */
 void lv_init(void);
 
+
+/**
+ * Deinit the 'lv' library
+ */
+void lv_deinit(void);
+
 /*--------------------
  * Create and delete
  *-------------------*/
