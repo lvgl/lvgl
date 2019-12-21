@@ -128,6 +128,7 @@ enum {
     LV_SIGNAL_GET_TYPE, /**< LittlevGL needs to retrieve the object's type */
 
     /*Input device related*/
+    LV_SIGNAL_HIT_TEST,          /**< Advanced hit-testing */
     LV_SIGNAL_PRESSED,           /**< The object has been pressed*/
     LV_SIGNAL_PRESSING,          /**< The object is being pressed (called continuously while pressing)*/
     LV_SIGNAL_PRESS_LOST,        /**< User is still pressing but slid cursor/finger off of the object */
@@ -198,7 +199,6 @@ typedef struct _lv_obj_t
     lv_event_cb_t event_cb; /**< Event callback function */
     lv_signal_cb_t signal_cb; /**< Object type specific signal function*/
     lv_design_cb_t design_cb; /**< Object type specific design function*/
-    lv_hittest_cb_t hit_cb;   /**< Object type specific advanced hit-test function */
 
     void * ext_attr;            /**< Object type specific extended data*/
     const lv_style_t * style_p; /**< Pointer to the object's style*/
@@ -265,6 +265,12 @@ typedef struct
     const char * type[LV_MAX_ANCESTOR_NUM]; /**< [0]: the actual type, [1]: ancestor, [2] #1's ancestor
                                                ... [x]: "lv_obj" */
 } lv_obj_type_t;
+
+typedef struct _lv_hit_test_info_t
+{
+    lv_point_t *point;
+    bool result;
+} lv_hit_test_info_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -603,13 +609,6 @@ const void * lv_event_get_data(void);
 void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb);
 
 /**
- * Set the advanced hit-test callback of an object. Used internally by the library.
- * @param obj pointer to an object
- * @param cb the new signal function
- */
-void lv_obj_set_hit_test_cb(lv_obj_t * obj, lv_hittest_cb_t hit_cb);
-
-/**
  * Send an event to the object
  * @param obj pointer to an object
  * @param event the type of the event from `lv_event_t`.
@@ -919,13 +918,6 @@ bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
  * @return the signal function
  */
 lv_signal_cb_t lv_obj_get_signal_cb(const lv_obj_t * obj);
-
-/**
- * Get the hit test function of an object
- * @param obj pointer to an object
- * @return the hit test function
- */
-lv_hittest_cb_t lv_obj_get_hit_test_cb(const lv_obj_t * obj);
 
 /**
  * Get the design function of an object

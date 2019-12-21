@@ -16,6 +16,7 @@
 #include "../lv_core/lv_indev.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_point.h"
 
 /*********************
  *      DEFINES
@@ -124,7 +125,6 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_cpicker, lv_cpicker_signal);
     lv_obj_set_design_cb(new_cpicker, lv_cpicker_design);
-    lv_obj_set_hit_test_cb(new_cpicker, lv_cpicker_hit);
 
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
@@ -891,6 +891,9 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
             res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
+    } else if(sign == LV_SIGNAL_HIT_TEST) {
+        lv_hit_test_info_t *info = param;
+        info->result = lv_cpicker_hit(cpicker, info->point);
     }
 
     return res;

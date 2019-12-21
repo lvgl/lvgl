@@ -240,7 +240,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         /*Set the callbacks*/
         new_obj->signal_cb = lv_obj_signal;
         new_obj->design_cb = lv_obj_design;
-        new_obj->hit_cb = NULL;
         new_obj->event_cb = NULL;
 
 #if LV_USE_BIDI
@@ -1560,18 +1559,6 @@ void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb)
 }
 
 /**
- * Set the advanced hit-test callback of an object. Used internally by the library.
- * @param obj pointer to an object
- * @param cb the new signal function
- */
-void lv_obj_set_hit_test_cb(lv_obj_t * obj, lv_hittest_cb_t hit_cb)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    obj->hit_cb = hit_cb;
-}
-
-/**
  * Send an event to the object
  * @param obj pointer to an object
  * @param event the type of the event from `lv_event_t`.
@@ -2261,18 +2248,6 @@ lv_signal_cb_t lv_obj_get_signal_cb(const lv_obj_t * obj)
 }
 
 /**
- * Get the hit test function of an object
- * @param obj pointer to an object
- * @return the hit test function
- */
-lv_hittest_cb_t lv_obj_get_hit_test_cb(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return obj->hit_cb;
-}
-
-/**
  * Get the design function of an object
  * @param obj pointer to an object
  * @return the design function
@@ -2445,8 +2420,12 @@ bool lv_obj_hittest(lv_obj_t * obj, lv_point_t * point) {
 #endif
         return false;
     }
-    if(obj->adv_hittest && obj->hit_cb != NULL) {
-        if(!obj->hit_cb(obj, point))
+    if(obj->adv_hittest) {
+        lv_hit_test_info_t hit_info;
+        hit_info.point = point;
+        hit_info.result = true;
+        obj->signal_cb(obj, LV_SIGNAL_HIT_TEST, &hit_info);
+        if(!hit_info.result)
             return false;
     }
     return true;
