@@ -56,6 +56,12 @@ typedef struct
 void lv_mem_init(void);
 
 /**
+ * Clean up the memory buffer which frees all the allocated memories.
+ * @note It work only if `LV_MEM_CUSTOM == 0`
+ */
+void lv_mem_deinit(void);
+
+/**
  * Allocate a memory dynamically
  * @param size size of the memory to allocate in bytes
  * @return pointer to the allocated memory
