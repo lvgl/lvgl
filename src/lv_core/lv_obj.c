@@ -121,6 +121,18 @@ void lv_init(void)
     LV_LOG_INFO("lv_init ready");
 }
 
+#if LV_ENABLE_GC || !LV_MEM_CUSTOM
+void lv_deinit(void)
+{
+    lv_gc_clear_roots();
+    lv_log_register_print_cb(NULL);
+    lv_disp_set_default(NULL);
+    lv_mem_deinit();
+    lv_initialized = false;
+    LV_LOG_INFO("lv_deinit done");
+}
+#endif
+
 /*--------------------
  * Create and delete
  *-------------------*/
