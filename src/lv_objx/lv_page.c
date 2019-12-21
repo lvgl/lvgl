@@ -150,16 +150,16 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->scrl                = lv_cont_create(new_page, copy_ext->scrl);
         lv_obj_set_signal_cb(ext->scrl, lv_page_scrollable_signal);
 
-        lv_page_set_sb_mode(new_page, copy_ext->sb.mode);
+        /* Add the signal function only if 'scrolling' is created
+         * because everything has to be ready before any signal is received*/
+        lv_obj_set_signal_cb(new_page, lv_page_signal);
+        lv_obj_set_design_cb(new_page, lv_page_design);
 
         lv_page_set_style(new_page, LV_PAGE_STYLE_BG, lv_page_get_style(copy, LV_PAGE_STYLE_BG));
         lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, lv_page_get_style(copy, LV_PAGE_STYLE_SCRL));
         lv_page_set_style(new_page, LV_PAGE_STYLE_SB, lv_page_get_style(copy, LV_PAGE_STYLE_SB));
 
-        /* Add the signal function only if 'scrolling' is created
-         * because everything has to be ready before any signal is received*/
-        lv_obj_set_signal_cb(new_page, lv_page_signal);
-        lv_obj_set_design_cb(new_page, lv_page_design);
+        lv_page_set_sb_mode(new_page, copy_ext->sb.mode);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_page);
