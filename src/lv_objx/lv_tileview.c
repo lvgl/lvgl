@@ -486,9 +486,9 @@ static void tileview_scrl_event_cb(lv_obj_t * scrl, lv_event_t event)
         lv_tileview_ext_t * ext = lv_obj_get_ext_attr(tileview);
         if(lv_indev_is_dragging(indev) && (ext->drag_hor || ext->drag_ver)) {
             indev->proc.types.pointer.drag_in_prog = 0;
+            drag_end_handler(tileview);
         }
 
-        drag_end_handler(tileview);
     }
 }
 
