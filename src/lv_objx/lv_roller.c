@@ -149,8 +149,9 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
 
         /* Make sure the roller's height and the scrollable's height is refreshed.
          * They are refreshed in `LV_SIGNAL_COORD_CHG` but if the new options has the same width
-         * that signal won't be called. (It called because LV_FIT_TIGHT hor fit)*/
+         * that signal won't be called. (It's called because of LV_FIT_TIGHT hor fit)*/
         refr_height(roller);
+        refr_position(roller, LV_ANIM_OFF);
     } else {
         ext->mode = LV_ROLLER_MODE_INIFINITE;
 
