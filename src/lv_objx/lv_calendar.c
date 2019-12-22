@@ -508,7 +508,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         lv_indev_get_point(indev, &p);
 
         /*If the header is pressed mark an arrow as pressed*/
-        if(lv_area_is_point_on(&header_area, &p)) {
+        if(lv_area_is_point_on(&header_area, &p, 0)) {
             if(p.x < header_area.x1 + lv_area_get_width(&header_area) / 2) {
                 if(ext->btn_pressing != -1) lv_obj_invalidate(calendar);
                 ext->btn_pressing = -1;
@@ -605,7 +605,7 @@ static bool calculate_touched_day(lv_obj_t * calendar, const lv_point_t * touche
     days_area.y1 =
         calendar->coords.y1 + get_header_height(calendar) + get_day_names_height(calendar) - style_bg->body.padding.top;
 
-    if(lv_area_is_point_on(&days_area, touched_point)) {
+    if(lv_area_is_point_on(&days_area, touched_point, 0)) {
         lv_coord_t w  = (days_area.x2 - days_area.x1 + 1) / 7;
         lv_coord_t h  = (days_area.y2 - days_area.y1 + 1) / 6;
         uint8_t x_pos = 0;

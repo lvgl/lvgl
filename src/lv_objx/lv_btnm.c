@@ -1056,7 +1056,7 @@ static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p)
         btn_area.y1 += btnm_cords.y1;
         btn_area.x2 += btnm_cords.x1;
         btn_area.y2 += btnm_cords.y1;
-        if(lv_area_is_point_on(&btn_area, p) != false) {
+        if(lv_area_is_point_on(&btn_area, p, 0) != false) {
             break;
         }
     }
