@@ -63,20 +63,16 @@ typedef struct {
 
 void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
 
+
 /**
  * Write a text
  * @param coords coordinates of the label
  * @param mask the label will be drawn only in this area
- * @param style pointer to a style
- * @param opa_scale scale down all opacities by the factor
- * @param txt 0 terminated text to write
- * @param flag settings for the text from 'txt_flag_t' enum
- * @param offset text offset in x and y direction (NULL if unused)
- * @param sel_start start index of selected area (`LV_LABEL_TXT_SEL_OFF` if none)
- * @param bidi_dir base direction of the text
+ * @param dsc pointer to draw descriptor
+ * @param txt `\0` terminated text to write
  */
 void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
-                   const char * txt, lv_opa_t opa_scale, lv_draw_label_hint_t * hint);
+                   const char * txt, lv_draw_label_hint_t * hint);
 
 /**********************
  *      MACROS

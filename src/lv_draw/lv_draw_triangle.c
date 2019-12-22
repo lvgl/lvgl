@@ -154,7 +154,7 @@ void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_are
 
 
 
-    lv_draw_rect(&poly_mask, &poly_mask, style, opa_scale);
+    lv_draw_rect(&poly_mask, &poly_mask, style);
 
     lv_draw_mask_remove_custom(mp);
 

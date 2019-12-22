@@ -187,7 +187,7 @@ typedef struct
     uint8_t auto_realign : 1;
     uint8_t origo_align : 1; /**< 1: the origo (center of the object) was aligned with
                                 `lv_obj_align_origo`*/
-} lv_reailgn_t;
+} lv_realign_t;
 #endif
 
 /*Protect some attributes (max. 8 bit)*/
@@ -249,7 +249,6 @@ typedef struct _lv_obj_t
     uint8_t drag_parent : 1;    /**< 1: Parent will be dragged instead*/
     uint8_t hidden : 1;         /**< 1: Object is hidden*/
     uint8_t top : 1;            /**< 1: If the object or its children is clicked it goes to the foreground*/
-    uint8_t opa_scale_en : 1;   /**< 1: opa_scale is set*/
     uint8_t parent_event : 1;   /**< 1: Send the object's events to the parent too. */
     lv_drag_dir_t drag_dir : 3; /**<  Which directions the object can be dragged in */
     lv_bidi_dir_t base_dir : 2; /**< Base direction of texts related to this object */
@@ -257,12 +256,11 @@ typedef struct _lv_obj_t
     uint8_t protect;            /**< Automatically happening actions can be prevented. 'OR'ed values from
                                    `lv_protect_t`*/
     uint8_t state;
-    lv_opa_t opa_scale;         /**< Scale down the opacity by this factor. Effects all children as well*/
 
     lv_coord_t ext_draw_pad; /**< EXTtend the size in every direction for drawing. */
 
 #if LV_USE_OBJ_REALIGN
-    lv_reailgn_t realign;       /**< Information about the last call to ::lv_obj_align. */
+    lv_realign_t realign;       /**< Information about the last call to ::lv_obj_align. */
 #endif
 
 #if LV_USE_USER_DATA
@@ -464,15 +462,19 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
  */
 void lv_obj_set_style(lv_obj_t * obj, const lv_style_t * style);
 
-void lv_obj_set_style_color(lv_obj_t * obj, lv_style_property_t prop, lv_color_t color);
+void lv_obj_set_style_color(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_color_t color);
 
-void lv_obj_set_style_value(lv_obj_t * obj, lv_style_property_t prop, lv_style_value_t value);
+void lv_obj_set_style_value(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_style_value_t value);
 
-void lv_obj_set_style_opa(lv_obj_t * obj, lv_style_property_t prop, lv_opa_t opa);
+void lv_obj_set_style_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_opa_t opa);
 
-void lv_obj_set_style_ptr(lv_obj_t * obj, lv_style_property_t prop, void * p);
+void lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, void * p);
 
 void lv_obj_add_style_class(lv_obj_t * obj, uint8_t type, lv_style_t * style);
+
+
+void lv_obj_reset_style(lv_obj_t * obj, uint8_t type);
+
 /**
  * Notify an object about its style is modified
  * @param obj pointer to an object
@@ -579,6 +581,10 @@ void lv_obj_set_protect(lv_obj_t * obj, uint8_t prot);
  * @param prot 'OR'-ed values from `lv_protect_t`
  */
 void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot);
+
+void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t state);
+
+void lv_obj_clear_state(lv_obj_t * obj, lv_obj_state_t state);
 
 /**
  * Set a an event handler function for an object.

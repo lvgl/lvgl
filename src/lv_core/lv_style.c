@@ -42,6 +42,31 @@ static void style_animation_common_end_cb(lv_anim_t * a);
 #endif
 
 /**********************
+ *  GLOABAL VARIABLES
+ **********************/
+
+/*Basic styles*/
+lv_style_t lv_style_plain;
+lv_style_t lv_style_panel;
+lv_style_t lv_style_panel;
+lv_style_t lv_style_btn;
+
+/*Color styles*/
+lv_style_t lv_style_dark;
+lv_style_t lv_style_light;
+lv_style_t lv_style_red;
+lv_style_t lv_style_green;
+lv_style_t lv_style_blue;
+
+/*Transparent styles*/
+lv_style_t lv_style_transp;
+lv_style_t lv_style_frame;
+
+/*Padding styles*/
+lv_style_t lv_style_tight;
+lv_style_t lv_style_fit;
+
+/**********************
  *  STATIC VARIABLES
  **********************/
 
@@ -59,6 +84,107 @@ static void style_animation_common_end_cb(lv_anim_t * a);
 void lv_style_built_in_init(void)
 {
 
+    lv_mem_monitor_t mon;
+    lv_mem_monitor(&mon);
+    printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n", (int)mon.total_size - mon.free_size,
+            mon.used_pct,
+            mon.frag_pct,
+            (int)mon.free_biggest_size);
+
+
+    /*Basic styles*/
+    lv_style_init(&lv_style_plain);
+    lv_style_set_value(&lv_style_plain, LV_STYLE_PAD_LEFT, LV_DPI / 12);
+    lv_style_set_value(&lv_style_plain, LV_STYLE_PAD_RIGHT, LV_DPI / 12);
+    lv_style_set_value(&lv_style_plain, LV_STYLE_PAD_TOP, LV_DPI / 12);
+    lv_style_set_value(&lv_style_plain, LV_STYLE_PAD_BOTTOM, LV_DPI / 12);
+    lv_style_set_value(&lv_style_plain, LV_STYLE_PAD_INNER, LV_DPI / 16);
+
+    lv_style_init(&lv_style_panel);
+    lv_style_set_value(&lv_style_panel, LV_STYLE_PAD_LEFT, LV_DPI / 12);
+    lv_style_set_value(&lv_style_panel, LV_STYLE_PAD_RIGHT, LV_DPI / 12);
+    lv_style_set_value(&lv_style_panel, LV_STYLE_PAD_TOP, LV_DPI / 12);
+    lv_style_set_value(&lv_style_panel, LV_STYLE_PAD_BOTTOM, LV_DPI / 12);
+    lv_style_set_value(&lv_style_panel, LV_STYLE_PAD_INNER, LV_DPI / 20);
+    lv_style_set_value(&lv_style_panel, LV_STYLE_RADIUS, LV_DPI / 16);
+    lv_style_set_value(&lv_style_panel, LV_STYLE_BORDER_WIDTH, LV_DPI / 50 > 0 ? LV_DPI / 50 : 1);
+    lv_style_set_color(&lv_style_panel, LV_STYLE_BG_COLOR, LV_COLOR_SILVER);
+    lv_style_set_color(&lv_style_panel, LV_STYLE_BG_GRAD_COLOR, LV_COLOR_GRAY);
+    lv_style_set_color(&lv_style_panel, LV_STYLE_BORDER_COLOR, LV_COLOR_GRAY);
+
+    lv_style_init(&lv_style_btn);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_LEFT, LV_DPI / 6);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_RIGHT, LV_DPI / 6);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_TOP, LV_DPI / 10);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_BOTTOM, LV_DPI / 10);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_INNER, LV_DPI / 16);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_RADIUS, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_BORDER_WIDTH, LV_DPI / 50 > 0 ? LV_DPI / 50 : 1);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_BG_GRAD_DIR, LV_GRAD_DIR_VER);
+    lv_style_set_color(&lv_style_btn, LV_STYLE_BG_COLOR, LV_COLOR_BLUE);
+    lv_style_set_color(&lv_style_btn, LV_STYLE_BG_GRAD_COLOR, LV_COLOR_NAVY);
+    lv_style_set_color(&lv_style_btn, LV_STYLE_BORDER_COLOR, LV_COLOR_NAVY);
+    lv_style_set_color(&lv_style_btn, LV_STYLE_BG_GRAD_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_BLACK);
+    lv_style_set_color(&lv_style_btn, LV_STYLE_TEXT_COLOR, LV_COLOR_WHITE);
+
+    /*Color styles*/
+    lv_style_init(&lv_style_light);
+    lv_style_set_color(&lv_style_light, LV_STYLE_BG_COLOR, LV_COLOR_SILVER);
+    lv_style_set_color(&lv_style_light, LV_STYLE_BG_GRAD_COLOR, LV_COLOR_GRAY);
+    lv_style_set_color(&lv_style_light, LV_STYLE_BORDER_COLOR, LV_COLOR_GRAY);
+
+    lv_style_init(&lv_style_dark);
+    lv_style_set_color(&lv_style_dark, LV_STYLE_BG_COLOR, lv_color_hex3(0x444));
+    lv_style_set_color(&lv_style_dark, LV_STYLE_BG_GRAD_COLOR, lv_color_hex3(0x222));
+    lv_style_set_color(&lv_style_dark, LV_STYLE_BORDER_COLOR, LV_COLOR_GRAY);
+    lv_style_set_color(&lv_style_blue, LV_STYLE_TEXT_COLOR, LV_COLOR_WHITE);
+
+    lv_style_init(&lv_style_red);
+    lv_style_set_color(&lv_style_red, LV_STYLE_BG_COLOR, LV_COLOR_RED);
+    lv_style_set_color(&lv_style_red, LV_STYLE_BG_GRAD_COLOR, LV_COLOR_MAROON);
+    lv_style_set_color(&lv_style_red, LV_STYLE_BORDER_COLOR, LV_COLOR_MAROON);
+    lv_style_set_color(&lv_style_blue, LV_STYLE_TEXT_COLOR, LV_COLOR_WHITE);
+
+    lv_style_init(&lv_style_green);
+    lv_style_set_color(&lv_style_green, LV_STYLE_BG_COLOR, LV_COLOR_LIME);
+    lv_style_set_color(&lv_style_green, LV_STYLE_BG_GRAD_COLOR, LV_COLOR_GREEN);
+    lv_style_set_color(&lv_style_green, LV_STYLE_BORDER_COLOR, LV_COLOR_GREEN);
+    lv_style_set_color(&lv_style_blue, LV_STYLE_TEXT_COLOR, LV_COLOR_WHITE);
+
+    lv_style_init(&lv_style_blue);
+    lv_style_set_color(&lv_style_blue, LV_STYLE_BG_COLOR, LV_COLOR_BLUE);
+    lv_style_set_color(&lv_style_blue, LV_STYLE_BG_GRAD_COLOR, LV_COLOR_NAVY);
+    lv_style_set_color(&lv_style_blue, LV_STYLE_BORDER_COLOR, LV_COLOR_NAVY);
+    lv_style_set_color(&lv_style_blue, LV_STYLE_BG_GRAD_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_BLACK);
+    lv_style_set_color(&lv_style_blue, LV_STYLE_TEXT_COLOR, LV_COLOR_WHITE);
+
+    /*Transparent styles*/
+    lv_style_init(&lv_style_transp);
+    lv_style_set_opa(&lv_style_transp, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
+    lv_style_set_opa(&lv_style_transp, LV_STYLE_BORDER_OPA, LV_OPA_TRANSP);
+
+    lv_style_init(&lv_style_frame);
+    lv_style_set_opa(&lv_style_frame, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
+
+    /*Padding styles*/
+    lv_style_init(&lv_style_tight);
+    lv_style_set_value(&lv_style_tight, LV_STYLE_PAD_LEFT, 0);
+    lv_style_set_value(&lv_style_tight, LV_STYLE_PAD_RIGHT, 0);
+    lv_style_set_value(&lv_style_tight, LV_STYLE_PAD_TOP, 0);
+    lv_style_set_value(&lv_style_tight, LV_STYLE_PAD_BOTTOM, 0);
+    lv_style_set_value(&lv_style_tight, LV_STYLE_PAD_INNER, 0);
+
+    lv_style_init(&lv_style_fit);
+    lv_style_set_value(&lv_style_fit, LV_STYLE_PAD_LEFT, 0);
+    lv_style_set_value(&lv_style_fit, LV_STYLE_PAD_RIGHT, 0);
+    lv_style_set_value(&lv_style_fit, LV_STYLE_PAD_TOP, 0);
+    lv_style_set_value(&lv_style_fit, LV_STYLE_PAD_BOTTOM, 0);
+
+    lv_mem_monitor(&mon);
+    printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n", (int)mon.total_size - mon.free_size,
+            mon.used_pct,
+            mon.frag_pct,
+            (int)mon.free_biggest_size);
 }
 
 void lv_style_init(lv_style_t * style)
@@ -72,6 +198,62 @@ void lv_style_dsc_init(lv_style_dsc_t * style_dsc)
 {
     lv_style_init(&style_dsc->local);
     style_dsc->classes = NULL;
+    style_dsc->class_cnt = 0;
+}
+
+
+void lv_style_dsc_add_class(lv_style_dsc_t * style_dsc, lv_style_t * class)
+{
+    lv_style_t ** new_classes = lv_mem_realloc(style_dsc->classes, sizeof(lv_style_t *) * (style_dsc->class_cnt + 1));
+    LV_ASSERT_MEM(new_classes);
+    if(new_classes == NULL) {
+        LV_LOG_WARN("lv_style_dsc_add_class: couldn't add the class");
+        return;
+    }
+
+    new_classes[style_dsc->class_cnt] = class;
+
+    style_dsc->class_cnt++;
+    style_dsc->classes = new_classes;
+}
+
+void lv_style_dsc_remove_class(lv_style_dsc_t * style_dsc, lv_style_t * class)
+{
+    if(style_dsc->class_cnt == 0) return;
+
+    lv_style_t ** new_classes = lv_mem_realloc(style_dsc->classes, sizeof(lv_style_t *) * (style_dsc->class_cnt - 1));
+    LV_ASSERT_MEM(new_classes);
+    if(new_classes == NULL) {
+        LV_LOG_WARN("lv_style_dsc_remove_class: couldn't remove the class");
+        return;
+    }
+    uint8_t i,j;
+    for(i = 0, j = 0; i < style_dsc->class_cnt; i++) {
+        if(style_dsc->classes[i] == class) continue;
+        new_classes[j] = style_dsc->classes[i];
+        j++;
+
+    }
+
+    style_dsc->class_cnt--;
+    style_dsc->classes = new_classes;
+}
+
+void lv_style_dsc_reset(lv_style_dsc_t * style_dsc)
+{
+    lv_mem_free(style_dsc->classes);
+    style_dsc->classes = NULL;
+    style_dsc->class_cnt = 0;
+    lv_style_reset(&style_dsc->local);
+
+}
+
+void lv_style_reset(lv_style_t * style)
+{
+    lv_mem_free(style->map);
+    style->map = NULL;
+    style->size = 0;
+    style->used_groups = 0;
 }
 
 /**
@@ -109,6 +291,10 @@ void lv_style_set_value(lv_style_t * style, lv_style_property_t prop, lv_style_v
 
     memcpy(style->map + style->size - (sizeof(lv_style_property_t) + sizeof(lv_style_value_t)), &prop, sizeof(lv_style_property_t));
     memcpy(style->map + style->size - sizeof(lv_style_value_t), &value, sizeof(lv_style_value_t));
+
+    /*Set that group is used this style*/
+    uint16_t group = (prop >> 4) & 0xF;
+    style->used_groups |= 1 << group;
 }
 
 void lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_t color)
@@ -136,6 +322,10 @@ void lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_t
 
     memcpy(style->map + style->size - (sizeof(lv_style_property_t) + sizeof(lv_color_t)), &prop, sizeof(lv_style_property_t));
     memcpy(style->map + style->size - sizeof(lv_color_t), &color, sizeof(lv_color_t));
+
+    /*Set that group is used this style*/
+    uint16_t group = (prop >> 4) & 0xF;
+    style->used_groups |= 1 << group;
 }
 
 void lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa)
@@ -163,6 +353,10 @@ void lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa
 
     memcpy(style->map + style->size - (sizeof(lv_style_property_t) + sizeof(lv_opa_t)), &prop, sizeof(lv_style_property_t));
     memcpy(style->map + style->size - sizeof(lv_opa_t), &opa, sizeof(lv_opa_t));
+
+    /*Set that group is used this style*/
+    uint16_t group = (prop >> 4) & 0xF;
+    style->used_groups |= 1 << group;
 }
 
 void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, void * p)
@@ -190,6 +384,10 @@ void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, void * p)
 
     memcpy(style->map + style->size - (sizeof(lv_style_property_t) + sizeof(void *)), &prop, sizeof(lv_style_property_t));
     memcpy(style->map + style->size - sizeof(void *), &p, sizeof(void *));
+
+    /*Set that group is used this style*/
+    uint16_t group = (prop >> 4) & 0xF;
+    style->used_groups |= 1 << group;
 }
 
 
@@ -366,15 +564,40 @@ void lv_style_anim_set_styles(lv_anim_t * a, lv_style_t * to_anim, const lv_styl
 
 static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop)
 {
+    static uint32_t stat[256];
+
+
+    static uint32_t s = 0;
+
+
     uint8_t id_to_find = prop & 0xFF;
     lv_style_attr_t attr;
     attr.full = (prop >> 8) & 0xFF;
 
+    stat[id_to_find]++;
+
+//    if(s > 1000) {
+//        printf("\n\n");
+//        s = 0;
+//        uint32_t i;
+//        for(i = 0; i < 256; i++) {
+//            if(stat[i] == 0) continue;
+//            printf("%02x;%d;\n", i, stat[i]);
+//        }
+//    }
+
     int16_t weight = -1;
     int16_t id_guess = -1;
 
+
+    uint16_t group = (id_to_find >> 4) & 0xF;
+    if((style->used_groups & (1 << group)) == 0) return id_guess;
+
     size_t i = 0;
     while(i < style->size) {
+//        s++;
+
+//        printf("style search:%d\n", s);
         lv_style_attr_t attr_act;
         attr_act.full = style->map[i + 1];
         if(style->map[i] == id_to_find) {

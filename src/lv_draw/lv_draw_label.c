@@ -63,7 +63,7 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
 {
     memset(dsc, 0x00, sizeof(lv_draw_label_dsc_t));
     dsc->opa = LV_OPA_COVER;
-    dsc->color = LV_COLOR_RED;
+    dsc->color = LV_COLOR_BLACK;
     dsc->font = LV_FONT_DEFAULT;
     dsc->sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
     dsc->sel_end = LV_DRAW_LABEL_NO_TXT_SEL;
@@ -75,15 +75,11 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
  * Write a text
  * @param coords coordinates of the label
  * @param mask the label will be drawn only in this area
- * @param style pointer to a style
- * @param opa_scale scale down all opacities by the factor
- * @param txt 0 terminated text to write
- * @paramdsc->flag settings for the text from 'txt_flag_t' enum
- * @param offset text offset in x and y direction (NULL if unused)
- * @param sel make the text selected in the range by drawing a background there
+ * @param dsc pointer to draw descriptor
+ * @param txt `\0` terminated text to write
  */
 void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
-                   const char * txt, lv_opa_t opa_scale, lv_draw_label_hint_t * hint)
+                   const char * txt, lv_draw_label_hint_t * hint)
 {
     const lv_font_t * font = dsc->font;
     lv_coord_t w;
@@ -167,7 +163,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
         pos.x += lv_area_get_width(coords) - line_width;
     }
 
-    lv_opa_t opa = opa_scale == LV_OPA_COVER ? dsc->opa : (uint16_t)((uint16_t)dsc->opa * opa_scale) >> 8;
+    lv_opa_t opa = dsc->opa;
 
     uint16_t sel_start = dsc->sel_start;
     uint16_t sel_end = dsc->sel_end;

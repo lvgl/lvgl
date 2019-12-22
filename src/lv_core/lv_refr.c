@@ -435,8 +435,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
         /*If no better children check this object*/
         if(found_p == NULL) {
-            if(design_res == LV_DESIGN_RES_COVER &&
-               lv_obj_get_opa_scale(obj) == LV_OPA_COVER) {
+            if(design_res == LV_DESIGN_RES_COVER) {
                 found_p = obj;
             }
         }

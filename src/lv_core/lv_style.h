@@ -76,6 +76,7 @@ typedef union {
 
 enum {
     LV_STYLE_PROP_INIT(LV_STYLE_RADIUS,             0x0, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_OPA_SCALE,          0x0, LV_STYLE_ID_OPA + 0,   LV_STYLE_ATTR_INHERIT),
 
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_TOP,            0x1, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_BOTTOM,         0x1, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
@@ -85,7 +86,9 @@ enum {
 
     LV_STYLE_PROP_INIT(LV_STYLE_BG_CLIP_CORNER,     0x2, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_BG_BLEND_MODE,      0x2, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_BG_GRAD_DIR,        0x2, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_MAIN_COLOR_STOP, 0x2, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_GRAD_COLOR_STOP, 0x2, LV_STYLE_ID_VALUE + 4, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_GRAD_DIR,        0x2, LV_STYLE_ID_VALUE + 5, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_BG_COLOR,           0x2, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_BG_GRAD_COLOR,      0x2, LV_STYLE_ID_COLOR + 1, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_BG_OPA,             0x2, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
@@ -95,7 +98,6 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_BORDER_BLEND_MODE,  0x3, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_BORDER_COLOR,       0x3, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_BORDER_OPA,         0x3, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
-
 
     LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_WIDTH,       0x4, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_OFFSET_X,    0x4, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
@@ -139,14 +141,35 @@ typedef struct {
     uint16_t reserved   :7;
 }lv_style_t;
 
-typedef struct _lv_style_classes_t {
-    lv_style_t * style;
-    struct _lv_style_classes_t * next;
-}lv_style_classes_t;
+typedef struct {
+    const lv_font_t * font;
+    lv_color_t bg_color;
+    lv_color_t text_color;
+    lv_style_value_t radius;
+    lv_style_value_t pad_left;
+    lv_style_value_t pad_right;
+    lv_style_value_t pad_top;
+    lv_style_value_t pad_bottom;
+    lv_style_value_t pad_inner;
+    lv_style_value_t border_width;
+    lv_style_value_t shadow_width;
+    lv_style_value_t letter_space;
+    lv_style_value_t line_space;
+    lv_style_value_t bg_grad_dir;
+    lv_opa_t opa_scale;
+    lv_opa_t bg_opa;
+    lv_opa_t border_opa;
+    lv_opa_t txt_opa;
+    lv_opa_t img_opa;
+}lv_style_cache_t;
 
 typedef struct {
     lv_style_t  local;
-    lv_style_classes_t * classes;
+    lv_style_t ** classes;
+    uint8_t class_cnt;
+#if LV_STYLE_CACHING
+    lv_style_cache_t cache;
+#endif
 }lv_style_dsc_t;
 
 
@@ -177,6 +200,14 @@ void lv_style_built_in_init(void);
 void lv_style_init(lv_style_t * style);
 
 void lv_style_dsc_init(lv_style_dsc_t * style_dsc);
+
+void lv_style_dsc_add_class(lv_style_dsc_t * style_dsc, lv_style_t * style);
+
+void lv_style_dsc_remove_class(lv_style_dsc_t * style_dsc, lv_style_t * class);
+
+void lv_style_dsc_reset(lv_style_dsc_t * style_dsc);
+
+void lv_style_reset(lv_style_t * style);
 
 /**
  * Copy a style to an other
@@ -302,19 +333,27 @@ static inline void lv_style_anim_create(lv_anim_t * a)
 /*************************
  *    GLOBAL VARIABLES
  *************************/
-//extern lv_style_t lv_style_scr;
-//extern lv_style_t lv_style_transp;
-//extern lv_style_t lv_style_transp_fit;
-//extern lv_style_t lv_style_transp_tight;
-//extern lv_style_t lv_style_plain;
-//extern lv_style_t lv_style_plain_color;
-//extern lv_style_t lv_style_pretty;
-//extern lv_style_t lv_style_pretty_color;
-//extern lv_style_t lv_style_btn_rel;
-//extern lv_style_t lv_style_btn_pr;
-//extern lv_style_t lv_style_btn_tgl_rel;
-//extern lv_style_t lv_style_btn_tgl_pr;
-//extern lv_style_t lv_style_btn_ina;
+
+/*Basic styles*/
+extern lv_style_t lv_style_plain;
+extern lv_style_t lv_style_panel;
+extern lv_style_t lv_style_panel;
+extern lv_style_t lv_style_btn;
+
+/*Color styles*/
+extern lv_style_t lv_style_dark;
+extern lv_style_t lv_style_light;
+extern lv_style_t lv_style_red;
+extern lv_style_t lv_style_green;
+extern lv_style_t lv_style_blue;
+
+/*Transparent styles*/
+extern lv_style_t lv_style_transp;
+extern lv_style_t lv_style_frame;
+
+/*Padding styles*/
+extern lv_style_t lv_style_tight;
+extern lv_style_t lv_style_fit;
 
 /**********************
  *      MACROS

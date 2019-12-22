@@ -635,12 +635,19 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
  */
 static void lv_cont_refr_autofit(lv_obj_t * cont)
 {
+    static uint32_t t = 0;
+
+
+
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 
     if(ext->fit_left == LV_FIT_NONE && ext->fit_right == LV_FIT_NONE && ext->fit_top == LV_FIT_NONE &&
        ext->fit_bottom == LV_FIT_NONE) {
         return;
     }
+
+    t++;
+    printf("autofit:%d\n", t);
 
     lv_area_t tight_area;
     lv_area_t ori;

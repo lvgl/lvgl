@@ -451,13 +451,12 @@ static lv_design_res_t lv_btn_design(lv_obj_t * btn, const lv_area_t * clip_area
             }
         }
 #else
-        lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
         lv_obj_init_draw_rect_dsc(btn, LV_OBJ_STYLE_MAIN, &draw_dsc);
 
-        lv_draw_rect(&btn->coords, clip_area, &draw_dsc, lv_obj_get_opa_scale(btn));
+        lv_draw_rect(&btn->coords, clip_area, &draw_dsc);
 
         if(lv_obj_get_style_value(btn, LV_OBJ_STYLE_MAIN, LV_STYLE_BG_CLIP_CORNER)) {
             lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
@@ -492,7 +491,6 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
-    lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
     bool tgl           = lv_btn_get_toggle(btn);
     lv_btn_state_t state = lv_btn_get_state(btn);
     if(sign == LV_SIGNAL_PRESSED) {

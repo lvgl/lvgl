@@ -1047,7 +1047,6 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         const lv_font_t * font   = lv_obj_get_style_ptr(label, LV_LABEL_STYLE_MAIN, LV_STYLE_FONT);
         lv_style_value_t line_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LINE_SPACE);
         lv_style_value_t letter_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LETTER_SPACE);
-        lv_opa_t opa_scale       = lv_obj_get_opa_scale(label);
         lv_obj_get_coords(label, &coords);
 
         lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
@@ -1068,7 +1067,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
             lv_draw_rect_dsc_init(&draw_rect_dsc);
             lv_obj_init_draw_rect_dsc(label, LV_LABEL_STYLE_MAIN, &draw_rect_dsc);
 
-            lv_draw_rect(&bg, clip_area, &draw_rect_dsc, lv_obj_get_opa_scale(label));
+            lv_draw_rect(&bg, clip_area, &draw_rect_dsc);
         }
 
         lv_label_align_t align = lv_label_get_align(label);
@@ -1111,7 +1110,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         label_draw_dsc.flag = flag;
         lv_obj_init_draw_label_dsc(label, LV_LABEL_STYLE_MAIN, &label_draw_dsc);
 
-        lv_draw_label(&coords, clip_area, &label_draw_dsc, ext->text, opa_scale, hint);
+        lv_draw_label(&coords, clip_area, &label_draw_dsc, ext->text, hint);
 
         if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
             lv_point_t size;
@@ -1124,7 +1123,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
                         lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
                 label_draw_dsc.ofs_y = ext->offset.y;
 
-                lv_draw_label(&coords, clip_area, &label_draw_dsc, ext->text, opa_scale, hint);
+                lv_draw_label(&coords, clip_area, &label_draw_dsc, ext->text, hint);
             }
 
             /*Draw the text again below the original to make an circular effect */
@@ -1132,7 +1131,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
                 label_draw_dsc.ofs_x = ext->offset.x;
                 label_draw_dsc.ofs_y = ext->offset.y + size.y + lv_font_get_line_height(font);
 
-                lv_draw_label(&coords, clip_area, &label_draw_dsc, ext->text, opa_scale, hint);
+                lv_draw_label(&coords, clip_area, &label_draw_dsc, ext->text, hint);
             }
         }
     }

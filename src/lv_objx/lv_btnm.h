@@ -56,7 +56,7 @@ typedef struct
     const char ** map_p;                              /*Pointer to the current map*/
     lv_area_t * button_areas;                         /*Array of areas of buttons*/
     lv_btnm_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
-    const lv_style_t * styles_btn[_LV_BTN_STATE_NUM]; /*Styles of buttons in each state*/
+    lv_style_dsc_t style_btn;                     /*Styles of buttons in each state*/
     uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
     uint16_t btn_id_pr;                               /*Index of the currently pressed button or LV_BTNM_BTN_NONE*/
     uint16_t btn_id_act;    /*Index of the active button (being pressed/released etc) or LV_BTNM_BTN_NONE */
@@ -65,12 +65,8 @@ typedef struct
 } lv_btnm_ext_t;
 
 enum {
-    LV_BTNM_STYLE_BG,
-    LV_BTNM_STYLE_BTN_REL,
-    LV_BTNM_STYLE_BTN_PR,
-    LV_BTNM_STYLE_BTN_TGL_REL,
-    LV_BTNM_STYLE_BTN_TGL_PR,
-    LV_BTNM_STYLE_BTN_INA,
+    LV_BTNM_STYLE_MAIN,
+    LV_BTNM_STYLE_BTN,
 };
 typedef uint8_t lv_btnm_style_t;
 
@@ -249,13 +245,8 @@ const char * lv_btnm_get_btn_text(const lv_obj_t * btnm, uint16_t btn_id);
  */
 bool lv_btnm_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl);
 
-/**
- * Get a style of a button matrix
- * @param btnm pointer to a button matrix object
- * @param type which style should be get
- * @return style pointer to a style
- */
-const lv_style_t * lv_btnm_get_style(const lv_obj_t * btnm, lv_btnm_style_t type);
+
+lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t type);
 
 /**
  * Find whether "one toggle" mode is enabled.
