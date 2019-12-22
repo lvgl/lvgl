@@ -204,48 +204,71 @@ void lv_style_dsc_init(lv_style_dsc_t * style_dsc)
 
 void lv_style_dsc_add_class(lv_style_dsc_t * style_dsc, lv_style_t * class)
 {
-    lv_style_t ** new_classes = lv_mem_realloc(style_dsc->classes, sizeof(lv_style_t *) * (style_dsc->class_cnt + 1));
-    LV_ASSERT_MEM(new_classes);
-    if(new_classes == NULL) {
-        LV_LOG_WARN("lv_style_dsc_add_class: couldn't add the class");
-        return;
+    /* Do not allocate memory for the first class.
+     * It can be simply stored as a pointer.*/
+    if(style_dsc->class_cnt == 0) {
+        style_dsc->classes = (lv_style_t**)class;
+        style_dsc->class_cnt = 1;
+    } else {
+
+        lv_style_t ** new_classes;
+        if(style_dsc->class_cnt == 1) new_classes = lv_mem_alloc(sizeof(lv_style_t *) * (style_dsc->class_cnt + 1));
+        else new_classes = lv_mem_realloc(style_dsc->classes, sizeof(lv_style_t *) * (style_dsc->class_cnt + 1));
+        LV_ASSERT_MEM(new_classes);
+        if(new_classes == NULL) {
+            LV_LOG_WARN("lv_style_dsc_add_class: couldn't add the class");
+            return;
+        }
+
+        new_classes[style_dsc->class_cnt] = class;
+
+        style_dsc->class_cnt++;
+        style_dsc->classes = new_classes;
     }
-
-    new_classes[style_dsc->class_cnt] = class;
-
-    style_dsc->class_cnt++;
-    style_dsc->classes = new_classes;
 }
 
 void lv_style_dsc_remove_class(lv_style_dsc_t * style_dsc, lv_style_t * class)
 {
     if(style_dsc->class_cnt == 0) return;
+    if(style_dsc->class_cnt == 1) {
+        if((lv_style_t*)style_dsc->classes == class) {
+            style_dsc->classes = NULL;
+            style_dsc->class_cnt = 0;
+        }
+    } else {
+        lv_style_t ** new_classes = lv_mem_realloc(style_dsc->classes, sizeof(lv_style_t *) * (style_dsc->class_cnt - 1));
+        LV_ASSERT_MEM(new_classes);
+        if(new_classes == NULL) {
+            LV_LOG_WARN("lv_style_dsc_remove_class: couldn't remove the class");
+            return;
+        }
+        uint8_t i,j;
+        for(i = 0, j = 0; i < style_dsc->class_cnt; i++) {
+            if(style_dsc->classes[i] == class) continue;
+            new_classes[j] = style_dsc->classes[i];
+            j++;
 
-    lv_style_t ** new_classes = lv_mem_realloc(style_dsc->classes, sizeof(lv_style_t *) * (style_dsc->class_cnt - 1));
-    LV_ASSERT_MEM(new_classes);
-    if(new_classes == NULL) {
-        LV_LOG_WARN("lv_style_dsc_remove_class: couldn't remove the class");
-        return;
+        }
+
+        style_dsc->class_cnt--;
+        style_dsc->classes = new_classes;
     }
-    uint8_t i,j;
-    for(i = 0, j = 0; i < style_dsc->class_cnt; i++) {
-        if(style_dsc->classes[i] == class) continue;
-        new_classes[j] = style_dsc->classes[i];
-        j++;
-
-    }
-
-    style_dsc->class_cnt--;
-    style_dsc->classes = new_classes;
 }
 
 void lv_style_dsc_reset(lv_style_dsc_t * style_dsc)
 {
-    lv_mem_free(style_dsc->classes);
+    if(style_dsc->class_cnt > 1) lv_mem_free(style_dsc->classes);
     style_dsc->classes = NULL;
     style_dsc->class_cnt = 0;
     lv_style_reset(&style_dsc->local);
+}
 
+lv_style_t * lv_style_dsc_get_class(lv_style_dsc_t * style_dsc, uint8_t id)
+{
+    if(style_dsc->class_cnt == 0) return NULL;
+    if(style_dsc->class_cnt == 1) return (lv_style_t*) style_dsc->classes;
+
+    return &style_dsc[id];
 }
 
 void lv_style_reset(lv_style_t * style)

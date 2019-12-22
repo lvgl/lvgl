@@ -2116,7 +2116,8 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_s
 
         int16_t ci;
         for(ci = dsc->class_cnt - 1; ci >= 0; ci--) {
-            weight_act = lv_style_get_value(dsc->classes[ci], prop, &value_act);
+            lv_style_t * class = lv_style_dsc_get_class(dsc, ci);
+            weight_act = lv_style_get_value(class, prop, &value_act);
             /*On perfect match return the value immediately*/
             if(weight_act == weight_goal) {
                 return value_act;
@@ -2187,7 +2188,8 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t type, lv_style_p
 
         int16_t ci;
         for(ci = dsc->class_cnt - 1; ci >= 0; ci--) {
-            weight_act = lv_style_get_color(dsc->classes[ci], prop, &value_act);
+            lv_style_t * class = lv_style_dsc_get_class(dsc, ci);
+            weight_act = lv_style_get_color(class, prop, &value_act);
             /*On perfect match return the value immediately*/
             if(weight_act == weight_goal) {
                 return value_act;
@@ -2261,7 +2263,8 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_prope
 
         int16_t ci;
         for(ci = dsc->class_cnt - 1; ci >= 0; ci--) {
-            weight_act = lv_style_get_opa(dsc->classes[ci], prop, &value_act);
+            lv_style_t * class = lv_style_dsc_get_class(dsc, ci);
+            weight_act = lv_style_get_opa(class, prop, &value_act);
             /*On perfect match return the value immediately*/
             if(weight_act == weight_goal) {
                 return value_act;
@@ -2327,7 +2330,8 @@ void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t type, lv_style_propert
 
         int16_t ci;
         for(ci = dsc->class_cnt - 1; ci >= 0; ci--) {
-            weight_act = lv_style_get_ptr(dsc->classes[ci], prop, &value_act);
+            lv_style_t * class = lv_style_dsc_get_class(dsc, ci);
+            weight_act = lv_style_get_ptr(class, prop, &value_act);
             /*On perfect match return the value immediately*/
             if(weight_act == weight_goal) {
                 return value_act;

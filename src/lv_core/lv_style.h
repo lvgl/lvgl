@@ -207,6 +207,8 @@ void lv_style_dsc_remove_class(lv_style_dsc_t * style_dsc, lv_style_t * class);
 
 void lv_style_dsc_reset(lv_style_dsc_t * style_dsc);
 
+lv_style_t * lv_style_dsc_get_class(lv_style_dsc_t * style_dsc, uint8_t id);
+
 void lv_style_reset(lv_style_t * style);
 
 /**
