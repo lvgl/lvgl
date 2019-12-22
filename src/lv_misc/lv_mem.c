@@ -23,7 +23,7 @@
 #define LV_MEM_ADD_JUNK 0
 #endif
 
-#ifdef LV_MEM_ENV64
+#ifdef LV_ARCH_64
 #define MEM_UNIT uint64_t
 #else
 #define MEM_UNIT uint32_t
@@ -128,7 +128,7 @@ void * lv_mem_alloc(size_t size)
         return &zero_mem;
     }
 
-#ifdef LV_MEM_ENV64
+#ifdef LV_ARCH_64
     /*Round the size up to 8*/
     if(size & 0x7) {
         size = size & (~0x7);
@@ -447,7 +447,7 @@ static void * ent_alloc(lv_mem_ent_t * e, size_t size)
  */
 static void ent_trunc(lv_mem_ent_t * e, size_t size)
 {
-#ifdef LV_MEM_ENV64
+#ifdef LV_ARCH_64
     /*Round the size up to 8*/
     if(size & 0x7) {
         size = size & (~0x7);
