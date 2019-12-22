@@ -262,7 +262,7 @@ static bool lv_point_within_circle(const lv_area_t * area, const lv_point_t * p)
 {
     lv_coord_t r = (area->x2 - area->x1) / 2;
 
-    /* Ellipse center */
+    /* Circle center */
     lv_coord_t cx = area->x1 + r;
     lv_coord_t cy = area->y1 + r;
     
