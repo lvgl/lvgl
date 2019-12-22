@@ -39,7 +39,6 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data);
 static void indev_proc_press(lv_indev_proc_t * proc);
 static void indev_proc_release(lv_indev_proc_t * proc);
 static void indev_proc_reset_query_handler(lv_indev_t * indev);
-static lv_obj_t * indev_search_obj(const lv_indev_proc_t * proc, lv_obj_t * obj);
 static void indev_drag(lv_indev_proc_t * proc);
 static void indev_drag_throw(lv_indev_proc_t * proc);
 static lv_obj_t * get_dragged_obj(lv_obj_t * obj);
@@ -1035,25 +1034,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t *point)
     lv_obj_t * found_p = NULL;
 
     /*If the point is on this object check its children too*/
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
-    lv_area_t ext_area;
-    ext_area.x1 = obj->coords.x1 - obj->ext_click_pad_hor;
-    ext_area.x2 = obj->coords.x2 + obj->ext_click_pad_hor;
-    ext_area.y1 = obj->coords.y1 - obj->ext_click_pad_ver;
-    ext_area.y2 = obj->coords.y2 + obj->ext_click_pad_ver;
-
-    if(lv_area_is_point_on(&ext_area, point)) {
-#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
-    lv_area_t ext_area;
-    ext_area.x1 = obj->coords.x1 - obj->ext_click_pad.x1;
-    ext_area.x2 = obj->coords.x2 + obj->ext_click_pad.x2;
-    ext_area.y1 = obj->coords.y1 - obj->ext_click_pad.y1;
-    ext_area.y2 = obj->coords.y2 + obj->ext_click_pad.y2;
-
-    if(lv_area_is_point_on(&ext_area, point)) {
-#else
-    if(lv_area_is_point_on(&obj->coords, point)) {
-#endif
+    if(lv_obj_hittest(obj, point)) {
         lv_obj_t * i;
 
         LV_LL_READ(obj->child_ll, i)

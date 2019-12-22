@@ -188,8 +188,6 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 
     lv_coord_t def = LV_CHART_POINT_DEF;
 
-    if(ser == NULL) return NULL;
-
     ser->color  = color;
     ser->points = lv_mem_alloc(sizeof(lv_coord_t) * ext->point_cnt);
     LV_ASSERT_MEM(ser->points);
@@ -933,7 +931,6 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
     lv_style_copy(&style_point, &lv_style_plain);
 
     style_point.body.border.width = 0;
-    style_point.body.radius       = LV_RADIUS_CIRCLE;
     style_point.body.opa          = ext->series.opa;
     style_point.body.radius       = ext->series.width;
 

@@ -17,8 +17,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-/* Check windows*/
-#ifdef __WIN64
+// Check windows
+#ifdef _WIN64
 #define LV_ARCH_64
 #endif
 

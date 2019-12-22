@@ -203,8 +203,8 @@ void lv_bar_set_range(lv_obj_t * bar, int16_t min, int16_t max)
     ext->max_value = max;
     ext->min_value = min;
 
-	if(lv_bar_get_type(bar) != LV_BAR_TYPE_CUSTOM)
-		ext->start_value = min;
+    if(lv_bar_get_type(bar) != LV_BAR_TYPE_CUSTOM)
+        ext->start_value = min;
 
     if(ext->cur_value > max) {
         ext->cur_value = max;
@@ -539,7 +539,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mo
                 ext->indic_area.x2 = zero;
             }
         } else {
-			lv_coord_t increment = (anim_start_value * indicw) / range;
+			lv_coord_t increment = ((anim_start_value-ext->min_value) * indicw) / range;
 			ext->indic_area.x1 += increment;
 			ext->indic_area.x2 += increment;
 		}
@@ -557,7 +557,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mo
                 ext->indic_area.y1 = zero;
             }
         } else {
-			lv_coord_t increment = (anim_start_value * objh) / range;
+			lv_coord_t increment = ((anim_start_value-ext->min_value) * objh) / range;
 			ext->indic_area.y1 += increment;
 			ext->indic_area.y2 += increment;
 		}

@@ -147,6 +147,13 @@ void lv_roller_set_style(lv_obj_t * roller, lv_roller_style_t type, const lv_sty
 uint16_t lv_roller_get_selected(const lv_obj_t * roller);
 
 /**
+ * Get the total number of options
+ * @param roller pointer to a roller object
+ * @return the total number of options in the list
+ */
+uint16_t lv_roller_get_option_cnt(const lv_obj_t * roller);
+
+/**
  * Get the current selected option as a string
  * @param roller pointer to roller object
  * @param buf pointer to an array to store the string

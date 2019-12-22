@@ -142,6 +142,18 @@ typedef struct {
 }lv_style_t;
 
 typedef struct {
+    lv_style_t  local;
+    lv_style_t ** classes;
+    uint8_t class_cnt;
+#if LV_STYLE_CACHING
+    lv_style_cache_t cache;
+#endif
+}lv_style_dsc_t;
+
+
+typedef int16_t lv_style_value_t;
+
+typedef struct {
     const lv_font_t * font;
     lv_color_t bg_color;
     lv_color_t text_color;
@@ -162,18 +174,6 @@ typedef struct {
     lv_opa_t txt_opa;
     lv_opa_t img_opa;
 }lv_style_cache_t;
-
-typedef struct {
-    lv_style_t  local;
-    lv_style_t ** classes;
-    uint8_t class_cnt;
-#if LV_STYLE_CACHING
-    lv_style_cache_t cache;
-#endif
-}lv_style_dsc_t;
-
-
-typedef int16_t lv_style_value_t;
 
 #if LV_USE_ANIMATION
 /** Data structure for style animations. */
