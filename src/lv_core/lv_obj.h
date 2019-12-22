@@ -148,7 +148,6 @@ enum {
 typedef uint8_t lv_signal_t;
 
 typedef lv_res_t (*lv_signal_cb_t)(struct _lv_obj_t * obj, lv_signal_t sign, void * param);
-typedef bool (*lv_hittest_cb_t)(struct _lv_obj_t * obj, const lv_point_t * point);
 
 /** Object alignment. */
 enum {

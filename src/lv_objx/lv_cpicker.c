@@ -16,7 +16,6 @@
 #include "../lv_core/lv_indev.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_math.h"
-#include "../lv_misc/lv_point.h"
 
 /*********************
  *      DEFINES
@@ -912,7 +911,7 @@ static bool lv_cpicker_hit(lv_obj_t * cpicker, const lv_point_t * p)
     area_mid.x2 -= style_main->line.width;
     area_mid.y2 -= style_main->line.width;
     
-    if(lv_point_within_ellipse(&area_mid, p))
+    if(lv_area_is_point_on(&area_mid, p, LV_RADIUS_CIRCLE))
         return false;
     
     return true;
