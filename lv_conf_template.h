@@ -587,7 +587,7 @@ typedef void * lv_obj_user_data_t;
 /*--END OF LV_CONF_H--*/
 
 /*Be sure every define has a default value*/
-#include "lvgl/src/lv_conf_checker.h"
+#include "lvgl/src/lv_conf_internal.h"
 
 #endif /*LV_CONF_H*/
 
