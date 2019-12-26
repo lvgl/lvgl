@@ -15,8 +15,6 @@ steps:
 
   - script: |
       echo Start build
-      echo root content:
-      ls 
       cd tests
       echo tests content:
       python build.py
