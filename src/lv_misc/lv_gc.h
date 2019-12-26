@@ -13,13 +13,6 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
-
 #include <stdint.h>
 #include <stdbool.h>
 #include "lv_mem.h"
@@ -31,6 +24,7 @@ extern "C" {
  *      DEFINES
  *********************/
 
+extern lv_mem_buf_t _lv_mem_buf[LV_MEM_BUF_MAX_NUM];
 
 #define LV_ITERATE_ROOTS(f) \
     f(lv_ll_t, _lv_task_ll)  /*Linked list to store the lv_tasks*/ \
@@ -43,7 +37,6 @@ extern "C" {
     f(lv_ll_t, _lv_img_defoder_ll)                                 \
     f(lv_img_cache_entry_t*, _lv_img_cache_array)                  \
     f(void*, _lv_task_act)                                         \
-    f(lv_mem_buf_t, _lv_mem_buf[LV_MEM_BUF_MAX_NUM])               \
 
 #define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;
 #define LV_ROOTS LV_ITERATE_ROOTS(LV_DEFINE_ROOT)

@@ -5,11 +5,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+
+#include "../lv_conf_internal.h"
 
 /* In the font converter use this list as range:
       61441, 61448, 61451, 61452, 61452, 61453, 61457, 61459, 61461, 61465,
