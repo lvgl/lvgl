@@ -121,7 +121,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
 //            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_PR, th->style.btn.tgl_pr);
 //            lv_btn_set_style(new_btn, LV_BTN_STYLE_INA, th->style.btn.ina);
         } else {
-//            lv_obj_reset_style(new_btn, LV_BTN_STYLE_MAIN);
+            lv_obj_reset_style(new_btn, LV_BTN_STYLE_MAIN);
             lv_obj_add_style_class(new_btn, LV_BTN_STYLE_MAIN, &lv_style_btn);
         }
     }

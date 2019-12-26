@@ -199,6 +199,8 @@ void lv_style_dsc_init(lv_style_dsc_t * style_dsc)
     lv_style_init(&style_dsc->local);
     style_dsc->classes = NULL;
     style_dsc->class_cnt = 0;
+    memset(&style_dsc->cache, 0x00, sizeof(lv_style_cache_t));
+    style_dsc->cache.enabled = 1;
 }
 
 
@@ -263,6 +265,7 @@ void lv_style_dsc_reset(lv_style_dsc_t * style_dsc)
     style_dsc->class_cnt = 0;
     lv_style_reset(&style_dsc->local);
 }
+
 
 void lv_style_reset(lv_style_t * style)
 {

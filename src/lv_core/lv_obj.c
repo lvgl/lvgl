@@ -53,6 +53,7 @@ typedef struct _lv_event_temp_data
 static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 static void report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj, uint8_t type);
+static lv_res_t style_cache_update_core(lv_obj_t * obj, uint8_t type);
 static void delete_children(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
 static void lv_event_mark_deleted(lv_obj_t * obj);
@@ -1216,6 +1217,8 @@ void lv_obj_refresh_style(lv_obj_t * obj, uint8_t type)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
+    lv_obj_update_style_cache(obj, type);
+
     lv_obj_invalidate(obj);
     obj->signal_cb(obj, LV_SIGNAL_STYLE_CHG, &type);
     lv_obj_invalidate(obj);
@@ -2015,13 +2018,67 @@ lv_style_dsc_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t type)
 
 lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop)
 {
+
+    lv_style_dsc_t * dsc = lv_obj_get_style(obj, type);
+    if(dsc->cache.enabled) {
+        switch(prop & (~LV_STYLE_STATE_MASK)) {
+        case LV_STYLE_PAD_LEFT:
+            if(dsc->cache.pad_left != LV_STYLE_CACHE_PAD_SKIPPED) {
+                return dsc->cache.pad_left;
+            }
+            break;
+        case LV_STYLE_PAD_RIGHT:
+            if(dsc->cache.pad_right != LV_STYLE_CACHE_PAD_SKIPPED) {
+                return dsc->cache.pad_right;
+            }
+            break;
+        case LV_STYLE_PAD_TOP:
+            if(dsc->cache.pad_top != LV_STYLE_CACHE_PAD_SKIPPED) {
+                return dsc->cache.pad_top;
+            }
+            break;
+        case LV_STYLE_PAD_BOTTOM:
+            if(dsc->cache.pad_bottom != LV_STYLE_CACHE_PAD_SKIPPED) {
+                return dsc->cache.pad_bottom;
+            }
+            break;
+        case LV_STYLE_PAD_INNER:
+            if(dsc->cache.pad_inner!= LV_STYLE_CACHE_PAD_SKIPPED) {
+                return dsc->cache.pad_inner;
+            }
+            break;
+        case LV_STYLE_BG_GRAD_DIR:
+            return dsc->cache.bg_grad_dir;
+            break;
+        case LV_STYLE_BORDER_WIDTH:
+            if(dsc->cache.border_width != LV_STYLE_CACHE_WIDTH_SKIPPED) {
+                return dsc->cache.border_width;
+            }
+            break;
+        case LV_STYLE_LINE_WIDTH:
+            if(dsc->cache.line_width != LV_STYLE_CACHE_WIDTH_SKIPPED) {
+                return dsc->cache.line_width;
+            }
+            break;
+        case LV_STYLE_LETTER_SPACE:
+            if(dsc->cache.letter_space != LV_STYLE_CACHE_WIDTH_SKIPPED) {
+                return dsc->cache.letter_space;
+            }
+            break;
+        case LV_STYLE_SHADOW_WIDTH:
+            if(dsc->cache.shadow_width == 0) {
+                return 0;
+            }
+            break;
+    }
+
+
     uint8_t state;
     lv_style_property_t prop_ori = prop;
 
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
-    int16_t weight_goal = attr.bits.state;
     int16_t weight = -1;
     lv_style_value_t value;
 
@@ -2031,6 +2088,7 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_s
         if(dsc == NULL) continue;
 
         state = lv_obj_get_state(parent);
+        int16_t weight_goal = state;
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
         int16_t weight_act;
@@ -2076,6 +2134,7 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_s
 
     if(weight >= 0) return value;
 
+
     prop = prop & (~LV_STYLE_STATE_MASK);
     switch(prop) {
     case LV_STYLE_BORDER_PART:
@@ -2087,6 +2146,11 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_s
 
 lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop)
 {
+    lv_style_dsc_t * dsc = lv_obj_get_style(obj, type);
+    if(dsc->cache.enabled) {
+
+    }
+
     uint8_t state;
     lv_style_property_t prop_ori = prop;
 
@@ -2162,6 +2226,41 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t type, lv_style_p
 
 lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop)
 {
+
+    lv_style_dsc_t * dsc = lv_obj_get_style(obj, type);
+    if(dsc->cache.enabled) {
+        switch(prop & (~LV_STYLE_STATE_MASK)) {
+        case LV_STYLE_BG_OPA:
+            if(dsc->cache.bg_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.bg_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            break;
+        case LV_STYLE_BORDER_OPA:
+            if(dsc->cache.border_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.border_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            break;
+        case LV_STYLE_TEXT_OPA:
+            if(dsc->cache.txt_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.txt_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            break;
+        case LV_STYLE_SHADOW_OPA:
+            if(dsc->cache.shadow_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.shadow_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            break;
+        case LV_STYLE_LINE_OPA:
+            if(dsc->cache.line_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.line_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            break;
+        case LV_STYLE_IMG_OPA:
+            if(dsc->cache.img_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.img_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            break;
+        case LV_STYLE_OPA_SCALE:
+            if(dsc->cache.opa_scale != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.opa_scale != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            break;
+        }
+    }
+
     uint8_t state;
     lv_style_property_t prop_ori = prop;
 
@@ -2298,6 +2397,24 @@ void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t type, lv_style_propert
     }
 
     return NULL;
+}
+
+
+void lv_obj_update_style_cache(lv_obj_t * obj, uint8_t type)
+{
+    if(type != LV_OBJ_STYLE_ALL) {
+        style_cache_update_core(obj, type);
+    } else {
+        uint8_t type_sub;
+        for(type_sub = 0; type_sub != LV_OBJ_STYLE_ALL; type_sub++) {
+            lv_res_t res;
+            res = style_cache_update_core(obj, type_sub);
+            if(res == LV_RES_INV) break;
+        }
+    }
+
+
+
 }
 
 /*-----------------
@@ -2726,6 +2843,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_draw_rect_dsc_t 
 void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t type, lv_draw_label_dsc_t * draw_dsc)
 {
     draw_dsc->color = lv_obj_get_style_color(obj, type, LV_STYLE_TEXT_COLOR);
+    draw_dsc->letter_space = lv_obj_get_style_value(obj, type, LV_STYLE_LETTER_SPACE);
 
     draw_dsc->font = lv_obj_get_style_ptr(obj, type, LV_STYLE_FONT);
 
@@ -2819,8 +2937,10 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     if(sign == LV_SIGNAL_GET_STYLE) {
+        uint8_t ** type_p = param;
         lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = &obj->style_dsc;
+        if((**type_p) == LV_OBJ_STYLE_MAIN)  *style_dsc_p = &obj->style_dsc;
+        else *style_dsc_p = NULL;
         return LV_RES_OK;
     }
     else if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
@@ -2903,11 +3023,39 @@ static void refresh_children_style(lv_obj_t * obj, uint8_t type)
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
     while(child != NULL) {
         refresh_children_style(child, type); /*Check children too*/
+
+        lv_obj_update_style_cache(child, type);
         lv_obj_invalidate(child);
         child->signal_cb(child, LV_SIGNAL_STYLE_CHG, &type);
         lv_obj_invalidate(child);
         child = lv_obj_get_child(obj, child);
     }
+}
+
+
+static lv_res_t style_cache_update_core(lv_obj_t * obj, uint8_t type)
+{
+    lv_style_dsc_t * dsc = lv_obj_get_style(obj, type);
+    if(dsc == NULL) return LV_RES_INV;
+
+    if(!dsc->cache.enabled) return LV_RES_OK;
+    dsc->cache.enabled = 0;
+
+
+    lv_style_value_t value;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_WIDTH);
+    if(value >= LV_STYLE_CACHE_WIDTH_SKIPPED || value < 0) value = LV_STYLE_CACHE_WIDTH_SKIPPED;
+    dsc->cache.border_width = value;
+
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_LETTER_SPACE);
+    if(value >= LV_STYLE_CACHE_WIDTH_SKIPPED || value < 0) value = LV_STYLE_CACHE_WIDTH_SKIPPED;
+    dsc->cache.letter_space = value;
+
+    dsc->cache.enabled = 1;
+
+    return LV_RES_OK;
 }
 
 /**

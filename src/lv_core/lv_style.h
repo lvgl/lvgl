@@ -26,6 +26,7 @@ extern "C" {
  *********************/
 #define LV_RADIUS_CIRCLE (LV_COORD_MAX) /**< A very big radius to always draw as circle*/
 #define LV_STYLE_DEGUG_SENTINEL_VALUE 0x12345678
+#define LV_STYLE_WEIGHT_MAX     0xFF
 
 LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
@@ -113,8 +114,12 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_TEXT_OPA,           0x5, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_FONT,               0x5, LV_STYLE_ID_PTR   + 0, LV_STYLE_ATTR_INHERIT),
 
-    //    LV_STYLE_PROP_INIT(LV_STYLE_LINE_COLOR,         0x50, LV_STYLE_ATTR_TYPE_COLOR),
-//    LV_STYLE_PROP_INIT(LV_STYLE_IMG_COLOR,          0x60, LV_STYLE_ATTR_TYPE_COLOR),
+    LV_STYLE_PROP_INIT(LV_STYLE_LINE_WIDTH,         0x6, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_LINE_COLOR,         0x6, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_LINE_OPA,           0x6, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
+
+    LV_STYLE_PROP_INIT(LV_STYLE_IMG_COLOR,          0x7, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_IMG_OPA,            0x7, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
 };
 
 typedef uint16_t lv_style_property_t;
@@ -141,39 +146,71 @@ typedef struct {
     uint16_t reserved   :7;
 }lv_style_t;
 
+typedef int16_t lv_style_value_t;
+
+#define LV_STYLE_CACHE_PAD_SKIPPED   31
+
+#define LV_STYLE_CACHE_OPA_TRANSP    0
+#define LV_STYLE_CACHE_OPA_COVER     1
+#define LV_STYLE_CACHE_OPA_SKIPPED   3
+
+#define LV_STYLE_CACHE_WIDTH_SKIPPED   7
+
+#define LV_STYLE_CACHE_RADIUS_CIRCLE    14
+#define LV_STYLE_CACHE_RADIUS_SKIPPED   15
+
+#define LV_STYLE_CACHE_FONT_DEFAULT   0
+#define LV_STYLE_CACHE_FONT_SKIPPED   1
+
+typedef struct {
+    /*32 bit*/
+    uint32_t pad_left   :6;
+    uint32_t pad_right  :6;
+    uint32_t pad_top    :6;
+    uint32_t pad_bottom :6;
+    uint32_t pad_inner  :6;
+    uint32_t bg_grad_dir  :2;
+
+    /*32 bit*/
+    uint32_t border_width :3;
+    uint32_t line_width   :3;
+    uint32_t letter_space :3;
+    uint32_t line_space   :3;
+    uint32_t shadow_width :1;
+
+    uint32_t bg_opa       :2;
+    uint32_t border_opa   :2;
+    uint32_t txt_opa      :2;
+    uint32_t img_opa      :2;
+    uint32_t line_opa     :2;
+    uint32_t shadow_opa   :2;
+    uint32_t opa_scale    :2;
+
+    uint32_t bg_blend_mode      :1;
+    uint32_t border_blend_mode  :1;
+    uint32_t txt_blend_mode     :1;
+    uint32_t line_blend_mode    :1;
+    uint32_t image_blend_mode   :1;
+
+    /*32 bit*/
+    uint32_t radius       :4;
+    uint32_t font         :1;
+    uint32_t clip_corner  :1;
+
+    uint32_t enabled    :1;
+
+    uint32_t reserved     :23;
+}lv_style_cache_t;
+
+
 typedef struct {
     lv_style_t  local;
     lv_style_t ** classes;
     uint8_t class_cnt;
-#if LV_STYLE_CACHING
     lv_style_cache_t cache;
-#endif
 }lv_style_dsc_t;
 
 
-typedef int16_t lv_style_value_t;
-
-typedef struct {
-    const lv_font_t * font;
-    lv_color_t bg_color;
-    lv_color_t text_color;
-    lv_style_value_t radius;
-    lv_style_value_t pad_left;
-    lv_style_value_t pad_right;
-    lv_style_value_t pad_top;
-    lv_style_value_t pad_bottom;
-    lv_style_value_t pad_inner;
-    lv_style_value_t border_width;
-    lv_style_value_t shadow_width;
-    lv_style_value_t letter_space;
-    lv_style_value_t line_space;
-    lv_style_value_t bg_grad_dir;
-    lv_opa_t opa_scale;
-    lv_opa_t bg_opa;
-    lv_opa_t border_opa;
-    lv_opa_t txt_opa;
-    lv_opa_t img_opa;
-}lv_style_cache_t;
 
 #if LV_USE_ANIMATION
 /** Data structure for style animations. */
@@ -243,7 +280,6 @@ int16_t lv_style_get_value(const lv_style_t * style, lv_style_property_t prop, l
 int16_t lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res);
 int16_t lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res);
 int16_t lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void ** res);
-
 
 #if LV_USE_ANIMATION
 

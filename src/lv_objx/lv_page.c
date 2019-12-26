@@ -125,7 +125,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
                                                               object by default for convenience */
 
         /* Add the signal function only if 'scrolling' is created
-         * because everything has to be ready before any signal is received*/
++         * because everything has to be ready before any signal is received*/
         lv_obj_set_signal_cb(new_page, lv_page_signal);
         lv_obj_set_design_cb(new_page, lv_page_design);
 

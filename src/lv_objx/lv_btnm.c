@@ -117,8 +117,11 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
         } else {
             lv_obj_reset_style(new_btnm, LV_BTNM_STYLE_MAIN);
             lv_obj_add_style_class(new_btnm, LV_BTNM_STYLE_MAIN, &lv_style_panel);
+
+            /* Do not cache the button style because it's independent from the object's style.
+             * (Therefore it can't be cached)*/
+            ext->style_btn.cache.enabled = 0;
             lv_obj_add_style_class(new_btnm, LV_BTNM_STYLE_BTN, &lv_style_btn);
-//            lv_obj_set_style(new_btnm, &lv_style_pretty);
         }
     }
     /*Copy an existing object*/
