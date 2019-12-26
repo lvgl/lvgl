@@ -707,6 +707,10 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
     if(opa <= LV_OPA_MIN) return bg;
 
     uint16_t tmp;
+#if LV_COLOR_DEPTH == 1
+    tmp = bg.full + fg.full;
+    fg.full = LV_MATH_MIN(tmp, 1);
+#else
     tmp = bg.ch.red + fg.ch.red;
 #if LV_COLOR_DEPTH == 8
     fg.ch.red = LV_MATH_MIN(tmp, 7);
@@ -740,6 +744,7 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
     fg.ch.blue = LV_MATH_MIN(tmp, 31);
 #elif LV_COLOR_DEPTH == 32
     fg.ch.blue = LV_MATH_MIN(tmp, 255);
+#endif
 #endif
 
     if(opa == LV_OPA_COVER) return fg;

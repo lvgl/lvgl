@@ -106,7 +106,7 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
 lv_objmask_mask_t * lv_objmask_add_mask(lv_obj_t * objmask, void * param)
 {
     LV_ASSERT_OBJ(objmask, LV_OBJX_NAME);
-    LV_ASSERT_NULL(param)
+    LV_ASSERT_NULL(param);
 
     lv_objmask_ext_t * ext = lv_obj_get_ext_attr(objmask);
 

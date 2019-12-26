@@ -1,6 +1,6 @@
 import os
 
-warnings = '"-Wall"' 
+warnings = '"-Wall -Werror"' 
 base_defines = '"-DLV_CONF_PATH=tests/lv_test_conf.h -DLV_BUILD_TEST"'
 optimization = '"-O3 -g0"'
 

@@ -22,6 +22,7 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_gc.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_log.h"
 #include "../lv_hal/lv_hal.h"
 #include <stdint.h>
 #include <string.h>
@@ -127,10 +128,12 @@ void lv_init(void)
 void lv_deinit(void)
 {
     lv_gc_clear_roots();
-    lv_log_register_print_cb(NULL);
     lv_disp_set_default(NULL);
     lv_mem_deinit();
     lv_initialized = false;
+#if LV_USE_LOG
+    lv_log_register_print_cb(NULL);
+#endif
     LV_LOG_INFO("lv_deinit done");
 }
 #endif
