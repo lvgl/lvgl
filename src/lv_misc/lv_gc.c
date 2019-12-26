@@ -29,6 +29,9 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
+lv_mem_buf_t _lv_mem_buf[LV_MEM_BUF_MAX_NUM];
+
+
 #if(!defined(LV_ENABLE_GC)) || LV_ENABLE_GC == 0
 LV_ROOTS
 #endif /* LV_ENABLE_GC */
