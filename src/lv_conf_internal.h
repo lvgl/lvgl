@@ -1,14 +1,24 @@
 /**
  * GENERATED FILE, DO NOT EDIT IT!
- * @file lv_conf_checker.h
+ * @file lv_conf_internal.h
  * Make sure all the defines of lv_conf.h have a default value
 **/
 
-#ifndef LV_CONF_CHECKER_H
-#define LV_CONF_CHECKER_H
+#ifndef LV_CONF_INTERNAL_H
+#define LV_CONF_INTERNAL_H
 /* clang-format off */
 
 #include <stdint.h>
+
+#ifdef LV_CONF_PATH
+#define __LV_TO_STR_AUX(x) #x
+#define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
+#include __LV_TO_STR(LV_CONF_PATH)
+#undef __LV_TO_STR_AUX
+#undef __LV_TO_STR
+#else
+#include "../../lv_conf.h"
+#endif
 
 /*====================
    Graphical settings
@@ -217,16 +227,6 @@
 /*========================
  * Image decoder and cache
  *========================*/
-
-/* 1: Enable indexed (palette) images */
-#ifndef LV_IMG_CF_INDEXED
-#define LV_IMG_CF_INDEXED       1
-#endif
-
-/* 1: Enable alpha indexed images */
-#ifndef LV_IMG_CF_ALPHA
-#define LV_IMG_CF_ALPHA         1
-#endif
 
 /* Default image cache size. Image caching keeps the images opened.
  * If only the built-in image formats are used there is no real advantage of caching.
