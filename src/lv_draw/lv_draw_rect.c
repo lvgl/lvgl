@@ -148,7 +148,6 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
 
     bool simple_mode = true;
     if(lv_draw_mask_get_cnt()!= 0) simple_mode = false;
-    else if(dsc->border_part != LV_BORDER_PART_FULL) simple_mode = false;
     else if(dsc->bg_grad_dir == LV_GRAD_DIR_HOR) simple_mode = false;
 
     int16_t mask_rout_id = LV_MASK_ID_INV;

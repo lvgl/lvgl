@@ -101,7 +101,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
             if(th) {
 //                lv_cont_set_style(new_cont, LV_CONT_STYLE_MAIN, th->style_dsc.cont);
             } else {
-//                lv_cont_set_style(new_cont, LV_CONT_STYLE_MAIN, &lv_style_pretty);
+                lv_obj_add_style_class(new_cont, LV_CONT_STYLE_MAIN, &lv_style_panel);
             }
         }
     }
@@ -645,9 +645,6 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
        ext->fit_bottom == LV_FIT_NONE) {
         return;
     }
-
-    t++;
-    printf("autofit:%d\n", t);
 
     lv_area_t tight_area;
     lv_area_t ori;

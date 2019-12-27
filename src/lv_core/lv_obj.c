@@ -155,7 +155,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
     lv_obj_t * new_obj = NULL;
 
-    /*Create the object*/
+    /*Create a screen*/
     if(parent == NULL) {
         LV_LOG_TRACE("Screen create started");
         lv_disp_t * disp = lv_disp_get_default();
@@ -174,7 +174,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->coords.x2    = lv_disp_get_hor_res(NULL) - 1;
         new_obj->coords.y2    = lv_disp_get_ver_res(NULL) - 1;
 
-    } else {
+    }
+    /*Create a normal object*/
+    else {
         LV_LOG_TRACE("Object create started");
         LV_ASSERT_OBJ(parent, LV_OBJX_NAME);
 
@@ -202,7 +204,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->design_cb = lv_obj_design;
     new_obj->event_cb = NULL;
 
-
     new_obj->ext_draw_pad = 0;
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
@@ -222,7 +223,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->realign.base         = NULL;
     new_obj->realign.auto_realign = 0;
 #endif
-
 
     /*Init. user date*/
 #if LV_USE_USER_DATA
@@ -260,7 +260,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     lv_style_dsc_init(&new_obj->style_dsc);
 
     if(parent != NULL) {
-        lv_style_dsc_add_class(&new_obj->style_dsc, &lv_style_panel);
+        lv_obj_add_style_class(new_obj, LV_OBJ_STYLE_MAIN, &lv_style_panel);
+    } else {
+        lv_obj_update_style_cache(new_obj, LV_OBJ_STYLE_MAIN);
     }
 
 
@@ -2074,27 +2076,27 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_s
             }
             break;
         case LV_STYLE_BG_BLEND_MODE:
-            if(dsc->cache.bg_blend_mode == 1) {
+            if(dsc->cache.bg_blend_mode == LV_STYLE_CACHE_BLEND_MODE_NORMAL) {
                 return LV_BLEND_MODE_NORMAL;
             }
             break;
         case LV_STYLE_BORDER_BLEND_MODE:
-            if(dsc->cache.border_blend_mode == 1) {
+            if(dsc->cache.border_blend_mode == LV_STYLE_CACHE_BLEND_MODE_NORMAL) {
                 return LV_BLEND_MODE_NORMAL;
             }
             break;
         case LV_STYLE_TEXT_BLEND_MODE:
-            if(dsc->cache.text_blend_mode == 1) {
+            if(dsc->cache.text_blend_mode == LV_STYLE_CACHE_BLEND_MODE_NORMAL) {
                 return LV_BLEND_MODE_NORMAL;
             }
             break;
         case LV_STYLE_LINE_BLEND_MODE:
-            if(dsc->cache.line_blend_mode == 1) {
+            if(dsc->cache.line_blend_mode == LV_STYLE_CACHE_BLEND_MODE_NORMAL) {
                 return LV_BLEND_MODE_NORMAL;
             }
             break;
         case LV_STYLE_IMAGE_BLEND_MODE:
-            if(dsc->cache.image_blend_mode == 1) {
+            if(dsc->cache.image_blend_mode == LV_STYLE_CACHE_BLEND_MODE_NORMAL) {
                 return LV_BLEND_MODE_NORMAL;
             }
             break;
@@ -2103,6 +2105,7 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_s
                 return dsc->cache.border_width == LV_STYLE_CACHE_RADIUS_CIRCLE ? LV_RADIUS_CIRCLE : dsc->cache.radius;
             }
             break;
+        }
     }
 
     uint8_t state;
@@ -2263,36 +2266,36 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_prope
     if(dsc->cache.enabled) {
         switch(prop & (~LV_STYLE_STATE_MASK)) {
         case LV_STYLE_BG_OPA:
-            if(dsc->cache.bg_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
-            if(dsc->cache.bg_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            if(dsc->cache.bg_opa == LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.bg_opa == LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
             break;
         case LV_STYLE_BORDER_OPA:
-            if(dsc->cache.border_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
-            if(dsc->cache.border_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            if(dsc->cache.border_opa == LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.border_opa == LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
             break;
         case LV_STYLE_TEXT_OPA:
-            if(dsc->cache.text_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
-            if(dsc->cache.text_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            if(dsc->cache.text_opa == LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.text_opa == LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
             break;
         case LV_STYLE_SHADOW_OPA:
-            if(dsc->cache.shadow_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
-            if(dsc->cache.shadow_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            if(dsc->cache.shadow_opa == LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.shadow_opa == LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
             break;
         case LV_STYLE_LINE_OPA:
-            if(dsc->cache.line_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
-            if(dsc->cache.line_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            if(dsc->cache.line_opa == LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.line_opa == LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
             break;
         case LV_STYLE_IMAGE_OPA:
-            if(dsc->cache.image_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
-            if(dsc->cache.image_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            if(dsc->cache.image_opa == LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.image_opa == LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
             break;
         case LV_STYLE_OVERLAY_OPA:
-            if(dsc->cache.overlay_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
-            if(dsc->cache.overlay_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            if(dsc->cache.overlay_opa == LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.overlay_opa == LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
             break;
         case LV_STYLE_OPA_SCALE:
-            if(dsc->cache.opa_scale != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
-            if(dsc->cache.opa_scale != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            if(dsc->cache.opa_scale == LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.opa_scale == LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
             break;
         }
     }
@@ -3079,15 +3082,133 @@ static lv_res_t style_cache_update_core(lv_obj_t * obj, uint8_t type)
 
 
     lv_style_value_t value;
+    lv_opa_t opa;
+    const void * ptr;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_LETTER_SPACE);
+    if(value >= LV_STYLE_CACHE_WIDTH_SKIPPED || value < 0) value = LV_STYLE_CACHE_WIDTH_SKIPPED;
+    dsc->cache.letter_space = value;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_PAD_LEFT);
+    if(value >= LV_STYLE_CACHE_PAD_SKIPPED || value < 0) value = LV_STYLE_CACHE_PAD_SKIPPED;
+    dsc->cache.pad_left = value;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_PAD_RIGHT);
+    if(value >= LV_STYLE_CACHE_PAD_SKIPPED || value < 0) value = LV_STYLE_CACHE_PAD_SKIPPED;
+    dsc->cache.pad_right= value;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_PAD_TOP);
+    if(value >= LV_STYLE_CACHE_PAD_SKIPPED || value < 0) value = LV_STYLE_CACHE_PAD_SKIPPED;
+    dsc->cache.pad_top= value;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_PAD_BOTTOM);
+    if(value >= LV_STYLE_CACHE_PAD_SKIPPED || value < 0) value = LV_STYLE_CACHE_PAD_SKIPPED;
+    dsc->cache.pad_bottom = value;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_PAD_INNER);
+    if(value >= LV_STYLE_CACHE_PAD_SKIPPED || value < 0) value = LV_STYLE_CACHE_PAD_SKIPPED;
+    dsc->cache.pad_inner = value;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_BG_GRAD_DIR);
+    dsc->cache.bg_grad_dir = value;
 
     value = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_WIDTH);
     if(value >= LV_STYLE_CACHE_WIDTH_SKIPPED || value < 0) value = LV_STYLE_CACHE_WIDTH_SKIPPED;
     dsc->cache.border_width = value;
 
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_LINE_WIDTH);
+    if(value >= LV_STYLE_CACHE_WIDTH_SKIPPED || value < 0) value = LV_STYLE_CACHE_WIDTH_SKIPPED;
+    dsc->cache.line_width = value;
 
     value = lv_obj_get_style_value(obj, type, LV_STYLE_LETTER_SPACE);
     if(value >= LV_STYLE_CACHE_WIDTH_SKIPPED || value < 0) value = LV_STYLE_CACHE_WIDTH_SKIPPED;
     dsc->cache.letter_space = value;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_LINE_SPACE);
+    if(value >= LV_STYLE_CACHE_WIDTH_SKIPPED || value < 0) value = LV_STYLE_CACHE_WIDTH_SKIPPED;
+    dsc->cache.line_space = value;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_SHADOW_WIDTH);
+    if(value >= LV_STYLE_CACHE_WIDTH_SKIPPED || value < 0) value = LV_STYLE_CACHE_WIDTH_SKIPPED;
+    dsc->cache.shadow_width = value;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_WIDTH);
+    if(value >= LV_STYLE_CACHE_WIDTH_SKIPPED || value < 0) value = LV_STYLE_CACHE_WIDTH_SKIPPED;
+    dsc->cache.border_width = value;
+
+    opa = lv_obj_get_style_opa(obj, type, LV_STYLE_BG_OPA);
+    if(opa >= LV_OPA_MAX) dsc->cache.bg_opa = LV_STYLE_CACHE_OPA_COVER;
+    else if(opa <= LV_OPA_MIN) dsc->cache.bg_opa = LV_STYLE_CACHE_OPA_TRANSP;
+    else dsc->cache.bg_opa = LV_STYLE_CACHE_OPA_SKIPPED;
+
+    opa = lv_obj_get_style_opa(obj, type, LV_STYLE_BORDER_OPA);
+    if(opa >= LV_OPA_MAX) dsc->cache.border_opa = LV_STYLE_CACHE_OPA_COVER;
+    else if(opa <= LV_OPA_MIN) dsc->cache.border_opa = LV_STYLE_CACHE_OPA_TRANSP;
+    else dsc->cache.border_opa = LV_STYLE_CACHE_OPA_SKIPPED;
+
+    opa = lv_obj_get_style_opa(obj, type, LV_STYLE_TEXT_OPA);
+    if(opa >= LV_OPA_MAX) dsc->cache.text_opa = LV_STYLE_CACHE_OPA_COVER;
+    else if(opa <= LV_OPA_MIN) dsc->cache.text_opa = LV_STYLE_CACHE_OPA_TRANSP;
+    else dsc->cache.text_opa = LV_STYLE_CACHE_OPA_SKIPPED;
+
+    opa = lv_obj_get_style_opa(obj, type, LV_STYLE_IMAGE_OPA);
+    if(opa >= LV_OPA_MAX) dsc->cache.image_opa = LV_STYLE_CACHE_OPA_COVER;
+    else if(opa <= LV_OPA_MIN) dsc->cache.image_opa = LV_STYLE_CACHE_OPA_TRANSP;
+    else dsc->cache.image_opa = LV_STYLE_CACHE_OPA_SKIPPED;
+
+    opa = lv_obj_get_style_opa(obj, type, LV_STYLE_LINE_OPA);
+    if(opa >= LV_OPA_MAX) dsc->cache.line_opa = LV_STYLE_CACHE_OPA_COVER;
+    else if(opa <= LV_OPA_MIN) dsc->cache.line_opa = LV_STYLE_CACHE_OPA_TRANSP;
+    else dsc->cache.line_opa = LV_STYLE_CACHE_OPA_SKIPPED;
+
+    opa = lv_obj_get_style_opa(obj, type, LV_STYLE_SHADOW_OPA);
+    if(opa >= LV_OPA_MAX) dsc->cache.shadow_opa = LV_STYLE_CACHE_OPA_COVER;
+    else if(opa <= LV_OPA_MIN) dsc->cache.shadow_opa = LV_STYLE_CACHE_OPA_TRANSP;
+    else dsc->cache.shadow_opa = LV_STYLE_CACHE_OPA_SKIPPED;
+
+    opa = lv_obj_get_style_opa(obj, type, LV_STYLE_OVERLAY_OPA);
+    if(opa >= LV_OPA_MAX) dsc->cache.overlay_opa = LV_STYLE_CACHE_OPA_COVER;
+    else if(opa <= LV_OPA_MIN) dsc->cache.overlay_opa = LV_STYLE_CACHE_OPA_TRANSP;
+    else dsc->cache.overlay_opa = LV_STYLE_CACHE_OPA_SKIPPED;
+
+    opa = lv_obj_get_style_opa(obj, type, LV_STYLE_OPA_SCALE);
+    if(opa >= LV_OPA_MAX) dsc->cache.opa_scale = LV_STYLE_CACHE_OPA_COVER;
+    else if(opa <= LV_OPA_MIN) dsc->cache.opa_scale = LV_STYLE_CACHE_OPA_TRANSP;
+    else dsc->cache.opa_scale = LV_STYLE_CACHE_OPA_SKIPPED;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_BG_BLEND_MODE);
+    if(value == LV_BLEND_MODE_NORMAL) dsc->cache.bg_blend_mode = LV_STYLE_CACHE_BLEND_MODE_NORMAL;
+    else dsc->cache.bg_blend_mode = LV_STYLE_CACHE_BLEND_MODE_SKIPPED;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_BLEND_MODE);
+    if(value == LV_BLEND_MODE_NORMAL) dsc->cache.border_blend_mode = LV_STYLE_CACHE_BLEND_MODE_NORMAL;
+    else dsc->cache.border_blend_mode = LV_STYLE_CACHE_BLEND_MODE_SKIPPED;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_TEXT_BLEND_MODE);
+    if(value == LV_BLEND_MODE_NORMAL) dsc->cache.text_blend_mode = LV_STYLE_CACHE_BLEND_MODE_NORMAL;
+    else dsc->cache.text_blend_mode = LV_STYLE_CACHE_BLEND_MODE_SKIPPED;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_LINE_BLEND_MODE);
+    if(value == LV_BLEND_MODE_NORMAL) dsc->cache.line_blend_mode = LV_STYLE_CACHE_BLEND_MODE_NORMAL;
+    else dsc->cache.line_blend_mode = LV_STYLE_CACHE_BLEND_MODE_SKIPPED;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_IMAGE_BLEND_MODE);
+    if(value == LV_BLEND_MODE_NORMAL) dsc->cache.image_blend_mode = LV_STYLE_CACHE_BLEND_MODE_NORMAL;
+    else dsc->cache.image_blend_mode = LV_STYLE_CACHE_BLEND_MODE_SKIPPED;
+
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_RADIUS);
+    if(value == LV_RADIUS_CIRCLE) dsc->cache.radius = LV_STYLE_CACHE_RADIUS_CIRCLE;
+    else if(value < LV_STYLE_CACHE_RADIUS_SKIPPED) dsc->cache.radius = value;
+    else dsc->cache.radius = LV_STYLE_CACHE_RADIUS_SKIPPED;
+
+    ptr = lv_obj_get_style_ptr(obj, type, LV_STYLE_FONT);
+    if(ptr == LV_FONT_DEFAULT) dsc->cache.font = LV_STYLE_CACHE_FONT_DEFAULT;
+    else dsc->cache.font = LV_STYLE_CACHE_FONT_SKIPPED;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_BG_CLIP_CORNER);
+    dsc->cache.clip_corner = value;
+
 
     dsc->cache.enabled = 1;
 
