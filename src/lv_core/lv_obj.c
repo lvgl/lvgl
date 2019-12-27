@@ -2073,8 +2073,37 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_s
                 return 0;
             }
             break;
+        case LV_STYLE_BG_BLEND_MODE:
+            if(dsc->cache.bg_blend_mode == 1) {
+                return LV_BLEND_MODE_NORMAL;
+            }
+            break;
+        case LV_STYLE_BORDER_BLEND_MODE:
+            if(dsc->cache.border_blend_mode == 1) {
+                return LV_BLEND_MODE_NORMAL;
+            }
+            break;
+        case LV_STYLE_TEXT_BLEND_MODE:
+            if(dsc->cache.text_blend_mode == 1) {
+                return LV_BLEND_MODE_NORMAL;
+            }
+            break;
+        case LV_STYLE_LINE_BLEND_MODE:
+            if(dsc->cache.line_blend_mode == 1) {
+                return LV_BLEND_MODE_NORMAL;
+            }
+            break;
+        case LV_STYLE_IMAGE_BLEND_MODE:
+            if(dsc->cache.image_blend_mode == 1) {
+                return LV_BLEND_MODE_NORMAL;
+            }
+            break;
+        case LV_STYLE_RADIUS:
+            if(dsc->cache.border_width != LV_STYLE_CACHE_RADIUS_SKIPPED) {
+                return dsc->cache.border_width == LV_STYLE_CACHE_RADIUS_CIRCLE ? LV_RADIUS_CIRCLE : dsc->cache.radius;
+            }
+            break;
     }
-
 
     uint8_t state;
     lv_style_property_t prop_ori = prop;
@@ -2242,8 +2271,8 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_prope
             if(dsc->cache.border_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
             break;
         case LV_STYLE_TEXT_OPA:
-            if(dsc->cache.txt_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
-            if(dsc->cache.txt_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            if(dsc->cache.text_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.text_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
             break;
         case LV_STYLE_SHADOW_OPA:
             if(dsc->cache.shadow_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
@@ -2253,9 +2282,13 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_prope
             if(dsc->cache.line_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
             if(dsc->cache.line_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
             break;
-        case LV_STYLE_IMG_OPA:
-            if(dsc->cache.img_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
-            if(dsc->cache.img_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+        case LV_STYLE_IMAGE_OPA:
+            if(dsc->cache.image_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.image_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
+            break;
+        case LV_STYLE_OVERLAY_OPA:
+            if(dsc->cache.overlay_opa != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
+            if(dsc->cache.overlay_opa != LV_STYLE_CACHE_OPA_TRANSP) return LV_OPA_TRANSP;
             break;
         case LV_STYLE_OPA_SCALE:
             if(dsc->cache.opa_scale != LV_STYLE_CACHE_OPA_COVER) return LV_OPA_COVER;
