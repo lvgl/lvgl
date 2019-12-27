@@ -2070,6 +2070,11 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_s
                 return dsc->cache.letter_space;
             }
             break;
+        case LV_STYLE_LINE_SPACE:
+            if(dsc->cache.line_space != LV_STYLE_CACHE_WIDTH_SKIPPED) {
+                return dsc->cache.line_space;
+            }
+            break;
         case LV_STYLE_SHADOW_WIDTH:
             if(dsc->cache.shadow_width == 0) {
                 return 0;
@@ -2104,6 +2109,12 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_s
             if(dsc->cache.border_width != LV_STYLE_CACHE_RADIUS_SKIPPED) {
                 return dsc->cache.border_width == LV_STYLE_CACHE_RADIUS_CIRCLE ? LV_RADIUS_CIRCLE : dsc->cache.radius;
             }
+            break;
+        case LV_STYLE_BG_CLIP_CORNER:
+        	return dsc->cache.clip_corner;
+            break;
+        case LV_STYLE_BORDER_PART:
+        	if(dsc->cache.border_part == LV_STYLE_CACHE_BORDER_PART_FULL) return LV_BORDER_PART_FULL;
             break;
         }
     }
@@ -2367,6 +2378,14 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_prope
 
 void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop)
 {
+    lv_style_dsc_t * dsc = lv_obj_get_style(obj, type);
+    if(dsc->cache.enabled) {
+        switch(prop & (~LV_STYLE_STATE_MASK)) {
+        case LV_STYLE_FONT:
+            if(dsc->cache.font == LV_STYLE_CACHE_FONT_DEFAULT) return LV_FONT_DEFAULT;
+            break;
+        }
+    }
     uint8_t state;
     lv_style_property_t prop_ori = prop;
 
@@ -2881,11 +2900,12 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_draw_rect_dsc_t 
 
 void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t type, lv_draw_label_dsc_t * draw_dsc)
 {
-    draw_dsc->color = lv_obj_get_style_color(obj, type, LV_STYLE_TEXT_COLOR);
-    draw_dsc->letter_space = lv_obj_get_style_value(obj, type, LV_STYLE_LETTER_SPACE);
+    draw_dsc->color = LV_COLOR_WHITE; //lv_obj_get_style_color(obj, type, LV_STYLE_TEXT_COLOR);
+    draw_dsc->letter_space = 0;//lv_obj_get_style_value(obj, type, LV_STYLE_LETTER_SPACE);
 
-    draw_dsc->font = lv_obj_get_style_ptr(obj, type, LV_STYLE_FONT);
-
+    draw_dsc->font = LV_FONT_DEFAULT;//lv_obj_get_style_ptr(obj, type, LV_STYLE_FONT);
+    draw_dsc->opa = LV_OPA_COVER;
+    return;
     lv_opa_t opa_scale = lv_obj_get_style_opa(obj, type, LV_STYLE_OPA_SCALE);
     if(opa_scale < LV_OPA_MAX) {
         draw_dsc->opa = (uint16_t)((uint16_t)draw_dsc->opa * opa_scale) >> 8;
@@ -2956,7 +2976,6 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         }
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
-//        const lv_style_t * style_dsc = lv_obj_get_style(obj);
         if(lv_obj_get_style_value(obj, LV_OBJ_STYLE_MAIN, LV_STYLE_BG_CLIP_CORNER)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
             lv_mem_buf_release(param);
@@ -3201,6 +3220,10 @@ static lv_res_t style_cache_update_core(lv_obj_t * obj, uint8_t type)
     if(value == LV_RADIUS_CIRCLE) dsc->cache.radius = LV_STYLE_CACHE_RADIUS_CIRCLE;
     else if(value < LV_STYLE_CACHE_RADIUS_SKIPPED) dsc->cache.radius = value;
     else dsc->cache.radius = LV_STYLE_CACHE_RADIUS_SKIPPED;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_BORDER_PART);
+    if(value == LV_BORDER_PART_FULL) dsc->cache.border_part = LV_STYLE_CACHE_BORDER_PART_FULL;
+    else dsc->cache.border_part = LV_STYLE_CACHE_BORDER_PART_SKIPPED;
 
     ptr = lv_obj_get_style_ptr(obj, type, LV_STYLE_FONT);
     if(ptr == LV_FONT_DEFAULT) dsc->cache.font = LV_STYLE_CACHE_FONT_DEFAULT;

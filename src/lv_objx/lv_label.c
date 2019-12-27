@@ -1044,9 +1044,6 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         return LV_DESIGN_RES_NOT_COVER;
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_area_t coords;
-        const lv_font_t * font   = lv_obj_get_style_ptr(label, LV_LABEL_STYLE_MAIN, LV_STYLE_FONT);
-        lv_style_value_t line_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LINE_SPACE);
-        lv_style_value_t letter_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LETTER_SPACE);
         lv_obj_get_coords(label, &coords);
 
         lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
@@ -1078,12 +1075,22 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         if(align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
         if(align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
 
+        lv_draw_label_dsc_t label_draw_dsc;
+        lv_draw_label_dsc_init(&label_draw_dsc);
+
+        label_draw_dsc.sel_start = lv_label_get_text_sel_start(label);
+        label_draw_dsc.sel_end = lv_label_get_text_sel_end(label);
+        label_draw_dsc.ofs_x = ext->offset.x;
+        label_draw_dsc.ofs_y = ext->offset.y;
+        label_draw_dsc.flag = flag;
+        lv_obj_init_draw_label_dsc(label, LV_LABEL_STYLE_MAIN, &label_draw_dsc);
+
         /* In ROLL mode the CENTER and RIGHT are pointless so remove them.
          * (In addition they will result mis-alignment is this case)*/
         if((ext->long_mode == LV_LABEL_LONG_SROLL || ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) &&
            (ext->align == LV_LABEL_ALIGN_CENTER || ext->align == LV_LABEL_ALIGN_RIGHT)) {
             lv_point_t size;
-            lv_txt_get_size(&size, ext->text, font, letter_space, line_space,
+            lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
                             LV_COORD_MAX, flag);
             if(size.x > lv_obj_get_width(label)) {
                 flag &= ~LV_TXT_FLAG_RIGHT;
@@ -1100,27 +1107,17 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         lv_draw_label_hint_t * hint = NULL;
 #endif
 
-        lv_draw_label_dsc_t label_draw_dsc;
-        lv_draw_label_dsc_init(&label_draw_dsc);
-
-        label_draw_dsc.sel_start = lv_label_get_text_sel_start(label);
-        label_draw_dsc.sel_end = lv_label_get_text_sel_end(label);
-        label_draw_dsc.ofs_x = ext->offset.x;
-        label_draw_dsc.ofs_y = ext->offset.y;
-        label_draw_dsc.flag = flag;
-        lv_obj_init_draw_label_dsc(label, LV_LABEL_STYLE_MAIN, &label_draw_dsc);
-
         lv_draw_label(&coords, clip_area, &label_draw_dsc, ext->text, hint);
 
         if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
             lv_point_t size;
-            lv_txt_get_size(&size, ext->text, font, letter_space, line_space,
+            lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
                             LV_COORD_MAX, flag);
 
             /*Draw the text again next to the original to make an circular effect */
             if(size.x > lv_obj_get_width(label)) {
                 label_draw_dsc.ofs_x = ext->offset.x + size.x +
-                        lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+                        lv_font_get_glyph_width(label_draw_dsc.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
                 label_draw_dsc.ofs_y = ext->offset.y;
 
                 lv_draw_label(&coords, clip_area, &label_draw_dsc, ext->text, hint);
@@ -1129,7 +1126,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
             /*Draw the text again below the original to make an circular effect */
             if(size.y > lv_obj_get_height(label)) {
                 label_draw_dsc.ofs_x = ext->offset.x;
-                label_draw_dsc.ofs_y = ext->offset.y + size.y + lv_font_get_line_height(font);
+                label_draw_dsc.ofs_y = ext->offset.y + size.y + lv_font_get_line_height(label_draw_dsc.font);
 
                 lv_draw_label(&coords, clip_area, &label_draw_dsc, ext->text, hint);
             }

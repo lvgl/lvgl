@@ -161,7 +161,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
     if(rout > short_side >> 1) rout = short_side >> 1;
 
     /*Most simple case: just a plain rectangle*/
-    if(simple_mode && rout == 0 && dsc->bg_color.full == dsc->bg_grad_color.full) {
+    if(simple_mode && rout == 0 && (dsc->bg_grad_dir == LV_GRAD_DIR_NONE)) {
         lv_blend_fill(clip, &coords_bg,
                 dsc->bg_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
                 dsc->bg_blend_mode);

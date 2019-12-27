@@ -171,6 +171,10 @@ typedef int16_t lv_style_value_t;
 #define LV_STYLE_CACHE_BLEND_MODE_NORMAL   0
 #define LV_STYLE_CACHE_BLEND_MODE_SKIPPED   1
 
+
+#define LV_STYLE_CACHE_BORDER_PART_FULL   0
+#define LV_STYLE_CACHE_BORDER_PART_SKIPPED   1
+
 typedef struct {
     /*32 bit*/
     uint32_t pad_left   :6;
@@ -206,6 +210,7 @@ typedef struct {
     uint32_t radius       :4;
     uint32_t font         :1;
     uint32_t clip_corner  :1;
+    uint32_t border_part  :1;
 
     uint32_t enabled    :1;
 
