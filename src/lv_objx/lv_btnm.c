@@ -679,6 +679,13 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
         lv_style_t style_tmp;
         lv_txt_flag_t txt_flag = LV_TXT_FLAG_NONE;
 
+#if LV_USE_GROUP
+        bool draw_focus_btn = false;
+        uint16_t focus_txt_i;
+        lv_point_t focus_txt_size;
+        const lv_style_t * focus_btn_style;
+#endif
+
         if(ext->recolor) txt_flag = LV_TXT_FLAG_RECOLOR;
         for(btn_i = 0; btn_i < ext->btn_cnt; btn_i++, txt_i++) {
             /*Search the next valid text in the map*/
@@ -713,38 +720,6 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             else
                 btn_style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BTN_REL); /*Not possible option, just to be sure*/
 
-            lv_style_copy(&style_tmp, btn_style);
-
-            bool removeBorder = true;
-#if LV_USE_GROUP
-            if(ext->act_style && btn_i == ext->btn_id_act) {
-                ext->style_mod_cb(lv_obj_get_group(btnm), &style_tmp);
-                removeBorder = false;
-            }
-#endif
-            if (removeBorder) {
-                /*Remove borders on the edges if `LV_BORDER_INTERNAL`*/
-                if(style_tmp.body.border.part & LV_BORDER_PART_INTERNAL) {
-                    if(area_tmp.y1 == btnm->coords.y1 + bg_style->body.padding.top) {
-                        style_tmp.body.border.part &= ~LV_BORDER_PART_TOP;
-                    }
-                    if(area_tmp.y2 == btnm->coords.y2 - bg_style->body.padding.bottom) {
-                        style_tmp.body.border.part &= ~LV_BORDER_PART_BOTTOM;
-                    }
-
-                    if(txt_i == 0) {
-                        style_tmp.body.border.part &= ~LV_BORDER_PART_LEFT;
-                    } else if(strcmp(ext->map_p[txt_i - 1], "\n") == 0) {
-                        style_tmp.body.border.part &= ~LV_BORDER_PART_LEFT;
-                    }
-
-                    if(ext->map_p[txt_i + 1][0] == '\0' || strcmp(ext->map_p[txt_i + 1], "\n") == 0) {
-                        style_tmp.body.border.part &= ~LV_BORDER_PART_RIGHT;
-                    }
-                }
-            }
-            lv_draw_rect(&area_tmp, clip_area, &style_tmp, opa_scale);
-
             /*Calculate the size of the text*/
             if(btn_style->glass) btn_style = bg_style;
             const lv_font_t * font = btn_style->text.font;
@@ -752,13 +727,83 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             lv_txt_get_size(&txt_size, ext->map_p[txt_i], font, btn_style->text.letter_space,
                             btn_style->text.line_space, lv_area_get_width(&area_btnm), txt_flag);
 
+#if LV_USE_GROUP
+            if(ext->act_style && btn_i == ext->btn_id_act) {
+                focus_txt_i = txt_i;
+                focus_txt_size = txt_size;
+                focus_btn_style = btn_style;
+                draw_focus_btn = true;
+                continue; // draw the focus btn later, so it's on top
+            }
+#endif
+            lv_style_copy(&style_tmp, btn_style);
+
+            lv_area_copy(&area_tmp, &ext->button_areas[btn_i]);
+            area_tmp.x1 += area_btnm.x1;
+            area_tmp.y1 += area_btnm.y1;
+            area_tmp.x2 += area_btnm.x1;
+            area_tmp.y2 += area_btnm.y1;
+
+            btn_w = lv_area_get_width(&area_tmp);
+            btn_h = lv_area_get_height(&area_tmp);
+
+            /*Remove borders on the edges if `LV_BORDER_INTERNAL`*/
+            if(style_tmp.body.border.part & LV_BORDER_PART_INTERNAL) {
+                if(area_tmp.y1 == btnm->coords.y1 + bg_style->body.padding.top) {
+                    style_tmp.body.border.part &= ~LV_BORDER_PART_TOP;
+                }
+                if(area_tmp.y2 == btnm->coords.y2 - bg_style->body.padding.bottom) {
+                    style_tmp.body.border.part &= ~LV_BORDER_PART_BOTTOM;
+                }
+
+                if(txt_i == 0) {
+                    style_tmp.body.border.part &= ~LV_BORDER_PART_LEFT;
+                } else if(strcmp(ext->map_p[txt_i - 1], "\n") == 0) {
+                    style_tmp.body.border.part &= ~LV_BORDER_PART_LEFT;
+                }
+
+                if(ext->map_p[txt_i + 1][0] == '\0' || strcmp(ext->map_p[txt_i + 1], "\n") == 0) {
+                    style_tmp.body.border.part &= ~LV_BORDER_PART_RIGHT;
+                }
+            }
+
+            lv_draw_rect(&area_tmp, clip_area, &style_tmp, opa_scale);
+
             area_tmp.x1 += (btn_w - txt_size.x) / 2;
             area_tmp.y1 += (btn_h - txt_size.y) / 2;
             area_tmp.x2 = area_tmp.x1 + txt_size.x;
             area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
-            lv_draw_label(&area_tmp, clip_area, btn_style, opa_scale, ext->map_p[txt_i], txt_flag, NULL, NULL, NULL, lv_obj_get_base_dir(btnm));
+            lv_draw_label(&area_tmp, clip_area, btn_style, opa_scale, ext->map_p[txt_i], txt_flag, NULL, NULL, NULL,
+                          lv_obj_get_base_dir(btnm));
         }
+
+#if LV_USE_GROUP
+        if(draw_focus_btn) {
+            /*Draw the focus btn last so it's not covered by the next button*/
+            lv_style_copy(&style_tmp, focus_btn_style);
+            ext->style_mod_cb(lv_obj_get_group(btnm), &style_tmp);
+
+            lv_area_copy(&area_tmp, &ext->button_areas[ext->btn_id_act]);
+            area_tmp.x1 += area_btnm.x1;
+            area_tmp.y1 += area_btnm.y1;
+            area_tmp.x2 += area_btnm.x1;
+            area_tmp.y2 += area_btnm.y1;
+
+            btn_w = lv_area_get_width(&area_tmp);
+            btn_h = lv_area_get_height(&area_tmp);
+
+            lv_draw_rect(&area_tmp, clip_area, &style_tmp, opa_scale);
+
+            area_tmp.x1 += (btn_w - focus_txt_size.x) / 2;
+            area_tmp.y1 += (btn_h - focus_txt_size.y) / 2;
+            area_tmp.x2 = area_tmp.x1 + focus_txt_size.x;
+            area_tmp.y2 = area_tmp.y1 + focus_txt_size.y;
+
+            lv_draw_label(&area_tmp, clip_area, focus_btn_style, opa_scale, ext->map_p[focus_txt_i], txt_flag, NULL,
+                          NULL, NULL, lv_obj_get_base_dir(btnm));
+        }
+#endif
     }
     return LV_DESIGN_RES_OK;
 }

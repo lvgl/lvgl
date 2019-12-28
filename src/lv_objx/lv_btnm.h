@@ -56,14 +56,11 @@ typedef struct
     uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
     uint16_t btn_id_pr;                               /*Index of the currently pressed button or LV_BTNM_BTN_NONE*/
     uint16_t btn_id_act;    /*Index of the active button (being pressed/released etc) or LV_BTNM_BTN_NONE */
+    uint8_t recolor : 1;    /*Enable button recoloring*/
+    uint8_t one_toggle : 1; /*Single button toggled at once*/
 #if LV_USE_GROUP
-    uint8_t recolor : 1,    /*Enable button recoloring*/
-            one_toggle : 1, /*Single button toggled at once*/
-            act_style : 1;  /*Enable style mod for last active button*/
+    uint8_t act_style : 1;                            /*Enable style mod for last active button*/
     lv_group_style_mod_cb_t style_mod_cb;             /*Style mod cb for focusing buttons*/
-#else
-    uint8_t recolor : 1,    /*Enable button recoloring*/
-            one_toggle : 1; /*Single button toggled at once*/
 #endif
 } lv_btnm_ext_t;
 
