@@ -42,6 +42,9 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char **
 static void invalidate_button_area(const lv_obj_t * btnm, uint16_t btn_idx);
 static bool maps_are_identical(const char ** map1, const char ** map2);
 static void make_one_button_toggled(lv_obj_t * btnm, uint16_t btn_idx);
+#if LV_USE_GROUP
+static void group_style_mod_empty_cb(lv_group_t * group, lv_style_t * style) {}
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -98,6 +101,10 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->styles_btn[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_rel;
     ext->styles_btn[LV_BTN_STATE_TGL_PR]  = &lv_style_btn_tgl_pr;
     ext->styles_btn[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
+#if LV_USE_GROUP
+    ext->act_style                        = 0;
+    ext->style_mod_cb                     = group_style_mod_empty_cb;
+#endif
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_btnm);
 
@@ -708,23 +715,32 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
 
             lv_style_copy(&style_tmp, btn_style);
 
-            /*Remove borders on the edges if `LV_BORDER_INTERNAL`*/
-            if(style_tmp.body.border.part & LV_BORDER_PART_INTERNAL) {
-                if(area_tmp.y1 == btnm->coords.y1 + bg_style->body.padding.top) {
-                    style_tmp.body.border.part &= ~LV_BORDER_PART_TOP;
-                }
-                if(area_tmp.y2 == btnm->coords.y2 - bg_style->body.padding.bottom) {
-                    style_tmp.body.border.part &= ~LV_BORDER_PART_BOTTOM;
-                }
+            bool removeBorder = true;
+#if LV_USE_GROUP
+            if(ext->act_style && btn_i == ext->btn_id_act) {
+                ext->style_mod_cb(lv_obj_get_group(btnm), &style_tmp);
+                removeBorder = false;
+            }
+#endif
+            if (removeBorder) {
+                /*Remove borders on the edges if `LV_BORDER_INTERNAL`*/
+                if(style_tmp.body.border.part & LV_BORDER_PART_INTERNAL) {
+                    if(area_tmp.y1 == btnm->coords.y1 + bg_style->body.padding.top) {
+                        style_tmp.body.border.part &= ~LV_BORDER_PART_TOP;
+                    }
+                    if(area_tmp.y2 == btnm->coords.y2 - bg_style->body.padding.bottom) {
+                        style_tmp.body.border.part &= ~LV_BORDER_PART_BOTTOM;
+                    }
 
-                if(txt_i == 0) {
-                    style_tmp.body.border.part &= ~LV_BORDER_PART_LEFT;
-                } else if(strcmp(ext->map_p[txt_i - 1], "\n") == 0) {
-                    style_tmp.body.border.part &= ~LV_BORDER_PART_LEFT;
-                }
+                    if(txt_i == 0) {
+                        style_tmp.body.border.part &= ~LV_BORDER_PART_LEFT;
+                    } else if(strcmp(ext->map_p[txt_i - 1], "\n") == 0) {
+                        style_tmp.body.border.part &= ~LV_BORDER_PART_LEFT;
+                    }
 
-                if(ext->map_p[txt_i + 1][0] == '\0' || strcmp(ext->map_p[txt_i + 1], "\n") == 0) {
-                    style_tmp.body.border.part &= ~LV_BORDER_PART_RIGHT;
+                    if(ext->map_p[txt_i + 1][0] == '\0' || strcmp(ext->map_p[txt_i + 1], "\n") == 0) {
+                        style_tmp.body.border.part &= ~LV_BORDER_PART_RIGHT;
+                    }
                 }
             }
             lv_draw_rect(&area_tmp, clip_area, &style_tmp, opa_scale);
@@ -773,17 +789,23 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_PRESSED) {
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
+#if LV_USE_GROUP
+            ext->act_style = 0;
+#endif
+
             uint16_t btn_pr;
             /*Search the pressed area*/
             lv_indev_get_point(param, &p);
             btn_pr = get_button_from_point(btnm, &p);
 
-            invalidate_button_area(btnm, ext->btn_id_pr) /*Invalidate the old area*/;
+            invalidate_button_area(btnm, ext->btn_id_act) /*Invalidate the old area*/;
             ext->btn_id_pr  = btn_pr;
             ext->btn_id_act = btn_pr;
             invalidate_button_area(btnm, ext->btn_id_pr); /*Invalidate the new area*/
         }
         if(ext->btn_id_act != LV_BTNM_BTN_NONE) {
+            ext->btn_id_pr  = ext->btn_id_act;
+            invalidate_button_area(btnm, ext->btn_id_pr) /*Invalidate the new area*/;
             if(button_is_click_trig(ext->ctrl_bits[ext->btn_id_act]) == false &&
                button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
                button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false) {
@@ -828,15 +850,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             /*Invalidate to old pressed area*/;
             invalidate_button_area(btnm, ext->btn_id_pr);
 
-#if LV_USE_GROUP
-            /*Leave the clicked button when releases if this not the focused object in a group*/
-            lv_group_t * g = lv_obj_get_group(btnm);
-            if(lv_group_get_focused(g) != btnm) {
-                ext->btn_id_pr = LV_BTNM_BTN_NONE;
-            }
-#else
             ext->btn_id_pr = LV_BTNM_BTN_NONE;
-#endif
 
             if(button_is_click_trig(ext->ctrl_bits[ext->btn_id_act]) == true &&
                button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
@@ -856,97 +870,102 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
         ext->btn_id_pr  = LV_BTNM_BTN_NONE;
-        ext->btn_id_act = LV_BTNM_BTN_NONE;
+#if LV_USE_GROUP
+        /*Restore style mod cb to group*/
+        lv_group_set_style_mod_cb(lv_obj_get_group(btnm), ext->style_mod_cb);
+        ext->style_mod_cb = group_style_mod_empty_cb;
+#endif
         lv_obj_invalidate(btnm);
     } else if(sign == LV_SIGNAL_FOCUS) {
 #if LV_USE_GROUP
         lv_indev_t * indev         = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
+        lv_group_t * group         = lv_obj_get_group(btnm);
 
         /*If not focused by an input device assume the last input device*/
-       if(indev_type == LV_INDEV_TYPE_NONE) {
-           indev_type = lv_indev_get_type(lv_indev_get_next(NULL));
-       }
-
-        if(indev_type == LV_INDEV_TYPE_POINTER) {
-            /*Select the clicked button*/
-            lv_point_t p1;
-            lv_indev_get_point(indev, &p1);
-            uint16_t btn_i = get_button_from_point(btnm, &p1);
-            ext->btn_id_pr = btn_i;
-
-        } else if(indev_type == LV_INDEV_TYPE_ENCODER) {
-            /*In navigation mode don't select any button but in edit mode select the fist*/
-            if(lv_group_get_editing(lv_obj_get_group(btnm)))
-                ext->btn_id_pr = 0;
-            else
-                ext->btn_id_pr = LV_BTNM_BTN_NONE;
-        } else {
-            ext->btn_id_pr = 0;
+        if(indev_type == LV_INDEV_TYPE_NONE) {
+            indev_type = lv_indev_get_type(lv_indev_get_next(NULL));
         }
-#else
-        ext->btn_id_pr = 0;
-#endif
 
-        ext->btn_id_act = ext->btn_id_pr;
+        if((indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(group)) ||
+           (ext->btn_id_act == LV_BTNM_BTN_NONE)) {
+            /*In edit mode or when last active is none, active the fist*/
+            ext->btn_id_act = 0;
+            ext->act_style  = 1;
+        }
+
+        /*Take over style mod cb to highlight buttons within the matrix*/
+        ext->style_mod_cb = lv_group_get_style_mod_cb(group);
+        lv_group_set_style_mod_cb(group, group_style_mod_empty_cb);
+
+#endif
+        ext->btn_id_pr = LV_BTNM_BTN_NONE;
         lv_obj_invalidate(btnm);
     } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT) {
-            if(ext->btn_id_pr == LV_BTNM_BTN_NONE)
-                ext->btn_id_pr = 0;
+            if(ext->btn_id_act == LV_BTNM_BTN_NONE)
+                ext->btn_id_act = 0;
             else
-                ext->btn_id_pr++;
-            if(ext->btn_id_pr >= ext->btn_cnt - 1) ext->btn_id_pr = ext->btn_cnt - 1;
-            ext->btn_id_act = ext->btn_id_pr;
+                ext->btn_id_act++;
+            if(ext->btn_id_act >= ext->btn_cnt - 1) ext->btn_id_act = ext->btn_cnt - 1;
+#if LV_USE_GROUP
+            ext->act_style = 1;
+#endif
             lv_obj_invalidate(btnm);
         } else if(c == LV_KEY_LEFT) {
-            if(ext->btn_id_pr == LV_BTNM_BTN_NONE) ext->btn_id_pr = 0;
-            if(ext->btn_id_pr > 0) ext->btn_id_pr--;
-            ext->btn_id_act = ext->btn_id_pr;
+            if(ext->btn_id_act == LV_BTNM_BTN_NONE) ext->btn_id_act = 0;
+            if(ext->btn_id_act > 0) ext->btn_id_act--;
+#if LV_USE_GROUP
+            ext->act_style = 1;
+#endif
             lv_obj_invalidate(btnm);
         } else if(c == LV_KEY_DOWN) {
             const lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
             /*Find the area below the the current*/
-            if(ext->btn_id_pr == LV_BTNM_BTN_NONE) {
-                ext->btn_id_pr = 0;
+            if(ext->btn_id_act == LV_BTNM_BTN_NONE) {
+                ext->btn_id_act = 0;
             } else {
                 uint16_t area_below;
                 lv_coord_t pr_center =
-                    ext->button_areas[ext->btn_id_pr].x1 + (lv_area_get_width(&ext->button_areas[ext->btn_id_pr]) >> 1);
+                    ext->button_areas[ext->btn_id_act].x1 + (lv_area_get_width(&ext->button_areas[ext->btn_id_act]) >> 1);
 
-                for(area_below = ext->btn_id_pr; area_below < ext->btn_cnt; area_below++) {
-                    if(ext->button_areas[area_below].y1 > ext->button_areas[ext->btn_id_pr].y1 &&
+                for(area_below = ext->btn_id_act; area_below < ext->btn_cnt; area_below++) {
+                    if(ext->button_areas[area_below].y1 > ext->button_areas[ext->btn_id_act].y1 &&
                        pr_center >= ext->button_areas[area_below].x1 &&
                        pr_center <= ext->button_areas[area_below].x2 + style->body.padding.inner) {
                         break;
                     }
                 }
 
-                if(area_below < ext->btn_cnt) ext->btn_id_pr = area_below;
+                if(area_below < ext->btn_cnt) ext->btn_id_act = area_below;
             }
-            ext->btn_id_act = ext->btn_id_pr;
+#if LV_USE_GROUP
+            ext->act_style = 1;
+#endif
             lv_obj_invalidate(btnm);
         } else if(c == LV_KEY_UP) {
             const lv_style_t * style = lv_btnm_get_style(btnm, LV_BTNM_STYLE_BG);
             /*Find the area below the the current*/
-            if(ext->btn_id_pr == LV_BTNM_BTN_NONE) {
-                ext->btn_id_pr = 0;
+            if(ext->btn_id_act == LV_BTNM_BTN_NONE) {
+                ext->btn_id_act = 0;
             } else {
                 int16_t area_above;
                 lv_coord_t pr_center =
-                    ext->button_areas[ext->btn_id_pr].x1 + (lv_area_get_width(&ext->button_areas[ext->btn_id_pr]) >> 1);
+                    ext->button_areas[ext->btn_id_act].x1 + (lv_area_get_width(&ext->button_areas[ext->btn_id_act]) >> 1);
 
-                for(area_above = ext->btn_id_pr; area_above >= 0; area_above--) {
-                    if(ext->button_areas[area_above].y1 < ext->button_areas[ext->btn_id_pr].y1 &&
+                for(area_above = ext->btn_id_act; area_above >= 0; area_above--) {
+                    if(ext->button_areas[area_above].y1 < ext->button_areas[ext->btn_id_act].y1 &&
                        pr_center >= ext->button_areas[area_above].x1 - style->body.padding.inner &&
                        pr_center <= ext->button_areas[area_above].x2) {
                         break;
                     }
                 }
-                if(area_above >= 0) ext->btn_id_pr = area_above;
+                if(area_above >= 0) ext->btn_id_act = area_above;
             }
-            ext->btn_id_act = ext->btn_id_pr;
+#if LV_USE_GROUP
+            ext->act_style = 1;
+#endif
             lv_obj_invalidate(btnm);
         }
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
