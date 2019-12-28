@@ -2011,6 +2011,8 @@ lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj)
 
 lv_style_dsc_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t type)
 {
+	if(type == LV_OBJ_STYLE_MAIN) return &obj->style_dsc;
+
     void * p = &type;
     lv_res_t res;
     res = lv_signal_send((lv_obj_t*)obj, LV_SIGNAL_GET_STYLE, &p);
@@ -2102,6 +2104,11 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_s
             break;
         case LV_STYLE_IMAGE_BLEND_MODE:
             if(dsc->cache.image_blend_mode == LV_STYLE_CACHE_BLEND_MODE_NORMAL) {
+                return LV_BLEND_MODE_NORMAL;
+            }
+            break;
+        case LV_STYLE_SHADOW_BLEND_MODE:
+            if(dsc->cache.shadow_blend_mode == LV_STYLE_CACHE_BLEND_MODE_NORMAL) {
                 return LV_BLEND_MODE_NORMAL;
             }
             break;
@@ -2265,7 +2272,9 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t type, lv_style_p
         return LV_COLOR_BLACK;
     case LV_STYLE_BORDER_COLOR:
         return LV_COLOR_BLACK;
-    }
+    case LV_STYLE_SHADOW_COLOR:
+		return LV_COLOR_GRAY;
+	}
 
     return LV_COLOR_WHITE;
 }
@@ -2891,6 +2900,18 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_draw_rect_dsc_t 
         }
     }
 
+    draw_dsc->shadow_width = lv_obj_get_style_value(obj, type, LV_STYLE_SHADOW_WIDTH);
+    if(draw_dsc->shadow_width) {
+        draw_dsc->shadow_opa = lv_obj_get_style_opa(obj, type, LV_STYLE_SHADOW_OPA);
+        if(draw_dsc->shadow_opa > LV_OPA_MIN) {
+            draw_dsc->shadow_ofs_x = lv_obj_get_style_value(obj, type, LV_STYLE_SHADOW_OFFSET_X);
+            draw_dsc->shadow_ofs_y = lv_obj_get_style_value(obj, type, LV_STYLE_SHADOW_OFFSET_Y);
+            draw_dsc->shadow_spread = lv_obj_get_style_value(obj, type, LV_STYLE_SHADOW_SPREAD);
+            draw_dsc->shadow_color = lv_obj_get_style_color(obj, type, LV_STYLE_SHADOW_COLOR);
+        }
+    }
+
+
     lv_opa_t opa_scale = lv_obj_get_style_opa(obj, type, LV_STYLE_OPA_SCALE);
     if(opa_scale < LV_OPA_MAX) {
         draw_dsc->bg_opa = (uint16_t)((uint16_t)draw_dsc->bg_opa * opa_scale) >> 8;
@@ -3214,6 +3235,10 @@ static lv_res_t style_cache_update_core(lv_obj_t * obj, uint8_t type)
     value = lv_obj_get_style_value(obj, type, LV_STYLE_IMAGE_BLEND_MODE);
     if(value == LV_BLEND_MODE_NORMAL) dsc->cache.image_blend_mode = LV_STYLE_CACHE_BLEND_MODE_NORMAL;
     else dsc->cache.image_blend_mode = LV_STYLE_CACHE_BLEND_MODE_SKIPPED;
+
+    value = lv_obj_get_style_value(obj, type, LV_STYLE_SHADOW_BLEND_MODE);
+    if(value == LV_BLEND_MODE_NORMAL) dsc->cache.shadow_blend_mode = LV_STYLE_CACHE_BLEND_MODE_NORMAL;
+    else dsc->cache.shadow_blend_mode = LV_STYLE_CACHE_BLEND_MODE_SKIPPED;
 
 
     value = lv_obj_get_style_value(obj, type, LV_STYLE_RADIUS);

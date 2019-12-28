@@ -70,10 +70,10 @@ typedef union {
 }lv_style_attr_t;
 
 
-#define LV_STYLE_ID_VALUE 0x0
-#define LV_STYLE_ID_COLOR 0x6
-#define LV_STYLE_ID_OPA   0xA
-#define LV_STYLE_ID_PTR   0xE
+#define LV_STYLE_ID_VALUE 0x0   /*6 pcs*/
+#define LV_STYLE_ID_COLOR 0x6   /*4 pcs*/
+#define LV_STYLE_ID_OPA   0xA   /*4 pcs*/
+#define LV_STYLE_ID_PTR   0xE   /*2 pcs*/
 
 enum {
     LV_STYLE_PROP_INIT(LV_STYLE_RADIUS,             0x0, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
@@ -184,7 +184,7 @@ typedef struct {
     uint32_t pad_inner  :6;
     uint32_t bg_grad_dir  :2;
 
-    /*32 bit*/
+    /*31 bit*/
     uint32_t border_width :3;
     uint32_t line_width   :3;
     uint32_t letter_space :3;
@@ -205,6 +205,7 @@ typedef struct {
     uint32_t text_blend_mode     :1;
     uint32_t line_blend_mode    :1;
     uint32_t image_blend_mode   :1;
+    uint32_t shadow_blend_mode   :1;
 
     /*32 bit*/
     uint32_t radius       :4;

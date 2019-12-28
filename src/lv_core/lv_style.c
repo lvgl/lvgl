@@ -118,14 +118,41 @@ void lv_style_built_in_init(void)
     lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_TOP, LV_DPI / 20);
     lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_BOTTOM, LV_DPI / 20);
     lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_INNER, LV_DPI / 16);
-//    lv_style_set_value(&lv_style_btn, LV_STYLE_RADIUS, LV_DPI / 20);
-//    lv_style_set_value(&lv_style_btn, LV_STYLE_BORDER_WIDTH, LV_DPI / 50 > 0 ? LV_DPI / 50 : 1);
-//    lv_style_set_value(&lv_style_btn, LV_STYLE_BG_GRAD_DIR, LV_GRAD_DIR_VER);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_LEFT 	| LV_STYLE_STATE_PRESSED, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_RIGHT 	| LV_STYLE_STATE_PRESSED, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_TOP 		| LV_STYLE_STATE_PRESSED, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_BOTTOM 	| LV_STYLE_STATE_PRESSED, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_INNER 	| LV_STYLE_STATE_PRESSED, LV_DPI / 16);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_LEFT 	| LV_STYLE_STATE_FOCUS, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_RIGHT 	| LV_STYLE_STATE_FOCUS, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_TOP 		| LV_STYLE_STATE_FOCUS, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_BOTTOM 	| LV_STYLE_STATE_FOCUS, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_INNER 	| LV_STYLE_STATE_FOCUS, LV_DPI / 16);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_LEFT 	| LV_STYLE_STATE_EDIT, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_RIGHT 	| LV_STYLE_STATE_EDIT, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_TOP 		| LV_STYLE_STATE_EDIT, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_BOTTOM 	| LV_STYLE_STATE_EDIT, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_INNER 	| LV_STYLE_STATE_EDIT, LV_DPI / 16);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_LEFT 	| LV_STYLE_STATE_HOVER, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_RIGHT 	| LV_STYLE_STATE_HOVER, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_TOP 		| LV_STYLE_STATE_HOVER, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_BOTTOM 	| LV_STYLE_STATE_HOVER, LV_DPI / 20);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_PAD_INNER 	| LV_STYLE_STATE_HOVER, LV_DPI / 16);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_RADIUS, 5);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_BORDER_WIDTH, 2);//LV_DPI / 50 > 0 ? LV_DPI / 50 : 1);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_BG_GRAD_DIR, LV_GRAD_DIR_VER);
     lv_style_set_color(&lv_style_btn, LV_STYLE_BG_COLOR, LV_COLOR_RED);
-//    lv_style_set_color(&lv_style_btn, LV_STYLE_BG_GRAD_COLOR, LV_COLOR_RED);
-//    lv_style_set_color(&lv_style_btn, LV_STYLE_BORDER_COLOR, LV_COLOR_NAVY);
-    lv_style_set_color(&lv_style_btn, LV_STYLE_BG_GRAD_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_BLACK);
+    lv_style_set_color(&lv_style_btn, LV_STYLE_BG_GRAD_COLOR, LV_COLOR_MAROON);
+    lv_style_set_color(&lv_style_btn, LV_STYLE_BORDER_COLOR, LV_COLOR_NAVY);
+    lv_style_set_color(&lv_style_btn, LV_STYLE_BG_GRAD_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_LIME);
     lv_style_set_color(&lv_style_btn, LV_STYLE_TEXT_COLOR, LV_COLOR_WHITE);
+    lv_style_set_opa(&lv_style_btn, LV_STYLE_BG_OPA, LV_OPA_50);
+    lv_style_set_opa(&lv_style_btn, LV_STYLE_BORDER_OPA, LV_OPA_50);
+    lv_style_set_opa(&lv_style_btn, LV_STYLE_TEXT_OPA, LV_OPA_50);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_SHADOW_WIDTH, 5);
+    lv_style_set_value(&lv_style_btn, LV_STYLE_SHADOW_OFFSET_Y, 3);
+
+
 
     /*Color styles*/
     lv_style_init(&lv_style_light);
@@ -609,8 +636,8 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
     int16_t id_guess = -1;
 
 
-    uint16_t group = (id_to_find >> 4) & 0xF;
-    if((style->used_groups & (1 << group)) == 0) return id_guess;
+//    uint16_t group = (id_to_find >> 4) & 0xF;
+//    if((style->used_groups & (1 << group)) == 0) return id_guess;
 
     size_t i = 0;
     while(i < style->size) {
@@ -620,11 +647,11 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
         lv_style_attr_t attr_act;
         attr_act.full = style->map[i + 1];
         if(style->map[i] == id_to_find) {
-            /*If there the state has perfectly match return this property*/
+            /*If the state perfectly matches return this property*/
             if(attr_act.bits.state == attr.bits.state) {
                 return i;
             }
-            /* Be sure the property not specifies other state the the requested.
+            /* Be sure the property not specifies other state than the requested.
              * E.g. For HOVER+PRESS, HOVER only is OK, but HOVER+FOCUS not*/
             else if((attr_act.bits.state & (~attr.bits.state)) == 0) {
                 /* Use this property if it describes better the requested state than the current candidate.
