@@ -913,7 +913,10 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 res        = lv_event_send(btnm, LV_EVENT_VALUE_CHANGED, &b);
             }
         }
-    } else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
+    } else if(sign == LV_SIGNAL_PRESS_LOST) {
+        ext->btn_id_pr  = LV_BTNM_BTN_NONE;
+        invalidate_button_area(btnm, ext->btn_id_act);
+    } else if(sign == LV_SIGNAL_DEFOCUS) {
         ext->btn_id_pr  = LV_BTNM_BTN_NONE;
 #if LV_USE_GROUP
         /*Restore style mod cb to group*/
