@@ -355,6 +355,9 @@ static bool lv_img_design(lv_obj_t * img, const lv_area_t * mask, lv_design_mode
 
         if(ext->cf == LV_IMG_CF_TRUE_COLOR || ext->cf == LV_IMG_CF_RAW) cover = lv_area_is_in(mask, &img->coords);
 
+        const lv_style_t * style = lv_img_get_style(img, LV_IMG_STYLE_MAIN);
+        if(style->image.opa < LV_OPA_MAX) return false;
+
         return cover;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
