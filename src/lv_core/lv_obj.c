@@ -1470,7 +1470,9 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
  */
 lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t event, const void * data)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    if(obj != NULL) {
+        LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    }
 
     /* Build a simple linked list from the objects used in the events
      * It's important to know if an this object was deleted by a nested event
