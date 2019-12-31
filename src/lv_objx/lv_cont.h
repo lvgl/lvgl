@@ -69,9 +69,9 @@ typedef struct
 
 /*Styles*/
 enum {
-    LV_CONT_STYLE_MAIN,
+    LV_CONT_PART_MAIN,
 };
-typedef uint8_t lv_cont_style_t;
+typedef uint8_t lv_cont_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES

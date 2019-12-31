@@ -69,11 +69,6 @@ typedef struct
 enum {
     LV_TABVIEW_STYLE_BG,
     LV_TABVIEW_STYLE_INDIC,
-    LV_TABVIEW_STYLE_BTN_BG,
-    LV_TABVIEW_STYLE_BTN_REL,
-    LV_TABVIEW_STYLE_BTN_PR,
-    LV_TABVIEW_STYLE_BTN_TGL_REL,
-    LV_TABVIEW_STYLE_BTN_TGL_PR,
 };
 typedef uint8_t lv_tabview_style_t;
 

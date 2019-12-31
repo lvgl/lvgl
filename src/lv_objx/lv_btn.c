@@ -121,8 +121,8 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
 //            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_PR, th->style.btn.tgl_pr);
 //            lv_btn_set_style(new_btn, LV_BTN_STYLE_INA, th->style.btn.ina);
         } else {
-            lv_obj_reset_style(new_btn, LV_BTN_STYLE_MAIN);
-            lv_obj_add_style_class(new_btn, LV_BTN_STYLE_MAIN, &lv_style_btn);
+            lv_obj_reset_style(new_btn, LV_BTN_PART_MAIN);
+            lv_obj_add_style_class(new_btn, LV_BTN_PART_MAIN, &lv_style_btn);
         }
     }
     /*Copy 'copy'*/
@@ -137,7 +137,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
 //        memcpy((void*) ext->styles, copy_ext->styles, sizeof(ext->styles));
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_btn,LV_BTN_STYLE_MAIN);
+        lv_obj_refresh_style(new_btn,LV_BTN_PART_MAIN);
     }
 
     LV_LOG_INFO("button created");
@@ -362,7 +362,7 @@ lv_style_dsc_t * lv_btn_get_style(lv_obj_t * cont, uint8_t type)
 {
     lv_style_dsc_t * style_dsc_p;
     switch(type) {
-    case LV_BTN_STYLE_MAIN:
+    case LV_BTN_PART_MAIN:
         style_dsc_p = &cont->style_dsc;
         break;
     default:
@@ -455,14 +455,14 @@ static lv_design_res_t lv_btn_design(lv_obj_t * btn, const lv_area_t * clip_area
 
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
-        lv_obj_init_draw_rect_dsc(btn, LV_OBJ_STYLE_MAIN, &draw_dsc);
+        lv_obj_init_draw_rect_dsc(btn, LV_OBJ_PART_MAIN, &draw_dsc);
 
         lv_draw_rect(&btn->coords, clip_area, &draw_dsc);
 
-        if(lv_obj_get_style_value(btn, LV_OBJ_STYLE_MAIN, LV_STYLE_BG_CLIP_CORNER)) {
+        if(lv_obj_get_style_value(btn, LV_OBJ_PART_MAIN, LV_STYLE_BG_CLIP_CORNER)) {
             lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
 
-            lv_coord_t r = lv_obj_get_style_value(btn, LV_OBJ_STYLE_MAIN, LV_STYLE_RADIUS);
+            lv_coord_t r = lv_obj_get_style_value(btn, LV_OBJ_PART_MAIN, LV_STYLE_RADIUS);
 
             lv_draw_mask_radius_init(mp, &btn->coords, r, false);
             /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/

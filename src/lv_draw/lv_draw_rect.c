@@ -309,7 +309,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
 
     bool simple_mode = true;
     if(lv_draw_mask_get_cnt()!= 0) simple_mode = false;
-    else if(dsc->border_part != LV_BORDER_PART_FULL) simple_mode = false;
+    else if(dsc->border_part != LV_BORDER_SIDE_FULL) simple_mode = false;
     else if(dsc->bg_grad_dir == LV_GRAD_DIR_HOR) simple_mode = false;
 
     int16_t mask_rout_id = LV_MASK_ID_INV;
@@ -337,10 +337,10 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
     /*Get the inner area*/
     lv_area_t area_small;
     lv_area_copy(&area_small, coords);
-    area_small.x1 += ((dsc->border_part & LV_BORDER_PART_LEFT) ? border_width : - (border_width + rout));
-    area_small.x2 -= ((dsc->border_part & LV_BORDER_PART_RIGHT) ? border_width : - (border_width + rout));
-    area_small.y1 += ((dsc->border_part & LV_BORDER_PART_TOP) ? border_width : - (border_width + rout));
-    area_small.y2 -= ((dsc->border_part & LV_BORDER_PART_BOTTOM) ? border_width : - (border_width + rout));
+    area_small.x1 += ((dsc->border_part & LV_BORDER_SIDE_LEFT) ? border_width : - (border_width + rout));
+    area_small.x2 -= ((dsc->border_part & LV_BORDER_SIDE_RIGHT) ? border_width : - (border_width + rout));
+    area_small.y1 += ((dsc->border_part & LV_BORDER_SIDE_TOP) ? border_width : - (border_width + rout));
+    area_small.y2 -= ((dsc->border_part & LV_BORDER_SIDE_BOTTOM) ? border_width : - (border_width + rout));
 
     /*Create inner the mask*/
     lv_draw_mask_radius_param_t mask_rin_param;
@@ -397,7 +397,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
         }
 
         /*Draw the lower corner area corner area*/
-        if(dsc->border_part & LV_BORDER_PART_BOTTOM) {
+        if(dsc->border_part & LV_BORDER_SIDE_BOTTOM) {
             lv_coord_t lower_corner_end = coords->y2 - disp_area->y1 - corner_size;
             if(lower_corner_end <= upper_corner_end) lower_corner_end = upper_corner_end + 1;
             fill_area.y1 = disp_area->y1 + lower_corner_end;

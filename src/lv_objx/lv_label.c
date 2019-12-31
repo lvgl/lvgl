@@ -591,9 +591,9 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
     lv_coord_t max_w         = lv_obj_get_width(label);
-    const lv_font_t * font   = lv_obj_get_style_ptr(label, LV_LABEL_STYLE_MAIN, LV_STYLE_FONT);
-    lv_style_value_t line_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LINE_SPACE);
-    lv_style_value_t letter_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LETTER_SPACE);
+    const lv_font_t * font   = lv_obj_get_style_ptr(label, LV_LABEL_PART_MAIN, LV_STYLE_FONT);
+    lv_style_value_t line_space = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_LINE_SPACE);
+    lv_style_value_t letter_space = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_LETTER_SPACE);
     lv_coord_t letter_height    = lv_font_get_line_height(font);
     lv_coord_t y             = 0;
     lv_txt_flag_t flag       = LV_TXT_FLAG_NONE;
@@ -695,9 +695,9 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
     lv_coord_t max_w         = lv_obj_get_width(label);
-    const lv_font_t * font   = lv_obj_get_style_ptr(label, LV_LABEL_STYLE_MAIN, LV_STYLE_FONT);
-    lv_style_value_t line_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LINE_SPACE);
-    lv_style_value_t letter_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LETTER_SPACE);
+    const lv_font_t * font   = lv_obj_get_style_ptr(label, LV_LABEL_PART_MAIN, LV_STYLE_FONT);
+    lv_style_value_t line_space = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_LINE_SPACE);
+    lv_style_value_t letter_space = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_LETTER_SPACE);
     lv_coord_t letter_height    = lv_font_get_line_height(font);
     lv_coord_t y             = 0;
     lv_txt_flag_t flag       = LV_TXT_FLAG_NONE;
@@ -856,9 +856,9 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
     lv_coord_t max_w         = lv_obj_get_width(label);
-    const lv_font_t * font   = lv_obj_get_style_ptr(label, LV_LABEL_STYLE_MAIN, LV_STYLE_FONT);
-    lv_style_value_t line_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LINE_SPACE);
-    lv_style_value_t letter_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LETTER_SPACE);
+    const lv_font_t * font   = lv_obj_get_style_ptr(label, LV_LABEL_PART_MAIN, LV_STYLE_FONT);
+    lv_style_value_t line_space = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_LINE_SPACE);
+    lv_style_value_t letter_space = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_LETTER_SPACE);
     lv_coord_t letter_height    = lv_font_get_line_height(font);
     lv_coord_t y             = 0;
     lv_txt_flag_t flag       = LV_TXT_FLAG_NONE;
@@ -938,7 +938,7 @@ lv_style_dsc_t * lv_label_get_style(lv_obj_t * label, uint8_t type)
 {
     lv_style_dsc_t * style_dsc_p;
     switch(type) {
-    case LV_LABEL_STYLE_MAIN:
+    case LV_LABEL_PART_MAIN:
         style_dsc_p = &label->style_dsc;
         break;
     default:
@@ -1044,9 +1044,9 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         return LV_DESIGN_RES_NOT_COVER;
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_area_t coords;
-        const lv_font_t * font   = lv_obj_get_style_ptr(label, LV_LABEL_STYLE_MAIN, LV_STYLE_FONT);
-        lv_style_value_t line_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LINE_SPACE);
-        lv_style_value_t letter_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LETTER_SPACE);
+        const lv_font_t * font   = lv_obj_get_style_ptr(label, LV_LABEL_PART_MAIN, LV_STYLE_FONT);
+        lv_style_value_t line_space = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_LINE_SPACE);
+        lv_style_value_t letter_space = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_LETTER_SPACE);
         lv_obj_get_coords(label, &coords);
 
         lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
@@ -1054,10 +1054,10 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
             lv_area_t bg;
             lv_obj_get_coords(label, &bg);
 
-            lv_coord_t left   = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_PAD_LEFT);
-            lv_coord_t right  = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_PAD_RIGHT);
-            lv_coord_t top    = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_PAD_TOP);
-            lv_coord_t bottom = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_PAD_BOTTOM);
+            lv_coord_t left   = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_LEFT);
+            lv_coord_t right  = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_RIGHT);
+            lv_coord_t top    = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_TOP);
+            lv_coord_t bottom = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_BOTTOM);
             bg.x1 -= left;
             bg.x2 += right;
             bg.y1 -= top;
@@ -1065,7 +1065,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
 
             lv_draw_rect_dsc_t draw_rect_dsc;
             lv_draw_rect_dsc_init(&draw_rect_dsc);
-            lv_obj_init_draw_rect_dsc(label, LV_LABEL_STYLE_MAIN, &draw_rect_dsc);
+            lv_obj_init_draw_rect_dsc(label, LV_LABEL_PART_MAIN, &draw_rect_dsc);
 
             lv_draw_rect(&bg, clip_area, &draw_rect_dsc);
         }
@@ -1108,7 +1108,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         label_draw_dsc.ofs_x = ext->offset.x;
         label_draw_dsc.ofs_y = ext->offset.y;
         label_draw_dsc.flag = flag;
-        lv_obj_init_draw_label_dsc(label, LV_LABEL_STYLE_MAIN, &label_draw_dsc);
+        lv_obj_init_draw_label_dsc(label, LV_LABEL_PART_MAIN, &label_draw_dsc);
 
         lv_draw_label(&coords, clip_area, &label_draw_dsc, ext->text, hint);
 
@@ -1182,10 +1182,10 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         if(ext->body_draw) {
-            lv_coord_t left   = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_PAD_LEFT);
-            lv_coord_t right  = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_PAD_RIGHT);
-            lv_coord_t top    = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_PAD_TOP);
-            lv_coord_t bottom = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_PAD_BOTTOM);
+            lv_coord_t left   = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_LEFT);
+            lv_coord_t right  = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_RIGHT);
+            lv_coord_t top    = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_TOP);
+            lv_coord_t bottom = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_BOTTOM);
             label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, left);
             label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, right);
             label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, top);
@@ -1222,9 +1222,9 @@ static void lv_label_refr_text(lv_obj_t * label)
 #endif
 
     lv_coord_t max_w         = lv_obj_get_width(label);
-    const lv_font_t * font   = lv_obj_get_style_ptr(label, LV_LABEL_STYLE_MAIN, LV_STYLE_FONT);
-    lv_style_value_t line_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LINE_SPACE);
-    lv_style_value_t letter_space = lv_obj_get_style_value(label, LV_LABEL_STYLE_MAIN, LV_STYLE_LETTER_SPACE);
+    const lv_font_t * font   = lv_obj_get_style_ptr(label, LV_LABEL_PART_MAIN, LV_STYLE_FONT);
+    lv_style_value_t line_space = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_LINE_SPACE);
+    lv_style_value_t letter_space = lv_obj_get_style_value(label, LV_LABEL_PART_MAIN, LV_STYLE_LETTER_SPACE);
 
     /*If the width will be expanded set the max length to very big */
     if(ext->long_mode == LV_LABEL_LONG_EXPAND) {

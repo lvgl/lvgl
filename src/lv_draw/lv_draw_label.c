@@ -188,9 +188,10 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
     lv_color_t recolor;
     lv_coord_t letter_w;
 
-//    lv_style_t sel_style;
-//    lv_style_copy(&sel_style, &lv_style_plain_color);
-//    sel_style.body.main_color = sel_style.body.grad_color = dsc->sel_color;
+
+    lv_draw_rect_dsc_t draw_dsc_sel;
+    lv_draw_rect_dsc_init(&draw_dsc_sel);
+    draw_dsc_sel.bg_color = dsc->sel_color;
 
     lv_coord_t pos_x_start = pos.x;
     /*Write out all lines*/
@@ -268,16 +269,16 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
 
             letter_w = lv_font_get_glyph_width(font, letter, letter_next);
 
-//            if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
-//                if(logical_char_pos >= sel_start && logical_char_pos < sel_end) {
-//                    lv_area_t sel_coords;
-//                    sel_coords.x1 = pos.x;
-//                    sel_coords.y1 = pos.y;
-//                    sel_coords.x2 = pos.x + letter_w + dsc->letter_space - 1;
-//                    sel_coords.y2 = pos.y + line_height - 1;
-//                    lv_draw_rect(&sel_coords, mask, &sel_style, opa);
-//                }
-//            }
+            if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
+                if(logical_char_pos >= sel_start && logical_char_pos < sel_end) {
+                    lv_area_t sel_coords;
+                    sel_coords.x1 = pos.x;
+                    sel_coords.y1 = pos.y;
+                    sel_coords.x2 = pos.x + letter_w + dsc->letter_space - 1;
+                    sel_coords.y2 = pos.y + line_height - 1;
+                    lv_draw_rect(&sel_coords, mask, &draw_dsc_sel);
+                }
+            }
 
             lv_draw_letter(&pos, mask, font, letter, color, opa);
 

@@ -30,6 +30,8 @@
  **********************/
 static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param);
 static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t type);
+
 static uint8_t get_button_width(lv_btnm_ctrl_t ctrl_bits);
 static bool button_is_hidden(lv_btnm_ctrl_t ctrl_bits);
 static bool button_is_repeat_disabled(lv_btnm_ctrl_t ctrl_bits);
@@ -115,13 +117,13 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
 //            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_TGL_PR, th->style.btnm.btn.tgl_pr);
 //            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_INA, th->style.btnm.btn.ina);
         } else {
-            lv_obj_reset_style(new_btnm, LV_BTNM_STYLE_MAIN);
-            lv_obj_add_style_class(new_btnm, LV_BTNM_STYLE_MAIN, &lv_style_panel);
+            lv_obj_reset_style(new_btnm, LV_BTNM_PART_MAIN);
+            lv_obj_add_style_class(new_btnm, LV_BTNM_PART_MAIN, &lv_style_panel);
 
             /* Do not cache the button style because it's independent from the object's style.
              * (Therefore it can't be cached)*/
             ext->style_btn.cache.enabled = 0;
-            lv_obj_add_style_class(new_btnm, LV_BTNM_STYLE_BTN, &lv_style_btn);
+            lv_obj_add_style_class(new_btnm, LV_BTNM_PART_BTN, &lv_style_btn);
         }
     }
     /*Copy an existing object*/
@@ -172,11 +174,11 @@ void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
     ext->map_p = map;
 
     /*Set size and positions of the buttons*/
-    lv_style_value_t left = lv_obj_get_style_value(btnm, LV_BTNM_STYLE_MAIN, LV_STYLE_PAD_LEFT);
-    lv_style_value_t right = lv_obj_get_style_value(btnm, LV_BTNM_STYLE_MAIN, LV_STYLE_PAD_RIGHT);
-    lv_style_value_t top = lv_obj_get_style_value(btnm, LV_BTNM_STYLE_MAIN, LV_STYLE_PAD_TOP);
-    lv_style_value_t bottom = lv_obj_get_style_value(btnm, LV_BTNM_STYLE_MAIN, LV_STYLE_PAD_BOTTOM);
-    lv_style_value_t inner = lv_obj_get_style_value(btnm, LV_BTNM_STYLE_MAIN, LV_STYLE_PAD_INNER);
+    lv_style_value_t left = lv_obj_get_style_value(btnm, LV_BTNM_PART_MAIN, LV_STYLE_PAD_LEFT);
+    lv_style_value_t right = lv_obj_get_style_value(btnm, LV_BTNM_PART_MAIN, LV_STYLE_PAD_RIGHT);
+    lv_style_value_t top = lv_obj_get_style_value(btnm, LV_BTNM_PART_MAIN, LV_STYLE_PAD_TOP);
+    lv_style_value_t bottom = lv_obj_get_style_value(btnm, LV_BTNM_PART_MAIN, LV_STYLE_PAD_BOTTOM);
+    lv_style_value_t inner = lv_obj_get_style_value(btnm, LV_BTNM_PART_MAIN, LV_STYLE_PAD_INNER);
 
 
     lv_coord_t max_w            = lv_obj_get_width(btnm) - left - right;
@@ -565,28 +567,6 @@ bool lv_btnm_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl)
 }
 
 
-lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t type)
-{
-    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
-
-    lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
-
-    lv_style_dsc_t * style_dsc_p;
-
-    switch(type) {
-    case LV_BTNM_STYLE_MAIN:
-        style_dsc_p = &btnm->style_dsc;
-        break;
-    case LV_BTNM_STYLE_BTN:
-        style_dsc_p = &ext->style_btn;
-        break;
-    default:
-        style_dsc_p = NULL;
-    }
-
-    return style_dsc_p;
-}
-
 /**
  * Find whether "one toggle" mode is enabled.
  * @param btnm Button matrix object
@@ -647,29 +627,29 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
 
         uint8_t state_ori = btnm->state;
         btnm->state = 0;
-        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_STYLE_BTN, &draw_rect_dsc[LV_BTN_STATE_REL]);
-        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_STYLE_BTN, &draw_label_dsc[LV_BTN_STATE_REL]);
+        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_dsc[LV_BTN_STATE_REL]);
+        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_dsc[LV_BTN_STATE_REL]);
 
         btnm->state = LV_OBJ_STATE_PRESSED;
-        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_STYLE_BTN, &draw_rect_dsc[LV_BTN_STATE_PR]);
-        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_STYLE_BTN, &draw_label_dsc[LV_BTN_STATE_PR]);
+        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_dsc[LV_BTN_STATE_PR]);
+        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_dsc[LV_BTN_STATE_PR]);
 
         btnm->state = LV_OBJ_STATE_CHECKED;
-        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_STYLE_BTN, &draw_rect_dsc[LV_BTN_STATE_TGL_REL]);
-        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_STYLE_BTN, &draw_label_dsc[LV_BTN_STATE_TGL_REL]);
+        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_dsc[LV_BTN_STATE_TGL_REL]);
+        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_dsc[LV_BTN_STATE_TGL_REL]);
 
         btnm->state = LV_OBJ_STATE_PRESSED | LV_OBJ_STATE_CHECKED;
-        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_STYLE_BTN, &draw_rect_dsc[LV_BTN_STATE_TGL_PR]);
-        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_STYLE_BTN, &draw_label_dsc[LV_BTN_STATE_TGL_PR]);
+        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_dsc[LV_BTN_STATE_TGL_PR]);
+        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_dsc[LV_BTN_STATE_TGL_PR]);
 
         btnm->state = LV_OBJ_STATE_DISABLED;
-        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_STYLE_BTN, &draw_rect_dsc[LV_BTN_STATE_INA]);
-        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_STYLE_BTN, &draw_label_dsc[LV_BTN_STATE_INA]);
+        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_dsc[LV_BTN_STATE_INA]);
+        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_dsc[LV_BTN_STATE_INA]);
 
         btnm->state = state_ori;
 
-        lv_style_value_t padding_top = lv_obj_get_style_value(btnm, LV_BTNM_STYLE_MAIN, LV_STYLE_PAD_TOP);
-        lv_style_value_t padding_bottom = lv_obj_get_style_value(btnm, LV_BTNM_STYLE_MAIN, LV_STYLE_PAD_BOTTOM);
+        lv_style_value_t padding_top = lv_obj_get_style_value(btnm, LV_BTNM_PART_MAIN, LV_STYLE_PAD_TOP);
+        lv_style_value_t padding_bottom = lv_obj_get_style_value(btnm, LV_BTNM_PART_MAIN, LV_STYLE_PAD_BOTTOM);
 
         if(ext->recolor) txt_flag = LV_TXT_FLAG_RECOLOR;
         for(btn_i = 0; btn_i < ext->btn_cnt; btn_i++, txt_i++) {
@@ -705,24 +685,24 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             lv_style_value_t border_part_ori = draw_rect_dsc[act_state].border_part;
 
             /*Remove borders on the edges if `LV_BORDER_INTERNAL`*/
-            if(border_part_ori & LV_BORDER_PART_INTERNAL) {
+            if(border_part_ori & LV_BORDER_SIDE_INTERNAL) {
                 /*Top/Bottom lines*/
                 if(area_tmp.y1 == btnm->coords.y1 + padding_top) {
-                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_PART_TOP;
+                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_SIDE_TOP;
                 }
                 if(area_tmp.y2 == btnm->coords.y2 - padding_bottom) {
-                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_PART_BOTTOM;
+                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_SIDE_BOTTOM;
                 }
 
                 /*Left/right columns*/
                 if(txt_i == 0) { /*First button*/
-                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_PART_LEFT;
+                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_SIDE_LEFT;
                 } else if(strcmp(ext->map_p[txt_i - 1], "\n") == 0) {
-                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_PART_LEFT;
+                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_SIDE_LEFT;
                 }
 
                 if(ext->map_p[txt_i + 1][0] == '\0' || strcmp(ext->map_p[txt_i + 1], "\n") == 0) {
-                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_PART_RIGHT;
+                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_SIDE_RIGHT;
                 }
             }
 
@@ -825,9 +805,9 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             /*Toggle the button if enabled*/
             if(button_is_tgl_enabled(ext->ctrl_bits[ext->btn_id_pr])) {
                 if(button_get_tgl_state(ext->ctrl_bits[ext->btn_id_pr])) {
-                    ext->ctrl_bits[ext->btn_id_pr] &= (~LV_BTNM_CTRL_TGL_STATE);
+                    ext->ctrl_bits[ext->btn_id_pr] &= (~LV_BTNM_CTRL_CHECHK_STATE);
                 } else {
-                    ext->ctrl_bits[ext->btn_id_pr] |= LV_BTNM_CTRL_TGL_STATE;
+                    ext->ctrl_bits[ext->btn_id_pr] |= LV_BTNM_CTRL_CHECHK_STATE;
                 }
                 if(ext->one_toggle) make_one_button_toggled(btnm, ext->btn_id_pr);
             }
@@ -913,7 +893,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             ext->btn_id_act = ext->btn_id_pr;
             lv_obj_invalidate(btnm);
         } else if(c == LV_KEY_DOWN) {
-            lv_style_value_t pad_inner = lv_obj_get_style_value(btnm, LV_BTNM_STYLE_MAIN, LV_STYLE_PAD_INNER);
+            lv_style_value_t pad_inner = lv_obj_get_style_value(btnm, LV_BTNM_PART_MAIN, LV_STYLE_PAD_INNER);
             /*Find the area below the the current*/
             if(ext->btn_id_pr == LV_BTNM_BTN_NONE) {
                 ext->btn_id_pr = 0;
@@ -935,7 +915,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             ext->btn_id_act = ext->btn_id_pr;
             lv_obj_invalidate(btnm);
         } else if(c == LV_KEY_UP) {
-            lv_style_value_t pad_inner = lv_obj_get_style_value(btnm, LV_BTNM_STYLE_MAIN, LV_STYLE_PAD_INNER);
+            lv_style_value_t pad_inner = lv_obj_get_style_value(btnm, LV_BTNM_PART_MAIN, LV_STYLE_PAD_INNER);
             /*Find the area below the the current*/
             if(ext->btn_id_pr == LV_BTNM_BTN_NONE) {
                 ext->btn_id_pr = 0;
@@ -963,6 +943,27 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     return res;
 }
 
+static lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t type)
+{
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
+    lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
+
+    lv_style_dsc_t * style_dsc_p;
+
+    switch(type) {
+    case LV_BTNM_PART_MAIN:
+        style_dsc_p = &btnm->style_dsc;
+        break;
+    case LV_BTNM_PART_BTN:
+        style_dsc_p = &ext->style_btn;
+        break;
+    default:
+        style_dsc_p = NULL;
+    }
+
+    return style_dsc_p;
+}
 /**
  * Create the required number of buttons and control bytes according to a map
  * @param btnm pointer to button matrix object
@@ -1035,12 +1036,12 @@ static bool button_is_click_trig(lv_btnm_ctrl_t ctrl_bits)
 
 static bool button_is_tgl_enabled(lv_btnm_ctrl_t ctrl_bits)
 {
-    return ctrl_bits & LV_BTNM_CTRL_TGL_ENABLE ? true : false;
+    return ctrl_bits & LV_BTNM_CTRL_CHECKABLE ? true : false;
 }
 
 static bool button_get_tgl_state(lv_btnm_ctrl_t ctrl_bits)
 {
-    return ctrl_bits & LV_BTNM_CTRL_TGL_STATE ? true : false;
+    return ctrl_bits & LV_BTNM_CTRL_CHECHK_STATE ? true : false;
 }
 
 /**
@@ -1121,11 +1122,11 @@ static bool maps_are_identical(const char ** map1, const char ** map2)
 static void make_one_button_toggled(lv_obj_t * btnm, uint16_t btn_idx)
 {
     /*Save whether the button was toggled*/
-    bool was_toggled = lv_btnm_get_btn_ctrl(btnm, btn_idx, LV_BTNM_CTRL_TGL_STATE);
+    bool was_toggled = lv_btnm_get_btn_ctrl(btnm, btn_idx, LV_BTNM_CTRL_CHECHK_STATE);
 
-    lv_btnm_clear_btn_ctrl_all(btnm, LV_BTNM_CTRL_TGL_STATE);
+    lv_btnm_clear_btn_ctrl_all(btnm, LV_BTNM_CTRL_CHECHK_STATE);
 
-    if(was_toggled) lv_btnm_set_btn_ctrl(btnm, btn_idx, LV_BTNM_CTRL_TGL_STATE);
+    if(was_toggled) lv_btnm_set_btn_ctrl(btnm, btn_idx, LV_BTNM_CTRL_CHECHK_STATE);
 }
 
 #endif

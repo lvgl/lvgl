@@ -57,7 +57,7 @@ typedef struct
     lv_obj_t * scrl; /*The scrollable object on the background*/
     struct
     {
-        const lv_style_t * style; /*Style of scrollbars*/
+        lv_style_dsc_t style; /*Style of scrollbars*/
         lv_area_t hor_area;       /*Horizontal scrollbar area relative to the page. (Handled by the library) */
         lv_area_t ver_area;       /*Vertical scrollbar area relative to the page (Handled by the library)*/
         uint8_t hor_draw : 1;     /*1: horizontal scrollbar is visible now (Handled by the library)*/
@@ -68,7 +68,7 @@ typedef struct
     struct
     {
         lv_anim_value_t state;    /*Store the current size of the edge flash effect*/
-        const lv_style_t * style; /*Style of edge flash effect (usually homogeneous circle)*/
+        lv_style_dsc_t style; /*Style of edge flash effect (usually homogeneous circle)*/
         uint8_t enabled : 1;      /*1: Show a flash animation on the edge*/
         uint8_t top_ip : 1;       /*Used internally to show that top most position is reached (flash is In
                                      Progress)*/
@@ -87,12 +87,12 @@ typedef struct
 } lv_page_ext_t;
 
 enum {
-    LV_PAGE_STYLE_BG,
-    LV_PAGE_STYLE_SCRL,
-    LV_PAGE_STYLE_SB,
-    LV_PAGE_STYLE_EDGE_FLASH,
+    LV_PAGE_PART_BG,
+    LV_PAGE_PART_SCRL,
+    LV_PAGE_PART_SCRL_BAR,
+    LV_PAGE_PART_EDGE_FLASH,
 };
-typedef uint8_t lv_page_style_t;
+typedef uint8_t lv_part_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -228,14 +228,6 @@ static inline void lv_page_set_scrl_layout(lv_obj_t * page, lv_layout_t layout)
     lv_cont_set_layout(lv_page_get_scrl(page), layout);
 }
 
-/**
- * Set a style of a page
- * @param page pointer to a page object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_page_set_style(lv_obj_t * page, lv_page_style_t type, const lv_style_t * style);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -344,14 +336,6 @@ static inline lv_fit_t lv_page_get_scrl_fit_bottom(const lv_obj_t * page)
 {
     return lv_cont_get_fit_bottom(lv_page_get_scrl(page));
 }
-
-/**
- * Get a style of a page
- * @param page pointer to page object
- * @param type which style should be get
- * @return style pointer to a style
- */
-const lv_style_t * lv_page_get_style(const lv_obj_t * page, lv_page_style_t type);
 
 /*=====================
  * Other functions

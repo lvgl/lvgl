@@ -267,11 +267,11 @@ typedef struct _lv_obj_t
 } lv_obj_t;
 
 enum {
-    LV_OBJ_STYLE_MAIN,
-    LV_OBJ_STYLE_ALL = 0xFF,
+    LV_OBJ_PART_MAIN,
+    LV_OBJ_PART_ALL = 0xFF,
 };
 
-typedef uint8_t lv_obj_style_t;
+typedef uint8_t lv_obj_part_t;
 
 /** Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
 typedef struct

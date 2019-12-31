@@ -68,10 +68,10 @@ typedef struct
 
 /**Styles*/
 enum {
-    LV_BTN_STYLE_MAIN,
+    LV_BTN_PART_MAIN,
 
 };
-typedef uint8_t lv_btn_style_t;
+typedef uint8_t lv_btn_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -183,7 +183,7 @@ void lv_btn_set_ink_out_time(lv_obj_t * btn, uint16_t time);
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_btn_set_style(lv_obj_t * btn, lv_btn_style_t type, const lv_style_t * style);
+void lv_btn_set_style(lv_obj_t * btn, lv_btn_part_t type, const lv_style_t * style);
 
 /*=====================
  * Getter functions

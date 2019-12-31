@@ -33,13 +33,14 @@ LV_EXPORT_CONST_INT(LV_BTNM_BTN_NONE);
  *      TYPEDEFS
  **********************/
 
-/** Type to store button control bits (disabled, hidden etc.) */
+/** Type to store button control bits (disabled, hidden etc.)
+ * The first 3 bits are used to store the width */
 enum {
     LV_BTNM_CTRL_HIDDEN     = 0x0008, /**< Button hidden */
     LV_BTNM_CTRL_NO_REPEAT  = 0x0010, /**< Do not repeat press this button. */
     LV_BTNM_CTRL_INACTIVE   = 0x0020, /**< Disable this button. */
-    LV_BTNM_CTRL_TGL_ENABLE = 0x0040, /**< Button *can* be toggled. */
-    LV_BTNM_CTRL_TGL_STATE  = 0x0080, /**< Button is currently toggled (e.g. checked). */
+    LV_BTNM_CTRL_CHECKABLE  = 0x0040, /**< Button *can* be toggled. */
+    LV_BTNM_CTRL_CHECHK_STATE  = 0x0080, /**< Button is currently toggled (e.g. checked). */
     LV_BTNM_CTRL_CLICK_TRIG = 0x0100, /**< 1: Send LV_EVENT_SELECTED on CLICK, 0: Send LV_EVENT_SELECTED on PRESS*/
 };
 typedef uint16_t lv_btnm_ctrl_t;
@@ -61,10 +62,10 @@ typedef struct
 } lv_btnm_ext_t;
 
 enum {
-    LV_BTNM_STYLE_MAIN,
-    LV_BTNM_STYLE_BTN,
+    LV_BTNM_PART_MAIN,
+    LV_BTNM_PART_BTN,
 };
-typedef uint8_t lv_btnm_style_t;
+typedef uint8_t lv_btnm_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -120,7 +121,7 @@ void lv_btnm_set_pressed(const lv_obj_t * btnm, uint16_t id);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_style_t type, const lv_style_t * style);
+void lv_btnm_set_style(lv_obj_t * btnm, lv_btnm_part_t type, const lv_style_t * style);
 
 /**
  * Enable recoloring of button's texts
@@ -240,9 +241,6 @@ const char * lv_btnm_get_btn_text(const lv_obj_t * btnm, uint16_t btn_id);
  * @return true: long press repeat is disabled; false: long press repeat enabled
  */
 bool lv_btnm_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnm_ctrl_t ctrl);
-
-
-lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t type);
 
 /**
  * Find whether "one toggle" mode is enabled.

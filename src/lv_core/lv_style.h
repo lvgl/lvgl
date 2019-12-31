@@ -25,8 +25,6 @@ extern "C" {
  *      DEFINES
  *********************/
 #define LV_RADIUS_CIRCLE (LV_COORD_MAX) /**< A very big radius to always draw as circle*/
-#define LV_STYLE_DEGUG_SENTINEL_VALUE 0x12345678
-#define LV_STYLE_WEIGHT_MAX     0xFF
 
 LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
@@ -36,15 +34,15 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
 /*Border types (Use 'OR'ed values)*/
 enum {
-    LV_BORDER_PART_NONE     = 0x00,
-    LV_BORDER_PART_BOTTOM   = 0x01,
-    LV_BORDER_PART_TOP      = 0x02,
-    LV_BORDER_PART_LEFT     = 0x04,
-    LV_BORDER_PART_RIGHT    = 0x08,
-    LV_BORDER_PART_FULL     = 0x0F,
-    LV_BORDER_PART_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
+    LV_BORDER_SIDE_NONE     = 0x00,
+    LV_BORDER_SIDE_BOTTOM   = 0x01,
+    LV_BORDER_SIDE_TOP      = 0x02,
+    LV_BORDER_SIDE_LEFT     = 0x04,
+    LV_BORDER_SIDE_RIGHT    = 0x08,
+    LV_BORDER_SIDE_FULL     = 0x0F,
+    LV_BORDER_SIDE_INTERNAL = 0x10, /**< FOR matrix-like objects (e.g. Button matrix)*/
 };
-typedef uint8_t lv_border_part_t;
+typedef uint8_t lv_border_side_t;
 
 enum {
     LV_GRAD_DIR_NONE,
@@ -70,10 +68,10 @@ typedef union {
 }lv_style_attr_t;
 
 
-#define LV_STYLE_ID_VALUE 0x0
-#define LV_STYLE_ID_COLOR 0x6
-#define LV_STYLE_ID_OPA   0xA
-#define LV_STYLE_ID_PTR   0xE
+#define LV_STYLE_ID_VALUE 0x0   /*max 6 pcs*/
+#define LV_STYLE_ID_COLOR 0x6   /*max 4 pcs*/
+#define LV_STYLE_ID_OPA   0xA   /*max 4 pcs*/
+#define LV_STYLE_ID_PTR   0xE   /*max 2 pcs*/
 
 enum {
     LV_STYLE_PROP_INIT(LV_STYLE_RADIUS,             0x0, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
@@ -126,6 +124,10 @@ enum {
 
     LV_STYLE_PROP_INIT(LV_STYLE_OVERLAY_COLOR,      0x8, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_INHERIT),
     LV_STYLE_PROP_INIT(LV_STYLE_OVERLAY_OPA,        0x8, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_INHERIT),
+
+    LV_STYLE_PROP_INIT(LV_STYLE_SCROLLBAR_WIDTH,     0x9, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
+
+
 };
 
 typedef uint16_t lv_style_property_t;

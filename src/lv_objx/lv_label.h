@@ -103,10 +103,10 @@ typedef struct
 
 /** Label styles*/
 enum {
-    LV_LABEL_STYLE_MAIN,
+    LV_LABEL_PART_MAIN,
 };
 
-typedef uint8_t lv_label_style_t;
+typedef uint8_t lv_label_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
