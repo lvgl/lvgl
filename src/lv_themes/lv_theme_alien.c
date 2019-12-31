@@ -95,9 +95,10 @@ static void basic_init(void)
     lv_style_set_color(&btn, LV_STYLE_BG_GRAD_COLOR, LV_COLOR_MAROON);
     lv_style_set_color(&btn, LV_STYLE_BORDER_COLOR, LV_COLOR_NAVY);
     lv_style_set_color(&btn, LV_STYLE_BG_GRAD_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_LIME);
+    lv_style_set_color(&btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_BLUE);
     lv_style_set_color(&btn, LV_STYLE_TEXT_COLOR, LV_COLOR_WHITE);
     lv_style_set_opa(&btn, LV_STYLE_BG_OPA, LV_OPA_50);
-    lv_style_set_opa(&btn, LV_STYLE_BORDER_OPA, LV_OPA_50);
+    lv_style_set_opa(&btn, LV_STYLE_BORDER_OPA, LV_OPA_70);
     lv_style_set_opa(&btn, LV_STYLE_TEXT_OPA, LV_OPA_50);
     lv_style_set_value(&btn, LV_STYLE_SHADOW_WIDTH, 5);
     lv_style_set_value(&btn, LV_STYLE_SHADOW_OFFSET_Y, 10);
@@ -214,17 +215,7 @@ static void bar_init(void)
 static void img_init(void)
 {
 #if LV_USE_IMG != 0
-    static lv_style_t img_light, img_dark;
-    lv_style_copy(&img_light, &def);
-    img_light.image.color   = lv_color_hsv_to_rgb(_hue, 15, 85);
-    img_light.image.intense = LV_OPA_80;
 
-    lv_style_copy(&img_dark, &def);
-    img_light.image.color   = lv_color_hsv_to_rgb(_hue, 85, 65);
-    img_light.image.intense = LV_OPA_80;
-
-    theme.style.img.light = &img_light;
-    theme.style.img.dark  = &img_dark;
 #endif
 }
 
@@ -263,6 +254,7 @@ static void slider_init(void)
 #if LV_USE_SLIDER != 0
     lv_style_init(&knob);
     lv_style_set_color(&knob, LV_STYLE_BG_COLOR, LV_COLOR_RED);
+    lv_style_set_color(&knob, LV_STYLE_BG_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_LIME);
     lv_style_set_value(&knob, LV_STYLE_PAD_TOP, LV_DPI/20);
     lv_style_set_value(&knob, LV_STYLE_PAD_BOTTOM, LV_DPI/20);
     lv_style_set_value(&knob, LV_STYLE_PAD_LEFT, LV_DPI/20);
@@ -398,53 +390,8 @@ static void calendar_init(void)
 static void cb_init(void)
 {
 #if LV_USE_CB != 0
-    static lv_style_t cb_bg, cb_rel, cb_pr, cb_trel, cb_tpr, cb_ina;
-    lv_style_copy(&cb_rel, &bg);
-    cb_rel.body.radius       = LV_DPI / 20;
-    cb_rel.body.border.width = 1;
-    cb_rel.body.border.color = LV_COLOR_GRAY;
-    cb_rel.body.main_color   = LV_COLOR_WHITE;
-    cb_rel.body.grad_color   = LV_COLOR_SILVER;
 
-    lv_style_copy(&cb_bg, &bg);
-    cb_bg.body.opa            = LV_OPA_TRANSP;
-    cb_bg.body.border.width   = 0;
-    cb_bg.body.padding.inner  = LV_DPI / 8;
-    cb_bg.body.padding.left   = 0;
-    cb_bg.body.padding.right  = 0;
-    cb_bg.body.padding.top    = 0;
-    cb_bg.body.padding.bottom = 0;
-    cb_bg.text.font           = _font;
 
-    lv_style_copy(&cb_pr, &cb_rel);
-    cb_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 90);
-    cb_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 82);
-
-    lv_style_copy(&cb_trel, &cb_rel);
-    cb_trel.body.border.width = 4;
-    cb_trel.body.border.color = LV_COLOR_WHITE;
-    cb_trel.body.border.opa   = LV_OPA_60;
-    cb_trel.body.main_color   = lv_color_hsv_to_rgb(_hue, 50, 82);
-    cb_trel.body.grad_color   = lv_color_hsv_to_rgb(_hue, 50, 62);
-
-    lv_style_copy(&cb_tpr, &cb_trel);
-    cb_tpr.body.border.color = LV_COLOR_SILVER;
-    cb_tpr.body.border.opa   = LV_OPA_70;
-    cb_tpr.body.main_color   = lv_color_hsv_to_rgb(_hue, 50, 72);
-    cb_tpr.body.grad_color   = lv_color_hsv_to_rgb(_hue, 50, 52);
-
-    lv_style_copy(&cb_ina, &cb_trel);
-    cb_ina.body.border.width = 1;
-    cb_ina.body.border.color = LV_COLOR_GRAY;
-    cb_ina.body.main_color   = LV_COLOR_SILVER;
-    cb_ina.body.grad_color   = LV_COLOR_SILVER;
-
-    theme.style.cb.bg          = &cb_bg;
-    theme.style.cb.box.rel     = &cb_rel;
-    theme.style.cb.box.pr      = &cb_pr;
-    theme.style.cb.box.tgl_rel = &cb_trel;
-    theme.style.cb.box.tgl_pr  = &cb_tpr;
-    theme.style.cb.box.ina     = &cb_ina;
 #endif
 }
 
@@ -830,6 +777,10 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
         return &bar_indic;
     case LV_THEME_SLIDER_KNOB:
         return &knob;
+    case LV_THEME_CB:
+           return &panel;
+    case LV_THEME_CB_BULLET:
+        return &btn;
     }
 
     return NULL;

@@ -67,6 +67,9 @@ typedef enum {
     LV_THEME_SW_INDIC,
     LV_THEME_SW_KNOB,
 
+    LV_THEME_CB,
+    LV_THEME_CB_BULLET,
+
 }lv_theme_style_t;
 
 typedef struct {

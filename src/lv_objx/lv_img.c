@@ -36,6 +36,7 @@
  **********************/
 static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param);
+static lv_style_dsc_t * lv_img_get_style(lv_obj_t * img, uint8_t type);
 
 /**********************
  *  STATIC VARIABLES
@@ -102,18 +103,16 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
          * and must be screen sized*/
         if(par != NULL) {
             ext->auto_size = 1;
-            lv_obj_set_style(new_img, NULL); /*Inherit the style  by default*/
         } else {
             ext->auto_size = 0;
-            lv_obj_set_style(new_img, &lv_style_plain); /*Set a style for screens*/
         }
     } else {
         lv_img_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->auto_size          = copy_ext->auto_size;
         lv_img_set_src(new_img, copy_ext->src);
 
-        /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_img);
+//        /*Refresh the style with new signal function*/
+//        lv_obj_refresh_style(new_img);
     }
 
     LV_LOG_INFO("image created");
@@ -191,9 +190,11 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 
     if(src_type == LV_IMG_SRC_SYMBOL) {
         /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
-        const lv_style_t * style = lv_img_get_style(img, LV_IMG_STYLE_MAIN);
+        const lv_font_t * font = lv_obj_get_style_ptr(img, LV_IMG_PART_MAIN, LV_STYLE_FONT);
+        lv_style_value_t letter_space = lv_obj_get_style_value(img, LV_IMG_PART_MAIN, LV_STYLE_LETTER_SPACE);
+        lv_style_value_t line_space = lv_obj_get_style_value(img, LV_IMG_PART_MAIN, LV_STYLE_LINE_SPACE);
         lv_point_t size;
-        lv_txt_get_size(&size, src_img, style->text.font, style->text.letter_space, style->text.line_space,
+        lv_txt_get_size(&size, src_img, font, letter_space, line_space,
                         LV_COORD_MAX, LV_TXT_FLAG_NONE);
         header.w = size.x;
         header.h = size.y;
@@ -491,7 +492,6 @@ bool lv_img_get_antialias(lv_obj_t * img)
  */
 static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
-    const lv_style_t * style = lv_obj_get_style(img);
     lv_img_ext_t * ext       = lv_obj_get_ext_attr(img);
 
     if(mode == LV_DESIGN_COVER_CHK) {
@@ -506,7 +506,6 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
         lv_area_t coords;
-        lv_opa_t opa_scale = lv_obj_get_opa_scale(img);
 
         lv_obj_get_coords(img, &coords);
 
@@ -518,6 +517,11 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             if(coords.y1 > img->coords.y1) coords.y1 -= ext->h;
 
             LV_LOG_TRACE("lv_img_design: start to draw image");
+
+            lv_draw_img_dsc_t img_dsc;
+            lv_draw_img_dsc_init(&img_dsc);
+            lv_obj_init_draw_img_dsc(img, LV_IMG_PART_MAIN, &img_dsc);
+
             lv_area_t cords_tmp;
             cords_tmp.y1 = coords.y1;
             cords_tmp.y2 = coords.y1 + ext->h - 1;
@@ -526,19 +530,21 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
                 cords_tmp.x1 = coords.x1;
                 cords_tmp.x2 = coords.x1 + ext->w - 1;
                 for(; cords_tmp.x1 <= coords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
-                    lv_draw_img(&cords_tmp, clip_area, ext->src, style, ext->angle, &ext->pivot, ext->zoom, ext->antialias, opa_scale);
+                    lv_draw_img(&cords_tmp, clip_area, ext->src, &img_dsc);
                 }
             }
         } else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
             LV_LOG_TRACE("lv_img_design: start to draw symbol");
-            lv_style_t style_mod;
-            lv_style_copy(&style_mod, style);
-            style_mod.text.color = style->image.color;
-            lv_draw_label(&coords, clip_area, &style_mod, opa_scale, ext->src, LV_TXT_FLAG_NONE, NULL, NULL, NULL, lv_obj_get_base_dir(img));
+            lv_draw_label_dsc_t label_dsc;
+            lv_draw_label_dsc_init(&label_dsc);
+            lv_obj_init_draw_label_dsc(img, LV_IMG_PART_MAIN, &label_dsc);
+
+            label_dsc.color = lv_obj_get_style_color(img, LV_IMG_PART_MAIN, LV_STYLE_OVERLAY_COLOR);
+            lv_draw_label(&coords, clip_area, &label_dsc, ext->src, NULL);
         } else {
             /*Trigger the error handler of image drawer*/
             LV_LOG_WARN("lv_img_design: image source type is unknown");
-            lv_draw_img(&img->coords, clip_area, NULL, style, 0, NULL, LV_IMG_ZOOM_NONE, false, opa_scale);
+            lv_draw_img(&img->coords, clip_area, NULL, NULL);
         }
     }
 
@@ -555,6 +561,12 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
 static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
 {
     lv_res_t res;
+    if(sign == LV_SIGNAL_GET_STYLE) {
+        uint8_t ** type_p = param;
+        lv_style_dsc_t ** style_dsc_p = param;
+        *style_dsc_p = lv_img_get_style(img, **type_p);
+        return LV_RES_OK;
+    }
 
     /* Include the ancient signal function */
     res = ancestor_signal(img, sign, param);
@@ -590,6 +602,21 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     }
 
     return res;
+}
+
+
+static lv_style_dsc_t * lv_img_get_style(lv_obj_t * img, uint8_t type)
+{
+    lv_style_dsc_t * style_dsc_p;
+    switch(type) {
+    case LV_IMG_PART_MAIN:
+        style_dsc_p = &img->style_dsc;
+        break;
+    default:
+        style_dsc_p = NULL;
+    }
+
+    return style_dsc_p;
 }
 
 #endif

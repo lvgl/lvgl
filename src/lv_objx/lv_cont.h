@@ -169,10 +169,6 @@ lv_fit_t lv_cont_get_fit_top(const lv_obj_t * cont);
  */
 lv_fit_t lv_cont_get_fit_bottom(const lv_obj_t * cont);
 
-
-
-lv_style_dsc_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type);
-
 /**********************
  *      MACROS
  **********************/

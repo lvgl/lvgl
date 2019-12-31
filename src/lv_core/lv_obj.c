@@ -2101,8 +2101,8 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t part, lv_s
             }
             break;
         case LV_STYLE_RADIUS:
-            if(dsc->cache.border_width != LV_STYLE_CACHE_RADIUS_SKIPPED) {
-                return dsc->cache.border_width == LV_STYLE_CACHE_RADIUS_CIRCLE ? LV_RADIUS_CIRCLE : dsc->cache.radius;
+            if(dsc->cache.radius != LV_STYLE_CACHE_RADIUS_SKIPPED) {
+                return dsc->cache.radius == LV_STYLE_CACHE_RADIUS_CIRCLE ? LV_RADIUS_CIRCLE : dsc->cache.radius;
             }
             break;
         }
@@ -2114,7 +2114,7 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t part, lv_s
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
-    int16_t weight_goal = attr.bits.state;
+    int16_t weight_goal = lv_obj_get_state(obj);
     int16_t weight = -1;
     lv_style_value_t value;
 
@@ -2183,18 +2183,13 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t part, lv_s
 
 lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
-    lv_style_dsc_t * dsc = lv_obj_get_style(obj, part);
-    if(dsc->cache.enabled) {
-
-    }
-
     uint8_t state;
     lv_style_property_t prop_ori = prop;
 
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
-    int16_t weight_goal = attr.bits.state;
+    int16_t weight_goal = lv_obj_get_state(obj);
     int16_t weight = -1;
     lv_color_t value;
 
@@ -2308,7 +2303,7 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prope
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
-    int16_t weight_goal = attr.bits.state;
+    int16_t weight_goal = lv_obj_get_state(obj);
     int16_t weight = -1;
     lv_opa_t value;
 
@@ -2375,7 +2370,7 @@ void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_propert
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
-    int16_t weight_goal = attr.bits.state;
+    int16_t weight_goal = lv_obj_get_state(obj);
     int16_t weight = -1;
     void * value;
 

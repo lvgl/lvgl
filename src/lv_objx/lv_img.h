@@ -47,11 +47,11 @@ typedef struct
     uint8_t antialias :1;  /*Apply anti-aliasing in transformations (rotate, zoom)*/
 } lv_img_ext_t;
 
-/*Styles*/
+/*Image parts*/
 enum {
-    LV_IMG_STYLE_MAIN,
+    LV_IMG_PART_MAIN,
 };
-typedef uint8_t lv_img_style_t;
+typedef uint8_t lv_img_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -136,18 +136,6 @@ void lv_img_set_zoom(lv_obj_t * img, uint16_t zoom);
  */
 void lv_img_set_antialias(lv_obj_t * img, bool antialias);
 
-/**
- * Set the style of an image
- * @param img pointer to an image object
- * @param type which style should be set (can be only `LV_IMG_STYLE_MAIN`)
- * @param style pointer to a style
- */
-static inline void lv_img_set_style(lv_obj_t * img, lv_img_style_t type, const lv_style_t * style)
-{
-    (void)type; /*Unused*/
-    lv_obj_set_style(img, style);
-}
-
 /*=====================
  * Getter functions
  *====================*/
@@ -214,18 +202,6 @@ uint16_t lv_img_get_zoom(lv_obj_t * img);
  * @return true: anti-aliased; false: not anti-aliased
  */
 bool lv_img_get_antialias(lv_obj_t * img);
-
-/**
- * Get the style of an image object
- * @param img pointer to an image object
- * @param type which style should be get (can be only `LV_IMG_STYLE_MAIN`)
- * @return pointer to the image's style
- */
-static inline const lv_style_t * lv_img_get_style(const lv_obj_t * img, lv_img_style_t type)
-{
-    (void)type; /*Unused*/
-    return lv_obj_get_style(img);
-}
 
 /**********************
  *      MACROS

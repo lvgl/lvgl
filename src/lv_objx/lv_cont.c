@@ -36,6 +36,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param);
+static lv_style_dsc_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type);
 static void lv_cont_refr_layout(lv_obj_t * cont);
 static void lv_cont_layout_col(lv_obj_t * cont);
 static void lv_cont_layout_row(lv_obj_t * cont);
@@ -238,21 +239,6 @@ lv_fit_t lv_cont_get_fit_bottom(const lv_obj_t * cont)
     return ext->fit_bottom;
 }
 
-
-lv_style_dsc_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type)
-{
-    lv_style_dsc_t * style_dsc_p;
-    switch(type) {
-    case LV_CONT_PART_MAIN:
-        style_dsc_p = &cont->style_dsc;
-        break;
-    default:
-        style_dsc_p = NULL;
-    }
-
-    return style_dsc_p;
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -266,7 +252,6 @@ lv_style_dsc_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type)
  */
 static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
 {
-
     if(sign == LV_SIGNAL_GET_STYLE) {
         uint8_t ** type_p = param;
         lv_style_dsc_t ** style_dsc_p = param;
@@ -300,6 +285,22 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
 
     return res;
 }
+
+
+static lv_style_dsc_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type)
+{
+    lv_style_dsc_t * style_dsc_p;
+    switch(type) {
+    case LV_CONT_PART_MAIN:
+        style_dsc_p = &cont->style_dsc;
+        break;
+    default:
+        style_dsc_p = NULL;
+    }
+
+    return style_dsc_p;
+}
+
 /**
  * Refresh the layout of a container
  * @param cont pointer to an object which layout should be refreshed
@@ -631,10 +632,6 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
  */
 static void lv_cont_refr_autofit(lv_obj_t * cont)
 {
-    static uint32_t t = 0;
-
-
-
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
 
     if(ext->fit_left == LV_FIT_NONE && ext->fit_right == LV_FIT_NONE && ext->fit_top == LV_FIT_NONE &&
