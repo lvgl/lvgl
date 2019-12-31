@@ -108,23 +108,13 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_size(new_btnm, LV_DPI * 3, LV_DPI * 2);
 
         /*Set the default styles*/
-        lv_theme_t * th = lv_theme_get_current();
-        if(th) {
-//            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BG, th->style.btnm.bg);
-//            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_REL, th->style.btnm.btn.rel);
-//            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_PR, th->style.btnm.btn.pr);
-//            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_TGL_REL, th->style.btnm.btn.tgl_rel);
-//            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_TGL_PR, th->style.btnm.btn.tgl_pr);
-//            lv_btnm_set_style(new_btnm, LV_BTNM_STYLE_BTN_INA, th->style.btnm.btn.ina);
-        } else {
-            lv_obj_reset_style(new_btnm, LV_BTNM_PART_MAIN);
-            lv_obj_add_style_class(new_btnm, LV_BTNM_PART_MAIN, &lv_style_panel);
+        lv_obj_reset_style(new_btnm, LV_BTNM_PART_MAIN);
+        lv_obj_add_style_class(new_btnm, LV_BTNM_PART_MAIN, _t(BTNM));
 
-            /* Do not cache the button style because it's independent from the object's style.
-             * (Therefore it can't be cached)*/
-            ext->style_btn.cache.enabled = 0;
-            lv_obj_add_style_class(new_btnm, LV_BTNM_PART_BTN, &lv_style_btn);
-        }
+        /* Do not cache the button style because it's independent from the object's style.
+         * (Therefore it can't be cached)*/
+        ext->style_btn.cache.enabled = 0;
+        lv_obj_add_style_class(new_btnm, LV_BTNM_PART_BTN, _t(BTNM_BTN));
     }
     /*Copy an existing object*/
     else {

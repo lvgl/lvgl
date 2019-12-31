@@ -390,27 +390,6 @@ static inline void lv_style_anim_create(lv_anim_t * a)
  *    GLOBAL VARIABLES
  *************************/
 
-/*Basic styles*/
-extern lv_style_t lv_style_plain;
-extern lv_style_t lv_style_panel;
-extern lv_style_t lv_style_panel;
-extern lv_style_t lv_style_btn;
-
-/*Color styles*/
-extern lv_style_t lv_style_dark;
-extern lv_style_t lv_style_light;
-extern lv_style_t lv_style_red;
-extern lv_style_t lv_style_green;
-extern lv_style_t lv_style_blue;
-
-/*Transparent styles*/
-extern lv_style_t lv_style_transp;
-extern lv_style_t lv_style_frame;
-
-/*Padding styles*/
-extern lv_style_t lv_style_tight;
-extern lv_style_t lv_style_fit;
-
 /**********************
  *      MACROS
  **********************/
@@ -421,11 +400,9 @@ extern lv_style_t lv_style_fit;
  *     LV_STYLE_CREATE(my_style, &lv_style_plain);
  *   is equivalent to
  *     static lv_style_t my_style;
- *     lv_style_copy(my_style, &lv_style_plain);
- *
- * If the style to copy is `NULL` `lv_style_plain` will be used.
+ *     lv_style_init(&my_style);
  */
-#define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_copy(&name, copy_p == NULL ? &lv_style_plain : copy_p);
+#define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_init(&name);
 
 #ifdef __cplusplus
 } /* extern "C" */

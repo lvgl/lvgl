@@ -113,17 +113,8 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_click(new_btn, true); /*Be sure the button is clickable*/
 
         /*Set the default styles*/
-        lv_theme_t * th = lv_theme_get_current();
-        if(th) {
-//            lv_btn_set_style(new_btn, LV_BTN_STYLE_REL, th->style.btn.rel);
-//            lv_btn_set_style(new_btn, LV_BTN_STYLE_PR, th->style.btn.pr);
-//            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_REL, th->style.btn.tgl_rel);
-//            lv_btn_set_style(new_btn, LV_BTN_STYLE_TGL_PR, th->style.btn.tgl_pr);
-//            lv_btn_set_style(new_btn, LV_BTN_STYLE_INA, th->style.btn.ina);
-        } else {
-            lv_obj_reset_style(new_btn, LV_BTN_PART_MAIN);
-            lv_obj_add_style_class(new_btn, LV_BTN_PART_MAIN, &lv_style_btn);
-        }
+        lv_obj_reset_style(new_btn, LV_BTN_PART_MAIN);
+        lv_obj_add_style_class(new_btn, LV_BTN_PART_MAIN, _t(BTN));
     }
     /*Copy 'copy'*/
     else {

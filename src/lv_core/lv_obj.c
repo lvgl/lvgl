@@ -107,7 +107,10 @@ void lv_init(void)
 #endif
 
     /*Init. the sstyles*/
-    lv_style_built_in_init();
+//    lv_style_built_in_init();
+
+    lv_theme_t * th = lv_theme_alien_init(0, NULL);
+    lv_theme_set_act(th);
 
     /*Initialize the screen refresh system*/
     lv_refr_init();
@@ -260,12 +263,10 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     lv_style_dsc_init(&new_obj->style_dsc);
 
     if(parent != NULL) {
-        lv_obj_add_style_class(new_obj, LV_OBJ_PART_MAIN, &lv_style_panel);
+        lv_obj_add_style_class(new_obj, LV_OBJ_PART_MAIN, _t(PANEL));
     } else {
-        lv_obj_update_style_cache(new_obj, LV_OBJ_PART_MAIN);
+        lv_obj_add_style_class(new_obj, LV_OBJ_PART_MAIN, _t(SCR));
     }
-
-
 
     /*Copy the attributes if required*/
     if(copy != NULL) {

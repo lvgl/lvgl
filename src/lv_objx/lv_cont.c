@@ -97,12 +97,8 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         /*Set the default styles if it's not screen*/
         if(par != NULL) {
-            lv_theme_t * th = lv_theme_get_current();
-            if(th) {
-//                lv_cont_set_style(new_cont, LV_CONT_PART_MAIN, th->style_dsc.cont);
-            } else {
-                lv_obj_add_style_class(new_cont, LV_CONT_PART_MAIN, &lv_style_panel);
-            }
+            lv_obj_reset_style(new_cont, LV_CONT_PART_MAIN);
+            lv_obj_add_style_class(new_cont, LV_CONT_PART_MAIN, _t(PANEL));
         }
     }
     /*Copy an existing object*/

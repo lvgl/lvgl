@@ -12,11 +12,12 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "lv_hal.h"
-#include "../lv_core/lv_debug.h"
 #include "../lv_misc/lv_mem.h"
+#include "../lv_misc/lv_gc.h"
+#include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_refr.h"
-#include "../lv_misc/lv_gc.h"
+#include "../lv_themes/lv_theme.h"
 
 #if defined(LV_GC_INCLUDE)
 #include LV_GC_INCLUDE
@@ -139,8 +140,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp->act_scr   = lv_obj_create(NULL, NULL); /*Create a default screen on the display*/
     disp->top_layer = lv_obj_create(NULL, NULL); /*Create top layer on the display*/
     disp->sys_layer = lv_obj_create(NULL, NULL); /*Create sys layer on the display*/
-    lv_obj_add_style_class(disp->top_layer, LV_OBJ_PART_MAIN, &lv_style_transp);
-    lv_obj_add_style_class(disp->sys_layer, LV_OBJ_PART_MAIN, &lv_style_transp);
+    lv_obj_add_style_class(disp->top_layer, LV_OBJ_PART_MAIN, _t(SCR_TRANSP));
+    lv_obj_add_style_class(disp->sys_layer, LV_OBJ_PART_MAIN, _t(SCR_TRANSP));
 
     lv_obj_invalidate(disp->act_scr);
 

@@ -95,22 +95,24 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     ext->scrl        = NULL;
+    lv_style_dsc_init(&ext->sb.style);
     ext->sb.hor_draw = 0;
     ext->sb.ver_draw = 0;
-//    ext->sb.style    = &lv_style_pretty;
     ext->sb.mode     = LV_SB_MODE_AUTO;
 #if LV_USE_ANIMATION
+    lv_style_dsc_init(&ext->edge_flash.style);
     ext->edge_flash.enabled   = 0;
     ext->edge_flash.bottom_ip = 0;
     ext->edge_flash.top_ip    = 0;
     ext->edge_flash.left_ip   = 0;
     ext->edge_flash.right_ip  = 0;
     ext->edge_flash.state     = 0;
-    ext->edge_flash.style     = &lv_style_plain_color;
     ext->anim_time            = LV_PAGE_DEF_ANIM_TIME;
 #endif
     ext->scroll_prop    = 0;
     ext->scroll_prop_obj = NULL;
+
+
 
     /*Init the new page object*/
     if(copy == NULL) {
@@ -131,23 +133,6 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_page_set_sb_mode(new_page, ext->sb.mode);
 
         lv_obj_refresh_style(new_page, LV_OBJ_PART_ALL);
-
-        /*Set the default styles*/
-        lv_theme_t * th = lv_theme_get_current();
-        if(th) {
-            if(par == NULL) { /*Different styles if it is screen*/
-//                lv_page_set_style(new_page, LV_PAGE_STYLE_BG, th->style.bg);
-//                lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, &lv_style_transp);
-            } else {
-//                lv_page_set_style(new_page, LV_PAGE_STYLE_BG, th->style.page.bg);
-//                lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, th->style.page.scrl);
-            }
-//            lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL_BAR, th->style.page.sb);
-        } else {
-//            lv_page_set_style(new_page, LV_PAGE_STYLE_BG, &lv_style_pretty_color);
-//            lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, &lv_style_pretty);
-//            lv_page_set_style(new_page, LV_PAGE_STYLE_SB, &lv_style_pretty_color);
-        }
 
     } else {
         lv_page_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
