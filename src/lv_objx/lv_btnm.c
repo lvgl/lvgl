@@ -87,14 +87,15 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
         return NULL;
     }
 
-    ext->btn_cnt      = 0;
-    ext->btn_id_pr    = LV_BTNM_BTN_NONE;
-    ext->btn_id_act   = LV_BTNM_BTN_NONE;
-    ext->button_areas = NULL;
-    ext->ctrl_bits    = NULL;
-    ext->map_p        = NULL;
-    ext->recolor      = 0;
-    ext->one_toggle   = 0;
+    ext->btn_cnt        = 0;
+    ext->btn_id_pr      = LV_BTNM_BTN_NONE;
+    ext->btn_id_focused = 1;//LV_BTNM_BTN_NONE;
+    ext->btn_id_act     = LV_BTNM_BTN_NONE;
+    ext->button_areas   = NULL;
+    ext->ctrl_bits      = NULL;
+    ext->map_p          = NULL;
+    ext->recolor        = 0;
+    ext->one_toggle     = 0;
     lv_style_dsc_init(&ext->style_btn);
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_btnm);
@@ -109,12 +110,12 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
 
         /*Set the default styles*/
         lv_obj_reset_style(new_btnm, LV_BTNM_PART_MAIN);
-        lv_obj_add_style_class(new_btnm, LV_BTNM_PART_MAIN, _t(BTNM));
+        _ot(new_btnm, LV_BTNM_PART_MAIN, BTNM);
 
         /* Do not cache the button style because it's independent from the object's style.
          * (Therefore it can't be cached)*/
         ext->style_btn.cache.enabled = 0;
-        lv_obj_add_style_class(new_btnm, LV_BTNM_PART_BTN, _t(BTNM_BTN));
+        _ot(new_btnm, LV_BTNM_PART_BTN, BTNM_BTN);
     }
     /*Copy an existing object*/
     else {
@@ -607,34 +608,37 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
         uint16_t txt_i = 0;
         lv_txt_flag_t txt_flag = LV_TXT_FLAG_NONE;
 
-        lv_draw_rect_dsc_t draw_rect_dsc[_LV_BTN_STATE_NUM];
-        lv_draw_label_dsc_t draw_label_dsc[_LV_BTN_STATE_NUM];
-        uint8_t i;
-        for(i = 0; i < _LV_BTN_STATE_NUM; i++) {
-            lv_draw_rect_dsc_init(&draw_rect_dsc[i]);
-            lv_draw_label_dsc_init(&draw_label_dsc[i]);
-        }
+        lv_draw_rect_dsc_t draw_rect_rel_dsc;
+        lv_draw_label_dsc_t draw_label_rel_dsc;
+
+        lv_draw_rect_dsc_t draw_rect_chk_dsc;
+        lv_draw_label_dsc_t draw_label_chk_dsc;
+
+        lv_draw_rect_dsc_t draw_rect_ina_dsc;
+        lv_draw_label_dsc_t draw_label_ina_dsc;
+
+        lv_draw_rect_dsc_t draw_rect_tmp_dsc;
+        lv_draw_label_dsc_t draw_label_tmp_dsc;
+
 
         uint8_t state_ori = btnm->state;
         btnm->state = 0;
-        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_dsc[LV_BTN_STATE_REL]);
-        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_dsc[LV_BTN_STATE_REL]);
-
-        btnm->state = LV_OBJ_STATE_PRESSED;
-        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_dsc[LV_BTN_STATE_PR]);
-        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_dsc[LV_BTN_STATE_PR]);
+        lv_draw_rect_dsc_init(&draw_rect_rel_dsc);
+        lv_draw_label_dsc_init(&draw_label_rel_dsc);
+        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_rel_dsc);
+        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_rel_dsc);
 
         btnm->state = LV_OBJ_STATE_CHECKED;
-        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_dsc[LV_BTN_STATE_TGL_REL]);
-        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_dsc[LV_BTN_STATE_TGL_REL]);
-
-        btnm->state = LV_OBJ_STATE_PRESSED | LV_OBJ_STATE_CHECKED;
-        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_dsc[LV_BTN_STATE_TGL_PR]);
-        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_dsc[LV_BTN_STATE_TGL_PR]);
+        lv_draw_rect_dsc_init(&draw_rect_chk_dsc);
+        lv_draw_label_dsc_init(&draw_label_chk_dsc);
+        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_chk_dsc);
+        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_chk_dsc);
 
         btnm->state = LV_OBJ_STATE_DISABLED;
-        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_dsc[LV_BTN_STATE_INA]);
-        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_dsc[LV_BTN_STATE_INA]);
+        lv_draw_rect_dsc_init(&draw_rect_ina_dsc);
+        lv_draw_label_dsc_init(&draw_label_ina_dsc);
+        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_ina_dsc);
+        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_ina_dsc);
 
         btnm->state = state_ori;
 
@@ -660,48 +664,64 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             btn_w = lv_area_get_width(&area_tmp);
             btn_h = lv_area_get_height(&area_tmp);
 
-            /*Load the style*/
+            /*Choose the style*/
+            lv_draw_rect_dsc_t * draw_rect_dsc_act;
+            lv_draw_label_dsc_t * draw_label_dsc_act;
             bool tgl_state = button_get_tgl_state(ext->ctrl_bits[btn_i]);
-            lv_btn_state_t act_state = LV_BTN_STATE_REL;
-            if(button_is_inactive(ext->ctrl_bits[btn_i]))
-                act_state = LV_BTN_STATE_INA;
-            else if(btn_i == ext->btn_id_pr && tgl_state == false)
-                act_state = LV_BTN_STATE_PR;
-            else if(btn_i != ext->btn_id_pr && tgl_state == true)
-                act_state = LV_BTN_STATE_TGL_REL;
-            else if(btn_i == ext->btn_id_pr && tgl_state == true)
-                act_state = LV_BTN_STATE_TGL_PR;
 
-            lv_style_value_t border_part_ori = draw_rect_dsc[act_state].border_part;
+            if(button_is_inactive(ext->ctrl_bits[btn_i])) {
+                draw_rect_dsc_act = &draw_rect_rel_dsc;
+                draw_label_dsc_act = &draw_label_rel_dsc;
+            }
+            /*Simple released or checked buttons button*/
+            else if(btn_i != ext->btn_id_pr && btn_i != ext->btn_id_focused) {
+                draw_rect_dsc_act = tgl_state ? &draw_rect_chk_dsc : &draw_rect_rel_dsc;
+                draw_label_dsc_act = tgl_state ? &draw_label_chk_dsc : &draw_label_rel_dsc;
+            }
+            /*Focused and/or pressed + checked or released button*/
+            else {
+                if(tgl_state) btnm->state = LV_OBJ_STATE_CHECKED;
+                if(ext->btn_id_pr == btn_i) btnm->state |= LV_OBJ_STATE_PRESSED;
+                if(ext->btn_id_focused == btn_i) btnm->state |= LV_OBJ_STATE_FOCUS;
+                lv_draw_rect_dsc_init(&draw_rect_tmp_dsc);
+                lv_draw_label_dsc_init(&draw_label_tmp_dsc);
+                lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_tmp_dsc);
+                lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_tmp_dsc);
+                draw_rect_dsc_act = &draw_rect_tmp_dsc;
+                draw_label_dsc_act = &draw_label_tmp_dsc;
+                btnm->state = state_ori;
+            }
+
+            lv_style_value_t border_part_ori = draw_rect_dsc_act->border_part;
 
             /*Remove borders on the edges if `LV_BORDER_INTERNAL`*/
             if(border_part_ori & LV_BORDER_SIDE_INTERNAL) {
                 /*Top/Bottom lines*/
                 if(area_tmp.y1 == btnm->coords.y1 + padding_top) {
-                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_SIDE_TOP;
+                    draw_rect_dsc_act->border_part &= ~LV_BORDER_SIDE_TOP;
                 }
                 if(area_tmp.y2 == btnm->coords.y2 - padding_bottom) {
-                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_SIDE_BOTTOM;
+                    draw_rect_dsc_act->border_part &= ~LV_BORDER_SIDE_BOTTOM;
                 }
 
                 /*Left/right columns*/
                 if(txt_i == 0) { /*First button*/
-                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_SIDE_LEFT;
+                    draw_rect_dsc_act->border_part &= ~LV_BORDER_SIDE_LEFT;
                 } else if(strcmp(ext->map_p[txt_i - 1], "\n") == 0) {
-                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_SIDE_LEFT;
+                    draw_rect_dsc_act->border_part &= ~LV_BORDER_SIDE_LEFT;
                 }
 
                 if(ext->map_p[txt_i + 1][0] == '\0' || strcmp(ext->map_p[txt_i + 1], "\n") == 0) {
-                    draw_rect_dsc[act_state].border_part &= ~LV_BORDER_SIDE_RIGHT;
+                    draw_rect_dsc_act->border_part &= ~LV_BORDER_SIDE_RIGHT;
                 }
             }
 
-            lv_draw_rect(&area_tmp, clip_area, &draw_rect_dsc[act_state]);
+            lv_draw_rect(&area_tmp, clip_area, draw_rect_dsc_act);
 
             /*Calculate the size of the text*/
-            const lv_font_t * font = draw_label_dsc[act_state].font;
-            lv_style_value_t letter_space = draw_label_dsc[act_state].letter_space;
-            lv_style_value_t line_space = draw_label_dsc[act_state].line_space;
+            const lv_font_t * font = draw_label_dsc_act->font;
+            lv_style_value_t letter_space = draw_label_dsc_act->letter_space;
+            lv_style_value_t line_space = draw_label_dsc_act->line_space;
             const char * txt = ext->map_p[txt_i];
             lv_point_t txt_size;
             lv_txt_get_size(&txt_size, txt, font, letter_space,
@@ -712,7 +732,7 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             area_tmp.x2 = area_tmp.x1 + txt_size.x;
             area_tmp.y2 = area_tmp.y1 + txt_size.y;
 
-            lv_draw_label(&area_tmp, clip_area, &draw_label_dsc[act_state], txt, NULL);
+            lv_draw_label(&area_tmp, clip_area, draw_label_dsc_act, txt, NULL);
         }
     }
     return LV_DESIGN_RES_OK;

@@ -53,9 +53,15 @@ lv_theme_t * lv_theme_get_act(void)
     return act_theme;
 }
 
-lv_style_t * lv_theme_get_style(lv_theme_style_t name)
+lv_style_t * lv_theme_get_style(lv_theme_t * th, lv_theme_style_t name)
 {
-    return act_theme->get_style_cb(name);
+    return th->get_style_cb(name);
+}
+
+
+void lv_obj_add_style_theme(lv_obj_t * obj, uint8_t part, lv_theme_style_t name)
+{
+
 }
 
 /**********************
