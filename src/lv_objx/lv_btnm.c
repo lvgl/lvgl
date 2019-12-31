@@ -30,7 +30,7 @@
  **********************/
 static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param);
 static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t type);
+static lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t part);
 
 static uint8_t get_button_width(lv_btnm_ctrl_t ctrl_bits);
 static bool button_is_hidden(lv_btnm_ctrl_t ctrl_bits);
@@ -953,7 +953,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     return res;
 }
 
-static lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t type)
+static lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t part)
 {
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
@@ -961,7 +961,7 @@ static lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t type)
 
     lv_style_dsc_t * style_dsc_p;
 
-    switch(type) {
+    switch(part) {
     case LV_BTNM_PART_MAIN:
         style_dsc_p = &btnm->style_dsc;
         break;

@@ -225,36 +225,36 @@ typedef struct _lv_obj_t
     void * ext_attr;            /**< Object type specific extended data*/
     lv_style_dsc_t  style_dsc;
 
-#if LV_USE_GROUP != 0
-    void * group_p; /**< Pointer to the group of the object*/
-#endif
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     uint8_t ext_click_pad_hor; /**< Extra click padding in horizontal direction */
     uint8_t ext_click_pad_ver; /**< Extra click padding in vertical direction */
-#endif
-
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
     lv_area_t ext_click_pad;   /**< Extra click padding area. */
 #endif
 
-    /*Attributes and states*/
-    uint8_t click : 1;          /**< 1: Can be pressed by an input device*/
-    uint8_t drag : 1;           /**< 1: Enable the dragging*/
-    uint8_t drag_throw : 1;     /**< 1: Enable throwing with drag*/
-    uint8_t drag_parent : 1;    /**< 1: Parent will be dragged instead*/
-    uint8_t hidden : 1;         /**< 1: Object is hidden*/
-    uint8_t top : 1;            /**< 1: If the object or its children is clicked it goes to the foreground*/
-    uint8_t parent_event : 1;   /**< 1: Send the object's events to the parent too. */
-    lv_drag_dir_t drag_dir : 3; /**<  Which directions the object can be dragged in */
-    lv_bidi_dir_t base_dir : 2; /**< Base direction of texts related to this object */
-    uint8_t adv_hittest : 1;    /**< 1: Use advanced hit-testing (slower) */
-    uint8_t reserved : 2;       /**<  Reserved for future use*/
-    uint8_t protect;            /**< Automatically happening actions can be prevented. 'OR'ed values from
-                                   `lv_protect_t`*/
-    uint8_t state;
-
     lv_coord_t ext_draw_pad; /**< EXTtend the size in every direction for drawing. */
+
+    /*Attributes and states*/
+    uint8_t click           :1;  /**< 1: Can be pressed by an input device*/
+    uint8_t drag            :1;  /**< 1: Enable the dragging*/
+    uint8_t drag_throw      :1;  /**< 1: Enable throwing with drag*/
+    uint8_t drag_parent     :1;  /**< 1: Parent will be dragged instead*/
+    uint8_t hidden          :1;  /**< 1: Object is hidden*/
+    uint8_t top             :1;  /**< 1: If the object or its children is clicked it goes to the foreground*/
+    uint8_t parent_event    :1;  /**< 1: Send the object's events to the parent too. */
+    uint8_t adv_hittest     :1;  /**< 1: Use advanced hit-testing (slower) */
+
+    lv_drag_dir_t drag_dir  :2;  /**<  Which directions the object can be dragged in */
+    lv_bidi_dir_t base_dir  :2;  /**< Base direction of texts related to this object */
+
+#if LV_USE_GROUP != 0
+    uint8_t group_id        :LV_GROUP_ID_MAX;
+#endif
+
+    uint8_t protect;            /**< Automatically happening actions can be prevented.
+                                     'OR'ed values from `lv_protect_t`*/
+    uint8_t state;
 
 #if LV_USE_OBJ_REALIGN
     lv_realign_t realign;       /**< Information about the last call to ::lv_obj_align. */
@@ -298,7 +298,7 @@ void lv_init(void);
 
 /**
  * Deinit the 'lv' library
- * Currently only implemented when not using custorm allocators, or GC is enabled.
+ * Currently only implemented when not using custom allocators, or GC is enabled.
  */
 #if LV_ENABLE_GC || !LV_MEM_CUSTOM
 void lv_deinit(void);
@@ -1075,6 +1075,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_draw_rect_dsc_t 
 
 void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t type, lv_draw_label_dsc_t * draw_dsc);
 
+void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * draw_dsc);
 /**********************
  *      MACROS
  **********************/

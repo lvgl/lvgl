@@ -129,6 +129,11 @@ void lv_init(void)
 }
 
 #if LV_ENABLE_GC || !LV_MEM_CUSTOM
+
+/**
+ * Deinit the 'lv' library
+ * Currently only implemented when not using custom allocators, or GC is enabled.
+ */
 void lv_deinit(void)
 {
     lv_gc_clear_roots();
@@ -255,8 +260,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 #else
     new_obj->base_dir     = LV_BIDI_DIR_LTR;
 #endif
-
-    new_obj->reserved     = 0;
 
     new_obj->ext_attr = NULL;
 
@@ -1241,22 +1244,16 @@ void lv_obj_refresh_style(lv_obj_t * obj, uint8_t part)
  */
 void lv_obj_report_style_mod(lv_style_t * style)
 {
-//    LV_ASSERT_STYLE(style);
-//
-//    lv_disp_t * d = lv_disp_get_next(NULL);
-//
-//    while(d) {
-//        lv_obj_t * i;
-//        LV_LL_READ(d->scr_ll, i)
-//        {
-//            if(i->style_p == style || style == NULL) {
-//                lv_obj_refresh_style(i);
-//            }
-//
-//            report_style_mod_core(style, i);
-//        }
-//        d = lv_disp_get_next(d);
-//    }
+    lv_disp_t * d = lv_disp_get_next(NULL);
+
+    while(d) {
+        lv_obj_t * i;
+        LV_LL_READ(d->scr_ll, i)
+        {
+            report_style_mod_core(style, i);
+        }
+        d = lv_disp_get_next(d);
+    }
 }
 
 /*-----------------
@@ -2895,6 +2892,25 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
     }
 }
 
+void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * draw_dsc)
+{
+    draw_dsc->angle = 0;
+    draw_dsc->zoom = LV_IMG_ZOOM_NONE;
+    draw_dsc->pivot.x = lv_area_get_width(&obj->coords) / 2;
+    draw_dsc->pivot.y = lv_area_get_height(&obj->coords) / 2;
+    draw_dsc->opa = lv_obj_get_style_opa(obj, part, LV_STYLE_IMAGE_OPA);
+    if(draw_dsc->opa <= LV_OPA_MIN)  return;
+    lv_opa_t opa_scale = lv_obj_get_style_opa(obj, part, LV_STYLE_OPA_SCALE);
+    if(opa_scale < LV_OPA_MAX) {
+        draw_dsc->opa = (uint16_t)((uint16_t)draw_dsc->opa * opa_scale) >> 8;
+    }
+    if(draw_dsc->opa <= LV_OPA_MIN)  return;
+
+    draw_dsc->overlay_opa = lv_obj_get_style_opa(obj, part, LV_STYLE_OVERLAY_OPA);
+    draw_dsc->overlay_color = lv_obj_get_style_color(obj, part, LV_STYLE_OVERLAY_COLOR);
+    draw_dsc->blend_mode = lv_obj_get_style_value(obj, part, LV_STYLE_IMAGE_BLEND_MODE);
+}
+
 /**
  * Handle the drawing related tasks of the base objects.
  * @param obj pointer to an object
@@ -3000,7 +3016,9 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(shadow > obj->ext_draw_pad) obj->ext_draw_pad = shadow;
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_refresh_ext_draw_pad(obj);
-    } else if(sign == LV_SIGNAL_FOCUS) {
+    }
+#if LV_USE_GROUP
+    else if(sign == LV_SIGNAL_FOCUS) {
         if(lv_group_get_editing(lv_obj_get_group(obj))) {
             uint8_t state = LV_OBJ_STATE_FOCUS;
             state |= LV_OBJ_STATE_EDIT;
@@ -3011,6 +3029,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         lv_obj_clear_state(obj, LV_OBJ_STATE_FOCUS | LV_OBJ_STATE_EDIT);
     }
+#endif
 
     return res;
 }
@@ -3037,21 +3056,40 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
 
 /**
  * Refresh the style of all children of an object. (Called recursively)
- * @param style_p refresh objects only with this style_dsc.
+ * @param style refresh objects only with this style_dsc.
  * @param obj pointer to an object
  */
-static void report_style_mod_core(void * style_p, lv_obj_t * obj)
+static void report_style_mod_core(void * style, lv_obj_t * obj)
 {
-//    lv_obj_t * i;
-//    LV_LL_READ(obj->child_ll, i)
-//    {
-//        if(i->style.local == style_p || style_p == NULL) {
-//            refresh_children_style(i);
-//            lv_obj_refresh_style(i);
-//        }
-//
-//        report_style_mod_core(style_p, i);
-//    }
+    uint8_t part_sub;
+    for(part_sub = 0; part_sub != LV_OBJ_PART_ALL; part_sub++) {
+        lv_style_dsc_t * dsc = lv_obj_get_style(obj, part_sub);
+        if(dsc == NULL) break;
+
+        if(&dsc->local == style) {
+            lv_obj_refresh_style(obj, part_sub);
+            /* Two local style can't have the same pointer
+             * so there won't be an other match*/
+            return;
+        }
+
+        uint8_t ci;
+        for(ci = 0; ci < dsc->class_cnt; ci++) {
+            lv_style_t * class = lv_style_dsc_get_class(dsc, ci);
+            if(class == style) {
+                lv_obj_refresh_style(obj, part_sub);
+                /*It's enough to handle once (if duplicated)*/
+                break;
+            }
+        }
+    }
+
+    lv_obj_t * child = lv_obj_get_child(obj, NULL);
+    while(child) {
+        report_style_mod_core(style, child);
+        child = lv_obj_get_child(obj, child);
+    }
+
 }
 
 /**

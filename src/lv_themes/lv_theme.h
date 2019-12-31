@@ -53,9 +53,19 @@ typedef enum {
     LV_THEME_LABEL_TITLE,
     LV_THEME_LABEL_HINT,
 
-
     LV_THEME_BTNM,
     LV_THEME_BTNM_BTN,
+
+    LV_THEME_BAR,
+    LV_THEME_BAR_INDIC,
+
+    LV_THEME_SLIDER,
+    LV_THEME_SLIDER_INDIC,
+    LV_THEME_SLIDER_KNOB,
+
+    LV_THEME_SW,
+    LV_THEME_SW_INDIC,
+    LV_THEME_SW_KNOB,
 
 }lv_theme_style_t;
 

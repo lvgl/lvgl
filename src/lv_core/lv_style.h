@@ -150,9 +150,7 @@ typedef uint16_t lv_style_state_t;
 
 typedef struct {
     uint8_t * map;
-    uint16_t used_groups;
     uint16_t size       :9;
-    uint16_t reserved   :7;
 }lv_style_t;
 
 typedef int16_t lv_style_value_t;
@@ -229,10 +227,11 @@ typedef struct {
 /** Data structure for style animations. */
 typedef struct
 {
-    lv_style_t style_start; /*Save not only pointers because can be same as 'style_anim' then it
-                               will be modified too*/
+    lv_style_t style_start; /* Save not only pointers because can be same as 'style_anim' and
+                               then it would be modified too*/
     lv_style_t style_end;
     lv_style_t * style_anim;
+    lv_style_property_t * prop_list;
     lv_anim_ready_cb_t ready_cb;
 } lv_style_anim_dsc_t;
 #endif

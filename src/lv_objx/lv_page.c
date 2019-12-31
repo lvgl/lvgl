@@ -372,36 +372,6 @@ lv_coord_t lv_page_get_fit_height(lv_obj_t * page)
     return lv_obj_get_height(page) - bg_top - bg_bottom - scrl_top - scrl_bottom;
 }
 
-
-static lv_style_dsc_t * lv_page_get_style(lv_obj_t * page, uint8_t type)
-{
-    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
-
-    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    lv_style_dsc_t * style_dsc_p;
-
-    switch(type) {
-    case LV_PAGE_PART_BG:
-        style_dsc_p = &page->style_dsc;
-        break;
-    case LV_PAGE_PART_SCRL:
-        style_dsc_p = lv_obj_get_style(ext->scrl, LV_CONT_PART_MAIN);
-        break;
-    case LV_PAGE_PART_SCRL_BAR:
-        style_dsc_p = &ext->sb.style;
-        break;
-#if LV_USE_ANIMATION
-    case LV_PAGE_STYLE_EDGE_FLASH:
-        style_dsc_p = &ext->edge_flash.style;
-        break;
-#endif
-    default:
-        style_dsc_p = NULL;
-    }
-
-    return style_dsc_p;
-}
-
 /*=====================
  * Other functions
  *====================*/
@@ -757,20 +727,21 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
 
             if(ext->edge_flash.left_ip || ext->edge_flash.right_ip || ext->edge_flash.top_ip ||
                ext->edge_flash.bottom_ip) {
-                lv_style_t flash_style;
-                lv_style_copy(&flash_style, ext->edge_flash.style);
-                flash_style.body.radius = LV_RADIUS_CIRCLE;
-                uint32_t opa            = (flash_style.body.opa * ext->edge_flash.state) / LV_PAGE_END_FLASH_SIZE;
-                flash_style.body.opa    = opa;
-                lv_draw_rect(&flash_area, clip_area, &flash_style, lv_obj_get_opa_scale(page));
+                lv_draw_rect_dsc_t edge_draw_dsc;
+                lv_draw_rect_dsc_init(&edge_draw_dsc);
+                lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_EDGE_FLASH, &edge_draw_dsc);
+                edge_draw_dsc.radius  = LV_RADIUS_CIRCLE;
+                uint32_t opa            = (edge_draw_dsc.bg_opa * ext->edge_flash.state) / LV_PAGE_END_FLASH_SIZE;
+                edge_draw_dsc.bg_opa    = opa;
+                lv_draw_rect(&flash_area, clip_area, &edge_draw_dsc);
             }
         }
 
-        if(style->body.corner_mask) {
+#endif
+        if(lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_BG_CLIP_CORNER)) {
             void * param = lv_draw_mask_remove_custom(page + 8);
             lv_mem_buf_release(param);
         }
-#endif
     }
 
     return LV_DESIGN_RES_OK;
@@ -1092,6 +1063,37 @@ static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event)
     }
     /*clang-format on*/
 }
+
+
+static lv_style_dsc_t * lv_page_get_style(lv_obj_t * page, uint8_t type)
+{
+    LV_ASSERT_OBJ(page, LV_OBJX_NAME);
+
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+    lv_style_dsc_t * style_dsc_p;
+
+    switch(type) {
+    case LV_PAGE_PART_BG:
+        style_dsc_p = &page->style_dsc;
+        break;
+    case LV_PAGE_PART_SCRL:
+        style_dsc_p = lv_obj_get_style(ext->scrl, LV_CONT_PART_MAIN);
+        break;
+    case LV_PAGE_PART_SCRL_BAR:
+        style_dsc_p = &ext->sb.style;
+        break;
+#if LV_USE_ANIMATION
+    case LV_PAGE_PART_EDGE_FLASH:
+        style_dsc_p = &ext->edge_flash.style;
+        break;
+#endif
+    default:
+        style_dsc_p = NULL;
+    }
+
+    return style_dsc_p;
+}
+
 
 /**
  * Refresh the position and size of the scroll bars.

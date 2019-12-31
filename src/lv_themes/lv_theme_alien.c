@@ -30,18 +30,16 @@ static lv_theme_t theme;
 
 static lv_style_t scr;
 static lv_style_t transp;
-static lv_style_t def;
-static lv_style_t bg;
 static lv_style_t panel; /*General fancy background (e.g. to chart or ta)*/
-static lv_style_t sb;
 static lv_style_t btn;
+static lv_style_t sb;
 
 #if LV_USE_BAR
-static lv_style_t bar_bg, bar_indic;
+static lv_style_t bar_indic;
 #endif
 
 #if LV_USE_SLIDER
-static lv_style_t slider_knob;
+static lv_style_t knob;
 #endif
 
 #if LV_USE_LMETER
@@ -50,10 +48,6 @@ static lv_style_t lmeter_bg;
 
 #if LV_USE_DDLIST
 static lv_style_t ddlist_bg, ddlist_sel;
-#endif
-
-#if LV_USE_BTNM
-static lv_style_t btnm_bg, btnm_rel, btnm_pr, btnm_trel, btnm_ina;
 #endif
 
 /**********************
@@ -67,9 +61,8 @@ static lv_style_t btnm_bg, btnm_rel, btnm_pr, btnm_trel, btnm_ina;
 static void basic_init(void)
 {
     lv_style_init(&scr);
-    lv_style_set_color(&scr, LV_STYLE_BG_COLOR, LV_COLOR_MAKE(0xF0, 0x90, 0x20));
+    lv_style_set_color(&scr, LV_STYLE_BG_COLOR, LV_COLOR_MAKE(0x20, 0x20, 0x20));
     lv_style_set_color(&scr, LV_STYLE_TEXT_COLOR , LV_COLOR_WHITE);
-
 
     lv_style_init(&transp);
     lv_style_set_value(&transp, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
@@ -209,36 +202,12 @@ static void label_init(void)
 static void bar_init(void)
 {
 #if LV_USE_BAR
-    lv_style_copy(&bar_bg, &def);
-    bar_bg.body.opa            = LV_OPA_30;
-    bar_bg.body.radius         = LV_RADIUS_CIRCLE;
-    bar_bg.body.main_color     = LV_COLOR_WHITE;
-    bar_bg.body.grad_color     = LV_COLOR_SILVER;
-    bar_bg.body.border.width   = 2;
-    bar_bg.body.border.color   = LV_COLOR_SILVER;
-    bar_bg.body.border.opa     = LV_OPA_20;
-    bar_bg.body.padding.left   = 0;
-    bar_bg.body.padding.right  = 0;
-    bar_bg.body.padding.top    = LV_DPI / 10;
-    bar_bg.body.padding.bottom = LV_DPI / 10;
-    bar_bg.body.padding.inner  = 0;
-
-    lv_style_copy(&bar_indic, &def);
-    bar_indic.body.radius         = LV_RADIUS_CIRCLE;
-    bar_indic.body.border.width   = 2;
-    bar_indic.body.border.color   = LV_COLOR_SILVER;
-    bar_indic.body.border.opa     = LV_OPA_70;
-    bar_indic.body.padding.left   = 0;
-    bar_indic.body.padding.right  = 0;
-    bar_indic.body.padding.top    = 0;
-    bar_indic.body.padding.bottom = 0;
-    bar_indic.body.shadow.width   = LV_DPI / 20;
-    bar_indic.body.shadow.color   = lv_color_hsv_to_rgb(_hue, 20, 90);
-    bar_indic.body.main_color     = lv_color_hsv_to_rgb(_hue, 40, 80);
-    bar_indic.body.grad_color     = lv_color_hsv_to_rgb(_hue, 40, 80);
-
-    theme.style.bar.bg    = &bar_bg;
-    theme.style.bar.indic = &bar_indic;
+    lv_style_init(&bar_indic);
+    lv_style_set_color(&bar_indic, LV_STYLE_BG_COLOR, LV_COLOR_BLUE);
+    lv_style_set_value(&bar_indic, LV_STYLE_PAD_TOP, LV_DPI/20);
+    lv_style_set_value(&bar_indic, LV_STYLE_PAD_BOTTOM, LV_DPI/20);
+    lv_style_set_value(&bar_indic, LV_STYLE_PAD_LEFT, LV_DPI/20);
+    lv_style_set_value(&bar_indic, LV_STYLE_PAD_RIGHT, LV_DPI/20);
 #endif
 }
 
@@ -292,54 +261,20 @@ static void led_init(void)
 static void slider_init(void)
 {
 #if LV_USE_SLIDER != 0
-    lv_style_copy(&slider_knob, &def);
-    slider_knob.body.opa          = LV_OPA_60;
-    slider_knob.body.radius       = LV_RADIUS_CIRCLE;
-    slider_knob.body.main_color   = LV_COLOR_WHITE;
-    slider_knob.body.grad_color   = LV_COLOR_SILVER;
-    slider_knob.body.border.width = 1;
-    slider_knob.body.border.color = LV_COLOR_GRAY;
-    slider_knob.body.border.opa   = LV_OPA_50;
-    slider_knob.body.padding.left = LV_DPI/25;
-    slider_knob.body.padding.right = LV_DPI/25;
-    slider_knob.body.padding.top = LV_DPI/25;
-    slider_knob.body.padding.bottom = LV_DPI/25;
+    lv_style_init(&knob);
+    lv_style_set_color(&knob, LV_STYLE_BG_COLOR, LV_COLOR_RED);
+    lv_style_set_value(&knob, LV_STYLE_PAD_TOP, LV_DPI/20);
+    lv_style_set_value(&knob, LV_STYLE_PAD_BOTTOM, LV_DPI/20);
+    lv_style_set_value(&knob, LV_STYLE_PAD_LEFT, LV_DPI/20);
+    lv_style_set_value(&knob, LV_STYLE_PAD_RIGHT, LV_DPI/20);
 
-    theme.style.slider.bg    = &bar_bg;
-    theme.style.slider.indic = &bar_indic;
-    theme.style.slider.knob  = &slider_knob;
 #endif
 }
 
 static void sw_init(void)
 {
 #if LV_USE_SW != 0
-    static lv_style_t sw_bg, sw_indic, sw_knob;
-    lv_style_copy(&sw_bg, &bar_bg);
-    sw_bg.body.opa            = LV_OPA_COVER;
-    sw_bg.body.padding.left   = -2;
-    sw_bg.body.padding.right  = -2;
-    sw_bg.body.padding.top    = -2;
-    sw_bg.body.padding.bottom = -2;
-    sw_bg.body.main_color     = lv_color_hex3(0x666);
-    sw_bg.body.grad_color     = lv_color_hex3(0x999);
-    sw_bg.body.border.width   = 2;
-    sw_bg.body.border.opa     = LV_OPA_50;
 
-    lv_style_copy(&sw_indic, &bar_indic);
-    sw_indic.body.shadow.width   = LV_DPI / 20;
-    sw_indic.body.padding.left   = 0;
-    sw_indic.body.padding.right  = 0;
-    sw_indic.body.padding.top    = 0;
-    sw_indic.body.padding.bottom = 0;
-
-    lv_style_copy(&sw_knob, &slider_knob);
-    sw_knob.body.opa = LV_OPA_80;
-
-    theme.style.sw.bg       = &sw_bg;
-    theme.style.sw.indic    = &sw_indic;
-    theme.style.sw.knob_off = &sw_knob;
-    theme.style.sw.knob_on  = &sw_knob;
 #endif
 }
 
@@ -879,10 +814,22 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
         return &transp;
     case LV_THEME_PANEL:
         return &panel;
+    case LV_THEME_BTN:
+        return &btn;
     case LV_THEME_BTNM:
         return &panel;
     case LV_THEME_BTNM_BTN:
         return &btn;
+    case LV_THEME_BAR:
+        return &panel;
+    case LV_THEME_BAR_INDIC:
+        return &bar_indic;
+    case LV_THEME_SLIDER:
+        return &panel;
+    case LV_THEME_SLIDER_INDIC:
+        return &bar_indic;
+    case LV_THEME_SLIDER_KNOB:
+        return &knob;
     }
 
     return NULL;

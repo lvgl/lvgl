@@ -20,6 +20,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_GROUP_NUM ((1 << LV_GROUP_ID_MAX) - 1)
 
 /**********************
  *      TYPEDEFS
@@ -39,6 +40,7 @@ static void obj_to_foreground(lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_group_t groups[LV_GROUP_NUM];
 
 /**********************
  *      MACROS
@@ -53,57 +55,19 @@ static void obj_to_foreground(lv_obj_t * obj);
  */
 void lv_group_init(void)
 {
-    lv_ll_init(&LV_GC_ROOT(_lv_group_ll), sizeof(lv_group_t));
-}
+    memset(groups, 0x00, sizeof(groups));
 
-/**
- * Create a new object group
- * @return pointer to the new object group
- */
-lv_group_t * lv_group_create(void)
-{
-    lv_group_t * group = lv_ll_ins_head(&LV_GC_ROOT(_lv_group_ll));
-    LV_ASSERT_MEM(group);
-    if(group == NULL) return NULL;
-    lv_ll_init(&group->obj_ll, sizeof(lv_obj_t *));
-
-    group->obj_focus      = NULL;
-    group->frozen         = 0;
-    group->focus_cb       = NULL;
-    group->click_focus    = 1;
-    group->editing        = 0;
-    group->refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
-    group->wrap           = 1;
-
-#if LV_USE_USER_DATA
-    memset(&group->user_data, 0, sizeof(lv_group_user_data_t));
-#endif
-
-    return group;
-}
-
-/**
- * Delete a group object
- * @param group pointer to a group
- */
-void lv_group_del(lv_group_t * group)
-{
-    /*Defocus the the currently focused object*/
-    if(group->obj_focus != NULL) {
-        (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
-        lv_obj_invalidate(*group->obj_focus);
+    uint8_t i;
+    for(i = 0; i < LV_GROUP_NUM; i++) {
+        lv_ll_init(&groups[i].obj_ll, sizeof(lv_obj_t *));
+        groups[i].obj_focus      = NULL;
+        groups[i].frozen         = 0;
+        groups[i].focus_cb       = NULL;
+        groups[i].click_focus    = 1;
+        groups[i].editing        = 0;
+        groups[i].refocus_policy = LV_GROUP_REFOCUS_POLICY_PREV;
+        groups[i].wrap           = 1;
     }
-
-    /*Remove the objects from the group*/
-    lv_obj_t ** obj;
-    LV_LL_READ(group->obj_ll, obj)
-    {
-        (*obj)->group_p = NULL;
-    }
-
-    lv_ll_clear(&(group->obj_ll));
-    lv_ll_remove(&LV_GC_ROOT(_lv_group_ll), group);
-    lv_mem_free(group);
 }
 
 /**

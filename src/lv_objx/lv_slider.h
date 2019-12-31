@@ -44,7 +44,7 @@ typedef struct
 {
     lv_bar_ext_t bar; /*Ext. of ancestor*/
     /*New data for this type */
-    const lv_style_t * style_knob; /*Style of the knob*/
+    lv_style_dsc_t style_knob; /*Style of the knob*/
 	lv_area_t left_knob_area;
 	lv_area_t right_knob_area;
 	int16_t *value_to_set; /* Which bar value to set */
@@ -54,9 +54,9 @@ typedef struct
 
 /** Built-in styles of slider*/
 enum {
-    LV_SLIDER_STYLE_BG, /** Slider background style. */
-    LV_SLIDER_STYLE_INDIC, /** Slider indicator (filled area) style. */
-    LV_SLIDER_STYLE_KNOB, /** Slider knob style. */
+    LV_SLIDER_PART_BG, /** Slider background style. */
+    LV_SLIDER_PART_INDIC, /** Slider indicator (filled area) style. */
+    LV_SLIDER_PART_KNOB, /** Slider knob style. */
 };
 typedef uint8_t lv_slider_style_t;
 
@@ -143,14 +143,6 @@ static inline void lv_slider_set_type(lv_obj_t * slider, lv_slider_type_t type)
 		lv_bar_set_type(slider, LV_BAR_TYPE_CUSTOM);
 }
 
-/**
- * Set a style of a slider
- * @param slider pointer to a slider object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_slider_set_style(lv_obj_t * slider, lv_slider_style_t type, const lv_style_t * style);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -231,14 +223,6 @@ static inline lv_slider_type_t lv_slider_get_type(lv_obj_t * slider)
 	else
 		return LV_SLIDER_TYPE_NORMAL;
 }
-
-/**
- * Get a style of a slider
- * @param slider pointer to a slider object
- * @param type which style should be get
- * @return style pointer to a style
- */
-const lv_style_t * lv_slider_get_style(const lv_obj_t * slider, lv_slider_style_t type);
 
 /**********************
  *      MACROS
