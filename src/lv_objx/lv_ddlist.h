@@ -57,7 +57,7 @@ typedef struct
 enum {
     LV_DDLIST_PART_BG,
     LV_DDLIST_PART_SCRL,
-    LV_DDLIST_PART_SCRL_BAR,
+    LV_DDLIST_PART_SCRLBAR,
     LV_DDLIST_PART_SEL,
 };
 typedef uint8_t lv_ddlist_part_t;

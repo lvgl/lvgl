@@ -93,6 +93,7 @@ void lv_init(void)
     /*Initialize the lv_misc modules*/
     lv_mem_init();
     lv_task_core_init();
+    lv_style_built_in_init();
 
 #if LV_USE_FILESYSTEM
     lv_fs_init();

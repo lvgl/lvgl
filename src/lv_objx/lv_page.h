@@ -89,7 +89,7 @@ typedef struct
 enum {
     LV_PAGE_PART_BG,
     LV_PAGE_PART_SCRL,
-    LV_PAGE_PART_SCRL_BAR,
+    LV_PAGE_PART_SCRLBAR,
     LV_PAGE_PART_EDGE_FLASH,
 };
 typedef uint8_t lv_part_style_t;

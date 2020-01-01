@@ -89,7 +89,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->btn_cnt        = 0;
     ext->btn_id_pr      = LV_BTNM_BTN_NONE;
-    ext->btn_id_focused = 1;//LV_BTNM_BTN_NONE;
+    ext->btn_id_focused = LV_BTNM_BTN_NONE;
     ext->btn_id_act     = LV_BTNM_BTN_NONE;
     ext->button_areas   = NULL;
     ext->ctrl_bits      = NULL;

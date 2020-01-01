@@ -67,10 +67,13 @@ typedef struct
 } lv_tabview_ext_t;
 
 enum {
-    LV_TABVIEW_STYLE_BG,
-    LV_TABVIEW_STYLE_INDIC,
+    LV_TABVIEW_PART_BG,
+    LV_TABVIEW_PART_BG_SCRL,
+    LV_TABVIEW_PART_BTNS,
+    LV_TABVIEW_PART_BTNS_BG,
+    LV_TABVIEW_PART_INDIC,
 };
-typedef uint8_t lv_tabview_style_t;
+typedef uint8_t lv_tabview_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -122,14 +125,6 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time);
 
 /**
- * Set the style of a tab view
- * @param tabview pointer to a tan view object
- * @param type which style should be set
- * @param style pointer to the new style
- */
-void lv_tabview_set_style(lv_obj_t * tabview, lv_tabview_style_t type, const lv_style_t * style);
-
-/**
  * Set the position of tab select buttons
  * @param tabview pointer to a tab view object
  * @param btns_pos which button position
@@ -167,14 +162,6 @@ lv_obj_t * lv_tabview_get_tab(const lv_obj_t * tabview, uint16_t id);
  * @return time of animation in milliseconds
  */
 uint16_t lv_tabview_get_anim_time(const lv_obj_t * tabview);
-
-/**
- * Get a style of a tab view
- * @param tabview pointer to a ab view object
- * @param type which style should be get
- * @return style pointer to a style
- */
-const lv_style_t * lv_tabview_get_style(const lv_obj_t * tabview, lv_tabview_style_t type);
 
 /**
  * Get position of tab select buttons

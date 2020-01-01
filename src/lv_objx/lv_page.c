@@ -146,7 +146,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
 //        lv_page_set_style(new_page, LV_PAGE_STYLE_BG, lv_page_get_style(copy, LV_PAGE_STYLE_BG));
 //        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, lv_page_get_style(copy, LV_PAGE_STYLE_SCRL));
-//        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL_BAR, lv_page_get_style(copy, LV_PAGE_STYLE_SCRL_BAR));
+//        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRLBAR, lv_page_get_style(copy, LV_PAGE_STYLE_SCRLBAR));
 
         lv_page_set_sb_mode(new_page, copy_ext->sb.mode);
     }
@@ -674,7 +674,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
         /*Draw the scrollbars*/
         lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
         lv_draw_rect_dsc_init(&draw_dsc);
-        lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCRL_BAR, &draw_dsc);
+        lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCRLBAR, &draw_dsc);
         lv_area_t sb_area;
         if(ext->sb.hor_draw && (ext->sb.mode & LV_SB_MODE_HIDE) == 0) {
             /*Convert the relative coordinates to absolute*/
@@ -824,7 +824,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         ext->scrl->signal_cb(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
 
-        lv_style_value_t sb_width = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL_BAR, LV_STYLE_SCROLLBAR_WIDTH);
+        lv_style_value_t sb_width = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_SCROLLBAR_WIDTH);
         lv_area_set_height(&ext->sb.hor_area, sb_width);
         lv_area_set_width(&ext->sb.ver_area, sb_width);
 
@@ -845,8 +845,8 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
 
-        lv_style_value_t sb_bottom = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL_BAR, LV_STYLE_PAD_BOTTOM);
-        lv_style_value_t sb_right = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL_BAR, LV_STYLE_PAD_RIGHT);
+        lv_style_value_t sb_bottom = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_BOTTOM);
+        lv_style_value_t sb_right = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_RIGHT);
 
         /*Ensure ext. size for the scrollbars if they are out of the page*/
         if(page->ext_draw_pad < (-sb_right)) page->ext_draw_pad = -sb_right;
@@ -1064,7 +1064,6 @@ static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event)
     /*clang-format on*/
 }
 
-
 /**
  * Get the style descriptor of a part of the object
  * @param page pointer the object
@@ -1085,7 +1084,7 @@ static lv_style_dsc_t * lv_page_get_style(lv_obj_t * page, uint8_t part)
     case LV_PAGE_PART_SCRL:
         style_dsc_p = lv_obj_get_style(ext->scrl, LV_CONT_PART_MAIN);
         break;
-    case LV_PAGE_PART_SCRL_BAR:
+    case LV_PAGE_PART_SCRLBAR:
         style_dsc_p = &ext->sb.style;
         break;
 #if LV_USE_ANIMATION
@@ -1115,9 +1114,9 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     lv_coord_t obj_w  = lv_obj_get_width(page);
     lv_coord_t obj_h  = lv_obj_get_height(page);
 
-    lv_style_value_t sb_width = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL_BAR, LV_STYLE_SCROLLBAR_WIDTH);
-    lv_style_value_t sb_right = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL_BAR, LV_STYLE_PAD_RIGHT);
-    lv_style_value_t sb_bottom = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL_BAR, LV_STYLE_PAD_BOTTOM);
+    lv_style_value_t sb_width = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_SCROLLBAR_WIDTH);
+    lv_style_value_t sb_right = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_RIGHT);
+    lv_style_value_t sb_bottom = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_BOTTOM);
 
     lv_style_value_t bg_left = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
     lv_style_value_t bg_right = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);

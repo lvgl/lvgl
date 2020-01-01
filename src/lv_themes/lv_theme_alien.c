@@ -107,6 +107,7 @@ static void basic_init(void)
     lv_style_set_color(&btn, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_AQUA);
     lv_style_set_value(&btn, LV_STYLE_BORDER_WIDTH | LV_STYLE_STATE_FOCUS, 6);
     lv_style_set_ptr(&btn, LV_STYLE_PATTERN_IMAGE | LV_STYLE_STATE_CHECKED, LV_SYMBOL_OK);
+    lv_style_set_value(&btn, LV_STYLE_PATTERN_REPEATE | LV_STYLE_STATE_CHECKED, 1);
     lv_style_set_ptr(&btn, LV_STYLE_FONT | LV_STYLE_STATE_CHECKED, &lv_font_roboto_12);
 
     lv_style_init(&transp_tight);
@@ -544,6 +545,7 @@ static void list_init(void)
 static void ddlist_init(void)
 {
 #if LV_USE_DDLIST != 0
+
 #endif
 }
 
@@ -705,6 +707,16 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
     case LV_THEME_DDLIST_SCRL:
         return &transp_tight;
     case LV_THEME_DDLIST_SEL:
+        return &btn;
+    case LV_THEME_TABVIEW_BG:
+    case LV_THEME_TABVIEW_BTNS_BG:
+    case LV_THEME_TABVIEW_TAB_SCRL:
+        return &transp_tight;
+    case LV_THEME_TABVIEW_INDIC:
+    case LV_THEME_TABVIEW_TAB_BG:
+           return &panel;
+    case LV_THEME_TABVIEW_BTNS:
+    case LV_THEME_TABVIEW_BG_SCRL:
         return &btn;
     }
 
