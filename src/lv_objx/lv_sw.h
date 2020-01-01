@@ -37,7 +37,6 @@ typedef struct
 {
     lv_slider_ext_t slider; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_coord_t start_x;
     uint8_t changed :1; /*Indicates the switch state explicitly changed by drag*/
     uint8_t state   :1; /*The current state*/
 } lv_sw_ext_t;

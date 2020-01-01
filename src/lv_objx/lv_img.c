@@ -499,7 +499,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL || ext->angle != 0) return LV_DESIGN_RES_NOT_COVER;
 
         if(ext->cf == LV_IMG_CF_TRUE_COLOR || ext->cf == LV_IMG_CF_RAW) {
-            cover = lv_area_is_in(clip_area, &img->coords) ? LV_DESIGN_RES_COVER : LV_DESIGN_RES_NOT_COVER;
+            cover = lv_area_is_in(clip_area, &img->coords, 0) ? LV_DESIGN_RES_COVER : LV_DESIGN_RES_NOT_COVER;
         }
 
         return cover;

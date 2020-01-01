@@ -124,7 +124,7 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
         /*Save only if this area is not in one of the saved areas*/
         uint16_t i;
         for(i = 0; i < disp->inv_p; i++) {
-            if(lv_area_is_in(&com_area, &disp->inv_areas[i]) != false) return;
+            if(lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return;
         }
 
         /*Save the area*/
@@ -422,7 +422,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     lv_obj_t * found_p = NULL;
 
     /*If this object is fully cover the draw area check the children too */
-    if(lv_area_is_in(area_p, &obj->coords) && obj->hidden == 0) {
+    if(lv_area_is_in(area_p, &obj->coords, 0) && obj->hidden == 0) {
         lv_design_res_t design_res = obj->design_cb(obj, area_p, LV_DESIGN_COVER_CHK);
         if(design_res == LV_DESIGN_RES_MASKED) return NULL;
 

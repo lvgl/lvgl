@@ -50,6 +50,17 @@ typedef struct {
     lv_style_value_t shadow_ofs_y;
     lv_opa_t shadow_opa;
 
+    /*Pattern*/
+    const void * pattern_src;
+    const lv_font_t * pattern_font;
+    lv_opa_t pattern_opa;
+    lv_opa_t pattern_recolor_opa;
+    lv_color_t pattern_recolor;
+    uint8_t pattern_repeate :1;
+
+    /*Overlay*/
+    lv_opa_t overlay_opa;
+    lv_color_t overlay_color;
 }lv_draw_rect_dsc_t;
 
 /**********************

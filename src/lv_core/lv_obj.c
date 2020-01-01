@@ -2358,6 +2358,15 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prope
 
     if(weight >= 0) return value;
 
+
+    prop = prop & (~LV_STYLE_STATE_MASK);
+    switch(prop) {
+    case LV_STYLE_OVERLAY_OPA:
+    case LV_STYLE_PATTERN_RECOLOR_OPA:
+    case LV_STYLE_IMAGE_RECOLOR_OPA:
+        return LV_OPA_TRANSP;
+    }
+
     return LV_OPA_COVER;
 }
 
@@ -2424,7 +2433,6 @@ void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_propert
     }
 
     if(weight >= 0) return value;
-
 
     prop = prop & (~LV_STYLE_STATE_MASK);
     switch(prop) {
@@ -2848,6 +2856,14 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
 {
     draw_dsc->radius = lv_obj_get_style_value(obj, part, LV_STYLE_RADIUS);
 
+    lv_opa_t opa_scale = lv_obj_get_style_opa(obj, part, LV_STYLE_OPA_SCALE);
+    if(opa_scale <= LV_OPA_MIN) {
+        draw_dsc->bg_opa = LV_OPA_TRANSP;
+        draw_dsc->border_opa = LV_OPA_TRANSP;
+        draw_dsc->shadow_opa = LV_OPA_TRANSP;
+        return;
+    }
+
     draw_dsc->bg_opa = lv_obj_get_style_opa(obj, part, LV_STYLE_BG_OPA);
     if(draw_dsc->bg_opa > LV_OPA_MIN) {
         draw_dsc->bg_color = lv_obj_get_style_color(obj, part, LV_STYLE_BG_COLOR);
@@ -2866,11 +2882,27 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
         }
     }
 
+    draw_dsc->pattern_src = lv_obj_get_style_ptr(obj, part, LV_STYLE_PATTERN_IMAGE);
+    if(draw_dsc->pattern_src) {
+        draw_dsc->pattern_opa = lv_obj_get_style_opa(obj, part, LV_STYLE_PATTERN_OPA);
+        if(draw_dsc->pattern_opa > LV_OPA_MIN) {
+            draw_dsc->pattern_repeate = lv_obj_get_style_value(obj, part, LV_STYLE_PATTERN_REPEATE) & 0x1U;
+            draw_dsc->pattern_recolor = lv_obj_get_style_color(obj, part, LV_STYLE_PATTERN_RECOLOR);
+            draw_dsc->pattern_recolor_opa = lv_obj_get_style_opa(obj, part, LV_STYLE_PATTERN_RECOLOR_OPA);
+            if(lv_img_src_get_type(draw_dsc->pattern_src) == LV_IMG_SRC_SYMBOL) {
+                draw_dsc->pattern_font = lv_obj_get_style_ptr(obj, part, LV_STYLE_FONT);
+            }
+        }
+    }
 
-    lv_opa_t opa_scale = lv_obj_get_style_opa(obj, part, LV_STYLE_OPA_SCALE);
+    draw_dsc->overlay_opa = lv_obj_get_style_opa(obj, part, LV_STYLE_OVERLAY_OPA);
+    draw_dsc->overlay_color = lv_obj_get_style_color(obj, part, LV_STYLE_OVERLAY_COLOR);
+
     if(opa_scale < LV_OPA_MAX) {
         draw_dsc->bg_opa = (uint16_t)((uint16_t)draw_dsc->bg_opa * opa_scale) >> 8;
         draw_dsc->border_opa = (uint16_t)((uint16_t)draw_dsc->border_opa * opa_scale) >> 8;
+        draw_dsc->shadow_opa = (uint16_t)((uint16_t)draw_dsc->shadow_opa * opa_scale) >> 8;
+        draw_dsc->pattern_opa = (uint16_t)((uint16_t)draw_dsc->pattern_opa * opa_scale) >> 8;
     }
 }
 
@@ -2889,10 +2921,6 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
 
 void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * draw_dsc)
 {
-    draw_dsc->angle = 0;
-    draw_dsc->zoom = LV_IMG_ZOOM_NONE;
-    draw_dsc->pivot.x = lv_area_get_width(&obj->coords) / 2;
-    draw_dsc->pivot.y = lv_area_get_height(&obj->coords) / 2;
     draw_dsc->opa = lv_obj_get_style_opa(obj, part, LV_STYLE_IMAGE_OPA);
     if(draw_dsc->opa <= LV_OPA_MIN)  return;
     lv_opa_t opa_scale = lv_obj_get_style_opa(obj, part, LV_STYLE_OPA_SCALE);
@@ -2901,8 +2929,18 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * 
     }
     if(draw_dsc->opa <= LV_OPA_MIN)  return;
 
+
+    draw_dsc->angle = 0;
+    draw_dsc->zoom = LV_IMG_ZOOM_NONE;
+    draw_dsc->pivot.x = lv_area_get_width(&obj->coords) / 2;
+    draw_dsc->pivot.y = lv_area_get_height(&obj->coords) / 2;
+
+    draw_dsc->recolor_opa = lv_obj_get_style_opa(obj, part, LV_STYLE_IMAGE_RECOLOR_OPA);
+    draw_dsc->recolor = lv_obj_get_style_color(obj, part, LV_STYLE_IMAGE_RECOLOR);
+
     draw_dsc->overlay_opa = lv_obj_get_style_opa(obj, part, LV_STYLE_OVERLAY_OPA);
     draw_dsc->overlay_color = lv_obj_get_style_color(obj, part, LV_STYLE_OVERLAY_COLOR);
+
     draw_dsc->blend_mode = lv_obj_get_style_value(obj, part, LV_STYLE_IMAGE_BLEND_MODE);
 }
 
@@ -2919,9 +2957,10 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 {
     if(mode == LV_DESIGN_COVER_CHK) {
         /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
-        if(lv_area_is_in(clip_area, &obj->coords) == false) return LV_DESIGN_RES_NOT_COVER;
+        lv_coord_t r = lv_obj_get_style_value(obj, LV_OBJ_PART_MAIN, LV_STYLE_RADIUS);
+        if(lv_area_is_in(clip_area, &obj->coords, r) == false) return LV_DESIGN_RES_NOT_COVER;
 
-        if(lv_obj_get_style_value(obj, LV_OBJ_PART_MAIN, LV_STYLE_BG_CLIP_CORNER)) return LV_DESIGN_RES_MASKED;
+        if(lv_obj_get_style_value(obj, LV_OBJ_PART_MAIN, LV_STYLE_CLIP_CORNER)) return LV_DESIGN_RES_MASKED;
 
         if(lv_obj_get_style_value(obj, LV_OBJ_PART_MAIN, LV_STYLE_BG_BLEND_MODE) != LV_BLEND_MODE_NORMAL) return LV_DESIGN_RES_NOT_COVER;
         if(lv_obj_get_style_value(obj, LV_OBJ_PART_MAIN, LV_STYLE_BORDER_BLEND_MODE) != LV_BLEND_MODE_NORMAL) return LV_DESIGN_RES_NOT_COVER;
@@ -2929,26 +2968,6 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         /*Can cover the area only if fully solid (no opacity)*/
         if(lv_obj_get_style_opa(obj, LV_OBJ_PART_MAIN, LV_STYLE_BG_OPA) < LV_OPA_MAX) return LV_DESIGN_RES_NOT_COVER;
         if(lv_obj_get_style_opa(obj, LV_OBJ_PART_MAIN, LV_STYLE_OPA_SCALE) < LV_OPA_MAX) return LV_DESIGN_RES_NOT_COVER;
-
-        /* Because of the radius it is not sure the area is covered
-         * Check the areas where there is no radius*/
-        lv_coord_t r = lv_obj_get_style_value(obj, LV_OBJ_PART_MAIN, LV_STYLE_RADIUS);
-
-        if(r == LV_RADIUS_CIRCLE) return LV_DESIGN_RES_NOT_COVER;
-
-        lv_area_t area_tmp;
-
-        /*Check horizontally without radius*/
-        lv_obj_get_coords(obj, &area_tmp);
-        area_tmp.x1 += r;
-        area_tmp.x2 -= r;
-        if(lv_area_is_in(clip_area, &area_tmp) == false) return LV_DESIGN_RES_NOT_COVER;
-
-        /*Check vertically without radius*/
-        lv_obj_get_coords(obj, &area_tmp);
-        area_tmp.y1 += r;
-        area_tmp.y2 -= r;
-        if(lv_area_is_in(clip_area, &area_tmp) == false) return LV_DESIGN_RES_NOT_COVER;
 
         return  LV_DESIGN_RES_COVER;
 
@@ -2959,7 +2978,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         lv_obj_init_draw_rect_dsc(obj, LV_OBJ_PART_MAIN, &draw_dsc);
         lv_draw_rect(&obj->coords, clip_area, &draw_dsc);
 
-        if(lv_obj_get_style_value(obj, LV_OBJ_PART_MAIN, LV_STYLE_BG_CLIP_CORNER)) {
+        if(lv_obj_get_style_value(obj, LV_OBJ_PART_MAIN, LV_STYLE_CLIP_CORNER)) {
             lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
 
             lv_coord_t r = lv_obj_get_style_value(obj, LV_OBJ_PART_MAIN, LV_STYLE_RADIUS);
@@ -2970,7 +2989,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         }
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
-        if(lv_obj_get_style_value(obj, LV_OBJ_PART_MAIN, LV_STYLE_BG_CLIP_CORNER)) {
+        if(lv_obj_get_style_value(obj, LV_OBJ_PART_MAIN, LV_STYLE_CLIP_CORNER)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
             lv_mem_buf_release(param);
         }
@@ -3241,7 +3260,7 @@ static lv_res_t style_cache_update_core(lv_obj_t * obj, uint8_t part)
     if(ptr == LV_FONT_DEFAULT) dsc->cache.font = LV_STYLE_CACHE_FONT_DEFAULT;
     else dsc->cache.font = LV_STYLE_CACHE_FONT_SKIPPED;
 
-    value = lv_obj_get_style_value(obj, part, LV_STYLE_BG_CLIP_CORNER);
+    value = lv_obj_get_style_value(obj, part, LV_STYLE_CLIP_CORNER);
     dsc->cache.clip_corner = value;
 
 

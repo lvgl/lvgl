@@ -53,10 +53,11 @@ typedef struct
 } lv_roller_ext_t;
 
 enum {
-    LV_ROLLER_STYLE_BG,
-    LV_ROLLER_STYLE_SEL,
+    LV_ROLLER_PART_BG,
+    LV_ROLLER_PART_SCRL,
+    LV_ROLLER_PART_SEL,
 };
-typedef uint8_t lv_roller_style_t;
+typedef uint8_t lv_roller_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -124,14 +125,6 @@ static inline void lv_roller_set_anim_time(lv_obj_t * roller, uint16_t anim_time
     lv_ddlist_set_anim_time(roller, anim_time);
 }
 
-/**
- * Set a style of a roller
- * @param roller pointer to a roller object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_roller_set_style(lv_obj_t * roller, lv_roller_style_t type, const lv_style_t * style);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -193,14 +186,6 @@ static inline uint16_t lv_roller_get_anim_time(const lv_obj_t * roller)
  * @return true: auto size enabled; false: manual width settings enabled
  */
 bool lv_roller_get_hor_fit(const lv_obj_t * roller);
-
-/**
- * Get a style of a roller
- * @param roller pointer to a roller object
- * @param type which style should be get
- * @return style pointer to a style
- *  */
-const lv_style_t * lv_roller_get_style(const lv_obj_t * roller, lv_roller_style_t type);
 
 /**********************
  *      MACROS

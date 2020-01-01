@@ -210,14 +210,6 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     } else if(sign == LV_SIGNAL_PRESSED) {
-
-        /*Save the x coordinate of the pressed point to see if the switch was slid*/
-        lv_indev_t * indev = lv_indev_get_act();
-        if(indev) {
-            lv_point_t p;
-            lv_indev_get_point(indev, &p);
-            ext->start_x = p.x;
-        }
         ext->changed = 0;
     } else if(sign == LV_SIGNAL_PRESSING) {
         if(ext->state != ext->slider.bar.cur_value) ext->changed = 1;

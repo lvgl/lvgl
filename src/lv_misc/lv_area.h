@@ -159,11 +159,12 @@ bool lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p);
 
 /**
  * Check if an area is fully on an other
- * @param ain_p pointer to an area which could be on aholder_p
- * @param aholder pointer to an area which could involve ain_p
- * @return
+ * @param ain_p pointer to an area which could be in 'aholder_p'
+ * @param aholder_p pointer to an area which could involve 'ain_p'
+ * @param radius radius of `aholder_p` (e.g. for rounded rectangle)
+ * @return true: `ain_p` is fully inside `aholder_p`
  */
-bool lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p);
+bool lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coord_t radius);
 
 /**
  * Increment or decrement an area's size by a single amount

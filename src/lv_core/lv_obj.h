@@ -864,6 +864,9 @@ void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t type, lv_style_propert
 // */
 //const lv_style_t * lv_obj_get_style(const lv_obj_t * obj);
 
+
+void lv_obj_update_style_cache(lv_obj_t * obj, uint8_t part);
+
 /*-----------------
  * Attribute get
  *----------------*/

@@ -43,23 +43,24 @@ typedef struct
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * label;             /*Label for the options*/
-    const lv_style_t * sel_style; /*Style of the selected option*/
+    lv_style_dsc_t style_sel; /*Style of the selected option*/
     const char * symbol;            /*Arrow or other icon when the drop-down list is closed*/
     uint16_t option_cnt;          /*Number of options*/
     uint16_t sel_opt_id;          /*Index of the current option*/
     uint16_t sel_opt_id_ori;      /*Store the original index on focus*/
+    lv_coord_t fix_height;        /*Height of the ddlist when opened. (0: auto-size)*/
     uint8_t opened : 1;           /*1: The list is opened (handled by the library)*/
     uint8_t force_sel : 1;        /*1: Keep the selection highlight even if the list is closed*/
     uint8_t stay_open : 1;        /*1: Don't close the list when a new item is selected*/
-    lv_coord_t fix_height;        /*Height of the ddlist when opened. (0: auto-size)*/
 } lv_ddlist_ext_t;
 
 enum {
-    LV_DDLIST_STYLE_BG,
-    LV_DDLIST_STYLE_SEL,
-    LV_DDLIST_STYLE_SB,
+    LV_DDLIST_PART_BG,
+    LV_DDLIST_PART_SCRL,
+    LV_DDLIST_PART_SCRL_BAR,
+    LV_DDLIST_PART_SEL,
 };
-typedef uint8_t lv_ddlist_style_t;
+typedef uint8_t lv_ddlist_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -140,14 +141,6 @@ static inline void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time
 }
 
 /**
- * Set a style of a drop down list
- * @param ddlist pointer to a drop down list object
- * @param type which style should be set
- * @param style pointer to a style
- *  */
-void lv_ddlist_set_style(lv_obj_t * ddlist, lv_ddlist_style_t type, const lv_style_t * style);
-
-/**
  * Set the alignment of the labels in a drop down list
  * @param ddlist pointer to a drop down list object
  * @param align alignment of labels
@@ -226,14 +219,6 @@ static inline uint16_t lv_ddlist_get_anim_time(const lv_obj_t * ddlist)
 {
     return lv_page_get_anim_time(ddlist);
 }
-
-/**
- * Get a style of a drop down list
- * @param ddlist pointer to a drop down list object
- * @param type which style should be get
- * @return style pointer to a style
- */
-const lv_style_t * lv_ddlist_get_style(const lv_obj_t * ddlist, lv_ddlist_style_t type);
 
 /**
  * Get the alignment of the labels in a drop down list

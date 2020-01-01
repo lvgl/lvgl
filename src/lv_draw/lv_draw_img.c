@@ -25,7 +25,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, lv_draw_img_dsc_t * draw_dsc, const void * src);
+static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src, lv_draw_img_dsc_t * draw_dsc);
 
 static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p, lv_draw_img_dsc_t * draw_dsc,
 	bool chroma_key, bool alpha_byte);
@@ -197,11 +197,11 @@ lv_img_src_t lv_img_src_get_type(const void * src)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, lv_draw_img_dsc_t * draw_dsc, const void * src)
+static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src, lv_draw_img_dsc_t * draw_dsc)
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
-    lv_img_cache_entry_t * cdsc = lv_img_cache_open(src, draw_dsc->overlay_color);
+    lv_img_cache_entry_t * cdsc = lv_img_cache_open(src, draw_dsc->recolor);
 
     if(cdsc == NULL) return LV_RES_INV;
 
@@ -354,7 +354,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
     /*The simplest case just copy the pixels into the VDB*/
     if(other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE &&
        chroma_key == false && alpha_byte == false &&
-       draw_dsc->opa == LV_OPA_COVER && draw_dsc->overlay_opa == LV_OPA_TRANSP) {
+       draw_dsc->opa == LV_OPA_COVER && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, LV_OPA_COVER, draw_dsc->blend_mode);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
@@ -410,7 +410,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             trans_dsc.cfg.cf = cf;
             trans_dsc.cfg.pivot_x = draw_dsc->pivot.x;
             trans_dsc.cfg.pivot_y = draw_dsc->pivot.y;
-            trans_dsc.cfg.color = draw_dsc->overlay_color;
+            trans_dsc.cfg.color = draw_dsc->recolor;
             trans_dsc.cfg.antialias = draw_dsc->antialias;
 
             lv_img_buf_transform_init(&trans_dsc);
@@ -463,8 +463,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                     }
                 }
 
-                if(draw_dsc->overlay_opa != 0) {
-                    c = lv_color_mix(draw_dsc->overlay_color, c, draw_dsc->overlay_opa);
+                if(draw_dsc->recolor_opa != 0) {
+                    c = lv_color_mix(draw_dsc->recolor, c, draw_dsc->recolor_opa);
                 }
 
                 map2[px_i].full = c.full;

@@ -70,6 +70,10 @@ typedef enum {
     LV_THEME_CB,
     LV_THEME_CB_BULLET,
 
+    LV_THEME_DDLIST_BG,
+    LV_THEME_DDLIST_SCRL,
+    LV_THEME_DDLIST_SCRL_BAR,
+    LV_THEME_DDLIST_SEL,
 }lv_theme_style_t;
 
 typedef struct {

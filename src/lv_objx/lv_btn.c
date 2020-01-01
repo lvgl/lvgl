@@ -450,7 +450,7 @@ static lv_design_res_t lv_btn_design(lv_obj_t * btn, const lv_area_t * clip_area
 
         lv_draw_rect(&btn->coords, clip_area, &draw_dsc);
 
-        if(lv_obj_get_style_value(btn, LV_OBJ_PART_MAIN, LV_STYLE_BG_CLIP_CORNER)) {
+        if(lv_obj_get_style_value(btn, LV_OBJ_PART_MAIN, LV_STYLE_CLIP_CORNER)) {
             lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
 
             lv_coord_t r = lv_obj_get_style_value(btn, LV_OBJ_PART_MAIN, LV_STYLE_RADIUS);

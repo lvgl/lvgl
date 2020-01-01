@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_theme.h"
+#include "../lv_objx/lv_img.h"
 
 #if LV_USE_THEME_ALIEN
 
@@ -33,6 +34,7 @@ static lv_style_t transp;
 static lv_style_t panel; /*General fancy background (e.g. to chart or ta)*/
 static lv_style_t btn;
 static lv_style_t sb;
+static lv_style_t transp_tight;
 
 #if LV_USE_BAR
 static lv_style_t bar_indic;
@@ -77,7 +79,8 @@ static void basic_init(void)
     lv_style_set_value(&panel, LV_STYLE_RADIUS, LV_DPI / 16);
     lv_style_set_value(&panel, LV_STYLE_BORDER_WIDTH, LV_DPI / 50 > 0 ? LV_DPI / 50 : 1);
     lv_style_set_color(&panel, LV_STYLE_BG_COLOR, LV_COLOR_SILVER);
-    lv_style_set_color(&panel, LV_STYLE_BG_GRAD_COLOR, LV_COLOR_GRAY);
+    lv_style_set_color(&panel, LV_STYLE_BG_GRAD_COLOR, LV_COLOR_BLUE);
+    lv_style_set_value(&panel, LV_STYLE_BG_GRAD_DIR, LV_GRAD_DIR_VER);
     lv_style_set_color(&panel, LV_STYLE_BORDER_COLOR, LV_COLOR_GRAY);
     lv_style_set_color(&panel, LV_STYLE_TEXT_COLOR, LV_COLOR_BLACK);
 
@@ -104,8 +107,19 @@ static void basic_init(void)
     lv_style_set_value(&btn, LV_STYLE_SHADOW_OFFSET_Y, 10);
     lv_style_set_color(&btn, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_AQUA);
     lv_style_set_value(&btn, LV_STYLE_BORDER_WIDTH | LV_STYLE_STATE_FOCUS, 6);
+    lv_style_set_ptr(&btn, LV_STYLE_PATTERN_IMAGE | LV_STYLE_STATE_CHECKED, LV_SYMBOL_OK);
+    lv_style_set_ptr(&btn, LV_STYLE_FONT | LV_STYLE_STATE_CHECKED, &lv_font_roboto_12);
 
-
+    lv_style_init(&transp_tight);
+    lv_style_set_opa(&transp_tight, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
+    lv_style_set_opa(&transp_tight, LV_STYLE_BORDER_OPA, LV_OPA_TRANSP);
+    lv_style_set_opa(&transp_tight, LV_STYLE_SHADOW_OPA, LV_OPA_TRANSP);
+    lv_style_set_opa(&transp_tight, LV_STYLE_PATTERN_OPA, LV_OPA_TRANSP);
+    lv_style_set_value(&transp_tight, LV_STYLE_PAD_LEFT, 0);
+    lv_style_set_value(&transp_tight, LV_STYLE_PAD_RIGHT, 0);
+    lv_style_set_value(&transp_tight, LV_STYLE_PAD_TOP, 0);
+    lv_style_set_value(&transp_tight, LV_STYLE_PAD_BOTTOM, 0);
+    lv_style_set_value(&transp_tight, LV_STYLE_PAD_INNER, 0);
 
 
 }
@@ -531,47 +545,13 @@ static void list_init(void)
 static void ddlist_init(void)
 {
 #if LV_USE_DDLIST != 0
-    lv_style_copy(&ddlist_bg, &panel);
-    ddlist_bg.text.line_space     = LV_DPI / 8;
-    ddlist_bg.body.padding.left   = LV_DPI / 6;
-    ddlist_bg.body.padding.right  = LV_DPI / 6;
-    ddlist_bg.body.padding.top    = LV_DPI / 6;
-    ddlist_bg.body.padding.bottom = LV_DPI / 6;
-
-    lv_style_copy(&ddlist_sel, &panel);
-    ddlist_sel.body.main_color = lv_color_hsv_to_rgb(_hue, 45, 70);
-    ddlist_sel.body.grad_color = lv_color_hsv_to_rgb(_hue, 45, 70);
-    ddlist_sel.body.opa        = LV_OPA_COVER;
-    ddlist_sel.body.radius     = 0;
-
-    theme.style.ddlist.bg  = &ddlist_bg;
-    theme.style.ddlist.sel = &ddlist_sel;
-    theme.style.ddlist.sb  = &sb;
 #endif
 }
 
 static void roller_init(void)
 {
 #if LV_USE_ROLLER != 0
-    static lv_style_t roller_bg, roller_sel;
-    lv_style_copy(&roller_bg, &ddlist_bg);
-    roller_bg.text.line_space   = LV_DPI / 6;
-    roller_bg.body.radius       = LV_DPI / 20;
-    roller_bg.body.main_color   = lv_color_hex3(0x222);
-    roller_bg.body.grad_color   = lv_color_hex3(0x666);
-    roller_bg.body.border.opa   = LV_OPA_30;
-    roller_bg.text.opa          = LV_OPA_70;
-    roller_bg.text.color        = lv_color_hsv_to_rgb(_hue, 20, 70);
-    roller_bg.body.shadow.width = 0;
 
-    lv_style_copy(&roller_sel, &panel);
-    roller_sel.body.opa    = LV_OPA_TRANSP;
-    roller_sel.body.radius = 0;
-    roller_sel.text.opa    = LV_OPA_COVER;
-    roller_sel.text.color  = lv_color_hsv_to_rgb(_hue, 70, 95);
-
-    theme.style.roller.bg  = &roller_bg;
-    theme.style.roller.sel = &roller_sel;
 #endif
 }
 
@@ -780,6 +760,10 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
     case LV_THEME_CB:
            return &panel;
     case LV_THEME_CB_BULLET:
+        return &btn;
+    case LV_THEME_DDLIST_SCRL:
+        return &transp_tight;
+    case LV_THEME_DDLIST_SEL:
         return &btn;
     }
 

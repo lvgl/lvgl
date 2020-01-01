@@ -36,10 +36,13 @@ typedef struct {
     lv_point_t pivot;
     uint16_t zoom;
 
+    lv_opa_t recolor_opa;
+    lv_color_t recolor;
+
     lv_opa_t overlay_opa;
     lv_color_t overlay_color;
-
     lv_blend_mode_t blend_mode;
+
 
     uint8_t antialias       :1;
 } lv_draw_img_dsc_t;

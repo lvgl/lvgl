@@ -46,7 +46,7 @@
 static void lv_page_sb_refresh(lv_obj_t * page);
 static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_page_get_style(lv_obj_t * page, uint8_t type);
+static lv_style_dsc_t * lv_page_get_style(lv_obj_t * page, uint8_t part);
 static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event);
 #if LV_USE_ANIMATION
@@ -652,7 +652,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
 
         lv_draw_rect(&page->coords, clip_area, &draw_dsc);
 
-        if(lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_BG_CLIP_CORNER)) {
+        if(lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_CLIP_CORNER)) {
             lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
 
             lv_coord_t r = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_RADIUS);
@@ -738,7 +738,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
         }
 
 #endif
-        if(lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_BG_CLIP_CORNER)) {
+        if(lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_CLIP_CORNER)) {
             void * param = lv_draw_mask_remove_custom(page + 8);
             lv_mem_buf_release(param);
         }
@@ -1065,14 +1065,20 @@ static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event)
 }
 
 
-static lv_style_dsc_t * lv_page_get_style(lv_obj_t * page, uint8_t type)
+/**
+ * Get the style descriptor of a part of the object
+ * @param page pointer the object
+ * @param part the part from `lv_page_part_t`. (LV_PAGE_PART_...)
+ * @return pointer to the style descriptor of the specified part
+ */
+static lv_style_dsc_t * lv_page_get_style(lv_obj_t * page, uint8_t part)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     lv_style_dsc_t * style_dsc_p;
 
-    switch(type) {
+    switch(part) {
     case LV_PAGE_PART_BG:
         style_dsc_p = &page->style_dsc;
         break;
@@ -1175,7 +1181,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         lv_area_set_pos(&ext->sb.hor_area,
                         sb_hor_pad +
                             (-(lv_obj_get_x(scrl) -bg_left) * (obj_w - size_tmp - 2 * sb_hor_pad)) /
-                                (scrl_w + bg_left + sb_right - obj_w),
+                                (scrl_w + bg_left + bg_right - obj_w),
                         obj_h - sb_width - sb_bottom);
 
         if(ext->sb.mode == LV_SB_MODE_AUTO || ext->sb.mode == LV_SB_MODE_DRAG) ext->sb.hor_draw = 1;
