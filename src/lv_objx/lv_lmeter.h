@@ -41,9 +41,9 @@ typedef struct
 
 /*Styles*/
 enum {
-    LV_LMETER_STYLE_MAIN,
+    LV_LMETER_PART_MAIN,
 };
-typedef uint8_t lv_lmeter_style_t;
+typedef uint8_t lv_lmeter_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -92,18 +92,6 @@ void lv_lmeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint16_t line_cnt);
  */
 void lv_lmeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle);
 
-/**
- * Set the styles of a line meter
- * @param lmeter pointer to a line meter object
- * @param type which style should be set (can be only `LV_LMETER_STYLE_MAIN`)
- * @param style set the style of the line meter
- */
-static inline void lv_lmeter_set_style(lv_obj_t * lmeter, lv_lmeter_style_t type, lv_style_t * style)
-{
-    (void)type; /*Unused*/
-    lv_obj_set_style(lmeter, style);
-}
-
 /*=====================
  * Getter functions
  *====================*/
@@ -150,17 +138,8 @@ uint16_t lv_lmeter_get_scale_angle(const lv_obj_t * lmeter);
  */
 uint16_t lv_lmeter_get_angle_offset(lv_obj_t * lmeter);
 
-/**
- * Get the style of a line meter
- * @param lmeter pointer to a line meter object
- * @param type which style should be get (can be only `LV_LMETER_STYLE_MAIN`)
- * @return pointer to the line meter's style
- */
-static inline const lv_style_t * lv_lmeter_get_style(const lv_obj_t * lmeter, lv_lmeter_style_t type)
-{
-    (void)type; /*Unused*/
-    return lv_obj_get_style(lmeter);
-}
+
+void lv_lmeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_t part);
 
 /**********************
  *      MACROS

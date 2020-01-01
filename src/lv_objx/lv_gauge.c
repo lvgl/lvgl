@@ -38,7 +38,8 @@
  **********************/
 static lv_design_res_t lv_gauge_design(lv_obj_t * gauge, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param);
-static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask);
+static lv_style_dsc_t * lv_gauge_get_style(lv_obj_t * gauge, uint8_t part);
+static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask);
 static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area);
 
 /**********************
@@ -101,13 +102,10 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_gauge_set_critical_value(new_gauge, 80);
         lv_obj_set_size(new_gauge, 2 * LV_DPI, 2 * LV_DPI);
 
-        /*Set the default styles*/
-        lv_theme_t * th = lv_theme_get_current();
-        if(th) {
-            lv_gauge_set_style(new_gauge, LV_GAUGE_STYLE_MAIN, th->style.gauge);
-        } else {
-            lv_gauge_set_style(new_gauge, LV_GAUGE_STYLE_MAIN, &lv_style_pretty_color);
-        }
+        lv_style_dsc_reset(&new_gauge->style_dsc);
+        _ot(new_gauge, LV_GAUGE_PART_MAIN, GAUGE);
+        _ot(new_gauge, LV_GAUGE_PART_STRONG, GAUGE_STRONG);
+
     }
     /*Copy an existing gauge*/
     else {
@@ -120,7 +118,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         }
         ext->label_count = copy_ext->label_count;
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_gauge);
+//        lv_obj_refresh_style(new_gauge);
     }
 
     LV_LOG_INFO("gauge created");
@@ -351,35 +349,21 @@ static lv_design_res_t lv_gauge_design(lv_obj_t * gauge, const lv_area_t * clip_
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-
-        /* Store the real pointer because of 'lv_group'
-         * If the object is in focus 'lv_obj_get_style()' will give a pointer to tmp style
-         * and to the real object style. It is important because of style change tricks below*/
-        const lv_style_t * style_ori_p = gauge->style_p;
-        const lv_style_t * style       = lv_obj_get_style(gauge);
         lv_gauge_ext_t * ext           = lv_obj_get_ext_attr(gauge);
-
-        lv_gauge_draw_scale(gauge, clip_area);
+        lv_gauge_draw_labels(gauge, clip_area);
 
         /*Draw the ancestor line meter with max value to show the rainbow like line colors*/
         uint16_t line_cnt_tmp = ext->lmeter.line_cnt;
         ancestor_design(gauge, clip_area, mode); /*To draw lines*/
 
-        /*Temporally modify the line meter to draw longer lines where labels are*/
-        lv_style_t style_tmp;
-        lv_style_copy(&style_tmp, style);
+
+        lv_lmeter_draw_scale(gauge, clip_area, LV_GAUGE_PART_MAIN);
+
         ext->lmeter.line_cnt         = ext->label_count;                 /*Only to labels*/
-        style_tmp.body.padding.left  = style_tmp.body.padding.left * 2;  /*Longer lines*/
-        style_tmp.body.padding.right = style_tmp.body.padding.right * 2; /*Longer lines*/
-        gauge->style_p               = &style_tmp;
-
-        ancestor_design(gauge, clip_area, mode); /*To draw lines*/
-
+        lv_lmeter_draw_scale(gauge, clip_area, LV_GAUGE_PART_STRONG);
         ext->lmeter.line_cnt = line_cnt_tmp; /*Restore the parameters*/
-        gauge->style_p       = style_ori_p;  /*Restore the ORIGINAL style pointer*/
 
         lv_gauge_draw_needle(gauge, clip_area);
-
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
@@ -399,6 +383,12 @@ static lv_design_res_t lv_gauge_design(lv_obj_t * gauge, const lv_area_t * clip_
 static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param)
 {
     lv_res_t res;
+    if(sign == LV_SIGNAL_GET_STYLE) {
+        uint8_t ** type_p = param;
+        lv_style_dsc_t ** style_dsc_p = param;
+        *style_dsc_p = lv_gauge_get_style(gauge, **type_p);
+        return LV_RES_OK;
+    }
 
     /* Include the ancient signal function */
     res = ancestor_signal(gauge, sign, param);
@@ -413,20 +403,45 @@ static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param
 
     return res;
 }
+/**
+ * Get the style descriptor of a part of the object
+ * @param page pointer the object
+ * @param part the part from `lv_gauge_part_t`. (LV_GAUGE_PART_...)
+ * @return pointer to the style descriptor of the specified part
+ */
+static lv_style_dsc_t * lv_gauge_get_style(lv_obj_t * gauge, uint8_t part)
+{
+    LV_ASSERT_OBJ(gauge, LV_OBJX_NAME);
 
+    lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
+    lv_style_dsc_t * style_dsc_p;
+
+    switch(part) {
+    case LV_GAUGE_PART_MAIN:
+        style_dsc_p = &gauge->style_dsc;
+        break;
+    case LV_GAUGE_PART_STRONG:
+        style_dsc_p = &ext->style_strong;
+        break;
+    default:
+        style_dsc_p = NULL;
+    }
+
+    return style_dsc_p;
+}
 /**
  * Draw the scale on a gauge
  * @param gauge pointer to gauge object
  * @param mask mask of drawing
  */
-static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
+static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask)
 {
     char scale_txt[16];
 
     lv_gauge_ext_t * ext     = lv_obj_get_ext_attr(gauge);
-    const lv_style_t * style = lv_obj_get_style(gauge);
-    lv_opa_t opa_scale       = lv_obj_get_opa_scale(gauge);
-    lv_coord_t r             = lv_obj_get_width(gauge) / 2 - (3 * style->body.padding.left) - style->body.padding.inner;
+    lv_style_value_t scale_width = lv_obj_get_style_value(gauge, LV_GAUGE_PART_STRONG, LV_STYLE_SCALE_WIDTH);
+    lv_style_value_t txt_pad = lv_obj_get_style_value(gauge, LV_GAUGE_PART_STRONG, LV_STYLE_PAD_INNER);
+    lv_coord_t r             = lv_obj_get_width(gauge) / 2 - scale_width - txt_pad;
     lv_coord_t x_ofs         = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
     lv_coord_t y_ofs         = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
     int16_t scale_angle      = lv_lmeter_get_scale_angle(gauge);
@@ -434,6 +449,10 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
     int16_t angle_ofs        = 90 + (360 - scale_angle) / 2;
     int16_t min              = lv_gauge_get_min_value(gauge);
     int16_t max              = lv_gauge_get_max_value(gauge);
+
+    lv_draw_label_dsc_t label_dsc;
+    lv_draw_label_dsc_init(&label_dsc);
+    lv_obj_init_draw_label_dsc(gauge, LV_GAUGE_PART_STRONG, &label_dsc);
 
     uint8_t i;
     for(i = 0; i < label_num; i++) {
@@ -452,7 +471,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
 
         lv_area_t label_cord;
         lv_point_t label_size;
-        lv_txt_get_size(&label_size, scale_txt, style->text.font, style->text.letter_space, style->text.line_space,
+        lv_txt_get_size(&label_size, scale_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
                         LV_COORD_MAX, LV_TXT_FLAG_NONE);
 
         /*Draw the label*/
@@ -461,7 +480,7 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
         label_cord.x2 = label_cord.x1 + label_size.x;
         label_cord.y2 = label_cord.y1 + label_size.y;
 
-        lv_draw_label(&label_cord, mask, style, opa_scale, scale_txt, LV_TXT_FLAG_NONE, NULL, NULL, NULL, lv_obj_get_base_dir(gauge));
+        lv_draw_label(&label_cord, mask, &label_dsc, scale_txt, NULL);
     }
 }
 /**
@@ -471,12 +490,10 @@ static void lv_gauge_draw_scale(lv_obj_t * gauge, const lv_area_t * mask)
  */
 static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
 {
-    lv_style_t style_needle;
     lv_gauge_ext_t * ext     = lv_obj_get_ext_attr(gauge);
-    const lv_style_t * style = lv_gauge_get_style(gauge, LV_GAUGE_STYLE_MAIN);
-    lv_opa_t opa_scale       = lv_obj_get_opa_scale(gauge);
 
-    lv_coord_t r      = lv_obj_get_width(gauge) / 2 - style->body.padding.left;
+    lv_style_value_t scale_width = lv_obj_get_style_value(gauge, LV_GAUGE_PART_STRONG, LV_STYLE_SCALE_WIDTH);
+    lv_coord_t r      = lv_obj_get_width(gauge) / 2 - scale_width;
     lv_coord_t x_ofs  = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
     lv_coord_t y_ofs  = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
     uint16_t angle    = lv_lmeter_get_scale_angle(gauge);
@@ -487,9 +504,17 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
     lv_point_t p_end;
     uint8_t i;
 
-    lv_style_copy(&style_needle, style);
-    if(ext->needle_colors != NULL) {
-        style_needle.image.intense = LV_OPA_COVER;
+    lv_draw_line_dsc_t line_dsc;
+    lv_draw_line_dsc_init(&line_dsc);
+    lv_obj_init_draw_line_dsc(gauge, LV_GAUGE_PART_MAIN, &line_dsc);
+
+    lv_draw_img_dsc_t img_dsc;
+    if(ext->needle_img == NULL) {
+        lv_draw_img_dsc_init(&img_dsc);
+        lv_obj_init_draw_img_dsc(gauge, LV_GAUGE_PART_MAIN, &img_dsc);
+        img_dsc.recolor_opa = LV_OPA_COVER;
+        img_dsc.pivot.x = ext->needle_img_pivot.x;
+        img_dsc.pivot.y = ext->needle_img_pivot.y;
     }
 
     p_mid.x = x_ofs;
@@ -506,10 +531,9 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
             p_end.x = (lv_trigo_sin(needle_angle + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
 
             /*Draw the needle with the corresponding color*/
-            if(ext->needle_colors != NULL)
-                style_needle.line.color = ext->needle_colors[i];
+            if(ext->needle_colors != NULL) line_dsc.color = ext->needle_colors[i];
 
-            lv_draw_line(&p_mid, &p_end, clip_area, &style_needle, opa_scale);
+            lv_draw_line(&p_mid, &p_end, clip_area, &line_dsc);
         }
         /*Draw image*/
         else {
@@ -523,26 +547,25 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
             a.y2 = a.y1 + info.h - 1;
 
             if(ext->needle_colors != NULL)
-                style_needle.image.color = ext->needle_colors[i];
+                img_dsc.recolor = ext->needle_colors[i];
 
-            lv_draw_img(&a, clip_area, ext->needle_img, &style_needle, needle_angle, &ext->needle_img_pivot, LV_IMG_ZOOM_NONE, true, opa_scale);
+
+            img_dsc.angle = needle_angle;
+            lv_draw_img(&a, clip_area, ext->needle_img, &img_dsc);
         }
     }
 
-    /*Draw the needle middle area*/
-    lv_style_t style_neddle_mid;
-    lv_style_copy(&style_neddle_mid, &lv_style_plain);
-    style_neddle_mid.body.main_color = style->body.border.color;
-    style_neddle_mid.body.grad_color = style->body.border.color;
-    style_neddle_mid.body.radius     = LV_RADIUS_CIRCLE;
 
+    lv_draw_rect_dsc_t mid_dsc;
+    lv_draw_rect_dsc_init(&mid_dsc);
+    lv_obj_init_draw_rect_dsc(gauge, LV_GAUGE_PART_MAIN, &mid_dsc);
+    lv_style_value_t size = lv_obj_get_style_value(gauge, LV_GAUGE_PART_MAIN, LV_STYLE_SIZE) / 2;
     lv_area_t nm_cord;
-    nm_cord.x1 = x_ofs - style->body.radius;
-    nm_cord.y1 = y_ofs - style->body.radius;
-    nm_cord.x2 = x_ofs + style->body.radius;
-    nm_cord.y2 = y_ofs + style->body.radius;
-
-    lv_draw_rect(&nm_cord, clip_area, &style_neddle_mid, lv_obj_get_opa_scale(gauge));
+    nm_cord.x1 = x_ofs - size;
+    nm_cord.y1 = y_ofs - size;
+    nm_cord.x2 = x_ofs + size;
+    nm_cord.y2 = y_ofs + size;
+    lv_draw_rect(&nm_cord, clip_area, &mid_dsc);
 }
 
 #endif

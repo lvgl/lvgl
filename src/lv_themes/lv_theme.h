@@ -87,6 +87,11 @@ typedef enum {
     LV_THEME_TABVIEW_TAB_BG,
     LV_THEME_TABVIEW_TAB_SCRL,
     LV_THEME_TABVIEW_TAB_SCRLBAR,
+
+    LV_THEME_LMETER,
+
+    LV_THEME_GAUGE,
+    LV_THEME_GAUGE_STRONG,
 }lv_theme_style_t;
 
 typedef struct {

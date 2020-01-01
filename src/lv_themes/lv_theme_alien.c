@@ -45,7 +45,12 @@ static lv_style_t knob;
 #endif
 
 #if LV_USE_LMETER
-static lv_style_t lmeter_bg;
+static lv_style_t lmeter;
+#endif
+
+#if LV_USE_GAUGE
+static lv_style_t gauge;
+static lv_style_t gauge_strong;
 #endif
 
 #if LV_USE_DDLIST
@@ -287,38 +292,30 @@ static void sw_init(void)
 static void lmeter_init(void)
 {
 #if LV_USE_LMETER != 0
-    lv_style_copy(&lmeter_bg, &def);
-    lmeter_bg.body.main_color    = lv_color_hsv_to_rgb(_hue, 10, 70);
-    lmeter_bg.body.grad_color    = lv_color_hsv_to_rgb(_hue, 80, 80);
-    lmeter_bg.body.padding.left  = LV_DPI / 8; /*Scale line length*/
-    lmeter_bg.body.padding.right = LV_DPI / 8; /*Scale line length*/
-    lmeter_bg.line.color         = lv_color_hex3(0x222);
-    lmeter_bg.line.width         = 2;
-
-    theme.style.lmeter = &lmeter_bg;
-
+    lv_style_init(&lmeter);
+    lv_style_set_color(&lmeter, LV_STYLE_SCALE_COLOR, LV_COLOR_AQUA);
+    lv_style_set_color(&lmeter, LV_STYLE_SCALE_GRAD_COLOR, LV_COLOR_NAVY);
+    lv_style_set_color(&lmeter, LV_STYLE_SCALE_END_COLOR, LV_COLOR_GRAY);
+    lv_style_set_value(&lmeter, LV_STYLE_LINE_WIDTH, 2);
 #endif
 }
 
 static void gauge_init(void)
 {
 #if LV_USE_GAUGE != 0
-    static lv_style_t gauge_bg;
-    lv_style_copy(&gauge_bg, &def);
-    gauge_bg.body.main_color     = lv_color_hsv_to_rgb(_hue, 10, 70);
-    gauge_bg.body.grad_color     = gauge_bg.body.main_color;
-    gauge_bg.body.padding.left   = LV_DPI / 16; /*Scale line length*/
-    gauge_bg.body.padding.right  = LV_DPI / 16; /*Scale line length*/
-    gauge_bg.body.padding.top    = LV_DPI / 10; /*Needle center size*/
-    gauge_bg.body.padding.bottom = LV_DPI / 10; /*Needle center size*/
-    gauge_bg.body.padding.inner  = LV_DPI / 12; /*Label - scale distance*/
-    gauge_bg.body.border.color   = lv_color_hex3(0x777);
-    gauge_bg.line.color          = lv_color_hsv_to_rgb(_hue, 80, 75);
-    gauge_bg.line.width          = 2;
-    gauge_bg.text.color          = lv_color_hsv_to_rgb(_hue, 10, 90);
-    gauge_bg.text.font           = _font;
+    lv_style_init(&gauge);
+    lv_style_set_color(&gauge, LV_STYLE_SCALE_COLOR, LV_COLOR_AQUA);
+    lv_style_set_color(&gauge, LV_STYLE_SCALE_GRAD_COLOR, LV_COLOR_NAVY);
+    lv_style_set_color(&gauge, LV_STYLE_SCALE_END_COLOR, LV_COLOR_RED);
+    lv_style_set_value(&gauge, LV_STYLE_LINE_WIDTH, 2);
 
-    theme.style.gauge = &gauge_bg;
+    lv_style_init(&gauge_strong);
+    lv_style_set_color(&gauge_strong, LV_STYLE_SCALE_COLOR, LV_COLOR_AQUA);
+    lv_style_set_color(&gauge_strong, LV_STYLE_SCALE_GRAD_COLOR, LV_COLOR_NAVY);
+    lv_style_set_color(&gauge_strong, LV_STYLE_SCALE_END_COLOR, LV_COLOR_RED);
+    lv_style_set_value(&gauge_strong, LV_STYLE_LINE_WIDTH, 4);
+    lv_style_set_value(&gauge_strong, LV_STYLE_SCALE_WIDTH, LV_DPI/5);
+    lv_style_set_value(&gauge_strong, LV_STYLE_PAD_INNER, LV_DPI/10);
 #endif
 }
 
@@ -718,6 +715,12 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
     case LV_THEME_TABVIEW_BTNS:
     case LV_THEME_TABVIEW_BG_SCRL:
         return &btn;
+    case LV_THEME_LMETER:
+        return &lmeter;
+    case LV_THEME_GAUGE:
+        return &gauge;
+    case LV_THEME_GAUGE_STRONG:
+        return &gauge_strong;
     }
 
     return NULL;

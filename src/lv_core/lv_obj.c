@@ -2194,8 +2194,10 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t part, lv_s
     switch(prop) {
     case LV_STYLE_BORDER_PART:
         return LV_BORDER_SIDE_FULL;
-    case LV_STYLE_SCROLLBAR_WIDTH:
-        return LV_DPI/10;
+    case LV_STYLE_SIZE:
+        return LV_DPI / 10;
+    case LV_STYLE_SCALE_WIDTH:
+        return LV_DPI / 8;
     }
 
     return 0;
@@ -2973,7 +2975,6 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * 
     }
     if(draw_dsc->opa <= LV_OPA_MIN)  return;
 
-
     draw_dsc->angle = 0;
     draw_dsc->zoom = LV_IMG_ZOOM_NONE;
     draw_dsc->pivot.x = lv_area_get_width(&obj->coords) / 2;
@@ -2986,6 +2987,23 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * 
     draw_dsc->overlay_color = lv_obj_get_style_color(obj, part, LV_STYLE_OVERLAY_COLOR);
 
     draw_dsc->blend_mode = lv_obj_get_style_value(obj, part, LV_STYLE_IMAGE_BLEND_MODE);
+}
+
+void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t * draw_dsc)
+{
+    draw_dsc->opa = lv_obj_get_style_opa(obj, part, LV_STYLE_IMAGE_OPA);
+    if(draw_dsc->opa <= LV_OPA_MIN)  return;
+    lv_opa_t opa_scale = lv_obj_get_style_opa(obj, part, LV_STYLE_OPA_SCALE);
+    if(opa_scale < LV_OPA_MAX) {
+        draw_dsc->opa = (uint16_t)((uint16_t)draw_dsc->opa * opa_scale) >> 8;
+    }
+    if(draw_dsc->opa <= LV_OPA_MIN)  return;
+
+    draw_dsc->width = lv_obj_get_style_value(obj, part, LV_STYLE_LINE_WIDTH);
+    if(draw_dsc->width == 0) return;
+
+    draw_dsc->color = lv_obj_get_style_color(obj, part, LV_STYLE_LINE_COLOR);
+    draw_dsc->blend_mode = lv_obj_get_style_value(obj, part, LV_STYLE_LINE_BLEND_MODE);
 }
 
 /**

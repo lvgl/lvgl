@@ -757,7 +757,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
 static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
 {
     lv_res_t res;
-     if(sign == LV_SIGNAL_GET_STYLE) {
+    if(sign == LV_SIGNAL_GET_STYLE) {
         uint8_t ** type_p = param;
         lv_style_dsc_t ** style_dsc_p = param;
         *style_dsc_p = lv_page_get_style(page, **type_p);
@@ -824,7 +824,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         ext->scrl->signal_cb(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
 
-        lv_style_value_t sb_width = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_SCROLLBAR_WIDTH);
+        lv_style_value_t sb_width = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_SIZE);
         lv_area_set_height(&ext->sb.hor_area, sb_width);
         lv_area_set_width(&ext->sb.ver_area, sb_width);
 
@@ -1114,7 +1114,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     lv_coord_t obj_w  = lv_obj_get_width(page);
     lv_coord_t obj_h  = lv_obj_get_height(page);
 
-    lv_style_value_t sb_width = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_SCROLLBAR_WIDTH);
+    lv_style_value_t sb_width = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_SIZE);
     lv_style_value_t sb_right = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_RIGHT);
     lv_style_value_t sb_bottom = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_BOTTOM);
 

@@ -810,7 +810,7 @@ static void refr_indic_size(lv_obj_t * tabview)
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
 
-    lv_coord_t indic_size = 10;
+    lv_coord_t indic_size = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_INDIC, LV_STYLE_SIZE);
 
     /*Set the indicator width/height*/
     lv_coord_t indic_w;

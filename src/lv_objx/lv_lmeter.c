@@ -85,13 +85,8 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_size(new_lmeter, LV_DPI, LV_DPI);
 
-        /*Set the default styles*/
-        lv_theme_t * th = lv_theme_get_current();
-        if(th) {
-            lv_lmeter_set_style(new_lmeter, LV_LMETER_STYLE_MAIN, th->style.lmeter);
-        } else {
-            lv_lmeter_set_style(new_lmeter, LV_LMETER_STYLE_MAIN, &lv_style_pretty_color);
-        }
+        lv_style_dsc_reset(lv_obj_get_style(new_lmeter, LV_LMETER_PART_MAIN));
+        _ot(new_lmeter, LV_LMETER_PART_MAIN, LMETER);
     }
     /*Copy an existing line meter*/
     else {
@@ -102,8 +97,8 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->max_value             = copy_ext->max_value;
         ext->cur_value             = copy_ext->cur_value;
 
-        /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_lmeter);
+//        /*Refresh the style with new signal function*/
+//        lv_obj_refresh_style(new_lmeter);
     }
 
     LV_LOG_INFO("line meter created");
@@ -273,9 +268,71 @@ uint16_t lv_lmeter_get_angle_offset(lv_obj_t * lmeter)
     return ext->angle_ofs;
 }
 
+void lv_lmeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_t part)
+{
+    lv_lmeter_ext_t * ext    = lv_obj_get_ext_attr(lmeter);
+
+    lv_coord_t r_out = lv_obj_get_width(lmeter) / 2;
+    lv_coord_t r_in  = r_out - lv_obj_get_style_value(lmeter, part, LV_STYLE_SCALE_WIDTH);
+    if(r_in < 1) r_in = 1;
+
+    lv_coord_t x_ofs  = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
+    lv_coord_t y_ofs  = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
+    int16_t angle_ofs = ext->angle_ofs + 90 + (360 - ext->scale_angle) / 2;
+    int16_t level =
+        (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
+    uint8_t i;
+
+    lv_color_t main_color = lv_obj_get_style_color(lmeter, part, LV_STYLE_SCALE_COLOR);
+    lv_color_t grad_color = lv_obj_get_style_color(lmeter, part, LV_STYLE_SCALE_GRAD_COLOR);
+    lv_color_t ina_color = lv_obj_get_style_color(lmeter, part, LV_STYLE_SCALE_END_COLOR);
+
+    lv_draw_line_dsc_t line_dsc;
+    lv_draw_line_dsc_init(&line_dsc);
+    lv_obj_init_draw_line_dsc(lmeter, part, &line_dsc);
+
+    for(i = 0; i < ext->line_cnt; i++) {
+        /*Calculate the position a scale label*/
+        int16_t angle = (i * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
+
+        lv_coord_t y_out = (int32_t)((int32_t)lv_trigo_sin(angle) * r_out) >> (LV_TRIGO_SHIFT - 8);
+        lv_coord_t x_out = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_out) >> (LV_TRIGO_SHIFT - 8);
+        lv_coord_t y_in  = (int32_t)((int32_t)lv_trigo_sin(angle) * r_in) >> (LV_TRIGO_SHIFT - 8);
+        lv_coord_t x_in  = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_in) >> (LV_TRIGO_SHIFT - 8);
+
+        /*Rounding*/
+        if(x_out <= 0) x_out = (x_out + 127) >> 8;
+        else x_out = (x_out - 127) >> 8;
+
+        if(x_in <= 0) x_in = (x_in + 127) >> 8;
+        else x_in = (x_in - 127) >> 8;
+
+        if(y_out <= 0) y_out = (y_out + 127) >> 8;
+        else y_out = (y_out - 127) >> 8;
+
+        if(y_in <= 0) y_in = (y_in + 127) >> 8;
+        else y_in = (y_in - 127) >> 8;
+
+        lv_point_t p1;
+        lv_point_t p2;
+
+        p2.x = x_in + x_ofs;
+        p2.y = y_in + y_ofs;
+
+        p1.x = x_out + x_ofs;
+        p1.y = y_out + y_ofs;
+
+        if(i >= level) line_dsc.color = ina_color;
+        else line_dsc.color = lv_color_mix(grad_color, main_color, (255 * i) / ext->line_cnt);
+
+        lv_draw_line(&p1, &p2, clip_area, &line_dsc);
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+#include <stdlib.h>
 
 /**
  * Handle the drawing related tasks of the line meters
@@ -295,73 +352,7 @@ static lv_design_res_t lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * cli
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_lmeter_ext_t * ext    = lv_obj_get_ext_attr(lmeter);
-        const lv_style_t * style = lv_obj_get_style(lmeter);
-        lv_opa_t opa_scale       = lv_obj_get_opa_scale(lmeter);
-        lv_style_t style_tmp;
-        lv_style_copy(&style_tmp, style);
-
-#if LV_USE_GROUP
-        lv_group_t * g = lv_obj_get_group(lmeter);
-        if(lv_group_get_focused(g) == lmeter) {
-            style_tmp.line.width += 1;
-        }
-#endif
-
-        lv_coord_t r_out = lv_obj_get_width(lmeter) / 2;
-        lv_coord_t r_in  = r_out - style->body.padding.left;
-        if(r_in < 1) r_in = 1;
-
-        lv_coord_t x_ofs  = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
-        lv_coord_t y_ofs  = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
-        int16_t angle_ofs = ext->angle_ofs + 90 + (360 - ext->scale_angle) / 2;
-        int16_t level =
-            (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
-        uint8_t i;
-
-        style_tmp.line.color = style->body.main_color;
-
-        for(i = 0; i < ext->line_cnt; i++) {
-            /*Calculate the position a scale label*/
-            int16_t angle = (i * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
-
-            lv_coord_t y_out = (int32_t)((int32_t)lv_trigo_sin(angle) * r_out) >> (LV_TRIGO_SHIFT - 8);
-            lv_coord_t x_out = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_out) >> (LV_TRIGO_SHIFT - 8);
-            lv_coord_t y_in  = (int32_t)((int32_t)lv_trigo_sin(angle) * r_in) >> (LV_TRIGO_SHIFT - 8);
-            lv_coord_t x_in  = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_in) >> (LV_TRIGO_SHIFT - 8);
-
-            /*Rounding*/
-            if(x_out <= 0) x_out = (x_out + 127) >> 8;
-            else x_out = (x_out - 127) >> 8;
-
-            if(x_in <= 0) x_in = (x_in + 127) >> 8;
-            else x_in = (x_in - 127) >> 8;
-
-            if(y_out <= 0) y_out = (y_out + 127) >> 8;
-            else y_out = (y_out - 127) >> 8;
-
-            if(y_in <= 0) y_in = (y_in + 127) >> 8;
-            else y_in = (y_in - 127) >> 8;
-
-            lv_point_t p1;
-            lv_point_t p2;
-
-            p2.x = x_in + x_ofs;
-            p2.y = y_in + y_ofs;
-
-            p1.x = x_out + x_ofs;
-            p1.y = y_out + y_ofs;
-
-            if(i >= level)
-                style_tmp.line.color = style->line.color;
-            else {
-                style_tmp.line.color =
-                    lv_color_mix(style->body.grad_color, style->body.main_color, (255 * i) / ext->line_cnt);
-            }
-
-            lv_draw_line(&p1, &p2, clip_area, &style_tmp, opa_scale);
-        }
-
+        lv_lmeter_draw_scale(lmeter, clip_area, LV_LMETER_PART_MAIN);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
@@ -390,9 +381,6 @@ static lv_res_t lv_lmeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * par
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_refresh_ext_draw_pad(lmeter);
-    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        const lv_style_t * style = lv_lmeter_get_style(lmeter, LV_LMETER_STYLE_MAIN);
-        lmeter->ext_draw_pad     = LV_MATH_MAX(lmeter->ext_draw_pad, style->line.width);
     }
 
     return res;
