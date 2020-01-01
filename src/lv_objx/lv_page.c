@@ -667,7 +667,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
         lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_BG, &draw_dsc);
 
         /*Draw only a border. It ensures that the page looks "closed" even with overflowing scrollable*/
-        draw_dsc.shadow_blur = 0;
+        draw_dsc.shadow_width = 0;
         draw_dsc.bg_opa = LV_OPA_TRANSP;
         lv_draw_rect(&page->coords, clip_area, &draw_dsc);
 

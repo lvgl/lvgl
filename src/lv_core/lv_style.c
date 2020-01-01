@@ -392,11 +392,11 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
         lv_style_attr_t attr_act;
         attr_act.full = style->map[i + 1];
         if(style->map[i] == id_to_find) {
-            /*If there the state has perfectly match return this property*/
+            /*If the state perfectly matches return this property*/
             if(attr_act.bits.state == attr.bits.state) {
                 return i;
             }
-            /* Be sure the property not specifies other state the the requested.
+            /* Be sure the property not specifies other state than the requested.
              * E.g. For HOVER+PRESS, HOVER only is OK, but HOVER+FOCUS not*/
             else if((attr_act.bits.state & (~attr.bits.state)) == 0) {
                 /* Use this property if it describes better the requested state than the current candidate.

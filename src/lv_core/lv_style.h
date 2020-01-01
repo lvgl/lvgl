@@ -179,6 +179,10 @@ typedef int16_t lv_style_value_t;
 #define LV_STYLE_CACHE_BLEND_MODE_NORMAL   0
 #define LV_STYLE_CACHE_BLEND_MODE_SKIPPED   1
 
+
+#define LV_STYLE_CACHE_BORDER_PART_FULL   0
+#define LV_STYLE_CACHE_BORDER_PART_SKIPPED   1
+
 typedef struct {
     /*32 bit*/
     uint32_t pad_left   :6;
@@ -188,7 +192,7 @@ typedef struct {
     uint32_t pad_inner  :6;
     uint32_t bg_grad_dir  :2;
 
-    /*32 bit*/
+    /*31 bit*/
     uint32_t border_width :3;
     uint32_t line_width   :3;
     uint32_t letter_space :3;
@@ -209,11 +213,13 @@ typedef struct {
     uint32_t text_blend_mode     :1;
     uint32_t line_blend_mode    :1;
     uint32_t image_blend_mode   :1;
+    uint32_t shadow_blend_mode   :1;
 
     /*32 bit*/
     uint32_t radius       :4;
     uint32_t font         :1;
     uint32_t clip_corner  :1;
+    uint32_t border_part  :1;
 
     uint32_t enabled    :1;
 

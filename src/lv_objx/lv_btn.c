@@ -447,7 +447,6 @@ static lv_design_res_t lv_btn_design(lv_obj_t * btn, const lv_area_t * clip_area
         lv_draw_rect_dsc_t draw_dsc;
         lv_draw_rect_dsc_init(&draw_dsc);
         lv_obj_init_draw_rect_dsc(btn, LV_OBJ_PART_MAIN, &draw_dsc);
-
         lv_draw_rect(&btn->coords, clip_area, &draw_dsc);
 
         if(lv_obj_get_style_value(btn, LV_OBJ_PART_MAIN, LV_STYLE_CLIP_CORNER)) {

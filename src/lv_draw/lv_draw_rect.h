@@ -45,9 +45,11 @@ typedef struct {
 
     /*Shadow*/
     lv_color_t shadow_color;
-    lv_style_value_t shadow_blur;
+    lv_style_value_t shadow_width;
     lv_style_value_t shadow_ofs_x;
     lv_style_value_t shadow_ofs_y;
+    lv_style_value_t shadow_spread;
+    lv_style_value_t shadow_blend_mode;
     lv_opa_t shadow_opa;
 
     /*Pattern*/
