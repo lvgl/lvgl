@@ -39,7 +39,7 @@ typedef struct
 
 /*Styles*/
 enum {
-    LV_LINE_STYLE_MAIN,
+    LV_LINE_PART_MAIN,
 };
 typedef uint8_t lv_line_style_t;
 
@@ -88,17 +88,6 @@ void lv_line_set_y_invert(lv_obj_t * line, bool en);
     lv_line_set_y_invert /*The name was inconsistent. In v.6.0 only `lv_line_set_y_invert`will                         \
                             work */
 
-/**
- * Set the style of a line
- * @param line pointer to a line object
- * @param type which style should be set (can be only `LV_LINE_STYLE_MAIN`)
- * @param style pointer to a style
- */
-static inline void lv_line_set_style(lv_obj_t * line, lv_line_style_t type, const lv_style_t * style)
-{
-    (void)type; /*Unused*/
-    lv_obj_set_style(line, style);
-}
 
 /*=====================
  * Getter functions
@@ -117,18 +106,6 @@ bool lv_line_get_auto_size(const lv_obj_t * line);
  * @return true: y inversion is enabled, false: disabled
  */
 bool lv_line_get_y_invert(const lv_obj_t * line);
-
-/**
- * Get the style of an line object
- * @param line pointer to an line object
- * @param type which style should be get (can be only `LV_LINE_STYLE_MAIN`)
- * @return pointer to the line's style
- */
-static inline const lv_style_t * lv_line_get_style(const lv_obj_t * line, lv_line_style_t type)
-{
-    (void)type; /*Unused*/
-    return lv_obj_get_style(line);
-}
 
 /**********************
  *      MACROS

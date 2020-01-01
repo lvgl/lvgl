@@ -75,6 +75,35 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
     if(point1->y == point2->y) draw_line_hor(point1, point2, &clip_line, dsc);
     else if(point1->x == point2->x) draw_line_ver(point1, point2, &clip_line, dsc);
     else draw_line_skew(point1, point2, &clip_line, dsc);
+
+
+    if(dsc->round_end || dsc->round_start) {
+        lv_draw_rect_dsc_t cir_dsc;
+        lv_draw_rect_dsc_init(&cir_dsc);
+        cir_dsc.bg_color = dsc->color;
+        cir_dsc.radius = LV_RADIUS_CIRCLE;
+        cir_dsc.bg_opa = dsc->opa;
+
+        lv_coord_t r = (dsc->width >> 1);
+        lv_coord_t r_corr = (dsc->width & 1) ? 0 : 1;
+        lv_area_t cir_area;
+
+        if(dsc->round_start) {
+            cir_area.x1 = point1->x - r;
+            cir_area.y1 = point1->y - r;
+            cir_area.x2 = point1->x + r - r_corr;
+            cir_area.y2 = point1->y + r - r_corr ;
+            lv_draw_rect(&cir_area, clip, &cir_dsc);
+        }
+
+        if(dsc->round_end) {
+            cir_area.x1 = point2->x - r;
+            cir_area.y1 = point2->y - r;
+            cir_area.x2 = point2->x + r - r_corr;
+            cir_area.y2 = point2->y + r - r_corr ;
+            lv_draw_rect(&cir_area, clip, &cir_dsc);
+        }
+    }
 }
 
 /**********************

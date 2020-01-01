@@ -549,7 +549,6 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
             if(ext->needle_colors != NULL)
                 img_dsc.recolor = ext->needle_colors[i];
 
-
             img_dsc.angle = needle_angle;
             lv_draw_img(&a, clip_area, ext->needle_img, &img_dsc);
         }

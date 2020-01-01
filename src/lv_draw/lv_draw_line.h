@@ -26,6 +26,8 @@ typedef struct {
     lv_style_value_t width;
     lv_opa_t opa;
     lv_blend_mode_t blend_mode;
+    uint8_t round_start :1;
+    uint8_t round_end   :1;
 }lv_draw_line_dsc_t;
 
 /**********************
@@ -43,6 +45,7 @@ typedef struct {
 void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * mask, lv_draw_line_dsc_t * dsc);
 
 void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
+
 /**********************
  *      MACROS
  **********************/

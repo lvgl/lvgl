@@ -241,12 +241,7 @@ static void img_init(void)
 static void line_init(void)
 {
 #if LV_USE_LINE != 0
-    static lv_style_t line_decor;
-    lv_style_copy(&line_decor, &def);
-    line_decor.line.color = lv_color_hsv_to_rgb(_hue, 50, 50);
-    line_decor.line.width = 1;
 
-    theme.style.line.decor = &line_decor;
 #endif
 }
 
