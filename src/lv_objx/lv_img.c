@@ -502,6 +502,9 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             cover = lv_area_is_in(clip_area, &img->coords) ? LV_DESIGN_RES_COVER : LV_DESIGN_RES_NOT_COVER;
         }
 
+        const lv_style_t * style = lv_img_get_style(img, LV_IMG_STYLE_MAIN);
+        if(style->image.opa < LV_OPA_MAX) return false;
+
         return cover;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
