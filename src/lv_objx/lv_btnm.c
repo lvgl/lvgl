@@ -815,7 +815,8 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->btn_id_pr != LV_BTNM_BTN_NONE) {
             /*Toggle the button if enabled*/
-            if(button_is_tgl_enabled(ext->ctrl_bits[ext->btn_id_pr])) {
+            if(button_is_tgl_enabled(ext->ctrl_bits[ext->btn_id_pr]) &&
+               !button_is_inactive(ext->ctrl_bits[ext->btn_id_pr])) {
                 if(button_get_tgl_state(ext->ctrl_bits[ext->btn_id_pr])) {
                     ext->ctrl_bits[ext->btn_id_pr] &= (~LV_BTNM_CTRL_TGL_STATE);
                 } else {
