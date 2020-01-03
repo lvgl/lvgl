@@ -63,7 +63,7 @@ typedef struct
 } lv_btnm_ext_t;
 
 enum {
-    LV_BTNM_PART_MAIN,
+    LV_BTNM_PART_BG,
     LV_BTNM_PART_BTN,
 };
 typedef uint8_t lv_btnm_part_t;

@@ -57,12 +57,8 @@ typedef struct
 } lv_kb_ext_t;
 
 enum {
-    LV_KB_STYLE_BG,
-    LV_KB_STYLE_BTN_REL,
-    LV_KB_STYLE_BTN_PR,
-    LV_KB_STYLE_BTN_TGL_REL,
-    LV_KB_STYLE_BTN_TGL_PR,
-    LV_KB_STYLE_BTN_INA,
+    LV_KB_PART_BG,
+    LV_KB_PART_BTN,
 };
 typedef uint8_t lv_kb_style_t;
 
@@ -123,14 +119,6 @@ void lv_kb_set_map(lv_obj_t * kb, lv_kb_mode_t mode, const char * map[]);
  */
 void lv_kb_set_ctrl_map(lv_obj_t * kb, lv_kb_mode_t mode, const lv_btnm_ctrl_t ctrl_map[]);
 
-/**
- * Set a style of a keyboard
- * @param kb pointer to a keyboard object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -165,14 +153,6 @@ static inline const char ** lv_kb_get_map_array(const lv_obj_t * kb)
 {
     return lv_btnm_get_map_array(kb);
 }
-
-/**
- * Get a style of a keyboard
- * @param kb pointer to a keyboard object
- * @param type which style should be get
- * @return style pointer to a style
- */
-const lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type);
 
 /*=====================
  * Other functions

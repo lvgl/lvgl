@@ -29,7 +29,8 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param);
-static void lv_kb_updatemap(lv_obj_t * kb);
+static lv_style_dsc_t * lv_kb_get_style(lv_obj_t * kb, uint8_t part);
+static void lv_kb_update_map(lv_obj_t * kb);
 
 /**********************
  *  STATIC VARIABLES
@@ -150,18 +151,6 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_btnm_set_map(new_kb, kb_map[ext->mode]);
         lv_btnm_set_ctrl_map(new_kb, kb_ctrl[ext->mode]);
 
-        /*Set the default styles*/
-        lv_theme_t * th = lv_theme_get_current();
-        if(th) {
-            lv_kb_set_style(new_kb, LV_KB_STYLE_BG, th->style.kb.bg);
-            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_REL, th->style.kb.btn.rel);
-            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_PR, th->style.kb.btn.pr);
-            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_TGL_REL, th->style.kb.btn.tgl_rel);
-            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_TGL_PR, th->style.kb.btn.tgl_pr);
-            lv_kb_set_style(new_kb, LV_KB_STYLE_BTN_INA, th->style.kb.btn.ina);
-        } else {
-            /*Let the button matrix's styles*/
-        }
     }
     /*Copy an existing keyboard*/
     else {
@@ -175,7 +164,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_btnm_set_ctrl_map(new_kb, kb_ctrl[ext->mode]);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_kb);
+//        lv_obj_refresh_style(new_kb);
     }
 
     LV_LOG_INFO("keyboard created");
@@ -259,26 +248,6 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
 }
 
 /**
- * Set a style of a keyboard
- * @param kb pointer to a keyboard object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style)
-{
-    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
-
-    switch(type) {
-        case LV_KB_STYLE_BG: lv_btnm_set_style(kb, LV_BTNM_STYLE_BG, style); break;
-        case LV_KB_STYLE_BTN_REL: lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_REL, style); break;
-        case LV_KB_STYLE_BTN_PR: lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_PR, style); break;
-        case LV_KB_STYLE_BTN_TGL_REL: lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_TGL_REL, style); break;
-        case LV_KB_STYLE_BTN_TGL_PR: lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_TGL_PR, style); break;
-        case LV_KB_STYLE_BTN_INA: lv_btnm_set_style(kb, LV_BTNM_STYLE_BTN_INA, style); break;
-    }
-}
-
-/**
  * Set a new map for the keyboard
  * @param kb pointer to a Keyboard object
  * @param mode keyboard map to alter 'lv_kb_mode_t'
@@ -288,7 +257,7 @@ void lv_kb_set_style(lv_obj_t * kb, lv_kb_style_t type, const lv_style_t * style
 void lv_kb_set_map(lv_obj_t * kb, lv_kb_mode_t mode, const char * map[])
 {
     kb_map[mode] = map;
-    lv_kb_updatemap(kb);
+    lv_kb_update_map(kb);
 }
 
 /**
@@ -303,7 +272,7 @@ void lv_kb_set_map(lv_obj_t * kb, lv_kb_mode_t mode, const char * map[])
 void lv_kb_set_ctrl_map(lv_obj_t * kb, lv_kb_mode_t mode, const lv_btnm_ctrl_t ctrl_map[])
 {
     kb_ctrl[mode] = ctrl_map;
-    lv_kb_updatemap(kb);
+    lv_kb_update_map(kb);
 }
 
 /*=====================
@@ -347,31 +316,6 @@ bool lv_kb_get_cursor_manage(const lv_obj_t * kb)
 
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
     return ext->cursor_mng == 0 ? false : true;
-}
-
-/**
- * Get a style of a keyboard
- * @param kb pointer to a keyboard object
- * @param type which style should be get
- * @return style pointer to a style
- */
-const lv_style_t * lv_kb_get_style(const lv_obj_t * kb, lv_kb_style_t type)
-{
-    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
-
-    const lv_style_t * style = NULL;
-
-    switch(type) {
-        case LV_KB_STYLE_BG: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BG); break;
-        case LV_KB_STYLE_BTN_REL: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_REL); break;
-        case LV_KB_STYLE_BTN_PR: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_PR); break;
-        case LV_KB_STYLE_BTN_TGL_REL: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_REL); break;
-        case LV_KB_STYLE_BTN_TGL_PR: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_TGL_PR); break;
-        case LV_KB_STYLE_BTN_INA: style = lv_btnm_get_style(kb, LV_BTNM_STYLE_BTN_INA); break;
-        default: style = NULL; break;
-    }
-
-    return style;
 }
 
 /*=====================
@@ -512,10 +456,37 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
 }
 
 /**
+ * Get the style descriptor of a part of the object
+ * @param kb pointer the object
+ * @param part the part from `lv_kb_part_t`. (LV_KB_PART_...)
+ * @return pointer to the style descriptor of the specified part
+ */
+static lv_style_dsc_t * lv_kb_get_style(lv_obj_t * kb, uint8_t part)
+{
+    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
+
+    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
+    lv_style_dsc_t * style_dsc_p;
+
+    switch(part) {
+    case LV_KB_PART_BG:
+        style_dsc_p = &kb->style_dsc;
+        break;
+    case LV_KB_PART_BTN:
+        style_dsc_p = &ext->btnm.style_btn;
+        break;
+    default:
+        style_dsc_p = NULL;
+    }
+
+    return style_dsc_p;
+}
+
+/**
  * Update the key map for the current mode
  * @param kb pointer to a keyboard object
  */
-static void lv_kb_updatemap(lv_obj_t * kb)
+static void lv_kb_update_map(lv_obj_t * kb)
 {
 	lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
 	lv_btnm_set_map(kb, kb_map[ext->mode]);

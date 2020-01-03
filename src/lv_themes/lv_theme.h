@@ -92,6 +92,10 @@ typedef enum {
 
     LV_THEME_GAUGE,
     LV_THEME_GAUGE_STRONG,
+
+    LV_THEME_TA,
+    LV_THEME_TA_CURSOR,
+    LV_THEME_TA_SCRLBAR,
 }lv_theme_style_t;
 
 typedef struct {

@@ -743,7 +743,7 @@ static lv_style_dsc_t * lv_tabview_get_style(lv_obj_t * tabview, uint8_t part)
         style_dsc_p = lv_obj_get_style(ext->content, LV_PAGE_PART_SCRL);
         break;
     case LV_TABVIEW_PART_BTNS_BG:
-        style_dsc_p = lv_obj_get_style(ext->btns, LV_BTNM_PART_MAIN);
+        style_dsc_p = lv_obj_get_style(ext->btns, LV_BTNM_PART_BG);
         break;
     case LV_TABVIEW_PART_BTNS:
         style_dsc_p = lv_obj_get_style(ext->btns, LV_BTNM_PART_BTN);

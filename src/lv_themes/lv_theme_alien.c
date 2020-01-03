@@ -57,6 +57,10 @@ static lv_style_t gauge_strong;
 static lv_style_t ddlist_bg, ddlist_sel;
 #endif
 
+#if LV_USE_TA
+static lv_style_t ta_cursor;
+#endif
+
 /**********************
  *      MACROS
  **********************/
@@ -101,6 +105,7 @@ static void basic_init(void)
     lv_style_set_color(&btn, LV_STYLE_BG_COLOR, LV_COLOR_RED);
     lv_style_set_color(&btn, LV_STYLE_BG_GRAD_COLOR, LV_COLOR_MAROON);
     lv_style_set_color(&btn, LV_STYLE_BORDER_COLOR, LV_COLOR_NAVY);
+    lv_style_set_color(&btn, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_AQUA);
     lv_style_set_color(&btn, LV_STYLE_BG_GRAD_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_LIME);
     lv_style_set_color(&btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_BLUE);
     lv_style_set_color(&btn, LV_STYLE_TEXT_COLOR, LV_COLOR_WHITE);
@@ -109,7 +114,6 @@ static void basic_init(void)
 //    lv_style_set_opa(&btn, LV_STYLE_TEXT_OPA, LV_OPA_50);
 //    lv_style_set_value(&btn, LV_STYLE_SHADOW_WIDTH, 5);
 //    lv_style_set_value(&btn, LV_STYLE_SHADOW_OFFSET_Y, 10);
-    lv_style_set_color(&btn, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_AQUA);
     lv_style_set_value(&btn, LV_STYLE_BORDER_WIDTH | LV_STYLE_STATE_FOCUS, 6);
     lv_style_set_ptr(&btn, LV_STYLE_PATTERN_IMAGE | LV_STYLE_STATE_CHECKED, LV_SYMBOL_OK);
     lv_style_set_value(&btn, LV_STYLE_PATTERN_REPEATE | LV_STYLE_STATE_CHECKED, 1);
@@ -442,12 +446,6 @@ static void btnm_init(void)
 static void kb_init(void)
 {
 #if LV_USE_KB
-    theme.style.kb.bg          = &btnm_bg;
-    theme.style.kb.btn.rel     = &btnm_rel;
-    theme.style.kb.btn.pr      = &btnm_pr;
-    theme.style.kb.btn.tgl_rel = &btnm_trel;
-    theme.style.kb.btn.tgl_pr  = &btnm_pr;
-    theme.style.kb.btn.ina     = &btnm_ina;
 #endif
 }
 
@@ -477,10 +475,11 @@ static void page_init(void)
 static void ta_init(void)
 {
 #if LV_USE_TA
-    theme.style.ta.area    = &panel;
-    theme.style.ta.oneline = &panel;
-    theme.style.ta.cursor  = NULL;
-    theme.style.ta.sb      = &sb;
+    lv_style_init(&ta_cursor);
+    lv_style_set_color(&ta_cursor, LV_STYLE_LINE_COLOR, LV_COLOR_LIME);
+    lv_style_set_color(&ta_cursor, LV_STYLE_BG_COLOR, LV_COLOR_RED);
+    lv_style_set_value(&ta_cursor, LV_STYLE_LINE_WIDTH, 3);
+//    lv_style_set_color(&ta_cursor, LV_STYLE_LINE_COLOR, LV_COLOR_RED);
 #endif
 }
 
@@ -716,6 +715,8 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
         return &gauge;
     case LV_THEME_GAUGE_STRONG:
         return &gauge_strong;
+    case LV_THEME_TA_CURSOR:
+        return &ta_cursor;
     }
 
     return NULL;
