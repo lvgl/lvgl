@@ -951,7 +951,7 @@ static void lv_chart_draw_points(lv_obj_t * chart, const lv_area_t * mask)
             y_tmp = (int32_t)((int32_t)ser->points[p_act] - ext->ymin) * h;
             y_tmp = y_tmp / (ext->ymax - ext->ymin);
 
-            cir_a.y1 = h - y_tmp + y_ofs;
+            cir_a.y1 = h - y_tmp + y_ofs - 1;
             cir_a.y2 = cir_a.y1 + style_point.body.radius;
             cir_a.y1 -= style_point.body.radius;
 
