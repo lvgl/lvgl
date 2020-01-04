@@ -940,6 +940,22 @@ lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj);
  * Other get
  *-----------------*/
 
+/**
+ * Check if a given screen-space point is on an object's coordinates.
+ * 
+ * This method is intended to be used mainly by advanced hit testing algorithms to check
+ * whether the point is even within the object (as an optimization).
+ * @param obj object to check
+ * @param point screen-space point
+ */
+bool lv_obj_is_point_on_coords(lv_obj_t * obj, const lv_point_t * point);
+
+/**
+ * Hit-test an object given a particular point in screen space.
+ * @param obj object to hit-test
+ * @param point screen-space point
+ * @return true if the object is considered under the point
+ */
 bool lv_obj_hittest(lv_obj_t * obj, lv_point_t * point);
 
 /**

@@ -900,9 +900,14 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
 
 static bool lv_cpicker_hit(lv_obj_t * cpicker, const lv_point_t * p)
 {
+    bool is_point_on_coords = lv_obj_is_point_on_coords(cpicker, p);
+    if(!is_point_on_coords)
+        return false;
+    
     lv_cpicker_ext_t * ext = (lv_cpicker_ext_t *)lv_obj_get_ext_attr(cpicker);
     if(ext->type != LV_CPICKER_TYPE_DISC || ext->preview)
         return true;
+    
     const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
     lv_area_t area_mid;
     lv_area_copy(&area_mid, &cpicker->coords);
