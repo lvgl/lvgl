@@ -2419,7 +2419,7 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
  * @param obj object to check
  * @param point screen-space point
  */
-bool lv_obj_is_point_on_coords(lv_obj_t * obj, lv_point_t * point) {
+bool lv_obj_is_point_on_coords(lv_obj_t * obj, const lv_point_t * point) {
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     lv_area_t ext_area;
     ext_area.x1 = obj->coords.x1 - obj->ext_click_pad_hor;

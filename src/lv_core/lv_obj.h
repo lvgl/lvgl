@@ -948,7 +948,7 @@ lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj);
  * @param obj object to check
  * @param point screen-space point
  */
-bool lv_obj_is_point_on_coords(lv_obj_t * obj, lv_point_t * point);
+bool lv_obj_is_point_on_coords(lv_obj_t * obj, const lv_point_t * point);
 
 /**
  * Hit-test an object given a particular point in screen space.
