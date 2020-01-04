@@ -2412,12 +2412,14 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
  *------------------*/
 
 /**
- * Hit-test an object given a particular point in screen space.
- * @param obj object to hit-test
+ * Check if a given screen-space point is on an object's coordinates.
+ * 
+ * This method is intended to be used mainly by advanced hit testing algorithms to check
+ * whether the point is even within the object (as an optimization).
+ * @param obj object to check
  * @param point screen-space point
- * @return true if the object is considered under the point
  */
-bool lv_obj_hittest(lv_obj_t * obj, lv_point_t * point) {
+bool lv_obj_is_point_on_coords(lv_obj_t * obj, lv_point_t * point) {
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     lv_area_t ext_area;
     ext_area.x1 = obj->coords.x1 - obj->ext_click_pad_hor;
@@ -2439,15 +2441,24 @@ bool lv_obj_hittest(lv_obj_t * obj, lv_point_t * point) {
 #endif
         return false;
     }
+    return true;
+}
+
+/**
+ * Hit-test an object given a particular point in screen space.
+ * @param obj object to hit-test
+ * @param point screen-space point
+ * @return true if the object is considered under the point
+ */
+bool lv_obj_hittest(lv_obj_t * obj, lv_point_t * point) {
     if(obj->adv_hittest) {
         lv_hit_test_info_t hit_info;
         hit_info.point = point;
         hit_info.result = true;
         obj->signal_cb(obj, LV_SIGNAL_HIT_TEST, &hit_info);
-        if(!hit_info.result)
-            return false;
-    }
-    return true;
+        return hit_info.result;
+    } else
+        return lv_obj_is_point_on_coords(obj, point);
 }
 
 /**
