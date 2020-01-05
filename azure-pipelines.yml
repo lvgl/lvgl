@@ -4,7 +4,7 @@
 # https://aka.ms/yaml
 
 trigger:
-- master
+- dev-7.0
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -14,9 +14,6 @@ steps:
     displayName: 'Run a one-line script'
 
   - script: |
-      echo Start build
-      echo root content:
-      ls 
       cd tests
       echo tests content:
       python build.py
