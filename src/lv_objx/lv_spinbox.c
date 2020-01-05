@@ -344,7 +344,6 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
 
-    lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     } else if(sign == LV_SIGNAL_GET_TYPE) {
@@ -357,6 +356,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
     } else if(sign == LV_SIGNAL_RELEASED) {
         /*If released with an ENCODER then move to the next digit*/
 #if LV_USE_GROUP
+        lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
             if(lv_group_get_editing(lv_obj_get_group(spinbox))) {
@@ -409,11 +409,15 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
     char buf[LV_SPINBOX_MAX_DIGIT_COUNT + 8];
     memset(buf, 0, sizeof(buf));
     char * buf_p = buf;
+    uint8_t cur_shift_left = 0;
 
     if (ext->range_min < 0) { // hide sign if there are only positive values
         /*Add the sign*/
         (*buf_p) = ext->value >= 0 ? '+' : '-';
         buf_p++;
+    } else {
+    	/*Cursor need shift to left*/
+    	cur_shift_left++;
     }
 
     int32_t i;
@@ -471,7 +475,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
 
     if(cur_pos > intDigits) cur_pos++; /*Skip teh decimal point*/
 
-    cur_pos += ext->digit_padding_left;
+    cur_pos += (ext->digit_padding_left - cur_shift_left);
 
     lv_ta_set_cursor_pos(spinbox, cur_pos);
 }

@@ -13,11 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+#include "../lv_conf_internal.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -267,6 +263,14 @@ uint16_t lv_anim_count_running(void);
  * @return the required time [ms] for the animation with the given parameters
  */
 uint16_t lv_anim_speed_to_time(uint16_t speed, lv_anim_value_t start, lv_anim_value_t end);
+
+/**
+ * Manually refresh the state of the animations.
+ * Useful to make the animations running in a blocking process where
+ * `lv_task_handler` can't run for a while.
+ * Shouldn't be used directly because it is called in `lv_refr_now()`.
+ */
+void lv_anim_refr_now(void);
 
 /**
  * Calculate the current value of an animation applying linear characteristic

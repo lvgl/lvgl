@@ -57,6 +57,7 @@
  **********************/
 static lv_design_res_t lv_cpicker_design(lv_obj_t * cpicker, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * param);
+static bool lv_cpicker_hit(lv_obj_t * cpicker, const lv_point_t * p);
 
 static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale);
 static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask, lv_opa_t opa_scale);
@@ -889,9 +890,36 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
             res = lv_event_send(cpicker, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
+    } else if(sign == LV_SIGNAL_HIT_TEST) {
+        lv_hit_test_info_t *info = param;
+        info->result = lv_cpicker_hit(cpicker, info->point);
     }
 
     return res;
+}
+
+static bool lv_cpicker_hit(lv_obj_t * cpicker, const lv_point_t * p)
+{
+    bool is_point_on_coords = lv_obj_is_point_on_coords(cpicker, p);
+    if(!is_point_on_coords)
+        return false;
+    
+    lv_cpicker_ext_t * ext = (lv_cpicker_ext_t *)lv_obj_get_ext_attr(cpicker);
+    if(ext->type != LV_CPICKER_TYPE_DISC || ext->preview)
+        return true;
+    
+    const lv_style_t * style_main = lv_cpicker_get_style(cpicker, LV_CPICKER_STYLE_MAIN);
+    lv_area_t area_mid;
+    lv_area_copy(&area_mid, &cpicker->coords);
+    area_mid.x1 += style_main->line.width;
+    area_mid.y1 += style_main->line.width;
+    area_mid.x2 -= style_main->line.width;
+    area_mid.y2 -= style_main->line.width;
+    
+    if(lv_area_is_point_on(&area_mid, p, LV_RADIUS_CIRCLE))
+        return false;
+    
+    return true;
 }
 
 static void next_color_mode(lv_obj_t * cpicker)

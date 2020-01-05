@@ -674,7 +674,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
     pos->y = y;
 
 #if LV_USE_BIDI
-    if(mutable_bidi_txt) lv_mem_free(mutable_bidi_txt);
+    if(mutable_bidi_txt) lv_mem_buf_release(mutable_bidi_txt);
 #endif
 }
 
@@ -978,8 +978,8 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt)
     lv_mem_buf_release(bidi_buf);
 #else
     lv_txt_ins(ext->text, pos, txt);
-    lv_label_refr_text(label);
 #endif
+    lv_label_refr_text(label);
 }
 
 /**

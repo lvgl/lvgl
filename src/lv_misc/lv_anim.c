@@ -178,6 +178,17 @@ uint16_t lv_anim_speed_to_time(uint16_t speed, lv_anim_value_t start, lv_anim_va
 }
 
 /**
+ * Manually refresh the state of the animations.
+ * Useful to make the animations running in a blocking process where
+ * `lv_task_handler` can't run for a while.
+ * Shouldn't be used directly because it is called in `lv_refr_now()`.
+ */
+void lv_anim_refr_now(void)
+{
+	anim_task(NULL);
+}
+
+/**
  * Calculate the current value of an animation applying linear characteristic
  * @param a pointer to an animation
  * @return the current value to set

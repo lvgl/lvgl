@@ -22,6 +22,7 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_gc.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_log.h"
 #include "../lv_hal/lv_hal.h"
 #include <stdint.h>
 #include <string.h>
@@ -123,6 +124,20 @@ void lv_init(void)
     LV_LOG_INFO("lv_init ready");
 }
 
+#if LV_ENABLE_GC || !LV_MEM_CUSTOM
+void lv_deinit(void)
+{
+    lv_gc_clear_roots();
+    lv_disp_set_default(NULL);
+    lv_mem_deinit();
+    lv_initialized = false;
+#if LV_USE_LOG
+    lv_log_register_print_cb(NULL);
+#endif
+    LV_LOG_INFO("lv_deinit done");
+}
+#endif
+
 /*--------------------
  * Create and delete
  *-------------------*/
@@ -201,6 +216,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->group_p = NULL;
 #endif
         /*Set attributes*/
+        new_obj->adv_hittest  = 0;
         new_obj->click        = 0;
         new_obj->drag         = 0;
         new_obj->drag_throw   = 0;
@@ -1276,6 +1292,17 @@ void lv_obj_set_hidden(lv_obj_t * obj, bool en)
 }
 
 /**
+ * Set whether advanced hit-testing is enabled on an object
+ * @param obj pointer to an object
+ * @param en true: advanced hit-testing is enabled
+ */
+void lv_obj_set_adv_hittest(lv_obj_t * obj, bool en) {
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    obj->adv_hittest = en == false ? 0 : 1;
+}
+
+/**
  * Enable or disable the clicking of an object
  * @param obj pointer to an object
  * @param en true: make the object clickable
@@ -1477,6 +1504,10 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
  */
 lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t event, const void * data)
 {
+    if(obj != NULL) {
+        LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    }
+
     /* Build a simple linked list from the objects used in the events
      * It's important to know if an this object was deleted by a nested event
      * called from this `even_cb`. */
@@ -2054,6 +2085,18 @@ bool lv_obj_get_hidden(const lv_obj_t * obj)
 }
 
 /**
+ * Get whether advanced hit-testing is enabled on an object
+ * @param obj pointer to an object
+ * @return true: advanced hit-testing is enabled
+ */
+bool lv_obj_get_adv_hittest(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    return obj->adv_hittest == 0 ? false : true;
+}
+
+/**
  * Get the click enable attribute of an object
  * @param obj pointer to an object
  * @return true: the object is clickable
@@ -2367,6 +2410,56 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
 /*-------------------
  * OTHER FUNCTIONS
  *------------------*/
+
+/**
+ * Check if a given screen-space point is on an object's coordinates.
+ * 
+ * This method is intended to be used mainly by advanced hit testing algorithms to check
+ * whether the point is even within the object (as an optimization).
+ * @param obj object to check
+ * @param point screen-space point
+ */
+bool lv_obj_is_point_on_coords(lv_obj_t * obj, const lv_point_t * point) {
+#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+    lv_area_t ext_area;
+    ext_area.x1 = obj->coords.x1 - obj->ext_click_pad_hor;
+    ext_area.x2 = obj->coords.x2 + obj->ext_click_pad_hor;
+    ext_area.y1 = obj->coords.y1 - obj->ext_click_pad_ver;
+    ext_area.y2 = obj->coords.y2 + obj->ext_click_pad_ver;
+
+    if(!lv_area_is_point_on(&ext_area, point, 0)) {
+#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+    lv_area_t ext_area;
+    ext_area.x1 = obj->coords.x1 - obj->ext_click_pad.x1;
+    ext_area.x2 = obj->coords.x2 + obj->ext_click_pad.x2;
+    ext_area.y1 = obj->coords.y1 - obj->ext_click_pad.y1;
+    ext_area.y2 = obj->coords.y2 + obj->ext_click_pad.y2;
+
+    if(!lv_area_is_point_on(&ext_area, point, 0)) {
+#else
+    if(!lv_area_is_point_on(&obj->coords, point, 0)) {
+#endif
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Hit-test an object given a particular point in screen space.
+ * @param obj object to hit-test
+ * @param point screen-space point
+ * @return true if the object is considered under the point
+ */
+bool lv_obj_hittest(lv_obj_t * obj, lv_point_t * point) {
+    if(obj->adv_hittest) {
+        lv_hit_test_info_t hit_info;
+        hit_info.point = point;
+        hit_info.result = true;
+        obj->signal_cb(obj, LV_SIGNAL_HIT_TEST, &hit_info);
+        return hit_info.result;
+    } else
+        return lv_obj_is_point_on_coords(obj, point);
+}
 
 /**
  * Used in the signal callback to handle `LV_SIGNAL_GET_TYPE` signal

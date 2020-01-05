@@ -13,11 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+#include "../lv_conf_internal.h"
 
 #if LV_USE_DDLIST != 0
 
@@ -175,6 +171,13 @@ const char * lv_ddlist_get_options(const lv_obj_t * ddlist);
  * @return id of the selected option (0 ... number of option - 1);
  */
 uint16_t lv_ddlist_get_selected(const lv_obj_t * ddlist);
+
+/**
+ * Get the total number of options
+ * @param ddlist pointer to drop down list object
+ * @return the total number of options in the list
+ */
+uint16_t lv_ddlist_get_option_cnt(const lv_obj_t * ddlist);
 
 /**
  * Get the current selected option as a string

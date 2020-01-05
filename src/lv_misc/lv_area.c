@@ -6,11 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+#include "../lv_conf_internal.h"
 
 #include "lv_area.h"
 #include "lv_math.h"
@@ -26,6 +22,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static bool lv_point_within_circle(const lv_area_t * area, const lv_point_t * p);
 
 /**********************
  *  STATIC VARIABLES
@@ -148,15 +146,62 @@ void lv_area_join(lv_area_t * a_res_p, const lv_area_t * a1_p, const lv_area_t *
  * @param p_p pointer to a point
  * @return false:the point is out of the area
  */
-bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p)
+bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coord_t radius)
 {
-    bool is_on = false;
-
+    /*First check the basic area*/
+    bool is_on_rect = false;
     if((p_p->x >= a_p->x1 && p_p->x <= a_p->x2) && ((p_p->y >= a_p->y1 && p_p->y <= a_p->y2))) {
-        is_on = true;
+        is_on_rect = true;
     }
-
-    return is_on;
+    if(!is_on_rect)
+        return false;
+    /*Now handle potential rounded rectangles*/
+    if(radius <= 0) {
+        /*No radius, it is within the rectangle*/
+        return true;
+    }
+    lv_coord_t max_radius = LV_MATH_MIN(lv_area_get_width(a_p) / 2, lv_area_get_height(a_p) / 2);
+    if(radius > max_radius)
+        radius = max_radius;
+    
+    /*Check if it's in one of the corners*/
+    lv_area_t corner_area;
+    /*Top left*/
+    corner_area.x1 = a_p->x1;
+    corner_area.x2 = a_p->x1 + radius;
+    corner_area.y1 = a_p->y1;
+    corner_area.y2 = a_p->y1 + radius;
+    if(lv_area_is_point_on(&corner_area, p_p, 0)) {
+        corner_area.x2 += radius;
+        corner_area.y2 += radius;
+        return lv_point_within_circle(&corner_area, p_p);
+    }
+    /*Bottom left*/
+    corner_area.y1 = a_p->y2 - radius;
+    corner_area.y2 = a_p->y2;
+    if(lv_area_is_point_on(&corner_area, p_p, 0)) {
+        corner_area.x2 += radius;
+        corner_area.y1 -= radius;
+        return lv_point_within_circle(&corner_area, p_p);
+    }
+    /*Bottom right*/
+    corner_area.x1 = a_p->x2 - radius;
+    corner_area.x2 = a_p->x2;
+    if(lv_area_is_point_on(&corner_area, p_p, 0)) {
+        corner_area.x1 -= radius;
+        corner_area.y1 -= radius;
+        return lv_point_within_circle(&corner_area, p_p);
+    }
+    /*Top right*/
+    corner_area.y1 = a_p->y1;
+    corner_area.y2 = a_p->y1 + radius;
+    if(lv_area_is_point_on(&corner_area, p_p, 0)) {
+        corner_area.x1 -= radius;
+        corner_area.y2 += radius;
+        return lv_point_within_circle(&corner_area, p_p);
+    }
+    /*Not within corners*/
+    return false;
 }
 
 /**
@@ -208,3 +253,24 @@ void lv_area_increment(lv_area_t * a_p, const lv_coord_t amount)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static bool lv_point_within_circle(const lv_area_t * area, const lv_point_t * p)
+{
+    lv_coord_t r = (area->x2 - area->x1) / 2;
+
+    /* Circle center */
+    lv_coord_t cx = area->x1 + r;
+    lv_coord_t cy = area->y1 + r;
+    
+    /*Simplify the code by moving everything to (0, 0) */
+    lv_coord_t px = p->x - cx;
+    lv_coord_t py = p->y - cy;
+
+    int32_t r_sqrd = r*r;
+    int32_t dist = (px*px) + (py*py);
+    
+    if(dist <= r_sqrd)
+        return true;
+    else
+        return false;
+}

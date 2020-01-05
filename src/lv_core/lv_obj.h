@@ -13,11 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+#include "../lv_conf_internal.h"
 
 #include <stddef.h>
 #include <stdbool.h>
@@ -27,7 +23,6 @@ extern "C" {
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_ll.h"
 #include "../lv_misc/lv_color.h"
-#include "../lv_misc/lv_log.h"
 #include "../lv_misc/lv_bidi.h"
 #include "../lv_hal/lv_hal.h"
 
@@ -128,6 +123,7 @@ enum {
     LV_SIGNAL_GET_TYPE, /**< LittlevGL needs to retrieve the object's type */
 
     /*Input device related*/
+    LV_SIGNAL_HIT_TEST,          /**< Advanced hit-testing */
     LV_SIGNAL_PRESSED,           /**< The object has been pressed*/
     LV_SIGNAL_PRESSING,          /**< The object is being pressed (called continuously while pressing)*/
     LV_SIGNAL_PRESS_LOST,        /**< User is still pressing but slid cursor/finger off of the object */
@@ -225,7 +221,8 @@ typedef struct _lv_obj_t
     uint8_t parent_event : 1;   /**< 1: Send the object's events to the parent too. */
     lv_drag_dir_t drag_dir : 3; /**<  Which directions the object can be dragged in */
     lv_bidi_dir_t base_dir : 2; /**< Base direction of texts related to this object */
-    uint8_t reserved : 3;       /**<  Reserved for future use*/
+    uint8_t adv_hittest : 1;    /**< 1: Use advanced hit-testing (slower) */
+    uint8_t reserved : 2;       /**<  Reserved for future use*/
     uint8_t protect;            /**< Automatically happening actions can be prevented. 'OR'ed values from
                                    `lv_protect_t`*/
     lv_opa_t opa_scale;         /**< Scale down the opacity by this factor. Effects all children as well*/
@@ -263,6 +260,12 @@ typedef struct
                                                ... [x]: "lv_obj" */
 } lv_obj_type_t;
 
+typedef struct _lv_hit_test_info_t
+{
+    lv_point_t *point;
+    bool result;
+} lv_hit_test_info_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -271,6 +274,15 @@ typedef struct
  * Init. the 'lv' library.
  */
 void lv_init(void);
+
+
+/**
+ * Deinit the 'lv' library
+ * Currently only implemented when not using custorm allocators, or GC is enabled.
+ */
+#if LV_ENABLE_GC || !LV_MEM_CUSTOM
+void lv_deinit(void);
+#endif
 
 /*--------------------
  * Create and delete
@@ -465,6 +477,13 @@ void lv_obj_report_style_mod(lv_style_t * style);
  * @param en true: hide the object
  */
 void lv_obj_set_hidden(lv_obj_t * obj, bool en);
+
+/**
+ * Set whether advanced hit-testing is enabled on an object
+ * @param obj pointer to an object
+ * @param en true: advanced hit-testing is enabled
+ */
+void lv_obj_set_adv_hittest(lv_obj_t * obj, bool en);
 
 /**
  * Enable or disable the clicking of an object
@@ -809,6 +828,13 @@ const lv_style_t * lv_obj_get_style(const lv_obj_t * obj);
 bool lv_obj_get_hidden(const lv_obj_t * obj);
 
 /**
+ * Get whether advanced hit-testing is enabled on an object
+ * @param obj pointer to an object
+ * @return true: advanced hit-testing is enabled
+ */
+bool lv_obj_get_adv_hittest(const lv_obj_t * obj);
+
+/**
  * Get the click enable attribute of an object
  * @param obj pointer to an object
  * @return true: the object is clickable
@@ -913,6 +939,24 @@ lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj);
 /*------------------
  * Other get
  *-----------------*/
+
+/**
+ * Check if a given screen-space point is on an object's coordinates.
+ * 
+ * This method is intended to be used mainly by advanced hit testing algorithms to check
+ * whether the point is even within the object (as an optimization).
+ * @param obj object to check
+ * @param point screen-space point
+ */
+bool lv_obj_is_point_on_coords(lv_obj_t * obj, const lv_point_t * point);
+
+/**
+ * Hit-test an object given a particular point in screen space.
+ * @param obj object to hit-test
+ * @param point screen-space point
+ * @return true if the object is considered under the point
+ */
+bool lv_obj_hittest(lv_obj_t * obj, lv_point_t * point);
 
 /**
  * Get the ext pointer

@@ -13,11 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+#include "../lv_conf_internal.h"
 
 #if LV_USE_GAUGE != 0
 
@@ -206,7 +202,7 @@ uint8_t lv_gauge_get_label_count(const lv_obj_t * gauge);
  * @param gauge pointer to a gauge object
  * @return number of the scale units
  */
-static inline uint8_t lv_gauge_get_line_count(const lv_obj_t * gauge)
+static inline uint16_t lv_gauge_get_line_count(const lv_obj_t * gauge)
 {
     return lv_lmeter_get_line_count(gauge);
 }

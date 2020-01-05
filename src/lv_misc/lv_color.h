@@ -13,11 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+#include "../lv_conf_internal.h"
 
 /*Error checking*/
 #if LV_COLOR_DEPTH == 24
@@ -104,9 +100,9 @@ enum {
 # define LV_COLOR_GET_B1(c) (c).ch.blue
 # define LV_COLOR_GET_A1(c) 1
 
-# define LV_COLOR_SET_R8(c, v) (c).ch.red = (uint8_t)((v) & 0x7);
-# define LV_COLOR_SET_G8(c, v) (c).ch.green = (uint8_t)((v) & 0x7);
-# define LV_COLOR_SET_B8(c, v) (c).ch.blue = (uint8_t)((v) & 0x3);
+# define LV_COLOR_SET_R8(c, v) (c).ch.red = (uint8_t)(v) & 0x7U;
+# define LV_COLOR_SET_G8(c, v) (c).ch.green = (uint8_t)(v) & 0x7U;
+# define LV_COLOR_SET_B8(c, v) (c).ch.blue = (uint8_t)(v) & 0x3U;
 # define LV_COLOR_SET_A8(c, v) do {} while(0)
 
 # define LV_COLOR_GET_R8(c) (c).ch.red
@@ -114,10 +110,10 @@ enum {
 # define LV_COLOR_GET_B8(c) (c).ch.blue
 # define LV_COLOR_GET_A8(c) 0xFF
 
-# define LV_COLOR_SET_R16(c, v) (c).ch.red = (uint8_t)(((uint8_t)(v)) & 0x1F);
-# define LV_COLOR_SET_G16(c, v) (c).ch.green = (uint8_t)((v) & 0x3F);
+# define LV_COLOR_SET_R16(c, v) (c).ch.red = (uint8_t)(v) & 0x1FU;
+# define LV_COLOR_SET_G16(c, v) (c).ch.green = (uint8_t)(v) & 0x3FU;
 # define LV_COLOR_SET_G16_SWAP(c, v) {(c).ch.green_h = (uint8_t)(((v) >> 3) & 0x7); (c).ch.green_l = (uint8_t)((v) & 0x7);}
-# define LV_COLOR_SET_B16(c, v) (c).ch.blue = (uint8_t)((v) & 0x1F);
+# define LV_COLOR_SET_B16(c, v) (c).ch.blue = (uint8_t)(v) & 0x1FU;
 # define LV_COLOR_SET_A16(c, v) do {} while(0)
 
 # define LV_COLOR_GET_R16(c) (c).ch.red
@@ -532,14 +528,14 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 
 /* The most simple macro to create a color from R,G and B values */
 #if LV_COLOR_DEPTH == 1
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){.full = (b8 >> 7 | g8 >> 7 | r8 >> 7)})
+#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){.full = ((b8 >> 7) | (g8 >> 7) | (r8 >> 7))})
 #elif LV_COLOR_DEPTH == 8
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{(uint8_t)(b8 >> 6), (uint8_t)(g8 >> 5), (uint8_t)(r8 >> 5)}})
+#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{(b8 >> 6) & 0x3U, (g8 >> 5) & 0x7U, (r8 >> 5) & 0x7U}})
 #elif LV_COLOR_DEPTH == 16
 #if LV_COLOR_16_SWAP == 0
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{(uint16_t)(b8 >> 3), (uint16_t)(g8 >> 2), (uint16_t)(r8 >> 3)}})
+#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{(b8 >> 3) & 0x1FU, (g8 >> 2) & 0x3FU, (r8 >> 3) & 0x1FU}})
 #else
-#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{((uint16_t)(g8 >> 5), (uint16_t)(r8 >> 3), (uint16_t)(b8 >> 3), (uint16_t)((g8 >> 2) & 0x7)}})
+#define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{(g8 >> 5) & 0x7U, (r8 >> 3) & 0x1FU, (b8 >> 3) & 0x1FU, (g8 >> 2) & 0x7U}})
 #endif
 #elif LV_COLOR_DEPTH == 32
 #define LV_COLOR_MAKE(r8, g8, b8) ((lv_color_t){{b8, g8, r8, 0xff}}) /*Fix 0xff alpha*/

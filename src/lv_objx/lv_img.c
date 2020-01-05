@@ -97,6 +97,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
 
     if(copy == NULL) {
         lv_obj_set_click(new_img, false);
+        lv_obj_set_adv_hittest(new_img, true); /*Images have fast hit-testing*/
         /* Enable auto size for non screens
          * because image screens are wallpapers
          * and must be screen sized*/
@@ -502,6 +503,9 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             cover = lv_area_is_in(clip_area, &img->coords) ? LV_DESIGN_RES_COVER : LV_DESIGN_RES_NOT_COVER;
         }
 
+        const lv_style_t * style = lv_img_get_style(img, LV_IMG_STYLE_MAIN);
+        if(style->image.opa < LV_OPA_MAX) return false;
+
         return cover;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
@@ -587,6 +591,26 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
             lv_coord_t d = ds.i / 2;
             img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, d);
         }
+    } else if(sign == LV_SIGNAL_HIT_TEST) {
+        lv_hit_test_info_t *info = param;
+        if(ext->zoom != 256 && ext->angle == 0) {
+            lv_coord_t origin_width = lv_area_get_width(&img->coords);
+            lv_coord_t origin_height = lv_area_get_height(&img->coords);
+            lv_coord_t scaled_width = (origin_width * ext->zoom + 255) / 256;
+            lv_coord_t scaled_height = (origin_height * ext->zoom + 255) / 256;
+
+            lv_coord_t width_offset = (origin_width - scaled_width) / 2;
+            lv_coord_t height_offset = (origin_height - scaled_height) / 2;
+
+            lv_area_t coords;
+            lv_area_copy(&coords, &img->coords);
+            coords.x1 += width_offset;
+            coords.x2 -= width_offset;
+            coords.y1 += height_offset;
+            coords.y2 -= height_offset;
+            info->result = lv_area_is_point_on(&coords, info->point, 0);
+        } else
+            info->result = lv_obj_is_point_on_coords(img, info->point);
     }
 
     return res;

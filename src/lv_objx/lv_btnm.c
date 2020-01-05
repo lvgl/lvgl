@@ -864,9 +864,10 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
 
         /*If not focused by an input device assume the last input device*/
-       if(indev_type == LV_INDEV_TYPE_NONE) {
-           indev_type = lv_indev_get_type(lv_indev_get_next(NULL));
-       }
+        if(indev == NULL) {
+            indev = lv_indev_get_next(NULL);
+            indev_type = lv_indev_get_type(indev);
+        }
 
         if(indev_type == LV_INDEV_TYPE_POINTER) {
             /*Select the clicked button*/
@@ -1056,7 +1057,7 @@ static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p)
         btn_area.y1 += btnm_cords.y1;
         btn_area.x2 += btnm_cords.x1;
         btn_area.y2 += btnm_cords.y1;
-        if(lv_area_is_point_on(&btn_area, p) != false) {
+        if(lv_area_is_point_on(&btn_area, p, 0) != false) {
             break;
         }
     }

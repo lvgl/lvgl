@@ -16,6 +16,10 @@
 #include LV_MEM_CUSTOM_INCLUDE
 #endif
 
+#if defined(LV_GC_INCLUDE)
+#include LV_GC_INCLUDE
+#endif /* LV_ENABLE_GC */
+
 /*********************
  *      DEFINES
  *********************/
@@ -24,7 +28,7 @@
 #define LV_MEM_ADD_JUNK 0
 #endif
 
-#ifdef LV_MEM_ENV64
+#ifdef LV_ARCH_64
 #define MEM_UNIT uint64_t
 #else
 #define MEM_UNIT uint32_t
@@ -104,6 +108,21 @@ void lv_mem_init(void)
 }
 
 /**
+ * Clean up the memory buffer which frees all the allocated memories.
+ * @note It work only if `LV_MEM_CUSTOM == 0`
+ */
+void lv_mem_deinit(void)
+{
+#if LV_MEM_CUSTOM == 0
+    memset(work_mem, 0x00, (LV_MEM_SIZE / sizeof(MEM_UNIT)) * sizeof(MEM_UNIT));
+    lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
+    full->header.s.used = 0;
+    /*The total mem size id reduced by the first header and the close patterns */
+    full->header.s.d_size = LV_MEM_SIZE - sizeof(lv_mem_header_t);
+#endif
+}
+
+/**
  * Allocate a memory dynamically
  * @param size size of the memory to allocate in bytes
  * @return pointer to the allocated memory
@@ -114,7 +133,7 @@ void * lv_mem_alloc(size_t size)
         return &zero_mem;
     }
 
-#ifdef LV_MEM_ENV64
+#ifdef LV_ARCH_64
     /*Round the size up to 8*/
     if(size & 0x7) {
         size = size & (~0x7);
@@ -388,23 +407,23 @@ void * lv_mem_buf_get(uint32_t size)
     /*Try to find a free buffer with suitable size */
     uint8_t i;
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
-        if(_lv_mem_buf[i].used == 0 && _lv_mem_buf[i].size >= size) {
-            _lv_mem_buf[i].used = 1;
-            return  _lv_mem_buf[i].p;
+        if(LV_GC_ROOT(_lv_mem_buf[i]).used == 0 && LV_GC_ROOT(_lv_mem_buf[i]).size >= size) {
+            LV_GC_ROOT(_lv_mem_buf[i]).used = 1;
+            return LV_GC_ROOT(_lv_mem_buf[i]).p;
         }
     }
 
     /*Reallocate a free buffer*/
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
-        if(_lv_mem_buf[i].used == 0) {
-            _lv_mem_buf[i].used = 1;
-            _lv_mem_buf[i].size = size;
+        if(LV_GC_ROOT(_lv_mem_buf[i]).used == 0) {
+            LV_GC_ROOT(_lv_mem_buf[i]).used = 1;
+            LV_GC_ROOT(_lv_mem_buf[i]).size = size;
             /*if this fails you probably need to increase your LV_MEM_SIZE/heap size*/
-            _lv_mem_buf[i].p = lv_mem_realloc(_lv_mem_buf[i].p, size);
-            if(_lv_mem_buf[i].p == NULL) {
+            LV_GC_ROOT(_lv_mem_buf[i]).p = lv_mem_realloc(LV_GC_ROOT(_lv_mem_buf[i]).p, size);
+            if(LV_GC_ROOT(_lv_mem_buf[i]).p == NULL) {
                 LV_LOG_ERROR("lv_mem_buf_get: Out of memory, can't allocate a new  buffer (increase your LV_MEM_SIZE/heap size)")
             }
-            return  _lv_mem_buf[i].p;
+            return  LV_GC_ROOT(_lv_mem_buf[i]).p;
         }
     }
 
@@ -421,8 +440,8 @@ void lv_mem_buf_release(void * p)
 {
     uint8_t i;
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
-        if(_lv_mem_buf[i].p == p) {
-            _lv_mem_buf[i].used = 0;
+        if(LV_GC_ROOT(_lv_mem_buf[i]).p == p) {
+            LV_GC_ROOT(_lv_mem_buf[i]).used = 0;
             return;
         }
     }
@@ -437,11 +456,11 @@ void lv_mem_buf_free_all(void)
 {
     uint8_t i;
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
-        if(_lv_mem_buf[i].p) {
-            lv_mem_free(_lv_mem_buf[i].p);
-            _lv_mem_buf[i].p = NULL;
-            _lv_mem_buf[i].used = 0;
-            _lv_mem_buf[i].size = 0;
+        if(LV_GC_ROOT(_lv_mem_buf[i]).p) {
+            lv_mem_free(LV_GC_ROOT(_lv_mem_buf[i]).p);
+            LV_GC_ROOT(_lv_mem_buf[i]).p = NULL;
+            LV_GC_ROOT(_lv_mem_buf[i]).used = 0;
+            LV_GC_ROOT(_lv_mem_buf[i]).size = 0;
         }
     }
 }
@@ -503,7 +522,7 @@ static void * ent_alloc(lv_mem_ent_t * e, size_t size)
  */
 static void ent_trunc(lv_mem_ent_t * e, size_t size)
 {
-#ifdef LV_MEM_ENV64
+#ifdef LV_ARCH_64
     /*Round the size up to 8*/
     if(size & 0x7) {
         size = size & (~0x7);
@@ -527,11 +546,11 @@ static void ent_trunc(lv_mem_ent_t * e, size_t size)
         uint8_t * e_data             = &e->first_data;
         lv_mem_ent_t * after_new_e   = (lv_mem_ent_t *)&e_data[size];
         after_new_e->header.s.used   = 0;
-        after_new_e->header.s.d_size = e->header.s.d_size - size - sizeof(lv_mem_header_t);
+        after_new_e->header.s.d_size = (uint32_t)e->header.s.d_size - size - sizeof(lv_mem_header_t);
     }
 
     /* Set the new size for the original entry */
-    e->header.s.d_size = size;
+    e->header.s.d_size = (uint32_t)size;
 }
 
 #endif

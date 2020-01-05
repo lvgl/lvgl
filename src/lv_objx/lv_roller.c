@@ -153,8 +153,9 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
 
         /* Make sure the roller's height and the scrollable's height is refreshed.
          * They are refreshed in `LV_SIGNAL_COORD_CHG` but if the new options has the same width
-         * that signal won't be called. (It called because LV_FIT_TIGHT hor fit)*/
+         * that signal won't be called. (It's called because of LV_FIT_TIGHT hor fit)*/
         refr_height(roller);
+        refr_position(roller, LV_ANIM_OFF);
     } else {
         ext->mode = LV_ROLLER_MODE_INIFINITE;
 
@@ -273,6 +274,24 @@ uint16_t lv_roller_get_selected(const lv_obj_t * roller)
         return lv_ddlist_get_selected(roller) % real_id_cnt;
     } else {
         return lv_ddlist_get_selected(roller);
+    }
+}
+
+/**
+ * Get the total number of options
+ * @param roller pointer to a roller object
+ * @return the total number of options
+ */
+uint16_t lv_roller_get_option_cnt(const lv_obj_t * roller)
+{
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+
+    lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    if(ext->mode == LV_ROLLER_MODE_INIFINITE) {
+        uint16_t real_id_cnt = ext->ddlist.option_cnt / LV_ROLLER_INF_PAGES;
+        return real_id_cnt;
+    } else {
+        return ext->ddlist.option_cnt;
     }
 }
 
