@@ -40,6 +40,7 @@ static uint32_t lv_task_time_remaining(lv_task_t * task);
 static bool lv_task_run  = false;
 static uint8_t idle_last = 0;
 static bool task_deleted;
+static bool task_list_changed;
 static bool task_created;
 
 /**********************
@@ -57,6 +58,7 @@ void lv_task_core_init(void)
 {
     lv_ll_init(&LV_GC_ROOT(_lv_task_ll), sizeof(lv_task_t));
 
+    task_list_changed = false;
     /*Initially enable the lv_task handling*/
     lv_task_enable(true);
 }
@@ -152,6 +154,13 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
                 break;
             }
 
+            if(task_list_changed) {
+                task_interrupter = NULL;
+                end_flag = false;
+                task_list_changed = false;
+                break;
+            }
+
             LV_GC_ROOT(_lv_task_act) = next; /*Load the next task*/
         }
     } while(!end_flag);
@@ -165,17 +174,19 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
         busy_time         = 0;
         idle_period_start = lv_tick_get();
     }
-	time_till_next = LV_NO_TASK_READY;
-	next = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
-	while(next) {
-		if(next->prio != LV_TASK_PRIO_OFF) {
-			uint32_t delay = lv_task_time_remaining(next);
-			if(delay < time_till_next)
-				time_till_next = delay;
-		}
-		
-		next = lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), next); /*Find the next task*/
-	}
+	
+    time_till_next = LV_NO_TASK_READY;
+    next = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
+    while(next) {
+        if(next->prio != LV_TASK_PRIO_OFF) {
+            uint32_t delay = lv_task_time_remaining(next);
+            if(delay < time_till_next)
+                time_till_next = delay;
+        }
+        
+        next = lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), next); /*Find the next task*/
+    }
+	
     already_running = false; /*Release the mutex*/
 
     LV_LOG_TRACE("lv_task_handler ready");
@@ -219,6 +230,7 @@ lv_task_t * lv_task_create_basic(void)
             if(new_task == NULL) return NULL;
         }
     }
+    task_list_changed = true;
 
     new_task->period  = DEF_PERIOD;
     new_task->task_cb = NULL;
@@ -275,6 +287,7 @@ void lv_task_set_cb(lv_task_t * task, lv_task_cb_t task_cb)
 void lv_task_del(lv_task_t * task)
 {
     lv_ll_remove(&LV_GC_ROOT(_lv_task_ll), task);
+    task_list_changed = true;
 
     lv_mem_free(task);
 
@@ -304,6 +317,7 @@ void lv_task_set_prio(lv_task_t * task, lv_task_prio_t prio)
     if(i == NULL) {
         lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), task, NULL);
     }
+    task_list_changed = true;
 
     task->prio = prio;
 }
