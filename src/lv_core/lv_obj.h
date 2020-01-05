@@ -46,6 +46,10 @@ extern "C" {
 #define LV_EXT_CLICK_AREA_TINY  1
 #define LV_EXT_CLICK_AREA_FULL  2
 
+#define _LV_OBJ_PART_MAIN_VALUE    0x00
+#define _LV_OBJ_PART_VIRTUAL_START 0x01
+#define _LV_OBJ_PART_REAL_START    0x40
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -280,11 +284,17 @@ typedef struct
                                                ... [x]: "lv_obj" */
 } lv_obj_type_t;
 
-typedef struct _lv_hit_test_info_t
+typedef struct
 {
     lv_point_t *point;
     bool result;
 } lv_hit_test_info_t;
+
+typedef struct
+{
+    uint8_t part;
+    lv_obj_state_t result;
+} lv_get_state_info_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -966,7 +976,7 @@ uint8_t lv_obj_get_protect(const lv_obj_t * obj);
  */
 bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
 
-lv_obj_state_t lv_obj_get_state(const lv_obj_t * obj);
+lv_obj_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part);
 
 /**
  * Get the signal function of an object

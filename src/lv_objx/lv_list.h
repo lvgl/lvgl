@@ -63,10 +63,11 @@ typedef struct
 
 /** List styles. */
 enum {
-    LV_LIST_PART_BG, /**< List background style */
-    LV_LIST_PART_SCRL, /**< List scrollable area style. */
-    LV_LIST_PART_SCRLBAR, /**< List scrollbar style. */
+    LV_LIST_PART_BG = _LV_OBJ_PART_MAIN_VALUE, /**< List background style */
+    LV_LIST_PART_SCRLBAR = _LV_OBJ_PART_VIRTUAL_START, /**< List scrollbar style. */
     LV_LIST_PART_EDGE_FLASH, /**< List edge flash style. */
+
+    LV_LIST_PART_SCRL = _LV_OBJ_PART_REAL_START, /**< List scrollable area style. */
 };
 typedef uint8_t lv_list_style_t;
 

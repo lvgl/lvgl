@@ -929,7 +929,7 @@ static lv_style_dsc_t * lv_list_get_style(lv_obj_t * list, uint8_t part)
         style_dsc_p = &ext->page.sb.style;
         break;
 #if LV_USE_ANIMATION
-    case LV_PAGE_PART_EDGE_FLASH:
+    case LV_LIST_PART_EDGE_FLASH:
         style_dsc_p = &ext->page.edge_flash.style;
         break;
 #endif

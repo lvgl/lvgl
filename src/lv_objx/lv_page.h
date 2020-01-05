@@ -87,10 +87,11 @@ typedef struct
 } lv_page_ext_t;
 
 enum {
-    LV_PAGE_PART_BG,
-    LV_PAGE_PART_SCRL,
-    LV_PAGE_PART_SCRLBAR,
+    LV_PAGE_PART_BG = _LV_OBJ_PART_MAIN_VALUE,
+    LV_PAGE_PART_SCRLBAR = _LV_OBJ_PART_VIRTUAL_START,
     LV_PAGE_PART_EDGE_FLASH,
+
+    LV_PAGE_PART_SCRL = _LV_OBJ_PART_REAL_START,
 };
 typedef uint8_t lv_part_style_t;
 

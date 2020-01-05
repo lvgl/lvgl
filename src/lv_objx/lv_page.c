@@ -758,9 +758,14 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
 {
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
+        uint8_t ** part_p = param;
         lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_page_get_style(page, **type_p);
+        *style_dsc_p = lv_page_get_style(page, **part_p);
+        return LV_RES_OK;
+    } else if(sign == LV_SIGNAL_GET_STATE) {
+        lv_get_state_info_t * info = param;
+        if(info->part == LV_PAGE_PART_SCRL) info->result = lv_obj_get_state(lv_page_get_scrl(page), LV_CONT_PART_MAIN);
+        else info->result = lv_obj_get_state(page, info->part);
         return LV_RES_OK;
     }
 

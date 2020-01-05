@@ -2138,7 +2138,7 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t part, lv_s
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
-    int16_t weight_goal = lv_obj_get_state(obj);
+    int16_t weight_goal = lv_obj_get_state(obj, part);
     int16_t weight = -1;
     lv_style_value_t value;
 
@@ -2147,7 +2147,7 @@ lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t part, lv_s
         lv_style_dsc_t * dsc = lv_obj_get_style(parent, part);
         if(dsc == NULL) continue;
 
-        state = lv_obj_get_state(parent);
+        state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
         int16_t weight_act;
@@ -2223,7 +2223,7 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_p
         lv_style_dsc_t * dsc = lv_obj_get_style(parent, part);
         if(dsc == NULL) continue;
 
-        state = lv_obj_get_state(parent);
+        state = lv_obj_get_state(parent, part);
         int16_t weight_goal = state;
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
@@ -2331,7 +2331,7 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prope
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
-    int16_t weight_goal = lv_obj_get_state(obj);
+    int16_t weight_goal = lv_obj_get_state(obj, part);
     int16_t weight = -1;
     lv_opa_t value;
 
@@ -2340,7 +2340,7 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prope
         lv_style_dsc_t * dsc = lv_obj_get_style(parent, part);
         if(dsc == NULL) continue;
 
-        state = lv_obj_get_state(parent);
+        state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
         int16_t weight_act;
@@ -2423,7 +2423,7 @@ void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_propert
         lv_style_dsc_t * dsc = lv_obj_get_style(parent, part);
         if(dsc == NULL) continue;
 
-        state = lv_obj_get_state(parent);
+        state = lv_obj_get_state(parent, part);
         int16_t weight_goal = state;
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
@@ -2648,22 +2648,25 @@ bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot)
     return (obj->protect & prot) == 0 ? false : true;
 }
 
-lv_obj_state_t lv_obj_get_state(const lv_obj_t * obj)
+lv_obj_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    return obj->state;
+    if(part < _LV_OBJ_PART_REAL_START) return obj->state;
 
-    uint8_t state = 0;
+    /*If a real part is asked, then use the object's signal to get its state.
+     * A real object can be in different state then the main part
+     * and only the object itseld knows who to get it's state. */
+    lv_get_state_info_t info;
+    info.part = part;
+    info.result = 0;
+    lv_res_t res;
+    res = lv_signal_send((lv_obj_t*)obj, LV_SIGNAL_GET_STATE, &info);
 
-    const lv_obj_t * parent = obj;
-    while(parent) {
-        state |= parent->state;
-        parent = lv_obj_get_parent(parent);
-    }
+    if(res != LV_RES_OK) return 0;
 
+    return info.result;
 
-    return state;
 }
 
 /**

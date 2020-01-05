@@ -189,7 +189,7 @@ void lv_btn_toggle(lv_obj_t * btn)
 {
     LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
 
-    if(lv_obj_get_state(btn) & LV_OBJ_STATE_CHECKED) {
+    if(lv_obj_get_state(btn, LV_BTN_PART_MAIN) & LV_OBJ_STATE_CHECKED) {
         lv_obj_clear_state(btn, LV_OBJ_STATE_CHECKED);
     } else {
         lv_obj_set_state(btn, LV_OBJ_STATE_CHECKED);
@@ -270,7 +270,7 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn)
 {
     LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
 
-    lv_obj_state_t state = lv_obj_get_state(btn);
+    lv_obj_state_t state = lv_obj_get_state(btn, LV_BTN_PART_MAIN);
 
     if(state & LV_OBJ_STATE_CHECKED) {
         if(state & LV_OBJ_STATE_PRESSED) return LV_BTN_STATE_TGL_PR;
