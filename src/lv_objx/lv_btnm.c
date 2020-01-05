@@ -765,7 +765,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_mem_free(ext->button_areas);
         lv_mem_free(ext->ctrl_bits);
-    } else if(sign == LV_SIGNAL_STYLE_CHG || sign == LV_SIGNAL_CORD_CHG) {
+    } else if(sign == LV_SIGNAL_STYLE_CHG || sign == LV_SIGNAL_COORD_CHG) {
         lv_btnm_set_map(btnm, ext->map_p);
     } else if(sign == LV_SIGNAL_PRESSED) {
         lv_indev_t * indev = lv_indev_get_act();

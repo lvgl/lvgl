@@ -119,8 +119,11 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->dot.tmp_ptr   = NULL;
     ext->dot_tmp_alloc = 0;
 
+    lv_obj_reset_style(new_label, LV_LABEL_PART_MAIN);
+
     lv_obj_set_design_cb(new_label, lv_label_design);
     lv_obj_set_signal_cb(new_label, lv_label_signal);
+
 
     /*Init the new label*/
     if(copy == NULL) {
@@ -1171,7 +1174,7 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
         lv_label_revert_dots(label);
 
         lv_label_refr_text(label);
-    } else if(sign == LV_SIGNAL_CORD_CHG) {
+    } else if(sign == LV_SIGNAL_COORD_CHG) {
         if(lv_area_get_width(&label->coords) != lv_area_get_width(param) ||
            lv_area_get_height(&label->coords) != lv_area_get_height(param)) {
             lv_label_revert_dots(label);

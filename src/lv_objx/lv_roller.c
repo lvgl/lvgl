@@ -405,7 +405,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         refr_height(roller);
 
         refr_position(roller, false);
-    } else if(sign == LV_SIGNAL_CORD_CHG) {
+    } else if(sign == LV_SIGNAL_COORD_CHG) {
 
         if(lv_obj_get_width(roller) != lv_area_get_width(param) ||
            lv_obj_get_height(roller) != lv_area_get_height(param)) {

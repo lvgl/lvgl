@@ -108,7 +108,11 @@ static void basic_init(void)
     lv_style_set_color(&btn, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_AQUA);
     lv_style_set_color(&btn, LV_STYLE_BG_GRAD_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_LIME);
     lv_style_set_color(&btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_BLUE);
-    lv_style_set_color(&btn, LV_STYLE_TEXT_COLOR, LV_COLOR_WHITE);
+    lv_style_set_color(&btn, LV_STYLE_TEXT_COLOR, LV_COLOR_LIME);
+    lv_style_set_color(&btn, LV_STYLE_IMAGE_RECOLOR, LV_COLOR_LIME);
+    lv_style_set_color(&btn, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_BLUE);
+    lv_style_set_color(&btn, LV_STYLE_IMAGE_RECOLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_BLUE);
+    lv_style_set_ptr(&btn, LV_STYLE_FONT | LV_STYLE_STATE_PRESSED, &lv_font_roboto_28);
     lv_style_set_opa(&btn, LV_STYLE_BG_OPA, LV_OPA_50);
     lv_style_set_opa(&btn, LV_STYLE_BORDER_OPA, LV_OPA_70);
 //    lv_style_set_opa(&btn, LV_STYLE_TEXT_OPA, LV_OPA_50);
@@ -495,41 +499,7 @@ static void spinbox_init(void)
 static void list_init(void)
 {
 #if LV_USE_LIST != 0
-    static lv_style_t list_bg, list_rel, list_pr, list_trel, list_tpr, list_ina;
-    lv_style_copy(&list_rel, &def);
-    list_rel.body.opa          = LV_OPA_TRANSP;
-    list_rel.body.border.width = 1;
-    list_rel.body.border.color = lv_color_hsv_to_rgb(_hue, 50, 85);
-    list_rel.body.border.opa   = LV_OPA_COVER;
-    list_rel.text.color        = lv_color_hsv_to_rgb(_hue, 10, 94);
-    list_rel.text.font         = _font;
-    list_rel.image.color       = lv_color_hsv_to_rgb(_hue, 10, 94);
 
-    lv_style_copy(&list_pr, &list_rel);
-    list_pr.body.opa        = LV_OPA_COVER;
-    list_pr.body.main_color = lv_color_hsv_to_rgb(_hue, 34, 41);
-    list_pr.body.grad_color = lv_color_hsv_to_rgb(_hue, 34, 41);
-    list_pr.text.color      = lv_color_hsv_to_rgb(_hue, 7, 96);
-    list_pr.image.color     = lv_color_hsv_to_rgb(_hue, 7, 96);
-
-    lv_style_copy(&list_trel, &list_rel);
-    lv_style_copy(&list_tpr, &list_pr);
-    lv_style_copy(&list_ina, &def);
-
-    lv_style_copy(&list_bg, &list_rel);
-    list_bg.body.padding.left   = 0;
-    list_bg.body.padding.right  = 0;
-    list_bg.body.padding.top    = 0;
-    list_bg.body.padding.bottom = 0;
-
-    theme.style.list.sb          = &sb;
-    theme.style.list.bg          = &list_bg;
-    theme.style.list.scrl        = &lv_style_transp_tight;
-    theme.style.list.btn.rel     = &list_rel;
-    theme.style.list.btn.pr      = &list_pr;
-    theme.style.list.btn.tgl_rel = &list_trel;
-    theme.style.list.btn.tgl_pr  = &list_tpr;
-    theme.style.list.btn.ina     = &list_ina;
 #endif
 }
 
@@ -717,6 +687,8 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
         return &gauge_strong;
     case LV_THEME_TA_CURSOR:
         return &ta_cursor;
+    case LV_THEME_LIST_BTN:
+        return &btn;
     }
 
     return NULL;

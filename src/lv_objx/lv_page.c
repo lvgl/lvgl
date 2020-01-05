@@ -822,7 +822,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             }
         }
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
-        ext->scrl->signal_cb(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
+        ext->scrl->signal_cb(ext->scrl, LV_SIGNAL_COORD_CHG, &ext->scrl->coords);
 
         lv_style_value_t sb_width = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_SIZE);
         lv_area_set_height(&ext->sb.hor_area, sb_width);
@@ -833,12 +833,12 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
 
         /*Refresh the ext. size because the scrollbars might be positioned out of the page*/
         lv_obj_refresh_ext_draw_pad(page);
-    } else if(sign == LV_SIGNAL_CORD_CHG) {
+    } else if(sign == LV_SIGNAL_COORD_CHG) {
         /*Refresh the scrollbar and notify the scrl if the size is changed*/
         if(ext->scrl != NULL && (lv_obj_get_width(page) != lv_area_get_width(param) ||
                                  lv_obj_get_height(page) != lv_area_get_height(param))) {
             /*If no hor_fit enabled set the scrollable's width to the page's width*/
-            ext->scrl->signal_cb(ext->scrl, LV_SIGNAL_CORD_CHG, &ext->scrl->coords);
+            ext->scrl->signal_cb(ext->scrl, LV_SIGNAL_COORD_CHG, &ext->scrl->coords);
 
             /*The scrollbars are important only if they are visible now*/
             if(ext->sb.hor_draw || ext->sb.ver_draw) lv_page_sb_refresh(page);
@@ -905,7 +905,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
     lv_obj_t * page               = lv_obj_get_parent(scrl);
     lv_page_ext_t * page_ext      = lv_obj_get_ext_attr(page);
 
-    if(sign == LV_SIGNAL_CORD_CHG) {
+    if(sign == LV_SIGNAL_COORD_CHG) {
         /*Limit the position of the scrollable object to be always visible
          * (Do not let its edge inner then its parent respective edge)*/
         lv_coord_t new_x = lv_obj_get_x(scrl);

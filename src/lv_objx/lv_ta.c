@@ -1328,9 +1328,7 @@ static lv_design_res_t lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t 
         cur_area.x2 += ext->label->coords.x1;
         cur_area.y2 += ext->label->coords.y1;
 
-
         if(ext->cursor.type == LV_CURSOR_LINE) {
-
             lv_draw_line_dsc_t cur_line_dsc;
             lv_draw_line_dsc_init(&cur_line_dsc);
             lv_obj_init_draw_line_dsc(ta, LV_TA_PART_CURSOR, &cur_line_dsc);
@@ -1417,7 +1415,7 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
             lv_label_set_text(ext->label, NULL);
             refr_cursor_area(ta);
         }
-    } else if(sign == LV_SIGNAL_CORD_CHG) {
+    } else if(sign == LV_SIGNAL_COORD_CHG) {
         /*Set the label width according to the text area width*/
         if(ext->label) {
             if(lv_obj_get_width(ta) != lv_area_get_width(param) || lv_obj_get_height(ta) != lv_area_get_height(param)) {
@@ -1516,7 +1514,7 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
         const lv_font_t * font = lv_obj_get_style_ptr(ta, LV_TA_PART_BG, LV_STYLE_FONT);
         lv_coord_t font_h              = lv_font_get_line_height(font);
         scrl->ext_draw_pad             = LV_MATH_MAX(scrl->ext_draw_pad, line_space + font_h);
-    } else if(sign == LV_SIGNAL_CORD_CHG) {
+    } else if(sign == LV_SIGNAL_COORD_CHG) {
         /*Set the label width according to the text area width*/
         if(ext->label) {
             if(lv_obj_get_width(scrl) != lv_area_get_width(param) ||

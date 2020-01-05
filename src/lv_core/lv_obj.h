@@ -116,7 +116,7 @@ enum {
     /*General signals*/
     LV_SIGNAL_CLEANUP, /**< Object is being deleted */
     LV_SIGNAL_CHILD_CHG, /**< Child was removed/added */
-    LV_SIGNAL_CORD_CHG, /**< Object coordinates/size have changed */
+    LV_SIGNAL_COORD_CHG, /**< Object coordinates/size have changed */
     LV_SIGNAL_PARENT_SIZE_CHG, /**< Parent's size has changed */
     LV_SIGNAL_STYLE_CHG,    /**< Object's style has changed */
     LV_SIGNAL_BASE_DIR_CHG, /**<The base dir has changed*/

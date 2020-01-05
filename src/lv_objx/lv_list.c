@@ -36,6 +36,7 @@
  **********************/
 static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
 static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
+static lv_style_dsc_t * lv_list_get_style(lv_obj_t * list, uint8_t part);
 static void lv_list_btn_single_select(lv_obj_t * btn);
 static bool lv_list_is_list_btn(lv_obj_t * list_btn);
 static bool lv_list_is_list_img(lv_obj_t * list_btn);
@@ -83,14 +84,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_del(new_list);
         return NULL;
     }
-
-    ext->style_img                        = NULL;
-    ext->styles_btn[LV_BTN_STATE_REL]     = &lv_style_btn_rel;
-    ext->styles_btn[LV_BTN_STATE_PR]      = &lv_style_btn_pr;
-    ext->styles_btn[LV_BTN_STATE_TGL_REL] = &lv_style_btn_tgl_rel;
-    ext->styles_btn[LV_BTN_STATE_TGL_PR]  = &lv_style_btn_tgl_pr;
-    ext->styles_btn[LV_BTN_STATE_INA]     = &lv_style_btn_ina;
-    ext->single_mode                      = false;
+    ext->single_mode                      = 0;
     ext->size                             = 0;
 
 #if LV_USE_GROUP
@@ -108,22 +102,6 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_size(new_list, 2 * LV_DPI, 3 * LV_DPI);
         lv_page_set_scrl_layout(new_list, LV_LIST_LAYOUT_DEF);
         lv_list_set_sb_mode(new_list, LV_SB_MODE_DRAG);
-
-        /*Set the default styles*/
-        lv_theme_t * th = lv_theme_get_current();
-        if(th) {
-            lv_list_set_style(new_list, LV_LIST_STYLE_BG, th->style.list.bg);
-            lv_list_set_style(new_list, LV_LIST_STYLE_SCRL, th->style.list.scrl);
-            lv_list_set_style(new_list, LV_LIST_STYLE_SB, th->style.list.sb);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_REL, th->style.list.btn.rel);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_PR, th->style.list.btn.pr);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_REL, th->style.list.btn.tgl_rel);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_PR, th->style.list.btn.tgl_pr);
-            lv_list_set_style(new_list, LV_LIST_STYLE_BTN_INA, th->style.list.btn.ina);
-        } else {
-            lv_list_set_style(new_list, LV_LIST_STYLE_BG, &lv_style_transp_fit);
-            lv_list_set_style(new_list, LV_LIST_STYLE_SCRL, &lv_style_pretty);
-        }
     } else {
         lv_list_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
@@ -138,14 +116,8 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
             copy_btn = lv_list_get_next_btn(copy, copy_btn);
         }
 
-        lv_list_set_style(new_list, LV_LIST_STYLE_BTN_REL, copy_ext->styles_btn[LV_BTN_STATE_REL]);
-        lv_list_set_style(new_list, LV_LIST_STYLE_BTN_PR, copy_ext->styles_btn[LV_BTN_STATE_PR]);
-        lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_REL, copy_ext->styles_btn[LV_BTN_STATE_TGL_REL]);
-        lv_list_set_style(new_list, LV_LIST_STYLE_BTN_TGL_PR, copy_ext->styles_btn[LV_BTN_STATE_TGL_REL]);
-        lv_list_set_style(new_list, LV_LIST_STYLE_BTN_INA, copy_ext->styles_btn[LV_BTN_STATE_INA]);
-
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_list);
+//        lv_obj_refresh_style(new_list);
     }
 
     LV_LOG_INFO("list created");
@@ -199,11 +171,8 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
     if(ancestor_btn_signal == NULL) ancestor_btn_signal = lv_obj_get_signal_cb(liste);
 
     /*Set the default styles*/
-    lv_btn_set_style(liste, LV_BTN_STYLE_REL, ext->styles_btn[LV_BTN_STATE_REL]);
-    lv_btn_set_style(liste, LV_BTN_STYLE_PR, ext->styles_btn[LV_BTN_STATE_PR]);
-    lv_btn_set_style(liste, LV_BTN_STYLE_TGL_REL, ext->styles_btn[LV_BTN_STATE_TGL_REL]);
-    lv_btn_set_style(liste, LV_BTN_STYLE_TGL_PR, ext->styles_btn[LV_BTN_STATE_TGL_PR]);
-    lv_btn_set_style(liste, LV_BTN_STYLE_INA, ext->styles_btn[LV_BTN_STATE_INA]);
+    lv_style_dsc_reset(&liste->style_dsc);
+    _ot(liste, LV_BTN_PART_MAIN, LIST_BTN);
 
     lv_page_glue_obj(liste, true);
     lv_btn_set_layout(liste, LV_LAYOUT_ROW_M);
@@ -231,22 +200,28 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
     if(img_src) {
         img = lv_img_create(liste, NULL);
         lv_img_set_src(img, img_src);
-        lv_obj_set_style(img, ext->style_img);
         lv_obj_set_click(img, false);
         if(img_signal == NULL) img_signal = lv_obj_get_signal_cb(img);
     }
 #endif
     if(txt != NULL) {
-        lv_coord_t btn_hor_pad = ext->styles_btn[LV_BTN_STYLE_REL]->body.padding.left -
-                                 ext->styles_btn[LV_BTN_STYLE_REL]->body.padding.right;
         lv_obj_t * label = lv_label_create(liste, NULL);
         lv_label_set_text(label, txt);
         lv_obj_set_click(label, false);
         lv_label_set_long_mode(label, LV_LABEL_LONG_SROLL_CIRC);
-        if(lv_obj_get_base_dir(liste) == LV_BIDI_DIR_RTL) lv_obj_set_width(label, label->coords.x2 - liste->coords.x1 - btn_hor_pad);
-        else  lv_obj_set_width(label, liste->coords.x2 - label->coords.x1 - btn_hor_pad);
+        if(lv_obj_get_base_dir(liste) == LV_BIDI_DIR_RTL) {
+            lv_coord_t pad = lv_obj_get_style_value(liste, LV_BTN_PART_MAIN, LV_STYLE_PAD_LEFT);
+            lv_obj_set_width(label, label->coords.x2 - liste->coords.x1 - pad);
+        }
+        else {
+            lv_coord_t pad = lv_obj_get_style_value(liste, LV_BTN_PART_MAIN, LV_STYLE_PAD_RIGHT);
+            lv_obj_set_width(label, liste->coords.x2 - label->coords.x1 - pad);
+        }
         if(label_signal == NULL) label_signal = lv_obj_get_signal_cb(label);
+        lv_label_set_body_draw(label, true);
+
     }
+
 #if LV_USE_GROUP
     /* If this is the first item to be added to the list and the list is
      * focused, select it */
@@ -351,61 +326,6 @@ void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
 }
 
 #endif
-
-/**
- * Set a style of a list
- * @param list pointer to a list object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_list_set_style(lv_obj_t * list, lv_list_style_t type, const lv_style_t * style)
-{
-    LV_ASSERT_OBJ(list, LV_OBJX_NAME);
-
-    lv_list_ext_t * ext           = lv_obj_get_ext_attr(list);
-    lv_btn_style_t btn_style_refr = LV_BTN_STYLE_REL;
-    lv_obj_t * btn;
-
-    switch(type) {
-        case LV_LIST_STYLE_BG:
-            lv_page_set_style(list, LV_PAGE_STYLE_BG, style);
-            /*style change signal will call 'refr_btn_width' */
-            break;
-        case LV_LIST_STYLE_SCRL: lv_page_set_style(list, LV_PAGE_STYLE_SCRL, style); break;
-        case LV_LIST_STYLE_SB: lv_page_set_style(list, LV_PAGE_STYLE_SB, style); break;
-        case LV_LIST_STYLE_EDGE_FLASH: lv_page_set_style(list, LV_PAGE_STYLE_EDGE_FLASH, style); break;
-        case LV_LIST_STYLE_BTN_REL:
-            ext->styles_btn[LV_BTN_STATE_REL] = style;
-            btn_style_refr                    = LV_BTN_STYLE_REL;
-            break;
-        case LV_LIST_STYLE_BTN_PR:
-            ext->styles_btn[LV_BTN_STATE_PR] = style;
-            btn_style_refr                   = LV_BTN_STYLE_PR;
-            break;
-        case LV_LIST_STYLE_BTN_TGL_REL:
-            ext->styles_btn[LV_BTN_STATE_TGL_REL] = style;
-            btn_style_refr                        = LV_BTN_STYLE_TGL_REL;
-            break;
-        case LV_LIST_STYLE_BTN_TGL_PR:
-            ext->styles_btn[LV_BTN_STATE_TGL_PR] = style;
-            btn_style_refr                       = LV_BTN_STYLE_TGL_PR;
-            break;
-        case LV_LIST_STYLE_BTN_INA:
-            ext->styles_btn[LV_BTN_STATE_INA] = style;
-            btn_style_refr                    = LV_BTN_STYLE_INA;
-            break;
-    }
-
-    /*Refresh existing buttons' style*/
-    if(type == LV_LIST_STYLE_BTN_PR || type == LV_LIST_STYLE_BTN_REL || type == LV_LIST_STYLE_BTN_TGL_REL ||
-       type == LV_LIST_STYLE_BTN_TGL_PR || type == LV_LIST_STYLE_BTN_INA) {
-        btn = lv_list_get_prev_btn(list, NULL);
-        while(btn != NULL) {
-            lv_btn_set_style(btn, btn_style_refr, ext->styles_btn[btn_style_refr]);
-            btn = lv_list_get_prev_btn(list, btn);
-        }
-    }
-}
 
 /**
  * Set layout of a list
@@ -642,35 +562,6 @@ lv_layout_t lv_list_get_layout(lv_obj_t * list)
     return lv_page_get_scrl_layout(list);
 }
 
-/**
- * Get a style of a list
- * @param list pointer to a list object
- * @param type which style should be get
- * @return style pointer to a style
- */
-const lv_style_t * lv_list_get_style(const lv_obj_t * list, lv_list_style_t type)
-{
-    LV_ASSERT_OBJ(list, LV_OBJX_NAME);
-
-    const lv_style_t * style = NULL;
-    lv_list_ext_t * ext      = lv_obj_get_ext_attr(list);
-
-    switch(type) {
-        case LV_LIST_STYLE_BG: style = lv_page_get_style(list, LV_PAGE_STYLE_BG); break;
-        case LV_LIST_STYLE_SCRL: style = lv_page_get_style(list, LV_PAGE_STYLE_SCRL); break;
-        case LV_LIST_STYLE_SB: style = lv_page_get_style(list, LV_PAGE_STYLE_SB); break;
-        case LV_LIST_STYLE_EDGE_FLASH: style = lv_page_get_style(list, LV_PAGE_STYLE_EDGE_FLASH); break;
-        case LV_LIST_STYLE_BTN_REL: style = ext->styles_btn[LV_BTN_STATE_REL]; break;
-        case LV_LIST_STYLE_BTN_PR: style = ext->styles_btn[LV_BTN_STATE_PR]; break;
-        case LV_LIST_STYLE_BTN_TGL_REL: style = ext->styles_btn[LV_BTN_STATE_TGL_REL]; break;
-        case LV_LIST_STYLE_BTN_TGL_PR: style = ext->styles_btn[LV_BTN_STATE_TGL_PR]; break;
-        case LV_LIST_STYLE_BTN_INA: style = ext->styles_btn[LV_BTN_STATE_INA]; break;
-        default: style = NULL; break;
-    }
-
-    return style;
-}
-
 /*=====================
  * Other functions
  *====================*/
@@ -796,6 +687,12 @@ void lv_list_focus(const lv_obj_t * btn, lv_anim_enable_t anim)
 static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 {
     lv_res_t res;
+    if(sign == LV_SIGNAL_GET_STYLE) {
+        uint8_t ** type_p = param;
+        lv_style_dsc_t ** style_dsc_p = param;
+        *style_dsc_p = lv_list_get_style(list, **type_p);
+        return LV_RES_OK;
+    }
 
     /* Include the ancient signal function */
     res = ancestor_page_signal(list, sign, param);
@@ -950,7 +847,23 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, "");
 
-    if(sign == LV_SIGNAL_RELEASED) {
+    if((sign == LV_SIGNAL_COORD_CHG && (lv_obj_get_width(btn) != lv_area_get_width(param) || lv_obj_get_height(btn) != lv_area_get_height(param))) ||
+            sign == LV_SIGNAL_STYLE_CHG) {
+        lv_obj_t * label = lv_list_get_btn_label(btn);
+        if(label) {
+            const lv_font_t * font = lv_obj_get_style_ptr(label, LV_LABEL_PART_MAIN, LV_STYLE_FONT);
+            lv_coord_t font_h = lv_font_get_line_height(font);
+            if(lv_obj_get_base_dir(btn) == LV_BIDI_DIR_RTL) {
+                lv_coord_t pad = lv_obj_get_style_value(btn, LV_BTN_PART_MAIN, LV_STYLE_PAD_LEFT);
+                lv_obj_set_size(label, label->coords.x2 - btn->coords.x1 - pad, font_h);
+            }
+            else {
+                lv_coord_t pad = lv_obj_get_style_value(btn, LV_BTN_PART_MAIN, LV_STYLE_PAD_RIGHT);
+                lv_obj_set_size(label, btn->coords.x2 - label->coords.x1 - pad, font_h);
+            }
+        }
+    }
+    else if(sign == LV_SIGNAL_RELEASED) {
         lv_obj_t * list          = lv_obj_get_parent(lv_obj_get_parent(btn));
         lv_list_ext_t * ext      = lv_obj_get_ext_attr(list);
 
@@ -991,6 +904,42 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
 
     return res;
 }
+
+/**
+ * Get the style descriptor of a part of the object
+ * @param list pointer the object
+ * @param part the part from `lv_page_list_t`. (LV_LIST_PART_...)
+ * @return pointer to the style descriptor of the specified part
+ */
+static lv_style_dsc_t * lv_list_get_style(lv_obj_t * list, uint8_t part)
+{
+    LV_ASSERT_OBJ(list, LV_OBJX_NAME);
+
+    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+    lv_style_dsc_t * style_dsc_p;
+
+    switch(part) {
+    case LV_LIST_PART_BG:
+        style_dsc_p = &list->style_dsc;
+        break;
+    case LV_LIST_PART_SCRL:
+        style_dsc_p = &ext->page.scrl->style_dsc;
+        break;
+    case LV_LIST_PART_SCRLBAR:
+        style_dsc_p = &ext->page.sb.style;
+        break;
+#if LV_USE_ANIMATION
+    case LV_PAGE_PART_EDGE_FLASH:
+        style_dsc_p = &ext->page.edge_flash.style;
+        break;
+#endif
+    default:
+        style_dsc_p = NULL;
+    }
+
+    return style_dsc_p;
+}
+
 
 /**
  * Make a single button selected in the list, deselect others.

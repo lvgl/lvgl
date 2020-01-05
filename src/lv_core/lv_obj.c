@@ -652,7 +652,7 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     refresh_children_position(obj, diff.x, diff.y);
 
     /*Inform the object about its new coordinates*/
-    obj->signal_cb(obj, LV_SIGNAL_CORD_CHG, &ori);
+    obj->signal_cb(obj, LV_SIGNAL_COORD_CHG, &ori);
 
     /*Send a signal to the parent too*/
     par->signal_cb(par, LV_SIGNAL_CHILD_CHG, obj);
@@ -719,7 +719,7 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     }
 
     /*Send a signal to the object with its new coordinates*/
-    obj->signal_cb(obj, LV_SIGNAL_CORD_CHG, &ori);
+    obj->signal_cb(obj, LV_SIGNAL_COORD_CHG, &ori);
 
     /*Send a signal to the parent too*/
     lv_obj_t * par = lv_obj_get_parent(obj);
@@ -2211,7 +2211,6 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_p
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
-    int16_t weight_goal = lv_obj_get_state(obj);
     int16_t weight = -1;
     lv_color_t value;
 
@@ -2221,6 +2220,7 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_p
         if(dsc == NULL) continue;
 
         state = lv_obj_get_state(parent);
+        int16_t weight_goal = state;
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
         int16_t weight_act;
@@ -2411,7 +2411,6 @@ void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_propert
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
-    int16_t weight_goal = lv_obj_get_state(obj);
     int16_t weight = -1;
     void * value;
 
@@ -2421,6 +2420,7 @@ void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_propert
         if(dsc == NULL) continue;
 
         state = lv_obj_get_state(parent);
+        int16_t weight_goal = state;
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
         int16_t weight_act;
@@ -2649,6 +2649,17 @@ lv_obj_state_t lv_obj_get_state(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     return obj->state;
+
+    uint8_t state = 0;
+
+    const lv_obj_t * parent = obj;
+    while(parent) {
+        state |= parent->state;
+        parent = lv_obj_get_parent(parent);
+    }
+
+
+    return state;
 }
 
 /**
