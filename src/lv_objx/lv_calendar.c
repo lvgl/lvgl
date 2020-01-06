@@ -45,7 +45,8 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask);
 static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask);
 static void draw_days(lv_obj_t * calendar, const lv_area_t * mask);
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day);
-static bool is_highlighted(lv_obj_t * calendar, int32_t year, int32_t month, int32_t day);
+static bool is_highlighted(lv_obj_t * calendar, day_draw_state_t draw_state, int32_t year, int32_t month, int32_t day);
+static bool is_pressed(lv_obj_t * calendar, day_draw_state_t draw_state, int32_t year, int32_t month, int32_t day);
 static const char * get_day_name(lv_obj_t * calendar, uint8_t day);
 static const char * get_month_name(lv_obj_t * calendar, int32_t month);
 static uint8_t get_month_length(int32_t year, int32_t month);
@@ -468,10 +469,10 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         }
         /*If a day is pressed save it*/
         else if(calculate_touched_day(calendar, &p)) {
-            if(ext->btn_pressing != 0) lv_obj_invalidate(calendar);
             ext->btn_pressing = 0;
+            lv_obj_invalidate(calendar);
         }
-        /*ELse set a deafault state*/
+        /*ELse set a default state*/
         else {
             if(ext->btn_pressing != 0) lv_obj_invalidate(calendar);
             ext->btn_pressing       = 0;
@@ -482,6 +483,9 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
     } else if(sign == LV_SIGNAL_PRESS_LOST) {
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
         ext->btn_pressing       = 0;
+        ext->pressed_date.year  = 0;
+        ext->pressed_date.month = 0;
+        ext->pressed_date.day   = 0;
         lv_obj_invalidate(calendar);
 
     } else if(sign == LV_SIGNAL_RELEASED) {
@@ -503,9 +507,13 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         } else if(ext->pressed_date.year != 0) {
             res = lv_event_send(calendar, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
+
         }
 
         ext->btn_pressing = 0;
+        ext->pressed_date.year  = 0;
+        ext->pressed_date.month = 0;
+        ext->pressed_date.day   = 0;
         lv_obj_invalidate(calendar);
     } else if(sign == LV_SIGNAL_CONTROL) {
         uint8_t c               = *((uint8_t *)param);
@@ -803,31 +811,38 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     lv_draw_label_dsc_t wb_label_dsc;
     lv_draw_label_dsc_t tb_label_dsc;
     lv_draw_label_dsc_t normal_label_dsc;
-    lv_draw_label_dsc_t focus_label_dsc;
+    lv_draw_label_dsc_t chk_label_dsc;
     lv_draw_label_dsc_t ina_label_dsc;
+    lv_draw_label_dsc_t pr_label_dsc;
 
     lv_draw_label_dsc_init(&wb_label_dsc);
     lv_draw_label_dsc_init(&tb_label_dsc);
     lv_draw_label_dsc_init(&normal_label_dsc);
-    lv_draw_label_dsc_init(&focus_label_dsc);
+    lv_draw_label_dsc_init(&chk_label_dsc);
     lv_draw_label_dsc_init(&ina_label_dsc);
+    lv_draw_label_dsc_init(&pr_label_dsc);
 
     tb_label_dsc.flag = LV_TXT_FLAG_CENTER;
     wb_label_dsc.flag = LV_TXT_FLAG_CENTER;
     normal_label_dsc.flag = LV_TXT_FLAG_CENTER;
-    focus_label_dsc.flag = LV_TXT_FLAG_CENTER;
+    chk_label_dsc.flag = LV_TXT_FLAG_CENTER;
     ina_label_dsc.flag = LV_TXT_FLAG_CENTER;
+    pr_label_dsc.flag = LV_TXT_FLAG_CENTER;
 
     calendar->state = 0;
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_WEEK_BOX, &wb_label_dsc);
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_TODAY_BOX, &tb_label_dsc);
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &normal_label_dsc);
 
-    calendar->state = LV_OBJ_STATE_FOCUS;
-    lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &focus_label_dsc);
+    calendar->state = LV_OBJ_STATE_CHECKED;
+    lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &chk_label_dsc);
 
     calendar->state = LV_OBJ_STATE_DISABLED;
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &ina_label_dsc);
+
+    calendar->state = LV_OBJ_STATE_PRESSED;
+    lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &pr_label_dsc);
+    pr_label_dsc.color = LV_COLOR_RED;
 
 
     calendar->state = state_ori;
@@ -920,17 +935,10 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 
             /*Get the final style : highlighted/week box/today box/normal*/
             lv_draw_label_dsc_t * final_label_dsc;
-            if(draw_state == DAY_DRAW_PREV_MONTH &&
-               is_highlighted(calendar, ext->showed_date.year - (ext->showed_date.month == 1 ? 1 : 0),
-                              ext->showed_date.month == 1 ? 12 : ext->showed_date.month - 1, day_cnt)) {
-                final_label_dsc = &focus_label_dsc;
-            } else if(draw_state == DAY_DRAW_ACT_MONTH &&
-                      is_highlighted(calendar, ext->showed_date.year, ext->showed_date.month, day_cnt)) {
-                final_label_dsc = &focus_label_dsc;
-            } else if(draw_state == DAY_DRAW_NEXT_MONTH &&
-                      is_highlighted(calendar, ext->showed_date.year + (ext->showed_date.month == 12 ? 1 : 0),
-                                     ext->showed_date.month == 12 ? 1 : ext->showed_date.month + 1, day_cnt)) {
-                final_label_dsc = &focus_label_dsc;
+            if(is_pressed(calendar, draw_state, ext->showed_date.year, ext->showed_date.month, day_cnt)) {
+                final_label_dsc = &pr_label_dsc;
+            } else if(is_highlighted(calendar, draw_state, ext->showed_date.year, ext->showed_date.month, day_cnt)) {
+                final_label_dsc = &chk_label_dsc;
             } else if(month_of_today_shown && day_cnt == ext->today.day && draw_state == DAY_DRAW_ACT_MONTH)
                 final_label_dsc = &tb_label_dsc;
             else if(in_week_box && draw_state == DAY_DRAW_ACT_MONTH)
@@ -955,16 +963,24 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 /**
  * Check weather a date is highlighted or not
  * @param calendar pointer to a calendar object
+ * @param draw_state which month is drawn (previous, active, next)
  * @param year a year
  * @param month a  month [1..12]
  * @param day a day [1..31]
  * @return true: highlighted
  */
-static bool is_highlighted(lv_obj_t * calendar, int32_t year, int32_t month, int32_t day)
+static bool is_highlighted(lv_obj_t * calendar, day_draw_state_t draw_state, int32_t year, int32_t month, int32_t day)
 {
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
-    if(ext->highlighted_dates == NULL || ext->highlighted_dates_num == 0) return false;
+
+    if(draw_state == DAY_DRAW_PREV_MONTH) {
+        year -= month == 1 ? 1 : 0;
+        month = month == 1 ? 12 : month - 1;
+    } else if(draw_state == DAY_DRAW_NEXT_MONTH) {
+        year += month == 12 ? 1 : 0;
+        month = month == 12 ? 1 : month + 1;
+    }
 
     uint32_t i;
     for(i = 0; i < ext->highlighted_dates_num; i++) {
@@ -977,6 +993,31 @@ static bool is_highlighted(lv_obj_t * calendar, int32_t year, int32_t month, int
     return false;
 }
 
+/**
+ * Check weather a date is highlighted or not
+ * @param calendar pointer to a calendar object
+ * @param draw_state which month is drawn (previous, active, next)
+ * @param year a year
+ * @param month a  month [1..12]
+ * @param day a day [1..31]
+ * @return true: highlighted
+ */
+static bool is_pressed(lv_obj_t * calendar, day_draw_state_t draw_state, int32_t year, int32_t month, int32_t day)
+{
+    lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+
+
+    if(draw_state == DAY_DRAW_PREV_MONTH) {
+        year -= month == 1 ? 1 : 0;
+        month = month == 1 ? 12 : month - 1;
+    } else if(draw_state == DAY_DRAW_NEXT_MONTH) {
+        year += month == 12 ? 1 : 0;
+        month = month == 12 ? 1 : month + 1;
+    }
+
+    if(year == ext->pressed_date.year && month == ext->pressed_date.month && day == ext->pressed_date.day) return true;
+    else return false;
+}
 /**
  * Get the day name
  * @param calendar pointer to a calendar object

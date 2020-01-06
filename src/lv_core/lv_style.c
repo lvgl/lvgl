@@ -65,11 +65,11 @@ void lv_style_built_in_init(void)
     lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_BORDER_OPA, LV_OPA_TRANSP);
     lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_SHADOW_OPA, LV_OPA_TRANSP);
     lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_PATTERN_OPA, LV_OPA_TRANSP);
-    lv_style_set_value(&lv_style_transp_tight, LV_STYLE_PAD_LEFT, 0);
-    lv_style_set_value(&lv_style_transp_tight, LV_STYLE_PAD_RIGHT, 0);
-    lv_style_set_value(&lv_style_transp_tight, LV_STYLE_PAD_TOP, 0);
-    lv_style_set_value(&lv_style_transp_tight, LV_STYLE_PAD_BOTTOM, 0);
-    lv_style_set_value(&lv_style_transp_tight, LV_STYLE_PAD_INNER, 0);
+    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_LEFT, 0);
+    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_RIGHT, 0);
+    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_TOP, 0);
+    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_BOTTOM, 0);
+    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_INNER, 0);
 }
 
 void lv_style_init(lv_style_t * style)
@@ -166,7 +166,7 @@ void lv_style_reset(lv_style_t * style)
     style->size = 0;
 }
 
-void lv_style_set_value(lv_style_t * style, lv_style_property_t prop, lv_style_int_t value)
+void lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_int_t value)
 {
     int32_t id = get_property_index(style, prop);
     /*The property already exists but not sure it's state is the same*/
@@ -285,7 +285,7 @@ void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, void * p)
  *         Higher number is means better fit
  *         -1 if the not found (`res` will be undefined)
  */
-int16_t lv_style_get_value(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res)
+int16_t lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res)
 {
     if(style == NULL) return -1;
     int32_t id = get_property_index(style, prop);
@@ -463,11 +463,11 @@ static void style_animator(lv_style_anim_dsc_t * dsc, lv_anim_value_t val)
 
             int16_t res2;
             lv_style_int_t v2;
-            res2 = lv_style_get_value(end, prop_act, &v2);
+            res2 = lv_style_get_int(end, prop_act, &v2);
 
             if(res2 >= 0) {
                 lv_style_int_t vres = v1 + ((int32_t)((int32_t)(v2-v1) * val) >> 8);
-                lv_style_set_value(act, prop_act, vres);
+                lv_style_set_int(act, prop_act, vres);
             }
 
             i+= sizeof(lv_style_int_t);

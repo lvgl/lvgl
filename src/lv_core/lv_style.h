@@ -298,13 +298,13 @@ void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
  */
 void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res, uint16_t ratio);
 
-void lv_style_set_value(lv_style_t * style, lv_style_property_t prop, lv_style_int_t value);
+void lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_int_t value);
 void lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_t color);
 void lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa);
 void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, void * p);
 
 
-int16_t lv_style_get_value(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res);
+int16_t lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res);
 int16_t lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res);
 int16_t lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res);
 int16_t lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void ** res);

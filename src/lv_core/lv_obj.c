@@ -1174,7 +1174,7 @@ void lv_obj_set_style_color(lv_obj_t * obj, uint8_t part, lv_style_property_t pr
 void lv_obj_set_style_value(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_int_t value)
 {
     lv_style_dsc_t * style_dsc = lv_obj_get_style(obj, part);
-    lv_style_set_value(&style_dsc->local, prop, value);
+    lv_style_set_int(&style_dsc->local, prop, value);
     lv_obj_refresh_style(obj, part);
 }
 
@@ -2138,7 +2138,6 @@ lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
-    int16_t weight_goal = lv_obj_get_state(obj, part);
     int16_t weight = -1;
     lv_style_int_t value;
 
@@ -2147,12 +2146,13 @@ lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style
         lv_style_dsc_t * dsc = lv_obj_get_style(parent, part);
         if(dsc == NULL) continue;
 
-        state = lv_obj_get_state(parent, part);
+        uint8_t state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
+        int16_t weight_goal = state;
 
         int16_t weight_act;
         lv_style_int_t value_act;
-        weight_act = lv_style_get_value(&dsc->local, prop, &value_act);
+        weight_act = lv_style_get_int(&dsc->local, prop, &value_act);
 
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
@@ -2167,7 +2167,7 @@ lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style
         int16_t ci;
         for(ci = dsc->class_cnt - 1; ci >= 0; ci--) {
             lv_style_t * class = lv_style_dsc_get_class(dsc, ci);
-            weight_act = lv_style_get_value(class, prop, &value_act);
+            weight_act = lv_style_get_int(class, prop, &value_act);
             /*On perfect match return the value immediately*/
             if(weight_act == weight_goal) {
                 return value_act;
@@ -2223,9 +2223,9 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_p
         lv_style_dsc_t * dsc = lv_obj_get_style(parent, part);
         if(dsc == NULL) continue;
 
-        state = lv_obj_get_state(parent, part);
-        int16_t weight_goal = state;
+        uint8_t state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
+        int16_t weight_goal = state;
 
         int16_t weight_act;
         lv_color_t value_act;
@@ -2325,13 +2325,12 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prope
         }
     }
 
-    uint8_t state;
+
     lv_style_property_t prop_ori = prop;
 
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
-    int16_t weight_goal = lv_obj_get_state(obj, part);
     int16_t weight = -1;
     lv_opa_t value;
 
@@ -2340,8 +2339,9 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prope
         lv_style_dsc_t * dsc = lv_obj_get_style(parent, part);
         if(dsc == NULL) continue;
 
-        state = lv_obj_get_state(parent, part);
+        uint8_t state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
+        int16_t weight_goal = state;
 
         int16_t weight_act;
         lv_opa_t value_act;
@@ -2423,9 +2423,9 @@ void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_propert
         lv_style_dsc_t * dsc = lv_obj_get_style(parent, part);
         if(dsc == NULL) continue;
 
-        state = lv_obj_get_state(parent, part);
-        int16_t weight_goal = state;
+        uint8_t state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
+        int16_t weight_goal = state;
 
         int16_t weight_act;
         void * value_act;
