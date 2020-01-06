@@ -427,7 +427,7 @@ void lv_ta_del_char(lv_obj_t * ta)
 
     /*Don't let 'width == 0' because cursor will not be visible*/
     if(lv_obj_get_width(ext->label) == 0) {
-        lv_style_value_t line_width = lv_obj_get_style_value(ta, LV_TA_PART_CURSOR, LV_STYLE_LINE_WIDTH);
+        lv_style_int_t line_width = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_LINE_WIDTH);
         lv_obj_set_width(ext->label, line_width);
     }
 
@@ -497,7 +497,7 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
 
     /*Don't let 'width == 0' because the cursor will not be visible*/
     if(lv_obj_get_width(ext->label) == 0) {
-        lv_style_value_t line_width = lv_obj_get_style_value(ta, LV_TA_PART_CURSOR, LV_STYLE_LINE_WIDTH);
+        lv_style_int_t line_width = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_LINE_WIDTH);
         lv_obj_set_width(ext->label, line_width);
     }
 
@@ -590,8 +590,8 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
     lv_obj_t * label_par = lv_obj_get_parent(ext->label);
     lv_point_t cur_pos;
     const lv_font_t * font = lv_obj_get_style_ptr(ta, LV_TA_PART_BG, LV_STYLE_FONT);
-    lv_style_value_t top = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_PAD_TOP);
-    lv_style_value_t bottom = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t top = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_PAD_TOP);
+    lv_style_int_t bottom = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_PAD_BOTTOM);
     lv_area_t label_cords;
     lv_area_t ta_cords;
     lv_label_get_letter_pos(ext->label, pos, &cur_pos);
@@ -613,8 +613,8 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
         lv_obj_set_x(label_par, -cur_pos.x + font_h);
     }
 
-    lv_style_value_t right = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_PAD_RIGHT);
-    lv_style_value_t left = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_PAD_LEFT);
+    lv_style_int_t right = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t left = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_PAD_LEFT);
     /*Check the right (use the font_h as general unit)*/
     if(label_cords.x1 + cur_pos.x + font_h + right > ta_cords.x2) {
         lv_obj_set_x(label_par, -(cur_pos.x - lv_obj_get_width(ta) + font_h + left + right));
@@ -734,9 +734,9 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
     if(ext->one_line == en) return;
 
     if(en) {
-        lv_style_value_t top = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_PAD_TOP);
-        lv_style_value_t bottom = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_PAD_BOTTOM);
-        lv_style_value_t left = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_PAD_LEFT);
+        lv_style_int_t top = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_PAD_TOP);
+        lv_style_int_t bottom = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_PAD_BOTTOM);
+        lv_style_int_t left = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_PAD_LEFT);
         const lv_font_t * font = lv_obj_get_style_ptr(ta, LV_TA_PART_BG, LV_STYLE_FONT);
         lv_coord_t font_h              = lv_font_get_line_height(font);
 
@@ -747,8 +747,8 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
         if(ext->placeholder) lv_label_set_long_mode(ext->placeholder, LV_LABEL_LONG_EXPAND);
         lv_obj_set_pos(lv_page_get_scrl(ta), left, top);
     } else {
-        lv_style_value_t top = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_PAD_TOP);
-        lv_style_value_t left = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_PAD_LEFT);
+        lv_style_int_t top = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_PAD_TOP);
+        lv_style_int_t left = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_PAD_LEFT);
         ext->one_line = 0;
         lv_page_set_scrl_fit2(ta, LV_FIT_FLOOD, LV_FIT_TIGHT);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
@@ -1210,7 +1210,7 @@ void lv_ta_cursor_down(lv_obj_t * ta)
 
     /*Increment the y with one line and keep the valid x*/
 
-    lv_style_value_t line_space = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_LINE_SPACE);
+    lv_style_int_t line_space = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_LINE_SPACE);
     const lv_font_t * font = lv_obj_get_style_ptr(ta, LV_TA_PART_BG, LV_STYLE_FONT);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     pos.y += font_h + line_space + 1;
@@ -1242,7 +1242,7 @@ void lv_ta_cursor_up(lv_obj_t * ta)
     lv_label_get_letter_pos(ext->label, lv_ta_get_cursor_pos(ta), &pos);
 
     /*Decrement the y with one line and keep the valid x*/
-    lv_style_value_t line_space = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_LINE_SPACE);
+    lv_style_int_t line_space = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_LINE_SPACE);
     const lv_font_t * font = lv_obj_get_style_ptr(ta, LV_TA_PART_BG, LV_STYLE_FONT);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     pos.y -= font_h + line_space - 1;
@@ -1342,8 +1342,8 @@ static lv_design_res_t lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t 
             char letter_buf[8] = {0};
             memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
 
-            lv_style_value_t left = lv_obj_get_style_value(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_LEFT);
-            lv_style_value_t top = lv_obj_get_style_value(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_TOP);
+            lv_style_int_t left = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_LEFT);
+            lv_style_int_t top = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_TOP);
             cur_area.x1 += left;
             cur_area.y1 += top;
 
@@ -1394,8 +1394,8 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         if(ext->label) {
             if(ext->one_line) {
-                lv_style_value_t top = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_PAD_TOP);
-                lv_style_value_t bottom = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_PAD_BOTTOM);
+                lv_style_int_t top = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_PAD_TOP);
+                lv_style_int_t bottom = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_PAD_BOTTOM);
                 const lv_font_t * font = lv_obj_get_style_ptr(ta, LV_TA_PART_BG, LV_STYLE_FONT);
 
                 /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
@@ -1510,7 +1510,7 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*Set ext. size because the cursor might be out of this object*/
-        lv_style_value_t line_space = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_LINE_SPACE);
+        lv_style_int_t line_space = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_LINE_SPACE);
         const lv_font_t * font = lv_obj_get_style_ptr(ta, LV_TA_PART_BG, LV_STYLE_FONT);
         lv_coord_t font_h              = lv_font_get_line_height(font);
         scrl->ext_draw_pad             = LV_MATH_MAX(scrl->ext_draw_pad, line_space + font_h);
@@ -1681,7 +1681,7 @@ static void refr_cursor_area(lv_obj_t * ta)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     const lv_font_t * font = lv_obj_get_style_ptr(ta, LV_TA_PART_BG, LV_STYLE_FONT);
-    lv_style_value_t line_space = lv_obj_get_style_value(ta, LV_TA_PART_BG, LV_STYLE_LINE_SPACE);
+    lv_style_int_t line_space = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_LINE_SPACE);
 
     uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
     const char * txt = lv_label_get_text(ext->label);
@@ -1728,10 +1728,10 @@ static void refr_cursor_area(lv_obj_t * ta)
 
     /*Calculate the cursor according to its type*/
 
-    lv_style_value_t top = lv_obj_get_style_value(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_TOP);
-    lv_style_value_t bottom = lv_obj_get_style_value(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_BOTTOM);
-    lv_style_value_t left = lv_obj_get_style_value(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_LEFT);
-    lv_style_value_t right = lv_obj_get_style_value(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t top = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_TOP);
+    lv_style_int_t bottom = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t left = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_LEFT);
+    lv_style_int_t right = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_RIGHT);
 
     lv_area_t cur_area;
 

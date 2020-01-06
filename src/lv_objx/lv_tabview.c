@@ -330,8 +330,8 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     }
 
     lv_coord_t cont_x;
-    lv_style_value_t scrl_inner = lv_obj_get_style_value(ext->content, LV_PAGE_PART_SCRL, LV_STYLE_PAD_INNER);
-    lv_style_value_t scrl_left = lv_obj_get_style_value(ext->content, LV_PAGE_PART_SCRL, LV_STYLE_PAD_LEFT);
+    lv_style_int_t scrl_inner = lv_obj_get_style_int(ext->content, LV_PAGE_PART_SCRL, LV_STYLE_PAD_INNER);
+    lv_style_int_t scrl_left = lv_obj_get_style_int(ext->content, LV_PAGE_PART_SCRL, LV_STYLE_PAD_LEFT);
 
     switch(ext->btns_pos) {
     default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
@@ -372,9 +372,9 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     lv_coord_t indic_size;
     lv_coord_t indic_pos = 0; /*silence uninitialized variable warning*/;
 
-    lv_style_value_t btns_bg_inner = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_INNER);
-    lv_style_value_t btns_bg_left = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_LEFT);
-    lv_style_value_t btns_bg_top = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_TOP);
+    lv_style_int_t btns_bg_inner = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_INNER);
+    lv_style_int_t btns_bg_left = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_LEFT);
+    lv_style_int_t btns_bg_top = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_TOP);
 
     switch(ext->btns_pos) {
     default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
@@ -810,7 +810,7 @@ static void refr_indic_size(lv_obj_t * tabview)
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
 
-    lv_coord_t indic_size = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_INDIC, LV_STYLE_SIZE);
+    lv_coord_t indic_size = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_INDIC, LV_STYLE_SIZE);
 
     /*Set the indicator width/height*/
     lv_coord_t indic_w;
@@ -856,15 +856,15 @@ static void refr_btns_size(lv_obj_t * tabview)
 {
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
 
-    lv_style_value_t btn_bg_left = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_LEFT);
-    lv_style_value_t btn_bg_right = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_RIGHT);
-    lv_style_value_t btn_bg_top = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_TOP);
-    lv_style_value_t btn_bg_bottom = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t btn_bg_left = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_LEFT);
+    lv_style_int_t btn_bg_right = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t btn_bg_top = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_TOP);
+    lv_style_int_t btn_bg_bottom = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BTNS_BG, LV_STYLE_PAD_BOTTOM);
 
-    lv_style_value_t btn_left = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BTNS, LV_STYLE_PAD_LEFT);
-    lv_style_value_t btn_right = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BTNS, LV_STYLE_PAD_RIGHT);
-    lv_style_value_t btn_top = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BTNS, LV_STYLE_PAD_TOP);
-    lv_style_value_t btn_bottom = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BTNS, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t btn_left = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BTNS, LV_STYLE_PAD_LEFT);
+    lv_style_int_t btn_right = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BTNS, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t btn_top = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BTNS, LV_STYLE_PAD_TOP);
+    lv_style_int_t btn_bottom = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BTNS, LV_STYLE_PAD_BOTTOM);
 
     const lv_font_t * font = lv_obj_get_style_ptr(tabview, LV_TABVIEW_PART_BTNS, LV_STYLE_FONT);
 
@@ -925,8 +925,8 @@ static void refr_content_size(lv_obj_t * tabview)
     lv_obj_set_size(ext->content, cont_w, cont_h);
 
     /*Refresh the size of the tab pages too. `ext->content` has a layout to align the pages*/
-    lv_style_value_t bg_top = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BG_SCRL, LV_STYLE_PAD_TOP);
-    lv_style_value_t bg_bottom = lv_obj_get_style_value(tabview, LV_TABVIEW_PART_BG_SCRL, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t bg_top = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BG_SCRL, LV_STYLE_PAD_TOP);
+    lv_style_int_t bg_bottom = lv_obj_get_style_int(tabview, LV_TABVIEW_PART_BG_SCRL, LV_STYLE_PAD_BOTTOM);
     cont_h -= bg_top + bg_bottom;
     lv_obj_t * content_scrl = lv_page_get_scrl(ext->content);
     lv_obj_t * pages = lv_obj_get_child(content_scrl, NULL);

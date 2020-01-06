@@ -273,7 +273,7 @@ void lv_lmeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_
     lv_lmeter_ext_t * ext    = lv_obj_get_ext_attr(lmeter);
 
     lv_coord_t r_out = lv_obj_get_width(lmeter) / 2;
-    lv_coord_t r_in  = r_out - lv_obj_get_style_value(lmeter, part, LV_STYLE_SCALE_WIDTH);
+    lv_coord_t r_in  = r_out - lv_obj_get_style_int(lmeter, part, LV_STYLE_SCALE_WIDTH);
     if(r_in < 1) r_in = 1;
 
     lv_coord_t x_ofs  = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;

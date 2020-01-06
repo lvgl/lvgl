@@ -362,42 +362,7 @@ static void chart_init(void)
 static void calendar_init(void)
 {
 #if LV_USE_CALENDAR
-    static lv_style_t header;
-    static lv_style_t color_text;
-    static lv_style_t gray_text;
-    static lv_style_t today_box;
 
-    lv_style_copy(&header, &def);
-    header.body.radius         = 0;
-    header.body.padding.left   = LV_DPI / 12;
-    header.body.padding.right  = LV_DPI / 12;
-    header.body.padding.top    = LV_DPI / 14;
-    header.body.padding.bottom = LV_DPI / 14;
-    header.body.main_color     = lv_color_hsv_to_rgb(_hue, 30, 60);
-    header.body.grad_color     = header.body.main_color;
-    header.body.border.opa     = panel.body.border.opa;
-    header.body.border.width   = panel.body.border.width;
-    header.body.border.color   = lv_color_hsv_to_rgb(_hue, 20, 80);
-    header.text.color          = lv_color_hsv_to_rgb(_hue, 5, 100);
-
-    lv_style_copy(&today_box, &header);
-    today_box.body.main_color = lv_color_hsv_to_rgb(_hue, 40, 70);
-    today_box.body.grad_color = today_box.body.main_color;
-    today_box.body.opa        = LV_OPA_TRANSP;
-
-    lv_style_copy(&color_text, &def);
-    color_text.text.color = lv_color_hsv_to_rgb(_hue, 30, 80);
-
-    lv_style_copy(&gray_text, &def);
-    gray_text.text.color = lv_color_hsv_to_rgb(_hue, 10, 65);
-
-    theme.style.calendar.bg               = &panel;
-    theme.style.calendar.header           = &header;
-    theme.style.calendar.week_box         = &header;
-    theme.style.calendar.today_box        = &today_box;
-    theme.style.calendar.day_names        = &color_text;
-    theme.style.calendar.highlighted_days = &color_text;
-    theme.style.calendar.inactive_days    = &gray_text;
 #endif
 }
 
@@ -688,6 +653,12 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
     case LV_THEME_TA_CURSOR:
         return &ta_cursor;
     case LV_THEME_LIST_BTN:
+        return &btn;
+    case LV_THEME_CALENDAR_BG:
+        return &panel;
+    case LV_THEME_CALENDAR_HEADER:
+    case LV_THEME_CALENDAR_TODAY_BOX:
+    case LV_THEME_CALENDAR_WEEK_BOX:
         return &btn;
     }
 

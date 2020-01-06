@@ -449,10 +449,10 @@ static lv_design_res_t lv_btn_design(lv_obj_t * btn, const lv_area_t * clip_area
         lv_obj_init_draw_rect_dsc(btn, LV_OBJ_PART_MAIN, &draw_dsc);
         lv_draw_rect(&btn->coords, clip_area, &draw_dsc);
 
-        if(lv_obj_get_style_value(btn, LV_OBJ_PART_MAIN, LV_STYLE_CLIP_CORNER)) {
+        if(lv_obj_get_style_int(btn, LV_OBJ_PART_MAIN, LV_STYLE_CLIP_CORNER)) {
             lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
 
-            lv_coord_t r = lv_obj_get_style_value(btn, LV_OBJ_PART_MAIN, LV_STYLE_RADIUS);
+            lv_coord_t r = lv_obj_get_style_int(btn, LV_OBJ_PART_MAIN, LV_STYLE_RADIUS);
 
             lv_draw_mask_radius_init(mp, &btn->coords, r, false);
             /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/

@@ -192,8 +192,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     if(src_type == LV_IMG_SRC_SYMBOL) {
         /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
         const lv_font_t * font = lv_obj_get_style_ptr(img, LV_IMG_PART_MAIN, LV_STYLE_FONT);
-        lv_style_value_t letter_space = lv_obj_get_style_value(img, LV_IMG_PART_MAIN, LV_STYLE_LETTER_SPACE);
-        lv_style_value_t line_space = lv_obj_get_style_value(img, LV_IMG_PART_MAIN, LV_STYLE_LINE_SPACE);
+        lv_style_int_t letter_space = lv_obj_get_style_int(img, LV_IMG_PART_MAIN, LV_STYLE_LETTER_SPACE);
+        lv_style_int_t line_space = lv_obj_get_style_int(img, LV_IMG_PART_MAIN, LV_STYLE_LINE_SPACE);
         lv_point_t size;
         lv_txt_get_size(&size, src_img, font, letter_space, line_space,
                         LV_COORD_MAX, LV_TXT_FLAG_NONE);

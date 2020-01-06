@@ -210,11 +210,11 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
         lv_obj_set_click(label, false);
         lv_label_set_long_mode(label, LV_LABEL_LONG_SROLL_CIRC);
         if(lv_obj_get_base_dir(liste) == LV_BIDI_DIR_RTL) {
-            lv_coord_t pad = lv_obj_get_style_value(liste, LV_BTN_PART_MAIN, LV_STYLE_PAD_LEFT);
+            lv_coord_t pad = lv_obj_get_style_int(liste, LV_BTN_PART_MAIN, LV_STYLE_PAD_LEFT);
             lv_obj_set_width(label, label->coords.x2 - liste->coords.x1 - pad);
         }
         else {
-            lv_coord_t pad = lv_obj_get_style_value(liste, LV_BTN_PART_MAIN, LV_STYLE_PAD_RIGHT);
+            lv_coord_t pad = lv_obj_get_style_int(liste, LV_BTN_PART_MAIN, LV_STYLE_PAD_RIGHT);
             lv_obj_set_width(label, liste->coords.x2 - label->coords.x1 - pad);
         }
         if(label_signal == NULL) label_signal = lv_obj_get_signal_cb(label);
@@ -854,11 +854,11 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
             const lv_font_t * font = lv_obj_get_style_ptr(label, LV_LABEL_PART_MAIN, LV_STYLE_FONT);
             lv_coord_t font_h = lv_font_get_line_height(font);
             if(lv_obj_get_base_dir(btn) == LV_BIDI_DIR_RTL) {
-                lv_coord_t pad = lv_obj_get_style_value(btn, LV_BTN_PART_MAIN, LV_STYLE_PAD_LEFT);
+                lv_coord_t pad = lv_obj_get_style_int(btn, LV_BTN_PART_MAIN, LV_STYLE_PAD_LEFT);
                 lv_obj_set_size(label, label->coords.x2 - btn->coords.x1 - pad, font_h);
             }
             else {
-                lv_coord_t pad = lv_obj_get_style_value(btn, LV_BTN_PART_MAIN, LV_STYLE_PAD_RIGHT);
+                lv_coord_t pad = lv_obj_get_style_int(btn, LV_BTN_PART_MAIN, LV_STYLE_PAD_RIGHT);
                 lv_obj_set_size(label, btn->coords.x2 - label->coords.x1 - pad, font_h);
             }
         }

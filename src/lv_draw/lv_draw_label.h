@@ -30,8 +30,8 @@ typedef struct {
     lv_color_t sel_color;
     const lv_font_t * font;
     lv_opa_t opa;
-    lv_style_value_t line_space;
-    lv_style_value_t letter_space;
+    lv_style_int_t line_space;
+    lv_style_int_t letter_space;
     uint16_t sel_start;
     uint16_t sel_end;
     lv_coord_t ofs_x;

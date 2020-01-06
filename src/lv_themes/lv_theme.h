@@ -103,6 +103,14 @@ typedef enum {
     LV_THEME_LIST_SCRLBAR,
     LV_THEME_LIST_EDGE_FLASH,
     LV_THEME_LIST_BTN,
+
+
+    LV_THEME_CALENDAR_BG,
+    LV_THEME_CALENDAR_HEADER,
+    LV_THEME_CALENDAR_DAY_NAMES,
+    LV_THEME_CALENDAR_DATE_NUMS,
+    LV_THEME_CALENDAR_TODAY_BOX,
+    LV_THEME_CALENDAR_WEEK_BOX,
 }lv_theme_style_t;
 
 typedef struct {
@@ -126,12 +134,12 @@ void lv_theme_set_act(lv_theme_t * th);
  */
 lv_theme_t * lv_theme_get_act(void);
 
-lv_style_t * lv_theme_get_style(lv_theme_t * th, lv_theme_style_t name);
+lv_style_t * lv_theme_get_style(lv_theme_style_t name);
 
 /**********************
  *    MACROS
  **********************/
-#define _t(name) lv_theme_get_style(lv_theme_get_act(), LV_THEME_ ## name)
+#define _t(name) lv_theme_get_style(LV_THEME_ ## name)
 #define _ot(obj, part, name) lv_obj_add_style_class(obj, part, _t(name))
 
 /**********************

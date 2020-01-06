@@ -25,31 +25,31 @@ extern "C" {
  **********************/
 
 typedef struct {
-    lv_style_value_t radius;
+    lv_style_int_t radius;
 
     /*Background*/
     lv_color_t bg_color;
     lv_color_t bg_grad_color;
     lv_grad_dir_t bg_grad_dir;
-    lv_style_value_t bg_main_color_stop;
-    lv_style_value_t bg_grad_color_stop;
+    lv_style_int_t bg_main_color_stop;
+    lv_style_int_t bg_grad_color_stop;
     lv_blend_mode_t bg_blend_mode;
     lv_opa_t bg_opa;
 
     /*Border*/
     lv_color_t border_color;
-    lv_style_value_t border_width;
+    lv_style_int_t border_width;
     lv_blend_mode_t border_blend_mode;
-    lv_style_value_t border_part;
+    lv_style_int_t border_part;
     lv_opa_t border_opa;
 
     /*Shadow*/
     lv_color_t shadow_color;
-    lv_style_value_t shadow_width;
-    lv_style_value_t shadow_ofs_x;
-    lv_style_value_t shadow_ofs_y;
-    lv_style_value_t shadow_spread;
-    lv_style_value_t shadow_blend_mode;
+    lv_style_int_t shadow_width;
+    lv_style_int_t shadow_ofs_x;
+    lv_style_int_t shadow_ofs_y;
+    lv_style_int_t shadow_spread;
+    lv_style_int_t shadow_blend_mode;
     lv_opa_t shadow_opa;
 
     /*Pattern*/

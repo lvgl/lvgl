@@ -23,7 +23,7 @@ extern "C" {
  **********************/
 typedef struct {
     lv_color_t color;
-    lv_style_value_t width;
+    lv_style_int_t width;
     lv_opa_t opa;
     lv_blend_mode_t blend_mode;
     uint8_t round_start :1;

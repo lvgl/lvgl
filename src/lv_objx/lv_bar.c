@@ -398,10 +398,10 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
     if(ext->type == LV_BAR_TYPE_SYM && ext->min_value < 0 && ext->max_value > 0 && ext->start_value == ext->min_value) sym = true;
 
     /*Calculate the indicator area*/
-    lv_style_value_t bg_left = lv_obj_get_style_value(bar,   LV_BAR_PART_BG, LV_STYLE_PAD_LEFT);
-    lv_style_value_t bg_right = lv_obj_get_style_value(bar,  LV_BAR_PART_BG, LV_STYLE_PAD_RIGHT);
-    lv_style_value_t bg_top = lv_obj_get_style_value(bar,    LV_BAR_PART_BG, LV_STYLE_PAD_TOP);
-    lv_style_value_t bg_bottom = lv_obj_get_style_value(bar, LV_BAR_PART_BG, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t bg_left = lv_obj_get_style_int(bar,   LV_BAR_PART_BG, LV_STYLE_PAD_LEFT);
+    lv_style_int_t bg_right = lv_obj_get_style_int(bar,  LV_BAR_PART_BG, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t bg_top = lv_obj_get_style_int(bar,    LV_BAR_PART_BG, LV_STYLE_PAD_TOP);
+    lv_style_int_t bg_bottom = lv_obj_get_style_int(bar, LV_BAR_PART_BG, LV_STYLE_PAD_BOTTOM);
 
     /*Respect padding and minimum width/height too*/
     lv_area_copy(&ext->indic_area, &bar->coords);
@@ -493,7 +493,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
     /*Do not draw a zero length indicator*/
     if(!sym && indic_length_calc(&ext->indic_area) == 0) return;
 
-    uint16_t bg_radius = lv_obj_get_style_value(bar, LV_BAR_PART_BG, LV_STYLE_RADIUS);
+    uint16_t bg_radius = lv_obj_get_style_int(bar, LV_BAR_PART_BG, LV_STYLE_RADIUS);
     lv_coord_t short_side = LV_MATH_MIN(objw, objh);
     if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
 
@@ -576,19 +576,19 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        lv_style_value_t bg_sh_width = lv_obj_get_style_value(bar, LV_BAR_PART_BG, LV_STYLE_SHADOW_WIDTH);
-        lv_style_value_t bg_sh_spread = lv_obj_get_style_value(bar, LV_BAR_PART_BG, LV_STYLE_SHADOW_SPREAD);
-        lv_style_value_t bg_sh_ofs_x = lv_obj_get_style_value(bar, LV_BAR_PART_BG, LV_STYLE_SHADOW_OFFSET_X);
-        lv_style_value_t bg_sh_ofs_y = lv_obj_get_style_value(bar, LV_BAR_PART_BG, LV_STYLE_SHADOW_OFFSET_Y);
+        lv_style_int_t bg_sh_width = lv_obj_get_style_int(bar, LV_BAR_PART_BG, LV_STYLE_SHADOW_WIDTH);
+        lv_style_int_t bg_sh_spread = lv_obj_get_style_int(bar, LV_BAR_PART_BG, LV_STYLE_SHADOW_SPREAD);
+        lv_style_int_t bg_sh_ofs_x = lv_obj_get_style_int(bar, LV_BAR_PART_BG, LV_STYLE_SHADOW_OFFSET_X);
+        lv_style_int_t bg_sh_ofs_y = lv_obj_get_style_int(bar, LV_BAR_PART_BG, LV_STYLE_SHADOW_OFFSET_Y);
 
         lv_coord_t bg_size = bg_sh_width + bg_sh_spread;
         bg_size += LV_MATH_MAX(LV_MATH_ABS(bg_sh_ofs_x), LV_MATH_ABS(bg_sh_ofs_y));
 
 
-        lv_style_value_t indic_sh_width = lv_obj_get_style_value(bar,  LV_BAR_PART_INDIC, LV_STYLE_SHADOW_WIDTH);
-        lv_style_value_t indic_sh_spread = lv_obj_get_style_value(bar, LV_BAR_PART_INDIC, LV_STYLE_SHADOW_SPREAD);
-        lv_style_value_t indic_sh_ofs_x = lv_obj_get_style_value(bar,  LV_BAR_PART_INDIC, LV_STYLE_SHADOW_OFFSET_X);
-        lv_style_value_t indic_sh_ofs_y = lv_obj_get_style_value(bar,  LV_BAR_PART_INDIC, LV_STYLE_SHADOW_OFFSET_Y);
+        lv_style_int_t indic_sh_width = lv_obj_get_style_int(bar,  LV_BAR_PART_INDIC, LV_STYLE_SHADOW_WIDTH);
+        lv_style_int_t indic_sh_spread = lv_obj_get_style_int(bar, LV_BAR_PART_INDIC, LV_STYLE_SHADOW_SPREAD);
+        lv_style_int_t indic_sh_ofs_x = lv_obj_get_style_int(bar,  LV_BAR_PART_INDIC, LV_STYLE_SHADOW_OFFSET_X);
+        lv_style_int_t indic_sh_ofs_y = lv_obj_get_style_int(bar,  LV_BAR_PART_INDIC, LV_STYLE_SHADOW_OFFSET_Y);
 
 
         lv_coord_t indic_size = indic_sh_width + indic_sh_spread;

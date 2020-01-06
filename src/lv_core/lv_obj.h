@@ -486,7 +486,7 @@ void lv_obj_set_style(lv_obj_t * obj, const lv_style_t * style);
 
 void lv_obj_set_style_color(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_color_t color);
 
-void lv_obj_set_style_value(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_style_value_t value);
+void lv_obj_set_style_value(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_style_int_t value);
 
 void lv_obj_set_style_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_opa_t opa);
 
@@ -860,7 +860,7 @@ lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj);
 
 lv_style_dsc_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t type);
 
-lv_style_value_t lv_obj_get_style_value(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 
 lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 

@@ -347,10 +347,10 @@ lv_coord_t lv_page_get_fit_width(lv_obj_t * page)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 
-    lv_style_value_t bg_left = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
-    lv_style_value_t bg_right = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);
-    lv_style_value_t scrl_left = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_LEFT);
-    lv_style_value_t scrl_right = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t bg_left = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
+    lv_style_int_t bg_right = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t scrl_left = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_LEFT);
+    lv_style_int_t scrl_right = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_RIGHT);
 
     return lv_obj_get_width(page) - bg_left - bg_right - scrl_left - scrl_right;
 }
@@ -364,10 +364,10 @@ lv_coord_t lv_page_get_fit_height(lv_obj_t * page)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 
-    lv_style_value_t bg_top = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_TOP);
-    lv_style_value_t bg_bottom = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_BOTTOM);
-    lv_style_value_t scrl_top = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_TOP);
-    lv_style_value_t scrl_bottom = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t bg_top = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_TOP);
+    lv_style_int_t bg_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t scrl_top = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_TOP);
+    lv_style_int_t scrl_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_BOTTOM);
 
     return lv_obj_get_height(page) - bg_top - bg_bottom - scrl_top - scrl_bottom;
 }
@@ -391,10 +391,10 @@ bool lv_page_on_edge(lv_obj_t * page, lv_page_edge_t edge)
     lv_obj_get_coords(scrl, &scrl_coords);
     lv_obj_get_coords(page, &page_coords);
 
-    lv_style_value_t left = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
-    lv_style_value_t right = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);
-    lv_style_value_t top = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_TOP);
-    lv_style_value_t bottom = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t left = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
+    lv_style_int_t right = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t top = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_TOP);
+    lv_style_int_t bottom = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_BOTTOM);
 
     if((edge & LV_PAGE_EDGE_TOP) && scrl_coords.y1 == page_coords.y1 + top) return true;
     if((edge & LV_PAGE_EDGE_BOTTOM) && scrl_coords.y2 == page_coords.y2 - bottom) return true;
@@ -444,10 +444,10 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
     lv_coord_t top_err = -(scrlable_y + obj_y);
     lv_coord_t bot_err = scrlable_y + obj_y + obj_h - page_h;
 
-    lv_style_value_t bg_top = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_TOP);
-    lv_style_value_t bg_bottom = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_BOTTOM);
-    lv_style_value_t scrl_top = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_TOP);
-    lv_style_value_t scrl_bottom = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t bg_top = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_TOP);
+    lv_style_int_t bg_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t scrl_top = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_TOP);
+    lv_style_int_t scrl_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_BOTTOM);
 
     /*Out of the page on the top*/
     if((obj_h <= page_h && top_err > 0) || (obj_h > page_h && top_err < bot_err)) {
@@ -473,10 +473,10 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
     lv_coord_t left_err  = -(scrlable_x + obj_x);
     lv_coord_t right_err = scrlable_x + obj_x + obj_w - page_w;
 
-    lv_style_value_t bg_left = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
-    lv_style_value_t bg_right = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);
-    lv_style_value_t scrl_left = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_LEFT);
-    lv_style_value_t scrl_right = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t bg_left = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
+    lv_style_int_t bg_right = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t scrl_left = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_LEFT);
+    lv_style_int_t scrl_right = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_RIGHT);
 
     /*Out of the page on the left*/
     if((obj_w <= page_w && left_err > 0) || (obj_w > page_w && left_err < right_err)) {
@@ -652,10 +652,10 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
 
         lv_draw_rect(&page->coords, clip_area, &draw_dsc);
 
-        if(lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_CLIP_CORNER)) {
+        if(lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_CLIP_CORNER)) {
             lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
 
-            lv_coord_t r = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_RADIUS);
+            lv_coord_t r = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_RADIUS);
 
             lv_draw_mask_radius_init(mp, &page->coords, r, false);
             /*Add the mask and use `page+8` as custom id. Don't use `page` directly because it might be sued by the user*/
@@ -738,7 +738,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
         }
 
 #endif
-        if(lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_CLIP_CORNER)) {
+        if(lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_CLIP_CORNER)) {
             void * param = lv_draw_mask_remove_custom(page + 8);
             lv_mem_buf_release(param);
         }
@@ -793,9 +793,9 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         lv_fit_t fit_top         = lv_page_get_scrl_fit_top(page);
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(page);
 
-        lv_style_value_t scrl_left = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_LEFT);
-        lv_style_value_t scrl_right = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_RIGHT);
-        lv_style_value_t scrl_top = lv_obj_get_style_value(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_TOP);
+        lv_style_int_t scrl_left = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_LEFT);
+        lv_style_int_t scrl_right = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_RIGHT);
+        lv_style_int_t scrl_top = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_TOP);
 
         child = lv_obj_get_child(page, NULL);
         while(child != NULL) {
@@ -829,7 +829,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         ext->scrl->signal_cb(ext->scrl, LV_SIGNAL_COORD_CHG, &ext->scrl->coords);
 
-        lv_style_value_t sb_width = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_SIZE);
+        lv_style_int_t sb_width = lv_obj_get_style_int(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_SIZE);
         lv_area_set_height(&ext->sb.hor_area, sb_width);
         lv_area_set_width(&ext->sb.ver_area, sb_width);
 
@@ -850,8 +850,8 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
 
-        lv_style_value_t sb_bottom = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_BOTTOM);
-        lv_style_value_t sb_right = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_RIGHT);
+        lv_style_int_t sb_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_BOTTOM);
+        lv_style_int_t sb_right = lv_obj_get_style_int(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_RIGHT);
 
         /*Ensure ext. size for the scrollbars if they are out of the page*/
         if(page->ext_draw_pad < (-sb_right)) page->ext_draw_pad = -sb_right;
@@ -951,10 +951,10 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
             }
         }
 
-        lv_style_value_t left = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
-        lv_style_value_t right = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);
-        lv_style_value_t top = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_TOP);
-        lv_style_value_t bottom = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_BOTTOM);
+        lv_style_int_t left = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
+        lv_style_int_t right = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);
+        lv_style_int_t top = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_TOP);
+        lv_style_int_t bottom = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_BOTTOM);
 
         /*scrollable width smaller then page width? -> align to left*/
         if(lv_area_get_width(&scrl_coords) + left +right <= lv_area_get_width(&page_coords)) {
@@ -1119,14 +1119,14 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     lv_coord_t obj_w  = lv_obj_get_width(page);
     lv_coord_t obj_h  = lv_obj_get_height(page);
 
-    lv_style_value_t sb_width = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_SIZE);
-    lv_style_value_t sb_right = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_RIGHT);
-    lv_style_value_t sb_bottom = lv_obj_get_style_value(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t sb_width = lv_obj_get_style_int(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_SIZE);
+    lv_style_int_t sb_right = lv_obj_get_style_int(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t sb_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_BOTTOM);
 
-    lv_style_value_t bg_left = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
-    lv_style_value_t bg_right = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);
-    lv_style_value_t bg_top = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_TOP);
-    lv_style_value_t bg_bottom = lv_obj_get_style_value(page, LV_PAGE_PART_BG, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t bg_left = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
+    lv_style_int_t bg_right = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t bg_top = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_TOP);
+    lv_style_int_t bg_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_BOTTOM);
 
     /*Always let 'scrollbar width' padding above, under, left and right to the scrollbars
      * else:

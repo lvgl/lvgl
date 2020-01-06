@@ -439,8 +439,8 @@ static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask)
     char scale_txt[16];
 
     lv_gauge_ext_t * ext     = lv_obj_get_ext_attr(gauge);
-    lv_style_value_t scale_width = lv_obj_get_style_value(gauge, LV_GAUGE_PART_STRONG, LV_STYLE_SCALE_WIDTH);
-    lv_style_value_t txt_pad = lv_obj_get_style_value(gauge, LV_GAUGE_PART_STRONG, LV_STYLE_PAD_INNER);
+    lv_style_int_t scale_width = lv_obj_get_style_int(gauge, LV_GAUGE_PART_STRONG, LV_STYLE_SCALE_WIDTH);
+    lv_style_int_t txt_pad = lv_obj_get_style_int(gauge, LV_GAUGE_PART_STRONG, LV_STYLE_PAD_INNER);
     lv_coord_t r             = lv_obj_get_width(gauge) / 2 - scale_width - txt_pad;
     lv_coord_t x_ofs         = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
     lv_coord_t y_ofs         = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
@@ -492,7 +492,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
 {
     lv_gauge_ext_t * ext     = lv_obj_get_ext_attr(gauge);
 
-    lv_style_value_t scale_width = lv_obj_get_style_value(gauge, LV_GAUGE_PART_STRONG, LV_STYLE_SCALE_WIDTH);
+    lv_style_int_t scale_width = lv_obj_get_style_int(gauge, LV_GAUGE_PART_STRONG, LV_STYLE_SCALE_WIDTH);
     lv_coord_t r      = lv_obj_get_width(gauge) / 2 - scale_width;
     lv_coord_t x_ofs  = lv_obj_get_width(gauge) / 2 + gauge->coords.x1;
     lv_coord_t y_ofs  = lv_obj_get_height(gauge) / 2 + gauge->coords.y1;
@@ -558,7 +558,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
     lv_draw_rect_dsc_t mid_dsc;
     lv_draw_rect_dsc_init(&mid_dsc);
     lv_obj_init_draw_rect_dsc(gauge, LV_GAUGE_PART_MAIN, &mid_dsc);
-    lv_style_value_t size = lv_obj_get_style_value(gauge, LV_GAUGE_PART_MAIN, LV_STYLE_SIZE) / 2;
+    lv_style_int_t size = lv_obj_get_style_int(gauge, LV_GAUGE_PART_MAIN, LV_STYLE_SIZE) / 2;
     lv_area_t nm_cord;
     nm_cord.x1 = x_ofs - size;
     nm_cord.y1 = y_ofs - size;
