@@ -2573,7 +2573,15 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_CHILD_CHG) {
         /*Return 'invalid' if the child change signal is not enabled*/
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
-    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    }
+#if LV_USE_OBJ_REALIGN
+    else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {
+        if(obj->realign.auto_realign) {
+            lv_obj_realign(obj);
+        }
+    }
+#endif
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         const lv_style_t * style = lv_obj_get_style(obj);
         lv_coord_t shadow = (style->body.shadow.width >> 1) + 1;
         shadow += style->body.shadow.spread;
