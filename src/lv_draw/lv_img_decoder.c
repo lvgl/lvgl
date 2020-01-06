@@ -509,6 +509,7 @@ void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_ds
         }
 #endif
         if(user_data->palette) lv_mem_free(user_data->palette);
+        if(user_data->opa) lv_mem_free(user_data->opa);
 
         lv_mem_free(user_data);
 
