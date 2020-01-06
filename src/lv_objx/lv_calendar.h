@@ -53,27 +53,23 @@ typedef struct
     const char ** month_names; /*Pointer to an array with the name of the month (NULL. use default names)*/
 
     /*Styles*/
-    const lv_style_t * style_header;
-    const lv_style_t * style_header_pr;
-    const lv_style_t * style_day_names;
-    const lv_style_t * style_highlighted_days;
-    const lv_style_t * style_inactive_days;
-    const lv_style_t * style_week_box;
-    const lv_style_t * style_today_box;
+    lv_style_dsc_t style_header;
+    lv_style_dsc_t style_day_names;
+    lv_style_dsc_t style_date_nums;
+    lv_style_dsc_t style_week_box;
+    lv_style_dsc_t style_today_box;
 } lv_calendar_ext_t;
 
-/** Calendar styles*/
+/** Calendar parts*/
 enum {
-    LV_CALENDAR_STYLE_BG, /**< Background and "normal" date numbers style */
-    LV_CALENDAR_STYLE_HEADER, /** Calendar header style */
-    LV_CALENDAR_STYLE_HEADER_PR, /** Calendar header style (when pressed) */
-    LV_CALENDAR_STYLE_DAY_NAMES, /** Day name style */
-    LV_CALENDAR_STYLE_HIGHLIGHTED_DAYS, /** Highlighted day style */ 
-    LV_CALENDAR_STYLE_INACTIVE_DAYS, /** Inactive day style */
-    LV_CALENDAR_STYLE_WEEK_BOX, /** Week highlight style */
-    LV_CALENDAR_STYLE_TODAY_BOX, /** Today highlight style */
+    LV_CALENDAR_PART_BG, /**< Background and "normal" date numbers style */
+    LV_CALENDAR_PART_HEADER, /** Calendar header style */
+    LV_CALENDAR_PART_DAY_NAMES, /** Day name style */
+    LV_CALENDAR_PART_DATE_NUMS, /** Day name style */
+    LV_CALENDAR_PART_WEEK_BOX, /** Week highlight style */
+    LV_CALENDAR_PART_TODAY_BOX, /** Today highlight style */
 };
-typedef uint8_t lv_calendar_style_t;
+typedef uint8_t lv_calendar_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -138,14 +134,6 @@ void lv_calendar_set_day_names(lv_obj_t * calendar, const char ** day_names);
  */
 void lv_calendar_set_month_names(lv_obj_t * calendar, const char ** month_names);
 
-/**
- * Set a style of a calendar.
- * @param calendar pointer to calendar object
- * @param type which style should be set
- * @param style pointer to a style
- *  */
-void lv_calendar_set_style(lv_obj_t * calendar, lv_calendar_style_t type, const lv_style_t * style);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -199,14 +187,6 @@ const char ** lv_calendar_get_day_names(const lv_obj_t * calendar);
  * @return pointer to the array of month names
  */
 const char ** lv_calendar_get_month_names(const lv_obj_t * calendar);
-
-/**
- * Get style of a calendar.
- * @param calendar pointer to calendar object
- * @param type which style should be get
- * @return style pointer to the style
- *  */
-const lv_style_t * lv_calendar_get_style(const lv_obj_t * calendar, lv_calendar_style_t type);
 
 /*=====================
  * Other functions
