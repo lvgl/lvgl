@@ -36,11 +36,11 @@ typedef struct
     lv_img_dsc_t dsc;
 } lv_canvas_ext_t;
 
-/*Styles*/
+/*Canvas part*/
 enum {
-    LV_CANVAS_STYLE_MAIN,
+    LV_CANVAS_PART_MAIN,
 };
-typedef uint8_t lv_canvas_style_t;
+typedef uint8_t lv_canvas_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -93,14 +93,6 @@ void lv_canvas_set_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_color_t 
  */
 void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color_t c);
 
-/**
- * Set a style of a canvas.
- * @param canvas pointer to canvas object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, const lv_style_t * style);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -120,14 +112,6 @@ lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y);
  * @return pointer to the image descriptor.
  */
 lv_img_dsc_t * lv_canvas_get_img(lv_obj_t * canvas);
-
-/**
- * Get style of a canvas.
- * @param canvas pointer to canvas object
- * @param type which style should be get
- * @return style pointer to the style
- */
-const lv_style_t * lv_canvas_get_style(const lv_obj_t * canvas, lv_canvas_style_t type);
 
 /*=====================
  * Other functions
