@@ -142,7 +142,7 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_style_dsc_add_class(&ext->style_today_box, lv_theme_get_style(LV_THEME_CALENDAR_TODAY_BOX));
         lv_style_dsc_add_class(&ext->style_week_box, lv_theme_get_style(LV_THEME_CALENDAR_WEEK_BOX));
 
-        lv_obj_refresh_style(new_calendar, LV_OBJ_PART_ALL);
+        lv_obj_refresh_style(new_calendar);
 
         lv_obj_set_size(new_calendar, LV_DPI * 2, LV_DPI * 2);
 
@@ -430,9 +430,10 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
 {
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** part_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_calendar_get_style(calendar, **part_p);
+        lv_get_style_info_t * info = param;
+        info->result = lv_calendar_get_style(calendar, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(calendar, sign, param);
         return LV_RES_OK;
     }
 
@@ -842,8 +843,6 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 
     calendar->state = LV_OBJ_STATE_PRESSED;
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &pr_label_dsc);
-    pr_label_dsc.color = LV_COLOR_RED;
-
 
     calendar->state = state_ori;
     calendar->style_dsc.cache.enabled = 1;

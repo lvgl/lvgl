@@ -757,10 +757,10 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 {
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_btnm_get_style(btnm, **type_p);
-        return LV_RES_OK;
+        lv_get_style_info_t * info = param;
+        info->result = lv_btnm_get_style(btnm, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(btnm, sign, param);
     }
 
     /* Include the ancient signal function */
@@ -773,8 +773,12 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_mem_free(ext->button_areas);
         lv_mem_free(ext->ctrl_bits);
-    } else if(sign == LV_SIGNAL_STYLE_CHG || sign == LV_SIGNAL_COORD_CHG) {
+    } else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_btnm_set_map(btnm, ext->map_p);
+    } else if(sign == LV_SIGNAL_COORD_CHG) {
+        if(lv_obj_get_width(btnm) != lv_area_get_width(param) || lv_obj_get_height(btnm) != lv_area_get_height(param)) {
+            lv_btnm_set_map(btnm, ext->map_p);
+        }
     } else if(sign == LV_SIGNAL_PRESSED) {
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {

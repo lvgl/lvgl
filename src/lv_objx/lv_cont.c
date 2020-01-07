@@ -112,7 +112,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->layout              = copy_ext->layout;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_cont, LV_CONT_PART_MAIN);
+        lv_obj_refresh_style(new_cont);
     }
 
     LV_LOG_INFO("container created");
@@ -253,9 +253,10 @@ lv_fit_t lv_cont_get_fit_bottom(const lv_obj_t * cont)
 static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
 {
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_cont_get_style(cont, **type_p);
+        lv_get_style_info_t * info = param;
+        info->result = lv_cont_get_style(cont, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(cont, sign, param);
         return LV_RES_OK;
     }
 

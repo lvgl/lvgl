@@ -41,11 +41,11 @@ typedef struct
 
 } lv_objmask_ext_t;
 
-/*Styles*/
+/*Parts of the object*/
 enum {
-    LV_OBJMASK_STYLE_BG,
+    LV_OBJMASK_PART_MAIN,
 };
-typedef uint8_t lv_objmask_style_t;
+typedef uint8_t lv_objmask_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -91,30 +91,9 @@ void lv_objmask_remove_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask);
  * Setter functions
  *====================*/
 
-/**
- * Set the style of a object mask
- * @param objmask pointer to a container object
- * @param type which style should be set (can be only `LV_CONT_STYLE_MAIN`)
- * @param style pointer to the new style
- */
-static inline void lv_objmask_set_style(lv_obj_t * objmask, lv_cont_style_t type, const lv_style_t * style)
-{
-    lv_cont_set_style(objmask, type, style);
-}
-
 /*=====================
  * Getter functions
  *====================*/
-/**
- * Get the style of an object mask
- * @param objmask pointer to a container object
- * @param type which style should be get (can be only `LV_CONT_STYLE_MAIN`)
- * @return pointer to the container's style
- */
-static inline const lv_style_t * lv_objmask_get_style(const lv_obj_t * objmask, lv_cont_style_t type)
-{
-    return lv_cont_get_style(objmask, type);
-}
 
 /*=====================
  * Other functions

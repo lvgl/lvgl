@@ -61,6 +61,14 @@ static lv_style_t ddlist_bg, ddlist_sel;
 static lv_style_t ta_cursor;
 #endif
 
+#if LV_USE_ARC
+static lv_style_t arc;
+#endif
+
+#if LV_USE_CALENDAR
+static lv_style_t calendar_date_nums;
+#endif
+
 /**********************
  *      MACROS
  **********************/
@@ -325,22 +333,9 @@ static void gauge_init(void)
 static void arc_init(void)
 {
 #if LV_USE_ARC != 0
-
-    static lv_style_t arc;
-    lv_style_copy(&arc, &def);
-    arc.line.width   = 8;
-    arc.line.color   = lv_color_hsv_to_rgb(_hue, 70, 90);
-    arc.line.rounded = 1;
-
-    /*For preloader*/
-    arc.body.border.width   = 2;
-    arc.body.border.color   = lv_color_hex3(0x555);
-    arc.body.padding.left   = 3;
-    arc.body.padding.right  = 3;
-    arc.body.padding.top    = 3;
-    arc.body.padding.bottom = 3;
-
-    theme.style.arc = &arc;
+    lv_style_init(&arc);
+    lv_style_set_color(&arc, LV_STYLE_LINE_COLOR, LV_COLOR_AQUA);
+    lv_style_set_int(&arc, LV_STYLE_LINE_WIDTH, 4);
 #endif
 }
 
@@ -362,7 +357,11 @@ static void chart_init(void)
 static void calendar_init(void)
 {
 #if LV_USE_CALENDAR
-
+    lv_style_init(&calendar_date_nums);
+    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR, LV_COLOR_RED);
+    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_DISABLED, LV_COLOR_GRAY);
+    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_WHITE);
+    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_NAVY);
 #endif
 }
 
@@ -455,9 +454,6 @@ static void ta_init(void)
 static void spinbox_init(void)
 {
 #if LV_USE_SPINBOX
-    theme.style.spinbox.bg     = &panel;
-    theme.style.spinbox.cursor = theme.style.ta.cursor;
-    theme.style.spinbox.sb     = theme.style.ta.sb;
 #endif
 }
 
@@ -660,6 +656,10 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
     case LV_THEME_CALENDAR_TODAY_BOX:
     case LV_THEME_CALENDAR_WEEK_BOX:
         return &btn;
+    case LV_THEME_CALENDAR_DATE_NUMS:
+        return &calendar_date_nums;
+    case LV_THEME_ARC:
+        return &arc;
     }
 
     return NULL;

@@ -46,10 +46,6 @@ extern "C" {
 #define LV_EXT_CLICK_AREA_TINY  1
 #define LV_EXT_CLICK_AREA_FULL  2
 
-#define _LV_OBJ_PART_MAIN_VALUE    0x00
-#define _LV_OBJ_PART_VIRTUAL_START 0x01
-#define _LV_OBJ_PART_REAL_START    0x40
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -272,7 +268,9 @@ typedef struct _lv_obj_t
 
 enum {
     LV_OBJ_PART_MAIN,
-    LV_OBJ_PART_ALL = 0xFF,
+    _LV_OBJ_PART_VIRTUAL_LAST = 0x01,
+    _LV_OBJ_PART_REAL_LAST =    0x40,
+    _LV_OBJ_PART_ALL = 0xFF,
 };
 
 typedef uint8_t lv_obj_part_t;
@@ -289,6 +287,13 @@ typedef struct
     lv_point_t *point;
     bool result;
 } lv_hit_test_info_t;
+
+
+typedef struct
+{
+    uint8_t part;
+    lv_style_dsc_t * result;
+} lv_get_style_info_t;
 
 typedef struct
 {
@@ -501,7 +506,7 @@ void lv_obj_reset_style(lv_obj_t * obj, uint8_t type);
  * Notify an object about its style is modified
  * @param obj pointer to an object
  */
-void lv_obj_refresh_style(lv_obj_t * obj, uint8_t type);
+void lv_obj_refresh_style(lv_obj_t * obj);
 
 /**
  * Notify all object if a style is modified
@@ -875,7 +880,7 @@ void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t type, lv_style_propert
 //const lv_style_t * lv_obj_get_style(const lv_obj_t * obj);
 
 
-void lv_obj_update_style_cache(lv_obj_t * obj, uint8_t part);
+void lv_obj_update_style_cache(lv_obj_t * obj);
 
 /*-----------------
  * Attribute get

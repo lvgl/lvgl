@@ -109,7 +109,6 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->pwd_show_time     = LV_TA_DEF_PWD_SHOW_TIME;
     ext->accapted_chars    = NULL;
     ext->max_length        = 0;
-    ext->cursor.style      = NULL;
     ext->cursor.blink_time = LV_TA_DEF_CURSOR_BLINK_TIME;
     ext->cursor.pos        = 0;
     ext->cursor.click_pos  = 1;
@@ -121,6 +120,8 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
     ext->label       = NULL;
     ext->placeholder = NULL;
+
+    lv_style_dsc_init(&ext->cursor.style);
 
 #if LV_USE_ANIMATION == 0
     ext->pwd_show_time     = 0;
@@ -1375,9 +1376,15 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
 {
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_ta_get_style(ta, **type_p);
+        lv_get_style_info_t * info = param;
+        info->result = lv_ta_get_style(ta, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(ta, sign, param);
+    }else if(sign == LV_SIGNAL_GET_STATE) {
+        lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+        lv_get_state_info_t * info = param;
+        if(info->part == LV_TA_PART_PLACEHOLDER) info->result = ext->placeholder ? lv_obj_get_state(ext->placeholder, LV_LABEL_PART_MAIN) : 0;
+        else info->result = lv_obj_get_state(ta, info->part);
         return LV_RES_OK;
     }
 
@@ -1549,20 +1556,23 @@ static lv_style_dsc_t * lv_ta_get_style(lv_obj_t * ta, uint8_t part)
     lv_style_dsc_t * style_dsc_p;
 
     switch(part) {
-    case LV_PAGE_PART_BG:
+    case LV_TA_PART_BG:
         style_dsc_p = &ta->style_dsc;
         break;
-    case LV_PAGE_PART_SCRL:
-        style_dsc_p = lv_obj_get_style(ext->page.scrl, LV_CONT_PART_MAIN);
-        break;
-    case LV_PAGE_PART_SCRLBAR:
+    case LV_TA_PART_SCRLBAR:
         style_dsc_p = &ext->page.sb.style;
         break;
+    case LV_TA_PART_CURSOR:
+        style_dsc_p = &ext->cursor.style;
+        break;
 #if LV_USE_ANIMATION
-    case LV_PAGE_PART_EDGE_FLASH:
+    case LV_TA_PART_EDGE_FLASH:
         style_dsc_p = &ext->page.edge_flash.style;
         break;
 #endif
+    case LV_TA_PART_PLACEHOLDER:
+        style_dsc_p = ext->placeholder ? lv_obj_get_style(ext->placeholder, LV_LABEL_PART_MAIN) : NULL;
+        break;
     default:
         style_dsc_p = NULL;
     }

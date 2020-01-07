@@ -77,7 +77,8 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new object mask object mask*/
     if(copy == NULL) {
-        lv_objmask_set_style(new_objmask, LV_OBJMASK_STYLE_BG, &lv_style_transp);
+        lv_style_dsc_reset(&new_objmask->style_dsc);
+        lv_obj_add_style_class(new_objmask, LV_OBJMASK_PART_MAIN, &lv_style_transp_tight);
 
     }
     /*TODO: Copy an existing object mask*/

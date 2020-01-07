@@ -126,7 +126,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->style_indic        = ext_copy->style_indic;
         ext->type                = ext_copy->type;
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_bar, LV_OBJ_PART_ALL);
+        lv_obj_refresh_style(new_bar);
 
         lv_bar_set_value(new_bar, ext->cur_value, false);
     }
@@ -564,9 +564,10 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     lv_res_t res;
 
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_bar_get_style(bar, **type_p);
+        lv_get_style_info_t * info = param;
+        info->result = lv_bar_get_style(bar, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(bar, sign, param);
         return LV_RES_OK;
     }
 

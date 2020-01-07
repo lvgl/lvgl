@@ -132,7 +132,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_page_set_sb_mode(new_page, ext->sb.mode);
 
-        lv_obj_refresh_style(new_page, LV_OBJ_PART_ALL);
+        lv_obj_refresh_style(new_page);
 
     } else {
         lv_page_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
@@ -758,10 +758,10 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
 {
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** part_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_page_get_style(page, **part_p);
-        return LV_RES_OK;
+        lv_get_style_info_t * info = param;
+        info->result = lv_page_get_style(page, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(page, sign, param);
     } else if(sign == LV_SIGNAL_GET_STATE) {
         lv_get_state_info_t * info = param;
         if(info->part == LV_PAGE_PART_SCRL) info->result = lv_obj_get_state(lv_page_get_scrl(page), LV_CONT_PART_MAIN);

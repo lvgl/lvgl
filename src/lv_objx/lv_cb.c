@@ -168,9 +168,10 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
 {
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_cb_get_style(cb, **type_p);
+        lv_get_style_info_t * info = param;
+        info->result = lv_cb_get_style(cb, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(cb, sign, param);
         return LV_RES_OK;
     }
 
@@ -186,7 +187,7 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
         lv_coord_t line_height = lv_font_get_line_height(font);
         lv_obj_set_size(ext->bullet, line_height, line_height);
         ext->bullet->state = cb->state;
-        lv_obj_refresh_style(ext->bullet, LV_OBJ_PART_ALL);
+        lv_obj_refresh_style(ext->bullet);
     } else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
     } else if(sign == LV_SIGNAL_CONTROL) {

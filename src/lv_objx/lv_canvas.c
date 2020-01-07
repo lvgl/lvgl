@@ -187,21 +187,6 @@ void lv_canvas_set_palette(lv_obj_t * canvas, uint8_t id, lv_color_t c)
     lv_obj_invalidate(canvas);
 }
 
-/**
- * Set a style of a canvas.
- * @param canvas pointer to canvas object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_canvas_set_style(lv_obj_t * canvas, lv_canvas_style_t type, const lv_style_t * style)
-{
-    LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
-
-    switch(type) {
-        case LV_CANVAS_STYLE_MAIN: lv_img_set_style(canvas, LV_IMG_STYLE_MAIN, style); break;
-    }
-}
-
 /*=====================
  * Getter functions
  *====================*/
@@ -726,8 +711,7 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_TRANSP;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-        rect_dsc->bg_color.full == ctransp.full &&
-        rect_dsc->bg_grad_color.full == ctransp.full)
+        rect_dsc->bg_color.full == ctransp.full)
     {
         disp.driver.antialiasing = 0;
     }
@@ -751,11 +735,10 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
  * @param txt text to display
  * @param align align of the text (`LV_LABEL_ALIGN_LEFT/RIGHT/CENTER`)
  */
-void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w, const lv_style_t * style,
+void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w, lv_draw_label_dsc_t * label_draw_dsc,
                          const char * txt, lv_label_align_t align)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
-    LV_ASSERT_NULL(style);
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
@@ -804,7 +787,9 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
         default: flag = LV_TXT_FLAG_NONE; break;
     }
 
-    lv_draw_label(&coords, &mask, style, LV_OPA_COVER, txt, flag, NULL,  NULL, NULL, lv_obj_get_base_dir(canvas));
+    label_draw_dsc->flag = flag;
+
+    lv_draw_label(&coords, &mask, label_draw_dsc, txt, NULL);
 
     lv_refr_set_disp_refreshing(refr_ori);
 }
@@ -818,7 +803,6 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src, lv_draw_img_dsc_t * img_draw_dsc)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
-    LV_ASSERT_NULL(style);
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
@@ -915,7 +899,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t 
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_TRANSP;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-        line_draw_dsc->color == ctransp.full)
+        line_draw_dsc->color.full == ctransp.full)
     {
         disp.driver.antialiasing = 0;
     }
@@ -939,10 +923,9 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t 
  * @param point_cnt number of points
  * @param style style of the polygon (`body.main_color` and `body.opa` is used)
  */
-void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt, const lv_style_t * style)
+void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt, lv_draw_rect_dsc_t * poly_draw_dsc)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
-    LV_ASSERT_NULL(style);
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
@@ -978,8 +961,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_TRANSP;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-        style->body.main_color.full == ctransp.full &&
-        style->body.grad_color.full == ctransp.full)
+        poly_draw_dsc->bg_color.full == ctransp.full)
     {
         disp.driver.antialiasing = 0;
     }
@@ -988,7 +970,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32
     lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
     lv_refr_set_disp_refreshing(&disp);
 
-    lv_draw_polygon(points, point_cnt, &mask, style, LV_OPA_COVER);
+//    lv_draw_polygon(points, point_cnt, &mask, poly_draw_dsc);
 
     lv_refr_set_disp_refreshing(refr_ori);
 }
@@ -1004,10 +986,9 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32
  * @param style style of the polygon (`body.main_color` and `body.opa` is used)
  */
 void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t r, int32_t start_angle,
-                        int32_t end_angle, const lv_style_t * style)
+                        int32_t end_angle, lv_draw_line_dsc_t * arc_draw_dsc)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
-    LV_ASSERT_NULL(style);
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
@@ -1043,8 +1024,7 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_TRANSP;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-        style->body.main_color.full == ctransp.full &&
-        style->body.grad_color.full == ctransp.full)
+            arc_draw_dsc->color.full == ctransp.full)
     {
         disp.driver.antialiasing = 0;
     }
@@ -1053,7 +1033,7 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
     lv_refr_set_disp_refreshing(&disp);
 
-    lv_draw_arc(x, y, r, &mask, start_angle, end_angle, style, LV_OPA_COVER);
+    lv_draw_arc(x, y, r,  start_angle, end_angle, &mask, arc_draw_dsc);
 
     lv_refr_set_disp_refreshing(refr_ori);
 }

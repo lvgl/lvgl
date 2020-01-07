@@ -584,10 +584,10 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
 {
     lv_res_t res;
      if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_tabview_get_style(tabview, **type_p);
-        return LV_RES_OK;
+         lv_get_style_info_t * info = param;
+         info->result = lv_tabview_get_style(tabview, info->part);
+         if(info->result != NULL) return LV_RES_OK;
+         else return ancestor_signal(tabview, sign, param);
     }
 
     /* Include the ancient signal function */
@@ -605,6 +605,9 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         ext->btns         = NULL; /*These objects were children so they are already invalid*/
         ext->content      = NULL;
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
+        /*Be sure the buttons are updated because correct button size is required in `tabview_realign`*/
+        lv_signal_send(ext->btns, LV_SIGNAL_STYLE_CHG, NULL);
+
         tabview_realign(tabview);
     } else if(sign == LV_SIGNAL_COORD_CHG) {
         if(ext->content != NULL && (lv_obj_get_width(tabview) != lv_area_get_width(param) ||

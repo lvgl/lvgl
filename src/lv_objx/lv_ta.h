@@ -65,7 +65,7 @@ typedef struct
     uint16_t pwd_show_time;      /*Time to show characters in password mode before change them to '*' */
     struct
     {
-        const lv_style_t * style;  /* Style of the cursor (NULL to use label's style)*/
+        lv_style_dsc_t style;  /* Style of the cursor (NULL to use label's style)*/
         lv_coord_t valid_x;        /* Used when stepping up/down to a shorter line.
                                     * (Used by the library)*/
         uint16_t pos;              /* The current cursor position
@@ -89,11 +89,14 @@ typedef struct
 
 /** Possible text areas tyles. */
 enum {
-    LV_TA_PART_BG, /**< Text area background style */
-    LV_TA_PART_SB, /**< Scrollbar style */
-    LV_TA_PART_CURSOR, /**< Cursor style */
-    LV_TA_PART_EDGE_FLASH, /**< Edge flash style */
-    LV_TA_PART_PLACEHOLDER, /**< Placeholder style */
+    LV_TA_PART_BG = LV_PAGE_PART_BG, /**< Text area background style */
+    LV_TA_PART_SCRLBAR = LV_PAGE_PART_SCRLBAR, /**< Scrollbar style */
+    LV_TA_PART_EDGE_FLASH = LV_PAGE_PART_EDGE_FLASH, /**< Edge flash style */
+    LV_TA_PART_CURSOR = _LV_PAGE_PART_VIRTUAL_LAST, /**< Cursor style */
+    _LV_TA_PART_VIRTUAL_LAST,
+
+    LV_TA_PART_PLACEHOLDER = _LV_PAGE_PART_REAL_LAST, /**< Placeholder style */
+    _LV_TA_PART_REAL_LAST,
 };
 typedef uint8_t lv_ta_style_t;
 

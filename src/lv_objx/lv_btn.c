@@ -103,7 +103,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
 //        memcpy((void*) ext->styles, copy_ext->styles, sizeof(ext->styles));
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_btn,LV_BTN_PART_MAIN);
+        lv_obj_refresh_style(new_btn);
     }
 
     LV_LOG_INFO("button created");
