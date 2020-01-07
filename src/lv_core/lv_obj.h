@@ -514,12 +514,12 @@ void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
 
 /**
-* Enable to use parent for gusture related operations.
-* If trying to gusture the object the parent will be moved instead
+* Enable to use parent for gesture related operations.
+* If trying to gesture the object the parent will be moved instead
 * @param obj pointer to an object
-* @param en true: enable the 'gusture parent' for the object
+* @param en true: enable the 'gesture parent' for the object
 */
-void lv_obj_set_gusture_parent(lv_obj_t * obj, bool en);
+void lv_obj_set_gesture_parent(lv_obj_t * obj, bool en);
 
 /**
  * Propagate the events to the parent too
