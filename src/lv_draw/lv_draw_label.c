@@ -207,7 +207,6 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
         char *bidi_txt = lv_mem_buf_get(line_end - line_start + 1);
         lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, dsc->bidi_dir, NULL, 0);
 #else
-        (void)bidi_dir;
         const char *bidi_txt = txt + line_start;
 #endif
 

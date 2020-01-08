@@ -129,6 +129,8 @@ static void basic_init(void)
     lv_style_set_int(&btn, LV_STYLE_BORDER_WIDTH | LV_STYLE_STATE_FOCUS, 6);
     lv_style_set_ptr(&btn, LV_STYLE_PATTERN_IMAGE | LV_STYLE_STATE_CHECKED, LV_SYMBOL_OK);
     lv_style_set_int(&btn, LV_STYLE_PATTERN_REPEATE | LV_STYLE_STATE_CHECKED, 1);
+    lv_style_set_int(&btn, LV_STYLE_SHADOW_WIDTH, 5);
+    lv_style_set_int(&btn, LV_STYLE_SHADOW_OFFSET_Y, 3);
     lv_style_set_ptr(&btn, LV_STYLE_FONT | LV_STYLE_STATE_CHECKED, &lv_font_roboto_12);
 
     lv_style_init(&transp_tight);
@@ -610,24 +612,33 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
         return &panel;
     case LV_THEME_BTNM_BTN:
         return &btn;
+#if LV_USE_LMETER
     case LV_THEME_BAR:
         return &panel;
     case LV_THEME_BAR_INDIC:
         return &bar_indic;
+#endif
+#if LV_USE_SLIDER
     case LV_THEME_SLIDER:
         return &panel;
     case LV_THEME_SLIDER_INDIC:
         return &bar_indic;
     case LV_THEME_SLIDER_KNOB:
         return &knob;
+#endif
+#if LV_USE_CB
     case LV_THEME_CB:
            return &panel;
     case LV_THEME_CB_BULLET:
         return &btn;
+#endif
+#if LV_USE_DDLIST
     case LV_THEME_DDLIST_SCRL:
         return &transp_tight;
     case LV_THEME_DDLIST_SEL:
         return &btn;
+#endif
+#if LV_USE_TABVIEW
     case LV_THEME_TABVIEW_BG:
     case LV_THEME_TABVIEW_BTNS_BG:
     case LV_THEME_TABVIEW_TAB_SCRL:
@@ -638,16 +649,26 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
     case LV_THEME_TABVIEW_BTNS:
     case LV_THEME_TABVIEW_BG_SCRL:
         return &btn;
+#endif
+#if LV_USE_LMETER
     case LV_THEME_LMETER:
         return &lmeter;
+#endif
+#if LV_USE_GAUGE
     case LV_THEME_GAUGE:
         return &gauge;
     case LV_THEME_GAUGE_STRONG:
         return &gauge_strong;
+#endif
+#if LV_USE_TA
     case LV_THEME_TA_CURSOR:
         return &ta_cursor;
+#endif
+#if LV_USE_LIST
     case LV_THEME_LIST_BTN:
         return &btn;
+#endif
+#if LV_USE_CALENDAR
     case LV_THEME_CALENDAR_BG:
         return &panel;
     case LV_THEME_CALENDAR_HEADER:
@@ -656,8 +677,11 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
         return &btn;
     case LV_THEME_CALENDAR_DATE_NUMS:
         return &calendar_date_nums;
+#endif
+#if LV_USE_ARC
     case LV_THEME_ARC:
         return &arc;
+#endif
     }
 
     return NULL;
