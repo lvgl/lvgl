@@ -293,6 +293,7 @@ void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, void * p)
 int16_t lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res)
 {
     if(style == NULL) return -1;
+    if(style->map == NULL) return -1;
     int32_t id = get_property_index(style, prop);
     if(id < 0) {
         return -1;
@@ -312,6 +313,7 @@ int16_t lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_
 int16_t lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res)
 {
     if(style == NULL) return -1;
+    if(style->map == NULL) return -1;
     int32_t id = get_property_index(style, prop);
     if(id < 0) {
         return -1;
@@ -330,6 +332,7 @@ int16_t lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_
 int16_t lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res)
 {
     if(style == NULL) return -1;
+    if(style->map == NULL) return -1;
     int32_t id = get_property_index(style, prop);
     if(id < 0) {
         return -1;
@@ -349,6 +352,7 @@ int16_t lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, l
 int16_t lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void ** res)
 {
     if(style == NULL) return -1;
+    if(style->map == NULL) return -1;
     int32_t id = get_property_index(style, prop);
     if(id < 0) {
         return -1;
@@ -775,10 +779,11 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
     int16_t weight = -1;
     int16_t id_guess = -1;
 
-    if(id_to_find == (LV_STYLE_RADIUS & 0xFF)) {
+    if(id_to_find == (LV_STYLE_OPA_SCALE & 0xFF)) {
         volatile uint8_t i = 0;
     }
 
+    stat[id_to_find]++;
 
     cnt++;
     if(cnt > 100000) {
@@ -801,7 +806,6 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
     size_t i = 0;
     while(i < style->size) {
 
-        stat[id_to_find]++;
         lv_style_attr_t attr_act;
         attr_act.full = style->map[i + 1];
         if(style->map[i] == id_to_find) {
