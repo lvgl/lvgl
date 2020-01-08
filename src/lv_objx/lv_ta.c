@@ -1381,11 +1381,13 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         if(info->result != NULL) return LV_RES_OK;
         else return ancestor_signal(ta, sign, param);
     }else if(sign == LV_SIGNAL_GET_STATE) {
-        lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
+        lv_ta_ext_t * ext = ta->ext_attr;
         lv_get_state_info_t * info = param;
-        if(info->part == LV_TA_PART_PLACEHOLDER) info->result = ext->placeholder ? lv_obj_get_state(ext->placeholder, LV_LABEL_PART_MAIN) : 0;
-        else info->result = lv_obj_get_state(ta, info->part);
-        return LV_RES_OK;
+        if(info->part == LV_TA_PART_PLACEHOLDER) {
+            info->result = ext->placeholder ? lv_obj_get_state(ext->placeholder, LV_LABEL_PART_MAIN) : 0;
+            return LV_RES_OK;
+        }
+        else return ancestor_signal(ta, sign, param);
     }
 
     /* Include the ancient signal function */

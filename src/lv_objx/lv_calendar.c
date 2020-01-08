@@ -128,11 +128,11 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
 
         /*Different styles will be used from the styles while rendering so disable caching*/
-        ext->style_date_nums.cache.enabled = 0;
-        ext->style_day_names.cache.enabled = 0;
-        ext->style_header.cache.enabled = 0;
-        ext->style_today_box.cache.enabled = 0;
-        ext->style_week_box.cache.enabled = 0;
+//        ext->style_date_nums.cache.enabled = 0;
+//        ext->style_day_names.cache.enabled = 0;
+//        ext->style_header.cache.enabled = 0;
+//        ext->style_today_box.cache.enabled = 0;
+//        ext->style_week_box.cache.enabled = 0;
 
         lv_style_dsc_reset(&new_calendar->style_dsc);
         lv_style_dsc_add_class(&new_calendar->style_dsc, lv_theme_get_style(LV_THEME_CALENDAR_BG));
@@ -707,7 +707,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     /*Add the left arrow*/
 
     /*The state changes without re-caching the styles, disable the use of cache*/
-    calendar->style_dsc.cache.enabled = 0;
+//    calendar->style_dsc.cache.enabled = 0;
     lv_obj_state_t state_ori = calendar->state;
 
     if(ext->btn_pressing < 0) calendar->state |= LV_OBJ_STATE_PRESSED;
@@ -732,7 +732,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     lv_draw_label(&header_area, mask, &label_dsc, LV_SYMBOL_RIGHT, NULL);
 
     calendar->state = state_ori;    /*Restore the state*/
-    calendar->style_dsc.cache.enabled = 1;
+//    calendar->style_dsc.cache.enabled = 1;
 }
 
 /**
@@ -806,7 +806,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     lv_style_int_t wb_bottom = lv_obj_get_style_int(calendar, LV_CALENDAR_PART_WEEK_BOX, LV_STYLE_PAD_BOTTOM);
 
     /*The state changes without re-caching the styles, disable the use of cache*/
-    calendar->style_dsc.cache.enabled = 0;
+//    calendar->style_dsc.cache.enabled = 0;
     lv_obj_state_t state_ori = calendar->state;
 
     lv_draw_label_dsc_t wb_label_dsc;
@@ -830,7 +830,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     ina_label_dsc.flag = LV_TXT_FLAG_CENTER;
     pr_label_dsc.flag = LV_TXT_FLAG_CENTER;
 
-    calendar->state = 0;
+//    calendar->state = 0;
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_WEEK_BOX, &wb_label_dsc);
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_TODAY_BOX, &tb_label_dsc);
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &normal_label_dsc);
@@ -845,7 +845,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &pr_label_dsc);
 
     calendar->state = state_ori;
-    calendar->style_dsc.cache.enabled = 1;
+//    calendar->style_dsc.cache.enabled = 1;
 
     lv_draw_label_dsc_t * act_label_dsc = &ina_label_dsc;
 

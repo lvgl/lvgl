@@ -189,10 +189,10 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     lv_res_t res;
 
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_sw_get_style(sw, **type_p);
-        return LV_RES_OK;
+        lv_get_style_info_t * info = param;
+        info->result = lv_sw_get_style(sw, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(sw, sign, param);
     }
 
     if(sign == LV_SIGNAL_GET_TYPE) {

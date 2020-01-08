@@ -135,6 +135,9 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_style_dsc_reset(lv_obj_get_style(ext->content, LV_PAGE_PART_BG));
         lv_style_dsc_reset(lv_obj_get_style(ext->content, LV_PAGE_PART_SCRL));
+        lv_style_dsc_reset(lv_obj_get_style(new_tabview, LV_TABVIEW_PART_INDIC));
+        lv_style_dsc_reset(lv_obj_get_style(new_tabview, LV_TABVIEW_PART_BTNS));
+        lv_style_dsc_reset(lv_obj_get_style(new_tabview, LV_TABVIEW_PART_BTNS_BG));
         lv_obj_add_style_class(ext->content, LV_PAGE_PART_BG, &lv_style_transp_tight);
         _ot(new_tabview, LV_TABVIEW_PART_BG_SCRL, TABVIEW_BG_SCRL);
         _ot(new_tabview, LV_TABVIEW_PART_BTNS, TABVIEW_BTNS);

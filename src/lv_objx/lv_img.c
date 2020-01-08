@@ -542,7 +542,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             lv_draw_label_dsc_init(&label_dsc);
             lv_obj_init_draw_label_dsc(img, LV_IMG_PART_MAIN, &label_dsc);
 
-            label_dsc.color = lv_obj_get_style_color(img, LV_IMG_PART_MAIN, LV_STYLE_OVERLAY_COLOR);
+            label_dsc.color = lv_obj_get_style_color(img, LV_IMG_PART_MAIN, LV_STYLE_IMAGE_RECOLOR);
             lv_draw_label(&coords, clip_area, &label_dsc, ext->src, NULL);
         } else {
             /*Trigger the error handler of image drawer*/
@@ -565,10 +565,11 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
 {
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_img_get_style(img, **type_p);
-        return LV_RES_OK;
+
+        lv_get_style_info_t * info = param;
+        info->result = lv_img_get_style(img, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(img, sign, param);
     }
 
     /* Include the ancient signal function */

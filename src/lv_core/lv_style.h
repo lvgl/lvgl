@@ -84,13 +84,13 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_RIGHT,          0x1, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_INNER,          0x1, LV_STYLE_ID_VALUE + 4, LV_STYLE_ATTR_NONE),
 
-    LV_STYLE_PROP_INIT(LV_STYLE_BG_BLEND_MODE,          0x2, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_BG_COLOR_STOP,          0x2, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_BG_GRAD_STOP,           0x2, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_BG_GRAD_DIR,            0x2, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_BG_COLOR,               0x2, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_BG_GRAD_COLOR,          0x2, LV_STYLE_ID_COLOR + 1, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_BG_OPA,                 0x2, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_BLEND_MODE,      0x2, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_COLOR_STOP,      0x2, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_GRAD_STOP,       0x2, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_GRAD_DIR,        0x2, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_COLOR,           0x2, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_GRAD_COLOR,      0x2, LV_STYLE_ID_COLOR + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_OPA,             0x2, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
 
     LV_STYLE_PROP_INIT(LV_STYLE_BORDER_WIDTH,       0x3, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_BORDER_PART,        0x3, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
@@ -107,9 +107,10 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_SHADOW_OPA,         0x4, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
 
     LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_REPEATE,       0x5, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_BLEND_MODE,    0x5, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_RECOLOR,       0x5, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_OPA,           0x5, LV_STYLE_ID_OPA   + 1, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_RECOLOR_OPA,   0x5, LV_STYLE_ID_OPA   + 2, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_OPA,           0x5, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_RECOLOR_OPA,   0x5, LV_STYLE_ID_OPA   + 1, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_PATTERN_IMAGE,         0x5, LV_STYLE_ID_PTR   + 0, LV_STYLE_ATTR_NONE),
 
     LV_STYLE_PROP_INIT(LV_STYLE_LETTER_SPACE,       0x6, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_INHERIT),
@@ -188,48 +189,42 @@ typedef int16_t lv_style_int_t;
 #define LV_STYLE_CACHE_BORDER_PART_SKIPPED   1
 
 typedef struct {
-    /*32 bit*/
-    uint32_t pad_left   :6;
-    uint32_t pad_right  :6;
-    uint32_t pad_top    :6;
-    uint32_t pad_bottom :6;
-    uint32_t pad_inner  :6;
-    uint32_t bg_grad_dir  :2;
-
-    /*31 bit*/
-    uint32_t border_width :3;
-    uint32_t line_width   :3;
-    uint32_t letter_space :3;
-    uint32_t line_space   :3;
-    uint32_t shadow_width :1;
-
-    uint32_t bg_opa       :2;
-    uint32_t border_opa   :2;
-    uint32_t text_opa      :2;
-    uint32_t image_opa      :2;
-    uint32_t line_opa     :2;
-    uint32_t shadow_opa   :2;
-    uint32_t overlay_opa   :2;
-    uint32_t opa_scale    :2;
-
+    /*7 props*/
     uint32_t bg_blend_mode      :1;
     uint32_t border_blend_mode  :1;
-    uint32_t text_blend_mode     :1;
-    uint32_t line_blend_mode    :1;
     uint32_t image_blend_mode   :1;
-    uint32_t shadow_blend_mode   :1;
+    uint32_t text_blend_mode    :1;
+    uint32_t line_blend_mode    :1;
+    uint32_t shadow_blend_mode  :1;
+    uint32_t pattern_blend_mode :1;
 
-    /*32 bit*/
-    uint32_t radius       :4;
-    uint32_t font         :1;
-    uint32_t clip_corner  :1;
-    uint32_t border_part  :1;
+    /*10 props*/
+    uint32_t opa_scale          :1;
+    uint32_t bg_opa             :1;
+    uint32_t border_opa         :1;
+    uint32_t image_opa          :1;
+    uint32_t image_recolor_opa  :1;
+    uint32_t text_opa           :1;
+    uint32_t line_opa           :1;
+    uint32_t shadow_opa         :1;
+    uint32_t overlay_opa        :1;
+    uint32_t pattern_opa        :1;
 
-    uint32_t enabled    :1;
+    /*8 props*/
+    uint32_t clip_corner        :1;
+    uint32_t pattern_image      :1;
+    uint32_t font               :1;
+    uint32_t letter_space       :1;
+    uint32_t line_space         :1;
+    uint32_t text_color         :1;
+    uint32_t border_part        :1;
+    uint32_t border_width       :1;
+    uint32_t shadow_width       :1;
 
-    uint32_t reserved     :23;
+    /*4 props*/
+    uint32_t enabled            :1;
+    uint32_t reserved           :3;
 }lv_style_cache_t;
-
 
 typedef struct {
     lv_style_t  local;
@@ -309,6 +304,13 @@ int16_t lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_
 int16_t lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res);
 int16_t lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res);
 int16_t lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void ** res);
+
+lv_res_t lv_style_dsc_get_int(lv_style_dsc_t * dsc, lv_style_property_t prop, lv_style_int_t * value);
+lv_res_t lv_style_dsc_get_color(lv_style_dsc_t * dsc, lv_style_property_t prop, lv_color_t * value);
+lv_res_t lv_style_dsc_get_opa(lv_style_dsc_t * dsc, lv_style_property_t prop, lv_opa_t * value);
+lv_res_t lv_style_dsc_get_ptr(lv_style_dsc_t * dsc, lv_style_property_t prop, void ** value);
+
+lv_res_t lv_style_cache_update(lv_style_dsc_t * dsc);
 
 #if LV_USE_ANIMATION
 

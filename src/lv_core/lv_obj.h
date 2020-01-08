@@ -213,7 +213,7 @@ typedef uint8_t lv_obj_state_t;
 
 typedef struct _lv_obj_t
 {
-    struct _lv_obj_t * par; /**< Pointer to the parent object*/
+    struct _lv_obj_t * parent; /**< Pointer to the parent object*/
     lv_ll_t child_ll;       /**< Linked list to store the children objects*/
 
     lv_area_t coords; /**< Coordinates of the object (x1, y1, x2, y2)*/

@@ -84,7 +84,7 @@ static void basic_init(void)
     lv_style_set_color(&scr, LV_STYLE_TEXT_COLOR , LV_COLOR_WHITE);
 
     lv_style_init(&transp);
-    lv_style_set_int(&transp, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
+    lv_style_set_opa(&transp, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
     lv_style_set_int(&transp, LV_STYLE_BORDER_WIDTH, 0);
 
     lv_style_init(&panel);
@@ -141,8 +141,6 @@ static void basic_init(void)
     lv_style_set_int(&transp_tight, LV_STYLE_PAD_TOP, 0);
     lv_style_set_int(&transp_tight, LV_STYLE_PAD_BOTTOM, 0);
     lv_style_set_int(&transp_tight, LV_STYLE_PAD_INNER, 0);
-
-
 }
 
 static void cont_init(void)

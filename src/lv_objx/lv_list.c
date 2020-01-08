@@ -218,7 +218,6 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
             lv_obj_set_width(label, liste->coords.x2 - label->coords.x1 - pad);
         }
         if(label_signal == NULL) label_signal = lv_obj_get_signal_cb(label);
-        lv_label_set_body_draw(label, true);
 
     }
 
@@ -688,9 +687,10 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 {
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_list_get_style(list, **type_p);
+        lv_get_style_info_t * info = param;
+        info->result = lv_list_get_style(list, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_page_signal(list, sign, param);
         return LV_RES_OK;
     }
 

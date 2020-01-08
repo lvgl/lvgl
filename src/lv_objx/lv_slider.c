@@ -234,10 +234,10 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     lv_res_t res;
 
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_slider_get_style(slider, **type_p);
-        return LV_RES_OK;
+        lv_get_style_info_t * info = param;
+        info->result = lv_slider_get_style(slider, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(slider, sign, param);
     }
 
     /* Include the ancient signal function */
