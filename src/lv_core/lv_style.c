@@ -533,7 +533,7 @@ lv_res_t lv_style_dsc_get_opa(lv_style_dsc_t * dsc, lv_style_property_t prop, lv
 {
     if(dsc == NULL) return LV_RES_INV;
 
-    lv_res_t res = LV_RES_OK;
+    volatile lv_res_t res = LV_RES_OK;
 
     if(dsc->cache.enabled) {
         switch(prop & (~LV_STYLE_STATE_MASK)) {
@@ -570,7 +570,9 @@ lv_res_t lv_style_dsc_get_opa(lv_style_dsc_t * dsc, lv_style_property_t prop, lv
         }
     }
 
-    if(res == LV_RES_INV) return LV_RES_INV;
+    if(res == LV_RES_INV) {
+    	return LV_RES_INV;
+    }
 
     lv_style_attr_t attr;
     attr.full = prop >> 8;
@@ -778,17 +780,17 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
 
     int16_t weight = -1;
     int16_t id_guess = -1;
-
-    if(id_to_find == (LV_STYLE_OPA_SCALE & 0xFF)) {
-        volatile uint8_t i = 0;
-    }
-
-    stat[id_to_find]++;
-
-    cnt++;
-    if(cnt > 100000) {
-        cnt = 0;
-        uint32_t i;
+//
+//    if(id_to_find == (LV_STYLE_OPA_SCALE & 0xFF)) {
+//        volatile uint8_t i = 0;
+//    }
+//
+//    stat[id_to_find]++;
+//
+//    cnt++;
+//    if(cnt > 100000) {
+//        cnt = 0;
+//        uint32_t i;
 
 ////        printf("\nQuerry:\n");
 //        for(i = 0; i < 256; i++) {
@@ -802,13 +804,34 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
 //        }
 //        memset(prop_fooled, 0x00, sizeof(stat));
 //        printf("\n");
-    }
+//    }
+
+    static const uint8_t size[16] = {
+    		sizeof(lv_style_int_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_style_int_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_style_int_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_style_int_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_style_int_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_color_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_color_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_color_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_color_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_color_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_opa_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_opa_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_opa_t) + sizeof(lv_style_property_t),
+    		sizeof(lv_opa_t) + sizeof(lv_style_property_t),
+    		sizeof(void*) + sizeof(lv_style_property_t),
+    		sizeof(void*) + sizeof(lv_style_property_t),
+    };
+
     size_t i = 0;
     while(i < style->size) {
 
-        lv_style_attr_t attr_act;
-        attr_act.full = style->map[i + 1];
         if(style->map[i] == id_to_find) {
+			lv_style_attr_t attr_act;
+			attr_act.full = style->map[i + 1];
+
             /*If the state perfectly matches return this property*/
             if(attr_act.bits.state == attr.bits.state) {
                 return i;
@@ -826,12 +849,13 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
         }
 
         /*Go to the next property*/
-        if((style->map[i] & 0xF) < LV_STYLE_ID_COLOR) i+= sizeof(lv_style_int_t);
-        else if((style->map[i] & 0xF) < LV_STYLE_ID_OPA) i+= sizeof(lv_color_t);
-        else if((style->map[i] & 0xF) < LV_STYLE_ID_PTR) i+= sizeof(lv_opa_t);
-        else i+= sizeof(void*);
-
-        i += sizeof(lv_style_property_t);
+        i+=size[style->map[i] & 0xF];
+//        if((style->map[i] & 0xF) < LV_STYLE_ID_COLOR) i+= sizeof(lv_style_int_t);
+//        else if((style->map[i] & 0xF) < LV_STYLE_ID_OPA) i+= sizeof(lv_color_t);
+//        else if((style->map[i] & 0xF) < LV_STYLE_ID_PTR) i+= sizeof(lv_opa_t);
+//        else i+= sizeof(void*);
+//
+//        i += sizeof(lv_style_property_t);
     }
 
     return id_guess;
