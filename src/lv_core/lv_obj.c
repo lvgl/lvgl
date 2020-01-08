@@ -2663,10 +2663,10 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
         draw_dsc->bg_blend_mode = lv_obj_get_style_int(obj, part, LV_STYLE_BG_BLEND_MODE);
     }
 
-    draw_dsc->border_width = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_WIDTH);
-    if(draw_dsc->border_width) {
-        draw_dsc->border_opa = lv_obj_get_style_opa(obj, part, LV_STYLE_BORDER_OPA);
-        if(draw_dsc->border_opa > LV_OPA_MIN) {
+    draw_dsc->border_opa = lv_obj_get_style_opa(obj, part, LV_STYLE_BORDER_OPA);
+    if(draw_dsc->border_opa > LV_OPA_MIN) {
+        draw_dsc->border_width = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_WIDTH);
+        if(draw_dsc->border_width) {
             draw_dsc->border_part = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_PART);
             draw_dsc->border_color = lv_obj_get_style_color(obj, part, LV_STYLE_BORDER_COLOR);
         }
@@ -2692,10 +2692,10 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
     if(draw_dsc->overlay_opa > LV_OPA_MIN) {
         draw_dsc->overlay_color = lv_obj_get_style_color(obj, part, LV_STYLE_OVERLAY_COLOR);
     }
-    draw_dsc->shadow_width = lv_obj_get_style_int(obj, part, LV_STYLE_SHADOW_WIDTH);
-    if(draw_dsc->shadow_width) {
-        draw_dsc->shadow_opa = lv_obj_get_style_opa(obj, part, LV_STYLE_SHADOW_OPA);
-        if(draw_dsc->shadow_opa > LV_OPA_MIN) {
+    draw_dsc->shadow_opa = lv_obj_get_style_opa(obj, part, LV_STYLE_SHADOW_OPA);
+    if(draw_dsc->shadow_opa > LV_OPA_MIN) {
+        draw_dsc->shadow_width = lv_obj_get_style_int(obj, part, LV_STYLE_SHADOW_WIDTH);
+        if(draw_dsc->shadow_width) {
             draw_dsc->shadow_ofs_x = lv_obj_get_style_int(obj, part, LV_STYLE_SHADOW_OFFSET_X);
             draw_dsc->shadow_ofs_y = lv_obj_get_style_int(obj, part, LV_STYLE_SHADOW_OFFSET_Y);
             draw_dsc->shadow_spread = lv_obj_get_style_int(obj, part, LV_STYLE_SHADOW_SPREAD);
