@@ -804,9 +804,9 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
         cnt = 0;
         uint32_t i;
 
-        printf("\nQuerry:\n");
+//        printf("\nQuerry:\n");
         for(i = 0; i < 256; i++) {
-            if(stat[i]) printf("%02x: %d\n", i, stat[i]);
+//            if(stat[i]) printf("%02x: %d\n", i, stat[i]);
         }
         memset(stat, 0x00, sizeof(stat));
 
@@ -815,7 +815,7 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
 //            if(prop_fooled[i]) printf("%02x: %d\n", i, prop_fooled[i]);
 //        }
         memset(prop_fooled, 0x00, sizeof(stat));
-        printf("\n");
+//        printf("\n");
     }
 
     static const uint8_t size[16] = {
