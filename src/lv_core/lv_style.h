@@ -167,70 +167,11 @@ typedef struct {
 
 typedef int16_t lv_style_int_t;
 
-#define LV_STYLE_CACHE_PAD_SKIPPED   31
-
-#define LV_STYLE_CACHE_OPA_TRANSP    0
-#define LV_STYLE_CACHE_OPA_COVER     1
-#define LV_STYLE_CACHE_OPA_SKIPPED   3
-
-#define LV_STYLE_CACHE_WIDTH_SKIPPED   7
-
-#define LV_STYLE_CACHE_RADIUS_CIRCLE    14
-#define LV_STYLE_CACHE_RADIUS_SKIPPED   15
-
-#define LV_STYLE_CACHE_FONT_DEFAULT   0
-#define LV_STYLE_CACHE_FONT_SKIPPED   1
-
-#define LV_STYLE_CACHE_BLEND_MODE_NORMAL   0
-#define LV_STYLE_CACHE_BLEND_MODE_SKIPPED   1
-
-
-#define LV_STYLE_CACHE_BORDER_PART_FULL   0
-#define LV_STYLE_CACHE_BORDER_PART_SKIPPED   1
-
-typedef struct {
-    /*7 props*/
-    uint32_t bg_blend_mode      :1;
-    uint32_t border_blend_mode  :1;
-    uint32_t image_blend_mode   :1;
-    uint32_t text_blend_mode    :1;
-    uint32_t line_blend_mode    :1;
-    uint32_t shadow_blend_mode  :1;
-    uint32_t pattern_blend_mode :1;
-
-    /*10 props*/
-    uint32_t opa_scale          :1;
-    uint32_t bg_opa             :1;
-    uint32_t border_opa         :1;
-    uint32_t image_opa          :1;
-    uint32_t image_recolor_opa  :1;
-    uint32_t text_opa           :1;
-    uint32_t line_opa           :1;
-    uint32_t shadow_opa         :1;
-    uint32_t overlay_opa        :1;
-    uint32_t pattern_opa        :1;
-
-    /*8 props*/
-    uint32_t clip_corner        :1;
-    uint32_t pattern_image      :1;
-    uint32_t font               :1;
-    uint32_t letter_space       :1;
-    uint32_t line_space         :1;
-    uint32_t text_color         :1;
-    uint32_t border_part        :1;
-    uint32_t border_width       :1;
-    uint32_t shadow_width       :1;
-
-    /*4 props*/
-    uint32_t enabled            :1;
-    uint32_t reserved           :3;
-}lv_style_cache_t;
 
 typedef struct {
     lv_style_t  local;
     lv_style_t ** classes;
     uint8_t class_cnt;
-    lv_style_cache_t cache;
 }lv_style_dsc_t;
 
 
@@ -251,7 +192,6 @@ typedef struct
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-
 
 /**
  *  Init. the built-in styles

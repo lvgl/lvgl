@@ -91,8 +91,6 @@ void lv_style_dsc_init(lv_style_dsc_t * style_dsc)
     lv_style_init(&style_dsc->local);
     style_dsc->classes = NULL;
     style_dsc->class_cnt = 0;
-    memset(&style_dsc->cache, 0xff, sizeof(lv_style_cache_t));
-    style_dsc->cache.enabled = 0;
 }
 
 
@@ -120,8 +118,6 @@ void lv_style_dsc_add_class(lv_style_dsc_t * dsc, lv_style_t * class)
         dsc->class_cnt++;
         dsc->classes = new_classes;
     }
-
-    lv_style_cache_update(dsc);
 }
 
 void lv_style_dsc_remove_class(lv_style_dsc_t * dsc, lv_style_t * class)
@@ -160,7 +156,6 @@ void lv_style_dsc_reset(lv_style_dsc_t * style_dsc)
     style_dsc->classes = NULL;
     style_dsc->class_cnt = 0;
     lv_style_reset(&style_dsc->local);
-    memset(&style_dsc->cache, 0xff, sizeof(lv_style_cache_t));
 }
 
 
@@ -374,62 +369,6 @@ lv_res_t lv_style_dsc_get_int(lv_style_dsc_t * dsc, lv_style_property_t prop, lv
     if(dsc == NULL) return LV_RES_INV;
     if(dsc->local.map == NULL && dsc->classes == NULL) return LV_RES_INV;
 
-    lv_res_t res = LV_RES_OK;
-
-    if(dsc->cache.enabled) {
-        switch(prop & (~LV_STYLE_STATE_MASK)) {
-        case LV_STYLE_PAD_INNER:
-        case LV_STYLE_PAD_TOP:
-        case LV_STYLE_PAD_BOTTOM:
-        case LV_STYLE_PAD_LEFT:
-        case LV_STYLE_PAD_RIGHT:
-            *value = 5;
-            return LV_RES_OK;
-            break;
-        case LV_STYLE_BG_BLEND_MODE:
-            res = dsc->cache.bg_blend_mode;
-            break;
-        case LV_STYLE_BORDER_BLEND_MODE:
-            res = dsc->cache.border_blend_mode;
-            break;
-        case LV_STYLE_IMAGE_BLEND_MODE:
-            res = dsc->cache.image_blend_mode;
-            break;
-        case LV_STYLE_TEXT_BLEND_MODE:
-            res = dsc->cache.text_blend_mode;
-            break;
-        case LV_STYLE_LINE_BLEND_MODE:
-            res = dsc->cache.line_blend_mode;
-            break;
-        case LV_STYLE_SHADOW_BLEND_MODE:
-            res = dsc->cache.shadow_blend_mode;
-            break;
-        case LV_STYLE_PATTERN_BLEND_MODE:
-            res = dsc->cache.pattern_blend_mode;
-            break;
-        case LV_STYLE_CLIP_CORNER:
-            res = dsc->cache.clip_corner;
-            break;
-        case LV_STYLE_LETTER_SPACE:
-            res = dsc->cache.letter_space;
-            break;
-        case LV_STYLE_LINE_SPACE:
-            res = dsc->cache.line_space;
-            break;
-        case LV_STYLE_BORDER_PART:
-            res = dsc->cache.border_part;
-            break;
-        case LV_STYLE_BORDER_WIDTH:
-            res = dsc->cache.border_width;
-            break;
-        case LV_STYLE_SHADOW_WIDTH:
-            res = dsc->cache.shadow_width;
-            break;
-        }
-    }
-
-    if(res == LV_RES_INV) return LV_RES_INV;
-
     lv_style_attr_t attr;
     attr.full = prop >> 8;
     int16_t weight_goal = attr.full;
@@ -480,18 +419,6 @@ lv_res_t lv_style_dsc_get_color(lv_style_dsc_t * dsc, lv_style_property_t prop, 
 {
     if(dsc == NULL) return LV_RES_INV;
     if(dsc->local.map == NULL && dsc->classes == NULL) return LV_RES_INV;
-
-    lv_res_t res = LV_RES_OK;
-
-    if(dsc->cache.enabled) {
-        switch(prop & (~LV_STYLE_STATE_MASK)) {
-        case LV_STYLE_TEXT_COLOR:
-            res = dsc->cache.text_color;
-            break;
-        }
-    }
-
-    if(res == LV_RES_INV) return LV_RES_INV;
 
     lv_style_attr_t attr;
     attr.full = prop >> 8;
@@ -544,47 +471,6 @@ lv_res_t lv_style_dsc_get_opa(lv_style_dsc_t * dsc, lv_style_property_t prop, lv
     if(dsc == NULL) return LV_RES_INV;
     if(dsc->local.map == NULL && dsc->classes == NULL) return LV_RES_INV;
 
-    volatile lv_res_t res = LV_RES_OK;
-
-    if(dsc->cache.enabled) {
-        switch(prop & (~LV_STYLE_STATE_MASK)) {
-        case LV_STYLE_OPA_SCALE:
-            res = dsc->cache.opa_scale;
-            break;
-        case LV_STYLE_BG_OPA:
-            res = dsc->cache.bg_opa;
-            break;
-        case LV_STYLE_BORDER_OPA:
-            res = dsc->cache.border_opa;
-            break;
-        case LV_STYLE_IMAGE_OPA:
-            res = dsc->cache.image_opa;
-            break;
-        case LV_STYLE_IMAGE_RECOLOR:
-            res = dsc->cache.image_recolor_opa;
-            break;
-        case LV_STYLE_TEXT_OPA:
-            res = dsc->cache.text_opa;
-            break;
-        case LV_STYLE_LINE_OPA:
-            res = dsc->cache.line_opa;
-            break;
-        case LV_STYLE_SHADOW_OPA:
-            res = dsc->cache.shadow_opa;
-            break;
-        case LV_STYLE_OVERLAY_OPA:
-            res = dsc->cache.overlay_opa;
-            break;
-        case LV_STYLE_PATTERN_OPA:
-            res = dsc->cache.pattern_opa;
-            break;
-        }
-    }
-
-    if(res == LV_RES_INV) {
-    	return LV_RES_INV;
-    }
-
     lv_style_attr_t attr;
     attr.full = prop >> 8;
     int16_t weight_goal = attr.full;
@@ -635,21 +521,6 @@ lv_res_t lv_style_dsc_get_ptr(lv_style_dsc_t * dsc, lv_style_property_t prop, vo
     if(dsc == NULL) return LV_RES_INV;
     if(dsc->local.map == NULL && dsc->classes == NULL) return LV_RES_INV;
 
-    lv_res_t res = LV_RES_OK;
-
-    if(dsc->cache.enabled) {
-        switch(prop & (~LV_STYLE_STATE_MASK)) {
-        case LV_STYLE_PATTERN_IMAGE:
-            res = dsc->cache.pattern_image;
-            break;
-        case LV_STYLE_FONT:
-            res = dsc->cache.font;
-            break;
-        }
-    }
-
-    if(res == LV_RES_INV) return LV_RES_INV;
-
     lv_style_attr_t attr;
     attr.full = prop >> 8;
     int16_t weight_goal = attr.full;
@@ -692,57 +563,6 @@ lv_res_t lv_style_dsc_get_ptr(lv_style_dsc_t * dsc, lv_style_property_t prop, vo
         return LV_RES_OK;
     }
     else return LV_RES_INV;
-}
-
-
-lv_res_t lv_style_cache_update(lv_style_dsc_t * dsc)
-{
-    if(dsc == NULL) return LV_RES_INV;
-
-    if(!dsc->cache.enabled) return LV_RES_OK;
-    dsc->cache.enabled = 0;
-
-
-    lv_style_int_t value;
-    lv_opa_t opa;
-    void * ptr;
-    lv_color_t color;
-
-    dsc->cache.bg_blend_mode = lv_style_dsc_get_int(dsc, LV_STYLE_BG_BLEND_MODE | LV_STYLE_STATE_ALL, &value) & 0x1U;
-    dsc->cache.border_blend_mode = lv_style_dsc_get_int(dsc, LV_STYLE_BORDER_BLEND_MODE | LV_STYLE_STATE_ALL, &value) & 0x1U;
-    dsc->cache.image_blend_mode = lv_style_dsc_get_int(dsc, LV_STYLE_IMAGE_BLEND_MODE | LV_STYLE_STATE_ALL, &value) & 0x1U;
-    dsc->cache.text_blend_mode = lv_style_dsc_get_int(dsc, LV_STYLE_TEXT_BLEND_MODE | LV_STYLE_STATE_ALL, &value) & 0x1U;
-    dsc->cache.line_blend_mode = lv_style_dsc_get_int(dsc, LV_STYLE_LINE_BLEND_MODE | LV_STYLE_STATE_ALL, &value) & 0x1U;
-    dsc->cache.shadow_blend_mode = lv_style_dsc_get_int(dsc, LV_STYLE_SHADOW_BLEND_MODE | LV_STYLE_STATE_ALL, &value) & 0x1U;
-    dsc->cache.pattern_blend_mode = lv_style_dsc_get_int(dsc, LV_STYLE_PATTERN_BLEND_MODE | LV_STYLE_STATE_ALL, &value) & 0x1U;
-
-    dsc->cache.clip_corner = lv_style_dsc_get_int(dsc, LV_STYLE_PATTERN_BLEND_MODE | LV_STYLE_STATE_ALL, &value) & 0x1U;
-    dsc->cache.letter_space = lv_style_dsc_get_int(dsc, LV_STYLE_LETTER_SPACE | LV_STYLE_STATE_ALL, &value) & 0x1U;
-    dsc->cache.line_space = lv_style_dsc_get_int(dsc, LV_STYLE_LINE_SPACE | LV_STYLE_STATE_ALL, &value) & 0x1U;
-    dsc->cache.border_part = lv_style_dsc_get_int(dsc, LV_STYLE_BORDER_PART  | LV_STYLE_STATE_ALL, &value) & 0x1U;
-    dsc->cache.border_width = lv_style_dsc_get_int(dsc, LV_STYLE_BORDER_WIDTH | LV_STYLE_STATE_ALL, &value) & 0x1U;
-    dsc->cache.shadow_width = lv_style_dsc_get_int(dsc, LV_STYLE_SHADOW_WIDTH | LV_STYLE_STATE_ALL, &value) & 0x1U;
-
-
-    dsc->cache.opa_scale = lv_style_dsc_get_opa(dsc, LV_STYLE_OPA_SCALE | LV_STYLE_STATE_ALL, &opa) & 0x1U;
-    dsc->cache.bg_opa = lv_style_dsc_get_opa(dsc, LV_STYLE_BG_OPA | LV_STYLE_STATE_ALL, &opa) & 0x1U;
-    dsc->cache.border_opa = lv_style_dsc_get_opa(dsc, LV_STYLE_BORDER_OPA | LV_STYLE_STATE_ALL, &opa) & 0x1U;
-    dsc->cache.image_opa = lv_style_dsc_get_opa(dsc, LV_STYLE_IMAGE_OPA | LV_STYLE_STATE_ALL, &opa) & 0x1U;
-    dsc->cache.image_recolor_opa = lv_style_dsc_get_opa(dsc, LV_STYLE_IMAGE_RECOLOR_OPA | LV_STYLE_STATE_ALL, &opa) & 0x1U;
-    dsc->cache.text_opa = lv_style_dsc_get_opa(dsc, LV_STYLE_TEXT_OPA | LV_STYLE_STATE_ALL, &opa) & 0x1U;
-    dsc->cache.line_opa = lv_style_dsc_get_opa(dsc, LV_STYLE_LINE_OPA | LV_STYLE_STATE_ALL, &opa) & 0x1U;
-    dsc->cache.shadow_opa = lv_style_dsc_get_opa(dsc, LV_STYLE_SHADOW_OPA | LV_STYLE_STATE_ALL, &opa) & 0x1U;
-    dsc->cache.overlay_opa = lv_style_dsc_get_opa(dsc, LV_STYLE_OVERLAY_OPA | LV_STYLE_STATE_ALL, &opa) & 0x1U;
-    dsc->cache.pattern_opa = lv_style_dsc_get_opa(dsc, LV_STYLE_PATTERN_OPA | LV_STYLE_STATE_ALL, &opa) & 0x1U;
-
-    dsc->cache.text_color = lv_style_dsc_get_color(dsc, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_ALL, &color) & 0x1U;
-
-    dsc->cache.font = lv_style_dsc_get_ptr(dsc, LV_STYLE_FONT | LV_STYLE_STATE_ALL, &ptr) & 0x1U;
-    dsc->cache.pattern_image = lv_style_dsc_get_ptr(dsc, LV_STYLE_PATTERN_IMAGE | LV_STYLE_STATE_ALL, &ptr) & 0x1U;
-
-    dsc->cache.enabled = 1;
-
-    return LV_RES_OK;
 }
 
 #if LV_USE_ANIMATION
@@ -792,10 +612,6 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
 
     int16_t weight = -1;
     int16_t id_guess = -1;
-
-    if(id_to_find == (LV_STYLE_OPA_SCALE & 0xFF)) {
-        volatile uint8_t i = 0;
-    }
 
     stat[id_to_find]++;
 
