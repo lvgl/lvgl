@@ -92,7 +92,7 @@ void lv_style_dsc_init(lv_style_dsc_t * style_dsc)
     style_dsc->classes = NULL;
     style_dsc->class_cnt = 0;
     memset(&style_dsc->cache, 0xff, sizeof(lv_style_cache_t));
-    style_dsc->cache.enabled = 1;
+    style_dsc->cache.enabled = 0;
 }
 
 
@@ -377,6 +377,14 @@ lv_res_t lv_style_dsc_get_int(lv_style_dsc_t * dsc, lv_style_property_t prop, lv
 
     if(dsc->cache.enabled) {
         switch(prop & (~LV_STYLE_STATE_MASK)) {
+        case LV_STYLE_PAD_INNER:
+        case LV_STYLE_PAD_TOP:
+        case LV_STYLE_PAD_BOTTOM:
+        case LV_STYLE_PAD_LEFT:
+        case LV_STYLE_PAD_RIGHT:
+            *value = 5;
+            return LV_RES_OK;
+            break;
         case LV_STYLE_BG_BLEND_MODE:
             res = dsc->cache.bg_blend_mode;
             break;
@@ -780,31 +788,31 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
 
     int16_t weight = -1;
     int16_t id_guess = -1;
-//
-//    if(id_to_find == (LV_STYLE_OPA_SCALE & 0xFF)) {
-//        volatile uint8_t i = 0;
-//    }
-//
-//    stat[id_to_find]++;
-//
-//    cnt++;
-//    if(cnt > 100000) {
-//        cnt = 0;
-//        uint32_t i;
 
-////        printf("\nQuerry:\n");
-//        for(i = 0; i < 256; i++) {
-//            if(stat[i]) printf("%02x: %d\n", i, stat[i]);
-//        }
-//        memset(stat, 0x00, sizeof(stat));
-//
-////        printf("\nFooled:\n");
+    if(id_to_find == (LV_STYLE_OPA_SCALE & 0xFF)) {
+        volatile uint8_t i = 0;
+    }
+
+    stat[id_to_find]++;
+
+    cnt++;
+    if(cnt > 1000) {
+        cnt = 0;
+        uint32_t i;
+
+        printf("\nQuerry:\n");
+        for(i = 0; i < 256; i++) {
+            if(stat[i]) printf("%02x: %d\n", i, stat[i]);
+        }
+        memset(stat, 0x00, sizeof(stat));
+
+//        printf("\nFooled:\n");
 //        for(i = 0; i < 256; i++) {
 //            if(prop_fooled[i]) printf("%02x: %d\n", i, prop_fooled[i]);
 //        }
-//        memset(prop_fooled, 0x00, sizeof(stat));
-//        printf("\n");
-//    }
+        memset(prop_fooled, 0x00, sizeof(stat));
+        printf("\n");
+    }
 
     static const uint8_t size[16] = {
     		sizeof(lv_style_int_t) + sizeof(lv_style_property_t),

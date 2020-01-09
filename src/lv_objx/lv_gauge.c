@@ -384,10 +384,10 @@ static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param
 {
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
-        *style_dsc_p = lv_gauge_get_style(gauge, **type_p);
-        return LV_RES_OK;
+        lv_get_style_info_t * info = param;
+        info->result = lv_gauge_get_style(gauge, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(gauge, sign, param);
     }
 
     /* Include the ancient signal function */

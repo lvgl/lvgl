@@ -170,6 +170,10 @@ void lv_disp_refr_task(lv_task_t * task)
 
     disp_refr = task->user_data;
 
+
+//    extern rect_cache_t cache[];
+//    extern uint32_t cp;
+
     lv_refr_join_area();
 
     lv_refr_areas();
