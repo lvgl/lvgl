@@ -368,6 +368,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->event_cb = copy->event_cb;
 
         /*Copy attributes*/
+        new_obj->adv_hittest  = copy->adv_hittest;
         new_obj->click        = copy->click;
         new_obj->drag         = copy->drag;
         new_obj->drag_dir     = copy->drag_dir;
