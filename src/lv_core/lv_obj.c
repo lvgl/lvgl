@@ -35,8 +35,9 @@
  *      DEFINES
  *********************/
 #define LV_OBJX_NAME "lv_obj"
-#define LV_OBJ_DEF_WIDTH (LV_DPI)
-#define LV_OBJ_DEF_HEIGHT (2 * LV_DPI / 3)
+#define LV_OBJ_DEF_WIDTH    (LV_DPI)
+#define LV_OBJ_DEF_HEIGHT   (2 * LV_DPI / 3)
+#define LV_DRAW_RECT_CACHE_SIZE     8
 
 /**********************
  *      TYPEDEFS
@@ -47,6 +48,12 @@ typedef struct _lv_event_temp_data
     bool deleted;
     struct _lv_event_temp_data * prev;
 } lv_event_temp_data_t;
+
+typedef struct {
+    lv_draw_rect_dsc_t draw_dsc;
+    lv_style_dsc_t * style_dsc;
+    uint8_t state;
+}lv_draw_rect_cache_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -68,6 +75,8 @@ static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
 static const void * event_act_data;
 
+static lv_draw_rect_cache_t lv_draw_rect_cache[LV_DRAW_RECT_CACHE_SIZE];
+static uint16_t lv_draw_rect_cache_last;
 /**********************
  *      MACROS
  **********************/
@@ -2632,14 +2641,6 @@ static void lv_obj_del_async_cb(void * obj)
     lv_obj_del(obj);
 }
 
-typedef struct {
-    lv_draw_rect_dsc_t draw_dsc;
-    uint8_t state;
-    lv_style_dsc_t * style_dsc;
-}rect_cache_t;
-#define CACHE_SIZE 4
-rect_cache_t cache[CACHE_SIZE];
-uint32_t cp;
 /**
  * Initialize a rectangle descriptor from an object's styles
  * @param obj pointer to an object
@@ -2650,19 +2651,19 @@ uint32_t cp;
  */
 void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t * draw_dsc)
 {
-    rect_cache_t * cached = NULL;
+    lv_draw_rect_cache_t * cached = NULL;
     lv_style_dsc_t * s = lv_obj_get_style(obj, part);
     lv_obj_state_t state = lv_obj_get_state(obj, part);
     if(lv_refr_get_disp_refreshing() && s) {
         uint32_t i;
-        for(i = 0; i < CACHE_SIZE; i++) {
+        for(i = 0; i < LV_DRAW_RECT_CACHE_SIZE; i++) {
             int32_t c;
             bool err = false;
-            if(cache[i].style_dsc == NULL) continue;
-            if(cache[i].style_dsc->class_cnt != s->class_cnt) continue;
-            if(cache[i].state != state) continue;
+            if(lv_draw_rect_cache[i].style_dsc == NULL) continue;
+            if(lv_draw_rect_cache[i].style_dsc->class_cnt != s->class_cnt) continue;
+            if(lv_draw_rect_cache[i].state != state) continue;
             for(c = 0; c < s->class_cnt; c++) {
-                    lv_style_t * class1 = lv_style_dsc_get_class(cache[i].style_dsc, c);
+                    lv_style_t * class1 = lv_style_dsc_get_class(lv_draw_rect_cache[i].style_dsc, c);
                     lv_style_t * class2 = lv_style_dsc_get_class(s, c);
                     if(class1 != class2) {
                         err = true;
@@ -2670,20 +2671,38 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
                     }
             }
             if(err == false) {
-                cached = &cache[i];
+                cached = &lv_draw_rect_cache[i];
                 break;
             }
         }
     }
-
-
     static uint32_t hit = 1;
     static uint32_t miss = 1;
     printf("hit: %d, miss:%d, pct:%d\n", hit, miss, hit * 100 / (hit+miss));
 
     if(cached) {
         hit++;
+        /*Load the cached data*/
         memcpy(draw_dsc, &cached->draw_dsc, sizeof(lv_draw_rect_dsc_t));
+
+        /*Get inherited properties because they can't be cached*/
+        lv_opa_t opa_scale = lv_obj_get_style_opa(obj, part, LV_STYLE_OPA_SCALE);
+        if(opa_scale <= LV_OPA_MIN) {
+            draw_dsc->bg_opa = LV_OPA_TRANSP;
+            draw_dsc->border_opa = LV_OPA_TRANSP;
+            draw_dsc->shadow_opa = LV_OPA_TRANSP;
+        } else if(opa_scale < LV_OPA_MAX) {
+            draw_dsc->bg_opa = (uint16_t)((uint16_t)draw_dsc->bg_opa * opa_scale) >> 8;
+            draw_dsc->border_opa = (uint16_t)((uint16_t)draw_dsc->border_opa * opa_scale) >> 8;
+            draw_dsc->shadow_opa = (uint16_t)((uint16_t)draw_dsc->shadow_opa * opa_scale) >> 8;
+            draw_dsc->pattern_opa = (uint16_t)((uint16_t)draw_dsc->pattern_opa * opa_scale) >> 8;
+        }
+
+        draw_dsc->overlay_opa = lv_obj_get_style_opa(obj, part, LV_STYLE_OVERLAY_OPA);
+        if(draw_dsc->overlay_opa > LV_OPA_MIN) {
+            draw_dsc->overlay_color = lv_obj_get_style_color(obj, part, LV_STYLE_OVERLAY_COLOR);
+        }
+
         return;
     }
     miss++;
@@ -2758,11 +2777,11 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
 
 
     if(lv_refr_get_disp_refreshing()) {
-        memcpy(&cache[cp].draw_dsc, draw_dsc, sizeof(lv_draw_rect_dsc_t));
-        cache[cp].style_dsc = s;
-        cache[cp].state = state;
-        cp++;
-        if(cp >= CACHE_SIZE) cp = 0;
+        memcpy(&lv_draw_rect_cache[lv_draw_rect_cache_last].draw_dsc, draw_dsc, sizeof(lv_draw_rect_dsc_t));
+        lv_draw_rect_cache[lv_draw_rect_cache_last].style_dsc = s;
+        lv_draw_rect_cache[lv_draw_rect_cache_last].state = state;
+        lv_draw_rect_cache_last++;
+        if(lv_draw_rect_cache_last >= LV_DRAW_RECT_CACHE_SIZE) lv_draw_rect_cache_last = 0;
     }
 }
 
