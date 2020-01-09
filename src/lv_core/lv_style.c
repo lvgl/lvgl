@@ -372,6 +372,7 @@ uint32_t prop_fooled[256];
 lv_res_t lv_style_dsc_get_int(lv_style_dsc_t * dsc, lv_style_property_t prop, lv_style_int_t * value)
 {
     if(dsc == NULL) return LV_RES_INV;
+    if(dsc->local.map == NULL && dsc->classes == NULL) return LV_RES_INV;
 
     lv_res_t res = LV_RES_OK;
 
@@ -470,6 +471,7 @@ lv_res_t lv_style_dsc_get_int(lv_style_dsc_t * dsc, lv_style_property_t prop, lv
 lv_res_t lv_style_dsc_get_color(lv_style_dsc_t * dsc, lv_style_property_t prop, lv_color_t * value)
 {
     if(dsc == NULL) return LV_RES_INV;
+    if(dsc->local.map == NULL && dsc->classes == NULL) return LV_RES_INV;
 
     lv_res_t res = LV_RES_OK;
 
@@ -532,6 +534,7 @@ lv_res_t lv_style_dsc_get_color(lv_style_dsc_t * dsc, lv_style_property_t prop, 
 lv_res_t lv_style_dsc_get_opa(lv_style_dsc_t * dsc, lv_style_property_t prop, lv_opa_t * value)
 {
     if(dsc == NULL) return LV_RES_INV;
+    if(dsc->local.map == NULL && dsc->classes == NULL) return LV_RES_INV;
 
     volatile lv_res_t res = LV_RES_OK;
 
@@ -622,6 +625,7 @@ lv_res_t lv_style_dsc_get_opa(lv_style_dsc_t * dsc, lv_style_property_t prop, lv
 lv_res_t lv_style_dsc_get_ptr(lv_style_dsc_t * dsc, lv_style_property_t prop, void ** value)
 {
     if(dsc == NULL) return LV_RES_INV;
+    if(dsc->local.map == NULL && dsc->classes == NULL) return LV_RES_INV;
 
     lv_res_t res = LV_RES_OK;
 
@@ -645,7 +649,7 @@ lv_res_t lv_style_dsc_get_ptr(lv_style_dsc_t * dsc, lv_style_property_t prop, vo
     int16_t weight_act;
     int16_t weight = -1;
 
-    void * value_act;
+    void * value_act = NULL;
     weight_act = lv_style_get_ptr(&dsc->local, prop, &value_act);
 
     /*On perfect match return the value immediately*/

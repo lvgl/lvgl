@@ -2037,7 +2037,6 @@ lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style
     lv_style_attr_t attr;
     attr.full = prop >> 8;
 
-    int16_t weight = -1;
     lv_style_int_t value;
     lv_res_t res = LV_RES_INV;
     const lv_obj_t * parent = obj;
@@ -2670,7 +2669,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
             draw_dsc->border_part = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_PART);
             draw_dsc->border_color = lv_obj_get_style_color(obj, part, LV_STYLE_BORDER_COLOR);
         }
-        draw_dsc->bg_blend_mode = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_BLEND_MODE);
+        draw_dsc->border_blend_mode = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_BLEND_MODE);
     }
 
     draw_dsc->pattern_src = lv_obj_get_style_ptr(obj, part, LV_STYLE_PATTERN_IMAGE);
@@ -2713,20 +2712,20 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
 
 void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_t * draw_dsc)
 {
-    draw_dsc->opa = LV_OPA_50;//lv_obj_get_style_opa(obj, part, LV_STYLE_TEXT_OPA);
+    draw_dsc->opa = lv_obj_get_style_opa(obj, part, LV_STYLE_TEXT_OPA);
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
-    lv_opa_t opa_scale = LV_OPA_COVER;//lv_obj_get_style_opa(obj, part, LV_STYLE_OPA_SCALE);
+    lv_opa_t opa_scale = lv_obj_get_style_opa(obj, part, LV_STYLE_OPA_SCALE);
     if(opa_scale < LV_OPA_MAX) {
         draw_dsc->opa = (uint16_t)((uint16_t)draw_dsc->opa * opa_scale) >> 8;
     }
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
-    draw_dsc->color = LV_COLOR_BLUE; //lv_obj_get_style_color(obj, part, LV_STYLE_TEXT_COLOR);
-    draw_dsc->letter_space = 0;//lv_obj_get_style_int(obj, part, LV_STYLE_LETTER_SPACE);
-    draw_dsc->line_space = 0;//lv_obj_get_style_int(obj, part, LV_STYLE_LETTER_SPACE);
+    draw_dsc->color = lv_obj_get_style_color(obj, part, LV_STYLE_TEXT_COLOR);
+    draw_dsc->letter_space = lv_obj_get_style_int(obj, part, LV_STYLE_LETTER_SPACE);
+    draw_dsc->line_space = lv_obj_get_style_int(obj, part, LV_STYLE_LETTER_SPACE);
 
-    draw_dsc->font = LV_FONT_DEFAULT;//lv_obj_get_style_ptr(obj, part, LV_STYLE_FONT);
+    draw_dsc->font = lv_obj_get_style_ptr(obj, part, LV_STYLE_FONT);
 
     if(draw_dsc->sel_start != LV_DRAW_LABEL_NO_TXT_SEL && draw_dsc->sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
         draw_dsc->color = lv_obj_get_style_color(obj, part, LV_STYLE_TEXT_SEL_COLOR);
