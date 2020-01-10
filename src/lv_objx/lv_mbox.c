@@ -38,6 +38,7 @@
  **********************/
 static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 static void mbox_realign(lv_obj_t * mbox);
+static lv_style_dsc_t * lv_mbox_get_style(lv_obj_t * mbox, uint8_t part);
 #if LV_USE_ANIMATION
 static void lv_mbox_close_ready_cb(lv_anim_t * a);
 #endif
@@ -106,12 +107,8 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_event_cb(new_mbox, lv_mbox_default_event_cb);
 
         /*Set the default styles*/
-        lv_theme_t * th = lv_theme_get_current();
-        if(th) {
-            lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, th->style.mbox.bg);
-        } else {
-            lv_mbox_set_style(new_mbox, LV_MBOX_STYLE_BG, &lv_style_pretty);
-        }
+        lv_style_dsc_reset(&new_mbox->style_dsc);
+        lv_obj_add_style_theme(new_mbox, LV_MBOX_PART_BG, LV_THEME_MBOX_BG);
 
     }
     /*Copy an existing message box*/
@@ -153,15 +150,12 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
     if(ext->btnm == NULL) {
         ext->btnm = lv_btnm_create(mbox, NULL);
 
-        /*Set the default styles*/
-        lv_theme_t * th = lv_theme_get_current();
-        if(th) {
-            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_BG, th->style.mbox.btn.bg);
-            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_REL, th->style.mbox.btn.rel);
-            lv_mbox_set_style(mbox, LV_MBOX_STYLE_BTN_PR, th->style.mbox.btn.pr);
-        } else {
-            lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BG, &lv_style_transp_fit);
-        }
+        lv_style_dsc_reset(&ext->btnm->style_dsc);
+        lv_obj_add_style_theme(ext->btnm, LV_BTNM_PART_BG, LV_THEME_MBOX_BTN_BG);
+
+
+        lv_style_dsc_reset(lv_obj_get_style(ext->btnm, LV_BTNM_PART_BTN));
+        lv_obj_add_style_theme(ext->btnm, LV_BTNM_PART_BTN, LV_THEME_MBOX_BTN);
     }
 
     lv_btnm_set_map(ext->btnm, btn_map);
@@ -283,31 +277,6 @@ void lv_mbox_stop_auto_close(lv_obj_t * mbox)
 }
 
 /**
- * Set a style of a message box
- * @param mbox pointer to a message box object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_mbox_set_style(lv_obj_t * mbox, lv_mbox_style_t type, const lv_style_t * style)
-{
-    LV_ASSERT_OBJ(mbox, LV_OBJX_NAME);
-
-    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-
-    switch(type) {
-        case LV_MBOX_STYLE_BG: lv_obj_set_style(mbox, style); break;
-        case LV_MBOX_STYLE_BTN_BG: lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BG, style); break;
-        case LV_MBOX_STYLE_BTN_REL: lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_REL, style); break;
-        case LV_MBOX_STYLE_BTN_PR: lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_PR, style); break;
-        case LV_MBOX_STYLE_BTN_TGL_REL: lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_REL, style); break;
-        case LV_MBOX_STYLE_BTN_TGL_PR: lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_PR, style); break;
-        case LV_MBOX_STYLE_BTN_INA: lv_btnm_set_style(ext->btnm, LV_BTNM_STYLE_BTN_INA, style); break;
-    }
-
-    mbox_realign(mbox);
-}
-
-/**
  * Set whether recoloring is enabled
  * @param btnm pointer to button matrix object
  * @param en whether recoloring is enabled
@@ -392,33 +361,6 @@ uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox)
 }
 
 /**
- * Get a style of a message box
- * @param mbox pointer to a message box object
- * @param type which style should be get
- * @return style pointer to a style
- */
-const lv_style_t * lv_mbox_get_style(const lv_obj_t * mbox, lv_mbox_style_t type)
-{
-    LV_ASSERT_OBJ(mbox, LV_OBJX_NAME);
-
-    const lv_style_t * style = NULL;
-    lv_mbox_ext_t * ext      = lv_obj_get_ext_attr(mbox);
-
-    switch(type) {
-        case LV_MBOX_STYLE_BG: style = lv_obj_get_style(mbox); break;
-        case LV_MBOX_STYLE_BTN_BG: style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BG); break;
-        case LV_MBOX_STYLE_BTN_REL: style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_REL); break;
-        case LV_MBOX_STYLE_BTN_PR: style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_PR); break;
-        case LV_MBOX_STYLE_BTN_TGL_REL: style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_REL); break;
-        case LV_MBOX_STYLE_BTN_TGL_PR: style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_TGL_PR); break;
-        case LV_MBOX_STYLE_BTN_INA: style = lv_btnm_get_style(ext->btnm, LV_BTNM_STYLE_BTN_INA); break;
-        default: style = NULL; break;
-    }
-
-    return style;
-}
-
-/**
  * Get whether recoloring is enabled
  * @param mbox pointer to a message box object
  * @return whether recoloring is enabled
@@ -473,13 +415,20 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
         param = &c_trans;
     }
 
+    if(sign == LV_SIGNAL_GET_STYLE) {
+            lv_get_style_info_t * info = param;
+            info->result = lv_mbox_get_style(mbox, info->part);
+            if(info->result != NULL) return LV_RES_OK;
+            else return ancestor_signal(mbox, sign, param);
+        }
+
     /* Include the ancient signal function */
     res = ancestor_signal(mbox, sign, param);
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-    if(sign == LV_SIGNAL_CORD_CHG) {
+    if(sign == LV_SIGNAL_COORD_CHG) {
         if(lv_obj_get_width(mbox) != lv_area_get_width(param)) {
             mbox_realign(mbox);
         }
@@ -518,6 +467,36 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
 }
 
 /**
+ * Get the style descriptor of a part of the object
+ * @param mbox pointer the object
+ * @param part the part from `lv_mbox_part_t`. (LV_MBOX_PART_...)
+ * @return pointer to the style descriptor of the specified part
+ */
+static lv_style_dsc_t * lv_mbox_get_style(lv_obj_t * mbox, uint8_t part)
+{
+    LV_ASSERT_OBJ(mbox, LV_OBJX_NAME);
+
+    lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+    lv_style_dsc_t * style_dsc_p;
+
+    switch(part) {
+    case LV_MBOX_PART_BG:
+        style_dsc_p = &mbox->style_dsc;
+        break;
+    case LV_MBOX_PART_BTN_BG:
+        style_dsc_p = ext->btnm ? lv_obj_get_style(ext->btnm, LV_BTNM_PART_BG) : NULL;
+        break;
+    case LV_MBOX_PART_BTN:
+        style_dsc_p = ext->btnm ? lv_obj_get_style(ext->btnm, LV_BTNM_PART_BTN) : NULL;
+        break;
+    default:
+        style_dsc_p = NULL;
+    }
+
+    return style_dsc_p;
+}
+
+/**
  * Resize the button holder to fit
  * @param mbox pointer to message box object
  */
@@ -525,20 +504,21 @@ static void mbox_realign(lv_obj_t * mbox)
 {
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
-    const lv_style_t * style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BG);
-    lv_coord_t w             = lv_obj_get_width(mbox) - style->body.padding.left - style->body.padding.right;
+    lv_coord_t w             = lv_obj_get_width_fit(mbox);
 
     if(ext->text) {
         lv_obj_set_width(ext->text, w);
     }
 
     if(ext->btnm) {
-        const lv_style_t * btn_bg_style  = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_BG);
-        const lv_style_t * btn_rel_style = lv_mbox_get_style(mbox, LV_MBOX_STYLE_BTN_REL);
-        lv_coord_t font_h                = lv_font_get_line_height(btn_rel_style->text.font);
-        lv_obj_set_size(ext->btnm, w,
-                        font_h + btn_rel_style->body.padding.top + btn_rel_style->body.padding.bottom +
-                            btn_bg_style->body.padding.top + btn_bg_style->body.padding.bottom);
+        lv_style_int_t bg_top = lv_obj_get_style_int(mbox, LV_MBOX_PART_BTN_BG, LV_STYLE_PAD_TOP);
+        lv_style_int_t bg_bottom = lv_obj_get_style_int(mbox, LV_MBOX_PART_BTN_BG, LV_STYLE_PAD_BOTTOM);
+        lv_style_int_t btn_top = lv_obj_get_style_int(mbox, LV_MBOX_PART_BTN, LV_STYLE_PAD_TOP);
+        lv_style_int_t btn_bottom = lv_obj_get_style_int(mbox, LV_MBOX_PART_BTN, LV_STYLE_PAD_BOTTOM);
+        const lv_font_t * font = lv_obj_get_style_ptr(mbox, LV_MBOX_PART_BTN, LV_STYLE_FONT);
+
+        lv_coord_t font_h = lv_font_get_line_height(font);
+        lv_obj_set_size(ext->btnm, w, font_h + btn_top + btn_bottom + bg_top + bg_bottom);
     }
 }
 

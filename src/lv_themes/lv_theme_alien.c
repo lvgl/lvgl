@@ -354,8 +354,16 @@ static void calendar_init(void)
     lv_style_init(&calendar_date_nums);
     lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR, LV_COLOR_RED);
     lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_DISABLED, LV_COLOR_GRAY);
-    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_WHITE);
+    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_GRAY);
     lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_NAVY);
+
+    lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA , LV_OPA_TRANSP);
+    lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA | LV_STYLE_STATE_FOCUS , LV_OPA_COVER);
+    lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA | LV_STYLE_STATE_CHECKED , LV_OPA_COVER);
+    lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA | LV_STYLE_STATE_PRESSED , LV_OPA_50);
+    lv_style_set_color(&calendar_date_nums, LV_STYLE_BG_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_GREEN);
+    lv_style_set_int(&calendar_date_nums, LV_STYLE_BORDER_WIDTH | LV_STYLE_STATE_CHECKED , 2);
+    lv_style_set_int(&calendar_date_nums, LV_STYLE_BORDER_PART| LV_STYLE_STATE_CHECKED , LV_BORDER_SIDE_LEFT);
 #endif
 }
 
@@ -414,14 +422,7 @@ static void kb_init(void)
 static void mbox_init(void)
 {
 #if LV_USE_MBOX
-    static lv_style_t mbox_bg;
-    lv_style_copy(&mbox_bg, &panel);
-    mbox_bg.body.shadow.width = LV_DPI / 12;
 
-    theme.style.mbox.bg      = &mbox_bg;
-    theme.style.mbox.btn.bg  = &lv_style_transp;
-    theme.style.mbox.btn.rel = &btn_trel;
-    theme.style.mbox.btn.pr  = &btn_tpr;
 #endif
 }
 
@@ -669,8 +670,6 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
     case LV_THEME_CALENDAR_BG:
         return &panel;
     case LV_THEME_CALENDAR_HEADER:
-    case LV_THEME_CALENDAR_TODAY_BOX:
-    case LV_THEME_CALENDAR_WEEK_BOX:
         return &btn;
     case LV_THEME_CALENDAR_DATE_NUMS:
         return &calendar_date_nums;
@@ -684,6 +683,14 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
 
 #if LV_USE_LED
     case LV_THEME_LED:
+        return &btn;
+#endif
+#if LV_USE_MBOX
+    case LV_THEME_MBOX_BG:
+        return &panel;
+    case LV_THEME_MBOX_BTN_BG:
+        return &transp_tight;
+    case LV_THEME_MBOX_BTN:
         return &btn;
 #endif
     }

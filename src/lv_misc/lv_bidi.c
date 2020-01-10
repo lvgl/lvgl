@@ -373,7 +373,6 @@ static void fill_pos_conv(uint16_t * out, uint16_t len, uint16_t index)
 {
     uint16_t i;
     for (i = 0; i < len; i++) {
-        printf("i:%d\n", i);
         out[i] = SET_RTL_POS(index, false);
         index++;
     }
