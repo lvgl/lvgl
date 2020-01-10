@@ -56,8 +56,6 @@ typedef struct
     lv_style_dsc_t style_header;
     lv_style_dsc_t style_day_names;
     lv_style_dsc_t style_date_nums;
-    lv_style_dsc_t style_week_box;
-    lv_style_dsc_t style_today_box;
 } lv_calendar_ext_t;
 
 /** Calendar parts*/
@@ -66,8 +64,6 @@ enum {
     LV_CALENDAR_PART_HEADER, /** Calendar header style */
     LV_CALENDAR_PART_DAY_NAMES, /** Day name style */
     LV_CALENDAR_PART_DATE_NUMS, /** Day name style */
-    LV_CALENDAR_PART_WEEK_BOX, /** Week highlight style */
-    LV_CALENDAR_PART_TODAY_BOX, /** Today highlight style */
 };
 typedef uint8_t lv_calendar_part_t;
 

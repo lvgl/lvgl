@@ -113,12 +113,12 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->day_names              = NULL;
     ext->month_names            = NULL;
 
+    ext->btn_pressing = 0;
+
 
     lv_style_dsc_init(&ext->style_date_nums);
     lv_style_dsc_init(&ext->style_day_names);
     lv_style_dsc_init(&ext->style_header);
-    lv_style_dsc_init(&ext->style_today_box);
-    lv_style_dsc_init(&ext->style_week_box);
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_calendar, lv_calendar_signal);
@@ -128,19 +128,11 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
 
         /*Different styles will be used from the styles while rendering so disable caching*/
-//        ext->style_date_nums.cache.enabled = 0;
-//        ext->style_day_names.cache.enabled = 0;
-//        ext->style_header.cache.enabled = 0;
-//        ext->style_today_box.cache.enabled = 0;
-//        ext->style_week_box.cache.enabled = 0;
-
         lv_style_dsc_reset(&new_calendar->style_dsc);
         lv_style_dsc_add_class(&new_calendar->style_dsc, lv_theme_get_style(LV_THEME_CALENDAR_BG));
         lv_style_dsc_add_class(&ext->style_date_nums, lv_theme_get_style(LV_THEME_CALENDAR_DATE_NUMS));
         lv_style_dsc_add_class(&ext->style_day_names, lv_theme_get_style(LV_THEME_CALENDAR_DAY_NAMES));
         lv_style_dsc_add_class(&ext->style_header, lv_theme_get_style(LV_THEME_CALENDAR_HEADER));
-        lv_style_dsc_add_class(&ext->style_today_box, lv_theme_get_style(LV_THEME_CALENDAR_TODAY_BOX));
-        lv_style_dsc_add_class(&ext->style_week_box, lv_theme_get_style(LV_THEME_CALENDAR_WEEK_BOX));
 
         lv_obj_refresh_style(new_calendar);
 
@@ -164,8 +156,6 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
 
         ext->month_names            = copy_ext->month_names;
         ext->style_header           = copy_ext->style_header;
-        ext->style_week_box         = copy_ext->style_week_box;
-        ext->style_today_box        = copy_ext->style_today_box;
         ext->style_day_names        = copy_ext->style_day_names;
         /*Refresh the style with new signal function*/
 //        lv_obj_refresh_style(new_calendar);
@@ -568,12 +558,6 @@ static lv_style_dsc_t * lv_calendar_get_style(lv_obj_t * calendar, uint8_t part)
     case LV_CALENDAR_PART_DATE_NUMS:
         style_dsc_p = &ext->style_date_nums;
         break;
-    case LV_CALENDAR_PART_WEEK_BOX:
-        style_dsc_p = &ext->style_week_box;
-        break;
-    case LV_CALENDAR_PART_TODAY_BOX:
-        style_dsc_p = &ext->style_today_box;
-        break;
     default:
         style_dsc_p = NULL;
     }
@@ -780,85 +764,39 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     const lv_font_t * daynames_font = lv_obj_get_style_ptr(calendar, LV_CALENDAR_PART_DAY_NAMES, LV_STYLE_FONT);
 
     const lv_font_t * nums_font = lv_obj_get_style_ptr(calendar, LV_CALENDAR_PART_DATE_NUMS, LV_STYLE_FONT);
-    lv_area_t label_area;
-    label_area.y1      = calendar->coords.y1 + get_header_height(calendar) + daynames_top +
-                    lv_font_get_line_height(daynames_font) + daynames_bottom;
-    label_area.y2 = label_area.y1 + lv_font_get_line_height(nums_font);
-
 
     lv_style_int_t bg_bottom = lv_obj_get_style_int(calendar, LV_CALENDAR_PART_BG, LV_STYLE_PAD_BOTTOM);
     lv_style_int_t bg_left = lv_obj_get_style_int(calendar, LV_CALENDAR_PART_BG, LV_STYLE_PAD_LEFT);
     lv_style_int_t bg_right = lv_obj_get_style_int(calendar, LV_CALENDAR_PART_BG, LV_STYLE_PAD_RIGHT);
 
-    lv_coord_t w          = lv_obj_get_width(calendar) - bg_left - bg_right;
-    lv_coord_t h          = calendar->coords.y2 - label_area.y1 - bg_bottom;
-    lv_coord_t box_w      = w / 7;
-    lv_coord_t vert_space = (h - (6 * lv_font_get_line_height(nums_font))) / 5;
-
-    uint32_t week;
-    uint8_t day_cnt;
-    uint8_t month_start_day = get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1);
-    day_draw_state_t draw_state; /*true: Not the prev. or next month is drawn*/
-
-    lv_style_int_t wb_left = lv_obj_get_style_int(calendar, LV_CALENDAR_PART_WEEK_BOX, LV_STYLE_PAD_LEFT);
-    lv_style_int_t wb_right = lv_obj_get_style_int(calendar, LV_CALENDAR_PART_WEEK_BOX, LV_STYLE_PAD_RIGHT);
-    lv_style_int_t wb_top = lv_obj_get_style_int(calendar, LV_CALENDAR_PART_WEEK_BOX, LV_STYLE_PAD_TOP);
-    lv_style_int_t wb_bottom = lv_obj_get_style_int(calendar, LV_CALENDAR_PART_WEEK_BOX, LV_STYLE_PAD_BOTTOM);
+    lv_coord_t days_y1 = calendar->coords.y1 + get_header_height(calendar) + daynames_top +
+            lv_font_get_line_height(daynames_font) + daynames_bottom;;
+    lv_coord_t days_h = calendar->coords.y2 - days_y1 - bg_bottom;
 
     /*The state changes without re-caching the styles, disable the use of cache*/
-//    calendar->style_dsc.cache.enabled = 0;
     lv_obj_state_t state_ori = calendar->state;
 
-    lv_draw_label_dsc_t wb_label_dsc;
-    lv_draw_label_dsc_t tb_label_dsc;
-    lv_draw_label_dsc_t normal_label_dsc;
-    lv_draw_label_dsc_t chk_label_dsc;
-    lv_draw_label_dsc_t ina_label_dsc;
-    lv_draw_label_dsc_t pr_label_dsc;
+    lv_obj_state_t month_state = LV_OBJ_STATE_DISABLED;
 
-    lv_draw_label_dsc_init(&wb_label_dsc);
-    lv_draw_label_dsc_init(&tb_label_dsc);
-    lv_draw_label_dsc_init(&normal_label_dsc);
-    lv_draw_label_dsc_init(&chk_label_dsc);
-    lv_draw_label_dsc_init(&ina_label_dsc);
-    lv_draw_label_dsc_init(&pr_label_dsc);
+    uint8_t day_cnt;
+    lv_coord_t w          = lv_obj_get_width(calendar) - bg_left - bg_right;
+    lv_coord_t box_w      = w / 7;
 
-    tb_label_dsc.flag = LV_TXT_FLAG_CENTER;
-    wb_label_dsc.flag = LV_TXT_FLAG_CENTER;
-    normal_label_dsc.flag = LV_TXT_FLAG_CENTER;
-    chk_label_dsc.flag = LV_TXT_FLAG_CENTER;
-    ina_label_dsc.flag = LV_TXT_FLAG_CENTER;
-    pr_label_dsc.flag = LV_TXT_FLAG_CENTER;
+    uint8_t month_start_day = get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1);
 
-//    calendar->state = 0;
-    lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_WEEK_BOX, &wb_label_dsc);
-    lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_TODAY_BOX, &tb_label_dsc);
-    lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &normal_label_dsc);
+    day_draw_state_t draw_state; /*true: Not the prev. or next month is drawn*/
 
-    calendar->state = LV_OBJ_STATE_CHECKED;
-    lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &chk_label_dsc);
-
-    calendar->state = LV_OBJ_STATE_DISABLED;
-    lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &ina_label_dsc);
-
-    calendar->state = LV_OBJ_STATE_PRESSED;
-    lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &pr_label_dsc);
-
-    calendar->state = state_ori;
-//    calendar->style_dsc.cache.enabled = 1;
-
-    lv_draw_label_dsc_t * act_label_dsc = &ina_label_dsc;
 
     /*If starting with the first day of the week then the previous month is not visible*/
     if(month_start_day == 0) {
         day_cnt    = 1;
         draw_state = DAY_DRAW_ACT_MONTH;
-        act_label_dsc  = &normal_label_dsc;
+        month_state  = 0;
     } else {
         draw_state = DAY_DRAW_PREV_MONTH;
         day_cnt = get_month_length(ext->showed_date.year, ext->showed_date.month - 1); /*Length of the previous month*/
         day_cnt -= month_start_day - 1; /*First visible number of the previous month*/
-        act_label_dsc = &ina_label_dsc;
+        month_state = LV_OBJ_STATE_DISABLED;
     }
 
     bool month_of_today_shown = false;
@@ -867,32 +805,20 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
     }
 
     char buf[3];
-    bool in_week_box = false;
 
     /*Draw 6 weeks*/
+    lv_draw_rect_dsc_t rect_dsc;
+    lv_draw_label_dsc_t label_dsc;
+    lv_obj_state_t prev_state = 0xFF;
+    uint32_t week;
     for(week = 0; week < 6; week++) {
+        lv_area_t box_area;
+        box_area.y1 = days_y1 + (week * days_h) / 6;
+        box_area.y2 = days_y1 + ((week + 1) * days_h) / 6;
 
-        /*Draw the "week box"*/
-        if(month_of_today_shown &&
-           ((draw_state == DAY_DRAW_ACT_MONTH && ext->today.day >= day_cnt && ext->today.day < day_cnt + 7) ||
-            (draw_state == DAY_DRAW_PREV_MONTH && ext->today.day <= 7 - month_start_day && week == 0))) {
-            lv_area_t week_box_area;
-            lv_area_copy(&week_box_area, &label_area); /*'label_area' is already set for this row*/
-            week_box_area.x1 = calendar->coords.x1 + bg_left - wb_left;
-            week_box_area.x2 = calendar->coords.x2 - bg_right + wb_right;
-
-            week_box_area.y1 -= wb_top;
-            week_box_area.y2 += wb_bottom;
-
-            lv_draw_rect_dsc_t wb_rect_dsc;
-            lv_draw_rect_dsc_init(&wb_rect_dsc);
-            lv_obj_init_draw_rect_dsc(calendar, LV_CALENDAR_PART_WEEK_BOX, &wb_rect_dsc);
-            lv_draw_rect(&week_box_area, mask, &wb_rect_dsc);
-
-            in_week_box = true;
-        } else {
-            in_week_box = false;
-        }
+        lv_area_t label_area;
+        label_area.y1 = box_area.y1 + (lv_area_get_height(&box_area) - lv_font_get_line_height(nums_font)) / 2;
+        label_area.y2 = label_area.y1 + lv_font_get_line_height(nums_font);
 
         /*Draw the 7 days of a week*/
         uint32_t day;
@@ -901,62 +827,61 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
             if(draw_state == DAY_DRAW_PREV_MONTH && day == month_start_day) {
                 draw_state = DAY_DRAW_ACT_MONTH;
                 day_cnt    = 1;
-                act_label_dsc  = &normal_label_dsc;
+                month_state  = 0;
             }
             /*The current month is over*/
-            if(draw_state == DAY_DRAW_ACT_MONTH &&
+            else if(draw_state == DAY_DRAW_ACT_MONTH &&
                day_cnt > get_month_length(ext->showed_date.year, ext->showed_date.month)) {
                 draw_state = DAY_DRAW_NEXT_MONTH;
                 day_cnt    = 1;
-                act_label_dsc  = &ina_label_dsc;
+                month_state  = LV_OBJ_STATE_DISABLED;
             }
+
+
+            lv_obj_state_t day_state = month_state;
+            if(is_pressed(calendar, draw_state, ext->showed_date.year, ext->showed_date.month, day_cnt)) {
+                day_state |= LV_OBJ_STATE_PRESSED;
+            }
+            if(is_highlighted(calendar, draw_state, ext->showed_date.year, ext->showed_date.month, day_cnt)) {
+                day_state |= LV_OBJ_STATE_CHECKED;
+            }
+            if(month_of_today_shown && day_cnt == ext->today.day && draw_state == DAY_DRAW_ACT_MONTH) {
+                day_state |= LV_OBJ_STATE_FOCUS;
+            }
+
+            if(prev_state != day_state) {
+                lv_draw_rect_dsc_init(&rect_dsc);
+                lv_draw_label_dsc_init(&label_dsc);
+                label_dsc.flag = LV_TXT_FLAG_CENTER;
+
+                calendar->state = day_state;
+                lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &label_dsc);
+                lv_obj_init_draw_rect_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &rect_dsc);
+
+                prev_state = day_state;
+            }
+
 
             label_area.x1 = calendar->coords.x1 + (w * day) / 7 + bg_left;
             label_area.x2 = label_area.x1 + box_w - 1;
 
-            /*Draw the "today box"*/
-            if(draw_state == DAY_DRAW_ACT_MONTH && month_of_today_shown && ext->today.day == day_cnt) {
-                lv_area_t today_box_area;
-                lv_area_copy(&today_box_area, &label_area);
-                today_box_area.x1 = label_area.x1;
-                today_box_area.x2 = label_area.x2;
+            box_area.x1 = label_area.x1;
+            box_area.x2 = label_area.x2;
 
-                lv_style_int_t tb_top = lv_obj_get_style_int(calendar, LV_CALENDAR_PART_TODAY_BOX, LV_STYLE_PAD_TOP);
-                lv_style_int_t tb_bottom = lv_obj_get_style_int(calendar, LV_CALENDAR_PART_TODAY_BOX, LV_STYLE_PAD_BOTTOM);
-                today_box_area.y1 = label_area.y1 - tb_top;
-                today_box_area.y2 = label_area.y2 + tb_bottom;
 
-                lv_draw_rect_dsc_t tb_rect_dsc;
-                lv_draw_rect_dsc_init(&tb_rect_dsc);
-                lv_obj_init_draw_rect_dsc(calendar, LV_CALENDAR_PART_WEEK_BOX, &tb_rect_dsc);
-                lv_draw_rect(&today_box_area, mask, &tb_rect_dsc);
-            }
-
-            /*Get the final style : highlighted/week box/today box/normal*/
-            lv_draw_label_dsc_t * final_label_dsc;
-            if(is_pressed(calendar, draw_state, ext->showed_date.year, ext->showed_date.month, day_cnt)) {
-                final_label_dsc = &pr_label_dsc;
-            } else if(is_highlighted(calendar, draw_state, ext->showed_date.year, ext->showed_date.month, day_cnt)) {
-                final_label_dsc = &chk_label_dsc;
-            } else if(month_of_today_shown && day_cnt == ext->today.day && draw_state == DAY_DRAW_ACT_MONTH)
-                final_label_dsc = &tb_label_dsc;
-            else if(in_week_box && draw_state == DAY_DRAW_ACT_MONTH)
-                final_label_dsc = &wb_label_dsc;
-            else
-                final_label_dsc = act_label_dsc;
+            lv_draw_rect(&label_area, mask, &rect_dsc);
 
             /*Write the day's number*/
             lv_utils_num_to_str(day_cnt, buf);
-            lv_draw_label(&label_area, mask, final_label_dsc, buf, NULL);
+            lv_draw_label(&label_area, mask, &label_dsc, buf, NULL);
 
             /*Go to the next day*/
             day_cnt++;
         }
-
-        /*Got to the next weeks row*/
-        label_area.y1 += vert_space + lv_font_get_line_height(nums_font);
-        label_area.y2 += vert_space + lv_font_get_line_height(nums_font);
     }
+    calendar->state = state_ori;
+
+
 }
 
 /**
