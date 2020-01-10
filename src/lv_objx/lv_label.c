@@ -96,7 +96,6 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->text       = NULL;
     ext->static_txt = 0;
     ext->recolor    = 0;
-    ext->body_draw  = 0;
     ext->align      = LV_LABEL_ALIGN_AUTO;
     ext->dot_end    = LV_LABEL_DOT_END_INV;
     ext->long_mode  = LV_LABEL_LONG_EXPAND;
@@ -136,7 +135,6 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_label_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_label_set_long_mode(new_label, lv_label_get_long_mode(copy));
         lv_label_set_recolor(new_label, lv_label_get_recolor(copy));
-        lv_label_set_body_draw(new_label, lv_label_get_body_draw(copy));
         lv_label_set_align(new_label, lv_label_get_align(copy));
         if(copy_ext->static_txt == 0)
             lv_label_set_text(new_label, lv_label_get_text(copy));
@@ -197,6 +195,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
     if(ext->text == text) {
         /*If set its own text then reallocate it (maybe its size changed)*/
         ext->text = lv_mem_realloc(ext->text, strlen(ext->text) + 1);
+
         LV_ASSERT_MEM(ext->text);
         if(ext->text == NULL) return;
     } else {
@@ -208,6 +207,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
         }
 
         ext->text = lv_mem_alloc(len);
+
         LV_ASSERT_MEM(ext->text);
         if(ext->text == NULL) return;
 
@@ -404,25 +404,6 @@ void lv_label_set_recolor(lv_obj_t * label, bool en)
 }
 
 /**
- * Set the label to draw (or not draw) background specified in its style's body
- * @param label pointer to a label object
- * @param en true: draw body; false: don't draw body
- */
-void lv_label_set_body_draw(lv_obj_t * label, bool en)
-{
-    LV_ASSERT_OBJ(label, LV_OBJX_NAME);
-
-    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    if(ext->body_draw == en) return;
-
-    ext->body_draw = en == false ? 0 : 1;
-
-    lv_obj_refresh_ext_draw_pad(label);
-
-    lv_obj_invalidate(label);
-}
-
-/**
  * Set the label's animation speed in LV_LABEL_LONG_SROLL/SCROLL_CIRC modes
  * @param label pointer to a label object
  * @param anim_speed speed of animation in px/sec unit
@@ -547,19 +528,6 @@ bool lv_label_get_recolor(const lv_obj_t * label)
 }
 
 /**
- * Get the body draw attribute
- * @param label pointer to a label object
- * @return true: draw body; false: don't draw body
- */
-bool lv_label_get_body_draw(const lv_obj_t * label)
-{
-    LV_ASSERT_OBJ(label, LV_OBJX_NAME);
-
-    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    return ext->body_draw == 0 ? false : true;
-}
-
-/**
  * Get the label's animation speed in LV_LABEL_LONG_ROLL and SCROLL modes
  * @param label pointer to a label object
  * @return speed of animation in px/sec unit
@@ -649,6 +617,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
         uint16_t visual_char_pos = lv_bidi_get_visual_pos(&txt[line_start], &mutable_bidi_txt, new_line_start - line_start, lv_obj_get_base_dir(label), line_char_id, &is_rtl);
         bidi_txt = mutable_bidi_txt;
         if (is_rtl) visual_char_pos++;
+
         visual_byte_pos = lv_txt_encoded_get_byte_id(bidi_txt, visual_char_pos);
     }
 #else
@@ -1046,29 +1015,28 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
     if(mode == LV_DESIGN_COVER_CHK)
         return LV_DESIGN_RES_NOT_COVER;
     else if(mode == LV_DESIGN_DRAW_MAIN) {
+        lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+
         lv_area_t coords;
         lv_obj_get_coords(label, &coords);
 
-        lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-        if(ext->body_draw) {
-            lv_area_t bg;
-            lv_obj_get_coords(label, &bg);
+        lv_area_t bg;
+        lv_obj_get_coords(label, &bg);
 
-            lv_coord_t left   = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_LEFT);
-            lv_coord_t right  = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_RIGHT);
-            lv_coord_t top    = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_TOP);
-            lv_coord_t bottom = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_BOTTOM);
-            bg.x1 -= left;
-            bg.x2 += right;
-            bg.y1 -= top;
-            bg.y2 += bottom;
+        lv_coord_t left   = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_LEFT);
+        lv_coord_t right  = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_RIGHT);
+        lv_coord_t top    = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_TOP);
+        lv_coord_t bottom = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_BOTTOM);
+        bg.x1 -= left;
+        bg.x2 += right;
+        bg.y1 -= top;
+        bg.y2 += bottom;
 
-            lv_draw_rect_dsc_t draw_rect_dsc;
-            lv_draw_rect_dsc_init(&draw_rect_dsc);
-            lv_obj_init_draw_rect_dsc(label, LV_LABEL_PART_MAIN, &draw_rect_dsc);
+        lv_draw_rect_dsc_t draw_rect_dsc;
+        lv_draw_rect_dsc_init(&draw_rect_dsc);
+        lv_obj_init_draw_rect_dsc(label, LV_LABEL_PART_MAIN, &draw_rect_dsc);
 
-            lv_draw_rect(&bg, clip_area, &draw_rect_dsc);
-        }
+        lv_draw_rect(&bg, clip_area, &draw_rect_dsc);
 
         lv_label_align_t align = lv_label_get_align(label);
 
@@ -1181,16 +1149,14 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
             lv_label_refr_text(label);
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        if(ext->body_draw) {
-            lv_coord_t left   = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_LEFT);
-            lv_coord_t right  = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_RIGHT);
-            lv_coord_t top    = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_TOP);
-            lv_coord_t bottom = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_BOTTOM);
-            label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, left);
-            label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, right);
-            label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, top);
-            label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, bottom);
-        }
+        lv_coord_t left   = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_LEFT);
+        lv_coord_t right  = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_RIGHT);
+        lv_coord_t top    = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_TOP);
+        lv_coord_t bottom = lv_obj_get_style_int(label, LV_LABEL_PART_MAIN, LV_STYLE_PAD_BOTTOM);
+        label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, left);
+        label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, right);
+        label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, top);
+        label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, bottom);
     }
     else if(sign == LV_SIGNAL_BASE_DIR_CHG) {
 #if LV_USE_BIDI

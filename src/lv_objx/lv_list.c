@@ -218,7 +218,6 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
             lv_obj_set_width(label, liste->coords.x2 - label->coords.x1 - pad);
         }
         if(label_signal == NULL) label_signal = lv_obj_get_signal_cb(label);
-
     }
 
 #if LV_USE_GROUP

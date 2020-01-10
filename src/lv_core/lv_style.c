@@ -44,7 +44,7 @@ static void style_animation_common_end_cb(lv_anim_t * a);
 /**********************
  *  GLOABAL VARIABLES
  **********************/
-lv_style_t lv_style_transp_tight;
+//lv_style_t lv_style_transp_tight;
 
 /**********************
  *  STATIC VARIABLES
@@ -60,16 +60,16 @@ lv_style_t lv_style_transp_tight;
 
 void lv_style_built_in_init(void)
 {
-    lv_style_init(&lv_style_transp_tight);
-    lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
-    lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_BORDER_OPA, LV_OPA_TRANSP);
-    lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_SHADOW_OPA, LV_OPA_TRANSP);
-    lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_PATTERN_OPA, LV_OPA_TRANSP);
-    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_LEFT, 0);
-    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_RIGHT, 0);
-    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_TOP, 0);
-    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_BOTTOM, 0);
-    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_INNER, 0);
+//    lv_style_init(&lv_style_transp_tight);
+//    lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
+//    lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_BORDER_OPA, LV_OPA_TRANSP);
+//    lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_SHADOW_OPA, LV_OPA_TRANSP);
+//    lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_PATTERN_OPA, LV_OPA_TRANSP);
+//    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_LEFT, 0);
+//    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_RIGHT, 0);
+//    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_TOP, 0);
+//    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_BOTTOM, 0);
+//    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_INNER, 0);
 }
 
 void lv_style_init(lv_style_t * style)

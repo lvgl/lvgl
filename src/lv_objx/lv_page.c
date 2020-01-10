@@ -904,6 +904,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
 
     /* Include the ancient signal function */
     res = ancestor_signal(scrl, sign, param);
+
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, "");
 
@@ -1044,7 +1045,6 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
             }
         }
     }
-
     return res;
 }
 

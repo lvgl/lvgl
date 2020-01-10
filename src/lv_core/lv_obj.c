@@ -737,8 +737,7 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 
     /*Tell the children the parent's size has changed*/
     lv_obj_t * i;
-    LV_LL_READ(obj->child_ll, i)
-    {
+    LV_LL_READ(obj->child_ll, i) {
         i->signal_cb(i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
     }
 

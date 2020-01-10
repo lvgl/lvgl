@@ -336,6 +336,20 @@ void lv_mem_defrag(void)
 #endif
 }
 
+void lv_mem_test(void)
+{
+    lv_mem_ent_t * e;
+    e = ent_get_next(NULL);
+    while(e) {
+        if(e->header.s.d_size > 200000) {
+            printf("mem err\n");
+            while(1);
+        }
+        e = ent_get_next(e);
+    }
+
+}
+
 /**
  * Give information about the work memory of dynamic allocation
  * @param mon_p pointer to a dm_mon_p variable,

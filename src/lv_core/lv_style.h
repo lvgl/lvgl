@@ -348,7 +348,7 @@ static inline void lv_style_anim_create(lv_anim_t * a)
 /*************************
  *    GLOBAL VARIABLES
  *************************/
-extern lv_style_t lv_style_transp_tight;
+//extern lv_style_t lv_style_transp_tight;
 
 /**********************
  *      MACROS

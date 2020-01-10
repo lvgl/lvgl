@@ -95,8 +95,7 @@ typedef struct
     uint8_t static_txt : 1;             /*Flag to indicate the text is static*/
     uint8_t align : 2;                  /*Align type from 'lv_label_align_t'*/
     uint8_t recolor : 1;                /*Enable in-line letter re-coloring*/
-    uint8_t expand : 1;                 /*Ignore real width (used by the library with LV_LABEL_LONG_ROLL)*/
-    uint8_t body_draw : 1;              /*Draw background body*/
+    uint8_t expand : 1;                 /*Ignore real width (used by the library with LV_LABEL_LONG_SROLL)*/
     uint8_t dot_tmp_alloc : 1; /*True if dot_tmp has been allocated. False if dot_tmp directly holds up to 4 bytes of
                                   characters */
 } lv_label_ext_t;
@@ -179,13 +178,6 @@ void lv_label_set_align(lv_obj_t * label, lv_label_align_t align);
 void lv_label_set_recolor(lv_obj_t * label, bool en);
 
 /**
- * Set the label to draw (or not draw) background specified in its style's body
- * @param label pointer to a label object
- * @param en true: draw body; false: don't draw body
- */
-void lv_label_set_body_draw(lv_obj_t * label, bool en);
-
-/**
  * Set the label's animation speed in LV_LABEL_LONG_SROLL/SCROLL_CIRC modes
  * @param label pointer to a label object
  * @param anim_speed speed of animation in px/sec unit
@@ -237,13 +229,6 @@ lv_label_align_t lv_label_get_align(const lv_obj_t * label);
  * @return true: recoloring is enabled, false: disable
  */
 bool lv_label_get_recolor(const lv_obj_t * label);
-
-/**
- * Get the body draw attribute
- * @param label pointer to a label object
- * @return true: draw body; false: don't draw body
- */
-bool lv_label_get_body_draw(const lv_obj_t * label);
 
 /**
  * Get the label's animation speed in LV_LABEL_LONG_ROLL and SCROLL modes

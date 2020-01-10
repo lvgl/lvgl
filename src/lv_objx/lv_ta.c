@@ -146,8 +146,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_size(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
         lv_ta_set_sb_mode(new_ta, LV_SB_MODE_DRAG);
 
-        lv_style_dsc_reset(&ext->page.scrl->style_dsc);
-        lv_obj_add_style_class(ext->page.scrl, LV_OBJ_PART_MAIN, &lv_style_transp_tight);
+        lv_obj_reset_style(new_ta, LV_PAGE_PART_SCRL);
 
         _ot(new_ta, LV_TA_PART_CURSOR, TA_CURSOR);
 
@@ -419,6 +418,7 @@ void lv_ta_del_char(lv_obj_t * ta)
     }
 
     char * label_txt = lv_label_get_text(ext->label);
+
     /*Delete a character*/
     lv_txt_cut(label_txt, ext->cursor.pos - 1, 1);
     /*Refresh the label*/
@@ -446,6 +446,7 @@ void lv_ta_del_char(lv_obj_t * ta)
     placeholder_update(ta);
 
     lv_event_send(ta, LV_EVENT_VALUE_CHANGED, NULL);
+
 }
 
 /**
@@ -1496,6 +1497,7 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
     /* Include the ancient signal function */
     res = scrl_signal(scrl, sign, param);
+
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, "");
 
@@ -1516,11 +1518,13 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
                 lv_obj_set_width(ext->label, lv_page_get_fit_width(ta));
                 lv_obj_set_pos(ext->label, 0, 0);
-                lv_label_set_text(ext->label, NULL); /*Refresh the label*/
 
+                lv_label_set_text(ext->label, NULL); /*Refresh the label*/
                 refr_cursor_area(ta);
             }
+
         }
+
     } else if(sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESS_LOST ||
               sign == LV_SIGNAL_RELEASED) {
         update_cursor_position_on_click(ta, sign, (lv_indev_t *)param);
@@ -1724,7 +1728,6 @@ static void refr_cursor_area(lv_obj_t * ta)
     ext->cursor.txt_byte_pos = byte_pos;
 
     /*Calculate the cursor according to its type*/
-
     lv_style_int_t top = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_TOP);
     lv_style_int_t bottom = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_BOTTOM);
     lv_style_int_t left = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_LEFT);

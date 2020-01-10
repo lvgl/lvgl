@@ -622,7 +622,6 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
 
 
         /*The state changes without re-caching the styles, disable the use of cache*/
-//        btnm->style_dsc.cache.enabled = 0;
         uint8_t state_ori = btnm->state;
         btnm->state = 0;
         lv_draw_rect_dsc_init(&draw_rect_rel_dsc);
@@ -643,7 +642,6 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
         lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_ina_dsc);
 
         btnm->state = state_ori;
-//        btnm->style_dsc.cache.enabled = 1;
 
         lv_style_int_t padding_top = lv_obj_get_style_int(btnm, LV_BTNM_PART_BG, LV_STYLE_PAD_TOP);
         lv_style_int_t padding_bottom = lv_obj_get_style_int(btnm, LV_BTNM_PART_BG, LV_STYLE_PAD_BOTTOM);
