@@ -103,12 +103,13 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         return NULL;
     }
 
-    ext->cursor.state      = 1;
     ext->pwd_mode          = 0;
     ext->pwd_tmp           = NULL;
     ext->pwd_show_time     = LV_TA_DEF_PWD_SHOW_TIME;
     ext->accapted_chars    = NULL;
     ext->max_length        = 0;
+    ext->cursor.state      = 1;
+    ext->cursor.hidden     = 0;
     ext->cursor.blink_time = LV_TA_DEF_CURSOR_BLINK_TIME;
     ext->cursor.pos        = 0;
     ext->cursor.click_pos  = 1;

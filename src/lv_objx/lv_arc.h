@@ -32,11 +32,13 @@ typedef struct
     /*New data for this type */
     lv_coord_t angle_start;
     lv_coord_t angle_end;
+    lv_style_dsc_t style_arc;
 } lv_arc_ext_t;
 
 /*Parts of the arc*/
 enum {
-    LV_ARC_PART_MAIN,
+    LV_ARC_PART_BG = LV_OBJ_PART_MAIN,
+    LV_ARC_PART_ARC,
 };
 typedef uint8_t lv_arc_part_t;
 

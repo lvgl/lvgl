@@ -216,19 +216,24 @@ uint16_t lv_bidi_get_logical_pos(const char * str_in, char **bidi_txt, uint32_t 
 uint16_t lv_bidi_get_visual_pos(const char * str_in, char **bidi_txt, uint16_t len, lv_bidi_dir_t base_dir, uint32_t logical_pos, bool *is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
-    void *buf = lv_mem_buf_get(len + pos_conv_len * sizeof(uint16_t));
+    char * buf = lv_mem_buf_get(len);
     if(buf == NULL) return (uint16_t) -1;
+
+    uint16_t *pos_conv_buf = lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
+    if(buf == NULL) return (uint16_t) -1;
+
     if (bidi_txt) *bidi_txt = buf;
 
-    uint16_t *pos_conv_buf = (uint16_t*) ((char*)buf + len);
     lv_bidi_process_paragraph(str_in, bidi_txt ? *bidi_txt: NULL, len, base_dir, pos_conv_buf, pos_conv_len);
     for (uint16_t i = 0; i < pos_conv_len; i++){
         if (GET_POS(pos_conv_buf[i]) == logical_pos){
             if (is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[i]);
+            lv_mem_buf_release(pos_conv_buf);
             if(bidi_txt == NULL) lv_mem_buf_release(buf);
             return i;
         }
     }
+    lv_mem_buf_release(pos_conv_buf);
     if(bidi_txt == NULL) lv_mem_buf_release(buf);
     return (uint16_t) -1;
 }
@@ -366,8 +371,9 @@ static uint32_t get_txt_len(const char * txt, uint32_t max_len)
 
 static void fill_pos_conv(uint16_t * out, uint16_t len, uint16_t index)
 {
-    for (uint16_t i = 0; i < len; i++)
-    {
+    uint16_t i;
+    for (i = 0; i < len; i++) {
+        printf("i:%d\n", i);
         out[i] = SET_RTL_POS(index, false);
         index++;
     }

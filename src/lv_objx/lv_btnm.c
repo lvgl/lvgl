@@ -966,6 +966,12 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
     return res;
 }
 
+/**
+ * Get the style descriptor of a part of the object
+ * @param btnm pointer the object
+ * @param part the part of the object. (LV_BTNM_PART_...)
+ * @return pointer to the style descriptor of the specified part
+ */
 static lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t part)
 {
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
@@ -987,6 +993,7 @@ static lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t part)
 
     return style_dsc_p;
 }
+
 /**
  * Create the required number of buttons and control bytes according to a map
  * @param btnm pointer to button matrix object

@@ -112,7 +112,10 @@ typedef enum {
     LV_THEME_CALENDAR_TODAY_BOX,
     LV_THEME_CALENDAR_WEEK_BOX,
 
+    LV_THEME_ARC_BG,
     LV_THEME_ARC,
+
+    LV_THEME_LED,
 }lv_theme_style_t;
 
 typedef struct {

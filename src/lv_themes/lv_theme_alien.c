@@ -63,6 +63,7 @@ static lv_style_t ta_cursor;
 
 #if LV_USE_ARC
 static lv_style_t arc;
+static lv_style_t arc_bg;
 #endif
 
 #if LV_USE_CALENDAR
@@ -123,7 +124,7 @@ static void basic_init(void)
     lv_style_set_ptr(&btn, LV_STYLE_FONT | LV_STYLE_STATE_PRESSED, &lv_font_roboto_28);
     lv_style_set_opa(&btn, LV_STYLE_BG_OPA, LV_OPA_50);
     lv_style_set_opa(&btn, LV_STYLE_BORDER_OPA, LV_OPA_70);
-    lv_style_set_opa(&btn, LV_STYLE_TEXT_OPA, LV_OPA_50);
+    lv_style_set_opa(&btn, LV_STYLE_TEXT_OPA, LV_OPA_80);
     lv_style_set_int(&btn, LV_STYLE_BORDER_WIDTH | LV_STYLE_STATE_FOCUS, 6);
     lv_style_set_ptr(&btn, LV_STYLE_PATTERN_IMAGE | LV_STYLE_STATE_CHECKED, LV_SYMBOL_OK);
     lv_style_set_int(&btn, LV_STYLE_PATTERN_REPEATE | LV_STYLE_STATE_CHECKED, 1);
@@ -262,18 +263,7 @@ static void line_init(void)
 static void led_init(void)
 {
 #if LV_USE_LED != 0
-    static lv_style_t led;
-    lv_style_copy(&led, &lv_style_pretty_color);
-    led.body.shadow.width = LV_DPI / 10;
-    led.body.radius       = LV_RADIUS_CIRCLE;
-    led.body.border.width = LV_DPI / 30;
-    led.body.border.opa   = LV_OPA_30;
-    led.body.main_color   = lv_color_hsv_to_rgb(_hue, 100, 100);
-    led.body.grad_color   = lv_color_hsv_to_rgb(_hue, 100, 40);
-    led.body.border.color = lv_color_hsv_to_rgb(_hue, 60, 60);
-    led.body.shadow.color = lv_color_hsv_to_rgb(_hue, 100, 100);
 
-    theme.style.led = &led;
 #endif
 }
 
@@ -334,6 +324,12 @@ static void arc_init(void)
     lv_style_init(&arc);
     lv_style_set_color(&arc, LV_STYLE_LINE_COLOR, LV_COLOR_AQUA);
     lv_style_set_int(&arc, LV_STYLE_LINE_WIDTH, 4);
+
+    lv_style_init(&arc_bg);
+    lv_style_set_color(&arc_bg, LV_STYLE_BORDER_COLOR, LV_COLOR_GRAY);
+    lv_style_set_int(&arc_bg, LV_STYLE_BORDER_WIDTH, 4);
+    lv_style_set_opa(&arc_bg, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
+
 #endif
 }
 
@@ -682,6 +678,13 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
 #if LV_USE_ARC
     case LV_THEME_ARC:
         return &arc;
+    case LV_THEME_ARC_BG:
+        return &arc_bg;
+#endif
+
+#if LV_USE_LED
+    case LV_THEME_LED:
+        return &btn;
 #endif
     }
 

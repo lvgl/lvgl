@@ -103,6 +103,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_size(new_gauge, 2 * LV_DPI, 2 * LV_DPI);
 
         lv_style_dsc_reset(&new_gauge->style_dsc);
+        lv_style_dsc_init(&ext->style_strong);
         _ot(new_gauge, LV_GAUGE_PART_MAIN, GAUGE);
         _ot(new_gauge, LV_GAUGE_PART_STRONG, GAUGE_STRONG);
 

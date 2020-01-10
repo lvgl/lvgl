@@ -35,11 +35,11 @@ typedef struct
     uint8_t bright; /*Current brightness of the LED (0..255)*/
 } lv_led_ext_t;
 
-/*Styles*/
+/*Parts of LED*/
 enum {
-    LV_LED_STYLE_MAIN,
+    LV_LED_PART_MAIN = LV_OBJ_PART_MAIN,
 };
-typedef uint8_t lv_led_style_t;
+typedef uint8_t lv_led_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -79,35 +79,11 @@ void lv_led_off(lv_obj_t * led);
 void lv_led_toggle(lv_obj_t * led);
 
 /**
- * Set the style of a led
- * @param led pointer to a led object
- * @param type which style should be set (can be only `LV_LED_STYLE_MAIN`)
- * @param style pointer to a style
- */
-static inline void lv_led_set_style(lv_obj_t * led, lv_led_style_t type, const lv_style_t * style)
-{
-    (void)type; /*Unused*/
-    lv_obj_set_style(led, style);
-}
-
-/**
  * Get the brightness of a LEd object
  * @param led pointer to LED object
  * @return bright 0 (max. dark) ... 255 (max. light)
  */
 uint8_t lv_led_get_bright(const lv_obj_t * led);
-
-/**
- * Get the style of an led object
- * @param led pointer to an led object
- * @param type which style should be get (can be only `LV_CHART_STYLE_MAIN`)
- * @return pointer to the led's style
- */
-static inline const lv_style_t * lv_led_get_style(const lv_obj_t * led, lv_led_style_t type)
-{
-    (void)type; /*Unused*/
-    return lv_obj_get_style(led);
-}
 
 /**********************
  *      MACROS
