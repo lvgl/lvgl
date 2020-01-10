@@ -112,7 +112,6 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cursor.blink_time = LV_TA_DEF_CURSOR_BLINK_TIME;
     ext->cursor.pos        = 0;
     ext->cursor.click_pos  = 1;
-    ext->cursor.type       = LV_CURSOR_LINE;
     ext->cursor.valid_x    = 0;
     ext->one_line          = 0;
 #if LV_LABEL_TEXT_SEL
@@ -164,7 +163,6 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->cursor.style      = copy_ext->cursor.style;
         ext->cursor.pos        = copy_ext->cursor.pos;
         ext->cursor.valid_x    = copy_ext->cursor.valid_x;
-        ext->cursor.type       = copy_ext->cursor.type;
 
         if(ext->pwd_mode != 0) pwd_char_hider( new_ta);
 
@@ -647,18 +645,17 @@ void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 }
 
 /**
- * Set the cursor type.
+ * Hide/Unhide the cursor.
  * @param ta pointer to a text area object
- * @param cur_type: element of 'lv_ta_cursor_type_t'
+ * @param hide: true: hide the cursor
  */
-void lv_ta_set_cursor_type(lv_obj_t * ta, lv_cursor_type_t cur_type)
+void lv_ta_set_cursor_hidden(lv_obj_t * ta, bool hide)
 {
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-    if(ext->cursor.type == cur_type) return;
 
-    ext->cursor.type = cur_type;
+    ext->cursor.hidden = hide ? 1 : 0;
 
     refr_cursor_area(ta);
 }
@@ -995,16 +992,16 @@ uint16_t lv_ta_get_cursor_pos(const lv_obj_t * ta)
 }
 
 /**
- * Get the current cursor type.
+ * Get whether the cursor is hidden or not
  * @param ta pointer to a text area object
- * @return element of 'lv_ta_cursor_type_t'
+ * @return true: the cursor is hidden
  */
-lv_cursor_type_t lv_ta_get_cursor_type(const lv_obj_t * ta)
+bool lv_ta_get_cursor_hidden(const lv_obj_t * ta)
 {
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-    return ext->cursor.type;
+    return ext->cursor.hidden ? true : false;
 }
 
 /**
@@ -1310,8 +1307,8 @@ static lv_design_res_t lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t 
         lv_obj_t * ta     = lv_obj_get_parent(scrl);
         lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-        if(ext->cursor.type == LV_CURSOR_NONE || (ext->cursor.type & LV_CURSOR_HIDDEN) || ext->cursor.state == 0) {
-            return true; /*The cursor is not visible now*/
+        if(ext->cursor.hidden|| ext->cursor.state == 0) {
+            return LV_DESIGN_RES_OK; /*The cursor is not visible now*/
         }
 
         lv_draw_rect_dsc_t cur_dsc;
@@ -1329,20 +1326,12 @@ static lv_design_res_t lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t 
         cur_area.x2 += ext->label->coords.x1;
         cur_area.y2 += ext->label->coords.y1;
 
-        if(ext->cursor.type == LV_CURSOR_LINE) {
-            lv_draw_line_dsc_t cur_line_dsc;
-            lv_draw_line_dsc_init(&cur_line_dsc);
-            lv_obj_init_draw_line_dsc(ta, LV_TA_PART_CURSOR, &cur_line_dsc);
-            cur_dsc.bg_color = cur_line_dsc.color;
-            cur_dsc.bg_opa = cur_line_dsc.opa;
-            cur_dsc.bg_blend_mode = cur_line_dsc.blend_mode;
-            lv_draw_rect(&cur_area, clip_area, &cur_dsc);
-        } else if(ext->cursor.type == LV_CURSOR_BLOCK) {
-            lv_draw_rect(&cur_area, clip_area, &cur_dsc);
+        lv_draw_rect(&cur_area, clip_area, &cur_dsc);
 
-            char letter_buf[8] = {0};
-            memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
+        char letter_buf[8] = {0};
+        memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
 
+        if(cur_dsc.bg_opa == LV_OPA_COVER) {
             lv_style_int_t left = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_LEFT);
             lv_style_int_t top = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_TOP);
             cur_area.x1 += left;
@@ -1352,13 +1341,6 @@ static lv_design_res_t lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t 
             lv_draw_label_dsc_init(&cur_label_dsc);
             lv_obj_init_draw_label_dsc(ta, LV_TA_PART_CURSOR, &cur_label_dsc);
             lv_draw_label(&cur_area, clip_area, &cur_label_dsc, letter_buf, NULL);
-
-        } else if(ext->cursor.type == LV_CURSOR_OUTLINE) {
-            cur_dsc.bg_opa = LV_OPA_TRANSP;
-            if(cur_dsc.border_width == 0) cur_dsc.border_width = 1; /*Be sure the border will be drawn*/
-            lv_draw_rect(&cur_area, clip_area, &cur_dsc);
-        } else if(ext->cursor.type == LV_CURSOR_UNDERLINE) {
-            lv_draw_rect(&cur_area, clip_area, &cur_dsc);
         }
     }
 
@@ -1470,9 +1452,11 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         bool * editable = (bool *)param;
         *editable       = true;
     } else if(sign == LV_SIGNAL_DEFOCUS) {
-        lv_cursor_type_t cur_type;
-        cur_type = lv_ta_get_cursor_type(ta);
-        lv_ta_set_cursor_type(ta, cur_type | LV_CURSOR_HIDDEN);
+#if LV_USE_GROUP
+        if(lv_obj_get_group(ta)) {
+            lv_ta_set_cursor_hidden(ta, true);
+        }
+#endif
     } else if(sign == LV_SIGNAL_FOCUS) {
 #if LV_USE_GROUP
         lv_cursor_type_t cur_type;
@@ -1594,7 +1578,7 @@ static void cursor_blink_anim(lv_obj_t * ta, lv_anim_value_t show)
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(show != ext->cursor.state) {
         ext->cursor.state = show == 0 ? 0 : 1;
-        if(ext->cursor.type != LV_CURSOR_NONE && (ext->cursor.type & LV_CURSOR_HIDDEN) == 0) {
+        if(ext->cursor.hidden == 0) {
             lv_disp_t * disp = lv_obj_get_disp(ta);
             lv_area_t area_tmp;
             lv_area_copy(&area_tmp, &ext->cursor.area);
@@ -1746,46 +1730,10 @@ static void refr_cursor_area(lv_obj_t * ta)
     lv_style_int_t right = lv_obj_get_style_int(ta, LV_TA_PART_CURSOR, LV_STYLE_PAD_RIGHT);
 
     lv_area_t cur_area;
-
-    if(ext->cursor.type == LV_CURSOR_LINE) {
-
-        lv_draw_line_dsc_t cur_dsc;
-        lv_draw_line_dsc_init(&cur_dsc);
-        lv_obj_init_draw_line_dsc(ta, LV_TA_PART_CURSOR, &cur_dsc);
-
-        cur_area.x1 =
-            letter_pos.x + left - (cur_dsc.width >> 1) - (cur_dsc.width & 0x1);
-        cur_area.y1 = letter_pos.y + top;
-        cur_area.x2 = letter_pos.x + right + (cur_dsc.width >> 1);
-        cur_area.y2 = letter_pos.y + bottom + letter_h;
-    } else if(ext->cursor.type == LV_CURSOR_BLOCK) {
-        cur_area.x1 = letter_pos.x - left;
-        cur_area.y1 = letter_pos.y - top;
-        cur_area.x2 = letter_pos.x + right + letter_w;
-        cur_area.y2 = letter_pos.y + bottom + letter_h;
-
-    } else if(ext->cursor.type == LV_CURSOR_OUTLINE) {
-        cur_area.x1 = letter_pos.x - left;
-        cur_area.y1 = letter_pos.y - top;
-        cur_area.x2 = letter_pos.x + right + letter_w;
-        cur_area.y2 = letter_pos.y + bottom + letter_h;
-    } else if(ext->cursor.type == LV_CURSOR_UNDERLINE) {
-        lv_draw_line_dsc_t cur_dsc;
-         lv_draw_line_dsc_init(&cur_dsc);
-         lv_obj_init_draw_line_dsc(ta, LV_TA_PART_CURSOR, &cur_dsc);
-
-
-        cur_area.x1 = letter_pos.x + left;
-        cur_area.y1 = letter_pos.y + top + letter_h - (cur_dsc.width >> 1);
-        cur_area.x2 = letter_pos.x + right + letter_w;
-        cur_area.y2 = letter_pos.y + bottom + letter_h + (cur_dsc.width >> 1) +
-                      (cur_dsc.width & 0x1);
-    } else if(ext->cursor.type == LV_CURSOR_NONE) {
-    	cur_area.x1 = letter_pos.x;
-    	cur_area.y1 = letter_pos.y;
-    	lv_area_set_width(&cur_area, 0);
-    	lv_area_set_height(&cur_area, 0);
-    }
+    cur_area.x1 = letter_pos.x - left;
+    cur_area.y1 = letter_pos.y - top;
+    cur_area.x2 = letter_pos.x + right + letter_w;
+    cur_area.y2 = letter_pos.y + bottom + letter_h;
 
     /*Save the new area*/
     lv_disp_t * disp = lv_obj_get_disp(ta);
@@ -1835,7 +1783,7 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
 
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->cursor.click_pos == 0) return;
-    if(ext->cursor.type == LV_CURSOR_NONE) return;
+    if(ext->cursor.hidden) return;
 
     if(lv_indev_get_type(click_source) == LV_INDEV_TYPE_KEYPAD ||
        lv_indev_get_type(click_source) == LV_INDEV_TYPE_ENCODER) {

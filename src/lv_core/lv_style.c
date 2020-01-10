@@ -146,8 +146,6 @@ void lv_style_dsc_remove_class(lv_style_dsc_t * dsc, lv_style_t * class)
         dsc->class_cnt--;
         dsc->classes = new_classes;
     }
-
-    lv_style_cache_update(dsc);
 }
 
 void lv_style_dsc_reset(lv_style_dsc_t * style_dsc)
@@ -616,13 +614,13 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
     stat[id_to_find]++;
 
     cnt++;
-    if(cnt > 1000) {
+    if(cnt > 100000) {
         cnt = 0;
         uint32_t i;
 
-//        printf("\nQuerry:\n");
+        printf("\nQuerry:\n");
         for(i = 0; i < 256; i++) {
-//            if(stat[i]) printf("%02x: %d\n", i, stat[i]);
+            if(stat[i]) printf("%02x: %d\n", i, stat[i]);
         }
         memset(stat, 0x00, sizeof(stat));
 

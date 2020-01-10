@@ -79,9 +79,8 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->range_max          = 99999;
     ext->range_min          = -99999;
 
-    lv_ta_set_cursor_type(new_spinbox, LV_CURSOR_BLOCK);
     lv_ta_set_one_line(new_spinbox, true);
-    lv_ta_set_cursor_click_pos(new_spinbox, false);
+    lv_ta_set_cursor_click_pos(new_spinbox, true);
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_spinbox, lv_spinbox_signal);

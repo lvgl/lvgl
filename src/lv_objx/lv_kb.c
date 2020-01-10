@@ -187,20 +187,17 @@ void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta)
     if(ta) LV_ASSERT_OBJ(ta, "lv_ta");
 
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    lv_cursor_type_t cur_type;
 
     /*Hide the cursor of the old Text area if cursor management is enabled*/
     if(ext->ta && ext->cursor_mng) {
-        cur_type = lv_ta_get_cursor_type(ext->ta);
-        lv_ta_set_cursor_type(ext->ta, cur_type | LV_CURSOR_HIDDEN);
+        lv_ta_set_cursor_hidden(ext->ta, true);
     }
 
     ext->ta = ta;
 
     /*Show the cursor of the new Text area if cursor management is enabled*/
     if(ext->ta && ext->cursor_mng) {
-        cur_type = lv_ta_get_cursor_type(ext->ta);
-        lv_ta_set_cursor_type(ext->ta, cur_type & (~LV_CURSOR_HIDDEN));
+        lv_ta_set_cursor_hidden(ext->ta, false);
     }
 }
 
@@ -236,13 +233,11 @@ void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en)
     ext->cursor_mng = en == false ? 0 : 1;
 
     if(ext->ta) {
-        lv_cursor_type_t cur_type;
-        cur_type = lv_ta_get_cursor_type(ext->ta);
 
         if(ext->cursor_mng) {
-            lv_ta_set_cursor_type(ext->ta, cur_type & (~LV_CURSOR_HIDDEN));
+            lv_ta_set_cursor_hidden(ext->ta, false);
         } else {
-            lv_ta_set_cursor_type(ext->ta, cur_type | LV_CURSOR_HIDDEN);
+            lv_ta_set_cursor_hidden(ext->ta, true);
         }
     }
 }
@@ -438,17 +433,15 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     } else if(sign == LV_SIGNAL_FOCUS) {
         lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-        /*Show the cursor of the new Text area if cursor management is enabled*/
+        /*Show the cursor of the Text area if cursor management is enabled*/
         if(ext->ta && ext->cursor_mng) {
-            lv_cursor_type_t cur_type = lv_ta_get_cursor_type(ext->ta);
-            lv_ta_set_cursor_type(ext->ta, cur_type & (~LV_CURSOR_HIDDEN));
+            lv_ta_set_cursor_hidden(ext->ta, false);
         }
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-        /*Show the cursor of the new Text area if cursor management is enabled*/
+        /*Show the cursor of the Text area if cursor management is enabled*/
         if(ext->ta && ext->cursor_mng) {
-            lv_cursor_type_t cur_type = lv_ta_get_cursor_type(ext->ta);
-            lv_ta_set_cursor_type(ext->ta, cur_type | LV_CURSOR_HIDDEN);
+            lv_ta_set_cursor_hidden(ext->ta, true);
         }
     }
 

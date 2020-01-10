@@ -41,17 +41,6 @@ LV_EXPORT_CONST_INT(LV_TA_CURSOR_LAST);
  *      TYPEDEFS
  **********************/
 
-/** Style of text area's cursor. */
-enum {
-    LV_CURSOR_NONE, /**< No cursor */
-    LV_CURSOR_LINE, /**< Vertical line */
-    LV_CURSOR_BLOCK, /**< Rectangle */
-    LV_CURSOR_OUTLINE, /**< Outline around character */
-    LV_CURSOR_UNDERLINE, /**< Horizontal line under character */
-    LV_CURSOR_HIDDEN = 0x08, /**< This flag can be ORed to any of the other values to temporarily hide the cursor */
-};
-typedef uint8_t lv_cursor_type_t;
-
 /*Data of text area*/
 typedef struct
 {
@@ -73,8 +62,8 @@ typedef struct
         uint16_t blink_time;       /*Blink period*/
         lv_area_t area;            /* Cursor area relative to the Text Area*/
         uint16_t txt_byte_pos;     /* Byte index of the letter after (on) the cursor*/
-        lv_cursor_type_t type : 4; /* Shape of the cursor*/
         uint8_t state : 1;         /*Cursor is visible now or not (Handled by the library)*/
+        uint8_t hidden : 1;        /*Cursor is hidden by he user */
         uint8_t click_pos : 1;     /*1: Enable positioning the cursor by clicking the text area*/
     } cursor;
 #if LV_LABEL_TEXT_SEL
@@ -171,11 +160,11 @@ void lv_ta_set_placeholder_text(lv_obj_t * ta, const char * txt);
 void lv_ta_set_cursor_pos(lv_obj_t * ta, int16_t pos);
 
 /**
- * Set the cursor type.
+ * Hide/Unhide the cursor.
  * @param ta pointer to a text area object
- * @param cur_type: element of 'lv_cursor_type_t'
+ * @param hide: true: hide the cursor
  */
-void lv_ta_set_cursor_type(lv_obj_t * ta, lv_cursor_type_t cur_type);
+void lv_ta_set_cursor_hidden(lv_obj_t * ta, bool hide);
 
 /**
  * Enable/Disable the positioning of the the cursor by clicking the text on the text area.
@@ -316,11 +305,11 @@ lv_obj_t * lv_ta_get_label(const lv_obj_t * ta);
 uint16_t lv_ta_get_cursor_pos(const lv_obj_t * ta);
 
 /**
- * Get the current cursor type.
+ * Get whether the cursor is hidden or not
  * @param ta pointer to a text area object
- * @return element of 'lv_cursor_type_t'
+ * @return true: the cursor is hidden
  */
-lv_cursor_type_t lv_ta_get_cursor_type(const lv_obj_t * ta);
+bool lv_ta_get_cursor_hidden(const lv_obj_t * ta);
 
 /**
  * Get whether the cursor click positioning is enabled or not.

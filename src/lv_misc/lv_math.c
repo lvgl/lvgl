@@ -199,7 +199,7 @@ void lv_sqrt(uint32_t x, lv_sqrt_res_t * q)
              240, 244, 248, 252, 0,
 
      };
-    if(x <= 64) {
+    if(x <= 1024) {
         x--;
         q->i = ci[x];
         q->f = cf[x];

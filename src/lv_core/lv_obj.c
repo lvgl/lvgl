@@ -37,7 +37,7 @@
 #define LV_OBJX_NAME "lv_obj"
 #define LV_OBJ_DEF_WIDTH    (LV_DPI)
 #define LV_OBJ_DEF_HEIGHT   (2 * LV_DPI / 3)
-#define LV_DRAW_RECT_CACHE_SIZE     10
+#define LV_DRAW_RECT_CACHE_SIZE     8
 
 /**********************
  *      TYPEDEFS
@@ -2212,23 +2212,6 @@ void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_propert
     return NULL;
 }
 
-
-void lv_obj_update_style_cache(lv_obj_t * obj)
-{
-    uint8_t part_sub;
-
-    for(part_sub = 0; part_sub != _LV_OBJ_PART_REAL_LAST; part_sub++) {
-        lv_res_t res;
-        res = lv_style_cache_update(lv_obj_get_style(obj, part_sub));
-        if(res == LV_RES_INV) break;
-    }
-
-    for(part_sub = _LV_OBJ_PART_REAL_LAST; part_sub != _LV_OBJ_PART_ALL; part_sub++) {
-        lv_res_t res;
-        res = lv_style_cache_update(lv_obj_get_style(obj, part_sub));
-        if(res == LV_RES_INV) break;
-    }
-}
 
 /*-----------------
  * Attribute get
