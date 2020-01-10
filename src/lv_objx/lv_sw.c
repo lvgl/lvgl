@@ -76,9 +76,6 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
         return NULL;
     }
 
-    /*Initialize the allocated 'ext' */
-    ext->changed = 0;
-
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_sw, lv_sw_signal);
 
@@ -204,32 +201,18 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
 
     /* Include the ancient signal function */
-    res = ancestor_signal(sw, sign, param);
-    if(res != LV_RES_OK) return res;
+    if(sign != LV_SIGNAL_PRESSED &&
+        sign != LV_SIGNAL_PRESSING &&
+        sign != LV_SIGNAL_RELEASED) {
+        res = ancestor_signal(sw, sign, param);
+        if(res != LV_RES_OK) return res;
+    }
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    } else if(sign == LV_SIGNAL_PRESSED) {
-        ext->changed = 0;
-    } else if(sign == LV_SIGNAL_PRESSING) {
-        if(ext->state != ext->slider.bar.cur_value) ext->changed = 1;
-    } else if(sign == LV_SIGNAL_PRESS_LOST) {
-        if(lv_sw_get_state(sw)) lv_sw_on(sw, LV_ANIM_ON);
-        else lv_sw_off(sw, LV_ANIM_ON);
     } else if(sign == LV_SIGNAL_RELEASED) {
-        /*If not dragged then toggle the switch*/
-        if(ext->changed == 0) {
-            if(lv_sw_get_state(sw)) {
-                lv_sw_off(sw, LV_ANIM_ON);
-            } else {
-                lv_sw_on(sw, LV_ANIM_ON);
-            }
-        }
-        /*If the switch was dragged then calculate the new state based on the current position*/
-        else {
-            if(ext->slider.bar.cur_value != 0) lv_sw_on(sw, LV_ANIM_ON);
-            else lv_sw_off(sw, LV_ANIM_ON);
-        }
+        if(lv_sw_get_state(sw)) lv_sw_off(sw, LV_ANIM_ON);
+        else lv_sw_on(sw, LV_ANIM_ON);
 
         res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RES_OK) return res;

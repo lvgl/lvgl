@@ -270,7 +270,7 @@ int16_t lv_bar_get_value(const lv_obj_t * bar)
     LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
 
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
-
+    return ext->cur_value;
     return LV_BAR_GET_ANIM_VALUE(ext->cur_value, ext->cur_value_anim);
 }
 
@@ -465,7 +465,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         
         anim_cur_value_x = (((anim_cur_value_end_x - anim_cur_value_start_x) * ext->cur_value_anim.anim_state) >> LV_BAR_ANIM_STATE_NORM);
 
-        if(anim_cur_value_x < 0)
+//        if(anim_cur_value_x < 0)
             anim_cur_value_x += anim_cur_value_start_x;
     } else
 #endif
@@ -685,6 +685,8 @@ static void lv_bar_set_value_with_anim(lv_obj_t * bar, int16_t new_value, int16_
         a.repeat_pause   = 0;
 
         lv_anim_create(&a);
+
+        ext->cur_value = new_value;
     }
 }
 
