@@ -1809,7 +1809,7 @@ void lv_obj_get_inner_coords(const lv_obj_t * obj, lv_area_t * coords_p)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_border_side_t part = lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_BORDER_PART);
+    lv_border_side_t part = lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_BORDER_SIDE);
     lv_coord_t w = lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_BORDER_WIDTH);
 
     if(part & LV_BORDER_SIDE_LEFT) coords_p->x1 += w;
@@ -2072,7 +2072,7 @@ lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style
 
     prop = prop & (~LV_STYLE_STATE_MASK);
     switch(prop) {
-    case LV_STYLE_BORDER_PART:
+    case LV_STYLE_BORDER_SIDE:
         return LV_BORDER_SIDE_FULL;
     case LV_STYLE_SIZE:
         return LV_DPI / 10;
@@ -2118,11 +2118,9 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_p
     prop = prop & (~LV_STYLE_STATE_MASK);
     switch(prop) {
     case LV_STYLE_TEXT_COLOR:
-        return LV_COLOR_BLACK;
     case LV_STYLE_BORDER_COLOR:
-        return LV_COLOR_BLACK;
     case LV_STYLE_SHADOW_COLOR:
-		return LV_COLOR_GRAY;
+		return LV_COLOR_BLACK;
 	}
 
     return LV_COLOR_WHITE;
@@ -2161,13 +2159,15 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prope
 
     prop = prop & (~LV_STYLE_STATE_MASK);
     switch(prop) {
-    case LV_STYLE_OVERLAY_OPA:
-    case LV_STYLE_PATTERN_RECOLOR_OPA:
-    case LV_STYLE_IMAGE_RECOLOR_OPA:
-        return LV_OPA_TRANSP;
+    case LV_STYLE_OPA_SCALE:
+    case LV_STYLE_TEXT_OPA:
+    case LV_STYLE_IMAGE_OPA:
+    case LV_STYLE_LINE_OPA:
+    case LV_STYLE_BORDER_OPA:
+        return LV_OPA_COVER;
     }
 
-    return LV_OPA_COVER;
+    return LV_OPA_TRANSP;
 }
 
 
@@ -2727,7 +2727,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
     if(draw_dsc->border_opa > LV_OPA_MIN) {
         draw_dsc->border_width = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_WIDTH);
         if(draw_dsc->border_width) {
-            draw_dsc->border_part = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_PART);
+            draw_dsc->border_part = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_SIDE);
             draw_dsc->border_color = lv_obj_get_style_color(obj, part, LV_STYLE_BORDER_COLOR);
         }
         draw_dsc->border_blend_mode = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_BLEND_MODE);

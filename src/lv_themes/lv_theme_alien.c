@@ -81,6 +81,7 @@ static lv_style_t calendar_date_nums;
 static void basic_init(void)
 {
     lv_style_init(&scr);
+    lv_style_set_opa(&scr, LV_STYLE_BG_OPA, LV_OPA_COVER);
     lv_style_set_color(&scr, LV_STYLE_BG_COLOR, LV_COLOR_MAKE(0x20, 0x20, 0x20));
     lv_style_set_color(&scr, LV_STYLE_TEXT_COLOR , LV_COLOR_WHITE);
 
@@ -89,6 +90,7 @@ static void basic_init(void)
     lv_style_set_int(&transp, LV_STYLE_BORDER_WIDTH, 0);
 
     lv_style_init(&panel);
+    lv_style_set_opa(&panel, LV_STYLE_BG_OPA, LV_OPA_COVER);
     lv_style_set_int(&panel, LV_STYLE_PAD_LEFT, LV_DPI / 20);
     lv_style_set_int(&panel, LV_STYLE_PAD_RIGHT, LV_DPI / 20);
     lv_style_set_int(&panel, LV_STYLE_PAD_TOP, LV_DPI / 20);
@@ -109,6 +111,7 @@ static void basic_init(void)
     lv_style_set_int(&btn, LV_STYLE_PAD_BOTTOM, LV_DPI / 20);
     lv_style_set_int(&btn, LV_STYLE_PAD_INNER, LV_DPI / 16);
     lv_style_set_int(&btn, LV_STYLE_RADIUS, 5);
+    lv_style_set_opa(&btn, LV_STYLE_BG_OPA, LV_OPA_COVER);
     lv_style_set_int(&btn, LV_STYLE_BORDER_WIDTH, 2);//LV_DPI / 50 > 0 ? LV_DPI / 50 : 1);
     lv_style_set_int(&btn, LV_STYLE_BG_GRAD_DIR, LV_GRAD_DIR_VER);
     lv_style_set_color(&btn, LV_STYLE_BG_COLOR, LV_COLOR_RED);
@@ -238,7 +241,8 @@ static void bar_init(void)
 {
 #if LV_USE_BAR
     lv_style_init(&bar_indic);
-    lv_style_set_color(&bar_indic, LV_STYLE_BG_COLOR, LV_COLOR_BLUE);
+    lv_style_set_opa(&bar_indic, LV_STYLE_BG_OPA, LV_OPA_COVER);
+    lv_style_set_color(&bar_indic, LV_STYLE_BG_COLOR, LV_COLOR_MAROON);
     lv_style_set_int(&bar_indic, LV_STYLE_PAD_TOP, LV_DPI/20);
     lv_style_set_int(&bar_indic, LV_STYLE_PAD_BOTTOM, LV_DPI/20);
     lv_style_set_int(&bar_indic, LV_STYLE_PAD_LEFT, LV_DPI/20);
@@ -271,6 +275,7 @@ static void slider_init(void)
 {
 #if LV_USE_SLIDER != 0
     lv_style_init(&knob);
+    lv_style_set_opa(&knob, LV_STYLE_BG_OPA, LV_OPA_COVER);
     lv_style_set_color(&knob, LV_STYLE_BG_COLOR, LV_COLOR_RED);
     lv_style_set_color(&knob, LV_STYLE_BG_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_LIME);
     lv_style_set_int(&knob, LV_STYLE_PAD_TOP, LV_DPI/20);
@@ -354,7 +359,7 @@ static void calendar_init(void)
     lv_style_init(&calendar_date_nums);
     lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR, LV_COLOR_RED);
     lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_DISABLED, LV_COLOR_GRAY);
-    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_GRAY);
+//    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_GRAY);
     lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_NAVY);
 
     lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA , LV_OPA_TRANSP);
@@ -363,7 +368,7 @@ static void calendar_init(void)
     lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA | LV_STYLE_STATE_PRESSED , LV_OPA_50);
     lv_style_set_color(&calendar_date_nums, LV_STYLE_BG_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_GREEN);
     lv_style_set_int(&calendar_date_nums, LV_STYLE_BORDER_WIDTH | LV_STYLE_STATE_CHECKED , 2);
-    lv_style_set_int(&calendar_date_nums, LV_STYLE_BORDER_PART| LV_STYLE_STATE_CHECKED , LV_BORDER_SIDE_LEFT);
+    lv_style_set_int(&calendar_date_nums, LV_STYLE_BORDER_SIDE| LV_STYLE_STATE_CHECKED , LV_BORDER_SIDE_LEFT);
 #endif
 }
 
@@ -439,13 +444,14 @@ static void ta_init(void)
 {
 #if LV_USE_TA
     lv_style_init(&ta_cursor);
+    lv_style_set_opa(&ta_cursor, LV_STYLE_BG_OPA, LV_OPA_50);
     lv_style_set_color(&ta_cursor, LV_STYLE_BG_COLOR, LV_COLOR_RED);
     lv_style_set_color(&ta_cursor, LV_STYLE_BORDER_COLOR, LV_COLOR_YELLOW);
     lv_style_set_color(&ta_cursor, LV_STYLE_TEXT_COLOR, LV_COLOR_WHITE);
     lv_style_set_int(&ta_cursor, LV_STYLE_BORDER_WIDTH, 2);
     lv_style_set_int(&ta_cursor, LV_STYLE_BORDER_WIDTH, 2);
     lv_style_set_int(&ta_cursor, LV_STYLE_PAD_RIGHT, 2);
-    lv_style_set_int(&ta_cursor, LV_STYLE_BORDER_PART, LV_BORDER_SIDE_LEFT);
+    lv_style_set_int(&ta_cursor, LV_STYLE_BORDER_SIDE, LV_BORDER_SIDE_LEFT);
 #endif
 }
 
