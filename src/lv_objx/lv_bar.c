@@ -518,9 +518,9 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mo
         lv_coord_t anim_start_value_end_x =
             (int32_t)((int32_t)anim_length * (ext->start_value_anim.anim_end - ext->min_value)) / range;
         
-        anim_start_value_x = (((anim_start_value_end_x - anim_start_value_start_x) * ext->start_value_anim.anim_state) >> LV_BAR_ANIM_STATE_NORM);
+        anim_start_value_x = (((anim_start_value_end_x - anim_start_value_start_x) * ext->start_value_anim.anim_state) / LV_BAR_ANIM_STATE_END);
 
-        if(anim_start_value_x < 0)
+        if(anim_start_value_end_x < anim_start_value_start_x)
             anim_start_value_x += anim_start_value_start_x;
     } else
 #endif
@@ -535,9 +535,9 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mo
         lv_coord_t anim_cur_value_end_x =
             (int32_t)((int32_t)anim_length * (ext->cur_value_anim.anim_end - ext->min_value)) / range;
         
-        anim_cur_value_x = (((anim_cur_value_end_x - anim_cur_value_start_x) * ext->cur_value_anim.anim_state) >> LV_BAR_ANIM_STATE_NORM);
+        anim_cur_value_x = (((anim_cur_value_end_x - anim_cur_value_start_x) * ext->cur_value_anim.anim_state) / LV_BAR_ANIM_STATE_END);
 
-        if(anim_cur_value_x < 0)
+        if(anim_cur_value_end_x < anim_cur_value_start_x)
             anim_cur_value_x += anim_cur_value_start_x;
     } else
 #endif
