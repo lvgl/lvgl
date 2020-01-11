@@ -484,7 +484,9 @@ void lv_ta_set_text(lv_obj_t * ta, const char * txt)
     if(lv_ta_get_accepted_chars(ta) || lv_ta_get_max_length(ta)) {
         lv_label_set_text(ext->label, "");
         lv_ta_set_cursor_pos(ta, LV_TA_CURSOR_LAST);
-
+        if(ext->pwd_mode != 0) {
+            ext->pwd_tmp[0] = '\0'; /*Clear the password too*/
+        }
         uint32_t i = 0;
         while(txt[i] != '\0') {
             uint32_t c = lv_txt_encoded_next(txt, &i);
