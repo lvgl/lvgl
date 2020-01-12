@@ -867,13 +867,13 @@ lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj);
 
 lv_style_dsc_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t type);
 
-lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+lv_style_int_t lv_obj_get_style_int(lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 
 lv_color_t lv_obj_get_style_color(lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 
-lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+lv_opa_t lv_obj_get_style_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 
-void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+const void * lv_obj_get_style_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 ///**
 // * Get the style pointer of an object (if NULL get style of the parent)
 // * @param obj pointer to an object

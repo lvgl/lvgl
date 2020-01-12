@@ -692,6 +692,7 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
                 if(tgl_state) btnm->state = LV_OBJ_STATE_CHECKED;
                 if(ext->btn_id_pr == btn_i) btnm->state |= LV_OBJ_STATE_PRESSED;
                 if(ext->btn_id_focused == btn_i) btnm->state |= LV_OBJ_STATE_FOCUS;
+                btnm->prev_state = btnm->state;
                 lv_draw_rect_dsc_init(&draw_rect_tmp_dsc);
                 lv_draw_label_dsc_init(&draw_label_tmp_dsc);
                 lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_tmp_dsc);
@@ -699,6 +700,7 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
                 draw_rect_dsc_act = &draw_rect_tmp_dsc;
                 draw_label_dsc_act = &draw_label_tmp_dsc;
                 btnm->state = state_ori;
+                btnm->state = prev_state_ori;
 
 //                btnm->style_dsc.cache.enabled = 1;
             }

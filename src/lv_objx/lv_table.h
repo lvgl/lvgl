@@ -61,19 +61,18 @@ typedef struct
     uint16_t col_cnt;
     uint16_t row_cnt;
     char ** cell_data;
-    const lv_style_t * cell_style[LV_TABLE_CELL_STYLE_CNT];
+    lv_style_dsc_t cell_style[LV_TABLE_CELL_STYLE_CNT];
     lv_coord_t col_w[LV_TABLE_COL_MAX];
 } lv_table_ext_t;
 
-/*Styles*/
+/*Parts of the table*/
 enum {
-    LV_TABLE_STYLE_BG,
-    LV_TABLE_STYLE_CELL1,
-    LV_TABLE_STYLE_CELL2,
-    LV_TABLE_STYLE_CELL3,
-    LV_TABLE_STYLE_CELL4,
+    LV_TABLE_PART_BG,
+    LV_TABLE_PART_CELL1,
+    LV_TABLE_PART_CELL2,
+    LV_TABLE_PART_CELL3,
+    LV_TABLE_PART_CELL4,
 };
-typedef uint8_t lv_table_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -159,14 +158,6 @@ void lv_table_set_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col, bool c
  */
 void lv_table_set_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col, bool en);
 
-/**
- * Set a style of a table.
- * @param table pointer to table object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_table_set_style(lv_obj_t * table, lv_table_style_t type, const lv_style_t * style);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -238,14 +229,6 @@ lv_label_align_t lv_table_get_cell_crop(lv_obj_t * table, uint16_t row, uint16_t
  * @return true: merge right; false: don't merge right
  */
 bool lv_table_get_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col);
-
-/**
- * Get style of a table.
- * @param table pointer to table object
- * @param type which style should be get
- * @return style pointer to the style
- */
-const lv_style_t * lv_table_get_style(const lv_obj_t * table, lv_table_style_t type);
 
 /*=====================
  * Other functions

@@ -70,6 +70,10 @@ static lv_style_t arc_bg;
 static lv_style_t calendar_date_nums;
 #endif
 
+#if LV_USE_TABLE
+static lv_style_t table_cell;
+#endif
+
 /**********************
  *      MACROS
  **********************/
@@ -122,6 +126,7 @@ static void basic_init(void)
     lv_style_set_color(&btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_BLUE);
     lv_style_set_color(&btn, LV_STYLE_TEXT_COLOR, LV_COLOR_LIME);
     lv_style_set_color(&btn, LV_STYLE_IMAGE_RECOLOR, LV_COLOR_LIME);
+    lv_style_set_int(&btn, LV_STYLE_RADIUS | LV_STYLE_STATE_PRESSED, LV_RADIUS_CIRCLE);
     lv_style_set_color(&btn, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_BLUE);
     lv_style_set_color(&btn, LV_STYLE_IMAGE_RECOLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_BLUE);
     lv_style_set_ptr(&btn, LV_STYLE_FONT | LV_STYLE_STATE_PRESSED, &lv_font_roboto_28);
@@ -133,6 +138,7 @@ static void basic_init(void)
     lv_style_set_int(&btn, LV_STYLE_PATTERN_REPEATE | LV_STYLE_STATE_CHECKED, 1);
     lv_style_set_int(&btn, LV_STYLE_SHADOW_WIDTH, 5);
     lv_style_set_int(&btn, LV_STYLE_SHADOW_OFFSET_Y, 3);
+    lv_style_set_int(&btn, LV_STYLE_TRANSITION_TIME, 200);
     lv_style_set_ptr(&btn, LV_STYLE_FONT | LV_STYLE_STATE_CHECKED, &lv_font_roboto_12);
 
     lv_style_init(&transp_tight);
@@ -501,17 +507,16 @@ static void tileview_init(void)
 static void table_init(void)
 {
 #if LV_USE_TABLE != 0
-    static lv_style_t cell;
-    lv_style_copy(&cell, &panel);
-    cell.body.radius         = 0;
-    cell.body.border.width   = 1;
-    cell.body.padding.left   = LV_DPI / 12;
-    cell.body.padding.right  = LV_DPI / 12;
-    cell.body.padding.top    = LV_DPI / 12;
-    cell.body.padding.bottom = LV_DPI / 12;
+    lv_style_init(&table_cell);
+    lv_style_set_opa(&table_cell, LV_STYLE_BG_OPA, LV_OPA_COVER);
+    lv_style_set_color(&table_cell, LV_STYLE_BG_COLOR, LV_COLOR_WHITE);
+    lv_style_set_color(&table_cell, LV_STYLE_BORDER_COLOR, LV_COLOR_BLACK);
+    lv_style_set_int(&table_cell, LV_STYLE_BORDER_WIDTH, 1);
+    lv_style_set_int(&table_cell, LV_STYLE_PAD_LEFT, LV_DPI/20);
+    lv_style_set_int(&table_cell, LV_STYLE_PAD_RIGHT, LV_DPI/20);
+    lv_style_set_int(&table_cell, LV_STYLE_PAD_TOP, LV_DPI/20);
+    lv_style_set_int(&table_cell, LV_STYLE_PAD_BOTTOM, LV_DPI/20);
 
-    theme.style.table.bg   = &lv_style_transp_tight;
-    theme.style.table.cell = &cell;
 #endif
 }
 
@@ -699,6 +704,17 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
     case LV_THEME_MBOX_BTN:
         return &btn;
 #endif
+
+#if LV_USE_TABLE
+    case LV_THEME_TABLE_BG:
+        return &panel;
+    case LV_THEME_TABLE_CELL1:
+    case LV_THEME_TABLE_CELL2:
+    case LV_THEME_TABLE_CELL3:
+    case LV_THEME_TABLE_CELL4:
+        return &table_cell;
+#endif
+
     }
 
     return NULL;

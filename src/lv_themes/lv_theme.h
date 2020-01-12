@@ -118,6 +118,12 @@ typedef enum {
     LV_THEME_MBOX_BG,
     LV_THEME_MBOX_BTN_BG,
     LV_THEME_MBOX_BTN,
+
+    LV_THEME_TABLE_BG,
+    LV_THEME_TABLE_CELL1,
+    LV_THEME_TABLE_CELL2,
+    LV_THEME_TABLE_CELL3,
+    LV_THEME_TABLE_CELL4,
 }lv_theme_style_t;
 
 typedef struct {
@@ -142,6 +148,8 @@ void lv_theme_set_act(lv_theme_t * th);
 lv_theme_t * lv_theme_get_act(void);
 
 lv_style_t * lv_theme_get_style(lv_theme_style_t name);
+
+void lv_obj_add_style_theme(void * obj, uint8_t part, lv_theme_style_t name);
 
 /**********************
  *    MACROS
