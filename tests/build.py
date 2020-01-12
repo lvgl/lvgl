@@ -2,9 +2,10 @@ import os
 
 lvgldirname = os.path.abspath('..')
 lvgldirname = os.path.basename(lvgldirname)
+lvgldirname = '"' + lvgldirname + '"'
 
 warnings = '"-Wall -Werror"' 
-base_defines = '"-DLV_CONF_PATH=lvgl/tests/lv_test_conf.h -DLV_BUILD_TEST"'
+base_defines = '"-DLV_CONF_PATH=' + lvgldirname +'/tests/lv_test_conf.h -DLV_BUILD_TEST"'
 optimization = '"-O3 -g0"'
 
 
@@ -22,11 +23,12 @@ def build(name, defines):
   
   d_all += '"'
   cmd = "make -j8 BIN=test.bin LVGL_DIR_NAME=" + lvgldirname + " DEFINES=" + d_all + " WARNINGS=" + warnings + " OPTIMIZATION=" + optimization
+  print(cmd)
   
   print("---------------------------")
   print("Clean")
   print("---------------------------")
-  os.system("make clean")
+  os.system("make clean LVGL_DIR_NAME=" + lvgldirname)
   os.system("rm -f ./test.bin")
   print("---------------------------")
   print("Build")
