@@ -23,7 +23,6 @@ def build(name, defines):
   
   d_all += '"'
   cmd = "make -j8 BIN=test.bin LVGL_DIR_NAME=" + lvgldirname + " DEFINES=" + d_all + " WARNINGS=" + warnings + " OPTIMIZATION=" + optimization
-  print(cmd)
   
   print("---------------------------")
   print("Clean")
