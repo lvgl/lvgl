@@ -274,7 +274,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
     new_obj->ext_attr = NULL;
 
-
     lv_style_dsc_init(&new_obj->style_dsc);
 
     if(parent != NULL) {
@@ -314,6 +313,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->event_cb = copy->event_cb;
 
         /*Copy attributes*/
+        new_obj->adv_hittest  = copy->adv_hittest;
         new_obj->click        = copy->click;
         new_obj->drag         = copy->drag;
         new_obj->drag_dir     = copy->drag_dir;
@@ -2976,9 +2976,15 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         shadow += lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_SPREAD);
         shadow += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_OFFSET_X)),
                               LV_MATH_ABS(lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_OFFSET_Y)));
-
-        if(shadow > obj->ext_draw_pad) obj->ext_draw_pad = shadow;
-    } else if(sign == LV_SIGNAL_STYLE_CHG) {
+    }
+#if LV_USE_OBJ_REALIGN
+    else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {
+        if(obj->realign.auto_realign) {
+            lv_obj_realign(obj);
+        }
+    }
+#endif
+    else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_refresh_ext_draw_pad(obj);
     }
 #if LV_USE_GROUP

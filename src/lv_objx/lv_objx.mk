@@ -32,7 +32,7 @@ CSRCS += lv_sw.c
 CSRCS += lv_win.c
 CSRCS += lv_objmask.c
 
-DEPPATH += --dep-path $(LVGL_DIR)/src/lv_objx
-VPATH += :$(LVGL_DIR)/src/lv_objx
+DEPPATH += --dep-path $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_objx
+VPATH += :$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_objx
 
-CFLAGS += "-I$(LVGL_DIR)/src/lv_objx"
+CFLAGS += "-I$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_objx"
