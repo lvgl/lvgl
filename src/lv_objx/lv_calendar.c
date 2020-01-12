@@ -775,6 +775,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
 
     /*The state changes without re-caching the styles, disable the use of cache*/
     lv_obj_state_t state_ori = calendar->state;
+    lv_obj_state_t prev_state_ori = calendar->prev_state;
 
     lv_obj_state_t month_state = LV_OBJ_STATE_DISABLED;
 
@@ -855,6 +856,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
                 label_dsc.flag = LV_TXT_FLAG_CENTER;
 
                 calendar->state = day_state;
+                calendar->prev_state = day_state;
                 lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &label_dsc);
                 lv_obj_init_draw_rect_dsc(calendar, LV_CALENDAR_PART_DATE_NUMS, &rect_dsc);
 
@@ -880,6 +882,7 @@ static void draw_days(lv_obj_t * calendar, const lv_area_t * mask)
         }
     }
     calendar->state = state_ori;
+    calendar->prev_state = prev_state_ori;
 
 
 }

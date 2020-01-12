@@ -255,6 +255,8 @@ typedef struct _lv_obj_t
     uint8_t protect;            /**< Automatically happening actions can be prevented.
                                      'OR'ed values from `lv_protect_t`*/
     uint8_t state;
+    uint8_t prev_state;
+    uint8_t state_anim;
 
 #if LV_USE_OBJ_REALIGN
     lv_realign_t realign;       /**< Information about the last call to ::lv_obj_align. */
@@ -867,7 +869,7 @@ lv_style_dsc_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t type);
 
 lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 
-lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+lv_color_t lv_obj_get_style_color(lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 
 lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 

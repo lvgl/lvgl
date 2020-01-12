@@ -1429,13 +1429,32 @@ void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot)
     obj->protect &= prot;
 }
 
+void lv_obj_state_anim_cb(void * p, lv_anim_value_t value)
+{
+    lv_obj_t * obj = p;
+    obj->state_anim = value;
+    if(value == 255)  obj->prev_state = obj->state;
+
+    lv_obj_refresh_style(obj);
+}
+
 void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t state)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     lv_obj_state_t new_state = obj->state | state;
     if(obj->state != new_state) {
+        obj->prev_state = obj->state;
         obj->state = new_state;
+        obj->state_anim = 0;
+
+        lv_anim_t a;
+        lv_anim_init(&a);
+        lv_anim_set_exec_cb(&a, obj, lv_obj_state_anim_cb);
+        lv_anim_set_values(&a, 0, 255);
+        lv_anim_set_time(&a, 1000, 0);
+        lv_anim_create(&a);
+
         lv_obj_refresh_style(obj);
     }
 }
@@ -1447,7 +1466,18 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_obj_state_t state)
     state = (~state) & 0xFF;
     lv_obj_state_t new_state = obj->state & state;
     if(obj->state != new_state) {
+        obj->prev_state = obj->state;
         obj->state = new_state;
+        obj->state_anim = 0;
+
+
+        lv_anim_t a;
+        lv_anim_init(&a);
+        lv_anim_set_exec_cb(&a, obj, lv_obj_state_anim_cb);
+        lv_anim_set_values(&a, 0, 255);
+        lv_anim_set_time(&a, 1000, 0);
+        lv_anim_create(&a);
+
         lv_obj_refresh_style(obj);
     }
 }
@@ -2082,7 +2112,8 @@ lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style
     return 0;
 }
 
-lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+
+lv_color_t lv_obj_get_style_color_core(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
     lv_style_property_t prop_ori = prop;
 
@@ -2119,10 +2150,27 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_p
     case LV_STYLE_TEXT_COLOR:
     case LV_STYLE_BORDER_COLOR:
     case LV_STYLE_SHADOW_COLOR:
-		return LV_COLOR_BLACK;
-	}
+        return LV_COLOR_BLACK;
+    }
 
     return LV_COLOR_WHITE;
+}
+
+
+lv_color_t lv_obj_get_style_color(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+{
+   if(obj->state == obj->prev_state) {
+       return lv_obj_get_style_color_core(obj, part, prop);
+   } else {
+       lv_color_t act_color = lv_obj_get_style_color_core(obj, part, prop);
+
+       lv_obj_state_t state_ori = obj->state;
+       obj->state = obj->prev_state;
+       lv_color_t prev_color = lv_obj_get_style_color_core(obj, part, prop);
+       obj->state = state_ori;
+
+       return lv_color_mix(prev_color, act_color, obj->state_anim);
+   }
 }
 
 lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
