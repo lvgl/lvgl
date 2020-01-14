@@ -37,7 +37,7 @@ static void refr_size(lv_obj_t * table);
  *  STATIC VARIABLES
  **********************/
 static lv_signal_cb_t ancestor_signal;
-static lv_design_cb_t ancestor_scrl_design;
+static lv_design_cb_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -71,7 +71,7 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_table);
-    if(ancestor_scrl_design == NULL) ancestor_scrl_design = lv_obj_get_design_cb(new_table);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_table);
 
     /*Initialize the allocated 'ext' */
     ext->cell_data     = NULL;
@@ -93,6 +93,7 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new table table*/
     if(copy == NULL) {
+        lv_style_dsc_reset(&new_table->style_dsc);
         lv_obj_add_style_theme(new_table, LV_TABLE_PART_BG, LV_THEME_TABLE_BG);
         lv_obj_add_style_theme(new_table, LV_TABLE_PART_CELL1, LV_THEME_TABLE_CELL1);
         lv_obj_add_style_theme(new_table, LV_TABLE_PART_CELL2, LV_THEME_TABLE_CELL2);
@@ -579,13 +580,31 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
-        return LV_DESIGN_RES_NOT_COVER;
+        return ancestor_design(table, clip_area, mode);
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        ancestor_scrl_design(table, clip_area, mode);
-
         lv_table_ext_t * ext        = lv_obj_get_ext_attr(table);
+
+        lv_draw_rect_dsc_t draw_dsc;
+        lv_draw_rect_dsc_init(&draw_dsc);
+        lv_obj_init_draw_rect_dsc(table, LV_TABLE_PART_BG, &draw_dsc);
+
+        /*Draw without border first*/
+        draw_dsc.border_width = 0;
+
+        lv_draw_rect(&table->coords, clip_area, &draw_dsc);
+
+        if(lv_obj_get_style_int(table, LV_TABLE_PART_BG, LV_STYLE_CLIP_CORNER)) {
+            lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
+
+            lv_coord_t r = lv_obj_get_style_int(table, LV_TABLE_PART_BG, LV_STYLE_RADIUS);
+
+            lv_draw_mask_radius_init(mp, &table->coords, r, false);
+            /*Add the mask and use some table specific data as custom id. Don't use `table` directly because it might be used by the user*/
+            lv_draw_mask_add(mp, ext->cell_style);
+        }
+
         lv_coord_t h_row;
         lv_point_t txt_size;
         lv_area_t cell_area;
@@ -651,7 +670,6 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
                 uint16_t col_merge = 0;
                 for(col_merge = 0; col_merge + col < ext->col_cnt - 1; col_merge++) {
-
                     if(ext->cell_data[cell + col_merge] != NULL) {
                         format.format_byte = ext->cell_data[cell + col_merge][0];
                         if(format.s.right_merge)
@@ -666,7 +684,13 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
                 uint8_t cell_type = format.s.type;
 
-                lv_draw_rect(&cell_area, clip_area, &rect_dsc[cell_type]);
+                /*Expand the cell area with a half border to avoid drawing 2 borders next to each other*/
+                lv_area_t cell_area_border;
+                lv_area_copy(&cell_area_border, &cell_area);
+                cell_area_border.x2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
+                cell_area_border.y2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
+
+                lv_draw_rect(&cell_area_border, clip_area, &rect_dsc[cell_type]);
 
                 if(ext->cell_data[cell]) {
 
@@ -735,6 +759,20 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
+        lv_draw_rect_dsc_t draw_dsc;
+        lv_draw_rect_dsc_init(&draw_dsc);
+        lv_obj_init_draw_rect_dsc(table, LV_TABLE_PART_BG, &draw_dsc);
+
+        /*Draw only a border to allow drawing a border around the whole table*/
+        draw_dsc.shadow_width = 0;
+        draw_dsc.bg_opa = LV_OPA_TRANSP;
+        lv_draw_rect(&table->coords, clip_area, &draw_dsc);
+
+        lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
+        if(lv_obj_get_style_int(table, LV_TABLE_PART_BG, LV_STYLE_CLIP_CORNER)) {
+            void * param = lv_draw_mask_remove_custom(ext->cell_style);
+            lv_mem_buf_release(param);
+        }
     }
 
     return LV_DESIGN_RES_OK;
@@ -876,7 +914,6 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
 
     for(cell = row_start, col = 0; cell < row_start + ext->col_cnt; cell++, col++) {
         if(ext->cell_data[cell] != NULL) {
-
             txt_w              = ext->col_w[col];
             uint16_t col_merge = 0;
             for(col_merge = 0; col_merge + col < ext->col_cnt - 1; col_merge++) {

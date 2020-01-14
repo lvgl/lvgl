@@ -1185,7 +1185,7 @@ void lv_obj_set_style_color(lv_obj_t * obj, uint8_t part, lv_style_property_t pr
     lv_obj_refresh_style(obj);
 }
 
-void lv_obj_set_style_value(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_int_t value)
+void lv_obj_set_style_int(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_int_t value)
 {
     lv_style_dsc_t * style_dsc = lv_obj_get_style(obj, part);
     lv_style_set_int(&style_dsc->local, prop, value);

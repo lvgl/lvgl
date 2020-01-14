@@ -87,7 +87,7 @@ static void basic_init(void)
     lv_style_init(&scr);
     lv_style_set_opa(&scr, LV_STYLE_BG_OPA, LV_OPA_COVER);
     lv_style_set_color(&scr, LV_STYLE_BG_COLOR, LV_COLOR_MAKE(0x20, 0x20, 0x20));
-    lv_style_set_color(&scr, LV_STYLE_TEXT_COLOR , LV_COLOR_WHITE);
+    lv_style_set_color(&scr, LV_STYLE_TEXT_COLOR , LV_COLOR_GRAY);
 
     lv_style_init(&transp);
     lv_style_set_opa(&transp, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
@@ -512,6 +512,7 @@ static void table_init(void)
     lv_style_set_color(&table_cell, LV_STYLE_BG_COLOR, LV_COLOR_WHITE);
     lv_style_set_color(&table_cell, LV_STYLE_BORDER_COLOR, LV_COLOR_BLACK);
     lv_style_set_int(&table_cell, LV_STYLE_BORDER_WIDTH, 1);
+    lv_style_set_int(&table_cell, LV_STYLE_BORDER_SIDE, LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT);
     lv_style_set_int(&table_cell, LV_STYLE_PAD_LEFT, LV_DPI/20);
     lv_style_set_int(&table_cell, LV_STYLE_PAD_RIGHT, LV_DPI/20);
     lv_style_set_int(&table_cell, LV_STYLE_PAD_TOP, LV_DPI/20);
@@ -707,7 +708,7 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
 
 #if LV_USE_TABLE
     case LV_THEME_TABLE_BG:
-        return &panel;
+        return NULL;
     case LV_THEME_TABLE_CELL1:
     case LV_THEME_TABLE_CELL2:
     case LV_THEME_TABLE_CELL3:

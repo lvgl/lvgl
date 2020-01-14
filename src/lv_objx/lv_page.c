@@ -662,19 +662,19 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
             lv_draw_mask_add(mp, page + 8);
         }
     } else if(mode == LV_DESIGN_DRAW_POST) {
-        lv_draw_rect_dsc_t draw_dsc;
-        lv_draw_rect_dsc_init(&draw_dsc);
-        lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_BG, &draw_dsc);
+        lv_draw_rect_dsc_t rect_dsc;
+        lv_draw_rect_dsc_init(&rect_dsc);
+        lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_BG, &rect_dsc);
 
         /*Draw only a border. It ensures that the page looks "closed" even with overflowing scrollable*/
-        draw_dsc.shadow_width = 0;
-        draw_dsc.bg_opa = LV_OPA_TRANSP;
-        lv_draw_rect(&page->coords, clip_area, &draw_dsc);
+        rect_dsc.shadow_width = 0;
+        rect_dsc.bg_opa = LV_OPA_TRANSP;
+        lv_draw_rect(&page->coords, clip_area, &rect_dsc);
 
         /*Draw the scrollbars*/
         lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-        lv_draw_rect_dsc_init(&draw_dsc);
-        lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCRLBAR, &draw_dsc);
+        lv_draw_rect_dsc_init(&rect_dsc);
+        lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCRLBAR, &rect_dsc);
         lv_area_t sb_area;
         if(ext->sb.hor_draw && (ext->sb.mode & LV_SB_MODE_HIDE) == 0) {
             /*Convert the relative coordinates to absolute*/
@@ -683,7 +683,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
             sb_area.y1 += page->coords.y1;
             sb_area.x2 += page->coords.x1;
             sb_area.y2 += page->coords.y1;
-            lv_draw_rect(&sb_area, clip_area, &draw_dsc);
+            lv_draw_rect(&sb_area, clip_area, &rect_dsc);
         }
 
         if(ext->sb.ver_draw && (ext->sb.mode & LV_SB_MODE_HIDE) == 0) {
@@ -693,7 +693,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
             sb_area.y1 += page->coords.y1;
             sb_area.x2 += page->coords.x1;
             sb_area.y2 += page->coords.y1;
-            lv_draw_rect(&sb_area, clip_area, &draw_dsc);
+            lv_draw_rect(&sb_area, clip_area, &rect_dsc);
         }
 
 #if LV_USE_ANIMATION

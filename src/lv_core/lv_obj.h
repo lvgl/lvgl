@@ -493,7 +493,7 @@ void lv_obj_set_style(lv_obj_t * obj, const lv_style_t * style);
 
 void lv_obj_set_style_color(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_color_t color);
 
-void lv_obj_set_style_value(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_style_int_t value);
+void lv_obj_set_style_int(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_style_int_t value);
 
 void lv_obj_set_style_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_opa_t opa);
 
