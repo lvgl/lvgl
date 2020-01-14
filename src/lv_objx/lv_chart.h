@@ -39,13 +39,9 @@ LV_EXPORT_CONST_INT(LV_CHART_TICK_LENGTH_AUTO);
 
 /** Chart types*/
 enum {
-    LV_CHART_TYPE_NONE           = 0x00, /**< Don't draw the series*/
-    LV_CHART_TYPE_LINE          = 0x01, /**< Connect the points with lines*/
-    LV_CHART_TYPE_COLUMN        = 0x02, /**< Draw columns*/
-    LV_CHART_TYPE_POINT         = 0x04, /**< Draw circles on the points*/
-    LV_CHART_TYPE_VERTICAL_LINE = 0x08, /**< Draw vertical lines on points (useful when chart width == point count)*/
-    LV_CHART_TYPE_AREA          = 0x10, /**< Draw area chart*/
-    LV_CHART_TYPE_AREA_FADED    = 0x20, /**< Draw area chart by fading out the bottom of the area*/
+    LV_CHART_TYPE_NONE     = 0x00, /**< Don't draw the series*/
+    LV_CHART_TYPE_LINE     = 0x01, /**< Connect the points with lines*/
+    LV_CHART_TYPE_COLUMN   = 0x02, /**< Draw columns*/
 };
 typedef uint8_t lv_chart_type_t;
 
@@ -91,25 +87,21 @@ typedef struct
     uint8_t hdiv_cnt;     /*Number of horizontal division lines*/
     uint8_t vdiv_cnt;     /*Number of vertical division lines*/
     uint16_t point_cnt;   /*Point number in a data line*/
+    lv_style_dsc_t style_series_bg;
+    lv_style_dsc_t style_series;
     lv_chart_type_t type; /*Line, column or point chart (from 'lv_chart_type_t')*/
     lv_chart_axis_cfg_t y_axis;
     lv_chart_axis_cfg_t x_axis;
     lv_chart_axis_cfg_t secondary_y_axis;
-    uint16_t margin;
     uint8_t update_mode : 1;
-    struct
-    {
-        lv_coord_t width; /*Line width or point radius*/
-        uint8_t num;      /*Number of data lines in dl_ll*/
-        lv_opa_t opa;     /*Opacity of data lines*/
-        lv_opa_t dark;    /*Dark level of the point/column bottoms*/
-    } series;
 } lv_chart_ext_t;
 
+/*Parts of the chart*/
 enum {
-    LV_CHART_STYLE_MAIN,
+    LV_CHART_PART_BG = LV_OBJ_PART_MAIN,
+    LV_CHART_PART_SERIES_BG = _LV_OBJ_PART_VIRTUAL_LAST,
+    LV_CHART_PART_SERIES
 };
-typedef uint8_t lv_chart_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -178,27 +170,6 @@ void lv_chart_set_type(lv_obj_t * chart, lv_chart_type_t type);
 void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt);
 
 /**
- * Set the opacity of the data series
- * @param chart pointer to a chart object
- * @param opa opacity of the data series
- */
-void lv_chart_set_series_opa(lv_obj_t * chart, lv_opa_t opa);
-
-/**
- * Set the line width or point radius of the data series
- * @param chart pointer to a chart object
- * @param width the new width
- */
-void lv_chart_set_series_width(lv_obj_t * chart, lv_coord_t width);
-
-/**
- * Set the dark effect on the bottom of the points or columns
- * @param chart pointer to a chart object
- * @param dark_eff dark effect level (LV_OPA_TRANSP to turn off)
- */
-void lv_chart_set_series_darking(lv_obj_t * chart, lv_opa_t dark_eff);
-
-/**
  * Initialize all data points with a value
  * @param chart pointer to chart object
  * @param ser pointer to a data series on 'chart'
@@ -228,18 +199,6 @@ void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y);
  * @param update mode
  */
 void lv_chart_set_update_mode(lv_obj_t * chart, lv_chart_update_mode_t update_mode);
-
-/**
- * Set the style of a chart
- * @param chart pointer to a chart object
- * @param type which style should be set (can be only `LV_CHART_STYLE_MAIN`)
- * @param style pointer to a style
- */
-static inline void lv_chart_set_style(lv_obj_t * chart, lv_chart_style_t type, const lv_style_t * style)
-{
-    (void)type; /*Unused*/
-    lv_obj_set_style(chart, style);
-}
 
 /**
  * Set the length of the tick marks on the x axis
@@ -304,13 +263,6 @@ void lv_chart_set_secondary_y_tick_texts(lv_obj_t * chart, const char * list_of_
 void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
                                lv_chart_axis_options_t options);
 
-/**
- * Set the margin around the chart, used for axes value and ticks
- * @param chart     pointer to an chart object
- * @param margin    value of the margin [px]
- */
-void lv_chart_set_margin(lv_obj_t * chart, uint16_t margin);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -328,46 +280,6 @@ lv_chart_type_t lv_chart_get_type(const lv_obj_t * chart);
  * @return point number on each data line
  */
 uint16_t lv_chart_get_point_count(const lv_obj_t * chart);
-
-/**
- * Get the opacity of the data series
- * @param chart pointer to chart object
- * @return the opacity of the data series
- */
-lv_opa_t lv_chart_get_series_opa(const lv_obj_t * chart);
-
-/**
- * Get the data series width
- * @param chart pointer to chart object
- * @return the width the data series (lines or points)
- */
-lv_coord_t lv_chart_get_series_width(const lv_obj_t * chart);
-
-/**
- * Get the dark effect level on the bottom of the points or columns
- * @param chart pointer to chart object
- * @return dark effect level (LV_OPA_TRANSP to turn off)
- */
-lv_opa_t lv_chart_get_series_darking(const lv_obj_t * chart);
-
-/**
- * Get the style of an chart object
- * @param chart pointer to an chart object
- * @param type which style should be get (can be only `LV_CHART_STYLE_MAIN`)
- * @return pointer to the chart's style
- */
-static inline const lv_style_t * lv_chart_get_style(const lv_obj_t * chart, lv_chart_style_t type)
-{
-    (void)type; /*Unused*/
-    return lv_obj_get_style(chart);
-}
-
-/**
- * Get the margin around the chart, used for axes value and labels
- * @param chart pointer to an chart object
- * @param return value of the margin
- */
-uint16_t lv_chart_get_margin(lv_obj_t * chart);
 
 /*=====================
  * Other functions

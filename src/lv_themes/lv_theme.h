@@ -124,6 +124,11 @@ typedef enum {
     LV_THEME_TABLE_CELL2,
     LV_THEME_TABLE_CELL3,
     LV_THEME_TABLE_CELL4,
+
+    LV_THEME_CHART_BG,
+    LV_THEME_CHART_SERIES_BG,
+    LV_THEME_CHART_SERIES,
+
 }lv_theme_style_t;
 
 typedef struct {

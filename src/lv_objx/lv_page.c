@@ -1072,7 +1072,7 @@ static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event)
 /**
  * Get the style descriptor of a part of the object
  * @param page pointer the object
- * @param part the part from `lv_page_part_t`. (LV_PAGE_PART_...)
+ * @param part the part of the page. (LV_PAGE_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
 static lv_style_dsc_t * lv_page_get_style(lv_obj_t * page, uint8_t part)

@@ -74,6 +74,9 @@ static lv_style_t calendar_date_nums;
 static lv_style_t table_cell;
 #endif
 
+#if LV_USE_CHART
+static lv_style_t chart_series;
+#endif
 /**********************
  *      MACROS
  **********************/
@@ -108,6 +111,7 @@ static void basic_init(void)
     lv_style_set_color(&panel, LV_STYLE_BORDER_COLOR, LV_COLOR_GRAY);
     lv_style_set_color(&panel, LV_STYLE_TEXT_COLOR, LV_COLOR_BLACK);
     lv_style_set_ptr(&panel, LV_STYLE_FONT , &lv_font_roboto_16);
+    lv_style_set_int(&panel, LV_STYLE_LINE_WIDTH, 2);
 
     lv_style_init(&btn);
     lv_style_set_int(&btn, LV_STYLE_PAD_LEFT, LV_DPI / 20);
@@ -356,7 +360,13 @@ static void preload_init(void)
 static void chart_init(void)
 {
 #if LV_USE_CHART
-    theme.style.chart = &panel;
+    lv_style_init(&chart_series);
+    lv_style_set_int(&chart_series, LV_STYLE_LINE_WIDTH , 2);
+    lv_style_set_int(&chart_series, LV_STYLE_SIZE , 3);
+    lv_style_set_int(&chart_series, LV_STYLE_PAD_INNER , 2);
+    lv_style_set_int(&chart_series, LV_STYLE_RADIUS , 4);
+    lv_style_set_opa(&chart_series, LV_STYLE_BG_OPA , LV_OPA_COVER);
+
 #endif
 }
 
@@ -717,7 +727,14 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
         return &table_cell;
 #endif
 
+#if LV_USE_CHART
+    case LV_THEME_CHART_BG:
+    case LV_THEME_CHART_SERIES_BG:
+        return &panel;
+    case LV_THEME_CHART_SERIES:
+        return &chart_series;
     }
+#endif
 
     return NULL;
 }
