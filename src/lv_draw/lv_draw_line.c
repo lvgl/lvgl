@@ -123,8 +123,11 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
     lv_coord_t w_half0 = w >> 1;
     lv_coord_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
+    bool dashed = dsc->dash_gap && dsc->dash_width ? true : false;
 
-    int16_t other_mask_cnt = lv_draw_mask_get_cnt();
+    bool simple_mode = true;
+    if(lv_draw_mask_get_cnt()) simple_mode = false;
+    else if(dashed) simple_mode = false;
 
     lv_area_t draw_area;
     draw_area.x1 = LV_MATH_MIN(point1->x, point2->x);
@@ -133,7 +136,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
     draw_area.y2 = point1->y + w_half0;
 
     /*If there is no mask then simply draw a rectangle*/
-    if(other_mask_cnt == 0) {
+    if(simple_mode) {
         lv_blend_fill(clip, &draw_area,
                 dsc->color, NULL, LV_DRAW_MASK_RES_FULL_COVER,opa,
                 LV_BLEND_MODE_NORMAL);
@@ -148,10 +151,10 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
 
         /* Now `draw_area` has absolute coordinates.
          * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
-        draw_area.x1 -= vdb->area.x1;
-        draw_area.y1 -= vdb->area.y1;
-        draw_area.x2 -= vdb->area.x1;
-        draw_area.y2 -= vdb->area.y1;
+        draw_area.x1 -= disp_area->x1;
+        draw_area.y1 -= disp_area->y1;
+        draw_area.x2 -= disp_area->x1;
+        draw_area.y2 -= disp_area->y1;
 
         lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
 
@@ -161,12 +164,34 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
         fill_area.y1 = draw_area.y1 + disp_area->y1;
         fill_area.y2 = fill_area.y1;
 
+        lv_style_int_t dash_start = (vdb->area.x1 + draw_area.x1) % (dsc->dash_gap + dsc->dash_width);
+
         lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
         lv_coord_t h;
         lv_draw_mask_res_t mask_res;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
              memset(mask_buf, LV_OPA_COVER, draw_area_w);
              mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+
+             if(dashed) {
+                 if(mask_res != LV_DRAW_MASK_RES_FULL_TRANSP) {
+                    lv_style_int_t dash_cnt = dash_start;
+                     uint32_t i;
+                     for(i = 0; i < draw_area_w; i++, dash_cnt++) {
+                         if(dash_cnt <= dsc->dash_width) {
+                           int16_t diff = dsc->dash_width - dash_cnt;
+                           i += diff;
+                           dash_cnt += diff;
+                         } else if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
+                             dash_cnt = 0;
+                         } else {
+                             mask_buf[i] = 0x00;
+                         }
+                     }
+
+                     mask_res = LV_DRAW_MASK_RES_CHANGED;
+                 }
+             }
 
              lv_blend_fill(clip, &fill_area,
                       dsc->color, mask_buf, mask_res, dsc->opa,
@@ -193,8 +218,11 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
     lv_coord_t w_half0 = w >> 1;
     lv_coord_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
+    bool dashed = dsc->dash_gap && dsc->dash_width ? true : false;
 
-    int16_t other_mask_cnt = lv_draw_mask_get_cnt();
+    bool simple_mode = true;
+    if(lv_draw_mask_get_cnt()) simple_mode = false;
+    else if(dashed) simple_mode = false;
 
     lv_area_t draw_area;
     draw_area.x1 = point1->x - w_half1;
@@ -203,8 +231,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
     draw_area.y2 = LV_MATH_MAX(point1->y, point2->y) - 1;
 
     /*If there is no mask then simply draw a rectangle*/
-    if(other_mask_cnt == 0) {
-
+    if(simple_mode) {
         lv_blend_fill(clip, &draw_area,
                 dsc->color,  NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
                 dsc->blend_mode);
@@ -233,11 +260,28 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
         fill_area.y2 = fill_area.y1;
 
         lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
+
+        lv_style_int_t dash_start = (vdb->area.y1 + draw_area.y1) % (dsc->dash_gap + dsc->dash_width);
+        lv_style_int_t dash_cnt = dash_start;
+
         lv_coord_t h;
         lv_draw_mask_res_t mask_res;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
              memset(mask_buf, LV_OPA_COVER, draw_area_w);
              mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+
+             if(dashed) {
+                 if(mask_res != LV_DRAW_MASK_RES_FULL_TRANSP) {
+                     if(dash_cnt > dsc->dash_width) {
+                         mask_res = LV_DRAW_MASK_RES_FULL_TRANSP;
+                     }
+
+                     if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
+                         dash_cnt = 0;
+                     }
+                 }
+                 dash_cnt ++;
+             }
 
              lv_blend_fill(clip, &fill_area,
                      dsc->color, mask_buf, mask_res, dsc->opa,

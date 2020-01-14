@@ -2708,6 +2708,11 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t 
 
     draw_dsc->color = lv_obj_get_style_color(obj, part, LV_STYLE_LINE_COLOR);
     draw_dsc->blend_mode = lv_obj_get_style_int(obj, part, LV_STYLE_LINE_BLEND_MODE);
+
+    draw_dsc->dash_width = lv_obj_get_style_int(obj, part, LV_STYLE_LINE_DASH_WIDTH);
+    if(draw_dsc->dash_width) {
+        draw_dsc->dash_gap = lv_obj_get_style_int(obj, part, LV_STYLE_LINE_DASH_GAP);
+    }
 }
 
 /**
