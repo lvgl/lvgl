@@ -61,18 +61,19 @@ void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_are
     if(points == NULL) return;
 
     int16_t i;
-    lv_area_t poly_mask = {.x1 = LV_COORD_MAX, .y1 = LV_COORD_MAX, .x2 = LV_COORD_MIN, .y2 = LV_COORD_MIN};
+    lv_area_t poly_coords = {.x1 = LV_COORD_MAX, .y1 = LV_COORD_MAX, .x2 = LV_COORD_MIN, .y2 = LV_COORD_MIN};
 
     for(i = 0; i < point_cnt; i++) {
-        poly_mask.x1 = LV_MATH_MIN(poly_mask.x1, points[i].x);
-        poly_mask.y1 = LV_MATH_MIN(poly_mask.y1, points[i].y);
-        poly_mask.x2 = LV_MATH_MAX(poly_mask.x2, points[i].x);
-        poly_mask.y2 = LV_MATH_MAX(poly_mask.y2, points[i].y);
+        poly_coords.x1 = LV_MATH_MIN(poly_coords.x1, points[i].x);
+        poly_coords.y1 = LV_MATH_MIN(poly_coords.y1, points[i].y);
+        poly_coords.x2 = LV_MATH_MAX(poly_coords.x2, points[i].x);
+        poly_coords.y2 = LV_MATH_MAX(poly_coords.y2, points[i].y);
     }
 
 
     bool is_common;
-    is_common = lv_area_intersect(&poly_mask, &poly_mask, clip_area);
+    lv_area_t poly_mask;
+    is_common = lv_area_intersect(&poly_mask, &poly_coords, clip_area);
     if(!is_common) return;
 
     /*Find the lowest point*/
@@ -154,7 +155,7 @@ void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_are
 
 
 
-    lv_draw_rect(&poly_mask, &poly_mask, style, opa_scale);
+    lv_draw_rect(&poly_coords, &poly_mask, style, opa_scale);
 
     lv_draw_mask_remove_custom(mp);
 
