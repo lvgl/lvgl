@@ -1084,10 +1084,21 @@ static void draw_img(const lv_area_t * coords, const lv_area_t * clip, lv_draw_r
         }
         lv_draw_mask_remove_id(radius_mask_id);
     } else {
-        coords_tmp.x1 = coords->x1 + lv_area_get_width(coords) / 2 - img_w / 2;
-        coords_tmp.y1 = coords->y1 + lv_area_get_height(coords) / 2 - img_h / 2;
+        lv_coord_t obj_w = lv_area_get_width(coords);
+        lv_coord_t obj_h = lv_area_get_height(coords);
+        coords_tmp.x1 = coords->x1 + (obj_w - img_w) / 2;
+        coords_tmp.y1 = coords->y1 + (obj_h - img_h) / 2;
         coords_tmp.x2 = coords_tmp.x1 + img_w - 1;
         coords_tmp.y2 = coords_tmp.y1 + img_h - 1;
+
+        /* If the (obj_h - img_h) is odd there is a rounding error when divided by 2.
+         * It's better round up in case of symbols because probably there is some extra space in the bottom
+         * due to the base line of font*/
+        if(src_type == LV_IMG_SRC_SYMBOL) {
+            lv_coord_t y_corr = (obj_h - img_h) & 0x1;
+            coords_tmp.y1 += y_corr;
+            coords_tmp.y2 += y_corr;
+        }
 
         int16_t radius_mask_id = LV_MASK_ID_INV;
         if(lv_area_is_in(&coords_tmp, coords, dsc->radius) == false) {

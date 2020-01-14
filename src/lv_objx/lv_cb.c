@@ -49,7 +49,6 @@ static lv_signal_cb_t ancestor_signal;
  */
 lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-
     LV_LOG_TRACE("check box create started");
 
     /*Create the ancestor basic object*/
@@ -187,6 +186,7 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
         lv_coord_t line_height = lv_font_get_line_height(font);
         lv_obj_set_size(ext->bullet, line_height, line_height);
         ext->bullet->state = cb->state;
+        ext->bullet->prev_state = cb->state;
         lv_obj_refresh_style(ext->bullet);
     } else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));

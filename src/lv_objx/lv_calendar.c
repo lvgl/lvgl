@@ -693,9 +693,12 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     /*The state changes without re-caching the styles, disable the use of cache*/
 //    calendar->style_dsc.cache.enabled = 0;
     lv_obj_state_t state_ori = calendar->state;
+    lv_obj_state_t prev_state_ori = calendar->prev_state;
 
     if(ext->btn_pressing < 0) calendar->state |= LV_OBJ_STATE_PRESSED;
     else calendar->state &= ~(LV_OBJ_STATE_PRESSED);
+
+    calendar->prev_state = calendar->state;
 
     header_area.x1 += left;
 
@@ -704,10 +707,13 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     lv_draw_label(&header_area, mask, &label_dsc, LV_SYMBOL_LEFT, NULL);
 
     calendar->state = state_ori;    /*Restore the state*/
+    calendar->prev_state = prev_state_ori;
 
     /*Add the right arrow*/
     if(ext->btn_pressing > 0) calendar->state |= LV_OBJ_STATE_PRESSED;
     else calendar->state &= ~(LV_OBJ_STATE_PRESSED);
+
+    calendar->prev_state = calendar->state;
 
     header_area.x1 = header_area.x2 - right - lv_txt_get_width(LV_SYMBOL_RIGHT, (uint16_t)strlen(LV_SYMBOL_RIGHT), font, 0, LV_TXT_FLAG_NONE);
 
@@ -716,6 +722,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     lv_draw_label(&header_area, mask, &label_dsc, LV_SYMBOL_RIGHT, NULL);
 
     calendar->state = state_ori;    /*Restore the state*/
+    calendar->prev_state = prev_state_ori;
 //    calendar->style_dsc.cache.enabled = 1;
 }
 

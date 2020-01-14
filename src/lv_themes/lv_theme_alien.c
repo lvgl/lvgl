@@ -107,6 +107,7 @@ static void basic_init(void)
     lv_style_set_int(&panel, LV_STYLE_BG_GRAD_DIR, LV_GRAD_DIR_VER);
     lv_style_set_color(&panel, LV_STYLE_BORDER_COLOR, LV_COLOR_GRAY);
     lv_style_set_color(&panel, LV_STYLE_TEXT_COLOR, LV_COLOR_BLACK);
+    lv_style_set_ptr(&panel, LV_STYLE_FONT , &lv_font_roboto_16);
 
     lv_style_init(&btn);
     lv_style_set_int(&btn, LV_STYLE_PAD_LEFT, LV_DPI / 20);
@@ -134,8 +135,8 @@ static void basic_init(void)
     lv_style_set_opa(&btn, LV_STYLE_BORDER_OPA, LV_OPA_70);
     lv_style_set_opa(&btn, LV_STYLE_TEXT_OPA, LV_OPA_80);
     lv_style_set_int(&btn, LV_STYLE_BORDER_WIDTH | LV_STYLE_STATE_FOCUS, 6);
-    lv_style_set_ptr(&btn, LV_STYLE_PATTERN_IMAGE | LV_STYLE_STATE_CHECKED, LV_SYMBOL_OK);
-    lv_style_set_int(&btn, LV_STYLE_PATTERN_REPEATE | LV_STYLE_STATE_CHECKED, 1);
+    lv_style_set_ptr(&btn, LV_STYLE_PATTERN_IMAGE | LV_STYLE_STATE_CHECKED, LV_SYMBOL_STOP);
+//    lv_style_set_int(&btn, LV_STYLE_PATTERN_REPEATE | LV_STYLE_STATE_CHECKED, 1);
     lv_style_set_int(&btn, LV_STYLE_SHADOW_WIDTH, 5);
     lv_style_set_int(&btn, LV_STYLE_SHADOW_OFFSET_Y, 3);
     lv_style_set_int(&btn, LV_STYLE_TRANSITION_TIME, 200);
