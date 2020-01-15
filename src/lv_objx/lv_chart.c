@@ -52,7 +52,7 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
 static lv_style_dsc_t * lv_chart_get_style(lv_obj_t * chart, uint8_t part);
 
 static void draw_series_bg(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * mask);
-static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * mask);
+static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area);
 static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area);
 static void draw_axes(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * mask);
 static void invalidate_lines(lv_obj_t * chart, uint16_t i);
@@ -763,7 +763,7 @@ static void draw_series_bg(lv_obj_t * chart, const lv_area_t * series_area, cons
  * Draw the data lines as lines on a chart
  * @param obj pointer to chart object
  */
-static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * mask)
+static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area)
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
@@ -779,6 +779,10 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
     lv_coord_t p_act;
     lv_chart_series_t * ser;
 
+    lv_area_t series_mask;
+    bool mask_ret = lv_area_intersect(&series_mask, series_area, clip_area);
+    if(mask_ret == false) return;
+
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(chart, LV_CHART_PART_SERIES, &line_dsc);
@@ -787,13 +791,14 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
     int16_t mask_fade_id = LV_MASK_ID_INV;
     lv_draw_rect_dsc_t area_dsc;
     bool has_area = lv_obj_get_style_opa(chart, LV_CHART_PART_SERIES, LV_STYLE_BG_OPA) > LV_OPA_MIN ? true : false;
-    bool has_fade = true;
+    bool has_fade = false;
     if(has_area) {
         lv_draw_rect_dsc_init(&area_dsc);
         lv_obj_init_draw_rect_dsc(chart, LV_CHART_PART_SERIES, &area_dsc);
 
+        has_fade = area_dsc.bg_grad_dir == LV_GRAD_DIR_VER ? true : false;
         if(has_fade) {
-            lv_draw_mask_fade_init(&mask_fade_p, &chart->coords, LV_OPA_90, chart->coords.y1 + (h >> 2), LV_OPA_10, chart->coords.y2 - (h >> 2));
+            lv_draw_mask_fade_init(&mask_fade_p, &chart->coords, area_dsc.bg_grad_color_stop, chart->coords.y1, area_dsc.bg_main_color_stop, chart->coords.y2);
         }
     }
 
@@ -810,6 +815,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
         line_dsc.color = ser->color;
         point_dsc.bg_color = ser->color;
         area_dsc.bg_color = ser->color;
+        area_dsc.bg_grad_color = ser->color;
 
         lv_coord_t start_point = ext->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
@@ -836,7 +842,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
 
             /*Don't draw the first point a second point is also required to draw the line*/
             if(i != 0 && ser->points[p_prev] != LV_CHART_POINT_DEF && ser->points[p_act] != LV_CHART_POINT_DEF) {
-                lv_draw_line(&p1, &p2, mask, &line_dsc);
+                lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
 
                 if(has_area) {
                     int16_t mask_line_id;
@@ -853,7 +859,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
                     if(has_fade) mask_fade_id = lv_draw_mask_add(&mask_fade_p, NULL);
 
 
-                    lv_draw_rect(&a, mask, &area_dsc);
+                    lv_draw_rect(&a, &series_mask, &area_dsc);
 
                     lv_draw_mask_remove_id(mask_line_id);
                     lv_draw_mask_remove_id(mask_fade_id);
@@ -872,7 +878,8 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
                 point_area.y1 -= point_radius;
 
                 if(ser->points[p_act] != LV_CHART_POINT_DEF) {
-                    lv_draw_rect(&point_area, mask, &point_dsc);
+                    /*Don't limit to `series_mask` to get full circles on the ends*/
+                    lv_draw_rect(&point_area, clip_area, &point_dsc);
                 }
             }
 
@@ -892,7 +899,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
             point_area.y1 -= point_radius;
 
             if(ser->points[p_act] != LV_CHART_POINT_DEF) {
-                lv_draw_rect(&point_area, mask, &point_dsc);
+                lv_draw_rect(&point_area, &series_mask, &point_dsc);
             }
         }
     }
@@ -909,7 +916,6 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
 
     uint16_t i;
     lv_area_t col_a;
-    lv_area_t series_mask;
     lv_coord_t w = lv_area_get_width(series_area);
     lv_coord_t h = lv_area_get_height(series_area);
     int32_t y_tmp;
@@ -925,6 +931,7 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
     /*Make the cols longer with `radius` to clip the rounding from the bottom*/
     col_a.y2 = series_area->y2 + col_dsc.radius;
 
+    lv_area_t series_mask;
     bool mask_ret = lv_area_intersect(&series_mask, series_area, clip_area);
     if(mask_ret == false) return;
 
@@ -1409,10 +1416,7 @@ static void invalidate_columns(lv_obj_t * chart, uint16_t i)
     lv_coord_t col_w = w / ((lv_ll_get_len(&ext->series_ll) + 1) * ext->point_cnt); /* Suppose + 1 series as separator*/
     lv_coord_t x_ofs = col_w / 2;                                    /*Shift with a half col.*/
 
-
-
     lv_coord_t x_act;
-
     x_act = (int32_t)((int32_t)w * i) / ext->point_cnt;
     x_act += series_area.x1 + x_ofs;
 

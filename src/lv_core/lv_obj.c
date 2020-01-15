@@ -2594,6 +2594,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
         draw_dsc->bg_grad_dir =  lv_obj_get_style_int(obj, part, LV_STYLE_BG_GRAD_DIR);
         if(draw_dsc->bg_grad_dir != LV_GRAD_DIR_NONE) {
             draw_dsc->bg_grad_color = lv_obj_get_style_color(obj, part, LV_STYLE_BG_GRAD_COLOR);
+            draw_dsc->bg_main_color_stop =  lv_obj_get_style_int(obj, part, LV_STYLE_BG_MAIN_STOP);
+            draw_dsc->bg_grad_color_stop =  lv_obj_get_style_int(obj, part, LV_STYLE_BG_GRAD_STOP);
         }
         draw_dsc->bg_blend_mode = lv_obj_get_style_int(obj, part, LV_STYLE_BG_BLEND_MODE);
     }
@@ -3054,6 +3056,8 @@ static lv_style_int_t lv_obj_get_style_int_core(const lv_obj_t * obj, uint8_t pa
         return LV_DPI / 10;
     case LV_STYLE_SCALE_WIDTH:
         return LV_DPI / 8;
+    case LV_STYLE_BG_GRAD_STOP:
+        return 255;
     }
 
     return 0;

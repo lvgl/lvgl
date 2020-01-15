@@ -91,7 +91,6 @@ static void basic_init(void)
     lv_style_set_opa(&scr, LV_STYLE_BG_OPA, LV_OPA_COVER);
     lv_style_set_color(&scr, LV_STYLE_BG_COLOR, LV_COLOR_MAKE(0x20, 0x20, 0x20));
     lv_style_set_color(&scr, LV_STYLE_TEXT_COLOR , LV_COLOR_GRAY);
-    lv_style_set_int(&scr, LV_STYLE_LINE_WIDTH, 2);
 
     lv_style_init(&transp);
     lv_style_set_opa(&transp, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
