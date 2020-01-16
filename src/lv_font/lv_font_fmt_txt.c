@@ -257,7 +257,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
         /*Kern classes*/
         const lv_font_fmt_txt_kern_classes_t * kdsc = fdsc->kern_dsc;
         uint8_t left_class = kdsc->left_class_mapping[gid_left];
-        uint8_t right_class = kdsc->left_class_mapping[gid_right];
+        uint8_t right_class = kdsc->right_class_mapping[gid_right];
 
         /* If class = 0, kerning not exist for that glyph
          * else got the value form `class_pair_values` 2D array*/
