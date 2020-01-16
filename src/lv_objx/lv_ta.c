@@ -46,7 +46,7 @@ static lv_design_res_t lv_ta_design(lv_obj_t * ta, const lv_area_t * clip_area, 
 static lv_design_res_t lv_ta_scrollable_design(lv_obj_t * scrl, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
 static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_ta_get_style(lv_obj_t * ta, uint8_t part);
+static lv_style_list_t * lv_ta_get_style(lv_obj_t * ta, uint8_t part);
 #if LV_USE_ANIMATION
 static void cursor_blink_anim(lv_obj_t * ta, lv_anim_value_t show);
 static void pwd_char_hider_anim(lv_obj_t * ta, lv_anim_value_t x);
@@ -121,7 +121,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->label       = NULL;
     ext->placeholder = NULL;
 
-    lv_style_dsc_init(&ext->cursor.style);
+    lv_style_list_init(&ext->cursor.style);
 
 #if LV_USE_ANIMATION == 0
     ext->pwd_show_time     = 0;
@@ -1541,12 +1541,12 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
  * @param part the part from `lv_ta_part_t`. (LV_TA_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_ta_get_style(lv_obj_t * ta, uint8_t part)
+static lv_style_list_t * lv_ta_get_style(lv_obj_t * ta, uint8_t part)
 {
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_TA_PART_BG:

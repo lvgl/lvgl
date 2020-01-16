@@ -33,7 +33,7 @@
  **********************/
 static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_roller_get_style(lv_obj_t * roller, uint8_t part);
+static lv_style_list_t * lv_roller_get_style(lv_obj_t * roller, uint8_t part);
 static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * param);
 static void refr_position(lv_obj_t * roller, lv_anim_enable_t animen);
 static void refr_height(lv_obj_t * roller);
@@ -385,7 +385,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
         uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
+        lv_style_list_t ** style_dsc_p = param;
         *style_dsc_p = lv_roller_get_style(roller, **type_p);
         return LV_RES_OK;
     }
@@ -475,12 +475,12 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
  * @param part the part from `lv_roller_part_t`. (LV_ROLLER_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_roller_get_style(lv_obj_t * roller, uint8_t part)
+static lv_style_list_t * lv_roller_get_style(lv_obj_t * roller, uint8_t part)
 {
     LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_ROLLER_PART_BG:

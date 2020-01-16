@@ -30,7 +30,7 @@
  **********************/
 static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param);
 static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t part);
+static lv_style_list_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t part);
 
 static uint8_t get_button_width(lv_btnm_ctrl_t ctrl_bits);
 static bool button_is_hidden(lv_btnm_ctrl_t ctrl_bits);
@@ -96,7 +96,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->map_p          = NULL;
     ext->recolor        = 0;
     ext->one_toggle     = 0;
-    lv_style_dsc_init(&ext->style_btn);
+    lv_style_list_init(&ext->style_btn);
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_btnm);
 
@@ -978,13 +978,13 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
  * @param part the part of the object. (LV_BTNM_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t part)
+static lv_style_list_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t part)
 {
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
     lv_btnm_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_BTNM_PART_BG:

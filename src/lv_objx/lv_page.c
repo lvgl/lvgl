@@ -46,7 +46,7 @@
 static void lv_page_sb_refresh(lv_obj_t * page);
 static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_page_get_style(lv_obj_t * page, uint8_t part);
+static lv_style_list_t * lv_page_get_style(lv_obj_t * page, uint8_t part);
 static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event);
 #if LV_USE_ANIMATION
@@ -95,12 +95,12 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     ext->scrl        = NULL;
-    lv_style_dsc_init(&ext->sb.style);
+    lv_style_list_init(&ext->sb.style);
     ext->sb.hor_draw = 0;
     ext->sb.ver_draw = 0;
     ext->sb.mode     = LV_SB_MODE_AUTO;
 #if LV_USE_ANIMATION
-    lv_style_dsc_init(&ext->edge_flash.style);
+    lv_style_list_init(&ext->edge_flash.style);
     ext->edge_flash.enabled   = 0;
     ext->edge_flash.bottom_ip = 0;
     ext->edge_flash.top_ip    = 0;
@@ -1075,12 +1075,12 @@ static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event)
  * @param part the part of the page. (LV_PAGE_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_page_get_style(lv_obj_t * page, uint8_t part)
+static lv_style_list_t * lv_page_get_style(lv_obj_t * page, uint8_t part)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_PAGE_PART_BG:

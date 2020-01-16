@@ -38,7 +38,7 @@
  **********************/
 static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param);
 static void mbox_realign(lv_obj_t * mbox);
-static lv_style_dsc_t * lv_mbox_get_style(lv_obj_t * mbox, uint8_t part);
+static lv_style_list_t * lv_mbox_get_style(lv_obj_t * mbox, uint8_t part);
 #if LV_USE_ANIMATION
 static void lv_mbox_close_ready_cb(lv_anim_t * a);
 #endif
@@ -107,7 +107,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_event_cb(new_mbox, lv_mbox_default_event_cb);
 
         /*Set the default styles*/
-        lv_style_dsc_reset(&new_mbox->style_dsc);
+        lv_style_list_reset(&new_mbox->style_dsc);
         lv_obj_add_style_theme(new_mbox, LV_MBOX_PART_BG, LV_THEME_MBOX_BG);
 
     }
@@ -150,11 +150,11 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
     if(ext->btnm == NULL) {
         ext->btnm = lv_btnm_create(mbox, NULL);
 
-        lv_style_dsc_reset(&ext->btnm->style_dsc);
+        lv_style_list_reset(&ext->btnm->style_dsc);
         lv_obj_add_style_theme(ext->btnm, LV_BTNM_PART_BG, LV_THEME_MBOX_BTN_BG);
 
 
-        lv_style_dsc_reset(lv_obj_get_style(ext->btnm, LV_BTNM_PART_BTN));
+        lv_style_list_reset(lv_obj_get_style(ext->btnm, LV_BTNM_PART_BTN));
         lv_obj_add_style_theme(ext->btnm, LV_BTNM_PART_BTN, LV_THEME_MBOX_BTN);
     }
 
@@ -472,12 +472,12 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
  * @param part the part from `lv_mbox_part_t`. (LV_MBOX_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_mbox_get_style(lv_obj_t * mbox, uint8_t part)
+static lv_style_list_t * lv_mbox_get_style(lv_obj_t * mbox, uint8_t part)
 {
     LV_ASSERT_OBJ(mbox, LV_OBJX_NAME);
 
     lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_MBOX_PART_BG:

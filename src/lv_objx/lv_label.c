@@ -906,9 +906,9 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
     return (pos->x >= (last_x - letter_space) && pos->x <= (last_x + max_diff));
 }
 
-lv_style_dsc_t * lv_label_get_style(lv_obj_t * label, uint8_t type)
+lv_style_list_t * lv_label_get_style(lv_obj_t * label, uint8_t type)
 {
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
     switch(type) {
     case LV_LABEL_PART_MAIN:
         style_dsc_p = &label->style_dsc;

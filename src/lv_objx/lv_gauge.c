@@ -38,7 +38,7 @@
  **********************/
 static lv_design_res_t lv_gauge_design(lv_obj_t * gauge, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_gauge_get_style(lv_obj_t * gauge, uint8_t part);
+static lv_style_list_t * lv_gauge_get_style(lv_obj_t * gauge, uint8_t part);
 static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask);
 static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area);
 
@@ -102,8 +102,8 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_gauge_set_critical_value(new_gauge, 80);
         lv_obj_set_size(new_gauge, 2 * LV_DPI, 2 * LV_DPI);
 
-        lv_style_dsc_reset(&new_gauge->style_dsc);
-        lv_style_dsc_init(&ext->style_strong);
+        lv_style_list_reset(&new_gauge->style_dsc);
+        lv_style_list_init(&ext->style_strong);
         _ot(new_gauge, LV_GAUGE_PART_MAIN, GAUGE);
         _ot(new_gauge, LV_GAUGE_PART_STRONG, GAUGE_STRONG);
 
@@ -410,12 +410,12 @@ static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param
  * @param part the part from `lv_gauge_part_t`. (LV_GAUGE_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_gauge_get_style(lv_obj_t * gauge, uint8_t part)
+static lv_style_list_t * lv_gauge_get_style(lv_obj_t * gauge, uint8_t part)
 {
     LV_ASSERT_OBJ(gauge, LV_OBJX_NAME);
 
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_GAUGE_PART_MAIN:

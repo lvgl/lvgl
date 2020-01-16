@@ -36,7 +36,7 @@
  **********************/
 static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
 static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_list_get_style(lv_obj_t * list, uint8_t part);
+static lv_style_list_t * lv_list_get_style(lv_obj_t * list, uint8_t part);
 static void lv_list_btn_single_select(lv_obj_t * btn);
 static bool lv_list_is_list_btn(lv_obj_t * list_btn);
 static bool lv_list_is_list_img(lv_obj_t * list_btn);
@@ -171,7 +171,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
     if(ancestor_btn_signal == NULL) ancestor_btn_signal = lv_obj_get_signal_cb(liste);
 
     /*Set the default styles*/
-    lv_style_dsc_reset(&liste->style_dsc);
+    lv_style_list_reset(&liste->style_dsc);
     _ot(liste, LV_BTN_PART_MAIN, LIST_BTN);
 
     lv_page_glue_obj(liste, true);
@@ -910,12 +910,12 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
  * @param part the part from `lv_page_list_t`. (LV_LIST_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_list_get_style(lv_obj_t * list, uint8_t part)
+static lv_style_list_t * lv_list_get_style(lv_obj_t * list, uint8_t part)
 {
     LV_ASSERT_OBJ(list, LV_OBJX_NAME);
 
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_LIST_PART_BG:

@@ -54,7 +54,7 @@ typedef struct
     uint16_t pwd_show_time;      /*Time to show characters in password mode before change them to '*' */
     struct
     {
-        lv_style_dsc_t style;  /* Style of the cursor (NULL to use label's style)*/
+        lv_style_list_t style;  /* Style of the cursor (NULL to use label's style)*/
         lv_coord_t valid_x;        /* Used when stepping up/down to a shorter line.
                                     * (Used by the library)*/
         uint16_t pos;              /* The current cursor position

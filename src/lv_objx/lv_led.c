@@ -82,7 +82,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_size(new_led, LV_LED_WIDTH_DEF, LV_LED_HEIGHT_DEF);
 
-        lv_style_dsc_init(&new_led->style_dsc);
+        lv_style_list_init(&new_led->style_dsc);
         lv_obj_add_style_class(new_led, LV_LED_PART_MAIN, lv_theme_get_style(LV_THEME_LED));
     }
     /*Copy an existing object*/

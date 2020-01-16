@@ -36,7 +36,7 @@
  **********************/
 static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_img_get_style(lv_obj_t * img, uint8_t type);
+static lv_style_list_t * lv_img_get_style(lv_obj_t * img, uint8_t type);
 
 /**********************
  *  STATIC VARIABLES
@@ -629,9 +629,9 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
 }
 
 
-static lv_style_dsc_t * lv_img_get_style(lv_obj_t * img, uint8_t type)
+static lv_style_list_t * lv_img_get_style(lv_obj_t * img, uint8_t type)
 {
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
     switch(type) {
     case LV_IMG_PART_MAIN:
         style_dsc_p = &img->style_dsc;

@@ -29,7 +29,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_kb_get_style(lv_obj_t * kb, uint8_t part);
+static lv_style_list_t * lv_kb_get_style(lv_obj_t * kb, uint8_t part);
 static void lv_kb_update_map(lv_obj_t * kb);
 
 /**********************
@@ -454,12 +454,12 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
  * @param part the part from `lv_kb_part_t`. (LV_KB_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_kb_get_style(lv_obj_t * kb, uint8_t part)
+static lv_style_list_t * lv_kb_get_style(lv_obj_t * kb, uint8_t part)
 {
     LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
 
     lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_KB_PART_BG:

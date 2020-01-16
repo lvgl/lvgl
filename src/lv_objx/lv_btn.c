@@ -210,9 +210,9 @@ bool lv_btn_get_toggle(const lv_obj_t * btn)
     return ext->toggle != 0 ? true : false;
 }
 
-lv_style_dsc_t * lv_btn_get_style(lv_obj_t * cont, uint8_t type)
+lv_style_list_t * lv_btn_get_style(lv_obj_t * cont, uint8_t type)
 {
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
     switch(type) {
     case LV_BTN_PART_MAIN:
         style_dsc_p = &cont->style_dsc;

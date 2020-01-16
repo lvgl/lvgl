@@ -51,7 +51,7 @@ typedef struct _lv_event_temp_data
 
 typedef struct {
     lv_draw_rect_dsc_t draw_dsc;
-    lv_style_dsc_t * style_dsc;
+    lv_style_list_t * style_dsc;
     uint8_t state;
 }lv_draw_rect_cache_t;
 
@@ -282,7 +282,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
     new_obj->ext_attr = NULL;
 
-    lv_style_dsc_init(&new_obj->style_dsc);
+    lv_style_list_init(&new_obj->style_dsc);
 
     if(parent != NULL) {
         lv_obj_add_style_class(new_obj, LV_OBJ_PART_MAIN, _t(PANEL));
@@ -1183,29 +1183,29 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
 
 void lv_obj_set_style_color(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_color_t color)
 {
-    lv_style_dsc_t * style_dsc = lv_obj_get_style(obj, part);
-    lv_style_set_color(&style_dsc->local, prop, color);
+    lv_style_list_t * style_dsc = lv_obj_get_style(obj, part);
+    lv_style_list_set_local_color(style_dsc, prop, color);
     lv_obj_refresh_style(obj);
 }
 
 void lv_obj_set_style_int(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_int_t value)
 {
-    lv_style_dsc_t * style_dsc = lv_obj_get_style(obj, part);
-    lv_style_set_int(&style_dsc->local, prop, value);
+    lv_style_list_t * style_dsc = lv_obj_get_style(obj, part);
+    lv_style_list_set_local_int(style_dsc, prop, value);
     lv_obj_refresh_style(obj);
 }
 
 void lv_obj_set_style_opa(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_opa_t opa)
 {
-    lv_style_dsc_t * style_dsc = lv_obj_get_style(obj, part);
-    lv_style_set_opa(&style_dsc->local, prop, opa);
+    lv_style_list_t * style_dsc = lv_obj_get_style(obj, part);
+    lv_style_list_set_local_opa(style_dsc, prop, opa);
     lv_obj_refresh_style(obj);
 }
 
 void lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, void * p)
 {
-    lv_style_dsc_t * style_dsc = lv_obj_get_style(obj, part);
-    lv_style_set_ptr(&style_dsc->local, prop, p);
+    lv_style_list_t * style_dsc = lv_obj_get_style(obj, part);
+    lv_style_list_set_local_ptr(style_dsc, prop, p);
     lv_obj_refresh_style(obj);
 }
 
@@ -1213,26 +1213,26 @@ void lv_obj_add_style_class(lv_obj_t * obj, uint8_t part, lv_style_t * style)
 {
     if(style == NULL) return;
 
-    lv_style_dsc_t * style_dsc = lv_obj_get_style(obj, part);
+    lv_style_list_t * style_dsc = lv_obj_get_style(obj, part);
     if(style_dsc == NULL) {
         LV_LOG_WARN("lv_obj_add_style_class: can't find style with `type`");
         return;
     }
 
-    lv_style_dsc_add_class(style_dsc, style);
+    lv_style_list_add_style(style_dsc, style);
 
     lv_obj_refresh_style(obj);
 }
 
 void lv_obj_reset_style(lv_obj_t * obj, uint8_t part)
 {
-    lv_style_dsc_t * style_dsc = lv_obj_get_style(obj, part);
+    lv_style_list_t * style_dsc = lv_obj_get_style(obj, part);
     if(style_dsc == NULL) {
         LV_LOG_WARN("lv_obj_clean_styles: can't find style with `part`");
         return;
     }
 
-    lv_style_dsc_reset(style_dsc);
+    lv_style_list_reset(style_dsc);
 
     lv_obj_refresh_style(obj);
 }
@@ -2058,7 +2058,7 @@ lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj)
  * Appearance get
  *---------------*/
 
-lv_style_dsc_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t part)
+lv_style_list_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t part)
 {
 	if(part == LV_OBJ_PART_MAIN) return &obj->style_dsc;
 
@@ -2858,19 +2858,12 @@ static void report_style_mod_core(void * style, lv_obj_t * obj)
 {
     uint8_t part_sub;
     for(part_sub = 0; part_sub != _LV_OBJ_PART_ALL; part_sub++) {
-        lv_style_dsc_t * dsc = lv_obj_get_style(obj, part_sub);
+        lv_style_list_t * dsc = lv_obj_get_style(obj, part_sub);
         if(dsc == NULL) break;
 
-        if(&dsc->local == style) {
-            lv_obj_refresh_style(obj);
-            /* Two local style can't have the same pointer
-             * so there won't be an other match*/
-            return;
-        }
-
-        uint8_t ci;
-        for(ci = 0; ci < dsc->class_cnt; ci++) {
-            lv_style_t * class = lv_style_dsc_get_class(dsc, ci);
+       uint8_t ci;
+        for(ci = 0; ci < dsc->style_cnt; ci++) {
+            lv_style_t * class = lv_style_list_get_style(dsc, ci);
             if(class == style) {
                 lv_obj_refresh_style(obj);
                 /*It's enough to handle once (if duplicated)*/
@@ -3028,12 +3021,12 @@ static lv_style_int_t lv_obj_get_style_int_core(const lv_obj_t * obj, uint8_t pa
     lv_res_t res = LV_RES_INV;
     const lv_obj_t * parent = obj;
     while(parent) {
-        lv_style_dsc_t * dsc = lv_obj_get_style(parent, part);
+        lv_style_list_t * dsc = lv_obj_get_style(parent, part);
 
         uint8_t state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
-        res = lv_style_dsc_get_int(dsc, prop, &value);
+        res = lv_style_list_get_int(dsc, prop, &value);
         if(res == LV_RES_OK) return value;
 
         if(attr.bits.inherit == 0) break;
@@ -3075,12 +3068,12 @@ static lv_color_t lv_obj_get_style_color_core(const lv_obj_t * obj, uint8_t part
     lv_res_t res = LV_RES_INV;
     const lv_obj_t * parent = obj;
     while(parent) {
-        lv_style_dsc_t * dsc = lv_obj_get_style(parent, part);
+        lv_style_list_t * dsc = lv_obj_get_style(parent, part);
 
         uint8_t state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
-        res = lv_style_dsc_get_color(dsc, prop, &value);
+        res = lv_style_list_get_color(dsc, prop, &value);
         if(res == LV_RES_OK) return value;
 
         if(attr.bits.inherit == 0) break;
@@ -3118,12 +3111,12 @@ static lv_opa_t lv_obj_get_style_opa_core(const lv_obj_t * obj, uint8_t part, lv
     lv_res_t res = LV_RES_INV;
     const lv_obj_t * parent = obj;
     while(parent) {
-        lv_style_dsc_t * dsc = lv_obj_get_style(parent, part);
+        lv_style_list_t * dsc = lv_obj_get_style(parent, part);
 
         uint8_t state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
-        res = lv_style_dsc_get_opa(dsc, prop, &value);
+        res = lv_style_list_get_opa(dsc, prop, &value);
         if(res == LV_RES_OK) return value;
 
         if(attr.bits.inherit == 0) break;
@@ -3163,12 +3156,12 @@ static const void * lv_obj_get_style_ptr_core(const lv_obj_t * obj, uint8_t part
     lv_res_t res = LV_RES_INV;
     const lv_obj_t * parent = obj;
     while(parent) {
-        lv_style_dsc_t * dsc = lv_obj_get_style(parent, part);
+        lv_style_list_t * dsc = lv_obj_get_style(parent, part);
 
         uint8_t state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
-        res = lv_style_dsc_get_ptr(dsc, prop, &value);
+        res = lv_style_list_get_ptr(dsc, prop, &value);
         if(res == LV_RES_OK) return value;
 
         if(attr.bits.inherit == 0) break;

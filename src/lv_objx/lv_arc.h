@@ -32,7 +32,7 @@ typedef struct
     /*New data for this type */
     lv_coord_t angle_start;
     lv_coord_t angle_end;
-    lv_style_dsc_t style_arc;
+    lv_style_list_t style_arc;
 } lv_arc_ext_t;
 
 /*Parts of the arc*/

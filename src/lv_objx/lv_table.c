@@ -29,7 +29,7 @@
  **********************/
 static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_table_signal(lv_obj_t * table, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_table_get_style(lv_obj_t * table, uint8_t part);
+static lv_style_list_t * lv_table_get_style(lv_obj_t * table, uint8_t part);
 static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id);
 static void refr_size(lv_obj_t * table);
 
@@ -80,7 +80,7 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
 
     uint16_t i;
     for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
-        lv_style_dsc_init(&ext->cell_style[i]);
+        lv_style_list_init(&ext->cell_style[i]);
     }
 
     for(i = 0; i < LV_TABLE_COL_MAX; i++) {
@@ -93,7 +93,7 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new table table*/
     if(copy == NULL) {
-        lv_style_dsc_reset(&new_table->style_dsc);
+        lv_style_list_reset(&new_table->style_dsc);
         lv_obj_add_style_theme(new_table, LV_TABLE_PART_BG, LV_THEME_TABLE_BG);
         lv_obj_add_style_theme(new_table, LV_TABLE_PART_CELL1, LV_THEME_TABLE_CELL1);
         lv_obj_add_style_theme(new_table, LV_TABLE_PART_CELL2, LV_THEME_TABLE_CELL2);
@@ -827,12 +827,12 @@ static lv_res_t lv_table_signal(lv_obj_t * table, lv_signal_t sign, void * param
  * @param part the part from. (LV_TABLE_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_table_get_style(lv_obj_t * table, uint8_t part)
+static lv_style_list_t * lv_table_get_style(lv_obj_t * table, uint8_t part)
 {
     LV_ASSERT_OBJ(table, LV_OBJX_NAME);
 
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_TABLE_PART_BG:

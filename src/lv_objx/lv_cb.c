@@ -26,7 +26,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_cb_get_style(lv_obj_t * cb, uint8_t type);
+static lv_style_list_t * lv_cb_get_style(lv_obj_t * cb, uint8_t type);
 
 /**********************
  *  STATIC VARIABLES
@@ -202,9 +202,9 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
 }
 
 
-static lv_style_dsc_t * lv_cb_get_style(lv_obj_t * cb, uint8_t type)
+static lv_style_list_t * lv_cb_get_style(lv_obj_t * cb, uint8_t type)
 {
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     switch(type) {

@@ -44,7 +44,7 @@ typedef struct
     const lv_color_t * needle_colors; /*Color of the needles (lv_color_t my_colors[needle_num])*/
     const void * needle_img;
     lv_point_t needle_img_pivot;
-    lv_style_dsc_t style_strong;
+    lv_style_list_t style_strong;
     uint8_t needle_count;             /*Number of needles*/
     uint8_t label_count;              /*Number of labels on the scale*/
 } lv_gauge_ext_t;

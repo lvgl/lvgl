@@ -36,7 +36,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type);
+static lv_style_list_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type);
 static void lv_cont_refr_layout(lv_obj_t * cont);
 static void lv_cont_layout_col(lv_obj_t * cont);
 static void lv_cont_layout_row(lv_obj_t * cont);
@@ -288,9 +288,9 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
 }
 
 
-static lv_style_dsc_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type)
+static lv_style_list_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type)
 {
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
     switch(type) {
     case LV_CONT_PART_MAIN:
         style_dsc_p = &cont->style_dsc;

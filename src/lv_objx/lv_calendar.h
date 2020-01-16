@@ -53,9 +53,9 @@ typedef struct
     const char ** month_names; /*Pointer to an array with the name of the month (NULL. use default names)*/
 
     /*Styles*/
-    lv_style_dsc_t style_header;
-    lv_style_dsc_t style_day_names;
-    lv_style_dsc_t style_date_nums;
+    lv_style_list_t style_header;
+    lv_style_list_t style_day_names;
+    lv_style_list_t style_date_nums;
 } lv_calendar_ext_t;
 
 /** Calendar parts*/

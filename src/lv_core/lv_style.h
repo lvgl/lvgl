@@ -172,12 +172,10 @@ typedef int16_t lv_style_int_t;
 
 
 typedef struct {
-    lv_style_t  local;
-    lv_style_t ** classes;
-    uint8_t class_cnt;
-}lv_style_dsc_t;
-
-
+    lv_style_t ** style_list;
+    uint8_t style_cnt;
+    uint8_t has_local   :1;
+}lv_style_list_t;
 
 #if LV_USE_ANIMATION
 /** Data structure for style animations. */
@@ -203,20 +201,21 @@ void lv_style_built_in_init(void);
 
 void lv_style_init(lv_style_t * style);
 
-void lv_style_dsc_init(lv_style_dsc_t * style_dsc);
+void lv_style_list_init(lv_style_list_t * style_dsc);
 
-void lv_style_dsc_add_class(lv_style_dsc_t * style_dsc, lv_style_t * style);
+void lv_style_list_add_style(lv_style_list_t * style_dsc, lv_style_t * style);
 
-void lv_style_dsc_remove_class(lv_style_dsc_t * style_dsc, lv_style_t * class);
+void lv_style_list_remove_style(lv_style_list_t * style_dsc, lv_style_t * class);
 
-void lv_style_dsc_reset(lv_style_dsc_t * style_dsc);
+void lv_style_list_reset(lv_style_list_t * style_dsc);
 
-static inline lv_style_t * lv_style_dsc_get_class(lv_style_dsc_t * style_dsc, uint8_t id)
+static inline lv_style_t * lv_style_list_get_style(lv_style_list_t * style_dsc, uint8_t id)
 {
-    if(style_dsc->class_cnt == 0) return NULL;
-    if(style_dsc->class_cnt == 1) return (lv_style_t*) style_dsc->classes;
+    if(style_dsc->style_cnt == 0) return NULL;
+    if(id >= style_dsc->style_cnt) return NULL;
 
-    return style_dsc->classes[id];
+    return style_dsc->style_list[id];
+
 }
 
 void lv_style_reset(lv_style_t * style);
@@ -240,20 +239,24 @@ void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t *
 void lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_int_t value);
 void lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_t color);
 void lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa);
-void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, void * p);
-
+void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void * p);
 
 int16_t lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res);
 int16_t lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res);
 int16_t lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res);
 int16_t lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void ** res);
 
-lv_res_t lv_style_dsc_get_int(lv_style_dsc_t * dsc, lv_style_property_t prop, lv_style_int_t * value);
-lv_res_t lv_style_dsc_get_color(lv_style_dsc_t * dsc, lv_style_property_t prop, lv_color_t * value);
-lv_res_t lv_style_dsc_get_opa(lv_style_dsc_t * dsc, lv_style_property_t prop, lv_opa_t * value);
-lv_res_t lv_style_dsc_get_ptr(lv_style_dsc_t * dsc, lv_style_property_t prop, void ** value);
+void lv_style_list_set_local_int(lv_style_list_t * dsc, lv_style_property_t prop, lv_style_int_t value);
+void lv_style_list_set_local_opa(lv_style_list_t * dsc, lv_style_property_t prop, lv_opa_t value);
+void lv_style_list_set_local_color(lv_style_list_t * dsc, lv_style_property_t prop, lv_color_t value);
+void lv_style_list_set_local_ptr(lv_style_list_t * dsc, lv_style_property_t prop, const void * value);
 
-lv_res_t lv_style_cache_update(lv_style_dsc_t * dsc);
+lv_res_t lv_style_list_get_int(lv_style_list_t * dsc, lv_style_property_t prop, lv_style_int_t * value);
+lv_res_t lv_style_list_get_color(lv_style_list_t * dsc, lv_style_property_t prop, lv_color_t * value);
+lv_res_t lv_style_list_get_opa(lv_style_list_t * dsc, lv_style_property_t prop, lv_opa_t * value);
+lv_res_t lv_style_list_get_ptr(lv_style_list_t * dsc, lv_style_property_t prop, void ** value);
+
+lv_res_t lv_style_cache_update(lv_style_list_t * dsc);
 
 #if LV_USE_ANIMATION
 
@@ -351,7 +354,6 @@ static inline void lv_style_anim_create(lv_anim_t * a)
 /*************************
  *    GLOBAL VARIABLES
  *************************/
-//extern lv_style_t lv_style_transp_tight;
 
 /**********************
  *      MACROS

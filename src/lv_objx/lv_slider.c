@@ -32,7 +32,7 @@
  **********************/
 static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_slider_get_style(lv_obj_t * slider, uint8_t part);
+static lv_style_list_t * lv_slider_get_style(lv_obj_t * slider, uint8_t part);
 static void lv_slider_position_knob(lv_obj_t * slider, lv_area_t * knob_area, lv_coord_t knob_size, bool hor);
 static void lv_slider_draw_knob(lv_obj_t * slider, const lv_area_t * knob_area, const lv_area_t * clip_area);
 
@@ -77,7 +77,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     /*Initialize the allocated 'ext' */
-    lv_style_dsc_init(&ext->style_knob);
+    lv_style_list_init(&ext->style_knob);
     ext->value_to_set = NULL;
     ext->dragging = false;
 
@@ -394,12 +394,12 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 }
 
 
-static lv_style_dsc_t * lv_slider_get_style(lv_obj_t * slider, uint8_t part)
+static lv_style_list_t * lv_slider_get_style(lv_obj_t * slider, uint8_t part)
 {
     LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
 
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_SLIDER_PART_BG:

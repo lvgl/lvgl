@@ -53,7 +53,7 @@ typedef struct
     const char ** map_p;                              /*Pointer to the current map*/
     lv_area_t * button_areas;                         /*Array of areas of buttons*/
     lv_btnm_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
-    lv_style_dsc_t style_btn;                     /*Styles of buttons in each state*/
+    lv_style_list_t style_btn;                     /*Styles of buttons in each state*/
     uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
     uint16_t btn_id_pr;                               /*Index of the currently pressed button or LV_BTNM_BTN_NONE*/
     uint16_t btn_id_focused;                          /*Index of the currently focused button or LV_BTNM_BTN_NONE*/

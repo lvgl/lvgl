@@ -37,7 +37,7 @@ typedef uint8_t day_draw_state_t;
  **********************/
 static lv_design_res_t lv_calendar_design(lv_obj_t * calendar, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_calendar_get_style(lv_obj_t * calendar, uint8_t part);
+static lv_style_list_t * lv_calendar_get_style(lv_obj_t * calendar, uint8_t part);
 static bool calculate_touched_day(lv_obj_t * calendar, const lv_point_t * touched_point);
 static lv_coord_t get_header_height(lv_obj_t * calendar);
 static lv_coord_t get_day_names_height(lv_obj_t * calendar);
@@ -116,9 +116,9 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->btn_pressing = 0;
 
 
-    lv_style_dsc_init(&ext->style_date_nums);
-    lv_style_dsc_init(&ext->style_day_names);
-    lv_style_dsc_init(&ext->style_header);
+    lv_style_list_init(&ext->style_date_nums);
+    lv_style_list_init(&ext->style_day_names);
+    lv_style_list_init(&ext->style_header);
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_calendar, lv_calendar_signal);
@@ -128,11 +128,11 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
 
         /*Different styles will be used from the styles while rendering so disable caching*/
-        lv_style_dsc_reset(&new_calendar->style_dsc);
-        lv_style_dsc_add_class(&new_calendar->style_dsc, lv_theme_get_style(LV_THEME_CALENDAR_BG));
-        lv_style_dsc_add_class(&ext->style_date_nums, lv_theme_get_style(LV_THEME_CALENDAR_DATE_NUMS));
-        lv_style_dsc_add_class(&ext->style_day_names, lv_theme_get_style(LV_THEME_CALENDAR_DAY_NAMES));
-        lv_style_dsc_add_class(&ext->style_header, lv_theme_get_style(LV_THEME_CALENDAR_HEADER));
+        lv_style_list_reset(&new_calendar->style_dsc);
+        lv_style_list_add_style(&new_calendar->style_dsc, lv_theme_get_style(LV_THEME_CALENDAR_BG));
+        lv_style_list_add_style(&ext->style_date_nums, lv_theme_get_style(LV_THEME_CALENDAR_DATE_NUMS));
+        lv_style_list_add_style(&ext->style_day_names, lv_theme_get_style(LV_THEME_CALENDAR_DAY_NAMES));
+        lv_style_list_add_style(&ext->style_header, lv_theme_get_style(LV_THEME_CALENDAR_HEADER));
 
         lv_obj_refresh_style(new_calendar);
 
@@ -537,12 +537,12 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
  * @param part the part from `lv_calendar_part_t`. (LV_CALENDAR_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_calendar_get_style(lv_obj_t * calendar, uint8_t part)
+static lv_style_list_t * lv_calendar_get_style(lv_obj_t * calendar, uint8_t part)
 {
     LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
 
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
 
     switch(part) {

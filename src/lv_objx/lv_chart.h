@@ -87,8 +87,8 @@ typedef struct
     uint8_t hdiv_cnt;     /*Number of horizontal division lines*/
     uint8_t vdiv_cnt;     /*Number of vertical division lines*/
     uint16_t point_cnt;   /*Point number in a data line*/
-    lv_style_dsc_t style_series_bg;
-    lv_style_dsc_t style_series;
+    lv_style_list_t style_series_bg;
+    lv_style_list_t style_series;
     lv_chart_type_t type; /*Line, column or point chart (from 'lv_chart_type_t')*/
     lv_chart_axis_cfg_t y_axis;
     lv_chart_axis_cfg_t x_axis;

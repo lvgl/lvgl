@@ -39,7 +39,7 @@
 static lv_design_res_t lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param);
 static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_ddlist_get_style(lv_obj_t * ddlist, uint8_t part);
+static lv_style_list_t * lv_ddlist_get_style(lv_obj_t * ddlist, uint8_t part);
 static lv_res_t release_handler(lv_obj_t * ddlist);
 static void lv_ddlist_refr_size(lv_obj_t * ddlist, lv_anim_enable_t anim);
 static void lv_ddlist_pos_current_option(lv_obj_t * ddlist);
@@ -102,7 +102,7 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->sel_opt_id_ori = 0;
     ext->option_cnt     = 0;
     ext->stay_open      = 0;
-    lv_style_dsc_init(&ext->style_sel);
+    lv_style_list_init(&ext->style_sel);
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_ddlist, lv_ddlist_signal);
@@ -594,7 +594,7 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
         uint8_t ** type_p = param;
-        lv_style_dsc_t ** style_dsc_p = param;
+        lv_style_list_t ** style_dsc_p = param;
         *style_dsc_p = lv_ddlist_get_style(ddlist, **type_p);
         return LV_RES_OK;
     }
@@ -739,12 +739,12 @@ static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * 
  * @param part the part from `lv_ddlist_part_t`. (LV_DDLIST_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_ddlist_get_style(lv_obj_t * ddlist, uint8_t part)
+static lv_style_list_t * lv_ddlist_get_style(lv_obj_t * ddlist, uint8_t part)
 {
     LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
 
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_DDLIST_PART_BG:

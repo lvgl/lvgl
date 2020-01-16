@@ -85,7 +85,7 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_size(new_lmeter, LV_DPI, LV_DPI);
 
-        lv_style_dsc_reset(lv_obj_get_style(new_lmeter, LV_LMETER_PART_MAIN));
+        lv_style_list_reset(lv_obj_get_style(new_lmeter, LV_LMETER_PART_MAIN));
         _ot(new_lmeter, LV_LMETER_PART_MAIN, LMETER);
     }
     /*Copy an existing line meter*/

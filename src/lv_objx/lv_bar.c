@@ -40,7 +40,7 @@
  **********************/
 static lv_design_res_t lv_bar_design(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_bar_get_style(lv_obj_t * bar, uint8_t part);
+static lv_style_list_t * lv_bar_get_style(lv_obj_t * bar, uint8_t part);
 
 static void draw_bg(lv_obj_t * bar, const lv_area_t * clip_area);
 static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area);
@@ -102,7 +102,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
 	lv_bar_init_anim(new_bar, &ext->start_value_anim);
 #endif
     ext->type         = LV_BAR_TYPE_NORMAL;
-    lv_style_dsc_init(&ext->style_indic);
+    lv_style_list_init(&ext->style_indic);
 
     lv_obj_set_signal_cb(new_bar, lv_bar_signal);
     lv_obj_set_design_cb(new_bar, lv_bar_design);
@@ -611,12 +611,12 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     return res;
 }
 
-static lv_style_dsc_t * lv_bar_get_style(lv_obj_t * bar, uint8_t part)
+static lv_style_list_t * lv_bar_get_style(lv_obj_t * bar, uint8_t part)
 {
     LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
 
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_BAR_PART_BG:

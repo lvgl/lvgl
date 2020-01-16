@@ -28,7 +28,7 @@
  **********************/
 static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_arc_get_style(lv_obj_t * arc, uint8_t part);
+static lv_style_list_t * lv_arc_get_style(lv_obj_t * arc, uint8_t part);
 
 /**********************
  *  STATIC VARIABLES
@@ -83,8 +83,8 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new arc arc*/
     if(copy == NULL) {
-        lv_style_dsc_init(&ext->style_arc);
-        lv_style_dsc_reset(&new_arc->style_dsc);
+        lv_style_list_init(&ext->style_arc);
+        lv_style_list_reset(&new_arc->style_dsc);
         _ot(new_arc, LV_ARC_PART_BG, ARC_BG);
         _ot(new_arc, LV_ARC_PART_ARC, ARC);
 
@@ -276,13 +276,13 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
  * @param part the part of the object. (LV_ARC_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_arc_get_style(lv_obj_t * arc, uint8_t part)
+static lv_style_list_t * lv_arc_get_style(lv_obj_t * arc, uint8_t part)
 {
     LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
 
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_ARC_PART_BG:

@@ -44,7 +44,7 @@ typedef struct
 {
     lv_bar_ext_t bar; /*Ext. of ancestor*/
     /*New data for this type */
-    lv_style_dsc_t style_knob; /*Style of the knob*/
+    lv_style_list_t style_knob; /*Style of the knob*/
 	lv_area_t left_knob_area;
 	lv_area_t right_knob_area;
 	int16_t *value_to_set; /* Which bar value to set */

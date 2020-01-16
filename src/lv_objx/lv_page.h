@@ -57,7 +57,7 @@ typedef struct
     lv_obj_t * scrl; /*The scrollable object on the background*/
     struct
     {
-        lv_style_dsc_t style; /*Style of scrollbars*/
+        lv_style_list_t style; /*Style of scrollbars*/
         lv_area_t hor_area;       /*Horizontal scrollbar area relative to the page. (Handled by the library) */
         lv_area_t ver_area;       /*Vertical scrollbar area relative to the page (Handled by the library)*/
         uint8_t hor_draw : 1;     /*1: horizontal scrollbar is visible now (Handled by the library)*/
@@ -68,7 +68,7 @@ typedef struct
     struct
     {
         lv_anim_value_t state;    /*Store the current size of the edge flash effect*/
-        lv_style_dsc_t style; /*Style of edge flash effect (usually homogeneous circle)*/
+        lv_style_list_t style; /*Style of edge flash effect (usually homogeneous circle)*/
         uint8_t enabled : 1;      /*1: Show a flash animation on the edge*/
         uint8_t top_ip : 1;       /*Used internally to show that top most position is reached (flash is In
                                      Progress)*/

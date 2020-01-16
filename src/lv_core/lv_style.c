@@ -36,6 +36,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop);
+static lv_style_t * get_local_style(lv_style_list_t * list);
 #if LV_USE_ANIMATION
 static void style_animator(lv_style_anim_dsc_t * dsc, lv_anim_value_t val);
 static void style_animation_common_end_cb(lv_anim_t * a);
@@ -60,16 +61,7 @@ static void style_animation_common_end_cb(lv_anim_t * a);
 
 void lv_style_built_in_init(void)
 {
-//    lv_style_init(&lv_style_transp_tight);
-//    lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
-//    lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_BORDER_OPA, LV_OPA_TRANSP);
-//    lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_SHADOW_OPA, LV_OPA_TRANSP);
-//    lv_style_set_opa(&lv_style_transp_tight, LV_STYLE_PATTERN_OPA, LV_OPA_TRANSP);
-//    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_LEFT, 0);
-//    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_RIGHT, 0);
-//    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_TOP, 0);
-//    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_BOTTOM, 0);
-//    lv_style_set_int(&lv_style_transp_tight, LV_STYLE_PAD_INNER, 0);
+
 }
 
 void lv_style_init(lv_style_t * style)
@@ -86,74 +78,92 @@ void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
     style_dest->size = style_src->size;
 }
 
-void lv_style_dsc_init(lv_style_dsc_t * style_dsc)
+void lv_style_list_init(lv_style_list_t * list)
 {
-    lv_style_init(&style_dsc->local);
-    style_dsc->classes = NULL;
-    style_dsc->class_cnt = 0;
+    list->style_list = NULL;
+    list->style_cnt = 0;
+    list->has_local = 0;
 }
 
 
-void lv_style_dsc_add_class(lv_style_dsc_t * dsc, lv_style_t * class)
+void lv_style_list_add_style(lv_style_list_t * list, lv_style_t * style)
 {
-    /* Do not allocate memory for the first class.
-     * It can be simply stored as a pointer.*/
-    if(dsc->class_cnt == 0) {
-        dsc->classes = (lv_style_t**)class;
-        dsc->class_cnt = 1;
-    } else {
+    /*Remove the style first if already exists*/
+    lv_style_list_remove_style(list, style);
 
-        lv_style_t ** new_classes;
-        if(dsc->class_cnt == 1) new_classes = lv_mem_alloc(sizeof(lv_style_t *) * (dsc->class_cnt + 1));
-        else new_classes = lv_mem_realloc(dsc->classes, sizeof(lv_style_t *) * (dsc->class_cnt + 1));
-        LV_ASSERT_MEM(new_classes);
-        if(new_classes == NULL) {
-            LV_LOG_WARN("lv_style_dsc_add_class: couldn't add the class");
-            return;
-        }
-
-        if(dsc->class_cnt == 1) new_classes[0] = (lv_style_t*)dsc->classes;
-        new_classes[dsc->class_cnt] = class;
-
-        dsc->class_cnt++;
-        dsc->classes = new_classes;
+    lv_style_t ** new_classes;
+    if(list->style_cnt == 0) new_classes = lv_mem_alloc(sizeof(lv_style_t *));
+    else new_classes = lv_mem_realloc(list->style_list, sizeof(lv_style_t *) * (list->style_cnt + 1));
+    LV_ASSERT_MEM(new_classes);
+    if(new_classes == NULL) {
+        LV_LOG_WARN("lv_style_list_add_style: couldn't add the class");
+        return;
     }
-}
 
-void lv_style_dsc_remove_class(lv_style_dsc_t * dsc, lv_style_t * class)
-{
-    if(dsc->class_cnt == 0) return;
-    if(dsc->class_cnt == 1) {
-        if((lv_style_t*)dsc->classes == class) {
-            dsc->classes = NULL;
-            dsc->class_cnt = 0;
-        }
-    } else {
-        lv_style_t ** new_classes = lv_mem_realloc(dsc->classes, sizeof(lv_style_t *) * (dsc->class_cnt - 1));
-        LV_ASSERT_MEM(new_classes);
-        if(new_classes == NULL) {
-            LV_LOG_WARN("lv_style_dsc_remove_class: couldn't remove the class");
-            return;
-        }
-        uint8_t i,j;
-        for(i = 0, j = 0; i < dsc->class_cnt; i++) {
-            if(dsc->classes[i] == class) continue;
-            new_classes[j] = dsc->classes[i];
-            j++;
-
-        }
-
-        dsc->class_cnt--;
-        dsc->classes = new_classes;
+    /*Make space for the new style at the beginning. Leave local style if exists*/
+    uint8_t i;
+    uint8_t first_style = list->has_local ? 1 : 0;
+    for(i = list->style_cnt; i > first_style; i--) {
+        new_classes[i] = new_classes[i - 1];
     }
+
+    new_classes[first_style] = style;
+    list->style_cnt++;
+    list->style_list = new_classes;
 }
 
-void lv_style_dsc_reset(lv_style_dsc_t * style_dsc)
+void lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * style)
 {
-    if(style_dsc->class_cnt > 1) lv_mem_free(style_dsc->classes);
-    style_dsc->classes = NULL;
-    style_dsc->class_cnt = 0;
-    lv_style_reset(&style_dsc->local);
+    if(list->style_cnt == 0) return;
+
+    /*Check if the style really exists here*/
+    uint8_t i;
+    bool found = false;
+    for(i = 0; i < list->style_cnt; i++) {
+        if(list->style_list[i] == style) {
+            found = true;
+            break;
+        }
+    }
+    if(found == false) return;
+
+    if(list->style_cnt == 1) {
+        lv_mem_free(list->style_list);
+        list->style_list = NULL;
+        list->style_cnt = 0;
+        list->has_local = 0;
+        return;
+    }
+
+    lv_style_t ** new_classes = lv_mem_realloc(list->style_list, sizeof(lv_style_t *) * (list->style_cnt - 1));
+    LV_ASSERT_MEM(new_classes);
+    if(new_classes == NULL) {
+        LV_LOG_WARN("lv_style_list_remove_style: couldn't reallocate class list");
+        return;
+    }
+    uint8_t j;
+    for(i = 0, j = 0; i < list->style_cnt; i++) {
+        if(list->style_list[i] == style) continue;
+        new_classes[j] = list->style_list[i];
+        j++;
+
+    }
+
+    list->style_cnt--;
+    list->style_list = new_classes;
+}
+
+void lv_style_list_reset(lv_style_list_t * list)
+{
+    if(list->has_local) {
+        lv_style_t * local = lv_style_list_get_style(list, 0);
+        lv_style_reset(local);
+        lv_mem_free(local);
+    }
+    if(list->style_cnt > 0) lv_mem_free(list->style_list);
+    list->style_list = NULL;
+    list->style_cnt = 0;
+    list->has_local = 0;
 }
 
 
@@ -245,7 +255,7 @@ void lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa
     memcpy(style->map + style->size - sizeof(lv_opa_t), &opa, sizeof(lv_opa_t));
 }
 
-void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, void * p)
+void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void * p)
 {
     int32_t id = get_property_index(style, prop);
     /*The property already exists but not sure it's state is the same*/
@@ -360,12 +370,37 @@ int16_t lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, voi
         return attr_act.bits.state & attr_goal.bits.state;
     }
 }
-uint32_t prop_fooled[256];
 
-lv_res_t lv_style_dsc_get_int(lv_style_dsc_t * dsc, lv_style_property_t prop, lv_style_int_t * value)
+
+void lv_style_list_set_local_int(lv_style_list_t * list, lv_style_property_t prop, lv_style_int_t value)
 {
-    if(dsc == NULL) return LV_RES_INV;
-    if(dsc->local.map == NULL && dsc->classes == NULL) return LV_RES_INV;
+    lv_style_t * local = get_local_style(list);
+    lv_style_set_int(local, prop, value);
+}
+
+void lv_style_list_set_local_opa(lv_style_list_t * list, lv_style_property_t prop, lv_opa_t value)
+{
+    lv_style_t * local = get_local_style(list);
+    lv_style_set_opa(local, prop, value);
+}
+
+void lv_style_list_set_local_color(lv_style_list_t * list, lv_style_property_t prop, lv_color_t value)
+{
+    lv_style_t * local = get_local_style(list);
+    lv_style_set_color(local, prop, value);
+}
+
+void lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t prop, const void * value)
+{
+    lv_style_t * local = get_local_style(list);
+    lv_style_set_ptr(local, prop, value);
+}
+
+
+lv_res_t lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop, lv_style_int_t * value)
+{
+    if(list == NULL) return LV_RES_INV;
+    if(list->style_list == NULL) return LV_RES_INV;
 
     lv_style_attr_t attr;
     attr.full = prop >> 8;
@@ -375,22 +410,10 @@ lv_res_t lv_style_dsc_get_int(lv_style_dsc_t * dsc, lv_style_property_t prop, lv
     int16_t weight = -1;
 
     lv_style_int_t value_act;
-    weight_act = lv_style_get_int(&dsc->local, prop, &value_act);
-
-    /*On perfect match return the value immediately*/
-    if(weight_act == weight_goal) {
-        *value = value_act;
-        return LV_RES_OK;
-    }
-    /*If the found ID is better the current candidate then use it*/
-    else if(weight_act > weight) {
-        weight =  weight_act;
-        *value = value_act;
-    }
 
     int16_t ci;
-    for(ci = dsc->class_cnt - 1; ci >= 0; ci--) {
-        lv_style_t * class = lv_style_dsc_get_class(dsc, ci);
+    for(ci = 0; ci < list->style_cnt; ci++) {
+        lv_style_t * class = lv_style_list_get_style(list, ci);
         weight_act = lv_style_get_int(class, prop, &value_act);
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
@@ -404,19 +427,16 @@ lv_res_t lv_style_dsc_get_int(lv_style_dsc_t * dsc, lv_style_property_t prop, lv
         }
     }
 
-    if(weight >= 0) {
-        prop_fooled[prop&0xFF]++;
-        return LV_RES_OK;
-    }
+    if(weight >= 0) return LV_RES_OK;
     else return LV_RES_INV;
 
 }
 
 
-lv_res_t lv_style_dsc_get_color(lv_style_dsc_t * dsc, lv_style_property_t prop, lv_color_t * value)
+lv_res_t lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t prop, lv_color_t * value)
 {
-    if(dsc == NULL) return LV_RES_INV;
-    if(dsc->local.map == NULL && dsc->classes == NULL) return LV_RES_INV;
+    if(list == NULL) return LV_RES_INV;
+    if(list->style_list == NULL) return LV_RES_INV;
 
     lv_style_attr_t attr;
     attr.full = prop >> 8;
@@ -426,22 +446,10 @@ lv_res_t lv_style_dsc_get_color(lv_style_dsc_t * dsc, lv_style_property_t prop, 
     int16_t weight = -1;
 
     lv_color_t value_act;
-    weight_act = lv_style_get_color(&dsc->local, prop, &value_act);
-
-    /*On perfect match return the value immediately*/
-    if(weight_act == weight_goal) {
-        *value = value_act;
-        return LV_RES_OK;
-    }
-    /*If the found ID is better the current candidate then use it*/
-    else if(weight_act > weight) {
-        weight =  weight_act;
-        *value = value_act;
-    }
 
     int16_t ci;
-    for(ci = dsc->class_cnt - 1; ci >= 0; ci--) {
-        lv_style_t * class = lv_style_dsc_get_class(dsc, ci);
+    for(ci = 0; ci < list->style_cnt; ci++) {
+        lv_style_t * class = lv_style_list_get_style(list, ci);
         weight_act = lv_style_get_color(class, prop, &value_act);
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
@@ -455,19 +463,16 @@ lv_res_t lv_style_dsc_get_color(lv_style_dsc_t * dsc, lv_style_property_t prop, 
         }
     }
 
-    if(weight >= 0) {
-        prop_fooled[prop&0xFF]++;
-        return LV_RES_OK;
-    }
+    if(weight >= 0)  return LV_RES_OK;
     else return LV_RES_INV;
 }
 
 
 
-lv_res_t lv_style_dsc_get_opa(lv_style_dsc_t * dsc, lv_style_property_t prop, lv_opa_t * value)
+lv_res_t lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop, lv_opa_t * value)
 {
-    if(dsc == NULL) return LV_RES_INV;
-    if(dsc->local.map == NULL && dsc->classes == NULL) return LV_RES_INV;
+    if(list == NULL) return LV_RES_INV;
+    if(list->style_list == NULL) return LV_RES_INV;
 
     lv_style_attr_t attr;
     attr.full = prop >> 8;
@@ -476,23 +481,11 @@ lv_res_t lv_style_dsc_get_opa(lv_style_dsc_t * dsc, lv_style_property_t prop, lv
     int16_t weight_act;
     int16_t weight = -1;
 
-    lv_opa_t value_act;
-    weight_act = lv_style_get_opa(&dsc->local, prop, &value_act);
-
-    /*On perfect match return the value immediately*/
-    if(weight_act == weight_goal) {
-        *value = value_act;
-        return LV_RES_OK;
-    }
-    /*If the found ID is better the current candidate then use it*/
-    else if(weight_act > weight) {
-        weight =  weight_act;
-        *value = value_act;
-    }
+    lv_opa_t value_act = LV_OPA_TRANSP;
 
     int16_t ci;
-    for(ci = dsc->class_cnt - 1; ci >= 0; ci--) {
-        lv_style_t * class = lv_style_dsc_get_class(dsc, ci);
+    for(ci = 0; ci < list->style_cnt; ci++) {
+        lv_style_t * class = lv_style_list_get_style(list, ci);
         weight_act = lv_style_get_opa(class, prop, &value_act);
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
@@ -506,18 +499,15 @@ lv_res_t lv_style_dsc_get_opa(lv_style_dsc_t * dsc, lv_style_property_t prop, lv
         }
     }
 
-    if(weight >= 0) {
-        prop_fooled[prop&0xFF]++;
-        return LV_RES_OK;
-    }
+    if(weight >= 0)  return LV_RES_OK;
     else return LV_RES_INV;
 }
 
 
-lv_res_t lv_style_dsc_get_ptr(lv_style_dsc_t * dsc, lv_style_property_t prop, void ** value)
+lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop, void ** value)
 {
-    if(dsc == NULL) return LV_RES_INV;
-    if(dsc->local.map == NULL && dsc->classes == NULL) return LV_RES_INV;
+    if(list == NULL) return LV_RES_INV;
+    if(list->style_list == NULL) return LV_RES_INV;
 
     lv_style_attr_t attr;
     attr.full = prop >> 8;
@@ -527,22 +517,10 @@ lv_res_t lv_style_dsc_get_ptr(lv_style_dsc_t * dsc, lv_style_property_t prop, vo
     int16_t weight = -1;
 
     void * value_act = NULL;
-    weight_act = lv_style_get_ptr(&dsc->local, prop, &value_act);
-
-    /*On perfect match return the value immediately*/
-    if(weight_act == weight_goal) {
-        *value = value_act;
-        return LV_RES_OK;
-    }
-    /*If the found ID is better the current candidate then use it*/
-    else if(weight_act > weight) {
-        weight =  weight_act;
-        *value = value_act;
-    }
 
     int16_t ci;
-    for(ci = dsc->class_cnt - 1; ci >= 0; ci--) {
-        lv_style_t * class = lv_style_dsc_get_class(dsc, ci);
+    for(ci = 0; ci < list->style_cnt; ci++) {
+        lv_style_t * class = lv_style_list_get_style(list, ci);
         weight_act = lv_style_get_ptr(class, prop, &value_act);
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
@@ -556,10 +534,7 @@ lv_res_t lv_style_dsc_get_ptr(lv_style_dsc_t * dsc, lv_style_property_t prop, vo
         }
     }
 
-    if(weight >= 0) {
-        prop_fooled[prop&0xFF]++;
-        return LV_RES_OK;
-    }
+    if(weight >= 0)  return LV_RES_OK;
     else return LV_RES_INV;
 }
 
@@ -600,8 +575,6 @@ void lv_style_anim_set_styles(lv_anim_t * a, lv_style_t * to_anim, const lv_styl
  *   STATIC FUNCTIONS
  **********************/
 
-static uint32_t cnt = 0;
-static uint32_t stat[256];
 static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop)
 {
     uint8_t id_to_find = prop & 0xFF;
@@ -610,27 +583,6 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
 
     int16_t weight = -1;
     int16_t id_guess = -1;
-
-    stat[id_to_find]++;
-
-    cnt++;
-    if(cnt > 100000) {
-        cnt = 0;
-        uint32_t i;
-
-        printf("\nQuerry:\n");
-        for(i = 0; i < 256; i++) {
-            if(stat[i]) printf("%02x: %d\n", i, stat[i]);
-        }
-        memset(stat, 0x00, sizeof(stat));
-
-//        printf("\nFooled:\n");
-//        for(i = 0; i < 256; i++) {
-//            if(prop_fooled[i]) printf("%02x: %d\n", i, prop_fooled[i]);
-//        }
-        memset(prop_fooled, 0x00, sizeof(stat));
-//        printf("\n");
-    }
 
     static const uint8_t size[16] = {
     		sizeof(lv_style_int_t) + sizeof(lv_style_property_t),
@@ -686,6 +638,28 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
 
     return id_guess;
 }
+
+
+static lv_style_t * get_local_style(lv_style_list_t * list)
+{
+
+    if(list->has_local) return lv_style_list_get_style(list, 0);
+
+
+    lv_style_t * local_style = lv_mem_alloc(sizeof(lv_style_t));
+    LV_ASSERT_MEM(local_style);
+    if(local_style == NULL) {
+        LV_LOG_WARN("get_local_style: couldn't create local style");
+        return NULL;
+    }
+    lv_style_init(local_style);
+
+    lv_style_list_add_style(list, local_style);
+    list->has_local = 1;
+
+    return local_style;
+}
+
 
 #if LV_USE_ANIMATION
 

@@ -61,7 +61,7 @@ typedef struct
     uint16_t col_cnt;
     uint16_t row_cnt;
     char ** cell_data;
-    lv_style_dsc_t cell_style[LV_TABLE_CELL_STYLE_CNT];
+    lv_style_list_t cell_style[LV_TABLE_CELL_STYLE_CNT];
     lv_coord_t col_w[LV_TABLE_COL_MAX];
 } lv_table_ext_t;
 

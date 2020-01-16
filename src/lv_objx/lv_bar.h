@@ -76,7 +76,7 @@ typedef struct
 	lv_bar_anim_t start_value_anim;
 #endif
 	uint8_t type : 2;			/*Type of bar*/
-    lv_style_dsc_t style_indic; /*Style of the indicator*/
+    lv_style_list_t style_indic; /*Style of the indicator*/
 } lv_bar_ext_t;
 
 /** Bar parts */

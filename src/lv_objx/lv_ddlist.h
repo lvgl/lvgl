@@ -43,7 +43,7 @@ typedef struct
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * label;             /*Label for the options*/
-    lv_style_dsc_t style_sel; /*Style of the selected option*/
+    lv_style_list_t style_sel; /*Style of the selected option*/
     const char * symbol;            /*Arrow or other icon when the drop-down list is closed*/
     uint16_t option_cnt;          /*Number of options*/
     uint16_t sel_opt_id;          /*Index of the current option*/

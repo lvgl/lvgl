@@ -49,7 +49,7 @@ typedef struct {
  **********************/
 static lv_design_res_t lv_chart_design(lv_obj_t * chart, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_chart_get_style(lv_obj_t * chart, uint8_t part);
+static lv_style_list_t * lv_chart_get_style(lv_obj_t * chart, uint8_t part);
 
 static void draw_series_bg(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * mask);
 static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area);
@@ -120,8 +120,8 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->secondary_y_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
 
 
-    lv_style_dsc_init(&ext->style_series_bg);
-    lv_style_dsc_init(&ext->style_series);
+    lv_style_list_init(&ext->style_series_bg);
+    lv_style_list_init(&ext->style_series);
 
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_chart);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_chart);
@@ -133,7 +133,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_size(new_chart, LV_DPI * 3, LV_DPI * 2);
 
-        lv_style_dsc_reset(&new_chart->style_dsc);
+        lv_style_list_reset(&new_chart->style_dsc);
         lv_obj_add_style_theme(new_chart, LV_CHART_PART_BG, LV_THEME_CHART_BG);
         lv_obj_add_style_theme(new_chart, LV_CHART_PART_SERIES_BG, LV_THEME_CHART_SERIES_BG);
         lv_obj_add_style_theme(new_chart, LV_CHART_PART_SERIES, LV_THEME_CHART_SERIES);
@@ -665,12 +665,12 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
  * @param part the part of the chart. (LV_CHART_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_chart_get_style(lv_obj_t * chart, uint8_t part)
+static lv_style_list_t * lv_chart_get_style(lv_obj_t * chart, uint8_t part)
 {
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
 
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_CHART_PART_BG:

@@ -38,7 +38,7 @@
  **********************/
 static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * param);
 static lv_res_t tabview_scrl_signal(lv_obj_t * tabview_scrl, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_tabview_get_style(lv_obj_t * tabview, uint8_t part);
+static lv_style_list_t * lv_tabview_get_style(lv_obj_t * tabview, uint8_t part);
 
 static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event);
 static void tabview_realign(lv_obj_t * tabview);
@@ -133,11 +133,11 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_page_set_sb_mode(ext->content, LV_SB_MODE_OFF);
         lv_obj_set_drag_dir(lv_page_get_scrl(ext->content), LV_DRAG_DIR_ONE);
 
-        lv_style_dsc_reset(lv_obj_get_style(ext->content, LV_PAGE_PART_BG));
-        lv_style_dsc_reset(lv_obj_get_style(ext->content, LV_PAGE_PART_SCRL));
-        lv_style_dsc_reset(lv_obj_get_style(new_tabview, LV_TABVIEW_PART_INDIC));
-        lv_style_dsc_reset(lv_obj_get_style(new_tabview, LV_TABVIEW_PART_BTNS));
-        lv_style_dsc_reset(lv_obj_get_style(new_tabview, LV_TABVIEW_PART_BTNS_BG));
+        lv_style_list_reset(lv_obj_get_style(ext->content, LV_PAGE_PART_BG));
+        lv_style_list_reset(lv_obj_get_style(ext->content, LV_PAGE_PART_SCRL));
+        lv_style_list_reset(lv_obj_get_style(new_tabview, LV_TABVIEW_PART_INDIC));
+        lv_style_list_reset(lv_obj_get_style(new_tabview, LV_TABVIEW_PART_BTNS));
+        lv_style_list_reset(lv_obj_get_style(new_tabview, LV_TABVIEW_PART_BTNS_BG));
 
         lv_obj_reset_style(ext->content, LV_PAGE_PART_BG);
         _ot(new_tabview, LV_TABVIEW_PART_BG_SCRL, TABVIEW_BG_SCRL);
@@ -219,8 +219,8 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_obj_t * h = lv_page_create(ext->content, NULL);
     lv_obj_set_size(h, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
     lv_page_set_sb_mode(h, LV_SB_MODE_AUTO);
-    lv_style_dsc_reset(lv_obj_get_style(h, LV_PAGE_PART_BG));
-    lv_style_dsc_reset(lv_obj_get_style(h, LV_PAGE_PART_SCRL));
+    lv_style_list_reset(lv_obj_get_style(h, LV_PAGE_PART_BG));
+    lv_style_list_reset(lv_obj_get_style(h, LV_PAGE_PART_SCRL));
     _ot(h, LV_PAGE_PART_BG, TABVIEW_TAB_BG);
     _ot(h, LV_PAGE_PART_SCRL, TABVIEW_TAB_SCRL);
     lv_page_set_scroll_propagation(h, true);
@@ -735,12 +735,12 @@ static lv_res_t tabview_scrl_signal(lv_obj_t * tabview_scrl, lv_signal_t sign, v
  * @param part the part from `lv_tabview_part_t`. (LV_TABVIEW_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_tabview_get_style(lv_obj_t * tabview, uint8_t part)
+static lv_style_list_t * lv_tabview_get_style(lv_obj_t * tabview, uint8_t part)
 {
     LV_ASSERT_OBJ(tabview, LV_OBJX_NAME);
 
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_TABVIEW_PART_BG:

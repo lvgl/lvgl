@@ -274,7 +274,7 @@ uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn);
  */
 uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn);
 
-lv_style_dsc_t * lv_btn_get_style(lv_obj_t * cont, uint8_t type);
+lv_style_list_t * lv_btn_get_style(lv_obj_t * cont, uint8_t type);
 
 /**********************
  *      MACROS

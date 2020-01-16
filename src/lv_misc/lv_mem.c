@@ -244,6 +244,21 @@ void lv_mem_free(const void * data)
 
 void * lv_mem_realloc(void * data_p, size_t new_size)
 {
+
+#ifdef LV_ARCH_64
+    /*Round the size up to 8*/
+    if(new_size & 0x7) {
+        new_size = new_size & (~0x7);
+        new_size += 8;
+    }
+#else
+    /*Round the size up to 4*/
+    if(new_size & 0x3) {
+        new_size = new_size & (~0x3);
+        new_size += 4;
+    }
+#endif
+
     /*data_p could be previously freed pointer (in this case it is invalid)*/
     if(data_p != NULL) {
         lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data_p - sizeof(lv_mem_header_t));
@@ -336,7 +351,7 @@ void lv_mem_defrag(void)
 #endif
 }
 
-void lv_mem_test(void)
+lv_res_t lv_mem_test(void)
 {
     lv_mem_ent_t * e;
     e = ent_get_next(NULL);
@@ -344,10 +359,12 @@ void lv_mem_test(void)
         if(e->header.s.d_size > 200000) {
             printf("mem err\n");
             while(1);
+            return LV_RES_INV;
         }
         e = ent_get_next(e);
     }
 
+    return LV_RES_OK;
 }
 
 /**

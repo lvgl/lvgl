@@ -21,6 +21,10 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+uint32_t custom_tick_get(void);
+#define LV_TICK_CUSTOM_SYS_TIME_EXPR custom_tick_get()
+
 typedef int16_t lv_coord_t;
 typedef void * lv_disp_drv_user_data_t;             /*Type of user data in the display driver*/
 typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the input device driver*/

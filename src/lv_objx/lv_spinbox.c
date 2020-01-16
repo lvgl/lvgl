@@ -27,7 +27,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * param);
-static lv_style_dsc_t * lv_spinbox_get_style(lv_obj_t * ta, uint8_t part);
+static lv_style_list_t * lv_spinbox_get_style(lv_obj_t * ta, uint8_t part);
 static void lv_spinbox_updatevalue(lv_obj_t * spinbox);
 
 /**********************
@@ -408,12 +408,12 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
  * @param part the part from `lv_spinbox_part_t`. (LV_SPINBOX_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_dsc_t * lv_spinbox_get_style(lv_obj_t * ta, uint8_t part)
+static lv_style_list_t * lv_spinbox_get_style(lv_obj_t * ta, uint8_t part)
 {
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(ta);
-    lv_style_dsc_t * style_dsc_p;
+    lv_style_list_t * style_dsc_p;
 
     switch(part) {
     case LV_SPINBOX_PART_BG:
