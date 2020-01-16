@@ -63,7 +63,6 @@ static void create_delete_change_parent(void)
     lv_obj_t * obj = lv_obj_create(lv_scr_act(), NULL);
     lv_test_assert_int_eq(1, lv_obj_count_children(lv_scr_act()), "Screen's children count after creation");
     lv_test_assert_int_eq(0, lv_obj_count_children(obj), "New object's children count after creation");
-    lv_test_assert_img_eq("lv_test_obj_1_1.png", "Draw test");
 
     lv_test_print("Delete the created object");
     lv_obj_del(obj);

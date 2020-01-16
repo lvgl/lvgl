@@ -748,7 +748,7 @@ static lv_style_list_t * lv_ddlist_get_style(lv_obj_t * ddlist, uint8_t part)
 
     switch(part) {
     case LV_DDLIST_PART_BG:
-        style_dsc_p = &ddlist->style_dsc;
+        style_dsc_p = &ddlist->style_list;
         break;
     case LV_DDLIST_PART_SCRL:
         style_dsc_p = lv_obj_get_style(ext->page.scrl, LV_CONT_PART_MAIN);

@@ -911,7 +911,7 @@ lv_style_list_t * lv_label_get_style(lv_obj_t * label, uint8_t type)
     lv_style_list_t * style_dsc_p;
     switch(type) {
     case LV_LABEL_PART_MAIN:
-        style_dsc_p = &label->style_dsc;
+        style_dsc_p = &label->style_list;
         break;
     default:
         style_dsc_p = NULL;

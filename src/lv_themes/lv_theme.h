@@ -154,13 +154,11 @@ lv_theme_t * lv_theme_get_act(void);
 
 lv_style_t * lv_theme_get_style(lv_theme_style_t name);
 
-void lv_obj_add_style_theme(void * obj, uint8_t part, lv_theme_style_t name);
-
 /**********************
  *    MACROS
  **********************/
 #define _t(name) lv_theme_get_style(LV_THEME_ ## name)
-#define _ot(obj, part, name) lv_obj_add_style_class(obj, part, _t(name))
+#define _ot(obj, part, name) lv_obj_add_style(obj, part, _t(name))
 
 /**********************
  *     POST INCLUDE

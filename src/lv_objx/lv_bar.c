@@ -620,7 +620,7 @@ static lv_style_list_t * lv_bar_get_style(lv_obj_t * bar, uint8_t part)
 
     switch(part) {
     case LV_BAR_PART_BG:
-        style_dsc_p = &bar->style_dsc;
+        style_dsc_p = &bar->style_list;
         break;
     case LV_BAR_PART_INDIC:
         style_dsc_p = &ext->style_indic;

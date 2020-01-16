@@ -93,7 +93,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
 
         /*Set the default styles*/
         lv_obj_reset_style(new_btn, LV_BTN_PART_MAIN);
-        lv_obj_add_style_class(new_btn, LV_BTN_PART_MAIN, _t(BTN));
+        lv_obj_add_style(new_btn, LV_BTN_PART_MAIN, _t(BTN));
     }
     /*Copy 'copy'*/
     else {
@@ -215,7 +215,7 @@ lv_style_list_t * lv_btn_get_style(lv_obj_t * cont, uint8_t type)
     lv_style_list_t * style_dsc_p;
     switch(type) {
     case LV_BTN_PART_MAIN:
-        style_dsc_p = &cont->style_dsc;
+        style_dsc_p = &cont->style_list;
         break;
     default:
         style_dsc_p = NULL;

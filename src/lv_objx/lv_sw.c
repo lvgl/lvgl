@@ -242,7 +242,7 @@ static lv_style_list_t * lv_sw_get_style(lv_obj_t * sw, uint8_t part)
 
     switch(part) {
     case LV_SW_PART_BG:
-        style_dsc_p = &sw->style_dsc;
+        style_dsc_p = &sw->style_list;
         break;
     case LV_SW_PART_INDIC:
         style_dsc_p = &ext->slider.bar.style_indic;

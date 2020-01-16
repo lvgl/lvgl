@@ -171,7 +171,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
     if(ancestor_btn_signal == NULL) ancestor_btn_signal = lv_obj_get_signal_cb(liste);
 
     /*Set the default styles*/
-    lv_style_list_reset(&liste->style_dsc);
+    lv_style_list_reset(&liste->style_list);
     _ot(liste, LV_BTN_PART_MAIN, LIST_BTN);
 
     lv_page_glue_obj(liste, true);
@@ -919,10 +919,10 @@ static lv_style_list_t * lv_list_get_style(lv_obj_t * list, uint8_t part)
 
     switch(part) {
     case LV_LIST_PART_BG:
-        style_dsc_p = &list->style_dsc;
+        style_dsc_p = &list->style_list;
         break;
     case LV_LIST_PART_SCRL:
-        style_dsc_p = &ext->page.scrl->style_dsc;
+        style_dsc_p = &ext->page.scrl->style_list;
         break;
     case LV_LIST_PART_SCRLBAR:
         style_dsc_p = &ext->page.sb.style;

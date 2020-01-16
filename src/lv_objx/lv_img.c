@@ -634,7 +634,7 @@ static lv_style_list_t * lv_img_get_style(lv_obj_t * img, uint8_t type)
     lv_style_list_t * style_dsc_p;
     switch(type) {
     case LV_IMG_PART_MAIN:
-        style_dsc_p = &img->style_dsc;
+        style_dsc_p = &img->style_list;
         break;
     default:
         style_dsc_p = NULL;

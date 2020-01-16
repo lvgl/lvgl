@@ -209,7 +209,7 @@ static lv_style_list_t * lv_cb_get_style(lv_obj_t * cb, uint8_t type)
     lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
     switch(type) {
     case LV_CB_PART_BG:
-        style_dsc_p = &cb->style_dsc;
+        style_dsc_p = &cb->style_list;
         break;
     case LV_CB_PART_BULLET:
         style_dsc_p = lv_obj_get_style(ext->bullet, LV_BTN_PART_MAIN);

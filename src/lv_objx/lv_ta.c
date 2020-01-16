@@ -1550,7 +1550,7 @@ static lv_style_list_t * lv_ta_get_style(lv_obj_t * ta, uint8_t part)
 
     switch(part) {
     case LV_TA_PART_BG:
-        style_dsc_p = &ta->style_dsc;
+        style_dsc_p = &ta->style_list;
         break;
     case LV_TA_PART_SCRLBAR:
         style_dsc_p = &ext->page.sb.style;

@@ -1084,7 +1084,7 @@ static lv_style_list_t * lv_page_get_style(lv_obj_t * page, uint8_t part)
 
     switch(part) {
     case LV_PAGE_PART_BG:
-        style_dsc_p = &page->style_dsc;
+        style_dsc_p = &page->style_list;
         break;
     case LV_PAGE_PART_SCRL:
         style_dsc_p = lv_obj_get_style(ext->scrl, LV_CONT_PART_MAIN);

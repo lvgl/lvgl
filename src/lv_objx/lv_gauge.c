@@ -102,7 +102,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_gauge_set_critical_value(new_gauge, 80);
         lv_obj_set_size(new_gauge, 2 * LV_DPI, 2 * LV_DPI);
 
-        lv_style_list_reset(&new_gauge->style_dsc);
+        lv_style_list_reset(&new_gauge->style_list);
         lv_style_list_init(&ext->style_strong);
         _ot(new_gauge, LV_GAUGE_PART_MAIN, GAUGE);
         _ot(new_gauge, LV_GAUGE_PART_STRONG, GAUGE_STRONG);
@@ -419,7 +419,7 @@ static lv_style_list_t * lv_gauge_get_style(lv_obj_t * gauge, uint8_t part)
 
     switch(part) {
     case LV_GAUGE_PART_MAIN:
-        style_dsc_p = &gauge->style_dsc;
+        style_dsc_p = &gauge->style_list;
         break;
     case LV_GAUGE_PART_STRONG:
         style_dsc_p = &ext->style_strong;

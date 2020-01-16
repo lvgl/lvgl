@@ -128,8 +128,8 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
 
         /*Different styles will be used from the styles while rendering so disable caching*/
-        lv_style_list_reset(&new_calendar->style_dsc);
-        lv_style_list_add_style(&new_calendar->style_dsc, lv_theme_get_style(LV_THEME_CALENDAR_BG));
+        lv_style_list_reset(&new_calendar->style_list);
+        lv_style_list_add_style(&new_calendar->style_list, lv_theme_get_style(LV_THEME_CALENDAR_BG));
         lv_style_list_add_style(&ext->style_date_nums, lv_theme_get_style(LV_THEME_CALENDAR_DATE_NUMS));
         lv_style_list_add_style(&ext->style_day_names, lv_theme_get_style(LV_THEME_CALENDAR_DAY_NAMES));
         lv_style_list_add_style(&ext->style_header, lv_theme_get_style(LV_THEME_CALENDAR_HEADER));
@@ -547,7 +547,7 @@ static lv_style_list_t * lv_calendar_get_style(lv_obj_t * calendar, uint8_t part
 
     switch(part) {
     case LV_CALENDAR_PART_BG:
-        style_dsc_p = &calendar->style_dsc;
+        style_dsc_p = &calendar->style_list;
         break;
     case LV_CALENDAR_PART_HEADER:
         style_dsc_p = &ext->style_header;

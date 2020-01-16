@@ -84,7 +84,7 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new arc arc*/
     if(copy == NULL) {
         lv_style_list_init(&ext->style_arc);
-        lv_style_list_reset(&new_arc->style_dsc);
+        lv_style_list_reset(&new_arc->style_list);
         _ot(new_arc, LV_ARC_PART_BG, ARC_BG);
         _ot(new_arc, LV_ARC_PART_ARC, ARC);
 
@@ -286,7 +286,7 @@ static lv_style_list_t * lv_arc_get_style(lv_obj_t * arc, uint8_t part)
 
     switch(part) {
     case LV_ARC_PART_BG:
-        style_dsc_p = &arc->style_dsc;
+        style_dsc_p = &arc->style_list;
         break;
     case LV_ARC_PART_ARC:
         style_dsc_p = &ext->style_arc;

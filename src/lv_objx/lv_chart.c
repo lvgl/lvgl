@@ -133,10 +133,10 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_size(new_chart, LV_DPI * 3, LV_DPI * 2);
 
-        lv_style_list_reset(&new_chart->style_dsc);
-        lv_obj_add_style_theme(new_chart, LV_CHART_PART_BG, LV_THEME_CHART_BG);
-        lv_obj_add_style_theme(new_chart, LV_CHART_PART_SERIES_BG, LV_THEME_CHART_SERIES_BG);
-        lv_obj_add_style_theme(new_chart, LV_CHART_PART_SERIES, LV_THEME_CHART_SERIES);
+        lv_style_list_reset(&new_chart->style_list);
+        lv_obj_add_theme(new_chart, LV_CHART_PART_BG, LV_THEME_CHART_BG);
+        lv_obj_add_theme(new_chart, LV_CHART_PART_SERIES_BG, LV_THEME_CHART_SERIES_BG);
+        lv_obj_add_theme(new_chart, LV_CHART_PART_SERIES, LV_THEME_CHART_SERIES);
 
     } else {
         lv_chart_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
@@ -674,7 +674,7 @@ static lv_style_list_t * lv_chart_get_style(lv_obj_t * chart, uint8_t part)
 
     switch(part) {
     case LV_CHART_PART_BG:
-        style_dsc_p = &chart->style_dsc;
+        style_dsc_p = &chart->style_list;
         break;
     case LV_CHART_PART_SERIES_BG:
         style_dsc_p = &ext->style_series_bg;

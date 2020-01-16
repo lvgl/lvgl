@@ -99,7 +99,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Set the default styles if it's not screen*/
         if(par != NULL) {
             lv_obj_reset_style(new_cont, LV_CONT_PART_MAIN);
-            lv_obj_add_style_class(new_cont, LV_CONT_PART_MAIN, _t(PANEL));
+            lv_obj_add_style(new_cont, LV_CONT_PART_MAIN, _t(PANEL));
         }
     }
     /*Copy an existing object*/
@@ -293,7 +293,7 @@ static lv_style_list_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type)
     lv_style_list_t * style_dsc_p;
     switch(type) {
     case LV_CONT_PART_MAIN:
-        style_dsc_p = &cont->style_dsc;
+        style_dsc_p = &cont->style_list;
         break;
     default:
         style_dsc_p = NULL;

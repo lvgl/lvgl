@@ -484,7 +484,7 @@ static lv_style_list_t * lv_roller_get_style(lv_obj_t * roller, uint8_t part)
 
     switch(part) {
     case LV_ROLLER_PART_BG:
-        style_dsc_p = &roller->style_dsc;
+        style_dsc_p = &roller->style_list;
         break;
     case LV_ROLLER_PART_SCRL:
         style_dsc_p = lv_obj_get_style(ext->ddlist.page.scrl, LV_CONT_PART_MAIN);

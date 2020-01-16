@@ -203,6 +203,8 @@ void lv_style_init(lv_style_t * style);
 
 void lv_style_list_init(lv_style_list_t * style_dsc);
 
+void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * list_src);
+
 void lv_style_list_add_style(lv_style_list_t * style_dsc, lv_style_t * style);
 
 void lv_style_list_remove_style(lv_style_list_t * style_dsc, lv_style_t * class);

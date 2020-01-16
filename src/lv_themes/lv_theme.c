@@ -59,11 +59,6 @@ lv_style_t * lv_theme_get_style(lv_theme_style_t name)
 }
 
 
-void lv_obj_add_style_theme(void * obj, uint8_t part, lv_theme_style_t name)
-{
-    lv_obj_add_style_class(obj, part, lv_theme_get_style(name));
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

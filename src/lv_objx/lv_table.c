@@ -93,12 +93,12 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new table table*/
     if(copy == NULL) {
-        lv_style_list_reset(&new_table->style_dsc);
-        lv_obj_add_style_theme(new_table, LV_TABLE_PART_BG, LV_THEME_TABLE_BG);
-        lv_obj_add_style_theme(new_table, LV_TABLE_PART_CELL1, LV_THEME_TABLE_CELL1);
-        lv_obj_add_style_theme(new_table, LV_TABLE_PART_CELL2, LV_THEME_TABLE_CELL2);
-        lv_obj_add_style_theme(new_table, LV_TABLE_PART_CELL3, LV_THEME_TABLE_CELL3);
-        lv_obj_add_style_theme(new_table, LV_TABLE_PART_CELL4, LV_THEME_TABLE_CELL4);
+        lv_style_list_reset(&new_table->style_list);
+        lv_obj_add_theme(new_table, LV_TABLE_PART_BG, LV_THEME_TABLE_BG);
+        lv_obj_add_theme(new_table, LV_TABLE_PART_CELL1, LV_THEME_TABLE_CELL1);
+        lv_obj_add_theme(new_table, LV_TABLE_PART_CELL2, LV_THEME_TABLE_CELL2);
+        lv_obj_add_theme(new_table, LV_TABLE_PART_CELL3, LV_THEME_TABLE_CELL3);
+        lv_obj_add_theme(new_table, LV_TABLE_PART_CELL4, LV_THEME_TABLE_CELL4);
     }
     /*Copy an existing table*/
     else {
@@ -836,7 +836,7 @@ static lv_style_list_t * lv_table_get_style(lv_obj_t * table, uint8_t part)
 
     switch(part) {
     case LV_TABLE_PART_BG:
-        style_dsc_p = &table->style_dsc;
+        style_dsc_p = &table->style_list;
         break;
     case LV_TABLE_PART_CELL1:
         style_dsc_p = &ext->cell_style[0];

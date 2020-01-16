@@ -23,6 +23,7 @@
 static void empty_style(void);
 static void add_remove_read_prop(void);
 static void cascade(void);
+static void copy(void);
 static void states(void);
 static void mem_leak(void);
 
@@ -48,6 +49,7 @@ void lv_test_style(void)
     empty_style();
     add_remove_read_prop();
     cascade();
+    copy();
     states();
     mem_leak();
 }
@@ -259,6 +261,52 @@ static void cascade(void)
     lv_style_list_reset(&style_list);
 }
 
+static void copy(void)
+{
+    lv_test_print("");
+    lv_test_print("Copy styles and style lists");
+    lv_test_print("---------------------------");
+
+
+    lv_test_print("Copy a style");
+    lv_style_t style_src;
+    lv_style_init(&style_src);
+    lv_style_set_int(&style_src, LV_STYLE_LINE_SPACE, 5);
+
+    lv_style_t style_dest;
+    lv_style_copy(&style_dest, &style_src);
+
+    int16_t weight;
+    lv_style_int_t value;
+
+    weight = lv_style_get_int(&style_dest, LV_STYLE_LINE_SPACE, &value);
+    lv_test_assert_int_eq(0, weight, "Get a copied property from a style");
+    lv_test_assert_int_eq(5, value, "Get the value of a copied from a property");
+
+    lv_test_print("Copy a style list");
+    lv_style_list_t list_src;
+    lv_style_list_init(&list_src);
+    lv_style_list_add_style(&list_src, &style_src);
+    lv_style_list_set_local_int(&list_src, LV_STYLE_LINE_DASH_WIDTH, 20);
+
+    lv_style_list_t list_dest;
+    lv_style_list_copy(&list_dest, &list_src);
+
+    lv_res_t found;
+    found = lv_style_list_get_int(&list_dest, LV_STYLE_LINE_SPACE, &value);
+    lv_test_assert_int_eq(LV_RES_OK, found, "Get a copied property from a list");
+    lv_test_assert_int_eq(5, value, "Get the value of a copied property from a list");
+    found = lv_style_list_get_int(&list_dest, LV_STYLE_LINE_DASH_WIDTH, &value);
+    lv_test_assert_int_eq(LV_RES_OK, found, "Get a copied local property from a list");
+    lv_test_assert_int_eq(20, value, "Get the value of a copied local property from a list");
+
+    /*Clean up*/
+    lv_style_list_reset(&list_dest);
+    lv_style_list_reset(&list_src);
+
+    lv_style_reset(&style_dest);
+    lv_style_reset(&style_src);
+}
 
 static void states(void)
 {

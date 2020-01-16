@@ -140,7 +140,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param btnm pointer to a button matrix object
  * @param map pointer a string array. The last string has to be: "". Use "\n" to make a line break.
  */
-void lv_btnm_set_map(const lv_obj_t * btnm, const char * map[])
+void lv_btnm_set_map(lv_obj_t * btnm, const char * map[])
 {
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
     LV_ASSERT_NULL(map);
@@ -988,7 +988,7 @@ static lv_style_list_t * lv_btnm_get_style(lv_obj_t * btnm, uint8_t part)
 
     switch(part) {
     case LV_BTNM_PART_BG:
-        style_dsc_p = &btnm->style_dsc;
+        style_dsc_p = &btnm->style_list;
         break;
     case LV_BTNM_PART_BTN:
         style_dsc_p = &ext->style_btn;

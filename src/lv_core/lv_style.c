@@ -73,6 +73,9 @@ void lv_style_init(lv_style_t * style)
 void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
 {
     lv_style_init(style_dest);
+
+    if(style_src->map == NULL) return;
+
     style_dest->map = lv_mem_alloc(style_src->size);
     memcpy(style_dest->map, style_src->map, style_src->size);
     style_dest->size = style_src->size;
@@ -83,6 +86,27 @@ void lv_style_list_init(lv_style_list_t * list)
     list->style_list = NULL;
     list->style_cnt = 0;
     list->has_local = 0;
+}
+
+void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * list_src)
+{
+    lv_style_list_init(list_dest);
+
+    if(list_src->style_list == NULL) return;
+
+    if(list_src->has_local == 0) {
+        list_dest->style_list = lv_mem_alloc(list_src->style_cnt * sizeof(lv_style_t *));
+        memcpy(list_dest->style_list, list_src->style_list, list_src->style_cnt * sizeof(lv_style_t *));
+
+        list_dest->style_cnt = list_src->style_cnt;
+    } else {
+        list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 1) * sizeof(lv_style_t *));
+        memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
+        list_dest->style_cnt = list_src->style_cnt - 1;
+
+        lv_style_t * local_style = get_local_style(list_dest);
+        lv_style_copy(local_style, get_local_style(list_src));
+    }
 }
 
 

@@ -26,6 +26,7 @@ extern "C" {
 #include "../lv_misc/lv_bidi.h"
 #include "../lv_hal/lv_hal.h"
 #include "../lv_draw/lv_draw_rect.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -223,7 +224,7 @@ typedef struct _lv_obj_t
     lv_design_cb_t design_cb; /**< Object type specific design function*/
 
     void * ext_attr;            /**< Object type specific extended data*/
-    lv_style_list_t  style_dsc;
+    lv_style_list_t  style_list;
 
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
@@ -499,8 +500,9 @@ void lv_obj_set_style_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t prop
 
 void lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, void * p);
 
-void lv_obj_add_style_class(lv_obj_t * obj, uint8_t type, lv_style_t * style);
+void lv_obj_add_style(lv_obj_t * obj, uint8_t type, lv_style_t * style);
 
+void lv_obj_add_theme(void * obj, uint8_t part, lv_theme_style_t name);
 
 void lv_obj_reset_style(lv_obj_t * obj, uint8_t type);
 
@@ -867,13 +869,13 @@ lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj);
 
 lv_style_list_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t type);
 
-lv_style_int_t lv_obj_get_style_int(lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 
-lv_color_t lv_obj_get_style_color(lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 
-lv_opa_t lv_obj_get_style_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 
-const void * lv_obj_get_style_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+const void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 ///**
 // * Get the style pointer of an object (if NULL get style of the parent)
 // * @param obj pointer to an object

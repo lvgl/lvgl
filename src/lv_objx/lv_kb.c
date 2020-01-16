@@ -463,7 +463,7 @@ static lv_style_list_t * lv_kb_get_style(lv_obj_t * kb, uint8_t part)
 
     switch(part) {
     case LV_KB_PART_BG:
-        style_dsc_p = &kb->style_dsc;
+        style_dsc_p = &kb->style_list;
         break;
     case LV_KB_PART_BTN:
         style_dsc_p = &ext->btnm.style_btn;

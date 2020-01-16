@@ -107,8 +107,8 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_event_cb(new_mbox, lv_mbox_default_event_cb);
 
         /*Set the default styles*/
-        lv_style_list_reset(&new_mbox->style_dsc);
-        lv_obj_add_style_theme(new_mbox, LV_MBOX_PART_BG, LV_THEME_MBOX_BG);
+        lv_style_list_reset(&new_mbox->style_list);
+        lv_obj_add_theme(new_mbox, LV_MBOX_PART_BG, LV_THEME_MBOX_BG);
 
     }
     /*Copy an existing message box*/
@@ -150,12 +150,12 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
     if(ext->btnm == NULL) {
         ext->btnm = lv_btnm_create(mbox, NULL);
 
-        lv_style_list_reset(&ext->btnm->style_dsc);
-        lv_obj_add_style_theme(ext->btnm, LV_BTNM_PART_BG, LV_THEME_MBOX_BTN_BG);
+        lv_style_list_reset(&ext->btnm->style_list);
+        lv_obj_add_theme(ext->btnm, LV_BTNM_PART_BG, LV_THEME_MBOX_BTN_BG);
 
 
         lv_style_list_reset(lv_obj_get_style(ext->btnm, LV_BTNM_PART_BTN));
-        lv_obj_add_style_theme(ext->btnm, LV_BTNM_PART_BTN, LV_THEME_MBOX_BTN);
+        lv_obj_add_theme(ext->btnm, LV_BTNM_PART_BTN, LV_THEME_MBOX_BTN);
     }
 
     lv_btnm_set_map(ext->btnm, btn_map);
@@ -481,7 +481,7 @@ static lv_style_list_t * lv_mbox_get_style(lv_obj_t * mbox, uint8_t part)
 
     switch(part) {
     case LV_MBOX_PART_BG:
-        style_dsc_p = &mbox->style_dsc;
+        style_dsc_p = &mbox->style_list;
         break;
     case LV_MBOX_PART_BTN_BG:
         style_dsc_p = ext->btnm ? lv_obj_get_style(ext->btnm, LV_BTNM_PART_BG) : NULL;
@@ -518,7 +518,9 @@ static void mbox_realign(lv_obj_t * mbox)
         const lv_font_t * font = lv_obj_get_style_ptr(mbox, LV_MBOX_PART_BTN, LV_STYLE_FONT);
 
         lv_coord_t font_h = lv_font_get_line_height(font);
+        lv_mem_test();
         lv_obj_set_size(ext->btnm, w, font_h + btn_top + btn_bottom + bg_top + bg_bottom);
+        lv_mem_test();
     }
 }
 

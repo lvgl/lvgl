@@ -282,14 +282,13 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
     new_obj->ext_attr = NULL;
 
-    lv_style_list_init(&new_obj->style_dsc);
-
-    if(parent != NULL) {
-        lv_obj_add_style_class(new_obj, LV_OBJ_PART_MAIN, _t(PANEL));
+    if(copy == NULL) {
+        lv_style_list_init(&new_obj->style_list);
+        if(parent != NULL) lv_obj_add_theme(new_obj, LV_OBJ_PART_MAIN, LV_THEME_PANEL);
+        else  lv_obj_add_theme(new_obj, LV_OBJ_PART_MAIN, LV_THEME_SCR);
     } else {
-        lv_obj_add_style_class(new_obj, LV_OBJ_PART_MAIN, _t(SCR));
+        lv_style_list_copy(&new_obj->style_list, &copy->style_list);
     }
-
     /*Copy the attributes if required*/
     if(copy != NULL) {
         lv_area_copy(&new_obj->coords, &copy->coords);
@@ -1209,19 +1208,25 @@ void lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t part, lv_style_property_t prop
     lv_obj_refresh_style(obj);
 }
 
-void lv_obj_add_style_class(lv_obj_t * obj, uint8_t part, lv_style_t * style)
+void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style)
 {
     if(style == NULL) return;
 
     lv_style_list_t * style_dsc = lv_obj_get_style(obj, part);
     if(style_dsc == NULL) {
-        LV_LOG_WARN("lv_obj_add_style_class: can't find style with `type`");
+        LV_LOG_WARN("lv_obj_add_style: can't find style with `type`");
         return;
     }
 
     lv_style_list_add_style(style_dsc, style);
 
     lv_obj_refresh_style(obj);
+}
+
+
+void lv_obj_add_theme(void * obj, uint8_t part, lv_theme_style_t name)
+{
+    lv_obj_add_style(obj, part, lv_theme_get_style(name));
 }
 
 void lv_obj_reset_style(lv_obj_t * obj, uint8_t part)
@@ -2060,7 +2065,7 @@ lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj)
 
 lv_style_list_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t part)
 {
-	if(part == LV_OBJ_PART_MAIN) return &obj->style_dsc;
+	if(part == LV_OBJ_PART_MAIN) return &((lv_obj_t*)obj)->style_list;
 
 	lv_get_style_info_t info;
 	info.part = part;
@@ -2075,16 +2080,16 @@ lv_style_list_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t part)
 }
 
 
-lv_style_int_t lv_obj_get_style_int(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
     if(obj->state == obj->prev_state) {
         return lv_obj_get_style_int_core(obj, part, prop);
     } else {
         lv_style_int_t act_int = lv_obj_get_style_int_core(obj, part, prop);
         lv_obj_state_t state_ori = obj->state;
-        obj->state = obj->prev_state;
+        ((lv_obj_t*)obj)->state = obj->prev_state;
         lv_style_int_t prev_int = lv_obj_get_style_int_core(obj, part, prop);
-        obj->state = state_ori;
+        ((lv_obj_t*)obj)->state = state_ori;
 
         if(prop == LV_STYLE_RADIUS) {
             if(act_int == LV_RADIUS_CIRCLE || prev_int == LV_RADIUS_CIRCLE) {
@@ -2108,31 +2113,31 @@ lv_style_int_t lv_obj_get_style_int(lv_obj_t * obj, uint8_t part, lv_style_prope
 
 
 
-lv_color_t lv_obj_get_style_color(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
    if(obj->state == obj->prev_state) {
        return lv_obj_get_style_color_core(obj, part, prop);
    } else {
        lv_color_t act_color = lv_obj_get_style_color_core(obj, part, prop);
        lv_obj_state_t state_ori = obj->state;
-       obj->state = obj->prev_state;
+       ((lv_obj_t*)obj)->state = obj->prev_state;
        lv_color_t prev_color = lv_obj_get_style_color_core(obj, part, prop);
-       obj->state = state_ori;
+       ((lv_obj_t*)obj)->state = state_ori;
 
        return lv_color_mix(act_color, prev_color, obj->state_anim);
    }
 }
 
-lv_opa_t lv_obj_get_style_opa(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
     if(obj->state == obj->prev_state) {
         return lv_obj_get_style_opa_core(obj, part, prop);
     } else {
         lv_opa_t act_opa = lv_obj_get_style_opa_core(obj, part, prop);
         lv_obj_state_t state_ori = obj->state;
-        obj->state = obj->prev_state;
+        ((lv_obj_t*)obj)->state = obj->prev_state;
         lv_opa_t prev_opa = lv_obj_get_style_opa_core(obj, part, prop);
-        obj->state = state_ori;
+        ((lv_obj_t*)obj)->state = state_ori;
 
         if(obj->state_anim >= 255) return act_opa;
         return prev_opa + (((act_opa - prev_opa) * obj->state_anim) >> 8);
@@ -2140,7 +2145,7 @@ lv_opa_t lv_obj_get_style_opa(lv_obj_t * obj, uint8_t part, lv_style_property_t 
 }
 
 
-const void * lv_obj_get_style_ptr(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+const void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
     if(obj->state == obj->prev_state) {
         return lv_obj_get_style_ptr_core(obj, part, prop);
@@ -2148,9 +2153,9 @@ const void * lv_obj_get_style_ptr(lv_obj_t * obj, uint8_t part, lv_style_propert
         if(obj->state_anim > 128) return lv_obj_get_style_ptr_core(obj, part, prop);
 
         lv_obj_state_t state_ori = obj->state;
-        obj->state = obj->prev_state;
-        void * prev_ptr = lv_obj_get_style_ptr_core(obj, part, prop);
-        obj->state = state_ori;
+        ((lv_obj_t*)obj)->state = obj->prev_state;
+        const void * prev_ptr = lv_obj_get_style_ptr_core(obj, part, prop);
+        ((lv_obj_t*)obj)->state = state_ori;
 
         return prev_ptr;
     }
@@ -2785,7 +2790,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     if(sign == LV_SIGNAL_GET_STYLE) {
         lv_get_style_info_t * info = param;
-        if(info->part == LV_OBJ_PART_MAIN) info->result = &obj->style_dsc;
+        if(info->part == LV_OBJ_PART_MAIN) info->result = &obj->style_list;
         else info->result = NULL;
         return LV_RES_OK;
     }
@@ -2851,7 +2856,7 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
 
 /**
  * Refresh the style of all children of an object. (Called recursively)
- * @param style refresh objects only with this style_dsc.
+ * @param style refresh objects only with this style_list.
  * @param obj pointer to an object
  */
 static void report_style_mod_core(void * style, lv_obj_t * obj)
