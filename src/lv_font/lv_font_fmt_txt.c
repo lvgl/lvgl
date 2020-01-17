@@ -475,5 +475,5 @@ static uint8_t rle_next(void)
  */
 static int32_t unicode_list_compare(const void * ref, const void * element)
 {
-    return (*(uint16_t *)ref) - (*(uint16_t *)element);
+    return ((int32_t)(*(uint16_t *)ref)) - ((int32_t)(*(uint16_t *)element));
 }
