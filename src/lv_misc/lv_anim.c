@@ -93,6 +93,11 @@ void lv_anim_create(lv_anim_t * a)
     /* Do not let two animations for the  same 'var' with the same 'fp'*/
     if(a->exec_cb != NULL) lv_anim_del(a->var, a->exec_cb); /*fp == NULL would delete all animations of var*/
 
+    /*If the list is empty the anim task was suspended and it's last run measure is invalid*/
+    if(lv_ll_is_empty(&LV_GC_ROOT(_lv_anim_ll))) {
+        last_task_run = lv_tick_get();
+    }
+
     /*Add the new animation to the animation linked list*/
     lv_anim_t * new_anim = lv_ll_ins_head(&LV_GC_ROOT(_lv_anim_ll));
     LV_ASSERT_MEM(new_anim);
