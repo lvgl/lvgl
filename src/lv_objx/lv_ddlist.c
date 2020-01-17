@@ -593,9 +593,9 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
 {
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
-        uint8_t ** type_p = param;
-        lv_style_list_t ** style_dsc_p = param;
-        *style_dsc_p = lv_ddlist_get_style(ddlist, **type_p);
+        lv_get_style_info_t * info = param;
+        info->result = lv_ddlist_get_style(ddlist, info->part);
+        if(info->result != NULL) return LV_RES_OK;
         return LV_RES_OK;
     }
 
@@ -720,7 +720,8 @@ static lv_res_t lv_ddlist_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * 
          * (The scrollabel is scrolled the "select rectangle" is drawn on the bg too)*/
         lv_style_int_t left = lv_obj_get_style_int(ddlist, LV_DDLIST_PART_BG, LV_STYLE_PAD_LEFT);
         lv_style_int_t right = lv_obj_get_style_int(ddlist, LV_DDLIST_PART_BG, LV_STYLE_PAD_RIGHT);
-        ddlist->ext_draw_pad = LV_MATH_MAX(ddlist->ext_draw_pad, LV_MATH_MAX(left, right));
+        lv_obj_t * scrl = lv_page_get_scrl(ddlist);
+        scrl->ext_draw_pad = LV_MATH_MAX(ddlist->ext_draw_pad, LV_MATH_MAX(left, right));
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
             release_handler(ddlist);
