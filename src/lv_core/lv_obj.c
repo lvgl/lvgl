@@ -199,7 +199,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->coords.y1    = 0;
         new_obj->coords.x2    = lv_disp_get_hor_res(NULL) - 1;
         new_obj->coords.y2    = lv_disp_get_ver_res(NULL) - 1;
-
     }
     /*Create a normal object*/
     else {
@@ -271,6 +270,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->top          = 0;
     new_obj->protect      = LV_PROTECT_NONE;
     new_obj->parent_event = 0;
+    new_obj->gesture_parent = 1;
     new_obj->state = 0;
 
 #if LV_USE_BIDI
@@ -331,6 +331,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->parent_event = copy->parent_event;
 
         new_obj->protect      = copy->protect;
+        new_obj->gesture_parent = copy->gesture_parent;
 
 #if LV_USE_GROUP
         /*Add to the same group*/
@@ -1389,6 +1390,17 @@ void lv_obj_set_drag_parent(lv_obj_t * obj, bool en)
 }
 
 /**
+* Enable to use parent for gesture related operations.
+* If trying to gesture the object the parent will be moved instead
+* @param obj pointer to an object
+* @param en true: enable the 'gesture parent' for the object
+*/
+void lv_obj_set_gesture_parent(lv_obj_t * obj, bool en)
+{
+    obj->gesture_parent = (en == true ? 1 : 0);
+}
+
+/**
  * Propagate the events to the parent too
  * @param obj pointer to an object
  * @param en true: enable the event propagation
@@ -2258,6 +2270,16 @@ bool lv_obj_get_drag_throw(const lv_obj_t * obj)
 bool lv_obj_get_drag_parent(const lv_obj_t * obj)
 {
     return obj->drag_parent == 0 ? false : true;
+}
+
+/**
+* Get the gesture parent attribute of an object
+* @param obj pointer to an object
+* @return true: gesture parent is enabled
+*/
+bool lv_obj_get_gesture_parent(const lv_obj_t * obj)
+{
+    return obj->gesture_parent == 0 ? false : true;
 }
 
 /**

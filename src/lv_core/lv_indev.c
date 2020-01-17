@@ -42,6 +42,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev);
 static void indev_drag(lv_indev_proc_t * proc);
 static void indev_drag_throw(lv_indev_proc_t * proc);
 static lv_obj_t * get_dragged_obj(lv_obj_t * obj);
+static void indev_gesture(lv_indev_proc_t * proc);
 static bool indev_reset_check(lv_indev_proc_t * proc);
 
 /**********************
@@ -240,6 +241,16 @@ void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point)
         point->x = indev->proc.types.pointer.act_point.x;
         point->y = indev->proc.types.pointer.act_point.y;
     }
+}
+
+/**
+* Get the current gesture direct
+* @param indev pointer to an input device
+* @return current gesture direct
+*///zlm
+lv_gesture_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev)
+{
+    return indev->proc.types.pointer.gesture_dir;
 }
 
 /**
@@ -774,6 +785,9 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             proc->types.pointer.drag_sum.x     = 0;
             proc->types.pointer.drag_sum.y     = 0;
             proc->types.pointer.drag_dir = LV_DRAG_DIR_BOTH;
+            proc->types.pointer.gesture_sent   = 0;
+            proc->types.pointer.gesture_sum.x  = 0;
+            proc->types.pointer.gesture_sum.y  = 0;
             proc->types.pointer.vect.x         = 0;
             proc->types.pointer.vect.y         = 0;
 
@@ -829,6 +843,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
         if(indev_act->proc.wait_until_release) return;
 
         indev_drag(proc);
+        indev_gesture(proc);
         if(indev_reset_check(proc)) return;
 
         /*If there is no drag then check for long press time*/
@@ -1019,6 +1034,8 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
         indev->proc.types.pointer.drag_dir = LV_DRAG_DIR_BOTH;
         indev->proc.types.pointer.drag_throw_vect.x = 0;
         indev->proc.types.pointer.drag_throw_vect.y = 0;
+        indev->proc.types.pointer.gesture_sum.x     = 0;
+        indev->proc.types.pointer.gesture_sum.y     = 0;
         indev->proc.reset_query                     = 0;
         indev_obj_act                               = NULL;
     }
@@ -1295,6 +1312,62 @@ static lv_obj_t * get_dragged_obj(lv_obj_t * obj)
 
     return drag_obj;
 }
+
+
+/**
+* Handle the gesture of indev_proc_p->types.pointer.act_obj
+* @param indev pointer to a input device state
+*/
+static void indev_gesture(lv_indev_proc_t * proc)
+{
+
+    if (proc->types.pointer.drag_in_prog) return;
+	if (proc->types.pointer.gesture_sent) return;
+
+	lv_obj_t * gesture_obj = proc->types.pointer.act_obj;
+
+	/*If gesture parent is active check recursively the drag_parent attribute*/
+	while (lv_obj_get_gesture_parent(gesture_obj) != false && gesture_obj != NULL) {
+		gesture_obj = lv_obj_get_parent(gesture_obj);
+	}
+
+	if (gesture_obj == NULL) return;
+
+	if ((LV_MATH_ABS(proc->types.pointer.vect.x) < indev_act->driver.gesture_min_velocity) &&
+		(LV_MATH_ABS(proc->types.pointer.vect.y) < indev_act->driver.gesture_min_velocity)) {
+		proc->types.pointer.gesture_sum.x = 0;
+		proc->types.pointer.gesture_sum.y = 0;
+	}
+
+	/*Count the movement by gesture*/
+	proc->types.pointer.gesture_sum.x += proc->types.pointer.vect.x;
+	proc->types.pointer.gesture_sum.y += proc->types.pointer.vect.y;
+
+	if ((LV_MATH_ABS(proc->types.pointer.gesture_sum.x) > indev_act->driver.gesture_limit) ||
+	    (LV_MATH_ABS(proc->types.pointer.gesture_sum.y) > indev_act->driver.gesture_limit)){
+
+	    proc->types.pointer.gesture_sent = 1;
+
+	    if (LV_MATH_ABS(proc->types.pointer.gesture_sum.x) > LV_MATH_ABS(proc->types.pointer.gesture_sum.y)){
+	        if (proc->types.pointer.gesture_sum.x > 0)
+	            proc->types.pointer.gesture_dir = LV_GESTURE_DIR_RIGHT;
+	        else
+	            proc->types.pointer.gesture_dir = LV_GESTURE_DIR_LEFT;
+	    }
+	    else{
+	        if (proc->types.pointer.gesture_sum.y > 0)
+	            proc->types.pointer.gesture_dir = LV_GESTURE_DIR_BOTTOM;
+	        else
+	            proc->types.pointer.gesture_dir = LV_GESTURE_DIR_TOP;
+	    }
+
+	    gesture_obj->signal_cb(gesture_obj, LV_SIGNAL_GESTURE, indev_act);
+	    if (indev_reset_check(proc)) return;
+	    lv_event_send(gesture_obj, LV_EVENT_GESTURE, NULL);
+	    if (indev_reset_check(proc)) return;
+	}
+}
+
 
 /**
  * Checks if the reset_query flag has been set. If so, perform necessary global indev cleanup actions

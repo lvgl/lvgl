@@ -91,6 +91,7 @@ enum {
     LV_EVENT_DRAG_BEGIN,		  
     LV_EVENT_DRAG_END,
     LV_EVENT_DRAG_THROW_BEGIN,
+    LV_EVENT_GESTURE,			/**< The object has been getture*/
     LV_EVENT_KEY,
     LV_EVENT_FOCUSED,
     LV_EVENT_DEFOCUSED,
@@ -137,6 +138,7 @@ enum {
     LV_SIGNAL_DRAG_BEGIN,	
     LV_SIGNAL_DRAG_THROW_BEGIN,
     LV_SIGNAL_DRAG_END,                                   
+    LV_SIGNAL_GESTURE,			/**< The object has been getture*/
 
     /*Group related*/
     LV_SIGNAL_FOCUS,
@@ -245,6 +247,7 @@ typedef struct _lv_obj_t
     uint8_t top             :1;  /**< 1: If the object or its children is clicked it goes to the foreground*/
     uint8_t parent_event    :1;  /**< 1: Send the object's events to the parent too. */
     uint8_t adv_hittest     :1;  /**< 1: Use advanced hit-testing (slower) */
+    uint8_t gesture_parent : 1; /**< 1: Parent will be gesture instead*/
 
     lv_drag_dir_t drag_dir  :2;  /**<  Which directions the object can be dragged in */
     lv_bidi_dir_t base_dir  :2;  /**< Base direction of texts related to this object */
@@ -582,13 +585,23 @@ void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
 
 /**
+* Enable to use parent for gesture related operations.
+* If trying to gesture the object the parent will be moved instead
+* @param obj pointer to an object
+* @param en true: enable the 'gesture parent' for the object
+*/
+void lv_obj_set_gesture_parent(lv_obj_t * obj, bool en);
+
+/**
  * Propagate the events to the parent too
  * @param obj pointer to an object
  * @param en true: enable the event propagation
  */
 void lv_obj_set_parent_event(lv_obj_t * obj, bool en);
 
+
 void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir);
+
 /**
  * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
  * @param obj pointer to an object
@@ -953,6 +966,12 @@ bool lv_obj_get_drag_parent(const lv_obj_t * obj);
  */
 bool lv_obj_get_parent_event(const lv_obj_t * obj);
 
+/**
+* Get the gesture parent attribute of an object
+* @param obj pointer to an object
+* @return true: gesture parent is enabled
+*/
+bool lv_obj_get_gesture_parent(const lv_obj_t * obj);
 
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj);
 
