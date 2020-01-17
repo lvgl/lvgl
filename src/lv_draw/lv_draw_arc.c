@@ -107,8 +107,8 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness,
     const uint8_t ps = 8;
     const uint8_t pa = 127;
 
-    lv_coord_t thick_half = tickness / 2;
-    lv_coord_t thick_corr = tickness & 0x01 ? 0 : 1;
+    int32_t thick_half = tickness / 2;
+    uint8_t thick_corr = tickness & 0x01 ? 0 : 1;
 
     lv_coord_t rx_corr;
     lv_coord_t ry_corr;
@@ -119,8 +119,8 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness,
     if(angle > 0 && angle < 180) ry_corr = 0;
     else  ry_corr = 0;
 
-    lv_coord_t cir_x;
-    lv_coord_t cir_y;
+    int32_t cir_x;
+    int32_t cir_y;
 
     cir_x = ((radius - rx_corr - thick_half) * lv_trigo_sin(90 - angle)) >> (LV_TRIGO_SHIFT - ps);
     cir_y = ((radius - ry_corr - thick_half) * lv_trigo_sin(angle)) >> (LV_TRIGO_SHIFT - ps);
