@@ -26,7 +26,6 @@ extern "C" {
 #include "../lv_misc/lv_bidi.h"
 #include "../lv_hal/lv_hal.h"
 #include "../lv_draw/lv_draw_rect.h"
-#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -505,7 +504,7 @@ void lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop
 
 void lv_obj_add_style(lv_obj_t * obj, uint8_t type, lv_style_t * style);
 
-void lv_obj_add_theme(void * obj, uint8_t part, lv_theme_style_t name);
+void lv_obj_add_theme(void * obj, uint8_t part, uint16_t name);
 
 void lv_obj_reset_style(lv_obj_t * obj, uint8_t type);
 

@@ -37,6 +37,7 @@ extern "C" {
 lv_theme_t * lv_theme_alien_init(uint16_t hue, lv_font_t * font);
 
 lv_theme_t * lv_theme_alien_get(void);
+lv_style_t * lv_theme_alien_get_style_part(lv_theme_style_t name, uint8_t part);
 
 lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name);
 

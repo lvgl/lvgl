@@ -1225,10 +1225,11 @@ void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style)
 }
 
 
-void lv_obj_add_theme(void * obj, uint8_t part, lv_theme_style_t name)
+void lv_obj_add_theme(void * obj, uint8_t part, uint16_t name)
 {
     lv_obj_add_style(obj, part, lv_theme_get_style(name));
 }
+
 
 void lv_obj_reset_style(lv_obj_t * obj, uint8_t part)
 {
@@ -1460,23 +1461,40 @@ void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t state)
 
     lv_obj_state_t new_state = obj->state | state;
     if(obj->state != new_state) {
-        lv_obj_state_t prev_state = obj->state;
+        /* Disabled/Enabled state change should be applied immediately without transition */
+        if((obj->state & LV_OBJ_STATE_DISABLED) != (new_state & LV_OBJ_STATE_DISABLED)) {
+            lv_anim_del(obj, obj_state_anim_cb);
+            obj->state = new_state;
+            obj->prev_state = new_state;
+            obj->state_anim = 0;
+        }
+        /*Start transition if set*/
+        else {
+            lv_style_int_t t = lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_TRANSITION_TIME);
+            if(t == 0) {
+                lv_anim_del(obj, obj_state_anim_cb);
+                obj->state = new_state;
+                obj->prev_state = new_state;
+                obj->state_anim = 0;
+            }
+            /*Set the new state for prev state too to get the TRANSITION_TIME for the new state*/
+            else {
+                lv_obj_state_t prev_state = obj->state;
+                obj->prev_state = new_state;
+                obj->state = new_state;
+                obj->state_anim = 0;
 
-        /*Set the new state for prev state too to get the TRANSITION_TIME for the new state*/
-        obj->prev_state = new_state;
-        obj->state = new_state;
-        obj->state_anim = 0;
+                /*Get the TRANSITION_TIME and set the real previous state*/
+                obj->prev_state = prev_state;
 
-        /*Get the TRANSITION_TIME and set the real previous state*/
-        lv_style_int_t t = lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_TRANSITION_TIME);
-        obj->prev_state = prev_state;
-
-        lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_exec_cb(&a, obj, obj_state_anim_cb);
-        lv_anim_set_values(&a, 0, 255);
-        lv_anim_set_time(&a, t, 0);
-        lv_anim_create(&a);
+                lv_anim_t a;
+                lv_anim_init(&a);
+                lv_anim_set_exec_cb(&a, obj, obj_state_anim_cb);
+                lv_anim_set_values(&a, 0, 255);
+                lv_anim_set_time(&a, t, 0);
+                lv_anim_create(&a);
+            }
+        }
     }
 }
 

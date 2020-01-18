@@ -77,9 +77,8 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     /*Initialize the allocated 'ext' */
-    lv_style_list_init(&ext->style_knob);
     ext->value_to_set = NULL;
-    ext->dragging = false;
+    ext->dragging = 0;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_slider, lv_slider_signal);
@@ -90,7 +89,8 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_click(new_slider, true);
         lv_obj_set_protect(new_slider, LV_PROTECT_PRESS_LOST);
 
-        _ot(new_slider, LV_SLIDER_PART_KNOB, SLIDER_KNOB);
+        lv_style_list_init(&ext->style_knob);
+        lv_theme_apply(new_slider, LV_THEME_SLIDER);
     }
     /*Copy an existing slider*/
     else {
@@ -344,6 +344,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         /* The smaller size is the knob diameter*/
         lv_coord_t knob_size = LV_MATH_MIN(lv_obj_get_width(slider), lv_obj_get_height(slider)) >> 1;
         knob_size += LV_MATH_MAX(LV_MATH_MAX(knob_left, knob_right), LV_MATH_MAX(knob_bottom,knob_top));
+        knob_size += 2;         /*For rounding error*/
 
         lv_style_int_t knob_sh_width = lv_obj_get_style_int(slider, LV_SLIDER_PART_KNOB, LV_STYLE_SHADOW_WIDTH);
         lv_style_int_t knob_sh_spread = lv_obj_get_style_int(slider, LV_SLIDER_PART_KNOB, LV_STYLE_SHADOW_SPREAD);
@@ -447,8 +448,6 @@ static void lv_slider_position_knob(lv_obj_t * slider, lv_area_t * knob_area, lv
 
 static void lv_slider_draw_knob(lv_obj_t * slider, const lv_area_t * knob_area, const lv_area_t * clip_area)
 {
-    lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-
     lv_draw_rect_dsc_t knob_rect_dsc;
     lv_draw_rect_dsc_init(&knob_rect_dsc);
     lv_obj_init_draw_rect_dsc(slider, LV_SLIDER_PART_KNOB, &knob_rect_dsc);

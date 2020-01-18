@@ -83,6 +83,7 @@ typedef struct
 enum {
     LV_BAR_PART_BG, /** Bar background style. */
     LV_BAR_PART_INDIC, /** Bar fill area style. */
+    _LV_BAR_PART_VIRTUAL_LAST
 };
 typedef uint8_t lv_bar_part_t;
 

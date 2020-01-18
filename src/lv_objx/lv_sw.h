@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 #include "../lv_core/lv_obj.h"
-#include "lv_slider.h"
+#include "lv_bar.h"
 
 /*********************
  *      DEFINES
@@ -35,8 +35,9 @@ extern "C" {
 /*Data of switch*/
 typedef struct
 {
-    lv_slider_ext_t slider; /*Ext. of ancestor*/
+    lv_bar_ext_t bar; /*Ext. of ancestor*/
     /*New data for this type */
+    lv_style_list_t style_knob; /*Style of the knob*/
     uint8_t state   :1; /*The current state*/
 } lv_sw_ext_t;
 
@@ -44,9 +45,10 @@ typedef struct
  * Switch parts.
  */
 enum {
-    LV_SW_PART_BG, /**< Switch background. */
-    LV_SW_PART_INDIC, /**< Switch fill area. */
-    LV_SW_PART_KNOB, /**< Switch knob (when off). */
+    LV_SW_PART_BG = LV_BAR_PART_BG,                 /**< Switch background. */
+    LV_SW_PART_INDIC = LV_BAR_PART_INDIC,           /**< Switch fill area. */
+    LV_SW_PART_KNOB = _LV_BAR_PART_VIRTUAL_LAST,    /**< Switch knob. */
+    _LV_SW_PART_VIRTUAL_LAST
 };
 
 typedef uint8_t lv_sw_part_t;

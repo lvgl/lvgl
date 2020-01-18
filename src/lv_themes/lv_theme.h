@@ -17,6 +17,8 @@ extern "C" {
 
 #include "../lv_core/lv_style.h"
 
+#include "../../lvgl.h"
+
 /*********************
  *    DEFINES
  *********************/
@@ -32,6 +34,7 @@ extern "C" {
  * backgrounds and panels.
  */
 typedef enum {
+    LV_THEME_NONE = 0,
     LV_THEME_SCR,
     LV_THEME_SCR_TRANSP,
 
@@ -57,15 +60,10 @@ typedef enum {
     LV_THEME_BTNM_BTN,
 
     LV_THEME_BAR,
-    LV_THEME_BAR_INDIC,
 
     LV_THEME_SLIDER,
-    LV_THEME_SLIDER_INDIC,
-    LV_THEME_SLIDER_KNOB,
 
     LV_THEME_SW,
-    LV_THEME_SW_INDIC,
-    LV_THEME_SW_KNOB,
 
     LV_THEME_CB,
     LV_THEME_CB_BULLET,
@@ -79,14 +77,8 @@ typedef enum {
     LV_THEME_ROLLER_SCRL,
     LV_THEME_ROLLER_SEL,
 
-    LV_THEME_TABVIEW_BG,
-    LV_THEME_TABVIEW_BG_SCRL,
-    LV_THEME_TABVIEW_BTNS,
-    LV_THEME_TABVIEW_BTNS_BG,
-    LV_THEME_TABVIEW_INDIC,
-    LV_THEME_TABVIEW_TAB_BG,
-    LV_THEME_TABVIEW_TAB_SCRL,
-    LV_THEME_TABVIEW_TAB_SCRLBAR,
+    LV_THEME_TABVIEW,
+    LV_THEME_TABVIEW_PAGE,
 
     LV_THEME_LMETER,
 
@@ -133,6 +125,8 @@ typedef enum {
 
 typedef struct {
     lv_style_t * (*get_style_cb)(lv_theme_style_t);
+    void (*apply_cb)(lv_obj_t *,lv_theme_style_t);
+    lv_style_t * (*get_style_part_cb)(lv_theme_style_t name, uint8_t part);
 }lv_theme_t;
 
 /**********************
@@ -153,6 +147,10 @@ void lv_theme_set_act(lv_theme_t * th);
 lv_theme_t * lv_theme_get_act(void);
 
 lv_style_t * lv_theme_get_style(lv_theme_style_t name);
+
+void lv_theme_apply(lv_obj_t * obj, lv_theme_style_t name);
+
+lv_style_t * lv_theme_get_style_part(lv_theme_style_t name, uint8_t part);
 
 /**********************
  *    MACROS

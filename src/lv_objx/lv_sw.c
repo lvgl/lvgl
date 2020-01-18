@@ -34,6 +34,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param);
+static lv_design_res_t lv_sw_design(lv_obj_t * sw, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_style_list_t * lv_sw_get_style(lv_obj_t * sw, uint8_t part);
 static lv_style_list_t * lv_sw_get_style(lv_obj_t * sw, uint8_t part);
 
@@ -41,6 +42,7 @@ static lv_style_list_t * lv_sw_get_style(lv_obj_t * sw, uint8_t part);
  *  STATIC VARIABLES
  **********************/
 static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_design;
 
 /**********************
  *      MACROS
@@ -61,12 +63,13 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("switch create started");
 
     /*Create the ancestor of switch*/
-    lv_obj_t * new_sw = lv_slider_create(par, copy);
+    lv_obj_t * new_sw = lv_bar_create(par, copy);
     LV_ASSERT_MEM(new_sw);
 
     if(new_sw == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_sw);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_sw);
 
     /*Allocate the switch type specific extended data*/
     lv_sw_ext_t * ext = lv_obj_allocate_ext_attr(new_sw, sizeof(lv_sw_ext_t));
@@ -78,16 +81,18 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_sw, lv_sw_signal);
+    lv_obj_set_design_cb(new_sw, lv_sw_design);
 
     /*Init the new switch switch*/
     if(copy == NULL) {
         lv_obj_set_click(new_sw, true);
         lv_obj_set_protect(new_sw, LV_PROTECT_PRESS_LOST);
         lv_obj_set_size(new_sw, 2 * LV_DPI / 3, LV_DPI / 3);
-        lv_slider_set_range(new_sw, 0, 1);
+        lv_bar_set_range(new_sw, 0, 1);
 
-        _ot(new_sw, LV_SW_PART_KNOB, SW_KNOB);
+        lv_style_list_init(&ext->style_knob);
 
+        lv_theme_apply(new_sw, LV_THEME_SW);
     }
     /*Copy an existing switch*/
     else {
@@ -121,7 +126,7 @@ void lv_sw_on(lv_obj_t * sw, lv_anim_enable_t anim)
 #endif
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     ext->state = 1;
-    lv_slider_set_value(sw, 1, anim);
+    lv_bar_set_value(sw, 1, anim);
     lv_obj_set_state(sw, LV_OBJ_STATE_CHECKED);
 }
 
@@ -175,6 +180,75 @@ bool lv_sw_toggle(lv_obj_t * sw, lv_anim_enable_t anim)
  **********************/
 
 /**
+ * Handle the drawing related tasks of the sliders
+ * @param slider pointer to an object
+ * @param clip_area the object will be drawn only in this area
+ * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ *                                  (return 'true' if yes)
+ *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_design_res_t`
+ */
+static lv_design_res_t lv_sw_design(lv_obj_t * sw, const lv_area_t * clip_area, lv_design_mode_t mode)
+{
+    /*Return false if the object is not covers the mask_p area*/
+    if(mode == LV_DESIGN_COVER_CHK) {
+        return LV_DESIGN_RES_NOT_COVER;
+    }
+    /*Draw the object*/
+    else if(mode == LV_DESIGN_DRAW_MAIN) {
+
+        /*The ancestor design function will draw the background and the indicator.
+         * It also sets ext->bar.indic_area*/
+        ancestor_design(sw, clip_area, mode);
+
+        lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
+
+        lv_coord_t objw = lv_obj_get_width(sw);
+        lv_coord_t objh = lv_obj_get_height(sw);
+        lv_coord_t knob_size = objh;
+        lv_area_t knob_area;
+
+        lv_style_int_t bg_left = lv_obj_get_style_int(sw,   LV_SW_PART_BG, LV_STYLE_PAD_LEFT);
+        lv_style_int_t bg_right = lv_obj_get_style_int(sw,  LV_SW_PART_BG, LV_STYLE_PAD_RIGHT);
+
+        lv_coord_t max_indic_w = objw - bg_left - bg_right;
+        lv_coord_t act_indic_w = lv_area_get_width(&ext->bar.indic_area);
+
+
+        knob_area.x1 = ext->bar.indic_area.x2 - ((act_indic_w * knob_size) / max_indic_w);
+        knob_area.x2 = knob_area.x1 + knob_size;
+        knob_area.y1 = sw->coords.y1;
+        knob_area.y2 = sw->coords.y2;
+
+        lv_style_int_t knob_left = lv_obj_get_style_int(sw,   LV_SW_PART_KNOB, LV_STYLE_PAD_LEFT);
+        lv_style_int_t knob_right = lv_obj_get_style_int(sw,  LV_SW_PART_KNOB, LV_STYLE_PAD_RIGHT);
+        lv_style_int_t knob_top = lv_obj_get_style_int(sw,    LV_SW_PART_KNOB, LV_STYLE_PAD_TOP);
+        lv_style_int_t knob_bottom = lv_obj_get_style_int(sw, LV_SW_PART_KNOB, LV_STYLE_PAD_BOTTOM);
+
+        /*Apply the paddings on the knob area*/
+        knob_area.x1 -= knob_left;
+        knob_area.x2 += knob_right;
+        knob_area.y1 -= knob_top;
+        knob_area.y2 += knob_bottom;
+
+        lv_draw_rect_dsc_t knob_rect_dsc;
+        lv_draw_rect_dsc_init(&knob_rect_dsc);
+        lv_obj_init_draw_rect_dsc(sw, LV_SW_PART_KNOB, &knob_rect_dsc);
+
+        lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
+
+    }
+    /*Post draw when the children are drawn*/
+    else if(mode == LV_DESIGN_DRAW_POST) {
+        return ancestor_design(sw, clip_area, mode);
+    }
+
+    return LV_DESIGN_RES_OK;
+}
+
+
+/**
  * Signal function of the switch
  * @param sw pointer to a switch object
  * @param sign a signal type from lv_signal_t enum
@@ -198,15 +272,9 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
     }
 
-    lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
-
     /* Include the ancient signal function */
-    if(sign != LV_SIGNAL_PRESSED &&
-        sign != LV_SIGNAL_PRESSING &&
-        sign != LV_SIGNAL_RELEASED) {
-        res = ancestor_signal(sw, sign, param);
-        if(res != LV_RES_OK) return res;
-    }
+    res = ancestor_signal(sw, sign, param);
+    if(res != LV_RES_OK) return res;
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
@@ -224,6 +292,44 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 
         res   = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RES_OK) return res;
+    }else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+        lv_style_int_t knob_left = lv_obj_get_style_int(sw,   LV_SW_PART_KNOB, LV_STYLE_PAD_LEFT);
+        lv_style_int_t knob_right = lv_obj_get_style_int(sw,  LV_SW_PART_KNOB, LV_STYLE_PAD_RIGHT);
+        lv_style_int_t knob_top = lv_obj_get_style_int(sw,    LV_SW_PART_KNOB, LV_STYLE_PAD_TOP);
+        lv_style_int_t knob_bottom = lv_obj_get_style_int(sw, LV_SW_PART_KNOB, LV_STYLE_PAD_BOTTOM);
+
+        /* The smaller size is the knob diameter*/
+        lv_coord_t knob_size;
+        knob_size = LV_MATH_MAX(LV_MATH_MAX(knob_left, knob_right), LV_MATH_MAX(knob_bottom,knob_top));
+        knob_size += 2;         /*For rounding error*/
+
+        lv_style_int_t knob_sh_width = lv_obj_get_style_int(sw, LV_SW_PART_KNOB, LV_STYLE_SHADOW_WIDTH);
+        lv_style_int_t knob_sh_spread = lv_obj_get_style_int(sw, LV_SW_PART_KNOB, LV_STYLE_SHADOW_SPREAD);
+        lv_style_int_t knob_sh_ox = lv_obj_get_style_int(sw, LV_SW_PART_KNOB, LV_STYLE_SHADOW_OFFSET_X);
+        lv_style_int_t knob_sh_oy = lv_obj_get_style_int(sw, LV_SW_PART_KNOB, LV_STYLE_SHADOW_OFFSET_Y);
+
+        knob_size += knob_sh_width + knob_sh_spread;
+        knob_size += LV_MATH_MAX(LV_MATH_ABS(knob_sh_ox), LV_MATH_ABS(knob_sh_oy));
+
+        lv_style_int_t bg_sh_width = lv_obj_get_style_int(sw, LV_SW_PART_BG, LV_STYLE_SHADOW_WIDTH);
+        lv_style_int_t bg_sh_spread = lv_obj_get_style_int(sw, LV_SW_PART_BG, LV_STYLE_SHADOW_SPREAD);
+        lv_style_int_t bg_sh_ox = lv_obj_get_style_int(sw, LV_SW_PART_BG, LV_STYLE_SHADOW_OFFSET_X);
+        lv_style_int_t bg_sh_oy = lv_obj_get_style_int(sw, LV_SW_PART_BG, LV_STYLE_SHADOW_OFFSET_Y);
+
+        lv_coord_t bg_size = bg_sh_width + bg_sh_spread;
+        bg_size += LV_MATH_MAX(LV_MATH_ABS(bg_sh_ox), LV_MATH_ABS(bg_sh_oy));
+
+        lv_style_int_t indic_sh_width = lv_obj_get_style_int(sw, LV_SW_PART_INDIC, LV_STYLE_SHADOW_WIDTH);
+        lv_style_int_t indic_sh_spread = lv_obj_get_style_int(sw, LV_SW_PART_INDIC, LV_STYLE_SHADOW_SPREAD);
+        lv_style_int_t indic_sh_ox = lv_obj_get_style_int(sw, LV_SW_PART_INDIC, LV_STYLE_SHADOW_OFFSET_X);
+        lv_style_int_t indic_sh_oy = lv_obj_get_style_int(sw, LV_SW_PART_INDIC, LV_STYLE_SHADOW_OFFSET_Y);
+
+        lv_coord_t indic_size = indic_sh_width + indic_sh_spread;
+        indic_size += LV_MATH_MAX(LV_MATH_ABS(indic_sh_ox), LV_MATH_ABS(indic_sh_oy));
+
+        sw->ext_draw_pad = LV_MATH_MAX(sw->ext_draw_pad, knob_size);
+        sw->ext_draw_pad = LV_MATH_MAX(sw->ext_draw_pad, indic_size);
+        sw->ext_draw_pad = LV_MATH_MAX(sw->ext_draw_pad, bg_size);
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
@@ -245,10 +351,10 @@ static lv_style_list_t * lv_sw_get_style(lv_obj_t * sw, uint8_t part)
         style_dsc_p = &sw->style_list;
         break;
     case LV_SW_PART_INDIC:
-        style_dsc_p = &ext->slider.bar.style_indic;
+        style_dsc_p = &ext->bar.style_indic;
         break;
     case LV_SW_PART_KNOB:
-        style_dsc_p = &ext->slider.style_knob;
+        style_dsc_p = &ext->style_knob;
         break;
     default:
         style_dsc_p = NULL;

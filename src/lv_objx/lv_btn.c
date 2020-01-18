@@ -60,55 +60,49 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("button create started");
 
-    lv_obj_t * new_btn;
+    lv_obj_t * btn;
 
-    new_btn = lv_cont_create(par, copy);
-    LV_ASSERT_MEM(new_btn);
-    if(new_btn == NULL) return NULL;
+    btn = lv_cont_create(par, copy);
+    LV_ASSERT_MEM(btn);
+    if(btn == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_btn);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_btn);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(btn);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(btn);
 
     /*Allocate the extended data*/
-    lv_btn_ext_t * ext = lv_obj_allocate_ext_attr(new_btn, sizeof(lv_btn_ext_t));
+    lv_btn_ext_t * ext = lv_obj_allocate_ext_attr(btn, sizeof(lv_btn_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_btn);
+        lv_obj_del(btn);
         return NULL;
     }
 
     ext->toggle = 0;
 
-    lv_obj_set_signal_cb(new_btn, lv_btn_signal);
-    lv_obj_set_design_cb(new_btn, lv_btn_design);
+    lv_obj_set_signal_cb(btn, lv_btn_signal);
+    lv_obj_set_design_cb(btn, lv_btn_design);
 
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
         /*Set layout if the button is not a screen*/
-        if(par != NULL) {
-            lv_btn_set_layout(new_btn, LV_LAYOUT_CENTER);
-        }
+        if(par) lv_btn_set_layout(btn, LV_LAYOUT_CENTER);
 
-        lv_obj_set_click(new_btn, true); /*Be sure the button is clickable*/
+        lv_obj_set_click(btn, true); /*Be sure the button is clickable*/
 
-        /*Set the default styles*/
-        lv_obj_reset_style(new_btn, LV_BTN_PART_MAIN);
-        lv_obj_add_style(new_btn, LV_BTN_PART_MAIN, _t(BTN));
+        lv_theme_apply(btn, LV_THEME_BTN);
     }
     /*Copy 'copy'*/
     else {
         lv_btn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->toggle             = copy_ext->toggle;
 
-//        memcpy((void*) ext->styles, copy_ext->styles, sizeof(ext->styles));
-
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_btn);
+        lv_obj_refresh_style(btn);
     }
 
     LV_LOG_INFO("button created");
 
-    return new_btn;
+    return btn;
 }
 
 /*=====================
@@ -153,7 +147,13 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
         case LV_BTN_STATE_TGL_PR:
             lv_obj_set_state(btn, LV_OBJ_STATE_PRESSED | LV_OBJ_STATE_CHECKED);
             break;
+        case LV_BTN_STATE_INA:
+            lv_obj_set_state(btn, LV_OBJ_STATE_DISABLED);
+            break;
     }
+
+//    /*Make the state change happen immediately, without transition*/
+//    btn->prev_state = btn->state;
 }
 
 /**
