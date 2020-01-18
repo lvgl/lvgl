@@ -518,6 +518,9 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
 #if LV_COLOR_SCREEN_TRANSP
     lv_opa_t opa_composed;
 #endif
+#if LV_COLOR_SCREEN_TRANSP || LV_USE_GPU
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+#endif
 
     lv_coord_t x;
     lv_coord_t y;
@@ -527,7 +530,6 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
         /*Go to the first px of the row*/
         map_buf_tmp += (draw_area->x1 - (map_area->x1 - disp_area->x1));
 #if LV_USE_GPU
-        lv_disp_t * disp = lv_refr_get_disp_refreshing();
         if(disp->driver.gpu_blend_cb &&
                 ((draw_area_w > GPU_WIDTH_LIMIT * 4 && opa == LV_OPA_COVER) ||
                         (draw_area_w > GPU_WIDTH_LIMIT && opa != LV_OPA_COVER))) {
