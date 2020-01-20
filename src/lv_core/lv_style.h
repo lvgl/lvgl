@@ -144,9 +144,7 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_SCALE_END_COLOR,     0xA, LV_STYLE_ID_COLOR + 2, LV_STYLE_ATTR_NONE),
 };
 
-
 typedef uint16_t lv_style_property_t;
-
 
 #define LV_STYLE_STATE_POS       8
 #define LV_STYLE_STATE_MASK      0x7F00

@@ -279,9 +279,8 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
             lv_cont_refr_autofit(cont);
         }
     } else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {
-        /*FLOOD and FILL fit needs to be refreshed if the parent size has changed*/
+        /*FLOOD and FILL fit needs to be refreshed if the parent's size has changed*/
         lv_cont_refr_autofit(cont);
-
     }
 
     return res;
@@ -729,9 +728,8 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
         }
 
         /*Tell the children the parent's size has changed*/
-        LV_LL_READ(cont->child_ll, child_i)
-        {
-            child_i->signal_cb(child_i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
+        LV_LL_READ(cont->child_ll, child_i) {
+            child_i->signal_cb(child_i, LV_SIGNAL_PARENT_SIZE_CHG, &ori);
         }
     }
 }

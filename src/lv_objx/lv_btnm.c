@@ -73,17 +73,17 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("button matrix create started");
 
     /*Create the ancestor object*/
-    lv_obj_t * new_btnm = lv_obj_create(par, copy);
-    LV_ASSERT_MEM(new_btnm);
-    if(new_btnm == NULL) return NULL;
+    lv_obj_t * btnm = lv_obj_create(par, copy);
+    LV_ASSERT_MEM(btnm);
+    if(btnm == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_btnm);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(btnm);
 
     /*Allocate the object type specific extended data*/
-    lv_btnm_ext_t * ext = lv_obj_allocate_ext_attr(new_btnm, sizeof(lv_btnm_ext_t));
+    lv_btnm_ext_t * ext = lv_obj_allocate_ext_attr(btnm, sizeof(lv_btnm_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_btnm);
+        lv_obj_del(btnm);
         return NULL;
     }
 
@@ -98,24 +98,16 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->one_toggle     = 0;
     lv_style_list_init(&ext->style_btn);
 
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_btnm);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(btnm);
 
-    lv_obj_set_signal_cb(new_btnm, lv_btnm_signal);
-    lv_obj_set_design_cb(new_btnm, lv_btnm_design);
+    lv_obj_set_signal_cb(btnm, lv_btnm_signal);
+    lv_obj_set_design_cb(btnm, lv_btnm_design);
 
     /*Init the new button matrix object*/
     if(copy == NULL) {
-        lv_btnm_set_map(new_btnm, lv_btnm_def_map);
-        lv_obj_set_size(new_btnm, LV_DPI * 3, LV_DPI * 2);
-
-        /*Set the default styles*/
-        lv_obj_reset_style(new_btnm, LV_BTNM_PART_BG);
-        _ot(new_btnm, LV_BTNM_PART_BG, BTNM);
-
-        /* Do not cache the button style because it's independent from the object's style.
-         * (Therefore it can't be cached)*/
-//        ext->style_btn.cache.enabled = 0;
-        _ot(new_btnm, LV_BTNM_PART_BTN, BTNM_BTN);
+        lv_btnm_set_map(btnm, lv_btnm_def_map);
+        lv_obj_set_size(btnm, LV_DPI * 3, LV_DPI * 2);
+        lv_theme_apply(btnm, LV_THEME_BTNM);
     }
     /*Copy an existing object*/
     else {
@@ -126,7 +118,7 @@ lv_obj_t * lv_btnm_create(lv_obj_t * par, const lv_obj_t * copy)
 
     LV_LOG_INFO("button matrix created");
 
-    return new_btnm;
+    return btnm;
 }
 
 /*=====================
@@ -676,8 +668,8 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             bool tgl_state = button_get_tgl_state(ext->ctrl_bits[btn_i]);
 
             if(button_is_inactive(ext->ctrl_bits[btn_i])) {
-                draw_rect_dsc_act = &draw_rect_rel_dsc;
-                draw_label_dsc_act = &draw_label_rel_dsc;
+                draw_rect_dsc_act = &draw_rect_ina_dsc;
+                draw_label_dsc_act = &draw_label_ina_dsc;
             }
             /*Simple released or checked buttons button*/
             else if(btn_i != ext->btn_id_pr && btn_i != ext->btn_id_focused) {
@@ -686,9 +678,6 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             }
             /*Focused and/or pressed + checked or released button*/
             else {
-                /*The state changes without re-caching the styles, disable the use of cache*/
-//                btnm->style_dsc.cache.enabled = 0;
-
                 if(tgl_state) btnm->state = LV_OBJ_STATE_CHECKED;
                 if(ext->btn_id_pr == btn_i) btnm->state |= LV_OBJ_STATE_PRESSED;
                 if(ext->btn_id_focused == btn_i) btnm->state |= LV_OBJ_STATE_FOCUS;
@@ -700,36 +689,36 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
                 draw_rect_dsc_act = &draw_rect_tmp_dsc;
                 draw_label_dsc_act = &draw_label_tmp_dsc;
                 btnm->state = state_ori;
-                btnm->state = prev_state_ori;
-
-//                btnm->style_dsc.cache.enabled = 1;
+                btnm->prev_state = prev_state_ori;
             }
 
-            lv_style_int_t border_part_ori = draw_rect_dsc_act->border_part;
+            lv_style_int_t border_part_ori = draw_rect_dsc_act->border_side;
 
             /*Remove borders on the edges if `LV_BORDER_INTERNAL`*/
             if(border_part_ori & LV_BORDER_SIDE_INTERNAL) {
                 /*Top/Bottom lines*/
                 if(area_tmp.y1 == btnm->coords.y1 + padding_top) {
-                    draw_rect_dsc_act->border_part &= ~LV_BORDER_SIDE_TOP;
+                    draw_rect_dsc_act->border_side &= ~LV_BORDER_SIDE_TOP;
                 }
                 if(area_tmp.y2 == btnm->coords.y2 - padding_bottom) {
-                    draw_rect_dsc_act->border_part &= ~LV_BORDER_SIDE_BOTTOM;
+                    draw_rect_dsc_act->border_side &= ~LV_BORDER_SIDE_BOTTOM;
                 }
 
                 /*Left/right columns*/
                 if(txt_i == 0) { /*First button*/
-                    draw_rect_dsc_act->border_part &= ~LV_BORDER_SIDE_LEFT;
+                    draw_rect_dsc_act->border_side &= ~LV_BORDER_SIDE_LEFT;
                 } else if(strcmp(ext->map_p[txt_i - 1], "\n") == 0) {
-                    draw_rect_dsc_act->border_part &= ~LV_BORDER_SIDE_LEFT;
+                    draw_rect_dsc_act->border_side &= ~LV_BORDER_SIDE_LEFT;
                 }
 
                 if(ext->map_p[txt_i + 1][0] == '\0' || strcmp(ext->map_p[txt_i + 1], "\n") == 0) {
-                    draw_rect_dsc_act->border_part &= ~LV_BORDER_SIDE_RIGHT;
+                    draw_rect_dsc_act->border_side &= ~LV_BORDER_SIDE_RIGHT;
                 }
             }
 
             lv_draw_rect(&area_tmp, clip_area, draw_rect_dsc_act);
+
+            draw_rect_dsc_act->border_side = border_part_ori;
 
             /*Calculate the size of the text*/
             const lv_font_t * font = draw_label_dsc_act->font;
@@ -747,6 +736,8 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
 
             lv_draw_label(&area_tmp, clip_area, draw_label_dsc_act, txt, NULL);
         }
+    } else if(mode == LV_DESIGN_DRAW_POST) {
+        ancestor_design_f(btnm, clip_area, mode);
     }
     return LV_DESIGN_RES_OK;
 }

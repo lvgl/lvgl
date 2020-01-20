@@ -89,6 +89,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->tab_cur      = 0;
+    ext->tab_cnt      = 0;
     ext->point_last.x = 0;
     ext->point_last.y = 0;
     ext->content      = NULL;
@@ -108,7 +109,6 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         LV_ASSERT_MEM(ext->tab_name_ptr);
         if(ext->tab_name_ptr == NULL) return NULL;
         ext->tab_name_ptr[0] = "";
-        ext->tab_cnt         = 0;
 
         /* Set a size which fits into the parent.
          * Don't use `par` directly because if the tabview is created on a page it is moved to the
@@ -156,19 +156,23 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->tab_name_ptr[0] = "";
         lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
 
-//        uint16_t i;
-//        lv_obj_t * new_tab;
-//        lv_obj_t * copy_tab;
-//        for(i = 0; i < copy_ext->tab_cnt; i++) {
-//            new_tab  = lv_tabview_add_tab(new_tabview, copy_ext->tab_name_ptr[i]);
-//            copy_tab = lv_tabview_get_tab(copy, i);
-////            lv_page_set_style(new_tab, LV_PAGE_STYLE_BG, lv_page_get_style(copy_tab, LV_PAGE_STYLE_BG));
-////            lv_page_set_style(new_tab, LV_PAGE_STYLE_SCRL, lv_page_get_style(copy_tab, LV_PAGE_STYLE_SCRL));
-////            lv_page_set_style(new_tab, LV_PAGE_STYLE_SB, lv_page_get_style(copy_tab, LV_PAGE_STYLE_SB));
-//        }
-//
-//        /*Refresh the style with new signal function*/
-//        lv_obj_refresh_style(new_tabview);
+        lv_style_list_copy(lv_obj_get_style(tabview, LV_TABVIEW_PART_BG_SCRL), lv_obj_get_style(copy, LV_TABVIEW_PART_BG_SCRL));
+        lv_style_list_copy(lv_obj_get_style(tabview, LV_TABVIEW_PART_TAB_BG), lv_obj_get_style(copy, LV_TABVIEW_PART_TAB_BG));
+        lv_style_list_copy(lv_obj_get_style(tabview, LV_TABVIEW_PART_TAB), lv_obj_get_style(copy, LV_TABVIEW_PART_TAB));
+
+        uint16_t i;
+        lv_obj_t * new_tab;
+        lv_obj_t * copy_tab;
+        for(i = 0; i < copy_ext->tab_cnt; i++) {
+            new_tab  = lv_tabview_add_tab(tabview, copy_ext->tab_name_ptr[i]);
+            copy_tab = lv_tabview_get_tab(copy, i);
+            lv_style_list_copy(lv_obj_get_style(new_tab, LV_PAGE_PART_SCRL), lv_obj_get_style(copy_tab, LV_PAGE_PART_SCRL));
+            lv_style_list_copy(lv_obj_get_style(new_tab, LV_PAGE_PART_SCRLBAR), lv_obj_get_style(copy_tab, LV_PAGE_PART_SCRLBAR));
+            lv_obj_refresh_style(new_tab);
+        }
+
+        /*Refresh the style with new signal function*/
+        lv_obj_refresh_style(tabview);
     }
 
     tabview_realign(tabview);

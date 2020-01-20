@@ -55,7 +55,7 @@ void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
     dsc->overlay_opa = LV_OPA_TRANSP;
     dsc->pattern_font = LV_FONT_DEFAULT;
     dsc->shadow_opa = LV_OPA_COVER;
-    dsc->border_part = LV_BORDER_SIDE_FULL;
+    dsc->border_side = LV_BORDER_SIDE_FULL;
 }
 
 /**
@@ -117,10 +117,10 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
 
     /*If the border fully covers make the bg area 1px smaller to avoid artifacts on the corners*/
     if(dsc->border_width > 1 && dsc->border_opa >= LV_OPA_MAX && dsc->radius != 0) {
-        coords_bg.x1++;
-        coords_bg.y1++;
-        coords_bg.x2--;
-        coords_bg.y2--;
+        coords_bg.x1 += dsc->border_side & LV_BORDER_SIDE_LEFT ? 1 : 0;
+        coords_bg.y1 += dsc->border_side & LV_BORDER_SIDE_TOP ? 1 : 0;
+        coords_bg.x2 -= dsc->border_side & LV_BORDER_SIDE_RIGHT ? 1 : 0;
+        coords_bg.y2 -= dsc->border_side & LV_BORDER_SIDE_BOTTOM ? 1 : 0;
     }
 
     lv_opa_t opa = dsc->bg_opa;
@@ -314,7 +314,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
 
     bool simple_mode = true;
     if(lv_draw_mask_get_cnt()!= 0) simple_mode = false;
-    else if(dsc->border_part != LV_BORDER_SIDE_FULL) simple_mode = false;
+    else if(dsc->border_side != LV_BORDER_SIDE_FULL) simple_mode = false;
     else if(dsc->bg_grad_dir == LV_GRAD_DIR_HOR) simple_mode = false;
 
     int16_t mask_rout_id = LV_MASK_ID_INV;
@@ -342,10 +342,10 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
     /*Get the inner area*/
     lv_area_t area_small;
     lv_area_copy(&area_small, coords);
-    area_small.x1 += ((dsc->border_part & LV_BORDER_SIDE_LEFT) ? border_width : - (border_width + rout));
-    area_small.x2 -= ((dsc->border_part & LV_BORDER_SIDE_RIGHT) ? border_width : - (border_width + rout));
-    area_small.y1 += ((dsc->border_part & LV_BORDER_SIDE_TOP) ? border_width : - (border_width + rout));
-    area_small.y2 -= ((dsc->border_part & LV_BORDER_SIDE_BOTTOM) ? border_width : - (border_width + rout));
+    area_small.x1 += ((dsc->border_side & LV_BORDER_SIDE_LEFT) ? border_width : - (border_width + rout));
+    area_small.x2 -= ((dsc->border_side & LV_BORDER_SIDE_RIGHT) ? border_width : - (border_width + rout));
+    area_small.y1 += ((dsc->border_side & LV_BORDER_SIDE_TOP) ? border_width : - (border_width + rout));
+    area_small.y2 -= ((dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? border_width : - (border_width + rout));
 
     /*Create inner the mask*/
     lv_draw_mask_radius_param_t mask_rin_param;
@@ -402,7 +402,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
         }
 
         /*Draw the lower corner area corner area*/
-        if(dsc->border_part & LV_BORDER_SIDE_BOTTOM) {
+        if(dsc->border_side & LV_BORDER_SIDE_BOTTOM) {
             lv_coord_t lower_corner_end = coords->y2 - disp_area->y1 - corner_size;
             if(lower_corner_end <= upper_corner_end) lower_corner_end = upper_corner_end + 1;
             fill_area.y1 = disp_area->y1 + lower_corner_end;
@@ -1048,6 +1048,7 @@ static void draw_img(const lv_area_t * coords, const lv_area_t * clip, lv_draw_r
         lv_draw_label_dsc_init(&label_dsc);
         label_dsc.color = dsc->pattern_recolor;
         label_dsc.font = dsc->pattern_font;
+        label_dsc.opa = dsc->pattern_opa;
         lv_point_t s;
         lv_txt_get_size(&s, dsc->pattern_src, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
         img_w = s.x;

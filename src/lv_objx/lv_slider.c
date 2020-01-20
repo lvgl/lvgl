@@ -91,6 +91,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_style_list_init(&ext->style_knob);
         lv_theme_apply(new_slider, LV_THEME_SLIDER);
+        lv_obj_set_height(new_slider, LV_DPI / 15);
     }
     /*Copy an existing slider*/
     else {
@@ -198,7 +199,7 @@ static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * cli
         }
 		lv_slider_position_knob(slider, &knob_area, knob_size, hor);
 
-		lv_area_copy(&ext->left_knob_area, &knob_area);
+		lv_area_copy(&ext->right_knob_area, &knob_area);
         lv_slider_draw_knob(slider, &knob_area, clip_area);
 
         if(lv_slider_get_type(slider) == LV_SLIDER_TYPE_RANGE) {
@@ -210,7 +211,7 @@ static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * cli
 			}
 			lv_slider_position_knob(slider, &knob_area, knob_size, hor);
 
-			lv_area_copy(&ext->right_knob_area, &knob_area);
+			lv_area_copy(&ext->left_knob_area, &knob_area);
 			lv_slider_draw_knob(slider, &knob_area, clip_area);
         }
     }
@@ -254,21 +255,27 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 			lv_indev_get_point(param, &p);
 			bool hor = lv_obj_get_width(slider) >= lv_obj_get_height(slider);
 
-			/* Calculate the distance from each knob */
 			lv_coord_t dist_left, dist_right;
 			if(hor) {
-				dist_left = LV_MATH_ABS((ext->left_knob_area.x1+(ext->left_knob_area.x2 - ext->left_knob_area.x1)/2) - p.x);
-				dist_right = LV_MATH_ABS((ext->right_knob_area.x1+(ext->right_knob_area.x2 - ext->right_knob_area.x1)/2) - p.x);
+			    if(p.x > ext->right_knob_area.x2) {
+			        ext->value_to_set = &ext->bar.cur_value;
+			    }
+			    else if(p.x < ext->left_knob_area.x1) {
+                    ext->value_to_set = &ext->bar.start_value;
+			    } else {
+                    /* Calculate the distance from each knob */
+                    dist_left = LV_MATH_ABS((ext->left_knob_area.x1+(ext->left_knob_area.x2 - ext->left_knob_area.x1)/2) - p.x);
+                    dist_right = LV_MATH_ABS((ext->right_knob_area.x1+(ext->right_knob_area.x2 - ext->right_knob_area.x1)/2) - p.x);
+
+                    /* Use whichever one is closer */
+                    if(dist_right < dist_left)ext->value_to_set = &ext->bar.cur_value;
+                    else ext->value_to_set = &ext->bar.start_value;
+			    }
 			} else {
 				dist_left = LV_MATH_ABS((ext->left_knob_area.y1+(ext->left_knob_area.y2 - ext->left_knob_area.y1)/2) - p.y);
 				dist_right = LV_MATH_ABS((ext->right_knob_area.y1+(ext->right_knob_area.y2 - ext->right_knob_area.y1)/2) - p.y);
 			}
 
-			/* Use whichever one is closer */
-			if(dist_right > dist_left)
-				ext->value_to_set = &ext->bar.cur_value;
-			else
-				ext->value_to_set = &ext->bar.start_value;
 		} else
 			ext->value_to_set = &ext->bar.cur_value;
     } else if(sign == LV_SIGNAL_PRESSING && ext->value_to_set != NULL) {
@@ -283,7 +290,9 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         lv_style_int_t bg_bottom = lv_obj_get_style_int(slider, LV_SLIDER_PART_BG, LV_STYLE_PAD_BOTTOM);
 
         int32_t range = ext->bar.max_value - ext->bar.min_value;
-        int16_t new_value = 0, real_max_value = ext->bar.max_value, real_min_value = ext->bar.min_value;
+        int16_t new_value = 0;
+        int16_t real_max_value = ext->bar.max_value;
+        int16_t real_min_value = ext->bar.min_value;
 
 	    if(w >= h) {
 	        lv_coord_t indic_w = w - bg_left - bg_right;
@@ -298,22 +307,22 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
 	    }
 
-		/* Figure out the min. and max. for this mode */
-		if(ext->value_to_set == &ext->bar.start_value) {
-			real_max_value = ext->bar.cur_value;
-		} else
-			real_min_value = ext->bar.start_value;
-
-		if(new_value < real_min_value) new_value = real_min_value;
-	    else if(new_value > real_max_value) new_value = real_max_value;
-
-	    if(new_value != ext->bar.cur_value) {
-			*ext->value_to_set = new_value;
-			lv_obj_invalidate(slider);
-			res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
-	    	if(res != LV_RES_OK) return res;
+	    /* Figure out the min. and max. for this mode */
+	    if(ext->value_to_set == &ext->bar.start_value) {
+	        real_max_value = ext->bar.cur_value;
+	    } else {
+	        real_min_value = ext->bar.start_value;
 	    }
-        
+
+	    if(new_value < real_min_value) new_value = real_min_value;
+	    else if(new_value > real_max_value) new_value = real_max_value;
+	    if(*ext->value_to_set != new_value) {
+	        *ext->value_to_set = new_value;
+	        lv_obj_invalidate(slider);
+	        res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
+	        if(res != LV_RES_OK) return res;
+	    }
+
     } else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         ext->dragging = false;
 		ext->value_to_set = NULL;

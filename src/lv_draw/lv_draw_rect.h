@@ -40,7 +40,7 @@ typedef struct {
     lv_color_t border_color;
     lv_style_int_t border_width;
     lv_blend_mode_t border_blend_mode;
-    lv_style_int_t border_part;
+    lv_style_int_t border_side;
     lv_opa_t border_opa;
 
     /*Shadow*/

@@ -79,18 +79,18 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("page create started");
 
     /*Create the ancestor object*/
-    lv_obj_t * new_page = lv_cont_create(par, copy);
-    LV_ASSERT_MEM(new_page);
-    if(new_page == NULL) return NULL;
+    lv_obj_t * page = lv_cont_create(par, copy);
+    LV_ASSERT_MEM(page);
+    if(page == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_page);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_page);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(page);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(page);
 
     /*Allocate the object type specific extended data*/
-    lv_page_ext_t * ext = lv_obj_allocate_ext_attr(new_page, sizeof(lv_page_ext_t));
+    lv_page_ext_t * ext = lv_obj_allocate_ext_attr(page, sizeof(lv_page_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_page);
+        lv_obj_del(page);
         return NULL;
     }
 
@@ -112,11 +112,9 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->scroll_prop    = 0;
     ext->scroll_prop_obj = NULL;
 
-
-
     /*Init the new page object*/
     if(copy == NULL) {
-        ext->scrl = lv_cont_create(new_page, NULL);
+        ext->scrl = lv_cont_create(page, NULL);
         lv_obj_set_drag(ext->scrl, true);
         lv_obj_set_drag_throw(ext->scrl, true);
         lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT | LV_PROTECT_PRESS_LOST);
@@ -127,36 +125,36 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
         /* Add the signal function only if 'scrolling' is created
 +         * because everything has to be ready before any signal is received*/
-        lv_obj_set_signal_cb(new_page, lv_page_signal);
-        lv_obj_set_design_cb(new_page, lv_page_design);
+        lv_obj_set_signal_cb(page, lv_page_signal);
+        lv_obj_set_design_cb(page, lv_page_design);
 
-        lv_page_set_sb_mode(new_page, ext->sb.mode);
+        lv_page_set_sb_mode(page, ext->sb.mode);
 
-        lv_obj_refresh_style(new_page);
+        lv_theme_apply(page, LV_THEME_PAGE);
 
     } else {
         lv_page_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->scrl                = lv_cont_create(new_page, copy_ext->scrl);
+        ext->scrl                = lv_cont_create(page, copy_ext->scrl);
         lv_obj_set_signal_cb(ext->scrl, lv_page_scrollable_signal);
 
         /* Add the signal function only if 'scrolling' is created
          * because everything has to be ready before any signal is received*/
-        lv_obj_set_signal_cb(new_page, lv_page_signal);
-        lv_obj_set_design_cb(new_page, lv_page_design);
+        lv_obj_set_signal_cb(page, lv_page_signal);
+        lv_obj_set_design_cb(page, lv_page_design);
 
 //        lv_page_set_style(new_page, LV_PAGE_STYLE_BG, lv_page_get_style(copy, LV_PAGE_STYLE_BG));
 //        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, lv_page_get_style(copy, LV_PAGE_STYLE_SCRL));
 //        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRLBAR, lv_page_get_style(copy, LV_PAGE_STYLE_SCRLBAR));
 
-        lv_page_set_sb_mode(new_page, copy_ext->sb.mode);
+        lv_page_set_sb_mode(page, copy_ext->sb.mode);
     }
 
 
-    lv_page_sb_refresh(new_page);
+    lv_page_sb_refresh(page);
 
     LV_LOG_INFO("page created");
 
-    return new_page;
+    return page;
 }
 
 /**

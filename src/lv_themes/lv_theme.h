@@ -36,25 +36,12 @@ extern "C" {
 typedef enum {
     LV_THEME_NONE = 0,
     LV_THEME_SCR,
-    LV_THEME_SCR_TRANSP,
 
     LV_THEME_PANEL,
-    LV_THEME_PANEL_TRANSP,
-    LV_THEME_PANEL_FRAME,
-    LV_THEME_PANEL_TIGHT,
-    LV_THEME_PANEL_FIT,
 
     LV_THEME_BTN,
-    LV_THEME_BTN_DANGER,
-    LV_THEME_BTN_APPROVE,
-    LV_THEME_BTN_TRANSP,
-    LV_THEME_BTN_FRAME,
-    LV_THEME_BTN_LARGE,
-    LV_THEME_BTN_SMALL,
 
     LV_THEME_LABEL,
-    LV_THEME_LABEL_TITLE,
-    LV_THEME_LABEL_HINT,
 
     LV_THEME_BTNM,
     LV_THEME_BTNM_BTN,
@@ -67,6 +54,8 @@ typedef enum {
 
     LV_THEME_CB,
     LV_THEME_CB_BULLET,
+
+    LV_THEME_PAGE,
 
     LV_THEME_DDLIST_BG,
     LV_THEME_DDLIST_SCRL,
@@ -117,6 +106,7 @@ typedef enum {
     LV_THEME_TABLE_CELL3,
     LV_THEME_TABLE_CELL4,
 
+    LV_THEME_CHART,
     LV_THEME_CHART_BG,
     LV_THEME_CHART_SERIES_BG,
     LV_THEME_CHART_SERIES,
@@ -126,7 +116,6 @@ typedef enum {
 typedef struct {
     lv_style_t * (*get_style_cb)(lv_theme_style_t);
     void (*apply_cb)(lv_obj_t *,lv_theme_style_t);
-    lv_style_t * (*get_style_part_cb)(lv_theme_style_t name, uint8_t part);
 }lv_theme_t;
 
 /**********************

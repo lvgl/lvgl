@@ -90,7 +90,7 @@ void lv_style_list_init(lv_style_list_t * list)
 
 void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * list_src)
 {
-    lv_style_list_init(list_dest);
+    lv_style_list_reset(list_dest);
 
     if(list_src->style_list == NULL) return;
 

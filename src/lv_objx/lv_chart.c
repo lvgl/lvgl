@@ -25,7 +25,6 @@
 #define LV_CHART_HDIV_DEF 3
 #define LV_CHART_VDIV_DEF 5
 #define LV_CHART_PNUM_DEF 10
-#define LV_CHART_AXIS_TO_LABEL_DISTANCE 4
 #define LV_CHART_AXIS_MAJOR_TICK_LEN_COE 1 / 15
 #define LV_CHART_AXIS_MINOR_TICK_LEN_COE 2 / 3
 #define LV_CHART_AXIS_PRIMARY_Y 1
@@ -88,15 +87,15 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("chart create started");
 
     /*Create the ancestor basic object*/
-    lv_obj_t * new_chart = lv_obj_create(par, copy);
-    LV_ASSERT_MEM(new_chart);
-    if(new_chart == NULL) return NULL;
+    lv_obj_t * chart = lv_obj_create(par, copy);
+    LV_ASSERT_MEM(chart);
+    if(chart == NULL) return NULL;
 
     /*Allocate the object type specific extended data*/
-    lv_chart_ext_t * ext = lv_obj_allocate_ext_attr(new_chart, sizeof(lv_chart_ext_t));
+    lv_chart_ext_t * ext = lv_obj_allocate_ext_attr(chart, sizeof(lv_chart_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_chart);
+        lv_obj_del(chart);
         return NULL;
     }
 
@@ -123,20 +122,17 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_style_list_init(&ext->style_series_bg);
     lv_style_list_init(&ext->style_series);
 
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_chart);
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_chart);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(chart);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(chart);
 
-    lv_obj_set_signal_cb(new_chart, lv_chart_signal);
-    lv_obj_set_design_cb(new_chart, lv_chart_design);
+    lv_obj_set_signal_cb(chart, lv_chart_signal);
+    lv_obj_set_design_cb(chart, lv_chart_design);
 
     /*Init the new chart background object*/
     if(copy == NULL) {
-        lv_obj_set_size(new_chart, LV_DPI * 3, LV_DPI * 2);
+        lv_obj_set_size(chart, LV_DPI * 3, LV_DPI * 2);
 
-        lv_style_list_reset(&new_chart->style_list);
-        lv_obj_add_theme(new_chart, LV_CHART_PART_BG, LV_THEME_CHART_BG);
-        lv_obj_add_theme(new_chart, LV_CHART_PART_SERIES_BG, LV_THEME_CHART_SERIES_BG);
-        lv_obj_add_theme(new_chart, LV_CHART_PART_SERIES, LV_THEME_CHART_SERIES);
+        lv_theme_apply(chart, LV_THEME_CHART);
 
     } else {
         lv_chart_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
@@ -152,12 +148,12 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
         memcpy(&ext->secondary_y_axis, &ext_copy->secondary_y_axis, sizeof(lv_chart_axis_cfg_t));
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_chart);
+        lv_obj_refresh_style(chart);
     }
 
     LV_LOG_INFO("chart created");
 
-    return new_chart;
+    return chart;
 }
 
 /*======================
@@ -798,7 +794,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
 
         has_fade = area_dsc.bg_grad_dir == LV_GRAD_DIR_VER ? true : false;
         if(has_fade) {
-            lv_draw_mask_fade_init(&mask_fade_p, &chart->coords, area_dsc.bg_grad_color_stop, chart->coords.y1, area_dsc.bg_main_color_stop, chart->coords.y2);
+            lv_draw_mask_fade_init(&mask_fade_p, &chart->coords, area_dsc.bg_main_color_stop, chart->coords.y1, area_dsc.bg_grad_color_stop, chart->coords.y2);
         }
     }
 
@@ -828,7 +824,6 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
         p2.y   = h - y_tmp + y_ofs;
 
         for(i = 0; i < ext->point_cnt; i++) {
-
             p1.x = p2.x;
             p1.y = p2.y;
 
@@ -899,7 +894,8 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
             point_area.y1 -= point_radius;
 
             if(ser->points[p_act] != LV_CHART_POINT_DEF) {
-                lv_draw_rect(&point_area, &series_mask, &point_dsc);
+                /*Don't limit to `series_mask` to get full circles on the ends*/
+                lv_draw_rect(&point_area, clip_area, &point_dsc);
             }
         }
     }
@@ -1199,6 +1195,8 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
     else
         num_scale_ticks = (y_axis->num_tick_marks * (num_of_labels - 1));
 
+    lv_style_int_t label_dist  = lv_obj_get_style_int(chart, LV_CHART_PART_SERIES_BG, which_axis == LV_CHART_AXIS_PRIMARY_Y ? LV_STYLE_PAD_LEFT : LV_STYLE_PAD_RIGHT);
+
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(chart, LV_CHART_PART_BG, &line_dsc);
@@ -1256,11 +1254,11 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
                 lv_area_t a = {.y1 = p2.y - size.y / 2, .y2 = p2.y + size.y / 2};
 
                 if(which_axis == LV_CHART_AXIS_PRIMARY_Y) {
-                    a.x1 = p2.x - size.x - LV_CHART_AXIS_TO_LABEL_DISTANCE;
-                    a.x2 = p2.x - LV_CHART_AXIS_TO_LABEL_DISTANCE;
+                    a.x1 = p2.x - size.x - label_dist;
+                    a.x2 = p2.x - label_dist;
                 } else {
-                    a.x1 = p2.x + LV_CHART_AXIS_TO_LABEL_DISTANCE;
-                    a.x2 = p2.x + size.x + LV_CHART_AXIS_TO_LABEL_DISTANCE;
+                    a.x1 = p2.x + label_dist;
+                    a.x2 = p2.x + size.x + label_dist;
                 }
 
                 lv_draw_label(&a, mask, &label_dsc, buf, NULL);
@@ -1312,6 +1310,9 @@ static void draw_x_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
     else
         num_scale_ticks = (ext->x_axis.num_tick_marks * (num_of_labels - 1));
 
+
+    lv_style_int_t label_dist  = lv_obj_get_style_int(chart, LV_CHART_PART_SERIES_BG, LV_STYLE_PAD_BOTTOM);
+
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(chart, LV_CHART_PART_BG, &line_dsc);
@@ -1350,8 +1351,8 @@ static void draw_x_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
                         LV_COORD_MAX, LV_TXT_FLAG_CENTER);
 
                 /* set the area at some distance of the major tick len under of the tick */
-                lv_area_t a = {(p2.x - size.x / 2), (p2.y + LV_CHART_AXIS_TO_LABEL_DISTANCE), (p2.x + size.x / 2),
-                        (p2.y + size.y + LV_CHART_AXIS_TO_LABEL_DISTANCE)};
+                lv_area_t a = {(p2.x - size.x / 2), (p2.y + label_dist), (p2.x + size.x / 2),
+                        (p2.y + size.y + label_dist)};
                 lv_draw_label(&a, mask, &label_dsc, buf, NULL);
             }
         }

@@ -52,55 +52,51 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("check box create started");
 
     /*Create the ancestor basic object*/
-    lv_obj_t * new_cb = lv_btn_create(par, copy);
-    LV_ASSERT_MEM(new_cb);
-    if(new_cb == NULL) return NULL;
+    lv_obj_t * cb = lv_btn_create(par, copy);
+    LV_ASSERT_MEM(cb);
+    if(cb == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_cb);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(cb);
 
-    lv_cb_ext_t * ext = lv_obj_allocate_ext_attr(new_cb, sizeof(lv_cb_ext_t));
+    lv_cb_ext_t * ext = lv_obj_allocate_ext_attr(cb, sizeof(lv_cb_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_cb);
+        lv_obj_del(cb);
         return NULL;
     }
 
     ext->bullet = NULL;
     ext->label  = NULL;
 
-    lv_obj_set_signal_cb(new_cb, lv_cb_signal);
+    lv_obj_set_signal_cb(cb, lv_cb_signal);
 
     /*Init the new checkbox object*/
     if(copy == NULL) {
-        ext->bullet = lv_obj_create(new_cb, NULL);
+        ext->bullet = lv_obj_create(cb, NULL);
         lv_obj_set_click(ext->bullet, false);
 
-        ext->label = lv_label_create(new_cb, NULL);
+        ext->label = lv_label_create(cb, NULL);
 
-        lv_cb_set_text(new_cb, "Check box");
-        lv_btn_set_layout(new_cb, LV_LAYOUT_ROW_M);
-        lv_btn_set_fit(new_cb, LV_FIT_TIGHT);
-        lv_btn_set_toggle(new_cb, true);
-        lv_obj_set_protect(new_cb, LV_PROTECT_PRESS_LOST);
+        lv_cb_set_text(cb, "Check box");
+        lv_btn_set_layout(cb, LV_LAYOUT_ROW_M);
+        lv_btn_set_fit(cb, LV_FIT_TIGHT);
+        lv_btn_set_toggle(cb, true);
+        lv_obj_set_protect(cb, LV_PROTECT_PRESS_LOST);
 
-        lv_obj_reset_style(new_cb, LV_CB_PART_BG);
-//        lv_obj_reset_style(new_cb, LV_CB_PART_BULLET);
-
-        _ot(new_cb, LV_CB_PART_BG, CB);
-        _ot(new_cb, LV_CB_PART_BULLET, CB_BULLET);
+        lv_theme_apply(cb, LV_THEME_CB);
 
     } else {
         lv_cb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->bullet            = lv_obj_create(new_cb, copy_ext->bullet);
-        ext->label             = lv_label_create(new_cb, copy_ext->label);
+        ext->bullet            = lv_obj_create(cb, copy_ext->bullet);
+        ext->label             = lv_label_create(cb, copy_ext->label);
 
         /*Refresh the style with new signal function*/
-//        lv_obj_refresh_style(new_cb);
+//        lv_obj_refresh_style(cb);
     }
 
     LV_LOG_INFO("check box created");
 
-    return new_cb;
+    return cb;
 }
 
 /*=====================
@@ -185,9 +181,7 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
         const lv_font_t * font = lv_obj_get_style_ptr(ext->label, LV_LABEL_PART_MAIN, LV_STYLE_FONT);
         lv_coord_t line_height = lv_font_get_line_height(font);
         lv_obj_set_size(ext->bullet, line_height, line_height);
-        ext->bullet->state = cb->state;
-        ext->bullet->prev_state = cb->state;
-        lv_obj_refresh_style(ext->bullet);
+        lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
     } else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
     } else if(sign == LV_SIGNAL_CONTROL) {

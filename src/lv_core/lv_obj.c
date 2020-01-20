@@ -282,8 +282,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
     new_obj->ext_attr = NULL;
 
+    lv_style_list_init(&new_obj->style_list);
     if(copy == NULL) {
-        lv_style_list_init(&new_obj->style_list);
         if(parent != NULL) lv_obj_add_theme(new_obj, LV_OBJ_PART_MAIN, LV_THEME_PANEL);
         else  lv_obj_add_theme(new_obj, LV_OBJ_PART_MAIN, LV_THEME_SCR);
     } else {
@@ -746,7 +746,7 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     /*Tell the children the parent's size has changed*/
     lv_obj_t * i;
     LV_LL_READ(obj->child_ll, i) {
-        i->signal_cb(i, LV_SIGNAL_PARENT_SIZE_CHG, NULL);
+        i->signal_cb(i, LV_SIGNAL_PARENT_SIZE_CHG,  &ori);
     }
 
     /*Invalidate the new area*/
@@ -1467,6 +1467,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t state)
             obj->state = new_state;
             obj->prev_state = new_state;
             obj->state_anim = 0;
+            lv_obj_refresh_style(obj);
         }
         /*Start transition if set*/
         else {
@@ -1476,6 +1477,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t state)
                 obj->state = new_state;
                 obj->prev_state = new_state;
                 obj->state_anim = 0;
+                lv_obj_refresh_style(obj);
             }
             /*Set the new state for prev state too to get the TRANSITION_TIME for the new state*/
             else {
@@ -2649,7 +2651,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
     if(draw_dsc->border_opa > LV_OPA_MIN) {
         draw_dsc->border_width = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_WIDTH);
         if(draw_dsc->border_width) {
-            draw_dsc->border_part = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_SIDE);
+            draw_dsc->border_side = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_SIDE);
             draw_dsc->border_color = lv_obj_get_style_color(obj, part, LV_STYLE_BORDER_COLOR);
         }
         draw_dsc->border_blend_mode = lv_obj_get_style_int(obj, part, LV_STYLE_BORDER_BLEND_MODE);

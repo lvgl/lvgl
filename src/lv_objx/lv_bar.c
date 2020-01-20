@@ -103,13 +103,14 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
     ext->type         = LV_BAR_TYPE_NORMAL;
 
+    lv_style_list_init(&ext->style_indic);
+
     lv_obj_set_signal_cb(bar, lv_bar_signal);
     lv_obj_set_design_cb(bar, lv_bar_design);
 
 
     /*Init the new  bar object*/
     if(copy == NULL) {
-        lv_style_list_init(&ext->style_indic);
 
         lv_obj_set_click(bar, false);
         lv_obj_set_size(bar, LV_DPI * 2, LV_DPI / 10);

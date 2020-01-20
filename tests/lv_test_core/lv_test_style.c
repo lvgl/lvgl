@@ -290,6 +290,7 @@ static void copy(void)
     lv_style_list_set_local_int(&list_src, LV_STYLE_LINE_DASH_WIDTH, 20);
 
     lv_style_list_t list_dest;
+    lv_style_list_init(&list_dest);
     lv_style_list_copy(&list_dest, &list_src);
 
     lv_res_t found;

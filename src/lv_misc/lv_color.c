@@ -37,6 +37,17 @@
  *   STATIC FUNCTIONS
  **********************/
 
+lv_color_t lv_color_lighten(lv_color_t c, lv_opa_t lvl)
+{
+    return lv_color_mix(LV_COLOR_WHITE, c, lvl);
+}
+
+
+lv_color_t lv_color_darken(lv_color_t c, lv_opa_t lvl)
+{
+    return lv_color_mix(LV_COLOR_BLACK, c, lvl);
+}
+
 /**
  * Convert a HSV color to RGB
  * @param h hue [0..359]
