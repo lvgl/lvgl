@@ -148,9 +148,11 @@ bool lv_bidi_letter_is_neutral(uint32_t letter)
 uint16_t lv_bidi_get_logical_pos(const char * str_in, char **bidi_txt, uint32_t len, lv_bidi_dir_t base_dir, uint32_t visual_pos, bool *is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
-    void *buf = lv_draw_get_buf(len + pos_conv_len * sizeof(uint16_t));
+    uint32_t txt_buf_size = len + 1;
+    txt_buf_size = (txt_buf_size + 3) & (~0x3);
+    void *buf = lv_draw_get_buf(txt_buf_size + pos_conv_len * sizeof(uint16_t));
     if (bidi_txt) *bidi_txt = buf;
-    uint16_t *pos_conv_buf = (uint16_t*) ((char*)buf + len);
+    uint16_t *pos_conv_buf = (uint16_t*) ((char*)buf + txt_buf_size);
     lv_bidi_process_paragraph(str_in, bidi_txt? *bidi_txt: NULL, len, base_dir, pos_conv_buf, pos_conv_len);
     if (is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[visual_pos]);
     return GET_POS(pos_conv_buf[visual_pos]);
@@ -159,9 +161,11 @@ uint16_t lv_bidi_get_logical_pos(const char * str_in, char **bidi_txt, uint32_t 
 uint16_t lv_bidi_get_visual_pos(const char * str_in, char **bidi_txt, uint16_t len, lv_bidi_dir_t base_dir, uint32_t logical_pos, bool *is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
-    void *buf = lv_draw_get_buf(len + pos_conv_len * sizeof(uint16_t));
+    uint32_t txt_buf_size = len + 1;
+    txt_buf_size = (txt_buf_size + 3) & (~0x3);
+    void *buf = lv_draw_get_buf(txt_buf_size + pos_conv_len * sizeof(uint16_t));
     if (bidi_txt) *bidi_txt = buf;
-    uint16_t *pos_conv_buf = (uint16_t*) ((char*)buf + len);
+    uint16_t *pos_conv_buf = (uint16_t*) ((char*)buf + txt_buf_size);
     lv_bidi_process_paragraph(str_in, bidi_txt? *bidi_txt: NULL, len, base_dir, pos_conv_buf, pos_conv_len);
     for (uint16_t i = 0; i < pos_conv_len; i++){
         if (GET_POS(pos_conv_buf[i]) == logical_pos){

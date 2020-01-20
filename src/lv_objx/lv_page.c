@@ -1073,7 +1073,6 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
 
         /*Hide scrollbars if required*/
         if(page_ext->sb.mode == LV_SB_MODE_DRAG) {
-            lv_disp_t * disp = lv_obj_get_disp(page);
             lv_area_t sb_area_tmp;
             if(page_ext->sb.hor_draw) {
                 lv_area_copy(&sb_area_tmp, &page_ext->sb.hor_area);
@@ -1150,7 +1149,6 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     }
 
     /*Invalidate the current (old) scrollbar areas*/
-    lv_disp_t * disp = lv_obj_get_disp(page);
     lv_area_t sb_area_tmp;
     if(ext->sb.hor_draw != 0) {
         lv_area_copy(&sb_area_tmp, &ext->sb.hor_area);
