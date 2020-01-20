@@ -521,10 +521,12 @@ void lv_obj_clean(lv_obj_t * obj)
 }
 
 /**
- * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
+ * Mark an area of an object as invalid.
+ * This area will be redrawn by 'lv_refr_task'
  * @param obj pointer to an object
+ * @param area the area to redraw
  */
-void lv_obj_invalidate(const lv_obj_t * obj)
+void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -535,31 +537,56 @@ void lv_obj_invalidate(const lv_obj_t * obj)
     lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
     if(obj_scr == lv_disp_get_scr_act(disp) || obj_scr == lv_disp_get_layer_top(disp) ||
        obj_scr == lv_disp_get_layer_sys(disp)) {
-        /*Truncate recursively to the parents*/
-        lv_area_t area_trunc;
-        lv_obj_t * par = lv_obj_get_parent(obj);
-        bool union_ok  = true;
-        /*Start with the original coordinates*/
-        lv_coord_t ext_size = obj->ext_draw_pad;
-        lv_area_copy(&area_trunc, &obj->coords);
-        area_trunc.x1 -= ext_size;
-        area_trunc.y1 -= ext_size;
-        area_trunc.x2 += ext_size;
-        area_trunc.y2 += ext_size;
 
-        /*Check through all parents*/
+        /*Truncate the area to the object*/
+        lv_area_t obj_coords;
+        lv_coord_t ext_size = obj->ext_draw_pad;
+        lv_area_copy(&obj_coords, &obj->coords);
+        obj_coords.x1 -= ext_size;
+        obj_coords.y1 -= ext_size;
+        obj_coords.x2 += ext_size;
+        obj_coords.y2 += ext_size;
+
+        bool is_common;
+        lv_area_t area_trunc;
+
+        is_common = lv_area_intersect(&area_trunc, area, &obj_coords);
+        if(is_common == false) return;  /*The area is not on the object*/
+
+        /*Truncate recursively to the parents*/
+        lv_obj_t * par = lv_obj_get_parent(obj);
         while(par != NULL) {
-            union_ok = lv_area_intersect(&area_trunc, &area_trunc, &par->coords);
-            if(union_ok == false) break;       /*If no common parts with parent break;*/
+            is_common = lv_area_intersect(&area_trunc, &area_trunc, &par->coords);
+            if(is_common == false) break;       /*If no common parts with parent break;*/
             if(lv_obj_get_hidden(par)) return; /*If the parent is hidden then the child is hidden and won't be drawn*/
 
             par = lv_obj_get_parent(par);
         }
 
-        if(union_ok) lv_inv_area(disp, &area_trunc);
+        if(is_common) lv_inv_area(disp, &area_trunc);
     }
 }
 
+/**
+ * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
+ * @param obj pointer to an object
+ */
+void lv_obj_invalidate(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    /*Truncate the area to the object*/
+    lv_area_t obj_coords;
+    lv_coord_t ext_size = obj->ext_draw_pad;
+    lv_area_copy(&obj_coords, &obj->coords);
+    obj_coords.x1 -= ext_size;
+    obj_coords.y1 -= ext_size;
+    obj_coords.x2 += ext_size;
+    obj_coords.y2 += ext_size;
+
+    lv_obj_invalidate_area(obj, &obj_coords);
+
+}
 /*=====================
  * Setter functions
  *====================*/

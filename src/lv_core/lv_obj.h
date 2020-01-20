@@ -312,6 +312,15 @@ void lv_obj_del_async(struct _lv_obj_t *obj);
  */
 void lv_obj_clean(lv_obj_t * obj);
 
+
+/**
+ * Mark an area of an object as invalid.
+ * This area will be redrawn by 'lv_refr_task'
+ * @param obj pointer to an object
+ * @param area the area to redraw
+ */
+void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area);
+
 /**
  * Mark the object as invalid therefore its current position will be redrawn by 'lv_refr_task'
  * @param obj pointer to an object

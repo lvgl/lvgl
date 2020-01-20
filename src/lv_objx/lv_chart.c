@@ -1496,13 +1496,13 @@ static void lv_chart_inv_lines(lv_obj_t * chart, uint16_t i)
         if(i < ext->point_cnt - 1) {
             coords.x1 = ((w * i) / (ext->point_cnt - 1)) + x_ofs - ext->series.width;
             coords.x2 = ((w * (i + 1)) / (ext->point_cnt - 1)) + x_ofs + ext->series.width;
-            lv_inv_area(lv_obj_get_disp(chart), &coords);
+            lv_obj_invalidate_area(chart, &coords);
         }
 
         if(i > 0) {
             coords.x1 = ((w * (i - 1)) / (ext->point_cnt - 1)) + x_ofs - ext->series.width;
             coords.x2 = ((w * i) / (ext->point_cnt - 1)) + x_ofs + ext->series.width;
-            lv_inv_area(lv_obj_get_disp(chart), &coords);
+            lv_obj_invalidate_area(chart, &coords);
         }
     }
 }

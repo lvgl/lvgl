@@ -1081,7 +1081,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 sb_area_tmp.y1 += page->coords.y1;
                 sb_area_tmp.x2 += page->coords.x1;
                 sb_area_tmp.y2 += page->coords.y1;
-                lv_inv_area(disp, &sb_area_tmp);
+                lv_obj_invalidate_area(page, &sb_area_tmp);
                 page_ext->sb.hor_draw = 0;
             }
             if(page_ext->sb.ver_draw) {
@@ -1090,7 +1090,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 sb_area_tmp.y1 += page->coords.y1;
                 sb_area_tmp.x2 += page->coords.x1;
                 sb_area_tmp.y2 += page->coords.y1;
-                lv_inv_area(disp, &sb_area_tmp);
+                lv_obj_invalidate_area(page, &sb_area_tmp);
                 page_ext->sb.ver_draw = 0;
             }
         }
@@ -1158,7 +1158,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         sb_area_tmp.y1 += page->coords.y1;
         sb_area_tmp.x2 += page->coords.x1;
         sb_area_tmp.y2 += page->coords.y1;
-        lv_inv_area(disp, &sb_area_tmp);
+        lv_obj_invalidate_area(page, &sb_area_tmp);
     }
     if(ext->sb.ver_draw != 0) {
         lv_area_copy(&sb_area_tmp, &ext->sb.ver_area);
@@ -1166,7 +1166,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         sb_area_tmp.y1 += page->coords.y1;
         sb_area_tmp.x2 += page->coords.x1;
         sb_area_tmp.y2 += page->coords.y1;
-        lv_inv_area(disp, &sb_area_tmp);
+        lv_obj_invalidate_area(page, &sb_area_tmp);
     }
 
     if(ext->sb.mode == LV_SB_MODE_DRAG && lv_indev_is_dragging(lv_indev_get_act()) == false) {
@@ -1228,7 +1228,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         sb_area_tmp.y1 += page->coords.y1;
         sb_area_tmp.x2 += page->coords.x1;
         sb_area_tmp.y2 += page->coords.y1;
-        lv_inv_area(disp, &sb_area_tmp);
+        lv_obj_invalidate_area(page, &sb_area_tmp);
     }
     if(ext->sb.ver_draw != 0) {
         lv_area_copy(&sb_area_tmp, &ext->sb.ver_area);
@@ -1236,7 +1236,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         sb_area_tmp.y1 += page->coords.y1;
         sb_area_tmp.x2 += page->coords.x1;
         sb_area_tmp.y2 += page->coords.y1;
-        lv_inv_area(disp, &sb_area_tmp);
+        lv_obj_invalidate_area(page, &sb_area_tmp);
     }
 }
 

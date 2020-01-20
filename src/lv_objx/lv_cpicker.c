@@ -750,7 +750,7 @@ static void invalidate_indic(lv_obj_t * cpicker)
 {
     lv_area_t indic_area = get_indic_area(cpicker);
 
-    lv_inv_area(lv_obj_get_disp(cpicker), &indic_area);
+    lv_obj_invalidate_area(cpicker, &indic_area);
 }
 
 static lv_area_t get_indic_area(lv_obj_t * cpicker)

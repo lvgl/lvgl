@@ -1084,7 +1084,7 @@ static void invalidate_button_area(const lv_obj_t * btnm, uint16_t btn_idx)
     btn_area.x2 += btnm_area.x1;
     btn_area.y2 += btnm_area.y1;
 
-    lv_inv_area(lv_obj_get_disp(btnm), &btn_area);
+    lv_obj_invalidate_area(btnm, &btn_area);
 }
 
 /**
