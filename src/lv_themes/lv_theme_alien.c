@@ -127,6 +127,7 @@ static void basic_init(void)
     lv_style_set_int(&panel, LV_STYLE_RADIUS, LV_DPI / 25);
     lv_style_set_opa(&panel, LV_STYLE_BG_OPA, LV_OPA_COVER);
     lv_style_set_color(&panel, LV_STYLE_BG_COLOR, COLOR_CONTAINER);
+    lv_style_set_color(&panel, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
     lv_style_set_color(&panel, LV_STYLE_BORDER_COLOR, lv_color_lighten(COLOR_CONTAINER, LV_OPA_10));
     lv_style_set_int(&panel, LV_STYLE_BORDER_WIDTH, LV_DPI / 50 > 0 ? LV_DPI / 50 : 1);
     lv_style_set_int(&panel, LV_STYLE_BORDER_SIDE , LV_BORDER_SIDE_TOP);
@@ -135,6 +136,7 @@ static void basic_init(void)
     lv_style_set_int(&panel, LV_STYLE_PAD_TOP, LV_DPI / 5);
     lv_style_set_int(&panel, LV_STYLE_PAD_BOTTOM, LV_DPI / 5);
     lv_style_set_int(&panel, LV_STYLE_PAD_INNER, LV_DPI / 5);
+    lv_style_set_int(&panel, LV_STYLE_PAD_INNER | LV_STYLE_STATE_FOCUS, LV_DPI);
     lv_style_set_color(&panel, LV_STYLE_TEXT_COLOR, lv_color_hex(0x979a9f));
     lv_style_set_ptr(&panel, LV_STYLE_FONT, &lv_font_roboto_16);
     lv_style_set_color(&panel, LV_STYLE_IMAGE_RECOLOR, lv_color_hex(0x979a9f));
@@ -573,6 +575,10 @@ static void win_init(void)
  */
 lv_theme_t * lv_theme_alien_init(uint16_t hue, lv_font_t * font)
 {
+
+    lv_mem_monitor_t mon1;
+    lv_mem_monitor(&mon1);
+
     basic_init();
     cont_init();
     btn_init();
@@ -607,6 +613,11 @@ lv_theme_t * lv_theme_alien_init(uint16_t hue, lv_font_t * font)
 
     theme.get_style_cb = lv_theme_alien_get_style;
     theme.apply_cb = lv_theme_alien_apply;
+
+
+    lv_mem_monitor_t mon2;
+    lv_mem_monitor(&mon2);
+    printf("theme size: %d\n", mon1.free_size - mon2.free_size);
     return &theme;
 }
 
@@ -625,6 +636,11 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
     lv_style_list_t * list;
 
     switch(name) {
+    case LV_THEME_SCR:
+        list = lv_obj_get_style(obj, LV_BTN_PART_MAIN);
+        lv_style_list_reset(list);
+        lv_style_list_reset(&scr);
+        break;
     case LV_THEME_BTN:
         list = lv_obj_get_style(obj, LV_BTN_PART_MAIN);
         lv_style_list_reset(list);
@@ -663,6 +679,20 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &sw_knob);
         break;
+
+#if LV_USE_IMG
+    case LV_THEME_IMAGE:
+        list = lv_obj_get_style(obj, LV_IMG_PART_MAIN);
+        lv_style_list_reset(list);
+        break;
+#endif
+
+#if LV_USE_LABEL
+    case LV_THEME_LABEL:
+        list = lv_obj_get_style(obj, LV_LABEL_PART_MAIN);
+        lv_style_list_reset(list);
+        break;
+#endif
 
 #if LV_USE_SLIDER
     case LV_THEME_SLIDER:
@@ -803,21 +833,6 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
 lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
 {
     switch(name) {
-    case LV_THEME_SCR:
-        return &scr;
-    case LV_THEME_PANEL:
-        return &panel;
-    case LV_THEME_BTNM:
-        return &panel;
-    case LV_THEME_BTNM_BTN:
-        return &btn;
-
-#if LV_USE_CB
-    case LV_THEME_CB:
-       return &panel;
-    case LV_THEME_CB_BULLET:
-        return &btn;
-#endif
 #if LV_USE_DDLIST
     case LV_THEME_DDLIST_SCRL:
         return NULL;
@@ -833,10 +848,6 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
         return &gauge;
     case LV_THEME_GAUGE_STRONG:
         return &gauge_strong;
-#endif
-#if LV_USE_TA
-    case LV_THEME_TA_CURSOR:
-        return &ta_cursor;
 #endif
 #if LV_USE_LIST
     case LV_THEME_LIST_BTN:
@@ -868,25 +879,6 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
         return NULL;
     case LV_THEME_MBOX_BTN:
         return &btn;
-#endif
-
-#if LV_USE_TABLE
-    case LV_THEME_TABLE_BG:
-        return NULL;
-    case LV_THEME_TABLE_CELL1:
-    case LV_THEME_TABLE_CELL2:
-    case LV_THEME_TABLE_CELL3:
-    case LV_THEME_TABLE_CELL4:
-        return &table_cell;
-#endif
-
-#if LV_USE_CHART
-    case LV_THEME_CHART_BG:
-        return &panel;
-    case LV_THEME_CHART_SERIES_BG:
-        return NULL;
-    case LV_THEME_CHART_SERIES:
-        return &chart_series;
 #endif
     }
 

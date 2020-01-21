@@ -43,6 +43,8 @@ typedef enum {
 
     LV_THEME_LABEL,
 
+    LV_THEME_IMAGE,
+
     LV_THEME_BTNM,
     LV_THEME_BTNM_BTN,
 

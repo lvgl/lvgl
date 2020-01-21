@@ -28,9 +28,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void style_mod_def(lv_group_t * group, lv_style_t * style);
-static void style_mod_edit_def(lv_group_t * group, lv_style_t * style);
-static void refresh_theme(lv_group_t * g, lv_theme_t * th);
 static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *),
                             void * (*move)(const lv_ll_t *, const void *));
 static void lv_group_refocus(lv_group_t * g);
@@ -78,9 +75,6 @@ lv_group_t * lv_group_create(void)
 #if LV_USE_USER_DATA
     memset(&group->user_data, 0, sizeof(lv_group_user_data_t));
 #endif
-
-    /*Initialize style modification callbacks from current theme*/
-    refresh_theme(group, lv_theme_get_current());
 
     return group;
 }
@@ -501,27 +495,6 @@ bool lv_group_get_wrap(lv_group_t * group)
     return group->wrap ? true : false;
 }
 
-/**
- * Notify the group that current theme changed and style modification callbacks need to be
- * refreshed.
- * @param group pointer to group. If NULL then all groups are notified.
- */
-void lv_group_report_style_mod(lv_group_t * group)
-{
-    lv_theme_t * th = lv_theme_get_current();
-
-    if(group != NULL) {
-        refresh_theme(group, th);
-        return;
-    }
-
-    lv_group_t * i;
-    LV_LL_READ(LV_GC_ROOT(_lv_group_ll), i)
-    {
-        refresh_theme(i, th);
-    }
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -538,89 +511,6 @@ static void lv_group_refocus(lv_group_t * g)
         lv_group_focus_prev(g);
     /*Restore wrap property*/
     g->wrap = temp_wrap;
-}
-
-/**
- * Default style modifier function
- * @param group pointer to the caller group
- * @param style pointer to a style to modify. (Typically group.style_tmp) It will be OVERWRITTEN.
- */
-static void style_mod_def(lv_group_t * group, lv_style_t * style)
-{
-    (void)group; /*Unused*/
-#if LV_COLOR_DEPTH != 1
-
-//    /*Make the style to be a little bit orange*/
-//    style->body.border.opa   = LV_OPA_COVER;
-//    style->body.border.color = LV_COLOR_ORANGE;
-//
-//    /*If not transparent or has border then emphasis the border*/
-//    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
-//
-//    style->body.main_color   = lv_color_mix(style->body.main_color, LV_COLOR_ORANGE, LV_OPA_70);
-//    style->body.grad_color   = lv_color_mix(style->body.grad_color, LV_COLOR_ORANGE, LV_OPA_70);
-//    style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_ORANGE, LV_OPA_60);
-//
-//    style->text.color = lv_color_mix(style->text.color, LV_COLOR_ORANGE, LV_OPA_70);
-//
-//    /*Add some recolor to the images*/
-//    if(style->image.intense < LV_OPA_MIN) {
-//        style->image.color   = LV_COLOR_ORANGE;
-//        style->image.intense = LV_OPA_40;
-//    }
-#else
-    style->body.border.opa   = LV_OPA_COVER;
-    style->body.border.color = LV_COLOR_BLACK;
-    style->body.border.width = 2;
-
-#endif
-}
-
-/**
- * Default style modifier function
- * @param group pointer to the caller group
- * @param style pointer to a style to modify. (Typically group.style_tmp) It will be OVERWRITTEN.
- */
-static void style_mod_edit_def(lv_group_t * group, lv_style_t * style)
-{
-    (void)group; /*Unused*/
-#if LV_COLOR_DEPTH != 1
-
-//    /*Make the style to be a little bit orange*/
-//    style->body.border.opa   = LV_OPA_COVER;
-//    style->body.border.color = LV_COLOR_GREEN;
-//
-//    /*If not empty or has border then emphasis the border*/
-//    if(style->body.opa != LV_OPA_TRANSP || style->body.border.width != 0) style->body.border.width = LV_DPI / 20;
-//
-//    style->body.main_color   = lv_color_mix(style->body.main_color, LV_COLOR_GREEN, LV_OPA_70);
-//    style->body.grad_color   = lv_color_mix(style->body.grad_color, LV_COLOR_GREEN, LV_OPA_70);
-//    style->body.shadow.color = lv_color_mix(style->body.shadow.color, LV_COLOR_GREEN, LV_OPA_60);
-//
-//    style->text.color = lv_color_mix(style->text.color, LV_COLOR_GREEN, LV_OPA_70);
-//
-//    /*Add some recolor to the images*/
-//    if(style->image.intense < LV_OPA_MIN) {
-//        style->image.color   = LV_COLOR_GREEN;
-//        style->image.intense = LV_OPA_40;
-//    }
-
-#else
-    style->body.border.opa   = LV_OPA_COVER;
-    style->body.border.color = LV_COLOR_BLACK;
-    style->body.border.width = 3;
-
-#endif
-}
-
-static void refresh_theme(lv_group_t * g, lv_theme_t * th)
-{
-    g->style_mod_cb      = style_mod_def;
-    g->style_mod_edit_cb = style_mod_edit_def;
-    if(th) {
-        if(th->group.style_mod_xcb) g->style_mod_cb = th->group.style_mod_xcb;
-        if(th->group.style_mod_edit_xcb) g->style_mod_edit_cb = th->group.style_mod_edit_xcb;
-    }
 }
 
 static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *),

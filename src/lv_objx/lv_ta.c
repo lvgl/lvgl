@@ -1459,20 +1459,16 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
 #endif
     } else if(sign == LV_SIGNAL_FOCUS) {
 #if LV_USE_GROUP
-        lv_cursor_type_t cur_type;
-        cur_type                   = lv_ta_get_cursor_type(ta);
         lv_group_t * g             = lv_obj_get_group(ta);
         bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
-            if(editing)
-                lv_ta_set_cursor_type(ta, cur_type & (~LV_CURSOR_HIDDEN));
-            else
-                lv_ta_set_cursor_type(ta, cur_type | LV_CURSOR_HIDDEN);
+            if(editing) lv_ta_set_cursor_hidden(ta, false);
+            else  lv_ta_set_cursor_hidden(ta, true);
         } else {
-            lv_ta_set_cursor_type(ta, cur_type & (~LV_CURSOR_HIDDEN));
+            lv_ta_set_cursor_hidden(ta, false);
         }
 #endif
     } else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESS_LOST ||

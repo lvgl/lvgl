@@ -252,7 +252,7 @@ typedef struct _lv_obj_t
     lv_bidi_dir_t base_dir  :2;  /**< Base direction of texts related to this object */
 
 #if LV_USE_GROUP != 0
-    uint8_t group_id        :LV_GROUP_ID_MAX;
+    void * group_p;
 #endif
 
     uint8_t protect;            /**< Automatically happening actions can be prevented.
