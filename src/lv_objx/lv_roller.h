@@ -18,12 +18,12 @@ extern "C" {
 #if LV_USE_ROLLER != 0
 
 /*Testing of dependencies*/
-#if LV_USE_DDLIST == 0
-#error "lv_roller: lv_ddlist is required. Enable it in lv_conf.h (LV_USE_DDLIST  1) "
+#if LV_USE_PAGE == 0
+#error "lv_roller: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE 1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
-#include "lv_ddlist.h"
+#include "lv_page.h"
 #include "lv_label.h"
 
 /*********************
@@ -47,15 +47,20 @@ typedef uint8_t lv_roller_mode_t;
 /*Data of roller*/
 typedef struct
 {
-    lv_ddlist_ext_t ddlist; /*Ext. of ancestor*/
+    lv_page_ext_t page; /*Ext. of ancestor*/
+
     /*New data for this type */
+    lv_style_list_t style_sel; /*Style of the selected option*/
+    uint16_t option_cnt;          /*Number of options*/
+    uint16_t sel_opt_id;          /*Index of the current option*/
+    uint16_t sel_opt_id_ori;      /*Store the original index on focus*/
     lv_roller_mode_t mode : 1;
 } lv_roller_ext_t;
 
 enum {
-    LV_ROLLER_PART_BG,
-    LV_ROLLER_PART_SCRL,
-    LV_ROLLER_PART_SEL,
+    LV_ROLLER_PART_BG = LV_PAGE_PART_BG,
+    LV_ROLLER_PART_SEL = _LV_PAGE_PART_VIRTUAL_LAST,
+    _LV_ROLLER_PART_VIRTUAL_LAST,
 };
 typedef uint8_t lv_roller_part_t;
 
@@ -106,23 +111,13 @@ void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, lv_anim_enable_
 void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt);
 
 /**
- * Set a fix width for the drop down list
- * @param roller pointer to a roller obejct
- * @param w the width when the list is opened (0: auto size)
- */
-static inline void lv_roller_set_fix_width(lv_obj_t * roller, lv_coord_t w)
-{
-    lv_ddlist_set_fix_width(roller, w);
-}
-
-/**
  * Set the open/close animation time.
  * @param roller pointer to a roller object
  * @param anim_time: open/close animation time [ms]
  */
 static inline void lv_roller_set_anim_time(lv_obj_t * roller, uint16_t anim_time)
 {
-    lv_ddlist_set_anim_time(roller, anim_time);
+    lv_page_set_anim_time(roller, anim_time);
 }
 
 /*=====================
@@ -148,10 +143,7 @@ uint16_t lv_roller_get_option_cnt(const lv_obj_t * roller);
  * @param buf pointer to an array to store the string
  * @param buf_size size of `buf` in bytes. 0: to ignore it.
  */
-static inline void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint16_t buf_size)
-{
-    lv_ddlist_get_selected_str(roller, buf, buf_size);
-}
+void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint16_t buf_size);
 
 /**
  * Get the align attribute. Default alignment after _create is LV_LABEL_ALIGN_CENTER
@@ -165,10 +157,7 @@ lv_label_align_t lv_roller_get_align(const lv_obj_t * roller);
  * @param roller pointer to roller object
  * @return the options separated by '\n'-s (E.g. "Option1\nOption2\nOption3")
  */
-static inline const char * lv_roller_get_options(const lv_obj_t * roller)
-{
-    return lv_ddlist_get_options(roller);
-}
+const char * lv_roller_get_options(const lv_obj_t * roller);
 
 /**
  * Get the open/close animation time.
@@ -177,7 +166,7 @@ static inline const char * lv_roller_get_options(const lv_obj_t * roller)
  */
 static inline uint16_t lv_roller_get_anim_time(const lv_obj_t * roller)
 {
-    return lv_ddlist_get_anim_time(roller);
+    return lv_page_get_anim_time(roller);
 }
 
 /**

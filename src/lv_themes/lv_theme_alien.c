@@ -136,7 +136,7 @@ static void basic_init(void)
     lv_style_set_int(&panel, LV_STYLE_PAD_TOP, LV_DPI / 5);
     lv_style_set_int(&panel, LV_STYLE_PAD_BOTTOM, LV_DPI / 5);
     lv_style_set_int(&panel, LV_STYLE_PAD_INNER, LV_DPI / 5);
-    lv_style_set_int(&panel, LV_STYLE_PAD_INNER | LV_STYLE_STATE_FOCUS, LV_DPI);
+//    lv_style_set_int(&panel, LV_STYLE_PAD_INNER | LV_STYLE_STATE_FOCUS, LV_DPI);
     lv_style_set_color(&panel, LV_STYLE_TEXT_COLOR, lv_color_hex(0x979a9f));
     lv_style_set_ptr(&panel, LV_STYLE_FONT, &lv_font_roboto_16);
     lv_style_set_color(&panel, LV_STYLE_IMAGE_RECOLOR, lv_color_hex(0x979a9f));
@@ -637,9 +637,14 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
 
     switch(name) {
     case LV_THEME_SCR:
-        list = lv_obj_get_style(obj, LV_BTN_PART_MAIN);
+        list = lv_obj_get_style(obj, LV_OBJ_PART_MAIN);
         lv_style_list_reset(list);
-        lv_style_list_reset(&scr);
+        lv_style_list_add_style(list, &scr);
+        break;
+    case LV_THEME_OBJ:
+        list = lv_obj_get_style(obj, LV_OBJ_PART_MAIN);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &panel);
         break;
     case LV_THEME_BTN:
         list = lv_obj_get_style(obj, LV_BTN_PART_MAIN);
@@ -765,6 +770,19 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
 
         break;
 #endif
+
+#if LV_USE_ROLLER
+    case LV_THEME_ROLLER:
+        list = lv_obj_get_style(obj, LV_ROLLER_PART_BG);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &panel);
+
+        list = lv_obj_get_style(obj, LV_ROLLER_PART_SEL);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &btn);
+        break;
+#endif
+
 #if LV_USE_CHART
     case LV_THEME_CHART:
         list = lv_obj_get_style(obj, LV_CHART_PART_BG);

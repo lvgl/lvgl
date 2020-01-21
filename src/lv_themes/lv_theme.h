@@ -36,6 +36,7 @@ extern "C" {
 typedef enum {
     LV_THEME_NONE = 0,
     LV_THEME_SCR,
+    LV_THEME_OBJ,
 
     LV_THEME_PANEL,
 
@@ -64,9 +65,7 @@ typedef enum {
     LV_THEME_DDLIST_SCRLBAR,
     LV_THEME_DDLIST_SEL,
 
-    LV_THEME_ROLLER_BG,
-    LV_THEME_ROLLER_SCRL,
-    LV_THEME_ROLLER_SEL,
+    LV_THEME_ROLLER,
 
     LV_THEME_TABVIEW,
     LV_THEME_TABVIEW_PAGE,

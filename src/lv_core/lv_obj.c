@@ -284,8 +284,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
     lv_style_list_init(&new_obj->style_list);
     if(copy == NULL) {
-        if(parent != NULL) lv_obj_add_theme(new_obj, LV_OBJ_PART_MAIN, LV_THEME_PANEL);
-        else  lv_obj_add_theme(new_obj, LV_OBJ_PART_MAIN, LV_THEME_SCR);
+        if(parent != NULL) lv_theme_apply(new_obj, LV_THEME_OBJ);
+        else  lv_theme_apply(new_obj, LV_THEME_SCR);
     } else {
         lv_style_list_copy(&new_obj->style_list, &copy->style_list);
     }
