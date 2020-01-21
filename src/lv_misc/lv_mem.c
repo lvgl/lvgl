@@ -356,7 +356,7 @@ lv_res_t lv_mem_test(void)
     lv_mem_ent_t * e;
     e = ent_get_next(NULL);
     while(e) {
-        if(e->header.s.d_size > 200000) {
+        if(e->header.s.d_size > 20000) {
             printf("mem err\n");
             while(1);
             return LV_RES_INV;
@@ -435,6 +435,8 @@ uint32_t lv_mem_get_size(const void * data)
  */
 void * lv_mem_buf_get(uint32_t size)
 {
+    if(size == 0) return NULL;
+
     /*Try to find a free buffer with suitable size */
     uint8_t i;
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {

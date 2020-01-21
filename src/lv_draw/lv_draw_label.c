@@ -336,6 +336,8 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
 
         if(pos.y > mask->y2) return;
     }
+
+    lv_mem_test();
 }
 
 /**********************

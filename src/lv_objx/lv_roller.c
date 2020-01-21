@@ -218,7 +218,9 @@ void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, lv_anim_enable_
     anim = LV_ANIM_OFF;
 #endif
 
-    if(lv_roller_get_selected(roller) == sel_opt) return;
+    /* Set the value even if it's the same as the current value because
+     * if moving to the next option with an animation which was just deleted in the PRESS signal
+     * nothing will continue the animation. */
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     ext->sel_opt_id     = sel_opt < ext->option_cnt ? sel_opt : ext->option_cnt - 1;

@@ -72,6 +72,8 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect
     draw_bg(coords, clip, dsc);
     draw_img(coords, clip, dsc);
     draw_border(coords, clip, dsc);
+
+    lv_mem_test();
 }
 
 /**
