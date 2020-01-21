@@ -58,20 +58,20 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("table create started");
 
     /*Create the ancestor of table*/
-    lv_obj_t * new_table = lv_obj_create(par, copy);
-    LV_ASSERT_MEM(new_table);
-    if(new_table == NULL) return NULL;
+    lv_obj_t * table = lv_obj_create(par, copy);
+    LV_ASSERT_MEM(table);
+    if(table == NULL) return NULL;
 
     /*Allocate the table type specific extended data*/
-    lv_table_ext_t * ext = lv_obj_allocate_ext_attr(new_table, sizeof(lv_table_ext_t));
+    lv_table_ext_t * ext = lv_obj_allocate_ext_attr(table, sizeof(lv_table_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_table);
+        lv_obj_del(table);
         return NULL;
     }
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_table);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_table);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(table);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(table);
 
     /*Initialize the allocated 'ext' */
     ext->cell_data     = NULL;
@@ -88,35 +88,29 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(new_table, lv_table_signal);
-    lv_obj_set_design_cb(new_table, lv_table_design);
+    lv_obj_set_signal_cb(table, lv_table_signal);
+    lv_obj_set_design_cb(table, lv_table_design);
 
     /*Init the new table table*/
     if(copy == NULL) {
-        lv_style_list_reset(&new_table->style_list);
-        lv_obj_add_theme(new_table, LV_TABLE_PART_BG, LV_THEME_TABLE_BG);
-        lv_obj_add_theme(new_table, LV_TABLE_PART_CELL1, LV_THEME_TABLE_CELL1);
-        lv_obj_add_theme(new_table, LV_TABLE_PART_CELL2, LV_THEME_TABLE_CELL2);
-        lv_obj_add_theme(new_table, LV_TABLE_PART_CELL3, LV_THEME_TABLE_CELL3);
-        lv_obj_add_theme(new_table, LV_TABLE_PART_CELL4, LV_THEME_TABLE_CELL4);
+        lv_theme_apply(table, LV_THEME_TABLE);
     }
     /*Copy an existing table*/
     else {
         lv_table_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-//        ext->cell_style[0]        = copy_ext->cell_style[0];
-//        ext->cell_style[1]        = copy_ext->cell_style[1];
-//        ext->cell_style[2]        = copy_ext->cell_style[2];
-//        ext->cell_style[3]        = copy_ext->cell_style[3];
-        lv_table_set_row_cnt(new_table, copy_ext->row_cnt);
-        lv_table_set_col_cnt(new_table, copy_ext->col_cnt);
+        for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
+            lv_style_list_copy(&ext->cell_style[i], &copy_ext->cell_style[i]);
+            lv_table_set_row_cnt(table, copy_ext->row_cnt);
+            lv_table_set_col_cnt(table, copy_ext->col_cnt);
+        }
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_table);
+        lv_obj_refresh_style(table);
     }
 
     LV_LOG_INFO("table created");
 
-    return new_table;
+    return table;
 }
 
 /*=====================
@@ -584,26 +578,10 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
+        /*Draw the background*/
+        ancestor_design(table, clip_area, mode);
+
         lv_table_ext_t * ext        = lv_obj_get_ext_attr(table);
-
-        lv_draw_rect_dsc_t draw_dsc;
-        lv_draw_rect_dsc_init(&draw_dsc);
-        lv_obj_init_draw_rect_dsc(table, LV_TABLE_PART_BG, &draw_dsc);
-
-        /*Draw without border first*/
-        draw_dsc.border_width = 0;
-
-        lv_draw_rect(&table->coords, clip_area, &draw_dsc);
-
-        if(lv_obj_get_style_int(table, LV_TABLE_PART_BG, LV_STYLE_CLIP_CORNER)) {
-            lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
-
-            lv_coord_t r = lv_obj_get_style_int(table, LV_TABLE_PART_BG, LV_STYLE_RADIUS);
-
-            lv_draw_mask_radius_init(mp, &table->coords, r, false);
-            /*Add the mask and use some table specific data as custom id. Don't use `table` directly because it might be used by the user*/
-            lv_draw_mask_add(mp, ext->cell_style);
-        }
 
         lv_coord_t h_row;
         lv_point_t txt_size;
@@ -759,20 +737,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
-        lv_draw_rect_dsc_t draw_dsc;
-        lv_draw_rect_dsc_init(&draw_dsc);
-        lv_obj_init_draw_rect_dsc(table, LV_TABLE_PART_BG, &draw_dsc);
-
-        /*Draw only a border to allow drawing a border around the whole table*/
-        draw_dsc.shadow_width = 0;
-        draw_dsc.bg_opa = LV_OPA_TRANSP;
-        lv_draw_rect(&table->coords, clip_area, &draw_dsc);
-
-        lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
-        if(lv_obj_get_style_int(table, LV_TABLE_PART_BG, LV_STYLE_CLIP_CORNER)) {
-            void * param = lv_draw_mask_remove_custom(ext->cell_style);
-            lv_mem_buf_release(param);
-        }
+        ancestor_design(table, clip_area, mode);
     }
 
     return LV_DESIGN_RES_OK;
@@ -880,7 +845,6 @@ static void refr_size(lv_obj_t * table)
     h += bg_top + bg_bottom;
 
     lv_obj_set_size(table, w + 1, h + 1);
-    lv_obj_invalidate(table);
 }
 
 static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)

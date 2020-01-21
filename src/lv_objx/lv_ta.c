@@ -122,6 +122,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->placeholder = NULL;
 
     lv_style_list_init(&ext->cursor.style);
+    lv_style_list_init(&ext->placeholder);
 
 #if LV_USE_ANIMATION == 0
     ext->pwd_show_time     = 0;
@@ -145,11 +146,6 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_click(ext->label, false);
         lv_obj_set_size(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
         lv_ta_set_sb_mode(new_ta, LV_SB_MODE_DRAG);
-
-        lv_obj_reset_style(new_ta, LV_PAGE_PART_SCRL);
-
-        _ot(new_ta, LV_TA_PART_CURSOR, TA_CURSOR);
-
 
     }
     /*Copy an existing object*/

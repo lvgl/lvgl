@@ -83,7 +83,7 @@ static lv_style_t ddlist_bg, ddlist_sel;
 #endif
 
 #if LV_USE_TA
-static lv_style_t ta_cursor;
+static lv_style_t ta_cursor, ta_oneline, ta_placeholder;
 #endif
 
 #if LV_USE_ARC
@@ -313,10 +313,10 @@ static void chart_init(void)
 
 
     lv_style_init(&chart_series);
-    lv_style_set_int(&chart_series, LV_STYLE_LINE_WIDTH , 2);
-    lv_style_set_int(&chart_series, LV_STYLE_SIZE , 3);
+    lv_style_set_int(&chart_series, LV_STYLE_LINE_WIDTH , 1);
+    lv_style_set_int(&chart_series, LV_STYLE_SIZE , 2);
     lv_style_set_int(&chart_series, LV_STYLE_PAD_INNER , 2);
-    lv_style_set_int(&chart_series, LV_STYLE_RADIUS , 4);
+    lv_style_set_int(&chart_series, LV_STYLE_RADIUS , 1);
     lv_style_set_opa(&chart_series, LV_STYLE_BG_OPA , LV_OPA_COVER);
     lv_style_set_opa(&chart_series, LV_STYLE_BG_OPA, LV_OPA_100);
     lv_style_set_int(&chart_series, LV_STYLE_BG_GRAD_DIR, LV_GRAD_DIR_VER);
@@ -372,8 +372,9 @@ static void btnm_init(void)
     lv_style_init(&btnm_bg);
     lv_style_set_int(&btnm_bg, LV_STYLE_BORDER_WIDTH, LV_DPI / 50);
     lv_style_set_color(&btnm_bg, LV_STYLE_BORDER_COLOR, lv_color_hex(0x373a3f));
-    lv_style_set_int(&btnm_bg, LV_STYLE_RADIUS, LV_DPI / 10);
+    lv_style_set_int(&btnm_bg, LV_STYLE_RADIUS, LV_DPI / 20);
     lv_style_set_int(&btnm_bg, LV_STYLE_CLIP_CORNER, 1);
+    lv_style_set_int(&btnm_bg, LV_STYLE_BORDER_POST, 1);
 
     lv_style_init(&btnm_btn);
     lv_style_set_int(&btnm_btn, LV_STYLE_BORDER_WIDTH, LV_DPI / 50);
@@ -423,14 +424,23 @@ static void ta_init(void)
 {
 #if LV_USE_TA
     lv_style_init(&ta_cursor);
-    lv_style_set_opa(&ta_cursor, LV_STYLE_BG_OPA, LV_OPA_50);
-    lv_style_set_color(&ta_cursor, LV_STYLE_BG_COLOR, LV_COLOR_RED);
-    lv_style_set_color(&ta_cursor, LV_STYLE_BORDER_COLOR, LV_COLOR_YELLOW);
-    lv_style_set_color(&ta_cursor, LV_STYLE_TEXT_COLOR, LV_COLOR_WHITE);
+    lv_style_set_color(&ta_cursor, LV_STYLE_BORDER_COLOR, lv_color_hex(0x6c737b));
     lv_style_set_int(&ta_cursor, LV_STYLE_BORDER_WIDTH, 2);
-    lv_style_set_int(&ta_cursor, LV_STYLE_BORDER_WIDTH, 2);
-    lv_style_set_int(&ta_cursor, LV_STYLE_PAD_RIGHT, 2);
+    lv_style_set_int(&ta_cursor, LV_STYLE_PAD_LEFT, 1);
     lv_style_set_int(&ta_cursor, LV_STYLE_BORDER_SIDE, LV_BORDER_SIDE_LEFT);
+
+    lv_style_init(&ta_oneline);
+    lv_style_set_int(&ta_oneline, LV_STYLE_BORDER_WIDTH, 1);
+    lv_style_set_int(&ta_oneline, LV_STYLE_RADIUS, LV_RADIUS_CIRCLE);
+    lv_style_set_color(&ta_oneline, LV_STYLE_BORDER_COLOR, lv_color_hex(0x3b3e43));
+    lv_style_set_color(&ta_oneline, LV_STYLE_TEXT_COLOR, lv_color_hex(0x6c737b));
+    lv_style_set_int(&ta_oneline, LV_STYLE_PAD_LEFT, LV_DPI / 10);
+    lv_style_set_int(&ta_oneline, LV_STYLE_PAD_RIGHT, LV_DPI / 10);
+    lv_style_set_int(&ta_oneline, LV_STYLE_PAD_TOP, LV_DPI / 10);
+    lv_style_set_int(&ta_oneline, LV_STYLE_PAD_BOTTOM, LV_DPI / 10);
+
+    lv_style_init(&ta_placeholder);
+    lv_style_set_color(&ta_placeholder, LV_STYLE_TEXT_COLOR, lv_color_hex(0x3b3e43));
 #endif
 }
 
@@ -511,15 +521,13 @@ static void table_init(void)
 {
 #if LV_USE_TABLE != 0
     lv_style_init(&table_cell);
-    lv_style_set_opa(&table_cell, LV_STYLE_BG_OPA, LV_OPA_COVER);
-    lv_style_set_color(&table_cell, LV_STYLE_BG_COLOR, LV_COLOR_WHITE);
-    lv_style_set_color(&table_cell, LV_STYLE_BORDER_COLOR, LV_COLOR_BLACK);
+    lv_style_set_color(&table_cell, LV_STYLE_BORDER_COLOR, lv_color_hex(0x303338));
     lv_style_set_int(&table_cell, LV_STYLE_BORDER_WIDTH, 1);
-    lv_style_set_int(&table_cell, LV_STYLE_BORDER_SIDE, LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_RIGHT);
-    lv_style_set_int(&table_cell, LV_STYLE_PAD_LEFT, LV_DPI/20);
-    lv_style_set_int(&table_cell, LV_STYLE_PAD_RIGHT, LV_DPI/20);
-    lv_style_set_int(&table_cell, LV_STYLE_PAD_TOP, LV_DPI/20);
-    lv_style_set_int(&table_cell, LV_STYLE_PAD_BOTTOM, LV_DPI/20);
+    lv_style_set_int(&table_cell, LV_STYLE_BORDER_SIDE, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM);
+    lv_style_set_int(&table_cell, LV_STYLE_PAD_LEFT, LV_DPI/7);
+    lv_style_set_int(&table_cell, LV_STYLE_PAD_RIGHT, LV_DPI/7);
+    lv_style_set_int(&table_cell, LV_STYLE_PAD_TOP, LV_DPI/7);
+    lv_style_set_int(&table_cell, LV_STYLE_PAD_BOTTOM, LV_DPI/7);
 
 #endif
 }
@@ -740,6 +748,49 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         list = lv_obj_get_style(obj, LV_CHART_PART_SERIES);
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &chart_series);
+        break;
+#endif
+#if LV_USE_TABLE
+    case LV_THEME_TABLE:
+        list = lv_obj_get_style(obj, LV_TABLE_PART_BG);
+        lv_style_list_reset(list);
+
+        list = lv_obj_get_style(obj, LV_TABLE_PART_CELL1);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &table_cell);
+
+        list = lv_obj_get_style(obj, LV_TABLE_PART_CELL2);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &table_cell);
+
+        list = lv_obj_get_style(obj, LV_TABLE_PART_CELL3);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &table_cell);
+
+        list = lv_obj_get_style(obj, LV_TABLE_PART_CELL4);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &table_cell);
+        break;
+#endif
+
+#if LV_USE_TA
+    case LV_THEME_TA_ONELINE:
+        list = lv_obj_get_style(obj, LV_TA_PART_BG);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &ta_oneline);
+
+        list = lv_obj_get_style(obj, LV_TA_PART_PLACEHOLDER);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &ta_placeholder);
+
+        list = lv_obj_get_style(obj, LV_TA_PART_CURSOR);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &ta_cursor);
+
+        list = lv_obj_get_style(obj, LV_TA_PART_SCRLBAR);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &sb);
+        break;
 #endif
     }
 

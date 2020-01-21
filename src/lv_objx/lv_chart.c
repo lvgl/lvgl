@@ -137,6 +137,9 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     } else {
         lv_chart_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
 
+        lv_style_list_copy(&ext->style_series, &ext_copy->style_series);
+        lv_style_list_copy(&ext->style_series_bg, &ext_copy->style_series_bg);
+
         ext->type       = ext_copy->type;
         ext->ymin       = ext_copy->ymin;
         ext->ymax       = ext_copy->ymax;
@@ -923,6 +926,7 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
     lv_draw_rect_dsc_t col_dsc;
     lv_draw_rect_dsc_init(&col_dsc);
     lv_obj_init_draw_rect_dsc(chart, LV_CHART_PART_SERIES, &col_dsc);
+    col_dsc.bg_grad_dir = LV_GRAD_DIR_NONE;
 
     /*Make the cols longer with `radius` to clip the rounding from the bottom*/
     col_a.y2 = series_area->y2 + col_dsc.radius;
@@ -955,7 +959,7 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
             lv_coord_t p_act = (start_point + i) % ext->point_cnt;
             y_tmp            = (int32_t)((int32_t)ser->points[p_act] - ext->ymin) * h;
             y_tmp            = y_tmp / (ext->ymax - ext->ymin);
-            col_a.y1         = h - y_tmp + chart->coords.y1;
+            col_a.y1         = h - y_tmp + series_area->y1;
 
             if(ser->points[p_act] != LV_CHART_POINT_DEF) {
                 lv_draw_rect(&col_a, &series_mask, &col_dsc);

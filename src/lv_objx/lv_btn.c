@@ -243,21 +243,7 @@ static lv_design_res_t lv_btn_design(lv_obj_t * btn, const lv_area_t * clip_area
     if(mode == LV_DESIGN_COVER_CHK) {
         return ancestor_design(btn, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
-
-        lv_draw_rect_dsc_t draw_dsc;
-        lv_draw_rect_dsc_init(&draw_dsc);
-        lv_obj_init_draw_rect_dsc(btn, LV_OBJ_PART_MAIN, &draw_dsc);
-        lv_draw_rect(&btn->coords, clip_area, &draw_dsc);
-
-        if(lv_obj_get_style_int(btn, LV_OBJ_PART_MAIN, LV_STYLE_CLIP_CORNER)) {
-            lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
-
-            lv_coord_t r = lv_obj_get_style_int(btn, LV_OBJ_PART_MAIN, LV_STYLE_RADIUS);
-
-            lv_draw_mask_radius_init(mp, &btn->coords, r, false);
-            /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
-            lv_draw_mask_add(mp, btn + 8);
-        }
+        ancestor_design(btn, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_POST) {
         ancestor_design(btn, clip_area, mode);
     }

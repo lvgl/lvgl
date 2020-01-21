@@ -112,6 +112,8 @@ void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * lis
 
 void lv_style_list_add_style(lv_style_list_t * list, lv_style_t * style)
 {
+    if(list == NULL) return;
+
     /*Remove the style first if already exists*/
     lv_style_list_remove_style(list, style);
 
@@ -179,6 +181,7 @@ void lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * style)
 
 void lv_style_list_reset(lv_style_list_t * list)
 {
+    if(list == NULL) return;
     if(list->has_local) {
         lv_style_t * local = lv_style_list_get_style(list, 0);
         lv_style_reset(local);
