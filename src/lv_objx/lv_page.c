@@ -828,6 +828,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     lv_obj_t * child;
     if(sign == LV_SIGNAL_CHILD_CHG) { /*Automatically move children to the scrollable object*/
+        if(ext->scrl == NULL) return LV_RES_OK;
         const lv_style_t * style_bg = lv_page_get_style(page, LV_PAGE_STYLE_BG);
         const lv_style_t * style_scrl = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
         lv_fit_t fit_left        = lv_page_get_scrl_fit_left(page);
@@ -1093,6 +1094,8 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 page_ext->sb.ver_draw = 0;
             }
         }
+    } else if(sign == LV_SIGNAL_CLEANUP) {
+        page_ext->scrl = NULL;
     }
 
     return res;
