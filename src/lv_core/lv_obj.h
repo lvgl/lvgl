@@ -879,7 +879,7 @@ lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj);
  * Appearance get
  *---------------*/
 
-lv_style_list_t * lv_obj_get_style(const lv_obj_t * obj, uint8_t type);
+lv_style_list_t * lv_obj_get_style_list(const lv_obj_t * obj, uint8_t type);
 
 lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
 

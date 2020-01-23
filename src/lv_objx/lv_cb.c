@@ -206,7 +206,7 @@ static lv_style_list_t * lv_cb_get_style(lv_obj_t * cb, uint8_t type)
         style_dsc_p = &cb->style_list;
         break;
     case LV_CB_PART_BULLET:
-        style_dsc_p = lv_obj_get_style(ext->bullet, LV_BTN_PART_MAIN);
+        style_dsc_p = lv_obj_get_style_list(ext->bullet, LV_BTN_PART_MAIN);
         break;
     default:
         style_dsc_p = NULL;

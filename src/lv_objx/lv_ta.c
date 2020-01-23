@@ -1556,7 +1556,7 @@ static lv_style_list_t * lv_ta_get_style(lv_obj_t * ta, uint8_t part)
         break;
 #endif
     case LV_TA_PART_PLACEHOLDER:
-        style_dsc_p = ext->placeholder ? lv_obj_get_style(ext->placeholder, LV_LABEL_PART_MAIN) : NULL;
+        style_dsc_p = ext->placeholder ? lv_obj_get_style_list(ext->placeholder, LV_LABEL_PART_MAIN) : NULL;
         break;
     default:
         style_dsc_p = NULL;

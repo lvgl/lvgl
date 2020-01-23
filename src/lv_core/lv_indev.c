@@ -951,7 +951,7 @@ static void indev_proc_release(lv_indev_proc_t * proc)
                 parent = lv_obj_get_parent(parent);
                 if(parent == NULL) break;
 
-                /*Ignore is the protected against click focus*/
+                /*Ignore if the protected against click focus*/
                 if(lv_obj_is_protected(parent, LV_PROTECT_CLICK_FOCUS)) {
                     parent = NULL;
                     break;
@@ -973,13 +973,19 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         /* Send defocus to the lastly "active" object and foucus to the new one.
          * Do not send the events if they was sent by the click focus*/
         if(proc->types.pointer.last_pressed != indev_obj_act && click_focus_sent == false) {
-            lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_DEFOCUSED, NULL);
-            if(indev_reset_check(proc)) return;
+            if(lv_obj_is_protected(indev_obj_act, LV_PROTECT_CLICK_FOCUS) == false) {
+                lv_signal_send(proc->types.pointer.last_pressed, LV_SIGNAL_DEFOCUS, NULL);
+                if(indev_reset_check(proc)) return;
+                lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_DEFOCUSED, NULL);
+                if(indev_reset_check(proc)) return;
 
-            lv_event_send(proc->types.pointer.act_obj, LV_EVENT_FOCUSED, NULL);
-            if(indev_reset_check(proc)) return;
+                lv_signal_send(proc->types.pointer.act_obj, LV_SIGNAL_FOCUS, NULL);
+                if(indev_reset_check(proc)) return;
+                lv_event_send(proc->types.pointer.act_obj, LV_EVENT_FOCUSED, NULL);
+                if(indev_reset_check(proc)) return;
 
-            proc->types.pointer.last_pressed = indev_obj_act;
+                proc->types.pointer.last_pressed = indev_obj_act;
+            }
         }
 
         if(indev_reset_check(proc)) return;

@@ -133,7 +133,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_page_set_sb_mode(ext->content, LV_SB_MODE_OFF);
         lv_obj_set_drag_dir(lv_page_get_scrl(ext->content), LV_DRAG_DIR_ONE);
 
-        lv_style_list_reset(lv_obj_get_style(ext->content, LV_PAGE_PART_BG));
+        lv_style_list_reset(lv_obj_get_style_list(ext->content, LV_PAGE_PART_BG));
 
         lv_theme_apply(tabview, LV_THEME_TABVIEW);
 
@@ -156,9 +156,9 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->tab_name_ptr[0] = "";
         lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
 
-        lv_style_list_copy(lv_obj_get_style(tabview, LV_TABVIEW_PART_BG_SCRL), lv_obj_get_style(copy, LV_TABVIEW_PART_BG_SCRL));
-        lv_style_list_copy(lv_obj_get_style(tabview, LV_TABVIEW_PART_TAB_BG), lv_obj_get_style(copy, LV_TABVIEW_PART_TAB_BG));
-        lv_style_list_copy(lv_obj_get_style(tabview, LV_TABVIEW_PART_TAB), lv_obj_get_style(copy, LV_TABVIEW_PART_TAB));
+        lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_BG_SCRL), lv_obj_get_style_list(copy, LV_TABVIEW_PART_BG_SCRL));
+        lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB_BG), lv_obj_get_style_list(copy, LV_TABVIEW_PART_TAB_BG));
+        lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB), lv_obj_get_style_list(copy, LV_TABVIEW_PART_TAB));
 
         uint16_t i;
         lv_obj_t * new_tab;
@@ -166,8 +166,8 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         for(i = 0; i < copy_ext->tab_cnt; i++) {
             new_tab  = lv_tabview_add_tab(tabview, copy_ext->tab_name_ptr[i]);
             copy_tab = lv_tabview_get_tab(copy, i);
-            lv_style_list_copy(lv_obj_get_style(new_tab, LV_PAGE_PART_SCRL), lv_obj_get_style(copy_tab, LV_PAGE_PART_SCRL));
-            lv_style_list_copy(lv_obj_get_style(new_tab, LV_PAGE_PART_SCRLBAR), lv_obj_get_style(copy_tab, LV_PAGE_PART_SCRLBAR));
+            lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCRL), lv_obj_get_style_list(copy_tab, LV_PAGE_PART_SCRL));
+            lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCRLBAR), lv_obj_get_style_list(copy_tab, LV_PAGE_PART_SCRLBAR));
             lv_obj_refresh_style(new_tab);
         }
 
@@ -740,16 +740,16 @@ static lv_style_list_t * lv_tabview_get_style(lv_obj_t * tabview, uint8_t part)
         style_dsc_p = &tabview->style_list;
         break;
     case LV_TABVIEW_PART_BG_SCRL:
-        style_dsc_p = lv_obj_get_style(ext->content, LV_PAGE_PART_SCRL);
+        style_dsc_p = lv_obj_get_style_list(ext->content, LV_PAGE_PART_SCRL);
         break;
     case LV_TABVIEW_PART_TAB_BG:
-        style_dsc_p = lv_obj_get_style(ext->btns, LV_BTNM_PART_BG);
+        style_dsc_p = lv_obj_get_style_list(ext->btns, LV_BTNM_PART_BG);
         break;
     case LV_TABVIEW_PART_TAB:
-        style_dsc_p = lv_obj_get_style(ext->btns, LV_BTNM_PART_BTN);
+        style_dsc_p = lv_obj_get_style_list(ext->btns, LV_BTNM_PART_BTN);
         break;
     case LV_TABVIEW_PART_INDIC:
-        style_dsc_p = lv_obj_get_style(ext->indic, LV_OBJ_PART_MAIN);
+        style_dsc_p = lv_obj_get_style_list(ext->indic, LV_OBJ_PART_MAIN);
         break;
     default:
         style_dsc_p = NULL;

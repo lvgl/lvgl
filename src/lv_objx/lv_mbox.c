@@ -154,7 +154,7 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
         lv_obj_add_theme(ext->btnm, LV_BTNM_PART_BG, LV_THEME_MBOX_BTN_BG);
 
 
-        lv_style_list_reset(lv_obj_get_style(ext->btnm, LV_BTNM_PART_BTN));
+        lv_style_list_reset(lv_obj_get_style_list(ext->btnm, LV_BTNM_PART_BTN));
         lv_obj_add_theme(ext->btnm, LV_BTNM_PART_BTN, LV_THEME_MBOX_BTN);
     }
 
@@ -484,10 +484,10 @@ static lv_style_list_t * lv_mbox_get_style(lv_obj_t * mbox, uint8_t part)
         style_dsc_p = &mbox->style_list;
         break;
     case LV_MBOX_PART_BTN_BG:
-        style_dsc_p = ext->btnm ? lv_obj_get_style(ext->btnm, LV_BTNM_PART_BG) : NULL;
+        style_dsc_p = ext->btnm ? lv_obj_get_style_list(ext->btnm, LV_BTNM_PART_BG) : NULL;
         break;
     case LV_MBOX_PART_BTN:
-        style_dsc_p = ext->btnm ? lv_obj_get_style(ext->btnm, LV_BTNM_PART_BTN) : NULL;
+        style_dsc_p = ext->btnm ? lv_obj_get_style_list(ext->btnm, LV_BTNM_PART_BTN) : NULL;
         break;
     default:
         style_dsc_p = NULL;

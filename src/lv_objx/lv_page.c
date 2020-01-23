@@ -49,6 +49,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
 static lv_style_list_t * lv_page_get_style(lv_obj_t * page, uint8_t part);
 static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event);
+static void refr_ext_draw_pad(lv_obj_t * page);
 #if LV_USE_ANIMATION
 static void edge_flash_anim(void * page, lv_anim_value_t v);
 static void edge_flash_anim_end(lv_anim_t * a);
@@ -759,6 +760,9 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                 parent_ext->scroll_prop_obj = NULL;
             }
         }
+
+        lv_style_list_reset(&ext->sb.style);
+        lv_style_list_reset(&ext->edge_flash.style);
     }
     /*Automatically move children to the scrollable object*/
     else if(sign == LV_SIGNAL_CHILD_CHG) {
@@ -812,7 +816,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         if(ext->sb.hor_draw || ext->sb.ver_draw) lv_page_sb_refresh(page);
 
         /*Refresh the ext. size because the scrollbars might be positioned out of the page*/
-        lv_obj_refresh_ext_draw_pad(page);
+        refr_ext_draw_pad(page);
     } else if(sign == LV_SIGNAL_COORD_CHG) {
         /*Refresh the scrollbar and notify the scrl if the size is changed*/
         if(ext->scrl != NULL && (lv_obj_get_width(page) != lv_area_get_width(param) ||
@@ -824,13 +828,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             if(ext->sb.hor_draw || ext->sb.ver_draw) lv_page_sb_refresh(page);
         }
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-
-        lv_style_int_t sb_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_BOTTOM);
-        lv_style_int_t sb_right = lv_obj_get_style_int(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_RIGHT);
-
-        /*Ensure ext. size for the scrollbars if they are out of the page*/
-        if(page->ext_draw_pad < (-sb_right)) page->ext_draw_pad = -sb_right;
-        if(page->ext_draw_pad < (-sb_bottom)) page->ext_draw_pad = -sb_bottom;
+        refr_ext_draw_pad(page);
     } else if(sign == LV_SIGNAL_CONTROL) {
         uint32_t c = *((uint32_t *)param);
 
@@ -1062,7 +1060,7 @@ static lv_style_list_t * lv_page_get_style(lv_obj_t * page, uint8_t part)
         style_dsc_p = &page->style_list;
         break;
     case LV_PAGE_PART_SCRL:
-        style_dsc_p = lv_obj_get_style(ext->scrl, LV_CONT_PART_MAIN);
+        style_dsc_p = lv_obj_get_style_list(ext->scrl, LV_CONT_PART_MAIN);
         break;
     case LV_PAGE_PART_SCRLBAR:
         style_dsc_p = &ext->sb.style;
@@ -1206,6 +1204,16 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         sb_area_tmp.y2 += page->coords.y1;
         lv_inv_area(disp, &sb_area_tmp);
     }
+}
+
+static void refr_ext_draw_pad(lv_obj_t * page)
+{
+    lv_style_int_t sb_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t sb_right = lv_obj_get_style_int(page, LV_PAGE_PART_SCRLBAR, LV_STYLE_PAD_RIGHT);
+
+    /*Ensure ext. size for the scrollbars if they are out of the page*/
+    if(page->ext_draw_pad < (-sb_right)) page->ext_draw_pad = -sb_right;
+    if(page->ext_draw_pad < (-sb_bottom)) page->ext_draw_pad = -sb_bottom;
 }
 
 #if LV_USE_ANIMATION
