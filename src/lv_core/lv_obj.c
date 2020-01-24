@@ -2883,6 +2883,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(lv_group_get_editing(lv_obj_get_group(obj))) {
             uint8_t state = LV_OBJ_STATE_FOCUS;
             state |= LV_OBJ_STATE_EDIT;
+            lv_obj_set_state(obj, state);
         } else {
             lv_obj_set_state(obj, LV_OBJ_STATE_FOCUS);
             lv_obj_clear_state(obj, LV_OBJ_STATE_EDIT);

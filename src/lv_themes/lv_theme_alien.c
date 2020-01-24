@@ -127,7 +127,7 @@ static void basic_init(void)
     lv_style_set_int(&panel, LV_STYLE_RADIUS, LV_DPI / 25);
     lv_style_set_opa(&panel, LV_STYLE_BG_OPA, LV_OPA_COVER);
     lv_style_set_color(&panel, LV_STYLE_BG_COLOR, COLOR_CONTAINER);
-    lv_style_set_color(&panel, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
+//    lv_style_set_color(&panel, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
     lv_style_set_color(&panel, LV_STYLE_BORDER_COLOR, lv_color_lighten(COLOR_CONTAINER, LV_OPA_10));
     lv_style_set_int(&panel, LV_STYLE_BORDER_WIDTH, LV_DPI / 50 > 0 ? LV_DPI / 50 : 1);
     lv_style_set_int(&panel, LV_STYLE_BORDER_SIDE , LV_BORDER_SIDE_TOP);
@@ -136,7 +136,6 @@ static void basic_init(void)
     lv_style_set_int(&panel, LV_STYLE_PAD_TOP, LV_DPI / 5);
     lv_style_set_int(&panel, LV_STYLE_PAD_BOTTOM, LV_DPI / 5);
     lv_style_set_int(&panel, LV_STYLE_PAD_INNER, LV_DPI / 5);
-//    lv_style_set_int(&panel, LV_STYLE_PAD_INNER | LV_STYLE_STATE_FOCUS, LV_DPI);
     lv_style_set_color(&panel, LV_STYLE_TEXT_COLOR, lv_color_hex(0x979a9f));
     lv_style_set_ptr(&panel, LV_STYLE_FONT, &lv_font_roboto_16);
     lv_style_set_color(&panel, LV_STYLE_IMAGE_RECOLOR, lv_color_hex(0x979a9f));
@@ -158,7 +157,8 @@ static void basic_init(void)
     lv_style_set_int(&btn, LV_STYLE_PAD_TOP, LV_DPI / 10);
     lv_style_set_int(&btn, LV_STYLE_PAD_BOTTOM, LV_DPI / 10);
     lv_style_set_int(&btn, LV_STYLE_PAD_INNER, LV_DPI / 10);
-    lv_style_set_int(&btn, LV_STYLE_TRANSITION_TIME, 100);
+    lv_style_set_int(&btn, LV_STYLE_TRANSITION_TIME, 500);
+    lv_style_set_color(&btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
 }
 
 static void cont_init(void)

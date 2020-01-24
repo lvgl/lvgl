@@ -304,7 +304,7 @@ void lv_ddlist_get_selected_str(const lv_obj_t * ddlist, char * buf, uint16_t bu
     uint16_t line        = 0;
     size_t txt_len     = strlen(ext->options);
 
-    for(i = 0; i < txt_len && line != ext->sel_opt_id; i++) {
+    for(i = 0; i < txt_len && line != ext->sel_opt_id_orig; i++) {
         if(ext->options[i] == '\n') line++;
     }
 
@@ -487,7 +487,7 @@ static lv_design_res_t lv_ddlist_design(lv_obj_t * ddlist, const lv_area_t * cli
         lv_point_t txt_size;
 
         const char * opt_txt = ext->text;
-        if(ext->show_selected && ext->sel_opt_id_orig >= 0) {
+        if(ext->show_selected) {
             char * buf = lv_mem_buf_get(256);
             lv_ddlist_get_selected_str(ddlist, buf, 256);
             opt_txt = buf;
@@ -640,41 +640,38 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
    if(sign == LV_SIGNAL_CLEANUP) {
         lv_ddlist_close(ddlist, LV_ANIM_OFF);
     }
-//    else if(sign == LV_SIGNAL_FOCUS) {
-//#if LV_USE_GROUP
-//        lv_group_t * g             = lv_obj_get_group(ddlist);
-//        bool editing               = lv_group_get_editing(g);
-//        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
-//
-//        /*Encoders need special handling*/
-//        if(indev_type == LV_INDEV_TYPE_ENCODER) {
-//            /*Open the list if editing*/
-//            if(editing) {
-//                ext->opened         = true;
-//                ext->sel_opt_id_ori = ext->sel_opt_id;
-//                lv_ddlist_refr_size(ddlist, true);
-//            }
-//            /*Close the lift if navigating*/
-//            else {
-//                ext->opened     = false;
-//                ext->sel_opt_id = ext->sel_opt_id_ori;
-//                lv_ddlist_refr_size(ddlist, true);
-//            }
-//        } else {
-//            /*Open the list if closed*/
-//            if(!ext->opened) {
-//                ext->opened         = true;
-//                ext->sel_opt_id_ori = ext->sel_opt_id; /*Save the current value. Used to revert this
-//                                                          state if ENER wont't be pressed*/
-//                lv_ddlist_refr_size(ddlist, true);
-//            }
-//        }
-//#endif
-//    }
+    else if(sign == LV_SIGNAL_FOCUS) {
+#if LV_USE_GROUP
+        lv_group_t * g             = lv_obj_get_group(ddlist);
+        bool editing               = lv_group_get_editing(g);
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+
+        /*Encoders need special handling*/
+        if(indev_type == LV_INDEV_TYPE_ENCODER) {
+            /*Open the list if editing*/
+            if(editing) lv_ddlist_open(ddlist, LV_ANIM_ON);
+            /*Close the list if navigating*/
+            else
+                lv_ddlist_close(ddlist, LV_ANIM_ON);
+        }
+#endif
+    }
     else if(sign == LV_SIGNAL_RELEASED) {
-        if(ext->page) lv_ddlist_close(ddlist, LV_ANIM_ON);
+
+        if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
+            if(ext->page) {
+                lv_ddlist_close(ddlist, LV_ANIM_ON);
+                if(ext->sel_opt_id_orig != ext->sel_opt_id) {
+                    ext->sel_opt_id_orig = ext->sel_opt_id;
+                    lv_obj_invalidate(ddlist);
+                }
+            } else {
+                lv_ddlist_open(ddlist, LV_ANIM_ON);
+            }
+        }
         else {
-            if(lv_indev_is_dragging(lv_indev_get_act()) == false) lv_ddlist_open(ddlist, LV_ANIM_ON);
+            ext->sel_opt_id = ext->sel_opt_id_orig;
+            lv_obj_invalidate(ddlist);
         }
     } else if(sign == LV_SIGNAL_DEFOCUS) {
         lv_ddlist_close(ddlist, LV_ANIM_ON);
@@ -687,38 +684,31 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
         lv_style_int_t bottom = lv_obj_get_style_int(ddlist, LV_DDLIST_PART_BTN, LV_STYLE_PAD_BOTTOM);
         const lv_font_t * font = lv_obj_get_style_ptr(ddlist, LV_DDLIST_PART_BTN, LV_STYLE_FONT);
         lv_obj_set_height(ddlist, top + bottom + lv_font_get_line_height(font));
+
+        if(ext->page) lv_obj_refresh_style(ext->page);
     }
-//    else if(sign == LV_SIGNAL_CONTROL) {
-//        char c = *((char *)param);
-//        if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
-//            if(!ext->opened) {
-//                ext->opened = 1;
-//                lv_ddlist_refr_size(ddlist, true);
-//            }
-//
-//            if(ext->sel_opt_id + 1 < ext->option_cnt) {
-//                ext->sel_opt_id++;
-//                lv_ddlist_pos_current_option(ddlist);
-//                lv_obj_invalidate(ddlist);
-//            }
-//        } else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
-//            if(!ext->opened) {
-//                ext->opened = 1;
-//                lv_ddlist_refr_size(ddlist, true);
-//            }
-//            if(ext->sel_opt_id > 0) {
-//                ext->sel_opt_id--;
-//                lv_ddlist_pos_current_option(ddlist);
-//                lv_obj_invalidate(ddlist);
-//            }
-//        } else if(c == LV_KEY_ESC) {
-//            if(ext->opened) {
-//                ext->opened     = 0;
-//                ext->sel_opt_id = ext->sel_opt_id_ori;
-//                lv_ddlist_refr_size(ddlist, true);
-//            }
-//        }
-//    }
+    else if(sign == LV_SIGNAL_CONTROL) {
+        char c = *((char *)param);
+        if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
+            if(ext->page == NULL) {
+                lv_ddlist_open(ddlist, LV_ANIM_ON);
+            } else if(ext->sel_opt_id + 1 < ext->option_cnt) {
+                ext->sel_opt_id++;
+                pos_selected(ddlist);
+            }
+        } else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
+
+            if(ext->page == NULL) {
+                lv_ddlist_open(ddlist, LV_ANIM_ON);
+            } else if(ext->sel_opt_id > 0) {
+                ext->sel_opt_id--;
+                pos_selected(ddlist);
+            }
+        } else if(c == LV_KEY_ESC) {
+                ext->sel_opt_id = ext->sel_opt_id_orig;
+                lv_ddlist_close(ddlist, LV_ANIM_ON);
+        }
+    }
 else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable       = true;
