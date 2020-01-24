@@ -68,8 +68,9 @@ typedef struct
 
 /**Styles*/
 enum {
-    LV_BTN_PART_MAIN,
-
+    LV_BTN_PART_MAIN = LV_OBJ_PART_MAIN ,
+    _LV_BTN_PART_VIRTUAL_LAST,
+    _LV_BTN_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,
 };
 typedef uint8_t lv_btn_part_t;
 

@@ -628,7 +628,6 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
 
     /*Calculate the x coordinate*/
     lv_coord_t x = lv_txt_get_width(bidi_txt, visual_byte_pos, font, letter_space, flag);
-
     if(char_id != line_start) x += letter_space;
 
     if(align == LV_LABEL_ALIGN_CENTER) {
@@ -709,7 +708,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 #if LV_USE_BIDI
     bidi_txt = lv_mem_buf_get(new_line_start - line_start + 1);
     uint16_t txt_len = new_line_start - line_start;
-    if(bidi_txt[new_line_start] == '\0' && txt_len > 0) txt_len--;
+    if(new_line_start > 0 && txt[new_line_start - 1] == '\0' && txt_len > 0) txt_len--;
     lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_base_dir(label), NULL, 0);
 #else
     bidi_txt = (char*)txt + line_start;
@@ -753,7 +752,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
             x += lv_font_get_glyph_width(font, letter, letter_next);
 
             /*Finish if the x position or the last char of the line is reached*/
-            if(pos->x < x || i + line_start == new_line_start) {
+            if(pos->x < x || i + line_start == new_line_start ||  txt[i + line_start] == '\0') {
                 i = i_act;
                 break;
             }
@@ -763,11 +762,11 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     }
 
 #if LV_USE_BIDI
-    lv_mem_buf_release(bidi_txt);
     /*Handle Bidi*/
     bool is_rtl;
     logical_pos = lv_bidi_get_logical_pos(&txt[line_start], NULL, txt_len, lv_obj_get_base_dir(label), lv_txt_encoded_get_char_id(bidi_txt, i), &is_rtl);
     if (is_rtl) logical_pos++;
+    lv_mem_buf_release(bidi_txt);
 #else
     logical_pos = lv_txt_encoded_get_char_id(bidi_txt, i);
 #endif

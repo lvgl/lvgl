@@ -1362,11 +1362,15 @@ static lv_res_t lv_ta_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
         info->result = lv_ta_get_style(ta, info->part);
         if(info->result != NULL) return LV_RES_OK;
         else return ancestor_signal(ta, sign, param);
-    }else if(sign == LV_SIGNAL_GET_STATE) {
+    }else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_ta_ext_t * ext = ta->ext_attr;
         lv_get_state_info_t * info = param;
         if(info->part == LV_TA_PART_PLACEHOLDER) {
-            info->result = ext->placeholder ? lv_obj_get_state(ext->placeholder, LV_LABEL_PART_MAIN) : 0;
+            if(ext->placeholder) {
+                info->result = lv_obj_get_state_dsc(ext->placeholder, LV_LABEL_PART_MAIN);
+            } else {
+                info->result = NULL;
+            }
             return LV_RES_OK;
         }
         else return ancestor_signal(ta, sign, param);

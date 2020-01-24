@@ -271,7 +271,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->protect      = LV_PROTECT_NONE;
     new_obj->parent_event = 0;
     new_obj->gesture_parent = 1;
-    new_obj->state = 0;
+    new_obj->state_dsc.act = LV_OBJ_STATE_NORMAL;
+    new_obj->state_dsc.prev = LV_OBJ_STATE_NORMAL;
+    new_obj->state_dsc.anim = 0;
 
 #if LV_USE_BIDI
     if(parent == NULL) new_obj->base_dir     = LV_BIDI_BASE_DIR_DEF;
@@ -1253,9 +1255,6 @@ void lv_obj_refresh_style(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-//    /*Re-cache all children's styles first*/
-//    lv_obj_update_style_cache(obj);
-
     /*Send style change signals*/
     refresh_children_style(obj);
 }
@@ -1459,43 +1458,28 @@ void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t state)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_state_t new_state = obj->state | state;
-    if(obj->state != new_state) {
-        /* Disabled/Enabled state change should be applied immediately without transition */
-        if((obj->state & LV_OBJ_STATE_DISABLED) != (new_state & LV_OBJ_STATE_DISABLED)) {
+    lv_obj_state_t new_state = obj->state_dsc.act | state;
+    if(obj->state_dsc.act != new_state) {
+        lv_style_int_t t = lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_TRANSITION_TIME);
+        if(t == 0) {
             lv_anim_del(obj, obj_state_anim_cb);
-            obj->state = new_state;
-            obj->prev_state = new_state;
-            obj->state_anim = 0;
+            obj->state_dsc.act = new_state;
+            obj->state_dsc.prev = new_state;
+            obj->state_dsc.anim = 0;
             lv_obj_refresh_style(obj);
         }
-        /*Start transition if set*/
+        /*Set the new state for prev state too to get the TRANSITION_TIME for the new state*/
         else {
-            lv_style_int_t t = lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_TRANSITION_TIME);
-            if(t == 0) {
-                lv_anim_del(obj, obj_state_anim_cb);
-                obj->state = new_state;
-                obj->prev_state = new_state;
-                obj->state_anim = 0;
-                lv_obj_refresh_style(obj);
-            }
-            /*Set the new state for prev state too to get the TRANSITION_TIME for the new state*/
-            else {
-                lv_obj_state_t prev_state = obj->state;
-                obj->prev_state = new_state;
-                obj->state = new_state;
-                obj->state_anim = 0;
+            obj->state_dsc.prev = obj->state_dsc.act;
+            obj->state_dsc.act = new_state;
+            obj->state_dsc.anim = 0;
 
-                /*Get the TRANSITION_TIME and set the real previous state*/
-                obj->prev_state = prev_state;
-
-                lv_anim_t a;
-                lv_anim_init(&a);
-                lv_anim_set_exec_cb(&a, obj, obj_state_anim_cb);
-                lv_anim_set_values(&a, 0, 255);
-                lv_anim_set_time(&a, t, 0);
-                lv_anim_create(&a);
-            }
+            lv_anim_t a;
+            lv_anim_init(&a);
+            lv_anim_set_exec_cb(&a, obj, obj_state_anim_cb);
+            lv_anim_set_values(&a, 0, 255);
+            lv_anim_set_time(&a, t, 0);
+            lv_anim_create(&a);
         }
     }
 }
@@ -1504,26 +1488,29 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_obj_state_t state)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    state = (~state) & 0xFF;
-    lv_obj_state_t new_state = obj->state & state;
-    if(obj->state != new_state) {
-        lv_obj_state_t prev_state = obj->state;
-
-        /*Set the new state for prev state too to get the TRANSITION_TIME for the new state*/
-        obj->prev_state = new_state;
-        obj->state = new_state;
-        obj->state_anim = 0;
-
-        /*Get the TRANSITION_TIME and set the real previous state*/
+    lv_obj_state_t new_state = obj->state_dsc.act & (~state);
+    if(obj->state_dsc.act != new_state) {
         lv_style_int_t t = lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_TRANSITION_TIME);
-        obj->prev_state = prev_state;
+        if(t == 0) {
+            lv_anim_del(obj, obj_state_anim_cb);
+            obj->state_dsc.act = new_state;
+            obj->state_dsc.prev = new_state;
+            obj->state_dsc.anim = 0;
+            lv_obj_refresh_style(obj);
+        }
+        /*Set the new state for prev state too to get the TRANSITION_TIME for the new state*/
+        else {
+            obj->state_dsc.prev = obj->state_dsc.act;
+            obj->state_dsc.act = new_state;
+            obj->state_dsc.anim = 0;
 
-        lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_exec_cb(&a, obj, obj_state_anim_cb);
-        lv_anim_set_values(&a, 0, 255);
-        lv_anim_set_time(&a, t, 0);
-        lv_anim_create(&a);
+            lv_anim_t a;
+            lv_anim_init(&a);
+            lv_anim_set_exec_cb(&a, obj, obj_state_anim_cb);
+            lv_anim_set_values(&a, 0, 255);
+            lv_anim_set_time(&a, t, 0);
+            lv_anim_create(&a);
+        }
     }
 }
 /**
@@ -2114,14 +2101,16 @@ lv_style_list_t * lv_obj_get_style_list(const lv_obj_t * obj, uint8_t part)
 
 lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
-    if(obj->state == obj->prev_state) {
+    lv_obj_state_dsc_t * state = lv_obj_get_state_dsc(obj, part);
+
+    if(state->act == state->prev) {
         return lv_obj_get_style_int_core(obj, part, prop);
     } else {
         lv_style_int_t act_int = lv_obj_get_style_int_core(obj, part, prop);
-        lv_obj_state_t state_ori = obj->state;
-        ((lv_obj_t*)obj)->state = obj->prev_state;
+        lv_obj_state_t state_ori = state->act;
+        state->act = state->prev;
         lv_style_int_t prev_int = lv_obj_get_style_int_core(obj, part, prop);
-        ((lv_obj_t*)obj)->state = state_ori;
+        state->act = state_ori;
 
         if(prop == LV_STYLE_RADIUS) {
             if(act_int == LV_RADIUS_CIRCLE || prev_int == LV_RADIUS_CIRCLE) {
@@ -2138,8 +2127,8 @@ lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style
             }
         }
 
-        if(obj->state_anim >= 255) return act_int;
-        return prev_int + (((act_int - prev_int) * obj->state_anim) >> 8);
+        if(state->anim >= 255) return act_int;
+        return prev_int + (((act_int - prev_int) * state->anim) >> 8);
     }
 }
 
@@ -2147,47 +2136,53 @@ lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style
 
 lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
-   if(obj->state == obj->prev_state) {
+    lv_obj_state_dsc_t * state = lv_obj_get_state_dsc(obj, part);
+
+    if(state->act == state->prev) {
        return lv_obj_get_style_color_core(obj, part, prop);
    } else {
        lv_color_t act_color = lv_obj_get_style_color_core(obj, part, prop);
-       lv_obj_state_t state_ori = obj->state;
-       ((lv_obj_t*)obj)->state = obj->prev_state;
+       lv_obj_state_t state_ori = state->act;
+       state->act = state->prev;
        lv_color_t prev_color = lv_obj_get_style_color_core(obj, part, prop);
-       ((lv_obj_t*)obj)->state = state_ori;
+       state->act = state_ori;
 
-       return lv_color_mix(act_color, prev_color, obj->state_anim);
+       return lv_color_mix(act_color, prev_color, state->anim);
    }
 }
 
 lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
-    if(obj->state == obj->prev_state) {
+    lv_obj_state_dsc_t * state = lv_obj_get_state_dsc(obj, part);
+
+    if(state->act == state->prev) {
         return lv_obj_get_style_opa_core(obj, part, prop);
     } else {
         lv_opa_t act_opa = lv_obj_get_style_opa_core(obj, part, prop);
-        lv_obj_state_t state_ori = obj->state;
-        ((lv_obj_t*)obj)->state = obj->prev_state;
+        lv_obj_state_t state_ori = state->act;
+        state->act = state->prev;
         lv_opa_t prev_opa = lv_obj_get_style_opa_core(obj, part, prop);
-        ((lv_obj_t*)obj)->state = state_ori;
+        state->act = state_ori;
 
-        if(obj->state_anim >= 255) return act_opa;
-        return prev_opa + (((act_opa - prev_opa) * obj->state_anim) >> 8);
+        if(state->anim >= 255) return act_opa;
+        return prev_opa + (((act_opa - prev_opa) * state->anim) >> 8);
     }
 }
 
 
 const void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
-    if(obj->state == obj->prev_state) {
+    lv_obj_state_dsc_t * state = lv_obj_get_state_dsc(obj, part);
+
+    if(state->act == state->prev) {
         return lv_obj_get_style_ptr_core(obj, part, prop);
     } else {
-        if(obj->state_anim > 128) return lv_obj_get_style_ptr_core(obj, part, prop);
+        if(state->anim > 128) return lv_obj_get_style_ptr_core(obj, part, prop);
 
-        lv_obj_state_t state_ori = obj->state;
-        ((lv_obj_t*)obj)->state = obj->prev_state;
+        lv_obj_state_t state_ori = state->act;
+        state->act = state->prev;
         const void * prev_ptr = lv_obj_get_style_ptr_core(obj, part, prop);
-        ((lv_obj_t*)obj)->state = state_ori;
+        state->act = state_ori;
 
         return prev_ptr;
     }
@@ -2358,25 +2353,36 @@ bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot)
     return (obj->protect & prot) == 0 ? false : true;
 }
 
-lv_obj_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part)
+lv_obj_state_dsc_t * lv_obj_get_state_dsc(const lv_obj_t * obj, uint8_t part)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(part < _LV_OBJ_PART_REAL_LAST) return obj->state;
+    if(part < _LV_OBJ_PART_REAL_LAST) return &obj->state_dsc;
+
+
+    static uint32_t x = 0;
+    x++;
+    printf("%d\n", x);
 
     /*If a real part is asked, then use the object's signal to get its state.
      * A real object can be in different state then the main part
      * and only the object itseld knows who to get it's state. */
     lv_get_state_info_t info;
     info.part = part;
-    info.result = 0;
+    info.result = NULL;
     lv_res_t res;
-    res = lv_signal_send((lv_obj_t*)obj, LV_SIGNAL_GET_STATE, &info);
+    res = lv_signal_send((lv_obj_t*)obj, LV_SIGNAL_GET_STATE_DSC, &info);
 
-    if(res != LV_RES_OK) return 0;
+    if(res != LV_RES_OK) return NULL;
 
     return info.result;
 
+}
+
+lv_obj_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part)
+{
+    lv_obj_state_dsc_t * state_dsc = lv_obj_get_state_dsc(obj, part);
+    return state_dsc->act;
 }
 
 /**
@@ -2928,11 +2934,11 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
 static void report_style_mod_core(void * style, lv_obj_t * obj)
 {
     uint8_t part_sub;
-    for(part_sub = 0; part_sub != _LV_OBJ_PART_ALL; part_sub++) {
+    for(part_sub = 0; part_sub != _LV_OBJ_PART_REAL_LAST; part_sub++) {
         lv_style_list_t * dsc = lv_obj_get_style_list(obj, part_sub);
         if(dsc == NULL) break;
 
-       uint8_t ci;
+        uint8_t ci;
         for(ci = 0; ci < dsc->style_cnt; ci++) {
             lv_style_t * class = lv_style_list_get_style(dsc, ci);
             if(class == style) {
@@ -2972,7 +2978,6 @@ static void refresh_children_style(lv_obj_t * obj)
 
         refresh_children_style(child); /*Check children too*/
         child = lv_obj_get_child(obj, child);
-
     }
 }
 
@@ -3064,8 +3069,8 @@ static void base_dir_refr_children(lv_obj_t * obj)
 static void obj_state_anim_cb(void * p, lv_anim_value_t value)
 {
     lv_obj_t * obj = p;
-    obj->state_anim = value;
-    if(value == 255)  obj->prev_state = obj->state;
+    obj->state_dsc.anim = value;
+    if(value == 255)  obj->state_dsc.prev = obj->state_dsc.act;
 
     lv_obj_refresh_style(obj);
 }

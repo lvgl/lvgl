@@ -71,17 +71,17 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("container create started");
 
     /*Create a basic object*/
-    lv_obj_t * new_cont = lv_obj_create(par, copy);
-    LV_ASSERT_MEM(new_cont);
-    if(new_cont == NULL) return NULL;
+    lv_obj_t * cont = lv_obj_create(par, copy);
+    LV_ASSERT_MEM(cont);
+    if(cont == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_cont);
-    if(ancestor_design == NULL) ancestor_design= lv_obj_get_design_cb(new_cont);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(cont);
+    if(ancestor_design == NULL) ancestor_design= lv_obj_get_design_cb(cont);
 
-    lv_obj_allocate_ext_attr(new_cont, sizeof(lv_cont_ext_t));
-    lv_cont_ext_t * ext = lv_obj_get_ext_attr(new_cont);
+    lv_obj_allocate_ext_attr(cont, sizeof(lv_cont_ext_t));
+    lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
     if(ext == NULL) {
-        lv_obj_del(new_cont);
+        lv_obj_del(cont);
         return NULL;
     }
 
@@ -92,15 +92,16 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->fit_bottom = LV_FIT_NONE;
     ext->layout     = LV_LAYOUT_OFF;
 
-    lv_obj_set_signal_cb(new_cont, lv_cont_signal);
+    lv_obj_set_signal_cb(cont, lv_cont_signal);
 
     /*Init the new container*/
     if(copy == NULL) {
         /*Set the default styles if it's not screen*/
         if(par != NULL) {
-            lv_obj_reset_style(new_cont, LV_CONT_PART_MAIN);
-            lv_obj_add_style(new_cont, LV_CONT_PART_MAIN, _t(PANEL));
+            lv_theme_apply(cont, LV_THEME_CONT);
         }
+
+
     }
     /*Copy an existing object*/
     else {
@@ -112,12 +113,12 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->layout              = copy_ext->layout;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_cont);
+        lv_obj_refresh_style(cont);
     }
 
     LV_LOG_INFO("container created");
 
-    return new_cont;
+    return cont;
 }
 
 /*=====================

@@ -585,6 +585,14 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
          info->result = lv_tabview_get_style(tabview, info->part);
          if(info->result != NULL) return LV_RES_OK;
          else return ancestor_signal(tabview, sign, param);
+    } else if(sign == LV_SIGNAL_GET_STATE_DSC) {
+        lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
+         lv_get_state_info_t * info = param;
+         if(info->part == LV_TABVIEW_PART_TAB_BG) info->result = lv_obj_get_state_dsc(ext->btns, LV_BTNM_PART_BG);
+         else if(info->part == LV_TABVIEW_PART_TAB) info->result = lv_obj_get_state_dsc(ext->btns, LV_BTNM_PART_BTN);
+         else if(info->part == LV_TABVIEW_PART_INDIC) info->result = lv_obj_get_state_dsc(ext->indic, LV_OBJ_PART_MAIN);
+         else if(info->part == LV_TABVIEW_PART_BG_SCRL) info->result = lv_obj_get_state_dsc(ext->content, LV_PAGE_PART_SCRL);
+         return LV_RES_OK;
     }
 
     /* Include the ancient signal function */

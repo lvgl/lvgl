@@ -94,6 +94,7 @@ enum {
     LV_EVENT_KEY,
     LV_EVENT_FOCUSED,
     LV_EVENT_DEFOCUSED,
+    LV_EVENT_LEAVE,
     LV_EVENT_VALUE_CHANGED,		 /**< The object's value has changed (i.e. slider moved) */
     LV_EVENT_INSERT,
     LV_EVENT_REFRESH,
@@ -124,7 +125,7 @@ enum {
     LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
     LV_SIGNAL_GET_TYPE, /**< LittlevGL needs to retrieve the object's type */
     LV_SIGNAL_GET_STYLE, /**<Get the style of an object*/
-    LV_SIGNAL_GET_STATE, /**<Get the state of the object*/
+    LV_SIGNAL_GET_STATE_DSC, /**<Get the state of the object*/
 
     /*Input device related*/
     LV_SIGNAL_HIT_TEST,          /**< Advanced hit-testing */
@@ -137,7 +138,8 @@ enum {
     LV_SIGNAL_DRAG_BEGIN,	
     LV_SIGNAL_DRAG_THROW_BEGIN,
     LV_SIGNAL_DRAG_END,                                   
-    LV_SIGNAL_GESTURE,			/**< The object has been getture*/
+    LV_SIGNAL_GESTURE,			/**< The object has been gesture*/
+    LV_SIGNAL_LEAVE,            /**< Another object is clicked or chosen via an input device */
 
     /*Group related*/
     LV_SIGNAL_FOCUS,
@@ -203,6 +205,7 @@ enum {
 typedef uint8_t lv_protect_t;
 
 enum {
+    LV_OBJ_STATE_NORMAL  =   0,
     LV_OBJ_STATE_CHECKED  =  (LV_STYLE_STATE_CHECKED >> LV_STYLE_STATE_POS),
     LV_OBJ_STATE_FOCUS  =    (LV_STYLE_STATE_FOCUS >> LV_STYLE_STATE_POS),
     LV_OBJ_STATE_EDIT  =     (LV_STYLE_STATE_EDIT >> LV_STYLE_STATE_POS),
@@ -212,6 +215,12 @@ enum {
 };
 
 typedef uint8_t lv_obj_state_t;
+
+typedef struct {
+    lv_obj_state_t act;
+    lv_obj_state_t prev;
+    uint8_t anim;
+}lv_obj_state_dsc_t;
 
 typedef struct _lv_obj_t
 {
@@ -257,9 +266,7 @@ typedef struct _lv_obj_t
 
     uint8_t protect;            /**< Automatically happening actions can be prevented.
                                      'OR'ed values from `lv_protect_t`*/
-    uint8_t state;
-    uint8_t prev_state;
-    uint8_t state_anim;
+    lv_obj_state_dsc_t state_dsc;
 
 #if LV_USE_OBJ_REALIGN
     lv_realign_t realign;       /**< Information about the last call to ::lv_obj_align. */
@@ -303,7 +310,7 @@ typedef struct
 typedef struct
 {
     uint8_t part;
-    lv_obj_state_t result;
+    lv_obj_state_dsc_t * result;
 } lv_get_state_info_t;
 
 /**********************
@@ -1002,6 +1009,8 @@ uint8_t lv_obj_get_protect(const lv_obj_t * obj);
  * @return false: none of the given bits are set, true: at least one bit is set
  */
 bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
+
+lv_obj_state_dsc_t * lv_obj_get_state_dsc(const lv_obj_t * obj, uint8_t part);
 
 lv_obj_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part);
 

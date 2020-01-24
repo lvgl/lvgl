@@ -164,6 +164,8 @@ void lv_btn_toggle(lv_obj_t * btn)
 {
     LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
 
+
+
     if(lv_obj_get_state(btn, LV_BTN_PART_MAIN) & LV_OBJ_STATE_CHECKED) {
         lv_obj_clear_state(btn, LV_OBJ_STATE_CHECKED);
     } else {

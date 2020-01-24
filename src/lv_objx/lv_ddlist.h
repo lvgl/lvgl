@@ -61,15 +61,17 @@ typedef struct
     lv_style_list_t style_scrlbar; /*Style of the scroll bar*/
     lv_coord_t max_height;        /*Height of the ddlist when opened. (0: auto-size)*/
     uint16_t option_cnt;          /*Number of options*/
-    int16_t sel_opt_id;          /*Index of the currently selected option*/
-    int16_t sel_opt_id_orig;     /*Store the original index on focus*/
+    uint16_t sel_opt_id;          /*Index of the currently selected option*/
+    uint16_t sel_opt_id_orig;     /*Store the original index on focus*/
+    uint16_t pr_opt_id;             /*Index of the currently pressed option*/
+    uint16_t anim_time;
     lv_ddlist_dir_t dir         :2;
     uint8_t show_selected  :1;
 } lv_ddlist_ext_t;
 
 enum {
-    LV_DDLIST_PART_BTN,
-    LV_DDLIST_PART_LIST,
+    LV_DDLIST_PART_BTN = LV_BTN_PART_MAIN,
+    LV_DDLIST_PART_LIST = _LV_BTN_PART_REAL_LAST,
     LV_DDLIST_PART_SCRLBAR,
     LV_DDLIST_PART_SELECTED,
 };

@@ -38,7 +38,7 @@ typedef enum {
     LV_THEME_SCR,
     LV_THEME_OBJ,
 
-    LV_THEME_PANEL,
+    LV_THEME_CONT,
 
     LV_THEME_BTN,
 

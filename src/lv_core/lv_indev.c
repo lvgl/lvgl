@@ -938,7 +938,6 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         if(indev_reset_check(proc)) return;
 
         /*Handle click focus*/
-        bool click_focus_sent = false;
 #if LV_USE_GROUP
         lv_group_t * g = lv_obj_get_group(indev_obj_act);
 
@@ -963,29 +962,20 @@ static void indev_proc_release(lv_indev_proc_t * proc)
              * `LV_EVENT_FOCUSED/DEFOCUSED` will be sent by `lv_group_focus_obj`*/
             if(g && parent) {
                 if(lv_group_get_click_focus(g)) {
-                    click_focus_sent = true;
                     lv_group_focus_obj(parent);
                 }
             }
         }
 #endif
 
-        /* Send defocus to the lastly "active" object and foucus to the new one.
-         * Do not send the events if they was sent by the click focus*/
-        if(proc->types.pointer.last_pressed != indev_obj_act && click_focus_sent == false) {
-            if(lv_obj_is_protected(indev_obj_act, LV_PROTECT_CLICK_FOCUS) == false) {
-                lv_signal_send(proc->types.pointer.last_pressed, LV_SIGNAL_DEFOCUS, NULL);
-                if(indev_reset_check(proc)) return;
-                lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_DEFOCUSED, NULL);
-                if(indev_reset_check(proc)) return;
+        /* Leave lastly "active" object */
+        if(proc->types.pointer.last_pressed != indev_obj_act && lv_obj_is_protected(indev_obj_act, LV_PROTECT_CLICK_FOCUS) == false) {
+            lv_signal_send(proc->types.pointer.last_pressed, LV_SIGNAL_LEAVE, NULL);
+            if(indev_reset_check(proc)) return;
+            lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_LEAVE, NULL);
+            if(indev_reset_check(proc)) return;
 
-                lv_signal_send(proc->types.pointer.act_obj, LV_SIGNAL_FOCUS, NULL);
-                if(indev_reset_check(proc)) return;
-                lv_event_send(proc->types.pointer.act_obj, LV_EVENT_FOCUSED, NULL);
-                if(indev_reset_check(proc)) return;
-
-                proc->types.pointer.last_pressed = indev_obj_act;
-            }
+            proc->types.pointer.last_pressed = indev_obj_act;
         }
 
         if(indev_reset_check(proc)) return;
@@ -1139,9 +1129,6 @@ static void indev_drag(lv_indev_proc_t * proc)
         /*Set new position if the vector is not zero*/
         if(proc->types.pointer.vect.x != 0 || proc->types.pointer.vect.y != 0) {
 
-            uint16_t inv_buf_size =
-                lv_disp_get_inv_buf_size(indev_act->driver.disp); /*Get the number of currently invalidated areas*/
-
             lv_coord_t prev_x     = drag_obj->coords.x1;
             lv_coord_t prev_y     = drag_obj->coords.y1;
             lv_coord_t prev_par_w = lv_obj_get_width(lv_obj_get_parent(drag_obj));
@@ -1157,21 +1144,18 @@ static void indev_drag(lv_indev_proc_t * proc)
                     act_x += proc->types.pointer.drag_sum.x;
                     act_y += proc->types.pointer.drag_sum.y;
                 }
-                lv_obj_set_pos(drag_obj, act_x + proc->types.pointer.vect.x, act_y + proc->types.pointer.vect.y);
             } else if(allowed_dirs == LV_DRAG_DIR_HOR) {
                 if(drag_just_started) {
                     proc->types.pointer.drag_dir = LV_DRAG_DIR_HOR;
                     proc->types.pointer.drag_sum.y = 0;
                     act_x += proc->types.pointer.drag_sum.x;
                 }
-                lv_obj_set_x(drag_obj, act_x + proc->types.pointer.vect.x);
             } else if(allowed_dirs == LV_DRAG_DIR_VER) {
                 if(drag_just_started) {
                     proc->types.pointer.drag_dir = LV_DRAG_DIR_VER;
                     proc->types.pointer.drag_sum.x = 0;
                     act_y += proc->types.pointer.drag_sum.y;
                 }
-                lv_obj_set_y(drag_obj, act_y + proc->types.pointer.vect.y);
             } else if(allowed_dirs == LV_DRAG_DIR_ONE) {
                 if(drag_just_started) {
                     if(LV_MATH_ABS(proc->types.pointer.drag_sum.x) > LV_MATH_ABS(proc->types.pointer.drag_sum.y)) {
@@ -1200,18 +1184,11 @@ static void indev_drag(lv_indev_proc_t * proc)
                 act_y += proc->types.pointer.vect.y;
             }
 
+            uint16_t inv_buf_size =
+                lv_disp_get_inv_buf_size(indev_act->driver.disp); /*Get the number of currently invalidated areas*/
+
             lv_obj_set_pos(drag_obj, act_x, act_y);
             proc->types.pointer.drag_in_prog = 1;
-
-            /*Set the drag in progress flag*/
-            /*Send the drag begin signal on first move*/
-            if(drag_just_started) {
-                drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_BEGIN, indev_act);
-                if(indev_reset_check(proc)) return;
-
-                lv_event_send(drag_obj, LV_EVENT_DRAG_BEGIN, NULL);
-                if(indev_reset_check(proc)) return;
-            }
 
             /*If the object didn't moved then clear the invalidated areas*/
             if(drag_obj->coords.x1 == prev_x && drag_obj->coords.y1 == prev_y) {
@@ -1225,6 +1202,17 @@ static void indev_drag(lv_indev_proc_t * proc)
                     lv_disp_pop_from_inv_buf(indev_act->driver.disp, new_inv_buf_size - inv_buf_size);
                 }
             }
+
+            /*Set the drag in progress flag*/
+            /*Send the drag begin signal on first move*/
+            if(drag_just_started) {
+                drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_BEGIN, indev_act);
+                if(indev_reset_check(proc)) return;
+
+                lv_event_send(drag_obj, LV_EVENT_DRAG_BEGIN, NULL);
+                if(indev_reset_check(proc)) return;
+            }
+
         }
     }
 }

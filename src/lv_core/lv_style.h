@@ -59,6 +59,8 @@ typedef uint8_t lv_grad_dir_t;
 #define LV_STYLE_ATTR_NONE          0
 #define LV_STYLE_ATTR_INHERIT       (1 << 7)
 
+#define _LV_STYLE_CLOSEING_PROP     0xFF
+
 typedef union {
     struct {
         uint8_t state       :7; /* To which state the property refers to*/
@@ -161,7 +163,6 @@ typedef uint16_t lv_style_state_t;
 
 typedef struct {
     uint8_t * map;
-    uint16_t size       :9;
 }lv_style_t;
 
 typedef int16_t lv_style_int_t;
@@ -217,6 +218,8 @@ static inline lv_style_t * lv_style_list_get_style(lv_style_list_t * style_dsc, 
 }
 
 void lv_style_reset(lv_style_t * style);
+
+uint16_t lv_style_get_size(lv_style_t * style);
 
 /**
  * Copy a style to an other

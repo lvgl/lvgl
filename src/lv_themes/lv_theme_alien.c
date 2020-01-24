@@ -6,8 +6,10 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <stdint.h>
 #include "lv_theme.h"
 #include "../lv_objx/lv_img.h"
+#include "../lv_misc/lv_types.h"
 
 #if LV_USE_THEME_ALIEN
 
@@ -40,6 +42,7 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name);
  **********************/
 
 static lv_theme_t theme;
+
 
 static lv_style_t scr;
 static lv_style_t panel; /*General fancy background (e.g. to chart or ta)*/
@@ -115,6 +118,7 @@ static lv_style_t chart_series_bg, chart_series;
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
 
 static void basic_init(void)
 {
