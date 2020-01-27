@@ -217,7 +217,9 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
         const lv_opa_t * mask, lv_draw_mask_res_t mask_res)
 {
 
+#if LV_USE_GPU
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
+#endif
 
     /*Get the width of the `disp_area` it will be used to go to the next line*/
     lv_coord_t disp_w = lv_area_get_width(disp_area);
