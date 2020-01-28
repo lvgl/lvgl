@@ -145,6 +145,7 @@ static void basic_init(void)
     lv_style_set_color(&panel, LV_STYLE_IMAGE_RECOLOR, lv_color_hex(0x979a9f));
     lv_style_set_color(&panel, LV_STYLE_LINE_COLOR, lv_color_hex(0x979a9f));
     lv_style_set_int(&panel, LV_STYLE_LINE_WIDTH, 1);
+    lv_style_set_color(&panel, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
 
     lv_style_init(&btn);
     lv_style_set_int(&btn, LV_STYLE_RADIUS, LV_RADIUS_CIRCLE);
@@ -495,6 +496,7 @@ static void tabview_init(void)
     lv_style_set_opa(&tabview_btns, LV_STYLE_BG_OPA | LV_STYLE_STATE_PRESSED, LV_OPA_COVER);
     lv_style_set_color(&tabview_btns, LV_STYLE_BG_COLOR | LV_STYLE_STATE_PRESSED, lv_color_hex(0x444444));
     lv_style_set_color(&tabview_btns, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_CHECKED, COLOR_ACCENT);
+    lv_style_set_color(&tabview_btns, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
     lv_style_set_int(&tabview_btns, LV_STYLE_PAD_TOP, LV_DPI / 5);
     lv_style_set_int(&tabview_btns, LV_STYLE_PAD_BOTTOM, LV_DPI / 5);
 
