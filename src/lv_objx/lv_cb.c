@@ -181,10 +181,13 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
         const lv_font_t * font = lv_obj_get_style_ptr(ext->label, LV_LABEL_PART_MAIN, LV_STYLE_FONT);
         lv_coord_t line_height = lv_font_get_line_height(font);
         lv_obj_set_size(ext->bullet, line_height, line_height);
-        lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
-    } else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
-        lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
-    } else if(sign == LV_SIGNAL_CONTROL) {
+        lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CB_PART_BG));
+    } else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST ||
+            sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS) {
+        lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CB_PART_BG));
+    } else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED) {
+
+    }else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN || c == LV_KEY_LEFT || c == LV_KEY_UP) {
             /*Follow the backgrounds state with the bullet*/

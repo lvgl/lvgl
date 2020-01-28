@@ -409,7 +409,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
-            lv_indev_reset(indev);
+            lv_indev_reset(indev, obj);
         }
         if(indev->proc.types.pointer.last_pressed == obj) {
             indev->proc.types.pointer.last_pressed = NULL;
@@ -417,7 +417,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 
 #if LV_USE_GROUP
         if(indev->group == group && obj == lv_indev_get_obj_act()) {
-            lv_indev_reset(indev);
+            lv_indev_reset(indev, obj);
         }
 #endif
         indev = lv_indev_get_next(indev);
@@ -1454,33 +1454,42 @@ void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot)
     obj->protect &= prot;
 }
 
-void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t state)
+void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t new_state)
+{
+    if(obj->state_dsc.act == new_state) return;
+
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_style_int_t t = lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_TRANSITION_TIME);
+    if(t == 0) {
+        lv_anim_del(obj, obj_state_anim_cb);
+        obj->state_dsc.act = new_state;
+        obj->state_dsc.prev = new_state;
+        obj->state_dsc.anim = 0;
+        lv_obj_refresh_style(obj);
+    }
+    /*Set the new state for prev state too to get the TRANSITION_TIME for the new state*/
+    else {
+        obj->state_dsc.prev = obj->state_dsc.act;
+        obj->state_dsc.act = new_state;
+        obj->state_dsc.anim = 0;
+
+        lv_anim_t a;
+        lv_anim_init(&a);
+        lv_anim_set_exec_cb(&a, obj, obj_state_anim_cb);
+        lv_anim_set_values(&a, 0, 255);
+        lv_anim_set_time(&a, t, 0);
+        lv_anim_create(&a);
+    }
+
+}
+
+void lv_obj_add_state(lv_obj_t * obj, lv_obj_state_t state)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     lv_obj_state_t new_state = obj->state_dsc.act | state;
     if(obj->state_dsc.act != new_state) {
-        lv_style_int_t t = lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_TRANSITION_TIME);
-        if(t == 0) {
-            lv_anim_del(obj, obj_state_anim_cb);
-            obj->state_dsc.act = new_state;
-            obj->state_dsc.prev = new_state;
-            obj->state_dsc.anim = 0;
-            lv_obj_refresh_style(obj);
-        }
-        /*Set the new state for prev state too to get the TRANSITION_TIME for the new state*/
-        else {
-            obj->state_dsc.prev = obj->state_dsc.act;
-            obj->state_dsc.act = new_state;
-            obj->state_dsc.anim = 0;
-
-            lv_anim_t a;
-            lv_anim_init(&a);
-            lv_anim_set_exec_cb(&a, obj, obj_state_anim_cb);
-            lv_anim_set_values(&a, 0, 255);
-            lv_anim_set_time(&a, t, 0);
-            lv_anim_create(&a);
-        }
+        lv_obj_set_state(obj, new_state);
     }
 }
 
@@ -1490,27 +1499,7 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_obj_state_t state)
 
     lv_obj_state_t new_state = obj->state_dsc.act & (~state);
     if(obj->state_dsc.act != new_state) {
-        lv_style_int_t t = lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_TRANSITION_TIME);
-        if(t == 0) {
-            lv_anim_del(obj, obj_state_anim_cb);
-            obj->state_dsc.act = new_state;
-            obj->state_dsc.prev = new_state;
-            obj->state_dsc.anim = 0;
-            lv_obj_refresh_style(obj);
-        }
-        /*Set the new state for prev state too to get the TRANSITION_TIME for the new state*/
-        else {
-            obj->state_dsc.prev = obj->state_dsc.act;
-            obj->state_dsc.act = new_state;
-            obj->state_dsc.anim = 0;
-
-            lv_anim_t a;
-            lv_anim_init(&a);
-            lv_anim_set_exec_cb(&a, obj, obj_state_anim_cb);
-            lv_anim_set_values(&a, 0, 255);
-            lv_anim_set_time(&a, t, 0);
-            lv_anim_create(&a);
-        }
+        lv_obj_set_state(obj, new_state);
     }
 }
 /**
@@ -2889,9 +2878,9 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(lv_group_get_editing(lv_obj_get_group(obj))) {
             uint8_t state = LV_OBJ_STATE_FOCUS;
             state |= LV_OBJ_STATE_EDIT;
-            lv_obj_set_state(obj, state);
+            lv_obj_add_state(obj, state);
         } else {
-            lv_obj_set_state(obj, LV_OBJ_STATE_FOCUS);
+            lv_obj_add_state(obj, LV_OBJ_STATE_FOCUS);
             lv_obj_clear_state(obj, LV_OBJ_STATE_EDIT);
         }
     } else if(sign == LV_SIGNAL_DEFOCUS) {
@@ -3025,7 +3014,7 @@ static void delete_children(lv_obj_t * obj)
     lv_indev_t * indev = lv_indev_get_next(NULL);
     while(indev) {
         if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
-            lv_indev_reset(indev);
+            lv_indev_reset(indev, obj);
         }
 
         if(indev->proc.types.pointer.last_pressed == obj) {
@@ -3033,7 +3022,7 @@ static void delete_children(lv_obj_t * obj)
         }
 #if LV_USE_GROUP
         if(indev->group == group && obj == lv_indev_get_obj_act()) {
-            lv_indev_reset(indev);
+            lv_indev_reset(indev, obj);
         }
 #endif
         indev = lv_indev_get_next(indev);

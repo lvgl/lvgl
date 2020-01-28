@@ -641,6 +641,8 @@ void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot);
 
 void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t state);
 
+void lv_obj_add_state(lv_obj_t * obj, lv_obj_state_t state);
+
 void lv_obj_clear_state(lv_obj_t * obj, lv_obj_state_t state);
 
 /**

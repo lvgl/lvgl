@@ -49,8 +49,8 @@ typedef struct
 
 /** Checkbox styles. */
 enum {
-    LV_CB_PART_BG,  /**< Style of object background. */
-    LV_CB_PART_BULLET, /**< Style of box (released). */
+    LV_CB_PART_BG = LV_BTN_PART_MAIN,  /**< Style of object background. */
+    LV_CB_PART_BULLET = _LV_BTN_PART_REAL_LAST, /**< Style of box (released). */
 };
 typedef uint8_t lv_cb_style_t;
 

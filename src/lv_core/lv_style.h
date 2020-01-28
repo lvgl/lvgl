@@ -156,7 +156,7 @@ enum {
     LV_STYLE_STATE_HOVER  =           (1 << (3 + LV_STYLE_STATE_POS)),
     LV_STYLE_STATE_PRESSED  =         (1 << (4 + LV_STYLE_STATE_POS)),
     LV_STYLE_STATE_DISABLED =         (1 << (6 + LV_STYLE_STATE_POS)),
-    LV_STYLE_STATE_ALL =              (0x7F << LV_STYLE_STATE_POS)
+    LV_STYLE_STATE_ALL =              (0x7F << LV_STYLE_STATE_POS),
 };
 
 typedef uint16_t lv_style_state_t;

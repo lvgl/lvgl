@@ -64,7 +64,7 @@ static lv_obj_t * indev_obj_act = NULL;
  */
 void lv_indev_init(void)
 {
-    lv_indev_reset(NULL); /*Reset all input devices*/
+    lv_indev_reset(NULL, NULL); /*Reset all input devices*/
 }
 
 /**
@@ -145,19 +145,26 @@ lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev)
 
     return indev->driver.type;
 }
+
 /**
  * Reset one or all input devices
  * @param indev pointer to an input device to reset or NULL to reset all of them
+ * @param obj pointer to an object which triggers the reset.
  */
-void lv_indev_reset(lv_indev_t * indev)
+void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj)
 {
-    if(indev)
+    if(indev) {
         indev->proc.reset_query = 1;
-    else {
+        if(obj == NULL || indev->proc.types.pointer.last_pressed == obj) {
+            indev->proc.types.pointer.last_pressed = NULL;
+        }
+    } else {
         lv_indev_t * i = lv_indev_get_next(NULL);
         while(i) {
             i->proc.reset_query = 1;
-
+            if(obj == NULL || i->proc.types.pointer.last_pressed == obj) {
+                i->proc.types.pointer.last_pressed = NULL;
+            }
             i = lv_indev_get_next(i);
         }
     }
@@ -938,7 +945,8 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         if(indev_reset_check(proc)) return;
 
         /*Handle click focus*/
-        if(lv_obj_is_protected(indev_obj_act, LV_PROTECT_CLICK_FOCUS) == false) {
+        if(lv_obj_is_protected(indev_obj_act, LV_PROTECT_CLICK_FOCUS) == false &&
+                proc->types.pointer.last_pressed != indev_obj_act) {
 #if LV_USE_GROUP
             lv_group_t * g_act = lv_obj_get_group(indev_obj_act);
             lv_group_t * g_prev = proc->types.pointer.last_pressed ? lv_obj_get_group(proc->types.pointer.last_pressed) : NULL;
@@ -967,9 +975,16 @@ static void indev_proc_release(lv_indev_proc_t * proc)
             }
             /*The object are not in the same group (in different group or one in not a group)*/
             else {
-                /*Leave the object focused in the previous group and focus to the act. its group*/
+                /*Focus to the act. its group*/
                 if(g_act) {
                     lv_group_focus_obj(indev_obj_act);
+                    if(indev_reset_check(proc)) return;
+                }
+                /*If the prev. obj. is not in a group then defocus it.*/
+                if(g_prev == NULL && proc->types.pointer.last_pressed) {
+                    lv_signal_send(proc->types.pointer.last_pressed, LV_SIGNAL_DEFOCUS, NULL);
+                    if(indev_reset_check(proc)) return;
+                    lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_DEFOCUSED, NULL);
                     if(indev_reset_check(proc)) return;
                 }
                 /*Focus on a non-group object*/
@@ -1051,7 +1066,6 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
     if(indev->proc.reset_query) {
         indev->proc.types.pointer.act_obj           = NULL;
         indev->proc.types.pointer.last_obj          = NULL;
-        indev->proc.types.pointer.last_pressed      = NULL;
         indev->proc.types.pointer.drag_limit_out    = 0;
         indev->proc.types.pointer.drag_in_prog      = 0;
         indev->proc.long_pr_sent                    = 0;
@@ -1398,7 +1412,7 @@ static void indev_gesture(lv_indev_proc_t * proc)
 /**
  * Checks if the reset_query flag has been set. If so, perform necessary global indev cleanup actions
  * @param proc pointer to an input device 'proc'
- * return true if indev query should be immediately truncated.
+ * @return true if indev query should be immediately truncated.
  */
 static bool indev_reset_check(lv_indev_proc_t * proc)
 {

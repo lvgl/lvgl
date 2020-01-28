@@ -235,6 +235,7 @@ static void slider_init(void)
     lv_style_set_int(&slider_knob, LV_STYLE_PAD_BOTTOM, LV_DPI/20);
     lv_style_set_int(&slider_knob, LV_STYLE_PAD_LEFT, LV_DPI/20);
     lv_style_set_int(&slider_knob, LV_STYLE_PAD_RIGHT, LV_DPI/20);
+    lv_style_set_color(&slider_knob, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
 #endif
 }
 
@@ -249,6 +250,7 @@ static void sw_init(void)
     lv_style_set_int(&sw_knob, LV_STYLE_PAD_BOTTOM, - LV_DPI/20);
     lv_style_set_int(&sw_knob, LV_STYLE_PAD_LEFT,   - LV_DPI/20);
     lv_style_set_int(&sw_knob, LV_STYLE_PAD_RIGHT,  - LV_DPI/20);
+    lv_style_set_color(&sw_knob, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
 #endif
 }
 
@@ -363,10 +365,12 @@ static void cb_init(void)
     lv_style_set_int(&cb_bullet, LV_STYLE_BORDER_WIDTH , 2);
     lv_style_set_color(&cb_bullet, LV_STYLE_BORDER_COLOR , lv_color_hex(0x52555a));
     lv_style_set_color(&cb_bullet, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_PRESSED , lv_color_darken(lv_color_hex(0x52555a), LV_OPA_30));
+    lv_style_set_color(&cb_bullet, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
+    lv_style_set_color(&cb_bullet, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_FOCUS | LV_STYLE_STATE_PRESSED, LV_COLOR_LIME);
     lv_style_set_color(&cb_bullet, LV_STYLE_BG_COLOR, COLOR_ACCENT);
     lv_style_set_opa(&cb_bullet, LV_STYLE_BG_OPA | LV_STYLE_STATE_CHECKED  , LV_OPA_COVER);
     lv_style_set_opa(&cb_bullet, LV_STYLE_BORDER_OPA | LV_STYLE_STATE_CHECKED  , LV_OPA_80);
-    lv_style_set_int(&cb_bullet, LV_STYLE_TRANSITION_TIME , 100);
+    lv_style_set_int(&cb_bullet, LV_STYLE_TRANSITION_TIME , 1000);
 
 
 

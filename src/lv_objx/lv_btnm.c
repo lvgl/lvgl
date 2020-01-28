@@ -677,16 +677,19 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             }
             /*Focused and/or pressed + checked or released button*/
             else {
+                btnm->state_dsc.act = LV_OBJ_STATE_NORMAL;
                 if(tgl_state) btnm->state_dsc.act = LV_OBJ_STATE_CHECKED;
                 if(ext->btn_id_pr == btn_i) btnm->state_dsc.act |= LV_OBJ_STATE_PRESSED;
                 if(ext->btn_id_focused == btn_i) btnm->state_dsc.act |= LV_OBJ_STATE_FOCUS;
                 btnm->state_dsc.prev = btnm->state_dsc.act;
+
                 lv_draw_rect_dsc_init(&draw_rect_tmp_dsc);
                 lv_draw_label_dsc_init(&draw_label_tmp_dsc);
                 lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_tmp_dsc);
                 lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_tmp_dsc);
                 draw_rect_dsc_act = &draw_rect_tmp_dsc;
                 draw_label_dsc_act = &draw_label_tmp_dsc;
+
                 btnm->state_dsc = state_ori;
             }
 
@@ -850,7 +853,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 res        = lv_event_send(btnm, LV_EVENT_VALUE_CHANGED, &b);
             }
         }
-    } else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_DEFOCUS) {
+    } else if(sign == LV_SIGNAL_PRESS_LOST) {
         ext->btn_id_pr  = LV_BTNM_BTN_NONE;
         ext->btn_id_act = LV_BTNM_BTN_NONE;
         lv_obj_invalidate(btnm);

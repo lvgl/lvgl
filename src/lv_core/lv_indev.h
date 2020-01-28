@@ -57,8 +57,9 @@ lv_indev_type_t lv_indev_get_type(const lv_indev_t * indev);
 /**
  * Reset one or all input devices
  * @param indev pointer to an input device to reset or NULL to reset all of them
+ * @param obj pointer to an object which triggers the reset.
  */
-void lv_indev_reset(lv_indev_t * indev);
+void lv_indev_reset(lv_indev_t * indev, lv_obj_t * obj);
 
 /**
  * Reset the long press state of an input device
