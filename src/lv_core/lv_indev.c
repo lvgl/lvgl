@@ -938,51 +938,83 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         if(indev_reset_check(proc)) return;
 
         /*Handle click focus*/
-#if LV_USE_GROUP
-        lv_group_t * g = lv_obj_get_group(indev_obj_act);
-
-        /*Check, if the parent is in a group and focus on it.*/
-        /*Respect the click focus protection*/
         if(lv_obj_is_protected(indev_obj_act, LV_PROTECT_CLICK_FOCUS) == false) {
-            lv_obj_t * parent = indev_obj_act;
+#if LV_USE_GROUP
+            lv_group_t * g_act = lv_obj_get_group(indev_obj_act);
+            lv_group_t * g_prev = proc->types.pointer.last_pressed ? lv_obj_get_group(proc->types.pointer.last_pressed) : NULL;
 
-            while(g == NULL) {
-                parent = lv_obj_get_parent(parent);
-                if(parent == NULL) break;
-
-                /*Ignore if the protected against click focus*/
-                if(lv_obj_is_protected(parent, LV_PROTECT_CLICK_FOCUS)) {
-                    parent = NULL;
-                    break;
+            /*If both the last and act. obj. are in the same group (or no group but it's also the same) */
+            if(g_act == g_prev) {
+                /*The objects are in a group*/
+                if(g_act) {
+                    lv_group_focus_obj(indev_obj_act);
+                    if(indev_reset_check(proc)) return;
                 }
-                g = lv_obj_get_group(parent);
+                /*The object are not in group*/
+                else {
+                    if(proc->types.pointer.last_pressed) {
+                        lv_signal_send(proc->types.pointer.last_pressed, LV_SIGNAL_DEFOCUS, NULL);
+                        if(indev_reset_check(proc)) return;
+                        lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_DEFOCUSED, NULL);
+                        if(indev_reset_check(proc)) return;
+                    }
+
+                    lv_signal_send(indev_obj_act, LV_SIGNAL_FOCUS, NULL);
+                    if(indev_reset_check(proc)) return;
+                    lv_event_send(indev_obj_act, LV_EVENT_FOCUSED, NULL);
+                    if(indev_reset_check(proc)) return;
+                }
+            }
+            /*The object are not in the same group (in different group or one in not a group)*/
+            else {
+                /*Leave the object focused in the previous group and focus to the act. its group*/
+                if(g_act) {
+                    lv_group_focus_obj(indev_obj_act);
+                    if(indev_reset_check(proc)) return;
+                }
+                /*Focus on a non-group object*/
+                else {
+                    if(proc->types.pointer.last_pressed) {
+                        /*If the prev. object also wasn't in a group defocus it*/
+                        if(g_prev == NULL) {
+                            lv_signal_send(proc->types.pointer.last_pressed, LV_SIGNAL_DEFOCUS, NULL);
+                            if(indev_reset_check(proc)) return;
+                            lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_DEFOCUSED, NULL);
+                            if(indev_reset_check(proc)) return;
+                        }
+                        /*If the prev. object also was in a group at least "LEAVE" it instead of defocus*/
+                        else {
+                            lv_signal_send(proc->types.pointer.last_pressed, LV_SIGNAL_LEAVE, NULL);
+                            if(indev_reset_check(proc)) return;
+                            lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_LEAVE, NULL);
+                            if(indev_reset_check(proc)) return;
+                        }
+                    }
+
+                    lv_signal_send(indev_obj_act, LV_SIGNAL_FOCUS, NULL);
+                    if(indev_reset_check(proc)) return;
+                    lv_event_send(indev_obj_act, LV_EVENT_FOCUSED, NULL);
+                    if(indev_reset_check(proc)) return;
+                }
+            }
+#else
+            if(proc->types.pointer.last_pressed) {
+                lv_signal_send(proc->types.pointer.last_pressed, LV_SIGNAL_DEFOCUS, NULL);
+                if(indev_reset_check(proc)) return;
+                lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_DEFOCUSED, NULL);
+                if(indev_reset_check(proc)) return;
             }
 
-            /* If a parent is in a group make it focused.
-             * `LV_EVENT_FOCUSED/DEFOCUSED` will be sent by `lv_group_focus_obj`*/
-            if(g && parent) {
-                if(lv_group_get_click_focus(g)) {
-                    lv_group_focus_obj(parent);
-                }
-            }
-        }
+            lv_signal_send(indev_obj_act, LV_SIGNAL_FOCUS, NULL);
+            if(indev_reset_check(proc)) return;
+            lv_event_send(indev_obj_act, LV_EVENT_FOCUSED, NULL);
+            if(indev_reset_check(proc)) return;
 #endif
-
-        /* Leave lastly "active" object */
-        if(proc->types.pointer.last_pressed != indev_obj_act && lv_obj_is_protected(indev_obj_act, LV_PROTECT_CLICK_FOCUS) == false) {
-            lv_signal_send(proc->types.pointer.last_pressed, LV_SIGNAL_LEAVE, NULL);
-            if(indev_reset_check(proc)) return;
-            lv_event_send(proc->types.pointer.last_pressed, LV_EVENT_LEAVE, NULL);
-            if(indev_reset_check(proc)) return;
-
             proc->types.pointer.last_pressed = indev_obj_act;
         }
 
-        if(indev_reset_check(proc)) return;
-
         /*Send LV_EVENT_DRAG_THROW_BEGIN if required */
         /*If drag parent is active check recursively the drag_parent attribute*/
-
         lv_obj_t * drag_obj = get_dragged_obj(indev_obj_act);
         if(drag_obj) {
             if(lv_obj_get_drag_throw(drag_obj) && proc->types.pointer.drag_in_prog) {
