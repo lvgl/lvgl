@@ -308,7 +308,6 @@ void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size
 void lv_label_set_static_text(lv_obj_t * label, const char * text)
 {
     LV_ASSERT_OBJ(label, LV_OBJX_NAME);
-    LV_ASSERT_STR(text);
 
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if(ext->static_txt == 0 && ext->text != NULL) {
