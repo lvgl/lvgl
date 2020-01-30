@@ -87,7 +87,6 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_obj_set_size(new_win, w, h);
 
-        lv_obj_set_pos(new_win, 0, 0);
         lv_obj_set_style(new_win, &lv_style_pretty);
 
         ext->page = lv_page_create(new_win, NULL);
