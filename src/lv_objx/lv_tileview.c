@@ -97,8 +97,17 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
         /* Set a size which fits into the parent.
          * Don't use `par` directly because if the tileview is created on a page it is moved to the
          * scrollable so the parent has changed */
-        lv_obj_set_size(new_tileview, lv_obj_get_width_fit(lv_obj_get_parent(new_tileview)),
-                        lv_obj_get_height_fit(lv_obj_get_parent(new_tileview)));
+        lv_coord_t w;
+        lv_coord_t h;
+        if(par) {
+            w = lv_obj_get_width_fit(lv_obj_get_parent(new_tileview));
+            h = lv_obj_get_height_fit(lv_obj_get_parent(new_tileview));
+        } else {
+            w = lv_disp_get_hor_res(NULL);
+            h = lv_disp_get_ver_res(NULL);
+        }
+
+        lv_obj_set_size(new_tileview, w, h);
 
         lv_obj_set_drag_throw(lv_page_get_scrl(new_tileview), false);
         lv_page_set_scrl_fit(new_tileview, LV_FIT_TIGHT);

@@ -114,8 +114,17 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         /* Set a size which fits into the parent.
          * Don't use `par` directly because if the tabview is created on a page it is moved to the
          * scrollable so the parent has changed */
-        lv_obj_set_size(new_tabview, lv_obj_get_width_fit(lv_obj_get_parent(new_tabview)),
-                        lv_obj_get_height_fit(lv_obj_get_parent(new_tabview)));
+        lv_coord_t w;
+        lv_coord_t h;
+        if(par) {
+            w = lv_obj_get_width_fit(lv_obj_get_parent(new_tabview));
+            h = lv_obj_get_height_fit(lv_obj_get_parent(new_tabview));
+        } else {
+            w = lv_disp_get_hor_res(NULL);
+            h = lv_disp_get_ver_res(NULL);
+        }
+
+        lv_obj_set_size(new_tabview, w, h);
 
         ext->content = lv_cont_create(new_tabview, NULL);
         ext->btns    = lv_btnm_create(new_tabview, NULL);
