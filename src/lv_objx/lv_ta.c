@@ -945,6 +945,7 @@ void lv_ta_set_cursor_blink_time(lv_obj_t * ta, uint16_t time)
         a.path_cb        = lv_anim_path_step;
         lv_anim_create(&a);
     } else {
+        lv_anim_del(ta, cursor_blink_anim);
         ext->cursor.state = 1;
     }
 #else
