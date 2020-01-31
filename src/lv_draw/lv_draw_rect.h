@@ -60,9 +60,6 @@ typedef struct {
     lv_color_t pattern_recolor;
     uint8_t pattern_repeate :1;
 
-    /*Overlay*/
-    lv_opa_t overlay_opa;
-    lv_color_t overlay_color;
 }lv_draw_rect_dsc_t;
 
 /**********************

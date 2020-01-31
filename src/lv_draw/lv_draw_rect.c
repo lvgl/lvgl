@@ -49,13 +49,18 @@ static void draw_img(const lv_area_t * coords, const lv_area_t * clip, lv_draw_r
 void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
 {
     memset(dsc, 0x00, sizeof(lv_draw_rect_dsc_t));
+    dsc->bg_color = LV_COLOR_WHITE;
+    dsc->bg_grad_color = LV_COLOR_BLACK;
+    dsc->border_color = LV_COLOR_BLACK;
+    dsc->pattern_recolor = LV_COLOR_BLACK;
+    dsc->shadow_color = LV_COLOR_BLACK;
     dsc->bg_grad_color_stop = 0xFF;
     dsc->bg_opa = LV_OPA_COVER;
     dsc->border_opa = LV_OPA_COVER;
-    dsc->overlay_opa = LV_OPA_TRANSP;
     dsc->pattern_font = LV_FONT_DEFAULT;
     dsc->shadow_opa = LV_OPA_COVER;
     dsc->border_side = LV_BORDER_SIDE_FULL;
+
 }
 
 /**

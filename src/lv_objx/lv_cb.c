@@ -185,13 +185,11 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST ||
             sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS) {
         lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CB_PART_BG));
-    } else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED) {
-
-    }else if(sign == LV_SIGNAL_CONTROL) {
+    } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN || c == LV_KEY_LEFT || c == LV_KEY_UP) {
             /*Follow the backgrounds state with the bullet*/
-            lv_btn_set_state(ext->bullet, lv_btn_get_state(cb));
+            lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CB_PART_BG));
         }
     }
 

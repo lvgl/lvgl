@@ -95,7 +95,7 @@ static lv_style_t arc_bg;
 #endif
 
 #if LV_USE_CALENDAR
-static lv_style_t calendar_date_nums;
+static lv_style_t calendar_date_nums, calendar_header, calendar_daynames;
 #endif
 
 
@@ -145,7 +145,7 @@ static void basic_init(void)
     lv_style_set_color(&panel, LV_STYLE_IMAGE_RECOLOR, lv_color_hex(0x979a9f));
     lv_style_set_color(&panel, LV_STYLE_LINE_COLOR, lv_color_hex(0x979a9f));
     lv_style_set_int(&panel, LV_STYLE_LINE_WIDTH, 1);
-    lv_style_set_color(&panel, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
+    lv_style_set_color(&panel, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, lv_color_mix(COLOR_CONTAINER, LV_COLOR_RED, LV_OPA_50));
 
     lv_style_init(&btn);
     lv_style_set_int(&btn, LV_STYLE_RADIUS, LV_RADIUS_CIRCLE);
@@ -163,7 +163,7 @@ static void basic_init(void)
     lv_style_set_int(&btn, LV_STYLE_PAD_BOTTOM, LV_DPI / 10);
     lv_style_set_int(&btn, LV_STYLE_PAD_INNER, LV_DPI / 10);
     lv_style_set_int(&btn, LV_STYLE_TRANSITION_TIME, 500);
-    lv_style_set_color(&btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
+    lv_style_set_color(&btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, lv_color_mix(LV_COLOR_RED, COLOR_ACCENT, LV_OPA_50));
 }
 
 static void cont_init(void)
@@ -338,19 +338,31 @@ static void chart_init(void)
 static void calendar_init(void)
 {
 #if LV_USE_CALENDAR
-    lv_style_init(&calendar_date_nums);
-    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR, LV_COLOR_RED);
-    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_DISABLED, LV_COLOR_GRAY);
-//    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_GRAY);
-    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_NAVY);
 
-    lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA , LV_OPA_TRANSP);
-    lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA | LV_STYLE_STATE_FOCUS , LV_OPA_COVER);
-    lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA | LV_STYLE_STATE_CHECKED , LV_OPA_COVER);
-    lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA | LV_STYLE_STATE_PRESSED , LV_OPA_50);
-    lv_style_set_color(&calendar_date_nums, LV_STYLE_BG_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_GREEN);
+    lv_style_init(&calendar_header);
+    lv_style_set_int(&calendar_header, LV_STYLE_PAD_LEFT , LV_DPI / 5);
+    lv_style_set_int(&calendar_header, LV_STYLE_PAD_RIGHT , LV_DPI / 5);
+    lv_style_set_int(&calendar_header, LV_STYLE_PAD_BOTTOM , LV_DPI / 5);
+    lv_style_set_color(&calendar_header, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_WHITE);
+
+    lv_style_init(&calendar_daynames);
+    lv_style_set_int(&calendar_daynames, LV_STYLE_PAD_LEFT , LV_DPI / 5);
+    lv_style_set_int(&calendar_daynames, LV_STYLE_PAD_RIGHT , LV_DPI / 5);
+    lv_style_set_int(&calendar_daynames, LV_STYLE_PAD_BOTTOM , LV_DPI / 5);
+
+    lv_style_init(&calendar_date_nums);
+    lv_style_set_int(&calendar_date_nums, LV_STYLE_RADIUS, LV_DPI / 50);
+    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_WHITE);
+    lv_style_set_color(&calendar_date_nums, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_FOCUS, COLOR_ACCENT);
+
+    lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA | LV_STYLE_STATE_CHECKED , LV_OPA_20);
+    lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA | LV_STYLE_STATE_PRESSED , LV_OPA_20);
+    lv_style_set_opa(&calendar_date_nums, LV_STYLE_BG_OPA | LV_STYLE_STATE_PRESSED | LV_STYLE_STATE_CHECKED , LV_OPA_40);
+    lv_style_set_color(&calendar_date_nums, LV_STYLE_BG_COLOR | LV_STYLE_STATE_CHECKED, LV_COLOR_WHITE);
     lv_style_set_int(&calendar_date_nums, LV_STYLE_BORDER_WIDTH | LV_STYLE_STATE_CHECKED , 2);
     lv_style_set_int(&calendar_date_nums, LV_STYLE_BORDER_SIDE| LV_STYLE_STATE_CHECKED , LV_BORDER_SIDE_LEFT);
+    lv_style_set_color(&calendar_date_nums, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_CHECKED, COLOR_ACCENT);
+    lv_style_set_int(&calendar_date_nums, LV_STYLE_PAD_INNER, LV_DPI / 20);
 #endif
 }
 
@@ -500,7 +512,7 @@ static void tabview_init(void)
     lv_style_set_opa(&tabview_btns, LV_STYLE_BG_OPA | LV_STYLE_STATE_PRESSED, LV_OPA_COVER);
     lv_style_set_color(&tabview_btns, LV_STYLE_BG_COLOR | LV_STYLE_STATE_PRESSED, lv_color_hex(0x444444));
     lv_style_set_color(&tabview_btns, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_CHECKED, COLOR_ACCENT);
-    lv_style_set_color(&tabview_btns, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
+    lv_style_set_color(&tabview_btns, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_GREEN);
     lv_style_set_int(&tabview_btns, LV_STYLE_PAD_TOP, LV_DPI / 5);
     lv_style_set_int(&tabview_btns, LV_STYLE_PAD_BOTTOM, LV_DPI / 5);
 
@@ -870,6 +882,26 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_add_style(list, &sb);
         break;
 #endif
+
+#if LV_USE_TA
+    case LV_THEME_CALENDAR:
+        list = lv_obj_get_style_list(obj, LV_CALENDAR_PART_BG);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &panel);
+
+        list = lv_obj_get_style_list(obj, LV_CALENDAR_PART_DATE_NUMS);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &calendar_date_nums);
+
+        list = lv_obj_get_style_list(obj, LV_CALENDAR_PART_HEADER);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &calendar_header);
+
+        list = lv_obj_get_style_list(obj, LV_CALENDAR_PART_DAY_NAMES);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &calendar_daynames);
+        break;
+#endif
     }
 
 
@@ -894,14 +926,6 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
 #if LV_USE_LIST
     case LV_THEME_LIST_BTN:
         return &btn;
-#endif
-#if LV_USE_CALENDAR
-    case LV_THEME_CALENDAR_BG:
-        return &panel;
-    case LV_THEME_CALENDAR_HEADER:
-        return &btn;
-    case LV_THEME_CALENDAR_DATE_NUMS:
-        return &calendar_date_nums;
 #endif
 #if LV_USE_ARC
     case LV_THEME_ARC:

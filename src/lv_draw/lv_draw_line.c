@@ -47,6 +47,7 @@ void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
     memset(dsc, 0x00, sizeof(lv_draw_line_dsc_t));
     dsc->width = 1;
     dsc->opa = LV_OPA_COVER;
+    dsc->color = LV_COLOR_BLACK;
 }
 
 /**

@@ -543,6 +543,9 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &draw_dsc);
         debug_color.full *= 17;
         debug_color.full += 0xA1;
+#if LV_COLOR_DEPTH == 32
+        debug_color.ch.alpha = 0xff;
+#endif
 #endif
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
         lv_obj_get_coords(obj, &obj_area);

@@ -46,6 +46,7 @@ void show_error(const lv_area_t * coords, const lv_area_t * clip_area, const cha
 void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
 {
     memset(dsc, 0x00, sizeof(lv_draw_img_dsc_t));
+    dsc->recolor = LV_COLOR_BLACK;
     dsc->opa = LV_OPA_COVER;
     dsc->zoom = LV_IMG_ZOOM_NONE;
     dsc->antialias = LV_ANTIALIAS;
