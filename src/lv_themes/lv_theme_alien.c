@@ -497,12 +497,14 @@ static void list_init(void)
 
     lv_style_init(&list_btn);
     lv_style_set_opa(&list_btn, LV_STYLE_BG_OPA| LV_STYLE_STATE_PRESSED, LV_OPA_20);
+    lv_style_set_opa(&list_btn, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
     lv_style_set_color(&list_btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_PRESSED, LV_COLOR_WHITE);
     lv_style_set_color(&list_btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_DISABLED, COLOR_DISABLED);
     lv_style_set_color(&list_btn, LV_STYLE_TEXT_COLOR, lv_color_hex(0xffffff));
     lv_style_set_color(&list_btn, LV_STYLE_TEXT_COLOR| LV_STYLE_STATE_PRESSED, lv_color_darken(lv_color_hex(0xffffff), LV_OPA_20));
     lv_style_set_color(&list_btn, LV_STYLE_TEXT_COLOR| LV_STYLE_STATE_DISABLED, lv_color_hex(0x686b70));
     lv_style_set_color(&list_btn, LV_STYLE_TEXT_COLOR| LV_STYLE_STATE_FOCUS, lv_color_hex(0xff0000));
+    lv_style_set_color(&list_btn, LV_STYLE_TEXT_COLOR| LV_STYLE_STATE_FOCUS| LV_STYLE_STATE_PRESSED, lv_color_hex(0xffff00));
     lv_style_set_color(&list_btn, LV_STYLE_IMAGE_RECOLOR, LV_COLOR_WHITE);
     lv_style_set_color(&list_btn, LV_STYLE_IMAGE_RECOLOR| LV_STYLE_STATE_PRESSED, lv_color_darken(lv_color_hex(0xffffff), LV_OPA_20));
     lv_style_set_opa(&list_btn, LV_STYLE_BORDER_OPA, LV_OPA_COVER);

@@ -258,7 +258,8 @@ lv_res_t lv_style_list_get_color(lv_style_list_t * dsc, lv_style_property_t prop
 lv_res_t lv_style_list_get_opa(lv_style_list_t * dsc, lv_style_property_t prop, lv_opa_t * value);
 lv_res_t lv_style_list_get_ptr(lv_style_list_t * dsc, lv_style_property_t prop, void ** value);
 
-lv_res_t lv_style_cache_update(lv_style_list_t * dsc);
+
+lv_opa_t lv_style_get_def_opa(lv_style_property_t prop);
 
 #if LV_USE_ANIMATION
 

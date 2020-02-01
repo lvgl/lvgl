@@ -346,10 +346,11 @@ lv_coord_t lv_page_get_fit_width(lv_obj_t * page)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     lv_style_int_t bg_left = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
-    lv_style_int_t bg_right = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);
-    lv_style_int_t scrl_left = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_LEFT);
-    lv_style_int_t scrl_right = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t bg_right = lv_obj_get_style_int(page, LV_PAGE_PART_BG,  LV_STYLE_PAD_RIGHT);
+    lv_style_int_t scrl_left = lv_obj_get_style_int(ext->scrl, LV_CONT_PART_MAIN, LV_STYLE_PAD_LEFT);
+    lv_style_int_t scrl_right = lv_obj_get_style_int(ext->scrl, LV_CONT_PART_MAIN, LV_STYLE_PAD_RIGHT);
 
     return lv_obj_get_width(page) - bg_left - bg_right - scrl_left - scrl_right;
 }
@@ -363,10 +364,12 @@ lv_coord_t lv_page_get_fit_height(lv_obj_t * page)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 
+    lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
+
     lv_style_int_t bg_top = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_TOP);
     lv_style_int_t bg_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_BOTTOM);
-    lv_style_int_t scrl_top = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_TOP);
-    lv_style_int_t scrl_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t scrl_top = lv_obj_get_style_int(ext->scrl, LV_CONT_PART_MAIN, LV_STYLE_PAD_TOP);
+    lv_style_int_t scrl_bottom = lv_obj_get_style_int(ext->scrl, LV_CONT_PART_MAIN, LV_STYLE_PAD_BOTTOM);
 
     return lv_obj_get_height(page) - bg_top - bg_bottom - scrl_top - scrl_bottom;
 }
@@ -445,8 +448,8 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
 
     lv_style_int_t bg_top = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_TOP);
     lv_style_int_t bg_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_BOTTOM);
-    lv_style_int_t scrl_top = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_TOP);
-    lv_style_int_t scrl_bottom = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t scrl_top = lv_obj_get_style_int(ext->scrl, LV_CONT_PART_MAIN,  LV_STYLE_PAD_TOP);
+    lv_style_int_t scrl_bottom = lv_obj_get_style_int(ext->scrl, LV_CONT_PART_MAIN, LV_STYLE_PAD_BOTTOM);
 
     /*Out of the page on the top*/
     if((obj_h <= page_h && top_err > 0) || (obj_h > page_h && top_err < bot_err)) {
@@ -474,8 +477,8 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
 
     lv_style_int_t bg_left = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_LEFT);
     lv_style_int_t bg_right = lv_obj_get_style_int(page, LV_PAGE_PART_BG, LV_STYLE_PAD_RIGHT);
-    lv_style_int_t scrl_left = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_LEFT);
-    lv_style_int_t scrl_right = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t scrl_left = lv_obj_get_style_int(ext->scrl, LV_CONT_PART_MAIN, LV_STYLE_PAD_LEFT);
+    lv_style_int_t scrl_right = lv_obj_get_style_int(ext->scrl, LV_CONT_PART_MAIN, LV_STYLE_PAD_RIGHT);
 
     /*Out of the page on the left*/
     if((obj_w <= page_w && left_err > 0) || (obj_w > page_w && left_err < right_err)) {
@@ -772,9 +775,9 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         lv_fit_t fit_top         = lv_page_get_scrl_fit_top(page);
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(page);
 
-        lv_style_int_t scrl_left = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_LEFT);
-        lv_style_int_t scrl_right = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_RIGHT);
-        lv_style_int_t scrl_top = lv_obj_get_style_int(page, LV_PAGE_PART_SCRL, LV_STYLE_PAD_TOP);
+        lv_style_int_t scrl_left = lv_obj_get_style_int(ext->scrl, LV_CONT_PART_MAIN, LV_STYLE_PAD_LEFT);
+        lv_style_int_t scrl_right = lv_obj_get_style_int(ext->scrl, LV_CONT_PART_MAIN, LV_STYLE_PAD_RIGHT);
+        lv_style_int_t scrl_top = lv_obj_get_style_int(ext->scrl, LV_CONT_PART_MAIN, LV_STYLE_PAD_TOP);
 
         child = lv_obj_get_child(page, NULL);
         while(child != NULL) {
