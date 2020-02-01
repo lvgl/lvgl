@@ -47,7 +47,6 @@ typedef enum {
     LV_THEME_IMAGE,
 
     LV_THEME_BTNM,
-    LV_THEME_BTNM_BTN,
 
     LV_THEME_BAR,
 
@@ -79,16 +78,12 @@ typedef enum {
     LV_THEME_TA_SCRLBAR,
 
 
-    LV_THEME_LIST_BG,
-    LV_THEME_LIST_SCRL,
-    LV_THEME_LIST_SCRLBAR,
-    LV_THEME_LIST_EDGE_FLASH,
+    LV_THEME_LIST,
     LV_THEME_LIST_BTN,
 
 
     LV_THEME_CALENDAR,
 
-    LV_THEME_ARC_BG,
     LV_THEME_ARC,
 
     LV_THEME_LED,

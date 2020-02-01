@@ -61,28 +61,28 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("image create started");
 
-    lv_obj_t * new_img = NULL;
+    lv_obj_t * img = NULL;
 
     /*Create a basic object*/
-    new_img = lv_obj_create(par, copy);
-    LV_ASSERT_MEM(new_img);
-    if(new_img == NULL) return NULL;
+    img = lv_obj_create(par, copy);
+    LV_ASSERT_MEM(img);
+    if(img == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_img);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(img);
 
     /*Extend the basic object to image object*/
-    lv_img_ext_t * ext = lv_obj_allocate_ext_attr(new_img, sizeof(lv_img_ext_t));
+    lv_img_ext_t * ext = lv_obj_allocate_ext_attr(img, sizeof(lv_img_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_img);
+        lv_obj_del(img);
         return NULL;
     }
 
     ext->src       = NULL;
     ext->src_type  = LV_IMG_SRC_UNKNOWN;
     ext->cf        = LV_IMG_CF_UNKNOWN;
-    ext->w         = lv_obj_get_width(new_img);
-    ext->h         = lv_obj_get_height(new_img);
+    ext->w         = lv_obj_get_width(img);
+    ext->h         = lv_obj_get_height(img);
     ext->angle = 0;
     ext->zoom = LV_IMG_ZOOM_NONE;
     ext->antialias = LV_ANTIALIAS ? 1 : 0;
@@ -93,12 +93,13 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->pivot.y = 0;
 
     /*Init the new object*/
-    lv_obj_set_signal_cb(new_img, lv_img_signal);
-    lv_obj_set_design_cb(new_img, lv_img_design);
+    lv_obj_set_signal_cb(img, lv_img_signal);
+    lv_obj_set_design_cb(img, lv_img_design);
 
     if(copy == NULL) {
-        lv_obj_set_click(new_img, false);
-        lv_obj_set_adv_hittest(new_img, true); /*Images have fast hit-testing*/
+        lv_theme_apply(img, LV_THEME_IMAGE);
+        lv_obj_set_click(img, false);
+        lv_obj_set_adv_hittest(img, true); /*Images have fast hit-testing*/
         /* Enable auto size for non screens
          * because image screens are wallpapers
          * and must be screen sized*/
@@ -110,15 +111,15 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     } else {
         lv_img_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->auto_size          = copy_ext->auto_size;
-        lv_img_set_src(new_img, copy_ext->src);
+        lv_img_set_src(img, copy_ext->src);
 
 //        /*Refresh the style with new signal function*/
-//        lv_obj_refresh_style(new_img);
+        lv_obj_refresh_style(img);
     }
 
     LV_LOG_INFO("image created");
 
-    return new_img;
+    return img;
 }
 
 /*=====================

@@ -63,7 +63,7 @@ enum {
     LV_CALENDAR_PART_BG, /**< Background and "normal" date numbers style */
     LV_CALENDAR_PART_HEADER, /** Calendar header style */
     LV_CALENDAR_PART_DAY_NAMES, /** Day name style */
-    LV_CALENDAR_PART_DATE_NUMS, /** Day name style */
+    LV_CALENDAR_PART_DATE, /** Day name style */
 };
 typedef uint8_t lv_calendar_part_t;
 

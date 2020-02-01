@@ -1467,11 +1467,17 @@ void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t new_state)
         obj->state_dsc.anim = 0;
         lv_obj_refresh_style(obj);
     }
-    /*Set the new state for prev state too to get the TRANSITION_TIME for the new state*/
     else {
-        obj->state_dsc.prev = obj->state_dsc.act;
-        obj->state_dsc.act = new_state;
-        obj->state_dsc.anim = 0;
+
+        bool was_anim = lv_anim_del(obj, obj_state_anim_cb);
+
+        if(obj->state_dsc.anim == 0 && was_anim) {
+            obj->state_dsc.act = new_state;
+        } else {
+            obj->state_dsc.prev = obj->state_dsc.act;
+            obj->state_dsc.act = new_state;
+            obj->state_dsc.anim = 0;
+        }
 
         lv_anim_t a;
         lv_anim_init(&a);
@@ -1479,6 +1485,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t new_state)
         lv_anim_set_values(&a, 0, 255);
         lv_anim_set_time(&a, t, 0);
         lv_anim_create(&a);
+
     }
 
 }
@@ -2762,6 +2769,9 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t 
     if(draw_dsc->dash_width) {
         draw_dsc->dash_gap = lv_obj_get_style_int(obj, part, LV_STYLE_LINE_DASH_GAP);
     }
+
+    draw_dsc->round_start = lv_obj_get_style_int(obj, part, LV_STYLE_LINE_ROUNDED);
+    draw_dsc->round_end = draw_dsc->round_start;
 }
 
 /**

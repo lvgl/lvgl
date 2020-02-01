@@ -72,16 +72,16 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("list create started");
 
     /*Create the ancestor basic object*/
-    lv_obj_t * new_list = lv_page_create(par, copy);
-    LV_ASSERT_MEM(new_list);
-    if(new_list == NULL) return NULL;
+    lv_obj_t * list = lv_page_create(par, copy);
+    LV_ASSERT_MEM(list);
+    if(list == NULL) return NULL;
 
-    if(ancestor_page_signal == NULL) ancestor_page_signal = lv_obj_get_signal_cb(new_list);
+    if(ancestor_page_signal == NULL) ancestor_page_signal = lv_obj_get_signal_cb(list);
 
-    lv_list_ext_t * ext = lv_obj_allocate_ext_attr(new_list, sizeof(lv_list_ext_t));
+    lv_list_ext_t * ext = lv_obj_allocate_ext_attr(list, sizeof(lv_list_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_list);
+        lv_obj_del(list);
         return NULL;
     }
     ext->single_mode                      = 0;
@@ -93,15 +93,18 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->last_clicked_btn = NULL;
 #endif
 
-    lv_obj_set_signal_cb(new_list, lv_list_signal);
+    lv_obj_set_signal_cb(list, lv_list_signal);
 
     /*Init the new list object*/
     if(copy == NULL) {
-        lv_page_set_anim_time(new_list, LV_LIST_DEF_ANIM_TIME);
-        lv_page_set_scrl_fit2(new_list, LV_FIT_FLOOD, LV_FIT_TIGHT);
-        lv_obj_set_size(new_list, 2 * LV_DPI, 3 * LV_DPI);
-        lv_page_set_scrl_layout(new_list, LV_LIST_LAYOUT_DEF);
-        lv_list_set_sb_mode(new_list, LV_SB_MODE_DRAG);
+        lv_page_set_anim_time(list, LV_LIST_DEF_ANIM_TIME);
+        lv_page_set_scrl_fit2(list, LV_FIT_FLOOD, LV_FIT_TIGHT);
+        lv_obj_set_size(list, 2 * LV_DPI, 3 * LV_DPI);
+        lv_page_set_scrl_layout(list, LV_LIST_LAYOUT_DEF);
+        lv_list_set_sb_mode(list, LV_SB_MODE_DRAG);
+
+        lv_theme_apply(list, LV_THEME_LIST);
+
     } else {
         lv_list_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
@@ -112,17 +115,17 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_obj_t * copy_img = lv_list_get_btn_img(copy_btn);
             if(copy_img) img_src = lv_img_get_src(copy_img);
 #endif
-            lv_list_add_btn(new_list, img_src, lv_list_get_btn_text(copy_btn));
+            lv_list_add_btn(list, img_src, lv_list_get_btn_text(copy_btn));
             copy_btn = lv_list_get_next_btn(copy, copy_btn);
         }
 
         /*Refresh the style with new signal function*/
-//        lv_obj_refresh_style(new_list);
+        lv_obj_refresh_style(list);
     }
 
     LV_LOG_INFO("list created");
 
-    return new_list;
+    return list;
 }
 
 /**
@@ -171,8 +174,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
     if(ancestor_btn_signal == NULL) ancestor_btn_signal = lv_obj_get_signal_cb(liste);
 
     /*Set the default styles*/
-    lv_style_list_reset(&liste->style_list);
-    _ot(liste, LV_BTN_PART_MAIN, LIST_BTN);
+    lv_theme_apply(liste, LV_THEME_LIST_BTN);
 
     lv_page_glue_obj(liste, true);
     lv_btn_set_layout(liste, LV_LAYOUT_ROW_M);

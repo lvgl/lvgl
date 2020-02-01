@@ -56,38 +56,36 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("arc create started");
 
     /*Create the ancestor of arc*/
-    lv_obj_t * new_arc = lv_obj_create(par, copy);
-    LV_ASSERT_MEM(new_arc);
-    if(new_arc == NULL) return NULL;
+    lv_obj_t * arc = lv_obj_create(par, copy);
+    LV_ASSERT_MEM(arc);
+    if(arc == NULL) return NULL;
 
     /*Allocate the arc type specific extended data*/
-    lv_arc_ext_t * ext = lv_obj_allocate_ext_attr(new_arc, sizeof(lv_arc_ext_t));
+    lv_arc_ext_t * ext = lv_obj_allocate_ext_attr(arc, sizeof(lv_arc_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_arc);
+        lv_obj_del(arc);
         return NULL;
     }
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_arc);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_arc);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(arc);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(arc);
 
     /*Initialize the allocated 'ext' */
     ext->angle_start = 45;
     ext->angle_end   = 315;
+    lv_style_list_init(&ext->style_arc);
 
-    lv_obj_set_size(new_arc, LV_DPI, LV_DPI);
+
+    lv_obj_set_size(arc, LV_DPI, LV_DPI);
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(new_arc, lv_arc_signal);
-    lv_obj_set_design_cb(new_arc, lv_arc_design);
+    lv_obj_set_signal_cb(arc, lv_arc_signal);
+    lv_obj_set_design_cb(arc, lv_arc_design);
 
     /*Init the new arc arc*/
     if(copy == NULL) {
-        lv_style_list_init(&ext->style_arc);
-        lv_style_list_reset(&new_arc->style_list);
-        _ot(new_arc, LV_ARC_PART_BG, ARC_BG);
-        _ot(new_arc, LV_ARC_PART_ARC, ARC);
-
+        lv_theme_apply(arc, LV_THEME_ARC);
     }
     /*Copy an existing arc*/
     else {
@@ -96,12 +94,12 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->angle_end          = copy_ext->angle_end;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_arc);
+        lv_obj_refresh_style(arc);
     }
 
     LV_LOG_INFO("arc created");
 
-    return new_arc;
+    return arc;
 }
 
 /*======================

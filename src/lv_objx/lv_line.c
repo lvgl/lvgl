@@ -240,8 +240,6 @@ static lv_design_res_t lv_line_design(lv_obj_t * line, const lv_area_t * clip_ar
         lv_draw_line_dsc_t line_dsc;
         lv_draw_line_dsc_init(&line_dsc);
         lv_obj_init_draw_line_dsc(line, LV_LINE_PART_MAIN, &line_dsc);
-        line_dsc.round_end = 1;
-        line_dsc.round_start = 1;
 
         /*Read all points and draw the lines*/
         for(i = 0; i < ext->point_num - 1; i++) {
@@ -257,7 +255,7 @@ static lv_design_res_t lv_line_design(lv_obj_t * line, const lv_area_t * clip_ar
                 p2.y = h - ext->point_array[i + 1].y + y_ofs;
             }
             lv_draw_line(&p1, &p2, clip_area, &line_dsc);
-            line_dsc.round_start = 0;
+            line_dsc.round_start = 0;   /*Draw the rounding only on the end points after the first line*/
         }
 
     }
