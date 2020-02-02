@@ -449,33 +449,6 @@ static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param)
 }
 
 /**
- * Get the style descriptor of a part of the object
- * @param kb pointer the object
- * @param part the part from `lv_kb_part_t`. (LV_KB_PART_...)
- * @return pointer to the style descriptor of the specified part
- */
-static lv_style_list_t * lv_kb_get_style(lv_obj_t * kb, uint8_t part)
-{
-    LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
-
-    lv_kb_ext_t * ext = lv_obj_get_ext_attr(kb);
-    lv_style_list_t * style_dsc_p;
-
-    switch(part) {
-    case LV_KB_PART_BG:
-        style_dsc_p = &kb->style_list;
-        break;
-    case LV_KB_PART_BTN:
-        style_dsc_p = &ext->btnm.style_btn;
-        break;
-    default:
-        style_dsc_p = NULL;
-    }
-
-    return style_dsc_p;
-}
-
-/**
  * Update the key map for the current mode
  * @param kb pointer to a keyboard object
  */

@@ -567,7 +567,6 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     lv_obj_t * label = get_label(roller);
     if(label == NULL) return LV_RES_INV;
 
-    lv_indev_t * indev    = lv_indev_get_act();
     int32_t id            = -1;
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
 
