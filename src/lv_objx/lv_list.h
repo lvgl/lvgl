@@ -48,16 +48,10 @@ typedef struct
 {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
-    uint16_t size;                                    /*the number of items(buttons) in the list*/
-
-    uint8_t single_mode : 1; /* whether single selected mode is enabled */
 
 #if LV_USE_GROUP
-    lv_obj_t * last_sel;     /* The last selected button. It will be reverted when the list is focused again */
-    lv_obj_t * selected_btn; /* The button is currently being selected*/
-    /*Used to make the last clicked button pressed (selected) when the list become focused and
-     * `click_focus == 1`*/
-    lv_obj_t * last_clicked_btn;
+    lv_obj_t * last_sel_btn;     /* The last selected button. It will be reverted when the list is focused again */
+    lv_obj_t * act_sel_btn; /* The button is currently being selected*/
 #endif
 } lv_list_ext_t;
 
@@ -116,13 +110,6 @@ bool lv_list_remove(const lv_obj_t * list, uint16_t index);
  * Setter functions
  *====================*/
 
-/**
- * Set single button selected mode, only one button will be selected if enabled.
- * @param list pointer to the currently pressed list object
- * @param mode enable(true)/disable(false) single selected mode.
- */
-void lv_list_set_single_mode(lv_obj_t * list, bool mode);
-
 #if LV_USE_GROUP
 
 /**
@@ -131,7 +118,7 @@ void lv_list_set_single_mode(lv_obj_t * list, bool mode);
  * @param btn pointer to a button to select
  *            NULL to not select any buttons
  */
-void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn);
+void lv_list_focus_btn(lv_obj_t * list, lv_obj_t * btn);
 #endif
 
 /**
@@ -185,12 +172,6 @@ void lv_list_set_layout(lv_obj_t * list, lv_layout_t layout);
 /*=====================
  * Getter functions
  *====================*/
-
-/**
- * Get single button selected mode.
- * @param list pointer to the currently pressed list object.
- */
-bool lv_list_get_single_mode(lv_obj_t * list);
 
 /**
  * Get the text of a list element

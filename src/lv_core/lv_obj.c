@@ -3017,10 +3017,13 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         /*Return 'invalid' if the child change signal is not enabled*/
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        lv_coord_t shadow = (lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_WIDTH) >> 1) + 1;
-        shadow += lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_SPREAD);
-        shadow += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_OFFSET_X)),
-                              LV_MATH_ABS(lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_OFFSET_Y)));
+        lv_coord_t shadow = (lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_WIDTH) >> 1);
+        if(shadow) {
+            shadow++;
+            shadow += lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_SPREAD);
+            shadow += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_OFFSET_X)),
+                                  LV_MATH_ABS(lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_OFFSET_Y)));
+        }
     }
 #if LV_USE_OBJ_REALIGN
     else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {

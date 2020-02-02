@@ -710,6 +710,11 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &panel);
         break;
+    case LV_THEME_CONT:
+        list = lv_obj_get_style_list(obj, LV_CONT_PART_MAIN);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &panel);
+        break;
     case LV_THEME_BTN:
         list = lv_obj_get_style_list(obj, LV_BTN_PART_MAIN);
         lv_style_list_reset(list);
@@ -751,6 +756,13 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_IMG
     case LV_THEME_IMAGE:
+        list = lv_obj_get_style_list(obj, LV_IMG_PART_MAIN);
+        lv_style_list_reset(list);
+        break;
+#endif
+
+#if LV_USE_IMGBTN
+    case LV_THEME_IMGBTN:
         list = lv_obj_get_style_list(obj, LV_IMG_PART_MAIN);
         lv_style_list_reset(list);
         break;

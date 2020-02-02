@@ -8,8 +8,10 @@
  *********************/
 
 #include "../lv_core/lv_debug.h"
+#include "../lv_themes/lv_theme.h"
 #include "lv_imgbtn.h"
 #include "lv_label.h"
+
 
 #if LV_USE_IMGBTN != 0
 
@@ -55,20 +57,20 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("image button create started");
 
     /*Create the ancestor of image button*/
-    lv_obj_t * new_imgbtn = lv_btn_create(par, copy);
-    LV_ASSERT_MEM(new_imgbtn);
-    if(new_imgbtn == NULL) return NULL;
+    lv_obj_t * imgbtn = lv_btn_create(par, copy);
+    LV_ASSERT_MEM(imgbtn);
+    if(imgbtn == NULL) return NULL;
 
     /*Allocate the image button type specific extended data*/
-    lv_imgbtn_ext_t * ext = lv_obj_allocate_ext_attr(new_imgbtn, sizeof(lv_imgbtn_ext_t));
+    lv_imgbtn_ext_t * ext = lv_obj_allocate_ext_attr(imgbtn, sizeof(lv_imgbtn_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_imgbtn);
+        lv_obj_del(imgbtn);
         return NULL;
     }
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_imgbtn);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_imgbtn);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(imgbtn);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(imgbtn);
 
         /*Initialize the allocated 'ext' */
 #if LV_IMGBTN_TILED == 0
@@ -82,12 +84,12 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->act_cf = LV_IMG_CF_UNKNOWN;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(new_imgbtn, lv_imgbtn_signal);
-    lv_obj_set_design_cb(new_imgbtn, lv_imgbtn_design);
+    lv_obj_set_signal_cb(imgbtn, lv_imgbtn_signal);
+    lv_obj_set_design_cb(imgbtn, lv_imgbtn_design);
 
     /*Init the new image button image button*/
     if(copy == NULL) {
-
+        lv_theme_apply(imgbtn, LV_THEME_IMGBTN);
     }
     /*Copy an existing image button*/
     else {
@@ -100,12 +102,12 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
         memcpy((void*)ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
 #endif
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_imgbtn);
+        lv_obj_refresh_style(imgbtn);
     }
 
     LV_LOG_INFO("image button created");
 
-    return new_imgbtn;
+    return imgbtn;
 }
 
 /*=====================
