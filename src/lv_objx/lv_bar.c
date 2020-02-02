@@ -401,10 +401,10 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
     if(ext->type == LV_BAR_TYPE_SYM && ext->min_value < 0 && ext->max_value > 0 && ext->start_value == ext->min_value) sym = true;
 
     /*Calculate the indicator area*/
-    lv_style_int_t bg_left = lv_obj_get_style_int(bar,   LV_BAR_PART_BG, LV_STYLE_PAD_LEFT);
-    lv_style_int_t bg_right = lv_obj_get_style_int(bar,  LV_BAR_PART_BG, LV_STYLE_PAD_RIGHT);
-    lv_style_int_t bg_top = lv_obj_get_style_int(bar,    LV_BAR_PART_BG, LV_STYLE_PAD_TOP);
-    lv_style_int_t bg_bottom = lv_obj_get_style_int(bar, LV_BAR_PART_BG, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t bg_left = lv_obj_get_style_pad_left(bar,     LV_BAR_PART_BG);
+    lv_style_int_t bg_right = lv_obj_get_style_pad_right(bar,   LV_BAR_PART_BG);
+    lv_style_int_t bg_top = lv_obj_get_style_pad_top(bar,       LV_BAR_PART_BG);
+    lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(bar, LV_BAR_PART_BG);
 
     /*Respect padding and minimum width/height too*/
     lv_area_copy(&ext->indic_area, &bar->coords);
@@ -496,7 +496,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
     /*Do not draw a zero length indicator*/
     if(!sym && indic_length_calc(&ext->indic_area) <= 1) return;
 
-    uint16_t bg_radius = lv_obj_get_style_int(bar, LV_BAR_PART_BG, LV_STYLE_RADIUS);
+    uint16_t bg_radius = lv_obj_get_style_radius(bar, LV_BAR_PART_BG);
     lv_coord_t short_side = LV_MATH_MIN(objw, objh);
     if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
 
@@ -511,14 +511,14 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
       (!hor && lv_area_get_height(&ext->indic_area) > bg_radius * 2)) {
         lv_opa_t bg_opa = draw_indic_dsc.bg_opa;
         lv_opa_t border_opa = draw_indic_dsc.border_opa;
-        void * pattern_src = draw_indic_dsc.pattern_src;
+        void * pattern_src = draw_indic_dsc.pattern_image;
         draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
         draw_indic_dsc.border_opa = LV_OPA_TRANSP;
-        draw_indic_dsc.pattern_src = NULL;
+        draw_indic_dsc.pattern_image = NULL;
         lv_draw_rect(&ext->indic_area, clip_area, &draw_indic_dsc);
         draw_indic_dsc.bg_opa = bg_opa;
         draw_indic_dsc.border_opa = border_opa;
-        draw_indic_dsc.pattern_src = pattern_src;
+        draw_indic_dsc.pattern_image = pattern_src;
 
     }
 
@@ -559,7 +559,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
     /*Draw the border*/
     draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
     draw_indic_dsc.shadow_opa = LV_OPA_TRANSP;
-    draw_indic_dsc.pattern_src = NULL;
+    draw_indic_dsc.pattern_image = NULL;
     lv_draw_rect(&ext->indic_area, clip_area, &draw_indic_dsc);
 
     lv_draw_mask_remove_id(mask_indic_id);
@@ -592,19 +592,19 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        lv_style_int_t bg_sh_width = lv_obj_get_style_int(bar, LV_BAR_PART_BG, LV_STYLE_SHADOW_WIDTH);
-        lv_style_int_t bg_sh_spread = lv_obj_get_style_int(bar, LV_BAR_PART_BG, LV_STYLE_SHADOW_SPREAD);
-        lv_style_int_t bg_sh_ofs_x = lv_obj_get_style_int(bar, LV_BAR_PART_BG, LV_STYLE_SHADOW_OFFSET_X);
-        lv_style_int_t bg_sh_ofs_y = lv_obj_get_style_int(bar, LV_BAR_PART_BG, LV_STYLE_SHADOW_OFFSET_Y);
+        lv_style_int_t bg_sh_width = lv_obj_get_style_shadow_width(bar, LV_BAR_PART_BG);
+        lv_style_int_t bg_sh_spread = lv_obj_get_style_shadow_spread(bar, LV_BAR_PART_BG);
+        lv_style_int_t bg_sh_ofs_x = lv_obj_get_style_shadow_offset_x(bar, LV_BAR_PART_BG);
+        lv_style_int_t bg_sh_ofs_y = lv_obj_get_style_shadow_offset_y(bar, LV_BAR_PART_BG);
 
         lv_coord_t bg_size = bg_sh_width + bg_sh_spread;
         bg_size += LV_MATH_MAX(LV_MATH_ABS(bg_sh_ofs_x), LV_MATH_ABS(bg_sh_ofs_y));
 
 
-        lv_style_int_t indic_sh_width = lv_obj_get_style_int(bar,  LV_BAR_PART_INDIC, LV_STYLE_SHADOW_WIDTH);
-        lv_style_int_t indic_sh_spread = lv_obj_get_style_int(bar, LV_BAR_PART_INDIC, LV_STYLE_SHADOW_SPREAD);
-        lv_style_int_t indic_sh_ofs_x = lv_obj_get_style_int(bar,  LV_BAR_PART_INDIC, LV_STYLE_SHADOW_OFFSET_X);
-        lv_style_int_t indic_sh_ofs_y = lv_obj_get_style_int(bar,  LV_BAR_PART_INDIC, LV_STYLE_SHADOW_OFFSET_Y);
+        lv_style_int_t indic_sh_width = lv_obj_get_style_shadow_width(bar,  LV_BAR_PART_INDIC);
+        lv_style_int_t indic_sh_spread = lv_obj_get_style_shadow_spread(bar, LV_BAR_PART_INDIC);
+        lv_style_int_t indic_sh_ofs_x = lv_obj_get_style_shadow_offset_x(bar,  LV_BAR_PART_INDIC);
+        lv_style_int_t indic_sh_ofs_y = lv_obj_get_style_shadow_offset_x(bar,  LV_BAR_PART_INDIC);
 
 
         lv_coord_t indic_size = indic_sh_width + indic_sh_spread;

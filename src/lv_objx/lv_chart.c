@@ -806,7 +806,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
     point_dsc.bg_opa = line_dsc.opa;
     point_dsc.radius = LV_RADIUS_CIRCLE;
 
-    lv_coord_t point_radius = lv_obj_get_style_int(chart, LV_CHART_PART_SERIES, LV_STYLE_SIZE);
+    lv_coord_t point_radius = lv_obj_get_style_radius(chart, LV_CHART_PART_SERIES);
 
     /*Go through all data lines*/
     LV_LL_READ_BACK(ext->series_ll, ser)
@@ -921,7 +921,7 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
     lv_chart_series_t * ser;
     lv_coord_t col_w = w / ((lv_ll_get_len(&ext->series_ll) + 1) * ext->point_cnt); /* Suppose + 1 series as separator*/
     lv_coord_t x_ofs = col_w / 2;                                    /*Shift with a half col.*/
-    lv_style_int_t col_space = lv_obj_get_style_int(chart, LV_CHART_PART_SERIES, LV_STYLE_PAD_INNER);
+    lv_style_int_t col_space = lv_obj_get_style_pad_inner(chart, LV_CHART_PART_SERIES);
 
     lv_draw_rect_dsc_t col_dsc;
     lv_draw_rect_dsc_init(&col_dsc);
@@ -1199,7 +1199,8 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
     else
         num_scale_ticks = (y_axis->num_tick_marks * (num_of_labels - 1));
 
-    lv_style_int_t label_dist  = lv_obj_get_style_int(chart, LV_CHART_PART_SERIES_BG, which_axis == LV_CHART_AXIS_PRIMARY_Y ? LV_STYLE_PAD_LEFT : LV_STYLE_PAD_RIGHT);
+    lv_style_int_t label_dist  = which_axis == LV_CHART_AXIS_PRIMARY_Y ?
+            lv_obj_get_style_pad_left(chart, LV_CHART_PART_SERIES_BG)  : lv_obj_get_style_pad_right(chart, LV_CHART_PART_SERIES_BG);
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
@@ -1315,7 +1316,7 @@ static void draw_x_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
         num_scale_ticks = (ext->x_axis.num_tick_marks * (num_of_labels - 1));
 
 
-    lv_style_int_t label_dist  = lv_obj_get_style_int(chart, LV_CHART_PART_SERIES_BG, LV_STYLE_PAD_BOTTOM);
+    lv_style_int_t label_dist  = lv_obj_get_style_pad_bottom(chart, LV_CHART_PART_SERIES_BG);
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
@@ -1385,8 +1386,8 @@ static void invalidate_lines(lv_obj_t * chart, uint16_t i)
     lv_coord_t w     = lv_area_get_width(&series_area);
     lv_coord_t x_ofs = series_area.x1;
 
-    lv_style_int_t line_width = lv_obj_get_style_int(chart, LV_CHART_PART_SERIES, LV_STYLE_LINE_WIDTH);
-    lv_style_int_t point_radius = lv_obj_get_style_int(chart, LV_CHART_PART_SERIES, LV_STYLE_SIZE);
+    lv_style_int_t line_width = lv_obj_get_style_line_width(chart, LV_CHART_PART_SERIES);
+    lv_style_int_t point_radius = lv_obj_get_style_size(chart, LV_CHART_PART_SERIES);
 
     lv_area_t coords;
     lv_area_copy(&coords, &series_area);
@@ -1435,10 +1436,10 @@ static void invalidate_columns(lv_obj_t * chart, uint16_t i)
 static void get_series_area(lv_obj_t * chart, lv_area_t * series_area)
 {
     lv_area_copy(series_area, &chart->coords);
-    series_area->x1 += lv_obj_get_style_int(chart, LV_CHART_PART_BG, LV_STYLE_PAD_LEFT);
-    series_area->x2 -= lv_obj_get_style_int(chart, LV_CHART_PART_BG, LV_STYLE_PAD_RIGHT);
-    series_area->y1 += lv_obj_get_style_int(chart, LV_CHART_PART_BG, LV_STYLE_PAD_TOP);
-    series_area->y2 -= lv_obj_get_style_int(chart, LV_CHART_PART_BG, LV_STYLE_PAD_BOTTOM);
+    series_area->x1 += lv_obj_get_style_pad_left(chart, LV_CHART_PART_BG);
+    series_area->x2 -= lv_obj_get_style_pad_right(chart, LV_CHART_PART_BG);
+    series_area->y1 += lv_obj_get_style_pad_top(chart, LV_CHART_PART_BG);
+    series_area->y2 -= lv_obj_get_style_pad_bottom(chart, LV_CHART_PART_BG);
 }
 
 #endif

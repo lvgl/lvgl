@@ -157,11 +157,11 @@ void lv_btnm_set_map(lv_obj_t * btnm, const char * map[])
     ext->map_p = map;
 
     /*Set size and positions of the buttons*/
-    lv_style_int_t left = lv_obj_get_style_int(btnm, LV_BTNM_PART_BG, LV_STYLE_PAD_LEFT);
-    lv_style_int_t right = lv_obj_get_style_int(btnm, LV_BTNM_PART_BG, LV_STYLE_PAD_RIGHT);
-    lv_style_int_t top = lv_obj_get_style_int(btnm, LV_BTNM_PART_BG, LV_STYLE_PAD_TOP);
-    lv_style_int_t bottom = lv_obj_get_style_int(btnm, LV_BTNM_PART_BG, LV_STYLE_PAD_BOTTOM);
-    lv_style_int_t inner = lv_obj_get_style_int(btnm, LV_BTNM_PART_BG, LV_STYLE_PAD_INNER);
+    lv_style_int_t left = lv_obj_get_style_pad_left(btnm, LV_BTNM_PART_BG);
+    lv_style_int_t right = lv_obj_get_style_pad_right(btnm, LV_BTNM_PART_BG);
+    lv_style_int_t top = lv_obj_get_style_pad_top(btnm, LV_BTNM_PART_BG);
+    lv_style_int_t bottom = lv_obj_get_style_pad_bottom(btnm, LV_BTNM_PART_BG);
+    lv_style_int_t inner = lv_obj_get_style_pad_inner(btnm, LV_BTNM_PART_BG);
 
 
     lv_coord_t max_w            = lv_obj_get_width(btnm) - left - right;
@@ -639,8 +639,8 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
 
         btnm->state_dsc = state_ori;
 
-        lv_style_int_t padding_top = lv_obj_get_style_int(btnm, LV_BTNM_PART_BG, LV_STYLE_PAD_TOP);
-        lv_style_int_t padding_bottom = lv_obj_get_style_int(btnm, LV_BTNM_PART_BG, LV_STYLE_PAD_BOTTOM);
+        lv_style_int_t padding_top = lv_obj_get_style_pad_top(btnm, LV_BTNM_PART_BG);
+        lv_style_int_t padding_bottom = lv_obj_get_style_pad_bottom(btnm, LV_BTNM_PART_BG);
 
         if(ext->recolor) txt_flag = LV_TXT_FLAG_RECOLOR;
         for(btn_i = 0; btn_i < ext->btn_cnt; btn_i++, txt_i++) {
@@ -904,7 +904,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             ext->btn_id_act = ext->btn_id_focused;
             lv_obj_invalidate(btnm);
         } else if(c == LV_KEY_DOWN) {
-            lv_style_int_t pad_inner = lv_obj_get_style_int(btnm, LV_BTNM_PART_BG, LV_STYLE_PAD_INNER);
+            lv_style_int_t pad_inner = lv_obj_get_style_pad_inner(btnm, LV_BTNM_PART_BG);
             /*Find the area below the the current*/
             if(ext->btn_id_focused == LV_BTNM_BTN_NONE) {
                 ext->btn_id_focused = 0;
@@ -926,7 +926,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             ext->btn_id_act = ext->btn_id_focused;
             lv_obj_invalidate(btnm);
         } else if(c == LV_KEY_UP) {
-            lv_style_int_t pad_inner = lv_obj_get_style_int(btnm, LV_BTNM_PART_BG, LV_STYLE_PAD_INNER);
+            lv_style_int_t pad_inner = lv_obj_get_style_pad_inner(btnm, LV_BTNM_PART_BG);
             /*Find the area below the the current*/
             if(ext->btn_id_focused == LV_BTNM_BTN_NONE) {
                 ext->btn_id_focused = 0;

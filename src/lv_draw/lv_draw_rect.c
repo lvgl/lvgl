@@ -1026,10 +1026,10 @@ static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, lv_opa_t * res_bu
 
 static void draw_img(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
 {
-    if(dsc->pattern_src == NULL) return;
+    if(dsc->pattern_image == NULL) return;
     if(dsc->pattern_opa <= LV_OPA_MIN) return;
 
-    lv_img_src_t src_type = lv_img_src_get_type(dsc->pattern_src);
+    lv_img_src_t src_type = lv_img_src_get_type(dsc->pattern_image);
 
     lv_draw_img_dsc_t img_dsc;
     lv_draw_label_dsc_t label_dsc;
@@ -1038,7 +1038,7 @@ static void draw_img(const lv_area_t * coords, const lv_area_t * clip, lv_draw_r
 
     if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_VARIABLE) {
         lv_img_header_t header;
-        lv_res_t res = lv_img_decoder_get_info(dsc->pattern_src, &header);
+        lv_res_t res = lv_img_decoder_get_info(dsc->pattern_image, &header);
         if(res!= LV_RES_OK) {
             LV_LOG_WARN("draw_img: can't get image info");
             return;
@@ -1057,7 +1057,7 @@ static void draw_img(const lv_area_t * coords, const lv_area_t * clip, lv_draw_r
         label_dsc.font = dsc->pattern_font;
         label_dsc.opa = dsc->pattern_opa;
         lv_point_t s;
-        lv_txt_get_size(&s, dsc->pattern_src, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+        lv_txt_get_size(&s, dsc->pattern_image, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
         img_w = s.x;
         img_h = s.y;
 
@@ -1086,8 +1086,8 @@ static void draw_img(const lv_area_t * coords, const lv_area_t * clip, lv_draw_r
             coords_tmp.x1 = coords->x1 - ofs_x;
             coords_tmp.x2 = coords_tmp.x1 + img_w - 1;
             for(; coords_tmp.x1 <= coords->x2; coords_tmp.x1 += img_w, coords_tmp.x2 += img_w) {
-                if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->pattern_src, NULL);
-                else lv_draw_img(&coords_tmp, clip, dsc->pattern_src, &img_dsc);
+                if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->pattern_image, NULL);
+                else lv_draw_img(&coords_tmp, clip, dsc->pattern_image, &img_dsc);
             }
         }
         lv_draw_mask_remove_id(radius_mask_id);
@@ -1115,8 +1115,8 @@ static void draw_img(const lv_area_t * coords, const lv_area_t * clip, lv_draw_r
             radius_mask_id = lv_draw_mask_add(&radius_mask_param, NULL);
         }
 
-        if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->pattern_src, NULL);
-        else lv_draw_img(&coords_tmp, clip, dsc->pattern_src, &img_dsc);
+        if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->pattern_image, NULL);
+        else lv_draw_img(&coords_tmp, clip, dsc->pattern_image, &img_dsc);
 
         lv_draw_mask_remove_id(radius_mask_id);
     }

@@ -53,7 +53,7 @@ typedef struct {
     lv_opa_t shadow_opa;
 
     /*Pattern*/
-    const void * pattern_src;
+    const void * pattern_image;
     const lv_font_t * pattern_font;
     lv_opa_t pattern_opa;
     lv_opa_t pattern_recolor_opa;
