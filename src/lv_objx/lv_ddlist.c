@@ -765,8 +765,8 @@ static lv_res_t lv_ddlist_page_signal(lv_obj_t * page, lv_signal_t sign, void * 
         /* Make possible to draw on the full width of the background to redraw the selected rectangle
          * when the ddlist is scrolled in fix height mode.
          * (The scrollabel is scrolled the "select rectangle" is drawn on the bg too)*/
-        lv_style_int_t left = lv_obj_get_style_int(ddlist, LV_DDLIST_PART_LIST, LV_STYLE_PAD_LEFT);
-        lv_style_int_t right = lv_obj_get_style_int(ddlist, LV_DDLIST_PART_LIST, LV_STYLE_PAD_RIGHT);
+        lv_style_int_t left = lv_obj_get_style_pad_left(ddlist, LV_DDLIST_PART_LIST);
+        lv_style_int_t right = lv_obj_get_style_pad_right(ddlist, LV_DDLIST_PART_LIST);
         lv_obj_t * scrl = lv_page_get_scrl(page);
         scrl->ext_draw_pad = LV_MATH_MAX(scrl->ext_draw_pad, LV_MATH_MAX(left, right));
     } else if(sign == LV_SIGNAL_RELEASED) {
@@ -871,8 +871,8 @@ void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_ob
     page->state_dsc.prev = page->state_dsc.act;
 
     /*Draw a rectangle under the selected item*/
-    const lv_font_t * font    = lv_obj_get_style_ptr(ddlist, LV_DDLIST_PART_LIST, LV_STYLE_FONT);
-    lv_style_int_t line_space = lv_obj_get_style_int(ddlist, LV_DDLIST_PART_LIST, LV_STYLE_LINE_SPACE);
+    const lv_font_t * font    = lv_obj_get_style_font(ddlist, LV_DDLIST_PART_LIST);
+    lv_style_int_t line_space = lv_obj_get_style_line_space(ddlist, LV_DDLIST_PART_LIST);
     lv_coord_t font_h         = lv_font_get_line_height(font);
 
     /*Draw the selected*/
@@ -1025,13 +1025,13 @@ static void pos_selected(lv_obj_t * ddlist)
 {
     lv_ddlist_ext_t * ext          = lv_obj_get_ext_attr(ddlist);
 
-    const lv_font_t * font         = lv_obj_get_style_ptr(ddlist, LV_DDLIST_PART_LIST, LV_STYLE_FONT);
+    const lv_font_t * font         = lv_obj_get_style_font(ddlist, LV_DDLIST_PART_LIST);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     lv_obj_t * scrl                = lv_page_get_scrl(ext->page);
     lv_obj_t * label = get_label(ddlist);
 
     lv_coord_t h = lv_obj_get_height(ext->page);
-    lv_style_int_t line_space = lv_obj_get_style_int(ddlist, LV_DDLIST_PART_LIST, LV_STYLE_LINE_SPACE);
+    lv_style_int_t line_space = lv_obj_get_style_line_space(ddlist, LV_DDLIST_PART_LIST);
 
     lv_coord_t line_y1 = ext->sel_opt_id * (font_h + line_space) + label->coords.y1 - scrl->coords.y1;
 

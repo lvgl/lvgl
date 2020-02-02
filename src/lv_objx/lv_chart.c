@@ -789,7 +789,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
     lv_draw_mask_fade_param_t mask_fade_p;
     int16_t mask_fade_id = LV_MASK_ID_INV;
     lv_draw_rect_dsc_t area_dsc;
-    bool has_area = lv_obj_get_style_opa(chart, LV_CHART_PART_SERIES, LV_STYLE_BG_OPA) > LV_OPA_MIN ? true : false;
+    bool has_area = lv_obj_get_style_bg_opa(chart, LV_CHART_PART_SERIES) > LV_OPA_MIN ? true : false;
     bool has_fade = false;
     if(has_area) {
         lv_draw_rect_dsc_init(&area_dsc);

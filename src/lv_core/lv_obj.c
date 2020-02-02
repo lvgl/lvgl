@@ -2970,7 +2970,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         }
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
-        if(lv_obj_get_style_border_post(obj, LV_OBJ_PART_MAIN)) {
+        if(lv_obj_get_style_clip_corner(obj, LV_OBJ_PART_MAIN)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(obj + 8);
             lv_mem_buf_release(param);
         }
@@ -3014,7 +3014,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         /*Return 'invalid' if the child change signal is not enabled*/
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        lv_coord_t shadow = lv_obj_get_style_shadow_width(obj, LV_OBJ_PART_MAIN) >> 1;
+        lv_coord_t shadow = lv_obj_get_style_shadow_width(obj, LV_OBJ_PART_MAIN);
         if(shadow) {
             shadow++;
             shadow += lv_obj_get_style_shadow_spread(obj, LV_OBJ_PART_MAIN);

@@ -652,7 +652,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     lv_style_int_t header_top = lv_obj_get_style_pad_top(calendar, LV_CALENDAR_PART_HEADER);
     lv_style_int_t header_left = lv_obj_get_style_pad_left(calendar, LV_CALENDAR_PART_HEADER);
     lv_style_int_t header_right = lv_obj_get_style_pad_right(calendar, LV_CALENDAR_PART_HEADER);
-    const lv_font_t * font = lv_obj_get_style_ptr(calendar, LV_CALENDAR_PART_HEADER, LV_STYLE_FONT);
+    const lv_font_t * font = lv_obj_get_style_font(calendar, LV_CALENDAR_PART_HEADER);
 
     lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
 
@@ -768,7 +768,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * mask)
 {
     lv_calendar_ext_t * ext     = lv_obj_get_ext_attr(calendar);
 
-    const lv_font_t * nums_font = lv_obj_get_style_ptr(calendar, LV_CALENDAR_PART_DATE, LV_STYLE_FONT);
+    const lv_font_t * nums_font = lv_obj_get_style_font(calendar, LV_CALENDAR_PART_DATE);
 
     lv_style_int_t date_top = lv_obj_get_style_pad_top(calendar, LV_CALENDAR_PART_DATE);
     lv_style_int_t date_bottom = lv_obj_get_style_pad_bottom(calendar, LV_CALENDAR_PART_DATE);

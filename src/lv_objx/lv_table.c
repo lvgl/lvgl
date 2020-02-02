@@ -589,8 +589,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
         lv_area_t txt_area;
         lv_txt_flag_t txt_flags;
 
-        lv_style_int_t bg_top = lv_obj_get_style_int(table, LV_TABLE_PART_BG, LV_STYLE_PAD_TOP);
-        lv_style_int_t bg_left= lv_obj_get_style_int(table, LV_TABLE_PART_BG, LV_STYLE_PAD_LEFT);
+        lv_style_int_t bg_top = lv_obj_get_style_pad_top(table, LV_TABLE_PART_BG);
+        lv_style_int_t bg_left= lv_obj_get_style_pad_left(table, LV_TABLE_PART_BG);
 
         lv_draw_rect_dsc_t rect_dsc[LV_TABLE_CELL_STYLE_CNT];
         lv_draw_label_dsc_t label_dsc[LV_TABLE_CELL_STYLE_CNT];
@@ -611,10 +611,10 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
             lv_draw_line_dsc_init(&line_dsc[i]);
             lv_obj_init_draw_line_dsc(table, LV_TABLE_PART_CELL1 + i, &line_dsc[i]);
 
-            cell_left[i] = lv_obj_get_style_int(table, LV_TABLE_PART_CELL1 + i, LV_STYLE_PAD_LEFT);
-            cell_right[i] = lv_obj_get_style_int(table, LV_TABLE_PART_CELL1 + i, LV_STYLE_PAD_RIGHT);
-            cell_top[i] = lv_obj_get_style_int(table, LV_TABLE_PART_CELL1 + i, LV_STYLE_PAD_TOP);
-            cell_bottom[i] = lv_obj_get_style_int(table, LV_TABLE_PART_CELL1 + i, LV_STYLE_PAD_BOTTOM);
+            cell_left[i] = lv_obj_get_style_pad_left(table, LV_TABLE_PART_CELL1 + i);
+            cell_right[i] = lv_obj_get_style_pad_right(table, LV_TABLE_PART_CELL1 + i);
+            cell_top[i] = lv_obj_get_style_pad_top(table, LV_TABLE_PART_CELL1 + i);
+            cell_bottom[i] = lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_CELL1 + i);
         }
 
         uint16_t col;
@@ -837,10 +837,10 @@ static void refr_size(lv_obj_t * table)
         h += get_row_height(table, i);
     }
 
-    lv_style_int_t bg_top = lv_obj_get_style_int(table, LV_TABLE_PART_BG, LV_STYLE_PAD_TOP);
-    lv_style_int_t bg_bottom= lv_obj_get_style_int(table, LV_TABLE_PART_BG, LV_STYLE_PAD_BOTTOM);
-    lv_style_int_t bg_left = lv_obj_get_style_int(table, LV_TABLE_PART_BG, LV_STYLE_PAD_LEFT);
-    lv_style_int_t bg_right= lv_obj_get_style_int(table, LV_TABLE_PART_BG, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t bg_top = lv_obj_get_style_pad_top(table, LV_TABLE_PART_BG);
+    lv_style_int_t bg_bottom= lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_BG);
+    lv_style_int_t bg_left = lv_obj_get_style_pad_left(table, LV_TABLE_PART_BG);
+    lv_style_int_t bg_right= lv_obj_get_style_pad_right(table, LV_TABLE_PART_BG);
     w += bg_left + bg_right;
     h += bg_top + bg_bottom;
 
@@ -864,10 +864,10 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
         lv_draw_label_dsc_init(&label_dsc[i]);
         lv_obj_init_draw_label_dsc(table, LV_TABLE_PART_CELL1 + i, &label_dsc[i]);
 
-        cell_left[i] = lv_obj_get_style_int(table, LV_TABLE_PART_CELL1 + i, LV_STYLE_PAD_LEFT);
-        cell_right[i] = lv_obj_get_style_int(table, LV_TABLE_PART_CELL1 + i, LV_STYLE_PAD_RIGHT);
-        cell_top[i] = lv_obj_get_style_int(table, LV_TABLE_PART_CELL1 + i, LV_STYLE_PAD_TOP);
-        cell_bottom[i] = lv_obj_get_style_int(table, LV_TABLE_PART_CELL1 + i, LV_STYLE_PAD_BOTTOM);
+        cell_left[i] = lv_obj_get_style_pad_left(table, LV_TABLE_PART_CELL1 + i);
+        cell_right[i] = lv_obj_get_style_pad_right(table, LV_TABLE_PART_CELL1 + i);
+        cell_top[i] = lv_obj_get_style_pad_top(table, LV_TABLE_PART_CELL1 + i);
+        cell_bottom[i] = lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_CELL1 + i);
     }
 
 

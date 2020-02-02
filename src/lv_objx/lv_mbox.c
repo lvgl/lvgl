@@ -511,11 +511,11 @@ static void mbox_realign(lv_obj_t * mbox)
     }
 
     if(ext->btnm) {
-        lv_style_int_t bg_top = lv_obj_get_style_int(mbox, LV_MBOX_PART_BTN_BG, LV_STYLE_PAD_TOP);
-        lv_style_int_t bg_bottom = lv_obj_get_style_int(mbox, LV_MBOX_PART_BTN_BG, LV_STYLE_PAD_BOTTOM);
-        lv_style_int_t btn_top = lv_obj_get_style_int(mbox, LV_MBOX_PART_BTN, LV_STYLE_PAD_TOP);
-        lv_style_int_t btn_bottom = lv_obj_get_style_int(mbox, LV_MBOX_PART_BTN, LV_STYLE_PAD_BOTTOM);
-        const lv_font_t * font = lv_obj_get_style_ptr(mbox, LV_MBOX_PART_BTN, LV_STYLE_FONT);
+        lv_style_int_t bg_top = lv_obj_get_style_pad_top(mbox, LV_MBOX_PART_BTN_BG);
+        lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(mbox, LV_MBOX_PART_BTN_BG);
+        lv_style_int_t btn_top = lv_obj_get_style_pad_top(mbox, LV_MBOX_PART_BTN);
+        lv_style_int_t btn_bottom = lv_obj_get_style_pad_bottom(mbox, LV_MBOX_PART_BTN);
+        const lv_font_t * font = lv_obj_get_style_font(mbox, LV_MBOX_PART_BTN);
 
         lv_coord_t font_h = lv_font_get_line_height(font);
         lv_mem_test();

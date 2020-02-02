@@ -192,9 +192,9 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 
     if(src_type == LV_IMG_SRC_SYMBOL) {
         /*`lv_img_dsc_get_info` couldn't set the with and height of a font so set it here*/
-        const lv_font_t * font = lv_obj_get_style_ptr(img, LV_IMG_PART_MAIN, LV_STYLE_FONT);
-        lv_style_int_t letter_space = lv_obj_get_style_int(img, LV_IMG_PART_MAIN, LV_STYLE_LETTER_SPACE);
-        lv_style_int_t line_space = lv_obj_get_style_int(img, LV_IMG_PART_MAIN, LV_STYLE_LINE_SPACE);
+        const lv_font_t * font = lv_obj_get_style_font(img, LV_IMG_PART_MAIN);
+        lv_style_int_t letter_space = lv_obj_get_style_letter_space(img, LV_IMG_PART_MAIN);
+        lv_style_int_t line_space = lv_obj_get_style_line_space(img, LV_IMG_PART_MAIN);
         lv_point_t size;
         lv_txt_get_size(&size, src_img, font, letter_space, line_space,
                         LV_COORD_MAX, LV_TXT_FLAG_NONE);
@@ -504,7 +504,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             cover = lv_area_is_in(clip_area, &img->coords, 0) ? LV_DESIGN_RES_COVER : LV_DESIGN_RES_NOT_COVER;
         }
 
-        if(lv_obj_get_style_opa(img, LV_IMG_PART_MAIN, LV_STYLE_IMAGE_OPA) < LV_OPA_MAX) return false;
+        if(lv_obj_get_style_image_opa(img, LV_IMG_PART_MAIN) < LV_OPA_MAX) return false;
 
         return cover;
     } else if(mode == LV_DESIGN_DRAW_MAIN) {
@@ -518,22 +518,22 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         lv_obj_init_draw_rect_dsc(img, LV_IMG_PART_MAIN, &bg_dsc);
 
         /*If the border is drawn later disable loading its properties*/
-        if(lv_obj_get_style_int(img, LV_OBJ_PART_MAIN, LV_STYLE_BORDER_POST)) {
+        if(lv_obj_get_style_border_post(img, LV_OBJ_PART_MAIN)) {
             bg_dsc.border_opa = LV_OPA_TRANSP;
         }
         lv_area_t bg_coords;
         lv_area_copy(&bg_coords, &img_coords);
-        bg_coords.x1 -= lv_obj_get_style_int(img, LV_IMG_PART_MAIN, LV_STYLE_PAD_LEFT);
-        bg_coords.x2 += lv_obj_get_style_int(img, LV_IMG_PART_MAIN, LV_STYLE_PAD_RIGHT);
-        bg_coords.y1 -= lv_obj_get_style_int(img, LV_IMG_PART_MAIN, LV_STYLE_PAD_TOP);
-        bg_coords.y2 += lv_obj_get_style_int(img, LV_IMG_PART_MAIN, LV_STYLE_PAD_BOTTOM);
+        bg_coords.x1 -= lv_obj_get_style_pad_left(img, LV_IMG_PART_MAIN);
+        bg_coords.x2 += lv_obj_get_style_pad_right(img, LV_IMG_PART_MAIN);
+        bg_coords.y1 -= lv_obj_get_style_pad_top(img, LV_IMG_PART_MAIN);
+        bg_coords.y2 += lv_obj_get_style_pad_bottom(img, LV_IMG_PART_MAIN);
 
         lv_draw_rect(&bg_coords, clip_area, &bg_dsc);
 
-        if(lv_obj_get_style_int(img, LV_OBJ_PART_MAIN, LV_STYLE_CLIP_CORNER)) {
+        if(lv_obj_get_style_clip_corner(img, LV_OBJ_PART_MAIN)) {
             lv_draw_mask_radius_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
 
-            lv_coord_t r = lv_obj_get_style_int(img, LV_OBJ_PART_MAIN, LV_STYLE_RADIUS);
+            lv_coord_t r = lv_obj_get_style_radius(img, LV_OBJ_PART_MAIN);
 
             lv_draw_mask_radius_init(mp, &bg_coords, r, false);
             /*Add the mask and use `img+8` as custom id. Don't use `obj` directly because it might be used by the user*/
@@ -570,7 +570,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             lv_draw_label_dsc_init(&label_dsc);
             lv_obj_init_draw_label_dsc(img, LV_IMG_PART_MAIN, &label_dsc);
 
-            label_dsc.color = lv_obj_get_style_color(img, LV_IMG_PART_MAIN, LV_STYLE_IMAGE_RECOLOR);
+            label_dsc.color = lv_obj_get_style_image_recolor(img, LV_CANVAS_PART_MAIN);
             lv_draw_label(&img_coords, clip_area, &label_dsc, ext->src, NULL);
         } else {
             /*Trigger the error handler of image drawer*/
@@ -578,7 +578,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             lv_draw_img(&img->coords, clip_area, NULL, NULL);
         }
     } else if(mode == LV_DESIGN_DRAW_POST) {
-        if(lv_obj_get_style_int(img, LV_OBJ_PART_MAIN, LV_STYLE_CLIP_CORNER)) {
+        if(lv_obj_get_style_clip_corner(img, LV_OBJ_PART_MAIN)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(img + 8);
             lv_mem_buf_release(param);
         }
@@ -587,7 +587,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         lv_draw_rect_dsc_init(&draw_dsc);
 
         /*If the border is drawn later disable loading other properties*/
-        if(lv_obj_get_style_int(img, LV_OBJ_PART_MAIN, LV_STYLE_BORDER_POST)) {
+        if(lv_obj_get_style_border_post(img, LV_OBJ_PART_MAIN)) {
             draw_dsc.bg_opa = LV_OPA_TRANSP;
             draw_dsc.pattern_opa = LV_OPA_TRANSP;
             draw_dsc.shadow_opa = LV_OPA_TRANSP;
@@ -650,10 +650,10 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         }
 
         /*Handle the padding of the background*/
-        lv_style_int_t left = lv_obj_get_style_int(img, LV_IMG_PART_MAIN, LV_STYLE_PAD_LEFT);
-        lv_style_int_t right = lv_obj_get_style_int(img, LV_IMG_PART_MAIN, LV_STYLE_PAD_RIGHT);
-        lv_style_int_t top = lv_obj_get_style_int(img, LV_IMG_PART_MAIN, LV_STYLE_PAD_TOP);
-        lv_style_int_t bottom = lv_obj_get_style_int(img, LV_IMG_PART_MAIN, LV_STYLE_PAD_BOTTOM);
+        lv_style_int_t left = lv_obj_get_style_pad_left(img, LV_IMG_PART_MAIN);
+        lv_style_int_t right = lv_obj_get_style_pad_right(img, LV_IMG_PART_MAIN);
+        lv_style_int_t top = lv_obj_get_style_pad_top(img, LV_IMG_PART_MAIN);
+        lv_style_int_t bottom = lv_obj_get_style_pad_bottom(img, LV_IMG_PART_MAIN);
 
         img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, left);
         img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, right);
@@ -661,12 +661,12 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, bottom);
 
         /*Handle shadow*/
-        lv_coord_t shadow = (lv_obj_get_style_int(img, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_WIDTH) >> 1);
+        lv_coord_t shadow = lv_obj_get_style_shadow_width(img, LV_OBJ_PART_MAIN);
         if(shadow) {
             shadow++;
-            shadow += lv_obj_get_style_int(img, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_SPREAD);
-            shadow += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_int(img, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_OFFSET_X)),
-                    LV_MATH_ABS(lv_obj_get_style_int(img, LV_OBJ_PART_MAIN, LV_STYLE_SHADOW_OFFSET_Y)));
+            shadow += lv_obj_get_style_shadow_spread(img, LV_OBJ_PART_MAIN);
+            shadow += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_shadow_offset_x(img, LV_OBJ_PART_MAIN)),
+                    LV_MATH_ABS(lv_obj_get_style_shadow_offset_y(img, LV_OBJ_PART_MAIN)));
         }
 
     } else if(sign == LV_SIGNAL_HIT_TEST) {

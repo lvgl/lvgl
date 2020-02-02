@@ -205,11 +205,11 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
         lv_obj_set_click(label, false);
         lv_label_set_long_mode(label, LV_LABEL_LONG_SROLL_CIRC);
         if(lv_obj_get_base_dir(btn) == LV_BIDI_DIR_RTL) {
-            lv_coord_t pad = lv_obj_get_style_int(btn, LV_BTN_PART_MAIN, LV_STYLE_PAD_LEFT);
+            lv_coord_t pad = lv_obj_get_style_pad_left(btn, LV_BTN_PART_MAIN);
             lv_obj_set_width(label, label->coords.x2 - btn->coords.x1 - pad);
         }
         else {
-            lv_coord_t pad = lv_obj_get_style_int(btn, LV_BTN_PART_MAIN, LV_STYLE_PAD_RIGHT);
+            lv_coord_t pad = lv_obj_get_style_pad_right(btn, LV_BTN_PART_MAIN);
             lv_obj_set_width(label, btn->coords.x2 - label->coords.x1 - pad);
         }
         if(label_signal == NULL) label_signal = lv_obj_get_signal_cb(label);
@@ -782,14 +782,14 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
             sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_t * label = lv_list_get_btn_label(btn);
         if(label) {
-            const lv_font_t * font = lv_obj_get_style_ptr(label, LV_LABEL_PART_MAIN, LV_STYLE_FONT);
+            const lv_font_t * font = lv_obj_get_style_font(label, LV_LABEL_PART_MAIN);
             lv_coord_t font_h = lv_font_get_line_height(font);
             if(lv_obj_get_base_dir(btn) == LV_BIDI_DIR_RTL) {
-                lv_coord_t pad = lv_obj_get_style_int(btn, LV_BTN_PART_MAIN, LV_STYLE_PAD_LEFT);
+                lv_coord_t pad = lv_obj_get_style_pad_left(btn, LV_BTN_PART_MAIN);
                 lv_obj_set_size(label, label->coords.x2 - btn->coords.x1 - pad, font_h);
             }
             else {
-                lv_coord_t pad = lv_obj_get_style_int(btn, LV_BTN_PART_MAIN, LV_STYLE_PAD_RIGHT);
+                lv_coord_t pad = lv_obj_get_style_pad_right(btn, LV_BTN_PART_MAIN);
                 lv_obj_set_size(label, btn->coords.x2 - label->coords.x1 - pad, font_h);
             }
         }

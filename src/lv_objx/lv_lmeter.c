@@ -273,7 +273,7 @@ void lv_lmeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_
     lv_lmeter_ext_t * ext    = lv_obj_get_ext_attr(lmeter);
 
     lv_coord_t r_out = lv_obj_get_width(lmeter) / 2;
-    lv_coord_t r_in  = r_out - lv_obj_get_style_int(lmeter, part, LV_STYLE_SCALE_WIDTH);
+    lv_coord_t r_in  = r_out - lv_obj_get_style_scale_width(lmeter, part);
     if(r_in < 1) r_in = 1;
 
     lv_coord_t x_ofs  = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
@@ -283,9 +283,9 @@ void lv_lmeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_
         (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
     uint8_t i;
 
-    lv_color_t main_color = lv_obj_get_style_color(lmeter, part, LV_STYLE_SCALE_COLOR);
-    lv_color_t grad_color = lv_obj_get_style_color(lmeter, part, LV_STYLE_SCALE_GRAD_COLOR);
-    lv_color_t ina_color = lv_obj_get_style_color(lmeter, part, LV_STYLE_SCALE_END_COLOR);
+    lv_color_t main_color = lv_obj_get_style_scale_color(lmeter, part);
+    lv_color_t grad_color = lv_obj_get_style_scale_grad_color(lmeter, part);
+    lv_color_t ina_color = lv_obj_get_style_scale_end_color(lmeter, part);
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);

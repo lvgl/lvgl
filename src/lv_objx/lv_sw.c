@@ -209,8 +209,8 @@ static lv_design_res_t lv_sw_design(lv_obj_t * sw, const lv_area_t * clip_area, 
         lv_coord_t knob_size = objh;
         lv_area_t knob_area;
 
-        lv_style_int_t bg_left = lv_obj_get_style_int(sw,   LV_SW_PART_BG, LV_STYLE_PAD_LEFT);
-        lv_style_int_t bg_right = lv_obj_get_style_int(sw,  LV_SW_PART_BG, LV_STYLE_PAD_RIGHT);
+        lv_style_int_t bg_left = lv_obj_get_style_pad_left(sw,   LV_SW_PART_BG);
+        lv_style_int_t bg_right = lv_obj_get_style_pad_right(sw,  LV_SW_PART_BG);
 
         lv_coord_t max_indic_w = objw - bg_left - bg_right;
         lv_coord_t act_indic_w = lv_area_get_width(&ext->bar.indic_area);
@@ -221,10 +221,10 @@ static lv_design_res_t lv_sw_design(lv_obj_t * sw, const lv_area_t * clip_area, 
         knob_area.y1 = sw->coords.y1;
         knob_area.y2 = sw->coords.y2;
 
-        lv_style_int_t knob_left = lv_obj_get_style_int(sw,   LV_SW_PART_KNOB, LV_STYLE_PAD_LEFT);
-        lv_style_int_t knob_right = lv_obj_get_style_int(sw,  LV_SW_PART_KNOB, LV_STYLE_PAD_RIGHT);
-        lv_style_int_t knob_top = lv_obj_get_style_int(sw,    LV_SW_PART_KNOB, LV_STYLE_PAD_TOP);
-        lv_style_int_t knob_bottom = lv_obj_get_style_int(sw, LV_SW_PART_KNOB, LV_STYLE_PAD_BOTTOM);
+        lv_style_int_t knob_left = lv_obj_get_style_pad_left(sw,   LV_SW_PART_KNOB);
+        lv_style_int_t knob_right = lv_obj_get_style_pad_right(sw,  LV_SW_PART_KNOB);
+        lv_style_int_t knob_top = lv_obj_get_style_pad_top(sw,    LV_SW_PART_KNOB);
+        lv_style_int_t knob_bottom = lv_obj_get_style_pad_bottom(sw, LV_SW_PART_KNOB);
 
         /*Apply the paddings on the knob area*/
         knob_area.x1 -= knob_left;
@@ -293,36 +293,36 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         res   = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RES_OK) return res;
     }else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        lv_style_int_t knob_left = lv_obj_get_style_int(sw,   LV_SW_PART_KNOB, LV_STYLE_PAD_LEFT);
-        lv_style_int_t knob_right = lv_obj_get_style_int(sw,  LV_SW_PART_KNOB, LV_STYLE_PAD_RIGHT);
-        lv_style_int_t knob_top = lv_obj_get_style_int(sw,    LV_SW_PART_KNOB, LV_STYLE_PAD_TOP);
-        lv_style_int_t knob_bottom = lv_obj_get_style_int(sw, LV_SW_PART_KNOB, LV_STYLE_PAD_BOTTOM);
+        lv_style_int_t knob_left = lv_obj_get_style_pad_left(sw,   LV_SW_PART_KNOB);
+        lv_style_int_t knob_right = lv_obj_get_style_pad_right(sw,  LV_SW_PART_KNOB);
+        lv_style_int_t knob_top = lv_obj_get_style_pad_top(sw,    LV_SW_PART_KNOB);
+        lv_style_int_t knob_bottom = lv_obj_get_style_pad_bottom(sw, LV_SW_PART_KNOB);
 
         /* The smaller size is the knob diameter*/
         lv_coord_t knob_size;
         knob_size = LV_MATH_MAX(LV_MATH_MAX(knob_left, knob_right), LV_MATH_MAX(knob_bottom,knob_top));
         knob_size += 2;         /*For rounding error*/
 
-        lv_style_int_t knob_sh_width = lv_obj_get_style_int(sw, LV_SW_PART_KNOB, LV_STYLE_SHADOW_WIDTH);
-        lv_style_int_t knob_sh_spread = lv_obj_get_style_int(sw, LV_SW_PART_KNOB, LV_STYLE_SHADOW_SPREAD);
-        lv_style_int_t knob_sh_ox = lv_obj_get_style_int(sw, LV_SW_PART_KNOB, LV_STYLE_SHADOW_OFFSET_X);
-        lv_style_int_t knob_sh_oy = lv_obj_get_style_int(sw, LV_SW_PART_KNOB, LV_STYLE_SHADOW_OFFSET_Y);
+        lv_style_int_t knob_sh_width = lv_obj_get_style_shadow_width(sw, LV_SW_PART_KNOB);
+        lv_style_int_t knob_sh_spread = lv_obj_get_style_shadow_spread(sw, LV_SW_PART_KNOB);
+        lv_style_int_t knob_sh_ox = lv_obj_get_style_shadow_offset_x(sw, LV_SW_PART_KNOB);
+        lv_style_int_t knob_sh_oy = lv_obj_get_style_shadow_offset_y(sw, LV_SW_PART_KNOB);
 
         knob_size += knob_sh_width + knob_sh_spread;
         knob_size += LV_MATH_MAX(LV_MATH_ABS(knob_sh_ox), LV_MATH_ABS(knob_sh_oy));
 
-        lv_style_int_t bg_sh_width = lv_obj_get_style_int(sw, LV_SW_PART_BG, LV_STYLE_SHADOW_WIDTH);
-        lv_style_int_t bg_sh_spread = lv_obj_get_style_int(sw, LV_SW_PART_BG, LV_STYLE_SHADOW_SPREAD);
-        lv_style_int_t bg_sh_ox = lv_obj_get_style_int(sw, LV_SW_PART_BG, LV_STYLE_SHADOW_OFFSET_X);
-        lv_style_int_t bg_sh_oy = lv_obj_get_style_int(sw, LV_SW_PART_BG, LV_STYLE_SHADOW_OFFSET_Y);
+        lv_style_int_t bg_sh_width = lv_obj_get_style_shadow_width(sw, LV_SW_PART_BG);
+        lv_style_int_t bg_sh_spread = lv_obj_get_style_shadow_spread(sw, LV_SW_PART_BG);
+        lv_style_int_t bg_sh_ox = lv_obj_get_style_shadow_offset_x(sw, LV_SW_PART_BG);
+        lv_style_int_t bg_sh_oy = lv_obj_get_style_shadow_offset_y(sw, LV_SW_PART_BG);
 
         lv_coord_t bg_size = bg_sh_width + bg_sh_spread;
         bg_size += LV_MATH_MAX(LV_MATH_ABS(bg_sh_ox), LV_MATH_ABS(bg_sh_oy));
 
-        lv_style_int_t indic_sh_width = lv_obj_get_style_int(sw, LV_SW_PART_INDIC, LV_STYLE_SHADOW_WIDTH);
-        lv_style_int_t indic_sh_spread = lv_obj_get_style_int(sw, LV_SW_PART_INDIC, LV_STYLE_SHADOW_SPREAD);
-        lv_style_int_t indic_sh_ox = lv_obj_get_style_int(sw, LV_SW_PART_INDIC, LV_STYLE_SHADOW_OFFSET_X);
-        lv_style_int_t indic_sh_oy = lv_obj_get_style_int(sw, LV_SW_PART_INDIC, LV_STYLE_SHADOW_OFFSET_Y);
+        lv_style_int_t indic_sh_width = lv_obj_get_style_shadow_width(sw, LV_SW_PART_INDIC);
+        lv_style_int_t indic_sh_spread = lv_obj_get_style_shadow_spread(sw, LV_SW_PART_INDIC);
+        lv_style_int_t indic_sh_ox = lv_obj_get_style_shadow_offset_x(sw, LV_SW_PART_INDIC);
+        lv_style_int_t indic_sh_oy = lv_obj_get_style_shadow_offset_y(sw, LV_SW_PART_INDIC);
 
         lv_coord_t indic_size = indic_sh_width + indic_sh_spread;
         indic_size += LV_MATH_MAX(LV_MATH_ABS(indic_sh_ox), LV_MATH_ABS(indic_sh_oy));

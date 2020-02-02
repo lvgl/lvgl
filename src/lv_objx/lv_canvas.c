@@ -203,7 +203,7 @@ lv_color_t lv_canvas_get_px(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y)
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
 
     lv_canvas_ext_t * ext    = lv_obj_get_ext_attr(canvas);
-    lv_color_t color = lv_obj_get_style_color(canvas, LV_CANVAS_PART_MAIN, LV_STYLE_IMAGE_RECOLOR);
+    lv_color_t color = lv_obj_get_style_image_recolor(canvas, LV_CANVAS_PART_MAIN);
 
     return lv_img_buf_get_px_color(&ext->dsc, x, y, color);
 }
@@ -280,7 +280,7 @@ void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, u
     LV_ASSERT_NULL(img);
 
     lv_canvas_ext_t * ext_dst = lv_obj_get_ext_attr(canvas);
-    lv_color_t color = lv_obj_get_style_color(canvas, LV_CANVAS_PART_MAIN, LV_STYLE_IMAGE_RECOLOR);
+    lv_color_t color = lv_obj_get_style_image_recolor(canvas, LV_CANVAS_PART_MAIN);
 
     int32_t dest_width  = ext_dst->dsc.header.w;
     int32_t dest_height = ext_dst->dsc.header.h;
@@ -390,7 +390,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
         a.y2 = ext->dsc.header.h - 1;
     }
 
-    lv_color_t color = lv_obj_get_style_color(canvas, LV_CANVAS_PART_MAIN, LV_STYLE_IMAGE_RECOLOR);
+    lv_color_t color = lv_obj_get_style_image_recolor(canvas, LV_CANVAS_PART_MAIN);
 
     uint16_t r_back = r / 2;
     uint16_t r_front = r / 2;
@@ -525,7 +525,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
         a.y2 = ext->dsc.header.h - 1;
     }
 
-    lv_color_t color = lv_obj_get_style_color(canvas, LV_CANVAS_PART_MAIN, LV_STYLE_IMAGE_RECOLOR);
+    lv_color_t color = lv_obj_get_style_image_recolor(canvas, LV_CANVAS_PART_MAIN);
 
     uint16_t r_back = r / 2;
     uint16_t r_front = r / 2;

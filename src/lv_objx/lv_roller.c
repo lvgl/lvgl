@@ -239,8 +239,8 @@ void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt)
     LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
 
     uint8_t n_line_space           = (row_cnt > 1) ? row_cnt - 1 : 1;
-    const lv_font_t * font = lv_obj_get_style_ptr(roller, LV_ROLLER_PART_BG, LV_STYLE_FONT);
-    lv_style_int_t line_space = lv_obj_get_style_int(roller, LV_ROLLER_PART_BG, LV_STYLE_LINE_SPACE);
+    const lv_font_t * font = lv_obj_get_style_font(roller, LV_ROLLER_PART_BG);
+    lv_style_int_t line_space = lv_obj_get_style_line_space(roller, LV_ROLLER_PART_BG);
     lv_obj_set_height(roller, lv_font_get_line_height(font) * row_cnt + line_space * n_line_space);
 
     refr_position(roller, LV_ANIM_OFF);
@@ -369,8 +369,8 @@ static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * cli
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         draw_bg(roller, clip_area);
 
-        const lv_font_t * font = lv_obj_get_style_ptr(roller, LV_ROLLER_PART_BG, LV_STYLE_FONT);
-        lv_style_int_t line_space = lv_obj_get_style_int(roller, LV_ROLLER_PART_BG, LV_STYLE_LINE_SPACE);
+        const lv_font_t * font = lv_obj_get_style_font(roller, LV_ROLLER_PART_BG);
+        lv_style_int_t line_space = lv_obj_get_style_line_space(roller, LV_ROLLER_PART_BG);
         lv_coord_t font_h        = lv_font_get_line_height(font);
         lv_area_t rect_area;
         rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - line_space / 2;
@@ -571,9 +571,8 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     int32_t id            = -1;
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
 
-
-    const lv_font_t * font = lv_obj_get_style_ptr(roller, LV_ROLLER_PART_BG, LV_STYLE_FONT);
-    lv_style_int_t line_space = lv_obj_get_style_int(roller, LV_ROLLER_PART_BG, LV_STYLE_LINE_SPACE);
+    const lv_font_t * font = lv_obj_get_style_font(roller, LV_ROLLER_PART_BG);
+    lv_style_int_t line_space = lv_obj_get_style_line_space(roller, LV_ROLLER_PART_BG);
     lv_coord_t font_h              = lv_font_get_line_height(font);
 
     if(sign == LV_SIGNAL_DRAG_END) {
@@ -677,8 +676,8 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
 
     lv_obj_t * roller_scrl         = lv_page_get_scrl(roller);
     lv_roller_ext_t * ext          = lv_obj_get_ext_attr(roller);
-    const lv_font_t * font = lv_obj_get_style_ptr(roller, LV_ROLLER_PART_BG, LV_STYLE_FONT);
-    lv_style_int_t line_space = lv_obj_get_style_int(roller, LV_ROLLER_PART_BG, LV_STYLE_LINE_SPACE);
+    const lv_font_t * font = lv_obj_get_style_font(roller, LV_ROLLER_PART_BG);
+    lv_style_int_t line_space = lv_obj_get_style_line_space(roller, LV_ROLLER_PART_BG);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     lv_coord_t h                   = lv_obj_get_height(roller);
     uint16_t anim_time             = lv_roller_get_anim_time(roller);
@@ -780,8 +779,8 @@ static void refr_width(lv_obj_t * roller)
     lv_obj_t * label = get_label(roller);
     lv_coord_t label_w = lv_obj_get_width(label);
 
-    lv_style_int_t left = lv_obj_get_style_int(roller, LV_ROLLER_PART_BG, LV_STYLE_PAD_LEFT);
-    lv_style_int_t right = lv_obj_get_style_int(roller, LV_ROLLER_PART_BG, LV_STYLE_PAD_RIGHT);
+    lv_style_int_t left = lv_obj_get_style_pad_left(roller, LV_ROLLER_PART_BG);
+    lv_style_int_t right = lv_obj_get_style_pad_right(roller, LV_ROLLER_PART_BG);
 
     lv_obj_set_width(roller, label_w + left + right);
 
@@ -821,8 +820,8 @@ static void inf_normalize(void * scrl)
         ext->sel_opt_id += (LV_ROLLER_INF_PAGES / 2) * real_id_cnt; /*Select the middle page*/
 
         /*Move to the new id*/
-        const lv_font_t * font = lv_obj_get_style_ptr(roller, LV_ROLLER_PART_BG, LV_STYLE_FONT);
-        lv_style_int_t line_space = lv_obj_get_style_int(roller, LV_ROLLER_PART_BG, LV_STYLE_LINE_SPACE);
+        const lv_font_t * font = lv_obj_get_style_font(roller, LV_ROLLER_PART_BG);
+        lv_style_int_t line_space = lv_obj_get_style_line_space(roller, LV_ROLLER_PART_BG);
         lv_coord_t font_h              = lv_font_get_line_height(font);
         lv_coord_t h                   = lv_obj_get_height(roller);
 
