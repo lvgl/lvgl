@@ -30,8 +30,10 @@ extern "C" {
 typedef struct
 {
     /*New data for this type */
-    lv_coord_t angle_start;
-    lv_coord_t angle_end;
+    lv_coord_t arc_angle_start;
+    lv_coord_t arc_angle_end;
+    lv_coord_t bg_angle_start;
+    lv_coord_t bg_angle_end;
     lv_style_list_t style_arc;
 } lv_arc_ext_t;
 
@@ -39,6 +41,9 @@ typedef struct
 enum {
     LV_ARC_PART_BG = LV_OBJ_PART_MAIN,
     LV_ARC_PART_ARC,
+    _LV_ARC_PART_VIRTUAL_LAST,
+
+    _LV_ARC_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,
 };
 typedef uint8_t lv_arc_part_t;
 

@@ -29,7 +29,6 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_kb_signal(lv_obj_t * kb, lv_signal_t sign, void * param);
-static lv_style_list_t * lv_kb_get_style(lv_obj_t * kb, uint8_t part);
 static void lv_kb_update_map(lv_obj_t * kb);
 
 /**********************
@@ -114,17 +113,17 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("keyboard create started");
 
     /*Create the ancestor of keyboard*/
-    lv_obj_t * new_kb = lv_btnm_create(par, copy);
-    LV_ASSERT_MEM(new_kb);
-    if(new_kb == NULL) return NULL;
+    lv_obj_t * kb = lv_btnm_create(par, copy);
+    LV_ASSERT_MEM(kb);
+    if(kb == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_kb);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(kb);
 
     /*Allocate the keyboard type specific extended data*/
-    lv_kb_ext_t * ext = lv_obj_allocate_ext_attr(new_kb, sizeof(lv_kb_ext_t));
+    lv_kb_ext_t * ext = lv_obj_allocate_ext_attr(kb, sizeof(lv_kb_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_kb);
+        lv_obj_del(kb);
         return NULL;
     }
 
@@ -135,21 +134,23 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cursor_mng = 0;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(new_kb, lv_kb_signal);
+    lv_obj_set_signal_cb(kb, lv_kb_signal);
 
     /*Init the new keyboard keyboard*/
     if(copy == NULL) {
         /* Set a size which fits into the parent.
          * Don't use `par` directly because if the window is created on a page it is moved to the
          * scrollable so the parent has changed */
-        lv_obj_set_size(new_kb, lv_obj_get_width_fit(lv_obj_get_parent(new_kb)),
-        lv_obj_get_height_fit(lv_obj_get_parent(new_kb)) / 2);
-        lv_obj_align(new_kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
-        lv_obj_set_event_cb(new_kb, lv_kb_def_event_cb);
-        lv_obj_set_base_dir(new_kb, LV_BIDI_DIR_LTR);
+        lv_obj_set_size(kb, lv_obj_get_width_fit(lv_obj_get_parent(kb)),
+        lv_obj_get_height_fit(lv_obj_get_parent(kb)) / 2);
+        lv_obj_align(kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
+        lv_obj_set_event_cb(kb, lv_kb_def_event_cb);
+        lv_obj_set_base_dir(kb, LV_BIDI_DIR_LTR);
 
-        lv_btnm_set_map(new_kb, kb_map[ext->mode]);
-        lv_btnm_set_ctrl_map(new_kb, kb_ctrl[ext->mode]);
+        lv_btnm_set_map(kb, kb_map[ext->mode]);
+        lv_btnm_set_ctrl_map(kb, kb_ctrl[ext->mode]);
+
+        lv_theme_apply(kb, LV_THEME_KB);
 
     }
     /*Copy an existing keyboard*/
@@ -160,8 +161,8 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->mode              = copy_ext->mode;
         ext->cursor_mng        = copy_ext->cursor_mng;
 
-        lv_btnm_set_map(new_kb, kb_map[ext->mode]);
-        lv_btnm_set_ctrl_map(new_kb, kb_ctrl[ext->mode]);
+        lv_btnm_set_map(kb, kb_map[ext->mode]);
+        lv_btnm_set_ctrl_map(kb, kb_ctrl[ext->mode]);
 
         /*Refresh the style with new signal function*/
 //        lv_obj_refresh_style(new_kb);
@@ -169,7 +170,7 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy)
 
     LV_LOG_INFO("keyboard created");
 
-    return new_kb;
+    return kb;
 }
 
 /*=====================

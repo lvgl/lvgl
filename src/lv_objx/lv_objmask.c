@@ -9,6 +9,7 @@
 #include "lv_objmask.h"
 #include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_themes/lv_theme.h"
 
 #if defined(LV_USE_OBJMASK) && LV_USE_OBJMASK != 0
 
@@ -53,31 +54,31 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("object mask create started");
 
     /*Create the ancestor of object mask*/
-    lv_obj_t * new_objmask = lv_cont_create(par, copy);
-    LV_ASSERT_MEM(new_objmask);
-    if(new_objmask == NULL) return NULL;
+    lv_obj_t * objmask = lv_cont_create(par, copy);
+    LV_ASSERT_MEM(objmask);
+    if(objmask == NULL) return NULL;
 
     /*Allocate the object mask type specific extended data*/
-    lv_objmask_ext_t * ext = lv_obj_allocate_ext_attr(new_objmask, sizeof(lv_objmask_ext_t));
+    lv_objmask_ext_t * ext = lv_obj_allocate_ext_attr(objmask, sizeof(lv_objmask_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_objmask);
+        lv_obj_del(objmask);
         return NULL;
     }
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_objmask);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_objmask);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(objmask);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(objmask);
 
     /*Initialize the allocated 'ext' */
     lv_ll_init(&ext->mask_ll, sizeof(lv_objmask_mask_t));
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(new_objmask, lv_objmask_signal);
-    lv_obj_set_design_cb(new_objmask, lv_objmask_design);
+    lv_obj_set_signal_cb(objmask, lv_objmask_signal);
+    lv_obj_set_design_cb(objmask, lv_objmask_design);
 
     /*Init the new object mask object mask*/
     if(copy == NULL) {
-        lv_obj_reset_style(new_objmask, LV_OBJMASK_PART_MAIN);
+        lv_theme_apply(objmask, LV_THEME_OBJMASK);
 
     }
     /*TODO: Copy an existing object mask*/
@@ -85,12 +86,12 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
         /* lv_objmask_ext_t * copy_ext = lv_obj_get_ext_attr(copy); */
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_objmask);
+        lv_obj_refresh_style(objmask);
     }
 
     LV_LOG_INFO("object mask created");
 
-    return new_objmask;
+    return objmask;
 }
 
 /*======================

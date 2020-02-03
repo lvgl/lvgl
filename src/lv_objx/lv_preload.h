@@ -68,9 +68,13 @@ typedef struct
     lv_preload_dir_t anim_dir : 1;   /*Animation Direction*/
 } lv_preload_ext_t;
 
-/*Styles*/
+/*Parts of the preloader*/
 enum {
-    LV_PRELOAD_STYLE_MAIN,
+    LV_PRELOAD_PART_BG = LV_ARC_PART_BG,
+    LV_PRELOAD_PART_ARC = LV_ARC_PART_ARC,
+    _LV_PRELOAD_PART_VIRTUAL_LAST,
+
+    _LV_PRELOAD_PART_REAL_LAST = _LV_ARC_PART_REAL_LAST,
 };
 typedef uint8_t lv_preload_style_t;
 

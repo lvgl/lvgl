@@ -51,8 +51,11 @@ static lv_style_t sb;
 
 
 #if LV_USE_BTNM
-static lv_style_t btnm_bg;
-static lv_style_t btnm_btn;
+static lv_style_t btnm_bg, btnm_btn;
+#endif
+
+#if LV_USE_BTNM
+static lv_style_t kb_bg, kb_btn;
 #endif
 
 #if LV_USE_BAR
@@ -150,7 +153,7 @@ static void basic_init(void)
     lv_style_set_color(&panel, LV_STYLE_IMAGE_RECOLOR, lv_color_hex(0x979a9f));
     lv_style_set_color(&panel, LV_STYLE_LINE_COLOR, lv_color_hex(0x979a9f));
     lv_style_set_int(&panel, LV_STYLE_LINE_WIDTH, 1);
-    lv_style_set_color(&panel, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, lv_color_mix(COLOR_CONTAINER, LV_COLOR_RED, LV_OPA_50));
+    lv_style_set_color(&panel, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
 
     lv_style_init(&btn);
     lv_style_set_int(&btn, LV_STYLE_RADIUS, LV_RADIUS_CIRCLE);
@@ -299,9 +302,9 @@ static void arc_init(void)
     lv_style_set_int(&arc, LV_STYLE_LINE_ROUNDED, 1);
 
     lv_style_init(&arc_bg);
-    lv_style_set_color(&arc_bg, LV_STYLE_BORDER_COLOR, LV_COLOR_GRAY);
-    lv_style_set_int(&arc_bg, LV_STYLE_BORDER_WIDTH, LV_DPI / 8);
-    lv_style_set_opa(&arc_bg, LV_STYLE_BG_OPA, LV_OPA_TRANSP);
+    lv_style_set_color(&arc_bg, LV_STYLE_LINE_COLOR, LV_COLOR_GRAY);
+    lv_style_set_int(&arc_bg, LV_STYLE_LINE_WIDTH, LV_DPI / 8);
+    lv_style_set_int(&arc_bg, LV_STYLE_LINE_ROUNDED, 1);
 
 #endif
 }
@@ -310,7 +313,7 @@ static void preload_init(void)
 {
 #if LV_USE_PRELOAD != 0
 
-    theme.style.preload = theme.style.arc;
+//    theme.style.preload = theme.style.arc;
 #endif
 }
 
@@ -430,6 +433,10 @@ static void btnm_init(void)
 static void kb_init(void)
 {
 #if LV_USE_KB
+    lv_style_init(&kb_bg);
+    lv_style_copy(&kb_bg, &panel);
+    lv_style_set_int(&kb_bg, LV_STYLE_PAD_INNER, LV_DPI/10);
+
 #endif
 }
 
@@ -577,9 +584,6 @@ static void tabview_init(void)
 static void tileview_init(void)
 {
 #if LV_USE_TILEVIEW != 0
-    theme.style.tileview.bg   = &lv_style_transp_tight;
-    theme.style.tileview.scrl = &lv_style_transp_tight;
-    theme.style.tileview.sb   = theme.style.page.sb;
 #endif
 }
 
@@ -730,6 +734,15 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &btnm_btn);
         break;
+    case LV_THEME_KB:
+        list = lv_obj_get_style_list(obj, LV_KB_PART_BG);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &kb_bg);
+
+        list = lv_obj_get_style_list(obj, LV_KB_PART_BTN);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &btnm_btn);
+        break;
     case LV_THEME_BAR:
         list = lv_obj_get_style_list(obj, LV_BAR_PART_BG);
         lv_style_list_reset(list);
@@ -775,6 +788,13 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         break;
 #endif
 
+#if LV_USE_LINE
+    case LV_THEME_LINE:
+        list = lv_obj_get_style_list(obj, LV_LABEL_PART_MAIN);
+        lv_style_list_reset(list);
+        break;
+#endif
+
 #if LV_USE_ARC
     case LV_THEME_ARC:
         list = lv_obj_get_style_list(obj, LV_ARC_PART_BG);
@@ -782,6 +802,18 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_add_style(list, &arc_bg);
 
         list = lv_obj_get_style_list(obj, LV_ARC_PART_ARC);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &arc);
+        break;
+#endif
+
+#if LV_USE_PRELOAD
+    case LV_THEME_PRELOAD:
+        list = lv_obj_get_style_list(obj, LV_PRELOAD_PART_BG);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &arc_bg);
+
+        list = lv_obj_get_style_list(obj, LV_PRELOAD_PART_ARC);
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &arc);
         break;
@@ -859,6 +891,15 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         break;
 #endif
 
+#if LV_USE_TILEVIEW
+    case LV_THEME_TILEVIEW:
+        list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_BG);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &scr);
+        break;
+#endif
+
+
 #if LV_USE_ROLLER
     case LV_THEME_ROLLER:
         list = lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
@@ -868,6 +909,14 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         list = lv_obj_get_style_list(obj, LV_ROLLER_PART_SEL);
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &btn);
+        break;
+#endif
+
+
+#if LV_USE_OBJMASK
+    case LV_THEME_OBJMASK:
+        list = lv_obj_get_style_list(obj, LV_OBJMASK_PART_MAIN);
+        lv_style_list_reset(list);
         break;
 #endif
 

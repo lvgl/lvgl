@@ -43,11 +43,14 @@ typedef enum {
     LV_THEME_BTN,
 
     LV_THEME_LABEL,
+    LV_THEME_LINE,
 
     LV_THEME_IMAGE,
     LV_THEME_IMGBTN,
 
     LV_THEME_BTNM,
+
+    LV_THEME_KB,
 
     LV_THEME_BAR,
 
@@ -65,8 +68,12 @@ typedef enum {
 
     LV_THEME_ROLLER,
 
+    LV_THEME_OBJMASK,
+
     LV_THEME_TABVIEW,
     LV_THEME_TABVIEW_PAGE,
+
+    LV_THEME_TILEVIEW,
 
     LV_THEME_LMETER,
 
@@ -86,6 +93,7 @@ typedef enum {
     LV_THEME_CALENDAR,
 
     LV_THEME_ARC,
+    LV_THEME_PRELOAD,
 
     LV_THEME_LED,
 

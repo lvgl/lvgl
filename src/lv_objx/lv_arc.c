@@ -72,8 +72,10 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(arc);
 
     /*Initialize the allocated 'ext' */
-    ext->angle_start = 45;
-    ext->angle_end   = 315;
+    ext->bg_angle_start = 135;
+    ext->bg_angle_end   = 45;
+    ext->arc_angle_start = 135;
+    ext->arc_angle_end   = 270;
     lv_style_list_init(&ext->style_arc);
 
 
@@ -90,8 +92,8 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing arc*/
     else {
         lv_arc_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->angle_start        = copy_ext->angle_start;
-        ext->angle_end          = copy_ext->angle_end;
+        ext->arc_angle_start        = copy_ext->arc_angle_start;
+        ext->arc_angle_end          = copy_ext->arc_angle_end;
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(arc);
@@ -128,7 +130,7 @@ void lv_arc_set_start_angle(lv_obj_t * arc, int16_t start)
     if(start > 360) start -= 360;
     if(start < 0) start += 360;
 
-    ext->angle_start = start;
+    ext->arc_angle_start = start;
 
     lv_obj_invalidate(arc);
 }
@@ -147,7 +149,7 @@ void lv_arc_set_end_angle(lv_obj_t * arc, int16_t end)
     if(end > 360) end -= 360;
     if(end < 0) end += 360;
 
-    ext->angle_end= end;
+    ext->arc_angle_end= end;
 
     lv_obj_invalidate(arc);
 }
@@ -167,7 +169,7 @@ uint16_t lv_arc_get_angle_start(lv_obj_t * arc)
 
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
-    return ext->angle_start;
+    return ext->arc_angle_start;
 }
 
 /**
@@ -181,7 +183,7 @@ uint16_t lv_arc_get_angle_end(lv_obj_t * arc)
 
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
-    return ext->angle_end;
+    return ext->arc_angle_end;
 }
 
 /*=====================
@@ -216,20 +218,21 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_arc_ext_t * ext       = lv_obj_get_ext_attr(arc);
 
-        lv_draw_rect_dsc_t arc_bg_dsc;
-        lv_draw_rect_dsc_init(&arc_bg_dsc);
-        lv_obj_init_draw_rect_dsc(arc, LV_ARC_PART_BG, &arc_bg_dsc);
-        arc_bg_dsc.radius = LV_RADIUS_CIRCLE;
-        lv_draw_rect(&arc->coords, clip_area, &arc_bg_dsc);
-
-        lv_draw_line_dsc_t arc_dsc;
-        lv_draw_line_dsc_init(&arc_dsc);
-        lv_obj_init_draw_line_dsc(arc, LV_ARC_PART_ARC, &arc_dsc);
-
         lv_coord_t r       = (LV_MATH_MIN(lv_obj_get_width(arc), lv_obj_get_height(arc))) / 2;
         lv_coord_t x       = arc->coords.x1 + lv_obj_get_width(arc) / 2;
         lv_coord_t y       = arc->coords.y1 + lv_obj_get_height(arc) / 2;
-        lv_draw_arc(x, y, r, ext->angle_start, ext->angle_end, clip_area, &arc_dsc);
+
+        lv_draw_line_dsc_t arc_dsc;
+        lv_draw_line_dsc_init(&arc_dsc);
+        lv_obj_init_draw_line_dsc(arc, LV_ARC_PART_BG, &arc_dsc);
+
+        lv_draw_arc(x, y, r, ext->bg_angle_start, ext->bg_angle_end, clip_area, &arc_dsc);
+
+
+        lv_draw_line_dsc_init(&arc_dsc);
+        lv_obj_init_draw_line_dsc(arc, LV_ARC_PART_ARC, &arc_dsc);
+
+        lv_draw_arc(x, y, r, ext->arc_angle_start, ext->arc_angle_end, clip_area, &arc_dsc);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {

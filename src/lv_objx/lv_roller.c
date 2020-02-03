@@ -96,6 +96,8 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_obj_set_signal_cb(roller, lv_roller_signal);
     lv_obj_set_design_cb(roller, lv_roller_design);
 
+
+
     /*Init the new roller roller*/
     if(copy == NULL) {
         lv_obj_t * label = lv_label_create(roller, NULL);

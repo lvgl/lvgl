@@ -44,11 +44,12 @@ typedef struct
     uint8_t drag_right_en : 1;
 } lv_tileview_ext_t;
 
-/*Styles*/
+/*Parts of the Tileview*/
 enum {
-    LV_TILEVIEW_STYLE_MAIN,
+    LV_TILEVIEW_PART_BG = LV_PAGE_PART_BG,
+    _LV_TILEVIEW_PART_VIRTUAL_LAST = _LV_PAGE_PART_VIRTUAL_LAST,
+    _LV_TILEVIEW_PART_REAL_LAST = _LV_PAGE_PART_REAL_LAST
 };
-typedef uint8_t lv_tileview_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -115,14 +116,6 @@ static inline void lv_tileview_set_anim_time(lv_obj_t * tileview, uint16_t anim_
     lv_page_set_anim_time(tileview, anim_time);
 }
 
-/**
- * Set a style of a tileview.
- * @param tileview pointer to tileview object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_tileview_set_style(lv_obj_t * tileview, lv_tileview_style_t type, const lv_style_t * style);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -152,14 +145,6 @@ static inline uint16_t lv_tileview_get_anim_time(lv_obj_t * tileview)
 {
     return lv_page_get_anim_time(tileview);
 }
-
-/**
- * Get style of a tileview.
- * @param tileview pointer to tileview object
- * @param type which style should be get
- * @return style pointer to the style
- */
-const lv_style_t * lv_tileview_get_style(const lv_obj_t * tileview, lv_tileview_style_t type);
 
 /*=====================
  * Other functions

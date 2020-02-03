@@ -12,6 +12,7 @@
 #include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_themes/lv_theme.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
@@ -54,17 +55,17 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("line create started");
 
     /*Create a basic object*/
-    lv_obj_t * new_line = lv_obj_create(par, copy);
-    LV_ASSERT_MEM(new_line);
-    if(new_line == NULL) return NULL;
+    lv_obj_t * line = lv_obj_create(par, copy);
+    LV_ASSERT_MEM(line);
+    if(line == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_line);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(line);
 
     /*Extend the basic object to line object*/
-    lv_line_ext_t * ext = lv_obj_allocate_ext_attr(new_line, sizeof(lv_line_ext_t));
+    lv_line_ext_t * ext = lv_obj_allocate_ext_attr(line, sizeof(lv_line_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_line);
+        lv_obj_del(line);
         return NULL;
     }
 
@@ -73,30 +74,32 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->auto_size   = 1;
     ext->y_inv       = 0;
 
-    lv_obj_set_design_cb(new_line, lv_line_design);
-    lv_obj_set_signal_cb(new_line, lv_line_signal);
+    lv_obj_set_design_cb(line, lv_line_design);
+    lv_obj_set_signal_cb(line, lv_line_signal);
 
     /*Init the new line*/
     if(copy == NULL) {
-        lv_obj_set_size(new_line, LV_DPI,
+        lv_obj_set_size(line, LV_DPI,
                         LV_DPI);          /*Auto size is enables, but set default size until no points are added*/
 
-        lv_obj_set_click(new_line, false);
+        lv_obj_set_click(line, false);
+
+        lv_theme_apply(line, LV_THEME_LINE);
     }
     /*Copy an existing object*/
     else {
         lv_line_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        lv_line_set_auto_size(new_line, lv_line_get_auto_size(copy));
-        lv_line_set_y_invert(new_line, lv_line_get_y_invert(copy));
-        lv_line_set_auto_size(new_line, lv_line_get_auto_size(copy));
-        lv_line_set_points(new_line, copy_ext->point_array, copy_ext->point_num);
+        lv_line_set_auto_size(line, lv_line_get_auto_size(copy));
+        lv_line_set_y_invert(line, lv_line_get_y_invert(copy));
+        lv_line_set_auto_size(line, lv_line_get_auto_size(copy));
+        lv_line_set_points(line, copy_ext->point_array, copy_ext->point_num);
         /*Refresh the style with new signal function*/
-//        lv_obj_refresh_style(new_line);
+//        lv_obj_refresh_style(line);
     }
 
     LV_LOG_INFO("line created");
 
-    return new_line;
+    return line;
 }
 
 /*=====================
