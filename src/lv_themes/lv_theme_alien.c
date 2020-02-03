@@ -278,15 +278,20 @@ static void gauge_init(void)
 {
 #if LV_USE_GAUGE != 0
     lv_style_init(&gauge);
-    lv_style_set_color(&gauge, LV_STYLE_SCALE_COLOR, LV_COLOR_AQUA);
-    lv_style_set_color(&gauge, LV_STYLE_SCALE_GRAD_COLOR, LV_COLOR_NAVY);
-    lv_style_set_color(&gauge, LV_STYLE_SCALE_END_COLOR, LV_COLOR_RED);
+    lv_style_set_color(&gauge, LV_STYLE_SCALE_COLOR, COLOR_DISABLED);
+    lv_style_set_color(&gauge, LV_STYLE_SCALE_GRAD_COLOR, COLOR_DISABLED);
+    lv_style_set_color(&gauge, LV_STYLE_SCALE_END_COLOR, COLOR_ACCENT);
     lv_style_set_int(&gauge, LV_STYLE_LINE_WIDTH, 2);
+    lv_style_set_int(&gauge, LV_STYLE_SCALE_END_BORDER_WIDTH, 4);
+    lv_style_set_opa(&gauge, LV_STYLE_BG_OPA, LV_OPA_COVER);
+    lv_style_set_color(&gauge, LV_STYLE_BG_COLOR, LV_COLOR_LIME);
+    lv_style_set_int(&gauge, LV_STYLE_SIZE, 4);
+
 
     lv_style_init(&gauge_strong);
-    lv_style_set_color(&gauge_strong, LV_STYLE_SCALE_COLOR, LV_COLOR_AQUA);
-    lv_style_set_color(&gauge_strong, LV_STYLE_SCALE_GRAD_COLOR, LV_COLOR_NAVY);
-    lv_style_set_color(&gauge_strong, LV_STYLE_SCALE_END_COLOR, LV_COLOR_RED);
+    lv_style_set_color(&gauge_strong, LV_STYLE_SCALE_COLOR, COLOR_DISABLED);
+    lv_style_set_color(&gauge_strong, LV_STYLE_SCALE_GRAD_COLOR, COLOR_DISABLED);
+    lv_style_set_color(&gauge_strong, LV_STYLE_SCALE_END_COLOR, COLOR_ACCENT);
     lv_style_set_int(&gauge_strong, LV_STYLE_LINE_WIDTH, 4);
     lv_style_set_int(&gauge_strong, LV_STYLE_SCALE_WIDTH, LV_DPI/5);
     lv_style_set_int(&gauge_strong, LV_STYLE_PAD_INNER, LV_DPI/10);
@@ -896,6 +901,14 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_BG);
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &scr);
+
+        list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_SCRLBAR);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &sb);
+
+        list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_EDGE_FLASH);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &btn);
         break;
 #endif
 

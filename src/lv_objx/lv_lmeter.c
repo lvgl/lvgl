@@ -285,7 +285,8 @@ void lv_lmeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_
 
     lv_color_t main_color = lv_obj_get_style_scale_color(lmeter, part);
     lv_color_t grad_color = lv_obj_get_style_scale_grad_color(lmeter, part);
-    lv_color_t ina_color = lv_obj_get_style_scale_end_color(lmeter, part);
+    lv_color_t end_color = lv_obj_get_style_scale_end_color(lmeter, part);
+
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
@@ -322,11 +323,41 @@ void lv_lmeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_
         p1.x = x_out + x_ofs;
         p1.y = y_out + y_ofs;
 
-        if(i >= level) line_dsc.color = ina_color;
+        if(i >= level) line_dsc.color = end_color;
         else line_dsc.color = lv_color_mix(grad_color, main_color, (255 * i) / ext->line_cnt);
 
         lv_draw_line(&p1, &p2, clip_area, &line_dsc);
     }
+
+    if(part == LV_LMETER_PART_MAIN) {
+        lv_style_int_t border_width = lv_obj_get_style_scale_border_width(lmeter, part);
+        lv_style_int_t end_border_width = lv_obj_get_style_scale_end_border_width(lmeter, part);
+
+
+        if(border_width || end_border_width)
+        {
+            int16_t end_angle = (level * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs - 1;
+            lv_draw_line_dsc_t arc_dsc;
+            lv_draw_line_dsc_init(&arc_dsc);
+            lv_obj_init_draw_line_dsc(lmeter, part, &arc_dsc);
+
+            if(border_width) {
+                arc_dsc.width = border_width;
+                arc_dsc.color = main_color;
+                lv_draw_arc(x_ofs, y_ofs, r_out, angle_ofs, end_angle, clip_area, &arc_dsc);
+            }
+
+            if(end_border_width) {
+                arc_dsc.width = end_border_width;
+            arc_dsc.color = end_color;
+            lv_draw_arc(x_ofs, y_ofs, r_out, end_angle, (angle_ofs + ext->scale_angle) % 360, clip_area, &arc_dsc);
+            }
+
+
+        }
+    }
+
+
 }
 
 /**********************
