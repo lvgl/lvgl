@@ -29,7 +29,6 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
 static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip, lv_draw_line_dsc_t * dsc);
 static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip, lv_draw_line_dsc_t * dsc);
 
-
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -61,6 +60,8 @@ void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
 void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip, lv_draw_line_dsc_t * dsc)
 {
     if(dsc->width == 0) return;
+    if(dsc->opa <= LV_OPA_MIN) return;
+
     if(point1->x == point2->x && point1->y == point2->y) return;
 
     lv_area_t clip_line;
@@ -85,8 +86,8 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
         cir_dsc.radius = LV_RADIUS_CIRCLE;
         cir_dsc.bg_opa = dsc->opa;
 
-        lv_coord_t r = (dsc->width >> 1);
-        lv_coord_t r_corr = (dsc->width & 1) ? 0 : 1;
+        int32_t r = (dsc->width >> 1);
+        int32_t r_corr = (dsc->width & 1) ? 0 : 1;
         lv_area_t cir_area;
 
         if(dsc->round_start) {
@@ -120,9 +121,9 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
 
     const lv_area_t * disp_area = &vdb->area;
 
-    lv_coord_t w = dsc->width - 1;
-    lv_coord_t w_half0 = w >> 1;
-    lv_coord_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
+    int32_t w = dsc->width - 1;
+    int32_t w_half0 = w >> 1;
+    int32_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
     bool dashed = dsc->dash_gap && dsc->dash_width ? true : false;
 
@@ -157,7 +158,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
         draw_area.x2 -= disp_area->x1;
         draw_area.y2 -= disp_area->y1;
 
-        lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
+        int32_t draw_area_w = lv_area_get_width(&draw_area);
 
         lv_area_t fill_area;
         fill_area.x1 = draw_area.x1 + disp_area->x1;
@@ -168,7 +169,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
         lv_style_int_t dash_start = (vdb->area.x1 + draw_area.x1) % (dsc->dash_gap + dsc->dash_width);
 
         lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
-        lv_coord_t h;
+        int32_t h;
         lv_draw_mask_res_t mask_res;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
              memset(mask_buf, LV_OPA_COVER, draw_area_w);
@@ -215,9 +216,9 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
 
     const lv_area_t * disp_area = &vdb->area;
 
-    lv_coord_t w = dsc->width - 1;
-    lv_coord_t w_half0 = w >> 1;
-    lv_coord_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
+    int32_t w = dsc->width - 1;
+    int32_t w_half0 = w >> 1;
+    int32_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
     bool dashed = dsc->dash_gap && dsc->dash_width ? true : false;
 
@@ -252,7 +253,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
         draw_area.x2 -= vdb->area.x1;
         draw_area.y2 -= vdb->area.y1;
 
-        lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
+        int32_t draw_area_w = lv_area_get_width(&draw_area);
 
         lv_area_t fill_area;
         fill_area.x1 = draw_area.x1 + disp_area->x1;
@@ -265,7 +266,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
         lv_style_int_t dash_start = (vdb->area.y1 + draw_area.y1) % (dsc->dash_gap + dsc->dash_width);
         lv_style_int_t dash_cnt = dash_start;
 
-        lv_coord_t h;
+        int32_t h;
         lv_draw_mask_res_t mask_res;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
              memset(mask_buf, LV_OPA_COVER, draw_area_w);
@@ -315,8 +316,8 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
         p2.x = point1->x;
     }
 
-    lv_coord_t xdiff = p2.x - p1.x;
-    lv_coord_t ydiff = p2.y - p1.y;
+    int32_t xdiff = p2.x - p1.x;
+    int32_t ydiff = p2.y - p1.y;
     bool flat = LV_MATH_ABS(xdiff) > LV_MATH_ABS(ydiff) ? true : false;
 
     static const uint8_t wcorr[] = {
@@ -327,14 +328,14 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
         181,
     };
 
-    lv_coord_t w = dsc->width;
-    lv_coord_t wcorr_i = 0;
+    int32_t w = dsc->width;
+    int32_t wcorr_i = 0;
     if(flat) wcorr_i = (LV_MATH_ABS(ydiff) << 5) / LV_MATH_ABS(xdiff);
     else wcorr_i = (LV_MATH_ABS(xdiff) << 5) / LV_MATH_ABS(ydiff);
 
     w = (w * wcorr[wcorr_i]) >> 7;
-    lv_coord_t w_half0 = w >> 1;
-    lv_coord_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
+    int32_t w_half0 = w >> 1;
+    int32_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 
     lv_area_t draw_area;
     draw_area.x1 = LV_MATH_MIN(p1.x, p2.x) - w;
@@ -386,10 +387,10 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     draw_area.x2 -= disp_area->x1;
     draw_area.y2 -= disp_area->y1;
 
-    lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
+    int32_t draw_area_w = lv_area_get_width(&draw_area);
 
     /*Draw the background line by line*/
-    lv_coord_t h;
+    int32_t h;
     lv_draw_mask_res_t mask_res;
     lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
     lv_area_t fill_area;

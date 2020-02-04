@@ -777,8 +777,12 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             lv_btnm_set_map(btnm, ext->map_p);
         }
     } else if(sign == LV_SIGNAL_PRESSED) {
-        lv_indev_t * indev = lv_indev_get_act();
-        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
+        invalidate_button_area(btnm, ext->btn_id_pr);
+        invalidate_button_area(btnm, ext->btn_id_focused);
+
+        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+
+        if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
             uint16_t btn_pr;
             /*Search the pressed area*/
             lv_indev_get_point(param, &p);
@@ -787,8 +791,13 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             invalidate_button_area(btnm, ext->btn_id_pr) /*Invalidate the old area*/;
             ext->btn_id_pr = btn_pr;
             ext->btn_id_act = btn_pr;
+            ext->btn_id_focused = btn_pr;
             invalidate_button_area(btnm, ext->btn_id_pr); /*Invalidate the new area*/
+        } else if(indev_type == LV_INDEV_TYPE_KEYPAD || (indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(btnm)))) {
+            ext->btn_id_pr = ext->btn_id_focused;
+            invalidate_button_area(btnm, ext->btn_id_focused);
         }
+
         if(ext->btn_id_act != LV_BTNM_BTN_NONE) {
             if(button_is_click_trig(ext->ctrl_bits[ext->btn_id_act]) == false &&
                button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
@@ -807,6 +816,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             lv_indev_reset_long_press(param); /*Start the log press time again on the new button*/
             if(ext->btn_id_pr != LV_BTNM_BTN_NONE) {
                 invalidate_button_area(btnm, ext->btn_id_pr);
+                invalidate_button_area(btnm, ext->btn_id_focused);
             }
             if(btn_pr != LV_BTNM_BTN_NONE) {
                 uint32_t b = ext->btn_id_act;
@@ -818,12 +828,13 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         }
 
         ext->btn_id_pr  = btn_pr;
+        ext->btn_id_focused  = btn_pr;
         ext->btn_id_act = btn_pr;
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->btn_id_pr != LV_BTNM_BTN_NONE) {
             /*Toggle the button if enabled*/
             if(button_is_tgl_enabled(ext->ctrl_bits[ext->btn_id_pr]) &&
-               !button_is_inactive(ext->ctrl_bits[ext->btn_id_pr])) {
+                    !button_is_inactive(ext->ctrl_bits[ext->btn_id_pr])) {
                 if(button_get_tgl_state(ext->ctrl_bits[ext->btn_id_pr])) {
                     ext->ctrl_bits[ext->btn_id_pr] &= (~LV_BTNM_CTRL_CHECHK_STATE);
                 } else {
@@ -834,7 +845,6 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
             /*Invalidate to old pressed area*/;
             invalidate_button_area(btnm, ext->btn_id_pr);
-            ext->btn_id_focused  = ext->btn_id_pr;
             ext->btn_id_pr = LV_BTNM_BTN_NONE;
 
             if(button_is_click_trig(ext->ctrl_bits[ext->btn_id_act]) == true &&
@@ -870,17 +880,17 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
        if(indev_type == LV_INDEV_TYPE_ENCODER) {
             /*In navigation mode don't select any button but in edit mode select the fist*/
-            if(lv_group_get_editing(lv_obj_get_group(btnm)))
+            if(lv_group_get_editing(lv_obj_get_group(btnm))) {
                 ext->btn_id_focused = 0;
-            else
+            } else {
                 ext->btn_id_focused = LV_BTNM_BTN_NONE;
+            }
+        } else if (indev_type == LV_INDEV_TYPE_KEYPAD) {
+            ext->btn_id_focused = 0;
         }
-#else
-        ext->btn_id_focused = 0;
-#endif
 
         ext->btn_id_act = ext->btn_id_focused;
-        lv_obj_invalidate(btnm);
+#endif
     }
     else if(sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_LEAVE) {
         if(ext->btn_id_focused != LV_BTNM_BTN_NONE) invalidate_button_area(btnm, ext->btn_id_focused);

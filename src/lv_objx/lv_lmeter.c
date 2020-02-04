@@ -84,9 +84,7 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new line meter line meter*/
     if(copy == NULL) {
         lv_obj_set_size(new_lmeter, LV_DPI, LV_DPI);
-
-        lv_style_list_reset(lv_obj_get_style_list(new_lmeter, LV_LMETER_PART_MAIN));
-        _ot(new_lmeter, LV_LMETER_PART_MAIN, LMETER);
+        lv_theme_apply(new_lmeter, LV_THEME_LMETER);
     }
     /*Copy an existing line meter*/
     else {
@@ -272,12 +270,16 @@ void lv_lmeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_
 {
     lv_lmeter_ext_t * ext    = lv_obj_get_ext_attr(lmeter);
 
-    lv_coord_t r_out = lv_obj_get_width(lmeter) / 2;
+    lv_style_int_t left = lv_obj_get_style_pad_left(lmeter, LV_LMETER_PART_MAIN);
+    lv_style_int_t right = lv_obj_get_style_pad_right(lmeter, LV_LMETER_PART_MAIN);
+    lv_style_int_t top = lv_obj_get_style_pad_top(lmeter, LV_LMETER_PART_MAIN);
+
+    lv_coord_t r_out = (lv_obj_get_width(lmeter) - left - right) / 2 ;
     lv_coord_t r_in  = r_out - lv_obj_get_style_scale_width(lmeter, part);
     if(r_in < 1) r_in = 1;
 
-    lv_coord_t x_ofs  = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
-    lv_coord_t y_ofs  = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
+    lv_coord_t x_ofs  = lmeter->coords.x1 + r_out + left;
+    lv_coord_t y_ofs  = lmeter->coords.y1 + r_out + top;
     int16_t angle_ofs = ext->angle_ofs + 90 + (360 - ext->scale_angle) / 2;
     int16_t level =
         (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
@@ -333,7 +335,6 @@ void lv_lmeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_
         lv_style_int_t border_width = lv_obj_get_style_scale_border_width(lmeter, part);
         lv_style_int_t end_border_width = lv_obj_get_style_scale_end_border_width(lmeter, part);
 
-
         if(border_width || end_border_width)
         {
             int16_t end_angle = (level * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs - 1;
@@ -383,6 +384,10 @@ static lv_design_res_t lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * cli
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
+        lv_draw_rect_dsc_t bg_dsc;
+        lv_draw_rect_dsc_init(&bg_dsc);
+        lv_obj_init_draw_rect_dsc(lmeter, LV_LMETER_PART_MAIN, &bg_dsc);
+        lv_draw_rect(&lmeter->coords, clip_area, &bg_dsc);
         lv_lmeter_draw_scale(lmeter, clip_area, LV_LMETER_PART_MAIN);
     }
     /*Post draw when the children are drawn*/

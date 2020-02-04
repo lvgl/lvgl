@@ -48,6 +48,9 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness,
  */
 void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle, const lv_area_t * clip_area, lv_draw_line_dsc_t * dsc)
 {
+    if(dsc->opa <= LV_OPA_MIN) return;
+    if(dsc->width == 0) return;
+
     lv_draw_rect_dsc_t cir_dsc;
     lv_draw_rect_dsc_init(&cir_dsc);
     cir_dsc.radius = LV_RADIUS_CIRCLE;
@@ -114,8 +117,8 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness,
     int32_t thick_half = tickness / 2;
     uint8_t thick_corr = tickness & 0x01 ? 0 : 1;
 
-    lv_coord_t rx_corr;
-    lv_coord_t ry_corr;
+    int32_t rx_corr;
+    int32_t ry_corr;
 
     if(angle > 90 && angle < 270) rx_corr = 0;
     else  rx_corr = 0;

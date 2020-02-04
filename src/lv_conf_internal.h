@@ -363,6 +363,11 @@
 #define LV_USE_ASSERT_MEM       1
 #endif
 
+/*Check the integrity of `lv_mem` after critical operations. (Slow)*/
+#ifndef LV_USE_ASSERT_MEM_INTEGRITY
+#define LV_USE_ASSERT_MEM_INTEGRITY       0
+#endif
+
 /* Check the strings.
  * Search for NULL, very long strings, invalid characters, and unnatural repetitions. (Slow)
  * If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled) */

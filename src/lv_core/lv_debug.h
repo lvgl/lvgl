@@ -30,6 +30,8 @@ extern "C" {
  **********************/
 bool lv_debug_check_null(const void * p);
 
+bool lv_debug_check_mem_integrity(void);
+
 bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
 
 bool lv_debug_check_obj_valid(const lv_obj_t * obj);
@@ -61,6 +63,11 @@ do {                                            \
 
 #ifndef LV_DEBUG_IS_NULL
 #define LV_DEBUG_IS_NULL(p)    (lv_debug_check_null(p))
+#endif
+
+
+#ifndef LV_DEBUG_CHECK_MEM_INTEGRITY
+#define LV_DEBUG_CHECK_MEM_INTEGRITY()    (lv_debug_check_mem_integrity())
 #endif
 
 #ifndef LV_DEBUG_IS_STR
@@ -100,6 +107,14 @@ do {                                            \
 # define LV_ASSERT_MEM(p) true
 #endif
 
+#if LV_USE_ASSERT_MEM_INTEGRITY
+# ifndef LV_ASSERT_MEM_INTEGRITY
+#  define LV_ASSERT_MEM_INTEGRITY() LV_DEBUG_ASSERT(LV_DEBUG_CHECK_MEM_INTEGRITY(), "Memory integrity error", 0);
+# endif
+#else
+# define LV_ASSERT_MEM_INTEGRITY() true
+#endif
+
 #if LV_USE_ASSERT_STR
 # ifndef LV_ASSERT_STR
 #  define LV_ASSERT_STR(str) LV_DEBUG_ASSERT(LV_DEBUG_IS_STR(str), "Strange or invalid string", str);
@@ -111,7 +126,6 @@ do {                                            \
 #   define LV_ASSERT_STR(str) true
 # endif
 #endif
-
 
 #if LV_USE_ASSERT_OBJ
 # ifndef LV_ASSERT_OBJ

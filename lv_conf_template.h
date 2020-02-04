@@ -269,6 +269,11 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 /*Checks is the memory is successfully allocated or no. (Quite fast)*/
 #define LV_USE_ASSERT_MEM       1
 
+/*Check the integrity of `lv_mem` after critical operations. (Slow)*/
+#ifndef LV_USE_ASSERT_MEM_INTEGRITY
+#define LV_USE_ASSERT_MEM_INTEGRITY       0
+#endif
+
 /* Check the strings.
  * Search for NULL, very long strings, invalid characters, and unnatural repetitions. (Slow)
  * If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled) */

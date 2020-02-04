@@ -80,8 +80,7 @@ static lv_style_t lmeter;
 #endif
 
 #if LV_USE_GAUGE
-static lv_style_t gauge;
-static lv_style_t gauge_strong;
+static lv_style_t gauge_main, gauge_strong, gauge_needle;
 #endif
 
 
@@ -131,48 +130,49 @@ static lv_style_t chart_series_bg, chart_series;
 static void basic_init(void)
 {
     lv_style_init(&scr);
-    lv_style_set_opa(&scr, LV_STYLE_BG_OPA, LV_OPA_COVER);
-    lv_style_set_color(&scr, LV_STYLE_BG_COLOR, COLOR_SCREEN);
-    lv_style_set_color(&scr, LV_STYLE_TEXT_COLOR , lv_color_hex(0xb8b8b9));
+    lv_style_set_bg_opa(&scr, LV_STYLE_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_bg_color(&scr, LV_STYLE_STATE_NORMAL, COLOR_SCREEN);
+    lv_style_set_text_color(&scr, LV_STYLE_STATE_NORMAL, lv_color_hex(0xb8b8b9));
 
     lv_style_init(&panel);
-    lv_style_set_int(&panel, LV_STYLE_RADIUS, LV_DPI / 25);
-    lv_style_set_opa(&panel, LV_STYLE_BG_OPA, LV_OPA_COVER);
-    lv_style_set_color(&panel, LV_STYLE_BG_COLOR, COLOR_CONTAINER);
+    lv_style_set_radius(&panel, LV_STYLE_STATE_NORMAL, LV_DPI / 25);
+    lv_style_set_bg_opa(&panel, LV_STYLE_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_bg_color(&panel, LV_STYLE_STATE_NORMAL, COLOR_CONTAINER);
 //    lv_style_set_color(&panel, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
-    lv_style_set_color(&panel, LV_STYLE_BORDER_COLOR, lv_color_lighten(COLOR_CONTAINER, LV_OPA_10));
-    lv_style_set_int(&panel, LV_STYLE_BORDER_WIDTH, LV_DPI / 50 > 0 ? LV_DPI / 50 : 1);
-    lv_style_set_int(&panel, LV_STYLE_BORDER_SIDE , LV_BORDER_SIDE_TOP);
-    lv_style_set_int(&panel, LV_STYLE_PAD_LEFT, LV_DPI / 5);
-    lv_style_set_int(&panel, LV_STYLE_PAD_RIGHT, LV_DPI / 5);
-    lv_style_set_int(&panel, LV_STYLE_PAD_TOP, LV_DPI / 5);
-    lv_style_set_int(&panel, LV_STYLE_PAD_BOTTOM, LV_DPI / 5);
-    lv_style_set_int(&panel, LV_STYLE_PAD_INNER, LV_DPI / 5);
-    lv_style_set_color(&panel, LV_STYLE_TEXT_COLOR, lv_color_hex(0x979a9f));
-    lv_style_set_ptr(&panel, LV_STYLE_FONT, &lv_font_roboto_16);
-    lv_style_set_color(&panel, LV_STYLE_IMAGE_RECOLOR, lv_color_hex(0x979a9f));
-    lv_style_set_color(&panel, LV_STYLE_LINE_COLOR, lv_color_hex(0x979a9f));
-    lv_style_set_int(&panel, LV_STYLE_LINE_WIDTH, 1);
-    lv_style_set_color(&panel, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
+    lv_style_set_border_color(&panel, LV_STYLE_STATE_NORMAL, lv_color_lighten(COLOR_CONTAINER, LV_OPA_10));
+    lv_style_set_border_width(&panel, LV_STYLE_STATE_NORMAL, LV_DPI / 50 > 0 ? LV_DPI / 50 : 1);
+    lv_style_set_border_side(&panel, LV_STYLE_STATE_NORMAL , LV_BORDER_SIDE_TOP);
+    lv_style_set_pad_left(&panel, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
+    lv_style_set_pad_right(&panel, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
+    lv_style_set_pad_top(&panel, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
+    lv_style_set_pad_bottom(&panel, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
+    lv_style_set_pad_inner(&panel, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
+    lv_style_set_text_color(&panel, LV_STYLE_STATE_NORMAL, lv_color_hex(0x979a9f));
+    lv_style_set_font(&panel, LV_STYLE_STATE_NORMAL, &lv_font_roboto_16);
+    lv_style_set_image_recolor(&panel, LV_STYLE_STATE_NORMAL, lv_color_hex(0x979a9f));
+    lv_style_set_line_color(&panel, LV_STYLE_STATE_NORMAL, lv_color_hex(0x979a9f));
+    lv_style_set_line_width(&panel, LV_STYLE_STATE_NORMAL, 1);
+    lv_style_set_border_color(&panel, LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
+    lv_style_set_transition_time(&panel, LV_STYLE_STATE_NORMAL, 500);
 
     lv_style_init(&btn);
-    lv_style_set_int(&btn, LV_STYLE_RADIUS, LV_RADIUS_CIRCLE);
-    lv_style_set_opa(&btn, LV_STYLE_BG_OPA, LV_OPA_COVER);
-    lv_style_set_color(&btn, LV_STYLE_BG_COLOR, COLOR_ACCENT);
-    lv_style_set_color(&btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_PRESSED, lv_color_darken(COLOR_ACCENT, LV_OPA_20));
-    lv_style_set_color(&btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_DISABLED, COLOR_DISABLED);
-    lv_style_set_color(&btn, LV_STYLE_TEXT_COLOR, lv_color_hex(0xffffff));
-    lv_style_set_color(&btn, LV_STYLE_TEXT_COLOR| LV_STYLE_STATE_PRESSED, lv_color_darken(lv_color_hex(0xffffff), LV_OPA_20));
-    lv_style_set_color(&btn, LV_STYLE_TEXT_COLOR| LV_STYLE_STATE_DISABLED, lv_color_hex(0x686b70));
-    lv_style_set_color(&btn, LV_STYLE_IMAGE_RECOLOR, LV_COLOR_WHITE);
-    lv_style_set_color(&btn, LV_STYLE_IMAGE_RECOLOR| LV_STYLE_STATE_PRESSED, lv_color_darken(lv_color_hex(0xffffff), LV_OPA_20));
-    lv_style_set_int(&btn, LV_STYLE_PAD_LEFT, LV_DPI / 5);
-    lv_style_set_int(&btn, LV_STYLE_PAD_RIGHT, LV_DPI / 5);
-    lv_style_set_int(&btn, LV_STYLE_PAD_TOP, LV_DPI / 10);
-    lv_style_set_int(&btn, LV_STYLE_PAD_BOTTOM, LV_DPI / 10);
-    lv_style_set_int(&btn, LV_STYLE_PAD_INNER, LV_DPI / 10);
-    lv_style_set_int(&btn, LV_STYLE_TRANSITION_TIME, 500);
-    lv_style_set_color(&btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, lv_color_mix(LV_COLOR_RED, COLOR_ACCENT, LV_OPA_50));
+    lv_style_set_radius(&btn, LV_STYLE_STATE_NORMAL, LV_RADIUS_CIRCLE);
+    lv_style_set_bg_opa(&btn, LV_STYLE_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_bg_color(&btn, LV_STYLE_STATE_NORMAL, COLOR_ACCENT);
+    lv_style_set_bg_color(&btn, LV_STYLE_STATE_PRESSED, lv_color_darken(COLOR_ACCENT, LV_OPA_20));
+    lv_style_set_bg_color(&btn, LV_STYLE_STATE_DISABLED, COLOR_DISABLED);
+    lv_style_set_text_color(&btn, LV_STYLE_STATE_NORMAL, lv_color_hex(0xffffff));
+    lv_style_set_text_color(&btn, LV_STYLE_STATE_PRESSED, lv_color_darken(lv_color_hex(0xffffff), LV_OPA_20));
+    lv_style_set_text_color(&btn, LV_STYLE_STATE_DISABLED, lv_color_hex(0x686b70));
+    lv_style_set_image_recolor(&btn, LV_STYLE_STATE_NORMAL, LV_COLOR_WHITE);
+    lv_style_set_image_recolor(&btn, LV_STYLE_STATE_PRESSED, lv_color_darken(lv_color_hex(0xffffff), LV_OPA_20));
+    lv_style_set_pad_left(&btn, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
+    lv_style_set_pad_right(&btn, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
+    lv_style_set_pad_top(&btn, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
+    lv_style_set_pad_bottom(&btn, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
+    lv_style_set_pad_inner(&btn, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
+    lv_style_set_transition_time(&btn, LV_STYLE_TRANSITION_TIME, 500);
+    lv_style_set_bg_color(&btn, LV_STYLE_STATE_FOCUS, lv_color_mix(LV_COLOR_RED, COLOR_ACCENT, LV_OPA_50));
 }
 
 static void cont_init(void)
@@ -277,15 +277,20 @@ static void lmeter_init(void)
 static void gauge_init(void)
 {
 #if LV_USE_GAUGE != 0
-    lv_style_init(&gauge);
-    lv_style_set_color(&gauge, LV_STYLE_SCALE_COLOR, COLOR_DISABLED);
-    lv_style_set_color(&gauge, LV_STYLE_SCALE_GRAD_COLOR, COLOR_DISABLED);
-    lv_style_set_color(&gauge, LV_STYLE_SCALE_END_COLOR, COLOR_ACCENT);
-    lv_style_set_int(&gauge, LV_STYLE_LINE_WIDTH, 2);
-    lv_style_set_int(&gauge, LV_STYLE_SCALE_END_BORDER_WIDTH, 4);
-    lv_style_set_opa(&gauge, LV_STYLE_BG_OPA, LV_OPA_COVER);
-    lv_style_set_color(&gauge, LV_STYLE_BG_COLOR, LV_COLOR_LIME);
-    lv_style_set_int(&gauge, LV_STYLE_SIZE, 4);
+    lv_style_init(&gauge_main);
+    lv_style_copy(&gauge_main, &panel);
+    lv_style_set_radius(&gauge_main, LV_STYLE_STATE_NORMAL, LV_RADIUS_CIRCLE);
+    lv_style_set_border_side(&gauge_main, LV_STYLE_STATE_NORMAL, LV_BORDER_SIDE_FULL);
+    lv_style_set_scale_color(&gauge_main, LV_STYLE_STATE_NORMAL, COLOR_DISABLED);
+    lv_style_set_scale_grad_color(&gauge_main, LV_STYLE_STATE_NORMAL, COLOR_DISABLED);
+    lv_style_set_scale_end_color(&gauge_main, LV_STYLE_STATE_NORMAL, COLOR_ACCENT);
+    lv_style_set_line_width(&gauge_main, LV_STYLE_STATE_NORMAL, 2);
+    lv_style_set_scale_end_border_width(&gauge_main, LV_STYLE_STATE_NORMAL, 4);
+    lv_style_set_bg_opa(&gauge_main, LV_STYLE_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_pad_left(&gauge_main, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
+    lv_style_set_pad_right(&gauge_main, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
+    lv_style_set_pad_top(&gauge_main, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
+    lv_style_set_pad_inner(&gauge_main, LV_STYLE_STATE_NORMAL, LV_DPI / 8);
 
 
     lv_style_init(&gauge_strong);
@@ -295,6 +300,14 @@ static void gauge_init(void)
     lv_style_set_int(&gauge_strong, LV_STYLE_LINE_WIDTH, 4);
     lv_style_set_int(&gauge_strong, LV_STYLE_SCALE_WIDTH, LV_DPI/5);
     lv_style_set_int(&gauge_strong, LV_STYLE_PAD_INNER, LV_DPI/10);
+
+    lv_style_init(&gauge_needle);
+    lv_style_set_color(&gauge_needle, LV_STYLE_LINE_COLOR, LV_COLOR_WHITE);
+    lv_style_set_int(&gauge_needle, LV_STYLE_LINE_WIDTH, LV_DPI / 30);
+    lv_style_set_bg_opa(&gauge_needle, LV_STYLE_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_bg_color(&gauge_needle, LV_STYLE_STATE_NORMAL, LV_COLOR_WHITE);
+    lv_style_set_size(&gauge_needle, LV_STYLE_STATE_NORMAL, 10);
+    lv_style_set_pad_inner(&gauge_needle, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
 #endif
 }
 
@@ -428,6 +441,7 @@ static void btnm_init(void)
     lv_style_set_color(&btnm_btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_CHECKED | LV_STYLE_STATE_PRESSED, lv_color_darken(COLOR_ACCENT, LV_OPA_40));
     lv_style_set_color(&btnm_btn, LV_STYLE_TEXT_COLOR , LV_COLOR_WHITE);
     lv_style_set_color(&btnm_btn, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_DISABLED , LV_COLOR_GRAY);
+    lv_style_set_color(&btnm_btn, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
     lv_style_set_opa(&btnm_btn, LV_STYLE_BG_OPA | LV_STYLE_STATE_CHECKED, LV_OPA_COVER);
     lv_style_set_opa(&btnm_btn, LV_STYLE_BG_OPA | LV_STYLE_STATE_PRESSED, LV_OPA_COVER);
     lv_style_set_opa(&btnm_btn, LV_STYLE_BG_OPA | LV_STYLE_STATE_DISABLED, LV_OPA_COVER);
@@ -566,7 +580,7 @@ static void tabview_init(void)
     lv_style_set_opa(&tabview_btns, LV_STYLE_BG_OPA | LV_STYLE_STATE_PRESSED, LV_OPA_COVER);
     lv_style_set_color(&tabview_btns, LV_STYLE_BG_COLOR | LV_STYLE_STATE_PRESSED, lv_color_hex(0x444444));
     lv_style_set_color(&tabview_btns, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_CHECKED, COLOR_ACCENT);
-    lv_style_set_color(&tabview_btns, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_GREEN);
+    lv_style_set_color(&tabview_btns, LV_STYLE_TEXT_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
     lv_style_set_int(&tabview_btns, LV_STYLE_PAD_TOP, LV_DPI / 5);
     lv_style_set_int(&tabview_btns, LV_STYLE_PAD_BOTTOM, LV_DPI / 5);
 
@@ -1051,6 +1065,21 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_add_style(list, &calendar_daynames);
         break;
 #endif
+#if LV_USE_GAUGE
+    case LV_THEME_GAUGE:
+        list = lv_obj_get_style_list(obj, LV_GAUGE_PART_MAIN);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &gauge_main);
+
+        list = lv_obj_get_style_list(obj, LV_GAUGE_PART_STRONG);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &gauge_strong);
+
+        list = lv_obj_get_style_list(obj, LV_GAUGE_PART_NEEDLE);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &gauge_needle);
+        break;
+#endif
     }
 
 
@@ -1066,27 +1095,9 @@ lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
     case LV_THEME_LMETER:
         return &lmeter;
 #endif
-#if LV_USE_GAUGE
-    case LV_THEME_GAUGE:
-        return &gauge;
-    case LV_THEME_GAUGE_STRONG:
-        return &gauge_strong;
-#endif
-#if LV_USE_LIST
-    case LV_THEME_LIST_BTN:
-        return &btn;
-#endif
 
 #if LV_USE_LED
     case LV_THEME_LED:
-        return &btn;
-#endif
-#if LV_USE_MBOX
-    case LV_THEME_MBOX_BG:
-        return &panel;
-    case LV_THEME_MBOX_BTN_BG:
-        return NULL;
-    case LV_THEME_MBOX_BTN:
         return &btn;
 #endif
     }

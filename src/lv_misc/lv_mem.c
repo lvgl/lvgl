@@ -356,10 +356,8 @@ lv_res_t lv_mem_test(void)
     lv_mem_ent_t * e;
     e = ent_get_next(NULL);
     while(e) {
-        if((e->header.s.used && e->header.s.d_size > 20000) ||
+        if((e->header.s.used && e->header.s.d_size > LV_MEM_SIZE) ||
             (e->header.s.used == 0 && e->header.s.d_size > LV_MEM_SIZE)) {
-            printf("mem err\n");
-            while(1);
             return LV_RES_INV;
         }
         e = ent_get_next(e);

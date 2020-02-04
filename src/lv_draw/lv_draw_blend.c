@@ -110,8 +110,8 @@ void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
 
     /*Round the values in the mask if anti-aliasing is disabled*/
     if(mask && disp->driver.antialiasing == 0) {
-        lv_coord_t mask_w = lv_area_get_width(&draw_area);
-        lv_coord_t i;
+        int32_t mask_w = lv_area_get_width(&draw_area);
+        int32_t i;
         for (i = 0; i < mask_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
     }
 
@@ -156,8 +156,8 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
 
     /*Round the values in the mask if anti-aliasing is disabled*/
     if(mask && disp->driver.antialiasing == 0) {
-        lv_coord_t mask_w = lv_area_get_width(&draw_area);
-        lv_coord_t i;
+        int32_t mask_w = lv_area_get_width(&draw_area);
+        int32_t i;
         for (i = 0; i < mask_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
     }
     if(disp->driver.set_px_cb) {
@@ -183,10 +183,10 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
 
     /*Get the width of the `disp_area` it will be used to go to the next line*/
-    lv_coord_t disp_w = lv_area_get_width(disp_area);
+    int32_t disp_w = lv_area_get_width(disp_area);
 
-    lv_coord_t x;
-    lv_coord_t y;
+    int32_t x;
+    int32_t y;
 
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
         for(y = draw_area->y1; y <= draw_area->y2; y++) {
@@ -201,11 +201,11 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
         const lv_opa_t * mask_tmp = mask - draw_area->x1;
 
         /*Get the width of the `draw_area` it will be used to go to the next line of the mask*/
-        lv_coord_t draw_area_w = lv_area_get_width(draw_area);
+        int32_t draw_area_w = lv_area_get_width(draw_area);
 
         for(y = draw_area->y1; y <= draw_area->y2; y++) {
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
-                disp->driver.set_px_cb(&disp->driver, (void*)disp_buf, disp_w, x, y, color, (uint16_t)((uint16_t)opa * mask_tmp[x]) >> 8);
+                disp->driver.set_px_cb(&disp->driver, (void*)disp_buf, disp_w, x, y, color, (uint32_t)((uint32_t)opa * mask_tmp[x]) >> 8);
             }
             mask_tmp += draw_area_w;
         }
@@ -220,16 +220,16 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
 
     /*Get the width of the `disp_area` it will be used to go to the next line*/
-    lv_coord_t disp_w = lv_area_get_width(disp_area);
+    int32_t disp_w = lv_area_get_width(disp_area);
 
     /*Get the width of the `draw_area` it will be used to go to the next line of the mask*/
-    lv_coord_t draw_area_w = lv_area_get_width(draw_area);
+    int32_t draw_area_w = lv_area_get_width(draw_area);
 
     /*Create a temp. disp_buf which always point to current line to draw*/
     lv_color_t * disp_buf_tmp = disp_buf + disp_w * draw_area->y1;
 
-    lv_coord_t x;
-    lv_coord_t y;
+    int32_t x;
+    int32_t y;
 
     /*Simple fill (maybe with opacity), no masking*/
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
@@ -245,7 +245,7 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
 
             /*Fill the first line. Use `memcpy` because it's faster then simple value assignment*/
             /*Set the first pixels manually*/
-            lv_coord_t direct_fill_end = LV_MATH_MIN(draw_area->x2, draw_area->x1 + FILL_DIRECT_LEN + (draw_area_w & FILL_DIRECT_MASK) - 1);
+            int32_t direct_fill_end = LV_MATH_MIN(draw_area->x2, draw_area->x1 + FILL_DIRECT_LEN + (draw_area_w & FILL_DIRECT_MASK) - 1);
             for(x = draw_area->x1; x <= direct_fill_end ; x++) {
                 disp_buf_tmp[x].full = color.full;
             }
@@ -344,7 +344,7 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
                 for(x = draw_area->x1; x <= draw_area->x2; x++) {
                     if(mask_tmp[x] == 0) continue;
                     if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full) {
-                        lv_opa_t opa_tmp = (uint16_t)((uint16_t)mask_tmp[x] * opa) >> 8;
+                        lv_opa_t opa_tmp = (uint32_t)((uint32_t)mask_tmp[x] * opa) >> 8;
 #if LV_COLOR_SCREEN_TRANSP
                         if(disp->driver.screen_transp) {
                             lv_color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[x].ch.alpha, color, opa_tmp, &last_res_color, &last_res_color.ch.alpha);
@@ -373,7 +373,7 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
         const lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_blend_mode_t mode)
 {
     /*Get the width of the `disp_area` it will be used to go to the next line*/
-    lv_coord_t disp_w = lv_area_get_width(disp_area);
+    int32_t disp_w = lv_area_get_width(disp_area);
 
     /*Create a temp. disp_buf which always point to current line to draw*/
     lv_color_t * disp_buf_tmp = disp_buf + disp_w * draw_area->y1;
@@ -393,8 +393,8 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
         break;
     }
 
-    lv_coord_t x;
-    lv_coord_t y;
+    int32_t x;
+    int32_t y;
 
     /*Simple fill (maybe with opacity), no masking*/
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
@@ -414,7 +414,7 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
     /*Masked*/
     else {
         /*Get the width of the `draw_area` it will be used to go to the next line of the mask*/
-        lv_coord_t draw_area_w = lv_area_get_width(draw_area);
+        int32_t draw_area_w = lv_area_get_width(draw_area);
 
         /* The mask is relative to the clipped area.
          * In the cycles below mask will be indexed from `draw_area.x1`
@@ -432,7 +432,7 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
                 if(mask_tmp[x] == 0) continue;
                 if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full) {
-                    lv_opa_t opa_tmp = mask_tmp[x] >= LV_OPA_MAX ? opa : (uint16_t)((uint16_t)mask_tmp[x] * opa) >> 8;
+                    lv_opa_t opa_tmp = mask_tmp[x] >= LV_OPA_MAX ? opa : (uint32_t)((uint32_t)mask_tmp[x] * opa) >> 8;
 
                     last_res_color = blend_fp(color, disp_buf_tmp[x], opa_tmp);
                     last_mask = mask_tmp[x];
@@ -454,21 +454,21 @@ static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
 
     /*Get the width of the `disp_area` it will be used to go to the next line*/
-    lv_coord_t disp_w = lv_area_get_width(disp_area);
+    int32_t disp_w = lv_area_get_width(disp_area);
 
     /*Get the width of the `draw_area` it will be used to go to the next line of the mask*/
-    lv_coord_t draw_area_w = lv_area_get_width(draw_area);
+    int32_t draw_area_w = lv_area_get_width(draw_area);
 
     /*Get the width of the `mask_area` it will be used to go to the next line*/
-    lv_coord_t map_w = lv_area_get_width(map_area);
+    int32_t map_w = lv_area_get_width(map_area);
 
     /*Create a temp. map_buf which always point to current line to draw*/
     const lv_color_t * map_buf_tmp = map_buf + map_w * (draw_area->y1 - (map_area->y1 - disp_area->y1));
 
     map_buf_tmp += (draw_area->x1 - (map_area->x1 - disp_area->x1));
     map_buf_tmp -= draw_area->x1;
-    lv_coord_t x;
-    lv_coord_t y;
+    int32_t x;
+    int32_t y;
 
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
         for(y = draw_area->y1; y <= draw_area->y2; y++) {
@@ -485,7 +485,7 @@ static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
 
         for(y = draw_area->y1; y <= draw_area->y2; y++) {
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
-                disp->driver.set_px_cb(&disp->driver, (void*)disp_buf, disp_w, x, y, map_buf_tmp[x], (uint16_t)((uint16_t)opa * mask_tmp[x]) >> 8);
+                disp->driver.set_px_cb(&disp->driver, (void*)disp_buf, disp_w, x, y, map_buf_tmp[x], (uint32_t)((uint32_t)opa * mask_tmp[x]) >> 8);
             }
             mask_tmp += draw_area_w;
             map_buf_tmp += map_w;
@@ -500,13 +500,13 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
 {
 
     /*Get the width of the `disp_area` it will be used to go to the next line*/
-    lv_coord_t disp_w = lv_area_get_width(disp_area);
+    int32_t disp_w = lv_area_get_width(disp_area);
 
     /*Get the width of the `draw_area` it will be used to go to the next line of the mask*/
-    lv_coord_t draw_area_w = lv_area_get_width(draw_area);
+    int32_t draw_area_w = lv_area_get_width(draw_area);
 
     /*Get the width of the `mask_area` it will be used to go to the next line*/
-    lv_coord_t map_w = lv_area_get_width(map_area);
+    int32_t map_w = lv_area_get_width(map_area);
 
     /*Create a temp. disp_buf which always point to current line to draw*/
     lv_color_t * disp_buf_tmp = disp_buf + disp_w * draw_area->y1;
@@ -519,8 +519,8 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
     lv_opa_t opa_composed;
 #endif
 
-    lv_coord_t x;
-    lv_coord_t y;
+    int32_t x;
+    int32_t y;
 
     /*Simple fill (maybe with opacity), no masking*/
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
@@ -633,13 +633,13 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
 {
 
     /*Get the width of the `disp_area` it will be used to go to the next line*/
-    lv_coord_t disp_w = lv_area_get_width(disp_area);
+    int32_t disp_w = lv_area_get_width(disp_area);
 
     /*Get the width of the `draw_area` it will be used to go to the next line of the mask*/
-    lv_coord_t draw_area_w = lv_area_get_width(draw_area);
+    int32_t draw_area_w = lv_area_get_width(draw_area);
 
     /*Get the width of the `mask_area` it will be used to go to the next line*/
-    lv_coord_t map_w = lv_area_get_width(map_area);
+    int32_t map_w = lv_area_get_width(map_area);
 
     /*Create a temp. disp_buf which always point to current line to draw*/
     lv_color_t * disp_buf_tmp = disp_buf + disp_w * draw_area->y1;
@@ -661,8 +661,8 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
         break;
     }
 
-    lv_coord_t x;
-    lv_coord_t y;
+    int32_t x;
+    int32_t y;
 
     /*Simple fill (maybe with opacity), no masking*/
     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) {
@@ -706,7 +706,7 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
 
     if(opa <= LV_OPA_MIN) return bg;
 
-    uint16_t tmp;
+    uint32_t tmp;
 #if LV_COLOR_DEPTH == 1
     tmp = bg.full + fg.full;
     fg.full = LV_MATH_MIN(tmp, 1);
@@ -757,7 +757,7 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
 
     if(opa <= LV_OPA_MIN) return bg;
 
-    int16_t tmp;
+    int32_t tmp;
     tmp = bg.ch.red - fg.ch.red;
     fg.ch.red = LV_MATH_MAX(tmp, 0);
 

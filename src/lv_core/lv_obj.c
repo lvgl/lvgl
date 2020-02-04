@@ -2502,12 +2502,7 @@ lv_obj_state_dsc_t * lv_obj_get_state_dsc(const lv_obj_t * obj, uint8_t part)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(part < _LV_OBJ_PART_REAL_LAST) return &obj->state_dsc;
-
-
-    static uint32_t x = 0;
-    x++;
-    printf("%d\n", x);
+    if(part < _LV_OBJ_PART_REAL_LAST) return &((lv_obj_t*)obj)->state_dsc;
 
     /*If a real part is asked, then use the object's signal to get its state.
      * A real object can be in different state then the main part
@@ -2802,10 +2797,10 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
     }
 
     if(draw_dsc->border_opa != LV_OPA_TRANSP) {
-        draw_dsc->border_opa = lv_obj_get_style_border_opa(obj, part);
-        if(draw_dsc->border_opa > LV_OPA_MIN) {
-            draw_dsc->border_width = lv_obj_get_style_border_width(obj, part);
-            if(draw_dsc->border_width) {
+        draw_dsc->border_width = lv_obj_get_style_border_width(obj, part);
+        if(draw_dsc->border_width) {
+            draw_dsc->border_opa = lv_obj_get_style_border_opa(obj, part);
+            if(draw_dsc->border_opa > LV_OPA_MIN) {
                 draw_dsc->border_side = lv_obj_get_style_border_side(obj, part);
                 draw_dsc->border_color = lv_obj_get_style_border_color(obj, part);
             }
@@ -2831,10 +2826,10 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
     }
 
     if(draw_dsc->shadow_opa > LV_OPA_MIN) {
-        draw_dsc->shadow_opa = lv_obj_get_style_shadow_opa(obj, part);
-        if(draw_dsc->shadow_opa > LV_OPA_MIN) {
-            draw_dsc->shadow_width = lv_obj_get_style_shadow_width(obj, part);
-            if(draw_dsc->shadow_width) {
+        draw_dsc->shadow_width = lv_obj_get_style_shadow_width(obj, part);
+        if(draw_dsc->shadow_width) {
+            draw_dsc->shadow_opa = lv_obj_get_style_shadow_opa(obj, part);
+            if(draw_dsc->shadow_opa > LV_OPA_MIN) {
                 draw_dsc->shadow_ofs_x = lv_obj_get_style_shadow_offset_x(obj, part);
                 draw_dsc->shadow_ofs_y = lv_obj_get_style_shadow_offset_y(obj, part);
                 draw_dsc->shadow_spread = lv_obj_get_style_shadow_spread(obj, part);
@@ -2975,10 +2970,10 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             lv_mem_buf_release(param);
         }
 
-        lv_draw_rect_dsc_t draw_dsc;
-        lv_draw_rect_dsc_init(&draw_dsc);
         /*If the border is drawn later disable loading other properties*/
         if(lv_obj_get_style_border_post(obj, LV_OBJ_PART_MAIN)) {
+            lv_draw_rect_dsc_t draw_dsc;
+            lv_draw_rect_dsc_init(&draw_dsc);
             draw_dsc.bg_opa = LV_OPA_TRANSP;
             draw_dsc.pattern_opa = LV_OPA_TRANSP;
             draw_dsc.shadow_opa = LV_OPA_TRANSP;

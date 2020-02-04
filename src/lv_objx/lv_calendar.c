@@ -396,6 +396,7 @@ static lv_design_res_t lv_calendar_design(lv_obj_t * calendar, const lv_area_t *
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
+        ancestor_design(calendar, clip_area, mode);
     }
 
     return LV_DESIGN_RES_OK;

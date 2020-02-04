@@ -70,17 +70,17 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("mesasge box create started");
 
     /*Create the ancestor message box*/
-    lv_obj_t * new_mbox = lv_cont_create(par, copy);
-    LV_ASSERT_MEM(new_mbox);
-    if(new_mbox == NULL) return NULL;
+    lv_obj_t * mbox = lv_cont_create(par, copy);
+    LV_ASSERT_MEM(mbox);
+    if(mbox == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_mbox);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(mbox);
 
     /*Allocate the message box type specific extended data*/
-    lv_mbox_ext_t * ext = lv_obj_allocate_ext_attr(new_mbox, sizeof(lv_mbox_ext_t));
+    lv_mbox_ext_t * ext = lv_obj_allocate_ext_attr(mbox, sizeof(lv_mbox_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_mbox);
+        lv_obj_del(mbox);
         return NULL;
     }
 
@@ -91,42 +91,41 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(new_mbox, lv_mbox_signal);
+    lv_obj_set_signal_cb(mbox, lv_mbox_signal);
 
     /*Init the new message box message box*/
     if(copy == NULL) {
-        ext->text = lv_label_create(new_mbox, NULL);
+        ext->text = lv_label_create(mbox, NULL);
         lv_label_set_align(ext->text, LV_LABEL_ALIGN_CENTER);
         lv_label_set_long_mode(ext->text, LV_LABEL_LONG_BREAK);
         lv_label_set_text(ext->text, "Message");
 
-        lv_cont_set_layout(new_mbox, LV_LAYOUT_COL_M);
-        lv_cont_set_fit2(new_mbox, LV_FIT_NONE, LV_FIT_TIGHT);
-        lv_obj_set_width(new_mbox, LV_DPI * 2);
-        lv_obj_align(new_mbox, NULL, LV_ALIGN_CENTER, 0, 0);
-        lv_obj_set_event_cb(new_mbox, lv_mbox_default_event_cb);
+        lv_cont_set_layout(mbox, LV_LAYOUT_COL_M);
+        lv_cont_set_fit2(mbox, LV_FIT_NONE, LV_FIT_TIGHT);
+        lv_obj_set_width(mbox, LV_DPI * 2);
+        lv_obj_align(mbox, NULL, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_set_event_cb(mbox, lv_mbox_default_event_cb);
 
         /*Set the default styles*/
-        lv_style_list_reset(&new_mbox->style_list);
-        lv_obj_add_theme(new_mbox, LV_MBOX_PART_BG, LV_THEME_MBOX_BG);
+        lv_theme_alien_apply(mbox, LV_THEME_MBOX);
 
     }
     /*Copy an existing message box*/
     else {
         lv_mbox_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
-        ext->text = lv_label_create(new_mbox, copy_ext->text);
+        ext->text = lv_label_create(mbox, copy_ext->text);
 
         /*Copy the buttons and the label on them*/
-        if(copy_ext->btnm) ext->btnm = lv_btnm_create(new_mbox, copy_ext->btnm);
+        if(copy_ext->btnm) ext->btnm = lv_btnm_create(mbox, copy_ext->btnm);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_mbox);
+        lv_obj_refresh_style(mbox);
     }
 
     LV_LOG_INFO("mesasge box created");
 
-    return new_mbox;
+    return mbox;
 }
 
 /*======================
@@ -150,12 +149,7 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
     if(ext->btnm == NULL) {
         ext->btnm = lv_btnm_create(mbox, NULL);
 
-        lv_style_list_reset(&ext->btnm->style_list);
-        lv_obj_add_theme(ext->btnm, LV_BTNM_PART_BG, LV_THEME_MBOX_BTN_BG);
-
-
-        lv_style_list_reset(lv_obj_get_style_list(ext->btnm, LV_BTNM_PART_BTN));
-        lv_obj_add_theme(ext->btnm, LV_BTNM_PART_BTN, LV_THEME_MBOX_BTN);
+        lv_theme_alien_apply(mbox, LV_MBOX_PART_BTN);
     }
 
     lv_btnm_set_map(ext->btnm, btn_map);
@@ -518,9 +512,7 @@ static void mbox_realign(lv_obj_t * mbox)
         const lv_font_t * font = lv_obj_get_style_font(mbox, LV_MBOX_PART_BTN);
 
         lv_coord_t font_h = lv_font_get_line_height(font);
-        lv_mem_test();
         lv_obj_set_size(ext->btnm, w, font_h + btn_top + btn_bottom + bg_top + bg_bottom);
-        lv_mem_test();
     }
 }
 

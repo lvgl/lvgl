@@ -66,11 +66,15 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
  */
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src, lv_draw_img_dsc_t * dsc)
 {
+
+
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
         show_error(coords, mask, "No\ndata");
         return;
     }
+
+    if(dsc->opa <= LV_OPA_MIN) return;
 
     lv_res_t res;
     res = lv_img_draw_core(coords, mask, src, dsc);
@@ -221,16 +225,16 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
         lv_area_copy(&map_area_rot, coords);
         if(draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) {
             /*Get the exact area which is required to show the rotated image*/
-            lv_coord_t pivot_x = lv_area_get_width(coords) / 2 + coords->x1;
-            lv_coord_t pivot_y = lv_area_get_height(coords) / 2 + coords->y1;
+            int32_t pivot_x = lv_area_get_width(coords) / 2 + coords->x1;
+            int32_t pivot_y = lv_area_get_height(coords) / 2 + coords->y1;
 
             pivot_x = draw_dsc->pivot.x + coords->x1;
             pivot_y = draw_dsc->pivot.y + coords->y1;
 
-                lv_coord_t w = lv_area_get_width(coords);
-            lv_coord_t w_zoom = (((w * draw_dsc->zoom) >> 8) - w) / 2;
-            lv_coord_t h = lv_area_get_height(coords);
-            lv_coord_t h_zoom = (((h * draw_dsc->zoom) >> 8) - h) / 2;
+            int32_t w = lv_area_get_width(coords);
+            int32_t w_zoom = (((w * draw_dsc->zoom) >> 8) - w) / 2;
+            int32_t h = lv_area_get_height(coords);
+            int32_t h_zoom = (((h * draw_dsc->zoom) >> 8) - h) / 2;
 
             lv_area_t norm;
             norm.x1 = coords->x1 - pivot_x - w_zoom;
@@ -283,16 +287,16 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
                                  successfully.*/
         }
 
-        lv_coord_t width = lv_area_get_width(&mask_com);
+        int32_t width = lv_area_get_width(&mask_com);
 
         uint8_t  * buf = lv_mem_buf_get(lv_area_get_width(&mask_com) * LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
 
         lv_area_t line;
         lv_area_copy(&line, &mask_com);
         lv_area_set_height(&line, 1);
-        lv_coord_t x = mask_com.x1 - coords->x1;
-        lv_coord_t y = mask_com.y1 - coords->y1;
-        lv_coord_t row;
+        int32_t x = mask_com.x1 - coords->x1;
+        int32_t y = mask_com.y1 - coords->y1;
+        int32_t row;
         lv_res_t read_res;
         for(row = mask_com.y1; row <= mask_com.y2; row++) {
             lv_area_t mask_line;
@@ -369,8 +373,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
 
         /*Go to the first displayed pixel of the map*/
-        lv_coord_t map_w = lv_area_get_width(map_area);
-        lv_coord_t map_h = lv_area_get_height(map_area);
+        int32_t map_w = lv_area_get_width(map_area);
+        int32_t map_h = lv_area_get_height(map_area);
         const uint8_t * map_buf_tmp = map_p;
         map_buf_tmp += map_w * (draw_area.y1 - (map_area->y1 - disp_area->y1)) * px_size_byte;
         map_buf_tmp += (draw_area.x1 - (map_area->x1 - disp_area->x1)) * px_size_byte;
@@ -419,8 +423,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
         lv_draw_mask_res_t mask_res;
         mask_res = (alpha_byte || chroma_key || draw_dsc->angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
-        lv_coord_t x;
-        lv_coord_t y;
+        int32_t x;
+        int32_t y;
         for(y = 0; y < lv_area_get_height(&draw_area); y++) {
             map_px = map_buf_tmp;
             px_i_start = px_i;
@@ -452,8 +456,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                 } else {
                     /*Rotate*/
                     bool ret;
-                    lv_coord_t rot_x = x + (disp_area->x1 + draw_area.x1) - map_area->x1;
-                    lv_coord_t rot_y = y + (disp_area->y1 + draw_area.y1) - map_area->y1;
+                    int32_t rot_x = x + (disp_area->x1 + draw_area.x1) - map_area->x1;
+                    int32_t rot_y = y + (disp_area->y1 + draw_area.y1) - map_area->y1;
                     ret = lv_img_buf_transform(&trans_dsc, rot_x, rot_y);
                     if(ret == false) {
                         mask_buf[px_i] = LV_OPA_TRANSP;

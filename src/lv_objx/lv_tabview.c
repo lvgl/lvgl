@@ -630,35 +630,17 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
             lv_event_send(ext->btns, LV_EVENT_CLICKED, lv_event_get_data());
         }
 #endif
-    } else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROL) {
+    } else if(sign == LV_SIGNAL_GET_EDITABLE) {
+        bool * editable = (bool *)param;
+        *editable       = true;
+    }
+
+    if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROL || sign == LV_SIGNAL_PRESSED  || sign == LV_SIGNAL_RELEASED) {
         /* The button matrix is not in a group (the tab view is in it) but it should handle the
          * group signals. So propagate the related signals to the button matrix manually*/
         if(ext->btns) {
             ext->btns->signal_cb(ext->btns, sign, param);
         }
-
-        if(sign == LV_SIGNAL_FOCUS) {
-            lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
-            /*If not focused by an input device assume the last input device*/
-            if(indev_type == LV_INDEV_TYPE_NONE) {
-                indev_type = lv_indev_get_type(lv_indev_get_next(NULL));
-            }
-
-            /*With ENCODER select the first button only in edit mode*/
-            if(indev_type == LV_INDEV_TYPE_ENCODER) {
-#if LV_USE_GROUP
-                lv_group_t * g = lv_obj_get_group(tabview);
-                if(lv_group_get_editing(g)) {
-                    lv_btnm_set_pressed(ext->btns, ext->tab_cur);
-                }
-#endif
-            } else {
-                lv_btnm_set_pressed(ext->btns, ext->tab_cur);
-            }
-        }
-    } else if(sign == LV_SIGNAL_GET_EDITABLE) {
-        bool * editable = (bool *)param;
-        *editable       = true;
     }
 
 

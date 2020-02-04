@@ -78,7 +78,7 @@ typedef union {
 enum {
     LV_STYLE_PROP_INIT(LV_STYLE_RADIUS,             0x0, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_CLIP_CORNER,        0x0, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_TRANSITION_TIME,    0x0, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANSITION_TIME,    0x0, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_OPA_SCALE,          0x0, LV_STYLE_ID_OPA + 0,   LV_STYLE_ATTR_INHERIT),
 
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_TOP,            0x1, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
@@ -153,6 +153,7 @@ typedef uint16_t lv_style_property_t;
 #define LV_STYLE_STATE_MASK      0x7F00
 
 enum {
+    LV_STYLE_STATE_NORMAL =           0,
     LV_STYLE_STATE_CHECKED  =         (1 << (0 + LV_STYLE_STATE_POS)),
     LV_STYLE_STATE_FOCUS  =           (1 << (1 + LV_STYLE_STATE_POS)),
     LV_STYLE_STATE_EDIT  =            (1 << (2 + LV_STYLE_STATE_POS)),
@@ -213,8 +214,7 @@ void lv_style_list_reset(lv_style_list_t * style_dsc);
 
 static inline lv_style_t * lv_style_list_get_style(lv_style_list_t * style_dsc, uint8_t id)
 {
-    if(style_dsc->style_cnt == 0) return NULL;
-    if(id >= style_dsc->style_cnt) return NULL;
+    if(style_dsc->style_cnt == 0 || id >= style_dsc->style_cnt) return NULL;
 
     return style_dsc->style_list[id];
 
@@ -222,7 +222,7 @@ static inline lv_style_t * lv_style_list_get_style(lv_style_list_t * style_dsc, 
 
 void lv_style_reset(lv_style_t * style);
 
-uint16_t lv_style_get_size(lv_style_t * style);
+uint16_t lv_style_get_mem_size(lv_style_t * style);
 
 /**
  * Copy a style to an other

@@ -75,7 +75,7 @@ void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
 
     if(style_src->map == NULL) return;
 
-    uint16_t size = lv_style_get_size(style_src);
+    uint16_t size = lv_style_get_mem_size(style_src);
 
     style_dest->map = lv_mem_alloc(size);
     memcpy(style_dest->map, style_src->map, size);
@@ -200,7 +200,7 @@ void lv_style_reset(lv_style_t * style)
     style->map = NULL;
 }
 
-uint16_t lv_style_get_size(lv_style_t * style)
+uint16_t lv_style_get_mem_size(lv_style_t * style)
 {
     if(style->map == NULL) return 0;
 
@@ -240,7 +240,7 @@ void lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_int
     lv_style_property_t end_mark = _LV_STYLE_CLOSEING_PROP;
     uint8_t end_mark_size = sizeof(end_mark);
 
-    uint16_t size = lv_style_get_size(style);
+    uint16_t size = lv_style_get_mem_size(style);
     if(size == 0) size += end_mark_size;
     size += sizeof(lv_style_property_t) + sizeof(lv_style_int_t);
     style->map = lv_mem_realloc(style->map, size);
@@ -274,7 +274,7 @@ void lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_t
     lv_style_property_t end_mark = _LV_STYLE_CLOSEING_PROP;
     uint8_t end_mark_size = sizeof(end_mark);
 
-    uint16_t size = lv_style_get_size(style);
+    uint16_t size = lv_style_get_mem_size(style);
     if(size == 0) size += end_mark_size;
 
     size += sizeof(lv_style_property_t) + sizeof(lv_color_t);
@@ -309,7 +309,7 @@ void lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa
     lv_style_property_t end_mark = _LV_STYLE_CLOSEING_PROP;
     uint8_t end_mark_size = sizeof(end_mark);
 
-    uint16_t size = lv_style_get_size(style);
+    uint16_t size = lv_style_get_mem_size(style);
     if(size == 0) size += end_mark_size;
 
     size += sizeof(lv_style_property_t) + sizeof(lv_opa_t);
@@ -344,7 +344,7 @@ void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void *
     lv_style_property_t end_mark = _LV_STYLE_CLOSEING_PROP;
     uint8_t end_mark_size = sizeof(end_mark);
 
-    uint16_t size = lv_style_get_size(style);
+    uint16_t size = lv_style_get_mem_size(style);
     if(size == 0) size += end_mark_size;
 
     size += sizeof(lv_style_property_t) + sizeof(void *);

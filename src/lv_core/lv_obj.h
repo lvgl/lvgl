@@ -908,6 +908,14 @@ static inline void lv_obj_set_style_##func_name (lv_obj_t * obj, uint8_t part, v
 {                                                                                           \
     lv_obj_set_style##style_type (obj, part, LV_STYLE_##prop_name, value);                  \
 }                                                                                           \
+static inline int16_t lv_style_get_##func_name (lv_style_t * style, void * res)             \
+{                                                                                           \
+    return lv_style_get##style_type (style, LV_STYLE_##prop_name, res);                     \
+}                                                                                           \
+static inline void lv_style_set_##func_name (lv_style_t * style, lv_style_state_t state, value_type value)          \
+{                                                                                           \
+    lv_style_set##style_type (style, LV_STYLE_##prop_name | (state), value);                          \
+}                                                                                           \
 
 
 LV_OBJ_STYLE_SET_GET_DECLARE(RADIUS, radius, lv_style_int_t,_int);

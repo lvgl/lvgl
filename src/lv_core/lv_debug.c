@@ -49,6 +49,11 @@ bool lv_debug_check_null(const void * p)
     return false;
 }
 
+bool lv_debug_check_mem_integrity(void)
+{
+    return lv_mem_test() == LV_RES_OK ? true : false;
+}
+
 bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type)
 {
     if(obj_type[0] == '\0') return true;

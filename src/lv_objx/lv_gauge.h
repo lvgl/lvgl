@@ -44,6 +44,7 @@ typedef struct
     const lv_color_t * needle_colors; /*Color of the needles (lv_color_t my_colors[needle_num])*/
     const void * needle_img;
     lv_point_t needle_img_pivot;
+    lv_style_list_t style_needle;
     lv_style_list_t style_strong;
     uint8_t needle_count;             /*Number of needles*/
     uint8_t label_count;              /*Number of labels on the scale*/
@@ -51,8 +52,11 @@ typedef struct
 
 /*Styles*/
 enum {
-    LV_GAUGE_PART_MAIN,
-    LV_GAUGE_PART_STRONG,
+    LV_GAUGE_PART_MAIN = LV_LMETER_PART_MAIN,
+    LV_GAUGE_PART_STRONG = _LV_LMETER_PART_VIRTUAL_LAST,
+    LV_GAUGE_PART_NEEDLE,
+    _LV_GAUGE_PART_VIRTUAL_LAST = _LV_LMETER_PART_VIRTUAL_LAST,
+    _LV_GAUGE_PART_REAL_LAST = _LV_LMETER_PART_REAL_LAST,
 };
 typedef uint8_t lv_gauge_style_t;
 

@@ -78,7 +78,6 @@ typedef enum {
     LV_THEME_LMETER,
 
     LV_THEME_GAUGE,
-    LV_THEME_GAUGE_STRONG,
 
     LV_THEME_TA,
     LV_THEME_TA_ONELINE,
@@ -97,9 +96,8 @@ typedef enum {
 
     LV_THEME_LED,
 
-    LV_THEME_MBOX_BG,
-    LV_THEME_MBOX_BTN_BG,
-    LV_THEME_MBOX_BTN,
+    LV_THEME_MBOX,
+    LV_THEME_MBOX_BTNS,
 
     LV_THEME_TABLE,
     LV_THEME_TABLE_BG,
@@ -146,8 +144,6 @@ lv_style_t * lv_theme_get_style_part(lv_theme_style_t name, uint8_t part);
 /**********************
  *    MACROS
  **********************/
-#define _t(name) lv_theme_get_style(LV_THEME_ ## name)
-#define _ot(obj, part, name) lv_obj_add_style(obj, part, _t(name))
 
 /**********************
  *     POST INCLUDE

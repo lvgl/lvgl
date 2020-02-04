@@ -42,6 +42,8 @@ typedef struct
 /*Styles*/
 enum {
     LV_LMETER_PART_MAIN,
+    _LV_LMETER_PART_VIRTUAL_LAST,
+    _LV_LMETER_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,
 };
 typedef uint8_t lv_lmeter_part_t;
 
