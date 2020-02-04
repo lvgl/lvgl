@@ -141,7 +141,7 @@ static void basic_init(void)
 //    lv_style_set_color(&panel, LV_STYLE_BG_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
     lv_style_set_border_color(&panel, LV_STYLE_STATE_NORMAL, lv_color_lighten(COLOR_CONTAINER, LV_OPA_10));
     lv_style_set_border_width(&panel, LV_STYLE_STATE_NORMAL, LV_DPI / 50 > 0 ? LV_DPI / 50 : 1);
-    lv_style_set_border_side(&panel, LV_STYLE_STATE_NORMAL , LV_BORDER_SIDE_TOP);
+//    lv_style_set_border_side(&panel, LV_STYLE_STATE_NORMAL , LV_BORDER_SIDE_TOP);
     lv_style_set_pad_left(&panel, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_right(&panel, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_top(&panel, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
@@ -173,6 +173,10 @@ static void basic_init(void)
     lv_style_set_pad_inner(&btn, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_transition_time(&btn, LV_STYLE_TRANSITION_TIME, 500);
     lv_style_set_bg_color(&btn, LV_STYLE_STATE_FOCUS, lv_color_mix(LV_COLOR_RED, COLOR_ACCENT, LV_OPA_50));
+    lv_style_set_shadow_opa(&btn, LV_STYLE_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_shadow_width(&btn, LV_STYLE_STATE_NORMAL, 8);
+    lv_style_set_shadow_offset_y(&btn, LV_STYLE_STATE_NORMAL, 3);
+    lv_style_set_shadow_color(&btn, LV_STYLE_STATE_NORMAL, LV_COLOR_BLUE);
 }
 
 static void cont_init(void)

@@ -3015,7 +3015,9 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             shadow += lv_obj_get_style_shadow_spread(obj, LV_OBJ_PART_MAIN);
             shadow += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_shadow_offset_x(obj, LV_OBJ_PART_MAIN)),
                                   LV_MATH_ABS(lv_obj_get_style_shadow_offset_y(obj, LV_OBJ_PART_MAIN)));
+            obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, shadow);
         }
+
     }
 #if LV_USE_OBJ_REALIGN
     else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {
