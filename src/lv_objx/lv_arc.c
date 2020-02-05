@@ -128,7 +128,6 @@ void lv_arc_set_start_angle(lv_obj_t * arc, int16_t start)
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     if(start > 360) start -= 360;
-    if(start < 0) start += 360;
 
     ext->angle_start = start;
 
@@ -147,9 +146,31 @@ void lv_arc_set_end_angle(lv_obj_t * arc, int16_t end)
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     if(end > 360) end -= 360;
-    if(end < 0) end += 360;
 
     ext->angle_end= end;
+
+    lv_obj_invalidate(arc);
+}
+
+
+/**
+ * Set the start and end angles
+ * @param arc pointer to an arc object
+ * @param start the start angle
+ * @param end the end angle
+ */
+void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
+{
+    LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
+
+    lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
+
+    if(end > 360) end -= 360;
+
+    if(start > 360) start -= 360;
+
+    ext->angle_start = start;
+    ext->angle_end = end;
 
     lv_obj_invalidate(arc);
 }
@@ -289,6 +310,34 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
     }
 
     return res;
+}
+
+
+static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle)
+{
+    uint8_t start_quarter = start_angle / 90;
+    uint8_t end_quarter = end_angle / 90;
+    lv_coord_t r       = (LV_MATH_MIN(lv_obj_get_width(arc), lv_obj_get_height(arc))) / 2;
+    lv_coord_t x       = arc->coords.x1 + lv_obj_get_width(arc) / 2;
+    lv_coord_t y       = arc->coords.y1 + lv_obj_get_height(arc) / 2;
+    const lv_style_t style = lv_arc_get_style(arc, LV_ARC_STYLE_MAIN);
+    lv_coord_t w       = style->line.width;
+    lv_area_t inv_area;
+
+    if(start_quarter == end_quarter) {
+        if(start_quarter == 3) {
+            /*Small arc here*/
+            inv_area.x1 = x + ((lv_trigo_sin(start_angle + 90) * (r - q->width)) >> LV_TRIGO_SHIFT);
+            inv_area.y1 = y + ((lv_trigo_sin(start_angle) * (r)) >> LV_TRIGO_SHIFT);
+
+            inv_area.x2 = x + ((lv_trigo_sin(end_angle + 90) * (r)) >> LV_TRIGO_SHIFT);
+            inv_area.y2 = y + ((lv_trigo_sin(end_angle) * (r - q->width)) >> LV_TRIGO_SHIFT);
+
+                    bool ok = lv_area_intersect(&quarter_area, &quarter_area, q->clip_area);
+                    if(ok) lv_draw_rect(q->draw_area, &quarter_area, q->style, q->opa_scale);
+        }
+    }
+
 }
 
 #endif

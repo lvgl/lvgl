@@ -539,7 +539,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         style_debug.body.grad_color = debug_color;
         style_debug.body.border.width = 2;
         style_debug.body.border.color.full = (debug_color.full + 0x13) * 9;
-        lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &style_debug, LV_OPA_50);
+        lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &style_debug, LV_OPA_20);
         debug_color.full *= 17;
         debug_color.full += 0xA1;
 #endif
