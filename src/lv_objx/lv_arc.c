@@ -354,7 +354,7 @@ static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angl
     lv_coord_t rout       = (LV_MATH_MIN(lv_obj_get_width(arc), lv_obj_get_height(arc))) / 2;
     const lv_style_t * style = lv_arc_get_style(arc, LV_ARC_STYLE_MAIN);
     lv_coord_t rin       = rout - style->line.width;
-    lv_coord_t extra_area = style->line.rounded ? style->line.width : 0;
+    lv_coord_t extra_area = style->line.rounded ? style->line.width / 2 + 2 : 0;
 
     lv_area_t inv_area;
 
