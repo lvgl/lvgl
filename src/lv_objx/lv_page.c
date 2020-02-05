@@ -876,7 +876,6 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_CHILD_CHG) {
         lv_obj_t * child;
         if(ext->scrl == NULL) return LV_RES_OK;
-        const lv_style_t * style_bg = lv_page_get_style(page, LV_PAGE_STYLE_BG);
         const lv_style_t * style_scrl = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
         lv_fit_t fit_left        = lv_page_get_scrl_fit_left(page);
         lv_fit_t fit_right        = lv_page_get_scrl_fit_right(page);
