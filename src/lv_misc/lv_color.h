@@ -340,7 +340,6 @@ static inline uint8_t lv_color_to8(lv_color_t color)
 
 static inline uint16_t lv_color_to16(lv_color_t color)
 {
-
 #if LV_COLOR_DEPTH == 1
     if(color.full == 0)
         return 0;
@@ -369,9 +368,7 @@ static inline uint16_t lv_color_to16(lv_color_t color)
 #endif
     LV_COLOR_SET_B16(ret, LV_COLOR_GET_B(color) >> 3);  /* 8 - 5  = 3*/
     return ret.full;
-#endif
-
-    return 0;
+#endif                         
 }
 
 static inline uint32_t lv_color_to32(lv_color_t color)
