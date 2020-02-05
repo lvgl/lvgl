@@ -794,14 +794,16 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
             }
         }
     }
-    else if(sign == LV_SIGNAL_PRESSED) {
-        lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
-        lv_list_focus_btn(list, btn);
-#if LV_USE_GROUP
-        if(lv_obj_get_group(list)) {
-            lv_group_focus_obj(list);
+    else if(sign == LV_SIGNAL_RELEASED) {
+        if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
+            lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
+            lv_list_focus_btn(list, btn);
+    #if LV_USE_GROUP
+            if(lv_obj_get_group(list)) {
+                lv_group_focus_obj(list);
+            }
+    #endif
         }
-#endif
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
 #if LV_USE_GROUP

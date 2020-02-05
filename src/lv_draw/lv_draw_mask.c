@@ -1119,9 +1119,9 @@ static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x
 
 static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_t mask_new)
 {
-    if(mask_new > LV_OPA_MAX) return mask_act;
-    if(mask_new < LV_OPA_MIN) return 0;
+    if(mask_new >= LV_OPA_MAX) return mask_act;
+    if(mask_new <= LV_OPA_MIN) return 0;
 
-    return (uint16_t)((uint16_t) (mask_act * mask_new) >> 8);
+    return (int32_t)((int32_t) (mask_act * mask_new) >> 8);
 
 }

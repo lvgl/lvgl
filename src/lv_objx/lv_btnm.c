@@ -778,7 +778,6 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         }
     } else if(sign == LV_SIGNAL_PRESSED) {
         invalidate_button_area(btnm, ext->btn_id_pr);
-        invalidate_button_area(btnm, ext->btn_id_focused);
 
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
@@ -787,12 +786,13 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
             /*Search the pressed area*/
             lv_indev_get_point(param, &p);
             btn_pr = get_button_from_point(btnm, &p);
-
-            invalidate_button_area(btnm, ext->btn_id_pr) /*Invalidate the old area*/;
-            ext->btn_id_pr = btn_pr;
-            ext->btn_id_act = btn_pr;
-            ext->btn_id_focused = btn_pr;
-            invalidate_button_area(btnm, ext->btn_id_pr); /*Invalidate the new area*/
+            if(button_is_inactive(ext->ctrl_bits[btn_pr]) == false &&
+               button_is_hidden(ext->ctrl_bits[btn_pr]) == false) {
+                invalidate_button_area(btnm, ext->btn_id_pr) /*Invalidate the old area*/;
+                ext->btn_id_pr = btn_pr;
+                ext->btn_id_act = btn_pr;
+                invalidate_button_area(btnm, ext->btn_id_pr); /*Invalidate the new area*/
+            }
         } else if(indev_type == LV_INDEV_TYPE_KEYPAD || (indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(btnm)))) {
             ext->btn_id_pr = ext->btn_id_focused;
             invalidate_button_area(btnm, ext->btn_id_focused);
@@ -812,11 +812,12 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         lv_indev_get_point(param, &p);
         btn_pr = get_button_from_point(btnm, &p);
         /*Invalidate to old and the new areas*/;
-        if(btn_pr != ext->btn_id_pr) {
+        if(btn_pr != ext->btn_id_pr &&
+                button_is_inactive(ext->ctrl_bits[btn_pr]) == false &&
+                button_is_hidden(ext->ctrl_bits[btn_pr]) == false) {
             lv_indev_reset_long_press(param); /*Start the log press time again on the new button*/
             if(ext->btn_id_pr != LV_BTNM_BTN_NONE) {
                 invalidate_button_area(btnm, ext->btn_id_pr);
-                invalidate_button_area(btnm, ext->btn_id_focused);
             }
             if(btn_pr != LV_BTNM_BTN_NONE) {
                 uint32_t b = ext->btn_id_act;
@@ -828,7 +829,6 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         }
 
         ext->btn_id_pr  = btn_pr;
-        ext->btn_id_focused  = btn_pr;
         ext->btn_id_act = btn_pr;
     } else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->btn_id_pr != LV_BTNM_BTN_NONE) {
@@ -845,6 +845,7 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
             /*Invalidate to old pressed area*/;
             invalidate_button_area(btnm, ext->btn_id_pr);
+            ext->btn_id_focused = ext->btn_id_pr;
             ext->btn_id_pr = LV_BTNM_BTN_NONE;
 
             if(button_is_click_trig(ext->ctrl_bits[ext->btn_id_act]) == true &&
@@ -926,7 +927,9 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 for(area_below = ext->btn_id_focused; area_below < ext->btn_cnt; area_below++) {
                     if(ext->button_areas[area_below].y1 > ext->button_areas[ext->btn_id_focused].y1 &&
                        pr_center >= ext->button_areas[area_below].x1 &&
-                       pr_center <= ext->button_areas[area_below].x2 + pad_inner) {
+                       pr_center <= ext->button_areas[area_below].x2 + pad_inner &&
+                       button_is_inactive(ext->ctrl_bits[area_below]) == false &&
+                       button_is_hidden(ext->ctrl_bits[area_below]) == false) {
                         break;
                     }
                 }
@@ -948,7 +951,9 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
                 for(area_above = ext->btn_id_focused; area_above >= 0; area_above--) {
                     if(ext->button_areas[area_above].y1 < ext->button_areas[ext->btn_id_focused].y1 &&
                        pr_center >= ext->button_areas[area_above].x1 - pad_inner &&
-                       pr_center <= ext->button_areas[area_above].x2) {
+                       pr_center <= ext->button_areas[area_above].x2 &&
+                       button_is_inactive(ext->ctrl_bits[area_above]) == false &&
+                       button_is_hidden(ext->ctrl_bits[area_above]) == false) {
                         break;
                     }
                 }

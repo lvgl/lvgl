@@ -161,9 +161,10 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
     /*Create a mask if there is a radius*/
     lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
 
+    uint16_t other_mask_cnt = lv_draw_mask_get_cnt();
     bool simple_mode = true;
-    if(lv_draw_mask_get_cnt()!= 0) simple_mode = false;
-    else if(dsc->bg_grad_dir == LV_GRAD_DIR_HOR) simple_mode = false;
+    if(other_mask_cnt) simple_mode = false;
+    else if(dsc->bg_grad_dir != LV_GRAD_DIR_NONE) simple_mode = false;
 
     int16_t mask_rout_id = LV_MASK_ID_INV;
 
@@ -181,7 +182,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
                 dsc->bg_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
                 dsc->bg_blend_mode);
     }
-    /*More complex case: there is a radius, gradient or mask.*/
+    /*More complex case: there is a radius, gradient or other mask.*/
     else {
         lv_draw_mask_radius_param_t mask_rout_param;
         if(rout > 0) {
@@ -189,101 +190,111 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
             mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
         }
 
-        if(opa >= LV_OPA_MIN) {
-            /*Draw the background line by line*/
-            int32_t h;
-            lv_draw_mask_res_t mask_res = LV_DRAW_MASK_RES_FULL_COVER;
-            lv_color_t grad_color = dsc->bg_color;
+        /*Draw the background line by line*/
+        int32_t h;
+        lv_draw_mask_res_t mask_res = LV_DRAW_MASK_RES_FULL_COVER;
+        lv_color_t grad_color = dsc->bg_color;
 
 
-            lv_color_t * grad_map = NULL;
-            /*In case of horizontal gradient pre-compute a line with a gradient*/
-            if(dsc->bg_grad_dir == LV_GRAD_DIR_HOR && dsc->bg_color.full != dsc->bg_grad_color.full) {
-                grad_map = lv_mem_buf_get(coords_w * sizeof(lv_color_t));
+        lv_color_t * grad_map = NULL;
+        /*In case of horizontal gradient pre-compute a line with a gradient*/
+        if(dsc->bg_grad_dir == LV_GRAD_DIR_HOR && dsc->bg_color.full != dsc->bg_grad_color.full) {
+            grad_map = lv_mem_buf_get(coords_w * sizeof(lv_color_t));
 
-                int32_t i;
-                for(i = 0; i < coords_w; i++) {
-                    grad_map[i] = grad_get(dsc, coords_w, i);
-                }
+            int32_t i;
+            for(i = 0; i < coords_w; i++) {
+                grad_map[i] = grad_get(dsc, coords_w, i);
             }
+        }
 
-            lv_area_t fill_area;
-            fill_area.x1 = coords_bg.x1;
-            fill_area.x2 = coords_bg.x2;
-            fill_area.y1 = disp_area->y1 + draw_area.y1;
-            fill_area.y2 = fill_area.y1;
-            for(h = draw_area.y1; h <= draw_area.y2; h++) {
-                int32_t y = h + vdb->area.y1;
+        lv_area_t fill_area;
+        fill_area.x1 = coords_bg.x1;
+        fill_area.x2 = coords_bg.x2;
+        fill_area.y1 = disp_area->y1 + draw_area.y1;
+        fill_area.y2 = fill_area.y1;
+        for(h = draw_area.y1; h <= draw_area.y2; h++) {
+            int32_t y = h + vdb->area.y1;
 
-                /*In not corner areas apply the mask only if required*/
-                if(y > coords_bg.y1 + rout + 1 &&
-                        y < coords_bg.y2 - rout - 1) {
-                    mask_res = LV_DRAW_MASK_RES_FULL_COVER;
-                    if(simple_mode == false) {
-                        memset(mask_buf, LV_OPA_COVER, draw_area_w);
-                        mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
-                    }
-                }
-                /*In corner areas apply the mask anyway*/
-                else {
+            /*In not corner areas apply the mask only if required*/
+            if(y > coords_bg.y1 + rout + 1 &&
+                    y < coords_bg.y2 - rout - 1) {
+                mask_res = LV_DRAW_MASK_RES_FULL_COVER;
+                if(simple_mode == false) {
                     memset(mask_buf, LV_OPA_COVER, draw_area_w);
                     mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
                 }
-
-                /*Get the current line color*/
-                if(dsc->bg_grad_dir == LV_GRAD_DIR_VER && dsc->bg_color.full != dsc->bg_grad_color.full) {
-                    grad_color = grad_get(dsc, lv_area_get_height(&coords_bg), y - coords_bg.y1);
-                }
-
-                /* If there is not other mask and drawing the corner area split the drawing to corner and middle areas
-                 * because it the middle mask shuldn't be taken into account (therefore its faster)*/
-                if(simple_mode &&
-                        (y < coords_bg.y1 + rout + 1 ||
-                                y > coords_bg.y2 - rout - 1)) {
-
-                    /*Left part*/
-                    lv_area_t fill_area2;
-                    fill_area2.x1 = coords_bg.x1;
-                    fill_area2.x2 = coords_bg.x1 + rout - 1;
-                    fill_area2.y1 = fill_area.y1;
-                    fill_area2.y2 = fill_area.y2;
-
-                    lv_blend_fill(clip, &fill_area2,
-                            grad_color, mask_buf, mask_res, opa, dsc->bg_blend_mode);
-
-
-                    /*Central part*/
-                    fill_area2.x1 = coords_bg.x1 + rout;
-                    fill_area2.x2 = coords_bg.x2 - rout;
-
-                    lv_blend_fill(clip, &fill_area2,
-                            grad_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
-
-                    fill_area2.x1 = coords_bg.x2 - rout + 1;
-                    fill_area2.x2 = coords_bg.x2;
-
-                    int32_t mask_ofs = (coords_bg.x2 - rout + 1) - (vdb->area.x1 + draw_area.x1);
-                    if(mask_ofs < 0) mask_ofs = 0;
-                    lv_blend_fill(clip, &fill_area2,
-                            grad_color, mask_buf + mask_ofs, mask_res, opa, dsc->bg_blend_mode);
-                } else {
-                    if(grad_map == NULL) {
-                        lv_blend_fill(clip, &fill_area,
-                                grad_color,mask_buf, mask_res, opa, dsc->bg_blend_mode);
-                    } else {
-                        lv_blend_map(clip, &fill_area, grad_map, mask_buf, mask_res, opa, dsc->bg_blend_mode);
-                    }
-
-                }
-                fill_area.y1++;
-                fill_area.y2++;
+            }
+            /*In corner areas apply the mask anyway*/
+            else {
+                memset(mask_buf, LV_OPA_COVER, draw_area_w);
+                mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
             }
 
-            if(grad_map) lv_mem_buf_release(grad_map);
+            /*Get the current line color*/
+            if(dsc->bg_grad_dir == LV_GRAD_DIR_VER && dsc->bg_color.full != dsc->bg_grad_color.full) {
+                grad_color = grad_get(dsc, lv_area_get_height(&coords_bg), y - coords_bg.y1);
+            }
+
+            /* If there is not other mask and drawing the corner area split the drawing to corner and middle areas
+             * because it the middle mask shuldn't be taken into account (therefore its faster)*/
+            if(simple_mode &&
+                    (y < coords_bg.y1 + rout + 1 ||
+                            y > coords_bg.y2 - rout - 1)) {
+
+                /*Left part*/
+                lv_area_t fill_area2;
+                fill_area2.x1 = coords_bg.x1;
+                fill_area2.x2 = coords_bg.x1 + rout - 1;
+                fill_area2.y1 = fill_area.y1;
+                fill_area2.y2 = fill_area.y2;
+
+                lv_blend_fill(clip, &fill_area2,
+                        grad_color, mask_buf, mask_res, opa, dsc->bg_blend_mode);
+
+                /*Right part*/
+                fill_area2.x1 = coords_bg.x2 - rout + 1;
+                fill_area2.x2 = coords_bg.x2;
+
+                int32_t mask_ofs = (coords_bg.x2 - rout + 1) - (vdb->area.x1 + draw_area.x1);
+                if(mask_ofs < 0) mask_ofs = 0;
+                lv_blend_fill(clip, &fill_area2,
+                        grad_color, mask_buf + mask_ofs, mask_res, opa, dsc->bg_blend_mode);
+            } else {
+                if(grad_map == NULL) {
+                    lv_blend_fill(clip, &fill_area,
+                            grad_color,mask_buf, mask_res, opa, dsc->bg_blend_mode);
+                } else {
+                    lv_blend_map(clip, &fill_area, grad_map, mask_buf, mask_res, opa, dsc->bg_blend_mode);
+                }
+
+            }
+            fill_area.y1++;
+            fill_area.y2++;
         }
 
-        lv_draw_mask_remove_id(mask_rout_id);
+        if(simple_mode) {
+            lv_area_t fill_area;
+            /*Central part*/
+            fill_area.x1 = coords_bg.x1 + rout;
+            fill_area.x2 = coords_bg.x2 - rout;
+            fill_area.y1 = coords_bg.y1;
+            fill_area.y2 = coords_bg.y1 + rout;
+
+            lv_blend_fill(clip, &fill_area,
+                    grad_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
+
+            fill_area.y1 = coords_bg.y2 - rout;
+            fill_area.y2 = coords_bg.y2;
+
+            lv_blend_fill(clip, &fill_area,
+                    grad_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
+
+        }
+
+        if(grad_map) lv_mem_buf_release(grad_map);
     }
+
+    lv_draw_mask_remove_id(mask_rout_id);
 
     lv_mem_buf_release(mask_buf);
 
@@ -954,6 +965,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, lv_opa_t * sh_buf, 
 #endif
 
     lv_mem_buf_release(sh_ups_buf);
+
 }
 
 static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, lv_opa_t * res_buf, uint16_t * sh_ups_buf)

@@ -228,7 +228,6 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
 
         lv_draw_arc(x, y, r, ext->bg_angle_start, ext->bg_angle_end, clip_area, &arc_dsc);
 
-
         lv_draw_line_dsc_init(&arc_dsc);
         lv_obj_init_draw_line_dsc(arc, LV_ARC_PART_ARC, &arc_dsc);
 

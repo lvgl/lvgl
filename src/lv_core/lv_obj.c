@@ -2270,6 +2270,7 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prope
     case LV_STYLE_IMAGE_OPA:
     case LV_STYLE_LINE_OPA:
     case LV_STYLE_BORDER_OPA:
+    case LV_STYLE_SHADOW_OPA:
     case LV_STYLE_PATTERN_OPA:
         return LV_OPA_COVER;
     }
@@ -3011,6 +3012,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         lv_coord_t shadow = lv_obj_get_style_shadow_width(obj, LV_OBJ_PART_MAIN);
         if(shadow) {
+            shadow = shadow / 2;    /*THe blur adds only half width*/
             shadow++;
             shadow += lv_obj_get_style_shadow_spread(obj, LV_OBJ_PART_MAIN);
             shadow += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_shadow_offset_x(obj, LV_OBJ_PART_MAIN)),

@@ -436,17 +436,17 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
 
 
     int32_t col, row;
-
-    uint8_t width_byte_scr = g->box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
-    if(g->box_w & 0x7) width_byte_scr++;
-    uint16_t width_bit = g->box_w * bpp; /*Letter width in bits*/
-
+    int32_t box_w = g->box_w;
+    int32_t box_h = g->box_h;
+    int32_t width_byte_scr = box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
+    if(box_w & 0x7) width_byte_scr++;
+    int32_t width_bit = box_w * bpp; /*Letter width in bits*/
 
     /* Calculate the col/row start/end on the map*/
     int32_t col_start = pos_x >= clip_area->x1 ? 0 : clip_area->x1 - pos_x;
-    int32_t col_end   = pos_x + g->box_w <= clip_area->x2 ? g->box_w : clip_area->x2 - pos_x + 1;
+    int32_t col_end   = pos_x + box_w <= clip_area->x2 ? box_w : clip_area->x2 - pos_x + 1;
     int32_t row_start = pos_y >= clip_area->y1 ? 0 : clip_area->y1 - pos_y;
-    int32_t row_end   = pos_y + g->box_h <= clip_area->y2 ? g->box_h : clip_area->y2 - pos_y + 1;
+    int32_t row_end   = pos_y + box_h <= clip_area->y2 ? box_h : clip_area->y2 - pos_y + 1;
 
     /*Move on the map too*/
     uint32_t bit_ofs = (row_start * width_bit) + (col_start * bpp);
@@ -457,7 +457,7 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
     uint32_t col_bit;
     col_bit = bit_ofs & 0x7; /* "& 0x7" equals to "% 8" just faster */
 
-    uint32_t mask_buf_size = g->box_w * g->box_h > LV_HOR_RES_MAX ? g->box_w * g->box_h : LV_HOR_RES_MAX;
+    uint32_t mask_buf_size = box_w * box_h > LV_HOR_RES_MAX ? box_w * box_h : LV_HOR_RES_MAX;
     lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
     int32_t mask_p = 0;
     int32_t mask_p_start;
@@ -481,8 +481,8 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
                 if(opa == LV_OPA_COVER) {
                     px_opa = bpp == 8 ? letter_px : bpp_opa_table[letter_px];
                 } else {
-                    px_opa = bpp == 8 ? (uint16_t)((uint16_t)letter_px * opa) >> 8
-                            : (uint16_t)((uint16_t)bpp_opa_table[letter_px] * opa) >> 8;
+                    px_opa = bpp == 8 ? (uint32_t)((uint32_t)letter_px * opa) >> 8
+                            : (uint32_t)((uint32_t)bpp_opa_table[letter_px] * opa) >> 8;
                 }
 
                 mask_buf[mask_p] = px_opa;
@@ -525,7 +525,7 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
             mask_p = 0;
         }
 
-        col_bit += ((g->box_w - col_end) + col_start) * bpp;
+        col_bit += ((box_w - col_end) + col_start) * bpp;
 
         map_p += (col_bit >> 3);
         col_bit = col_bit & 0x7;
@@ -575,27 +575,29 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
 
     int32_t col, row;
 
-    uint32_t width_byte_scr = g->box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
-    if(g->box_w & 0x7) width_byte_scr++;
-    uint16_t width_bit = g->box_w * bpp; /*Letter width in bits*/
+    int32_t box_w = g->box_w;
+    int32_t box_h = g->box_h;
+    int32_t width_byte_scr = box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
+    if(box_w & 0x7) width_byte_scr++;
+    int32_t width_bit = box_w * bpp; /*Letter width in bits*/
 
 
     /* Calculate the col/row start/end on the map*/
     int32_t col_start = pos_x >= clip_area->x1 ? 0 : (clip_area->x1 - pos_x) * 3;
-    int32_t col_end   = pos_x + g->box_w / 3 <= clip_area->x2 ? g->box_w : (clip_area->x2 - pos_x + 1) * 3;
+    int32_t col_end   = pos_x + box_w / 3 <= clip_area->x2 ? box_w : (clip_area->x2 - pos_x + 1) * 3;
     int32_t row_start = pos_y >= clip_area->y1 ? 0 : clip_area->y1 - pos_y;
-    int32_t row_end   = pos_y + g->box_h <= clip_area->y2 ? g->box_h : clip_area->y2 - pos_y + 1;
+    int32_t row_end   = pos_y + box_h <= clip_area->y2 ? box_h : clip_area->y2 - pos_y + 1;
 
     /*Move on the map too*/
-    uint32_t bit_ofs = (row_start * width_bit) + (col_start * bpp);
+    int32_t bit_ofs = (row_start * width_bit) + (col_start * bpp);
     map_p += bit_ofs >> 3;
 
     uint8_t letter_px;
     lv_opa_t px_opa;
-    uint32_t col_bit;
+    int32_t col_bit;
     col_bit = bit_ofs & 0x7; /* "& 0x7" equals to "% 8" just faster */
 
-    uint32_t mask_buf_size = g->box_w * g->box_h > LV_HOR_RES_MAX ? g->box_w * g->box_h : LV_HOR_RES_MAX;
+    int32_t mask_buf_size = box_w * box_h > LV_HOR_RES_MAX ? g->box_w * g->box_h : LV_HOR_RES_MAX;
     lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
     int32_t mask_p = 0;
     int32_t mask_p_start;
@@ -663,17 +665,17 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
 #endif
 
 #if LV_SUBPX_BGR
-                res_color.ch.blue = (uint16_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
-                res_color.ch.red = (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
+                res_color.ch.blue = (uint326_t)((uint32_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
+                res_color.ch.red = (uint32_t)((uint32_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
 #else
-                res_color.ch.red = (uint16_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
-                res_color.ch.blue = (uint16_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
+                res_color.ch.red = (uint32_t)((uint16_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
+                res_color.ch.blue = (uint32_t)((uint16_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
 #endif
 
 #if LV_COLOR_16_SWAP == 0
-                        res_color.ch.green = (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
+                        res_color.ch.green = (uint32_t)((uint32_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
 #else
-                        uint8_t green = (uint16_t)((uint16_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
+                        uint8_t green = (uint32_t)((uint32_t)txt_rgb[1] * font_rgb[1] + (bg_rgb[1] * (255 - font_rgb[1]))) >> 8;
                         res_color.ch.green_h = green >> 3;
                         res_color.ch.green_l = green & 0x7;
 #endif
@@ -716,7 +718,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
             mask_p = 0;
         }
 
-        col_bit += ((g->box_w - col_end) + col_start) * bpp;
+        col_bit += ((box_w - col_end) + col_start) * bpp;
 
         map_p += (col_bit >> 3);
         col_bit = col_bit & 0x7;
