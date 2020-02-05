@@ -217,7 +217,9 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
         const lv_opa_t * mask, lv_draw_mask_res_t mask_res)
 {
 
+#if LV_USE_GPU
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
+#endif
 
     /*Get the width of the `disp_area` it will be used to go to the next line*/
     int32_t disp_w = lv_area_get_width(disp_area);
@@ -518,6 +520,9 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
 #if LV_COLOR_SCREEN_TRANSP
     lv_opa_t opa_composed;
 #endif
+#if LV_COLOR_SCREEN_TRANSP || LV_USE_GPU
+    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+#endif
 
     int32_t x;
     int32_t y;
@@ -527,7 +532,6 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
         /*Go to the first px of the row*/
         map_buf_tmp += (draw_area->x1 - (map_area->x1 - disp_area->x1));
 #if LV_USE_GPU
-        lv_disp_t * disp = lv_refr_get_disp_refreshing();
         if(disp->driver.gpu_blend_cb &&
                 ((draw_area_w > GPU_WIDTH_LIMIT * 4 && opa == LV_OPA_COVER) ||
                         (draw_area_w > GPU_WIDTH_LIMIT && opa != LV_OPA_COVER))) {

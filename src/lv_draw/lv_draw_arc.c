@@ -14,7 +14,7 @@
  *      DEFINES
  *********************/
 #define SPLIT_RADIUS_LIMIT 10  /*With radius greater then this the arc will drawn in quarters. A quarter is drawn only if there is arc in it */
-#define SPLIT_ANGLE_GAP_LIMIT 60  /*With small gaps in the arc don't bother with splitting because there is nothing to skip.
+#define SPLIT_ANGLE_GAP_LIMIT 60  /*With small gaps in the arc don't bother with splitting because there is nothing to skip.*/
 
 /**********************
  *      TYPEDEFS
@@ -33,6 +33,7 @@ typedef struct {
     const lv_area_t * clip_area;
 }quarter_draw_dsc_t;
 
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -41,6 +42,7 @@ static void draw_quarter_1(quarter_draw_dsc_t*  q);
 static void draw_quarter_2(quarter_draw_dsc_t*  q);
 static void draw_quarter_3(quarter_draw_dsc_t*  q);
 static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness, lv_area_t * res_area);
+
 
 /**********************
  *  STATIC VARIABLES
@@ -118,7 +120,6 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     } else {
         lv_draw_rect(&area, clip_area, &cir_dsc);
     }
-
     lv_draw_mask_remove_id(mask_angle_id);
 
     if(dsc->round_start || dsc->round_end) {
@@ -150,10 +151,10 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     }
 }
 
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
 static void draw_quarter_0(quarter_draw_dsc_t * q)
 {
     lv_area_t quarter_area;
@@ -368,6 +369,8 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
 }
 
 
+
+
 static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness, lv_area_t * res_area)
 {
     const uint8_t ps = 8;
@@ -414,3 +417,4 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness,
         res_area->y2 = cir_y + thick_half - thick_corr;
     }
 }
+

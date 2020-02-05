@@ -277,8 +277,8 @@ static void basic_init(void)
     lv_style_set_border_opa(&btn, LV_STYLE_STATE_NORMAL, LV_OPA_50);
     lv_style_set_shadow_width(&btn, LV_STYLE_STATE_NORMAL, 10);
 //    lv_style_set_shadow_width(&btn, LV_STYLE_STATE_PRESSED, 2);
-    lv_style_set_shadow_offset_x(&btn, LV_STYLE_STATE_NORMAL, 35);
-    lv_style_set_shadow_offset_y(&btn, LV_STYLE_STATE_NORMAL, 80);
+//    lv_style_set_shadow_offset_x(&btn, LV_STYLE_STATE_NORMAL, 35);
+    lv_style_set_shadow_offset_y(&btn, LV_STYLE_STATE_NORMAL, 8);
     lv_style_set_shadow_offset_y(&btn, LV_STYLE_STATE_PRESSED, 1);
     lv_style_set_shadow_color(&btn, LV_STYLE_STATE_NORMAL, LV_COLOR_BLUE);
 //    lv_style_set_shadow_spread(&btn, LV_STYLE_STATE_NORMAL, 5);
