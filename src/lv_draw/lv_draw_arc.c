@@ -106,8 +106,8 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
         q_dsc.radius = radius;
         q_dsc.start_angle = start_angle;
         q_dsc.end_angle = end_angle;
-        q_dsc.start_quarter= start_angle / 90;
-        q_dsc.end_quarter = end_angle / 90;
+        q_dsc.start_quarter= (start_angle / 90) & 0x3;
+        q_dsc.end_quarter = (end_angle / 90) & 0x3;
         q_dsc.width = dsc->width;
         q_dsc.draw_dsc =  &cir_dsc;
         q_dsc.draw_area = &area;
