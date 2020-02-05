@@ -130,9 +130,24 @@ void lv_arc_set_start_angle(lv_obj_t * arc, int16_t start)
 
     if(start > 360) start -= 360;
 
-    ext->angle_start = start;
+    /*Too large move, the whole arc need to be invalidated anyway*/
+    if(LV_MATH_ABS(start - ext->angle_start) >= 180) {
+        lv_obj_invalidate(arc);
+    }
+    /*Only a smaller incremental move*/
+    else if(ext->angle_start > ext->angle_end && start > ext->angle_end) {
+        inv_arc_area(arc, LV_MATH_MIN(ext->angle_start, start), LV_MATH_MAX(ext->angle_start, start));
+    }
+    /*Only a smaller incremental move*/
+    else  if(ext->angle_start < ext->angle_end && start < ext->angle_end) {
+        inv_arc_area(arc, LV_MATH_MIN(ext->angle_start, start), LV_MATH_MAX(ext->angle_start, start));
+    }
+    /*Crossing the start angle makes the whole arc change*/
+    else {
+        lv_obj_invalidate(arc);
+    }
 
-    lv_obj_invalidate(arc);
+    ext->angle_start = start;
 }
 
 /**
@@ -148,9 +163,24 @@ void lv_arc_set_end_angle(lv_obj_t * arc, int16_t end)
 
     if(end > 360) end -= 360;
 
-    ext->angle_end= end;
+    /*Too large move, the whole arc need to be invalidated anyway*/
+    if(LV_MATH_ABS(end - ext->angle_end) >= 180) {
+        lv_obj_invalidate(arc);
+    }
+    /*Only a smaller incremental move*/
+    else if(ext->angle_end > ext->angle_start && end > ext->angle_start ) {
+        inv_arc_area(arc, LV_MATH_MIN(ext->angle_end, end), LV_MATH_MAX(ext->angle_end, end));
+    }
+    /*Only a smaller incremental move*/
+    else  if(ext->angle_end < ext->angle_start && end < ext->angle_start ) {
+        inv_arc_area(arc, LV_MATH_MIN(ext->angle_end, end), LV_MATH_MAX(ext->angle_end, end));
+    }
+    /*Crossing the end angle makes the whole arc change*/
+    else {
+        lv_obj_invalidate(arc);
+    }
 
-    lv_obj_invalidate(arc);
+    ext->angle_end= end;
 }
 
 
@@ -327,7 +357,7 @@ static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angl
 
     lv_area_t inv_area;
 
-    if(start_quarter == end_quarter) {
+    if(start_quarter == end_quarter && start_angle <= end_angle) {
         if(start_quarter == 0) {
             inv_area.y1 = y + ((lv_trigo_sin(start_angle) * rin) >> LV_TRIGO_SHIFT);
             inv_area.x2 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT);

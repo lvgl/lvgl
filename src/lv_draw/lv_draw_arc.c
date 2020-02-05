@@ -298,7 +298,7 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
     else if((q->start_quarter == q->end_quarter && q->start_quarter != 2 && q->end_angle < q->start_angle) ||
             (q->start_quarter == 0 && q->end_quarter == 3) ||
             (q->start_quarter == 1 && q->end_quarter == 3) ||
-            (q->start_quarter == 3 && q->end_quarter == 1)) {
+            (q->start_quarter == 1 && q->end_quarter == 0)) {
         /*Arc crosses here*/
         quarter_area.x1 = q->center_x - q->radius;
         quarter_area.y1 = q->center_y - q->radius;
@@ -363,8 +363,6 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
         if(ok) lv_draw_rect(q->draw_area, &quarter_area, q->style, q->opa_scale);
     }
 }
-
-
 
 
 static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness, lv_area_t * res_area)
