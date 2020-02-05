@@ -117,7 +117,7 @@ void lv_style_init(void)
 
     lv_style_scr.line.opa     = LV_OPA_COVER;
     lv_style_scr.line.color   = lv_color_make(0x20, 0x20, 0x20);
-    lv_style_scr.line.width   = 2;
+    lv_style_scr.line.width   = 40;
     lv_style_scr.line.rounded = 0;
     lv_style_scr.line.blend_mode = LV_BLEND_MODE_NORMAL;
 
