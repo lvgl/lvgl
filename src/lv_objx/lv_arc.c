@@ -361,7 +361,7 @@ static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angl
     lv_style_int_t w = lv_obj_get_style_line_width(arc, LV_ARC_PART_ARC);
     lv_style_int_t rounded = lv_obj_get_style_line_rounded(arc, LV_ARC_PART_ARC);
     lv_coord_t rin       = rout - w;
-    lv_coord_t extra_area = rounded ? w : 0;
+    lv_coord_t extra_area = rounded ? w / 2 + 2 : 0;
 
     lv_area_t inv_area;
 
