@@ -105,13 +105,14 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
         q_dsc.radius = radius;
         q_dsc.start_angle = start_angle;
         q_dsc.end_angle = end_angle;
-        q_dsc.start_quarter= start_angle / 90;
-        q_dsc.end_quarter = end_angle / 90;
+        q_dsc.start_quarter= (start_angle / 90) & 0x3;
+        q_dsc.end_quarter = (end_angle / 90) & 0x3;
         q_dsc.width = circle_style.body.border.width;
         q_dsc.opa_scale = opa_scale;
         q_dsc.style =  &circle_style;
         q_dsc.draw_area = &area;
         q_dsc.clip_area = clip_area;
+
 
         draw_quarter_0(&q_dsc);
         draw_quarter_1(&q_dsc);

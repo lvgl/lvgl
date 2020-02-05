@@ -354,71 +354,72 @@ static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angl
     lv_coord_t rout       = (LV_MATH_MIN(lv_obj_get_width(arc), lv_obj_get_height(arc))) / 2;
     const lv_style_t * style = lv_arc_get_style(arc, LV_ARC_STYLE_MAIN);
     lv_coord_t rin       = rout - style->line.width;
+    lv_coord_t extra_area = style->line.rounded ? style->line.width : 0;
 
     lv_area_t inv_area;
 
     if(start_quarter == end_quarter && start_angle <= end_angle) {
         if(start_quarter == 0) {
-            inv_area.y1 = y + ((lv_trigo_sin(start_angle) * rin) >> LV_TRIGO_SHIFT);
-            inv_area.x2 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT);
+            inv_area.y1 = y + ((lv_trigo_sin(start_angle) * rin) >> LV_TRIGO_SHIFT) - extra_area;
+            inv_area.x2 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT) + extra_area;
 
-            inv_area.y2 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT);
-            inv_area.x1 = x + ((lv_trigo_sin(end_angle + 90) * rin) >> LV_TRIGO_SHIFT);
+            inv_area.y2 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT) + extra_area;
+            inv_area.x1 = x + ((lv_trigo_sin(end_angle + 90) * rin) >> LV_TRIGO_SHIFT) - extra_area;
 
             lv_obj_invalidate_area(arc, &inv_area);
         }
         else if(start_quarter == 1) {
-            inv_area.y2 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT);
-            inv_area.x2 = x + ((lv_trigo_sin(start_angle + 90) * rin) >> LV_TRIGO_SHIFT);
+            inv_area.y2 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT) + extra_area;
+            inv_area.x2 = x + ((lv_trigo_sin(start_angle + 90) * rin) >> LV_TRIGO_SHIFT) + extra_area;
 
-            inv_area.y1 = y + ((lv_trigo_sin(end_angle) * rin) >> LV_TRIGO_SHIFT);
-            inv_area.x1 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT);
+            inv_area.y1 = y + ((lv_trigo_sin(end_angle) * rin) >> LV_TRIGO_SHIFT) - extra_area;
+            inv_area.x1 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT) - extra_area;
 
             lv_obj_invalidate_area(arc, &inv_area);
         }
         else if(start_quarter == 2) {
-            inv_area.x1 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT);
-            inv_area.y2 = y + ((lv_trigo_sin(start_angle) * rin) >> LV_TRIGO_SHIFT);
+            inv_area.x1 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT) - extra_area;
+            inv_area.y2 = y + ((lv_trigo_sin(start_angle) * rin) >> LV_TRIGO_SHIFT) + extra_area;
 
-            inv_area.y1 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT);
-            inv_area.x2 = x + ((lv_trigo_sin(end_angle + 90) * rin) >> LV_TRIGO_SHIFT);
+            inv_area.y1 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT) - extra_area;
+            inv_area.x2 = x + ((lv_trigo_sin(end_angle + 90) * rin) >> LV_TRIGO_SHIFT) + extra_area;
 
             lv_obj_invalidate_area(arc, &inv_area);
         }
         else if(start_quarter == 3) {
             /*Small arc here*/
-            inv_area.x1 = x + ((lv_trigo_sin(start_angle + 90) * rin) >> LV_TRIGO_SHIFT);
-            inv_area.y1 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT);
+            inv_area.x1 = x + ((lv_trigo_sin(start_angle + 90) * rin) >> LV_TRIGO_SHIFT) - extra_area;
+            inv_area.y1 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT) - extra_area;
 
-            inv_area.x2 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT);
-            inv_area.y2 = y + ((lv_trigo_sin(end_angle) * rin) >> LV_TRIGO_SHIFT);
+            inv_area.x2 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT) + extra_area;
+            inv_area.y2 = y + ((lv_trigo_sin(end_angle) * rin) >> LV_TRIGO_SHIFT) + extra_area;
 
             lv_obj_invalidate_area(arc, &inv_area);
         }
 
     } else if(start_quarter == 0 && end_quarter == 1) {
-        inv_area.x1 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT);
-        inv_area.y1 = y + ((LV_MATH_MIN(lv_trigo_sin(end_angle), lv_trigo_sin(start_angle))  * rin) >> LV_TRIGO_SHIFT);
-        inv_area.x2 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT);
-        inv_area.y2 = y + rout;
+        inv_area.x1 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT) - extra_area;
+        inv_area.y1 = y + ((LV_MATH_MIN(lv_trigo_sin(end_angle), lv_trigo_sin(start_angle))  * rin) >> LV_TRIGO_SHIFT) - extra_area;
+        inv_area.x2 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT) + extra_area;
+        inv_area.y2 = y + rout + extra_area;
         lv_obj_invalidate_area(arc, &inv_area);
     } else if(start_quarter == 1 && end_quarter == 2) {
-        inv_area.x1 = x - rout;
-        inv_area.y1 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT);
-        inv_area.x2 = x + ((LV_MATH_MAX(lv_trigo_sin(start_angle + 90) , lv_trigo_sin(end_angle + 90)) * rin) >> LV_TRIGO_SHIFT);
-        inv_area.y2 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT);
+        inv_area.x1 = x - rout - extra_area;
+        inv_area.y1 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT) - extra_area;
+        inv_area.x2 = x + ((LV_MATH_MAX(lv_trigo_sin(start_angle + 90) , lv_trigo_sin(end_angle + 90)) * rin) >> LV_TRIGO_SHIFT) + extra_area;
+        inv_area.y2 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT) + extra_area;
         lv_obj_invalidate_area(arc, &inv_area);
     }  else if(start_quarter == 2 && end_quarter == 3) {
-        inv_area.x1 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT);
-        inv_area.y1 = y - rout;
-        inv_area.x2 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT);
-        inv_area.y2 = y + (LV_MATH_MAX(lv_trigo_sin(end_angle) * rin, lv_trigo_sin(start_angle) * rin) >> LV_TRIGO_SHIFT);
+        inv_area.x1 = x + ((lv_trigo_sin(start_angle + 90) * rout) >> LV_TRIGO_SHIFT) - extra_area;
+        inv_area.y1 = y - rout - extra_area;
+        inv_area.x2 = x + ((lv_trigo_sin(end_angle + 90) * rout) >> LV_TRIGO_SHIFT) + extra_area;
+        inv_area.y2 = y + (LV_MATH_MAX(lv_trigo_sin(end_angle) * rin, lv_trigo_sin(start_angle) * rin) >> LV_TRIGO_SHIFT) + extra_area;
         lv_obj_invalidate_area(arc, &inv_area);
     } else if(start_quarter == 3 && end_quarter == 0) {
-        inv_area.x1 = x + ((LV_MATH_MIN(lv_trigo_sin(end_angle + 90), lv_trigo_sin(start_angle + 90)) * rin) >> LV_TRIGO_SHIFT);
-        inv_area.y1 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT);
-        inv_area.x2 = x + rout;
-        inv_area.y2 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT);
+        inv_area.x1 = x + ((LV_MATH_MIN(lv_trigo_sin(end_angle + 90), lv_trigo_sin(start_angle + 90)) * rin) >> LV_TRIGO_SHIFT) - extra_area;
+        inv_area.y1 = y + ((lv_trigo_sin(start_angle) * rout) >> LV_TRIGO_SHIFT) - extra_area;
+        inv_area.x2 = x + rout + extra_area;
+        inv_area.y2 = y + ((lv_trigo_sin(end_angle) * rout) >> LV_TRIGO_SHIFT) + extra_area;
 
         lv_obj_invalidate_area(arc, &inv_area);
     } else {
