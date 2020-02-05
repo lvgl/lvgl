@@ -314,7 +314,6 @@ void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size
 void lv_label_set_static_text(lv_obj_t * label, const char * text)
 {
     LV_ASSERT_OBJ(label, LV_OBJX_NAME);
-    LV_ASSERT_STR(text);
 
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     if(ext->static_txt == 0 && ext->text != NULL) {
@@ -1321,10 +1320,18 @@ static void lv_label_refr_text(lv_obj_t * label)
             p.y -= line_space;                                               /*Trim the last line space*/
             uint32_t letter_id = lv_label_get_letter_on(label, &p);
 
-            /*Save letters under the dots and replace them with dots*/
-            uint32_t i;
+
+            /*Be sure there is space for the dots*/
+            size_t txt_len = strlen(ext->text);
             uint32_t byte_id     = lv_txt_encoded_get_byte_id(ext->text, letter_id);
+            while(byte_id + LV_LABEL_DOT_NUM > txt_len) {
+                byte_id -= lv_txt_encoded_size(&ext->text[byte_id]);
+                letter_id--;
+            }
+
+            /*Save letters under the dots and replace them with dots*/
             uint32_t byte_id_ori = byte_id;
+            uint32_t i;
             uint8_t len          = 0;
             for(i = 0; i <= LV_LABEL_DOT_NUM; i++) {
                 len += lv_txt_encoded_size(&ext->text[byte_id]);

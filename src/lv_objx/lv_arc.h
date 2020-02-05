@@ -81,6 +81,14 @@ void lv_arc_set_start_angle(lv_obj_t * arc, int16_t start);
  */
 void lv_arc_set_end_angle(lv_obj_t * arc, int16_t end);
 
+/**
+ * Set the start and end angles
+ * @param arc pointer to an arc object
+ * @param start the start angle
+ * @param end the end angle
+ */
+void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end);
+
 /*=====================
  * Getter functions
  *====================*/

@@ -96,7 +96,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     if(end_angle > start_angle) {
         angle_gap = 360 - (end_angle - start_angle);
     } else {
-        angle_gap = end_angle - start_angle;
+        angle_gap = start_angle - end_angle;
     }
     if(angle_gap > SPLIT_ANGLE_GAP_LIMIT && radius > SPLIT_RADIUS_LIMIT) {
         /*Handle each quarter individually and skip which is empty*/
@@ -217,7 +217,7 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
         quarter_area.y2 = q->center_y + ((lv_trigo_sin(q->start_angle) * (q->radius)) >> LV_TRIGO_SHIFT);
         quarter_area.x2 = q->center_x + ((lv_trigo_sin(q->start_angle + 90) * (q->radius - q->width)) >> LV_TRIGO_SHIFT);
 
-        quarter_area.y1 = q->center_y + ((lv_trigo_sin(q->end_angle) * q->radius - q->width) >> LV_TRIGO_SHIFT);
+        quarter_area.y1 = q->center_y + ((lv_trigo_sin(q->end_angle) * (q->radius - q->width)) >> LV_TRIGO_SHIFT);
         quarter_area.x1 = q->center_x + ((lv_trigo_sin(q->end_angle + 90) * (q->radius)) >> LV_TRIGO_SHIFT);
 
         bool ok = lv_area_intersect(&quarter_area, &quarter_area, q->clip_area);
@@ -302,7 +302,7 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
     else if((q->start_quarter == q->end_quarter && q->start_quarter != 2 && q->end_angle < q->start_angle) ||
             (q->start_quarter == 0 && q->end_quarter == 3) ||
             (q->start_quarter == 1 && q->end_quarter == 3) ||
-            (q->start_quarter == 3 && q->end_quarter == 1)) {
+            (q->start_quarter == 1 && q->end_quarter == 0)) {
         /*Arc crosses here*/
         quarter_area.x1 = q->center_x - q->radius;
         quarter_area.y1 = q->center_y - q->radius;
@@ -325,7 +325,7 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
         quarter_area.y1 = q->center_y + ((lv_trigo_sin(q->start_angle) * (q->radius)) >> LV_TRIGO_SHIFT);
 
         quarter_area.x2 = q->center_x + ((lv_trigo_sin(q->end_angle + 90) * (q->radius)) >> LV_TRIGO_SHIFT);
-        quarter_area.y2 = q->center_y + ((lv_trigo_sin(q->end_angle) * q->radius - q->width) >> LV_TRIGO_SHIFT);
+        quarter_area.y2 = q->center_y + ((lv_trigo_sin(q->end_angle) * (q->radius - q->width)) >> LV_TRIGO_SHIFT);
 
         bool ok = lv_area_intersect(&quarter_area, &quarter_area, q->clip_area);
         if(ok) lv_draw_rect(q->draw_area, &quarter_area, q->draw_dsc);
@@ -367,8 +367,6 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
         if(ok) lv_draw_rect(q->draw_area, &quarter_area, q->draw_dsc);
     }
 }
-
-
 
 
 static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness, lv_area_t * res_area)
