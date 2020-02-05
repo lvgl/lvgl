@@ -326,8 +326,8 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
                         } else
 #endif
                         {
-                            if(mask_tmp[x] > LV_OPA_MAX) last_res_color = color;
-                            else if(mask_tmp[x] < LV_OPA_MIN) last_res_color = disp_buf_tmp[x];
+                            if(mask_tmp[x] == LV_OPA_COVER) last_res_color = color;
+                            else if(mask_tmp[x] == LV_OPA_TRANSP) last_res_color = disp_buf_tmp[x];
                             else if(disp_buf_tmp[x].full == color.full) last_res_color = color;
                             else last_res_color = lv_color_mix(color, disp_buf_tmp[x], mask_tmp[x]);
                         }
@@ -346,15 +346,15 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
                 for(x = draw_area->x1; x <= draw_area->x2; x++) {
                     if(mask_tmp[x] == 0) continue;
                     if(mask_tmp[x] != last_mask || last_dest_color.full != disp_buf_tmp[x].full) {
-                        lv_opa_t opa_tmp = mask_tmp[x] >= LV_OPA_MAX ? opa : (uint32_t)((uint32_t)mask_tmp[x] * opa) >> 8;
+                        lv_opa_t opa_tmp = mask_tmp[x] == LV_OPA_COVER ? opa : (uint32_t)((uint32_t)mask_tmp[x] * opa) >> 8;
 #if LV_COLOR_SCREEN_TRANSP
                         if(disp->driver.screen_transp) {
                             lv_color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[x].ch.alpha, color, opa_tmp, &last_res_color, &last_res_color.ch.alpha);
                         } else
 #endif
                         {
-                            if(opa_tmp > LV_OPA_MAX) last_res_color = lv_color_mix(color, disp_buf_tmp[x], mask_tmp[x]);
-                            else if(opa_tmp < LV_OPA_MIN) last_res_color = disp_buf_tmp[x];
+                            if(opa_tmp == LV_OPA_COVER) last_res_color = lv_color_mix(color, disp_buf_tmp[x], mask_tmp[x]);
+                            else if(opa_tmp == LV_OPA_TRANSP) last_res_color = disp_buf_tmp[x];
                             else last_res_color = lv_color_mix(color, disp_buf_tmp[x],opa_tmp);
                         }
                         last_mask = mask_tmp[x];
