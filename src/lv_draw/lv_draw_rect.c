@@ -720,8 +720,8 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_dra
     }
 
     first_px = 0;
-    if(disp_area->x1 >= a.x1) {
-        first_px = disp_area->x1 - a.x1;
+    if(clip->x1 >= a.x1) {
+        first_px = clip->x1 - a.x1;
         a.x1 += first_px;
     }
 
@@ -908,8 +908,6 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, 
 #if SHADOW_ENHANCE
     /*Set half shadow width width because blur will be repeated*/
     if(sw_ori == 1) sw = 1;
-    else if(sw_ori == 2) sw = 2;
-    else if(sw_ori == 3) sw = 2;
     else sw = sw_ori >> 1;
 #endif
 
@@ -954,7 +952,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, 
         res_buf[x] = sh_buf[x];
     }
 #else
-    sw = sw_ori - sw;
+    sw += sw_ori & 1;
     if(sw > 1) {
         uint32_t i;
         sh_buf[0] = (sh_buf[0] << SHADOW_UPSACALE_SHIFT) / sw;
