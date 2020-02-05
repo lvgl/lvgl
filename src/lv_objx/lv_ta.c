@@ -733,7 +733,7 @@ void lv_ta_set_one_line(lv_obj_t * ta, bool en)
 
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->one_line == en) return;
-    lv_label_align_t old_align = lv_ta_get_text_align(ta);
+    lv_label_align_t old_align = lv_label_get_align(ext->label);
 
     if(en) {
         const lv_style_t * style_ta    = lv_obj_get_style(ta);
