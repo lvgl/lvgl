@@ -24,7 +24,7 @@
  *      DEFINES
  *********************/
 /* Draw translucent random colored areas on the invalidated (redrawn) areas*/
-#define MASK_AREA_DEBUG 0
+#define MASK_AREA_DEBUG 1
 
 /**********************
  *      TYPEDEFS
