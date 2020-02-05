@@ -95,7 +95,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, cons
     if(end_angle > start_angle) {
         angle_gap = 360 - (end_angle - start_angle);
     } else {
-        angle_gap = end_angle - start_angle;
+        angle_gap = start_angle - end_angle;
     }
     if(angle_gap > SPLIT_ANGLE_GAP_LIMIT && radius > SPLIT_RADIUS_LIMIT) {
         /*Handle each quarter individually and skip which is empty*/
