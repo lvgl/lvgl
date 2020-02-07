@@ -94,9 +94,9 @@ int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
 
     return v1 + v2 + v3 + v4;
 }
-#define BITSPERLONG 32
+#define BITSPERLONG 32UL
 
-#define TOP2BITS(x) ((x & (3L << (BITSPERLONG-2))) >> (BITSPERLONG-2))
+#define TOP2BITS(x) ((x & (3UL << (BITSPERLONG-2))) >> (BITSPERLONG-2))
 
 void lv_sqrt(uint32_t x, lv_sqrt_res_t * q)
 {
