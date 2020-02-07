@@ -511,13 +511,16 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
       (!hor && lv_area_get_height(&ext->indic_area) > bg_radius * 2)) {
         lv_opa_t bg_opa = draw_indic_dsc.bg_opa;
         lv_opa_t border_opa = draw_indic_dsc.border_opa;
+        lv_opa_t value_opa = draw_indic_dsc.border_opa;
         void * pattern_src = draw_indic_dsc.pattern_image;
         draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
         draw_indic_dsc.border_opa = LV_OPA_TRANSP;
+        draw_indic_dsc.value_opa = LV_OPA_TRANSP;
         draw_indic_dsc.pattern_image = NULL;
         lv_draw_rect(&ext->indic_area, clip_area, &draw_indic_dsc);
         draw_indic_dsc.bg_opa = bg_opa;
         draw_indic_dsc.border_opa = border_opa;
+        draw_indic_dsc.value_opa = value_opa;
         draw_indic_dsc.pattern_image = pattern_src;
 
     }
@@ -526,11 +529,13 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
     lv_draw_mask_radius_init(&mask_bg_param, &bar->coords, bg_radius, false);
     int16_t mask_bg_id = lv_draw_mask_add(&mask_bg_param, NULL);
 
-    /*Draw_only the background*/
+    /*Draw_only the background and the pattern*/
     lv_opa_t shadow_opa = draw_indic_dsc.shadow_opa;
     lv_opa_t border_opa = draw_indic_dsc.border_opa;
+    lv_opa_t value_opa = draw_indic_dsc.value_opa;
     draw_indic_dsc.border_opa = LV_OPA_TRANSP;
     draw_indic_dsc.shadow_opa = LV_OPA_TRANSP;
+    draw_indic_dsc.value_opa = LV_OPA_TRANSP;
 
     /*Get the max possible indicator area. The gradient should be applied on this*/
     lv_area_t mask_indic_max_area;
@@ -555,8 +560,9 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
     lv_draw_rect(&mask_indic_max_area, clip_area, &draw_indic_dsc);
     draw_indic_dsc.border_opa = border_opa;
     draw_indic_dsc.shadow_opa = shadow_opa;
+    draw_indic_dsc.value_opa = value_opa;
 
-    /*Draw the border*/
+    /*Draw the border and the value*/
     draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
     draw_indic_dsc.shadow_opa = LV_OPA_TRANSP;
     draw_indic_dsc.pattern_image = NULL;

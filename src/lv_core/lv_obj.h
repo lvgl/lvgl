@@ -151,32 +151,6 @@ typedef uint8_t lv_signal_t;
 
 typedef lv_res_t (*lv_signal_cb_t)(struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
-/** Object alignment. */
-enum {
-    LV_ALIGN_CENTER = 0,
-    LV_ALIGN_IN_TOP_LEFT,
-    LV_ALIGN_IN_TOP_MID,
-    LV_ALIGN_IN_TOP_RIGHT,
-    LV_ALIGN_IN_BOTTOM_LEFT,
-    LV_ALIGN_IN_BOTTOM_MID,
-    LV_ALIGN_IN_BOTTOM_RIGHT,
-    LV_ALIGN_IN_LEFT_MID,
-    LV_ALIGN_IN_RIGHT_MID,
-    LV_ALIGN_OUT_TOP_LEFT,
-    LV_ALIGN_OUT_TOP_MID,
-    LV_ALIGN_OUT_TOP_RIGHT,
-    LV_ALIGN_OUT_BOTTOM_LEFT,
-    LV_ALIGN_OUT_BOTTOM_MID,
-    LV_ALIGN_OUT_BOTTOM_RIGHT,
-    LV_ALIGN_OUT_LEFT_TOP,
-    LV_ALIGN_OUT_LEFT_MID,
-    LV_ALIGN_OUT_LEFT_BOTTOM,
-    LV_ALIGN_OUT_RIGHT_TOP,
-    LV_ALIGN_OUT_RIGHT_MID,
-    LV_ALIGN_OUT_RIGHT_BOTTOM,
-};
-typedef uint8_t lv_align_t;
-
 #if LV_USE_OBJ_REALIGN
 typedef struct
 {
@@ -913,9 +887,9 @@ static inline value_type lv_obj_get_style_##func_name (const lv_obj_t * obj, uin
 {                                                                                           \
     return (value_type) lv_obj_get_style##style_type (obj, part, LV_STYLE_##prop_name);     \
 }                                                                                           \
-static inline void lv_obj_set_style_##func_name (lv_obj_t * obj, uint8_t part, value_type value)  \
+static inline void lv_obj_set_style_##func_name (lv_obj_t * obj, uint8_t part, lv_style_state_t state, value_type value)  \
 {                                                                                           \
-    lv_obj_set_style##style_type (obj, part, LV_STYLE_##prop_name, value);                  \
+    lv_obj_set_style##style_type (obj, part, LV_STYLE_##prop_name | state, value);                  \
 }                                                                                           \
 static inline int16_t lv_style_get_##func_name (lv_style_t * style, void * res)             \
 {                                                                                           \
@@ -956,18 +930,28 @@ LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_SPREAD, shadow_spread, lv_style_int_t, _int)
 LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_BLEND_MODE, shadow_blend_mode, lv_blend_mode_t, _int );
 LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_COLOR, shadow_color, lv_color_t, _color);
 LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_OPA, shadow_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_REPEAT, pattern_repeat, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_BLEND_MODE, pattern_blend_mode, lv_blend_mode_t, _int );
 LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_RECOLOR, pattern_recolor, lv_color_t, _color);
 LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_OPA, pattern_opa, lv_opa_t, _opa);
 LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_RECOLOR_OPA, pattern_recolor_opa, lv_opa_t, _opa);
 LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_IMAGE, pattern_image, const void *, _ptr);
-LV_OBJ_STYLE_SET_GET_DECLARE(LETTER_SPACE, letter_space, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(LINE_SPACE, line_space, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_LETTER_SPACE, value_letter_space, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_LINE_SPACE, value_line_space, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_BLEND_MODE, value_blend_mode, lv_blend_mode_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_OFS_X, value_ofs_x, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_OFS_Y, value_ofs_y, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_ALIGN, value_align, lv_align_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_COLOR, value_color, lv_color_t, _color);
+LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_OPA, value_opa, lv_opa_t, _opa);
+LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_FONT, value_font, const lv_font_t * , _ptr);
+LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_STR, value_str, const char * , _ptr);
+LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_LETTER_SPACE, letter_space, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_LINE_SPACE, line_space, lv_style_int_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_BLEND_MODE, text_blend_mode, lv_blend_mode_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_COLOR, text_color, lv_color_t, _color);
 LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_SEL_COLOR, text_sel_color, lv_color_t, _color);
 LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_OPA, text_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(FONT, font, const lv_font_t * , _ptr);
+LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_FONT, font, const lv_font_t * , _ptr);
 LV_OBJ_STYLE_SET_GET_DECLARE(LINE_WIDTH, line_width, lv_style_int_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(LINE_BLEND_MODE, line_blend_mode, lv_blend_mode_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(LINE_DASH_WIDTH, line_dash_width, lv_style_int_t, _int);

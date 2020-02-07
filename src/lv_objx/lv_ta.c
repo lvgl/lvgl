@@ -1678,8 +1678,8 @@ static void refr_cursor_area(lv_obj_t * ta)
 {
     lv_ta_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    const lv_font_t * font = lv_obj_get_style_ptr(ta, LV_TA_PART_BG, LV_STYLE_FONT);
-    lv_style_int_t line_space = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_LINE_SPACE);
+    const lv_font_t * font = lv_obj_get_style_ptr(ta, LV_TA_PART_BG, LV_STYLE_TEXT_FONT);
+    lv_style_int_t line_space = lv_obj_get_style_int(ta, LV_TA_PART_BG, LV_STYLE_TEXT_LINE_SPACE);
 
     uint16_t cur_pos = lv_ta_get_cursor_pos(ta);
     const char * txt = lv_label_get_text(ext->label);

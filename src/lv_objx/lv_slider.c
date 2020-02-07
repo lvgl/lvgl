@@ -383,6 +383,39 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         slider->ext_draw_pad = LV_MATH_MAX(slider->ext_draw_pad, indic_size);
         slider->ext_draw_pad = LV_MATH_MAX(slider->ext_draw_pad, bg_size);
 
+        /*The value string(s) can be out of the slider*/
+        const char * value_str = lv_obj_get_style_value_str(slider, LV_SLIDER_PART_KNOB);
+        if(value_str) {
+            lv_style_int_t letter_space = lv_obj_get_style_value_letter_space(slider, LV_SLIDER_PART_KNOB);
+            lv_style_int_t line_space = lv_obj_get_style_value_letter_space(slider, LV_SLIDER_PART_KNOB);
+            const lv_font_t * font = lv_obj_get_style_value_font(slider, LV_SLIDER_PART_KNOB);
+
+            lv_point_t s;
+            lv_txt_get_size(&s, value_str, font, letter_space, line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+
+            lv_area_t value_area;
+            value_area.x1 = 0;
+            value_area.y1 = 0;
+            value_area.x2 = s.x - 1;
+            value_area.y2 = s.y - 1;
+
+            lv_style_int_t align = lv_obj_get_style_value_align(slider, LV_SLIDER_PART_KNOB);
+            lv_style_int_t xofs = lv_obj_get_style_value_ofs_x(slider, LV_SLIDER_PART_KNOB);
+            lv_style_int_t yofs = lv_obj_get_style_value_ofs_y(slider, LV_SLIDER_PART_KNOB);
+            lv_point_t p_align;
+            lv_area_align(&slider->coords, &value_area, align, &p_align);
+
+            value_area.x1 += p_align.x + xofs;
+            value_area.y1 += p_align.y + yofs;
+            value_area.x2 += p_align.x + xofs;
+            value_area.y2 += p_align.y + yofs;
+
+            slider->ext_draw_pad = LV_MATH_MAX(slider->ext_draw_pad, slider->coords.x1 - value_area.x1);
+            slider->ext_draw_pad = LV_MATH_MAX(slider->ext_draw_pad, slider->coords.y1 - value_area.y1);
+            slider->ext_draw_pad = LV_MATH_MAX(slider->ext_draw_pad, value_area.x2 - slider->coords.x2);
+            slider->ext_draw_pad = LV_MATH_MAX(slider->ext_draw_pad, value_area.y2 - slider->coords.y2);
+        }
+
     } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
 

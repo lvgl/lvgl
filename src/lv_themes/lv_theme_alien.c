@@ -275,13 +275,14 @@ static void basic_init(void)
     lv_style_set_border_color(&btn, LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
     lv_style_set_border_width(&btn, LV_STYLE_STATE_NORMAL, 2);
     lv_style_set_border_opa(&btn, LV_STYLE_STATE_NORMAL, LV_OPA_50);
-    lv_style_set_shadow_width(&btn, LV_STYLE_STATE_NORMAL, 10);
+    lv_style_set_shadow_blend_mode(&btn, LV_STYLE_STATE_NORMAL, LV_BLEND_MODE_NORMAL);
+    lv_style_set_shadow_width(&btn, LV_STYLE_STATE_NORMAL, 20);
     lv_style_set_shadow_width(&btn, LV_STYLE_STATE_PRESSED, 2);
     lv_style_set_shadow_offset_x(&btn, LV_STYLE_STATE_NORMAL, -4);
     lv_style_set_shadow_offset_y(&btn, LV_STYLE_STATE_NORMAL, 8);
 //    lv_style_set_shadow_offset_y(&btn, LV_STYLE_STATE_PRESSED, 1);
     lv_style_set_shadow_color(&btn, LV_STYLE_STATE_NORMAL, LV_COLOR_BLUE);
-//    lv_style_set_shadow_spread(&btn, LV_STYLE_STATE_NORMAL, 5);
+    lv_style_set_shadow_spread(&btn, LV_STYLE_STATE_NORMAL, 5);
     lv_style_set_text_color(&btn, LV_STYLE_STATE_NORMAL, LV_COLOR_WHITE);
     lv_style_set_text_color(&btn, LV_STYLE_STATE_PRESSED, LV_COLOR_BLACK);
     lv_style_set_text_color(&btn, LV_STYLE_STATE_DISABLED, LV_COLOR_SILVER);
@@ -693,7 +694,7 @@ static void tabview_init(void)
     lv_style_set_int(&tabview_btns_bg, LV_STYLE_BORDER_WIDTH, LV_DPI / 30 > 0 ? LV_DPI / 30 : 1);
     lv_style_set_int(&tabview_btns_bg, LV_STYLE_BORDER_SIDE , LV_BORDER_SIDE_BOTTOM);
     lv_style_set_color(&tabview_btns_bg, LV_STYLE_TEXT_COLOR, lv_color_hex(0x979a9f));
-    lv_style_set_ptr(&tabview_btns_bg, LV_STYLE_FONT, &lv_font_roboto_16);
+    lv_style_set_ptr(&tabview_btns_bg, LV_STYLE_TEXT_FONT, &lv_font_roboto_16);
     lv_style_set_color(&tabview_btns_bg, LV_STYLE_IMAGE_RECOLOR, lv_color_hex(0x979a9f));
 
 

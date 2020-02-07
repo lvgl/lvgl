@@ -37,10 +37,6 @@
  **********************/
 static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop);
 static lv_style_t * get_local_style(lv_style_list_t * list);
-#if LV_USE_ANIMATION
-static void style_animator(lv_style_anim_dsc_t * dsc, lv_anim_value_t val);
-static void style_animation_common_end_cb(lv_anim_t * a);
-#endif
 
 /**********************
  *  GLOABAL VARIABLES
@@ -613,39 +609,6 @@ lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop,
     else return LV_RES_INV;
 }
 
-#if LV_USE_ANIMATION
-
-void lv_style_anim_init(lv_anim_t * a)
-{
-    lv_anim_init(a);
-    a->start    = 0;
-    a->end      = STYLE_MIX_MAX;
-    a->exec_cb  = (lv_anim_exec_xcb_t)style_animator;
-    a->path_cb  = lv_anim_path_linear;
-    a->ready_cb = style_animation_common_end_cb;
-
-    lv_style_anim_dsc_t * dsc;
-
-    dsc = lv_mem_alloc(sizeof(lv_style_anim_dsc_t));
-    LV_ASSERT_MEM(dsc);
-    if(dsc == NULL) return;
-    dsc->ready_cb   = NULL;
-    dsc->style_anim = NULL;
-    lv_style_init(&dsc->style_start);
-    lv_style_init(&dsc->style_end);
-
-    a->var = (void *)dsc;
-}
-
-void lv_style_anim_set_styles(lv_anim_t * a, lv_style_t * to_anim, const lv_style_t * start, const lv_style_t * end)
-{
-    lv_style_anim_dsc_t * dsc = a->var;
-    dsc->style_anim           = to_anim;
-
-    lv_style_copy(&dsc->style_start, start);
-    lv_style_copy(&dsc->style_end, end);
-}
-#endif
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -716,109 +679,3 @@ static lv_style_t * get_local_style(lv_style_list_t * list)
     return local_style;
 }
 
-
-#if LV_USE_ANIMATION
-
-/**
- * Used by the style animations to set the values of a style according to start and end style.
- * @param dsc the 'animated variable' set by lv_style_anim_create()
- * @param val the current state of the animation between 0 and LV_ANIM_RESOLUTION
- */
-static void style_animator(lv_style_anim_dsc_t * dsc, lv_anim_value_t val)
-{
-    const lv_style_t * start = &dsc->style_start;
-    const lv_style_t * end   = &dsc->style_end;
-    lv_style_t * act         = dsc->style_anim;
-
-    size_t i = 0;
-    lv_style_property_t prop_act;
-    while(start->map[i] != _LV_STYLE_CLOSEING_PROP) {
-        prop_act = start->map[i] + (start->map[i + 1] << 8);
-
-        /*Value*/
-        if((start->map[i] & 0xF) < LV_STYLE_ID_COLOR) {
-            lv_style_int_t v1;
-            memcpy(&v1, &start->map[i + sizeof(lv_style_property_t)], sizeof(lv_style_int_t));
-
-            int16_t res2;
-            lv_style_int_t v2;
-            res2 = lv_style_get_int(end, prop_act, &v2);
-
-            if(res2 >= 0) {
-                lv_style_int_t vres = v1 + ((int32_t)((int32_t)(v2-v1) * val) >> 8);
-                lv_style_set_int(act, prop_act, vres);
-            }
-
-            i+= sizeof(lv_style_int_t);
-        }
-        /*Color*/
-        else if((start->map[i] & 0xF) < LV_STYLE_ID_OPA) {
-            lv_color_t color1;
-            memcpy(&color1, &start->map[i + sizeof(lv_style_property_t)], sizeof(lv_color_t));
-
-            int16_t res2;
-            lv_color_t color2;
-            res2 = lv_style_get_color(end, prop_act, &color2);
-
-            if(res2 >= 0) {
-                lv_color_t color_res = val == 256 ? color2 : lv_color_mix(color2, color1, (lv_opa_t)val);
-                lv_style_set_color(act, prop_act, color_res);
-            }
-
-            i+= sizeof(lv_color_t);
-        }
-        /*Opa*/
-        else if((start->map[i] & 0xF) < LV_STYLE_ID_PTR) {
-            lv_opa_t opa1;
-            memcpy(&opa1, &start->map[i + sizeof(lv_style_property_t)], sizeof(lv_opa_t));
-
-            int16_t res2;
-            lv_opa_t opa2;
-            res2 = lv_style_get_opa(end, prop_act, &opa2);
-
-            if(res2 >= 0) {
-                lv_opa_t opa_res = opa1 + ((uint16_t)((uint16_t)(opa2 - opa1) * val) >> 8);
-                lv_style_set_opa(act, prop_act, opa_res);
-            }
-
-            i+= sizeof(lv_opa_t);
-        }
-        else {
-            void * p1;
-            memcpy(p1, &start->map[i + sizeof(lv_style_property_t)], sizeof(void *));
-
-            int16_t res2;
-            void * p2;
-            res2 = lv_style_get_ptr(end, prop_act, &p2);
-
-            if(res2 >= 0) {
-                if(val > 128) lv_style_set_ptr(act, prop_act, p2);
-                else if(val > 128) lv_style_set_ptr(act, prop_act, p1);
-            }
-
-            i+= sizeof(void*);
-        }
-
-        i += sizeof(lv_style_property_t);
-    }
-
-    lv_obj_report_style_mod(dsc->style_anim);
-}
-
-/**
- * Called when a style animation is ready
- * It called the user defined call back and free the allocated memories
- * @param a pointer to the animation
- */
-static void style_animation_common_end_cb(lv_anim_t * a)
-{
-
-    (void)a;                            /*Unused*/
-    lv_style_anim_dsc_t * dsc = a->var; /*To avoid casting*/
-
-    if(dsc->ready_cb) dsc->ready_cb(a);
-
-    lv_mem_free(dsc);
-}
-
-#endif

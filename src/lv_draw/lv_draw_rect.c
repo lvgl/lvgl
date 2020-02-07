@@ -33,7 +33,8 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_dra
 static inline lv_color_t grad_get(lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
 static void shadow_draw_corner_buf(const lv_area_t * coords,  uint16_t * sh_buf, lv_coord_t s, lv_coord_t r);
 static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf);
-static void draw_img(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
+static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
+static void draw_value(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -54,11 +55,15 @@ void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
     dsc->bg_grad_color = LV_COLOR_BLACK;
     dsc->border_color = LV_COLOR_BLACK;
     dsc->pattern_recolor = LV_COLOR_BLACK;
+    dsc->value_color = LV_COLOR_BLACK;
     dsc->shadow_color = LV_COLOR_BLACK;
     dsc->bg_grad_color_stop = 0xFF;
     dsc->bg_opa = LV_OPA_COVER;
     dsc->border_opa = LV_OPA_COVER;
+    dsc->pattern_opa = LV_OPA_COVER;
     dsc->pattern_font = LV_FONT_DEFAULT;
+    dsc->value_opa = LV_OPA_COVER;
+    dsc->value_font = LV_FONT_DEFAULT;
     dsc->shadow_opa = LV_OPA_COVER;
     dsc->border_side = LV_BORDER_SIDE_FULL;
 
@@ -76,8 +81,9 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect
 
     draw_shadow(coords, clip, dsc);
     draw_bg(coords, clip, dsc);
-    draw_img(coords, clip, dsc);
+    draw_pattern(coords, clip, dsc);
     draw_border(coords, clip, dsc);
+    draw_value(coords, clip, dsc);
 
     LV_ASSERT_MEM_INTEGRITY();
 }
@@ -1043,7 +1049,7 @@ static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups
     lv_mem_buf_release(sh_ups_blur_buf);
 }
 
-static void draw_img(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
+static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
 {
     if(dsc->pattern_image == NULL) return;
     if(dsc->pattern_opa <= LV_OPA_MIN) return;
@@ -1090,54 +1096,58 @@ static void draw_img(const lv_area_t * coords, const lv_area_t * clip, lv_draw_r
 
     lv_area_t coords_tmp;
 
-    if(dsc->pattern_repeate) {
-        lv_draw_mask_radius_param_t radius_mask_param;
-        lv_draw_mask_radius_init(&radius_mask_param, coords, dsc->radius, false);
-        int16_t radius_mask_id = lv_draw_mask_add(&radius_mask_param, NULL);
+    lv_draw_mask_radius_param_t radius_mask_param;
+    lv_draw_mask_radius_init(&radius_mask_param, coords, dsc->radius, false);
+    int16_t radius_mask_id = lv_draw_mask_add(&radius_mask_param, NULL);
 
-        /*Align the pattern to the middle*/
-        int32_t ofs_x = (lv_area_get_width(coords) - (lv_area_get_width(coords) / img_w) * img_w) / 2;
-        int32_t ofs_y = (lv_area_get_height(coords) - (lv_area_get_height(coords) / img_h) * img_h) / 2;
+    /*Align the pattern to the middle*/
+    int32_t ofs_x = (lv_area_get_width(coords) - (lv_area_get_width(coords) / img_w) * img_w) / 2;
+    int32_t ofs_y = (lv_area_get_height(coords) - (lv_area_get_height(coords) / img_h) * img_h) / 2;
 
-        coords_tmp.y1 = coords->y1 - ofs_y;
-        coords_tmp.y2 = coords_tmp.y1 + img_h - 1;
-        for(; coords_tmp.y1 <= coords->y2; coords_tmp.y1 += img_h, coords_tmp.y2 += img_h) {
-            coords_tmp.x1 = coords->x1 - ofs_x;
-            coords_tmp.x2 = coords_tmp.x1 + img_w - 1;
-            for(; coords_tmp.x1 <= coords->x2; coords_tmp.x1 += img_w, coords_tmp.x2 += img_w) {
-                if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->pattern_image, NULL);
-                else lv_draw_img(&coords_tmp, clip, dsc->pattern_image, &img_dsc);
-            }
-        }
-        lv_draw_mask_remove_id(radius_mask_id);
-    } else {
-        int32_t obj_w = lv_area_get_width(coords);
-        int32_t obj_h = lv_area_get_height(coords);
-        coords_tmp.x1 = coords->x1 + (obj_w - img_w) / 2;
-        coords_tmp.y1 = coords->y1 + (obj_h - img_h) / 2;
+    coords_tmp.y1 = coords->y1 - ofs_y;
+    coords_tmp.y2 = coords_tmp.y1 + img_h - 1;
+    for(; coords_tmp.y1 <= coords->y2; coords_tmp.y1 += img_h, coords_tmp.y2 += img_h) {
+        coords_tmp.x1 = coords->x1 - ofs_x;
         coords_tmp.x2 = coords_tmp.x1 + img_w - 1;
-        coords_tmp.y2 = coords_tmp.y1 + img_h - 1;
-
-        /* If the (obj_h - img_h) is odd there is a rounding error when divided by 2.
-         * It's better round up in case of symbols because probably there is some extra space in the bottom
-         * due to the base line of font*/
-        if(src_type == LV_IMG_SRC_SYMBOL) {
-            int32_t y_corr = (obj_h - img_h) & 0x1;
-            coords_tmp.y1 += y_corr;
-            coords_tmp.y2 += y_corr;
+        for(; coords_tmp.x1 <= coords->x2; coords_tmp.x1 += img_w, coords_tmp.x2 += img_w) {
+            if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->pattern_image, NULL);
+            else lv_draw_img(&coords_tmp, clip, dsc->pattern_image, &img_dsc);
         }
-
-        int16_t radius_mask_id = LV_MASK_ID_INV;
-        if(lv_area_is_in(&coords_tmp, coords, dsc->radius) == false) {
-            lv_draw_mask_radius_param_t radius_mask_param;
-            lv_draw_mask_radius_init(&radius_mask_param, coords, dsc->radius, false);
-            radius_mask_id = lv_draw_mask_add(&radius_mask_param, NULL);
-        }
-
-        if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->pattern_image, NULL);
-        else lv_draw_img(&coords_tmp, clip, dsc->pattern_image, &img_dsc);
-
-        lv_draw_mask_remove_id(radius_mask_id);
     }
+    lv_draw_mask_remove_id(radius_mask_id);
+}
+
+
+static void draw_value(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
+{
+    if(dsc->value_str == NULL) return;
+    if(dsc->value_opa <= LV_OPA_MIN) return;
+
+    lv_point_t s;
+    lv_txt_get_size(&s, dsc->value_str, dsc->value_font, dsc->value_letter_space, dsc->value_line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+
+    lv_area_t value_area;
+    value_area.x1 = 0;
+    value_area.y1 = 0;
+    value_area.x2 = s.x - 1;
+    value_area.y2 = s.y - 1;
+
+    lv_point_t p_align;
+    lv_area_align(coords, &value_area, dsc->value_align, &p_align);
+
+    value_area.x1 += p_align.x + dsc->value_ofs_x;
+    value_area.y1 += p_align.y + dsc->value_ofs_y;
+    value_area.x2 += p_align.x + dsc->value_ofs_x;
+    value_area.y2 += p_align.y + dsc->value_ofs_y;
+
+    lv_draw_label_dsc_t label_dsc;
+    lv_draw_label_dsc_init(&label_dsc);
+    label_dsc.font = dsc->value_font;
+    label_dsc.letter_space = dsc->value_letter_space;
+    label_dsc.line_space = dsc->value_line_space;
+    label_dsc.color = dsc->value_color;
+    label_dsc.opa = dsc->value_opa;
+
+    lv_draw_label(&value_area, clip, &label_dsc, dsc->value_str, NULL);
 }
 

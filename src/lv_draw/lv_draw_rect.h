@@ -49,7 +49,7 @@ typedef struct {
     lv_style_int_t shadow_ofs_x;
     lv_style_int_t shadow_ofs_y;
     lv_style_int_t shadow_spread;
-    lv_style_int_t shadow_blend_mode;
+    lv_blend_mode_t shadow_blend_mode;
     lv_opa_t shadow_opa;
 
     /*Pattern*/
@@ -58,8 +58,19 @@ typedef struct {
     lv_opa_t pattern_opa;
     lv_opa_t pattern_recolor_opa;
     lv_color_t pattern_recolor;
-    uint8_t pattern_repeate :1;
+    lv_blend_mode_t pattern_blend_mode;
 
+    /*Value*/
+    const char * value_str;
+    const lv_font_t * value_font;
+    lv_opa_t value_opa;
+    lv_color_t value_color;
+    lv_style_int_t value_ofs_x;
+    lv_style_int_t value_ofs_y;
+    lv_style_int_t value_letter_space;
+    lv_style_int_t value_line_space;
+    lv_align_t value_align;
+    lv_blend_mode_t value_blend_mode;
 }lv_draw_rect_dsc_t;
 
 /**********************

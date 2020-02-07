@@ -94,7 +94,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
 
     /*Draw a full ring*/
     if(start_angle + 360 == end_angle) {
-        lv_draw_rect(&area, clip_area, &circle_style, opa_scale);
+        lv_draw_rect(&area, clip_area, dsc);
         return;
     }
 
