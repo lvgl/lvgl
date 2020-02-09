@@ -446,11 +446,16 @@ void lv_ddlist_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
         else if(dir == LV_DDLIST_DIR_RIGHT)lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
     }
 
+    lv_obj_t * scr = lv_scr_act();
+    if(ext->page->coords.y2 > scr->coords.y2) {
+        lv_obj_set_height(ext->page, lv_obj_get_height(ext->page) - (ext->page->coords.y2 - scr->coords.y2));
+    }
+
     if(dir != LV_DDLIST_DIR_UP) {
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_exec_cb(&a, ddlist, list_anim);
-        lv_anim_set_values(&a, 0, list_h);
+        lv_anim_set_values(&a, 0, lv_obj_get_height(ext->page));
         lv_anim_set_time(&a, ext->anim_time, 0);
         lv_anim_create(&a);
     }
