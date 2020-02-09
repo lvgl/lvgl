@@ -843,7 +843,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
                 lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
 
                 lv_coord_t y_top = LV_MATH_MIN(p1.y, p2.y);
-                if(has_area && y_top >= clip_area->y1) {
+                if(has_area && y_top <= clip_area->y2) {
                     int16_t mask_line_id;
                     lv_draw_mask_line_param_t mask_line_p;
                     lv_draw_mask_line_points_init(&mask_line_p, p1.x, p1.y, p2.x, p2.y, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
@@ -853,7 +853,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
                     a.x1 = p1.x;
                     a.x2 = p2.x - 1;
                     a.y1 = y_top;
-                    a.y2 = chart->coords.y2;
+                    a.y2 = series_area->y2;
 
                     if(has_fade) mask_fade_id = lv_draw_mask_add(&mask_fade_p, NULL);
 
