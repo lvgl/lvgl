@@ -30,7 +30,8 @@
 static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_table_signal(lv_obj_t * table, lv_signal_t sign, void * param);
 static lv_style_list_t * lv_table_get_style(lv_obj_t * table, uint8_t part);
-static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id);
+static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id, const lv_font_t ** font, lv_style_int_t * letter_space, lv_style_int_t * line_space,
+								 lv_style_int_t * cell_left, lv_style_int_t * cell_right, lv_style_int_t * cell_top, lv_style_int_t * cell_bottom);
 static void refr_size(lv_obj_t * table);
 
 /**********************
@@ -599,6 +600,9 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
         lv_style_int_t cell_right[LV_TABLE_CELL_STYLE_CNT];
         lv_style_int_t cell_top[LV_TABLE_CELL_STYLE_CNT];
         lv_style_int_t cell_bottom[LV_TABLE_CELL_STYLE_CNT];
+        lv_style_int_t letter_space[LV_TABLE_CELL_STYLE_CNT];
+        lv_style_int_t line_space[LV_TABLE_CELL_STYLE_CNT];
+        const lv_font_t * font[LV_TABLE_CELL_STYLE_CNT];
 
         uint16_t i;
         for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
@@ -615,6 +619,9 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
             cell_right[i] = lv_obj_get_style_pad_right(table, LV_TABLE_PART_CELL1 + i);
             cell_top[i] = lv_obj_get_style_pad_top(table, LV_TABLE_PART_CELL1 + i);
             cell_bottom[i] = lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_CELL1 + i);
+            letter_space[i] = label_dsc[i].letter_space;
+            line_space[i] = label_dsc[i].line_space;
+            font[i] = label_dsc[i].font;
         }
 
         uint16_t col;
@@ -623,10 +630,16 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
         cell_area.y2 = table->coords.y1 + bg_top;
         for(row = 0; row < ext->row_cnt; row++) {
-            h_row = get_row_height(table, row);
+            h_row = get_row_height(table, row, font, letter_space, line_space,
+            		cell_left, cell_right, cell_top, cell_bottom);
 
             cell_area.y1 = cell_area.y2 + 1;
             cell_area.y2 = cell_area.y1 + h_row - 1;
+
+
+//            if(cell_area.y2 < clip_area->y1) continue;
+//            if(cell_area.y1 > clip_area->y2) return LV_DESIGN_RES_OK;
+
 
             cell_area.x2 = table->coords.x1 + bg_left;
 
@@ -668,7 +681,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                 cell_area_border.x2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
                 cell_area_border.y2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
 
-                lv_draw_rect(&cell_area_border, clip_area, &rect_dsc[cell_type]);
+//                lv_draw_rect(&cell_area_border, clip_area, &rect_dsc[cell_type]);
 
                 if(ext->cell_data[cell]) {
 
@@ -833,8 +846,29 @@ static void refr_size(lv_obj_t * table)
     for(i = 0; i < ext->col_cnt; i++) {
         w += ext->col_w[i];
     }
+
+    lv_style_int_t cell_left[LV_TABLE_CELL_STYLE_CNT];
+    lv_style_int_t cell_right[LV_TABLE_CELL_STYLE_CNT];
+    lv_style_int_t cell_top[LV_TABLE_CELL_STYLE_CNT];
+    lv_style_int_t cell_bottom[LV_TABLE_CELL_STYLE_CNT];
+    lv_style_int_t letter_space[LV_TABLE_CELL_STYLE_CNT];
+    lv_style_int_t line_space[LV_TABLE_CELL_STYLE_CNT];
+    const lv_font_t * font[LV_TABLE_CELL_STYLE_CNT];
+
+    for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
+        cell_left[i] = lv_obj_get_style_pad_left(table, LV_TABLE_PART_CELL1 + i);
+        cell_right[i] = lv_obj_get_style_pad_right(table, LV_TABLE_PART_CELL1 + i);
+        cell_top[i] = lv_obj_get_style_pad_top(table, LV_TABLE_PART_CELL1 + i);
+        cell_bottom[i] = lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_CELL1 + i);
+        letter_space[i] = lv_obj_get_style_letter_space(table, LV_TABLE_PART_CELL1 + i);
+        line_space[i] = lv_obj_get_style_line_space(table, LV_TABLE_PART_CELL1 + i);
+        font[i] = lv_obj_get_style_font(table, LV_TABLE_PART_CELL1 + i);
+    }
+
+
     for(i = 0; i < ext->row_cnt; i++) {
-        h += get_row_height(table, i);
+    	h += get_row_height(table, i, font, letter_space, line_space,
+    	            		cell_left, cell_right, cell_top, cell_bottom);
     }
 
     lv_style_int_t bg_top = lv_obj_get_style_pad_top(table, LV_TABLE_PART_BG);
@@ -847,34 +881,17 @@ static void refr_size(lv_obj_t * table)
     lv_obj_set_size(table, w + 1, h + 1);
 }
 
-static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
+static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id, const lv_font_t ** font, lv_style_int_t * letter_space, lv_style_int_t * line_space,
+								 lv_style_int_t * cell_left, lv_style_int_t * cell_right, lv_style_int_t * cell_top, lv_style_int_t * cell_bottom)
 {
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
     lv_point_t txt_size;
     lv_coord_t txt_w;
 
-    lv_draw_label_dsc_t label_dsc[LV_TABLE_CELL_STYLE_CNT];
-    lv_style_int_t cell_left[LV_TABLE_CELL_STYLE_CNT];
-    lv_style_int_t cell_right[LV_TABLE_CELL_STYLE_CNT];
-    lv_style_int_t cell_top[LV_TABLE_CELL_STYLE_CNT];
-    lv_style_int_t cell_bottom[LV_TABLE_CELL_STYLE_CNT];
-
-    uint16_t i;
-    for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
-        lv_draw_label_dsc_init(&label_dsc[i]);
-        lv_obj_init_draw_label_dsc(table, LV_TABLE_PART_CELL1 + i, &label_dsc[i]);
-
-        cell_left[i] = lv_obj_get_style_pad_left(table, LV_TABLE_PART_CELL1 + i);
-        cell_right[i] = lv_obj_get_style_pad_right(table, LV_TABLE_PART_CELL1 + i);
-        cell_top[i] = lv_obj_get_style_pad_top(table, LV_TABLE_PART_CELL1 + i);
-        cell_bottom[i] = lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_CELL1 + i);
-    }
-
-
     uint16_t row_start = row_id * ext->col_cnt;
     uint16_t cell;
     uint16_t col;
-    lv_coord_t h_max = lv_font_get_line_height(label_dsc[0].font) + cell_top[0] + cell_bottom[0];
+    lv_coord_t h_max = lv_font_get_line_height(font[0]) + cell_top[0] + cell_bottom[0];
 
     for(cell = row_start, col = 0; cell < row_start + ext->col_cnt; cell++, col++) {
         if(ext->cell_data[cell] != NULL) {
@@ -900,15 +917,15 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id)
 
             /*With text crop assume 1 line*/
             if(format.s.crop) {
-                h_max = LV_MATH_MAX(lv_font_get_line_height(label_dsc[cell_type].font) + cell_top[cell_type] + cell_bottom[cell_type],
+                h_max = LV_MATH_MAX(lv_font_get_line_height(font[cell_type]) + cell_top[cell_type] + cell_bottom[cell_type],
                                     h_max);
             }
             /*Without text crop calculate the height of the text in the cell*/
             else {
                 txt_w -= cell_left[cell_type] + cell_right[cell_type];
 
-                lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, label_dsc[cell_type].font,
-                                label_dsc[cell_type].letter_space, label_dsc[cell_type].line_space, txt_w, LV_TXT_FLAG_NONE);
+                lv_txt_get_size(&txt_size, ext->cell_data[cell] + 1, font[cell_type],
+                                letter_space[cell_type], line_space[cell_type], txt_w, LV_TXT_FLAG_NONE);
 
                 h_max = LV_MATH_MAX(txt_size.y + cell_top[cell_type] + cell_bottom[cell_type], h_max);
                 cell += col_merge;
