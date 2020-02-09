@@ -43,7 +43,7 @@ static lv_coord_t get_header_height(lv_obj_t * calendar);
 static lv_coord_t get_day_names_height(lv_obj_t * calendar);
 static void draw_header(lv_obj_t * calendar, const lv_area_t * mask);
 static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask);
-static void draw_dates(lv_obj_t * calendar, const lv_area_t * mask);
+static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area);
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day);
 static bool is_highlighted(lv_obj_t * calendar, day_draw_state_t draw_state, int32_t year, int32_t month, int32_t day);
 static bool is_pressed(lv_obj_t * calendar, day_draw_state_t draw_state, int32_t year, int32_t month, int32_t day);
@@ -661,7 +661,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     header_area.x1 = calendar->coords.x1;
     header_area.x2 = calendar->coords.x2;
     header_area.y1 = calendar->coords.y1 + header_top;
-    header_area.y2 = calendar->coords.y1 + lv_font_get_line_height(font);
+    header_area.y2 = header_area.y1 + lv_font_get_line_height(font);
 
     lv_draw_rect_dsc_t header_rect_dsc;
     lv_draw_rect_dsc_init(&header_rect_dsc);
@@ -752,7 +752,6 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
 
     uint32_t i;
     for(i = 0; i < 7; i++) {
-
         label_area.x1 = calendar->coords.x1 + ((w - box_size) * i) / 6  + box_size / 2 - label_w / 2 + left;
         label_area.x2 = label_area.x1 + label_w - 1;
 
@@ -765,7 +764,7 @@ static void draw_day_names(lv_obj_t * calendar, const lv_area_t * mask)
  * @param calendar point to a calendar
  * @param mask a mask for drawing
  */
-static void draw_dates(lv_obj_t * calendar, const lv_area_t * mask)
+static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
 {
     lv_calendar_ext_t * ext     = lv_obj_get_ext_attr(calendar);
 
@@ -827,6 +826,8 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * mask)
         box_area.y1 = days_y1 + ((days_h - box_size) * week) / 5;
         box_area.y2 = box_area.y1 + box_size - 1;
 
+        if(box_area.y1 > clip_area->y2) return;
+
         lv_area_t label_area;
         label_area.y1 = box_area.y1 + (lv_area_get_height(&box_area) - lv_font_get_line_height(nums_font)) / 2;
         label_area.y2 = label_area.y1 + lv_font_get_line_height(nums_font);
@@ -848,6 +849,10 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * mask)
                 month_state  = LV_OBJ_STATE_DISABLED;
             }
 
+            if(box_area.y2 < clip_area->y1) {
+                day_cnt++;
+                continue;
+            }
 
             lv_obj_state_t day_state = month_state;
             if(is_pressed(calendar, draw_state, ext->showed_date.year, ext->showed_date.month, day_cnt)) {
@@ -880,11 +885,11 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * mask)
             box_area.x2 = label_area.x2;
 
 
-            lv_draw_rect(&box_area, mask, &rect_dsc);
+            lv_draw_rect(&box_area, clip_area, &rect_dsc);
 
             /*Write the day's number*/
             lv_utils_num_to_str(day_cnt, buf);
-            lv_draw_label(&label_area, mask, &label_dsc, buf, NULL);
+            lv_draw_label(&label_area, clip_area, &label_dsc, buf, NULL);
 
             /*Go to the next day*/
             day_cnt++;

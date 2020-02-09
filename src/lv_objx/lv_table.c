@@ -636,10 +636,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
             cell_area.y1 = cell_area.y2 + 1;
             cell_area.y2 = cell_area.y1 + h_row - 1;
 
-
-//            if(cell_area.y2 < clip_area->y1) continue;
-//            if(cell_area.y1 > clip_area->y2) return LV_DESIGN_RES_OK;
-
+            if(cell_area.y1 > clip_area->y2) return LV_DESIGN_RES_OK;
 
             cell_area.x2 = table->coords.x1 + bg_left;
 
@@ -654,7 +651,6 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     format.s.type        = 0;
                     format.s.crop        = 1;
                 }
-
 
                 cell_area.x1 = cell_area.x2 + 1;
                 cell_area.x2 = cell_area.x1 + ext->col_w[col] - 1;
@@ -672,6 +668,11 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     }
                 }
 
+                if(cell_area.y2 < clip_area->y1) {
+                    cell += col_merge + 1;
+                    col += col_merge;
+                    continue;
+                }
 
                 uint8_t cell_type = format.s.type;
 
@@ -681,10 +682,9 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                 cell_area_border.x2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
                 cell_area_border.y2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
 
-//                lv_draw_rect(&cell_area_border, clip_area, &rect_dsc[cell_type]);
+                lv_draw_rect(&cell_area_border, clip_area, &rect_dsc[cell_type]);
 
                 if(ext->cell_data[cell]) {
-
                     txt_area.x1 = cell_area.x1 + cell_left[cell_type];
                     txt_area.x2 = cell_area.x2 - cell_right[cell_type];
                     txt_area.y1 = cell_area.y1 + cell_top[cell_type];
@@ -721,6 +721,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     if(label_mask_ok) {
                         lv_draw_label(&txt_area, &label_mask, &label_dsc[cell_type], ext->cell_data[cell] + 1, NULL);
                     }
+
                     /*Draw lines after '\n's*/
                     lv_point_t p1;
                     lv_point_t p2;
