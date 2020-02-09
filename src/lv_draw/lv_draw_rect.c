@@ -1115,25 +1115,55 @@ static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, lv_dr
 
     lv_area_t coords_tmp;
 
-    lv_draw_mask_radius_param_t radius_mask_param;
-    lv_draw_mask_radius_init(&radius_mask_param, coords, dsc->radius, false);
-    int16_t radius_mask_id = lv_draw_mask_add(&radius_mask_param, NULL);
+    if(dsc->pattern_repeat) {
+        lv_draw_mask_radius_param_t radius_mask_param;
+        lv_draw_mask_radius_init(&radius_mask_param, coords, dsc->radius, false);
+        int16_t radius_mask_id = lv_draw_mask_add(&radius_mask_param, NULL);
 
-    /*Align the pattern to the middle*/
-    int32_t ofs_x = (lv_area_get_width(coords) - (lv_area_get_width(coords) / img_w) * img_w) / 2;
-    int32_t ofs_y = (lv_area_get_height(coords) - (lv_area_get_height(coords) / img_h) * img_h) / 2;
+        /*Align the pattern to the middle*/
+        int32_t ofs_x = (lv_area_get_width(coords) - (lv_area_get_width(coords) / img_w) * img_w) / 2;
+        int32_t ofs_y = (lv_area_get_height(coords) - (lv_area_get_height(coords) / img_h) * img_h) / 2;
 
-    coords_tmp.y1 = coords->y1 - ofs_y;
-    coords_tmp.y2 = coords_tmp.y1 + img_h - 1;
-    for(; coords_tmp.y1 <= coords->y2; coords_tmp.y1 += img_h, coords_tmp.y2 += img_h) {
-        coords_tmp.x1 = coords->x1 - ofs_x;
-        coords_tmp.x2 = coords_tmp.x1 + img_w - 1;
-        for(; coords_tmp.x1 <= coords->x2; coords_tmp.x1 += img_w, coords_tmp.x2 += img_w) {
-            if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->pattern_image, NULL);
-            else lv_draw_img(&coords_tmp, clip, dsc->pattern_image, &img_dsc);
+        coords_tmp.y1 = coords->y1 - ofs_y;
+        coords_tmp.y2 = coords_tmp.y1 + img_h - 1;
+        for(; coords_tmp.y1 <= coords->y2; coords_tmp.y1 += img_h, coords_tmp.y2 += img_h) {
+            coords_tmp.x1 = coords->x1 - ofs_x;
+            coords_tmp.x2 = coords_tmp.x1 + img_w - 1;
+            for(; coords_tmp.x1 <= coords->x2; coords_tmp.x1 += img_w, coords_tmp.x2 += img_w) {
+                if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->pattern_image, NULL);
+                else lv_draw_img(&coords_tmp, clip, dsc->pattern_image, &img_dsc);
+            }
         }
+        lv_draw_mask_remove_id(radius_mask_id);
+    } else {
+        int32_t obj_w = lv_area_get_width(coords);
+        int32_t obj_h = lv_area_get_height(coords);
+        coords_tmp.x1 = coords->x1 + (obj_w - img_w) / 2;
+        coords_tmp.y1 = coords->y1 + (obj_h - img_h) / 2;
+        coords_tmp.x2 = coords_tmp.x1 + img_w - 1;
+        coords_tmp.y2 = coords_tmp.y1 + img_h - 1;
+
+        /* If the (obj_h - img_h) is odd there is a rounding error when divided by 2.
+         * It's better round up in case of symbols because probably there is some extra space in the bottom
+         * due to the base line of font*/
+        if(src_type == LV_IMG_SRC_SYMBOL) {
+            int32_t y_corr = (obj_h - img_h) & 0x1;
+            coords_tmp.y1 += y_corr;
+            coords_tmp.y2 += y_corr;
+        }
+
+        int16_t radius_mask_id = LV_MASK_ID_INV;
+        if(lv_area_is_in(&coords_tmp, coords, dsc->radius) == false) {
+            lv_draw_mask_radius_param_t radius_mask_param;
+            lv_draw_mask_radius_init(&radius_mask_param, coords, dsc->radius, false);
+            radius_mask_id = lv_draw_mask_add(&radius_mask_param, NULL);
+        }
+
+        if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->pattern_image, NULL);
+        else lv_draw_img(&coords_tmp, clip, dsc->pattern_image, &img_dsc);
+
+        lv_draw_mask_remove_id(radius_mask_id);
     }
-    lv_draw_mask_remove_id(radius_mask_id);
 }
 
 

@@ -2737,6 +2737,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
             if(draw_dsc->pattern_opa > LV_OPA_MIN) {
                 draw_dsc->pattern_blend_mode = lv_obj_get_style_pattern_blend_mode(obj, part);
                 draw_dsc->pattern_recolor_opa = lv_obj_get_style_pattern_recolor_opa(obj, part);
+                draw_dsc->pattern_repeat = lv_obj_get_style_pattern_repeat(obj, part);
                 if(lv_img_src_get_type(draw_dsc->pattern_image) == LV_IMG_SRC_SYMBOL) {
                     draw_dsc->pattern_recolor = lv_obj_get_style_pattern_recolor(obj, part);
                     draw_dsc->pattern_font = lv_obj_get_style_font(obj, part);

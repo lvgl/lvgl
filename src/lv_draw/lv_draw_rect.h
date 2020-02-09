@@ -55,6 +55,7 @@ typedef struct {
     /*Pattern*/
     const void * pattern_image;
     const lv_font_t * pattern_font;
+    bool pattern_repeat;
     lv_opa_t pattern_opa;
     lv_opa_t pattern_recolor_opa;
     lv_color_t pattern_recolor;
