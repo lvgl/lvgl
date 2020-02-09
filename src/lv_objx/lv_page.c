@@ -652,31 +652,31 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
 
         lv_area_t sb_hor_area;
         lv_area_t sb_ver_area;
+        /*Convert the relative coordinates to absolute*/
+        lv_area_copy(&sb_hor_area, &ext->sb.hor_area);
 		sb_hor_area.x1 += page->coords.x1;
 		sb_hor_area.y1 += page->coords.y1;
 		sb_hor_area.x2 += page->coords.x1;
 		sb_hor_area.y2 += page->coords.y1;
 
+        /*Convert the relative coordinates to absolute*/
+        lv_area_copy(&sb_ver_area, &ext->sb.ver_area);
 		sb_ver_area.x1 += page->coords.x1;
 		sb_ver_area.y1 += page->coords.y1;
 		sb_ver_area.x2 += page->coords.x1;
 		sb_ver_area.y2 += page->coords.y1;
 
-		if((ext->sb.hor_draw || ext->sb.ver_draw) &&
-				(lv_area_is_in(clip_area, &sb_hor_area, 0) || lv_area_is_in(clip_area, &sb_ver_area, 0))) {
+		if((ext->sb.hor_draw && lv_area_is_in(&sb_hor_area, clip_area, 0)) ||
+		   (ext->sb.ver_draw && lv_area_is_in(&sb_ver_area, clip_area, 0))) {
 			/*Draw the scrollbars*/
 			lv_draw_rect_dsc_t rect_dsc;
 			lv_draw_rect_dsc_init(&rect_dsc);
 			lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCRLBAR, &rect_dsc);
 			if(ext->sb.hor_draw && (ext->sb.mode & LV_SB_MODE_HIDE) == 0) {
-				/*Convert the relative coordinates to absolute*/
-				lv_area_copy(&sb_hor_area, &ext->sb.hor_area);
 				lv_draw_rect(&sb_hor_area, clip_area, &rect_dsc);
 			}
 
 			if(ext->sb.ver_draw && (ext->sb.mode & LV_SB_MODE_HIDE) == 0) {
-				/*Convert the relative coordinates to absolute*/
-				lv_area_copy(&sb_ver_area, &ext->sb.ver_area);
 				lv_draw_rect(&sb_ver_area, clip_area, &rect_dsc);
 			}
 		}
