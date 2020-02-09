@@ -433,7 +433,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
     /*If this object is fully cover the draw area check the children too */
     if(lv_area_is_in(area_p, &obj->coords, 0) && obj->hidden == 0) {
-        lv_design_res_t design_res = obj->design_cb(obj, area_p, LV_DESIGN_COVER_CHK);
+        lv_design_res_t design_res = obj->design_cb ? obj->design_cb(obj, area_p, LV_DESIGN_COVER_CHK) : LV_DESIGN_RES_NOT_COVER;
         if(design_res == LV_DESIGN_RES_MASKED) return NULL;
 
         lv_obj_t * i;
@@ -491,7 +491,7 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
         }
 
         /*Call the post draw design function of the parents of the to object*/
-        par->design_cb(par, mask_p, LV_DESIGN_DRAW_POST);
+        if(par->design_cb) par->design_cb(par, mask_p, LV_DESIGN_DRAW_POST);
 
         /*The new border will be there last parents,
          *so the 'younger' brothers of parent will be refreshed*/
@@ -529,7 +529,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     if(union_ok != false) {
 
         /* Redraw the object */
-        obj->design_cb(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
+        if(obj->design_cb) obj->design_cb(obj, &obj_ext_mask, LV_DESIGN_DRAW_MAIN);
 
 #if MASK_AREA_DEBUG
         static lv_color_t debug_color = LV_COLOR_RED;
@@ -576,7 +576,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         }
 
         /* If all the children are redrawn make 'post draw' design */
-        obj->design_cb(obj, &obj_ext_mask, LV_DESIGN_DRAW_POST);
+        if(obj->design_cb) obj->design_cb(obj, &obj_ext_mask, LV_DESIGN_DRAW_POST);
     }
 }
 

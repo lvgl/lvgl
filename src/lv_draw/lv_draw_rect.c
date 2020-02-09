@@ -170,7 +170,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
     uint16_t other_mask_cnt = lv_draw_mask_get_cnt();
     bool simple_mode = true;
     if(other_mask_cnt) simple_mode = false;
-    else if(dsc->bg_grad_dir != LV_GRAD_DIR_NONE) simple_mode = false;
+    else if(dsc->bg_grad_dir == LV_GRAD_DIR_HOR) simple_mode = false;
 
     int16_t mask_rout_id = LV_MASK_ID_INV;
 
@@ -264,21 +264,23 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
                 int32_t mask_ofs = (coords_bg.x2 - rout + 1) - (vdb->area.x1 + draw_area.x1);
                 if(mask_ofs < 0) mask_ofs = 0;
                 lv_blend_fill(clip, &fill_area2,
-                        grad_color, mask_buf + mask_ofs, mask_res, opa, dsc->bg_blend_mode);
+                		grad_color, mask_buf + mask_ofs, mask_res, opa, dsc->bg_blend_mode);
             } else {
-                if(grad_map == NULL) {
+                if(dsc->bg_grad_dir == LV_GRAD_DIR_HOR) {
+                    lv_blend_map(clip, &fill_area, grad_map, mask_buf, mask_res, opa, dsc->bg_blend_mode);
+                } else if(dsc->bg_grad_dir == LV_GRAD_DIR_VER) {
                     lv_blend_fill(clip, &fill_area,
                             grad_color,mask_buf, mask_res, opa, dsc->bg_blend_mode);
-                } else {
-                    lv_blend_map(clip, &fill_area, grad_map, mask_buf, mask_res, opa, dsc->bg_blend_mode);
+                } else if(other_mask_cnt != 0) {
+                    lv_blend_fill(clip, &fill_area,
+                                        grad_color,mask_buf, mask_res, opa, dsc->bg_blend_mode);
                 }
-
             }
             fill_area.y1++;
             fill_area.y2++;
         }
 
-        if(simple_mode) {
+        if(dsc->bg_grad_dir == LV_GRAD_DIR_NONE && other_mask_cnt == 0) {
             lv_area_t fill_area;
             /*Central part*/
             fill_area.x1 = coords_bg.x1 + rout;
@@ -287,13 +289,21 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
             fill_area.y2 = coords_bg.y1 + rout;
 
             lv_blend_fill(clip, &fill_area,
-                    grad_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
+                    dsc->bg_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
 
             fill_area.y1 = coords_bg.y2 - rout;
             fill_area.y2 = coords_bg.y2;
 
             lv_blend_fill(clip, &fill_area,
-                    grad_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
+            		dsc->bg_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
+
+            fill_area.x1 = coords_bg.x1;
+            fill_area.x2 = coords_bg.x2;
+            fill_area.y1 = coords_bg.y1 + rout + 1;
+            fill_area.y2 = coords_bg.y2 - rout - 1;
+
+            lv_blend_fill(clip, &fill_area,
+            		dsc->bg_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
 
         }
 
@@ -339,10 +349,10 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
     /*Create a mask if there is a radius*/
     lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
 
+    uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
     bool simple_mode = true;
-    if(lv_draw_mask_get_cnt()!= 0) simple_mode = false;
+    if(other_mask_cnt) simple_mode = false;
     else if(dsc->border_side != LV_BORDER_SIDE_FULL) simple_mode = false;
-    else if(dsc->bg_grad_dir == LV_GRAD_DIR_HOR) simple_mode = false;
 
     int16_t mask_rout_id = LV_MASK_ID_INV;
 
@@ -360,7 +370,6 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
         lv_draw_mask_radius_init(&mask_rout_param, coords, rout, false);
         mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
     }
-
 
     /*Get the inner radius*/
     int32_t rin = rout - dsc->border_width;
@@ -485,12 +494,18 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
         fill_area.x2 = coords->x2;
         fill_area.y1 = disp_area->y1 + draw_area.y1;
         fill_area.y2 = fill_area.y1;
+
+		if(dsc->border_side == LV_BORDER_SIDE_LEFT) fill_area.x2 = coords->x1 + rout;
+		else if(dsc->border_side == LV_BORDER_SIDE_RIGHT) fill_area.x1 = coords->x2 - rout;
+
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
-            memset(mask_buf, LV_OPA_COVER, draw_area_w);
-            mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+            if((dsc->border_side == LV_BORDER_SIDE_BOTTOM && fill_area.y1 >= coords->y2 - rout - 1) ||
+               (dsc->border_side == LV_BORDER_SIDE_TOP && fill_area.y1 <= coords->y1 + rout + 1)) {
+				memset(mask_buf, LV_OPA_COVER, draw_area_w);
+				mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
-            lv_blend_fill( clip, &fill_area, color, mask_buf, mask_res, opa, blend_mode);
-
+				lv_blend_fill( clip, &fill_area, color, mask_buf, mask_res, opa, blend_mode);
+            }
             fill_area.y1++;
             fill_area.y2++;
 

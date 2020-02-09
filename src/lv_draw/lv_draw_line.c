@@ -1,4 +1,4 @@
-/**lip
+/**
  * @file lv_draw_line.c
  *
  */

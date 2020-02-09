@@ -587,8 +587,9 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         ancestor_design_f(btnm, clip_area, mode);
 
-        lv_btnm_ext_t * ext         = lv_obj_get_ext_attr(btnm);
 
+        lv_btnm_ext_t * ext         = lv_obj_get_ext_attr(btnm);
+        if(ext->btn_cnt == 0) return LV_DESIGN_RES_OK;
         lv_area_t area_btnm;
         lv_obj_get_coords(btnm, &area_btnm);
 
@@ -599,6 +600,7 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
         uint16_t btn_i = 0;
         uint16_t txt_i = 0;
         lv_txt_flag_t txt_flag = LV_TXT_FLAG_NONE;
+        if(ext->recolor) txt_flag = LV_TXT_FLAG_RECOLOR;
 
         lv_draw_rect_dsc_t draw_rect_rel_dsc;
         lv_draw_label_dsc_t draw_label_rel_dsc;
@@ -614,7 +616,6 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
 
 
         /*The state changes without re-caching the styles, disable the use of cache*/
-        lv_obj_state_dsc_t state = btnm->state_dsc;
         lv_obj_state_dsc_t state_ori = btnm->state_dsc;
         btnm->state_dsc.act = LV_OBJ_STATE_NORMAL;
         btnm->state_dsc.prev = btnm->state_dsc.act;
@@ -622,27 +623,15 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
         lv_draw_label_dsc_init(&draw_label_rel_dsc);
         lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_rel_dsc);
         lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_rel_dsc);
-
-        btnm->state_dsc.act = LV_OBJ_STATE_CHECKED;
-        btnm->state_dsc.prev = btnm->state_dsc.act;
-        lv_draw_rect_dsc_init(&draw_rect_chk_dsc);
-        lv_draw_label_dsc_init(&draw_label_chk_dsc);
-        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_chk_dsc);
-        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_chk_dsc);
-
-        btnm->state_dsc.act = LV_OBJ_STATE_DISABLED;
-        btnm->state_dsc.prev = btnm->state_dsc.act;
-        lv_draw_rect_dsc_init(&draw_rect_ina_dsc);
-        lv_draw_label_dsc_init(&draw_label_ina_dsc);
-        lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_ina_dsc);
-        lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_ina_dsc);
-
+        draw_label_rel_dsc.flag = txt_flag;
         btnm->state_dsc = state_ori;
+
+        bool chk_inited = false;
+        bool disabled_inited = false;
 
         lv_style_int_t padding_top = lv_obj_get_style_pad_top(btnm, LV_BTNM_PART_BG);
         lv_style_int_t padding_bottom = lv_obj_get_style_pad_bottom(btnm, LV_BTNM_PART_BG);
 
-        if(ext->recolor) txt_flag = LV_TXT_FLAG_RECOLOR;
         for(btn_i = 0; btn_i < ext->btn_cnt; btn_i++, txt_i++) {
             /*Search the next valid text in the map*/
             while(strcmp(ext->map_p[txt_i], "\n") == 0) {
@@ -666,7 +655,32 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             lv_draw_label_dsc_t * draw_label_dsc_act;
             bool tgl_state = button_get_tgl_state(ext->ctrl_bits[btn_i]);
 
+            if(tgl_state) {
+            	if(!chk_inited) {
+					btnm->state_dsc.act = LV_OBJ_STATE_CHECKED;
+					btnm->state_dsc.prev = btnm->state_dsc.act;
+					lv_draw_rect_dsc_init(&draw_rect_chk_dsc);
+					lv_draw_label_dsc_init(&draw_label_chk_dsc);
+					lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_chk_dsc);
+					lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_chk_dsc);
+			        draw_label_chk_dsc.flag = txt_flag;
+			        btnm->state_dsc = state_ori;
+					chk_inited = true;
+            	}
+            }
+
             if(button_is_inactive(ext->ctrl_bits[btn_i])) {
+            	if(!disabled_inited) {
+					btnm->state_dsc.act = LV_OBJ_STATE_DISABLED;
+					btnm->state_dsc.prev = btnm->state_dsc.act;
+					lv_draw_rect_dsc_init(&draw_rect_ina_dsc);
+					lv_draw_label_dsc_init(&draw_label_ina_dsc);
+					lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_ina_dsc);
+					lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_ina_dsc);
+			        draw_label_ina_dsc.flag = txt_flag;
+			        btnm->state_dsc = state_ori;
+					disabled_inited = true;
+            	}
                 draw_rect_dsc_act = &draw_rect_ina_dsc;
                 draw_label_dsc_act = &draw_label_ina_dsc;
             }
@@ -687,6 +701,7 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
                 lv_draw_label_dsc_init(&draw_label_tmp_dsc);
                 lv_obj_init_draw_rect_dsc(btnm, LV_BTNM_PART_BTN, &draw_rect_tmp_dsc);
                 lv_obj_init_draw_label_dsc(btnm, LV_BTNM_PART_BTN, &draw_label_tmp_dsc);
+                draw_label_tmp_dsc.flag = txt_flag;
                 draw_rect_dsc_act = &draw_rect_tmp_dsc;
                 draw_label_dsc_act = &draw_label_tmp_dsc;
 

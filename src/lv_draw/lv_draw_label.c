@@ -89,6 +89,11 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
     /*No need to waste processor time if string is empty*/
     if (txt[0] == '\0')  return;
 
+    lv_area_t clipped_area;
+    bool clip_ok = lv_area_intersect(&clipped_area, coords, mask);
+    if(!clip_ok) return;
+
+
     if((dsc->flag & LV_TXT_FLAG_EXPAND) == 0) {
         /*Normally use the label's width as width*/
         w = lv_area_get_width(coords);

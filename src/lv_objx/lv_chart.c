@@ -806,7 +806,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
     point_dsc.bg_opa = line_dsc.opa;
     point_dsc.radius = LV_RADIUS_CIRCLE;
 
-    lv_coord_t point_radius = lv_obj_get_style_radius(chart, LV_CHART_PART_SERIES);
+    lv_coord_t point_radius = lv_obj_get_style_size(chart, LV_CHART_PART_SERIES);
 
     /*Go through all data lines*/
     LV_LL_READ_BACK(ext->series_ll, ser)

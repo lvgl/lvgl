@@ -648,76 +648,81 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
         return ancestor_design(page, clip_area, mode);
     } else if(mode == LV_DESIGN_DRAW_POST) {
         ancestor_design(page, clip_area, mode);
-
-        /*Draw the scrollbars*/
         lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
-        lv_draw_rect_dsc_t rect_dsc;
-        lv_draw_rect_dsc_init(&rect_dsc);
-        lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCRLBAR, &rect_dsc);
-        lv_area_t sb_area;
-        if(ext->sb.hor_draw && (ext->sb.mode & LV_SB_MODE_HIDE) == 0) {
-            /*Convert the relative coordinates to absolute*/
-            lv_area_copy(&sb_area, &ext->sb.hor_area);
-            sb_area.x1 += page->coords.x1;
-            sb_area.y1 += page->coords.y1;
-            sb_area.x2 += page->coords.x1;
-            sb_area.y2 += page->coords.y1;
-            lv_draw_rect(&sb_area, clip_area, &rect_dsc);
-        }
 
-        if(ext->sb.ver_draw && (ext->sb.mode & LV_SB_MODE_HIDE) == 0) {
-            /*Convert the relative coordinates to absolute*/
-            lv_area_copy(&sb_area, &ext->sb.ver_area);
-            sb_area.x1 += page->coords.x1;
-            sb_area.y1 += page->coords.y1;
-            sb_area.x2 += page->coords.x1;
-            sb_area.y2 += page->coords.y1;
-            lv_draw_rect(&sb_area, clip_area, &rect_dsc);
-        }
+        lv_area_t sb_hor_area;
+        lv_area_t sb_ver_area;
+		sb_hor_area.x1 += page->coords.x1;
+		sb_hor_area.y1 += page->coords.y1;
+		sb_hor_area.x2 += page->coords.x1;
+		sb_hor_area.y2 += page->coords.y1;
+
+		sb_ver_area.x1 += page->coords.x1;
+		sb_ver_area.y1 += page->coords.y1;
+		sb_ver_area.x2 += page->coords.x1;
+		sb_ver_area.y2 += page->coords.y1;
+
+		if((ext->sb.hor_draw || ext->sb.ver_draw) &&
+				(lv_area_is_in(clip_area, &sb_hor_area, 0) || lv_area_is_in(clip_area, &sb_ver_area, 0))) {
+			/*Draw the scrollbars*/
+			lv_draw_rect_dsc_t rect_dsc;
+			lv_draw_rect_dsc_init(&rect_dsc);
+			lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCRLBAR, &rect_dsc);
+			if(ext->sb.hor_draw && (ext->sb.mode & LV_SB_MODE_HIDE) == 0) {
+				/*Convert the relative coordinates to absolute*/
+				lv_area_copy(&sb_hor_area, &ext->sb.hor_area);
+				lv_draw_rect(&sb_hor_area, clip_area, &rect_dsc);
+			}
+
+			if(ext->sb.ver_draw && (ext->sb.mode & LV_SB_MODE_HIDE) == 0) {
+				/*Convert the relative coordinates to absolute*/
+				lv_area_copy(&sb_ver_area, &ext->sb.ver_area);
+				lv_draw_rect(&sb_ver_area, clip_area, &rect_dsc);
+			}
+		}
 
 #if LV_USE_ANIMATION
-        {
-            lv_coord_t page_w = lv_obj_get_width(page);
-            lv_coord_t page_h = lv_obj_get_height(page);
+		{
+			lv_coord_t page_w = lv_obj_get_width(page);
+			lv_coord_t page_h = lv_obj_get_height(page);
 
-            lv_area_t flash_area;
+			lv_area_t flash_area;
 
-            if(ext->edge_flash.top_ip) {
-                flash_area.x1 = page->coords.x1 - page_w;
-                flash_area.x2 = page->coords.x2 + page_w;
-                flash_area.y1 = page->coords.y1 - 3 * page_w + ext->edge_flash.state;
-                flash_area.y2 = page->coords.y1 + ext->edge_flash.state;
-            } else if(ext->edge_flash.bottom_ip) {
-                flash_area.x1 = page->coords.x1 - page_w;
-                flash_area.x2 = page->coords.x2 + page_w;
-                flash_area.y1 = page->coords.y2 - ext->edge_flash.state;
-                flash_area.y2 = page->coords.y2 + 3 * page_w - ext->edge_flash.state;
-            } else if(ext->edge_flash.right_ip) {
-                flash_area.x1 = page->coords.x2 - ext->edge_flash.state;
-                flash_area.x2 = page->coords.x2 + 3 * page_h - ext->edge_flash.state;
-                flash_area.y1 = page->coords.y1 - page_h;
-                flash_area.y2 = page->coords.y2 + page_h;
-            } else if(ext->edge_flash.left_ip) {
-                flash_area.x1 = page->coords.x1 - 3 * page_h + ext->edge_flash.state;
-                flash_area.x2 = page->coords.x1 + ext->edge_flash.state;
-                flash_area.y1 = page->coords.y1 - page_h;
-                flash_area.y2 = page->coords.y2 + page_h;
-            }
+			if(ext->edge_flash.top_ip) {
+				flash_area.x1 = page->coords.x1 - page_w;
+				flash_area.x2 = page->coords.x2 + page_w;
+				flash_area.y1 = page->coords.y1 - 3 * page_w + ext->edge_flash.state;
+				flash_area.y2 = page->coords.y1 + ext->edge_flash.state;
+			} else if(ext->edge_flash.bottom_ip) {
+				flash_area.x1 = page->coords.x1 - page_w;
+				flash_area.x2 = page->coords.x2 + page_w;
+				flash_area.y1 = page->coords.y2 - ext->edge_flash.state;
+				flash_area.y2 = page->coords.y2 + 3 * page_w - ext->edge_flash.state;
+			} else if(ext->edge_flash.right_ip) {
+				flash_area.x1 = page->coords.x2 - ext->edge_flash.state;
+				flash_area.x2 = page->coords.x2 + 3 * page_h - ext->edge_flash.state;
+				flash_area.y1 = page->coords.y1 - page_h;
+				flash_area.y2 = page->coords.y2 + page_h;
+			} else if(ext->edge_flash.left_ip) {
+				flash_area.x1 = page->coords.x1 - 3 * page_h + ext->edge_flash.state;
+				flash_area.x2 = page->coords.x1 + ext->edge_flash.state;
+				flash_area.y1 = page->coords.y1 - page_h;
+				flash_area.y2 = page->coords.y2 + page_h;
+			}
 
-            if(ext->edge_flash.left_ip || ext->edge_flash.right_ip || ext->edge_flash.top_ip ||
-               ext->edge_flash.bottom_ip) {
-                lv_draw_rect_dsc_t edge_draw_dsc;
-                lv_draw_rect_dsc_init(&edge_draw_dsc);
-                lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_EDGE_FLASH, &edge_draw_dsc);
-                edge_draw_dsc.radius  = LV_RADIUS_CIRCLE;
-                uint32_t opa            = (edge_draw_dsc.bg_opa * ext->edge_flash.state) / LV_PAGE_END_FLASH_SIZE;
-                edge_draw_dsc.bg_opa    = opa;
-                lv_draw_rect(&flash_area, clip_area, &edge_draw_dsc);
-            }
-        }
-
+			if(ext->edge_flash.left_ip || ext->edge_flash.right_ip || ext->edge_flash.top_ip ||
+					ext->edge_flash.bottom_ip) {
+				lv_draw_rect_dsc_t edge_draw_dsc;
+				lv_draw_rect_dsc_init(&edge_draw_dsc);
+				lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_EDGE_FLASH, &edge_draw_dsc);
+				edge_draw_dsc.radius  = LV_RADIUS_CIRCLE;
+				uint32_t opa            = (edge_draw_dsc.bg_opa * ext->edge_flash.state) / LV_PAGE_END_FLASH_SIZE;
+				edge_draw_dsc.bg_opa    = opa;
+				lv_draw_rect(&flash_area, clip_area, &edge_draw_dsc);
+			}
+		}
 #endif
-    }
+	}
 
     return LV_DESIGN_RES_OK;
 }

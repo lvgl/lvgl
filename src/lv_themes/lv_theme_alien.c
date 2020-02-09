@@ -134,7 +134,7 @@ static void basic_init(void)
     lv_style_set_bg_color(&scr, LV_STYLE_STATE_NORMAL, COLOR_SCREEN);
     lv_style_set_text_color(&scr, LV_STYLE_STATE_NORMAL, lv_color_hex(0xb8b8b9));
 
-#define PERF_TEST 3
+#define PERF_TEST 0
 #if PERF_TEST == 0
     lv_style_init(&panel);
     lv_style_set_radius(&panel, LV_STYLE_STATE_NORMAL, LV_DPI / 25);
