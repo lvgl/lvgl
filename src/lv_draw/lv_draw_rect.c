@@ -499,14 +499,17 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
 		else if(dsc->border_side == LV_BORDER_SIDE_RIGHT) fill_area.x1 = coords->x2 - rout;
 
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
-            if(dsc->border_side == LV_BORDER_SIDE_FULL ||
-                    (dsc->border_side == LV_BORDER_SIDE_BOTTOM && fill_area.y1 >= coords->y2 - rout - 1) ||
-               (dsc->border_side == LV_BORDER_SIDE_TOP && fill_area.y1 <= coords->y1 + rout + 1)) {
-				memset(mask_buf, LV_OPA_COVER, draw_area_w);
-				mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+            if((dsc->border_side == LV_BORDER_SIDE_BOTTOM && fill_area.y1 < coords->y2 - rout - 1) ||
+               (dsc->border_side == LV_BORDER_SIDE_TOP && fill_area.y1 > coords->y1 + rout + 1)) {
 
-				lv_blend_fill( clip, &fill_area, color, mask_buf, mask_res, opa, blend_mode);
+                fill_area.y1++;
+                fill_area.y2++;
+                continue;
             }
+            memset(mask_buf, LV_OPA_COVER, draw_area_w);
+            mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+
+            lv_blend_fill( clip, &fill_area, color, mask_buf, mask_res, opa, blend_mode);
             fill_area.y1++;
             fill_area.y2++;
 
