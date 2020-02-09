@@ -9,6 +9,8 @@
 #include "../../lvgl.h"
 #include "../lv_test_assert.h"
 
+#if LV_BUILD_TEST
+
 /*********************
  *      DEFINES
  *********************/
@@ -630,3 +632,4 @@ static void mem_leak(void)
     lv_mem_monitor(&mon_end);
     lv_test_assert_int_lt(sizeof(void*) * 8, mon_start.free_size - mon_end.free_size, "Style memory leak");
 }
+#endif

@@ -7,6 +7,9 @@
  *      INCLUDES
  *********************/
 #include "../lv_test_assert.h"
+
+#if LV_BUILD_TEST
+
 #include "lv_test_obj.h"
 #include "lv_test_style.h"
 
@@ -49,4 +52,4 @@ void lv_test_core(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
+#endif

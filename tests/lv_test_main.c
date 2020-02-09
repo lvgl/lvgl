@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-#if LV_BUILD_TEST == 0
+#if LV_BUILD_TEST
 
 
 static void hal_init(void);

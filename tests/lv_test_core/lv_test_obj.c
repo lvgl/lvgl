@@ -9,6 +9,8 @@
 #include "../../lvgl.h"
 #include "../lv_test_assert.h"
 
+#if LV_BUILD_TEST
+
 /*********************
  *      DEFINES
  *********************/
@@ -84,3 +86,4 @@ static void create_delete_change_parent(void)
     lv_obj_del(obj_parent);
     lv_test_assert_int_eq(0, lv_obj_count_children(lv_scr_act()), "Screen's children count after delete");
 }
+#endif
