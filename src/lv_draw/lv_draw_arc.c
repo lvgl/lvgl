@@ -31,8 +31,6 @@ typedef struct {
     lv_draw_rect_dsc_t * draw_dsc;
     const lv_area_t * draw_area;
     const lv_area_t * clip_area;
-    uint16_t angle_mask_id;
-    lv_draw_mask_angle_param_t * angle_mask_param;
 }quarter_draw_dsc_t;
 
 
@@ -83,6 +81,10 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     cir_dsc.border_width = dsc->width;
     cir_dsc.border_blend_mode = dsc->blend_mode;
 
+    lv_draw_mask_angle_param_t mask_angle_param;
+    lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, start_angle, end_angle);
+
+    int16_t mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);
 
     lv_area_t area;
     area.x1 = center_x - radius;
@@ -92,13 +94,9 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
 
     /*Draw a full ring*/
     if(start_angle + 360 == end_angle) {
-        lv_draw_rect(&area, clip_area, &cir_dsc);
+        lv_draw_rect(&area, clip_area, dsc);
         return;
     }
-
-    lv_draw_mask_angle_param_t mask_angle_param;
-    lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, start_angle, end_angle);
-    int16_t mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);
 
     int32_t angle_gap;
     if(end_angle > start_angle) {
@@ -120,18 +118,15 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
         q_dsc.draw_dsc =  &cir_dsc;
         q_dsc.draw_area = &area;
         q_dsc.clip_area = clip_area;
-        q_dsc.angle_mask_id = mask_angle_id;
-        q_dsc.angle_mask_param = &mask_angle_param;
 
         draw_quarter_0(&q_dsc);
         draw_quarter_1(&q_dsc);
         draw_quarter_2(&q_dsc);
         draw_quarter_3(&q_dsc);
-        lv_draw_mask_remove_id(q_dsc.angle_mask_id);
     } else {
         lv_draw_rect(&area, clip_area, &cir_dsc);
-        lv_draw_mask_remove_id(mask_angle_id);
     }
+    lv_draw_mask_remove_id(mask_angle_id);
 
     if(dsc->round_start || dsc->round_end) {
         cir_dsc.bg_color        = dsc->color;
@@ -215,12 +210,7 @@ static void draw_quarter_0(quarter_draw_dsc_t * q)
         quarter_area.y2 = q->center_y + q->radius;
 
         bool ok = lv_area_intersect(&quarter_area, &quarter_area, q->clip_area);
-        if(ok) {
-            /*It's a simple quarter border. Angle mask is not required*/
-            lv_draw_mask_remove_id(q->angle_mask_id);
-            lv_draw_rect(q->draw_area, &quarter_area, q->draw_dsc);
-            q->angle_mask_id = lv_draw_mask_add(q->angle_mask_param, NULL);
-        }
+        if(ok) lv_draw_rect(q->draw_area, &quarter_area, q->draw_dsc);
     }
 }
 
@@ -273,12 +263,7 @@ static void draw_quarter_1(quarter_draw_dsc_t * q)
         quarter_area.y2 = q->center_y + q->radius;
 
         bool ok = lv_area_intersect(&quarter_area, &quarter_area, q->clip_area);
-        if(ok) {
-            /*It's a simple quarter border. Angle mask is not required*/
-            lv_draw_mask_remove_id(q->angle_mask_id);
-            lv_draw_rect(q->draw_area, &quarter_area, q->draw_dsc);
-            q->angle_mask_id = lv_draw_mask_add(q->angle_mask_param, NULL);
-        }
+        if(ok) lv_draw_rect(q->draw_area, &quarter_area, q->draw_dsc);
     }
 }
 
@@ -331,12 +316,7 @@ static void draw_quarter_2(quarter_draw_dsc_t * q)
         quarter_area.y2 = q->center_y - 1;
 
         bool ok = lv_area_intersect(&quarter_area, &quarter_area, q->clip_area);
-        if(ok) {
-            /*It's a simple quarter border. Angle mask is not required*/
-            lv_draw_mask_remove_id(q->angle_mask_id);
-            lv_draw_rect(q->draw_area, &quarter_area, q->draw_dsc);
-            q->angle_mask_id = lv_draw_mask_add(q->angle_mask_param, NULL);
-        }
+        if(ok) lv_draw_rect(q->draw_area, &quarter_area, q->draw_dsc);
     }
 }
 
@@ -390,12 +370,7 @@ static void draw_quarter_3(quarter_draw_dsc_t * q)
         quarter_area.y2 = q->center_y - 1;
 
         bool ok = lv_area_intersect(&quarter_area, &quarter_area, q->clip_area);
-        if(ok) {
-            /*It's a simple quarter border. Angle mask is not required*/
-            lv_draw_mask_remove_id(q->angle_mask_id);
-            lv_draw_rect(q->draw_area, &quarter_area, q->draw_dsc);
-            q->angle_mask_id = lv_draw_mask_add(q->angle_mask_param, NULL);
-        }
+        if(ok) lv_draw_rect(q->draw_area, &quarter_area, q->draw_dsc);
     }
 }
 
