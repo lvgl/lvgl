@@ -81,10 +81,6 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     cir_dsc.border_width = dsc->width;
     cir_dsc.border_blend_mode = dsc->blend_mode;
 
-    lv_draw_mask_angle_param_t mask_angle_param;
-    lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, start_angle, end_angle);
-
-    int16_t mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);
 
     lv_area_t area;
     area.x1 = center_x - radius;
@@ -94,9 +90,14 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
 
     /*Draw a full ring*/
     if(start_angle + 360 == end_angle) {
-        lv_draw_rect(&area, clip_area, dsc);
+        lv_draw_rect(&area, clip_area, &cir_dsc);
         return;
     }
+
+    lv_draw_mask_angle_param_t mask_angle_param;
+    lv_draw_mask_angle_init(&mask_angle_param, center_x, center_y, start_angle, end_angle);
+
+    int16_t mask_angle_id = lv_draw_mask_add(&mask_angle_param, NULL);
 
     int32_t angle_gap;
     if(end_angle > start_angle) {
