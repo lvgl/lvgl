@@ -923,6 +923,11 @@ LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_BLEND_MODE, border_blend_mode, lv_blend_mode
 LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_POST, border_post, bool, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_COLOR, border_color, lv_color_t, _color);
 LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_OPA, border_opa, lv_opa_t, _opa);
+LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_WIDTH, outline_width, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_PAD, outline_pad, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_BLEND_MODE, outline_blend_mode, lv_blend_mode_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_COLOR, outline_color, lv_color_t, _color);
+LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_OPA, outline_opa, lv_opa_t, _opa);
 LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_WIDTH, shadow_width, lv_style_int_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_OFFSET_X, shadow_offset_x, lv_style_int_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_OFFSET_Y, shadow_offset_y, lv_style_int_t, _int);

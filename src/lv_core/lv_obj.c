@@ -1371,7 +1371,12 @@ void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t new_state)
     if(obj->state_dsc.act == new_state) return;
 
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_obj_state_dsc_t dsc_ori = obj->state_dsc;
+    obj->state_dsc.act = new_state;
+    obj->state_dsc.prev = new_state;
     lv_style_int_t t = lv_obj_get_style_transition_time(obj, LV_OBJ_PART_MAIN);
+    obj->state_dsc = dsc_ori;
     if(t == 0) {
         lv_anim_del(obj, obj_state_anim_cb);
         obj->state_dsc.act = new_state;
@@ -2188,6 +2193,7 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prope
     case LV_STYLE_IMAGE_OPA:
     case LV_STYLE_LINE_OPA:
     case LV_STYLE_BORDER_OPA:
+    case LV_STYLE_OUTLINE_OPA:
     case LV_STYLE_SHADOW_OPA:
     case LV_STYLE_PATTERN_OPA:
     case LV_STYLE_VALUE_OPA:
@@ -2726,7 +2732,20 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
                 draw_dsc->border_side = lv_obj_get_style_border_side(obj, part);
                 draw_dsc->border_color = lv_obj_get_style_border_color(obj, part);
             }
-            draw_dsc->border_blend_mode = lv_obj_get_style_bg_blend_mode(obj, part);
+            draw_dsc->border_blend_mode = lv_obj_get_style_border_blend_mode(obj, part);
+        }
+    }
+
+
+    if(draw_dsc->outline_opa != LV_OPA_TRANSP) {
+        draw_dsc->outline_width = lv_obj_get_style_outline_width(obj, part);
+        if(draw_dsc->outline_width) {
+            draw_dsc->outline_opa = lv_obj_get_style_outline_opa(obj, part);
+            if(draw_dsc->outline_opa > LV_OPA_MIN) {
+                draw_dsc->outline_pad = lv_obj_get_style_outline_pad(obj, part);
+                draw_dsc->outline_color = lv_obj_get_style_outline_color(obj, part);
+            }
+            draw_dsc->outline_blend_mode = lv_obj_get_style_outline_blend_mode(obj, part);
         }
     }
 
@@ -2990,6 +3009,11 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, obj->coords.y1 - value_area.y1);
             obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, value_area.x2 - obj->coords.x2);
             obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, value_area.y2 - obj->coords.y2);
+        }
+        lv_style_int_t outline_width = lv_obj_get_style_outline_width(obj, LV_OBJ_PART_MAIN);
+        if(outline_width) {
+            lv_style_int_t outline_pad = lv_obj_get_style_outline_pad(obj, LV_OBJ_PART_MAIN);
+            obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, outline_pad + outline_width);
         }
     }
 #if LV_USE_OBJ_REALIGN

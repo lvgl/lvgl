@@ -43,6 +43,13 @@ typedef struct {
     lv_style_int_t border_side;
     lv_opa_t border_opa;
 
+    /*Outline*/
+    lv_color_t outline_color;
+    lv_style_int_t outline_width;
+    lv_style_int_t outline_pad;
+    lv_blend_mode_t outline_blend_mode;
+    lv_opa_t outline_opa;
+
     /*Shadow*/
     lv_color_t shadow_color;
     lv_style_int_t shadow_width;
