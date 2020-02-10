@@ -401,7 +401,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
     if(simple_mode) {
         /*Draw the upper corner area*/
         int32_t upper_corner_end = coords->y1 - disp_area->y1 + corner_size;
-
+        upper_corner_end = LV_MATH_MIN(upper_corner_end, draw_area.y2);
         fill_area.x1 = coords->x1;
         fill_area.x2 = coords->x2;
         fill_area.y1 = disp_area->y1 + draw_area.y1;
@@ -440,11 +440,12 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
 
         /*Draw the lower corner area */
         int32_t lower_corner_end = coords->y2 - disp_area->y1 - corner_size;
+        lower_corner_end = LV_MATH_MAX(lower_corner_end, draw_area.y1);
         if(lower_corner_end <= upper_corner_end) lower_corner_end = upper_corner_end + 1;
         fill_area.y1 = disp_area->y1 + lower_corner_end;
         fill_area.y2 = fill_area.y1;
         for(h = lower_corner_end; h <= draw_area.y2; h++) {
-            memset(mask_buf, LV_OPA_COVER, draw_area_w);
+        	memset(mask_buf, LV_OPA_COVER, draw_area_w);
             mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
             lv_area_t fill_area2;
