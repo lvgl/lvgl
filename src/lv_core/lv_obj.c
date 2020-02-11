@@ -725,6 +725,11 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * par = obj->par;
+    
+    if(par == NULL) {
+        LV_LOG_WARN("lv_obj_set_pos: not changing position of screen object");
+        return;
+    }
 
     x = x + par->coords.x1;
     y = y + par->coords.y1;
