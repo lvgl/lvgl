@@ -107,7 +107,7 @@ static lv_style_t calendar_date_nums, calendar_header, calendar_daynames;
 
 
 #if LV_USE_TABVIEW
-static lv_style_t tabview_btns, tabview_btns_bg, tabview_indic, tabaview_page_scrl;
+static lv_style_t tabview_btns, tabview_btns_bg, tabview_indic, tabview_page_scrl;
 #endif
 
 #if LV_USE_TABLE
@@ -725,12 +725,12 @@ static void tabview_init(void)
     lv_style_set_int(&tabview_indic, LV_STYLE_RADIUS, LV_RADIUS_CIRCLE);
 
 
-    lv_style_init(&tabaview_page_scrl);
-    lv_style_set_int(&tabaview_page_scrl, LV_STYLE_PAD_TOP, LV_DPI / 5);
-    lv_style_set_int(&tabaview_page_scrl, LV_STYLE_PAD_BOTTOM, LV_DPI / 5);
-    lv_style_set_int(&tabaview_page_scrl, LV_STYLE_PAD_LEFT, LV_DPI / 3);
-    lv_style_set_int(&tabaview_page_scrl, LV_STYLE_PAD_RIGHT, LV_DPI / 3);
-    lv_style_set_int(&tabaview_page_scrl, LV_STYLE_PAD_INNER, LV_DPI / 5);
+    lv_style_init(&tabview_page_scrl);
+    lv_style_set_int(&tabview_page_scrl, LV_STYLE_PAD_TOP, LV_DPI / 5);
+    lv_style_set_int(&tabview_page_scrl, LV_STYLE_PAD_BOTTOM, LV_DPI / 5);
+    lv_style_set_int(&tabview_page_scrl, LV_STYLE_PAD_LEFT, LV_DPI / 3);
+    lv_style_set_int(&tabview_page_scrl, LV_STYLE_PAD_RIGHT, LV_DPI / 3);
+    lv_style_set_int(&tabview_page_scrl, LV_STYLE_PAD_INNER, LV_DPI / 5);
 #endif
 }
 
@@ -758,29 +758,7 @@ static void table_init(void)
 static void win_init(void)
 {
 #if LV_USE_WIN != 0
-    static lv_style_t header;
 
-    lv_style_copy(&header, &def);
-    header.body.radius         = 0;
-    header.body.padding.left   = LV_DPI / 12;
-    header.body.padding.right  = LV_DPI / 12;
-    header.body.padding.top    = LV_DPI / 20;
-    header.body.padding.bottom = LV_DPI / 20;
-    header.body.main_color     = lv_color_hsv_to_rgb(_hue, 30, 60);
-    header.body.grad_color     = header.body.main_color;
-    header.body.border.opa     = panel.body.border.opa;
-    header.body.border.width   = panel.body.border.width;
-    header.body.border.color   = lv_color_hsv_to_rgb(_hue, 20, 80);
-    header.body.border.part    = LV_BORDER_PART_BOTTOM;
-    header.text.color          = lv_color_hsv_to_rgb(_hue, 5, 100);
-    header.image.color         = lv_color_hsv_to_rgb(_hue, 5, 100);
-
-    theme.style.win.bg      = &bg;
-    theme.style.win.sb      = &sb;
-    theme.style.win.header  = &header;
-    theme.style.win.content = &lv_style_transp;
-    theme.style.win.btn.rel = &btn_rel;
-    theme.style.win.btn.pr  = &btn_pr;
 #endif
 }
 
@@ -1018,8 +996,10 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_BG);
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &scr);
+
         list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_BG_SCRL);
         lv_style_list_reset(list);
+
         list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_TAB_BG);
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &tabview_btns_bg);
@@ -1037,9 +1017,10 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
     case LV_THEME_TABVIEW_PAGE:
         list = lv_obj_get_style_list(obj, LV_PAGE_PART_BG);
         lv_style_list_reset(list);
+
         list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCRL);
         lv_style_list_reset(list);
-        lv_style_list_add_style(list, &tabaview_page_scrl);
+        lv_style_list_add_style(list, &tabview_page_scrl);
 
         break;
 #endif
@@ -1169,6 +1150,30 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &panel);
         break;
+#endif
+#if LV_USE_WIN
+    case LV_THEME_WIN:
+        list = lv_obj_get_style_list(obj, LV_WIN_PART_BG);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &scr);
+
+        list = lv_obj_get_style_list(obj, LV_WIN_PART_SCRLBAR);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &sb);
+
+        list = lv_obj_get_style_list(obj, LV_WIN_PART_CONTENT_SCRL);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &tabview_page_scrl);
+
+        list = lv_obj_get_style_list(obj, LV_WIN_PART_HEADER);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &tabview_btns_bg);
+        break;
+    case LV_THEME_WIN_BTN:
+        list = lv_obj_get_style_list(obj, LV_BTN_PART_MAIN);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &tabview_btns);
+    	break;
 #endif
 
 #if LV_USE_TA

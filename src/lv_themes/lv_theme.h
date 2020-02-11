@@ -105,6 +105,9 @@ typedef enum {
 
     LV_THEME_CHART,
 
+    LV_THEME_WIN,
+    LV_THEME_WIN_BTN,
+
 }lv_theme_style_t;
 
 typedef struct {

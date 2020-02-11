@@ -56,22 +56,18 @@ typedef struct
     /*New data for this type */
     lv_obj_t * page;                  /*Pointer to a page which holds the content*/
     lv_obj_t * header;                /*Pointer to the header container of the window*/
-    lv_obj_t * title;                 /*Pointer to the title label of the window*/
-    const lv_style_t * style_btn_rel; /*Control button releases style*/
-    const lv_style_t * style_btn_pr;  /*Control button pressed style*/
-    lv_coord_t btn_size;              /*Size of the control buttons (square)*/
+    char * title_txt;                 /*Pointer to the title label of the window*/
 } lv_win_ext_t;
 
-/** Window styles. */
+/** Window parts. */
 enum {
-    LV_WIN_STYLE_BG, /**< Window object background style. */
-    LV_WIN_STYLE_CONTENT, /**< Window content style. */
-    LV_WIN_STYLE_SB, /**< Window scrollbar style. */
-    LV_WIN_STYLE_HEADER, /**< Window titlebar background style. */
-    LV_WIN_STYLE_BTN_REL, /**< Same meaning as ordinary button styles. */
-    LV_WIN_STYLE_BTN_PR,
+    LV_WIN_PART_BG = LV_OBJ_PART_MAIN, /**< Window object background style. */
+	_LV_WIN_PART_VIRTUAL_LAST,
+    LV_WIN_PART_HEADER = _LV_OBJ_PART_REAL_LAST, /**< Window titlebar background style. */
+    LV_WIN_PART_CONTENT_SCRL, /**< Window content style. */
+    LV_WIN_PART_SCRLBAR, /**< Window scrollbar style. */
+	_LV_WIN_PART_REAL_LAST
 };
-typedef uint8_t lv_win_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -126,7 +122,7 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
  * @param win pointer to a window object
  * @return control button size
  */
-void lv_win_set_btn_size(lv_obj_t * win, lv_coord_t size);
+void lv_win_set_header_height(lv_obj_t * win, lv_coord_t size);
 
 
 /**
@@ -157,14 +153,6 @@ void lv_win_set_sb_mode(lv_obj_t * win, lv_sb_mode_t sb_mode);
  * @param anim_time duration of animation [ms]
  */
 void lv_win_set_anim_time(lv_obj_t * win, uint16_t anim_time);
-
-/**
- * Set a style of a window
- * @param win pointer to a window object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_win_set_style(lv_obj_t * win, lv_win_style_t type, const lv_style_t * style);
 
 /**
  * Set drag status of a window. If set to 'true' window can be dragged like on a PC.
@@ -233,14 +221,6 @@ uint16_t lv_win_get_anim_time(const lv_obj_t * win);
  * @return the width of the content area
  */
 lv_coord_t lv_win_get_width(lv_obj_t * win);
-
-/**
- * Get a style of a window
- * @param win pointer to a button object
- * @param type which style window be get
- * @return style pointer to a style
- */
-const lv_style_t * lv_win_get_style(const lv_obj_t * win, lv_win_style_t type);
 
 /**
  * Get drag status of a window. If set to 'true' window can be dragged like on a PC.
