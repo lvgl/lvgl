@@ -19,7 +19,13 @@ extern "C" {
  *      DEFINES
  *********************/
 #define LV_MATH_MIN(a, b) ((a) < (b) ? (a) : (b))
+#define LV_MATH_MIN3(a, b, c) (LV_MATH_MIN(LV_MATH_MIN(a,b), c))
+#define LV_MATH_MIN4(a, b, c, d) (LV_MATH_MIN(LV_MATH_MIN(a,b), LV_MATH_MIN(c,d)))
+
 #define LV_MATH_MAX(a, b) ((a) > (b) ? (a) : (b))
+#define LV_MATH_MAX3(a, b, c) (LV_MATH_MAX(LV_MATH_MAX(a,b), c))
+#define LV_MATH_MAX4(a, b, c, d) (LV_MATH_MAX(LV_MATH_MAX(a,b), LV_MATH_MAX(c,d)))
+
 #define LV_MATH_ABS(x) ((x) > 0 ? (x) : (-(x)))
 
 #define LV_TRIGO_SIN_MAX 32767

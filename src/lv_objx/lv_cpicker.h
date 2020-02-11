@@ -46,7 +46,7 @@ typedef uint8_t lv_cpicker_color_mode_t;
 typedef struct {
     lv_color_hsv_t hsv;
     struct {
-        lv_style_t * style;
+        lv_style_list_t style_list;
         lv_point_t pos;
         uint8_t colored     :1;
 
@@ -60,12 +60,13 @@ typedef struct {
     uint8_t preview                     :1;
 } lv_cpicker_ext_t;
 
-/*Styles*/
+/*Parts*/
 enum {
-    LV_CPICKER_STYLE_MAIN,
-    LV_CPICKER_STYLE_INDICATOR,
+    LV_CPICKER_PART_MAIN = LV_OBJ_PART_MAIN,
+    LV_CPICKER_PART_INDIC = _LV_OBJ_PART_VIRTUAL_LAST,
+    _LV_CPICKER_PART_VIRTUAL_LAST,
+    _LV_CPICKER_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,
 };
-typedef uint8_t lv_cpicker_style_t;
 
 
 /**********************
@@ -90,14 +91,6 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param type new type of the colorpicker (from 'lv_cpicker_type_t' enum)
  */
 void lv_cpicker_set_type(lv_obj_t * cpicker, lv_cpicker_type_t type);
-
-/**
- * Set a style of a colorpicker.
- * @param cpicker pointer to colorpicker object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_cpicker_set_style(lv_obj_t * cpicker, lv_cpicker_style_t type, lv_style_t *style);
 
 /**
  * Set the current hue of a colorpicker.
@@ -184,14 +177,6 @@ lv_cpicker_color_mode_t lv_cpicker_get_color_mode(lv_obj_t * cpicker);
  * @return mode cannot be changed on long press
  */
 bool lv_cpicker_get_color_mode_fixed(lv_obj_t * cpicker);
-
-/**
- * Get style of a colorpicker.
- * @param cpicker pointer to colorpicker object
- * @param type which style should be get
- * @return pointer to the style
- */
-const lv_style_t * lv_cpicker_get_style(const lv_obj_t * cpicker, lv_cpicker_style_t type);
 
 /**
  * Get the current hue of a colorpicker.

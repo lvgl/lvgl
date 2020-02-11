@@ -534,6 +534,7 @@ static void cb_init(void)
     lv_style_set_color(&cb_bullet, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_FOCUS, LV_COLOR_RED);
     lv_style_set_color(&cb_bullet, LV_STYLE_BORDER_COLOR | LV_STYLE_STATE_FOCUS | LV_STYLE_STATE_PRESSED, LV_COLOR_LIME);
     lv_style_set_color(&cb_bullet, LV_STYLE_BG_COLOR, COLOR_ACCENT);
+    lv_style_set_opa(&cb_bullet, LV_STYLE_BG_OPA | LV_STYLE_STATE_NORMAL  , LV_OPA_TRANSP);
     lv_style_set_opa(&cb_bullet, LV_STYLE_BG_OPA | LV_STYLE_STATE_CHECKED  , LV_OPA_COVER);
     lv_style_set_opa(&cb_bullet, LV_STYLE_BORDER_OPA | LV_STYLE_STATE_CHECKED  , LV_OPA_80);
     lv_style_set_int(&cb_bullet, LV_STYLE_TRANSITION_TIME , 1000);
@@ -1145,6 +1146,17 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         list = lv_obj_get_style_list(obj, LV_TABLE_PART_CELL4);
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &table_cell);
+        break;
+#endif
+
+#if LV_USE_CPICKER
+    case LV_THEME_CPICKER:
+        list = lv_obj_get_style_list(obj, LV_CPICKER_PART_MAIN);
+        lv_style_list_reset(list);
+
+        list = lv_obj_get_style_list(obj, LV_CPICKER_PART_INDIC);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &panel);
         break;
 #endif
 
