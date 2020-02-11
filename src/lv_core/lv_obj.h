@@ -1216,6 +1216,13 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * 
 
 void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t * draw_dsc);
 
+/**
+ * Get the required extra size (around the object's part) to draw shadow, outline, value etc.
+ * @param obj poinr to an object
+ * @param part part of the object
+ */
+lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part);
+
 /**********************
  *      MACROS
  **********************/

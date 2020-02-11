@@ -2877,6 +2877,74 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t 
 }
 
 /**
+ * Get the required extra size (around the object's part) to draw shadow, outline, value etc.
+ * @param obj poinr to an object
+ * @param part part of the object
+ */
+lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
+{
+    lv_coord_t s = 0;
+
+    lv_opa_t sh_opa = lv_obj_get_style_shadow_opa(obj, part);
+    if(sh_opa > LV_OPA_MIN) {
+        lv_coord_t sh_width = lv_obj_get_style_shadow_width(obj, LV_OBJ_PART_MAIN);
+        if(sh_width) {
+            sh_width = sh_width / 2;    /*THe blur adds only half width*/
+            sh_width++;
+            sh_width += lv_obj_get_style_shadow_spread(obj, LV_OBJ_PART_MAIN);
+            sh_width += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_shadow_offset_x(obj, LV_OBJ_PART_MAIN)),
+                    LV_MATH_ABS(lv_obj_get_style_shadow_offset_y(obj, LV_OBJ_PART_MAIN)));
+            s = LV_MATH_MAX(s, sh_width);
+        }
+    }
+
+    lv_opa_t value_opa = lv_obj_get_style_value_opa(obj, part);
+    if(value_opa > LV_OPA_MIN) {
+        const char * value_str = lv_obj_get_style_value_str(obj, LV_OBJ_PART_MAIN);
+        if(value_str) {
+            lv_style_int_t letter_space = lv_obj_get_style_value_letter_space(obj, LV_OBJ_PART_MAIN);
+            lv_style_int_t line_space = lv_obj_get_style_value_letter_space(obj, LV_OBJ_PART_MAIN);
+            const lv_font_t * font = lv_obj_get_style_value_font(obj, LV_OBJ_PART_MAIN);
+
+            lv_point_t txt_size;
+            lv_txt_get_size(&txt_size, value_str, font, letter_space, line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+
+            lv_area_t value_area;
+            value_area.x1 = 0;
+            value_area.y1 = 0;
+            value_area.x2 = txt_size.x - 1;
+            value_area.y2 = txt_size.y - 1;
+
+            lv_style_int_t align = lv_obj_get_style_value_align(obj, LV_OBJ_PART_MAIN);
+            lv_style_int_t xofs = lv_obj_get_style_value_ofs_x(obj, LV_OBJ_PART_MAIN);
+            lv_style_int_t yofs = lv_obj_get_style_value_ofs_y(obj, LV_OBJ_PART_MAIN);
+            lv_point_t p_align;
+            lv_area_align(&obj->coords, &value_area, align, &p_align);
+
+            value_area.x1 += p_align.x + xofs;
+            value_area.y1 += p_align.y + yofs;
+            value_area.x2 += p_align.x + xofs;
+            value_area.y2 += p_align.y + yofs;
+
+            s = LV_MATH_MAX(s, obj->coords.x1 - value_area.x1);
+            s = LV_MATH_MAX(s, obj->coords.y1 - value_area.y1);
+            s = LV_MATH_MAX(s, value_area.x2 - obj->coords.x2);
+            s = LV_MATH_MAX(s, value_area.y2 - obj->coords.y2);
+        }
+    }
+
+    lv_opa_t outline_opa = lv_obj_get_style_outline_opa(obj, part);
+    if(outline_opa > LV_OPA_MIN) {
+        lv_style_int_t outline_width = lv_obj_get_style_outline_width(obj, LV_OBJ_PART_MAIN);
+        if(outline_width) {
+            lv_style_int_t outline_pad = lv_obj_get_style_outline_pad(obj, LV_OBJ_PART_MAIN);
+            s = LV_MATH_MAX(s, outline_pad + outline_width);
+        }
+    }
+    return s;
+}
+
+/**
  * Handle the drawing related tasks of the base objects.
  * @param obj pointer to an object
  * @param clip_area the object will be drawn only in this area
@@ -2969,52 +3037,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         /*Return 'invalid' if the child change signal is not enabled*/
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        lv_coord_t shadow = lv_obj_get_style_shadow_width(obj, LV_OBJ_PART_MAIN);
-        if(shadow) {
-            shadow = shadow / 2;    /*THe blur adds only half width*/
-            shadow++;
-            shadow += lv_obj_get_style_shadow_spread(obj, LV_OBJ_PART_MAIN);
-            shadow += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_shadow_offset_x(obj, LV_OBJ_PART_MAIN)),
-                                  LV_MATH_ABS(lv_obj_get_style_shadow_offset_y(obj, LV_OBJ_PART_MAIN)));
-            obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, shadow);
-        }
-
-        const char * value_str = lv_obj_get_style_value_str(obj, LV_OBJ_PART_MAIN);
-        if(value_str) {
-            lv_style_int_t letter_space = lv_obj_get_style_value_letter_space(obj, LV_OBJ_PART_MAIN);
-            lv_style_int_t line_space = lv_obj_get_style_value_letter_space(obj, LV_OBJ_PART_MAIN);
-            const lv_font_t * font = lv_obj_get_style_value_font(obj, LV_OBJ_PART_MAIN);
-
-            lv_point_t s;
-            lv_txt_get_size(&s, value_str, font, letter_space, line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
-
-            lv_area_t value_area;
-            value_area.x1 = 0;
-            value_area.y1 = 0;
-            value_area.x2 = s.x - 1;
-            value_area.y2 = s.y - 1;
-
-            lv_style_int_t align = lv_obj_get_style_value_align(obj, LV_OBJ_PART_MAIN);
-            lv_style_int_t xofs = lv_obj_get_style_value_ofs_x(obj, LV_OBJ_PART_MAIN);
-            lv_style_int_t yofs = lv_obj_get_style_value_ofs_y(obj, LV_OBJ_PART_MAIN);
-            lv_point_t p_align;
-            lv_area_align(&obj->coords, &value_area, align, &p_align);
-
-            value_area.x1 += p_align.x + xofs;
-            value_area.y1 += p_align.y + yofs;
-            value_area.x2 += p_align.x + xofs;
-            value_area.y2 += p_align.y + yofs;
-
-            obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, obj->coords.x1 - value_area.x1);
-            obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, obj->coords.y1 - value_area.y1);
-            obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, value_area.x2 - obj->coords.x2);
-            obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, value_area.y2 - obj->coords.y2);
-        }
-        lv_style_int_t outline_width = lv_obj_get_style_outline_width(obj, LV_OBJ_PART_MAIN);
-        if(outline_width) {
-            lv_style_int_t outline_pad = lv_obj_get_style_outline_pad(obj, LV_OBJ_PART_MAIN);
-            obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, outline_pad + outline_width);
-        }
+        obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, lv_obj_get_draw_rect_ext_pad_size(obj, LV_OBJ_PART_MAIN));
     }
 #if LV_USE_OBJ_REALIGN
     else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {

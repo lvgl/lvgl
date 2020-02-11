@@ -293,43 +293,20 @@ static lv_res_t lv_sw_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         res   = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RES_OK) return res;
     }else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        lv_style_int_t knob_left = lv_obj_get_style_pad_left(sw,   LV_SW_PART_KNOB);
-        lv_style_int_t knob_right = lv_obj_get_style_pad_right(sw,  LV_SW_PART_KNOB);
-        lv_style_int_t knob_top = lv_obj_get_style_pad_top(sw,    LV_SW_PART_KNOB);
-        lv_style_int_t knob_bottom = lv_obj_get_style_pad_bottom(sw, LV_SW_PART_KNOB);
+        lv_style_int_t knob_left = lv_obj_get_style_pad_left(sw,   LV_SLIDER_PART_KNOB);
+        lv_style_int_t knob_right = lv_obj_get_style_pad_right(sw,  LV_SLIDER_PART_KNOB);
+        lv_style_int_t knob_top = lv_obj_get_style_pad_top(sw,    LV_SLIDER_PART_KNOB);
+        lv_style_int_t knob_bottom = lv_obj_get_style_pad_bottom(sw, LV_SLIDER_PART_KNOB);
 
         /* The smaller size is the knob diameter*/
-        lv_coord_t knob_size;
-        knob_size = LV_MATH_MAX(LV_MATH_MAX(knob_left, knob_right), LV_MATH_MAX(knob_bottom,knob_top));
+        lv_coord_t knob_size = LV_MATH_MIN(lv_obj_get_width(sw), lv_obj_get_height(sw)) >> 1;
+        knob_size += LV_MATH_MAX(LV_MATH_MAX(knob_left, knob_right), LV_MATH_MAX(knob_bottom,knob_top));
         knob_size += 2;         /*For rounding error*/
 
-        lv_style_int_t knob_sh_width = lv_obj_get_style_shadow_width(sw, LV_SW_PART_KNOB);
-        lv_style_int_t knob_sh_spread = lv_obj_get_style_shadow_spread(sw, LV_SW_PART_KNOB);
-        lv_style_int_t knob_sh_ox = lv_obj_get_style_shadow_offset_x(sw, LV_SW_PART_KNOB);
-        lv_style_int_t knob_sh_oy = lv_obj_get_style_shadow_offset_y(sw, LV_SW_PART_KNOB);
+        knob_size += lv_obj_get_draw_rect_ext_pad_size(sw, LV_SLIDER_PART_KNOB);
 
-        knob_size += knob_sh_width + knob_sh_spread;
-        knob_size += LV_MATH_MAX(LV_MATH_ABS(knob_sh_ox), LV_MATH_ABS(knob_sh_oy));
-
-        lv_style_int_t bg_sh_width = lv_obj_get_style_shadow_width(sw, LV_SW_PART_BG);
-        lv_style_int_t bg_sh_spread = lv_obj_get_style_shadow_spread(sw, LV_SW_PART_BG);
-        lv_style_int_t bg_sh_ox = lv_obj_get_style_shadow_offset_x(sw, LV_SW_PART_BG);
-        lv_style_int_t bg_sh_oy = lv_obj_get_style_shadow_offset_y(sw, LV_SW_PART_BG);
-
-        lv_coord_t bg_size = bg_sh_width + bg_sh_spread;
-        bg_size += LV_MATH_MAX(LV_MATH_ABS(bg_sh_ox), LV_MATH_ABS(bg_sh_oy));
-
-        lv_style_int_t indic_sh_width = lv_obj_get_style_shadow_width(sw, LV_SW_PART_INDIC);
-        lv_style_int_t indic_sh_spread = lv_obj_get_style_shadow_spread(sw, LV_SW_PART_INDIC);
-        lv_style_int_t indic_sh_ox = lv_obj_get_style_shadow_offset_x(sw, LV_SW_PART_INDIC);
-        lv_style_int_t indic_sh_oy = lv_obj_get_style_shadow_offset_y(sw, LV_SW_PART_INDIC);
-
-        lv_coord_t indic_size = indic_sh_width + indic_sh_spread;
-        indic_size += LV_MATH_MAX(LV_MATH_ABS(indic_sh_ox), LV_MATH_ABS(indic_sh_oy));
-
+        /*Indic. size is handled by bar*/
         sw->ext_draw_pad = LV_MATH_MAX(sw->ext_draw_pad, knob_size);
-        sw->ext_draw_pad = LV_MATH_MAX(sw->ext_draw_pad, indic_size);
-        sw->ext_draw_pad = LV_MATH_MAX(sw->ext_draw_pad, bg_size);
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;

@@ -598,25 +598,11 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        lv_style_int_t bg_sh_width = lv_obj_get_style_shadow_width(bar, LV_BAR_PART_BG);
-        lv_style_int_t bg_sh_spread = lv_obj_get_style_shadow_spread(bar, LV_BAR_PART_BG);
-        lv_style_int_t bg_sh_ofs_x = lv_obj_get_style_shadow_offset_x(bar, LV_BAR_PART_BG);
-        lv_style_int_t bg_sh_ofs_y = lv_obj_get_style_shadow_offset_y(bar, LV_BAR_PART_BG);
 
-        lv_coord_t bg_size = bg_sh_width + bg_sh_spread;
-        bg_size += LV_MATH_MAX(LV_MATH_ABS(bg_sh_ofs_x), LV_MATH_ABS(bg_sh_ofs_y));
+        lv_coord_t indic_size;
+        indic_size = lv_obj_get_draw_rect_ext_pad_size(bar, LV_SLIDER_PART_INDIC);
 
-
-        lv_style_int_t indic_sh_width = lv_obj_get_style_shadow_width(bar,  LV_BAR_PART_INDIC);
-        lv_style_int_t indic_sh_spread = lv_obj_get_style_shadow_spread(bar, LV_BAR_PART_INDIC);
-        lv_style_int_t indic_sh_ofs_x = lv_obj_get_style_shadow_offset_x(bar,  LV_BAR_PART_INDIC);
-        lv_style_int_t indic_sh_ofs_y = lv_obj_get_style_shadow_offset_x(bar,  LV_BAR_PART_INDIC);
-
-
-        lv_coord_t indic_size = indic_sh_width + indic_sh_spread;
-        indic_size += LV_MATH_MAX(LV_MATH_ABS(indic_sh_ofs_x), LV_MATH_ABS(indic_sh_ofs_y));
-
-        bar->ext_draw_pad = LV_MATH_MAX(bar->ext_draw_pad, bg_size);
+        /*Bg size is handled by lv_obj*/
         bar->ext_draw_pad = LV_MATH_MAX(bar->ext_draw_pad, indic_size);
 
     }
