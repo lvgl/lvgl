@@ -31,6 +31,11 @@
 #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
+
+#if defined(LV_USER_DATA_FREE_INCLUDE)
+#include LV_USER_DATA_FREE_INCLUDE
+#endif /* LV_USE_USER_DATA_FREE */
+
 /*********************
  *      DEFINES
  *********************/
@@ -491,6 +496,10 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         lv_ll_remove(&(par->child_ll), obj);
     }
 
+#if LV_USE_USER_DATA_FREE
+    /*Delete the user data*/
+    LV_USER_DATA_FREE(obj);
+#endif
     /*Delete the base objects*/
     if(obj->ext_attr != NULL) lv_mem_free(obj->ext_attr);
     lv_mem_free(obj); /*Free the object itself*/
