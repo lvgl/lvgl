@@ -619,7 +619,7 @@ static void draw_indic(lv_obj_t * cpicker, const lv_area_t * mask)
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
     lv_draw_rect_dsc_t cir_dsc;
-    lv_draw_tect_dsc_init(&cir_dsc);
+    lv_draw_rect_dsc_init(&cir_dsc);
     lv_obj_init_draw_rect_dsc(cpicker, LV_CPICKER_PART_INDIC, &cir_dsc);
 
     cir_dsc.radius = LV_RADIUS_CIRCLE;

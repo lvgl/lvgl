@@ -494,8 +494,6 @@ void lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop
 
 void lv_obj_add_style(lv_obj_t * obj, uint8_t type, lv_style_t * style);
 
-void lv_obj_add_theme(void * obj, uint8_t part, uint16_t name);
-
 void lv_obj_reset_style(lv_obj_t * obj, uint8_t type);
 
 /**
@@ -904,6 +902,7 @@ static inline void lv_style_set_##func_name (lv_style_t * style, lv_style_state_
 LV_OBJ_STYLE_SET_GET_DECLARE(RADIUS, radius, lv_style_int_t,_int);
 LV_OBJ_STYLE_SET_GET_DECLARE(CLIP_CORNER, clip_corner, bool, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_TIME, transition_time, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(SIZE, size, lv_style_int_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(OPA_SCALE, opa_scale, lv_opa_t, _opa);
 LV_OBJ_STYLE_SET_GET_DECLARE(PAD_TOP, pad_top, lv_style_int_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(PAD_BOTTOM, pad_bottom, lv_style_int_t, _int);
@@ -951,8 +950,8 @@ LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_COLOR, value_color, lv_color_t, _color);
 LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_OPA, value_opa, lv_opa_t, _opa);
 LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_FONT, value_font, const lv_font_t * , _ptr);
 LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_STR, value_str, const char * , _ptr);
-LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_LETTER_SPACE, letter_space, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_LINE_SPACE, line_space, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_LETTER_SPACE, text_letter_space, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_LINE_SPACE, text_line_space, lv_style_int_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_BLEND_MODE, text_blend_mode, lv_blend_mode_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_COLOR, text_color, lv_color_t, _color);
 LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_SEL_COLOR, text_sel_color, lv_color_t, _color);
@@ -969,10 +968,10 @@ LV_OBJ_STYLE_SET_GET_DECLARE(IMAGE_BLEND_MODE, image_blend_mode, lv_blend_mode_t
 LV_OBJ_STYLE_SET_GET_DECLARE(IMAGE_RECOLOR, image_recolor, lv_color_t, _color);
 LV_OBJ_STYLE_SET_GET_DECLARE(IMAGE_OPA, image_opa, lv_opa_t, _opa);
 LV_OBJ_STYLE_SET_GET_DECLARE(IMAGE_RECOLOR_OPA, image_recolor_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(SIZE, size, lv_style_int_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_WIDTH, scale_width, lv_style_int_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_BORDER_WIDTH, scale_border_width, lv_style_int_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_BORDER_WIDTH, scale_end_border_width, lv_style_int_t, _int);
+LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_LINE_WIDTH, scale_end_line_width, lv_style_int_t, _int);
 LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_COLOR, scale_color, lv_color_t, _color);
 LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_GRAD_COLOR, scale_grad_color, lv_color_t, _color);
 LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_COLOR, scale_end_color, lv_color_t, _color);

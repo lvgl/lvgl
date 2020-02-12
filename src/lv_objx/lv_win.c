@@ -27,12 +27,14 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param);
+static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_style_list_t * lv_win_get_style(lv_obj_t * win, uint8_t part);
 static void lv_win_realign(lv_obj_t * win);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
+static lv_design_cb_t ancestor_header_design;
 static lv_signal_cb_t ancestor_signal;
 
 /**********************
@@ -97,10 +99,11 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
         /*Create a holder for the header*/
         ext->header = lv_obj_create(new_win, NULL);
-        /*Move back the header because it is automatically moved to the scrollable */
+        /*Move back to window background because it's automatically moved to the content page*/
         lv_obj_set_protect(ext->header, LV_PROTECT_PARENT);
         lv_obj_set_parent(ext->header, new_win);
-
+        if(ancestor_header_design == NULL) ancestor_header_design= lv_obj_get_design_cb(ext->header);
+        lv_obj_set_design_cb(ext->header, lv_win_header_design);
         lv_obj_set_signal_cb(new_win, lv_win_signal);
 
         lv_theme_apply(new_win, LV_THEME_WIN);
@@ -438,7 +441,54 @@ void lv_win_focus(lv_obj_t * win, lv_obj_t * obj, lv_anim_enable_t anim_en)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+/**
+ * Handle the drawing related tasks of the window header
+ * @param header pointer to an object
+ * @param clip_area the object will be drawn only in this area
+ * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ *                                  (return 'true' if yes)
+ *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_design_res_t`
+ */
+static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t * clip_area, lv_design_mode_t mode)
+{
+    /*Return false if the object is not covers the mask_p area*/
+    if(mode == LV_DESIGN_COVER_CHK) {
+        return ancestor_header_design(header, clip_area, mode);
+    }
+    /*Draw the object*/
+    else if(mode == LV_DESIGN_DRAW_MAIN) {
+        ancestor_header_design(header, clip_area, mode);
 
+        lv_obj_t * win = lv_obj_get_parent(header);
+        lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+
+        lv_style_int_t left = lv_obj_get_style_pad_left(header, LV_OBJ_PART_MAIN);
+        lv_style_int_t top = lv_obj_get_style_pad_top(header, LV_OBJ_PART_MAIN);
+
+        lv_draw_label_dsc_t label_dsc;
+        lv_draw_label_dsc_init(&label_dsc);
+        lv_obj_init_draw_label_dsc(header, LV_OBJ_PART_MAIN, &label_dsc);
+
+        lv_area_t txt_area;
+        lv_point_t txt_size;
+
+
+        lv_txt_get_size(&txt_size, ext->title_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, label_dsc.flag);
+
+        txt_area.x1 = header->coords.x1 + left;
+        txt_area.y1 = header->coords.y1 + (lv_obj_get_height(header) - txt_size.y) / 2;
+        txt_area.x2 = txt_area.x1 + txt_size.x;
+        txt_area.y2 = txt_area.y1 + txt_size.y;
+
+        lv_draw_label(&txt_area, clip_area, &label_dsc, ext->title_txt, NULL);
+    } else if(mode == LV_DESIGN_DRAW_POST) {
+        ancestor_header_design(header, clip_area, mode);
+    }
+
+    return LV_DESIGN_RES_OK;
+}
 /**
  * Signal function of the window
  * @param win pointer to a window object
@@ -539,13 +589,15 @@ static lv_style_list_t * lv_win_get_style(lv_obj_t * win, uint8_t part)
 }
 /**
  * Realign the building elements of a window
- * @param win pointer to window objectker
+ * @param win pointer to a window object
  */
 static void lv_win_realign(lv_obj_t * win)
 {
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
     if(ext->page == NULL || ext->header == NULL) return;
+
+    lv_obj_set_width(ext->header, lv_obj_get_width(win));
 
     lv_obj_t * btn;
     lv_obj_t * btn_prev = NULL;
@@ -554,7 +606,6 @@ static void lv_win_realign(lv_obj_t * win)
     lv_style_int_t header_right = lv_obj_get_style_pad_right(win, LV_WIN_PART_HEADER);
     /*Refresh the size of all control buttons*/
     btn = lv_obj_get_child_back(ext->header, NULL);
-    btn = lv_obj_get_child_back(ext->header, btn); /*Skip the title*/
     while(btn != NULL) {
         lv_obj_set_size(btn, btn_size, btn_size);
         if(btn_prev == NULL) {

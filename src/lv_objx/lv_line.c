@@ -93,8 +93,9 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_line_set_y_invert(line, lv_line_get_y_invert(copy));
         lv_line_set_auto_size(line, lv_line_get_auto_size(copy));
         lv_line_set_points(line, copy_ext->point_array, copy_ext->point_num);
+
         /*Refresh the style with new signal function*/
-//        lv_obj_refresh_style(line);
+        lv_obj_refresh_style(line);
     }
 
     LV_LOG_INFO("line created");

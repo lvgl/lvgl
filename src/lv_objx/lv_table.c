@@ -861,8 +861,8 @@ static void refr_size(lv_obj_t * table)
         cell_right[i] = lv_obj_get_style_pad_right(table, LV_TABLE_PART_CELL1 + i);
         cell_top[i] = lv_obj_get_style_pad_top(table, LV_TABLE_PART_CELL1 + i);
         cell_bottom[i] = lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_CELL1 + i);
-        letter_space[i] = lv_obj_get_style_letter_space(table, LV_TABLE_PART_CELL1 + i);
-        line_space[i] = lv_obj_get_style_line_space(table, LV_TABLE_PART_CELL1 + i);
+        letter_space[i] = lv_obj_get_style_text_letter_space(table, LV_TABLE_PART_CELL1 + i);
+        line_space[i] = lv_obj_get_style_text_line_space(table, LV_TABLE_PART_CELL1 + i);
         font[i] = lv_obj_get_style_font(table, LV_TABLE_PART_CELL1 + i);
     }
 

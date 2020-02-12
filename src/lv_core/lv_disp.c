@@ -43,7 +43,7 @@ lv_obj_t * lv_disp_get_scr_act(lv_disp_t * disp)
 {
     if(!disp) disp = lv_disp_get_default();
     if(!disp) {
-        LV_LOG_WARN("lv_scr_act: no display registered to get its top layer");
+        LV_LOG_WARN("lv_scr_act: no display registered to get its act. screen");
         return NULL;
     }
 
@@ -89,7 +89,7 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp)
 {
     if(!disp) disp = lv_disp_get_default();
     if(!disp) {
-        LV_LOG_WARN("lv_layer_sys: no display registered to get its top layer");
+        LV_LOG_WARN("lv_layer_sys: no display registered to get its sys. layer");
         return NULL;
     }
 

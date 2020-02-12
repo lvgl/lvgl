@@ -737,7 +737,6 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-
     /* Do nothing if the size is not changed */
     /* It is very important else recursive resizing can
      * occur without size change*/
@@ -1136,12 +1135,6 @@ void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style)
     lv_style_list_add_style(style_dsc, style);
 
     lv_obj_refresh_style(obj);
-}
-
-
-void lv_obj_add_theme(void * obj, uint8_t part, uint16_t name)
-{
-    lv_obj_add_style(obj, part, lv_theme_get_style(name));
 }
 
 
@@ -2698,7 +2691,7 @@ static void lv_obj_del_async_cb(void * obj)
  */
 void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t * draw_dsc)
 {
-    draw_dsc->radius = lv_obj_get_style_radius(obj, LV_OBJ_PART_MAIN);
+    draw_dsc->radius = lv_obj_get_style_radius(obj, part);
 
     lv_opa_t opa_scale = lv_obj_get_style_opa_scale(obj, part);
     if(opa_scale <= LV_OPA_MIN) {
@@ -2819,8 +2812,8 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 
     draw_dsc->color = lv_obj_get_style_text_color(obj, part);
-    draw_dsc->letter_space = lv_obj_get_style_letter_space(obj, part);
-    draw_dsc->line_space = lv_obj_get_style_line_space(obj, part);
+    draw_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, part);
+    draw_dsc->line_space = lv_obj_get_style_text_line_space(obj, part);
 
     draw_dsc->font = lv_obj_get_style_font(obj, part);
 
@@ -2887,24 +2880,24 @@ lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
 
     lv_opa_t sh_opa = lv_obj_get_style_shadow_opa(obj, part);
     if(sh_opa > LV_OPA_MIN) {
-        lv_coord_t sh_width = lv_obj_get_style_shadow_width(obj, LV_OBJ_PART_MAIN);
+        lv_coord_t sh_width = lv_obj_get_style_shadow_width(obj, part);
         if(sh_width) {
             sh_width = sh_width / 2;    /*THe blur adds only half width*/
             sh_width++;
-            sh_width += lv_obj_get_style_shadow_spread(obj, LV_OBJ_PART_MAIN);
-            sh_width += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_shadow_offset_x(obj, LV_OBJ_PART_MAIN)),
-                    LV_MATH_ABS(lv_obj_get_style_shadow_offset_y(obj, LV_OBJ_PART_MAIN)));
+            sh_width += lv_obj_get_style_shadow_spread(obj, part);
+            sh_width += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_shadow_offset_x(obj, part)),
+                    LV_MATH_ABS(lv_obj_get_style_shadow_offset_y(obj, part)));
             s = LV_MATH_MAX(s, sh_width);
         }
     }
 
     lv_opa_t value_opa = lv_obj_get_style_value_opa(obj, part);
     if(value_opa > LV_OPA_MIN) {
-        const char * value_str = lv_obj_get_style_value_str(obj, LV_OBJ_PART_MAIN);
+        const char * value_str = lv_obj_get_style_value_str(obj, part);
         if(value_str) {
-            lv_style_int_t letter_space = lv_obj_get_style_value_letter_space(obj, LV_OBJ_PART_MAIN);
-            lv_style_int_t line_space = lv_obj_get_style_value_letter_space(obj, LV_OBJ_PART_MAIN);
-            const lv_font_t * font = lv_obj_get_style_value_font(obj, LV_OBJ_PART_MAIN);
+            lv_style_int_t letter_space = lv_obj_get_style_value_letter_space(obj, part);
+            lv_style_int_t line_space = lv_obj_get_style_value_letter_space(obj, part);
+            const lv_font_t * font = lv_obj_get_style_value_font(obj, part);
 
             lv_point_t txt_size;
             lv_txt_get_size(&txt_size, value_str, font, letter_space, line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
@@ -2915,9 +2908,9 @@ lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
             value_area.x2 = txt_size.x - 1;
             value_area.y2 = txt_size.y - 1;
 
-            lv_style_int_t align = lv_obj_get_style_value_align(obj, LV_OBJ_PART_MAIN);
-            lv_style_int_t xofs = lv_obj_get_style_value_ofs_x(obj, LV_OBJ_PART_MAIN);
-            lv_style_int_t yofs = lv_obj_get_style_value_ofs_y(obj, LV_OBJ_PART_MAIN);
+            lv_style_int_t align = lv_obj_get_style_value_align(obj, part);
+            lv_style_int_t xofs = lv_obj_get_style_value_ofs_x(obj, part);
+            lv_style_int_t yofs = lv_obj_get_style_value_ofs_y(obj, part);
             lv_point_t p_align;
             lv_area_align(&obj->coords, &value_area, align, &p_align);
 
@@ -2935,9 +2928,9 @@ lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
 
     lv_opa_t outline_opa = lv_obj_get_style_outline_opa(obj, part);
     if(outline_opa > LV_OPA_MIN) {
-        lv_style_int_t outline_width = lv_obj_get_style_outline_width(obj, LV_OBJ_PART_MAIN);
+        lv_style_int_t outline_width = lv_obj_get_style_outline_width(obj, part);
         if(outline_width) {
-            lv_style_int_t outline_pad = lv_obj_get_style_outline_pad(obj, LV_OBJ_PART_MAIN);
+            lv_style_int_t outline_pad = lv_obj_get_style_outline_pad(obj, part);
             s = LV_MATH_MAX(s, outline_pad + outline_width);
         }
     }

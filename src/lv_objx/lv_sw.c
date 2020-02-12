@@ -63,49 +63,50 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("switch create started");
 
     /*Create the ancestor of switch*/
-    lv_obj_t * new_sw = lv_bar_create(par, copy);
-    LV_ASSERT_MEM(new_sw);
+    lv_obj_t * sw = lv_bar_create(par, copy);
+    LV_ASSERT_MEM(sw);
 
-    if(new_sw == NULL) return NULL;
+    if(sw == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_sw);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_sw);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(sw);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(sw);
 
     /*Allocate the switch type specific extended data*/
-    lv_sw_ext_t * ext = lv_obj_allocate_ext_attr(new_sw, sizeof(lv_sw_ext_t));
+    lv_sw_ext_t * ext = lv_obj_allocate_ext_attr(sw, sizeof(lv_sw_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_sw);
+        lv_obj_del(sw);
         return NULL;
     }
 
+    lv_style_list_init(&ext->style_knob);
+
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(new_sw, lv_sw_signal);
-    lv_obj_set_design_cb(new_sw, lv_sw_design);
+    lv_obj_set_signal_cb(sw, lv_sw_signal);
+    lv_obj_set_design_cb(sw, lv_sw_design);
 
     /*Init the new switch switch*/
     if(copy == NULL) {
-        lv_obj_set_click(new_sw, true);
-        lv_obj_set_protect(new_sw, LV_PROTECT_PRESS_LOST);
-        lv_obj_set_size(new_sw, 2 * LV_DPI / 3, LV_DPI / 3);
-        lv_bar_set_range(new_sw, 0, 1);
+        lv_obj_set_click(sw, true);
+        lv_obj_set_protect(sw, LV_PROTECT_PRESS_LOST);
+        lv_obj_set_size(sw, 2 * LV_DPI / 3, LV_DPI / 3);
+        lv_bar_set_range(sw, 0, 1);
 
-        lv_style_list_init(&ext->style_knob);
-
-        lv_theme_apply(new_sw, LV_THEME_SW);
+        lv_theme_apply(sw, LV_THEME_SW);
     }
     /*Copy an existing switch*/
     else {
-//        lv_sw_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-//        ext->style_knob_off    = copy_ext->style_knob_off;
-//        ext->style_knob_on     = copy_ext->style_knob_on;
+        lv_sw_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+
+        lv_style_list_copy(&ext->style_knob, &copy_ext->style_knob);
+        lv_obj_refresh_style(sw);
     }
 
     /*Refresh the style with new signal function*/
 
     LV_LOG_INFO("switch created");
 
-    return new_sw;
+    return sw;
 }
 
 /*=====================

@@ -79,6 +79,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Initialize the allocated 'ext' */
     ext->value_to_set = NULL;
     ext->dragging = 0;
+    lv_style_list_init(&ext->style_knob);
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_slider, lv_slider_signal);
@@ -89,7 +90,6 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_click(new_slider, true);
         lv_obj_set_protect(new_slider, LV_PROTECT_PRESS_LOST);
 
-        lv_style_list_init(&ext->style_knob);
         lv_theme_apply(new_slider, LV_THEME_SLIDER);
         lv_obj_set_height(new_slider, LV_DPI / 15);
     }

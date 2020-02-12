@@ -53,10 +53,6 @@ lv_theme_t * lv_theme_get_act(void)
     return act_theme;
 }
 
-lv_style_t * lv_theme_get_style(lv_theme_style_t name)
-{
-    return act_theme->get_style_cb(name);
-}
 
 void lv_theme_apply(lv_obj_t * obj, lv_theme_style_t name)
 {

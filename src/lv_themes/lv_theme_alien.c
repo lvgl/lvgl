@@ -89,7 +89,7 @@ static lv_style_t list_bg, list_btn;
 #endif
 
 #if LV_USE_DDLIST
-static lv_style_t ddlist_bg, ddlist_sel;
+static lv_style_t ddlist_btn, ddlist_page, ddlist_sel;
 #endif
 
 #if LV_USE_TA
@@ -176,7 +176,7 @@ static void basic_init(void)
     lv_style_set_pad_top(&btn, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_bottom(&btn, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_inner(&btn, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
-    lv_style_set_transition_time(&btn, LV_STYLE_STATE_NORMAL, 3000);
+    lv_style_set_transition_time(&btn, LV_STYLE_STATE_NORMAL, 300);
     lv_style_set_transition_time(&btn, LV_STYLE_STATE_PRESSED, 0);
     lv_style_set_bg_color(&btn, LV_STYLE_STATE_FOCUS, lv_color_mix(LV_COLOR_RED, COLOR_ACCENT, LV_OPA_50));
 
@@ -403,7 +403,16 @@ static void lmeter_init(void)
     lv_style_set_color(&lmeter, LV_STYLE_SCALE_COLOR, LV_COLOR_AQUA);
     lv_style_set_color(&lmeter, LV_STYLE_SCALE_GRAD_COLOR, LV_COLOR_NAVY);
     lv_style_set_color(&lmeter, LV_STYLE_SCALE_END_COLOR, LV_COLOR_GRAY);
-    lv_style_set_int(&lmeter, LV_STYLE_LINE_WIDTH, 2);
+    lv_style_set_line_rounded(&lmeter, LV_STYLE_STATE_NORMAL, true);
+    lv_style_set_int(&lmeter, LV_STYLE_LINE_WIDTH, 4);
+    lv_style_set_scale_end_line_width(&lmeter, LV_STYLE_STATE_NORMAL, 2);
+
+    /*Padding to not clip rounded line endings*/
+    lv_style_set_pad_left(&lmeter, LV_STYLE_STATE_NORMAL, 3);
+    lv_style_set_pad_right(&lmeter, LV_STYLE_STATE_NORMAL, 3);
+    lv_style_set_pad_top(&lmeter, LV_STYLE_STATE_NORMAL, 3);
+    lv_style_set_pad_bottom(&lmeter, LV_STYLE_STATE_NORMAL, 3);
+
 #endif
 }
 
@@ -418,29 +427,31 @@ static void gauge_init(void)
     lv_style_set_scale_grad_color(&gauge_main, LV_STYLE_STATE_NORMAL, COLOR_DISABLED);
     lv_style_set_scale_end_color(&gauge_main, LV_STYLE_STATE_NORMAL, COLOR_ACCENT);
     lv_style_set_line_width(&gauge_main, LV_STYLE_STATE_NORMAL, 2);
+    lv_style_set_scale_end_line_width(&gauge_main, LV_STYLE_STATE_NORMAL, 4);
     lv_style_set_scale_end_border_width(&gauge_main, LV_STYLE_STATE_NORMAL, 4);
     lv_style_set_bg_opa(&gauge_main, LV_STYLE_STATE_NORMAL, LV_OPA_COVER);
     lv_style_set_pad_left(&gauge_main, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_right(&gauge_main, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_top(&gauge_main, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
-    lv_style_set_pad_inner(&gauge_main, LV_STYLE_STATE_NORMAL, LV_DPI / 8);
-
+    lv_style_set_pad_inner(&gauge_main, LV_STYLE_STATE_NORMAL, LV_DPI / 6);
+    lv_style_set_scale_width(&gauge_main, LV_STYLE_STATE_NORMAL, LV_DPI/12);
 
     lv_style_init(&gauge_strong);
     lv_style_set_color(&gauge_strong, LV_STYLE_SCALE_COLOR, COLOR_DISABLED);
     lv_style_set_color(&gauge_strong, LV_STYLE_SCALE_GRAD_COLOR, COLOR_DISABLED);
     lv_style_set_color(&gauge_strong, LV_STYLE_SCALE_END_COLOR, COLOR_ACCENT);
     lv_style_set_int(&gauge_strong, LV_STYLE_LINE_WIDTH, 4);
-    lv_style_set_int(&gauge_strong, LV_STYLE_SCALE_WIDTH, LV_DPI/5);
-    lv_style_set_int(&gauge_strong, LV_STYLE_PAD_INNER, LV_DPI/10);
+    lv_style_set_scale_end_line_width(&gauge_strong, LV_STYLE_STATE_NORMAL, 4);
+    lv_style_set_scale_width(&gauge_strong, LV_STYLE_STATE_NORMAL, LV_DPI/7);
 
     lv_style_init(&gauge_needle);
     lv_style_set_color(&gauge_needle, LV_STYLE_LINE_COLOR, LV_COLOR_WHITE);
-    lv_style_set_int(&gauge_needle, LV_STYLE_LINE_WIDTH, LV_DPI / 30);
+    lv_style_set_line_width(&gauge_needle, LV_STYLE_STATE_NORMAL, LV_DPI / 20);
     lv_style_set_bg_opa(&gauge_needle, LV_STYLE_STATE_NORMAL, LV_OPA_COVER);
     lv_style_set_bg_color(&gauge_needle, LV_STYLE_STATE_NORMAL, LV_COLOR_WHITE);
-    lv_style_set_size(&gauge_needle, LV_STYLE_STATE_NORMAL, 10);
-    lv_style_set_pad_inner(&gauge_needle, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
+    lv_style_set_radius(&gauge_needle, LV_STYLE_STATE_NORMAL, LV_RADIUS_CIRCLE);
+    lv_style_set_size(&gauge_needle, LV_STYLE_STATE_NORMAL, LV_DPI / 7);
+    lv_style_set_pad_inner(&gauge_needle, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
 #endif
 }
 
@@ -559,14 +570,17 @@ static void btnm_init(void)
 {
 #if LV_USE_BTNM
     lv_style_init(&btnm_bg);
+    lv_style_set_bg_opa(&btnm_bg, LV_STYLE_STATE_NORMAL, LV_OPA_COVER);
     lv_style_set_int(&btnm_bg, LV_STYLE_BORDER_WIDTH, LV_DPI / 50);
     lv_style_set_color(&btnm_bg, LV_STYLE_BORDER_COLOR, lv_color_hex(0x373a3f));
     lv_style_set_int(&btnm_bg, LV_STYLE_RADIUS, LV_DPI / 20);
     lv_style_set_int(&btnm_bg, LV_STYLE_CLIP_CORNER, 1);
     lv_style_set_int(&btnm_bg, LV_STYLE_BORDER_POST, 1);
+    lv_style_set_bg_color(&btnm_bg, LV_STYLE_STATE_NORMAL, COLOR_CONTAINER);
+    lv_style_set_border_color(&btnm_bg, LV_STYLE_STATE_FOCUS, lv_color_hex3(0xf66));
 
     lv_style_init(&btnm_btn);
-    lv_style_set_int(&btnm_btn, LV_STYLE_BORDER_WIDTH, LV_DPI / 50);
+    lv_style_set_int(&btnm_btn, LV_STYLE_BORDER_WIDTH, LV_DPI / 70 > 0? LV_DPI / 70 : 1);
     lv_style_set_int(&btnm_btn, LV_STYLE_BORDER_SIDE, LV_BORDER_SIDE_FULL);
     lv_style_set_color(&btnm_btn, LV_STYLE_BORDER_COLOR, lv_color_hex(0x373a3f));
     lv_style_set_color(&btnm_btn, LV_STYLE_BG_COLOR | LV_STYLE_STATE_PRESSED, lv_color_hex3(0x666));
@@ -685,6 +699,31 @@ static void list_init(void)
 static void ddlist_init(void)
 {
 #if LV_USE_DDLIST != 0
+
+    lv_style_init(&ddlist_btn);
+    lv_style_copy(&ddlist_btn, &panel);
+    lv_style_set_border_side(&ddlist_btn, LV_STYLE_STATE_NORMAL, LV_BORDER_SIDE_FULL);
+    lv_style_set_bg_color(&ddlist_btn, LV_STYLE_STATE_PRESSED, lv_color_hex3(0x666));
+    lv_style_set_pad_top(&ddlist_btn, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
+    lv_style_set_pad_bottom(&ddlist_btn, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
+
+    lv_style_init(&ddlist_page);
+    lv_style_copy(&ddlist_page, &panel);
+    lv_style_set_border_side(&ddlist_page, LV_STYLE_STATE_NORMAL, LV_BORDER_SIDE_FULL);
+    lv_style_set_bg_color(&ddlist_page, LV_STYLE_STATE_NORMAL, lv_color_hex3(0xeee));
+    lv_style_set_text_color(&ddlist_page, LV_STYLE_STATE_NORMAL, lv_color_hex3(0x333));
+    lv_style_set_text_line_space(&ddlist_page, LV_STYLE_STATE_NORMAL, LV_DPI / 5);
+    lv_style_set_border_post(&ddlist_page, LV_STYLE_STATE_NORMAL, true);
+
+    lv_style_init(&ddlist_sel);
+    lv_style_set_bg_opa(&ddlist_sel, LV_STYLE_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_bg_color(&ddlist_sel, LV_STYLE_STATE_NORMAL, COLOR_ACCENT);
+
+    lv_style_set_bg_color(&ddlist_sel, LV_STYLE_STATE_PRESSED, LV_COLOR_SILVER);
+
+    lv_style_set_text_color(&ddlist_sel, LV_STYLE_STATE_NORMAL, lv_color_hex3(0x333));
+
+
 
 #endif
 }
@@ -809,10 +848,7 @@ lv_theme_t * lv_theme_alien_init(uint16_t hue, lv_font_t * font)
     table_init();
     win_init();
 
-
-    theme.get_style_cb = lv_theme_alien_get_style;
     theme.apply_cb = lv_theme_alien_apply;
-
 
     lv_mem_monitor_t mon2;
     lv_mem_monitor(&mon2);
@@ -845,17 +881,23 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &panel);
         break;
+#if LV_USE_CONT
     case LV_THEME_CONT:
         list = lv_obj_get_style_list(obj, LV_CONT_PART_MAIN);
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &panel);
         break;
+#endif
+
+#if LV_USE_BTN
     case LV_THEME_BTN:
         list = lv_obj_get_style_list(obj, LV_BTN_PART_MAIN);
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &btn);
         break;
+#endif
 
+#if LV_USE_BTNM
     case LV_THEME_BTNM:
         list = lv_obj_get_style_list(obj, LV_BTNM_PART_BG);
         lv_style_list_reset(list);
@@ -865,6 +907,9 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &btnm_btn);
         break;
+#endif
+
+#if LV_USE_KB
     case LV_THEME_KB:
         list = lv_obj_get_style_list(obj, LV_KB_PART_BG);
         lv_style_list_reset(list);
@@ -874,6 +919,9 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &btnm_btn);
         break;
+#endif
+
+#if LV_USE_BAR
     case LV_THEME_BAR:
         list = lv_obj_get_style_list(obj, LV_BAR_PART_BG);
         lv_style_list_reset(list);
@@ -883,7 +931,9 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &bar_indic);
         break;
+#endif
 
+#if LV_USE_SW
     case LV_THEME_SW:
         list = lv_obj_get_style_list(obj, LV_SW_PART_BG);
         lv_style_list_reset(list);
@@ -897,6 +947,7 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &sw_knob);
         break;
+#endif
 
 #if LV_USE_IMG
     case LV_THEME_IMAGE:
@@ -1062,7 +1113,7 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         break;
 #endif
 
-#if LV_USE_DDLIST
+#if LV_USE_LIST
     case LV_THEME_LIST:
         list = lv_obj_get_style_list(obj, LV_LIST_PART_BG);
         lv_style_list_reset(list);
@@ -1087,11 +1138,11 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
     case LV_THEME_DDLIST:
         list = lv_obj_get_style_list(obj, LV_DDLIST_PART_BTN);
         lv_style_list_reset(list);
-        lv_style_list_add_style(list, &btn);
+        lv_style_list_add_style(list, &ddlist_btn);
 
         list = lv_obj_get_style_list(obj, LV_DDLIST_PART_LIST);
         lv_style_list_reset(list);
-        lv_style_list_add_style(list, &panel);
+        lv_style_list_add_style(list, &ddlist_page);
 
         list = lv_obj_get_style_list(obj, LV_DDLIST_PART_SCRLBAR);
         lv_style_list_reset(list);
@@ -1099,7 +1150,7 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
 
         list = lv_obj_get_style_list(obj, LV_DDLIST_PART_SELECTED);
         lv_style_list_reset(list);
-        lv_style_list_add_style(list, &btn);
+        lv_style_list_add_style(list, &ddlist_sel);
         break;
 #endif
 
@@ -1172,7 +1223,7 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
     case LV_THEME_WIN_BTN:
         list = lv_obj_get_style_list(obj, LV_BTN_PART_MAIN);
         lv_style_list_reset(list);
-        lv_style_list_add_style(list, &tabview_btns);
+        lv_style_list_add_style(list, &btn);
     	break;
 #endif
 
@@ -1196,7 +1247,7 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         break;
 #endif
 
-#if LV_USE_TA
+#if LV_USE_CALENDAR
     case LV_THEME_CALENDAR:
         list = lv_obj_get_style_list(obj, LV_CALENDAR_PART_BG);
         lv_style_list_reset(list);
@@ -1213,6 +1264,13 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         list = lv_obj_get_style_list(obj, LV_CALENDAR_PART_DAY_NAMES);
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &calendar_daynames);
+        break;
+#endif
+#if LV_USE_LMETER
+    case LV_THEME_LMETER:
+        list = lv_obj_get_style_list(obj, LV_LMETER_PART_MAIN);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &lmeter);
         break;
 #endif
 #if LV_USE_GAUGE
@@ -1236,23 +1294,6 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
     lv_obj_refresh_style(obj);
 
 
-}
-
-lv_style_t * lv_theme_alien_get_style(lv_theme_style_t name)
-{
-    switch(name) {
-#if LV_USE_LMETER
-    case LV_THEME_LMETER:
-        return &lmeter;
-#endif
-
-#if LV_USE_LED
-    case LV_THEME_LED:
-        return &btn;
-#endif
-    }
-
-    return NULL;
 }
 
 /**********************

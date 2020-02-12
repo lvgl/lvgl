@@ -123,7 +123,6 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
 		ext->start_value		= ext_copy->start_value;
         ext->max_value          = ext_copy->max_value;
         ext->cur_value          = ext_copy->cur_value;
-        ext->style_indic        = ext_copy->style_indic;
         ext->type                = ext_copy->type;
 
         lv_style_list_copy(&ext->style_indic, &ext_copy->style_indic);
@@ -512,7 +511,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         lv_opa_t bg_opa = draw_indic_dsc.bg_opa;
         lv_opa_t border_opa = draw_indic_dsc.border_opa;
         lv_opa_t value_opa = draw_indic_dsc.border_opa;
-        void * pattern_src = draw_indic_dsc.pattern_image;
+        const void * pattern_src = draw_indic_dsc.pattern_image;
         draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
         draw_indic_dsc.border_opa = LV_OPA_TRANSP;
         draw_indic_dsc.value_opa = LV_OPA_TRANSP;
@@ -600,7 +599,7 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
 
         lv_coord_t indic_size;
-        indic_size = lv_obj_get_draw_rect_ext_pad_size(bar, LV_SLIDER_PART_INDIC);
+        indic_size = lv_obj_get_draw_rect_ext_pad_size(bar, LV_BAR_PART_INDIC);
 
         /*Bg size is handled by lv_obj*/
         bar->ext_draw_pad = LV_MATH_MAX(bar->ext_draw_pad, indic_size);

@@ -1208,7 +1208,7 @@ void lv_ta_cursor_down(lv_obj_t * ta)
 
     /*Increment the y with one line and keep the valid x*/
 
-    lv_style_int_t line_space = lv_obj_get_style_line_space(ta, LV_TA_PART_BG);
+    lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TA_PART_BG);
     const lv_font_t * font = lv_obj_get_style_font(ta, LV_TA_PART_BG);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     pos.y += font_h + line_space + 1;
@@ -1240,7 +1240,7 @@ void lv_ta_cursor_up(lv_obj_t * ta)
     lv_label_get_letter_pos(ext->label, lv_ta_get_cursor_pos(ta), &pos);
 
     /*Decrement the y with one line and keep the valid x*/
-    lv_style_int_t line_space = lv_obj_get_style_line_space(ta, LV_TA_PART_BG);
+    lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TA_PART_BG);
     const lv_font_t * font = lv_obj_get_style_font(ta, LV_TA_PART_BG);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     pos.y -= font_h + line_space - 1;
@@ -1504,7 +1504,7 @@ static lv_res_t lv_ta_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*Set ext. size because the cursor might be out of this object*/
-        lv_style_int_t line_space = lv_obj_get_style_line_space(ta, LV_TA_PART_BG);
+        lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TA_PART_BG);
         const lv_font_t * font = lv_obj_get_style_font(ta, LV_TA_PART_BG);
         lv_coord_t font_h              = lv_font_get_line_height(font);
         scrl->ext_draw_pad             = LV_MATH_MAX(scrl->ext_draw_pad, line_space + font_h);

@@ -94,6 +94,13 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy);
  *====================*/
 
 /**
+ * Set text of the ddlist (Displayed on the button if `show_selected = false`)
+ * @param ddlist pointer to a drop down list object
+ * @param txt the text as a string (Only it's pointer is saved)
+ */
+void lv_ddlist_set_text(lv_obj_t * ddlist, const char * txt);
+
+/**
  * Set the options in a drop down list from a string
  * @param ddlist pointer to drop down list object
  * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
@@ -148,9 +155,23 @@ static inline void lv_ddlist_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time
  */
 void lv_ddlist_set_dir(lv_obj_t * ddlist, lv_ddlist_dir_t dir);
 
+/**
+ * Set whether the ddlist highlight the last selected option and display its text or not
+ * @param ddlist pointer to a drop down list object
+ * @param show true/false
+ */
+void lv_ddlist_set_show_selected(lv_obj_t * ddlist, bool show);
+
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get text of the ddlist (Displayed on the button if `show_selected = false`)
+ * @param ddlist pointer to a drop down list object
+ * @return the text string
+ */
+const char * lv_ddlist_get_text(lv_obj_t * ddlist);
 
 /**
  * Get the options of a drop down list
@@ -201,6 +222,13 @@ const char * lv_ddlist_get_symbol(lv_obj_t * ddlist);
  * @return the symbol or NULL if not enabled
  */
 lv_ddlist_dir_t lv_ddlist_get_dir(const lv_obj_t * ddlist);
+
+/**
+ * Get whether the ddlist highlight the last selected option and display its text or not
+ * @param ddlist pointer to a drop down list object
+ * @return true/false
+ */
+bool lv_ddlist_get_show_selected(lv_obj_t * ddlist);
 
 /**
  * Get the scroll bar mode of a drop down list

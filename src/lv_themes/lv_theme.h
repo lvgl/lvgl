@@ -111,7 +111,6 @@ typedef enum {
 }lv_theme_style_t;
 
 typedef struct {
-    lv_style_t * (*get_style_cb)(lv_theme_style_t);
     void (*apply_cb)(lv_obj_t *,lv_theme_style_t);
 }lv_theme_t;
 

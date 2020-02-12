@@ -294,6 +294,8 @@ void lv_lmeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(lmeter, part, &line_dsc);
 
+    lv_style_int_t end_line_width = lv_obj_get_style_scale_end_line_width(lmeter, part);
+
     for(i = 0; i < ext->line_cnt; i++) {
         /*Calculate the position a scale label*/
         int16_t angle = (i * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
@@ -325,7 +327,10 @@ void lv_lmeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_
         p1.x = x_out + x_ofs;
         p1.y = y_out + y_ofs;
 
-        if(i >= level) line_dsc.color = end_color;
+        if(i >= level) {
+            line_dsc.color = end_color;
+            line_dsc.width = end_line_width;
+        }
         else line_dsc.color = lv_color_mix(grad_color, main_color, (255 * i) / ext->line_cnt);
 
         lv_draw_line(&p1, &p2, clip_area, &line_dsc);

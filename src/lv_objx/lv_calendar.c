@@ -826,7 +826,10 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
         box_area.y1 = days_y1 + ((days_h - box_size) * week) / 5;
         box_area.y2 = box_area.y1 + box_size - 1;
 
-        if(box_area.y1 > clip_area->y2) return;
+        if(box_area.y1 > clip_area->y2) {
+            calendar->state_dsc = state_ori;
+            return;
+        }
 
         lv_area_t label_area;
         label_area.y1 = box_area.y1 + (lv_area_get_height(&box_area) - lv_font_get_line_height(nums_font)) / 2;

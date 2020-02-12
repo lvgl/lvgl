@@ -587,7 +587,6 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         ancestor_design_f(btnm, clip_area, mode);
 
-
         lv_btnm_ext_t * ext         = lv_obj_get_ext_attr(btnm);
         if(ext->btn_cnt == 0) return LV_DESIGN_RES_OK;
         lv_area_t area_btnm;
@@ -795,7 +794,6 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
         invalidate_button_area(btnm, ext->btn_id_pr);
 
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
-
         if(indev_type == LV_INDEV_TYPE_POINTER || indev_type == LV_INDEV_TYPE_BUTTON) {
             uint16_t btn_pr;
             /*Search the pressed area*/
@@ -860,7 +858,14 @@ static lv_res_t lv_btnm_signal(lv_obj_t * btnm, lv_signal_t sign, void * param)
 
             /*Invalidate to old pressed area*/;
             invalidate_button_area(btnm, ext->btn_id_pr);
-            ext->btn_id_focused = ext->btn_id_pr;
+            invalidate_button_area(btnm, ext->btn_id_focused);
+
+
+            lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
+            if(indev_type == LV_INDEV_TYPE_KEYPAD || indev_type == LV_INDEV_TYPE_ENCODER) {
+                ext->btn_id_focused = ext->btn_id_pr;
+            }
+
             ext->btn_id_pr = LV_BTNM_BTN_NONE;
 
             if(button_is_click_trig(ext->ctrl_bits[ext->btn_id_act]) == true &&

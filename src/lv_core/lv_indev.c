@@ -820,6 +820,11 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             if(indev_reset_check(proc)) return;
 
             if(indev_act->proc.wait_until_release) return;
+
+            /*Handle focus*/
+            indev_click_focus(&indev_act->proc);
+            if(indev_reset_check(proc)) return;
+
         }
     }
 
@@ -943,9 +948,6 @@ static void indev_proc_release(lv_indev_proc_t * proc)
             lv_event_send(indev_obj_act, LV_EVENT_RELEASED, NULL);
             if(indev_reset_check(proc)) return;
         }
-
-        indev_click_focus(&indev_act->proc);
-        if(indev_reset_check(proc)) return;
 
         /*Send LV_EVENT_DRAG_THROW_BEGIN if required */
         /*If drag parent is active check recursively the drag_parent attribute*/

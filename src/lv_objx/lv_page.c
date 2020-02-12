@@ -1022,7 +1022,18 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 page_ext->sb.ver_draw = 0;
             }
         }
-    } else if(sign == LV_SIGNAL_CLEANUP) {
+    } else if(sign == LV_SIGNAL_FOCUS) {
+        res = lv_signal_send(page, LV_SIGNAL_FOCUS, NULL);
+        if(res != LV_RES_OK) return res;
+        res = lv_event_send(page, LV_EVENT_FOCUSED, NULL);
+        if(res != LV_RES_OK) return res;
+    }  else if(sign == LV_SIGNAL_DEFOCUS) {
+        res = lv_signal_send(page, LV_SIGNAL_DEFOCUS, NULL);
+        if(res != LV_RES_OK) return res;
+        res = lv_event_send(page, LV_EVENT_DEFOCUSED, NULL);
+        if(res != LV_RES_OK) return res;
+    }
+    else if(sign == LV_SIGNAL_CLEANUP) {
         page_ext->scrl = NULL;
     }
     return res;

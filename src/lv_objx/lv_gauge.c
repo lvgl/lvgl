@@ -350,19 +350,13 @@ static lv_design_res_t lv_gauge_design(lv_obj_t * gauge, const lv_area_t * clip_
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_draw_rect_dsc_t bg_dsc;
-        lv_draw_rect_dsc_init(&bg_dsc);
-        lv_obj_init_draw_rect_dsc(gauge, LV_GAUGE_PART_MAIN, &bg_dsc);
-        lv_draw_rect(&gauge->coords, clip_area, &bg_dsc);
+        ancestor_design(gauge, clip_area, mode);
 
         lv_gauge_ext_t * ext           = lv_obj_get_ext_attr(gauge);
         lv_gauge_draw_labels(gauge, clip_area);
 
-        /*Draw the ancestor line meter with max value to show the rainbow like line colors*/
+        /*Add the strong lines*/
         uint16_t line_cnt_tmp = ext->lmeter.line_cnt;
-
-        lv_lmeter_draw_scale(gauge, clip_area, LV_GAUGE_PART_MAIN);
-
         ext->lmeter.line_cnt         = ext->label_count;                 /*Only to labels*/
         lv_lmeter_draw_scale(gauge, clip_area, LV_GAUGE_PART_STRONG);
         ext->lmeter.line_cnt = line_cnt_tmp; /*Restore the parameters*/
