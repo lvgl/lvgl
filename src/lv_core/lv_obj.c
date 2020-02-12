@@ -31,6 +31,11 @@
 #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
+
+#if defined(LV_USER_DATA_FREE_INCLUDE)
+#include LV_USER_DATA_FREE_INCLUDE
+#endif /* LV_USE_USER_DATA_FREE */
+
 /*********************
  *      DEFINES
  *********************/
@@ -370,6 +375,11 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         /*Remove the animations from this object*/
 #if LV_USE_ANIMATION
     lv_anim_del(obj, NULL);
+#endif
+
+    /*Delete the user data*/
+#if LV_USE_USER_DATA_FREE
+    LV_USER_DATA_FREE(obj);
 #endif
 
     /*Recursively delete the children*/
