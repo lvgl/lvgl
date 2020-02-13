@@ -67,7 +67,7 @@ static lv_signal_cb_t ancestor_signal;
  */
 lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("mesasge box create started");
+    LV_LOG_TRACE("message box create started");
 
     /*Create the ancestor message box*/
     lv_obj_t * mbox = lv_cont_create(par, copy);
@@ -107,7 +107,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_event_cb(mbox, lv_mbox_default_event_cb);
 
         /*Set the default styles*/
-        lv_theme_alien_apply(mbox, LV_THEME_MBOX);
+        lv_theme_apply(mbox, LV_THEME_MBOX);
 
     }
     /*Copy an existing message box*/
@@ -123,7 +123,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_refresh_style(mbox);
     }
 
-    LV_LOG_INFO("mesasge box created");
+    LV_LOG_INFO("message box created");
 
     return mbox;
 }
@@ -149,7 +149,7 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
     if(ext->btnm == NULL) {
         ext->btnm = lv_btnm_create(mbox, NULL);
 
-        lv_theme_alien_apply(mbox, LV_MBOX_PART_BTN);
+        lv_theme_alien_apply(mbox, LV_THEME_MBOX_BTNS);
     }
 
     lv_btnm_set_map(ext->btnm, btn_map);

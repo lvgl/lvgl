@@ -121,7 +121,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing roller*/
     else {
         lv_roller_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->mode                  = copy_ext->mode;
+        lv_roller_set_options(roller, lv_roller_get_options(copy), copy_ext->mode);
 
         lv_obj_t * scrl = lv_page_get_scrl(roller);
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
