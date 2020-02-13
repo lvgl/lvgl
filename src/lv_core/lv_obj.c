@@ -3042,6 +3042,12 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_refresh_ext_draw_pad(obj);
     }
+    else if(sign == LV_SIGNAL_PRESSED) {
+        lv_obj_add_state(obj, LV_OBJ_STATE_PRESSED);
+    }
+    else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
+        lv_obj_clear_state(obj, LV_OBJ_STATE_PRESSED);
+    }
 #if LV_USE_GROUP
     else if(sign == LV_SIGNAL_FOCUS) {
         if(lv_group_get_editing(lv_obj_get_group(obj))) {

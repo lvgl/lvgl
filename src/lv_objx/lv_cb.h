@@ -93,7 +93,7 @@ void lv_cb_set_static_text(lv_obj_t * cb, const char * txt);
  */
 static inline void lv_cb_set_checked(lv_obj_t * cb, bool checked)
 {
-    lv_btn_set_state(cb, checked ? LV_BTN_STATE_TGL_REL : LV_BTN_STATE_REL);
+    lv_btn_set_state(cb, checked ? LV_BTN_STATE_CHECKED_RELEASED: LV_BTN_STATE_RELEASED);
 }
 
 /**
@@ -102,7 +102,7 @@ static inline void lv_cb_set_checked(lv_obj_t * cb, bool checked)
  */
 static inline void lv_cb_set_inactive(lv_obj_t * cb)
 {
-    lv_btn_set_state(cb, LV_BTN_STATE_INA);
+    lv_btn_set_state(cb, LV_BTN_STATE_DISABLED);
 }
 
 /**
@@ -131,7 +131,7 @@ const char * lv_cb_get_text(const lv_obj_t * cb);
  */
 static inline bool lv_cb_is_checked(const lv_obj_t * cb)
 {
-    return lv_btn_get_state(cb) == LV_BTN_STATE_REL ? false : true;
+    return lv_btn_get_state(cb) == LV_BTN_STATE_RELEASED ? false : true;
 }
 
 /**
@@ -141,7 +141,7 @@ static inline bool lv_cb_is_checked(const lv_obj_t * cb)
  */
 static inline bool lv_cb_is_inactive(const lv_obj_t * cb)
 {
-    return lv_btn_get_state(cb) == LV_BTN_STATE_INA ? true :false;
+    return lv_btn_get_state(cb) == LV_BTN_STATE_DISABLED ? true :false;
 }
 
 

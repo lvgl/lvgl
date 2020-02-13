@@ -36,23 +36,12 @@ extern "C" {
 /** Possible states of a button.
  * It can be used not only by buttons but other button-like objects too*/
 enum {
-    /**Released*/
-    LV_BTN_STATE_REL,
-
-    /**Pressed*/
-    LV_BTN_STATE_PR,
-
-    /**Toggled released*/
-    LV_BTN_STATE_TGL_REL,
-
-    /**Toggled pressed*/
-    LV_BTN_STATE_TGL_PR,
-
-    /**Inactive*/
-    LV_BTN_STATE_INA,
-
-    /**Number of states*/
-    _LV_BTN_STATE_NUM,
+    LV_BTN_STATE_RELEASED,
+    LV_BTN_STATE_PRESSED,
+    LV_BTN_STATE_CHECKED_RELEASED,
+    LV_BTN_STATE_CHECKED_PRESSED,
+    LV_BTN_STATE_DISABLED,
+    _LV_BTN_STATE_LAST, /* Number of states*/
 };
 typedef uint8_t lv_btn_state_t;
 
@@ -95,7 +84,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param btn pointer to a button object
  * @param tgl true: enable toggled states, false: disable
  */
-void lv_btn_set_toggle(lv_obj_t * btn, bool tgl);
+void lv_btn_set_checkable(lv_obj_t * btn, bool tgl);
 
 /**
  * Set the state of the button
@@ -202,7 +191,7 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn);
  * @param btn pointer to a button object
  * @return true: toggle enabled, false: disabled
  */
-bool lv_btn_get_toggle(const lv_obj_t * btn);
+bool lv_btn_get_checkable(const lv_obj_t * btn);
 
 /**
  * Get the layout of a button
@@ -253,29 +242,6 @@ static inline lv_fit_t lv_btn_get_fit_bottom(const lv_obj_t * btn)
 {
     return lv_cont_get_fit_bottom(btn);
 }
-
-/**
- * Get time of the ink in effect (draw a circle on click to animate in the new state)
- * @param btn pointer to a button object
- * @return the time of the ink animation
- */
-uint16_t lv_btn_get_ink_in_time(const lv_obj_t * btn);
-
-/**
- * Get the wait time before the ink disappears
- * @param btn pointer to a button object
- * @return the time of the ink animation
- */
-uint16_t lv_btn_get_ink_wait_time(const lv_obj_t * btn);
-
-/**
- * Get time of the ink out effect (animate to the releases state)
- * @param btn pointer to a button object
- * @return the time of the ink animation
- */
-uint16_t lv_btn_get_ink_out_time(const lv_obj_t * btn);
-
-lv_style_list_t * lv_btn_get_style(lv_obj_t * cont, uint8_t type);
 
 /**********************
  *      MACROS

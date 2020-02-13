@@ -114,7 +114,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param btn pointer to a button object
  * @param tgl true: enable toggled states, false: disable
  */
-void lv_btn_set_toggle(lv_obj_t * btn, bool tgl)
+void lv_btn_set_checkable(lv_obj_t * btn, bool tgl)
 {
     LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
 
@@ -133,21 +133,21 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
     LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
 
     switch(state) {
-        case LV_BTN_STATE_REL:
+        case LV_BTN_STATE_RELEASED:
             lv_obj_clear_state(btn, LV_OBJ_STATE_PRESSED | LV_OBJ_STATE_CHECKED);
             break;
-        case LV_BTN_STATE_PR:
+        case LV_BTN_STATE_PRESSED:
             lv_obj_clear_state(btn, LV_OBJ_STATE_CHECKED);
             lv_obj_add_state(btn, LV_OBJ_STATE_PRESSED);
             break;
-        case LV_BTN_STATE_TGL_REL:
+        case LV_BTN_STATE_CHECKED_RELEASED:
             lv_obj_add_state(btn, LV_OBJ_STATE_CHECKED);
             lv_obj_clear_state(btn, LV_OBJ_STATE_PRESSED);
             break;
-        case LV_BTN_STATE_TGL_PR:
+        case LV_BTN_STATE_CHECKED_PRESSED:
             lv_obj_add_state(btn, LV_OBJ_STATE_PRESSED | LV_OBJ_STATE_CHECKED);
             break;
-        case LV_BTN_STATE_INA:
+        case LV_BTN_STATE_DISABLED:
             lv_obj_add_state(btn, LV_OBJ_STATE_DISABLED);
             break;
     }
@@ -188,12 +188,14 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn)
 
     lv_obj_state_t state = lv_obj_get_state(btn, LV_BTN_PART_MAIN);
 
-    if(state & LV_OBJ_STATE_CHECKED) {
-        if(state & LV_OBJ_STATE_PRESSED) return LV_BTN_STATE_TGL_PR;
-        else return LV_BTN_STATE_TGL_REL;
+    if(state & LV_OBJ_STATE_DISABLED) {
+        return LV_BTN_STATE_DISABLED;
+    } else if(state & LV_OBJ_STATE_CHECKED) {
+        if(state & LV_OBJ_STATE_PRESSED) return LV_BTN_STATE_CHECKED_PRESSED;
+        else return LV_BTN_STATE_CHECKED_RELEASED;
     } else {
-        if(state & LV_OBJ_STATE_PRESSED) return LV_BTN_STATE_PR;
-        else return LV_BTN_STATE_REL;
+        if(state & LV_OBJ_STATE_PRESSED) return LV_BTN_STATE_PRESSED;
+        else return LV_BTN_STATE_RELEASED;
     }
 
 }
@@ -203,27 +205,13 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn)
  * @param btn pointer to a button object
  * @return true: toggle enabled, false: disabled
  */
-bool lv_btn_get_toggle(const lv_obj_t * btn)
+bool lv_btn_get_checkable(const lv_obj_t * btn)
 {
     LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
 
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
     return ext->toggle != 0 ? true : false;
-}
-
-lv_style_list_t * lv_btn_get_style(lv_obj_t * cont, uint8_t type)
-{
-    lv_style_list_t * style_dsc_p;
-    switch(type) {
-    case LV_BTN_PART_MAIN:
-        style_dsc_p = &cont->style_list;
-        break;
-    default:
-        style_dsc_p = NULL;
-    }
-
-    return style_dsc_p;
 }
 
 /**********************
@@ -269,64 +257,29 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
-    bool tgl           = lv_btn_get_toggle(btn);
-    lv_btn_state_t state = lv_btn_get_state(btn);
-    if(sign == LV_SIGNAL_PRESSED) {
-        /*Refresh the state*/
-        if(state == LV_BTN_STATE_REL) {
-            lv_btn_set_state(btn, LV_BTN_STATE_PR);
-        } else if(state == LV_BTN_STATE_TGL_REL) {
-            lv_btn_set_state(btn, LV_BTN_STATE_TGL_PR);
-        }
-    } else if(sign == LV_SIGNAL_PRESS_LOST) {
-        /*Refresh the state*/
-        if(state == LV_BTN_STATE_PR)
-            lv_btn_set_state(btn, LV_BTN_STATE_REL);
-        else if(state == LV_BTN_STATE_TGL_PR)
-            lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-    } else if(sign == LV_SIGNAL_PRESSING) {
-        /*When the button begins to drag revert pressed states to released*/
-        if(lv_indev_is_dragging(param) != false) {
-            if(state == LV_BTN_STATE_PR)
-                lv_btn_set_state(btn, LV_BTN_STATE_REL);
-            else if(state == LV_BTN_STATE_TGL_PR)
-                lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-        }
-    } else if(sign == LV_SIGNAL_RELEASED) {
+    bool tgl           = lv_btn_get_checkable(btn);
+
+    if(sign == LV_SIGNAL_RELEASED) {
         /*If not dragged and it was not long press action then
          *change state and run the action*/
-        if(lv_indev_is_dragging(param) == false) {
+        if(lv_indev_is_dragging(param) == false && tgl) {
             uint32_t toggled = 0;
-            if(state == LV_BTN_STATE_PR && tgl == false) {
-                lv_btn_set_state(btn, LV_BTN_STATE_REL);
+            if(lv_obj_get_state(btn, LV_BTN_PART_MAIN) & LV_OBJ_STATE_CHECKED) {
+                lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
                 toggled = 0;
-            } else if(state == LV_BTN_STATE_TGL_PR && tgl == false) {
-                lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+            } else {
+                lv_btn_set_state(btn, LV_BTN_STATE_CHECKED_RELEASED);
                 toggled = 1;
-            } else if(state == LV_BTN_STATE_PR && tgl == true) {
-                lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-                toggled = 1;
-            } else if(state == LV_BTN_STATE_TGL_PR && tgl == true) {
-                lv_btn_set_state(btn, LV_BTN_STATE_REL);
-                toggled = 0;
             }
 
-            if(tgl) {
-                res = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &toggled);
-                if(res != LV_RES_OK) return res;
-            }
-        } else { /*If dragged change back the state*/
-            if(state == LV_BTN_STATE_PR) {
-                lv_btn_set_state(btn, LV_BTN_STATE_REL);
-            } else if(state == LV_BTN_STATE_TGL_PR) {
-                lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
-            }
+            res = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &toggled);
+            if(res != LV_RES_OK) return res;
         }
     } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
-            if(lv_btn_get_toggle(btn)) {
-                lv_btn_set_state(btn, LV_BTN_STATE_TGL_REL);
+            if(lv_btn_get_checkable(btn)) {
+                lv_btn_set_state(btn, LV_BTN_STATE_CHECKED_RELEASED);
 
                 uint32_t state = 1;
                 res            = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &state);
@@ -334,8 +287,8 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             }
 
         } else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
-            if(lv_btn_get_toggle(btn)) {
-                lv_btn_set_state(btn, LV_BTN_STATE_REL);
+            if(lv_btn_get_checkable(btn)) {
+                lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
 
                 uint32_t state = 0;
                 res            = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &state);

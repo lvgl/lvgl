@@ -414,7 +414,13 @@ static lv_res_t lv_mbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param)
             info->result = lv_mbox_get_style(mbox, info->part);
             if(info->result != NULL) return LV_RES_OK;
             else return ancestor_signal(mbox, sign, param);
-        }
+    } else if(sign == LV_SIGNAL_GET_STATE_DSC) {
+        lv_get_state_info_t * info = param;
+        lv_mbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+        if(ext->btnm && info->part == LV_MBOX_PART_BTN_BG) info->result = lv_obj_get_state_dsc(ext->btnm, LV_BTNM_PART_BG);
+        else if(ext->btnm && info->part == LV_MBOX_PART_BTN) info->result = lv_obj_get_state_dsc(ext->btnm, LV_BTNM_PART_BTN);
+        return LV_RES_OK;
+    }
 
     /* Include the ancient signal function */
     res = ancestor_signal(mbox, sign, param);

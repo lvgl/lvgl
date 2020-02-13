@@ -39,7 +39,7 @@ typedef struct
     lv_btn_ext_t btn; /*Ext. of ancestor*/
     /*New data for this type */
 #if LV_IMGBTN_TILED == 0
-    const void * img_src[_LV_BTN_STATE_NUM]; /*Store images to each state*/
+    const void * img_src[_LV_BTN_STATE_LAST]; /*Store images to each state*/
 #else
     const void * img_src_left[_LV_BTN_STATE_NUM];  /*Store left side images to each state*/
     const void * img_src_mid[_LV_BTN_STATE_NUM];   /*Store center images to each state*/
@@ -105,9 +105,9 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src
  * @param imgbtn pointer to an image button object
  * @param tgl true: enable toggled states, false: disable
  */
-static inline void lv_imgbtn_set_toggle(lv_obj_t * imgbtn, bool tgl)
+static inline void lv_imgbtn_set_checkable(lv_obj_t * imgbtn, bool tgl)
 {
-    lv_btn_set_toggle(imgbtn, tgl);
+    lv_btn_set_checkable(imgbtn, tgl);
 }
 
 /**
@@ -184,9 +184,9 @@ static inline lv_btn_state_t lv_imgbtn_get_state(const lv_obj_t * imgbtn)
  * @param imgbtn pointer to a image button object
  * @return ture: toggle enabled, false: disabled
  */
-static inline bool lv_imgbtn_get_toggle(const lv_obj_t * imgbtn)
+static inline bool lv_imgbtn_get_checkable(const lv_obj_t * imgbtn)
 {
-    return lv_btn_get_toggle(imgbtn);
+    return lv_btn_get_checkable(imgbtn);
 }
 
 /*=====================

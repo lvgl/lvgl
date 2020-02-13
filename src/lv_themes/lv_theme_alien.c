@@ -181,7 +181,7 @@ static void basic_init(void)
     lv_style_set_pad_bottom(&btn, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_inner(&btn, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_transition_time(&btn, LV_STYLE_STATE_NORMAL, 300);
-    lv_style_set_transition_time(&btn, LV_STYLE_STATE_PRESSED, 0);
+//    lv_style_set_transition_time(&btn, LV_STYLE_STATE_PRESSED, 0);
     lv_style_set_bg_color(&btn, LV_STYLE_STATE_FOCUS, lv_color_mix(LV_COLOR_RED, COLOR_ACCENT, LV_OPA_50));
 
     lv_style_set_outline_width(&btn, LV_STYLE_STATE_NORMAL, 3);
