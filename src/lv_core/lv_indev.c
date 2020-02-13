@@ -1029,7 +1029,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t *point)
 
         /*If then the children was not ok, and this obj is clickable
          * and it or its parent is not hidden then save this object*/
-        if(found_p == NULL && lv_obj_get_click(obj) != false && (lv_obj_get_state(obj, LV_OBJ_PART_MAIN) & LV_OBJ_STATE_DISABLED) == 0) {
+        if(found_p == NULL && lv_obj_get_click(obj) != false && (lv_obj_get_state(obj, LV_OBJ_PART_MAIN) & LV_STATE_DISABLED) == 0) {
             lv_obj_t * hidden_i = obj;
             while(hidden_i != NULL) {
                 if(lv_obj_get_hidden(hidden_i) == true) break;

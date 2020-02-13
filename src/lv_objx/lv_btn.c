@@ -134,21 +134,21 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
 
     switch(state) {
         case LV_BTN_STATE_RELEASED:
-            lv_obj_clear_state(btn, LV_OBJ_STATE_PRESSED | LV_OBJ_STATE_CHECKED);
+            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED);
             break;
         case LV_BTN_STATE_PRESSED:
-            lv_obj_clear_state(btn, LV_OBJ_STATE_CHECKED);
-            lv_obj_add_state(btn, LV_OBJ_STATE_PRESSED);
+            lv_obj_clear_state(btn, LV_STATE_CHECKED);
+            lv_obj_add_state(btn, LV_STATE_PRESSED);
             break;
         case LV_BTN_STATE_CHECKED_RELEASED:
-            lv_obj_add_state(btn, LV_OBJ_STATE_CHECKED);
-            lv_obj_clear_state(btn, LV_OBJ_STATE_PRESSED);
+            lv_obj_add_state(btn, LV_STATE_CHECKED);
+            lv_obj_clear_state(btn, LV_STATE_PRESSED);
             break;
         case LV_BTN_STATE_CHECKED_PRESSED:
-            lv_obj_add_state(btn, LV_OBJ_STATE_PRESSED | LV_OBJ_STATE_CHECKED);
+            lv_obj_add_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED);
             break;
         case LV_BTN_STATE_DISABLED:
-            lv_obj_add_state(btn, LV_OBJ_STATE_DISABLED);
+            lv_obj_add_state(btn, LV_STATE_DISABLED);
             break;
     }
 
@@ -166,10 +166,10 @@ void lv_btn_toggle(lv_obj_t * btn)
 
 
 
-    if(lv_obj_get_state(btn, LV_BTN_PART_MAIN) & LV_OBJ_STATE_CHECKED) {
-        lv_obj_clear_state(btn, LV_OBJ_STATE_CHECKED);
+    if(lv_obj_get_state(btn, LV_BTN_PART_MAIN) & LV_STATE_CHECKED) {
+        lv_obj_clear_state(btn, LV_STATE_CHECKED);
     } else {
-        lv_obj_add_state(btn, LV_OBJ_STATE_CHECKED);
+        lv_obj_add_state(btn, LV_STATE_CHECKED);
     }
 }
 
@@ -186,15 +186,15 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn)
 {
     LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
 
-    lv_obj_state_t state = lv_obj_get_state(btn, LV_BTN_PART_MAIN);
+    lv_state_t state = lv_obj_get_state(btn, LV_BTN_PART_MAIN);
 
-    if(state & LV_OBJ_STATE_DISABLED) {
+    if(state & LV_STATE_DISABLED) {
         return LV_BTN_STATE_DISABLED;
-    } else if(state & LV_OBJ_STATE_CHECKED) {
-        if(state & LV_OBJ_STATE_PRESSED) return LV_BTN_STATE_CHECKED_PRESSED;
+    } else if(state & LV_STATE_CHECKED) {
+        if(state & LV_STATE_PRESSED) return LV_BTN_STATE_CHECKED_PRESSED;
         else return LV_BTN_STATE_CHECKED_RELEASED;
     } else {
-        if(state & LV_OBJ_STATE_PRESSED) return LV_BTN_STATE_PRESSED;
+        if(state & LV_STATE_PRESSED) return LV_BTN_STATE_PRESSED;
         else return LV_BTN_STATE_RELEASED;
     }
 
@@ -264,7 +264,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
          *change state and run the action*/
         if(lv_indev_is_dragging(param) == false && tgl) {
             uint32_t toggled = 0;
-            if(lv_obj_get_state(btn, LV_BTN_PART_MAIN) & LV_OBJ_STATE_CHECKED) {
+            if(lv_obj_get_state(btn, LV_BTN_PART_MAIN) & LV_STATE_CHECKED) {
                 lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
                 toggled = 0;
             } else {

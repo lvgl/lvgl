@@ -684,8 +684,8 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     /*Add the left arrow*/
     lv_obj_state_dsc_t state_ori = calendar->state_dsc;
 
-    if(ext->btn_pressing < 0) calendar->state_dsc.act |= LV_OBJ_STATE_PRESSED;
-    else calendar->state_dsc.act &= ~(LV_OBJ_STATE_PRESSED);
+    if(ext->btn_pressing < 0) calendar->state_dsc.act |= LV_STATE_PRESSED;
+    else calendar->state_dsc.act &= ~(LV_STATE_PRESSED);
 
     calendar->state_dsc.prev = calendar->state_dsc.act;
 
@@ -698,8 +698,8 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     calendar->state_dsc = state_ori;    /*Restore the state*/
 
     /*Add the right arrow*/
-    if(ext->btn_pressing > 0) calendar->state_dsc.act |= LV_OBJ_STATE_PRESSED;
-    else calendar->state_dsc.act &= ~(LV_OBJ_STATE_PRESSED);
+    if(ext->btn_pressing > 0) calendar->state_dsc.act |= LV_STATE_PRESSED;
+    else calendar->state_dsc.act &= ~(LV_STATE_PRESSED);
 
     calendar->state_dsc.prev = calendar->state_dsc.act;
 
@@ -781,10 +781,10 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
 
     /*The state changes without re-caching the styles, disable the use of cache*/
     lv_obj_state_dsc_t state_ori = calendar->state_dsc;
-    calendar->state_dsc.act = LV_OBJ_STATE_NORMAL;
-    calendar->state_dsc.prev = LV_OBJ_STATE_NORMAL;
+    calendar->state_dsc.act = LV_STATE_NORMAL;
+    calendar->state_dsc.prev = LV_STATE_NORMAL;
 
-    lv_obj_state_t month_state = LV_OBJ_STATE_DISABLED;
+    lv_state_t month_state = LV_STATE_DISABLED;
 
     uint8_t day_cnt;
     lv_coord_t days_w      = lv_obj_get_width(calendar) - date_left - date_right;
@@ -805,7 +805,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
         draw_state = DAY_DRAW_PREV_MONTH;
         day_cnt = get_month_length(ext->showed_date.year, ext->showed_date.month - 1); /*Length of the previous month*/
         day_cnt -= month_start_day - 1; /*First visible number of the previous month*/
-        month_state = LV_OBJ_STATE_DISABLED;
+        month_state = LV_STATE_DISABLED;
     }
 
     bool month_of_today_shown = false;
@@ -818,7 +818,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
     /*Draw 6 weeks*/
     lv_draw_rect_dsc_t rect_dsc;
     lv_draw_label_dsc_t label_dsc;
-    lv_obj_state_t prev_state = 0xFF;
+    lv_state_t prev_state = 0xFF;
     uint32_t week;
     for(week = 0; week < 6; week++) {
         lv_area_t box_area;
@@ -849,7 +849,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
                day_cnt > get_month_length(ext->showed_date.year, ext->showed_date.month)) {
                 draw_state = DAY_DRAW_NEXT_MONTH;
                 day_cnt    = 1;
-                month_state  = LV_OBJ_STATE_DISABLED;
+                month_state  = LV_STATE_DISABLED;
             }
 
             if(box_area.y2 < clip_area->y1) {
@@ -857,15 +857,15 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
                 continue;
             }
 
-            lv_obj_state_t day_state = month_state;
+            lv_state_t day_state = month_state;
             if(is_pressed(calendar, draw_state, ext->showed_date.year, ext->showed_date.month, day_cnt)) {
-                day_state |= LV_OBJ_STATE_PRESSED;
+                day_state |= LV_STATE_PRESSED;
             }
             if(is_highlighted(calendar, draw_state, ext->showed_date.year, ext->showed_date.month, day_cnt)) {
-                day_state |= LV_OBJ_STATE_CHECKED;
+                day_state |= LV_STATE_CHECKED;
             }
             if(month_of_today_shown && day_cnt == ext->today.day && draw_state == DAY_DRAW_ACT_MONTH) {
-                day_state |= LV_OBJ_STATE_FOCUS;
+                day_state |= LV_STATE_FOCUS;
             }
 
             if(prev_state != day_state) {

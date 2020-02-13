@@ -275,7 +275,7 @@ void lv_list_focus_btn(lv_obj_t * list, lv_obj_t * btn)
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
     /*Defocus the current button*/
-    if(ext->act_sel_btn) lv_obj_clear_state(ext->act_sel_btn, LV_OBJ_STATE_FOCUS);
+    if(ext->act_sel_btn) lv_obj_clear_state(ext->act_sel_btn, LV_STATE_FOCUS);
 
 
     /*Don't forget which button was selected.
@@ -286,7 +286,7 @@ void lv_list_focus_btn(lv_obj_t * list, lv_obj_t * btn)
     ext->act_sel_btn = btn;
 
     if(ext->act_sel_btn) {
-        lv_obj_add_state(ext->act_sel_btn, LV_OBJ_STATE_FOCUS);
+        lv_obj_add_state(ext->act_sel_btn, LV_STATE_FOCUS);
         lv_page_focus(list, ext->act_sel_btn, LV_ANIM_ON);
     }
 }

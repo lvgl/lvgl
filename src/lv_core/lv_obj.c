@@ -266,8 +266,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->protect      = LV_PROTECT_NONE;
     new_obj->parent_event = 0;
     new_obj->gesture_parent = 1;
-    new_obj->state_dsc.act = LV_OBJ_STATE_NORMAL;
-    new_obj->state_dsc.prev = LV_OBJ_STATE_NORMAL;
+    new_obj->state_dsc.act = LV_STATE_NORMAL;
+    new_obj->state_dsc.prev = LV_STATE_NORMAL;
     new_obj->state_dsc.anim = 0;
 
 #if LV_USE_BIDI
@@ -1359,7 +1359,7 @@ void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot)
     obj->protect &= prot;
 }
 
-void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t new_state)
+void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 {
     if(obj->state_dsc.act == new_state) return;
 
@@ -1400,21 +1400,21 @@ void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t new_state)
 
 }
 
-void lv_obj_add_state(lv_obj_t * obj, lv_obj_state_t state)
+void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_state_t new_state = obj->state_dsc.act | state;
+    lv_state_t new_state = obj->state_dsc.act | state;
     if(obj->state_dsc.act != new_state) {
         lv_obj_set_state(obj, new_state);
     }
 }
 
-void lv_obj_clear_state(lv_obj_t * obj, lv_obj_state_t state)
+void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_state_t new_state = obj->state_dsc.act & (~state);
+    lv_state_t new_state = obj->state_dsc.act & (~state);
     if(obj->state_dsc.act != new_state) {
         lv_obj_set_state(obj, new_state);
     }
@@ -2439,7 +2439,7 @@ lv_obj_state_dsc_t * lv_obj_get_state_dsc(const lv_obj_t * obj, uint8_t part)
 
 }
 
-lv_obj_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part)
+lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part)
 {
     lv_obj_state_dsc_t * state_dsc = lv_obj_get_state_dsc(obj, part);
     return state_dsc->act;
@@ -3043,23 +3043,23 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_obj_refresh_ext_draw_pad(obj);
     }
     else if(sign == LV_SIGNAL_PRESSED) {
-        lv_obj_add_state(obj, LV_OBJ_STATE_PRESSED);
+        lv_obj_add_state(obj, LV_STATE_PRESSED);
     }
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
-        lv_obj_clear_state(obj, LV_OBJ_STATE_PRESSED);
+        lv_obj_clear_state(obj, LV_STATE_PRESSED);
     }
 #if LV_USE_GROUP
     else if(sign == LV_SIGNAL_FOCUS) {
         if(lv_group_get_editing(lv_obj_get_group(obj))) {
-            uint8_t state = LV_OBJ_STATE_FOCUS;
-            state |= LV_OBJ_STATE_EDIT;
+            uint8_t state = LV_STATE_FOCUS;
+            state |= LV_STATE_EDIT;
             lv_obj_add_state(obj, state);
         } else {
-            lv_obj_add_state(obj, LV_OBJ_STATE_FOCUS);
-            lv_obj_clear_state(obj, LV_OBJ_STATE_EDIT);
+            lv_obj_add_state(obj, LV_STATE_FOCUS);
+            lv_obj_clear_state(obj, LV_STATE_EDIT);
         }
     } else if(sign == LV_SIGNAL_DEFOCUS) {
-        lv_obj_clear_state(obj, LV_OBJ_STATE_FOCUS | LV_OBJ_STATE_EDIT);
+        lv_obj_clear_state(obj, LV_STATE_FOCUS | LV_STATE_EDIT);
     }
 #endif
     else if(sign == LV_SIGNAL_CLEANUP) {

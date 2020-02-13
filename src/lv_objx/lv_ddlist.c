@@ -49,8 +49,8 @@ static lv_res_t lv_ddlist_signal(lv_obj_t * ddlist, lv_signal_t sign, void * par
 static lv_res_t lv_ddlist_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
 static lv_res_t lv_ddlist_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 static lv_style_list_t * lv_ddlist_get_style(lv_obj_t * ddlist, uint8_t part);
-static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_obj_state_t state);
-static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_obj_state_t state);
+static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
+static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
 static lv_res_t page_release_handler(lv_obj_t * page);
 static void page_press_handler(lv_obj_t * page);
 static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t x, lv_coord_t y);
@@ -670,11 +670,11 @@ static lv_design_res_t lv_ddlist_page_design(lv_obj_t * page, const lv_area_t * 
         /*Draw the boxes if the page is not being deleted*/
         if(ext->page) {
             if(ext->pr_opt_id != LV_DDLIST_PR_NONE) {
-                draw_box(ddlist, clip_area, ext->pr_opt_id, LV_OBJ_STATE_PRESSED);
+                draw_box(ddlist, clip_area, ext->pr_opt_id, LV_STATE_PRESSED);
             }
 
             if(ext->show_selected) {
-                draw_box(ddlist, clip_area, ext->sel_opt_id, LV_OBJ_STATE_NORMAL);
+                draw_box(ddlist, clip_area, ext->sel_opt_id, LV_STATE_NORMAL);
             }
         }
     }
@@ -691,11 +691,11 @@ static lv_design_res_t lv_ddlist_page_design(lv_obj_t * page, const lv_area_t * 
         /*Draw the box labels if the page is not being deleted*/
         if(ext->page) {
             if(ext->pr_opt_id != LV_DDLIST_PR_NONE) {
-                draw_box_label(ddlist, clip_area, ext->pr_opt_id, LV_OBJ_STATE_PRESSED);
+                draw_box_label(ddlist, clip_area, ext->pr_opt_id, LV_STATE_PRESSED);
             }
 
             if(ext->show_selected) {
-                draw_box_label(ddlist, clip_area, ext->sel_opt_id, LV_OBJ_STATE_NORMAL);
+                draw_box_label(ddlist, clip_area, ext->sel_opt_id, LV_STATE_NORMAL);
             }
         }
     }
@@ -933,13 +933,13 @@ static lv_style_list_t * lv_ddlist_get_style(lv_obj_t * ddlist, uint8_t part)
     return style_dsc_p;
 }
 
-static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_obj_state_t state)
+static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_state_t state)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     lv_obj_t * page = ext->page;
     lv_obj_state_dsc_t state_orig = page->state_dsc;
 
-    page->state_dsc.act = LV_OBJ_STATE_NORMAL;
+    page->state_dsc.act = LV_STATE_NORMAL;
     page->state_dsc.act |= state;
     page->state_dsc.prev = page->state_dsc.act;
 
@@ -969,13 +969,13 @@ static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id
 
 
 
-static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_obj_state_t state)
+static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_state_t state)
 {
     lv_ddlist_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     lv_obj_t * page = ext->page;
     lv_obj_state_dsc_t state_orig = page->state_dsc;
 
-    page->state_dsc.act = LV_OBJ_STATE_NORMAL;
+    page->state_dsc.act = LV_STATE_NORMAL;
     page->state_dsc.act |= state;
     page->state_dsc.prev = page->state_dsc.act;
 

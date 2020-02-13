@@ -616,7 +616,7 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
 
         /*The state changes without re-caching the styles, disable the use of cache*/
         lv_obj_state_dsc_t state_ori = btnm->state_dsc;
-        btnm->state_dsc.act = LV_OBJ_STATE_NORMAL;
+        btnm->state_dsc.act = LV_STATE_NORMAL;
         btnm->state_dsc.prev = btnm->state_dsc.act;
         lv_draw_rect_dsc_init(&draw_rect_rel_dsc);
         lv_draw_label_dsc_init(&draw_label_rel_dsc);
@@ -656,7 +656,7 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
 
             if(tgl_state) {
             	if(!chk_inited) {
-					btnm->state_dsc.act = LV_OBJ_STATE_CHECKED;
+					btnm->state_dsc.act = LV_STATE_CHECKED;
 					btnm->state_dsc.prev = btnm->state_dsc.act;
 					lv_draw_rect_dsc_init(&draw_rect_chk_dsc);
 					lv_draw_label_dsc_init(&draw_label_chk_dsc);
@@ -670,7 +670,7 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
 
             if(button_is_inactive(ext->ctrl_bits[btn_i])) {
             	if(!disabled_inited) {
-					btnm->state_dsc.act = LV_OBJ_STATE_DISABLED;
+					btnm->state_dsc.act = LV_STATE_DISABLED;
 					btnm->state_dsc.prev = btnm->state_dsc.act;
 					lv_draw_rect_dsc_init(&draw_rect_ina_dsc);
 					lv_draw_label_dsc_init(&draw_label_ina_dsc);
@@ -690,10 +690,10 @@ static lv_design_res_t lv_btnm_design(lv_obj_t * btnm, const lv_area_t * clip_ar
             }
             /*Focused and/or pressed + checked or released button*/
             else {
-                btnm->state_dsc.act = LV_OBJ_STATE_NORMAL;
-                if(tgl_state) btnm->state_dsc.act = LV_OBJ_STATE_CHECKED;
-                if(ext->btn_id_pr == btn_i) btnm->state_dsc.act |= LV_OBJ_STATE_PRESSED;
-                if(ext->btn_id_focused == btn_i) btnm->state_dsc.act |= LV_OBJ_STATE_FOCUS;
+                btnm->state_dsc.act = LV_STATE_NORMAL;
+                if(tgl_state) btnm->state_dsc.act = LV_STATE_CHECKED;
+                if(ext->btn_id_pr == btn_i) btnm->state_dsc.act |= LV_STATE_PRESSED;
+                if(ext->btn_id_focused == btn_i) btnm->state_dsc.act |= LV_STATE_FOCUS;
                 btnm->state_dsc.prev = btnm->state_dsc.act;
 
                 lv_draw_rect_dsc_init(&draw_rect_tmp_dsc);

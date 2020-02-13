@@ -128,7 +128,7 @@ void lv_sw_on(lv_obj_t * sw, lv_anim_enable_t anim)
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     ext->state = 1;
     lv_bar_set_value(sw, 1, anim);
-    lv_obj_add_state(sw, LV_OBJ_STATE_CHECKED);
+    lv_obj_add_state(sw, LV_STATE_CHECKED);
 }
 
 /**
@@ -146,7 +146,7 @@ void lv_sw_off(lv_obj_t * sw, lv_anim_enable_t anim)
     lv_sw_ext_t * ext = lv_obj_get_ext_attr(sw);
     ext->state = 0;
     lv_bar_set_value(sw, 0, anim);
-    lv_obj_clear_state(sw, LV_OBJ_STATE_CHECKED);
+    lv_obj_clear_state(sw, LV_STATE_CHECKED);
 }
 
 /**

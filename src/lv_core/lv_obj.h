@@ -179,20 +179,20 @@ enum {
 typedef uint8_t lv_protect_t;
 
 enum {
-    LV_OBJ_STATE_NORMAL  =   0,
-    LV_OBJ_STATE_CHECKED  =  (LV_STYLE_STATE_CHECKED >> LV_STYLE_STATE_POS),
-    LV_OBJ_STATE_FOCUS  =    (LV_STYLE_STATE_FOCUS >> LV_STYLE_STATE_POS),
-    LV_OBJ_STATE_EDIT  =     (LV_STYLE_STATE_EDIT >> LV_STYLE_STATE_POS),
-    LV_OBJ_STATE_HOVER  =    (LV_STYLE_STATE_HOVER >> LV_STYLE_STATE_POS),
-    LV_OBJ_STATE_PRESSED  =  (LV_STYLE_STATE_PRESSED >> LV_STYLE_STATE_POS),
-    LV_OBJ_STATE_DISABLED =  (LV_STYLE_STATE_DISABLED >> LV_STYLE_STATE_POS),
+    LV_STATE_NORMAL  =   0x00,
+    LV_STATE_CHECKED  =  0x01,
+    LV_STATE_FOCUS  =    0x02,
+    LV_STATE_EDIT  =     0x04,
+    LV_STATE_HOVER  =    0x08,
+    LV_STATE_PRESSED  =  0x10,
+    LV_STATE_DISABLED =  0x20,
 };
 
-typedef uint8_t lv_obj_state_t;
+typedef uint8_t lv_state_t;
 
 typedef struct {
-    lv_obj_state_t act;
-    lv_obj_state_t prev;
+    lv_state_t act;
+    lv_state_t prev;
     uint8_t anim;
 }lv_obj_state_dsc_t;
 
@@ -620,11 +620,11 @@ void lv_obj_set_protect(lv_obj_t * obj, uint8_t prot);
  */
 void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot);
 
-void lv_obj_set_state(lv_obj_t * obj, lv_obj_state_t state);
+void lv_obj_set_state(lv_obj_t * obj, lv_state_t state);
 
-void lv_obj_add_state(lv_obj_t * obj, lv_obj_state_t state);
+void lv_obj_add_state(lv_obj_t * obj, lv_state_t state);
 
-void lv_obj_clear_state(lv_obj_t * obj, lv_obj_state_t state);
+void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
 
 /**
  * Set a an event handler function for an object.
@@ -885,17 +885,17 @@ static inline value_type lv_obj_get_style_##func_name (const lv_obj_t * obj, uin
 {                                                                                           \
     return (value_type) lv_obj_get_style##style_type (obj, part, LV_STYLE_##prop_name);     \
 }                                                                                           \
-static inline void lv_obj_set_style_##func_name (lv_obj_t * obj, uint8_t part, lv_style_state_t state, value_type value)  \
+static inline void lv_obj_set_style_##func_name (lv_obj_t * obj, uint8_t part, lv_state_t state, value_type value)  \
 {                                                                                           \
-    lv_obj_set_style##style_type (obj, part, LV_STYLE_##prop_name | state, value);                  \
+    lv_obj_set_style##style_type (obj, part, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                  \
 }                                                                                           \
-static inline int16_t lv_style_get_##func_name (lv_style_t * style, void * res)             \
+static inline int16_t lv_style_get_##func_name (lv_style_t * style, lv_state_t state, void * res)             \
 {                                                                                           \
-    return lv_style_get##style_type (style, LV_STYLE_##prop_name, res);                     \
+    return lv_style_get##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), res);                     \
 }                                                                                           \
-static inline void lv_style_set_##func_name (lv_style_t * style, lv_style_state_t state, value_type value)          \
+static inline void lv_style_set_##func_name (lv_style_t * style, lv_state_t state, value_type value)          \
 {                                                                                           \
-    lv_style_set##style_type (style, LV_STYLE_##prop_name | (state), value);                          \
+    lv_style_set##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                          \
 }                                                                                           \
 
 
@@ -1083,7 +1083,7 @@ bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
 
 lv_obj_state_dsc_t * lv_obj_get_state_dsc(const lv_obj_t * obj, uint8_t part);
 
-lv_obj_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part);
+lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part);
 
 /**
  * Get the signal function of an object
