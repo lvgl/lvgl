@@ -476,9 +476,13 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
     }
 
     /* Set the indicator length */
-    *axis2 = *axis1 + anim_cur_value_x;
-    *axis1 += anim_start_value_x;
-
+    if(hor) {
+        *axis2 = *axis1 + anim_cur_value_x;
+        *axis1 += anim_start_value_x;
+    } else {
+        *axis2 -= anim_start_value_x;
+        *axis1 = *axis2 - anim_cur_value_x;
+    }
     if(sym) {
         lv_coord_t zero;
         zero = *axis1 + (-ext->min_value * anim_length) / range;

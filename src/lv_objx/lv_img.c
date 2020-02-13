@@ -570,7 +570,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             lv_draw_label_dsc_init(&label_dsc);
             lv_obj_init_draw_label_dsc(img, LV_IMG_PART_MAIN, &label_dsc);
 
-            label_dsc.color = lv_obj_get_style_image_recolor(img, LV_CANVAS_PART_MAIN);
+            label_dsc.color = lv_obj_get_style_image_recolor(img, LV_IMG_PART_MAIN);
             lv_draw_label(&img_coords, clip_area, &label_dsc, ext->src, NULL);
         } else {
             /*Trigger the error handler of image drawer*/

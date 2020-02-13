@@ -86,20 +86,20 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("text area create started");
 
     /*Create the ancestor object*/
-    lv_obj_t * new_ta = lv_page_create(par, copy);
-    LV_ASSERT_MEM(new_ta);
-    if(new_ta == NULL) return NULL;
+    lv_obj_t * ta = lv_page_create(par, copy);
+    LV_ASSERT_MEM(ta);
+    if(ta == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_ta);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_ta);
-    if(scrl_signal == NULL) scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(new_ta));
-    if(scrl_design == NULL) scrl_design = lv_obj_get_design_cb(lv_page_get_scrl(new_ta));
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(ta);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(ta);
+    if(scrl_signal == NULL) scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(ta));
+    if(scrl_design == NULL) scrl_design = lv_obj_get_design_cb(lv_page_get_scrl(ta));
 
     /*Allocate the object type specific extended data*/
-    lv_ta_ext_t * ext = lv_obj_allocate_ext_attr(new_ta, sizeof(lv_ta_ext_t));
+    lv_ta_ext_t * ext = lv_obj_allocate_ext_attr(ta, sizeof(lv_ta_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_ta);
+        lv_obj_del(ta);
         return NULL;
     }
 
@@ -128,30 +128,32 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cursor.blink_time = 0;
 #endif
 
-    lv_obj_set_signal_cb(new_ta, lv_ta_signal);
-    lv_obj_set_signal_cb(lv_page_get_scrl(new_ta), lv_ta_scrollable_signal);
-    lv_obj_set_design_cb(new_ta, lv_ta_design);
+    lv_obj_set_signal_cb(ta, lv_ta_signal);
+    lv_obj_set_signal_cb(lv_page_get_scrl(ta), lv_ta_scrollable_signal);
+    lv_obj_set_design_cb(ta, lv_ta_design);
 
     /*Init the new text area object*/
     if(copy == NULL) {
-        lv_page_set_scrl_fit2(new_ta, LV_FIT_FLOOD, LV_FIT_TIGHT);
+        lv_page_set_scrl_fit2(ta, LV_FIT_FLOOD, LV_FIT_TIGHT);
 
-        ext->label = lv_label_create(new_ta, NULL);
+        ext->label = lv_label_create(ta, NULL);
 
         lv_obj_set_design_cb(ext->page.scrl, lv_ta_scrollable_design);
 
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
         lv_label_set_text(ext->label, "Text area");
         lv_obj_set_click(ext->label, false);
-        lv_obj_set_size(new_ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
-        lv_ta_set_sb_mode(new_ta, LV_SB_MODE_DRAG);
+        lv_obj_set_size(ta, LV_TA_DEF_WIDTH, LV_TA_DEF_HEIGHT);
+        lv_ta_set_sb_mode(ta, LV_SB_MODE_DRAG);
+
+        lv_theme_apply(ta, LV_THEME_TA);
 
     }
     /*Copy an existing object*/
     else {
         lv_obj_set_design_cb(ext->page.scrl, lv_ta_scrollable_design);
         lv_ta_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->label             = lv_label_create(new_ta, copy_ext->label);
+        ext->label             = lv_label_create(ta, copy_ext->label);
         ext->pwd_mode          = copy_ext->pwd_mode;
         ext->accapted_chars    = copy_ext->accapted_chars;
         ext->max_length        = copy_ext->max_length;
@@ -159,10 +161,12 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->cursor.pos        = copy_ext->cursor.pos;
         ext->cursor.valid_x    = copy_ext->cursor.valid_x;
 
-        if(ext->pwd_mode != 0) pwd_char_hider( new_ta);
+        lv_style_list_copy(&ext->cursor.style, &copy_ext->cursor.style);
+
+        if(ext->pwd_mode != 0) pwd_char_hider( ta);
 
         if(copy_ext->placeholder != NULL)
-            ext->placeholder = lv_label_create(new_ta, copy_ext->placeholder);
+            ext->placeholder = lv_label_create(ta, copy_ext->placeholder);
         else
             ext->placeholder = NULL;
 
@@ -175,19 +179,17 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
             memcpy(ext->pwd_tmp, copy_ext->pwd_tmp, len);
         }
 
-        if(copy_ext->one_line) lv_ta_set_one_line(new_ta, true);
-
-//        lv_ta_set_style(new_ta, LV_TA_STYLE_CURSOR, lv_ta_get_style(copy, LV_TA_STYLE_CURSOR));
+        if(copy_ext->one_line) lv_ta_set_one_line(ta, true);
 
         /*Refresh the style with new signal function*/
-//        lv_obj_refresh_style(new_ta);
+        lv_obj_refresh_style(ta);
     }
 
 #if LV_USE_ANIMATION
     if(ext->cursor.blink_time) {
         /*Create a cursor blinker animation*/
         lv_anim_t a;
-        a.var            = new_ta;
+        a.var            = ta;
         a.exec_cb        = (lv_anim_exec_xcb_t)cursor_blink_anim;
         a.time           = ext->cursor.blink_time;
         a.act_time       = 0;
@@ -205,7 +207,7 @@ lv_obj_t * lv_ta_create(lv_obj_t * par, const lv_obj_t * copy)
 
     LV_LOG_INFO("text area created");
 
-    return new_ta;
+    return ta;
 }
 
 /*======================

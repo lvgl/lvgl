@@ -102,7 +102,6 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(tabview, lv_tabview_signal);
-//    lv_obj_set_design_cb(tabview, NULL);
     /*Init the new tab tab*/
     if(copy == NULL) {
         ext->tab_name_ptr = lv_mem_alloc(sizeof(char *));
@@ -128,11 +127,6 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->content = lv_page_create(tabview, NULL);
         ext->btns    = lv_btnm_create(tabview, NULL);
         ext->indic   = lv_obj_create(ext->btns, NULL);
-
-//        lv_obj_set_design_cb(ext->content, NULL);
-//        lv_obj_set_design_cb(lv_page_get_scrl(ext->content), NULL);
-//        lv_obj_set_design_cb(ext->btns, NULL);
-//        lv_obj_set_design_cb(ext->indic, NULL);
 
         if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(ext->content));
         lv_obj_set_signal_cb(lv_page_get_scrl(ext->content), tabview_scrl_signal);

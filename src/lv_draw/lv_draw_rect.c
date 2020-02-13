@@ -499,12 +499,12 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
         fill_area.y1 = disp_area->y1 + draw_area.y1;
         fill_area.y2 = fill_area.y1;
 
-		if(dsc->border_side == LV_BORDER_SIDE_LEFT) fill_area.x2 = coords->x1 + rout;
-		else if(dsc->border_side == LV_BORDER_SIDE_RIGHT) fill_area.x1 = coords->x2 - rout;
+		if(dsc->border_side == LV_BORDER_SIDE_LEFT) fill_area.x2 = coords->x1 + corner_size;
+		else if(dsc->border_side == LV_BORDER_SIDE_RIGHT) fill_area.x1 = coords->x2 - corner_size;
 
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
-            if((dsc->border_side == LV_BORDER_SIDE_BOTTOM && fill_area.y1 < coords->y2 - rout - 1) ||
-               (dsc->border_side == LV_BORDER_SIDE_TOP && fill_area.y1 > coords->y1 + rout + 1)) {
+            if((dsc->border_side == LV_BORDER_SIDE_BOTTOM && fill_area.y1 < coords->y2 - corner_size - 1) ||
+               (dsc->border_side == LV_BORDER_SIDE_TOP && fill_area.y1 > coords->y1 + corner_size + 1)) {
 
                 fill_area.y1++;
                 fill_area.y2++;

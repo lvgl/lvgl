@@ -666,8 +666,8 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
 		sb_ver_area.x2 += page->coords.x1;
 		sb_ver_area.y2 += page->coords.y1;
 
-		if((ext->sb.hor_draw && lv_area_is_in(&sb_hor_area, clip_area, 0)) ||
-		   (ext->sb.ver_draw && lv_area_is_in(&sb_ver_area, clip_area, 0))) {
+		if((ext->sb.hor_draw && lv_area_is_on(&sb_hor_area, clip_area)) ||
+		   (ext->sb.ver_draw && lv_area_is_on(&sb_ver_area, clip_area))) {
 			/*Draw the scrollbars*/
 			lv_draw_rect_dsc_t rect_dsc;
 			lv_draw_rect_dsc_init(&rect_dsc);
@@ -1197,7 +1197,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
 
         lv_area_set_pos(&ext->sb.ver_area,
                         obj_w - sb_width - sb_right,
-                        sb_ver_pad + (-(lv_obj_get_y(scrl) - sb_bottom) *
+                        sb_ver_pad + (-(lv_obj_get_y(scrl) - bg_left) *
                                       (obj_h - size_tmp - 2 * sb_ver_pad)) /
                                          (scrl_h + bg_top + bg_bottom - obj_h));
 

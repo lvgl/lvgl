@@ -81,13 +81,13 @@ typedef enum {
 
     LV_THEME_TA,
     LV_THEME_TA_ONELINE,
-    LV_THEME_TA_CURSOR,
-    LV_THEME_TA_SCRLBAR,
 
 
     LV_THEME_LIST,
     LV_THEME_LIST_BTN,
 
+    LV_THEME_CANVAS,
+    LV_THEME_CPICKER,
 
     LV_THEME_CALENDAR,
 
@@ -100,8 +100,6 @@ typedef enum {
     LV_THEME_MBOX_BTNS,
 
     LV_THEME_TABLE,
-
-    LV_THEME_CPICKER,
 
     LV_THEME_CHART,
 

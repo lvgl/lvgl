@@ -132,15 +132,20 @@ lv_obj_t * lv_ddlist_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing drop down list*/
     else {
-//        lv_ddlist_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-//        ext->label                 = lv_label_create(ddlist, copy_ext->label);
-//        lv_label_set_text(ext->label, lv_label_get_text(copy_ext->label));
-//        ext->sel_opt_id     = copy_ext->sel_opt_id;
-//        ext->sel_opt_id_ori = copy_ext->sel_opt_id;
-//        ext->fix_height     = copy_ext->fix_height;
-//        ext->option_cnt     = copy_ext->option_cnt;
-//        ext->symbol           = copy_ext->symbol;
-//        ext->stay_open      = copy_ext->stay_open;
+        lv_ddlist_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        ext->options        = copy_ext->options;
+        ext->option_cnt        = copy_ext->option_cnt;
+        ext->sel_opt_id     = copy_ext->sel_opt_id;
+        ext->sel_opt_id_orig = copy_ext->sel_opt_id;
+        ext->symbol           = copy_ext->symbol;
+        ext->max_height      = copy_ext->max_height;
+        ext->anim_time      = copy_ext->anim_time;
+        ext->text      = copy_ext->text;
+        ext->dir      = copy_ext->dir;
+        ext->show_selected      = copy_ext->show_selected;
+        lv_style_list_copy(&ext->style_page, &copy_ext->style_page);
+        lv_style_list_copy(&ext->style_selected, &copy_ext->style_selected);
+        lv_style_list_copy(&ext->style_scrlbar, &copy_ext->style_scrlbar);
     }
 
     LV_LOG_INFO("drop down list created");
@@ -490,25 +495,19 @@ void lv_ddlist_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
     else if(ext->dir == LV_DDLIST_DIR_LEFT) lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_LEFT_TOP, 0, 0);
     else if(ext->dir == LV_DDLIST_DIR_RIGHT)lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
 
-    lv_ddlist_dir_t dir = ext->dir;
-    if(dir == LV_DDLIST_DIR_DOWN && ext->page->coords.y2 >= vres) dir = LV_DDLIST_DIR_UP;
-    else if(dir == LV_DDLIST_DIR_UP && ext->page->coords.y1 <= 0) dir = LV_DDLIST_DIR_DOWN;
-    else if(dir == LV_DDLIST_DIR_RIGHT && ext->page->coords.x2 >= hres) dir = LV_DDLIST_DIR_LEFT;
-    else if(dir == LV_DDLIST_DIR_LEFT && ext->page->coords.x1 <= 0) dir = LV_DDLIST_DIR_RIGHT;
-
-    if(dir != ext->dir) {
-        if(dir == LV_DDLIST_DIR_DOWN)      lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
-        else if(dir == LV_DDLIST_DIR_UP)   lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
-        else if(dir == LV_DDLIST_DIR_LEFT) lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_LEFT_TOP, 0, 0);
-        else if(dir == LV_DDLIST_DIR_RIGHT)lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
-    }
-
     lv_obj_t * scr = lv_scr_act();
-    if(ext->page->coords.y2 > scr->coords.y2) {
-        lv_obj_set_height(ext->page, lv_obj_get_height(ext->page) - (ext->page->coords.y2 - scr->coords.y2));
+    if(ext->dir != LV_DDLIST_DIR_UP) {
+        if(ext->page->coords.y2 > scr->coords.y2) {
+            lv_obj_set_y(ext->page, lv_obj_get_y(ext->page) - (ext->page->coords.y2 - scr->coords.y2));
+        }
+    }
+    else {
+        if(ext->page->coords.y1 < 0) {
+            lv_obj_set_y(ext->page, 0);
+        }
     }
 
-    if(dir != LV_DDLIST_DIR_UP) {
+    if(ext->dir != LV_DDLIST_DIR_UP) {
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_exec_cb(&a, ddlist, list_anim);

@@ -57,7 +57,6 @@ typedef struct {
     lv_cpicker_color_mode_t color_mode  :2;
     uint8_t color_mode_fixed            :1;
     lv_cpicker_type_t type              :1;
-    uint8_t preview                     :1;
 } lv_cpicker_ext_t;
 
 /*Parts*/
@@ -152,13 +151,6 @@ void lv_cpicker_set_color_mode_fixed(lv_obj_t * cpicker, bool fixed);
  * @param en true: color the indicator; false: not color the indicator
  */
 void lv_cpicker_set_indic_colored(lv_obj_t * cpicker, bool en);
-
-/**
- * Add a color preview in the middle of the DISC type color picker
- * @param cpicker pointer to colorpicker object
- * @param en true: enable preview; false: disable preview
- */
-void lv_cpicker_set_preview(lv_obj_t * cpicker, bool en);
 
 /*=====================
  * Getter functions

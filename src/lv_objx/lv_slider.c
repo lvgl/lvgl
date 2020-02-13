@@ -95,7 +95,10 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing slider*/
     else {
-//        lv_slider_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        lv_slider_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        lv_style_list_copy(&ext->style_knob, &copy_ext->style_knob);
+        lv_area_copy(&ext->left_knob_area, &copy_ext->left_knob_area);
+        lv_area_copy(&ext->right_knob_area, &copy_ext->right_knob_area);
     }
 
     LV_LOG_INFO("slider created");

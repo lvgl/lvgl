@@ -105,6 +105,10 @@ static lv_style_t arc_bg;
 static lv_style_t calendar_date_nums, calendar_header, calendar_daynames;
 #endif
 
+#if LV_USE_CPICKER
+static lv_style_t cpicker_bg, cpicker_indic;
+#endif
+
 
 #if LV_USE_TABVIEW
 static lv_style_t tabview_btns, tabview_btns_bg, tabview_indic, tabview_page_scrl;
@@ -502,7 +506,7 @@ static void chart_init(void)
     lv_style_set_opa(&chart_series, LV_STYLE_BG_OPA, LV_OPA_100);
     lv_style_set_int(&chart_series, LV_STYLE_BG_GRAD_DIR, LV_GRAD_DIR_VER);
     lv_style_set_int(&chart_series, LV_STYLE_BG_MAIN_STOP, 96);
-    lv_style_set_int(&chart_series, LV_STYLE_BG_GRAD_STOP, 32);
+    lv_style_set_int(&chart_series, LV_STYLE_BG_GRAD_STOP, 0);
 
 #endif
 }
@@ -539,6 +543,30 @@ static void calendar_init(void)
     lv_style_set_int(&calendar_date_nums, LV_STYLE_PAD_LEFT , LV_DPI / 7);
     lv_style_set_int(&calendar_date_nums, LV_STYLE_PAD_RIGHT , LV_DPI / 7);
     lv_style_set_int(&calendar_date_nums, LV_STYLE_PAD_BOTTOM , LV_DPI / 7);
+#endif
+}
+
+static void cpicker_init(void)
+{
+#if LV_USE_CPICKER
+
+    lv_style_init(&cpicker_bg);
+    lv_style_set_scale_width(&cpicker_bg, LV_STYLE_STATE_NORMAL, LV_DPI / 4);
+    lv_style_set_bg_opa(&cpicker_bg, LV_STYLE_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_bg_color(&cpicker_bg, LV_STYLE_STATE_NORMAL, COLOR_SCREEN);
+    lv_style_set_pad_inner(&cpicker_bg, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
+    lv_style_set_radius(&cpicker_bg, LV_STYLE_STATE_NORMAL, LV_RADIUS_CIRCLE);
+
+    lv_style_init(&cpicker_indic);
+    lv_style_set_radius(&cpicker_indic, LV_STYLE_STATE_NORMAL, LV_RADIUS_CIRCLE);
+    lv_style_set_bg_color(&cpicker_indic, LV_STYLE_STATE_NORMAL, LV_COLOR_WHITE);
+    lv_style_set_bg_opa(&cpicker_indic, LV_STYLE_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_border_width(&cpicker_indic, LV_STYLE_STATE_NORMAL, 2);
+    lv_style_set_border_color(&cpicker_indic, LV_STYLE_STATE_NORMAL, LV_COLOR_GRAY);
+    lv_style_set_pad_left(&cpicker_indic, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
+    lv_style_set_pad_right(&cpicker_indic, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
+    lv_style_set_pad_top(&cpicker_indic, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
+    lv_style_set_pad_bottom(&cpicker_indic, LV_STYLE_STATE_NORMAL, LV_DPI / 10);
 #endif
 }
 
@@ -602,7 +630,11 @@ static void kb_init(void)
 #if LV_USE_KB
     lv_style_init(&kb_bg);
     lv_style_copy(&kb_bg, &panel);
-    lv_style_set_int(&kb_bg, LV_STYLE_PAD_INNER, LV_DPI/10);
+    lv_style_set_pad_inner(&kb_bg, LV_STYLE_STATE_NORMAL, LV_DPI/20);
+    lv_style_set_pad_left(&kb_bg, LV_STYLE_STATE_NORMAL, LV_DPI/20);
+    lv_style_set_pad_right(&kb_bg, LV_STYLE_STATE_NORMAL, LV_DPI/20);
+    lv_style_set_pad_top(&kb_bg, LV_STYLE_STATE_NORMAL, LV_DPI/20);
+    lv_style_set_pad_bottom(&kb_bg, LV_STYLE_STATE_NORMAL, LV_DPI/20);
 
 #endif
 }
@@ -833,6 +865,7 @@ lv_theme_t * lv_theme_alien_init(uint16_t hue, lv_font_t * font)
     preload_init();
     chart_init();
     calendar_init();
+    cpicker_init();
     cb_init();
     btnm_init();
     kb_init();
@@ -946,6 +979,13 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         list = lv_obj_get_style_list(obj, LV_SW_PART_KNOB);
         lv_style_list_reset(list);
         lv_style_list_add_style(list, &sw_knob);
+        break;
+#endif
+
+#if LV_USE_CANVAS
+    case LV_THEME_CANVAS:
+        list = lv_obj_get_style_list(obj, LV_CANVAS_PART_MAIN);
+        lv_style_list_reset(list);
         break;
 #endif
 
@@ -1192,16 +1232,6 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         break;
 #endif
 
-#if LV_USE_CPICKER
-    case LV_THEME_CPICKER:
-        list = lv_obj_get_style_list(obj, LV_CPICKER_PART_MAIN);
-        lv_style_list_reset(list);
-
-        list = lv_obj_get_style_list(obj, LV_CPICKER_PART_INDIC);
-        lv_style_list_reset(list);
-        lv_style_list_add_style(list, &panel);
-        break;
-#endif
 #if LV_USE_WIN
     case LV_THEME_WIN:
         list = lv_obj_get_style_list(obj, LV_WIN_PART_BG);
@@ -1223,11 +1253,29 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
     case LV_THEME_WIN_BTN:
         list = lv_obj_get_style_list(obj, LV_BTN_PART_MAIN);
         lv_style_list_reset(list);
-        lv_style_list_add_style(list, &btn);
+        lv_style_list_add_style(list, &tabview_btns);
     	break;
 #endif
 
 #if LV_USE_TA
+    case LV_THEME_TA:
+        list = lv_obj_get_style_list(obj, LV_TA_PART_BG);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &panel);
+
+        list = lv_obj_get_style_list(obj, LV_TA_PART_PLACEHOLDER);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &ta_placeholder);
+
+        list = lv_obj_get_style_list(obj, LV_TA_PART_CURSOR);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &ta_cursor);
+
+        list = lv_obj_get_style_list(obj, LV_TA_PART_SCRLBAR);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &sb);
+        break;
+
     case LV_THEME_TA_ONELINE:
         list = lv_obj_get_style_list(obj, LV_TA_PART_BG);
         lv_style_list_reset(list);
@@ -1266,6 +1314,18 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_add_style(list, &calendar_daynames);
         break;
 #endif
+#if LV_USE_CPICKER
+    case LV_THEME_CPICKER:
+        list = lv_obj_get_style_list(obj, LV_CPICKER_PART_MAIN);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &cpicker_bg);
+
+        list = lv_obj_get_style_list(obj, LV_CPICKER_PART_INDIC);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &cpicker_indic);
+        break;
+#endif
+
 #if LV_USE_LMETER
     case LV_THEME_LMETER:
         list = lv_obj_get_style_list(obj, LV_LMETER_PART_MAIN);

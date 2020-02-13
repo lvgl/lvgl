@@ -12,6 +12,7 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_refr.h"
+#include "../lv_themes/lv_theme.h"
 
 #if LV_USE_CANVAS != 0
 
@@ -103,12 +104,12 @@ lv_obj_t * lv_canvas_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new canvas canvas*/
     if(copy == NULL) {
-
+        lv_theme_apply(new_canvas, LV_THEME_CANVAS);
     }
     /*Copy an existing canvas*/
     else {
-        /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_canvas);
+        /*Do not copy the image data because each canvas needs it's own buffer*/
+
     }
 
     LV_LOG_INFO("canvas created");
