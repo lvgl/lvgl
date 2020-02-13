@@ -9,7 +9,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_port_fs_templ.h"
+#include "lv_port_fs_template.h"
 
 /*********************
  *      DEFINES
@@ -85,30 +85,30 @@ void lv_port_fs_init(void)
      *--------------------------------------------------*/
 
     /* Add a simple drive to open images */
-    lv_fs_drv_t fs_drv;                         /*A driver descriptor*/
-    memset(&fs_drv, 0, sizeof(lv_fs_drv_t));    /*Initialization*/
+    lv_fs_drv_t fs_drv;
+    lv_fs_drv_init(&fs_drv);
 
     /*Set up fields...*/
     fs_drv.file_size = sizeof(file_t);
     fs_drv.letter = 'P';
-    fs_drv.open = fs_open;
-    fs_drv.close = fs_close;
-    fs_drv.read = fs_read;
-    fs_drv.write = fs_write;
-    fs_drv.seek = fs_seek;
-    fs_drv.tell = fs_tell;
-    fs_drv.free = fs_free;
-    fs_drv.size = fs_size;
-    fs_drv.remove = fs_remove;
-    fs_drv.rename = fs_rename;
-    fs_drv.trunc = fs_trunc;
+    fs_drv.open_cb = fs_open;
+    fs_drv.close_cb = fs_close;
+    fs_drv.read_cb = fs_read;
+    fs_drv.write_cb = fs_write;
+    fs_drv.seek_cb = fs_seek;
+    fs_drv.tell_cb = fs_tell;
+    fs_drv.free_space_cb = fs_free;
+    fs_drv.size_cb = fs_size;
+    fs_drv.remove_cb = fs_remove;
+    fs_drv.rename_cb = fs_rename;
+    fs_drv.trunc_cb = fs_trunc;
 
     fs_drv.rddir_size = sizeof(dir_t);
-    fs_drv.dir_close = fs_dir_close;
-    fs_drv.dir_open = fs_dir_open;
-    fs_drv.dir_read = fs_dir_read;
+    fs_drv.dir_close_cb = fs_dir_close;
+    fs_drv.dir_open_cb = fs_dir_open;
+    fs_drv.dir_read_cb = fs_dir_read;
 
-    lv_fs_add_drv(&fs_drv);
+    lv_fs_drv_register(&fs_drv);
 }
 
 /**********************
@@ -315,7 +315,7 @@ static lv_fs_res_t fs_rename (lv_fs_drv_t * drv, const char * oldname, const cha
  * @param free_p pointer to store the free size [kB]
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-static lv_fs_res_t fs_free (uint32_t * total_p, uint32_t * free_p)
+static lv_fs_res_t fs_free (lv_fs_drv_t * drv, uint32_t * total_p, uint32_t * free_p)
 {
     lv_fs_res_t res = LV_FS_RES_NOT_IMP;
 
