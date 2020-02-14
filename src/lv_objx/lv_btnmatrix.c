@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_btnm.h"
+#include "lv_btnmatrix.h"
 #if LV_USE_BTNMATRIX != 0
 
 #include "../lv_core/lv_debug.h"

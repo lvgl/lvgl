@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_ddlist.h"
+#include "lv_dropdown.h"
 #if LV_USE_DROPDOWN != 0
 
 #include "../lv_core/lv_debug.h"

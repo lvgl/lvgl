@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_cb.h"
+#include "lv_checkbox.h"
 #if LV_USE_CHECKBOX != 0
 
 #include "../lv_core/lv_debug.h"

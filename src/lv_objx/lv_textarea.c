@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_ta.h"
+#include "lv_textarea.h"
 #if LV_USE_TEXTAREA != 0
 
 #include <string.h>

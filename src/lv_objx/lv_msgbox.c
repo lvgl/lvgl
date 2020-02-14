@@ -1,12 +1,12 @@
 /**
- * @file lv_mbox.c
+ * @file lv_msgbox.c
  *
  */
 
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_mbox.h"
+#include "lv_msgbox.h"
 #if LV_USE_MSGBOX != 0
 
 #include "../lv_core/lv_debug.h"

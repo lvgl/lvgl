@@ -27,7 +27,7 @@ extern "C" {
 #endif
 
 #include "../lv_core/lv_obj.h"
-#include "lv_btnm.h"
+#include "lv_btnmatrix.h"
 
 /*********************
  *      DEFINES

@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_sw.h"
+#include "lv_switch.h"
 
 #if LV_USE_SWITCH != 0
 

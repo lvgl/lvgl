@@ -9,7 +9,7 @@
 #include "lv_tabview.h"
 #if LV_USE_TEXTAREABVIEW != 0
 
-#include "lv_btnm.h"
+#include "lv_btnmatrix.h"
 #include "../lv_core/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_anim.h"
