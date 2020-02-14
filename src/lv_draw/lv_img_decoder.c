@@ -643,10 +643,9 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
 #endif
     }
 
-    uint8_t byte_act = 0;
     uint8_t val_act;
     for(i = 0; i < len; i++) {
-        val_act = (data_tmp[byte_act] & (mask << pos)) >> pos;
+        val_act = (*data_tmp & (mask << pos)) >> pos;
 
         buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + LV_IMG_PX_SIZE_ALPHA_BYTE - 1] =
             dsc->header.cf == LV_IMG_CF_ALPHA_8BIT ? val_act : opa_table[val_act];

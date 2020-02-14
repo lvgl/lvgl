@@ -188,8 +188,8 @@ void lv_draw_mask_line_points_init(lv_draw_mask_line_param_t * param, lv_coord_t
 
     param->cfg.p1.x = p1x;
     param->cfg.p1.y = p1y;
-    param->cfg.p2.x = p1x;
-    param->cfg.p2.y = p1y;
+    param->cfg.p2.x = p2x;
+    param->cfg.p2.y = p2y;
     param->cfg.side = side;
 
     param->origo.x = p1x;
