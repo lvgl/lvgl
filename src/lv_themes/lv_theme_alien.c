@@ -147,8 +147,6 @@ static void basic_init(void)
     lv_style_set_text_color(&scr, LV_STATE_NORMAL, lv_color_hex(0xb8b8b9));
     lv_style_set_value_color(&scr, LV_STATE_NORMAL, lv_color_hex(0xb8b8b9));
 
-#define PERF_TEST 0
-#if PERF_TEST == 0
     lv_style_init(&panel);
     lv_style_set_radius(&panel, LV_STATE_NORMAL, LV_DPI / 25);
     lv_style_set_bg_opa(&panel, LV_STATE_NORMAL, LV_OPA_COVER);
@@ -167,7 +165,7 @@ static void basic_init(void)
     lv_style_set_image_recolor(&panel, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
     lv_style_set_line_color(&panel, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
     lv_style_set_line_width(&panel, LV_STATE_NORMAL, 1);
-    lv_style_set_border_color(&panel, LV_STATE_FOCUS, LV_COLOR_RED);
+    lv_style_set_border_color(&panel, LV_STATE_FOCUS, COLOR_ACCENT);
     lv_style_set_transition_time(&panel, LV_STATE_NORMAL, 500);
 
     lv_style_init(&btn);
@@ -176,9 +174,6 @@ static void basic_init(void)
     lv_style_set_bg_color(&btn, LV_STATE_NORMAL, COLOR_ACCENT);
     lv_style_set_bg_color(&btn, LV_STATE_PRESSED, lv_color_darken(COLOR_ACCENT, LV_OPA_20));
     lv_style_set_bg_color(&btn, LV_STATE_DISABLED, COLOR_DISABLED);
-    //    lv_style_set_border_color(&btn, LV_STATE_NORMAL, LV_COLOR_RED);
-    //    lv_style_set_border_width(&btn, LV_STATE_NORMAL, 2);
-    //    lv_style_set_border_opa(&btn, LV_STATE_NORMAL, L);
     lv_style_set_text_color(&btn, LV_STATE_NORMAL, lv_color_hex(0xffffff));
     lv_style_set_text_color(&btn, LV_STATE_PRESSED, lv_color_darken(lv_color_hex(0xffffff), LV_OPA_20));
     lv_style_set_text_color(&btn, LV_STATE_DISABLED, lv_color_hex(0x686b70));
@@ -190,136 +185,10 @@ static void basic_init(void)
     lv_style_set_pad_bottom(&btn, LV_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_inner(&btn, LV_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_transition_time(&btn, LV_STATE_NORMAL, 300);
-    //    lv_style_set_transition_time(&btn, LV_STATE_PRESSED, 0);
-    lv_style_set_bg_color(&btn, LV_STATE_FOCUS, lv_color_mix(LV_COLOR_RED, COLOR_ACCENT, LV_OPA_50));
 
-    lv_style_set_outline_width(&btn, LV_STATE_NORMAL, 3);
-    //    lv_style_set_outline_width(&btn, LV_STATE_PRESSED, 0);
-    //    lv_style_set_outline_pad(&btn, LV_STATE_NORMAL, 5);
-    //    lv_style_set_outline_pad(&btn, LV_STATE_PRESSED, 0);
-    lv_style_set_outline_opa(&btn, LV_STATE_NORMAL, LV_OPA_COVER);
-    lv_style_set_outline_color(&btn, LV_STATE_NORMAL, LV_COLOR_WHITE);
-    //    lv_style_set_outline_opa(&btn, LV_STATE_PRESSED, LV_OPA_COVER);
-#elif PERF_TEST == 1
-    lv_style_init(&panel);
-    lv_style_set_radius(&panel, LV_STATE_NORMAL, 0);
-    lv_style_set_bg_opa(&panel, LV_STATE_NORMAL, LV_OPA_COVER);
-    lv_style_set_bg_color(&panel, LV_STATE_NORMAL, LV_COLOR_GRAY);
-    lv_style_set_pad_left(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_right(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_top(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_bottom(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_inner(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_text_color(&panel, LV_STATE_NORMAL, LV_COLOR_RED);
-    lv_style_set_image_recolor(&panel, LV_STATE_NORMAL, LV_COLOR_RED);
-    lv_style_set_line_color(&panel, LV_STATE_NORMAL, LV_COLOR_RED);
-
-    lv_style_init(&btn);
-    lv_style_set_bg_opa(&btn, LV_STATE_NORMAL, LV_OPA_COVER);
-    lv_style_set_bg_color(&btn, LV_STATE_NORMAL, LV_COLOR_BLUE);
-    lv_style_set_bg_color(&btn, LV_STATE_PRESSED, LV_COLOR_NAVY);
-    lv_style_set_bg_color(&btn, LV_STATE_DISABLED, LV_COLOR_GRAY);
-    lv_style_set_text_color(&btn, LV_STATE_NORMAL, LV_COLOR_WHITE);
-    lv_style_set_text_color(&btn, LV_STATE_PRESSED, LV_COLOR_BLACK);
-    lv_style_set_text_color(&btn, LV_STATE_DISABLED, LV_COLOR_SILVER);
-    lv_style_set_image_recolor(&btn, LV_STATE_NORMAL, LV_COLOR_WHITE);
-    lv_style_set_image_recolor(&btn, LV_STATE_PRESSED,LV_COLOR_BLACK);
-    lv_style_set_pad_left(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_right(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_top(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_bottom(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_inner(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-#elif PERF_TEST == 2
-    lv_style_init(&panel);
-    lv_style_set_radius(&panel, LV_STATE_NORMAL, 5);
-    lv_style_set_bg_opa(&panel, LV_STATE_NORMAL, LV_OPA_COVER);
-    lv_style_set_bg_color(&panel, LV_STATE_NORMAL, LV_COLOR_GRAY);
-    lv_style_set_border_color(&panel, LV_STATE_NORMAL, LV_COLOR_BLACK);
-    lv_style_set_border_color(&panel, LV_STATE_FOCUS, LV_COLOR_RED);
-    lv_style_set_border_width(&panel, LV_STATE_NORMAL, 2);
-    lv_style_set_pad_left(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_right(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_top(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_bottom(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_inner(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_text_color(&panel, LV_STATE_NORMAL, LV_COLOR_RED);
-    lv_style_set_image_recolor(&panel, LV_STATE_NORMAL, LV_COLOR_RED);
-    lv_style_set_line_color(&panel, LV_STATE_NORMAL, LV_COLOR_RED);
-
-    lv_style_init(&btn);
-    lv_style_set_radius(&btn, LV_STATE_NORMAL, 5);
-    lv_style_set_bg_opa(&btn, LV_STATE_NORMAL, LV_OPA_COVER);
-    lv_style_set_bg_grad_dir(&btn, LV_STATE_NORMAL, LV_GRAD_DIR_NONE);
-    lv_style_set_bg_color(&btn, LV_STATE_NORMAL, LV_COLOR_BLUE);
-    lv_style_set_bg_grad_color(&btn, LV_STATE_NORMAL, LV_COLOR_LIME);
-    lv_style_set_bg_color(&btn, LV_STATE_PRESSED, LV_COLOR_NAVY);
-    lv_style_set_bg_color(&btn, LV_STATE_DISABLED, LV_COLOR_GRAY);
-    lv_style_set_border_color(&btn, LV_STATE_NORMAL, LV_COLOR_BLACK);
-    lv_style_set_border_color(&btn, LV_STATE_FOCUS, LV_COLOR_RED);
-    lv_style_set_border_width(&btn, LV_STATE_NORMAL, 2);
-    lv_style_set_text_color(&btn, LV_STATE_NORMAL, LV_COLOR_WHITE);
-    lv_style_set_text_color(&btn, LV_STATE_PRESSED, LV_COLOR_BLACK);
-    lv_style_set_text_color(&btn, LV_STATE_DISABLED, LV_COLOR_SILVER);
-    lv_style_set_image_recolor(&btn, LV_STATE_NORMAL, LV_COLOR_WHITE);
-    lv_style_set_image_recolor(&btn, LV_STATE_PRESSED,LV_COLOR_BLACK);
-    lv_style_set_pad_left(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_right(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_top(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_bottom(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_inner(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-#elif PERF_TEST == 3
-    lv_style_init(&panel);
-    lv_style_set_radius(&panel, LV_STATE_NORMAL, 10);
-    lv_style_set_bg_opa(&panel, LV_STATE_NORMAL, LV_OPA_50);
-    lv_style_set_bg_color(&panel, LV_STATE_NORMAL, LV_COLOR_GRAY);
-    lv_style_set_border_color(&panel, LV_STATE_NORMAL, LV_COLOR_BLACK);
-    lv_style_set_border_color(&panel, LV_STATE_FOCUS, LV_COLOR_RED);
-    lv_style_set_border_width(&panel, LV_STATE_NORMAL, 2);
-    lv_style_set_border_opa(&panel, LV_STATE_NORMAL, LV_OPA_80);
-    //    lv_style_set_shadow_width(&panel, LV_STATE_NORMAL, 5);
-    //    lv_style_set_shadow_offset_y(&panel, LV_STATE_NORMAL, 3);
-    //    lv_style_set_shadow_color(&panel, LV_STATE_NORMAL, LV_COLOR_BLUE);
-    lv_style_set_pad_left(&panel, LV_STATE_NORMAL, 3);
-    lv_style_set_pad_right(&panel, LV_STATE_NORMAL, 3);
-    lv_style_set_pad_top(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_bottom(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_inner(&panel, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_text_color(&panel, LV_STATE_NORMAL, LV_COLOR_RED);
-    lv_style_set_image_recolor(&panel, LV_STATE_NORMAL, LV_COLOR_RED);
-    lv_style_set_line_color(&panel, LV_STATE_NORMAL, LV_COLOR_RED);
-
-    lv_style_init(&btn);
-    lv_style_set_radius(&btn, LV_STATE_NORMAL, 5);
-    lv_style_set_bg_opa(&btn, LV_STATE_NORMAL, LV_OPA_50);
-    lv_style_set_bg_grad_dir(&btn, LV_STATE_NORMAL, LV_GRAD_DIR_VER);
-    lv_style_set_bg_color(&btn, LV_STATE_NORMAL, LV_COLOR_BLUE);
-    lv_style_set_bg_grad_color(&btn, LV_STATE_NORMAL, LV_COLOR_LIME);
-    lv_style_set_bg_color(&btn, LV_STATE_PRESSED, LV_COLOR_NAVY);
-    lv_style_set_bg_color(&btn, LV_STATE_DISABLED, LV_COLOR_GRAY);
-    lv_style_set_border_color(&btn, LV_STATE_NORMAL, LV_COLOR_BLACK);
-    lv_style_set_border_color(&btn, LV_STATE_FOCUS, LV_COLOR_RED);
-    lv_style_set_border_width(&btn, LV_STATE_NORMAL, 2);
-    lv_style_set_border_opa(&btn, LV_STATE_NORMAL, LV_OPA_50);
-    lv_style_set_shadow_blend_mode(&btn, LV_STATE_NORMAL, LV_BLEND_MODE_NORMAL);
-    lv_style_set_shadow_width(&btn, LV_STATE_NORMAL, 20);
-    lv_style_set_shadow_width(&btn, LV_STATE_PRESSED, 2);
-    lv_style_set_shadow_offset_x(&btn, LV_STATE_NORMAL, -4);
-    lv_style_set_shadow_offset_y(&btn, LV_STATE_NORMAL, 8);
-    //    lv_style_set_shadow_offset_y(&btn, LV_STATE_PRESSED, 1);
-    lv_style_set_shadow_color(&btn, LV_STATE_NORMAL, LV_COLOR_BLUE);
-    lv_style_set_shadow_spread(&btn, LV_STATE_NORMAL, 5);
-    lv_style_set_text_color(&btn, LV_STATE_NORMAL, LV_COLOR_WHITE);
-    lv_style_set_text_color(&btn, LV_STATE_PRESSED, LV_COLOR_BLACK);
-    lv_style_set_text_color(&btn, LV_STATE_DISABLED, LV_COLOR_SILVER);
-    lv_style_set_image_recolor(&btn, LV_STATE_NORMAL, LV_COLOR_WHITE);
-    lv_style_set_image_recolor(&btn, LV_STATE_PRESSED,LV_COLOR_BLACK);
-    lv_style_set_pad_left(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_right(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_top(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_bottom(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_pad_inner(&btn, LV_STATE_NORMAL, LV_DPI / 20);
-    lv_style_set_transition_time(&btn, LV_STATE_NORMAL, 200);
-#endif
+    lv_style_set_outline_width(&btn, LV_STATE_FOCUS, 3);
+    lv_style_set_outline_opa(&btn, LV_STATE_FOCUS, LV_OPA_50);
+    lv_style_set_outline_color(&btn, LV_STATE_FOCUS, COLOR_ACCENT);
 }
 
 static void cont_init(void)
@@ -350,6 +219,9 @@ static void bar_init(void)
     lv_style_set_radius(&bar_bg, LV_STATE_NORMAL, LV_RADIUS_CIRCLE);
     lv_style_set_bg_opa(&bar_bg, LV_STATE_NORMAL, LV_OPA_COVER);
     lv_style_set_bg_color(&bar_bg, LV_STATE_NORMAL, COLOR_BACKGROUND);
+    lv_style_set_outline_color(&bar_bg, LV_STATE_FOCUS, COLOR_ACCENT);
+    lv_style_set_outline_opa(&bar_bg, LV_STATE_FOCUS, LV_OPA_50);
+    lv_style_set_outline_width(&bar_bg, LV_STATE_FOCUS, 3);
 
     lv_style_init(&bar_indic);
     lv_style_set_bg_opa(&bar_indic, LV_STATE_NORMAL, LV_OPA_COVER);
@@ -379,7 +251,6 @@ static void led_init(void)
     lv_style_init(&led);
     lv_style_set_bg_opa(&led, LV_STATE_NORMAL, LV_OPA_COVER);
     lv_style_set_bg_color(&led, LV_STATE_NORMAL, COLOR_ACCENT);
-    lv_style_set_bg_color(&led, LV_STATE_PRESSED, LV_COLOR_RED);
     lv_style_set_border_width(&led, LV_STATE_NORMAL, 2);
     lv_style_set_border_opa(&led, LV_STATE_NORMAL, LV_OPA_50);
     lv_style_set_border_color(&led, LV_STATE_NORMAL, lv_color_lighten(COLOR_ACCENT, LV_OPA_30));
@@ -401,7 +272,6 @@ static void slider_init(void)
     lv_style_set_pad_right(&slider_knob, LV_STATE_NORMAL, LV_DPI/20);
     lv_style_set_pad_top(&slider_knob, LV_STATE_NORMAL, LV_DPI/20);
     lv_style_set_pad_bottom(&slider_knob, LV_STATE_NORMAL, LV_DPI/20);
-    lv_style_set_bg_color(&slider_knob, LV_STATE_FOCUS, LV_COLOR_RED);
 #endif
 }
 
@@ -416,7 +286,6 @@ static void sw_init(void)
     lv_style_set_pad_bottom(&sw_knob, LV_STATE_NORMAL, - LV_DPI/20);
     lv_style_set_pad_left(&sw_knob, LV_STATE_NORMAL,   - LV_DPI/20);
     lv_style_set_pad_right(&sw_knob, LV_STATE_NORMAL,  - LV_DPI/20);
-    lv_style_set_bg_color(&sw_knob, LV_STATE_FOCUS, LV_COLOR_RED);
 #endif
 }
 
@@ -498,8 +367,6 @@ static void arc_init(void)
 static void preload_init(void)
 {
 #if LV_USE_SPINNER != 0
-
-    //    theme.style.preload = theme.style.arc;
 #endif
 }
 
@@ -593,23 +460,27 @@ static void cb_init(void)
 {
 #if LV_USE_CHECKBOX != 0
     lv_style_init(&cb_bg);
-    lv_style_set_pad_inner(&cb_bg, LV_STATE_NORMAL , LV_DPI / 10);
+    lv_style_set_radius(&cb_bg, LV_STATE_NORMAL, LV_DPI / 50);
+//    lv_style_set_pad_left(&cb_bg, LV_STATE_NORMAL, LV_DPI / 20);
+//    lv_style_set_pad_right(&cb_bg, LV_STATE_NORMAL, LV_DPI / 20);
+//    lv_style_set_pad_bottom(&cb_bg, LV_STATE_NORMAL, LV_DPI / 20);
+//    lv_style_set_pad_top(&cb_bg, LV_STATE_NORMAL, LV_DPI / 20);
+    lv_style_set_pad_inner(&cb_bg, LV_STATE_NORMAL , LV_DPI / 20);
+    lv_style_set_outline_color(&cb_bg, LV_STATE_FOCUS, COLOR_ACCENT);
+    lv_style_set_outline_opa(&cb_bg, LV_STATE_FOCUS, LV_OPA_50);
+    lv_style_set_outline_width(&cb_bg, LV_STATE_FOCUS, 3);
+    lv_style_set_outline_pad(&cb_bg, LV_STATE_FOCUS, LV_DPI/20);
 
     lv_style_init(&cb_bullet);
     lv_style_set_radius(&cb_bullet, LV_STATE_NORMAL, LV_DPI / 50);
     lv_style_set_border_width(&cb_bullet, LV_STATE_NORMAL , 2);
     lv_style_set_border_color(&cb_bullet, LV_STATE_NORMAL , lv_color_hex(0x52555a));
     lv_style_set_border_color(&cb_bullet, LV_STATE_PRESSED , lv_color_darken(lv_color_hex(0x52555a), LV_OPA_30));
-    lv_style_set_border_color(&cb_bullet, LV_STATE_FOCUS, LV_COLOR_RED);
-    lv_style_set_border_color(&cb_bullet, LV_STATE_FOCUS | LV_STATE_PRESSED, LV_COLOR_LIME);
     lv_style_set_bg_color(&cb_bullet, LV_STATE_NORMAL, COLOR_ACCENT);
     lv_style_set_bg_opa(&cb_bullet, LV_STATE_NORMAL  , LV_OPA_TRANSP);
     lv_style_set_bg_opa(&cb_bullet, LV_STATE_CHECKED  , LV_OPA_COVER);
     lv_style_set_border_opa(&cb_bullet, LV_STATE_CHECKED  , LV_OPA_80);
-    lv_style_set_transition_time(&cb_bullet, LV_STATE_NORMAL , 1000);
-
-
-
+    lv_style_set_transition_time(&cb_bullet, LV_STATE_NORMAL , 300);
 #endif
 }
 
