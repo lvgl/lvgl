@@ -1,5 +1,5 @@
 /**
- * @file lv_rect.c
+ * @file lv_label.c
  *
  */
 
@@ -17,6 +17,7 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_bidi.h"
 #include "../lv_misc/lv_printf.h"
+#include "../lv_themes/lv_theme.h"
 
 /*********************
  *      DEFINES
@@ -119,13 +120,13 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->dot.tmp_ptr   = NULL;
     ext->dot_tmp_alloc = 0;
 
-    lv_obj_reset_style(new_label, LV_LABEL_PART_MAIN);
 
     lv_obj_set_design_cb(new_label, lv_label_design);
     lv_obj_set_signal_cb(new_label, lv_label_signal);
 
     /*Init the new label*/
     if(copy == NULL) {
+        lv_theme_apply(new_label, LV_THEME_LABEL);
         lv_obj_set_click(new_label, false);
         lv_label_set_long_mode(new_label, LV_LABEL_LONG_EXPAND);
         lv_label_set_text(new_label, "Text");

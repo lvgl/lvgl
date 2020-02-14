@@ -326,7 +326,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 
     if(id >= ext->tab_cnt) id = ext->tab_cnt - 1;
 
-    lv_btnmatrix_clear_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNMATRIX_CTRL_CHECHK_STATE);
+    lv_btnmatrix_clear_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNMATRIX_CTRL_CHECK_STATE);
 
     ext->tab_cur = id;
 
@@ -445,7 +445,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     }
 #endif
 
-    lv_btnmatrix_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNMATRIX_CTRL_CHECHK_STATE);
+    lv_btnmatrix_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNMATRIX_CTRL_CHECK_STATE);
 }
 
 /**
@@ -769,8 +769,8 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
     uint16_t btn_id = lv_btnmatrix_get_active_btn(tab_btnm);
     if(btn_id == LV_BTNMATRIX_BTN_NONE) return;
 
-    lv_btnmatrix_clear_btn_ctrl_all(tab_btnm, LV_BTNMATRIX_CTRL_CHECHK_STATE);
-    lv_btnmatrix_set_btn_ctrl(tab_btnm, btn_id, LV_BTNMATRIX_CTRL_CHECHK_STATE);
+    lv_btnmatrix_clear_btn_ctrl_all(tab_btnm, LV_BTNMATRIX_CTRL_CHECK_STATE);
+    lv_btnmatrix_set_btn_ctrl(tab_btnm, btn_id, LV_BTNMATRIX_CTRL_CHECK_STATE);
 
     lv_obj_t * tabview = lv_obj_get_parent(tab_btnm);
 

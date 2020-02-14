@@ -1,5 +1,5 @@
 /**
- * @file lv_rect.h
+ * @file lv_label.h
  *
  */
 

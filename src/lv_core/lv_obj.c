@@ -59,7 +59,6 @@ static void delete_children(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
 static void obj_state_anim_cb(void * p, lv_anim_value_t value);
 static void lv_event_mark_deleted(lv_obj_t * obj);
-static void align_core(const lv_obj_t * base, const lv_obj_t * to_align, lv_align_t align, lv_point_t * res);
 static void lv_obj_del_async_cb(void * obj);
 static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
@@ -95,7 +94,6 @@ void lv_init(void)
     /*Initialize the lv_misc modules*/
     lv_mem_init();
     lv_task_core_init();
-    lv_style_built_in_init();
 
 #if LV_USE_FILESYSTEM
     lv_fs_init();
@@ -109,8 +107,6 @@ void lv_init(void)
     lv_group_init();
 #endif
 
-    /*Init. the sstyles*/
-//    lv_style_built_in_init();
 
     lv_theme_t * th = lv_theme_default_init(0, NULL);
     lv_theme_set_act(th);

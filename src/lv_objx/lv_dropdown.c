@@ -128,7 +128,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_dropdown_set_options(ddlist, "Option 1\nOption 2\nOption 3");
 
-        lv_theme_apply(ddlist, LV_THEME_DDLIST);
+        lv_theme_apply(ddlist, LV_THEME_DROPDOWN);
     }
     /*Copy an existing drop down list*/
     else {
@@ -625,8 +625,8 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
                 txt_area.x1 = ddlist->coords.x1 + (lv_obj_get_width(ddlist) - txt_size.x) / 2;
                 txt_area.x2 = txt_area.x1 + txt_size.x;
             } else {
-                txt_area.x1 = txt_area.x2 - txt_size.x;
-                txt_area.x2 = ddlist->coords.x2 - right;
+                txt_area.x1 = ddlist->coords.x2 - right - txt_size.x;
+                txt_area.x2 = txt_area.x1 + txt_size.x;
             }
 
             lv_draw_label(&txt_area, clip_area, &label_dsc, txt, NULL);

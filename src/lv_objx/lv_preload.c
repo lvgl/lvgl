@@ -98,7 +98,7 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->arc.bg_angle_start = 0;
         ext->arc.bg_angle_end = 360;
         lv_obj_set_size(preload, LV_DPI, LV_DPI);
-        lv_theme_apply(preload, LV_THEME_PRELOAD);
+        lv_theme_apply(preload, LV_THEME_SPINNER);
 
     }
     /*Copy an existing spinner*/

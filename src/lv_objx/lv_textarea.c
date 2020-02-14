@@ -147,7 +147,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_size(ta, LV_TEXTAREA_DEF_WIDTH, LV_TEXTAREA_DEF_HEIGHT);
         lv_textarea_set_sb_mode(ta, LV_SB_MODE_DRAG);
 
-        lv_theme_apply(ta, LV_THEME_TA);
+        lv_theme_apply(ta, LV_THEME_TEXTAREA);
 
     }
     /*Copy an existing object*/
@@ -158,7 +158,6 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->pwd_mode          = copy_ext->pwd_mode;
         ext->accapted_chars    = copy_ext->accapted_chars;
         ext->max_length        = copy_ext->max_length;
-        ext->cursor.style      = copy_ext->cursor.style;
         ext->cursor.pos        = copy_ext->cursor.pos;
         ext->cursor.valid_x    = copy_ext->cursor.valid_x;
 
@@ -555,6 +554,8 @@ void lv_textarea_set_placeholder_text(lv_obj_t * ta, const char * txt)
         } else {
             lv_label_set_long_mode(ext->placeholder, LV_LABEL_LONG_BREAK);
         }
+
+        lv_theme_apply(ta, LV_THEME_TEXTAREA);
     }
 
     lv_label_set_text(ext->placeholder, txt);

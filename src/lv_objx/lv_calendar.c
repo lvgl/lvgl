@@ -668,6 +668,8 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     lv_obj_init_draw_rect_dsc(calendar, LV_CALENDAR_PART_HEADER, &header_rect_dsc);
     lv_draw_rect(&header_area, mask, &header_rect_dsc);
 
+    lv_obj_state_dsc_t state_ori = calendar->state_dsc;
+
     /*Add the year + month name*/
     char txt_buf[64];
     lv_utils_num_to_str(ext->showed_date.year, txt_buf);
@@ -675,15 +677,18 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     txt_buf[5] = '\0';
     strcpy(&txt_buf[5], get_month_name(calendar, ext->showed_date.month));
 
+    calendar->state_dsc.act = LV_STATE_NORMAL;
+    calendar->state_dsc.prev = LV_STATE_NORMAL;
+
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_HEADER, &label_dsc);
     label_dsc.flag = LV_TXT_FLAG_CENTER;
     lv_draw_label(&header_area, mask, &label_dsc,txt_buf, NULL);
 
-    /*Add the left arrow*/
-    lv_obj_state_dsc_t state_ori = calendar->state_dsc;
+    calendar->state_dsc = state_ori;    /*Restore the state*/
 
+    /*Add the left arrow*/
     if(ext->btn_pressing < 0) calendar->state_dsc.act |= LV_STATE_PRESSED;
     else calendar->state_dsc.act &= ~(LV_STATE_PRESSED);
 

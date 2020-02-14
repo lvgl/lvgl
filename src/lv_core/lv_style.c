@@ -55,16 +55,20 @@ static lv_style_t * get_local_style(lv_style_list_t * list);
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_style_built_in_init(void)
-{
-
-}
-
+/**
+ * Initialize a style
+ * @param style pointer to a style to initialize
+ */
 void lv_style_init(lv_style_t * style)
 {
     style->map = NULL;
 }
 
+/**
+ * Copy a style with all its properties
+ * @param style_dest pointer to the destination style. (Should be initialized with `lv_style_init()`)
+ * @param style_src pointer to the source (to copy )style
+ */
 void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
 {
     lv_style_init(style_dest);
@@ -77,6 +81,10 @@ void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
     memcpy(style_dest->map, style_src->map, size);
 }
 
+/**
+ * Initialize a style list
+ * @param list a style list to initialize
+ */
 void lv_style_list_init(lv_style_list_t * list)
 {
     list->style_list = NULL;
@@ -84,6 +92,11 @@ void lv_style_list_init(lv_style_list_t * list)
     list->has_local = 0;
 }
 
+/**
+ * Copy a style list with all its styles and local style properties
+ * @param list_dest pointer to the destination style list. (should be initialized with `lv_style_list_init()`)
+ * @param list_src pointer to the source (to copy) style list.
+ */
 void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * list_src)
 {
     lv_style_list_reset(list_dest);
@@ -101,11 +114,17 @@ void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * lis
         list_dest->style_cnt = list_src->style_cnt - 1;
 
         lv_style_t * local_style = get_local_style(list_dest);
-        lv_style_copy(local_style, get_local_style(list_src));
+        lv_style_copy(local_style, (lv_style_t *)get_local_style(list_src));
     }
 }
 
-
+/**
+ * Add a style to a style list.
+ * Only the the style pointer will be saved so the shouldn't be a local variable.
+ * (It should be static, global or dynamically allocated)
+ * @param list pointer to a style list
+ * @param style pointer to a style to add
+ */
 void lv_style_list_add_style(lv_style_list_t * list, lv_style_t * style)
 {
     if(list == NULL) return;
@@ -134,6 +153,11 @@ void lv_style_list_add_style(lv_style_list_t * list, lv_style_t * style)
     list->style_list = new_classes;
 }
 
+/**
+ * Remove a style from a style list
+ * @param style_list pointer to a style list
+ * @param style pointer to a style to remove
+ */
 void lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * style)
 {
     if(list->style_cnt == 0) return;
@@ -175,6 +199,10 @@ void lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * style)
     list->style_list = new_classes;
 }
 
+/**
+ * Remove all styles added from style list, clear the local style and free all allocated memories
+ * @param list pointer to a style list.
+ */
 void lv_style_list_reset(lv_style_list_t * list)
 {
     if(list == NULL) return;
@@ -189,14 +217,22 @@ void lv_style_list_reset(lv_style_list_t * list)
     list->has_local = 0;
 }
 
-
+/**
+ * Clear all properties from a style and all allocated memories.
+ * @param style pointer to a style
+ */
 void lv_style_reset(lv_style_t * style)
 {
     lv_mem_free(style->map);
     style->map = NULL;
 }
 
-uint16_t lv_style_get_mem_size(lv_style_t * style)
+/**
+ * Get the size of the properties in a style in bytes
+ * @param style pointer to a style
+ * @return size of the properties in bytes
+ */
+uint16_t lv_style_get_mem_size(const lv_style_t * style)
 {
     if(style->map == NULL) return 0;
 

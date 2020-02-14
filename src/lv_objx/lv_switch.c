@@ -92,7 +92,7 @@ lv_obj_t * lv_switch_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_size(sw, LV_DPI / 2, LV_DPI / 4);
         lv_bar_set_range(sw, 0, 1);
 
-        lv_theme_apply(sw, LV_THEME_SW);
+        lv_theme_apply(sw, LV_THEME_SWITCH);
     }
     /*Copy an existing switch*/
     else {

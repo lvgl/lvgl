@@ -146,11 +146,12 @@ lv_obj_t * lv_keyboard_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_align(kb, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
         lv_obj_set_event_cb(kb, lv_keyboard_def_event_cb);
         lv_obj_set_base_dir(kb, LV_BIDI_DIR_LTR);
+        lv_obj_set_protect(kb, LV_PROTECT_CLICK_FOCUS);
 
         lv_btnmatrix_set_map(kb, kb_map[ext->mode]);
         lv_btnmatrix_set_ctrl_map(kb, kb_ctrl[ext->mode]);
 
-        lv_theme_apply(kb, LV_THEME_KB);
+        lv_theme_apply(kb, LV_THEME_KEYBOARD);
 
     }
     /*Copy an existing keyboard*/

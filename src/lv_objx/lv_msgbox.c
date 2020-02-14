@@ -107,7 +107,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_event_cb(mbox, lv_msgbox_default_event_cb);
 
         /*Set the default styles*/
-        lv_theme_apply(mbox, LV_THEME_MBOX);
+        lv_theme_apply(mbox, LV_THEME_MSGBOX);
 
     }
     /*Copy an existing message box*/
@@ -149,7 +149,7 @@ void lv_msgbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
     if(ext->btnm == NULL) {
         ext->btnm = lv_btnmatrix_create(mbox, NULL);
 
-        lv_theme_alien_apply(mbox, LV_THEME_MBOX_BTNS);
+        lv_theme_alien_apply(mbox, LV_THEME_MSGBOX_BTNS);
     }
 
     lv_btnmatrix_set_map(ext->btnm, btn_map);

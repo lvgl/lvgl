@@ -107,7 +107,7 @@ lv_obj_t * lv_btnmatrix_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_btnmatrix_set_map(btnm, lv_btnmatrix_def_map);
         lv_obj_set_size(btnm, LV_DPI * 3, LV_DPI * 2);
-        lv_theme_apply(btnm, LV_THEME_BTNM);
+        lv_theme_apply(btnm, LV_THEME_BTNMATRIX);
     }
     /*Copy an existing object*/
     else {
@@ -849,9 +849,9 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
             if(button_is_tgl_enabled(ext->ctrl_bits[ext->btn_id_pr]) &&
                     !button_is_inactive(ext->ctrl_bits[ext->btn_id_pr])) {
                 if(button_get_tgl_state(ext->ctrl_bits[ext->btn_id_pr])) {
-                    ext->ctrl_bits[ext->btn_id_pr] &= (~LV_BTNMATRIX_CTRL_CHECHK_STATE);
+                    ext->ctrl_bits[ext->btn_id_pr] &= (~LV_BTNMATRIX_CTRL_CHECK_STATE);
                 } else {
-                    ext->ctrl_bits[ext->btn_id_pr] |= LV_BTNMATRIX_CTRL_CHECHK_STATE;
+                    ext->ctrl_bits[ext->btn_id_pr] |= LV_BTNMATRIX_CTRL_CHECK_STATE;
                 }
                 if(ext->one_toggle) make_one_button_toggled(btnm, ext->btn_id_pr);
             }
@@ -1094,7 +1094,7 @@ static bool button_is_tgl_enabled(lv_btnmatrix_ctrl_t ctrl_bits)
 
 static bool button_get_tgl_state(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return ctrl_bits & LV_BTNMATRIX_CTRL_CHECHK_STATE ? true : false;
+    return ctrl_bits & LV_BTNMATRIX_CTRL_CHECK_STATE ? true : false;
 }
 
 /**
@@ -1175,11 +1175,11 @@ static bool maps_are_identical(const char ** map1, const char ** map2)
 static void make_one_button_toggled(lv_obj_t * btnm, uint16_t btn_idx)
 {
     /*Save whether the button was toggled*/
-    bool was_toggled = lv_btnmatrix_get_btn_ctrl(btnm, btn_idx, LV_BTNMATRIX_CTRL_CHECHK_STATE);
+    bool was_toggled = lv_btnmatrix_get_btn_ctrl(btnm, btn_idx, LV_BTNMATRIX_CTRL_CHECK_STATE);
 
-    lv_btnmatrix_clear_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECHK_STATE);
+    lv_btnmatrix_clear_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECK_STATE);
 
-    if(was_toggled) lv_btnmatrix_set_btn_ctrl(btnm, btn_idx, LV_BTNMATRIX_CTRL_CHECHK_STATE);
+    if(was_toggled) lv_btnmatrix_set_btn_ctrl(btnm, btn_idx, LV_BTNMATRIX_CTRL_CHECK_STATE);
 }
 
 #endif

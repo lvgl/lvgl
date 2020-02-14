@@ -40,7 +40,7 @@ enum {
     LV_BTNMATRIX_CTRL_NO_REPEAT  = 0x0010, /**< Do not repeat press this button. */
     LV_BTNMATRIX_CTRL_INACTIVE   = 0x0020, /**< Disable this button. */
     LV_BTNMATRIX_CTRL_CHECKABLE  = 0x0040, /**< Button *can* be toggled. */
-    LV_BTNMATRIX_CTRL_CHECHK_STATE  = 0x0080, /**< Button is currently toggled (e.g. checked). */
+    LV_BTNMATRIX_CTRL_CHECK_STATE  = 0x0080, /**< Button is currently toggled (e.g. checked). */
     LV_BTNMATRIX_CTRL_CLICK_TRIG = 0x0100, /**< 1: Send LV_EVENT_SELECTED on CLICK, 0: Send LV_EVENT_SELECTED on PRESS*/
 };
 typedef uint16_t lv_btnmatrix_ctrl_t;

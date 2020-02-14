@@ -20,7 +20,7 @@
  *********************/
 #define LV_OBJX_NAME "lv_list"
 
-#define LV_LIST_LAYOUT_DEF LV_LAYOUT_COL_M
+#define LV_LIST_LAYOUT_DEF LV_LAYOUT_COLUMN_MID
 
 #if LV_USE_ANIMATION == 0
 #undef LV_LIST_DEF_ANIM_TIME
