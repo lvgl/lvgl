@@ -437,7 +437,6 @@ bool lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t
         yt *= dsc->tmp.zoom_inv;
         xs = ((dsc->tmp.cosma * xt - dsc->tmp.sinma * yt) >> (LV_TRIGO_SHIFT)) + dsc->tmp.pivot_x_256;
         ys = ((dsc->tmp.sinma * xt + dsc->tmp.cosma * yt) >> (LV_TRIGO_SHIFT)) + dsc->tmp.pivot_y_256;
-
     }
 
     /*Get the integer part of the source pixel*/

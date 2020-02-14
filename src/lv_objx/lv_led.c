@@ -58,32 +58,31 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("led create started");
 
     /*Create the ancestor basic object*/
-    lv_obj_t * new_led = lv_obj_create(par, copy);
-    LV_ASSERT_MEM(new_led);
-    if(new_led == NULL) return NULL;
+    lv_obj_t * led = lv_obj_create(par, copy);
+    LV_ASSERT_MEM(led);
+    if(led == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_led);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_led);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(led);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(led);
 
     /*Allocate the object type specific extended data*/
-    lv_led_ext_t * ext = lv_obj_allocate_ext_attr(new_led, sizeof(lv_led_ext_t));
+    lv_led_ext_t * ext = lv_obj_allocate_ext_attr(led, sizeof(lv_led_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_led);
+        lv_obj_del(led);
         return NULL;
     }
 
     ext->bright = LV_LED_BRIGHT_ON;
 
-    lv_obj_set_signal_cb(new_led, lv_led_signal);
-    lv_obj_set_design_cb(new_led, lv_led_design);
+    lv_obj_set_signal_cb(led, lv_led_signal);
+    lv_obj_set_design_cb(led, lv_led_design);
 
     /*Init the new led object*/
     if(copy == NULL) {
-        lv_obj_set_size(new_led, LV_LED_WIDTH_DEF, LV_LED_HEIGHT_DEF);
+        lv_obj_set_size(led, LV_LED_WIDTH_DEF, LV_LED_HEIGHT_DEF);
 
-        lv_style_list_init(&new_led->style_list);
-        lv_obj_add_style(new_led, LV_LED_PART_MAIN, lv_theme_get_style(LV_THEME_LED));
+        lv_theme_apply(led,LV_THEME_LED);
     }
     /*Copy an existing object*/
     else {
@@ -91,12 +90,12 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->bright             = copy_ext->bright;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_led);
+        lv_obj_refresh_style(led);
     }
 
     LV_LOG_INFO("led created");
 
-    return new_led;
+    return led;
 }
 
 /*=====================
@@ -207,6 +206,7 @@ static lv_design_res_t lv_led_design(lv_obj_t * led, const lv_area_t * clip_area
         rect_dsc.bg_color   = lv_color_mix(rect_dsc.bg_color, LV_COLOR_BLACK, ext->bright);
         rect_dsc.bg_grad_color   = lv_color_mix(rect_dsc.bg_grad_color, LV_COLOR_BLACK, ext->bright);
         rect_dsc.border_color = lv_color_mix(rect_dsc.border_color, LV_COLOR_BLACK, ext->bright);
+        rect_dsc.shadow_color = lv_color_mix(rect_dsc.shadow_color, LV_COLOR_BLACK, ext->bright);
 
         /*Set the current shadow width according to brightness proportionally between LV_LED_BRIGHT_OFF
          * and LV_LED_BRIGHT_ON*/

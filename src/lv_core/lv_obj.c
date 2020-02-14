@@ -2126,13 +2126,12 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_p
     /*Handle unset values*/
     prop = prop & (~LV_STYLE_STATE_MASK);
     switch(prop) {
-    case LV_STYLE_TEXT_COLOR:
-    case LV_STYLE_BORDER_COLOR:
-    case LV_STYLE_SHADOW_COLOR:
-        return LV_COLOR_BLACK;
+    case LV_STYLE_BG_COLOR:
+    case LV_STYLE_BG_GRAD_COLOR:
+        return LV_COLOR_WHITE;
     }
 
-    return LV_COLOR_WHITE;
+    return LV_COLOR_BLACK;
 }
 
 lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)

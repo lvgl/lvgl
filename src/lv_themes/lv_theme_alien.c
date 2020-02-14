@@ -96,6 +96,10 @@ static lv_style_t ddlist_btn, ddlist_page, ddlist_sel;
 static lv_style_t ta_cursor, ta_oneline, ta_placeholder;
 #endif
 
+#if LV_USE_LED
+static lv_style_t led;
+#endif
+
 #if LV_USE_ARC
 static lv_style_t arc;
 static lv_style_t arc_bg;
@@ -141,6 +145,7 @@ static void basic_init(void)
     lv_style_set_bg_opa(&scr, LV_STATE_NORMAL, LV_OPA_COVER);
     lv_style_set_bg_color(&scr, LV_STATE_NORMAL, COLOR_SCREEN);
     lv_style_set_text_color(&scr, LV_STATE_NORMAL, lv_color_hex(0xb8b8b9));
+    lv_style_set_value_color(&scr, LV_STATE_NORMAL, lv_color_hex(0xb8b8b9));
 
 #define PERF_TEST 0
 #if PERF_TEST == 0
@@ -157,6 +162,7 @@ static void basic_init(void)
     lv_style_set_pad_bottom(&panel, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_inner(&panel, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_text_color(&panel, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
+    lv_style_set_value_color(&panel, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
     lv_style_set_font(&panel, LV_STATE_NORMAL, &lv_font_roboto_16);
     lv_style_set_image_recolor(&panel, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
     lv_style_set_line_color(&panel, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
@@ -192,6 +198,7 @@ static void basic_init(void)
     //    lv_style_set_outline_pad(&btn, LV_STATE_NORMAL, 5);
     //    lv_style_set_outline_pad(&btn, LV_STATE_PRESSED, 0);
     lv_style_set_outline_opa(&btn, LV_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_outline_color(&btn, LV_STATE_NORMAL, LV_COLOR_WHITE);
     //    lv_style_set_outline_opa(&btn, LV_STATE_PRESSED, LV_OPA_COVER);
 #elif PERF_TEST == 1
     lv_style_init(&panel);
@@ -369,7 +376,17 @@ static void line_init(void)
 static void led_init(void)
 {
 #if LV_USE_LED != 0
-
+    lv_style_init(&led);
+    lv_style_set_bg_opa(&led, LV_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_bg_color(&led, LV_STATE_NORMAL, COLOR_ACCENT);
+    lv_style_set_bg_color(&led, LV_STATE_PRESSED, LV_COLOR_RED);
+    lv_style_set_border_width(&led, LV_STATE_NORMAL, 2);
+    lv_style_set_border_opa(&led, LV_STATE_NORMAL, LV_OPA_50);
+    lv_style_set_border_color(&led, LV_STATE_NORMAL, lv_color_lighten(COLOR_ACCENT, LV_OPA_30));
+    lv_style_set_radius(&led, LV_STATE_NORMAL, LV_RADIUS_CIRCLE);
+    lv_style_set_shadow_width(&led, LV_STATE_NORMAL, LV_DPI / 4);
+    lv_style_set_shadow_color(&led, LV_STATE_NORMAL, COLOR_ACCENT);
+    lv_style_set_shadow_spread(&led, LV_STATE_NORMAL, LV_DPI / 16);
 #endif
 }
 
@@ -1092,7 +1109,13 @@ void lv_theme_alien_apply(lv_obj_t * obj, lv_theme_style_t name)
         break;
 
 #endif
-
+#if LV_USE_LED
+    case LV_THEME_LED:
+        list = lv_obj_get_style_list(obj, LV_LED_PART_MAIN);
+        lv_style_list_reset(list);
+        lv_style_list_add_style(list, &led);
+        break;
+#endif
 #if LV_USE_PAGE
     case LV_THEME_PAGE:
         list = lv_obj_get_style_list(obj, LV_PAGE_PART_BG);

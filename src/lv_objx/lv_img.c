@@ -541,6 +541,14 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         }
 
         if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_VARIABLE) {
+            lv_draw_rect_dsc_t r;
+            lv_draw_rect_dsc_init(&r);
+            lv_draw_rect(clip_area, clip_area, &r);
+
+            r.bg_color = LV_COLOR_RED;
+            lv_draw_rect(&img->coords, clip_area, &r);
+
+
             img_coords.x1 += ext->offset.x;
             img_coords.y1 += ext->offset.y;
 
@@ -552,6 +560,10 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             lv_draw_img_dsc_t img_dsc;
             lv_draw_img_dsc_init(&img_dsc);
             lv_obj_init_draw_img_dsc(img, LV_IMG_PART_MAIN, &img_dsc);
+            img_dsc.angle = ext->angle;
+            img_dsc.zoom = ext->zoom;
+            img_dsc.pivot.x = ext->pivot.x;
+            img_dsc.pivot.y = ext->pivot.y;
 
             lv_area_t cords_tmp;
             cords_tmp.y1 = img_coords.y1;
@@ -638,15 +650,56 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*If the image has angle provide enough room for the rotated corners */
         if(ext->angle || ext->zoom != LV_IMG_ZOOM_NONE) {
-            lv_sqrt_res_t ds;
-            lv_coord_t max_w = ext->w + LV_MATH_ABS(ext->pivot.x + ext->w / 2);
-            lv_coord_t max_h = ext->h + LV_MATH_ABS(ext->pivot.y + ext->h / 2);
-			lv_sqrt(max_w * max_w + max_h * max_h, &ds);/*Maximum diagonal length*/
-			lv_sqrt(ds.i * ds.i + ds.i * ds.i, &ds);    /*Maximum side length of external rectangle*/
-            ds.i = (ds.i * ext->zoom ) >> 8;         /*+10 to be sure anything won't be clipped*/
+            int32_t w = ext->w;
+            int32_t h = ext->h;
 
-            lv_coord_t d = ds.i / 2;
-            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, d);
+            lv_area_t norm;
+            norm.x1 = 0 - ext->pivot.x;
+            norm.y1 = 0 - ext->pivot.y;
+            norm.x2 = w - ext->pivot.x;
+            norm.y2 = h - ext->pivot.y;
+
+            int16_t sinma = lv_trigo_sin(ext->angle);
+            int16_t cosma = lv_trigo_sin(ext->angle + 90);
+
+            lv_point_t lt;
+            lv_point_t rt;
+            lv_point_t lb;
+            lv_point_t rb;
+
+            lv_coord_t xt;
+            lv_coord_t yt;
+
+            xt = (norm.x1 * ext->zoom) >> 8;
+            yt = (norm.y1 * ext->zoom) >> 8;
+            lt.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.x;
+            lt.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.y;
+
+            xt = (norm.x2 * ext->zoom) >> 8;
+            yt = (norm.y1 * ext->zoom) >> 8;
+            rt.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.x;
+            rt.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.y;
+
+            xt = (norm.x1 * ext->zoom) >> 8;
+            yt = (norm.y2 * ext->zoom) >> 8;
+            lb.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.x;
+            lb.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.y;
+
+            xt = (norm.x2 * ext->zoom) >> 8;
+            yt = (norm.y2 * ext->zoom) >> 8;
+            rb.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.x;
+            rb.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.y;
+
+            lv_area_t a;
+            a.x1 = LV_MATH_MIN4(lb.x, lt.x, rb.x, rt.x);
+            a.x2 = LV_MATH_MAX4(lb.x, lt.x, rb.x, rt.x);
+            a.y1 = LV_MATH_MIN4(lb.y, lt.y, rb.y, rt.y);
+            a.y2 = LV_MATH_MAX4(lb.y, lt.y, rb.y, rt.y);
+
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, - a.x1);
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, - a.y1);
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, a.x2 - ext->w);
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, a.y2 - ext->h);
         }
 
         /*Handle the padding of the background*/
@@ -660,14 +713,6 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, top);
         img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, bottom);
 
-        /*Handle shadow*/
-        lv_coord_t shadow = lv_obj_get_style_shadow_width(img, LV_OBJ_PART_MAIN);
-        if(shadow) {
-            shadow++;
-            shadow += lv_obj_get_style_shadow_spread(img, LV_OBJ_PART_MAIN);
-            shadow += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_shadow_offset_x(img, LV_OBJ_PART_MAIN)),
-                    LV_MATH_ABS(lv_obj_get_style_shadow_offset_y(img, LV_OBJ_PART_MAIN)));
-        }
 
     } else if(sign == LV_SIGNAL_HIT_TEST) {
         lv_hit_test_info_t *info = param;
