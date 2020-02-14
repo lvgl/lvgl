@@ -38,17 +38,17 @@ extern "C" {
 #endif
 
 
-#if LV_USE_DDLIST
+#if LV_USE_DROPDOWN
 
-static inline void lv_ddlist_set_draw_arrow(lv_obj_t * ddlist, bool en)
+static inline void lv_dropdown_set_draw_arrow(lv_obj_t * ddlist, bool en)
 {
-    if(en) lv_ddlist_set_symbol(ddlist, LV_SYMBOL_DOWN);
-    else lv_ddlist_set_symbol(ddlist, NULL);
+    if(en) lv_dropdown_set_symbol(ddlist, LV_SYMBOL_DOWN);
+    else lv_dropdown_set_symbol(ddlist, NULL);
 }
 
-static inline bool lv_ddlist_get_draw_arrow(lv_obj_t * ddlist)
+static inline bool lv_dropdown_get_draw_arrow(lv_obj_t * ddlist)
 {
-    if(lv_ddlist_get_symbol(ddlist)) return true;
+    if(lv_dropdown_get_symbol(ddlist)) return true;
     else return false;
 }
 

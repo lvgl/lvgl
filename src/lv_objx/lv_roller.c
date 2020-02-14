@@ -295,7 +295,7 @@ void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint16_t bu
     uint16_t c;
     for(c = 0; opt_txt[i] != '\n' && i < txt_len; c++, i++) {
         if(buf_size && c >= buf_size - 1) {
-            LV_LOG_WARN("lv_ddlist_get_selected_str: the buffer was too small")
+            LV_LOG_WARN("lv_dropdown_get_selected_str: the buffer was too small")
             break;
         }
         buf[c] = opt_txt[i];

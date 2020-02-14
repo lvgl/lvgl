@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_KB_H
-#define LV_KB_H
+#ifndef LV_KEYBOARD_H
+#define LV_KEYBOARD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,15 +15,15 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#if LV_USE_KB != 0
+#if LV_USE_KEYBOARD != 0
 
 /*Testing of dependencies*/
-#if LV_USE_BTNM == 0
-#error "lv_kb: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNM  1) "
+#if LV_USE_BTNMATRIX == 0
+#error "lv_kb: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNMATRIX  1) "
 #endif
 
-#if LV_USE_TA == 0
-#error "lv_kb: lv_ta is required. Enable it in lv_conf.h (LV_USE_TA  1) "
+#if LV_USE_TEXTAREA == 0
+#error "lv_kb: lv_ta is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -39,28 +39,28 @@ extern "C" {
 
 /** Current keyboard mode. */
 enum {
-    LV_KB_MODE_TEXT_LOWER,
-    LV_KB_MODE_TEXT_UPPER,
-    LV_KB_MODE_SPECIAL,
-    LV_KB_MODE_NUM,
+    LV_KEYBOARD_MODE_TEXT_LOWER,
+    LV_KEYBOARD_MODE_TEXT_UPPER,
+    LV_KEYBOARD_MODE_SPECIAL,
+    LV_KEYBOARD_MODE_NUM,
 };
-typedef uint8_t lv_kb_mode_t;
+typedef uint8_t lv_keyboard_mode_t;
     
 /*Data of keyboard*/
 typedef struct
 {
-    lv_btnm_ext_t btnm; /*Ext. of ancestor*/
+    lv_btnmatrix_ext_t btnm; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * ta;          /*Pointer to the assigned text area*/
-    lv_kb_mode_t mode;      /*Key map type*/
+    lv_keyboard_mode_t mode;      /*Key map type*/
     uint8_t cursor_mng : 1; /*1: automatically show/hide cursor when a text area is assigned or left*/
-} lv_kb_ext_t;
+} lv_keyboard_ext_t;
 
 enum {
-    LV_KB_PART_BG,
-    LV_KB_PART_BTN,
+    LV_KEYBOARD_PART_BG,
+    LV_KEYBOARD_PART_BTN,
 };
-typedef uint8_t lv_kb_style_t;
+typedef uint8_t lv_keyboard_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -72,7 +72,7 @@ typedef uint8_t lv_kb_style_t;
  * @param copy pointer to a keyboard object, if not NULL then the new object will be copied from it
  * @return pointer to the created keyboard
  */
-lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy);
+lv_obj_t * lv_keyboard_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -83,41 +83,41 @@ lv_obj_t * lv_kb_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param kb pointer to a Keyboard object
  * @param ta pointer to a Text Area object to write there
  */
-void lv_kb_set_ta(lv_obj_t * kb, lv_obj_t * ta);
+void lv_keyboard_set_ta(lv_obj_t * kb, lv_obj_t * ta);
 
 /**
  * Set a new a mode (text or number map)
  * @param kb pointer to a Keyboard object
- * @param mode the mode from 'lv_kb_mode_t'
+ * @param mode the mode from 'lv_keyboard_mode_t'
  */
-void lv_kb_set_mode(lv_obj_t * kb, lv_kb_mode_t mode);
+void lv_keyboard_set_mode(lv_obj_t * kb, lv_keyboard_mode_t mode);
 
 /**
  * Automatically hide or show the cursor of the current Text Area
  * @param kb pointer to a Keyboard object
  * @param en true: show cursor on the current text area, false: hide cursor
  */
-void lv_kb_set_cursor_manage(lv_obj_t * kb, bool en);
+void lv_keyboard_set_cursor_manage(lv_obj_t * kb, bool en);
 
 /**
  * Set a new map for the keyboard
  * @param kb pointer to a Keyboard object
- * @param mode keyboard map to alter 'lv_kb_mode_t'
+ * @param mode keyboard map to alter 'lv_keyboard_mode_t'
  * @param map pointer to a string array to describe the map.
- *            See 'lv_btnm_set_map()' for more info.
+ *            See 'lv_btnmatrix_set_map()' for more info.
  */
-void lv_kb_set_map(lv_obj_t * kb, lv_kb_mode_t mode, const char * map[]);
+void lv_keyboard_set_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const char * map[]);
 
 /**
  * Set the button control map (hidden, disabled etc.) for the keyboard. The
  * control map array will be copied and so may be deallocated after this
  * function returns.
  * @param kb pointer to a keyboard object
- * @param mode keyboard ctrl map to alter 'lv_kb_mode_t'
+ * @param mode keyboard ctrl map to alter 'lv_keyboard_mode_t'
  * @param ctrl_map pointer to an array of `lv_btn_ctrl_t` control bytes.
- *                 See: `lv_btnm_set_ctrl_map` for more details.
+ *                 See: `lv_btnmatrix_set_ctrl_map` for more details.
  */
-void lv_kb_set_ctrl_map(lv_obj_t * kb, lv_kb_mode_t mode, const lv_btnm_ctrl_t ctrl_map[]);
+void lv_keyboard_set_ctrl_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const lv_btnmatrix_ctrl_t ctrl_map[]);
 
 /*=====================
  * Getter functions
@@ -128,30 +128,30 @@ void lv_kb_set_ctrl_map(lv_obj_t * kb, lv_kb_mode_t mode, const lv_btnm_ctrl_t c
  * @param kb pointer to a Keyboard object
  * @return pointer to the assigned Text Area object
  */
-lv_obj_t * lv_kb_get_ta(const lv_obj_t * kb);
+lv_obj_t * lv_keyboard_get_ta(const lv_obj_t * kb);
 
 /**
  * Set a new a mode (text or number map)
  * @param kb pointer to a Keyboard object
- * @return the current mode from 'lv_kb_mode_t'
+ * @return the current mode from 'lv_keyboard_mode_t'
  */
-lv_kb_mode_t lv_kb_get_mode(const lv_obj_t * kb);
+lv_keyboard_mode_t lv_keyboard_get_mode(const lv_obj_t * kb);
 
 /**
  * Get the current cursor manage mode.
  * @param kb pointer to a Keyboard object
  * @return true: show cursor on the current text area, false: hide cursor
  */
-bool lv_kb_get_cursor_manage(const lv_obj_t * kb);
+bool lv_keyboard_get_cursor_manage(const lv_obj_t * kb);
 
 /**
  * Get the current map of a keyboard
  * @param kb pointer to a keyboard object
  * @return the current map
  */
-static inline const char ** lv_kb_get_map_array(const lv_obj_t * kb)
+static inline const char ** lv_keyboard_get_map_array(const lv_obj_t * kb)
 {
-    return lv_btnm_get_map_array(kb);
+    return lv_btnmatrix_get_map_array(kb);
 }
 
 /*=====================
@@ -165,16 +165,16 @@ static inline const char ** lv_kb_get_map_array(const lv_obj_t * kb)
  * @param kb pointer to a  keyboard
  * @param event the triggering event
  */
-void lv_kb_def_event_cb(lv_obj_t * kb, lv_event_t event);
+void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_KB*/
+#endif /*LV_USE_KEYBOARD*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /*LV_KB_H*/
+#endif /*LV_KEYBOARD_H*/

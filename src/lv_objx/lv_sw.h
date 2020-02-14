@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_SW_H
-#define LV_SW_H
+#ifndef LV_SWITCH_H
+#define LV_SWITCH_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#if LV_USE_SW != 0
+#if LV_USE_SWITCH != 0
 
 /*Testing of dependencies*/
 #if LV_USE_SLIDER == 0
@@ -39,19 +39,19 @@ typedef struct
     /*New data for this type */
     lv_style_list_t style_knob; /*Style of the knob*/
     uint8_t state   :1; /*The current state*/
-} lv_sw_ext_t;
+} lv_switch_ext_t;
 
 /**
  * Switch parts.
  */
 enum {
-    LV_SW_PART_BG = LV_BAR_PART_BG,                 /**< Switch background. */
-    LV_SW_PART_INDIC = LV_BAR_PART_INDIC,           /**< Switch fill area. */
-    LV_SW_PART_KNOB = _LV_BAR_PART_VIRTUAL_LAST,    /**< Switch knob. */
-    _LV_SW_PART_VIRTUAL_LAST
+    LV_SWITCH_PART_BG = LV_BAR_PART_BG,                 /**< Switch background. */
+    LV_SWITCH_PART_INDIC = LV_BAR_PART_INDIC,           /**< Switch fill area. */
+    LV_SWITCH_PART_KNOB = _LV_BAR_PART_VIRTUAL_LAST,    /**< Switch knob. */
+    _LV_SWITCH_PART_VIRTUAL_LAST
 };
 
-typedef uint8_t lv_sw_part_t;
+typedef uint8_t lv_switch_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -63,7 +63,7 @@ typedef uint8_t lv_sw_part_t;
  * @param copy pointer to a switch object, if not NULL then the new object will be copied from it
  * @return pointer to the created switch
  */
-lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy);
+lv_obj_t * lv_switch_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
@@ -74,14 +74,14 @@ lv_obj_t * lv_sw_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param sw pointer to a switch object
  * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-void lv_sw_on(lv_obj_t * sw, lv_anim_enable_t anim);
+void lv_switch_on(lv_obj_t * sw, lv_anim_enable_t anim);
 
 /**
  * Turn OFF the switch
  * @param sw pointer to a switch object
  * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-void lv_sw_off(lv_obj_t * sw, lv_anim_enable_t anim);
+void lv_switch_off(lv_obj_t * sw, lv_anim_enable_t anim);
 
 /**
  * Toggle the position of the switch
@@ -89,7 +89,7 @@ void lv_sw_off(lv_obj_t * sw, lv_anim_enable_t anim);
  * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  * @return resulting state of the switch.
  */
-bool lv_sw_toggle(lv_obj_t * sw, lv_anim_enable_t anim);
+bool lv_switch_toggle(lv_obj_t * sw, lv_anim_enable_t anim);
 
 /**
  * Set an image to display on the knob of the switch.
@@ -97,7 +97,7 @@ bool lv_sw_toggle(lv_obj_t * sw, lv_anim_enable_t anim);
  * @param img_src pointer to an `lv_img_dsc_t` variable or a path to an image
  *        (not an `lv_img` object)
  */
-void lv_sw_set_knob_img(lv_obj_t * sw, const void * img_src);
+void lv_switch_set_knob_img(lv_obj_t * sw, const void * img_src);
 
 /**
  * Set an image to display on the knob of the switch when it's in ON state
@@ -105,7 +105,7 @@ void lv_sw_set_knob_img(lv_obj_t * sw, const void * img_src);
  * @param img_src pointer to an `lv_img_dsc_t` variable or a path to an image
  *        (not an `lv_img` object)
  */
-void lv_sw_set_knob_on_img(lv_obj_t * sw, const void * img_src);
+void lv_switch_set_knob_on_img(lv_obj_t * sw, const void * img_src);
 
 /**
  * Set the animation time of the switch
@@ -113,7 +113,7 @@ void lv_sw_set_knob_on_img(lv_obj_t * sw, const void * img_src);
  * @param anim_time animation time
  * @return style pointer to a style
  */
-static inline void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time)
+static inline void lv_switch_set_anim_time(lv_obj_t * sw, uint16_t anim_time)
 {
     lv_bar_set_anim_time(sw, anim_time);
 }
@@ -127,9 +127,9 @@ static inline void lv_sw_set_anim_time(lv_obj_t * sw, uint16_t anim_time)
  * @param sw pointer to a switch object
  * @return false: OFF; true: ON
  */
-static inline bool lv_sw_get_state(const lv_obj_t * sw)
+static inline bool lv_switch_get_state(const lv_obj_t * sw)
 {
-    lv_sw_ext_t * ext = (lv_sw_ext_t *)lv_obj_get_ext_attr(sw);
+    lv_switch_ext_t * ext = (lv_switch_ext_t *)lv_obj_get_ext_attr(sw);
     return ext->state ? true : false;
 }
 /**
@@ -152,7 +152,7 @@ const void * lv_slider_get_knob_on_img(lv_obj_t * sw, const void * img_src);
  * @param sw pointer to a  switch object
  * @return style pointer to a style
  */
-static inline uint16_t lv_sw_get_anim_time(const lv_obj_t * sw)
+static inline uint16_t lv_switch_get_anim_time(const lv_obj_t * sw)
 {
     return lv_bar_get_anim_time(sw);
 }
@@ -161,10 +161,10 @@ static inline uint16_t lv_sw_get_anim_time(const lv_obj_t * sw)
  *      MACROS
  **********************/
 
-#endif /*LV_USE_SW*/
+#endif /*LV_USE_SWITCH*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /*LV_SW_H*/
+#endif /*LV_SWITCH_H*/

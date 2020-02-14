@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_PRELOAD_H
-#define LV_PRELOAD_H
+#ifndef LV_SPINNER_H
+#define LV_SPINNER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#if LV_USE_PRELOAD != 0
+#if LV_USE_SPINNER != 0
 
 /*Testing of dependencies*/
 #if LV_USE_ARC == 0
@@ -39,23 +39,23 @@ extern "C" {
  **********************/
 
 /**
- * Type of preloader.
+ * Type of spinner.
  */
 enum {
-    LV_PRELOAD_TYPE_SPINNING_ARC,
-    LV_PRELOAD_TYPE_FILLSPIN_ARC,
-    LV_PRELOAD_TYPE_CONSTANT_ARC,
+    LV_SPINNER_TYPE_SPINNING_ARC,
+    LV_SPINNER_TYPE_FILLSPIN_ARC,
+    LV_SPINNER_TYPE_CONSTANT_ARC,
 };
-typedef uint8_t lv_preload_type_t;
+typedef uint8_t lv_spinner_type_t;
 
 /**
- * Direction the preloader should spin.
+ * Direction the spinner should spin.
  */
 enum {
-    LV_PRELOAD_DIR_FORWARD,
-    LV_PRELOAD_DIR_BACKWARD,
+    LV_SPINNER_DIR_FORWARD,
+    LV_SPINNER_DIR_BACKWARD,
 };
-typedef uint8_t lv_preload_dir_t;
+typedef uint8_t lv_spinner_dir_t;
 
 /*Data of pre loader*/
 typedef struct
@@ -64,19 +64,19 @@ typedef struct
     /*New data for this type */
     lv_anim_value_t arc_length;      /*Length of the spinning indicator in degree*/
     uint16_t time;                   /*Time of one round*/
-    lv_preload_type_t anim_type : 2; /*Type of the arc animation*/
-    lv_preload_dir_t anim_dir : 1;   /*Animation Direction*/
-} lv_preload_ext_t;
+    lv_spinner_type_t anim_type : 2; /*Type of the arc animation*/
+    lv_spinner_dir_t anim_dir : 1;   /*Animation Direction*/
+} lv_spinner_ext_t;
 
-/*Parts of the preloader*/
+/*Parts of the spinner*/
 enum {
-    LV_PRELOAD_PART_BG = LV_ARC_PART_BG,
-    LV_PRELOAD_PART_ARC = LV_ARC_PART_ARC,
-    _LV_PRELOAD_PART_VIRTUAL_LAST,
+    LV_SPINNER_PART_BG = LV_ARC_PART_BG,
+    LV_SPINNER_PART_ARC = LV_ARC_PART_ARC,
+    _LV_SPINNER_PART_VIRTUAL_LAST,
 
-    _LV_PRELOAD_PART_REAL_LAST = _LV_ARC_PART_REAL_LAST,
+    _LV_SPINNER_PART_REAL_LAST = _LV_ARC_PART_REAL_LAST,
 };
-typedef uint8_t lv_preload_style_t;
+typedef uint8_t lv_spinner_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -89,7 +89,7 @@ typedef uint8_t lv_preload_style_t;
  * it
  * @return pointer to the created pre loader
  */
-lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy);
+lv_obj_t * lv_spinner_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*======================
  * Add/remove functions
@@ -100,14 +100,14 @@ lv_obj_t * lv_preload_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param preload pointer to a preload object
  * @param deg length of the arc
  */
-void lv_preload_set_arc_length(lv_obj_t * preload, lv_anim_value_t deg);
+void lv_spinner_set_arc_length(lv_obj_t * preload, lv_anim_value_t deg);
 
 /**
  * Set the spin time of the arc
  * @param preload pointer to a preload object
  * @param time time of one round in milliseconds
  */
-void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time);
+void lv_spinner_set_spin_time(lv_obj_t * preload, uint16_t time);
 
 /*=====================
  * Setter functions
@@ -119,21 +119,21 @@ void lv_preload_set_spin_time(lv_obj_t * preload, uint16_t time);
  * @param type which style should be set
  * @param style pointer to a style
  *  */
-void lv_preload_set_style(lv_obj_t * preload, lv_preload_style_t type, const lv_style_t * style);
+void lv_spinner_set_style(lv_obj_t * preload, lv_spinner_style_t type, const lv_style_t * style);
 
 /**
- * Set the animation type of a preloader.
+ * Set the animation type of a spinner.
  * @param preload pointer to pre loader object
  * @param type animation type of the preload
  *  */
-void lv_preload_set_type(lv_obj_t * preload, lv_preload_type_t type);
+void lv_spinner_set_type(lv_obj_t * preload, lv_spinner_type_t type);
 
 /**
- * Set the animation direction of a preloader
+ * Set the animation direction of a spinner
  * @param preload pointer to pre loader object
  * @param direction animation direction of the preload
  */
-void lv_preload_set_dir(lv_obj_t * preload, lv_preload_dir_t dir);
+void lv_spinner_set_dir(lv_obj_t * preload, lv_spinner_dir_t dir);
 
 /*=====================
  * Getter functions
@@ -143,13 +143,13 @@ void lv_preload_set_dir(lv_obj_t * preload, lv_preload_dir_t dir);
  * Get the arc length [degree] of the a pre loader
  * @param preload pointer to a pre loader object
  */
-lv_anim_value_t lv_preload_get_arc_length(const lv_obj_t * preload);
+lv_anim_value_t lv_spinner_get_arc_length(const lv_obj_t * preload);
 
 /**
  * Get the spin time of the arc
  * @param preload pointer to a pre loader object [milliseconds]
  */
-uint16_t lv_preload_get_spin_time(const lv_obj_t * preload);
+uint16_t lv_spinner_get_spin_time(const lv_obj_t * preload);
 
 /**
  * Get style of a pre loader.
@@ -157,21 +157,21 @@ uint16_t lv_preload_get_spin_time(const lv_obj_t * preload);
  * @param type which style should be get
  * @return style pointer to the style
  *  */
-const lv_style_t * lv_preload_get_style(const lv_obj_t * preload, lv_preload_style_t type);
+const lv_style_t * lv_spinner_get_style(const lv_obj_t * preload, lv_spinner_style_t type);
 
 /**
- * Get the animation type of a preloader.
+ * Get the animation type of a spinner.
  * @param preload pointer to pre loader object
  * @return animation type
  *  */
-lv_preload_type_t lv_preload_get_type(lv_obj_t * preload);
+lv_spinner_type_t lv_spinner_get_type(lv_obj_t * preload);
 
 /**
- * Get the animation direction of a preloader
+ * Get the animation direction of a spinner
  * @param preload pointer to pre loader object
  * @return animation direction
  */
-lv_preload_dir_t lv_preload_get_dir(lv_obj_t * preload);
+lv_spinner_dir_t lv_spinner_get_dir(lv_obj_t * preload);
 
 /*=====================
  * Other functions
@@ -179,19 +179,19 @@ lv_preload_dir_t lv_preload_get_dir(lv_obj_t * preload);
 
 /**
  * Animator function  (exec_cb) to rotate the arc of spinner.
- * @param ptr pointer to preloader
+ * @param ptr pointer to spinner
  * @param val the current desired value [0..360]
  */
-void lv_preload_spinner_anim(void * ptr, lv_anim_value_t val);
+void lv_spinner_spinner_anim(void * ptr, lv_anim_value_t val);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_PRELOAD*/
+#endif /*LV_USE_SPINNER*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /*LV_PRELOAD_H*/
+#endif /*LV_SPINNER_H*/

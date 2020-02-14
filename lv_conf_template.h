@@ -438,7 +438,7 @@ typedef void * lv_obj_user_data_t;
 #endif
 
 /*Button matrix (dependencies: -)*/
-#define LV_USE_BTNM     1
+#define LV_USE_BTNMATRIX     1
 
 /*Calendar (dependencies: -)*/
 #define LV_USE_CALENDAR 1
@@ -447,7 +447,7 @@ typedef void * lv_obj_user_data_t;
 #define LV_USE_CANVAS   1
 
 /*Check box (dependencies: lv_btn, lv_label)*/
-#define LV_USE_CB       1
+#define LV_USE_CHECKBOX       1
 
 /*Chart (dependencies: -)*/
 #define LV_USE_CHART    1
@@ -462,13 +462,13 @@ typedef void * lv_obj_user_data_t;
 #define LV_USE_CPICKER   1
 
 /*Drop down list (dependencies: lv_page, lv_label, lv_symbol_def.h)*/
-#define LV_USE_DDLIST    1
-#if LV_USE_DDLIST != 0
+#define LV_USE_DROPDOWN    1
+#if LV_USE_DROPDOWN != 0
 /*Open and close default animation time [ms] (0: no animation)*/
-#  define LV_DDLIST_DEF_ANIM_TIME     200
+#  define LV_DROPDOWN_DEF_ANIM_TIME     200
 #endif
 
-/*Gauge (dependencies:lv_bar, lv_lmeter)*/
+/*Gauge (dependencies:lv_bar, lv_linemeter)*/
 #define LV_USE_GAUGE    1
 
 /*Image (dependencies: lv_label*/
@@ -482,7 +482,7 @@ typedef void * lv_obj_user_data_t;
 #endif
 
 /*Keyboard (dependencies: lv_btnm)*/
-#define LV_USE_KB       1
+#define LV_USE_KEYBOARD       1
 
 /*Label (dependencies: -*/
 #define LV_USE_LABEL    1
@@ -520,7 +520,7 @@ typedef void * lv_obj_user_data_t;
 #define LV_USE_OBJMASK  0
 
 /*Message box (dependencies: lv_rect, lv_btnm, lv_label)*/
-#define LV_USE_MBOX     1
+#define LV_USE_MSGBOX     1
 
 /*Page (dependencies: lv_cont)*/
 #define LV_USE_PAGE     1
@@ -530,11 +530,11 @@ typedef void * lv_obj_user_data_t;
 #endif
 
 /*Preload (dependencies: lv_arc, lv_anim)*/
-#define LV_USE_PRELOAD      1
-#if LV_USE_PRELOAD != 0
-#  define LV_PRELOAD_DEF_ARC_LENGTH   60      /*[deg]*/
-#  define LV_PRELOAD_DEF_SPIN_TIME    1000    /*[ms]*/
-#  define LV_PRELOAD_DEF_ANIM         LV_PRELOAD_TYPE_SPINNING_ARC
+#define LV_USE_SPINNER      1
+#if LV_USE_SPINNER != 0
+#  define LV_SPINNER_DEF_ARC_LENGTH   60      /*[deg]*/
+#  define LV_SPINNER_DEF_SPIN_TIME    1000    /*[ms]*/
+#  define LV_SPINNER_DEF_ANIM         LV_SPINNER_TYPE_SPINNING_ARC
 #endif
 
 /*Roller (dependencies: lv_ddlist)*/
@@ -554,24 +554,24 @@ typedef void * lv_obj_user_data_t;
 #define LV_USE_SPINBOX       1
 
 /*Switch (dependencies: lv_slider)*/
-#define LV_USE_SW       1
+#define LV_USE_SWITCH       1
 
 /*Text area (dependencies: lv_label, lv_page)*/
-#define LV_USE_TA       1
-#if LV_USE_TA != 0
-#  define LV_TA_DEF_CURSOR_BLINK_TIME 400     /*ms*/
-#  define LV_TA_DEF_PWD_SHOW_TIME     1500    /*ms*/
+#define LV_USE_TEXTAREA       1
+#if LV_USE_TEXTAREA != 0
+#  define LV_TEXTAREA_DEF_CURSOR_BLINK_TIME 400     /*ms*/
+#  define LV_TEXTAREA_DEF_PWD_SHOW_TIME     1500    /*ms*/
 #endif
 
 /*Table (dependencies: lv_label)*/
-#define LV_USE_TABLE    1
-#if LV_USE_TABLE
+#define LV_USE_TEXTAREABLE    1
+#if LV_USE_TEXTAREABLE
 #  define LV_TABLE_COL_MAX    12
 #endif
 
 /*Tab (dependencies: lv_page, lv_btnm)*/
-#define LV_USE_TABVIEW      1
-#  if LV_USE_TABVIEW != 0
+#define LV_USE_TEXTAREABVIEW      1
+#  if LV_USE_TEXTAREABVIEW != 0
 /*Time of slide animation [ms] (0: no animation)*/
 #  define LV_TABVIEW_DEF_ANIM_TIME    300
 #endif

@@ -251,7 +251,7 @@ static void slider_init(void)
 
 static void sw_init(void)
 {
-#if LV_USE_SW != 0
+#if LV_USE_SWITCH != 0
     static lv_style_t indic;
 
     lv_style_copy(&indic, theme.style.slider.indic);
@@ -318,7 +318,7 @@ static void arc_init(void)
     arc.line.color   = lv_color_hsv_to_rgb(_hue, 40, 90);
     arc.line.rounded = 1;
 
-    /*For preloader*/
+    /*For spinner*/
     arc.body.border.width = 0;
 
     theme.style.arc = &arc;
@@ -327,7 +327,7 @@ static void arc_init(void)
 
 static void preload_init(void)
 {
-#if LV_USE_PRELOAD != 0
+#if LV_USE_SPINNER != 0
 
     theme.style.preload = theme.style.arc;
 #endif
@@ -370,7 +370,7 @@ static void calendar_init(void)
 
 static void cb_init(void)
 {
-#if LV_USE_CB != 0
+#if LV_USE_CHECKBOX != 0
     static lv_style_t rel, pr, tgl_rel, tgl_pr, ina;
     lv_style_copy(&rel, &def);
     rel.body.radius       = LV_DPI / 20;
@@ -408,7 +408,7 @@ static void cb_init(void)
 
 static void btnm_init(void)
 {
-#if LV_USE_BTNM
+#if LV_USE_BTNMATRIX
     static lv_style_t bg, rel, pr, tgl_rel, tgl_pr, ina;
 
     lv_style_copy(&bg, &lv_style_transp);
@@ -460,7 +460,7 @@ static void btnm_init(void)
 
 static void kb_init(void)
 {
-#if LV_USE_KB
+#if LV_USE_KEYBOARD
     static lv_style_t bg, rel, pr, tgl_rel, tgl_pr, ina;
     lv_style_copy(&bg, &def);
     bg.body.main_color     = lv_color_hex3(0x666);
@@ -516,7 +516,7 @@ static void kb_init(void)
 
 static void mbox_init(void)
 {
-#if LV_USE_MBOX
+#if LV_USE_MSGBOX
     static lv_style_t bg, rel, pr;
     lv_style_copy(&bg, theme.style.panel);
     bg.body.main_color = lv_color_hsv_to_rgb(_hue, 10, 95);
@@ -560,7 +560,7 @@ static void page_init(void)
 
 static void ta_init(void)
 {
-#if LV_USE_TA
+#if LV_USE_TEXTAREA
     static lv_style_t oneline;
     lv_style_copy(&oneline, theme.style.panel);
     oneline.body.radius         = LV_RADIUS_CIRCLE;
@@ -633,7 +633,7 @@ static void list_init(void)
 
 static void ddlist_init(void)
 {
-#if LV_USE_DDLIST != 0
+#if LV_USE_DROPDOWN != 0
     static lv_style_t bg, sel;
     lv_style_copy(&bg, theme.style.panel);
     bg.text.line_space     = LV_DPI / 8;
@@ -675,7 +675,7 @@ static void roller_init(void)
 
 static void tabview_init(void)
 {
-#if LV_USE_TABVIEW != 0
+#if LV_USE_TEXTAREABVIEW != 0
     static lv_style_t btn_bg, indic, rel, pr, tgl_rel, tgl_pr;
 
     lv_style_copy(&btn_bg, &def);
@@ -726,7 +726,7 @@ static void tileview_init(void)
 
 static void table_init(void)
 {
-#if LV_USE_TABLE != 0
+#if LV_USE_TEXTAREABLE != 0
     static lv_style_t cell;
     lv_style_copy(&cell, theme.style.panel);
     cell.body.radius         = 0;

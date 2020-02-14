@@ -18,8 +18,8 @@ extern "C" {
 #if LV_USE_SPINBOX != 0
 
 /*Testing of dependencies*/
-#if LV_USE_TA == 0
-#error "lv_spinbox: lv_ta is required. Enable it in lv_conf.h (LV_USE_TA  1) "
+#if LV_USE_TEXTAREA == 0
+#error "lv_spinbox: lv_ta is required. Enable it in lv_conf.h (LV_USE_TEXTAREA  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -37,7 +37,7 @@ extern "C" {
 /*Data of spinbox*/
 typedef struct
 {
-    lv_ta_ext_t ta; /*Ext. of ancestor*/
+    lv_textarea_ext_t ta; /*Ext. of ancestor*/
     /*New data for this type */
     int32_t value;
     int32_t range_max;
@@ -50,11 +50,11 @@ typedef struct
 
 /*Styles*/
 enum {
-    LV_SPINBOX_PART_BG = LV_TA_PART_BG,
-    LV_SPINBOX_PART_SCRLBAR = LV_TA_PART_SCRLBAR,
-    LV_SPINBOX_PART_CURSOR = LV_TA_PART_CURSOR,
-    _LV_SPINBOX_PART_VIRTUAL_LAST = _LV_TA_PART_VIRTUAL_LAST,
-    _LV_SPINBOX_PART_REAL_LAST = _LV_TA_PART_REAL_LAST,
+    LV_SPINBOX_PART_BG = LV_TEXTAREA_PART_BG,
+    LV_SPINBOX_PART_SCRLBAR = LV_TEXTAREA_PART_SCRLBAR,
+    LV_SPINBOX_PART_CURSOR = LV_TEXTAREA_PART_CURSOR,
+    _LV_SPINBOX_PART_VIRTUAL_LAST = _LV_TEXTAREA_PART_VIRTUAL_LAST,
+    _LV_SPINBOX_PART_REAL_LAST = _LV_TEXTAREA_PART_REAL_LAST,
 };
 typedef uint8_t lv_spinbox_part_t;
 

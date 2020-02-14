@@ -51,11 +51,11 @@ static lv_style_t slider_knob;
 static lv_style_t lmeter_bg;
 #endif
 
-#if LV_USE_DDLIST
+#if LV_USE_DROPDOWN
 static lv_style_t ddlist_bg, ddlist_sel;
 #endif
 
-#if LV_USE_BTNM
+#if LV_USE_BTNMATRIX
 static lv_style_t btnm_bg, btnm_rel, btnm_pr, btnm_trel, btnm_ina;
 #endif
 
@@ -326,7 +326,7 @@ static void slider_init(void)
 
 static void sw_init(void)
 {
-#if LV_USE_SW != 0
+#if LV_USE_SWITCH != 0
     static lv_style_t sw_bg, sw_indic, sw_knob;
     lv_style_copy(&sw_bg, &bar_bg);
     sw_bg.body.opa            = LV_OPA_COVER;
@@ -403,7 +403,7 @@ static void arc_init(void)
     arc.line.color   = lv_color_hsv_to_rgb(_hue, 70, 90);
     arc.line.rounded = 1;
 
-    /*For preloader*/
+    /*For spinner*/
     arc.body.border.width = 0;
 
     theme.style.arc = &arc;
@@ -412,7 +412,7 @@ static void arc_init(void)
 
 static void preload_init(void)
 {
-#if LV_USE_PRELOAD != 0
+#if LV_USE_SPINNER != 0
 
     theme.style.preload = theme.style.arc;
 #endif
@@ -463,7 +463,7 @@ static void calendar_init(void)
 
 static void cb_init(void)
 {
-#if LV_USE_CB != 0
+#if LV_USE_CHECKBOX != 0
     static lv_style_t cb_bg, cb_rel, cb_pr, cb_trel, cb_tpr, cb_ina;
     lv_style_copy(&cb_rel, &bg);
     cb_rel.body.radius       = LV_DPI / 20;
@@ -516,7 +516,7 @@ static void cb_init(void)
 
 static void btnm_init(void)
 {
-#if LV_USE_BTNM
+#if LV_USE_BTNMATRIX
     lv_style_copy(&btnm_bg, &lv_style_transp_tight);
     btnm_bg.body.border.width = 1;
     btnm_bg.body.border.color = lv_color_hsv_to_rgb(_hue, 60, 80);
@@ -554,7 +554,7 @@ static void btnm_init(void)
 
 static void kb_init(void)
 {
-#if LV_USE_KB
+#if LV_USE_KEYBOARD
     theme.style.kb.bg          = &btnm_bg;
     theme.style.kb.btn.rel     = &btnm_rel;
     theme.style.kb.btn.pr      = &btnm_pr;
@@ -566,7 +566,7 @@ static void kb_init(void)
 
 static void mbox_init(void)
 {
-#if LV_USE_MBOX
+#if LV_USE_MSGBOX
     static lv_style_t mbox_bg;
     lv_style_copy(&mbox_bg, &panel);
     mbox_bg.body.shadow.width = LV_DPI / 12;
@@ -589,7 +589,7 @@ static void page_init(void)
 
 static void ta_init(void)
 {
-#if LV_USE_TA
+#if LV_USE_TEXTAREA
     theme.style.ta.area    = &panel;
     theme.style.ta.oneline = &panel;
     theme.style.ta.cursor  = NULL;
@@ -647,7 +647,7 @@ static void list_init(void)
 
 static void ddlist_init(void)
 {
-#if LV_USE_DDLIST != 0
+#if LV_USE_DROPDOWN != 0
     lv_style_copy(&ddlist_bg, &panel);
     ddlist_bg.text.line_space     = LV_DPI / 8;
     ddlist_bg.body.padding.left   = LV_DPI / 6;
@@ -694,7 +694,7 @@ static void roller_init(void)
 
 static void tabview_init(void)
 {
-#if LV_USE_TABVIEW != 0
+#if LV_USE_TEXTAREABVIEW != 0
     static lv_style_t tab_rel, tab_pr, tab_trel, tab_tpr, tab_indic;
     lv_style_copy(&tab_rel, &def);
     tab_rel.body.main_color     = lv_color_hex3(0x500);
@@ -768,7 +768,7 @@ static void tileview_init(void)
 
 static void table_init(void)
 {
-#if LV_USE_TABLE != 0
+#if LV_USE_TEXTAREABLE != 0
     static lv_style_t cell;
     lv_style_copy(&cell, &panel);
     cell.body.radius       = 0;

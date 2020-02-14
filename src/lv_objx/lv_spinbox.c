@@ -55,7 +55,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("spinbox create started");
 
     /*Create the ancestor of spinbox*/
-    lv_obj_t * new_spinbox = lv_ta_create(par, copy);
+    lv_obj_t * new_spinbox = lv_textarea_create(par, copy);
     LV_ASSERT_MEM(new_spinbox);
     if(new_spinbox == NULL) return NULL;
 
@@ -79,8 +79,8 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->range_max          = 99999;
     ext->range_min          = -99999;
 
-    lv_ta_set_one_line(new_spinbox, true);
-    lv_ta_set_cursor_click_pos(new_spinbox, true);
+    lv_textarea_set_one_line(new_spinbox, true);
+    lv_textarea_set_cursor_click_pos(new_spinbox, true);
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_spinbox, lv_spinbox_signal);
@@ -395,7 +395,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
         } else if(c == LV_KEY_DOWN) {
             lv_spinbox_decrement(spinbox);
         } else {
-            lv_ta_add_char(spinbox, c);
+            lv_textarea_add_char(spinbox, c);
         }
     }
 
@@ -492,7 +492,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
     }
 
     /*Refresh the text*/
-    lv_ta_set_text(spinbox, (char *)buf);
+    lv_textarea_set_text(spinbox, (char *)buf);
 
     /*Set the cursor position*/
     int32_t step    = ext->step;
@@ -506,7 +506,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
 
     cur_pos += (ext->digit_padding_left - cur_shift_left);
 
-    lv_ta_set_cursor_pos(spinbox, cur_pos);
+    lv_textarea_set_cursor_pos(spinbox, cur_pos);
 }
 
 #endif

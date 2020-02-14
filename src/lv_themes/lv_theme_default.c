@@ -161,7 +161,7 @@ static void slider_init(void)
 
 static void sw_init(void)
 {
-#if LV_USE_SW != 0
+#if LV_USE_SWITCH != 0
 	static lv_style_t sw_bg;
     lv_style_copy(&sw_bg, &lv_style_pretty);
     sw_bg.body.padding.left   = 3;
@@ -215,7 +215,7 @@ static void chart_init(void)
 
 static void cb_init(void)
 {
-#if LV_USE_CB != 0
+#if LV_USE_CHECKBOX != 0
 
     theme.style.cb.bg          = &lv_style_transp;
     theme.style.cb.box.rel     = &lv_style_pretty;
@@ -228,7 +228,7 @@ static void cb_init(void)
 
 static void btnm_init(void)
 {
-#if LV_USE_BTNM
+#if LV_USE_BTNMATRIX
 
     theme.style.btnm.bg          = &lv_style_pretty;
     theme.style.btnm.btn.rel     = &lv_style_btn_rel;
@@ -241,7 +241,7 @@ static void btnm_init(void)
 
 static void kb_init(void)
 {
-#if LV_USE_KB
+#if LV_USE_KEYBOARD
 
     theme.style.kb.bg          = &lv_style_pretty;
     theme.style.kb.btn.rel     = &lv_style_btn_rel;
@@ -254,7 +254,7 @@ static void kb_init(void)
 
 static void mbox_init(void)
 {
-#if LV_USE_MBOX
+#if LV_USE_MSGBOX
 
     theme.style.mbox.bg      = &lv_style_pretty;
     theme.style.mbox.btn.bg  = &lv_style_transp;
@@ -275,7 +275,7 @@ static void page_init(void)
 
 static void ta_init(void)
 {
-#if LV_USE_TA
+#if LV_USE_TEXTAREA
 
     theme.style.ta.area    = &lv_style_pretty;
     theme.style.ta.oneline = &lv_style_pretty;
@@ -301,7 +301,7 @@ static void list_init(void)
 
 static void ddlist_init(void)
 {
-#if LV_USE_DDLIST != 0
+#if LV_USE_DROPDOWN != 0
 
     theme.style.ddlist.bg  = &lv_style_pretty;
     theme.style.ddlist.sel = &lv_style_plain_color;
@@ -320,7 +320,7 @@ static void roller_init(void)
 
 static void tabview_init(void)
 {
-#if LV_USE_TABVIEW != 0
+#if LV_USE_TEXTAREABVIEW != 0
 
     theme.style.tabview.bg          = &plain_bordered;
     theme.style.tabview.indic       = &lv_style_plain_color;
@@ -334,7 +334,7 @@ static void tabview_init(void)
 
 static void table_init(void)
 {
-#if LV_USE_TABLE != 0
+#if LV_USE_TEXTAREABLE != 0
     theme.style.table.bg   = &lv_style_transp_tight;
     theme.style.table.cell = &lv_style_plain;
 #endif

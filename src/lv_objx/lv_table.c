@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_table.h"
-#if LV_USE_TABLE != 0
+#if LV_USE_TEXTAREABLE != 0
 
 #include "../lv_core/lv_debug.h"
 #include "../lv_misc/lv_txt.h"

@@ -19,11 +19,11 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_LMETER == 0
-#error "lv_gauge: lv_lmeter is required. Enable it in lv_conf.h (LV_USE_LMETER  1) "
+#error "lv_gauge: lv_linemeter is required. Enable it in lv_conf.h (LV_USE_LMETER  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
-#include "lv_lmeter.h"
+#include "lv_linemeter.h"
 #include "lv_label.h"
 #include "lv_line.h"
 
@@ -38,7 +38,7 @@ extern "C" {
 /*Data of gauge*/
 typedef struct
 {
-    lv_lmeter_ext_t lmeter; /*Ext. of ancestor*/
+    lv_linemeter_ext_t lmeter; /*Ext. of ancestor*/
     /*New data for this type */
     int16_t * values;                 /*Array of the set values (for needles) */
     const lv_color_t * needle_colors; /*Color of the needles (lv_color_t my_colors[needle_num])*/
@@ -52,11 +52,11 @@ typedef struct
 
 /*Styles*/
 enum {
-    LV_GAUGE_PART_MAIN = LV_LMETER_PART_MAIN,
-    LV_GAUGE_PART_STRONG = _LV_LMETER_PART_VIRTUAL_LAST,
+    LV_GAUGE_PART_MAIN = LV_LINEMETER_PART_MAIN,
+    LV_GAUGE_PART_STRONG = _LV_LINEMETER_PART_VIRTUAL_LAST,
     LV_GAUGE_PART_NEEDLE,
-    _LV_GAUGE_PART_VIRTUAL_LAST = _LV_LMETER_PART_VIRTUAL_LAST,
-    _LV_GAUGE_PART_REAL_LAST = _LV_LMETER_PART_REAL_LAST,
+    _LV_GAUGE_PART_VIRTUAL_LAST = _LV_LINEMETER_PART_VIRTUAL_LAST,
+    _LV_GAUGE_PART_REAL_LAST = _LV_LINEMETER_PART_REAL_LAST,
 };
 typedef uint8_t lv_gauge_style_t;
 
@@ -100,7 +100,7 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value);
  */
 static inline void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max)
 {
-    lv_lmeter_set_range(gauge, min, max);
+    lv_linemeter_set_range(gauge, min, max);
 }
 
 /**
@@ -110,7 +110,7 @@ static inline void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max
  */
 static inline void lv_gauge_set_critical_value(lv_obj_t * gauge, int16_t value)
 {
-    lv_lmeter_set_value(gauge, value);
+    lv_linemeter_set_value(gauge, value);
 }
 
 /**
@@ -173,7 +173,7 @@ uint8_t lv_gauge_get_needle_count(const lv_obj_t * gauge);
  */
 static inline int16_t lv_gauge_get_min_value(const lv_obj_t * lmeter)
 {
-    return lv_lmeter_get_min_value(lmeter);
+    return lv_linemeter_get_min_value(lmeter);
 }
 
 /**
@@ -183,7 +183,7 @@ static inline int16_t lv_gauge_get_min_value(const lv_obj_t * lmeter)
  */
 static inline int16_t lv_gauge_get_max_value(const lv_obj_t * lmeter)
 {
-    return lv_lmeter_get_max_value(lmeter);
+    return lv_linemeter_get_max_value(lmeter);
 }
 
 /**
@@ -193,7 +193,7 @@ static inline int16_t lv_gauge_get_max_value(const lv_obj_t * lmeter)
  */
 static inline int16_t lv_gauge_get_critical_value(const lv_obj_t * gauge)
 {
-    return lv_lmeter_get_value(gauge);
+    return lv_linemeter_get_value(gauge);
 }
 
 /**
@@ -210,7 +210,7 @@ uint8_t lv_gauge_get_label_count(const lv_obj_t * gauge);
  */
 static inline uint16_t lv_gauge_get_line_count(const lv_obj_t * gauge)
 {
-    return lv_lmeter_get_line_count(gauge);
+    return lv_linemeter_get_line_count(gauge);
 }
 
 /**
@@ -220,7 +220,7 @@ static inline uint16_t lv_gauge_get_line_count(const lv_obj_t * gauge)
  */
 static inline uint16_t lv_gauge_get_scale_angle(const lv_obj_t * gauge)
 {
-    return lv_lmeter_get_scale_angle(gauge);
+    return lv_linemeter_get_scale_angle(gauge);
 }
 
 /**

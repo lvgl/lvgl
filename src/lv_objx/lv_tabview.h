@@ -15,11 +15,11 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#if LV_USE_TABVIEW != 0
+#if LV_USE_TEXTAREABVIEW != 0
 
 /*Testing of dependencies*/
-#if LV_USE_BTNM == 0
-#error "lv_tabview: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNM  1) "
+#if LV_USE_BTNMATRIX == 0
+#error "lv_tabview: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNMATRIX  1) "
 #endif
 
 #if LV_USE_PAGE == 0
@@ -176,7 +176,7 @@ lv_tabview_btns_pos_t lv_tabview_get_btns_pos(const lv_obj_t * tabview);
  *      MACROS
  **********************/
 
-#endif /*LV_USE_TABVIEW*/
+#endif /*LV_USE_TEXTAREABVIEW*/
 
 #ifdef __cplusplus
 } /* extern "C" */

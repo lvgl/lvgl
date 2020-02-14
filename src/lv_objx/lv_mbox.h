@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_MBOX_H
-#define LV_MBOX_H
+#ifndef LV_MSGBOX_H
+#define LV_MSGBOX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -15,15 +15,15 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#if LV_USE_MBOX != 0
+#if LV_USE_MSGBOX != 0
 
 /*Testing of dependencies*/
 #if LV_USE_CONT == 0
 #error "lv_mbox: lv_cont is required. Enable it in lv_conf.h (LV_USE_CONT  1) "
 #endif
 
-#if LV_USE_BTNM == 0
-#error "lv_mbox: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNM  1) "
+#if LV_USE_BTNMATRIX == 0
+#error "lv_mbox: lv_btnm is required. Enable it in lv_conf.h (LV_USE_BTNMATRIX  1) "
 #endif
 
 #if LV_USE_LABEL == 0
@@ -53,16 +53,16 @@ typedef struct
 #if LV_USE_ANIMATION
     uint16_t anim_time; /*Duration of close animation [ms] (0: no animation)*/
 #endif
-} lv_mbox_ext_t;
+} lv_msgbox_ext_t;
 
 /** Message box styles. */
 enum {
-    LV_MBOX_PART_BG = LV_CONT_PART_MAIN,
+    LV_MSGBOX_PART_BG = LV_CONT_PART_MAIN,
 
-    LV_MBOX_PART_BTN_BG = _LV_CONT_PART_REAL_LAST,
-    LV_MBOX_PART_BTN,
+    LV_MSGBOX_PART_BTN_BG = _LV_CONT_PART_REAL_LAST,
+    LV_MSGBOX_PART_BTN,
 };
-typedef uint8_t lv_mbox_style_t;
+typedef uint8_t lv_msgbox_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -75,7 +75,7 @@ typedef uint8_t lv_mbox_style_t;
  * it
  * @return pointer to the created message box
  */
-lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy);
+lv_obj_t * lv_msgbox_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /*======================
  * Add/remove functions
@@ -87,7 +87,7 @@ lv_obj_t * lv_mbox_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param btn_map button descriptor (button matrix map).
  *                E.g.  a const char *txt[] = {"ok", "close", ""} (Can not be local variable)
  */
-void lv_mbox_add_btns(lv_obj_t * mbox, const char * btn_mapaction[]);
+void lv_msgbox_add_btns(lv_obj_t * mbox, const char * btn_mapaction[]);
 
 /*=====================
  * Setter functions
@@ -98,27 +98,27 @@ void lv_mbox_add_btns(lv_obj_t * mbox, const char * btn_mapaction[]);
  * @param mbox pointer to a message box
  * @param txt a '\0' terminated character string which will be the message box text
  */
-void lv_mbox_set_text(lv_obj_t * mbox, const char * txt);
+void lv_msgbox_set_text(lv_obj_t * mbox, const char * txt);
 
 /**
  * Set animation duration
  * @param mbox pointer to a message box object
  * @param anim_time animation length in  milliseconds (0: no animation)
  */
-void lv_mbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time);
+void lv_msgbox_set_anim_time(lv_obj_t * mbox, uint16_t anim_time);
 
 /**
  * Automatically delete the message box after a given time
  * @param mbox pointer to a message box object
  * @param delay a time (in milliseconds) to wait before delete the message box
  */
-void lv_mbox_start_auto_close(lv_obj_t * mbox, uint16_t delay);
+void lv_msgbox_start_auto_close(lv_obj_t * mbox, uint16_t delay);
 
 /**
  * Stop the auto. closing of message box
  * @param mbox pointer to a message box object
  */
-void lv_mbox_stop_auto_close(lv_obj_t * mbox);
+void lv_msgbox_stop_auto_close(lv_obj_t * mbox);
 
 /**
  * Set a style of a message box
@@ -126,14 +126,14 @@ void lv_mbox_stop_auto_close(lv_obj_t * mbox);
  * @param type which style should be set
  * @param style pointer to a style
  */
-void lv_mbox_set_style(lv_obj_t * mbox, lv_mbox_style_t type, const lv_style_t * style);
+void lv_msgbox_set_style(lv_obj_t * mbox, lv_msgbox_style_t type, const lv_style_t * style);
 
 /**
- * Set whether recoloring is enabled. Must be called after `lv_mbox_add_btns`.
+ * Set whether recoloring is enabled. Must be called after `lv_msgbox_add_btns`.
  * @param btnm pointer to button matrix object
  * @param en whether recoloring is enabled
  */
-void lv_mbox_set_recolor(lv_obj_t * mbox, bool en);
+void lv_msgbox_set_recolor(lv_obj_t * mbox, bool en);
 
 /*=====================
  * Getter functions
@@ -144,15 +144,15 @@ void lv_mbox_set_recolor(lv_obj_t * mbox, bool en);
  * @param mbox pointer to a message box object
  * @return pointer to the text of the message box
  */
-const char * lv_mbox_get_text(const lv_obj_t * mbox);
+const char * lv_msgbox_get_text(const lv_obj_t * mbox);
 
 /**
  * Get the index of the lastly "activated" button by the user (pressed, released etc)
  * Useful in the the `event_cb`.
  * @param btnm pointer to button matrix object
- * @return  index of the last released button (LV_BTNM_BTN_NONE: if unset)
+ * @return  index of the last released button (LV_BTNMATRIX_BTN_NONE: if unset)
  */
-uint16_t lv_mbox_get_active_btn(lv_obj_t * mbox);
+uint16_t lv_msgbox_get_active_btn(lv_obj_t * mbox);
 
 /**
  * Get the text of the lastly "activated" button by the user (pressed, released etc)
@@ -160,38 +160,38 @@ uint16_t lv_mbox_get_active_btn(lv_obj_t * mbox);
  * @param btnm pointer to button matrix object
  * @return text of the last released button (NULL: if unset)
  */
-const char * lv_mbox_get_active_btn_text(lv_obj_t * mbox);
+const char * lv_msgbox_get_active_btn_text(lv_obj_t * mbox);
 
 /**
  * Get the animation duration (close animation time)
  * @param mbox pointer to a message box object
  * @return animation length in  milliseconds (0: no animation)
  */
-uint16_t lv_mbox_get_anim_time(const lv_obj_t * mbox);
+uint16_t lv_msgbox_get_anim_time(const lv_obj_t * mbox);
 
 /**
  * Get whether recoloring is enabled
  * @param mbox pointer to a message box object
  * @return whether recoloring is enabled
  */
-bool lv_mbox_get_recolor(const lv_obj_t * mbox);
+bool lv_msgbox_get_recolor(const lv_obj_t * mbox);
 
 /**
  * Get message box button matrix
  * @param mbox pointer to a message box object
  * @return pointer to button matrix object
- * @remarks return value will be NULL unless `lv_mbox_add_btns` has been already called
+ * @remarks return value will be NULL unless `lv_msgbox_add_btns` has been already called
  */
-lv_obj_t * lv_mbox_get_btnm(lv_obj_t * mbox);
+lv_obj_t * lv_msgbox_get_btnm(lv_obj_t * mbox);
 
 /**********************
  *      MACROS
  **********************/
 
-#endif /*LV_USE_MBOX*/
+#endif /*LV_USE_MSGBOX*/
 
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
 
-#endif /*LV_MBOX_H*/
+#endif /*LV_MSGBOX_H*/

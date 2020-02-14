@@ -67,7 +67,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("gauge create started");
 
     /*Create the ancestor gauge*/
-    lv_obj_t * new_gauge = lv_lmeter_create(par, copy);
+    lv_obj_t * new_gauge = lv_linemeter_create(par, copy);
     LV_ASSERT_MEM(new_gauge);
     if(new_gauge == NULL) return NULL;
 
@@ -207,7 +207,7 @@ void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint
 {
     LV_ASSERT_OBJ(gauge, LV_OBJX_NAME);
 
-    lv_lmeter_set_scale(gauge, angle, line_cnt);
+    lv_linemeter_set_scale(gauge, angle, line_cnt);
 
     lv_gauge_ext_t * ext = lv_obj_get_ext_attr(gauge);
     ext->label_count     = label_cnt;
@@ -358,7 +358,7 @@ static lv_design_res_t lv_gauge_design(lv_obj_t * gauge, const lv_area_t * clip_
         /*Add the strong lines*/
         uint16_t line_cnt_tmp = ext->lmeter.line_cnt;
         ext->lmeter.line_cnt         = ext->label_count;                 /*Only to labels*/
-        lv_lmeter_draw_scale(gauge, clip_area, LV_GAUGE_PART_STRONG);
+        lv_linemeter_draw_scale(gauge, clip_area, LV_GAUGE_PART_STRONG);
         ext->lmeter.line_cnt = line_cnt_tmp; /*Restore the parameters*/
 
         lv_gauge_draw_needle(gauge, clip_area);
@@ -448,7 +448,7 @@ static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask)
     lv_coord_t r             = (lv_obj_get_width(gauge) - left - right) / 2 - scale_width - txt_pad;
     lv_coord_t x_ofs         = gauge->coords.x1 + r + left + scale_width + txt_pad;
     lv_coord_t y_ofs         = gauge->coords.y1 + r + top + scale_width + txt_pad;
-    int16_t scale_angle      = lv_lmeter_get_scale_angle(gauge);
+    int16_t scale_angle      = lv_linemeter_get_scale_angle(gauge);
     uint16_t label_num       = ext->label_count;
     int16_t angle_ofs        = 90 + (360 - scale_angle) / 2;
     int16_t min              = lv_gauge_get_min_value(gauge);
@@ -504,7 +504,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
     lv_coord_t r      = (lv_obj_get_width(gauge) - left - right) / 2 - pad;
     lv_coord_t x_ofs  = gauge->coords.x1 + r + left + pad;
     lv_coord_t y_ofs  = gauge->coords.y1 + r + top + pad;
-    uint16_t angle    = lv_lmeter_get_scale_angle(gauge);
+    uint16_t angle    = lv_linemeter_get_scale_angle(gauge);
     int16_t angle_ofs = 90 + (360 - angle) / 2;
     int16_t min       = lv_gauge_get_min_value(gauge);
     int16_t max       = lv_gauge_get_max_value(gauge);

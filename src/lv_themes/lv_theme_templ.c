@@ -138,7 +138,7 @@ static void slider_init(void)
 
 static void sw_init(void)
 {
-#if LV_USE_SW != 0
+#if LV_USE_SWITCH != 0
 
     theme.style.sw.bg       = &def;
     theme.style.sw.indic    = &def;
@@ -173,7 +173,7 @@ static void arc_init(void)
 
 static void preload_init(void)
 {
-#if LV_USE_PRELOAD != 0
+#if LV_USE_SPINNER != 0
 
     theme.style.preload = &def;
 #endif
@@ -204,7 +204,7 @@ static void calendar_init(void)
 
 static void cb_init(void)
 {
-#if LV_USE_CB != 0
+#if LV_USE_CHECKBOX != 0
 
     theme.style.cb.bg          = &def;
     theme.style.cb.box.rel     = &def;
@@ -217,7 +217,7 @@ static void cb_init(void)
 
 static void btnm_init(void)
 {
-#if LV_USE_BTNM
+#if LV_USE_BTNMATRIX
 
     theme.style.btnm.bg          = &def;
     theme.style.btnm.btn.rel     = &def;
@@ -230,7 +230,7 @@ static void btnm_init(void)
 
 static void kb_init(void)
 {
-#if LV_USE_KB
+#if LV_USE_KEYBOARD
 
     theme.style.kb.bg          = &def;
     theme.style.kb.btn.rel     = &def;
@@ -243,7 +243,7 @@ static void kb_init(void)
 
 static void mbox_init(void)
 {
-#if LV_USE_MBOX
+#if LV_USE_MSGBOX
 
     theme.style.mbox.bg      = &def;
     theme.style.mbox.btn.bg  = &def;
@@ -264,7 +264,7 @@ static void page_init(void)
 
 static void ta_init(void)
 {
-#if LV_USE_TA
+#if LV_USE_TEXTAREA
 
     theme.style.ta.area    = &def;
     theme.style.ta.oneline = &def;
@@ -290,7 +290,7 @@ static void list_init(void)
 
 static void ddlist_init(void)
 {
-#if LV_USE_DDLIST != 0
+#if LV_USE_DROPDOWN != 0
 
     theme.style.ddlist.bg  = &def;
     theme.style.ddlist.sel = &def;
@@ -309,7 +309,7 @@ static void roller_init(void)
 
 static void tabview_init(void)
 {
-#if LV_USE_TABVIEW != 0
+#if LV_USE_TEXTAREABVIEW != 0
 
     theme.style.tabview.bg          = &def;
     theme.style.tabview.indic       = &def;
@@ -323,7 +323,7 @@ static void tabview_init(void)
 
 static void table_init(void)
 {
-#if LV_USE_TABLE != 0
+#if LV_USE_TEXTAREABLE != 0
     theme.style.table.bg   = &def;
     theme.style.table.cell = &def;
 #endif

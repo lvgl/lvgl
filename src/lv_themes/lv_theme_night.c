@@ -255,7 +255,7 @@ static void slider_init(void)
 
 static void sw_init(void)
 {
-#if LV_USE_SW != 0
+#if LV_USE_SWITCH != 0
 
     theme.style.sw.bg       = theme.style.bar.bg;
     theme.style.sw.indic    = theme.style.bar.indic;
@@ -307,7 +307,7 @@ static void arc_init(void)
     arc.line.color   = lv_color_hsv_to_rgb(_hue, 80, 70);
     arc.line.rounded = 1;
 
-    /*For preloader*/
+    /*For spinner*/
     arc.body.border.width   = 7;
     arc.body.border.color   = lv_color_hsv_to_rgb(_hue, 11, 48);
     arc.body.padding.left   = 1;
@@ -321,7 +321,7 @@ static void arc_init(void)
 
 static void preload_init(void)
 {
-#if LV_USE_PRELOAD != 0
+#if LV_USE_SPINNER != 0
 
     theme.style.preload = theme.style.arc;
 #endif
@@ -402,7 +402,7 @@ static void calendar_init(void)
 
 static void cb_init(void)
 {
-#if LV_USE_CB != 0
+#if LV_USE_CHECKBOX != 0
 
     static lv_style_t rel, pr, tgl_rel, tgl_pr, ina;
 
@@ -449,7 +449,7 @@ static void cb_init(void)
 
 static void btnm_init(void)
 {
-#if LV_USE_BTNM
+#if LV_USE_BTNMATRIX
     static lv_style_t btnm_bg, rel, pr, tgl_rel, tgl_pr, ina;
 
     lv_style_copy(&btnm_bg, theme.style.btn.rel);
@@ -496,7 +496,7 @@ static void btnm_init(void)
 
 static void kb_init(void)
 {
-#if LV_USE_KB
+#if LV_USE_KEYBOARD
     theme.style.kb.bg          = &bg;
     theme.style.kb.btn.rel     = theme.style.btn.rel;
     theme.style.kb.btn.pr      = theme.style.btn.pr;
@@ -508,7 +508,7 @@ static void kb_init(void)
 
 static void mbox_init(void)
 {
-#if LV_USE_MBOX
+#if LV_USE_MSGBOX
     static lv_style_t mbox_bg;
     lv_style_copy(&mbox_bg, &bg);
     mbox_bg.body.main_color   = lv_color_hsv_to_rgb(_hue, 30, 30);
@@ -545,7 +545,7 @@ static void page_init(void)
 
 static void ta_init(void)
 {
-#if LV_USE_TA
+#if LV_USE_TEXTAREA
     theme.style.ta.area    = &panel;
     theme.style.ta.oneline = &panel;
     theme.style.ta.cursor  = NULL;
@@ -623,7 +623,7 @@ static void list_init(void)
 
 static void ddlist_init(void)
 {
-#if LV_USE_DDLIST != 0
+#if LV_USE_DROPDOWN != 0
 	static lv_style_t ddlist_bg, ddlist_sel;
     lv_style_copy(&ddlist_bg, theme.style.btn.rel);
     ddlist_bg.text.line_space     = LV_DPI / 8;
@@ -662,7 +662,7 @@ static void roller_init(void)
 
 static void tabview_init(void)
 {
-#if LV_USE_TABVIEW != 0
+#if LV_USE_TEXTAREABVIEW != 0
     theme.style.tabview.bg          = &bg;
     theme.style.tabview.indic       = &lv_style_transp;
     theme.style.tabview.btn.bg      = &lv_style_transp;
@@ -684,7 +684,7 @@ static void tileview_init(void)
 
 static void table_init(void)
 {
-#if LV_USE_TABLE != 0
+#if LV_USE_TEXTAREABLE != 0
     static lv_style_t cell;
     lv_style_copy(&cell, &panel);
     cell.body.radius         = 0;

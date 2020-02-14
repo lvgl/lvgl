@@ -267,7 +267,7 @@ static void slider_init(void)
 
 static void sw_init(void)
 {
-#if LV_USE_SW != 0
+#if LV_USE_SWITCH != 0
     static lv_style_t sw_bg, sw_indic, sw_knob_off, sw_knob_on;
     lv_style_copy(&sw_bg, theme.style.slider.bg);
     sw_bg.body.radius = LV_RADIUS_CIRCLE;
@@ -353,7 +353,7 @@ static void arc_init(void)
 
 static void preload_init(void)
 {
-#if LV_USE_PRELOAD != 0
+#if LV_USE_SPINNER != 0
 
     theme.style.preload = theme.style.arc;
 #endif
@@ -409,7 +409,7 @@ static void calendar_init(void)
 
 static void cb_init(void)
 {
-#if LV_USE_CB != 0
+#if LV_USE_CHECKBOX != 0
     static lv_style_t rel, pr, tgl_rel, tgl_pr, ina;
     lv_style_copy(&rel, theme.style.panel);
     rel.body.shadow.width = 3;
@@ -442,7 +442,7 @@ static void cb_init(void)
 
 static void btnm_init(void)
 {
-#if LV_USE_BTNM
+#if LV_USE_BTNMATRIX
     static lv_style_t bg, rel, pr, tgl_rel, tgl_pr, ina;
 
     lv_style_copy(&bg, theme.style.panel);
@@ -492,7 +492,7 @@ static void btnm_init(void)
 
 static void kb_init(void)
 {
-#if LV_USE_KB
+#if LV_USE_KEYBOARD
 
     static lv_style_t rel;
     lv_style_copy(&rel, &lv_style_transp);
@@ -509,7 +509,7 @@ static void kb_init(void)
 
 static void mbox_init(void)
 {
-#if LV_USE_MBOX
+#if LV_USE_MSGBOX
     static lv_style_t pr, rel;
 
     lv_style_copy(&rel, &lv_style_transp);
@@ -539,7 +539,7 @@ static void page_init(void)
 
 static void ta_init(void)
 {
-#if LV_USE_TA
+#if LV_USE_TEXTAREA
     static lv_style_t oneline;
 
     lv_style_copy(&oneline, &def);
@@ -626,7 +626,7 @@ static void list_init(void)
 
 static void ddlist_init(void)
 {
-#if LV_USE_DDLIST != 0
+#if LV_USE_DROPDOWN != 0
     static lv_style_t bg, sel;
     lv_style_copy(&bg, theme.style.panel);
     bg.body.padding.left   = LV_DPI / 6;
@@ -672,7 +672,7 @@ static void roller_init(void)
 
 static void tabview_init(void)
 {
-#if LV_USE_TABVIEW != 0
+#if LV_USE_TEXTAREABVIEW != 0
     static lv_style_t indic, btn_bg, rel, pr, tgl_rel, tgl_pr;
 
     lv_style_copy(&indic, &def);
@@ -752,7 +752,7 @@ static void tileview_init(void)
 
 static void table_init(void)
 {
-#if LV_USE_TABLE != 0
+#if LV_USE_TEXTAREABLE != 0
     static lv_style_t cell;
     lv_style_copy(&cell, theme.style.panel);
     cell.body.radius         = 0;

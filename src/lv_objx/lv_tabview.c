@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_tabview.h"
-#if LV_USE_TABVIEW != 0
+#if LV_USE_TEXTAREABVIEW != 0
 
 #include "lv_btnm.h"
 #include "../lv_core/lv_debug.h"
@@ -125,13 +125,13 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_size(tabview, w, h);
 
         ext->content = lv_page_create(tabview, NULL);
-        ext->btns    = lv_btnm_create(tabview, NULL);
+        ext->btns    = lv_btnmatrix_create(tabview, NULL);
         ext->indic   = lv_obj_create(ext->btns, NULL);
 
         if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(ext->content));
         lv_obj_set_signal_cb(lv_page_get_scrl(ext->content), tabview_scrl_signal);
 
-        lv_btnm_set_map(ext->btns, tab_def);
+        lv_btnmatrix_set_map(ext->btns, tab_def);
         lv_obj_set_event_cb(ext->btns, tab_btnm_event_cb);
 
         lv_obj_set_click(ext->indic, false);
@@ -151,7 +151,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_tabview_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->point_last.x           = 0;
         ext->point_last.y           = 0;
-        ext->btns                   = lv_btnm_create(tabview, copy_ext->btns);
+        ext->btns                   = lv_btnmatrix_create(tabview, copy_ext->btns);
         ext->indic                  = lv_obj_create(ext->btns, copy_ext->indic);
         ext->content                = lv_page_create(tabview, copy_ext->content);
 #if LV_USE_ANIMATION
@@ -162,7 +162,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         LV_ASSERT_MEM(ext->tab_name_ptr);
         if(ext->tab_name_ptr == NULL) return NULL;
         ext->tab_name_ptr[0] = "";
-        lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
+        lv_btnmatrix_set_map(ext->btns, ext->tab_name_ptr);
 
         lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_BG_SCRL), lv_obj_get_style_list(copy, LV_TABVIEW_PART_BG_SCRL));
         lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB_BG), lv_obj_get_style_list(copy, LV_TABVIEW_PART_TAB_BG));
@@ -289,11 +289,11 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
 
     /* The button matrix's map still points to the old `tab_name_ptr` which might be freed by
      * `lv_mem_realloc`. So make its current map invalid*/
-    lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
+    lv_btnmatrix_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
     btnm_ext->map_p          = NULL;
 
-    lv_btnm_set_map(ext->btns, ext->tab_name_ptr);
-    lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_NO_REPEAT);
+    lv_btnmatrix_set_map(ext->btns, ext->tab_name_ptr);
+    lv_btnmatrix_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNMATRIX_CTRL_NO_REPEAT);
 
     /*Set the first btn as active*/
     if(ext->tab_cnt == 1)  ext->tab_cur = 0;
@@ -326,7 +326,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 
     if(id >= ext->tab_cnt) id = ext->tab_cnt - 1;
 
-    lv_btnm_clear_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_CHECHK_STATE);
+    lv_btnmatrix_clear_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNMATRIX_CTRL_CHECHK_STATE);
 
     ext->tab_cur = id;
 
@@ -445,7 +445,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     }
 #endif
 
-    lv_btnm_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNM_CTRL_CHECHK_STATE);
+    lv_btnmatrix_set_btn_ctrl(ext->btns, ext->tab_cur, LV_BTNMATRIX_CTRL_CHECHK_STATE);
 }
 
 /**
@@ -596,8 +596,8 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
     } else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
          lv_get_state_info_t * info = param;
-         if(info->part == LV_TABVIEW_PART_TAB_BG) info->result = lv_obj_get_state_dsc(ext->btns, LV_BTNM_PART_BG);
-         else if(info->part == LV_TABVIEW_PART_TAB) info->result = lv_obj_get_state_dsc(ext->btns, LV_BTNM_PART_BTN);
+         if(info->part == LV_TABVIEW_PART_TAB_BG) info->result = lv_obj_get_state_dsc(ext->btns, LV_BTNMATRIX_PART_BG);
+         else if(info->part == LV_TABVIEW_PART_TAB) info->result = lv_obj_get_state_dsc(ext->btns, LV_BTNMATRIX_PART_BTN);
          else if(info->part == LV_TABVIEW_PART_INDIC) info->result = lv_obj_get_state_dsc(ext->indic, LV_OBJ_PART_MAIN);
          else if(info->part == LV_TABVIEW_PART_BG_SCRL) info->result = lv_obj_get_state_dsc(ext->content, LV_PAGE_PART_SCRL);
          return LV_RES_OK;
@@ -741,10 +741,10 @@ static lv_style_list_t * lv_tabview_get_style(lv_obj_t * tabview, uint8_t part)
         style_dsc_p = lv_obj_get_style_list(ext->content, LV_PAGE_PART_SCRL);
         break;
     case LV_TABVIEW_PART_TAB_BG:
-        style_dsc_p = lv_obj_get_style_list(ext->btns, LV_BTNM_PART_BG);
+        style_dsc_p = lv_obj_get_style_list(ext->btns, LV_BTNMATRIX_PART_BG);
         break;
     case LV_TABVIEW_PART_TAB:
-        style_dsc_p = lv_obj_get_style_list(ext->btns, LV_BTNM_PART_BTN);
+        style_dsc_p = lv_obj_get_style_list(ext->btns, LV_BTNMATRIX_PART_BTN);
         break;
     case LV_TABVIEW_PART_INDIC:
         style_dsc_p = lv_obj_get_style_list(ext->indic, LV_OBJ_PART_MAIN);
@@ -766,11 +766,11 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
 {
     if(event != LV_EVENT_CLICKED) return;
 
-    uint16_t btn_id = lv_btnm_get_active_btn(tab_btnm);
-    if(btn_id == LV_BTNM_BTN_NONE) return;
+    uint16_t btn_id = lv_btnmatrix_get_active_btn(tab_btnm);
+    if(btn_id == LV_BTNMATRIX_BTN_NONE) return;
 
-    lv_btnm_clear_btn_ctrl_all(tab_btnm, LV_BTNM_CTRL_CHECHK_STATE);
-    lv_btnm_set_btn_ctrl(tab_btnm, btn_id, LV_BTNM_CTRL_CHECHK_STATE);
+    lv_btnmatrix_clear_btn_ctrl_all(tab_btnm, LV_BTNMATRIX_CTRL_CHECHK_STATE);
+    lv_btnmatrix_set_btn_ctrl(tab_btnm, btn_id, LV_BTNMATRIX_CTRL_CHECHK_STATE);
 
     lv_obj_t * tabview = lv_obj_get_parent(tab_btnm);
 
@@ -806,7 +806,7 @@ static void tabview_realign(lv_obj_t * tabview)
 static void refr_indic_size(lv_obj_t * tabview)
 {
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
-    lv_btnm_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
+    lv_btnmatrix_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btns);
 
     lv_coord_t indic_size = lv_obj_get_style_size(tabview, LV_TABVIEW_PART_INDIC);
 

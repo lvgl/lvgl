@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_cb.h"
-#if LV_USE_CB != 0
+#if LV_USE_CHECKBOX != 0
 
 #include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_group.h"
@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define LV_OBJX_NAME "lv_cb"
+#define LV_OBJX_NAME "lv_checkbox"
 
 /**********************
  *      TYPEDEFS
@@ -25,8 +25,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
-static lv_style_list_t * lv_cb_get_style(lv_obj_t * cb, uint8_t type);
+static lv_res_t lv_checkbox_signal(lv_obj_t * cb, lv_signal_t sign, void * param);
+static lv_style_list_t * lv_checkbox_get_style(lv_obj_t * cb, uint8_t type);
 
 /**********************
  *  STATIC VARIABLES
@@ -47,7 +47,7 @@ static lv_signal_cb_t ancestor_signal;
  * @param copy pointer to a check box object, if not NULL then the new object will be copied from it
  * @return pointer to the created check box
  */
-lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
+lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("check box create started");
 
@@ -58,7 +58,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(cb);
 
-    lv_cb_ext_t * ext = lv_obj_allocate_ext_attr(cb, sizeof(lv_cb_ext_t));
+    lv_checkbox_ext_t * ext = lv_obj_allocate_ext_attr(cb, sizeof(lv_checkbox_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
         lv_obj_del(cb);
@@ -68,7 +68,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->bullet = NULL;
     ext->label  = NULL;
 
-    lv_obj_set_signal_cb(cb, lv_cb_signal);
+    lv_obj_set_signal_cb(cb, lv_checkbox_signal);
 
     /*Init the new checkbox object*/
     if(copy == NULL) {
@@ -77,7 +77,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
 
         ext->label = lv_label_create(cb, NULL);
 
-        lv_cb_set_text(cb, "Check box");
+        lv_checkbox_set_text(cb, "Check box");
         lv_btn_set_layout(cb, LV_LAYOUT_ROW_M);
         lv_btn_set_fit(cb, LV_FIT_TIGHT);
         lv_btn_set_checkable(cb, true);
@@ -86,7 +86,7 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_theme_apply(cb, LV_THEME_CB);
 
     } else {
-        lv_cb_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        lv_checkbox_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->bullet            = lv_obj_create(cb, copy_ext->bullet);
         ext->label             = lv_label_create(cb, copy_ext->label);
 
@@ -109,11 +109,11 @@ lv_obj_t * lv_cb_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param cb pointer to a check box
  * @param txt the text of the check box. NULL to refresh with the current text.
  */
-void lv_cb_set_text(lv_obj_t * cb, const char * txt)
+void lv_checkbox_set_text(lv_obj_t * cb, const char * txt)
 {
     LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
 
-    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+    lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
     lv_label_set_text(ext->label, txt);
 }
 
@@ -123,11 +123,11 @@ void lv_cb_set_text(lv_obj_t * cb, const char * txt)
  * @param cb pointer to a check box
  * @param txt the text of the check box. NULL to refresh with the current text.
  */
-void lv_cb_set_static_text(lv_obj_t * cb, const char * txt)
+void lv_checkbox_set_static_text(lv_obj_t * cb, const char * txt)
 {
     LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
 
-    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+    lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
     lv_label_set_static_text(ext->label, txt);
 }
 
@@ -140,11 +140,11 @@ void lv_cb_set_static_text(lv_obj_t * cb, const char * txt)
  * @param cb pointer to check box object
  * @return pointer to the text of the check box
  */
-const char * lv_cb_get_text(const lv_obj_t * cb)
+const char * lv_checkbox_get_text(const lv_obj_t * cb)
 {
     LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
 
-    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+    lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
     return lv_label_get_text(ext->label);
 }
 
@@ -159,12 +159,12 @@ const char * lv_cb_get_text(const lv_obj_t * cb)
  * @param param pointer to a signal specific variable
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
+static lv_res_t lv_checkbox_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
 {
     lv_res_t res;
     if(sign == LV_SIGNAL_GET_STYLE) {
         lv_get_style_info_t * info = param;
-        info->result = lv_cb_get_style(cb, info->part);
+        info->result = lv_checkbox_get_style(cb, info->part);
         if(info->result != NULL) return LV_RES_OK;
         else return ancestor_signal(cb, sign, param);
         return LV_RES_OK;
@@ -175,21 +175,21 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
-    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+    lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
         const lv_font_t * font = lv_obj_get_style_font(ext->label, LV_LABEL_PART_MAIN);
         lv_coord_t line_height = lv_font_get_line_height(font);
         lv_obj_set_size(ext->bullet, line_height, line_height);
-        lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CB_PART_BG));
+        lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CHECKBOX_PART_BG));
     } else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST ||
             sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS) {
-        lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CB_PART_BG));
+        lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CHECKBOX_PART_BG));
     } else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN || c == LV_KEY_LEFT || c == LV_KEY_UP) {
             /*Follow the backgrounds state with the bullet*/
-            lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CB_PART_BG));
+            lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CHECKBOX_PART_BG));
         }
     }
 
@@ -197,16 +197,16 @@ static lv_res_t lv_cb_signal(lv_obj_t * cb, lv_signal_t sign, void * param)
 }
 
 
-static lv_style_list_t * lv_cb_get_style(lv_obj_t * cb, uint8_t type)
+static lv_style_list_t * lv_checkbox_get_style(lv_obj_t * cb, uint8_t type)
 {
     lv_style_list_t * style_dsc_p;
 
-    lv_cb_ext_t * ext = lv_obj_get_ext_attr(cb);
+    lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
     switch(type) {
-    case LV_CB_PART_BG:
+    case LV_CHECKBOX_PART_BG:
         style_dsc_p = &cb->style_list;
         break;
-    case LV_CB_PART_BULLET:
+    case LV_CHECKBOX_PART_BULLET:
         style_dsc_p = lv_obj_get_style_list(ext->bullet, LV_BTN_PART_MAIN);
         break;
     default:
