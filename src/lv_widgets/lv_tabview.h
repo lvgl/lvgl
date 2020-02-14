@@ -27,8 +27,8 @@ extern "C" {
 #endif
 
 #include "../lv_core/lv_obj.h"
-#include "../lv_objx/lv_win.h"
-#include "../lv_objx/lv_page.h"
+#include "../lv_widgets/lv_win.h"
+#include "../lv_widgets/lv_page.h"
 
 /*********************
  *      DEFINES

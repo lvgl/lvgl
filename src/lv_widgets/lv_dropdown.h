@@ -26,9 +26,9 @@ extern "C" {
 #error "lv_ddlist: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
-#include "../lv_objx/lv_btn.h"
-#include "../lv_objx/lv_page.h"
-#include "../lv_objx/lv_label.h"
+#include "../lv_widgets/lv_btn.h"
+#include "../lv_widgets/lv_page.h"
+#include "../lv_widgets/lv_label.h"
 
 /*********************
  *      DEFINES

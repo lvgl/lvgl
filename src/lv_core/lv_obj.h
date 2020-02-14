@@ -477,23 +477,21 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
  *--------------------*/
 
 /**
- * Set a new style for an object
+ * Add a new stye to the style list of an object.
  * @param obj pointer to an object
- * @param style_p pointer to the new style
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param style pointer to a style to add (Only its pointer will be saved)
  */
-void lv_obj_set_style(lv_obj_t * obj, const lv_style_t * style);
+void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style);
 
-void lv_obj_set_style_color(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_color_t color);
-
-void lv_obj_set_style_int(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_style_int_t value);
-
-void lv_obj_set_style_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_opa_t opa);
-
-void lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, const void * p);
-
-void lv_obj_add_style(lv_obj_t * obj, uint8_t type, lv_style_t * style);
-
-void lv_obj_reset_style(lv_obj_t * obj, uint8_t type);
+/**
+ * Remove all styles from the objects style list. Also reset the local styles
+ * @param obj pointer to an object
+ * @param part the part of the object which style list should be reseted.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ */
+void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part);
 
 /**
  * Notify an object about its style is modified
@@ -507,6 +505,62 @@ void lv_obj_refresh_style(lv_obj_t * obj);
  *               (NULL to notify all objects)
  */
 void lv_obj_report_style_mod(lv_style_t * style);
+
+/**
+ * Set a local style property of a part of an object in a given state.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_COLOR | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param the value to set
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has color type
+ */
+void _lv_obj_set_style_color(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_color_t color);
+
+/**
+ * Set a local style property of a part of an object in a given state.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param the value to set
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has integer type
+ */
+void _lv_obj_set_style_int(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_style_int_t value);
+
+/**
+ * Set a local style property of a part of an object in a given state.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_OPA | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param the value to set
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has opacity type
+ */
+void _lv_obj_set_style_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_opa_t opa);
+
+/**
+ * Set a local style property of a part of an object in a given state.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param the value to set
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has pointer type
+ */
+void _lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, const void * value);
 
 /*-----------------
  * Attribute set
@@ -585,32 +639,19 @@ void lv_obj_set_gesture_parent(lv_obj_t * obj, bool en);
  */
 void lv_obj_set_parent_event(lv_obj_t * obj, bool en);
 
-
+/**
+ * Set the base direction of the object
+ * @param obj pointer to an object
+ * @param dir the new base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
+ */
 void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir);
-
-/**
- * Set the opa scale enable parameter (required to set opa_scale with `lv_obj_set_opa_scale()`)
- * @param obj pointer to an object
- * @param en true: opa scaling is enabled for this object and all children; false: no opa scaling
- */
-void lv_obj_set_opa_scale_enable(lv_obj_t * obj, bool en);
-
-/**
- * Set the opa scale of an object.
- * The opacity of this object and all it's children will be scaled down with this factor.
- * `lv_obj_set_opa_scale_enable(obj, true)` needs to be called to enable it.
- * (not for all children just for the parent where to start the opa scaling)
- * @param obj pointer to an object
- * @param opa_scale a factor to scale down opacity [0..255]
- */
-void lv_obj_set_opa_scale(lv_obj_t * obj, lv_opa_t opa_scale);
 
 /**
  * Set a bit or bits in the protect filed
  * @param obj pointer to an object
  * @param prot 'OR'-ed values from `lv_protect_t`
  */
-void lv_obj_set_protect(lv_obj_t * obj, uint8_t prot);
+void lv_obj_add_protect(lv_obj_t * obj, uint8_t prot);
 
 /**
  * Clear a bit or bits in the protect filed
@@ -619,10 +660,31 @@ void lv_obj_set_protect(lv_obj_t * obj, uint8_t prot);
  */
 void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot);
 
+/**
+ * Set the state (fully overwrite) of an object.
+ * If specified in the styles a transition animation will be started
+ * from the previous state to the current
+ * @param obj pointer to an object
+ * @param state the new state
+ */
 void lv_obj_set_state(lv_obj_t * obj, lv_state_t state);
 
+/**
+ * Add a given state or states to the object. The other state bits will remain unchanged.
+ * If specified in the styles a transition animation will be started
+ * from the previous state to the current
+ * @param obj pointer to an object
+ * @param state the state bits to add. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
+ */
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state);
 
+/**
+ * Remove a given state or states to the object. The other state bits will remain unchanged.
+ * If specified in the styles a transition animation will be started
+ * from the previous state to the current
+ * @param obj pointer to an object
+ * @param state the state bits to remove. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
+ */
 void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
 
 /**
@@ -869,113 +931,199 @@ lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj);
  * Appearance get
  *---------------*/
 
-lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+/**
+ * Get the style list of an obejct's part.
+ * @param obj pointer to an object.
+ * @param part part the part of the object which style list should be get.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @return pointer to the style list. (Can be `NULL`)
+ */
+lv_style_list_t * lv_obj_get_style_list(const lv_obj_t * obj, uint8_t part);
 
-lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+/**
+ * Get a style property of a part of an object in the object's current state.
+ * If there is a running transitions it is taken into account
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be get.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop the property to get. E.g. `LV_STYLE_BORDER_WIDTH`.
+ *  The state of the object will be added internally
+ * @return the value of the property of the given part in the current state.
+ * If the property is not found a default value will be returned.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_width()`
+ * @note for performance reasons it's not checked if the property really has integer type
+ */
+lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
-lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+/**
+ * Get a style property of a part of an object in the object's current state.
+ * If there is a running transitions it is taken into account
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be get.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop the property to get. E.g. `LV_STYLE_BORDER_COLOR`.
+ *  The state of the object will be added internally
+ * @return the value of the property of the given part in the current state.
+ * If the property is not found a default value will be returned.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_color()`
+ * @note for performance reasons it's not checked if the property really has color type
+ */
+lv_color_t _lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
-const void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t type, lv_style_property_t prop);
+/**
+ * Get a style property of a part of an object in the object's current state.
+ * If there is a running transitions it is taken into account
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be get.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop the property to get. E.g. `LV_STYLE_BORDER_OPA`.
+ *  The state of the object will be added internally
+ * @return the value of the property of the given part in the current state.
+ * If the property is not found a default value will be returned.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has opacity type
+ */
+lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
+/**
+ * Get a style property of a part of an object in the object's current state.
+ * If there is a running transitions it is taken into account
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be get.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop the property to get. E.g. `LV_STYLE_TEXT_FONT`.
+ *  The state of the object will be added internally
+ * @return the value of the property of the given part in the current state.
+ * If the property is not found a default value will be returned.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has pointer type
+ */
+const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
-lv_style_list_t * lv_obj_get_style_list(const lv_obj_t * obj, uint8_t type);
+/**
+ * Macro to declare the most important style set/get API functions.
+ *
+ * - Get the value of a style property from an object in the object's current state.
+ *   If there is a transition animation in progress calculate the value accordingly.
+ *   If the property is not set in the object's style check the parent(s) if the property can be inherited
+ *   If still not found return a default value.
+ *   For example:
+ *      `lv_obj_get_style_border_width(btn1, LV_BTN_PART_MAIN);`
+ *
+ * - Set a local style property for an object in a given state
+ *   For example:
+ *      `lv_obj_set_style_border_width(btn1, LV_BTN_PART_MAIN, LV_STATE_PRESSED, 2);`
+ *
+ *  - Get the value from a style in a given state:
+ *    For example
+ *      `int16_t weight = lv_style_get_border_width(&style1, LV_STATE_PRESSED, &result);`
+ *      `if(weight > 0) ...the property is found and loaded into result...`
+ *
+ *  - Set a value in a style in a given state
+ *     For example
+ *       `lv_style_set_border_width(&style1, LV_STATE_PRESSED, 2);`
+ */
 
-#define LV_OBJ_STYLE_SET_GET_DECLARE(prop_name, func_name, value_type, style_type)          \
+#define _LV_OBJ_STYLE_SET_GET_DECLARE(prop_name, func_name, value_type, style_type)          \
 static inline value_type lv_obj_get_style_##func_name (const lv_obj_t * obj, uint8_t part)  \
 {                                                                                           \
-    return (value_type) lv_obj_get_style##style_type (obj, part, LV_STYLE_##prop_name);     \
+    return (value_type) _lv_obj_get_style##style_type (obj, part, LV_STYLE_##prop_name);     \
 }                                                                                           \
 static inline void lv_obj_set_style_##func_name (lv_obj_t * obj, uint8_t part, lv_state_t state, value_type value)  \
 {                                                                                           \
-    lv_obj_set_style##style_type (obj, part, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                  \
+    _lv_obj_set_style##style_type (obj, part, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                  \
 }                                                                                           \
 static inline int16_t lv_style_get_##func_name (lv_style_t * style, lv_state_t state, void * res)             \
 {                                                                                           \
-    return lv_style_get##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), res);                     \
+    return _lv_style_get##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), res);                     \
 }                                                                                           \
 static inline void lv_style_set_##func_name (lv_style_t * style, lv_state_t state, value_type value)          \
 {                                                                                           \
-    lv_style_set##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                          \
+    _lv_style_set##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                          \
 }                                                                                           \
 
+_LV_OBJ_STYLE_SET_GET_DECLARE(RADIUS, radius, lv_style_int_t,_int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(CLIP_CORNER, clip_corner, bool, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_TIME, transition_time, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SIZE, size, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(OPA_SCALE, opa_scale, lv_opa_t, _opa);
+_LV_OBJ_STYLE_SET_GET_DECLARE(PAD_TOP, pad_top, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(PAD_BOTTOM, pad_bottom, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(PAD_LEFT, pad_left, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(PAD_RIGHT, pad_right, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(PAD_INNER, pad_inner, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BG_BLEND_MODE, bg_blend_mode, lv_blend_mode_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BG_MAIN_STOP, bg_main_stop, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BG_GRAD_STOP, bg_grad_stop, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BG_GRAD_DIR, bg_grad_dir, lv_grad_dir_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BG_COLOR, bg_color, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BG_GRAD_COLOR, bg_grad_color, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BG_OPA, bg_opa, lv_opa_t , _opa);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_WIDTH, border_width, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_SIDE, border_side, lv_border_side_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_BLEND_MODE, border_blend_mode, lv_blend_mode_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_POST, border_post, bool, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_COLOR, border_color, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_OPA, border_opa, lv_opa_t, _opa);
+_LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_WIDTH, outline_width, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_PAD, outline_pad, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_BLEND_MODE, outline_blend_mode, lv_blend_mode_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_COLOR, outline_color, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_OPA, outline_opa, lv_opa_t, _opa);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_WIDTH, shadow_width, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_OFFSET_X, shadow_offset_x, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_OFFSET_Y, shadow_offset_y, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_SPREAD, shadow_spread, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_BLEND_MODE, shadow_blend_mode, lv_blend_mode_t, _int );
+_LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_COLOR, shadow_color, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_OPA, shadow_opa, lv_opa_t, _opa);
+_LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_REPEAT, pattern_repeat, bool, _int );
+_LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_BLEND_MODE, pattern_blend_mode, lv_blend_mode_t, _int );
+_LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_RECOLOR, pattern_recolor, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_OPA, pattern_opa, lv_opa_t, _opa);
+_LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_RECOLOR_OPA, pattern_recolor_opa, lv_opa_t, _opa);
+_LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_IMAGE, pattern_image, const void *, _ptr);
+_LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_LETTER_SPACE, value_letter_space, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_LINE_SPACE, value_line_space, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_BLEND_MODE, value_blend_mode, lv_blend_mode_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_OFS_X, value_ofs_x, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_OFS_Y, value_ofs_y, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_ALIGN, value_align, lv_align_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_COLOR, value_color, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_OPA, value_opa, lv_opa_t, _opa);
+_LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_FONT, value_font, const lv_font_t * , _ptr);
+_LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_STR, value_str, const char * , _ptr);
+_LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_LETTER_SPACE, text_letter_space, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_LINE_SPACE, text_line_space, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_BLEND_MODE, text_blend_mode, lv_blend_mode_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_COLOR, text_color, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_SEL_COLOR, text_sel_color, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_OPA, text_opa, lv_opa_t, _opa);
+_LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_FONT, font, const lv_font_t * , _ptr);
+_LV_OBJ_STYLE_SET_GET_DECLARE(LINE_WIDTH, line_width, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(LINE_BLEND_MODE, line_blend_mode, lv_blend_mode_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(LINE_DASH_WIDTH, line_dash_width, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(LINE_DASH_GAP, line_dash_gap, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(LINE_ROUNDED, line_rounded, bool, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(LINE_COLOR, line_color, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(LINE_OPA, line_opa, lv_opa_t, _opa);
+_LV_OBJ_STYLE_SET_GET_DECLARE(IMAGE_BLEND_MODE, image_blend_mode, lv_blend_mode_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(IMAGE_RECOLOR, image_recolor, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(IMAGE_OPA, image_opa, lv_opa_t, _opa);
+_LV_OBJ_STYLE_SET_GET_DECLARE(IMAGE_RECOLOR_OPA, image_recolor_opa, lv_opa_t, _opa);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_WIDTH, scale_width, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_BORDER_WIDTH, scale_border_width, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_BORDER_WIDTH, scale_end_border_width, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_LINE_WIDTH, scale_end_line_width, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_COLOR, scale_color, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_GRAD_COLOR, scale_grad_color, lv_color_t, _color);
+_LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_COLOR, scale_end_color, lv_color_t, _color);
 
-LV_OBJ_STYLE_SET_GET_DECLARE(RADIUS, radius, lv_style_int_t,_int);
-LV_OBJ_STYLE_SET_GET_DECLARE(CLIP_CORNER, clip_corner, bool, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_TIME, transition_time, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(SIZE, size, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(OPA_SCALE, opa_scale, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(PAD_TOP, pad_top, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(PAD_BOTTOM, pad_bottom, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(PAD_LEFT, pad_left, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(PAD_RIGHT, pad_right, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(PAD_INNER, pad_inner, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(BG_BLEND_MODE, bg_blend_mode, lv_blend_mode_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(BG_MAIN_STOP, bg_main_stop, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(BG_GRAD_STOP, bg_grad_stop, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(BG_GRAD_DIR, bg_grad_dir, lv_grad_dir_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(BG_COLOR, bg_color, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(BG_GRAD_COLOR, bg_grad_color, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(BG_OPA, bg_opa, lv_opa_t , _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_WIDTH, border_width, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_SIDE, border_side, lv_border_side_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_BLEND_MODE, border_blend_mode, lv_blend_mode_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_POST, border_post, bool, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_COLOR, border_color, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(BORDER_OPA, border_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_WIDTH, outline_width, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_PAD, outline_pad, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_BLEND_MODE, outline_blend_mode, lv_blend_mode_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_COLOR, outline_color, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(OUTLINE_OPA, outline_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_WIDTH, shadow_width, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_OFFSET_X, shadow_offset_x, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_OFFSET_Y, shadow_offset_y, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_SPREAD, shadow_spread, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_BLEND_MODE, shadow_blend_mode, lv_blend_mode_t, _int );
-LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_COLOR, shadow_color, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(SHADOW_OPA, shadow_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_REPEAT, pattern_repeat, bool, _int );
-LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_BLEND_MODE, pattern_blend_mode, lv_blend_mode_t, _int );
-LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_RECOLOR, pattern_recolor, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_OPA, pattern_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_RECOLOR_OPA, pattern_recolor_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(PATTERN_IMAGE, pattern_image, const void *, _ptr);
-LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_LETTER_SPACE, value_letter_space, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_LINE_SPACE, value_line_space, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_BLEND_MODE, value_blend_mode, lv_blend_mode_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_OFS_X, value_ofs_x, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_OFS_Y, value_ofs_y, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_ALIGN, value_align, lv_align_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_COLOR, value_color, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_OPA, value_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_FONT, value_font, const lv_font_t * , _ptr);
-LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_STR, value_str, const char * , _ptr);
-LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_LETTER_SPACE, text_letter_space, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_LINE_SPACE, text_line_space, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_BLEND_MODE, text_blend_mode, lv_blend_mode_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_COLOR, text_color, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_SEL_COLOR, text_sel_color, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_OPA, text_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_FONT, font, const lv_font_t * , _ptr);
-LV_OBJ_STYLE_SET_GET_DECLARE(LINE_WIDTH, line_width, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(LINE_BLEND_MODE, line_blend_mode, lv_blend_mode_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(LINE_DASH_WIDTH, line_dash_width, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(LINE_DASH_GAP, line_dash_gap, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(LINE_ROUNDED, line_rounded, bool, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(LINE_COLOR, line_color, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(LINE_OPA, line_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(IMAGE_BLEND_MODE, image_blend_mode, lv_blend_mode_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(IMAGE_RECOLOR, image_recolor, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(IMAGE_OPA, image_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(IMAGE_RECOLOR_OPA, image_recolor_opa, lv_opa_t, _opa);
-LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_WIDTH, scale_width, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_BORDER_WIDTH, scale_border_width, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_BORDER_WIDTH, scale_end_border_width, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_LINE_WIDTH, scale_end_line_width, lv_style_int_t, _int);
-LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_COLOR, scale_color, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_GRAD_COLOR, scale_grad_color, lv_color_t, _color);
-LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_COLOR, scale_end_color, lv_color_t, _color);
-
+#undef _LV_OBJ_STYLE_SET_GET_DECLARE
 /*-----------------
  * Attribute get
  *----------------*/

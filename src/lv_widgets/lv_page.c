@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_objx/lv_page.h"
+#include "../lv_widgets/lv_page.h"
 #if LV_USE_PAGE != 0
 
 #include "../lv_core/lv_debug.h"
@@ -118,7 +118,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->scrl = lv_cont_create(page, NULL);
         lv_obj_set_drag(ext->scrl, true);
         lv_obj_set_drag_throw(ext->scrl, true);
-        lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT | LV_PROTECT_PRESS_LOST);
+        lv_obj_add_protect(ext->scrl, LV_PROTECT_PARENT | LV_PROTECT_PRESS_LOST);
         lv_cont_set_fit4(ext->scrl, LV_FIT_MAX, LV_FIT_MAX, LV_FIT_MAX, LV_FIT_MAX);
         lv_obj_set_event_cb(ext->scrl, scrl_def_event_cb); /*Propagate some event to the background
                                                               object by default for convenience */

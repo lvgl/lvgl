@@ -1068,55 +1068,12 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
  *--------------------*/
 
 /**
- * Set a new style for an object
+ * Add a new stye to the style list of an object.
  * @param obj pointer to an object
- * @param style_p pointer to the new style
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param style pointer to a style to add (Only its pointer will be saved)
  */
-//void lv_obj_set_style(lv_obj_t * obj, const lv_style_t * style)
-//{
-//    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-//    if(style) {
-//        LV_ASSERT_STYLE(style);
-//    }
-//
-//    obj->style_p = style;
-//
-//    /*Send a signal about style change to every children with NULL style*/
-//    refresh_children_style(obj);
-//
-//    /*Notify the object about the style change too*/
-//    lv_obj_refresh_style(obj);
-//}
-
-
-void lv_obj_set_style_color(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_color_t color)
-{
-    lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
-    lv_style_list_set_local_color(style_dsc, prop, color);
-    lv_obj_refresh_style(obj);
-}
-
-void lv_obj_set_style_int(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_int_t value)
-{
-    lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
-    lv_style_list_set_local_int(style_dsc, prop, value);
-    lv_obj_refresh_style(obj);
-}
-
-void lv_obj_set_style_opa(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_opa_t opa)
-{
-    lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
-    lv_style_list_set_local_opa(style_dsc, prop, opa);
-    lv_obj_refresh_style(obj);
-}
-
-void lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, const void * p)
-{
-    lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
-    lv_style_list_set_local_ptr(style_dsc, prop, p);
-    lv_obj_refresh_style(obj);
-}
-
 void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style)
 {
     if(style == NULL) return;
@@ -1132,8 +1089,13 @@ void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style)
     lv_obj_refresh_style(obj);
 }
 
-
-void lv_obj_reset_style(lv_obj_t * obj, uint8_t part)
+/**
+ * Remove all styles from the objects style list. Also reset the local styles
+ * @param obj pointer to an object
+ * @param part the part of the object which style list should be reseted.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ */
+void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part)
 {
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     if(style_dsc == NULL) {
@@ -1146,6 +1108,81 @@ void lv_obj_reset_style(lv_obj_t * obj, uint8_t part)
     lv_obj_refresh_style(obj);
 }
 
+/**
+ * Set a local style property of a part of an object in a given state.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param the value to set
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has integer type
+ */
+void _lv_obj_set_style_int(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_int_t value)
+{
+    lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
+    lv_style_list_set_local_int(style_dsc, prop, value);
+    lv_obj_refresh_style(obj);
+}
+
+/**
+ * Set a local style property of a part of an object in a given state.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_COLOR | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param the value to set
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has color type
+ */
+void _lv_obj_set_style_color(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_color_t color)
+{
+    lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
+    lv_style_list_set_local_color(style_dsc, prop, color);
+    lv_obj_refresh_style(obj);
+}
+
+/**
+ * Set a local style property of a part of an object in a given state.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_OPA | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param the value to set
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has opacity type
+ */
+void _lv_obj_set_style_opa(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_opa_t opa)
+{
+    lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
+    lv_style_list_set_local_opa(style_dsc, prop, opa);
+    lv_obj_refresh_style(obj);
+}
+
+/**
+ * Set a local style property of a part of an object in a given state.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param the value to set
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has pointer type
+ */
+void _lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, const void * p)
+{
+    lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
+    lv_style_list_set_local_ptr(style_dsc, prop, p);
+    lv_obj_refresh_style(obj);
+}
 
 /**
  * Notify an object (and its children) about its style is modified
@@ -1312,6 +1349,11 @@ void lv_obj_set_parent_event(lv_obj_t * obj, bool en)
     obj->parent_event = (en == true ? 1 : 0);
 }
 
+/**
+ * Set the base direction of the object
+ * @param obj pointer to an object
+ * @param dir the new base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
+ */
 void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
 {
     if(dir != LV_BIDI_DIR_LTR && dir != LV_BIDI_DIR_RTL &&
@@ -1334,7 +1376,7 @@ void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
  * @param obj pointer to an object
  * @param prot 'OR'-ed values from `lv_protect_t`
  */
-void lv_obj_set_protect(lv_obj_t * obj, uint8_t prot)
+void lv_obj_add_protect(lv_obj_t * obj, uint8_t prot)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1354,6 +1396,13 @@ void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot)
     obj->protect &= prot;
 }
 
+/**
+ * Set the state (fully overwrite) of an object.
+ * If specified in the styles a transition animation will be started
+ * from the previous state to the current
+ * @param obj pointer to an object
+ * @param state the new state
+ */
 void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 {
     if(obj->state_dsc.act == new_state) return;
@@ -1395,6 +1444,13 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
 }
 
+/**
+ * Add a given state or states to the object. The other state bits will remain unchanged.
+ * If specified in the styles a transition animation will be started
+ * from the previous state to the current
+ * @param obj pointer to an object
+ * @param state the state bits to add. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
+ */
 void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -1405,6 +1461,13 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state)
     }
 }
 
+/**
+ * Remove a given state or states to the object. The other state bits will remain unchanged.
+ * If specified in the styles a transition animation will be started
+ * from the previous state to the current
+ * @param obj pointer to an object
+ * @param state the state bits to remove. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
+ */
 void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
@@ -1999,8 +2062,21 @@ lv_style_list_t * lv_obj_get_style_list(const lv_obj_t * obj, uint8_t part)
     return info.result;
 }
 
-
-lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+/**
+ * Get a style property of a part of an object in the object's current state.
+ * If there is a running transitions it is taken into account
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be get.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop the property to get. E.g. `LV_STYLE_BORDER_WIDTH`.
+ *  The state of the object will be added internally
+ * @return the value of the property of the given part in the current state.
+ * If the property is not found a default value will be returned.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_width()`
+ * @note for performance reasons it's not checked if the property really has integer type
+ */
+lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
     lv_style_property_t prop_ori = prop;
 
@@ -2075,9 +2151,21 @@ lv_style_int_t lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style
     return 0;
 }
 
-
-
-lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+/**
+ * Get a style property of a part of an object in the object's current state.
+ * If there is a running transitions it is taken into account
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be get.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop the property to get. E.g. `LV_STYLE_BORDER_COLOR`.
+ *  The state of the object will be added internally
+ * @return the value of the property of the given part in the current state.
+ * If the property is not found a default value will be returned.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_color()`
+ * @note for performance reasons it's not checked if the property really has color type
+ */
+lv_color_t _lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
     lv_style_property_t prop_ori = prop;
 
@@ -2129,7 +2217,21 @@ lv_color_t lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_p
     return LV_COLOR_BLACK;
 }
 
-lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+/**
+ * Get a style property of a part of an object in the object's current state.
+ * If there is a running transitions it is taken into account
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be get.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop the property to get. E.g. `LV_STYLE_BORDER_OPA`.
+ *  The state of the object will be added internally
+ * @return the value of the property of the given part in the current state.
+ * If the property is not found a default value will be returned.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has opacity type
+ */
+lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
     lv_style_property_t prop_ori = prop;
 
@@ -2175,24 +2277,28 @@ lv_opa_t lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prope
     /*Handle unset values*/
     prop = prop & (~LV_STYLE_STATE_MASK);
     switch(prop) {
-    case LV_STYLE_OPA_SCALE:
-    case LV_STYLE_TEXT_OPA:
-    case LV_STYLE_IMAGE_OPA:
-    case LV_STYLE_LINE_OPA:
-    case LV_STYLE_BORDER_OPA:
-    case LV_STYLE_OUTLINE_OPA:
-    case LV_STYLE_SHADOW_OPA:
-    case LV_STYLE_PATTERN_OPA:
-    case LV_STYLE_VALUE_OPA:
-        return LV_OPA_COVER;
+    case LV_STYLE_BG_OPA:
+        return LV_OPA_TRANSP;
     }
 
-    return LV_OPA_TRANSP;
-
+    return LV_OPA_COVER;
 }
 
-
-const void * lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+/**
+ * Get a style property of a part of an object in the object's current state.
+ * If there is a running transitions it is taken into account
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be get.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param prop the property to get. E.g. `LV_STYLE_TEXT_FONT`.
+ *  The state of the object will be added internally
+ * @return the value of the property of the given part in the current state.
+ * If the property is not found a default value will be returned.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_obj_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has pointer type
+ */
+const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
     lv_style_property_t prop_ori = prop;
 

@@ -18,7 +18,7 @@ extern "C" {
 #if LV_USE_OBJMASK != 0
 
 #include "../lv_core/lv_obj.h"
-#include "../lv_objx/lv_cont.h"
+#include "../lv_widgets/lv_cont.h"
 
 /*********************
  *      DEFINES

@@ -93,14 +93,14 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_size(new_win, w, h);
 
         ext->page = lv_page_create(new_win, NULL);
-        lv_obj_set_protect(ext->page, LV_PROTECT_PARENT);
+        lv_obj_add_protect(ext->page, LV_PROTECT_PARENT);
         lv_page_set_sb_mode(ext->page, LV_SB_MODE_AUTO);
         lv_style_list_reset(lv_obj_get_style_list(ext->page, LV_PAGE_PART_BG));
 
         /*Create a holder for the header*/
         ext->header = lv_obj_create(new_win, NULL);
         /*Move back to window background because it's automatically moved to the content page*/
-        lv_obj_set_protect(ext->header, LV_PROTECT_PARENT);
+        lv_obj_add_protect(ext->header, LV_PROTECT_PARENT);
         lv_obj_set_parent(ext->header, new_win);
         if(ancestor_header_design == NULL) ancestor_header_design= lv_obj_get_design_cb(ext->header);
         lv_obj_set_height(ext->header, LV_DPI / 2);
@@ -467,7 +467,6 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
         lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
         lv_style_int_t left = lv_obj_get_style_pad_left(header, LV_OBJ_PART_MAIN);
-        lv_style_int_t top = lv_obj_get_style_pad_top(header, LV_OBJ_PART_MAIN);
 
         lv_draw_label_dsc_t label_dsc;
         lv_draw_label_dsc_init(&label_dsc);

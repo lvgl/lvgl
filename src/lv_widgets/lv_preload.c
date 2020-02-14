@@ -39,7 +39,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_design_res_t lv_spinner_design(lv_obj_t * preload, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_spinner_signal(lv_obj_t * preload, lv_signal_t sign, void * param);
 
 /**********************
@@ -91,7 +90,6 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(preload, lv_spinner_signal);
-//    lv_obj_set_design_cb(preload, lv_spinner_design);
 
     /*Init the new spinner spinner*/
     if(copy == NULL) {
@@ -327,60 +325,6 @@ void lv_spinner_spinner_anim(void * ptr, lv_anim_value_t val)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-/**
- * Handle the drawing related tasks of the pre loaders
- * @param preload pointer to an object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_design_res_t`
- */
-static lv_design_res_t lv_spinner_design(lv_obj_t * preload, const lv_area_t * clip_area, lv_design_mode_t mode)
-{
-//    /*Return false if the object is not covers the mask_p area*/
-//    if(mode == LV_DESIGN_COVER_CHK) {
-//        return LV_DESIGN_RES_NOT_COVER;
-//    }
-//    /*Draw the object*/
-//    else if(mode == LV_DESIGN_DRAW_MAIN) {
-//
-//        /*Draw a circle as background*/
-//        const lv_style_t * style = lv_arc_get_style(preload, LV_ARC_STYLE_MAIN);
-//        if(style->body.border.width > 0) {
-//            lv_coord_t r = (LV_MATH_MIN(lv_obj_get_width(preload), lv_obj_get_height(preload))) / 2;
-//            r -= LV_MATH_MIN(style->body.padding.left, style->body.padding.top);
-//
-//            lv_coord_t x = preload->coords.x1 + lv_obj_get_width(preload) / 2;
-//            lv_coord_t y = preload->coords.y1 + lv_obj_get_height(preload) / 2;
-//
-//            lv_style_t bg_style;
-//            lv_style_copy(&bg_style, &lv_style_plain);
-//            bg_style.body.opa          = LV_OPA_TRANSP;
-//            bg_style.body.radius       = LV_RADIUS_CIRCLE;
-//            bg_style.body.border.color = style->body.border.color;
-//            bg_style.body.border.width = style->body.border.width;
-//            bg_style.body.border.opa = style->body.border.opa;
-//
-//            lv_area_t bg_area;
-//            bg_area.x1 = x - r;
-//            bg_area.y1 = y - r;
-//            bg_area.x2 = x + r;
-//            bg_area.y2 = y + r;
-//
-//            lv_draw_rect(&bg_area, clip_area, &bg_style, lv_obj_get_opa_scale(preload));
-//        }
-//        /*Draw the arc above the background circle */
-//        ancestor_design(preload, clip_area, mode);
-//    }
-//    /*Post draw when the children are drawn*/
-//    else if(mode == LV_DESIGN_DRAW_POST) {
-//    }
-
-    return LV_DESIGN_RES_OK;
-}
 
 /**
  * Signal function of the pre loader

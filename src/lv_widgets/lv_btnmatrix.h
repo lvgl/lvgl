@@ -169,7 +169,7 @@ void lv_btnmatrix_clear_btn_ctrl_all(lv_obj_t * btnm, lv_btnmatrix_ctrl_t ctrl);
  * @param btn_id 0 based index of the button to modify.
  * @param width Relative width compared to the buttons in the same row. [1..7]
  */
-void lv_btnmatrix_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width);
+void lv_btnmatrix_set_btn_width(lv_obj_t * btnm, uint16_t btn_id, uint8_t width);
 
 /**
  * Make the button matrix like a selector widget (only one button may be toggled at a time).

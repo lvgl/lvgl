@@ -367,7 +367,7 @@ static void lv_cont_layout_col(lv_obj_t * cont)
 
     /* Disable child change action because the children will be moved a lot
      * an unnecessary child change signals could be sent*/
-    lv_obj_set_protect(cont, LV_PROTECT_CHILD_CHG);
+    lv_obj_add_protect(cont, LV_PROTECT_CHILD_CHG);
     /* Align the children */
     lv_coord_t last_cord = top;
     LV_LL_READ_BACK(cont->child_ll, child)
@@ -416,7 +416,7 @@ static void lv_cont_layout_row(lv_obj_t * cont)
 
     /* Disable child change action because the children will be moved a lot
      * an unnecessary child change signals could be sent*/
-    lv_obj_set_protect(cont, LV_PROTECT_CHILD_CHG);
+    lv_obj_add_protect(cont, LV_PROTECT_CHILD_CHG);
 
     /* Align the children */
     lv_coord_t last_cord;
@@ -462,7 +462,7 @@ static void lv_cont_layout_center(lv_obj_t * cont)
 
     /* Disable child change action because the children will be moved a lot
      * an unnecessary child change signals could be sent*/
-    lv_obj_set_protect(cont, LV_PROTECT_CHILD_CHG);
+    lv_obj_add_protect(cont, LV_PROTECT_CHILD_CHG);
 
     /* Align the children */
     lv_coord_t last_cord = -(h_tot / 2);
@@ -495,7 +495,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
     child_rs = lv_ll_get_tail(&cont->child_ll); /*Set the row starter child*/
     if(child_rs == NULL) return;                /*Return if no child*/
 
-    lv_obj_set_protect(cont, LV_PROTECT_CHILD_CHG);
+    lv_obj_add_protect(cont, LV_PROTECT_CHILD_CHG);
     lv_coord_t left          =  lv_obj_get_style_pad_left(cont, LV_CONT_PART_MAIN);
     lv_coord_t right         =  lv_obj_get_style_pad_right(cont, LV_CONT_PART_MAIN);
     lv_coord_t inner = lv_obj_get_style_pad_inner(cont, LV_CONT_PART_MAIN);
@@ -598,7 +598,7 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
 
     /* Disable child change action because the children will be moved a lot
      * an unnecessary child change signals could be sent*/
-    lv_obj_set_protect(cont, LV_PROTECT_CHILD_CHG);
+    lv_obj_add_protect(cont, LV_PROTECT_CHILD_CHG);
 
     /* Align the children */
     lv_coord_t left = lv_obj_get_style_pad_left(cont, LV_CONT_PART_MAIN);

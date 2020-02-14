@@ -17,7 +17,7 @@ extern "C" {
 
 #if LV_USE_TILEVIEW != 0
 
-#include "../lv_objx/lv_page.h"
+#include "../lv_widgets/lv_page.h"
 
 /*********************
  *      DEFINES

@@ -149,7 +149,7 @@ void lv_msgbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
     if(ext->btnm == NULL) {
         ext->btnm = lv_btnmatrix_create(mbox, NULL);
 
-        lv_theme_alien_apply(mbox, LV_THEME_MSGBOX_BTNS);
+        lv_theme_apply(mbox, LV_THEME_MSGBOX_BTNS);
     }
 
     lv_btnmatrix_set_map(ext->btnm, btn_map);

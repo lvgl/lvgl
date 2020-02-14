@@ -18,7 +18,7 @@ extern "C" {
 #if LV_USE_CANVAS != 0
 
 #include "../lv_core/lv_obj.h"
-#include "../lv_objx/lv_img.h"
+#include "../lv_widgets/lv_img.h"
 #include "../lv_draw/lv_draw_img.h"
 
 /*********************

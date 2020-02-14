@@ -88,7 +88,7 @@ lv_obj_t * lv_switch_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new switch switch*/
     if(copy == NULL) {
         lv_obj_set_click(sw, true);
-        lv_obj_set_protect(sw, LV_PROTECT_PRESS_LOST);
+        lv_obj_add_protect(sw, LV_PROTECT_PRESS_LOST);
         lv_obj_set_size(sw, LV_DPI / 2, LV_DPI / 4);
         lv_bar_set_range(sw, 0, 1);
 

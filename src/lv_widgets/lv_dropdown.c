@@ -449,8 +449,8 @@ void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
     if(ext->page) return;
 
     ext->page = lv_page_create(lv_obj_get_screen(ddlist), NULL);
-    lv_obj_set_protect(ext->page, LV_PROTECT_POS | LV_PROTECT_CLICK_FOCUS);
-    lv_obj_set_protect(lv_page_get_scrl(ext->page), LV_PROTECT_CLICK_FOCUS);
+    lv_obj_add_protect(ext->page, LV_PROTECT_POS | LV_PROTECT_CLICK_FOCUS);
+    lv_obj_add_protect(lv_page_get_scrl(ext->page), LV_PROTECT_CLICK_FOCUS);
 
     if(ancestor_page_signal == NULL) ancestor_page_signal = lv_obj_get_signal_cb(ext->page);
     if(ancestor_page_scrl_signal == NULL) ancestor_page_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(ext->page));
@@ -485,10 +485,6 @@ void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
     lv_obj_set_height(ext->page, list_h);
 
     pos_selected(ddlist);
-
-    lv_disp_t * disp  = lv_obj_get_disp(ddlist);
-    lv_coord_t vres = lv_disp_get_ver_res(disp);
-    lv_coord_t hres = lv_disp_get_hor_res(disp);
 
     if(ext->dir == LV_DROPDOWN_DIR_DOWN)      lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
     else if(ext->dir == LV_DROPDOWN_DIR_UP)   lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_TOP_LEFT, 0, 0);

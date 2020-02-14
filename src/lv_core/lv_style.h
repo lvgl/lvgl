@@ -242,7 +242,6 @@ static inline lv_style_t * lv_style_list_get_style(lv_style_list_t * list, uint8
     if(list->style_cnt == 0 || id >= list->style_cnt) return NULL;
 
     return list->style_list[id];
-
 }
 
 /**
@@ -266,35 +265,205 @@ uint16_t lv_style_get_mem_size(const lv_style_t * style);
 void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
 
 /**
- * Mix two styles according to a given ratio
- * @param start start style
- * @param end end style
- * @param res store the result style here
- * @param ratio the ratio of mix [0..256]; 0: `start` style; 256: `end` style
+ * Set an integer typed property in a style.
+ * @param style pointer to a style where the property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note shouldn't be used directly. Use the specific property set functions instead.
+ *       For example: `lv_style_set_border_width()`
+ * @note for performance reasons it's not checked if the property really has integer type
  */
-void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res, uint16_t ratio);
+void _lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_int_t value);
 
-void lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_int_t value);
-void lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_t color);
-void lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa);
-void lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void * p);
+/**
+ * Set a color typed property in a style.
+ * @param style pointer to a style where the property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_COLOR | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note shouldn't be used directly. Use the specific property set functions instead.
+ *       For example: `lv_style_set_border_color()`
+ * @note for performance reasons it's not checked if the property really has color type
+ */
+void _lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_t color);
 
-int16_t lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res);
-int16_t lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res);
-int16_t lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res);
-int16_t lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void ** res);
+/**
+ * Set an opacity typed property in a style.
+ * @param style pointer to a style where the property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_OPA | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note shouldn't be used directly. Use the specific property set functions instead.
+ *       For example: `lv_style_set_border_opa()`
+ * @note for performance reasons it's not checked if the property really has opacity type
+ */
+void _lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa);
 
-void lv_style_list_set_local_int(lv_style_list_t * dsc, lv_style_property_t prop, lv_style_int_t value);
-void lv_style_list_set_local_opa(lv_style_list_t * dsc, lv_style_property_t prop, lv_opa_t value);
-void lv_style_list_set_local_color(lv_style_list_t * dsc, lv_style_property_t prop, lv_color_t value);
-void lv_style_list_set_local_ptr(lv_style_list_t * dsc, lv_style_property_t prop, const void * value);
+/**
+ * Set a pointer typed property in a style.
+ * @param style pointer to a style where the property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_POINTER | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note shouldn't be used directly. Use the specific property set functions instead.
+ *       For example: `lv_style_set_border_width()`
+ * @note for performance reasons it's not checked if the property really has pointer type
+ */
+void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void * p);
 
-lv_res_t lv_style_list_get_int(lv_style_list_t * dsc, lv_style_property_t prop, lv_style_int_t * value);
-lv_res_t lv_style_list_get_color(lv_style_list_t * dsc, lv_style_property_t prop, lv_color_t * value);
-lv_res_t lv_style_list_get_opa(lv_style_list_t * dsc, lv_style_property_t prop, lv_opa_t * value);
-lv_res_t lv_style_list_get_ptr(lv_style_list_t * dsc, lv_style_property_t prop, void ** value);
+/**
+ * Get an integer typed property from a style.
+ * @param style pointer to a style from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result value
+ * @return -1: the property wasn't found in the style.
+ *         The matching state bits of the desired state (in `prop`) and the best matching property's state
+ *         Higher value means match in higher precedence state.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_style_get_border_width()`
+ * @note for performance reasons it's not checked if the property really has integer type
+ */
+int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res);
 
-lv_opa_t lv_style_get_def_opa(lv_style_property_t prop);
+/**
+ * Get a color typed property from a style.
+ * @param style pointer to a style from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_COLOR | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result value
+ * @return -1: the property wasn't found in the style.
+ *         The matching state bits of the desired state (in `prop`) and the best matching property's state
+ *         Higher value means match in higher precedence state.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_style_get_border_color()`
+ * @note for performance reasons it's not checked if the property really has color type
+ */
+int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res);
+
+/**
+ * Get an opacity typed property from a style.
+ * @param style pointer to a style from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_OPA | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result value
+ * @return -1: the property wasn't found in the style.
+ *         The matching state bits of the desired state (in `prop`) and the best matching property's state
+ *         Higher value means match in higher precedence state.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has opacity type
+ */
+int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res);
+
+/**
+ * Get a pointer typed property from a style.
+ * @param style pointer to a style from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result value
+ * @return -1: the property wasn't found in the style.
+ *         The matching state bits of the desired state (in `prop`) and the best matching property's state
+ *         Higher value means match in higher precedence state.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_style_get_text_font()`
+ * @note for performance reasons it's not checked if the property really has pointer type
+ */
+int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void ** res);
+
+/**
+ * Set a local integer typed property in a style list.
+ * @param list pointer to a style list where the local property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note for performance reasons it's not checked if the property really has integer type
+ */
+void lv_style_list_set_local_int(lv_style_list_t * list, lv_style_property_t prop, lv_style_int_t value);
+
+/**
+ * Set a local color typed property in a style list.
+ * @param list pointer to a style list where the local property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_COLOR | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note for performance reasons it's not checked if the property really has color type
+ */
+void lv_style_list_set_local_color(lv_style_list_t * list, lv_style_property_t prop, lv_color_t value);
+
+/**
+ * Set a local opacity typed property in a style list.
+ * @param list pointer to a style list where the local property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_OPA | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note for performance reasons it's not checked if the property really has opacity type
+ */
+void lv_style_list_set_local_opa(lv_style_list_t * list, lv_style_property_t prop, lv_opa_t value);
+
+/**
+ * Set a local pointer typed property in a style list.
+ * @param list pointer to a style list where the local property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note for performance reasons it's not checked if the property really has pointer type
+ */
+void lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t prop, const void * value);
+
+/**
+ * Get an integer typed property from a style list.
+ * It will return the property which match best with given state.
+ * @param list pointer to a style list from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result
+ * @return LV_RES_OK: there was a matching property in the list
+ *         LV_RES_INV: there was NO matching property in the list
+ * @note for performance reasons it's not checked if the property really has integer type
+ */
+lv_res_t lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop, lv_style_int_t * res);
+
+/**
+ * Get a color typed property from a style list.
+ * It will return the property which match best with given state.
+ * @param list pointer to a style list from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_COLOR | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result
+ * @return LV_RES_OK: there was a matching property in the list
+ *         LV_RES_INV: there was NO matching property in the list
+ * @note for performance reasons it's not checked if the property really has color type
+ */
+lv_res_t lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t prop, lv_color_t * res);
+
+
+/**
+ * Get an opacity typed property from a style list.
+ * It will return the property which match best with given state.
+ * @param list pointer to a style list from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_OPA | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result
+ * @return LV_RES_OK: there was a matching property in the list
+ *         LV_RES_INV: there was NO matching property in the list
+ * @note for performance reasons it's not checked if the property really has opacity type
+ */
+lv_res_t lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop, lv_opa_t * res);
+
+/**
+ * Get a pointer typed property from a style list.
+ * It will return the property which match best with given state.
+ * @param list pointer to a style list from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result
+ * @return LV_RES_OK: there was a matching property in the list
+ *         LV_RES_INV: there was NO matching property in the list
+ * @note for performance reasons it's not checked if the property really has pointer type
+ */
+lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop, void ** res);
 
 /*************************
  *    GLOBAL VARIABLES
@@ -307,12 +476,13 @@ lv_opa_t lv_style_get_def_opa(lv_style_property_t prop);
 /**
  * Create and initialize a `static` style
  * Example:
- *     LV_STYLE_CREATE(my_style, &lv_style_plain);
+ *     LV_STYLE_CREATE(my_style, &style_to_copy);
  *   is equivalent to
  *     static lv_style_t my_style;
  *     lv_style_init(&my_style);
+ *     lv_style_copy(&my_style, &style_to_copy);
  */
-#define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_init(&name);
+#define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_init(&name); lv_style_copy(&name, copy);
 
 #ifdef __cplusplus
 } /* extern "C" */

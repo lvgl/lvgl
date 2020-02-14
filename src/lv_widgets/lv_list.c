@@ -102,8 +102,6 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_theme_apply(list, LV_THEME_LIST);
 
     } else {
-        lv_list_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-
         lv_obj_t * copy_btn = lv_list_get_next_btn(copy, NULL);
         while(copy_btn) {
             const void * img_src = NULL;
@@ -157,8 +155,6 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
     lv_coord_t pos_x_ori = lv_obj_get_x(list);
     lv_coord_t pos_y_ori = lv_obj_get_y(list);
 
-
-    lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
     /*Create a list element with the image an the text*/
     lv_obj_t * btn;
     btn = lv_btn_create(list, NULL);
@@ -187,7 +183,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
     }
 
 
-    lv_obj_set_protect(btn, LV_PROTECT_PRESS_LOST);
+    lv_obj_add_protect(btn, LV_PROTECT_PRESS_LOST);
     lv_obj_set_signal_cb(btn, lv_list_btn_signal);
 
 #if LV_USE_IMG != 0

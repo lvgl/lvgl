@@ -135,18 +135,6 @@ void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint
  */
 void lv_gauge_set_needle_img(lv_obj_t * gauge, const void * img, lv_coord_t pivot_x, lv_coord_t pivot_y);
 
-/**
- * Set the styles of a gauge
- * @param gauge pointer to a gauge object
- * @param type which style should be set (can be only `LV_GAUGE_STYLE_MAIN`)
- * @param style set the style of the gauge
- *  */
-static inline void lv_gauge_set_style(lv_obj_t * gauge, lv_gauge_style_t type, lv_style_t * style)
-{
-    (void)type; /*Unused*/
-    lv_obj_set_style(gauge, style);
-}
-
 /*=====================
  * Getter functions
  *====================*/

@@ -112,17 +112,13 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         lv_obj_set_size(new_tileview, w, h);
-<<<<<<< HEAD
-
-=======
->>>>>>> dev-7.0
         lv_obj_set_drag_throw(lv_page_get_scrl(new_tileview), true);
         lv_obj_set_drag_dir(lv_page_get_scrl(new_tileview), LV_DRAG_DIR_ONE);
 
         lv_page_set_scrl_fit(new_tileview, LV_FIT_TIGHT);
 
-        lv_obj_reset_style(new_tileview, LV_PAGE_PART_SCRL);
-        lv_theme_alien_apply(new_tileview, LV_THEME_TILEVIEW);
+        lv_obj_reset_style_list(new_tileview, LV_PAGE_PART_SCRL);
+        lv_theme_apply(new_tileview, LV_THEME_TILEVIEW);
     }
     /*Copy an existing tileview*/
     else {

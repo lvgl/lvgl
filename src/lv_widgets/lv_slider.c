@@ -88,7 +88,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new slider slider*/
     if(copy == NULL) {
         lv_obj_set_click(new_slider, true);
-        lv_obj_set_protect(new_slider, LV_PROTECT_PRESS_LOST);
+        lv_obj_add_protect(new_slider, LV_PROTECT_PRESS_LOST);
 
         lv_theme_apply(new_slider, LV_THEME_SLIDER);
         lv_obj_set_height(new_slider, LV_DPI / 15);

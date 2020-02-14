@@ -129,7 +129,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
         lv_obj_set_size(cpicker, LV_DPI * 2, LV_DPI * 2);
-        lv_obj_set_protect(cpicker, LV_PROTECT_PRESS_LOST);
+        lv_obj_add_protect(cpicker, LV_PROTECT_PRESS_LOST);
         lv_obj_set_adv_hittest(cpicker, true);
         lv_theme_apply(cpicker, LV_THEME_CPICKER);
     }

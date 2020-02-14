@@ -8,7 +8,7 @@
  *********************/
 #include <stdint.h>
 #include "lv_theme.h"
-#include "../lv_objx/lv_img.h"
+#include "../lv_widgets/lv_img.h"
 #include "../lv_misc/lv_types.h"
 
 #if LV_USE_THEME_ALIEN
@@ -525,6 +525,10 @@ static void btnm_init(void)
 static void kb_init(void)
 {
 #if LV_USE_KEYBOARD
+    lv_style_init(&kb_btn);
+    lv_style_copy(&kb_btn, &btnm_btn);
+    lv_style_set_radius(&kb_btn, LV_STATE_NORMAL, LV_DPI / 50);
+
     lv_style_init(&kb_bg);
     lv_style_copy(&kb_bg, &panel);
     lv_style_set_pad_inner(&kb_bg, LV_STATE_NORMAL, LV_DPI/20);

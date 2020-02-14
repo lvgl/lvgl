@@ -762,7 +762,7 @@ void lv_textarea_set_one_line(lv_obj_t * ta, bool en)
 
     placeholder_update(ta);
     /* `refr_cursor_area` is called at the end of lv_ta_set_text_align */
-    lv_ta_set_text_align(ta, old_align);
+    lv_textarea_set_text_align(ta, old_align);
 }
 
 /**
@@ -1684,8 +1684,8 @@ static void refr_cursor_area(lv_obj_t * ta)
 {
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    const lv_font_t * font = lv_obj_get_style_ptr(ta, LV_TEXTAREA_PART_BG, LV_STYLE_TEXT_FONT);
-    lv_style_int_t line_space = lv_obj_get_style_int(ta, LV_TEXTAREA_PART_BG, LV_STYLE_TEXT_LINE_SPACE);
+    const lv_font_t * font = _lv_obj_get_style_ptr(ta, LV_TEXTAREA_PART_BG, LV_STYLE_TEXT_FONT);
+    lv_style_int_t line_space = _lv_obj_get_style_int(ta, LV_TEXTAREA_PART_BG, LV_STYLE_TEXT_LINE_SPACE);
 
     uint16_t cur_pos = lv_textarea_get_cursor_pos(ta);
     const char * txt = lv_label_get_text(ext->label);

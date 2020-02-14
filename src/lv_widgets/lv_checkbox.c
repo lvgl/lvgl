@@ -81,7 +81,7 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_btn_set_layout(cb, LV_LAYOUT_ROW_MID);
         lv_btn_set_fit(cb, LV_FIT_TIGHT);
         lv_btn_set_checkable(cb, true);
-        lv_obj_set_protect(cb, LV_PROTECT_PRESS_LOST);
+        lv_obj_add_protect(cb, LV_PROTECT_PRESS_LOST);
 
         lv_theme_apply(cb, LV_THEME_CHECKBOX);
 
