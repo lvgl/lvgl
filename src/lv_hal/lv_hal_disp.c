@@ -140,6 +140,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     if(disp->refr_task == NULL) return NULL;
     
     disp->inv_p = 0;
+    disp->last_activity_time = 0;
 
     disp->act_scr   = lv_obj_create(NULL, NULL); /*Create a default screen on the display*/
     disp->top_layer = lv_obj_create(NULL, NULL); /*Create top layer on the display*/

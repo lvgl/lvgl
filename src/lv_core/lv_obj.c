@@ -49,12 +49,6 @@ typedef struct _lv_event_temp_data
     struct _lv_event_temp_data * prev;
 } lv_event_temp_data_t;
 
-typedef struct {
-    lv_draw_rect_dsc_t draw_dsc;
-    lv_style_list_t * style_dsc;
-    uint8_t state;
-}lv_draw_rect_cache_t;
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -665,6 +659,11 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * par = obj->parent;
+    
+    if(par == NULL) {
+        LV_LOG_WARN("lv_obj_set_pos: not changing position of screen object");
+        return;
+    }
 
     x = x + par->coords.x1;
     y = y + par->coords.y1;
@@ -1586,7 +1585,8 @@ void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size)
 }
 
 /**
- * Send a 'LV_SIGNAL_REFR_EXT_SIZE' signal to the object
+ * Send a 'LV_SIGNAL_REFR_EXT_SIZE' signal to the object to refresh the extended draw area.
+ * he object needs to be invalidated by `lv_obj_invalidate(obj)` manually after this function.
  * @param obj pointer to an object
  */
 void lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
@@ -1596,7 +1596,6 @@ void lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
     obj->ext_draw_pad = 0;
     obj->signal_cb(obj, LV_SIGNAL_REFR_EXT_DRAW_PAD, NULL);
 
-    lv_obj_invalidate(obj);
 }
 
 /*=======================

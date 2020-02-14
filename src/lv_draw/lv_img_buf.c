@@ -496,6 +496,61 @@ bool lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t
     return ret;
 }
 
+/**
+ * Get the area of a rectangle if its rotated and scaled
+ * @param res store the coordinates here
+ * @param w width of the rectangle to transform
+ * @param h height of the rectangle to transform
+ * @param angle angle of rotation
+ * @param zoom zoom, (256 no zoom)
+ * @param pivot x,y pivot coordinates of rotation
+ */
+void lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom, lv_point_t * pivot)
+{
+    int16_t sinma = lv_trigo_sin(angle);
+    int16_t cosma = lv_trigo_sin(angle + 90);
+
+    lv_point_t lt;
+    lv_point_t rt;
+    lv_point_t lb;
+    lv_point_t rb;
+
+    lv_coord_t xt;
+    lv_coord_t yt;
+
+    lv_area_t a;
+    a.x1 = ((-pivot->x) * zoom) >> 8;
+    a.y1 = ((-pivot->y) * zoom) >> 8;
+    a.x2 = ((w -pivot->x) * zoom) >> 8;
+    a.y2 = ((h -pivot->y) * zoom) >> 8;
+
+    xt = a.x1;
+    yt = a.y1;
+    lt.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
+    lt.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+
+    xt = a.x2;
+    yt = a.y1;
+    rt.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
+    rt.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+
+    xt = a.x1;
+    yt = a.y2;
+    lb.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
+    lb.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+
+    xt = a.x2;
+    yt = a.y2;
+    rb.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
+    rb.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+
+    res->x1 = LV_MATH_MIN4(lb.x, lt.x, rb.x, rt.x);
+    res->x2 = LV_MATH_MAX4(lb.x, lt.x, rb.x, rt.x);
+    res->y1 = LV_MATH_MIN4(lb.y, lt.y, rb.y, rt.y);
+    res->y2 = LV_MATH_MAX4(lb.y, lt.y, rb.y, rt.y);
+
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

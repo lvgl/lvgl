@@ -682,11 +682,13 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
            lv_obj_get_height(cpicker) != lv_area_get_height(param)) {
             lv_obj_refresh_ext_draw_pad(cpicker);
             refr_indic_pos(cpicker);
+            lv_obj_invalidate(cpicker);
         }
     }  else if(sign == LV_SIGNAL_STYLE_CHG) {
         /*Refresh extended draw area to make knob visible*/
         lv_obj_refresh_ext_draw_pad(cpicker);
         refr_indic_pos(cpicker);
+        lv_obj_invalidate(cpicker);
     }
     else if(sign == LV_SIGNAL_CONTROL) {
         uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/

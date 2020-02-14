@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include <stdbool.h>
 #include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_area.h"
 
 
 /*********************
@@ -269,6 +270,16 @@ void lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc);
  */
 bool lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t y);
 
+/**
+ * Get the area of a rectangle if its rotated and scaled
+ * @param res store the coordinates here
+ * @param w width of the rectangle to transform
+ * @param h height of the rectangle to transform
+ * @param angle angle of rotation
+ * @param zoom zoom, (256 no zoom)
+ * @param pivot x,y pivot coordinates of rotation
+ */
+void lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom, lv_point_t * pivot);
 
 /**********************
  *      MACROS

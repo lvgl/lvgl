@@ -698,7 +698,8 @@ void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb);
 void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
 
 /**
- * Send a 'LV_SIGNAL_REFR_EXT_SIZE' signal to the object
+ * Send a 'LV_SIGNAL_REFR_EXT_SIZE' signal to the object to refresh the extended draw area.
+ * he object needs to be invalidated by `lv_obj_invalidate(obj)` manually after this function.
  * @param obj pointer to an object
  */
 void lv_obj_refresh_ext_draw_pad(lv_obj_t * obj);
