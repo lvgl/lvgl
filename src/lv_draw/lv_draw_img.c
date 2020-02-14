@@ -215,24 +215,14 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
         lv_area_t map_area_rot;
         lv_area_copy(&map_area_rot, coords);
         if(angle || zoom != LV_IMG_ZOOM_NONE) {
-            /*Get the exact area which is required to show the rotated image*/
-            lv_coord_t pivot_x = lv_area_get_width(coords) / 2 + coords->x1;
-            lv_coord_t pivot_y = lv_area_get_height(coords) / 2 + coords->y1;
-
-            if (pivot){
-                pivot_x = pivot->x + coords->x1;
-                pivot_y = pivot->y + coords->y1;
-            }
-            lv_coord_t w = lv_area_get_width(coords);
-            lv_coord_t w_zoom = (((w * zoom) >> 8) - w) / 2;
-            lv_coord_t h = lv_area_get_height(coords);
-            lv_coord_t h_zoom = (((h * zoom) >> 8) - h) / 2;
+            int32_t w = lv_area_get_width(coords);
+            int32_t h = lv_area_get_height(coords);
 
             lv_area_t norm;
-            norm.x1 = coords->x1 - pivot_x - w_zoom;
-            norm.y1 = coords->y1 - pivot_y - h_zoom;
-            norm.x2 = coords->x2 - pivot_x + w_zoom;
-            norm.y2 = coords->y2 - pivot_y + h_zoom;
+            norm.x1 = 0 - pivot->x;
+            norm.y1 = 0 - pivot->y;
+            norm.x2 = w - pivot->x;
+            norm.y2 = h - pivot->y;
 
             int16_t sinma = lv_trigo_sin(angle);
             int16_t cosma = lv_trigo_sin(angle + 90);
@@ -241,22 +231,40 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
             lv_point_t rt;
             lv_point_t lb;
             lv_point_t rb;
-            lt.x = ((cosma * norm.x1 - sinma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_x;
-            lt.y = ((sinma * norm.x1 + cosma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_y;
 
-            rt.x = ((cosma * norm.x2 - sinma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_x;
-            rt.y = ((sinma * norm.x2 + cosma * norm.y1) >> (LV_TRIGO_SHIFT)) + pivot_y;
+            lv_coord_t xt;
+            lv_coord_t yt;
 
-            lb.x = ((cosma * norm.x1 - sinma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_x;
-            lb.y = ((sinma * norm.x1 + cosma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_y;
+            xt = (norm.x1 * zoom) >> 8;
+            yt = (norm.y1 * zoom) >> 8;
+            lt.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
+            lt.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
 
-            rb.x = ((cosma * norm.x2 - sinma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_x;
-            rb.y = ((sinma * norm.x2 + cosma * norm.y2) >> (LV_TRIGO_SHIFT)) + pivot_y;
+            xt = (norm.x2 * zoom) >> 8;
+            yt = (norm.y1 * zoom) >> 8;
+            rt.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
+            rt.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
 
-            map_area_rot.x1 = LV_MATH_MIN(LV_MATH_MIN(LV_MATH_MIN(lb.x, lt.x), rb.x), rt.x);
-            map_area_rot.x2 = LV_MATH_MAX(LV_MATH_MAX(LV_MATH_MAX(lb.x, lt.x), rb.x), rt.x);
-            map_area_rot.y1 = LV_MATH_MIN(LV_MATH_MIN(LV_MATH_MIN(lb.y, lt.y), rb.y), rt.y);
-            map_area_rot.y2 = LV_MATH_MAX(LV_MATH_MAX(LV_MATH_MAX(lb.y, lt.y), rb.y), rt.y);
+            xt = (norm.x1 * zoom) >> 8;
+            yt = (norm.y2 * zoom) >> 8;
+            lb.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
+            lb.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+
+            xt = (norm.x2 * zoom) >> 8;
+            yt = (norm.y2 * zoom) >> 8;
+            rb.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
+            rb.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+
+            map_area_rot.x1 = LV_MATH_MIN(lb.x, LV_MATH_MIN(lt.x, LV_MATH_MIN(rb.x, rt.x))) + coords->x1;
+            map_area_rot.x2 = LV_MATH_MAX(lb.x, LV_MATH_MAX(lt.x, LV_MATH_MAX(rb.x, rt.x))) + coords->x1;
+            map_area_rot.y1 = LV_MATH_MIN(lb.y, LV_MATH_MIN(lt.y, LV_MATH_MIN(rb.y, rt.y))) + coords->y1;
+            map_area_rot.y2 = LV_MATH_MAX(lb.y, LV_MATH_MAX(lt.y, LV_MATH_MAX(rb.y, rt.y))) + coords->y1;
+
+//            lv_draw_rect_dsc_t r;
+//            lv_draw_rect_dsc_init(&r);
+//            r.bg_color = LV_COLOR_BLUE;
+//            r.bg_opa = LV_OPA_50;
+//            lv_draw_rect(&map_area_rot, mask, &r);
         }
 
         lv_area_t mask_com; /*Common area of mask and coords*/

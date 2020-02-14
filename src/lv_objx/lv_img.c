@@ -581,15 +581,56 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*If the image has angle provide enough room for the rotated corners */
         if(ext->angle || ext->zoom != LV_IMG_ZOOM_NONE) {
-            lv_sqrt_res_t ds;
-            lv_coord_t max_w = ext->w + LV_MATH_ABS(ext->pivot.x + ext->w / 2);
-            lv_coord_t max_h = ext->h + LV_MATH_ABS(ext->pivot.y + ext->h / 2);
-			lv_sqrt(max_w * max_w + max_h * max_h, &ds);/*Maximum diagonal length*/
-			lv_sqrt(ds.i * ds.i + ds.i * ds.i, &ds);    /*Maximum side length of external rectangle*/
-            ds.i = (ds.i * ext->zoom ) >> 8;         /*+10 to be sure anything won't be clipped*/
+            int32_t w = ext->w;
+            int32_t h = ext->h;
 
-            lv_coord_t d = ds.i / 2;
-            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, d);
+            lv_area_t norm;
+            norm.x1 = 0 - ext->pivot.x;
+            norm.y1 = 0 - ext->pivot.y;
+            norm.x2 = w - ext->pivot.x;
+            norm.y2 = h - ext->pivot.y;
+
+            int16_t sinma = lv_trigo_sin(ext->angle);
+            int16_t cosma = lv_trigo_sin(ext->angle + 90);
+
+            lv_point_t lt;
+            lv_point_t rt;
+            lv_point_t lb;
+            lv_point_t rb;
+
+            lv_coord_t xt;
+            lv_coord_t yt;
+
+            xt = (norm.x1 * ext->zoom) >> 8;
+            yt = (norm.y1 * ext->zoom) >> 8;
+            lt.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.x;
+            lt.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.y;
+
+            xt = (norm.x2 * ext->zoom) >> 8;
+            yt = (norm.y1 * ext->zoom) >> 8;
+            rt.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.x;
+            rt.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.y;
+
+            xt = (norm.x1 * ext->zoom) >> 8;
+            yt = (norm.y2 * ext->zoom) >> 8;
+            lb.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.x;
+            lb.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.y;
+
+            xt = (norm.x2 * ext->zoom) >> 8;
+            yt = (norm.y2 * ext->zoom) >> 8;
+            rb.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.x;
+            rb.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + ext->pivot.y;
+
+            lv_area_t a;
+            a.x1 = LV_MATH_MIN(lb.x, LV_MATH_MIN(lt.x, LV_MATH_MIN(rb.x, rt.x)));
+            a.x2 = LV_MATH_MAX(lb.x, LV_MATH_MAX(lt.x, LV_MATH_MAX(rb.x, rt.x)));
+            a.y1 = LV_MATH_MIN(lb.y, LV_MATH_MIN(lt.y, LV_MATH_MIN(rb.y, rt.y)));
+            a.y2 = LV_MATH_MAX(lb.y, LV_MATH_MAX(lt.y, LV_MATH_MAX(rb.y, rt.y)));
+
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, - a.x1);
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, - a.y1);
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, a.x2 - ext->w);
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, a.y2 - ext->h);
         }
     } else if(sign == LV_SIGNAL_HIT_TEST) {
         lv_hit_test_info_t *info = param;
