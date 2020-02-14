@@ -94,7 +94,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new list object*/
     if(copy == NULL) {
         lv_page_set_anim_time(list, LV_LIST_DEF_ANIM_TIME);
-        lv_page_set_scrl_fit2(list, LV_FIT_FLOOD, LV_FIT_TIGHT);
+        lv_page_set_scrl_fit2(list, LV_FIT_PARENT, LV_FIT_TIGHT);
         lv_obj_set_size(list, 2 * LV_DPI, 3 * LV_DPI);
         lv_page_set_scrl_layout(list, LV_LIST_LAYOUT_DEF);
         lv_list_set_sb_mode(list, LV_SB_MODE_DRAG);
@@ -170,16 +170,16 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
     lv_theme_apply(btn, LV_THEME_LIST_BTN);
 
     lv_page_glue_obj(btn, true);
-    lv_btn_set_layout(btn, LV_LAYOUT_ROW_M);
+    lv_btn_set_layout(btn, LV_LAYOUT_ROW_MID);
 
     lv_layout_t list_layout = lv_list_get_layout(list);
     bool layout_ver = false;
-    if(list_layout == LV_LAYOUT_COL_M || list_layout == LV_LAYOUT_COL_L || list_layout == LV_LAYOUT_COL_R) {
+    if(list_layout == LV_LAYOUT_COLUMN_MID || list_layout == LV_LAYOUT_COLUMN_LEFT || list_layout == LV_LAYOUT_COLUMN_RIGHT) {
            layout_ver = true;
     }
 
     if(layout_ver) {
-        lv_btn_set_fit2(btn, LV_FIT_FLOOD, LV_FIT_TIGHT);
+        lv_btn_set_fit2(btn, LV_FIT_PARENT, LV_FIT_TIGHT);
     } else {
         lv_coord_t w = last_btn ? lv_obj_get_width(last_btn) : (LV_DPI * 3) / 2;
         lv_btn_set_fit2(btn, LV_FIT_NONE, LV_FIT_TIGHT);
@@ -275,7 +275,7 @@ void lv_list_focus_btn(lv_obj_t * list, lv_obj_t * btn)
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
     /*Defocus the current button*/
-    if(ext->act_sel_btn) lv_obj_clear_state(ext->act_sel_btn, LV_STATE_FOCUS);
+    if(ext->act_sel_btn) lv_obj_clear_state(ext->act_sel_btn, LV_STATE_FOCUSED);
 
 
     /*Don't forget which button was selected.
@@ -286,7 +286,7 @@ void lv_list_focus_btn(lv_obj_t * list, lv_obj_t * btn)
     ext->act_sel_btn = btn;
 
     if(ext->act_sel_btn) {
-        lv_obj_add_state(ext->act_sel_btn, LV_STATE_FOCUS);
+        lv_obj_add_state(ext->act_sel_btn, LV_STATE_FOCUSED);
         lv_page_focus(list, ext->act_sel_btn, LV_ANIM_ON);
     }
 }
@@ -311,20 +311,20 @@ void lv_list_focus_btn(lv_obj_t * list, lv_obj_t * btn)
     /* Visit all buttons on the list and update their layout  */
     while(btn != NULL) {
         /*If a column layout set the buttons' width to list width*/
-        if(layout == LV_LAYOUT_COL_M || layout == LV_LAYOUT_COL_L || layout == LV_LAYOUT_COL_R) {
-            lv_btn_set_fit2(btn, LV_FIT_FLOOD, LV_FIT_TIGHT);
+        if(layout == LV_LAYOUT_COLUMN_MID || layout == LV_LAYOUT_COLUMN_LEFT || layout == LV_LAYOUT_COLUMN_RIGHT) {
+            lv_btn_set_fit2(btn, LV_FIT_PARENT, LV_FIT_TIGHT);
         }
         /*If a row layout set the buttons' width according to the content*/
-        else if (layout == LV_LAYOUT_ROW_M || layout == LV_LAYOUT_ROW_T || layout == LV_LAYOUT_ROW_B) {
+        else if (layout == LV_LAYOUT_ROW_MID || layout == LV_LAYOUT_ROW_TOP || layout == LV_LAYOUT_ROW_BOTTOM) {
             lv_btn_set_fit(btn, LV_FIT_TIGHT);
         }
 
         btn = lv_list_get_prev_btn(list, btn);
     }
 
-    if(layout == LV_LAYOUT_COL_M || layout == LV_LAYOUT_COL_L || layout == LV_LAYOUT_COL_R) {
-        lv_page_set_scrl_fit2(list, LV_FIT_FLOOD, LV_FIT_TIGHT);
-    } else if (layout == LV_LAYOUT_ROW_M || layout == LV_LAYOUT_ROW_T || layout == LV_LAYOUT_ROW_B) {
+    if(layout == LV_LAYOUT_COLUMN_MID || layout == LV_LAYOUT_COLUMN_LEFT || layout == LV_LAYOUT_COLUMN_RIGHT) {
+        lv_page_set_scrl_fit2(list, LV_FIT_PARENT, LV_FIT_TIGHT);
+    } else if (layout == LV_LAYOUT_ROW_MID || layout == LV_LAYOUT_ROW_TOP || layout == LV_LAYOUT_ROW_BOTTOM) {
         lv_page_set_scrl_fit2(list, LV_FIT_TIGHT, LV_FIT_TIGHT);
         lv_cont_set_fit2(list, LV_FIT_NONE, LV_FIT_TIGHT);
     }

@@ -31,15 +31,15 @@ extern "C" {
 enum {
     LV_LAYOUT_OFF = 0, /**< No layout */
     LV_LAYOUT_CENTER, /**< Center objects */
-    LV_LAYOUT_COL_L,  /**< Column left align*/
-    LV_LAYOUT_COL_M,  /**< Column middle align*/
-    LV_LAYOUT_COL_R,  /**< Column right align*/
-    LV_LAYOUT_ROW_T,  /**< Row top align*/
-    LV_LAYOUT_ROW_M,  /**< Row middle align*/
-    LV_LAYOUT_ROW_B,  /**< Row bottom align*/
+    LV_LAYOUT_COLUMN_LEFT,  /**< Column left align*/
+    LV_LAYOUT_COLUMN_MID,  /**< Column middle align*/
+    LV_LAYOUT_COLUMN_RIGHT,  /**< Column right align*/
+    LV_LAYOUT_ROW_TOP,  /**< Row top align*/
+    LV_LAYOUT_ROW_MID,  /**< Row middle align*/
+    LV_LAYOUT_ROW_BOTTOM,  /**< Row bottom align*/
     LV_LAYOUT_PRETTY, /**< Put as many object as possible in row and begin a new row*/
     LV_LAYOUT_GRID,   /**< Align same-sized object into a grid*/
-    _LV_LAYOUT_NUM
+    _LV_LAYOUT_LAST
 };
 typedef uint8_t lv_layout_t;
 
@@ -49,10 +49,10 @@ typedef uint8_t lv_layout_t;
 enum {
     LV_FIT_NONE,  /**< Do not change the size automatically*/
     LV_FIT_TIGHT, /**< Shrink wrap around the children */
-    LV_FIT_FLOOD, /**< Align the size to the parent's edge*/
-    LV_FIT_FILL,  /**< Align the size to the parent's edge first but if there is an object out of it
+    LV_FIT_PARENT, /**< Align the size to the parent's edge*/
+    LV_FIT_MAX,  /**< Align the size to the parent's edge first but if there is an object out of it
                      then get larger */
-    _LV_FIT_NUM
+    _LV_FIT_LAST
 };
 typedef uint8_t lv_fit_t;
 
@@ -67,13 +67,12 @@ typedef struct
     lv_fit_t fit_bottom : 2; /*A fit type from `lv_fit_t` enum */
 } lv_cont_ext_t;
 
-/*Styles*/
+/*Part of the container*/
 enum {
     LV_CONT_PART_MAIN = LV_OBJ_PART_MAIN,
     _LV_CONT_PART_VIRTUAL_LAST = _LV_OBJ_PART_VIRTUAL_LAST,
     _LV_CONT_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,
 };
-typedef uint8_t lv_cont_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES

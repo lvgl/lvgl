@@ -135,7 +135,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new text area object*/
     if(copy == NULL) {
-        lv_page_set_scrl_fit2(ta, LV_FIT_FLOOD, LV_FIT_TIGHT);
+        lv_page_set_scrl_fit2(ta, LV_FIT_PARENT, LV_FIT_TIGHT);
 
         ext->label = lv_label_create(ta, NULL);
 
@@ -741,7 +741,7 @@ void lv_textarea_set_one_line(lv_obj_t * ta, bool en)
         lv_coord_t font_h              = lv_font_get_line_height(font);
 
         ext->one_line = 1;
-        lv_page_set_scrl_fit2(ta, LV_FIT_TIGHT, LV_FIT_FLOOD);
+        lv_page_set_scrl_fit2(ta, LV_FIT_TIGHT, LV_FIT_PARENT);
         lv_obj_set_height(ta, font_h + top + bottom);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_EXPAND);
         if(ext->placeholder) lv_label_set_long_mode(ext->placeholder, LV_LABEL_LONG_EXPAND);
@@ -750,7 +750,7 @@ void lv_textarea_set_one_line(lv_obj_t * ta, bool en)
         lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_BG);
         lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_BG);
         ext->one_line = 0;
-        lv_page_set_scrl_fit2(ta, LV_FIT_FLOOD, LV_FIT_TIGHT);
+        lv_page_set_scrl_fit2(ta, LV_FIT_PARENT, LV_FIT_TIGHT);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
         if(ext->placeholder) lv_label_set_long_mode(ext->placeholder, LV_LABEL_LONG_BREAK);
 
@@ -782,7 +782,7 @@ void lv_textarea_set_text_align(lv_obj_t * ta, lv_label_align_t align)
         /*Normal left align. Just let the text expand*/
         if(align == LV_LABEL_ALIGN_LEFT) {
             lv_label_set_long_mode(label, LV_LABEL_LONG_EXPAND);
-            lv_page_set_scrl_fit2(ta, LV_FIT_TIGHT, LV_FIT_FLOOD);
+            lv_page_set_scrl_fit2(ta, LV_FIT_TIGHT, LV_FIT_PARENT);
             lv_label_set_align(label, align);
             if(ext->placeholder) lv_label_set_align(ext->placeholder, align);
 
@@ -790,7 +790,7 @@ void lv_textarea_set_text_align(lv_obj_t * ta, lv_label_align_t align)
         /*Else use fix label width equal to the Text area width*/
         else {
             lv_label_set_long_mode(label, LV_LABEL_LONG_CROP);
-            lv_page_set_scrl_fit2(ta, LV_FIT_FLOOD, LV_FIT_FLOOD);
+            lv_page_set_scrl_fit2(ta, LV_FIT_PARENT, LV_FIT_PARENT);
             lv_label_set_align(label, align);
             if(ext->placeholder) lv_label_set_align(ext->placeholder, align);
 

@@ -78,7 +78,7 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->label = lv_label_create(cb, NULL);
 
         lv_checkbox_set_text(cb, "Check box");
-        lv_btn_set_layout(cb, LV_LAYOUT_ROW_M);
+        lv_btn_set_layout(cb, LV_LAYOUT_ROW_MID);
         lv_btn_set_fit(cb, LV_FIT_TIGHT);
         lv_btn_set_checkable(cb, true);
         lv_obj_set_protect(cb, LV_PROTECT_PRESS_LOST);

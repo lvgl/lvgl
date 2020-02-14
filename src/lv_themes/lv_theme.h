@@ -142,14 +142,7 @@ lv_style_t * lv_theme_get_style_part(lv_theme_style_t name, uint8_t part);
 /**********************
  *     POST INCLUDE
  *********************/
-#include "lv_theme_templ.h"
-#include "lv_theme_default.h"
-#include "lv_theme_alien.h"
-#include "lv_theme_night.h"
-#include "lv_theme_zen.h"
-#include "lv_theme_mono.h"
-#include "lv_theme_nemo.h"
-#include "lv_theme_material.h"
+#include "lv_theme_def.h"
 
 #ifdef __cplusplus
 } /* extern "C" */

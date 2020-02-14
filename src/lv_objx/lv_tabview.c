@@ -136,8 +136,8 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_obj_set_click(ext->indic, false);
 
-        lv_page_set_scrl_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_FLOOD);
-        lv_page_set_scrl_layout(ext->content, LV_LAYOUT_ROW_T);
+        lv_page_set_scrl_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_PARENT);
+        lv_page_set_scrl_layout(ext->content, LV_LAYOUT_ROW_TOP);
         lv_page_set_sb_mode(ext->content, LV_SB_MODE_OFF);
         lv_obj_set_drag_dir(lv_page_get_scrl(ext->content), LV_DRAG_DIR_ONE);
 

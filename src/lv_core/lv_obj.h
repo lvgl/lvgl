@@ -179,11 +179,11 @@ enum {
 typedef uint8_t lv_protect_t;
 
 enum {
-    LV_STATE_NORMAL  =   0x00,
+    LV_STATE_NORMAL   =  0x00,
     LV_STATE_CHECKED  =  0x01,
-    LV_STATE_FOCUS  =    0x02,
-    LV_STATE_EDIT  =     0x04,
-    LV_STATE_HOVER  =    0x08,
+    LV_STATE_FOCUSED  =  0x02,
+    LV_STATE_EDITED   =  0x04,
+    LV_STATE_HOVERED  =  0x08,
     LV_STATE_PRESSED  =  0x10,
     LV_STATE_DISABLED =  0x20,
 };
@@ -210,7 +210,6 @@ typedef struct _lv_obj_t
     void * ext_attr;            /**< Object type specific extended data*/
     lv_style_list_t  style_list;
 
-
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     uint8_t ext_click_pad_hor; /**< Extra click padding in horizontal direction */
     uint8_t ext_click_pad_ver; /**< Extra click padding in vertical direction */
@@ -229,7 +228,7 @@ typedef struct _lv_obj_t
     uint8_t top             :1;  /**< 1: If the object or its children is clicked it goes to the foreground*/
     uint8_t parent_event    :1;  /**< 1: Send the object's events to the parent too. */
     uint8_t adv_hittest     :1;  /**< 1: Use advanced hit-testing (slower) */
-    uint8_t gesture_parent : 1; /**< 1: Parent will be gesture instead*/
+    uint8_t gesture_parent : 1;  /**< 1: Parent will be gesture instead*/
 
     lv_drag_dir_t drag_dir  :2;  /**<  Which directions the object can be dragged in */
     lv_bidi_dir_t base_dir  :2;  /**< Base direction of texts related to this object */

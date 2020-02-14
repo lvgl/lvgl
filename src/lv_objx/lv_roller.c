@@ -105,7 +105,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_obj_t * scrl = lv_page_get_scrl(roller);
         lv_obj_set_drag(scrl, true);                                  /*In ddlist it might be disabled*/
-        lv_page_set_scrl_fit2(roller, LV_FIT_FLOOD, LV_FIT_NONE); /*Height is specified directly*/
+        lv_page_set_scrl_fit2(roller, LV_FIT_PARENT, LV_FIT_NONE); /*Height is specified directly*/
         lv_roller_set_anim_time(roller, LV_ROLLER_DEF_ANIM_TIME);
         lv_roller_set_options(roller, "Option 1\nOption 2\nOption 3", LV_ROLLER_MODE_NORMAL);
         lv_roller_set_visible_row_count(roller, 3);

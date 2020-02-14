@@ -317,9 +317,9 @@ static void lv_cont_refr_layout(lv_obj_t * cont)
 
     if(type == LV_LAYOUT_CENTER) {
         lv_cont_layout_center(cont);
-    } else if(type == LV_LAYOUT_COL_L || type == LV_LAYOUT_COL_M || type == LV_LAYOUT_COL_R) {
+    } else if(type == LV_LAYOUT_COLUMN_LEFT || type == LV_LAYOUT_COLUMN_MID || type == LV_LAYOUT_COLUMN_RIGHT) {
         lv_cont_layout_col(cont);
-    } else if(type == LV_LAYOUT_ROW_T || type == LV_LAYOUT_ROW_M || type == LV_LAYOUT_ROW_B) {
+    } else if(type == LV_LAYOUT_ROW_TOP || type == LV_LAYOUT_ROW_MID || type == LV_LAYOUT_ROW_BOTTOM) {
         lv_cont_layout_row(cont);
     } else if(type == LV_LAYOUT_PRETTY) {
         lv_cont_layout_pretty(cont);
@@ -347,15 +347,15 @@ static void lv_cont_layout_col(lv_obj_t * cont)
     lv_coord_t hpad_corr;
 
     switch(type) {
-        case LV_LAYOUT_COL_L:
+        case LV_LAYOUT_COLUMN_LEFT:
             hpad_corr = left;
             align     = LV_ALIGN_IN_TOP_LEFT;
             break;
-        case LV_LAYOUT_COL_M:
+        case LV_LAYOUT_COLUMN_MID:
             hpad_corr = 0;
             align     = LV_ALIGN_IN_TOP_MID;
             break;
-        case LV_LAYOUT_COL_R:
+        case LV_LAYOUT_COLUMN_RIGHT:
             hpad_corr = -right;
             align     = LV_ALIGN_IN_TOP_RIGHT;
             break;
@@ -396,15 +396,15 @@ static void lv_cont_layout_row(lv_obj_t * cont)
     lv_coord_t vpad_corr;
     lv_bidi_dir_t base_dir = lv_obj_get_base_dir(cont);
     switch(type) {
-        case LV_LAYOUT_ROW_T:
+        case LV_LAYOUT_ROW_TOP:
             vpad_corr = lv_obj_get_style_pad_top(cont, LV_CONT_PART_MAIN);
             align     = base_dir == LV_BIDI_DIR_RTL ? LV_ALIGN_IN_TOP_RIGHT : LV_ALIGN_IN_TOP_LEFT;
             break;
-        case LV_LAYOUT_ROW_M:
+        case LV_LAYOUT_ROW_MID:
             vpad_corr = 0;
             align     = base_dir == LV_BIDI_DIR_RTL ? LV_ALIGN_IN_RIGHT_MID: LV_ALIGN_IN_LEFT_MID;
             break;
-        case LV_LAYOUT_ROW_B:
+        case LV_LAYOUT_ROW_BOTTOM:
             vpad_corr = -lv_obj_get_style_pad_bottom(cont, LV_CONT_PART_MAIN);
             align     = base_dir == LV_BIDI_DIR_RTL ? LV_ALIGN_IN_BOTTOM_RIGHT: LV_ALIGN_IN_BOTTOM_LEFT;
             break;
@@ -684,29 +684,29 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
 
     switch(ext->fit_left) {
         case LV_FIT_TIGHT: new_area.x1 = tight_area.x1; break;
-        case LV_FIT_FLOOD: new_area.x1 = flood_area.x1; break;
-        case LV_FIT_FILL: new_area.x1 = has_children ? LV_MATH_MIN(tight_area.x1, flood_area.x1) : flood_area.x1; break;
+        case LV_FIT_PARENT: new_area.x1 = flood_area.x1; break;
+        case LV_FIT_MAX: new_area.x1 = has_children ? LV_MATH_MIN(tight_area.x1, flood_area.x1) : flood_area.x1; break;
         default: break;
     }
 
     switch(ext->fit_right) {
         case LV_FIT_TIGHT: new_area.x2 = tight_area.x2; break;
-        case LV_FIT_FLOOD: new_area.x2 = flood_area.x2; break;
-        case LV_FIT_FILL: new_area.x2 = has_children ? LV_MATH_MAX(tight_area.x2, flood_area.x2) : flood_area.x2; break;
+        case LV_FIT_PARENT: new_area.x2 = flood_area.x2; break;
+        case LV_FIT_MAX: new_area.x2 = has_children ? LV_MATH_MAX(tight_area.x2, flood_area.x2) : flood_area.x2; break;
         default: break;
     }
 
     switch(ext->fit_top) {
         case LV_FIT_TIGHT: new_area.y1 = tight_area.y1; break;
-        case LV_FIT_FLOOD: new_area.y1 = flood_area.y1; break;
-        case LV_FIT_FILL: new_area.y1 = has_children ? LV_MATH_MIN(tight_area.y1, flood_area.y1) : flood_area.y1; break;
+        case LV_FIT_PARENT: new_area.y1 = flood_area.y1; break;
+        case LV_FIT_MAX: new_area.y1 = has_children ? LV_MATH_MIN(tight_area.y1, flood_area.y1) : flood_area.y1; break;
         default: break;
     }
 
     switch(ext->fit_bottom) {
         case LV_FIT_TIGHT: new_area.y2 = tight_area.y2; break;
-        case LV_FIT_FLOOD: new_area.y2 = flood_area.y2; break;
-        case LV_FIT_FILL: new_area.y2 = has_children ? LV_MATH_MAX(tight_area.y2, flood_area.y2) : flood_area.y2; break;
+        case LV_FIT_PARENT: new_area.y2 = flood_area.y2; break;
+        case LV_FIT_MAX: new_area.y2 = has_children ? LV_MATH_MAX(tight_area.y2, flood_area.y2) : flood_area.y2; break;
         default: break;
     }
 

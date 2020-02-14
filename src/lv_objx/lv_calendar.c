@@ -865,7 +865,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
                 day_state |= LV_STATE_CHECKED;
             }
             if(month_of_today_shown && day_cnt == ext->today.day && draw_state == DAY_DRAW_ACT_MONTH) {
-                day_state |= LV_STATE_FOCUS;
+                day_state |= LV_STATE_FOCUSED;
             }
 
             if(prev_state != day_state) {

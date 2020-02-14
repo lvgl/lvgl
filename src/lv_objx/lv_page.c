@@ -119,7 +119,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_drag(ext->scrl, true);
         lv_obj_set_drag_throw(ext->scrl, true);
         lv_obj_set_protect(ext->scrl, LV_PROTECT_PARENT | LV_PROTECT_PRESS_LOST);
-        lv_cont_set_fit4(ext->scrl, LV_FIT_FILL, LV_FIT_FILL, LV_FIT_FILL, LV_FIT_FILL);
+        lv_cont_set_fit4(ext->scrl, LV_FIT_MAX, LV_FIT_MAX, LV_FIT_MAX, LV_FIT_MAX);
         lv_obj_set_event_cb(ext->scrl, scrl_def_event_cb); /*Propagate some event to the background
                                                               object by default for convenience */
         lv_obj_set_signal_cb(ext->scrl, lv_page_scrollable_signal);
@@ -791,18 +791,18 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                 /* Reposition the child to take padding into account (Only if it's on (0;0) or (widht;height) coordinates now)
                  * It's required to keep new the object on the same coordinate if FIT is enabled.*/
                 if((tmp->coords.x1 == page->coords.x1)  &&
-                        (fit_left == LV_FIT_TIGHT || fit_left == LV_FIT_FILL) &&
+                        (fit_left == LV_FIT_TIGHT || fit_left == LV_FIT_MAX) &&
                         base_dir != LV_BIDI_DIR_RTL) {
                     tmp->coords.x1 += scrl_left;
                     tmp->coords.x2 += scrl_left;
                 }
                 else if((tmp->coords.x2 == page->coords.x2) &&
-                        (fit_right == LV_FIT_TIGHT || fit_right == LV_FIT_FILL)
+                        (fit_right == LV_FIT_TIGHT || fit_right == LV_FIT_MAX)
                         && base_dir == LV_BIDI_DIR_RTL) {
                     tmp->coords.x1 -= scrl_right;
                     tmp->coords.x2 -= scrl_right;
                 }
-                if((tmp->coords.y1 == page->coords.y1) && (fit_top == LV_FIT_TIGHT || fit_top == LV_FIT_FILL)) {
+                if((tmp->coords.y1 == page->coords.y1) && (fit_top == LV_FIT_TIGHT || fit_top == LV_FIT_MAX)) {
                     tmp->coords.y1 += scrl_top;
                     tmp->coords.y2 += scrl_top;
                 }

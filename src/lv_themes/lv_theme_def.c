@@ -165,7 +165,7 @@ static void basic_init(void)
     lv_style_set_image_recolor(&panel, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
     lv_style_set_line_color(&panel, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
     lv_style_set_line_width(&panel, LV_STATE_NORMAL, 1);
-    lv_style_set_border_color(&panel, LV_STATE_FOCUS, COLOR_ACCENT);
+    lv_style_set_border_color(&panel, LV_STATE_FOCUSED, COLOR_ACCENT);
     lv_style_set_transition_time(&panel, LV_STATE_NORMAL, 500);
 
     lv_style_init(&btn);
@@ -186,9 +186,9 @@ static void basic_init(void)
     lv_style_set_pad_inner(&btn, LV_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_transition_time(&btn, LV_STATE_NORMAL, 300);
 
-    lv_style_set_outline_width(&btn, LV_STATE_FOCUS, 3);
-    lv_style_set_outline_opa(&btn, LV_STATE_FOCUS, LV_OPA_50);
-    lv_style_set_outline_color(&btn, LV_STATE_FOCUS, COLOR_ACCENT);
+    lv_style_set_outline_width(&btn, LV_STATE_FOCUSED, 3);
+    lv_style_set_outline_opa(&btn, LV_STATE_FOCUSED, LV_OPA_50);
+    lv_style_set_outline_color(&btn, LV_STATE_FOCUSED, COLOR_ACCENT);
 }
 
 static void cont_init(void)
@@ -219,9 +219,9 @@ static void bar_init(void)
     lv_style_set_radius(&bar_bg, LV_STATE_NORMAL, LV_RADIUS_CIRCLE);
     lv_style_set_bg_opa(&bar_bg, LV_STATE_NORMAL, LV_OPA_COVER);
     lv_style_set_bg_color(&bar_bg, LV_STATE_NORMAL, COLOR_BACKGROUND);
-    lv_style_set_outline_color(&bar_bg, LV_STATE_FOCUS, COLOR_ACCENT);
-    lv_style_set_outline_opa(&bar_bg, LV_STATE_FOCUS, LV_OPA_50);
-    lv_style_set_outline_width(&bar_bg, LV_STATE_FOCUS, 3);
+    lv_style_set_outline_color(&bar_bg, LV_STATE_FOCUSED, COLOR_ACCENT);
+    lv_style_set_outline_opa(&bar_bg, LV_STATE_FOCUSED, LV_OPA_50);
+    lv_style_set_outline_width(&bar_bg, LV_STATE_FOCUSED, 3);
 
     lv_style_init(&bar_indic);
     lv_style_set_bg_opa(&bar_indic, LV_STATE_NORMAL, LV_OPA_COVER);
@@ -416,7 +416,7 @@ static void calendar_init(void)
     lv_style_init(&calendar_date_nums);
     lv_style_set_radius(&calendar_date_nums, LV_STATE_NORMAL, LV_DPI / 50);
     lv_style_set_text_color(&calendar_date_nums, LV_STATE_CHECKED, LV_COLOR_WHITE);
-    lv_style_set_text_color(&calendar_date_nums, LV_STATE_FOCUS, COLOR_ACCENT);
+    lv_style_set_text_color(&calendar_date_nums, LV_STATE_FOCUSED, COLOR_ACCENT);
 
     lv_style_set_bg_opa(&calendar_date_nums, LV_STATE_CHECKED , LV_OPA_20);
     lv_style_set_bg_opa(&calendar_date_nums, LV_STATE_PRESSED , LV_OPA_20);
@@ -466,10 +466,10 @@ static void cb_init(void)
 //    lv_style_set_pad_bottom(&cb_bg, LV_STATE_NORMAL, LV_DPI / 20);
 //    lv_style_set_pad_top(&cb_bg, LV_STATE_NORMAL, LV_DPI / 20);
     lv_style_set_pad_inner(&cb_bg, LV_STATE_NORMAL , LV_DPI / 20);
-    lv_style_set_outline_color(&cb_bg, LV_STATE_FOCUS, COLOR_ACCENT);
-    lv_style_set_outline_opa(&cb_bg, LV_STATE_FOCUS, LV_OPA_50);
-    lv_style_set_outline_width(&cb_bg, LV_STATE_FOCUS, 3);
-    lv_style_set_outline_pad(&cb_bg, LV_STATE_FOCUS, LV_DPI/20);
+    lv_style_set_outline_color(&cb_bg, LV_STATE_FOCUSED, COLOR_ACCENT);
+    lv_style_set_outline_opa(&cb_bg, LV_STATE_FOCUSED, LV_OPA_50);
+    lv_style_set_outline_width(&cb_bg, LV_STATE_FOCUSED, 3);
+    lv_style_set_outline_pad(&cb_bg, LV_STATE_FOCUSED, LV_DPI/20);
 
     lv_style_init(&cb_bullet);
     lv_style_set_radius(&cb_bullet, LV_STATE_NORMAL, LV_DPI / 50);
@@ -495,7 +495,7 @@ static void btnm_init(void)
     lv_style_set_clip_corner(&btnm_bg, LV_STATE_NORMAL, true);
     lv_style_set_border_post(&btnm_bg, LV_STATE_NORMAL, true);
     lv_style_set_bg_color(&btnm_bg, LV_STATE_NORMAL, COLOR_CONTAINER);
-    lv_style_set_border_color(&btnm_bg, LV_STATE_FOCUS, lv_color_hex3(0xf66));
+    lv_style_set_border_color(&btnm_bg, LV_STATE_FOCUSED, lv_color_hex3(0xf66));
 
     lv_style_init(&btnm_btn);
     lv_style_set_border_width(&btnm_btn, LV_STATE_NORMAL, LV_DPI / 70 > 0? LV_DPI / 70 : 1);
@@ -507,7 +507,7 @@ static void btnm_init(void)
     lv_style_set_bg_color(&btnm_btn, LV_STATE_CHECKED | LV_STATE_PRESSED, lv_color_darken(COLOR_ACCENT, LV_OPA_40));
     lv_style_set_text_color(&btnm_btn, LV_STATE_NORMAL, LV_COLOR_WHITE);
     lv_style_set_text_color(&btnm_btn, LV_STATE_DISABLED , LV_COLOR_GRAY);
-    lv_style_set_text_color(&btnm_btn, LV_STATE_FOCUS, LV_COLOR_RED);
+    lv_style_set_text_color(&btnm_btn, LV_STATE_FOCUSED, LV_COLOR_RED);
     lv_style_set_bg_opa(&btnm_btn, LV_STATE_CHECKED, LV_OPA_COVER);
     lv_style_set_bg_opa(&btnm_btn, LV_STATE_PRESSED, LV_OPA_COVER);
     lv_style_set_bg_opa(&btnm_btn, LV_STATE_DISABLED, LV_OPA_COVER);
@@ -602,8 +602,8 @@ static void list_init(void)
     lv_style_set_text_color(&list_btn, LV_STATE_NORMAL, lv_color_hex(0xffffff));
     lv_style_set_text_color(&list_btn, LV_STATE_PRESSED, lv_color_darken(lv_color_hex(0xffffff), LV_OPA_20));
     lv_style_set_text_color(&list_btn, LV_STATE_DISABLED, lv_color_hex(0x686b70));
-    lv_style_set_text_color(&list_btn, LV_STATE_FOCUS, lv_color_hex(0xff0000));
-    lv_style_set_text_color(&list_btn, LV_STATE_FOCUS| LV_STATE_PRESSED, lv_color_hex(0xffff00));
+    lv_style_set_text_color(&list_btn, LV_STATE_FOCUSED, lv_color_hex(0xff0000));
+    lv_style_set_text_color(&list_btn, LV_STATE_FOCUSED| LV_STATE_PRESSED, lv_color_hex(0xffff00));
     lv_style_set_image_recolor(&list_btn, LV_STATE_NORMAL, LV_COLOR_WHITE);
     lv_style_set_image_recolor(&list_btn, LV_STATE_PRESSED, lv_color_darken(lv_color_hex(0xffffff), LV_OPA_20));
     lv_style_set_border_opa(&list_btn, LV_STATE_NORMAL, LV_OPA_COVER);
@@ -678,7 +678,7 @@ static void tabview_init(void)
     lv_style_set_bg_opa(&tabview_btns, LV_STATE_PRESSED, LV_OPA_COVER);
     lv_style_set_bg_color(&tabview_btns, LV_STATE_PRESSED, lv_color_hex(0x444444));
     lv_style_set_text_color(&tabview_btns, LV_STATE_CHECKED, COLOR_ACCENT);
-    lv_style_set_text_color(&tabview_btns, LV_STATE_FOCUS, LV_COLOR_RED);
+    lv_style_set_text_color(&tabview_btns, LV_STATE_FOCUSED, LV_COLOR_RED);
     lv_style_set_pad_top(&tabview_btns, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_bottom(&tabview_btns, LV_STATE_NORMAL, LV_DPI / 5);
 
@@ -736,7 +736,7 @@ static void win_init(void)
  * @param hue [0..360] hue value from HSV color space to define the theme's base color
  * @param font pointer to a font (NULL to use the default)
  */
-lv_theme_t * lv_theme_alien_init(uint16_t hue, lv_font_t * font)
+lv_theme_t * lv_theme_default_init(uint16_t hue, lv_font_t * font)
 {
 
     lv_mem_monitor_t mon1;

@@ -34,7 +34,7 @@ extern "C" {
  * @param hue [0..360] hue value from HSV color space to define the theme's base color
  * @param font pointer to a font (NULL to use the default)
  */
-lv_theme_t * lv_theme_alien_init(uint16_t hue, lv_font_t * font);
+lv_theme_t * lv_theme_default_init(uint16_t hue, lv_font_t * font);
 
 lv_theme_t * lv_theme_alien_get(void);
 lv_style_t * lv_theme_alien_get_style_part(lv_theme_style_t name, uint8_t part);

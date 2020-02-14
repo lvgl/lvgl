@@ -112,7 +112,7 @@ void lv_init(void)
     /*Init. the sstyles*/
 //    lv_style_built_in_init();
 
-    lv_theme_t * th = lv_theme_alien_init(0, NULL);
+    lv_theme_t * th = lv_theme_default_init(0, NULL);
     lv_theme_set_act(th);
 
     /*Initialize the screen refresh system*/
@@ -3049,15 +3049,15 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 #if LV_USE_GROUP
     else if(sign == LV_SIGNAL_FOCUS) {
         if(lv_group_get_editing(lv_obj_get_group(obj))) {
-            uint8_t state = LV_STATE_FOCUS;
-            state |= LV_STATE_EDIT;
+            uint8_t state = LV_STATE_FOCUSED;
+            state |= LV_STATE_EDITED;
             lv_obj_add_state(obj, state);
         } else {
-            lv_obj_add_state(obj, LV_STATE_FOCUS);
-            lv_obj_clear_state(obj, LV_STATE_EDIT);
+            lv_obj_add_state(obj, LV_STATE_FOCUSED);
+            lv_obj_clear_state(obj, LV_STATE_EDITED);
         }
     } else if(sign == LV_SIGNAL_DEFOCUS) {
-        lv_obj_clear_state(obj, LV_STATE_FOCUS | LV_STATE_EDIT);
+        lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
     }
 #endif
     else if(sign == LV_SIGNAL_CLEANUP) {

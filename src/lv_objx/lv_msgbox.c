@@ -100,7 +100,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_label_set_long_mode(ext->text, LV_LABEL_LONG_BREAK);
         lv_label_set_text(ext->text, "Message");
 
-        lv_cont_set_layout(mbox, LV_LAYOUT_COL_M);
+        lv_cont_set_layout(mbox, LV_LAYOUT_COLUMN_MID);
         lv_cont_set_fit2(mbox, LV_FIT_NONE, LV_FIT_TIGHT);
         lv_obj_set_width(mbox, LV_DPI * 2);
         lv_obj_align(mbox, NULL, LV_ALIGN_CENTER, 0, 0);

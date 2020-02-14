@@ -693,7 +693,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
                 btnm->state_dsc.act = LV_STATE_NORMAL;
                 if(tgl_state) btnm->state_dsc.act = LV_STATE_CHECKED;
                 if(ext->btn_id_pr == btn_i) btnm->state_dsc.act |= LV_STATE_PRESSED;
-                if(ext->btn_id_focused == btn_i) btnm->state_dsc.act |= LV_STATE_FOCUS;
+                if(ext->btn_id_focused == btn_i) btnm->state_dsc.act |= LV_STATE_FOCUSED;
                 btnm->state_dsc.prev = btnm->state_dsc.act;
 
                 lv_draw_rect_dsc_init(&draw_rect_tmp_dsc);
