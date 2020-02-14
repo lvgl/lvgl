@@ -733,6 +733,7 @@ void lv_textarea_set_one_line(lv_obj_t * ta, bool en)
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->one_line == en) return;
+    lv_label_align_t old_align = lv_label_get_align(ext->label);
 
     if(en) {
         lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_BG);
@@ -760,7 +761,8 @@ void lv_textarea_set_one_line(lv_obj_t * ta, bool en)
     }
 
     placeholder_update(ta);
-    refr_cursor_area(ta);
+    /* `refr_cursor_area` is called at the end of lv_ta_set_text_align */
+    lv_ta_set_text_align(ta, old_align);
 }
 
 /**

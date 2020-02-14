@@ -112,7 +112,10 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         lv_obj_set_size(new_tileview, w, h);
+<<<<<<< HEAD
 
+=======
+>>>>>>> dev-7.0
         lv_obj_set_drag_throw(lv_page_get_scrl(new_tileview), true);
         lv_obj_set_drag_dir(lv_page_get_scrl(new_tileview), LV_DRAG_DIR_ONE);
 
@@ -216,6 +219,7 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
     for(tile_id = 0; tile_id < ext->valid_pos_cnt; tile_id++) {
         if(ext->valid_pos[tile_id].x == x && ext->valid_pos[tile_id].y == y) {
             valid = true;
+            break;
         }
     }
 
