@@ -160,6 +160,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->max_length        = copy_ext->max_length;
         ext->cursor.pos        = copy_ext->cursor.pos;
         ext->cursor.valid_x    = copy_ext->cursor.valid_x;
+        ext->cursor.hidden    = copy_ext->cursor.hidden;
 
         lv_style_list_copy(&ext->cursor.style, &copy_ext->cursor.style);
 
@@ -591,7 +592,7 @@ void lv_textarea_set_cursor_pos(lv_obj_t * ta, int16_t pos)
     /*Position the label to make the cursor visible*/
     lv_obj_t * label_par = lv_obj_get_parent(ext->label);
     lv_point_t cur_pos;
-    const lv_font_t * font = lv_obj_get_style_font(ta, LV_TEXTAREA_PART_BG);
+    const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
     lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_BG);
     lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_BG);
     lv_area_t label_cords;
@@ -739,7 +740,7 @@ void lv_textarea_set_one_line(lv_obj_t * ta, bool en)
         lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_BG);
         lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_BG);
         lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_BG);
-        const lv_font_t * font = lv_obj_get_style_font(ta, LV_TEXTAREA_PART_BG);
+        const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
         lv_coord_t font_h              = lv_font_get_line_height(font);
 
         ext->one_line = 1;
@@ -1215,7 +1216,7 @@ void lv_textarea_cursor_down(lv_obj_t * ta)
     /*Increment the y with one line and keep the valid x*/
 
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_BG);
-    const lv_font_t * font = lv_obj_get_style_font(ta, LV_TEXTAREA_PART_BG);
+    const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     pos.y += font_h + line_space + 1;
     pos.x = ext->cursor.valid_x;
@@ -1247,7 +1248,7 @@ void lv_textarea_cursor_up(lv_obj_t * ta)
 
     /*Decrement the y with one line and keep the valid x*/
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_BG);
-    const lv_font_t * font = lv_obj_get_style_font(ta, LV_TEXTAREA_PART_BG);
+    const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     pos.y -= font_h + line_space - 1;
     pos.x = ext->cursor.valid_x;
@@ -1397,7 +1398,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
             if(ext->one_line) {
                 lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_BG);
                 lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_BG);
-                const lv_font_t * font = lv_obj_get_style_font(ta, LV_TEXTAREA_PART_BG);
+                const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
 
                 /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
                 lv_coord_t font_h              = lv_font_get_line_height(font);
@@ -1511,7 +1512,7 @@ static lv_res_t lv_textarea_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign,
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*Set ext. size because the cursor might be out of this object*/
         lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_BG);
-        const lv_font_t * font = lv_obj_get_style_font(ta, LV_TEXTAREA_PART_BG);
+        const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
         lv_coord_t font_h              = lv_font_get_line_height(font);
         scrl->ext_draw_pad             = LV_MATH_MAX(scrl->ext_draw_pad, line_space + font_h);
     } else if(sign == LV_SIGNAL_COORD_CHG) {

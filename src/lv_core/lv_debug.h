@@ -38,6 +38,8 @@ bool lv_debug_check_obj_valid(const lv_obj_t * obj);
 
 bool lv_debug_check_style(const lv_style_t * style);
 
+bool lv_debug_check_style_list(const lv_style_list_t * list);
+
 bool lv_debug_check_str(const void * str);
 
 void lv_debug_log_error(const char * msg, uint64_t value);
@@ -83,6 +85,10 @@ do {                                            \
 
 #ifndef LV_DEBUG_IS_STYLE
 #define LV_DEBUG_IS_STYLE(style_p) (lv_debug_check_style(style_p))
+#endif
+
+#ifndef LV_DEBUG_IS_STYLE_LIST
+#define LV_DEBUG_IS_STYLE_LIST(list_p) (lv_debug_check_style_list(list_p))
 #endif
 
 /*-----------------
@@ -144,8 +150,12 @@ do {                                            \
 # ifndef LV_ASSERT_STYLE
 #  define LV_ASSERT_STYLE(style_p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STYLE(style_p), "Invalid style", style_p);
 # endif
+# ifndef LV_ASSERT_STYLE_LIST
+#  define LV_ASSERT_STYLE_LIST(list_p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STYLE_LIST(list_p), "Invalid style list", list_p);
+# endif
 #else
-#  define LV_ASSERT_STYLE(style) true
+#  define LV_ASSERT_STYLE(style_p) true
+#  define LV_ASSERT_STYLE_LIST(list_p) true
 #endif
 
 #else /* LV_USE_DEBUG == 0 */

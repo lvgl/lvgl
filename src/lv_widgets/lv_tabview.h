@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#if LV_USE_TEXTAREABVIEW != 0
+#if LV_USE_TABVIEW != 0
 
 /*Testing of dependencies*/
 #if LV_USE_BTNMATRIX == 0
@@ -176,7 +176,7 @@ lv_tabview_btns_pos_t lv_tabview_get_btns_pos(const lv_obj_t * tabview);
  *      MACROS
  **********************/
 
-#endif /*LV_USE_TEXTAREABVIEW*/
+#endif /*LV_USE_TABVIEW*/
 
 #ifdef __cplusplus
 } /* extern "C" */

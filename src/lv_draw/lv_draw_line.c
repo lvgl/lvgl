@@ -8,7 +8,6 @@
  *********************/
 #include <stdio.h>
 #include <stdbool.h>
-#include "lv_draw.h"
 #include "lv_draw_mask.h"
 #include "lv_draw_blend.h"
 #include "../lv_core/lv_refr.h"

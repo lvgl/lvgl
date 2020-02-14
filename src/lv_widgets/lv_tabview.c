@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_tabview.h"
-#if LV_USE_TEXTAREABVIEW != 0
+#if LV_USE_TABVIEW != 0
 
 #include "lv_btnmatrix.h"
 #include "../lv_core/lv_debug.h"
@@ -864,7 +864,7 @@ static void refr_btns_size(lv_obj_t * tabview)
     lv_style_int_t tab_top = lv_obj_get_style_pad_top(tabview, LV_TABVIEW_PART_TAB);
     lv_style_int_t tab_bottom = lv_obj_get_style_pad_bottom(tabview, LV_TABVIEW_PART_TAB);
 
-    const lv_font_t * font = lv_obj_get_style_font(tabview, LV_TABVIEW_PART_TAB);
+    const lv_font_t * font = lv_obj_get_style_text_font(tabview, LV_TABVIEW_PART_TAB);
 
     /*Set the tabs height/width*/
     lv_coord_t btns_w;

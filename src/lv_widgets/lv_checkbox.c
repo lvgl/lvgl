@@ -178,7 +178,7 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * cb, lv_signal_t sign, void * param
     lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
-        const lv_font_t * font = lv_obj_get_style_font(ext->label, LV_LABEL_PART_MAIN);
+        const lv_font_t * font = lv_obj_get_style_text_font(ext->label, LV_LABEL_PART_MAIN);
         lv_coord_t line_height = lv_font_get_line_height(font);
         lv_obj_set_size(ext->bullet, line_height, line_height);
         lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CHECKBOX_PART_BG));

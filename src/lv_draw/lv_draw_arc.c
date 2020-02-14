@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_draw_arc.h"
+#include "lv_draw_rect.h"
 #include "lv_draw_mask.h"
 #include "../lv_misc/lv_math.h"
 

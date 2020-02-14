@@ -778,7 +778,7 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
             sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_t * label = lv_list_get_btn_label(btn);
         if(label) {
-            const lv_font_t * font = lv_obj_get_style_font(label, LV_LABEL_PART_MAIN);
+            const lv_font_t * font = lv_obj_get_style_text_font(label, LV_LABEL_PART_MAIN);
             lv_coord_t font_h = lv_font_get_line_height(font);
             if(lv_obj_get_base_dir(btn) == LV_BIDI_DIR_RTL) {
                 lv_coord_t pad = lv_obj_get_style_pad_left(btn, LV_BTN_PART_MAIN);

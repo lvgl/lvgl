@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#if LV_USE_TEXTAREABLE != 0
+#if LV_USE_TABLE != 0
 
 /*Testing of dependencies*/
 #if LV_USE_LABEL == 0
@@ -238,7 +238,7 @@ bool lv_table_get_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col)
  *      MACROS
  **********************/
 
-#endif /*LV_USE_TEXTAREABLE*/
+#endif /*LV_USE_TABLE*/
 
 #ifdef __cplusplus
 } /* extern "C" */

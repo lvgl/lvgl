@@ -372,6 +372,17 @@ static lv_design_res_t lv_bar_design(lv_obj_t * bar, const lv_area_t * clip_area
         draw_bg(bar, clip_area);
         draw_indic(bar, clip_area);
 
+        /*Get the value and draw it after the indicator*/
+        lv_draw_rect_dsc_t draw_dsc;
+        lv_draw_rect_dsc_init(&draw_dsc);
+        draw_dsc.bg_opa = LV_OPA_TRANSP;
+        draw_dsc.border_opa = LV_OPA_TRANSP;
+        draw_dsc.shadow_opa = LV_OPA_TRANSP;
+        draw_dsc.pattern_opa = LV_OPA_TRANSP;
+        draw_dsc.outline_opa = LV_OPA_TRANSP;
+        lv_obj_init_draw_rect_dsc(bar, LV_BAR_PART_BG, &draw_dsc);
+        lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
+
     } else if(mode == LV_DESIGN_DRAW_POST) {
 
     }
@@ -565,14 +576,19 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
     draw_indic_dsc.shadow_opa = shadow_opa;
     draw_indic_dsc.value_opa = value_opa;
 
-    /*Draw the border and the value*/
+    /*Draw the border*/
     draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
     draw_indic_dsc.shadow_opa = LV_OPA_TRANSP;
+    draw_indic_dsc.value_opa = LV_OPA_TRANSP;
     draw_indic_dsc.pattern_image = NULL;
     lv_draw_rect(&ext->indic_area, clip_area, &draw_indic_dsc);
 
     lv_draw_mask_remove_id(mask_indic_id);
     lv_draw_mask_remove_id(mask_bg_id);
+
+    /*When not masks draw the value*/
+    draw_indic_dsc.value_opa = value_opa;
+    lv_draw_rect(&ext->indic_area, clip_area, &draw_indic_dsc);
 
 }
 

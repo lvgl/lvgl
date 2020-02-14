@@ -26,6 +26,9 @@ extern "C" {
 #include "../lv_misc/lv_bidi.h"
 #include "../lv_hal/lv_hal.h"
 #include "../lv_draw/lv_draw_rect.h"
+#include "../lv_draw/lv_draw_label.h"
+#include "../lv_draw/lv_draw_line.h"
+#include "../lv_draw/lv_draw_img.h"
 
 /*********************
  *      DEFINES
@@ -1099,11 +1102,13 @@ _LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_FONT, value_font, const lv_font_t * , _ptr);
 _LV_OBJ_STYLE_SET_GET_DECLARE(VALUE_STR, value_str, const char * , _ptr);
 _LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_LETTER_SPACE, text_letter_space, lv_style_int_t, _int);
 _LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_LINE_SPACE, text_line_space, lv_style_int_t, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_UNDERLINE, text_underline, bool, _int);
+_LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_STRIKETHROUGH, text_strikethrough, bool, _int);
 _LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_BLEND_MODE, text_blend_mode, lv_blend_mode_t, _int);
 _LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_COLOR, text_color, lv_color_t, _color);
 _LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_SEL_COLOR, text_sel_color, lv_color_t, _color);
 _LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_OPA, text_opa, lv_opa_t, _opa);
-_LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_FONT, font, const lv_font_t * , _ptr);
+_LV_OBJ_STYLE_SET_GET_DECLARE(TEXT_FONT, text_font, const lv_font_t * , _ptr);
 _LV_OBJ_STYLE_SET_GET_DECLARE(LINE_WIDTH, line_width, lv_style_int_t, _int);
 _LV_OBJ_STYLE_SET_GET_DECLARE(LINE_BLEND_MODE, line_blend_mode, lv_blend_mode_t, _int);
 _LV_OBJ_STYLE_SET_GET_DECLARE(LINE_DASH_WIDTH, line_dash_width, lv_style_int_t, _int);

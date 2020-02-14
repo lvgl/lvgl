@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../lv_core/lv_style.h"
 
 /*********************
  *      DEFINES

@@ -824,20 +824,20 @@
 #endif
 
 /*Table (dependencies: lv_label)*/
-#ifndef LV_USE_TEXTAREABLE
-#define LV_USE_TEXTAREABLE    1
+#ifndef LV_USE_TABLE
+#define LV_USE_TABLE    1
 #endif
-#if LV_USE_TEXTAREABLE
+#if LV_USE_TABLE
 #ifndef LV_TABLE_COL_MAX
 #  define LV_TABLE_COL_MAX    12
 #endif
 #endif
 
 /*Tab (dependencies: lv_page, lv_btnm)*/
-#ifndef LV_USE_TEXTAREABVIEW
-#define LV_USE_TEXTAREABVIEW      1
+#ifndef LV_USE_TABVIEW
+#define LV_USE_TABVIEW      1
 #endif
-#  if LV_USE_TEXTAREABVIEW != 0
+#  if LV_USE_TABVIEW != 0
 /*Time of slide animation [ms] (0: no animation)*/
 #ifndef LV_TABVIEW_DEF_ANIM_TIME
 #  define LV_TABVIEW_DEF_ANIM_TIME    300

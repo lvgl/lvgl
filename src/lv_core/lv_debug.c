@@ -92,10 +92,24 @@ bool lv_debug_check_style(const lv_style_t * style)
     if(style == NULL) return true;  /*NULL style is still valid*/
 
 #if LV_USE_ASSERT_STYLE
-//    if(style->debug_sentinel != LV_STYLE_DEGUG_SENTINEL_VALUE) {
-//        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
-//        return false;
-//    }
+    if(style->sentinel != LV_DEBUG_STYLE_SENTINEL_VALUE) {
+        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
+        return false;
+    }
+#endif
+
+    return true;
+}
+
+bool lv_debug_check_style_list(const lv_style_list_t * list)
+{
+    if(list == NULL) return true;  /*NULL list is still valid*/
+
+#if LV_USE_ASSERT_STYLE
+    if(list->sentinel != LV_DEBUG_STYLE_LIST_SENTINEL_VALUE) {
+        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
+        return false;
+    }
 #endif
 
     return true;

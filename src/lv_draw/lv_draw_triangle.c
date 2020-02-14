@@ -35,15 +35,14 @@
  **********************/
 
 /**
- *
+ * Draw a triangle
  * @param points pointer to an array with 3 points
  * @param clip_area the triangle will be drawn only in this area
- * @param style style for of the triangle
- * @param opa_scale scale down all opacities by the factor (0..255)
+ * @param draw_dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_triangle(const lv_point_t * points, const lv_area_t * clip_area, const lv_style_t * style, lv_opa_t opa_scale)
+void lv_draw_triangle(const lv_point_t * points, const lv_area_t * clip_area, lv_draw_rect_dsc_t * draw_dsc)
 {
-    lv_draw_polygon(points, 3, clip_area, style, opa_scale);
+    lv_draw_polygon(points, 3, clip_area, draw_dsc);
 }
 
 /**
@@ -51,11 +50,9 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * clip_area, co
  * @param points an array of points
  * @param point_cnt number of points
  * @param clip_area polygon will be drawn only in this area
- * @param style style of the polygon
- * @param opa_scale scale down all opacities by the factor (0..255)
+ * @param draw_dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_area_t * clip_area, const lv_style_t * style,
-                     lv_opa_t opa_scale)
+void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_area_t * clip_area, lv_draw_rect_dsc_t * draw_dsc)
 {
     if(point_cnt < 3) return;
     if(points == NULL) return;
@@ -153,9 +150,7 @@ void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_are
 
     }while( mask_cnt < point_cnt);
 
-
-
-    lv_draw_rect(&poly_coords, &poly_mask, style);
+    lv_draw_rect(&poly_coords, clip_area, draw_dsc);
 
     lv_draw_mask_remove_custom(mp);
 

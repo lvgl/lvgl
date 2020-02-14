@@ -288,18 +288,6 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 
 #endif /*LV_USE_DEBUG*/
 
-/*================
- *  THEME USAGE
- *================*/
-#define LV_USE_THEME_TEMPL      0   /*Just for test*/
-#define LV_USE_THEME_DEFAULT    0   /*Built mainly from the built-in styles. Consumes very few RAM*/
-#define LV_USE_THEME_ALIEN      0   /*Dark futuristic theme*/
-#define LV_USE_THEME_NIGHT      0   /*Dark elegant theme*/
-#define LV_USE_THEME_MONO       0   /*Mono color theme for monochrome displays*/
-#define LV_USE_THEME_MATERIAL   0   /*Flat theme with bold colors and light shadows*/
-#define LV_USE_THEME_ZEN        0   /*Peaceful, mainly light theme */
-#define LV_USE_THEME_NEMO       0   /*Water-like theme based on the movie "Finding Nemo"*/
-
 /*==================
  *    FONT USAGE
  *===================*/
@@ -333,9 +321,6 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
  */
 #define LV_FONT_CUSTOM_DECLARE
 
-/*Always set a default font from the built-in fonts*/
-#define LV_FONT_DEFAULT        &lv_font_roboto_16
-
 /* Enable it if you have fonts with a lot of characters.
  * The limit depends on the font size, font face and bpp
  * but with > 10,000 characters if you see issues probably you need to enable it.*/
@@ -349,6 +334,23 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 
 /*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
 typedef void * lv_font_user_data_t;
+
+
+/*================
+ *  THEME USAGE
+ *================*/
+
+/*Always enable at least on theme*/
+#define LV_USE_THEME_MATERIAL    1   /*A fast and impressive theme*/
+
+#define LV_THEME_DEFAULT_INIT               lv_theme_material_init
+#define LV_THEME_DEFAULT_COLOR_PRIMARY      LV_COLOR_RED
+#define LV_THEME_DEFAULT_COLOR_SECONDARY    LV_COLOR_BLUE
+#define LV_THEME_DEFAULT_FLAGS              LV_THEME_MATERIAL_FLAG_NONE
+#define LV_THEME_DEFAULT_FONT_SMALL         &lv_font_roboto_12
+#define LV_THEME_DEFAULT_FONT_NORMAL        &lv_font_roboto_16
+#define LV_THEME_DEFAULT_FONT_SUBTITLE      &lv_font_roboto_22
+#define LV_THEME_DEFAULT_FONT_TITLE         &lv_font_roboto_28
 
 /*=================
  *  Text settings
@@ -564,14 +566,14 @@ typedef void * lv_obj_user_data_t;
 #endif
 
 /*Table (dependencies: lv_label)*/
-#define LV_USE_TEXTAREABLE    1
-#if LV_USE_TEXTAREABLE
+#define LV_USE_TABLE    1
+#if LV_USE_TABLE
 #  define LV_TABLE_COL_MAX    12
 #endif
 
 /*Tab (dependencies: lv_page, lv_btnm)*/
-#define LV_USE_TEXTAREABVIEW      1
-#  if LV_USE_TEXTAREABVIEW != 0
+#define LV_USE_TABVIEW      1
+#  if LV_USE_TABVIEW != 0
 /*Time of slide animation [ms] (0: no animation)*/
 #  define LV_TABVIEW_DEF_ANIM_TIME    300
 #endif

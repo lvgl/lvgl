@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 #include "../lv_core/lv_obj.h"
-#include "../lv_widgets/lv_ta.h"
+#include "../lv_widgets/lv_textarea.h"
 
 /*********************
  *      DEFINES

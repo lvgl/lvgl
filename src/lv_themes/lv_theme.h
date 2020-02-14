@@ -111,7 +111,7 @@ lv_style_t * lv_theme_get_style_part(lv_theme_style_t name, uint8_t part);
 /**********************
  *     POST INCLUDE
  *********************/
-#include "lv_theme_def.h"
+#include <lvgl/src/lv_themes/lv_theme_material.h>
 
 #ifdef __cplusplus
 } /* extern "C" */

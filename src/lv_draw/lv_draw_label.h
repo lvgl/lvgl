@@ -13,8 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw.h"
 #include "../lv_misc/lv_bidi.h"
+#include "../lv_misc/lv_txt.h"
+#include "../lv_core/lv_style.h"
 
 /*********************
  *      DEFINES
@@ -38,6 +39,9 @@ typedef struct {
     lv_coord_t ofs_y;
     lv_bidi_dir_t bidi_dir;
     lv_txt_flag_t flag;
+    lv_blend_mode_t blend_mode;
+    uint8_t underline    :1;
+    uint8_t strikethrough    :1;
 }lv_draw_label_dsc_t;
 
 /** Store some info to speed up drawing of very large texts
@@ -62,7 +66,6 @@ typedef struct {
  **********************/
 
 void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
-
 
 /**
  * Write a text

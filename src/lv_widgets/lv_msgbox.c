@@ -515,7 +515,7 @@ static void mbox_realign(lv_obj_t * mbox)
         lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(mbox, LV_MSGBOX_PART_BTN_BG);
         lv_style_int_t btn_top = lv_obj_get_style_pad_top(mbox, LV_MSGBOX_PART_BTN);
         lv_style_int_t btn_bottom = lv_obj_get_style_pad_bottom(mbox, LV_MSGBOX_PART_BTN);
-        const lv_font_t * font = lv_obj_get_style_font(mbox, LV_MSGBOX_PART_BTN);
+        const lv_font_t * font = lv_obj_get_style_text_font(mbox, LV_MSGBOX_PART_BTN);
 
         lv_coord_t font_h = lv_font_get_line_height(font);
         lv_obj_set_size(ext->btnm, w, font_h + btn_top + btn_bottom + bg_top + bg_bottom);

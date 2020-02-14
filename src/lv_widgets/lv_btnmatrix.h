@@ -106,7 +106,7 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[]);
  *                 An element of the map should look like e.g.:
  *                 `ctrl_map[0] = width | LV_BTNMATRIX_CTRL_NO_REPEAT |  LV_BTNMATRIX_CTRL_TGL_ENABLE`
  */
-void lv_btnmatrix_set_ctrl_map(const lv_obj_t * btnm, const lv_btnmatrix_ctrl_t ctrl_map[]);
+void lv_btnmatrix_set_ctrl_map(lv_obj_t * btnm, const lv_btnmatrix_ctrl_t ctrl_map[]);
 
 /**
  * Set the pressed button i.e. visually highlight it.
@@ -114,7 +114,7 @@ void lv_btnmatrix_set_ctrl_map(const lv_obj_t * btnm, const lv_btnmatrix_ctrl_t 
  * @param btnm pointer to button matrix object
  * @param id index of the currently pressed button (`LV_BTNMATRIX_BTN_NONE` to unpress)
  */
-void lv_btnmatrix_set_pressed(const lv_obj_t * btnm, uint16_t id);
+void lv_btnmatrix_set_pressed(lv_obj_t * btnm, uint16_t id);
 
 /**
  * Set a style of a button matrix

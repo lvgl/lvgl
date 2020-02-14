@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_table.h"
-#if LV_USE_TEXTAREABLE != 0
+#if LV_USE_TABLE != 0
 
 #include "../lv_core/lv_debug.h"
 #include "../lv_misc/lv_txt.h"
@@ -863,7 +863,7 @@ static void refr_size(lv_obj_t * table)
         cell_bottom[i] = lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_CELL1 + i);
         letter_space[i] = lv_obj_get_style_text_letter_space(table, LV_TABLE_PART_CELL1 + i);
         line_space[i] = lv_obj_get_style_text_line_space(table, LV_TABLE_PART_CELL1 + i);
-        font[i] = lv_obj_get_style_font(table, LV_TABLE_PART_CELL1 + i);
+        font[i] = lv_obj_get_style_text_font(table, LV_TABLE_PART_CELL1 + i);
     }
 
 

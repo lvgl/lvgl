@@ -402,7 +402,7 @@ static void refr_img(lv_obj_t * imgbtn)
 
     lv_res_t info_res = LV_RES_OK;
     if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
-        const lv_font_t * font = lv_obj_get_style_font(imgbtn, LV_IMGBTN_PART_MAIN);
+        const lv_font_t * font = lv_obj_get_style_text_font(imgbtn, LV_IMGBTN_PART_MAIN);
         header.h = lv_font_get_line_height(font);
         header.w = lv_txt_get_width(src, (uint16_t)strlen(src), font, 0, LV_TXT_FLAG_NONE);
         header.always_zero = 0;

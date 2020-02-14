@@ -776,7 +776,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_style_int_t top = lv_obj_get_style_pad_top(ddlist, LV_DROPDOWN_PART_BTN);
         lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ddlist, LV_DROPDOWN_PART_BTN);
-        const lv_font_t * font = lv_obj_get_style_font(ddlist, LV_DROPDOWN_PART_BTN);
+        const lv_font_t * font = lv_obj_get_style_text_font(ddlist, LV_DROPDOWN_PART_BTN);
         lv_obj_set_height(ddlist, top + bottom + lv_font_get_line_height(font));
 
         if(ext->page) lv_obj_refresh_style(ext->page);
@@ -940,7 +940,7 @@ static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id
     page->state_dsc.prev = page->state_dsc.act;
 
     /*Draw a rectangle under the selected item*/
-    const lv_font_t * font    = lv_obj_get_style_font(ddlist, LV_DROPDOWN_PART_LIST);
+    const lv_font_t * font    = lv_obj_get_style_text_font(ddlist, LV_DROPDOWN_PART_LIST);
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(ddlist, LV_DROPDOWN_PART_LIST);
     lv_coord_t font_h         = lv_font_get_line_height(font);
 
@@ -1095,7 +1095,7 @@ static void pos_selected(lv_obj_t * ddlist)
 {
     lv_dropdown_ext_t * ext          = lv_obj_get_ext_attr(ddlist);
 
-    const lv_font_t * font         = lv_obj_get_style_font(ddlist, LV_DROPDOWN_PART_LIST);
+    const lv_font_t * font         = lv_obj_get_style_text_font(ddlist, LV_DROPDOWN_PART_LIST);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     lv_obj_t * scrl                = lv_page_get_scrl(ext->page);
     lv_obj_t * label = get_label(ddlist);

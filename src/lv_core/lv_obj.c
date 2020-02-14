@@ -108,7 +108,10 @@ void lv_init(void)
 #endif
 
 
-    lv_theme_t * th = lv_theme_default_init(0, NULL);
+
+    lv_theme_t * th = LV_THEME_DEFAULT_INIT(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY,
+            LV_THEME_DEFAULT_FLAGS,
+            LV_THEME_DEFAULT_FONT_SMALL, LV_THEME_DEFAULT_FONT_NORMAL, LV_THEME_DEFAULT_FONT_SUBTITLE, LV_THEME_DEFAULT_FONT_TITLE);
     lv_theme_set_act(th);
 
     /*Initialize the screen refresh system*/
@@ -2852,7 +2855,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
                 draw_dsc->pattern_repeat = lv_obj_get_style_pattern_repeat(obj, part);
                 if(lv_img_src_get_type(draw_dsc->pattern_image) == LV_IMG_SRC_SYMBOL) {
                     draw_dsc->pattern_recolor = lv_obj_get_style_pattern_recolor(obj, part);
-                    draw_dsc->pattern_font = lv_obj_get_style_font(obj, part);
+                    draw_dsc->pattern_font = lv_obj_get_style_text_font(obj, part);
                 } else if(draw_dsc->pattern_recolor_opa > LV_OPA_MIN ) {
                     draw_dsc->pattern_recolor = lv_obj_get_style_pattern_recolor(obj, part);
                 }
@@ -2914,8 +2917,11 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
     draw_dsc->color = lv_obj_get_style_text_color(obj, part);
     draw_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, part);
     draw_dsc->line_space = lv_obj_get_style_text_line_space(obj, part);
+    draw_dsc->blend_mode = lv_obj_get_style_text_blend_mode(obj, part);
+    draw_dsc->underline = lv_obj_get_style_text_underline(obj, part);
+    draw_dsc->strikethrough = lv_obj_get_style_text_strikethrough(obj, part);
 
-    draw_dsc->font = lv_obj_get_style_font(obj, part);
+    draw_dsc->font = lv_obj_get_style_text_font(obj, part);
 
     if(draw_dsc->sel_start != LV_DRAW_LABEL_NO_TXT_SEL && draw_dsc->sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
         draw_dsc->color = lv_obj_get_style_text_sel_color(obj, part);

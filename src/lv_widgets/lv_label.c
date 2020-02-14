@@ -565,7 +565,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
     lv_coord_t max_w         = lv_area_get_width(&txt_coords);
-    const lv_font_t * font   = lv_obj_get_style_font(label, LV_LABEL_PART_MAIN);
+    const lv_font_t * font   = lv_obj_get_style_text_font(label, LV_LABEL_PART_MAIN);
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(label, LV_LABEL_PART_MAIN);
     lv_style_int_t letter_space = lv_obj_get_style_text_letter_space(label, LV_LABEL_PART_MAIN);
     lv_coord_t letter_height    = lv_font_get_line_height(font);
@@ -671,7 +671,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
     lv_coord_t max_w         = lv_area_get_width(&txt_coords);
-    const lv_font_t * font   = lv_obj_get_style_font(label, LV_LABEL_PART_MAIN);
+    const lv_font_t * font   = lv_obj_get_style_text_font(label, LV_LABEL_PART_MAIN);
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(label, LV_LABEL_PART_MAIN);
     lv_style_int_t letter_space = lv_obj_get_style_text_letter_space(label, LV_LABEL_PART_MAIN);
     lv_coord_t letter_height    = lv_font_get_line_height(font);
@@ -834,7 +834,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
     lv_coord_t max_w         = lv_area_get_width(&txt_coords);
-    const lv_font_t * font   = lv_obj_get_style_font(label, LV_LABEL_PART_MAIN);
+    const lv_font_t * font   = lv_obj_get_style_text_font(label, LV_LABEL_PART_MAIN);
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(label, LV_LABEL_PART_MAIN);
     lv_style_int_t letter_space = lv_obj_get_style_text_letter_space(label, LV_LABEL_PART_MAIN);
     lv_coord_t letter_height    = lv_font_get_line_height(font);
@@ -1179,7 +1179,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     lv_area_t txt_coords;
     get_txt_coords(label, &txt_coords);
     lv_coord_t max_w         = lv_area_get_width(&txt_coords);
-    const lv_font_t * font   = lv_obj_get_style_font(label, LV_LABEL_PART_MAIN);
+    const lv_font_t * font   = lv_obj_get_style_text_font(label, LV_LABEL_PART_MAIN);
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(label, LV_LABEL_PART_MAIN);
     lv_style_int_t letter_space = lv_obj_get_style_text_letter_space(label, LV_LABEL_PART_MAIN);
 
