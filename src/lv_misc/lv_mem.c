@@ -353,6 +353,7 @@ void lv_mem_defrag(void)
 
 lv_res_t lv_mem_test(void)
 {
+#if LV_MEM_CUSTOM == 0
     lv_mem_ent_t * e;
     e = ent_get_next(NULL);
     while(e) {
@@ -362,7 +363,7 @@ lv_res_t lv_mem_test(void)
         }
         e = ent_get_next(e);
     }
-
+#endif
     return LV_RES_OK;
 }
 
