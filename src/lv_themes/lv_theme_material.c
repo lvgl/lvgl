@@ -728,8 +728,7 @@ static void tabview_init(void)
     lv_style_init(&tabview_btns);
     lv_style_set_bg_opa(&tabview_btns, LV_STATE_PRESSED, LV_OPA_COVER);
     lv_style_set_bg_color(&tabview_btns, LV_STATE_PRESSED, lv_color_hex(0x444444));
-    lv_style_set_text_color(&tabview_btns, LV_STATE_CHECKED, COLOR_ACCENT);
-    lv_style_set_text_color(&tabview_btns, LV_STATE_FOCUSED, LV_COLOR_RED);
+    lv_style_set_text_color(&tabview_btns, LV_STATE_CHECKED, LV_COLOR_WHITE);
     lv_style_set_pad_top(&tabview_btns, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_bottom(&tabview_btns, LV_STATE_NORMAL, LV_DPI / 5);
 
