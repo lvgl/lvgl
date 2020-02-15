@@ -420,7 +420,7 @@ static lv_style_list_t * lv_spinbox_get_style(lv_obj_t * ta, uint8_t part)
         style_dsc_p = &ta->style_list;
         break;
     case LV_SPINBOX_PART_SCRLBAR:
-        style_dsc_p = &ext->ta.page.sb.style;
+        style_dsc_p = &ext->ta.page.scrlbar.style;
         break;
     case LV_SPINBOX_PART_CURSOR:
         style_dsc_p = &ext->ta.cursor.style;

@@ -278,9 +278,10 @@ static lv_res_t lv_switch_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
 
     if(sign == LV_SIGNAL_CLEANUP) {
-        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+        lv_switch_ext_t * ext = lv_obj_get_ext_attr(sw);
+        lv_style_list_reset(&ext->style_knob);
     } else if(sign == LV_SIGNAL_RELEASED) {
-        if(lv_switch_get_state(sw)) lv_switch_off(sw, LV_ANIM_ON);
+            if(lv_switch_get_state(sw)) lv_switch_off(sw, LV_ANIM_ON);
         else lv_switch_on(sw, LV_ANIM_ON);
 
         res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);

@@ -740,6 +740,9 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         lv_dropdown_close(ddlist, LV_ANIM_OFF);
+        lv_style_list_reset(&ext->style_page);
+        lv_style_list_reset(&ext->style_scrlbar);
+        lv_style_list_reset(&ext->style_selected);
     }
     else if(sign == LV_SIGNAL_FOCUS) {
 #if LV_USE_GROUP

@@ -652,6 +652,9 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
             lv_mem_free(*datal);
         }
         lv_ll_clear(&ext->series_ll);
+
+        lv_style_list_reset(&ext->style_series);
+        lv_style_list_reset(&ext->style_series_bg);
     }
 
     return res;

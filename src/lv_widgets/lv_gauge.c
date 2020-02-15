@@ -397,6 +397,8 @@ static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_mem_free(ext->values);
         ext->values = NULL;
+        lv_style_list_reset(&ext->style_needle);
+        lv_style_list_reset(&ext->style_strong);
     }
 
     return res;

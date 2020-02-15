@@ -419,7 +419,8 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
-        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+        lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
+        lv_style_list_reset(&ext->style_arc);
     }
 
     return res;

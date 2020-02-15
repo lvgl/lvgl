@@ -782,15 +782,19 @@ static lv_res_t lv_table_signal(lv_obj_t * table, lv_signal_t sign, void * param
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Free the cell texts*/
         lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
-        uint16_t cell;
-        for(cell = 0; cell < ext->col_cnt * ext->row_cnt; cell++) {
-            if(ext->cell_data[cell]) {
-                lv_mem_free(ext->cell_data[cell]);
-                ext->cell_data[cell] = NULL;
+        uint16_t i;
+        for(i = 0; i < ext->col_cnt * ext->row_cnt; i++) {
+            if(ext->cell_data[i]) {
+                lv_mem_free(ext->cell_data[i]);
+                ext->cell_data[i] = NULL;
             }
         }
-        if(ext->cell_data != NULL)
-            lv_mem_free(ext->cell_data);
+
+        if(ext->cell_data != NULL) lv_mem_free(ext->cell_data);
+
+        for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
+            lv_style_list_reset(&ext->cell_style[i]);
+        }
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         refr_size(table);

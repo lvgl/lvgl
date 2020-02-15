@@ -830,7 +830,7 @@ static lv_style_list_t * lv_list_get_style(lv_obj_t * list, uint8_t part)
         style_dsc_p = &ext->page.scrl->style_list;
         break;
     case LV_LIST_PART_SCRLBAR:
-        style_dsc_p = &ext->page.sb.style;
+        style_dsc_p = &ext->page.scrlbar.style;
         break;
 #if LV_USE_ANIMATION
     case LV_LIST_PART_EDGE_FLASH:

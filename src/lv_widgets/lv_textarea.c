@@ -1391,8 +1391,9 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(sign == LV_SIGNAL_CLEANUP) {
         if(ext->pwd_tmp != NULL) lv_mem_free(ext->pwd_tmp);
-
         /* (The created label will be deleted automatically) */
+
+        lv_style_list_reset(&ext->cursor.style);
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         if(ext->label) {
             if(ext->one_line) {
@@ -1556,7 +1557,7 @@ static lv_style_list_t * lv_textarea_get_style(lv_obj_t * ta, uint8_t part)
         style_dsc_p = &ta->style_list;
         break;
     case LV_TEXTAREA_PART_SCRLBAR:
-        style_dsc_p = &ext->page.sb.style;
+        style_dsc_p = &ext->page.scrlbar.style;
         break;
     case LV_TEXTAREA_PART_CURSOR:
         style_dsc_p = &ext->cursor.style;

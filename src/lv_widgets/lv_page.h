@@ -63,7 +63,7 @@ typedef struct
         uint8_t hor_draw : 1;     /*1: horizontal scrollbar is visible now (Handled by the library)*/
         uint8_t ver_draw : 1;     /*1: vertical scrollbar is visible now (Handled by the library)*/
         lv_sb_mode_t mode : 3;    /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
-    } sb;
+    } scrlbar;
 #if LV_USE_ANIMATION
     struct
     {
