@@ -66,8 +66,6 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
  */
 void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src, lv_draw_img_dsc_t * dsc)
 {
-
-
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
         show_error(coords, mask, "No\ndata");

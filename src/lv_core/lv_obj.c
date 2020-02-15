@@ -2296,6 +2296,8 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
     prop = prop & (~LV_STYLE_STATE_MASK);
     switch(prop) {
     case LV_STYLE_BG_OPA:
+    case LV_STYLE_IMAGE_RECOLOR_OPA:
+    case LV_STYLE_PATTERN_RECOLOR_OPA:
         return LV_OPA_TRANSP;
     }
 
