@@ -119,7 +119,7 @@ static lv_style_t cpicker_bg, cpicker_indic;
 
 
 #if LV_USE_MSGBOX
-static lv_style_t mbox_btn, mbox_btn_bg;
+static lv_style_t mbox_bg, mbox_btn, mbox_btn_bg;
 #endif
 
 #if LV_USE_TABVIEW
@@ -549,16 +549,22 @@ static void keyboard_init(void)
 static void msgbox_init(void)
 {
 #if LV_USE_MSGBOX
+    lv_style_init(&mbox_bg);
+    lv_style_copy(&mbox_bg, &panel);
+    lv_style_set_border_side(&mbox_bg, LV_STATE_NORMAL, LV_BORDER_SIDE_FULL);
+    lv_style_set_bg_color(&mbox_bg, LV_STATE_NORMAL, lv_color_lighten(COLOR_CONTAINER, LV_OPA_10));
+    lv_style_set_border_color(&mbox_bg, LV_STATE_NORMAL, lv_color_lighten(COLOR_CONTAINER, LV_OPA_30));
+
     lv_style_init(&mbox_btn);
     lv_style_set_radius(&mbox_btn, LV_STATE_NORMAL, LV_RADIUS_CIRCLE);
     lv_style_set_bg_opa(&mbox_btn, LV_STATE_NORMAL, LV_OPA_COVER);
-    lv_style_set_bg_color(&mbox_btn, LV_STATE_NORMAL, lv_color_lighten(COLOR_CONTAINER, LV_OPA_10));
-    lv_style_set_bg_color(&mbox_btn, LV_STATE_PRESSED, lv_color_darken(COLOR_CONTAINER, LV_OPA_30));
+    lv_style_set_bg_color(&mbox_btn, LV_STATE_NORMAL, lv_color_lighten(COLOR_CONTAINER, LV_OPA_20));
+    lv_style_set_bg_color(&mbox_btn, LV_STATE_PRESSED, lv_color_darken(COLOR_CONTAINER, LV_OPA_10));
     lv_style_set_bg_color(&mbox_btn, LV_STATE_CHECKED, COLOR_ACCENT);
     lv_style_set_bg_color(&mbox_btn, LV_STATE_CHECKED | LV_STATE_PRESSED, lv_color_darken(COLOR_ACCENT, LV_OPA_30));
     lv_style_set_border_width(&mbox_btn, LV_STATE_NORMAL, 2);
     lv_style_set_border_width(&mbox_btn, LV_STATE_CHECKED, 0);
-    lv_style_set_text_color(&mbox_btn, LV_STATE_CHECKED, LV_COLOR_WHITE);
+    lv_style_set_text_color(&mbox_btn, LV_STATE_NORMAL, LV_COLOR_WHITE);
     lv_style_set_border_color(&mbox_btn, LV_STATE_NORMAL, lv_color_lighten(COLOR_CONTAINER, LV_OPA_30));
     lv_style_set_pad_top(&mbox_btn, LV_STATE_NORMAL,  LV_DPI / 20);
     lv_style_set_pad_bottom(&mbox_btn, LV_STATE_NORMAL,  LV_DPI / 20);
@@ -1019,7 +1025,7 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
     case LV_THEME_MSGBOX:
         list = lv_obj_get_style_list(obj, LV_MSGBOX_PART_BG);
         lv_style_list_reset(list);
-        lv_style_list_add_style(list, &panel);
+        lv_style_list_add_style(list, &mbox_bg);
         break;
 
     case LV_THEME_MSGBOX_BTNS:
