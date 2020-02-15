@@ -124,7 +124,6 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
  */
 void lv_win_set_header_height(lv_obj_t * win, lv_coord_t size);
 
-
 /**
  * Set the size of the content area.
  * @param win pointer to a window object
@@ -185,6 +184,13 @@ lv_obj_t * lv_win_get_content(const lv_obj_t * win);
  * @return control button size
  */
 lv_coord_t lv_win_get_btn_size(const lv_obj_t * win);
+
+/**
+ * Get the header height
+ * @param win pointer to a window object
+ * @return header height
+ */
+lv_coord_t lv_win_get_header_height(const lv_obj_t * win);
 
 /**
  * Get the pointer of a widow from one of  its control button.

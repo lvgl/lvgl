@@ -56,8 +56,10 @@ static void page_press_handler(lv_obj_t * page);
 static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t x, lv_coord_t y);
 static void pos_selected(lv_obj_t * ddlist);
 static lv_obj_t * get_label(const lv_obj_t * ddlist);
+#if LV_USE_ANIMATION
 static void list_anim(void * p, lv_anim_value_t v);
 static void close_anim_ready(lv_anim_t * a);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -503,6 +505,7 @@ void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
         }
     }
 
+#if LV_USE_ANIMATION
     if(ext->dir != LV_DROPDOWN_DIR_UP) {
         lv_anim_t a;
         lv_anim_init(&a);
@@ -511,6 +514,7 @@ void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
         lv_anim_set_time(&a, ext->anim_time, 0);
         lv_anim_create(&a);
     }
+#endif
 }
 
 /**
@@ -532,16 +536,18 @@ void lv_dropdown_close(lv_obj_t * ddlist, lv_anim_enable_t anim)
         lv_obj_del(ext->page);
         ext->page = NULL;
     } else {
-//    if(dir != LV_DROPDOWN_DIR_UP) {
-        lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_exec_cb(&a, ddlist, list_anim);
-        lv_anim_set_values(&a, lv_obj_get_height(ext->page), 0);
-        lv_anim_set_time(&a, ext->anim_time, 0);
-        lv_anim_set_ready_cb(&a, close_anim_ready);
-        lv_anim_create(&a);
+#if LV_USE_ANIMATION
+        if(ext->dir != LV_DROPDOWN_DIR_UP) {
+            lv_anim_t a;
+            lv_anim_init(&a);
+            lv_anim_set_exec_cb(&a, ddlist, list_anim);
+            lv_anim_set_values(&a, lv_obj_get_height(ext->page), 0);
+            lv_anim_set_time(&a, ext->anim_time, 0);
+            lv_anim_set_ready_cb(&a, close_anim_ready);
+            lv_anim_create(&a);
 
-//    }
+        }
+#endif
     }
 
 }
@@ -628,7 +634,7 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
             lv_draw_label(&txt_area, clip_area, &label_dsc, txt, NULL);
         }
 
-        if(ext->show_selected && ext->sel_opt_id_orig >= 0) {
+        if(ext->show_selected) {
             lv_mem_buf_release((char *)opt_txt);
         }
 
@@ -1119,6 +1125,7 @@ static lv_obj_t * get_label(const lv_obj_t * ddlist)
     return lv_obj_get_child(lv_page_get_scrl(ext->page), NULL);
 }
 
+#if LV_USE_ANIMATION
 static void list_anim(void * p, lv_anim_value_t v)
 {
     lv_obj_t * ddlist = p;
@@ -1133,5 +1140,6 @@ static void close_anim_ready(lv_anim_t * a)
     lv_obj_del(ext->page);
     ext->page = NULL;
 }
+#endif
 
 #endif

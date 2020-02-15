@@ -208,10 +208,9 @@ void read_png_file(png_img_t * p, const char* file_name)
     FILE *fp = fopen(file_name, "rb");
     if (!fp)
         lv_test_exit("[read_png_file] File %s could not be opened for reading", file_name);
-    fread(header, 1, 8, fp);
-    if (png_sig_cmp((png_const_bytep)header, 0, 8))
+    size_t rcnt = fread(header, 1, 8, fp);
+    if (rcnt != 8 || png_sig_cmp((png_const_bytep)header, 0, 8))
         lv_test_exit("[read_png_file] File %s is not recognized as a PNG file", file_name);
-
 
     /* initialize stuff */
     p->png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);

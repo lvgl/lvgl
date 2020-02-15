@@ -94,7 +94,7 @@ void lv_style_list_init(lv_style_list_t * list)
     list->style_list = NULL;
     list->style_cnt = 0;
     list->has_local = 0;
-    #if LV_USE_ASSERT_STYLE
+#if LV_USE_ASSERT_STYLE
     list->sentinel = LV_DEBUG_STYLE_LIST_SENTINEL_VALUE;
 #endif
 }
@@ -124,7 +124,7 @@ void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * lis
         list_dest->style_cnt = list_src->style_cnt - 1;
 
         lv_style_t * local_style = get_local_style(list_dest);
-        lv_style_copy(local_style, get_local_style((lv_style_t *)list_src));
+        lv_style_copy(local_style, get_local_style((lv_style_list_t *)list_src));
     }
 }
 

@@ -1,14 +1,15 @@
 #include "../lvgl.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/time.h>
+#include "lv_test_core/lv_test_core.h"
 
 #if LV_BUILD_TEST
-
 
 static void hal_init(void);
 static void dummy_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
 
-int main2(void)
+int main(void)
 {
     printf("Call lv_init...\n");
     lv_init();
@@ -16,7 +17,6 @@ int main2(void)
     hal_init();
 
     lv_test_core();
-
 
     printf("Exit with success!\n");
     return 0;

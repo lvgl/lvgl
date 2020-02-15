@@ -806,10 +806,13 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
                 ext->btn_id_act = btn_pr;
                 invalidate_button_area(btnm, ext->btn_id_pr); /*Invalidate the new area*/
             }
-        } else if(indev_type == LV_INDEV_TYPE_KEYPAD || (indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(btnm)))) {
+        }
+#if LV_USE_GROUP
+        else if(indev_type == LV_INDEV_TYPE_KEYPAD || (indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(btnm)))) {
             ext->btn_id_pr = ext->btn_id_focused;
             invalidate_button_area(btnm, ext->btn_id_focused);
         }
+#endif
 
         if(ext->btn_id_act != LV_BTNMATRIX_BTN_NONE) {
             if(button_is_click_trig(ext->ctrl_bits[ext->btn_id_act]) == false &&

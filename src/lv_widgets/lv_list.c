@@ -86,8 +86,8 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
 
 #if LV_USE_GROUP
     ext->last_sel_btn     = NULL;
-    ext->act_sel_btn = NULL;
 #endif
+    ext->act_sel_btn = NULL;
 
     lv_obj_set_signal_cb(list, lv_list_signal);
 
@@ -255,8 +255,6 @@ bool lv_list_remove(const lv_obj_t * list, uint16_t index)
  * Setter functions
  *====================*/
 
-#if LV_USE_GROUP
-
 /**
  * Make a button selected
  * @param list pointer to a list object
@@ -273,10 +271,11 @@ void lv_list_focus_btn(lv_obj_t * list, lv_obj_t * btn)
     /*Defocus the current button*/
     if(ext->act_sel_btn) lv_obj_clear_state(ext->act_sel_btn, LV_STATE_FOCUSED);
 
-
+#if LV_USE_GROUP
     /*Don't forget which button was selected.
      * It will be restored when the list is focused again.*/
     if(btn) ext->last_sel_btn = btn;
+#endif
 
     /*Focus the new button*/
     ext->act_sel_btn = btn;
@@ -286,8 +285,6 @@ void lv_list_focus_btn(lv_obj_t * list, lv_obj_t * btn)
         lv_page_focus(list, ext->act_sel_btn, LV_ANIM_ON);
     }
 }
-
-#endif
 
 /**
  * Set layout of a list

@@ -164,9 +164,11 @@ do {                                            \
 
 #define LV_ASSERT_NULL(p) true
 #define LV_ASSERT_MEM(p) true
+#define LV_ASSERT_MEM_INTEGRITY() true
 #define LV_ASSERT_STR(p) true
 #define LV_ASSERT_OBJ(obj, obj_type) true
 #define LV_ASSERT_STYLE(p) true
+#define LV_ASSERT_STYLE_LIST(p) true
 
 #endif /* LV_USE_DEBUG */
 /*clang-format on*/

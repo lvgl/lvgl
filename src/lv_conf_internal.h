@@ -469,11 +469,6 @@
 #define LV_FONT_CUSTOM_DECLARE
 #endif
 
-/*Always set a default font from the built-in fonts*/
-#ifndef LV_FONT_DEFAULT
-#define LV_FONT_DEFAULT        &lv_font_roboto_16
-#endif
-
 /* Enable it if you have fonts with a lot of characters.
  * The limit depends on the font size, font face and bpp
  * but with > 10,000 characters if you see issues probably you need to enable it.*/

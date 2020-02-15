@@ -426,7 +426,10 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
-        /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
+        lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
+        lv_style_list_reset(&ext->style_header);
+        lv_style_list_reset(&ext->style_day_names);
+        lv_style_list_reset(&ext->style_date_nums);
     } else if(sign == LV_SIGNAL_PRESSING) {
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
         lv_area_t header_area;

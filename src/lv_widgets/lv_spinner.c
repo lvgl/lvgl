@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_preload.h"
+#include "lv_spinner.h"
 #if LV_USE_SPINNER != 0
 
 #include "../lv_core/lv_debug.h"

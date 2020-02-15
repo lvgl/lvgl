@@ -49,14 +49,16 @@ static lv_font_t * _font_title;
 static lv_style_t scr;
 static lv_style_t panel; /*General fancy background (e.g. to chart or ta)*/
 static lv_style_t btn;
-static lv_style_t sb;
 
+#if LV_USE_PAGE
+static lv_style_t sb;
+#endif
 
 #if LV_USE_BTNMATRIX
 static lv_style_t btnm_bg, btnm_btn;
 #endif
 
-#if LV_USE_BTNMATRIX
+#if LV_USE_KEYBOARD
 static lv_style_t kb_bg, kb_btn;
 #endif
 
@@ -166,7 +168,7 @@ static void basic_init(void)
     lv_style_set_pad_inner(&panel, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_text_color(&panel, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
     lv_style_set_value_color(&panel, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
-    lv_style_set_text_font(&panel, LV_STATE_NORMAL, &lv_font_roboto_16);
+    lv_style_set_text_font(&panel, LV_STATE_NORMAL, _font_normal);
     lv_style_set_image_recolor(&panel, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
     lv_style_set_line_color(&panel, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
     lv_style_set_line_width(&panel, LV_STATE_NORMAL, 1);
@@ -719,7 +721,7 @@ static void tabview_init(void)
     lv_style_set_border_width(&tabview_btns_bg, LV_STATE_NORMAL, LV_DPI / 30 > 0 ? LV_DPI / 30 : 1);
     lv_style_set_border_side(&tabview_btns_bg, LV_STATE_NORMAL , LV_BORDER_SIDE_BOTTOM);
     lv_style_set_text_color(&tabview_btns_bg, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
-    lv_style_set_text_font(&tabview_btns_bg, LV_STATE_NORMAL, &lv_font_roboto_16);
+    lv_style_set_text_font(&tabview_btns_bg, LV_STATE_NORMAL, _font_normal);
     lv_style_set_image_recolor(&tabview_btns_bg, LV_STATE_NORMAL, lv_color_hex(0x979a9f));
 
 
@@ -837,15 +839,6 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
 
     theme.apply_cb = lv_theme_material_apply;
 
-    return &theme;
-}
-
-/**
- * Get a pointer to the theme
- * @return pointer to the theme
- */
-lv_theme_t * lv_theme_alien_get(void)
-{
     return &theme;
 }
 
@@ -1345,6 +1338,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
         lv_style_list_add_style(list, &gauge_needle);
         break;
 #endif
+        default:
+            break;
     }
 
 

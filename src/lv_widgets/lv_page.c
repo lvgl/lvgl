@@ -766,7 +766,9 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         }
 
         lv_style_list_reset(&ext->sb.style);
+#if LV_USE_ANIMATION
         lv_style_list_reset(&ext->edge_flash.style);
+#endif
     }
     /*Automatically move children to the scrollable object*/
     else if(sign == LV_SIGNAL_CHILD_CHG) {

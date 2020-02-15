@@ -21,6 +21,9 @@ MAINSRC = ./lv_test_main.c
 include ../lvgl.mk
 
 CSRCS += lv_test_assert.c
+CSRCS += lv_test_core/lv_test_core.c
+CSRCS += lv_test_core/lv_test_obj.c
+CSRCS += lv_test_core/lv_test_style.c
 
 OBJEXT ?= .o
 

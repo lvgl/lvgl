@@ -57,7 +57,9 @@ static void report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
+#if LV_USE_ANIMATION
 static void obj_state_anim_cb(void * p, lv_anim_value_t value);
+#endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static void lv_obj_del_async_cb(void * obj);
 static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
@@ -1415,17 +1417,23 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     lv_obj_state_dsc_t dsc_ori = obj->state_dsc;
     obj->state_dsc.act = new_state;
     obj->state_dsc.prev = new_state;
+#if LV_USE_ANIMATION
     lv_style_int_t t = lv_obj_get_style_transition_time(obj, LV_OBJ_PART_MAIN);
+#else
+    lv_style_int_t t = 0;
+#endif
     obj->state_dsc = dsc_ori;
     if(t == 0) {
+#if LV_USE_ANIMATION
         lv_anim_del(obj, obj_state_anim_cb);
+#endif
         obj->state_dsc.act = new_state;
         obj->state_dsc.prev = new_state;
         obj->state_dsc.anim = 0;
         lv_obj_refresh_style(obj);
     }
     else {
-
+#if LV_USE_ANIMATION
         bool was_anim = lv_anim_del(obj, obj_state_anim_cb);
 
         if(obj->state_dsc.anim == 0 && was_anim) {
@@ -1442,7 +1450,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         lv_anim_set_values(&a, 0, 255);
         lv_anim_set_time(&a, t, 0);
         lv_anim_create(&a);
-
+#endif
     }
 
 }
@@ -2193,6 +2201,7 @@ lv_color_t _lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_
                 prop = (uint16_t)prop_ori + ((uint16_t)state->prev << LV_STYLE_STATE_POS);
                 res = lv_style_list_get_color(dsc, prop, &value_prev);
                 if(res == LV_RES_INV) value_prev = value_act;
+                if(value_act.full == value_prev.full) return value_act;
                 return lv_color_mix(value_act, value_prev, state->anim);
             }
         }
@@ -2350,7 +2359,7 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
     switch(prop) {
     case LV_STYLE_TEXT_FONT:
     case LV_STYLE_VALUE_FONT:
-        return LV_FONT_DEFAULT;
+        return LV_THEME_DEFAULT_FONT_NORMAL;
     }
 
     return NULL;
@@ -3336,6 +3345,7 @@ static void base_dir_refr_children(lv_obj_t * obj)
     }
 }
 
+#if LV_USE_ANIMATION
 static void obj_state_anim_cb(void * p, lv_anim_value_t value)
 {
     lv_obj_t * obj = p;
@@ -3344,7 +3354,7 @@ static void obj_state_anim_cb(void * p, lv_anim_value_t value)
 
     lv_obj_refresh_style(obj);
 }
-
+#endif
 
 static void lv_event_mark_deleted(lv_obj_t * obj)
 {

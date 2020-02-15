@@ -63,9 +63,9 @@ void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
     dsc->outline_opa = LV_OPA_COVER;
     dsc->border_opa = LV_OPA_COVER;
     dsc->pattern_opa = LV_OPA_COVER;
-    dsc->pattern_font = LV_FONT_DEFAULT;
+    dsc->pattern_font = LV_THEME_DEFAULT_FONT_NORMAL;
     dsc->value_opa = LV_OPA_COVER;
-    dsc->value_font = LV_FONT_DEFAULT;
+    dsc->value_font = LV_THEME_DEFAULT_FONT_NORMAL;
     dsc->shadow_opa = LV_OPA_COVER;
     dsc->border_side = LV_BORDER_SIDE_FULL;
 
@@ -1314,6 +1314,7 @@ static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, lv_dr
         /*Trigger the error handler of image drawer*/
         LV_LOG_WARN("lv_img_design: image source type is unknown");
         lv_draw_img(coords, clip, NULL, NULL);
+        return;
     }
 
     lv_area_t coords_tmp;

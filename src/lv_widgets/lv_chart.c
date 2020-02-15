@@ -821,6 +821,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
         p1.x = 0 + x_ofs;
         p2.x = 0 + x_ofs;
 
+        p_act = start_point;
         p_prev = start_point;
         y_tmp  = (int32_t)((int32_t)ser->points[p_prev] - ext->ymin) * h;
         y_tmp  = y_tmp / (ext->ymax - ext->ymin);

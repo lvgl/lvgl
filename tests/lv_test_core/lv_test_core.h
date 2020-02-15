@@ -25,6 +25,7 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+void lv_test_core(void);
 
 /**********************
  *      MACROS

@@ -65,7 +65,7 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
     memset(dsc, 0x00, sizeof(lv_draw_label_dsc_t));
     dsc->opa = LV_OPA_COVER;
     dsc->color = LV_COLOR_BLACK;
-    dsc->font = LV_FONT_DEFAULT;
+    dsc->font = LV_THEME_DEFAULT_FONT_NORMAL;
     dsc->sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
     dsc->sel_end = LV_DRAW_LABEL_NO_TXT_SEL;
     dsc->sel_color = LV_COLOR_BLUE;
@@ -669,7 +669,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
                                              vdb_buf_tmp->ch.blue};
 #endif
 
-#if LV_SUBPX_BGR
+#if LV_FONT_SUBPX_BGR
                 res_color.ch.blue = (uint326_t)((uint32_t)txt_rgb[0] * font_rgb[0] + (bg_rgb[0] * (255 - font_rgb[0]))) >> 8;
                 res_color.ch.red = (uint32_t)((uint32_t)txt_rgb[2] * font_rgb[2] + (bg_rgb[2] * (255 - font_rgb[2]))) >> 8;
 #else
