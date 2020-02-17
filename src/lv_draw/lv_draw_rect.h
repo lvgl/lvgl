@@ -33,27 +33,21 @@ typedef struct {
     lv_style_int_t bg_main_color_stop;
     lv_style_int_t bg_grad_color_stop;
     lv_opa_t bg_opa;
-#if LV_USE_BLEND_MODES
     lv_blend_mode_t bg_blend_mode;
-#endif
 
     /*Border*/
     lv_color_t border_color;
     lv_style_int_t border_width;
     lv_style_int_t border_side;
     lv_opa_t border_opa;
-#if LV_USE_BLEND_MODES
     lv_blend_mode_t border_blend_mode;
-#endif
 
     /*Outline*/
     lv_color_t outline_color;
     lv_style_int_t outline_width;
     lv_style_int_t outline_pad;
     lv_opa_t outline_opa;
-#if LV_USE_BLEND_MODES
     lv_blend_mode_t outline_blend_mode;
-#endif
 
     /*Shadow*/
     lv_color_t shadow_color;
@@ -62,9 +56,7 @@ typedef struct {
     lv_style_int_t shadow_ofs_y;
     lv_style_int_t shadow_spread;
     lv_opa_t shadow_opa;
-#if LV_USE_BLEND_MODES
     lv_blend_mode_t shadow_blend_mode;
-#endif
 
     /*Pattern*/
     const void * pattern_image;
@@ -73,9 +65,7 @@ typedef struct {
     lv_opa_t pattern_opa;
     lv_opa_t pattern_recolor_opa;
     uint8_t pattern_repeat :1;
-#if LV_USE_BLEND_MODES
     lv_blend_mode_t pattern_blend_mode;
-#endif
 
     /*Value*/
     const char * value_str;
@@ -87,9 +77,7 @@ typedef struct {
     lv_style_int_t value_letter_space;
     lv_style_int_t value_line_space;
     lv_align_t value_align;
-#if LV_USE_BLEND_MODES
     lv_blend_mode_t value_blend_mode;
-#endif
 }lv_draw_rect_dsc_t;
 
 /**********************

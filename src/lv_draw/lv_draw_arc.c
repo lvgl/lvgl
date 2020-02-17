@@ -82,7 +82,6 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     cir_dsc.border_width = dsc->width;
     cir_dsc.border_blend_mode = dsc->blend_mode;
 
-
     lv_area_t area;
     area.x1 = center_x - radius;
     area.y1 = center_y - radius;
