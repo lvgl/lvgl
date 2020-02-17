@@ -680,7 +680,7 @@ lv_res_t lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop,
     int16_t weight_act;
     int16_t weight = -1;
 
-    lv_style_int_t value_act;
+    lv_style_int_t value_act = 0;
 
     int16_t ci;
     for(ci = 0; ci < list->style_cnt; ci++) {
@@ -728,7 +728,7 @@ lv_res_t lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t pro
     int16_t weight_act;
     int16_t weight = -1;
 
-    lv_color_t value_act;
+    lv_color_t value_act = { 0 };
 
     int16_t ci;
     for(ci = 0; ci < list->style_cnt; ci++) {

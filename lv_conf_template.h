@@ -405,8 +405,17 @@ typedef void * lv_font_user_data_t;
  *  LV_OBJ SETTINGS
  *==================*/
 
+#if LV_USE_USER_DATA
 /*Declare the type of the user data of object (can be e.g. `void *`, `int`, `struct`)*/
 typedef void * lv_obj_user_data_t;
+/*Provide a function to free user data*/
+#define LV_USE_USER_DATA_FREE 0
+#if LV_USE_USER_DATA_FREE
+#  define LV_USER_DATA_FREE_INCLUDE  "something.h"  /*Header for user data free function*/
+/* Function prototype : void user_data_free(lv_obj_t * obj); */
+#  define LV_USER_DATA_FREE  (user_data_free)       /*Invoking for user data free function*/
+#endif
+#endif
 
 /*1: enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
 #define LV_USE_OBJ_REALIGN          1

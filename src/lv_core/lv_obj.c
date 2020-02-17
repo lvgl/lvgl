@@ -31,6 +31,11 @@
 #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
+
+#if defined(LV_USER_DATA_FREE_INCLUDE)
+#include LV_USER_DATA_FREE_INCLUDE
+#endif /* LV_USE_USER_DATA_FREE */
+
 /*********************
  *      DEFINES
  *********************/
@@ -335,10 +340,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         /*Set the same coordinates for non screen objects*/
         if(lv_obj_get_parent(copy) != NULL && parent != NULL) {
             lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
-        } else {
-            lv_obj_set_pos(new_obj, 0, 0);
         }
-
     }
 
     /*Send a signal to the parent to notify it about the new child*/
@@ -373,6 +375,11 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         /*Remove the animations from this object*/
 #if LV_USE_ANIMATION
     lv_anim_del(obj, NULL);
+#endif
+
+    /*Delete the user data*/
+#if LV_USE_USER_DATA_FREE
+    LV_USER_DATA_FREE(obj);
 #endif
 
     /*Recursively delete the children*/
