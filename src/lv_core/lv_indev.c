@@ -255,7 +255,7 @@ void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point)
 * Get the current gesture direct
 * @param indev pointer to an input device
 * @return current gesture direct
-*///zlm
+*/
 lv_gesture_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev)
 {
     return indev->proc.types.pointer.gesture_dir;

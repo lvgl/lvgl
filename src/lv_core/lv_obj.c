@@ -1453,16 +1453,17 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
             obj->state_dsc.anim = 0;
         }
 
-        /* Create (or recreate) the animation from where it was deleted.
-         * Calculate the remaining time proportionally too.*/
-        t = ((t - obj->state_dsc.anim) * t)  / 255;
-
-        lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_exec_cb(&a, obj, obj_state_anim_cb);
-        lv_anim_set_values(&a, obj->state_dsc.anim, 255);
-        lv_anim_set_time(&a, t, 0);
-        lv_anim_create(&a);
+        if(obj->state_dsc.prev != obj->state_dsc.act) {
+            t = t - ((obj->state_dsc.anim * t)  / 255);
+            lv_anim_t a;
+            lv_anim_init(&a);
+            lv_anim_set_exec_cb(&a, obj, obj_state_anim_cb);
+            lv_anim_set_values(&a, obj->state_dsc.anim, 255);
+            lv_anim_set_time(&a, t, 0);
+            lv_anim_create(&a);
+        } else {
+            lv_obj_refresh_style(obj);
+        }
 #endif
     }
 
