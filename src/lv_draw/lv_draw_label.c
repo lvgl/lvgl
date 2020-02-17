@@ -181,7 +181,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
     }
 
     lv_draw_line_dsc_t line_dsc;
-    if(dsc->underline || dsc->strikethrough) {
+    if((dsc->decor & LV_TEXT_DECOR_UNDERLINE) || (dsc->decor & LV_TEXT_DECOR_STRIKETHROUGH)) {
         lv_draw_line_dsc_init(&line_dsc);
         line_dsc.color = dsc->color;
         line_dsc.width = (dsc->font->line_height + 5) / 10;    /*+5 for rounding*/
@@ -294,7 +294,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
             }
         }
 
-        if(dsc->strikethrough) {
+        if(dsc->decor & LV_TEXT_DECOR_STRIKETHROUGH) {
             lv_point_t p1;
             lv_point_t p2;
             p1.x = pos_x_start;
@@ -304,7 +304,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
             lv_draw_line(&p1, &p2, mask, &line_dsc);
         }
 
-        if(dsc->underline) {
+        if(dsc->decor  & LV_TEXT_DECOR_UNDERLINE) {
             lv_point_t p1;
             lv_point_t p2;
             p1.x = pos_x_start;

@@ -145,6 +145,12 @@ typedef void * lv_anim_user_data_t;
 /* 1: Enable shadow drawing*/
 #define LV_USE_SHADOW           1
 
+/* 1: Use other blend modes than normal (`LV_BLEND_MODE_...`)*/
+#define LV_USE_BLEND_MODES      1
+
+/* 1: Use the `opa_scale` style property to set the opacity of an object and its children at once*/
+#define LV_USE_OPA_SCALE        1
+
 /* 1: Enable object groups (for keyboard/encoder navigation) */
 #define LV_USE_GROUP            1
 #if LV_USE_GROUP

@@ -39,9 +39,10 @@ typedef struct {
     lv_coord_t ofs_y;
     lv_bidi_dir_t bidi_dir;
     lv_txt_flag_t flag;
+    lv_text_decor_t decor;
+#if LV_USE_BLEND_MODES
     lv_blend_mode_t blend_mode;
-    uint8_t underline    :1;
-    uint8_t strikethrough    :1;
+#endif
 }lv_draw_label_dsc_t;
 
 /** Store some info to speed up drawing of very large texts
