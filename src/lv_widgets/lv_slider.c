@@ -61,18 +61,18 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("slider create started");
 
     /*Create the ancestor slider*/
-    lv_obj_t * new_slider = lv_bar_create(par, copy);
-    LV_ASSERT_MEM(new_slider);
-    if(new_slider == NULL) return NULL;
+    lv_obj_t * slider = lv_bar_create(par, copy);
+    LV_ASSERT_MEM(slider);
+    if(slider == NULL) return NULL;
 
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(new_slider);
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_slider);
+    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(slider);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(slider);
 
     /*Allocate the slider type specific extended data*/
-    lv_slider_ext_t * ext = lv_obj_allocate_ext_attr(new_slider, sizeof(lv_slider_ext_t));
+    lv_slider_ext_t * ext = lv_obj_allocate_ext_attr(slider, sizeof(lv_slider_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_slider);
+        lv_obj_del(slider);
         return NULL;
     }
 
@@ -82,16 +82,17 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_style_list_init(&ext->style_knob);
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(new_slider, lv_slider_signal);
-    lv_obj_set_design_cb(new_slider, lv_slider_design);
+    lv_obj_set_signal_cb(slider, lv_slider_signal);
+    lv_obj_set_design_cb(slider, lv_slider_design);
 
     /*Init the new slider slider*/
     if(copy == NULL) {
-        lv_obj_set_click(new_slider, true);
-        lv_obj_add_protect(new_slider, LV_PROTECT_PRESS_LOST);
+        lv_obj_set_click(slider, true);
+        lv_obj_add_protect(slider, LV_PROTECT_PRESS_LOST);
+        lv_obj_set_ext_click_area(slider, 0, 0, LV_DPI / 10, LV_DPI / 10);
 
-        lv_theme_apply(new_slider, LV_THEME_SLIDER);
-        lv_obj_set_height(new_slider, LV_DPI / 15);
+        lv_theme_apply(slider, LV_THEME_SLIDER);
+        lv_obj_set_height(slider, LV_DPI / 15);
     }
     /*Copy an existing slider*/
     else {
@@ -103,7 +104,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 
     LV_LOG_INFO("slider created");
 
-    return new_slider;
+    return slider;
 }
 
 /*=====================
