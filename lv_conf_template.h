@@ -367,7 +367,7 @@ typedef void * lv_font_user_data_t;
 
 /* If a word is at least this long, will break wherever "prettiest"
  * To disable, set to a value <= 0 */
-#define LV_TXT_LINE_BREAK_LONG_LEN          12
+#define LV_TXT_LINE_BREAK_LONG_LEN          0
 
 /* Minimum number of characters in a long word to put on a line before a break.
  * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
