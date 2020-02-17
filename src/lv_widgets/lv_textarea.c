@@ -36,6 +36,9 @@
 #define LV_TEXTAREA_DEF_WIDTH (2 * LV_DPI)
 #define LV_TEXTAREA_DEF_HEIGHT (1 * LV_DPI)
 
+#define LV_TEXTAREA_PWD_BULLET_UNICODE      0x2022
+#define LV_TEXTAREA_PWD_BULLET_UTF8         "\xE2\x80\xA2"
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -699,16 +702,9 @@ void lv_textarea_set_pwd_mode(lv_obj_t * ta, bool en)
 
         strcpy(ext->pwd_tmp, txt);
 
-        uint16_t i;
-        uint16_t encoded_len = lv_txt_get_encoded_length(txt); 
-        for(i = 0; i < encoded_len; i++) {
-            txt[i] = '*'; /*All char to '*'*/
-        }
-        txt[i] = '\0';
+        pwd_char_hider(ta);
 
         lv_textarea_clear_selection(ta);
-
-        lv_label_set_text(ext->label, NULL);
     }
     /*Pwd mode is now disabled*/
     else if(ext->pwd_mode == 1 && en == false) {
@@ -1634,17 +1630,29 @@ static void pwd_char_hider(lv_obj_t * ta)
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->pwd_mode != 0) {
         char * txt  = lv_label_get_text(ext->label);
-        int16_t len = lv_txt_get_encoded_length(txt);
-        bool refr   = false;
+        int16_t enc_len = lv_txt_get_encoded_length(txt);
+        if(enc_len == 0) return;
+
+        /*If the textarea's font has "bullet" character use it else fallback to "*"*/
+        const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
+        lv_font_glyph_dsc_t g;
+        bool has_bullet;
+        has_bullet = lv_font_get_glyph_dsc(font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, 0);
+        const char * bullet;
+        if(has_bullet) bullet = LV_TEXTAREA_PWD_BULLET_UTF8;
+        else bullet = "*";
+
+        size_t bullet_len = strlen(bullet);
+        char * txt_tmp = lv_mem_buf_get(enc_len * bullet_len + 1);
         uint16_t i;
-        for(i = 0; i < len; i++) {
-            txt[i] = '*';
-            refr   = true;
+        for(i = 0; i < enc_len; i++) {
+            memcpy(&txt_tmp[i * bullet_len], bullet, bullet_len);
         }
 
-        txt[i] = '\0';
+        txt_tmp[i * bullet_len] = '\0';
 
-        if(refr != false) lv_label_set_text(ext->label, txt);
+        lv_label_set_text(ext->label, txt_tmp);
+        lv_mem_buf_release(txt_tmp);
     }
 }
 
