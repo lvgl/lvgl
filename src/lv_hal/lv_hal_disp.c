@@ -127,6 +127,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     memset(&disp->inv_area_joined, 0, sizeof(disp->inv_area_joined));
     memset(&disp->inv_areas, 0, sizeof(disp->inv_areas));
     lv_ll_init(&disp->scr_ll, sizeof(lv_obj_t));
+    disp->last_activity_time = 0;
 
     if(disp_def == NULL) disp_def = disp;
 
