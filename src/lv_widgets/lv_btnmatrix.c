@@ -799,12 +799,15 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
             /*Search the pressed area*/
             lv_indev_get_point(param, &p);
             btn_pr = get_button_from_point(btnm, &p);
-            if(button_is_inactive(ext->ctrl_bits[btn_pr]) == false &&
-               button_is_hidden(ext->ctrl_bits[btn_pr]) == false) {
-                invalidate_button_area(btnm, ext->btn_id_pr) /*Invalidate the old area*/;
-                ext->btn_id_pr = btn_pr;
-                ext->btn_id_act = btn_pr;
-                invalidate_button_area(btnm, ext->btn_id_pr); /*Invalidate the new area*/
+            /*Handle the case where there is no button there*/
+            if(btn_pr != LV_BTNMATRIX_BTN_NONE) {
+                if(button_is_inactive(ext->ctrl_bits[btn_pr]) == false &&
+                button_is_hidden(ext->ctrl_bits[btn_pr]) == false) {
+                    invalidate_button_area(btnm, ext->btn_id_pr) /*Invalidate the old area*/;
+                    ext->btn_id_pr = btn_pr;
+                    ext->btn_id_act = btn_pr;
+                    invalidate_button_area(btnm, ext->btn_id_pr); /*Invalidate the new area*/
+                }
             }
         }
 #if LV_USE_GROUP
@@ -827,15 +830,16 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
         /*Search the pressed area*/
         lv_indev_get_point(param, &p);
         btn_pr = get_button_from_point(btnm, &p);
-        /*Invalidate to old and the new areas*/;
-        if(btn_pr != ext->btn_id_pr &&
-                button_is_inactive(ext->ctrl_bits[btn_pr]) == false &&
-                button_is_hidden(ext->ctrl_bits[btn_pr]) == false) {
-            lv_indev_reset_long_press(param); /*Start the log press time again on the new button*/
+        /*Invalidate to old and the new areas*/
+        if(btn_pr != ext->btn_id_pr) {
             if(ext->btn_id_pr != LV_BTNMATRIX_BTN_NONE) {
                 invalidate_button_area(btnm, ext->btn_id_pr);
             }
-            if(btn_pr != LV_BTNMATRIX_BTN_NONE) {
+            lv_indev_reset_long_press(param); /*Start the log press time again on the new button*/
+            if(btn_pr != LV_BTNMATRIX_BTN_NONE &&
+               button_is_inactive(ext->ctrl_bits[btn_pr]) == false &&
+               button_is_hidden(ext->ctrl_bits[btn_pr]) == false) {
+                /* Send VALUE_CHANGED for the newly pressed button */
                 uint32_t b = ext->btn_id_act;
                 res        = lv_event_send(btnm, LV_EVENT_VALUE_CHANGED, &b);
                 if(res == LV_RES_OK) {

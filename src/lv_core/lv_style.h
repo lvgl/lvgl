@@ -250,7 +250,7 @@ void lv_style_list_add_style(lv_style_list_t * list, lv_style_t * style);
  * @param style_list pointer to a style list
  * @param style pointer to a style to remove
  */
-void lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * class);
+void lv_style_list_remove_style(lv_style_list_t *, lv_style_t *);
 
 /**
  * Remove all styles added from style list, clear the local style and free all allocated memories
@@ -346,7 +346,7 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void 
  *       For example: `lv_style_get_border_width()`
  * @note for performance reasons it's not checked if the property really has integer type
  */
-int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res);
+int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, void * res);
 
 /**
  * Get a color typed property from a style.
@@ -361,7 +361,7 @@ int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv
  *       For example: `lv_style_get_border_color()`
  * @note for performance reasons it's not checked if the property really has color type
  */
-int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res);
+int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, void * res);
 
 /**
  * Get an opacity typed property from a style.
@@ -376,7 +376,7 @@ int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, 
  *       For example: `lv_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has opacity type
  */
-int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res);
+int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, void * res);
 
 /**
  * Get a pointer typed property from a style.
@@ -391,7 +391,7 @@ int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv
  *       For example: `lv_style_get_text_font()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void ** res);
+int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void * res);
 
 /**
  * Set a local integer typed property in a style list.

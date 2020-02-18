@@ -434,7 +434,7 @@ static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * cli
  */
 static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * param)
 {
-    lv_res_t res;
+    lv_res_t res = LV_RES_OK;
     if(sign == LV_SIGNAL_GET_STYLE) {
         lv_get_style_info_t * info = param;
         info->result = lv_roller_get_style(roller, info->part);

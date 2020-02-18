@@ -471,8 +471,9 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void 
  *         Higher number is means better fit
  *         -1 if the not found (`res` will be undefined)
  */
-int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv_style_int_t * res)
+int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, void * v_res)
 {
+    lv_style_int_t * res = (lv_style_int_t *)v_res;
     LV_ASSERT_STYLE(style);
 
     if(style == NULL) return -1;
@@ -505,8 +506,9 @@ int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, lv
  *       For example: `lv_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has opacity type
  */
-int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv_opa_t * res)
+int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, void * v_res)
 {
+    lv_opa_t * res = (lv_opa_t *)v_res;
     LV_ASSERT_STYLE(style);
 
     if(style == NULL) return -1;
@@ -539,8 +541,9 @@ int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, lv
  *       For example: `lv_style_get_border_color()`
  * @note for performance reasons it's not checked if the property really has color type
  */
-int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, lv_color_t * res)
+int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, void * v_res)
 {
+    lv_color_t * res = (lv_color_t *)v_res;
     if(style == NULL) return -1;
     if(style->map == NULL) return -1;
     int32_t id = get_property_index(style, prop);
@@ -571,8 +574,9 @@ int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, 
  *       For example: `lv_style_get_text_font()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void ** res)
+int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void * v_res)
 {
+    void **res = (void *)v_res;
     if(style == NULL) return -1;
     if(style->map == NULL) return -1;
     int32_t id = get_property_index(style, prop);
