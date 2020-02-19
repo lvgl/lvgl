@@ -699,13 +699,13 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
         lv_obj_set_y(roller_scrl, new_y);
     } else {
 #if LV_USE_ANIMATION
-
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, roller_scrl);
         lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
         lv_anim_set_values(&a, lv_obj_get_y(roller_scrl), new_y);
         lv_anim_set_time(&a, anim_time);
+        lv_anim_set_ready_cb(&a, scroll_anim_ready_cb);
         lv_anim_start(&a);
 #endif
     }
