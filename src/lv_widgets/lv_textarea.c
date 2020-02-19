@@ -193,19 +193,15 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ext->cursor.blink_time) {
         /*Create a cursor blinker animation*/
         lv_anim_t a;
-        a.var            = ta;
-        a.exec_cb        = (lv_anim_exec_xcb_t)cursor_blink_anim;
-        a.time           = ext->cursor.blink_time;
-        a.act_time       = 0;
-        a.ready_cb       = NULL;
-        a.start          = 1;
-        a.end            = 0;
-        a.repeat         = 1;
-        a.repeat_pause   = 0;
-        a.playback       = 1;
-        a.playback_pause = 0;
-        a.path_cb        = lv_anim_path_step;
-        lv_anim_create(&a);
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, ta);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)cursor_blink_anim);
+        lv_anim_set_time(&a, ext->cursor.blink_time);
+        lv_anim_set_playback_time(&a, ext->cursor.blink_time);
+        lv_anim_set_values(&a, 0, 1);
+        lv_anim_set_path_cb(&a, lv_anim_path_step);
+        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
+        lv_anim_start(&a);
     }
 #endif
 
@@ -279,19 +275,14 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
 #if LV_USE_ANIMATION
         /*Auto hide characters*/
         lv_anim_t a;
-        a.var            = ta;
-        a.exec_cb        = (lv_anim_exec_xcb_t)pwd_char_hider_anim;
-        a.time           = ext->pwd_show_time;
-        a.act_time       = 0;
-        a.ready_cb       = pwd_char_hider_anim_ready;
-        a.start          = 0;
-        a.end            = 1;
-        a.repeat         = 0;
-        a.repeat_pause   = 0;
-        a.playback       = 0;
-        a.playback_pause = 0;
-        a.path_cb        = lv_anim_path_step;
-        lv_anim_create(&a);
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, ta);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)pwd_char_hider_anim);
+        lv_anim_set_time(&a, ext->pwd_show_time);
+        lv_anim_set_values(&a, 0, 1);
+        lv_anim_set_path_cb(&a, lv_anim_path_step);
+        lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
+        lv_anim_start(&a);
 
 #else
         pwd_char_hider(ta);
@@ -363,19 +354,14 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
 #if LV_USE_ANIMATION
         /*Auto hide characters*/
         lv_anim_t a;
-        a.var            = ta;
-        a.exec_cb        = (lv_anim_exec_xcb_t)pwd_char_hider_anim;
-        a.time           = ext->pwd_show_time;
-        a.act_time       = 0;
-        a.ready_cb       = pwd_char_hider_anim_ready;
-        a.start          = 0;
-        a.end            = 1;
-        a.repeat         = 0;
-        a.repeat_pause   = 0;
-        a.playback       = 0;
-        a.playback_pause = 0;
-        a.path_cb        = lv_anim_path_step;
-        lv_anim_create(&a);
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, ta);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)pwd_char_hider_anim);
+        lv_anim_set_time(&a, ext->pwd_show_time);
+        lv_anim_set_values(&a, 0, 1);
+        lv_anim_set_path_cb(&a, lv_anim_path_step);
+        lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
+        lv_anim_start(&a);
 #else
         pwd_char_hider(ta);
 #endif
@@ -514,19 +500,14 @@ void lv_textarea_set_text(lv_obj_t * ta, const char * txt)
 #if LV_USE_ANIMATION
         /*Auto hide characters*/
         lv_anim_t a;
-        a.var            = ta;
-        a.exec_cb        = (lv_anim_exec_xcb_t)pwd_char_hider_anim;
-        a.time           = ext->pwd_show_time;
-        a.act_time       = 0;
-        a.ready_cb       = pwd_char_hider_anim_ready;
-        a.start          = 0;
-        a.end            = 1;
-        a.repeat         = 0;
-        a.repeat_pause   = 0;
-        a.playback       = 0;
-        a.playback_pause = 0;
-        a.path_cb        = lv_anim_path_step;
-        lv_anim_create(&a);
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, ta);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)pwd_char_hider_anim);
+        lv_anim_set_time(&a, ext->pwd_show_time);
+        lv_anim_set_values(&a, 0, 1);
+        lv_anim_set_path_cb(&a, lv_anim_path_step);
+        lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
+        lv_anim_start(&a);
 #else
         pwd_char_hider(ta);
 #endif
@@ -632,19 +613,15 @@ void lv_textarea_set_cursor_pos(lv_obj_t * ta, int16_t pos)
     if(ext->cursor.blink_time) {
         /*Reset cursor blink animation*/
         lv_anim_t a;
-        a.var            = ta;
-        a.exec_cb        = (lv_anim_exec_xcb_t)cursor_blink_anim;
-        a.time           = ext->cursor.blink_time;
-        a.act_time       = 0;
-        a.ready_cb       = NULL;
-        a.start          = 1;
-        a.end            = 0;
-        a.repeat         = 1;
-        a.repeat_pause   = 0;
-        a.playback       = 1;
-        a.playback_pause = 0;
-        a.path_cb        = lv_anim_path_step;
-        lv_anim_create(&a);
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, ta);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)cursor_blink_anim);
+        lv_anim_set_time(&a, ext->cursor.blink_time);
+        lv_anim_set_playback_time(&a, ext->cursor.blink_time);
+        lv_anim_set_values(&a, 1, 0);
+        lv_anim_set_path_cb(&a, lv_anim_path_step);
+        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
+        lv_anim_start(&a);
     }
 #endif
 
@@ -903,19 +880,14 @@ void lv_textarea_set_cursor_blink_time(lv_obj_t * ta, uint16_t time)
     if(ext->cursor.blink_time) {
         /*Reset cursor blink animation*/
         lv_anim_t a;
-        a.var            = ta;
-        a.exec_cb        = (lv_anim_exec_xcb_t)cursor_blink_anim;
-        a.time           = ext->cursor.blink_time;
-        a.act_time       = 0;
-        a.ready_cb       = NULL;
-        a.start          = 1;
-        a.end            = 0;
-        a.repeat         = 1;
-        a.repeat_pause   = 0;
-        a.playback       = 1;
-        a.playback_pause = 0;
-        a.path_cb        = lv_anim_path_step;
-        lv_anim_create(&a);
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, ta);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)cursor_blink_anim);
+        lv_anim_set_time(&a, ext->cursor.blink_time);
+        lv_anim_set_playback_time(&a, ext->cursor.blink_time);
+        lv_anim_set_values(&a, 1, 0);
+        lv_anim_set_path_cb(&a, lv_anim_path_step);
+        lv_anim_start(&a);
     } else {
         lv_anim_del(ta, (lv_anim_exec_xcb_t)cursor_blink_anim);
         ext->cursor.state = 1;

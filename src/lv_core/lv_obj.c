@@ -1459,10 +1459,11 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
             t = t - ((obj->state_dsc.anim * t)  / 255);
             lv_anim_t a;
             lv_anim_init(&a);
-            lv_anim_set_exec_cb(&a, obj, obj_state_anim_cb);
+            lv_anim_set_var(&a, obj);
+            lv_anim_set_exec_cb(&a, obj_state_anim_cb);
             lv_anim_set_values(&a, obj->state_dsc.anim, 255);
-            lv_anim_set_time(&a, t, 0);
-            lv_anim_create(&a);
+            lv_anim_set_time(&a, t);
+            lv_anim_start(&a);
         } else {
             lv_obj_refresh_style(obj);
         }

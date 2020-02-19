@@ -82,12 +82,13 @@ void lv_anim_init(lv_anim_t * a)
     a->start   = 0;
     a->end     = 100;
     a->path_cb = lv_anim_path_linear;
+    a->repeat_cnt = 1;
 }
 /**
  * Create an animation
  * @param a an initialized 'anim_t' variable. Not required after call.
  */
-void lv_anim_create(lv_anim_t * a)
+void lv_anim_start(lv_anim_t * a)
 {
     LV_LOG_TRACE("animation create started")
     /* Do not let two animations for the  same 'var' with the same 'fp'*/
@@ -105,6 +106,7 @@ void lv_anim_create(lv_anim_t * a)
 
     /*Initialize the animation descriptor*/
     a->playback_now = 0;
+    a->time_orig = a->time;
     memcpy(new_anim, a, sizeof(lv_anim_t));
 
     /*Set the start value*/
@@ -455,11 +457,15 @@ static void anim_task(lv_task_t * param)
  * */
 static bool anim_ready_handler(lv_anim_t * a)
 {
+    /*In the end of a forward anim decrement repeat cnt.*/
+    if(a->playback_now == 0 && a->repeat_cnt > 0 && a->repeat_cnt != LV_ANIM_REPEAT_INFINIT) {
+        a->repeat_cnt--;
+    }
 
     /*Delete the animation if
-     * - no repeat and no play back (simple one shot animation)
+     * - no repeat left and no play back (simple one shot animation)
      * - no repeat, play back is enabled and play back is ready */
-    if((a->repeat == 0 && a->playback == 0) || (a->repeat == 0 && a->playback == 1 && a->playback_now == 1)) {
+    if(a->repeat_cnt == 0 && ((a->playback_time == 0) || (a->playback_time && a->playback_now == 1))) {
 
         /*Create copy from the animation and delete the animation from the list.
          * This way the `ready_cb` will see the animations like it's animation is ready deleted*/
@@ -475,11 +481,11 @@ static bool anim_ready_handler(lv_anim_t * a)
     }
     /*If the animation is not deleted then restart it*/
     else {
-        a->act_time = -a->repeat_pause; /*Restart the animation*/
+        a->act_time = -a->repeat_delay; /*Restart the animation*/
         /*Swap the start and end values in play back mode*/
-        if(a->playback != 0) {
+        if(a->playback_time != 0) {
             /*If now turning back use the 'playback_pause*/
-            if(a->playback_now == 0) a->act_time = -a->playback_pause;
+            if(a->playback_now == 0) a->act_time = -a->playback_delay;
 
             /*Toggle the play back state*/
             a->playback_now = a->playback_now == 0 ? 1 : 0;
@@ -488,6 +494,8 @@ static bool anim_ready_handler(lv_anim_t * a)
             tmp      = a->start;
             a->start = a->end;
             a->end   = tmp;
+
+            a->time = a->playback_now == 0 ? a->time_orig : a->playback_time;
         }
     }
 

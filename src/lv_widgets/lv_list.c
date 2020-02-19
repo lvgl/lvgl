@@ -541,19 +541,12 @@ void lv_list_up(const lv_obj_t * list)
                 } else {
 #if LV_USE_ANIMATION
                     lv_anim_t a;
-                    a.var            = scrl;
-                    a.start          = lv_obj_get_y(scrl);
-                    a.end            = new_y;
-                    a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_y;
-                    a.path_cb        = lv_anim_path_linear;
-                    a.ready_cb       = NULL;
-                    a.act_time       = 0;
-                    a.time           = LV_LIST_DEF_ANIM_TIME;
-                    a.playback       = 0;
-                    a.playback_pause = 0;
-                    a.repeat         = 0;
-                    a.repeat_pause   = 0;
-                    lv_anim_create(&a);
+                    lv_anim_init(&a);
+                    lv_anim_set_var(&a, scrl);
+                    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
+                    lv_anim_set_values(&a, lv_obj_get_y(scrl), new_y);
+                    lv_anim_set_time(&a, LV_LIST_DEF_ANIM_TIME);
+                    lv_anim_start(&a);
 #endif
                 }
             }
@@ -585,19 +578,12 @@ void lv_list_down(const lv_obj_t * list)
             } else {
 #if LV_USE_ANIMATION
                 lv_anim_t a;
-                a.var            = scrl;
-                a.start          = lv_obj_get_y(scrl);
-                a.end            = new_y;
-                a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_y;
-                a.path_cb        = lv_anim_path_linear;
-                a.ready_cb       = NULL;
-                a.act_time       = 0;
-                a.time           = LV_LIST_DEF_ANIM_TIME;
-                a.playback       = 0;
-                a.playback_pause = 0;
-                a.repeat         = 0;
-                a.repeat_pause   = 0;
-                lv_anim_create(&a);
+                lv_anim_init(&a);
+                lv_anim_set_var(&a, scrl);
+                lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
+                lv_anim_set_values(&a, lv_obj_get_y(scrl), new_y);
+                lv_anim_set_time(&a, LV_LIST_DEF_ANIM_TIME);
+                lv_anim_start(&a);
 #endif
             }
             break;

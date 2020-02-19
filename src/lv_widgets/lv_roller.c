@@ -699,20 +699,14 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
         lv_obj_set_y(roller_scrl, new_y);
     } else {
 #if LV_USE_ANIMATION
+
         lv_anim_t a;
-        a.var            = roller_scrl;
-        a.start          = lv_obj_get_y(roller_scrl);
-        a.end            = new_y;
-        a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_y;
-        a.path_cb        = lv_anim_path_linear;
-        a.ready_cb       = scroll_anim_ready_cb;
-        a.act_time       = 0;
-        a.time           = anim_time;
-        a.playback       = 0;
-        a.playback_pause = 0;
-        a.repeat         = 0;
-        a.repeat_pause   = 0;
-        lv_anim_create(&a);
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, roller_scrl);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
+        lv_anim_set_values(&a, lv_obj_get_y(roller_scrl), new_y);
+        lv_anim_set_time(&a, anim_time);
+        lv_anim_start(&a);
 #endif
     }
 }

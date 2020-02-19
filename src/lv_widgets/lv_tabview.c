@@ -357,19 +357,12 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 #if LV_USE_ANIMATION
     else {
         lv_anim_t a;
-        a.var            = lv_page_get_scrl(ext->content);
-        a.start          = lv_obj_get_x(lv_page_get_scrl(ext->content));
-        a.end            = cont_x;
-        a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_x;
-        a.path_cb        = lv_anim_path_linear;
-        a.ready_cb       = NULL;
-        a.act_time       = 0;
-        a.time           = ext->anim_time;
-        a.playback       = 0;
-        a.playback_pause = 0;
-        a.repeat         = 0;
-        a.repeat_pause   = 0;
-        lv_anim_create(&a);
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, lv_page_get_scrl(ext->content));
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
+        lv_anim_set_values(&a, lv_obj_get_x(lv_page_get_scrl(ext->content)), cont_x);
+        lv_anim_set_time(&a, ext->anim_time);
+        lv_anim_start(&a);
     }
 #endif
 
@@ -413,7 +406,9 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 #if LV_USE_ANIMATION
     else {
         lv_anim_t a;
-        a.var = ext->indic;
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, ext->indic);
+        lv_anim_set_time(&a, ext->anim_time);
 
         switch(ext->btns_pos) {
         default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
@@ -421,27 +416,17 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
             break;
         case LV_TABVIEW_BTNS_POS_TOP:
         case LV_TABVIEW_BTNS_POS_BOTTOM:
-            a.start   = lv_obj_get_x(ext->indic);
-            a.end     = indic_pos;
-            a.exec_cb = (lv_anim_exec_xcb_t)lv_obj_set_x;
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
+            lv_anim_set_values(&a, lv_obj_get_x(ext->indic), indic_pos);
             break;
         case LV_TABVIEW_BTNS_POS_LEFT:
         case LV_TABVIEW_BTNS_POS_RIGHT:
-            a.start   = lv_obj_get_y(ext->indic);
-            a.end     = indic_pos;
-            a.exec_cb = (lv_anim_exec_xcb_t)lv_obj_set_y;
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
+            lv_anim_set_values(&a, lv_obj_get_y(ext->indic), indic_pos);
             break;
         }
 
-        a.path_cb        = lv_anim_path_linear;
-        a.ready_cb       = NULL;
-        a.act_time       = 0;
-        a.time           = ext->anim_time;
-        a.playback       = 0;
-        a.playback_pause = 0;
-        a.repeat         = 0;
-        a.repeat_pause   = 0;
-        lv_anim_create(&a);
+        lv_anim_start(&a);
     }
 #endif
 

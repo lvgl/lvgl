@@ -509,10 +509,11 @@ void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
     if(ext->dir != LV_DROPDOWN_DIR_UP) {
         lv_anim_t a;
         lv_anim_init(&a);
-        lv_anim_set_exec_cb(&a, ddlist, list_anim);
+        lv_anim_set_var(&a, ddlist);
+        lv_anim_set_exec_cb(&a, list_anim);
         lv_anim_set_values(&a, 0, lv_obj_get_height(ext->page));
-        lv_anim_set_time(&a, ext->anim_time, 0);
-        lv_anim_create(&a);
+        lv_anim_set_time(&a, ext->anim_time);
+        lv_anim_start(&a);
     }
 #endif
 }
@@ -540,11 +541,12 @@ void lv_dropdown_close(lv_obj_t * ddlist, lv_anim_enable_t anim)
         if(ext->dir != LV_DROPDOWN_DIR_UP) {
             lv_anim_t a;
             lv_anim_init(&a);
-            lv_anim_set_exec_cb(&a, ddlist, list_anim);
+            lv_anim_set_var(&a, ddlist);
+            lv_anim_set_exec_cb(&a, list_anim);
             lv_anim_set_values(&a, lv_obj_get_height(ext->page), 0);
-            lv_anim_set_time(&a, ext->anim_time, 0);
+            lv_anim_set_time(&a, ext->anim_time);
             lv_anim_set_ready_cb(&a, close_anim_ready);
-            lv_anim_create(&a);
+            lv_anim_start(&a);
 
         }
 #endif

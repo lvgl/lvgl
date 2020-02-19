@@ -169,46 +169,22 @@ void lv_spinner_set_type(lv_obj_t * preload, lv_spinner_type_t type)
         case LV_SPINNER_TYPE_FILLSPIN_ARC: {
             ext->anim_type = LV_SPINNER_TYPE_FILLSPIN_ARC;
             lv_anim_t a;
-            a.var = preload;
-            if(ext->anim_dir == LV_SPINNER_DIR_FORWARD) {
-                /* Clockwise */
-                a.start = 0;
-                a.end   = 360;
-            } else {
-                a.start = 360;
-                a.end   = 0;
-            }
-            a.exec_cb        = (lv_anim_exec_xcb_t)lv_spinner_spinner_anim;
-            a.path_cb        = lv_anim_path_ease_in_out;
-            a.ready_cb       = NULL;
-            a.act_time       = 0;
-            a.time           = ext->time;
-            a.playback       = 0;
-            a.playback_pause = 0;
-            a.repeat         = 1;
-            a.repeat_pause   = 0;
-            lv_anim_create(&a);
+            lv_anim_init(&a);
+            lv_anim_set_var(&a, preload);
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_spinner_spinner_anim);
+            lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
+            lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
+            lv_anim_set_time(&a, ext->time);
+            if(ext->anim_dir == LV_SPINNER_DIR_FORWARD) lv_anim_set_values(&a, 0, 360);
+            else lv_anim_set_values(&a, 360, 0);
+            lv_anim_start(&a);
 
-            lv_anim_t b;
-            b.var = preload;
-            if(ext->anim_dir == LV_SPINNER_DIR_FORWARD) {
-                /* Clockwise */
-                b.start = ext->arc_length;
-                b.end   = 360 - ext->arc_length;
-            } else {
-                b.start = 360 - ext->arc_length;
-                b.end   = ext->arc_length;
-            }
-            b.exec_cb        = (lv_anim_exec_xcb_t)lv_spinner_set_arc_length;
-            b.path_cb        = lv_anim_path_ease_in_out;
-            b.ready_cb       = NULL;
-            b.act_time       = 0;
-            b.time           = ext->time;
-            b.playback       = 1;
-            b.playback_pause = 0;
-            b.repeat         = 1;
-            b.repeat_pause   = 0;
-            lv_anim_create(&b);
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_spinner_set_arc_length);
+            if(ext->anim_dir == LV_SPINNER_DIR_FORWARD) lv_anim_set_values(&a, ext->arc_length, 360 - ext->arc_length);
+            else lv_anim_set_values(&a, 360 - ext->arc_length, ext->arc_length);
+
+            lv_anim_set_playback_time(&a, ext->time);
+            lv_anim_start(&a);
             break;
         }
         case LV_SPINNER_TYPE_CONSTANT_ARC:
@@ -216,26 +192,15 @@ void lv_spinner_set_type(lv_obj_t * preload, lv_spinner_type_t type)
         default: {
             ext->anim_type = type;
             lv_anim_t a;
-            a.var = preload;
-            if(ext->anim_dir == LV_SPINNER_DIR_FORWARD) {
-                /* Clockwise */
-                a.start = 0;
-                a.end   = 360;
-            } else {
-                a.start = 360;
-                a.end   = 0;
-            }
-            a.exec_cb        = (lv_anim_exec_xcb_t)lv_spinner_spinner_anim;
-            a.path_cb        = (LV_SPINNER_TYPE_CONSTANT_ARC == type ?
-                                lv_anim_path_linear : lv_anim_path_ease_in_out);
-            a.ready_cb       = NULL;
-            a.act_time       = 0;
-            a.time           = ext->time;
-            a.playback       = 0;
-            a.playback_pause = 0;
-            a.repeat         = 1;
-            a.repeat_pause   = 0;
-            lv_anim_create(&a);
+            lv_anim_init(&a);
+            lv_anim_set_var(&a, preload);
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_spinner_spinner_anim);
+            lv_anim_set_time(&a, ext->time);
+            lv_anim_set_path_cb(&a, (LV_SPINNER_TYPE_CONSTANT_ARC == type ? lv_anim_path_linear : lv_anim_path_ease_in_out));
+            lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
+            if(ext->anim_dir == LV_SPINNER_DIR_FORWARD) lv_anim_set_values(&a, 0, 360);
+            else lv_anim_set_values(&a, 360, 0);
+            lv_anim_start(&a);
             break;
         }
     }

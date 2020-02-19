@@ -500,22 +500,16 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
     } else {
 #if LV_USE_ANIMATION
         lv_anim_t a;
-        a.act_time = 0;
-        a.start    = lv_obj_get_y(ext->scrl);
-        a.end      = scrlable_y;
-        a.time     = lv_page_get_anim_time(page);
-        a.ready_cb = NULL;
-        a.playback = 0;
-        a.repeat   = 0;
-        a.var      = ext->scrl;
-        a.path_cb  = lv_anim_path_linear;
-        a.exec_cb  = (lv_anim_exec_xcb_t)lv_obj_set_y;
-        lv_anim_create(&a);
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, ext->scrl);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
+        lv_anim_set_values(&a, lv_obj_get_y(ext->scrl), scrlable_y);
+        lv_anim_set_time(&a, lv_page_get_anim_time(page));
+        lv_anim_start(&a);
 
-        a.start   = lv_obj_get_x(ext->scrl);
-        a.end     = scrlable_x;
-        a.exec_cb = (lv_anim_exec_xcb_t)lv_obj_set_x;
-        lv_anim_create(&a);
+        lv_anim_set_values(&a, lv_obj_get_x(ext->scrl), scrlable_x);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
+        lv_anim_start(&a);
 #endif
     }
 }
@@ -531,19 +525,12 @@ void lv_page_scroll_hor(lv_obj_t * page, lv_coord_t dist)
 
 #if LV_USE_ANIMATION
     lv_anim_t a;
-    a.var            = scrl;
-    a.start          = lv_obj_get_x(scrl);
-    a.end            = a.start + dist;
-    a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_x;
-    a.path_cb        = lv_anim_path_linear;
-    a.ready_cb       = NULL;
-    a.act_time       = 0;
-    a.time           = LV_PAGE_SCROLL_ANIM_TIME;
-    a.playback       = 0;
-    a.playback_pause = 0;
-    a.repeat         = 0;
-    a.repeat_pause   = 0;
-    lv_anim_create(&a);
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, scrl);
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
+    lv_anim_set_values(&a, lv_obj_get_x(scrl), lv_obj_get_x(scrl) + dist);
+    lv_anim_set_time(&a, lv_page_get_anim_time(page));
+    lv_anim_start(&a);
 #else
     lv_obj_set_x(scrl, lv_obj_get_x(scrl) + dist);
 #endif
@@ -560,19 +547,12 @@ void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
 
 #if LV_USE_ANIMATION
     lv_anim_t a;
-    a.var            = scrl;
-    a.start          = lv_obj_get_y(scrl);
-    a.end            = a.start + dist;
-    a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_y;
-    a.path_cb        = lv_anim_path_linear;
-    a.ready_cb       = NULL;
-    a.act_time       = 0;
-    a.time           = LV_PAGE_SCROLL_ANIM_TIME;
-    a.playback       = 0;
-    a.playback_pause = 0;
-    a.repeat         = 0;
-    a.repeat_pause   = 0;
-    lv_anim_create(&a);
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, scrl);
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
+    lv_anim_set_values(&a, lv_obj_get_y(scrl), lv_obj_get_y(scrl) + dist);
+    lv_anim_set_time(&a, lv_page_get_anim_time(page));
+    lv_anim_start(&a);
 #else
     lv_obj_set_y(scrl, lv_obj_get_y(scrl) + dist);
 #endif
@@ -598,19 +578,15 @@ void lv_page_start_edge_flash(lv_obj_t * page, lv_page_edge_t edge)
     }
 
     lv_anim_t a;
-    a.var            = page;
-    a.start          = 0;
-    a.end            = LV_PAGE_END_FLASH_SIZE;
-    a.exec_cb        = (lv_anim_exec_xcb_t)edge_flash_anim;
-    a.path_cb        = lv_anim_path_linear;
-    a.ready_cb       = edge_flash_anim_end;
-    a.act_time       = 0;
-    a.time           = LV_PAGE_END_ANIM_TIME;
-    a.playback       = 1;
-    a.playback_pause = LV_PAGE_END_ANIM_WAIT_TIME;
-    a.repeat         = 0;
-    a.repeat_pause   = 0;
-    lv_anim_create(&a);
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, page);
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)edge_flash_anim);
+    lv_anim_set_values(&a, 0, LV_PAGE_END_FLASH_SIZE);
+    lv_anim_set_time(&a, lv_page_get_anim_time(page));
+    lv_anim_set_playback_time(&a, lv_page_get_anim_time(page));
+    lv_anim_set_playback_delay(&a, LV_PAGE_END_ANIM_WAIT_TIME);
+    lv_anim_set_ready_cb(&a, edge_flash_anim_end);
+    lv_anim_start(&a);
 
     switch(edge) {
         case LV_PAGE_EDGE_BOTTOM: ext->edge_flash.bottom_ip = 1; break;

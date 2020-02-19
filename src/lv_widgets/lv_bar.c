@@ -697,20 +697,13 @@ static void lv_bar_set_value_with_anim(lv_obj_t * bar, int16_t new_value, int16_
 		lv_anim_del(anim_info, NULL);
 
         lv_anim_t a;
-        a.var            = anim_info;
-        a.start          = LV_BAR_ANIM_STATE_START;
-        a.end            = LV_BAR_ANIM_STATE_END;
-        a.exec_cb        = (lv_anim_exec_xcb_t)lv_bar_anim;
-        a.path_cb        = lv_anim_path_linear;
-        a.ready_cb       = lv_bar_anim_ready;
-        a.act_time       = 0;
-        a.time           = ext->anim_time;
-        a.playback       = 0;
-        a.playback_pause = 0;
-        a.repeat         = 0;
-        a.repeat_pause   = 0;
-
-        lv_anim_create(&a);
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, anim_info);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_bar_anim);
+        lv_anim_set_values(&a, LV_BAR_ANIM_STATE_START, LV_BAR_ANIM_STATE_END);
+        lv_anim_set_ready_cb(&a, lv_bar_anim_ready);
+        lv_anim_set_time(&a, ext->anim_time);
+        lv_anim_start(&a);
 
         ext->cur_value = new_value;
     }

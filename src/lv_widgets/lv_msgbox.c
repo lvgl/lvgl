@@ -211,43 +211,32 @@ void lv_msgbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
     if(lv_msgbox_get_anim_time(mbox) != 0) {
         /*Add shrinking animations*/
         lv_anim_t a;
-        a.var            = mbox;
-        a.start          = lv_obj_get_height(mbox);
-        a.end            = 0;
-        a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_height;
-        a.path_cb        = lv_anim_path_linear;
-        a.ready_cb       = NULL;
-        a.act_time       = -delay;
-        a.time           = lv_msgbox_get_anim_time(mbox);
-        a.playback       = 0;
-        a.playback_pause = 0;
-        a.repeat         = 0;
-        a.repeat_pause   = 0;
-        lv_anim_create(&a);
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, mbox);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_height);
+        lv_anim_set_values(&a, lv_obj_get_height(mbox), 0);
+        lv_anim_set_time(&a, lv_msgbox_get_anim_time(mbox));
+        lv_anim_set_delay(&a, delay);
+        lv_anim_start(&a);
 
-        a.start    = lv_obj_get_width(mbox);
-        a.exec_cb  = (lv_anim_exec_xcb_t)lv_obj_set_width;
-        a.ready_cb = lv_msgbox_close_ready_cb;
-        lv_anim_create(&a);
+        lv_anim_set_exec_cb(&a,(lv_anim_exec_xcb_t)lv_obj_set_width);
+        lv_anim_set_values(&a, lv_obj_get_width(mbox), 0);
+        lv_anim_set_ready_cb(&a, lv_msgbox_close_ready_cb);
+        lv_anim_start(&a);
 
         /*Disable fit to let shrinking work*/
         lv_cont_set_fit(mbox, LV_FIT_NONE);
     } else {
         /*Create an animation to delete the mbox `delay` ms later*/
         lv_anim_t a;
-        a.var            = mbox;
-        a.start          = 0;
-        a.end            = 1;
-        a.exec_cb        = (lv_anim_exec_xcb_t)NULL;
-        a.path_cb        = lv_anim_path_linear;
-        a.ready_cb       = lv_msgbox_close_ready_cb;
-        a.act_time       = -delay;
-        a.time           = 0;
-        a.playback       = 0;
-        a.playback_pause = 0;
-        a.repeat         = 0;
-        a.repeat_pause   = 0;
-        lv_anim_create(&a);
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, mbox);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)NULL);
+        lv_anim_set_values(&a, 0, 1);
+        lv_anim_set_ready_cb(&a, lv_msgbox_close_ready_cb);
+        lv_anim_set_time(&a, lv_msgbox_get_anim_time(mbox));
+        lv_anim_set_delay(&a, delay);
+        lv_anim_start(&a);
     }
 #else
     (void)delay; /*Unused*/

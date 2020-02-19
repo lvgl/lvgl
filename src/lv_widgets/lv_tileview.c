@@ -232,29 +232,24 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
         lv_coord_t x_act = lv_obj_get_x(scrl);
         lv_coord_t y_act = lv_obj_get_y(scrl);
 
+
         lv_anim_t a;
-        a.var            = scrl;
-        a.exec_cb        = (lv_anim_exec_xcb_t)lv_obj_set_x;
-        a.path_cb        = lv_anim_path_linear;
-        a.ready_cb       = NULL;
-        a.act_time       = 0;
-        a.time           = ext->anim_time;
-        a.playback       = 0;
-        a.playback_pause = 0;
-        a.repeat         = 0;
-        a.repeat_pause   = 0;
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, scrl);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
+        lv_anim_set_time(&a, ext->anim_time);
+        lv_anim_set_path_cb(&a, lv_anim_path_linear);
+
 
         if(x_coord != x_act) {
-            a.start = x_act;
-            a.end   = x_coord;
-            lv_anim_create(&a);
+            lv_anim_set_values(&a, x_act, x_coord);
+            lv_anim_start(&a);
         }
 
         if(y_coord != y_act) {
-            a.start   = y_act;
-            a.end     = y_coord;
-            a.exec_cb = (lv_anim_exec_xcb_t)lv_obj_set_y;
-            lv_anim_create(&a);
+            lv_anim_set_exec_cb(&a,(lv_anim_exec_xcb_t)lv_obj_set_y);
+            lv_anim_set_values(&a, y_act, y_coord);
+            lv_anim_start(&a);
         }
 #endif
     } else {
