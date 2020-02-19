@@ -37,7 +37,9 @@ enum {
     LV_LAYOUT_ROW_TOP,  /**< Row top align*/
     LV_LAYOUT_ROW_MID,  /**< Row middle align*/
     LV_LAYOUT_ROW_BOTTOM,  /**< Row bottom align*/
-    LV_LAYOUT_PRETTY, /**< Put as many object as possible in row and begin a new row*/
+    LV_LAYOUT_PRETTY_TOP, /**< Put as many object as possible in row and begin a new row*/
+    LV_LAYOUT_PRETTY_MID, /**< Put as many object as possible in row and begin a new row*/
+    LV_LAYOUT_PRETTY_BOTTOM, /**< Put as many object as possible in row and begin a new row*/
     LV_LAYOUT_GRID,   /**< Align same-sized object into a grid*/
     _LV_LAYOUT_LAST
 };

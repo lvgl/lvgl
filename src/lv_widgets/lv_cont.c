@@ -321,7 +321,7 @@ static void lv_cont_refr_layout(lv_obj_t * cont)
         lv_cont_layout_col(cont);
     } else if(type == LV_LAYOUT_ROW_TOP || type == LV_LAYOUT_ROW_MID || type == LV_LAYOUT_ROW_BOTTOM) {
         lv_cont_layout_row(cont);
-    } else if(type == LV_LAYOUT_PRETTY) {
+    } else if(type == LV_LAYOUT_PRETTY_MID || type == LV_LAYOUT_PRETTY_TOP || type == LV_LAYOUT_PRETTY_BOTTOM) {
         lv_cont_layout_pretty(cont);
     } else if(type == LV_LAYOUT_GRID) {
         lv_cont_layout_grid(cont);
@@ -484,6 +484,8 @@ static void lv_cont_layout_center(lv_obj_t * cont)
  */
 static void lv_cont_layout_pretty(lv_obj_t * cont)
 {
+    lv_layout_t type = lv_cont_get_layout(cont);
+
     lv_obj_t * child_rs;  /* Row starter child */
     lv_obj_t * child_rc;  /* Row closer child */
     lv_obj_t * child_tmp; /* Temporary child */
@@ -530,7 +532,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
                                         next as first */
         } while(child_rc != NULL);
 
-        /*If the object is too long  then align it to the middle*/
+        /*If the object is too long then align it to the middle*/
         if(obj_num == 0) {
             if(child_rc != NULL) {
                 lv_obj_align(child_rc, cont, LV_ALIGN_IN_TOP_MID, 0, act_y);
@@ -547,8 +549,22 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
             lv_obj_t * obj2 = lv_ll_get_prev(&cont->child_ll, child_rs);
             w_row           = lv_obj_get_width(obj1) + lv_obj_get_width(obj2);
             lv_coord_t pad  = (w_obj - w_row) / 3;
-            lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y + (h_row - lv_obj_get_height(obj1)) / 2);
-            lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y + (h_row - lv_obj_get_height(obj2)) / 2);
+            switch(type) {
+            case LV_LAYOUT_PRETTY_TOP:
+                lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y);
+                lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y);
+                break;
+            case LV_LAYOUT_PRETTY_MID:
+                lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y + (h_row - lv_obj_get_height(obj1)) / 2);
+                lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y + (h_row - lv_obj_get_height(obj2)) / 2);
+                break;
+            case LV_LAYOUT_PRETTY_BOTTOM:
+                lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y + h_row - lv_obj_get_height(obj1));
+                lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y + h_row - lv_obj_get_height(obj2));
+                break;
+            default:
+                break;
+            }
         }
         /* Align the children (from child_rs to child_rc)*/
         else {
@@ -558,8 +574,24 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
             child_tmp           = child_rs;
             while(child_tmp != NULL) {
                 if(lv_obj_get_hidden(child_tmp) == false && lv_obj_is_protected(child_tmp, LV_PROTECT_POS) == false) {
-                    lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x,
-                                 act_y + (h_row - lv_obj_get_height(child_tmp)) / 2);
+                    switch(type) {
+                    case LV_LAYOUT_PRETTY_TOP:
+                        lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x,
+                                act_y);
+                        break;
+                    case LV_LAYOUT_PRETTY_MID:
+                        lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x,
+                                act_y + (h_row - lv_obj_get_height(child_tmp)) / 2);
+
+                        break;
+                    case LV_LAYOUT_PRETTY_BOTTOM:
+                        lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x,
+                                act_y + h_row - lv_obj_get_height(child_tmp));
+                        break;
+                    default:
+                        break;
+                    }
+
                     act_x += lv_obj_get_width(child_tmp) + new_opad;
                 }
                 if(child_tmp == child_rc) break;
