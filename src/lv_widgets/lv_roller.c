@@ -107,15 +107,15 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_drag(scrl, true);                                  /*In ddlist it might be disabled*/
         lv_page_set_scrl_fit2(roller, LV_FIT_PARENT, LV_FIT_NONE); /*Height is specified directly*/
         lv_roller_set_anim_time(roller, LV_ROLLER_DEF_ANIM_TIME);
-        lv_roller_set_options(roller, "Option 1\nOption 2\nOption 3", LV_ROLLER_MODE_NORMAL);
-        lv_roller_set_visible_row_count(roller, 3);
+        lv_roller_set_options(roller, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
 
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
 
         lv_style_list_reset(lv_obj_get_style_list(roller, LV_PAGE_PART_SCRL));
         lv_theme_apply(roller, LV_THEME_ROLLER);
-
         refr_height(roller);
+
+        lv_roller_set_visible_row_count(roller, 4);
 
     }
     /*Copy an existing roller*/
@@ -240,10 +240,9 @@ void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt)
 {
     LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
 
-    uint8_t n_line_space           = (row_cnt > 1) ? row_cnt - 1 : 1;
     const lv_font_t * font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(roller, LV_ROLLER_PART_BG);
-    lv_obj_set_height(roller, lv_font_get_line_height(font) * row_cnt + line_space * n_line_space);
+    lv_obj_set_height(roller, (lv_font_get_line_height(font) + line_space) * row_cnt);
 
     refr_position(roller, LV_ANIM_OFF);
 }
@@ -696,6 +695,7 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
     lv_coord_t new_y = -line_y1 + (h - font_h) / 2;
 
     if(anim_en == LV_ANIM_OFF || anim_time == 0) {
+        lv_anim_del(roller_scrl, (lv_anim_exec_xcb_t)lv_obj_set_y);
         lv_obj_set_y(roller_scrl, new_y);
     } else {
 #if LV_USE_ANIMATION
@@ -719,6 +719,10 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
  */
 static lv_res_t release_handler(lv_obj_t * roller)
 {
+
+    /*If there was dragging `DRAG_END` signal will refresh the position and update the selected option*/
+    if(lv_indev_is_dragging(lv_indev_get_act())) return LV_RES_OK;
+
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
 
     lv_indev_t * indev = lv_indev_get_act();
@@ -765,7 +769,6 @@ static lv_res_t release_handler(lv_obj_t * roller)
     uint32_t id  = ext->sel_opt_id; /*Just to use uint32_t in event data*/
     lv_res_t res = lv_event_send(roller, LV_EVENT_VALUE_CHANGED, &id);
     if(res != LV_RES_OK) return res;
-
     return LV_RES_OK;
 }
 
