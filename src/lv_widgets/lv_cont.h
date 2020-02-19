@@ -31,16 +31,55 @@ extern "C" {
 enum {
     LV_LAYOUT_OFF = 0, /**< No layout */
     LV_LAYOUT_CENTER, /**< Center objects */
-    LV_LAYOUT_COLUMN_LEFT,  /**< Column left align*/
-    LV_LAYOUT_COLUMN_MID,  /**< Column middle align*/
-    LV_LAYOUT_COLUMN_RIGHT,  /**< Column right align*/
-    LV_LAYOUT_ROW_TOP,  /**< Row top align*/
-    LV_LAYOUT_ROW_MID,  /**< Row middle align*/
-    LV_LAYOUT_ROW_BOTTOM,  /**< Row bottom align*/
-    LV_LAYOUT_PRETTY_TOP, /**< Put as many object as possible in row and begin a new row*/
-    LV_LAYOUT_PRETTY_MID, /**< Put as many object as possible in row and begin a new row*/
-    LV_LAYOUT_PRETTY_BOTTOM, /**< Put as many object as possible in row and begin a new row*/
+
+    /**
+     * COULMN:
+     * - Place the object below each other
+     * - Keep `pad_top` space on the top
+     * - Keep `pad_inner` space between the objects
+     */
+    LV_LAYOUT_COLUMN_LEFT,      /**< Column left align*/
+    LV_LAYOUT_COLUMN_MID,       /**< Column middle align*/
+    LV_LAYOUT_COLUMN_RIGHT,     /**< Column right align*/
+
+    /**
+     * ROW:
+     * - Place the object next to each other
+     * - Keep `pad_left` space on the left
+     * - Keep `pad_inner` space between the objects
+     * - If the object which applies the layout has `base_dir == LV_BIDI_DIR_RTL`
+     *   the row will start from the right applying `pad.right` space
+     */
+    LV_LAYOUT_ROW_TOP,          /**< Row top align*/
+    LV_LAYOUT_ROW_MID,          /**< Row middle align*/
+    LV_LAYOUT_ROW_BOTTOM,       /**< Row bottom align*/
+
+
+    /**
+     * PRETTY:
+     * - Place the object next to each other
+     * - If there is no more space start a new row
+     * - Respect `pad_left` and `pad_right` when determining the available space in a row
+     * - Keep `pad_inner` space between the objects in the same row
+     * - Keep `pad_inner` space between the objects in rows
+     * - Divide the remaining horizontal space equally
+     */
+    LV_LAYOUT_PRETTY_TOP,       /**< Row top align*/
+    LV_LAYOUT_PRETTY_MID,       /**< Row middle align*/
+    LV_LAYOUT_PRETTY_BOTTOM,    /**< Row bottom align*/
+
+    /**
+     * GRID
+     * - Place the object next to each other
+     * - If there is no more space start a new row
+     * - Respect `pad_left` and `pad_right` when determining the available space in a row
+     * - Keep `pad_inner` space between the objects in the same row
+     * - Keep `pad_inner` space between the objects in rows
+     * - Unlike `PRETTY`, `GRID` always keep `pad_inner` space horizontally between objects
+     *   so it doesn't divide the remaining horizontal space equally
+     */
     LV_LAYOUT_GRID,   /**< Align same-sized object into a grid*/
+
     _LV_LAYOUT_LAST
 };
 typedef uint8_t lv_layout_t;
