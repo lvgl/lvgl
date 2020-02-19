@@ -96,6 +96,10 @@ static lv_style_t list_bg, list_btn;
 static lv_style_t ddlist_btn, ddlist_page, ddlist_sel;
 #endif
 
+#if LV_USE_ROLLER
+static lv_style_t roller_bg, roller_sel;
+#endif
+
 #if LV_USE_TEXTAREA
 static lv_style_t ta_bg, ta_cursor, ta_oneline, ta_placeholder;
 #endif
@@ -713,7 +717,14 @@ static void ddlist_init(void)
 static void roller_init(void)
 {
 #if LV_USE_ROLLER != 0
+    lv_style_init(&roller_bg);
+    lv_style_copy(&roller_bg, &ta_bg);
+    lv_style_set_text_line_space(&roller_bg, LV_STATE_NORMAL, LV_DPI / 8);
 
+    lv_style_init(&roller_sel);
+    lv_style_set_bg_opa(&roller_sel, LV_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_bg_color(&roller_sel, LV_STATE_NORMAL, COLOR_ACCENT);
+    lv_style_set_text_color(&roller_sel, LV_STATE_NORMAL, LV_COLOR_WHITE);
 #endif
 }
 
@@ -1115,11 +1126,11 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
     case LV_THEME_ROLLER:
         list = lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
         lv_style_list_reset(list);
-        lv_style_list_add_style(list, &panel);
+        lv_style_list_add_style(list, &roller_bg);
 
         list = lv_obj_get_style_list(obj, LV_ROLLER_PART_SEL);
         lv_style_list_reset(list);
-        lv_style_list_add_style(list, &btn);
+        lv_style_list_add_style(list, &roller_sel);
         break;
 #endif
 
