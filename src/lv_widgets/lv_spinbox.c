@@ -314,6 +314,30 @@ void lv_spinbox_decrement(lv_obj_t * spinbox)
     lv_spinbox_updatevalue(spinbox);
 }
 
+/**
+ * An event callback which can ne simply used for a "+" button
+ * @param spinbox pointer to spinbox
+ * @param e the event (`LV_EVENT_...`)
+ */
+void lv_spinbox_increment_event_cb(lv_obj_t * spinbox, lv_event_t e)
+{
+    if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT) {
+        lv_spinbox_increment(spinbox);
+    }
+}
+
+/**
+ * An event callback which can be simply used for a "-" button
+ * @param spinbox pointer to spinbox
+ * @param e the event (`LV_EVENT_...`)
+ */
+void lv_spinbox_decrement_event_cb(lv_obj_t * spinbox, lv_event_t e)
+{
+    if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT) {
+        lv_spinbox_decrement(spinbox);
+    }
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
