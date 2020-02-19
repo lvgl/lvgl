@@ -695,7 +695,9 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
     lv_coord_t new_y = -line_y1 + (h - font_h) / 2;
 
     if(anim_en == LV_ANIM_OFF || anim_time == 0) {
+#if LV_USE_ANIMATION
         lv_anim_del(roller_scrl, (lv_anim_exec_xcb_t)lv_obj_set_y);
+#endif
         lv_obj_set_y(roller_scrl, new_y);
     } else {
 #if LV_USE_ANIMATION
