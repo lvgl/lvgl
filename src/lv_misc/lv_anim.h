@@ -244,6 +244,17 @@ static inline void lv_anim_set_repeat_delay(lv_anim_t * a, uint16_t delay)
  */
 void lv_anim_start(lv_anim_t * a);
 
+
+/**
+ * Get a delay before starting the animation
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @return delay before the animation in milliseconds
+ */
+static inline int32_t lv_anim_get_delay(lv_anim_t * a)
+{
+	return -a->act_time;
+}
+
 /**
  * Delete an animation of a variable with a given animator function
  * @param var pointer to variable
