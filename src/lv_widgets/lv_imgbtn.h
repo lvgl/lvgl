@@ -41,9 +41,9 @@ typedef struct
 #if LV_IMGBTN_TILED == 0
     const void * img_src[_LV_BTN_STATE_LAST]; /*Store images to each state*/
 #else
-    const void * img_src_left[_LV_BTN_STATE_NUM];  /*Store left side images to each state*/
-    const void * img_src_mid[_LV_BTN_STATE_NUM];   /*Store center images to each state*/
-    const void * img_src_right[_LV_BTN_STATE_NUM]; /*Store right side images to each state*/
+    const void * img_src_left[_LV_BTN_STATE_LAST];  /*Store left side images to each state*/
+    const void * img_src_mid[_LV_BTN_STATE_LAST];   /*Store center images to each state*/
+    const void * img_src_right[_LV_BTN_STATE_LAST]; /*Store right side images to each state*/
 #endif
     lv_img_cf_t act_cf; /*Color format of the currently active image*/
 } lv_imgbtn_ext_t;
