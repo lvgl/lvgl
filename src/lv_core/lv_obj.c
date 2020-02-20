@@ -66,10 +66,10 @@ static void delete_children(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
 #if LV_USE_ANIMATION
 static void obj_state_anim_cb(void * p, lv_anim_value_t value);
+static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
 #endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static void lv_obj_del_async_cb(void * obj);
-static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -3101,6 +3101,7 @@ lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
  */
 void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
 {
+#if LV_USE_ANIMATION
 	lv_anim_t a;
 	lv_anim_init(&a);
 	lv_anim_set_var(&a, obj);
@@ -3109,6 +3110,11 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
 	lv_anim_set_time(&a, time);
 	lv_anim_set_delay(&a, delay);
 	lv_anim_start(&a);
+#else
+	(void) obj;		/*Unused*/
+	(void) time;	/*Unused*/
+	(void) delay;	/*Unused*/
+#endif
 }
 
 /**
@@ -3119,6 +3125,7 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
  */
 void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
 {
+#if LV_USE_ANIMATION
 	lv_anim_t a;
 	lv_anim_init(&a);
 	lv_anim_set_var(&a, obj);
@@ -3127,7 +3134,11 @@ void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
 	lv_anim_set_time(&a, time);
 	lv_anim_set_delay(&a, delay);
 	lv_anim_start(&a);
-
+#else
+	(void) obj;		/*Unused*/
+	(void) time;	/*Unused*/
+	(void) delay;	/*Unused*/
+#endif
 }
 
 /**********************
@@ -3444,6 +3455,12 @@ static void obj_state_anim_cb(void * p, lv_anim_value_t value)
 
     lv_obj_refresh_style(obj);
 }
+
+static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v)
+{
+	lv_obj_set_style_opa_scale(obj, LV_OBJ_PART_MAIN, LV_STATE_NORMAL, v);
+}
+
 #endif
 
 static void lv_event_mark_deleted(lv_obj_t * obj)
@@ -3454,11 +3471,6 @@ static void lv_event_mark_deleted(lv_obj_t * obj)
         if(t->obj == obj) t->deleted = true;
         t = t->prev;
     }
-}
-
-static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v)
-{
-	lv_obj_set_style_opa_scale(obj, LV_OBJ_PART_MAIN, LV_STATE_NORMAL, v);
 }
 
 
