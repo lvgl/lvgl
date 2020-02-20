@@ -389,8 +389,19 @@ void lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
 {
     dsc->tmp.pivot_x_256 = dsc->cfg.pivot_x * 256;
     dsc->tmp.pivot_y_256 = dsc->cfg.pivot_y * 256;
-    dsc->tmp.sinma = lv_trigo_sin(-dsc->cfg.angle);
-    dsc->tmp.cosma = lv_trigo_sin(-dsc->cfg.angle + 90);
+
+    int32_t angle_low = dsc->cfg.angle / 10;
+    int32_t angle_hight = angle_low + 1;
+    int32_t angle_rem = dsc->cfg.angle  - (angle_low * 10);
+
+    int32_t s1 = lv_trigo_sin(-angle_low);
+    int32_t s2 = lv_trigo_sin(-angle_hight);
+
+    int32_t c1 = lv_trigo_sin(-angle_low + 90);
+    int32_t c2 = lv_trigo_sin(-angle_hight + 90);
+
+    dsc->tmp.sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
+    dsc->tmp.cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
 
     dsc->tmp.chroma_keyed = lv_img_cf_is_chroma_keyed(dsc->cfg.cf) ? 1 : 0;
     dsc->tmp.has_alpha = lv_img_cf_has_alpha(dsc->cfg.cf) ? 1 : 0;
@@ -507,8 +518,19 @@ bool lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t
  */
 void lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom, lv_point_t * pivot)
 {
-    int16_t sinma = lv_trigo_sin(angle);
-    int16_t cosma = lv_trigo_sin(angle + 90);
+
+    int32_t angle_low = angle / 10;
+    int32_t angle_hight = angle_low + 1;
+    int32_t angle_rem = angle  - (angle_low * 10);
+
+    int32_t s1 = lv_trigo_sin(angle_low);
+    int32_t s2 = lv_trigo_sin(angle_hight);
+
+    int32_t c1 = lv_trigo_sin(angle_low + 90);
+    int32_t c2 = lv_trigo_sin(angle_hight + 90);
+
+    int32_t sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
+    int32_t cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
 
     lv_point_t lt;
     lv_point_t rt;

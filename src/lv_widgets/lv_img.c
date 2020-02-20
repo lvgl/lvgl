@@ -304,13 +304,13 @@ void lv_img_set_pivot(lv_obj_t * img, lv_coord_t pivot_x, lv_coord_t pivot_y)
 
 /**
  * Set the rotation angle of the image.
- * The image will be rotated around its middle point
+ * The image will be rotated around the set pivot set by `lv_img_set_pivot()`
  * @param img pointer to an image object
- * @param angle rotation angle in degree (> 0: clock wise)
+ * @param angle rotation angle in degree with 0.1 degree resolution (0..3600: clock wise)
  */
 void lv_img_set_angle(lv_obj_t * img, int16_t angle)
 {
-    if(angle < 0 || angle >= 360) angle = angle % 360;
+    if(angle < 0 || angle >= 3600) angle = angle % 3600;
 
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
     if(angle == ext->angle) return;
