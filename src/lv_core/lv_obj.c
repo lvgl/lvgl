@@ -57,6 +57,8 @@ typedef struct _lv_event_temp_data
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 static void report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
@@ -67,8 +69,7 @@ static void obj_state_anim_cb(void * p, lv_anim_value_t value);
 #endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static void lv_obj_del_async_cb(void * obj);
-static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
 
 /**********************
  *  STATIC VARIABLES
@@ -2801,21 +2802,10 @@ lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name)
     return LV_RES_OK;
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-static void lv_obj_del_async_cb(void * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_obj_del(obj);
-}
-
 /**
  * Initialize a rectangle descriptor from an object's styles
  * @param obj pointer to an object
- * @param type type of style. E.g.  `LV_OBJ_STYLE_MAIN`, `LV_BTN_STYLE_REL` or `LV_PAGE_STYLE_SCRL`
+ * @param type type of style. E.g.  `LV_OBJ_PART_MAIN`, `LV_BTN_STYLE_REL` or `LV_PAGE_STYLE_SCRL`
  * @param draw_dsc the descriptor the initialize
  * @note Only the relevant fields will be set.
  * E.g. if `border width == 0` the other border properties won't be evaluated.
@@ -3102,6 +3092,55 @@ lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
     }
     return s;
 }
+
+/**
+ * Fade in (from transparent to fully cover) an object and all its children using an `opa_scale` animation.
+ * @param obj the object to fade in
+ * @param time duration of the animation [ms]
+ * @param delay wait before the animation starts [ms]
+ */
+void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
+{
+	lv_anim_t a;
+	lv_anim_init(&a);
+	lv_anim_set_var(&a, obj);
+	lv_anim_set_values(&a, LV_OPA_TRANSP, LV_OPA_COVER);
+	lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)opa_scale_anim);
+	lv_anim_set_time(&a, time);
+	lv_anim_set_delay(&a, delay);
+	lv_anim_start(&a);
+}
+
+/**
+ * Fade out (from fully cover to transparent) an object and all its children using an `opa_scale` animation.
+ * @param obj the object to fade in
+ * @param time duration of the animation [ms]
+ * @param delay wait before the animation starts [ms]
+ */
+void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
+{
+	lv_anim_t a;
+	lv_anim_init(&a);
+	lv_anim_set_var(&a, obj);
+	lv_anim_set_values(&a, LV_OPA_COVER, LV_OPA_TRANSP);
+	lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)opa_scale_anim);
+	lv_anim_set_time(&a, time);
+	lv_anim_set_delay(&a, delay);
+	lv_anim_start(&a);
+
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void lv_obj_del_async_cb(void * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_obj_del(obj);
+}
+
 
 /**
  * Handle the drawing related tasks of the base objects.
@@ -3416,4 +3455,10 @@ static void lv_event_mark_deleted(lv_obj_t * obj)
         t = t->prev;
     }
 }
+
+static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v)
+{
+	lv_obj_set_style_opa_scale(obj, LV_OBJ_PART_MAIN, LV_STATE_NORMAL, v);
+}
+
 

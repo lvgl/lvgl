@@ -1235,7 +1235,7 @@ lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name);
 /**
  * Initialize a rectangle descriptor from an object's styles
  * @param obj pointer to an object
- * @param type type of style. E.g.  `LV_OBJ_STYLE_MAIN`, `LV_BTN_STYLE_REL` or `LV_PAGE_STYLE_SCRL`
+ * @param type type of style. E.g.  `LV_OBJ_PART_MAIN`, `LV_BTN_STYLE_REL` or `LV_PAGE_STYLE_SCRL`
  * @param draw_dsc the descriptor the initialize
  * @note Only the relevant fields will be set.
  * E.g. if `border width == 0` the other border properties won't be evaluated.
@@ -1254,6 +1254,22 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t 
  * @param part part of the object
  */
 lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part);
+
+/**
+ * Fade in (from transparent to fully cover) an object and all its children using an `opa_scale` animation.
+ * @param obj the object to fade in
+ * @param time duration of the animation [ms]
+ * @param delay wait before the animation starts [ms]
+ */
+void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay);
+
+/**
+ * Fade out (from fully cover to transparent) an object and all its children using an `opa_scale` animation.
+ * @param obj the object to fade in
+ * @param time duration of the animation [ms]
+ * @param delay wait before the animation starts [ms]
+ */
+void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay);
 
 /**********************
  *      MACROS
