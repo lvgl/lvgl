@@ -104,6 +104,10 @@ static lv_style_t roller_bg, roller_sel;
 static lv_style_t ta_bg, ta_cursor, ta_oneline, ta_placeholder;
 #endif
 
+#if LV_USE_SPINBOX
+static lv_style_t spinbox_btn, spinbox_cursor;
+#endif
+
 #if LV_USE_LED
 static lv_style_t led;
 #endif
@@ -631,6 +635,17 @@ static void textarea_init(void)
 static void spinbox_init(void)
 {
 #if LV_USE_SPINBOX
+    lv_style_init(&spinbox_btn);
+    lv_style_copy(&spinbox_btn, &ta_bg);
+    lv_style_set_bg_color(&spinbox_btn, LV_STATE_PRESSED, lv_color_hex3(0xaaa));
+
+    lv_style_init(&spinbox_cursor);
+    lv_style_set_bg_opa(&spinbox_cursor, LV_STATE_NORMAL, LV_OPA_COVER);
+    lv_style_set_bg_color(&spinbox_cursor, LV_STATE_NORMAL, COLOR_ACCENT);
+    lv_style_set_text_color(&spinbox_cursor, LV_STATE_NORMAL, LV_COLOR_WHITE);
+    lv_style_set_pad_top(&spinbox_cursor, LV_STATE_NORMAL, LV_DPI);
+    lv_style_set_pad_bottom(&spinbox_cursor, LV_STATE_NORMAL, LV_DPI);
+
 #endif
 }
 
@@ -1289,15 +1304,17 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
     case LV_THEME_SPINBOX:
         list = lv_obj_get_style_list(obj, LV_SPINBOX_PART_BG);
         lv_style_list_reset(list);
-        lv_style_list_add_style(list, &ta_oneline);
+        lv_style_list_add_style(list, &ta_bg);
 
         list = lv_obj_get_style_list(obj, LV_SPINBOX_PART_CURSOR);
         lv_style_list_reset(list);
-        lv_style_list_add_style(list, &ta_cursor);
+        lv_style_list_add_style(list, &spinbox_cursor);
+        break;
 
-        list = lv_obj_get_style_list(obj, LV_SPINBOX_PART_SCRLBAR);
+    case LV_THEME_SPINBOX_BTN:
+        list = lv_obj_get_style_list(obj, LV_BTN_PART_MAIN);
         lv_style_list_reset(list);
-        lv_style_list_add_style(list, &sb);
+        lv_style_list_add_style(list, &spinbox_btn);
         break;
 #endif
 

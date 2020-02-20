@@ -65,6 +65,7 @@ typedef enum {
     LV_THEME_ROLLER,
     LV_THEME_SLIDER,
     LV_THEME_SPINBOX,
+    LV_THEME_SPINBOX_BTN,   /*Button extra for spinbox*/
     LV_THEME_SPINNER,
     LV_THEME_SWITCH,
     LV_THEME_TABLE,

@@ -1716,7 +1716,7 @@ static void refr_cursor_area(lv_obj_t * ta)
     lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_CURSOR);
     lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_CURSOR);
     lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_CURSOR);
-    lv_style_int_t right = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_CURSOR);
+    lv_style_int_t right = lv_obj_get_style_pad_right(ta, LV_TEXTAREA_PART_CURSOR);
 
     lv_area_t cur_area;
     cur_area.x1 = letter_pos.x - left;

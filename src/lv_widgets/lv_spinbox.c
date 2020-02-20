@@ -55,20 +55,20 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("spinbox create started");
 
     /*Create the ancestor of spinbox*/
-    lv_obj_t * new_spinbox = lv_textarea_create(par, copy);
-    LV_ASSERT_MEM(new_spinbox);
-    if(new_spinbox == NULL) return NULL;
+    lv_obj_t * spinbox = lv_textarea_create(par, copy);
+    LV_ASSERT_MEM(spinbox);
+    if(spinbox == NULL) return NULL;
 
     /*Allocate the spinbox type specific extended data*/
-    lv_spinbox_ext_t * ext = lv_obj_allocate_ext_attr(new_spinbox, sizeof(lv_spinbox_ext_t));
+    lv_spinbox_ext_t * ext = lv_obj_allocate_ext_attr(spinbox, sizeof(lv_spinbox_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_spinbox);
+        lv_obj_del(spinbox);
         return NULL;
     }
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_spinbox);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_spinbox);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(spinbox);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(spinbox);
 
     /*Initialize the allocated 'ext'*/
     ext->value              = 0;
@@ -79,35 +79,40 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->range_max          = 99999;
     ext->range_min          = -99999;
 
-    lv_textarea_set_one_line(new_spinbox, true);
-    lv_textarea_set_cursor_click_pos(new_spinbox, true);
+    lv_textarea_set_one_line(spinbox, true);
+    lv_textarea_set_cursor_click_pos(spinbox, true);
+
+    lv_theme_apply(spinbox, LV_THEME_SPINBOX);
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(new_spinbox, lv_spinbox_signal);
-    lv_obj_set_design_cb(new_spinbox, ancestor_design); /*Leave the Text area's design function*/
+    lv_obj_set_signal_cb(spinbox, lv_spinbox_signal);
+    lv_obj_set_design_cb(spinbox, ancestor_design); /*Leave the Text area's design function*/
 
     /*Init the new spinbox spinbox*/
     if(copy == NULL) {
-
+        /* No scrolling will happen here so make the scrollable non-clickable
+         * It allows to handle input events in the bg object only.*/
+        lv_obj_set_click(lv_page_get_scrl(spinbox), false);
     }
     /*Copy an existing spinbox*/
     else {
         lv_spinbox_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
-        lv_spinbox_set_value(new_spinbox, copy_ext->value);
-        lv_spinbox_set_digit_format(new_spinbox, (uint8_t)copy_ext->digit_count, (uint8_t)copy_ext->dec_point_pos);
-        lv_spinbox_set_range(new_spinbox, copy_ext->range_min, copy_ext->range_max);
-        lv_spinbox_set_step(new_spinbox, copy_ext->step);
+        lv_spinbox_set_value(spinbox, copy_ext->value);
+        lv_spinbox_set_digit_format(spinbox, (uint8_t)copy_ext->digit_count, (uint8_t)copy_ext->dec_point_pos);
+        lv_spinbox_set_range(spinbox, copy_ext->range_min, copy_ext->range_max);
+        lv_spinbox_set_step(spinbox, copy_ext->step);
+
 
         /*Refresh the style with new signal function*/
-//        lv_obj_refresh_style(new_spinbox);
+        lv_obj_refresh_style(spinbox);
     }
 
-    lv_spinbox_updatevalue(new_spinbox);
+    lv_spinbox_updatevalue(spinbox);
 
     LV_LOG_INFO("spinbox created");
 
-    return new_spinbox;
+    return spinbox;
 }
 
 /*=====================
@@ -150,6 +155,7 @@ void lv_spinbox_set_digit_format(lv_obj_t * spinbox, uint8_t digit_count, uint8_
 
     if(digit_count > LV_SPINBOX_MAX_DIGIT_COUNT) digit_count = LV_SPINBOX_MAX_DIGIT_COUNT;
 
+    if(separator_position >= digit_count) separator_position = 0;
     if(separator_position > LV_SPINBOX_MAX_DIGIT_COUNT) separator_position = LV_SPINBOX_MAX_DIGIT_COUNT;
 
     ext->digit_count   = digit_count;
@@ -314,30 +320,6 @@ void lv_spinbox_decrement(lv_obj_t * spinbox)
     lv_spinbox_updatevalue(spinbox);
 }
 
-/**
- * An event callback which can ne simply used for a "+" button
- * @param spinbox pointer to spinbox
- * @param e the event (`LV_EVENT_...`)
- */
-void lv_spinbox_increment_event_cb(lv_obj_t * spinbox, lv_event_t e)
-{
-    if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT) {
-        lv_spinbox_increment(spinbox);
-    }
-}
-
-/**
- * An event callback which can be simply used for a "-" button
- * @param spinbox pointer to spinbox
- * @param e the event (`LV_EVENT_...`)
- */
-void lv_spinbox_decrement_event_cb(lv_obj_t * spinbox, lv_event_t e)
-{
-    if(e == LV_EVENT_SHORT_CLICKED || e == LV_EVENT_LONG_PRESSED_REPEAT) {
-        lv_spinbox_decrement(spinbox);
-    }
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -379,10 +361,10 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
         buf->type[i] = "lv_spinbox";
     } else if(sign == LV_SIGNAL_RELEASED) {
         /*If released with an ENCODER then move to the next digit*/
-#if LV_USE_GROUP
         lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
         lv_indev_t * indev = lv_indev_get_act();
         if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
+#if LV_USE_GROUP
             if(lv_group_get_editing(lv_obj_get_group(spinbox))) {
                 if(ext->step > 1) {
                     lv_spinbox_step_next(spinbox);
@@ -398,8 +380,36 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
                     lv_spinbox_step_prev(spinbox);
                 }
             }
-        }
 #endif
+        }else {
+            /*The cursor has been positioned to a digit.
+             * Set `step` accordingly*/
+            const char * txt = lv_textarea_get_text(spinbox);
+            size_t txt_len = strlen(txt);
+
+            if(txt[ext->ta.cursor.pos] == '.') {
+                lv_textarea_cursor_left(spinbox);
+            } else if(ext->ta.cursor.pos == txt_len) {
+                lv_textarea_set_cursor_pos(spinbox, txt_len - 1);
+            } else if(ext->ta.cursor.pos == 0 && ext->range_min < 0) {
+                lv_textarea_set_cursor_pos(spinbox, 1);
+            }
+
+            size_t len = ext->digit_count - 1;
+            uint16_t cp = ext->ta.cursor.pos;
+
+            if(ext->ta.cursor.pos > ext->dec_point_pos && ext->dec_point_pos != 0) cp--;
+            uint32_t pos = len - cp;
+
+            if(ext->range_min < 0) pos++;
+
+            ext->step = 1;
+            uint16_t i;
+            for(i = 0; i < pos; i++) ext->step *= 10;
+
+
+
+        }
     } else if(sign == LV_SIGNAL_CONTROL) {
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
@@ -442,9 +452,6 @@ static lv_style_list_t * lv_spinbox_get_style(lv_obj_t * ta, uint8_t part)
     switch(part) {
     case LV_SPINBOX_PART_BG:
         style_dsc_p = &ta->style_list;
-        break;
-    case LV_SPINBOX_PART_SCRLBAR:
-        style_dsc_p = &ext->ta.page.scrlbar.style;
         break;
     case LV_SPINBOX_PART_CURSOR:
         style_dsc_p = &ext->ta.cursor.style;
@@ -526,7 +533,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
         cur_pos--;
     }
 
-    if(cur_pos > intDigits) cur_pos++; /*Skip teh decimal point*/
+    if(cur_pos > intDigits) cur_pos++; /*Skip the decimal point*/
 
     cur_pos += (ext->digit_padding_left - cur_shift_left);
 
