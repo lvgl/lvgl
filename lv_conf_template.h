@@ -530,7 +530,7 @@ typedef void * lv_obj_user_data_t;
 #endif
 
 /*Line meter (dependencies: *;)*/
-#define LV_USE_LMETER   1
+#define LV_USE_LINEMETER   1
 
 /*Mask (dependencies: -)*/
 #define LV_USE_OBJMASK  0
