@@ -285,7 +285,7 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
     uint8_t i;
 
-    lv_color_t main_color = lv_obj_get_style_scale_color(lmeter, part);
+    lv_color_t main_color = lv_obj_get_style_line_color(lmeter, part);
     lv_color_t grad_color = lv_obj_get_style_scale_grad_color(lmeter, part);
     lv_color_t end_color = lv_obj_get_style_scale_end_color(lmeter, part);
 

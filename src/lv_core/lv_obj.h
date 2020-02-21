@@ -195,8 +195,6 @@ typedef uint8_t lv_state_t;
 
 typedef struct {
     lv_state_t act;
-    lv_state_t prev;
-    uint8_t anim;
 }lv_obj_state_dsc_t;
 
 typedef struct _lv_obj_t
@@ -564,6 +562,15 @@ void _lv_obj_set_style_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t pro
  * @note for performance reasons it's not checked if the property really has pointer type
  */
 void _lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, const void * value);
+
+/**
+ * Get the local style of a part of an object.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @return pointer to the local style if exists else `NULL`.
+ */
+lv_style_t * lv_obj_get_local_style(lv_obj_t * obj, uint8_t part);
 
 /*-----------------
  * Attribute set

@@ -681,7 +681,6 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     strcpy(&txt_buf[5], get_month_name(calendar, ext->showed_date.month));
 
     calendar->state_dsc.act = LV_STATE_NORMAL;
-    calendar->state_dsc.prev = LV_STATE_NORMAL;
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
@@ -695,8 +694,6 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     if(ext->btn_pressing < 0) calendar->state_dsc.act |= LV_STATE_PRESSED;
     else calendar->state_dsc.act &= ~(LV_STATE_PRESSED);
 
-    calendar->state_dsc.prev = calendar->state_dsc.act;
-
     header_area.x1 += header_left;
 
     lv_draw_label_dsc_init(&label_dsc);
@@ -708,8 +705,6 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     /*Add the right arrow*/
     if(ext->btn_pressing > 0) calendar->state_dsc.act |= LV_STATE_PRESSED;
     else calendar->state_dsc.act &= ~(LV_STATE_PRESSED);
-
-    calendar->state_dsc.prev = calendar->state_dsc.act;
 
     header_area.x1 = header_area.x2 - header_right - lv_txt_get_width(LV_SYMBOL_RIGHT, (uint16_t)strlen(LV_SYMBOL_RIGHT), font, 0, LV_TXT_FLAG_NONE);
 
@@ -790,7 +785,6 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
     /*The state changes without re-caching the styles, disable the use of cache*/
     lv_obj_state_dsc_t state_ori = calendar->state_dsc;
     calendar->state_dsc.act = LV_STATE_NORMAL;
-    calendar->state_dsc.prev = LV_STATE_NORMAL;
 
     lv_state_t month_state = LV_STATE_DISABLED;
 
@@ -882,7 +876,6 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
                 label_dsc.flag = LV_TXT_FLAG_CENTER;
 
                 calendar->state_dsc.act = day_state;
-                calendar->state_dsc.prev = day_state;
                 lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_DATE, &label_dsc);
                 lv_obj_init_draw_rect_dsc(calendar, LV_CALENDAR_PART_DATE, &rect_dsc);
 

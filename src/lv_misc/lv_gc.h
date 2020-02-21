@@ -33,6 +33,7 @@ extern "C" {
     f(lv_ll_t, _lv_anim_ll)                                        \
     f(lv_ll_t, _lv_group_ll)                                       \
     f(lv_ll_t, _lv_img_defoder_ll)                                 \
+    f(lv_ll_t, _lv_obj_style_trans_ll)                             \
     f(lv_img_cache_entry_t*, _lv_img_cache_array)                  \
     f(void*, _lv_task_act)                                         \
     f(lv_mem_buf_arr_t , _lv_mem_buf)                              \

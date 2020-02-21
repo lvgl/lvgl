@@ -39,6 +39,8 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
 #define _LV_STYLE_CLOSEING_PROP     0xFF
 
+#define LV_STYLE_TRANS_NUM_MAX      6
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -84,15 +86,15 @@ typedef union {
 }lv_style_attr_t;
 
 
-#define LV_STYLE_ID_VALUE 0x0   /*max 6 pcs*/
-#define LV_STYLE_ID_COLOR 0x6   /*max 4 pcs*/
-#define LV_STYLE_ID_OPA   0xA   /*max 4 pcs*/
+#define LV_STYLE_ID_VALUE 0x0   /*max 8 pcs*/
+#define LV_STYLE_ID_COLOR 0x8   /*max 3 pcs*/
+#define LV_STYLE_ID_OPA   0xB   /*max 3 pcs*/
 #define LV_STYLE_ID_PTR   0xE   /*max 2 pcs*/
 
 enum {
-    LV_STYLE_PROP_INIT(LV_STYLE_RADIUS,             0x0, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_CLIP_CORNER,        0x0, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_TRANSITION_TIME,    0x0, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
+    /*Skip 0th property*/
+    LV_STYLE_PROP_INIT(LV_STYLE_RADIUS,             0x0, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_CLIP_CORNER,        0x0, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_SIZE,               0x0, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_OPA_SCALE,          0x0, LV_STYLE_ID_OPA + 0,   LV_STYLE_ATTR_INHERIT),
 
@@ -103,7 +105,7 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_INNER,          0x1, LV_STYLE_ID_VALUE + 4, LV_STYLE_ATTR_NONE),
 
     LV_STYLE_PROP_INIT(LV_STYLE_BG_BLEND_MODE,      0x2, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_BG_MAIN_STOP,      0x2, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_BG_MAIN_STOP,       0x2, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_BG_GRAD_STOP,       0x2, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_BG_GRAD_DIR,        0x2, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_BG_COLOR,           0x2, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
@@ -171,13 +173,32 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_IMAGE_OPA,          0xA, LV_STYLE_ID_OPA   + 0, LV_STYLE_ATTR_INHERIT),
     LV_STYLE_PROP_INIT(LV_STYLE_IMAGE_RECOLOR_OPA,  0xA, LV_STYLE_ID_OPA   + 1, LV_STYLE_ATTR_INHERIT),
 
-    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_WIDTH,         0xB, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_BORDER_WIDTH,     0xB, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_END_BORDER_WIDTH, 0xB, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_END_LINE_WIDTH, 0xB, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_COLOR,         0xB, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_GRAD_COLOR,    0xB, LV_STYLE_ID_COLOR + 1, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_END_COLOR,     0xB, LV_STYLE_ID_COLOR + 2, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS_TIME,    0xB, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS_DELAY,   0xB, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS_PROP_1,  0xB, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS_PROP_2,  0xB, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS_PROP_3,  0xB, LV_STYLE_ID_VALUE + 4, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS_PROP_4,  0xB, LV_STYLE_ID_VALUE + 5, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS_PROP_5,  0xB, LV_STYLE_ID_VALUE + 6, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS_PROP_6,  0xB, LV_STYLE_ID_VALUE + 7, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS_PATH,    0xB, LV_STYLE_ID_PTR + 0, LV_STYLE_ATTR_NONE),
+
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS2_TIME,    0xC, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS2_DELAY,   0xC, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS2_PROP_1,  0xC, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS2_PROP_2,  0xC, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS2_PROP_3,  0xC, LV_STYLE_ID_VALUE + 4, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS2_PROP_4,  0xC, LV_STYLE_ID_VALUE + 5, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS2_PROP_5,  0xC, LV_STYLE_ID_VALUE + 6, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS2_PROP_6,  0xC, LV_STYLE_ID_VALUE + 7, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_TRANS2_PATH,    0xC, LV_STYLE_ID_PTR + 0, LV_STYLE_ATTR_NONE),
+
+    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_WIDTH,         0xD, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_BORDER_WIDTH,     0xD, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_END_BORDER_WIDTH, 0xD, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_END_LINE_WIDTH, 0xD, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_GRAD_COLOR,    0xD, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCALE_END_COLOR,     0xD, LV_STYLE_ID_COLOR + 1, LV_STYLE_ATTR_NONE),
 };
 
 typedef uint16_t lv_style_property_t;
@@ -203,7 +224,9 @@ typedef struct {
     uint32_t sentinel;
 #endif
     uint8_t style_cnt;
-    uint8_t has_local   :1;
+    uint8_t has_local    :1;
+    uint8_t has_trans    :1;
+    uint8_t skip_trans   :1;
 }lv_style_list_t;
 
 /**********************
@@ -260,8 +283,8 @@ void lv_style_list_reset(lv_style_list_t * style_list);
 
 static inline lv_style_t * lv_style_list_get_style(lv_style_list_t * list, uint8_t id)
 {
+    if(list->has_trans && list->skip_trans) id++;
     if(list->style_cnt == 0 || id >= list->style_cnt) return NULL;
-
     return list->style_list[id];
 }
 
@@ -284,6 +307,15 @@ uint16_t lv_style_get_mem_size(const lv_style_t * style);
  * @param src pointer to the source style
  */
 void lv_style_copy(lv_style_t * dest, const lv_style_t * src);
+
+/**
+ * Remove a property from a style
+ * @param style pointer to a style
+ * @param prop  a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @return true: the property was found and removed; false: the property wasn't found
+ */
+bool lv_style_remove_prop(lv_style_t * style, lv_style_property_t prop);
 
 /**
  * Set an integer typed property in a style.
@@ -392,6 +424,27 @@ int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, vo
  * @note for performance reasons it's not checked if the property really has pointer type
  */
 int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void * res);
+
+/**
+ * Get the local style of a style list
+ * @param list pointer to a style list where the local property should be set
+ * @return pointer to the local style if exists else `NULL`.
+ */
+lv_style_t * lv_style_list_get_local_style(lv_style_list_t * list);
+
+/**
+ * Get the transition style of a style list
+ * @param list pointer to a style list where the local property should be set
+ * @return pointer to the transition style if exists else `NULL`.
+ */
+lv_style_t * lv_style_list_get_trans_style(lv_style_list_t * list);
+
+/**
+ * Allocate the transition style in a style list. If already exists simply return it.
+ * @param list pointer to a style list
+ * @return the transition style of a style list
+ */
+lv_style_t * lv_style_list_add_trans_style(lv_style_list_t * list);
 
 /**
  * Set a local integer typed property in a style list.

@@ -948,7 +948,6 @@ static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id
 
     page->state_dsc.act = LV_STATE_NORMAL;
     page->state_dsc.act |= state;
-    page->state_dsc.prev = page->state_dsc.act;
 
     /*Draw a rectangle under the selected item*/
     const lv_font_t * font    = lv_obj_get_style_text_font(ddlist, LV_DROPDOWN_PART_LIST);
@@ -984,7 +983,6 @@ static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint1
 
     page->state_dsc.act = LV_STATE_NORMAL;
     page->state_dsc.act |= state;
-    page->state_dsc.prev = page->state_dsc.act;
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);

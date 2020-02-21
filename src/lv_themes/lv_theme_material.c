@@ -183,7 +183,7 @@ static void basic_init(void)
     lv_style_set_image_recolor(&panel, LV_STATE_NORMAL, color_panel_txt(LV_STATE_NORMAL));
     lv_style_set_line_color(&panel, LV_STATE_NORMAL, color_panel_txt(LV_STATE_NORMAL));
     lv_style_set_line_width(&panel, LV_STATE_NORMAL, 1);
-    lv_style_set_transition_time(&panel, LV_STATE_NORMAL, TRANSITION_TIME);
+    lv_style_set_trans_time(&panel, LV_STATE_NORMAL, TRANSITION_TIME);
     lv_style_set_pad_left(&panel, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_right(&panel, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_top(&panel, LV_STATE_NORMAL, LV_DPI / 5);
@@ -208,7 +208,7 @@ static void basic_init(void)
     lv_style_set_pad_top(&bg, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_bottom(&bg, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_inner(&bg, LV_STATE_NORMAL, LV_DPI / 5);
-    lv_style_set_transition_time(&panel, LV_STATE_NORMAL, TRANSITION_TIME);
+    lv_style_set_trans_time(&panel, LV_STATE_NORMAL, TRANSITION_TIME);
 
     lv_style_init(&btn);
     lv_style_set_radius(&btn, LV_STATE_NORMAL, LV_RADIUS_CIRCLE);
@@ -221,6 +221,7 @@ static void basic_init(void)
     lv_style_set_border_color(&btn, LV_STATE_NORMAL, color_btn_border(LV_STATE_NORMAL));
     lv_style_set_border_color(&btn, LV_STATE_PRESSED, color_btn_border(LV_STATE_PRESSED));
     lv_style_set_border_width(&btn, LV_STATE_NORMAL, BORDER_WIDTH);
+    lv_style_set_border_width(&btn, LV_STATE_PRESSED, BORDER_WIDTH * 10);
     lv_style_set_border_width(&btn, LV_STATE_CHECKED, 0);
     lv_style_set_text_color(&btn, LV_STATE_NORMAL, color_btn_txt(LV_STATE_NORMAL));
     lv_style_set_text_color(&btn, LV_STATE_PRESSED, color_btn_txt(LV_STATE_PRESSED));
@@ -237,10 +238,12 @@ static void basic_init(void)
     lv_style_set_pad_top(&btn, LV_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_bottom(&btn, LV_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_inner(&btn, LV_STATE_NORMAL, LV_DPI / 10);
-    lv_style_set_outline_width(&btn, LV_STATE_FOCUSED, 3);
-    lv_style_set_outline_opa(&btn, LV_STATE_FOCUSED, LV_OPA_50);
-    lv_style_set_outline_color(&btn, LV_STATE_FOCUSED, _color_primary);
-    lv_style_set_transition_time(&btn, LV_STATE_NORMAL, TRANSITION_TIME);
+    lv_style_set_outline_width(&btn, LV_STATE_FOCUSED, 10);
+    lv_style_set_outline_opa(&btn, LV_STATE_NORMAL, LV_OPA_50);
+    lv_style_set_outline_color(&btn, LV_STATE_NORMAL, _color_primary);
+    lv_style_set_trans_time(&btn, LV_STATE_NORMAL, TRANSITION_TIME);
+    lv_style_set_trans_prop1(&btn, LV_STATE_NORMAL, LV_STYLE_BORDER_WIDTH);
+    lv_style_set_trans_prop2(&btn, LV_STATE_NORMAL, LV_STYLE_OUTLINE_WIDTH);
 }
 
 static void cont_init(void)
@@ -358,7 +361,7 @@ static void linemeter_init(void)
     lv_style_set_pad_inner(&lmeter, LV_STATE_NORMAL, LV_DPI / 6);
     lv_style_set_scale_width(&lmeter, LV_STATE_NORMAL, LV_DPI/12);
 
-    lv_style_set_scale_color(&lmeter, LV_STATE_NORMAL, _color_primary);
+    lv_style_set_line_color(&lmeter, LV_STATE_NORMAL, _color_primary);
     lv_style_set_scale_grad_color(&lmeter, LV_STATE_NORMAL, _color_primary);
     lv_style_set_scale_end_color(&lmeter, LV_STATE_NORMAL, lv_color_hex3(0x888));
     lv_style_set_line_rounded(&lmeter, LV_STATE_NORMAL, true);
@@ -374,7 +377,7 @@ static void gauge_init(void)
     lv_style_copy(&gauge_main, &panel);
     lv_style_set_radius(&gauge_main, LV_STATE_NORMAL, LV_RADIUS_CIRCLE);
     lv_style_set_border_side(&gauge_main, LV_STATE_NORMAL, LV_BORDER_SIDE_FULL);
-    lv_style_set_scale_color(&gauge_main, LV_STATE_NORMAL, lv_color_hex3(0x888));
+    lv_style_set_line_color(&gauge_main, LV_STATE_NORMAL, lv_color_hex3(0x888));
     lv_style_set_scale_grad_color(&gauge_main, LV_STATE_NORMAL, lv_color_hex3(0x888));
     lv_style_set_scale_end_color(&gauge_main, LV_STATE_NORMAL, _color_primary);
     lv_style_set_line_width(&gauge_main, LV_STATE_NORMAL, LV_DPI / 50);
@@ -388,7 +391,7 @@ static void gauge_init(void)
     lv_style_set_scale_width(&gauge_main, LV_STATE_NORMAL, LV_DPI/12);
 
     lv_style_init(&gauge_strong);
-    lv_style_set_scale_color(&gauge_strong, LV_STATE_NORMAL, lv_color_hex3(0x888));
+    lv_style_set_line_color(&gauge_strong, LV_STATE_NORMAL, lv_color_hex3(0x888));
     lv_style_set_scale_grad_color(&gauge_strong, LV_STATE_NORMAL, lv_color_hex3(0x888));
     lv_style_set_scale_end_color(&gauge_strong, LV_STATE_NORMAL, _color_primary);
     lv_style_set_line_width(&gauge_strong, LV_STATE_NORMAL, LV_DPI / 25);
@@ -538,7 +541,7 @@ static void checkbox_init(void)
     lv_style_set_pattern_image(&cb_bullet, LV_STATE_CHECKED, LV_SYMBOL_OK);
     lv_style_set_pattern_recolor(&cb_bullet, LV_STATE_CHECKED, LV_COLOR_WHITE);
     lv_style_set_text_font(&cb_bullet, LV_STATE_CHECKED, _font_small);
-    lv_style_set_transition_time(&cb_bullet, LV_STATE_NORMAL , TRANSITION_TIME);
+    lv_style_set_trans_time(&cb_bullet, LV_STATE_NORMAL , TRANSITION_TIME);
 #endif
 }
 
@@ -626,7 +629,7 @@ static void textarea_init(void)
     lv_style_set_pad_right(&ta_oneline, LV_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_top(&ta_oneline, LV_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_bottom(&ta_oneline, LV_STATE_NORMAL, LV_DPI / 10);
-    lv_style_set_transition_time(&ta_oneline, LV_STATE_NORMAL, TRANSITION_TIME);
+    lv_style_set_trans_time(&ta_oneline, LV_STATE_NORMAL, TRANSITION_TIME);
 
     lv_style_init(&ta_placeholder);
     lv_style_set_text_color(&ta_placeholder, LV_STATE_NORMAL, lv_color_hex(0x3b3e43));
@@ -693,7 +696,7 @@ static void list_init(void)
     lv_style_set_pad_top(&list_btn, LV_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_bottom(&list_btn, LV_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_inner(&list_btn, LV_STATE_NORMAL, LV_DPI / 10);
-    lv_style_set_transition_time(&list_btn, LV_STATE_NORMAL, TRANSITION_TIME);
+    lv_style_set_trans_time(&list_btn, LV_STATE_NORMAL, TRANSITION_TIME);
 
 #endif
 }

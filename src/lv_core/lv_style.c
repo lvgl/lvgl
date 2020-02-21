@@ -36,7 +36,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop);
-static lv_style_t * get_local_style(lv_style_list_t * list);
+static lv_style_t * get_alloc_local_style(lv_style_list_t * list);
 
 /**********************
  *  GLOABAL VARIABLES
@@ -86,6 +86,51 @@ void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
 }
 
 /**
+ * Remove a property from a style
+ * @param style pointer to a style
+ * @param prop  a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @return true: the property was found and removed; false: the property wasn't found
+ */
+bool lv_style_remove_prop(lv_style_t * style, lv_style_property_t prop)
+{
+    if(style == NULL) return false;
+    LV_ASSERT_STYLE(style);
+
+    int32_t id = get_property_index(style, prop);
+    /*The property exists but not sure it's state is the same*/
+    if(id >= 0) {
+        lv_style_attr_t attr_found;
+        lv_style_attr_t attr_goal;
+
+        attr_found.full = *(style->map + id + 1);
+        attr_goal.full = (prop >> 8) & 0xFFU;
+
+        if(attr_found.bits.state == attr_goal.bits.state)
+        {
+            uint32_t map_size = lv_style_get_mem_size(style);
+            uint8_t prop_size = sizeof(lv_style_property_t);
+            if((prop & 0xF) < LV_STYLE_ID_COLOR) prop_size += sizeof(lv_style_int_t);
+            else if((prop & 0xF) < LV_STYLE_ID_OPA) prop_size += sizeof(lv_color_t);
+            else if((prop & 0xF) < LV_STYLE_ID_PTR) prop_size += sizeof(lv_opa_t);
+            else prop_size += sizeof(const void *);
+
+            /*Move the props to fill the space of the property to delete*/
+            uint32_t i;
+            for(i = id; i < map_size - prop_size; i++) {
+                style->map[i] = style->map[i + prop_size];
+            }
+
+            style->map = lv_mem_realloc(style->map, map_size - prop_size);
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
  * Initialize a style list
  * @param list a style list to initialize
  */
@@ -113,18 +158,30 @@ void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * lis
 
     if(list_src->style_list == NULL) return;
 
+    /*Copy the styles but skip the transitions*/
     if(list_src->has_local == 0) {
-        list_dest->style_list = lv_mem_alloc(list_src->style_cnt * sizeof(lv_style_t *));
-        memcpy(list_dest->style_list, list_src->style_list, list_src->style_cnt * sizeof(lv_style_t *));
-
-        list_dest->style_cnt = list_src->style_cnt;
+        if(list_src->has_trans) {
+            list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 1) * sizeof(lv_style_t *));
+            memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
+            list_dest->style_cnt = list_src->style_cnt - 1;
+        } else {
+            list_dest->style_list = lv_mem_alloc(list_src->style_cnt * sizeof(lv_style_t *));
+            memcpy(list_dest->style_list, list_src->style_list, list_src->style_cnt * sizeof(lv_style_t *));
+            list_dest->style_cnt = list_src->style_cnt;
+        }
     } else {
-        list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 1) * sizeof(lv_style_t *));
-        memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
-        list_dest->style_cnt = list_src->style_cnt - 1;
+        if(list_src->has_trans) {
+            list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 2) * sizeof(lv_style_t *));
+            memcpy(list_dest->style_list, list_src->style_list + 2, (list_src->style_cnt - 2) * sizeof(lv_style_t *));
+            list_dest->style_cnt = list_src->style_cnt - 2;
+        } else {
+            list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 1) * sizeof(lv_style_t *));
+            memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
+            list_dest->style_cnt = list_src->style_cnt - 1;
+        }
 
-        lv_style_t * local_style = get_local_style(list_dest);
-        lv_style_copy(local_style, get_local_style((lv_style_list_t *)list_src));
+        lv_style_t * local_style = get_alloc_local_style(list_dest);
+        lv_style_copy(local_style, get_alloc_local_style((lv_style_list_t *)list_src));
     }
 }
 
@@ -154,9 +211,11 @@ void lv_style_list_add_style(lv_style_list_t * list, lv_style_t * style)
         return;
     }
 
-    /*Make space for the new style at the beginning. Leave local style if exists*/
+    /*Make space for the new style at the beginning. Leave local and trans style if exists*/
     uint8_t i;
-    uint8_t first_style = list->has_local ? 1 : 0;
+    uint8_t first_style = 0;
+    if(list->has_trans) first_style++;
+    if(list->has_local) first_style++;
     for(i = list->style_cnt; i > first_style; i--) {
         new_classes[i] = new_classes[i - 1];
     }
@@ -226,9 +285,16 @@ void lv_style_list_reset(lv_style_list_t * list)
     if(list == NULL) return;
 
     if(list->has_local) {
-        lv_style_t * local = lv_style_list_get_style(list, 0);
-        lv_style_reset(local);
-        lv_mem_free(local);
+        lv_style_t * local = lv_style_list_get_local_style(list);
+        if(local) {
+            lv_style_reset(local);
+            lv_mem_free(local);
+        }
+        lv_style_t * trans = lv_style_list_get_trans_style(list);
+        if(trans) {
+            lv_style_reset(trans);
+            lv_mem_free(trans);
+        }
     }
     if(list->style_cnt > 0) lv_mem_free(list->style_list);
     list->style_list = NULL;
@@ -460,7 +526,6 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void 
     memcpy(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
 }
 
-
 /**
  * Get the a property from a style.
  * Take into account the style state and return the property which matches the best.
@@ -594,6 +659,58 @@ int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, vo
     }
 }
 
+/**
+ * Get the local style of a style list
+ * @param list pointer to a style list where the local property should be set
+ * @return pointer to the local style if exists else `NULL`.
+ */
+lv_style_t * lv_style_list_get_local_style(lv_style_list_t * list)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    if(!list->has_local) return NULL;
+    if(list->has_trans) return list->style_list[1];
+    else return list->style_list[0];
+}
+
+/**
+ * Get the transition style of a style list
+ * @param list pointer to a style list where the local property should be set
+ * @return pointer to the transition style if exists else `NULL`.
+ */
+lv_style_t * lv_style_list_get_trans_style(lv_style_list_t * list)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    if(!list->has_trans) return NULL;
+    return list->style_list[0];
+}
+
+/**
+ * Allocate the transition style in a style list. If already exists simply return it.
+ * @param list pointer to a style list
+ * @return the transition style of a style list
+ */
+lv_style_t * lv_style_list_add_trans_style(lv_style_list_t * list)
+{
+    LV_ASSERT_STYLE_LIST(list);
+    if(list->has_trans) return lv_style_list_get_trans_style(list);
+
+    lv_style_t * trans_style = lv_mem_alloc(sizeof(lv_style_t));
+    LV_ASSERT_MEM(trans_style);
+    if(trans_style == NULL) {
+        LV_LOG_WARN("lv_style_list_add_trans_style: couldn't create transition style");
+        return NULL;
+    }
+
+    lv_style_init(trans_style);
+
+    lv_style_list_add_style(list, trans_style);
+    list->has_trans = 1;
+
+    return trans_style;
+}
+
 
 /**
  * Set a local integer typed property in a style list.
@@ -607,7 +724,7 @@ void lv_style_list_set_local_int(lv_style_list_t * list, lv_style_property_t pro
 {
     LV_ASSERT_STYLE_LIST(list);
 
-    lv_style_t * local = get_local_style(list);
+    lv_style_t * local = get_alloc_local_style(list);
     _lv_style_set_int(local, prop, value);
 }
 
@@ -623,7 +740,7 @@ void lv_style_list_set_local_opa(lv_style_list_t * list, lv_style_property_t pro
 {
     LV_ASSERT_STYLE_LIST(list);
 
-    lv_style_t * local = get_local_style(list);
+    lv_style_t * local = get_alloc_local_style(list);
     _lv_style_set_opa(local, prop, value);
 }
 
@@ -639,7 +756,7 @@ void lv_style_list_set_local_color(lv_style_list_t * list, lv_style_property_t p
 {
     LV_ASSERT_STYLE_LIST(list);
 
-    lv_style_t * local = get_local_style(list);
+    lv_style_t * local = get_alloc_local_style(list);
     _lv_style_set_color(local, prop, value);
 }
 
@@ -655,7 +772,7 @@ void lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t pro
 {
     LV_ASSERT_STYLE_LIST(list);
 
-    lv_style_t * local = get_local_style(list);
+    lv_style_t * local = get_alloc_local_style(list);
     _lv_style_set_ptr(local, prop, value);
 }
 
@@ -692,6 +809,10 @@ lv_res_t lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop,
         weight_act = _lv_style_get_int(class, prop, &value_act);
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
+            *res = value_act;
+            return LV_RES_OK;
+        }
+        else if(weight_act >= 0 && ci == 0 && list->has_trans && !list->skip_trans) {
             *res = value_act;
             return LV_RES_OK;
         }
@@ -913,7 +1034,7 @@ static inline int32_t get_property_index(const lv_style_t * style, lv_style_prop
  * @param list pointer to a style list
  * @return pointer to the local style
  */
-static lv_style_t * get_local_style(lv_style_list_t * list)
+static lv_style_t * get_alloc_local_style(lv_style_list_t * list)
 {
     LV_ASSERT_STYLE_LIST(list);
 
@@ -927,6 +1048,7 @@ static lv_style_t * get_local_style(lv_style_list_t * list)
     }
     lv_style_init(local_style);
 
+    /*Add the local style to the furst place*/
     lv_style_list_add_style(list, local_style);
     list->has_local = 1;
 
