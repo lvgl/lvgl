@@ -16,7 +16,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define TRANSITION_TIME     300
+#define TRANSITION_TIME     200
 #define BORDER_WIDTH        (LV_DPI / 50 > 0 ? LV_DPI / 50 : 1)
 
 /**********************
@@ -113,6 +113,7 @@ static lv_style_t list_bg, list_btn;
 #endif
 
 #if LV_USE_MSGBOX
+static lv_style_t mbox_btn_bg;
 
 #endif
 
@@ -217,8 +218,8 @@ static void basic_init(void)
     lv_style_set_bg_color(&btn, LV_STATE_CHECKED, color_btn(LV_STATE_CHECKED));
     lv_style_set_bg_color(&btn, LV_STATE_CHECKED | LV_STATE_PRESSED, color_btn(LV_STATE_CHECKED | LV_STATE_PRESSED));
     lv_style_set_bg_color(&btn, LV_STATE_DISABLED, color_btn(LV_STATE_DISABLED));
-    lv_style_set_border_color(&btn, LV_STATE_NORMAL, color_btn_txt(LV_STATE_NORMAL));
-    lv_style_set_border_color(&btn, LV_STATE_PRESSED, color_btn_txt(LV_STATE_PRESSED));
+    lv_style_set_border_color(&btn, LV_STATE_NORMAL, color_btn_border(LV_STATE_NORMAL));
+    lv_style_set_border_color(&btn, LV_STATE_PRESSED, color_btn_border(LV_STATE_PRESSED));
     lv_style_set_border_width(&btn, LV_STATE_NORMAL, BORDER_WIDTH);
     lv_style_set_border_width(&btn, LV_STATE_CHECKED, 0);
     lv_style_set_text_color(&btn, LV_STATE_NORMAL, color_btn_txt(LV_STATE_NORMAL));
@@ -579,7 +580,8 @@ static void keyboard_init(void)
 static void msgbox_init(void)
 {
 #if LV_USE_MSGBOX
-
+    lv_style_init(&mbox_btn_bg);
+    lv_style_set_pad_inner(&mbox_btn_bg, LV_STATE_NORMAL,  LV_DPI / 10);
 #endif
 }
 
@@ -1054,6 +1056,7 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
     case LV_THEME_MSGBOX_BTNS:
         list = lv_obj_get_style_list(obj, LV_MSGBOX_PART_BTN_BG);
         lv_style_list_reset(list);
+        lv_style_list_add_style(list, &mbox_btn_bg);
 
         list = lv_obj_get_style_list(obj, LV_MSGBOX_PART_BTN);
         lv_style_list_reset(list);
@@ -1430,8 +1433,13 @@ static inline lv_color_t color_btn(lv_state_t state)
 {
     switch(state) {
     case LV_STATE_NORMAL:
+        return lv_color_hex(0x303439);
     case LV_STATE_PRESSED:
+        return lv_color_hex(0x43484f);
     case LV_STATE_CHECKED:
+        return _color_primary;
+    case LV_STATE_CHECKED | LV_STATE_PRESSED:
+        return lv_color_hex(0x006adb);
     case LV_STATE_FOCUSED:
     case LV_STATE_EDITED:
     case LV_STATE_HOVERED:
@@ -1477,14 +1485,16 @@ static inline lv_color_t color_bg_border(lv_state_t state)
 {
     switch(state) {
     case LV_STATE_NORMAL:
+        return lv_color_hex(0x606060);
     case LV_STATE_PRESSED:
+        return lv_color_hex(0x404040);
     case LV_STATE_CHECKED:
     case LV_STATE_FOCUSED:
     case LV_STATE_EDITED:
     case LV_STATE_HOVERED:
     case LV_STATE_DISABLED:
     default:
-        return lv_color_hex(0xffff00);
+        return lv_color_hex(0x606060);
     }
 }
 
@@ -1493,6 +1503,7 @@ static inline lv_color_t color_btn_border(lv_state_t state)
     switch(state) {
     case LV_STATE_NORMAL:
     case LV_STATE_PRESSED:
+        return lv_color_hex(0x606060);
     case LV_STATE_CHECKED:
     case LV_STATE_FOCUSED:
     case LV_STATE_EDITED:
@@ -1546,7 +1557,7 @@ static inline lv_color_t color_bg_txt(lv_state_t state)
     case LV_STATE_HOVERED:
     case LV_STATE_DISABLED:
     default:
-        return lv_color_hex(0xff00ff);
+        return lv_color_hex(0xa5a8ad);
     }
 }
 
@@ -1559,7 +1570,9 @@ static inline lv_color_t color_btn_txt(lv_state_t state)
     case LV_STATE_FOCUSED:
     case LV_STATE_EDITED:
     case LV_STATE_HOVERED:
+        return lv_color_hex(0xffffff);
     case LV_STATE_DISABLED:
+        return lv_color_hex(0x888888);
     default:
         return lv_color_hex(0xffffff);
     }
