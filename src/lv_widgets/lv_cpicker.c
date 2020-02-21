@@ -661,7 +661,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     lv_cpicker_ext_t * ext = lv_obj_get_ext_attr(cpicker);
 
     if(sign == LV_SIGNAL_CLEANUP) {
-        lv_style_list_reset(&ext->indic.style_list);
+        lv_obj_clean_style_list(cpicker, LV_CPICKER_PART_INDIC);
     } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         lv_style_int_t left = lv_obj_get_style_pad_left(cpicker, LV_CPICKER_PART_INDIC);
         lv_style_int_t right = lv_obj_get_style_pad_right(cpicker, LV_CPICKER_PART_INDIC);

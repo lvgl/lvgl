@@ -627,7 +627,7 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
     }
 	if(sign == LV_SIGNAL_CLEANUP) {
 	    lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
-        lv_style_list_reset(&ext->style_indic);
+        lv_obj_clean_style_list(bar, LV_BAR_PART_INDIC);
 #if LV_USE_ANIMATION
 		lv_anim_del(&ext->cur_value_anim, NULL);
 		lv_anim_del(&ext->start_value_anim, NULL);

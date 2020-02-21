@@ -793,7 +793,7 @@ static lv_res_t lv_table_signal(lv_obj_t * table, lv_signal_t sign, void * param
         if(ext->cell_data != NULL) lv_mem_free(ext->cell_data);
 
         for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
-            lv_style_list_reset(&ext->cell_style[i]);
+            lv_obj_clean_style_list(table, LV_TABLE_PART_CELL1 + i);
         }
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {

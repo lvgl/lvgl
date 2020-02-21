@@ -653,8 +653,8 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
         }
         lv_ll_clear(&ext->series_ll);
 
-        lv_style_list_reset(&ext->style_series);
-        lv_style_list_reset(&ext->style_series_bg);
+        lv_obj_clean_style_list(chart, LV_CHART_PART_SERIES);
+        lv_obj_clean_style_list(chart, LV_CHART_PART_SERIES_BG);
     }
 
     return res;

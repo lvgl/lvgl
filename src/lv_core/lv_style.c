@@ -60,7 +60,7 @@ static lv_style_t * get_alloc_local_style(lv_style_list_t * list);
  */
 void lv_style_init(lv_style_t * style)
 {
-    style->map = NULL;
+    memset(style, 0x00, sizeof(lv_style_t));
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_DEBUG_STYLE_SENTINEL_VALUE;
 #endif
@@ -136,10 +136,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_property_t prop)
  */
 void lv_style_list_init(lv_style_list_t * list)
 {
-    list->style_list = NULL;
-    list->style_cnt = 0;
-    list->has_local = 0;
-    list->has_trans = 0;
+    memset(list, 0x00, sizeof(lv_style_list_t));
 #if LV_USE_ASSERT_STYLE
     list->sentinel = LV_DEBUG_STYLE_LIST_SENTINEL_VALUE;
 #endif
@@ -709,6 +706,12 @@ lv_style_t * lv_style_list_add_trans_style(lv_style_list_t * list)
     lv_style_list_add_style(list, trans_style);
     list->has_trans = 1;
 
+    /*If the list has local style trans was added after it. But trans should be the first so swap them*/
+    if(list->has_local) {
+        lv_style_t * tmp = list->style_list[0];
+        list->style_list[0] = list->style_list[1];
+        list->style_list[1] = tmp;
+    }
     return trans_style;
 }
 

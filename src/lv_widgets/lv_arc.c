@@ -420,7 +420,7 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
 
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
-        lv_style_list_reset(&ext->style_arc);
+        lv_obj_clean_style_list(arc, LV_ARC_PART_ARC);
     }
 
     return res;

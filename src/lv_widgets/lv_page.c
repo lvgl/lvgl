@@ -741,9 +741,9 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             }
         }
 
-        lv_style_list_reset(&ext->scrlbar.style);
+        lv_obj_clean_style_list(page, LV_PAGE_PART_SCRLBAR);
 #if LV_USE_ANIMATION
-        lv_style_list_reset(&ext->edge_flash.style);
+        lv_obj_clean_style_list(page, LV_PAGE_PART_EDGE_FLASH);
 #endif
     }
     /*Automatically move children to the scrollable object*/
@@ -1013,10 +1013,6 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         page_ext->scrl = NULL;
-#if LV_USE_ANIMATION
-        lv_style_list_reset(&page_ext->edge_flash.style);
-#endif
-        lv_style_list_reset(&page_ext->scrlbar.style);
 
     }
     return res;

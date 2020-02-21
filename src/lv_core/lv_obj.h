@@ -487,7 +487,19 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
 void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style);
 
 /**
- * Remove all styles from the objects style list. Also reset the local styles
+ * Reset a style to the default (empty) state.
+ * Release all used memories and cancel pending related transitions.
+ * Typically used in `LV_SIGN_CLEAN_UP.
+ * @param obj pointer to an object
+ * @param part the part of the object which style list should be reseted.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ */
+void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part);
+
+/**
+ * Reset a style to the default (empty) state.
+ * Release all used memories and cancel pending related transitions.
+ * Also notifies the object about the style change.
  * @param obj pointer to an object
  * @param part the part of the object which style list should be reseted.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`

@@ -226,7 +226,8 @@ typedef struct {
     uint8_t style_cnt;
     uint8_t has_local    :1;
     uint8_t has_trans    :1;
-    uint8_t skip_trans   :1;
+    uint8_t skip_trans   :1;        /*1: Temporally skip the transition style if any*/
+    uint8_t ignore_trans   :1;      /*1: Mark that this style list shouldn't receive transitions at all*/
 }lv_style_list_t;
 
 /**********************

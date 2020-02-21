@@ -135,13 +135,13 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_event_cb(ext->btns, tab_btnm_event_cb);
 
         lv_obj_set_click(ext->indic, false);
+        lv_obj_set_drag_dir(lv_page_get_scrl(ext->content), LV_DRAG_DIR_ONE);
 
         lv_page_set_scrl_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_PARENT);
         lv_page_set_scrl_layout(ext->content, LV_LAYOUT_ROW_TOP);
         lv_page_set_sb_mode(ext->content, LV_SB_MODE_OFF);
-        lv_obj_set_drag_dir(lv_page_get_scrl(ext->content), LV_DRAG_DIR_ONE);
 
-        lv_style_list_reset(lv_obj_get_style_list(ext->content, LV_PAGE_PART_BG));
+        lv_obj_clean_style_list(ext->content, LV_PAGE_PART_BG);
 
         lv_theme_apply(tabview, LV_THEME_TABVIEW);
 

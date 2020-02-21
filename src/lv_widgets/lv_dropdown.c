@@ -467,7 +467,7 @@ void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
 
     lv_style_list_copy(lv_obj_get_style_list(ext->page, LV_PAGE_PART_BG), &ext->style_page);
     lv_style_list_copy(lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCRLBAR), &ext->style_scrlbar);
-    lv_style_list_reset(lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCRL));
+    lv_obj_clean_style_list(ext->page, LV_PAGE_PART_SCRL);
     lv_obj_refresh_style(ext->page);
 
     lv_page_set_scrl_fit(ext->page, LV_FIT_TIGHT);
@@ -742,9 +742,13 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         lv_dropdown_close(ddlist, LV_ANIM_OFF);
+
+        /*`lv_obj_clean_style_list` is not required because these styles are only copied to the page
+         * so they can have transitions or other object related things. */
         lv_style_list_reset(&ext->style_page);
         lv_style_list_reset(&ext->style_scrlbar);
         lv_style_list_reset(&ext->style_selected);
+
     }
     else if(sign == LV_SIGNAL_FOCUS) {
 #if LV_USE_GROUP

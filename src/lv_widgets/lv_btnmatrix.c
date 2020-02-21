@@ -97,6 +97,7 @@ lv_obj_t * lv_btnmatrix_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->recolor        = 0;
     ext->one_toggle     = 0;
     lv_style_list_init(&ext->style_btn);
+    ext->style_btn.ignore_trans = 1;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(btnm);
 
@@ -778,6 +779,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
     lv_point_t p;
     if(sign == LV_SIGNAL_CLEANUP) {
+        lv_obj_clean_style_list(btnm, LV_BTNMATRIX_PART_BTN);
         lv_mem_free(ext->button_areas);
         lv_mem_free(ext->ctrl_bits);
     } else if(sign == LV_SIGNAL_STYLE_CHG) {

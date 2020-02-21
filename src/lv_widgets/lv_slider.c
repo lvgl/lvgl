@@ -377,7 +377,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
             if(res != LV_RES_OK) return res;
         }
     } else if(sign == LV_SIGNAL_CLEANUP) {
-        lv_style_list_reset(&ext->style_knob);
+        lv_obj_clean_style_list(slider, LV_SLIDER_PART_KNOB);
     } else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable       = true;

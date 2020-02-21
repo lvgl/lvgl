@@ -57,6 +57,7 @@ typedef struct _lv_event_temp_data
 typedef struct {
     lv_obj_t * obj;
     lv_style_property_t prop;
+    uint8_t part;
     union {
         lv_color_t _color;
         lv_style_int_t _int;
@@ -89,8 +90,8 @@ static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
 #endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static void lv_obj_del_async_cb(void * obj);
-static lv_anim_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, lv_state_t prev_state, lv_state_t new_state);
-static void trans_del(lv_obj_t * obj, lv_style_property_t prop);
+static lv_anim_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state, lv_state_t new_state);
+static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
 /**********************
  *  STATIC VARIABLES
@@ -397,6 +398,8 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 #if LV_USE_ANIMATION
     lv_anim_del(obj, NULL);
 #endif
+
+    trans_del(obj, 0xFF, 0xFF);
 
     /*Delete the user data*/
 #if LV_USE_USER_DATA_FREE
@@ -1123,20 +1126,37 @@ void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style)
 }
 
 /**
- * Remove all styles from the objects style list. Also reset the local styles
+ * Reset a style to the default (empty) state.
+ * Release all used memories and cancel pending related transitions.
+ * Typically used in `LV_SIGN_CLEAN_UP.
+ * @param obj pointer to an object
+ * @param part the part of the object which style list should be reseted.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ */
+void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part)
+{
+    lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
+    if(style_dsc == NULL) {
+        LV_LOG_WARN("lv_obj_clean_style_list: can't find style with `part`");
+        return;
+    }
+
+    lv_style_list_reset(style_dsc);
+
+    trans_del(obj, part, 0xFF);
+}
+
+/**
+ * Reset a style to the default (empty) state.
+ * Release all used memories and cancel pending related transitions.
+ * Also notifies the object about the style change.
  * @param obj pointer to an object
  * @param part the part of the object which style list should be reseted.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
  */
 void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part)
 {
-    lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
-    if(style_dsc == NULL) {
-        LV_LOG_WARN("lv_obj_clean_styles: can't find style with `part`");
-        return;
-    }
-
-    lv_style_list_reset(style_dsc);
+    lv_obj_clean_style_list(obj, part);
 
     lv_obj_refresh_style(obj);
 }
@@ -1465,75 +1485,82 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     lv_state_t prev_state = obj->state_dsc.act;
     obj->state_dsc.act = new_state;
 
-    lv_style_int_t time = lv_obj_get_style_trans_time(obj, LV_OBJ_PART_MAIN);
-    lv_style_property_t props[LV_STYLE_TRANS_NUM_MAX];
-    lv_style_int_t delay = lv_obj_get_style_trans_delay(obj, LV_OBJ_PART_MAIN);
-    lv_anim_path_cb_t path = lv_obj_get_style_trans_path(obj, LV_OBJ_PART_MAIN);
-    props[0] = lv_obj_get_style_trans_prop1(obj, LV_OBJ_PART_MAIN);
-    props[1] = lv_obj_get_style_trans_prop2(obj, LV_OBJ_PART_MAIN);
-    props[2] = lv_obj_get_style_trans_prop3(obj, LV_OBJ_PART_MAIN);
-    props[3] = lv_obj_get_style_trans_prop4(obj, LV_OBJ_PART_MAIN);
-    props[4] = lv_obj_get_style_trans_prop5(obj, LV_OBJ_PART_MAIN);
-    props[5] = lv_obj_get_style_trans_prop6(obj, LV_OBJ_PART_MAIN);
+    uint8_t part;
+    for(part = 0; part < _LV_OBJ_PART_REAL_LAST; part++) {
+        lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
+        if(style_list == NULL) break;   /*No more style lists*/
+        if(style_list->ignore_trans) continue;
 
-    lv_style_list_t * style_list = lv_obj_get_style_list(obj, LV_OBJ_PART_MAIN);
+        lv_style_int_t time = lv_obj_get_style_trans_time(obj, part);
+        lv_style_property_t props[LV_STYLE_TRANS_NUM_MAX];
+        lv_style_int_t delay = lv_obj_get_style_trans_delay(obj, part);
+        lv_anim_path_cb_t path = lv_obj_get_style_trans_path(obj, part);
+        props[0] = lv_obj_get_style_trans_prop1(obj, part);
+        props[1] = lv_obj_get_style_trans_prop2(obj, part);
+        props[2] = lv_obj_get_style_trans_prop3(obj, part);
+        props[3] = lv_obj_get_style_trans_prop4(obj, part);
+        props[4] = lv_obj_get_style_trans_prop5(obj, part);
+        props[5] = lv_obj_get_style_trans_prop6(obj, part);
 
-    uint8_t i;
-    for(i = 0; i < LV_STYLE_TRANS_NUM_MAX; i++) {
-        if(props[i] != 0) {
-            lv_style_list_add_trans_style(style_list);
 
-            lv_anim_trans_t * tr = trans_create(obj, props[i], prev_state, new_state);
+        uint8_t i;
+        for(i = 0; i < LV_STYLE_TRANS_NUM_MAX; i++) {
+            if(props[i] != 0) {
+                lv_style_list_add_trans_style(style_list);
 
-            /*If there is a pending anim for this property remove it*/
-            if(tr) {
-                tr->obj = obj;
-                tr->prop = props[i];
+                lv_anim_trans_t * tr = trans_create(obj, props[i], part, prev_state, new_state);
 
-                if(time == 0) {
-                    trans_anim_cb(tr, 255);
-                } else {
-                    lv_anim_t a;
-                    lv_anim_init(&a);
-                    lv_anim_set_var(&a, tr);
-                    lv_anim_set_exec_cb(&a, trans_anim_cb);
-                    lv_anim_set_start_cb(&a, trans_anim_start_cb);
-                    lv_anim_set_ready_cb(&a, trans_anim_ready_cb);
-                    lv_anim_set_values(&a, 0x00, 0xFF);
-                    lv_anim_set_time(&a, time);
-                    lv_anim_set_delay(&a, delay);
-                    lv_anim_set_path_cb(&a, path);
-                    a.early_apply = 0;
-                    lv_anim_start(&a);
+                /*If there is a pending anim for this property remove it*/
+                if(tr) {
+                    tr->obj = obj;
+                    tr->prop = props[i];
+                    tr->part = part;
+
+                    if(time == 0) {
+                        trans_anim_cb(tr, 255);
+                    } else {
+                        lv_anim_t a;
+                        lv_anim_init(&a);
+                        lv_anim_set_var(&a, tr);
+                        lv_anim_set_exec_cb(&a, trans_anim_cb);
+                        lv_anim_set_start_cb(&a, trans_anim_start_cb);
+                        lv_anim_set_ready_cb(&a, trans_anim_ready_cb);
+                        lv_anim_set_values(&a, 0x00, 0xFF);
+                        lv_anim_set_time(&a, time);
+                        lv_anim_set_delay(&a, delay);
+                        lv_anim_set_path_cb(&a, path);
+                        a.early_apply = 0;
+                        lv_anim_start(&a);
+                    }
                 }
-            }
 
-        }
+            }
 #endif
+        }
     }
 
     lv_obj_refresh_style(obj);
 
 }
 
-static lv_anim_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, lv_state_t prev_state, lv_state_t new_state)
+static lv_anim_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state, lv_state_t new_state)
 {
     lv_anim_trans_t * tr;
-    lv_style_list_t * style_list = lv_obj_get_style_list(obj, LV_OBJ_PART_MAIN);
+    lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
     lv_style_t * style_trans = lv_style_list_get_trans_style(style_list);
 
     /*Get the previous and current values*/
     if((prop & 0xF) < LV_STYLE_ID_COLOR) { /*Int*/
         style_list->skip_trans = 1;
         obj->state_dsc.act = prev_state;
-        lv_style_int_t int1 = _lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, prop);
+        lv_style_int_t int1 = _lv_obj_get_style_int(obj, part, prop);
         obj->state_dsc.act = new_state;
-        lv_style_int_t int2 =  _lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, prop);
+        lv_style_int_t int2 =  _lv_obj_get_style_int(obj, part, prop);
         style_list->skip_trans = 0;
 
         if(int1 == int2)  return NULL;
         obj->state_dsc.act = prev_state;
-        int1 = _lv_obj_get_style_int(obj, LV_OBJ_PART_MAIN, prop);
+        int1 = _lv_obj_get_style_int(obj, part, prop);
         obj->state_dsc.act = new_state;
         _lv_style_set_int(style_trans, prop, int1);   /*Be sure `trans_style` has a valid value */
 
@@ -1555,14 +1582,14 @@ static lv_anim_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, 
     else if((prop & 0xF) < LV_STYLE_ID_OPA) { /*Color*/
         style_list->skip_trans = 1;
         obj->state_dsc.act = prev_state;
-        lv_color_t c1 = _lv_obj_get_style_color(obj, LV_OBJ_PART_MAIN, prop);
+        lv_color_t c1 = _lv_obj_get_style_color(obj, part, prop);
         obj->state_dsc.act = new_state;
-        lv_color_t c2 =  _lv_obj_get_style_color(obj, LV_OBJ_PART_MAIN, prop);
+        lv_color_t c2 =  _lv_obj_get_style_color(obj, part, prop);
         style_list->skip_trans = 0;
 
         if(c1.full == c2.full) return NULL;
         obj->state_dsc.act = prev_state;
-        c1 = _lv_obj_get_style_color(obj, LV_OBJ_PART_MAIN, prop);
+        c1 = _lv_obj_get_style_color(obj, part, prop);
         obj->state_dsc.act = new_state;
         _lv_style_set_color(style_trans, prop, c1);    /*Be sure `trans_style` has a valid value */
 
@@ -1575,15 +1602,15 @@ static lv_anim_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, 
     else if((prop & 0xF) < LV_STYLE_ID_PTR) { /*Opa*/
         style_list->skip_trans = 1;
         obj->state_dsc.act = prev_state;
-        lv_opa_t o1 = _lv_obj_get_style_opa(obj, LV_OBJ_PART_MAIN, prop);
+        lv_opa_t o1 = _lv_obj_get_style_opa(obj, part, prop);
         obj->state_dsc.act = new_state;
-        lv_opa_t o2 =  _lv_obj_get_style_opa(obj, LV_OBJ_PART_MAIN, prop);
+        lv_opa_t o2 =  _lv_obj_get_style_opa(obj, part, prop);
         style_list->skip_trans = 0;
 
         if(o1 == o2) return NULL;
 
         obj->state_dsc.act = prev_state;
-        o1 = _lv_obj_get_style_opa(obj, LV_OBJ_PART_MAIN, prop);
+        o1 = _lv_obj_get_style_opa(obj, part, prop);
         obj->state_dsc.act = new_state;
         _lv_style_set_opa(style_trans, prop, o1);   /*Be sure `trans_style` has a valid value */
 
@@ -1595,14 +1622,14 @@ static lv_anim_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, 
     } else {    /*Ptr*/
         obj->state_dsc.act = prev_state;
         style_list->skip_trans = 1;
-        const void * p1 = _lv_obj_get_style_ptr(obj, LV_OBJ_PART_MAIN, prop);
+        const void * p1 = _lv_obj_get_style_ptr(obj, part, prop);
         obj->state_dsc.act = new_state;
-        const void * p2 =  _lv_obj_get_style_ptr(obj, LV_OBJ_PART_MAIN, prop);
+        const void * p2 =  _lv_obj_get_style_ptr(obj, part, prop);
         style_list->skip_trans = 0;
 
         if(p1 == p2)  return NULL;
         obj->state_dsc.act = prev_state;
-        p1 = _lv_obj_get_style_ptr(obj, LV_OBJ_PART_MAIN, prop);
+        p1 = _lv_obj_get_style_ptr(obj, part, prop);
         obj->state_dsc.act = new_state;
         _lv_style_set_ptr(style_trans, prop, p1);   /*Be sure `trans_style` has a valid value */
 
@@ -1616,7 +1643,7 @@ static lv_anim_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, 
     return tr;
 }
 
-static void trans_del(lv_obj_t * obj, lv_style_property_t prop)
+static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
     lv_anim_trans_t * tr;
     lv_anim_trans_t * tr_next;
@@ -1625,7 +1652,7 @@ static void trans_del(lv_obj_t * obj, lv_style_property_t prop)
        /*'tr' might be deleted, so get the next object while 'tr' is valid*/
        tr_next = lv_ll_get_next(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
 
-        if(tr->obj == obj && (prop == tr->prop || prop == 0xFF)) {
+        if(tr->obj == obj && (part == tr->part || part == 0xFF) && (prop == tr->prop || prop == 0xFF)) {
             lv_anim_del(tr, NULL);
             lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
             lv_mem_free(tr);
@@ -3379,8 +3406,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     }
 #endif
     else if(sign == LV_SIGNAL_CLEANUP) {
-
-        lv_style_list_reset(&obj->style_list);
+        lv_obj_clean_style_list(obj, LV_OBJ_PART_MAIN);
     }
 
     return res;
@@ -3550,7 +3576,7 @@ static void base_dir_refr_children(lv_obj_t * obj)
 
 static void trans_anim_cb(lv_anim_trans_t * tr, lv_anim_value_t v)
 {
-    lv_style_list_t * list = lv_obj_get_style_list(tr->obj, LV_OBJ_PART_MAIN);
+    lv_style_list_t * list = lv_obj_get_style_list(tr->obj, tr->part);
     lv_style_t * style = lv_style_list_get_trans_style(list);
 
     if((tr->prop & 0xF) < LV_STYLE_ID_COLOR) { /*Value*/
@@ -3591,21 +3617,21 @@ static void trans_anim_start_cb(lv_anim_t * a)
     /*Init prop to an invalid values to be sure `trans_del` won't delete the just added `tr`*/
     tr->prop = 0;
     /*Delete the relate transition if any*/
-    trans_del(tr->obj, prop_tmp);
+    trans_del(tr->obj, tr->part, prop_tmp);
 
     tr->prop = prop_tmp;
 
-    /*Get the previous and current values*/
+    /*Start the animation from the current value*/
     if((prop_tmp & 0xF) < LV_STYLE_ID_COLOR) { /*Int*/
-        tr->start_value._int = _lv_obj_get_style_int(tr->obj, LV_OBJ_PART_MAIN, prop_tmp);
+        tr->start_value._int = _lv_obj_get_style_int(tr->obj, tr->part, prop_tmp);
     }
     else if((prop_tmp & 0xF) < LV_STYLE_ID_OPA) { /*Color*/
-        tr->start_value._color = _lv_obj_get_style_color(tr->obj, LV_OBJ_PART_MAIN, prop_tmp);
+        tr->start_value._color = _lv_obj_get_style_color(tr->obj, tr->part, prop_tmp);
     }
     else if((prop_tmp & 0xF) < LV_STYLE_ID_PTR) { /*Opa*/
-        tr->start_value._opa = _lv_obj_get_style_opa(tr->obj, LV_OBJ_PART_MAIN, prop_tmp);
+        tr->start_value._opa = _lv_obj_get_style_opa(tr->obj, tr->part, prop_tmp);
     } else {    /*Ptr*/
-        tr->start_value._ptr= _lv_obj_get_style_ptr(tr->obj, LV_OBJ_PART_MAIN, prop_tmp);
+        tr->start_value._ptr= _lv_obj_get_style_ptr(tr->obj, tr->part, prop_tmp);
     }
 
 

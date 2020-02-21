@@ -119,6 +119,9 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_style_list_init(&ext->style_date_nums);
     lv_style_list_init(&ext->style_day_names);
     lv_style_list_init(&ext->style_header);
+    ext->style_date_nums.skip_trans = 1;
+    ext->style_day_names.skip_trans = 1;
+    ext->style_header.skip_trans = 1;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(calendar, lv_calendar_signal);
@@ -426,10 +429,9 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
-        lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
-        lv_style_list_reset(&ext->style_header);
-        lv_style_list_reset(&ext->style_day_names);
-        lv_style_list_reset(&ext->style_date_nums);
+        lv_obj_clean_style_list(calendar, LV_CALENDAR_PART_HEADER);
+        lv_obj_clean_style_list(calendar, LV_CALENDAR_PART_DAY_NAMES);
+        lv_obj_clean_style_list(calendar, LV_CALENDAR_PART_DATE);
     } else if(sign == LV_SIGNAL_PRESSING) {
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
         lv_area_t header_area;
@@ -459,7 +461,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
             ext->btn_pressing = 0;
             lv_obj_invalidate(calendar);
         }
-        /*ELse set a default state*/
+        /*Else set a default state*/
         else {
             if(ext->btn_pressing != 0) lv_obj_invalidate(calendar);
             ext->btn_pressing       = 0;

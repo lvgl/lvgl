@@ -95,7 +95,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->page = lv_page_create(new_win, NULL);
         lv_obj_add_protect(ext->page, LV_PROTECT_PARENT);
         lv_page_set_sb_mode(ext->page, LV_SB_MODE_AUTO);
-        lv_style_list_reset(lv_obj_get_style_list(ext->page, LV_PAGE_PART_BG));
+        lv_obj_clean_style_list(ext->page, LV_PAGE_PART_BG);
 
         /*Create a holder for the header*/
         ext->header = lv_obj_create(new_win, NULL);

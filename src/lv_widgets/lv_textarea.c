@@ -1361,7 +1361,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
         if(ext->pwd_tmp != NULL) lv_mem_free(ext->pwd_tmp);
         /* (The created label will be deleted automatically) */
 
-        lv_style_list_reset(&ext->cursor.style);
+        lv_obj_clean_style_list(ta, LV_TEXTAREA_PART_CURSOR);
     } else if(sign == LV_SIGNAL_STYLE_CHG) {
         if(ext->label) {
             if(ext->one_line) {
