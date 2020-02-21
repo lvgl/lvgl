@@ -189,6 +189,7 @@ static void basic_init(void)
     lv_style_set_pad_top(&panel, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_bottom(&panel, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_inner(&panel, LV_STATE_NORMAL, LV_DPI / 5);
+    lv_style_set_trans_prop1(&panel, LV_STATE_NORMAL, LV_STYLE_BORDER_COLOR);
 
     lv_style_init(&bg);
     lv_style_set_radius(&bg, LV_STATE_NORMAL, LV_DPI / 25);
@@ -221,7 +222,7 @@ static void basic_init(void)
     lv_style_set_border_color(&btn, LV_STATE_NORMAL, color_btn_border(LV_STATE_NORMAL));
     lv_style_set_border_color(&btn, LV_STATE_PRESSED, color_btn_border(LV_STATE_PRESSED));
     lv_style_set_border_width(&btn, LV_STATE_NORMAL, BORDER_WIDTH);
-    lv_style_set_border_width(&btn, LV_STATE_PRESSED, BORDER_WIDTH * 10);
+    lv_style_set_border_width(&btn, LV_STATE_PRESSED, BORDER_WIDTH * 2);
     lv_style_set_border_width(&btn, LV_STATE_CHECKED, 0);
     lv_style_set_text_color(&btn, LV_STATE_NORMAL, color_btn_txt(LV_STATE_NORMAL));
     lv_style_set_text_color(&btn, LV_STATE_PRESSED, color_btn_txt(LV_STATE_PRESSED));
@@ -233,17 +234,28 @@ static void basic_init(void)
     lv_style_set_image_recolor(&btn, LV_STATE_PRESSED, color_btn_txt(LV_STATE_CHECKED));
     lv_style_set_image_recolor(&btn, LV_STATE_CHECKED | LV_STATE_PRESSED, color_btn_txt(LV_STATE_CHECKED | LV_STATE_PRESSED));
     lv_style_set_image_recolor(&btn, LV_STATE_DISABLED,color_btn_txt(LV_STATE_DISABLED));
+    lv_style_set_value_color(&btn, LV_STATE_NORMAL, color_btn_txt(LV_STATE_NORMAL));
+
     lv_style_set_pad_left(&btn, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_right(&btn, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_top(&btn, LV_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_bottom(&btn, LV_STATE_NORMAL, LV_DPI / 10);
     lv_style_set_pad_inner(&btn, LV_STATE_NORMAL, LV_DPI / 10);
-    lv_style_set_outline_width(&btn, LV_STATE_FOCUSED, 10);
-    lv_style_set_outline_opa(&btn, LV_STATE_NORMAL, LV_OPA_50);
+    lv_style_set_outline_width(&btn, LV_STATE_NORMAL, 3);
+    lv_style_set_outline_opa(&btn, LV_STATE_NORMAL, LV_OPA_0);
+    lv_style_set_outline_opa(&btn, LV_STATE_FOCUSED, LV_OPA_50);
     lv_style_set_outline_color(&btn, LV_STATE_NORMAL, _color_primary);
+
     lv_style_set_trans_time(&btn, LV_STATE_NORMAL, TRANSITION_TIME);
+
+//    lv_style_set_trans_path(&btn, LV_STATE_PRESSED, lv_anim_path_overshoot);
+//    lv_style_set_trans_path(&btn, LV_STATE_NORMAL, lv_anim_path_linear);
     lv_style_set_trans_prop1(&btn, LV_STATE_NORMAL, LV_STYLE_BORDER_WIDTH);
-    lv_style_set_trans_prop2(&btn, LV_STATE_NORMAL, LV_STYLE_OUTLINE_WIDTH);
+    lv_style_set_trans_prop2(&btn, LV_STATE_NORMAL, LV_STYLE_OUTLINE_OPA);
+    lv_style_set_trans_prop3(&btn, LV_STATE_NORMAL, LV_STYLE_BG_COLOR);
+    lv_style_set_trans_prop4(&btn, LV_STATE_NORMAL, LV_STYLE_VALUE_FONT);
+    lv_style_set_trans_delay(&btn, LV_STATE_NORMAL, 100);
+    lv_style_set_trans_delay(&btn, LV_STATE_PRESSED, 0);
 }
 
 static void cont_init(void)
@@ -568,6 +580,7 @@ static void keyboard_init(void)
 #if LV_USE_KEYBOARD
     lv_style_init(&kb_btn);
     lv_style_set_radius(&kb_btn, LV_STATE_NORMAL, LV_DPI / 50);
+    lv_style_set_border_width(&kb_btn, LV_STATE_NORMAL, 1);
 
     lv_style_init(&kb_bg);
     lv_style_copy(&kb_bg, &panel);

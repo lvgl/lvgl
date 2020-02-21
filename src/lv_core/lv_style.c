@@ -139,6 +139,7 @@ void lv_style_list_init(lv_style_list_t * list)
     list->style_list = NULL;
     list->style_cnt = 0;
     list->has_local = 0;
+    list->has_trans = 0;
 #if LV_USE_ASSERT_STYLE
     list->sentinel = LV_DEBUG_STYLE_LIST_SENTINEL_VALUE;
 #endif
@@ -812,7 +813,7 @@ lv_res_t lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop,
             *res = value_act;
             return LV_RES_OK;
         }
-        else if(weight_act >= 0 && ci == 0 && list->has_trans && !list->skip_trans) {
+        else if(list->has_trans && weight_act >= 0 && ci == 0 && !list->skip_trans) {
             *res = value_act;
             return LV_RES_OK;
         }
@@ -864,6 +865,10 @@ lv_res_t lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t pro
             *res = value_act;
             return LV_RES_OK;
         }
+        else if(list->has_trans && weight_act >= 0 && ci == 0 && !list->skip_trans) {
+            *res = value_act;
+            return LV_RES_OK;
+        }
         /*If the found ID is better the current candidate then use it*/
         else if(weight_act > weight) {
             weight =  weight_act;
@@ -911,6 +916,10 @@ lv_res_t lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop,
             *res = value_act;
             return LV_RES_OK;
         }
+        else if(list->has_trans && weight_act >= 0 && ci == 0 && !list->skip_trans) {
+            *res = value_act;
+            return LV_RES_OK;
+        }
         /*If the found ID is better the current candidate then use it*/
         else if(weight_act > weight) {
             weight =  weight_act;
@@ -955,6 +964,10 @@ lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop,
         weight_act = _lv_style_get_ptr(class, prop, &value_act);
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
+            *res = value_act;
+            return LV_RES_OK;
+        }
+        else if(list->has_trans && weight_act >= 0 && ci == 0 && !list->skip_trans) {
             *res = value_act;
             return LV_RES_OK;
         }

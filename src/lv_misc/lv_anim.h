@@ -62,12 +62,16 @@ typedef lv_anim_value_t (*lv_anim_path_cb_t)(const struct _lv_anim_t *);
 /** Callback to call when the animation is ready*/
 typedef void (*lv_anim_ready_cb_t)(struct _lv_anim_t *);
 
+/** Callback to call when the animation really stars (considering `delay`)*/
+typedef void (*lv_anim_start_cb_t)(struct _lv_anim_t *);
+
 /** Describes an animation*/
 typedef struct _lv_anim_t
 {
     void * var;                  /**<Variable to animate*/
     lv_anim_exec_xcb_t exec_cb;   /**< Function to execute to animate*/
     lv_anim_path_cb_t path_cb;   /**< Function to get the steps of animations*/
+    lv_anim_start_cb_t start_cb; /**< Call it when the animation is starts (considering `delay`)*/
     lv_anim_ready_cb_t ready_cb; /**< Call it when the animation is ready*/
     int32_t start;               /**< Start value*/
     int32_t end;                 /**< End value*/
@@ -77,6 +81,7 @@ typedef struct _lv_anim_t
     uint32_t playback_time;      /**< Duration of playback animation*/
     uint32_t repeat_delay;       /**< Wait before repeat*/
     uint16_t repeat_cnt;         /**< Repeat count for the animation*/
+    uint8_t early_apply  :1;     /**< 1: Apply start value immediately even is there is `delay` */
 #if LV_USE_USER_DATA
     lv_anim_user_data_t user_data; /**< Custom user data*/
 #endif
@@ -186,6 +191,17 @@ static inline void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec
 static inline void lv_anim_set_path_cb(lv_anim_t * a, lv_anim_path_cb_t path_cb)
 {
     a->path_cb = path_cb;
+}
+
+
+/**
+ * Set a function call when the animation really starts (considering `delay`)
+ * @param a pointer to an initialized `lv_anim_t` variable
+ * @param start_cb a function call when the animation starts
+ */
+static inline void lv_anim_set_start_cb(lv_anim_t * a, lv_anim_ready_cb_t start_cb)
+{
+    a->start_cb = start_cb;
 }
 
 /**

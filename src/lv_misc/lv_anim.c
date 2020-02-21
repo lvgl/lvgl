@@ -83,6 +83,7 @@ void lv_anim_init(lv_anim_t * a)
     a->end     = 100;
     a->path_cb = lv_anim_path_linear;
     a->repeat_cnt = 1;
+    a->early_apply = 1;
 }
 /**
  * Create an animation
@@ -96,7 +97,7 @@ void lv_anim_start(lv_anim_t * a)
 
     /*If the list is empty the anim task was suspended and it's last run measure is invalid*/
     if(lv_ll_is_empty(&LV_GC_ROOT(_lv_anim_ll))) {
-        last_task_run = lv_tick_get();
+        last_task_run = lv_tick_get() - 1;
     }
 
     /*Add the new animation to the animation linked list*/
@@ -110,7 +111,9 @@ void lv_anim_start(lv_anim_t * a)
     memcpy(new_anim, a, sizeof(lv_anim_t));
 
     /*Set the start value*/
-    if(new_anim->exec_cb) new_anim->exec_cb(new_anim->var, new_anim->start);
+    if(new_anim->early_apply) {
+        if(new_anim->exec_cb) new_anim->exec_cb(new_anim->var, new_anim->start);
+    }
 
     /* Creating an animation changed the linked list.
      * It's important if it happens in a ready callback. (see `anim_task`)*/
@@ -309,7 +312,7 @@ lv_anim_value_t lv_anim_path_overshoot(const lv_anim_t * a)
     else
         t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
-    int32_t step = lv_bezier3(t, 0, 600, 1300, 1024);
+    int32_t step = lv_bezier3(t, 0, 1000, 2000, 1024);
 
     int32_t new_value;
     new_value = (int32_t)step * (a->end - a->start);
@@ -318,6 +321,7 @@ lv_anim_value_t lv_anim_path_overshoot(const lv_anim_t * a)
 
     return (lv_anim_value_t)new_value;
 }
+
 
 /**
  * Calculate the current value of an animation with 3 bounces
@@ -421,6 +425,12 @@ static void anim_task(lv_task_t * param)
 
         if(!a->has_run) {
             a->has_run = 1; /*The list readying might be reseted so need to know which anim has run already*/
+
+            /*The animation will run now for the first time. Call `start_cb`*/
+            int32_t new_act_time = a->act_time + elaps;
+            if(a->act_time <= 0 && new_act_time >= 0) {
+                if(a->start_cb) a->start_cb(a);
+            }
             a->act_time += elaps;
             if(a->act_time >= 0) {
                 if(a->act_time > a->time) a->act_time = a->time;
