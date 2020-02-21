@@ -193,10 +193,6 @@ enum {
 
 typedef uint8_t lv_state_t;
 
-typedef struct {
-    lv_state_t act;
-}lv_obj_state_dsc_t;
-
 typedef struct _lv_obj_t
 {
     struct _lv_obj_t * parent; /**< Pointer to the parent object*/
@@ -240,7 +236,7 @@ typedef struct _lv_obj_t
 
     uint8_t protect;            /**< Automatically happening actions can be prevented.
                                      'OR'ed values from `lv_protect_t`*/
-    lv_obj_state_dsc_t state_dsc;
+    lv_state_t state;
 
 #if LV_USE_OBJ_REALIGN
     lv_realign_t realign;       /**< Information about the last call to ::lv_obj_align. */
@@ -274,7 +270,6 @@ typedef struct
     bool result;
 } lv_hit_test_info_t;
 
-
 typedef struct
 {
     uint8_t part;
@@ -284,7 +279,7 @@ typedef struct
 typedef struct
 {
     uint8_t part;
-    lv_obj_state_dsc_t * result;
+    lv_state_t result;
 } lv_get_state_info_t;
 
 /**********************
@@ -1133,7 +1128,6 @@ uint8_t lv_obj_get_protect(const lv_obj_t * obj);
  */
 bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
 
-lv_obj_state_dsc_t * lv_obj_get_state_dsc(const lv_obj_t * obj, uint8_t part);
 
 lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part);
 

@@ -737,7 +737,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
         if(info->part == LV_DROPDOWN_PART_LIST ||
             info->part == LV_DROPDOWN_PART_SCRLBAR ||
             info->part == LV_DROPDOWN_PART_SELECTED) {
-        info->result = lv_obj_get_state_dsc(ext->page, LV_PAGE_PART_BG);
+        info->result = lv_obj_get_state(ext->page, LV_PAGE_PART_BG);
         }
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
@@ -948,10 +948,10 @@ static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id
 {
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     lv_obj_t * page = ext->page;
-    lv_obj_state_dsc_t state_orig = page->state_dsc;
+    lv_state_t state_orig = page->state;
 
-    page->state_dsc.act = LV_STATE_NORMAL;
-    page->state_dsc.act |= state;
+    page->state = LV_STATE_NORMAL;
+    page->state |= state;
 
     /*Draw a rectangle under the selected item*/
     const lv_font_t * font    = lv_obj_get_style_text_font(ddlist, LV_DROPDOWN_PART_LIST);
@@ -974,7 +974,7 @@ static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id
     lv_obj_init_draw_rect_dsc(ddlist, LV_DROPDOWN_PART_SELECTED, &sel_rect);
     lv_draw_rect(&rect_area, clip_area, &sel_rect);
 
-    page->state_dsc = state_orig;
+    page->state = state_orig;
 }
 
 
@@ -983,10 +983,10 @@ static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint1
 {
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     lv_obj_t * page = ext->page;
-    lv_obj_state_dsc_t state_orig = page->state_dsc;
+    lv_state_t state_orig = page->state;
 
-    page->state_dsc.act = LV_STATE_NORMAL;
-    page->state_dsc.act |= state;
+    page->state = LV_STATE_NORMAL;
+    page->state |= state;
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
@@ -1009,7 +1009,7 @@ static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint1
     if(area_ok) {
         lv_draw_label(&label->coords, &mask_sel, &label_dsc, lv_label_get_text(label), NULL);
     }
-    page->state_dsc = state_orig;
+    page->state = state_orig;
 }
 
 /**

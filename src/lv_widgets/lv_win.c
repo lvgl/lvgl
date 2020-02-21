@@ -510,9 +510,9 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
     } else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
         lv_get_state_info_t * info = param;
-        if(info->part == LV_WIN_PART_CONTENT_SCRL) info->result = lv_obj_get_state_dsc(lv_page_get_scrl(ext->page), LV_CONT_PART_MAIN);
-        else if(info->part == LV_WIN_PART_SCRLBAR) info->result = lv_obj_get_state_dsc(ext->page, LV_PAGE_PART_SCRLBAR);
-        else if(info->part == LV_WIN_PART_HEADER) info->result = lv_obj_get_state_dsc(ext->header, LV_OBJ_PART_MAIN);
+        if(info->part == LV_WIN_PART_CONTENT_SCRL) info->result = lv_obj_get_state(lv_page_get_scrl(ext->page), LV_CONT_PART_MAIN);
+        else if(info->part == LV_WIN_PART_SCRLBAR) info->result = lv_obj_get_state(ext->page, LV_PAGE_PART_SCRLBAR);
+        else if(info->part == LV_WIN_PART_HEADER) info->result = lv_obj_get_state(ext->header, LV_OBJ_PART_MAIN);
         return LV_RES_OK;
     }
 

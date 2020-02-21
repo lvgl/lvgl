@@ -720,8 +720,8 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         else return ancestor_signal(page, sign, param);
     } else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_get_state_info_t * info = param;
-        if(info->part == LV_PAGE_PART_SCRL) info->result = lv_obj_get_state_dsc(lv_page_get_scrl(page), LV_CONT_PART_MAIN);
-        else info->result = lv_obj_get_state_dsc(page, info->part);
+        if(info->part == LV_PAGE_PART_SCRL) info->result = lv_obj_get_state(lv_page_get_scrl(page), LV_CONT_PART_MAIN);
+        else info->result = lv_obj_get_state(page, info->part);
         return LV_RES_OK;
     }
 

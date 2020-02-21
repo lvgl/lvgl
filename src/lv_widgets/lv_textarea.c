@@ -1342,7 +1342,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
         lv_get_state_info_t * info = param;
         if(info->part == LV_TEXTAREA_PART_PLACEHOLDER) {
             if(ext->placeholder) {
-                info->result = lv_obj_get_state_dsc(ext->placeholder, LV_LABEL_PART_MAIN);
+                info->result = lv_obj_get_state(ext->placeholder, LV_LABEL_PART_MAIN);
             } else {
                 info->result = NULL;
             }

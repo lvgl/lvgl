@@ -189,7 +189,7 @@ static void basic_init(void)
     lv_style_set_pad_top(&panel, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_bottom(&panel, LV_STATE_NORMAL, LV_DPI / 5);
     lv_style_set_pad_inner(&panel, LV_STATE_NORMAL, LV_DPI / 5);
-    lv_style_set_trans_prop1(&panel, LV_STATE_NORMAL, LV_STYLE_BORDER_COLOR);
+    lv_style_set_trans_prop_1(&panel, LV_STATE_NORMAL, LV_STYLE_BORDER_COLOR);
 
     lv_style_init(&bg);
     lv_style_set_radius(&bg, LV_STATE_NORMAL, LV_DPI / 25);
@@ -250,10 +250,9 @@ static void basic_init(void)
 
 //    lv_style_set_trans_path(&btn, LV_STATE_PRESSED, lv_anim_path_overshoot);
 //    lv_style_set_trans_path(&btn, LV_STATE_NORMAL, lv_anim_path_linear);
-    lv_style_set_trans_prop1(&btn, LV_STATE_NORMAL, LV_STYLE_BORDER_WIDTH);
-    lv_style_set_trans_prop2(&btn, LV_STATE_NORMAL, LV_STYLE_OUTLINE_OPA);
-    lv_style_set_trans_prop3(&btn, LV_STATE_NORMAL, LV_STYLE_BG_COLOR);
-    lv_style_set_trans_prop4(&btn, LV_STATE_NORMAL, LV_STYLE_VALUE_FONT);
+    lv_style_set_trans_prop_1(&btn, LV_STATE_NORMAL, LV_STYLE_BORDER_WIDTH);
+    lv_style_set_trans_prop_2(&btn, LV_STATE_NORMAL, LV_STYLE_OUTLINE_OPA);
+    lv_style_set_trans_prop_3(&btn, LV_STATE_NORMAL, LV_STYLE_BG_COLOR);
     lv_style_set_trans_delay(&btn, LV_STATE_NORMAL, 100);
     lv_style_set_trans_delay(&btn, LV_STATE_PRESSED, 0);
 }
@@ -344,7 +343,7 @@ static void slider_init(void)
     lv_style_set_pad_top(&slider_knob, LV_STATE_NORMAL, LV_DPI/20);
     lv_style_set_pad_bottom(&slider_knob, LV_STATE_NORMAL, LV_DPI/20);
     lv_style_set_trans_time(&slider_knob, LV_STATE_NORMAL, 500);
-    lv_style_set_trans_prop1(&slider_knob, LV_STATE_NORMAL, LV_STYLE_BG_COLOR);
+    lv_style_set_trans_prop_1(&slider_knob, LV_STATE_NORMAL, LV_STYLE_BG_COLOR);
 
 #endif
 }
@@ -613,8 +612,8 @@ static void page_init(void)
     lv_style_set_bg_color(&sb, LV_STATE_NORMAL, lv_color_hex(0x3a3d42));
     lv_style_set_radius(&sb, LV_STATE_NORMAL, LV_RADIUS_CIRCLE);
     lv_style_set_size(&sb,LV_STATE_NORMAL, LV_DPI / 30);
-    lv_style_set_pad_right(&sb,LV_STATE_NORMAL,  LV_DPI / 10);
-    lv_style_set_pad_bottom(&sb,LV_STATE_NORMAL,  LV_DPI / 10);
+    lv_style_set_pad_right(&sb,LV_STATE_NORMAL,  LV_DPI / 20);
+    lv_style_set_pad_bottom(&sb,LV_STATE_NORMAL,  LV_DPI / 20);
 
 #endif
 }
