@@ -288,16 +288,23 @@ void lv_style_list_reset(lv_style_list_t * list)
             lv_style_reset(local);
             lv_mem_free(local);
         }
+    }
+
+    if(list->has_trans) {
         lv_style_t * trans = lv_style_list_get_trans_style(list);
         if(trans) {
             lv_style_reset(trans);
             lv_mem_free(trans);
         }
     }
+
     if(list->style_cnt > 0) lv_mem_free(list->style_list);
     list->style_list = NULL;
     list->style_cnt = 0;
     list->has_local = 0;
+    list->has_trans = 0;
+    list->skip_trans = 0;
+    list->ignore_trans = 0;
 }
 
 /**

@@ -83,6 +83,8 @@ static void refresh_children_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
 #if LV_USE_ANIMATION
+static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state, lv_state_t new_state);
+static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v);
 static void trans_anim_start_cb(lv_anim_t * a);
 static void trans_anim_ready_cb(lv_anim_t * a);
@@ -90,8 +92,6 @@ static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
 #endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static void lv_obj_del_async_cb(void * obj);
-static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state, lv_state_t new_state);
-static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
 /**********************
  *  STATIC VARIABLES
@@ -393,12 +393,11 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     if(group) lv_group_remove_obj(obj);
 #endif
 
-        /*Remove the animations from this object*/
+    /*Remove the animations from this object*/
 #if LV_USE_ANIMATION
     lv_anim_del(obj, NULL);
-#endif
-
     trans_del(obj, 0xFF, 0xFF);
+#endif
 
     /*Delete the user data*/
 #if LV_USE_USER_DATA_FREE
@@ -1120,9 +1119,9 @@ void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style)
     }
 
     lv_style_list_add_style(style_dsc, style);
-
+#if LV_USE_ANIMATION
     trans_del(obj, part, 0xFF);
-
+#endif
     lv_obj_refresh_style(obj);
 }
 
@@ -1143,8 +1142,9 @@ void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part)
     }
 
     lv_style_list_reset(style_dsc);
-
+#if LV_USE_ANIMATION
     trans_del(obj, part, 0xFF);
+#endif
 }
 
 /**
@@ -1178,7 +1178,9 @@ void _lv_obj_set_style_int(lv_obj_t * obj, uint8_t part, lv_style_property_t pro
 {
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_int(style_dsc, prop, value);
+#if LV_USE_ANIMATION
     trans_del(obj, part, prop);
+#endif
     lv_obj_refresh_style(obj);
 }
 
@@ -1198,7 +1200,9 @@ void _lv_obj_set_style_color(lv_obj_t * obj, uint8_t part, lv_style_property_t p
 {
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_color(style_dsc, prop, color);
+#if LV_USE_ANIMATION
     trans_del(obj, part, prop);
+#endif
     lv_obj_refresh_style(obj);
 }
 
@@ -1218,7 +1222,9 @@ void _lv_obj_set_style_opa(lv_obj_t * obj, uint8_t part, lv_style_property_t pro
 {
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_opa(style_dsc, prop, opa);
+#if LV_USE_ANIMATION
     trans_del(obj, part, prop);
+#endif
     lv_obj_refresh_style(obj);
 }
 
@@ -1238,7 +1244,9 @@ void _lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t part, lv_style_property_t pro
 {
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_ptr(style_dsc, prop, p);
+#if LV_USE_ANIMATION
     trans_del(obj, part, prop);
+#endif
     lv_obj_refresh_style(obj);
 }
 
@@ -1483,8 +1491,6 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
 #if LV_USE_ANIMATION == 0
     obj->state = new_state;
-    obj->state.prev = new_state;
-    obj->state.anim = 0;
     lv_obj_refresh_style(obj);
 #else
     lv_state_t prev_state = obj->state;
@@ -1540,130 +1546,12 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
                 }
 
             }
-#endif
         }
     }
+#endif
 
     lv_obj_refresh_style(obj);
 
-}
-
-static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state, lv_state_t new_state)
-{
-    lv_style_trans_t * tr;
-    lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
-    lv_style_t * style_trans = lv_style_list_get_trans_style(style_list);
-
-    /*Get the previous and current values*/
-    if((prop & 0xF) < LV_STYLE_ID_COLOR) { /*Int*/
-        style_list->skip_trans = 1;
-        obj->state = prev_state;
-        lv_style_int_t int1 = _lv_obj_get_style_int(obj, part, prop);
-        obj->state = new_state;
-        lv_style_int_t int2 =  _lv_obj_get_style_int(obj, part, prop);
-        style_list->skip_trans = 0;
-
-        if(int1 == int2)  return NULL;
-        obj->state = prev_state;
-        int1 = _lv_obj_get_style_int(obj, part, prop);
-        obj->state = new_state;
-        _lv_style_set_int(style_trans, prop, int1);   /*Be sure `trans_style` has a valid value */
-
-        if(prop == LV_STYLE_RADIUS) {
-            if(int1 == LV_RADIUS_CIRCLE || int2 == LV_RADIUS_CIRCLE) {
-                lv_coord_t whalf = lv_obj_get_width(obj) / 2;
-                lv_coord_t hhalf = lv_obj_get_width(obj) / 2;
-                if(int1 == LV_RADIUS_CIRCLE) int1 = LV_MATH_MIN(whalf + 1, hhalf + 1);
-                if(int2 == LV_RADIUS_CIRCLE) int2 = LV_MATH_MIN(whalf + 1, hhalf + 1);
-            }
-        }
-
-        tr = lv_ll_ins_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
-        LV_ASSERT_MEM(tr);
-        if(tr == NULL) return NULL;
-        tr->start_value._int = int1;
-        tr->end_value._int = int2;
-    }
-    else if((prop & 0xF) < LV_STYLE_ID_OPA) { /*Color*/
-        style_list->skip_trans = 1;
-        obj->state = prev_state;
-        lv_color_t c1 = _lv_obj_get_style_color(obj, part, prop);
-        obj->state = new_state;
-        lv_color_t c2 =  _lv_obj_get_style_color(obj, part, prop);
-        style_list->skip_trans = 0;
-
-        if(c1.full == c2.full) return NULL;
-        obj->state = prev_state;
-        c1 = _lv_obj_get_style_color(obj, part, prop);
-        obj->state = new_state;
-        _lv_style_set_color(style_trans, prop, c1);    /*Be sure `trans_style` has a valid value */
-
-        tr = lv_ll_ins_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
-        LV_ASSERT_MEM(tr);
-        if(tr == NULL) return NULL;
-        tr->start_value._color = c1;
-        tr->end_value._color = c2;
-    }
-    else if((prop & 0xF) < LV_STYLE_ID_PTR) { /*Opa*/
-        style_list->skip_trans = 1;
-        obj->state = prev_state;
-        lv_opa_t o1 = _lv_obj_get_style_opa(obj, part, prop);
-        obj->state = new_state;
-        lv_opa_t o2 =  _lv_obj_get_style_opa(obj, part, prop);
-        style_list->skip_trans = 0;
-
-        if(o1 == o2) return NULL;
-
-        obj->state = prev_state;
-        o1 = _lv_obj_get_style_opa(obj, part, prop);
-        obj->state = new_state;
-        _lv_style_set_opa(style_trans, prop, o1);   /*Be sure `trans_style` has a valid value */
-
-        tr = lv_ll_ins_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
-        LV_ASSERT_MEM(tr);
-        if(tr == NULL) return NULL;
-        tr->start_value._opa= o1;
-        tr->end_value._opa = o2;
-    } else {    /*Ptr*/
-        obj->state = prev_state;
-        style_list->skip_trans = 1;
-        const void * p1 = _lv_obj_get_style_ptr(obj, part, prop);
-        obj->state = new_state;
-        const void * p2 =  _lv_obj_get_style_ptr(obj, part, prop);
-        style_list->skip_trans = 0;
-
-        if(p1 == p2)  return NULL;
-        obj->state = prev_state;
-        p1 = _lv_obj_get_style_ptr(obj, part, prop);
-        obj->state = new_state;
-        _lv_style_set_ptr(style_trans, prop, p1);   /*Be sure `trans_style` has a valid value */
-
-        tr = lv_ll_ins_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
-        LV_ASSERT_MEM(tr);
-        if(tr == NULL) return NULL;
-        tr->start_value._ptr= p1;
-        tr->end_value._ptr = p2;
-    }
-
-    return tr;
-}
-
-static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
-{
-    lv_style_trans_t * tr;
-    lv_style_trans_t * tr_next;
-    tr = lv_ll_get_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
-   while(tr != NULL) {
-       /*'tr' might be deleted, so get the next object while 'tr' is valid*/
-       tr_next = lv_ll_get_next(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
-
-        if(tr->obj == obj && (part == tr->part || part == 0xFF) && (prop == tr->prop || prop == 0xFF)) {
-            lv_anim_del(tr, NULL);
-            lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
-            lv_mem_free(tr);
-        }
-        tr = tr_next;
-    }
 }
 
 /**
@@ -2509,8 +2397,10 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
     case LV_STYLE_TEXT_FONT:
     case LV_STYLE_VALUE_FONT:
         return LV_THEME_DEFAULT_FONT_NORMAL;
+#if LV_USE_ANIMATION
     case LV_STYLE_TRANS_PATH:
         return lv_anim_path_linear;
+#endif
     }
 
     return NULL;
@@ -3603,6 +3493,142 @@ static void base_dir_refr_children(lv_obj_t * obj)
 }
 
 #if LV_USE_ANIMATION
+
+/**
+ * Allocate and initialize a transition for a property of an object if the properties value is different in the new state.
+ * It allocates `lv_style_trans_t` in `_lv_obj_style_trans_ll` and set only `start/end_values`. No animation will be created here.
+ * @param obj and object to add the transition
+ * @param prop the property to apply the transaction
+ * @param part the part of the object to apply the transaction
+ * @param prev_state the previous state of the objects
+ * @param new_state the new state of the object
+ * @return pointer to the allocated `the transaction` variable or `NULL` if no transtion created
+ */
+static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state, lv_state_t new_state)
+{
+    lv_style_trans_t * tr;
+    lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
+    lv_style_t * style_trans = lv_style_list_get_trans_style(style_list);
+
+    /*Get the previous and current values*/
+    if((prop & 0xF) < LV_STYLE_ID_COLOR) { /*Int*/
+        style_list->skip_trans = 1;
+        obj->state = prev_state;
+        lv_style_int_t int1 = _lv_obj_get_style_int(obj, part, prop);
+        obj->state = new_state;
+        lv_style_int_t int2 =  _lv_obj_get_style_int(obj, part, prop);
+        style_list->skip_trans = 0;
+
+        if(int1 == int2)  return NULL;
+        obj->state = prev_state;
+        int1 = _lv_obj_get_style_int(obj, part, prop);
+        obj->state = new_state;
+        _lv_style_set_int(style_trans, prop, int1);   /*Be sure `trans_style` has a valid value */
+
+        if(prop == LV_STYLE_RADIUS) {
+            if(int1 == LV_RADIUS_CIRCLE || int2 == LV_RADIUS_CIRCLE) {
+                lv_coord_t whalf = lv_obj_get_width(obj) / 2;
+                lv_coord_t hhalf = lv_obj_get_width(obj) / 2;
+                if(int1 == LV_RADIUS_CIRCLE) int1 = LV_MATH_MIN(whalf + 1, hhalf + 1);
+                if(int2 == LV_RADIUS_CIRCLE) int2 = LV_MATH_MIN(whalf + 1, hhalf + 1);
+            }
+        }
+
+        tr = lv_ll_ins_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
+        LV_ASSERT_MEM(tr);
+        if(tr == NULL) return NULL;
+        tr->start_value._int = int1;
+        tr->end_value._int = int2;
+    }
+    else if((prop & 0xF) < LV_STYLE_ID_OPA) { /*Color*/
+        style_list->skip_trans = 1;
+        obj->state = prev_state;
+        lv_color_t c1 = _lv_obj_get_style_color(obj, part, prop);
+        obj->state = new_state;
+        lv_color_t c2 =  _lv_obj_get_style_color(obj, part, prop);
+        style_list->skip_trans = 0;
+
+        if(c1.full == c2.full) return NULL;
+        obj->state = prev_state;
+        c1 = _lv_obj_get_style_color(obj, part, prop);
+        obj->state = new_state;
+        _lv_style_set_color(style_trans, prop, c1);    /*Be sure `trans_style` has a valid value */
+
+        tr = lv_ll_ins_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
+        LV_ASSERT_MEM(tr);
+        if(tr == NULL) return NULL;
+        tr->start_value._color = c1;
+        tr->end_value._color = c2;
+    }
+    else if((prop & 0xF) < LV_STYLE_ID_PTR) { /*Opa*/
+        style_list->skip_trans = 1;
+        obj->state = prev_state;
+        lv_opa_t o1 = _lv_obj_get_style_opa(obj, part, prop);
+        obj->state = new_state;
+        lv_opa_t o2 =  _lv_obj_get_style_opa(obj, part, prop);
+        style_list->skip_trans = 0;
+
+        if(o1 == o2) return NULL;
+
+        obj->state = prev_state;
+        o1 = _lv_obj_get_style_opa(obj, part, prop);
+        obj->state = new_state;
+        _lv_style_set_opa(style_trans, prop, o1);   /*Be sure `trans_style` has a valid value */
+
+        tr = lv_ll_ins_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
+        LV_ASSERT_MEM(tr);
+        if(tr == NULL) return NULL;
+        tr->start_value._opa= o1;
+        tr->end_value._opa = o2;
+    } else {    /*Ptr*/
+        obj->state = prev_state;
+        style_list->skip_trans = 1;
+        const void * p1 = _lv_obj_get_style_ptr(obj, part, prop);
+        obj->state = new_state;
+        const void * p2 =  _lv_obj_get_style_ptr(obj, part, prop);
+        style_list->skip_trans = 0;
+
+        if(p1 == p2)  return NULL;
+        obj->state = prev_state;
+        p1 = _lv_obj_get_style_ptr(obj, part, prop);
+        obj->state = new_state;
+        _lv_style_set_ptr(style_trans, prop, p1);   /*Be sure `trans_style` has a valid value */
+
+        tr = lv_ll_ins_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
+        LV_ASSERT_MEM(tr);
+        if(tr == NULL) return NULL;
+        tr->start_value._ptr= p1;
+        tr->end_value._ptr = p2;
+    }
+
+    return tr;
+}
+
+/**
+ * Remove the transition from objectt's part's property.
+ * - Remove the transition from `_lv_obj_style_trans_ll` and free it
+ * - Delete pending transitions
+ * @param obj pointer to an object which transition(s) should be removed
+ * @param part a part of object or 0xFF to remove from all parts
+ * @param prop a property or 0xFF to remove all porpeties
+ */
+static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+{
+    lv_style_trans_t * tr;
+    lv_style_trans_t * tr_next;
+    tr = lv_ll_get_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
+   while(tr != NULL) {
+       /*'tr' might be deleted, so get the next object while 'tr' is valid*/
+       tr_next = lv_ll_get_next(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
+
+        if(tr->obj == obj && (part == tr->part || part == 0xFF) && (prop == tr->prop || prop == 0xFF)) {
+            lv_anim_del(tr, NULL);
+            lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
+            lv_mem_free(tr);
+        }
+        tr = tr_next;
+    }
+}
 
 static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
 {

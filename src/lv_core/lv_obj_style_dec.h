@@ -146,7 +146,11 @@ _LV_OBJ_STYLE_SET_GET_DECLARE(TRANS_PROP_3, trans_prop_3, lv_style_int_t, _int, 
 _LV_OBJ_STYLE_SET_GET_DECLARE(TRANS_PROP_4, trans_prop_4, lv_style_int_t, _int, scalar)
 _LV_OBJ_STYLE_SET_GET_DECLARE(TRANS_PROP_5, trans_prop_5, lv_style_int_t, _int, scalar)
 _LV_OBJ_STYLE_SET_GET_DECLARE(TRANS_PROP_6, trans_prop_6, lv_style_int_t, _int, scalar)
+#if LV_USE_ANIMATION
 _LV_OBJ_STYLE_SET_GET_DECLARE(TRANS_PATH, trans_path, const lv_anim_path_cb_t , _ptr, scalar)
+#else
+_LV_OBJ_STYLE_SET_GET_DECLARE(TRANS_PATH, trans_path, const void * , _ptr, scalar)  /*For compatibility*/
+#endif
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_WIDTH, scale_width, lv_style_int_t, _int, scalar)
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_BORDER_WIDTH, scale_border_width, lv_style_int_t, _int, scalar)
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_BORDER_WIDTH, scale_end_border_width, lv_style_int_t, _int, scalar)
