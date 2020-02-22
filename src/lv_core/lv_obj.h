@@ -182,7 +182,7 @@ enum {
 typedef uint8_t lv_protect_t;
 
 enum {
-    LV_STATE_NORMAL   =  0x00,
+    LV_STATE_DEFAULT   =  0x00,
     LV_STATE_CHECKED  =  0x01,
     LV_STATE_FOCUSED  =  0x02,
     LV_STATE_EDITED   =  0x04,

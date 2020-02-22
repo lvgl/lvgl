@@ -289,7 +289,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->protect      = LV_PROTECT_NONE;
     new_obj->parent_event = 0;
     new_obj->gesture_parent = 1;
-    new_obj->state = LV_STATE_NORMAL;
+    new_obj->state = LV_STATE_DEFAULT;
 
 #if LV_USE_BIDI
     if(parent == NULL) new_obj->base_dir     = LV_BIDI_BASE_DIR_DEF;
@@ -2692,7 +2692,7 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part)
      * and only the object itseld knows who to get it's state. */
     lv_get_state_info_t info;
     info.part = part;
-    info.result = LV_STATE_NORMAL;
+    info.result = LV_STATE_DEFAULT;
     lv_signal_send((lv_obj_t*)obj, LV_SIGNAL_GET_STATE_DSC, &info);
 
     return info.result;
@@ -3676,7 +3676,7 @@ static void trans_anim_ready_cb(lv_anim_t * a)
 
 static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v)
 {
-	lv_obj_set_style_opa_scale(obj, LV_OBJ_PART_MAIN, LV_STATE_NORMAL, v);
+	lv_obj_set_style_opa_scale(obj, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, v);
 }
 
 #endif

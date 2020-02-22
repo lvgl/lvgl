@@ -682,7 +682,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     txt_buf[5] = '\0';
     strcpy(&txt_buf[5], get_month_name(calendar, ext->showed_date.month));
 
-    calendar->state = LV_STATE_NORMAL;
+    calendar->state = LV_STATE_DEFAULT;
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
@@ -786,7 +786,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
 
     /*The state changes without re-caching the styles, disable the use of cache*/
     lv_state_t state_ori = calendar->state;
-    calendar->state = LV_STATE_NORMAL;
+    calendar->state = LV_STATE_DEFAULT;
 
     lv_state_t month_state = LV_STATE_DISABLED;
 

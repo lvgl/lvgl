@@ -617,7 +617,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
 
         /*The state changes without re-caching the styles, disable the use of cache*/
         lv_state_t state_ori = btnm->state;
-        btnm->state = LV_STATE_NORMAL;
+        btnm->state = LV_STATE_DEFAULT;
         lv_draw_rect_dsc_init(&draw_rect_rel_dsc);
         lv_draw_label_dsc_init(&draw_label_rel_dsc);
         lv_obj_init_draw_rect_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_rect_rel_dsc);
@@ -688,7 +688,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
             }
             /*Focused and/or pressed + checked or released button*/
             else {
-                btnm->state = LV_STATE_NORMAL;
+                btnm->state = LV_STATE_DEFAULT;
                 if(tgl_state) btnm->state = LV_STATE_CHECKED;
                 if(ext->btn_id_pr == btn_i) btnm->state |= LV_STATE_PRESSED;
                 if(ext->btn_id_focused == btn_i) btnm->state |= LV_STATE_FOCUSED;

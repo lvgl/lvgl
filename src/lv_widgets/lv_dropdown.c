@@ -678,7 +678,7 @@ static lv_design_res_t lv_dropdown_page_design(lv_obj_t * page, const lv_area_t 
             }
 
             if(ext->show_selected) {
-                draw_box(ddlist, clip_area, ext->sel_opt_id, LV_STATE_NORMAL);
+                draw_box(ddlist, clip_area, ext->sel_opt_id, LV_STATE_DEFAULT);
             }
         }
     }
@@ -699,7 +699,7 @@ static lv_design_res_t lv_dropdown_page_design(lv_obj_t * page, const lv_area_t 
             }
 
             if(ext->show_selected) {
-                draw_box_label(ddlist, clip_area, ext->sel_opt_id, LV_STATE_NORMAL);
+                draw_box_label(ddlist, clip_area, ext->sel_opt_id, LV_STATE_DEFAULT);
             }
         }
     }
@@ -950,7 +950,7 @@ static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id
     lv_obj_t * page = ext->page;
     lv_state_t state_orig = page->state;
 
-    page->state = LV_STATE_NORMAL;
+    page->state = LV_STATE_DEFAULT;
     page->state |= state;
 
     /*Draw a rectangle under the selected item*/
@@ -985,7 +985,7 @@ static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint1
     lv_obj_t * page = ext->page;
     lv_state_t state_orig = page->state;
 
-    page->state = LV_STATE_NORMAL;
+    page->state = LV_STATE_DEFAULT;
     page->state |= state;
 
     lv_draw_label_dsc_t label_dsc;
