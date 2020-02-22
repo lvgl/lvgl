@@ -272,7 +272,6 @@ int16_t lv_bar_get_value(const lv_obj_t * bar)
     LV_ASSERT_OBJ(bar, LV_OBJX_NAME);
 
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
-    return ext->cur_value;
     return LV_BAR_GET_ANIM_VALUE(ext->cur_value, ext->cur_value_anim);
 }
 
