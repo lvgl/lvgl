@@ -1023,11 +1023,20 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
+        lv_coord_t w = lv_obj_get_style_width(label, LV_LABEL_PART_MAIN);
+        lv_coord_t h = lv_obj_get_style_height(label, LV_LABEL_PART_MAIN);
+        lv_area_t bg_coords;
+        lv_area_copy(&bg_coords, &label->coords);
+        bg_coords.x1 -= w;
+        bg_coords.x2 += w;
+        bg_coords.y1 -= h;
+        bg_coords.y2 += h;
+
         lv_draw_rect_dsc_t draw_rect_dsc;
         lv_draw_rect_dsc_init(&draw_rect_dsc);
         lv_obj_init_draw_rect_dsc(label, LV_LABEL_PART_MAIN, &draw_rect_dsc);
 
-        lv_draw_rect(&label->coords, clip_area, &draw_rect_dsc);
+        lv_draw_rect(&bg_coords, clip_area, &draw_rect_dsc);
 
         lv_area_t txt_coords;
         get_txt_coords(label, &txt_coords);
@@ -1035,7 +1044,6 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         lv_area_t txt_clip;
         bool is_common = lv_area_intersect(&txt_clip, clip_area, &txt_coords);
         if(!is_common) return LV_DESIGN_RES_OK;
-
 
         lv_label_align_t align = lv_label_get_align(label);
 

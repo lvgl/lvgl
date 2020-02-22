@@ -103,7 +103,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_gauge_set_scale(new_gauge, LV_GAUGE_DEF_ANGLE, LV_GAUGE_DEF_LINE_COUNT, LV_GAUGE_DEF_LABEL_COUNT);
         lv_gauge_set_needle_count(new_gauge, 1, NULL);
         lv_gauge_set_critical_value(new_gauge, 80);
-        lv_obj_set_size(new_gauge, 2 * LV_DPI, 2 * LV_DPI);
+        lv_obj_set_size(new_gauge, 3 * LV_DPI / 2, 3 * LV_DPI / 2);
 
         lv_theme_apply(new_gauge, LV_THEME_GAUGE);
 

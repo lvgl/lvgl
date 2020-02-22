@@ -79,7 +79,6 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->arc_angle_end   = 270;
     lv_style_list_init(&ext->style_arc);
 
-
     lv_obj_set_size(arc, LV_DPI, LV_DPI);
 
     /*The signal and design functions are not copied so set them here*/
@@ -419,7 +418,6 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
-        lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
         lv_obj_clean_style_list(arc, LV_ARC_PART_ARC);
     }
 

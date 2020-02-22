@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_linemeter.h"
-#if LV_USE_LMETER != 0
+#if LV_USE_LINEMETER != 0
 
 #include "../lv_core/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
