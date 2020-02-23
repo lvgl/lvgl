@@ -167,7 +167,6 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * cb, lv_signal_t sign, void * param
         info->result = lv_checkbox_get_style(cb, info->part);
         if(info->result != NULL) return LV_RES_OK;
         else return ancestor_signal(cb, sign, param);
-        return LV_RES_OK;
     }
 
     /* Include the ancient signal function */

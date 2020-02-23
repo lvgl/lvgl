@@ -258,7 +258,6 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
         info->result = lv_cont_get_style(cont, info->part);
         if(info->result != NULL) return LV_RES_OK;
         else return ancestor_signal(cont, sign, param);
-        return LV_RES_OK;
     }
 
     lv_res_t res;

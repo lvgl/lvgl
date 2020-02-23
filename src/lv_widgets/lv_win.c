@@ -506,7 +506,6 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
         info->result = lv_win_get_style(win, info->part);
         if(info->result != NULL) return LV_RES_OK;
         else return ancestor_signal(win, sign, param);
-        return LV_RES_OK;
     } else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
         lv_get_state_info_t * info = param;

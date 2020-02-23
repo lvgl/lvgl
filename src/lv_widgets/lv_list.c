@@ -629,7 +629,6 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         info->result = lv_list_get_style(list, info->part);
         if(info->result != NULL) return LV_RES_OK;
         else return ancestor_page_signal(list, sign, param);
-        return LV_RES_OK;
     }
 
     /* Include the ancient signal function */
