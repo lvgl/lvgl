@@ -771,7 +771,7 @@ static lv_res_t release_handler(lv_obj_t * roller)
 
     uint32_t id  = ext->sel_opt_id; /*Just to use uint32_t in event data*/
     lv_res_t res = lv_event_send(roller, LV_EVENT_VALUE_CHANGED, &id);
-    return LV_RES_OK;
+    return res;
 }
 
 static void refr_width(lv_obj_t * roller)
