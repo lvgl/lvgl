@@ -1023,8 +1023,8 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
-        lv_coord_t w = lv_obj_get_style_width(label, LV_LABEL_PART_MAIN);
-        lv_coord_t h = lv_obj_get_style_height(label, LV_LABEL_PART_MAIN);
+        lv_coord_t w = lv_obj_get_style_transform_width(label, LV_LABEL_PART_MAIN);
+        lv_coord_t h = lv_obj_get_style_transform_height(label, LV_LABEL_PART_MAIN);
         lv_area_t bg_coords;
         lv_area_copy(&bg_coords, &label->coords);
         bg_coords.x1 -= w;

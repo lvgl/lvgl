@@ -292,7 +292,7 @@ void lv_style_list_reset(lv_style_list_t * list)
     }
 
     if(list->has_trans) {
-        lv_style_t * trans = lv_style_list_get_trans_style(list);
+        lv_style_t * trans = lv_style_list_get_transition_style(list);
         if(trans) {
             lv_style_reset(trans);
             lv_mem_free(trans);
@@ -686,7 +686,7 @@ lv_style_t * lv_style_list_get_local_style(lv_style_list_t * list)
  * @param list pointer to a style list where the local property should be set
  * @return pointer to the transition style if exists else `NULL`.
  */
-lv_style_t * lv_style_list_get_trans_style(lv_style_list_t * list)
+lv_style_t * lv_style_list_get_transition_style(lv_style_list_t * list)
 {
     LV_ASSERT_STYLE_LIST(list);
 
@@ -702,7 +702,7 @@ lv_style_t * lv_style_list_get_trans_style(lv_style_list_t * list)
 lv_style_t * lv_style_list_add_trans_style(lv_style_list_t * list)
 {
     LV_ASSERT_STYLE_LIST(list);
-    if(list->has_trans) return lv_style_list_get_trans_style(list);
+    if(list->has_trans) return lv_style_list_get_transition_style(list);
 
     lv_style_t * trans_style = lv_mem_alloc(sizeof(lv_style_t));
     LV_ASSERT_MEM(trans_style);

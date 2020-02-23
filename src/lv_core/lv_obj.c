@@ -1513,16 +1513,16 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         if(style_list == NULL) break;   /*No more style lists*/
         if(style_list->ignore_trans) continue;
 
-        lv_style_int_t time = lv_obj_get_style_trans_time(obj, part);
+        lv_style_int_t time = lv_obj_get_style_transition_time(obj, part);
         lv_style_property_t props[LV_STYLE_TRANS_NUM_MAX];
-        lv_style_int_t delay = lv_obj_get_style_trans_delay(obj, part);
-        lv_anim_path_cb_t path = lv_obj_get_style_trans_path(obj, part);
-        props[0] = lv_obj_get_style_trans_prop_1(obj, part);
-        props[1] = lv_obj_get_style_trans_prop_2(obj, part);
-        props[2] = lv_obj_get_style_trans_prop_3(obj, part);
-        props[3] = lv_obj_get_style_trans_prop_4(obj, part);
-        props[4] = lv_obj_get_style_trans_prop_5(obj, part);
-        props[5] = lv_obj_get_style_trans_prop_6(obj, part);
+        lv_style_int_t delay = lv_obj_get_style_transition_delay(obj, part);
+        lv_anim_path_cb_t path = lv_obj_get_style_transition_path(obj, part);
+        props[0] = lv_obj_get_style_transition_prop_1(obj, part);
+        props[1] = lv_obj_get_style_transition_prop_2(obj, part);
+        props[2] = lv_obj_get_style_transition_prop_3(obj, part);
+        props[3] = lv_obj_get_style_transition_prop_4(obj, part);
+        props[4] = lv_obj_get_style_transition_prop_5(obj, part);
+        props[5] = lv_obj_get_style_transition_prop_6(obj, part);
 
 
         uint8_t i;
@@ -2409,7 +2409,7 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
     case LV_STYLE_VALUE_FONT:
         return LV_THEME_DEFAULT_FONT_NORMAL;
 #if LV_USE_ANIMATION
-    case LV_STYLE_TRANS_PATH:
+    case LV_STYLE_TRANSITION_PATH:
         return lv_anim_path_linear;
 #endif
     }
@@ -3114,8 +3114,8 @@ lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
         }
     }
 
-    lv_coord_t w = lv_obj_get_style_width(obj, part);
-    lv_coord_t h = lv_obj_get_style_height(obj, part);
+    lv_coord_t w = lv_obj_get_style_transform_width(obj, part);
+    lv_coord_t h = lv_obj_get_style_transform_height(obj, part);
     lv_coord_t wh = LV_MATH_MAX(w, h);
     if(wh > 0) s += wh;
 
@@ -3196,8 +3196,8 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
     if(mode == LV_DESIGN_COVER_CHK) {
         /*Most trivial test. Is the mask fully IN the object? If no it surely doesn't cover it*/
         lv_coord_t r = lv_obj_get_style_radius(obj, LV_OBJ_PART_MAIN);
-        lv_coord_t w = lv_obj_get_style_width(obj, LV_OBJ_PART_MAIN);
-        lv_coord_t h = lv_obj_get_style_height(obj, LV_OBJ_PART_MAIN);
+        lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_OBJ_PART_MAIN);
+        lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_OBJ_PART_MAIN);
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
         coords.x1 -= w;
@@ -3229,8 +3229,8 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         lv_obj_init_draw_rect_dsc(obj, LV_OBJ_PART_MAIN, &draw_dsc);
 
 
-        lv_coord_t w = lv_obj_get_style_width(obj, LV_OBJ_PART_MAIN);
-        lv_coord_t h = lv_obj_get_style_height(obj, LV_OBJ_PART_MAIN);
+        lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_OBJ_PART_MAIN);
+        lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_OBJ_PART_MAIN);
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
         coords.x1 -= w;
@@ -3265,8 +3265,8 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             draw_dsc.shadow_opa = LV_OPA_TRANSP;
             lv_obj_init_draw_rect_dsc(obj, LV_OBJ_PART_MAIN, &draw_dsc);
 
-            lv_coord_t w = lv_obj_get_style_width(obj, LV_OBJ_PART_MAIN);
-            lv_coord_t h = lv_obj_get_style_height(obj, LV_OBJ_PART_MAIN);
+            lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_OBJ_PART_MAIN);
+            lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_OBJ_PART_MAIN);
             lv_area_t coords;
             lv_area_copy(&coords, &obj->coords);
             coords.x1 -= w;
@@ -3519,7 +3519,7 @@ static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop,
 {
     lv_style_trans_t * tr;
     lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
-    lv_style_t * style_trans = lv_style_list_get_trans_style(style_list);
+    lv_style_t * style_trans = lv_style_list_get_transition_style(style_list);
 
     /*Get the previous and current values*/
     if((prop & 0xF) < LV_STYLE_ID_COLOR) { /*Int*/
@@ -3644,7 +3644,7 @@ static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
 {
     lv_style_list_t * list = lv_obj_get_style_list(tr->obj, tr->part);
-    lv_style_t * style = lv_style_list_get_trans_style(list);
+    lv_style_t * style = lv_style_list_get_transition_style(list);
 
     if((tr->prop & 0xF) < LV_STYLE_ID_COLOR) { /*Value*/
         lv_style_int_t x;
