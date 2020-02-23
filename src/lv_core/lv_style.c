@@ -273,7 +273,8 @@ void lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * style)
 }
 
 /**
- * Remove all styles added from style list, clear the local style and free all allocated memories
+ * Remove all styles added from style list, clear the local style, transition style and free all allocated memories.
+ * Leave `ignore_trans` flag as it is.
  * @param list pointer to a style list.
  */
 void lv_style_list_reset(lv_style_list_t * list)
@@ -304,7 +305,9 @@ void lv_style_list_reset(lv_style_list_t * list)
     list->has_local = 0;
     list->has_trans = 0;
     list->skip_trans = 0;
-    list->ignore_trans = 0;
+
+    /* Intentionally leave `ignore_trans` as it is,
+     * because it's independent from the styles in the list*/
 }
 
 /**

@@ -77,7 +77,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
         return NULL;
     }
 
-    ext->toggle = 0;
+    ext->checkable = 0;
 
     lv_obj_set_signal_cb(btn, lv_btn_signal);
     lv_obj_set_design_cb(btn, lv_btn_design);
@@ -94,7 +94,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy 'copy'*/
     else {
         lv_btn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->toggle             = copy_ext->toggle;
+        ext->checkable             = copy_ext->checkable;
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(btn);
@@ -120,7 +120,7 @@ void lv_btn_set_checkable(lv_obj_t * btn, bool tgl)
 
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
-    ext->toggle = tgl != false ? 1 : 0;
+    ext->checkable = tgl != false ? 1 : 0;
 }
 
 /**
@@ -211,7 +211,7 @@ bool lv_btn_get_checkable(const lv_obj_t * btn)
 
     lv_btn_ext_t * ext = lv_obj_get_ext_attr(btn);
 
-    return ext->toggle != 0 ? true : false;
+    return ext->checkable != 0 ? true : false;
 }
 
 /**********************

@@ -152,7 +152,6 @@ lv_obj_t * lv_keyboard_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_btnmatrix_set_ctrl_map(kb, kb_ctrl[ext->mode]);
 
         lv_theme_apply(kb, LV_THEME_KEYBOARD);
-
     }
     /*Copy an existing keyboard*/
     else {

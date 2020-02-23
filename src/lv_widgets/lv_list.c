@@ -769,7 +769,7 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
             }
             else {
                 lv_coord_t pad = lv_obj_get_style_pad_right(btn, LV_BTN_PART_MAIN);
-                lv_obj_set_size(label, btn->coords.x2 - label->coords.x1 - pad, font_h);
+                lv_obj_set_size(label, btn->coords.x2 - label->coords.x1 - pad + 1, font_h);
             }
         }
     }

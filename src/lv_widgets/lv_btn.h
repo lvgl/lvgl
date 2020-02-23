@@ -52,7 +52,7 @@ typedef struct
     lv_cont_ext_t cont;
 
     /** 1: Toggle enabled*/
-    uint8_t toggle : 1;
+    uint8_t checkable : 1;
 } lv_btn_ext_t;
 
 /**Styles*/
@@ -146,35 +146,6 @@ static inline void lv_btn_set_fit(lv_obj_t * btn, lv_fit_t fit)
     lv_cont_set_fit(btn, fit);
 }
 
-/**
- * Set time of the ink effect (draw a circle on click to animate in the new state)
- * @param btn pointer to a button object
- * @param time the time of the ink animation
- */
-void lv_btn_set_ink_in_time(lv_obj_t * btn, uint16_t time);
-
-/**
- * Set the wait time before the ink disappears
- * @param btn pointer to a button object
- * @param time the time of the ink animation
- */
-void lv_btn_set_ink_wait_time(lv_obj_t * btn, uint16_t time);
-
-/**
- * Set time of the ink out effect (animate to the released state)
- * @param btn pointer to a button object
- * @param time the time of the ink animation
- */
-void lv_btn_set_ink_out_time(lv_obj_t * btn, uint16_t time);
-
-/**
- * Set a style of a button.
- * @param btn pointer to button object
- * @param type which style should be set
- * @param style pointer to a style
- *  */
-void lv_btn_set_style(lv_obj_t * btn, lv_btn_part_t type, const lv_style_t * style);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -189,7 +160,7 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn);
 /**
  * Get the toggle enable attribute of the button
  * @param btn pointer to a button object
- * @return true: toggle enabled, false: disabled
+ * @return true: checkable enabled, false: disabled
  */
 bool lv_btn_get_checkable(const lv_obj_t * btn);
 

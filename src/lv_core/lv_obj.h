@@ -320,6 +320,14 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
  */
 lv_res_t lv_obj_del(lv_obj_t * obj);
 
+#if LV_USE_ANIMATION
+/**
+ * A function to be easily used in animation ready callback to delete an object when the animation is ready
+ * @param a pointer to the animation
+ */
+void lv_obj_del_anim_ready_cb(lv_anim_t * a);
+#endif
+
 /**
  * Helper function for asynchronously deleting objects.
  * Useful for cases where you can't delete an object directly in an `LV_EVENT_DELETE` handler (i.e. parent).

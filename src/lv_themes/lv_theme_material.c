@@ -56,6 +56,7 @@ static lv_style_t scr;
 static lv_style_t panel; /*General fancy panel like car to hold other objects*/
 static lv_style_t bg;
 static lv_style_t btn;
+static lv_style_t pad;
 
 
 #if LV_USE_ARC
@@ -249,6 +250,13 @@ static void basic_init(void)
     lv_style_set_trans_prop_6(&btn, LV_STATE_DEFAULT, LV_STYLE_OUTLINE_OPA);
     lv_style_set_trans_delay(&btn, LV_STATE_DEFAULT, 100);
     lv_style_set_trans_delay(&btn, LV_STATE_PRESSED, 0);
+
+    lv_style_init(&pad);
+    lv_style_set_pad_inner(&pad, LV_STATE_DEFAULT, LV_DPI / 10);
+    lv_style_set_pad_left(&pad, LV_STATE_DEFAULT, LV_DPI / 10);
+    lv_style_set_pad_right(&pad, LV_STATE_DEFAULT, LV_DPI / 10);
+    lv_style_set_pad_top(&pad, LV_STATE_DEFAULT, LV_DPI / 10);
+    lv_style_set_pad_bottom(&pad, LV_STATE_DEFAULT, LV_DPI / 10);
 }
 
 static void cont_init(void)
@@ -320,9 +328,9 @@ static void led_init(void)
     lv_style_set_border_opa(&led, LV_STATE_DEFAULT, LV_OPA_50);
     lv_style_set_border_color(&led, LV_STATE_DEFAULT, lv_color_lighten(_color_primary, LV_OPA_30));
     lv_style_set_radius(&led, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-    lv_style_set_shadow_width(&led, LV_STATE_DEFAULT, LV_DPI / 4);
+    lv_style_set_shadow_width(&led, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_shadow_color(&led, LV_STATE_DEFAULT, _color_primary);
-    lv_style_set_shadow_spread(&led, LV_STATE_DEFAULT, LV_DPI / 16);
+    lv_style_set_shadow_spread(&led, LV_STATE_DEFAULT, LV_DPI / 20);
 #endif
 }
 
@@ -1094,6 +1102,7 @@ lv_style_list_add_style(list, &bar_bg);
 
         lv_obj_clean_style_list(obj, LV_PAGE_PART_SCRL);
         list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCRL);
+        lv_style_list_add_style(list, &pad);
 
         lv_obj_clean_style_list(obj, LV_PAGE_PART_SCRLBAR);
         list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCRLBAR);
