@@ -1185,7 +1185,7 @@ void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part)
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has integer type
  */
-void _lv_obj_set_style_int(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_int_t value)
+void _lv_obj_set_style_local_int(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_int_t value)
 {
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_int(style_dsc, prop, value);
@@ -1207,7 +1207,7 @@ void _lv_obj_set_style_int(lv_obj_t * obj, uint8_t part, lv_style_property_t pro
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has color type
  */
-void _lv_obj_set_style_color(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_color_t color)
+void _lv_obj_set_style_local_color(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_color_t color)
 {
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_color(style_dsc, prop, color);
@@ -1229,7 +1229,7 @@ void _lv_obj_set_style_color(lv_obj_t * obj, uint8_t part, lv_style_property_t p
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has opacity type
  */
-void _lv_obj_set_style_opa(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_opa_t opa)
+void _lv_obj_set_style_local_opa(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_opa_t opa)
 {
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_opa(style_dsc, prop, opa);
@@ -1251,7 +1251,7 @@ void _lv_obj_set_style_opa(lv_obj_t * obj, uint8_t part, lv_style_property_t pro
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-void _lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, const void * p)
+void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, const void * p)
 {
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_ptr(style_dsc, prop, p);
@@ -1262,17 +1262,22 @@ void _lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t part, lv_style_property_t pro
 }
 
 /**
- * Get the local style of a part of an object.
+ * Remove a local style property from a part of an object with a given state.
  * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
+ * @param part the part of the object which style property should be removed.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @return pointer to the local style if exists else `NULL`.
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @note shouldn't be used directly. Use the specific property remove functions instead.
+ *       For example: `lv_obj_style_remove_border_opa()`
+ * @return true: the property was found and removed; false: teh property was not found
  */
-lv_style_t * lv_obj_get_local_style(lv_obj_t * obj, uint8_t part)
+bool _lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
-    lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
-    return lv_style_list_get_local_style(style_dsc);
-
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_style_t * style = lv_obj_get_local_style(obj, part);
+    if(style) return lv_style_remove_prop(style, prop);
+    else return false;
 }
 
 /**
@@ -2417,6 +2422,19 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
     return NULL;
 }
 
+/**
+ * Get the local style of a part of an object.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @return pointer to the local style if exists else `NULL`.
+ */
+lv_style_t * lv_obj_get_local_style(lv_obj_t * obj, uint8_t part)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
+    return lv_style_list_get_local_style(style_list);
+}
 
 /*-----------------
  * Attribute get
@@ -3713,7 +3731,7 @@ static void trans_anim_ready_cb(lv_anim_t * a)
 
 static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v)
 {
-	lv_obj_set_style_opa_scale(obj, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, v);
+	lv_obj_set_style_local_opa_scale(obj, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, v);
 }
 
 #endif

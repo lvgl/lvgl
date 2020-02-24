@@ -534,7 +534,7 @@ void lv_obj_report_style_mod(lv_style_t * style);
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has color type
  */
-void _lv_obj_set_style_color(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_color_t color);
+void _lv_obj_set_style_local_color(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_color_t color);
 
 /**
  * Set a local style property of a part of an object in a given state.
@@ -548,7 +548,7 @@ void _lv_obj_set_style_color(lv_obj_t * obj, uint8_t type, lv_style_property_t p
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has integer type
  */
-void _lv_obj_set_style_int(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_style_int_t value);
+void _lv_obj_set_style_local_int(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_style_int_t value);
 
 /**
  * Set a local style property of a part of an object in a given state.
@@ -562,7 +562,7 @@ void _lv_obj_set_style_int(lv_obj_t * obj, uint8_t type, lv_style_property_t pro
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has opacity type
  */
-void _lv_obj_set_style_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_opa_t opa);
+void _lv_obj_set_style_local_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_opa_t opa);
 
 /**
  * Set a local style property of a part of an object in a given state.
@@ -576,16 +576,20 @@ void _lv_obj_set_style_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t pro
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-void _lv_obj_set_style_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, const void * value);
+void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, const void * value);
 
 /**
- * Get the local style of a part of an object.
+ * Remove a local style property from a part of an object with a given state.
  * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
+ * @param part the part of the object which style property should be removed.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @return pointer to the local style if exists else `NULL`.
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @note shouldn't be used directly. Use the specific property remove functions instead.
+ *       For example: `lv_obj_style_remove_border_opa()`
+ * @return true: the property was found and removed; false: teh property was not found
  */
-lv_style_t * lv_obj_get_local_style(lv_obj_t * obj, uint8_t part);
+bool _lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
 /*-----------------
  * Attribute set
@@ -1028,6 +1032,17 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
  * @note for performance reasons it's not checked if the property really has pointer type
  */
 const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
+
+
+/**
+ * Get the local style of a part of an object.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @return pointer to the local style if exists else `NULL`.
+ */
+lv_style_t * lv_obj_get_local_style(lv_obj_t * obj, uint8_t part);
+
 
 #include "lv_obj_style_dec.h"
 

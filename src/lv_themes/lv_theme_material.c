@@ -253,10 +253,6 @@ static void basic_init(void)
 
     lv_style_init(&pad);
     lv_style_set_pad_inner(&pad, LV_STATE_DEFAULT, LV_DPI / 10);
-    lv_style_set_pad_left(&pad, LV_STATE_DEFAULT, LV_DPI / 10);
-    lv_style_set_pad_right(&pad, LV_STATE_DEFAULT, LV_DPI / 10);
-    lv_style_set_pad_top(&pad, LV_STATE_DEFAULT, LV_DPI / 10);
-    lv_style_set_pad_bottom(&pad, LV_STATE_DEFAULT, LV_DPI / 10);
 }
 
 static void cont_init(void)

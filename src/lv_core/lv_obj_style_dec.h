@@ -18,53 +18,80 @@ extern "C" {
 /**
  * Macro to declare the most important style set/get API functions.
  *
- * - Get the value of a style property from an object in the object's current state.
- *   If there is a transition animation in progress calculate the value accordingly.
- *   If the property is not set in the object's style check the parent(s) if the property can be inherited
- *   If still not found return a default value.
- *   For example:
- *      `lv_obj_get_style_border_width(btn1, LV_BTN_PART_MAIN);`
+ * Get the value of a style property from an object in the object's current state
+ * -----------------------------------------------------------------------------
+ *  - Get the value of a style property from an object in the object's current state.
+ *  - Transition animation is taken into account.
+ *  - If the property is not set in the object's styles check the parent(s) if the property can be inherited
+ *  - If still not found return a default value.
+ *  - For example:
+ *      `lv_style_int_t w = lv_obj_get_style_border_width(btn1, LV_BTN_PART_MAIN);`
  *
- * - Set a local style property for an object in a given state
- *   For example:
- *      `lv_obj_set_style_border_width(btn1, LV_BTN_PART_MAIN, LV_STATE_PRESSED, 2);`
+ * Set a local style property for an object in a given state
+ * ---------------------------------------------------------
+ *  - For example:
+ *      `lv_obj_set_style_local_border_width(btn1, LV_BTN_PART_MAIN, LV_STATE_PRESSED, 2);`
  *
- *  - Get the value from a style in a given state:
- *    For example
- *      `int16_t weight = lv_style_get_border_width(&style1, LV_STATE_PRESSED, &result);`
+ * Get a local style property's value of an object in a given state
+ * ----------------------------------------------------------------
+ *  - Return the best matching property in the given state.
+ *  - E.g. if `state` parameter is LV_STATE_PRESSED | LV_STATE_CHECKED` but the property defined only in
+ *    `LV_STATE_PRESSED` and `LV_STATE_DEFAULT` the best matching state is `LV_STATE_PRESSED`
+ *    (because it has higher precedence) and it will be returned.
+ *  - If the property is not found even in `LV_STATE_DEFAULT` `-1` is returned.
+ *  - For example:
+ *      `//Type of result should be lv_style_int_t/lv_opa_t/lv_color_t/const void * according to the type of the property`
+ *      `lv_style_int_t result;`
+ *      `lv_obj_get_style_local_border_width(btn1, LV_BTN_PART_MAIN, LV_STATE_PRESSED, &result);`
  *      `if(weight > 0) ...the property is found and loaded into result...`
  *
- *  - Set a value in a style in a given state
- *     For example
- *       `lv_style_set_border_width(&style1, LV_STATE_PRESSED, 2);`
+ * Get the value from a style in a given state
+ * -------------------------------------------
+ * - The same rules applies to the return value then for "lv_obj_get_style_local_...()" above
+ * - For example
+ *      `int16_t weight = lv_style_get_border_width(&style1, LV_STATE_PRESSED, &result);`
+ *      `if(weight > 0) ...the property is found and loaded into result...`
+
+ * Set a value in a style in a given state
+ * ---------------------------------------
+ * - For example
+ *      `lv_style_set_border_width(&style1, LV_STATE_PRESSED, 2);`
  */
 
 
-#define _LV_OBJ_STYLE_DECLARE_GET_scalar(prop_name, func_name, value_type, style_type) \
-static inline value_type lv_obj_get_style_##func_name (const lv_obj_t * obj, uint8_t part)  \
-{                                                                                           \
-    return (value_type) _lv_obj_get_style##style_type (obj, part, LV_STYLE_##prop_name);     \
+#define _LV_OBJ_STYLE_DECLARE_GET_scalar(prop_name, func_name, value_type, style_type)          \
+static inline value_type lv_obj_get_style_##func_name (const lv_obj_t * obj, uint8_t part)      \
+{                                                                                               \
+    return (value_type) _lv_obj_get_style##style_type (obj, part, LV_STYLE_##prop_name);        \
 }
 
-#define _LV_OBJ_STYLE_DECLARE_GET_nonscalar(prop_name, func_name, value_type, style_type) \
-static inline value_type lv_obj_get_style_##func_name (const lv_obj_t * obj, uint8_t part)  \
-{                                                                                           \
-    return _lv_obj_get_style##style_type (obj, part, LV_STYLE_##prop_name);     \
+#define _LV_OBJ_STYLE_DECLARE_GET_nonscalar(prop_name, func_name, value_type, style_type)       \
+static inline value_type lv_obj_get_style_##func_name (const lv_obj_t * obj, uint8_t part)      \
+{                                                                                               \
+    return _lv_obj_get_style##style_type (obj, part, LV_STYLE_##prop_name);                     \
 }
 
-#define _LV_OBJ_STYLE_SET_GET_DECLARE(prop_name, func_name, value_type, style_type, scalar)          \
-_LV_OBJ_STYLE_DECLARE_GET_##scalar(prop_name, func_name, value_type, style_type) \
-static inline void lv_obj_set_style_##func_name (lv_obj_t * obj, uint8_t part, lv_state_t state, value_type value)  \
-{                                                                                           \
-    _lv_obj_set_style##style_type (obj, part, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                  \
-}                                                                                           \
-static inline int16_t lv_style_get_##func_name (lv_style_t * style, lv_state_t state, void * res)             \
-{                                                                                           \
-    return _lv_style_get##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), res);                     \
-}                                                                                           \
-static inline void lv_style_set_##func_name (lv_style_t * style, lv_state_t state, value_type value)          \
-{                                                                                           \
-    _lv_style_set##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                          \
+#define _LV_OBJ_STYLE_SET_GET_DECLARE(prop_name, func_name, value_type, style_type, scalar)                         \
+_LV_OBJ_STYLE_DECLARE_GET_##scalar(prop_name, func_name, value_type, style_type)                                    \
+static inline void lv_obj_set_style_local_##func_name (lv_obj_t * obj, uint8_t part, lv_state_t state, value_type value)  \
+{                                                                                                                   \
+    _lv_obj_set_style_local##style_type (obj, part, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);         \
+}                                                                                                                   \
+static inline void lv_obj_get_style_local_##func_name (lv_obj_t * obj, uint8_t part, lv_state_t state, void * res)  \
+{                                                                                                                   \
+    _lv_style_get##style_type (lv_obj_get_local_style(obj, part), LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), res);         \
+}                                        \
+static inline void lv_obj_remove_style_local_##func_name (lv_obj_t * obj, uint8_t part, lv_state_t state)                 \
+{                                                                                                                   \
+    _lv_obj_remove_style_local_prop(obj, part, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS));                     \
+}                                                                                                                   \
+static inline int16_t lv_style_get_##func_name (lv_style_t * style, lv_state_t state, void * res)                   \
+{                                                                                                                   \
+    return _lv_style_get##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), res);            \
+}                                                                                                                   \
+static inline void lv_style_set_##func_name (lv_style_t * style, lv_state_t state, value_type value)                \
+{                                                                                                                   \
+    _lv_style_set##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                 \
 }
 
 _LV_OBJ_STYLE_SET_GET_DECLARE(RADIUS, radius, lv_style_int_t,_int, scalar)
