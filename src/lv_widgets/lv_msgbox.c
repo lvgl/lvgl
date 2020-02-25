@@ -365,7 +365,7 @@ bool lv_msgbox_get_recolor(const lv_obj_t * mbox)
  * @return pointer to button matrix object
  * @remarks return value will be NULL unless `lv_msgbox_add_btns` has been already called
  */
-lv_obj_t * lv_msgbox_get_btnm(lv_obj_t * mbox)
+lv_obj_t * lv_msgbox_get_btnmatrix(lv_obj_t * mbox)
 {
     LV_ASSERT_OBJ(mbox, LV_OBJX_NAME);
 

@@ -174,9 +174,9 @@ _LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PROP_4, transition_prop_4, lv_style_int
 _LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PROP_5, transition_prop_5, lv_style_int_t, _int, scalar)
 _LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PROP_6, transition_prop_6, lv_style_int_t, _int, scalar)
 #if LV_USE_ANIMATION
-_LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PATH, transition_path, const lv_anim_path_cb_t , _ptr, scalar)
+_LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PATH, transition_path, lv_anim_path_cb_t , _ptr, scalar)
 #else
-_LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PATH, transition_path, const void * , _ptr, scalar)  /*For compatibility*/
+_LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PATH, transition_path, void * , _ptr, scalar)  /*For compatibility*/
 #endif
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_WIDTH, scale_width, lv_style_int_t, _int, scalar)
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_BORDER_WIDTH, scale_border_width, lv_style_int_t, _int, scalar)
