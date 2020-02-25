@@ -182,7 +182,7 @@ lv_spinner_dir_t lv_spinner_get_dir(lv_obj_t * preload);
  * @param ptr pointer to spinner
  * @param val the current desired value [0..360]
  */
-void lv_spinner_spinner_anim(void * ptr, lv_anim_value_t val);
+void lv_spinner_anim_cb(void * ptr, lv_anim_value_t val);
 
 /**********************
  *      MACROS

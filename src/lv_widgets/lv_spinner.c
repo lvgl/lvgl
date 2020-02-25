@@ -171,7 +171,7 @@ void lv_spinner_set_type(lv_obj_t * preload, lv_spinner_type_t type)
             lv_anim_t a;
             lv_anim_init(&a);
             lv_anim_set_var(&a, preload);
-            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_spinner_spinner_anim);
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_spinner_anim_cb);
             lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
             lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
             lv_anim_set_time(&a, ext->time);
@@ -194,7 +194,7 @@ void lv_spinner_set_type(lv_obj_t * preload, lv_spinner_type_t type)
             lv_anim_t a;
             lv_anim_init(&a);
             lv_anim_set_var(&a, preload);
-            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_spinner_spinner_anim);
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_spinner_anim_cb);
             lv_anim_set_time(&a, ext->time);
             lv_anim_set_path_cb(&a, (LV_SPINNER_TYPE_CONSTANT_ARC == type ? lv_anim_path_linear : lv_anim_path_ease_in_out));
             lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
@@ -272,7 +272,7 @@ lv_spinner_dir_t lv_spinner_get_dir(lv_obj_t * preload)
  * @param ptr pointer to spinner
  * @param val the current desired value [0..360]
  */
-void lv_spinner_spinner_anim(void * ptr, lv_anim_value_t val)
+void lv_spinner_anim_cb(void * ptr, lv_anim_value_t val)
 {
     lv_obj_t * preload     = ptr;
     lv_spinner_ext_t * ext = lv_obj_get_ext_attr(preload);
