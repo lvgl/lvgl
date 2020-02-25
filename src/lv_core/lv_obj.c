@@ -1603,6 +1603,29 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
         lv_obj_set_state(obj, new_state);
     }
 }
+
+#if LV_USE_ANIMATION
+/**
+ * Finish all pending transitions on a part of an object
+ * @param obj pointer to an object
+ * @param part part of the object, e.g `LV_BRN_PART_MAIN` or `LV_OBJ_PART_ALL` for all parts
+ */
+void lv_obj_finish_transitions(lv_obj_t * obj, uint8_t part)
+{
+	/*Animate all related transition to the end value*/
+	lv_style_trans_t * tr;
+	tr = lv_ll_get_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
+	LV_LL_READ(LV_GC_ROOT(_lv_obj_style_trans_ll), tr) {
+		if(tr->obj == obj && (part == tr->part || part == LV_OBJ_PART_ALL)) {
+			trans_anim_cb(tr, 255);
+		}
+	}
+
+	/*Free all related transition data*/
+	trans_del(obj, part, 0xFF);
+}
+#endif
+
 /**
  * Set a an event handler function for an object.
  * Used by the user to react on event which happens with the object.
