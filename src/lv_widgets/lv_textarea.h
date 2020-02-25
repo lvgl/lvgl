@@ -47,7 +47,8 @@ typedef struct
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * label;            /*Label of the text area*/
-    lv_obj_t * placeholder;      /*Place holder label. only visible if text is an empty string*/
+    char * placeholder_txt;      /*Place holder label. only visible if text is an empty string*/
+    lv_style_list_t style_placeholder;
     char * pwd_tmp;              /*Used to store the original text in password mode*/
     const char * accapted_chars; /*Only these characters will be accepted. NULL: accept all*/
     uint16_t max_length;         /*The max. number of characters. 0: no limit*/
@@ -82,10 +83,10 @@ enum {
     LV_TEXTAREA_PART_SCRLBAR = LV_PAGE_PART_SCRLBAR, /**< Scrollbar style */
     LV_TEXTAREA_PART_EDGE_FLASH = LV_PAGE_PART_EDGE_FLASH, /**< Edge flash style */
     LV_TEXTAREA_PART_CURSOR = _LV_PAGE_PART_VIRTUAL_LAST, /**< Cursor style */
+    LV_TEXTAREA_PART_PLACEHOLDER, /**< Placeholder style */
     _LV_TEXTAREA_PART_VIRTUAL_LAST,
 
-    LV_TEXTAREA_PART_PLACEHOLDER = _LV_PAGE_PART_REAL_LAST, /**< Placeholder style */
-    _LV_TEXTAREA_PART_REAL_LAST,
+    _LV_TEXTAREA_PART_REAL_LAST = _LV_PAGE_PART_REAL_LAST,
 };
 typedef uint8_t lv_textarea_style_t;
 
