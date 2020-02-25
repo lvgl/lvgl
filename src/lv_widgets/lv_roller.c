@@ -96,10 +96,9 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_obj_set_signal_cb(roller, lv_roller_signal);
     lv_obj_set_design_cb(roller, lv_roller_design);
 
-
-
     /*Init the new roller roller*/
     if(copy == NULL) {
+
         lv_obj_t * label = lv_label_create(roller, NULL);
         lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
 
@@ -111,13 +110,11 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
 
-
         lv_obj_clean_style_list(roller, LV_PAGE_PART_SCRL); /*Use a transparent scrollable*/
         lv_theme_apply(roller, LV_THEME_ROLLER);
         refr_height(roller);
 
         lv_roller_set_visible_row_count(roller, 4);
-
     }
     /*Copy an existing roller*/
     else {
@@ -148,6 +145,7 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
     LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
     LV_ASSERT_STR(options);
 
+
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_obj_t * label = get_label(roller);
 
@@ -169,7 +167,7 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
         ext->mode = LV_ROLLER_MODE_INIFINITE;
 
         size_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
-        char * opt_extra = lv_mem_alloc(opt_len * LV_ROLLER_INF_PAGES);
+        char * opt_extra = lv_mem_buf_get(opt_len * LV_ROLLER_INF_PAGES);
         uint8_t i;
         for(i = 0; i < LV_ROLLER_INF_PAGES; i++) {
             strcpy(&opt_extra[opt_len * i], options);
@@ -177,7 +175,7 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
         }
         opt_extra[opt_len * LV_ROLLER_INF_PAGES - 1] = '\0';
         lv_label_set_text(label, opt_extra);
-        lv_mem_free(opt_extra);
+        lv_mem_buf_release(opt_extra);
 
         ext->sel_opt_id     = ((LV_ROLLER_INF_PAGES / 2) + 1) * ext->option_cnt;
 
@@ -245,6 +243,7 @@ void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt)
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(roller, LV_ROLLER_PART_BG);
     lv_obj_set_height(roller, (lv_font_get_line_height(font) + line_space) * row_cnt);
 
+    refr_height(roller);
     refr_position(roller, LV_ANIM_OFF);
 }
 
@@ -439,7 +438,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         lv_get_style_info_t * info = param;
         info->result = lv_roller_get_style(roller, info->part);
         if(info->result != NULL) return LV_RES_OK;
-        return LV_RES_OK;
+        else return ancestor_signal(roller, sign, param);
     }
 
     /*Don't let the drop down list to handle the control signals. It works differently*/
@@ -516,7 +515,9 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             }
         }
     }
-
+    else if(sign == LV_SIGNAL_CLEANUP) {
+       lv_obj_clean_style_list(roller, LV_ROLLER_PART_SEL);
+    }
     return res;
 }
 
@@ -835,7 +836,9 @@ static void inf_normalize(void * scrl)
 
 static lv_obj_t * get_label(const lv_obj_t * roller)
 {
-    return lv_obj_get_child(lv_page_get_scrl(roller), NULL);
+    lv_obj_t * scrl = lv_page_get_scrl(roller);
+    if(scrl == NULL) return NULL;   /*The roller is being deleted, the scrollable already not exists*/
+    return lv_obj_get_child(scrl, NULL);
 }
 
 #if LV_USE_ANIMATION

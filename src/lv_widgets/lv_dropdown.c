@@ -534,6 +534,7 @@ void lv_dropdown_close(lv_obj_t * ddlist, lv_anim_enable_t anim)
     ext->pr_opt_id = LV_DROPDOWN_PR_NONE;
 
     if(ext->anim_time == 0 || anim == LV_ANIM_OFF) {
+        lv_anim_del(ddlist, list_anim);
         lv_obj_del(ext->page);
         ext->page = NULL;
     } else {
@@ -547,7 +548,10 @@ void lv_dropdown_close(lv_obj_t * ddlist, lv_anim_enable_t anim)
             lv_anim_set_time(&a, ext->anim_time);
             lv_anim_set_ready_cb(&a, close_anim_ready);
             lv_anim_start(&a);
-
+        } else {
+            lv_anim_del(ddlist, list_anim);
+            lv_obj_del(ext->page);
+            ext->page = NULL;
         }
 #endif
     }

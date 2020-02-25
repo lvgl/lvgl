@@ -607,7 +607,6 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
         info->result = lv_bar_get_style(bar, info->part);
         if(info->result != NULL) return LV_RES_OK;
         else return ancestor_signal(bar, sign, param);
-        return LV_RES_OK;
     }
 
     /* Include the ancient signal function */
