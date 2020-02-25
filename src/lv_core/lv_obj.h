@@ -716,12 +716,14 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state);
  */
 void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
 
+#if LV_USE_ANIMATION
 /**
  * Finish all pending transitions on a part of an object
  * @param obj pointer to an object
  * @param part part of the object, e.g `LV_BRN_PART_MAIN` or `LV_OBJ_PART_ALL` for all parts
  */
 void lv_obj_finish_transitions(lv_obj_t * obj, uint8_t part);
+#endif
 
 /**
  * Set a an event handler function for an object.

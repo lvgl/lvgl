@@ -1604,6 +1604,7 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
     }
 }
 
+#if LV_USE_ANIMATION
 /**
  * Finish all pending transitions on a part of an object
  * @param obj pointer to an object
@@ -1623,6 +1624,7 @@ void lv_obj_finish_transitions(lv_obj_t * obj, uint8_t part)
 	/*Free all related transition data*/
 	trans_del(obj, part, 0xFF);
 }
+#endif
 
 /**
  * Set a an event handler function for an object.
