@@ -252,7 +252,7 @@ enum {
     LV_OBJ_PART_MAIN,
     _LV_OBJ_PART_VIRTUAL_LAST = 0x01,
     _LV_OBJ_PART_REAL_LAST =    0x40,
-    _LV_OBJ_PART_ALL = 0xFF,
+    LV_OBJ_PART_ALL = 0xFF,
 };
 
 typedef uint8_t lv_obj_part_t;
@@ -715,6 +715,13 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state);
  * @param state the state bits to remove. E.g `LV_STATE_PRESSED | LV_STATE_FOCUSED`
  */
 void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
+
+/**
+ * Finish all pending transitions on a part of an object
+ * @param obj pointer to an object
+ * @param part part of the object, e.g `LV_BRN_PART_MAIN` or `LV_OBJ_PART_ALL` for all parts
+ */
+void lv_obj_finish_transitions(lv_obj_t * obj, uint8_t part);
 
 /**
  * Set a an event handler function for an object.
@@ -1265,8 +1272,6 @@ bool lv_obj_is_focused(const lv_obj_t * obj);
  * @return LV_RES_OK
  */
 lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name);
-
-
 
 /**
  * Initialize a rectangle descriptor from an object's styles
