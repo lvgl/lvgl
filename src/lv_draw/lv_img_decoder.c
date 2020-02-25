@@ -287,6 +287,10 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
         if(res == LV_FS_RES_OK) {
             res = lv_fs_read(&file, header, sizeof(lv_img_header_t), &rn);
             lv_fs_close(&file);
+            if(res != LV_FS_RES_OK || rn != sizeof(lv_img_header_t)) {
+                LV_LOG_WARN("Image get info get read file header");
+                return LV_RES_INV;
+            }
         }
 
         if(header->cf < CF_BUILT_IN_FIRST || header->cf > CF_BUILT_IN_LAST) return LV_RES_INV;
@@ -643,9 +647,8 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
 #endif
     }
 
-    uint8_t val_act;
     for(i = 0; i < len; i++) {
-        val_act = (*data_tmp & (mask << pos)) >> pos;
+        uint8_t val_act = (*data_tmp & (mask << pos)) >> pos;
 
         buf[i * LV_IMG_PX_SIZE_ALPHA_BYTE + LV_IMG_PX_SIZE_ALPHA_BYTE - 1] =
             dsc->header.cf == LV_IMG_CF_ALPHA_8BIT ? val_act : opa_table[val_act];
@@ -729,10 +732,9 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
 #endif
     }
 
-    uint8_t val_act;
     lv_coord_t i;
     for(i = 0; i < len; i++) {
-        val_act = (*data_tmp & (mask << pos)) >> pos;
+        uint8_t val_act = (*data_tmp & (mask << pos)) >> pos;
 
         lv_color_t color = user_data->palette[val_act];
 #if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1

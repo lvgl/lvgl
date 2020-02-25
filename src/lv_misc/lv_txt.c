@@ -102,7 +102,6 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
 
     uint32_t line_start     = 0;
     uint32_t new_line_start = 0;
-    lv_coord_t act_line_length;
     uint16_t letter_height = lv_font_get_line_height(font);
 
     /*Calc. the height and longest line*/
@@ -112,7 +111,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
         size_res->y += line_space;
 
         /*Calculate the the longest line*/
-        act_line_length = lv_txt_get_width(&text[line_start], new_line_start - line_start, font, letter_space, flag);
+        lv_coord_t act_line_length = lv_txt_get_width(&text[line_start], new_line_start - line_start, font, letter_space, flag);
 
         size_res->x = LV_MATH_MAX(act_line_length, size_res->x);
         line_start  = new_line_start;
@@ -340,13 +339,11 @@ lv_coord_t lv_txt_get_width(const char * txt, uint16_t length, const lv_font_t *
     uint32_t i                   = 0;
     lv_coord_t width             = 0;
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
-    uint32_t letter;
-    uint32_t letter_next;
 
     if(length != 0) {
         while(i < length) {
-            letter      = lv_txt_encoded_next(txt, &i);
-            letter_next = lv_txt_encoded_next(&txt[i], NULL);
+            uint32_t letter      = lv_txt_encoded_next(txt, &i);
+            uint32_t letter_next = lv_txt_encoded_next(&txt[i], NULL);
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
                 if(lv_txt_is_cmd(&cmd_state, letter) != false) {
                     continue;

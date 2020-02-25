@@ -254,11 +254,13 @@ void lv_label_set_text_fmt(lv_obj_t * label, const char * fmt, ...)
     uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
 
     va_end(ap);
-    
 
     ext->text = lv_mem_alloc(len+1);
     LV_ASSERT_MEM(ext->text);
-    if(ext->text == NULL) return;
+    if(ext->text == NULL) {
+        va_end(ap2);
+        return;
+    }
     ext->text[len-1] = 0; /* Ensure NULL termination */
 
     lv_vsnprintf(ext->text, len+1, fmt, ap2);
@@ -736,16 +738,14 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 
     uint32_t i = 0;
     uint32_t i_act = i;
-    uint32_t letter;
-    uint32_t letter_next;
 
     if(new_line_start > 0) {
         while(i + line_start < new_line_start) {
             /* Get the current letter.*/
-            letter = lv_txt_encoded_next(bidi_txt, &i);
+            uint32_t letter = lv_txt_encoded_next(bidi_txt, &i);
 
             /*Get the next letter too for kerning*/
-            letter_next = lv_txt_encoded_next(&bidi_txt[i], NULL);
+            uint32_t letter_next = lv_txt_encoded_next(&bidi_txt[i], NULL);
 
             /*Handle the recolor command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {

@@ -163,11 +163,10 @@ lv_fs_res_t lv_fs_close(lv_fs_file_t * file_p)
 lv_fs_res_t lv_fs_remove(const char * path)
 {
     if(path == NULL) return LV_FS_RES_INV_PARAM;
-    lv_fs_drv_t * drv = NULL;
 
     char letter = path[0];
 
-    drv = lv_fs_get_drv(letter);
+    lv_fs_drv_t * drv = lv_fs_get_drv(letter);
     if(drv == NULL) return LV_FS_RES_NOT_EX;
     if(drv->ready_cb != NULL) {
         if(drv->ready_cb(drv) == false) return LV_FS_RES_HW_ERR;

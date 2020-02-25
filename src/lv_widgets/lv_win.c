@@ -119,14 +119,13 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         strcpy(ext->title_txt, copy_ext->title_txt);
         ext->page     = lv_page_create(new_win, copy_ext->page);
 
-        /*Copy the control buttons*/
+        /*Copy the buttons*/
         lv_obj_t * child;
-        lv_obj_t * cbtn;
         child = lv_obj_get_child_back(copy_ext->header, NULL);
         child = lv_obj_get_child_back(copy_ext->header, child); /*Sip the title*/
         while(child != NULL) {
-            cbtn = lv_btn_create(ext->header, child);
-            lv_img_create(cbtn, lv_obj_get_child(child, NULL));
+            lv_obj_t * btn = lv_btn_create(ext->header, child);
+            lv_img_create(btn, lv_obj_get_child(child, NULL));
             child = lv_obj_get_child_back(copy_ext->header, child);
         }
 

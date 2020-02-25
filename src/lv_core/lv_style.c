@@ -812,7 +812,6 @@ lv_res_t lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop,
     attr.full = prop >> 8;
     int16_t weight_goal = attr.full;
 
-    int16_t weight_act;
     int16_t weight = -1;
 
     lv_style_int_t value_act = 0;
@@ -820,7 +819,8 @@ lv_res_t lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop,
     int16_t ci;
     for(ci = 0; ci < list->style_cnt; ci++) {
         lv_style_t * class = lv_style_list_get_style(list, ci);
-        weight_act = _lv_style_get_int(class, prop, &value_act);
+        int16_t weight_act = _lv_style_get_int(class, prop, &value_act);
+
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
             *res = value_act;
@@ -864,7 +864,6 @@ lv_res_t lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t pro
     attr.full = prop >> 8;
     int16_t weight_goal = attr.full;
 
-    int16_t weight_act;
     int16_t weight = -1;
 
     lv_color_t value_act = { 0 };
@@ -872,7 +871,7 @@ lv_res_t lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t pro
     int16_t ci;
     for(ci = 0; ci < list->style_cnt; ci++) {
         lv_style_t * class = lv_style_list_get_style(list, ci);
-        weight_act = _lv_style_get_color(class, prop, &value_act);
+        int16_t weight_act = _lv_style_get_color(class, prop, &value_act);
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
             *res = value_act;
@@ -915,7 +914,6 @@ lv_res_t lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop,
     attr.full = prop >> 8;
     int16_t weight_goal = attr.full;
 
-    int16_t weight_act;
     int16_t weight = -1;
 
     lv_opa_t value_act = LV_OPA_TRANSP;
@@ -923,7 +921,7 @@ lv_res_t lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop,
     int16_t ci;
     for(ci = 0; ci < list->style_cnt; ci++) {
         lv_style_t * class = lv_style_list_get_style(list, ci);
-        weight_act = _lv_style_get_opa(class, prop, &value_act);
+        int16_t weight_act = _lv_style_get_opa(class, prop, &value_act);
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
             *res = value_act;
@@ -966,7 +964,6 @@ lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop,
     attr.full = prop >> 8;
     int16_t weight_goal = attr.full;
 
-    int16_t weight_act;
     int16_t weight = -1;
 
     void * value_act = NULL;
@@ -974,7 +971,7 @@ lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop,
     int16_t ci;
     for(ci = 0; ci < list->style_cnt; ci++) {
         lv_style_t * class = lv_style_list_get_style(list, ci);
-        weight_act = _lv_style_get_ptr(class, prop, &value_act);
+        int16_t weight_act = _lv_style_get_ptr(class, prop, &value_act);
         /*On perfect match return the value immediately*/
         if(weight_act == weight_goal) {
             *res = value_act;

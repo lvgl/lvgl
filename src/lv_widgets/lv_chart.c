@@ -776,9 +776,6 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
     lv_coord_t h     = lv_area_get_height(series_area);
     lv_coord_t x_ofs = series_area->x1;
     lv_coord_t y_ofs = series_area->y1;
-    int32_t y_tmp;
-    lv_coord_t p_prev;
-    lv_coord_t p_act;
     lv_chart_series_t * ser;
 
     lv_area_t series_mask;
@@ -824,9 +821,9 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
         p1.x = 0 + x_ofs;
         p2.x = 0 + x_ofs;
 
-        p_act = start_point;
-        p_prev = start_point;
-        y_tmp  = (int32_t)((int32_t)ser->points[p_prev] - ext->ymin) * h;
+        lv_coord_t p_act = start_point;
+        lv_coord_t p_prev = start_point;
+        int32_t y_tmp = (int32_t)((int32_t)ser->points[p_prev] - ext->ymin) * h;
         y_tmp  = y_tmp / (ext->ymax - ext->ymin);
         p2.y   = h - y_tmp + y_ofs;
 
@@ -939,11 +936,9 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
     bool mask_ret = lv_area_intersect(&series_mask, series_area, clip_area);
     if(mask_ret == false) return;
 
-    lv_coord_t x_act;
-
     /*Go through all points*/
     for(i = 0; i < ext->point_cnt; i++) {
-        x_act = (int32_t)((int32_t)w * i) / ext->point_cnt;
+        lv_coord_t x_act = (int32_t)((int32_t)w * i) / ext->point_cnt;
         x_act += series_area->x1 + x_ofs;
 
         /*Draw the current point of all data line*/

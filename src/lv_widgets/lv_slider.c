@@ -255,18 +255,20 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
     if(sign == LV_SIGNAL_PRESSED) {
         ext->dragging = true;
-		if(lv_slider_get_type(slider) == LV_SLIDER_TYPE_RANGE) {
-			lv_indev_get_point(param, &p);
-			bool hor = lv_obj_get_width(slider) >= lv_obj_get_height(slider);
+        if(lv_slider_get_type(slider) == LV_SLIDER_TYPE_NORMAL) {
+            ext->value_to_set = &ext->bar.cur_value;
+        } else if(lv_slider_get_type(slider) == LV_SLIDER_TYPE_RANGE) {
+            lv_indev_get_point(param, &p);
+            bool hor = lv_obj_get_width(slider) >= lv_obj_get_height(slider);
 
-			lv_coord_t dist_left, dist_right;
-			if(hor) {
-			    if(p.x > ext->right_knob_area.x2) {
-			        ext->value_to_set = &ext->bar.cur_value;
-			    }
-			    else if(p.x < ext->left_knob_area.x1) {
+            lv_coord_t dist_left, dist_right;
+            if(hor) {
+                if(p.x > ext->right_knob_area.x2) {
+                    ext->value_to_set = &ext->bar.cur_value;
+                }
+                else if(p.x < ext->left_knob_area.x1) {
                     ext->value_to_set = &ext->bar.start_value;
-			    } else {
+                } else {
                     /* Calculate the distance from each knob */
                     dist_left = LV_MATH_ABS((ext->left_knob_area.x1+(ext->left_knob_area.x2 - ext->left_knob_area.x1)/2) - p.x);
                     dist_right = LV_MATH_ABS((ext->right_knob_area.x1+(ext->right_knob_area.x2 - ext->right_knob_area.x1)/2) - p.x);
@@ -274,14 +276,24 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
                     /* Use whichever one is closer */
                     if(dist_right < dist_left)ext->value_to_set = &ext->bar.cur_value;
                     else ext->value_to_set = &ext->bar.start_value;
-			    }
-			} else {
-				dist_left = LV_MATH_ABS((ext->left_knob_area.y1+(ext->left_knob_area.y2 - ext->left_knob_area.y1)/2) - p.y);
-				dist_right = LV_MATH_ABS((ext->right_knob_area.y1+(ext->right_knob_area.y2 - ext->right_knob_area.y1)/2) - p.y);
-			}
+                }
+            } else {
+                if(p.y < ext->right_knob_area.y1) {
+                    ext->value_to_set = &ext->bar.cur_value;
+                }
+                else if(p.y > ext->left_knob_area.y2) {
+                    ext->value_to_set = &ext->bar.start_value;
+                } else {
+                    /* Calculate the distance from each knob */
+                    dist_left = LV_MATH_ABS((ext->left_knob_area.y1+(ext->left_knob_area.y2 - ext->left_knob_area.y1)/2) - p.y);
+                    dist_right = LV_MATH_ABS((ext->right_knob_area.y1+(ext->right_knob_area.y2 - ext->right_knob_area.y1)/2) - p.y);
 
-		} else
-			ext->value_to_set = &ext->bar.cur_value;
+                    /* Use whichever one is closer */
+                    if(dist_right < dist_left)ext->value_to_set = &ext->bar.cur_value;
+                    else ext->value_to_set = &ext->bar.start_value;
+                }
+            }
+        }
     } else if(sign == LV_SIGNAL_PRESSING && ext->value_to_set != NULL) {
         lv_indev_get_point(param, &p);
 
@@ -298,11 +310,11 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         int16_t real_max_value = ext->bar.max_value;
         int16_t real_min_value = ext->bar.min_value;
 
-	    if(w >= h) {
-	        lv_coord_t indic_w = w - bg_left - bg_right;
-	        new_value = p.x - (slider->coords.x1 + bg_left); /*Make the point relative to the indicator*/
-	        new_value = (new_value * range) / indic_w;
-	        new_value += ext->bar.min_value;
+        if(w >= h) {
+            lv_coord_t indic_w = w - bg_left - bg_right;
+            new_value = p.x - (slider->coords.x1 + bg_left); /*Make the point relative to the indicator*/
+            new_value = (new_value * range) / indic_w;
+            new_value += ext->bar.min_value;
 	    } else {
 	        lv_coord_t indic_h = h - bg_bottom - bg_top;
 	        new_value = p.y - (slider->coords.y2 + bg_bottom); /*Make the point relative to the indicator*/

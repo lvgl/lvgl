@@ -292,7 +292,7 @@ void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint16_t bu
     }
 
     uint16_t c;
-    for(c = 0; opt_txt[i] != '\n' && i < txt_len; c++, i++) {
+    for(c = 0; i < txt_len && opt_txt[i] != '\n'; c++, i++) {
         if(buf_size && c >= buf_size - 1) {
             LV_LOG_WARN("lv_dropdown_get_selected_str: the buffer was too small")
             break;
@@ -758,9 +758,8 @@ static lv_res_t release_handler(lv_obj_t * roller)
         uint32_t i_prev   = 0;
 
         uint32_t letter_cnt = 0;
-        uint32_t letter;
         for(letter_cnt = 0; letter_cnt < letter_i; letter_cnt++) {
-            letter = lv_txt_encoded_next(txt, &i);
+            uint32_t letter = lv_txt_encoded_next(txt, &i);
             /*Count he lines to reach the clicked letter. But ignore the last '\n' because it
              * still belongs to the clicked line*/
             if(letter == '\n' && i_prev != letter_i) new_opt++;

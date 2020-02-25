@@ -646,18 +646,14 @@ static inline bool transform_anti_alias(lv_img_transform_dsc_t * dsc)
             a01 = lv_img_buf_get_px_alpha(&dsc->tmp.img_dsc, dsc->tmp.xs_int, dsc->tmp.ys_int + yn);
             a11 = lv_img_buf_get_px_alpha(&dsc->tmp.img_dsc, dsc->tmp.xs_int + xn, dsc->tmp.ys_int + yn);
         }
-
     }
 
-    lv_opa_t a0;
-    lv_opa_t a1;
     lv_opa_t xr0 = xr;
     lv_opa_t xr1 = xr;
     if(dsc->tmp.has_alpha) {
-        a0 = (a00 * xr + (a10 * (255 - xr))) >> 8;
-        a1 = (a01 * xr + (a11 * (255 - xr))) >> 8;
+        lv_opa_t a0 = (a00 * xr + (a10 * (255 - xr))) >> 8;
+        lv_opa_t a1 = (a01 * xr + (a11 * (255 - xr))) >> 8;
         dsc->res.opa = (a0 * yr + (a1 * (255 - yr))) >> 8;
-
 
         if(a0 <= LV_OPA_MIN && a1 <= LV_OPA_MIN) return false;
         if(a0 <= LV_OPA_MIN) yr = LV_OPA_TRANSP;
@@ -666,7 +662,6 @@ static inline bool transform_anti_alias(lv_img_transform_dsc_t * dsc)
         if(a10 <= LV_OPA_MIN) xr0 = LV_OPA_COVER;
         if(a01 <= LV_OPA_MIN) xr1 = LV_OPA_TRANSP;
         if(a11 <= LV_OPA_MIN) xr1 = LV_OPA_COVER;
-
     } else {
         xr0 = xr;
         xr1 = xr;

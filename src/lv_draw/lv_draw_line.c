@@ -169,10 +169,9 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
 
         lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
         int32_t h;
-        lv_draw_mask_res_t mask_res;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
              memset(mask_buf, LV_OPA_COVER, draw_area_w);
-             mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
              if(dashed) {
                  if(mask_res != LV_DRAW_MASK_RES_FULL_TRANSP) {
@@ -266,10 +265,9 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
         lv_style_int_t dash_cnt = dash_start;
 
         int32_t h;
-        lv_draw_mask_res_t mask_res;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
              memset(mask_buf, LV_OPA_COVER, draw_area_w);
-             mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
              if(dashed) {
                  if(mask_res != LV_DRAW_MASK_RES_FULL_TRANSP) {
@@ -390,7 +388,6 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
 
     /*Draw the background line by line*/
     int32_t h;
-    lv_draw_mask_res_t mask_res;
     lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
     lv_area_t fill_area;
     fill_area.x1 = draw_area.x1 + disp_area->x1;
@@ -401,14 +398,14 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     /*Fill the first row with 'color'*/
     for(h = draw_area.y1; h <= draw_area.y2; h++) {
         memset(mask_buf, LV_OPA_COVER, draw_area_w);
-         mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+        lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
-         lv_blend_fill(clip, &fill_area,
-                 dsc->color, mask_buf, mask_res, opa,
-                 dsc->blend_mode);
+        lv_blend_fill(clip, &fill_area,
+                dsc->color, mask_buf, mask_res, opa,
+                dsc->blend_mode);
 
-         fill_area.y1++;
-         fill_area.y2++;
+        fill_area.y1++;
+        fill_area.y2++;
     }
 
     lv_mem_buf_release(mask_buf);

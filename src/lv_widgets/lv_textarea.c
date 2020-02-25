@@ -1664,9 +1664,9 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
     /*Accepted character?*/
     if(ext->accapted_chars) {
         uint32_t i = 0;
-        uint32_t a;
+
         while(ext->accapted_chars[i] != '\0') {
-            a = lv_txt_encoded_next(ext->accapted_chars, &i);
+            uint32_t a = lv_txt_encoded_next(ext->accapted_chars, &i);
             if(a == c) return true; /*Accepted*/
         }
 

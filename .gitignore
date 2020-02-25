@@ -4,3 +4,4 @@
 **/*.swo
 tags
 docs/api_doc
+scripts/cppcheck_res.txt

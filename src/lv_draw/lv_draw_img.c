@@ -348,7 +348,6 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         lv_color_t c;
         lv_color_t chroma_keyed_color = LV_COLOR_TRANSP;
         uint32_t px_i = 0;
-        uint32_t px_i_start;
 
         const uint8_t * map_px;
 
@@ -393,7 +392,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         int32_t y;
         for(y = 0; y < lv_area_get_height(&draw_area); y++) {
             map_px = map_buf_tmp;
-            px_i_start = px_i;
+            uint32_t px_i_start = px_i;
 
             for(x = 0; x < lv_area_get_width(&draw_area); x++, map_px += px_size_byte, px_i++) {
 

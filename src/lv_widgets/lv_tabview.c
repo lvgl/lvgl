@@ -169,11 +169,9 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB), lv_obj_get_style_list(copy, LV_TABVIEW_PART_TAB));
 
         uint16_t i;
-        lv_obj_t * new_tab;
-        lv_obj_t * copy_tab;
         for(i = 0; i < copy_ext->tab_cnt; i++) {
-            new_tab  = lv_tabview_add_tab(tabview, copy_ext->tab_name_ptr[i]);
-            copy_tab = lv_tabview_get_tab(copy, i);
+            lv_obj_t * new_tab = lv_tabview_add_tab(tabview, copy_ext->tab_name_ptr[i]);
+            lv_obj_t * copy_tab = lv_tabview_get_tab(copy, i);
             lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCRL), lv_obj_get_style_list(copy_tab, LV_PAGE_PART_SCRL));
             lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCRLBAR), lv_obj_get_style_list(copy_tab, LV_PAGE_PART_SCRLBAR));
             lv_obj_refresh_style(new_tab);

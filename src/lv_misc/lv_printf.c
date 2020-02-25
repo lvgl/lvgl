@@ -38,6 +38,8 @@
 #include <stdint.h>
 
 
+#define PRINTF_DISABLE_SUPPORT_FLOAT    1
+
 // 'ntoa' conversion buffer size, this must be big enough to hold one converted
 // numeric number including padded zeros (dynamically created on stack)
 // default: 32 byte

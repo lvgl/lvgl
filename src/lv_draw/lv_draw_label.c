@@ -208,8 +208,6 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
         /*Write all letter of a line*/
         cmd_state = CMD_STATE_WAIT;
         i         = 0;
-        uint32_t letter;
-        uint32_t letter_next;
 #if LV_USE_BIDI
         char *bidi_txt = lv_mem_buf_get(line_end - line_start + 1);
         lv_bidi_process_paragraph(txt + line_start, bidi_txt, line_end - line_start, dsc->bidi_dir, NULL, 0);
@@ -229,9 +227,8 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
 #endif
             }
 
-            letter      = lv_txt_encoded_next(bidi_txt, &i);
-            letter_next = lv_txt_encoded_next(&bidi_txt[i], NULL);
-
+            uint32_t letter      = lv_txt_encoded_next(bidi_txt, &i);
+            uint32_t letter_next = lv_txt_encoded_next(&bidi_txt[i], NULL);
 
             /*Handle the re-color command*/
             if((dsc->flag & LV_TXT_FLAG_RECOLOR) != 0) {
@@ -465,7 +462,6 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
     uint32_t mask_buf_size = box_w * box_h > LV_HOR_RES_MAX ? box_w * box_h : LV_HOR_RES_MAX;
     lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
     int32_t mask_p = 0;
-    int32_t mask_p_start;
 
     lv_area_t fill_area;
     fill_area.x1 = col_start + pos_x;
@@ -477,7 +473,8 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
 
     for(row = row_start ; row < row_end; row++) {
         bitmask = bitmask_init >> col_bit;
-        mask_p_start = mask_p;
+
+        int32_t mask_p_start = mask_p;
         for(col = col_start; col < col_end; col++) {
 
             /*Load the pixel's opacity into the mask*/
@@ -605,7 +602,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     int32_t mask_buf_size = box_w * box_h > LV_HOR_RES_MAX ? g->box_w * g->box_h : LV_HOR_RES_MAX;
     lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
     int32_t mask_p = 0;
-    int32_t mask_p_start;
+
     lv_color_t * color_buf = lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
 
     lv_disp_t * disp    = lv_refr_get_disp_refreshing();
@@ -639,7 +636,8 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     for(row = row_start ; row < row_end; row++) {
         uint32_t subpx_cnt = 0;
         bitmask = bitmask_init >> col_bit;
-        mask_p_start = mask_p;
+        int32_t mask_p_start = mask_p;
+
         for(col = col_start; col < col_end; col++) {
             /*Load the pixel's opacity into the mask*/
             letter_px = (*map_p & bitmask) >> (8 - col_bit - bpp);

@@ -136,10 +136,10 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
 
     /*If the border fully covers make the bg area 1px smaller to avoid artifacts on the corners*/
     if(dsc->border_width > 1 && dsc->border_opa >= LV_OPA_MAX && dsc->radius != 0) {
-        coords_bg.x1 += dsc->border_side & LV_BORDER_SIDE_LEFT ? 1 : 0;
-        coords_bg.y1 += dsc->border_side & LV_BORDER_SIDE_TOP ? 1 : 0;
-        coords_bg.x2 -= dsc->border_side & LV_BORDER_SIDE_RIGHT ? 1 : 0;
-        coords_bg.y2 -= dsc->border_side & LV_BORDER_SIDE_BOTTOM ? 1 : 0;
+        coords_bg.x1 += (dsc->border_side & LV_BORDER_SIDE_LEFT) ? 1 : 0;
+        coords_bg.y1 += (dsc->border_side & LV_BORDER_SIDE_TOP) ? 1 : 0;
+        coords_bg.x2 -= (dsc->border_side & LV_BORDER_SIDE_RIGHT) ? 1 : 0;
+        coords_bg.y2 -= (dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? 1 : 0;
     }
 
     lv_opa_t opa = dsc->bg_opa;
@@ -615,8 +615,6 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_dra
     else if(dsc->shadow_ofs_x != 0 || dsc->shadow_ofs_y != 0) simple_mode = false;
     else if(dsc->shadow_spread != 0) simple_mode = false;
 
-    int32_t y_max;
-
     /*Create a mask*/
     lv_draw_mask_res_t mask_res;
     lv_opa_t * mask_buf = lv_mem_buf_get(lv_area_get_width(&sh_rect_area));
@@ -624,8 +622,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_dra
     lv_draw_mask_radius_param_t mask_rout_param;
     lv_draw_mask_radius_init(&mask_rout_param, &bg_coords, r_bg, true);
 
-    int16_t mask_rout_id = LV_MASK_ID_INV;
-    mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
+    int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
 
     lv_area_t a;
 
@@ -838,10 +835,9 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_dra
     }
 
     if(a.x1 <= a.x2) {
-
         sh_buf_tmp = sh_buf + corner_size - 1;
 
-        y_max = corner_size - ver_mid_dist;
+        int32_t y_max = corner_size - ver_mid_dist;
         if(simple_mode) {
             y_max = sw / 2 + 1;
             if(y_max > corner_size - ver_mid_dist) y_max = corner_size - ver_mid_dist;
@@ -925,7 +921,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, 
 
     lv_area_t sh_area;
     lv_area_copy(&sh_area, coords);
-    sh_area.x2 = sw / 2 + r -1  - (sw & 1 ? 0 : 1);
+    sh_area.x2 = sw / 2 + r -1  - ((sw & 1) ? 0 : 1);
     sh_area.y1 = sw / 2 + 1;
 
     sh_area.x1 = sh_area.x2 - lv_area_get_width(coords);
@@ -940,13 +936,12 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, 
     else sw = sw_ori >> 1;
 #endif
 
-    lv_draw_mask_res_t mask_res;
     int32_t y;
     lv_opa_t * mask_line = lv_mem_buf_get(size);
     uint16_t * sh_ups_tmp_buf = (uint16_t *)sh_buf;
     for(y = 0; y < size; y++) {
         memset(mask_line, 0xFF, size);
-        mask_res = mask_param.dsc.cb(mask_line, 0, y, size, &mask_param);
+        lv_draw_mask_res_t mask_res = mask_param.dsc.cb(mask_line, 0, y, size, &mask_param);
         if(mask_res == LV_DRAW_MASK_RES_FULL_TRANSP) {
             memset(sh_ups_tmp_buf, 0x00, size * sizeof(sh_ups_tmp_buf[0]));
         } else {
@@ -1144,10 +1139,9 @@ static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, lv_dr
     lv_draw_mask_radius_init(&mask_rin_param, &area_inner, rin, true);
     int16_t mask_rin_id = lv_draw_mask_add(&mask_rin_param, NULL);
 
-    int16_t mask_rout_id = LV_MASK_ID_INV;
     lv_draw_mask_radius_param_t mask_rout_param;
     lv_draw_mask_radius_init(&mask_rout_param, &area_outer, rout, false);
-    mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
+    int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
 
     lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
 

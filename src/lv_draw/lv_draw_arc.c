@@ -384,7 +384,7 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness,
     const uint8_t pa = 127;
 
     int32_t thick_half = tickness / 2;
-    uint8_t thick_corr = tickness & 0x01 ? 0 : 1;
+    uint8_t thick_corr = (tickness & 0x01) ? 0 : 1;
 
     int32_t rx_corr;
     int32_t ry_corr;

@@ -61,10 +61,8 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("image create started");
 
-    lv_obj_t * img = NULL;
-
     /*Create a basic object*/
-    img = lv_obj_create(par, copy);
+    lv_obj_t * img = lv_obj_create(par, copy);
     LV_ASSERT_MEM(img);
     if(img == NULL) return NULL;
 

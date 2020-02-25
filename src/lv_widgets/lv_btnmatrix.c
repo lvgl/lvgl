@@ -182,17 +182,15 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
 
     /* Count the units and the buttons in a line
      * (A button can be 1,2,3... unit wide)*/
-    uint16_t unit_cnt;           /*Number of units in a row*/
     uint16_t unit_act_cnt;       /*Number of units currently put in a row*/
-    uint16_t btn_cnt;            /*Number of buttons in a row*/
     uint16_t i_tot          = 0; /*Act. index in the str map*/
     uint16_t btn_i          = 0; /*Act. index of button areas*/
     const char ** map_p_tmp = map;
 
     /*Count the units and the buttons in a line*/
     while(1) {
-        unit_cnt = 0;
-        btn_cnt  = 0;
+        uint16_t unit_cnt = 0;           /*Number of units in a row*/
+        uint16_t btn_cnt = 0;            /*Number of buttons in a row*/
         /*Count the buttons in a line*/
         while(strcmp(map_p_tmp[btn_cnt], "\n") != 0 && strlen(map_p_tmp[btn_cnt]) != 0) { /*Check a line*/
             unit_cnt += get_button_width(ext->ctrl_bits[btn_i + btn_cnt]);
@@ -215,13 +213,12 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
             uint16_t i;
             lv_coord_t act_x;
 
-            lv_coord_t act_unit_w;
             unit_act_cnt = 0;
             for(i = 0; i < btn_cnt; i++) {
                 /* one_unit_w = all_unit_w / unit_cnt
                  * act_unit_w = one_unit_w * button_width
                  * do this two operations but the multiply first to divide a greater number */
-                act_unit_w = (all_unit_w * get_button_width(ext->ctrl_bits[btn_i])) / unit_cnt;
+                lv_coord_t act_unit_w = (all_unit_w * get_button_width(ext->ctrl_bits[btn_i])) / unit_cnt;
                 act_unit_w--; /*-1 because e.g. width = 100 means 101 pixels (0..100)*/
 
                 /*Always recalculate act_x because of rounding errors */
@@ -547,7 +544,7 @@ bool lv_btnmatrix_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnmatrix_ct
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
     if(btn_id >= ext->btn_cnt) return false;
 
-    return ext->ctrl_bits[btn_id] & ctrl ? true : false;
+    return (ext->ctrl_bits[btn_id] & ctrl) ? true : false;
 }
 
 
@@ -1074,32 +1071,32 @@ static uint8_t get_button_width(lv_btnmatrix_ctrl_t ctrl_bits)
 
 static bool button_is_hidden(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return ctrl_bits & LV_BTNMATRIX_CTRL_HIDDEN ? true : false;
+    return (ctrl_bits & LV_BTNMATRIX_CTRL_HIDDEN) ? true : false;
 }
 
 static bool button_is_repeat_disabled(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return ctrl_bits & LV_BTNMATRIX_CTRL_NO_REPEAT ? true : false;
+    return (ctrl_bits & LV_BTNMATRIX_CTRL_NO_REPEAT) ? true : false;
 }
 
 static bool button_is_inactive(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return ctrl_bits & LV_BTNMATRIX_CTRL_INACTIVE ? true : false;
+    return (ctrl_bits & LV_BTNMATRIX_CTRL_INACTIVE) ? true : false;
 }
 
 static bool button_is_click_trig(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return ctrl_bits & LV_BTNMATRIX_CTRL_CLICK_TRIG ? true : false;
+    return (ctrl_bits & LV_BTNMATRIX_CTRL_CLICK_TRIG) ? true : false;
 }
 
 static bool button_is_tgl_enabled(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return ctrl_bits & LV_BTNMATRIX_CTRL_CHECKABLE ? true : false;
+    return (ctrl_bits & LV_BTNMATRIX_CTRL_CHECKABLE) ? true : false;
 }
 
 static bool button_get_tgl_state(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return ctrl_bits & LV_BTNMATRIX_CTRL_CHECK_STATE ? true : false;
+    return (ctrl_bits & LV_BTNMATRIX_CTRL_CHECK_STATE) ? true : false;
 }
 
 /**

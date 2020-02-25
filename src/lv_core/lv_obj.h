@@ -227,7 +227,7 @@ typedef struct _lv_obj_t
     uint8_t adv_hittest     :1;  /**< 1: Use advanced hit-testing (slower) */
     uint8_t gesture_parent : 1;  /**< 1: Parent will be gesture instead*/
 
-    lv_drag_dir_t drag_dir  :2;  /**<  Which directions the object can be dragged in */
+    lv_drag_dir_t drag_dir  :3;  /**<  Which directions the object can be dragged in */
     lv_bidi_dir_t base_dir  :2;  /**< Base direction of texts related to this object */
 
 #if LV_USE_GROUP != 0

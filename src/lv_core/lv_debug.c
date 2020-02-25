@@ -122,7 +122,7 @@ bool lv_debug_check_str(const void * str)
     uint32_t rep = 0;
     uint32_t i;
 
-    for(i = 0; s[i] != '\0' && i < LV_DEBUG_STR_MAX_LENGTH; i++) {
+    for(i = 0; i < LV_DEBUG_STR_MAX_LENGTH && s[i] != '\0'; i++) {
         if(s[i] != last_byte) {
             last_byte = s[i];
             rep = 1;

@@ -256,7 +256,7 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
         lv_obj_set_pos(scrl, x_coord, y_coord);
     }
 
-    lv_res_t res = LV_RES_OK;
+    lv_res_t res;
     res          = lv_event_send(tileview, LV_EVENT_VALUE_CHANGED, &tile_id);
     if(res != LV_RES_OK) return; /*Prevent the tile loading*/
 

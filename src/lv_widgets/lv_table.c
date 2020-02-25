@@ -584,7 +584,6 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
         lv_table_ext_t * ext        = lv_obj_get_ext_attr(table);
 
-        lv_coord_t h_row;
         lv_point_t txt_size;
         lv_area_t cell_area;
         lv_area_t txt_area;
@@ -630,7 +629,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
         cell_area.y2 = table->coords.y1 + bg_top;
         for(row = 0; row < ext->row_cnt; row++) {
-            h_row = get_row_height(table, row, font, letter_space, line_space,
+            lv_coord_t h_row = get_row_height(table, row, font, letter_space, line_space,
             		cell_left, cell_right, cell_top, cell_bottom);
 
             cell_area.y1 = cell_area.y2 + 1;

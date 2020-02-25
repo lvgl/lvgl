@@ -156,7 +156,6 @@ lv_obj_t * lv_keyboard_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing keyboard*/
     else {
         lv_keyboard_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->ta                = NULL;
         ext->ta                = copy_ext->ta;
         ext->mode              = copy_ext->mode;
         ext->cursor_mng        = copy_ext->cursor_mng;

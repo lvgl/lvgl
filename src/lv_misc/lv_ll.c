@@ -105,7 +105,6 @@ void * lv_ll_ins_head(lv_ll_t * ll_p)
 void * lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)
 {
     lv_ll_node_t * n_new;
-    lv_ll_node_t * n_prev;
 
     if(NULL == ll_p || NULL == n_act) return NULL;
 
@@ -116,6 +115,7 @@ void * lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)
         n_new = lv_mem_alloc(ll_p->n_size + LL_NODE_META_SIZE);
         if(n_new == NULL) return NULL;
 
+        lv_ll_node_t * n_prev;
         n_prev = lv_ll_get_prev(ll_p, n_act);
         node_set_next(ll_p, n_prev, n_new);
         node_set_prev(ll_p, n_new, n_prev);
