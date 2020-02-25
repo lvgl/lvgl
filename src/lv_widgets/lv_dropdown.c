@@ -534,7 +534,9 @@ void lv_dropdown_close(lv_obj_t * ddlist, lv_anim_enable_t anim)
     ext->pr_opt_id = LV_DROPDOWN_PR_NONE;
 
     if(ext->anim_time == 0 || anim == LV_ANIM_OFF) {
+#if LV_USE_ANIMATION
         lv_anim_del(ddlist, list_anim);
+#endif
         lv_obj_del(ext->page);
         ext->page = NULL;
     } else {
