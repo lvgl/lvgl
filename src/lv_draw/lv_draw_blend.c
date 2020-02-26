@@ -109,7 +109,12 @@ void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
     draw_area.y2 -= disp_area->y1;
 
     /*Round the values in the mask if anti-aliasing is disabled*/
-    if(mask && disp->driver.antialiasing == 0) {
+#if LV_ANTIALAIS
+    if(mask && disp->driver.antialiasing == 0)
+#else
+    if(mask)
+#endif
+    {
         int32_t mask_w = lv_area_get_width(&draw_area);
         int32_t i;
         for(i = 0; i < mask_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
@@ -155,7 +160,12 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
     draw_area.y2 -= disp_area->y1;
 
     /*Round the values in the mask if anti-aliasing is disabled*/
-    if(mask && disp->driver.antialiasing == 0) {
+#if LV_ANTIALAIS
+    if(mask && disp->driver.antialiasing == 0)
+#else
+    if(mask)
+#endif
+    {
         int32_t mask_w = lv_area_get_width(&draw_area);
         int32_t i;
         for(i = 0; i < mask_w; i++)  mask[i] = mask[i] > 128 ? LV_OPA_COVER : LV_OPA_TRANSP;
@@ -401,7 +411,6 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
         default:
             LV_LOG_WARN("fill_blended: unsupported blend mode");
             return;
-            break;
     }
 
     int32_t x;
@@ -679,7 +688,6 @@ static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
         default:
             LV_LOG_WARN("fill_blended: unsupported blend mode");
             return;
-            break;
     }
 
     int32_t x;

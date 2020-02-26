@@ -1120,10 +1120,7 @@ static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_
             mask_buf[i] = mask_mix(mask_buf[i], opa_act);
         }
         return LV_DRAW_MASK_RES_CHANGED;
-
-
     }
-    return LV_DRAW_MASK_RES_FULL_COVER;
 }
 
 static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
