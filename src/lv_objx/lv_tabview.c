@@ -923,12 +923,14 @@ static void tabpage_pressing_handler(lv_obj_t * tabview, lv_obj_t * tabpage)
                 p = ((tabpage->coords.x1 - tabview->coords.x1) * (indic_size + tabs_style->body.padding.inner)) /
                     lv_obj_get_width(tabview);
 
-                uint16_t id = ext->tab_cur;
-                if(lv_obj_get_base_dir(tabview) == LV_BIDI_DIR_RTL) {
-                    id = (ext->tab_cnt - (id + 1));
+                {
+                    uint16_t id = ext->tab_cur;
+                    if(lv_obj_get_base_dir(tabview) == LV_BIDI_DIR_RTL) {
+                        id = (ext->tab_cnt - (id + 1));
+                    }
+                    lv_obj_set_x(ext->indic, indic_size * id + tabs_style->body.padding.inner * id +
+                                                 indic_style->body.padding.left - p);
                 }
-                lv_obj_set_x(ext->indic, indic_size * id + tabs_style->body.padding.inner * id +
-                                             indic_style->body.padding.left - p);
                 break;
             case LV_TABVIEW_BTNS_POS_LEFT:
             case LV_TABVIEW_BTNS_POS_RIGHT:

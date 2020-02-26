@@ -22,6 +22,11 @@ extern "C" {
 #define LV_MATH_MAX(a, b) ((a) > (b) ? (a) : (b))
 #define LV_MATH_ABS(x) ((x) > 0 ? (x) : (-(x)))
 
+#define LV_IS_SIGNED(t) (((t)(-1)) < ((t) 0))
+#define LV_UMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0xFULL << ((sizeof(t) * 8ULL) - 4ULL)))
+#define LV_SMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0x7ULL << ((sizeof(t) * 8ULL) - 4ULL)))
+#define LV_MAX_OF(t) ((unsigned long) (LV_IS_SIGNED(t) ? LV_SMAX_OF(t) : LV_UMAX_OF(t)))
+
 #define LV_TRIGO_SIN_MAX 32767
 #define LV_TRIGO_SHIFT 15 /**<  >> LV_TRIGO_SHIFT to normalize*/
 

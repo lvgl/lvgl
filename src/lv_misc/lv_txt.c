@@ -8,6 +8,7 @@
  *********************/
 #include "lv_txt.h"
 #include "lv_math.h"
+#include "lv_log.h"
 
 /*********************
  *      DEFINES
@@ -108,8 +109,14 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
     /*Calc. the height and longest line*/
     while(text[line_start] != '\0') {
         new_line_start += lv_txt_get_next_line(&text[line_start], font, letter_space, max_width, flag);
-        size_res->y += letter_height;
-        size_res->y += line_space;
+
+        if ((unsigned long)size_res->y + (unsigned long)letter_height + (unsigned long)line_space > LV_MAX_OF(lv_coord_t)) {
+            LV_LOG_WARN("lv_txt_get_size: integer overflow while calculating text height");
+            return;
+        } else {
+            size_res->y += letter_height;
+            size_res->y += line_space;
+        }
 
         /*Calculate the the longest line*/
         act_line_length = lv_txt_get_width(&text[line_start], new_line_start - line_start, font, letter_space, flag);
@@ -118,7 +125,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
         line_start  = new_line_start;
     }
 
-    /*Ma ke the text one line taller if the last character is '\n' or '\r'*/
+    /*Make the text one line taller if the last character is '\n' or '\r'*/
     if((line_start != 0) && (text[line_start - 1] == '\n' || text[line_start - 1] == '\r')) {
         size_res->y += letter_height + line_space;
     }
