@@ -21,12 +21,12 @@
 #define LV_OBJX_NAME "lv_tileview"
 
 #if LV_USE_ANIMATION
-#ifndef LV_TILEVIEW_DEF_ANIM_TIME
-#define LV_TILEVIEW_DEF_ANIM_TIME 300 /*Animation time loading a tile [ms] (0: no animation)  */
-#endif
+    #ifndef LV_TILEVIEW_DEF_ANIM_TIME
+        #define LV_TILEVIEW_DEF_ANIM_TIME 300 /*Animation time loading a tile [ms] (0: no animation)  */
+    #endif
 #else
-#undef LV_TILEVIEW_DEF_ANIM_TIME
-#define LV_TILEVIEW_DEF_ANIM_TIME 0 /*No animations*/
+    #undef LV_TILEVIEW_DEF_ANIM_TIME
+    #define LV_TILEVIEW_DEF_ANIM_TIME 0 /*No animations*/
 #endif
 
 /**********************
@@ -106,7 +106,8 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
         if(par) {
             w = lv_obj_get_width_fit(lv_obj_get_parent(new_tileview));
             h = lv_obj_get_height_fit(lv_obj_get_parent(new_tileview));
-        } else {
+        }
+        else {
             w = lv_disp_get_hor_res(NULL);
             h = lv_disp_get_ver_res(NULL);
         }
@@ -247,12 +248,13 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
         }
 
         if(y_coord != y_act) {
-            lv_anim_set_exec_cb(&a,(lv_anim_exec_xcb_t)lv_obj_set_y);
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
             lv_anim_set_values(&a, y_act, y_coord);
             lv_anim_start(&a);
         }
 #endif
-    } else {
+    }
+    else {
         lv_obj_set_pos(scrl, x_coord, y_coord);
     }
 
@@ -276,7 +278,7 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
 * @param x column id (0, 1, 2...)
 * @param y line id (0, 1, 2...)
 */
-void lv_tileview_get_tile_act(lv_obj_t * tileview, lv_coord_t *x, lv_coord_t *y)
+void lv_tileview_get_tile_act(lv_obj_t * tileview, lv_coord_t * x, lv_coord_t * y)
 {
     lv_tileview_ext_t * ext = lv_obj_get_ext_attr(tileview);
 
@@ -419,7 +421,8 @@ static void drag_end_handler(lv_obj_t * tileview)
 
         p.x -= predict;
 
-    } else if(drag_dir & LV_DRAG_DIR_VER) {
+    }
+    else if(drag_dir & LV_DRAG_DIR_VER) {
         lv_point_t vect;
         lv_indev_get_vect(indev, &vect);
         lv_coord_t predict = 0;

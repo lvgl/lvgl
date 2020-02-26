@@ -50,13 +50,13 @@ void lv_debug_log_error(const char * msg, uint64_t value);
 
 #ifndef LV_DEBUG_ASSERT
 #define LV_DEBUG_ASSERT(expr, msg, value)       \
-do {                                            \
-    if(!(expr)) {                               \
-        LV_LOG_ERROR(__func__);                 \
-        lv_debug_log_error(msg, (uint64_t)((uintptr_t)value));         \
-        while(1);                               \
-    }                                           \
-} while(0)
+    do {                                            \
+        if(!(expr)) {                               \
+            LV_LOG_ERROR(__func__);                 \
+            lv_debug_log_error(msg, (uint64_t)((uintptr_t)value));         \
+            while(1);                               \
+        }                                           \
+    } while(0)
 #endif
 
 /*----------------

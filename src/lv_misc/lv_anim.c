@@ -18,7 +18,7 @@
 #include "lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
-#include LV_GC_INCLUDE
+    #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
 /*********************
@@ -62,8 +62,8 @@ void lv_anim_core_init(void)
     lv_ll_init(&LV_GC_ROOT(_lv_anim_ll), sizeof(lv_anim_t));
     last_task_run = lv_tick_get();
     _lv_anim_task = lv_task_create(anim_task, LV_DISP_DEF_REFR_PERIOD, LV_ANIM_TASK_PRIO, NULL);
-	anim_mark_list_change(); /*Turn off the animation task*/
-	anim_list_changed = false; /*The list has not actaully changed*/
+    anim_mark_list_change(); /*Turn off the animation task*/
+    anim_list_changed = false; /*The list has not actaully changed*/
 }
 
 /**
@@ -117,7 +117,7 @@ void lv_anim_start(lv_anim_t * a)
 
     /* Creating an animation changed the linked list.
      * It's important if it happens in a ready callback. (see `anim_task`)*/
-	anim_mark_list_change();
+    anim_mark_list_change();
 
     LV_LOG_TRACE("animation created")
 }
@@ -195,7 +195,7 @@ uint16_t lv_anim_speed_to_time(uint16_t speed, lv_anim_value_t start, lv_anim_va
  */
 void lv_anim_refr_now(void)
 {
-	anim_task(NULL);
+    anim_task(NULL);
 }
 
 /**
@@ -209,7 +209,8 @@ lv_anim_value_t lv_anim_path_linear(const lv_anim_t * a)
     uint32_t step;
     if(a->time == a->act_time) {
         step = LV_ANIM_RESOLUTION; /*Use the last value if the time fully elapsed*/
-    } else {
+    }
+    else {
         step = ((int32_t)a->act_time * LV_ANIM_RESOLUTION) / a->time;
     }
 
@@ -344,24 +345,28 @@ lv_anim_value_t lv_anim_path_bounce(const lv_anim_t * a)
     if(t < 408) {
         /*Go down*/
         t = (t * 2500) >> 10; /*[0..1024] range*/
-    } else if(t >= 408 && t < 614) {
+    }
+    else if(t >= 408 && t < 614) {
         /*First bounce back*/
         t -= 408;
         t    = t * 5; /*to [0..1024] range*/
         t    = 1024 - t;
         diff = diff / 6;
-    } else if(t >= 614 && t < 819) {
+    }
+    else if(t >= 614 && t < 819) {
         /*Fall back*/
         t -= 614;
         t    = t * 5; /*to [0..1024] range*/
         diff = diff / 6;
-    } else if(t >= 819 && t < 921) {
+    }
+    else if(t >= 819 && t < 921) {
         /*Second bounce back*/
         t -= 819;
         t    = t * 10; /*to [0..1024] range*/
         t    = 1024 - t;
         diff = diff / 16;
-    } else if(t >= 921 && t <= 1024) {
+    }
+    else if(t >= 921 && t <= 1024) {
         /*Fall back*/
         t -= 921;
         t    = t * 10; /*to [0..1024] range*/
@@ -407,8 +412,7 @@ static void anim_task(lv_task_t * param)
     (void)param;
 
     lv_anim_t * a;
-    LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a)
-    {
+    LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) {
         a->has_run = 0;
     }
 
@@ -483,8 +487,8 @@ static bool anim_ready_handler(lv_anim_t * a)
         memcpy(&a_tmp, a, sizeof(lv_anim_t));
         lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
         lv_mem_free(a);
-		/*Flag that the list has changed */
-		anim_mark_list_change();
+        /*Flag that the list has changed */
+        anim_mark_list_change();
 
         /* Call the callback function at the end*/
         if(a_tmp.ready_cb != NULL) a_tmp.ready_cb(&a_tmp);
@@ -513,10 +517,10 @@ static bool anim_ready_handler(lv_anim_t * a)
 }
 static void anim_mark_list_change(void)
 {
-	anim_list_changed = true;
-	if(lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll)) == NULL)
-		lv_task_set_prio(_lv_anim_task, LV_TASK_PRIO_OFF);
-	else
-		lv_task_set_prio(_lv_anim_task, LV_ANIM_TASK_PRIO);
+    anim_list_changed = true;
+    if(lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll)) == NULL)
+        lv_task_set_prio(_lv_anim_task, LV_TASK_PRIO_OFF);
+    else
+        lv_task_set_prio(_lv_anim_task, LV_ANIM_TASK_PRIO);
 }
 #endif

@@ -35,15 +35,13 @@ LV_EXPORT_CONST_INT(LV_COORD_MIN);
 /**
  * Represents a point on the screen.
  */
-typedef struct
-{
+typedef struct {
     lv_coord_t x;
     lv_coord_t y;
 } lv_point_t;
 
 /** Represents an area of the screen. */
-typedef struct
-{
+typedef struct {
     lv_coord_t x1;
     lv_coord_t y1;
     lv_coord_t x2;

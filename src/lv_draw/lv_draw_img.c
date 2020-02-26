@@ -25,10 +25,12 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src, lv_draw_img_dsc_t * draw_dsc);
+static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
+                                 lv_draw_img_dsc_t * draw_dsc);
 
-static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p, lv_draw_img_dsc_t * draw_dsc,
-	bool chroma_key, bool alpha_byte);
+static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p,
+                        lv_draw_img_dsc_t * draw_dsc,
+                        bool chroma_key, bool alpha_byte);
 
 void show_error(const lv_area_t * coords, const lv_area_t * clip_area, const char * msg);
 /**********************
@@ -94,20 +96,36 @@ uint8_t lv_img_cf_get_px_size(lv_img_cf_t cf)
     uint8_t px_size = 0;
 
     switch(cf) {
-    case LV_IMG_CF_UNKNOWN:
-    case LV_IMG_CF_RAW: px_size = 0; break;
-    case LV_IMG_CF_TRUE_COLOR:
-    case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED: px_size = LV_COLOR_SIZE; break;
-    case LV_IMG_CF_TRUE_COLOR_ALPHA: px_size = LV_IMG_PX_SIZE_ALPHA_BYTE << 3; break;
-    case LV_IMG_CF_INDEXED_1BIT:
-    case LV_IMG_CF_ALPHA_1BIT: px_size = 1; break;
-    case LV_IMG_CF_INDEXED_2BIT:
-    case LV_IMG_CF_ALPHA_2BIT: px_size = 2; break;
-    case LV_IMG_CF_INDEXED_4BIT:
-    case LV_IMG_CF_ALPHA_4BIT: px_size = 4; break;
-    case LV_IMG_CF_INDEXED_8BIT:
-    case LV_IMG_CF_ALPHA_8BIT: px_size = 8; break;
-    default: px_size = 0; break;
+        case LV_IMG_CF_UNKNOWN:
+        case LV_IMG_CF_RAW:
+            px_size = 0;
+            break;
+        case LV_IMG_CF_TRUE_COLOR:
+        case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
+            px_size = LV_COLOR_SIZE;
+            break;
+        case LV_IMG_CF_TRUE_COLOR_ALPHA:
+            px_size = LV_IMG_PX_SIZE_ALPHA_BYTE << 3;
+            break;
+        case LV_IMG_CF_INDEXED_1BIT:
+        case LV_IMG_CF_ALPHA_1BIT:
+            px_size = 1;
+            break;
+        case LV_IMG_CF_INDEXED_2BIT:
+        case LV_IMG_CF_ALPHA_2BIT:
+            px_size = 2;
+            break;
+        case LV_IMG_CF_INDEXED_4BIT:
+        case LV_IMG_CF_ALPHA_4BIT:
+            px_size = 4;
+            break;
+        case LV_IMG_CF_INDEXED_8BIT:
+        case LV_IMG_CF_ALPHA_8BIT:
+            px_size = 8;
+            break;
+        default:
+            px_size = 0;
+            break;
     }
 
     return px_size;
@@ -123,17 +141,20 @@ bool lv_img_cf_is_chroma_keyed(lv_img_cf_t cf)
     bool is_chroma_keyed = false;
 
     switch(cf) {
-    case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
-    case LV_IMG_CF_RAW_CHROMA_KEYED:
+        case LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED:
+        case LV_IMG_CF_RAW_CHROMA_KEYED:
 #if LV_INDEXED_CHROMA
-    case LV_IMG_CF_INDEXED_1BIT:
-    case LV_IMG_CF_INDEXED_2BIT:
-    case LV_IMG_CF_INDEXED_4BIT:
-    case LV_IMG_CF_INDEXED_8BIT:
+        case LV_IMG_CF_INDEXED_1BIT:
+        case LV_IMG_CF_INDEXED_2BIT:
+        case LV_IMG_CF_INDEXED_4BIT:
+        case LV_IMG_CF_INDEXED_8BIT:
 #endif
-        is_chroma_keyed = true; break;
+            is_chroma_keyed = true;
+            break;
 
-    default: is_chroma_keyed = false; break;
+        default:
+            is_chroma_keyed = false;
+            break;
     }
 
     return is_chroma_keyed;
@@ -149,17 +170,21 @@ bool lv_img_cf_has_alpha(lv_img_cf_t cf)
     bool has_alpha = false;
 
     switch(cf) {
-    case LV_IMG_CF_TRUE_COLOR_ALPHA:
-    case LV_IMG_CF_RAW_ALPHA:
-    case LV_IMG_CF_INDEXED_1BIT:
-    case LV_IMG_CF_INDEXED_2BIT:
-    case LV_IMG_CF_INDEXED_4BIT:
-    case LV_IMG_CF_INDEXED_8BIT:
-    case LV_IMG_CF_ALPHA_1BIT:
-    case LV_IMG_CF_ALPHA_2BIT:
-    case LV_IMG_CF_ALPHA_4BIT:
-    case LV_IMG_CF_ALPHA_8BIT: has_alpha = true; break;
-    default: has_alpha = false; break;
+        case LV_IMG_CF_TRUE_COLOR_ALPHA:
+        case LV_IMG_CF_RAW_ALPHA:
+        case LV_IMG_CF_INDEXED_1BIT:
+        case LV_IMG_CF_INDEXED_2BIT:
+        case LV_IMG_CF_INDEXED_4BIT:
+        case LV_IMG_CF_INDEXED_8BIT:
+        case LV_IMG_CF_ALPHA_1BIT:
+        case LV_IMG_CF_ALPHA_2BIT:
+        case LV_IMG_CF_ALPHA_4BIT:
+        case LV_IMG_CF_ALPHA_8BIT:
+            has_alpha = true;
+            break;
+        default:
+            has_alpha = false;
+            break;
     }
 
     return has_alpha;
@@ -183,9 +208,11 @@ lv_img_src_t lv_img_src_get_type(const void * src)
     /*The first byte shows the type of the image source*/
     if(u8_p[0] >= 0x20 && u8_p[0] <= 0x7F) {
         img_src_type = LV_IMG_SRC_FILE; /*If it's an ASCII character then it's file name*/
-    } else if(u8_p[0] >= 0x80) {
+    }
+    else if(u8_p[0] >= 0x80) {
         img_src_type = LV_IMG_SRC_SYMBOL; /*Symbols begins after 0x7F*/
-    } else {
+    }
+    else {
         img_src_type = LV_IMG_SRC_VARIABLE; /*`lv_img_dsc_t` is design to the first byte < 0x20*/
     }
 
@@ -200,7 +227,8 @@ lv_img_src_t lv_img_src_get_type(const void * src)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src, lv_draw_img_dsc_t * draw_dsc)
+static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
+                                 lv_draw_img_dsc_t * draw_dsc)
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
@@ -255,7 +283,8 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
 
         int32_t width = lv_area_get_width(&mask_com);
 
-        uint8_t  * buf = lv_mem_buf_get(lv_area_get_width(&mask_com) * LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
+        uint8_t  * buf = lv_mem_buf_get(lv_area_get_width(&mask_com) *
+                                        LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
 
         lv_area_t line;
         lv_area_copy(&line, &mask_com);
@@ -303,7 +332,8 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
  * @param zoom zoom factor
  * @param antialias anti-alias transformations (rotate, zoom) or not
  */
-static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p, lv_draw_img_dsc_t * draw_dsc, bool chroma_key, bool alpha_byte)
+static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p,
+                        lv_draw_img_dsc_t * draw_dsc, bool chroma_key, bool alpha_byte)
 {
     /* Use the clip area as draw area*/
     lv_area_t draw_area;
@@ -326,7 +356,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
     if(other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE &&
        chroma_key == false && alpha_byte == false &&
        draw_dsc->opa == LV_OPA_COVER && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
-        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, LV_OPA_COVER, draw_dsc->blend_mode);
+        lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, LV_OPA_COVER,
+                     draw_dsc->blend_mode);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
@@ -406,7 +437,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 #endif
                             continue;
                         }
-                    } else {
+                    }
+                    else {
                         mask_buf[px_i] = LV_OPA_COVER;
                     }
 
@@ -415,15 +447,16 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 #elif LV_COLOR_DEPTH == 16
                     c.full =  map_px[0] + (map_px[1] << 8);
 #elif LV_COLOR_DEPTH == 32
-                    c.full =  *((uint32_t*)map_px);
+                    c.full =  *((uint32_t *)map_px);
 #endif
-                    if (chroma_key) {
+                    if(chroma_key) {
                         if(c.full == chroma_keyed_color.full) {
                             mask_buf[px_i] = LV_OPA_TRANSP;
                             continue;
                         }
                     }
-                } else {
+                }
+                else {
                     /*Rotate*/
                     bool ret;
                     int32_t rot_x = x + (disp_area->x1 + draw_area.x1) - map_area->x1;
@@ -432,7 +465,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                     if(ret == false) {
                         mask_buf[px_i] = LV_OPA_TRANSP;
                         continue;
-                    } else {
+                    }
+                    else {
                         mask_buf[px_i] = trans_dsc.res.opa;
                         c.full = trans_dsc.res.color.full;
                     }
@@ -448,11 +482,13 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             /*Apply the masks if any*/
             if(other_mask_cnt) {
                 lv_draw_mask_res_t mask_res_sub;
-                mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1, lv_area_get_width(&draw_area));
+                mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1,
+                                                  lv_area_get_width(&draw_area));
                 if(mask_res_sub == LV_DRAW_MASK_RES_FULL_TRANSP) {
                     memset(mask_buf + px_i_start, 0x00, lv_area_get_width(&draw_area));
                     mask_res = LV_DRAW_MASK_RES_CHANGED;
-                } else if(mask_res_sub == LV_DRAW_MASK_RES_CHANGED) {
+                }
+                else if(mask_res_sub == LV_DRAW_MASK_RES_CHANGED) {
                     mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
             }
@@ -460,7 +496,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             map_buf_tmp += map_w * px_size_byte;
             if(px_i + lv_area_get_width(&draw_area) < mask_buf_size) {
                 blend_area.y2 ++;
-            } else {
+            }
+            else {
                 lv_blend_map(clip_area, &blend_area, map2, mask_buf, mask_res, draw_dsc->opa, draw_dsc->blend_mode);
 
                 blend_area.y1 = blend_area.y2 + 1;

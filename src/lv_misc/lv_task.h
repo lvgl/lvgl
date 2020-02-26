@@ -57,8 +57,7 @@ typedef uint8_t lv_task_prio_t;
 /**
  * Descriptor of a lv_task
  */
-typedef struct _lv_task_t
-{
+typedef struct _lv_task_t {
     uint32_t period; /**< How often the task should run */
     uint32_t last_run; /**< Last time the task ran */
     lv_task_cb_t task_cb; /**< Task function */

@@ -82,7 +82,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_size(led, LV_LED_WIDTH_DEF, LV_LED_HEIGHT_DEF);
 
-        lv_theme_apply(led,LV_THEME_LED);
+        lv_theme_apply(led, LV_THEME_LED);
     }
     /*Copy an existing object*/
     else {
@@ -194,7 +194,8 @@ static lv_design_res_t lv_led_design(lv_obj_t * led, const lv_area_t * clip_area
     if(mode == LV_DESIGN_COVER_CHK) {
         /*Return false if the object is not covers the clip_area area*/
         return ancestor_design(led, clip_area, mode);
-    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+    }
+    else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Make darker colors in a temporary style according to the brightness*/
         lv_led_ext_t * ext       = lv_obj_get_ext_attr(led);
 
@@ -210,7 +211,8 @@ static lv_design_res_t lv_led_design(lv_obj_t * led, const lv_area_t * clip_area
 
         /*Set the current shadow width according to brightness proportionally between LV_LED_BRIGHT_OFF
          * and LV_LED_BRIGHT_ON*/
-        rect_dsc.shadow_width = ((ext->bright - LV_LED_BRIGHT_OFF) * rect_dsc.shadow_width) / (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
+        rect_dsc.shadow_width = ((ext->bright - LV_LED_BRIGHT_OFF) * rect_dsc.shadow_width) /
+                                (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
 
         lv_draw_rect(&led->coords, clip_area, &rect_dsc);
     }

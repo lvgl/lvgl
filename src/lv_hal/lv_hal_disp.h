@@ -44,8 +44,7 @@ struct _disp_drv_t;
 /**
  * Structure for holding display buffer information.
  */
-typedef struct
-{
+typedef struct {
     void * buf1; /**< First display buffer. */
     void * buf2; /**< Second display buffer. */
 
@@ -59,8 +58,7 @@ typedef struct
 /**
  * Display Driver structure to be registered by HAL
  */
-typedef struct _disp_drv_t
-{
+typedef struct _disp_drv_t {
 
     lv_coord_t hor_res; /**< Horizontal resolution. */
     lv_coord_t ver_res; /**< Vertical resolution. */
@@ -124,8 +122,7 @@ struct _lv_obj_t;
  * Display structure.
  * ::lv_disp_drv_t is the first member of the structure.
  */
-typedef struct _disp_t
-{
+typedef struct _disp_t {
     /**< Driver to the display*/
     lv_disp_drv_t driver;
 

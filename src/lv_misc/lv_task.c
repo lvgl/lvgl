@@ -14,7 +14,7 @@
 #include "lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
-#include LV_GC_INCLUDE
+    #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
 /*********************
@@ -81,7 +81,7 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
     static uint32_t idle_period_start = 0;
     static uint32_t handler_start     = 0;
     static uint32_t busy_time         = 0;
-	static uint32_t time_till_next;
+    static uint32_t time_till_next;
 
     if(lv_task_run == false) {
         already_running = false; /*Release mutex*/
@@ -174,7 +174,7 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
         busy_time         = 0;
         idle_period_start = lv_tick_get();
     }
-	
+
     time_till_next = LV_NO_TASK_READY;
     next = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
     while(next) {
@@ -183,14 +183,14 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
             if(delay < time_till_next)
                 time_till_next = delay;
         }
-        
+
         next = lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), next); /*Find the next task*/
     }
-	
+
     already_running = false; /*Release the mutex*/
 
     LV_LOG_TRACE("lv_task_handler ready");
-	return time_till_next;
+    return time_till_next;
 }
 /**
  * Create an "empty" task. It needs to initialzed with at least
@@ -305,8 +305,7 @@ void lv_task_set_prio(lv_task_t * task, lv_task_prio_t prio)
 
     /*Find the tasks with new priority*/
     lv_task_t * i;
-    LV_LL_READ(LV_GC_ROOT(_lv_task_ll), i)
-    {
+    LV_LL_READ(LV_GC_ROOT(_lv_task_ll), i) {
         if(i->prio <= prio) {
             if(i != task) lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), task, i);
             break;
@@ -416,9 +415,9 @@ static bool lv_task_exec(lv_task_t * task)
  */
 static uint32_t lv_task_time_remaining(lv_task_t * task)
 {
-	/*Check if at least 'period' time elapsed*/
+    /*Check if at least 'period' time elapsed*/
     uint32_t elp = lv_tick_elaps(task->last_run);
-	if(elp >= task->period)
-		return 0;
-	return task->period - elp;
+    if(elp >= task->period)
+        return 0;
+    return task->period - elp;
 }

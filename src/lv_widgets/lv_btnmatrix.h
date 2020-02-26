@@ -46,8 +46,7 @@ enum {
 typedef uint16_t lv_btnmatrix_ctrl_t;
 
 /*Data of button matrix*/
-typedef struct
-{
+typedef struct {
     /*No inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
     const char ** map_p;                              /*Pointer to the current map*/

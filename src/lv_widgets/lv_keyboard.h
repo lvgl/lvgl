@@ -45,10 +45,9 @@ enum {
     LV_KEYBOARD_MODE_NUM,
 };
 typedef uint8_t lv_keyboard_mode_t;
-    
+
 /*Data of keyboard*/
-typedef struct
-{
+typedef struct {
     lv_btnmatrix_ext_t btnm; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * ta;          /*Pointer to the assigned text area*/

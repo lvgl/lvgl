@@ -41,7 +41,7 @@ typedef struct {
     lv_txt_flag_t flag;
     lv_text_decor_t decor;
     lv_blend_mode_t blend_mode;
-}lv_draw_label_dsc_t;
+} lv_draw_label_dsc_t;
 
 /** Store some info to speed up drawing of very large texts
  * It takes a lot of time to get the first visible character because
@@ -58,7 +58,7 @@ typedef struct {
     /** The 'y1' coordinate of the label when the hint was saved.
      * Used to invalidate the hint if the label has moved too much. */
     int32_t coord_y;
-}lv_draw_label_hint_t;
+} lv_draw_label_hint_t;
 
 /**********************
  * GLOBAL PROTOTYPES

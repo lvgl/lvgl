@@ -52,8 +52,7 @@ enum {
 };
 typedef uint8_t lv_chart_update_mode_t;
 
-typedef struct
-{
+typedef struct {
     lv_coord_t * points;
     lv_color_t color;
     uint16_t start_point;
@@ -67,8 +66,7 @@ enum {
 };
 typedef uint8_t lv_chart_axis_options_t;
 
-typedef struct
-{
+typedef struct {
     const char * list_of_values;
     lv_chart_axis_options_t options;
     uint8_t num_tick_marks;
@@ -77,8 +75,7 @@ typedef struct
 } lv_chart_axis_cfg_t;
 
 /*Data of chart */
-typedef struct
-{
+typedef struct {
     /*No inherited ext*/ /*Ext. of ancestor*/
     /*New data for this type */
     lv_ll_t series_ll;    /*Linked list for the data line pointers (stores lv_chart_dl_t)*/
@@ -250,7 +247,7 @@ void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, ui
  * @param options           extra options
  */
 void lv_chart_set_secondary_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
-                                        lv_chart_axis_options_t options);
+                                         lv_chart_axis_options_t options);
 
 /**
  * Set the y-axis tick count and labels of a chart

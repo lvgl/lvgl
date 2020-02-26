@@ -58,8 +58,7 @@ enum {
 typedef uint8_t lv_spinner_dir_t;
 
 /*Data of pre loader*/
-typedef struct
-{
+typedef struct {
     lv_arc_ext_t arc; /*Ext. of ancestor*/
     /*New data for this type */
     lv_anim_value_t arc_length;      /*Length of the spinning indicator in degree*/

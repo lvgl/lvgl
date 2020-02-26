@@ -46,8 +46,7 @@ enum {
 typedef uint8_t lv_btn_state_t;
 
 /** Extended data of button*/
-typedef struct
-{
+typedef struct {
     /** Ext. of ancestor*/
     lv_cont_ext_t cont;
 
@@ -57,7 +56,7 @@ typedef struct
 
 /**Styles*/
 enum {
-    LV_BTN_PART_MAIN = LV_OBJ_PART_MAIN ,
+    LV_BTN_PART_MAIN = LV_OBJ_PART_MAIN,
     _LV_BTN_PART_VIRTUAL_LAST,
     _LV_BTN_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,
 };

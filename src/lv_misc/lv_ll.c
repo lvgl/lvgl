@@ -111,7 +111,8 @@ void * lv_ll_ins_prev(lv_ll_t * ll_p, void * n_act)
     if(lv_ll_get_head(ll_p) == n_act) {
         n_new = lv_ll_ins_head(ll_p);
         if(n_new == NULL) return NULL;
-    } else {
+    }
+    else {
         n_new = lv_mem_alloc(ll_p->n_size + LL_NODE_META_SIZE);
         if(n_new == NULL) return NULL;
 
@@ -166,18 +167,22 @@ void lv_ll_remove(lv_ll_t * ll_p, void * node_p)
         ll_p->head = lv_ll_get_next(ll_p, node_p);
         if(ll_p->head == NULL) {
             ll_p->tail = NULL;
-        } else {
+        }
+        else {
             node_set_prev(ll_p, ll_p->head, NULL);
         }
-    } else if(lv_ll_get_tail(ll_p) == node_p) {
+    }
+    else if(lv_ll_get_tail(ll_p) == node_p) {
         /*The new tail will be the  node before 'n_act'*/
         ll_p->tail = lv_ll_get_prev(ll_p, node_p);
         if(ll_p->tail == NULL) {
             ll_p->head = NULL;
-        } else {
+        }
+        else {
             node_set_next(ll_p, ll_p->tail, NULL);
         }
-    } else {
+    }
+    else {
         lv_ll_node_t * n_prev = lv_ll_get_prev(ll_p, node_p);
         lv_ll_node_t * n_next = lv_ll_get_next(ll_p, node_p);
 
@@ -233,7 +238,8 @@ void lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool he
         if(ll_new_p->tail == NULL) { /*If there is no tail (first node) set the tail too*/
             ll_new_p->tail = node;
         }
-    } else {
+    }
+    else {
         /*Set node as tail*/
         node_set_prev(ll_new_p, node, ll_new_p->tail);
         node_set_next(ll_new_p, node, NULL);

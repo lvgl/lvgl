@@ -30,21 +30,20 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 /*Data of image*/
-typedef struct
-{
+typedef struct {
     /*No inherited ext. because inherited from the base object*/ /*Ext. of ancestor*/
     /*New data for this type */
     const void * src; /*Image source: Pointer to an array or a file or a symbol*/
     lv_point_t offset;
     lv_coord_t w;          /*Width of the image (Handled by the library)*/
     lv_coord_t h;          /*Height of the image (Handled by the library)*/
-    uint16_t angle;	   /*rotation angle of the image*/
+    uint16_t angle;    /*rotation angle of the image*/
     lv_point_t pivot;     /*rotation center of the image*/
     uint16_t zoom;         /*256 means no zoom, 512 double size, 128 hasl size*/
     uint8_t src_type : 2;  /*See: lv_img_src_t*/
     uint8_t auto_size : 1; /*1: automatically set the object size to the image size*/
     uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
-    uint8_t antialias :1;  /*Apply anti-aliasing in transformations (rotate, zoom)*/
+    uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
 } lv_img_ext_t;
 
 /*Image parts*/
@@ -187,7 +186,7 @@ uint16_t lv_img_get_angle(lv_obj_t * img);
  * @param img pointer to an image object
  * @param center rotation center of the image
  */
-void lv_img_get_pivot(lv_obj_t * img, lv_point_t *center);
+void lv_img_get_pivot(lv_obj_t * img, lv_point_t * center);
 
 /**
  * Get the zoom factor of the image.

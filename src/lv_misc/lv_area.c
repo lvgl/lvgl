@@ -164,7 +164,7 @@ bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coord
     lv_coord_t max_radius = LV_MATH_MIN(lv_area_get_width(a_p) / 2, lv_area_get_height(a_p) / 2);
     if(radius > max_radius)
         radius = max_radius;
-    
+
     /*Check if it's in one of the corners*/
     lv_area_t corner_area;
     /*Top left*/
@@ -215,7 +215,8 @@ bool lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     if((a1_p->x1 <= a2_p->x2) && (a1_p->x2 >= a2_p->x1) && (a1_p->y1 <= a2_p->y2) && (a1_p->y2 >= a2_p->y1)) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -284,108 +285,108 @@ void lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align_
 {
 
     switch(align) {
-    case LV_ALIGN_CENTER:
-        res->x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
-        res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
-        break;
+        case LV_ALIGN_CENTER:
+            res->x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
+            res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
+            break;
 
-    case LV_ALIGN_IN_TOP_LEFT:
-        res->x = 0;
-        res->y = 0;
-        break;
-    case LV_ALIGN_IN_TOP_MID:
-        res->x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
-        res->y = 0;
-        break;
+        case LV_ALIGN_IN_TOP_LEFT:
+            res->x = 0;
+            res->y = 0;
+            break;
+        case LV_ALIGN_IN_TOP_MID:
+            res->x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
+            res->y = 0;
+            break;
 
-    case LV_ALIGN_IN_TOP_RIGHT:
-        res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
-        res->y = 0;
-        break;
+        case LV_ALIGN_IN_TOP_RIGHT:
+            res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
+            res->y = 0;
+            break;
 
-    case LV_ALIGN_IN_BOTTOM_LEFT:
-        res->x = 0;
-        res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
-        break;
-    case LV_ALIGN_IN_BOTTOM_MID:
-        res->x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
-        res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
-        break;
+        case LV_ALIGN_IN_BOTTOM_LEFT:
+            res->x = 0;
+            res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
+            break;
+        case LV_ALIGN_IN_BOTTOM_MID:
+            res->x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
+            res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
+            break;
 
-    case LV_ALIGN_IN_BOTTOM_RIGHT:
-        res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
-        res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
-        break;
+        case LV_ALIGN_IN_BOTTOM_RIGHT:
+            res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
+            res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
+            break;
 
-    case LV_ALIGN_IN_LEFT_MID:
-        res->x = 0;
-        res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
-        break;
+        case LV_ALIGN_IN_LEFT_MID:
+            res->x = 0;
+            res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
+            break;
 
-    case LV_ALIGN_IN_RIGHT_MID:
-        res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
-        res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
-        break;
+        case LV_ALIGN_IN_RIGHT_MID:
+            res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
+            res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
+            break;
 
-    case LV_ALIGN_OUT_TOP_LEFT:
-        res->x = 0;
-        res->y = -lv_area_get_height(to_align);
-        break;
+        case LV_ALIGN_OUT_TOP_LEFT:
+            res->x = 0;
+            res->y = -lv_area_get_height(to_align);
+            break;
 
-    case LV_ALIGN_OUT_TOP_MID:
-        res->x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
-        res->y = -lv_area_get_height(to_align);
-        break;
+        case LV_ALIGN_OUT_TOP_MID:
+            res->x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
+            res->y = -lv_area_get_height(to_align);
+            break;
 
-    case LV_ALIGN_OUT_TOP_RIGHT:
-        res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
-        res->y = -lv_area_get_height(to_align);
-        break;
+        case LV_ALIGN_OUT_TOP_RIGHT:
+            res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
+            res->y = -lv_area_get_height(to_align);
+            break;
 
-    case LV_ALIGN_OUT_BOTTOM_LEFT:
-        res->x = 0;
-        res->y = lv_area_get_height(base);
-        break;
+        case LV_ALIGN_OUT_BOTTOM_LEFT:
+            res->x = 0;
+            res->y = lv_area_get_height(base);
+            break;
 
-    case LV_ALIGN_OUT_BOTTOM_MID:
-        res->x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
-        res->y = lv_area_get_height(base);
-        break;
+        case LV_ALIGN_OUT_BOTTOM_MID:
+            res->x = lv_area_get_width(base) / 2 - lv_area_get_width(to_align) / 2;
+            res->y = lv_area_get_height(base);
+            break;
 
-    case LV_ALIGN_OUT_BOTTOM_RIGHT:
-        res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
-        res->y = lv_area_get_height(base);
-        break;
+        case LV_ALIGN_OUT_BOTTOM_RIGHT:
+            res->x = lv_area_get_width(base) - lv_area_get_width(to_align);
+            res->y = lv_area_get_height(base);
+            break;
 
-    case LV_ALIGN_OUT_LEFT_TOP:
-        res->x = -lv_area_get_width(to_align);
-        res->y = 0;
-        break;
+        case LV_ALIGN_OUT_LEFT_TOP:
+            res->x = -lv_area_get_width(to_align);
+            res->y = 0;
+            break;
 
-    case LV_ALIGN_OUT_LEFT_MID:
-        res->x = -lv_area_get_width(to_align);
-        res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
-        break;
+        case LV_ALIGN_OUT_LEFT_MID:
+            res->x = -lv_area_get_width(to_align);
+            res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
+            break;
 
-    case LV_ALIGN_OUT_LEFT_BOTTOM:
-        res->x = -lv_area_get_width(to_align);
-        res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
-        break;
+        case LV_ALIGN_OUT_LEFT_BOTTOM:
+            res->x = -lv_area_get_width(to_align);
+            res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
+            break;
 
-    case LV_ALIGN_OUT_RIGHT_TOP:
-        res->x = lv_area_get_width(base);
-        res->y = 0;
-        break;
+        case LV_ALIGN_OUT_RIGHT_TOP:
+            res->x = lv_area_get_width(base);
+            res->y = 0;
+            break;
 
-    case LV_ALIGN_OUT_RIGHT_MID:
-        res->x = lv_area_get_width(base);
-        res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
-        break;
+        case LV_ALIGN_OUT_RIGHT_MID:
+            res->x = lv_area_get_width(base);
+            res->y = lv_area_get_height(base) / 2 - lv_area_get_height(to_align) / 2;
+            break;
 
-    case LV_ALIGN_OUT_RIGHT_BOTTOM:
-        res->x = lv_area_get_width(base);
-        res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
-        break;
+        case LV_ALIGN_OUT_RIGHT_BOTTOM:
+            res->x = lv_area_get_width(base);
+            res->y = lv_area_get_height(base) - lv_area_get_height(to_align);
+            break;
     }
 
     res->x += base->x1;
@@ -403,14 +404,14 @@ static bool lv_point_within_circle(const lv_area_t * area, const lv_point_t * p)
     /* Circle center */
     lv_coord_t cx = area->x1 + r;
     lv_coord_t cy = area->y1 + r;
-    
+
     /*Simplify the code by moving everything to (0, 0) */
     lv_coord_t px = p->x - cx;
     lv_coord_t py = p->y - cy;
 
-    int32_t r_sqrd = r*r;
-    int32_t dist = (px*px) + (py*py);
-    
+    int32_t r_sqrd = r * r;
+    int32_t dist = (px * px) + (py * py);
+
     if(dist <= r_sqrd)
         return true;
     else

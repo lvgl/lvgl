@@ -39,13 +39,11 @@ extern "C" {
 
 /**
  * Internal table cell format structure.
- * 
+ *
  * Use the `lv_table` APIs instead.
  */
-typedef union
-{
-    struct
-    {
+typedef union {
+    struct {
         uint8_t align : 2;
         uint8_t right_merge : 1;
         uint8_t type : 2;
@@ -55,8 +53,7 @@ typedef union
 } lv_table_cell_format_t;
 
 /*Data of table*/
-typedef struct
-{
+typedef struct {
     /*New data for this type */
     uint16_t col_cnt;
     uint16_t row_cnt;

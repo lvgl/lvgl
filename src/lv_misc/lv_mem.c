@@ -13,11 +13,11 @@
 #include <string.h>
 
 #if LV_MEM_CUSTOM != 0
-#include LV_MEM_CUSTOM_INCLUDE
+    #include LV_MEM_CUSTOM_INCLUDE
 #endif
 
 #if defined(LV_GC_INCLUDE)
-#include LV_GC_INCLUDE
+    #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
 /*********************
@@ -25,13 +25,13 @@
  *********************/
 /*Add memory junk on alloc (0xaa) and free(0xbb) (just for testing purposes)*/
 #ifndef LV_MEM_ADD_JUNK
-#define LV_MEM_ADD_JUNK 1
+    #define LV_MEM_ADD_JUNK 1
 #endif
 
 #ifdef LV_ARCH_64
-#define MEM_UNIT uint64_t
+    #define MEM_UNIT uint64_t
 #else
-#define MEM_UNIT uint32_t
+    #define MEM_UNIT uint32_t
 #endif
 
 /**********************
@@ -41,18 +41,15 @@
 #if LV_ENABLE_GC == 0 /*gc custom allocations must not include header*/
 
 /*The size of this union must be 4 bytes (uint32_t)*/
-typedef union
-{
-    struct
-    {
+typedef union {
+    struct {
         MEM_UNIT used : 1;    /* 1: if the entry is used*/
         MEM_UNIT d_size : 31; /* Size off the data (1 means 4 bytes)*/
     } s;
     MEM_UNIT header; /* The header (used + d_size)*/
 } lv_mem_header_t;
 
-typedef struct
-{
+typedef struct {
     lv_mem_header_t header;
     uint8_t first_data; /*First data byte in the allocated data (Just for easily create a pointer)*/
 } lv_mem_ent_t;
@@ -63,16 +60,16 @@ typedef struct
  *  STATIC PROTOTYPES
  **********************/
 #if LV_MEM_CUSTOM == 0
-static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e);
-static void * ent_alloc(lv_mem_ent_t * e, size_t size);
-static void ent_trunc(lv_mem_ent_t * e, size_t size);
+    static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e);
+    static void * ent_alloc(lv_mem_ent_t * e, size_t size);
+    static void ent_trunc(lv_mem_ent_t * e, size_t size);
 #endif
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 #if LV_MEM_CUSTOM == 0
-static uint8_t * work_mem;
+    static uint8_t * work_mem;
 #endif
 
 static uint32_t zero_mem; /*Give the address of this variable if 0 byte should be allocated*/
@@ -165,7 +162,7 @@ void * lv_mem_alloc(size_t size)
     } while(e != NULL && alloc == NULL);
 
 #else
-/*Use custom, user defined malloc function*/
+    /*Use custom, user defined malloc function*/
 #if LV_ENABLE_GC == 1 /*gc must not include header*/
     alloc = LV_MEM_CUSTOM_ALLOC(size);
 #else                 /* LV_ENABLE_GC */
@@ -217,7 +214,8 @@ void lv_mem_free(const void * data)
     while(e_next != NULL) {
         if(e_next->header.s.used == 0) {
             e->header.s.d_size += e_next->header.s.d_size + sizeof(e->header);
-        } else {
+        }
+        else {
             break;
         }
         e_next = ent_get_next(e_next);
@@ -324,7 +322,8 @@ void lv_mem_defrag(void)
         while(e_free != NULL) {
             if(e_free->header.s.used != 0) {
                 e_free = ent_get_next(e_free);
-            } else {
+            }
+            else {
                 break;
             }
         }
@@ -336,7 +335,8 @@ void lv_mem_defrag(void)
         while(e_next != NULL) {
             if(e_next->header.s.used == 0) {
                 e_free->header.s.d_size += e_next->header.s.d_size + sizeof(e_next->header);
-            } else {
+            }
+            else {
                 break;
             }
 
@@ -358,7 +358,7 @@ lv_res_t lv_mem_test(void)
     e = ent_get_next(NULL);
     while(e) {
         if((e->header.s.used && e->header.s.d_size > LV_MEM_SIZE) ||
-            (e->header.s.used == 0 && e->header.s.d_size > LV_MEM_SIZE)) {
+           (e->header.s.used == 0 && e->header.s.d_size > LV_MEM_SIZE)) {
             return LV_RES_INV;
         }
         e = ent_get_next(e);
@@ -389,7 +389,8 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
             if(e->header.s.d_size > mon_p->free_biggest_size) {
                 mon_p->free_biggest_size = e->header.s.d_size;
             }
-        } else {
+        }
+        else {
             mon_p->used_cnt++;
         }
 
@@ -514,7 +515,8 @@ static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e)
 
     if(act_e == NULL) { /*NULL means: get the first entry*/
         next_e = (lv_mem_ent_t *)work_mem;
-    } else { /*Get the next entry */
+    }
+    else {   /*Get the next entry */
         uint8_t * data = &act_e->first_data;
         next_e         = (lv_mem_ent_t *)&data[act_e->header.s.d_size];
 
@@ -539,7 +541,7 @@ static void * ent_alloc(lv_mem_ent_t * e, size_t size)
         /*Truncate the entry to the desired size */
         ent_trunc(e, size),
 
-            e->header.s.used = 1;
+                  e->header.s.used = 1;
 
         /*Save the allocated data*/
         alloc = &e->first_data;

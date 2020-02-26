@@ -134,7 +134,8 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_theme_apply(chart, LV_THEME_CHART);
 
-    } else {
+    }
+    else {
         lv_chart_ext_t * ext_copy = lv_obj_get_ext_attr(copy);
 
         lv_style_list_copy(&ext->style_series, &ext_copy->style_series);
@@ -301,8 +302,7 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
 
     if(point_cnt < 1) point_cnt = 1;
 
-    LV_LL_READ_BACK(ext->series_ll, ser)
-    {
+    LV_LL_READ_BACK(ext->series_ll, ser) {
         if(ser->start_point != 0) {
             lv_coord_t * new_points = lv_mem_alloc(sizeof(lv_coord_t) * point_cnt);
             LV_ASSERT_MEM(new_points);
@@ -316,7 +316,8 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
                 for(i = point_cnt_old; i < point_cnt; i++) {
                     new_points[i] = def; /*Fill up the rest with default value*/
                 }
-            } else {
+            }
+            else {
                 for(i = 0; i < point_cnt; i++) {
                     new_points[i] =
                         ser->points[(i + ser->start_point) % point_cnt_old]; /*Copy old contents to new array*/
@@ -326,7 +327,8 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
             /*Switch over pointer from old to new*/
             lv_mem_free(ser->points);
             ser->points = new_points;
-        } else {
+        }
+        else {
             ser->points = lv_mem_realloc(ser->points, sizeof(lv_coord_t) * point_cnt);
             LV_ASSERT_MEM(ser->points);
             if(ser->points == NULL) return;
@@ -400,7 +402,8 @@ void lv_chart_set_next(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t y)
             y; /*This was the place of the former left most value, after shifting it is the rightmost*/
         ser->start_point = (ser->start_point + 1) % ext->point_cnt;
         lv_chart_refresh(chart);
-    } else if(ext->update_mode == LV_CHART_UPDATE_MODE_CIRCULAR) {
+    }
+    else if(ext->update_mode == LV_CHART_UPDATE_MODE_CIRCULAR) {
         ser->points[ser->start_point] = y;
 
         if(ext->type & LV_CHART_TYPE_LINE) invalidate_lines(chart, ser->start_point);
@@ -479,11 +482,11 @@ void lv_chart_set_secondary_y_tick_length(lv_obj_t * chart, uint8_t major_tick_l
 
 /**
  * Set the x-axis tick count and labels of a chart
- * @param chart 			pointer to a chart object
- * @param list_of_values 	list of string values, terminated with \n, except the last
- * @param num_tick_marks 	if list_of_values is NULL: total number of ticks per axis
- * 							else number of ticks between two value labels
- * @param options			extra options
+ * @param chart             pointer to a chart object
+ * @param list_of_values    list of string values, terminated with \n, except the last
+ * @param num_tick_marks    if list_of_values is NULL: total number of ticks per axis
+ *                          else number of ticks between two value labels
+ * @param options           extra options
  */
 void lv_chart_set_x_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
                                lv_chart_axis_options_t options)
@@ -526,7 +529,7 @@ void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, ui
  * @param options           extra options
  */
 void lv_chart_set_secondary_y_tick_texts(lv_obj_t * chart, const char * list_of_values, uint8_t num_tick_marks,
-                                        lv_chart_axis_options_t options)
+                                         lv_chart_axis_options_t options)
 {
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
     LV_ASSERT_NULL(list_of_values);
@@ -600,7 +603,8 @@ static lv_design_res_t lv_chart_design(lv_obj_t * chart, const lv_area_t * clip_
 {
     if(mode == LV_DESIGN_COVER_CHK) {
         return ancestor_design(chart, clip_area, mode);
-    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+    }
+    else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Draw the background*/
         lv_draw_rect_dsc_t bg_dsc;
         lv_draw_rect_dsc_init(&bg_dsc);
@@ -647,8 +651,7 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
 
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_coord_t ** datal;
-        LV_LL_READ(ext->series_ll, datal)
-        {
+        LV_LL_READ(ext->series_ll, datal) {
             lv_mem_free(*datal);
         }
         lv_ll_clear(&ext->series_ll);
@@ -675,17 +678,17 @@ static lv_style_list_t * lv_chart_get_style(lv_obj_t * chart, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-    case LV_CHART_PART_BG:
-        style_dsc_p = &chart->style_list;
-        break;
-    case LV_CHART_PART_SERIES_BG:
-        style_dsc_p = &ext->style_series_bg;
-        break;
-    case LV_CHART_PART_SERIES:
-        style_dsc_p = &ext->style_series;
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_CHART_PART_BG:
+            style_dsc_p = &chart->style_list;
+            break;
+        case LV_CHART_PART_SERIES_BG:
+            style_dsc_p = &ext->style_series_bg;
+            break;
+        case LV_CHART_PART_SERIES:
+            style_dsc_p = &ext->style_series;
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;
@@ -725,7 +728,8 @@ static void draw_series_bg(lv_obj_t * chart, const lv_area_t * series_area, cons
         if(bg_dsc.border_width != 0) {
             div_i_start = 1;
             div_i_end   = ext->hdiv_cnt;
-        } else {
+        }
+        else {
             div_i_start = 0;
             div_i_end   = ext->hdiv_cnt + 1;
         }
@@ -745,7 +749,8 @@ static void draw_series_bg(lv_obj_t * chart, const lv_area_t * series_area, cons
         if(bg_dsc.border_width != 0) {
             div_i_start = 1;
             div_i_end   = ext->vdiv_cnt;
-        } else {
+        }
+        else {
             div_i_start = 0;
             div_i_end   = ext->vdiv_cnt + 1;
         }
@@ -797,7 +802,8 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
 
         has_fade = area_dsc.bg_grad_dir == LV_GRAD_DIR_VER ? true : false;
         if(has_fade) {
-            lv_draw_mask_fade_init(&mask_fade_p, &chart->coords, area_dsc.bg_main_color_stop, chart->coords.y1, area_dsc.bg_grad_color_stop, chart->coords.y2);
+            lv_draw_mask_fade_init(&mask_fade_p, &chart->coords, area_dsc.bg_main_color_stop, chart->coords.y1,
+                                   area_dsc.bg_grad_color_stop, chart->coords.y2);
         }
     }
 
@@ -809,8 +815,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
     lv_coord_t point_radius = lv_obj_get_style_size(chart, LV_CHART_PART_SERIES);
 
     /*Go through all data lines*/
-    LV_LL_READ_BACK(ext->series_ll, ser)
-    {
+    LV_LL_READ_BACK(ext->series_ll, ser) {
         line_dsc.color = ser->color;
         point_dsc.bg_color = ser->color;
         area_dsc.bg_color = ser->color;
@@ -942,8 +947,7 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
         x_act += series_area->x1 + x_ofs;
 
         /*Draw the current point of all data line*/
-        LV_LL_READ_BACK(ext->series_ll, ser)
-        {
+        LV_LL_READ_BACK(ext->series_ll, ser) {
             lv_coord_t start_point = ext->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
             col_a.x1 = x_act;
@@ -1047,14 +1051,15 @@ static lv_chart_label_iterator_t create_axis_label_iter(const char * list, uint8
 
     /* count number of list items */
     for(j = 0; list[j] != '\0'; j++) {
-            if(list[j] == '\n')
-               iterator.items_left++;
+        if(list[j] == '\n')
+            iterator.items_left++;
     }
 
     if(iterator_dir == LV_CHART_LABEL_ITERATOR_FORWARD) {
         iterator.is_reverse_iter = 0;
         iterator.current_pos = list;
-    } else {
+    }
+    else {
         iterator.is_reverse_iter = 1;
         // -1 to skip '\0' at the end of the string
         iterator.current_pos = list + j - 1;
@@ -1071,42 +1076,45 @@ static lv_chart_label_iterator_t create_axis_label_iter(const char * list, uint8
 static void get_next_axis_label(lv_chart_label_iterator_t * iterator, char * buf)
 {
     uint8_t label_len = 0;
-    if (iterator->is_reverse_iter) {
+    if(iterator->is_reverse_iter) {
         const char * label_start;
         /* count the length of the current label*/
-        while ((*iterator->current_pos != '\n') &&
-                (iterator->current_pos != iterator->list_start)) {
+        while((*iterator->current_pos != '\n') &&
+              (iterator->current_pos != iterator->list_start)) {
             iterator->current_pos--;
             label_len++;
         }
 
         label_start = iterator->current_pos;
 
-        if (*iterator->current_pos == '\n') {
+        if(*iterator->current_pos == '\n') {
             /* do not copy \n symbol, +1 to skip it*/
             label_start++;
             /* skip newline*/
             iterator->current_pos--;
-        } else {
+        }
+        else {
             /* it is last label in list (first one from the beginning )*/
             label_len++;
         }
 
         /* do not allow output buffer overflow */
-        if (label_len > LV_CHART_AXIS_TICK_LABEL_MAX_LEN) {
+        if(label_len > LV_CHART_AXIS_TICK_LABEL_MAX_LEN) {
             label_len = LV_CHART_AXIS_TICK_LABEL_MAX_LEN;
         }
 
         strncpy(buf, label_start, label_len);
-    } else {
+    }
+    else {
         /* search for tick string */
         while(iterator->current_pos[label_len] != '\n' &&
-            iterator->current_pos[label_len] != '\0') {
+              iterator->current_pos[label_len] != '\0') {
             /* do not overflow the buffer, but move to the end of the current label */
             if(label_len < LV_CHART_AXIS_TICK_LABEL_MAX_LEN) {
                 buf[label_len] = iterator->current_pos[label_len];
                 label_len++;
-            } else {
+            }
+            else {
                 label_len++;
             }
         }
@@ -1114,7 +1122,7 @@ static void get_next_axis_label(lv_chart_label_iterator_t * iterator, char * buf
         iterator->current_pos += label_len;
 
         /* do not allow output buffer overflow */
-        if (label_len > LV_CHART_AXIS_TICK_LABEL_MAX_LEN) {
+        if(label_len > LV_CHART_AXIS_TICK_LABEL_MAX_LEN) {
             label_len = LV_CHART_AXIS_TICK_LABEL_MAX_LEN;
         }
 
@@ -1141,7 +1149,7 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
 {
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     lv_chart_axis_cfg_t * y_axis = (which_axis == LV_CHART_AXIS_PRIMARY_Y) ?
-                                            &ext->y_axis : &ext->secondary_y_axis;
+                                   &ext->y_axis : &ext->secondary_y_axis;
 
     if(y_axis->list_of_values == NULL && y_axis->num_tick_marks == 0)  return;
 
@@ -1183,7 +1191,8 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
         minor_tick_len *= -1;
     }
 
-    iter_dir = (y_axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) ? LV_CHART_LABEL_ITERATOR_REVERSE : LV_CHART_LABEL_ITERATOR_FORWARD;
+    iter_dir = (y_axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) ? LV_CHART_LABEL_ITERATOR_REVERSE :
+               LV_CHART_LABEL_ITERATOR_FORWARD;
     iter = create_axis_label_iter(y_axis->list_of_values, iter_dir);
 
     /*determine the number of options */
@@ -1199,7 +1208,7 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
         num_scale_ticks = (y_axis->num_tick_marks * (num_of_labels - 1));
 
     lv_style_int_t label_dist  = which_axis == LV_CHART_AXIS_PRIMARY_Y ?
-            lv_obj_get_style_pad_left(chart, LV_CHART_PART_SERIES_BG)  : lv_obj_get_style_pad_right(chart, LV_CHART_PART_SERIES_BG);
+                                 lv_obj_get_style_pad_left(chart, LV_CHART_PART_SERIES_BG)  : lv_obj_get_style_pad_right(chart, LV_CHART_PART_SERIES_BG);
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
@@ -1210,11 +1219,11 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
     lv_obj_init_draw_label_dsc(chart, LV_CHART_PART_BG, &label_dsc);
 
     for(i = 0; i < (num_scale_ticks + 1); i++) { /* one extra loop - it may not exist in the list, empty label */
-                                                 /* first point of the tick */
+        /* first point of the tick */
         p1.x = x_ofs;
 
         /* move extra pixel out of chart boundary */
-        if (which_axis == LV_CHART_AXIS_PRIMARY_Y)
+        if(which_axis == LV_CHART_AXIS_PRIMARY_Y)
             p1.x--;
         else
             p1.x++;
@@ -1227,7 +1236,7 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
 
         /* draw a line at moving y position */
         p2.y = p1.y =
-            y_ofs + (int32_t)((int32_t)(h - line_dsc.width) * i) / num_scale_ticks;
+                   y_ofs + (int32_t)((int32_t)(h - line_dsc.width) * i) / num_scale_ticks;
 
         if(y_axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) {
             /*if label order is inversed last tick have number 0*/
@@ -1235,7 +1244,8 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
                 lv_draw_line(&p1, &p2, mask, &line_dsc);
             else if((y_axis->options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
                 lv_draw_line(&p1, &p2, mask, &line_dsc);
-        } else {
+        }
+        else {
             if(i != num_scale_ticks)
                 lv_draw_line(&p1, &p2, mask, &line_dsc);
             else if((y_axis->options & LV_CHART_AXIS_DRAW_LAST_TICK) != 0)
@@ -1260,7 +1270,8 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
                 if(which_axis == LV_CHART_AXIS_PRIMARY_Y) {
                     a.x1 = p2.x - size.x - label_dist;
                     a.x2 = p2.x - label_dist;
-                } else {
+                }
+                else {
                     a.x1 = p2.x + label_dist;
                     a.x2 = p2.x + size.x + label_dist;
                 }
@@ -1352,11 +1363,12 @@ static void draw_x_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
                 /* reserve appropriate area */
                 lv_point_t size;
                 lv_txt_get_size(&size, buf, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
-                        LV_COORD_MAX, LV_TXT_FLAG_CENTER);
+                                LV_COORD_MAX, LV_TXT_FLAG_CENTER);
 
                 /* set the area at some distance of the major tick len under of the tick */
                 lv_area_t a = {(p2.x - size.x / 2), (p2.y + label_dist), (p2.x + size.x / 2),
-                        (p2.y + size.y + label_dist)};
+                               (p2.y + size.y + label_dist)
+                              };
                 lv_draw_label(&a, mask, &label_dsc, buf, NULL);
             }
         }

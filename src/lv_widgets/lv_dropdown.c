@@ -25,8 +25,8 @@
 #define LV_OBJX_NAME "lv_dropdown"
 
 #if LV_USE_ANIMATION == 0
-#undef LV_DROPDOWN_DEF_ANIM_TIME
-#define LV_DROPDOWN_DEF_ANIM_TIME 0 /*No animation*/
+    #undef LV_DROPDOWN_DEF_ANIM_TIME
+    #define LV_DROPDOWN_DEF_ANIM_TIME 0 /*No animation*/
 #endif
 
 #define LV_DROPDOWN_PR_NONE 0xFFFF
@@ -34,11 +34,10 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct
-{
+typedef struct {
     lv_page_ext_t page;
     lv_obj_t * ddlist;      /*Pointer to the ddlist where the page belongs*/
-}lv_dropdown_page_ext_t;
+} lv_dropdown_page_ext_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -57,8 +56,8 @@ static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t x, lv_coord_t y);
 static void pos_selected(lv_obj_t * ddlist);
 static lv_obj_t * get_label(const lv_obj_t * ddlist);
 #if LV_USE_ANIMATION
-static void list_anim(void * p, lv_anim_value_t v);
-static void close_anim_ready(lv_anim_t * a);
+    static void list_anim(void * p, lv_anim_value_t v);
+    static void close_anim_ready(lv_anim_t * a);
 #endif
 
 /**********************
@@ -237,7 +236,8 @@ void lv_dropdown_set_max_height(lv_obj_t * ddlist, lv_coord_t h)
     if(ext->page) {
         if(h == 0) {
             lv_cont_set_fit(ext->page, LV_FIT_TIGHT);
-        } else {
+        }
+        else {
             lv_cont_set_fit2(ext->page, LV_FIT_TIGHT, LV_FIT_NONE);
             lv_obj_set_height(ext->page, h);
         }
@@ -539,7 +539,8 @@ void lv_dropdown_close(lv_obj_t * ddlist, lv_anim_enable_t anim)
 #endif
         lv_obj_del(ext->page);
         ext->page = NULL;
-    } else {
+    }
+    else {
 #if LV_USE_ANIMATION
         if(ext->dir != LV_DROPDOWN_DIR_UP) {
             lv_anim_t a;
@@ -550,7 +551,8 @@ void lv_dropdown_close(lv_obj_t * ddlist, lv_anim_enable_t anim)
             lv_anim_set_time(&a, ext->anim_time);
             lv_anim_set_ready_cb(&a, close_anim_ready);
             lv_anim_start(&a);
-        } else {
+        }
+        else {
             lv_anim_del(ddlist, list_anim);
             lv_obj_del(ext->page);
             ext->page = NULL;
@@ -608,7 +610,8 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
 
         txt = ext->dir != LV_DROPDOWN_DIR_LEFT ? opt_txt : ext->symbol;
         if(txt) {
-            lv_txt_get_size(&txt_size, txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, label_dsc.flag);
+            lv_txt_get_size(&txt_size, txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+                            label_dsc.flag);
 
             txt_area.y1 = ddlist->coords.y1 + top;
             txt_area.y2 = txt_area.y1 + txt_size.y;
@@ -617,7 +620,8 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
             if(ext->symbol == NULL && txt == opt_txt) {
                 txt_area.x1 = ddlist->coords.x1 + (lv_obj_get_width(ddlist) - txt_size.x) / 2;
                 txt_area.x2 = txt_area.x1 + txt_size.x;
-            } else {
+            }
+            else {
                 txt_area.x1 = ddlist->coords.x1 + left;
                 txt_area.x2 = txt_area.x1 + txt_size.x;
             }
@@ -626,7 +630,8 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
 
         txt = ext->dir != LV_DROPDOWN_DIR_LEFT ? ext->symbol : opt_txt;
         if(txt) {
-            lv_txt_get_size(&txt_size, txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, label_dsc.flag);
+            lv_txt_get_size(&txt_size, txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+                            label_dsc.flag);
             txt_area.y1 = ddlist->coords.y1 + top;
             txt_area.y2 = txt_area.y1 + txt_size.y;
 
@@ -634,7 +639,8 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
             if(ext->symbol == NULL && txt == opt_txt) {
                 txt_area.x1 = ddlist->coords.x1 + (lv_obj_get_width(ddlist) - txt_size.x) / 2;
                 txt_area.x2 = txt_area.x1 + txt_size.x;
-            } else {
+            }
+            else {
                 txt_area.x1 = ddlist->coords.x2 - right - txt_size.x;
                 txt_area.x2 = txt_area.x1 + txt_size.x;
             }
@@ -646,7 +652,8 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
             lv_mem_buf_release((char *)opt_txt);
         }
 
-    } else if(mode == LV_DESIGN_DRAW_POST) {
+    }
+    else if(mode == LV_DESIGN_DRAW_POST) {
         ancestor_design(ddlist, clip_area, mode);
     }
 
@@ -741,9 +748,9 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
         lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
         lv_get_state_info_t * info = param;
         if(info->part == LV_DROPDOWN_PART_LIST ||
-            info->part == LV_DROPDOWN_PART_SCRLBAR ||
-            info->part == LV_DROPDOWN_PART_SELECTED) {
-        info->result = lv_obj_get_state(ext->page, LV_PAGE_PART_BG);
+           info->part == LV_DROPDOWN_PART_SCRLBAR ||
+           info->part == LV_DROPDOWN_PART_SELECTED) {
+            info->result = lv_obj_get_state(ext->page, LV_PAGE_PART_BG);
         }
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
@@ -771,7 +778,8 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
                 lv_dropdown_close(ddlist, LV_ANIM_ON);
         }
 #endif
-    } else if(sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_LEAVE) {
+    }
+    else if(sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_LEAVE) {
         lv_dropdown_close(ddlist, LV_ANIM_ON);
     }
     else if(sign == LV_SIGNAL_RELEASED) {
@@ -782,7 +790,8 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
                     ext->sel_opt_id_orig = ext->sel_opt_id;
                     lv_obj_invalidate(ddlist);
                 }
-            } else {
+            }
+            else {
                 lv_dropdown_open(ddlist, LV_ANIM_ON);
             }
         }
@@ -807,24 +816,28 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(ext->page == NULL) {
                 lv_dropdown_open(ddlist, LV_ANIM_ON);
-            } else if(ext->sel_opt_id + 1 < ext->option_cnt) {
+            }
+            else if(ext->sel_opt_id + 1 < ext->option_cnt) {
                 ext->sel_opt_id++;
                 pos_selected(ddlist);
             }
-        } else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
+        }
+        else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
 
             if(ext->page == NULL) {
                 lv_dropdown_open(ddlist, LV_ANIM_ON);
-            } else if(ext->sel_opt_id > 0) {
+            }
+            else if(ext->sel_opt_id > 0) {
                 ext->sel_opt_id--;
                 pos_selected(ddlist);
             }
-        } else if(c == LV_KEY_ESC) {
-                ext->sel_opt_id = ext->sel_opt_id_orig;
-                lv_dropdown_close(ddlist, LV_ANIM_ON);
+        }
+        else if(c == LV_KEY_ESC) {
+            ext->sel_opt_id = ext->sel_opt_id_orig;
+            lv_dropdown_close(ddlist, LV_ANIM_ON);
         }
     }
-else if(sign == LV_SIGNAL_GET_EDITABLE) {
+    else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable       = true;
     }
@@ -859,13 +872,16 @@ static lv_res_t lv_dropdown_page_signal(lv_obj_t * page, lv_signal_t sign, void 
         lv_style_int_t right = lv_obj_get_style_pad_right(ddlist, LV_DROPDOWN_PART_LIST);
         lv_obj_t * scrl = lv_page_get_scrl(page);
         scrl->ext_draw_pad = LV_MATH_MAX(scrl->ext_draw_pad, LV_MATH_MAX(left, right));
-    } else if(sign == LV_SIGNAL_RELEASED) {
+    }
+    else if(sign == LV_SIGNAL_RELEASED) {
         if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
             page_release_handler(page);
         }
-    } else if(sign == LV_SIGNAL_PRESSED) {
-         page_press_handler(page);
-    } else if(sign == LV_SIGNAL_CLEANUP) {
+    }
+    else if(sign == LV_SIGNAL_PRESSED) {
+        page_press_handler(page);
+    }
+    else if(sign == LV_SIGNAL_CLEANUP) {
         lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
         ext->page  = NULL; /*The page is just being deleted*/
     }
@@ -894,24 +910,26 @@ static lv_res_t lv_dropdown_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, 
     lv_obj_t * ddlist = page_ext->ddlist;
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
-   if(sign == LV_SIGNAL_RELEASED) {
+    if(sign == LV_SIGNAL_RELEASED) {
         if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
             page_release_handler(page);
         }
-   } else if(sign == LV_SIGNAL_PRESSED) {
-       page_press_handler(page);
-   } else if(sign == LV_SIGNAL_DRAG_BEGIN) {
-       ext->pr_opt_id = LV_DROPDOWN_PR_NONE;
-       lv_obj_invalidate(page);
-   }
-   else  if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-       /* Make possible to draw on the full width of the background to redraw the selected rectangle
-        * when the ddlist is scrolled in fix height mode.
-        * (The scrollabel is scrolled the "select rectangle" is drawn on the bg too)*/
-       lv_style_int_t left = lv_obj_get_style_pad_left(ddlist, LV_DROPDOWN_PART_LIST);
-       lv_style_int_t right = lv_obj_get_style_pad_right(ddlist, LV_DROPDOWN_PART_LIST);
-       scrl->ext_draw_pad = LV_MATH_MAX(scrl->ext_draw_pad, LV_MATH_MAX(left, right));
-   }
+    }
+    else if(sign == LV_SIGNAL_PRESSED) {
+        page_press_handler(page);
+    }
+    else if(sign == LV_SIGNAL_DRAG_BEGIN) {
+        ext->pr_opt_id = LV_DROPDOWN_PR_NONE;
+        lv_obj_invalidate(page);
+    }
+    else  if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+        /* Make possible to draw on the full width of the background to redraw the selected rectangle
+         * when the ddlist is scrolled in fix height mode.
+         * (The scrollabel is scrolled the "select rectangle" is drawn on the bg too)*/
+        lv_style_int_t left = lv_obj_get_style_pad_left(ddlist, LV_DROPDOWN_PART_LIST);
+        lv_style_int_t right = lv_obj_get_style_pad_right(ddlist, LV_DROPDOWN_PART_LIST);
+        scrl->ext_draw_pad = LV_MATH_MAX(scrl->ext_draw_pad, LV_MATH_MAX(left, right));
+    }
 
     return res;
 }
@@ -931,20 +949,20 @@ static lv_style_list_t * lv_dropdown_get_style(lv_obj_t * ddlist, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-    case LV_DROPDOWN_PART_BTN:
-        style_dsc_p = &ddlist->style_list;
-        break;
-    case LV_DROPDOWN_PART_LIST:
-        style_dsc_p = &ext->style_page;
-        break;
-    case LV_DROPDOWN_PART_SCRLBAR:
-        style_dsc_p = &ext->style_scrlbar;
-        break;
-    case LV_DROPDOWN_PART_SELECTED:
-        style_dsc_p = &ext->style_selected;
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_DROPDOWN_PART_BTN:
+            style_dsc_p = &ddlist->style_list;
+            break;
+        case LV_DROPDOWN_PART_LIST:
+            style_dsc_p = &ext->style_page;
+            break;
+        case LV_DROPDOWN_PART_SCRLBAR:
+            style_dsc_p = &ext->style_scrlbar;
+            break;
+        case LV_DROPDOWN_PART_SELECTED:
+            style_dsc_p = &ext->style_selected;
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;
@@ -997,7 +1015,8 @@ static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint1
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
     lv_obj_init_draw_label_dsc(ddlist, LV_DROPDOWN_PART_SELECTED, &label_dsc);
-    label_dsc.line_space = lv_obj_get_style_text_line_space(ddlist, LV_DROPDOWN_PART_LIST);  /*Line space should come from the page*/
+    label_dsc.line_space = lv_obj_get_style_text_line_space(ddlist,
+                                                            LV_DROPDOWN_PART_LIST);  /*Line space should come from the page*/
     lv_coord_t font_h        = lv_font_get_line_height(label_dsc.font);
 
     lv_obj_t * label = get_label(ddlist);

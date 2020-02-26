@@ -44,8 +44,7 @@ extern "C" {
  **********************/
 
 /*Data of message box*/
-typedef struct
-{
+typedef struct {
     lv_cont_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * text; /*Text of the message box*/

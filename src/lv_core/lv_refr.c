@@ -17,7 +17,7 @@
 #include "../lv_draw/lv_draw.h"
 
 #if defined(LV_GC_INCLUDE)
-#include LV_GC_INCLUDE
+    #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
 /*********************
@@ -74,12 +74,13 @@ void lv_refr_init(void)
 void lv_refr_now(lv_disp_t * disp)
 {
 #if LV_USE_ANIMATION
-	lv_anim_refr_now();
+    lv_anim_refr_now();
 #endif
 
     if(disp) {
         lv_disp_refr_task(disp->refr_task);
-    } else {
+    }
+    else {
         lv_disp_t * d;
         d = lv_disp_get_next(NULL);
         while(d) {
@@ -130,12 +131,13 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
         /*Save the area*/
         if(disp->inv_p < LV_INV_BUF_SIZE) {
             lv_area_copy(&disp->inv_areas[disp->inv_p], &com_area);
-        } else { /*If no place for the area add the screen*/
+        }
+        else {   /*If no place for the area add the screen*/
             disp->inv_p = 0;
             lv_area_copy(&disp->inv_areas[disp->inv_p], &scr_area);
         }
         disp->inv_p++;
-		lv_task_set_prio(disp->refr_task, LV_REFR_TASK_PRIO);
+        lv_task_set_prio(disp->refr_task, LV_REFR_TASK_PRIO);
     }
 }
 
@@ -169,16 +171,16 @@ void lv_disp_refr_task(lv_task_t * task)
 
     uint32_t start = lv_tick_get();
 
-	/* Ensure the task does not run again automatically.
+    /* Ensure the task does not run again automatically.
      * This is done before refreshing in case refreshing invalidates something else.
      */
-	lv_task_set_prio(task, LV_TASK_PRIO_OFF);
+    lv_task_set_prio(task, LV_TASK_PRIO_OFF);
 
     disp_refr = task->user_data;
 
 
-//    extern rect_cache_t cache[];
-//    extern uint32_t cp;
+    //    extern rect_cache_t cache[];
+    //    extern uint32_t cp;
 
     lv_refr_join_area();
 
@@ -348,7 +350,8 @@ static void lv_refr_area(const lv_area_t * area_p)
                 LV_LOG_WARN("Can't set VDB height using the round function. (Wrong round_cb or to "
                             "small VDB)");
                 return;
-            } else {
+            }
+            else {
                 max_row = tmp.y2 + 1;
             }
         }
@@ -433,12 +436,12 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
     /*If this object is fully cover the draw area check the children too */
     if(lv_area_is_in(area_p, &obj->coords, 0) && obj->hidden == 0) {
-        lv_design_res_t design_res = obj->design_cb ? obj->design_cb(obj, area_p, LV_DESIGN_COVER_CHK) : LV_DESIGN_RES_NOT_COVER;
+        lv_design_res_t design_res = obj->design_cb ? obj->design_cb(obj, area_p,
+                                                                     LV_DESIGN_COVER_CHK) : LV_DESIGN_RES_NOT_COVER;
         if(design_res == LV_DESIGN_RES_MASKED) return NULL;
 
         lv_obj_t * i;
-        LV_LL_READ(obj->child_ll, i)
-        {
+        LV_LL_READ(obj->child_ll, i) {
             found_p = lv_refr_get_top_obj(area_p, i);
 
             /*If a children is ok then break*/
@@ -555,8 +558,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
             lv_area_t mask_child; /*Mask from obj and its child*/
             lv_obj_t * child_p;
             lv_area_t child_area;
-            LV_LL_READ_BACK(obj->child_ll, child_p)
-            {
+            LV_LL_READ_BACK(obj->child_ll, child_p) {
                 lv_obj_get_coords(child_p, &child_area);
                 ext_size = child_p->ext_draw_pad;
                 child_area.x1 -= ext_size;

@@ -12,7 +12,7 @@
 
 /*Testing of dependencies*/
 #if LV_USE_SLIDER == 0
-#error "lv_sw: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER  1) "
+    #error "lv_sw: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER  1) "
 #endif
 
 #include "../lv_core/lv_debug.h"
@@ -279,21 +279,24 @@ static lv_res_t lv_switch_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_obj_clean_style_list(sw, LV_SWITCH_PART_KNOB);
-    } else if(sign == LV_SIGNAL_RELEASED) {
-            if(lv_switch_get_state(sw)) lv_switch_off(sw, LV_ANIM_ON);
+    }
+    else if(sign == LV_SIGNAL_RELEASED) {
+        if(lv_switch_get_state(sw)) lv_switch_off(sw, LV_ANIM_ON);
         else lv_switch_on(sw, LV_ANIM_ON);
 
         res = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RES_OK) return res;
 
-    } else if(sign == LV_SIGNAL_CONTROL) {
+    }
+    else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) lv_switch_on(sw, LV_ANIM_ON);
         else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) lv_switch_off(sw, LV_ANIM_ON);
 
         res   = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RES_OK) return res;
-    }else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    }
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         lv_style_int_t knob_left = lv_obj_get_style_pad_left(sw,   LV_SLIDER_PART_KNOB);
         lv_style_int_t knob_right = lv_obj_get_style_pad_right(sw,  LV_SLIDER_PART_KNOB);
         lv_style_int_t knob_top = lv_obj_get_style_pad_top(sw,    LV_SLIDER_PART_KNOB);
@@ -301,7 +304,7 @@ static lv_res_t lv_switch_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 
         /* The smaller size is the knob diameter*/
         lv_coord_t knob_size = LV_MATH_MIN(lv_obj_get_width(sw), lv_obj_get_height(sw)) >> 1;
-        knob_size += LV_MATH_MAX(LV_MATH_MAX(knob_left, knob_right), LV_MATH_MAX(knob_bottom,knob_top));
+        knob_size += LV_MATH_MAX(LV_MATH_MAX(knob_left, knob_right), LV_MATH_MAX(knob_bottom, knob_top));
         knob_size += 2;         /*For rounding error*/
 
         knob_size += lv_obj_get_draw_rect_ext_pad_size(sw, LV_SLIDER_PART_KNOB);
@@ -325,17 +328,17 @@ static lv_style_list_t * lv_switch_get_style(lv_obj_t * sw, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-    case LV_SWITCH_PART_BG:
-        style_dsc_p = &sw->style_list;
-        break;
-    case LV_SWITCH_PART_INDIC:
-        style_dsc_p = &ext->bar.style_indic;
-        break;
-    case LV_SWITCH_PART_KNOB:
-        style_dsc_p = &ext->style_knob;
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_SWITCH_PART_BG:
+            style_dsc_p = &sw->style_list;
+            break;
+        case LV_SWITCH_PART_INDIC:
+            style_dsc_p = &ext->bar.style_indic;
+            break;
+        case LV_SWITCH_PART_KNOB:
+            style_dsc_p = &ext->style_knob;
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;

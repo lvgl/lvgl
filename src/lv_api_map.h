@@ -77,7 +77,8 @@ static inline void lv_bar_set_sym(lv_obj_t * bar, bool en)
  * @return true: symmetric is enabled; false: disable
  * @deprecated As of v7.0, you should use `lv_bar_get_type` instead.
  */
-static inline bool lv_bar_get_sym(lv_obj_t * bar) {
+static inline bool lv_bar_get_sym(lv_obj_t * bar)
+{
     return lv_bar_get_type(bar) == LV_BAR_TYPE_SYM;
 }
 
@@ -94,7 +95,7 @@ static inline bool lv_bar_get_sym(lv_obj_t * bar) {
  */
 static inline void lv_slider_set_sym(lv_obj_t * slider, bool en)
 {
-	lv_bar_set_sym(slider, en);
+    lv_bar_set_sym(slider, en);
 }
 
 /**
@@ -103,8 +104,9 @@ static inline void lv_slider_set_sym(lv_obj_t * slider, bool en)
  * @return true: symmetric is enabled; false: disable
  * @deprecated As of v7.0, you should use `lv_slider_get_type` instead.
  */
-static inline bool lv_slider_get_sym(lv_obj_t * slider) {
-	return lv_bar_get_sym(slider);
+static inline bool lv_slider_get_sym(lv_obj_t * slider)
+{
+    return lv_bar_get_sym(slider);
 }
 
 #endif

@@ -152,8 +152,8 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
             break;
     }
 
-//    /*Make the state change happen immediately, without transition*/
-//    btn->prev_state = btn->state;
+    //    /*Make the state change happen immediately, without transition*/
+    //    btn->prev_state = btn->state;
 }
 
 /**
@@ -168,7 +168,8 @@ void lv_btn_toggle(lv_obj_t * btn)
 
     if(lv_obj_get_state(btn, LV_BTN_PART_MAIN) & LV_STATE_CHECKED) {
         lv_obj_clear_state(btn, LV_STATE_CHECKED);
-    } else {
+    }
+    else {
         lv_obj_add_state(btn, LV_STATE_CHECKED);
     }
 }
@@ -190,10 +191,12 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn)
 
     if(state & LV_STATE_DISABLED) {
         return LV_BTN_STATE_DISABLED;
-    } else if(state & LV_STATE_CHECKED) {
+    }
+    else if(state & LV_STATE_CHECKED) {
         if(state & LV_STATE_PRESSED) return LV_BTN_STATE_CHECKED_PRESSED;
         else return LV_BTN_STATE_CHECKED_RELEASED;
-    } else {
+    }
+    else {
         if(state & LV_STATE_PRESSED) return LV_BTN_STATE_PRESSED;
         else return LV_BTN_STATE_RELEASED;
     }
@@ -232,9 +235,11 @@ static lv_design_res_t lv_btn_design(lv_obj_t * btn, const lv_area_t * clip_area
 {
     if(mode == LV_DESIGN_COVER_CHK) {
         return ancestor_design(btn, clip_area, mode);
-    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+    }
+    else if(mode == LV_DESIGN_DRAW_MAIN) {
         ancestor_design(btn, clip_area, mode);
-    } else if(mode == LV_DESIGN_DRAW_POST) {
+    }
+    else if(mode == LV_DESIGN_DRAW_POST) {
         ancestor_design(btn, clip_area, mode);
     }
 
@@ -267,7 +272,8 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             if(lv_obj_get_state(btn, LV_BTN_PART_MAIN) & LV_STATE_CHECKED) {
                 lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
                 toggled = 0;
-            } else {
+            }
+            else {
                 lv_btn_set_state(btn, LV_BTN_STATE_CHECKED_RELEASED);
                 toggled = 1;
             }
@@ -275,7 +281,8 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
             res = lv_event_send(btn, LV_EVENT_VALUE_CHANGED, &toggled);
             if(res != LV_RES_OK) return res;
         }
-    } else if(sign == LV_SIGNAL_CONTROL) {
+    }
+    else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             if(lv_btn_get_checkable(btn)) {
@@ -286,7 +293,8 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 if(res != LV_RES_OK) return res;
             }
 
-        } else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
+        }
+        else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
             if(lv_btn_get_checkable(btn)) {
                 lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);
 

@@ -30,16 +30,14 @@ extern "C" {
 /**
  * Represents a date on the calendar object (platform-agnostic).
  */
-typedef struct
-{
+typedef struct {
     uint16_t year;
     int8_t month;
     int8_t day;
 } lv_calendar_date_t;
 
 /*Data of calendar*/
-typedef struct
-{
+typedef struct {
     /*None*/ /*Ext. of ancestor*/
     /*New data for this type */
     lv_calendar_date_t today;               /*Date of today*/

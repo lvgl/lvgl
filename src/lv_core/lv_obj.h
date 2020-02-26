@@ -89,16 +89,16 @@ enum {
     LV_EVENT_LONG_PRESSED_REPEAT, /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every
                                        `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if dragged.*/
     LV_EVENT_CLICKED,             /**< Called on release if not dragged (regardless to long press)*/
-    LV_EVENT_RELEASED,            /**< Called in every cases when the object has been released*/                                    
-    LV_EVENT_DRAG_BEGIN,		  
+    LV_EVENT_RELEASED,            /**< Called in every cases when the object has been released*/
+    LV_EVENT_DRAG_BEGIN,
     LV_EVENT_DRAG_END,
     LV_EVENT_DRAG_THROW_BEGIN,
-    LV_EVENT_GESTURE,			/**< The object has been getture*/
+    LV_EVENT_GESTURE,           /**< The object has been getture*/
     LV_EVENT_KEY,
     LV_EVENT_FOCUSED,
     LV_EVENT_DEFOCUSED,
     LV_EVENT_LEAVE,
-    LV_EVENT_VALUE_CHANGED,		 /**< The object's value has changed (i.e. slider moved) */
+    LV_EVENT_VALUE_CHANGED,      /**< The object's value has changed (i.e. slider moved) */
     LV_EVENT_INSERT,
     LV_EVENT_REFRESH,
     LV_EVENT_APPLY,  /**< "Ok", "Apply" or similar specific button has clicked*/
@@ -138,10 +138,10 @@ enum {
     LV_SIGNAL_RELEASED,          /**< User pressed object for a short period of time, then released it. Not called if dragged. */
     LV_SIGNAL_LONG_PRESS,        /**< Object has been pressed for at least `LV_INDEV_LONG_PRESS_TIME`.  Not called if dragged.*/
     LV_SIGNAL_LONG_PRESS_REP,    /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if dragged.*/
-    LV_SIGNAL_DRAG_BEGIN,	
+    LV_SIGNAL_DRAG_BEGIN,
     LV_SIGNAL_DRAG_THROW_BEGIN,
-    LV_SIGNAL_DRAG_END,                                   
-    LV_SIGNAL_GESTURE,			/**< The object has been gesture*/
+    LV_SIGNAL_DRAG_END,
+    LV_SIGNAL_GESTURE,          /**< The object has been gesture*/
     LV_SIGNAL_LEAVE,            /**< Another object is clicked or chosen via an input device */
 
     /*Group related*/
@@ -155,8 +155,7 @@ typedef uint8_t lv_signal_t;
 typedef lv_res_t (*lv_signal_cb_t)(struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
 #if LV_USE_OBJ_REALIGN
-typedef struct
-{
+typedef struct {
     const struct _lv_obj_t * base;
     lv_coord_t xofs;
     lv_coord_t yofs;
@@ -193,8 +192,7 @@ enum {
 
 typedef uint8_t lv_state_t;
 
-typedef struct _lv_obj_t
-{
+typedef struct _lv_obj_t {
     struct _lv_obj_t * parent; /**< Pointer to the parent object*/
     lv_ll_t child_ll;       /**< Linked list to store the children objects*/
 
@@ -217,18 +215,18 @@ typedef struct _lv_obj_t
     lv_coord_t ext_draw_pad; /**< EXTtend the size in every direction for drawing. */
 
     /*Attributes and states*/
-    uint8_t click           :1;  /**< 1: Can be pressed by an input device*/
-    uint8_t drag            :1;  /**< 1: Enable the dragging*/
-    uint8_t drag_throw      :1;  /**< 1: Enable throwing with drag*/
-    uint8_t drag_parent     :1;  /**< 1: Parent will be dragged instead*/
-    uint8_t hidden          :1;  /**< 1: Object is hidden*/
-    uint8_t top             :1;  /**< 1: If the object or its children is clicked it goes to the foreground*/
-    uint8_t parent_event    :1;  /**< 1: Send the object's events to the parent too. */
-    uint8_t adv_hittest     :1;  /**< 1: Use advanced hit-testing (slower) */
+    uint8_t click           : 1; /**< 1: Can be pressed by an input device*/
+    uint8_t drag            : 1; /**< 1: Enable the dragging*/
+    uint8_t drag_throw      : 1; /**< 1: Enable throwing with drag*/
+    uint8_t drag_parent     : 1; /**< 1: Parent will be dragged instead*/
+    uint8_t hidden          : 1; /**< 1: Object is hidden*/
+    uint8_t top             : 1; /**< 1: If the object or its children is clicked it goes to the foreground*/
+    uint8_t parent_event    : 1; /**< 1: Send the object's events to the parent too. */
+    uint8_t adv_hittest     : 1; /**< 1: Use advanced hit-testing (slower) */
     uint8_t gesture_parent : 1;  /**< 1: Parent will be gesture instead*/
 
-    lv_drag_dir_t drag_dir  :3;  /**<  Which directions the object can be dragged in */
-    lv_bidi_dir_t base_dir  :2;  /**< Base direction of texts related to this object */
+    lv_drag_dir_t drag_dir  : 3; /**<  Which directions the object can be dragged in */
+    lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
 
 #if LV_USE_GROUP != 0
     void * group_p;
@@ -258,26 +256,22 @@ enum {
 typedef uint8_t lv_obj_part_t;
 
 /** Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
-typedef struct
-{
+typedef struct {
     const char * type[LV_MAX_ANCESTOR_NUM]; /**< [0]: the actual type, [1]: ancestor, [2] #1's ancestor
                                                ... [x]: "lv_obj" */
 } lv_obj_type_t;
 
-typedef struct
-{
-    lv_point_t *point;
+typedef struct {
+    lv_point_t * point;
     bool result;
 } lv_hit_test_info_t;
 
-typedef struct
-{
+typedef struct {
     uint8_t part;
     lv_style_list_t * result;
 } lv_get_style_info_t;
 
-typedef struct
-{
+typedef struct {
     uint8_t part;
     lv_state_t result;
 } lv_get_state_info_t;
@@ -334,7 +328,7 @@ void lv_obj_del_anim_ready_cb(lv_anim_t * a);
  * @param obj object to delete
  * @see lv_async_call
  */
-void lv_obj_del_async(struct _lv_obj_t *obj);
+void lv_obj_del_async(struct _lv_obj_t * obj);
 
 /**
  * Delete all children of an object
@@ -1190,7 +1184,7 @@ lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj);
 
 /**
  * Check if a given screen-space point is on an object's coordinates.
- * 
+ *
  * This method is intended to be used mainly by advanced hit testing algorithms to check
  * whether the point is even within the object (as an optimization).
  * @param obj object to check

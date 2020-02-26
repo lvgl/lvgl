@@ -34,21 +34,20 @@ extern "C" {
  **********************/
 
 enum {
-	LV_SLIDER_TYPE_NORMAL,
-	LV_SLIDER_TYPE_SYM,
-	LV_SLIDER_TYPE_RANGE
+    LV_SLIDER_TYPE_NORMAL,
+    LV_SLIDER_TYPE_SYM,
+    LV_SLIDER_TYPE_RANGE
 };
 typedef uint8_t lv_slider_type_t;
 /*Data of slider*/
-typedef struct
-{
+typedef struct {
     lv_bar_ext_t bar; /*Ext. of ancestor*/
     /*New data for this type */
     lv_style_list_t style_knob; /*Style of the knob*/
-	lv_area_t left_knob_area;
-	lv_area_t right_knob_area;
-	int16_t *value_to_set; /* Which bar value to set */
-    uint8_t dragging :1;        /*1: the slider is being dragged*/
+    lv_area_t left_knob_area;
+    lv_area_t right_knob_area;
+    int16_t * value_to_set; /* Which bar value to set */
+    uint8_t dragging : 1;       /*1: the slider is being dragged*/
 } lv_slider_ext_t;
 
 /** Built-in styles of slider*/
@@ -126,12 +125,12 @@ static inline void lv_slider_set_anim_time(lv_obj_t * slider, uint16_t anim_time
  */
 static inline void lv_slider_set_type(lv_obj_t * slider, lv_slider_type_t type)
 {
-	if(type == LV_SLIDER_TYPE_NORMAL)
-		lv_bar_set_type(slider, LV_BAR_TYPE_NORMAL);
-	else if(type == LV_SLIDER_TYPE_SYM)
-		lv_bar_set_type(slider, LV_BAR_TYPE_SYM);
-	else if(type == LV_SLIDER_TYPE_RANGE)
-		lv_bar_set_type(slider, LV_BAR_TYPE_CUSTOM);
+    if(type == LV_SLIDER_TYPE_NORMAL)
+        lv_bar_set_type(slider, LV_BAR_TYPE_NORMAL);
+    else if(type == LV_SLIDER_TYPE_SYM)
+        lv_bar_set_type(slider, LV_BAR_TYPE_SYM);
+    else if(type == LV_SLIDER_TYPE_RANGE)
+        lv_bar_set_type(slider, LV_BAR_TYPE_CUSTOM);
 }
 
 /*=====================
@@ -206,13 +205,13 @@ static inline uint16_t lv_slider_get_anim_time(lv_obj_t * slider)
  */
 static inline lv_slider_type_t lv_slider_get_type(lv_obj_t * slider)
 {
-	lv_bar_type_t type = lv_bar_get_type(slider);
-	if(type == LV_BAR_TYPE_SYM)
-		return LV_SLIDER_TYPE_SYM;
-	else if(type == LV_BAR_TYPE_CUSTOM)
-		return LV_SLIDER_TYPE_RANGE;
-	else
-		return LV_SLIDER_TYPE_NORMAL;
+    lv_bar_type_t type = lv_bar_get_type(slider);
+    if(type == LV_BAR_TYPE_SYM)
+        return LV_SLIDER_TYPE_SYM;
+    else if(type == LV_BAR_TYPE_CUSTOM)
+        return LV_SLIDER_TYPE_RANGE;
+    else
+        return LV_SLIDER_TYPE_NORMAL;
 }
 
 /**********************

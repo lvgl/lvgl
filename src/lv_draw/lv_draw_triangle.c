@@ -52,7 +52,8 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * clip_area, lv
  * @param clip_area polygon will be drawn only in this area
  * @param draw_dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_area_t * clip_area, lv_draw_rect_dsc_t * draw_dsc)
+void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_area_t * clip_area,
+                     lv_draw_rect_dsc_t * draw_dsc)
 {
     if(point_cnt < 3) return;
     if(points == NULL) return;
@@ -111,7 +112,8 @@ void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_are
 
             i_next_right = i_prev_right + 1;
             if(i_next_right > point_cnt - 1) i_next_right = 0;
-        } else {
+        }
+        else {
             i_next_left = i_prev_left + 1;
             if(i_next_left > point_cnt - 1) i_next_left = 0;
 
@@ -121,10 +123,10 @@ void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_are
 
         if(points[i_next_left].y >=  points[i_prev_left].y) {
             if(points[i_next_left].y != points[i_prev_left].y &&
-                           points[i_next_left].x !=  points[i_prev_left].x) {
+               points[i_next_left].x !=  points[i_prev_left].x) {
                 lv_draw_mask_line_points_init(mp_next, points[i_prev_left].x, points[i_prev_left].y,
-                                                         points[i_next_left].x, points[i_next_left].y,
-                                                         LV_DRAW_MASK_LINE_SIDE_RIGHT);
+                                              points[i_next_left].x, points[i_next_left].y,
+                                              LV_DRAW_MASK_LINE_SIDE_RIGHT);
                 lv_draw_mask_add(mp_next, mp);
                 mp_next++;
             }
@@ -139,8 +141,8 @@ void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_are
                points[i_next_right].x !=  points[i_prev_right].x) {
 
                 lv_draw_mask_line_points_init(mp_next, points[i_prev_right].x, points[i_prev_right].y,
-                                                         points[i_next_right].x, points[i_next_right].y,
-                                                         LV_DRAW_MASK_LINE_SIDE_LEFT);
+                                              points[i_next_right].x, points[i_next_right].y,
+                                              LV_DRAW_MASK_LINE_SIDE_LEFT);
                 lv_draw_mask_add(mp_next, mp);
                 mp_next++;
             }
@@ -148,7 +150,7 @@ void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_are
             i_prev_right = i_next_right;
         }
 
-    }while( mask_cnt < point_cnt);
+    } while(mask_cnt < point_cnt);
 
     lv_draw_rect(&poly_coords, clip_area, draw_dsc);
 

@@ -194,10 +194,8 @@ enum {
  *      TYPEDEFS
  **********************/
 
-typedef union
-{
-    struct
-    {
+typedef union {
+    struct {
         uint8_t blue : 1;
         uint8_t green : 1;
         uint8_t red : 1;
@@ -205,10 +203,8 @@ typedef union
     uint8_t full;
 } lv_color1_t;
 
-typedef union
-{
-    struct
-    {
+typedef union {
+    struct {
         uint8_t blue : 2;
         uint8_t green : 3;
         uint8_t red : 3;
@@ -216,10 +212,8 @@ typedef union
     uint8_t full;
 } lv_color8_t;
 
-typedef union
-{
-    struct
-    {
+typedef union {
+    struct {
 #if LV_COLOR_16_SWAP == 0
         uint16_t blue : 5;
         uint16_t green : 6;
@@ -234,10 +228,8 @@ typedef union
     uint16_t full;
 } lv_color16_t;
 
-typedef union
-{
-    struct
-    {
+typedef union {
+    struct {
         uint8_t blue;
         uint8_t green;
         uint8_t red;
@@ -264,8 +256,7 @@ typedef lv_color32_t lv_color_t;
 
 typedef uint8_t lv_opa_t;
 
-typedef struct
-{
+typedef struct {
     uint16_t h;
     uint8_t s;
     uint8_t v;
@@ -296,19 +287,22 @@ static inline uint8_t lv_color_to1(lv_color_t color)
 #elif LV_COLOR_DEPTH == 8
     if((LV_COLOR_GET_R(color) & 0x4) || (LV_COLOR_GET_G(color) & 0x4) || (LV_COLOR_GET_B(color) & 0x2)) {
         return 1;
-    } else {
+    }
+    else {
         return 0;
     }
 #elif LV_COLOR_DEPTH == 16
     if((LV_COLOR_GET_R(color) & 0x10) || (LV_COLOR_GET_G(color) & 0x20) || (LV_COLOR_GET_B(color) & 0x10)) {
         return 1;
-    } else {
+    }
+    else {
         return 0;
     }
 #elif LV_COLOR_DEPTH == 32
     if((LV_COLOR_GET_R(color) & 0x80) || (LV_COLOR_GET_G(color) & 0x80) || (LV_COLOR_GET_B(color) & 0x80)) {
         return 1;
-    } else {
+    }
+    else {
         return 0;
     }
 #endif
@@ -368,7 +362,7 @@ static inline uint16_t lv_color_to16(lv_color_t color)
 #endif
     LV_COLOR_SET_B16(ret, LV_COLOR_GET_B(color) >> 3);  /* 8 - 5  = 3*/
     return ret.full;
-#endif                         
+#endif
 }
 
 static inline uint32_t lv_color_to32(lv_color_t color)
@@ -392,9 +386,9 @@ static inline uint32_t lv_color_to32(lv_color_t color)
      * The faster integer math for conversion is:
      *  valueto = ( valuefrom * multiplier + adder ) >> divisor
      *   multiplier = FLOOR( ( (2^bitsto - 1) << divisor ) / (float)(2^bitsfrom - 1) )
-     * 
+     *
      * Find the first divisor where ( adder >> divisor ) <= 0
-     * 
+     *
      * 5-bit to 8-bit: ( 31 * multiplier + adder ) >> divisor = 255
      * divisor  multiplier  adder  min (0)  max (31)
      *       0           8      7        7       255
@@ -403,7 +397,7 @@ static inline uint32_t lv_color_to32(lv_color_t color)
      *       3          65     25        3       255
      *       4         131     19        1       255
      *       5         263      7        0       255
-     * 
+     *
      * 6-bit to 8-bit: 255 = ( 63 * multiplier + adder ) >> divisor
      * divisor  multiplier  adder  min (0)  max (63)
      *       0           4      3        3       255
@@ -415,9 +409,9 @@ static inline uint32_t lv_color_to32(lv_color_t color)
      *       6         259      3        0       255
      */
     lv_color32_t ret;
-    LV_COLOR_SET_R32(ret, (LV_COLOR_GET_R(color) * 263 + 7 ) >> 5);
-    LV_COLOR_SET_G32(ret, (LV_COLOR_GET_G(color) * 259 + 3 ) >> 6);
-    LV_COLOR_SET_B32(ret, (LV_COLOR_GET_B(color) * 263 + 7 ) >> 5);
+    LV_COLOR_SET_R32(ret, (LV_COLOR_GET_R(color) * 263 + 7) >> 5);
+    LV_COLOR_SET_G32(ret, (LV_COLOR_GET_G(color) * 259 + 3) >> 6);
+    LV_COLOR_SET_B32(ret, (LV_COLOR_GET_B(color) * 263 + 7) >> 5);
     LV_COLOR_SET_A32(ret, 0xFF);
     return ret.full;
 #elif LV_COLOR_DEPTH == 32
@@ -459,7 +453,8 @@ static inline lv_color_t lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
  * @param res_color the result color
  * @param res_opa the result opacity
  */
-static inline void lv_color_mix_with_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa, lv_color_t * res_color, lv_opa_t * res_opa)
+static inline void lv_color_mix_with_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa,
+                                           lv_color_t * res_color, lv_opa_t * res_opa)
 {
     /* Pick the foreground if it's fully opaque or the Background is fully transparent*/
     if(fg_opa > LV_OPA_MAX || bg_opa <= LV_OPA_MIN) {
@@ -487,7 +482,7 @@ static inline void lv_color_mix_with_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
         static lv_opa_t res_opa_saved = 0;
 
         if(fg_opa != fg_opa_save || bg_opa != bg_opa_save || fg_color.full != fg_color_save.full ||
-                bg_color.full != bg_color_save.full) {
+           bg_color.full != bg_color_save.full) {
             fg_opa_save        = fg_opa;
             bg_opa_save        = bg_opa;
             fg_color_save.full = fg_color.full;

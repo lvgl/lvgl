@@ -85,7 +85,8 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         if(par) {
             w = lv_obj_get_width_fit(lv_obj_get_parent(new_win));
             h = lv_obj_get_height_fit(lv_obj_get_parent(new_win));
-        } else {
+        }
+        else {
             w = lv_disp_get_hor_res(NULL);
             h = lv_disp_get_ver_res(NULL);
         }
@@ -102,7 +103,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         /*Move back to window background because it's automatically moved to the content page*/
         lv_obj_add_protect(ext->header, LV_PROTECT_PARENT);
         lv_obj_set_parent(ext->header, new_win);
-        if(ancestor_header_design == NULL) ancestor_header_design= lv_obj_get_design_cb(ext->header);
+        if(ancestor_header_design == NULL) ancestor_header_design = lv_obj_get_design_cb(ext->header);
         lv_obj_set_height(ext->header, LV_DPI / 2);
 
         lv_obj_set_design_cb(ext->header, lv_win_header_design);
@@ -475,7 +476,8 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
         lv_point_t txt_size;
 
 
-        lv_txt_get_size(&txt_size, ext->title_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX, label_dsc.flag);
+        lv_txt_get_size(&txt_size, ext->title_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+                        label_dsc.flag);
 
         txt_area.x1 = header->coords.x1 + left;
         txt_area.y1 = header->coords.y1 + (lv_obj_get_height(header) - txt_size.y) / 2;
@@ -483,7 +485,8 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
         txt_area.y2 = txt_area.y1 + txt_size.y;
 
         lv_draw_label(&txt_area, clip_area, &label_dsc, ext->title_txt, NULL);
-    } else if(mode == LV_DESIGN_DRAW_POST) {
+    }
+    else if(mode == LV_DESIGN_DRAW_POST) {
         ancestor_header_design(header, clip_area, mode);
     }
 
@@ -505,10 +508,12 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
         info->result = lv_win_get_style(win, info->part);
         if(info->result != NULL) return LV_RES_OK;
         else return ancestor_signal(win, sign, param);
-    } else if(sign == LV_SIGNAL_GET_STATE_DSC) {
+    }
+    else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
         lv_get_state_info_t * info = param;
-        if(info->part == LV_WIN_PART_CONTENT_SCRL) info->result = lv_obj_get_state(lv_page_get_scrl(ext->page), LV_CONT_PART_MAIN);
+        if(info->part == LV_WIN_PART_CONTENT_SCRL) info->result = lv_obj_get_state(lv_page_get_scrl(ext->page),
+                                                                                       LV_CONT_PART_MAIN);
         else if(info->part == LV_WIN_PART_SCRLBAR) info->result = lv_obj_get_state(ext->page, LV_PAGE_PART_SCRLBAR);
         else if(info->part == LV_WIN_PART_HEADER) info->result = lv_obj_get_state(ext->header, LV_OBJ_PART_MAIN);
         return LV_RES_OK;
@@ -530,24 +535,29 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
                     lv_obj_t * tmp = child;
                     child          = lv_obj_get_child(win, child); /*Get the next child before move this*/
                     lv_obj_set_parent(tmp, page);
-                } else {
+                }
+                else {
                     child = lv_obj_get_child(win, child);
                 }
             }
         }
-    } else if(sign == LV_SIGNAL_STYLE_CHG) {
+    }
+    else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_win_realign(win);
-    } else if(sign == LV_SIGNAL_COORD_CHG) {
+    }
+    else if(sign == LV_SIGNAL_COORD_CHG) {
         /*If the size is changed refresh the window*/
         if(lv_area_get_width(param) != lv_obj_get_width(win) || lv_area_get_height(param) != lv_obj_get_height(win)) {
             lv_win_realign(win);
         }
-    } else if(sign == LV_SIGNAL_CLEANUP) {
+    }
+    else if(sign == LV_SIGNAL_CLEANUP) {
         ext->header = NULL; /*These objects were children so they are already invalid*/
         ext->page   = NULL;
         lv_mem_free(ext->title_txt);
         ext->title_txt  = NULL;
-    } else if(sign == LV_SIGNAL_CONTROL) {
+    }
+    else if(sign == LV_SIGNAL_CONTROL) {
         /*Forward all the control signals to the page*/
         ext->page->signal_cb(ext->page, sign, param);
     }
@@ -568,20 +578,20 @@ static lv_style_list_t * lv_win_get_style(lv_obj_t * win, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-    case LV_WIN_PART_BG:
-        style_dsc_p = &win->style_list;
-        break;
-    case LV_WIN_PART_HEADER:
-        style_dsc_p = lv_obj_get_style_list(ext->header, LV_OBJ_PART_MAIN);
-        break;
-    case LV_WIN_PART_SCRLBAR:
-        style_dsc_p = lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCRLBAR);
-        break;
-    case LV_WIN_PART_CONTENT_SCRL:
-        style_dsc_p = lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCRL);
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_WIN_PART_BG:
+            style_dsc_p = &win->style_list;
+            break;
+        case LV_WIN_PART_HEADER:
+            style_dsc_p = lv_obj_get_style_list(ext->header, LV_OBJ_PART_MAIN);
+            break;
+        case LV_WIN_PART_SCRLBAR:
+            style_dsc_p = lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCRLBAR);
+            break;
+        case LV_WIN_PART_CONTENT_SCRL:
+            style_dsc_p = lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCRL);
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;
@@ -609,7 +619,8 @@ static void lv_win_realign(lv_obj_t * win)
         lv_obj_set_size(btn, btn_size, btn_size);
         if(btn_prev == NULL) {
             lv_obj_align(btn, ext->header, LV_ALIGN_IN_RIGHT_MID, -header_right, 0);
-        } else {
+        }
+        else {
             lv_obj_align(btn, btn_prev, LV_ALIGN_OUT_LEFT_MID, - header_inner, 0);
         }
         btn_prev = btn;

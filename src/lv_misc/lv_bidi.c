@@ -26,19 +26,21 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct
-{
+typedef struct {
     uint32_t bracklet_pos;
     lv_bidi_dir_t dir;
-}bracket_stack_t;
+} bracket_stack_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint32_t max_len, uint32_t * len, uint16_t  * pos_conv_len);
-static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t *pos_conv_out, uint16_t pos_conv_rd_base, uint16_t pos_conv_len);
+static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint32_t max_len, uint32_t * len,
+                                  uint16_t  * pos_conv_len);
+static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * pos_conv_out, uint16_t pos_conv_rd_base,
+                        uint16_t pos_conv_len);
 static uint32_t char_change_to_pair(uint32_t letter);
-static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32_t len, uint32_t letter, lv_bidi_dir_t base_dir);
+static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32_t len, uint32_t letter,
+                                     lv_bidi_dir_t base_dir);
 static void fill_pos_conv(uint16_t * out, uint16_t len, uint16_t index);
 static uint32_t get_txt_len(const char * txt, uint32_t max_len);
 
@@ -151,7 +153,7 @@ bool lv_bidi_letter_is_weak(uint32_t letter)
  */
 bool lv_bidi_letter_is_rtl(uint32_t letter)
 {
-     if(letter >= 0x5d0 && letter <= 0x5ea) return true;
+    if(letter >= 0x5d0 && letter <= 0x5ea) return true;
     if(letter == 0x202E) return true;               /*Unicode of LV_BIDI_RLO*/
 
     return false;
@@ -185,23 +187,24 @@ bool lv_bidi_letter_is_neutral(uint32_t letter)
  * @param is_rtl tell the the char at `viasual_pos` is RTL or LTR context
  * @return the logical character position
  */
-uint16_t lv_bidi_get_logical_pos(const char * str_in, char **bidi_txt, uint32_t len, lv_bidi_dir_t base_dir, uint32_t visual_pos, bool *is_rtl)
+uint16_t lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_t len, lv_bidi_dir_t base_dir,
+                                 uint32_t visual_pos, bool * is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
     char * buf = lv_mem_buf_get(len + 1);
     if(buf == NULL) return (uint16_t) -1;
 
-    uint16_t *pos_conv_buf = lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
+    uint16_t * pos_conv_buf = lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
     if(pos_conv_buf == NULL) {
         lv_mem_buf_release(buf);
         return (uint16_t) -1;
     }
 
-    if (bidi_txt) *bidi_txt = buf;
+    if(bidi_txt) *bidi_txt = buf;
 
-    lv_bidi_process_paragraph(str_in, bidi_txt? *bidi_txt: NULL, len, base_dir, pos_conv_buf, pos_conv_len);
+    lv_bidi_process_paragraph(str_in, bidi_txt ? *bidi_txt : NULL, len, base_dir, pos_conv_buf, pos_conv_len);
 
-    if (is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[visual_pos]);
+    if(is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[visual_pos]);
 
     if(bidi_txt == NULL) lv_mem_buf_release(buf);
     uint16_t res = GET_POS(pos_conv_buf[visual_pos]);
@@ -221,26 +224,27 @@ uint16_t lv_bidi_get_logical_pos(const char * str_in, char **bidi_txt, uint32_t 
  * @param is_rtl tell the the char at `logical_pos` is RTL or LTR context
  * @return the visual character position
  */
-uint16_t lv_bidi_get_visual_pos(const char * str_in, char **bidi_txt, uint16_t len, lv_bidi_dir_t base_dir, uint32_t logical_pos, bool *is_rtl)
+uint16_t lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t len, lv_bidi_dir_t base_dir,
+                                uint32_t logical_pos, bool * is_rtl)
 {
     uint32_t pos_conv_len = get_txt_len(str_in, len);
     char * buf = lv_mem_buf_get(len + 1);
     if(buf == NULL) return (uint16_t) -1;
 
-    uint16_t *pos_conv_buf = lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
+    uint16_t * pos_conv_buf = lv_mem_buf_get(pos_conv_len * sizeof(uint16_t));
     if(pos_conv_buf == NULL) {
         lv_mem_buf_release(buf);
         return (uint16_t) -1;
     }
 
-    if (bidi_txt) *bidi_txt = buf;
+    if(bidi_txt) *bidi_txt = buf;
 
-    lv_bidi_process_paragraph(str_in, bidi_txt ? *bidi_txt: NULL, len, base_dir, pos_conv_buf, pos_conv_len);
+    lv_bidi_process_paragraph(str_in, bidi_txt ? *bidi_txt : NULL, len, base_dir, pos_conv_buf, pos_conv_len);
 
-    for (uint16_t i = 0; i < pos_conv_len; i++){
-        if (GET_POS(pos_conv_buf[i]) == logical_pos){
+    for(uint16_t i = 0; i < pos_conv_len; i++) {
+        if(GET_POS(pos_conv_buf[i]) == logical_pos) {
 
-            if (is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[i]);
+            if(is_rtl) *is_rtl = IS_RTL_POS(pos_conv_buf[i]);
             lv_mem_buf_release(pos_conv_buf);
 
             if(bidi_txt == NULL) lv_mem_buf_release(buf);
@@ -262,7 +266,8 @@ uint16_t lv_bidi_get_visual_pos(const char * str_in, char **bidi_txt, uint16_t l
  * Can be `NULL` is unused
  * @param pos_conv_len length of `pos_conv_out` in element count
  */
-void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_bidi_dir_t base_dir, uint16_t *pos_conv_out, uint16_t pos_conv_len)
+void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len, lv_bidi_dir_t base_dir,
+                               uint16_t * pos_conv_out, uint16_t pos_conv_len)
 {
     uint32_t run_len = 0;
     lv_bidi_dir_t run_dir;
@@ -282,7 +287,7 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
         pos_conv_wr = 0;
     }
 
-    if (str_out) str_out[len] = '\0';
+    if(str_out) str_out[len] = '\0';
 
     lv_bidi_dir_t dir = base_dir;
 
@@ -299,24 +304,26 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
     }
 
     if(rd && str_in[rd] != '\0') {
-       lv_txt_encoded_prev(str_in, &rd);
-       pos_conv_rd--;
+        lv_txt_encoded_prev(str_in, &rd);
+        pos_conv_rd--;
     }
 
     if(rd) {
         if(base_dir == LV_BIDI_DIR_LTR) {
-            if (str_out) {
+            if(str_out) {
                 memcpy(&str_out[wr], str_in, rd);
                 wr += rd;
             }
-            if (pos_conv_out) {
+            if(pos_conv_out) {
                 fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_rd, 0);
                 pos_conv_wr += pos_conv_rd;
             }
-        } else {
+        }
+        else {
             wr -= rd;
             pos_conv_wr -= pos_conv_rd;
-            rtl_reverse(str_out? &str_out[wr]: NULL, str_in, rd, pos_conv_out? &pos_conv_out[pos_conv_wr]: NULL, 0, pos_conv_rd);
+            rtl_reverse(str_out ? &str_out[wr] : NULL, str_in, rd, pos_conv_out ? &pos_conv_out[pos_conv_wr] : NULL, 0,
+                        pos_conv_rd);
         }
     }
 
@@ -327,21 +334,24 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
 
         if(base_dir == LV_BIDI_DIR_LTR) {
             if(run_dir == LV_BIDI_DIR_LTR) {
-                if (str_out) memcpy(&str_out[wr], &str_in[rd], run_len);
-                if (pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_run_len, pos_conv_rd);
+                if(str_out) memcpy(&str_out[wr], &str_in[rd], run_len);
+                if(pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_run_len, pos_conv_rd);
             }
-            else rtl_reverse(str_out? &str_out[wr]: NULL, &str_in[rd], run_len, pos_conv_out? &pos_conv_out[pos_conv_wr] : NULL, pos_conv_rd, pos_conv_run_len);
-           wr += run_len;
-           pos_conv_wr += pos_conv_run_len;
-       } else {
-           wr -= run_len;
-           pos_conv_wr -= pos_conv_run_len;
-           if(run_dir == LV_BIDI_DIR_LTR) {
-               if (str_out) memcpy(&str_out[wr], &str_in[rd], run_len);
-               if (pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_run_len, pos_conv_rd);
-           }
-           else rtl_reverse(str_out? &str_out[wr]: NULL, &str_in[rd], run_len, pos_conv_out? &pos_conv_out[pos_conv_wr] : NULL, pos_conv_rd, pos_conv_run_len);
-       }
+            else rtl_reverse(str_out ? &str_out[wr] : NULL, &str_in[rd], run_len, pos_conv_out ? &pos_conv_out[pos_conv_wr] : NULL,
+                                 pos_conv_rd, pos_conv_run_len);
+            wr += run_len;
+            pos_conv_wr += pos_conv_run_len;
+        }
+        else {
+            wr -= run_len;
+            pos_conv_wr -= pos_conv_run_len;
+            if(run_dir == LV_BIDI_DIR_LTR) {
+                if(str_out) memcpy(&str_out[wr], &str_in[rd], run_len);
+                if(pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_run_len, pos_conv_rd);
+            }
+            else rtl_reverse(str_out ? &str_out[wr] : NULL, &str_in[rd], run_len, pos_conv_out ? &pos_conv_out[pos_conv_wr] : NULL,
+                                 pos_conv_rd, pos_conv_run_len);
+        }
 
         rd += run_len;
         pos_conv_rd += pos_conv_run_len;
@@ -386,13 +396,14 @@ static uint32_t get_txt_len(const char * txt, uint32_t max_len)
 static void fill_pos_conv(uint16_t * out, uint16_t len, uint16_t index)
 {
     uint16_t i;
-    for (i = 0; i < len; i++) {
+    for(i = 0; i < len; i++) {
         out[i] = SET_RTL_POS(index, false);
         index++;
     }
-} 
+}
 
-static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint32_t max_len, uint32_t * len, uint16_t  * pos_conv_len)
+static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint32_t max_len, uint32_t * len,
+                                  uint16_t  * pos_conv_len)
 {
     uint32_t i = 0;
     uint32_t letter;
@@ -473,7 +484,8 @@ static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint
     return run_dir;
 }
 
-static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t *pos_conv_out, uint16_t pos_conv_rd_base, uint16_t pos_conv_len)
+static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * pos_conv_out, uint16_t pos_conv_rd_base,
+                        uint16_t pos_conv_len)
 {
     uint32_t i = len;
     uint32_t wr = 0;
@@ -498,7 +510,7 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t *p
 
                 /*Finish on non-weak char */
                 /*but treat number and currency related chars as weak*/
-                if (lv_bidi_letter_is_weak(letter) == false && letter != '.' && letter != ',' && letter != '$' && letter != '%') {
+                if(lv_bidi_letter_is_weak(letter) == false && letter != '.' && letter != ',' && letter != '$' && letter != '%') {
                     lv_txt_encoded_next(src, &i);   /*Rewind one letter*/
                     pos_conv_i++;
                     first_weak = i;
@@ -511,8 +523,9 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t *p
                 pos_conv_first_weak = 0;
             }
 
-            if (dest) memcpy(&dest[wr], &src[first_weak], last_weak - first_weak + 1);
-            if (pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_last_weak - pos_conv_first_weak + 1, pos_conv_rd_base + pos_conv_first_weak); 
+            if(dest) memcpy(&dest[wr], &src[first_weak], last_weak - first_weak + 1);
+            if(pos_conv_out) fill_pos_conv(&pos_conv_out[pos_conv_wr], pos_conv_last_weak - pos_conv_first_weak + 1,
+                                               pos_conv_rd_base + pos_conv_first_weak);
             wr += last_weak - first_weak + 1;
             pos_conv_wr += pos_conv_last_weak - pos_conv_first_weak + 1;
         }
@@ -523,15 +536,15 @@ static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t *p
             /*Swap arithmetical symbols*/
             if(letter_size == 1) {
                 uint32_t new_letter = letter = char_change_to_pair(letter);
-                if (dest) dest[wr] = (uint8_t)new_letter;
-                if (pos_conv_out) pos_conv_out[pos_conv_wr] = SET_RTL_POS(pos_conv_rd_base + pos_conv_letter, true);
+                if(dest) dest[wr] = (uint8_t)new_letter;
+                if(pos_conv_out) pos_conv_out[pos_conv_wr] = SET_RTL_POS(pos_conv_rd_base + pos_conv_letter, true);
                 wr++;
                 pos_conv_wr++;
             }
             /*Just store the letter*/
             else {
-                if (dest) memcpy(&dest[wr], &src[i], letter_size);
-                if (pos_conv_out) pos_conv_out[pos_conv_wr] = SET_RTL_POS(pos_conv_rd_base + pos_conv_i, true);
+                if(dest) memcpy(&dest[wr], &src[i], letter_size);
+                if(pos_conv_out) pos_conv_out[pos_conv_wr] = SET_RTL_POS(pos_conv_rd_base + pos_conv_i, true);
                 wr += letter_size;
                 pos_conv_wr++;
             }
@@ -554,7 +567,8 @@ static uint32_t char_change_to_pair(uint32_t letter)
     return letter;
 }
 
-static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32_t len, uint32_t letter, lv_bidi_dir_t base_dir)
+static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32_t len, uint32_t letter,
+                                     lv_bidi_dir_t base_dir)
 {
     lv_bidi_dir_t bracket_dir = LV_BIDI_DIR_NEUTRAL;
 
@@ -570,7 +584,8 @@ static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32
                 if(letter_next == bracket_right[i]) {
                     /*Closing bracket found*/
                     break;
-                } else {
+                }
+                else {
                     /*Save the dir*/
                     lv_bidi_dir_t letter_dir = lv_bidi_get_letter_dir(letter_next);
                     if(letter_dir == base_dir) {
@@ -619,7 +634,8 @@ static lv_bidi_dir_t bracket_process(const char * txt, uint32_t next_pos, uint32
 
         br_stack_p++;
         return bracket_dir;
-    } else if(br_stack_p > 0) {
+    }
+    else if(br_stack_p > 0) {
         /*Is the letter a closing bracket of the last opening?*/
         if(letter == bracket_right[br_stack[br_stack_p - 1].bracklet_pos]) {
             bracket_dir = br_stack[br_stack_p - 1].dir;

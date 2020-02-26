@@ -66,8 +66,7 @@ typedef void (*lv_anim_ready_cb_t)(struct _lv_anim_t *);
 typedef void (*lv_anim_start_cb_t)(struct _lv_anim_t *);
 
 /** Describes an animation*/
-typedef struct _lv_anim_t
-{
+typedef struct _lv_anim_t {
     void * var;                  /**<Variable to animate*/
     lv_anim_exec_xcb_t exec_cb;   /**< Function to execute to animate*/
     lv_anim_path_cb_t path_cb;   /**< Function to get the steps of animations*/
@@ -81,7 +80,7 @@ typedef struct _lv_anim_t
     uint32_t playback_time;      /**< Duration of playback animation*/
     uint32_t repeat_delay;       /**< Wait before repeat*/
     uint16_t repeat_cnt;         /**< Repeat count for the animation*/
-    uint8_t early_apply  :1;     /**< 1: Apply start value immediately even is there is `delay` */
+    uint8_t early_apply  : 1;    /**< 1: Apply start value immediately even is there is `delay` */
 #if LV_USE_USER_DATA
     lv_anim_user_data_t user_data; /**< Custom user data*/
 #endif
@@ -268,7 +267,7 @@ void lv_anim_start(lv_anim_t * a);
  */
 static inline int32_t lv_anim_get_delay(lv_anim_t * a)
 {
-	return -a->act_time;
+    return -a->act_time;
 }
 
 /**

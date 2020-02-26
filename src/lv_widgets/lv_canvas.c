@@ -31,21 +31,22 @@
 static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * param);
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf);
 
-static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
-                      lv_color_t color, lv_opa_t opa);
+static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x,
+                                    lv_coord_t y,
+                                    lv_color_t color, lv_opa_t opa);
 
 static void set_px_cb_alpha1(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
-                      lv_color_t color, lv_opa_t opa);
+                             lv_color_t color, lv_opa_t opa);
 
 static void set_px_cb_alpha2(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
-                      lv_color_t color, lv_opa_t opa);
+                             lv_color_t color, lv_opa_t opa);
 
 static void set_px_cb_alpha4(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
-                      lv_color_t color, lv_opa_t opa);
+                             lv_color_t color, lv_opa_t opa);
 
 
 static void set_px_cb_alpha8(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
-                      lv_color_t color, lv_opa_t opa);
+                             lv_color_t color, lv_opa_t opa);
 
 static void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, lv_color_t color, lv_opa_t opa);
 
@@ -274,8 +275,9 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, l
  *                Set to `source height / 2` to rotate around the center
  * @param antialias apply anti-aliasing during the transformation. Looks better but slower.
  */
-void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, uint16_t zoom, lv_coord_t offset_x, lv_coord_t offset_y,
-                      int32_t pivot_x, int32_t pivot_y, bool antialias)
+void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, uint16_t zoom, lv_coord_t offset_x,
+                         lv_coord_t offset_y,
+                         int32_t pivot_x, int32_t pivot_y, bool antialias)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
     LV_ASSERT_NULL(img);
@@ -314,7 +316,8 @@ void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, u
                 /*If the image has no alpha channel just simple set the result color on the canvas*/
                 if(lv_img_cf_has_alpha(img->header.cf) == false) {
                     lv_img_buf_set_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.res.color);
-                } else {
+                }
+                else {
                     lv_color_t bg_color = lv_img_buf_get_px_color(&ext_dst->dsc, x + offset_x, y + offset_y, dsc.cfg.color);
 
                     /*If the canvas has no alpha but the image has mix the image's color with
@@ -384,7 +387,8 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
         if(a.y1 < 0) a.y1 = 0;
         if(a.x2 > ext->dsc.header.w - 1) a.x2 = ext->dsc.header.w - 1;
         if(a.y2 > ext->dsc.header.h - 1) a.y2 = ext->dsc.header.h - 1;
-    } else {
+    }
+    else {
         a.x1 = 0;
         a.y1 = 0;
         a.x2 = ext->dsc.header.w - 1;
@@ -425,7 +429,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
         memcpy(line_buf, &ext->dsc.data[y * line_w], line_w);
 
 
-        for(x = a.x1 -r_back; x <= a.x1 + r_front; x++) {
+        for(x = a.x1 - r_back; x <= a.x1 + r_front; x++) {
             x_safe = x < 0 ? 0 : x;
             x_safe = x_safe > ext->dsc.header.w - 1 ? ext->dsc.header.w - 1 : x_safe;
 
@@ -447,8 +451,8 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 
         for(x = a.x1; x <= a.x2; x++) {
 
-        	if(asum) {
-				c.ch.red = rsum / r;
+            if(asum) {
+                c.ch.red = rsum / r;
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
                 uint8_t gtmp = gsum / r;
                 c.ch.green_h = gtmp >> 3;
@@ -456,12 +460,12 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 #else
                 c.ch.green = gsum / r;
 #endif
-				c.ch.blue = bsum / r;
-				if(has_alpha) opa = asum / r;
+                c.ch.blue = bsum / r;
+                if(has_alpha) opa = asum / r;
 
-				lv_img_buf_set_px_color(&ext->dsc, x, y, c);
-        	}
-        	if(has_alpha) lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa);
+                lv_img_buf_set_px_color(&ext->dsc, x, y, c);
+            }
+            if(has_alpha) lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa);
 
             x_safe = x - r_back;
             x_safe = x_safe < 0 ? 0 : x_safe;
@@ -519,7 +523,8 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
         if(a.y1 < 0) a.y1 = 0;
         if(a.x2 > ext->dsc.header.w - 1) a.x2 = ext->dsc.header.w - 1;
         if(a.y2 > ext->dsc.header.h - 1) a.y2 = ext->dsc.header.h - 1;
-    } else {
+    }
+    else {
         a.x1 = 0;
         a.y1 = 0;
         a.x2 = ext->dsc.header.w - 1;
@@ -557,7 +562,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
         lv_color_t c;
         lv_opa_t opa = LV_OPA_COVER;
 
-        for(y = a.y1 -r_back; y <= a.y1 + r_front; y++) {
+        for(y = a.y1 - r_back; y <= a.y1 + r_front; y++) {
             y_safe = y < 0 ? 0 : y;
             y_safe = y_safe > ext->dsc.header.h - 1 ? ext->dsc.header.h - 1 : y_safe;
 
@@ -581,21 +586,21 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
         if(has_alpha == false) asum = LV_OPA_COVER;
 
         for(y = a.y1; y <= a.y2; y++) {
-        	if(asum) {
-				c.ch.red = rsum / r;
+            if(asum) {
+                c.ch.red = rsum / r;
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
-				uint8_t gtmp = gsum / r;
+                uint8_t gtmp = gsum / r;
                 c.ch.green_h = gtmp >> 3;
                 c.ch.green_l = gtmp & 0x7;
 #else
                 c.ch.green = gsum / r;
 #endif
-				c.ch.blue = bsum / r;
-				if(has_alpha) opa = asum / r;
+                c.ch.blue = bsum / r;
+                if(has_alpha) opa = asum / r;
 
-				lv_img_buf_set_px_color(&ext->dsc, x, y, c);
-        	}
-        	if(has_alpha) lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa);
+                lv_img_buf_set_px_color(&ext->dsc, x, y, c);
+            }
+            if(has_alpha) lv_img_buf_set_px_alpha(&ext->dsc, x, y, opa);
 
             y_safe = y - r_back;
             y_safe = y_safe < 0 ? 0 : y_safe;
@@ -714,8 +719,7 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_TRANSP;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-        rect_dsc->bg_color.full == ctransp.full)
-    {
+       rect_dsc->bg_color.full == ctransp.full) {
         disp.driver.antialiasing = 0;
     }
 #endif
@@ -740,7 +744,8 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
  * @param txt text to display
  * @param align align of the text (`LV_LABEL_ALIGN_LEFT/RIGHT/CENTER`)
  */
-void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w, lv_draw_label_dsc_t * label_draw_dsc,
+void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_t max_w,
+                         lv_draw_label_dsc_t * label_draw_dsc,
                          const char * txt, lv_label_align_t align)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
@@ -786,10 +791,18 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 
     lv_txt_flag_t flag;
     switch(align) {
-        case LV_LABEL_ALIGN_LEFT: flag = LV_TXT_FLAG_NONE; break;
-        case LV_LABEL_ALIGN_RIGHT: flag = LV_TXT_FLAG_RIGHT; break;
-        case LV_LABEL_ALIGN_CENTER: flag = LV_TXT_FLAG_CENTER; break;
-        default: flag = LV_TXT_FLAG_NONE; break;
+        case LV_LABEL_ALIGN_LEFT:
+            flag = LV_TXT_FLAG_NONE;
+            break;
+        case LV_LABEL_ALIGN_RIGHT:
+            flag = LV_TXT_FLAG_RIGHT;
+            break;
+        case LV_LABEL_ALIGN_CENTER:
+            flag = LV_TXT_FLAG_CENTER;
+            break;
+        default:
+            flag = LV_TXT_FLAG_NONE;
+            break;
     }
 
     label_draw_dsc->flag = flag;
@@ -807,7 +820,8 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
  * @param src image source. Can be a pointer an `lv_img_dsc_t` variable or a path an image.
  * @param style style of the image (`image` properties are used)
  */
-void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src, lv_draw_img_dsc_t * img_draw_dsc)
+void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const void * src,
+                        lv_draw_img_dsc_t * img_draw_dsc)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
 
@@ -871,7 +885,8 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
  * @param point_cnt number of points
  * @param style style of the line (`line` properties are used)
  */
-void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt, lv_draw_line_dsc_t * line_draw_dsc)
+void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt,
+                         lv_draw_line_dsc_t * line_draw_dsc)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
 
@@ -908,8 +923,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t 
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_TRANSP;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-        line_draw_dsc->color.full == ctransp.full)
-    {
+       line_draw_dsc->color.full == ctransp.full) {
         disp.driver.antialiasing = 0;
     }
 #endif
@@ -921,7 +935,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t 
     for(i = 0; i < point_cnt - 1; i++) {
         lv_draw_line(&points[i], &points[i + 1], &mask, line_draw_dsc);
     }
-    
+
     lv_refr_set_disp_refreshing(refr_ori);
 
     lv_obj_invalidate(canvas);
@@ -934,7 +948,8 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t 
  * @param point_cnt number of points
  * @param style style of the polygon (`body.main_color` and `body.opa` is used)
  */
-void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt, lv_draw_rect_dsc_t * poly_draw_dsc)
+void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt,
+                            lv_draw_rect_dsc_t * poly_draw_dsc)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
 
@@ -972,8 +987,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_TRANSP;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-        poly_draw_dsc->bg_color.full == ctransp.full)
-    {
+       poly_draw_dsc->bg_color.full == ctransp.full) {
         disp.driver.antialiasing = 0;
     }
 #endif
@@ -981,7 +995,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32
     lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
     lv_refr_set_disp_refreshing(&disp);
 
-//    lv_draw_polygon(points, point_cnt, &mask, poly_draw_dsc);
+    //    lv_draw_polygon(points, point_cnt, &mask, poly_draw_dsc);
 
     lv_refr_set_disp_refreshing(refr_ori);
 
@@ -1037,8 +1051,7 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     /*Disable anti-aliasing if drawing with transparent color to chroma keyed canvas*/
     lv_color_t ctransp = LV_COLOR_TRANSP;
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED &&
-            arc_draw_dsc->color.full == ctransp.full)
-    {
+       arc_draw_dsc->color.full == ctransp.full) {
         disp.driver.antialiasing = 0;
     }
 #endif
@@ -1083,17 +1096,28 @@ static lv_res_t lv_canvas_signal(lv_obj_t * canvas, lv_signal_t sign, void * par
 static void set_set_px_cb(lv_disp_drv_t * disp_drv, lv_img_cf_t cf)
 {
     switch(cf) {
-        case LV_IMG_CF_TRUE_COLOR_ALPHA: disp_drv->set_px_cb = set_px_true_color_alpha; break;
-        case LV_IMG_CF_ALPHA_1BIT: disp_drv->set_px_cb = set_px_cb_alpha1; break;
-        case LV_IMG_CF_ALPHA_2BIT: disp_drv->set_px_cb = set_px_cb_alpha2; break;
-        case LV_IMG_CF_ALPHA_4BIT: disp_drv->set_px_cb = set_px_cb_alpha4; break;
-        case LV_IMG_CF_ALPHA_8BIT: disp_drv->set_px_cb = set_px_cb_alpha8; break;
-        default: disp_drv->set_px_cb = NULL;
+        case LV_IMG_CF_TRUE_COLOR_ALPHA:
+            disp_drv->set_px_cb = set_px_true_color_alpha;
+            break;
+        case LV_IMG_CF_ALPHA_1BIT:
+            disp_drv->set_px_cb = set_px_cb_alpha1;
+            break;
+        case LV_IMG_CF_ALPHA_2BIT:
+            disp_drv->set_px_cb = set_px_cb_alpha2;
+            break;
+        case LV_IMG_CF_ALPHA_4BIT:
+            disp_drv->set_px_cb = set_px_cb_alpha4;
+            break;
+        case LV_IMG_CF_ALPHA_8BIT:
+            disp_drv->set_px_cb = set_px_cb_alpha8;
+            break;
+        default:
+            disp_drv->set_px_cb = NULL;
     }
 }
 
 static void set_px_cb_alpha1(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
-                      lv_color_t color, lv_opa_t opa)
+                             lv_color_t color, lv_opa_t opa)
 {
     (void) disp_drv; /*Unused*/
 
@@ -1107,7 +1131,7 @@ static void set_px_cb_alpha1(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t
 }
 
 static void set_px_cb_alpha2(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
-                      lv_color_t color, lv_opa_t opa)
+                             lv_color_t color, lv_opa_t opa)
 {
     (void) disp_drv; /*Unused*/
 
@@ -1121,7 +1145,7 @@ static void set_px_cb_alpha2(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t
 }
 
 static void set_px_cb_alpha4(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
-                      lv_color_t color, lv_opa_t opa)
+                             lv_color_t color, lv_opa_t opa)
 {
     (void) disp_drv; /*Unused*/
 
@@ -1135,7 +1159,7 @@ static void set_px_cb_alpha4(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t
 }
 
 static void set_px_cb_alpha8(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
-                      lv_color_t color, lv_opa_t opa)
+                             lv_color_t color, lv_opa_t opa)
 {
     (void) disp_drv; /*Unused*/
 
@@ -1163,8 +1187,9 @@ static void set_px_alpha_generic(lv_img_dsc_t * d, lv_coord_t x, lv_coord_t y, l
 }
 
 
-static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x, lv_coord_t y,
-                      lv_color_t color, lv_opa_t opa)
+static void set_px_true_color_alpha(lv_disp_drv_t * disp_drv, uint8_t * buf, lv_coord_t buf_w, lv_coord_t x,
+                                    lv_coord_t y,
+                                    lv_color_t color, lv_opa_t opa)
 {
     (void) disp_drv; /*Unused*/
 

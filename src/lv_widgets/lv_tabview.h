@@ -49,8 +49,7 @@ enum {
 typedef uint8_t lv_tabview_btns_pos_t;
 
 /*Data of tab*/
-typedef struct
-{
+typedef struct {
     /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * btns;

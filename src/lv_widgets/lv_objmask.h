@@ -30,11 +30,10 @@ extern "C" {
 
 typedef struct {
     void * param;
-}lv_objmask_mask_t;
+} lv_objmask_mask_t;
 
 /*Data of object mask*/
-typedef struct
-{
+typedef struct {
     lv_cont_ext_t cont; /*Ext. of ancestor*/
     /*New data for this type */
     lv_ll_t mask_ll;    /*Store the created masks*/

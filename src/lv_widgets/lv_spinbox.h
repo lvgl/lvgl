@@ -35,8 +35,7 @@ extern "C" {
  **********************/
 
 /*Data of spinbox*/
-typedef struct
-{
+typedef struct {
     lv_textarea_ext_t ta; /*Ext. of ancestor*/
     /*New data for this type */
     int32_t value;

@@ -97,8 +97,7 @@ enum {
 };
 typedef uint8_t lv_fit_t;
 
-typedef struct
-{
+typedef struct {
     /*Inherited from 'base_obj' so no inherited ext. */ /*Ext. of ancestor*/
     /*New data for this type */
     lv_layout_t layout : 4;     /*A layout from 'lv_layout_t' enum*/

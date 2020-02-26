@@ -20,7 +20,7 @@
 #include "../lv_themes/lv_theme.h"
 
 #if defined(LV_GC_INCLUDE)
-#include LV_GC_INCLUDE
+    #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
 /*********************
@@ -139,7 +139,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp->refr_task = lv_task_create(lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, LV_REFR_TASK_PRIO, disp);
     LV_ASSERT_MEM(disp->refr_task);
     if(disp->refr_task == NULL) return NULL;
-    
+
     disp->inv_p = 0;
     disp->last_activity_time = 0;
 
@@ -170,8 +170,7 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
     memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
 
     lv_obj_t * scr;
-    LV_LL_READ(disp->scr_ll, scr)
-    {
+    LV_LL_READ(disp->scr_ll, scr) {
         lv_obj_set_size(scr, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
     }
 }
@@ -352,7 +351,8 @@ bool lv_disp_is_true_double_buf(lv_disp_t * disp)
 
     if(lv_disp_is_double_buf(disp) && disp->driver.buffer->size == scr_size) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }

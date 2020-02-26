@@ -40,7 +40,7 @@ typedef struct {
 
     lv_blend_mode_t blend_mode;
 
-    uint8_t antialias       :1;
+    uint8_t antialias       : 1;
 } lv_draw_img_dsc_t;
 
 /**********************

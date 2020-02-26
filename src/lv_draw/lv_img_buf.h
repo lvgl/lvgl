@@ -103,8 +103,7 @@ typedef uint8_t lv_img_cf_t;
 /**
  * LittlevGL image header
  */
-typedef struct
-{
+typedef struct {
 
     /* The first 8 bit is very important to distinguish the different source types.
      * For more info see `lv_img_get_src_type()` in lv_img.c */
@@ -121,8 +120,7 @@ typedef struct
 
 /** Image header it is compatible with
  * the result from image converter utility*/
-typedef struct
-{
+typedef struct {
     lv_img_header_t header;
     uint32_t data_size;
     const uint8_t * data;
@@ -140,12 +138,12 @@ typedef struct {
         lv_color_t color;           /*a color used for `LV_IMG_CF_INDEXED_1/2/4/8BIT` color formats*/
         lv_img_cf_t cf;             /*color format of the image to rotate*/
         bool antialias;
-    }cfg;
+    } cfg;
 
     struct {
         lv_color_t color;
         lv_opa_t opa;
-    }res;
+    } res;
 
 
     struct {
@@ -155,9 +153,9 @@ typedef struct {
         int32_t sinma;
         int32_t cosma;
 
-        uint8_t chroma_keyed :1;
-        uint8_t has_alpha :1;
-        uint8_t native_color :1;
+        uint8_t chroma_keyed : 1;
+        uint8_t has_alpha : 1;
+        uint8_t native_color : 1;
 
         uint16_t zoom_inv;
 
@@ -168,8 +166,8 @@ typedef struct {
         lv_coord_t ys_int;
         uint32_t pxi;
         uint8_t px_size;
-    }tmp;
-}lv_img_transform_dsc_t;
+    } tmp;
+} lv_img_transform_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -182,7 +180,7 @@ typedef struct {
  * @param cf a color format (`LV_IMG_CF_...`)
  * @return an allocated image, or NULL on failure
  */
-lv_img_dsc_t *lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf);
+lv_img_dsc_t * lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf);
 
 /**
  * Get the color of an image's pixel
@@ -242,7 +240,7 @@ void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color_t c);
  * Free an allocated image buffer
  * @param dsc image buffer to free
  */
-void lv_img_buf_free(lv_img_dsc_t *dsc);
+void lv_img_buf_free(lv_img_dsc_t * dsc);
 
 /**
  * Get the memory consumption of a raw bitmap, given color format and dimensions.
@@ -279,7 +277,8 @@ bool lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t
  * @param zoom zoom, (256 no zoom)
  * @param pivot x,y pivot coordinates of rotation
  */
-void lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom, lv_point_t * pivot);
+void lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
+                                     lv_point_t * pivot);
 
 /**********************
  *      MACROS

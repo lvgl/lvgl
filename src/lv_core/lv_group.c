@@ -14,7 +14,7 @@
 #include "../lv_misc/lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
-#include LV_GC_INCLUDE
+    #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
 /*********************
@@ -93,8 +93,7 @@ void lv_group_del(lv_group_t * group)
 
     /*Remove the objects from the group*/
     lv_obj_t ** obj;
-    LV_LL_READ(group->obj_ll, obj)
-    {
+    LV_LL_READ(group->obj_ll, obj) {
         (*obj)->group_p = NULL;
     }
 
@@ -114,8 +113,7 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 
     /*Do not add the object twice*/
     lv_obj_t ** obj_i;
-    LV_LL_READ(group->obj_ll, obj_i)
-    {
+    LV_LL_READ(group->obj_ll, obj_i) {
         if((*obj_i) == obj) {
             LV_LOG_INFO("lv_group_add_obj: the object is already added to this group");
             return;
@@ -175,8 +173,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
 
     /*Search the object and remove it from its group */
     lv_obj_t ** i;
-    LV_LL_READ(g->obj_ll, i)
-    {
+    LV_LL_READ(g->obj_ll, i) {
         if(*i == obj) {
             lv_ll_remove(&g->obj_ll, i);
             lv_mem_free(i);
@@ -201,8 +198,7 @@ void lv_group_remove_all_objs(lv_group_t * group)
 
     /*Remove the objects from the group*/
     lv_obj_t ** obj;
-    LV_LL_READ(group->obj_ll, obj)
-    {
+    LV_LL_READ(group->obj_ll, obj) {
         (*obj)->group_p = NULL;
     }
 
@@ -227,8 +223,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
     lv_group_set_editing(g, false);
 
     lv_obj_t ** i;
-    LV_LL_READ(g->obj_ll, i)
-    {
+    LV_LL_READ(g->obj_ll, i) {
         if(*i == obj) {
             if(g->obj_focus != NULL) {
                 (*g->obj_focus)->signal_cb(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);
@@ -400,7 +395,8 @@ lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style)
 
     if(group->editing) {
         if(group->style_mod_edit_cb) group->style_mod_edit_cb(group, &group->style_tmp);
-    } else {
+    }
+    else {
         if(group->style_mod_cb) group->style_mod_cb(group, &group->style_tmp);
     }
     return &group->style_tmp;
@@ -532,7 +528,8 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
                 obj_next  = begin(&group->obj_ll);
                 can_move  = false;
                 can_begin = false;
-            } else {
+            }
+            else {
                 /*Currently focused object is the last/first in the group, keep it that way*/
                 return;
             }

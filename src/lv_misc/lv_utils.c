@@ -100,10 +100,12 @@ void * lv_utils_bsearch(const void * key, const void * base, uint32_t n, uint32_
         if((c = (*cmp)(key, middle)) > 0) {
             n    = (n / 2) - ((n & 1) == 0);
             base = (middle += size);
-        } else if(c < 0) {
+        }
+        else if(c < 0) {
             n /= 2;
             middle = base;
-        } else {
+        }
+        else {
             return (char *)middle;
         }
     }

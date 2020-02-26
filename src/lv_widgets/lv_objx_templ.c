@@ -129,8 +129,10 @@ void lv_templ_set_style(lv_obj_t * templ, lv_templ_style_t type, const lv_style_
     lv_templ_ext_t * ext = lv_obj_get_ext_attr(templ);
 
     switch(type) {
-        case LV_TEMPL_STYLE_X: break;
-        case LV_TEMPL_STYLE_Y: break;
+        case LV_TEMPL_STYLE_X:
+            break;
+        case LV_TEMPL_STYLE_Y:
+            break;
     }
 }
 
@@ -156,9 +158,12 @@ lv_style_t * lv_templ_get_style(const lv_obj_t * templ, lv_templ_style_t type)
     lv_style_t * style   = NULL;
 
     switch(type) {
-        case LV_TEMPL_STYLE_X: style = NULL; /*Replace NULL with a pointer to the style*/
-        case LV_TEMPL_STYLE_Y: style = NULL; /*Replace NULL with a pointer to the style*/
-        default: style = NULL;
+        case LV_TEMPL_STYLE_X:
+            style = NULL; /*Replace NULL with a pointer to the style*/
+        case LV_TEMPL_STYLE_Y:
+            style = NULL; /*Replace NULL with a pointer to the style*/
+        default:
+            style = NULL;
     }
 
     return style;

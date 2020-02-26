@@ -48,15 +48,15 @@ typedef struct {
     struct {
         lv_style_list_t style_list;
         lv_point_t pos;
-        uint8_t colored     :1;
+        uint8_t colored     : 1;
 
     } indic;
     uint32_t last_click_time;
     uint32_t last_change_time;
     lv_point_t last_press_point;
-    lv_cpicker_color_mode_t color_mode  :2;
-    uint8_t color_mode_fixed            :1;
-    lv_cpicker_type_t type              :1;
+    lv_cpicker_color_mode_t color_mode  : 2;
+    uint8_t color_mode_fixed            : 1;
+    lv_cpicker_type_t type              : 1;
 } lv_cpicker_ext_t;
 
 /*Parts*/

@@ -72,9 +72,9 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(imgbtn);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(imgbtn);
 
-        /*Initialize the allocated 'ext' */
+    /*Initialize the allocated 'ext' */
 #if LV_IMGBTN_TILED == 0
-    memset((void*)ext->img_src, 0, sizeof(ext->img_src));
+    memset((void *)ext->img_src, 0, sizeof(ext->img_src));
 #else
     memset(ext->img_src_left, 0, sizeof(ext->img_src_left));
     memset(ext->img_src_mid, 0, sizeof(ext->img_src_mid));
@@ -95,11 +95,11 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     else {
         lv_imgbtn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 #if LV_IMGBTN_TILED == 0
-        memcpy((void*)ext->img_src, copy_ext->img_src, sizeof(ext->img_src));
+        memcpy((void *)ext->img_src, copy_ext->img_src, sizeof(ext->img_src));
 #else
-        memcpy((void*)ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
-        memcpy((void*)ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
-        memcpy((void*)ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
+        memcpy((void *)ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
+        memcpy((void *)ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
+        memcpy((void *)ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
 #endif
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(imgbtn);
@@ -151,9 +151,8 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src
 
 
     if(lv_img_src_get_type(src_left) == LV_IMG_SRC_SYMBOL ||
-        lv_img_src_get_type(src_mid) == LV_IMG_SRC_SYMBOL ||
-        lv_img_src_get_type(src_right) == LV_IMG_SRC_SYMBOL )
-    {
+       lv_img_src_get_type(src_mid) == LV_IMG_SRC_SYMBOL ||
+       lv_img_src_get_type(src_right) == LV_IMG_SRC_SYMBOL) {
         LV_LOG_WARN("lv_imgbtn_set_src: symbols are not supported in tiled mode");
         return;
     }
@@ -283,7 +282,8 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
             lv_draw_label_dsc_init(&label_dsc);
             lv_obj_init_draw_label_dsc(imgbtn, LV_IMGBTN_PART_MAIN, &label_dsc);
             lv_draw_label(&imgbtn->coords, clip_area, &label_dsc, src, NULL);
-        } else {
+        }
+        else {
             lv_draw_img_dsc_t img_dsc;
             lv_draw_img_dsc_init(&img_dsc);
             lv_obj_init_draw_img_dsc(imgbtn, LV_IMGBTN_PART_MAIN, &img_dsc);
@@ -328,31 +328,31 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
 
         src = ext->img_src_mid[state];
         if(src) {
-        	lv_area_t clip_center_area;
-        	clip_center_area.x1 = imgbtn->coords.x1 + left_w;
-        	clip_center_area.x2 = imgbtn->coords.x2 - right_w;
-        	clip_center_area.y1 = imgbtn->coords.y1;
-        	clip_center_area.y2 = imgbtn->coords.y2;
+            lv_area_t clip_center_area;
+            clip_center_area.x1 = imgbtn->coords.x1 + left_w;
+            clip_center_area.x2 = imgbtn->coords.x2 - right_w;
+            clip_center_area.y1 = imgbtn->coords.y1;
+            clip_center_area.y2 = imgbtn->coords.y2;
 
-        	bool comm_res;
-        	comm_res = lv_area_intersect(&clip_center_area, &clip_center_area, clip_area);
-        	if(comm_res) {
+            bool comm_res;
+            comm_res = lv_area_intersect(&clip_center_area, &clip_center_area, clip_area);
+            if(comm_res) {
 
-				lv_coord_t obj_w = lv_obj_get_width(imgbtn);
-				lv_coord_t i;
-				lv_img_decoder_get_info(src, &header);
+                lv_coord_t obj_w = lv_obj_get_width(imgbtn);
+                lv_coord_t i;
+                lv_img_decoder_get_info(src, &header);
 
-				coords.x1 = imgbtn->coords.x1 + left_w;
-				coords.y1 = imgbtn->coords.y1;
-				coords.x2 = coords.x1 + header.w - 1;
-				coords.y2 = imgbtn->coords.y1 + header.h - 1;
+                coords.x1 = imgbtn->coords.x1 + left_w;
+                coords.y1 = imgbtn->coords.y1;
+                coords.x2 = coords.x1 + header.w - 1;
+                coords.y2 = imgbtn->coords.y1 + header.h - 1;
 
-				for(i = 0; i < obj_w - right_w - left_w; i += header.w) {
-		            lv_draw_img(&coords, clip_area, src, &img_dsc);
-					coords.x1 = coords.x2 + 1;
-					coords.x2 += header.w;
-				}
-        	}
+                for(i = 0; i < obj_w - right_w - left_w; i += header.w) {
+                    lv_draw_img(&coords, clip_area, src, &img_dsc);
+                    coords.x1 = coords.x2 + 1;
+                    coords.x2 += header.w;
+                }
+            }
         }
 
 #endif
@@ -385,7 +385,8 @@ static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * par
         /* If the style changed then the button was clicked, released etc. so probably the state was
          * changed as well Set the new image for the new state.*/
         refr_img(imgbtn);
-    } else if(sign == LV_SIGNAL_CLEANUP) {
+    }
+    else if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     }
 
@@ -411,7 +412,8 @@ static void refr_img(lv_obj_t * imgbtn)
         header.w = lv_txt_get_width(src, (uint16_t)strlen(src), font, 0, LV_TXT_FLAG_NONE);
         header.always_zero = 0;
         header.cf = LV_IMG_CF_ALPHA_1BIT;
-    } else {
+    }
+    else {
         info_res = lv_img_decoder_get_info(src, &header);
     }
 
@@ -422,7 +424,8 @@ static void refr_img(lv_obj_t * imgbtn)
 #else
         lv_obj_set_height(imgbtn, header.h);
 #endif
-    } else {
+    }
+    else {
         ext->act_cf = LV_IMG_CF_UNKNOWN;
     }
 

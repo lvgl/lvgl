@@ -30,8 +30,9 @@
 static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_table_signal(lv_obj_t * table, lv_signal_t sign, void * param);
 static lv_style_list_t * lv_table_get_style(lv_obj_t * table, uint8_t part);
-static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id, const lv_font_t ** font, lv_style_int_t * letter_space, lv_style_int_t * line_space,
-								 lv_style_int_t * cell_left, lv_style_int_t * cell_right, lv_style_int_t * cell_top, lv_style_int_t * cell_bottom);
+static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id, const lv_font_t ** font,
+                                 lv_style_int_t * letter_space, lv_style_int_t * line_space,
+                                 lv_style_int_t * cell_left, lv_style_int_t * cell_right, lv_style_int_t * cell_top, lv_style_int_t * cell_bottom);
 static void refr_size(lv_obj_t * table);
 
 /**********************
@@ -150,9 +151,9 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
         else if(base_dir == LV_BIDI_DIR_RTL) format.s.align = LV_LABEL_ALIGN_RIGHT;
         else if(base_dir == LV_BIDI_DIR_AUTO)
 #if LV_USE_BIDI
-        	format.s.align = lv_bidi_detect_base_dir(txt);
+            format.s.align = lv_bidi_detect_base_dir(txt);
 #else
-        	format.s.align = LV_LABEL_ALIGN_LEFT;
+            format.s.align = LV_LABEL_ALIGN_LEFT;
 #endif
         format.s.right_merge = 0;
         format.s.type        = 0;
@@ -188,7 +189,8 @@ void lv_table_set_row_cnt(lv_obj_t * table, uint16_t row_cnt)
             uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
             memset(&ext->cell_data[old_cell_cnt], 0, (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
         }
-    } else {
+    }
+    else {
         lv_mem_free(ext->cell_data);
         ext->cell_data = NULL;
     }
@@ -223,7 +225,8 @@ void lv_table_set_col_cnt(lv_obj_t * table, uint16_t col_cnt)
             memset(&ext->cell_data[old_cell_cnt], 0, (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
         }
 
-    } else {
+    }
+    else {
         lv_mem_free(ext->cell_data);
         ext->cell_data = NULL;
     }
@@ -590,7 +593,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
         lv_txt_flag_t txt_flags;
 
         lv_style_int_t bg_top = lv_obj_get_style_pad_top(table, LV_TABLE_PART_BG);
-        lv_style_int_t bg_left= lv_obj_get_style_pad_left(table, LV_TABLE_PART_BG);
+        lv_style_int_t bg_left = lv_obj_get_style_pad_left(table, LV_TABLE_PART_BG);
 
         lv_draw_rect_dsc_t rect_dsc[LV_TABLE_CELL_STYLE_CNT];
         lv_draw_label_dsc_t label_dsc[LV_TABLE_CELL_STYLE_CNT];
@@ -630,7 +633,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
         cell_area.y2 = table->coords.y1 + bg_top;
         for(row = 0; row < ext->row_cnt; row++) {
             lv_coord_t h_row = get_row_height(table, row, font, letter_space, line_space,
-            		cell_left, cell_right, cell_top, cell_bottom);
+                                              cell_left, cell_right, cell_top, cell_bottom);
 
             cell_area.y1 = cell_area.y2 + 1;
             cell_area.y2 = cell_area.y1 + h_row - 1;
@@ -644,7 +647,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                 lv_table_cell_format_t format;
                 if(ext->cell_data[cell]) {
                     format.format_byte = ext->cell_data[cell][0];
-                } else {
+                }
+                else {
                     format.s.right_merge = 0;
                     format.s.align       = LV_LABEL_ALIGN_LEFT;
                     format.s.type        = 0;
@@ -662,7 +666,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                             cell_area.x2 += ext->col_w[col + col_merge + 1];
                         else
                             break;
-                    } else {
+                    }
+                    else {
                         break;
                     }
                 }
@@ -692,7 +697,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     /*Align the content to the middle if not cropped*/
                     if(format.s.crop == 0) {
                         txt_flags = LV_TXT_FLAG_NONE;
-                    } else {
+                    }
+                    else {
                         txt_flags = LV_TXT_FLAG_EXPAND;
                     }
 
@@ -709,9 +715,15 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     label_dsc[cell_type].flag = 0;
                     switch(format.s.align) {
                         default:
-                        case LV_LABEL_ALIGN_LEFT: label_dsc[cell_type].flag |= LV_TXT_FLAG_NONE; break;
-                        case LV_LABEL_ALIGN_RIGHT: label_dsc[cell_type].flag |= LV_TXT_FLAG_RIGHT; break;
-                        case LV_LABEL_ALIGN_CENTER: label_dsc[cell_type].flag |= LV_TXT_FLAG_CENTER; break;
+                        case LV_LABEL_ALIGN_LEFT:
+                            label_dsc[cell_type].flag |= LV_TXT_FLAG_NONE;
+                            break;
+                        case LV_LABEL_ALIGN_RIGHT:
+                            label_dsc[cell_type].flag |= LV_TXT_FLAG_RIGHT;
+                            break;
+                        case LV_LABEL_ALIGN_CENTER:
+                            label_dsc[cell_type].flag |= LV_TXT_FLAG_CENTER;
+                            break;
                     }
 
                     lv_area_t label_mask;
@@ -817,23 +829,23 @@ static lv_style_list_t * lv_table_get_style(lv_obj_t * table, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-    case LV_TABLE_PART_BG:
-        style_dsc_p = &table->style_list;
-        break;
-    case LV_TABLE_PART_CELL1:
-        style_dsc_p = &ext->cell_style[0];
-        break;
-    case LV_TABLE_PART_CELL2:
-        style_dsc_p = &ext->cell_style[1];
-        break;
-    case LV_TABLE_PART_CELL3:
-        style_dsc_p = &ext->cell_style[2];
-        break;
-    case LV_TABLE_PART_CELL4:
-        style_dsc_p = &ext->cell_style[3];
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_TABLE_PART_BG:
+            style_dsc_p = &table->style_list;
+            break;
+        case LV_TABLE_PART_CELL1:
+            style_dsc_p = &ext->cell_style[0];
+            break;
+        case LV_TABLE_PART_CELL2:
+            style_dsc_p = &ext->cell_style[1];
+            break;
+        case LV_TABLE_PART_CELL3:
+            style_dsc_p = &ext->cell_style[2];
+            break;
+        case LV_TABLE_PART_CELL4:
+            style_dsc_p = &ext->cell_style[3];
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;
@@ -871,22 +883,23 @@ static void refr_size(lv_obj_t * table)
 
 
     for(i = 0; i < ext->row_cnt; i++) {
-    	h += get_row_height(table, i, font, letter_space, line_space,
-    	            		cell_left, cell_right, cell_top, cell_bottom);
+        h += get_row_height(table, i, font, letter_space, line_space,
+                            cell_left, cell_right, cell_top, cell_bottom);
     }
 
     lv_style_int_t bg_top = lv_obj_get_style_pad_top(table, LV_TABLE_PART_BG);
-    lv_style_int_t bg_bottom= lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_BG);
+    lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_BG);
     lv_style_int_t bg_left = lv_obj_get_style_pad_left(table, LV_TABLE_PART_BG);
-    lv_style_int_t bg_right= lv_obj_get_style_pad_right(table, LV_TABLE_PART_BG);
+    lv_style_int_t bg_right = lv_obj_get_style_pad_right(table, LV_TABLE_PART_BG);
     w += bg_left + bg_right;
     h += bg_top + bg_bottom;
 
     lv_obj_set_size(table, w + 1, h + 1);
 }
 
-static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id, const lv_font_t ** font, lv_style_int_t * letter_space, lv_style_int_t * line_space,
-								 lv_style_int_t * cell_left, lv_style_int_t * cell_right, lv_style_int_t * cell_top, lv_style_int_t * cell_bottom)
+static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id, const lv_font_t ** font,
+                                 lv_style_int_t * letter_space, lv_style_int_t * line_space,
+                                 lv_style_int_t * cell_left, lv_style_int_t * cell_right, lv_style_int_t * cell_top, lv_style_int_t * cell_bottom)
 {
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
     lv_point_t txt_size;
@@ -910,7 +923,8 @@ static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id, const lv_fon
                         txt_w += ext->col_w[col + col_merge + 1];
                     else
                         break;
-                } else {
+                }
+                else {
                     break;
                 }
             }

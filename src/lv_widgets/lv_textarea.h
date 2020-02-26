@@ -42,8 +42,7 @@ LV_EXPORT_CONST_INT(LV_TEXTAREA_CURSOR_LAST);
  **********************/
 
 /*Data of text area*/
-typedef struct
-{
+typedef struct {
     lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * label;            /*Label of the text area*/
@@ -53,8 +52,7 @@ typedef struct
     const char * accapted_chars; /*Only these characters will be accepted. NULL: accept all*/
     uint16_t max_length;         /*The max. number of characters. 0: no limit*/
     uint16_t pwd_show_time;      /*Time to show characters in password mode before change them to '*' */
-    struct
-    {
+    struct {
         lv_style_list_t style;  /* Style of the cursor (NULL to use label's style)*/
         lv_coord_t valid_x;        /* Used when stepping up/down to a shorter line.
                                     * (Used by the library)*/

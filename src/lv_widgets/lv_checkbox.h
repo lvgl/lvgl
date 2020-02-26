@@ -39,8 +39,7 @@ extern "C" {
  **********************/
 
 /*Data of check box*/
-typedef struct
-{
+typedef struct {
     lv_btn_ext_t bg_btn; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * bullet; /*Pointer to button*/
@@ -93,7 +92,7 @@ void lv_checkbox_set_static_text(lv_obj_t * cb, const char * txt);
  */
 static inline void lv_checkbox_set_checked(lv_obj_t * cb, bool checked)
 {
-    lv_btn_set_state(cb, checked ? LV_BTN_STATE_CHECKED_RELEASED: LV_BTN_STATE_RELEASED);
+    lv_btn_set_state(cb, checked ? LV_BTN_STATE_CHECKED_RELEASED : LV_BTN_STATE_RELEASED);
 }
 
 /**
@@ -141,7 +140,7 @@ static inline bool lv_checkbox_is_checked(const lv_obj_t * cb)
  */
 static inline bool lv_checkbox_is_inactive(const lv_obj_t * cb)
 {
-    return lv_btn_get_state(cb) == LV_BTN_STATE_DISABLED ? true :false;
+    return lv_btn_get_state(cb) == LV_BTN_STATE_DISABLED ? true : false;
 }
 
 

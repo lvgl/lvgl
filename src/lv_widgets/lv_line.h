@@ -28,8 +28,7 @@ extern "C" {
  **********************/
 
 /*Data of line*/
-typedef struct
-{
+typedef struct {
     /*Inherited from 'base_obj' so no inherited ext.*/ /*Ext. of ancestor*/
     const lv_point_t * point_array;                    /*Pointer to an array with the points of the line*/
     uint16_t point_num;                                /*Number of points in 'point_array' */
@@ -86,7 +85,7 @@ void lv_line_set_y_invert(lv_obj_t * line, bool en);
 
 #define lv_line_set_y_inv                                                                                              \
     lv_line_set_y_invert /*The name was inconsistent. In v.6.0 only `lv_line_set_y_invert`will                         \
-                            work */
+work */
 
 
 /*=====================

@@ -14,7 +14,7 @@
 #include "../lv_misc/lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
-#include LV_GC_INCLUDE
+    #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 /*********************
  *      DEFINES
@@ -30,7 +30,7 @@
 #define LV_IMG_CACHE_LIFE_LIMIT 1000
 
 #if LV_IMG_CACHE_DEF_SIZE < 1
-#error "LV_IMG_CACHE_DEF_SIZE must be >= 1. See lv_conf.h"
+    #error "LV_IMG_CACHE_DEF_SIZE must be >= 1. See lv_conf.h"
 #endif
 
 /**********************
@@ -86,7 +86,8 @@ lv_img_cache_entry_t * lv_img_cache_open(const void * src, lv_color_t color)
         lv_img_src_t src_type = lv_img_src_get_type(cache[i].dec_dsc.src);
         if(src_type == LV_IMG_SRC_VARIABLE) {
             if(cache[i].dec_dsc.src == src && cache[i].dec_dsc.color.full == color.full) match = true;
-        } else if(src_type == LV_IMG_SRC_FILE) {
+        }
+        else if(src_type == LV_IMG_SRC_FILE) {
             if(strcmp(cache[i].dec_dsc.src, src) == 0) match = true;
         }
 
@@ -116,7 +117,8 @@ lv_img_cache_entry_t * lv_img_cache_open(const void * src, lv_color_t color)
         if(cached_src->dec_dsc.src) {
             lv_img_decoder_close(&cached_src->dec_dsc);
             LV_LOG_INFO("image draw: cache miss, close and reuse an entry");
-        } else {
+        }
+        else {
             LV_LOG_INFO("image draw: cache miss, cached to an empty entry");
         }
 

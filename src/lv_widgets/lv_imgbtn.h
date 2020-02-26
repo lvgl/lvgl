@@ -34,8 +34,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 /*Data of image button*/
-typedef struct
-{
+typedef struct {
     lv_btn_ext_t btn; /*Ext. of ancestor*/
     /*New data for this type */
 #if LV_IMGBTN_TILED == 0

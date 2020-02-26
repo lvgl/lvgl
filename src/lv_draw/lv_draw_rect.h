@@ -64,7 +64,7 @@ typedef struct {
     lv_color_t pattern_recolor;
     lv_opa_t pattern_opa;
     lv_opa_t pattern_recolor_opa;
-    uint8_t pattern_repeat :1;
+    uint8_t pattern_repeat : 1;
     lv_blend_mode_t pattern_blend_mode;
 
     /*Value*/
@@ -78,7 +78,7 @@ typedef struct {
     lv_style_int_t value_line_space;
     lv_align_t value_align;
     lv_blend_mode_t value_blend_mode;
-}lv_draw_rect_dsc_t;
+} lv_draw_rect_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -16,7 +16,7 @@
 #include "lv_hal_disp.h"
 
 #if defined(LV_GC_INCLUDE)
-#include LV_GC_INCLUDE
+    #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
 /*********************
@@ -148,7 +148,8 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
         LV_LOG_TRACE("idnev read started");
         cont = indev->driver.read_cb(&indev->driver, data);
         LV_LOG_TRACE("idnev read finished");
-    } else {
+    }
+    else {
         LV_LOG_WARN("indev function registered");
     }
 

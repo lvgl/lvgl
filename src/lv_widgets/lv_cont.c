@@ -76,7 +76,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
     if(cont == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(cont);
-    if(ancestor_design == NULL) ancestor_design= lv_obj_get_design_cb(cont);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(cont);
 
     lv_obj_allocate_ext_attr(cont, sizeof(lv_cont_ext_t));
     lv_cont_ext_t * ext = lv_obj_get_ext_attr(cont);
@@ -270,15 +270,18 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_STYLE_CHG) { /*Recalculate the padding if the style changed*/
         lv_cont_refr_layout(cont);
         lv_cont_refr_autofit(cont);
-    } else if(sign == LV_SIGNAL_CHILD_CHG) {
+    }
+    else if(sign == LV_SIGNAL_CHILD_CHG) {
         lv_cont_refr_layout(cont);
         lv_cont_refr_autofit(cont);
-    } else if(sign == LV_SIGNAL_COORD_CHG) {
+    }
+    else if(sign == LV_SIGNAL_COORD_CHG) {
         if(lv_obj_get_width(cont) != lv_area_get_width(param) || lv_obj_get_height(cont) != lv_area_get_height(param)) {
             lv_cont_refr_layout(cont);
             lv_cont_refr_autofit(cont);
         }
-    } else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {
+    }
+    else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {
         /*FLOOD and FILL fit needs to be refreshed if the parent's size has changed*/
         lv_cont_refr_autofit(cont);
     }
@@ -291,11 +294,11 @@ static lv_style_list_t * lv_cont_get_style(lv_obj_t * cont, uint8_t type)
 {
     lv_style_list_t * style_dsc_p;
     switch(type) {
-    case LV_CONT_PART_MAIN:
-        style_dsc_p = &cont->style_list;
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_CONT_PART_MAIN:
+            style_dsc_p = &cont->style_list;
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;
@@ -316,13 +319,17 @@ static void lv_cont_refr_layout(lv_obj_t * cont)
 
     if(type == LV_LAYOUT_CENTER) {
         lv_cont_layout_center(cont);
-    } else if(type == LV_LAYOUT_COLUMN_LEFT || type == LV_LAYOUT_COLUMN_MID || type == LV_LAYOUT_COLUMN_RIGHT) {
+    }
+    else if(type == LV_LAYOUT_COLUMN_LEFT || type == LV_LAYOUT_COLUMN_MID || type == LV_LAYOUT_COLUMN_RIGHT) {
         lv_cont_layout_col(cont);
-    } else if(type == LV_LAYOUT_ROW_TOP || type == LV_LAYOUT_ROW_MID || type == LV_LAYOUT_ROW_BOTTOM) {
+    }
+    else if(type == LV_LAYOUT_ROW_TOP || type == LV_LAYOUT_ROW_MID || type == LV_LAYOUT_ROW_BOTTOM) {
         lv_cont_layout_row(cont);
-    } else if(type == LV_LAYOUT_PRETTY_MID || type == LV_LAYOUT_PRETTY_TOP || type == LV_LAYOUT_PRETTY_BOTTOM) {
+    }
+    else if(type == LV_LAYOUT_PRETTY_MID || type == LV_LAYOUT_PRETTY_TOP || type == LV_LAYOUT_PRETTY_BOTTOM) {
         lv_cont_layout_pretty(cont);
-    } else if(type == LV_LAYOUT_GRID) {
+    }
+    else if(type == LV_LAYOUT_GRID) {
         lv_cont_layout_grid(cont);
     }
 }
@@ -369,8 +376,7 @@ static void lv_cont_layout_col(lv_obj_t * cont)
     lv_obj_add_protect(cont, LV_PROTECT_CHILD_CHG);
     /* Align the children */
     lv_coord_t last_cord = top;
-    LV_LL_READ_BACK(cont->child_ll, child)
-    {
+    LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
         lv_obj_align(child, cont, align, hpad_corr, last_cord);
@@ -401,11 +407,11 @@ static void lv_cont_layout_row(lv_obj_t * cont)
             break;
         case LV_LAYOUT_ROW_MID:
             vpad_corr = 0;
-            align     = base_dir == LV_BIDI_DIR_RTL ? LV_ALIGN_IN_RIGHT_MID: LV_ALIGN_IN_LEFT_MID;
+            align     = base_dir == LV_BIDI_DIR_RTL ? LV_ALIGN_IN_RIGHT_MID : LV_ALIGN_IN_LEFT_MID;
             break;
         case LV_LAYOUT_ROW_BOTTOM:
             vpad_corr = -lv_obj_get_style_pad_bottom(cont, LV_CONT_PART_MAIN);
-            align     = base_dir == LV_BIDI_DIR_RTL ? LV_ALIGN_IN_BOTTOM_RIGHT: LV_ALIGN_IN_BOTTOM_LEFT;
+            align     = base_dir == LV_BIDI_DIR_RTL ? LV_ALIGN_IN_BOTTOM_RIGHT : LV_ALIGN_IN_BOTTOM_LEFT;
             break;
         default:
             vpad_corr = 0;
@@ -424,8 +430,7 @@ static void lv_cont_layout_row(lv_obj_t * cont)
 
     lv_coord_t inner = lv_obj_get_style_pad_inner(cont, LV_CONT_PART_MAIN);
 
-    LV_LL_READ_BACK(cont->child_ll, child)
-    {
+    LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
         if(base_dir == LV_BIDI_DIR_RTL) lv_obj_align(child, cont, align, -last_cord, vpad_corr);
@@ -448,8 +453,7 @@ static void lv_cont_layout_center(lv_obj_t * cont)
     lv_coord_t h_tot         = 0;
 
     lv_coord_t inner = lv_obj_get_style_pad_inner(cont, LV_CONT_PART_MAIN);
-    LV_LL_READ(cont->child_ll, child)
-    {
+    LV_LL_READ(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
         h_tot += lv_obj_get_height(child) + inner;
         obj_num++;
@@ -465,8 +469,7 @@ static void lv_cont_layout_center(lv_obj_t * cont)
 
     /* Align the children */
     lv_coord_t last_cord = -(h_tot / 2);
-    LV_LL_READ_BACK(cont->child_ll, child)
-    {
+    LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
         lv_obj_align(child, cont, LV_ALIGN_CENTER, 0, last_cord + lv_obj_get_height(child) / 2);
@@ -549,20 +552,20 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
             w_row           = lv_obj_get_width(obj1) + lv_obj_get_width(obj2);
             lv_coord_t pad  = (w_obj - w_row) / 3;
             switch(type) {
-            case LV_LAYOUT_PRETTY_TOP:
-                lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y);
-                lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y);
-                break;
-            case LV_LAYOUT_PRETTY_MID:
-                lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y + (h_row - lv_obj_get_height(obj1)) / 2);
-                lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y + (h_row - lv_obj_get_height(obj2)) / 2);
-                break;
-            case LV_LAYOUT_PRETTY_BOTTOM:
-                lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y + h_row - lv_obj_get_height(obj1));
-                lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y + h_row - lv_obj_get_height(obj2));
-                break;
-            default:
-                break;
+                case LV_LAYOUT_PRETTY_TOP:
+                    lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y);
+                    lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y);
+                    break;
+                case LV_LAYOUT_PRETTY_MID:
+                    lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y + (h_row - lv_obj_get_height(obj1)) / 2);
+                    lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y + (h_row - lv_obj_get_height(obj2)) / 2);
+                    break;
+                case LV_LAYOUT_PRETTY_BOTTOM:
+                    lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT, pad, act_y + h_row - lv_obj_get_height(obj1));
+                    lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT, -pad, act_y + h_row - lv_obj_get_height(obj2));
+                    break;
+                default:
+                    break;
             }
         }
         /* Align the children (from child_rs to child_rc)*/
@@ -574,21 +577,21 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
             while(child_tmp != NULL) {
                 if(lv_obj_get_hidden(child_tmp) == false && lv_obj_is_protected(child_tmp, LV_PROTECT_POS) == false) {
                     switch(type) {
-                    case LV_LAYOUT_PRETTY_TOP:
-                        lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x,
-                                act_y);
-                        break;
-                    case LV_LAYOUT_PRETTY_MID:
-                        lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x,
-                                act_y + (h_row - lv_obj_get_height(child_tmp)) / 2);
+                        case LV_LAYOUT_PRETTY_TOP:
+                            lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x,
+                                         act_y);
+                            break;
+                        case LV_LAYOUT_PRETTY_MID:
+                            lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x,
+                                         act_y + (h_row - lv_obj_get_height(child_tmp)) / 2);
 
-                        break;
-                    case LV_LAYOUT_PRETTY_BOTTOM:
-                        lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x,
-                                act_y + h_row - lv_obj_get_height(child_tmp));
-                        break;
-                    default:
-                        break;
+                            break;
+                        case LV_LAYOUT_PRETTY_BOTTOM:
+                            lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT, act_x,
+                                         act_y + h_row - lv_obj_get_height(child_tmp));
+                            break;
+                        default:
+                            break;
                     }
 
                     act_x += lv_obj_get_width(child_tmp) + new_opad;
@@ -622,7 +625,8 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
     lv_coord_t x_ofs;
     if(obj_row > 1) {
         x_ofs = w_obj + (w_fit - (obj_row * w_obj)) / (obj_row - 1);
-    } else {
+    }
+    else {
         x_ofs = w_tot / 2 - w_obj / 2;
     }
     lv_coord_t y_ofs = h_obj + inner;
@@ -636,14 +640,14 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
     lv_coord_t act_x = left;
     lv_coord_t act_y = lv_obj_get_style_pad_top(cont, LV_CONT_PART_MAIN);
     uint16_t obj_cnt = 0;
-    LV_LL_READ_BACK(cont->child_ll, child)
-    {
+    LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
         if(obj_row > 1) {
             lv_obj_set_pos(child, act_x, act_y);
             act_x += x_ofs;
-        } else {
+        }
+        else {
             lv_obj_set_pos(child, x_ofs, act_y);
         }
         obj_cnt++;
@@ -695,8 +699,7 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
         tight_area.x2 = LV_COORD_MIN;
         tight_area.y2 = LV_COORD_MIN;
 
-        LV_LL_READ(cont->child_ll, child_i)
-        {
+        LV_LL_READ(cont->child_ll, child_i) {
             if(lv_obj_get_hidden(child_i) != false) continue;
             tight_area.x1 = LV_MATH_MIN(tight_area.x1, child_i->coords.x1);
             tight_area.y1 = LV_MATH_MIN(tight_area.y1, child_i->coords.y1);
@@ -714,31 +717,59 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
     lv_area_copy(&new_area, &ori);
 
     switch(ext->fit_left) {
-        case LV_FIT_TIGHT: new_area.x1 = tight_area.x1; break;
-        case LV_FIT_PARENT: new_area.x1 = flood_area.x1; break;
-        case LV_FIT_MAX: new_area.x1 = has_children ? LV_MATH_MIN(tight_area.x1, flood_area.x1) : flood_area.x1; break;
-        default: break;
+        case LV_FIT_TIGHT:
+            new_area.x1 = tight_area.x1;
+            break;
+        case LV_FIT_PARENT:
+            new_area.x1 = flood_area.x1;
+            break;
+        case LV_FIT_MAX:
+            new_area.x1 = has_children ? LV_MATH_MIN(tight_area.x1, flood_area.x1) : flood_area.x1;
+            break;
+        default:
+            break;
     }
 
     switch(ext->fit_right) {
-        case LV_FIT_TIGHT: new_area.x2 = tight_area.x2; break;
-        case LV_FIT_PARENT: new_area.x2 = flood_area.x2; break;
-        case LV_FIT_MAX: new_area.x2 = has_children ? LV_MATH_MAX(tight_area.x2, flood_area.x2) : flood_area.x2; break;
-        default: break;
+        case LV_FIT_TIGHT:
+            new_area.x2 = tight_area.x2;
+            break;
+        case LV_FIT_PARENT:
+            new_area.x2 = flood_area.x2;
+            break;
+        case LV_FIT_MAX:
+            new_area.x2 = has_children ? LV_MATH_MAX(tight_area.x2, flood_area.x2) : flood_area.x2;
+            break;
+        default:
+            break;
     }
 
     switch(ext->fit_top) {
-        case LV_FIT_TIGHT: new_area.y1 = tight_area.y1; break;
-        case LV_FIT_PARENT: new_area.y1 = flood_area.y1; break;
-        case LV_FIT_MAX: new_area.y1 = has_children ? LV_MATH_MIN(tight_area.y1, flood_area.y1) : flood_area.y1; break;
-        default: break;
+        case LV_FIT_TIGHT:
+            new_area.y1 = tight_area.y1;
+            break;
+        case LV_FIT_PARENT:
+            new_area.y1 = flood_area.y1;
+            break;
+        case LV_FIT_MAX:
+            new_area.y1 = has_children ? LV_MATH_MIN(tight_area.y1, flood_area.y1) : flood_area.y1;
+            break;
+        default:
+            break;
     }
 
     switch(ext->fit_bottom) {
-        case LV_FIT_TIGHT: new_area.y2 = tight_area.y2; break;
-        case LV_FIT_PARENT: new_area.y2 = flood_area.y2; break;
-        case LV_FIT_MAX: new_area.y2 = has_children ? LV_MATH_MAX(tight_area.y2, flood_area.y2) : flood_area.y2; break;
-        default: break;
+        case LV_FIT_TIGHT:
+            new_area.y2 = tight_area.y2;
+            break;
+        case LV_FIT_PARENT:
+            new_area.y2 = flood_area.y2;
+            break;
+        case LV_FIT_MAX:
+            new_area.y2 = has_children ? LV_MATH_MAX(tight_area.y2, flood_area.y2) : flood_area.y2;
+            break;
+        default:
+            break;
     }
 
     /*Do nothing if the coordinates are not changed*/

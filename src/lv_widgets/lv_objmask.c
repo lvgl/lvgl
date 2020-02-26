@@ -231,8 +231,8 @@ static lv_design_res_t lv_objmask_design(lv_obj_t * objmask, const lv_area_t * c
                 lv_draw_mask_line_param_t * p_new = lv_mem_buf_get(sizeof(lv_draw_mask_line_param_t));
 
                 lv_draw_mask_line_points_init(p_new, p_ori->cfg.p1.x + xofs, p_ori->cfg.p1.y + yofs,
-                                                     p_ori->cfg.p2.x + xofs, p_ori->cfg.p2.y + yofs,
-                                                     p_ori->cfg.side);
+                                              p_ori->cfg.p2.x + xofs, p_ori->cfg.p2.y + yofs,
+                                              p_ori->cfg.side);
                 lv_draw_mask_add(p_new, m->param);
             }
             else if(dsc->type == LV_DRAW_MASK_TYPE_ANGLE) {
@@ -240,7 +240,7 @@ static lv_design_res_t lv_objmask_design(lv_obj_t * objmask, const lv_area_t * c
                 lv_draw_mask_angle_param_t * p_new = lv_mem_buf_get(sizeof(lv_draw_mask_angle_param_t));
 
                 lv_draw_mask_angle_init(p_new, p_ori->cfg.vertex_p.x + xofs, p_ori->cfg.vertex_p.y + yofs,
-                                                     p_ori->cfg.start_angle, p_ori->cfg.end_angle);
+                                        p_ori->cfg.start_angle, p_ori->cfg.end_angle);
                 lv_draw_mask_add(p_new, m->param);
             }
             else if(dsc->type == LV_DRAW_MASK_TYPE_RADIUS) {
@@ -267,7 +267,7 @@ static lv_design_res_t lv_objmask_design(lv_obj_t * objmask, const lv_area_t * c
                 rect.y2 = p_ori->cfg.coords.y2 + yofs;
 
                 lv_draw_mask_fade_init(p_new, &rect, p_ori->cfg.opa_top, p_ori->cfg.y_top + yofs,
-                                                     p_ori->cfg.opa_bottom, p_ori->cfg.y_bottom + yofs);
+                                       p_ori->cfg.opa_bottom, p_ori->cfg.y_bottom + yofs);
                 lv_draw_mask_add(p_new, m->param);
             }
             else if(dsc->type == LV_DRAW_MASK_TYPE_MAP) {
@@ -341,12 +341,23 @@ static uint16_t get_param_size(lv_draw_mask_type_t type)
 {
     uint16_t param_size;
     switch(type) {
-        case LV_DRAW_MASK_TYPE_LINE: param_size = sizeof(lv_draw_mask_line_param_t); break;
-        case LV_DRAW_MASK_TYPE_ANGLE: param_size = sizeof(lv_draw_mask_angle_param_t); break;
-        case LV_DRAW_MASK_TYPE_RADIUS: param_size = sizeof(lv_draw_mask_radius_param_t); break;
-        case LV_DRAW_MASK_TYPE_FADE: param_size = sizeof(lv_draw_mask_fade_param_t); break;
-        case LV_DRAW_MASK_TYPE_MAP: param_size = sizeof(lv_draw_mask_map_param_t); break;
-        default: param_size = 0;
+        case LV_DRAW_MASK_TYPE_LINE:
+            param_size = sizeof(lv_draw_mask_line_param_t);
+            break;
+        case LV_DRAW_MASK_TYPE_ANGLE:
+            param_size = sizeof(lv_draw_mask_angle_param_t);
+            break;
+        case LV_DRAW_MASK_TYPE_RADIUS:
+            param_size = sizeof(lv_draw_mask_radius_param_t);
+            break;
+        case LV_DRAW_MASK_TYPE_FADE:
+            param_size = sizeof(lv_draw_mask_fade_param_t);
+            break;
+        case LV_DRAW_MASK_TYPE_MAP:
+            param_size = sizeof(lv_draw_mask_map_param_t);
+            break;
+        default:
+            param_size = 0;
     }
 
     return param_size;

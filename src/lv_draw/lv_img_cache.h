@@ -25,11 +25,10 @@ extern "C" {
 
 /**
  * When loading images from the network it can take a long time to download and decode the image.
- * 
+ *
  * To avoid repeating this heavy load images can be cached.
  */
-typedef struct
-{
+typedef struct {
     lv_img_decoder_dsc_t dec_dsc; /**< Image information */
 
     /** Count the cache entries's life. Add `time_tio_open` to `life` when the entry is used.

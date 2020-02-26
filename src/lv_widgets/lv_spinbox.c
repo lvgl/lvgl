@@ -292,7 +292,8 @@ void lv_spinbox_increment(lv_obj_t * spinbox)
         if((ext->value + ext->step) > 0 && ext->value < 0) ext->value = -ext->value;
         ext->value += ext->step;
 
-    } else {
+    }
+    else {
         ext->value = ext->range_max;
     }
 
@@ -313,7 +314,8 @@ void lv_spinbox_decrement(lv_obj_t * spinbox)
         /*Special mode when zero crossing*/
         if((ext->value - ext->step) < 0 && ext->value > 0) ext->value = -ext->value;
         ext->value -= ext->step;
-    } else {
+    }
+    else {
         ext->value = ext->range_min;
     }
 
@@ -352,14 +354,16 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    } else if(sign == LV_SIGNAL_GET_TYPE) {
+    }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
         lv_obj_type_t * buf = param;
         uint8_t i;
         for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
             if(buf->type[i] == NULL) break;
         }
         buf->type[i] = "lv_spinbox";
-    } else if(sign == LV_SIGNAL_RELEASED) {
+    }
+    else if(sign == LV_SIGNAL_RELEASED) {
         /*If released with an ENCODER then move to the next digit*/
         lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
         lv_indev_t * indev = lv_indev_get_act();
@@ -368,7 +372,8 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
             if(lv_group_get_editing(lv_obj_get_group(spinbox))) {
                 if(ext->step > 1) {
                     lv_spinbox_step_next(spinbox);
-                } else {
+                }
+                else {
                     /*Restart from the MSB*/
                     ext->step = 1;
                     uint32_t i;
@@ -381,7 +386,8 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
                 }
             }
 #endif
-        }else {
+        }
+        else {
             /*The cursor has been positioned to a digit.
              * Set `step` accordingly*/
             const char * txt = lv_textarea_get_text(spinbox);
@@ -389,9 +395,11 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
 
             if(txt[ext->ta.cursor.pos] == '.') {
                 lv_textarea_cursor_left(spinbox);
-            } else if(ext->ta.cursor.pos == txt_len) {
+            }
+            else if(ext->ta.cursor.pos == txt_len) {
                 lv_textarea_set_cursor_pos(spinbox, txt_len - 1);
-            } else if(ext->ta.cursor.pos == 0 && ext->range_min < 0) {
+            }
+            else if(ext->ta.cursor.pos == 0 && ext->range_min < 0) {
                 lv_textarea_set_cursor_pos(spinbox, 1);
             }
 
@@ -410,7 +418,8 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
 
 
         }
-    } else if(sign == LV_SIGNAL_CONTROL) {
+    }
+    else if(sign == LV_SIGNAL_CONTROL) {
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
@@ -419,16 +428,20 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
                 lv_spinbox_increment(spinbox);
             else
                 lv_spinbox_step_next(spinbox);
-        } else if(c == LV_KEY_LEFT) {
+        }
+        else if(c == LV_KEY_LEFT) {
             if(indev_type == LV_INDEV_TYPE_ENCODER)
                 lv_spinbox_decrement(spinbox);
             else
                 lv_spinbox_step_prev(spinbox);
-        } else if(c == LV_KEY_UP) {
+        }
+        else if(c == LV_KEY_UP) {
             lv_spinbox_increment(spinbox);
-        } else if(c == LV_KEY_DOWN) {
+        }
+        else if(c == LV_KEY_DOWN) {
             lv_spinbox_decrement(spinbox);
-        } else {
+        }
+        else {
             lv_textarea_add_char(spinbox, c);
         }
     }
@@ -450,14 +463,14 @@ static lv_style_list_t * lv_spinbox_get_style(lv_obj_t * ta, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-    case LV_SPINBOX_PART_BG:
-        style_dsc_p = &ta->style_list;
-        break;
-    case LV_SPINBOX_PART_CURSOR:
-        style_dsc_p = &ext->ta.cursor.style;
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_SPINBOX_PART_BG:
+            style_dsc_p = &ta->style_list;
+            break;
+        case LV_SPINBOX_PART_CURSOR:
+            style_dsc_p = &ext->ta.cursor.style;
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;
@@ -471,13 +484,14 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
     char * buf_p = buf;
     uint8_t cur_shift_left = 0;
 
-    if (ext->range_min < 0) { // hide sign if there are only positive values
+    if(ext->range_min < 0) {  // hide sign if there are only positive values
         /*Add the sign*/
         (*buf_p) = ext->value >= 0 ? '+' : '-';
         buf_p++;
-    } else {
-    	/*Cursor need shift to left*/
-    	cur_shift_left++;
+    }
+    else {
+        /*Cursor need shift to left*/
+        cur_shift_left++;
     }
 
     int32_t i;

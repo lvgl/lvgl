@@ -95,8 +95,8 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->max_value             = copy_ext->max_value;
         ext->cur_value             = copy_ext->cur_value;
 
-//        /*Refresh the style with new signal function*/
-//        lv_obj_refresh_style(new_lmeter);
+        //        /*Refresh the style with new signal function*/
+        //        lv_obj_refresh_style(new_lmeter);
     }
 
     LV_LOG_INFO("line meter created");
@@ -340,8 +340,7 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         lv_style_int_t border_width = lv_obj_get_style_scale_border_width(lmeter, part);
         lv_style_int_t end_border_width = lv_obj_get_style_scale_end_border_width(lmeter, part);
 
-        if(border_width || end_border_width)
-        {
+        if(border_width || end_border_width) {
             int16_t end_angle = (level * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs - 1;
             lv_draw_line_dsc_t arc_dsc;
             lv_draw_line_dsc_init(&arc_dsc);
@@ -355,8 +354,8 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
 
             if(end_border_width) {
                 arc_dsc.width = end_border_width;
-            arc_dsc.color = end_color;
-            lv_draw_arc(x_ofs, y_ofs, r_out, end_angle, (angle_ofs + ext->scale_angle) % 360, clip_area, &arc_dsc);
+                arc_dsc.color = end_color;
+                lv_draw_arc(x_ofs, y_ofs, r_out, end_angle, (angle_ofs + ext->scale_angle) % 360, clip_area, &arc_dsc);
             }
 
 
@@ -420,7 +419,8 @@ static lv_res_t lv_linemeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * 
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    } else if(sign == LV_SIGNAL_STYLE_CHG) {
+    }
+    else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_refresh_ext_draw_pad(lmeter);
         lv_obj_invalidate(lmeter);
     }

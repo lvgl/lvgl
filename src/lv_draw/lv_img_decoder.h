@@ -84,8 +84,7 @@ typedef lv_res_t (*lv_img_decoder_read_line_f_t)(struct _lv_img_decoder * decode
  */
 typedef void (*lv_img_decoder_close_f_t)(struct _lv_img_decoder * decoder, struct _lv_img_decoder_dsc * dsc);
 
-typedef struct _lv_img_decoder
-{
+typedef struct _lv_img_decoder {
     lv_img_decoder_info_f_t info_cb;
     lv_img_decoder_open_f_t open_cb;
     lv_img_decoder_read_line_f_t read_line_cb;
@@ -97,8 +96,7 @@ typedef struct _lv_img_decoder
 } lv_img_decoder_t;
 
 /**Describe an image decoding session. Stores data about the decoding*/
-typedef struct _lv_img_decoder_dsc
-{
+typedef struct _lv_img_decoder_dsc {
     /**The decoder which was able to open the image source*/
     lv_img_decoder_t * decoder;
 
@@ -254,7 +252,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
  * @return LV_RES_OK: ok; LV_RES_INV: failed
  */
 lv_res_t lv_img_decoder_built_in_read_line(lv_img_decoder_t * decoder, lv_img_decoder_dsc_t * dsc, lv_coord_t x,
-                                                  lv_coord_t y, lv_coord_t len, uint8_t * buf);
+                                           lv_coord_t y, lv_coord_t len, uint8_t * buf);
 
 /**
  * Close the pending decoding. Free resources etc.

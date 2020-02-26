@@ -35,8 +35,7 @@ extern "C" {
 /**
  * Heap information structure.
  */
-typedef struct
-{
+typedef struct {
     uint32_t total_size; /**< Total heap size */
     uint32_t free_cnt;
     uint32_t free_size; /**< Size of available memory */
@@ -49,8 +48,8 @@ typedef struct
 typedef struct {
     void * p;
     uint16_t size;
-    uint8_t used    :1;
-}lv_mem_buf_t;
+    uint8_t used    : 1;
+} lv_mem_buf_t;
 
 typedef lv_mem_buf_t lv_mem_buf_arr_t[LV_MEM_BUF_MAX_NUM];
 extern lv_mem_buf_arr_t _lv_mem_buf;

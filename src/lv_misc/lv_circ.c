@@ -68,7 +68,8 @@ void lv_circ_next(lv_point_t * c, lv_coord_t * tmp)
 
     if(*tmp <= 0) {
         (*tmp) += 2 * c->y + 1; /*Change in decision criterion for y -> y+1*/
-    } else {
+    }
+    else {
         c->x--;
         (*tmp) += 2 * (c->y - c->x) + 1; /*Change for y -> y+1, x -> x-1*/
     }

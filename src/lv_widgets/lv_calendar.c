@@ -59,7 +59,8 @@ static lv_signal_cb_t ancestor_signal;
 static lv_design_cb_t ancestor_design;
 static const char * day_name[7]    = {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"};
 static const char * month_name[12] = {"January", "February", "March",     "April",   "May",      "June",
-                                      "July",    "August",   "September", "October", "November", "December"};
+                                      "July",    "August",   "September", "October", "November", "December"
+                                     };
 
 /**********************
  *      MACROS
@@ -131,7 +132,7 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_theme_apply(calendar, LV_THEME_CALENDAR);
 
-        lv_obj_set_size(calendar, 5*LV_DPI/2, 5*LV_DPI/2);
+        lv_obj_set_size(calendar, 5 * LV_DPI / 2, 5 * LV_DPI / 2);
 
     }
     /*Copy an existing calendar*/
@@ -153,7 +154,7 @@ lv_obj_t * lv_calendar_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->style_header           = copy_ext->style_header;
         ext->style_day_names        = copy_ext->style_day_names;
         /*Refresh the style with new signal function*/
-//        lv_obj_refresh_style(new_calendar);
+        //        lv_obj_refresh_style(new_calendar);
     }
 
     LV_LOG_INFO("calendar created");
@@ -432,7 +433,8 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         lv_obj_clean_style_list(calendar, LV_CALENDAR_PART_HEADER);
         lv_obj_clean_style_list(calendar, LV_CALENDAR_PART_DAY_NAMES);
         lv_obj_clean_style_list(calendar, LV_CALENDAR_PART_DATE);
-    } else if(sign == LV_SIGNAL_PRESSING) {
+    }
+    else if(sign == LV_SIGNAL_PRESSING) {
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
         lv_area_t header_area;
         lv_area_copy(&header_area, &calendar->coords);
@@ -447,7 +449,8 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
             if(p.x < header_area.x1 + lv_area_get_width(&header_area) / 2) {
                 if(ext->btn_pressing != -1) lv_obj_invalidate(calendar);
                 ext->btn_pressing = -1;
-            } else {
+            }
+            else {
                 if(ext->btn_pressing != 1) lv_obj_invalidate(calendar);
                 ext->btn_pressing = 1;
             }
@@ -469,7 +472,8 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
             ext->pressed_date.month = 0;
             ext->pressed_date.day   = 0;
         }
-    } else if(sign == LV_SIGNAL_PRESS_LOST) {
+    }
+    else if(sign == LV_SIGNAL_PRESS_LOST) {
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
         ext->btn_pressing       = 0;
         ext->pressed_date.year  = 0;
@@ -477,23 +481,28 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         ext->pressed_date.day   = 0;
         lv_obj_invalidate(calendar);
 
-    } else if(sign == LV_SIGNAL_RELEASED) {
+    }
+    else if(sign == LV_SIGNAL_RELEASED) {
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
         if(ext->btn_pressing < 0) {
             if(ext->showed_date.month <= 1) {
                 ext->showed_date.month = 12;
                 ext->showed_date.year--;
-            } else {
+            }
+            else {
                 ext->showed_date.month--;
             }
-        } else if(ext->btn_pressing > 0) {
+        }
+        else if(ext->btn_pressing > 0) {
             if(ext->showed_date.month >= 12) {
                 ext->showed_date.month = 1;
                 ext->showed_date.year++;
-            } else {
+            }
+            else {
                 ext->showed_date.month++;
             }
-        } else if(ext->pressed_date.year != 0) {
+        }
+        else if(ext->pressed_date.year != 0) {
             res = lv_event_send(calendar, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
 
@@ -504,22 +513,26 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         ext->pressed_date.month = 0;
         ext->pressed_date.day   = 0;
         lv_obj_invalidate(calendar);
-    } else if(sign == LV_SIGNAL_CONTROL) {
+    }
+    else if(sign == LV_SIGNAL_CONTROL) {
         uint8_t c               = *((uint8_t *)param);
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             if(ext->showed_date.month >= 12) {
                 ext->showed_date.month = 1;
                 ext->showed_date.year++;
-            } else {
+            }
+            else {
                 ext->showed_date.month++;
             }
             lv_obj_invalidate(calendar);
-        } else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
+        }
+        else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
             if(ext->showed_date.month <= 1) {
                 ext->showed_date.month = 12;
                 ext->showed_date.year--;
-            } else {
+            }
+            else {
                 ext->showed_date.month--;
             }
             lv_obj_invalidate(calendar);
@@ -544,20 +557,20 @@ static lv_style_list_t * lv_calendar_get_style(lv_obj_t * calendar, uint8_t part
 
 
     switch(part) {
-    case LV_CALENDAR_PART_BG:
-        style_dsc_p = &calendar->style_list;
-        break;
-    case LV_CALENDAR_PART_HEADER:
-        style_dsc_p = &ext->style_header;
-        break;
-    case LV_CALENDAR_PART_DAY_NAMES:
-        style_dsc_p = &ext->style_day_names;
-        break;
-    case LV_CALENDAR_PART_DATE:
-        style_dsc_p = &ext->style_date_nums;
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_CALENDAR_PART_BG:
+            style_dsc_p = &calendar->style_list;
+            break;
+        case LV_CALENDAR_PART_HEADER:
+            style_dsc_p = &ext->style_header;
+            break;
+        case LV_CALENDAR_PART_DAY_NAMES:
+            style_dsc_p = &ext->style_day_names;
+            break;
+        case LV_CALENDAR_PART_DATE:
+            style_dsc_p = &ext->style_date_nums;
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;
@@ -602,20 +615,23 @@ static bool calculate_touched_day(lv_obj_t * calendar, const lv_point_t * touche
             ext->pressed_date.year  = ext->showed_date.year - (ext->showed_date.month == 1 ? 1 : 0);
             ext->pressed_date.month = ext->showed_date.month == 1 ? 12 : (ext->showed_date.month - 1);
             ext->pressed_date.day   = get_month_length(ext->pressed_date.year, ext->pressed_date.month) -
-                                    get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) + 1 + i_pos;
-        } else if(i_pos < (get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) +
-                           get_month_length(ext->showed_date.year, ext->showed_date.month))) {
+                                      get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) + 1 + i_pos;
+        }
+        else if(i_pos < (get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) +
+                         get_month_length(ext->showed_date.year, ext->showed_date.month))) {
             ext->pressed_date.year  = ext->showed_date.year;
             ext->pressed_date.month = ext->showed_date.month;
             ext->pressed_date.day   = i_pos + 1 - get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1);
-        } else if(i_pos < 42) {
+        }
+        else if(i_pos < 42) {
             ext->pressed_date.year  = ext->showed_date.year + (ext->showed_date.month == 12 ? 1 : 0);
             ext->pressed_date.month = ext->showed_date.month == 12 ? 1 : (ext->showed_date.month + 1);
             ext->pressed_date.day   = i_pos + 1 - get_day_of_week(ext->showed_date.year, ext->showed_date.month, 1) -
-                                    get_month_length(ext->showed_date.year, ext->showed_date.month);
+                                      get_month_length(ext->showed_date.year, ext->showed_date.month);
         }
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -688,7 +704,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     lv_draw_label_dsc_init(&label_dsc);
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_HEADER, &label_dsc);
     label_dsc.flag = LV_TXT_FLAG_CENTER;
-    lv_draw_label(&header_area, mask, &label_dsc,txt_buf, NULL);
+    lv_draw_label(&header_area, mask, &label_dsc, txt_buf, NULL);
 
     calendar->state = state_ori;    /*Restore the state*/
 
@@ -708,7 +724,8 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     if(ext->btn_pressing > 0) calendar->state |= LV_STATE_PRESSED;
     else calendar->state &= ~(LV_STATE_PRESSED);
 
-    header_area.x1 = header_area.x2 - header_right - lv_txt_get_width(LV_SYMBOL_RIGHT, (uint16_t)strlen(LV_SYMBOL_RIGHT), font, 0, LV_TXT_FLAG_NONE);
+    header_area.x1 = header_area.x2 - header_right - lv_txt_get_width(LV_SYMBOL_RIGHT, (uint16_t)strlen(LV_SYMBOL_RIGHT),
+                                                                      font, 0, LV_TXT_FLAG_NONE);
 
     lv_draw_label_dsc_init(&label_dsc);
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_HEADER, &label_dsc);
@@ -805,7 +822,8 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
         day_cnt    = 1;
         draw_state = DAY_DRAW_ACT_MONTH;
         month_state  = 0;
-    } else {
+    }
+    else {
         draw_state = DAY_DRAW_PREV_MONTH;
         day_cnt = get_month_length(ext->showed_date.year, ext->showed_date.month - 1); /*Length of the previous month*/
         day_cnt -= month_start_day - 1; /*First visible number of the previous month*/
@@ -850,7 +868,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
             }
             /*The current month is over*/
             else if(draw_state == DAY_DRAW_ACT_MONTH &&
-               day_cnt > get_month_length(ext->showed_date.year, ext->showed_date.month)) {
+                    day_cnt > get_month_length(ext->showed_date.year, ext->showed_date.month)) {
                 draw_state = DAY_DRAW_NEXT_MONTH;
                 day_cnt    = 1;
                 month_state  = LV_STATE_DISABLED;
@@ -923,7 +941,8 @@ static bool is_highlighted(lv_obj_t * calendar, day_draw_state_t draw_state, int
     if(draw_state == DAY_DRAW_PREV_MONTH) {
         year -= month == 1 ? 1 : 0;
         month = month == 1 ? 12 : month - 1;
-    } else if(draw_state == DAY_DRAW_NEXT_MONTH) {
+    }
+    else if(draw_state == DAY_DRAW_NEXT_MONTH) {
         year += month == 12 ? 1 : 0;
         month = month == 12 ? 1 : month + 1;
     }
@@ -956,7 +975,8 @@ static bool is_pressed(lv_obj_t * calendar, day_draw_state_t draw_state, int32_t
     if(draw_state == DAY_DRAW_PREV_MONTH) {
         year -= month == 1 ? 1 : 0;
         month = month == 1 ? 12 : month - 1;
-    } else if(draw_state == DAY_DRAW_NEXT_MONTH) {
+    }
+    else if(draw_state == DAY_DRAW_NEXT_MONTH) {
         year += month == 12 ? 1 : 0;
         month = month == 12 ? 1 : month + 1;
     }

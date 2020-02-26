@@ -119,7 +119,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         }
         ext->label_count = copy_ext->label_count;
         /*Refresh the style with new signal function*/
-//        lv_obj_refresh_style(new_gauge);
+        //        lv_obj_refresh_style(new_gauge);
     }
 
     LV_LOG_INFO("gauge created");
@@ -417,17 +417,17 @@ static lv_style_list_t * lv_gauge_get_style(lv_obj_t * gauge, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-    case LV_GAUGE_PART_MAIN:
-        style_dsc_p = &gauge->style_list;
-        break;
-    case LV_GAUGE_PART_STRONG:
-        style_dsc_p = &ext->style_strong;
-        break;
-    case LV_GAUGE_PART_NEEDLE:
-        style_dsc_p = &ext->style_needle;
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_GAUGE_PART_MAIN:
+            style_dsc_p = &gauge->style_list;
+            break;
+        case LV_GAUGE_PART_STRONG:
+            style_dsc_p = &ext->style_strong;
+            break;
+        case LV_GAUGE_PART_NEEDLE:
+            style_dsc_p = &ext->style_needle;
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;

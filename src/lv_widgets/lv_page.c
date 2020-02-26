@@ -32,8 +32,8 @@
 #define LV_PAGE_END_ANIM_WAIT_TIME 300
 
 #if LV_USE_ANIMATION == 0
-#undef LV_PAGE_DEF_ANIM_TIME
-#define LV_PAGE_DEF_ANIM_TIME 0 /*No animation*/
+    #undef LV_PAGE_DEF_ANIM_TIME
+    #define LV_PAGE_DEF_ANIM_TIME 0 /*No animation*/
 #endif
 
 /**********************
@@ -51,8 +51,8 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
 static void scrl_def_event_cb(lv_obj_t * scrl, lv_event_t event);
 static void refr_ext_draw_pad(lv_obj_t * page);
 #if LV_USE_ANIMATION
-static void edge_flash_anim(void * page, lv_anim_value_t v);
-static void edge_flash_anim_end(lv_anim_t * a);
+    static void edge_flash_anim(void * page, lv_anim_value_t v);
+    static void edge_flash_anim_end(lv_anim_t * a);
 #endif
 
 /**********************
@@ -125,7 +125,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_signal_cb(ext->scrl, lv_page_scrollable_signal);
 
         /* Add the signal function only if 'scrolling' is created
-+         * because everything has to be ready before any signal is received*/
+        +         * because everything has to be ready before any signal is received*/
         lv_obj_set_signal_cb(page, lv_page_signal);
         lv_obj_set_design_cb(page, lv_page_design);
 
@@ -133,7 +133,8 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_theme_apply(page, LV_THEME_PAGE);
 
-    } else {
+    }
+    else {
         lv_page_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->scrl                = lv_cont_create(page, copy_ext->scrl);
         lv_obj_set_signal_cb(ext->scrl, lv_page_scrollable_signal);
@@ -143,9 +144,9 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_signal_cb(page, lv_page_signal);
         lv_obj_set_design_cb(page, lv_page_design);
 
-//        lv_page_set_style(new_page, LV_PAGE_STYLE_BG, lv_page_get_style(copy, LV_PAGE_STYLE_BG));
-//        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, lv_page_get_style(copy, LV_PAGE_STYLE_SCRL));
-//        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRLBAR, lv_page_get_style(copy, LV_PAGE_STYLE_SCRLBAR));
+        //        lv_page_set_style(new_page, LV_PAGE_STYLE_BG, lv_page_get_style(copy, LV_PAGE_STYLE_BG));
+        //        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, lv_page_get_style(copy, LV_PAGE_STYLE_SCRL));
+        //        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRLBAR, lv_page_get_style(copy, LV_PAGE_STYLE_SCRLBAR));
 
         lv_page_set_sb_mode(page, copy_ext->scrlbar.mode);
     }
@@ -497,7 +498,8 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
     if(anim_en == LV_ANIM_OFF || lv_page_get_anim_time(page) == 0) {
         lv_obj_set_y(ext->scrl, scrlable_y);
         lv_obj_set_x(ext->scrl, scrlable_x);
-    } else {
+    }
+    else {
 #if LV_USE_ANIMATION
         lv_anim_t a;
         lv_anim_init(&a);
@@ -589,10 +591,18 @@ void lv_page_start_edge_flash(lv_obj_t * page, lv_page_edge_t edge)
     lv_anim_start(&a);
 
     switch(edge) {
-        case LV_PAGE_EDGE_BOTTOM: ext->edge_flash.bottom_ip = 1; break;
-        case LV_PAGE_EDGE_TOP: ext->edge_flash.top_ip = 1; break;
-        case LV_PAGE_EDGE_LEFT: ext->edge_flash.left_ip = 1; break;
-        case LV_PAGE_EDGE_RIGHT: ext->edge_flash.right_ip = 1; break;
+        case LV_PAGE_EDGE_BOTTOM:
+            ext->edge_flash.bottom_ip = 1;
+            break;
+        case LV_PAGE_EDGE_TOP:
+            ext->edge_flash.top_ip = 1;
+            break;
+        case LV_PAGE_EDGE_LEFT:
+            ext->edge_flash.left_ip = 1;
+            break;
+        case LV_PAGE_EDGE_RIGHT:
+            ext->edge_flash.right_ip = 1;
+            break;
     }
 
 #else
@@ -622,7 +632,8 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
 
     if(mode == LV_DESIGN_DRAW_MAIN) {
         return ancestor_design(page, clip_area, mode);
-    } else if(mode == LV_DESIGN_DRAW_POST) {
+    }
+    else if(mode == LV_DESIGN_DRAW_POST) {
         ancestor_design(page, clip_area, mode);
         lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
 
@@ -630,75 +641,78 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
         lv_area_t sb_ver_area;
         /*Convert the relative coordinates to absolute*/
         lv_area_copy(&sb_hor_area, &ext->scrlbar.hor_area);
-		sb_hor_area.x1 += page->coords.x1;
-		sb_hor_area.y1 += page->coords.y1;
-		sb_hor_area.x2 += page->coords.x1;
-		sb_hor_area.y2 += page->coords.y1;
+        sb_hor_area.x1 += page->coords.x1;
+        sb_hor_area.y1 += page->coords.y1;
+        sb_hor_area.x2 += page->coords.x1;
+        sb_hor_area.y2 += page->coords.y1;
 
         /*Convert the relative coordinates to absolute*/
         lv_area_copy(&sb_ver_area, &ext->scrlbar.ver_area);
-		sb_ver_area.x1 += page->coords.x1;
-		sb_ver_area.y1 += page->coords.y1;
-		sb_ver_area.x2 += page->coords.x1;
-		sb_ver_area.y2 += page->coords.y1;
+        sb_ver_area.x1 += page->coords.x1;
+        sb_ver_area.y1 += page->coords.y1;
+        sb_ver_area.x2 += page->coords.x1;
+        sb_ver_area.y2 += page->coords.y1;
 
-		if((ext->scrlbar.hor_draw && lv_area_is_on(&sb_hor_area, clip_area)) ||
-		   (ext->scrlbar.ver_draw && lv_area_is_on(&sb_ver_area, clip_area))) {
-			/*Draw the scrollbars*/
-			lv_draw_rect_dsc_t rect_dsc;
-			lv_draw_rect_dsc_init(&rect_dsc);
-			lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCRLBAR, &rect_dsc);
-			if(ext->scrlbar.hor_draw && (ext->scrlbar.mode & LV_SB_MODE_HIDE) == 0) {
-				lv_draw_rect(&sb_hor_area, clip_area, &rect_dsc);
-			}
+        if((ext->scrlbar.hor_draw && lv_area_is_on(&sb_hor_area, clip_area)) ||
+           (ext->scrlbar.ver_draw && lv_area_is_on(&sb_ver_area, clip_area))) {
+            /*Draw the scrollbars*/
+            lv_draw_rect_dsc_t rect_dsc;
+            lv_draw_rect_dsc_init(&rect_dsc);
+            lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCRLBAR, &rect_dsc);
+            if(ext->scrlbar.hor_draw && (ext->scrlbar.mode & LV_SB_MODE_HIDE) == 0) {
+                lv_draw_rect(&sb_hor_area, clip_area, &rect_dsc);
+            }
 
-			if(ext->scrlbar.ver_draw && (ext->scrlbar.mode & LV_SB_MODE_HIDE) == 0) {
-				lv_draw_rect(&sb_ver_area, clip_area, &rect_dsc);
-			}
-		}
+            if(ext->scrlbar.ver_draw && (ext->scrlbar.mode & LV_SB_MODE_HIDE) == 0) {
+                lv_draw_rect(&sb_ver_area, clip_area, &rect_dsc);
+            }
+        }
 
 #if LV_USE_ANIMATION
-		{
-			lv_coord_t page_w = lv_obj_get_width(page);
-			lv_coord_t page_h = lv_obj_get_height(page);
+        {
+            lv_coord_t page_w = lv_obj_get_width(page);
+            lv_coord_t page_h = lv_obj_get_height(page);
 
-			lv_area_t flash_area;
+            lv_area_t flash_area;
 
-			if(ext->edge_flash.top_ip) {
-				flash_area.x1 = page->coords.x1 - page_w;
-				flash_area.x2 = page->coords.x2 + page_w;
-				flash_area.y1 = page->coords.y1 - 3 * page_w + ext->edge_flash.state;
-				flash_area.y2 = page->coords.y1 + ext->edge_flash.state;
-			} else if(ext->edge_flash.bottom_ip) {
-				flash_area.x1 = page->coords.x1 - page_w;
-				flash_area.x2 = page->coords.x2 + page_w;
-				flash_area.y1 = page->coords.y2 - ext->edge_flash.state;
-				flash_area.y2 = page->coords.y2 + 3 * page_w - ext->edge_flash.state;
-			} else if(ext->edge_flash.right_ip) {
-				flash_area.x1 = page->coords.x2 - ext->edge_flash.state;
-				flash_area.x2 = page->coords.x2 + 3 * page_h - ext->edge_flash.state;
-				flash_area.y1 = page->coords.y1 - page_h;
-				flash_area.y2 = page->coords.y2 + page_h;
-			} else if(ext->edge_flash.left_ip) {
-				flash_area.x1 = page->coords.x1 - 3 * page_h + ext->edge_flash.state;
-				flash_area.x2 = page->coords.x1 + ext->edge_flash.state;
-				flash_area.y1 = page->coords.y1 - page_h;
-				flash_area.y2 = page->coords.y2 + page_h;
-			}
+            if(ext->edge_flash.top_ip) {
+                flash_area.x1 = page->coords.x1 - page_w;
+                flash_area.x2 = page->coords.x2 + page_w;
+                flash_area.y1 = page->coords.y1 - 3 * page_w + ext->edge_flash.state;
+                flash_area.y2 = page->coords.y1 + ext->edge_flash.state;
+            }
+            else if(ext->edge_flash.bottom_ip) {
+                flash_area.x1 = page->coords.x1 - page_w;
+                flash_area.x2 = page->coords.x2 + page_w;
+                flash_area.y1 = page->coords.y2 - ext->edge_flash.state;
+                flash_area.y2 = page->coords.y2 + 3 * page_w - ext->edge_flash.state;
+            }
+            else if(ext->edge_flash.right_ip) {
+                flash_area.x1 = page->coords.x2 - ext->edge_flash.state;
+                flash_area.x2 = page->coords.x2 + 3 * page_h - ext->edge_flash.state;
+                flash_area.y1 = page->coords.y1 - page_h;
+                flash_area.y2 = page->coords.y2 + page_h;
+            }
+            else if(ext->edge_flash.left_ip) {
+                flash_area.x1 = page->coords.x1 - 3 * page_h + ext->edge_flash.state;
+                flash_area.x2 = page->coords.x1 + ext->edge_flash.state;
+                flash_area.y1 = page->coords.y1 - page_h;
+                flash_area.y2 = page->coords.y2 + page_h;
+            }
 
-			if(ext->edge_flash.left_ip || ext->edge_flash.right_ip || ext->edge_flash.top_ip ||
-					ext->edge_flash.bottom_ip) {
-				lv_draw_rect_dsc_t edge_draw_dsc;
-				lv_draw_rect_dsc_init(&edge_draw_dsc);
-				lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_EDGE_FLASH, &edge_draw_dsc);
-				edge_draw_dsc.radius  = LV_RADIUS_CIRCLE;
-				uint32_t opa            = (edge_draw_dsc.bg_opa * ext->edge_flash.state) / LV_PAGE_END_FLASH_SIZE;
-				edge_draw_dsc.bg_opa    = opa;
-				lv_draw_rect(&flash_area, clip_area, &edge_draw_dsc);
-			}
-		}
+            if(ext->edge_flash.left_ip || ext->edge_flash.right_ip || ext->edge_flash.top_ip ||
+               ext->edge_flash.bottom_ip) {
+                lv_draw_rect_dsc_t edge_draw_dsc;
+                lv_draw_rect_dsc_init(&edge_draw_dsc);
+                lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_EDGE_FLASH, &edge_draw_dsc);
+                edge_draw_dsc.radius  = LV_RADIUS_CIRCLE;
+                uint32_t opa            = (edge_draw_dsc.bg_opa * ext->edge_flash.state) / LV_PAGE_END_FLASH_SIZE;
+                edge_draw_dsc.bg_opa    = opa;
+                lv_draw_rect(&flash_area, clip_area, &edge_draw_dsc);
+            }
+        }
 #endif
-	}
+    }
 
     return LV_DESIGN_RES_OK;
 }
@@ -718,7 +732,8 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         info->result = lv_page_get_style(page, info->part);
         if(info->result != NULL) return LV_RES_OK;
         else return ancestor_signal(page, sign, param);
-    } else if(sign == LV_SIGNAL_GET_STATE_DSC) {
+    }
+    else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_get_state_info_t * info = param;
         if(info->part == LV_PAGE_PART_SCRL) info->result = lv_obj_get_state(lv_page_get_scrl(page), LV_CONT_PART_MAIN);
         else info->result = lv_obj_get_state(page, info->part);
@@ -769,8 +784,8 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                 /* Reposition the child to take padding into account (Only if it's on (0;0) or (widht;height) coordinates now)
                  * It's required to keep new the object on the same coordinate if FIT is enabled.*/
                 if((tmp->coords.x1 == page->coords.x1)  &&
-                        (fit_left == LV_FIT_TIGHT || fit_left == LV_FIT_MAX) &&
-                        base_dir != LV_BIDI_DIR_RTL) {
+                   (fit_left == LV_FIT_TIGHT || fit_left == LV_FIT_MAX) &&
+                   base_dir != LV_BIDI_DIR_RTL) {
                     tmp->coords.x1 += scrl_left;
                     tmp->coords.x2 += scrl_left;
                 }
@@ -785,11 +800,13 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                     tmp->coords.y2 += scrl_top;
                 }
                 lv_obj_set_parent(tmp, ext->scrl);
-            } else {
+            }
+            else {
                 child = lv_obj_get_child(page, child);
             }
         }
-    } else if(sign == LV_SIGNAL_STYLE_CHG) {
+    }
+    else if(sign == LV_SIGNAL_STYLE_CHG) {
         ext->scrl->signal_cb(ext->scrl, LV_SIGNAL_COORD_CHG, &ext->scrl->coords);
 
         lv_style_int_t sb_width = lv_obj_get_style_size(page, LV_PAGE_PART_SCRLBAR);
@@ -801,7 +818,8 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
 
         /*Refresh the ext. size because the scrollbars might be positioned out of the page*/
         refr_ext_draw_pad(page);
-    } else if(sign == LV_SIGNAL_COORD_CHG) {
+    }
+    else if(sign == LV_SIGNAL_COORD_CHG) {
         /*Refresh the scrollbar and notify the scrl if the size is changed*/
         if(ext->scrl != NULL && (lv_obj_get_width(page) != lv_area_get_width(param) ||
                                  lv_obj_get_height(page) != lv_area_get_height(param))) {
@@ -811,23 +829,28 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             /*The scrollbars are important only if they are visible now*/
             if(ext->scrlbar.hor_draw || ext->scrlbar.ver_draw) lv_page_sb_refresh(page);
         }
-    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    }
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         refr_ext_draw_pad(page);
-    } else if(sign == LV_SIGNAL_CONTROL) {
+    }
+    else if(sign == LV_SIGNAL_CONTROL) {
         uint32_t c = *((uint32_t *)param);
 
         if(c == LV_KEY_DOWN) {
             lv_page_scroll_ver(page, -lv_obj_get_height(page) / 4);
-        } else if(c == LV_KEY_UP) {
+        }
+        else if(c == LV_KEY_UP) {
             lv_page_scroll_ver(page, lv_obj_get_height(page) / 4);
-        } else if(c == LV_KEY_RIGHT) {
+        }
+        else if(c == LV_KEY_RIGHT) {
             /*If the page can't be scrolled horizontally because it's not wide enough then scroll it
              * vertically*/
             if(lv_page_get_scrl_width(page) <= lv_obj_get_width(page))
                 lv_page_scroll_ver(page, -lv_obj_get_height(page) / 4);
             else
                 lv_page_scroll_hor(page, -lv_obj_get_width(page) / 4);
-        } else if(c == LV_KEY_LEFT) {
+        }
+        else if(c == LV_KEY_LEFT) {
             /*If the page can't be scrolled horizontally because it's not wide enough then scroll it
              * vertically*/
             if(lv_page_get_scrl_width(page) <= lv_obj_get_width(page))
@@ -835,7 +858,8 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             else
                 lv_page_scroll_hor(page, lv_obj_get_width(page) / 4);
         }
-    } else if(sign == LV_SIGNAL_GET_EDITABLE) {
+    }
+    else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable       = true;
     }
@@ -893,14 +917,14 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 if((lv_indev_is_dragging(indev) == false || page_ext->scroll_prop_obj) && (drag_sum->y || drag_sum->x)) {
                     /*Propagate vertically?*/
                     if((drag_sum->y > 0 && lv_page_on_edge(page, LV_PAGE_EDGE_TOP)) ||
-                        (drag_sum->y < 0 && lv_page_on_edge(page, LV_PAGE_EDGE_BOTTOM))) {
+                       (drag_sum->y < 0 && lv_page_on_edge(page, LV_PAGE_EDGE_BOTTOM))) {
                         lv_obj_set_drag_parent(page, true);
                         lv_obj_set_drag_parent(scrl, true);
                         parent_ext->scroll_prop_obj = page;
                     }
                     /*Propagate horizontally?*/
                     if((drag_sum->x > 0 && lv_page_on_edge(page, LV_PAGE_EDGE_LEFT)) ||
-                        (drag_sum->x < 0 && lv_page_on_edge(page, LV_PAGE_EDGE_RIGHT))) {
+                       (drag_sum->x < 0 && lv_page_on_edge(page, LV_PAGE_EDGE_RIGHT))) {
                         lv_obj_set_drag_parent(page, true);
                         lv_obj_set_drag_parent(scrl, true);
                         parent_ext->scroll_prop_obj = page;
@@ -915,18 +939,20 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         lv_style_int_t bottom = lv_obj_get_style_pad_bottom(page, LV_PAGE_PART_BG);
 
         /*scrollable width smaller then page width? -> align to left*/
-        if(lv_area_get_width(&scrl_coords) + left +right <= lv_area_get_width(&page_coords)) {
+        if(lv_area_get_width(&scrl_coords) + left + right <= lv_area_get_width(&page_coords)) {
             if(scrl_coords.x1 != page_coords.x1 + left) {
                 new_x  = left;
                 refr_x = true;
             }
-        } else {
+        }
+        else {
             /*The edges of the scrollable can not be in the page (minus hpad) */
             if(scrl_coords.x2 < page_coords.x2 - right) {
                 new_x = lv_area_get_width(&page_coords) - lv_area_get_width(&scrl_coords) - right; /* Right align */
                 refr_x = true;
                 lv_page_start_edge_flash(page, LV_PAGE_EDGE_RIGHT);
-            } else if(scrl_coords.x1 > page_coords.x1 + left) {
+            }
+            else if(scrl_coords.x1 > page_coords.x1 + left) {
                 new_x  = left; /*Left align*/
                 refr_x = true;
                 lv_page_start_edge_flash(page, LV_PAGE_EDGE_LEFT);
@@ -939,13 +965,15 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 new_y  = top;
                 refr_y = true;
             }
-        } else {
+        }
+        else {
             /*The edges of the scrollable can not be in the page (minus vpad) */
             if(scrl_coords.y2 < page_coords.y2 - bottom) {
                 new_y = lv_area_get_height(&page_coords) - lv_area_get_height(&scrl_coords) - bottom; /* Bottom align */
                 refr_y = true;
                 lv_page_start_edge_flash(page, LV_PAGE_EDGE_BOTTOM);
-            } else if(scrl_coords.y1 > page_coords.y1 + top) {
+            }
+            else if(scrl_coords.y1 > page_coords.y1 + top) {
                 new_y  = top; /*Top align*/
                 refr_y = true;
                 lv_page_start_edge_flash(page, LV_PAGE_EDGE_TOP);
@@ -957,7 +985,8 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
 
         lv_page_sb_refresh(page);
-    } else if(sign == LV_SIGNAL_DRAG_END) {
+    }
+    else if(sign == LV_SIGNAL_DRAG_END) {
 
         /*Scroll propagation is finished on drag end*/
         if(page_ext->scroll_prop_obj) {
@@ -1000,12 +1029,14 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 page_ext->scrlbar.ver_draw = 0;
             }
         }
-    } else if(sign == LV_SIGNAL_FOCUS) {
+    }
+    else if(sign == LV_SIGNAL_FOCUS) {
         res = lv_signal_send(page, LV_SIGNAL_FOCUS, NULL);
         if(res != LV_RES_OK) return res;
         res = lv_event_send(page, LV_EVENT_FOCUSED, NULL);
         if(res != LV_RES_OK) return res;
-    }  else if(sign == LV_SIGNAL_DEFOCUS) {
+    }
+    else if(sign == LV_SIGNAL_DEFOCUS) {
         res = lv_signal_send(page, LV_SIGNAL_DEFOCUS, NULL);
         if(res != LV_RES_OK) return res;
         res = lv_event_send(page, LV_EVENT_DEFOCUSED, NULL);
@@ -1053,22 +1084,22 @@ static lv_style_list_t * lv_page_get_style(lv_obj_t * page, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-    case LV_PAGE_PART_BG:
-        style_dsc_p = &page->style_list;
-        break;
-    case LV_PAGE_PART_SCRL:
-        style_dsc_p = lv_obj_get_style_list(ext->scrl, LV_CONT_PART_MAIN);
-        break;
-    case LV_PAGE_PART_SCRLBAR:
-        style_dsc_p = &ext->scrlbar.style;
-        break;
+        case LV_PAGE_PART_BG:
+            style_dsc_p = &page->style_list;
+            break;
+        case LV_PAGE_PART_SCRL:
+            style_dsc_p = lv_obj_get_style_list(ext->scrl, LV_CONT_PART_MAIN);
+            break;
+        case LV_PAGE_PART_SCRLBAR:
+            style_dsc_p = &ext->scrlbar.style;
+            break;
 #if LV_USE_ANIMATION
-    case LV_PAGE_PART_EDGE_FLASH:
-        style_dsc_p = &ext->edge_flash.style;
-        break;
+        case LV_PAGE_PART_EDGE_FLASH:
+            style_dsc_p = &ext->edge_flash.style;
+            break;
 #endif
-    default:
-        style_dsc_p = NULL;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;
@@ -1153,8 +1184,8 @@ static void lv_page_sb_refresh(lv_obj_t * page)
 
         lv_area_set_pos(&ext->scrlbar.hor_area,
                         sb_hor_pad +
-                            (-(lv_obj_get_x(scrl) -bg_left) * (obj_w - size_tmp - 2 * sb_hor_pad)) /
-                                (scrl_w + bg_left + bg_right - obj_w),
+                        (-(lv_obj_get_x(scrl) - bg_left) * (obj_w - size_tmp - 2 * sb_hor_pad)) /
+                        (scrl_w + bg_left + bg_right - obj_w),
                         obj_h - sb_width - sb_bottom);
 
         if(ext->scrlbar.mode == LV_SB_MODE_AUTO || ext->scrlbar.mode == LV_SB_MODE_DRAG) ext->scrlbar.hor_draw = 1;
@@ -1178,7 +1209,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
                         obj_w - sb_width - sb_right,
                         sb_ver_pad + (-(lv_obj_get_y(scrl) - bg_left) *
                                       (obj_h - size_tmp - 2 * sb_ver_pad)) /
-                                         (scrl_h + bg_top + bg_bottom - obj_h));
+                        (scrl_h + bg_top + bg_bottom - obj_h));
 
         if(ext->scrlbar.mode == LV_SB_MODE_AUTO || ext->scrlbar.mode == LV_SB_MODE_DRAG) ext->scrlbar.ver_draw = 1;
     }

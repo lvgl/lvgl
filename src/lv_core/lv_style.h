@@ -79,11 +79,11 @@ typedef uint8_t lv_text_decor_t;
 
 typedef union {
     struct {
-        uint8_t state       :7; /* To which state the property refers to*/
-        uint8_t inherit     :1; /*1: The property can be inherited*/
-    }bits;
+        uint8_t state       : 7; /* To which state the property refers to*/
+        uint8_t inherit     : 1; /*1: The property can be inherited*/
+    } bits;
     uint8_t full;
-}lv_style_attr_t;
+} lv_style_attr_t;
 
 
 #define LV_STYLE_ID_VALUE 0x0   /*max 8 pcs*/
@@ -205,7 +205,7 @@ typedef struct {
 #if LV_USE_ASSERT_STYLE
     uint32_t sentinel;
 #endif
-}lv_style_t;
+} lv_style_t;
 
 typedef int16_t lv_style_int_t;
 
@@ -216,11 +216,11 @@ typedef struct {
     uint32_t sentinel;
 #endif
     uint8_t style_cnt;
-    uint8_t has_local    :1;
-    uint8_t has_trans    :1;
-    uint8_t skip_trans   :1;        /*1: Temporally skip the transition style if any*/
-    uint8_t ignore_trans   :1;      /*1: Mark that this style list shouldn't receive transitions at all*/
-}lv_style_list_t;
+    uint8_t has_local    : 1;
+    uint8_t has_trans    : 1;
+    uint8_t skip_trans   : 1;       /*1: Temporally skip the transition style if any*/
+    uint8_t ignore_trans   : 1;     /*1: Mark that this style list shouldn't receive transitions at all*/
+} lv_style_list_t;
 
 /**********************
  * GLOBAL PROTOTYPES

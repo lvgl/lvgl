@@ -254,7 +254,8 @@ static lv_design_res_t lv_line_design(lv_obj_t * line, const lv_area_t * clip_ar
             if(ext->y_inv == 0) {
                 p1.y = ext->point_array[i].y + y_ofs;
                 p2.y = ext->point_array[i + 1].y + y_ofs;
-            } else {
+            }
+            else {
                 p1.y = h - ext->point_array[i].y + y_ofs;
                 p2.y = h - ext->point_array[i + 1].y + y_ofs;
             }
@@ -281,9 +282,9 @@ static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
-   if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-       /*The corner of the skew lines is out of the intended area*/
-       lv_style_int_t line_width = lv_obj_get_style_line_width(line, LV_LINE_PART_MAIN);
+    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+        /*The corner of the skew lines is out of the intended area*/
+        lv_style_int_t line_width = lv_obj_get_style_line_width(line, LV_LINE_PART_MAIN);
         if(line->ext_draw_pad < line_width) line->ext_draw_pad = line_width;
     }
 

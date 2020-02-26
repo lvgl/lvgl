@@ -45,8 +45,7 @@ typedef uint8_t lv_roller_mode_t;
 
 
 /*Data of roller*/
-typedef struct
-{
+typedef struct {
     lv_page_ext_t page; /*Ext. of ancestor*/
 
     /*New data for this type */

@@ -44,24 +44,23 @@ extern "C" {
  **********************/
 
 enum {
-	LV_BAR_TYPE_NORMAL,
-	LV_BAR_TYPE_SYM,
-	LV_BAR_TYPE_CUSTOM
+    LV_BAR_TYPE_NORMAL,
+    LV_BAR_TYPE_SYM,
+    LV_BAR_TYPE_CUSTOM
 };
 typedef uint8_t lv_bar_type_t;
 
 #if LV_USE_ANIMATION
 typedef struct {
     lv_obj_t * bar;
-	lv_anim_value_t anim_start;
+    lv_anim_value_t anim_start;
     lv_anim_value_t anim_end;
-	lv_anim_value_t anim_state;
+    lv_anim_value_t anim_state;
 } lv_bar_anim_t;
 #endif
 
 /** Data of bar*/
-typedef struct
-{
+typedef struct {
     /*No inherited ext, derived from the base object */
 
     /*New data for this type */
@@ -73,9 +72,9 @@ typedef struct
 #if LV_USE_ANIMATION
     lv_anim_value_t anim_time;
     lv_bar_anim_t cur_value_anim;
-	lv_bar_anim_t start_value_anim;
+    lv_bar_anim_t start_value_anim;
 #endif
-	uint8_t type : 2;			/*Type of bar*/
+    uint8_t type : 2;           /*Type of bar*/
     lv_style_list_t style_indic; /*Style of the indicator*/
 } lv_bar_ext_t;
 

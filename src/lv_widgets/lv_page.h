@@ -50,13 +50,11 @@ enum { LV_PAGE_EDGE_LEFT = 0x1, LV_PAGE_EDGE_TOP = 0x2, LV_PAGE_EDGE_RIGHT = 0x4
 typedef uint8_t lv_page_edge_t;
 
 /*Data of page*/
-typedef struct
-{
+typedef struct {
     lv_cont_ext_t bg; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * scrl; /*The scrollable object on the background*/
-    struct
-    {
+    struct {
         lv_style_list_t style; /*Style of scrollbars*/
         lv_area_t hor_area;       /*Horizontal scrollbar area relative to the page. (Handled by the library) */
         lv_area_t ver_area;       /*Vertical scrollbar area relative to the page (Handled by the library)*/
@@ -65,8 +63,7 @@ typedef struct
         lv_sb_mode_t mode : 3;    /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
     } scrlbar;
 #if LV_USE_ANIMATION
-    struct
-    {
+    struct {
         lv_anim_value_t state;    /*Store the current size of the edge flash effect*/
         lv_style_list_t style; /*Style of edge flash effect (usually homogeneous circle)*/
         uint8_t enabled : 1;      /*1: Show a flash animation on the edge*/
@@ -83,7 +80,7 @@ typedef struct
     uint16_t anim_time; /*Scroll animation time*/
 #endif
     lv_obj_t * scroll_prop_obj;          /*Pointer to child page from where the scroll is being propagated */
-    uint8_t scroll_prop :1;    /*The direction of the scroll propagation*/
+    uint8_t scroll_prop : 1;   /*The direction of the scroll propagation*/
 } lv_page_ext_t;
 
 enum {

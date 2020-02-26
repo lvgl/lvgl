@@ -21,12 +21,12 @@
 #define LV_OBJX_NAME "lv_msgbox"
 
 #if LV_USE_ANIMATION
-#ifndef LV_MSGBOX_CLOSE_ANIM_TIME
-#define LV_MSGBOX_CLOSE_ANIM_TIME 200 /*List close animation time)  */
-#endif
+    #ifndef LV_MSGBOX_CLOSE_ANIM_TIME
+        #define LV_MSGBOX_CLOSE_ANIM_TIME 200 /*List close animation time)  */
+    #endif
 #else
-#undef LV_MSGBOX_CLOSE_ANIM_TIME
-#define LV_MSGBOX_CLOSE_ANIM_TIME 0 /*No animations*/
+    #undef LV_MSGBOX_CLOSE_ANIM_TIME
+    #define LV_MSGBOX_CLOSE_ANIM_TIME 0 /*No animations*/
 #endif
 
 /**********************
@@ -40,7 +40,7 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
 static void mbox_realign(lv_obj_t * mbox);
 static lv_style_list_t * lv_msgbox_get_style(lv_obj_t * mbox, uint8_t part);
 #if LV_USE_ANIMATION
-static void lv_msgbox_close_ready_cb(lv_anim_t * a);
+    static void lv_msgbox_close_ready_cb(lv_anim_t * a);
 #endif
 static void lv_msgbox_default_event_cb(lv_obj_t * mbox, lv_event_t event);
 static void lv_msgbox_btnm_event_cb(lv_obj_t * btnm, lv_event_t event);
@@ -219,14 +219,15 @@ void lv_msgbox_start_auto_close(lv_obj_t * mbox, uint16_t delay)
         lv_anim_set_delay(&a, delay);
         lv_anim_start(&a);
 
-        lv_anim_set_exec_cb(&a,(lv_anim_exec_xcb_t)lv_obj_set_width);
+        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_width);
         lv_anim_set_values(&a, lv_obj_get_width(mbox), 0);
         lv_anim_set_ready_cb(&a, lv_msgbox_close_ready_cb);
         lv_anim_start(&a);
 
         /*Disable fit to let shrinking work*/
         lv_cont_set_fit(mbox, LV_FIT_NONE);
-    } else {
+    }
+    else {
         /*Create an animation to delete the mbox `delay` ms later*/
         lv_anim_t a;
         lv_anim_init(&a);
@@ -399,15 +400,17 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
     }
 
     if(sign == LV_SIGNAL_GET_STYLE) {
-            lv_get_style_info_t * info = param;
-            info->result = lv_msgbox_get_style(mbox, info->part);
-            if(info->result != NULL) return LV_RES_OK;
-            else return ancestor_signal(mbox, sign, param);
-    } else if(sign == LV_SIGNAL_GET_STATE_DSC) {
+        lv_get_style_info_t * info = param;
+        info->result = lv_msgbox_get_style(mbox, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(mbox, sign, param);
+    }
+    else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_get_state_info_t * info = param;
         lv_msgbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
         if(ext->btnm && info->part == LV_MSGBOX_PART_BTN_BG) info->result = lv_obj_get_state(ext->btnm, LV_BTNMATRIX_PART_BG);
-        else if(ext->btnm && info->part == LV_MSGBOX_PART_BTN) info->result = lv_obj_get_state(ext->btnm, LV_BTNMATRIX_PART_BTN);
+        else if(ext->btnm &&
+                info->part == LV_MSGBOX_PART_BTN) info->result = lv_obj_get_state(ext->btnm, LV_BTNMATRIX_PART_BTN);
         return LV_RES_OK;
     }
 
@@ -421,15 +424,18 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
         if(lv_obj_get_width(mbox) != lv_area_get_width(param)) {
             mbox_realign(mbox);
         }
-    } else if(sign == LV_SIGNAL_STYLE_CHG) {
+    }
+    else if(sign == LV_SIGNAL_STYLE_CHG) {
         mbox_realign(mbox);
-    } else if(sign == LV_SIGNAL_RELEASED) {
+    }
+    else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->btnm) {
             uint32_t btn_id = lv_btnmatrix_get_active_btn(ext->btnm);
             if(btn_id != LV_BTNMATRIX_BTN_NONE) lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
         }
-    } else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROL ||
-              sign == LV_SIGNAL_GET_EDITABLE) {
+    }
+    else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROL ||
+            sign == LV_SIGNAL_GET_EDITABLE) {
         if(ext->btnm) {
             ext->btnm->signal_cb(ext->btnm, sign, param);
         }
@@ -469,17 +475,17 @@ static lv_style_list_t * lv_msgbox_get_style(lv_obj_t * mbox, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-    case LV_MSGBOX_PART_BG:
-        style_dsc_p = &mbox->style_list;
-        break;
-    case LV_MSGBOX_PART_BTN_BG:
-        style_dsc_p = ext->btnm ? lv_obj_get_style_list(ext->btnm, LV_BTNMATRIX_PART_BG) : NULL;
-        break;
-    case LV_MSGBOX_PART_BTN:
-        style_dsc_p = ext->btnm ? lv_obj_get_style_list(ext->btnm, LV_BTNMATRIX_PART_BTN) : NULL;
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_MSGBOX_PART_BG:
+            style_dsc_p = &mbox->style_list;
+            break;
+        case LV_MSGBOX_PART_BTN_BG:
+            style_dsc_p = ext->btnm ? lv_obj_get_style_list(ext->btnm, LV_BTNMATRIX_PART_BG) : NULL;
+            break;
+        case LV_MSGBOX_PART_BTN:
+            style_dsc_p = ext->btnm ? lv_obj_get_style_list(ext->btnm, LV_BTNMATRIX_PART_BTN) : NULL;
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;

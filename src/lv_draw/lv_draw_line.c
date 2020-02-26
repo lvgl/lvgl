@@ -24,9 +24,12 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip, lv_draw_line_dsc_t * dsc);
-static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip, lv_draw_line_dsc_t * dsc);
-static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip, lv_draw_line_dsc_t * dsc);
+static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+                           lv_draw_line_dsc_t * dsc);
+static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+                          lv_draw_line_dsc_t * dsc);
+static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+                          lv_draw_line_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -56,7 +59,8 @@ void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
  * @param style pointer to a line's style
  * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip, lv_draw_line_dsc_t * dsc)
+void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+                  lv_draw_line_dsc_t * dsc)
 {
     if(dsc->width == 0) return;
     if(dsc->opa <= LV_OPA_MIN) return;
@@ -64,10 +68,10 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
     if(point1->x == point2->x && point1->y == point2->y) return;
 
     lv_area_t clip_line;
-    clip_line.x1 = LV_MATH_MIN(point1->x, point2->x) - dsc->width/2;
-    clip_line.x2 = LV_MATH_MAX(point1->x, point2->x) + dsc->width/2;
-    clip_line.y1 = LV_MATH_MIN(point1->y, point2->y) - dsc->width/2;
-    clip_line.y2 = LV_MATH_MAX(point1->y, point2->y) + dsc->width/2;
+    clip_line.x1 = LV_MATH_MIN(point1->x, point2->x) - dsc->width / 2;
+    clip_line.x2 = LV_MATH_MAX(point1->x, point2->x) + dsc->width / 2;
+    clip_line.y1 = LV_MATH_MIN(point1->y, point2->y) - dsc->width / 2;
+    clip_line.y2 = LV_MATH_MAX(point1->y, point2->y) + dsc->width / 2;
 
     bool is_common;
     is_common = lv_area_intersect(&clip_line, &clip_line, clip);
@@ -111,7 +115,8 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
  *   STATIC FUNCTIONS
  **********************/
 
-static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip, lv_draw_line_dsc_t * dsc)
+static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+                          lv_draw_line_dsc_t * dsc)
 {
     lv_opa_t opa = dsc->opa;
 
@@ -139,8 +144,8 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
     /*If there is no mask then simply draw a rectangle*/
     if(simple_mode) {
         lv_blend_fill(clip, &draw_area,
-                dsc->color, NULL, LV_DRAW_MASK_RES_FULL_COVER,opa,
-                LV_BLEND_MODE_NORMAL);
+                      dsc->color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
+                      LV_BLEND_MODE_NORMAL);
     }
     /*If there other mask apply it*/
     else {
@@ -170,42 +175,45 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
         lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
         int32_t h;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
-             memset(mask_buf, LV_OPA_COVER, draw_area_w);
-             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+            memset(mask_buf, LV_OPA_COVER, draw_area_w);
+            lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
-             if(dashed) {
-                 if(mask_res != LV_DRAW_MASK_RES_FULL_TRANSP) {
+            if(dashed) {
+                if(mask_res != LV_DRAW_MASK_RES_FULL_TRANSP) {
                     lv_style_int_t dash_cnt = dash_start;
-                     uint32_t i;
-                     for(i = 0; i < draw_area_w; i++, dash_cnt++) {
-                         if(dash_cnt <= dsc->dash_width) {
-                           int16_t diff = dsc->dash_width - dash_cnt;
-                           i += diff;
-                           dash_cnt += diff;
-                         } else if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
-                             dash_cnt = 0;
-                         } else {
-                             mask_buf[i] = 0x00;
-                         }
-                     }
+                    uint32_t i;
+                    for(i = 0; i < draw_area_w; i++, dash_cnt++) {
+                        if(dash_cnt <= dsc->dash_width) {
+                            int16_t diff = dsc->dash_width - dash_cnt;
+                            i += diff;
+                            dash_cnt += diff;
+                        }
+                        else if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
+                            dash_cnt = 0;
+                        }
+                        else {
+                            mask_buf[i] = 0x00;
+                        }
+                    }
 
-                     mask_res = LV_DRAW_MASK_RES_CHANGED;
-                 }
-             }
+                    mask_res = LV_DRAW_MASK_RES_CHANGED;
+                }
+            }
 
-             lv_blend_fill(clip, &fill_area,
-                      dsc->color, mask_buf, mask_res, dsc->opa,
-                      dsc->blend_mode);
+            lv_blend_fill(clip, &fill_area,
+                          dsc->color, mask_buf, mask_res, dsc->opa,
+                          dsc->blend_mode);
 
-             fill_area.y1++;
-             fill_area.y2++;
-         }
+            fill_area.y1++;
+            fill_area.y2++;
+        }
         lv_mem_buf_release(mask_buf);
     }
 }
 
 
-static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip, lv_draw_line_dsc_t * dsc)
+static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+                          lv_draw_line_dsc_t * dsc)
 {
     lv_opa_t opa = dsc->opa;
 
@@ -233,8 +241,8 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
     /*If there is no mask then simply draw a rectangle*/
     if(simple_mode) {
         lv_blend_fill(clip, &draw_area,
-                dsc->color,  NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
-                dsc->blend_mode);
+                      dsc->color,  NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
+                      dsc->blend_mode);
     }
     /*If there other mask apply it*/
     else {
@@ -266,35 +274,36 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
 
         int32_t h;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
-             memset(mask_buf, LV_OPA_COVER, draw_area_w);
-             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+            memset(mask_buf, LV_OPA_COVER, draw_area_w);
+            lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
-             if(dashed) {
-                 if(mask_res != LV_DRAW_MASK_RES_FULL_TRANSP) {
-                     if(dash_cnt > dsc->dash_width) {
-                         mask_res = LV_DRAW_MASK_RES_FULL_TRANSP;
-                     }
+            if(dashed) {
+                if(mask_res != LV_DRAW_MASK_RES_FULL_TRANSP) {
+                    if(dash_cnt > dsc->dash_width) {
+                        mask_res = LV_DRAW_MASK_RES_FULL_TRANSP;
+                    }
 
-                     if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
-                         dash_cnt = 0;
-                     }
-                 }
-                 dash_cnt ++;
-             }
+                    if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
+                        dash_cnt = 0;
+                    }
+                }
+                dash_cnt ++;
+            }
 
-             lv_blend_fill(clip, &fill_area,
-                     dsc->color, mask_buf, mask_res, dsc->opa,
-                     LV_BLEND_MODE_NORMAL);
+            lv_blend_fill(clip, &fill_area,
+                          dsc->color, mask_buf, mask_res, dsc->opa,
+                          LV_BLEND_MODE_NORMAL);
 
-             fill_area.y1++;
-             fill_area.y2++;
-         }
+            fill_area.y1++;
+            fill_area.y2++;
+        }
         lv_mem_buf_release(mask_buf);
     }
 }
 
 
-static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip, lv_draw_line_dsc_t * dsc)
+static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+                           lv_draw_line_dsc_t * dsc)
 {
     lv_opa_t opa = dsc->opa;
 
@@ -306,7 +315,8 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
         p2.y = point2->y;
         p1.x = point1->x;
         p2.x = point2->x;
-    } else {
+    }
+    else {
         p1.y = point2->y;
         p2.y = point1->y;
         p1.x = point2->x;
@@ -353,20 +363,28 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
 
     if(flat) {
         if(xdiff > 0) {
-            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0, LV_DRAW_MASK_LINE_SIDE_LEFT);
-            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1, LV_DRAW_MASK_LINE_SIDE_RIGHT);
-        } else {
-            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1, LV_DRAW_MASK_LINE_SIDE_LEFT);
-            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0, LV_DRAW_MASK_LINE_SIDE_RIGHT);
+            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0,
+                                          LV_DRAW_MASK_LINE_SIDE_LEFT);
+            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1,
+                                          LV_DRAW_MASK_LINE_SIDE_RIGHT);
         }
-    } else {
-        lv_draw_mask_line_points_init(&mask_left_param, p1.x + w_half1, p1.y, p2.x + w_half1, p2.y, LV_DRAW_MASK_LINE_SIDE_LEFT);
-        lv_draw_mask_line_points_init(&mask_right_param, p1.x - w_half0, p1.y, p2.x - w_half0, p2.y, LV_DRAW_MASK_LINE_SIDE_RIGHT);
+        else {
+            lv_draw_mask_line_points_init(&mask_left_param, p1.x, p1.y + w_half1, p2.x, p2.y + w_half1,
+                                          LV_DRAW_MASK_LINE_SIDE_LEFT);
+            lv_draw_mask_line_points_init(&mask_right_param, p1.x, p1.y - w_half0, p2.x, p2.y - w_half0,
+                                          LV_DRAW_MASK_LINE_SIDE_RIGHT);
+        }
+    }
+    else {
+        lv_draw_mask_line_points_init(&mask_left_param, p1.x + w_half1, p1.y, p2.x + w_half1, p2.y,
+                                      LV_DRAW_MASK_LINE_SIDE_LEFT);
+        lv_draw_mask_line_points_init(&mask_right_param, p1.x - w_half0, p1.y, p2.x - w_half0, p2.y,
+                                      LV_DRAW_MASK_LINE_SIDE_RIGHT);
     }
 
     /*Use the normal vector for the endings*/
     lv_draw_mask_line_points_init(&mask_top_param, p1.x, p1.y, p1.x - ydiff, p1.y + xdiff, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
-    lv_draw_mask_line_points_init(&mask_bottom_param, p2.x, p2.y,p2.x - ydiff, p2.y + xdiff,  LV_DRAW_MASK_LINE_SIDE_TOP);
+    lv_draw_mask_line_points_init(&mask_bottom_param, p2.x, p2.y, p2.x - ydiff, p2.y + xdiff,  LV_DRAW_MASK_LINE_SIDE_TOP);
 
     int16_t mask_left_id = lv_draw_mask_add(&mask_left_param, NULL);
     int16_t mask_right_id = lv_draw_mask_add(&mask_right_param, NULL);
@@ -401,8 +419,8 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
         lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
         lv_blend_fill(clip, &fill_area,
-                dsc->color, mask_buf, mask_res, opa,
-                dsc->blend_mode);
+                      dsc->color, mask_buf, mask_res, opa,
+                      dsc->blend_mode);
 
         fill_area.y1++;
         fill_area.y2++;

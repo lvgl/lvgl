@@ -20,8 +20,8 @@
 #define LV_OBJX_NAME "lv_roller"
 
 #if LV_USE_ANIMATION == 0
-#undef LV_ROLLER_DEF_ANIM_TIME
-#define LV_ROLLER_DEF_ANIM_TIME 0 /*No animation*/
+    #undef LV_ROLLER_DEF_ANIM_TIME
+    #define LV_ROLLER_DEF_ANIM_TIME 0 /*No animation*/
 #endif
 
 /**********************
@@ -42,7 +42,7 @@ static lv_res_t release_handler(lv_obj_t * roller);
 static void inf_normalize(void * roller_scrl);
 static lv_obj_t * get_label(const lv_obj_t * roller);
 #if LV_USE_ANIMATION
-static void scroll_anim_ready_cb(lv_anim_t * a);
+    static void scroll_anim_ready_cb(lv_anim_t * a);
 #endif
 static void draw_bg(lv_obj_t * roller, const lv_area_t * clip_area);
 
@@ -163,7 +163,8 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
     if(mode == LV_ROLLER_MODE_NORMAL) {
         ext->mode = LV_ROLLER_MODE_NORMAL;
         lv_label_set_text(label, options);
-    } else {
+    }
+    else {
         ext->mode = LV_ROLLER_MODE_INIFINITE;
 
         size_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
@@ -264,7 +265,8 @@ uint16_t lv_roller_get_selected(const lv_obj_t * roller)
     if(ext->mode == LV_ROLLER_MODE_INIFINITE) {
         uint16_t real_id_cnt = ext->option_cnt / LV_ROLLER_INF_PAGES;
         return ext->sel_opt_id % real_id_cnt;
-    } else {
+    }
+    else {
         return ext->sel_opt_id;
     }
 }
@@ -315,7 +317,8 @@ uint16_t lv_roller_get_option_cnt(const lv_obj_t * roller)
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     if(ext->mode == LV_ROLLER_MODE_INIFINITE) {
         return ext->option_cnt / LV_ROLLER_INF_PAGES;
-    } else {
+    }
+    else {
         return ext->option_cnt;
     }
 }
@@ -413,7 +416,8 @@ static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * cli
 
             if(LV_LABEL_ALIGN_CENTER == label_align) {
                 label_dsc.flag |= LV_TXT_FLAG_CENTER;
-            } else if(LV_LABEL_ALIGN_RIGHT == label_align) {
+            }
+            else if(LV_LABEL_ALIGN_RIGHT == label_align) {
                 label_dsc.flag |= LV_TXT_FLAG_RIGHT;
             }
 
@@ -456,7 +460,8 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         refr_height(roller);
         refr_width(roller);
         refr_position(roller, false);
-    } else if(sign == LV_SIGNAL_COORD_CHG) {
+    }
+    else if(sign == LV_SIGNAL_COORD_CHG) {
 
         if(lv_obj_get_width(roller) != lv_area_get_width(param) ||
            lv_obj_get_height(roller) != lv_area_get_height(param)) {
@@ -465,9 +470,11 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
 #endif
             refr_position(roller, false);
         }
-    } else if(sign == LV_SIGNAL_RELEASED) {
+    }
+    else if(sign == LV_SIGNAL_RELEASED) {
         release_handler(roller);
-    } else if(sign == LV_SIGNAL_FOCUS) {
+    }
+    else if(sign == LV_SIGNAL_FOCUS) {
 #if LV_USE_GROUP
         lv_group_t * g             = lv_obj_get_group(roller);
         bool editing               = lv_group_get_editing(g);
@@ -486,12 +493,14 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             else {
                 ext->sel_opt_id_ori = ext->sel_opt_id;
             }
-        } else {
+        }
+        else {
             ext->sel_opt_id_ori = ext->sel_opt_id; /*Save the current value. Used to revert this state if
                                                                     ENER wont't be pressed*/
         }
 #endif
-    } else if(sign == LV_SIGNAL_DEFOCUS) {
+    }
+    else if(sign == LV_SIGNAL_DEFOCUS) {
 #if LV_USE_GROUP
         /*Revert the original state*/
         if(ext->sel_opt_id != ext->sel_opt_id_ori) {
@@ -499,7 +508,8 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             refr_position(roller, true);
         }
 #endif
-    } else if(sign == LV_SIGNAL_CONTROL) {
+    }
+    else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(ext->sel_opt_id + 1 < ext->option_cnt) {
@@ -507,7 +517,8 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
                 lv_roller_set_selected(roller, ext->sel_opt_id + 1, true);
                 ext->sel_opt_id_ori = ori_id;
             }
-        } else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
+        }
+        else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
             if(ext->sel_opt_id > 0) {
                 uint16_t ori_id = ext->sel_opt_id_ori; /*lv_roller_set_selceted will overwrite this*/
                 lv_roller_set_selected(roller, ext->sel_opt_id - 1, true);
@@ -516,7 +527,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         }
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
-       lv_obj_clean_style_list(roller, LV_ROLLER_PART_SEL);
+        lv_obj_clean_style_list(roller, LV_ROLLER_PART_SEL);
     }
     return res;
 }
@@ -535,14 +546,14 @@ static lv_style_list_t * lv_roller_get_style(lv_obj_t * roller, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-    case LV_ROLLER_PART_BG:
-        style_dsc_p = &roller->style_list;
-        break;
-    case LV_ROLLER_PART_SEL:
-        style_dsc_p = &ext->style_sel;
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_ROLLER_PART_BG:
+            style_dsc_p = &roller->style_list;
+            break;
+        case LV_ROLLER_PART_SEL:
+            style_dsc_p = &ext->style_sel;
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;
@@ -595,8 +606,9 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     }
     /*If picked an option by clicking then set it*/
     else if(sign == LV_SIGNAL_RELEASED) {
-       release_handler(roller);
-    } else if(sign == LV_SIGNAL_PRESSED) {
+        release_handler(roller);
+    }
+    else if(sign == LV_SIGNAL_PRESSED) {
 #if LV_USE_ANIMATION
         lv_anim_del(roller_scrl, (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
@@ -701,7 +713,8 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
         lv_anim_del(roller_scrl, (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
         lv_obj_set_y(roller_scrl, new_y);
-    } else {
+    }
+    else {
 #if LV_USE_ANIMATION
         lv_anim_t a;
         lv_anim_init(&a);

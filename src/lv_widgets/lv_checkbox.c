@@ -85,13 +85,14 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_theme_apply(cb, LV_THEME_CHECKBOX);
 
-    } else {
+    }
+    else {
         lv_checkbox_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->bullet            = lv_obj_create(cb, copy_ext->bullet);
         ext->label             = lv_label_create(cb, copy_ext->label);
 
         /*Refresh the style with new signal function*/
-//        lv_obj_refresh_style(cb);
+        //        lv_obj_refresh_style(cb);
     }
 
     LV_LOG_INFO("check box created");
@@ -181,10 +182,12 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * cb, lv_signal_t sign, void * param
         lv_coord_t line_height = lv_font_get_line_height(font);
         lv_obj_set_size(ext->bullet, line_height, line_height);
         lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CHECKBOX_PART_BG));
-    } else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST ||
+    }
+    else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST ||
             sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS) {
         lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CHECKBOX_PART_BG));
-    } else if(sign == LV_SIGNAL_CONTROL) {
+    }
+    else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN || c == LV_KEY_LEFT || c == LV_KEY_UP) {
             /*Follow the backgrounds state with the bullet*/
@@ -202,14 +205,14 @@ static lv_style_list_t * lv_checkbox_get_style(lv_obj_t * cb, uint8_t type)
 
     lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
     switch(type) {
-    case LV_CHECKBOX_PART_BG:
-        style_dsc_p = &cb->style_list;
-        break;
-    case LV_CHECKBOX_PART_BULLET:
-        style_dsc_p = lv_obj_get_style_list(ext->bullet, LV_BTN_PART_MAIN);
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_CHECKBOX_PART_BG:
+            style_dsc_p = &cb->style_list;
+            break;
+        case LV_CHECKBOX_PART_BULLET:
+            style_dsc_p = lv_obj_get_style_list(ext->bullet, LV_BTN_PART_MAIN);
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;

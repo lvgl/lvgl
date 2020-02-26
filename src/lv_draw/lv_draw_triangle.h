@@ -42,7 +42,8 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * clip, lv_draw
  * @param clip_area polygon will be drawn only in this area
  * @param draw_dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_area_t * mask, lv_draw_rect_dsc_t * draw_dsc);
+void lv_draw_polygon(const lv_point_t * points, uint16_t point_cnt, const lv_area_t * mask,
+                     lv_draw_rect_dsc_t * draw_dsc);
 
 /**********************
  *      MACROS

@@ -27,8 +27,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 /*Data of arc*/
-typedef struct
-{
+typedef struct {
     /*New data for this type */
     lv_coord_t arc_angle_start;
     lv_coord_t arc_angle_end;

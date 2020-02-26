@@ -61,14 +61,12 @@ enum {
 typedef uint8_t lv_label_align_t;
 
 /** Data of label*/
-typedef struct
-{
+typedef struct {
     /*Inherited from 'base_obj' so no inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
     char * text;        /*Text of the label*/
 
-    union
-    {
+    union {
         char * tmp_ptr; /* Pointer to the allocated memory containing the character which are replaced by dots (Handled
                            by the library)*/
         char tmp[LV_LABEL_DOT_NUM + 1]; /* Directly store the characters if <=4 characters */

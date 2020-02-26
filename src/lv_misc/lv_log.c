@@ -13,7 +13,7 @@
 #include "lv_printf.h"
 
 #if LV_LOG_PRINTF
-#include <stdio.h>
+    #include <stdio.h>
 #endif
 
 /*********************

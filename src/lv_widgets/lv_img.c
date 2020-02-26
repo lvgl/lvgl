@@ -11,7 +11,7 @@
 
 /*Testing of dependencies*/
 #if LV_USE_LABEL == 0
-#error "lv_img: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
+    #error "lv_img: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
 #include "../lv_core/lv_debug.h"
@@ -103,15 +103,17 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
          * and must be screen sized*/
         if(par != NULL) {
             ext->auto_size = 1;
-        } else {
+        }
+        else {
             ext->auto_size = 0;
         }
-    } else {
+    }
+    else {
         lv_img_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->auto_size          = copy_ext->auto_size;
         lv_img_set_src(img, copy_ext->src);
 
-//        /*Refresh the style with new signal function*/
+        //        /*Refresh the style with new signal function*/
         lv_obj_refresh_style(img);
     }
 
@@ -138,10 +140,17 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
 
 #if LV_USE_LOG && LV_LOG_LEVEL >= LV_LOG_LEVEL_INFO
     switch(src_type) {
-        case LV_IMG_SRC_FILE: LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_FILE` type found"); break;
-        case LV_IMG_SRC_VARIABLE: LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_VARIABLE` type found"); break;
-        case LV_IMG_SRC_SYMBOL: LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_SYMBOL` type found"); break;
-        default: LV_LOG_WARN("lv_img_set_src: unknown type");
+        case LV_IMG_SRC_FILE:
+            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_FILE` type found");
+            break;
+        case LV_IMG_SRC_VARIABLE:
+            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_VARIABLE` type found");
+            break;
+        case LV_IMG_SRC_SYMBOL:
+            LV_LOG_TRACE("lv_img_set_src: `LV_IMG_SRC_SYMBOL` type found");
+            break;
+        default:
+            LV_LOG_WARN("lv_img_set_src: unknown type");
     }
 #endif
 
@@ -168,7 +177,8 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
             lv_mem_free(ext->src);
         }
         ext->src = src_img;
-    } else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
+    }
+    else if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_SYMBOL) {
         /* If the new and the old src are the same then it was only a refresh.*/
         if(ext->src != src_img) {
             const void * old_src = NULL;
@@ -278,7 +288,7 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y)
 void lv_img_set_pivot(lv_obj_t * img, lv_coord_t pivot_x, lv_coord_t pivot_y)
 {
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
-	if (ext->pivot.x == pivot_x && ext->pivot.y == pivot_y) return;
+    if(ext->pivot.x == pivot_x && ext->pivot.y == pivot_y) return;
 
     lv_area_t a;
     lv_img_buf_get_transformed_area(&a, ext->w, ext->h, ext->angle, ext->zoom, &ext->pivot);
@@ -464,7 +474,7 @@ lv_coord_t lv_img_get_offset_y(lv_obj_t * img)
  * @param img pointer to an image object
  * @param center rotation center of the image
  */
-void lv_img_get_pivot(lv_obj_t * img, lv_point_t *pivot)
+void lv_img_get_pivot(lv_obj_t * img, lv_point_t * pivot)
 {
     LV_ASSERT_OBJ(img, LV_OBJX_NAME);
 
@@ -535,7 +545,8 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
 
     if(mode == LV_DESIGN_COVER_CHK) {
         lv_design_res_t cover = LV_DESIGN_RES_NOT_COVER;
-        if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL || ext->angle != 0) return LV_DESIGN_RES_NOT_COVER;
+        if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL ||
+           ext->angle != 0) return LV_DESIGN_RES_NOT_COVER;
 
         if(ext->cf == LV_IMG_CF_TRUE_COLOR || ext->cf == LV_IMG_CF_RAW) {
             cover = lv_area_is_in(clip_area, &img->coords, 0) ? LV_DESIGN_RES_COVER : LV_DESIGN_RES_NOT_COVER;
@@ -544,7 +555,8 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         if(lv_obj_get_style_image_opa(img, LV_IMG_PART_MAIN) < LV_OPA_MAX) return false;
 
         return cover;
-    } else if(mode == LV_DESIGN_DRAW_MAIN) {
+    }
+    else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
         lv_area_t img_coords;
 
@@ -605,7 +617,8 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
                     lv_draw_img(&cords_tmp, clip_area, ext->src, &img_dsc);
                 }
             }
-        } else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
+        }
+        else if(ext->src_type == LV_IMG_SRC_SYMBOL) {
             LV_LOG_TRACE("lv_img_design: start to draw symbol");
             lv_draw_label_dsc_t label_dsc;
             lv_draw_label_dsc_init(&label_dsc);
@@ -613,12 +626,14 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
 
             label_dsc.color = lv_obj_get_style_image_recolor(img, LV_IMG_PART_MAIN);
             lv_draw_label(&img_coords, clip_area, &label_dsc, ext->src, NULL);
-        } else {
+        }
+        else {
             /*Trigger the error handler of image drawer*/
             LV_LOG_WARN("lv_img_design: image source type is unknown");
             lv_draw_img(&img->coords, clip_area, NULL, NULL);
         }
-    } else if(mode == LV_DESIGN_DRAW_POST) {
+    }
+    else if(mode == LV_DESIGN_DRAW_POST) {
         if(lv_obj_get_style_clip_corner(img, LV_OBJ_PART_MAIN)) {
             lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(img + 8);
             lv_mem_buf_release(param);
@@ -671,12 +686,14 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
             ext->src      = NULL;
             ext->src_type = LV_IMG_SRC_UNKNOWN;
         }
-    } else if(sign == LV_SIGNAL_STYLE_CHG) {
+    }
+    else if(sign == LV_SIGNAL_STYLE_CHG) {
         /*Refresh the file name to refresh the symbol text size*/
         if(ext->src_type == LV_IMG_SRC_SYMBOL) {
             lv_img_set_src(img, ext->src);
         }
-    } else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    }
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*If the image has angle provide enough room for the rotated corners */
         if(ext->angle || ext->zoom != LV_IMG_ZOOM_NONE) {
             lv_area_t a;
@@ -699,8 +716,9 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, bottom);
 
 
-    } else if(sign == LV_SIGNAL_HIT_TEST) {
-        lv_hit_test_info_t *info = param;
+    }
+    else if(sign == LV_SIGNAL_HIT_TEST) {
+        lv_hit_test_info_t * info = param;
         if(ext->zoom != 256 && ext->angle == 0) {
             lv_coord_t origin_width = lv_area_get_width(&img->coords);
             lv_coord_t origin_height = lv_area_get_height(&img->coords);
@@ -717,7 +735,8 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
             coords.y1 += height_offset;
             coords.y2 -= height_offset;
             info->result = lv_area_is_point_on(&coords, info->point, 0);
-        } else
+        }
+        else
             info->result = lv_obj_is_point_on_coords(img, info->point);
     }
 
@@ -729,11 +748,11 @@ static lv_style_list_t * lv_img_get_style(lv_obj_t * img, uint8_t type)
 {
     lv_style_list_t * style_dsc_p;
     switch(type) {
-    case LV_IMG_PART_MAIN:
-        style_dsc_p = &img->style_list;
-        break;
-    default:
-        style_dsc_p = NULL;
+        case LV_IMG_PART_MAIN:
+            style_dsc_p = &img->style_list;
+            break;
+        default:
+            style_dsc_p = NULL;
     }
 
     return style_dsc_p;

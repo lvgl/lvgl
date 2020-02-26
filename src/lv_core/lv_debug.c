@@ -15,11 +15,11 @@
  *      DEFINES
  *********************/
 #ifndef LV_DEBUG_STR_MAX_LENGTH
-#define LV_DEBUG_STR_MAX_LENGTH  (1024 * 8)
+    #define LV_DEBUG_STR_MAX_LENGTH  (1024 * 8)
 #endif
 
 #ifndef LV_DEBUG_STR_MAX_REPEAT
-#define LV_DEBUG_STR_MAX_REPEAT  8
+    #define LV_DEBUG_STR_MAX_REPEAT  8
 #endif
 /**********************
  *      TYPEDEFS
@@ -126,7 +126,8 @@ bool lv_debug_check_str(const void * str)
         if(s[i] != last_byte) {
             last_byte = s[i];
             rep = 1;
-        } else if(s[i] > 0x7F){
+        }
+        else if(s[i] > 0x7F) {
             rep++;
             if(rep > LV_DEBUG_STR_MAX_REPEAT) {
                 LV_LOG_WARN("lv_debug_check_str: a non-ASCII char has repeated more than LV_DEBUG_STR_MAX_REPEAT times)");
@@ -184,7 +185,8 @@ void lv_debug_log_error(const char * msg, uint64_t value)
 
         *bufp = '\0';
         LV_LOG_ERROR(buf);
-    } else {
+    }
+    else {
         LV_LOG_ERROR(msg);
     }
 }

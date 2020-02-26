@@ -27,8 +27,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 /*Data of line meter*/
-typedef struct
-{
+typedef struct {
     /*No inherited ext.*/ /*Ext. of ancestor*/
     /*New data for this type */
     uint16_t scale_angle; /*Angle of the scale in deg. (0..360)*/

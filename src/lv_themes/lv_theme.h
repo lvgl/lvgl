@@ -29,7 +29,7 @@ extern "C" {
 
 /**
  * A theme in LittlevGL consists of many styles bound together.
- * 
+ *
  * There is a style for each object type, as well as a generic style for
  * backgrounds and panels.
  */
@@ -76,11 +76,11 @@ typedef enum {
     LV_THEME_TILEVIEW,
     LV_THEME_WIN,
     LV_THEME_WIN_BTN,   /*The buttons are initialized separately*/
-}lv_theme_style_t;
+} lv_theme_style_t;
 
 typedef struct {
-    void (*apply_cb)(lv_obj_t *,lv_theme_style_t);
-}lv_theme_t;
+    void (*apply_cb)(lv_obj_t *, lv_theme_style_t);
+} lv_theme_t;
 
 /**********************
  *  GLOBAL PROTOTYPES

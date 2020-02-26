@@ -48,8 +48,7 @@ enum {
 typedef uint8_t lv_dropdown_dir_t;
 
 /*Data of drop down list*/
-typedef struct
-{
+typedef struct {
     lv_btn_ext_t btn; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * page;             /*The dropped down list*/
@@ -65,8 +64,8 @@ typedef struct
     uint16_t sel_opt_id_orig;     /*Store the original index on focus*/
     uint16_t pr_opt_id;             /*Index of the currently pressed option*/
     uint16_t anim_time;
-    lv_dropdown_dir_t dir         :2;
-    uint8_t show_selected  :1;
+    lv_dropdown_dir_t dir         : 2;
+    uint8_t show_selected  : 1;
 } lv_dropdown_ext_t;
 
 enum {

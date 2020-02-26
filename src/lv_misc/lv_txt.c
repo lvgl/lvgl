@@ -25,23 +25,23 @@
 static inline bool is_break_char(uint32_t letter);
 
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8
-static uint8_t lv_txt_utf8_size(const char * str);
-static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni);
-static uint32_t lv_txt_utf8_conv_wc(uint32_t c);
-static uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i);
-static uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i_start);
-static uint32_t lv_txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id);
-static uint32_t lv_txt_utf8_get_char_id(const char * txt, uint32_t byte_id);
-static uint32_t lv_txt_utf8_get_length(const char * txt);
+    static uint8_t lv_txt_utf8_size(const char * str);
+    static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni);
+    static uint32_t lv_txt_utf8_conv_wc(uint32_t c);
+    static uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i);
+    static uint32_t lv_txt_utf8_prev(const char * txt, uint32_t * i_start);
+    static uint32_t lv_txt_utf8_get_byte_id(const char * txt, uint32_t utf8_id);
+    static uint32_t lv_txt_utf8_get_char_id(const char * txt, uint32_t byte_id);
+    static uint32_t lv_txt_utf8_get_length(const char * txt);
 #elif LV_TXT_ENC == LV_TXT_ENC_ASCII
-static uint8_t lv_txt_iso8859_1_size(const char * str);
-static uint32_t lv_txt_unicode_to_iso8859_1(uint32_t letter_uni);
-static uint32_t lv_txt_iso8859_1_conv_wc(uint32_t c);
-static uint32_t lv_txt_iso8859_1_next(const char * txt, uint32_t * i);
-static uint32_t lv_txt_iso8859_1_prev(const char * txt, uint32_t * i_start);
-static uint32_t lv_txt_iso8859_1_get_byte_id(const char * txt, uint32_t utf8_id);
-static uint32_t lv_txt_iso8859_1_get_char_id(const char * txt, uint32_t byte_id);
-static uint32_t lv_txt_iso8859_1_get_length(const char * txt);
+    static uint8_t lv_txt_iso8859_1_size(const char * str);
+    static uint32_t lv_txt_unicode_to_iso8859_1(uint32_t letter_uni);
+    static uint32_t lv_txt_iso8859_1_conv_wc(uint32_t c);
+    static uint32_t lv_txt_iso8859_1_next(const char * txt, uint32_t * i);
+    static uint32_t lv_txt_iso8859_1_prev(const char * txt, uint32_t * i_start);
+    static uint32_t lv_txt_iso8859_1_get_byte_id(const char * txt, uint32_t utf8_id);
+    static uint32_t lv_txt_iso8859_1_get_char_id(const char * txt, uint32_t byte_id);
+    static uint32_t lv_txt_iso8859_1_get_length(const char * txt);
 #endif
 /**********************
  *  STATIC VARIABLES
@@ -51,23 +51,23 @@ static uint32_t lv_txt_iso8859_1_get_length(const char * txt);
  *  GLOBAL VARIABLES
  **********************/
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8
-uint8_t (*lv_txt_encoded_size)(const char *)                   = lv_txt_utf8_size;
-uint32_t (*lv_txt_unicode_to_encoded)(uint32_t)                = lv_txt_unicode_to_utf8;
-uint32_t (*lv_txt_encoded_conv_wc)(uint32_t)                   = lv_txt_utf8_conv_wc;
-uint32_t (*lv_txt_encoded_next)(const char *, uint32_t *)      = lv_txt_utf8_next;
-uint32_t (*lv_txt_encoded_prev)(const char *, uint32_t *)      = lv_txt_utf8_prev;
-uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t) = lv_txt_utf8_get_byte_id;
-uint32_t (*lv_txt_encoded_get_char_id)(const char *, uint32_t) = lv_txt_utf8_get_char_id;
-uint32_t (*lv_txt_get_encoded_length)(const char *)            = lv_txt_utf8_get_length;
+    uint8_t (*lv_txt_encoded_size)(const char *)                   = lv_txt_utf8_size;
+    uint32_t (*lv_txt_unicode_to_encoded)(uint32_t)                = lv_txt_unicode_to_utf8;
+    uint32_t (*lv_txt_encoded_conv_wc)(uint32_t)                   = lv_txt_utf8_conv_wc;
+    uint32_t (*lv_txt_encoded_next)(const char *, uint32_t *)      = lv_txt_utf8_next;
+    uint32_t (*lv_txt_encoded_prev)(const char *, uint32_t *)      = lv_txt_utf8_prev;
+    uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t) = lv_txt_utf8_get_byte_id;
+    uint32_t (*lv_txt_encoded_get_char_id)(const char *, uint32_t) = lv_txt_utf8_get_char_id;
+    uint32_t (*lv_txt_get_encoded_length)(const char *)            = lv_txt_utf8_get_length;
 #elif LV_TXT_ENC == LV_TXT_ENC_ASCII
-uint8_t (*lv_txt_encoded_size)(const char *)                   = lv_txt_iso8859_1_size;
-uint32_t (*lv_txt_unicode_to_encoded)(uint32_t)                = lv_txt_unicode_to_iso8859_1;
-uint32_t (*lv_txt_encoded_conv_wc)(uint32_t)                   = lv_txt_iso8859_1_conv_wc;
-uint32_t (*lv_txt_encoded_next)(const char *, uint32_t *)      = lv_txt_iso8859_1_next;
-uint32_t (*lv_txt_encoded_prev)(const char *, uint32_t *)      = lv_txt_iso8859_1_prev;
-uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t) = lv_txt_iso8859_1_get_byte_id;
-uint32_t (*lv_txt_encoded_get_char_id)(const char *, uint32_t)     = lv_txt_iso8859_1_get_char_id;
-uint32_t (*lv_txt_get_encoded_length)(const char *)            = lv_txt_iso8859_1_get_length;
+    uint8_t (*lv_txt_encoded_size)(const char *)                   = lv_txt_iso8859_1_size;
+    uint32_t (*lv_txt_unicode_to_encoded)(uint32_t)                = lv_txt_unicode_to_iso8859_1;
+    uint32_t (*lv_txt_encoded_conv_wc)(uint32_t)                   = lv_txt_iso8859_1_conv_wc;
+    uint32_t (*lv_txt_encoded_next)(const char *, uint32_t *)      = lv_txt_iso8859_1_next;
+    uint32_t (*lv_txt_encoded_prev)(const char *, uint32_t *)      = lv_txt_iso8859_1_prev;
+    uint32_t (*lv_txt_encoded_get_byte_id)(const char *, uint32_t) = lv_txt_iso8859_1_get_byte_id;
+    uint32_t (*lv_txt_encoded_get_char_id)(const char *, uint32_t)     = lv_txt_iso8859_1_get_char_id;
+    uint32_t (*lv_txt_get_encoded_length)(const char *)            = lv_txt_iso8859_1_get_length;
 
 #endif
 
@@ -109,10 +109,11 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
     while(text[line_start] != '\0') {
         new_line_start += lv_txt_get_next_line(&text[line_start], font, letter_space, max_width, flag);
 
-        if ((unsigned long)size_res->y + (unsigned long)letter_height + (unsigned long)line_space > LV_MAX_OF(lv_coord_t)) {
+        if((unsigned long)size_res->y + (unsigned long)letter_height + (unsigned long)line_space > LV_MAX_OF(lv_coord_t)) {
             LV_LOG_WARN("lv_txt_get_size: integer overflow while calculating text height");
             return;
-        } else {
+        }
+        else {
             size_res->y += letter_height;
             size_res->y += line_space;
         }
@@ -155,7 +156,7 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  *     3. Return i=9, pointing at breakchar '\n'
  *     4. Parenting lv_txt_get_next_line() would detect subsequent '\0'
  *
- * TODO: Returned word_w_ptr may overestimate the returned word's width when 
+ * TODO: Returned word_w_ptr may overestimate the returned word's width when
  * max_width is reached. In current usage, this has no impact.
  *
  * @param txt a '\0' terminated string
@@ -168,8 +169,8 @@ void lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t *
  * @return the index of the first char of the next word (in byte index not letter index. With UTF-8 they are different)
  */
 static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
-                              lv_coord_t letter_space, lv_coord_t max_width,
-                              lv_txt_flag_t flag, uint32_t *word_w_ptr, lv_txt_cmd_state_t * cmd_state, bool force)
+                                     lv_coord_t letter_space, lv_coord_t max_width,
+                                     lv_txt_flag_t flag, uint32_t * word_w_ptr, lv_txt_cmd_state_t * cmd_state, bool force)
 {
     if(txt == NULL || txt[0] == '\0') return 0;
     if(font == NULL) return 0;
@@ -212,7 +213,7 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
 
         /* Test if this character fits within max_width */
         if(break_index == NO_BREAK_FOUND && (cur_w - letter_space) > max_width) {
-            break_index = i; 
+            break_index = i;
             break_letter_count = word_len - 1;
             /* break_index is now pointing at the character that doesn't fit */
         }
@@ -227,7 +228,7 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         }
 
         /* Update the output width */
-        if( word_w_ptr != NULL && break_index == NO_BREAK_FOUND ) *word_w_ptr = cur_w;
+        if(word_w_ptr != NULL && break_index == NO_BREAK_FOUND) *word_w_ptr = cur_w;
 
 
         i = i_next;
@@ -236,22 +237,22 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
     }
 
     /* Entire Word fits in the provided space */
-    if( break_index == NO_BREAK_FOUND ) {
-        if( word_len == 0 || (letter == '\r' && letter_next == '\n') ) i = i_next;
+    if(break_index == NO_BREAK_FOUND) {
+        if(word_len == 0 || (letter == '\r' && letter_next == '\n')) i = i_next;
         return i;
     }
 
 #if LV_TXT_LINE_BREAK_LONG_LEN > 0
     /* Word doesn't fit in provided space, but isn't "long" */
     if(word_len < LV_TXT_LINE_BREAK_LONG_LEN) {
-        if( force ) return break_index;
+        if(force) return break_index;
         if(word_w_ptr != NULL) *word_w_ptr = 0; /* Return no word */
         return 0;
     }
 
     /* Word is "long," but insufficient amounts can fit in provided space */
     if(break_letter_count < LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN) {
-        if( force ) return break_index;
+        if(force) return break_index;
         if(word_w_ptr != NULL) *word_w_ptr = 0;
         return 0;
     }
@@ -261,7 +262,7 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
         i = break_index;
         int32_t n_move = LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN - (word_len - break_letter_count);
         /* Move pointer "i" backwards */
-        for(;n_move>0; n_move--){
+        for(; n_move > 0; n_move--) {
             lv_txt_encoded_prev(txt, &i);
             // TODO: it would be appropriate to update the returned word width here
             // However, in current usage, this doesn't impact anything.
@@ -269,7 +270,7 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
     }
     return i;
 #else
-    if( force ) return break_index;
+    if(force) return break_index;
     if(word_w_ptr != NULL) *word_w_ptr = 0; /* Return no word */
     (void) break_letter_count;
     return 0;
@@ -300,10 +301,10 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
     while(txt[i] != '\0' && max_width > 0) {
         uint32_t word_w = 0;
-        uint32_t advance = lv_txt_get_next_word(&txt[i], font, letter_space, max_width, flag, &word_w, &cmd_state, i==0);
+        uint32_t advance = lv_txt_get_next_word(&txt[i], font, letter_space, max_width, flag, &word_w, &cmd_state, i == 0);
         max_width -= word_w;
 
-        if( advance == 0 ){
+        if(advance == 0) {
             if(i == 0) lv_txt_encoded_next(txt, &i); // prevent inf loops
             break;
         }
@@ -312,7 +313,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
         if(txt[0] == '\n' || txt[0] == '\r') break;
 
-        if(txt[i] == '\n' || txt[i] == '\r'){
+        if(txt[i] == '\n' || txt[i] == '\r') {
             i++;  /* Include the following newline in the current line */
             break;
         }
@@ -496,12 +497,14 @@ static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni)
         bytes[1] = ((letter_uni >> 0) & 0x3F) | 0x80;
         bytes[2] = 0;
         bytes[3] = 0;
-    } else if(letter_uni < 0x010000) {
+    }
+    else if(letter_uni < 0x010000) {
         bytes[0] = ((letter_uni >> 12) & 0x0F) | 0xE0;
         bytes[1] = ((letter_uni >> 6) & 0x3F) | 0x80;
         bytes[2] = ((letter_uni >> 0) & 0x3F) | 0x80;
         bytes[3] = 0;
-    } else if(letter_uni < 0x110000) {
+    }
+    else if(letter_uni < 0x110000) {
         bytes[0] = ((letter_uni >> 18) & 0x07) | 0xF0;
         bytes[1] = ((letter_uni >> 12) & 0x3F) | 0x80;
         bytes[2] = ((letter_uni >> 6) & 0x3F) | 0x80;
@@ -603,7 +606,8 @@ static uint32_t lv_txt_utf8_next(const char * txt, uint32_t * i)
             if((txt[*i] & 0xC0) != 0x80) return 0; /*Invalid UTF-8 code*/
             result += txt[*i] & 0x3F;
             (*i)++;
-        } else {
+        }
+        else {
             (*i)++; /*Not UTF-8 char. Go the next.*/
         }
     }
