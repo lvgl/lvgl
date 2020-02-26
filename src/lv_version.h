@@ -16,7 +16,7 @@ extern "C" {
 /*Current version of LittlevGL*/
 #define LVGL_VERSION_MAJOR   6
 #define LVGL_VERSION_MINOR   1
-#define LVGL_VERSION_PATCH   1
+#define LVGL_VERSION_PATCH   2
 #define LVGL_VERSION_INFO    ""
 
 
