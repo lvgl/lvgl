@@ -3260,6 +3260,30 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
 }
 
 /**
+ * Float the object in from the top of its parent.
+ * @param obj the object to float
+ * @param time duration of the animation [ms]
+ * @param delay wait before the animation starts [ms]
+ */
+void lv_obj_float_top_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
+{
+#if LV_USE_ANIMATION
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, obj);
+    lv_anim_set_values(&a, -lv_obj_get_height(obj), lv_obj_get_y(obj));
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)opa_scale_anim);
+    lv_anim_set_time(&a, time);
+    lv_anim_set_delay(&a, delay);
+    lv_anim_start(&a);
+#else
+    (void) obj;     /*Unused*/
+    (void) time;    /*Unused*/
+    (void) delay;   /*Unused*/
+#endif
+}
+
+/**
  * Fade out (from fully cover to transparent) an object and all its children using an `opa_scale` animation.
  * @param obj the object to fade in
  * @param time duration of the animation [ms]
@@ -3341,7 +3365,6 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 
         lv_obj_init_draw_rect_dsc(obj, LV_OBJ_PART_MAIN, &draw_dsc);
 
-
         lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_OBJ_PART_MAIN);
         lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_OBJ_PART_MAIN);
         lv_area_t coords;
@@ -3388,7 +3411,6 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             coords.y2 += h;
             lv_draw_rect(&coords, clip_area, &draw_dsc);
         }
-
     }
 
     return LV_DESIGN_RES_OK;
@@ -3509,8 +3531,6 @@ static void report_style_mod_core(void * style, lv_obj_t * obj)
     }
 
 }
-
-
 
 /**
  * Recursively refresh the style of the children. Go deeper until a not NULL style is found
