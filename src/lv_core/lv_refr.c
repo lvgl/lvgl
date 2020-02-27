@@ -13,8 +13,13 @@
 #include "../lv_hal/lv_hal_disp.h"
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_mem.h"
+#include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_gc.h"
 #include "../lv_draw/lv_draw.h"
+
+#if LV_USE_PERF_MONITOR
+#include "../lv_widgets/lv_label.h"
+#endif
 
 #if defined(LV_GC_INCLUDE)
     #include LV_GC_INCLUDE
@@ -227,10 +232,44 @@ void lv_disp_refr_task(lv_task_t * task)
         memset(disp_refr->inv_area_joined, 0, sizeof(disp_refr->inv_area_joined));
         disp_refr->inv_p = 0;
 
+        uint32_t elaps = lv_tick_elaps(start);
         /*Call monitor cb if present*/
         if(disp_refr->driver.monitor_cb) {
-            disp_refr->driver.monitor_cb(&disp_refr->driver, lv_tick_elaps(start), px_num);
+            disp_refr->driver.monitor_cb(&disp_refr->driver, elaps, px_num);
         }
+
+#if LV_USE_PERF_MONITOR && LV_USE_LABEL
+        static lv_obj_t * perf_label = NULL;
+        if(perf_label == NULL) {
+            perf_label = lv_label_create(lv_layer_sys(), NULL);
+            lv_label_set_align(perf_label, LV_LABEL_ALIGN_RIGHT);
+            lv_obj_set_style_local_bg_opa(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_COVER);
+            lv_obj_set_style_local_bg_color(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_BLACK);
+            lv_obj_set_style_local_text_color(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+            lv_obj_set_style_local_pad_top(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
+            lv_obj_set_style_local_pad_bottom(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
+            lv_obj_set_style_local_pad_left(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
+            lv_obj_set_style_local_pad_right(perf_label, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
+            lv_label_set_text(perf_label, "?");
+            lv_obj_align(perf_label, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
+        }
+
+        static uint32_t perf_last_time = 0;
+        static uint32_t elaps_max = 1;
+        if(lv_tick_elaps(perf_last_time) > 300) {
+            elaps_max = LV_MATH_MAX(elaps, elaps_max);
+        } else {
+            perf_last_time = lv_tick_get();
+            uint32_t fps = 1000 / (elaps_max == 0 ? 1 : elaps_max);
+            elaps_max = 1;
+            uint32_t fps_limit = 1000 / disp_refr->refr_task->period;
+            if(fps > fps_limit) fps = fps_limit;
+
+            uint32_t cpu = 100 - lv_task_get_idle();
+            lv_label_set_text_fmt(perf_label, "%d FPS\n%d%% CPU", fps, cpu);
+            lv_obj_align(perf_label, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
+        }
+#endif
     }
 
     lv_mem_buf_free_all();

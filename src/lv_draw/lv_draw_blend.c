@@ -109,7 +109,7 @@ void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
     draw_area.y2 -= disp_area->y1;
 
     /*Round the values in the mask if anti-aliasing is disabled*/
-#if LV_ANTIALAIS
+#if LV_ANTIALIAS
     if(mask && disp->driver.antialiasing == 0)
 #else
     if(mask)
@@ -160,7 +160,7 @@ void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const
     draw_area.y2 -= disp_area->y1;
 
     /*Round the values in the mask if anti-aliasing is disabled*/
-#if LV_ANTIALAIS
+#if LV_ANTIALIAS
     if(mask && disp->driver.antialiasing == 0)
 #else
     if(mask)

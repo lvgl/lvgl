@@ -170,6 +170,9 @@ typedef void * lv_fs_drv_user_data_t;
 /*1: Add a `user_data` to drivers and objects*/
 #define LV_USE_USER_DATA        0
 
+/*1: Show CPU usage and FPS count in the right bottom corner*/
+#define LV_USE_PERF_MONITOR     1
+
 /*========================
  * Image decoder and cache
  *========================*/
