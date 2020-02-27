@@ -883,7 +883,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
 
                 if(ser->points[p_act] != LV_CHART_POINT_DEF) {
                     /*Don't limit to `series_mask` to get full circles on the ends*/
-                    lv_draw_rect(&point_area, &series_mask, &point_dsc);
+                    lv_draw_rect(&point_area, clip_area, &point_dsc);
                 }
             }
 
