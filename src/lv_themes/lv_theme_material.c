@@ -462,10 +462,6 @@ static void chart_init(void)
     lv_style_set_size(&chart_series, LV_STATE_DEFAULT, 2);
     lv_style_set_pad_inner(&chart_series, LV_STATE_DEFAULT, 2);
     lv_style_set_radius(&chart_series, LV_STATE_DEFAULT, 1);
-    lv_style_set_bg_opa(&chart_series, LV_STATE_DEFAULT, LV_OPA_COVER);
-    lv_style_set_bg_grad_dir(&chart_series, LV_STATE_DEFAULT, LV_GRAD_DIR_VER);
-    lv_style_set_bg_main_stop(&chart_series, LV_STATE_DEFAULT, 96);
-    lv_style_set_bg_grad_stop(&chart_series, LV_STATE_DEFAULT, 0);
 
 #endif
 }

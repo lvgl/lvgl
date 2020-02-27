@@ -933,6 +933,7 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
     lv_draw_rect_dsc_init(&col_dsc);
     lv_obj_init_draw_rect_dsc(chart, LV_CHART_PART_SERIES, &col_dsc);
     col_dsc.bg_grad_dir = LV_GRAD_DIR_NONE;
+    col_dsc.bg_opa = LV_OPA_COVER;
 
     /*Make the cols longer with `radius` to clip the rounding from the bottom*/
     col_a.y2 = series_area->y2 + col_dsc.radius;
