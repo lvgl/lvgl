@@ -32,7 +32,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
+#define LV_KEYBOARD_CTRL_BTN_FLAGS (LV_BTNMATRIX_CTRL_NO_REPEAT | LV_BTNMATRIX_CTRL_CLICK_TRIG)
+    
 /**********************
  *      TYPEDEFS
  **********************/
