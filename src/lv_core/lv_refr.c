@@ -256,8 +256,10 @@ void lv_disp_refr_task(lv_task_t * task)
 
         static uint32_t perf_last_time = 0;
         static uint32_t elaps_max = 1;
-        if(lv_tick_elaps(perf_last_time) > 300) {
+        if(lv_tick_elaps(perf_last_time) < 300) {
             elaps_max = LV_MATH_MAX(elaps, elaps_max);
+            /*Just refresh the label to always have something to monitor*/
+            lv_label_set_text(perf_label, NULL);
         } else {
             perf_last_time = lv_tick_get();
             uint32_t fps = 1000 / (elaps_max == 0 ? 1 : elaps_max);
