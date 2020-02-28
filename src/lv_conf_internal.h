@@ -733,8 +733,8 @@
 #endif
 
 /*Line meter (dependencies: *;)*/
-#ifndef LV_USE_LMETER
-#define LV_USE_LMETER   1
+#ifndef LV_USE_LINEMETER
+#define LV_USE_LINEMETER   1
 #endif
 
 /*Mask (dependencies: -)*/

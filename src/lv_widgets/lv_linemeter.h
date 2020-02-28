@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_conf_internal.h"
 
-#if LV_USE_LMETER != 0
+#if LV_USE_LINEMETER != 0
 
 #include "../lv_core/lv_obj.h"
 
@@ -146,7 +146,7 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
  *      MACROS
  **********************/
 
-#endif /*LV_USE_LMETER*/
+#endif /*LV_USE_LINEMETER*/
 
 #ifdef __cplusplus
 } /* extern "C" */
