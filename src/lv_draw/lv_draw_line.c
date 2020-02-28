@@ -402,7 +402,12 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     draw_area.x2 -= disp_area->x1;
     draw_area.y2 -= disp_area->y1;
 
-    int32_t draw_area_w = lv_area_get_width(&draw_area);
+    /* The real draw area is around the line.
+     * It's easy to calculate with steep lines, but the area can be very wide with very flat lines.
+     * So deal with it only with steep lines. */
+    int32_t draw_area_w;
+    if(flat) draw_area_w = lv_area_get_width(&draw_area);
+    else draw_area_w = LV_MATH_MIN(lv_area_get_width(&draw_area), dsc->width * 2 + 2);
 
     /*Draw the background line by line*/
     int32_t h;
@@ -413,10 +418,24 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     fill_area.y1 = draw_area.y1 + disp_area->y1;
     fill_area.y2 = fill_area.y1;
 
+    lv_point_t v;
+    v.x = p2.x - p1.x;
+    v.y = p2.y - p1.y;
+    int32_t x = vdb->area.x1 + draw_area.x1;
+
     /*Fill the first row with 'color'*/
-    for(h = draw_area.y1; h <= draw_area.y2; h++) {
+    for(h = draw_area.y1 + disp_area->y1; h <= draw_area.y2 + disp_area->y1; h++) {
         memset(mask_buf, LV_OPA_COVER, draw_area_w);
-        lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+
+        if(!flat) {
+            /*Where is the current point?*/
+            x = (v.y * p1.x - v.x * p1.y + v.x * h) / v.y - dsc->width - 1;
+            if(x < draw_area.x1 + disp_area->x1) x = draw_area.x1 + disp_area->x1;
+            fill_area.x1 = x;
+            fill_area.x2 = fill_area.x1 + draw_area_w - 1;
+        }
+
+        lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, x, h, draw_area_w);
 
         lv_blend_fill(clip, &fill_area,
                       dsc->color, mask_buf, mask_res, opa,
