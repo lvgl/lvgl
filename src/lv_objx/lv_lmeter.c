@@ -199,7 +199,7 @@ void lv_lmeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle)
  * @param lmeter pointer to a line meter object
  * @param mirror mirror setting
  */
-void lv_lmeter_set_mirror(lv_obj_t *lmeter, uint8_t mirror) {
+void lv_lmeter_set_mirror(lv_obj_t *lmeter, bool mirror) {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
     if(ext->mirrored == mirror) return;
 
