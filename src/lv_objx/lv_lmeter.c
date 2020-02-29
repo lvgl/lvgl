@@ -292,9 +292,9 @@ uint16_t lv_lmeter_get_angle_offset(lv_obj_t * lmeter)
 /**
  * get the mirror setting for the line meter
  * @param lmeter pointer to a line meter object
- * @return mirror (0 or 1)
+ * @return mirror (true or false)
  */
-uint16_t lv_lmeter_get_mirror(lv_obj_t * lmeter)
+bool lv_lmeter_get_mirror(lv_obj_t * lmeter)
 {
     lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
 

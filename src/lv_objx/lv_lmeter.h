@@ -102,7 +102,7 @@ void lv_lmeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle);
  * @param lmeter pointer to a line meter object
  * @param mirror mirror setting
  */
-void lv_lmeter_set_mirror(lv_obj_t *lmeter, uint8_t mirror);
+void lv_lmeter_set_mirror(lv_obj_t *lmeter, bool mirror);
 
 /**
  * Set the styles of a line meter
@@ -165,9 +165,9 @@ uint16_t lv_lmeter_get_angle_offset(lv_obj_t * lmeter);
 /**
  * get the mirror setting for the line meter
  * @param lmeter pointer to a line meter object
- * @return mirror (0 or 1)
+ * @return mirror (true or false)
  */
-uint16_t lv_lmeter_get_mirror(lv_obj_t * lmeter);
+bool lv_lmeter_get_mirror(lv_obj_t * lmeter);
 
 /**
  * Get the style of a line meter
