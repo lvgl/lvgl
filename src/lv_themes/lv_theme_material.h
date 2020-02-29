@@ -54,4 +54,4 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
 } /* extern "C" */
 #endif
 
-#endif /*LV_THEME_ALIEN_H*/
+#endif /*LV_THEME_MATERIAL_H*/
