@@ -326,6 +326,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
 {
     if(dsc->border_opa <= LV_OPA_MIN) return;
     if(dsc->border_width == 0) return;
+    if(dsc->border_side == LV_BORDER_SIDE_NONE) return;
 
     lv_opa_t opa = dsc->border_opa;
 
