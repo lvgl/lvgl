@@ -77,6 +77,7 @@ lv_obj_t * lv_lmeter_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->line_cnt    = 21;  /*Odd scale number looks better*/
     ext->scale_angle = 240; /*(scale_num - 1) * N looks better */
     ext->angle_ofs = 0;
+    ext->mirrored = 0;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_lmeter, lv_lmeter_signal);
@@ -193,6 +194,20 @@ void lv_lmeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle)
     lv_obj_invalidate(lmeter);
 }
 
+/**
+ * Set the orientation of the meter growth, clockwise or counterclockwise (mirrored)
+ * @param lmeter pointer to a line meter object
+ * @param mirror mirror setting
+ */
+void lv_lmeter_set_mirror(lv_obj_t *lmeter, bool mirror) {
+    lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+    if(ext->mirrored == mirror) return;
+
+    ext->mirrored = mirror;
+
+    lv_obj_invalidate(lmeter);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -273,6 +288,18 @@ uint16_t lv_lmeter_get_angle_offset(lv_obj_t * lmeter)
 
     return ext->angle_ofs;
 }
+
+/**
+ * get the mirror setting for the line meter
+ * @param lmeter pointer to a line meter object
+ * @return mirror (true or false)
+ */
+bool lv_lmeter_get_mirror(lv_obj_t * lmeter)
+{
+    lv_lmeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+
+    return ext->mirrored;
+}
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -315,7 +342,8 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
         lv_coord_t x_ofs  = lv_obj_get_width(lmeter) / 2 + lmeter->coords.x1;
         lv_coord_t y_ofs  = lv_obj_get_height(lmeter) / 2 + lmeter->coords.y1;
         int16_t angle_ofs = ext->angle_ofs + 90 + (360 - ext->scale_angle) / 2;
-        int16_t level =
+        int16_t level = ext->mirrored ?
+            (int32_t)((int32_t)(ext->max_value - ext->cur_value) * ext->line_cnt) / (ext->max_value - ext->min_value) :
             (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
         uint8_t i;
 
@@ -349,11 +377,12 @@ static bool lv_lmeter_design(lv_obj_t * lmeter, const lv_area_t * mask, lv_desig
             p1.x = x_out + x_ofs;
             p1.y = y_out + y_ofs;
 
-            if(i >= level)
+            uint16_t index = ext->mirrored ? ext->line_cnt - i : i;
+            if((!ext->mirrored && i >= level) || (ext->mirrored && i <= level))
                 style_tmp.line.color = style->line.color;
             else {
                 style_tmp.line.color =
-                    lv_color_mix(style->body.grad_color, style->body.main_color, (255 * i) / ext->line_cnt);
+                    lv_color_mix(style->body.grad_color, style->body.main_color, (255 * index) / ext->line_cnt);
             }
 
             lv_draw_line(&p1, &p2, mask, &style_tmp, opa_scale);
