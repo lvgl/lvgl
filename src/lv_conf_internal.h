@@ -22,6 +22,10 @@
 #include "../../lv_conf.h"
 #endif
 
+/* clang-format off */
+
+#include <stdint.h>
+
 /*====================
    Graphical settings
  *====================*/
@@ -212,6 +216,16 @@
 #define LV_USE_SHADOW           1
 #endif
 
+/* 1: Use other blend modes than normal (`LV_BLEND_MODE_...`)*/
+#ifndef LV_USE_BLEND_MODES
+#define LV_USE_BLEND_MODES      1
+#endif
+
+/* 1: Use the `opa_scale` style property to set the opacity of an object and its children at once*/
+#ifndef LV_USE_OPA_SCALE
+#define LV_USE_OPA_SCALE        1
+#endif
+
 /* 1: Enable object groups (for keyboard/encoder navigation) */
 #ifndef LV_USE_GROUP
 #define LV_USE_GROUP            1
@@ -237,9 +251,24 @@
 #define LV_USE_USER_DATA        0
 #endif
 
+/*1: Show CPU usage and FPS count in the right bottom corner*/
+#ifndef LV_USE_PERF_MONITOR
+#define LV_USE_PERF_MONITOR     1
+#endif
+
 /*========================
  * Image decoder and cache
  *========================*/
+
+/* 1: Enable indexed (palette) images */
+#ifndef LV_IMG_CF_INDEXED
+#define LV_IMG_CF_INDEXED       1
+#endif
+
+/* 1: Enable alpha indexed images */
+#ifndef LV_IMG_CF_ALPHA
+#define LV_IMG_CF_ALPHA         1
+#endif
 
 /* Default image cache size. Image caching keeps the images opened.
  * If only the built-in image formats are used there is no real advantage of caching.
@@ -365,7 +394,9 @@
 
 /*Check the integrity of `lv_mem` after critical operations. (Slow)*/
 #ifndef LV_USE_ASSERT_MEM_INTEGRITY
+#ifndef LV_USE_ASSERT_MEM_INTEGRITY
 #define LV_USE_ASSERT_MEM_INTEGRITY       0
+#endif
 #endif
 
 /* Check the strings.
@@ -387,38 +418,6 @@
 #endif
 
 #endif /*LV_USE_DEBUG*/
-
-/*================
- *  THEME USAGE
- *================*/
-#ifndef LV_THEME_LIVE_UPDATE
-#define LV_THEME_LIVE_UPDATE    0   /*1: Allow theme switching at run time. Uses 8..10 kB of RAM*/
-#endif
-
-#ifndef LV_USE_THEME_TEMPL
-#define LV_USE_THEME_TEMPL      0   /*Just for test*/
-#endif
-#ifndef LV_USE_THEME_DEFAULT
-#define LV_USE_THEME_DEFAULT    0   /*Built mainly from the built-in styles. Consumes very few RAM*/
-#endif
-#ifndef LV_USE_THEME_ALIEN
-#define LV_USE_THEME_ALIEN      0   /*Dark futuristic theme*/
-#endif
-#ifndef LV_USE_THEME_NIGHT
-#define LV_USE_THEME_NIGHT      0   /*Dark elegant theme*/
-#endif
-#ifndef LV_USE_THEME_MONO
-#define LV_USE_THEME_MONO       0   /*Mono color theme for monochrome displays*/
-#endif
-#ifndef LV_USE_THEME_MATERIAL
-#define LV_USE_THEME_MATERIAL   0   /*Flat theme with bold colors and light shadows*/
-#endif
-#ifndef LV_USE_THEME_ZEN
-#define LV_USE_THEME_ZEN        0   /*Peaceful, mainly light theme */
-#endif
-#ifndef LV_USE_THEME_NEMO
-#define LV_USE_THEME_NEMO       0   /*Water-like theme based on the movie "Finding Nemo"*/
-#endif
 
 /*==================
  *    FONT USAGE
@@ -486,6 +485,46 @@
 
 /*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
 
+/*================
+ *  THEME USAGE
+ *================*/
+
+/*Always enable at least on theme*/
+#ifndef LV_USE_THEME_EMPTY
+#define LV_USE_THEME_EMPTY       0   /*No theme, you can apply your styles as you need*/
+#endif
+#ifndef LV_USE_THEME_TEMPLATE
+#define LV_USE_THEME_TEMPLATE    0   /*Simple to the create your theme based on it*/
+#endif
+#ifndef LV_USE_THEME_MATERIAL
+#define LV_USE_THEME_MATERIAL    1   /*A fast and impressive theme*/
+#endif
+
+#ifndef LV_THEME_DEFAULT_INIT
+#define LV_THEME_DEFAULT_INIT               lv_theme_material_init
+#endif
+#ifndef LV_THEME_DEFAULT_COLOR_PRIMARY
+#define LV_THEME_DEFAULT_COLOR_PRIMARY      LV_COLOR_RED
+#endif
+#ifndef LV_THEME_DEFAULT_COLOR_SECONDARY
+#define LV_THEME_DEFAULT_COLOR_SECONDARY    LV_COLOR_BLUE
+#endif
+#ifndef LV_THEME_DEFAULT_FLAGS
+#define LV_THEME_DEFAULT_FLAGS              LV_THEME_MATERIAL_FLAG_NONE
+#endif
+#ifndef LV_THEME_DEFAULT_FONT_SMALL
+#define LV_THEME_DEFAULT_FONT_SMALL         &lv_font_roboto_16
+#endif
+#ifndef LV_THEME_DEFAULT_FONT_NORMAL
+#define LV_THEME_DEFAULT_FONT_NORMAL        &lv_font_roboto_16
+#endif
+#ifndef LV_THEME_DEFAULT_FONT_SUBTITLE
+#define LV_THEME_DEFAULT_FONT_SUBTITLE      &lv_font_roboto_16
+#endif
+#ifndef LV_THEME_DEFAULT_FONT_TITLE
+#define LV_THEME_DEFAULT_FONT_TITLE         &lv_font_roboto_16
+#endif
+
 /*=================
  *  Text settings
  *=================*/
@@ -507,7 +546,7 @@
 /* If a word is at least this long, will break wherever "prettiest"
  * To disable, set to a value <= 0 */
 #ifndef LV_TXT_LINE_BREAK_LONG_LEN
-#define LV_TXT_LINE_BREAK_LONG_LEN          12
+#define LV_TXT_LINE_BREAK_LONG_LEN          0
 #endif
 
 /* Minimum number of characters in a long word to put on a line before a break.
@@ -564,7 +603,22 @@
  *  LV_OBJ SETTINGS
  *==================*/
 
+#if LV_USE_USER_DATA
 /*Declare the type of the user data of object (can be e.g. `void *`, `int`, `struct`)*/
+/*Provide a function to free user data*/
+#ifndef LV_USE_USER_DATA_FREE
+#define LV_USE_USER_DATA_FREE 0
+#endif
+#if LV_USE_USER_DATA_FREE
+#ifndef LV_USER_DATA_FREE_INCLUDE
+#  define LV_USER_DATA_FREE_INCLUDE  "something.h"  /*Header for user data free function*/
+#endif
+/* Function prototype : void user_data_free(lv_obj_t * obj); */
+#ifndef LV_USER_DATA_FREE
+#  define LV_USER_DATA_FREE  (user_data_free)       /*Invoking for user data free function*/
+#endif
+#endif
+#endif
 
 /*1: enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
 #ifndef LV_USE_OBJ_REALIGN
@@ -577,7 +631,7 @@
  * LV_EXT_CLICK_AREA_FULL: The extra area can be adjusted in all 4 directions (-32k..+32k px)
  */
 #ifndef LV_USE_EXT_CLICK_AREA
-#define LV_USE_EXT_CLICK_AREA  LV_EXT_CLICK_AREA_OFF
+#define LV_USE_EXT_CLICK_AREA  LV_EXT_CLICK_AREA_TINY
 #endif
 
 /*==================
@@ -733,8 +787,8 @@
 #endif
 
 /*Line meter (dependencies: *;)*/
-#ifndef LV_USE_LMETER
-#define LV_USE_LMETER   1
+#ifndef LV_USE_LINEMETER
+#define LV_USE_LINEMETER   1
 #endif
 
 /*Mask (dependencies: -)*/

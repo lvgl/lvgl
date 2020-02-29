@@ -799,6 +799,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
     if(has_area) {
         lv_draw_rect_dsc_init(&area_dsc);
         lv_obj_init_draw_rect_dsc(chart, LV_CHART_PART_SERIES, &area_dsc);
+        area_dsc.border_width = 0;
 
         has_fade = area_dsc.bg_grad_dir == LV_GRAD_DIR_VER ? true : false;
         if(has_fade) {

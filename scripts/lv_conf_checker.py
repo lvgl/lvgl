@@ -8,18 +8,34 @@ Generates a checker file for lv_conf.h from lv_conf_templ.h define all the not d
 import re
 
 fin = open("../lv_conf_template.h", "r")
-fout = open("../src/lv_conf_checker.h", "w")
+fout = open("../src/lv_conf_internal.h", "w")
 
 
 fout.write(
 '''/**
  * GENERATED FILE, DO NOT EDIT IT!
- * @file lv_conf_checker.h
+ * @file lv_conf_internal.h
  * Make sure all the defines of lv_conf.h have a default value
 **/
 
-#ifndef LV_CONF_CHECKER_H
-#define LV_CONF_CHECKER_H
+#ifndef LV_CONF_INTERNAL_H
+#define LV_CONF_INTERNAL_H
+/* clang-format off */
+
+#include <stdint.h>
+
+#if defined(LV_CONF_PATH)
+#define __LV_TO_STR_AUX(x) #x
+#define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
+#include __LV_TO_STR(LV_CONF_PATH)
+#undef __LV_TO_STR_AUX
+#undef __LV_TO_STR
+#elif defined(LV_CONF_INCLUDE_SIMPLE)
+#include "lv_conf.h"
+#else
+#include "../../lv_conf.h"
+#endif
+
 '''
 )
 

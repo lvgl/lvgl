@@ -169,8 +169,8 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
                                                                                                           LV_TABVIEW_PART_BG_SCRL));
         lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB_BG), lv_obj_get_style_list(copy,
                                                                                                          LV_TABVIEW_PART_TAB_BG));
-        lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB), lv_obj_get_style_list(copy,
-                                                                                                      LV_TABVIEW_PART_TAB));
+        lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB_BTN), lv_obj_get_style_list(copy,
+                                                                                                      LV_TABVIEW_PART_TAB_BTN));
 
         uint16_t i;
         for(i = 0; i < copy_ext->tab_cnt; i++) {
@@ -593,7 +593,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
         lv_get_state_info_t * info = param;
         if(info->part == LV_TABVIEW_PART_TAB_BG) info->result = lv_obj_get_state(ext->btns, LV_BTNMATRIX_PART_BG);
-        else if(info->part == LV_TABVIEW_PART_TAB) info->result = lv_obj_get_state(ext->btns, LV_BTNMATRIX_PART_BTN);
+        else if(info->part == LV_TABVIEW_PART_TAB_BTN) info->result = lv_obj_get_state(ext->btns, LV_BTNMATRIX_PART_BTN);
         else if(info->part == LV_TABVIEW_PART_INDIC) info->result = lv_obj_get_state(ext->indic, LV_OBJ_PART_MAIN);
         else if(info->part == LV_TABVIEW_PART_BG_SCRL) info->result = lv_obj_get_state(ext->content, LV_PAGE_PART_SCRL);
         return LV_RES_OK;
@@ -693,6 +693,7 @@ static lv_res_t tabview_scrl_signal(lv_obj_t * tabview_scrl, lv_signal_t sign, v
         res = lv_indev_finish_drag(indev);
         if(res != LV_RES_OK) return res;
         lv_obj_t * tab_page = lv_tabview_get_tab(tabview, ext->tab_cur);
+        if(tab_page == NULL) return LV_RES_OK;
         lv_coord_t page_x1  = tab_page->coords.x1 - tabview->coords.x1 + x_predict;
         lv_coord_t page_x2  = page_x1 + lv_obj_get_width(tabview);
         lv_coord_t treshold = lv_obj_get_width(tabview) / 2;
@@ -745,7 +746,7 @@ static lv_style_list_t * lv_tabview_get_style(lv_obj_t * tabview, uint8_t part)
         case LV_TABVIEW_PART_TAB_BG:
             style_dsc_p = lv_obj_get_style_list(ext->btns, LV_BTNMATRIX_PART_BG);
             break;
-        case LV_TABVIEW_PART_TAB:
+        case LV_TABVIEW_PART_TAB_BTN:
             style_dsc_p = lv_obj_get_style_list(ext->btns, LV_BTNMATRIX_PART_BTN);
             break;
         case LV_TABVIEW_PART_INDIC:
@@ -863,12 +864,12 @@ static void refr_btns_size(lv_obj_t * tabview)
     lv_style_int_t tab_bg_top = lv_obj_get_style_pad_top(tabview, LV_TABVIEW_PART_TAB_BG);
     lv_style_int_t tab_bg_bottom = lv_obj_get_style_pad_bottom(tabview, LV_TABVIEW_PART_TAB_BG);
 
-    lv_style_int_t tab_left = lv_obj_get_style_pad_left(tabview, LV_TABVIEW_PART_TAB);
-    lv_style_int_t tab_right = lv_obj_get_style_pad_right(tabview, LV_TABVIEW_PART_TAB);
-    lv_style_int_t tab_top = lv_obj_get_style_pad_top(tabview, LV_TABVIEW_PART_TAB);
-    lv_style_int_t tab_bottom = lv_obj_get_style_pad_bottom(tabview, LV_TABVIEW_PART_TAB);
+    lv_style_int_t tab_left = lv_obj_get_style_pad_left(tabview, LV_TABVIEW_PART_TAB_BTN);
+    lv_style_int_t tab_right = lv_obj_get_style_pad_right(tabview, LV_TABVIEW_PART_TAB_BTN);
+    lv_style_int_t tab_top = lv_obj_get_style_pad_top(tabview, LV_TABVIEW_PART_TAB_BTN);
+    lv_style_int_t tab_bottom = lv_obj_get_style_pad_bottom(tabview, LV_TABVIEW_PART_TAB_BTN);
 
-    const lv_font_t * font = lv_obj_get_style_text_font(tabview, LV_TABVIEW_PART_TAB);
+    const lv_font_t * font = lv_obj_get_style_text_font(tabview, LV_TABVIEW_PART_TAB_BTN);
 
     /*Set the tabs height/width*/
     lv_coord_t btns_w;

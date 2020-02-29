@@ -1119,8 +1119,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_INDIC);
             lv_style_list_add_style(list, &tabview_indic);
 
-            lv_obj_clean_style_list(obj, LV_TABVIEW_PART_TAB);
-            list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_TAB);
+            lv_obj_clean_style_list(obj, LV_TABVIEW_PART_TAB_BTN);
+            list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_TAB_BTN);
             lv_style_list_add_style(list, &tabview_btns);
             break;
 
