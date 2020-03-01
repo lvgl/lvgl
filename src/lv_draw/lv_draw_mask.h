@@ -257,7 +257,7 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
  * @param opa_bottom opacity at the bottom
  * @param y_bottom at which coordinate reach `opa_bottom`.
  */
-void lv_draw_mask_fade_init(lv_draw_mask_fade_param_t * param, lv_area_t * coords, lv_opa_t opa_top, lv_coord_t y_top,
+void lv_draw_mask_fade_init(lv_draw_mask_fade_param_t * param, const lv_area_t * coords, lv_opa_t opa_top, lv_coord_t y_top,
                             lv_opa_t opa_bottom, lv_coord_t y_bottom);
 
 /**
@@ -266,7 +266,7 @@ void lv_draw_mask_fade_init(lv_draw_mask_fade_param_t * param, lv_area_t * coord
  * @param coords coordinates of the map (absolute coordinates)
  * @param map array of bytes with the mask values
  */
-void lv_draw_mask_map_init(lv_draw_mask_map_param_t * param, lv_area_t * coords, const lv_opa_t * map);
+void lv_draw_mask_map_init(lv_draw_mask_map_param_t * param, const lv_area_t * coords, const lv_opa_t * map);
 
 /**********************
  *      MACROS
