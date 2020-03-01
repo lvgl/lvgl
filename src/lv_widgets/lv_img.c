@@ -110,10 +110,17 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     else {
         lv_img_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->auto_size          = copy_ext->auto_size;
+        ext->auto_size     = copy_ext->auto_size;
+        ext->zoom          = copy_ext->zoom;
+        ext->angle         = copy_ext->angle;
+        ext->antialias     = copy_ext->antialias;
+        ext->offset.x     = copy_ext->offset.x;
+        ext->offset.y     = copy_ext->offset.y;
+        ext->pivot.x     = copy_ext->pivot.x;
+        ext->pivot.y     = copy_ext->pivot.y;
         lv_img_set_src(img, copy_ext->src);
 
-        //        /*Refresh the style with new signal function*/
+		/*Refresh the style with new signal function*/
         lv_obj_refresh_style(img);
     }
 
@@ -605,6 +612,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             img_dsc.zoom = ext->zoom;
             img_dsc.pivot.x = ext->pivot.x;
             img_dsc.pivot.y = ext->pivot.y;
+            img_dsc.antialias = ext->antialias;
 
             lv_area_t cords_tmp;
             cords_tmp.y1 = img_coords.y1;
