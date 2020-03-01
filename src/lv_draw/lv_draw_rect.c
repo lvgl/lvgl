@@ -506,18 +506,26 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
         if(dsc->border_side == LV_BORDER_SIDE_LEFT) fill_area.x2 = coords->x1 + corner_size;
         else if(dsc->border_side == LV_BORDER_SIDE_RIGHT) fill_area.x1 = coords->x2 - corner_size;
 
+        volatile bool top_only = false;
+        volatile bool bottom_only = false;
+        if(dsc->border_side == LV_BORDER_SIDE_TOP) top_only = true;
+        if(dsc->border_side == LV_BORDER_SIDE_BOTTOM) bottom_only = true;
+        if(dsc->border_side == (LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM)) {
+        	top_only = true;
+        	bottom_only = true;
+        }
+
+        volatile bool normal = !top_only && !bottom_only ? true : false;
+
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
-            if((dsc->border_side == LV_BORDER_SIDE_BOTTOM && fill_area.y1 < coords->y2 - corner_size - 1) ||
-               (dsc->border_side == LV_BORDER_SIDE_TOP && fill_area.y1 > coords->y1 + corner_size + 1)) {
-
-                fill_area.y1++;
-                fill_area.y2++;
-                continue;
+            if(normal ||
+            		(top_only && fill_area.y1 <= coords->y1 + corner_size) ||
+            		(bottom_only && fill_area.y1 >= coords->y2 - corner_size))
+            {
+				memset(mask_buf, LV_OPA_COVER, draw_area_w);
+				mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
+				lv_blend_fill(clip, &fill_area, color, mask_buf, mask_res, opa, blend_mode);
             }
-            memset(mask_buf, LV_OPA_COVER, draw_area_w);
-            mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
-
-            lv_blend_fill(clip, &fill_area, color, mask_buf, mask_res, opa, blend_mode);
             fill_area.y1++;
             fill_area.y2++;
 
