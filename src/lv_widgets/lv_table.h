@@ -60,6 +60,7 @@ typedef struct {
     char ** cell_data;
     lv_style_list_t cell_style[LV_TABLE_CELL_STYLE_CNT];
     lv_coord_t col_w[LV_TABLE_COL_MAX];
+    uint8_t cell_types :4;	/*Keep track which cell types exists to avoid dealing with unused ones*/
 } lv_table_ext_t;
 
 /*Parts of the table*/

@@ -367,7 +367,7 @@ static void linemeter_init(void)
     lv_style_init(&lmeter);
     lv_style_copy(&lmeter, &panel);
     lv_style_set_radius(&lmeter, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-    lv_style_set_border_side(&lmeter, LV_STATE_DEFAULT, LV_BORDER_SIDE_FULL);
+    lv_style_set_border_side(&lmeter, LV_STATE_DEFAULT, LV_BORDER_SIDE_LEFT | LV_BORDER_SIDE_TOP);
     lv_style_set_bg_opa(&lmeter, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_pad_left(&lmeter, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_right(&lmeter, LV_STATE_DEFAULT, LV_DPI / 10);
