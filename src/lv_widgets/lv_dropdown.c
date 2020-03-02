@@ -269,7 +269,9 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, int pos)
     /*Allocate space for the new option*/
     size_t old_len = (ext->options == NULL) ? 0 : strlen(ext->options);
     size_t ins_len = strlen(option);
-    size_t new_len = ins_len + old_len + 1; // +1 for \n
+    size_t new_len = ins_len + old_len + 1; /* +1 for terminating NULL */
+    if(ext->option_cnt > 0)
+        new_len++; /* +1 for \n */
     ext->options        = lv_mem_realloc(ext->options, new_len + 1);
     LV_ASSERT_MEM(ext->options);
     if(ext->options == NULL) return;
@@ -277,25 +279,22 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, int pos)
     ext->options[old_len] = 0;
 
     /*Find the insert character position*/
-    int charpos;
-    if(pos == LV_DROPDOWN_POS_LAST) {
-        charpos = 0;
-        if(old_len > 0) {
-            strcat(ext->options, "\n");
-            charpos = old_len + 1;
-        }
-    }
-    else {
+    int charpos = old_len;
+    if(pos != LV_DROPDOWN_POS_LAST) {
         int opcnt = 0;
         for(charpos = 0; ext->options[charpos] != 0; charpos++) {
-            if(opcnt == pos)
-                break;
-            if(ext->options[charpos] == '\n')
-                opcnt++;
+        if(opcnt == pos)
+            break;
+        if(ext->options[charpos] == '\n')
+            opcnt++;
         }
     }
 
-    /*Insert the option, adding \n if necessary*/
+    /*Add delimiter to existing options*/
+    if(charpos > 0)
+        lv_txt_ins(ext->options, charpos++, "\n");
+
+    /*Insert the new option, adding \n if necessary*/
     char * ins_buf = lv_mem_buf_get(ins_len + 1);
     LV_ASSERT_MEM(ins_buf);
     if(ins_buf == NULL) return;
@@ -304,6 +303,7 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, int pos)
         strcat(ins_buf, "\n");
     lv_txt_ins(ext->options, charpos, ins_buf);
     lv_mem_buf_release(ins_buf);
+    LV_DEBUG_ASSERT(strlen(ext->options) + 1 == new_len, "dd mem alloc bad calc", new_len);
 
     ext->option_cnt++;
 }
