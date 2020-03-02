@@ -865,7 +865,11 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         lv_dropdown_close(ddlist, LV_ANIM_OFF);
-
+        if(ext->static_txt == 0) {
+            lv_mem_free(ext->options);
+            ext->options = NULL;
+        }
+        
         /*`lv_obj_clean_style_list` is not required because these styles are only copied to the page
          * so they can have transitions or other object related things. */
         lv_style_list_reset(&ext->style_page);
