@@ -1,5 +1,5 @@
 /**
- * @file lv_kb.h
+ * @file lv_keyboard.h
  *
  */
 
