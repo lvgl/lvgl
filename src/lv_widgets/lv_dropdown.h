@@ -33,7 +33,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-
+#define LV_DROPDOWN_POS_LAST 0xFFFF
+    
 /**********************
  *      TYPEDEFS
  **********************/
@@ -54,7 +55,7 @@ typedef struct {
     lv_obj_t * page;             /*The dropped down list*/
     const char * text;           /*Text to display on the ddlist's button*/
     const char * symbol;         /*Arrow or other icon when the drop-down list is closed*/
-    const char * options;
+    char * options;
     lv_style_list_t style_selected; /*Style of the selected option*/
     lv_style_list_t style_page;     /*Style of the dropped down list*/
     lv_style_list_t style_scrlbar; /*Style of the scroll bar*/
@@ -66,6 +67,7 @@ typedef struct {
     uint16_t anim_time;
     lv_dropdown_dir_t dir         : 2;
     uint8_t show_selected  : 1;
+    uint8_t static_txt : 1;
 } lv_dropdown_ext_t;
 
 enum {
@@ -103,9 +105,25 @@ void lv_dropdown_set_text(lv_obj_t * ddlist, const char * txt);
  * Set the options in a drop down list from a string
  * @param ddlist pointer to drop down list object
  * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
+ * The options string can be destroyed after calling this function
  */
 void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options);
 
+/**
+ * Set the options in a drop down list from a string
+ * @param ddlist pointer to drop down list object
+ * @param options a static string with '\n' separated options. E.g. "One\nTwo\nThree"
+ */
+void lv_dropdown_set_static_options(lv_obj_t * ddlist, const char * options);
+
+/**
+ * Add an options to a drop down list from a string.  Only works for dynamic options.
+ * @param ddlist pointer to drop down list object
+ * @param options a string without '\n'. E.g. "Four"
+ * @param position the insert position, indexed from 0, LV_DROPDOWN_POS_LAST = end of string
+ */
+void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, int pos);
+    
 /**
  * Set the selected option
  * @param ddlist pointer to drop down list object
