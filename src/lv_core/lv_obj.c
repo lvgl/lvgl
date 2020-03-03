@@ -84,7 +84,7 @@ static void base_dir_refr_children(lv_obj_t * obj);
 #if LV_USE_ANIMATION
     static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state,
     lv_state_t new_state);
-    static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
+    static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_trans_t * tr_limit);
     static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v);
     static void trans_anim_start_cb(lv_anim_t * a);
     static void trans_anim_ready_cb(lv_anim_t * a);
@@ -398,7 +398,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     /*Remove the animations from this object*/
 #if LV_USE_ANIMATION
     lv_anim_del(obj, NULL);
-    trans_del(obj, 0xFF, 0xFF);
+    trans_del(obj, 0xFF, 0xFF, NULL);
 #endif
 
     /*Delete the user data*/
@@ -1137,7 +1137,7 @@ void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style)
 
     lv_style_list_add_style(style_dsc, style);
 #if LV_USE_ANIMATION
-    trans_del(obj, part, 0xFF);
+    trans_del(obj, part, 0xFF, NULL);
 #endif
     lv_obj_refresh_style(obj);
 }
@@ -1160,7 +1160,7 @@ void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part)
 
     lv_style_list_reset(style_dsc);
 #if LV_USE_ANIMATION
-    trans_del(obj, part, 0xFF);
+    trans_del(obj, part, 0xFF, NULL);
 #endif
 }
 
@@ -1196,7 +1196,7 @@ void _lv_obj_set_style_local_int(lv_obj_t * obj, uint8_t part, lv_style_property
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_int(style_dsc, prop, value);
 #if LV_USE_ANIMATION
-    trans_del(obj, part, prop);
+    trans_del(obj, part, prop, NULL);
 #endif
     lv_obj_refresh_style(obj);
 }
@@ -1218,7 +1218,7 @@ void _lv_obj_set_style_local_color(lv_obj_t * obj, uint8_t part, lv_style_proper
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_color(style_dsc, prop, color);
 #if LV_USE_ANIMATION
-    trans_del(obj, part, prop);
+    trans_del(obj, part, prop, NULL);
 #endif
     lv_obj_refresh_style(obj);
 }
@@ -1240,7 +1240,7 @@ void _lv_obj_set_style_local_opa(lv_obj_t * obj, uint8_t part, lv_style_property
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_opa(style_dsc, prop, opa);
 #if LV_USE_ANIMATION
-    trans_del(obj, part, prop);
+    trans_del(obj, part, prop, NULL);
 #endif
     lv_obj_refresh_style(obj);
 }
@@ -1262,7 +1262,7 @@ void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t part, lv_style_property
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_ptr(style_dsc, prop, p);
 #if LV_USE_ANIMATION
-    trans_del(obj, part, prop);
+    trans_del(obj, part, prop, NULL);
 #endif
     lv_obj_refresh_style(obj);
 }
@@ -1629,7 +1629,7 @@ void lv_obj_finish_transitions(lv_obj_t * obj, uint8_t part)
     }
 
     /*Free all related transition data*/
-    trans_del(obj, part, 0xFF);
+    trans_del(obj, part, 0xFF, NULL);
 }
 #endif
 
@@ -3679,22 +3679,25 @@ static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop,
  * @param obj pointer to an object which transition(s) should be removed
  * @param part a part of object or 0xFF to remove from all parts
  * @param prop a property or 0xFF to remove all porpeties
+ * @param tr_limit delete transitions only "older" then this. `NULL` is not used
  */
-static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_trans_t * tr_limit)
 {
     lv_style_trans_t * tr;
-    lv_style_trans_t * tr_next;
-    tr = lv_ll_get_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
+    lv_style_trans_t * tr_prev;
+    tr = lv_ll_get_tail(&LV_GC_ROOT(_lv_obj_style_trans_ll));
     while(tr != NULL) {
+        if(tr == tr_limit) break;
+
         /*'tr' might be deleted, so get the next object while 'tr' is valid*/
-        tr_next = lv_ll_get_next(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
+        tr_prev = lv_ll_get_prev(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
 
         if(tr->obj == obj && (part == tr->part || part == 0xFF) && (prop == tr->prop || prop == 0xFF)) {
             lv_anim_del(tr, NULL);
             lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
             lv_mem_free(tr);
         }
-        tr = tr_next;
+        tr = tr_prev;
     }
 }
 
@@ -3742,7 +3745,7 @@ static void trans_anim_start_cb(lv_anim_t * a)
     /*Init prop to an invalid values to be sure `trans_del` won't delete the just added `tr`*/
     tr->prop = 0;
     /*Delete the relate transition if any*/
-    trans_del(tr->obj, tr->part, prop_tmp);
+    trans_del(tr->obj, tr->part, prop_tmp, tr);
 
     tr->prop = prop_tmp;
 
@@ -3759,8 +3762,6 @@ static void trans_anim_start_cb(lv_anim_t * a)
     else {      /*Ptr*/
         tr->start_value._ptr = _lv_obj_get_style_ptr(tr->obj, tr->part, prop_tmp);
     }
-
-
 }
 
 static void trans_anim_ready_cb(lv_anim_t * a)
