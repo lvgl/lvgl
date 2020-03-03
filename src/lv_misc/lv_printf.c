@@ -314,9 +314,9 @@ static size_t _ntoa_long_long(out_fct_type out, char * buffer, size_t idx, size_
 #if defined(PRINTF_SUPPORT_FLOAT)
 
 #if defined(PRINTF_SUPPORT_EXPONENTIAL)
-    // forward declaration so that _ftoa can switch to exp notation for values > PRINTF_MAX_FLOAT
-    static size_t _etoa(out_fct_type out, char * buffer, size_t idx, size_t maxlen, double value, unsigned int prec,
-    unsigned int width, unsigned int flags);
+// forward declaration so that _ftoa can switch to exp notation for values > PRINTF_MAX_FLOAT
+static size_t _etoa(out_fct_type out, char * buffer, size_t idx, size_t maxlen, double value, unsigned int prec,
+                    unsigned int width, unsigned int flags);
 #endif
 
 

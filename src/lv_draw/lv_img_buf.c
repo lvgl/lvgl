@@ -439,7 +439,8 @@ void lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
     if(dsc->cfg.cf == LV_IMG_CF_TRUE_COLOR || dsc->cfg.cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
        dsc->cfg.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
         dsc->tmp.native_color = 1;
-    } else {
+    }
+    else {
         dsc->tmp.native_color = 0;
     }
 

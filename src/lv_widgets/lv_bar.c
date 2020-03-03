@@ -46,11 +46,11 @@ static void draw_bg(lv_obj_t * bar, const lv_area_t * clip_area);
 static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area);
 
 #if LV_USE_ANIMATION
-    static void lv_bar_set_value_with_anim(lv_obj_t * bar, int16_t new_value, int16_t * value_ptr,
-    lv_bar_anim_t * anim_info, lv_anim_enable_t en);
-    static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
-    static void lv_bar_anim(lv_bar_anim_t * bar, lv_anim_value_t value);
-    static void lv_bar_anim_ready(lv_anim_t * a);
+static void lv_bar_set_value_with_anim(lv_obj_t * bar, int16_t new_value, int16_t * value_ptr,
+                                       lv_bar_anim_t * anim_info, lv_anim_enable_t en);
+static void lv_bar_init_anim(lv_obj_t * bar, lv_bar_anim_t * bar_anim);
+static void lv_bar_anim(lv_bar_anim_t * bar, lv_anim_value_t value);
+static void lv_bar_anim_ready(lv_anim_t * a);
 #endif
 
 /**********************

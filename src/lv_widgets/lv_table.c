@@ -611,7 +611,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
         uint16_t i;
         for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
-        	if((ext->cell_types & (1 << i)) == 0) continue;	/*Skip unused cell types*/
+            if((ext->cell_types & (1 << i)) == 0) continue; /*Skip unused cell types*/
             lv_draw_rect_dsc_init(&rect_dsc[i]);
             lv_obj_init_draw_rect_dsc(table, LV_TABLE_PART_CELL1 + i, &rect_dsc[i]);
 
@@ -876,7 +876,7 @@ static void refr_size(lv_obj_t * table)
     const lv_font_t * font[LV_TABLE_CELL_STYLE_CNT];
 
     for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
-    	if((ext->cell_types & (1 << i)) == 0) continue;	/*Skip unused cell types*/
+        if((ext->cell_types & (1 << i)) == 0) continue; /*Skip unused cell types*/
         cell_left[i] = lv_obj_get_style_pad_left(table, LV_TABLE_PART_CELL1 + i);
         cell_right[i] = lv_obj_get_style_pad_right(table, LV_TABLE_PART_CELL1 + i);
         cell_top[i] = lv_obj_get_style_pad_top(table, LV_TABLE_PART_CELL1 + i);

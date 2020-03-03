@@ -214,7 +214,7 @@ static void led_init(void)
 {
 #if LV_USE_LED != 0
 
-    #endif
+#endif
 }
 
 static void page_init(void)
@@ -251,7 +251,7 @@ static void spinner_init(void)
 {
 #if LV_USE_SPINNER != 0
 
-    #endif
+#endif
 }
 
 static void keyboard_init(void)
@@ -265,21 +265,21 @@ static void msgbox_init(void)
 {
 #if LV_USE_MSGBOX
 
-    #endif
+#endif
 }
 
 static void textarea_init(void)
 {
 #if LV_USE_TEXTAREA
 
-    #endif
+#endif
 }
 
 static void list_init(void)
 {
 #if LV_USE_LIST != 0
 
-    #endif
+#endif
 }
 
 static void ddlist_init(void)
@@ -293,14 +293,14 @@ static void roller_init(void)
 {
 #if LV_USE_ROLLER != 0
 
-    #endif
+#endif
 }
 
 static void tabview_init(void)
 {
 #if LV_USE_TABVIEW != 0
 
-    #endif
+#endif
 }
 
 static void tileview_init(void)

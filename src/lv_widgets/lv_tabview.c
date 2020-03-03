@@ -170,7 +170,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB_BG), lv_obj_get_style_list(copy,
                                                                                                          LV_TABVIEW_PART_TAB_BG));
         lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB_BTN), lv_obj_get_style_list(copy,
-                                                                                                      LV_TABVIEW_PART_TAB_BTN));
+                                                                                                          LV_TABVIEW_PART_TAB_BTN));
 
         uint16_t i;
         for(i = 0; i < copy_ext->tab_cnt; i++) {

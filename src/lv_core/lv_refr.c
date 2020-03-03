@@ -18,7 +18,7 @@
 #include "../lv_draw/lv_draw.h"
 
 #if LV_USE_PERF_MONITOR
-#include "../lv_widgets/lv_label.h"
+    #include "../lv_widgets/lv_label.h"
 #endif
 
 #if defined(LV_GC_INCLUDE)
@@ -213,7 +213,7 @@ void lv_disp_refr_task(lv_task_t * task)
                 if(disp_refr->inv_area_joined[a] == 0) {
                     lv_coord_t y;
                     uint32_t start_offs =
-                            (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
+                        (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
                     uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) * sizeof(lv_color_t);
 
                     for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
@@ -265,7 +265,8 @@ void lv_disp_refr_task(lv_task_t * task)
         a.x2 = a.x1;
         a.y2 = a.y1;
         lv_inv_area(disp_refr, &a);
-    } else {
+    }
+    else {
         perf_last_time = lv_tick_get();
         uint32_t fps = 1000 / (elaps_max == 0 ? 1 : elaps_max);
         elaps_max = 1;

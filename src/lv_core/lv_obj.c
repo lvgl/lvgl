@@ -82,13 +82,13 @@ static void refresh_children_style(lv_obj_t * obj);
 static void delete_children(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
 #if LV_USE_ANIMATION
-    static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state,
-    lv_state_t new_state);
-    static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_trans_t * tr_limit);
-    static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v);
-    static void trans_anim_start_cb(lv_anim_t * a);
-    static void trans_anim_ready_cb(lv_anim_t * a);
-    static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
+static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state,
+                                       lv_state_t new_state);
+static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_trans_t * tr_limit);
+static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v);
+static void trans_anim_start_cb(lv_anim_t * a);
+static void trans_anim_ready_cb(lv_anim_t * a);
+static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
 #endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static void lv_obj_del_async_cb(void * obj);
