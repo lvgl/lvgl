@@ -268,42 +268,43 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, int pos)
 
     /*Allocate space for the new option*/
     size_t old_len = (ext->options == NULL) ? 0 : strlen(ext->options);
-    size_t ins_len = strlen(option);
-    size_t new_len = ins_len + old_len + 1; /* +1 for terminating NULL */
-    if(ext->option_cnt > 0)
-        new_len++; /* +1 for \n */
-    ext->options        = lv_mem_realloc(ext->options, new_len + 1);
-    LV_ASSERT_MEM(ext->options);
-    if(ext->options == NULL) return;
+	size_t ins_len = strlen(option);
+	size_t new_len = ins_len + old_len + 2; /* +2 for terminating NULL and possible \n */
+	lv_mem_monitor_t mem_mon;
+	lv_mem_monitor(&mem_mon);
+	lv_mem_defrag();
+	lv_mem_monitor(&mem_mon);
+	ext->options        = lv_mem_realloc(ext->options, new_len + 1);
+	LV_ASSERT_MEM(ext->options);
+	if(ext->options == NULL) return;
 
     ext->options[old_len] = 0;
 
     /*Find the insert character position*/
-    int charpos = old_len;
+    int insert_pos = old_len;
     if(pos != LV_DROPDOWN_POS_LAST) {
         int opcnt = 0;
-        for(charpos = 0; ext->options[charpos] != 0; charpos++) {
-        if(opcnt == pos)
-            break;
-        if(ext->options[charpos] == '\n')
-            opcnt++;
+        for(insert_pos = 0; ext->options[insert_pos] != 0; insert_pos++) {
+            if(opcnt == pos)
+                break;
+            if(ext->options[insert_pos] == '\n')
+                opcnt++;
         }
     }
 
     /*Add delimiter to existing options*/
-    if(charpos > 0)
-        lv_txt_ins(ext->options, charpos++, "\n");
+    if((insert_pos > 0) && (pos >= ext->option_cnt))
+        lv_txt_ins(ext->options, insert_pos++, "\n");
 
     /*Insert the new option, adding \n if necessary*/
-    char * ins_buf = lv_mem_buf_get(ins_len + 1);
+    char * ins_buf = lv_mem_buf_get(ins_len + 2); /* + 2 for terminating NULL and possible \n */
     LV_ASSERT_MEM(ins_buf);
     if(ins_buf == NULL) return;
-    strcpy(ins_buf, option);
+        strcpy(ins_buf, option);
     if(pos < ext->option_cnt)
         strcat(ins_buf, "\n");
-    lv_txt_ins(ext->options, charpos, ins_buf);
+    lv_txt_ins(ext->options, insert_pos, ins_buf);
     lv_mem_buf_release(ins_buf);
-    LV_DEBUG_ASSERT(strlen(ext->options) + 1 == new_len, "dd mem alloc bad calc", new_len);
 
     ext->option_cnt++;
 }
