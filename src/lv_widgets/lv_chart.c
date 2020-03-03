@@ -803,8 +803,8 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
 
         has_fade = area_dsc.bg_grad_dir == LV_GRAD_DIR_VER ? true : false;
         if(has_fade) {
-            lv_draw_mask_fade_init(&mask_fade_p, &chart->coords, area_dsc.bg_main_color_stop, chart->coords.y1,
-                                   area_dsc.bg_grad_color_stop, chart->coords.y2);
+            lv_draw_mask_fade_init(&mask_fade_p, series_area, area_dsc.bg_main_color_stop, series_area->y1,
+                                   area_dsc.bg_grad_color_stop, series_area->y2);
         }
     }
 
