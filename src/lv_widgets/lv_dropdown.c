@@ -253,10 +253,10 @@ void lv_dropdown_set_static_options(lv_obj_t * ddlist, const char * options)
 /**
  * Add an options to a drop down list from a string.  Only works for dynamic options.
  * @param ddlist pointer to drop down list object
- * @param options a string without '\n'. E.g. "Four"
- * @param position the insert position, indexed from 0, -1 = end of string
+ * @param option a string without '\n'. E.g. "Four"
+ * @param pos the insert position, indexed from 0, LV_DROPDOWN_POS_LAST = end of string
  */
-void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, int pos)
+void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos)
 {
     LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
     LV_ASSERT_STR(option);
@@ -270,10 +270,6 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, int pos)
     size_t old_len = (ext->options == NULL) ? 0 : strlen(ext->options);
 	size_t ins_len = strlen(option);
 	size_t new_len = ins_len + old_len + 2; /* +2 for terminating NULL and possible \n */
-	lv_mem_monitor_t mem_mon;
-	lv_mem_monitor(&mem_mon);
-	lv_mem_defrag();
-	lv_mem_monitor(&mem_mon);
 	ext->options        = lv_mem_realloc(ext->options, new_len + 1);
 	LV_ASSERT_MEM(ext->options);
 	if(ext->options == NULL) return;
@@ -281,7 +277,7 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, int pos)
     ext->options[old_len] = 0;
 
     /*Find the insert character position*/
-    int insert_pos = old_len;
+    uint16_t insert_pos = old_len;
     if(pos != LV_DROPDOWN_POS_LAST) {
         int opcnt = 0;
         for(insert_pos = 0; ext->options[insert_pos] != 0; insert_pos++) {
