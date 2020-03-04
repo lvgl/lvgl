@@ -358,8 +358,12 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
     }
     mon_p->total_size = LV_MEM_SIZE;
     mon_p->used_pct   = 100 - (100U * mon_p->free_size) / mon_p->total_size;
-    mon_p->frag_pct   = (uint32_t)mon_p->free_biggest_size * 100U / mon_p->free_size;
-    mon_p->frag_pct   = 100 - mon_p->frag_pct;
+    if(mon_p->free_size > 0) {
+        mon_p->frag_pct   = (uint32_t)mon_p->free_biggest_size * 100U / mon_p->free_size;
+        mon_p->frag_pct   = 100 - mon_p->frag_pct;
+    } else {
+        mon_p->frag_pct   = 0; /*no fragmentation if all the RAM is used*/
+    }
 #endif
 }
 
