@@ -356,7 +356,6 @@ typedef void * lv_font_user_data_t;
 #define LV_THEME_DEFAULT_INIT               lv_theme_material_init
 #define LV_THEME_DEFAULT_COLOR_PRIMARY      LV_COLOR_RED
 #define LV_THEME_DEFAULT_COLOR_SECONDARY    LV_COLOR_BLUE
-#define LV_THEME_DEFAULT_FLAGS              LV_THEME_MATERIAL_FLAG_NONE
 #define LV_THEME_DEFAULT_FONT_SMALL         &lv_font_roboto_16
 #define LV_THEME_DEFAULT_FONT_NORMAL        &lv_font_roboto_16
 #define LV_THEME_DEFAULT_FONT_SUBTITLE      &lv_font_roboto_16
