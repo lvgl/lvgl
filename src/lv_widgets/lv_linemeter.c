@@ -301,31 +301,55 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
     mask_area.x2 = x_ofs + r_in-1;
     mask_area.y1 = y_ofs - r_in;
     mask_area.y2 = y_ofs + r_in-1;
-    lv_draw_mask_radius_param_t mask_param;
-    lv_draw_mask_radius_init(&mask_param, &mask_area, LV_RADIUS_CIRCLE, true);
-    int16_t mask_id = lv_draw_mask_add(&mask_param, 0);
+    lv_draw_mask_radius_param_t mask_in_param;
+    lv_draw_mask_radius_init(&mask_in_param, &mask_area, LV_RADIUS_CIRCLE, true);
+    int16_t mask_in_id = lv_draw_mask_add(&mask_in_param, 0);
 
+    mask_area.x1 = x_ofs - r_out;
+    mask_area.x2 = x_ofs + r_out-1;
+    mask_area.y1 = y_ofs - r_out;
+    mask_area.y2 = y_ofs + r_out-1;
+    lv_draw_mask_radius_param_t mask_out_param;
+    lv_draw_mask_radius_init(&mask_out_param, &mask_area, LV_RADIUS_CIRCLE, false);
+    int16_t mask_out_id = lv_draw_mask_add(&mask_out_param, 0);
 
+    /*In calculation use a larger radius to avoid rounding errors */
+    lv_coord_t r_out_extra = r_out + LV_DPI;
     for(i = 0; i < ext->line_cnt; i++) {
-        /*Calculate the position a scale label*/
-        int16_t angle = (i * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
+        /* `* 16` for extra precision*/
+        int32_t angle_upscale = (i * ext->scale_angle * 16) / (ext->line_cnt - 1);
+        int32_t angle_normal = angle_upscale >> 4;
 
-        int32_t y_out = (int32_t)((int32_t)lv_trigo_sin(angle) * r_out) >> (LV_TRIGO_SHIFT - 8);
-        int32_t x_out = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_out) >> (LV_TRIGO_SHIFT - 8);
+        int32_t angle_low = (angle_upscale >> 4);
+        int32_t angle_high = angle_low + 1;
+        int32_t angle_rem = angle_upscale & 0xF;
+
+        /*Interpolate sine and cos*/
+        int32_t sin_low = lv_trigo_sin(angle_low + angle_ofs);
+        int32_t sin_high = lv_trigo_sin(angle_high + angle_ofs);
+        int32_t sin_mid =  (sin_low * (16 - angle_rem) + sin_high * angle_rem) >> 4;
+
+        int32_t cos_low = lv_trigo_sin(angle_low + 90 + angle_ofs);
+        int32_t cos_high = lv_trigo_sin(angle_high + 90 + angle_ofs);
+        int32_t cos_mid =  (cos_low * (16 - angle_rem) + cos_high * angle_rem) >> 4;
+
+        /*Use the interpolated values to get x and y coordinates*/
+        int32_t y_out = (int32_t)((int32_t)sin_mid * r_out_extra) >> (LV_TRIGO_SHIFT - 8);
+        int32_t x_out = (int32_t)((int32_t)cos_mid * r_out_extra) >> (LV_TRIGO_SHIFT - 8);
 
         /*Rounding*/
-        if(x_out <= 0) x_out = (x_out + 127) >> 8;
+        if(x_out > 0) x_out = (x_out + 127) >> 8;
         else x_out = (x_out - 127) >> 8;
 
-        if(y_out <= 0) y_out = (y_out + 127) >> 8;
+        if(y_out > 0) y_out = (y_out + 127) >> 8;
         else y_out = (y_out - 127) >> 8;
 
         x_out += x_ofs;
         y_out += y_ofs;
 
-        int32_t y_in  = (int32_t)((int32_t)lv_trigo_sin(angle) * r_in) >> LV_TRIGO_SHIFT;
-        int32_t x_in  = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_in) >> LV_TRIGO_SHIFT;
-
+        /*Use smaller clip area only around the visible line*/
+        int32_t y_in  = (int32_t)((int32_t)lv_trigo_sin(angle_normal + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
+        int32_t x_in  = (int32_t)((int32_t)lv_trigo_sin(angle_normal + 90 + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
 
         x_in += x_ofs;
         y_in += y_ofs;
@@ -351,12 +375,15 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
             line_dsc.color = end_color;
             line_dsc.width = end_line_width;
         }
-        else line_dsc.color = lv_color_mix(grad_color, main_color, (255 * i) / ext->line_cnt);
+        else {
+            line_dsc.color = lv_color_mix(grad_color, main_color, (255 * i) / ext->line_cnt);
+        }
 
         lv_draw_line(&p1, &p2, &clip_sub, &line_dsc);
     }
 
-    lv_draw_mask_remove_id(mask_id);
+    lv_draw_mask_remove_id(mask_in_id);
+    lv_draw_mask_remove_id(mask_out_id);
 
     if(part == LV_LINEMETER_PART_MAIN) {
         lv_style_int_t border_width = lv_obj_get_style_scale_border_width(lmeter, part);
