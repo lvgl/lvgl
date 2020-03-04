@@ -296,36 +296,56 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
 
     lv_style_int_t end_line_width = lv_obj_get_style_scale_end_line_width(lmeter, part);
 
+    lv_area_t mask_area;
+    mask_area.x1 = x_ofs - r_in;
+    mask_area.x2 = x_ofs + r_in-1;
+    mask_area.y1 = y_ofs - r_in;
+    mask_area.y2 = y_ofs + r_in-1;
+    lv_draw_mask_radius_param_t mask_param;
+    lv_draw_mask_radius_init(&mask_param, &mask_area, LV_RADIUS_CIRCLE, true);
+    int16_t mask_id = lv_draw_mask_add(&mask_param, 0);
+
+
     for(i = 0; i < ext->line_cnt; i++) {
         /*Calculate the position a scale label*/
         int16_t angle = (i * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
 
-        lv_coord_t y_out = (int32_t)((int32_t)lv_trigo_sin(angle) * r_out) >> (LV_TRIGO_SHIFT - 8);
-        lv_coord_t x_out = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_out) >> (LV_TRIGO_SHIFT - 8);
-        lv_coord_t y_in  = (int32_t)((int32_t)lv_trigo_sin(angle) * r_in) >> (LV_TRIGO_SHIFT - 8);
-        lv_coord_t x_in  = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_in) >> (LV_TRIGO_SHIFT - 8);
+        int32_t y_out = (int32_t)((int32_t)lv_trigo_sin(angle) * r_out) >> (LV_TRIGO_SHIFT - 8);
+        int32_t x_out = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_out) >> (LV_TRIGO_SHIFT - 8);
 
         /*Rounding*/
         if(x_out <= 0) x_out = (x_out + 127) >> 8;
         else x_out = (x_out - 127) >> 8;
 
-        if(x_in <= 0) x_in = (x_in + 127) >> 8;
-        else x_in = (x_in - 127) >> 8;
-
         if(y_out <= 0) y_out = (y_out + 127) >> 8;
         else y_out = (y_out - 127) >> 8;
 
-        if(y_in <= 0) y_in = (y_in + 127) >> 8;
-        else y_in = (y_in - 127) >> 8;
+        x_out += x_ofs;
+        y_out += y_ofs;
+
+        int32_t y_in  = (int32_t)((int32_t)lv_trigo_sin(angle) * r_in) >> LV_TRIGO_SHIFT;
+        int32_t x_in  = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r_in) >> LV_TRIGO_SHIFT;
+
+
+        x_in += x_ofs;
+        y_in += y_ofs;
+
+        lv_area_t clip_sub;
+        clip_sub.x1 = LV_MATH_MIN(x_in, x_out) - line_dsc.width;
+        clip_sub.x2 = LV_MATH_MAX(x_in, x_out) + line_dsc.width;
+        clip_sub.y1 = LV_MATH_MIN(y_in, y_out) - line_dsc.width;
+        clip_sub.y2 = LV_MATH_MAX(y_in, y_out) + line_dsc.width;
+
+        if(lv_area_intersect(&clip_sub, &clip_sub, clip_area) == false) continue;
 
         lv_point_t p1;
         lv_point_t p2;
 
-        p2.x = x_in + x_ofs;
-        p2.y = y_in + y_ofs;
+        p2.x = x_ofs;
+        p2.y = y_ofs;
 
-        p1.x = x_out + x_ofs;
-        p1.y = y_out + y_ofs;
+        p1.x = x_out;
+        p1.y = y_out;
 
         if(i >= level) {
             line_dsc.color = end_color;
@@ -333,8 +353,10 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         }
         else line_dsc.color = lv_color_mix(grad_color, main_color, (255 * i) / ext->line_cnt);
 
-        lv_draw_line(&p1, &p2, clip_area, &line_dsc);
+        lv_draw_line(&p1, &p2, &clip_sub, &line_dsc);
     }
+
+    lv_draw_mask_remove_id(mask_id);
 
     if(part == LV_LINEMETER_PART_MAIN) {
         lv_style_int_t border_width = lv_obj_get_style_scale_border_width(lmeter, part);
