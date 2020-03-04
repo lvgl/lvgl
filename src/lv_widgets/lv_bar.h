@@ -45,7 +45,7 @@ extern "C" {
 
 enum {
     LV_BAR_TYPE_NORMAL,
-    LV_BAR_TYPE_SYM,
+    LV_BAR_TYPE_SYMMETRICAL,
     LV_BAR_TYPE_CUSTOM
 };
 typedef uint8_t lv_bar_type_t;

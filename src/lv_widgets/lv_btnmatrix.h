@@ -38,7 +38,7 @@ LV_EXPORT_CONST_INT(LV_BTNMATRIX_BTN_NONE);
 enum {
     LV_BTNMATRIX_CTRL_HIDDEN     = 0x0008, /**< Button hidden */
     LV_BTNMATRIX_CTRL_NO_REPEAT  = 0x0010, /**< Do not repeat press this button. */
-    LV_BTNMATRIX_CTRL_INACTIVE   = 0x0020, /**< Disable this button. */
+    LV_BTNMATRIX_CTRL_DISABLED   = 0x0020, /**< Disable this button. */
     LV_BTNMATRIX_CTRL_CHECKABLE  = 0x0040, /**< Button *can* be toggled. */
     LV_BTNMATRIX_CTRL_CHECK_STATE  = 0x0080, /**< Button is currently toggled (e.g. checked). */
     LV_BTNMATRIX_CTRL_CLICK_TRIG = 0x0100, /**< 1: Send LV_EVENT_SELECTED on CLICK, 0: Send LV_EVENT_SELECTED on PRESS*/
@@ -58,7 +58,7 @@ typedef struct {
     uint16_t btn_id_focused;                          /*Index of the currently focused button or LV_BTNMATRIX_BTN_NONE*/
     uint16_t btn_id_act;    /*Index of the active button (being pressed/released etc) or LV_BTNMATRIX_BTN_NONE */
     uint8_t recolor : 1;    /*Enable button recoloring*/
-    uint8_t one_toggle : 1; /*Single button toggled at once*/
+    uint8_t one_check : 1;  /*Single button toggled at once*/
 } lv_btnmatrix_ext_t;
 
 enum {
@@ -172,14 +172,12 @@ void lv_btnmatrix_set_btn_width(lv_obj_t * btnm, uint16_t btn_id, uint8_t width)
 
 /**
  * Make the button matrix like a selector widget (only one button may be toggled at a time).
- *
- * Toggling must be enabled on the buttons you want to be selected with `lv_btnmatrix_set_ctrl` or
+ * `Checkable` must be enabled on the buttons you want to be selected with `lv_btnmatrix_set_ctrl` or
  * `lv_btnmatrix_set_btn_ctrl_all`.
- *
  * @param btnm Button matrix object
- * @param one_toggle Whether "one toggle" mode is enabled
+ * @param one_chk Whether "one check" mode is enabled
  */
-void lv_btnmatrix_set_one_toggle(lv_obj_t * btnm, bool one_toggle);
+void lv_btnmatrix_set_one_check(lv_obj_t * btnm, bool one_chk);
 
 /*=====================
  * Getter functions
@@ -247,7 +245,7 @@ bool lv_btnmatrix_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnmatrix_ct
  * @param btnm Button matrix object
  * @return whether "one toggle" mode is enabled
  */
-bool lv_btnmatrix_get_one_toggle(const lv_obj_t * btnm);
+bool lv_btnmatrix_get_one_check(const lv_obj_t * btnm);
 /**********************
  *      MACROS
  **********************/

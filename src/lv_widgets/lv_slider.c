@@ -173,7 +173,7 @@ static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * cli
         bool hor = objw >= objh ? true : false;
         lv_coord_t knob_size = hor ? objh : objw;
         bool sym = false;
-        if(ext->bar.type == LV_BAR_TYPE_SYM && ext->bar.min_value < 0 && ext->bar.max_value > 0) sym = true;
+        if(ext->bar.type == LV_BAR_TYPE_SYMMETRICAL && ext->bar.min_value < 0 && ext->bar.max_value > 0) sym = true;
 
         lv_area_t knob_area;
 

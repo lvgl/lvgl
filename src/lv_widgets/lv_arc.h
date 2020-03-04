@@ -39,7 +39,7 @@ typedef struct {
 /*Parts of the arc*/
 enum {
     LV_ARC_PART_BG = LV_OBJ_PART_MAIN,
-    LV_ARC_PART_ARC,
+    LV_ARC_PART_INDIC,
     _LV_ARC_PART_VIRTUAL_LAST,
 
     _LV_ARC_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,

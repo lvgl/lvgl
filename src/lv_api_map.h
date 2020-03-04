@@ -66,7 +66,7 @@ static inline bool lv_dropdown_get_draw_arrow(lv_obj_t * ddlist)
 static inline void lv_bar_set_sym(lv_obj_t * bar, bool en)
 {
     if(en)
-        lv_bar_set_type(bar, LV_BAR_TYPE_SYM);
+        lv_bar_set_type(bar, LV_BAR_TYPE_SYMMETRICAL);
     else
         lv_bar_set_type(bar, LV_BAR_TYPE_NORMAL);
 }
@@ -79,7 +79,7 @@ static inline void lv_bar_set_sym(lv_obj_t * bar, bool en)
  */
 static inline bool lv_bar_get_sym(lv_obj_t * bar)
 {
-    return lv_bar_get_type(bar) == LV_BAR_TYPE_SYM;
+    return lv_bar_get_type(bar) == LV_BAR_TYPE_SYMMETRICAL;
 }
 
 #endif

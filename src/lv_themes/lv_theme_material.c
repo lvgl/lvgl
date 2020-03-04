@@ -1016,8 +1016,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_ARC_PART_BG);
             lv_style_list_add_style(list, &arc_bg);
 
-            lv_obj_clean_style_list(obj, LV_ARC_PART_ARC);
-            list = lv_obj_get_style_list(obj, LV_ARC_PART_ARC);
+            lv_obj_clean_style_list(obj, LV_ARC_PART_INDIC);
+            list = lv_obj_get_style_list(obj, LV_ARC_PART_INDIC);
             lv_style_list_add_style(list, &arc);
             break;
 #endif

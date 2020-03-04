@@ -131,8 +131,8 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, l
 
 /**
  * Transform and image and store the result on a canvas.
- * @param canvas pointer to a canvas object
- * @param img pointer to an image descriptor.
+ * @param canvas pointer to a canvas object to store the result of the transformation.
+ * @param img pointer to an image descriptor to transform.
  *             Can be the image descriptor of an other canvas too (`lv_canvas_get_img()`).
  * @param angle the angle of rotation (0..3600), 0.1 deg resolution
  * @param zoom zoom factor (256 no zoom);

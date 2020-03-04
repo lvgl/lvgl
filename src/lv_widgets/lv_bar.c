@@ -412,7 +412,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
     int32_t range = ext->max_value - ext->min_value;
     bool hor = objw >= objh ? true : false;
     bool sym = false;
-    if(ext->type == LV_BAR_TYPE_SYM && ext->min_value < 0 && ext->max_value > 0 &&
+    if(ext->type == LV_BAR_TYPE_SYMMETRICAL && ext->min_value < 0 && ext->max_value > 0 &&
        ext->start_value == ext->min_value) sym = true;
 
     /*Calculate the indicator area*/

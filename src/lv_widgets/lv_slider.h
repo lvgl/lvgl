@@ -128,7 +128,7 @@ static inline void lv_slider_set_type(lv_obj_t * slider, lv_slider_type_t type)
     if(type == LV_SLIDER_TYPE_NORMAL)
         lv_bar_set_type(slider, LV_BAR_TYPE_NORMAL);
     else if(type == LV_SLIDER_TYPE_SYM)
-        lv_bar_set_type(slider, LV_BAR_TYPE_SYM);
+        lv_bar_set_type(slider, LV_BAR_TYPE_SYMMETRICAL);
     else if(type == LV_SLIDER_TYPE_RANGE)
         lv_bar_set_type(slider, LV_BAR_TYPE_CUSTOM);
 }
@@ -206,7 +206,7 @@ static inline uint16_t lv_slider_get_anim_time(lv_obj_t * slider)
 static inline lv_slider_type_t lv_slider_get_type(lv_obj_t * slider)
 {
     lv_bar_type_t type = lv_bar_get_type(slider);
-    if(type == LV_BAR_TYPE_SYM)
+    if(type == LV_BAR_TYPE_SYMMETRICAL)
         return LV_SLIDER_TYPE_SYM;
     else if(type == LV_BAR_TYPE_CUSTOM)
         return LV_SLIDER_TYPE_RANGE;

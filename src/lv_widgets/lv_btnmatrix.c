@@ -95,7 +95,7 @@ lv_obj_t * lv_btnmatrix_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->ctrl_bits      = NULL;
     ext->map_p          = NULL;
     ext->recolor        = 0;
-    ext->one_toggle     = 0;
+    ext->one_check      = 0;
     lv_style_list_init(&ext->style_btn);
     ext->style_btn.ignore_trans = 1;
 
@@ -406,19 +406,17 @@ void lv_btnmatrix_set_btn_width(lv_obj_t * btnm, uint16_t btn_id, uint8_t width)
 
 /**
  * Make the button matrix like a selector widget (only one button may be toggled at a time).
- *
- * Toggling must be enabled on the buttons you want to be selected with `lv_btnmatrix_set_ctrl` or
+ * `Checkable` must be enabled on the buttons you want to be selected with `lv_btnmatrix_set_ctrl` or
  * `lv_btnmatrix_set_btn_ctrl_all`.
- *
  * @param btnm Button matrix object
- * @param one_toggle Whether "one toggle" mode is enabled
+ * @param one_chk Whether "one check" mode is enabled
  */
-void lv_btnmatrix_set_one_toggle(lv_obj_t * btnm, bool one_toggle)
+void lv_btnmatrix_set_one_check(lv_obj_t * btnm, bool one_chk)
 {
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
-    ext->one_toggle     = one_toggle;
+    ext->one_check     = one_chk;
 
     /*If more than one button is toggled only the first one should be*/
     make_one_button_toggled(btnm, 0);
@@ -552,17 +550,17 @@ bool lv_btnmatrix_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnmatrix_ct
 
 
 /**
- * Find whether "one toggle" mode is enabled.
+ * Find whether "one check" mode is enabled.
  * @param btnm Button matrix object
- * @return whether "one toggle" mode is enabled
+ * @return whether "one check" mode is enabled
  */
-bool lv_btnmatrix_get_one_toggle(const lv_obj_t * btnm)
+bool lv_btnmatrix_get_one_check(const lv_obj_t * btnm)
 {
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
-    return ext->one_toggle;
+    return ext->one_check;
 }
 
 /**********************
@@ -867,7 +865,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
                 else {
                     ext->ctrl_bits[ext->btn_id_pr] |= LV_BTNMATRIX_CTRL_CHECK_STATE;
                 }
-                if(ext->one_toggle) make_one_button_toggled(btnm, ext->btn_id_pr);
+                if(ext->one_check) make_one_button_toggled(btnm, ext->btn_id_pr);
             }
 
             /*Invalidate to old pressed area*/;
@@ -1105,7 +1103,7 @@ static bool button_is_repeat_disabled(lv_btnmatrix_ctrl_t ctrl_bits)
 
 static bool button_is_inactive(lv_btnmatrix_ctrl_t ctrl_bits)
 {
-    return (ctrl_bits & LV_BTNMATRIX_CTRL_INACTIVE) ? true : false;
+    return (ctrl_bits & LV_BTNMATRIX_CTRL_DISABLED) ? true : false;
 }
 
 static bool button_is_click_trig(lv_btnmatrix_ctrl_t ctrl_bits)
