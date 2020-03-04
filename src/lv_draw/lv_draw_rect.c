@@ -298,7 +298,9 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
                           dsc->bg_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
 
             fill_area.y1 = coords_bg.y2 - rout;
+            if(fill_area.y1 <= fill_area.y2) fill_area.y1 = fill_area.y2 + 1;    /*Avoid overdrawing the last line*/
             fill_area.y2 = coords_bg.y2;
+
 
             lv_blend_fill(clip, &fill_area,
                           dsc->bg_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
