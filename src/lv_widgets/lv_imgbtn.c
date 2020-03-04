@@ -272,6 +272,7 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
+        ancestor_design(imgbtn, clip_area, mode);
         /*Just draw an image*/
         lv_imgbtn_ext_t * ext    = lv_obj_get_ext_attr(imgbtn);
         lv_btn_state_t state     = lv_imgbtn_get_state(imgbtn);
