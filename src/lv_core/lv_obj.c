@@ -1294,6 +1294,10 @@ void lv_obj_refresh_style(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
+    lv_obj_invalidate(obj);
+    obj->signal_cb(obj, LV_SIGNAL_STYLE_CHG, NULL);
+    lv_obj_invalidate(obj);
+
     /*Send style change signals*/
     refresh_children_style(obj);
 }
@@ -3458,10 +3462,6 @@ static void report_style_mod_core(void * style, lv_obj_t * obj)
  */
 static void refresh_children_style(lv_obj_t * obj)
 {
-    lv_obj_invalidate(obj);
-    obj->signal_cb(obj, LV_SIGNAL_STYLE_CHG, NULL);
-    lv_obj_invalidate(obj);
-
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
     while(child != NULL) {
         lv_obj_invalidate(child);
