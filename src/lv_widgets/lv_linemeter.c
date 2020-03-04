@@ -316,22 +316,22 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
     /*In calculation use a larger radius to avoid rounding errors */
     lv_coord_t r_out_extra = r_out + LV_DPI;
     for(i = 0; i < ext->line_cnt; i++) {
-        /* `* 16` for extra precision*/
-        int32_t angle_upscale = (i * ext->scale_angle * 16) / (ext->line_cnt - 1);
-        int32_t angle_normal = angle_upscale >> 4;
+        /* `* 256` for extra precision*/
+        int32_t angle_upscale = (i * ext->scale_angle * 256) / (ext->line_cnt - 1);
+        int32_t angle_normal = angle_upscale >> 8;
 
-        int32_t angle_low = (angle_upscale >> 4);
+        int32_t angle_low = (angle_upscale >> 8);
         int32_t angle_high = angle_low + 1;
-        int32_t angle_rem = angle_upscale & 0xF;
+        int32_t angle_rem = angle_upscale & 0xFF;
 
         /*Interpolate sine and cos*/
         int32_t sin_low = lv_trigo_sin(angle_low + angle_ofs);
         int32_t sin_high = lv_trigo_sin(angle_high + angle_ofs);
-        int32_t sin_mid =  (sin_low * (16 - angle_rem) + sin_high * angle_rem) >> 4;
+        int32_t sin_mid =  (sin_low * (256 - angle_rem) + sin_high * angle_rem) >> 8;
 
         int32_t cos_low = lv_trigo_sin(angle_low + 90 + angle_ofs);
         int32_t cos_high = lv_trigo_sin(angle_high + 90 + angle_ofs);
-        int32_t cos_mid =  (cos_low * (16 - angle_rem) + cos_high * angle_rem) >> 4;
+        int32_t cos_mid =  (cos_low * (256 - angle_rem) + cos_high * angle_rem) >> 8;
 
         /*Use the interpolated values to get x and y coordinates*/
         int32_t y_out = (int32_t)((int32_t)sin_mid * r_out_extra) >> (LV_TRIGO_SHIFT - 8);
