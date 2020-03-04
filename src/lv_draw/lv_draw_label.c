@@ -110,7 +110,8 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
         w = p.x;
     }
 
-    int32_t line_height = lv_font_get_line_height(font) + dsc->line_space;
+    int32_t line_height_font = lv_font_get_line_height(font);
+    int32_t line_height = line_height_font + dsc->line_space;
 
     /*Init variables for the first line*/
     int32_t line_width = 0;
@@ -142,11 +143,10 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
         pos.y += hint->y;
     }
 
-
     uint32_t line_end = line_start + lv_txt_get_next_line(&txt[line_start], font, dsc->letter_space, w, dsc->flag);
 
     /*Go the first visible line*/
-    while(pos.y + line_height < mask->y1) {
+    while(pos.y + line_height_font < mask->y1) {
         /*Go to next line*/
         line_start = line_end;
         line_end += lv_txt_get_next_line(&txt[line_start], font, dsc->letter_space, w, dsc->flag);
