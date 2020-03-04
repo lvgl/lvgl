@@ -109,6 +109,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->options     = NULL;
     ext->symbol         = LV_SYMBOL_DOWN;
     ext->text         = "Select";
+    ext->static_txt = 0;
     ext->show_selected   = 1;
     ext->sel_opt_id      = 0;
     ext->sel_opt_id_orig = 0;
@@ -127,14 +128,17 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new drop down list drop down list*/
     if(copy == NULL) {
-        lv_dropdown_set_options(ddlist, "Option 1\nOption 2\nOption 3");
+        ext->options = NULL;
 
         lv_theme_apply(ddlist, LV_THEME_DROPDOWN);
     }
     /*Copy an existing drop down list*/
     else {
         lv_dropdown_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->options        = copy_ext->options;
+        if(copy_ext->static_txt == 0)
+            lv_dropdown_set_options(ddlist, lv_dropdown_get_options(copy));
+		else
+		    lv_dropdown_set_static_options(ddlist, lv_dropdown_get_options(copy));
         ext->option_cnt        = copy_ext->option_cnt;
         ext->sel_opt_id     = copy_ext->sel_opt_id;
         ext->sel_opt_id_orig = copy_ext->sel_opt_id;
@@ -178,6 +182,7 @@ void lv_dropdown_set_text(lv_obj_t * ddlist, const char * txt)
  * Set the options in a drop down list from a string
  * @param ddlist pointer to drop down list object
  * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
+ * The options string can be destroyed after calling this function
  */
 void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options)
 {
@@ -195,7 +200,109 @@ void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options)
     ext->option_cnt++;   /*Last option has no `\n`*/
     ext->sel_opt_id      = 0;
     ext->sel_opt_id_orig = 0;
-    ext->options = options;
+    
+    /*Allocate space for the new text*/
+    size_t len = strlen(options) + 1;
+    if(ext->options != NULL && ext->static_txt == 0) {
+        lv_mem_free(ext->options);
+        ext->options = NULL;
+    }
+
+    ext->options = lv_mem_alloc(len);
+
+    LV_ASSERT_MEM(ext->options);
+    if(ext->options == NULL) return;
+
+    strcpy(ext->options, options);
+
+    /*Now the text is dynamically allocated*/
+    ext->static_txt = 0;
+}
+
+/**
+ * Set the options in a drop down list from a string
+ * @param ddlist pointer to drop down list object
+ * @param options a staic string with '\n' separated options. E.g. "One\nTwo\nThree"
+ */
+void lv_dropdown_set_static_options(lv_obj_t * ddlist, const char * options)
+{
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_STR(options);
+
+    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+    /*Count the '\n'-s to determine the number of options*/
+    ext->option_cnt = 0;
+    uint16_t i;
+    for(i = 0; options[i] != '\0'; i++) {
+        if(options[i] == '\n') ext->option_cnt++;
+    }
+    ext->option_cnt++;   /*Last option has no `\n`*/
+    ext->sel_opt_id      = 0;
+    ext->sel_opt_id_orig = 0;
+
+    if(ext->static_txt == 0 && ext->options != NULL) {
+        lv_mem_free(ext->options);
+        ext->options = NULL;
+    }
+
+    ext->static_txt = 1;
+    ext->options = (char *)options;
+}
+
+/**
+ * Add an options to a drop down list from a string.  Only works for dynamic options.
+ * @param ddlist pointer to drop down list object
+ * @param option a string without '\n'. E.g. "Four"
+ * @param pos the insert position, indexed from 0, LV_DROPDOWN_POS_LAST = end of string
+ */
+void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos)
+{
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_STR(option);
+
+    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+    /*Can not append to static options*/
+    if(ext->static_txt != 0) return;
+
+    /*Allocate space for the new option*/
+    size_t old_len = (ext->options == NULL) ? 0 : strlen(ext->options);
+	size_t ins_len = strlen(option);
+	size_t new_len = ins_len + old_len + 2; /* +2 for terminating NULL and possible \n */
+	ext->options        = lv_mem_realloc(ext->options, new_len + 1);
+	LV_ASSERT_MEM(ext->options);
+	if(ext->options == NULL) return;
+
+    ext->options[old_len] = 0;
+
+    /*Find the insert character position*/
+    uint16_t insert_pos = old_len;
+    if(pos != LV_DROPDOWN_POS_LAST) {
+        int opcnt = 0;
+        for(insert_pos = 0; ext->options[insert_pos] != 0; insert_pos++) {
+            if(opcnt == pos)
+                break;
+            if(ext->options[insert_pos] == '\n')
+                opcnt++;
+        }
+    }
+
+    /*Add delimiter to existing options*/
+    if((insert_pos > 0) && (pos >= ext->option_cnt))
+        lv_txt_ins(ext->options, insert_pos++, "\n");
+
+    /*Insert the new option, adding \n if necessary*/
+    char * ins_buf = lv_mem_buf_get(ins_len + 2); /* + 2 for terminating NULL and possible \n */
+    LV_ASSERT_MEM(ins_buf);
+    if(ins_buf == NULL) return;
+        strcpy(ins_buf, option);
+    if(pos < ext->option_cnt)
+        strcat(ins_buf, "\n");
+    lv_txt_ins(ext->options, insert_pos, ins_buf);
+    lv_mem_buf_release(ins_buf);
+
+    ext->option_cnt++;
 }
 
 /**
@@ -755,7 +862,11 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         lv_dropdown_close(ddlist, LV_ANIM_OFF);
-
+        if(ext->static_txt == 0) {
+            lv_mem_free(ext->options);
+            ext->options = NULL;
+        }
+        
         /*`lv_obj_clean_style_list` is not required because these styles are only copied to the page
          * so they can have transitions or other object related things. */
         lv_style_list_reset(&ext->style_page);
