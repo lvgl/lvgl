@@ -24,7 +24,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_RADIUS_CIRCLE (LV_COORD_MAX) /**< A very big radius to always draw as circle*/
+#define LV_RADIUS_CIRCLE (0x7FFF) /**< A very big radius to always draw as circle*/
 LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
 #define LV_DEBUG_STYLE_SENTINEL_VALUE       0x2288AAEE
