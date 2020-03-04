@@ -253,7 +253,7 @@
 
 /*1: Show CPU usage and FPS count in the right bottom corner*/
 #ifndef LV_USE_PERF_MONITOR
-#define LV_USE_PERF_MONITOR     1
+#define LV_USE_PERF_MONITOR     0
 #endif
 
 /*========================
