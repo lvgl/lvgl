@@ -170,7 +170,10 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
         fill_area.y1 = draw_area.y1 + disp_area->y1;
         fill_area.y2 = fill_area.y1;
 
-        lv_style_int_t dash_start = (vdb->area.x1 + draw_area.x1) % (dsc->dash_gap + dsc->dash_width);
+        lv_style_int_t dash_start = 0;
+        if(dashed) {
+            dash_start = (vdb->area.x1 + draw_area.x1) % (dsc->dash_gap + dsc->dash_width);
+        }
 
         lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
         int32_t h;
@@ -269,7 +272,11 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
 
         lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
 
-        lv_style_int_t dash_start = (vdb->area.y1 + draw_area.y1) % (dsc->dash_gap + dsc->dash_width);
+        lv_style_int_t dash_start = 0;
+        if(dashed) {
+            dash_start = (vdb->area.x1 + draw_area.x1) % (dsc->dash_gap + dsc->dash_width);
+        }
+
         lv_style_int_t dash_cnt = dash_start;
 
         int32_t h;
