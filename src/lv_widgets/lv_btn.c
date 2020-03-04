@@ -134,20 +134,21 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
 
     switch(state) {
         case LV_BTN_STATE_RELEASED:
-            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED);
+            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED | LV_STATE_DISABLED);
             break;
         case LV_BTN_STATE_PRESSED:
-            lv_obj_clear_state(btn, LV_STATE_CHECKED);
+            lv_obj_clear_state(btn, LV_STATE_CHECKED | LV_STATE_DISABLED);
             lv_obj_add_state(btn, LV_STATE_PRESSED);
             break;
         case LV_BTN_STATE_CHECKED_RELEASED:
             lv_obj_add_state(btn, LV_STATE_CHECKED);
-            lv_obj_clear_state(btn, LV_STATE_PRESSED);
+            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_DISABLED);
             break;
         case LV_BTN_STATE_CHECKED_PRESSED:
-            lv_obj_add_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED);
+            lv_obj_add_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED | LV_STATE_DISABLED);
             break;
         case LV_BTN_STATE_DISABLED:
+            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED);
             lv_obj_add_state(btn, LV_STATE_DISABLED);
             break;
     }
