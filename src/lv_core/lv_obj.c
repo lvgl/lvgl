@@ -1625,8 +1625,7 @@ void lv_obj_finish_transitions(lv_obj_t * obj, uint8_t part)
 {
     /*Animate all related transition to the end value*/
     lv_style_trans_t * tr;
-    tr = lv_ll_get_head(&LV_GC_ROOT(_lv_obj_style_trans_ll));
-    LV_LL_READ(LV_GC_ROOT(_lv_obj_style_trans_ll), tr) {
+    LV_LL_READ_BACK(LV_GC_ROOT(_lv_obj_style_trans_ll), tr) {
         if(tr->obj == obj && (part == tr->part || part == LV_OBJ_PART_ALL)) {
             trans_anim_cb(tr, 255);
         }
