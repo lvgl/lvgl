@@ -26,7 +26,7 @@ int main(void)
 static void hal_init(void)
 {
     static lv_disp_buf_t disp_buf;
-    lv_color_t * disp_buf1 = malloc(LV_HOR_RES * LV_VER_RES * sizeof(lv_color_t));
+    lv_color_t * disp_buf1 = (lv_color_t *)malloc(LV_HOR_RES * LV_VER_RES * sizeof(lv_color_t));
 
     lv_disp_buf_init(&disp_buf, disp_buf1, NULL, LV_HOR_RES* LV_VER_RES);
 

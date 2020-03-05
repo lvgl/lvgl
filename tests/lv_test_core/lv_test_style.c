@@ -73,7 +73,7 @@ static void empty_style(void)
     lv_res_t found;
     lv_style_int_t value;
     lv_opa_t opa;
-    void * ptr;
+    const void * ptr;
     lv_color_t color;
 
     lv_test_print("Get a properties from an empty style");
@@ -84,7 +84,7 @@ static void empty_style(void)
     found = lv_style_list_get_opa(&style_list, LV_STYLE_BG_OPA, &opa);
     lv_test_assert_int_eq(LV_RES_INV, found, "Get an 'opa' property");
 
-    found = lv_style_list_get_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
+    found = lv_style_list_get_data_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
     lv_test_assert_int_eq(LV_RES_INV, found, "Get a 'ptr' property");
 
     found = lv_style_list_get_color(&style_list, LV_STYLE_BG_COLOR, &color);
@@ -108,7 +108,7 @@ static void add_remove_read_prop(void)
     lv_res_t found;
     lv_style_int_t value;
     lv_opa_t opa;
-    void * ptr;
+    const void * ptr;
     lv_color_t color;
 
     lv_test_print("Add an empty style and read properties");
@@ -119,7 +119,7 @@ static void add_remove_read_prop(void)
     found = lv_style_list_get_opa(&style_list, LV_STYLE_BG_OPA, &opa);
     lv_test_assert_int_eq(LV_RES_INV, found, "Get a non existing 'opa' property");
 
-    found = lv_style_list_get_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
+    found = lv_style_list_get_data_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
     lv_test_assert_int_eq(LV_RES_INV, found, "Get a non existing 'ptr' property");
 
     found = lv_style_list_get_color(&style_list, LV_STYLE_BG_COLOR, &color);
@@ -128,7 +128,7 @@ static void add_remove_read_prop(void)
     lv_test_print("Set properties and read back the values");
     _lv_style_set_int(&style, LV_STYLE_TEXT_LINE_SPACE, 5);
     _lv_style_set_opa(&style, LV_STYLE_BG_OPA, LV_OPA_50);
-    _lv_style_set_ptr(&style, LV_STYLE_TEXT_FONT, LV_THEME_DEFAULT_FONT_NORMAL);
+    _lv_style_set_data_ptr(&style, LV_STYLE_TEXT_FONT, LV_THEME_DEFAULT_FONT_NORMAL);
     _lv_style_set_color(&style, LV_STYLE_BG_COLOR, LV_COLOR_RED);
 
     found = lv_style_list_get_int(&style_list, LV_STYLE_TEXT_LINE_SPACE, &value);
@@ -139,7 +139,7 @@ static void add_remove_read_prop(void)
     lv_test_assert_int_eq(LV_RES_OK, found, "Get an existing 'opa' property");
     lv_test_assert_int_eq(LV_OPA_50, opa, "Get the value of an  'opa' property");
 
-    found = lv_style_list_get_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
+    found = lv_style_list_get_data_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
     lv_test_assert_int_eq(LV_RES_OK, found, "Get an existing 'ptr' property");
     lv_test_assert_ptr_eq(LV_THEME_DEFAULT_FONT_NORMAL, ptr, "Get the value of a 'ptr' property");
 
@@ -155,7 +155,7 @@ static void add_remove_read_prop(void)
     found = lv_style_list_get_opa(&style_list, LV_STYLE_BG_OPA, &opa);
     lv_test_assert_int_eq(LV_RES_INV, found, "Get an 'opa' property from a reseted style");
 
-    found = lv_style_list_get_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
+    found = lv_style_list_get_data_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
     lv_test_assert_int_eq(LV_RES_INV, found, "Get an 'ptr' property from a reseted style");
 
     found = lv_style_list_get_color(&style_list, LV_STYLE_BG_COLOR, &color);
@@ -186,14 +186,14 @@ static void cascade(void)
     lv_res_t found;
     lv_style_int_t value;
     lv_opa_t opa;
-    void * ptr;
+    const void * ptr;
     lv_color_t color;
 
     lv_test_print("Read properties set only in the firstly added style");
 
     _lv_style_set_int(&style_first, LV_STYLE_TEXT_LINE_SPACE, 5);
     _lv_style_set_opa(&style_first, LV_STYLE_BG_OPA, LV_OPA_50);
-    _lv_style_set_ptr(&style_first, LV_STYLE_TEXT_FONT, LV_THEME_DEFAULT_FONT_NORMAL);
+    _lv_style_set_data_ptr(&style_first, LV_STYLE_TEXT_FONT, LV_THEME_DEFAULT_FONT_NORMAL);
     _lv_style_set_color(&style_first, LV_STYLE_BG_COLOR, LV_COLOR_RED);
 
     found = lv_style_list_get_int(&style_list, LV_STYLE_TEXT_LINE_SPACE, &value);
@@ -204,7 +204,7 @@ static void cascade(void)
     lv_test_assert_int_eq(LV_RES_OK, found, "Get an 'opa' property");
     lv_test_assert_int_eq(LV_OPA_50, opa, "Get the value of an  'opa' property");
 
-    found = lv_style_list_get_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
+    found = lv_style_list_get_data_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
     lv_test_assert_int_eq(LV_RES_OK, found, "Get an 'ptr' property");
     lv_test_assert_ptr_eq(LV_THEME_DEFAULT_FONT_NORMAL, ptr, "Get the value of a 'ptr' property");
 
@@ -216,7 +216,7 @@ static void cascade(void)
 
     _lv_style_set_int(&style_second, LV_STYLE_TEXT_LINE_SPACE, 10);
     _lv_style_set_opa(&style_second, LV_STYLE_BG_OPA, LV_OPA_60);
-    _lv_style_set_ptr(&style_second, LV_STYLE_TEXT_FONT, LV_THEME_DEFAULT_FONT_NORMAL + 1);
+    _lv_style_set_data_ptr(&style_second, LV_STYLE_TEXT_FONT, LV_THEME_DEFAULT_FONT_NORMAL + 1);
     _lv_style_set_color(&style_second, LV_STYLE_BG_COLOR, LV_COLOR_BLUE);
 
     found = lv_style_list_get_int(&style_list, LV_STYLE_TEXT_LINE_SPACE, &value);
@@ -227,7 +227,7 @@ static void cascade(void)
     lv_test_assert_int_eq(LV_RES_OK, found, "Get an overwritten 'opa' property");
     lv_test_assert_int_eq(LV_OPA_60, opa, "Get the value of an overwritten 'opa' property");
 
-    found = lv_style_list_get_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
+    found = lv_style_list_get_data_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
     lv_test_assert_int_eq(LV_RES_OK, found, "Get an overwritten 'ptr' property");
     lv_test_assert_ptr_eq(LV_THEME_DEFAULT_FONT_NORMAL + 1, ptr, "Get the value of an overwritten 'ptr' property");
 
@@ -239,7 +239,7 @@ static void cascade(void)
     lv_test_print("Overwrite the properties with the local style");
     lv_style_list_set_local_int(&style_list, LV_STYLE_TEXT_LINE_SPACE, 20);
     lv_style_list_set_local_opa(&style_list, LV_STYLE_BG_OPA, LV_OPA_70);
-    lv_style_list_set_local_ptr(&style_list, LV_STYLE_TEXT_FONT, LV_THEME_DEFAULT_FONT_NORMAL + 2);
+    lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_TEXT_FONT, LV_THEME_DEFAULT_FONT_NORMAL + 2);
     lv_style_list_set_local_color(&style_list, LV_STYLE_BG_COLOR, LV_COLOR_LIME);
 
     found = lv_style_list_get_int(&style_list, LV_STYLE_TEXT_LINE_SPACE, &value);
@@ -250,7 +250,7 @@ static void cascade(void)
     lv_test_assert_int_eq(LV_RES_OK, found, "Get a local 'opa' property");
     lv_test_assert_int_eq(LV_OPA_70, opa, "Get the value of a local 'opa' property");
 
-    found = lv_style_list_get_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
+    found = lv_style_list_get_data_ptr(&style_list, LV_STYLE_TEXT_FONT, &ptr);
     lv_test_assert_int_eq(LV_RES_OK, found, "Get a local 'ptr' property");
     lv_test_assert_ptr_eq(LV_THEME_DEFAULT_FONT_NORMAL + 2, ptr, "Get the value of a local'ptr' property");
 
@@ -469,17 +469,17 @@ static void mem_leak(void)
     lv_test_print("Use local style");
     lv_mem_monitor(&mon_start);
     for(i = 0; i < 100; i++) {
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED) << LV_STYLE_STATE_POS, LV_THEME_DEFAULT_FONT_NORMAL);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED) << LV_STYLE_STATE_POS, LV_THEME_DEFAULT_FONT_NORMAL);
 
         lv_style_list_reset(&style_list);
 
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED) << LV_STYLE_STATE_POS, NULL);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED) << LV_STYLE_STATE_POS, NULL);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
 
         lv_style_list_reset(&style_list);
     }
@@ -558,7 +558,7 @@ static void mem_leak(void)
 
     for(i = 0; i < 100; i++) {
         if(i % 2 == 0) {
-            lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_CLOSE);
+            lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_CLOSE);
         }
 
         _lv_style_set_color(&style1, LV_STYLE_LINE_COLOR, LV_COLOR_RED);
@@ -570,7 +570,7 @@ static void mem_leak(void)
 
 
         if(i % 4 == 0) {
-            lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_CLOSE);
+            lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_CLOSE);
         }
 
         lv_style_list_remove_style(&style_list, &style1);
@@ -585,7 +585,7 @@ static void mem_leak(void)
         lv_style_list_add_style(&style_list, &style2);
 
         if(i % 8 == 0) {
-            lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_CLOSE);
+            lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_CLOSE);
         }
 
         lv_style_list_add_style(&style_list, &style2);
@@ -603,14 +603,14 @@ static void mem_leak(void)
         _lv_style_set_int(&style3, LV_STYLE_PAD_LEFT, 12);
         _lv_style_set_int(&style3, LV_STYLE_PAD_RIGHT, 23);
 
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED) << LV_STYLE_STATE_POS, LV_THEME_DEFAULT_FONT_NORMAL);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED) << LV_STYLE_STATE_POS, NULL);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
-        lv_style_list_set_local_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED) << LV_STYLE_STATE_POS, LV_THEME_DEFAULT_FONT_NORMAL);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED) << LV_STYLE_STATE_POS, NULL);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
+        lv_style_list_set_local_data_ptr(&style_list, LV_STYLE_PATTERN_IMAGE, LV_SYMBOL_OK);
 
         lv_style_list_add_style(&style_list, &style3);
         lv_style_list_add_style(&style_list, &style2);
