@@ -756,9 +756,11 @@ static lv_res_t release_handler(lv_obj_t * roller)
 
     lv_obj_t * label = get_label(roller);
 
-    /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
-    uint16_t new_opt  = 0;
+    
+    
     if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
+        /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
+        uint16_t new_opt  = 0;
         lv_point_t p;
         lv_indev_get_point(indev, &p);
         p.y -= label->coords.y1;
@@ -778,9 +780,8 @@ static lv_res_t release_handler(lv_obj_t * roller)
             if(letter == '\n' && i_prev != letter_i) new_opt++;
             i_prev = i;
         }
+        lv_roller_set_selected(roller, new_opt, LV_ANIM_ON);
     }
-
-    lv_roller_set_selected(roller, new_opt, LV_ANIM_ON);
 
     uint32_t id  = ext->sel_opt_id; /*Just to use uint32_t in event data*/
     lv_res_t res = lv_event_send(roller, LV_EVENT_VALUE_CHANGED, &id);
