@@ -52,7 +52,7 @@ typedef struct {
 /*Styles*/
 enum {
     LV_GAUGE_PART_MAIN = LV_LINEMETER_PART_MAIN,
-    LV_GAUGE_PART_STRONG = _LV_LINEMETER_PART_VIRTUAL_LAST,
+    LV_GAUGE_PART_MAJOR = _LV_LINEMETER_PART_VIRTUAL_LAST,
     LV_GAUGE_PART_NEEDLE,
     _LV_GAUGE_PART_VIRTUAL_LAST = _LV_LINEMETER_PART_VIRTUAL_LAST,
     _LV_GAUGE_PART_REAL_LAST = _LV_LINEMETER_PART_REAL_LAST,
@@ -122,6 +122,16 @@ static inline void lv_gauge_set_critical_value(lv_obj_t * gauge, int16_t value)
  * @param label_cnt count of scale labels.
  */
 void lv_gauge_set_scale(lv_obj_t * gauge, uint16_t angle, uint8_t line_cnt, uint8_t label_cnt);
+
+/**
+ * Set the set an offset for the gauge's angles to rotate it.
+ * @param gauge pointer to a line meter object
+ * @param angle angle offset (0..360), rotates clockwise
+ */
+static inline void lv_gauge_set_angle_offset(lv_obj_t * gauge, uint16_t angle)
+{
+    lv_linemeter_set_angle_offset(gauge, angle);
+}
 
 /**
  * Set an image to display as needle(s).
@@ -208,6 +218,16 @@ static inline uint16_t lv_gauge_get_line_count(const lv_obj_t * gauge)
 static inline uint16_t lv_gauge_get_scale_angle(const lv_obj_t * gauge)
 {
     return lv_linemeter_get_scale_angle(gauge);
+}
+
+/**
+ * Get the offset for the gauge.
+ * @param gauge pointer to a gauge object
+ * @return angle offset (0..360)
+ */
+static inline uint16_t lv_gauge_get_angle_offset(lv_obj_t * gauge)
+{
+    return lv_linemeter_get_angle_offset(gauge);
 }
 
 /**

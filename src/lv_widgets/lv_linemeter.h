@@ -133,7 +133,7 @@ uint16_t lv_linemeter_get_line_count(const lv_obj_t * lmeter);
 uint16_t lv_linemeter_get_scale_angle(const lv_obj_t * lmeter);
 
 /**
- * get the set an offset for the line meter.
+ * Get the offset for the line meter.
  * @param lmeter pointer to a line meter object
  * @return angle offset (0..360)
  */

@@ -135,7 +135,7 @@ uint16_t lv_page_get_anim_time(const lv_obj_t * page);
  * @param page pointer to a page object
  * @param sb_mode the new mode from 'lv_page_sb.mode_t' enum
  */
-void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode);
+void lv_page_set_scrlbar_mode(lv_obj_t * page, lv_sb_mode_t sb_mode);
 
 /**
  * Set the animation time for the page

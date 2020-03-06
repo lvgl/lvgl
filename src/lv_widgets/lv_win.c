@@ -95,7 +95,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
         ext->page = lv_page_create(new_win, NULL);
         lv_obj_add_protect(ext->page, LV_PROTECT_PARENT);
-        lv_page_set_sb_mode(ext->page, LV_SB_MODE_AUTO);
+        lv_page_set_scrlbar_mode(ext->page, LV_SB_MODE_AUTO);
         lv_obj_clean_style_list(ext->page, LV_PAGE_PART_BG);
 
         /*Create a holder for the header*/
@@ -277,7 +277,7 @@ void lv_win_set_sb_mode(lv_obj_t * win, lv_sb_mode_t sb_mode)
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
-    lv_page_set_sb_mode(ext->page, sb_mode);
+    lv_page_set_scrlbar_mode(ext->page, sb_mode);
 }
 /**
  * Set focus animation duration on `lv_win_focus()`

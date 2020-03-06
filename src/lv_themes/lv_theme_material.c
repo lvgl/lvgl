@@ -1195,8 +1195,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_DROPDOWN
         case LV_THEME_DROPDOWN:
-            lv_obj_clean_style_list(obj, LV_DROPDOWN_PART_BTN);
-            list = lv_obj_get_style_list(obj, LV_DROPDOWN_PART_BTN);
+            lv_obj_clean_style_list(obj, LV_DROPDOWN_PART_MAIN);
+            list = lv_obj_get_style_list(obj, LV_DROPDOWN_PART_MAIN);
             lv_style_list_add_style(list, &ddlist_btn);
 
             lv_obj_clean_style_list(obj, LV_DROPDOWN_PART_LIST);
@@ -1378,8 +1378,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_GAUGE_PART_MAIN);
             lv_style_list_add_style(list, &gauge_main);
 
-            lv_obj_clean_style_list(obj, LV_GAUGE_PART_STRONG);
-            list = lv_obj_get_style_list(obj, LV_GAUGE_PART_STRONG);
+            lv_obj_clean_style_list(obj, LV_GAUGE_PART_MAJOR);
+            list = lv_obj_get_style_list(obj, LV_GAUGE_PART_MAJOR);
             lv_style_list_add_style(list, &gauge_strong);
 
             lv_obj_clean_style_list(obj, LV_GAUGE_PART_NEEDLE);

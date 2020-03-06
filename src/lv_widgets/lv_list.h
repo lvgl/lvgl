@@ -124,7 +124,7 @@ void lv_list_focus_btn(lv_obj_t * list, lv_obj_t * btn);
  */
 static inline void lv_list_set_sb_mode(lv_obj_t * list, lv_sb_mode_t mode)
 {
-    lv_page_set_sb_mode(list, mode);
+    lv_page_set_scrlbar_mode(list, mode);
 }
 
 /**

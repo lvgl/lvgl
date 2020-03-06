@@ -118,8 +118,9 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
             ext->values[i] = copy_ext->values[i];
         }
         ext->label_count = copy_ext->label_count;
+
         /*Refresh the style with new signal function*/
-        //        lv_obj_refresh_style(new_gauge);
+        lv_obj_refresh_style(new_gauge);
     }
 
     LV_LOG_INFO("gauge created");
@@ -358,7 +359,7 @@ static lv_design_res_t lv_gauge_design(lv_obj_t * gauge, const lv_area_t * clip_
         /*Add the strong lines*/
         uint16_t line_cnt_tmp = ext->lmeter.line_cnt;
         ext->lmeter.line_cnt         = ext->label_count;                 /*Only to labels*/
-        lv_linemeter_draw_scale(gauge, clip_area, LV_GAUGE_PART_STRONG);
+        lv_linemeter_draw_scale(gauge, clip_area, LV_GAUGE_PART_MAJOR);
         ext->lmeter.line_cnt = line_cnt_tmp; /*Restore the parameters*/
 
         lv_gauge_draw_needle(gauge, clip_area);
@@ -398,7 +399,7 @@ static lv_res_t lv_gauge_signal(lv_obj_t * gauge, lv_signal_t sign, void * param
         lv_mem_free(ext->values);
         ext->values = NULL;
         lv_obj_clean_style_list(gauge, LV_GAUGE_PART_NEEDLE);
-        lv_obj_clean_style_list(gauge, LV_GAUGE_PART_STRONG);
+        lv_obj_clean_style_list(gauge, LV_GAUGE_PART_MAJOR);
     }
 
     return res;
@@ -420,7 +421,7 @@ static lv_style_list_t * lv_gauge_get_style(lv_obj_t * gauge, uint8_t part)
         case LV_GAUGE_PART_MAIN:
             style_dsc_p = &gauge->style_list;
             break;
-        case LV_GAUGE_PART_STRONG:
+        case LV_GAUGE_PART_MAJOR:
             style_dsc_p = &ext->style_strong;
             break;
         case LV_GAUGE_PART_NEEDLE:
@@ -442,7 +443,7 @@ static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask)
     char scale_txt[16];
 
     lv_gauge_ext_t * ext     = lv_obj_get_ext_attr(gauge);
-    lv_style_int_t scale_width = lv_obj_get_style_scale_width(gauge, LV_GAUGE_PART_STRONG);
+    lv_style_int_t scale_width = lv_obj_get_style_scale_width(gauge, LV_GAUGE_PART_MAJOR);
     lv_style_int_t left = lv_obj_get_style_pad_left(gauge, LV_GAUGE_PART_MAIN);
     lv_style_int_t right = lv_obj_get_style_pad_right(gauge, LV_GAUGE_PART_MAIN);
     lv_style_int_t top = lv_obj_get_style_pad_top(gauge, LV_GAUGE_PART_MAIN);
@@ -458,7 +459,7 @@ static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask)
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
-    lv_obj_init_draw_label_dsc(gauge, LV_GAUGE_PART_STRONG, &label_dsc);
+    lv_obj_init_draw_label_dsc(gauge, LV_GAUGE_PART_MAJOR, &label_dsc);
 
     uint8_t i;
     for(i = 0; i < label_num; i++) {
@@ -563,7 +564,6 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
             lv_draw_img(&a, clip_area, ext->needle_img, &img_dsc);
         }
     }
-
 
     lv_draw_rect_dsc_t mid_dsc;
     lv_draw_rect_dsc_init(&mid_dsc);

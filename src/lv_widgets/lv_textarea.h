@@ -226,7 +226,7 @@ void lv_textarea_set_insert_replace(lv_obj_t * ta, const char * txt);
  */
 static inline void lv_textarea_set_sb_mode(lv_obj_t * ta, lv_sb_mode_t mode)
 {
-    lv_page_set_sb_mode(ta, mode);
+    lv_page_set_scrlbar_mode(ta, mode);
 }
 
 /**

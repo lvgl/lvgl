@@ -129,7 +129,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_signal_cb(page, lv_page_signal);
         lv_obj_set_design_cb(page, lv_page_design);
 
-        lv_page_set_sb_mode(page, ext->scrlbar.mode);
+        lv_page_set_scrlbar_mode(page, ext->scrlbar.mode);
 
         lv_theme_apply(page, LV_THEME_PAGE);
 
@@ -148,7 +148,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         //        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, lv_page_get_style(copy, LV_PAGE_STYLE_SCRL));
         //        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRLBAR, lv_page_get_style(copy, LV_PAGE_STYLE_SCRLBAR));
 
-        lv_page_set_sb_mode(page, copy_ext->scrlbar.mode);
+        lv_page_set_scrlbar_mode(page, copy_ext->scrlbar.mode);
     }
 
 
@@ -180,7 +180,7 @@ void lv_page_clean(lv_obj_t * page)
  * @param page pointer to a page object
  * @param sb_mode the new mode from 'lv_page_sb.mode_t' enum
  */
-void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
+void lv_page_set_scrlbar_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 

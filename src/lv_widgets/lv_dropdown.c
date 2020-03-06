@@ -89,7 +89,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("drop down list create started");
 
     /*Create the ancestor drop down list*/
-    lv_obj_t * ddlist = lv_btn_create(par, copy);
+    lv_obj_t * ddlist = lv_obj_create(par, copy);
     LV_ASSERT_MEM(ddlist);
     if(ddlist == NULL) return NULL;
 
@@ -116,7 +116,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->pr_opt_id = LV_DROPDOWN_PR_NONE;
     ext->option_cnt      = 0;
     ext->dir = LV_DROPDOWN_DIR_DOWN;
-    ext->max_height = LV_DPI * 2;
+    ext->max_height = (3 * lv_disp_get_ver_res(NULL)) / 4;
     ext->anim_time = LV_DROPDOWN_DEF_ANIM_TIME;
     lv_style_list_init(&ext->style_page);
     lv_style_list_init(&ext->style_scrlbar);
@@ -326,10 +326,26 @@ void lv_dropdown_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
 }
 
 /**
- * Set a fix height for the drop down list
- * If 0 then the opened ddlist will be auto. sized else the set height will be applied.
+ * Set the direction of the a drop down list
+ * @param ddlist pointer to a drop down list object
+ * @param dir LV_DROPDOWN_DIR_LEF/RIGHT/TOP/BOTTOM
+ */
+void lv_dropdown_set_dir(lv_obj_t * ddlist, lv_dropdown_dir_t dir)
+{
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
+    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    if(ext->dir == dir) return;
+
+    ext->dir = dir;
+
+    lv_obj_invalidate(ddlist);
+}
+
+/**
+ * Set the maximal height for the drop down list
  * @param ddlist pointer to a drop down list
- * @param h the height when the list is opened (0: auto size)
+ * @param h the maximal height
  */
 void lv_dropdown_set_max_height(lv_obj_t * ddlist, lv_coord_t h)
 {
@@ -362,23 +378,6 @@ void lv_dropdown_set_symbol(lv_obj_t * ddlist, const char * symbol)
 
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     ext->symbol = symbol;
-    lv_obj_invalidate(ddlist);
-}
-
-/**
- * Set the direction of the a drop down list
- * @param ddlist pointer to a drop down list object
- * @param dir LV_DROPDOWN_DIR_LEF/RIGHT/TOP/BOTTOM
- */
-void lv_dropdown_set_dir(lv_obj_t * ddlist, lv_dropdown_dir_t dir)
-{
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
-
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    if(ext->dir == dir) return;
-
-    ext->dir = dir;
-
     lv_obj_invalidate(ddlist);
 }
 
@@ -695,13 +694,13 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
 
         lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
-        lv_style_int_t left = lv_obj_get_style_pad_left(ddlist, LV_DROPDOWN_PART_BTN);
-        lv_style_int_t right = lv_obj_get_style_pad_right(ddlist, LV_DROPDOWN_PART_BTN);
-        lv_style_int_t top = lv_obj_get_style_pad_top(ddlist, LV_DROPDOWN_PART_BTN);
+        lv_style_int_t left = lv_obj_get_style_pad_left(ddlist, LV_DROPDOWN_PART_MAIN);
+        lv_style_int_t right = lv_obj_get_style_pad_right(ddlist, LV_DROPDOWN_PART_MAIN);
+        lv_style_int_t top = lv_obj_get_style_pad_top(ddlist, LV_DROPDOWN_PART_MAIN);
 
         lv_draw_label_dsc_t label_dsc;
         lv_draw_label_dsc_init(&label_dsc);
-        lv_obj_init_draw_label_dsc(ddlist, LV_DROPDOWN_PART_BTN, &label_dsc);
+        lv_obj_init_draw_label_dsc(ddlist, LV_DROPDOWN_PART_MAIN, &label_dsc);
 
         lv_area_t txt_area;
         lv_point_t txt_size;
@@ -915,9 +914,9 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
         if(ext->page) lv_dropdown_close(ddlist, LV_ANIM_OFF);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_style_int_t top = lv_obj_get_style_pad_top(ddlist, LV_DROPDOWN_PART_BTN);
-        lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ddlist, LV_DROPDOWN_PART_BTN);
-        const lv_font_t * font = lv_obj_get_style_text_font(ddlist, LV_DROPDOWN_PART_BTN);
+        lv_style_int_t top = lv_obj_get_style_pad_top(ddlist, LV_DROPDOWN_PART_MAIN);
+        lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ddlist, LV_DROPDOWN_PART_MAIN);
+        const lv_font_t * font = lv_obj_get_style_text_font(ddlist, LV_DROPDOWN_PART_MAIN);
         lv_obj_set_height(ddlist, top + bottom + lv_font_get_line_height(font));
 
         if(ext->page) lv_obj_refresh_style(ext->page);
@@ -1060,7 +1059,7 @@ static lv_style_list_t * lv_dropdown_get_style(lv_obj_t * ddlist, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-        case LV_DROPDOWN_PART_BTN:
+        case LV_DROPDOWN_PART_MAIN:
             style_dsc_p = &ddlist->style_list;
             break;
         case LV_DROPDOWN_PART_LIST:
