@@ -71,7 +71,7 @@ Just to mention some **platforms**:
 - NXP Kinetis, LPC, iMX
 - [Linux frame buffer](https://blog.littlevgl.com/2018-01-03/linux_fb) (/dev/fb)
 - [Raspberry PI](http://www.vk3erw.com/index.php/16-software/63-raspberry-pi-official-7-touchscreen-and-littlevgl)
-- [Espressif ESP32](https://github.com/littlevgl/esp32_ili9431)
+- [Espressif ESP32](https://github.com/littlevgl/lv_port_esp32)
 - Nordic nrf52
 - Quectell M66
 
