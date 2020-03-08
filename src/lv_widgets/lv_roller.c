@@ -225,6 +225,13 @@ void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, lv_anim_enable_
      * nothing will continue the animation. */
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+
+    /*In infinite mode interpret the new ID relative to the currently visible "page"*/
+    if(ext->mode == LV_ROLLER_MODE_INIFINITE) {
+        uint16_t page = ext->sel_opt_id / LV_ROLLER_INF_PAGES;
+        sel_opt = page * LV_ROLLER_INF_PAGES + sel_opt;
+    }
+
     ext->sel_opt_id     = sel_opt < ext->option_cnt ? sel_opt : ext->option_cnt - 1;
     ext->sel_opt_id_ori = ext->sel_opt_id;
 
