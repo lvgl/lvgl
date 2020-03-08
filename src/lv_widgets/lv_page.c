@@ -99,7 +99,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_style_list_init(&ext->scrlbar.style);
     ext->scrlbar.hor_draw = 0;
     ext->scrlbar.ver_draw = 0;
-    ext->scrlbar.mode     = LV_SB_MODE_AUTO;
+    ext->scrlbar.mode     = LV_SCRLBAR_MODE_AUTO;
 #if LV_USE_ANIMATION
     lv_style_list_init(&ext->edge_flash.style);
     ext->edge_flash.enabled   = 0;
@@ -180,19 +180,19 @@ void lv_page_clean(lv_obj_t * page)
  * @param page pointer to a page object
  * @param sb_mode the new mode from 'lv_page_sb.mode_t' enum
  */
-void lv_page_set_scrlbar_mode(lv_obj_t * page, lv_sb_mode_t sb_mode)
+void lv_page_set_scrlbar_mode(lv_obj_t * page, lv_scrlbar_mode_t sb_mode)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     if(ext->scrlbar.mode == sb_mode) return;
 
-    if(sb_mode == LV_SB_MODE_HIDE)
-        ext->scrlbar.mode |= LV_SB_MODE_HIDE; /*Set the hidden flag*/
-    else if(sb_mode == LV_SB_MODE_UNHIDE)
-        ext->scrlbar.mode &= (~LV_SB_MODE_HIDE); /*Clear the hidden flag*/
+    if(sb_mode == LV_SCRLBAR_MODE_HIDE)
+        ext->scrlbar.mode |= LV_SCRLBAR_MODE_HIDE; /*Set the hidden flag*/
+    else if(sb_mode == LV_SCRLBAR_MODE_UNHIDE)
+        ext->scrlbar.mode &= (~LV_SCRLBAR_MODE_HIDE); /*Clear the hidden flag*/
     else {
-        if(ext->scrlbar.mode & LV_SB_MODE_HIDE) sb_mode |= LV_SB_MODE_HIDE;
+        if(ext->scrlbar.mode & LV_SCRLBAR_MODE_HIDE) sb_mode |= LV_SCRLBAR_MODE_HIDE;
         ext->scrlbar.mode = sb_mode;
     }
 
@@ -299,7 +299,7 @@ uint16_t lv_page_get_anim_time(const lv_obj_t * page)
  * @param page pointer to a page object
  * @return the mode from 'lv_page_sb.mode_t' enum
  */
-lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page)
+lv_scrlbar_mode_t lv_page_get_sb_mode(const lv_obj_t * page)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 
@@ -659,11 +659,11 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
             lv_draw_rect_dsc_t rect_dsc;
             lv_draw_rect_dsc_init(&rect_dsc);
             lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCRLBAR, &rect_dsc);
-            if(ext->scrlbar.hor_draw && (ext->scrlbar.mode & LV_SB_MODE_HIDE) == 0) {
+            if(ext->scrlbar.hor_draw && (ext->scrlbar.mode & LV_SCRLBAR_MODE_HIDE) == 0) {
                 lv_draw_rect(&sb_hor_area, clip_area, &rect_dsc);
             }
 
-            if(ext->scrlbar.ver_draw && (ext->scrlbar.mode & LV_SB_MODE_HIDE) == 0) {
+            if(ext->scrlbar.ver_draw && (ext->scrlbar.mode & LV_SCRLBAR_MODE_HIDE) == 0) {
                 lv_draw_rect(&sb_ver_area, clip_area, &rect_dsc);
             }
         }
@@ -1008,7 +1008,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
 
         /*Hide scrollbars if required*/
-        if(page_ext->scrlbar.mode == LV_SB_MODE_DRAG) {
+        if(page_ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) {
             lv_area_t sb_area_tmp;
             if(page_ext->scrlbar.hor_draw) {
                 lv_area_copy(&sb_area_tmp, &page_ext->scrlbar.hor_area);
@@ -1136,9 +1136,9 @@ static void lv_page_sb_refresh(lv_obj_t * page)
     lv_coord_t sb_hor_pad = LV_MATH_MAX(sb_width, sb_right);
     lv_coord_t sb_ver_pad = LV_MATH_MAX(sb_width, sb_bottom);
 
-    if(ext->scrlbar.mode == LV_SB_MODE_OFF) return;
+    if(ext->scrlbar.mode == LV_SCRLBAR_MODE_OFF) return;
 
-    if(ext->scrlbar.mode == LV_SB_MODE_ON) {
+    if(ext->scrlbar.mode == LV_SCRLBAR_MODE_ON) {
         ext->scrlbar.hor_draw = 1;
         ext->scrlbar.ver_draw = 1;
     }
@@ -1162,7 +1162,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         lv_obj_invalidate_area(page, &sb_area_tmp);
     }
 
-    if(ext->scrlbar.mode == LV_SB_MODE_DRAG && lv_indev_is_dragging(lv_indev_get_act()) == false) {
+    if(ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG && lv_indev_is_dragging(lv_indev_get_act()) == false) {
         ext->scrlbar.hor_draw = 0;
         ext->scrlbar.ver_draw = 0;
         return;
@@ -1173,7 +1173,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         lv_area_set_width(&ext->scrlbar.hor_area, obj_w - 2 * sb_hor_pad);
         lv_area_set_pos(&ext->scrlbar.hor_area, sb_hor_pad,
                         obj_h - sb_width - sb_bottom);
-        if(ext->scrlbar.mode == LV_SB_MODE_AUTO || ext->scrlbar.mode == LV_SB_MODE_DRAG) ext->scrlbar.hor_draw = 0;
+        if(ext->scrlbar.mode == LV_SCRLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) ext->scrlbar.hor_draw = 0;
     }
     /*Smaller horizontal scrollbar*/
     else {
@@ -1188,7 +1188,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
                         (scrl_w + bg_left + bg_right - obj_w),
                         obj_h - sb_width - sb_bottom);
 
-        if(ext->scrlbar.mode == LV_SB_MODE_AUTO || ext->scrlbar.mode == LV_SB_MODE_DRAG) ext->scrlbar.hor_draw = 1;
+        if(ext->scrlbar.mode == LV_SCRLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) ext->scrlbar.hor_draw = 1;
     }
 
     /*Full sized vertical scroll bar*/
@@ -1196,7 +1196,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
         lv_area_set_height(&ext->scrlbar.ver_area, obj_h - 2 * sb_ver_pad);
         lv_area_set_pos(&ext->scrlbar.ver_area,
                         obj_w - sb_width - sb_right, sb_ver_pad);
-        if(ext->scrlbar.mode == LV_SB_MODE_AUTO || ext->scrlbar.mode == LV_SB_MODE_DRAG) ext->scrlbar.ver_draw = 0;
+        if(ext->scrlbar.mode == LV_SCRLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 0;
     }
     /*Smaller vertical scroll bar*/
     else {
@@ -1211,7 +1211,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
                                       (obj_h - size_tmp - 2 * sb_ver_pad)) /
                         (scrl_h + bg_top + bg_bottom - obj_h));
 
-        if(ext->scrlbar.mode == LV_SB_MODE_AUTO || ext->scrlbar.mode == LV_SB_MODE_DRAG) ext->scrlbar.ver_draw = 1;
+        if(ext->scrlbar.mode == LV_SCRLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 1;
     }
 
     /*Invalidate the new scrollbar areas*/

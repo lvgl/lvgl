@@ -143,7 +143,7 @@ void lv_win_set_layout(lv_obj_t * win, lv_layout_t layout);
  * @param win pointer to a window object
  * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
  */
-void lv_win_set_sb_mode(lv_obj_t * win, lv_sb_mode_t sb_mode);
+void lv_win_set_sb_mode(lv_obj_t * win, lv_scrlbar_mode_t sb_mode);
 
 /**
  * Set focus animation duration on `lv_win_focus()`
@@ -211,7 +211,7 @@ lv_layout_t lv_win_get_layout(lv_obj_t * win);
  * @param win pointer to a window object
  * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
  */
-lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t * win);
+lv_scrlbar_mode_t lv_win_get_sb_mode(lv_obj_t * win);
 
 /**
  * Get focus animation duration

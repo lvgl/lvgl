@@ -224,7 +224,7 @@ void lv_textarea_set_insert_replace(lv_obj_t * ta, const char * txt);
  * @param ta pointer to a text area object
  * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
  */
-static inline void lv_textarea_set_sb_mode(lv_obj_t * ta, lv_sb_mode_t mode)
+static inline void lv_textarea_set_sb_mode(lv_obj_t * ta, lv_scrlbar_mode_t mode)
 {
     lv_page_set_scrlbar_mode(ta, mode);
 }
@@ -350,7 +350,7 @@ uint16_t lv_textarea_get_max_length(lv_obj_t * ta);
  * @param ta pointer to a text area object
  * @return scrollbar mode from 'lv_page_sb_mode_t' enum
  */
-static inline lv_sb_mode_t lv_textarea_get_sb_mode(const lv_obj_t * ta)
+static inline lv_scrlbar_mode_t lv_textarea_get_sb_mode(const lv_obj_t * ta)
 {
     return lv_page_get_sb_mode(ta);
 }

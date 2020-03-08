@@ -95,7 +95,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
         ext->page = lv_page_create(new_win, NULL);
         lv_obj_add_protect(ext->page, LV_PROTECT_PARENT);
-        lv_page_set_scrlbar_mode(ext->page, LV_SB_MODE_AUTO);
+        lv_page_set_scrlbar_mode(ext->page, LV_SCRLBAR_MODE_AUTO);
         lv_obj_clean_style_list(ext->page, LV_PAGE_PART_BG);
 
         /*Create a holder for the header*/
@@ -272,7 +272,7 @@ void lv_win_set_layout(lv_obj_t * win, lv_layout_t layout)
  * @param win pointer to a window object
  * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
  */
-void lv_win_set_sb_mode(lv_obj_t * win, lv_sb_mode_t sb_mode)
+void lv_win_set_sb_mode(lv_obj_t * win, lv_scrlbar_mode_t sb_mode)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
 
@@ -383,7 +383,7 @@ lv_layout_t lv_win_get_layout(lv_obj_t * win)
  * @param win pointer to a window object
  * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
  */
-lv_sb_mode_t lv_win_get_sb_mode(lv_obj_t * win)
+lv_scrlbar_mode_t lv_win_get_sb_mode(lv_obj_t * win)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
 

@@ -687,8 +687,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
             lv_style_list_add_style(list, &style_bg);
 
-            lv_obj_clean_style_list(obj, LV_ROLLER_PART_SEL);
-            list = lv_obj_get_style_list(obj, LV_ROLLER_PART_SEL);
+            lv_obj_clean_style_list(obj, LV_ROLLER_PART_SELECTED);
+            list = lv_obj_get_style_list(obj, LV_ROLLER_PART_SELECTED);
             lv_style_list_add_style(list, &style_bg);
             lv_style_list_add_style(list, &style_color);
             break;

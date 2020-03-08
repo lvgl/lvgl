@@ -103,7 +103,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
 
         lv_obj_t * scrl = lv_page_get_scrl(roller);
-        lv_obj_set_drag(scrl, true);                                  /*In ddlist it might be disabled*/
+        lv_obj_set_drag(scrl, true);
         lv_page_set_scrl_fit2(roller, LV_FIT_PARENT, LV_FIT_NONE); /*Height is specified directly*/
         lv_roller_set_anim_time(roller, LV_ROLLER_DEF_ANIM_TIME);
         lv_roller_set_options(roller, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
@@ -389,14 +389,14 @@ static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * cli
 
         lv_draw_rect_dsc_t sel_dsc;
         lv_draw_rect_dsc_init(&sel_dsc);
-        lv_obj_init_draw_rect_dsc(roller, LV_ROLLER_PART_SEL, &sel_dsc);
+        lv_obj_init_draw_rect_dsc(roller, LV_ROLLER_PART_SELECTED, &sel_dsc);
         lv_draw_rect(&rect_area, clip_area, &sel_dsc);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
         lv_draw_label_dsc_t label_dsc;
         lv_draw_label_dsc_init(&label_dsc);
-        lv_obj_init_draw_label_dsc(roller, LV_ROLLER_PART_SEL, &label_dsc);
+        lv_obj_init_draw_label_dsc(roller, LV_ROLLER_PART_SELECTED, &label_dsc);
 
         lv_coord_t font_h        = lv_font_get_line_height(label_dsc.font);
 
@@ -527,7 +527,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         }
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
-        lv_obj_clean_style_list(roller, LV_ROLLER_PART_SEL);
+        lv_obj_clean_style_list(roller, LV_ROLLER_PART_SELECTED);
     }
     return res;
 }
@@ -549,7 +549,7 @@ static lv_style_list_t * lv_roller_get_style(lv_obj_t * roller, uint8_t part)
         case LV_ROLLER_PART_BG:
             style_dsc_p = &roller->style_list;
             break;
-        case LV_ROLLER_PART_SEL:
+        case LV_ROLLER_PART_SELECTED:
             style_dsc_p = &ext->style_sel;
             break;
         default:

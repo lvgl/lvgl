@@ -35,10 +35,11 @@ extern "C" {
 
 enum {
     LV_SLIDER_TYPE_NORMAL,
-    LV_SLIDER_TYPE_SYM,
+    LV_SLIDER_TYPE_SYMMETRICAL,
     LV_SLIDER_TYPE_RANGE
 };
 typedef uint8_t lv_slider_type_t;
+
 /*Data of slider*/
 typedef struct {
     lv_bar_ext_t bar; /*Ext. of ancestor*/
@@ -56,7 +57,6 @@ enum {
     LV_SLIDER_PART_INDIC, /** Slider indicator (filled area) style. */
     LV_SLIDER_PART_KNOB, /** Slider knob style. */
 };
-typedef uint8_t lv_slider_style_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -127,7 +127,7 @@ static inline void lv_slider_set_type(lv_obj_t * slider, lv_slider_type_t type)
 {
     if(type == LV_SLIDER_TYPE_NORMAL)
         lv_bar_set_type(slider, LV_BAR_TYPE_NORMAL);
-    else if(type == LV_SLIDER_TYPE_SYM)
+    else if(type == LV_SLIDER_TYPE_SYMMETRICAL)
         lv_bar_set_type(slider, LV_BAR_TYPE_SYMMETRICAL);
     else if(type == LV_SLIDER_TYPE_RANGE)
         lv_bar_set_type(slider, LV_BAR_TYPE_CUSTOM);
@@ -182,13 +182,6 @@ static inline int16_t lv_slider_get_max_value(const lv_obj_t * slider)
 bool lv_slider_is_dragged(const lv_obj_t * slider);
 
 /**
- * Get an image to display on the knob of the slider
- * @param slider pointer to a slider object
- * @return the image source: pointer to an `lv_img_dsc_t` variable or a path to an image  (not an `lv_img` object)
- */
-const void * lv_slider_get_knob_img(lv_obj_t * slider, const void * img_src);
-
-/**
  * Get the animation time of the slider
  * @param slider pointer to a slider object
  * @return the animation time in milliseconds.
@@ -207,7 +200,7 @@ static inline lv_slider_type_t lv_slider_get_type(lv_obj_t * slider)
 {
     lv_bar_type_t type = lv_bar_get_type(slider);
     if(type == LV_BAR_TYPE_SYMMETRICAL)
-        return LV_SLIDER_TYPE_SYM;
+        return LV_SLIDER_TYPE_SYMMETRICAL;
     else if(type == LV_BAR_TYPE_CUSTOM)
         return LV_SLIDER_TYPE_RANGE;
     else

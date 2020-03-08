@@ -140,7 +140,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_page_set_scrl_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_PARENT);
         lv_page_set_scrl_layout(ext->content, LV_LAYOUT_ROW_TOP);
-        lv_page_set_scrlbar_mode(ext->content, LV_SB_MODE_OFF);
+        lv_page_set_scrlbar_mode(ext->content, LV_SCRLBAR_MODE_OFF);
 
         lv_obj_clean_style_list(ext->content, LV_PAGE_PART_BG);
 
@@ -226,7 +226,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     /*Create the container page*/
     lv_obj_t * h = lv_page_create(ext->content, NULL);
     lv_obj_set_size(h, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
-    lv_page_set_scrlbar_mode(h, LV_SB_MODE_AUTO);
+    lv_page_set_scrlbar_mode(h, LV_SCRLBAR_MODE_AUTO);
     lv_page_set_scroll_propagation(h, true);
     lv_theme_apply(h, LV_THEME_TABVIEW_PAGE);
 

@@ -408,9 +408,12 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
     else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_get_state_info_t * info = param;
         lv_msgbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-        if(ext->btnm && info->part == LV_MSGBOX_PART_BTN_BG) info->result = lv_obj_get_state(ext->btnm, LV_BTNMATRIX_PART_BG);
-        else if(ext->btnm &&
-                info->part == LV_MSGBOX_PART_BTN) info->result = lv_obj_get_state(ext->btnm, LV_BTNMATRIX_PART_BTN);
+        if(ext->btnm && info->part == LV_MSGBOX_PART_BTN_BG) {
+            info->result = lv_obj_get_state(ext->btnm, LV_BTNMATRIX_PART_BG);
+        }
+        else if(ext->btnm && info->part == LV_MSGBOX_PART_BTN) {
+            info->result = lv_obj_get_state(ext->btnm, LV_BTNMATRIX_PART_BTN);
+        }
         return LV_RES_OK;
     }
 

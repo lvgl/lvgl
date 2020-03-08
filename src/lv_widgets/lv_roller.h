@@ -58,7 +58,7 @@ typedef struct {
 
 enum {
     LV_ROLLER_PART_BG = LV_PAGE_PART_BG,
-    LV_ROLLER_PART_SEL = _LV_PAGE_PART_VIRTUAL_LAST,
+    LV_ROLLER_PART_SELECTED = _LV_PAGE_PART_VIRTUAL_LAST,
     _LV_ROLLER_PART_VIRTUAL_LAST,
 };
 typedef uint8_t lv_roller_part_t;
@@ -168,12 +168,6 @@ static inline uint16_t lv_roller_get_anim_time(const lv_obj_t * roller)
     return lv_page_get_anim_time(roller);
 }
 
-/**
- * Get the auto width set attribute
- * @param roller pointer to a roller object
- * @return true: auto size enabled; false: manual width settings enabled
- */
-bool lv_roller_get_hor_fit(const lv_obj_t * roller);
 
 /**********************
  *      MACROS
