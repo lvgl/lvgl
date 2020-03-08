@@ -389,6 +389,13 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
     lv_obj_invalidate(obj);
 
+    lv_disp_t * disp = NULL;
+    bool act_scr_del = false;
+    if(obj->parent == NULL) {
+         disp = lv_obj_get_disp(obj);
+         if(disp->act_scr == obj) act_scr_del = true;
+    }
+
     /*Delete from the group*/
 #if LV_USE_GROUP
     lv_group_t * group = lv_obj_get_group(obj);
@@ -465,6 +472,11 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     /*Send a signal to the parent to notify it about the child delete*/
     if(par != NULL) {
         par->signal_cb(par, LV_SIGNAL_CHILD_CHG, NULL);
+    }
+
+    /*Handle if the active screen was deleted*/
+    if(act_scr_del)  {
+        disp->act_scr = NULL;
     }
 
     return LV_RES_INV;
