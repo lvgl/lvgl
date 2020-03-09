@@ -55,7 +55,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy);
 /**
  * Set the brightness of a LED object
  * @param led pointer to a LED object
- * @param bright 0 (max. dark) ... 255 (max. light)
+ * @param bright LV_LED_BRIGHT_MIN (max. dark) ... LV_LED_BRIGHT_MAX (max. light)
  */
 void lv_led_set_bright(lv_obj_t * led, uint8_t bright);
 

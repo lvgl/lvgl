@@ -20,8 +20,6 @@
 
 #define LV_LED_WIDTH_DEF (LV_DPI / 3)
 #define LV_LED_HEIGHT_DEF (LV_DPI / 3)
-#define LV_LED_BRIGHT_OFF 60
-#define LV_LED_BRIGHT_ON 255
 
 /**********************
  *      TYPEDEFS
@@ -73,7 +71,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
         return NULL;
     }
 
-    ext->bright = LV_LED_BRIGHT_ON;
+    ext->bright = LV_LED_BRIGHT_MAX;
 
     lv_obj_set_signal_cb(led, lv_led_signal);
     lv_obj_set_design_cb(led, lv_led_design);
@@ -105,7 +103,7 @@ lv_obj_t * lv_led_create(lv_obj_t * par, const lv_obj_t * copy)
 /**
  * Set the brightness of a LED object
  * @param led pointer to a LED object
- * @param bright 0 (max. dark) ... 255 (max. light)
+ * @param bright LV_LED_BRIGHT_MIN (max. dark) ... LV_LED_BRIGHT_MAX (max. light)
  */
 void lv_led_set_bright(lv_obj_t * led, uint8_t bright)
 {
@@ -114,6 +112,9 @@ void lv_led_set_bright(lv_obj_t * led, uint8_t bright)
     /*Set the brightness*/
     lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
     if(ext->bright == bright) return;
+
+    if(bright < LV_LED_BRIGHT_MIN) bright = LV_LED_BRIGHT_MIN;
+    if(bright > LV_LED_BRIGHT_MAX) bright = LV_LED_BRIGHT_MAX;
 
     ext->bright = bright;
 
@@ -129,7 +130,7 @@ void lv_led_on(lv_obj_t * led)
 {
     LV_ASSERT_OBJ(led, LV_OBJX_NAME);
 
-    lv_led_set_bright(led, LV_LED_BRIGHT_ON);
+    lv_led_set_bright(led, LV_LED_BRIGHT_MAX);
 }
 
 /**
@@ -140,7 +141,7 @@ void lv_led_off(lv_obj_t * led)
 {
     LV_ASSERT_OBJ(led, LV_OBJX_NAME);
 
-    lv_led_set_bright(led, LV_LED_BRIGHT_OFF);
+    lv_led_set_bright(led, LV_LED_BRIGHT_MIN);
 }
 
 /**
@@ -152,7 +153,7 @@ void lv_led_toggle(lv_obj_t * led)
     LV_ASSERT_OBJ(led, LV_OBJX_NAME);
 
     uint8_t bright = lv_led_get_bright(led);
-    if(bright > (LV_LED_BRIGHT_OFF + LV_LED_BRIGHT_ON) >> 1)
+    if(bright > (LV_LED_BRIGHT_MIN + LV_LED_BRIGHT_MAX) >> 1)
         lv_led_off(led);
     else
         lv_led_on(led);
@@ -211,8 +212,8 @@ static lv_design_res_t lv_led_design(lv_obj_t * led, const lv_area_t * clip_area
 
         /*Set the current shadow width according to brightness proportionally between LV_LED_BRIGHT_OFF
          * and LV_LED_BRIGHT_ON*/
-        rect_dsc.shadow_width = ((ext->bright - LV_LED_BRIGHT_OFF) * rect_dsc.shadow_width) /
-                                (LV_LED_BRIGHT_ON - LV_LED_BRIGHT_OFF);
+        rect_dsc.shadow_width = ((ext->bright - LV_LED_BRIGHT_MIN) * rect_dsc.shadow_width) /
+                                (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
 
         lv_draw_rect(&led->coords, clip_area, &rect_dsc);
     }

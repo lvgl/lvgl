@@ -522,6 +522,10 @@ typedef void * lv_obj_user_data_t;
 
 /*LED (dependencies: -)*/
 #define LV_USE_LED      1
+#if LV_USE_LED
+#  define LV_LED_BRIGHT_MIN  60      /*Minimal brightness*/
+#  define LV_LED_BRIGHT_MAX  255     /*Maximal brightness*/
+#endif
 
 /*Line (dependencies: -*/
 #define LV_USE_LINE     1
