@@ -1551,7 +1551,6 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         props[4] = lv_obj_get_style_transition_prop_5(obj, part);
         props[5] = lv_obj_get_style_transition_prop_6(obj, part);
 
-
         uint8_t i;
         for(i = 0; i < LV_STYLE_TRANS_NUM_MAX; i++) {
             if(props[i] != 0) {
@@ -1565,23 +1564,18 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
                     tr->prop = props[i];
                     tr->part = part;
 
-                    if(time == 0) {
-                        trans_anim_cb(tr, 255);
-                    }
-                    else {
-                        lv_anim_t a;
-                        lv_anim_init(&a);
-                        lv_anim_set_var(&a, tr);
-                        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)trans_anim_cb);
-                        lv_anim_set_start_cb(&a, trans_anim_start_cb);
-                        lv_anim_set_ready_cb(&a, trans_anim_ready_cb);
-                        lv_anim_set_values(&a, 0x00, 0xFF);
-                        lv_anim_set_time(&a, time);
-                        lv_anim_set_delay(&a, delay);
-                        lv_anim_set_path_cb(&a, path);
-                        a.early_apply = 0;
-                        lv_anim_start(&a);
-                    }
+                    lv_anim_t a;
+                    lv_anim_init(&a);
+                    lv_anim_set_var(&a, tr);
+                    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)trans_anim_cb);
+                    lv_anim_set_start_cb(&a, trans_anim_start_cb);
+                    lv_anim_set_ready_cb(&a, trans_anim_ready_cb);
+                    lv_anim_set_values(&a, 0x00, 0xFF);
+                    lv_anim_set_time(&a, time);
+                    lv_anim_set_delay(&a, delay);
+                    lv_anim_set_path_cb(&a, path);
+                    a.early_apply = 0;
+                    lv_anim_start(&a);
                 }
 
             }
