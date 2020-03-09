@@ -95,7 +95,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->content      = NULL;
     ext->indic        = NULL;
     ext->btns         = NULL;
-    ext->btns_pos     = LV_TABVIEW_BTNS_POS_TOP;
+    ext->btns_pos     = LV_TABVIEW_TAB_POS_TOP;
 #if LV_USE_ANIMATION
     ext->anim_time = LV_TABVIEW_DEF_ANIM_TIME;
 #endif
@@ -242,12 +242,12 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     ext->tab_cnt++;
 
     switch(ext->btns_pos) {
-        case LV_TABVIEW_BTNS_POS_TOP:
-        case LV_TABVIEW_BTNS_POS_BOTTOM:
+        case LV_TABVIEW_TAB_POS_TOP:
+        case LV_TABVIEW_TAB_POS_BOTTOM:
             ext->tab_name_ptr = lv_mem_realloc((void *)ext->tab_name_ptr, sizeof(char *) * (ext->tab_cnt + 1));
             break;
-        case LV_TABVIEW_BTNS_POS_LEFT:
-        case LV_TABVIEW_BTNS_POS_RIGHT:
+        case LV_TABVIEW_TAB_POS_LEFT:
+        case LV_TABVIEW_TAB_POS_RIGHT:
             ext->tab_name_ptr = lv_mem_realloc((void *)ext->tab_name_ptr, sizeof(char *) * (ext->tab_cnt * 2));
             break;
     }
@@ -261,9 +261,9 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
      */
     switch(ext->btns_pos) {
         default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
-        case LV_TABVIEW_BTNS_POS_NONE:
-        case LV_TABVIEW_BTNS_POS_TOP:
-        case LV_TABVIEW_BTNS_POS_BOTTOM:
+        case LV_TABVIEW_TAB_POS_NONE:
+        case LV_TABVIEW_TAB_POS_TOP:
+        case LV_TABVIEW_TAB_POS_BOTTOM:
             ext->tab_name_ptr = lv_mem_realloc(ext->tab_name_ptr, sizeof(char *) * (ext->tab_cnt + 1));
 
             LV_ASSERT_MEM(ext->tab_name_ptr);
@@ -273,8 +273,8 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
             ext->tab_name_ptr[ext->tab_cnt]     = "";
 
             break;
-        case LV_TABVIEW_BTNS_POS_LEFT:
-        case LV_TABVIEW_BTNS_POS_RIGHT:
+        case LV_TABVIEW_TAB_POS_LEFT:
+        case LV_TABVIEW_TAB_POS_RIGHT:
             ext->tab_name_ptr = lv_mem_realloc(ext->tab_name_ptr, sizeof(char *) * (ext->tab_cnt * 2));
 
             LV_ASSERT_MEM(ext->tab_name_ptr);
@@ -345,13 +345,13 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 
     switch(ext->btns_pos) {
         default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
-        case LV_TABVIEW_BTNS_POS_NONE:
-        case LV_TABVIEW_BTNS_POS_TOP:
-        case LV_TABVIEW_BTNS_POS_BOTTOM:
+        case LV_TABVIEW_TAB_POS_NONE:
+        case LV_TABVIEW_TAB_POS_TOP:
+        case LV_TABVIEW_TAB_POS_BOTTOM:
             cont_x = -(lv_obj_get_width(tabview) * id + scrl_inner * id + scrl_left);
             break;
-        case LV_TABVIEW_BTNS_POS_LEFT:
-        case LV_TABVIEW_BTNS_POS_RIGHT:
+        case LV_TABVIEW_TAB_POS_LEFT:
+        case LV_TABVIEW_TAB_POS_RIGHT:
             cont_x = -((lv_obj_get_width(tabview) - lv_obj_get_width(ext->btns)) * id + scrl_inner * id + scrl_left);
             break;
     }
@@ -381,15 +381,15 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 
     switch(ext->btns_pos) {
         default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
-        case LV_TABVIEW_BTNS_POS_NONE:
+        case LV_TABVIEW_TAB_POS_NONE:
             break;
-        case LV_TABVIEW_BTNS_POS_TOP:
-        case LV_TABVIEW_BTNS_POS_BOTTOM:
+        case LV_TABVIEW_TAB_POS_TOP:
+        case LV_TABVIEW_TAB_POS_BOTTOM:
             indic_size = lv_obj_get_width(ext->indic);
             indic_pos  = indic_size * id + btns_bg_inner * id + btns_bg_left;
             break;
-        case LV_TABVIEW_BTNS_POS_LEFT:
-        case LV_TABVIEW_BTNS_POS_RIGHT:
+        case LV_TABVIEW_TAB_POS_LEFT:
+        case LV_TABVIEW_TAB_POS_RIGHT:
             indic_size = lv_obj_get_height(ext->indic);
             indic_pos  = btns_bg_top + id * (indic_size + btns_bg_inner);
             break;
@@ -401,14 +401,14 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     {
         switch(ext->btns_pos) {
             default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
-            case LV_TABVIEW_BTNS_POS_NONE:
+            case LV_TABVIEW_TAB_POS_NONE:
                 break;
-            case LV_TABVIEW_BTNS_POS_TOP:
-            case LV_TABVIEW_BTNS_POS_BOTTOM:
+            case LV_TABVIEW_TAB_POS_TOP:
+            case LV_TABVIEW_TAB_POS_BOTTOM:
                 lv_obj_set_x(ext->indic, indic_pos);
                 break;
-            case LV_TABVIEW_BTNS_POS_LEFT:
-            case LV_TABVIEW_BTNS_POS_RIGHT:
+            case LV_TABVIEW_TAB_POS_LEFT:
+            case LV_TABVIEW_TAB_POS_RIGHT:
                 lv_obj_set_y(ext->indic, indic_pos);
                 break;
         }
@@ -422,15 +422,15 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 
         switch(ext->btns_pos) {
             default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
-            case LV_TABVIEW_BTNS_POS_NONE:
+            case LV_TABVIEW_TAB_POS_NONE:
                 break;
-            case LV_TABVIEW_BTNS_POS_TOP:
-            case LV_TABVIEW_BTNS_POS_BOTTOM:
+            case LV_TABVIEW_TAB_POS_TOP:
+            case LV_TABVIEW_TAB_POS_BOTTOM:
                 lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
                 lv_anim_set_values(&a, lv_obj_get_x(ext->indic), indic_pos);
                 break;
-            case LV_TABVIEW_BTNS_POS_LEFT:
-            case LV_TABVIEW_BTNS_POS_RIGHT:
+            case LV_TABVIEW_TAB_POS_LEFT:
+            case LV_TABVIEW_TAB_POS_RIGHT:
                 lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_y);
                 lv_anim_set_values(&a, lv_obj_get_y(ext->indic), indic_pos);
                 break;
@@ -468,11 +468,11 @@ void lv_tabview_set_anim_time(lv_obj_t * tabview, uint16_t anim_time)
  */
 void lv_tabview_set_btns_pos(lv_obj_t * tabview, lv_tabview_btns_pos_t btns_pos)
 {
-    if(btns_pos != LV_TABVIEW_BTNS_POS_NONE &&
-       btns_pos != LV_TABVIEW_BTNS_POS_TOP &&
-       btns_pos != LV_TABVIEW_BTNS_POS_BOTTOM &&
-       btns_pos != LV_TABVIEW_BTNS_POS_LEFT &&
-       btns_pos != LV_TABVIEW_BTNS_POS_RIGHT) {
+    if(btns_pos != LV_TABVIEW_TAB_POS_NONE &&
+       btns_pos != LV_TABVIEW_TAB_POS_TOP &&
+       btns_pos != LV_TABVIEW_TAB_POS_BOTTOM &&
+       btns_pos != LV_TABVIEW_TAB_POS_LEFT &&
+       btns_pos != LV_TABVIEW_TAB_POS_RIGHT) {
         LV_LOG_WARN("lv_tabview_set_btns_pos: unexpected button position");
         return;
     }
@@ -819,13 +819,13 @@ static void refr_indic_size(lv_obj_t * tabview)
 
     switch(ext->btns_pos) {
         default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
-        case LV_TABVIEW_BTNS_POS_NONE:
+        case LV_TABVIEW_TAB_POS_NONE:
             lv_obj_set_hidden(ext->indic, true);
             indic_w = 0;
             indic_h = 0;
             break;
-        case LV_TABVIEW_BTNS_POS_TOP:
-        case LV_TABVIEW_BTNS_POS_BOTTOM:
+        case LV_TABVIEW_TAB_POS_TOP:
+        case LV_TABVIEW_TAB_POS_BOTTOM:
             lv_obj_set_hidden(ext->indic, false);
             if(ext->tab_cnt) {
                 indic_h = indic_size;
@@ -836,8 +836,8 @@ static void refr_indic_size(lv_obj_t * tabview)
                 indic_h = 0;
             }
             break;
-        case LV_TABVIEW_BTNS_POS_LEFT:
-        case LV_TABVIEW_BTNS_POS_RIGHT:
+        case LV_TABVIEW_TAB_POS_LEFT:
+        case LV_TABVIEW_TAB_POS_RIGHT:
             lv_obj_set_hidden(ext->indic, false);
             if(ext->tab_cnt) {
                 indic_w = indic_size;
@@ -877,20 +877,20 @@ static void refr_btns_size(lv_obj_t * tabview)
 
     switch(ext->btns_pos) {
         default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
-        case LV_TABVIEW_BTNS_POS_NONE:
+        case LV_TABVIEW_TAB_POS_NONE:
             btns_w = 0;
             btns_h = 0;
             lv_obj_set_hidden(ext->btns, true);
             break;
-        case LV_TABVIEW_BTNS_POS_TOP:
-        case LV_TABVIEW_BTNS_POS_BOTTOM:
+        case LV_TABVIEW_TAB_POS_TOP:
+        case LV_TABVIEW_TAB_POS_BOTTOM:
             lv_obj_set_hidden(ext->btns, false);
             btns_h = lv_font_get_line_height(font) + tab_top + tab_bottom + tab_bg_top + tab_bg_bottom;
             btns_w = lv_obj_get_width(tabview);
 
             break;
-        case LV_TABVIEW_BTNS_POS_LEFT:
-        case LV_TABVIEW_BTNS_POS_RIGHT:
+        case LV_TABVIEW_TAB_POS_LEFT:
+        case LV_TABVIEW_TAB_POS_RIGHT:
             lv_obj_set_hidden(ext->btns, false);
             btns_w = lv_font_get_glyph_width(font, 'A', '\0') +
                      tab_left + tab_right + tab_bg_left + tab_bg_right;
@@ -909,17 +909,17 @@ static void refr_content_size(lv_obj_t * tabview)
 
     switch(ext->btns_pos) {
         default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
-        case LV_TABVIEW_BTNS_POS_NONE:
+        case LV_TABVIEW_TAB_POS_NONE:
             cont_w = lv_obj_get_width(tabview);
             cont_h = lv_obj_get_height(tabview);
             break;
-        case LV_TABVIEW_BTNS_POS_TOP:
-        case LV_TABVIEW_BTNS_POS_BOTTOM:
+        case LV_TABVIEW_TAB_POS_TOP:
+        case LV_TABVIEW_TAB_POS_BOTTOM:
             cont_w = lv_obj_get_width(tabview);
             cont_h = lv_obj_get_height(tabview) - lv_obj_get_height(ext->btns);
             break;
-        case LV_TABVIEW_BTNS_POS_LEFT:
-        case LV_TABVIEW_BTNS_POS_RIGHT:
+        case LV_TABVIEW_TAB_POS_LEFT:
+        case LV_TABVIEW_TAB_POS_RIGHT:
             cont_w = lv_obj_get_width(tabview) - lv_obj_get_width(ext->btns);
             cont_h = lv_obj_get_height(tabview);
             break;
@@ -948,25 +948,25 @@ static void refr_align(lv_obj_t * tabview)
 
     switch(ext->btns_pos) {
         default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
-        case LV_TABVIEW_BTNS_POS_NONE:
+        case LV_TABVIEW_TAB_POS_NONE:
             lv_obj_align(ext->content, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
             break;
-        case LV_TABVIEW_BTNS_POS_TOP:
+        case LV_TABVIEW_TAB_POS_TOP:
             lv_obj_align(ext->btns, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
             lv_obj_align(ext->content, ext->btns, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
             lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_BOTTOM_LEFT, 0, 0);
             break;
-        case LV_TABVIEW_BTNS_POS_BOTTOM:
+        case LV_TABVIEW_TAB_POS_BOTTOM:
             lv_obj_align(ext->content, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
             lv_obj_align(ext->btns, ext->content, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
             lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_TOP_LEFT, 0, 0);
             break;
-        case LV_TABVIEW_BTNS_POS_LEFT:
+        case LV_TABVIEW_TAB_POS_LEFT:
             lv_obj_align(ext->btns, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0);
             lv_obj_align(ext->content, tabview, LV_ALIGN_IN_TOP_LEFT, lv_obj_get_width(ext->btns), 0);
             lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
             break;
-        case LV_TABVIEW_BTNS_POS_RIGHT:
+        case LV_TABVIEW_TAB_POS_RIGHT:
             lv_obj_align(ext->btns, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, 0);
             lv_obj_align(ext->content, tabview, LV_ALIGN_IN_TOP_LEFT, 0, 0);
             lv_obj_align(ext->indic, ext->btns, LV_ALIGN_IN_TOP_LEFT, 0, 0);
