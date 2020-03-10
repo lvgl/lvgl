@@ -936,7 +936,7 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
     }
 
 
-    lv_obj_refresh_style(obj);
+    lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
 
 
 }

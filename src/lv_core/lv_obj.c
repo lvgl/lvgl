@@ -1574,7 +1574,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
 #if LV_USE_ANIMATION == 0
     obj->state = new_state;
-    lv_obj_refresh_style(obj);
+    lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
 #else
     lv_state_t prev_state = obj->state;
     obj->state = new_state;

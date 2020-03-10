@@ -120,7 +120,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->label_count = copy_ext->label_count;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_gauge);
+        lv_obj_refresh_style(new_gauge, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("gauge created");
