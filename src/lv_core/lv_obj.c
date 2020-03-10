@@ -1325,7 +1325,9 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop)
         case LV_STYLE_PAD_INNER:
         case LV_STYLE_OUTLINE_WIDTH:
         case LV_STYLE_OUTLINE_PAD:
+        case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_WIDTH:
+        case LV_STYLE_SHADOW_OPA:
         case LV_STYLE_SHADOW_OFS_X:
         case LV_STYLE_SHADOW_OFS_Y:
         case LV_STYLE_SHADOW_SPREAD:
@@ -1336,6 +1338,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop)
         case LV_STYLE_VALUE_ALIGN:
         case LV_STYLE_VALUE_STR:
         case LV_STYLE_VALUE_FONT:
+        case LV_STYLE_VALUE_OPA:
         case LV_STYLE_TEXT_LETTER_SPACE:
         case LV_STYLE_TEXT_LINE_SPACE:
         case LV_STYLE_TEXT_FONT:
@@ -3820,6 +3823,12 @@ static void trans_anim_start_cb(lv_anim_t * a)
 static void trans_anim_ready_cb(lv_anim_t * a)
 {
     lv_style_trans_t * tr = a->var;
+    /* Remove the transitioned property from trans. style
+     * to allow changing it by normal styles*/
+    lv_style_list_t * list = lv_obj_get_style_list(tr->obj, tr->part);
+    lv_style_t * style_trans = lv_style_list_get_transition_style(list);
+    lv_style_remove_prop(style_trans, tr->prop);
+
     lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
     lv_mem_free(tr);
 }
