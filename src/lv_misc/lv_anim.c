@@ -26,7 +26,7 @@
  *********************/
 #define LV_ANIM_RESOLUTION 1024
 #define LV_ANIM_RES_SHIFT 10
-#define LV_ANIM_TASK_PRIO LV_TASK_PRIO_MID
+#define LV_ANIM_TASK_PRIO LV_TASK_PRIO_HIGH
 
 /**********************
  *      TYPEDEFS
