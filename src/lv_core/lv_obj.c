@@ -3260,30 +3260,6 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
 }
 
 /**
- * Float the object in from the top of its parent.
- * @param obj the object to float
- * @param time duration of the animation [ms]
- * @param delay wait before the animation starts [ms]
- */
-void lv_obj_float_top_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
-{
-#if LV_USE_ANIMATION
-    lv_anim_t a;
-    lv_anim_init(&a);
-    lv_anim_set_var(&a, obj);
-    lv_anim_set_values(&a, -lv_obj_get_height(obj), lv_obj_get_y(obj));
-    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)opa_scale_anim);
-    lv_anim_set_time(&a, time);
-    lv_anim_set_delay(&a, delay);
-    lv_anim_start(&a);
-#else
-    (void) obj;     /*Unused*/
-    (void) time;    /*Unused*/
-    (void) delay;   /*Unused*/
-#endif
-}
-
-/**
  * Fade out (from fully cover to transparent) an object and all its children using an `opa_scale` animation.
  * @param obj the object to fade in
  * @param time duration of the animation [ms]
