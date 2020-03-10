@@ -108,7 +108,7 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(table);
+        lv_obj_refresh_style(table, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("table created");

@@ -161,7 +161,9 @@ bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coord
         /*No radius, it is within the rectangle*/
         return true;
     }
-    lv_coord_t max_radius = LV_MATH_MIN(lv_area_get_width(a_p) / 2, lv_area_get_height(a_p) / 2);
+    lv_coord_t w = lv_area_get_width(a_p) / 2;
+    lv_coord_t h = lv_area_get_height(a_p) / 2;
+    lv_coord_t max_radius = LV_MATH_MIN(w, h);
     if(radius > max_radius)
         radius = max_radius;
 

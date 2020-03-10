@@ -1154,7 +1154,7 @@ void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style)
 #if LV_USE_ANIMATION
     trans_del(obj, part, 0xFF, NULL);
 #endif
-    lv_obj_refresh_style(obj);
+    lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
 }
 
 /**
@@ -1191,7 +1191,7 @@ void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part)
 {
     lv_obj_clean_style_list(obj, part);
 
-    lv_obj_refresh_style(obj);
+    lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
 }
 
 /**
@@ -1213,7 +1213,7 @@ void _lv_obj_set_style_local_int(lv_obj_t * obj, uint8_t part, lv_style_property
 #if LV_USE_ANIMATION
     trans_del(obj, part, prop, NULL);
 #endif
-    lv_obj_refresh_style(obj);
+    lv_obj_refresh_style(obj, prop & (~LV_STYLE_STATE_MASK));
 }
 
 /**
@@ -1235,7 +1235,7 @@ void _lv_obj_set_style_local_color(lv_obj_t * obj, uint8_t part, lv_style_proper
 #if LV_USE_ANIMATION
     trans_del(obj, part, prop, NULL);
 #endif
-    lv_obj_refresh_style(obj);
+    lv_obj_refresh_style(obj, prop & (~LV_STYLE_STATE_MASK));
 }
 
 /**
@@ -1257,7 +1257,7 @@ void _lv_obj_set_style_local_opa(lv_obj_t * obj, uint8_t part, lv_style_property
 #if LV_USE_ANIMATION
     trans_del(obj, part, prop, NULL);
 #endif
-    lv_obj_refresh_style(obj);
+    lv_obj_refresh_style(obj, prop & (~LV_STYLE_STATE_MASK));
 }
 
 /**
@@ -1279,7 +1279,7 @@ void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t part, lv_style_property
 #if LV_USE_ANIMATION
     trans_del(obj, part, prop, NULL);
 #endif
-    lv_obj_refresh_style(obj);
+    lv_obj_refresh_style(obj, prop & (~LV_STYLE_STATE_MASK));
 }
 
 /**
@@ -1304,17 +1304,59 @@ bool _lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_prop
 /**
  * Notify an object (and its children) about its style is modified
  * @param obj pointer to an object
+ * @param prop `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property. It is used the optimize what needs to be refreshed.
  */
-void lv_obj_refresh_style(lv_obj_t * obj)
+void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_invalidate(obj);
-    obj->signal_cb(obj, LV_SIGNAL_STYLE_CHG, NULL);
-    lv_obj_invalidate(obj);
+    /*If a real style refresh is required*/
+    bool real_refr = false;
+    switch(prop) {
+        case LV_STYLE_PROP_ALL:
+        case LV_STYLE_CLIP_CORNER:
+        case LV_STYLE_SIZE:
+        case LV_STYLE_TRANSFORM_WIDTH:
+        case LV_STYLE_TRANSFORM_HEIGHT:
+        case LV_STYLE_PAD_TOP:
+        case LV_STYLE_PAD_BOTTOM:
+        case LV_STYLE_PAD_LEFT:
+        case LV_STYLE_PAD_RIGHT:
+        case LV_STYLE_PAD_INNER:
+        case LV_STYLE_OUTLINE_WIDTH:
+        case LV_STYLE_OUTLINE_PAD:
+        case LV_STYLE_SHADOW_WIDTH:
+        case LV_STYLE_SHADOW_OFS_X:
+        case LV_STYLE_SHADOW_OFS_Y:
+        case LV_STYLE_SHADOW_SPREAD:
+        case LV_STYLE_VALUE_LETTER_SPACE:
+        case LV_STYLE_VALUE_LINE_SPACE:
+        case LV_STYLE_VALUE_OFS_X:
+        case LV_STYLE_VALUE_OFS_Y:
+        case LV_STYLE_VALUE_ALIGN:
+        case LV_STYLE_VALUE_STR:
+        case LV_STYLE_VALUE_FONT:
+        case LV_STYLE_TEXT_LETTER_SPACE:
+        case LV_STYLE_TEXT_LINE_SPACE:
+        case LV_STYLE_TEXT_FONT:
+        case LV_STYLE_LINE_WIDTH:
+            real_refr = true;
+            break;
+        default:
+            real_refr = false;
+    }
 
-    /*Send style change signals*/
-    refresh_children_style(obj);
+    if(real_refr) {
+        lv_obj_invalidate(obj);
+        obj->signal_cb(obj, LV_SIGNAL_STYLE_CHG, NULL);
+        lv_obj_invalidate(obj);
+
+        if(prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_INHERIT_MASK))
+        /*Send style change signals*/
+        refresh_children_style(obj);
+    } else {
+        lv_obj_invalidate(obj);
+    }
 }
 
 /**
@@ -1586,7 +1628,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     }
 #endif
 
-    lv_obj_refresh_style(obj);
+    lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
 
 }
 
@@ -3134,8 +3176,9 @@ lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
             sh_width = sh_width / 2;    /*THe blur adds only half width*/
             sh_width++;
             sh_width += lv_obj_get_style_shadow_spread(obj, part);
-            sh_width += LV_MATH_MAX(LV_MATH_ABS(lv_obj_get_style_shadow_ofs_x(obj, part)),
-                                    LV_MATH_ABS(lv_obj_get_style_shadow_ofs_y(obj, part)));
+            lv_style_int_t sh_ofs_x = lv_obj_get_style_shadow_ofs_x(obj, part);
+            lv_style_int_t sh_ofs_y = lv_obj_get_style_shadow_ofs_y(obj, part);
+            sh_width += LV_MATH_MAX(LV_MATH_ABS(sh_ofs_x), LV_MATH_ABS(sh_ofs_y));
             s = LV_MATH_MAX(s, sh_width);
         }
     }
@@ -3375,7 +3418,8 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
     }
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, lv_obj_get_draw_rect_ext_pad_size(obj, LV_OBJ_PART_MAIN));
+        lv_coord_t d = lv_obj_get_draw_rect_ext_pad_size(obj, LV_OBJ_PART_MAIN);
+        obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, d);
     }
 #if LV_USE_OBJ_REALIGN
     else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {
@@ -3451,7 +3495,7 @@ static void report_style_mod_core(void * style, lv_obj_t * obj)
         for(ci = 0; ci < dsc->style_cnt; ci++) {
             lv_style_t * class = lv_style_list_get_style(dsc, ci);
             if(class == style) {
-                lv_obj_refresh_style(obj);
+                lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
                 /*It's enough to handle once (if duplicated)*/
                 break;
             }
@@ -3746,7 +3790,7 @@ static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
         else x = tr->end_value._ptr;
         _lv_style_set_ptr(style, tr->prop, x);
     }
-    lv_obj_refresh_style(tr->obj);
+    lv_obj_refresh_style(tr->obj, tr->prop);
 
 }
 

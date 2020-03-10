@@ -260,8 +260,9 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
 
             /*Fill the first line. Use `memcpy` because it's faster then simple value assignment*/
             /*Set the first pixels manually*/
+            int32_t fill_end = draw_area->x1 + FILL_DIRECT_LEN + (draw_area_w & FILL_DIRECT_MASK) - 1;
             int32_t direct_fill_end = LV_MATH_MIN(draw_area->x2,
-                                                  draw_area->x1 + FILL_DIRECT_LEN + (draw_area_w & FILL_DIRECT_MASK) - 1);
+                                                  fill_end);
             for(x = draw_area->x1; x <= direct_fill_end ; x++) {
                 disp_buf_tmp[x].full = color.full;
             }

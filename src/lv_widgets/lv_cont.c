@@ -113,7 +113,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->layout              = copy_ext->layout;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(cont);
+        lv_obj_refresh_style(cont, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("container created");
@@ -243,7 +243,7 @@ lv_fit_t lv_cont_get_fit_bottom(const lv_obj_t * cont)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
+extern uint32_t cont_sign;
 /**
  * Signal function of the container
  * @param cont pointer to a container object
@@ -282,7 +282,7 @@ static lv_res_t lv_cont_signal(lv_obj_t * cont, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {
-        /*FLOOD and FILL fit needs to be refreshed if the parent's size has changed*/
+        /*MAX and EDGE fit needs to be refreshed if the parent's size has changed*/
         lv_cont_refr_autofit(cont);
     }
 
@@ -523,7 +523,8 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
                     break;
                 }
                 w_row += lv_obj_get_width(child_rc) + inner; /*Add the object width + opad*/
-                h_row = LV_MATH_MAX(h_row, lv_obj_get_height(child_rc));         /*Search the highest object*/
+                lv_coord_t child_h = lv_obj_get_height(child_rc);
+                h_row = LV_MATH_MAX(h_row, child_h);         /*Search the highest object*/
                 obj_num++;
                 if(lv_obj_is_protected(child_rc, LV_PROTECT_FOLLOW))
                     break; /*If can not be followed by an other object then break here*/

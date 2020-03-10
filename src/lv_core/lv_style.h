@@ -42,6 +42,8 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
 #define LV_STYLE_TRANS_NUM_MAX      6
 
+#define LV_STYLE_PROP_ALL 0xFF
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -198,6 +200,7 @@ typedef uint16_t lv_style_property_t;
 
 #define LV_STYLE_STATE_POS       8
 #define LV_STYLE_STATE_MASK      0x7F00
+#define LV_STYLE_INHERIT_MASK    0x8000
 
 typedef uint16_t lv_style_state_t;
 

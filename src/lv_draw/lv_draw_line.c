@@ -412,9 +412,8 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     /* The real draw area is around the line.
      * It's easy to calculate with steep lines, but the area can be very wide with very flat lines.
      * So deal with it only with steep lines. */
-    int32_t draw_area_w;
-    if(flat) draw_area_w = lv_area_get_width(&draw_area);
-    else draw_area_w = LV_MATH_MIN(lv_area_get_width(&draw_area), dsc->width * 2 + 2);
+    int32_t draw_area_w = lv_area_get_width(&draw_area);
+    if(!flat) draw_area_w = LV_MATH_MIN(draw_area_w, dsc->width * 2 + 2);
 
     /*Draw the background line by line*/
     int32_t h;

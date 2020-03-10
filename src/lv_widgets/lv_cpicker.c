@@ -144,7 +144,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_style_list_copy(&ext->indic.style_list, &copy_ext->indic.style_list);
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(cpicker);
+        lv_obj_refresh_style(cpicker, LV_STYLE_PROP_ALL);
     }
     refr_indic_pos(cpicker);
 
