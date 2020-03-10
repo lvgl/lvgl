@@ -106,10 +106,10 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->page          = NULL;
-    ext->options     = NULL;
+    ext->options     = "Option 1\nOption 2\nOption 3";
     ext->symbol         = LV_SYMBOL_DOWN;
     ext->text         = "Select";
-    ext->static_txt = 0;
+    ext->static_txt = 1;
     ext->show_selected   = 1;
     ext->sel_opt_id      = 0;
     ext->sel_opt_id_orig = 0;
@@ -128,7 +128,6 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new drop down list drop down list*/
     if(copy == NULL) {
-        ext->options = NULL;
 
         lv_theme_apply(ddlist, LV_THEME_DROPDOWN);
     }
