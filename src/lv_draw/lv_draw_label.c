@@ -446,13 +446,9 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
             return; /*Invalid bpp. Can't render the letter*/
     }
 
-
-
     int32_t col, row;
     int32_t box_w = g->box_w;
     int32_t box_h = g->box_h;
-    int32_t width_byte_scr = box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
-    if(box_w & 0x7) width_byte_scr++;
     int32_t width_bit = box_w * bpp; /*Letter width in bits*/
 
     /* Calculate the col/row start/end on the map*/
@@ -596,8 +592,6 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
 
     int32_t box_w = g->box_w;
     int32_t box_h = g->box_h;
-    int32_t width_byte_scr = box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
-    if(box_w & 0x7) width_byte_scr++;
     int32_t width_bit = box_w * bpp; /*Letter width in bits*/
 
 

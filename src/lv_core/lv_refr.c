@@ -522,6 +522,7 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
      * but in special cases (e.g. if the screen has alpha) it won't.
      * In this case use the screen directly */
     if(top_p == NULL) top_p = lv_disp_get_scr_act(disp_refr);
+    if(top_p == NULL) return;  /*Shouldn't happen*/
 
     /*Refresh the top object and its children*/
     lv_refr_obj(top_p, mask_p);

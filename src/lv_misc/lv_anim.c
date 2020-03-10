@@ -163,7 +163,7 @@ uint16_t lv_anim_count_running(void)
     lv_anim_t * a;
     LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) cnt++;
 
-    return cnt++;
+    return cnt;
 }
 
 /**

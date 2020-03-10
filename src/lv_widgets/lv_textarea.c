@@ -348,8 +348,8 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
 
     /*If the textarea is empty, invalidate it to hide the placeholder*/
     if(ext->placeholder_txt) {
-        const char * txt = lv_label_get_text(ext->label);
-        if(txt[0] == '\0') lv_obj_invalidate(ta);
+        const char * txt_act = lv_label_get_text(ext->label);
+        if(txt_act[0] == '\0') lv_obj_invalidate(ta);
     }
 
     /*Insert the text*/
@@ -504,8 +504,8 @@ void lv_textarea_set_text(lv_obj_t * ta, const char * txt)
 
     /*If the textarea is empty, invalidate it to hide the placeholder*/
     if(ext->placeholder_txt) {
-        const char * txt = lv_label_get_text(ext->label);
-        if(txt[0] == '\0') lv_obj_invalidate(ta);
+        const char * txt_act = lv_label_get_text(ext->label);
+        if(txt_act[0] == '\0') lv_obj_invalidate(ta);
     }
 
     /*Don't let 'width == 0' because the cursor will not be visible*/

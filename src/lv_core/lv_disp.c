@@ -57,7 +57,7 @@ lv_obj_t * lv_disp_get_scr_act(lv_disp_t * disp)
 void lv_disp_load_scr(lv_obj_t * scr)
 {
     lv_disp_t * d = lv_obj_get_disp(scr);
-
+    if(!d) return;  /*Shouldn't happen, just to be sure*/
     d->act_scr = scr;
 
     lv_obj_invalidate(scr);

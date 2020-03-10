@@ -47,9 +47,10 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-void read_png_file(png_img_t * p, const char* file_name);
-void write_png_file(png_img_t * p, const char* file_name);
-void png_release(png_img_t * p);
+static void read_png_file(png_img_t * p, const char* file_name);
+static void write_png_file(png_img_t * p, const char* file_name);
+static void png_release(png_img_t * p);
+static void process_file(png_img_t * p);
 
 /**********************
  *  STATIC VARIABLES
@@ -200,7 +201,7 @@ void lv_test_assert_img_eq(const char * fn_ref, const char * s)
  *   STATIC FUNCTIONS
  **********************/
 
-void read_png_file(png_img_t * p, const char* file_name)
+static void read_png_file(png_img_t * p, const char* file_name)
 {
     char header[8];    // 8 is the maximum size that can be checked
 
@@ -255,7 +256,7 @@ void read_png_file(png_img_t * p, const char* file_name)
 }
 
 
-void write_png_file(png_img_t * p, const char* file_name)
+static void write_png_file(png_img_t * p, const char* file_name)
 {
     /* create file */
     FILE *fp = fopen(file_name, "wb");
@@ -306,7 +307,7 @@ void write_png_file(png_img_t * p, const char* file_name)
     fclose(fp);
 }
 
-void png_release(png_img_t * p)
+static void png_release(png_img_t * p)
 {
     int y;
       for (y=0; y<p->height; y++)
@@ -314,7 +315,7 @@ void png_release(png_img_t * p)
       free(p->row_pointers);
 }
 
-void process_file(png_img_t * p)
+static void process_file(png_img_t * p)
 {
     if (png_get_color_type(p->png_ptr, p->info_ptr) == PNG_COLOR_TYPE_RGB)
         lv_test_exit("[process_file] input file is PNG_COLOR_TYPE_RGB but must be PNG_COLOR_TYPE_RGBA "

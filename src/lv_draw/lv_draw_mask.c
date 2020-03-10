@@ -99,11 +99,11 @@ lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_
     bool changed = false;
     lv_draw_mask_common_dsc_t * dsc;
 
-    lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;
     uint8_t i;
     for(i = 0; i < LV_MASK_MAX_NUM; i++) {
         if(mask_list[i].param) {
             dsc = mask_list[i].param;
+            lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;
             res = dsc->cb(mask_buf, abs_x, abs_y, len, (void *)mask_list[i].param);
             if(res == LV_DRAW_MASK_RES_FULL_TRANSP) return LV_DRAW_MASK_RES_FULL_TRANSP;
             else if(res == LV_DRAW_MASK_RES_CHANGED) changed = true;

@@ -393,6 +393,7 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
     bool act_scr_del = false;
     if(obj->parent == NULL) {
          disp = lv_obj_get_disp(obj);
+         if(!disp) return LV_RES_INV;   /*Shouldn't happen*/
          if(disp->act_scr == obj) act_scr_del = true;
     }
 
@@ -409,8 +410,10 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 #endif
 
     /*Delete the user data*/
+#if LV_USE_USER_DATA
 #if LV_USE_USER_DATA_FREE
     LV_USER_DATA_FREE(obj);
+#endif
 #endif
 
     /*Recursively delete the children*/

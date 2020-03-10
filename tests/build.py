@@ -6,7 +6,6 @@ lvgldirname = os.path.abspath('..')
 lvgldirname = os.path.basename(lvgldirname)
 lvgldirname = '"' + lvgldirname + '"'
 
-warnings = '"-Wall -Werror"' 
 base_defines = '"-DLV_CONF_PATH=' + lvgldirname +'/tests/lv_test_conf.h -DLV_BUILD_TEST"'
 optimization = '"-O3 -g0"'
 
@@ -24,7 +23,7 @@ def build(name, defines):
     d_all += " -D" + d + "=" + str(defines[d])
   
   d_all += '"'
-  cmd = "make -j8 BIN=test.bin LVGL_DIR_NAME=" + lvgldirname + " DEFINES=" + d_all + " WARNINGS=" + warnings + " OPTIMIZATION=" + optimization
+  cmd = "make -j8 BIN=test.bin LVGL_DIR_NAME=" + lvgldirname + " DEFINES=" + d_all + " OPTIMIZATION=" + optimization
   
   print("---------------------------")
   print("Clean")
@@ -64,6 +63,7 @@ minimal_monochrome = {
   "LV_GPU":0,
   "LV_USE_FILESYSTEM":0,
   "LV_USE_USER_DATA":0,
+  "LV_USE_USER_DATA_FREE":0,
   "LV_USE_LOG":0,
   "LV_USE_THEME_MATERIAL":1,   
   "LV_THEME_DEFAULT_INIT": "\\\"lv_theme_material_init\\\"",
@@ -74,7 +74,13 @@ minimal_monochrome = {
   "LV_THEME_DEFAULT_FONT_NORMAL"   :     "\\\"&lv_font_unscii_8\\\"",
   "LV_THEME_DEFAULT_FONT_SUBTITLE" :     "\\\"&lv_font_unscii_8\\\"",
   "LV_THEME_DEFAULT_FONT_TITLE"    :     "\\\"&lv_font_unscii_8\\\"",
+  "LV_LOG_PRINTF":0,
   "LV_USE_DEBUG":0,
+  "LV_USE_ASSERT_NULL":0,
+  "LV_USE_ASSERT_MEM":0,
+  "LV_USE_ASSERT_STR":0,
+  "LV_USE_ASSERT_OBJ":0,
+  "LV_USE_ASSERT_STYLE":0,
   "LV_FONT_ROBOTO_12":0,
   "LV_FONT_ROBOTO_16":0,
   "LV_FONT_ROBOTO_22":0,
@@ -131,6 +137,7 @@ all_obj_minimal_features = {
   "LV_GPU":0,
   "LV_USE_FILESYSTEM":0,
   "LV_USE_USER_DATA":0,
+  "LV_USE_USER_DATA_FREE":0,
   "LV_USE_LOG":0,
   "LV_USE_THEME_MATERIAL":1,   
   "LV_THEME_DEFAULT_INIT": "\\\"lv_theme_material_init\\\"",
@@ -142,6 +149,11 @@ all_obj_minimal_features = {
   "LV_THEME_DEFAULT_FONT_SUBTITLE" :     "\\\"&lv_font_roboto_16\\\"",
   "LV_THEME_DEFAULT_FONT_TITLE"    :     "\\\"&lv_font_roboto_16\\\"",
   "LV_USE_DEBUG":0,
+  "LV_USE_ASSERT_NULL":0,
+  "LV_USE_ASSERT_MEM":0,
+  "LV_USE_ASSERT_STR":0,
+  "LV_USE_ASSERT_OBJ":0,
+  "LV_USE_ASSERT_STYLE":0,
   "LV_FONT_ROBOTO_12":0,
   "LV_FONT_ROBOTO_16":1,
   "LV_FONT_ROBOTO_22":0,
@@ -199,6 +211,7 @@ all_obj_all_features = {
   "LV_GPU":1,
   "LV_USE_FILESYSTEM":1,
   "LV_USE_USER_DATA":1,
+  "LV_USE_USER_DATA_FREE":0,
   "LV_USE_LOG":1,
   "LV_USE_THEME_MATERIAL":1,   
   "LV_THEME_DEFAULT_INIT": "\\\"lv_theme_material_init\\\"",
@@ -208,7 +221,14 @@ all_obj_all_features = {
   "LV_THEME_DEFAULT_FONT_SMALL"    :     "\\\"&lv_font_roboto_12\\\"",
   "LV_THEME_DEFAULT_FONT_NORMAL"   :     "\\\"&lv_font_roboto_16\\\"",
   "LV_THEME_DEFAULT_FONT_SUBTITLE" :     "\\\"&lv_font_roboto_22\\\"",
-  "LV_THEME_DEFAULT_FONT_TITLE"    :     "\\\"&lv_font_roboto_28\\\"",
+  "LV_THEME_DEFAULT_FONT_TITLE"    :     "\\\"&lv_font_roboto_28\\\"",  
+  "LV_LOG_PRINTF":0,
+  "LV_USE_DEBUG":0,
+  "LV_USE_ASSERT_NULL":0,
+  "LV_USE_ASSERT_MEM":0,
+  "LV_USE_ASSERT_STR":0,
+  "LV_USE_ASSERT_OBJ":0,
+  "LV_USE_ASSERT_STYLE":0,
   "LV_FONT_ROBOTO_12":1,
   "LV_FONT_ROBOTO_16":1,
   "LV_FONT_ROBOTO_22":1,
@@ -266,6 +286,9 @@ advanced_features = {
   "LV_GPU":1,
   "LV_USE_FILESYSTEM":1,
   "LV_USE_USER_DATA":1,
+  "LV_USE_USER_DATA_FREE":1,
+  "LV_USER_DATA_FREE_INCLUDE":"\\\"<stdio.h>\\\"",
+  "LV_USER_DATA_FREE": "\\\"free\\\"",
   "LV_IMG_CACHE_DEF_SIZE":32,
   "LV_USE_LOG":1,
   "LV_USE_THEME_MATERIAL":1,  

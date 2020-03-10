@@ -154,9 +154,9 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
 
     /*Count the '\n'-s to determine the number of options*/
     ext->option_cnt = 0;
-    uint16_t i;
-    for(i = 0; options[i] != '\0'; i++) {
-        if(options[i] == '\n') ext->option_cnt++;
+    uint16_t cnt;
+    for(cnt = 0; options[cnt] != '\0'; cnt++) {
+        if(options[cnt] == '\n') ext->option_cnt++;
     }
     ext->option_cnt++; /*Last option has no `\n`*/
 
@@ -762,8 +762,7 @@ static lv_res_t release_handler(lv_obj_t * roller)
 #endif
 
     lv_obj_t * label = get_label(roller);
-
-    
+    if(label == NULL) return LV_RES_OK;
     
     if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
         /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
@@ -798,13 +797,14 @@ static lv_res_t release_handler(lv_obj_t * roller)
 static void refr_width(lv_obj_t * roller)
 {
     lv_obj_t * label = get_label(roller);
+    if(label == NULL) return;
+
     lv_coord_t label_w = lv_obj_get_width(label);
 
     lv_style_int_t left = lv_obj_get_style_pad_left(roller, LV_ROLLER_PART_BG);
     lv_style_int_t right = lv_obj_get_style_pad_right(roller, LV_ROLLER_PART_BG);
 
     lv_obj_set_width(roller, label_w + left + right);
-
 }
 
 /**
@@ -814,6 +814,7 @@ static void refr_width(lv_obj_t * roller)
 static void refr_height(lv_obj_t * roller)
 {
     lv_obj_t * label = get_label(roller);
+    if(label == NULL) return;
 
     lv_obj_set_height(lv_page_get_scrl(roller), lv_obj_get_height(label) + lv_obj_get_height(roller));
     lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);

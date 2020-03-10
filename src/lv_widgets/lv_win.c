@@ -219,6 +219,9 @@ void lv_win_set_title(lv_obj_t * win, const char * title)
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
     ext->title_txt    = lv_mem_realloc(ext->title_txt, strlen(title) + 1);
+    LV_ASSERT_MEM(ext->title_txt);
+    if(ext->title_txt == NULL) return;
+
     strcpy(ext->title_txt, title);
     lv_obj_invalidate(ext->header);
 }

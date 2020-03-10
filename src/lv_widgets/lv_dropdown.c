@@ -551,7 +551,7 @@ bool lv_dropdown_get_show_selected(lv_obj_t * ddlist)
 void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
 {
 #if LV_USE_ANIMATION == 0
-    anim = false;
+    (void) anim;    /*Unused*/
 #endif
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     if(ext->page) return;
@@ -565,6 +565,12 @@ void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
     if(ancestor_page_design == NULL) ancestor_page_design = lv_obj_get_design_cb(ext->page);
 
     lv_dropdown_page_ext_t * page_ext = lv_obj_allocate_ext_attr(ext->page, sizeof(lv_dropdown_page_ext_t));
+    LV_ASSERT_MEM(page_ext);
+    if(page_ext == NULL) {
+        lv_obj_del(ext->page);
+        ext->page = NULL;
+        return;
+    }
     page_ext->ddlist = ddlist;
 
     lv_obj_set_design_cb(ext->page, lv_dropdown_page_design);
@@ -612,7 +618,7 @@ void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
     }
 
 #if LV_USE_ANIMATION
-    if(ext->dir != LV_DROPDOWN_DIR_UP) {
+    if(anim == LV_ANIM_ON && ext->dir != LV_DROPDOWN_DIR_UP) {
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, ddlist);
@@ -851,7 +857,6 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
         return LV_RES_OK;
     }
     else if(sign == LV_SIGNAL_GET_STATE_DSC) {
-        lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
         lv_get_state_info_t * info = param;
         if(info->part == LV_DROPDOWN_PART_LIST ||
            info->part == LV_DROPDOWN_PART_SCRLBAR ||
@@ -1130,6 +1135,8 @@ static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint1
     lv_coord_t font_h        = lv_font_get_line_height(label_dsc.font);
 
     lv_obj_t * label = get_label(ddlist);
+    if(label == NULL) return;
+
     lv_area_t area_sel;
     area_sel.y1 = label->coords.y1;
     area_sel.y1 += id * (font_h + label_dsc.line_space);
@@ -1211,6 +1218,7 @@ static void page_press_handler(lv_obj_t * page)
 static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t x, lv_coord_t y)
 {
     lv_obj_t * label = get_label(ddlist);
+    if(label == NULL) return 0;
     x -= label->coords.x1;
     y -= label->coords.y1;
     uint16_t letter_i;
@@ -1246,6 +1254,7 @@ static void pos_selected(lv_obj_t * ddlist)
     lv_coord_t font_h              = lv_font_get_line_height(font);
     lv_obj_t * scrl                = lv_page_get_scrl(ext->page);
     lv_obj_t * label = get_label(ddlist);
+    if(label == NULL) return;
 
     lv_coord_t h = lv_obj_get_height(ext->page);
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(ddlist, LV_DROPDOWN_PART_LIST);

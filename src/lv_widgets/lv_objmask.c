@@ -115,9 +115,11 @@ lv_objmask_mask_t * lv_objmask_add_mask(lv_obj_t * objmask, void * param)
     uint16_t param_size = get_param_size(dsc->type);
 
     lv_objmask_mask_t * m = lv_ll_ins_head(&ext->mask_ll);
+    LV_ASSERT_MEM(m);
+    if(m == NULL) return NULL;
     m->param = lv_mem_alloc(param_size);
     LV_ASSERT_MEM(m->param);
-    if(m == NULL) return NULL;
+    if(m->param == NULL) return NULL;
 
     memcpy(m->param, param, param_size);
 

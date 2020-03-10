@@ -924,7 +924,6 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
 #if LV_USE_BTNMATRIX
         case LV_THEME_BTNMATRIX:
             lv_obj_clean_style_list(obj, LV_BTNMATRIX_PART_BG);
-            list = lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BG);
 
             lv_obj_clean_style_list(obj, LV_BTNMATRIX_PART_BTN);
             list = lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BTN);
@@ -978,35 +977,30 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
 #if LV_USE_CANVAS
         case LV_THEME_CANVAS:
             lv_obj_clean_style_list(obj, LV_CANVAS_PART_MAIN);
-            list = lv_obj_get_style_list(obj, LV_CANVAS_PART_MAIN);
             break;
 #endif
 
 #if LV_USE_IMG
         case LV_THEME_IMAGE:
             lv_obj_clean_style_list(obj, LV_IMG_PART_MAIN);
-            list = lv_obj_get_style_list(obj, LV_IMG_PART_MAIN);
             break;
 #endif
 
 #if LV_USE_IMGBTN
         case LV_THEME_IMGBTN:
             lv_obj_clean_style_list(obj, LV_IMG_PART_MAIN);
-            list = lv_obj_get_style_list(obj, LV_IMG_PART_MAIN);
             break;
 #endif
 
 #if LV_USE_LABEL
         case LV_THEME_LABEL:
             lv_obj_clean_style_list(obj, LV_LABEL_PART_MAIN);
-            list = lv_obj_get_style_list(obj, LV_LABEL_PART_MAIN);
             break;
 #endif
 
 #if LV_USE_LINE
         case LV_THEME_LINE:
             lv_obj_clean_style_list(obj, LV_LABEL_PART_MAIN);
-            list = lv_obj_get_style_list(obj, LV_LABEL_PART_MAIN);
             break;
 #endif
 
@@ -1109,7 +1103,6 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             lv_style_list_add_style(list, &scr);
 
             lv_obj_clean_style_list(obj, LV_TABVIEW_PART_BG_SCRL);
-            list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_BG_SCRL);
 
             lv_obj_clean_style_list(obj, LV_TABVIEW_PART_TAB_BG);
             list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_TAB_BG);
@@ -1126,7 +1119,6 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
 
         case LV_THEME_TABVIEW_PAGE:
             lv_obj_clean_style_list(obj, LV_PAGE_PART_BG);
-            list = lv_obj_get_style_list(obj, LV_PAGE_PART_BG);
 
             lv_obj_clean_style_list(obj, LV_PAGE_PART_SCRL);
             list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCRL);
@@ -1179,7 +1171,6 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             lv_style_list_add_style(list, &list_bg);
 
             lv_obj_clean_style_list(obj, LV_LIST_PART_SCRL);
-            list = lv_obj_get_style_list(obj, LV_LIST_PART_SCRL);
 
             lv_obj_clean_style_list(obj, LV_LIST_PART_SCRLBAR);
             list = lv_obj_get_style_list(obj, LV_LIST_PART_SCRLBAR);
@@ -1231,7 +1222,6 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
 #if LV_USE_TABLE
         case LV_THEME_TABLE:
             lv_obj_clean_style_list(obj, LV_TABLE_PART_BG);
-            list = lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
 
             lv_obj_clean_style_list(obj, LV_TABLE_PART_CELL1);
             list = lv_obj_get_style_list(obj, LV_TABLE_PART_CELL1);

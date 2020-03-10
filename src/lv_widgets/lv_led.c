@@ -113,8 +113,8 @@ void lv_led_set_bright(lv_obj_t * led, uint8_t bright)
     lv_led_ext_t * ext = lv_obj_get_ext_attr(led);
     if(ext->bright == bright) return;
 
-    if(bright < LV_LED_BRIGHT_MIN) bright = LV_LED_BRIGHT_MIN;
-    if(bright > LV_LED_BRIGHT_MAX) bright = LV_LED_BRIGHT_MAX;
+    if(bright <= LV_LED_BRIGHT_MIN) bright = LV_LED_BRIGHT_MIN;
+    if(bright >= LV_LED_BRIGHT_MAX) bright = LV_LED_BRIGHT_MAX;
 
     ext->bright = bright;
 
