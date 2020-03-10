@@ -106,7 +106,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Initialize the allocated 'ext' */
     ext->page          = NULL;
-    ext->options     = "Option 1\nOption 2\nOption 3";
+    ext->options     = NULL;
     ext->symbol         = LV_SYMBOL_DOWN;
     ext->text         = "Select";
     ext->static_txt = 1;
@@ -128,7 +128,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new drop down list drop down list*/
     if(copy == NULL) {
-
+        lv_dropdown_set_static_options(ddlist, "Option 1\nOption 2\nOption 3");
         lv_theme_apply(ddlist, LV_THEME_DROPDOWN);
     }
     /*Copy an existing drop down list*/

@@ -488,7 +488,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         anim_cur_value_x = (((anim_cur_value_end_x - anim_cur_value_start_x) * ext->cur_value_anim.anim_state) /
                             LV_BAR_ANIM_STATE_END);
 
-        if(anim_cur_value_end_x < anim_cur_value_start_x)
+//        if(anim_cur_value_end_x < anim_cur_value_start_x)
             anim_cur_value_x += anim_cur_value_start_x;
     }
     else

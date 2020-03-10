@@ -829,9 +829,13 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
         }
     }
     else if(sign == LV_SIGNAL_PRESSING) {
-        uint16_t btn_pr;
+        uint16_t btn_pr = LV_BTNMATRIX_BTN_NONE;
         /*Search the pressed area*/
-        lv_indev_get_point(param, &p);
+        lv_indev_t * indev = lv_indev_get_act();
+        lv_indev_type_t indev_type = lv_indev_get_type(indev);
+        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) return LV_RES_OK;
+
+        lv_indev_get_point(indev, &p);
         btn_pr = get_button_from_point(btnm, &p);
         /*Invalidate to old and the new areas*/
         if(btn_pr != ext->btn_id_pr) {

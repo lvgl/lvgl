@@ -85,7 +85,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
 #if LV_USE_GROUP
-    ext->last_sel_btn     = NULL;
+    ext->last_sel_btn = NULL;
 #endif
     ext->act_sel_btn = NULL;
 

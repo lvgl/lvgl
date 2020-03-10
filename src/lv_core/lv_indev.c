@@ -247,6 +247,11 @@ void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t * points)
  */
 void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point)
 {
+    if(indev == NULL) {
+        point->x = 0;
+        point->y = 0;
+        return;
+    }
     if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) {
         point->x = -1;
         point->y = -1;
@@ -488,6 +493,14 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PR && prev_state == LV_INDEV_STATE_PR) {
+
+        if(data->key == LV_KEY_ENTER) {
+            indev_obj_act->signal_cb(indev_obj_act, LV_SIGNAL_PRESSING, NULL);
+            if(indev_reset_check(&i->proc)) return;
+            lv_event_send(indev_obj_act, LV_EVENT_PRESSING, NULL);
+            if(indev_reset_check(&i->proc)) return;
+        }
+
         /*Long press time has elapsed?*/
         if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > i->driver.long_press_time) {
             i->proc.long_pr_sent = 1;

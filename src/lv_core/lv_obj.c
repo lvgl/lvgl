@@ -3749,6 +3749,12 @@ static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv
         tr_prev = lv_ll_get_prev(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
 
         if(tr->obj == obj && (part == tr->part || part == 0xFF) && (prop == tr->prop || prop == 0xFF)) {
+            /* Remove the transitioned property from trans. style
+             * to allow changing it by normal styles*/
+            lv_style_list_t * list = lv_obj_get_style_list(tr->obj, tr->part);
+            lv_style_t * style_trans = lv_style_list_get_transition_style(list);
+            lv_style_remove_prop(style_trans, tr->prop);
+
             lv_anim_del(tr, NULL);
             lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
             lv_mem_free(tr);
@@ -3796,14 +3802,8 @@ static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
 static void trans_anim_start_cb(lv_anim_t * a)
 {
     lv_style_trans_t * tr = a->var;
+
     lv_style_property_t prop_tmp = tr->prop;
-
-    /*Init prop to an invalid values to be sure `trans_del` won't delete the just added `tr`*/
-    tr->prop = 0;
-    /*Delete the relate transition if any*/
-    trans_del(tr->obj, tr->part, prop_tmp, tr);
-
-    tr->prop = prop_tmp;
 
     /*Start the animation from the current value*/
     if((prop_tmp & 0xF) < LV_STYLE_ID_COLOR) { /*Int*/
@@ -3818,11 +3818,20 @@ static void trans_anim_start_cb(lv_anim_t * a)
     else {      /*Ptr*/
         tr->start_value._ptr = _lv_obj_get_style_ptr(tr->obj, tr->part, prop_tmp);
     }
+
+    /*Init prop to an invalid values to be sure `trans_del` won't delete this added `tr`*/
+    tr->prop = 0;
+    /*Delete the relate transition if any*/
+    trans_del(tr->obj, tr->part, prop_tmp, tr);
+
+    tr->prop = prop_tmp;
+
 }
 
 static void trans_anim_ready_cb(lv_anim_t * a)
 {
     lv_style_trans_t * tr = a->var;
+
     /* Remove the transitioned property from trans. style
      * to allow changing it by normal styles*/
     lv_style_list_t * list = lv_obj_get_style_list(tr->obj, tr->part);
