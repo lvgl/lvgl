@@ -108,12 +108,11 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[]);
 void lv_btnmatrix_set_ctrl_map(lv_obj_t * btnm, const lv_btnmatrix_ctrl_t ctrl_map[]);
 
 /**
- * Set the pressed button i.e. visually highlight it.
- * Mainly used a when the btnm is in a group to show the selected button
+ * Set the focused button i.e. visually highlight it.
  * @param btnm pointer to button matrix object
- * @param id index of the currently pressed button (`LV_BTNMATRIX_BTN_NONE` to unpress)
+ * @param id index of the button to focus(`LV_BTNMATRIX_BTN_NONE` to remove focus)
  */
-void lv_btnmatrix_set_pressed(lv_obj_t * btnm, uint16_t id);
+void lv_btnmatrix_set_focused_btn(lv_obj_t * btnm, uint16_t id);
 
 /**
  * Set a style of a button matrix
@@ -214,12 +213,11 @@ uint16_t lv_btnmatrix_get_active_btn(const lv_obj_t * btnm);
 const char * lv_btnmatrix_get_active_btn_text(const lv_obj_t * btnm);
 
 /**
- * Get the pressed button's index.
- * The button be really pressed by the user or manually set to pressed with `lv_btnmatrix_set_pressed`
+ * Get the focused button's index.
  * @param btnm pointer to button matrix object
- * @return  index of the pressed button (LV_BTNMATRIX_BTN_NONE: if unset)
+ * @return  index of the focused button (LV_BTNMATRIX_BTN_NONE: if unset)
  */
-uint16_t lv_btnmatrix_get_pressed_btn(const lv_obj_t * btnm);
+uint16_t lv_btnmatrix_get_focused_btn(const lv_obj_t * btnm);
 
 /**
  * Get the button's text

@@ -649,10 +649,16 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
 
     if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROL || sign == LV_SIGNAL_PRESSED  ||
        sign == LV_SIGNAL_RELEASED) {
+
         /* The button matrix is not in a group (the tab view is in it) but it should handle the
          * group signals. So propagate the related signals to the button matrix manually*/
         if(ext->btns) {
             ext->btns->signal_cb(ext->btns, sign, param);
+
+            /*Make the active tab's button focused*/
+            if(sign == LV_SIGNAL_FOCUS) {
+                lv_btnmatrix_set_focused_btn(ext->btns, ext->tab_cur);
+            }
         }
     }
 
@@ -720,7 +726,7 @@ static lv_res_t tabview_scrl_signal(lv_obj_t * tabview_scrl, lv_signal_t sign, v
         lv_tabview_set_tab_act(tabview, tab_cur, LV_ANIM_ON);
         uint32_t id_new = lv_tabview_get_tab_act(tabview);
 
-        if(id_prev != id_new) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
+        if(id_prev != id_new) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_prev);
         if(res != LV_RES_OK) return res;
 
     }

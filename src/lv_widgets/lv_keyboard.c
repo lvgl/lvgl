@@ -134,7 +134,6 @@ lv_obj_t * lv_keyboard_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     /*Initialize the allocated 'ext' */
-
     ext->ta         = NULL;
     ext->mode       = LV_KEYBOARD_MODE_TEXT_LOWER;
     ext->cursor_mng = 0;
@@ -187,7 +186,7 @@ lv_obj_t * lv_keyboard_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param kb pointer to a Keyboard object
  * @param ta pointer to a Text Area object to write there
  */
-void lv_keyboard_set_ta(lv_obj_t * kb, lv_obj_t * ta)
+void lv_keyboard_set_textarea(lv_obj_t * kb, lv_obj_t * ta)
 {
     LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
     if(ta) LV_ASSERT_OBJ(ta, "lv_ta");
@@ -286,7 +285,7 @@ void lv_keyboard_set_ctrl_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const lv_b
  * @param kb pointer to a Keyboard object
  * @return pointer to the assigned Text Area object
  */
-lv_obj_t * lv_keyboard_get_ta(const lv_obj_t * kb)
+lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * kb)
 {
     LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
 
@@ -371,7 +370,7 @@ void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event)
             if(res != LV_RES_OK) return;
         }
         else {
-            lv_keyboard_set_ta(kb, NULL); /*De-assign the text area  to hide it cursor if needed*/
+            lv_keyboard_set_textarea(kb, NULL); /*De-assign the text area  to hide it cursor if needed*/
             lv_obj_del(kb);
             return;
         }
@@ -383,7 +382,7 @@ void lv_keyboard_def_event_cb(lv_obj_t * kb, lv_event_t event)
             if(res != LV_RES_OK) return;
         }
         else {
-            lv_keyboard_set_ta(kb, NULL); /*De-assign the text area to hide it cursor if needed*/
+            lv_keyboard_set_textarea(kb, NULL); /*De-assign the text area to hide it cursor if needed*/
         }
         return;
     }

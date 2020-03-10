@@ -1467,29 +1467,6 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
         bool * editable = (bool *)param;
         *editable       = true;
     }
-    else if(sign == LV_SIGNAL_DEFOCUS) {
-#if LV_USE_GROUP
-        if(lv_obj_get_group(ta)) {
-            lv_textarea_set_cursor_hidden(ta, true);
-        }
-#endif
-    }
-    else if(sign == LV_SIGNAL_FOCUS) {
-#if LV_USE_GROUP
-        lv_group_t * g             = lv_obj_get_group(ta);
-        bool editing               = lv_group_get_editing(g);
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
-
-        /*Encoders need special handling*/
-        if(indev_type == LV_INDEV_TYPE_ENCODER) {
-            if(editing) lv_textarea_set_cursor_hidden(ta, false);
-            else  lv_textarea_set_cursor_hidden(ta, true);
-        }
-        else {
-            lv_textarea_set_cursor_hidden(ta, false);
-        }
-#endif
-    }
     else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESS_LOST ||
             sign == LV_SIGNAL_RELEASED) {
         update_cursor_position_on_click(ta, sign, (lv_indev_t *)param);
