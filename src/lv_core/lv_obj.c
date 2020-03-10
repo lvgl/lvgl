@@ -3169,10 +3169,10 @@ lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
 {
     lv_coord_t s = 0;
 
-    lv_opa_t sh_opa = lv_obj_get_style_shadow_opa(obj, part);
-    if(sh_opa > LV_OPA_MIN) {
-        lv_coord_t sh_width = lv_obj_get_style_shadow_width(obj, part);
-        if(sh_width) {
+	lv_coord_t sh_width = lv_obj_get_style_shadow_width(obj, part);
+	if(sh_width) {
+		lv_opa_t sh_opa = lv_obj_get_style_shadow_opa(obj, part);
+		if(sh_opa > LV_OPA_MIN) {
             sh_width = sh_width / 2;    /*THe blur adds only half width*/
             sh_width++;
             sh_width += lv_obj_get_style_shadow_spread(obj, part);
@@ -3183,10 +3183,10 @@ lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
         }
     }
 
-    lv_opa_t value_opa = lv_obj_get_style_value_opa(obj, part);
-    if(value_opa > LV_OPA_MIN) {
-        const char * value_str = lv_obj_get_style_value_str(obj, part);
-        if(value_str) {
+	const char * value_str = lv_obj_get_style_value_str(obj, part);
+	if(value_str) {
+		lv_opa_t value_opa = lv_obj_get_style_value_opa(obj, part);
+		if(value_opa > LV_OPA_MIN) {
             lv_style_int_t letter_space = lv_obj_get_style_value_letter_space(obj, part);
             lv_style_int_t line_space = lv_obj_get_style_value_letter_space(obj, part);
             const lv_font_t * font = lv_obj_get_style_value_font(obj, part);
@@ -3218,10 +3218,10 @@ lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
         }
     }
 
-    lv_opa_t outline_opa = lv_obj_get_style_outline_opa(obj, part);
-    if(outline_opa > LV_OPA_MIN) {
-        lv_style_int_t outline_width = lv_obj_get_style_outline_width(obj, part);
-        if(outline_width) {
+	lv_style_int_t outline_width = lv_obj_get_style_outline_width(obj, part);
+	if(outline_width) {
+		lv_opa_t outline_opa = lv_obj_get_style_outline_opa(obj, part);
+		if(outline_opa > LV_OPA_MIN) {
             lv_style_int_t outline_pad = lv_obj_get_style_outline_pad(obj, part);
             s = LV_MATH_MAX(s, outline_pad + outline_width);
         }
