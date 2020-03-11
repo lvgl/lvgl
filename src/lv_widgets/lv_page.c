@@ -1031,9 +1031,12 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
     }
     else if(sign == LV_SIGNAL_FOCUS) {
+#if LV_USE_GROUP
         if(lv_obj_get_group(page)) {
             lv_group_focus_obj(page);
-        } else {
+        } else
+#endif
+        {
             res = lv_signal_send(page, LV_SIGNAL_FOCUS, NULL);
             if(res != LV_RES_OK) return res;
             res = lv_event_send(page, LV_EVENT_FOCUSED, NULL);

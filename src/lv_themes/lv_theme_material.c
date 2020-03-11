@@ -178,6 +178,7 @@ static void basic_init(void)
     lv_style_set_border_color(&panel, LV_STATE_FOCUSED, color_panel_border(LV_STATE_FOCUSED));
     lv_style_set_border_width(&panel, LV_STATE_DEFAULT, BORDER_WIDTH);
     lv_style_set_border_side(&panel, LV_STATE_DEFAULT, LV_BORDER_SIDE_TOP);
+    lv_style_set_border_post(&panel, LV_STATE_DEFAULT, true);
     lv_style_set_text_font(&panel, LV_STATE_DEFAULT, _font_normal);
     lv_style_set_text_color(&panel, LV_STATE_DEFAULT, color_panel_txt(LV_STATE_DEFAULT));
     lv_style_set_value_color(&panel, LV_STATE_DEFAULT, color_panel_txt(LV_STATE_DEFAULT));
