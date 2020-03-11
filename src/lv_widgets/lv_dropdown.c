@@ -266,6 +266,7 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos
     if(ext->static_txt != 0) {
         ext->options = NULL;
         ext->static_txt = 0;
+        ext->option_cnt = 0;
     }
 
     /*Allocate space for the new option*/
