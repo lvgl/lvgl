@@ -262,8 +262,11 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos
 
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
-    /*Can not append to static options*/
-    if(ext->static_txt != 0) return;
+    /*Clear any existing static options*/
+    if(ext->static_txt != 0) {
+        ext->options = NULL;
+        ext->static_txt = 0;
+    }
 
     /*Allocate space for the new option*/
     size_t old_len = (ext->options == NULL) ? 0 : strlen(ext->options);
