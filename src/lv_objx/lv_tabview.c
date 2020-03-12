@@ -165,6 +165,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_tabview_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->point_last.x           = 0;
         ext->point_last.y           = 0;
+        ext->tab_cnt                = 0; /*Incremented later when the old tabs are copied*/
         ext->btns                   = lv_btnm_create(new_tabview, copy_ext->btns);
         ext->indic                  = lv_obj_create(ext->btns, copy_ext->indic);
         ext->content                = lv_cont_create(new_tabview, copy_ext->content);
