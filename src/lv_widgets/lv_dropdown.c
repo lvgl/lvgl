@@ -178,6 +178,26 @@ void lv_dropdown_set_text(lv_obj_t * ddlist, const char * txt)
 }
 
 /**
+ * Clear any options in a drop down list.  Static or dynamic.
+ * @param ddlist pointer to drop down list object
+ */
+void lv_dropdown_clear_options(lv_obj_t * ddlist)
+{
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    if(ext->options == NULL) return;
+
+    if(ext->static_txt == 0)
+        lv_mem_free(ext->options);
+
+    ext->options = NULL;
+    ext->static_txt = 0;
+    ext->option_cnt = 0;
+
+    lv_obj_invalidate(ddlist);
+}
+
+/**
  * Set the options in a drop down list from a string
  * @param ddlist pointer to drop down list object
  * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
@@ -262,8 +282,18 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos
 
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
-    /*Can not append to static options*/
-    if(ext->static_txt != 0) return;
+    /*Convert static options to dynmaic*/
+    if(ext->static_txt != 0) {
+        char * static_options = ext->options;
+        size_t len = strlen(static_options) + 1;
+
+        ext->options = lv_mem_alloc(len);
+        LV_ASSERT_MEM(ext->options);
+        if(ext->options == NULL) return;
+
+        strcpy(ext->options, static_options);
+        ext->static_txt = 0;
+    }
 
     /*Allocate space for the new option*/
     size_t old_len = (ext->options == NULL) ? 0 : strlen(ext->options);
