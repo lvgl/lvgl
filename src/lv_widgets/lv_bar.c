@@ -470,8 +470,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         anim_start_value_x = (((anim_start_value_end_x - anim_start_value_start_x) * ext->start_value_anim.anim_state) /
                               LV_BAR_ANIM_STATE_END);
 
-        if(anim_start_value_end_x < anim_start_value_start_x)
-            anim_start_value_x += anim_start_value_start_x;
+        anim_start_value_x += anim_start_value_start_x;
     }
     else
 #endif
@@ -486,11 +485,8 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         lv_coord_t anim_cur_value_end_x =
             (int32_t)((int32_t)anim_length * (ext->cur_value_anim.anim_end - ext->min_value)) / range;
 
-        anim_cur_value_x = (((anim_cur_value_end_x - anim_cur_value_start_x) * ext->cur_value_anim.anim_state) /
+        anim_cur_value_x = anim_cur_value_start_x + (((anim_cur_value_end_x - anim_cur_value_start_x) * ext->cur_value_anim.anim_state) /
                             LV_BAR_ANIM_STATE_END);
-
-        if(anim_cur_value_end_x < anim_cur_value_start_x)
-            anim_cur_value_x += anim_cur_value_start_x;
     }
     else
 #endif
@@ -507,6 +503,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         anim_cur_value_x = -anim_cur_value_x;
         anim_start_value_x = -anim_start_value_x;
     }
+
     /* Set the indicator length */
     if(hor) {
         *axis2 = *axis1 + anim_cur_value_x;
@@ -729,8 +726,6 @@ static void lv_bar_set_value_with_anim(lv_obj_t * bar, int16_t new_value, int16_
         lv_anim_set_ready_cb(&a, lv_bar_anim_ready);
         lv_anim_set_time(&a, ext->anim_time);
         lv_anim_start(&a);
-
-        ext->cur_value = new_value;
     }
 }
 
