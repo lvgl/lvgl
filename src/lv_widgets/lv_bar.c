@@ -406,6 +406,7 @@ static void draw_bg(lv_obj_t * bar, const lv_area_t * clip_area)
 static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
+    lv_bidi_dir_t base_dir = lv_obj_get_base_dir(bar);
 
     lv_coord_t objw = lv_obj_get_width(bar);
     lv_coord_t objh = lv_obj_get_height(bar);
@@ -497,14 +498,23 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         anim_cur_value_x = (int32_t)((int32_t)anim_length * (ext->cur_value - ext->min_value)) / range;
     }
 
+    if(hor && base_dir == LV_BIDI_DIR_RTL) {
+        /* Swap axes */
+        lv_coord_t * tmp;
+        tmp = axis1;
+        axis1 = axis2;
+        axis2 = tmp;
+        anim_cur_value_x = -anim_cur_value_x;
+        anim_start_value_x = -anim_start_value_x;
+    }
     /* Set the indicator length */
     if(hor) {
         *axis2 = *axis1 + anim_cur_value_x;
         *axis1 += anim_start_value_x;
     }
     else {
-        *axis2 -= anim_start_value_x;
         *axis1 = *axis2 - anim_cur_value_x;
+        *axis2 -= anim_start_value_x;
     }
     if(sym) {
         lv_coord_t zero;
