@@ -3,14 +3,14 @@
 /*******************************************************************************
  * Size: 18 px
  * Bpp: 4
- * Opts: 
+ * Opts:
  ******************************************************************************/
 
-#ifndef PERSIAN_FONT
-#define PERSIAN_FONT 1
+#ifndef LV_FONT_AP_18
+#define LV_FONT_AP_18 1
 #endif
 
-#if PERSIAN_FONT
+#if LV_FONT_AP_18
 
 /*-----------------
  *    BITMAPS
@@ -5487,7 +5487,7 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
  *----------------*/
 
 /*Initialize a public general font descriptor*/
-lv_font_t persian_font = {
+lv_font_t lv_font_ap_18 = {
     .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
     .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
     .line_height = 26,          /*The maximum line height required by the font*/
@@ -5498,5 +5498,4 @@ lv_font_t persian_font = {
     .dsc = &font_dsc           /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
 };
 
-#endif /*#if PERSIAN_FONT*/
-
+#endif /*#if LV_FONT_AP_18*/
