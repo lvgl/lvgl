@@ -156,6 +156,11 @@ bool lv_bidi_letter_is_rtl(uint32_t letter)
     if(letter >= 0x5d0 && letter <= 0x5ea) return true;
     if(letter == 0x202E) return true;               /*Unicode of LV_BIDI_RLO*/
 
+    /* Check for Persian and Arabic characters [https://en.wikipedia.org/wiki/Arabic_script_in_Unicode]*/
+    if(letter >= 0x600 && letter <= 0x6FF) return true;
+    if(letter >= 0xFB50 && letter <= 0xFDFF) return true;
+    if(letter >= 0xFE70 && letter <= 0xFEFF) return true;
+
     return false;
 }
 
