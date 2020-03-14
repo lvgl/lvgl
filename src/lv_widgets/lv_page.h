@@ -36,14 +36,14 @@ extern "C" {
 
 /** Scrollbar modes: shows when should the scrollbars be visible*/
 enum {
-    LV_SB_MODE_OFF    = 0x0, /**< Never show scrollbars*/
-    LV_SB_MODE_ON     = 0x1, /**< Always show scrollbars*/
-    LV_SB_MODE_DRAG   = 0x2, /**< Show scrollbars when page is being dragged*/
-    LV_SB_MODE_AUTO   = 0x3, /**< Show scrollbars when the scrollable container is large enough to be scrolled*/
-    LV_SB_MODE_HIDE   = 0x4, /**< Hide the scroll bar temporally*/
-    LV_SB_MODE_UNHIDE = 0x5, /**< Unhide the previously hidden scrollbar. Recover it's type too*/
+    LV_SCRLBAR_MODE_OFF    = 0x0, /**< Never show scroll bars*/
+    LV_SCRLBAR_MODE_ON     = 0x1, /**< Always show scroll bars*/
+    LV_SCRLBAR_MODE_DRAG   = 0x2, /**< Show scroll bars when page is being dragged*/
+    LV_SCRLBAR_MODE_AUTO   = 0x3, /**< Show scroll bars when the scrollable container is large enough to be scrolled*/
+    LV_SCRLBAR_MODE_HIDE   = 0x4, /**< Hide the scroll bar temporally*/
+    LV_SCRLBAR_MODE_UNHIDE = 0x5, /**< Unhide the previously hidden scroll bar. Recover original mode too*/
 };
-typedef uint8_t lv_sb_mode_t;
+typedef uint8_t lv_scrlbar_mode_t;
 
 /** Edges: describes the four edges of the page*/
 enum { LV_PAGE_EDGE_LEFT = 0x1, LV_PAGE_EDGE_TOP = 0x2, LV_PAGE_EDGE_RIGHT = 0x4, LV_PAGE_EDGE_BOTTOM = 0x8 };
@@ -60,7 +60,7 @@ typedef struct {
         lv_area_t ver_area;       /*Vertical scrollbar area relative to the page (Handled by the library)*/
         uint8_t hor_draw : 1;     /*1: horizontal scrollbar is visible now (Handled by the library)*/
         uint8_t ver_draw : 1;     /*1: vertical scrollbar is visible now (Handled by the library)*/
-        lv_sb_mode_t mode : 3;    /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
+        lv_scrlbar_mode_t mode : 3;    /*Scrollbar visibility from 'lv_page_sb_mode_t'*/
     } scrlbar;
 #if LV_USE_ANIMATION
     struct {
@@ -135,7 +135,7 @@ uint16_t lv_page_get_anim_time(const lv_obj_t * page);
  * @param page pointer to a page object
  * @param sb_mode the new mode from 'lv_page_sb.mode_t' enum
  */
-void lv_page_set_sb_mode(lv_obj_t * page, lv_sb_mode_t sb_mode);
+void lv_page_set_scrlbar_mode(lv_obj_t * page, lv_scrlbar_mode_t sb_mode);
 
 /**
  * Set the animation time for the page
@@ -237,7 +237,7 @@ static inline void lv_page_set_scrl_layout(lv_obj_t * page, lv_layout_t layout)
  * @param page pointer to a page object
  * @return the mode from 'lv_page_sb.mode_t' enum
  */
-lv_sb_mode_t lv_page_get_sb_mode(const lv_obj_t * page);
+lv_scrlbar_mode_t lv_page_get_sb_mode(const lv_obj_t * page);
 
 /**
  * Get the scroll propagation property

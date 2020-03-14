@@ -100,7 +100,7 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_style_list_copy(&ext->style_arc, &copy_ext->style_arc);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(arc);
+        lv_obj_refresh_style(arc, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("arc created");
@@ -132,6 +132,7 @@ void lv_arc_set_start_angle(lv_obj_t * arc, int16_t start)
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     if(start > 360) start -= 360;
+    if(start < 0) start += 360;
 
     /*Too large move, the whole arc need to be invalidated anyway*/
     if(LV_MATH_ABS(start - ext->arc_angle_start) >= 180) {
@@ -164,6 +165,9 @@ void lv_arc_set_end_angle(lv_obj_t * arc, int16_t end)
 
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
+    if(end > 360) end -= 360;
+    if(end < 0) end += 360;
+
     /*Too large move, the whole arc need to be invalidated anyway*/
     if(LV_MATH_ABS(end - ext->arc_angle_end) >= 180) {
         lv_obj_invalidate(arc);
@@ -191,14 +195,17 @@ void lv_arc_set_end_angle(lv_obj_t * arc, int16_t end)
  * @param start the start angle
  * @param end the end angle
  */
-void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
+void lv_arc_set_angles(lv_obj_t * arc, int16_t start, int16_t end)
 {
     LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
 
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     if(end > 360) end -= 360;
+    if(end < 0) end += 360;
+
     if(start > 360) start -= 360;
+    if(start < 0) start += 360;
 
     inv_arc_area(arc, ext->arc_angle_start, ext->arc_angle_end);
 
@@ -220,6 +227,7 @@ void lv_arc_set_bg_start_angle(lv_obj_t * arc, int16_t start)
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     if(start > 360) start -= 360;
+    if(start < 0) start += 360;
 
     /*Too large move, the whole arc need to be invalidated anyway*/
     if(LV_MATH_ABS(start - ext->bg_angle_start) >= 180) {
@@ -253,6 +261,7 @@ void lv_arc_set_bg_end_angle(lv_obj_t * arc, int16_t end)
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     if(end > 360) end -= 360;
+    if(end < 0) end += 360;
 
     /*Too large move, the whole arc need to be invalidated anyway*/
     if(LV_MATH_ABS(end - ext->bg_angle_end) >= 180) {
@@ -280,14 +289,17 @@ void lv_arc_set_bg_end_angle(lv_obj_t * arc, int16_t end)
  * @param start the start angle
  * @param end the end angle
  */
-void lv_arc_set_bg_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
+void lv_arc_set_bg_angles(lv_obj_t * arc, int16_t start, int16_t end)
 {
     LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
 
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     if(end > 360) end -= 360;
+    if(end < 0) end += 360;
+
     if(start > 360) start -= 360;
+    if(start < 0) start += 360;
 
     inv_arc_area(arc, ext->bg_angle_start, ext->bg_angle_end);
 

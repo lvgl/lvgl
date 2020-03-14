@@ -108,7 +108,7 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(table);
+        lv_obj_refresh_style(table, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("table created");
@@ -162,6 +162,8 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
     }
 
     ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
+    LV_ASSERT_MEM(ext->cell_data[cell]);
+    if(ext->cell_data[cell] == NULL) return;
     strcpy(ext->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
 
     ext->cell_data[cell][0] = format.format_byte;
@@ -742,7 +744,6 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     lv_point_t p2;
                     p1.x = cell_area.x1;
                     p2.x = cell_area.x2;
-                    uint16_t i;
                     for(i = 1; ext->cell_data[cell][i] != '\0'; i++) {
                         if(ext->cell_data[cell][i] == '\n') {
                             ext->cell_data[cell][i] = '\0';

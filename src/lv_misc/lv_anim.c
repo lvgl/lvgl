@@ -26,7 +26,7 @@
  *********************/
 #define LV_ANIM_RESOLUTION 1024
 #define LV_ANIM_RES_SHIFT 10
-#define LV_ANIM_TASK_PRIO LV_TASK_PRIO_MID
+#define LV_ANIM_TASK_PRIO LV_TASK_PRIO_HIGH
 
 /**********************
  *      TYPEDEFS
@@ -163,7 +163,7 @@ uint16_t lv_anim_count_running(void)
     lv_anim_t * a;
     LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) cnt++;
 
-    return cnt++;
+    return cnt;
 }
 
 /**

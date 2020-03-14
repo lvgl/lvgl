@@ -507,7 +507,7 @@ void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part);
  * Notify an object about its style is modified
  * @param obj pointer to an object
  */
-void lv_obj_refresh_style(lv_obj_t * obj);
+void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop);
 
 /**
  * Notify all object if a style is modified

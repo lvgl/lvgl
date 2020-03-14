@@ -8,6 +8,7 @@
  *********************/
 #include "../../lvgl.h"
 #include "../lv_test_assert.h"
+#include "lv_test_obj.h"
 
 #if LV_BUILD_TEST
 

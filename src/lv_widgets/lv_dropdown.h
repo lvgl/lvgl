@@ -26,7 +26,6 @@ extern "C" {
 #error "lv_ddlist: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
-#include "../lv_widgets/lv_btn.h"
 #include "../lv_widgets/lv_page.h"
 #include "../lv_widgets/lv_label.h"
 
@@ -50,7 +49,6 @@ typedef uint8_t lv_dropdown_dir_t;
 
 /*Data of drop down list*/
 typedef struct {
-    lv_btn_ext_t btn; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * page;             /*The dropped down list*/
     const char * text;           /*Text to display on the ddlist's button*/
@@ -71,8 +69,8 @@ typedef struct {
 } lv_dropdown_ext_t;
 
 enum {
-    LV_DROPDOWN_PART_BTN = LV_BTN_PART_MAIN,
-    LV_DROPDOWN_PART_LIST = _LV_BTN_PART_REAL_LAST,
+    LV_DROPDOWN_PART_MAIN = LV_OBJ_PART_MAIN,
+    LV_DROPDOWN_PART_LIST = _LV_OBJ_PART_REAL_LAST,
     LV_DROPDOWN_PART_SCRLBAR,
     LV_DROPDOWN_PART_SELECTED,
 };
@@ -100,6 +98,12 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param txt the text as a string (Only it's pointer is saved)
  */
 void lv_dropdown_set_text(lv_obj_t * ddlist, const char * txt);
+
+/**
+ * Clear any options in a drop down list.  Static or dynamic.
+ * @param ddlist pointer to drop down list object
+ */
+void lv_dropdown_clear_options(lv_obj_t * ddlist);
 
 /**
  * Set the options in a drop down list from a string
@@ -131,11 +135,18 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos
  */
 void lv_dropdown_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
 
+
 /**
- * Set a maximum height for the drop down list
- * If 0 then the opened ddlist will be auto. sized else the set height will be applied.
+ * Set the direction of the a drop down list
+ * @param ddlist pointer to a drop down list object
+ * @param dir LV_DROPDOWN_DIR_LEF/RIGHT/TOP/BOTTOM
+ */
+void lv_dropdown_set_dir(lv_obj_t * ddlist, lv_dropdown_dir_t dir);
+
+/**
+ * Set the maximal height for the drop down list
  * @param ddlist pointer to a drop down list
- * @param h the height when the list is opened (0: auto size)
+ * @param h the maximal height
  */
 void lv_dropdown_set_max_height(lv_obj_t * ddlist, lv_coord_t h);
 
@@ -147,14 +158,12 @@ void lv_dropdown_set_max_height(lv_obj_t * ddlist, lv_coord_t h);
 void lv_dropdown_set_symbol(lv_obj_t * ddlist, const char * symbol);
 
 /**
- * Set the scroll bar mode of a drop down list
+ * Set whether the ddlist highlight the last selected option and display its text or not
  * @param ddlist pointer to a drop down list object
- * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
+ * @param show true/false
  */
-static inline void lv_dropdown_set_sb_mode(lv_obj_t * ddlist, lv_sb_mode_t mode)
-{
-    lv_page_set_sb_mode(ddlist, mode);
-}
+void lv_dropdown_set_show_selected(lv_obj_t * ddlist, bool show);
+
 /**
  * Set the open/close animation time.
  * @param ddlist pointer to a drop down list
@@ -164,20 +173,6 @@ static inline void lv_dropdown_set_anim_time(lv_obj_t * ddlist, uint16_t anim_ti
 {
     lv_page_set_anim_time(ddlist, anim_time);
 }
-
-/**
- * Set the direction of the a drop down list
- * @param ddlist pointer to a drop down list object
- * @param dir LV_DROPDOWN_DIR_LEF/RIGHT/TOP/BOTTOM
- */
-void lv_dropdown_set_dir(lv_obj_t * ddlist, lv_dropdown_dir_t dir);
-
-/**
- * Set whether the ddlist highlight the last selected option and display its text or not
- * @param ddlist pointer to a drop down list object
- * @param show true/false
- */
-void lv_dropdown_set_show_selected(lv_obj_t * ddlist, bool show);
 
 /*=====================
  * Getter functions
@@ -248,16 +243,6 @@ lv_dropdown_dir_t lv_dropdown_get_dir(const lv_obj_t * ddlist);
 bool lv_dropdown_get_show_selected(lv_obj_t * ddlist);
 
 /**
- * Get the scroll bar mode of a drop down list
- * @param ddlist pointer to a  drop down list object
- * @return scrollbar mode from 'lv_page_sb_mode_t' enum
- */
-static inline lv_sb_mode_t lv_dropdown_get_sb_mode(const lv_obj_t * ddlist)
-{
-    return lv_page_get_sb_mode(ddlist);
-}
-
-/**
  * Get the open/close animation time.
  * @param ddlist pointer to a drop down list
  * @return open/close animation time [ms]
@@ -266,13 +251,6 @@ static inline uint16_t lv_dropdown_get_anim_time(const lv_obj_t * ddlist)
 {
     return lv_page_get_anim_time(ddlist);
 }
-
-/**
- * Get the alignment of the labels in a drop down list
- * @param ddlist pointer to a drop down list object
- * @return alignment of labels
- */
-lv_label_align_t lv_dropdown_get_align(const lv_obj_t * ddlist);
 
 /*=====================
  * Other functions

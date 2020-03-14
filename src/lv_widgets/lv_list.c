@@ -85,7 +85,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
 #if LV_USE_GROUP
-    ext->last_sel_btn     = NULL;
+    ext->last_sel_btn = NULL;
 #endif
     ext->act_sel_btn = NULL;
 
@@ -97,7 +97,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_page_set_scrl_fit2(list, LV_FIT_PARENT, LV_FIT_TIGHT);
         lv_obj_set_size(list, 2 * LV_DPI, 3 * LV_DPI);
         lv_page_set_scrl_layout(list, LV_LIST_LAYOUT_DEF);
-        lv_list_set_sb_mode(list, LV_SB_MODE_DRAG);
+        lv_list_set_sb_mode(list, LV_SCRLBAR_MODE_DRAG);
 
         lv_theme_apply(list, LV_THEME_LIST);
 
@@ -115,7 +115,7 @@ lv_obj_t * lv_list_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(list);
+        lv_obj_refresh_style(list, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("list created");

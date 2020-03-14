@@ -120,7 +120,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * par, const lv_obj_t * copy)
         if(copy_ext->btnm) ext->btnm = lv_btnmatrix_create(mbox, copy_ext->btnm);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(mbox);
+        lv_obj_refresh_style(mbox, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("message box created");
@@ -408,9 +408,12 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
     else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_get_state_info_t * info = param;
         lv_msgbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-        if(ext->btnm && info->part == LV_MSGBOX_PART_BTN_BG) info->result = lv_obj_get_state(ext->btnm, LV_BTNMATRIX_PART_BG);
-        else if(ext->btnm &&
-                info->part == LV_MSGBOX_PART_BTN) info->result = lv_obj_get_state(ext->btnm, LV_BTNMATRIX_PART_BTN);
+        if(ext->btnm && info->part == LV_MSGBOX_PART_BTN_BG) {
+            info->result = lv_obj_get_state(ext->btnm, LV_BTNMATRIX_PART_BG);
+        }
+        else if(ext->btnm && info->part == LV_MSGBOX_PART_BTN) {
+            info->result = lv_obj_get_state(ext->btnm, LV_BTNMATRIX_PART_BTN);
+        }
         return LV_RES_OK;
     }
 
@@ -499,7 +502,7 @@ static void mbox_realign(lv_obj_t * mbox)
 {
     lv_msgbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
 
-    lv_coord_t w             = lv_obj_get_width_fit(mbox);
+    lv_coord_t w = lv_obj_get_width_fit(mbox);
 
     if(ext->text) {
         lv_obj_set_width(ext->text, w);
@@ -508,12 +511,21 @@ static void mbox_realign(lv_obj_t * mbox)
     if(ext->btnm) {
         lv_style_int_t bg_top = lv_obj_get_style_pad_top(mbox, LV_MSGBOX_PART_BTN_BG);
         lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(mbox, LV_MSGBOX_PART_BTN_BG);
+        lv_style_int_t bg_inner = lv_obj_get_style_pad_inner(mbox, LV_MSGBOX_PART_BTN_BG);
         lv_style_int_t btn_top = lv_obj_get_style_pad_top(mbox, LV_MSGBOX_PART_BTN);
         lv_style_int_t btn_bottom = lv_obj_get_style_pad_bottom(mbox, LV_MSGBOX_PART_BTN);
         const lv_font_t * font = lv_obj_get_style_text_font(mbox, LV_MSGBOX_PART_BTN);
 
+        uint16_t btnm_lines = 1;
+        const char ** btnm_map = lv_btnmatrix_get_map_array(ext->btnm);
+        uint16_t i;
+        for(i = 0; btnm_map[i][0] != '\0'; i++) {
+            if(btnm_map[i][0] == '\n') btnm_lines++;
+        }
+
         lv_coord_t font_h = lv_font_get_line_height(font);
-        lv_obj_set_size(ext->btnm, w, font_h + btn_top + btn_bottom + bg_top + bg_bottom);
+        lv_coord_t btn_h = font_h + btn_top + btn_bottom;
+        lv_obj_set_size(ext->btnm, w, btn_h * btnm_lines + bg_inner * (btnm_lines - 1) + bg_top + bg_bottom);
     }
 }
 

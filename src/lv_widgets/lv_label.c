@@ -161,7 +161,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->dot_end       = copy_ext->dot_end;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_label);
+        lv_obj_refresh_style(new_label, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("label created");
@@ -1153,7 +1153,6 @@ static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         /*Revert dots for proper refresh*/
         lv_label_revert_dots(label);
-
         lv_label_refr_text(label);
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {

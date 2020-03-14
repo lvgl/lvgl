@@ -66,9 +66,6 @@ lv_color_t lv_color_hsv_to_rgb(uint16_t h, uint8_t s, uint8_t v)
     uint8_t region, remainder, p, q, t;
 
     if(s == 0) {
-        r = v;
-        g = v;
-        b = v;
         return lv_color_make(v, v, v);
     }
 

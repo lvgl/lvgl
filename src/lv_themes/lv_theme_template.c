@@ -60,6 +60,7 @@ static void basic_init(void)
     lv_style_init(&style_bg);
     lv_style_set_bg_opa(&style_bg, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_border_width(&style_bg, LV_STATE_DEFAULT, 1);
+    lv_style_set_border_width(&style_bg, LV_STATE_FOCUSED, 2);
     lv_style_set_border_color(&style_bg, LV_STATE_FOCUSED, _color_secondary);
     lv_style_set_border_color(&style_bg, LV_STATE_EDITED, lv_color_darken(_color_secondary, LV_OPA_30));
     lv_style_set_line_width(&style_bg, LV_STATE_DEFAULT, 1);
@@ -79,7 +80,6 @@ static void basic_init(void)
     lv_style_set_bg_color(&style_btn, LV_STATE_DISABLED, LV_COLOR_SILVER);
     lv_style_set_text_color(&style_btn, LV_STATE_DISABLED, LV_COLOR_GRAY);
     lv_style_set_image_recolor(&style_btn, LV_STATE_DISABLED, LV_COLOR_GRAY);
-
 
     lv_style_init(&style_round);
     lv_style_set_radius(&style_round, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
@@ -543,8 +543,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             lv_style_list_add_style(list, &style_bg);
             lv_style_list_add_style(list, &style_tick_line);
 
-            lv_obj_clean_style_list(obj, LV_SPINNER_PART_ARC);
-            list = lv_obj_get_style_list(obj, LV_SPINNER_PART_ARC);
+            lv_obj_clean_style_list(obj, LV_SPINNER_PART_INDIC);
+            list = lv_obj_get_style_list(obj, LV_SPINNER_PART_INDIC);
             lv_style_list_add_style(list, &style_bg);
             lv_style_list_add_style(list, &style_color);
             lv_style_list_add_style(list, &style_tick_line);
@@ -687,8 +687,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
             lv_style_list_add_style(list, &style_bg);
 
-            lv_obj_clean_style_list(obj, LV_ROLLER_PART_SEL);
-            list = lv_obj_get_style_list(obj, LV_ROLLER_PART_SEL);
+            lv_obj_clean_style_list(obj, LV_ROLLER_PART_SELECTED);
+            list = lv_obj_get_style_list(obj, LV_ROLLER_PART_SELECTED);
             lv_style_list_add_style(list, &style_bg);
             lv_style_list_add_style(list, &style_color);
             break;
@@ -726,8 +726,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_DROPDOWN
         case LV_THEME_DROPDOWN:
-            lv_obj_clean_style_list(obj, LV_DROPDOWN_PART_BTN);
-            list = lv_obj_get_style_list(obj, LV_DROPDOWN_PART_BTN);
+            lv_obj_clean_style_list(obj, LV_DROPDOWN_PART_MAIN);
+            list = lv_obj_get_style_list(obj, LV_DROPDOWN_PART_MAIN);
             lv_style_list_add_style(list, &style_bg);
             lv_style_list_add_style(list, &style_btn);
 
@@ -922,8 +922,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             lv_style_list_add_style(list, &style_bg);
             lv_style_list_add_style(list, &style_round);
 
-            lv_obj_clean_style_list(obj, LV_GAUGE_PART_STRONG);
-            list = lv_obj_get_style_list(obj, LV_GAUGE_PART_STRONG);
+            lv_obj_clean_style_list(obj, LV_GAUGE_PART_MAJOR);
+            list = lv_obj_get_style_list(obj, LV_GAUGE_PART_MAJOR);
             lv_style_list_add_style(list, &style_tick_line);
 
             lv_obj_clean_style_list(obj, LV_GAUGE_PART_NEEDLE);
@@ -936,7 +936,7 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
     }
 
 
-    lv_obj_refresh_style(obj);
+    lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
 
 
 }

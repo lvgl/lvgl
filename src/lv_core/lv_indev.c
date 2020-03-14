@@ -247,6 +247,11 @@ void lv_indev_set_button_points(lv_indev_t * indev, const lv_point_t * points)
  */
 void lv_indev_get_point(const lv_indev_t * indev, lv_point_t * point)
 {
+    if(indev == NULL) {
+        point->x = 0;
+        point->y = 0;
+        return;
+    }
     if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) {
         point->x = -1;
         point->y = -1;
@@ -488,6 +493,14 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
     }
     /*Pressing*/
     else if(data->state == LV_INDEV_STATE_PR && prev_state == LV_INDEV_STATE_PR) {
+
+        if(data->key == LV_KEY_ENTER) {
+            indev_obj_act->signal_cb(indev_obj_act, LV_SIGNAL_PRESSING, NULL);
+            if(indev_reset_check(&i->proc)) return;
+            lv_event_send(indev_obj_act, LV_EVENT_PRESSING, NULL);
+            if(indev_reset_check(&i->proc)) return;
+        }
+
         /*Long press time has elapsed?*/
         if(i->proc.long_pr_sent == 0 && lv_tick_elaps(i->proc.pr_timestamp) > i->driver.long_press_time) {
             i->proc.long_pr_sent = 1;
@@ -780,6 +793,11 @@ static void indev_proc_press(lv_indev_proc_t * proc)
         indev_drag_throw(proc);
     }
 
+    /*Do not use disabled objects*/
+    if((lv_obj_get_state(indev_obj_act, LV_OBJ_PART_MAIN) & LV_STATE_DISABLED)) {
+        indev_obj_act = proc->types.pointer.act_obj;
+    }
+
     /*If a new object was found reset some variables and send a pressed signal*/
     if(indev_obj_act != proc->types.pointer.act_obj) {
         proc->types.pointer.last_point.x = proc->types.pointer.act_point.x;
@@ -1044,8 +1062,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 
         /*If then the children was not ok, and this obj is clickable
          * and it or its parent is not hidden then save this object*/
-        if(found_p == NULL && lv_obj_get_click(obj) != false &&
-           (lv_obj_get_state(obj, LV_OBJ_PART_MAIN) & LV_STATE_DISABLED) == 0) {
+        if(found_p == NULL && lv_obj_get_click(obj) != false) {
             lv_obj_t * hidden_i = obj;
             while(hidden_i != NULL) {
                 if(lv_obj_get_hidden(hidden_i) == true) break;

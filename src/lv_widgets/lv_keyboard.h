@@ -83,7 +83,7 @@ lv_obj_t * lv_keyboard_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param kb pointer to a Keyboard object
  * @param ta pointer to a Text Area object to write there
  */
-void lv_keyboard_set_ta(lv_obj_t * kb, lv_obj_t * ta);
+void lv_keyboard_set_textarea(lv_obj_t * kb, lv_obj_t * ta);
 
 /**
  * Set a new a mode (text or number map)
@@ -128,7 +128,7 @@ void lv_keyboard_set_ctrl_map(lv_obj_t * kb, lv_keyboard_mode_t mode, const lv_b
  * @param kb pointer to a Keyboard object
  * @return pointer to the assigned Text Area object
  */
-lv_obj_t * lv_keyboard_get_ta(const lv_obj_t * kb);
+lv_obj_t * lv_keyboard_get_textarea(const lv_obj_t * kb);
 
 /**
  * Set a new a mode (text or number map)

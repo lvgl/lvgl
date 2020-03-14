@@ -49,7 +49,9 @@ typedef struct {
 /** Checkbox styles. */
 enum {
     LV_CHECKBOX_PART_BG = LV_BTN_PART_MAIN,  /**< Style of object background. */
+    _LV_CHECKBOX_PART_VIRTUAL_LAST,
     LV_CHECKBOX_PART_BULLET = _LV_BTN_PART_REAL_LAST, /**< Style of box (released). */
+    _LV_CHECKBOX_PART_REAL_LAST
 };
 typedef uint8_t lv_checkbox_style_t;
 
@@ -99,7 +101,7 @@ static inline void lv_checkbox_set_checked(lv_obj_t * cb, bool checked)
  * Make the check box inactive (disabled)
  * @param cb pointer to a check box object
  */
-static inline void lv_checkbox_set_inactive(lv_obj_t * cb)
+static inline void lv_checkbox_set_disabled(lv_obj_t * cb)
 {
     lv_btn_set_state(cb, LV_BTN_STATE_DISABLED);
 }

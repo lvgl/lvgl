@@ -279,9 +279,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 #define LV_USE_ASSERT_MEM       1
 
 /*Check the integrity of `lv_mem` after critical operations. (Slow)*/
-#ifndef LV_USE_ASSERT_MEM_INTEGRITY
 #define LV_USE_ASSERT_MEM_INTEGRITY       0
-#endif
 
 /* Check the strings.
  * Search for NULL, very long strings, invalid characters, and unnatural repetitions. (Slow)
@@ -293,7 +291,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 #define LV_USE_ASSERT_OBJ       0
 
 /*Check if the styles are properly initialized. (Fast)*/
-#define LV_USE_ASSERT_STYLE     1
+#define LV_USE_ASSERT_STYLE     0
 
 #endif /*LV_USE_DEBUG*/
 
@@ -522,6 +520,10 @@ typedef void * lv_obj_user_data_t;
 
 /*LED (dependencies: -)*/
 #define LV_USE_LED      1
+#if LV_USE_LED
+#  define LV_LED_BRIGHT_MIN  60      /*Minimal brightness*/
+#  define LV_LED_BRIGHT_MAX  255     /*Maximal brightness*/
+#endif
 
 /*Line (dependencies: -*/
 #define LV_USE_LINE     1

@@ -652,7 +652,7 @@ void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color, lv_opa_t opa)
 
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
-    uint32_t x = dsc->header.w * dsc->header.h;
+    uint32_t x;
     uint32_t y;
     for(y = 0; y < dsc->header.h; y++) {
         for(x = 0; x < dsc->header.w; x++) {

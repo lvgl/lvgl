@@ -110,7 +110,6 @@ void lv_group_del(lv_group_t * group)
 void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
 {
     if(group == NULL) return;
-
     /*Do not add the object twice*/
     lv_obj_t ** obj_i;
     LV_LL_READ(group->obj_ll, obj_i) {

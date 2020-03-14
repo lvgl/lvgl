@@ -389,6 +389,9 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
         return;
     }
 
+    /* Don't draw anything if the character is empty. E.g. space */
+    if((g.box_h == 0) && (g.box_w == 0)) return;
+
     int32_t pos_x = pos_p->x + g.ofs_x;
     int32_t pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - g.box_h - g.ofs_y;
 
@@ -446,13 +449,9 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
             return; /*Invalid bpp. Can't render the letter*/
     }
 
-
-
     int32_t col, row;
     int32_t box_w = g->box_w;
     int32_t box_h = g->box_h;
-    int32_t width_byte_scr = box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
-    if(box_w & 0x7) width_byte_scr++;
     int32_t width_bit = box_w * bpp; /*Letter width in bits*/
 
     /* Calculate the col/row start/end on the map*/
@@ -596,8 +595,6 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
 
     int32_t box_w = g->box_w;
     int32_t box_h = g->box_h;
-    int32_t width_byte_scr = box_w >> 3; /*Width in bytes (on the screen finally) (e.g. w = 11 -> 2 bytes wide)*/
-    if(box_w & 0x7) width_byte_scr++;
     int32_t width_bit = box_w * bpp; /*Letter width in bits*/
 
 

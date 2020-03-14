@@ -152,7 +152,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
         memcpy(&ext->secondary_y_axis, &ext_copy->secondary_y_axis, sizeof(lv_chart_axis_cfg_t));
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(chart);
+        lv_obj_refresh_style(chart, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("chart created");

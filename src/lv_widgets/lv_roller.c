@@ -103,7 +103,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
 
         lv_obj_t * scrl = lv_page_get_scrl(roller);
-        lv_obj_set_drag(scrl, true);                                  /*In ddlist it might be disabled*/
+        lv_obj_set_drag(scrl, true);
         lv_page_set_scrl_fit2(roller, LV_FIT_PARENT, LV_FIT_NONE); /*Height is specified directly*/
         lv_roller_set_anim_time(roller, LV_ROLLER_DEF_ANIM_TIME);
         lv_roller_set_options(roller, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
@@ -154,9 +154,9 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
 
     /*Count the '\n'-s to determine the number of options*/
     ext->option_cnt = 0;
-    uint16_t i;
-    for(i = 0; options[i] != '\0'; i++) {
-        if(options[i] == '\n') ext->option_cnt++;
+    uint16_t cnt;
+    for(cnt = 0; options[cnt] != '\0'; cnt++) {
+        if(options[cnt] == '\n') ext->option_cnt++;
     }
     ext->option_cnt++; /*Last option has no `\n`*/
 
@@ -225,6 +225,13 @@ void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, lv_anim_enable_
      * nothing will continue the animation. */
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+
+    /*In infinite mode interpret the new ID relative to the currently visible "page"*/
+    if(ext->mode == LV_ROLLER_MODE_INIFINITE) {
+        uint16_t page = ext->sel_opt_id / LV_ROLLER_INF_PAGES;
+        sel_opt = page * LV_ROLLER_INF_PAGES + sel_opt;
+    }
+
     ext->sel_opt_id     = sel_opt < ext->option_cnt ? sel_opt : ext->option_cnt - 1;
     ext->sel_opt_id_ori = ext->sel_opt_id;
 
@@ -389,14 +396,14 @@ static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * cli
 
         lv_draw_rect_dsc_t sel_dsc;
         lv_draw_rect_dsc_init(&sel_dsc);
-        lv_obj_init_draw_rect_dsc(roller, LV_ROLLER_PART_SEL, &sel_dsc);
+        lv_obj_init_draw_rect_dsc(roller, LV_ROLLER_PART_SELECTED, &sel_dsc);
         lv_draw_rect(&rect_area, clip_area, &sel_dsc);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
         lv_draw_label_dsc_t label_dsc;
         lv_draw_label_dsc_init(&label_dsc);
-        lv_obj_init_draw_label_dsc(roller, LV_ROLLER_PART_SEL, &label_dsc);
+        lv_obj_init_draw_label_dsc(roller, LV_ROLLER_PART_SELECTED, &label_dsc);
 
         lv_coord_t font_h        = lv_font_get_line_height(label_dsc.font);
 
@@ -445,12 +452,9 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         else return ancestor_signal(roller, sign, param);
     }
 
-    /*Don't let the drop down list to handle the control signals. It works differently*/
-    if(sign != LV_SIGNAL_CONTROL && sign != LV_SIGNAL_FOCUS && sign != LV_SIGNAL_DEFOCUS) {
-        /* Include the ancient signal function */
-        res = ancestor_signal(roller, sign, param);
-        if(res != LV_RES_OK) return res;
-    }
+    /* Include the ancient signal function */
+    res = ancestor_signal(roller, sign, param);
+    if(res != LV_RES_OK) return res;
 
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
@@ -496,7 +500,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         }
         else {
             ext->sel_opt_id_ori = ext->sel_opt_id; /*Save the current value. Used to revert this state if
-                                                                    ENER wont't be pressed*/
+                                                                    ENTER wont't be pressed*/
         }
 #endif
     }
@@ -527,7 +531,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         }
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
-        lv_obj_clean_style_list(roller, LV_ROLLER_PART_SEL);
+        lv_obj_clean_style_list(roller, LV_ROLLER_PART_SELECTED);
     }
     return res;
 }
@@ -549,7 +553,7 @@ static lv_style_list_t * lv_roller_get_style(lv_obj_t * roller, uint8_t part)
         case LV_ROLLER_PART_BG:
             style_dsc_p = &roller->style_list;
             break;
-        case LV_ROLLER_PART_SEL:
+        case LV_ROLLER_PART_SELECTED:
             style_dsc_p = &ext->style_sel;
             break;
         default:
@@ -745,18 +749,21 @@ static lv_res_t release_handler(lv_obj_t * roller)
     lv_indev_t * indev = lv_indev_get_act();
 #if LV_USE_GROUP
     /*Leave edit mode once a new option is selected*/
-    if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
+    lv_indev_type_t indev_type = lv_indev_get_type(indev);
+    if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
         ext->sel_opt_id_ori = ext->sel_opt_id;
-        lv_group_t * g      = lv_obj_get_group(roller);
-        if(lv_group_get_editing(g)) {
-            lv_group_set_editing(g, false);
+
+        if(indev_type == LV_INDEV_TYPE_ENCODER) {
+            lv_group_t * g      = lv_obj_get_group(roller);
+            if(lv_group_get_editing(g)) {
+                lv_group_set_editing(g, false);
+            }
         }
     }
 #endif
 
     lv_obj_t * label = get_label(roller);
-
-    
+    if(label == NULL) return LV_RES_OK;
     
     if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
         /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
@@ -791,13 +798,14 @@ static lv_res_t release_handler(lv_obj_t * roller)
 static void refr_width(lv_obj_t * roller)
 {
     lv_obj_t * label = get_label(roller);
+    if(label == NULL) return;
+
     lv_coord_t label_w = lv_obj_get_width(label);
 
     lv_style_int_t left = lv_obj_get_style_pad_left(roller, LV_ROLLER_PART_BG);
     lv_style_int_t right = lv_obj_get_style_pad_right(roller, LV_ROLLER_PART_BG);
 
     lv_obj_set_width(roller, label_w + left + right);
-
 }
 
 /**
@@ -807,6 +815,7 @@ static void refr_width(lv_obj_t * roller)
 static void refr_height(lv_obj_t * roller)
 {
     lv_obj_t * label = get_label(roller);
+    if(label == NULL) return;
 
     lv_obj_set_height(lv_page_get_scrl(roller), lv_obj_get_height(label) + lv_obj_get_height(roller));
     lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
