@@ -3110,6 +3110,9 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
         draw_dsc->color = lv_obj_get_style_text_sel_color(obj, part);
     }
 
+#if LV_USE_BIDI
+        draw_dsc->bidi_dir = lv_obj_get_base_dir(obj);
+#endif
 }
 
 void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * draw_dsc)
