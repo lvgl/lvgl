@@ -198,6 +198,7 @@ static lv_design_res_t lv_switch_design(lv_obj_t * sw, const lv_area_t * clip_ar
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
+        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(sw);
 
         /*The ancestor design function will draw the background and the indicator.
          * It also sets ext->bar.indic_area*/
@@ -215,10 +216,14 @@ static lv_design_res_t lv_switch_design(lv_obj_t * sw, const lv_area_t * clip_ar
 
         lv_coord_t max_indic_w = objw - bg_left - bg_right;
         lv_coord_t act_indic_w = lv_area_get_width(&ext->bar.indic_area);
+        if(base_dir != LV_BIDI_DIR_RTL) {
+            knob_area.x1 = ext->bar.indic_area.x2 - ((act_indic_w * knob_size) / max_indic_w);
+            knob_area.x2 = knob_area.x1 + knob_size;
+        } else {
+            knob_area.x2 = ext->bar.indic_area.x1 + ((act_indic_w * knob_size) / max_indic_w);
+            knob_area.x1 = knob_area.x2 - knob_size;
+        }
 
-
-        knob_area.x1 = ext->bar.indic_area.x2 - ((act_indic_w * knob_size) / max_indic_w);
-        knob_area.x2 = knob_area.x1 + knob_size;
         knob_area.y1 = sw->coords.y1;
         knob_area.y2 = sw->coords.y2;
 
