@@ -605,19 +605,22 @@ void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
     else if(ext->dir == LV_DROPDOWN_DIR_RIGHT)lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
 
     lv_obj_t * scr = lv_scr_act();
+    bool moved = false;
     if(ext->dir != LV_DROPDOWN_DIR_UP) {
         if(ext->page->coords.y2 > scr->coords.y2) {
             lv_obj_set_y(ext->page, lv_obj_get_y(ext->page) - (ext->page->coords.y2 - scr->coords.y2));
+            moved = true;
         }
     }
     else {
         if(ext->page->coords.y1 < 0) {
             lv_obj_set_y(ext->page, 0);
+            moved = true;
         }
     }
 
 #if LV_USE_ANIMATION
-    if(anim == LV_ANIM_ON && ext->dir != LV_DROPDOWN_DIR_UP) {
+    if(anim == LV_ANIM_ON && ext->dir != LV_DROPDOWN_DIR_UP && !moved) {
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, ddlist);

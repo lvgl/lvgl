@@ -988,9 +988,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
     }
     else if(sign == LV_SIGNAL_DRAG_BEGIN) {
         if(page_ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) {
-            page_ext->scrlbar.ver_draw = 1;
-            page_ext->scrlbar.hor_draw = 1;
-            lv_obj_invalidate(page);
+            lv_page_sb_refresh(page);
         }
     }
     else if(sign == LV_SIGNAL_DRAG_END) {
@@ -1232,7 +1230,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
                                       (obj_h - size_tmp - 2 * sb_ver_pad)) /
                         (scrl_h + bg_top + bg_bottom - obj_h));
 
-        if(ext->scrlbar.mode == LV_SCRLBAR_MODE_AUTO) ext->scrlbar.ver_draw = 1;
+        if(ext->scrlbar.mode == LV_SCRLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 1;
     }
 
     /*Invalidate the new scrollbar areas*/

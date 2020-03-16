@@ -133,7 +133,6 @@ typedef enum {
 #endif
 #if LV_USE_TEXTAREA
     LV_THEME_TEXTAREA,
-    LV_THEME_TEXTAREA_ONELINE,
 #endif
 #if LV_USE_TILEVIEW
     LV_THEME_TILEVIEW,
