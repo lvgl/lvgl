@@ -100,6 +100,12 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy);
 void lv_dropdown_set_text(lv_obj_t * ddlist, const char * txt);
 
 /**
+ * Clear any options in a drop down list.  Static or dynamic.
+ * @param ddlist pointer to drop down list object
+ */
+void lv_dropdown_clear_options(lv_obj_t * ddlist);
+
+/**
  * Set the options in a drop down list from a string
  * @param ddlist pointer to drop down list object
  * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
