@@ -109,7 +109,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->options     = NULL;
     ext->symbol         = LV_SYMBOL_DOWN;
     ext->text         = "Select";
-    ext->static_txt = 0;
+    ext->static_txt = 1;
     ext->show_selected   = 1;
     ext->sel_opt_id      = 0;
     ext->sel_opt_id_orig = 0;
@@ -128,8 +128,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new drop down list drop down list*/
     if(copy == NULL) {
-        ext->options = NULL;
-
+        lv_dropdown_set_static_options(ddlist, "Option 1\nOption 2\nOption 3");
         lv_theme_apply(ddlist, LV_THEME_DROPDOWN);
     }
     /*Copy an existing drop down list*/
@@ -174,6 +173,26 @@ void lv_dropdown_set_text(lv_obj_t * ddlist, const char * txt)
     if(ext->text == txt) return;
 
     ext->text = txt;
+
+    lv_obj_invalidate(ddlist);
+}
+
+/**
+ * Clear any options in a drop down list.  Static or dynamic.
+ * @param ddlist pointer to drop down list object
+ */
+void lv_dropdown_clear_options(lv_obj_t * ddlist)
+{
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    if(ext->options == NULL) return;
+
+    if(ext->static_txt == 0)
+        lv_mem_free(ext->options);
+
+    ext->options = NULL;
+    ext->static_txt = 0;
+    ext->option_cnt = 0;
 
     lv_obj_invalidate(ddlist);
 }
@@ -263,8 +282,18 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos
 
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
-    /*Can not append to static options*/
-    if(ext->static_txt != 0) return;
+    /*Convert static options to dynmaic*/
+    if(ext->static_txt != 0) {
+        char * static_options = ext->options;
+        size_t len = strlen(static_options) + 1;
+
+        ext->options = lv_mem_alloc(len);
+        LV_ASSERT_MEM(ext->options);
+        if(ext->options == NULL) return;
+
+        strcpy(ext->options, static_options);
+        ext->static_txt = 0;
+    }
 
     /*Allocate space for the new option*/
     size_t old_len = (ext->options == NULL) ? 0 : strlen(ext->options);
@@ -1130,12 +1159,19 @@ static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint1
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
     lv_obj_init_draw_label_dsc(ddlist, LV_DROPDOWN_PART_SELECTED, &label_dsc);
+
     label_dsc.line_space = lv_obj_get_style_text_line_space(ddlist,
                                                             LV_DROPDOWN_PART_LIST);  /*Line space should come from the page*/
-    lv_coord_t font_h        = lv_font_get_line_height(label_dsc.font);
 
     lv_obj_t * label = get_label(ddlist);
     if(label == NULL) return;
+
+    lv_label_align_t align = lv_label_get_align(label);
+
+    if(align == LV_LABEL_ALIGN_CENTER) label_dsc.flag |= LV_TXT_FLAG_CENTER;
+    else if(align == LV_LABEL_ALIGN_RIGHT) label_dsc.flag |= LV_TXT_FLAG_RIGHT;
+
+    lv_coord_t font_h        = lv_font_get_line_height(label_dsc.font);
 
     lv_area_t area_sel;
     area_sel.y1 = label->coords.y1;

@@ -242,7 +242,22 @@ void lv_win_set_header_height(lv_obj_t * win, lv_coord_t height)
 }
 
 /**
+ * Set the width of the control buttons on the header
+ * @param win pointer to a window object
+ * @param width width of the control button. 0: to make them square automatically.
+ */
+void lv_win_set_btn_width(lv_obj_t * win, lv_coord_t width)
+{
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    ext->btn_w = width;
+    lv_win_realign(win);
+}
+
+/**
  * Set the size of the content area.
+ * It's the effective area where object can be placed.
  * @param win pointer to a window object
  * @param w width
  * @param h height (the window will be higher with the height of the header)
@@ -275,7 +290,7 @@ void lv_win_set_layout(lv_obj_t * win, lv_layout_t layout)
  * @param win pointer to a window object
  * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
  */
-void lv_win_set_sb_mode(lv_obj_t * win, lv_scrlbar_mode_t sb_mode)
+void lv_win_set_scrlbar_mode(lv_obj_t * win, lv_scrlbar_mode_t sb_mode)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
 
@@ -350,6 +365,20 @@ lv_coord_t lv_win_get_header_height(const lv_obj_t * win)
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
     return lv_obj_get_height(ext->header);
+}
+
+/**
+ * Get the width of the control buttons on the header
+ * @param win pointer to a window object
+ * @return width of the control button. 0: square.
+ */
+lv_coord_t lv_win_get_btn_width(lv_obj_t * win)
+{
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+    return ext->btn_w;
+
 }
 
 /**
@@ -613,13 +642,14 @@ static void lv_win_realign(lv_obj_t * win)
 
     lv_obj_t * btn;
     lv_obj_t * btn_prev = NULL;
-    lv_coord_t btn_size = lv_obj_get_height_fit(ext->header);
+    lv_coord_t btn_h = lv_obj_get_height_fit(ext->header);
+    lv_coord_t btn_w = ext->btn_w != 0 ? ext->btn_w : btn_h;
     lv_style_int_t header_inner = lv_obj_get_style_pad_inner(win, LV_WIN_PART_HEADER);
     lv_style_int_t header_right = lv_obj_get_style_pad_right(win, LV_WIN_PART_HEADER);
     /*Refresh the size of all control buttons*/
     btn = lv_obj_get_child_back(ext->header, NULL);
     while(btn != NULL) {
-        lv_obj_set_size(btn, btn_size, btn_size);
+        lv_obj_set_size(btn, btn_h, btn_w);
         if(btn_prev == NULL) {
             lv_obj_align(btn, ext->header, LV_ALIGN_IN_RIGHT_MID, -header_right, 0);
         }

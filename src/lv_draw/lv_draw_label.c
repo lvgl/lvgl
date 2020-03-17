@@ -389,6 +389,9 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
         return;
     }
 
+    /* Don't draw anything if the character is empty. E.g. space */
+    if((g.box_h == 0) && (g.box_w == 0)) return;
+
     int32_t pos_x = pos_p->x + g.ofs_x;
     int32_t pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - g.box_h - g.ofs_y;
 

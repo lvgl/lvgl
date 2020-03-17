@@ -56,6 +56,7 @@ typedef struct {
     lv_obj_t * page;                  /*Pointer to a page which holds the content*/
     lv_obj_t * header;                /*Pointer to the header container of the window*/
     char * title_txt;                 /*Pointer to the title label of the window*/
+    lv_coord_t btn_w;                 /*Width of the control buttons*/
 } lv_win_ext_t;
 
 /** Window parts. */
@@ -124,6 +125,13 @@ void lv_win_set_title(lv_obj_t * win, const char * title);
 void lv_win_set_header_height(lv_obj_t * win, lv_coord_t size);
 
 /**
+ * Set the width of the control buttons on the header
+ * @param win pointer to a window object
+ * @param width width of the control button. 0: to make them square automatically.
+ */
+void lv_win_set_btn_width(lv_obj_t * win, lv_coord_t width);
+
+/**
  * Set the size of the content area.
  * @param win pointer to a window object
  * @param w width
@@ -143,7 +151,7 @@ void lv_win_set_layout(lv_obj_t * win, lv_layout_t layout);
  * @param win pointer to a window object
  * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
  */
-void lv_win_set_sb_mode(lv_obj_t * win, lv_scrlbar_mode_t sb_mode);
+void lv_win_set_scrlbar_mode(lv_obj_t * win, lv_scrlbar_mode_t sb_mode);
 
 /**
  * Set focus animation duration on `lv_win_focus()`
@@ -190,6 +198,14 @@ lv_coord_t lv_win_get_btn_size(const lv_obj_t * win);
  * @return header height
  */
 lv_coord_t lv_win_get_header_height(const lv_obj_t * win);
+
+
+/**
+ * Get the width of the control buttons on the header
+ * @param win pointer to a window object
+ * @return width of the control button. 0: square.
+ */
+lv_coord_t lv_win_get_btn_width(lv_obj_t * win);
 
 /**
  * Get the pointer of a widow from one of  its control button.

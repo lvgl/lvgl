@@ -483,14 +483,18 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask)
     uint16_t i;
     lv_coord_t cir_w = lv_obj_get_style_scale_width(cpicker, LV_CPICKER_PART_MAIN);
 
+    /* The inner line ends will be masked out.
+     * So make lines a little bit longer because the masking makes a more even result */
+    lv_coord_t cir_w_extra = cir_w + line_dsc.width;
+
     for(i = 0; i <= 360; i += LV_CPICKER_DEF_QF) {
         line_dsc.color = angle_to_mode_color(cpicker, i);
 
         lv_point_t p[2];
         p[0].x = cx + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
         p[0].y = cy + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
-        p[1].x = cx + ((r - cir_w) * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-        p[1].y = cy + ((r - cir_w) * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+        p[1].x = cx + ((r - cir_w_extra) * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+        p[1].y = cy + ((r - cir_w_extra) * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
 
         lv_draw_line(&p[0], &p[1], mask, &line_dsc);
     }
@@ -697,6 +701,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
     }
     else if(sign == LV_SIGNAL_CONTROL) {
         uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
+
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             lv_color_hsv_t hsv_cur;
             hsv_cur = ext->hsv;
@@ -718,7 +723,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
                 if(res != LV_RES_OK) return res;
             }
         }
-        else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN)  {
+        else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
             lv_color_hsv_t hsv_cur;
             hsv_cur = ext->hsv;
 
@@ -750,8 +755,15 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         lv_indev_t * indev = lv_indev_get_act();
         if(indev == NULL) return res;
 
+        lv_indev_type_t indev_type = lv_indev_get_type(indev);
         lv_point_t p;
-        lv_indev_get_point(indev, &p);
+        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
+            p.x = cpicker->coords.x1 + lv_obj_get_width(cpicker) / 2;
+            p.y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
+        }
+        else {
+            lv_indev_get_point(indev, &p);
+        }
 
         if((LV_MATH_ABS(p.x - ext->last_press_point.x) > indev->driver.drag_limit / 2) ||
            (LV_MATH_ABS(p.y - ext->last_press_point.y) > indev->driver.drag_limit / 2)) {

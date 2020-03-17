@@ -986,6 +986,13 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
 
         lv_page_sb_refresh(page);
     }
+    else if(sign == LV_SIGNAL_DRAG_BEGIN) {
+        if(page_ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) {
+            page_ext->scrlbar.ver_draw = 1;
+            page_ext->scrlbar.hor_draw = 1;
+            lv_obj_invalidate(page);
+        }
+    }
     else if(sign == LV_SIGNAL_DRAG_END) {
 
         /*Scroll propagation is finished on drag end*/
@@ -1003,6 +1010,13 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 lv_obj_set_drag_parent(scroller_page, false);
                 lv_obj_set_drag_parent(lv_page_get_scrl(scroller_page), false);
 
+                lv_page_ext_t * scroller_page_ext = lv_obj_get_ext_attr(scroller_page);
+                /*Hide scrollbars if required*/
+                if(scroller_page_ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) {
+                    scroller_page_ext->scrlbar.hor_draw = 0;
+                    scroller_page_ext->scrlbar.ver_draw = 0;
+                    lv_obj_invalidate(scroller_page);
+                }
                 scroller_ext = lv_obj_get_ext_attr(scroller_page);
             }
         }
@@ -1031,10 +1045,17 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
     }
     else if(sign == LV_SIGNAL_FOCUS) {
-        res = lv_signal_send(page, LV_SIGNAL_FOCUS, NULL);
-        if(res != LV_RES_OK) return res;
-        res = lv_event_send(page, LV_EVENT_FOCUSED, NULL);
-        if(res != LV_RES_OK) return res;
+#if LV_USE_GROUP
+        if(lv_obj_get_group(page)) {
+            lv_group_focus_obj(page);
+        } else
+#endif
+        {
+            res = lv_signal_send(page, LV_SIGNAL_FOCUS, NULL);
+            if(res != LV_RES_OK) return res;
+            res = lv_event_send(page, LV_EVENT_FOCUSED, NULL);
+            if(res != LV_RES_OK) return res;
+        }
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
         res = lv_signal_send(page, LV_SIGNAL_DEFOCUS, NULL);
@@ -1211,7 +1232,7 @@ static void lv_page_sb_refresh(lv_obj_t * page)
                                       (obj_h - size_tmp - 2 * sb_ver_pad)) /
                         (scrl_h + bg_top + bg_bottom - obj_h));
 
-        if(ext->scrlbar.mode == LV_SCRLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 1;
+        if(ext->scrlbar.mode == LV_SCRLBAR_MODE_AUTO) ext->scrlbar.ver_draw = 1;
     }
 
     /*Invalidate the new scrollbar areas*/

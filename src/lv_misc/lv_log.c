@@ -10,6 +10,7 @@
 #if LV_USE_LOG
 
 #include <stdarg.h>
+#include <string.h>
 #include "lv_printf.h"
 
 #if LV_LOG_PRINTF
@@ -52,15 +53,17 @@ void lv_log_register_print_cb(lv_log_print_g_cb_t print_cb)
     custom_print_cb = print_cb;
 }
 
+
 /**
  * Add a log
  * @param level the level of log. (From `lv_log_level_t` enum)
  * @param file name of the file when the log added
  * @param line line number in the source code where the log added
+ * @param func name of the function when the log added
  * @param format printf-like format string
  * @param ... parameters for `format`
  */
-void lv_log_add(lv_log_level_t level, const char * file, int line, const char * format, ...)
+void lv_log_add(lv_log_level_t level, const char * file, int line, const char * func, const char * format, ...)
 {
     if(level >= _LV_LOG_LEVEL_NUM) return; /*Invalid level*/
 
@@ -72,10 +75,19 @@ void lv_log_add(lv_log_level_t level, const char * file, int line, const char * 
         va_end(args);
 
 #if LV_LOG_PRINTF
+        /*Use only the file name not the path*/
+        size_t p;
+        for(p = strlen(file); p > 0; p--) {
+            if(file[p] == '/' || file[p] == '\\') {
+                p++;    /*Skip the slash*/
+                break;
+            }
+        }
+
         static const char * lvl_prefix[] = {"Trace", "Info", "Warn", "Error", "User"};
-        printf("%s: %s \t(%s #%d)\n", lvl_prefix[level], buf, file, line);
+        printf("%s: %s \t(%s #%d %s())\n", lvl_prefix[level], buf, &file[p], line ,func);
 #else
-        if(custom_print_cb) custom_print_cb(level, file, line, buf);
+        if(custom_print_cb) custom_print_cb(level, file, line, func, buf);
 #endif
     }
 }

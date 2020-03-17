@@ -792,9 +792,9 @@ void lv_textarea_set_text_align(lv_obj_t * ta, lv_label_align_t align)
         /*Else use fix label width equal to the Text area width*/
         else {
             lv_label_set_long_mode(label, LV_LABEL_LONG_CROP);
-            lv_page_set_scrl_fit2(ta, LV_FIT_PARENT, LV_FIT_PARENT);
-            lv_label_set_align(label, align);
             lv_obj_set_width(label, lv_page_get_fit_width(ta));
+            lv_label_set_align(label, align);
+            lv_page_set_scrl_fit2(ta, LV_FIT_PARENT, LV_FIT_PARENT);
         }
     }
 
@@ -1466,29 +1466,6 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
         bool * editable = (bool *)param;
         *editable       = true;
-    }
-    else if(sign == LV_SIGNAL_DEFOCUS) {
-#if LV_USE_GROUP
-        if(lv_obj_get_group(ta)) {
-            lv_textarea_set_cursor_hidden(ta, true);
-        }
-#endif
-    }
-    else if(sign == LV_SIGNAL_FOCUS) {
-#if LV_USE_GROUP
-        lv_group_t * g             = lv_obj_get_group(ta);
-        bool editing               = lv_group_get_editing(g);
-        lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
-
-        /*Encoders need special handling*/
-        if(indev_type == LV_INDEV_TYPE_ENCODER) {
-            if(editing) lv_textarea_set_cursor_hidden(ta, false);
-            else  lv_textarea_set_cursor_hidden(ta, true);
-        }
-        else {
-            lv_textarea_set_cursor_hidden(ta, false);
-        }
-#endif
     }
     else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESS_LOST ||
             sign == LV_SIGNAL_RELEASED) {

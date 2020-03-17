@@ -212,6 +212,12 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
         memset(new_obj, 0x00, sizeof(lv_obj_t));
 
+#if LV_USE_BIDI
+        new_obj->base_dir     = LV_BIDI_BASE_DIR_DEF;
+#else
+        new_obj->base_dir     = LV_BIDI_DIR_LTR;
+#endif
+
         /*Set coordinates to full screen size*/
         new_obj->coords.x1    = 0;
         new_obj->coords.y1    = 0;
@@ -229,6 +235,14 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
         memset(new_obj, 0x00, sizeof(lv_obj_t));
 
+        new_obj->parent = parent;
+
+#if LV_USE_BIDI
+        new_obj->base_dir     = LV_BIDI_DIR_INHERIT;
+#else
+        new_obj->base_dir     = LV_BIDI_DIR_LTR;
+#endif
+
         new_obj->coords.y1    = parent->coords.y1;
         new_obj->coords.y2    = parent->coords.y1 + LV_OBJ_DEF_HEIGHT;
         if(lv_obj_get_base_dir(new_obj) == LV_BIDI_DIR_RTL) {
@@ -241,7 +255,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         }
     }
 
-    new_obj->parent = parent;
 
     lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
 
@@ -291,13 +304,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->parent_event = 0;
     new_obj->gesture_parent = 1;
     new_obj->state = LV_STATE_DEFAULT;
-
-#if LV_USE_BIDI
-    if(parent == NULL) new_obj->base_dir     = LV_BIDI_BASE_DIR_DEF;
-    else new_obj->base_dir     = LV_BIDI_DIR_INHERIT;
-#else
-    new_obj->base_dir     = LV_BIDI_DIR_LTR;
-#endif
 
     new_obj->ext_attr = NULL;
 
@@ -1325,7 +1331,9 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop)
         case LV_STYLE_PAD_INNER:
         case LV_STYLE_OUTLINE_WIDTH:
         case LV_STYLE_OUTLINE_PAD:
+        case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_WIDTH:
+        case LV_STYLE_SHADOW_OPA:
         case LV_STYLE_SHADOW_OFS_X:
         case LV_STYLE_SHADOW_OFS_Y:
         case LV_STYLE_SHADOW_SPREAD:
@@ -1336,6 +1344,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop)
         case LV_STYLE_VALUE_ALIGN:
         case LV_STYLE_VALUE_STR:
         case LV_STYLE_VALUE_FONT:
+        case LV_STYLE_VALUE_OPA:
         case LV_STYLE_TEXT_LETTER_SPACE:
         case LV_STYLE_TEXT_LINE_SPACE:
         case LV_STYLE_TEXT_FONT:
@@ -3101,6 +3110,9 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
         draw_dsc->color = lv_obj_get_style_text_sel_color(obj, part);
     }
 
+#if LV_USE_BIDI
+        draw_dsc->bidi_dir = lv_obj_get_base_dir(obj);
+#endif
 }
 
 void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * draw_dsc)
@@ -3746,6 +3758,12 @@ static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv
         tr_prev = lv_ll_get_prev(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
 
         if(tr->obj == obj && (part == tr->part || part == 0xFF) && (prop == tr->prop || prop == 0xFF)) {
+            /* Remove the transitioned property from trans. style
+             * to allow changing it by normal styles*/
+            lv_style_list_t * list = lv_obj_get_style_list(tr->obj, tr->part);
+            lv_style_t * style_trans = lv_style_list_get_transition_style(list);
+            lv_style_remove_prop(style_trans, tr->prop);
+
             lv_anim_del(tr, NULL);
             lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
             lv_mem_free(tr);
@@ -3793,14 +3811,8 @@ static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
 static void trans_anim_start_cb(lv_anim_t * a)
 {
     lv_style_trans_t * tr = a->var;
+
     lv_style_property_t prop_tmp = tr->prop;
-
-    /*Init prop to an invalid values to be sure `trans_del` won't delete the just added `tr`*/
-    tr->prop = 0;
-    /*Delete the relate transition if any*/
-    trans_del(tr->obj, tr->part, prop_tmp, tr);
-
-    tr->prop = prop_tmp;
 
     /*Start the animation from the current value*/
     if((prop_tmp & 0xF) < LV_STYLE_ID_COLOR) { /*Int*/
@@ -3815,11 +3827,26 @@ static void trans_anim_start_cb(lv_anim_t * a)
     else {      /*Ptr*/
         tr->start_value._ptr = _lv_obj_get_style_ptr(tr->obj, tr->part, prop_tmp);
     }
+
+    /*Init prop to an invalid values to be sure `trans_del` won't delete this added `tr`*/
+    tr->prop = 0;
+    /*Delete the relate transition if any*/
+    trans_del(tr->obj, tr->part, prop_tmp, tr);
+
+    tr->prop = prop_tmp;
+
 }
 
 static void trans_anim_ready_cb(lv_anim_t * a)
 {
     lv_style_trans_t * tr = a->var;
+
+    /* Remove the transitioned property from trans. style
+     * to allow changing it by normal styles*/
+    lv_style_list_t * list = lv_obj_get_style_list(tr->obj, tr->part);
+    lv_style_t * style_trans = lv_style_list_get_transition_style(list);
+    lv_style_remove_prop(style_trans, tr->prop);
+
     lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
     lv_mem_free(tr);
 }

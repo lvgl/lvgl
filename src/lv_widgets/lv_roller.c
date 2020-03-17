@@ -452,12 +452,9 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         else return ancestor_signal(roller, sign, param);
     }
 
-    /*Don't let the drop down list to handle the control signals. It works differently*/
-    if(sign != LV_SIGNAL_CONTROL && sign != LV_SIGNAL_FOCUS && sign != LV_SIGNAL_DEFOCUS) {
-        /* Include the ancient signal function */
-        res = ancestor_signal(roller, sign, param);
-        if(res != LV_RES_OK) return res;
-    }
+    /* Include the ancient signal function */
+    res = ancestor_signal(roller, sign, param);
+    if(res != LV_RES_OK) return res;
 
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
@@ -503,7 +500,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         }
         else {
             ext->sel_opt_id_ori = ext->sel_opt_id; /*Save the current value. Used to revert this state if
-                                                                    ENER wont't be pressed*/
+                                                                    ENTER wont't be pressed*/
         }
 #endif
     }
@@ -752,11 +749,15 @@ static lv_res_t release_handler(lv_obj_t * roller)
     lv_indev_t * indev = lv_indev_get_act();
 #if LV_USE_GROUP
     /*Leave edit mode once a new option is selected*/
-    if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
+    lv_indev_type_t indev_type = lv_indev_get_type(indev);
+    if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
         ext->sel_opt_id_ori = ext->sel_opt_id;
-        lv_group_t * g      = lv_obj_get_group(roller);
-        if(lv_group_get_editing(g)) {
-            lv_group_set_editing(g, false);
+
+        if(indev_type == LV_INDEV_TYPE_ENCODER) {
+            lv_group_t * g      = lv_obj_get_group(roller);
+            if(lv_group_get_editing(g)) {
+                lv_group_set_editing(g, false);
+            }
         }
     }
 #endif

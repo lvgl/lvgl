@@ -406,6 +406,7 @@ static void draw_bg(lv_obj_t * bar, const lv_area_t * clip_area)
 static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
 {
     lv_bar_ext_t * ext = lv_obj_get_ext_attr(bar);
+    lv_bidi_dir_t base_dir = lv_obj_get_base_dir(bar);
 
     lv_coord_t objw = lv_obj_get_width(bar);
     lv_coord_t objh = lv_obj_get_height(bar);
@@ -469,8 +470,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         anim_start_value_x = (((anim_start_value_end_x - anim_start_value_start_x) * ext->start_value_anim.anim_state) /
                               LV_BAR_ANIM_STATE_END);
 
-        if(anim_start_value_end_x < anim_start_value_start_x)
-            anim_start_value_x += anim_start_value_start_x;
+        anim_start_value_x += anim_start_value_start_x;
     }
     else
 #endif
@@ -485,16 +485,23 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         lv_coord_t anim_cur_value_end_x =
             (int32_t)((int32_t)anim_length * (ext->cur_value_anim.anim_end - ext->min_value)) / range;
 
-        anim_cur_value_x = (((anim_cur_value_end_x - anim_cur_value_start_x) * ext->cur_value_anim.anim_state) /
+        anim_cur_value_x = anim_cur_value_start_x + (((anim_cur_value_end_x - anim_cur_value_start_x) * ext->cur_value_anim.anim_state) /
                             LV_BAR_ANIM_STATE_END);
-
-        if(anim_cur_value_end_x < anim_cur_value_start_x)
-            anim_cur_value_x += anim_cur_value_start_x;
     }
     else
 #endif
     {
         anim_cur_value_x = (int32_t)((int32_t)anim_length * (ext->cur_value - ext->min_value)) / range;
+    }
+
+    if(hor && base_dir == LV_BIDI_DIR_RTL) {
+        /* Swap axes */
+        lv_coord_t * tmp;
+        tmp = axis1;
+        axis1 = axis2;
+        axis2 = tmp;
+        anim_cur_value_x = -anim_cur_value_x;
+        anim_start_value_x = -anim_start_value_x;
     }
 
     /* Set the indicator length */
@@ -503,8 +510,8 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         *axis1 += anim_start_value_x;
     }
     else {
-        *axis2 -= anim_start_value_x;
         *axis1 = *axis2 - anim_cur_value_x;
+        *axis2 -= anim_start_value_x;
     }
     if(sym) {
         lv_coord_t zero;
@@ -719,8 +726,6 @@ static void lv_bar_set_value_with_anim(lv_obj_t * bar, int16_t new_value, int16_
         lv_anim_set_ready_cb(&a, lv_bar_anim_ready);
         lv_anim_set_time(&a, ext->anim_time);
         lv_anim_start(&a);
-
-        ext->cur_value = new_value;
     }
 }
 
