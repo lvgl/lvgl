@@ -792,9 +792,9 @@ void lv_textarea_set_text_align(lv_obj_t * ta, lv_label_align_t align)
         /*Else use fix label width equal to the Text area width*/
         else {
             lv_label_set_long_mode(label, LV_LABEL_LONG_CROP);
-            lv_page_set_scrl_fit2(ta, LV_FIT_PARENT, LV_FIT_PARENT);
-            lv_label_set_align(label, align);
             lv_obj_set_width(label, lv_page_get_fit_width(ta));
+            lv_label_set_align(label, align);
+            lv_page_set_scrl_fit2(ta, LV_FIT_PARENT, LV_FIT_PARENT);
         }
     }
 
