@@ -41,7 +41,7 @@ typedef void (*value_format_type)(lv_obj_t * gauge, char buf[], int bufsize, lv_
 typedef struct {
     lv_linemeter_ext_t lmeter; /*Ext. of ancestor*/
     /*New data for this type */
-    int16_t * values;                 /*Array of the set values (for needles) */
+    lv_gauge_value_t * values;        /*Array of the set values (for needles) */
     const lv_color_t * needle_colors; /*Color of the needles (lv_color_t my_colors[needle_num])*/
     const void * needle_img;
     lv_point_t needle_img_pivot;
@@ -92,7 +92,7 @@ void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, const lv_co
  * @param needle_id the id of the needle
  * @param value the new value
  */
-void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value);
+void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, lv_gauge_value_t value);
 
 /**
  * Set minimum and the maximum values of a gauge
@@ -100,7 +100,7 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value);
  * @param min minimum value
  * @param max maximum value
  */
-static inline void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max)
+static inline void lv_gauge_set_range(lv_obj_t * gauge, lv_gauge_value_t min, lv_gauge_value_t max)
 {
     lv_linemeter_set_range(gauge, min, max);
 }
@@ -110,7 +110,7 @@ static inline void lv_gauge_set_range(lv_obj_t * gauge, int16_t min, int16_t max
  * @param gauge pointer to a gauge object
  * @param value the critical value
  */
-static inline void lv_gauge_set_critical_value(lv_obj_t * gauge, int16_t value)
+static inline void lv_gauge_set_critical_value(lv_obj_t * gauge, lv_gauge_value_t value)
 {
     lv_linemeter_set_value(gauge, value);
 }
@@ -164,7 +164,7 @@ void lv_gauge_set_formatter(lv_obj_t * gauge, value_format_type value_format_fn)
  * @param needle the id of the needle
  * @return the value of the needle [min,max]
  */
-int16_t lv_gauge_get_value(const lv_obj_t * gauge, uint8_t needle);
+lv_gauge_value_t lv_gauge_get_value(const lv_obj_t * gauge, uint8_t needle);
 
 /**
  * Get the count of needles on a gauge
@@ -178,7 +178,7 @@ uint8_t lv_gauge_get_needle_count(const lv_obj_t * gauge);
  * @param gauge pointer to a gauge object
  * @return the minimum value of the gauge
  */
-static inline int16_t lv_gauge_get_min_value(const lv_obj_t * lmeter)
+static inline lv_gauge_value_t lv_gauge_get_min_value(const lv_obj_t * lmeter)
 {
     return lv_linemeter_get_min_value(lmeter);
 }
@@ -188,7 +188,7 @@ static inline int16_t lv_gauge_get_min_value(const lv_obj_t * lmeter)
  * @param gauge pointer to a gauge object
  * @return the maximum value of the gauge
  */
-static inline int16_t lv_gauge_get_max_value(const lv_obj_t * lmeter)
+static inline lv_gauge_value_t lv_gauge_get_max_value(const lv_obj_t * lmeter)
 {
     return lv_linemeter_get_max_value(lmeter);
 }
@@ -198,7 +198,7 @@ static inline int16_t lv_gauge_get_max_value(const lv_obj_t * lmeter)
  * @param gauge pointer to a gauge object
  * @return the critical value
  */
-static inline int16_t lv_gauge_get_critical_value(const lv_obj_t * gauge)
+static inline lv_gauge_value_t lv_gauge_get_critical_value(const lv_obj_t * gauge)
 {
     return lv_linemeter_get_value(gauge);
 }
