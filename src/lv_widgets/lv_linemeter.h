@@ -33,9 +33,9 @@ typedef struct {
     uint16_t scale_angle; /*Angle of the scale in deg. (0..360)*/
     uint16_t angle_ofs;
     uint16_t line_cnt;     /*Count of lines */
-    int16_t cur_value;
-    int16_t min_value;
-    int16_t max_value;
+    lv_linemeter_value_t cur_value;
+    lv_linemeter_value_t min_value;
+    lv_linemeter_value_t max_value;
 } lv_linemeter_ext_t;
 
 /*Styles*/
@@ -68,7 +68,7 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param lmeter pointer to a line meter object
  * @param value new value
  */
-void lv_linemeter_set_value(lv_obj_t * lmeter, int16_t value);
+void lv_linemeter_set_value(lv_obj_t * lmeter, lv_linemeter_value_t value);
 
 /**
  * Set minimum and the maximum values of a line meter
@@ -76,7 +76,7 @@ void lv_linemeter_set_value(lv_obj_t * lmeter, int16_t value);
  * @param min minimum value
  * @param max maximum value
  */
-void lv_linemeter_set_range(lv_obj_t * lmeter, int16_t min, int16_t max);
+void lv_linemeter_set_range(lv_obj_t * lmeter, lv_linemeter_value_t min, lv_linemeter_value_t max);
 
 /**
  * Set the scale settings of a line meter
@@ -102,21 +102,21 @@ void lv_linemeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle);
  * @param lmeter pointer to a line meter object
  * @return the value of the line meter
  */
-int16_t lv_linemeter_get_value(const lv_obj_t * lmeter);
+lv_linemeter_value_t lv_linemeter_get_value(const lv_obj_t * lmeter);
 
 /**
  * Get the minimum value of a line meter
  * @param lmeter pointer to a line meter object
  * @return the minimum value of the line meter
  */
-int16_t lv_linemeter_get_min_value(const lv_obj_t * lmeter);
+lv_linemeter_value_t lv_linemeter_get_min_value(const lv_obj_t * lmeter);
 
 /**
  * Get the maximum value of a line meter
  * @param lmeter pointer to a line meter object
  * @return the maximum value of the line meter
  */
-int16_t lv_linemeter_get_max_value(const lv_obj_t * lmeter);
+lv_linemeter_value_t lv_linemeter_get_max_value(const lv_obj_t * lmeter);
 
 /**
  * Get the scale number of a line meter
