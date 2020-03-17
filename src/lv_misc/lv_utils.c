@@ -72,6 +72,42 @@ char * lv_utils_num_to_str(int32_t num, char * buf)
     return buf;
 }
 
+/**
+ * Convert a fixed point number to string
+ * @param num a number
+ * @param number of digits after decimal point
+ * @param buf pointer to a `char` buffer. Buffer must be big enough for number.
+ * @return same as `buf` (just for convenience)
+ */
+char * lv_utils_num_to_str_fixed(int32_t num, int decimals, char * buf)
+{
+    uint16_t dec_power = 1;
+    for(int i=0; i<decimals; i++)
+        dec_power *= 10;
+
+    lv_utils_num_to_str(num / dec_power, buf);
+    if(decimals > 0) {
+        /*find end of string*/
+        char * p = buf;
+        while(*p != 0)
+            p++;
+        *p++ = localeconv()->decimal_point[0];
+
+        /*now work backwards from end*/
+        num = num % dec_power;
+        p += decimals;
+        *p-- = '\x0';
+
+        while(decimals > 0) {
+            char digit = num % 10;
+            *p-- = digit + 48;
+            decimals--;
+            num = num / 10;
+        }
+    }
+    return buf;
+}
+
 /** Searches base[0] to base[n - 1] for an item that matches *key.
  *
  * @note The function cmp must return negative if its first
