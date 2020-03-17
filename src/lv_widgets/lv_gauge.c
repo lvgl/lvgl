@@ -175,7 +175,7 @@ void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, const lv_co
  * @param needle_id the id of the needle
  * @param value the new value
  */
-void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int16_t value)
+void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, lv_gauge_value_t value)
 {
     LV_ASSERT_OBJ(gauge, LV_OBJX_NAME);
 
@@ -263,7 +263,7 @@ void lv_gauge_set_formatter(lv_obj_t * gauge, value_format_type value_format_fn)
  * @param needle the id of the needle
  * @return the value of the needle [min,max]
  */
-int16_t lv_gauge_get_value(const lv_obj_t * gauge, uint8_t needle)
+lv_gauge_value_t lv_gauge_get_value(const lv_obj_t * gauge, uint8_t needle)
 {
     LV_ASSERT_OBJ(gauge, LV_OBJX_NAME);
 
@@ -470,8 +470,8 @@ static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask)
     int16_t scale_angle      = lv_linemeter_get_scale_angle(gauge);
     uint16_t label_num       = ext->label_count;
     int16_t angle_ofs        = 90 + (360 - scale_angle) / 2;
-    int16_t min              = lv_gauge_get_min_value(gauge);
-    int16_t max              = lv_gauge_get_max_value(gauge);
+    lv_gauge_value_t min     = lv_gauge_get_min_value(gauge);
+    lv_gauge_value_t max     = lv_gauge_get_max_value(gauge);
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
@@ -488,7 +488,7 @@ static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask)
         lv_coord_t x = (int32_t)((int32_t)lv_trigo_sin(angle + 90) * r) / LV_TRIGO_SIN_MAX;
         x += x_ofs;
 
-        int16_t scale_act = (int32_t)((int32_t)(max - min) * i) / (label_num - 1);
+        lv_gauge_value_t scale_act = (lv_gauge_value_t)((lv_gauge_value_t)(max - min) * i) / (label_num - 1);
         scale_act += min;
         if(ext->value_format_cb == NULL)
             lv_utils_num_to_str(scale_act, scale_txt);
