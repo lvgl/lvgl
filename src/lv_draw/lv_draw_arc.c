@@ -90,7 +90,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     area.y2 = center_y + radius - 1;
 
     /*Draw a full ring*/
-    if(start_angle + 360 == end_angle) {
+    if(start_angle + 360 == end_angle || start_angle == end_angle + 360) {
         lv_draw_rect(&area, clip_area, &cir_dsc);
         return;
     }
