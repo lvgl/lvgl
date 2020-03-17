@@ -91,7 +91,7 @@ char * lv_utils_num_to_str_fixed(int32_t num, int decimals, char * buf)
         char * p = buf;
         while(*p != 0)
             p++;
-        *p++ = localeconv()->decimal_point[0];
+        *p++ = '.';
 
         /*now work backwards from end*/
         num = num % dec_power;
