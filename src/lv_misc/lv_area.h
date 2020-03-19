@@ -17,6 +17,7 @@ extern "C" {
 #include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "lv_memcpy.h"
 
 /*********************
  *      DEFINES

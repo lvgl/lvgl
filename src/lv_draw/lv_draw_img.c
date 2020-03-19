@@ -417,6 +417,12 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             lv_img_buf_transform_init(&trans_dsc);
         }
 
+		uint16_t recolor_premult[3] = {0};
+		lv_opa_t recolor_opa_inv = 255 - draw_dsc->recolor_opa;
+        if(draw_dsc->recolor_opa != 0) {
+            lv_color_premult(draw_dsc->recolor, draw_dsc->recolor_opa, recolor_premult);
+        }
+
         lv_draw_mask_res_t mask_res;
         mask_res = (alpha_byte || chroma_key || draw_dsc->angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
         int32_t x;
@@ -473,7 +479,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                 }
 
                 if(draw_dsc->recolor_opa != 0) {
-                    c = lv_color_mix(draw_dsc->recolor, c, draw_dsc->recolor_opa);
+                    c = lv_color_mix_premult(recolor_premult, c, recolor_opa_inv);
                 }
 
                 map2[px_i].full = c.full;
