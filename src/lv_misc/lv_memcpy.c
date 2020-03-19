@@ -23,12 +23,21 @@ void * lv_memcpy(void * dst, const void * src, size_t len)
 
 	uint32_t * d32 = dst;
 	const uint32_t * s32 = src;
-	while(len > 16) {
+	while(len > 32) {
 		COPY32;
 		COPY32;
 		COPY32;
 		COPY32;
-		len -= 16;
+		COPY32;
+		COPY32;
+		COPY32;
+		COPY32;
+		len -= 32;
+	}
+
+	while(len > 4) {
+		COPY32;
+		len--;
 	}
 
 	d8 = (uint8_t *)d32;
