@@ -94,6 +94,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
         lv_draw_rect(&area, clip_area, &cir_dsc);
         return;
     }
+
     if(start_angle >= 360) start_angle -= 360;
     if(end_angle >= 360) end_angle -= 360;
 

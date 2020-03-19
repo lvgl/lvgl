@@ -165,7 +165,6 @@ void lv_arc_set_end_angle(lv_obj_t * arc, int16_t end)
 
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
-    if(end > 360) end -= 360;
     if(end < 0) end += 360;
 
     /*Too large move, the whole arc need to be invalidated anyway*/
@@ -201,7 +200,6 @@ void lv_arc_set_angles(lv_obj_t * arc, int16_t start, int16_t end)
 
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
-    if(end > 360) end -= 360;
     if(end < 0) end += 360;
 
     if(start > 360) start -= 360;
