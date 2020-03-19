@@ -73,8 +73,8 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->min_value   = 0;
     ext->max_value   = 100;
     ext->cur_value   = 0;
-    ext->line_cnt    = 21;  /*Odd scale number looks better*/
-    ext->scale_angle = 240; /*(scale_num - 1) * N looks better */
+    ext->line_cnt    = 18;
+    ext->scale_angle = 240;
     ext->angle_ofs = 0;
 
     /*The signal and design functions are not copied so set them here*/

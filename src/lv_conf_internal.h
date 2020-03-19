@@ -768,7 +768,7 @@
 #endif
 #if LV_USE_LED
 #ifndef LV_LED_BRIGHT_MIN
-#  define LV_LED_BRIGHT_MIN  60      /*Minimal brightness*/
+#  define LV_LED_BRIGHT_MIN  100      /*Minimal brightness*/
 #endif
 #ifndef LV_LED_BRIGHT_MAX
 #  define LV_LED_BRIGHT_MAX  255     /*Maximal brightness*/

@@ -347,7 +347,7 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     if(flat) wcorr_i = (LV_MATH_ABS(ydiff) << 5) / LV_MATH_ABS(xdiff);
     else wcorr_i = (LV_MATH_ABS(xdiff) << 5) / LV_MATH_ABS(ydiff);
 
-    w = (w * wcorr[wcorr_i]) >> 7;
+    w = (w * wcorr[wcorr_i] + 63) >> 7;     /*+ 63 for rounding*/
     int32_t w_half0 = w >> 1;
     int32_t w_half1 = w_half0 + (w & 0x1); /*Compensate rounding error*/
 

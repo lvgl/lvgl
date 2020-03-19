@@ -832,24 +832,6 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_TEXTAREA_PART_SCRLBAR);
             lv_style_list_add_style(list, &style_bg);
             break;
-
-        case LV_THEME_TEXTAREA_ONELINE:
-            lv_obj_clean_style_list(obj, LV_TEXTAREA_PART_BG);
-            list = lv_obj_get_style_list(obj, LV_TEXTAREA_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
-
-            lv_obj_clean_style_list(obj, LV_TEXTAREA_PART_PLACEHOLDER);
-            list = lv_obj_get_style_list(obj, LV_TEXTAREA_PART_PLACEHOLDER);
-
-            lv_obj_clean_style_list(obj, LV_TEXTAREA_PART_CURSOR);
-            list = lv_obj_get_style_list(obj, LV_TEXTAREA_PART_CURSOR);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_tight);
-
-            lv_obj_clean_style_list(obj, LV_TEXTAREA_PART_SCRLBAR);
-            list = lv_obj_get_style_list(obj, LV_TEXTAREA_PART_SCRLBAR);
-            lv_style_list_add_style(list, &style_bg);
-            break;
 #endif
 
 
