@@ -659,6 +659,8 @@ void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
         lv_anim_set_time(&a, ext->anim_time);
         lv_anim_start(&a);
     }
+#else
+    (void)moved;        /*Unused*/
 #endif
 }
 
