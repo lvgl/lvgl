@@ -444,6 +444,53 @@ static inline lv_color_t lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
     return ret;
 }
 
+static inline void lv_color_premult(lv_color_t c, uint8_t mix, uint16_t * out)
+{
+#if LV_COLOR_DEPTH != 1
+	out[0] = (uint16_t) LV_COLOR_GET_R(c) * mix;
+	out[1] = (uint16_t) LV_COLOR_GET_G(c) * mix;
+	out[2] = (uint16_t) LV_COLOR_GET_B(c) * mix;
+#else
+	/*Pre-multiplication can't be used with 1 bpp*/
+	out[0] = LV_COLOR_GET_R(c);
+	out[1] = LV_COLOR_GET_G(c);
+	out[2] = LV_COLOR_GET_B(c);
+#endif
+
+}
+
+/**
+ * Mix two colors with a given ratio. It runs faster then `lv_color_mix` but requires some pre computation.
+ * @param c1 The first color. Should be preprocessed with `lv_color_premult(c1)`
+ * @param c2 The second color. As it is no pre computation required on it
+ * @param mix The ratio of the colors. 0: full `c2`, 255: full `c1`, 127: half `c1` and half `c2`.
+ *            Should be modified like mix = `255 - mix`
+ * @return the mixed color
+ * @note 255 won't give clearly `c1`.
+ */
+static inline lv_color_t lv_color_mix_premult(uint16_t * premult_c1 , lv_color_t c2, uint8_t mix)
+{
+    lv_color_t ret;
+#if LV_COLOR_DEPTH != 1
+    /*LV_COLOR_DEPTH == 8, 16 or 32*/
+    LV_COLOR_SET_R(ret, (uint16_t)((uint16_t) premult_c1[0] + LV_COLOR_GET_R(c2) * mix) >> 8);
+    LV_COLOR_SET_G(ret, (uint16_t)((uint16_t) premult_c1[1] + LV_COLOR_GET_G(c2) * mix) >> 8);
+    LV_COLOR_SET_B(ret, (uint16_t)((uint16_t) premult_c1[2] + LV_COLOR_GET_B(c2) * mix) >> 8);
+    LV_COLOR_SET_A(ret, 0xFF);
+#else
+    /*LV_COLOR_DEPTH == 1*/
+    /*Restore color1*/
+    lv_color_t c1;
+    LV_COLOR_SET_R(c1, premult_c1[0]);
+    LV_COLOR_SET_G(c1, premult_c1[1]);
+    LV_COLOR_SET_B(c1, premult_c1[2]);
+    ret.full = mix > LV_OPA_50 ? c1.full : c2.full;
+#endif
+
+    return ret;
+}
+
+
 /**
  * Mix two colors. Both color can have alpha value. It requires ARGB888 colors.
  * @param bg_color background color
