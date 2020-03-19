@@ -3833,10 +3833,22 @@ static void trans_anim_ready_cb(lv_anim_t * a)
     lv_style_trans_t * tr = a->var;
 
     /* Remove the transitioned property from trans. style
-     * to allow changing it by normal styles*/
-    lv_style_list_t * list = lv_obj_get_style_list(tr->obj, tr->part);
-    lv_style_t * style_trans = lv_style_list_get_transition_style(list);
-    lv_style_remove_prop(style_trans, tr->prop);
+     * if there no more transitions for this property
+     * It allows changing it by normal styles*/
+
+    bool running = false;
+    lv_style_trans_t * tr_i;
+    LV_LL_READ(LV_GC_ROOT(_lv_obj_style_trans_ll), tr_i) {
+        if(tr_i != tr && tr_i->obj == tr->obj && tr_i->part == tr->part && tr_i->prop == tr->prop) {
+            running = true;
+        }
+    }
+
+    if(!running) {
+        lv_style_list_t * list = lv_obj_get_style_list(tr->obj, tr->part);
+        lv_style_t * style_trans = lv_style_list_get_transition_style(list);
+        lv_style_remove_prop(style_trans, tr->prop);
+    }
 
     lv_ll_remove(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr);
     lv_mem_free(tr);
