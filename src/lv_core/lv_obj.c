@@ -79,7 +79,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 static void report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
-static void delete_children(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
 #if LV_USE_ANIMATION
 static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state,
@@ -403,6 +402,9 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
          if(disp->act_scr == obj) act_scr_del = true;
     }
 
+    /*Let the user free the resources used in `LV_EVENT_DELETE`*/
+    lv_event_send(obj, LV_EVENT_DELETE, NULL);
+
     /*Delete from the group*/
 #if LV_USE_GROUP
     lv_group_t * group = lv_obj_get_group(obj);
@@ -431,14 +433,11 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         i_next = lv_ll_get_next(&(obj->child_ll), i);
 
         /*Call the recursive del to the child too*/
-        delete_children(i);
+        lv_obj_del(i);
 
         /*Set i to the next node*/
         i = i_next;
     }
-
-    /*Let the user free the resources used in `LV_EVENT_DELETE`*/
-    lv_event_send(obj, LV_EVENT_DELETE, NULL);
 
     lv_event_mark_deleted(obj);
 
@@ -3536,76 +3535,6 @@ static void refresh_children_style(lv_obj_t * obj)
         refresh_children_style(child); /*Check children too*/
         child = lv_obj_get_child(obj, child);
     }
-}
-
-/**
- * Called by 'lv_obj_del' to delete the children objects
- * @param obj pointer to an object (all of its children will be deleted)
- */
-static void delete_children(lv_obj_t * obj)
-{
-    lv_obj_t * i;
-    lv_obj_t * i_next;
-    i = lv_ll_get_head(&(obj->child_ll));
-
-    /*Remove from the group; remove before transversing children so that
-     * the object still has access to all children during the
-     * LV_SIGNAL_DEFOCUS call*/
-#if LV_USE_GROUP
-    lv_group_t * group = lv_obj_get_group(obj);
-    if(group) lv_group_remove_obj(obj);
-#endif
-
-    while(i != NULL) {
-        /*Get the next object before delete this*/
-        i_next = lv_ll_get_next(&(obj->child_ll), i);
-
-        /*Call the recursive del to the child too*/
-        delete_children(i);
-
-        /*Set i to the next node*/
-        i = i_next;
-    }
-
-    /*Let the suer free the resources used in `LV_EVENT_DELETE`*/
-    lv_event_send(obj, LV_EVENT_DELETE, NULL);
-
-    lv_event_mark_deleted(obj);
-
-    /*Remove the animations from this object*/
-#if LV_USE_ANIMATION
-    lv_anim_del(obj, NULL);
-#endif
-
-    /* Reset the input devices if
-     * the object to delete is used*/
-    lv_indev_t * indev = lv_indev_get_next(NULL);
-    while(indev) {
-        if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
-            lv_indev_reset(indev, obj);
-        }
-
-        if(indev->proc.types.pointer.last_pressed == obj) {
-            indev->proc.types.pointer.last_pressed = NULL;
-        }
-#if LV_USE_GROUP
-        if(indev->group == group && obj == lv_indev_get_obj_act()) {
-            lv_indev_reset(indev, obj);
-        }
-#endif
-        indev = lv_indev_get_next(indev);
-    }
-
-    /* Clean up the object specific data*/
-    obj->signal_cb(obj, LV_SIGNAL_CLEANUP, NULL);
-
-    /*Remove the object from parent's children list*/
-    lv_obj_t * par = lv_obj_get_parent(obj);
-    lv_ll_remove(&(par->child_ll), obj);
-
-    /*Delete the base objects*/
-    if(obj->ext_attr != NULL) lv_mem_free(obj->ext_attr);
-    lv_mem_free(obj); /*Free the object itself*/
 }
 
 static void base_dir_refr_children(lv_obj_t * obj)
