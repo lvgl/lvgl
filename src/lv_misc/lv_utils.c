@@ -10,6 +10,8 @@
 
 #include "lv_utils.h"
 #include "lv_math.h"
+#include "lv_printf.h"
+#include "lv_txt.h"
 
 /*********************
  *      DEFINES
