@@ -34,8 +34,6 @@ typedef void * lv_anim_user_data_t;
 typedef void * lv_group_user_data_t;
 typedef void * lv_fs_drv_user_data_t;
 typedef void * lv_img_decoder_user_data_t;
-typedef int16_t lv_gauge_value_t;
-typedef int16_t lv_linemeter_value_t;    
 
 /**********************
  * GLOBAL PROTOTYPES
