@@ -39,7 +39,8 @@ char * lv_utils_num_to_str(int32_t num, char * buf);
  * Convert a fixed point number to string
  * @param num a number
  * @param decimals number of digits after decimal point
- * @param buf pointer to a `char` buffer. Buffer must be big enough for number.
+ * @param buf pointer to a `char` buffer
+ * @param bufsize length of buffer
  * @return same as `buf` (just for convenience)
  */
 char * lv_utils_num_to_str_fixed(int32_t num, int32_t decimals, char * buf, size_t bufsize);
