@@ -290,7 +290,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
             fill_area.y2++;
         }
 
-        if(dsc->bg_grad_dir == LV_GRAD_DIR_NONE && other_mask_cnt == 0) {
+        if(dsc->bg_grad_dir == LV_GRAD_DIR_NONE && other_mask_cnt == 0 && split) {
             /*Central part*/
             fill_area.x1 = coords_bg.x1 + rout;
             fill_area.x2 = coords_bg.x2 - rout;
