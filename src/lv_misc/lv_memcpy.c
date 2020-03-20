@@ -19,6 +19,7 @@ void * lv_memcpy(void * dst, const void * src, size_t len)
 	/*Fallback to simply memcpy for unaligned addresses*/
 	if(((lv_uintptr_t)d8 & ALIGN_MASK) || ((lv_uintptr_t)s8 & ALIGN_MASK)) {
 		memcpy(dst, src, len);
+        return dst;
 	}
 
 	uint32_t * d32 = dst;
