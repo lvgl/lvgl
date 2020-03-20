@@ -242,7 +242,6 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
                 lv_memset_ff(mask_buf, draw_area_w);
                 mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
             }
-            mask_res = LV_DRAW_MASK_RES_CHANGED;
 
             /*Get the current line color*/
             if(dsc->bg_grad_dir == LV_GRAD_DIR_VER && dsc->bg_color.full != dsc->bg_grad_color.full) {
