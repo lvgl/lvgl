@@ -35,7 +35,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef void (*value_format_type)(lv_obj_t * gauge, char buf[], int bufsize, lv_gauge_value_t value);
+typedef void (*lv_gauge_format_cb_t)(lv_obj_t * gauge, char buf[], int bufsize, int32_t value);
 
 /*Data of gauge*/
 typedef struct {
@@ -49,7 +49,7 @@ typedef struct {
     lv_style_list_t style_strong;
     uint8_t needle_count;             /*Number of needles*/
     uint8_t label_count;              /*Number of labels on the scale*/
-    value_format_type value_format_cb;
+    lv_gauge_format_cb_t format_cb;
 } lv_gauge_ext_t;
 
 /*Styles*/
@@ -150,9 +150,9 @@ void lv_gauge_set_needle_img(lv_obj_t * gauge, const void * img, lv_coord_t pivo
 /**
  * Assign a function to format gauge values
  * @param gauge pointer to a gauge object
- * @param value_format_fn pointer to function of value_format_type
+ * @param format_cb pointer to function of lv_gauge_format_cb_t
  */
-void lv_gauge_set_formatter(lv_obj_t * gauge, value_format_type value_format_fn);
+void lv_gauge_set_formatter_cb(lv_obj_t * gauge, lv_gauge_format_cb_t format_cb);
 
 /*=====================
  * Getter functions
