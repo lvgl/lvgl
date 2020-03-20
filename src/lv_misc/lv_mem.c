@@ -85,8 +85,9 @@ static uint32_t zero_mem; /*Give the address of this variable if 0 byte should b
  **********************/
 
 #define COPY32 *d32 = *s32; d32++; s32++;
+#define COPY8 *d8 = *s8; d8++; s8++;
 #define SET32(x) *d32 = x; d32++;
-
+#define REPEAT8(expr) expr expr expr expr expr expr expr expr
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -509,29 +510,52 @@ void lv_mem_buf_free_all(void)
     }
 }
 
-
+/**
+ * Same as `memcpy` but optimized for 4 byte operation.
+ * `dst` and `src` should be word aligned else normal `memcpy` will be used
+ * @param dst pointer to the destination buffer
+ * @param src pointer to the source buffer
+ * @param len number of byte to copy
+ */
 void * lv_memcpy(void * dst, const void * src, size_t len)
 {
 	uint8_t * d8 = dst;
 	const uint8_t * s8 = src;
 
-	/*Fallback to simply memcpy for unaligned addresses*/
-	if(((lv_uintptr_t)d8 & ALIGN_MASK) || ((lv_uintptr_t)s8 & ALIGN_MASK)) {
-		memcpy(dst, src, len);
-		return dst;
+	lv_uintptr_t d_align = (lv_uintptr_t)d8 & ALIGN_MASK;
+	lv_uintptr_t s_align = (lv_uintptr_t)s8 & ALIGN_MASK;
+
+	/*Byte copy for unaligned memories*/
+	if(s_align != d_align) {
+	    while(len > 32) {
+	        REPEAT8(COPY8);
+            REPEAT8(COPY8);
+            REPEAT8(COPY8);
+            REPEAT8(COPY8);
+	        len -= 32;
+	    }
+	    while(len) {
+	        COPY8
+	        len--;
+	    }
+	    return dst;
 	}
 
-	uint32_t * d32 = dst;
-	const uint32_t * s32 = src;
+
+	/*Make the memories aligned*/
+	if(d_align) {
+	    d_align = ALIGN_MASK + 1 - d_align;
+        while(d_align && len) {
+            COPY8;
+            d_align--;
+            len--;
+        }
+	}
+
+	uint32_t * d32 = (uint32_t*)d8;
+	const uint32_t * s32 = (uint32_t*)s8;
 	while(len > 32) {
-		COPY32;
-		COPY32;
-		COPY32;
-		COPY32;
-		COPY32;
-		COPY32;
-		COPY32;
-		COPY32;
+	    REPEAT8(COPY32)
 		len -= 32;
 	}
 
@@ -543,9 +567,7 @@ void * lv_memcpy(void * dst, const void * src, size_t len)
 	d8 = (uint8_t *)d32;
 	s8 = (const uint8_t *)s32;
 	while(len) {
-		*d8 = *s8;
-		d8++;
-		s8++;
+	    COPY8
 		len--;
 	}
 
@@ -564,14 +586,23 @@ void lv_memset(void * dst, uint8_t v, size_t len)
 {
 	uint8_t * d8 = (uint8_t *) dst;
 
-	if((lv_uintptr_t) d8 & ALIGN_MASK) {
-		memset(dst, v, len);
-		return;
-	}
+	uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
+
+	/*Make the address aligned*/
+    if(d_align) {
+        d_align = ALIGN_MASK + 1 - d_align;
+        while(d_align && len) {
+            *d8 = v;
+            d8++;
+            len--;
+            d_align--;
+        }
+    }
 
 	uint32_t v32 = v + (v << 8) + (v << 16) + (v << 24);
 
-	uint32_t * d32 = dst;
+	uint32_t * d32 = (uint32_t*)d8;
+
 	while(len > 32) {
 		SET32(v32);
 		SET32(v32);
@@ -598,7 +629,6 @@ void lv_memset(void * dst, uint8_t v, size_t len)
 	}
 }
 
-
 /**
  * Same as `memset(dst, 0x00, len)` but optimized for 4 byte operation.
  * `dst` should be word aligned else normal `memcpy` will be used
@@ -608,13 +638,21 @@ void lv_memset(void * dst, uint8_t v, size_t len)
 void lv_memset_00(void * dst, size_t len)
 {
 	uint8_t * d8 = (uint8_t*) dst;
+    uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
 
-	if((lv_uintptr_t) d8 & ALIGN_MASK) {
-		memset(dst, 0x00, len);
-		return;
-	}
 
-	uint32_t * d32 = dst;
+    /*Make the address aligned*/
+    if(d_align) {
+        d_align = ALIGN_MASK + 1 - d_align;
+        while(d_align && len) {
+            *d8 = 0x00;
+            d8++;
+            len--;
+            d_align--;
+        }
+    }
+
+    uint32_t * d32 = (uint32_t*)d8;
 	while(len > 32) {
 		SET32(0);
 		SET32(0);
@@ -650,13 +688,21 @@ void lv_memset_00(void * dst, size_t len)
 void lv_memset_ff(void * dst, size_t len)
 {
 	uint8_t * d8 = (uint8_t*) dst;
+    uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
 
-	if((lv_uintptr_t) d8 & ALIGN_MASK) {
-		memset(dst, 0xFF, len);
-		return;
-	}
 
-	uint32_t * d32 = dst;
+    /*Make the address aligned*/
+    if(d_align) {
+        d_align = ALIGN_MASK + 1 - d_align;
+        while(d_align && len) {
+            *d8 = 0xFF;
+            d8++;
+            len--;
+            d_align--;
+        }
+    }
+
+    uint32_t * d32 = (uint32_t*)d8;
 	while(len > 32) {
 		SET32(0xFFFFFFFF);
 		SET32(0xFFFFFFFF);
