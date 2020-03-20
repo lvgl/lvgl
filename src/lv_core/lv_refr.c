@@ -231,8 +231,8 @@ void lv_disp_refr_task(lv_task_t * task)
         } /*End of true double buffer handling*/
 
         /*Clean up*/
-        memset(disp_refr->inv_areas, 0, sizeof(disp_refr->inv_areas));
-        memset(disp_refr->inv_area_joined, 0, sizeof(disp_refr->inv_area_joined));
+        lv_memset_00(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
+        lv_memset_00(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
         disp_refr->inv_p = 0;
 
         elaps = lv_tick_elaps(start);

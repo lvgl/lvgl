@@ -233,15 +233,16 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
                y < coords_bg.y2 - rout - 1) {
                 mask_res = LV_DRAW_MASK_RES_FULL_COVER;
                 if(simple_mode == false) {
-                    memset(mask_buf, LV_OPA_COVER, draw_area_w);
+                    lv_memset_ff(mask_buf, draw_area_w);
                     mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
                 }
             }
             /*In corner areas apply the mask anyway*/
             else {
-                memset(mask_buf, LV_OPA_COVER, draw_area_w);
+                lv_memset_ff(mask_buf, draw_area_w);
                 mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
             }
+            mask_res = LV_DRAW_MASK_RES_CHANGED;
 
             /*Get the current line color*/
             if(dsc->bg_grad_dir == LV_GRAD_DIR_VER && dsc->bg_color.full != dsc->bg_grad_color.full) {
@@ -419,7 +420,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
         fill_area.y1 = disp_area->y1 + draw_area.y1;
         fill_area.y2 = fill_area.y1;
         for(h = draw_area.y1; h <= upper_corner_end; h++) {
-            memset(mask_buf, LV_OPA_COVER, draw_area_w);
+            lv_memset_ff(mask_buf, draw_area_w);
             mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
             lv_area_t fill_area2;
@@ -457,7 +458,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
         fill_area.y1 = disp_area->y1 + lower_corner_end;
         fill_area.y2 = fill_area.y1;
         for(h = lower_corner_end; h <= draw_area.y2; h++) {
-            memset(mask_buf, LV_OPA_COVER, draw_area_w);
+            lv_memset_ff(mask_buf, draw_area_w);
             mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
             lv_area_t fill_area2;
@@ -526,7 +527,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
             if(normal ||
                (top_only && fill_area.y1 <= coords->y1 + corner_size) ||
                (bottom_only && fill_area.y1 >= coords->y2 - corner_size)) {
-                memset(mask_buf, LV_OPA_COVER, draw_area_w);
+                lv_memset_ff(mask_buf, draw_area_w);
                 mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
                 lv_blend_fill(clip, &fill_area, color, mask_buf, mask_res, opa, blend_mode);
             }
@@ -861,7 +862,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_dra
 
         for(y = 0; y < y_max; y++) {
             if(simple_mode == false) {
-                memset(mask_buf, sh_buf_tmp[0], lv_area_get_width(&a));
+                lv_memset(mask_buf, sh_buf_tmp[0], lv_area_get_width(&a));
                 mask_res = lv_draw_mask_apply(mask_buf, a.x1, a.y1, lv_area_get_width(&a));
                 if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
 
@@ -891,7 +892,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_dra
 
         for(y = y_min; y < corner_size; y++) {
             if(simple_mode == false) {
-                memset(mask_buf, sh_buf_tmp[0], lv_area_get_width(&a));
+                lv_memset(mask_buf, sh_buf_tmp[0], lv_area_get_width(&a));
                 mask_res = lv_draw_mask_apply(mask_buf, a.x1, a.y1, lv_area_get_width(&a));
                 if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
                 lv_blend_fill(clip, &a,
@@ -916,7 +917,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_dra
         a.y2 = a.y1;
         if(a.x1 <= a.x2) {
             for(y = 0; y < lv_area_get_height(&sh_area) - corner_size * 2; y++) {
-                memset(mask_buf, 0xFF, lv_area_get_width(&a));
+                lv_memset_ff(mask_buf, lv_area_get_width(&a));
                 mask_res = lv_draw_mask_apply(mask_buf, a.x1, a.y1, lv_area_get_width(&a));
                 lv_blend_fill(clip, &a,
                               dsc->shadow_color, mask_buf, mask_res, opa, dsc->shadow_blend_mode);
@@ -958,10 +959,10 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, 
     lv_opa_t * mask_line = lv_mem_buf_get(size);
     uint16_t * sh_ups_tmp_buf = (uint16_t *)sh_buf;
     for(y = 0; y < size; y++) {
-        memset(mask_line, 0xFF, size);
+        lv_memset_ff(mask_line, size);
         lv_draw_mask_res_t mask_res = mask_param.dsc.cb(mask_line, 0, y, size, &mask_param);
         if(mask_res == LV_DRAW_MASK_RES_FULL_TRANSP) {
-            memset(sh_ups_tmp_buf, 0x00, size * sizeof(sh_ups_tmp_buf[0]));
+            lv_memset_00(sh_ups_tmp_buf, size * sizeof(sh_ups_tmp_buf[0]));
         }
         else {
             int32_t i;
@@ -1183,7 +1184,7 @@ static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, lv_dr
         fill_area.y1 = disp_area->y1 + draw_area.y1;
         fill_area.y2 = fill_area.y1;
         for(h = draw_area.y1; h <= upper_corner_end; h++) {
-            memset(mask_buf, LV_OPA_COVER, draw_area_w);
+            lv_memset_ff(mask_buf, draw_area_w);
             mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
             lv_area_t fill_area2;
@@ -1220,7 +1221,7 @@ static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, lv_dr
         fill_area.y1 = disp_area->y1 + lower_corner_end;
         fill_area.y2 = fill_area.y1;
         for(h = lower_corner_end; h <= draw_area.y2; h++) {
-            memset(mask_buf, LV_OPA_COVER, draw_area_w);
+            lv_memset_ff(mask_buf, draw_area_w);
             mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
             lv_area_t fill_area2;
@@ -1272,7 +1273,7 @@ static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, lv_dr
         fill_area.y2 = fill_area.y1;
 
         for(h = draw_area.y1; h <= draw_area.y2; h++) {
-            memset(mask_buf, LV_OPA_COVER, draw_area_w);
+            lv_memset_ff(mask_buf, draw_area_w);
             mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
             lv_blend_fill(clip, &fill_area, color, mask_buf, mask_res, opa, blend_mode);

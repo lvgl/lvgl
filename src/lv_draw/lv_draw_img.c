@@ -390,13 +390,13 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
         /*Prepare the `mask_buf`if there are other masks*/
         if(other_mask_cnt) {
-            memset(mask_buf, 0xFF, mask_buf_size);
+            lv_memset_ff(mask_buf,mask_buf_size);
         }
 
 
         bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_IMG_ZOOM_NONE ? true : false;
         lv_img_transform_dsc_t trans_dsc;
-        memset(&trans_dsc, 0, sizeof(lv_img_transform_dsc_t));
+        lv_memset_00(&trans_dsc, sizeof(lv_img_transform_dsc_t));
         if(transform) {
             lv_img_cf_t cf = LV_IMG_CF_TRUE_COLOR;
             if(alpha_byte) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
@@ -491,7 +491,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                 mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1,
                                                   lv_area_get_width(&draw_area));
                 if(mask_res_sub == LV_DRAW_MASK_RES_FULL_TRANSP) {
-                    memset(mask_buf + px_i_start, 0x00, lv_area_get_width(&draw_area));
+                    lv_memset_00(mask_buf + px_i_start, lv_area_get_width(&draw_area));
                     mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
                 else if(mask_res_sub == LV_DRAW_MASK_RES_CHANGED) {
@@ -514,7 +514,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
                 /*Prepare the `mask_buf`if there are other masks*/
                 if(other_mask_cnt) {
-                    memset(mask_buf, 0xFF, mask_buf_size);
+                    lv_memset_ff(mask_buf, mask_buf_size);
                 }
             }
         }

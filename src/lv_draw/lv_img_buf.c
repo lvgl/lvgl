@@ -336,7 +336,7 @@ lv_img_dsc_t * lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
     if(dsc == NULL)
         return NULL;
 
-    memset(dsc, 0, sizeof(lv_img_dsc_t));
+    lv_memset_00(dsc, sizeof(lv_img_dsc_t));
 
     /* Get image data size */
     dsc->data_size = lv_img_buf_get_img_size(w, h, cf);
@@ -351,7 +351,7 @@ lv_img_dsc_t * lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
         lv_mem_free(dsc);
         return NULL;
     }
-    memset((uint8_t *)dsc->data, 0, dsc->data_size);
+    lv_memset_00((uint8_t *)dsc->data, dsc->data_size);
 
     /* Fill in header */
     dsc->header.always_zero = 0;
