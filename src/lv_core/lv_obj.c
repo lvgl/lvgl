@@ -3268,7 +3268,7 @@ static void obj_del_core(lv_obj_t * obj)
         i_next = lv_ll_get_next(&(obj->child_ll), i);
 
         /*Call the recursive del to the child too*/
-        lv_obj_del(i);
+        obj_del_core(i);
 
         /*Set i to the next node*/
         i = i_next;
