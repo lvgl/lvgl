@@ -488,8 +488,6 @@ typedef void * lv_obj_user_data_t;
 
 /*Gauge (dependencies:lv_bar, lv_linemeter)*/
 #define LV_USE_GAUGE    1
-/*Type for gauge min, max, value*/
-typedef int16_t lv_gauge_value_t;
 
 /*Image (dependencies: lv_label*/
 #define LV_USE_IMG      1
@@ -539,8 +537,6 @@ typedef int16_t lv_gauge_value_t;
 
 /*Line meter (dependencies: *;)*/
 #define LV_USE_LINEMETER   1
-/*Type for line meter min, max, value*/
-typedef int16_t lv_linemeter_value_t;
 
 /*Mask (dependencies: -)*/
 #define LV_USE_OBJMASK  0
