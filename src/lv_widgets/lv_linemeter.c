@@ -113,7 +113,7 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param lmeter pointer to a line meter object
  * @param value new value
  */
-void lv_linemeter_set_value(lv_obj_t * lmeter, lv_linemeter_value_t value)
+void lv_linemeter_set_value(lv_obj_t * lmeter, int32_t value)
 {
     LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
 
@@ -131,7 +131,7 @@ void lv_linemeter_set_value(lv_obj_t * lmeter, lv_linemeter_value_t value)
  * @param min minimum value
  * @param max maximum value
  */
-void lv_linemeter_set_range(lv_obj_t * lmeter, lv_linemeter_value_t min, lv_linemeter_value_t max)
+void lv_linemeter_set_range(lv_obj_t * lmeter, int32_t min, int32_t max)
 {
     LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
 
@@ -194,7 +194,7 @@ void lv_linemeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle)
  * @param lmeter pointer to a line meter object
  * @return the value of the line meter
  */
-lv_linemeter_value_t lv_linemeter_get_value(const lv_obj_t * lmeter)
+int32_t lv_linemeter_get_value(const lv_obj_t * lmeter)
 {
     LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
 
@@ -207,7 +207,7 @@ lv_linemeter_value_t lv_linemeter_get_value(const lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return the minimum value of the line meter
  */
-lv_linemeter_value_t lv_linemeter_get_min_value(const lv_obj_t * lmeter)
+int32_t lv_linemeter_get_min_value(const lv_obj_t * lmeter)
 {
     LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
 
@@ -220,7 +220,7 @@ lv_linemeter_value_t lv_linemeter_get_min_value(const lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return the maximum value of the line meter
  */
-lv_linemeter_value_t lv_linemeter_get_max_value(const lv_obj_t * lmeter)
+int32_t lv_linemeter_get_max_value(const lv_obj_t * lmeter)
 {
     LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
 
