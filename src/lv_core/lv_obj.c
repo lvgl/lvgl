@@ -91,6 +91,7 @@ static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
 #endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static void lv_obj_del_async_cb(void * obj);
+static void obj_del_core(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -396,89 +397,18 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 
     lv_disp_t * disp = NULL;
     bool act_scr_del = false;
-    if(obj->parent == NULL) {
+    lv_obj_t * par = lv_obj_get_parent(obj);
+    if(par == NULL) {
          disp = lv_obj_get_disp(obj);
          if(!disp) return LV_RES_INV;   /*Shouldn't happen*/
          if(disp->act_scr == obj) act_scr_del = true;
     }
 
-    /*Let the user free the resources used in `LV_EVENT_DELETE`*/
-    lv_event_send(obj, LV_EVENT_DELETE, NULL);
 
-    /*Delete from the group*/
-#if LV_USE_GROUP
-    lv_group_t * group = lv_obj_get_group(obj);
-    if(group) lv_group_remove_obj(obj);
-#endif
-
-    /*Remove the animations from this object*/
-#if LV_USE_ANIMATION
-    lv_anim_del(obj, NULL);
-    trans_del(obj, 0xFF, 0xFF, NULL);
-#endif
-
-    /*Delete the user data*/
-#if LV_USE_USER_DATA
-#if LV_USE_USER_DATA_FREE
-    LV_USER_DATA_FREE(obj);
-#endif
-#endif
-
-    /*Recursively delete the children*/
-    lv_obj_t * i;
-    lv_obj_t * i_next;
-    i = lv_ll_get_head(&(obj->child_ll));
-    while(i != NULL) {
-        /*Get the next object before delete this*/
-        i_next = lv_ll_get_next(&(obj->child_ll), i);
-
-        /*Call the recursive del to the child too*/
-        lv_obj_del(i);
-
-        /*Set i to the next node*/
-        i = i_next;
-    }
-
-    lv_event_mark_deleted(obj);
-
-    /* Reset all input devices if the object to delete is used*/
-    lv_indev_t * indev = lv_indev_get_next(NULL);
-    while(indev) {
-        if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
-            lv_indev_reset(indev, obj);
-        }
-        if(indev->proc.types.pointer.last_pressed == obj) {
-            indev->proc.types.pointer.last_pressed = NULL;
-        }
-
-#if LV_USE_GROUP
-        if(indev->group == group && obj == lv_indev_get_obj_act()) {
-            lv_indev_reset(indev, obj);
-        }
-#endif
-        indev = lv_indev_get_next(indev);
-    }
-
-    /* All children deleted.
-     * Now clean up the object specific data*/
-    obj->signal_cb(obj, LV_SIGNAL_CLEANUP, NULL);
-
-    /*Remove the object from parent's children list*/
-    lv_obj_t * par = lv_obj_get_parent(obj);
-    if(par == NULL) { /*It is a screen*/
-        lv_disp_t * d = lv_obj_get_disp(obj);
-        lv_ll_remove(&d->scr_ll, obj);
-    }
-    else {
-        lv_ll_remove(&(par->child_ll), obj);
-    }
-
-    /*Delete the base objects*/
-    if(obj->ext_attr != NULL) lv_mem_free(obj->ext_attr);
-    lv_mem_free(obj); /*Free the object itself*/
+    obj_del_core(obj);
 
     /*Send a signal to the parent to notify it about the child delete*/
-    if(par != NULL) {
+    if(par) {
         par->signal_cb(par, LV_SIGNAL_CHILD_CHG, NULL);
     }
 
@@ -3305,6 +3235,83 @@ static void lv_obj_del_async_cb(void * obj)
     lv_obj_del(obj);
 }
 
+static void obj_del_core(lv_obj_t * obj)
+{
+    /*Let the user free the resources used in `LV_EVENT_DELETE`*/
+    lv_event_send(obj, LV_EVENT_DELETE, NULL);
+
+    /*Delete from the group*/
+#if LV_USE_GROUP
+    lv_group_t * group = lv_obj_get_group(obj);
+    if(group) lv_group_remove_obj(obj);
+#endif
+
+    /*Remove the animations from this object*/
+#if LV_USE_ANIMATION
+    lv_anim_del(obj, NULL);
+    trans_del(obj, 0xFF, 0xFF, NULL);
+#endif
+
+    /*Delete the user data*/
+#if LV_USE_USER_DATA
+#if LV_USE_USER_DATA_FREE
+    LV_USER_DATA_FREE(obj);
+#endif
+#endif
+
+    /*Recursively delete the children*/
+    lv_obj_t * i;
+    lv_obj_t * i_next;
+    i = lv_ll_get_head(&(obj->child_ll));
+    while(i != NULL) {
+        /*Get the next object before delete this*/
+        i_next = lv_ll_get_next(&(obj->child_ll), i);
+
+        /*Call the recursive del to the child too*/
+        lv_obj_del(i);
+
+        /*Set i to the next node*/
+        i = i_next;
+    }
+
+    lv_event_mark_deleted(obj);
+
+    /* Reset all input devices if the object to delete is used*/
+    lv_indev_t * indev = lv_indev_get_next(NULL);
+    while(indev) {
+        if(indev->proc.types.pointer.act_obj == obj || indev->proc.types.pointer.last_obj == obj) {
+            lv_indev_reset(indev, obj);
+        }
+        if(indev->proc.types.pointer.last_pressed == obj) {
+            indev->proc.types.pointer.last_pressed = NULL;
+        }
+
+#if LV_USE_GROUP
+        if(indev->group == group && obj == lv_indev_get_obj_act()) {
+            lv_indev_reset(indev, obj);
+        }
+#endif
+        indev = lv_indev_get_next(indev);
+    }
+
+    /* All children deleted.
+     * Now clean up the object specific data*/
+    obj->signal_cb(obj, LV_SIGNAL_CLEANUP, NULL);
+
+    /*Remove the object from parent's children list*/
+    lv_obj_t * par = lv_obj_get_parent(obj);
+    if(par == NULL) { /*It is a screen*/
+        lv_disp_t * d = lv_obj_get_disp(obj);
+        lv_ll_remove(&d->scr_ll, obj);
+    }
+    else {
+        lv_ll_remove(&(par->child_ll), obj);
+    }
+
+    /*Delete the base objects*/
+    if(obj->ext_attr != NULL) lv_mem_free(obj->ext_attr);
+    lv_mem_free(obj); /*Free the object itself*/
+}
 
 /**
  * Handle the drawing related tasks of the base objects.
