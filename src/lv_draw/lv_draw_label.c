@@ -481,7 +481,7 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
         if(prev_opa != opa || prev_bpp != bpp) {
             uint32_t i;
             for(i = 0; i < shades; i++) {
-                opa_table[i] = bpp = 8 ? opa : (bpp_opa_table_p[i] * opa) >> 8;
+                opa_table[i] = bpp == 8 ? opa : (bpp_opa_table_p[i] * opa) >> 8;
             }
         }
         bpp_opa_table_p = opa_table;
