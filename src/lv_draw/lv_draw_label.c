@@ -523,45 +523,32 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
     for(row = row_start ; row < row_end; row++) {
         int32_t mask_p_start = mask_p;
 
-        if(bpp == 8) {
-            if(opa == LV_OPA_COVER) {
-                lv_memcpy(&mask_buf[mask_p], map_p, col_end - col_start + 1);
-                mask_p += col_end - col_start + 1;
-                map_p += box_w + 1;
-            } else {
-                for(col = col_start; col < col_end; col++) {
-                    mask_buf[mask_p] = bpp_opa_table_p[*map_p];
-                    mask_p++;
-                    map_p++;
-                }
-            }
-        } else {
-            bitmask = bitmask_init >> col_bit;
-            for(col = col_start; col < col_end; col++) {
-                /*Load the pixel's opacity into the mask*/
-                letter_px = (*map_p & bitmask) >> (col_bit_max - col_bit);
-                if(letter_px) {
-                    mask_buf[mask_p] = bpp_opa_table_p[letter_px];
-                }
-                else {
-                    mask_buf[mask_p] = 0;
-                }
+        bitmask = bitmask_init >> col_bit;
+		for(col = col_start; col < col_end; col++) {
+			/*Load the pixel's opacity into the mask*/
+			letter_px = (*map_p & bitmask) >> (col_bit_max - col_bit);
+			if(letter_px) {
+				mask_buf[mask_p] = bpp_opa_table_p[letter_px];
+			}
+			else {
+				mask_buf[mask_p] = 0;
+			}
 
-                /*Go to the next column*/
-                if(col_bit < col_bit_max) {
-                    col_bit += bpp;
-                    bitmask = bitmask >> bpp;
-                }
-                else {
-                    col_bit = 0;
-                    bitmask = bitmask_init;
-                    map_p++;
-                }
+			/*Go to the next column*/
+			if(col_bit < col_bit_max) {
+				col_bit += bpp;
+				bitmask = bitmask >> bpp;
+			}
+			else {
+				col_bit = 0;
+				bitmask = bitmask_init;
+				map_p++;
+			}
 
-                /*Next mask byte*/
-                mask_p++;
-            }
-        }
+			/*Next mask byte*/
+			mask_p++;
+		}
+
 
         /*Apply masks if any*/
         if(other_mask_cnt) {
