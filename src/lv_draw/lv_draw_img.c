@@ -393,6 +393,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             lv_memset_ff(mask_buf,mask_buf_size);
         }
 
+        lv_coord_t draw_area_h = lv_area_get_height(&draw_area);
+        lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
 
         bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_IMG_ZOOM_NONE ? true : false;
 
@@ -400,8 +402,6 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         if(other_mask_cnt == 0 && !transform && !chroma_key && alpha_byte) {
             int32_t x;
             int32_t y;
-            lv_coord_t draw_area_h = lv_area_get_height(&draw_area);
-            lv_coord_t draw_area_w = lv_area_get_width(&draw_area);
             for(y = 0; y < draw_area_h; y++) {
                 map_px = map_buf_tmp;
                 for(x = 0; x < draw_area_w; x++, map_px += px_size_byte, px_i++) {
@@ -445,7 +445,9 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
             lv_mem_buf_release(mask_buf);
             lv_mem_buf_release(map2);
-        } else {
+        }
+        /*Most complicated case: transform or other mask or chroma keyed*/
+        else {
 
 			lv_img_transform_dsc_t trans_dsc;
 			lv_memset_00(&trans_dsc, sizeof(lv_img_transform_dsc_t));
@@ -453,7 +455,6 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 				lv_img_cf_t cf = LV_IMG_CF_TRUE_COLOR;
 				if(alpha_byte) cf = LV_IMG_CF_TRUE_COLOR_ALPHA;
 				else if(chroma_key) cf = LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED;
-
 
 				trans_dsc.cfg.angle = draw_dsc->angle;
 				trans_dsc.cfg.zoom = draw_dsc->zoom;
@@ -479,11 +480,11 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 			mask_res = (alpha_byte || chroma_key || draw_dsc->angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
 			int32_t x;
 			int32_t y;
-			for(y = 0; y < lv_area_get_height(&draw_area); y++) {
+			for(y = 0; y < draw_area_h; y++) {
 				map_px = map_buf_tmp;
 				uint32_t px_i_start = px_i;
 
-				for(x = 0; x < lv_area_get_width(&draw_area); x++, map_px += px_size_byte, px_i++) {
+				for(x = 0; x < draw_area_w; x++, map_px += px_size_byte, px_i++) {
 
 					if(transform == false)
 					{
