@@ -169,10 +169,7 @@ void lv_dropdown_set_show_selected(lv_obj_t * ddlist, bool show);
  * @param ddlist pointer to a drop down list
  * @param anim_time: open/close animation time [ms]
  */
-static inline void lv_dropdown_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time)
-{
-    lv_page_set_anim_time(ddlist, anim_time);
-}
+void lv_dropdown_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time);
 
 /*=====================
  * Getter functions
@@ -247,10 +244,7 @@ bool lv_dropdown_get_show_selected(lv_obj_t * ddlist);
  * @param ddlist pointer to a drop down list
  * @return open/close animation time [ms]
  */
-static inline uint16_t lv_dropdown_get_anim_time(const lv_obj_t * ddlist)
-{
-    return lv_page_get_anim_time(ddlist);
-}
+uint16_t lv_dropdown_get_anim_time(const lv_obj_t * ddlist);
 
 /*=====================
  * Other functions

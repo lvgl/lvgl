@@ -426,6 +426,21 @@ void lv_dropdown_set_show_selected(lv_obj_t * ddlist, bool show)
 
     lv_obj_invalidate(ddlist);
 }
+
+/**
+ * Set the open/close animation time.
+ * @param ddlist pointer to a drop down list
+ * @param anim_time: open/close animation time [ms]
+ */
+void lv_dropdown_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time)
+{
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
+    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    ext->anim_time = anim_time;
+}
+
+
 /*=====================
  * Getter functions
  *====================*/
@@ -550,6 +565,8 @@ const char * lv_dropdown_get_symbol(lv_obj_t * ddlist)
  */
 lv_dropdown_dir_t lv_dropdown_get_dir(const lv_obj_t * ddlist)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     return ext->dir;
@@ -562,10 +579,26 @@ lv_dropdown_dir_t lv_dropdown_get_dir(const lv_obj_t * ddlist)
  */
 bool lv_dropdown_get_show_selected(lv_obj_t * ddlist)
 {
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
     return ext->show_selected ? true : false;
 
+}
+
+/**
+ * Get the open/close animation time.
+ * @param ddlist pointer to a drop down list
+ * @return open/close animation time [ms]
+ */
+ uint16_t lv_dropdown_get_anim_time(const lv_obj_t * ddlist)
+{
+	 LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+
+	 lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+
+	 return ext->anim_time;
 }
 
 /*=====================
