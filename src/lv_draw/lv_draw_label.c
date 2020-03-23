@@ -411,13 +411,11 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
     int32_t pos_x = pos_p->x + g.ofs_x;
     int32_t pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - g.box_h - g.ofs_y;
 
-    static uint32_t cnt = 0;
     /*If the letter is completely out of mask don't draw it */
     if(pos_x + g.box_w < clip_area->x1 ||
        pos_x > clip_area->x2 ||
        pos_y + g.box_h < clip_area->y1 ||
        pos_y > clip_area->y2)  {
-        cnt++;
         return;
     }
 
@@ -473,7 +471,6 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
             return; /*Invalid bpp. Can't render the letter*/
     }
 
-
     static lv_opa_t opa_table[256];
     static lv_opa_t prev_opa = LV_OPA_TRANSP;
     static uint32_t prev_bpp = 0;
@@ -481,7 +478,7 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
         if(prev_opa != opa || prev_bpp != bpp) {
             uint32_t i;
             for(i = 0; i < shades; i++) {
-                opa_table[i] = bpp == 8 ? opa : (bpp_opa_table_p[i] * opa) >> 8;
+                opa_table[i] = bpp_opa_table_p[i] == LV_OPA_COVER ? opa : ((bpp_opa_table_p[i] * opa) >> 8);
             }
         }
         bpp_opa_table_p = opa_table;
@@ -524,39 +521,52 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
     uint32_t col_bit_row_ofs = (box_w + col_start- col_end) * bpp;
 
     for(row = row_start ; row < row_end; row++) {
-        bitmask = bitmask_init >> col_bit;
-
         int32_t mask_p_start = mask_p;
-        for(col = col_start; col < col_end; col++) {
 
-            /*Load the pixel's opacity into the mask*/
-            letter_px = (*map_p & bitmask) >> (col_bit_max - col_bit);
-            if(letter_px) {
-                mask_buf[mask_p] = bpp_opa_table_p[letter_px];
+        if(bpp == 8) {
+            if(opa == LV_OPA_COVER) {
+                lv_memcpy(&mask_buf[mask_p], map_p, col_end - col_start + 1);
+                mask_p += col_end - col_start + 1;
+                map_p += box_w + 1;
+            } else {
+                for(col = col_start; col < col_end; col++) {
+                    mask_buf[mask_p] = bpp_opa_table_p[*map_p];
+                    mask_p++;
+                    map_p++;
+                }
             }
-            else {
-                mask_buf[mask_p] = 0;
-            }
+        } else {
+            bitmask = bitmask_init >> col_bit;
+            for(col = col_start; col < col_end; col++) {
+                /*Load the pixel's opacity into the mask*/
+                letter_px = (*map_p & bitmask) >> (col_bit_max - col_bit);
+                if(letter_px) {
+                    mask_buf[mask_p] = bpp_opa_table_p[letter_px];
+                }
+                else {
+                    mask_buf[mask_p] = 0;
+                }
 
-            /*Go to the next column*/
-            if(col_bit < col_bit_max) {
-                col_bit += bpp;
-                bitmask = bitmask >> bpp;
-            }
-            else {
-                col_bit = 0;
-                bitmask = bitmask_init;
-                map_p++;
-            }
+                /*Go to the next column*/
+                if(col_bit < col_bit_max) {
+                    col_bit += bpp;
+                    bitmask = bitmask >> bpp;
+                }
+                else {
+                    col_bit = 0;
+                    bitmask = bitmask_init;
+                    map_p++;
+                }
 
-            /*Next mask byte*/
-            mask_p++;
+                /*Next mask byte*/
+                mask_p++;
+            }
         }
 
         /*Apply masks if any*/
         if(other_mask_cnt) {
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, fill_area.x1, fill_area.y2,
-                                                             lv_area_get_width(&fill_area));
+                    lv_area_get_width(&fill_area));
             if(mask_res == LV_DRAW_MASK_RES_FULL_TRANSP) {
                 lv_memset_00(mask_buf + mask_p_start, lv_area_get_width(&fill_area));
             }
@@ -567,8 +577,8 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
         }
         else {
             lv_blend_fill(clip_area, &fill_area,
-                          color, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa,
-                          LV_BLEND_MODE_NORMAL);
+                    color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
+                    LV_BLEND_MODE_NORMAL);
 
             fill_area.y1 = fill_area.y2 + 1;
             fill_area.y2 = fill_area.y1;
@@ -576,7 +586,6 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
         }
 
         col_bit += col_bit_row_ofs;
-
         map_p += (col_bit >> 3);
         col_bit = col_bit & 0x7;
     }
@@ -585,7 +594,7 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
     if(fill_area.y1 != fill_area.y2) {
         fill_area.y2--;
         lv_blend_fill(clip_area, &fill_area,
-                      color, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa,
+                      color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
                       LV_BLEND_MODE_NORMAL);
         mask_p = 0;
     }
@@ -616,7 +625,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
             bitmask_init  = 0xF0;
             break;
         case 8:
-            bpp_opa_table = NULL;
+            bpp_opa_table = bpp8_opa_table;
             bitmask_init  = 0xFF;
             break;       /*No opa table, pixel value will be used directly*/
         default:

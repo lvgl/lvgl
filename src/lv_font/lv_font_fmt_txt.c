@@ -38,11 +38,11 @@ static int32_t kern_pair_8_compare(const void * ref, const void * element);
 static int32_t kern_pair_16_compare(const void * ref, const void * element);
 
 static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp);
-static void decompress_line(uint8_t * out, lv_coord_t w);
-static uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len);
-static void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len);
-static void rle_init(const uint8_t * in,  uint8_t bpp);
-static uint8_t rle_next(void);
+static inline void decompress_line(uint8_t * out, lv_coord_t w);
+static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len);
+static inline void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len);
+static inline void rle_init(const uint8_t * in,  uint8_t bpp);
+static inline uint8_t rle_next(void);
 
 
 /**********************
@@ -337,6 +337,7 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
 
     lv_coord_t y;
     lv_coord_t x;
+
     for(x = 0; x < w; x++) {
         bits_write(out, wrp, line_buf1[x], bpp);
         wrp += wr_size;
@@ -361,7 +362,7 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
  * @param out output buffer
  * @param w width of the line in pixel count
  */
-static void decompress_line(uint8_t * out, lv_coord_t w)
+static inline void decompress_line(uint8_t * out, lv_coord_t w)
 {
     lv_coord_t i;
     for(i = 0; i < w; i++) {
@@ -376,16 +377,28 @@ static void decompress_line(uint8_t * out, lv_coord_t w)
  * @param len number of bits to read (must be <= 8).
  * @return the read bits
  */
-static uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len)
+static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len)
 {
-    uint8_t res = 0;
+	uint8_t bit_mask;
+	switch(len) {
+		case 1: bit_mask = 0x1; break;
+		case 2: bit_mask = 0x3; break;
+		case 3: bit_mask = 0x7; break;
+		case 4: bit_mask = 0xF; break;
+		case 8: bit_mask = 0xFF; break;
+		default: bit_mask = (uint16_t)((uint16_t) 1 << len) - 1;
+	}
+
     uint32_t byte_pos = bit_pos >> 3;
     bit_pos = bit_pos & 0x7;
-    uint8_t bit_mask = (uint16_t)((uint16_t) 1 << len) - 1;
-    uint16_t in16 = (in[byte_pos] << 8) + in[byte_pos + 1];
 
-    res = (in16 >> (16 - bit_pos - len)) & bit_mask;
-    return res;
+    if(bit_pos + len >= 8) {
+        uint16_t in16 = (in[byte_pos] << 8) + in[byte_pos + 1];
+        return (in16 >> (16 - bit_pos - len)) & bit_mask;
+    }
+    else {
+        return (in[byte_pos] >> (8 - bit_pos - len)) & bit_mask;
+    }
 }
 
 /**
@@ -396,7 +409,7 @@ static uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len)
  * @param len length of bits to write from `val`. (Counted from the LSB).
  * @note `len == 3` will be converted to `len = 4` and `val` will be upscaled too
  */
-static void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len)
+static inline void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len)
 {
     if(len == 3) {
         len = 4;
@@ -437,7 +450,7 @@ static void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len
     out[byte_pos] |= (val << bit_pos);
 }
 
-static void rle_init(const uint8_t * in,  uint8_t bpp)
+static inline void rle_init(const uint8_t * in,  uint8_t bpp)
 {
     rle_in = in;
     rle_bpp = bpp;
@@ -447,7 +460,7 @@ static void rle_init(const uint8_t * in,  uint8_t bpp)
     rle_cnt = 0;
 }
 
-static uint8_t rle_next(void)
+static inline uint8_t rle_next(void)
 {
     uint8_t v = 0;
     uint8_t ret = 0;

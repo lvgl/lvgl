@@ -64,22 +64,15 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
 
 
 #define FILL_NORMAL_MASK_PX(out_x,  color)                                                          \
-    if(*mask_tmp_x) {                                                                               \
-        if(*mask_tmp_x != last_mask || last_dest_color.full != disp_buf_tmp[out_x].full) {          \
-            if(*mask_tmp_x == LV_OPA_COVER) last_res_color = color;                                 \
-            else if(disp_buf_tmp[out_x].full == color.full) last_res_color = color;                 \
-            else last_res_color = lv_color_mix(color, disp_buf_tmp[out_x], *mask_tmp_x);            \
-            last_mask = *mask_tmp_x;                                                                \
-            last_dest_color.full = disp_buf_tmp[out_x].full;                                        \
+        if(disp_buf_tmp[out_x].full != color.full) {                 								\
+			if(*mask_tmp_x == LV_OPA_COVER) disp_buf_tmp[out_x] = color;                             \
+        	disp_buf_tmp[out_x] = lv_color_mix(color, disp_buf_tmp[out_x], *mask_tmp_x); ;          \
         }                                                                                           \
-        disp_buf_tmp[out_x] = last_res_color;                                                       \
-    }                                                                                               \
-    mask_tmp_x++;
+		mask_tmp_x++;
 
 
 
 #define FILL_NORMAL_MASK_PX_SCR_TRANSP(out_x,  color)                                               \
-    if(*mask_tmp_x) {                                                                               \
         if(*mask_tmp_x != last_mask || last_dest_color.full != disp_buf_tmp[out_x].full) {          \
         	 if(disp->driver.screen_transp) {														\
 				lv_color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[out_x].ch.alpha, 				\

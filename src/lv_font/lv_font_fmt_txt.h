@@ -177,8 +177,8 @@ typedef struct {
     /*Number of cmap tables*/
     uint16_t cmap_num       : 10;
 
-    /*Bit per pixel: 1, 2, 3, 4*/
-    uint16_t bpp            : 3;
+    /*Bit per pixel: 1, 2, 3, 4, 8*/
+    uint16_t bpp            : 4;
 
     /*Type of `kern_dsc`*/
     uint16_t kern_classes   : 1;
