@@ -134,10 +134,16 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
     LV_ASSERT_NULL(txt);
 
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
-    if(row >= ext->row_cnt || col >= ext->col_cnt) {
-        LV_LOG_WARN("lv_table_set_cell_value: invalid row or column");
+    if(col >= ext->col_cnt) {
+        LV_LOG_WARN("lv_table_set_cell_value: invalid column");
         return;
     }
+
+    /*Auto expand*/
+    if(row >= ext->row_cnt) {
+        lv_table_set_row_cnt(table, row + 1);
+    }
+
     uint32_t cell = row * ext->col_cnt + col;
     lv_table_cell_format_t format;
 
@@ -268,9 +274,14 @@ void lv_table_set_cell_align(lv_obj_t * table, uint16_t row, uint16_t col, lv_la
     LV_ASSERT_OBJ(table, LV_OBJX_NAME);
 
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
-    if(row >= ext->row_cnt || col >= ext->col_cnt) {
-        LV_LOG_WARN("lv_table_set_cell_align: invalid row or column");
+    if(col >= ext->col_cnt) {
+        LV_LOG_WARN("lv_table_set_cell_align: invalid column");
         return;
+    }
+
+    /*Auto expand*/
+    if(row >= ext->row_cnt) {
+        lv_table_set_row_cnt(table, row + 1);
     }
     uint32_t cell = row * ext->col_cnt + col;
 
@@ -298,10 +309,16 @@ void lv_table_set_cell_type(lv_obj_t * table, uint16_t row, uint16_t col, uint8_
     LV_ASSERT_OBJ(table, LV_OBJX_NAME);
 
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
-    if(row >= ext->row_cnt || col >= ext->col_cnt) {
-        LV_LOG_WARN("lv_table_set_cell_type: invalid row or column");
+    if(col >= ext->col_cnt) {
+        LV_LOG_WARN("lv_table_set_cell_type: invalid column");
         return;
     }
+
+    /*Auto expand*/
+    if(row >= ext->row_cnt) {
+        lv_table_set_row_cnt(table, row + 1);
+    }
+
     uint32_t cell = row * ext->col_cnt + col;
 
     if(ext->cell_data[cell] == NULL) {
@@ -333,10 +350,16 @@ void lv_table_set_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col, bool c
     LV_ASSERT_OBJ(table, LV_OBJX_NAME);
 
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
-    if(row >= ext->row_cnt || col >= ext->col_cnt) {
-        LV_LOG_WARN("lv_table_set_cell_crop: invalid row or column");
+    if( col >= ext->col_cnt) {
+        LV_LOG_WARN("lv_table_set_cell_crop: invalid column");
         return;
     }
+
+    /*Auto expand*/
+    if(row >= ext->row_cnt) {
+        lv_table_set_row_cnt(table, row + 1);
+    }
+
     uint32_t cell = row * ext->col_cnt + col;
 
     if(ext->cell_data[cell] == NULL) {
@@ -363,9 +386,14 @@ void lv_table_set_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col,
     LV_ASSERT_OBJ(table, LV_OBJX_NAME);
 
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
-    if(row >= ext->row_cnt || col >= ext->col_cnt) {
-        LV_LOG_WARN("lv_table_set_cell_merge_right: invalid row or column");
+    if(col >= ext->col_cnt) {
+        LV_LOG_WARN("lv_table_set_cell_merge_right: invalid column");
         return;
+    }
+
+    /*Auto expand*/
+    if(row >= ext->row_cnt) {
+        lv_table_set_row_cnt(table, row + 1);
     }
 
     uint32_t cell = row * ext->col_cnt + col;

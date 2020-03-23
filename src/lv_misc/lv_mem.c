@@ -584,6 +584,7 @@ void * lv_memcpy(void * dst, const void * src, size_t len)
  */
 void lv_memset(void * dst, uint8_t v, size_t len)
 {
+
 	uint8_t * d8 = (uint8_t *) dst;
 
 	uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
