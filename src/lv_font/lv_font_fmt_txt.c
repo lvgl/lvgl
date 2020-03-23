@@ -97,16 +97,16 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
         uint32_t buf_size = gsize;
         switch(fdsc->bpp) {
             case 1:
-                buf_size = gsize >> 3;
+                buf_size = (gsize >> 3) + 4;
                 break;
             case 2:
-                buf_size = gsize >> 2;
+                buf_size = (gsize >> 2) + 4;
                 break;
             case 3:
-                buf_size = gsize >> 1;
+                buf_size = (gsize >> 1) + 4;
                 break;
             case 4:
-                buf_size = gsize >> 1;
+                buf_size = (gsize >> 1) + 4;
                 break;
         }
 
