@@ -52,8 +52,23 @@ static const uint8_t bpp2_opa_table[4]  = {0, 85, 170, 255}; /*Opacity mapping w
 static const uint8_t bpp4_opa_table[16] = {0,  17, 34,  51,  /*Opacity mapping with bpp = 4*/
                                            68, 85, 102, 119,
                                            136, 153, 170, 187,
-                                           204, 221, 238, 255
-                                          };
+                                           204, 221, 238, 255};
+static const uint8_t bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                                            16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+                                            32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+                                            48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+                                            64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+                                            80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
+                                            96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
+                                            112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127,
+                                            128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143,
+                                            144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
+                                            160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175,
+                                            176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191,
+                                            192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207,
+                                            208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223,
+                                            224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
+                                            240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
 /*clang-format on*/
 
 /**********************
@@ -86,6 +101,7 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
 void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
                    const char * txt, lv_draw_label_hint_t * hint)
 {
+
     if(dsc->opa <= LV_OPA_MIN) return;
     const lv_font_t * font = dsc->font;
     int32_t w;
@@ -395,11 +411,15 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
     int32_t pos_x = pos_p->x + g.ofs_x;
     int32_t pos_y = pos_p->y + (font_p->line_height - font_p->base_line) - g.box_h - g.ofs_y;
 
+    static uint32_t cnt = 0;
     /*If the letter is completely out of mask don't draw it */
     if(pos_x + g.box_w < clip_area->x1 ||
        pos_x > clip_area->x2 ||
        pos_y + g.box_h < clip_area->y1 ||
-       pos_y > clip_area->y2) return;
+       pos_y > clip_area->y2)  {
+        cnt++;
+        return;
+    }
 
 
     const uint8_t * map_p = lv_font_get_glyph_bitmap(font_p, letter);
@@ -420,33 +440,53 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
 static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                                const uint8_t * map_p, lv_color_t color, lv_opa_t opa)
 {
-
-    const uint8_t * bpp_opa_table;
+    const uint8_t * bpp_opa_table_p;
     uint32_t bitmask_init;
     uint32_t bitmask;
     uint32_t bpp = g->bpp;
+    uint32_t shades;
     if(bpp == 3) bpp = 4;
 
     switch(bpp) {
         case 1:
-            bpp_opa_table = bpp1_opa_table;
+            bpp_opa_table_p = bpp1_opa_table;
             bitmask_init  = 0x80;
+            shades = 2;
             break;
         case 2:
-            bpp_opa_table = bpp2_opa_table;
+            bpp_opa_table_p = bpp2_opa_table;
             bitmask_init  = 0xC0;
+            shades = 4;
             break;
         case 4:
-            bpp_opa_table = bpp4_opa_table;
+            bpp_opa_table_p = bpp4_opa_table;
             bitmask_init  = 0xF0;
+            shades = 16;
             break;
         case 8:
-            bpp_opa_table = NULL;
+            bpp_opa_table_p = bpp8_opa_table;
             bitmask_init  = 0xFF;
+            shades = 256;
             break;       /*No opa table, pixel value will be used directly*/
         default:
-            LV_LOG_WARN("lv_draw_letter: invalid bpp not found");
+            LV_LOG_WARN("lv_draw_letter: invalid bpp");
             return; /*Invalid bpp. Can't render the letter*/
+    }
+
+
+    static lv_opa_t opa_table[256];
+    static lv_opa_t prev_opa = LV_OPA_TRANSP;
+    static uint32_t prev_bpp = 0;
+    if(opa < LV_OPA_MAX) {
+        if(prev_opa != opa || prev_bpp != bpp) {
+            uint32_t i;
+            for(i = 0; i < shades; i++) {
+                opa_table[i] = bpp = 8 ? opa : (bpp_opa_table_p[i] * opa) >> 8;
+            }
+        }
+        bpp_opa_table_p = opa_table;
+        prev_opa = opa;
+        prev_bpp = bpp;
     }
 
     int32_t col, row;
@@ -465,7 +505,6 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
     map_p += bit_ofs >> 3;
 
     uint8_t letter_px;
-    lv_opa_t px_opa;
     uint32_t col_bit;
     col_bit = bit_ofs & 0x7; /* "& 0x7" equals to "% 8" just faster */
 
@@ -481,6 +520,9 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
 
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
 
+    uint32_t col_bit_max = 8 - bpp;
+    uint32_t col_bit_row_ofs = (box_w + col_start- col_end) * bpp;
+
     for(row = row_start ; row < row_end; row++) {
         bitmask = bitmask_init >> col_bit;
 
@@ -488,25 +530,16 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
         for(col = col_start; col < col_end; col++) {
 
             /*Load the pixel's opacity into the mask*/
-            letter_px = (*map_p & bitmask) >> (8 - col_bit - bpp);
-            if(letter_px != 0) {
-                if(opa == LV_OPA_COVER) {
-                    px_opa = bpp == 8 ? letter_px : bpp_opa_table[letter_px];
-                }
-                else {
-                    px_opa = bpp == 8 ? (uint32_t)((uint32_t)letter_px * opa) >> 8
-                             : (uint32_t)((uint32_t)bpp_opa_table[letter_px] * opa) >> 8;
-                }
-
-                mask_buf[mask_p] = px_opa;
-
+            letter_px = (*map_p & bitmask) >> (col_bit_max - col_bit);
+            if(letter_px) {
+                mask_buf[mask_p] = bpp_opa_table_p[letter_px];
             }
             else {
                 mask_buf[mask_p] = 0;
             }
 
             /*Go to the next column*/
-            if(col_bit < 8 - bpp) {
+            if(col_bit < col_bit_max) {
                 col_bit += bpp;
                 bitmask = bitmask >> bpp;
             }
@@ -542,7 +575,7 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
             mask_p = 0;
         }
 
-        col_bit += ((box_w - col_end) + col_start) * bpp;
+        col_bit += col_bit_row_ofs;
 
         map_p += (col_bit >> 3);
         col_bit = col_bit & 0x7;
