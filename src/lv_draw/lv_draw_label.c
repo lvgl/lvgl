@@ -52,7 +52,8 @@ static const uint8_t bpp2_opa_table[4]  = {0, 85, 170, 255}; /*Opacity mapping w
 static const uint8_t bpp4_opa_table[16] = {0,  17, 34,  51,  /*Opacity mapping with bpp = 4*/
                                            68, 85, 102, 119,
                                            136, 153, 170, 187,
-                                           204, 221, 238, 255};
+                                           204, 221, 238, 255
+                                          };
 static const uint8_t bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
                                             16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
                                             32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
@@ -68,7 +69,8 @@ static const uint8_t bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
                                             192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207,
                                             208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223,
                                             224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
-                                            240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255};
+                                            240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
+                                           };
 /*clang-format on*/
 
 /**********************
@@ -518,42 +520,42 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
     uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
 
     uint32_t col_bit_max = 8 - bpp;
-    uint32_t col_bit_row_ofs = (box_w + col_start- col_end) * bpp;
+    uint32_t col_bit_row_ofs = (box_w + col_start - col_end) * bpp;
 
     for(row = row_start ; row < row_end; row++) {
         int32_t mask_p_start = mask_p;
 
         bitmask = bitmask_init >> col_bit;
-		for(col = col_start; col < col_end; col++) {
-			/*Load the pixel's opacity into the mask*/
-			letter_px = (*map_p & bitmask) >> (col_bit_max - col_bit);
-			if(letter_px) {
-				mask_buf[mask_p] = bpp_opa_table_p[letter_px];
-			}
-			else {
-				mask_buf[mask_p] = 0;
-			}
+        for(col = col_start; col < col_end; col++) {
+            /*Load the pixel's opacity into the mask*/
+            letter_px = (*map_p & bitmask) >> (col_bit_max - col_bit);
+            if(letter_px) {
+                mask_buf[mask_p] = bpp_opa_table_p[letter_px];
+            }
+            else {
+                mask_buf[mask_p] = 0;
+            }
 
-			/*Go to the next column*/
-			if(col_bit < col_bit_max) {
-				col_bit += bpp;
-				bitmask = bitmask >> bpp;
-			}
-			else {
-				col_bit = 0;
-				bitmask = bitmask_init;
-				map_p++;
-			}
+            /*Go to the next column*/
+            if(col_bit < col_bit_max) {
+                col_bit += bpp;
+                bitmask = bitmask >> bpp;
+            }
+            else {
+                col_bit = 0;
+                bitmask = bitmask_init;
+                map_p++;
+            }
 
-			/*Next mask byte*/
-			mask_p++;
-		}
+            /*Next mask byte*/
+            mask_p++;
+        }
 
 
         /*Apply masks if any*/
         if(other_mask_cnt) {
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, fill_area.x1, fill_area.y2,
-                    lv_area_get_width(&fill_area));
+                                                             lv_area_get_width(&fill_area));
             if(mask_res == LV_DRAW_MASK_RES_FULL_TRANSP) {
                 lv_memset_00(mask_buf + mask_p_start, lv_area_get_width(&fill_area));
             }
@@ -564,8 +566,8 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
         }
         else {
             lv_blend_fill(clip_area, &fill_area,
-                    color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
-                    LV_BLEND_MODE_NORMAL);
+                          color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
+                          LV_BLEND_MODE_NORMAL);
 
             fill_area.y1 = fill_area.y2 + 1;
             fill_area.y2 = fill_area.y1;

@@ -57,9 +57,9 @@ typedef struct {
 #endif /* LV_ENABLE_GC */
 
 #ifdef LV_ARCH_64
-#define ALIGN_MASK	0x7
+    #define ALIGN_MASK  0x7
 #else
-#define ALIGN_MASK	0x3
+    #define ALIGN_MASK  0x3
 #endif
 
 /**********************
@@ -519,59 +519,59 @@ void lv_mem_buf_free_all(void)
  */
 void * lv_memcpy(void * dst, const void * src, size_t len)
 {
-	uint8_t * d8 = dst;
-	const uint8_t * s8 = src;
+    uint8_t * d8 = dst;
+    const uint8_t * s8 = src;
 
-	lv_uintptr_t d_align = (lv_uintptr_t)d8 & ALIGN_MASK;
-	lv_uintptr_t s_align = (lv_uintptr_t)s8 & ALIGN_MASK;
+    lv_uintptr_t d_align = (lv_uintptr_t)d8 & ALIGN_MASK;
+    lv_uintptr_t s_align = (lv_uintptr_t)s8 & ALIGN_MASK;
 
-	/*Byte copy for unaligned memories*/
-	if(s_align != d_align) {
-	    while(len > 32) {
-	        REPEAT8(COPY8);
+    /*Byte copy for unaligned memories*/
+    if(s_align != d_align) {
+        while(len > 32) {
             REPEAT8(COPY8);
             REPEAT8(COPY8);
             REPEAT8(COPY8);
-	        len -= 32;
-	    }
-	    while(len) {
-	        COPY8
-	        len--;
-	    }
-	    return dst;
-	}
+            REPEAT8(COPY8);
+            len -= 32;
+        }
+        while(len) {
+            COPY8
+            len--;
+        }
+        return dst;
+    }
 
 
-	/*Make the memories aligned*/
-	if(d_align) {
-	    d_align = ALIGN_MASK + 1 - d_align;
+    /*Make the memories aligned*/
+    if(d_align) {
+        d_align = ALIGN_MASK + 1 - d_align;
         while(d_align && len) {
             COPY8;
             d_align--;
             len--;
         }
-	}
+    }
 
-	uint32_t * d32 = (uint32_t*)d8;
-	const uint32_t * s32 = (uint32_t*)s8;
-	while(len > 32) {
-	    REPEAT8(COPY32)
-		len -= 32;
-	}
+    uint32_t * d32 = (uint32_t *)d8;
+    const uint32_t * s32 = (uint32_t *)s8;
+    while(len > 32) {
+        REPEAT8(COPY32)
+        len -= 32;
+    }
 
-	while(len > 4) {
-		COPY32;
-		len -= 4;
-	}
+    while(len > 4) {
+        COPY32;
+        len -= 4;
+    }
 
-	d8 = (uint8_t *)d32;
-	s8 = (const uint8_t *)s32;
-	while(len) {
-	    COPY8
-		len--;
-	}
+    d8 = (uint8_t *)d32;
+    s8 = (const uint8_t *)s32;
+    while(len) {
+        COPY8
+        len--;
+    }
 
-	return dst;
+    return dst;
 }
 
 
@@ -585,11 +585,11 @@ void * lv_memcpy(void * dst, const void * src, size_t len)
 void lv_memset(void * dst, uint8_t v, size_t len)
 {
 
-	uint8_t * d8 = (uint8_t *) dst;
+    uint8_t * d8 = (uint8_t *) dst;
 
-	uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
+    uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
 
-	/*Make the address aligned*/
+    /*Make the address aligned*/
     if(d_align) {
         d_align = ALIGN_MASK + 1 - d_align;
         while(d_align && len) {
@@ -600,34 +600,34 @@ void lv_memset(void * dst, uint8_t v, size_t len)
         }
     }
 
-	uint32_t v32 = v + (v << 8) + (v << 16) + (v << 24);
+    uint32_t v32 = v + (v << 8) + (v << 16) + (v << 24);
 
-	uint32_t * d32 = (uint32_t*)d8;
+    uint32_t * d32 = (uint32_t *)d8;
 
-	while(len > 32) {
-		SET32(v32);
-		SET32(v32);
-		SET32(v32);
-		SET32(v32);
-		SET32(v32);
-		SET32(v32);
-		SET32(v32);
-		SET32(v32);
-		len -= 32;
-	}
+    while(len > 32) {
+        SET32(v32);
+        SET32(v32);
+        SET32(v32);
+        SET32(v32);
+        SET32(v32);
+        SET32(v32);
+        SET32(v32);
+        SET32(v32);
+        len -= 32;
+    }
 
-	while(len > 4) {
-		SET32(v32);
-		len -= 4;
-	}
+    while(len > 4) {
+        SET32(v32);
+        len -= 4;
+    }
 
 
-	d8 = (uint8_t *)d32;
-	while(len) {
-		*d8 = v;
-		d8++;
-		len--;
-	}
+    d8 = (uint8_t *)d32;
+    while(len) {
+        *d8 = v;
+        d8++;
+        len--;
+    }
 }
 
 /**
@@ -638,7 +638,7 @@ void lv_memset(void * dst, uint8_t v, size_t len)
  */
 void lv_memset_00(void * dst, size_t len)
 {
-	uint8_t * d8 = (uint8_t*) dst;
+    uint8_t * d8 = (uint8_t *) dst;
     uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
 
 
@@ -653,31 +653,31 @@ void lv_memset_00(void * dst, size_t len)
         }
     }
 
-    uint32_t * d32 = (uint32_t*)d8;
-	while(len > 32) {
-		SET32(0);
-		SET32(0);
-		SET32(0);
-		SET32(0);
-		SET32(0);
-		SET32(0);
-		SET32(0);
-		SET32(0);
-		len -= 32;
-	}
+    uint32_t * d32 = (uint32_t *)d8;
+    while(len > 32) {
+        SET32(0);
+        SET32(0);
+        SET32(0);
+        SET32(0);
+        SET32(0);
+        SET32(0);
+        SET32(0);
+        SET32(0);
+        len -= 32;
+    }
 
-	while(len > 4) {
-		SET32(0);
-		len -= 4;
-	}
+    while(len > 4) {
+        SET32(0);
+        len -= 4;
+    }
 
 
-	d8 = (uint8_t *)d32;
-	while(len) {
-		*d8 = 0;
-		d8++;
-		len--;
-	}
+    d8 = (uint8_t *)d32;
+    while(len) {
+        *d8 = 0;
+        d8++;
+        len--;
+    }
 }
 
 /**
@@ -688,7 +688,7 @@ void lv_memset_00(void * dst, size_t len)
  */
 void lv_memset_ff(void * dst, size_t len)
 {
-	uint8_t * d8 = (uint8_t*) dst;
+    uint8_t * d8 = (uint8_t *) dst;
     uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
 
 
@@ -703,31 +703,31 @@ void lv_memset_ff(void * dst, size_t len)
         }
     }
 
-    uint32_t * d32 = (uint32_t*)d8;
-	while(len > 32) {
-		SET32(0xFFFFFFFF);
-		SET32(0xFFFFFFFF);
-		SET32(0xFFFFFFFF);
-		SET32(0xFFFFFFFF);
-		SET32(0xFFFFFFFF);
-		SET32(0xFFFFFFFF);
-		SET32(0xFFFFFFFF);
-		SET32(0xFFFFFFFF);
-		len -= 32;
-	}
+    uint32_t * d32 = (uint32_t *)d8;
+    while(len > 32) {
+        SET32(0xFFFFFFFF);
+        SET32(0xFFFFFFFF);
+        SET32(0xFFFFFFFF);
+        SET32(0xFFFFFFFF);
+        SET32(0xFFFFFFFF);
+        SET32(0xFFFFFFFF);
+        SET32(0xFFFFFFFF);
+        SET32(0xFFFFFFFF);
+        len -= 32;
+    }
 
-	while(len > 4) {
-		SET32(0xFFFFFFFF);
-		len -= 4;
-	}
+    while(len > 4) {
+        SET32(0xFFFFFFFF);
+        len -= 4;
+    }
 
 
-	d8 = (uint8_t *)d32;
-	while(len) {
-		*d8 = 0xFF;
-		d8++;
-		len--;
-	}
+    d8 = (uint8_t *)d32;
+    while(len) {
+        *d8 = 0xFF;
+        d8++;
+        len--;
+    }
 }
 
 

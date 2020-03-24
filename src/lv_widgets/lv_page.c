@@ -986,7 +986,8 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
 #if LV_USE_GROUP
         if(lv_obj_get_group(page)) {
             lv_group_focus_obj(page);
-        } else
+        }
+        else
 #endif
         {
             res = lv_signal_send(page, LV_SIGNAL_FOCUS, NULL);

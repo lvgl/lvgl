@@ -760,7 +760,8 @@ static void tabview_init(void)
     lv_style_init(&tabview_btns_bg);
     lv_style_set_bg_opa(&tabview_btns_bg, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&tabview_btns_bg, LV_STATE_DEFAULT, COLOR_BG);
-    lv_style_set_border_color(&tabview_btns_bg, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0xe4eaf0) : lv_color_hex(0x3b3e42));
+    lv_style_set_border_color(&tabview_btns_bg, LV_STATE_DEFAULT,
+                              IS_LIGHT ? lv_color_hex(0xe4eaf0) : lv_color_hex(0x3b3e42));
     lv_style_set_border_width(&tabview_btns_bg, LV_STATE_DEFAULT, LV_DPI / 30 > 0 ? LV_DPI / 30 : 1);
     lv_style_set_border_side(&tabview_btns_bg, LV_STATE_DEFAULT, LV_BORDER_SIDE_BOTTOM);
     lv_style_set_text_color(&tabview_btns_bg, LV_STATE_DEFAULT, COLOR_SCR_TEXT);

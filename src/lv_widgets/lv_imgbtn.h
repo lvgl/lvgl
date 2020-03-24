@@ -43,7 +43,7 @@ typedef struct {
     const void * img_src_right[_LV_BTN_STATE_LAST]; /*Store right side images to each state*/
 #endif
     lv_img_cf_t act_cf; /*Color format of the currently active image*/
-    uint8_t tiled   :1; /*1: the middle src will be repeated to fill the user defined width*/
+    uint8_t tiled   : 1; /*1: the middle src will be repeated to fill the user defined width*/
 } lv_imgbtn_ext_t;
 
 /*Parts of the image button*/
@@ -94,7 +94,7 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src
  * to a file)
  */
 void lv_imgbtn_set_src_tiled(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src_left, const void * src_mid,
-                       const void * src_right);
+                             const void * src_right);
 
 #endif
 

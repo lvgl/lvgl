@@ -19,7 +19,7 @@
  *********************/
 #define SHADOW_UPSACALE_SHIFT   6
 #define SHADOW_ENHANCE          1
-#define SPLIT_LIMIT				50
+#define SPLIT_LIMIT             50
 
 /**********************
  *      TYPEDEFS

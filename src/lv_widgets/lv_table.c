@@ -350,7 +350,7 @@ void lv_table_set_cell_crop(lv_obj_t * table, uint16_t row, uint16_t col, bool c
     LV_ASSERT_OBJ(table, LV_OBJX_NAME);
 
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
-    if( col >= ext->col_cnt) {
+    if(col >= ext->col_cnt) {
         LV_LOG_WARN("lv_table_set_cell_crop: invalid column");
         return;
     }

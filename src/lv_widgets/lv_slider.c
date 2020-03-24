@@ -273,10 +273,12 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
             lv_coord_t dist_left, dist_right;
             if(hor) {
-                if((base_dir != LV_BIDI_DIR_RTL && p.x > ext->right_knob_area.x2) || (base_dir == LV_BIDI_DIR_RTL && p.x < ext->right_knob_area.x1)) {
+                if((base_dir != LV_BIDI_DIR_RTL && p.x > ext->right_knob_area.x2) || (base_dir == LV_BIDI_DIR_RTL &&
+                                                                                      p.x < ext->right_knob_area.x1)) {
                     ext->value_to_set = &ext->bar.cur_value;
                 }
-                else if((base_dir != LV_BIDI_DIR_RTL && p.x < ext->left_knob_area.x1) || (base_dir == LV_BIDI_DIR_RTL && p.x > ext->left_knob_area.x2)) {
+                else if((base_dir != LV_BIDI_DIR_RTL && p.x < ext->left_knob_area.x1) || (base_dir == LV_BIDI_DIR_RTL &&
+                                                                                          p.x > ext->left_knob_area.x2)) {
                     ext->value_to_set = &ext->bar.start_value;
                 }
                 else {

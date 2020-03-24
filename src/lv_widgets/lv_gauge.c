@@ -1,7 +1,7 @@
- /**
- * @file lv_gauge.c
- *
- */
+/**
+* @file lv_gauge.c
+*
+*/
 
 /*********************
  *      INCLUDES

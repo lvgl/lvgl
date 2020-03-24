@@ -33,7 +33,7 @@ extern "C" {
  *      DEFINES
  *********************/
 #define LV_DROPDOWN_POS_LAST 0xFFFF
-    
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -127,7 +127,7 @@ void lv_dropdown_set_static_options(lv_obj_t * ddlist, const char * options);
  * @param pos  the insert position, indexed from 0, LV_DROPDOWN_POS_LAST = end of string
  */
 void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos);
-    
+
 /**
  * Set the selected option
  * @param ddlist pointer to drop down list object

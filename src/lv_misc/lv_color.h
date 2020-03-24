@@ -447,14 +447,14 @@ static inline lv_color_t lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
 static inline void lv_color_premult(lv_color_t c, uint8_t mix, uint16_t * out)
 {
 #if LV_COLOR_DEPTH != 1
-	out[0] = (uint16_t) LV_COLOR_GET_R(c) * mix;
-	out[1] = (uint16_t) LV_COLOR_GET_G(c) * mix;
-	out[2] = (uint16_t) LV_COLOR_GET_B(c) * mix;
+    out[0] = (uint16_t) LV_COLOR_GET_R(c) * mix;
+    out[1] = (uint16_t) LV_COLOR_GET_G(c) * mix;
+    out[2] = (uint16_t) LV_COLOR_GET_B(c) * mix;
 #else
-	/*Pre-multiplication can't be used with 1 bpp*/
-	out[0] = LV_COLOR_GET_R(c);
-	out[1] = LV_COLOR_GET_G(c);
-	out[2] = LV_COLOR_GET_B(c);
+    /*Pre-multiplication can't be used with 1 bpp*/
+    out[0] = LV_COLOR_GET_R(c);
+    out[1] = LV_COLOR_GET_G(c);
+    out[2] = LV_COLOR_GET_B(c);
 #endif
 
 }
@@ -468,7 +468,7 @@ static inline void lv_color_premult(lv_color_t c, uint8_t mix, uint16_t * out)
  * @return the mixed color
  * @note 255 won't give clearly `c1`.
  */
-static inline lv_color_t lv_color_mix_premult(uint16_t * premult_c1 , lv_color_t c2, uint8_t mix)
+static inline lv_color_t lv_color_mix_premult(uint16_t * premult_c1, lv_color_t c2, uint8_t mix)
 {
     lv_color_t ret;
 #if LV_COLOR_DEPTH != 1

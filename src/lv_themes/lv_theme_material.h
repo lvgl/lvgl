@@ -28,7 +28,7 @@ extern "C" {
 typedef enum {
     LV_THEME_MATERIAL_PALETTE_LIGHT,
     LV_THEME_MATERIAL_PALETTE_DARK,
-}lv_theme_material_palette_t;
+} lv_theme_material_palette_t;
 
 
 /**********************

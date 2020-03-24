@@ -651,7 +651,7 @@ static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x,
             if(k >= len) {
                 return LV_DRAW_MASK_RES_FULL_TRANSP;
             }
-            if(k >= 0) lv_memset_00(&mask_buf[0],k);
+            if(k >= 0) lv_memset_00(&mask_buf[0], k);
 
         }
         else {
@@ -979,7 +979,7 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
                     return LV_DRAW_MASK_RES_FULL_TRANSP;
                 }
                 if(kr <= len) {
-                    lv_memset_00(&mask_buf[kr],len - kr);
+                    lv_memset_00(&mask_buf[kr], len - kr);
                 }
             }
             else {

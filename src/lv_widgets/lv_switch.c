@@ -219,7 +219,8 @@ static lv_design_res_t lv_switch_design(lv_obj_t * sw, const lv_area_t * clip_ar
         if(base_dir != LV_BIDI_DIR_RTL) {
             knob_area.x1 = ext->bar.indic_area.x2 - ((act_indic_w * knob_size) / max_indic_w);
             knob_area.x2 = knob_area.x1 + knob_size;
-        } else {
+        }
+        else {
             knob_area.x2 = ext->bar.indic_area.x1 + ((act_indic_w * knob_size) / max_indic_w);
             knob_area.x1 = knob_area.x2 - knob_size;
         }
