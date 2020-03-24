@@ -399,7 +399,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         bool transform = draw_dsc->angle != 0 || draw_dsc->zoom != LV_IMG_ZOOM_NONE ? true : false;
 
         /*Simple ARGB image. Handle it as special case because it's very common*/
-        if(other_mask_cnt == 0 && !transform && !chroma_key && alpha_byte) {
+        if(other_mask_cnt == 0 && !transform && !chroma_key && draw_dsc->recolor_opa == LV_OPA_TRANSP && alpha_byte) {
             int32_t x;
             int32_t y;
             for(y = 0; y < draw_area_h; y++) {
