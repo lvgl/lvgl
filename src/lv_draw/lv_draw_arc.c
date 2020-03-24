@@ -73,6 +73,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
 {
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
+    if(start_angle == end_angle) return;
 
     lv_draw_rect_dsc_t cir_dsc;
     lv_draw_rect_dsc_init(&cir_dsc);

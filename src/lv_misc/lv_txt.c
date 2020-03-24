@@ -295,6 +295,17 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
 
+    /* If max_width doesn't mater simply find the new line character
+     * without thinking about word wrapping*/
+    if((flag & LV_TXT_FLAG_EXPAND) || (flag & LV_TXT_FLAG_FIT)) {
+        uint32_t i;
+        for(i = 0; txt[i] != '\n' && txt[i] != '\r' && txt[i] != '\0'; i++) {
+            /*Just find the new line chars or string ends by incrementing `i`*/
+        }
+        if(txt[i] != '\0') i++;    /*To go beyond `\n`*/
+        return i;
+    }
+
     if(flag & LV_TXT_FLAG_EXPAND) max_width = LV_COORD_MAX;
     lv_txt_cmd_state_t cmd_state = LV_TXT_CMD_STATE_WAIT;
     uint32_t i = 0;                                        /* Iterating index into txt */
