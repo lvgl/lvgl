@@ -1220,6 +1220,27 @@ static void lv_label_refr_text(lv_obj_t * label)
             lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
             lv_anim_set_time(&a, lv_anim_speed_to_time(ext->anim_speed, a.start, a.end));
             lv_anim_set_playback_time(&a, a.time);
+
+            lv_anim_t * anim_cur = lv_anim_get(label, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
+            uint32_t act_time = 0;
+            bool playback_now = false;
+            if(anim_cur) {
+                act_time = anim_cur->act_time;
+                playback_now = anim_cur->playback_now;
+            }
+            if(act_time < a.time) {
+                a.act_time = act_time;      /*To keep the old position*/
+                a.early_apply = 0;
+                if(playback_now) {
+                    a.playback_now = 1;
+                    /*Swap the start and end values*/
+                    int32_t tmp;
+                    tmp      = a.start;
+                    a.start = a.end;
+                    a.end   = tmp;
+                }
+            }
+
             lv_anim_start(&a);
             hor_anim = true;
         }
@@ -1234,6 +1255,27 @@ static void lv_label_refr_text(lv_obj_t * label)
             lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
             lv_anim_set_time(&a, lv_anim_speed_to_time(ext->anim_speed, a.start, a.end));
             lv_anim_set_playback_time(&a, a.time);
+
+            lv_anim_t * anim_cur = lv_anim_get(label, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
+            uint32_t act_time = 0;
+            bool playback_now = false;
+            if(anim_cur) {
+                act_time = anim_cur->act_time;
+                playback_now = anim_cur->playback_now;
+            }
+            if(act_time < a.time) {
+                a.act_time = act_time;      /*To keep the old position*/
+                a.early_apply = 0;
+                if(playback_now) {
+                    a.playback_now = 1;
+                    /*Swap the start and end values*/
+                    int32_t tmp;
+                    tmp      = a.start;
+                    a.start = a.end;
+                    a.end   = tmp;
+                }
+            }
+
             lv_anim_start(&a);
         }
         else {
@@ -1250,16 +1292,20 @@ static void lv_label_refr_text(lv_obj_t * label)
         lv_anim_init(&a);
         lv_anim_set_var(&a, label);
         lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
-        uint32_t delay = (((lv_font_get_glyph_width(font, ' ', ' ') + letter_space) * 1000) /
-                          ext->anim_speed) *
-                         LV_LABEL_WAIT_CHAR_COUNT;
-        lv_anim_set_delay(&a, delay);
 
         bool hor_anim = false;
         if(size.x > lv_area_get_width(&txt_coords)) {
             lv_anim_set_values(&a, 0, -size.x - lv_font_get_glyph_width(font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT);
             lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
             lv_anim_set_time(&a, lv_anim_speed_to_time(ext->anim_speed, a.start, a.end));
+
+            lv_anim_t * anim_cur = lv_anim_get(label, (lv_anim_exec_xcb_t)lv_label_set_offset_x);
+            uint32_t act_time = anim_cur ? anim_cur->act_time : 0;
+            if(act_time < a.time) {
+                a.act_time = act_time;      /*To keep the old position*/
+                a.early_apply = 0;
+            }
+
             lv_anim_start(&a);
             hor_anim = true;
         }
@@ -1273,6 +1319,14 @@ static void lv_label_refr_text(lv_obj_t * label)
             lv_anim_set_values(&a, 0, -size.y - (lv_font_get_line_height(font)));
             lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
             lv_anim_set_time(&a, lv_anim_speed_to_time(ext->anim_speed, a.start, a.end));
+
+            lv_anim_t * anim_cur = lv_anim_get(label, (lv_anim_exec_xcb_t)lv_label_set_offset_y);
+            uint32_t act_time = anim_cur ? anim_cur->act_time : 0;
+            if(act_time < a.time) {
+                a.act_time = act_time;      /*To keep the old position*/
+                a.early_apply = 0;
+            }
+
             lv_anim_start(&a);
         }
         else {

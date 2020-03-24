@@ -35,6 +35,22 @@ extern "C" {
  */
 char * lv_utils_num_to_str(int32_t num, char * buf);
 
+/**
+ * Convert a fixed point number to string
+ * @param num a number
+ * @param decimals number of digits after decimal point
+ * @param buf pointer to a `char` buffer
+ * @param bufsize length of buffer
+ * @return same as `buf` (just for convenience)
+ */
+char * lv_utils_num_to_str_fixed(int32_t num, int32_t decimals, char * buf, size_t bufsize);
+
+/**
+ * Set the decimal separator character used by lv_utils_num_to_str_fixed
+ * @param separator the decimal separator char
+ */
+void lv_utils_set_decimal_separator(char separator);
+
 /** Searches base[0] to base[n - 1] for an item that matches *key.
  *
  * @note The function cmp must return negative if its first

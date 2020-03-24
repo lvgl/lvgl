@@ -279,6 +279,16 @@ static inline int32_t lv_anim_get_delay(lv_anim_t * a)
  */
 bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb);
 
+
+/**
+ * Get the animation of a variable and its `exec_cb`.
+ * @param var pointer to variable
+ * @param exec_cb a function pointer which is animating 'var',
+ *           or NULL to delete all the animations of 'var'
+ * @return pointer to the animation.
+ */
+lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb);
+
 /**
  * Delete an animation by getting the animated variable from `a`.
  * Only animations with `exec_cb` will be deleted.
