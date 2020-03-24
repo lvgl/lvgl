@@ -268,6 +268,8 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, l
         px += ext->dsc.header.w * px_size;
         to_copy8 += w * px_size;
     }
+    
+    lv_obj_invalidate(canvas);
 }
 
 /**
@@ -464,6 +466,8 @@ void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color)
             lv_img_buf_set_px_color(dsc, x, y, color);
         }
     }
+    lv_obj_invalidate(canvas);
+    lv_obj_invalidate(canvas);
 }
 
 /**
@@ -527,6 +531,7 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     lv_draw_rect(&coords, &mask, style, LV_OPA_COVER);
 
     lv_refr_set_disp_refreshing(refr_ori);
+    lv_obj_invalidate(canvas);
 }
 
 /**
@@ -588,6 +593,7 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     lv_draw_label(&coords, &mask, style, LV_OPA_COVER, txt, flag, NULL,  NULL, NULL, lv_obj_get_base_dir(canvas));
 
     lv_refr_set_disp_refreshing(refr_ori);
+    lv_obj_invalidate(canvas);
 }
 
 /**
@@ -643,6 +649,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     lv_draw_img(&coords, &mask, src, style, LV_OPA_COVER);
 
     lv_refr_set_disp_refreshing(refr_ori);
+    lv_obj_invalidate(canvas);
 }
 
 /**
@@ -726,6 +733,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t 
     }
     
     lv_refr_set_disp_refreshing(refr_ori);
+    lv_obj_invalidate(canvas);
 }
 
 /**
@@ -780,6 +788,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32
     lv_draw_polygon(points, point_cnt, &mask, style, LV_OPA_COVER);
 
     lv_refr_set_disp_refreshing(refr_ori);
+    lv_obj_invalidate(canvas);
 }
 
 /**
@@ -838,6 +847,7 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     lv_draw_arc(x, y, r, &mask, start_angle, end_angle, style, LV_OPA_COVER);
 
     lv_refr_set_disp_refreshing(refr_ori);
+    lv_obj_invalidate(canvas);
 }
 
 /**********************
