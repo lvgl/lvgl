@@ -106,7 +106,6 @@ void lv_anim_start(lv_anim_t * a)
     if(new_anim == NULL) return;
 
     /*Initialize the animation descriptor*/
-    a->playback_now = 0;
     a->time_orig = a->time;
     memcpy(new_anim, a, sizeof(lv_anim_t));
 
@@ -151,6 +150,25 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
     }
 
     return del;
+}
+
+/**
+ * Get the animation of a variable and its `exec_cb`.
+ * @param var pointer to variable
+ * @param exec_cb a function pointer which is animating 'var',
+ *           or NULL to delete all the animations of 'var'
+ * @return pointer to the animation.
+ */
+lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb)
+{
+    lv_anim_t * a;
+    LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) {
+        if(a->var == var && a->exec_cb == exec_cb) {
+            return a;
+        }
+    }
+
+    return NULL;
 }
 
 /**
