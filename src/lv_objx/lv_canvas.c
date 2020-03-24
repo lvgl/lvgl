@@ -467,7 +467,6 @@ void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color)
         }
     }
     lv_obj_invalidate(canvas);
-    lv_obj_invalidate(canvas);
 }
 
 /**
