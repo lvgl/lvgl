@@ -340,6 +340,34 @@ uint16_t lv_arc_get_angle_end(lv_obj_t * arc)
     return ext->arc_angle_end;
 }
 
+/**
+ * Get the start angle of an arc background.
+ * @param arc pointer to an arc object
+ * @return the start angle [0..360]
+ */
+uint16_t lv_arc_get_bg_angle_start(lv_obj_t * arc)
+{
+    LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
+
+    lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
+
+    return ext->bg_angle_start;
+}
+
+/**
+ * Get the end angle of an arc background.
+ * @param arc pointer to an arc object
+ * @return the end angle [0..360]
+ */
+uint16_t lv_arc_get_bg_angle_end(lv_obj_t * arc)
+{
+    LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
+
+    lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
+
+    return ext->bg_angle_end;
+}
+
 /*=====================
  * Other functions
  *====================*/
