@@ -1052,11 +1052,14 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
 
         lv_label_align_t align = lv_label_get_align(label);
 
+        if(ext->long_mode == LV_LABEL_LONG_EXPAND) ext->expand = 1;
+
         lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
         if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
         if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
         if(align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
         if(align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
+
 
         lv_draw_label_dsc_t label_draw_dsc;
         lv_draw_label_dsc_init(&label_draw_dsc);
