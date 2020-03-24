@@ -578,15 +578,11 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TXT_FLAG_FIT;
 
     lv_label_align_t align = lv_label_get_align(label);
     if(align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
     if(align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
-
-    /*If the width will be expanded  the set the max length to very big */
-    if(ext->long_mode == LV_LABEL_LONG_EXPAND) {
-        max_w = LV_COORD_MAX;
-    }
 
     uint16_t byte_id = lv_txt_encoded_get_byte_id(txt, char_id);
 
@@ -688,15 +684,11 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TXT_FLAG_FIT;
 
     lv_label_align_t align = lv_label_get_align(label);
     if(align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
     if(align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
-
-    /*If the width will be expanded set the max length to very big */
-    if(ext->long_mode == LV_LABEL_LONG_EXPAND) {
-        max_w = LV_COORD_MAX;
-    }
 
     /*Search the line of the index letter */;
     while(txt[line_start] != '\0') {
@@ -849,12 +841,8 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TXT_FLAG_FIT;
     if(align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
-
-    /*If the width will be expanded set the max length to very big */
-    if(ext->long_mode == LV_LABEL_LONG_EXPAND) {
-        max_w = LV_COORD_MAX;
-    }
 
     /*Search the line of the index letter */;
     while(txt[line_start] != '\0') {
@@ -1052,14 +1040,12 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
 
         lv_label_align_t align = lv_label_get_align(label);
 
-        if(ext->long_mode == LV_LABEL_LONG_EXPAND) ext->expand = 1;
-
         lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
         if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
         if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
+        if(ext->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TXT_FLAG_FIT;
         if(align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
         if(align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
-
 
         lv_draw_label_dsc_t label_draw_dsc;
         lv_draw_label_dsc_init(&label_draw_dsc);
@@ -1202,16 +1188,12 @@ static void lv_label_refr_text(lv_obj_t * label)
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(label, LV_LABEL_PART_MAIN);
     lv_style_int_t letter_space = lv_obj_get_style_text_letter_space(label, LV_LABEL_PART_MAIN);
 
-    /*If the width will be expanded set the max length to very big */
-    if(ext->long_mode == LV_LABEL_LONG_EXPAND) {
-        max_w = LV_COORD_MAX;
-    }
-
     /*Calc. the height and longest line*/
     lv_point_t size;
     lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
+    if(ext->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TXT_FLAG_FIT;
     lv_txt_get_size(&size, ext->text, font, letter_space, line_space, max_w, flag);
 
     /*Set the full size in expand mode*/
