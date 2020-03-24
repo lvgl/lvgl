@@ -136,8 +136,8 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_dropdown_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         if(copy_ext->static_txt == 0)
             lv_dropdown_set_options(ddlist, lv_dropdown_get_options(copy));
-		else
-		    lv_dropdown_set_static_options(ddlist, lv_dropdown_get_options(copy));
+        else
+            lv_dropdown_set_static_options(ddlist, lv_dropdown_get_options(copy));
         ext->option_cnt        = copy_ext->option_cnt;
         ext->sel_opt_id     = copy_ext->sel_opt_id;
         ext->sel_opt_id_orig = copy_ext->sel_opt_id;
@@ -219,7 +219,7 @@ void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options)
     ext->option_cnt++;   /*Last option has no `\n`*/
     ext->sel_opt_id      = 0;
     ext->sel_opt_id_orig = 0;
-    
+
     /*Allocate space for the new text*/
     size_t len = strlen(options) + 1;
     if(ext->options != NULL && ext->static_txt == 0) {
@@ -297,11 +297,11 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos
 
     /*Allocate space for the new option*/
     size_t old_len = (ext->options == NULL) ? 0 : strlen(ext->options);
-	size_t ins_len = strlen(option);
-	size_t new_len = ins_len + old_len + 2; /* +2 for terminating NULL and possible \n */
-	ext->options        = lv_mem_realloc(ext->options, new_len + 1);
-	LV_ASSERT_MEM(ext->options);
-	if(ext->options == NULL) return;
+    size_t ins_len = strlen(option);
+    size_t new_len = ins_len + old_len + 2; /* +2 for terminating NULL and possible \n */
+    ext->options        = lv_mem_realloc(ext->options, new_len + 1);
+    LV_ASSERT_MEM(ext->options);
+    if(ext->options == NULL) return;
 
     ext->options[old_len] = 0;
 
@@ -325,7 +325,7 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos
     char * ins_buf = lv_mem_buf_get(ins_len + 2); /* + 2 for terminating NULL and possible \n */
     LV_ASSERT_MEM(ins_buf);
     if(ins_buf == NULL) return;
-        strcpy(ins_buf, option);
+    strcpy(ins_buf, option);
     if(pos < ext->option_cnt)
         strcat(ins_buf, "\n");
     lv_txt_ins(ext->options, insert_pos, ins_buf);
@@ -592,13 +592,13 @@ bool lv_dropdown_get_show_selected(lv_obj_t * ddlist)
  * @param ddlist pointer to a drop down list
  * @return open/close animation time [ms]
  */
- uint16_t lv_dropdown_get_anim_time(const lv_obj_t * ddlist)
+uint16_t lv_dropdown_get_anim_time(const lv_obj_t * ddlist)
 {
-	 LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
 
-	 lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
-	 return ext->anim_time;
+    return ext->anim_time;
 }
 
 /*=====================
@@ -937,7 +937,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
             lv_mem_free(ext->options);
             ext->options = NULL;
         }
-        
+
         /*`lv_obj_clean_style_list` is not required because these styles are only copied to the page
          * so they can have transitions or other object related things. */
         lv_style_list_reset(&ext->style_page);

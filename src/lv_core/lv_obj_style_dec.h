@@ -101,22 +101,22 @@ extern "C" {
     }
 
 #define _OBJ_SET_STYLE_scalar(prop_name, func_name, value_type, style_type)                                             \
-   static inline void lv_style_set_##func_name (lv_style_t * style, lv_state_t state, value_type value)                 \
-   {                                                                                                                    \
-       _lv_style_set##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                  \
-   }
+    static inline void lv_style_set_##func_name (lv_style_t * style, lv_state_t state, value_type value)                 \
+    {                                                                                                                    \
+        _lv_style_set##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                  \
+    }
 
 #define _OBJ_SET_STYLE_nonscalar(prop_name, func_name, value_type, style_type)                                          \
-   static inline void lv_style_set_##func_name (lv_style_t * style, lv_state_t state, value_type value)                 \
-   {                                                                                                                    \
-       _lv_style_set##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                  \
-   }
+    static inline void lv_style_set_##func_name (lv_style_t * style, lv_state_t state, value_type value)                 \
+    {                                                                                                                    \
+        _lv_style_set##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), value);                  \
+    }
 
 #define _OBJ_SET_STYLE_func_ptr(prop_name, func_name, value_type, style_type)                                           \
-   static inline void lv_style_set_##func_name (lv_style_t * style, lv_state_t state, value_type value)                 \
-   {                                                                                                                    \
-       _lv_style_set##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), FUNC_PTR_CAST(value));                 \
-   }                                                                                                                    \
+    static inline void lv_style_set_##func_name (lv_style_t * style, lv_state_t state, value_type value)                 \
+    {                                                                                                                    \
+        _lv_style_set##style_type (style, LV_STYLE_##prop_name | (state << LV_STYLE_STATE_POS), FUNC_PTR_CAST(value));                 \
+    }                                                                                                                    \
 
 #define _LV_OBJ_STYLE_SET_GET_DECLARE(prop_name, func_name, value_type, style_type, scalar)                             \
     _OBJ_GET_STYLE_##scalar(prop_name, func_name, value_type, style_type)                                          \
@@ -217,7 +217,8 @@ _LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PROP_6, transition_prop_6, lv_style_int
 #if LV_USE_ANIMATION
 _LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PATH, transition_path, lv_anim_path_cb_t, _func_ptr, func_ptr)
 #else
-_LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PATH, transition_path,lv_style_prop_cb_t, _func_ptr, func_ptr)   /*For compatibility*/
+_LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PATH, transition_path, lv_style_prop_cb_t, _func_ptr,
+                              func_ptr)  /*For compatibility*/
 #endif
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_WIDTH, scale_width, lv_style_int_t, _int, scalar)
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_BORDER_WIDTH, scale_border_width, lv_style_int_t, _int, scalar)

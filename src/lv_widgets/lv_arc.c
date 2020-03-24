@@ -382,7 +382,8 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
         lv_coord_t right_bg = lv_obj_get_style_pad_right(arc, LV_ARC_PART_BG);
         lv_coord_t top_bg = lv_obj_get_style_pad_top(arc, LV_ARC_PART_BG);
         lv_coord_t bottom_bg = lv_obj_get_style_pad_bottom(arc, LV_ARC_PART_BG);
-        lv_coord_t r       = (LV_MATH_MIN(lv_obj_get_width(arc) - left_bg - right_bg, lv_obj_get_height(arc) - top_bg - bottom_bg)) / 2;
+        lv_coord_t r       = (LV_MATH_MIN(lv_obj_get_width(arc) - left_bg - right_bg,
+                                          lv_obj_get_height(arc) - top_bg - bottom_bg)) / 2;
         lv_coord_t x       = arc->coords.x1 + r + left_bg;
         lv_coord_t y       = arc->coords.y1 + r + top_bg;
 
@@ -400,7 +401,7 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
         lv_coord_t right_indic = lv_obj_get_style_pad_right(arc, LV_ARC_PART_INDIC);
         lv_coord_t top_indic = lv_obj_get_style_pad_top(arc, LV_ARC_PART_INDIC);
         lv_coord_t bottom_indic = lv_obj_get_style_pad_bottom(arc, LV_ARC_PART_INDIC);
-        r-= LV_MATH_MAX4(left_indic, right_indic, top_indic, bottom_indic);
+        r -= LV_MATH_MAX4(left_indic, right_indic, top_indic, bottom_indic);
 
         lv_draw_arc(x, y, r, ext->arc_angle_start, ext->arc_angle_end, clip_area, &arc_dsc);
     }

@@ -764,7 +764,7 @@ static lv_res_t release_handler(lv_obj_t * roller)
 
     lv_obj_t * label = get_label(roller);
     if(label == NULL) return LV_RES_OK;
-    
+
     if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
         /*Search the clicked option (For KEYPAD and ENCODER the new value should be already set)*/
         uint16_t new_opt  = 0;

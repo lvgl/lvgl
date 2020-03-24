@@ -584,7 +584,8 @@ void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property
  *       For example: `lv_obj_style_get_trasition_path()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-static inline void _lv_obj_set_style_local_func_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_style_prop_cb_t value)
+static inline void _lv_obj_set_style_local_func_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop,
+                                                    lv_style_prop_cb_t value)
 {
     lv_style_fptr_dptr_t fd;
     fd.fptr = value;
@@ -603,7 +604,8 @@ static inline void _lv_obj_set_style_local_func_ptr(lv_obj_t * obj, uint8_t type
  *       For example: `lv_obj_style_get_text_font()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-static inline void _lv_obj_set_style_local_data_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, const void * value)
+static inline void _lv_obj_set_style_local_data_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop,
+                                                    const void * value)
 {
     lv_style_fptr_dptr_t fd;
     fd.fptr = NULL;
@@ -1089,7 +1091,8 @@ lv_style_fptr_dptr_t _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, l
  *       For example: `lv_obj_style_get_trasition_path()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-static inline  lv_style_prop_cb_t _lv_obj_get_style_func_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+static inline  lv_style_prop_cb_t _lv_obj_get_style_func_ptr(const lv_obj_t * obj, uint8_t part,
+                                                             lv_style_property_t prop)
 {
     lv_style_fptr_dptr_t fd;
     fd = _lv_obj_get_style_ptr(obj, part, prop);

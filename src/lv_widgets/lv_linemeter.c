@@ -113,7 +113,7 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param lmeter pointer to a line meter object
  * @param value new value
  */
-void lv_linemeter_set_value(lv_obj_t * lmeter, int16_t value)
+void lv_linemeter_set_value(lv_obj_t * lmeter, int32_t value)
 {
     LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
 
@@ -131,7 +131,7 @@ void lv_linemeter_set_value(lv_obj_t * lmeter, int16_t value)
  * @param min minimum value
  * @param max maximum value
  */
-void lv_linemeter_set_range(lv_obj_t * lmeter, int16_t min, int16_t max)
+void lv_linemeter_set_range(lv_obj_t * lmeter, int32_t min, int32_t max)
 {
     LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
 
@@ -194,7 +194,7 @@ void lv_linemeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle)
  * @param lmeter pointer to a line meter object
  * @return the value of the line meter
  */
-int16_t lv_linemeter_get_value(const lv_obj_t * lmeter)
+int32_t lv_linemeter_get_value(const lv_obj_t * lmeter)
 {
     LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
 
@@ -207,7 +207,7 @@ int16_t lv_linemeter_get_value(const lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return the minimum value of the line meter
  */
-int16_t lv_linemeter_get_min_value(const lv_obj_t * lmeter)
+int32_t lv_linemeter_get_min_value(const lv_obj_t * lmeter)
 {
     LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
 
@@ -220,7 +220,7 @@ int16_t lv_linemeter_get_min_value(const lv_obj_t * lmeter)
  * @param lmeter pointer to a line meter object
  * @return the maximum value of the line meter
  */
-int16_t lv_linemeter_get_max_value(const lv_obj_t * lmeter)
+int32_t lv_linemeter_get_max_value(const lv_obj_t * lmeter)
 {
     LV_ASSERT_OBJ(lmeter, LV_OBJX_NAME);
 
@@ -298,17 +298,17 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
 
     lv_area_t mask_area;
     mask_area.x1 = x_ofs - r_in;
-    mask_area.x2 = x_ofs + r_in-1;
+    mask_area.x2 = x_ofs + r_in - 1;
     mask_area.y1 = y_ofs - r_in;
-    mask_area.y2 = y_ofs + r_in-1;
+    mask_area.y2 = y_ofs + r_in - 1;
     lv_draw_mask_radius_param_t mask_in_param;
     lv_draw_mask_radius_init(&mask_in_param, &mask_area, LV_RADIUS_CIRCLE, true);
     int16_t mask_in_id = lv_draw_mask_add(&mask_in_param, 0);
 
     mask_area.x1 = x_ofs - r_out;
-    mask_area.x2 = x_ofs + r_out-1;
+    mask_area.x2 = x_ofs + r_out - 1;
     mask_area.y1 = y_ofs - r_out;
-    mask_area.y2 = y_ofs + r_out-1;
+    mask_area.y2 = y_ofs + r_out - 1;
     lv_draw_mask_radius_param_t mask_out_param;
     lv_draw_mask_radius_init(&mask_out_param, &mask_area, LV_RADIUS_CIRCLE, false);
     int16_t mask_out_id = lv_draw_mask_add(&mask_out_param, 0);
@@ -327,11 +327,11 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         /*Interpolate sine and cos*/
         int32_t sin_low = lv_trigo_sin(angle_low + angle_ofs);
         int32_t sin_high = lv_trigo_sin(angle_high + angle_ofs);
-        int32_t sin_mid =  (sin_low * (256 - angle_rem) + sin_high * angle_rem) >> 8;
+        int32_t sin_mid = (sin_low * (256 - angle_rem) + sin_high * angle_rem) >> 8;
 
         int32_t cos_low = lv_trigo_sin(angle_low + 90 + angle_ofs);
         int32_t cos_high = lv_trigo_sin(angle_high + 90 + angle_ofs);
-        int32_t cos_mid =  (cos_low * (256 - angle_rem) + cos_high * angle_rem) >> 8;
+        int32_t cos_mid = (cos_low * (256 - angle_rem) + cos_high * angle_rem) >> 8;
 
         /*Use the interpolated values to get x and y coordinates*/
         int32_t y_out = (int32_t)((int32_t)sin_mid * r_out_extra) >> (LV_TRIGO_SHIFT - 8);

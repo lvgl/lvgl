@@ -146,7 +146,7 @@ void lv_imgbtn_set_src(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src
  * to a file)
  */
 void lv_imgbtn_set_src_tiled(lv_obj_t * imgbtn, lv_btn_state_t state, const void * src_left, const void * src_mid,
-                       const void * src_right)
+                             const void * src_right)
 {
     LV_ASSERT_OBJ(imgbtn, LV_OBJX_NAME);
 
@@ -293,7 +293,8 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
                 lv_obj_init_draw_img_dsc(imgbtn, LV_IMGBTN_PART_MAIN, &img_dsc);
                 lv_draw_img(&imgbtn->coords, clip_area, src, &img_dsc);
             }
-        } else {
+        }
+        else {
 #if LV_IMGBTN_TILED
             const void * src = ext->img_src_left[state];
             if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {

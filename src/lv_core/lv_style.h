@@ -218,7 +218,7 @@ typedef void(*lv_style_prop_cb_t)(void);
 typedef union {
     lv_style_prop_cb_t fptr;
     const void * dptr;
-}lv_style_fptr_dptr_t;
+} lv_style_fptr_dptr_t;
 
 
 typedef struct {
@@ -512,8 +512,8 @@ static inline int16_t _lv_style_get_data_ptr(const lv_style_t * style, lv_style_
     fd_res.fptr = NULL;
     lv_res_t r =  _lv_style_get_ptr(style, prop, &fd_res);
 
-    void** res2 = (void**)res;
-    *res2 = (void*)fd_res.dptr;
+    void ** res2 = (void **)res;
+    *res2 = (void *)fd_res.dptr;
     return r;
 }
 
@@ -587,7 +587,8 @@ void lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t pro
  * @param value the value to set
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-static inline void lv_style_list_set_local_func_ptr(lv_style_list_t * list, lv_style_property_t prop, lv_style_prop_cb_t value)
+static inline void lv_style_list_set_local_func_ptr(lv_style_list_t * list, lv_style_property_t prop,
+                                                    lv_style_prop_cb_t value)
 {
     lv_style_fptr_dptr_t fd;
     fd.dptr = NULL;
@@ -603,7 +604,8 @@ static inline void lv_style_list_set_local_func_ptr(lv_style_list_t * list, lv_s
  * @param value the value to set
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-static inline void lv_style_list_set_local_data_ptr(lv_style_list_t * list, lv_style_property_t prop, const void * value)
+static inline void lv_style_list_set_local_data_ptr(lv_style_list_t * list, lv_style_property_t prop,
+                                                    const void * value)
 {
     lv_style_fptr_dptr_t fd;
     fd.fptr = NULL;
