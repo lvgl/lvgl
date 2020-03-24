@@ -72,7 +72,6 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
     mask_tmp_x++;
 
 
-
 #define FILL_NORMAL_MASK_PX_SCR_TRANSP(out_x,  color)                                               \
     if(*mask_tmp_x) {                                                                               \
         if(*mask_tmp_x != last_mask || last_dest_color.full != disp_buf_tmp[out_x].full) {          \
