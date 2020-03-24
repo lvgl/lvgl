@@ -297,7 +297,7 @@ uint16_t lv_txt_get_next_line(const char * txt, const lv_font_t * font,
 
     /* If max_width doesn't mater simply find the new line character
      * without thinking about word wrapping*/
-    if(flag & LV_TXT_FLAG_EXPAND || flag & LV_TXT_FLAG_FIT) {
+    if((flag & LV_TXT_FLAG_EXPAND) || (flag & LV_TXT_FLAG_FIT)) {
         uint32_t i;
         for(i = 0; txt[i] != '\n' && txt[i] != '\r' && txt[i] != '\0'; i++) {
             /*Just find the new line chars or string ends by incrementing `i`*/
