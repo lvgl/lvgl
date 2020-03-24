@@ -740,13 +740,14 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                                     label_dsc[cell_type].letter_space, label_dsc[cell_type].line_space,
                                     lv_area_get_width(&txt_area), txt_flags);
 
+                    label_dsc[cell_type].flag = 0;
                     /*Align the content to the middle if not cropped*/
                     if(format.s.crop == 0) {
                         txt_area.y1 = cell_area.y1 + h_row / 2 - txt_size.y / 2;
                         txt_area.y2 = cell_area.y1 + h_row / 2 + txt_size.y / 2;
+                        label_dsc[cell_type].flag |= LV_TXT_FLAG_FIT;
                     }
 
-                    label_dsc[cell_type].flag = 0;
                     switch(format.s.align) {
                         default:
                         case LV_LABEL_ALIGN_LEFT:
