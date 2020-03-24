@@ -714,10 +714,22 @@ static inline bool transform_anti_alias(lv_img_transform_dsc_t * dsc)
         dsc->res.opa = LV_OPA_COVER;
     }
 
-    lv_color_t c0 = lv_color_mix(c00, c01, xr0);
-    lv_color_t c1 = lv_color_mix(c10, c11, xr1);
+    lv_color_t c0;
+    if(xr0 == LV_OPA_TRANSP) c0 = c01;
+    else if(xr0 == LV_OPA_COVER) c0 = c00;
+    else if(c00.full == c01.full) c0 = c00;
+    else c0 = lv_color_mix(c00, c01, xr0);
 
-    dsc->res.color = lv_color_mix(c0, c1, yr);
+    lv_color_t c1;
+    if(xr1 == LV_OPA_TRANSP) c1 = c11;
+    else if(xr1 == LV_OPA_COVER) c1 = c10;
+    else if(c10.full == c11.full) c1 = c00;
+    else c1 = lv_color_mix(c10, c11, xr1);
+
+    if(yr == LV_OPA_TRANSP) dsc->res.color = c1;
+    else if(yr == LV_OPA_COVER) dsc->res.color = c0;
+    else if(c0.full == c1.full) dsc->res.color = c0;
+    else dsc->res.color = lv_color_mix(c0, c1, yr);
 
     return true;
 }
