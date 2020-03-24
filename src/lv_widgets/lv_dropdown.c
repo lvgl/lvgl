@@ -332,6 +332,8 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos
     lv_mem_buf_release(ins_buf);
 
     ext->option_cnt++;
+
+    lv_obj_invalidate(ddlist);
 }
 
 /**
