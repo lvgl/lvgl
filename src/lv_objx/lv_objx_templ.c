@@ -62,12 +62,12 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Create the ancestor of template*/
     /*TODO modify it to the ancestor create function */
     lv_obj_t * new_templ = lv_ANCESTOR_create(par, copy);
-    lv_mem_assert(new_templ);
+    LV_ASSERT_MEM(new_templ);
     if(new_templ == NULL) return NULL;
 
     /*Allocate the template type specific extended data*/
     lv_templ_ext_t * ext = lv_obj_allocate_ext_attr(new_templ, sizeof(lv_templ_ext_t));
-    lv_mem_assert(ext);
+    LV_ASSERT_MEM(ext);
     if(ext == NULL) return NULL;
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_func(new_templ);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_func(new_templ);

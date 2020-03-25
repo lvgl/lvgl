@@ -316,7 +316,7 @@ void lv_list_set_single_mode(lv_obj_t * list, bool mode)
 void lv_list_set_btn_selected(lv_obj_t * list, lv_obj_t * btn)
 {
     LV_ASSERT_OBJ(list, LV_OBJX_NAME);
-    if(btn) LV_ASSERT_OBJ(list, "lv_btn");
+    if(btn) LV_ASSERT_OBJ(btn, "lv_btn");
 
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
