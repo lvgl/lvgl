@@ -177,11 +177,6 @@ void lv_disp_refr_task(lv_task_t * task)
     uint32_t start = lv_tick_get();
     uint32_t elaps = 0;
 
-    /* Ensure the task does not run again automatically.
-     * This is done before refreshing in case refreshing invalidates something else.
-     */
-    lv_task_set_prio(task, LV_TASK_PRIO_OFF);
-
     disp_refr = task->user_data;
 
     /*Do nothing if there is no active screen*/
@@ -264,13 +259,6 @@ void lv_disp_refr_task(lv_task_t * task)
     static uint32_t elaps_max = 1;
     if(lv_tick_elaps(perf_last_time) < 300) {
         elaps_max = LV_MATH_MAX(elaps, elaps_max);
-        /*Just refresh 1 px to have something to monitor*/
-        lv_area_t a;
-        a.x1 = lv_disp_get_hor_res(disp_refr) - 1;
-        a.y1 = lv_disp_get_ver_res(disp_refr) - 1;
-        a.x2 = a.x1;
-        a.y2 = a.y1;
-        lv_inv_area(disp_refr, &a);
     }
     else {
         perf_last_time = lv_tick_get();
@@ -283,6 +271,13 @@ void lv_disp_refr_task(lv_task_t * task)
         lv_label_set_text_fmt(perf_label, "%d FPS\n%d%% CPU", fps, cpu);
         lv_obj_align(perf_label, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
     }
+#endif
+
+#if LV_USE_PERF_MONITOR == 0
+    /* Ensure the task does not run again automatically.
+     * This is done before refreshing in case refreshing invalidates something else.
+     */
+    lv_task_set_prio(task, LV_TASK_PRIO_OFF);
 #endif
 
     LV_LOG_TRACE("lv_refr_task: ready");
