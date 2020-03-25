@@ -654,45 +654,6 @@ static void lv_draw_rect_border_straight(const lv_area_t * coords, const lv_area
             lv_draw_fill(&work_area, mask, color, opa);
         }
     }
-
-    /*If radius == 0 one px on the corners are not drawn by main drawer*/
-    if(style->body.radius == 0) {
-        /*Left top corner*/
-        if(part & (LV_BORDER_TOP | LV_BORDER_LEFT)) {
-            work_area.x1 = coords->x1;
-            work_area.x2 = coords->x1 + aa;
-            work_area.y1 = coords->y1;
-            work_area.y2 = coords->y1 + aa;
-            lv_draw_fill(&work_area, mask, color, opa);
-        }
-
-        /*Right top corner*/
-        if(part & (LV_BORDER_TOP | LV_BORDER_RIGHT)) {
-            work_area.x1 = coords->x2 - aa;
-            work_area.x2 = coords->x2;
-            work_area.y1 = coords->y1;
-            work_area.y2 = coords->y1 + aa;
-            lv_draw_fill(&work_area, mask, color, opa);
-        }
-
-        /*Left bottom corner*/
-        if(part & (LV_BORDER_BOTTOM | LV_BORDER_LEFT)) {
-            work_area.x1 = coords->x1;
-            work_area.x2 = coords->x1 + aa;
-            work_area.y1 = coords->y2 - aa;
-            work_area.y2 = coords->y2;
-            lv_draw_fill(&work_area, mask, color, opa);
-        }
-
-        /*Right bottom corner*/
-        if(part & (LV_BORDER_BOTTOM | LV_BORDER_RIGHT)) {
-            work_area.x1 = coords->x2 - aa;
-            work_area.x2 = coords->x2;
-            work_area.y1 = coords->y2 - aa;
-            work_area.y2 = coords->y2;
-            lv_draw_fill(&work_area, mask, color, opa);
-        }
-    }
 }
 
 /**
