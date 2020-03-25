@@ -47,6 +47,7 @@ typedef struct
     int32_t range_max;
     int32_t range_min;
     int32_t step;
+	bool rollover;	// Set to true for rollover functionality
     uint16_t digit_count : 4;
     uint16_t dec_point_pos : 4; /*if 0, there is no separator and the number is an integer*/
     uint16_t digit_padding_left : 4;
@@ -75,6 +76,13 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy);
 /*=====================
  * Setter functions
  *====================*/
+
+/**
+ * Set spinbox rollover function
+ * @param spinbox pointer to spinbox
+ * @param b true or false to enable or disable (default)
+ */
+void lv_spinbox_set_rollover(lv_obj_t * spinbox, bool b);
 
 /**
  * Set a style of a spinbox.
@@ -128,6 +136,12 @@ void lv_spinbox_set_padding_left(lv_obj_t * spinbox, uint8_t padding);
 /*=====================
  * Getter functions
  *====================*/
+
+/**
+ * Get spinbox rollover function status
+ * @param spinbox pointer to spinbox
+ */
+bool lv_spinbox_get_rollover(lv_obj_t * spinbox);
 
 /**
  * Get style of a spinbox.
