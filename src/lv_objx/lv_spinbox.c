@@ -101,6 +101,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_spinbox_set_digit_format(new_spinbox, (uint8_t)copy_ext->digit_count, (uint8_t)copy_ext->dec_point_pos);
         lv_spinbox_set_range(new_spinbox, copy_ext->range_min, copy_ext->range_max);
         lv_spinbox_set_step(new_spinbox, copy_ext->step);
+        lv_spinbox_set_rollover(new_spinbox, copy_ext->rollover);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(new_spinbox);
