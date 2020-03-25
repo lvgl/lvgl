@@ -477,7 +477,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
             }
 
             lv_draw_mask_res_t mask_res;
-            mask_res = (alpha_byte || chroma_key || draw_dsc->angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+            mask_res = (alpha_byte || chroma_key || draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
             int32_t x;
             int32_t y;
             for(y = 0; y < draw_area_h; y++) {
@@ -516,7 +516,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                         }
                     }
                     else {
-                        /*Rotate*/
+                        /*Transform*/
                         bool ret;
                         int32_t rot_x = x + (disp_area->x1 + draw_area.x1) - map_area->x1;
                         int32_t rot_y = y + (disp_area->y1 + draw_area.y1) - map_area->y1;
@@ -563,7 +563,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                     blend_area.y2 = blend_area.y1;
 
                     px_i = 0;
-                    mask_res = (alpha_byte || chroma_key || draw_dsc->angle) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+                    mask_res = (alpha_byte || chroma_key || draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
 
                     /*Prepare the `mask_buf`if there are other masks*/
                     if(other_mask_cnt) {

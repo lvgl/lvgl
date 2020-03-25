@@ -528,7 +528,6 @@ bool lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t
         if(dsc->res.color.full == ct.full) return false;
     }
 
-
     if(dsc->cfg.antialias == false) return true;
 
     dsc->tmp.xs = xs;
