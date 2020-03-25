@@ -126,7 +126,6 @@ void lv_spinbox_set_rollover(lv_obj_t * spinbox, bool b) {
     LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
 
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
-    if(ext == NULL) return;
 
 	ext->rollover = b;
 }
