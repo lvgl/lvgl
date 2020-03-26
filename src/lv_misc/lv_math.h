@@ -28,6 +28,8 @@ extern "C" {
 
 #define LV_MATH_ABS(x) ((x) > 0 ? (x) : (-(x)))
 
+#define LV_MATH_UDIV255(x) ((uint32_t)((uint32_t) (x) * 0x8081) >> 0x17)
+
 #define LV_IS_SIGNED(t) (((t)(-1)) < ((t) 0))
 #define LV_UMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0xFULL << ((sizeof(t) * 8ULL) - 4ULL)))
 #define LV_SMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0x7ULL << ((sizeof(t) * 8ULL) - 4ULL)))
@@ -38,6 +40,8 @@ extern "C" {
 
 #define LV_BEZIER_VAL_MAX 1024 /**< Max time in Bezier functions (not [0..1] to use integers) */
 #define LV_BEZIER_VAL_SHIFT 10 /**< log2(LV_BEZIER_VAL_MAX): used to normalize up scaled values*/
+
+
 
 /**********************
  *      TYPEDEFS
