@@ -107,14 +107,15 @@ lv_obj_t * lv_btnmatrix_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new button matrix object*/
     if(copy == NULL) {
         lv_btnmatrix_set_map(btnm, lv_btnmatrix_def_map);
-        lv_obj_set_size(btnm, LV_DPI * 3, LV_DPI * 2);
+        lv_obj_set_size(btnm, LV_DPI * 2, LV_DPI * 1);
         lv_theme_apply(btnm, LV_THEME_BTNMATRIX);
     }
     /*Copy an existing object*/
     else {
-        //        lv_btnmatrix_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        //        memcpy((void*)ext->styles_btn, copy_ext->styles_btn, sizeof(ext->styles_btn));
-        //        lv_btnmatrix_set_map(new_btnm, lv_btnmatrix_get_map_array(copy));
+        lv_btnmatrix_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        lv_btnmatrix_set_map(btnm, copy_ext->map_p);
+        lv_btnmatrix_set_ctrl_map(btnm, copy_ext->ctrl_bits);
+        lv_style_list_copy(&ext->style_btn, &copy_ext->style_btn);
     }
 
     LV_LOG_INFO("button matrix created");
