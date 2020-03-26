@@ -152,7 +152,7 @@ void lv_gauge_set_needle_count(lv_obj_t * gauge, uint8_t needle_cnt, const lv_co
             ext->values = NULL;
         }
 
-        ext->values = lv_mem_realloc(ext->values, needle_cnt * sizeof(int16_t));
+        ext->values = lv_mem_realloc(ext->values, needle_cnt * sizeof(ext->values[0]));
         LV_ASSERT_MEM(ext->values);
         if(ext->values == NULL) return;
 
@@ -456,8 +456,6 @@ static lv_style_list_t * lv_gauge_get_style(lv_obj_t * gauge, uint8_t part)
  */
 static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask)
 {
-    char scale_txt[16];
-
     lv_gauge_ext_t * ext     = lv_obj_get_ext_attr(gauge);
     lv_style_int_t scale_width = lv_obj_get_style_scale_width(gauge, LV_GAUGE_PART_MAJOR);
     lv_style_int_t left = lv_obj_get_style_pad_left(gauge, LV_GAUGE_PART_MAIN);
@@ -490,6 +488,7 @@ static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask)
 
         int32_t scale_act = (int32_t)((int32_t)(max - min) * i) / (label_num - 1);
         scale_act += min;
+        char scale_txt[16];
         if(ext->format_cb == NULL)
             lv_utils_num_to_str(scale_act, scale_txt);
         else
