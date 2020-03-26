@@ -17,7 +17,7 @@
  *********************/
 #define FILL_DIRECT_LEN     32
 #define FILL_DIRECT_MASK    0x1F
-#define GPU_WIDTH_LIMIT     32
+#define GPU_SIZE_LIMIT     1024
 
 /**********************
  *      TYPEDEFS
@@ -273,7 +273,7 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
             lv_color_t * disp_buf_tmp_ori =  disp_buf_tmp;
 
 #if LV_USE_GPU
-            if(disp->driver.gpu_fill_cb && draw_area_w > GPU_WIDTH_LIMIT) {
+            if(disp->driver.gpu_fill_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
                 disp->driver.gpu_fill_cb(&disp->driver, disp_buf, disp_w, draw_area, color);
                 return;
             }
@@ -302,7 +302,7 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
         /*No mask with opacity*/
         else {
 #if LV_USE_GPU
-            if(disp->driver.gpu_blend_cb && draw_area_w > GPU_WIDTH_LIMIT) {
+            if(disp->driver.gpu_blend_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
                 static lv_color_t blend_buf[LV_HOR_RES_MAX];
                 for(x = 0; x < draw_area_w ; x++) blend_buf[x].full = color.full;
 
@@ -618,9 +618,7 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
         /*Go to the first px of the row*/
         map_buf_tmp += (draw_area->x1 - (map_area->x1 - disp_area->x1));
 #if LV_USE_GPU
-        if(disp->driver.gpu_blend_cb &&
-           ((draw_area_w > GPU_WIDTH_LIMIT * 4 && opa == LV_OPA_COVER) ||
-            (draw_area_w > GPU_WIDTH_LIMIT && opa != LV_OPA_COVER))) {
+        if(disp->driver.gpu_blend_cb && (lv_area_get_size(draw_area) > GPU_SIZE_LIMIT)) {
             for(y = draw_area->y1; y <= draw_area->y2; y++) {
                 disp->driver.gpu_blend_cb(&disp->driver, &disp_buf_tmp[draw_area->x1], map_buf_tmp, draw_area_w, opa);
                 disp_buf_tmp += disp_w;
