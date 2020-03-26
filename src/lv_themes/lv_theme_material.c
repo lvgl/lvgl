@@ -167,7 +167,7 @@ static lv_style_t pad_small;
     static lv_style_t table_cell;
 #endif
 
-#if LV_USE_TABVIEW
+#if LV_USE_TABVIEW || LV_USE_WIN
     static lv_style_t tabview_btns, tabview_btns_bg, tabview_indic, tabview_page_scrl;
 #endif
 
