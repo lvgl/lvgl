@@ -312,8 +312,6 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
 static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
                            lv_draw_line_dsc_t * dsc)
 {
-    lv_opa_t opa = dsc->opa;
-
     /*Keep the great y in p1*/
     lv_point_t p1;
     lv_point_t p2;
