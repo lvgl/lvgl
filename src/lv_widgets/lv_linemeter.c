@@ -334,18 +334,18 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         int32_t cos_mid = (cos_low * (256 - angle_rem) + cos_high * angle_rem) >> 8;
 
         /*Use the interpolated values to get x and y coordinates*/
-        int32_t y_out = (int32_t)((int32_t)sin_mid * r_out_extra) >> (LV_TRIGO_SHIFT - 8);
-        int32_t x_out = (int32_t)((int32_t)cos_mid * r_out_extra) >> (LV_TRIGO_SHIFT - 8);
+        int32_t y_out_extra = (int32_t)((int32_t)sin_mid * r_out_extra) >> (LV_TRIGO_SHIFT - 8);
+        int32_t x_out_extra = (int32_t)((int32_t)cos_mid * r_out_extra) >> (LV_TRIGO_SHIFT - 8);
 
         /*Rounding*/
-        if(x_out > 0) x_out = (x_out + 127) >> 8;
-        else x_out = (x_out - 127) >> 8;
+        if(x_out_extra > 0) x_out_extra = (x_out_extra + 127) >> 8;
+        else x_out_extra = (x_out_extra - 127) >> 8;
 
-        if(y_out > 0) y_out = (y_out + 127) >> 8;
-        else y_out = (y_out - 127) >> 8;
+        if(y_out_extra > 0) y_out_extra = (y_out_extra + 127) >> 8;
+        else y_out_extra = (y_out_extra - 127) >> 8;
 
-        x_out += x_ofs;
-        y_out += y_ofs;
+        x_out_extra += x_ofs;
+        y_out_extra += y_ofs;
 
         /*Use smaller clip area only around the visible line*/
         int32_t y_in  = (int32_t)((int32_t)lv_trigo_sin(angle_normal + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
@@ -353,6 +353,12 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
 
         x_in += x_ofs;
         y_in += y_ofs;
+
+        int32_t y_out  = (int32_t)((int32_t)lv_trigo_sin(angle_normal + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
+        int32_t x_out  = (int32_t)((int32_t)lv_trigo_sin(angle_normal + 90 + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
+
+        x_out += x_ofs;
+        y_out += y_ofs;
 
         lv_area_t clip_sub;
         clip_sub.x1 = LV_MATH_MIN(x_in, x_out) - line_dsc.width;
@@ -368,8 +374,8 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         p2.x = x_ofs;
         p2.y = y_ofs;
 
-        p1.x = x_out;
-        p1.y = y_out;
+        p1.x = x_out_extra;
+        p1.y = y_out_extra;
 
         if(i >= level) {
             line_dsc.color = end_color;
