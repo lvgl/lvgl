@@ -330,12 +330,28 @@ static void lv_refr_join_area(void)
 static void lv_refr_areas(void)
 {
     px_num = 0;
-    uint32_t i;
+
+    if(disp_refr->inv_p == 0) return;
+
+    /*Find the last area which will be drawn*/
+    int32_t i;
+    int32_t last_i = 0;
+    for(i = disp_refr->inv_p - 1; i >= 0; i--) {
+        if(disp_refr->inv_area_joined[i] == 0) {
+        	last_i = i;
+        	break;
+        }
+    }
+
+    disp_refr->driver.buffer->last_area = 0;
+    disp_refr->driver.buffer->last_part = 0;
 
     for(i = 0; i < disp_refr->inv_p; i++) {
         /*Refresh the unjoined areas*/
         if(disp_refr->inv_area_joined[i] == 0) {
 
+        	if(i == last_i) disp_refr->driver.buffer->last_area = 1;
+        	disp_refr->driver.buffer->last_part = 0;
             lv_refr_area(&disp_refr->inv_areas[i]);
 
             if(disp_refr->driver.monitor_cb) px_num += lv_area_get_size(&disp_refr->inv_areas[i]);
@@ -357,6 +373,7 @@ static void lv_refr_area(const lv_area_t * area_p)
         vdb->area.x2        = lv_disp_get_hor_res(disp_refr) - 1;
         vdb->area.y1        = 0;
         vdb->area.y2        = lv_disp_get_ver_res(disp_refr) - 1;
+        disp_refr->driver.buffer->last_part = 1;
         lv_refr_area_part(area_p);
     }
     /*The buffer is smaller: refresh the area in parts*/
@@ -412,6 +429,7 @@ static void lv_refr_area(const lv_area_t * area_p)
             vdb->area.y2 = row + max_row - 1;
             if(vdb->area.y2 > y2) vdb->area.y2 = y2;
             row_last = vdb->area.y2;
+            if(y2 == row_last) disp_refr->driver.buffer->last_part = 1;
             lv_refr_area_part(area_p);
         }
 
@@ -423,7 +441,7 @@ static void lv_refr_area(const lv_area_t * area_p)
             vdb->area.y1 = row;
             vdb->area.y2 = y2;
 
-            /*Refresh this part too*/
+            disp_refr->driver.buffer->last_part = 1;
             lv_refr_area_part(area_p);
         }
     }
@@ -435,14 +453,12 @@ static void lv_refr_area(const lv_area_t * area_p)
  */
 static void lv_refr_area_part(const lv_area_t * area_p)
 {
-
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
 
     /*In non double buffered mode, before rendering the next part wait until the previous image is
      * flushed*/
     if(lv_disp_is_double_buf(disp_refr) == false) {
-        while(vdb->flushing)
-            ;
+        while(vdb->flushing) ;
     }
 
     lv_obj_t * top_p;
@@ -638,11 +654,13 @@ static void lv_refr_vdb_flush(void)
     /*In double buffered mode wait until the other buffer is flushed before flushing the current
      * one*/
     if(lv_disp_is_double_buf(disp_refr)) {
-        while(vdb->flushing)
-            ;
+        while(vdb->flushing);
     }
 
     vdb->flushing = 1;
+
+    if(disp_refr->driver.buffer->last_area && disp_refr->driver.buffer->last_part) vdb->flushing_last = 1;
+    else vdb->flushing_last = 0;
 
     /*Flush the rendered content to the display*/
     lv_disp_t * disp = lv_refr_get_disp_refreshing();

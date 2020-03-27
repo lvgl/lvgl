@@ -274,11 +274,24 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
     /*If the screen is transparent initialize it when the flushing is ready*/
 #if LV_COLOR_SCREEN_TRANSP
     if(disp_drv->screen_transp) {
-        memset(disp_drv->buffer->buf_act, 0x00, disp_drv->buffer->size * sizeof(lv_color32_t));
+        lv_memset_00(disp_drv->buffer->buf_act, disp_drv->buffer->size * sizeof(lv_color32_t));
     }
 #endif
 
     disp_drv->buffer->flushing = 0;
+    disp_drv->buffer->flushing_last = 0;
+}
+
+
+/**
+ * Tell if it's the last area of the refreshing process.
+ * Can be called from `flush_cb` to execute some special display refreshing if needed when all areas area flushed.
+ * @param disp_drv pointer to display driver
+ * @return true: it's the last area to flush; false: there are other areas too which will be refreshed soon
+ */
+LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_drv_t * disp_drv)
+{
+    return disp_drv->buffer->flushing_last;
 }
 
 /**
