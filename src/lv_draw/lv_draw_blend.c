@@ -17,7 +17,7 @@
  *********************/
 #define FILL_DIRECT_LEN     32
 #define FILL_DIRECT_MASK    0x1F
-#define GPU_SIZE_LIMIT     1024
+#define GPU_SIZE_LIMIT      240
 
 /**********************
  *      TYPEDEFS
