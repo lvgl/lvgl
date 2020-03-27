@@ -55,17 +55,17 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("line meter create started");
 
     /*Create the ancestor of line meter*/
-    lv_obj_t * new_lmeter = lv_obj_create(par, copy);
-    LV_ASSERT_MEM(new_lmeter);
-    if(new_lmeter == NULL) return NULL;
+    lv_obj_t * linemeter = lv_obj_create(par, copy);
+    LV_ASSERT_MEM(linemeter);
+    if(linemeter == NULL) return NULL;
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_lmeter);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(linemeter);
 
     /*Allocate the line meter type specific extended data*/
-    lv_linemeter_ext_t * ext = lv_obj_allocate_ext_attr(new_lmeter, sizeof(lv_linemeter_ext_t));
+    lv_linemeter_ext_t * ext = lv_obj_allocate_ext_attr(linemeter, sizeof(lv_linemeter_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_lmeter);
+        lv_obj_del(linemeter);
         return NULL;
     }
 
@@ -78,13 +78,13 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->angle_ofs = 0;
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(new_lmeter, lv_linemeter_signal);
-    lv_obj_set_design_cb(new_lmeter, lv_linemeter_design);
+    lv_obj_set_signal_cb(linemeter, lv_linemeter_signal);
+    lv_obj_set_design_cb(linemeter, lv_linemeter_design);
 
     /*Init the new line meter line meter*/
     if(copy == NULL) {
-        lv_obj_set_size(new_lmeter, LV_DPI, LV_DPI);
-        lv_theme_apply(new_lmeter, LV_THEME_LINEMETER);
+        lv_obj_set_size(linemeter, LV_DPI, LV_DPI);
+        lv_theme_apply(linemeter, LV_THEME_LINEMETER);
     }
     /*Copy an existing line meter*/
     else {
@@ -95,13 +95,13 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->max_value             = copy_ext->max_value;
         ext->cur_value             = copy_ext->cur_value;
 
-        //        /*Refresh the style with new signal function*/
-        //        lv_obj_refresh_style(new_lmeter);
+        /*Refresh the style with new signal function*/
+        lv_obj_refresh_style(linemeter, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("line meter created");
 
-    return new_lmeter;
+    return linemeter;
 }
 
 /*=====================
@@ -293,6 +293,7 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(lmeter, part, &line_dsc);
+    line_dsc.raw_end = 1;
 
     lv_style_int_t end_line_width = lv_obj_get_style_scale_end_line_width(lmeter, part);
 

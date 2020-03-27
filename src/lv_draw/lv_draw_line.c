@@ -395,8 +395,13 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
 
     int16_t mask_left_id = lv_draw_mask_add(&mask_left_param, NULL);
     int16_t mask_right_id = lv_draw_mask_add(&mask_right_param, NULL);
-    int16_t mask_top_id = lv_draw_mask_add(&mask_top_param, NULL);
-    int16_t mask_bottom_id = lv_draw_mask_add(&mask_bottom_param, NULL);
+    int16_t mask_top_id = LV_MASK_ID_INV;
+    int16_t mask_bottom_id = LV_MASK_ID_INV;
+
+    if(!dsc->raw_end) {
+        mask_top_id = lv_draw_mask_add(&mask_top_param, NULL);
+        mask_bottom_id = lv_draw_mask_add(&mask_bottom_param, NULL);
+    }
 
     lv_disp_t * disp    = lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
@@ -413,42 +418,54 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
      * It's easy to calculate with steep lines, but the area can be very wide with very flat lines.
      * So deal with it only with steep lines. */
     int32_t draw_area_w = lv_area_get_width(&draw_area);
-    if(!flat) draw_area_w = LV_MATH_MIN(draw_area_w, dsc->width * 2 + 2);
 
     /*Draw the background line by line*/
     int32_t h;
-    lv_opa_t * mask_buf = lv_mem_buf_get(draw_area_w);
+    size_t mask_buf_size = LV_MATH_MIN(lv_area_get_size(&draw_area), LV_HOR_RES_MAX);
+    lv_opa_t * mask_buf = lv_mem_buf_get(mask_buf_size);
+
     lv_area_t fill_area;
     fill_area.x1 = draw_area.x1 + disp_area->x1;
     fill_area.x2 = draw_area.x2 + disp_area->x1;
     fill_area.y1 = draw_area.y1 + disp_area->y1;
     fill_area.y2 = fill_area.y1;
 
-    lv_point_t v;
-    v.x = p2.x - p1.x;
-    v.y = p2.y - p1.y;
     int32_t x = vdb->area.x1 + draw_area.x1;
 
+    uint32_t mask_p = 0;
+
+    lv_memset_ff(mask_buf, mask_buf_size);
     /*Fill the first row with 'color'*/
     for(h = draw_area.y1 + disp_area->y1; h <= draw_area.y2 + disp_area->y1; h++) {
-        lv_memset_ff(mask_buf, draw_area_w);
 
-        if(!flat) {
-            /*Where is the current point?*/
-            x = (v.y * p1.x - v.x * p1.y + v.x * h) / v.y - dsc->width - 1;
-            if(x < draw_area.x1 + disp_area->x1) x = draw_area.x1 + disp_area->x1;
-            fill_area.x1 = x;
-            fill_area.x2 = fill_area.x1 + draw_area_w - 1;
+        lv_draw_mask_res_t mask_res = lv_draw_mask_apply(&mask_buf[mask_p], x, h, draw_area_w);
+        if(mask_res == LV_DRAW_MASK_RES_FULL_TRANSP) {
+            lv_memset_00(&mask_buf[mask_p], draw_area_w);
         }
 
-        lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, x, h, draw_area_w);
+        mask_p += draw_area_w;
+        if((uint32_t) mask_p + draw_area_w < mask_buf_size) {
+            fill_area.y2 ++;
+        }
+        else {
+            lv_blend_fill(&fill_area, clip,
+                    dsc->color, mask_buf, LV_DRAW_MASK_RES_CHANGED, dsc->opa,
+                    dsc->blend_mode);
 
-        lv_blend_fill(clip, &fill_area,
-                      dsc->color, mask_buf, mask_res, opa,
-                      dsc->blend_mode);
+            fill_area.y1 = fill_area.y2 + 1;
+            fill_area.y2 = fill_area.y1;
+            mask_p = 0;
+            lv_memset_ff(mask_buf, mask_buf_size);
+        }
+    }
 
-        fill_area.y1++;
-        fill_area.y2++;
+    /*Flush the last part*/
+    if(fill_area.y1 != fill_area.y2) {
+        fill_area.y2--;
+        lv_blend_fill( &fill_area, clip,
+                dsc->color, mask_buf, LV_DRAW_MASK_RES_CHANGED, dsc->opa,
+                dsc->blend_mode);
+
     }
 
     lv_mem_buf_release(mask_buf);
