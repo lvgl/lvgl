@@ -67,15 +67,15 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("gauge create started");
 
     /*Create the ancestor gauge*/
-    lv_obj_t * new_gauge = lv_linemeter_create(par, copy);
-    LV_ASSERT_MEM(new_gauge);
-    if(new_gauge == NULL) return NULL;
+    lv_obj_t * gauge = lv_linemeter_create(par, copy);
+    LV_ASSERT_MEM(gauge);
+    if(gauge == NULL) return NULL;
 
     /*Allocate the gauge type specific extended data*/
-    lv_gauge_ext_t * ext = lv_obj_allocate_ext_attr(new_gauge, sizeof(lv_gauge_ext_t));
+    lv_gauge_ext_t * ext = lv_obj_allocate_ext_attr(gauge, sizeof(lv_gauge_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
-        lv_obj_del(new_gauge);
+        lv_obj_del(gauge);
         return NULL;
     }
 
@@ -89,30 +89,29 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->needle_img = 0;
     ext->needle_img_pivot.x = 0;
     ext->needle_img_pivot.y = 0;
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_gauge);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_gauge);
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(gauge);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(gauge);
 
     lv_style_list_init(&ext->style_strong);
     lv_style_list_init(&ext->style_needle);
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(new_gauge, lv_gauge_signal);
-    lv_obj_set_design_cb(new_gauge, lv_gauge_design);
+    lv_obj_set_signal_cb(gauge, lv_gauge_signal);
+    lv_obj_set_design_cb(gauge, lv_gauge_design);
 
     /*Init the new gauge gauge*/
     if(copy == NULL) {
-        lv_gauge_set_scale(new_gauge, LV_GAUGE_DEF_ANGLE, LV_GAUGE_DEF_LINE_COUNT, LV_GAUGE_DEF_LABEL_COUNT);
-        lv_gauge_set_needle_count(new_gauge, 1, NULL);
-        lv_gauge_set_critical_value(new_gauge, 80);
-        lv_obj_set_size(new_gauge, 3 * LV_DPI / 2, 3 * LV_DPI / 2);
+        lv_gauge_set_scale(gauge, LV_GAUGE_DEF_ANGLE, LV_GAUGE_DEF_LINE_COUNT, LV_GAUGE_DEF_LABEL_COUNT);
+        lv_gauge_set_needle_count(gauge, 1, NULL);
+        lv_gauge_set_critical_value(gauge, 80);
 
-        lv_theme_apply(new_gauge, LV_THEME_GAUGE);
+        lv_theme_apply(gauge, LV_THEME_GAUGE);
 
     }
     /*Copy an existing gauge*/
     else {
         lv_gauge_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        lv_gauge_set_needle_count(new_gauge, copy_ext->needle_count, copy_ext->needle_colors);
+        lv_gauge_set_needle_count(gauge, copy_ext->needle_count, copy_ext->needle_colors);
 
         uint8_t i;
         for(i = 0; i < ext->needle_count; i++) {
@@ -122,12 +121,12 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->format_cb   = copy_ext->format_cb;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_gauge, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(gauge, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("gauge created");
 
-    return new_gauge;
+    return gauge;
 }
 
 /*=====================
