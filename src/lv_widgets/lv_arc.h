@@ -29,10 +29,10 @@ extern "C" {
 /*Data of arc*/
 typedef struct {
     /*New data for this type */
-		uint16_t arc_angle_start;
-		uint16_t arc_angle_end;
-		uint16_t bg_angle_start;
-		uint16_t bg_angle_end;
+    uint16_t arc_angle_start;
+    uint16_t arc_angle_end;
+    uint16_t bg_angle_start;
+    uint16_t bg_angle_end;
     lv_style_list_t style_arc;
 } lv_arc_ext_t;
 
