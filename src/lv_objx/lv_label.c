@@ -68,7 +68,7 @@ static lv_signal_cb_t ancestor_signal;
 /**
  * Create a label objects
  * @param par pointer to an object, it will be the parent of the new label
- * @param copy pointer to a button object, if not NULL then the new object will be copied from it
+ * @param copy pointer to a label object, if not NULL then the new object will be copied from it
  * @return pointer to the created button
  */
 lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
