@@ -17,6 +17,7 @@ extern "C" {
 #include <stdbool.h>
 #include "lv_mem.h"
 #include "lv_ll.h"
+#include "lv_task.h"
 #include "../lv_draw/lv_img_cache.h"
 #include "../lv_draw/lv_draw.h"
 
@@ -35,7 +36,7 @@ extern "C" {
     f(lv_ll_t, _lv_img_defoder_ll)                                 \
     f(lv_ll_t, _lv_obj_style_trans_ll)                             \
     f(lv_img_cache_entry_t*, _lv_img_cache_array)                  \
-    f(void*, _lv_task_act)                                         \
+    f(lv_task_t*, _lv_task_act)                                         \
     f(lv_mem_buf_arr_t , _lv_mem_buf)                              \
 
 #define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;

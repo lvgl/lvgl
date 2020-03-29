@@ -179,6 +179,13 @@ void lv_disp_refr_task(lv_task_t * task)
 
     disp_refr = task->user_data;
 
+#if LV_USE_PERF_MONITOR == 0
+    /* Ensure the task does not run again automatically.
+     * This is done before refreshing in case refreshing invalidates something else.
+     */
+    lv_task_set_prio(task, LV_TASK_PRIO_OFF);
+#endif
+
     /*Do nothing if there is no active screen*/
     if(disp_refr->act_scr == NULL) {
         disp_refr->inv_p = 0;
@@ -271,13 +278,6 @@ void lv_disp_refr_task(lv_task_t * task)
         lv_label_set_text_fmt(perf_label, "%d FPS\n%d%% CPU", fps, cpu);
         lv_obj_align(perf_label, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
     }
-#endif
-
-#if LV_USE_PERF_MONITOR == 0
-    /* Ensure the task does not run again automatically.
-     * This is done before refreshing in case refreshing invalidates something else.
-     */
-    lv_task_set_prio(task, LV_TASK_PRIO_OFF);
 #endif
 
     LV_LOG_TRACE("lv_refr_task: ready");
