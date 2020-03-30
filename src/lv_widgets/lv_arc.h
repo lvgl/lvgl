@@ -29,6 +29,7 @@ extern "C" {
 /*Data of arc*/
 typedef struct {
     /*New data for this type */
+    uint16_t rotation_angle;
     uint16_t arc_angle_start;
     uint16_t arc_angle_end;
     uint16_t bg_angle_start;
@@ -109,6 +110,13 @@ void lv_arc_set_bg_end_angle(lv_obj_t * arc, uint16_t end);
  * @param end the end angle
  */
 void lv_arc_set_bg_angles(lv_obj_t * arc, uint16_t start, uint16_t end);
+
+/**
+ * Set the rotation for the whole arc
+ * @param arc pointer to an arc object
+ * @param rotation_angle rotation angle
+ */
+void lv_arc_set_rotation(lv_obj_t * arc, uint16_t rotation_angle);
 
 /*=====================
  * Getter functions
