@@ -73,6 +73,7 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(arc);
 
     /*Initialize the allocated 'ext' */
+    ext->rotation_angle = 0;
     ext->bg_angle_start = 135;
     ext->bg_angle_end   = 45;
     ext->arc_angle_start = 135;
