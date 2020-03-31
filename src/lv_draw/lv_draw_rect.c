@@ -563,6 +563,7 @@ static inline lv_color_t grad_get(lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coo
     lv_opa_t mix = (i * 255) / d;
     return lv_color_mix(dsc->bg_grad_color, dsc->bg_color, mix);
 }
+
 #if LV_USE_SHADOW
 static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
 {
