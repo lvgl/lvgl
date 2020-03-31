@@ -856,6 +856,8 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
 
     theme.apply_cb = lv_theme_material_apply;
 
+    lv_obj_report_style_mod(NULL);
+
     return &theme;
 }
 

@@ -3511,9 +3511,8 @@ static void report_style_mod_core(void * style, lv_obj_t * obj)
         uint8_t ci;
         for(ci = 0; ci < dsc->style_cnt; ci++) {
             lv_style_t * class = lv_style_list_get_style(dsc, ci);
-            if(class == style) {
+            if(class == style || style == NULL) {
                 lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
-                /*It's enough to handle once (if duplicated)*/
                 break;
             }
         }
