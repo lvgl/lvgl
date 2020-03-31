@@ -1057,7 +1057,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         label_draw_dsc.flag = flag;
         lv_obj_init_draw_label_dsc(label, LV_LABEL_PART_MAIN, &label_draw_dsc);
 
-        /* In ROLL mode the CENTER and RIGHT are pointless so remove them.
+        /* In SCROLl and SCROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
          * (In addition they will result mis-alignment is this case)*/
         if((ext->long_mode == LV_LABEL_LONG_SROLL || ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) &&
            (ext->align == LV_LABEL_ALIGN_CENTER || ext->align == LV_LABEL_ALIGN_RIGHT)) {
@@ -1065,8 +1065,8 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
             lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
                             LV_COORD_MAX, flag);
             if(size.x > lv_area_get_width(&txt_coords)) {
-                flag &= ~LV_TXT_FLAG_RIGHT;
-                flag &= ~LV_TXT_FLAG_CENTER;
+                label_draw_dsc.flag &= ~LV_TXT_FLAG_RIGHT;
+                label_draw_dsc.flag &= ~LV_TXT_FLAG_CENTER;
             }
         }
 #if LV_LABEL_LONG_TXT_HINT
