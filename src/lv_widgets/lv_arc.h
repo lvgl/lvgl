@@ -29,10 +29,11 @@ extern "C" {
 /*Data of arc*/
 typedef struct {
     /*New data for this type */
-    lv_coord_t arc_angle_start;
-    lv_coord_t arc_angle_end;
-    lv_coord_t bg_angle_start;
-    lv_coord_t bg_angle_end;
+    uint16_t rotation_angle;
+    uint16_t arc_angle_start;
+    uint16_t arc_angle_end;
+    uint16_t bg_angle_start;
+    uint16_t bg_angle_end;
     lv_style_list_t style_arc;
 } lv_arc_ext_t;
 
@@ -71,14 +72,14 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy);
  * @param arc pointer to an arc object
  * @param start the start angle
  */
-void lv_arc_set_start_angle(lv_obj_t * arc, int16_t start);
+void lv_arc_set_start_angle(lv_obj_t * arc, uint16_t start);
 
 /**
  * Set the start angle of an arc. 0 deg: right, 90 bottom, etc.
  * @param arc pointer to an arc object
  * @param end the end angle
  */
-void lv_arc_set_end_angle(lv_obj_t * arc, int16_t end);
+void lv_arc_set_end_angle(lv_obj_t * arc, uint16_t end);
 
 /**
  * Set the start and end angles
@@ -86,21 +87,21 @@ void lv_arc_set_end_angle(lv_obj_t * arc, int16_t end);
  * @param start the start angle
  * @param end the end angle
  */
-void lv_arc_set_angles(lv_obj_t * arc, int16_t start, int16_t end);
+void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end);
 
 /**
  * Set the start angle of an arc background. 0 deg: right, 90 bottom, etc.
  * @param arc pointer to an arc object
  * @param start the start angle
  */
-void lv_arc_set_bg_start_angle(lv_obj_t * arc, int16_t start);
+void lv_arc_set_bg_start_angle(lv_obj_t * arc, uint16_t start);
 
 /**
  * Set the start angle of an arc background. 0 deg: right, 90 bottom etc.
  * @param arc pointer to an arc object
  * @param end the end angle
  */
-void lv_arc_set_bg_end_angle(lv_obj_t * arc, int16_t end);
+void lv_arc_set_bg_end_angle(lv_obj_t * arc, uint16_t end);
 
 /**
  * Set the start and end angles of the arc background
@@ -108,7 +109,14 @@ void lv_arc_set_bg_end_angle(lv_obj_t * arc, int16_t end);
  * @param start the start angle
  * @param end the end angle
  */
-void lv_arc_set_bg_angles(lv_obj_t * arc, int16_t start, int16_t end);
+void lv_arc_set_bg_angles(lv_obj_t * arc, uint16_t start, uint16_t end);
+
+/**
+ * Set the rotation for the whole arc
+ * @param arc pointer to an arc object
+ * @param rotation_angle rotation angle
+ */
+void lv_arc_set_rotation(lv_obj_t * arc, uint16_t rotation_angle);
 
 /*=====================
  * Getter functions
@@ -127,6 +135,20 @@ uint16_t lv_arc_get_angle_start(lv_obj_t * arc);
  * @return the end angle [0..360]
  */
 uint16_t lv_arc_get_angle_end(lv_obj_t * arc);
+
+/**
+ * Get the start angle of an arc background.
+ * @param arc pointer to an arc object
+ * @return the start angle [0..360]
+ */
+uint16_t lv_arc_get_bg_angle_start(lv_obj_t * arc);
+
+/**
+ * Get the end angle of an arc background.
+ * @param arc pointer to an arc object
+ * @return the end angle [0..360]
+ */
+uint16_t lv_arc_get_bg_angle_end(lv_obj_t * arc);
 
 /*=====================
  * Other functions
