@@ -317,8 +317,8 @@ void lv_spinbox_increment(lv_obj_t * spinbox)
 
     } else {
 		// Rollover?
-		if (ext->rollover)
-			ext->value = ext->range_min + ext->step - 1;
+		if ((ext->rollover) && (ext->value == ext->range_max))
+			ext->value = ext->range_min;
 		else
 			ext->value = ext->range_max;
     }
@@ -342,8 +342,8 @@ void lv_spinbox_decrement(lv_obj_t * spinbox)
         ext->value -= ext->step;
     } else {
 		// Rollover?
-		if (ext->rollover)
-			ext->value = ext->range_max - ext->step + 1;
+		if ((ext->rollover) && (ext->value == ext->range_min))
+			ext->value = ext->range_max;
 		else
 			ext->value = ext->range_min;
     }
