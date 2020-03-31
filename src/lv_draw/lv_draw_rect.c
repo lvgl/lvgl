@@ -643,7 +643,6 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_dra
         }
     }
 
-    uint16_t other_mask_cnt = lv_draw_mask_get_cnt();
     bool simple_mode = true;
     if(lv_draw_mask_get_cnt() > 0) simple_mode = false;
     else if(dsc->shadow_ofs_x != 0 || dsc->shadow_ofs_y != 0) simple_mode = false;
@@ -659,23 +658,6 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_dra
     int16_t mask_rout_id = lv_draw_mask_add(&mask_rout_param, NULL);
 
     lv_area_t a;
-    bool top = false;
-    bool bottom = false;
-    bool mid = false;
-
-    a.x1 = sh_area.x1;
-    a.x2 = sh_area.x2;
-    a.y1 = sh_area.y1;
-    a.y2 = sh_area.y1 + corner_size;
-    if(lv_area_is_on(&a, clip)) top = true;
-
-    a.y1 = sh_area.y2 - corner_size;
-    a.y2 = sh_area.y2;
-    if(lv_area_is_on(&a, clip)) bottom = true;
-
-    a.y1 = sh_area.y1 + corner_size;
-    a.y2 = sh_area.y2 - corner_size;
-    if(lv_area_is_on(&a, clip)) mid = true;
 
     /*Draw the top right corner*/
     int32_t y;
