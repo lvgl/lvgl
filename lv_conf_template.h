@@ -144,6 +144,13 @@ typedef void * lv_anim_user_data_t;
 
 /* 1: Enable shadow drawing*/
 #define LV_USE_SHADOW           1
+#if LV_USE_SHADOW
+/* Allow buffering some shadow calculation
+ * LV_SHADOW_CACHE_SIZE is the max. shadow size to buffer,
+ * where shadow size is `shadow_width + radius`
+ * Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost*/
+#define LV_SHADOW_CACHE_SIZE    0
+#endif
 
 /* 1: Use other blend modes than normal (`LV_BLEND_MODE_...`)*/
 #define LV_USE_BLEND_MODES      1

@@ -215,6 +215,15 @@
 #ifndef LV_USE_SHADOW
 #define LV_USE_SHADOW           1
 #endif
+#if LV_USE_SHADOW
+/* Allow buffering some shadow calculation
+ * LV_SHADOW_CACHE_SIZE is the max. shadow size to buffer,
+ * where shadow size is `shadow_width + radius`
+ * Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost*/
+#ifndef LV_SHADOW_CACHE_SIZE
+#define LV_SHADOW_CACHE_SIZE    0
+#endif
+#endif
 
 /* 1: Use other blend modes than normal (`LV_BLEND_MODE_...`)*/
 #ifndef LV_USE_BLEND_MODES
@@ -293,6 +302,11 @@
 /* Define a custom attribute to `lv_task_handler` function */
 #ifndef LV_ATTRIBUTE_TASK_HANDLER
 #define LV_ATTRIBUTE_TASK_HANDLER
+#endif
+
+/* Define a custom attribute to `lv_disp_flush_ready` function */
+#ifndef LV_ATTRIBUTE_FLUSH_READY
+#define LV_ATTRIBUTE_FLUSH_READY
 #endif
 
 /* With size optimization (-Os) the compiler might not align data to
@@ -394,9 +408,7 @@
 
 /*Check the integrity of `lv_mem` after critical operations. (Slow)*/
 #ifndef LV_USE_ASSERT_MEM_INTEGRITY
-#ifndef LV_USE_ASSERT_MEM_INTEGRITY
 #define LV_USE_ASSERT_MEM_INTEGRITY       0
-#endif
 #endif
 
 /* Check the strings.
@@ -414,7 +426,7 @@
 
 /*Check if the styles are properly initialized. (Fast)*/
 #ifndef LV_USE_ASSERT_STYLE
-#define LV_USE_ASSERT_STYLE     1
+#define LV_USE_ASSERT_STYLE     0
 #endif
 
 #endif /*LV_USE_DEBUG*/
@@ -768,7 +780,7 @@
 #endif
 #if LV_USE_LED
 #ifndef LV_LED_BRIGHT_MIN
-#  define LV_LED_BRIGHT_MIN  100      /*Minimal brightness*/
+#  define LV_LED_BRIGHT_MIN  60      /*Minimal brightness*/
 #endif
 #ifndef LV_LED_BRIGHT_MAX
 #  define LV_LED_BRIGHT_MAX  255     /*Maximal brightness*/
