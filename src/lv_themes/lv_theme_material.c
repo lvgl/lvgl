@@ -297,11 +297,11 @@ static void basic_init(void)
     lv_style_set_pad_inner(&pad_inner, LV_STATE_DEFAULT, LV_DPI / 10);
 
     lv_style_init(&pad_small);
-    lv_style_set_pad_left(&pad_small, LV_STATE_DEFAULT,  LV_DPI / 10);
-    lv_style_set_pad_right(&pad_small, LV_STATE_DEFAULT, LV_DPI / 10);
-    lv_style_set_pad_top(&pad_small, LV_STATE_DEFAULT,  LV_DPI / 10);
-    lv_style_set_pad_bottom(&pad_small, LV_STATE_DEFAULT, LV_DPI / 10);
-    lv_style_set_pad_inner(&pad_small, LV_STATE_DEFAULT, LV_DPI / 20);
+    lv_style_set_pad_left(&pad_small, LV_STATE_DEFAULT,  LV_DPI / 15);
+    lv_style_set_pad_right(&pad_small, LV_STATE_DEFAULT, LV_DPI / 15);
+    lv_style_set_pad_top(&pad_small, LV_STATE_DEFAULT,  LV_DPI / 15);
+    lv_style_set_pad_bottom(&pad_small, LV_STATE_DEFAULT, LV_DPI / 15);
+    lv_style_set_pad_inner(&pad_small, LV_STATE_DEFAULT, LV_DPI / 25);
 }
 
 static void cont_init(void)

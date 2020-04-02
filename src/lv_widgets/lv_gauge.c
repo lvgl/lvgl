@@ -113,6 +113,9 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_gauge_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_gauge_set_needle_count(gauge, copy_ext->needle_count, copy_ext->needle_colors);
 
+        lv_style_list_copy(&ext->style_strong, &copy_ext->style_strong);
+        lv_style_list_copy(&ext->style_needle, &copy_ext->style_needle);
+
         uint8_t i;
         for(i = 0; i < ext->needle_count; i++) {
             ext->values[i] = copy_ext->values[i];

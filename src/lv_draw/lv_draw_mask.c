@@ -99,15 +99,16 @@ lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_
     bool changed = false;
     lv_draw_mask_common_dsc_t * dsc;
 
-    uint8_t i;
-    for(i = 0; i < LV_MASK_MAX_NUM; i++) {
-        if(mask_list[i].param) {
-            dsc = mask_list[i].param;
-            lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;
-            res = dsc->cb(mask_buf, abs_x, abs_y, len, (void *)mask_list[i].param);
-            if(res == LV_DRAW_MASK_RES_FULL_TRANSP) return LV_DRAW_MASK_RES_FULL_TRANSP;
-            else if(res == LV_DRAW_MASK_RES_CHANGED) changed = true;
-        }
+    lv_mask_saved_t * m = mask_list;
+
+    while(m->param) {
+        dsc = m->param;
+        lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;
+        res = dsc->cb(mask_buf, abs_x, abs_y, len, (void *)m->param);
+        if(res == LV_DRAW_MASK_RES_FULL_TRANSP) return LV_DRAW_MASK_RES_FULL_TRANSP;
+        else if(res == LV_DRAW_MASK_RES_CHANGED) changed = true;
+
+        m++;
     }
 
     return changed ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
@@ -874,28 +875,33 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
 static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
                                               lv_draw_mask_radius_param_t * p)
 {
-    if(p->cfg.outer == 0) {
-        if(abs_y < p->cfg.rect.y1 || abs_y > p->cfg.rect.y2) {
+    bool outer = p->cfg.outer;
+    int32_t radius = p->cfg.radius;
+    lv_area_t rect;
+    lv_area_copy(&rect, &p->cfg.rect);
+
+    if(outer == false) {
+        if(abs_y < rect.y1 || abs_y >rect.y2) {
             return LV_DRAW_MASK_RES_FULL_TRANSP;
         }
     }
     else {
-        if(abs_y < p->cfg.rect.y1 || abs_y > p->cfg.rect.y2) {
+        if(abs_y < rect.y1 || abs_y > rect.y2) {
             return LV_DRAW_MASK_RES_FULL_COVER;
         }
     }
 
-    if((abs_x >= p->cfg.rect.x1 + p->cfg.radius && abs_x + len <= p->cfg.rect.x2 - p->cfg.radius) ||
-       (abs_y >= p->cfg.rect.y1 + p->cfg.radius && abs_y <= p->cfg.rect.y2 - p->cfg.radius)) {
-        if(p->cfg.outer == 0) {
+    if((abs_x >= rect.x1 + radius && abs_x + len <= rect.x2 - radius) ||
+       (abs_y >= rect.y1 + radius && abs_y <= rect.y2 - radius)) {
+        if(outer == false) {
             /*Remove the edges*/
-            int32_t last =  p->cfg.rect.x1 - abs_x;
+            int32_t last =  rect.x1 - abs_x;
             if(last > len) return LV_DRAW_MASK_RES_FULL_TRANSP;
             if(last >= 0) {
                 lv_memset_00(&mask_buf[0], last);
             }
 
-            int32_t first = p->cfg.rect.x2 - abs_x + 1;
+            int32_t first = rect.x2 - abs_x + 1;
             if(first <= 0) return LV_DRAW_MASK_RES_FULL_TRANSP;
             else if(first < len) {
                 lv_memset_00(&mask_buf[first], len - first);
@@ -904,10 +910,10 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
             else return LV_DRAW_MASK_RES_CHANGED;
         }
         else {
-            int32_t first = p->cfg.rect.x1 - abs_x;
+            int32_t first = rect.x1 - abs_x;
             if(first < 0) first = 0;
             if(first <= len) {
-                int32_t last =  p->cfg.rect.x2 - abs_x - first + 1;
+                int32_t last =  rect.x2 - abs_x - first + 1;
                 if(first + last > len) last = len - first;
                 if(last >= 0) {
                     lv_memset_00(&mask_buf[first], last);
@@ -917,28 +923,34 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
         return LV_DRAW_MASK_RES_CHANGED;
     }
 
-    int32_t k = p->cfg.rect.x1 - abs_x; /*First relevant coordinate on the of the mask*/
-    int32_t w = lv_area_get_width(&p->cfg.rect);
-    int32_t h = lv_area_get_height(&p->cfg.rect);
-    abs_x -= p->cfg.rect.x1;
-    abs_y -= p->cfg.rect.y1;
+    int32_t k = rect.x1 - abs_x; /*First relevant coordinate on the of the mask*/
+    int32_t w = lv_area_get_width(&rect);
+    int32_t h = lv_area_get_height(&rect);
+    abs_x -= rect.x1;
+    abs_y -= rect.y1;
 
     uint32_t r2 = p->cfg.radius * p->cfg.radius;
 
     /*Handle corner areas*/
-    if(abs_y < p->cfg.radius || abs_y > h - p->cfg.radius - 1) {
+    if(abs_y < radius || abs_y > h - radius - 1) {
+
+        uint32_t sqrt_mask;
+        if(radius <= 32) sqrt_mask = 0x200;
+        if(radius <= 256) sqrt_mask = 0x800;
+        else sqrt_mask = 0x8000;
+
         /* y = 0 should mean the top of the circle */
         int32_t y;
-        if(abs_y < p->cfg.radius)  y = p->cfg.radius - abs_y;
-        else y = p->cfg.radius - (h - abs_y) + 1;
+        if(abs_y < radius)  y = radius - abs_y;
+        else y = radius - (h - abs_y) + 1;
 
         /* Get the x intersection points for `abs_y` and `abs_y+1`
          * Use the circle's equation x = sqrt(r^2 - y^2) */
         lv_sqrt_res_t x0;
-        lv_sqrt(r2 - (y * y), &x0);
+        lv_sqrt(r2 - (y * y), &x0, sqrt_mask);
 
         lv_sqrt_res_t x1;
-        lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1);
+        lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1, sqrt_mask);
 
         /* If x1 is on the next round coordinate (e.g. x0: 3.5, x1:4.0)
          * then treat x1 as x1: 3.99 to handle them as they were on the same pixel*/
@@ -947,11 +959,11 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
             x1.f = 0xFF;
         }
 
-        /*If the two x intersections are on the same x then just get average of the fractionals*/
+        /*If the two x intersections are on the same x then just get average of the fractions*/
         if(x0.i == x1.i) {
             lv_opa_t m = (x0.f + x1.f) >> 1;
-            if(p->cfg.outer) m = 255 - m;
-            int32_t ofs = p->cfg.radius - x0.i - 1;
+            if(outer) m = 255 - m;
+            int32_t ofs = radius - x0.i - 1;
 
             /*Left corner*/
             int32_t kl = k + ofs;
@@ -967,7 +979,7 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
             }
 
             /*Clear the unused parts*/
-            if(p->cfg.outer == 0) {
+            if(outer == false) {
                 kr++;
                 if(kl > len)  {
                     return LV_DRAW_MASK_RES_FULL_TRANSP;
@@ -996,11 +1008,11 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
         }
         /*Multiple pixels are affected. Get y intersection of the pixels*/
         else {
-            int32_t ofs = p->cfg.radius - (x0.i + 1);
+            int32_t ofs = radius - (x0.i + 1);
             int32_t kl = k + ofs;
             int32_t kr = k + (w - ofs - 1);
 
-            if(p->cfg.outer) {
+            if(outer) {
                 int32_t first = kl + 1;
                 if(first < 0) first = 0;
 
@@ -1016,7 +1028,7 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
             lv_sqrt_res_t y_prev;
             lv_sqrt_res_t y_next;
 
-            lv_sqrt(r2 - (x0.i * x0.i), &y_prev);
+            lv_sqrt(r2 - (x0.i * x0.i), &y_prev, sqrt_mask);
 
             if(y_prev.f == 0) {
                 y_prev.i--;
@@ -1025,10 +1037,10 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
 
             /*The first y intersection is special as it might be in the previous line*/
             if(y_prev.i >= y) {
-                lv_sqrt(r2 - (i * i), &y_next);
+                lv_sqrt(r2 - (i * i), &y_next, sqrt_mask);
                 m = 255 - (((255 - x0.f) * (255 - y_next.f)) >> 9);
 
-                if(p->cfg.outer) m = 255 - m;
+                if(outer) m = 255 - m;
                 if(kl >= 0 && kl < len) mask_buf[kl] = mask_mix(mask_buf[kl], m);
                 if(kr >= 0 && kr < len) mask_buf[kr] = mask_mix(mask_buf[kr], m);
                 kl--;
@@ -1039,10 +1051,10 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
 
             /*Set all points which are crossed by the circle*/
             for(; i <= x1.i; i++) {
-                lv_sqrt(r2 - (i * i), &y_next);
+                lv_sqrt(r2 - (i * i), &y_next, sqrt_mask);
 
                 m = (y_prev.f + y_next.f) >> 1;
-                if(p->cfg.outer) m = 255 - m;
+                if(outer) m = 255 - m;
                 if(kl >= 0 && kl < len) mask_buf[kl] = mask_mix(mask_buf[kl], m);
                 if(kr >= 0 && kr < len) mask_buf[kr] = mask_mix(mask_buf[kr], m);
                 kl--;
@@ -1054,14 +1066,14 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
              * the circle still has parts on the next one*/
             if(y_prev.f) {
                 m = (y_prev.f * x1.f) >> 9;
-                if(p->cfg.outer) m = 255 - m;
+                if(outer) m = 255 - m;
                 if(kl >= 0 && kl < len) mask_buf[kl] = mask_mix(mask_buf[kl], m);
                 if(kr >= 0 && kr < len) mask_buf[kr] = mask_mix(mask_buf[kr], m);
                 kl--;
                 kr++;
             }
 
-            if(p->cfg.outer == 0) {
+            if(outer == 0) {
                 kl++;
                 if(kl > len) {
                     return LV_DRAW_MASK_RES_FULL_TRANSP;

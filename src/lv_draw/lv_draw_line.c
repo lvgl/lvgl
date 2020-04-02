@@ -388,8 +388,6 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     }
 
     /*Use the normal vector for the endings*/
-    lv_draw_mask_line_points_init(&mask_top_param, p1.x, p1.y, p1.x - ydiff, p1.y + xdiff, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
-    lv_draw_mask_line_points_init(&mask_bottom_param, p2.x, p2.y, p2.x - ydiff, p2.y + xdiff,  LV_DRAW_MASK_LINE_SIDE_TOP);
 
     int16_t mask_left_id = lv_draw_mask_add(&mask_left_param, NULL);
     int16_t mask_right_id = lv_draw_mask_add(&mask_right_param, NULL);
@@ -397,6 +395,8 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     int16_t mask_bottom_id = LV_MASK_ID_INV;
 
     if(!dsc->raw_end) {
+        lv_draw_mask_line_points_init(&mask_top_param, p1.x, p1.y, p1.x - ydiff, p1.y + xdiff, LV_DRAW_MASK_LINE_SIDE_BOTTOM);
+        lv_draw_mask_line_points_init(&mask_bottom_param, p2.x, p2.y, p2.x - ydiff, p2.y + xdiff,  LV_DRAW_MASK_LINE_SIDE_TOP);
         mask_top_id = lv_draw_mask_add(&mask_top_param, NULL);
         mask_bottom_id = lv_draw_mask_add(&mask_bottom_param, NULL);
     }
