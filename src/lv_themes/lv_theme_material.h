@@ -20,16 +20,15 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+typedef enum {
+    LV_THEME_MATERIAL_FLAG_DARK =  0x01,
+    LV_THEME_MATERIAL_FLAG_LIGHT = 0x02,
+    LV_THEME_MATERIAL_FLAG_NO_TRANSITION  = 0x10,
+}lv_theme_material_flag_t;
 
 /**********************
  *      TYPEDEFS
  **********************/
-
-typedef enum {
-    LV_THEME_MATERIAL_PALETTE_LIGHT,
-    LV_THEME_MATERIAL_PALETTE_DARK,
-} lv_theme_material_palette_t;
-
 
 /**********************
  * GLOBAL PROTOTYPES

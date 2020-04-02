@@ -145,6 +145,13 @@ typedef enum {
 
 typedef struct {
     void (*apply_cb)(lv_obj_t *, lv_theme_style_t);
+    lv_color_t color_primary;
+    lv_color_t color_secondary;
+    const lv_font_t * font_small;
+    const lv_font_t * font_normal;
+    const lv_font_t * font_subtitle;
+    const lv_font_t * font_title;
+    uint32_t flags;
 } lv_theme_t;
 
 /**********************

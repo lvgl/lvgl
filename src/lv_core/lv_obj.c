@@ -140,7 +140,7 @@ void lv_init(void)
     lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(lv_style_trans_t));
 
     lv_theme_t * th = LV_THEME_DEFAULT_INIT(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY,
-                                            0,
+                                            LV_THEME_DEFAULT_FLAG,
                                             LV_THEME_DEFAULT_FONT_SMALL, LV_THEME_DEFAULT_FONT_NORMAL, LV_THEME_DEFAULT_FONT_SUBTITLE, LV_THEME_DEFAULT_FONT_TITLE);
     lv_theme_set_act(th);
 
@@ -3511,9 +3511,8 @@ static void report_style_mod_core(void * style, lv_obj_t * obj)
         uint8_t ci;
         for(ci = 0; ci < dsc->style_cnt; ci++) {
             lv_style_t * class = lv_style_list_get_style(dsc, ci);
-            if(class == style) {
+            if(class == style || style == NULL) {
                 lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
-                /*It's enough to handle once (if duplicated)*/
                 break;
             }
         }

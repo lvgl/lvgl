@@ -282,7 +282,7 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos
 
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
-    /*Convert static options to dynmaic*/
+    /*Convert static options to dynamic*/
     if(ext->static_txt != 0) {
         char * static_options = ext->options;
         size_t len = strlen(static_options) + 1;
@@ -319,7 +319,7 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos
 
     /*Add delimiter to existing options*/
     if((insert_pos > 0) && (pos >= ext->option_cnt))
-        lv_txt_ins(ext->options, insert_pos++, "\n");
+        lv_txt_ins(ext->options, lv_txt_encoded_get_char_id(ext->options, insert_pos++), "\n");
 
     /*Insert the new option, adding \n if necessary*/
     char * ins_buf = lv_mem_buf_get(ins_len + 2); /* + 2 for terminating NULL and possible \n */
@@ -328,7 +328,7 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos
     strcpy(ins_buf, option);
     if(pos < ext->option_cnt)
         strcat(ins_buf, "\n");
-    lv_txt_ins(ext->options, insert_pos, ins_buf);
+    lv_txt_ins(ext->options, lv_txt_encoded_get_char_id(ext->options, insert_pos), ins_buf);
     lv_mem_buf_release(ins_buf);
 
     ext->option_cnt++;
@@ -1309,7 +1309,7 @@ static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t x, lv_coord_t y)
     uint32_t letter_cnt = 0;
     for(letter_cnt = 0; letter_cnt < letter_i; letter_cnt++) {
         uint32_t letter = lv_txt_encoded_next(txt, &i);
-        /*Count he lines to reach the clicked letter. But ignore the last '\n' because it
+        /*Count the lines to reach the clicked letter. But ignore the last '\n' because it
          * still belongs to the clicked line*/
         if(letter == '\n' && i_prev != letter_i) opt++;
         i_prev = i;
