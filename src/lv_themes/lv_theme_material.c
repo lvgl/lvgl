@@ -416,7 +416,6 @@ static void linemeter_init(void)
     lv_style_set_line_color(&lmeter, LV_STATE_DEFAULT, theme.color_primary);
     lv_style_set_scale_grad_color(&lmeter, LV_STATE_DEFAULT, theme.color_primary);
     lv_style_set_scale_end_color(&lmeter, LV_STATE_DEFAULT, lv_color_hex3(0x666));
-    lv_style_set_line_rounded(&lmeter, LV_STATE_DEFAULT, true);
     lv_style_set_line_width(&lmeter, LV_STATE_DEFAULT, LV_DPI / 20);
     lv_style_set_scale_end_line_width(&lmeter, LV_STATE_DEFAULT, LV_DPI / 30);
 #endif

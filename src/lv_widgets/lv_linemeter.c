@@ -19,6 +19,7 @@
  *      DEFINES
  *********************/
 #define LV_OBJX_NAME "lv_linemeter"
+#define LV_LINEMETER_PRECISE    0      /*Draw line more precisely at cost of performance*/
 
 /**********************
  *      TYPEDEFS
@@ -293,19 +294,26 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
     lv_obj_init_draw_line_dsc(lmeter, part, &line_dsc);
+#if LV_LINEMETER_PRECISE == 2
     line_dsc.raw_end = 1;
+#endif
 
     lv_style_int_t end_line_width = lv_obj_get_style_scale_end_line_width(lmeter, part);
 
+#if LV_LINEMETER_PRECISE > 0
     lv_area_t mask_area;
     mask_area.x1 = x_ofs - r_in;
     mask_area.x2 = x_ofs + r_in - 1;
     mask_area.y1 = y_ofs - r_in;
     mask_area.y2 = y_ofs + r_in - 1;
+
     lv_draw_mask_radius_param_t mask_in_param;
     lv_draw_mask_radius_init(&mask_in_param, &mask_area, LV_RADIUS_CIRCLE, true);
     int16_t mask_in_id = lv_draw_mask_add(&mask_in_param, 0);
+#endif
 
+
+#if LV_LINEMETER_PRECISE > 1
     mask_area.x1 = x_ofs - r_out;
     mask_area.x2 = x_ofs + r_out - 1;
     mask_area.y1 = y_ofs - r_out;
@@ -313,9 +321,12 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
     lv_draw_mask_radius_param_t mask_out_param;
     lv_draw_mask_radius_init(&mask_out_param, &mask_area, LV_RADIUS_CIRCLE, false);
     int16_t mask_out_id = lv_draw_mask_add(&mask_out_param, 0);
-
     /*In calculation use a larger radius to avoid rounding errors */
     lv_coord_t r_out_extra = r_out + LV_DPI;
+#else
+    lv_coord_t r_out_extra = r_out;
+#endif
+
     for(i = 0; i < ext->line_cnt; i++) {
         /* `* 256` for extra precision*/
         int32_t angle_upscale = (i * ext->scale_angle * 256) / (ext->line_cnt - 1);
@@ -348,6 +359,26 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         x_out_extra += x_ofs;
         y_out_extra += y_ofs;
 
+        /*With no extra precision use the coordinates on the inner radius*/
+#if LV_LINEMETER_PRECISE == 0
+        /*Use the interpolated values to get x and y coordinates*/
+        int32_t y_in_extra = (int32_t)((int32_t)sin_mid * r_in) >> (LV_TRIGO_SHIFT - 8);
+        int32_t x_in_extra = (int32_t)((int32_t)cos_mid * r_in) >> (LV_TRIGO_SHIFT - 8);
+
+        /*Rounding*/
+        if(x_in_extra > 0) x_in_extra = (x_in_extra + 127) >> 8;
+        else x_in_extra = (x_in_extra - 127) >> 8;
+
+        if(y_in_extra > 0) y_in_extra = (y_in_extra + 127) >> 8;
+        else y_in_extra = (y_in_extra - 127) >> 8;
+
+        x_in_extra += x_ofs;
+        y_in_extra += y_ofs;
+#else
+        int32_t x_in_extra = x_ofs;
+        int32_t y_in_extra = y_ofs;
+#endif
+
         /*Use smaller clip area only around the visible line*/
         int32_t y_in  = (int32_t)((int32_t)lv_trigo_sin(angle_normal + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
         int32_t x_in  = (int32_t)((int32_t)lv_trigo_sin(angle_normal + 90 + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
@@ -372,8 +403,8 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         lv_point_t p1;
         lv_point_t p2;
 
-        p2.x = x_ofs;
-        p2.y = y_ofs;
+        p2.x = x_in_extra;
+        p2.y = y_in_extra;
 
         p1.x = x_out_extra;
         p1.y = y_out_extra;
@@ -389,8 +420,13 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         lv_draw_line(&p1, &p2, &clip_sub, &line_dsc);
     }
 
+#if LV_LINEMETER_PRECISE > 0
     lv_draw_mask_remove_id(mask_in_id);
+#endif
+
+#if LV_LINEMETER_PRECISE > 1
     lv_draw_mask_remove_id(mask_out_id);
+#endif
 
     if(part == LV_LINEMETER_PART_MAIN) {
         lv_style_int_t border_width = lv_obj_get_style_scale_border_width(lmeter, part);

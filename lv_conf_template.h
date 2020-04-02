@@ -548,6 +548,15 @@ typedef void * lv_obj_user_data_t;
 
 /*Line meter (dependencies: *;)*/
 #define LV_USE_LINEMETER   1
+#if LV_USE_LINEMETER
+/* Draw line more precisely at cost of performance.
+ * Useful if there are lot of lines any minor are visible
+ * 0: No extra precision
+ * 1: Some extra precision
+ * 2: Best precision
+ */
+#  define LV_LINEMETER_PRECISE    0
+#endif
 
 /*Mask (dependencies: -)*/
 #define LV_USE_OBJMASK  0

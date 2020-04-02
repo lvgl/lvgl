@@ -122,10 +122,6 @@ void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
         trial = root + mask;
         if ((uint32_t)trial * trial <= x) root = trial;
         mask = mask >> 1;
-
-        trial = root + mask;
-        if ((uint32_t)trial * trial <= x) root = trial;
-        mask = mask >> 1;
     } while(mask);
 
     q->i = (uint32_t) root >> 4;

@@ -810,6 +810,17 @@
 #ifndef LV_USE_LINEMETER
 #define LV_USE_LINEMETER   1
 #endif
+#if LV_USE_LINEMETER
+/* Draw line more precisely at cost of performance.
+ * Useful if there are lot of lines any minor are visible
+ * 0: No extra precision
+ * 1: Some extra precision
+ * 2: Best precision
+ */
+#ifndef LV_LINEMETER_PRECISE
+#  define LV_LINEMETER_PRECISE    0
+#endif
+#endif
 
 /*Mask (dependencies: -)*/
 #ifndef LV_USE_OBJMASK
