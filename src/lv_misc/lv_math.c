@@ -101,6 +101,16 @@ int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
     return v1 + v2 + v3 + v4;
 }
 
+/**
+ * Get the square root of a number
+ * @param x integer which square root should be calculatoed
+ * @param q store the result here. q->i: integer part, q->f: fractional part in 1/256 unit
+ * @param mask: optional to skip some iterations if the magnitude of the root is known.
+ * Set to 0x8000 by default.
+ * If root < 16: mask = 0x80
+ * If root < 256: mask = 0x800
+ * Else: mask = 0x8000
+ */
 void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
 {
     x = x << 8; /*To get 4 bit precision. (sqrt(256) = 16 = 4 bit)*/
