@@ -598,7 +598,11 @@ static void keyboard_init(void)
     lv_style_set_radius(&kb_bg, LV_STATE_DEFAULT, 0);
     lv_style_set_border_width(&kb_bg, LV_STATE_DEFAULT, (LV_DPI / 40 > 0 ? LV_DPI / 40 : 1));
     lv_style_set_border_side(&kb_bg, LV_STATE_DEFAULT, LV_BORDER_SIDE_TOP);
-
+    lv_style_set_pad_left(&kb_bg, LV_STATE_DEFAULT,  LV_DPI / 20);
+    lv_style_set_pad_right(&kb_bg, LV_STATE_DEFAULT, LV_DPI / 20);
+    lv_style_set_pad_top(&kb_bg, LV_STATE_DEFAULT,  LV_DPI / 20);
+    lv_style_set_pad_bottom(&kb_bg, LV_STATE_DEFAULT, LV_DPI / 20);
+    lv_style_set_pad_inner(&kb_bg, LV_STATE_DEFAULT, LV_DPI / 40);
 #endif
 }
 
@@ -915,8 +919,6 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_KEYBOARD_PART_BG);
             lv_style_list_add_style(list, &scr);
             lv_style_list_add_style(list, &kb_bg);
-            lv_style_list_add_style(list, &pad_small);
-
 
             lv_obj_clean_style_list(obj, LV_KEYBOARD_PART_BTN);
             list = lv_obj_get_style_list(obj, LV_KEYBOARD_PART_BTN);
@@ -946,6 +948,7 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             lv_obj_clean_style_list(obj, LV_SWITCH_PART_INDIC);
             list = lv_obj_get_style_list(obj, LV_SWITCH_PART_INDIC);
             lv_style_list_add_style(list, &bar_indic);
+            lv_style_list_add_style(list, &bg);
 
             lv_obj_clean_style_list(obj, LV_SWITCH_PART_KNOB);
             list = lv_obj_get_style_list(obj, LV_SWITCH_PART_KNOB);
