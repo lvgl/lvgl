@@ -172,9 +172,9 @@ void lv_disp_refr_task(lv_task_t * task)
 
     /*If refresh happened ...*/
     if(disp_refr->inv_p != 0) {
-        /*In true double buffered mode copy the refreshed areas to the new VDB to keep it up to
-         * date*/
-        if(lv_disp_is_true_double_buf(disp_refr)) {
+        /* In true double buffered mode copy the refreshed areas to the new VDB to keep it up to date.
+         * With set_px_cb we don't know anything about the buffer (even it's size) so skip copying.*/
+        if(lv_disp_is_true_double_buf(disp_refr) && disp_refr->driver.set_px_cb == NULL) {
             lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
 
             /*Flush the content of the VDB*/
