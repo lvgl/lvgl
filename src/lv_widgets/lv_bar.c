@@ -609,6 +609,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
 
     /*When not masks draw the value*/
     draw_indic_dsc.value_opa = value_opa;
+    draw_indic_dsc.border_opa = LV_OPA_TRANSP;
     lv_draw_rect(&ext->indic_area, clip_area, &draw_indic_dsc);
 
 }
