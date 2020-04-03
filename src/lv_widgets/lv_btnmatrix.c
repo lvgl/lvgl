@@ -165,7 +165,6 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
     lv_style_int_t bottom = lv_obj_get_style_pad_bottom(btnm, LV_BTNMATRIX_PART_BG);
     lv_style_int_t inner = lv_obj_get_style_pad_inner(btnm, LV_BTNMATRIX_PART_BG);
 
-
     lv_coord_t max_w            = lv_obj_get_width(btnm) - left - right;
     lv_coord_t max_h            = lv_obj_get_height(btnm) - top - bottom;
     lv_coord_t act_y            = top;
@@ -234,7 +233,7 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
                 /* Set the button's area.
                  * If inner padding is zero then use the prev. button x2 as x1 to avoid rounding
                  * errors*/
-                if(btn_i != 0 && inner == 0 && ((act_x == left && base_dir != LV_BIDI_DIR_RTL) ||
+                if(btn_i != 0 && inner == 0 && ((act_x != left && base_dir != LV_BIDI_DIR_RTL) ||
                                                 (act_x + act_unit_w == max_w - right && base_dir == LV_BIDI_DIR_RTL))) {
                     lv_area_set(&ext->button_areas[btn_i], ext->button_areas[btn_i - 1].x2, act_y, act_x + act_unit_w,
                                 act_y + btn_h);
