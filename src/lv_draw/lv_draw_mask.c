@@ -879,6 +879,22 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
     }
 }
 
+
+static inline void sqrt_approx(lv_sqrt_res_t * q, lv_sqrt_res_t * ref, uint32_t x)
+{
+
+    x = x << 8;
+
+    uint32_t raw = (ref->i << 4) + (ref->f >> 4);
+    uint32_t raw2 = raw*raw;
+
+    int32_t d = x -raw2;
+    d = (int32_t)d / (int32_t)(2 * raw) + raw;
+
+    q->i = d >> 4;
+    q->f = (d & 0xF) << 4;
+}
+
 static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
                                               lv_draw_mask_radius_param_t * p)
 {
@@ -1083,7 +1099,10 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
 
             /*Set all points which are crossed by the circle*/
             for(; i <= x1.i; i++) {
-                lv_sqrt(r2 - (i * i), &y_next, sqrt_mask);
+
+                sqrt_approx(&y_next, &y_prev, r2 - (i * i));
+
+//                lv_sqrt(r2 - (i * i), &y_next, sqrt_mask);
 
                 m = (y_prev.f + y_next.f) >> 1;
                 if(outer) m = 255 - m;
@@ -1212,15 +1231,3 @@ static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_t mask_new)
     return (int32_t)((int32_t)(mask_act * mask_new) >> 8);
 
 }
-
-
-static inline sqrt_approx(lv_sqrt_res_t * q, lv_sqrt_res_t * ref, uint32_t x)
-{
-    uint32_t raw = (ref->i << 4) + (ref->f >> 4);
-
-
-
-}
-
-
-

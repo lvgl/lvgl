@@ -19,7 +19,6 @@
  *      DEFINES
  *********************/
 #define LV_OBJX_NAME "lv_linemeter"
-#define LV_LINEMETER_PRECISE    0      /*Draw line more precisely at cost of performance*/
 
 /**********************
  *      TYPEDEFS

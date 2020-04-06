@@ -127,20 +127,56 @@ static inline lv_coord_t lv_font_get_line_height(const lv_font_t * font_p)
 
 #define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
 
-#if LV_FONT_ROBOTO_12
-LV_FONT_DECLARE(lv_font_roboto_12)
+#if LV_FONT_MONTSERRAT_12
+LV_FONT_DECLARE(lv_font_montserrat_12)
 #endif
 
-#if LV_FONT_ROBOTO_16
-LV_FONT_DECLARE(lv_font_roboto_16)
+#if LV_FONT_MONTSERRAT_14
+LV_FONT_DECLARE(lv_font_montserrat_14)
 #endif
 
-#if LV_FONT_ROBOTO_22
-LV_FONT_DECLARE(lv_font_roboto_22)
+#if LV_FONT_MONTSERRAT_16
+LV_FONT_DECLARE(lv_font_montserrat_16)
 #endif
 
-#if LV_FONT_ROBOTO_28
-LV_FONT_DECLARE(lv_font_roboto_28)
+#if LV_FONT_MONTSERRAT_18
+LV_FONT_DECLARE(lv_font_montserrat_18)
+#endif
+
+#if LV_FONT_MONTSERRAT_20
+LV_FONT_DECLARE(lv_font_montserrat_20)
+#endif
+
+#if LV_FONT_MONTSERRAT_22
+LV_FONT_DECLARE(lv_font_montserrat_22)
+#endif
+
+#if LV_FONT_MONTSERRAT_24
+LV_FONT_DECLARE(lv_font_montserrat_24)
+#endif
+
+#if LV_FONT_MONTSERRAT_26
+LV_FONT_DECLARE(lv_font_montserrat_26)
+#endif
+
+#if LV_FONT_MONTSERRAT_28
+LV_FONT_DECLARE(lv_font_montserrat_28)
+#endif
+
+#if LV_FONT_MONTSERRAT_30
+LV_FONT_DECLARE(lv_font_montserrat_30)
+#endif
+
+#if LV_FONT_MONTSERRAT_32
+LV_FONT_DECLARE(lv_font_montserrat_32)
+#endif
+
+#if LV_FONT_MONTSERRAT_28_COMPRESSED
+LV_FONT_DECLARE(lv_font_montserrat_28_compressed)
+#endif
+
+#if LV_FONT_MONTSERRAT_12_SUBPX
+LV_FONT_DECLARE(lv_font_montserrat_12_subpx)
 #endif
 
 #if LV_FONT_UNSCII_8
