@@ -79,10 +79,6 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->range_max          = 99999;
     ext->range_min          = -99999;
 
-    lv_textarea_set_one_line(spinbox, true);
-    lv_textarea_set_cursor_click_pos(spinbox, true);
-
-    lv_theme_apply(spinbox, LV_THEME_SPINBOX);
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(spinbox, lv_spinbox_signal);
@@ -93,6 +89,10 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
         /* No scrolling will happen here so make the scrollable non-clickable
          * It allows to handle input events in the bg object only.*/
         lv_obj_set_click(lv_page_get_scrl(spinbox), false);
+        lv_textarea_set_one_line(spinbox, true);
+        lv_textarea_set_cursor_click_pos(spinbox, true);
+        lv_obj_set_width(spinbox, LV_DPI);
+        lv_theme_apply(spinbox, LV_THEME_SPINBOX);
     }
     /*Copy an existing spinbox*/
     else {
