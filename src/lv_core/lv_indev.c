@@ -358,6 +358,7 @@ lv_res_t lv_indev_finish_drag(lv_indev_t * indev)
  */
 void lv_indev_wait_release(lv_indev_t * indev)
 {
+    if(indev == NULL)return;
     indev->proc.wait_until_release = 1;
 }
 

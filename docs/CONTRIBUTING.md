@@ -19,7 +19,7 @@ But first, start with the most Frequently Asked Questions.
 
 We use the [Forum](https://forum.littlevgl.com/) to ask and answer questions and [GitHub's issue tracker](https://github.com/littlevgl/lvgl/issues) for development-related discussion.
 
-But there are some simple rules:
+We have some simple rules:
 - Be kind and friendly.
 - Speak about one thing in one issue/topic.
 - Give feedback and close the issue or mark the topic as solved if your question is answered. 

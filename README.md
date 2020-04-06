@@ -1,7 +1,7 @@
 <h1 align="center"> LittlevGL - Open-source Embedded GUI Library</h1>
 <p align="center">
 <a href="https://github.com/littlevgl/lvgl/blob/master/LICENCE.txt"><img src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
-<a href="https://github.com/littlevgl/lvgl/releases/tag/v6.0"><img src="https://img.shields.io/badge/version-6.0-blue.svg"></a>
+<a href="https://github.com/littlevgl/lvgl/releases/tag/v6.1.2"><img src="https://img.shields.io/badge/version-6.1.2-blue.svg"></a>
 </p>
 
 <p align="center">
@@ -71,7 +71,7 @@ Just to mention some **platforms**:
 - NXP Kinetis, LPC, iMX
 - [Linux frame buffer](https://blog.littlevgl.com/2018-01-03/linux_fb) (/dev/fb)
 - [Raspberry PI](http://www.vk3erw.com/index.php/16-software/63-raspberry-pi-official-7-touchscreen-and-littlevgl)
-- [Espressif ESP32](https://github.com/littlevgl/esp32_ili9431)
+- [Espressif ESP32](https://github.com/littlevgl/lv_port_esp32)
 - Nordic nrf52
 - Quectell M66
 

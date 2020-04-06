@@ -185,6 +185,20 @@ void lv_linemeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle)
     lv_obj_invalidate(lmeter);
 }
 
+/**
+ * Set the orientation of the meter growth, clockwise or counterclockwise (mirrored)
+ * @param lmeter pointer to a line meter object
+ * @param mirror mirror setting
+ */
+void lv_linemeter_set_mirror(lv_obj_t *lmeter, bool mirror) {
+    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+    if(ext->mirrored == mirror) return;
+
+    ext->mirrored = mirror;
+
+    lv_obj_invalidate(lmeter);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -264,6 +278,18 @@ uint16_t lv_linemeter_get_angle_offset(lv_obj_t * lmeter)
     lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
 
     return ext->angle_ofs;
+}
+
+/**
+ * get the mirror setting for the line meter
+ * @param lmeter pointer to a line meter object
+ * @return mirror (true or false)
+ */
+bool lv_linemeter_get_mirror(lv_obj_t * lmeter)
+{
+    lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
+
+    return ext->mirrored;
 }
 
 void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_t part)
