@@ -957,7 +957,6 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             lv_obj_clean_style_list(obj, LV_SWITCH_PART_INDIC);
             list = lv_obj_get_style_list(obj, LV_SWITCH_PART_INDIC);
             lv_style_list_add_style(list, &bar_indic);
-            lv_style_list_add_style(list, &bg);
 
             lv_obj_clean_style_list(obj, LV_SWITCH_PART_KNOB);
             list = lv_obj_get_style_list(obj, LV_SWITCH_PART_KNOB);
