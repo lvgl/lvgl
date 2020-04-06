@@ -532,6 +532,9 @@
 #ifndef LV_USE_THEME_MATERIAL
 #define LV_USE_THEME_MATERIAL    1   /*A fast and impressive theme*/
 #endif
+#ifndef LV_USE_THEME_MONO
+#define LV_USE_THEME_MONO        0   /*Mono-color theme for monochrome displays*/
+#endif
 
 #ifndef LV_THEME_DEFAULT_INIT
 #define LV_THEME_DEFAULT_INIT               lv_theme_material_init

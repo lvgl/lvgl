@@ -367,6 +367,7 @@ typedef void * lv_font_user_data_t;
 #define LV_USE_THEME_EMPTY       0   /*No theme, you can apply your styles as you need*/
 #define LV_USE_THEME_TEMPLATE    0   /*Simple to the create your theme based on it*/
 #define LV_USE_THEME_MATERIAL    1   /*A fast and impressive theme*/
+#define LV_USE_THEME_MONO        0   /*Mono-color theme for monochrome displays*/
 
 #define LV_THEME_DEFAULT_INIT               lv_theme_material_init
 #define LV_THEME_DEFAULT_COLOR_PRIMARY      LV_COLOR_RED
