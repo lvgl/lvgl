@@ -127,6 +127,8 @@ typedef struct {
         /* Invert the mask. 0: Keep the pixels inside.*/
         uint8_t outer: 1;
     } cfg;
+    int32_t y_prev;
+    lv_sqrt_res_t y_prev_x;
 
 } lv_draw_mask_radius_param_t;
 

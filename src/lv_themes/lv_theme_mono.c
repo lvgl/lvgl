@@ -488,7 +488,9 @@ void lv_theme_mono_apply(lv_obj_t * obj, lv_theme_style_t name)
             lv_obj_clean_style_list(obj, LV_OBJ_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_OBJ_PART_MAIN);
             lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_pad_none);
+            lv_style_list_add_style(list, &style_border_none);
+            lv_style_list_add_style(list, &style_no_radius);
+//            lv_style_list_add_style(list, &style_pad_none);
             break;
         case LV_THEME_OBJ:
             lv_obj_clean_style_list(obj, LV_OBJ_PART_MAIN);

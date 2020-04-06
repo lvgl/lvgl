@@ -1,3 +1,7 @@
+
+
+
+
 /**
  * @file lv_mask.c
  *
@@ -372,6 +376,9 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
     param->cfg.outer = inv ? 1 : 0;
     param->dsc.cb = (lv_draw_mask_cb_t)lv_draw_mask_radius;
     param->dsc.type = LV_DRAW_MASK_TYPE_RADIUS;
+    param->y_prev = INT32_MIN;
+    param->y_prev_x.f = 0;
+    param->y_prev_x.i = 0;
 }
 
 
@@ -939,18 +946,43 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
         if(radius <= 256) sqrt_mask = 0x800;
         else sqrt_mask = 0x8000;
 
+        lv_sqrt_res_t x0;
+        lv_sqrt_res_t x1;
         /* y = 0 should mean the top of the circle */
         int32_t y;
-        if(abs_y < radius)  y = radius - abs_y;
-        else y = radius - (h - abs_y) + 1;
+        if(abs_y < radius) {
+            y = radius - abs_y;
 
-        /* Get the x intersection points for `abs_y` and `abs_y+1`
-         * Use the circle's equation x = sqrt(r^2 - y^2) */
-        lv_sqrt_res_t x0;
-        lv_sqrt(r2 - (y * y), &x0, sqrt_mask);
+            /* Get the x intersection points for `abs_y` and `abs_y+1`
+             * Use the circle's equation x = sqrt(r^2 - y^2) */
+            if(y == p->y_prev) {
+                x0.f = p->y_prev_x.f;
+                x0.i = p->y_prev_x.i;
+            } else {
+                lv_sqrt(r2 - (y * y), &x0, sqrt_mask);
+            }
+            lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1, sqrt_mask);
+            p->y_prev = y-1;
+            p->y_prev_x.f = x1.f;
+            p->y_prev_x.i = x1.i;
+        }
+        else {
+            y = radius - (h - abs_y) + 1;
+            if((y-1) == p->y_prev) {
+                x1.f = p->y_prev_x.f;
+                x1.i = p->y_prev_x.i;
+            } else {
+                lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1, sqrt_mask);
+            }
 
-        lv_sqrt_res_t x1;
-        lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1, sqrt_mask);
+            lv_sqrt(r2 - (y * y), &x0, sqrt_mask);
+            p->y_prev = y;
+            p->y_prev_x.f = x0.f;
+            p->y_prev_x.i = x0.i;
+        }
+
+        printf("x0.i:%d, x0.f:%d, x1.i:%d, x1.f:%d\n", x0.i, x0.f, x1.i, x1.f);
+
 
         /* If x1 is on the next round coordinate (e.g. x0: 3.5, x1:4.0)
          * then treat x1 as x1: 3.99 to handle them as they were on the same pixel*/
@@ -1180,3 +1212,15 @@ static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_t mask_new)
     return (int32_t)((int32_t)(mask_act * mask_new) >> 8);
 
 }
+
+
+static inline sqrt_approx(lv_sqrt_res_t * q, lv_sqrt_res_t * ref, uint32_t x)
+{
+    uint32_t raw = (ref->i << 4) + (ref->f >> 4);
+
+
+
+}
+
+
+
