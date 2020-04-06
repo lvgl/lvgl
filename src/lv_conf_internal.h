@@ -441,27 +441,48 @@
  * To create a new font go to: https://littlevgl.com/ttf-font-to-c-array
  */
 
-/* Robot fonts with bpp = 4
- * https://fonts.google.com/specimen/Roboto  */
-#ifndef LV_FONT_ROBOTO_12
-#define LV_FONT_ROBOTO_12    0
+/* Montserrat fonts with bpp = 4
+ * https://fonts.google.com/specimen/Montserrat  */
+#ifndef LV_FONT_MONTSERRAT_12
+#define LV_FONT_MONTSERRAT_12    0
 #endif
-#ifndef LV_FONT_ROBOTO_16
-#define LV_FONT_ROBOTO_16    1
+#ifndef LV_FONT_MONTSERRAT_14
+#define LV_FONT_MONTSERRAT_14    0
 #endif
-#ifndef LV_FONT_ROBOTO_22
-#define LV_FONT_ROBOTO_22    0
+#ifndef LV_FONT_MONTSERRAT_16
+#define LV_FONT_MONTSERRAT_16    1
 #endif
-#ifndef LV_FONT_ROBOTO_28
-#define LV_FONT_ROBOTO_28    0
+#ifndef LV_FONT_MONTSERRAT_18
+#define LV_FONT_MONTSERRAT_18    0
+#endif
+#ifndef LV_FONT_MONTSERRAT_20
+#define LV_FONT_MONTSERRAT_20    0
+#endif
+#ifndef LV_FONT_MONTSERRAT_22
+#define LV_FONT_MONTSERRAT_22    0
+#endif
+#ifndef LV_FONT_MONTSERRAT_24
+#define LV_FONT_MONTSERRAT_24    0
+#endif
+#ifndef LV_FONT_MONTSERRAT_26
+#define LV_FONT_MONTSERRAT_26    0
+#endif
+#ifndef LV_FONT_MONTSERRAT_28
+#define LV_FONT_MONTSERRAT_28    0
+#endif
+#ifndef LV_FONT_MONTSERRAT_30
+#define LV_FONT_MONTSERRAT_30    0
+#endif
+#ifndef LV_FONT_MONTSERRAT_32
+#define LV_FONT_MONTSERRAT_32    0
 #endif
 
 /* Demonstrate special features */
-#ifndef LV_FONT_ROBOTO_12_SUBPX
-#define LV_FONT_ROBOTO_12_SUBPX 1
+#ifndef LV_FONT_MONTSERRAT_12_SUBPX
+#define LV_FONT_MONTSERRAT_12_SUBPX      0
 #endif
-#ifndef LV_FONT_ROBOTO_28_COMPRESSED
-#define LV_FONT_ROBOTO_28_COMPRESSED 1  /*bpp = 3*/
+#ifndef LV_FONT_MONTSERRAT_28_COMPRESSED
+#define LV_FONT_MONTSERRAT_28_COMPRESSED 0  /*bpp = 3*/
 #endif
 
 /*Pixel perfect monospace font
@@ -525,16 +546,16 @@
 #define LV_THEME_DEFAULT_FLAG               LV_THEME_MATERIAL_FLAG_LIGHT
 #endif
 #ifndef LV_THEME_DEFAULT_FONT_SMALL
-#define LV_THEME_DEFAULT_FONT_SMALL         &lv_font_roboto_16
+#define LV_THEME_DEFAULT_FONT_SMALL         &lv_font_montserrat_16
 #endif
 #ifndef LV_THEME_DEFAULT_FONT_NORMAL
-#define LV_THEME_DEFAULT_FONT_NORMAL        &lv_font_roboto_16
+#define LV_THEME_DEFAULT_FONT_NORMAL        &lv_font_montserrat_16
 #endif
 #ifndef LV_THEME_DEFAULT_FONT_SUBTITLE
-#define LV_THEME_DEFAULT_FONT_SUBTITLE      &lv_font_roboto_16
+#define LV_THEME_DEFAULT_FONT_SUBTITLE      &lv_font_montserrat_16
 #endif
 #ifndef LV_THEME_DEFAULT_FONT_TITLE
-#define LV_THEME_DEFAULT_FONT_TITLE         &lv_font_roboto_16
+#define LV_THEME_DEFAULT_FONT_TITLE         &lv_font_montserrat_16
 #endif
 
 /*=================
@@ -783,7 +804,7 @@
 #endif
 #if LV_USE_LED
 #ifndef LV_LED_BRIGHT_MIN
-#  define LV_LED_BRIGHT_MIN  120      /*Minimal brightness*/
+#  define LV_LED_BRIGHT_MIN  80      /*Minimal brightness*/
 #endif
 #ifndef LV_LED_BRIGHT_MAX
 #  define LV_LED_BRIGHT_MAX  255     /*Maximal brightness*/
