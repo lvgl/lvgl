@@ -438,7 +438,7 @@ static void gauge_init(void)
     lv_style_set_pad_left(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_right(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_top(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 10);
-    lv_style_set_pad_inner(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 7);
+    lv_style_set_pad_inner(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_scale_width(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_radius(&gauge_main, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
     lv_style_set_border_width(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 50);
@@ -558,6 +558,7 @@ static void cpicker_init(void)
     lv_style_set_bg_opa(&cpicker_indic, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_border_width(&cpicker_indic, LV_STATE_DEFAULT, 2);
     lv_style_set_border_color(&cpicker_indic, LV_STATE_DEFAULT, LV_COLOR_GRAY);
+    lv_style_set_border_color(&cpicker_indic, LV_STATE_FOCUSED, theme.color_primary);
     lv_style_set_pad_left(&cpicker_indic, LV_STATE_DEFAULT, LV_DPI / 15);
     lv_style_set_pad_right(&cpicker_indic, LV_STATE_DEFAULT, LV_DPI / 15);
     lv_style_set_pad_top(&cpicker_indic, LV_STATE_DEFAULT, LV_DPI / 15);
@@ -691,6 +692,7 @@ static void list_init(void)
 
     lv_style_set_border_side(&list_btn, LV_STATE_DEFAULT, LV_BORDER_SIDE_BOTTOM);
     lv_style_set_border_color(&list_btn, LV_STATE_DEFAULT, COLOR_BG_BORDER);
+    lv_style_set_border_color(&list_btn, LV_STATE_FOCUSED, theme.color_primary);
     lv_style_set_border_width(&list_btn, LV_STATE_DEFAULT, 1);
 
     lv_style_set_pad_left(&list_btn, LV_STATE_DEFAULT, LV_DPI / 10);
@@ -720,7 +722,7 @@ static void ddlist_init(void)
     lv_style_init(&ddlist_sel);
     lv_style_set_bg_opa(&ddlist_sel, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&ddlist_sel, LV_STATE_DEFAULT, theme.color_primary);
-    lv_style_set_text_color(&ddlist_sel, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex3(0x333) : lv_color_hex3(0xfff));
+    lv_style_set_text_color(&ddlist_sel, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex3(0xfff) : lv_color_hex3(0xfff));
     lv_style_set_bg_color(&ddlist_sel, LV_STATE_PRESSED, COLOR_BG_PR);
 #endif
 }
@@ -761,6 +763,7 @@ static void tabview_init(void)
     lv_style_set_text_color(&tabview_btns, LV_STATE_CHECKED, COLOR_SCR_TEXT);
     lv_style_set_pad_top(&tabview_btns, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_bottom(&tabview_btns, LV_STATE_DEFAULT, LV_DPI / 10);
+    lv_style_set_text_color(&tabview_btns, LV_STATE_FOCUSED, theme.color_primary);
 
     lv_style_init(&tabview_indic);
     lv_style_set_bg_opa(&tabview_indic, LV_STATE_DEFAULT, LV_OPA_COVER);
@@ -957,7 +960,6 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             lv_obj_clean_style_list(obj, LV_SWITCH_PART_INDIC);
             list = lv_obj_get_style_list(obj, LV_SWITCH_PART_INDIC);
             lv_style_list_add_style(list, &bar_indic);
-            lv_style_list_add_style(list, &bg);
 
             lv_obj_clean_style_list(obj, LV_SWITCH_PART_KNOB);
             list = lv_obj_get_style_list(obj, LV_SWITCH_PART_KNOB);
@@ -1223,6 +1225,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
 #if LV_USE_TABLE
         case LV_THEME_TABLE:
             lv_obj_clean_style_list(obj, LV_TABLE_PART_BG);
+            list = lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
+            lv_style_list_add_style(list, &bg);
 
             lv_obj_clean_style_list(obj, LV_TABLE_PART_CELL1);
             list = lv_obj_get_style_list(obj, LV_TABLE_PART_CELL1);

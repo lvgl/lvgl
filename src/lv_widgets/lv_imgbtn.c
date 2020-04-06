@@ -414,6 +414,7 @@ static void refr_img(lv_obj_t * imgbtn)
     lv_img_header_t header;
 
     const void * src = ext->img_src_mid[state];
+    if(src == NULL) return;
 
     lv_res_t info_res = LV_RES_OK;
     if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
