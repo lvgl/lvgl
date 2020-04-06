@@ -438,7 +438,7 @@ static void gauge_init(void)
     lv_style_set_pad_left(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_right(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_top(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 10);
-    lv_style_set_pad_inner(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 7);
+    lv_style_set_pad_inner(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_scale_width(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_radius(&gauge_main, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
     lv_style_set_border_width(&gauge_main, LV_STATE_DEFAULT, LV_DPI / 50);
@@ -1223,6 +1223,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
 #if LV_USE_TABLE
         case LV_THEME_TABLE:
             lv_obj_clean_style_list(obj, LV_TABLE_PART_BG);
+            list = lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
+            lv_style_list_add_style(list, &bg);
 
             lv_obj_clean_style_list(obj, LV_TABLE_PART_CELL1);
             list = lv_obj_get_style_list(obj, LV_TABLE_PART_CELL1);

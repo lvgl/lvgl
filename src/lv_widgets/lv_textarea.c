@@ -37,7 +37,6 @@
 #define LV_TEXTAREA_DEF_HEIGHT (1 * LV_DPI)
 
 #define LV_TEXTAREA_PWD_BULLET_UNICODE      0x2022
-#define LV_TEXTAREA_PWD_BULLET_UTF8         "\xE2\x80\xA2"
 
 /**********************
  *      TYPEDEFS
@@ -1629,7 +1628,7 @@ static void pwd_char_hider(lv_obj_t * ta)
         bool has_bullet;
         has_bullet = lv_font_get_glyph_dsc(font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, 0);
         const char * bullet;
-        if(has_bullet) bullet = LV_TEXTAREA_PWD_BULLET_UTF8;
+        if(has_bullet) bullet = LV_SYMBOL_BULLET;
         else bullet = "*";
 
         size_t bullet_len = strlen(bullet);

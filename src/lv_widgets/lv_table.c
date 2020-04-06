@@ -644,7 +644,9 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
         lv_txt_flag_t txt_flags;
 
         lv_style_int_t bg_top = lv_obj_get_style_pad_top(table, LV_TABLE_PART_BG);
+        lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_BG);
         lv_style_int_t bg_left = lv_obj_get_style_pad_left(table, LV_TABLE_PART_BG);
+        lv_style_int_t bg_right = lv_obj_get_style_pad_right(table, LV_TABLE_PART_BG);
 
         lv_draw_rect_dsc_t rect_dsc[LV_TABLE_CELL_STYLE_CNT];
         lv_draw_label_dsc_t label_dsc[LV_TABLE_CELL_STYLE_CNT];
@@ -682,7 +684,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
         uint16_t row;
         uint16_t cell = 0;
 
-        cell_area.y2 = table->coords.y1 + bg_top;
+        cell_area.y2 = table->coords.y1 + bg_top - 1;
         for(row = 0; row < ext->row_cnt; row++) {
             lv_coord_t h_row = get_row_height(table, row, font, letter_space, line_space,
                                               cell_left, cell_right, cell_top, cell_bottom);
@@ -692,7 +694,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
             if(cell_area.y1 > clip_area->y2) return LV_DESIGN_RES_OK;
 
-            cell_area.x2 = table->coords.x1 + bg_left;
+            cell_area.x2 = table->coords.x1 + bg_left - 1;
 
             for(col = 0; col < ext->col_cnt; col++) {
 
@@ -735,8 +737,10 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                 /*Expand the cell area with a half border to avoid drawing 2 borders next to each other*/
                 lv_area_t cell_area_border;
                 lv_area_copy(&cell_area_border, &cell_area);
-                cell_area_border.x2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
-                cell_area_border.y2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
+                if(cell_area_border.x1 > table->coords.x1 + bg_left) cell_area_border.x1 -= rect_dsc[cell_type].border_width / 2;
+                if(cell_area_border.y1 > table->coords.y1 + bg_top) cell_area_border.y1 -= rect_dsc[cell_type].border_width / 2;
+                if(cell_area_border.x2 < table->coords.x2 - bg_right - 1) cell_area_border.x2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
+                if(cell_area_border.y2 < table->coords.y2 - bg_bottom - 1) cell_area_border.y2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
 
                 lv_draw_rect(&cell_area_border, clip_area, &rect_dsc[cell_type]);
 
