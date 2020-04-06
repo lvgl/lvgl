@@ -950,9 +950,6 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
         lv_sqrt_res_t x0;
         lv_sqrt_res_t x1;
         /* y = 0 should mean the top of the circle */
-
-        static volatile uint32_t a = 0,b = 0;
-
         int32_t y;
         if(abs_y < radius) {
             y = radius - abs_y;
@@ -964,7 +961,6 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
                 x0.f = p->y_prev_x.f;
                 x0.i = p->y_prev_x.i;
             } else {
-                a++;
                 lv_sqrt(r2 - (y * y), &x0, sqrt_mask);
             }
             lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1, sqrt_mask);
@@ -982,7 +978,6 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
                 x1.f = p->y_prev_x.f;
                 x1.i = p->y_prev_x.i;
             } else {
-                a++;
                 lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1, sqrt_mask);
             }
 
@@ -992,7 +987,6 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
             p->y_prev_x.i = x0.i;
         }
 
-        b++;
         /* If x1 is on the next round coordinate (e.g. x0: 3.5, x1:4.0)
          * then treat x1 as x1: 3.99 to handle them as they were on the same pixel*/
         if(x0.i == x1.i - 1 && x1.f == 0) {
