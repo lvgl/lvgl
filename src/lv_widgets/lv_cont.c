@@ -558,11 +558,11 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
         /*If there is only one object in the row then align it to the middle*/
         else if(obj_num == 1) {
             lv_obj_align(child_rs, cont, LV_ALIGN_IN_TOP_MID,
-                    lv_obj_get_style_margin_left(child_rs, LV_OBJ_PART_MAIN),
+                    0,
                     act_y + lv_obj_get_style_margin_top(child_rs, LV_OBJ_PART_MAIN));
         }
         /*If there are two object in the row then align them proportionally*/
-        else if(obj_num == 2) {
+        else if(obj_num == 2 && 0) {
             lv_obj_t * obj1 = child_rs;
             lv_obj_t * obj2 = lv_ll_get_prev(&cont->child_ll, child_rs);
             w_row           = lv_obj_get_width(obj1) + lv_obj_get_width(obj2);

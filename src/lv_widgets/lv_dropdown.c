@@ -53,12 +53,8 @@ static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint1
 static lv_res_t page_release_handler(lv_obj_t * page);
 static void page_press_handler(lv_obj_t * page);
 static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t x, lv_coord_t y);
-static void pos_selected(lv_obj_t * ddlist);
+static void position_to_selected(lv_obj_t * ddlist);
 static lv_obj_t * get_label(const lv_obj_t * ddlist);
-#if LV_USE_ANIMATION
-    static void list_anim(void * p, lv_anim_value_t v);
-    static void close_anim_ready(lv_anim_t * a);
-#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -117,7 +113,6 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->option_cnt      = 0;
     ext->dir = LV_DROPDOWN_DIR_DOWN;
     ext->max_height = (3 * lv_disp_get_ver_res(NULL)) / 4;
-    ext->anim_time = LV_DROPDOWN_DEF_ANIM_TIME;
     lv_style_list_init(&ext->style_page);
     lv_style_list_init(&ext->style_scrlbar);
     lv_style_list_init(&ext->style_selected);
@@ -143,7 +138,6 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->sel_opt_id_orig = copy_ext->sel_opt_id;
         ext->symbol           = copy_ext->symbol;
         ext->max_height      = copy_ext->max_height;
-        ext->anim_time      = copy_ext->anim_time;
         ext->text      = copy_ext->text;
         ext->dir      = copy_ext->dir;
         ext->show_selected      = copy_ext->show_selected;
@@ -429,20 +423,6 @@ void lv_dropdown_set_show_selected(lv_obj_t * ddlist, bool show)
     lv_obj_invalidate(ddlist);
 }
 
-/**
- * Set the open/close animation time.
- * @param ddlist pointer to a drop down list
- * @param anim_time: open/close animation time [ms]
- */
-void lv_dropdown_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time)
-{
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
-
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    ext->anim_time = anim_time;
-}
-
-
 /*=====================
  * Getter functions
  *====================*/
@@ -589,20 +569,6 @@ bool lv_dropdown_get_show_selected(lv_obj_t * ddlist)
 
 }
 
-/**
- * Get the open/close animation time.
- * @param ddlist pointer to a drop down list
- * @return open/close animation time [ms]
- */
-uint16_t lv_dropdown_get_anim_time(const lv_obj_t * ddlist)
-{
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
-
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-
-    return ext->anim_time;
-}
-
 /*=====================
  * Other functions
  *====================*/
@@ -610,13 +576,9 @@ uint16_t lv_dropdown_get_anim_time(const lv_obj_t * ddlist)
 /**
  * Open the drop down list with or without animation
  * @param ddlist pointer to drop down list object
- * @param anim_en LV_ANIM_EN: use animation; LV_ANIM_OFF: not use animations
  */
-void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
+void lv_dropdown_open(lv_obj_t * ddlist)
 {
-#if LV_USE_ANIMATION == 0
-    (void) anim;    /*Unused*/
-#endif
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     if(ext->page) return;
 
@@ -660,87 +622,60 @@ void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim)
 
     if(list_h > ext->max_height) list_h = ext->max_height;
 
+    lv_dropdown_dir_t dir = ext->dir;
+    /*No place on the bottom? See if top is better.*/
+    if(ext->dir == LV_DROPDOWN_DIR_DOWN) {
+        if(ddlist->coords.y2 + list_h > LV_VER_RES) {
+            if(ddlist->coords.y1 > LV_VER_RES - ddlist->coords.y2) {
+                /*There is more space on the top, so make it drop up*/
+                dir = LV_DROPDOWN_DIR_UP;
+                list_h = ddlist->coords.y1;
+            } else {
+                list_h = LV_VER_RES - ddlist->coords.y2;
+            }
+        }
+    }
+    /*No place on the top? See if bottom is better.*/
+    else if(ext->dir == LV_DROPDOWN_DIR_UP) {
+        if(ddlist->coords.y1 - list_h < 0) {
+            if(ddlist->coords.y1 < LV_VER_RES - ddlist->coords.y2) {
+                /*There is more space on the top, so make it drop up*/
+                dir = LV_DROPDOWN_DIR_DOWN;
+                list_h = LV_VER_RES - ddlist->coords.y2;
+            } else {
+                list_h = ddlist->coords.y1;
+            }
+        }
+    }
+
     lv_obj_set_height(ext->page, list_h);
 
-    pos_selected(ddlist);
+    position_to_selected(ddlist);
 
-    if(ext->dir == LV_DROPDOWN_DIR_DOWN)      lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
-    else if(ext->dir == LV_DROPDOWN_DIR_UP)   lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
-    else if(ext->dir == LV_DROPDOWN_DIR_LEFT) lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_LEFT_TOP, 0, 0);
-    else if(ext->dir == LV_DROPDOWN_DIR_RIGHT)lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
+    if(dir == LV_DROPDOWN_DIR_DOWN)      lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+    else if(dir == LV_DROPDOWN_DIR_UP)   lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_TOP_LEFT, 0, 0);
+    else if(dir == LV_DROPDOWN_DIR_LEFT) lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_LEFT_TOP, 0, 0);
+    else if(dir == LV_DROPDOWN_DIR_RIGHT)lv_obj_align(ext->page, ddlist, LV_ALIGN_OUT_RIGHT_TOP, 0, 0);
 
-    lv_obj_t * scr = lv_scr_act();
-    bool moved = false;
-    if(ext->dir != LV_DROPDOWN_DIR_UP) {
-        if(ext->page->coords.y2 > scr->coords.y2) {
-            lv_obj_set_y(ext->page, lv_obj_get_y(ext->page) - (ext->page->coords.y2 - scr->coords.y2));
-            moved = true;
+    if(ext->dir == LV_DROPDOWN_DIR_LEFT || ext->dir == LV_DROPDOWN_DIR_RIGHT) {
+        if(ext->page->coords.y2 > LV_VER_RES) {
+            lv_obj_set_y(ext->page, lv_obj_get_y(ext->page) - (ext->page->coords.y2 - LV_VER_RES));
         }
     }
-    else {
-        if(ext->page->coords.y1 < 0) {
-            lv_obj_set_y(ext->page, 0);
-            moved = true;
-        }
-    }
-
-#if LV_USE_ANIMATION
-    if(anim == LV_ANIM_ON && ext->dir != LV_DROPDOWN_DIR_UP && !moved) {
-        lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_var(&a, ddlist);
-        lv_anim_set_exec_cb(&a, list_anim);
-        lv_anim_set_values(&a, 0, lv_obj_get_height(ext->page));
-        lv_anim_set_time(&a, ext->anim_time);
-        lv_anim_start(&a);
-    }
-#else
-    (void)moved;        /*Unused*/
-#endif
 }
 
 /**
  * Close (Collapse) the drop down list
  * @param ddlist pointer to drop down list object
- * @param anim_en LV_ANIM_ON: use animation; LV_ANIM_OFF: not use animations
  */
-void lv_dropdown_close(lv_obj_t * ddlist, lv_anim_enable_t anim)
+void lv_dropdown_close(lv_obj_t * ddlist)
 {
-#if LV_USE_ANIMATION == 0
-    anim = false;
-#endif
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     if(ext->page == NULL) return;
 
     ext->pr_opt_id = LV_DROPDOWN_PR_NONE;
-
-    if(ext->anim_time == 0 || anim == LV_ANIM_OFF) {
-#if LV_USE_ANIMATION
-        lv_anim_del(ddlist, list_anim);
-#endif
-        lv_obj_del(ext->page);
-        ext->page = NULL;
-    }
-    else {
-#if LV_USE_ANIMATION
-        if(ext->dir != LV_DROPDOWN_DIR_UP) {
-            lv_anim_t a;
-            lv_anim_init(&a);
-            lv_anim_set_var(&a, ddlist);
-            lv_anim_set_exec_cb(&a, list_anim);
-            lv_anim_set_values(&a, lv_obj_get_height(ext->page), 0);
-            lv_anim_set_time(&a, ext->anim_time);
-            lv_anim_set_ready_cb(&a, close_anim_ready);
-            lv_anim_start(&a);
-        }
-        else {
-            lv_anim_del(ddlist, list_anim);
-            lv_obj_del(ext->page);
-            ext->page = NULL;
-        }
-#endif
-    }
-
+    lv_obj_del(ext->page);
+    ext->page = NULL;
 }
 
 /**********************
@@ -934,7 +869,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
         }
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
-        lv_dropdown_close(ddlist, LV_ANIM_OFF);
+        lv_dropdown_close(ddlist);
         if(ext->static_txt == 0) {
             lv_mem_free(ext->options);
             ext->options = NULL;
@@ -956,27 +891,27 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
         /*Encoders need special handling*/
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             /*Open the list if editing*/
-            if(editing) lv_dropdown_open(ddlist, LV_ANIM_ON);
+            if(editing) lv_dropdown_open(ddlist);
             /*Close the list if navigating*/
             else
-                lv_dropdown_close(ddlist, LV_ANIM_ON);
+                lv_dropdown_close(ddlist);
         }
 #endif
     }
     else if(sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_LEAVE) {
-        lv_dropdown_close(ddlist, LV_ANIM_ON);
+        lv_dropdown_close(ddlist);
     }
     else if(sign == LV_SIGNAL_RELEASED) {
         if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
             if(ext->page) {
-                lv_dropdown_close(ddlist, LV_ANIM_ON);
+                lv_dropdown_close(ddlist);
                 if(ext->sel_opt_id_orig != ext->sel_opt_id) {
                     ext->sel_opt_id_orig = ext->sel_opt_id;
                     lv_obj_invalidate(ddlist);
                 }
             }
             else {
-                lv_dropdown_open(ddlist, LV_ANIM_ON);
+                lv_dropdown_open(ddlist);
             }
         }
         else {
@@ -985,7 +920,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
         }
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {
-        if(ext->page) lv_dropdown_close(ddlist, LV_ANIM_OFF);
+        if(ext->page) lv_dropdown_close(ddlist);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_style_int_t top = lv_obj_get_style_pad_top(ddlist, LV_DROPDOWN_PART_MAIN);
@@ -999,26 +934,26 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(ext->page == NULL) {
-                lv_dropdown_open(ddlist, LV_ANIM_ON);
+                lv_dropdown_open(ddlist);
             }
             else if(ext->sel_opt_id + 1 < ext->option_cnt) {
                 ext->sel_opt_id++;
-                pos_selected(ddlist);
+                position_to_selected(ddlist);
             }
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
 
             if(ext->page == NULL) {
-                lv_dropdown_open(ddlist, LV_ANIM_ON);
+                lv_dropdown_open(ddlist);
             }
             else if(ext->sel_opt_id > 0) {
                 ext->sel_opt_id--;
-                pos_selected(ddlist);
+                position_to_selected(ddlist);
             }
         }
         else if(c == LV_KEY_ESC) {
             ext->sel_opt_id = ext->sel_opt_id_orig;
-            lv_dropdown_close(ddlist, LV_ANIM_ON);
+            lv_dropdown_close(ddlist);
         }
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
@@ -1262,7 +1197,7 @@ static lv_res_t page_release_handler(lv_obj_t * page)
         ext->sel_opt_id_orig = ext->sel_opt_id;
     }
 
-    lv_dropdown_close(ddlist, LV_ANIM_ON);
+    lv_dropdown_close(ddlist);
 
     /*Invalidate to refresh the text*/
     if(ext->show_selected) lv_obj_invalidate(ddlist);
@@ -1322,7 +1257,7 @@ static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t x, lv_coord_t y)
  * Set the position of list when it is closed to show the selected item
  * @param ddlist pointer to a drop down list
  */
-static void pos_selected(lv_obj_t * ddlist)
+static void position_to_selected(lv_obj_t * ddlist)
 {
     lv_dropdown_ext_t * ext          = lv_obj_get_ext_attr(ddlist);
 
@@ -1350,22 +1285,5 @@ static lv_obj_t * get_label(const lv_obj_t * ddlist)
 
     return lv_obj_get_child(lv_page_get_scrl(ext->page), NULL);
 }
-
-#if LV_USE_ANIMATION
-static void list_anim(void * p, lv_anim_value_t v)
-{
-    lv_obj_t * ddlist = p;
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    lv_obj_set_height(ext->page, v);
-}
-
-static void close_anim_ready(lv_anim_t * a)
-{
-    lv_obj_t * ddlist = a->var;
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    lv_obj_del(ext->page);
-    ext->page = NULL;
-}
-#endif
 
 #endif

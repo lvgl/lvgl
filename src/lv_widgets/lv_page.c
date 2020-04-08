@@ -393,7 +393,7 @@ lv_coord_t lv_page_get_width_grid(lv_obj_t * page, uint8_t div, uint8_t span)
     lv_coord_t obj_w = lv_page_get_width_fit(page);
     lv_style_int_t pinner = lv_obj_get_style_pad_inner(page, LV_PAGE_PART_SCRL);
 
-    lv_coord_t r = obj_w / div - (div - 1) * pinner;
+    lv_coord_t r = (obj_w - (div - 1) * pinner) / div;
 
     r = r * span + (span - 1) * pinner;
     return r;
@@ -415,7 +415,7 @@ lv_coord_t lv_page_get_height_grid(lv_obj_t * page, uint8_t div, uint8_t span)
     lv_coord_t obj_h = lv_page_get_height_fit(page);
     lv_style_int_t pinner = lv_obj_get_style_pad_inner(page, LV_PAGE_PART_SCRL);
 
-    lv_coord_t r = obj_h / div - (div - 1) * pinner;
+    lv_coord_t r = (obj_h - (div - 1) * pinner) / div;
 
     r = r * span + (span - 1) * pinner;
     return r;

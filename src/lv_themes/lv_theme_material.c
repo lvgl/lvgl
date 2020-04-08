@@ -42,11 +42,11 @@
 #define COLOR_BG_PR_CHK     lv_color_darken(theme.color_primary, LV_OPA_20)
 #define COLOR_BG_DIS        COLOR_BG
 
-#define COLOR_BG_BORDER         (IS_LIGHT ? lv_color_hex(0xdfe7ed) : lv_color_hex(0x404040))
+#define COLOR_BG_BORDER         (IS_LIGHT ? lv_color_hex(0xd6dde3) : lv_color_hex(0x404040))   /*dfe7ed*/
 #define COLOR_BG_BORDER_PR      (IS_LIGHT ? lv_color_hex3(0xccc) : lv_color_hex(0x404040))
 #define COLOR_BG_BORDER_CHK     (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0x404040))
 #define COLOR_BG_BORDER_CHK_PR  (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0x404040))
-#define COLOR_BG_BORDER_DIS     (IS_LIGHT ? lv_color_hex(0xdfe7ed) : lv_color_hex(0x404040))
+#define COLOR_BG_BORDER_DIS     (IS_LIGHT ? lv_color_hex(0xd6dde3) : lv_color_hex(0x404040))
 
 #define COLOR_BG_TEXT           (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0xffffff))
 #define COLOR_BG_TEXT_PR        (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0xffffff))
@@ -275,8 +275,8 @@ static void basic_init(void)
     lv_style_set_value_color(&btn, LV_STATE_CHECKED | LV_STATE_PRESSED, lv_color_hex(0xffffff));
     lv_style_set_value_color(&btn, LV_STATE_DISABLED, IS_LIGHT ? lv_color_hex(0x888888) : lv_color_hex(0x888888));
 
-    lv_style_set_pad_left(&btn, LV_STATE_DEFAULT, LV_DPI / 7);
-    lv_style_set_pad_right(&btn, LV_STATE_DEFAULT, LV_DPI / 7);
+    lv_style_set_pad_left(&btn, LV_STATE_DEFAULT, LV_DPI / 5);
+    lv_style_set_pad_right(&btn, LV_STATE_DEFAULT, LV_DPI / 5);
     lv_style_set_pad_top(&btn, LV_STATE_DEFAULT, LV_DPI / 15);
     lv_style_set_pad_bottom(&btn, LV_STATE_DEFAULT, LV_DPI / 15);
     lv_style_set_pad_inner(&btn, LV_STATE_DEFAULT, LV_DPI / 10);
@@ -391,8 +391,8 @@ static void slider_init(void)
     lv_style_set_pad_bottom(&slider_knob, LV_STATE_DEFAULT, LV_DPI / 20);
 
     lv_style_init(&slider_bg);
-    lv_style_set_margin_left(&slider_bg, LV_STATE_DEFAULT, LV_DPI / 20);
-    lv_style_set_margin_right(&slider_bg, LV_STATE_DEFAULT, LV_DPI / 20);
+    lv_style_set_margin_left(&slider_bg, LV_STATE_DEFAULT, LV_DPI / 12);
+    lv_style_set_margin_right(&slider_bg, LV_STATE_DEFAULT, LV_DPI / 12);
     lv_style_set_margin_top(&slider_bg, LV_STATE_DEFAULT, LV_DPI / 20);
     lv_style_set_margin_bottom(&slider_bg, LV_STATE_DEFAULT, LV_DPI / 20);
 
@@ -460,12 +460,12 @@ static void gauge_init(void)
 
     lv_style_init(&gauge_needle);
     lv_style_set_line_color(&gauge_needle, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x464b5b) : LV_COLOR_WHITE);
-    lv_style_set_line_width(&gauge_needle, LV_STATE_DEFAULT, LV_DPI / 20);
+    lv_style_set_line_width(&gauge_needle, LV_STATE_DEFAULT, LV_DPI / 25);
     lv_style_set_bg_opa(&gauge_needle, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&gauge_needle, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x464b5b) : LV_COLOR_WHITE);
     lv_style_set_radius(&gauge_needle, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
     lv_style_set_size(&gauge_needle, LV_STATE_DEFAULT, LV_DPI / 7);
-    lv_style_set_pad_inner(&gauge_needle, LV_STATE_DEFAULT, LV_DPI / 10);
+    lv_style_set_pad_inner(&gauge_needle, LV_STATE_DEFAULT, LV_DPI / 20);
 #endif
 }
 
@@ -605,8 +605,9 @@ static void keyboard_init(void)
 #if LV_USE_KEYBOARD
     lv_style_init(&kb_bg);
     lv_style_set_radius(&kb_bg, LV_STATE_DEFAULT, 0);
-    lv_style_set_border_width(&kb_bg, LV_STATE_DEFAULT, (LV_DPI / 40 > 0 ? LV_DPI / 40 : 1));
+    lv_style_set_border_width(&kb_bg, LV_STATE_DEFAULT, (LV_DPI / 50 > 0 ? LV_DPI / 50 : 1));
     lv_style_set_border_side(&kb_bg, LV_STATE_DEFAULT, LV_BORDER_SIDE_TOP);
+    lv_style_set_border_color(&kb_bg, LV_STATE_DEFAULT, COLOR_BG_TEXT);
     lv_style_set_pad_left(&kb_bg, LV_STATE_DEFAULT,  LV_DPI / 20);
     lv_style_set_pad_right(&kb_bg, LV_STATE_DEFAULT, LV_DPI / 20);
     lv_style_set_pad_top(&kb_bg, LV_STATE_DEFAULT,  LV_DPI / 20);
@@ -733,6 +734,7 @@ static void ddlist_init(void)
     lv_style_set_bg_color(&ddlist_sel, LV_STATE_DEFAULT, theme.color_primary);
     lv_style_set_text_color(&ddlist_sel, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex3(0xfff) : lv_color_hex3(0xfff));
     lv_style_set_bg_color(&ddlist_sel, LV_STATE_PRESSED, COLOR_BG_PR);
+    lv_style_set_text_color(&ddlist_sel, LV_STATE_PRESSED, COLOR_BG_TEXT_PR);
 #endif
 }
 
@@ -1009,6 +1011,7 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_ARC:
             lv_obj_clean_style_list(obj, LV_ARC_PART_BG);
             list = lv_obj_get_style_list(obj, LV_ARC_PART_BG);
+            lv_style_list_add_style(list, &bg);
             lv_style_list_add_style(list, &arc_bg);
 
             lv_obj_clean_style_list(obj, LV_ARC_PART_INDIC);
