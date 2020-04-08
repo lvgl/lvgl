@@ -1301,6 +1301,17 @@ static void draw_x_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
     lv_coord_t y_ofs = series_area->y1;
     lv_coord_t h     = lv_area_get_height(series_area);
     lv_coord_t w     = lv_area_get_width(series_area);
+
+    /* The columns don't start at the most right position
+     * so change the width and offset accordingly. */
+    if(ext->type == LV_CHART_TYPE_COLUMN) {
+        uint32_t ser_num = lv_ll_get_len(&ext->series_ll);
+        lv_coord_t col_w = w / ((ser_num + 1) * ext->point_cnt); /* Suppose + 1 series as separator*/
+        x_ofs += col_w / 2 + (col_w * (ser_num) / 2);
+        w -= col_w * ser_num + col_w;
+    }
+
+
     char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN + 1]; /* up to N symbols per label + null terminator */
 
     /* calculate the size of tick marks */

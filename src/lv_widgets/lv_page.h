@@ -258,14 +258,40 @@ bool lv_page_get_edge_flash(lv_obj_t * page);
  * @param page pointer to a page object
  * @return the width which still fits into the page
  */
-lv_coord_t lv_page_get_fit_width(lv_obj_t * page);
+lv_coord_t lv_page_get_width_fit(lv_obj_t * page);
 
 /**
  * Get that height which can be set to the children to still not cause overflow (show scrollbars)
  * @param page pointer to a page object
  * @return the height which still fits into the page
  */
-lv_coord_t lv_page_get_fit_height(lv_obj_t * page);
+lv_coord_t lv_page_get_height_fit(lv_obj_t * page);
+
+/**
+ * Divide the width of the object and get the width of a given number of columns.
+ * Take into account the paddings of the background and scrollbale too.
+ * @param page pointer to an object
+ * @param div indicates how many columns are assumed.
+ * If 1 the width will be set the the parent's width
+ * If 2 only half parent width - inner padding of the parent
+ * If 3 only third parent width - 2 * inner padding of the parent
+ * @param span how many columns are combined
+ * @return the width according to the given parameters
+ */
+lv_coord_t lv_page_get_width_grid(lv_obj_t * page, uint8_t div, uint8_t span);
+
+/**
+ * Divide the height of the object and get the width of a given number of columns.
+ * Take into account the paddings of the background and scrollbale too.
+ * @param page pointer to an object
+ * @param div indicates how many rows are assumed.
+ * If 1 the height will be set the the parent's height
+ * If 2 only half parent height - inner padding of the parent
+ * If 3 only third parent height - 2 * inner padding of the parent
+ * @param span how many rows are combined
+ * @return the height according to the given parameters
+ */
+lv_coord_t lv_page_get_height_grid(lv_obj_t * page, uint8_t div, uint8_t span);
 
 /**
  * Get width of the scrollable part of a page

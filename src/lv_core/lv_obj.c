@@ -40,9 +40,8 @@
  *      DEFINES
  *********************/
 #define LV_OBJX_NAME "lv_obj"
-#define LV_OBJ_DEF_WIDTH    (LV_DPI)
-#define LV_OBJ_DEF_HEIGHT   (2 * LV_DPI / 3)
-#define LV_DRAW_RECT_CACHE_SIZE     0
+#define LV_OBJ_DEF_WIDTH    (LV_DPI / 2)
+#define LV_OBJ_DEF_HEIGHT   (LV_DPI / 4)
 
 /**********************
  *      TYPEDEFS
@@ -802,6 +801,35 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
 }
 
 /**
+ * Set the width of an object by taking the left and right margin into account.
+ * The object heigwidthht will be `obj_w = w - margon_left - margin_right`
+ * @param obj pointer to an object
+ * @param w new height including margins
+ */
+void lv_obj_set_width_margin(lv_obj_t * obj, lv_coord_t w)
+{
+    lv_style_int_t mleft = lv_obj_get_style_margin_left(obj, LV_OBJ_PART_MAIN);
+    lv_style_int_t mright = lv_obj_get_style_margin_right(obj, LV_OBJ_PART_MAIN);
+
+    lv_obj_set_width(obj, w - mleft - mright);
+}
+
+/**
+ * Set the height of an object by taking the top and bottom margin into account.
+ * The object height will be `obj_h = h - margon_top - margin_bottom`
+ * @param obj pointer to an object
+ * @param h new height including margins
+ */
+void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h)
+{
+    lv_style_int_t mtop = lv_obj_get_style_margin_top(obj, LV_OBJ_PART_MAIN);
+    lv_style_int_t mbottom = lv_obj_get_style_margin_bottom(obj, LV_OBJ_PART_MAIN);
+
+    lv_obj_set_height(obj, h - mtop - mbottom);
+}
+
+
+/**
  * Align an object to an other object.
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
@@ -1258,6 +1286,10 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop)
         case LV_STYLE_PAD_LEFT:
         case LV_STYLE_PAD_RIGHT:
         case LV_STYLE_PAD_INNER:
+        case LV_STYLE_MARGIN_TOP:
+        case LV_STYLE_MARGIN_BOTTOM:
+        case LV_STYLE_MARGIN_LEFT:
+        case LV_STYLE_MARGIN_RIGHT:
         case LV_STYLE_OUTLINE_WIDTH:
         case LV_STYLE_OUTLINE_PAD:
         case LV_STYLE_OUTLINE_OPA:
@@ -1287,6 +1319,17 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop)
     if(real_refr) {
         lv_obj_invalidate(obj);
         obj->signal_cb(obj, LV_SIGNAL_STYLE_CHG, NULL);
+
+        switch(prop) {
+            case LV_STYLE_PROP_ALL:
+            case LV_STYLE_MARGIN_TOP:
+            case LV_STYLE_MARGIN_BOTTOM:
+            case LV_STYLE_MARGIN_LEFT:
+            case LV_STYLE_MARGIN_RIGHT:
+                if(obj->parent) obj->parent->signal_cb(obj->parent, LV_SIGNAL_CHILD_CHG, NULL);
+                break;
+        }
+
         lv_obj_invalidate(obj);
 
         if(prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_INHERIT_MASK))
@@ -2085,6 +2128,76 @@ lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
     lv_style_int_t bottom =  lv_obj_get_style_pad_bottom((lv_obj_t *)obj, LV_OBJ_PART_MAIN);
 
     return lv_obj_get_height(obj) - top - bottom;
+}
+
+/**
+ * Get the height of an object by taking the top and bottom margin into account.
+ * The returned height will be `obj_h + margon_top + margin_bottom`
+ * @param obj pointer to an object
+ * @return the height including thee margins
+ */
+lv_coord_t lv_obj_get_height_margin(lv_obj_t * obj)
+{
+    lv_style_int_t mtop = lv_obj_get_style_margin_top(obj, LV_OBJ_PART_MAIN);
+    lv_style_int_t mbottom = lv_obj_get_style_margin_bottom(obj, LV_OBJ_PART_MAIN);
+
+    return lv_obj_get_height(obj) + mtop + mbottom;
+}
+
+/**
+ * Get the width of an object by taking the left and right margin into account.
+ * The returned width will be `obj_w + margon_left + margin_right`
+ * @param obj pointer to an object
+ * @return the height including thee margins
+ */
+lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj)
+{
+    lv_style_int_t mleft = lv_obj_get_style_margin_left(obj, LV_OBJ_PART_MAIN);
+    lv_style_int_t mright = lv_obj_get_style_margin_right(obj, LV_OBJ_PART_MAIN);
+
+    return lv_obj_get_width(obj) + mleft + mright;
+}
+
+/**
+ * Set that width reduced by the left and right padding of the parent.
+ * @param obj pointer to an object
+ * @param div indicates how many columns are assumed.
+ * If 1 the width will be set the the parent's width
+ * If 2 only half parent width - inner padding of the parent
+ * If 3 only third parent width - 2 * inner padding of the parent
+ * @param span how many columns are combined
+ * @return the width according to the given parameters
+ */
+lv_coord_t lv_obj_get_width_grid(lv_obj_t * obj, uint8_t div, uint8_t span)
+{
+    lv_coord_t obj_w = lv_obj_get_width_fit(obj);
+    lv_style_int_t pinner = lv_obj_get_style_pad_inner(obj, LV_OBJ_PART_MAIN);
+
+    lv_coord_t r = (obj_w - (div - 1) * pinner) / div;
+
+    r = r * span + (span - 1) * pinner;
+    return r;
+}
+
+/**
+ * Get that height reduced by the top and bottom padding of the parent.
+ * @param obj pointer to an object
+ * @param div indicates how many rows are assumed.
+ * If 1 the height will be set the the parent's height
+ * If 2 only half parent height - inner padding of the parent
+ * If 3 only third parent height - 2 * inner padding of the parent
+ * @param span how many rows are combined
+ * @return the height according to the given parameters
+ */
+lv_coord_t lv_obj_get_height_grid(lv_obj_t * obj, uint8_t div, uint8_t span)
+{
+    lv_coord_t obj_h = lv_obj_get_height_fit(obj);
+    lv_style_int_t pinner = lv_obj_get_style_pad_inner(obj, LV_OBJ_PART_MAIN);
+
+    lv_coord_t r = (obj_h - (div - 1) * pinner) / div;
+
+    r = r * span + (span - 1) * pinner;
+    return r;
 }
 
 /**

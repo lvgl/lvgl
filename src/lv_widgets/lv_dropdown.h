@@ -62,7 +62,6 @@ typedef struct {
     uint16_t sel_opt_id;          /*Index of the currently selected option*/
     uint16_t sel_opt_id_orig;     /*Store the original index on focus*/
     uint16_t pr_opt_id;             /*Index of the currently pressed option*/
-    uint16_t anim_time;
     lv_dropdown_dir_t dir         : 2;
     uint8_t show_selected  : 1;
     uint8_t static_txt : 1;
@@ -164,13 +163,6 @@ void lv_dropdown_set_symbol(lv_obj_t * ddlist, const char * symbol);
  */
 void lv_dropdown_set_show_selected(lv_obj_t * ddlist, bool show);
 
-/**
- * Set the open/close animation time.
- * @param ddlist pointer to a drop down list
- * @param anim_time: open/close animation time [ms]
- */
-void lv_dropdown_set_anim_time(lv_obj_t * ddlist, uint16_t anim_time);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -239,13 +231,6 @@ lv_dropdown_dir_t lv_dropdown_get_dir(const lv_obj_t * ddlist);
  */
 bool lv_dropdown_get_show_selected(lv_obj_t * ddlist);
 
-/**
- * Get the open/close animation time.
- * @param ddlist pointer to a drop down list
- * @return open/close animation time [ms]
- */
-uint16_t lv_dropdown_get_anim_time(const lv_obj_t * ddlist);
-
 /*=====================
  * Other functions
  *====================*/
@@ -253,16 +238,15 @@ uint16_t lv_dropdown_get_anim_time(const lv_obj_t * ddlist);
 /**
  * Open the drop down list with or without animation
  * @param ddlist pointer to drop down list object
- * @param anim_en LV_ANIM_ON: use animation; LV_ANOM_OFF: not use animations
  */
-void lv_dropdown_open(lv_obj_t * ddlist, lv_anim_enable_t anim);
+void lv_dropdown_open(lv_obj_t * ddlist);
 
 /**
  * Close (Collapse) the drop down list
  * @param ddlist pointer to drop down list object
  * @param anim_en LV_ANIM_ON: use animation; LV_ANOM_OFF: not use animations
  */
-void lv_dropdown_close(lv_obj_t * ddlist, lv_anim_enable_t anim);
+void lv_dropdown_close(lv_obj_t * ddlist);
 
 /**********************
  *      MACROS

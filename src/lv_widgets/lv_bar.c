@@ -385,7 +385,6 @@ static lv_design_res_t lv_bar_design(lv_obj_t * bar, const lv_area_t * clip_area
         draw_dsc.outline_opa = LV_OPA_TRANSP;
         lv_obj_init_draw_rect_dsc(bar, LV_BAR_PART_BG, &draw_dsc);
         lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
-
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
 
@@ -545,7 +544,7 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
        (!hor && lv_area_get_height(&ext->indic_area) > bg_radius * 2)) {
         lv_opa_t bg_opa = draw_indic_dsc.bg_opa;
         lv_opa_t border_opa = draw_indic_dsc.border_opa;
-        lv_opa_t value_opa = draw_indic_dsc.border_opa;
+        lv_opa_t value_opa = draw_indic_dsc.value_opa;
         const void * pattern_src = draw_indic_dsc.pattern_image;
         draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
         draw_indic_dsc.border_opa = LV_OPA_TRANSP;

@@ -611,6 +611,77 @@ bool lv_table_get_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col)
     }
 }
 
+/**
+ * Get the last pressed or being pressed cell
+ * @param table pointer to a table object
+ * @param row pointer to variable to store the pressed row
+ * @param col pointer to variable to store the pressed column
+ * @return LV_RES_OK: a valid pressed cell was found, LV_RES_INV: no valid cell is pressed
+ */
+lv_res_t lv_table_get_pressed_cell(lv_obj_t * table, uint16_t * row, uint16_t * col)
+{
+    lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
+
+    lv_indev_type_t type = lv_indev_get_type(lv_indev_get_act());
+    if(type != LV_INDEV_TYPE_POINTER && type != LV_INDEV_TYPE_BUTTON) {
+        if(col) *col = 0xFFFF;
+        if(row) *row = 0xFFFF;
+        return LV_RES_INV;
+    }
+
+    lv_point_t p;
+    lv_indev_get_point(lv_indev_get_act(), &p);
+
+    lv_coord_t tmp;
+    if(col) {
+        lv_coord_t x = p.x;
+        x -= table->coords.x1;
+        x -= lv_obj_get_style_pad_left(table, LV_TABLE_PART_BG);
+        *col = 0;
+        tmp = 0;
+        for(*col = 0; *col < ext->col_cnt; (*col)++) {
+            tmp += ext->col_w[*col];
+            if(x < tmp) break;
+        }
+    }
+
+    if(row) {
+        lv_coord_t y = p.y;
+        y -= table->coords.y1;
+        y -= lv_obj_get_style_pad_top(table, LV_TABLE_PART_BG);
+
+        *row = 0;
+        tmp = 0;
+        lv_style_int_t cell_left[LV_TABLE_CELL_STYLE_CNT];
+        lv_style_int_t cell_right[LV_TABLE_CELL_STYLE_CNT];
+        lv_style_int_t cell_top[LV_TABLE_CELL_STYLE_CNT];
+        lv_style_int_t cell_bottom[LV_TABLE_CELL_STYLE_CNT];
+        lv_style_int_t letter_space[LV_TABLE_CELL_STYLE_CNT];
+        lv_style_int_t line_space[LV_TABLE_CELL_STYLE_CNT];
+        const lv_font_t * font[LV_TABLE_CELL_STYLE_CNT];
+
+        uint16_t i;
+        for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
+            if((ext->cell_types & (1 << i)) == 0) continue; /*Skip unused cell types*/
+            cell_left[i] = lv_obj_get_style_pad_left(table, LV_TABLE_PART_CELL1 + i);
+            cell_right[i] = lv_obj_get_style_pad_right(table, LV_TABLE_PART_CELL1 + i);
+            cell_top[i] = lv_obj_get_style_pad_top(table, LV_TABLE_PART_CELL1 + i);
+            cell_bottom[i] = lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_CELL1 + i);
+            letter_space[i] = lv_obj_get_style_text_letter_space(table, LV_TABLE_PART_CELL1 + i);
+            line_space[i] = lv_obj_get_style_text_line_space(table, LV_TABLE_PART_CELL1 + i);
+            font[i] = lv_obj_get_style_text_font(table, LV_TABLE_PART_CELL1 + i);
+        }
+
+        for(*row = 0; *row < ext->row_cnt; (*row)++) {
+            tmp += get_row_height(table, *row, font, letter_space, line_space,
+                    cell_left, cell_right, cell_top, cell_bottom);
+            if(y < tmp) break;
+        }
+    }
+
+    return LV_RES_OK;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -737,10 +808,18 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                 /*Expand the cell area with a half border to avoid drawing 2 borders next to each other*/
                 lv_area_t cell_area_border;
                 lv_area_copy(&cell_area_border, &cell_area);
-                if(cell_area_border.x1 > table->coords.x1 + bg_left) cell_area_border.x1 -= rect_dsc[cell_type].border_width / 2;
-                if(cell_area_border.y1 > table->coords.y1 + bg_top) cell_area_border.y1 -= rect_dsc[cell_type].border_width / 2;
-                if(cell_area_border.x2 < table->coords.x2 - bg_right - 1) cell_area_border.x2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
-                if(cell_area_border.y2 < table->coords.y2 - bg_bottom - 1) cell_area_border.y2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
+                if((rect_dsc[cell_type].border_side & LV_BORDER_SIDE_LEFT) && cell_area_border.x1 > table->coords.x1 + bg_left) {
+                    cell_area_border.x1 -= rect_dsc[cell_type].border_width / 2;
+                }
+                if((rect_dsc[cell_type].border_side & LV_BORDER_SIDE_TOP) && cell_area_border.y1 > table->coords.y1 + bg_top) {
+                    cell_area_border.y1 -= rect_dsc[cell_type].border_width / 2;
+                }
+                if((rect_dsc[cell_type].border_side & LV_BORDER_SIDE_RIGHT) && cell_area_border.x2 < table->coords.x2 - bg_right - 1) {
+                    cell_area_border.x2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
+                }
+                if((rect_dsc[cell_type].border_side & LV_BORDER_SIDE_BOTTOM) && cell_area_border.y2 < table->coords.y2 - bg_bottom - 1) {
+                    cell_area_border.y2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
+                }
 
                 lv_draw_rect(&cell_area_border, clip_area, &rect_dsc[cell_type]);
 
@@ -767,7 +846,6 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     if(format.s.crop == 0) {
                         txt_area.y1 = cell_area.y1 + h_row / 2 - txt_size.y / 2;
                         txt_area.y2 = cell_area.y1 + h_row / 2 + txt_size.y / 2;
-                        label_dsc[cell_type].flag |= LV_TXT_FLAG_FIT;
                     }
 
                     switch(format.s.align) {
