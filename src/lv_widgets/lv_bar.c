@@ -384,6 +384,16 @@ static lv_design_res_t lv_bar_design(lv_obj_t * bar, const lv_area_t * clip_area
         draw_dsc.pattern_opa = LV_OPA_TRANSP;
         draw_dsc.outline_opa = LV_OPA_TRANSP;
         lv_obj_init_draw_rect_dsc(bar, LV_BAR_PART_BG, &draw_dsc);
+//        lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
+
+        /*Finally draw the indicators value*/
+        lv_draw_rect_dsc_init(&draw_dsc);
+        draw_dsc.bg_opa = LV_OPA_TRANSP;
+        draw_dsc.border_opa = LV_OPA_TRANSP;
+        draw_dsc.shadow_opa = LV_OPA_TRANSP;
+        draw_dsc.pattern_opa = LV_OPA_TRANSP;
+        draw_dsc.outline_opa = LV_OPA_TRANSP;
+        lv_obj_init_draw_rect_dsc(bar, LV_BAR_PART_INDIC, &draw_dsc);
         lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
 
     }
@@ -545,7 +555,6 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
        (!hor && lv_area_get_height(&ext->indic_area) > bg_radius * 2)) {
         lv_opa_t bg_opa = draw_indic_dsc.bg_opa;
         lv_opa_t border_opa = draw_indic_dsc.border_opa;
-        lv_opa_t value_opa = draw_indic_dsc.border_opa;
         const void * pattern_src = draw_indic_dsc.pattern_image;
         draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
         draw_indic_dsc.border_opa = LV_OPA_TRANSP;
@@ -554,7 +563,6 @@ static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)
         lv_draw_rect(&ext->indic_area, clip_area, &draw_indic_dsc);
         draw_indic_dsc.bg_opa = bg_opa;
         draw_indic_dsc.border_opa = border_opa;
-        draw_indic_dsc.value_opa = value_opa;
         draw_indic_dsc.pattern_image = pattern_src;
 
     }

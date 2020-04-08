@@ -228,6 +228,15 @@ lv_label_align_t lv_table_get_cell_crop(lv_obj_t * table, uint16_t row, uint16_t
  */
 bool lv_table_get_cell_merge_right(lv_obj_t * table, uint16_t row, uint16_t col);
 
+/**
+ * Get the last pressed or being pressed cell
+ * @param table pointer to a table object
+ * @param row pointer to variable to store the pressed row
+ * @param col pointer to variable to store the pressed column
+ * @return LV_RES_OK: a valid pressed cell was found, LV_RES_INV: no valid cell is pressed
+ */
+lv_res_t lv_table_get_pressed_cell(lv_obj_t * table, uint16_t * row, uint16_t * col);
+
 /*=====================
  * Other functions
  *====================*/

@@ -427,6 +427,22 @@ void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w);
 void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
 
 /**
+ * Set the width of an object by taking the left and right margin into account.
+ * The object heigwidthht will be `obj_w = w - margon_left - margin_right`
+ * @param obj pointer to an object
+ * @param w new height including margins
+ */
+void lv_obj_set_width_margin(lv_obj_t * obj, lv_coord_t w);
+
+/**
+ * Set the height of an object by taking the top and bottom margin into account.
+ * The object height will be `obj_h = h - margon_top - margin_bottom`
+ * @param obj pointer to an object
+ * @param h new height including margins
+ */
+void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h);
+
+/**
  * Align an object to an other object.
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
@@ -957,6 +973,48 @@ lv_coord_t lv_obj_get_width_fit(const lv_obj_t * obj);
  * @return the height which still fits into the container
  */
 lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj);
+
+/**
+ * Get the height of an object by taking the top and bottom margin into account.
+ * The returned height will be `obj_h + margon_top + margin_bottom`
+ * @param obj pointer to an object
+ * @return the height including thee margins
+ */
+lv_coord_t lv_obj_get_height_margin(lv_obj_t * obj);
+
+/**
+ * Get the width of an object by taking the left and right margin into account.
+ * The returned width will be `obj_w + margon_left + margin_right`
+ * @param obj pointer to an object
+ * @return the height including thee margins
+ */
+lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj);
+
+/**
+ * Divide the width of the object and get the width of a given number of columns.
+ * Take paddings into account.
+ * @param obj pointer to an object
+ * @param div indicates how many columns are assumed.
+ * If 1 the width will be set the the parent's width
+ * If 2 only half parent width - inner padding of the parent
+ * If 3 only third parent width - 2 * inner padding of the parent
+ * @param span how many columns are combined
+ * @return the width according to the given parameters
+ */
+lv_coord_t lv_obj_get_width_grid(lv_obj_t * obj, uint8_t div, uint8_t span);
+
+/**
+ * Divide the height of the object and get the width of a given number of columns.
+ * Take paddings into account.
+ * @param obj pointer to an object
+ * @param div indicates how many rows are assumed.
+ * If 1 the height will be set the the parent's height
+ * If 2 only half parent height - inner padding of the parent
+ * If 3 only third parent height - 2 * inner padding of the parent
+ * @param span how many rows are combined
+ * @return the height according to the given parameters
+ */
+lv_coord_t lv_obj_get_height_grid(lv_obj_t * obj, uint8_t div, uint8_t span);
 
 /**
  * Get the automatic realign property of the object.

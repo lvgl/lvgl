@@ -791,7 +791,7 @@ void lv_textarea_set_text_align(lv_obj_t * ta, lv_label_align_t align)
         /*Else use fix label width equal to the Text area width*/
         else {
             lv_label_set_long_mode(label, LV_LABEL_LONG_CROP);
-            lv_obj_set_width(label, lv_page_get_fit_width(ta));
+            lv_obj_set_width(label, lv_page_get_width_fit(ta));
             lv_label_set_align(label, align);
             lv_page_set_scrl_fit2(ta, LV_FIT_PARENT, LV_FIT_PARENT);
         }
@@ -1324,6 +1324,8 @@ static lv_design_res_t lv_textarea_scrollable_design(lv_obj_t * scrl, const lv_a
                     break;
             }
 
+            if(ext->one_line) ph_dsc.flag |= LV_TXT_FLAG_EXPAND;
+
             lv_draw_label(&scrl->coords, clip_area, &ph_dsc, ext->placeholder_txt, NULL);
         }
 
@@ -1420,7 +1422,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
             }
             else {
                 /*In not one line mode refresh the Label width because 'hpad' can modify it*/
-                lv_obj_set_width(ext->label, lv_page_get_fit_width(ta));
+                lv_obj_set_width(ext->label, lv_page_get_width_fit(ta));
                 lv_obj_set_pos(ext->label, 0, 0); /*Be sure the Label is in the correct position*/
 
             }
@@ -1432,7 +1434,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
         /*Set the label width according to the text area width*/
         if(ext->label) {
             if(lv_obj_get_width(ta) != lv_area_get_width(param) || lv_obj_get_height(ta) != lv_area_get_height(param)) {
-                lv_obj_set_width(ext->label, lv_page_get_fit_width(ta));
+                lv_obj_set_width(ext->label, lv_page_get_width_fit(ta));
                 lv_obj_set_pos(ext->label, 0, 0);
                 lv_label_set_text(ext->label, NULL); /*Refresh the label*/
 
@@ -1506,7 +1508,7 @@ static lv_res_t lv_textarea_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign,
             if(lv_obj_get_width(scrl) != lv_area_get_width(param) ||
                lv_obj_get_height(scrl) != lv_area_get_height(param)) {
 
-                lv_obj_set_width(ext->label, lv_page_get_fit_width(ta));
+                lv_obj_set_width(ext->label, lv_page_get_width_fit(ta));
                 lv_obj_set_pos(ext->label, 0, 0);
 
                 lv_label_set_text(ext->label, NULL); /*Refresh the label*/
