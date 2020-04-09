@@ -772,6 +772,9 @@ static void draw_series_bg(lv_obj_t * chart, const lv_area_t * series_area, cons
  */
 static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area)
 {
+    lv_area_t com_area;
+    if(lv_area_intersect(&com_area, series_area, clip_area) == false) return;
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
     uint16_t i;
@@ -813,7 +816,11 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
     point_dsc.bg_opa = line_dsc.opa;
     point_dsc.radius = LV_RADIUS_CIRCLE;
 
+
     lv_coord_t point_radius = lv_obj_get_style_size(chart, LV_CHART_PART_SERIES);
+
+    /*Do not bother with line ending is the point will over it*/
+    if(point_radius > line_dsc.width / 2) line_dsc.raw_end = 1;
 
     /*Go through all data lines*/
     LV_LL_READ_BACK(ext->series_ll, ser) {
@@ -918,6 +925,9 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
  */
 static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area)
 {
+    lv_area_t com_area;
+    if(lv_area_intersect(&com_area, series_area, clip_area) == false) return;
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
     uint16_t i;
