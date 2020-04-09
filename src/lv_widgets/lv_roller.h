@@ -54,6 +54,7 @@ typedef struct {
     uint16_t sel_opt_id;          /*Index of the current option*/
     uint16_t sel_opt_id_ori;      /*Store the original index on focus*/
     lv_roller_mode_t mode : 1;
+    uint8_t auto_fit : 1;         /*1: Automatically set the width*/
 } lv_roller_ext_t;
 
 enum {
@@ -110,6 +111,13 @@ void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, lv_anim_enable_
 void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt);
 
 /**
+ * Allow automatically setting the width of roller according to it's content.
+ * @param roller pointer to a roller object
+ * @param auto_fit true: enable auto fit
+ */
+void lv_roller_set_auto_fit(lv_obj_t * roller, bool auto_fit);
+
+/**
  * Set the open/close animation time.
  * @param roller pointer to a roller object
  * @param anim_time: open/close animation time [ms]
@@ -150,6 +158,13 @@ void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint16_t bu
  * @return LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
  */
 lv_label_align_t lv_roller_get_align(const lv_obj_t * roller);
+
+/**
+ * Get whether the auto fit option is enabled or not.
+ * @param roller pointer to a roller object
+ * @return true: auto fit is enabled
+ */
+bool lv_roller_get_auto_fit(lv_obj_t * roller);
 
 /**
  * Get the options of a roller

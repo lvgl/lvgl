@@ -90,6 +90,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->option_cnt = 0;
     ext->sel_opt_id = 0;
     ext->sel_opt_id_ori = 0;
+    ext->auto_fit = 1;
     lv_style_list_init(&ext->style_sel);
 
     /*The signal and design functions are not copied so set them here*/
@@ -120,7 +121,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     else {
         lv_roller_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_roller_set_options(roller, lv_roller_get_options(copy), copy_ext->mode);
-
+        ext->auto_fit = copy_ext->auto_fit;
         lv_obj_t * scrl = lv_page_get_scrl(roller);
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
     }
@@ -186,8 +187,8 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
     ext->sel_opt_id_ori = ext->sel_opt_id;
 
 
-    refr_width(roller);
-    refr_height(roller);
+//    refr_width(roller);
+//    refr_height(roller);
     refr_position(roller, LV_ANIM_OFF);
 }
 
@@ -204,6 +205,7 @@ void lv_roller_set_align(lv_obj_t * roller, lv_label_align_t align)
     if(label == NULL) return; /*Probably the roller is being deleted if the label is NULL.*/
 
     lv_label_set_align(label, align);
+    refr_width(roller); /*To set the correct label position*/
 }
 
 /**
@@ -253,6 +255,19 @@ void lv_roller_set_visible_row_count(lv_obj_t * roller, uint8_t row_cnt)
 
     refr_height(roller);
     refr_position(roller, LV_ANIM_OFF);
+}
+
+/**
+ * Allow automatically setting the width of roller according to it's content.
+ * @param roller pointer to a roller object
+ * @param auto_fit true: enable auto fit
+ */
+void lv_roller_set_auto_fit(lv_obj_t * roller, bool auto_fit)
+{
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+    lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    ext->auto_fit = auto_fit;
+    refr_width(roller);
 }
 
 /*=====================
@@ -342,6 +357,17 @@ lv_label_align_t lv_roller_get_align(const lv_obj_t * roller)
     return lv_label_get_align(get_label(roller));
 }
 
+/**
+ * Get whether the auto fit option is enabled or not.
+ * @param roller pointer to a roller object
+ * @return true: auto fit is enabled
+ */
+bool lv_roller_get_auto_fit(lv_obj_t * roller)
+{
+    LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
+    lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    return ext->auto_fit ? true : false;
+}
 
 /**
  * Get the options of a roller
@@ -473,6 +499,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
             lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
             refr_position(roller, false);
+            refr_width(roller);
         }
     }
     else if(sign == LV_SIGNAL_RELEASED) {
@@ -616,6 +643,14 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
 #if LV_USE_ANIMATION
         lv_anim_del(roller_scrl, (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
+    }
+    else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {
+#if LV_USE_ANIMATION
+            lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
+#endif
+            refr_position(roller, false);
+            refr_width(roller);
+
     }
 
     /*Position the scrollable according to the new selected option*/
@@ -800,6 +835,21 @@ static void refr_width(lv_obj_t * roller)
     lv_obj_t * label = get_label(roller);
     if(label == NULL) return;
 
+    switch(lv_label_get_align(label)) {
+    case LV_LABEL_ALIGN_LEFT:
+        lv_obj_align(label, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0);
+        break;
+    case LV_LABEL_ALIGN_CENTER:
+        lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+        break;
+    case LV_LABEL_ALIGN_RIGHT:
+        lv_obj_align(label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0);
+        break;
+    }
+
+
+    if(lv_roller_get_auto_fit(roller) == false) return;
+
     lv_coord_t label_w = lv_obj_get_width(label);
 
     lv_style_int_t left = lv_obj_get_style_pad_left(roller, LV_ROLLER_PART_BG);
@@ -818,7 +868,7 @@ static void refr_height(lv_obj_t * roller)
     if(label == NULL) return;
 
     lv_obj_set_height(lv_page_get_scrl(roller), lv_obj_get_height(label) + lv_obj_get_height(roller));
-    lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+
 #if LV_USE_ANIMATION
     lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif

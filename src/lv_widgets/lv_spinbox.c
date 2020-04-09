@@ -84,7 +84,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_obj_set_signal_cb(spinbox, lv_spinbox_signal);
     lv_obj_set_design_cb(spinbox, ancestor_design); /*Leave the Text area's design function*/
 
-    /*Init the new spinbox spinbox*/
+    /*Init the new spinbox*/
     if(copy == NULL) {
         /* No scrolling will happen here so make the scrollable non-clickable
          * It allows to handle input events in the bg object only.*/
