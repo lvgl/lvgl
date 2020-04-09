@@ -19,12 +19,12 @@
  *********************/
 
 /*SCREEN*/
-#define COLOR_SCR        (IS_LIGHT ? lv_color_hex(0xeaeff3) : lv_color_hex(0x22252a))
-#define COLOR_SCR_TEXT   (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0xbababa))
+#define COLOR_SCR        (IS_LIGHT ? lv_color_hex(0xeaeff3) : lv_color_hex(0x444b5a))
+#define COLOR_SCR_TEXT   (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0xe7e9ec))
 
 /*BUTTON*/
-#define COLOR_BTN           (IS_LIGHT ? lv_color_hex(0xffffff) : lv_color_hex(0x303439))
-#define COLOR_BTN_PR        (IS_LIGHT ? lv_color_mix(theme.color_primary, COLOR_BTN, LV_OPA_10) : lv_color_mix(theme.color_primary, COLOR_BTN, LV_OPA_10))
+#define COLOR_BTN           (IS_LIGHT ? lv_color_hex(0xffffff) : lv_color_hex(0x586273))
+#define COLOR_BTN_PR        (IS_LIGHT ? lv_color_mix(theme.color_primary, COLOR_BTN, LV_OPA_10) : lv_color_mix(theme.color_primary, COLOR_BTN, LV_OPA_30))
 #define COLOR_BTN_CHK       (theme.color_primary)
 #define COLOR_BTN_CHK_PR    (lv_color_darken(theme.color_primary, LV_OPA_30))
 #define COLOR_BTN_DIS       (IS_LIGHT ? lv_color_hex3(0xccc) : lv_color_hex3(0x888))
@@ -36,23 +36,23 @@
 #define COLOR_BTN_BORDER_INA    (IS_LIGHT ? lv_color_hex3(0x888) : lv_color_hex(0x404040))
 
 /*BACKGROUND*/
-#define COLOR_BG            (IS_LIGHT ? lv_color_hex(0xffffff) : lv_color_hex(0x303439))
+#define COLOR_BG            (IS_LIGHT ? lv_color_hex(0xffffff) : lv_color_hex(0x586273))
 #define COLOR_BG_PR         (IS_LIGHT ? lv_color_hex(0xeeeeee) : lv_color_hex(0x494f57))
 #define COLOR_BG_CHK        theme.color_primary
 #define COLOR_BG_PR_CHK     lv_color_darken(theme.color_primary, LV_OPA_20)
 #define COLOR_BG_DIS        COLOR_BG
 
-#define COLOR_BG_BORDER         (IS_LIGHT ? lv_color_hex(0xd6dde3) : lv_color_hex(0x404040))   /*dfe7ed*/
-#define COLOR_BG_BORDER_PR      (IS_LIGHT ? lv_color_hex3(0xccc) : lv_color_hex(0x404040))
-#define COLOR_BG_BORDER_CHK     (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0x404040))
-#define COLOR_BG_BORDER_CHK_PR  (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0x404040))
-#define COLOR_BG_BORDER_DIS     (IS_LIGHT ? lv_color_hex(0xd6dde3) : lv_color_hex(0x404040))
+#define COLOR_BG_BORDER         (IS_LIGHT ? lv_color_hex(0xd6dde3) : lv_color_hex(0x808a97))   /*dfe7ed*/
+#define COLOR_BG_BORDER_PR      (IS_LIGHT ? lv_color_hex3(0xccc) : lv_color_hex(0x5f656e))
+#define COLOR_BG_BORDER_CHK     (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0x5f656e))
+#define COLOR_BG_BORDER_CHK_PR  (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0x5f656e))
+#define COLOR_BG_BORDER_DIS     (IS_LIGHT ? lv_color_hex(0xd6dde3) : lv_color_hex(0x5f656e))
 
 #define COLOR_BG_TEXT           (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0xffffff))
 #define COLOR_BG_TEXT_PR        (IS_LIGHT ? lv_color_hex(0x3b3e42) : lv_color_hex(0xffffff))
 #define COLOR_BG_TEXT_CHK       (IS_LIGHT ? lv_color_hex(0xffffff) : lv_color_hex(0xffffff))
 #define COLOR_BG_TEXT_CHK_PR    (IS_LIGHT ? lv_color_hex(0xffffff) : lv_color_hex(0xffffff))
-#define COLOR_BG_TEXT_DIS       (IS_LIGHT ? lv_color_hex3(0xaaa) : lv_color_hex3(0x777))
+#define COLOR_BG_TEXT_DIS       (IS_LIGHT ? lv_color_hex3(0xaaa) : lv_color_hex3(0x999))
 
 /*SECONDARY BACKGROUND*/
 #define COLOR_BG_SEC            (IS_LIGHT ? lv_color_hex(0xd4d7d9) : lv_color_hex(0x45494d))
@@ -427,7 +427,7 @@ static void linemeter_init(void)
 
     lv_style_set_line_color(&lmeter, LV_STATE_DEFAULT, theme.color_primary);
     lv_style_set_scale_grad_color(&lmeter, LV_STATE_DEFAULT, theme.color_primary);
-    lv_style_set_scale_end_color(&lmeter, LV_STATE_DEFAULT, lv_color_hex3(0x666));
+    lv_style_set_scale_end_color(&lmeter, LV_STATE_DEFAULT, lv_color_hex3(0x888));
     lv_style_set_line_width(&lmeter, LV_STATE_DEFAULT, LV_DPI / 20);
     lv_style_set_scale_end_line_width(&lmeter, LV_STATE_DEFAULT, LV_DPI / 30);
 #endif
@@ -496,7 +496,7 @@ static void chart_init(void)
 {
 #if LV_USE_CHART
     style_init_reset(&chart_bg);
-    lv_style_set_text_color(&chart_bg, LV_STATE_DEFAULT, COLOR_BG_TEXT_DIS);
+    lv_style_set_text_color(&chart_bg, LV_STATE_DEFAULT, IS_LIGHT ? COLOR_BG_TEXT_DIS : lv_color_hex(0xa1adbd));
 
     style_init_reset(&chart_series_bg);
     lv_style_set_line_width(&chart_series_bg, LV_STATE_DEFAULT, 1);
@@ -533,13 +533,14 @@ static void calendar_init(void)
     style_init_reset(&calendar_date_nums);
     lv_style_set_radius(&calendar_date_nums, LV_STATE_DEFAULT, LV_DPI / 50);
     lv_style_set_text_color(&calendar_date_nums, LV_STATE_CHECKED, IS_LIGHT ? lv_color_hex(0x31404f) : LV_COLOR_WHITE);
-    lv_style_set_text_color(&calendar_date_nums, LV_STATE_FOCUSED, theme.color_primary);
 
-    lv_style_set_bg_opa(&calendar_date_nums, LV_STATE_CHECKED, LV_OPA_20);
+    lv_style_set_bg_opa(&calendar_date_nums, LV_STATE_CHECKED, IS_LIGHT ? LV_OPA_20 : LV_OPA_40);
     lv_style_set_bg_opa(&calendar_date_nums, LV_STATE_PRESSED, LV_OPA_20);
-    lv_style_set_bg_opa(&calendar_date_nums, LV_STATE_PRESSED | LV_STATE_CHECKED, LV_OPA_40);
+    lv_style_set_bg_opa(&calendar_date_nums, LV_STATE_FOCUSED, LV_OPA_COVER);
+    lv_style_set_text_color(&calendar_date_nums, LV_STATE_FOCUSED, LV_COLOR_WHITE);
+    lv_style_set_bg_color(&calendar_date_nums, LV_STATE_FOCUSED, theme.color_primary);
     lv_style_set_bg_color(&calendar_date_nums, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x666666) : LV_COLOR_WHITE);
-    lv_style_set_bg_color(&calendar_date_nums, LV_STATE_CHECKED, IS_LIGHT ? theme.color_primary : LV_COLOR_WHITE);
+    lv_style_set_bg_color(&calendar_date_nums, LV_STATE_CHECKED, theme.color_primary);
     lv_style_set_border_width(&calendar_date_nums, LV_STATE_CHECKED, 2);
     lv_style_set_border_side(&calendar_date_nums, LV_STATE_CHECKED, LV_BORDER_SIDE_LEFT);
     lv_style_set_border_color(&calendar_date_nums, LV_STATE_CHECKED, theme.color_primary);
@@ -608,7 +609,7 @@ static void keyboard_init(void)
     lv_style_set_radius(&kb_bg, LV_STATE_DEFAULT, 0);
     lv_style_set_border_width(&kb_bg, LV_STATE_DEFAULT, (LV_DPI / 50 > 0 ? LV_DPI / 50 : 1));
     lv_style_set_border_side(&kb_bg, LV_STATE_DEFAULT, LV_BORDER_SIDE_TOP);
-    lv_style_set_border_color(&kb_bg, LV_STATE_DEFAULT, COLOR_BG_TEXT);
+    lv_style_set_border_color(&kb_bg, LV_STATE_DEFAULT, IS_LIGHT ? COLOR_BG_TEXT : LV_COLOR_BLACK);
     lv_style_set_pad_left(&kb_bg, LV_STATE_DEFAULT,  LV_DPI / 20);
     lv_style_set_pad_right(&kb_bg, LV_STATE_DEFAULT, LV_DPI / 20);
     lv_style_set_pad_top(&kb_bg, LV_STATE_DEFAULT,  LV_DPI / 20);
@@ -622,7 +623,7 @@ static void msgbox_init(void)
 #if LV_USE_MSGBOX
     style_init_reset(&mbox_bg);
     lv_style_set_shadow_width(&mbox_bg, LV_STATE_DEFAULT, LV_DPI / 4);
-    lv_style_set_shadow_color(&mbox_bg, LV_STATE_DEFAULT, LV_COLOR_SILVER);
+    lv_style_set_shadow_color(&mbox_bg, LV_STATE_DEFAULT, IS_LIGHT ? LV_COLOR_SILVER : lv_color_hex3(0x999));
 
 #endif
 }
@@ -651,7 +652,7 @@ static void textarea_init(void)
     lv_style_set_border_side(&ta_cursor, LV_STATE_DEFAULT, LV_BORDER_SIDE_LEFT);
 
     style_init_reset(&ta_placeholder);
-    lv_style_set_text_color(&ta_placeholder, LV_STATE_DEFAULT, COLOR_BG_TEXT_DIS);
+    lv_style_set_text_color(&ta_placeholder, LV_STATE_DEFAULT, IS_LIGHT ? COLOR_BG_TEXT_DIS : lv_color_hex(0xa1adbd));
 #endif
 }
 
