@@ -274,6 +274,8 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
     if(disp_drv->screen_transp) {
         memset(disp_drv->buffer->buf_act, 0x00, disp_drv->buffer->size * sizeof(lv_color32_t));
     }
+#elif LV_COLOR_DEPTH == 1
+    memset(disp_drv->buffer->buf_act, 0x00, disp_drv->buffer->size * sizeof(lv_color_t));
 #endif
 
     disp_drv->buffer->flushing = 0;
