@@ -73,10 +73,11 @@ void lv_style_init(lv_style_t * style)
  */
 void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
 {
+    if(style_src == NULL) return;
+
     LV_ASSERT_STYLE(style_dest);
     LV_ASSERT_STYLE(style_src);
 
-    if(style_src == NULL) return;
     if(style_src->map == NULL) return;
 
     uint16_t size = lv_style_get_mem_size(style_src);

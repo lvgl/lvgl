@@ -88,7 +88,6 @@ typedef union {
     uint8_t full;
 } lv_style_attr_t;
 
-
 #define LV_STYLE_ID_VALUE 0x0   /*max 9 pcs*/
 #define LV_STYLE_ID_COLOR 0x9   /*max 3 pcs*/
 #define LV_STYLE_ID_OPA   0xC   /*max 2 pcs*/
@@ -733,6 +732,15 @@ static inline lv_res_t lv_style_list_get_data_ptr(lv_style_list_t * list, lv_sty
  *     lv_style_copy(&my_style, &style_to_copy);
  */
 #define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_init(&name); lv_style_copy(&name, copy);
+
+/**
+ * Same as Android's DIP. (Different name is chosen to avoid mistype between LV_DPI and LV_DIP)
+ * 1 dip is 1 px on a 160 DPI screen
+ * 1 dip is 2 px on a 320 DPI screen
+ * https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
+ */
+#define LV_DPX(n)   LV_MATH_MAX(((LV_DPI * (n)) / 160), 1)
+
 
 #ifdef __cplusplus
 } /* extern "C" */
