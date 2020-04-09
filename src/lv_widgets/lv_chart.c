@@ -772,6 +772,9 @@ static void draw_series_bg(lv_obj_t * chart, const lv_area_t * series_area, cons
  */
 static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area)
 {
+    lv_area_t com_area;
+    if(lv_area_intersect(&com_area, series_area, clip_area) == false) return;
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
     uint16_t i;
@@ -813,7 +816,11 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
     point_dsc.bg_opa = line_dsc.opa;
     point_dsc.radius = LV_RADIUS_CIRCLE;
 
+
     lv_coord_t point_radius = lv_obj_get_style_size(chart, LV_CHART_PART_SERIES);
+
+    /*Do not bother with line ending is the point will over it*/
+    if(point_radius > line_dsc.width / 2) line_dsc.raw_end = 1;
 
     /*Go through all data lines*/
     LV_LL_READ_BACK(ext->series_ll, ser) {
@@ -918,6 +925,9 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
  */
 static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area)
 {
+    lv_area_t com_area;
+    if(lv_area_intersect(&com_area, series_area, clip_area) == false) return;
+
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
     uint16_t i;
@@ -1221,6 +1231,17 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
     lv_obj_init_draw_label_dsc(chart, LV_CHART_PART_BG, &label_dsc);
 
     for(i = 0; i < (num_scale_ticks + 1); i++) { /* one extra loop - it may not exist in the list, empty label */
+
+        /* draw a line at moving y position */
+        p2.y = p1.y =
+                   y_ofs + (int32_t)((int32_t)(h - line_dsc.width) * i) / num_scale_ticks;
+
+        if(p2.y - label_dsc.font->line_height > mask->y2) return;
+        if(p2.y + label_dsc.font->line_height < mask->y1) {
+            get_next_axis_label(&iter, buf);
+            continue;
+        }
+
         /* first point of the tick */
         p1.x = x_ofs;
 
@@ -1235,10 +1256,6 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
             p2.x = p1.x - major_tick_len; /* major tick */
         else
             p2.x = p1.x - minor_tick_len; /* minor tick */
-
-        /* draw a line at moving y position */
-        p2.y = p1.y =
-                   y_ofs + (int32_t)((int32_t)(h - line_dsc.width) * i) / num_scale_ticks;
 
         if(y_axis->options & LV_CHART_AXIS_INVERSE_LABELS_ORDER) {
             /*if label order is inversed last tick have number 0*/
@@ -1301,6 +1318,18 @@ static void draw_x_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
     lv_coord_t y_ofs = series_area->y1;
     lv_coord_t h     = lv_area_get_height(series_area);
     lv_coord_t w     = lv_area_get_width(series_area);
+    lv_style_int_t label_dist  = lv_obj_get_style_pad_bottom(chart, LV_CHART_PART_SERIES_BG);
+
+    lv_draw_label_dsc_t label_dsc;
+    lv_draw_label_dsc_init(&label_dsc);
+    lv_obj_init_draw_label_dsc(chart, LV_CHART_PART_BG, &label_dsc);
+
+    if(h + y_ofs > mask->y2) return;
+    if(h + y_ofs + label_dsc.font->line_height + label_dist < mask->y1) return;
+
+    lv_draw_line_dsc_t line_dsc;
+    lv_draw_line_dsc_init(&line_dsc);
+    lv_obj_init_draw_line_dsc(chart, LV_CHART_PART_BG, &line_dsc);
 
     /* The columns don't start at the most right position
      * so change the width and offset accordingly. */
@@ -1310,7 +1339,6 @@ static void draw_x_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
         x_ofs += col_w / 2 + (col_w * (ser_num) / 2);
         w -= col_w * ser_num + col_w;
     }
-
 
     char buf[LV_CHART_AXIS_TICK_LABEL_MAX_LEN + 1]; /* up to N symbols per label + null terminator */
 
@@ -1337,17 +1365,6 @@ static void draw_x_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
         num_scale_ticks = ext->x_axis.num_tick_marks;
     else
         num_scale_ticks = (ext->x_axis.num_tick_marks * (num_of_labels - 1));
-
-
-    lv_style_int_t label_dist  = lv_obj_get_style_pad_bottom(chart, LV_CHART_PART_SERIES_BG);
-
-    lv_draw_line_dsc_t line_dsc;
-    lv_draw_line_dsc_init(&line_dsc);
-    lv_obj_init_draw_line_dsc(chart, LV_CHART_PART_BG, &line_dsc);
-
-    lv_draw_label_dsc_t label_dsc;
-    lv_draw_label_dsc_init(&label_dsc);
-    lv_obj_init_draw_label_dsc(chart, LV_CHART_PART_BG, &label_dsc);
 
     for(i = 0; i < (num_scale_ticks + 1); i++) { /* one extra loop - it may not exist in the list, empty label */
         /* first point of the tick */
