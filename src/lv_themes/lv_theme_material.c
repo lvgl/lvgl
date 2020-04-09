@@ -1071,7 +1071,7 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_MSGBOX_BTNS:
             lv_obj_clean_style_list(obj, LV_MSGBOX_PART_BTN_BG);
             list = lv_obj_get_style_list(obj, LV_MSGBOX_PART_BTN_BG);
-            lv_style_list_add_style(list, &pad_inner);
+            lv_style_list_add_style(list, &pad_small);
 
             lv_obj_clean_style_list(obj, LV_MSGBOX_PART_BTN);
             list = lv_obj_get_style_list(obj, LV_MSGBOX_PART_BTN);

@@ -153,6 +153,8 @@ void lv_group_remove_obj(lv_obj_t * obj)
 
     /*Focus on the next object*/
     if(*g->obj_focus == obj) {
+        if(g->frozen) g->frozen = 0;
+
         /*If this is the only object in the group then focus to nothing.*/
         if(lv_ll_get_head(&g->obj_ll) == g->obj_focus && lv_ll_get_tail(&g->obj_ll) == g->obj_focus) {
             (*g->obj_focus)->signal_cb(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);

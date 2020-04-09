@@ -156,6 +156,10 @@ void lv_msgbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
     lv_btnmatrix_set_btn_ctrl_all(ext->btnm, LV_BTNMATRIX_CTRL_CLICK_TRIG | LV_BTNMATRIX_CTRL_NO_REPEAT);
     lv_obj_set_event_cb(ext->btnm, lv_msgbox_btnm_event_cb);
 
+    if(lv_obj_is_focused(mbox)) {
+        lv_btnmatrix_set_focused_btn(ext->btnm, 0);
+    }
+
     mbox_realign(mbox);
 }
 
