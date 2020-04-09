@@ -36,6 +36,7 @@ typedef struct {
     int32_t cur_value;
     int32_t min_value;
     int32_t max_value;
+    uint8_t mirrored :1;
 } lv_linemeter_ext_t;
 
 /*Styles*/
@@ -93,6 +94,13 @@ void lv_linemeter_set_scale(lv_obj_t * lmeter, uint16_t angle, uint16_t line_cnt
  */
 void lv_linemeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle);
 
+/**
+ * Set the orientation of the meter growth, clockwise or counterclockwise (mirrored)
+ * @param lmeter pointer to a line meter object
+ * @param mirror mirror setting
+ */
+void lv_linemeter_set_mirror(lv_obj_t *lmeter, bool mirror);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -141,6 +149,13 @@ uint16_t lv_linemeter_get_angle_offset(lv_obj_t * lmeter);
 
 
 void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uint8_t part);
+
+/**
+ * get the mirror setting for the line meter
+ * @param lmeter pointer to a line meter object
+ * @return mirror (true or false)
+ */
+bool lv_linemeter_get_mirror(lv_obj_t * lmeter);
 
 /**********************
  *      MACROS

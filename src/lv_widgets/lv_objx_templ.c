@@ -62,7 +62,7 @@ lv_obj_t * lv_templ_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Create the ancestor of template*/
     /*TODO modify it to the ancestor create function */
     lv_obj_t * new_templ = lv_ANCESTOR_create(par, copy);
-    lv_mem_assert(new_templ);
+    LV_ASSERT_MEM(new_templ);
     if(new_templ == NULL) return NULL;
 
     /*Allocate the template type specific extended data*/

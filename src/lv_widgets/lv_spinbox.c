@@ -78,6 +78,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->step               = 1;
     ext->range_max          = 99999;
     ext->range_min          = -99999;
+	ext->rollover			= false;
 
 
     /*The signal and design functions are not copied so set them here*/
@@ -102,7 +103,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_spinbox_set_digit_format(spinbox, (uint8_t)copy_ext->digit_count, (uint8_t)copy_ext->dec_point_pos);
         lv_spinbox_set_range(spinbox, copy_ext->range_min, copy_ext->range_max);
         lv_spinbox_set_step(spinbox, copy_ext->step);
-
+        lv_spinbox_set_rollover(spinbox, copy_ext->rollover);
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(spinbox, LV_STYLE_PROP_ALL);
@@ -118,6 +119,19 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
 /*=====================
  * Setter functions
  *====================*/
+
+/**
+ * Set spinbox rollover function
+ * @param spinbox pointer to spinbox
+ * @param b true or false to enable or disable (default)
+ */
+void lv_spinbox_set_rollover(lv_obj_t * spinbox, bool b) {
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
+    lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
+
+	ext->rollover = b;
+}
 
 /**
  * Set spinbox value
@@ -224,6 +238,18 @@ void lv_spinbox_set_padding_left(lv_obj_t * spinbox, uint8_t padding)
  *====================*/
 
 /**
+ * Get spinbox rollover function status
+ * @param spinbox pointer to spinbox
+ */
+bool lv_spinbox_get_rollover(lv_obj_t * spinbox) {
+    LV_ASSERT_OBJ(spinbox, LV_OBJX_NAME);
+
+    lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
+
+	return ext->rollover;
+}
+
+/**
  * Get the spinbox numeral value (user has to convert to float according to its digit format)
  * @param spinbox pointer to spinbox
  * @return value integer value of the spinbox
@@ -292,9 +318,12 @@ void lv_spinbox_increment(lv_obj_t * spinbox)
         if((ext->value + ext->step) > 0 && ext->value < 0) ext->value = -ext->value;
         ext->value += ext->step;
 
-    }
-    else {
-        ext->value = ext->range_max;
+    } else {
+		// Rollover?
+		if ((ext->rollover) && (ext->value == ext->range_max))
+			ext->value = ext->range_min;
+		else
+			ext->value = ext->range_max;
     }
 
     lv_spinbox_updatevalue(spinbox);
@@ -314,9 +343,12 @@ void lv_spinbox_decrement(lv_obj_t * spinbox)
         /*Special mode when zero crossing*/
         if((ext->value - ext->step) < 0 && ext->value > 0) ext->value = -ext->value;
         ext->value -= ext->step;
-    }
-    else {
-        ext->value = ext->range_min;
+    } else {
+		// Rollover?
+		if ((ext->rollover) && (ext->value == ext->range_min))
+			ext->value = ext->range_max;
+		else
+			ext->value = ext->range_min;
     }
 
     lv_spinbox_updatevalue(spinbox);
