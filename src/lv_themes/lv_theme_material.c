@@ -723,7 +723,7 @@ static void ddlist_init(void)
 #if LV_USE_DROPDOWN != 0
 
     style_init_reset(&ddlist_page);
-    lv_style_set_text_line_space(&ddlist_page, LV_STATE_DEFAULT, LV_DPI / 5);
+    lv_style_set_text_line_space(&ddlist_page, LV_STATE_DEFAULT, LV_DPI / 10);
 
     style_init_reset(&ddlist_sel);
     lv_style_set_bg_opa(&ddlist_sel, LV_STATE_DEFAULT, LV_OPA_COVER);
