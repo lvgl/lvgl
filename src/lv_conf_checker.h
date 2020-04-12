@@ -621,7 +621,7 @@
 #endif
 #if LV_USE_CHART
 #ifndef LV_CHART_AXIS_TICK_LABEL_MAX_LEN
-#  define LV_CHART_AXIS_TICK_LABEL_MAX_LEN    20
+#  define LV_CHART_AXIS_TICK_LABEL_MAX_LEN    256
 #endif
 #endif
 
