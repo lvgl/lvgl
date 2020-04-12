@@ -199,6 +199,8 @@ void lv_spinbox_set_range(lv_obj_t * spinbox, int32_t range_min, int32_t range_m
         ext->value = ext->range_min;
         lv_obj_invalidate(spinbox);
     }
+
+    lv_spinbox_updatevalue(spinbox);
 }
 
 /**
