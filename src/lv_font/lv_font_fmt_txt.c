@@ -94,11 +94,12 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
         if(gsize == 0) return NULL;
 
         uint32_t buf_size = gsize;
+        /*Compute memory size needed to hold decompressed glyph, rounding up*/
         switch(fdsc->bpp) {
-        case 1: buf_size = gsize >> 3;  break;
-        case 2: buf_size = gsize >> 2;  break;
-        case 3: buf_size = gsize >> 1;  break;
-        case 4: buf_size = gsize >> 1;  break;
+        case 1: buf_size = (gsize + 7) >> 3;  break;
+        case 2: buf_size = (gsize + 3) >> 2;  break;
+        case 3: buf_size = (gsize + 1) >> 1;  break;
+        case 4: buf_size = (gsize + 1) >> 1;  break;
         }
 
         if(lv_mem_get_size(buf) < buf_size) {
