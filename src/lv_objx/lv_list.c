@@ -1007,7 +1007,8 @@ static void lv_list_btn_single_select(lv_obj_t * btn)
         if(e == btn) {
             lv_btn_set_state(e, LV_BTN_STATE_TGL_REL);
         } else {
-            lv_btn_set_state(e, LV_BTN_STATE_REL);
+            if (lv_btn_get_state(e) != LV_BTN_STATE_INA)
+                lv_btn_set_state(e, LV_BTN_STATE_REL);
         }
         e = lv_list_get_next_btn(list, e);
     } while(e != NULL);
