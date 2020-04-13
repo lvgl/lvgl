@@ -551,19 +551,10 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
  */
 static void lv_cont_layout_grid(lv_obj_t * cont)
 {
-    lv_obj_t * child;
     const lv_style_t * style = lv_obj_get_style(cont);
-    lv_coord_t w_tot         = lv_obj_get_width(cont);
-    lv_coord_t w_obj         = lv_obj_get_width(lv_obj_get_child(cont, NULL));
     lv_coord_t w_fit         =  lv_obj_get_width_fit(cont);
     lv_coord_t h_obj         = lv_obj_get_height(lv_obj_get_child(cont, NULL));
-    uint16_t obj_row         = (w_fit) / (w_obj + style->body.padding.inner); /*Obj. num. in a row*/
-    lv_coord_t x_ofs;
-    if(obj_row > 1) {
-        x_ofs = w_obj + (w_fit - (obj_row * w_obj)) / (obj_row - 1);
-    } else {
-        x_ofs = w_tot / 2 - w_obj / 2;
-    }
+
     lv_coord_t y_ofs = h_obj + style->body.padding.inner;
 
     /* Disable child change action because the children will be moved a lot
@@ -573,24 +564,19 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
     /* Align the children */
     lv_coord_t act_x = style->body.padding.left;
     lv_coord_t act_y = style->body.padding.top;
-    uint16_t obj_cnt = 0;
+    lv_obj_t * child;
     LV_LL_READ_BACK(cont->child_ll, child)
     {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
+        lv_coord_t obj_w = lv_obj_get_width(child);
 
-        if(obj_row > 1) {
-            lv_obj_set_pos(child, act_x, act_y);
-            act_x += x_ofs;
-        } else {
-            lv_obj_set_pos(child, x_ofs, act_y);
-        }
-        obj_cnt++;
-
-        if(obj_cnt >= obj_row) {
-            obj_cnt = 0;
-            act_x   = style->body.padding.left;
+        if(act_x + style->body.padding.inner + obj_w > w_fit) {
+            act_x = style->body.padding.left;
             act_y += y_ofs;
         }
+
+        lv_obj_set_pos(child, act_x, act_y);
+        act_x += style->body.padding.inner + obj_w;
     }
 
     lv_obj_clear_protect(cont, LV_PROTECT_CHILD_CHG);
