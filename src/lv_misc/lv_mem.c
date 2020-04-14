@@ -160,7 +160,6 @@ void * lv_mem_alloc(size_t size)
 #endif
     void * alloc = NULL;
 
-    printf("alloc: %d\n", size);
 #if LV_MEM_CUSTOM == 0
     /*Use the built-in allocators*/
     lv_mem_ent_t * e = NULL;
@@ -786,7 +785,6 @@ static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e)
 static void * ent_alloc(lv_mem_ent_t * e, size_t size)
 {
     void * alloc = NULL;
-    printf("%s, size:%d\n", e->header.s.used == 0 ? "free" : "used", e->header.s.d_size);
     /*If the memory is free and big enough then use it */
     if(e->header.s.used == 0 && e->header.s.d_size >= size) {
         /*Truncate the entry to the desired size */

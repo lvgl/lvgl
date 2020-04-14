@@ -244,6 +244,13 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp);
 bool lv_disp_get_antialiasing(lv_disp_t * disp);
 
 /**
+ * Get the DPI of the display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return dpi of the display
+ */
+uint32_t lv_disp_get_dpi(lv_disp_t * disp);
+
+/**
  * Get the size category of the display based on it's hor. res. and dpi.
  * @param disp pointer to a display (NULL to use the default display)
  * @return LV_DISP_SIZE_SMALL/MEDIUM/LARGE/EXTRA_LARGE

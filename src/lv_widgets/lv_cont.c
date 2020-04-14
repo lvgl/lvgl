@@ -243,7 +243,7 @@ lv_fit_t lv_cont_get_fit_bottom(const lv_obj_t * cont)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-extern uint32_t cont_sign;
+
 /**
  * Signal function of the container
  * @param cont pointer to a container object
@@ -528,7 +528,6 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
                     break;
                 }
                 w_row += w + pinner; /*Add the object width + inner padding*/
-                lv_coord_t child_h = lv_obj_get_height(child_rc);
 
                 lv_coord_t h = lv_obj_get_height(child_rc);
                 h += lv_obj_get_style_margin_top(child_rc, LV_OBJ_PART_MAIN);

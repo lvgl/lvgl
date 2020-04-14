@@ -2882,7 +2882,6 @@ void lv_obj_set_user_data(lv_obj_t * obj, lv_obj_user_data_t data)
 }
 #endif
 
-#if LV_USE_GROUP
 /**
  * Get the group of the object
  * @param obj pointer to an object
@@ -2892,7 +2891,11 @@ void * lv_obj_get_group(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
+#if LV_USE_GROUP
     return obj->group_p;
+#else
+    return NULL;
+#endif
 }
 
 /**
@@ -2904,13 +2907,15 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
+#if LV_USE_GROUP
     if(obj->group_p) {
         if(lv_group_get_focused(obj->group_p) == obj) return true;
     }
-
     return false;
-}
+#else
+    return false;
 #endif
+}
 
 
 /*-------------------
