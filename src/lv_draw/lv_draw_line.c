@@ -145,7 +145,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
     if(simple_mode) {
         lv_blend_fill(clip, &draw_area,
                       dsc->color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
-                      LV_BLEND_MODE_NORMAL);
+                      dsc->blend_mode);
     }
     /*If there other mask apply it*/
     else {
