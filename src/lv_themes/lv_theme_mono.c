@@ -336,6 +336,15 @@ static void ta_init(void)
 #endif
 }
 
+static void spinbox_init(void)
+{
+#if LV_USE_SPINBOX
+
+    theme.style.spinbox.bg    = &light_frame;
+    theme.style.spinbox.cursor  = NULL; /*Let library to calculate the cursor's style*/
+#endif
+}
+
 static void list_init(void)
 {
 #if LV_USE_LIST != 0
@@ -495,6 +504,7 @@ lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t * font)
     mbox_init();
     page_init();
     ta_init();
+    spinbox_init();
     list_init();
     ddlist_init();
     roller_init();
