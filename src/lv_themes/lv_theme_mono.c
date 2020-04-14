@@ -37,7 +37,6 @@ static lv_style_t style_btn;
 static lv_style_t style_round;
 static lv_style_t style_no_radius;
 static lv_style_t style_fg_color;
-static lv_style_t style_tick_line;
 static lv_style_t style_border_none;
 static lv_style_t style_big_line_space;       /*In roller or dropdownlist*/
 static lv_style_t style_pad_none;
@@ -71,6 +70,10 @@ static lv_style_t style_gauge_needle, style_gauge_major;
 
 #if LV_USE_PAGE
 static lv_style_t style_sb;
+#endif
+
+#if LV_USE_SPINNER
+static lv_style_t style_tick_line;
 #endif
 
 #if LV_USE_TEXTAREA
