@@ -490,6 +490,8 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                             if(px_opa < LV_OPA_MIN) {
                                 continue;
                             }
+                        } else {
+                            mask_buf[px_i] = 0xFF;
                         }
 
 #if LV_COLOR_DEPTH == 8
@@ -498,6 +500,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                         c.full =  map_px[0] + (map_px[1] << 8);
 #elif LV_COLOR_DEPTH == 32
                         c.full =  *((uint32_t *)map_px);
+                        c.ch.alpha = 0xFF;
 #endif
                         if(chroma_key) {
                             if(c.full == chroma_keyed_color.full) {
