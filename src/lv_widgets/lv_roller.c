@@ -115,7 +115,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_theme_apply(roller, LV_THEME_ROLLER);
         refr_height(roller);
 
-        lv_roller_set_visible_row_count(roller, 4);
+        lv_roller_set_visible_row_count(roller, 3);
     }
     /*Copy an existing roller*/
     else {

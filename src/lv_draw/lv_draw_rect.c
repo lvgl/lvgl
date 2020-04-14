@@ -92,11 +92,11 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect
     draw_shadow(coords, clip, dsc);
 #endif
 
-    draw_outline(coords, clip, dsc);
     draw_bg(coords, clip, dsc);
     draw_pattern(coords, clip, dsc);
     draw_border(coords, clip, dsc);
     draw_value(coords, clip, dsc);
+    draw_outline(coords, clip, dsc);
 
     LV_ASSERT_MEM_INTEGRITY();
 }

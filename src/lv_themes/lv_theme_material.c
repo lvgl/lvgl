@@ -191,7 +191,8 @@ static void basic_init(void)
     lv_style_set_bg_color(&scr, LV_STATE_DEFAULT, COLOR_SCR);
     lv_style_set_text_color(&scr, LV_STATE_DEFAULT, COLOR_SCR_TEXT);
     lv_style_set_value_color(&scr, LV_STATE_DEFAULT, COLOR_SCR_TEXT);
-    lv_style_set_border_post(&scr, LV_STATE_DEFAULT, true);
+    lv_style_set_text_font(&scr, LV_STATE_DEFAULT, theme.font_normal);
+    lv_style_set_value_font(&scr, LV_STATE_DEFAULT, theme.font_normal);
 
     style_init_reset(&bg);
     lv_style_set_radius(&bg, LV_STATE_DEFAULT, LV_DPX(8));
@@ -203,6 +204,7 @@ static void basic_init(void)
     lv_style_set_border_post(&bg, LV_STATE_DEFAULT, true);
     lv_style_set_text_font(&bg, LV_STATE_DEFAULT, theme.font_normal);
     lv_style_set_text_color(&bg, LV_STATE_DEFAULT, COLOR_BG_TEXT);
+    lv_style_set_value_font(&bg, LV_STATE_DEFAULT, theme.font_normal);
     lv_style_set_value_color(&bg, LV_STATE_DEFAULT, COLOR_BG_TEXT);
     lv_style_set_image_recolor(&bg, LV_STATE_DEFAULT, COLOR_BG_TEXT);
     lv_style_set_line_color(&bg, LV_STATE_DEFAULT, COLOR_BG_TEXT);
@@ -409,10 +411,10 @@ static void switch_init(void)
     lv_style_set_bg_opa(&sw_knob, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&sw_knob, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_style_set_radius(&sw_knob, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-    lv_style_set_pad_top(&sw_knob, LV_STATE_DEFAULT,    - LV_DPX(10));
-    lv_style_set_pad_bottom(&sw_knob, LV_STATE_DEFAULT, - LV_DPX(10));
-    lv_style_set_pad_left(&sw_knob, LV_STATE_DEFAULT,   - LV_DPX(10));
-    lv_style_set_pad_right(&sw_knob, LV_STATE_DEFAULT,  - LV_DPX(10));
+    lv_style_set_pad_top(&sw_knob, LV_STATE_DEFAULT,    - LV_DPX(8));
+    lv_style_set_pad_bottom(&sw_knob, LV_STATE_DEFAULT, - LV_DPX(8));
+    lv_style_set_pad_left(&sw_knob, LV_STATE_DEFAULT,   - LV_DPX(8));
+    lv_style_set_pad_right(&sw_knob, LV_STATE_DEFAULT,  - LV_DPX(8));
 #endif
 }
 
@@ -633,7 +635,7 @@ static void page_init(void)
 #if LV_USE_PAGE
     style_init_reset(&sb);
     lv_style_set_bg_opa(&sb, LV_STATE_DEFAULT, LV_OPA_COVER);
-    lv_style_set_bg_color(&sb, LV_STATE_DEFAULT,  (IS_LIGHT ? lv_color_hex(0xcccfd1) : lv_color_hex(0x505559)));
+    lv_style_set_bg_color(&sb, LV_STATE_DEFAULT,  (IS_LIGHT ? lv_color_hex(0xcccfd1) : lv_color_hex(0x777f85)));
     lv_style_set_radius(&sb, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
     lv_style_set_size(&sb, LV_STATE_DEFAULT, LV_DPX(7));
     lv_style_set_pad_right(&sb, LV_STATE_DEFAULT,  LV_DPX(7));

@@ -102,7 +102,12 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_cont_set_layout(mbox, LV_LAYOUT_COLUMN_MID);
         lv_cont_set_fit2(mbox, LV_FIT_NONE, LV_FIT_TIGHT);
-        lv_obj_set_width(mbox, LV_DPI * 2);
+        lv_coord_t fit_w = lv_obj_get_width_fit(par);
+        if(lv_disp_get_size_category(NULL) <= LV_DISP_SIZE_SMALL) {
+            lv_obj_set_width(mbox, fit_w);
+        } else {
+            lv_obj_set_width(mbox, LV_MATH_MIN(fit_w, LV_DPX(400)));
+        }
         lv_obj_align(mbox, NULL, LV_ALIGN_CENTER, 0, 0);
         lv_obj_set_event_cb(mbox, lv_msgbox_default_event_cb);
 

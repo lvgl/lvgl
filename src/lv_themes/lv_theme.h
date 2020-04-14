@@ -175,7 +175,43 @@ lv_style_t * lv_theme_get_style(lv_theme_style_t name);
 
 void lv_theme_apply(lv_obj_t * obj, lv_theme_style_t name);
 
-lv_style_t * lv_theme_get_style_part(lv_theme_style_t name, uint8_t part);
+
+/**
+ * Get the small font of the theme
+ * @return pointer to the font
+ */
+const lv_font_t * lv_theme_get_font_small(void);
+
+/**
+ * Get the normal font of the theme
+ * @return pointer to the font
+ */
+const lv_font_t * lv_theme_get_font_normal(void);
+
+/**
+ * Get the subtitle font of the theme
+ * @return pointer to the font
+ */
+const lv_font_t * lv_theme_get_font_subtitle(void);
+
+/**
+ * Get the title font of the theme
+ * @return pointer to the font
+ */
+const lv_font_t * lv_theme_get_font_title(void);
+
+/**
+ * Get the primary color of the theme
+ * @return the color
+ */
+lv_color_t lv_theme_get_color_primary(void);
+
+/**
+ * Get the flags of the theme
+ * @return the flags
+ */
+uint32_t lv_theme_get_flags(void);
+
 
 /**********************
  *    MACROS

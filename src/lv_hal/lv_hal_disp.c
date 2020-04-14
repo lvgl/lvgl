@@ -64,6 +64,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
     driver->buffer           = NULL;
     driver->rotated          = 0;
     driver->color_chroma_key = LV_COLOR_TRANSP;
+    driver->dpi = LV_DPI;
 
 #if LV_ANTIALIAS
     driver->antialiasing = true;
@@ -263,6 +264,36 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp)
 
     return disp->driver.antialiasing ? true : false;
 #endif
+}
+
+/**
+ * Get the DPI of the display
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return dpi of the display
+ */
+uint32_t lv_disp_get_dpi(lv_disp_t * disp)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return 1;  /*Do not return 0 because it might be a divider*/
+    return disp->driver.dpi;
+}
+
+/**
+ * Get the size category of the display based on it's hor. res. and dpi.
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return LV_DISP_SIZE_SMALL/MEDIUM/LARGE/EXTRA_LARGE
+ */
+lv_disp_size_t lv_disp_get_size_category(lv_disp_t * disp)
+{
+    if(disp == NULL) disp = lv_disp_get_default();
+    if(disp == NULL) return LV_DISP_SIZE_SMALL;
+
+    uint32_t w = lv_disp_get_hor_res(disp) * 10 / disp->driver.dpi;
+
+    if(w < LV_DISP_SMALL_LIMIT) return LV_DISP_SIZE_SMALL;
+    if(w < LV_DISP_MEDIUM_LIMIT) return LV_DISP_SIZE_MEDIUM;
+    if(w < LV_DISP_LARGE_LIMIT) return LV_DISP_SIZE_LARGE;
+    else return LV_DISP_SIZE_EXTRA_LARGE;
 }
 
 /**

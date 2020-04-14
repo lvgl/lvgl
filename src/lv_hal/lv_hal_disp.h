@@ -81,6 +81,11 @@ typedef struct _disp_drv_t {
     uint32_t screen_transp : 1;
 #endif
 
+    /** DPI (dot per inch) of the display.
+     * Set to `LV_DPI` from `lv_Conf.h` by default.
+     */
+    uint32_t dpi :10;
+
     /** MANDATORY: Write the internal buffer (VDB) to the display. 'lv_disp_flush_ready()' has to be
      * called when finished */
     void (*flush_cb)(struct _disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p);
@@ -146,6 +151,14 @@ typedef struct _disp_t {
     /*Miscellaneous data*/
     uint32_t last_activity_time; /**< Last time there was activity on this display */
 } lv_disp_t;
+
+
+typedef enum {
+    LV_DISP_SIZE_SMALL,
+    LV_DISP_SIZE_MEDIUM,
+    LV_DISP_SIZE_LARGE,
+    LV_DISP_SIZE_EXTRA_LARGE,
+}lv_disp_size_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -229,6 +242,13 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp);
  * @return true: anti-aliasing is enabled; false: disabled
  */
 bool lv_disp_get_antialiasing(lv_disp_t * disp);
+
+/**
+ * Get the size category of the display based on it's hor. res. and dpi.
+ * @param disp pointer to a display (NULL to use the default display)
+ * @return LV_DISP_SIZE_SMALL/MEDIUM/LARGE/EXTRA_LARGE
+ */
+lv_disp_size_t lv_disp_get_size_category(lv_disp_t * disp);
 
 /**
  * Call in the display driver's `flush_cb` function when the flushing is finished
