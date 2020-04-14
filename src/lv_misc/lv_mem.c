@@ -28,6 +28,10 @@
     #define LV_MEM_ADD_JUNK 1
 #endif
 
+#ifndef LV_MEM_FULL_DEFRAG_CNT
+    #define LV_MEM_FULL_DEFRAG_CNT 16
+#endif
+
 #ifdef LV_ARCH_64
     #define MEM_UNIT uint64_t
 #else
@@ -156,6 +160,7 @@ void * lv_mem_alloc(size_t size)
 #endif
     void * alloc = NULL;
 
+    printf("alloc: %d\n", size);
 #if LV_MEM_CUSTOM == 0
     /*Use the built-in allocators*/
     lv_mem_ent_t * e = NULL;
@@ -218,20 +223,30 @@ void lv_mem_free(const void * data)
 
 #if LV_MEM_CUSTOM == 0
 #if LV_MEM_AUTO_DEFRAG
-    /* Make a simple defrag.
-     * Join the following free entries after this*/
-    lv_mem_ent_t * e_next;
-    e_next = ent_get_next(e);
-    while(e_next != NULL) {
-        if(e_next->header.s.used == 0) {
-            e->header.s.d_size += e_next->header.s.d_size + sizeof(e->header);
+    static uint16_t full_defrag_cnt = 0;
+    full_defrag_cnt++;
+    if(full_defrag_cnt < LV_MEM_FULL_DEFRAG_CNT) {
+        /* Make a simple defrag.
+         * Join the following free entries after this*/
+        lv_mem_ent_t * e_next;
+        e_next = ent_get_next(e);
+        while(e_next != NULL) {
+            if(e_next->header.s.used == 0) {
+                e->header.s.d_size += e_next->header.s.d_size + sizeof(e->header);
+            }
+            else {
+                break;
+            }
+            e_next = ent_get_next(e_next);
         }
-        else {
-            break;
-        }
-        e_next = ent_get_next(e_next);
+    } else {
+        full_defrag_cnt = 0;
+        lv_mem_defrag();
+
     }
-#endif
+
+
+#endif /*LV_MEM_AUTO_DEFRAG*/
 #else /*Use custom, user defined free function*/
 #if LV_ENABLE_GC == 0
     LV_MEM_CUSTOM_FREE(e);
@@ -771,13 +786,12 @@ static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e)
 static void * ent_alloc(lv_mem_ent_t * e, size_t size)
 {
     void * alloc = NULL;
-
+    printf("%s, size:%d\n", e->header.s.used == 0 ? "free" : "used", e->header.s.d_size);
     /*If the memory is free and big enough then use it */
     if(e->header.s.used == 0 && e->header.s.d_size >= size) {
         /*Truncate the entry to the desired size */
-        ent_trunc(e, size),
-
-                  e->header.s.used = 1;
+        ent_trunc(e, size);
+        e->header.s.used = 1;
 
         /*Save the allocated data*/
         alloc = &e->first_data;
