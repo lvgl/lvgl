@@ -89,6 +89,23 @@
 #define LV_DPI              100     /*[px]*/
 #endif
 
+/* The the real width of the display changes some default values:
+ * default object sizes, layout of examples, etc.
+ * According to the width of the display (hor. res. / dpi)
+ * the displays fall in 4 categories.
+ * The 4th is extra large which has no upper limit so not listed here
+ * The upper limit of the categories are set below in 0.1 inch unit.
+ */
+#ifndef LV_DISP_SMALL_LIMIT
+#define LV_DISP_SMALL_LIMIT 20
+#endif
+#ifndef LV_DISP_MEDIUM_LIMIT
+#define LV_DISP_MEDIUM_LIMIT 45
+#endif
+#ifndef LV_DISP_LARGE_LIMIT
+#define LV_DISP_LARGE_LIMIT 65
+#endif
+
 /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
 
 /*=========================
