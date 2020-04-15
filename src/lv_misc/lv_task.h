@@ -64,8 +64,8 @@ typedef struct _lv_task_t {
 
     void * user_data; /**< Custom user data */
 
+    int32_t repeat_count; /**< 1: Task times;  -1 : infinity;  0 : stop ;  n>0: residual times */
     uint8_t prio : 3; /**< Task priority */
-    uint8_t once : 1; /**< 1: one shot task */
 } lv_task_t;
 
 /**********************
@@ -140,10 +140,11 @@ void lv_task_set_period(lv_task_t * task, uint32_t period);
 void lv_task_ready(lv_task_t * task);
 
 /**
- * Delete the lv_task after one call
+ * Set the number of times a task will repeat. 
  * @param task pointer to a lv_task.
+ * @param repeat_count -1 : infinity;  0 : stop ;  n>0: residual times
  */
-void lv_task_once(lv_task_t * task);
+void lv_task_set_repeat_count(lv_task_t * task, int32_t repeat_count);
 
 /**
  * Reset a lv_task.
