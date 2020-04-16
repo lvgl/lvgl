@@ -182,7 +182,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
             if(dashed) {
-                if(mask_res != LV_DRAW_MASK_RES_FULL_TRANSP) {
+                if(mask_res != LV_DRAW_MASK_RES_TRANSP) {
                     lv_style_int_t dash_cnt = dash_start;
                     uint32_t i;
                     for(i = 0; i < draw_area_w; i++, dash_cnt++) {
@@ -285,9 +285,9 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf, vdb->area.x1 + draw_area.x1, vdb->area.y1 + h, draw_area_w);
 
             if(dashed) {
-                if(mask_res != LV_DRAW_MASK_RES_FULL_TRANSP) {
+                if(mask_res != LV_DRAW_MASK_RES_TRANSP) {
                     if(dash_cnt > dsc->dash_width) {
-                        mask_res = LV_DRAW_MASK_RES_FULL_TRANSP;
+                        mask_res = LV_DRAW_MASK_RES_TRANSP;
                     }
 
                     if(dash_cnt >= dsc->dash_gap + dsc->dash_width) {
@@ -437,7 +437,7 @@ static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
     for(h = draw_area.y1 + disp_area->y1; h <= draw_area.y2 + disp_area->y1; h++) {
 
         lv_draw_mask_res_t mask_res = lv_draw_mask_apply(&mask_buf[mask_p], x, h, draw_area_w);
-        if(mask_res == LV_DRAW_MASK_RES_FULL_TRANSP) {
+        if(mask_res == LV_DRAW_MASK_RES_TRANSP) {
             lv_memset_00(&mask_buf[mask_p], draw_area_w);
         }
 

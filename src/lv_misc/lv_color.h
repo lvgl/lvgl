@@ -597,6 +597,8 @@ static inline lv_color_t lv_color_hex3(uint32_t c)
                          (uint8_t)((c & 0xF) | ((c & 0xF) << 4)));
 }
 
+void lv_color_fill(lv_color_t * buf, lv_color_t color, uint32_t px_num);
+
 lv_color_t lv_color_lighten(lv_color_t c, lv_opa_t lvl);
 
 lv_color_t lv_color_darken(lv_color_t c, lv_opa_t lvl);

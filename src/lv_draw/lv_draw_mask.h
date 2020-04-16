@@ -27,7 +27,7 @@ extern "C" {
  **********************/
 
 enum {
-    LV_DRAW_MASK_RES_FULL_TRANSP,
+    LV_DRAW_MASK_RES_TRANSP,
     LV_DRAW_MASK_RES_FULL_COVER,
     LV_DRAW_MASK_RES_CHANGED,
     LV_DRAW_MASK_RES_UNKNOWN

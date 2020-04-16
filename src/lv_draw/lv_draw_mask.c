@@ -110,7 +110,7 @@ lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_
         dsc = m->param;
         lv_draw_mask_res_t res = LV_DRAW_MASK_RES_FULL_COVER;
         res = dsc->cb(mask_buf, abs_x, abs_y, len, (void *)m->param);
-        if(res == LV_DRAW_MASK_RES_FULL_TRANSP) return LV_DRAW_MASK_RES_FULL_TRANSP;
+        if(res == LV_DRAW_MASK_RES_TRANSP) return LV_DRAW_MASK_RES_TRANSP;
         else if(res == LV_DRAW_MASK_RES_CHANGED) changed = true;
 
         m++;
@@ -442,7 +442,7 @@ static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_
             else if(p->cfg.side == LV_DRAW_MASK_LINE_SIDE_TOP && abs_y + 1 < 0) return LV_DRAW_MASK_RES_FULL_COVER;
             else if(p->cfg.side == LV_DRAW_MASK_LINE_SIDE_BOTTOM && abs_y > 0) return LV_DRAW_MASK_RES_FULL_COVER;
             else {
-                return LV_DRAW_MASK_RES_FULL_TRANSP;
+                return LV_DRAW_MASK_RES_TRANSP;
             }
         }
         /*Vertical*/
@@ -455,17 +455,17 @@ static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_
                 if(abs_x + len < 0) return LV_DRAW_MASK_RES_FULL_COVER;
                 else {
                     int32_t k = - abs_x;
-                    if(k < 0) return LV_DRAW_MASK_RES_FULL_TRANSP;
+                    if(k < 0) return LV_DRAW_MASK_RES_TRANSP;
                     if(k >= 0 && k < len) lv_memset_00(&mask_buf[k], len - k);
                     return  LV_DRAW_MASK_RES_CHANGED;
                 }
             }
             else {
-                if(abs_x + len < 0) return LV_DRAW_MASK_RES_FULL_TRANSP;
+                if(abs_x + len < 0) return LV_DRAW_MASK_RES_TRANSP;
                 else {
                     int32_t k = - abs_x;
                     if(k < 0) k = 0;
-                    if(k >= len) return LV_DRAW_MASK_RES_FULL_TRANSP;
+                    if(k >= len) return LV_DRAW_MASK_RES_TRANSP;
                     else if(k >= 0 && k < len) lv_memset_00(&mask_buf[0], k);
                     return  LV_DRAW_MASK_RES_CHANGED;
                 }
@@ -496,7 +496,7 @@ static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, 
                 return LV_DRAW_MASK_RES_FULL_COVER;
             }
             else {
-                return LV_DRAW_MASK_RES_FULL_TRANSP;
+                return LV_DRAW_MASK_RES_TRANSP;
             }
         }
     }
@@ -506,7 +506,7 @@ static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, 
                 return LV_DRAW_MASK_RES_FULL_COVER;
             }
             else {
-                return LV_DRAW_MASK_RES_FULL_TRANSP;
+                return LV_DRAW_MASK_RES_TRANSP;
             }
         }
     }
@@ -517,7 +517,7 @@ static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, 
     if(p->yx_steep > 0) {
         if(y_at_x < abs_y) {
             if(p->inv) {
-                return LV_DRAW_MASK_RES_FULL_TRANSP;
+                return LV_DRAW_MASK_RES_TRANSP;
             }
             else {
                 return LV_DRAW_MASK_RES_FULL_COVER;
@@ -527,7 +527,7 @@ static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, 
     else {
         if(y_at_x > abs_y) {
             if(p->inv) {
-                return LV_DRAW_MASK_RES_FULL_TRANSP;
+                return LV_DRAW_MASK_RES_TRANSP;
             }
             else {
                 return LV_DRAW_MASK_RES_FULL_COVER;
@@ -581,7 +581,7 @@ static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, 
     if(p->inv) {
         k = xei - abs_x;
         if(k > len) {
-            return LV_DRAW_MASK_RES_FULL_TRANSP;
+            return LV_DRAW_MASK_RES_TRANSP;
         }
         if(k >= 0) {
             lv_memset_00(&mask_buf[0], k);
@@ -590,7 +590,7 @@ static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, 
     else {
         k++;
         if(k < 0) {
-            return LV_DRAW_MASK_RES_FULL_TRANSP;
+            return LV_DRAW_MASK_RES_TRANSP;
         }
         if(k <= len) {
             lv_memset_00(&mask_buf[k], len - k);
@@ -614,7 +614,7 @@ static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x,
             return LV_DRAW_MASK_RES_FULL_COVER;
         }
         else {
-            return LV_DRAW_MASK_RES_FULL_TRANSP;
+            return LV_DRAW_MASK_RES_TRANSP;
         }
     }
 
@@ -623,7 +623,7 @@ static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x,
     x_at_y = (int32_t)((int32_t)p->xy_steep * (abs_y)) >> 10;
     if(x_at_y > abs_x + len) {
         if(p->inv) {
-            return LV_DRAW_MASK_RES_FULL_TRANSP;
+            return LV_DRAW_MASK_RES_TRANSP;
         }
         else {
             return LV_DRAW_MASK_RES_FULL_COVER;
@@ -660,14 +660,14 @@ static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x,
         if(p->inv) {
             k = xsi - abs_x;
             if(k >= len) {
-                return LV_DRAW_MASK_RES_FULL_TRANSP;
+                return LV_DRAW_MASK_RES_TRANSP;
             }
             if(k >= 0) lv_memset_00(&mask_buf[0], k);
 
         }
         else {
             if(k > len) k = len;
-            if(k == 0) return LV_DRAW_MASK_RES_FULL_TRANSP;
+            if(k == 0) return LV_DRAW_MASK_RES_TRANSP;
             else if(k > 0) lv_memset_00(&mask_buf[k],  len - k);
         }
 
@@ -726,13 +726,13 @@ static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x,
 
             if(p->inv) {
                 k = xsi - abs_x;
-                if(k > len)  return LV_DRAW_MASK_RES_FULL_TRANSP;
+                if(k > len)  return LV_DRAW_MASK_RES_TRANSP;
                 if(k >= 0) lv_memset_00(&mask_buf[0],  k);
 
             }
             else {
                 if(k > len) k = len;
-                if(k == 0) return LV_DRAW_MASK_RES_FULL_TRANSP;
+                if(k == 0) return LV_DRAW_MASK_RES_TRANSP;
                 else if(k > 0) lv_memset_00(&mask_buf[k],  len - k);
             }
         }
@@ -781,7 +781,7 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         if(tmp > len) tmp = len;
         if(tmp > 0) {
             res1 = lv_draw_mask_line(&mask_buf[0], abs_x, abs_y, tmp, &p->start_line);
-            if(res1 == LV_DRAW_MASK_RES_FULL_TRANSP) {
+            if(res1 == LV_DRAW_MASK_RES_TRANSP) {
                 lv_memset_00(&mask_buf[0], tmp);
             }
         }
@@ -789,7 +789,7 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         if(tmp > len) tmp = len;
         if(tmp < 0) tmp = 0;
         res2 = lv_draw_mask_line(&mask_buf[tmp], abs_x + tmp, abs_y, len - tmp, &p->end_line);
-        if(res2 == LV_DRAW_MASK_RES_FULL_TRANSP) {
+        if(res2 == LV_DRAW_MASK_RES_TRANSP) {
             lv_memset_00(&mask_buf[tmp], len - tmp);
         }
         if(res1 == res2) return res1;
@@ -823,7 +823,7 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         if(tmp > len) tmp = len;
         if(tmp > 0) {
             res1 = lv_draw_mask_line(&mask_buf[0], abs_x, abs_y, tmp, (lv_draw_mask_line_param_t *)&p->end_line);
-            if(res1 == LV_DRAW_MASK_RES_FULL_TRANSP) {
+            if(res1 == LV_DRAW_MASK_RES_TRANSP) {
                 lv_memset_00(&mask_buf[0], tmp);
             }
         }
@@ -831,7 +831,7 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
         if(tmp > len) tmp = len;
         if(tmp < 0) tmp = 0;
         res2 = lv_draw_mask_line(&mask_buf[tmp], abs_x + tmp, abs_y, len - tmp, (lv_draw_mask_line_param_t *)&p->start_line);
-        if(res2 == LV_DRAW_MASK_RES_FULL_TRANSP) {
+        if(res2 == LV_DRAW_MASK_RES_TRANSP) {
             lv_memset_00(&mask_buf[tmp], len - tmp);
         }
         if(res1 == res2) return res1;
@@ -874,8 +874,8 @@ static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs
             res2 = lv_draw_mask_line(mask_buf, abs_x, abs_y, len, &p->end_line);
         }
 
-        if(res1 == LV_DRAW_MASK_RES_FULL_TRANSP || res2 == LV_DRAW_MASK_RES_FULL_TRANSP) return LV_DRAW_MASK_RES_FULL_TRANSP;
-        else if(res1 == LV_DRAW_MASK_RES_UNKNOWN && res2 == LV_DRAW_MASK_RES_UNKNOWN) return LV_DRAW_MASK_RES_FULL_TRANSP;
+        if(res1 == LV_DRAW_MASK_RES_TRANSP || res2 == LV_DRAW_MASK_RES_TRANSP) return LV_DRAW_MASK_RES_TRANSP;
+        else if(res1 == LV_DRAW_MASK_RES_UNKNOWN && res2 == LV_DRAW_MASK_RES_UNKNOWN) return LV_DRAW_MASK_RES_TRANSP;
         else if(res1 == LV_DRAW_MASK_RES_FULL_COVER &&  res2 == LV_DRAW_MASK_RES_FULL_COVER) return LV_DRAW_MASK_RES_FULL_COVER;
         else return LV_DRAW_MASK_RES_CHANGED;
     }
@@ -891,7 +891,7 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
 
     if(outer == false) {
         if(abs_y < rect.y1 || abs_y >rect.y2) {
-            return LV_DRAW_MASK_RES_FULL_TRANSP;
+            return LV_DRAW_MASK_RES_TRANSP;
         }
     }
     else {
@@ -905,13 +905,13 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
         if(outer == false) {
             /*Remove the edges*/
             int32_t last =  rect.x1 - abs_x;
-            if(last > len) return LV_DRAW_MASK_RES_FULL_TRANSP;
+            if(last > len) return LV_DRAW_MASK_RES_TRANSP;
             if(last >= 0) {
                 lv_memset_00(&mask_buf[0], last);
             }
 
             int32_t first = rect.x2 - abs_x + 1;
-            if(first <= 0) return LV_DRAW_MASK_RES_FULL_TRANSP;
+            if(first <= 0) return LV_DRAW_MASK_RES_TRANSP;
             else if(first < len) {
                 lv_memset_00(&mask_buf[first], len - first);
             }
@@ -1018,13 +1018,13 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
             if(outer == false) {
                 kr++;
                 if(kl > len)  {
-                    return LV_DRAW_MASK_RES_FULL_TRANSP;
+                    return LV_DRAW_MASK_RES_TRANSP;
                 }
                 if(kl >= 0) {
                     lv_memset_00(&mask_buf[0], kl);
                 }
                 if(kr < 0) {
-                    return LV_DRAW_MASK_RES_FULL_TRANSP;
+                    return LV_DRAW_MASK_RES_TRANSP;
                 }
                 if(kr <= len) {
                     lv_memset_00(&mask_buf[kr], len - kr);
@@ -1114,12 +1114,12 @@ static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t ab
             if(outer == 0) {
                 kl++;
                 if(kl > len) {
-                    return LV_DRAW_MASK_RES_FULL_TRANSP;
+                    return LV_DRAW_MASK_RES_TRANSP;
                 }
                 if(kl >= 0) lv_memset_00(&mask_buf[0], kl);
 
                 if(kr < 0) {
-                    return LV_DRAW_MASK_RES_FULL_TRANSP;
+                    return LV_DRAW_MASK_RES_TRANSP;
                 }
                 if(kr < len) lv_memset_00(&mask_buf[kr], len - kr);
             }

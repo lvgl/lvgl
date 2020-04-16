@@ -556,7 +556,7 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
         if(other_mask_cnt) {
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, fill_area.x1, fill_area.y2,
                                                              lv_area_get_width(&fill_area));
-            if(mask_res == LV_DRAW_MASK_RES_FULL_TRANSP) {
+            if(mask_res == LV_DRAW_MASK_RES_TRANSP) {
                 lv_memset_00(mask_buf + mask_p_start, lv_area_get_width(&fill_area));
             }
         }
@@ -756,7 +756,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
         if(other_mask_cnt) {
             lv_draw_mask_res_t mask_res = lv_draw_mask_apply(mask_buf + mask_p_start, map_area.x1, map_area.y2,
                                                              lv_area_get_width(&map_area));
-            if(mask_res == LV_DRAW_MASK_RES_FULL_TRANSP) {
+            if(mask_res == LV_DRAW_MASK_RES_TRANSP) {
                 lv_memset_00(mask_buf + mask_p_start, lv_area_get_width(&map_area));
             }
         }

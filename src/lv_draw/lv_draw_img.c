@@ -537,7 +537,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                     lv_draw_mask_res_t mask_res_sub;
                     mask_res_sub = lv_draw_mask_apply(mask_buf + px_i_start, draw_area.x1 + vdb->area.x1, y + draw_area.y1 + vdb->area.y1,
                                                       lv_area_get_width(&draw_area));
-                    if(mask_res_sub == LV_DRAW_MASK_RES_FULL_TRANSP) {
+                    if(mask_res_sub == LV_DRAW_MASK_RES_TRANSP) {
                         lv_memset_00(mask_buf + px_i_start, lv_area_get_width(&draw_area));
                         mask_res = LV_DRAW_MASK_RES_CHANGED;
                     }
