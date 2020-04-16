@@ -101,7 +101,7 @@ void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t
     HAL_DMA2D_PollForTransfer(&hdma2d, HAL_MAX_DELAY);
 }
 
-void lv_gpu_stm32_dma2d_blend_normal_cover(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h)
+void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h)
 {
 #if __DCACHE_PRESENT
     SCB_CleanInvalidateDCache();
@@ -128,7 +128,7 @@ void lv_gpu_stm32_dma2d_blend_normal_cover(lv_color_t * buf, lv_coord_t buf_w, c
     }
 }
 
-void lv_gpu_stm32_dma2d_blend_normal_opa(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_opa_t opa, lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h)
+void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_opa_t opa, lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h)
 {
 #if __DCACHE_PRESENT
     SCB_CleanInvalidateDCache();
@@ -145,7 +145,7 @@ void lv_gpu_stm32_dma2d_blend_normal_opa(lv_color_t * buf, lv_coord_t buf_w, con
     hdma2d.LayerCfg[0].AlphaInverted = DMA2D_REGULAR_ALPHA;
 
     /* Foreground layer */
-    hdma2d.LayerCfg[1].AlphaMode = DMA2D_REPLACE_ALPHA;
+    hdma2d.LayerCfg[1].AlphaMode = DMA2D_COMBINE_ALPHA;
     hdma2d.LayerCfg[1].InputAlpha = opa;
     hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_FORMAT;
     hdma2d.LayerCfg[1].InputOffset = map_w - copy_w;
@@ -160,6 +160,7 @@ void lv_gpu_stm32_dma2d_blend_normal_opa(lv_color_t * buf, lv_coord_t buf_w, con
         }
     }
 }
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

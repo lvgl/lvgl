@@ -13,6 +13,8 @@
 #include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_gpu/lv_gpu_stm32_dma2d.h"
+
 
 /*********************
  *      DEFINES
@@ -395,6 +397,16 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
 
         /*Simple ARGB image. Handle it as special case because it's very common*/
         if(other_mask_cnt == 0 && !transform && !chroma_key && draw_dsc->recolor_opa == LV_OPA_TRANSP && alpha_byte) {
+#if LV_USE_GPU_STM32_DMA2D && LV_COLOR_DEPTH == 32
+            /*Blend ARGB images directly*/
+            if(lv_area_get_size(draw_area) > 240) {
+                int32_t disp_w = lv_area_get_width(disp_area);
+                lv_color_t * disp_buf = vdb->buf_act;
+                lv_color_t * disp_buf_first = disp_buf + disp_w * draw_area.y1 + draw_area.x1;
+                lv_gpu_stm32_dma2d_blend(disp_buf_first, disp_w, (const lv_color_t *)map_buf_tmp, draw_dsc->opa, map_w, draw_area_w, draw_area_h);
+                return;
+            }
+#endif
             int32_t x;
             int32_t y;
             for(y = 0; y < draw_area_h; y++) {

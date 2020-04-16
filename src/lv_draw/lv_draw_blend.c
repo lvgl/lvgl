@@ -655,7 +655,7 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
     int32_t map_w = lv_area_get_width(map_area);
 
     /*Create a temp. disp_buf which always point to first pixel to draw*/
-    lv_color_t * disp_buf_first = disp_buf + disp_w * draw_area->y1 + draw_area->x1;;
+    lv_color_t * disp_buf_first = disp_buf + disp_w * draw_area->y1 + draw_area->x1;
 
     /*Create a temp. map_buf which always point to first pixel to draw from the map*/
     const lv_color_t * map_buf_first = map_buf + map_w * (draw_area->y1 - (map_area->y1 - disp_area->y1));
@@ -687,7 +687,7 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
         if(opa > LV_OPA_MAX) {
 #if LV_USE_GPU_STM32_DMA2D
         if(lv_area_get_size(draw_area) >= 240) {
-            lv_gpu_stm32_dma2d_blend_normal_cover(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h);
+            lv_gpu_stm32_dma2d_copy(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h);
             return;
         }
 #endif
@@ -702,7 +702,7 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
         else {
 #if LV_USE_GPU_STM32_DMA2D
         if(lv_area_get_size(draw_area) >= 240) {
-            lv_gpu_stm32_dma2d_blend_normal_opa(disp_buf_first, disp_w, map_buf_first, opa, map_w, draw_area_w, draw_area_h);
+            lv_gpu_stm32_dma2d_blend(disp_buf_first, disp_w, map_buf_first, opa, map_w, draw_area_w, draw_area_h);
             return;
         }
 #endif
