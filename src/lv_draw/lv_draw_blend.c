@@ -20,7 +20,7 @@ static DMA2D_HandleTypeDef hdma2d;
  *********************/
 #define GPU_SIZE_LIMIT      240
 
-#if LV_USE_GPU_STM32_CHROM_ART
+#if LV_USE_GPU_STM32_DMA2D
 #if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
 #define DMA2D_OUTPUT_FORMAT DMA2D_OUTPUT_RGB565
 #define DMA2D_INPUT_FORMAT DMA2D_INPUT_RGB565
@@ -330,7 +330,7 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
                 disp->driver.gpu_fill_cb(&disp->driver, disp_buf, disp_w, draw_area, color);
                 return;
             }
-#if LV_USE_GPU_STM32_CHROM_ART
+#if LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
 #if __DCACHE_PRESENT
                 SCB_CleanInvalidateDCache();
@@ -407,7 +407,7 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
     else {
 
         /*DMA2D could be used here but it's much slower than software rendering*/
-#if LV_USE_GPU_STM32_CHROM_ART && 0
+#if LV_USE_GPU_STM32_DMA2D && 0
         if(lv_area_get_size(draw_area) > 240) {
 #if __DCACHE_PRESENT
                 SCB_CleanInvalidateDCache();
@@ -747,7 +747,7 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
 #endif
 
         if(opa > LV_OPA_MAX) {
-#if LV_USE_GPU_STM32_CHROM_ART
+#if LV_USE_GPU_STM32_DMA2D
         if(lv_area_get_size(draw_area) >= 240) {
 #if __DCACHE_PRESENT
                 SCB_CleanInvalidateDCache();
@@ -784,7 +784,7 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
             }
         }
         else {
-#if LV_USE_GPU_STM32_CHROM_ART
+#if LV_USE_GPU_STM32_DMA2D
         if(lv_area_get_size(draw_area) >= 256) {
 #if __DCACHE_PRESENT
                 SCB_CleanInvalidateDCache();
