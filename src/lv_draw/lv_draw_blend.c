@@ -11,29 +11,13 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_hal/lv_hal_disp.h"
 #include "../lv_core/lv_refr.h"
-#include LV_GPU_INCLUDE
 
-static DMA2D_HandleTypeDef hdma2d;
+#include "../lv_gpu/lv_gpu_stm32_dma2d.h"
 
 /*********************
  *      DEFINES
  *********************/
 #define GPU_SIZE_LIMIT      240
-
-#if LV_USE_GPU_STM32_DMA2D
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
-#define DMA2D_OUTPUT_FORMAT DMA2D_OUTPUT_RGB565
-#define DMA2D_INPUT_FORMAT DMA2D_INPUT_RGB565
-#elif LV_COLOR_DEPTH == 32
-#define DMA2D_OUTPUT_FORMAT DMA2D_OUTPUT_ARGB8888
-#define DMA2D_INPUT_FORMAT DMA2D_INPUT_ARGB8888
-#else
-/*Can't use GPU with other formats*/
-#undef LV_USE_GPU_STM32_DMA2D
-#endif
-#endif
-
-//#undef LV_USE_GPU_STM32_CHROM_ART
 
 /**********************
  *      TYPEDEFS
@@ -332,24 +316,7 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
             }
 #if LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
-#if __DCACHE_PRESENT
-                SCB_CleanInvalidateDCache();
-#endif
-                hdma2d.Instance = DMA2D;
-                hdma2d.Init.Mode = DMA2D_R2M;
-                hdma2d.Init.ColorMode = DMA2D_OUTPUT_FORMAT;
-                hdma2d.Init.OutputOffset = disp_w - draw_area_w;
-                hdma2d.LayerCfg[1].InputAlpha = DMA2D_NO_MODIF_ALPHA;
-                hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_FORMAT;
-                hdma2d.LayerCfg[1].InputOffset = 0;
-
-                /* DMA2D Initialization */
-                if (HAL_DMA2D_Init(&hdma2d) == HAL_OK) {
-                    if (HAL_DMA2D_ConfigLayer(&hdma2d, 1) == HAL_OK) {
-                        HAL_DMA2D_Start(&hdma2d, (uint32_t)lv_color_to32(color), (uint32_t)disp_buf_first, draw_area_w, draw_area_h);
-                        HAL_DMA2D_PollForTransfer(&hdma2d, HAL_MAX_DELAY);
-                    }
-                }
+                lv_gpu_stm32_dma2d_fill(disp_buf_first, disp_w, color, draw_area_w, draw_area_h);
                 return;
             }
 #endif
@@ -405,39 +372,10 @@ static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
     }
     /*Masked*/
     else {
-
         /*DMA2D could be used here but it's much slower than software rendering*/
 #if LV_USE_GPU_STM32_DMA2D && 0
         if(lv_area_get_size(draw_area) > 240) {
-#if __DCACHE_PRESENT
-                SCB_CleanInvalidateDCache();
-#endif
-            /* Configure the DMA2D Mode, Color Mode and line output offset */
-               hdma2d.Init.Mode         = DMA2D_M2M_BLEND;
-               hdma2d.Init.ColorMode    = DMA2D_OUTPUT_FORMAT;
-               hdma2d.Init.OutputOffset = disp_w - draw_area_w;
-
-               /* Configure the foreground -> The character */
-               lv_color32_t c32;
-               c32.full = lv_color_to32(color);
-               c32.ch.alpha = opa;
-               hdma2d.LayerCfg[1].AlphaMode       = DMA2D_COMBINE_ALPHA;
-               hdma2d.LayerCfg[1].InputAlpha      = c32.full;
-               hdma2d.LayerCfg[1].InputColorMode  = DMA2D_INPUT_A8;
-               hdma2d.LayerCfg[1].InputOffset     = 0;
-
-               /* Configure the background -> Display buffer */
-               hdma2d.LayerCfg[0].AlphaMode       = DMA2D_NO_MODIF_ALPHA;
-               hdma2d.LayerCfg[0].InputAlpha      = 0x00;
-               hdma2d.LayerCfg[0].InputColorMode  = DMA2D_INPUT_FORMAT;
-               hdma2d.LayerCfg[0].InputOffset     = disp_w - draw_area_w;
-
-            /* DMA2D Initialization */
-            HAL_DMA2D_Init(&hdma2d);
-            HAL_DMA2D_ConfigLayer(&hdma2d, 0);
-            HAL_DMA2D_ConfigLayer(&hdma2d, 1);
-            HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t) mask, (uint32_t) disp_buf_first,  (uint32_t)disp_buf_first, draw_area_w, draw_area_h);
-            HAL_DMA2D_PollForTransfer(&hdma2d, HAL_MAX_DELAY);
+            lv_gpu_stm32_dma2d_fill_mask(disp_buf_first, disp_w, color, mask, opa, draw_area_w, draw_area_h);
             return;
         }
 #endif
@@ -749,29 +687,7 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
         if(opa > LV_OPA_MAX) {
 #if LV_USE_GPU_STM32_DMA2D
         if(lv_area_get_size(draw_area) >= 240) {
-#if __DCACHE_PRESENT
-                SCB_CleanInvalidateDCache();
-#endif
-            hdma2d.Instance = DMA2D;
-            hdma2d.Init.Mode = DMA2D_M2M;
-            hdma2d.Init.ColorMode = DMA2D_OUTPUT_FORMAT;
-            hdma2d.Init.OutputOffset = disp_w - draw_area_w;
-
-            /* Foreground layer */
-            hdma2d.LayerCfg[1].AlphaMode = DMA2D_REPLACE_ALPHA;
-            hdma2d.LayerCfg[1].InputAlpha = opa;
-            hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_FORMAT;
-            hdma2d.LayerCfg[1].InputOffset = map_w - draw_area_w;
-            hdma2d.LayerCfg[1].AlphaInverted = DMA2D_REGULAR_ALPHA;
-
-            /* DMA2D Initialization */
-            if (HAL_DMA2D_Init(&hdma2d) == HAL_OK) {
-                HAL_DMA2D_ConfigLayer(&hdma2d, 0);
-                if (HAL_DMA2D_ConfigLayer(&hdma2d, 1) == HAL_OK) {
-                    HAL_DMA2D_Start(&hdma2d, (uint32_t)map_buf_first, (uint32_t)disp_buf_first, draw_area_w, draw_area_h);
-                    HAL_DMA2D_PollForTransfer(&hdma2d, HAL_MAX_DELAY);
-                }
-            }
+            lv_gpu_stm32_dma2d_blend_normal_cover(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h);
             return;
         }
 #endif
@@ -785,36 +701,8 @@ static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
         }
         else {
 #if LV_USE_GPU_STM32_DMA2D
-        if(lv_area_get_size(draw_area) >= 256) {
-#if __DCACHE_PRESENT
-                SCB_CleanInvalidateDCache();
-#endif
-            hdma2d.Instance = DMA2D;
-            hdma2d.Init.Mode = DMA2D_M2M_BLEND;
-            hdma2d.Init.ColorMode = DMA2D_OUTPUT_FORMAT;
-            hdma2d.Init.OutputOffset = disp_w - draw_area_w;
-
-            /* Background layer */
-            hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
-            hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_FORMAT;
-            hdma2d.LayerCfg[0].InputOffset = disp_w - draw_area_w;
-            hdma2d.LayerCfg[0].AlphaInverted = DMA2D_REGULAR_ALPHA;
-
-            /* Foreground layer */
-            hdma2d.LayerCfg[1].AlphaMode = DMA2D_REPLACE_ALPHA;
-            hdma2d.LayerCfg[1].InputAlpha = opa;
-            hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_FORMAT;
-            hdma2d.LayerCfg[1].InputOffset = map_w - draw_area_w;
-            hdma2d.LayerCfg[1].AlphaInverted = DMA2D_REGULAR_ALPHA;
-
-            /* DMA2D Initialization */
-            if (HAL_DMA2D_Init(&hdma2d) == HAL_OK) {
-                HAL_DMA2D_ConfigLayer(&hdma2d, 0);
-                if (HAL_DMA2D_ConfigLayer(&hdma2d, 1) == HAL_OK) {
-                    HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t)map_buf_first, (uint32_t)disp_buf_first, (uint32_t)disp_buf_first, draw_area_w, draw_area_h);
-                    HAL_DMA2D_PollForTransfer(&hdma2d, HAL_MAX_DELAY);
-                }
-            }
+        if(lv_area_get_size(draw_area) >= 240) {
+            lv_gpu_stm32_dma2d_blend_normal_opa(disp_buf_first, disp_w, map_buf_first, opa, map_w, draw_area_w, draw_area_h);
             return;
         }
 #endif
