@@ -530,7 +530,7 @@ void lv_draw_map(const lv_area_t * cords_p, const lv_area_t * mask_p, const uint
         else {
             for(row = masked_a.y1; row <= masked_a.y2; row++) {
 #if LV_USE_GPU
-                if(disp->driver.gpu_blend_cb == false) {
+                if(disp->driver.gpu_blend_cb == NULL) {
                     sw_mem_blend(vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
                 } else {
                     disp->driver.gpu_blend_cb(&disp->driver, vdb_buf_tmp, (lv_color_t *)map_p, map_useful_w, opa);
