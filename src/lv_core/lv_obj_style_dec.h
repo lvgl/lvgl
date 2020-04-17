@@ -61,7 +61,7 @@ extern "C" {
 #ifdef __cplusplus
 #define FUNC_PTR_CAST(v) reinterpret_cast<lv_style_prop_cb_t>(v)
 #else
-#define FUNC_PTR_CAST(v) (lv_style_prop_cb_t)v
+#define FUNC_PTR_CAST(v) (_lv_style_prop_xcb_t)v
 #endif
 
 #define _OBJ_GET_STYLE_scalar(prop_name, func_name, value_type, style_type)                         \
