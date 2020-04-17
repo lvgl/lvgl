@@ -196,25 +196,48 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 
     if(ext->text == text) {
         /*If set its own text then reallocate it (maybe its size changed)*/
+#if LV_USE_ARABIC_PERSIAN_CHARS
+        /*Get the size of the text and process it*/
+        size_t len = lv_txt_ap_calc_bytes_cnt(text);
+
+        ext->text = lv_mem_realloc(ext->text, len);
+        LV_ASSERT_MEM(ext->text);
+        if(ext->text == NULL) return;
+
+        lv_txt_ap_proc(ext->text, ext->text);
+#else
         ext->text = lv_mem_realloc(ext->text, strlen(ext->text) + 1);
+#endif
 
         LV_ASSERT_MEM(ext->text);
         if(ext->text == NULL) return;
     }
     else {
-        /*Allocate space for the new text*/
-        size_t len = strlen(text) + 1;
+        /*Free the old text*/
         if(ext->text != NULL && ext->static_txt == 0) {
             lv_mem_free(ext->text);
             ext->text = NULL;
         }
 
-        ext->text = lv_mem_alloc(len);
+#if LV_USE_ARABIC_PERSIAN_CHARS
+        /*Get the size of the text and process it*/
+        size_t len = lv_txt_ap_calc_bytes_cnt(text);
 
+        ext->text = lv_mem_alloc(len);
         LV_ASSERT_MEM(ext->text);
         if(ext->text == NULL) return;
 
+        lv_txt_ap_proc(text, ext->text);
+#else
+        /*Get the size of the text*/
+        size_t len = strlen(text) + 1;
+
+        /*Allocate space for the new text*/
+        ext->text = lv_mem_alloc(len);
+        LV_ASSERT_MEM(ext->text);
+        if(ext->text == NULL) return;
         strcpy(ext->text, text);
+#endif
 
         /*Now the text is dynamically allocated*/
         ext->static_txt = 0;
@@ -248,15 +271,38 @@ void lv_label_set_text_fmt(lv_obj_t * label, const char * fmt, ...)
         ext->text = NULL;
     }
 
+
     va_list ap, ap2;
     va_start(ap, fmt);
     va_copy(ap2, ap);
 
     /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12 */
     uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
-
     va_end(ap);
 
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    /*Put together the text according to the format string*/
+    char * raw_txt = lv_mem_buf_get(len + 1);
+    LV_ASSERT_MEM(raw_txt);
+    if(raw_txt == NULL) {
+        va_end(ap2);
+        return;
+    }
+
+    lv_vsnprintf(raw_txt, len + 1, fmt, ap2);
+
+    /*Get the size of the Arabic text and process it*/
+    size_t len_ap = lv_txt_ap_calc_bytes_cnt(raw_txt);
+    ext->text = lv_mem_alloc(len_ap + 1);
+    LV_ASSERT_MEM(ext->text);
+    if(ext->text == NULL) {
+        va_end(ap2);
+        return;
+    }
+    lv_txt_ap_proc(raw_txt, ext->text);
+
+    lv_mem_buf_release(raw_txt);
+#else
     ext->text = lv_mem_alloc(len + 1);
     LV_ASSERT_MEM(ext->text);
     if(ext->text == NULL) {
@@ -266,45 +312,9 @@ void lv_label_set_text_fmt(lv_obj_t * label, const char * fmt, ...)
     ext->text[len - 1] = 0; /* Ensure NULL termination */
 
     lv_vsnprintf(ext->text, len + 1, fmt, ap2);
+#endif
 
     va_end(ap2);
-    ext->static_txt = 0; /*Now the text is dynamically allocated*/
-
-    lv_label_refr_text(label);
-}
-
-/**
- * Set a new text for a label from a character array. The array don't has to be '\0' terminated.
- * Memory will be allocated to store the array by the label.
- * @param label pointer to a label object
- * @param array array of characters or NULL to refresh the label
- * @param size the size of 'array' in bytes
- */
-void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size)
-{
-    LV_ASSERT_OBJ(label, LV_OBJX_NAME);
-
-    lv_obj_invalidate(label);
-
-    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-
-    /*If trying to set its own text or the array is NULL then refresh */
-    if(array == ext->text || array == NULL) {
-        lv_label_refr_text(label);
-        return;
-    }
-
-    /*Allocate space for the new text*/
-    if(ext->text != NULL && ext->static_txt == 0) {
-        lv_mem_free(ext->text);
-        ext->text = NULL;
-    }
-    ext->text = lv_mem_alloc(size + 1);
-    LV_ASSERT_MEM(ext->text);
-    if(ext->text == NULL) return;
-
-    memcpy(ext->text, array, size);
-    ext->text[size] = '\0';
     ext->static_txt = 0; /*Now the text is dynamically allocated*/
 
     lv_label_refr_text(label);

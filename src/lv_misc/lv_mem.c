@@ -312,7 +312,7 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
     if(data_p != NULL) {
         /*Copy the old data to the new. Use the smaller size*/
         if(old_size != 0) {
-            memcpy(new_p, data_p, LV_MATH_MIN(new_size, old_size));
+            lv_memcpy(new_p, data_p, LV_MATH_MIN(new_size, old_size));
             lv_mem_free(data_p);
         }
     }

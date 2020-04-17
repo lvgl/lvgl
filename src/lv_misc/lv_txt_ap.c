@@ -128,7 +128,8 @@ uint32_t lv_txt_ap_calc_bytes_cnt(const char * txt){
 }
 
 
-void lv_txt_ap_proc(const char * txt,char * txt_out){
+void lv_txt_ap_proc(const char * txt,char * txt_out)
+{
     uint32_t txt_length=0;
     uint32_t index_current,idx_next,idx_previous,i,j;
     uint32_t * ch_enc;
@@ -136,12 +137,14 @@ void lv_txt_ap_proc(const char * txt,char * txt_out){
 
     txt_length = lv_txt_get_encoded_length(txt);
 
-    ch_enc = (uint32_t *)lv_mem_alloc(sizeof(uint32_t) * txt_length);
+    ch_enc = (uint32_t *)lv_mem_alloc(sizeof(uint32_t) * (txt_length + 1));
 
     i=0;
     j=0;
     while(j<txt_length)
     	ch_enc[j++] = lv_txt_encoded_next(txt, &i);
+
+    ch_enc[j] = 0;
 
     i=0;
     idx_previous = LV_UNDEF_ARABIC_PERSIAN_CHARS;
@@ -171,27 +174,23 @@ void lv_txt_ap_proc(const char * txt,char * txt_out){
         i++;
     }
 
-#if LV_USE_REVERSE_ARABIC_PERSIAN_CHARS == 1
-    lv_ap_normalize_chars(ch_enc,txt_length);
-#endif
-
     txt_out_temp = txt_out;
     i=0;
+
     while(i<txt_length){
-      if((*ch_enc) <=0x7F){
-          *(txt_out_temp++) = *ch_enc;
-      }else if((*ch_enc) <=0x7FFF){
-          *(txt_out_temp++) = 0xC0 | ((*ch_enc>>6) & 0x3F);
-          *(txt_out_temp++) = 0x80 | (*ch_enc & 0x3F);
+      if((ch_enc[i]) <=0x7F){
+          *(txt_out_temp++) = ch_enc[i];
+      }else if(ch_enc[i] <=0x7FFF){
+          *(txt_out_temp++) = 0xC0 | ((ch_enc[i]>>6) & 0x3F);
+          *(txt_out_temp++) = 0x80 | (ch_enc[i] & 0x3F);
       }else {
-        *(txt_out_temp++) = 0xE0 | ((*ch_enc>>12) & 0x3F);
-        *(txt_out_temp++) = 0x80 | ((*ch_enc>>6) & 0x3F);
-        *(txt_out_temp++) = 0x80 | (*ch_enc & 0x3F);
+        *(txt_out_temp++) = 0xE0 | ((ch_enc[i]>>12) & 0x3F);
+        *(txt_out_temp++) = 0x80 | ((ch_enc[i]>>6) & 0x3F);
+        *(txt_out_temp++) = 0x80 | (ch_enc[i] & 0x3F);
       }
-      ch_enc++;
       i++;
   }
-  *(txt_out_temp++)=0;
+  *(txt_out_temp) = '\0';
   lv_mem_free(ch_enc);
 }
 /**********************
@@ -206,58 +205,4 @@ static uint32_t lv_ap_get_char_index(uint16_t c){
     return LV_UNDEF_ARABIC_PERSIAN_CHARS;
 }
 
-#if LV_USE_REVERSE_ARABIC_PERSIAN_CHARS == 1
-static void lv_ap_normalize_chars(uint32_t * str,uint16_t count){
-  uint16_t t,u,i=0,j,is_digit_domin=0,digit_domin_s=0,is_ascii_domin=0,ascii_domin_s=0;
-  while(i<count){
-    if(str[i]>=0x06F0 && str[i]<=0x06F9){
-      if(is_digit_domin==0)
-      digit_domin_s = i;
-        is_digit_domin = 1;
-    }else if(is_digit_domin){
-      for(j=0;j<(i-digit_domin_s)/2;j++){
-        t = str[j+digit_domin_s];
-        str[j+digit_domin_s] = str[i-j-1];
-        str[i-j-1] = t;
-      }
-      is_digit_domin = 0;
-    }
-
-    if((str[i] & 0x80) == 0){
-      if(is_ascii_domin==0)
-        ascii_domin_s = i;
-      is_ascii_domin = 1;
-    }else if(is_ascii_domin){
-      for(j=0;j<(i-ascii_domin_s)/2;j++){
-        u = str[j+ascii_domin_s];
-        str[j+ascii_domin_s] = str[i-j-1];
-        str[i-j-1] = u;
-      }
-      is_ascii_domin = 0;
-    }
-    i++;
-  }
-  if(is_ascii_domin){
-      for(j=0;j<(count-ascii_domin_s)/2;j++){
-        u = str[j+ascii_domin_s];
-        str[j+ascii_domin_s] = str[i-j-1];
-        str[i-j-1] = u;
-      }
-  }
-  if(is_digit_domin){
-      for(j=0;j<(count-digit_domin_s)/2;j++){
-        t = str[j+digit_domin_s];
-        str[j+digit_domin_s] = str[i-j-1];
-        str[i-j-1] = t;
-      }
-  }
-  i=0;
-  while(i<count/2){
-    t = str[i];
-    str[i] = str[count-i-1];
-    str[count-i-1] = t;
-    i++;
-  }
-}
-#endif
 #endif
