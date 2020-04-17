@@ -1006,6 +1006,8 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
 
     uint16_t btn_id = lv_btnm_get_active_btn(tab_btnm);
     if(btn_id == LV_BTNM_BTN_NONE) return;
+    
+    if(lv_btnm_get_btn_ctrl(tab_btnm, btn_id, LV_BTNM_CTRL_INACTIVE)) return;
 
     lv_btnm_clear_btn_ctrl_all(tab_btnm, LV_BTNM_CTRL_TGL_STATE);
     lv_btnm_set_btn_ctrl(tab_btnm, btn_id, LV_BTNM_CTRL_TGL_STATE);
