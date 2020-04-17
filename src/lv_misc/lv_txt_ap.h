@@ -2,6 +2,7 @@
  * @file lv_txt_ap.h
  *
  */
+
 #ifndef LV_TXT_AP_H
 #define LV_TXT_AP_H
 
@@ -9,15 +10,12 @@
 extern "C" {
 #endif
 
-
-
 /*********************
  *      INCLUDES
  *********************/
 #include <stddef.h>
 #include "lv_bidi.h"
 #include "lv_txt.h"
-#include "lv_conf.h"
 #include "../lv_draw/lv_draw.h"
 
 /*********************

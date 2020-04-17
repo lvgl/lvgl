@@ -9,7 +9,6 @@
 #include <stddef.h>
 #include "lv_bidi.h"
 #include "lv_txt.h"
-#include "lv_conf.h"
 #include "lv_txt_ap.h"
 #include "../lv_draw/lv_draw.h"
 
@@ -26,9 +25,6 @@
  *  STATIC PROTOTYPES
  **********************/
 static uint32_t lv_ap_get_char_index(uint16_t c);
-#if LV_USE_REVERSE_ARABIC_PERSIAN_CHARS == 1
-static void lv_ap_normalize_chars(uint32_t * str,uint16_t count);
-#endif
 
 /**********************
  *  STATIC VARIABLES
