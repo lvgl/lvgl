@@ -221,7 +221,7 @@ _LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PROP_6, transition_prop_6, lv_style_int
 #if LV_USE_ANIMATION
 _LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PATH, transition_path, lv_anim_path_cb_t, _func_ptr, func_ptr)
 #else
-_LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PATH, transition_path, lv_style_prop_cb_t, _func_ptr,
+_LV_OBJ_STYLE_SET_GET_DECLARE(TRANSITION_PATH, transition_path, _lv_style_prop_xcb_t, _func_ptr,
                               func_ptr)  /*For compatibility*/
 #endif
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_WIDTH, scale_width, lv_style_int_t, _int, scalar)

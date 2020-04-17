@@ -527,7 +527,7 @@ lv_theme_t * lv_theme_mono_init(lv_color_t color_primary, lv_color_t color_secon
     table_init();
     win_init();
 
-    theme.apply_cb = lv_theme_mono_apply;
+    theme.apply_xcb = lv_theme_mono_apply;
 
     return &theme;
 }

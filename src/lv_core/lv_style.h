@@ -216,12 +216,14 @@ typedef struct {
 
 typedef int16_t lv_style_int_t;
 
-typedef void(*lv_style_prop_cb_t)(void);
+/*A helper general function pointer*/
+typedef void(*_lv_style_prop_xcb_t)(void);
 
+/*A helper type to handle data pointers and function pointer is the same way.*/
 typedef union {
-    lv_style_prop_cb_t fptr;
+    _lv_style_prop_xcb_t fptr;
     const void * dptr;
-} lv_style_fptr_dptr_t;
+} _lv_style_fptr_dptr_t;
 
 
 typedef struct {
@@ -371,7 +373,7 @@ void _lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t op
  *       For example: `lv_style_set_border_width()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, lv_style_fptr_dptr_t p);
+void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, _lv_style_fptr_dptr_t p);
 
 /**
  * Set a function pointer typed property in a style.
@@ -383,9 +385,9 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, lv_style_fp
  *       For example: `lv_style_set_border_width()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-static inline void _lv_style_set_func_ptr(lv_style_t * style, lv_style_property_t prop, lv_style_prop_cb_t p)
+static inline void _lv_style_set_func_ptr(lv_style_t * style, lv_style_property_t prop, _lv_style_prop_xcb_t p)
 {
-    lv_style_fptr_dptr_t fd;
+    _lv_style_fptr_dptr_t fd;
     fd.dptr = NULL;
     fd.fptr = p;
     _lv_style_set_ptr(style, prop, fd);
@@ -403,7 +405,7 @@ static inline void _lv_style_set_func_ptr(lv_style_t * style, lv_style_property_
  */
 static inline void _lv_style_set_data_ptr(lv_style_t * style, lv_style_property_t prop, const void * p)
 {
-    lv_style_fptr_dptr_t fd;
+    _lv_style_fptr_dptr_t fd;
     fd.fptr = NULL;
     fd.dptr = p;
     _lv_style_set_ptr(style, prop, fd);
@@ -485,12 +487,12 @@ int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, vo
  */
 static inline int16_t _lv_style_get_func_ptr(const lv_style_t * style, lv_style_property_t prop, void * res)
 {
-    lv_style_fptr_dptr_t fd_res;
+    _lv_style_fptr_dptr_t fd_res;
     fd_res.dptr = NULL;
     fd_res.fptr = NULL;
     lv_res_t r =  _lv_style_get_ptr(style, prop, &fd_res);
 
-    lv_style_prop_cb_t * res2 = (lv_style_prop_cb_t *)res;
+    _lv_style_prop_xcb_t * res2 = (_lv_style_prop_xcb_t *)res;
     *res2 = fd_res.fptr;
     return r;
 }
@@ -510,7 +512,7 @@ static inline int16_t _lv_style_get_func_ptr(const lv_style_t * style, lv_style_
  */
 static inline int16_t _lv_style_get_data_ptr(const lv_style_t * style, lv_style_property_t prop, void * res)
 {
-    lv_style_fptr_dptr_t fd_res;
+    _lv_style_fptr_dptr_t fd_res;
     fd_res.dptr = NULL;
     fd_res.fptr = NULL;
     lv_res_t r =  _lv_style_get_ptr(style, prop, &fd_res);
@@ -580,7 +582,7 @@ void lv_style_list_set_local_opa(lv_style_list_t * list, lv_style_property_t pro
  * @param value the value to set
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-void lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t prop, lv_style_fptr_dptr_t value);
+void lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t prop, _lv_style_fptr_dptr_t value);
 
 /**
  * Set a local pointer typed property in a style list.
@@ -591,9 +593,9 @@ void lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t pro
  * @note for performance reasons it's not checked if the property really has pointer type
  */
 static inline void lv_style_list_set_local_func_ptr(lv_style_list_t * list, lv_style_property_t prop,
-                                                    lv_style_prop_cb_t value)
+                                                    _lv_style_prop_xcb_t value)
 {
-    lv_style_fptr_dptr_t fd;
+    _lv_style_fptr_dptr_t fd;
     fd.dptr = NULL;
     fd.fptr = value;
     lv_style_list_set_local_ptr(list, prop, fd);
@@ -610,7 +612,7 @@ static inline void lv_style_list_set_local_func_ptr(lv_style_list_t * list, lv_s
 static inline void lv_style_list_set_local_data_ptr(lv_style_list_t * list, lv_style_property_t prop,
                                                     const void * value)
 {
-    lv_style_fptr_dptr_t fd;
+    _lv_style_fptr_dptr_t fd;
     fd.fptr = NULL;
     fd.dptr = value;
     lv_style_list_set_local_ptr(list, prop, fd);
@@ -667,7 +669,7 @@ lv_res_t lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop,
  * @note for performance reasons it's not checked if the property really has pointer type
  * @note Do not use this function directly. Use `lv_style_list_get_func_ptr` or `lv_style_list_get_data_ptr`
  */
-lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop, lv_style_fptr_dptr_t * res);
+lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop, _lv_style_fptr_dptr_t * res);
 
 
 /**
@@ -683,7 +685,7 @@ lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop,
  */
 static inline lv_res_t lv_style_list_get_func_ptr(lv_style_list_t * list, lv_style_property_t prop, void (**res)(void))
 {
-    lv_style_fptr_dptr_t fd_res;
+    _lv_style_fptr_dptr_t fd_res;
     fd_res.dptr = NULL;
     fd_res.fptr = NULL;
     lv_res_t r =  lv_style_list_get_ptr(list, prop, &fd_res);
@@ -705,7 +707,7 @@ static inline lv_res_t lv_style_list_get_func_ptr(lv_style_list_t * list, lv_sty
  */
 static inline lv_res_t lv_style_list_get_data_ptr(lv_style_list_t * list, lv_style_property_t prop, const void ** res)
 {
-    lv_style_fptr_dptr_t fd_res;
+    _lv_style_fptr_dptr_t fd_res;
     fd_res.dptr = NULL;
     fd_res.fptr = NULL;
     lv_res_t r =  lv_style_list_get_ptr(list, prop, &fd_res);

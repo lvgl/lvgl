@@ -878,7 +878,7 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
     table_init();
     win_init();
 
-    theme.apply_cb = lv_theme_material_apply;
+    theme.apply_xcb = lv_theme_material_apply;
 
     inited = true;
 
