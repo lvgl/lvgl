@@ -660,6 +660,13 @@
 #endif
 #endif
 
+/* Enable Arabic/Persian processing
+ * In these languages characters should be replaced with
+ * an other form based on their position in the text */
+#ifndef LV_USE_ARABIC_PERSIAN_CHARS
+#define LV_USE_ARABIC_PERSIAN_CHARS 0
+#endif
+
 /*Change the built in (v)snprintf functions*/
 #ifndef LV_SPRINTF_CUSTOM
 #define LV_SPRINTF_CUSTOM   0
