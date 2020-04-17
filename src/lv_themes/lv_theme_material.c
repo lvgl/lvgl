@@ -1353,8 +1353,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_CPICKER_PART_MAIN);
             lv_style_list_add_style(list, &cpicker_bg);
 
-            lv_obj_clean_style_list(obj, LV_CPICKER_PART_INDIC);
-            list = lv_obj_get_style_list(obj, LV_CPICKER_PART_INDIC);
+            lv_obj_clean_style_list(obj, LV_CPICKER_PART_KNOB);
+            list = lv_obj_get_style_list(obj, LV_CPICKER_PART_KNOB);
             lv_style_list_add_style(list, &cpicker_indic);
             break;
 #endif

@@ -128,7 +128,7 @@ struct _lv_obj_t;
 
 /**
  * Display structure.
- * ::lv_disp_drv_t is the first member of the structure.
+ * @note `lv_disp_drv_t` should be the first member of the structure.
  */
 typedef struct _disp_t {
     /**< Driver to the display*/
@@ -257,6 +257,8 @@ uint32_t lv_disp_get_dpi(lv_disp_t * disp);
  */
 lv_disp_size_t lv_disp_get_size_category(lv_disp_t * disp);
 
+//! @cond Doxygen_Suppress
+
 /**
  * Call in the display driver's `flush_cb` function when the flushing is finished
  * @param disp_drv pointer to display driver in `flush_cb` where this function is called
@@ -270,6 +272,8 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv);
  * @return true: it's the last area to flush; false: there are other areas too which will be refreshed soon
  */
 LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_drv_t * disp_drv);
+
+//! @endcond
 
 /**
  * Get the next display.

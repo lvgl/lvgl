@@ -104,7 +104,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_add_protect(ext->header, LV_PROTECT_PARENT);
         lv_obj_set_parent(ext->header, new_win);
         if(ancestor_header_design == NULL) ancestor_header_design = lv_obj_get_design_cb(ext->header);
-        lv_obj_set_height(ext->header, LV_DPI / 2);
+        lv_obj_set_height(ext->header, LV_DPX(65));
 
         lv_obj_set_design_cb(ext->header, lv_win_header_design);
         lv_obj_set_signal_cb(new_win, lv_win_signal);

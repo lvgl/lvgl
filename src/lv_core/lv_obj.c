@@ -40,8 +40,8 @@
  *      DEFINES
  *********************/
 #define LV_OBJX_NAME "lv_obj"
-#define LV_OBJ_DEF_WIDTH    (LV_DPI / 2)
-#define LV_OBJ_DEF_HEIGHT   (LV_DPI / 4)
+#define LV_OBJ_DEF_WIDTH    (LV_DPX(100))
+#define LV_OBJ_DEF_HEIGHT   (LV_DPX(50))
 
 /**********************
  *      TYPEDEFS

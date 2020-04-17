@@ -87,6 +87,7 @@ enum {
 #error "Invalid LV_COLOR_DEPTH in lv_conf.h! Set it to 1, 8, 16 or 32!"
 #endif
 
+
 /*---------------------------------------
  * Macros for all existing  color depths
  * to set/get values of the color channels
@@ -255,13 +256,17 @@ typedef lv_color32_t lv_color_t;
 #error "Invalid LV_COLOR_DEPTH in lv_conf.h! Set it to 1, 8, 16 or 32!"
 #endif
 
-typedef uint8_t lv_opa_t;
 
 typedef struct {
     uint16_t h;
     uint8_t s;
     uint8_t v;
 } lv_color_hsv_t;
+
+//! @cond Doxygen_Suppress
+/*No idea where the guard is required but else throws warnings in the docs*/
+typedef uint8_t lv_opa_t;
+//! @endcond
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -280,7 +285,6 @@ typedef struct {
  *        ----------------------
  *         Shift right with 5 - 3 = 2
  */
-
 static inline uint8_t lv_color_to1(lv_color_t color)
 {
 #if LV_COLOR_DEPTH == 1
@@ -409,6 +413,7 @@ static inline uint32_t lv_color_to32(lv_color_t color)
      *       5         129     33        1       255
      *       6         259      3        0       255
      */
+
     lv_color32_t ret;
     LV_COLOR_SET_R32(ret, (LV_COLOR_GET_R(color) * 263 + 7) >> 5);
     LV_COLOR_SET_G32(ret, (LV_COLOR_GET_G(color) * 259 + 3) >> 6);
@@ -420,13 +425,13 @@ static inline uint32_t lv_color_to32(lv_color_t color)
 #endif
 }
 
+
 /**
  * Mix two colors with a given ratio.
- * @param c1
- * @param c2
+ * @param c1 the first color to mix (usually the foreground)
+ * @param c2 the second color to mix (usually the background)
  * @param mix The ratio of the colors. 0: full `c2`, 255: full `c1`, 127: half `c1` and half`c2`
  * @return the mixed color
- * @note 255 won't give clearly `c1`.
  */
 static inline lv_color_t lv_color_mix(lv_color_t c1, lv_color_t c2, uint8_t mix)
 {
@@ -552,7 +557,6 @@ static inline void lv_color_mix_with_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
     }
 }
 
-
 /**
  * Get the brightness of a color
  * @param color a color
@@ -625,6 +629,7 @@ lv_color_hsv_t lv_color_rgb_to_hsv(uint8_t r8, uint8_t g8, uint8_t b8);
  * @return the given color in HSV
  */
 lv_color_hsv_t lv_color_to_hsv(lv_color_t color);
+
 
 /**********************
  *      MACROS
