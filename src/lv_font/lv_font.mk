@@ -14,6 +14,7 @@ CSRCS += lv_font_montserrat_32.c
 CSRCS += lv_font_montserrat_12_subpx.c
 CSRCS += lv_font_montserrat_28_compressed.c
 CSRCS += lv_font_unscii_8.c
+CSRCS += lv_font_ap_18.c
 
 DEPPATH += --dep-path $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_font
 VPATH += :$(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_font
