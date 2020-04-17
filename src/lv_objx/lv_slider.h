@@ -93,10 +93,9 @@ static inline void lv_slider_set_range(lv_obj_t * slider, int16_t min, int16_t m
 }
 
 /**
- * Make the slider symmetric to zero. The indicator will grow from zero instead of the minimum
- * position.
- * @param slider pointer to a slider object
- * @param en true: enable disable symmetric behavior; false: disable
+ * Set the animation time of the slider
+ * @param slider pointer to a bar object
+ * @param anim_time the animation time in milliseconds.
  */
 static inline void lv_slider_set_anim_time(lv_obj_t * slider, uint16_t anim_time)
 {
@@ -104,9 +103,10 @@ static inline void lv_slider_set_anim_time(lv_obj_t * slider, uint16_t anim_time
 }
 
 /**
- * Set the animation time of the slider
- * @param slider pointer to a bar object
- * @param anim_time the animation time in milliseconds.
+ * Make the slider symmetric to zero. The indicator will grow from zero instead of the minimum
+ * position.
+ * @param slider pointer to a slider object
+ * @param en true: enable disable symmetric behavior; false: disable
  */
 static inline void lv_slider_set_sym(lv_obj_t * slider, bool en)
 {
