@@ -1087,7 +1087,7 @@ static lv_chart_label_iterator_t create_axis_label_iter(const char * list, uint8
  */
 static void get_next_axis_label(lv_chart_label_iterator_t * iterator, char * buf)
 {
-    uint8_t label_len = 0;
+    uint32_t label_len = 0;
     if(iterator->is_reverse_iter) {
         const char * label_start;
         /* count the length of the current label*/
