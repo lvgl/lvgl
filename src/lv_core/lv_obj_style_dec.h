@@ -59,7 +59,7 @@ extern "C" {
  */
 
 #ifdef __cplusplus
-#define FUNC_PTR_CAST(v) reinterpret_cast<lv_style_prop_cb_t>(v)
+#define FUNC_PTR_CAST(v) reinterpret_cast<_lv_style_prop_xcb_t>(v)
 #else
 #define FUNC_PTR_CAST(v) (_lv_style_prop_xcb_t)v
 #endif
