@@ -81,7 +81,6 @@ void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
     if(style_src->map == NULL) return;
 
     uint16_t size = lv_style_get_mem_size(style_src);
-
     style_dest->map = lv_mem_alloc(size);
     memcpy(style_dest->map, style_src->map, size);
 }
@@ -554,6 +553,7 @@ int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, vo
 
     if(style == NULL) return -1;
     if(style->map == NULL) return -1;
+
     int32_t id = get_property_index(style, prop);
     if(id < 0) {
         return -1;
@@ -590,6 +590,7 @@ int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, vo
 
     if(style == NULL) return -1;
     if(style->map == NULL) return -1;
+
     int32_t id = get_property_index(style, prop);
     if(id < 0) {
         return -1;
@@ -658,6 +659,7 @@ int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, vo
     _lv_style_fptr_dptr_t * res = (_lv_style_fptr_dptr_t *)v_res;
     if(style == NULL) return -1;
     if(style->map == NULL) return -1;
+
     int32_t id = get_property_index(style, prop);
     if(id < 0) {
         return -1;
@@ -1020,7 +1022,6 @@ lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop,
  */
 static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop)
 {
-
     LV_ASSERT_STYLE(style);
 
     if(style->map == NULL) return -1;
@@ -1091,4 +1092,3 @@ static lv_style_t * get_alloc_local_style(lv_style_list_t * list)
 
     return local_style;
 }
-

@@ -1332,9 +1332,8 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop)
 
         lv_obj_invalidate(obj);
 
-        if(prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_INHERIT_MASK))
-            /*Send style change signals*/
-            refresh_children_style(obj);
+        /*Send style change signals*/
+        if(prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_INHERIT_MASK)) refresh_children_style(obj);
     }
     else {
         lv_obj_invalidate(obj);
