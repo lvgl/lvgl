@@ -1065,7 +1065,13 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
 
         sel.start = lv_label_get_text_sel_start(label);
         sel.end = lv_label_get_text_sel_end(label);
-        lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ext->offset, &sel, hint, lv_obj_get_base_dir(label));
+
+        lv_area_t mask2;
+        bool has_common;
+        has_common = lv_area_intersect(&mask2, &coords, mask);
+        if(!has_common) return false;
+
+        lv_draw_label(&coords, &mask2, style, opa_scale, ext->text, flag, &ext->offset, &sel, hint, lv_obj_get_base_dir(label));
 
 
         if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
@@ -1081,14 +1087,14 @@ static bool lv_label_design(lv_obj_t * label, const lv_area_t * mask, lv_design_
                         lv_font_get_glyph_width(style->text.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
                 ofs.y = ext->offset.y;
 
-                lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs, &sel, NULL, lv_obj_get_base_dir(label));
+                lv_draw_label(&coords, &mask2, style, opa_scale, ext->text, flag, &ofs, &sel, NULL, lv_obj_get_base_dir(label));
             }
 
             /*Draw the text again below the original to make an circular effect */
             if(size.y > lv_obj_get_height(label)) {
                 ofs.x = ext->offset.x;
                 ofs.y = ext->offset.y + size.y + lv_font_get_line_height(style->text.font);
-                lv_draw_label(&coords, mask, style, opa_scale, ext->text, flag, &ofs, &sel, NULL, lv_obj_get_base_dir(label));
+                lv_draw_label(&coords, &mask2, style, opa_scale, ext->text, flag, &ofs, &sel, NULL, lv_obj_get_base_dir(label));
             }
         }
     }
