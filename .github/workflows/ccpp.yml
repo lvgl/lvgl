@@ -14,4 +14,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run tests
-      run: cd test; python ./build.py
+      run: cd tests; python ./build.py
