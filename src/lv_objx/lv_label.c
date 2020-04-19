@@ -727,7 +727,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 #if LV_USE_BIDI
     bidi_txt = lv_draw_get_buf(new_line_start - line_start + 1);
     uint16_t txt_len = new_line_start - line_start;
-    if(bidi_txt[new_line_start] == '\0') txt_len--;
+    if(txt[new_line_start] == '\0') txt_len--;
     lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_base_dir(label), NULL, 0);
 #else
     bidi_txt = (char*)txt + line_start;
