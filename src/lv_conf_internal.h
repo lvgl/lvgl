@@ -263,11 +263,8 @@
 #ifndef LV_USE_GPU
 #define LV_USE_GPU              1
 #endif
-#ifndef LV_GPU_INCLUDE
-#define LV_GPU_INCLUDE  <stdint.h> /*E.g. "stm32f7xx_hal.h"*/
-#endif
 #ifndef LV_USE_GPU_STM32_DMA2D
-#define LV_USE_GPU_STM32_DMA2D  1
+#define LV_USE_GPU_STM32_DMA2D  0
 #endif
 
 /* 1: Enable file system (might be required for images */
