@@ -604,8 +604,8 @@ void lv_dropdown_open(lv_obj_t * ddlist)
     lv_obj_set_signal_cb(lv_page_get_scrl(ext->page), lv_dropdown_page_scrl_signal);
 
     lv_style_list_copy(lv_obj_get_style_list(ext->page, LV_PAGE_PART_BG), &ext->style_page);
-    lv_style_list_copy(lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCRLBAR), &ext->style_scrlbar);
-    lv_obj_clean_style_list(ext->page, LV_PAGE_PART_SCRL);
+    lv_style_list_copy(lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCROLLBAR), &ext->style_scrlbar);
+    lv_obj_clean_style_list(ext->page, LV_PAGE_PART_SCROLLABLE);
     lv_obj_refresh_style(ext->page, LV_STYLE_PROP_ALL);
 
     lv_page_set_scrl_fit(ext->page, LV_FIT_TIGHT);

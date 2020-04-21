@@ -111,7 +111,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
 
-        lv_obj_clean_style_list(roller, LV_PAGE_PART_SCRL); /*Use a transparent scrollable*/
+        lv_obj_clean_style_list(roller, LV_PAGE_PART_SCROLLABLE); /*Use a transparent scrollable*/
         lv_theme_apply(roller, LV_THEME_ROLLER);
         refr_height(roller);
 

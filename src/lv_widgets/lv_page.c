@@ -391,7 +391,7 @@ lv_coord_t lv_page_get_width_grid(lv_obj_t * page, uint8_t div, uint8_t span)
 {
 
     lv_coord_t obj_w = lv_page_get_width_fit(page);
-    lv_style_int_t pinner = lv_obj_get_style_pad_inner(page, LV_PAGE_PART_SCRL);
+    lv_style_int_t pinner = lv_obj_get_style_pad_inner(page, LV_PAGE_PART_SCROLLABLE);
 
     lv_coord_t r = (obj_w - (div - 1) * pinner) / div;
 
@@ -413,7 +413,7 @@ lv_coord_t lv_page_get_width_grid(lv_obj_t * page, uint8_t div, uint8_t span)
 lv_coord_t lv_page_get_height_grid(lv_obj_t * page, uint8_t div, uint8_t span)
 {
     lv_coord_t obj_h = lv_page_get_height_fit(page);
-    lv_style_int_t pinner = lv_obj_get_style_pad_inner(page, LV_PAGE_PART_SCRL);
+    lv_style_int_t pinner = lv_obj_get_style_pad_inner(page, LV_PAGE_PART_SCROLLABLE);
 
     lv_coord_t r = (obj_h - (div - 1) * pinner) / div;
 
@@ -704,7 +704,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
             /*Draw the scrollbars*/
             lv_draw_rect_dsc_t rect_dsc;
             lv_draw_rect_dsc_init(&rect_dsc);
-            lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCRLBAR, &rect_dsc);
+            lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCROLLBAR, &rect_dsc);
             if(ext->scrlbar.hor_draw && (ext->scrlbar.mode & LV_SCRLBAR_MODE_HIDE) == 0) {
                 lv_draw_rect(&sb_hor_area, clip_area, &rect_dsc);
             }
@@ -781,7 +781,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_get_state_info_t * info = param;
-        if(info->part == LV_PAGE_PART_SCRL) info->result = lv_obj_get_state(lv_page_get_scrl(page), LV_CONT_PART_MAIN);
+        if(info->part == LV_PAGE_PART_SCROLLABLE) info->result = lv_obj_get_state(lv_page_get_scrl(page), LV_CONT_PART_MAIN);
         else info->result = lv_obj_get_state(page, info->part);
         return LV_RES_OK;
     }
@@ -802,7 +802,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             }
         }
 
-        lv_obj_clean_style_list(page, LV_PAGE_PART_SCRLBAR);
+        lv_obj_clean_style_list(page, LV_PAGE_PART_SCROLLBAR);
 #if LV_USE_ANIMATION
         lv_obj_clean_style_list(page, LV_PAGE_PART_EDGE_FLASH);
 #endif
@@ -853,7 +853,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_style_int_t sb_width = lv_obj_get_style_size(page, LV_PAGE_PART_SCRLBAR);
+        lv_style_int_t sb_width = lv_obj_get_style_size(page, LV_PAGE_PART_SCROLLBAR);
         lv_area_set_height(&ext->scrlbar.hor_area, sb_width);
         lv_area_set_width(&ext->scrlbar.ver_area, sb_width);
 
@@ -1091,10 +1091,10 @@ static lv_style_list_t * lv_page_get_style(lv_obj_t * page, uint8_t part)
         case LV_PAGE_PART_BG:
             style_dsc_p = &page->style_list;
             break;
-        case LV_PAGE_PART_SCRL:
+        case LV_PAGE_PART_SCROLLABLE:
             style_dsc_p = lv_obj_get_style_list(ext->scrl, LV_CONT_PART_MAIN);
             break;
-        case LV_PAGE_PART_SCRLBAR:
+        case LV_PAGE_PART_SCROLLBAR:
             style_dsc_p = &ext->scrlbar.style;
             break;
 #if LV_USE_ANIMATION
@@ -1190,9 +1190,9 @@ static void scrlbar_refresh(lv_obj_t * page)
     lv_coord_t obj_w  = lv_obj_get_width(page);
     lv_coord_t obj_h  = lv_obj_get_height(page);
 
-    lv_style_int_t sb_width = lv_obj_get_style_size(page, LV_PAGE_PART_SCRLBAR);
-    lv_style_int_t sb_right = lv_obj_get_style_pad_right(page, LV_PAGE_PART_SCRLBAR);
-    lv_style_int_t sb_bottom = lv_obj_get_style_pad_bottom(page, LV_PAGE_PART_SCRLBAR);
+    lv_style_int_t sb_width = lv_obj_get_style_size(page, LV_PAGE_PART_SCROLLBAR);
+    lv_style_int_t sb_right = lv_obj_get_style_pad_right(page, LV_PAGE_PART_SCROLLBAR);
+    lv_style_int_t sb_bottom = lv_obj_get_style_pad_bottom(page, LV_PAGE_PART_SCROLLBAR);
 
     lv_style_int_t bg_left = lv_obj_get_style_pad_left(page, LV_PAGE_PART_BG);
     lv_style_int_t bg_right = lv_obj_get_style_pad_right(page, LV_PAGE_PART_BG);
@@ -1314,8 +1314,8 @@ static void scrlbar_refresh(lv_obj_t * page)
 
 static void refr_ext_draw_pad(lv_obj_t * page)
 {
-    lv_style_int_t sb_bottom = lv_obj_get_style_pad_bottom(page, LV_PAGE_PART_SCRLBAR);
-    lv_style_int_t sb_right = lv_obj_get_style_pad_right(page, LV_PAGE_PART_SCRLBAR);
+    lv_style_int_t sb_bottom = lv_obj_get_style_pad_bottom(page, LV_PAGE_PART_SCROLLBAR);
+    lv_style_int_t sb_right = lv_obj_get_style_pad_right(page, LV_PAGE_PART_SCROLLBAR);
 
     /*Ensure ext. size for the scrollbars if they are out of the page*/
     if(page->ext_draw_pad < (-sb_right)) page->ext_draw_pad = -sb_right;
