@@ -118,7 +118,7 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_page_set_scrl_fit(new_tileview, LV_FIT_TIGHT);
 
-        lv_obj_reset_style_list(new_tileview, LV_PAGE_PART_SCRL);
+        lv_obj_reset_style_list(new_tileview, LV_PAGE_PART_SCROLLABLE);
         lv_theme_apply(new_tileview, LV_THEME_TILEVIEW);
     }
     /*Copy an existing tileview*/

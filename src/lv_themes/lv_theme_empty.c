@@ -62,7 +62,7 @@ lv_theme_t * lv_theme_empty_init(lv_color_t color_primary, lv_color_t color_seco
     lv_style_init(&opa_cover);
     lv_style_set_bg_opa(&opa_cover, LV_STATE_DEFAULT, LV_OPA_COVER);
 
-    theme.apply_cb = lv_theme_empty_apply;
+    theme.apply_xcb = lv_theme_empty_apply;
     return &theme;
 }
 

@@ -1095,12 +1095,12 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_PAGE_PART_BG);
             lv_style_list_add_style(list, &bg);
 
-            lv_obj_clean_style_list(obj, LV_PAGE_PART_SCRL);
-            list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCRL);
+            lv_obj_clean_style_list(obj, LV_PAGE_PART_SCROLLABLE);
+            list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCROLLABLE);
             lv_style_list_add_style(list, &pad_inner);
 
-            lv_obj_clean_style_list(obj, LV_PAGE_PART_SCRLBAR);
-            list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCRLBAR);
+            lv_obj_clean_style_list(obj, LV_PAGE_PART_SCROLLBAR);
+            list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCROLLBAR);
             lv_style_list_add_style(list, &sb);
             break;
 #endif
@@ -1128,8 +1128,8 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_TABVIEW_PAGE:
             lv_obj_clean_style_list(obj, LV_PAGE_PART_BG);
 
-            lv_obj_clean_style_list(obj, LV_PAGE_PART_SCRL);
-            list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCRL);
+            lv_obj_clean_style_list(obj, LV_PAGE_PART_SCROLLABLE);
+            list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCROLLABLE);
             lv_style_list_add_style(list, &tabview_page_scrl);
 
             break;
@@ -1265,12 +1265,12 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_WIN_PART_BG);
             lv_style_list_add_style(list, &scr);
 
-            lv_obj_clean_style_list(obj, LV_WIN_PART_SCRLBAR);
-            list = lv_obj_get_style_list(obj, LV_WIN_PART_SCRLBAR);
+            lv_obj_clean_style_list(obj, LV_WIN_PART_SCROLLBAR);
+            list = lv_obj_get_style_list(obj, LV_WIN_PART_SCROLLBAR);
             lv_style_list_add_style(list, &sb);
 
-            lv_obj_clean_style_list(obj, LV_WIN_PART_CONTENT_SCRL);
-            list = lv_obj_get_style_list(obj, LV_WIN_PART_CONTENT_SCRL);
+            lv_obj_clean_style_list(obj, LV_WIN_PART_CONTENT_SCROLLABLE);
+            list = lv_obj_get_style_list(obj, LV_WIN_PART_CONTENT_SCROLLABLE);
             lv_style_list_add_style(list, &tabview_page_scrl);
 
             lv_obj_clean_style_list(obj, LV_WIN_PART_HEADER);
