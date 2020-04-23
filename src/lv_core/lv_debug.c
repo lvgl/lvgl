@@ -63,6 +63,7 @@ bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type)
 
     uint8_t i;
     for(i = 0; i < LV_MAX_ANCESTOR_NUM; i++) {
+        if(types.type[i] == NULL) break;
         if(strcmp(types.type[i], obj_type) == 0) return true;
     }
 
