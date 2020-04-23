@@ -162,6 +162,13 @@ void lv_msgbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
     lv_obj_set_event_cb(ext->btnm, lv_msgbox_btnm_event_cb);
 
     if(lv_obj_is_focused(mbox)) {
+        lv_state_t state = lv_obj_get_state(mbox, LV_TABVIEW_PART_BG);
+        if(state & LV_STATE_EDITED) {
+            lv_obj_set_state(ext->btnm, LV_STATE_FOCUSED | LV_STATE_EDITED);
+        } else {
+            lv_obj_set_state(ext->btnm, LV_STATE_FOCUSED);
+        }
+
         lv_btnmatrix_set_focused_btn(ext->btnm, 0);
     }
 
@@ -460,14 +467,27 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
             lv_indev_type_t indev_type = lv_indev_get_type(indev);
             if(indev_type == LV_INDEV_TYPE_ENCODER) {
                 /*In navigation mode don't select any button but in edit mode select the fist*/
-                lv_btnmatrix_ext_t * btnm_ext = lv_obj_get_ext_attr(ext->btnm);
-                if(lv_group_get_editing(lv_obj_get_group(mbox)))
-                    btnm_ext->btn_id_pr = 0;
-                else
-                    btnm_ext->btn_id_pr = LV_BTNMATRIX_BTN_NONE;
+                if(lv_group_get_editing(lv_obj_get_group(mbox))) lv_btnmatrix_set_focused_btn(ext->btnm, 0);
+                else lv_btnmatrix_set_focused_btn(ext->btnm, LV_BTNMATRIX_BTN_NONE);
             }
-#endif
         }
+
+        if(ext->btnm && (sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS)) {
+            lv_state_t state = lv_obj_get_state(mbox, LV_TABVIEW_PART_BG);
+            if(state & LV_STATE_FOCUSED) {
+                lv_obj_set_state(ext->btnm, LV_STATE_FOCUSED);
+            } else {
+                lv_obj_clear_state(ext->btnm, LV_STATE_FOCUSED);
+
+            }
+            if(state & LV_STATE_EDITED) {
+                lv_obj_set_state(ext->btnm, LV_STATE_EDITED);
+            } else {
+                lv_obj_clear_state(ext->btnm, LV_STATE_EDITED);
+
+            }
+        }
+#endif
     }
 
     return res;

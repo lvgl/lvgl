@@ -123,6 +123,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new drop down list drop down list*/
     if(copy == NULL) {
+        lv_obj_set_width(ddlist, LV_DPX(150));
         lv_dropdown_set_static_options(ddlist, "Option 1\nOption 2\nOption 3");
         lv_theme_apply(ddlist, LV_THEME_DROPDOWN);
     }
@@ -902,12 +903,17 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
         lv_dropdown_close(ddlist);
     }
     else if(sign == LV_SIGNAL_RELEASED) {
-        if(lv_indev_is_dragging(lv_indev_get_act()) == false) {
+        lv_indev_t * indev = lv_indev_get_act();
+        if(lv_indev_is_dragging(indev) == false) {
             if(ext->page) {
                 lv_dropdown_close(ddlist);
                 if(ext->sel_opt_id_orig != ext->sel_opt_id) {
                     ext->sel_opt_id_orig = ext->sel_opt_id;
                     lv_obj_invalidate(ddlist);
+                }
+                lv_indev_type_t indev_type = lv_indev_get_type(indev);
+                if(indev_type == LV_INDEV_TYPE_ENCODER) {
+                    lv_group_set_editing(lv_obj_get_group(ddlist), false);
                 }
             }
             else {

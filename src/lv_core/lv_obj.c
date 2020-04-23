@@ -834,10 +834,10 @@ void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h)
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
  * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_mod x coordinate shift after alignment
- * @param y_mod y coordinate shift after alignment
+ * @param x_ofs x coordinate offset after alignment
+ * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod)
+void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -852,8 +852,8 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
     lv_obj_t * par        = lv_obj_get_parent(obj);
     lv_coord_t par_abs_x  = par->coords.x1;
     lv_coord_t par_abs_y  = par->coords.y1;
-    new_pos.x += x_mod;
-    new_pos.y += y_mod;
+    new_pos.x += x_ofs;
+    new_pos.y += y_ofs;
     new_pos.x -= par_abs_x;
     new_pos.y -= par_abs_y;
 
@@ -862,8 +862,8 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 #if LV_USE_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
     obj->realign.align       = align;
-    obj->realign.xofs        = x_mod;
-    obj->realign.yofs        = y_mod;
+    obj->realign.xofs        = x_ofs;
+    obj->realign.yofs        = y_ofs;
     obj->realign.base        = base;
     obj->realign.origo_align = 0;
 #endif
@@ -874,10 +874,10 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
  * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_mod x coordinate shift after alignment
- * @param y_mod y coordinate shift after alignment
+ * @param x_ofs x coordinate offset after alignment
+ * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod)
+void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1005,8 +1005,8 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
     lv_coord_t base_abs_y = base->coords.y1;
     lv_coord_t par_abs_x  = par->coords.x1;
     lv_coord_t par_abs_y  = par->coords.y1;
-    new_x += x_mod + base_abs_x;
-    new_y += y_mod + base_abs_y;
+    new_x += x_ofs + base_abs_x;
+    new_y += y_ofs + base_abs_y;
     new_x -= par_abs_x;
     new_y -= par_abs_y;
 
@@ -1015,8 +1015,8 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
 #if LV_USE_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
     obj->realign.align       = align;
-    obj->realign.xofs        = x_mod;
-    obj->realign.yofs        = y_mod;
+    obj->realign.xofs        = x_ofs;
+    obj->realign.yofs        = y_ofs;
     obj->realign.base        = base;
     obj->realign.origo_align = 1;
 #endif
@@ -3580,7 +3580,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
         else {
             lv_obj_add_state(obj, LV_STATE_FOCUSED);
-            lv_obj_clear_state(obj, LV_STATE_EDITED);
+            lv_obj_clear_state(obj, LV_STATE_EDITED | LV_STATE_PRESSED);
         }
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {

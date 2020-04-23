@@ -612,7 +612,6 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
         lv_draw_rect_dsc_t draw_rect_tmp_dsc;
         lv_draw_label_dsc_t draw_label_tmp_dsc;
 
-
         /*The state changes without re-caching the styles, disable the use of cache*/
         lv_state_t state_ori = btnm->state;
         btnm->state = LV_STATE_DEFAULT;
@@ -689,7 +688,10 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
                 btnm->state = LV_STATE_DEFAULT;
                 if(tgl_state) btnm->state = LV_STATE_CHECKED;
                 if(ext->btn_id_pr == btn_i) btnm->state |= LV_STATE_PRESSED;
-                if(ext->btn_id_focused == btn_i) btnm->state |= LV_STATE_FOCUSED;
+                if(ext->btn_id_focused == btn_i) {
+                    btnm->state |= LV_STATE_FOCUSED;
+                    if(state_ori & LV_STATE_EDITED) btnm->state |= LV_STATE_EDITED;
+                }
 
                 lv_draw_rect_dsc_init(&draw_rect_tmp_dsc);
                 lv_draw_label_dsc_init(&draw_label_tmp_dsc);
