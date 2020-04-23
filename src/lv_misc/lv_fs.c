@@ -491,7 +491,7 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p)
     LV_ASSERT_MEM(new_drv);
     if(new_drv == NULL) return;
 
-    memcpy(new_drv, drv_p, sizeof(lv_fs_drv_t));
+    lv_memcpy(new_drv, drv_p, sizeof(lv_fs_drv_t));
 }
 
 /**

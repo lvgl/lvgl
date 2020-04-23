@@ -427,8 +427,22 @@ void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w);
 void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
 
 /**
+ * Set the width reduced by the left and right padding.
+ * @param obj pointer to an object
+ * @param w the width without paddings
+ */
+void lv_obj_set_width_fit(const lv_obj_t * obj, lv_coord_t w);
+
+/**
+ * Set the height reduced by the top and bottom padding.
+ * @param obj pointer to an object
+ * @param h the height without paddings
+ */
+void lv_obj_set_height_fit(const lv_obj_t * obj, lv_coord_t h);
+
+/**
  * Set the width of an object by taking the left and right margin into account.
- * The object heigwidthht will be `obj_w = w - margon_left - margin_right`
+ * The object width will be `obj_w = w - margon_left - margin_right`
  * @param obj pointer to an object
  * @param w new height including margins
  */
@@ -520,8 +534,9 @@ void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part);
 void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part);
 
 /**
- * Notify an object about its style is modified
+ * Notify an object (and its children) about its style is modified
  * @param obj pointer to an object
+ * @param prop `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property. It is used to optimize what needs to be refreshed.
  */
 void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop);
 

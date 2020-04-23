@@ -275,7 +275,7 @@ void lv_btnmatrix_set_ctrl_map(lv_obj_t * btnm, const lv_btnmatrix_ctrl_t ctrl_m
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
-    memcpy(ext->ctrl_bits, ctrl_map, sizeof(lv_btnmatrix_ctrl_t) * ext->btn_cnt);
+    lv_memcpy(ext->ctrl_bits, ctrl_map, sizeof(lv_btnmatrix_ctrl_t) * ext->btn_cnt);
 
     lv_btnmatrix_set_map(btnm, ext->map_p);
 }
@@ -497,7 +497,7 @@ uint16_t lv_btnmatrix_get_focused_btn(const lv_obj_t * btnm)
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
-    return ext->btn_id_pr;
+    return ext->btn_id_focused;
 }
 
 /**

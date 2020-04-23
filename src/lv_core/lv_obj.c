@@ -328,7 +328,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
         /*Set user data*/
 #if LV_USE_USER_DATA
-        memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
+        lv_memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
 #endif
 
         /*Copy realign*/
@@ -801,8 +801,34 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
 }
 
 /**
+ * Set the width reduced by the left and right padding.
+ * @param obj pointer to an object
+ * @param w the width without paddings
+ */
+void lv_obj_set_width_fit(const lv_obj_t * obj, lv_coord_t w)
+{
+    lv_style_int_t pleft = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
+    lv_style_int_t pright = lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
+
+    lv_obj_set_width(obj, w - pleft - pright);
+}
+
+/**
+ * Set the height reduced by the top and bottom padding.
+ * @param obj pointer to an object
+ * @param h the height without paddings
+ */
+void lv_obj_set_height_fit(const lv_obj_t * obj, lv_coord_t h)
+{
+    lv_style_int_t ptop = lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN);
+    lv_style_int_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
+
+    lv_obj_set_width(obj, h - ptop - pbottom);
+}
+
+/**
  * Set the width of an object by taking the left and right margin into account.
- * The object heigwidthht will be `obj_w = w - margon_left - margin_right`
+ * The object width will be `obj_w = w - margon_left - margin_right`
  * @param obj pointer to an object
  * @param w new height including margins
  */
@@ -1267,7 +1293,7 @@ bool _lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_prop
 /**
  * Notify an object (and its children) about its style is modified
  * @param obj pointer to an object
- * @param prop `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property. It is used the optimize what needs to be refreshed.
+ * @param prop `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property. It is used to optimize what needs to be refreshed.
  */
 void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop)
 {
@@ -2877,7 +2903,7 @@ void lv_obj_set_user_data(lv_obj_t * obj, lv_obj_user_data_t data)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    memcpy(&obj->user_data, &data, sizeof(lv_obj_user_data_t));
+    lv_memcpy(&obj->user_data, &data, sizeof(lv_obj_user_data_t));
 }
 #endif
 

@@ -353,7 +353,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             return LV_RES_INV;
         }
 
-        memcpy(user_data->f, &f, sizeof(f));
+        lv_memcpy_small(user_data->f, &f, sizeof(f));
 
 #else
         LV_LOG_WARN("Image built-in decoder cannot read file because LV_USE_FILESYSTEM = 0");

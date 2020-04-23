@@ -84,8 +84,8 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
         return NULL;
     }
 
-    memset(indev, 0, sizeof(lv_indev_t));
-    memcpy(&indev->driver, driver, sizeof(lv_indev_drv_t));
+    lv_memset_00(indev, sizeof(lv_indev_t));
+    lv_memcpy(&indev->driver, driver, sizeof(lv_indev_drv_t));
 
     indev->proc.reset_query = 1;
     indev->cursor           = NULL;

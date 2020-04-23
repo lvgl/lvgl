@@ -312,7 +312,7 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
     if(data_p != NULL) {
         /*Copy the old data to the new. Use the smaller size*/
         if(old_size != 0) {
-            memcpy(new_p, data_p, LV_MATH_MIN(new_size, old_size));
+            lv_memcpy(new_p, data_p, LV_MATH_MIN(new_size, old_size));
             lv_mem_free(data_p);
         }
     }
@@ -530,7 +530,6 @@ void lv_mem_buf_free_all(void)
 
 /**
  * Same as `memcpy` but optimized for 4 byte operation.
- * `dst` and `src` should be word aligned else normal `memcpy` will be used
  * @param dst pointer to the destination buffer
  * @param src pointer to the source buffer
  * @param len number of byte to copy

@@ -93,10 +93,10 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing image button*/
     else {
         lv_imgbtn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        memcpy((void *)ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
+        lv_memcpy((void *)ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
 #if LV_IMGBTN_TILED
-        memcpy((void *)ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
-        memcpy((void *)ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
+        lv_memcpy((void *)ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
+        lv_memcpy((void *)ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
 #endif
         ext->tiled = copy_ext->tiled;
         /*Refresh the style with new signal function*/

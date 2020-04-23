@@ -299,7 +299,7 @@ void * lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
 
     if(ll_p != NULL) {
         const lv_ll_node_t * n_act_d = n_act;
-        memcpy(&next, n_act_d + LL_NEXT_P_OFFSET(ll_p), sizeof(void *));
+        lv_memcpy_small(&next, n_act_d + LL_NEXT_P_OFFSET(ll_p), sizeof(void *));
     }
 
     return next;
@@ -317,7 +317,7 @@ void * lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act)
 
     if(ll_p != NULL) {
         const lv_ll_node_t * n_act_d = n_act;
-        memcpy(&prev, n_act_d + LL_PREV_P_OFFSET(ll_p), sizeof(void *));
+        lv_memcpy_small(&prev, n_act_d + LL_PREV_P_OFFSET(ll_p), sizeof(void *));
     }
 
     return prev;
@@ -404,9 +404,9 @@ static void node_set_prev(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * pre
 
     uint32_t node_p_size = sizeof(lv_ll_node_t *);
     if(prev)
-        memcpy(act + LL_PREV_P_OFFSET(ll_p), &prev, node_p_size);
+        lv_memcpy_small(act + LL_PREV_P_OFFSET(ll_p), &prev, node_p_size);
     else
-        memset(act + LL_PREV_P_OFFSET(ll_p), 0, node_p_size);
+        lv_memset_00(act + LL_PREV_P_OFFSET(ll_p), node_p_size);
 }
 
 /**
@@ -421,7 +421,7 @@ static void node_set_next(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * nex
 
     uint32_t node_p_size = sizeof(lv_ll_node_t *);
     if(next)
-        memcpy(act + LL_NEXT_P_OFFSET(ll_p), &next, node_p_size);
+        lv_memcpy_small(act + LL_NEXT_P_OFFSET(ll_p), &next, node_p_size);
     else
-        memset(act + LL_NEXT_P_OFFSET(ll_p), 0, node_p_size);
+        lv_memset_00(act + LL_NEXT_P_OFFSET(ll_p), node_p_size);
 }

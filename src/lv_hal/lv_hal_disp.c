@@ -125,9 +125,9 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
         return NULL;
     }
 
-    memcpy(&disp->driver, driver, sizeof(lv_disp_drv_t));
-    memset(&disp->inv_area_joined, 0, sizeof(disp->inv_area_joined));
-    memset(&disp->inv_areas, 0, sizeof(disp->inv_areas));
+    lv_memcpy(&disp->driver, driver, sizeof(lv_disp_drv_t));
+    lv_memset_00(&disp->inv_area_joined, sizeof(disp->inv_area_joined));
+    lv_memset_00(&disp->inv_areas, sizeof(disp->inv_areas));
     lv_ll_init(&disp->scr_ll, sizeof(lv_obj_t));
     disp->last_activity_time = 0;
 

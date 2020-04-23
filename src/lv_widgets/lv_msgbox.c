@@ -319,10 +319,14 @@ uint16_t lv_msgbox_get_active_btn(lv_obj_t * mbox)
     LV_ASSERT_OBJ(mbox, LV_OBJX_NAME);
 
     lv_msgbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
-    if(ext->btnm)
-        return lv_btnmatrix_get_active_btn(ext->btnm);
-    else
-        return LV_BTNMATRIX_BTN_NONE;
+    if(ext->btnm == NULL) return LV_BTNMATRIX_BTN_NONE;
+
+    uint16_t id = lv_btnmatrix_get_active_btn(ext->btnm);
+    if(id == LV_BTNMATRIX_BTN_NONE) {
+        id = lv_btnmatrix_get_focused_btn(ext->btnm);
+    }
+
+    return id;
 }
 
 /**
@@ -449,7 +453,7 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
     }
     else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->btnm) {
-            uint32_t btn_id = lv_btnmatrix_get_active_btn(ext->btnm);
+            uint32_t btn_id = lv_btnmatrix_get_focused_btn(ext->btnm);
             if(btn_id != LV_BTNMATRIX_BTN_NONE) lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
         }
     }

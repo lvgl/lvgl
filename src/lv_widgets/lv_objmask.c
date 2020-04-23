@@ -121,7 +121,7 @@ lv_objmask_mask_t * lv_objmask_add_mask(lv_obj_t * objmask, void * param)
     LV_ASSERT_MEM(m->param);
     if(m->param == NULL) return NULL;
 
-    memcpy(m->param, param, param_size);
+    lv_memcpy(m->param, param, param_size);
 
     lv_obj_invalidate(objmask);
 
