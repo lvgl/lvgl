@@ -73,10 +73,10 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(imgbtn);
 
     /*Initialize the allocated 'ext' */
-    memset((void *)ext->img_src_mid, 0, sizeof(ext->img_src_mid));
+    lv_memset_00((void *)ext->img_src_mid, sizeof(ext->img_src_mid));
 #if LV_IMGBTN_TILED
-    memset(ext->img_src_left, 0, sizeof(ext->img_src_left));
-    memset(ext->img_src_right, 0, sizeof(ext->img_src_right));
+    lv_memset_00(ext->img_src_left, sizeof(ext->img_src_left));
+    lv_memset_00(ext->img_src_right, sizeof(ext->img_src_right));
 #endif
     ext->tiled = 0;
 

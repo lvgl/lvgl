@@ -82,7 +82,7 @@ static const uint8_t bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 
 void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
 {
-    memset(dsc, 0x00, sizeof(lv_draw_label_dsc_t));
+    lv_memset_00(dsc, sizeof(lv_draw_label_dsc_t));
     dsc->opa = LV_OPA_COVER;
     dsc->color = LV_COLOR_BLACK;
     dsc->font = LV_THEME_DEFAULT_FONT_NORMAL;

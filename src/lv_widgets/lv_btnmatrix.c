@@ -1081,7 +1081,7 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char **
     LV_ASSERT_MEM(ext->ctrl_bits);
     if(ext->button_areas == NULL || ext->ctrl_bits == NULL) btn_cnt = 0;
 
-    memset(ext->ctrl_bits, 0, sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
+    lv_memset_00(ext->ctrl_bits, sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
 
     ext->btn_cnt = btn_cnt;
 }

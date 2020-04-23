@@ -77,7 +77,7 @@ void lv_anim_core_init(void)
  */
 void lv_anim_init(lv_anim_t * a)
 {
-    memset(a, 0, sizeof(lv_anim_t));
+    lv_memset_00(a, sizeof(lv_anim_t));
     a->time    = 500;
     a->start   = 0;
     a->end     = 100;

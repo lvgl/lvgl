@@ -108,9 +108,9 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->point_cnt             = LV_CHART_PNUM_DEF;
     ext->type                  = LV_CHART_TYPE_LINE;
     ext->update_mode           = LV_CHART_UPDATE_MODE_SHIFT;
-    memset(&ext->x_axis, 0, sizeof(ext->x_axis));
-    memset(&ext->y_axis, 0, sizeof(ext->y_axis));
-    memset(&ext->secondary_y_axis, 0, sizeof(ext->secondary_y_axis));
+    lv_memset_00(&ext->x_axis, sizeof(ext->x_axis));
+    lv_memset_00(&ext->y_axis, sizeof(ext->y_axis));
+    lv_memset_00(&ext->secondary_y_axis, sizeof(ext->secondary_y_axis));
     ext->x_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->x_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->y_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;

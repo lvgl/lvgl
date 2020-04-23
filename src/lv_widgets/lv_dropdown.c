@@ -911,10 +911,12 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
                     ext->sel_opt_id_orig = ext->sel_opt_id;
                     lv_obj_invalidate(ddlist);
                 }
+#if LV_USE_GROUP
                 lv_indev_type_t indev_type = lv_indev_get_type(indev);
                 if(indev_type == LV_INDEV_TYPE_ENCODER) {
                     lv_group_set_editing(lv_obj_get_group(ddlist), false);
                 }
+#endif
             }
             else {
                 lv_dropdown_open(ddlist);

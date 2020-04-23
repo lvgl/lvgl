@@ -56,7 +56,7 @@ static lv_disp_t * disp_def;
  */
 void lv_disp_drv_init(lv_disp_drv_t * driver)
 {
-    memset(driver, 0, sizeof(lv_disp_drv_t));
+    lv_memset_00(driver, sizeof(lv_disp_drv_t));
 
     driver->flush_cb         = NULL;
     driver->hor_res          = LV_HOR_RES_MAX;
@@ -103,7 +103,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
  */
 void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32_t size_in_px_cnt)
 {
-    memset(disp_buf, 0, sizeof(lv_disp_buf_t));
+    lv_memset_00(disp_buf, sizeof(lv_disp_buf_t));
 
     disp_buf->buf1    = buf1;
     disp_buf->buf2    = buf2;

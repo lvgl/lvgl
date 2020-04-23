@@ -162,7 +162,7 @@ void lv_msgbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
     lv_obj_set_event_cb(ext->btnm, lv_msgbox_btnm_event_cb);
 
     if(lv_obj_is_focused(mbox)) {
-        lv_state_t state = lv_obj_get_state(mbox, LV_TABVIEW_PART_BG);
+        lv_state_t state = lv_obj_get_state(mbox, LV_MSGBOX_PART_BG);
         if(state & LV_STATE_EDITED) {
             lv_obj_set_state(ext->btnm, LV_STATE_FOCUSED | LV_STATE_EDITED);
         } else {
@@ -465,8 +465,8 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
 
         /* The button matrix with ENCODER input supposes it's in a group but in this case it isn't
          * (Only the message box's container) So so some actions here instead*/
-        if(sign == LV_SIGNAL_FOCUS) {
 #if LV_USE_GROUP
+        if(sign == LV_SIGNAL_FOCUS) {
             lv_indev_t * indev         = lv_indev_get_act();
             lv_indev_type_t indev_type = lv_indev_get_type(indev);
             if(indev_type == LV_INDEV_TYPE_ENCODER) {
@@ -477,7 +477,7 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
         }
 
         if(ext->btnm && (sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS)) {
-            lv_state_t state = lv_obj_get_state(mbox, LV_TABVIEW_PART_BG);
+            lv_state_t state = lv_obj_get_state(mbox, LV_MSGBOX_PART_BG);
             if(state & LV_STATE_FOCUSED) {
                 lv_obj_set_state(ext->btnm, LV_STATE_FOCUSED);
             } else {

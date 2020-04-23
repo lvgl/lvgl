@@ -209,7 +209,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         LV_ASSERT_MEM(new_obj);
         if(new_obj == NULL) return NULL;
 
-        memset(new_obj, 0x00, sizeof(lv_obj_t));
+        lv_memset_00(new_obj, sizeof(lv_obj_t));
 
 #if LV_USE_BIDI
         new_obj->base_dir     = LV_BIDI_BASE_DIR_DEF;
@@ -232,7 +232,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         LV_ASSERT_MEM(new_obj);
         if(new_obj == NULL) return NULL;
 
-        memset(new_obj, 0x00, sizeof(lv_obj_t));
+        lv_memset_00(new_obj, sizeof(lv_obj_t));
 
         new_obj->parent = parent;
 
@@ -265,7 +265,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->ext_draw_pad = 0;
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
-    memset(&new_obj->ext_click_pad, 0, sizeof(new_obj->ext_click_pad));
+    lv_memset_00(&new_obj->ext_click_pad, sizeof(new_obj->ext_click_pad));
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     new_obj->ext_click_pad_hor = 0;
     new_obj->ext_click_pad_ver = 0;
@@ -282,7 +282,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
     /*Init. user date*/
 #if LV_USE_USER_DATA
-    memset(&new_obj->user_data, 0, sizeof(lv_obj_user_data_t));
+    lv_memset_00(&new_obj->user_data, sizeof(lv_obj_user_data_t));
 #endif
 
 
@@ -2851,8 +2851,8 @@ void lv_obj_get_type(const lv_obj_t * obj, lv_obj_type_t * buf)
 
     lv_obj_type_t tmp;
 
-    memset(buf, 0, sizeof(lv_obj_type_t));
-    memset(&tmp, 0, sizeof(lv_obj_type_t));
+    lv_memset_00(buf, sizeof(lv_obj_type_t));
+    lv_memset_00(&tmp, sizeof(lv_obj_type_t));
 
     obj->signal_cb((lv_obj_t *)obj, LV_SIGNAL_GET_TYPE, &tmp);
 

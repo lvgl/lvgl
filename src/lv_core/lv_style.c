@@ -60,7 +60,7 @@ static lv_style_t * get_alloc_local_style(lv_style_list_t * list);
  */
 void lv_style_init(lv_style_t * style)
 {
-    memset(style, 0x00, sizeof(lv_style_t));
+    lv_memset_00(style, sizeof(lv_style_t));
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_DEBUG_STYLE_SENTINEL_VALUE;
 #endif
@@ -135,7 +135,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_property_t prop)
  */
 void lv_style_list_init(lv_style_list_t * list)
 {
-    memset(list, 0x00, sizeof(lv_style_list_t));
+    lv_memset_00(list, sizeof(lv_style_list_t));
 #if LV_USE_ASSERT_STYLE
     list->sentinel = LV_DEBUG_STYLE_LIST_SENTINEL_VALUE;
 #endif

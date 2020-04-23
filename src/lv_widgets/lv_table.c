@@ -199,7 +199,7 @@ void lv_table_set_row_cnt(lv_obj_t * table, uint16_t row_cnt)
         if(old_row_cnt < row_cnt) {
             uint16_t old_cell_cnt = old_row_cnt * ext->col_cnt;
             uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
-            memset(&ext->cell_data[old_cell_cnt], 0, (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
+            lv_memset_00(&ext->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
         }
     }
     else {
@@ -237,7 +237,7 @@ void lv_table_set_col_cnt(lv_obj_t * table, uint16_t col_cnt)
         if(old_col_cnt < col_cnt) {
             uint16_t old_cell_cnt = old_col_cnt * ext->row_cnt;
             uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
-            memset(&ext->cell_data[old_cell_cnt], 0, (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
+            lv_memset_00(&ext->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
         }
 
     }

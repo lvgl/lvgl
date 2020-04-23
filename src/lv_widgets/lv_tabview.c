@@ -813,9 +813,11 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
     lv_res_t res = LV_RES_OK;
     if(id_prev != id_new) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
 
+#if LV_USE_GROUP
     if(lv_indev_get_type(lv_indev_get_act()) == LV_INDEV_TYPE_ENCODER) {
         lv_group_set_editing(lv_obj_get_group(tabview), false);
     }
+#endif
 
     if(res != LV_RES_OK) return;
 }

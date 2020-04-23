@@ -51,7 +51,7 @@
  */
 void lv_indev_drv_init(lv_indev_drv_t * driver)
 {
-    memset(driver, 0, sizeof(lv_indev_drv_t));
+    lv_memset_00(driver, sizeof(lv_indev_drv_t));
 
     driver->type                 = LV_INDEV_TYPE_NONE;
     driver->drag_limit           = LV_INDEV_DEF_DRAG_LIMIT;
@@ -131,7 +131,7 @@ bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
 {
     bool cont = false;
 
-    memset(data, 0, sizeof(lv_indev_data_t));
+    lv_memset_00(data, sizeof(lv_indev_data_t));
 
     /* For touchpad sometimes users don't the last pressed coordinate on release.
      * So be sure a coordinates are initialized to the last point */

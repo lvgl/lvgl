@@ -475,7 +475,7 @@ lv_fs_res_t lv_fs_free_space(char letter, uint32_t * total_p, uint32_t * free_p)
  */
 void lv_fs_drv_init(lv_fs_drv_t * drv)
 {
-    memset(drv, 0, sizeof(lv_fs_drv_t));
+    lv_memset_00(drv, sizeof(lv_fs_drv_t));
 }
 
 /**
