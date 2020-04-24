@@ -59,7 +59,7 @@ static int32_t sh_cache_r = -1;
 
 void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
 {
-    memset(dsc, 0x00, sizeof(lv_draw_rect_dsc_t));
+    lv_memset_00(dsc, sizeof(lv_draw_rect_dsc_t));
     dsc->bg_color = LV_COLOR_WHITE;
     dsc->bg_grad_color = LV_COLOR_BLACK;
     dsc->border_color = LV_COLOR_BLACK;

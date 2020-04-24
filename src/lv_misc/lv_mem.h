@@ -135,12 +135,30 @@ void lv_mem_buf_free_all(void);
 
 /**
  * Same as `memcpy` but optimized for 4 byte operation.
- * `dst` and `src` should be word aligned else normal `memcpy` will be used
  * @param dst pointer to the destination buffer
  * @param src pointer to the source buffer
  * @param len number of byte to copy
  */
 void * lv_memcpy(void * dst, const void * src, size_t len);
+
+/**
+ * Same as `memcpy` but optimized to copy only a few bytes.
+ * @param dst pointer to the destination buffer
+ * @param src pointer to the source buffer
+ * @param len number of byte to copy
+ */
+static inline void * lv_memcpy_small(void * dst, const void * src, size_t len)
+{
+    uint8_t * d8 = dst;
+    const uint8_t * s8 = src;
+
+    while(len) {
+        *d8 = *s8; d8++; s8++;
+        len--;
+    }
+
+    return dst;
+}
 
 /**
  * Same as `memset` but optimized for 4 byte operation.

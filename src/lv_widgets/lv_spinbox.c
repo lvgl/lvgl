@@ -514,7 +514,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
 
     char buf[LV_SPINBOX_MAX_DIGIT_COUNT + 8];
-    memset(buf, 0, sizeof(buf));
+    lv_memset_00(buf, sizeof(buf));
     char * buf_p = buf;
     uint8_t cur_shift_left = 0;
 

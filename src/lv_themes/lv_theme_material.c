@@ -63,7 +63,7 @@
 #define COLOR_BG_SEC_TEXT_DIS   (IS_LIGHT ? lv_color_hex(0xaaaaaa) : lv_color_hex(0xa5a8ad))
 
 #define TRANSITION_TIME         150
-#define BORDER_WIDTH            LV_DPX(3)
+#define BORDER_WIDTH            LV_DPX(2)
 #define IS_LIGHT (theme.flags & LV_THEME_MATERIAL_FLAG_LIGHT)
 
 /**********************
@@ -200,6 +200,7 @@ static void basic_init(void)
     lv_style_set_bg_color(&bg, LV_STATE_DEFAULT, COLOR_BG);
     lv_style_set_border_color(&bg, LV_STATE_DEFAULT, COLOR_BG_BORDER);
     lv_style_set_border_color(&bg, LV_STATE_FOCUSED, theme.color_primary);
+    lv_style_set_border_color(&bg, LV_STATE_EDITED, theme.color_secondary);
     lv_style_set_border_width(&bg, LV_STATE_DEFAULT, BORDER_WIDTH);
     lv_style_set_border_post(&bg, LV_STATE_DEFAULT, true);
     lv_style_set_text_font(&bg, LV_STATE_DEFAULT, theme.font_normal);
@@ -289,6 +290,7 @@ static void basic_init(void)
     lv_style_set_outline_opa(&btn, LV_STATE_DEFAULT, LV_OPA_0);
     lv_style_set_outline_opa(&btn, LV_STATE_FOCUSED, LV_OPA_50);
     lv_style_set_outline_color(&btn, LV_STATE_DEFAULT, theme.color_primary);
+    lv_style_set_outline_color(&btn, LV_STATE_EDITED, theme.color_secondary);
     lv_style_set_transition_time(&btn, LV_STATE_DEFAULT, TRANSITION_TIME);
     lv_style_set_transition_prop_4(&btn, LV_STATE_DEFAULT, LV_STYLE_BORDER_OPA);
     lv_style_set_transition_prop_5(&btn, LV_STATE_DEFAULT, LV_STYLE_BG_COLOR);
@@ -337,6 +339,7 @@ static void bar_init(void)
     lv_style_set_bg_color(&bar_bg, LV_STATE_DEFAULT, COLOR_BG_SEC);
     lv_style_set_value_color(&bar_bg, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x31404f) : LV_COLOR_WHITE);
     lv_style_set_outline_color(&bar_bg, LV_STATE_DEFAULT, theme.color_primary);
+    lv_style_set_outline_color(&bar_bg, LV_STATE_EDITED, theme.color_secondary);
     lv_style_set_outline_opa(&bar_bg, LV_STATE_DEFAULT, LV_OPA_TRANSP);
     lv_style_set_outline_opa(&bar_bg, LV_STATE_FOCUSED, LV_OPA_50);
     lv_style_set_outline_width(&bar_bg, LV_STATE_DEFAULT, 3);
@@ -570,6 +573,7 @@ static void cpicker_init(void)
     lv_style_set_border_width(&cpicker_indic, LV_STATE_DEFAULT, 2);
     lv_style_set_border_color(&cpicker_indic, LV_STATE_DEFAULT, LV_COLOR_GRAY);
     lv_style_set_border_color(&cpicker_indic, LV_STATE_FOCUSED, theme.color_primary);
+    lv_style_set_border_color(&cpicker_indic, LV_STATE_EDITED, theme.color_secondary);
     lv_style_set_pad_left(&cpicker_indic, LV_STATE_DEFAULT,LV_DPX(13));
     lv_style_set_pad_right(&cpicker_indic, LV_STATE_DEFAULT, LV_DPX(13));
     lv_style_set_pad_top(&cpicker_indic, LV_STATE_DEFAULT, LV_DPX(13));
@@ -612,6 +616,7 @@ static void keyboard_init(void)
     lv_style_set_border_width(&kb_bg, LV_STATE_DEFAULT, LV_DPX(4));
     lv_style_set_border_side(&kb_bg, LV_STATE_DEFAULT, LV_BORDER_SIDE_TOP);
     lv_style_set_border_color(&kb_bg, LV_STATE_DEFAULT, IS_LIGHT ? COLOR_BG_TEXT : LV_COLOR_BLACK);
+    lv_style_set_border_color(&kb_bg, LV_STATE_EDITED, theme.color_secondary);
     lv_style_set_pad_left(&kb_bg, LV_STATE_DEFAULT,  LV_DPX(10));
     lv_style_set_pad_right(&kb_bg, LV_STATE_DEFAULT, LV_DPX(10));
     lv_style_set_pad_top(&kb_bg, LV_STATE_DEFAULT,  LV_DPX(10));
@@ -774,10 +779,12 @@ static void tabview_init(void)
     lv_style_set_pad_top(&tabview_btns, LV_STATE_DEFAULT, LV_DPX(20));
     lv_style_set_pad_bottom(&tabview_btns, LV_STATE_DEFAULT, LV_DPX(20));
     lv_style_set_text_color(&tabview_btns, LV_STATE_FOCUSED, theme.color_primary);
+    lv_style_set_text_color(&tabview_btns, LV_STATE_EDITED, theme.color_secondary);
 
     style_init_reset(&tabview_indic);
     lv_style_set_bg_opa(&tabview_indic, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&tabview_indic, LV_STATE_DEFAULT, theme.color_primary);
+    lv_style_set_bg_color(&tabview_indic, LV_STATE_EDITED, theme.color_secondary);
     lv_style_set_size(&tabview_indic, LV_STATE_DEFAULT, LV_DPX(5));
     lv_style_set_radius(&tabview_indic, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
 

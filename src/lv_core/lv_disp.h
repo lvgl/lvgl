@@ -152,7 +152,7 @@ static inline void lv_scr_load(lv_obj_t * scr)
  * 1 dip is 2 px on a 320 DPI screen
  * https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
  */
-#define LV_DPX(n)   LV_MATH_MAX(((LV_DPI * (n)) / 160), 1)
+#define LV_DPX(n)   LV_MATH_MAX(((LV_DPI * (n) + 80) / 160), 1) /*+80 for rounding*/
 
 #ifdef __cplusplus
 } /* extern "C" */

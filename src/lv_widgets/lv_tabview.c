@@ -652,16 +652,33 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
 
         /* The button matrix is not in a group (the tab view is in it) but it should handle the
          * group signals. So propagate the related signals to the button matrix manually*/
-        if(ext->btns) {
-            ext->btns->signal_cb(ext->btns, sign, param);
+        ext->btns->signal_cb(ext->btns, sign, param);
 
-            /*Make the active tab's button focused*/
-            if(sign == LV_SIGNAL_FOCUS) {
-                lv_btnmatrix_set_focused_btn(ext->btns, ext->tab_cur);
+        /*Make the active tab's button focused*/
+        if(sign == LV_SIGNAL_FOCUS) {
+            lv_btnmatrix_set_focused_btn(ext->btns, ext->tab_cur);
+        }
+
+        if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS) {
+            lv_state_t state = lv_obj_get_state(tabview, LV_TABVIEW_PART_BG);
+            if(state & LV_STATE_FOCUSED) {
+                lv_obj_set_state(ext->btns, LV_STATE_FOCUSED);
+                lv_obj_set_state(ext->indic, LV_STATE_FOCUSED);
+            } else {
+                lv_obj_clear_state(ext->btns, LV_STATE_FOCUSED);
+                lv_obj_clear_state(ext->indic, LV_STATE_FOCUSED);
+
+            }
+            if(state & LV_STATE_EDITED) {
+                lv_obj_set_state(ext->btns, LV_STATE_EDITED);
+                lv_obj_set_state(ext->indic, LV_STATE_EDITED);
+            } else {
+                lv_obj_clear_state(ext->btns, LV_STATE_EDITED);
+                lv_obj_clear_state(ext->indic, LV_STATE_EDITED);
+
             }
         }
     }
-
 
     return res;
 }
@@ -795,6 +812,12 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
 
     lv_res_t res = LV_RES_OK;
     if(id_prev != id_new) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
+
+#if LV_USE_GROUP
+    if(lv_indev_get_type(lv_indev_get_act()) == LV_INDEV_TYPE_ENCODER) {
+        lv_group_set_editing(lv_obj_get_group(tabview), false);
+    }
+#endif
 
     if(res != LV_RES_OK) return;
 }

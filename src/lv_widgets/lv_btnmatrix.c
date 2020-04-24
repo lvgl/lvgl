@@ -275,7 +275,7 @@ void lv_btnmatrix_set_ctrl_map(lv_obj_t * btnm, const lv_btnmatrix_ctrl_t ctrl_m
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
-    memcpy(ext->ctrl_bits, ctrl_map, sizeof(lv_btnmatrix_ctrl_t) * ext->btn_cnt);
+    lv_memcpy(ext->ctrl_bits, ctrl_map, sizeof(lv_btnmatrix_ctrl_t) * ext->btn_cnt);
 
     lv_btnmatrix_set_map(btnm, ext->map_p);
 }
@@ -497,7 +497,7 @@ uint16_t lv_btnmatrix_get_focused_btn(const lv_obj_t * btnm)
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
-    return ext->btn_id_pr;
+    return ext->btn_id_focused;
 }
 
 /**
@@ -612,7 +612,6 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
         lv_draw_rect_dsc_t draw_rect_tmp_dsc;
         lv_draw_label_dsc_t draw_label_tmp_dsc;
 
-
         /*The state changes without re-caching the styles, disable the use of cache*/
         lv_state_t state_ori = btnm->state;
         btnm->state = LV_STATE_DEFAULT;
@@ -689,7 +688,10 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
                 btnm->state = LV_STATE_DEFAULT;
                 if(tgl_state) btnm->state = LV_STATE_CHECKED;
                 if(ext->btn_id_pr == btn_i) btnm->state |= LV_STATE_PRESSED;
-                if(ext->btn_id_focused == btn_i) btnm->state |= LV_STATE_FOCUSED;
+                if(ext->btn_id_focused == btn_i) {
+                    btnm->state |= LV_STATE_FOCUSED;
+                    if(state_ori & LV_STATE_EDITED) btnm->state |= LV_STATE_EDITED;
+                }
 
                 lv_draw_rect_dsc_init(&draw_rect_tmp_dsc);
                 lv_draw_label_dsc_init(&draw_label_tmp_dsc);
@@ -1079,7 +1081,7 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char **
     LV_ASSERT_MEM(ext->ctrl_bits);
     if(ext->button_areas == NULL || ext->ctrl_bits == NULL) btn_cnt = 0;
 
-    memset(ext->ctrl_bits, 0, sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
+    lv_memset_00(ext->ctrl_bits, sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
 
     ext->btn_cnt = btn_cnt;
 }

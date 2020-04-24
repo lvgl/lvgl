@@ -479,8 +479,10 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
     }
 
     /* Include the ancient signal function */
-    res = ancestor_signal(roller, sign, param);
-    if(res != LV_RES_OK) return res;
+    if(sign != LV_SIGNAL_CONTROL) { /*Don't let the page to scroll on keys*/
+        res = ancestor_signal(roller, sign, param);
+        if(res != LV_RES_OK) return res;
+    }
 
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 

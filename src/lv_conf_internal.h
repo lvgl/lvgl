@@ -86,7 +86,7 @@
  * E.g. a button with width = LV_DPI / 2 -> half inch wide
  * (Not so important, you can adjust it to modify default sizes and spaces)*/
 #ifndef LV_DPI
-#define LV_DPI              100     /*[px]*/
+#define LV_DPI              130     /*[px]*/
 #endif
 
 /* The the real width of the display changes some default values:
@@ -97,13 +97,13 @@
  * The upper limit of the categories are set below in 0.1 inch unit.
  */
 #ifndef LV_DISP_SMALL_LIMIT
-#define LV_DISP_SMALL_LIMIT 20
+#define LV_DISP_SMALL_LIMIT  30
 #endif
 #ifndef LV_DISP_MEDIUM_LIMIT
-#define LV_DISP_MEDIUM_LIMIT 45
+#define LV_DISP_MEDIUM_LIMIT 50
 #endif
 #ifndef LV_DISP_LARGE_LIMIT
-#define LV_DISP_LARGE_LIMIT 65
+#define LV_DISP_LARGE_LIMIT  70
 #endif
 
 /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */

@@ -253,7 +253,7 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, l
     uint8_t * to_copy8 = (uint8_t *)to_copy;
     lv_coord_t i;
     for(i = 0; i < h; i++) {
-        memcpy((void *)&ext->dsc.data[px], to_copy8, w * px_size);
+        lv_memcpy((void *)&ext->dsc.data[px], to_copy8, w * px_size);
         px += ext->dsc.header.w * px_size;
         to_copy8 += w * px_size;
     }
@@ -425,7 +425,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 
         lv_color_t c;
         lv_opa_t opa = LV_OPA_TRANSP;
-        memcpy(line_buf, &ext->dsc.data[y * line_w], line_w);
+        lv_memcpy(line_buf, &ext->dsc.data[y * line_w], line_w);
 
 
         for(x = a.x1 - r_back; x <= a.x1 + r_front; x++) {

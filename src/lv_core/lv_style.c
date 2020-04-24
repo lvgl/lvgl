@@ -60,7 +60,7 @@ static lv_style_t * get_alloc_local_style(lv_style_list_t * list);
  */
 void lv_style_init(lv_style_t * style)
 {
-    memset(style, 0x00, sizeof(lv_style_t));
+    lv_memset_00(style, sizeof(lv_style_t));
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_DEBUG_STYLE_SENTINEL_VALUE;
 #endif
@@ -82,7 +82,7 @@ void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
 
     uint16_t size = lv_style_get_mem_size(style_src);
     style_dest->map = lv_mem_alloc(size);
-    memcpy(style_dest->map, style_src->map, size);
+    lv_memcpy(style_dest->map, style_src->map, size);
 }
 
 /**
@@ -135,7 +135,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_property_t prop)
  */
 void lv_style_list_init(lv_style_list_t * list)
 {
-    memset(list, 0x00, sizeof(lv_style_list_t));
+    lv_memset_00(list, sizeof(lv_style_list_t));
 #if LV_USE_ASSERT_STYLE
     list->sentinel = LV_DEBUG_STYLE_LIST_SENTINEL_VALUE;
 #endif
@@ -159,24 +159,24 @@ void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * lis
     if(list_src->has_local == 0) {
         if(list_src->has_trans) {
             list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 1) * sizeof(lv_style_t *));
-            memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
+            lv_memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
             list_dest->style_cnt = list_src->style_cnt - 1;
         }
         else {
             list_dest->style_list = lv_mem_alloc(list_src->style_cnt * sizeof(lv_style_t *));
-            memcpy(list_dest->style_list, list_src->style_list, list_src->style_cnt * sizeof(lv_style_t *));
+            lv_memcpy(list_dest->style_list, list_src->style_list, list_src->style_cnt * sizeof(lv_style_t *));
             list_dest->style_cnt = list_src->style_cnt;
         }
     }
     else {
         if(list_src->has_trans) {
             list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 2) * sizeof(lv_style_t *));
-            memcpy(list_dest->style_list, list_src->style_list + 2, (list_src->style_cnt - 2) * sizeof(lv_style_t *));
+            lv_memcpy(list_dest->style_list, list_src->style_list + 2, (list_src->style_cnt - 2) * sizeof(lv_style_t *));
             list_dest->style_cnt = list_src->style_cnt - 2;
         }
         else {
             list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 1) * sizeof(lv_style_t *));
-            memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
+            lv_memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
             list_dest->style_cnt = list_src->style_cnt - 1;
         }
 
@@ -373,7 +373,7 @@ void _lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_in
         attr_goal.full = (prop >> 8) & 0xFFU;
 
         if(attr_found.bits.state == attr_goal.bits.state) {
-            memcpy(style->map + id + sizeof(lv_style_property_t), &value, sizeof(lv_style_int_t));
+            lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &value, sizeof(lv_style_int_t));
             return;
         }
     }
@@ -390,9 +390,9 @@ void _lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_in
     LV_ASSERT_MEM(style->map);
     if(style == NULL) return;
 
-    memcpy(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
-    memcpy(style->map + size - sizeof(lv_style_int_t) - end_mark_size, &value, sizeof(lv_style_int_t));
-    memcpy(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
+    lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
+    lv_memcpy_small(style->map + size - sizeof(lv_style_int_t) - end_mark_size, &value, sizeof(lv_style_int_t));
+    lv_memcpy_small(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
 }
 
 /**
@@ -419,7 +419,7 @@ void _lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_
         attr_goal.full = (prop >> 8) & 0xFFU;
 
         if(attr_found.bits.state == attr_goal.bits.state) {
-            memcpy(style->map + id + sizeof(lv_style_property_t), &color, sizeof(lv_color_t));
+            lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &color, sizeof(lv_color_t));
             return;
         }
     }
@@ -437,9 +437,9 @@ void _lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_
     LV_ASSERT_MEM(style->map);
     if(style == NULL) return;
 
-    memcpy(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
-    memcpy(style->map + size - sizeof(lv_color_t) - end_mark_size, &color, sizeof(lv_color_t));
-    memcpy(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
+    lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
+    lv_memcpy_small(style->map + size - sizeof(lv_color_t) - end_mark_size, &color, sizeof(lv_color_t));
+    lv_memcpy_small(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
 }
 
 /**
@@ -466,7 +466,7 @@ void _lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t op
         attr_goal.full = (prop >> 8) & 0xFFU;
 
         if(attr_found.bits.state == attr_goal.bits.state) {
-            memcpy(style->map + id + sizeof(lv_style_property_t), &opa, sizeof(lv_opa_t));
+            lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &opa, sizeof(lv_opa_t));
             return;
         }
     }
@@ -484,9 +484,9 @@ void _lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t op
     LV_ASSERT_MEM(style->map);
     if(style == NULL) return;
 
-    memcpy(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
-    memcpy(style->map + size - sizeof(lv_opa_t) - end_mark_size, &opa, sizeof(lv_opa_t));
-    memcpy(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
+    lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
+    lv_memcpy_small(style->map + size - sizeof(lv_opa_t) - end_mark_size, &opa, sizeof(lv_opa_t));
+    lv_memcpy_small(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
 }
 
 /**
@@ -513,7 +513,7 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, _lv_style_f
         attr_goal.full = (prop >> 8) & 0xFFU;
 
         if(attr_found.bits.state == attr_goal.bits.state) {
-            memcpy(style->map + id + sizeof(lv_style_property_t), &p, sizeof(_lv_style_fptr_dptr_t));
+            lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &p, sizeof(_lv_style_fptr_dptr_t));
             return;
         }
     }
@@ -531,9 +531,9 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, _lv_style_f
     LV_ASSERT_MEM(style->map);
     if(style == NULL) return;
 
-    memcpy(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
-    memcpy(style->map + size - sizeof(_lv_style_fptr_dptr_t) - end_mark_size, &p, sizeof(_lv_style_fptr_dptr_t));
-    memcpy(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
+    lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
+    lv_memcpy_small(style->map + size - sizeof(_lv_style_fptr_dptr_t) - end_mark_size, &p, sizeof(_lv_style_fptr_dptr_t));
+    lv_memcpy_small(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
 }
 
 /**
@@ -559,7 +559,7 @@ int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, vo
         return -1;
     }
     else {
-        memcpy(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(lv_style_int_t));
+        lv_memcpy_small(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(lv_style_int_t));
         lv_style_attr_t attr_act;
         attr_act.full = style->map[id + 1];
 
@@ -596,7 +596,7 @@ int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, vo
         return -1;
     }
     else {
-        memcpy(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(lv_opa_t));
+        lv_memcpy_small(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(lv_opa_t));
         lv_style_attr_t attr_act;
         attr_act.full = style->map[id + 1];
 
@@ -630,7 +630,7 @@ int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, 
         return -1;
     }
     else {
-        memcpy(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(lv_color_t));
+        lv_memcpy_small(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(lv_color_t));
         lv_style_attr_t attr_act;
         attr_act.full = style->map[id + 1];
 
@@ -665,7 +665,7 @@ int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, vo
         return -1;
     }
     else {
-        memcpy(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(_lv_style_fptr_dptr_t));
+        lv_memcpy_small(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(_lv_style_fptr_dptr_t));
         lv_style_attr_t attr_act;
         attr_act.full = style->map[id + 1];
 
