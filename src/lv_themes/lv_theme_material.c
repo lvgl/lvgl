@@ -649,9 +649,11 @@ static void page_init(void)
     lv_style_set_pad_right(&sb, LV_STATE_DEFAULT,  LV_DPX(7));
     lv_style_set_pad_bottom(&sb, LV_STATE_DEFAULT,  LV_DPX(7));
 
+#if  LV_USE_ANIMATION
     style_init_reset(&edge_flash);
     lv_style_set_bg_opa(&edge_flash, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&edge_flash, LV_STATE_DEFAULT,  lv_color_hex3(0x888));
+#endif
 #endif
 }
 
