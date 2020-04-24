@@ -63,7 +63,7 @@
 #define COLOR_BG_SEC_TEXT_DIS   (IS_LIGHT ? lv_color_hex(0xaaaaaa) : lv_color_hex(0xa5a8ad))
 
 #define TRANSITION_TIME         150
-#define BORDER_WIDTH            LV_DPX(3)
+#define BORDER_WIDTH            LV_DPX(2)
 #define IS_LIGHT (theme.flags & LV_THEME_MATERIAL_FLAG_LIGHT)
 
 /**********************

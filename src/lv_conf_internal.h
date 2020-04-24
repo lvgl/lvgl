@@ -97,13 +97,13 @@
  * The upper limit of the categories are set below in 0.1 inch unit.
  */
 #ifndef LV_DISP_SMALL_LIMIT
-#define LV_DISP_SMALL_LIMIT 25
+#define LV_DISP_SMALL_LIMIT  30
 #endif
 #ifndef LV_DISP_MEDIUM_LIMIT
-#define LV_DISP_MEDIUM_LIMIT 45
+#define LV_DISP_MEDIUM_LIMIT 50
 #endif
 #ifndef LV_DISP_LARGE_LIMIT
-#define LV_DISP_LARGE_LIMIT 65
+#define LV_DISP_LARGE_LIMIT  70
 #endif
 
 /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
