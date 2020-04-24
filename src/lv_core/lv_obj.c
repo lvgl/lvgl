@@ -805,7 +805,7 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
  * @param obj pointer to an object
  * @param w the width without paddings
  */
-void lv_obj_set_width_fit(const lv_obj_t * obj, lv_coord_t w)
+void lv_obj_set_width_fit(lv_obj_t * obj, lv_coord_t w)
 {
     lv_style_int_t pleft = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
     lv_style_int_t pright = lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
@@ -818,7 +818,7 @@ void lv_obj_set_width_fit(const lv_obj_t * obj, lv_coord_t w)
  * @param obj pointer to an object
  * @param h the height without paddings
  */
-void lv_obj_set_height_fit(const lv_obj_t * obj, lv_coord_t h)
+void lv_obj_set_height_fit(lv_obj_t * obj, lv_coord_t h)
 {
     lv_style_int_t ptop = lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN);
     lv_style_int_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);

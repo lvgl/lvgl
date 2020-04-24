@@ -149,8 +149,8 @@ void * lv_memcpy(void * dst, const void * src, size_t len);
  */
 static inline void * lv_memcpy_small(void * dst, const void * src, size_t len)
 {
-    uint8_t * d8 = dst;
-    const uint8_t * s8 = src;
+    uint8_t * d8 = (uint8_t *)dst;
+    const uint8_t * s8 = (const uint8_t *)src;
 
     while(len) {
         *d8 = *s8; d8++; s8++;
