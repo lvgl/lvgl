@@ -146,6 +146,9 @@ static lv_style_t pad_small;
 
 #if LV_USE_PAGE
     static lv_style_t sb;
+#if LV_USE_ANIMATION
+    static lv_style_t edge_flash;
+#endif
 #endif
 
 #if LV_USE_ROLLER
@@ -646,6 +649,9 @@ static void page_init(void)
     lv_style_set_pad_right(&sb, LV_STATE_DEFAULT,  LV_DPX(7));
     lv_style_set_pad_bottom(&sb, LV_STATE_DEFAULT,  LV_DPX(7));
 
+    style_init_reset(&edge_flash);
+    lv_style_set_bg_opa(&edge_flash, LV_STATE_DEFAULT, LV_OPA_COVER);
+    lv_style_set_bg_color(&edge_flash, LV_STATE_DEFAULT,  lv_color_hex3(0x888));
 #endif
 }
 
@@ -1109,6 +1115,12 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             lv_obj_clean_style_list(obj, LV_PAGE_PART_SCROLLBAR);
             list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCROLLBAR);
             lv_style_list_add_style(list, &sb);
+
+#if LV_USE_ANIMATION
+            lv_obj_clean_style_list(obj, LV_PAGE_PART_EDGE_FLASH);
+            list = lv_obj_get_style_list(obj, LV_PAGE_PART_EDGE_FLASH);
+            lv_style_list_add_style(list, &edge_flash);
+#endif
             break;
 #endif
 #if LV_USE_TABVIEW
@@ -1154,7 +1166,6 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
 
             lv_obj_clean_style_list(obj, LV_TILEVIEW_PART_EDGE_FLASH);
             list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_EDGE_FLASH);
-            lv_style_list_add_style(list, &btn);
             break;
 #endif
 

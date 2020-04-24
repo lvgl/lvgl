@@ -54,6 +54,7 @@ static void refr_ext_draw_pad(lv_obj_t * page);
 #if LV_USE_ANIMATION
     static void edge_flash_anim(void * page, lv_anim_value_t v);
     static void edge_flash_anim_end(lv_anim_t * a);
+    static void get_edge_flash_area(lv_obj_t * page, lv_area_t * area, lv_coord_t state);
 #endif
 
 /**********************
@@ -716,38 +717,13 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
 
 #if LV_USE_ANIMATION
         {
-            lv_coord_t page_w = lv_obj_get_width(page);
-            lv_coord_t page_h = lv_obj_get_height(page);
 
-            lv_area_t flash_area;
-
-            if(ext->edge_flash.top_ip) {
-                flash_area.x1 = page->coords.x1 - page_w;
-                flash_area.x2 = page->coords.x2 + page_w;
-                flash_area.y1 = page->coords.y1 - 3 * page_w + ext->edge_flash.state;
-                flash_area.y2 = page->coords.y1 + ext->edge_flash.state;
-            }
-            else if(ext->edge_flash.bottom_ip) {
-                flash_area.x1 = page->coords.x1 - page_w;
-                flash_area.x2 = page->coords.x2 + page_w;
-                flash_area.y1 = page->coords.y2 - ext->edge_flash.state;
-                flash_area.y2 = page->coords.y2 + 3 * page_w - ext->edge_flash.state;
-            }
-            else if(ext->edge_flash.right_ip) {
-                flash_area.x1 = page->coords.x2 - ext->edge_flash.state;
-                flash_area.x2 = page->coords.x2 + 3 * page_h - ext->edge_flash.state;
-                flash_area.y1 = page->coords.y1 - page_h;
-                flash_area.y2 = page->coords.y2 + page_h;
-            }
-            else if(ext->edge_flash.left_ip) {
-                flash_area.x1 = page->coords.x1 - 3 * page_h + ext->edge_flash.state;
-                flash_area.x2 = page->coords.x1 + ext->edge_flash.state;
-                flash_area.y1 = page->coords.y1 - page_h;
-                flash_area.y2 = page->coords.y2 + page_h;
-            }
 
             if(ext->edge_flash.left_ip || ext->edge_flash.right_ip || ext->edge_flash.top_ip ||
                ext->edge_flash.bottom_ip) {
+                lv_area_t flash_area;
+                get_edge_flash_area(page, &flash_area, ext->edge_flash.state);
+
                 lv_draw_rect_dsc_t edge_draw_dsc;
                 lv_draw_rect_dsc_init(&edge_draw_dsc);
                 lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_EDGE_FLASH, &edge_draw_dsc);
@@ -1327,18 +1303,60 @@ static void edge_flash_anim(void * page, lv_anim_value_t v)
 {
     lv_page_ext_t * ext   = lv_obj_get_ext_attr(page);
     ext->edge_flash.state = v;
-    lv_obj_invalidate(page);
+
+    lv_area_t flash_area;
+    get_edge_flash_area(page, &flash_area, LV_PAGE_END_FLASH_SIZE);
+    lv_obj_invalidate_area(page, &flash_area);
 }
 
 static void edge_flash_anim_end(lv_anim_t * a)
 {
+    lv_area_t flash_area;
+    get_edge_flash_area(a->var, &flash_area, LV_PAGE_END_FLASH_SIZE);
+    lv_obj_invalidate_area(a->var, &flash_area);
+
     lv_page_ext_t * ext       = lv_obj_get_ext_attr(a->var);
     ext->edge_flash.top_ip    = 0;
     ext->edge_flash.bottom_ip = 0;
     ext->edge_flash.left_ip   = 0;
     ext->edge_flash.right_ip  = 0;
-    lv_obj_invalidate(a->var);
+
 }
+
+static void get_edge_flash_area(lv_obj_t * page, lv_area_t * flash_area, lv_coord_t state)
+{
+    lv_coord_t page_w = lv_obj_get_width(page);
+    lv_coord_t page_h = lv_obj_get_height(page);
+    lv_page_ext_t * ext   = lv_obj_get_ext_attr(page);
+
+    if(ext->edge_flash.top_ip) {
+        flash_area->x1 = page->coords.x1 - page_w;
+        flash_area->x2 = page->coords.x2 + page_w;
+        flash_area->y1 = page->coords.y1 - 3 * page_w + state;
+        flash_area->y2 = page->coords.y1 + state;
+    }
+    else if(ext->edge_flash.bottom_ip) {
+        flash_area->x1 = page->coords.x1 - page_w;
+        flash_area->x2 = page->coords.x2 + page_w;
+        flash_area->y1 = page->coords.y2 - state;
+        flash_area->y2 = page->coords.y2 + 3 * page_w - state;
+    }
+    else if(ext->edge_flash.right_ip) {
+        flash_area->x1 = page->coords.x2 - state;
+        flash_area->x2 = page->coords.x2 + 3 * page_h - state;
+        flash_area->y1 = page->coords.y1 - page_h;
+        flash_area->y2 = page->coords.y2 + page_h;
+    }
+    else if(ext->edge_flash.left_ip) {
+        flash_area->x1 = page->coords.x1 - 3 * page_h + state;
+        flash_area->x2 = page->coords.x1 + state;
+        flash_area->y1 = page->coords.y1 - page_h;
+        flash_area->y2 = page->coords.y2 + page_h;
+    } else {
+        lv_area_set(flash_area, 0, 0, -1, -1);
+    }
+}
+
 #endif
 
 #endif
