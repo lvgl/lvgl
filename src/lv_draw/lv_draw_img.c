@@ -399,7 +399,7 @@ static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
         if(other_mask_cnt == 0 && !transform && !chroma_key && draw_dsc->recolor_opa == LV_OPA_TRANSP && alpha_byte) {
 #if LV_USE_GPU_STM32_DMA2D && LV_COLOR_DEPTH == 32
             /*Blend ARGB images directly*/
-            if(lv_area_get_size(draw_area) > 240) {
+            if(lv_area_get_size(&draw_area) > 240) {
                 int32_t disp_w = lv_area_get_width(disp_area);
                 lv_color_t * disp_buf = vdb->buf_act;
                 lv_color_t * disp_buf_first = disp_buf + disp_w * draw_area.y1 + draw_area.x1;

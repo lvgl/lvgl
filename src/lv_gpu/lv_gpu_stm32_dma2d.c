@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_gpu_stm32_dma2d.h"
+#include "../lv_core/lv_refr.h"
 
 #if LV_USE_GPU_STM32_DMA2D
 #include "stm32f7xx_hal.h"
@@ -71,8 +72,8 @@ void lv_gpu_stm32_dma2d_fill(lv_color_t * buf, lv_coord_t buf_w, lv_color_t colo
     hdma2d.LayerCfg[1].InputOffset = 0;
 
     /* DMA2D Initialization */
-    HAL_DMA2D_Init(&hdma2d) {
-    HAL_DMA2D_ConfigLayer(&hdma2d, 1)
+    HAL_DMA2D_Init(&hdma2d);
+    HAL_DMA2D_ConfigLayer(&hdma2d, 1);
     HAL_DMA2D_Start(&hdma2d, (uint32_t)lv_color_to32(color), (uint32_t)buf, fill_w, fill_h);
     dma2d_wait();
 }
@@ -191,7 +192,7 @@ void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color
     hdma2d.LayerCfg[1].AlphaInverted = DMA2D_REGULAR_ALPHA;
 
     /* DMA2D Initialization */
-    HAL_DMA2D_Init(&hdma2d); {
+    HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 0);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
     HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t)map, (uint32_t)buf, (uint32_t)buf, copy_w, copy_h);
@@ -205,7 +206,7 @@ void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color
 static void dma2d_wait(void)
 {
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
-    while(HAL_DMA2D_PollForTransfer(&hdma2d, 0) == HAL_BUSY) {
+    while(HAL_DMA2D_PollForTransfer(&hdma2d, 0) == HAL_TIMEOUT) {
         if(disp->driver.wait_cb) disp->driver.wait_cb(&disp->driver);
     }
 }
