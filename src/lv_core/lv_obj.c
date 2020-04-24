@@ -3606,7 +3606,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
         else {
             lv_obj_add_state(obj, LV_STATE_FOCUSED);
-            lv_obj_clear_state(obj, LV_STATE_EDITED | LV_STATE_PRESSED);
+            lv_obj_clear_state(obj, LV_STATE_EDITED);
         }
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
