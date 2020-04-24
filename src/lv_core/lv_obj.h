@@ -431,14 +431,14 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
  * @param obj pointer to an object
  * @param w the width without paddings
  */
-void lv_obj_set_width_fit(const lv_obj_t * obj, lv_coord_t w);
+void lv_obj_set_width_fit(lv_obj_t * obj, lv_coord_t w);
 
 /**
  * Set the height reduced by the top and bottom padding.
  * @param obj pointer to an object
  * @param h the height without paddings
  */
-void lv_obj_set_height_fit(const lv_obj_t * obj, lv_coord_t h);
+void lv_obj_set_height_fit(lv_obj_t * obj, lv_coord_t h);
 
 /**
  * Set the width of an object by taking the left and right margin into account.
