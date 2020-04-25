@@ -382,8 +382,11 @@ lv_res_t lv_mem_test(void)
     lv_mem_ent_t * e;
     e = ent_get_next(NULL);
     while(e) {
-        if((e->header.s.used && e->header.s.d_size > LV_MEM_SIZE) ||
-           (e->header.s.used == 0 && e->header.s.d_size > LV_MEM_SIZE)) {
+        if(e->header.s.d_size > LV_MEM_SIZE) {
+            return LV_RES_INV;
+        }
+        uint8_t * e8 = (uint8_t*) e;
+        if(e8 + e->header.s.d_size > work_mem + LV_MEM_SIZE) {
             return LV_RES_INV;
         }
         e = ent_get_next(e);
