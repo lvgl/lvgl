@@ -60,13 +60,13 @@ typedef struct {
         lv_color_t _color;
         lv_style_int_t _int;
         lv_opa_t _opa;
-        lv_style_fptr_dptr_t _ptr;
+        _lv_style_fptr_dptr_t _ptr;
     } start_value;
     union {
         lv_color_t _color;
         lv_style_int_t _int;
         lv_opa_t _opa;
-        lv_style_fptr_dptr_t _ptr;
+        _lv_style_fptr_dptr_t _ptr;
     } end_value;
 } lv_style_trans_t;
 
@@ -209,7 +209,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         LV_ASSERT_MEM(new_obj);
         if(new_obj == NULL) return NULL;
 
-        memset(new_obj, 0x00, sizeof(lv_obj_t));
+        lv_memset_00(new_obj, sizeof(lv_obj_t));
 
 #if LV_USE_BIDI
         new_obj->base_dir     = LV_BIDI_BASE_DIR_DEF;
@@ -232,7 +232,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         LV_ASSERT_MEM(new_obj);
         if(new_obj == NULL) return NULL;
 
-        memset(new_obj, 0x00, sizeof(lv_obj_t));
+        lv_memset_00(new_obj, sizeof(lv_obj_t));
 
         new_obj->parent = parent;
 
@@ -265,7 +265,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->ext_draw_pad = 0;
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
-    memset(&new_obj->ext_click_pad, 0, sizeof(new_obj->ext_click_pad));
+    lv_memset_00(&new_obj->ext_click_pad, sizeof(new_obj->ext_click_pad));
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     new_obj->ext_click_pad_hor = 0;
     new_obj->ext_click_pad_ver = 0;
@@ -282,7 +282,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
     /*Init. user date*/
 #if LV_USE_USER_DATA
-    memset(&new_obj->user_data, 0, sizeof(lv_obj_user_data_t));
+    lv_memset_00(&new_obj->user_data, sizeof(lv_obj_user_data_t));
 #endif
 
 
@@ -328,7 +328,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
         /*Set user data*/
 #if LV_USE_USER_DATA
-        memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
+        lv_memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
 #endif
 
         /*Copy realign*/
@@ -801,8 +801,34 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
 }
 
 /**
+ * Set the width reduced by the left and right padding.
+ * @param obj pointer to an object
+ * @param w the width without paddings
+ */
+void lv_obj_set_width_fit(lv_obj_t * obj, lv_coord_t w)
+{
+    lv_style_int_t pleft = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
+    lv_style_int_t pright = lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
+
+    lv_obj_set_width(obj, w - pleft - pright);
+}
+
+/**
+ * Set the height reduced by the top and bottom padding.
+ * @param obj pointer to an object
+ * @param h the height without paddings
+ */
+void lv_obj_set_height_fit(lv_obj_t * obj, lv_coord_t h)
+{
+    lv_style_int_t ptop = lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN);
+    lv_style_int_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
+
+    lv_obj_set_width(obj, h - ptop - pbottom);
+}
+
+/**
  * Set the width of an object by taking the left and right margin into account.
- * The object heigwidthht will be `obj_w = w - margon_left - margin_right`
+ * The object width will be `obj_w = w - margon_left - margin_right`
  * @param obj pointer to an object
  * @param w new height including margins
  */
@@ -834,10 +860,10 @@ void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h)
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
  * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_mod x coordinate shift after alignment
- * @param y_mod y coordinate shift after alignment
+ * @param x_ofs x coordinate offset after alignment
+ * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod)
+void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -852,8 +878,8 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
     lv_obj_t * par        = lv_obj_get_parent(obj);
     lv_coord_t par_abs_x  = par->coords.x1;
     lv_coord_t par_abs_y  = par->coords.y1;
-    new_pos.x += x_mod;
-    new_pos.y += y_mod;
+    new_pos.x += x_ofs;
+    new_pos.y += y_ofs;
     new_pos.x -= par_abs_x;
     new_pos.y -= par_abs_y;
 
@@ -862,8 +888,8 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 #if LV_USE_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
     obj->realign.align       = align;
-    obj->realign.xofs        = x_mod;
-    obj->realign.yofs        = y_mod;
+    obj->realign.xofs        = x_ofs;
+    obj->realign.yofs        = y_ofs;
     obj->realign.base        = base;
     obj->realign.origo_align = 0;
 #endif
@@ -874,10 +900,10 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
  * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_mod x coordinate shift after alignment
- * @param y_mod y coordinate shift after alignment
+ * @param x_ofs x coordinate offset after alignment
+ * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod)
+void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1005,8 +1031,8 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
     lv_coord_t base_abs_y = base->coords.y1;
     lv_coord_t par_abs_x  = par->coords.x1;
     lv_coord_t par_abs_y  = par->coords.y1;
-    new_x += x_mod + base_abs_x;
-    new_y += y_mod + base_abs_y;
+    new_x += x_ofs + base_abs_x;
+    new_y += y_ofs + base_abs_y;
     new_x -= par_abs_x;
     new_y -= par_abs_y;
 
@@ -1015,8 +1041,8 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
 #if LV_USE_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
     obj->realign.align       = align;
-    obj->realign.xofs        = x_mod;
-    obj->realign.yofs        = y_mod;
+    obj->realign.xofs        = x_ofs;
+    obj->realign.yofs        = y_ofs;
     obj->realign.base        = base;
     obj->realign.origo_align = 1;
 #endif
@@ -1235,7 +1261,7 @@ void _lv_obj_set_style_local_opa(lv_obj_t * obj, uint8_t part, lv_style_property
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_fptr_dptr_t value)
+void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, _lv_style_fptr_dptr_t value)
 {
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     lv_style_list_set_local_ptr(style_dsc, prop, value);
@@ -1267,7 +1293,7 @@ bool _lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_prop
 /**
  * Notify an object (and its children) about its style is modified
  * @param obj pointer to an object
- * @param prop `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property. It is used the optimize what needs to be refreshed.
+ * @param prop `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property. It is used to optimize what needs to be refreshed.
  */
 void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop)
 {
@@ -1332,9 +1358,8 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop)
 
         lv_obj_invalidate(obj);
 
-        if(prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_INHERIT_MASK))
-            /*Send style change signals*/
-            refresh_children_style(obj);
+        /*Send style change signals*/
+        if(prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_INHERIT_MASK)) refresh_children_style(obj);
     }
     else {
         lv_obj_invalidate(obj);
@@ -2513,14 +2538,14 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-lv_style_fptr_dptr_t _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+_lv_style_fptr_dptr_t _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
     lv_style_property_t prop_ori = prop;
 
     lv_style_attr_t attr;
     attr.full = prop_ori >> 8;
 
-    lv_style_fptr_dptr_t value_act;
+    _lv_style_fptr_dptr_t value_act;
     lv_res_t res = LV_RES_INV;
     const lv_obj_t * parent = obj;
     while(parent) {
@@ -2546,7 +2571,7 @@ lv_style_fptr_dptr_t _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, l
 
     /*Handle unset values*/
     prop = prop & (~LV_STYLE_STATE_MASK);
-    lv_style_fptr_dptr_t fd;
+    _lv_style_fptr_dptr_t fd;
     fd.dptr = NULL;
     fd.fptr = NULL;
     switch(prop) {
@@ -2556,7 +2581,7 @@ lv_style_fptr_dptr_t _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, l
             return fd;
 #if LV_USE_ANIMATION
         case LV_STYLE_TRANSITION_PATH:
-            fd.fptr = (lv_style_prop_cb_t)lv_anim_path_linear;
+            fd.fptr = (_lv_style_prop_xcb_t)lv_anim_path_linear;
             return fd;
 #endif
     }
@@ -2826,8 +2851,8 @@ void lv_obj_get_type(const lv_obj_t * obj, lv_obj_type_t * buf)
 
     lv_obj_type_t tmp;
 
-    memset(buf, 0, sizeof(lv_obj_type_t));
-    memset(&tmp, 0, sizeof(lv_obj_type_t));
+    lv_memset_00(buf, sizeof(lv_obj_type_t));
+    lv_memset_00(&tmp, sizeof(lv_obj_type_t));
 
     obj->signal_cb((lv_obj_t *)obj, LV_SIGNAL_GET_TYPE, &tmp);
 
@@ -2878,7 +2903,7 @@ void lv_obj_set_user_data(lv_obj_t * obj, lv_obj_user_data_t data)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    memcpy(&obj->user_data, &data, sizeof(lv_obj_user_data_t));
+    lv_memcpy(&obj->user_data, &data, sizeof(lv_obj_user_data_t));
 }
 #endif
 
@@ -3770,12 +3795,12 @@ static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop,
     else {      /*Ptr*/
         obj->state = prev_state;
         style_list->skip_trans = 1;
-        lv_style_fptr_dptr_t fd1 = _lv_obj_get_style_ptr(obj, part, prop);
+        _lv_style_fptr_dptr_t fd1 = _lv_obj_get_style_ptr(obj, part, prop);
         obj->state = new_state;
-        lv_style_fptr_dptr_t fd2 = _lv_obj_get_style_ptr(obj, part, prop);
+        _lv_style_fptr_dptr_t fd2 = _lv_obj_get_style_ptr(obj, part, prop);
         style_list->skip_trans = 0;
 
-        if(memcmp(&fd1, &fd2, sizeof(lv_style_fptr_dptr_t)) == 0)  return NULL;
+        if(memcmp(&fd1, &fd2, sizeof(_lv_style_fptr_dptr_t)) == 0)  return NULL;
         obj->state = prev_state;
         fd1 = _lv_obj_get_style_ptr(obj, part, prop);
         obj->state = new_state;
@@ -3853,7 +3878,7 @@ static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
         _lv_style_set_opa(style, tr->prop, x);
     }
     else {
-        lv_style_fptr_dptr_t x;
+        _lv_style_fptr_dptr_t x;
         if(v < 128) x = tr->start_value._ptr;
         else x = tr->end_value._ptr;
         _lv_style_set_ptr(style, tr->prop, x);

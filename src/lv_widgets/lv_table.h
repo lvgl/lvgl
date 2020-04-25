@@ -58,6 +58,7 @@ typedef struct {
     uint16_t col_cnt;
     uint16_t row_cnt;
     char ** cell_data;
+    lv_coord_t * row_h;
     lv_style_list_t cell_style[LV_TABLE_CELL_STYLE_CNT];
     lv_coord_t col_w[LV_TABLE_COL_MAX];
     uint8_t cell_types : 4; /*Keep track which cell types exists to avoid dealing with unused ones*/

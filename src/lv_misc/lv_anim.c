@@ -77,7 +77,7 @@ void lv_anim_core_init(void)
  */
 void lv_anim_init(lv_anim_t * a)
 {
-    memset(a, 0, sizeof(lv_anim_t));
+    lv_memset_00(a, sizeof(lv_anim_t));
     a->time    = 500;
     a->start   = 0;
     a->end     = 100;
@@ -107,7 +107,7 @@ void lv_anim_start(lv_anim_t * a)
 
     /*Initialize the animation descriptor*/
     a->time_orig = a->time;
-    memcpy(new_anim, a, sizeof(lv_anim_t));
+    lv_memcpy(new_anim, a, sizeof(lv_anim_t));
 
     /*Set the start value*/
     if(new_anim->early_apply) {
@@ -502,7 +502,7 @@ static bool anim_ready_handler(lv_anim_t * a)
         /*Create copy from the animation and delete the animation from the list.
          * This way the `ready_cb` will see the animations like it's animation is ready deleted*/
         lv_anim_t a_tmp;
-        memcpy(&a_tmp, a, sizeof(lv_anim_t));
+        lv_memcpy(&a_tmp, a, sizeof(lv_anim_t));
         lv_ll_remove(&LV_GC_ROOT(_lv_anim_ll), a);
         lv_mem_free(a);
         /*Flag that the list has changed */

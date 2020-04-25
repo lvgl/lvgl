@@ -31,6 +31,11 @@ extern "C" {
  * V6.0 COMPATIBILITY
  *--------------------*/
 
+static inline void lv_task_once(lv_task_t *task)
+{
+    lv_task_set_repeat_count(task, 1);
+}
+
 #if LV_USE_CHART
 
 #define lv_chart_get_point_cnt lv_chart_get_point_count

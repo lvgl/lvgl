@@ -475,7 +475,7 @@ lv_fs_res_t lv_fs_free_space(char letter, uint32_t * total_p, uint32_t * free_p)
  */
 void lv_fs_drv_init(lv_fs_drv_t * drv)
 {
-    memset(drv, 0, sizeof(lv_fs_drv_t));
+    lv_memset_00(drv, sizeof(lv_fs_drv_t));
 }
 
 /**
@@ -491,7 +491,7 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p)
     LV_ASSERT_MEM(new_drv);
     if(new_drv == NULL) return;
 
-    memcpy(new_drv, drv_p, sizeof(lv_fs_drv_t));
+    lv_memcpy(new_drv, drv_p, sizeof(lv_fs_drv_t));
 }
 
 /**

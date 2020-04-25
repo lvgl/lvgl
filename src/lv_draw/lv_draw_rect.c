@@ -59,7 +59,7 @@ static int32_t sh_cache_r = -1;
 
 void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
 {
-    memset(dsc, 0x00, sizeof(lv_draw_rect_dsc_t));
+    lv_memset_00(dsc, sizeof(lv_draw_rect_dsc_t));
     dsc->bg_color = LV_COLOR_WHITE;
     dsc->bg_grad_color = LV_COLOR_BLACK;
     dsc->border_color = LV_COLOR_BLACK;
@@ -274,10 +274,12 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
                               grad_color, mask_buf, mask_res, opa, dsc->bg_blend_mode);
 
                 /*Center part*/
-                fill_area2.x1 = coords_bg.x1 + rout;
-                fill_area2.x2 = coords_bg.x2 - rout;
-                lv_blend_fill(clip, &fill_area2,
-                              grad_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
+                if(dsc->bg_grad_dir == LV_GRAD_DIR_VER) {
+                    fill_area2.x1 = coords_bg.x1 + rout;
+                    fill_area2.x2 = coords_bg.x2 - rout;
+                    lv_blend_fill(clip, &fill_area2,
+                                  grad_color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa, dsc->bg_blend_mode);
+                }
 
                 /*Right part*/
                 fill_area2.x1 = coords_bg.x2 - rout + 1;

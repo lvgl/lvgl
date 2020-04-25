@@ -544,9 +544,9 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
         lv_get_state_info_t * info = param;
-        if(info->part == LV_WIN_PART_CONTENT_SCRL) info->result = lv_obj_get_state(lv_page_get_scrl(ext->page),
+        if(info->part == LV_WIN_PART_CONTENT_SCROLLABLE) info->result = lv_obj_get_state(lv_page_get_scrl(ext->page),
                                                                                        LV_CONT_PART_MAIN);
-        else if(info->part == LV_WIN_PART_SCRLBAR) info->result = lv_obj_get_state(ext->page, LV_PAGE_PART_SCRLBAR);
+        else if(info->part == LV_WIN_PART_SCROLLBAR) info->result = lv_obj_get_state(ext->page, LV_PAGE_PART_SCROLLBAR);
         else if(info->part == LV_WIN_PART_HEADER) info->result = lv_obj_get_state(ext->header, LV_OBJ_PART_MAIN);
         return LV_RES_OK;
     }
@@ -616,11 +616,11 @@ static lv_style_list_t * lv_win_get_style(lv_obj_t * win, uint8_t part)
         case LV_WIN_PART_HEADER:
             style_dsc_p = lv_obj_get_style_list(ext->header, LV_OBJ_PART_MAIN);
             break;
-        case LV_WIN_PART_SCRLBAR:
-            style_dsc_p = lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCRLBAR);
+        case LV_WIN_PART_SCROLLBAR:
+            style_dsc_p = lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCROLLBAR);
             break;
-        case LV_WIN_PART_CONTENT_SCRL:
-            style_dsc_p = lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCRL);
+        case LV_WIN_PART_CONTENT_SCROLLABLE:
+            style_dsc_p = lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCROLLABLE);
             break;
         default:
             style_dsc_p = NULL;

@@ -427,8 +427,22 @@ void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w);
 void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
 
 /**
+ * Set the width reduced by the left and right padding.
+ * @param obj pointer to an object
+ * @param w the width without paddings
+ */
+void lv_obj_set_width_fit(lv_obj_t * obj, lv_coord_t w);
+
+/**
+ * Set the height reduced by the top and bottom padding.
+ * @param obj pointer to an object
+ * @param h the height without paddings
+ */
+void lv_obj_set_height_fit(lv_obj_t * obj, lv_coord_t h);
+
+/**
  * Set the width of an object by taking the left and right margin into account.
- * The object heigwidthht will be `obj_w = w - margon_left - margin_right`
+ * The object width will be `obj_w = w - margon_left - margin_right`
  * @param obj pointer to an object
  * @param w new height including margins
  */
@@ -447,20 +461,20 @@ void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h);
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
  * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_mod x coordinate shift after alignment
- * @param y_mod y coordinate shift after alignment
+ * @param x_ofs x coordinate offset after alignment
+ * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
+void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
 
 /**
  * Align an object to an other object.
  * @param obj pointer to an object to align
  * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
  * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_mod x coordinate shift after alignment
- * @param y_mod y coordinate shift after alignment
+ * @param x_ofs x coordinate offset after alignment
+ * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_mod, lv_coord_t y_mod);
+void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
 
 /**
  * Realign the object based on the last `lv_obj_align` parameters.
@@ -520,8 +534,9 @@ void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part);
 void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part);
 
 /**
- * Notify an object about its style is modified
+ * Notify an object (and its children) about its style is modified
  * @param obj pointer to an object
+ * @param prop `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property. It is used to optimize what needs to be refreshed.
  */
 void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop);
 
@@ -586,7 +601,7 @@ void _lv_obj_set_style_local_opa(lv_obj_t * obj, uint8_t type, lv_style_property
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_style_fptr_dptr_t value);
+void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, _lv_style_fptr_dptr_t value);
 
 /**
  * Set a local style property of a part of an object in a given state.
@@ -601,9 +616,9 @@ void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property
  * @note for performance reasons it's not checked if the property really has pointer type
  */
 static inline void _lv_obj_set_style_local_func_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop,
-                                                    lv_style_prop_cb_t value)
+                                                    _lv_style_prop_xcb_t value)
 {
-    lv_style_fptr_dptr_t fd;
+    _lv_style_fptr_dptr_t fd;
     fd.fptr = value;
     fd.dptr = NULL;
     _lv_obj_set_style_local_ptr(obj, type, prop, fd);
@@ -623,7 +638,7 @@ static inline void _lv_obj_set_style_local_func_ptr(lv_obj_t * obj, uint8_t type
 static inline void _lv_obj_set_style_local_data_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop,
                                                     const void * value)
 {
-    lv_style_fptr_dptr_t fd;
+    _lv_style_fptr_dptr_t fd;
     fd.fptr = NULL;
     fd.dptr = value;
     _lv_obj_set_style_local_ptr(obj, type, prop, fd);
@@ -1133,7 +1148,7 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-lv_style_fptr_dptr_t _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
+_lv_style_fptr_dptr_t _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
 /**
  * Get a style property of a part of an object in the object's current state.
@@ -1149,10 +1164,10 @@ lv_style_fptr_dptr_t _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, l
  *       For example: `lv_obj_style_get_trasition_path()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-static inline  lv_style_prop_cb_t _lv_obj_get_style_func_ptr(const lv_obj_t * obj, uint8_t part,
+static inline  _lv_style_prop_xcb_t _lv_obj_get_style_func_ptr(const lv_obj_t * obj, uint8_t part,
                                                              lv_style_property_t prop)
 {
-    lv_style_fptr_dptr_t fd;
+    _lv_style_fptr_dptr_t fd;
     fd = _lv_obj_get_style_ptr(obj, part, prop);
     return fd.fptr;
 }
@@ -1173,7 +1188,7 @@ static inline  lv_style_prop_cb_t _lv_obj_get_style_func_ptr(const lv_obj_t * ob
  */
 static inline const void * _lv_obj_get_style_data_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
-    lv_style_fptr_dptr_t fd;
+    _lv_style_fptr_dptr_t fd;
     fd = _lv_obj_get_style_ptr(obj, part, prop);
     return fd.dptr;
 }

@@ -147,7 +147,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
             ext->text = lv_mem_realloc(ext->text, lv_mem_get_size(copy_ext->text));
             LV_ASSERT_MEM(ext->text);
             if(ext->text == NULL) return NULL;
-            memcpy(ext->text, copy_ext->text, lv_mem_get_size(copy_ext->text));
+            lv_memcpy(ext->text, copy_ext->text, lv_mem_get_size(copy_ext->text));
         }
 
         if(copy_ext->dot_tmp_alloc && copy_ext->dot.tmp_ptr) {
@@ -155,7 +155,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_label_set_dot_tmp(new_label, ext->dot.tmp_ptr, len);
         }
         else {
-            memcpy(ext->dot.tmp, copy_ext->dot.tmp, sizeof(ext->dot.tmp));
+            lv_memcpy(ext->dot.tmp, copy_ext->dot.tmp, sizeof(ext->dot.tmp));
         }
         ext->dot_tmp_alloc = copy_ext->dot_tmp_alloc;
         ext->dot_end       = copy_ext->dot_end;
@@ -1460,14 +1460,14 @@ static bool lv_label_set_dot_tmp(lv_obj_t * label, char * data, uint16_t len)
             LV_LOG_ERROR("Failed to allocate memory for dot_tmp_ptr");
             return false;
         }
-        memcpy(ext->dot.tmp_ptr, data, len);
+        lv_memcpy(ext->dot.tmp_ptr, data, len);
         ext->dot.tmp_ptr[len] = '\0';
         ext->dot_tmp_alloc    = true;
     }
     else {
         /* Characters can be directly stored in object */
         ext->dot_tmp_alloc = false;
-        memcpy(ext->dot.tmp, data, len);
+        lv_memcpy(ext->dot.tmp, data, len);
     }
     return true;
 }

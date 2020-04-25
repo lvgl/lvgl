@@ -73,7 +73,7 @@ lv_group_t * lv_group_create(void)
     group->wrap           = 1;
 
 #if LV_USE_USER_DATA
-    memset(&group->user_data, 0, sizeof(lv_group_user_data_t));
+    lv_memset_00(&group->user_data, sizeof(lv_group_user_data_t));
 #endif
 
     return group;
@@ -304,28 +304,6 @@ lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c)
 }
 
 /**
- * Set a function for a group which will modify the object's style if it is in focus
- * @param group pointer to a group
- * @param style_mod_cb the style modifier function pointer
- */
-void lv_group_set_style_mod_cb(lv_group_t * group, lv_group_style_mod_cb_t style_mod_cb)
-{
-    group->style_mod_cb = style_mod_cb;
-    if(group->obj_focus != NULL) lv_obj_invalidate(*group->obj_focus);
-}
-
-/**
- * Set a function for a group which will modify the object's style if it is in focus in edit mode
- * @param group pointer to a group
- * @param style_mod_func the style modifier function pointer
- */
-void lv_group_set_style_mod_edit_cb(lv_group_t * group, lv_group_style_mod_cb_t style_mod_edit_cb)
-{
-    group->style_mod_edit_cb = style_mod_edit_cb;
-    if(group->obj_focus != NULL) lv_obj_invalidate(*group->obj_focus);
-}
-
-/**
  * Set a function for a group which will be called when a new object is focused
  * @param group pointer to a group
  * @param focus_cb the call back function or NULL if unused
@@ -342,6 +320,7 @@ void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb)
  */
 void lv_group_set_editing(lv_group_t * group, bool edit)
 {
+    if(group == NULL) return;
     uint8_t en_val = edit ? 1 : 0;
 
     if(en_val == group->editing) return; /*Do not set the same mode again*/
@@ -384,26 +363,6 @@ void lv_group_set_wrap(lv_group_t * group, bool en)
 }
 
 /**
- * Modify a style with the set 'style_mod' function. The input style remains unchanged.
- * @param group pointer to group
- * @param style pointer to a style to modify
- * @return a copy of the input style but modified with the 'style_mod' function
- */
-lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style)
-{
-    /*Load the current style. It will be modified by the callback*/
-    lv_style_copy(&group->style_tmp, style);
-
-    if(group->editing) {
-        if(group->style_mod_edit_cb) group->style_mod_edit_cb(group, &group->style_tmp);
-    }
-    else {
-        if(group->style_mod_cb) group->style_mod_cb(group, &group->style_tmp);
-    }
-    return &group->style_tmp;
-}
-
-/**
  * Get the focused object or NULL if there isn't one
  * @param group pointer to a group
  * @return pointer to the focused object
@@ -427,28 +386,6 @@ lv_group_user_data_t * lv_group_get_user_data(lv_group_t * group)
     return &group->user_data;
 }
 #endif
-
-/**
- * Get a the style modifier function of a group
- * @param group pointer to a group
- * @return pointer to the style modifier function
- */
-lv_group_style_mod_cb_t lv_group_get_style_mod_cb(const lv_group_t * group)
-{
-    if(!group) return NULL;
-    return group->style_mod_cb;
-}
-
-/**
- * Get a the style modifier function of a group in edit mode
- * @param group pointer to a group
- * @return pointer to the style modifier function
- */
-lv_group_style_mod_cb_t lv_group_get_style_mod_edit_cb(const lv_group_t * group)
-{
-    if(!group) return NULL;
-    return group->style_mod_edit_cb;
-}
 
 /**
  * Get the focus callback function of a group

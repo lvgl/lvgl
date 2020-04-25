@@ -137,27 +137,26 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
 
     switch(state) {
         case LV_BTN_STATE_RELEASED:
-            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED | LV_STATE_DISABLED);
+            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED);
             break;
         case LV_BTN_STATE_PRESSED:
-            lv_obj_clear_state(btn, LV_STATE_CHECKED | LV_STATE_DISABLED);
+            lv_obj_clear_state(btn, LV_STATE_CHECKED);
             lv_obj_add_state(btn, LV_STATE_PRESSED);
             break;
         case LV_BTN_STATE_CHECKED_RELEASED:
             lv_obj_add_state(btn, LV_STATE_CHECKED);
-            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_DISABLED);
+            lv_obj_clear_state(btn, LV_STATE_PRESSED);
             break;
         case LV_BTN_STATE_CHECKED_PRESSED:
-            lv_obj_add_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED | LV_STATE_DISABLED);
+            lv_obj_add_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED);
             break;
         case LV_BTN_STATE_DISABLED:
-            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED);
             lv_obj_add_state(btn, LV_STATE_DISABLED);
             break;
+        case LV_BTN_STATE_ACTIVE:
+            lv_obj_clear_state(btn, LV_STATE_DISABLED);
+            break;
     }
-
-    //    /*Make the state change happen immediately, without transition*/
-    //    btn->prev_state = btn->state;
 }
 
 /**
@@ -185,26 +184,25 @@ void lv_btn_toggle(lv_obj_t * btn)
 /**
  * Get the current state of the button
  * @param btn pointer to a button object
- * @return the state of the button (from lv_btn_state_t enum)
+ * @return the state of the button (from lv_btn_state_t enum).
+ * If the button is in disabled state `LV_BTN_STATE_DISABLED` will be ORed to the other button states.
  */
 lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn)
 {
     LV_ASSERT_OBJ(btn, LV_OBJX_NAME);
 
-    lv_state_t state = lv_obj_get_state(btn, LV_BTN_PART_MAIN);
+    lv_state_t obj_state = lv_obj_get_state(btn, LV_BTN_PART_MAIN);
+    lv_btn_state_t btn_state = 0;
+    if(obj_state & LV_STATE_DISABLED) btn_state = LV_BTN_STATE_DISABLED;
 
-    if(state & LV_STATE_DISABLED) {
-        return LV_BTN_STATE_DISABLED;
-    }
-    else if(state & LV_STATE_CHECKED) {
-        if(state & LV_STATE_PRESSED) return LV_BTN_STATE_CHECKED_PRESSED;
-        else return LV_BTN_STATE_CHECKED_RELEASED;
+    if(obj_state & LV_STATE_CHECKED) {
+        if(obj_state & LV_STATE_PRESSED) return btn_state | LV_BTN_STATE_CHECKED_PRESSED;
+        else return btn_state | LV_BTN_STATE_CHECKED_RELEASED;
     }
     else {
-        if(state & LV_STATE_PRESSED) return LV_BTN_STATE_PRESSED;
-        else return LV_BTN_STATE_RELEASED;
+        if(obj_state & LV_STATE_PRESSED) return btn_state | LV_BTN_STATE_PRESSED;
+        else return btn_state | LV_BTN_STATE_RELEASED;
     }
-
 }
 
 /**

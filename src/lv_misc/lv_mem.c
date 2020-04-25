@@ -382,8 +382,11 @@ lv_res_t lv_mem_test(void)
     lv_mem_ent_t * e;
     e = ent_get_next(NULL);
     while(e) {
-        if((e->header.s.used && e->header.s.d_size > LV_MEM_SIZE) ||
-           (e->header.s.used == 0 && e->header.s.d_size > LV_MEM_SIZE)) {
+        if(e->header.s.d_size > LV_MEM_SIZE) {
+            return LV_RES_INV;
+        }
+        uint8_t * e8 = (uint8_t*) e;
+        if(e8 + e->header.s.d_size > work_mem + LV_MEM_SIZE) {
             return LV_RES_INV;
         }
         e = ent_get_next(e);
@@ -530,7 +533,6 @@ void lv_mem_buf_free_all(void)
 
 /**
  * Same as `memcpy` but optimized for 4 byte operation.
- * `dst` and `src` should be word aligned else normal `memcpy` will be used
  * @param dst pointer to the destination buffer
  * @param src pointer to the source buffer
  * @param len number of byte to copy

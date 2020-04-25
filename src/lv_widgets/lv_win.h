@@ -64,8 +64,8 @@ enum {
     LV_WIN_PART_BG = LV_OBJ_PART_MAIN, /**< Window object background style. */
     _LV_WIN_PART_VIRTUAL_LAST,
     LV_WIN_PART_HEADER = _LV_OBJ_PART_REAL_LAST, /**< Window titlebar background style. */
-    LV_WIN_PART_CONTENT_SCRL, /**< Window content style. */
-    LV_WIN_PART_SCRLBAR, /**< Window scrollbar style. */
+    LV_WIN_PART_CONTENT_SCROLLABLE, /**< Window content style. */
+    LV_WIN_PART_SCROLLBAR, /**< Window scrollbar style. */
     _LV_WIN_PART_REAL_LAST
 };
 

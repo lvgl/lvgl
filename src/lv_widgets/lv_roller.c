@@ -111,7 +111,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
 
-        lv_obj_clean_style_list(roller, LV_PAGE_PART_SCRL); /*Use a transparent scrollable*/
+        lv_obj_clean_style_list(roller, LV_PAGE_PART_SCROLLABLE); /*Use a transparent scrollable*/
         lv_theme_apply(roller, LV_THEME_ROLLER);
         refr_height(roller);
 
@@ -479,8 +479,10 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
     }
 
     /* Include the ancient signal function */
-    res = ancestor_signal(roller, sign, param);
-    if(res != LV_RES_OK) return res;
+    if(sign != LV_SIGNAL_CONTROL) { /*Don't let the page to scroll on keys*/
+        res = ancestor_signal(roller, sign, param);
+        if(res != LV_RES_OK) return res;
+    }
 
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 

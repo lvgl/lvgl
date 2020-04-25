@@ -52,10 +52,10 @@ typedef struct {
     void * buf_act;
     uint32_t size; /*In pixel count*/
     lv_area_t area;
-    volatile uint32_t flushing 	        :1;
-    volatile uint32_t flushing_last     :1;
-    volatile uint32_t last_area         :1;
-    volatile uint32_t last_part         :1;
+    volatile int flushing;      /*1: flushing is in progress. (It can't be a bitfield because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
+    volatile int flushing_last; /*1: It was the last chunk to flush. (It can't be a bitfield because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
+    volatile uint32_t last_area         :1; /*1: the last area is being rendered*/
+    volatile uint32_t last_part         :1; /*1: the last part of the current area is being rendered*/
 } lv_disp_buf_t;
 
 /**
