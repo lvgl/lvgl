@@ -41,8 +41,8 @@ enum {
     LV_BTN_STATE_PRESSED,
     LV_BTN_STATE_CHECKED_RELEASED,
     LV_BTN_STATE_CHECKED_PRESSED,
-    LV_BTN_STATE_DISABLED = 0x80,
-    _LV_BTN_STATE_LAST, /* Number of states*/
+    _LV_BTN_STATE_LAST = LV_BTN_STATE_CHECKED_PRESSED + 1, /* Number of states*/
+    LV_BTN_STATE_DISABLED = 0x80
 };
 typedef uint8_t lv_btn_state_t;
 
