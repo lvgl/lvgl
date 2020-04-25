@@ -1166,8 +1166,11 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_SCRLBAR);
             lv_style_list_add_style(list, &sb);
 
+#if LV_USE_ANIMATION
             lv_obj_clean_style_list(obj, LV_TILEVIEW_PART_EDGE_FLASH);
             list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_EDGE_FLASH);
+            lv_style_list_add_style(list, &edge_flash);
+#endif
             break;
 #endif
 
