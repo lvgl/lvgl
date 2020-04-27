@@ -307,10 +307,6 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element)
  */
 static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp)
 {
-    uint32_t wrp = 0;
-    uint8_t wr_size = bpp;
-    if(bpp == 3) wr_size = 4;
-
     rle_init(in, bpp);
 
     const uint8_t * bpp_opa_table;
@@ -330,6 +326,9 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
         case 8:
             bpp_opa_table = _lv_bpp8_opa_table;
             break;
+        default:
+            LV_LOG_WARN("Invalid bpp (%d)", bpp);
+            return;
     }
 
     uint8_t * line_buf1 = lv_mem_buf_get(w);
