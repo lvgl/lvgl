@@ -171,6 +171,34 @@ LV_FONT_DECLARE(lv_font_montserrat_30)
 LV_FONT_DECLARE(lv_font_montserrat_32)
 #endif
 
+#if LV_FONT_MONTSERRAT_36
+LV_FONT_DECLARE(lv_font_montserrat_36)
+#endif
+
+#if LV_FONT_MONTSERRAT_38
+LV_FONT_DECLARE(lv_font_montserrat_38)
+#endif
+
+#if LV_FONT_MONTSERRAT_40
+LV_FONT_DECLARE(lv_font_montserrat_40)
+#endif
+
+#if LV_FONT_MONTSERRAT_42
+LV_FONT_DECLARE(lv_font_montserrat_42)
+#endif
+
+#if LV_FONT_MONTSERRAT_44
+LV_FONT_DECLARE(lv_font_montserrat_44)
+#endif
+
+#if LV_FONT_MONTSERRAT_46
+LV_FONT_DECLARE(lv_font_montserrat_46)
+#endif
+
+#if LV_FONT_MONTSERRAT_48
+LV_FONT_DECLARE(lv_font_montserrat_48)
+#endif
+
 #if LV_FONT_MONTSERRAT_28_COMPRESSED
 LV_FONT_DECLARE(lv_font_montserrat_28_compressed)
 #endif

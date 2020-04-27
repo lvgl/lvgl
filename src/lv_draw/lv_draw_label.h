@@ -76,6 +76,15 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
 void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
                    const char * txt, lv_draw_label_hint_t * hint);
 
+/***********************
+ * GLOBAL VARIABLES
+ ***********************/
+extern const uint8_t _lv_bpp2_opa_table[];
+extern const uint8_t _lv_bpp3_opa_table[];
+extern const uint8_t _lv_bpp1_opa_table[];
+extern const uint8_t _lv_bpp4_opa_table[];
+extern const uint8_t _lv_bpp8_opa_table[];
+
 /**********************
  *      MACROS
  **********************/
