@@ -16,7 +16,15 @@
  *      DEFINES
  *********************/
 
-#if LV_COLOR_DEPTH == 16 && LV_COLOR_16_SWAP
+#if LV_COLOR_16_SWAP
+#error "Can't use DMA2D with LV_COLOR_16_SWAP 1"
+#endif
+
+#if LV_COLOR_DEPTH == 8
+#error "Can't use DMA2D with LV_COLOR_DEPTH == 8"
+#endif
+
+#if LV_COLOR_DEPTH == 16
 #define DMA2D_OUTPUT_FORMAT DMA2D_OUTPUT_RGB565
 #define DMA2D_INPUT_FORMAT DMA2D_INPUT_RGB565
 #elif LV_COLOR_DEPTH == 32
@@ -24,7 +32,6 @@
 #define DMA2D_INPUT_FORMAT DMA2D_INPUT_ARGB8888
 #else
 /*Can't use GPU with other formats*/
-#undef LV_USE_GPU_STM32_DMA2D
 #endif
 
 /**********************
