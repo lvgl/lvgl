@@ -53,13 +53,17 @@ enum {
     LV_DRAW_MASK_LINE_SIDE_BOTTOM,
 };
 
-typedef lv_draw_mask_res_t (*lv_draw_mask_cb_t)(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
+/**
+ * A common callback type for every mask type.
+ * Used internally by the library.
+ */
+typedef lv_draw_mask_res_t (*lv_draw_mask_xcb_t)(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
                                                 void * p);
 
 typedef uint8_t lv_draw_mask_line_side_t;
 
 typedef struct {
-    lv_draw_mask_cb_t cb;
+    lv_draw_mask_xcb_t cb;
     lv_draw_mask_type_t type;
 } lv_draw_mask_common_dsc_t;
 

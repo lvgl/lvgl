@@ -225,7 +225,7 @@ void lv_disp_refr_task(lv_task_t * task)
                     uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) * sizeof(lv_color_t);
 
                     for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
-                        memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
+                        lv_memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
                         start_offs += hres * sizeof(lv_color_t);
                     }
                 }

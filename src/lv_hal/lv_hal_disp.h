@@ -52,10 +52,10 @@ typedef struct {
     void * buf_act;
     uint32_t size; /*In pixel count*/
     lv_area_t area;
-    volatile uint32_t flushing 	        :1;
-    volatile uint32_t flushing_last     :1;
-    volatile uint32_t last_area         :1;
-    volatile uint32_t last_part         :1;
+    volatile int flushing;      /*1: flushing is in progress. (It can't be a bitfield because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
+    volatile int flushing_last; /*1: It was the last chunk to flush. (It can't be a bitfield because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
+    volatile uint32_t last_area         :1; /*1: the last area is being rendered*/
+    volatile uint32_t last_part         :1; /*1: the last part of the current area is being rendered*/
 } lv_disp_buf_t;
 
 /**
@@ -133,7 +133,7 @@ struct _lv_obj_t;
 
 /**
  * Display structure.
- * ::lv_disp_drv_t is the first member of the structure.
+ * @note `lv_disp_drv_t` should be the first member of the structure.
  */
 typedef struct _disp_t {
     /**< Driver to the display*/
@@ -262,6 +262,8 @@ uint32_t lv_disp_get_dpi(lv_disp_t * disp);
  */
 lv_disp_size_t lv_disp_get_size_category(lv_disp_t * disp);
 
+//! @cond Doxygen_Suppress
+
 /**
  * Call in the display driver's `flush_cb` function when the flushing is finished
  * @param disp_drv pointer to display driver in `flush_cb` where this function is called
@@ -275,6 +277,8 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv);
  * @return true: it's the last area to flush; false: there are other areas too which will be refreshed soon
  */
 LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_drv_t * disp_drv);
+
+//! @endcond
 
 /**
  * Get the next display.

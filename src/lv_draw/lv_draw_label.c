@@ -33,12 +33,11 @@ typedef uint8_t cmd_state_t;
  *  STATIC PROTOTYPES
  **********************/
 static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const lv_font_t * font_p,
-                           uint32_t letter,
-                           lv_color_t color, lv_opa_t opa);
+                           uint32_t letter, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
 static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
-                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa);
+                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
-                              const uint8_t * map_p, lv_color_t color, lv_opa_t opa);
+                              const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
 
 
 static uint8_t hex_char_to_num(char hex);
@@ -46,32 +45,39 @@ static uint8_t hex_char_to_num(char hex);
 /**********************
  *  STATIC VARIABLES
  **********************/
-/*clang-format off*/
-static const uint8_t bpp1_opa_table[2]  = {0, 255};          /*Opacity mapping with bpp = 1 (Just for compatibility)*/
-static const uint8_t bpp2_opa_table[4]  = {0, 85, 170, 255}; /*Opacity mapping with bpp = 2*/
-static const uint8_t bpp4_opa_table[16] = {0,  17, 34,  51,  /*Opacity mapping with bpp = 4*/
-                                           68, 85, 102, 119,
-                                           136, 153, 170, 187,
-                                           204, 221, 238, 255
-                                          };
-static const uint8_t bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-                                            16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-                                            32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
-                                            48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
-                                            64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
-                                            80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
-                                            96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
-                                            112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127,
-                                            128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143,
-                                            144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
-                                            160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175,
-                                            176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191,
-                                            192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207,
-                                            208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223,
-                                            224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
-                                            240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
-                                           };
-/*clang-format on*/
+
+/**********************
+ *  GLOBAL VARIABLES
+ **********************/
+
+const uint8_t _lv_bpp1_opa_table[2]  = {0, 255};          /*Opacity mapping with bpp = 1 (Just for compatibility)*/
+const uint8_t _lv_bpp2_opa_table[4]  = {0, 85, 170, 255}; /*Opacity mapping with bpp = 2*/
+
+const uint8_t _lv_bpp3_opa_table[8]  = {0, 36,  73, 109,   /*Opacity mapping with bpp = 3*/
+        146, 182,  219, 255};
+
+const uint8_t _lv_bpp4_opa_table[16] = {0,  17, 34,  51,  /*Opacity mapping with bpp = 4*/
+        68, 85, 102, 119,
+        136, 153, 170, 187,
+        204, 221, 238, 255
+};
+const uint8_t _lv_bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+        48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+        64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+        80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
+        96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
+        112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127,
+        128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143,
+        144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
+        160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175,
+        176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191,
+        192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207,
+        208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223,
+        224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
+        240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
+};
 
 /**********************
  *      MACROS
@@ -83,7 +89,7 @@ static const uint8_t bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11
 
 void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
 {
-    memset(dsc, 0x00, sizeof(lv_draw_label_dsc_t));
+    lv_memset_00(dsc, sizeof(lv_draw_label_dsc_t));
     dsc->opa = LV_OPA_COVER;
     dsc->color = LV_COLOR_BLACK;
     dsc->font = LV_THEME_DEFAULT_FONT_NORMAL;
@@ -276,7 +282,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
                         /*Get the parameter*/
                         if(i - par_start == LABEL_RECOLOR_PAR_LENGTH + 1) {
                             char buf[LABEL_RECOLOR_PAR_LENGTH + 1];
-                            memcpy(buf, &bidi_txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
+                            lv_memcpy_small(buf, &bidi_txt[par_start], LABEL_RECOLOR_PAR_LENGTH);
                             buf[LABEL_RECOLOR_PAR_LENGTH] = '\0';
                             int r, g, b;
                             r       = (hex_char_to_num(buf[0]) << 4) + hex_char_to_num(buf[1]);
@@ -310,7 +316,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
                 }
             }
 
-            lv_draw_letter(&pos, mask, font, letter, color, opa);
+            lv_draw_letter(&pos, mask, font, letter, color, opa, dsc->blend_mode);
 
             if(letter_w > 0) {
                 pos.x += letter_w + dsc->letter_space;
@@ -386,7 +392,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
  */
 static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const lv_font_t * font_p,
                            uint32_t letter,
-                           lv_color_t color, lv_opa_t opa)
+                           lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
@@ -429,16 +435,16 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
     }
 
     if(font_p->subpx) {
-        draw_letter_subpx(pos_x, pos_y, &g, clip_area, map_p, color, opa);
+        draw_letter_subpx(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
     }
     else {
-        draw_letter_normal(pos_x, pos_y, &g, clip_area, map_p, color, opa);
+        draw_letter_normal(pos_x, pos_y, &g, clip_area, map_p, color, opa, blend_mode);
     }
 }
 
 
 static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
-                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa)
+                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     const uint8_t * bpp_opa_table_p;
     uint32_t bitmask_init;
@@ -449,22 +455,22 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
 
     switch(bpp) {
         case 1:
-            bpp_opa_table_p = bpp1_opa_table;
+            bpp_opa_table_p = _lv_bpp1_opa_table;
             bitmask_init  = 0x80;
             shades = 2;
             break;
         case 2:
-            bpp_opa_table_p = bpp2_opa_table;
+            bpp_opa_table_p = _lv_bpp2_opa_table;
             bitmask_init  = 0xC0;
             shades = 4;
             break;
         case 4:
-            bpp_opa_table_p = bpp4_opa_table;
+            bpp_opa_table_p = _lv_bpp4_opa_table;
             bitmask_init  = 0xF0;
             shades = 16;
             break;
         case 8:
-            bpp_opa_table_p = bpp8_opa_table;
+            bpp_opa_table_p = _lv_bpp8_opa_table;
             bitmask_init  = 0xFF;
             shades = 256;
             break;       /*No opa table, pixel value will be used directly*/
@@ -567,7 +573,7 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
         else {
             lv_blend_fill(clip_area, &fill_area,
                           color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
-                          LV_BLEND_MODE_NORMAL);
+                          blend_mode);
 
             fill_area.y1 = fill_area.y2 + 1;
             fill_area.y2 = fill_area.y1;
@@ -584,7 +590,7 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
         fill_area.y2--;
         lv_blend_fill(clip_area, &fill_area,
                       color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
-                      LV_BLEND_MODE_NORMAL);
+                      blend_mode);
         mask_p = 0;
     }
 
@@ -592,7 +598,7 @@ static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph
 }
 
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
-                              const uint8_t * map_p, lv_color_t color, lv_opa_t opa)
+                              const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     const uint8_t * bpp_opa_table;
     uint32_t bitmask_init;
@@ -602,19 +608,19 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
 
     switch(bpp) {
         case 1:
-            bpp_opa_table = bpp1_opa_table;
+            bpp_opa_table = _lv_bpp1_opa_table;
             bitmask_init  = 0x80;
             break;
         case 2:
-            bpp_opa_table = bpp2_opa_table;
+            bpp_opa_table = _lv_bpp2_opa_table;
             bitmask_init  = 0xC0;
             break;
         case 4:
-            bpp_opa_table = bpp4_opa_table;
+            bpp_opa_table = _lv_bpp4_opa_table;
             bitmask_init  = 0xF0;
             break;
         case 8:
-            bpp_opa_table = bpp8_opa_table;
+            bpp_opa_table = _lv_bpp8_opa_table;
             bitmask_init  = 0xFF;
             break;       /*No opa table, pixel value will be used directly*/
         default:
@@ -765,7 +771,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
             map_area.y2 ++;
         }
         else {
-            lv_blend_map(clip_area, &map_area, color_buf, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa, LV_BLEND_MODE_NORMAL);
+            lv_blend_map(clip_area, &map_area, color_buf, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa, blend_mode);
 
             map_area.y1 = map_area.y2 + 1;
             map_area.y2 = map_area.y1;
@@ -784,7 +790,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
     /*Flush the last part*/
     if(map_area.y1 != map_area.y2) {
         map_area.y2--;
-        lv_blend_map(clip_area, &map_area, color_buf, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa, LV_BLEND_MODE_NORMAL);
+        lv_blend_map(clip_area, &map_area, color_buf, mask_buf, LV_DRAW_MASK_RES_CHANGED, opa, blend_mode);
     }
 
     lv_mem_buf_release(mask_buf);

@@ -168,12 +168,16 @@ void lv_spinner_set_type(lv_obj_t * spinner, lv_spinner_type_t type)
     switch(type) {
         case LV_SPINNER_TYPE_FILLSPIN_ARC: {
                 ext->anim_type = LV_SPINNER_TYPE_FILLSPIN_ARC;
+                lv_anim_path_t path;
+                lv_anim_path_init(&path);
+                lv_anim_path_set_cb(&path, lv_anim_path_ease_in_out);
+
                 lv_anim_t a;
                 lv_anim_init(&a);
                 lv_anim_set_var(&a, spinner);
                 lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_spinner_anim_cb);
-                lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
-                lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
+                lv_anim_set_path(&a, &path);
+                lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
                 lv_anim_set_time(&a, ext->time);
                 if(ext->anim_dir == LV_SPINNER_DIR_FORWARD) lv_anim_set_values(&a, 0, 360);
                 else lv_anim_set_values(&a, 360, 0);
@@ -191,13 +195,18 @@ void lv_spinner_set_type(lv_obj_t * spinner, lv_spinner_type_t type)
         case LV_SPINNER_TYPE_SPINNING_ARC:
         default: {
                 ext->anim_type = type;
+
+                lv_anim_path_t path;
+                lv_anim_path_init(&path);
+                lv_anim_path_set_cb(&path, (LV_SPINNER_TYPE_CONSTANT_ARC == type ? lv_anim_path_linear : lv_anim_path_ease_in_out));
+
                 lv_anim_t a;
                 lv_anim_init(&a);
                 lv_anim_set_var(&a, spinner);
                 lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_spinner_anim_cb);
                 lv_anim_set_time(&a, ext->time);
-                lv_anim_set_path_cb(&a, (LV_SPINNER_TYPE_CONSTANT_ARC == type ? lv_anim_path_linear : lv_anim_path_ease_in_out));
-                lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
+                lv_anim_set_path(&a, &path);
+                lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
                 if(ext->anim_dir == LV_SPINNER_DIR_FORWARD) lv_anim_set_values(&a, 0, 360);
                 else lv_anim_set_values(&a, 360, 0);
                 lv_anim_start(&a);

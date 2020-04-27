@@ -527,7 +527,7 @@ lv_theme_t * lv_theme_mono_init(lv_color_t color_primary, lv_color_t color_secon
     table_init();
     win_init();
 
-    theme.apply_cb = lv_theme_mono_apply;
+    theme.apply_xcb = lv_theme_mono_apply;
 
     return &theme;
 }
@@ -760,12 +760,12 @@ void lv_theme_mono_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_PAGE_PART_BG);
             lv_style_list_add_style(list, &style_bg);
 
-            lv_obj_clean_style_list(obj, LV_PAGE_PART_SCRL);
-            list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCRL);
+            lv_obj_clean_style_list(obj, LV_PAGE_PART_SCROLLABLE);
+            list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCROLLABLE);
             lv_style_list_add_style(list, &style_pad_inner);
 
-            lv_obj_clean_style_list(obj, LV_PAGE_PART_SCRLBAR);
-            list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCRLBAR);
+            lv_obj_clean_style_list(obj, LV_PAGE_PART_SCROLLBAR);
+            list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCROLLBAR);
             lv_style_list_add_style(list, &style_sb);
             break;
 #endif
@@ -794,8 +794,8 @@ void lv_theme_mono_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_TABVIEW_PAGE:
             lv_obj_clean_style_list(obj, LV_PAGE_PART_BG);
 
-            lv_obj_clean_style_list(obj, LV_PAGE_PART_SCRL);
-            list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCRL);
+            lv_obj_clean_style_list(obj, LV_PAGE_PART_SCROLLABLE);
+            list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCROLLABLE);
             lv_style_list_add_style(list, &style_pad_normal);
 
             break;
@@ -939,12 +939,12 @@ void lv_theme_mono_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_WIN_PART_BG);
             lv_style_list_add_style(list, &style_bg);
 
-            lv_obj_clean_style_list(obj, LV_WIN_PART_SCRLBAR);
-            list = lv_obj_get_style_list(obj, LV_WIN_PART_SCRLBAR);
+            lv_obj_clean_style_list(obj, LV_WIN_PART_SCROLLBAR);
+            list = lv_obj_get_style_list(obj, LV_WIN_PART_SCROLLBAR);
             lv_style_list_add_style(list, &style_sb);
 
-            lv_obj_clean_style_list(obj, LV_WIN_PART_CONTENT_SCRL);
-            list = lv_obj_get_style_list(obj, LV_WIN_PART_CONTENT_SCRL);
+            lv_obj_clean_style_list(obj, LV_WIN_PART_CONTENT_SCROLLABLE);
+            list = lv_obj_get_style_list(obj, LV_WIN_PART_CONTENT_SCROLLABLE);
             lv_style_list_add_style(list, &style_bg);
 
             lv_obj_clean_style_list(obj, LV_WIN_PART_HEADER);
@@ -1032,8 +1032,8 @@ void lv_theme_mono_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_CPICKER_PART_MAIN);
             lv_style_list_add_style(list, &style_bg);
 
-            lv_obj_clean_style_list(obj, LV_CPICKER_PART_INDIC);
-            list = lv_obj_get_style_list(obj, LV_CPICKER_PART_INDIC);
+            lv_obj_clean_style_list(obj, LV_CPICKER_PART_KNOB);
+            list = lv_obj_get_style_list(obj, LV_CPICKER_PART_KNOB);
             lv_style_list_add_style(list, &style_bg);
             lv_style_list_add_style(list, &style_round);
             break;

@@ -50,7 +50,7 @@ typedef struct {
         lv_point_t pos;
         uint8_t colored     : 1;
 
-    } indic;
+    } knob;
     uint32_t last_click_time;
     uint32_t last_change_time;
     lv_point_t last_press_point;
@@ -62,7 +62,7 @@ typedef struct {
 /*Parts*/
 enum {
     LV_CPICKER_PART_MAIN = LV_OBJ_PART_MAIN,
-    LV_CPICKER_PART_INDIC = _LV_OBJ_PART_VIRTUAL_LAST,
+    LV_CPICKER_PART_KNOB = _LV_OBJ_PART_VIRTUAL_LAST,
     _LV_CPICKER_PART_VIRTUAL_LAST,
     _LV_CPICKER_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,
 };
@@ -146,11 +146,11 @@ void lv_cpicker_set_color_mode(lv_obj_t * cpicker, lv_cpicker_color_mode_t mode)
 void lv_cpicker_set_color_mode_fixed(lv_obj_t * cpicker, bool fixed);
 
 /**
- * Make the indicator to be colored to the current color
+ * Make the knob to be colored to the current color
  * @param cpicker pointer to colorpicker object
- * @param en true: color the indicator; false: not color the indicator
+ * @param en true: color the knob; false: not color the knob
  */
-void lv_cpicker_set_indic_colored(lv_obj_t * cpicker, bool en);
+void lv_cpicker_set_knob_colored(lv_obj_t * cpicker, bool en);
 
 /*=====================
  * Getter functions
@@ -206,11 +206,11 @@ lv_color_hsv_t lv_cpicker_get_hsv(lv_obj_t * cpicker);
 lv_color_t lv_cpicker_get_color(lv_obj_t * cpicker);
 
 /**
- * Whether the indicator is colored to the current color or not
- * @param cpicker pointer to colorpicker object
- * @return true: color the indicator; false: not color the indicator
+ * Whether the knob is colored to the current color or not
+ * @param cpicker pointer to color picker object
+ * @return true: color the knob; false: not color the knob
  */
-bool lv_cpicker_get_indic_colored(lv_obj_t * cpicker);
+bool lv_cpicker_get_knob_colored(lv_obj_t * cpicker);
 
 /**
  *  Whether the preview is enabled or not

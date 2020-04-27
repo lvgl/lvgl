@@ -54,6 +54,7 @@ static void refr_ext_draw_pad(lv_obj_t * page);
 #if LV_USE_ANIMATION
     static void edge_flash_anim(void * page, lv_anim_value_t v);
     static void edge_flash_anim_end(lv_anim_t * a);
+    static void get_edge_flash_area(lv_obj_t * page, lv_area_t * area, lv_coord_t state);
 #endif
 
 /**********************
@@ -391,7 +392,7 @@ lv_coord_t lv_page_get_width_grid(lv_obj_t * page, uint8_t div, uint8_t span)
 {
 
     lv_coord_t obj_w = lv_page_get_width_fit(page);
-    lv_style_int_t pinner = lv_obj_get_style_pad_inner(page, LV_PAGE_PART_SCRL);
+    lv_style_int_t pinner = lv_obj_get_style_pad_inner(page, LV_PAGE_PART_SCROLLABLE);
 
     lv_coord_t r = (obj_w - (div - 1) * pinner) / div;
 
@@ -413,7 +414,7 @@ lv_coord_t lv_page_get_width_grid(lv_obj_t * page, uint8_t div, uint8_t span)
 lv_coord_t lv_page_get_height_grid(lv_obj_t * page, uint8_t div, uint8_t span)
 {
     lv_coord_t obj_h = lv_page_get_height_fit(page);
-    lv_style_int_t pinner = lv_obj_get_style_pad_inner(page, LV_PAGE_PART_SCRL);
+    lv_style_int_t pinner = lv_obj_get_style_pad_inner(page, LV_PAGE_PART_SCROLLABLE);
 
     lv_coord_t r = (obj_h - (div - 1) * pinner) / div;
 
@@ -704,7 +705,7 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
             /*Draw the scrollbars*/
             lv_draw_rect_dsc_t rect_dsc;
             lv_draw_rect_dsc_init(&rect_dsc);
-            lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCRLBAR, &rect_dsc);
+            lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCROLLBAR, &rect_dsc);
             if(ext->scrlbar.hor_draw && (ext->scrlbar.mode & LV_SCRLBAR_MODE_HIDE) == 0) {
                 lv_draw_rect(&sb_hor_area, clip_area, &rect_dsc);
             }
@@ -716,38 +717,13 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
 
 #if LV_USE_ANIMATION
         {
-            lv_coord_t page_w = lv_obj_get_width(page);
-            lv_coord_t page_h = lv_obj_get_height(page);
 
-            lv_area_t flash_area;
-
-            if(ext->edge_flash.top_ip) {
-                flash_area.x1 = page->coords.x1 - page_w;
-                flash_area.x2 = page->coords.x2 + page_w;
-                flash_area.y1 = page->coords.y1 - 3 * page_w + ext->edge_flash.state;
-                flash_area.y2 = page->coords.y1 + ext->edge_flash.state;
-            }
-            else if(ext->edge_flash.bottom_ip) {
-                flash_area.x1 = page->coords.x1 - page_w;
-                flash_area.x2 = page->coords.x2 + page_w;
-                flash_area.y1 = page->coords.y2 - ext->edge_flash.state;
-                flash_area.y2 = page->coords.y2 + 3 * page_w - ext->edge_flash.state;
-            }
-            else if(ext->edge_flash.right_ip) {
-                flash_area.x1 = page->coords.x2 - ext->edge_flash.state;
-                flash_area.x2 = page->coords.x2 + 3 * page_h - ext->edge_flash.state;
-                flash_area.y1 = page->coords.y1 - page_h;
-                flash_area.y2 = page->coords.y2 + page_h;
-            }
-            else if(ext->edge_flash.left_ip) {
-                flash_area.x1 = page->coords.x1 - 3 * page_h + ext->edge_flash.state;
-                flash_area.x2 = page->coords.x1 + ext->edge_flash.state;
-                flash_area.y1 = page->coords.y1 - page_h;
-                flash_area.y2 = page->coords.y2 + page_h;
-            }
 
             if(ext->edge_flash.left_ip || ext->edge_flash.right_ip || ext->edge_flash.top_ip ||
                ext->edge_flash.bottom_ip) {
+                lv_area_t flash_area;
+                get_edge_flash_area(page, &flash_area, ext->edge_flash.state);
+
                 lv_draw_rect_dsc_t edge_draw_dsc;
                 lv_draw_rect_dsc_init(&edge_draw_dsc);
                 lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_EDGE_FLASH, &edge_draw_dsc);
@@ -781,7 +757,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_get_state_info_t * info = param;
-        if(info->part == LV_PAGE_PART_SCRL) info->result = lv_obj_get_state(lv_page_get_scrl(page), LV_CONT_PART_MAIN);
+        if(info->part == LV_PAGE_PART_SCROLLABLE) info->result = lv_obj_get_state(lv_page_get_scrl(page), LV_CONT_PART_MAIN);
         else info->result = lv_obj_get_state(page, info->part);
         return LV_RES_OK;
     }
@@ -802,7 +778,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             }
         }
 
-        lv_obj_clean_style_list(page, LV_PAGE_PART_SCRLBAR);
+        lv_obj_clean_style_list(page, LV_PAGE_PART_SCROLLBAR);
 #if LV_USE_ANIMATION
         lv_obj_clean_style_list(page, LV_PAGE_PART_EDGE_FLASH);
 #endif
@@ -853,7 +829,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_style_int_t sb_width = lv_obj_get_style_size(page, LV_PAGE_PART_SCRLBAR);
+        lv_style_int_t sb_width = lv_obj_get_style_size(page, LV_PAGE_PART_SCROLLBAR);
         lv_area_set_height(&ext->scrlbar.hor_area, sb_width);
         lv_area_set_width(&ext->scrlbar.ver_area, sb_width);
 
@@ -1091,10 +1067,10 @@ static lv_style_list_t * lv_page_get_style(lv_obj_t * page, uint8_t part)
         case LV_PAGE_PART_BG:
             style_dsc_p = &page->style_list;
             break;
-        case LV_PAGE_PART_SCRL:
+        case LV_PAGE_PART_SCROLLABLE:
             style_dsc_p = lv_obj_get_style_list(ext->scrl, LV_CONT_PART_MAIN);
             break;
-        case LV_PAGE_PART_SCRLBAR:
+        case LV_PAGE_PART_SCROLLBAR:
             style_dsc_p = &ext->scrlbar.style;
             break;
 #if LV_USE_ANIMATION
@@ -1190,9 +1166,9 @@ static void scrlbar_refresh(lv_obj_t * page)
     lv_coord_t obj_w  = lv_obj_get_width(page);
     lv_coord_t obj_h  = lv_obj_get_height(page);
 
-    lv_style_int_t sb_width = lv_obj_get_style_size(page, LV_PAGE_PART_SCRLBAR);
-    lv_style_int_t sb_right = lv_obj_get_style_pad_right(page, LV_PAGE_PART_SCRLBAR);
-    lv_style_int_t sb_bottom = lv_obj_get_style_pad_bottom(page, LV_PAGE_PART_SCRLBAR);
+    lv_style_int_t sb_width = lv_obj_get_style_size(page, LV_PAGE_PART_SCROLLBAR);
+    lv_style_int_t sb_right = lv_obj_get_style_pad_right(page, LV_PAGE_PART_SCROLLBAR);
+    lv_style_int_t sb_bottom = lv_obj_get_style_pad_bottom(page, LV_PAGE_PART_SCROLLBAR);
 
     lv_style_int_t bg_left = lv_obj_get_style_pad_left(page, LV_PAGE_PART_BG);
     lv_style_int_t bg_right = lv_obj_get_style_pad_right(page, LV_PAGE_PART_BG);
@@ -1314,8 +1290,8 @@ static void scrlbar_refresh(lv_obj_t * page)
 
 static void refr_ext_draw_pad(lv_obj_t * page)
 {
-    lv_style_int_t sb_bottom = lv_obj_get_style_pad_bottom(page, LV_PAGE_PART_SCRLBAR);
-    lv_style_int_t sb_right = lv_obj_get_style_pad_right(page, LV_PAGE_PART_SCRLBAR);
+    lv_style_int_t sb_bottom = lv_obj_get_style_pad_bottom(page, LV_PAGE_PART_SCROLLBAR);
+    lv_style_int_t sb_right = lv_obj_get_style_pad_right(page, LV_PAGE_PART_SCROLLBAR);
 
     /*Ensure ext. size for the scrollbars if they are out of the page*/
     if(page->ext_draw_pad < (-sb_right)) page->ext_draw_pad = -sb_right;
@@ -1327,18 +1303,60 @@ static void edge_flash_anim(void * page, lv_anim_value_t v)
 {
     lv_page_ext_t * ext   = lv_obj_get_ext_attr(page);
     ext->edge_flash.state = v;
-    lv_obj_invalidate(page);
+
+    lv_area_t flash_area;
+    get_edge_flash_area(page, &flash_area, LV_PAGE_END_FLASH_SIZE);
+    lv_obj_invalidate_area(page, &flash_area);
 }
 
 static void edge_flash_anim_end(lv_anim_t * a)
 {
+    lv_area_t flash_area;
+    get_edge_flash_area(a->var, &flash_area, LV_PAGE_END_FLASH_SIZE);
+    lv_obj_invalidate_area(a->var, &flash_area);
+
     lv_page_ext_t * ext       = lv_obj_get_ext_attr(a->var);
     ext->edge_flash.top_ip    = 0;
     ext->edge_flash.bottom_ip = 0;
     ext->edge_flash.left_ip   = 0;
     ext->edge_flash.right_ip  = 0;
-    lv_obj_invalidate(a->var);
+
 }
+
+static void get_edge_flash_area(lv_obj_t * page, lv_area_t * flash_area, lv_coord_t state)
+{
+    lv_coord_t page_w = lv_obj_get_width(page);
+    lv_coord_t page_h = lv_obj_get_height(page);
+    lv_page_ext_t * ext   = lv_obj_get_ext_attr(page);
+
+    if(ext->edge_flash.top_ip) {
+        flash_area->x1 = page->coords.x1 - page_w;
+        flash_area->x2 = page->coords.x2 + page_w;
+        flash_area->y1 = page->coords.y1 - 3 * page_w + state;
+        flash_area->y2 = page->coords.y1 + state;
+    }
+    else if(ext->edge_flash.bottom_ip) {
+        flash_area->x1 = page->coords.x1 - page_w;
+        flash_area->x2 = page->coords.x2 + page_w;
+        flash_area->y1 = page->coords.y2 - state;
+        flash_area->y2 = page->coords.y2 + 3 * page_w - state;
+    }
+    else if(ext->edge_flash.right_ip) {
+        flash_area->x1 = page->coords.x2 - state;
+        flash_area->x2 = page->coords.x2 + 3 * page_h - state;
+        flash_area->y1 = page->coords.y1 - page_h;
+        flash_area->y2 = page->coords.y2 + page_h;
+    }
+    else if(ext->edge_flash.left_ip) {
+        flash_area->x1 = page->coords.x1 - 3 * page_h + state;
+        flash_area->x2 = page->coords.x1 + state;
+        flash_area->y1 = page->coords.y1 - page_h;
+        flash_area->y2 = page->coords.y2 + page_h;
+    } else {
+        lv_area_set(flash_area, 0, 0, -1, -1);
+    }
+}
+
 #endif
 
 #endif

@@ -108,9 +108,9 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->point_cnt             = LV_CHART_PNUM_DEF;
     ext->type                  = LV_CHART_TYPE_LINE;
     ext->update_mode           = LV_CHART_UPDATE_MODE_SHIFT;
-    memset(&ext->x_axis, 0, sizeof(ext->x_axis));
-    memset(&ext->y_axis, 0, sizeof(ext->y_axis));
-    memset(&ext->secondary_y_axis, 0, sizeof(ext->secondary_y_axis));
+    lv_memset_00(&ext->x_axis, sizeof(ext->x_axis));
+    lv_memset_00(&ext->y_axis, sizeof(ext->y_axis));
+    lv_memset_00(&ext->secondary_y_axis, sizeof(ext->secondary_y_axis));
     ext->x_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->x_axis.minor_tick_len = LV_CHART_TICK_LENGTH_AUTO;
     ext->y_axis.major_tick_len = LV_CHART_TICK_LENGTH_AUTO;
@@ -147,9 +147,9 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->hdiv_cnt   = ext_copy->hdiv_cnt;
         ext->vdiv_cnt   = ext_copy->vdiv_cnt;
         ext->point_cnt  = ext_copy->point_cnt;
-        memcpy(&ext->x_axis, &ext_copy->x_axis, sizeof(lv_chart_axis_cfg_t));
-        memcpy(&ext->y_axis, &ext_copy->y_axis, sizeof(lv_chart_axis_cfg_t));
-        memcpy(&ext->secondary_y_axis, &ext_copy->secondary_y_axis, sizeof(lv_chart_axis_cfg_t));
+        lv_memcpy(&ext->x_axis, &ext_copy->x_axis, sizeof(lv_chart_axis_cfg_t));
+        lv_memcpy(&ext->y_axis, &ext_copy->y_axis, sizeof(lv_chart_axis_cfg_t));
+        lv_memcpy(&ext->secondary_y_axis, &ext_copy->secondary_y_axis, sizeof(lv_chart_axis_cfg_t));
 
         /*Refresh the style with new signal function*/
         lv_obj_refresh_style(chart, LV_STYLE_PROP_ALL);
@@ -1087,7 +1087,7 @@ static lv_chart_label_iterator_t create_axis_label_iter(const char * list, uint8
  */
 static void get_next_axis_label(lv_chart_label_iterator_t * iterator, char * buf)
 {
-    uint8_t label_len = 0;
+    uint32_t label_len = 0;
     if(iterator->is_reverse_iter) {
         const char * label_start;
         /* count the length of the current label*/

@@ -150,7 +150,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_size(ta, LV_TEXTAREA_DEF_WIDTH, LV_TEXTAREA_DEF_HEIGHT);
         lv_textarea_set_sb_mode(ta, LV_SCRLBAR_MODE_DRAG);
 
-        lv_obj_reset_style_list(ta, LV_PAGE_PART_SCRL);
+        lv_obj_reset_style_list(ta, LV_PAGE_PART_SCROLLABLE);
         lv_theme_apply(ta, LV_THEME_TEXTAREA);
 
     }
@@ -181,7 +181,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
             LV_ASSERT_MEM(ext->pwd_tmp);
             if(ext->pwd_tmp == NULL) return NULL;
 
-            memcpy(ext->pwd_tmp, copy_ext->pwd_tmp, len);
+            lv_memcpy(ext->pwd_tmp, copy_ext->pwd_tmp, len);
         }
 
         if(copy_ext->one_line) lv_textarea_set_one_line(ta, true);
@@ -193,6 +193,10 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
 #if LV_USE_ANIMATION
     if(ext->cursor.blink_time) {
         /*Create a cursor blinker animation*/
+        lv_anim_path_t path;
+        lv_anim_path_init(&path);
+        lv_anim_path_set_cb(&path, lv_anim_path_step);
+
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, ta);
@@ -200,8 +204,8 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_anim_set_time(&a, ext->cursor.blink_time);
         lv_anim_set_playback_time(&a, ext->cursor.blink_time);
         lv_anim_set_values(&a, 0, 1);
-        lv_anim_set_path_cb(&a, lv_anim_path_step);
-        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
+        lv_anim_set_path(&a, &path);
+        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
         lv_anim_start(&a);
     }
 #endif
@@ -281,13 +285,17 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
 
 #if LV_USE_ANIMATION
         /*Auto hide characters*/
+        lv_anim_path_t path;
+        lv_anim_path_init(&path);
+        lv_anim_path_set_cb(&path, lv_anim_path_step);
+
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, ta);
         lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)pwd_char_hider_anim);
         lv_anim_set_time(&a, ext->pwd_show_time);
         lv_anim_set_values(&a, 0, 1);
-        lv_anim_set_path_cb(&a, lv_anim_path_step);
+        lv_anim_set_path(&a, &path);
         lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
         lv_anim_start(&a);
 
@@ -364,13 +372,16 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
 
 #if LV_USE_ANIMATION
         /*Auto hide characters*/
+        lv_anim_path_t path;
+        lv_anim_path_init(&path);
+        lv_anim_path_set_cb(&path, lv_anim_path_step);
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, ta);
         lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)pwd_char_hider_anim);
         lv_anim_set_time(&a, ext->pwd_show_time);
         lv_anim_set_values(&a, 0, 1);
-        lv_anim_set_path_cb(&a, lv_anim_path_step);
+        lv_anim_set_path(&a, &path);
         lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
         lv_anim_start(&a);
 #else
@@ -521,13 +532,17 @@ void lv_textarea_set_text(lv_obj_t * ta, const char * txt)
 
 #if LV_USE_ANIMATION
         /*Auto hide characters*/
+        lv_anim_path_t path;
+        lv_anim_path_init(&path);
+        lv_anim_path_set_cb(&path, lv_anim_path_step);
+
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, ta);
         lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)pwd_char_hider_anim);
         lv_anim_set_time(&a, ext->pwd_show_time);
         lv_anim_set_values(&a, 0, 1);
-        lv_anim_set_path_cb(&a, lv_anim_path_step);
+        lv_anim_set_path(&a, &path);
         lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
         lv_anim_start(&a);
 #else
@@ -640,6 +655,10 @@ void lv_textarea_set_cursor_pos(lv_obj_t * ta, int16_t pos)
 #if LV_USE_ANIMATION
     if(ext->cursor.blink_time) {
         /*Reset cursor blink animation*/
+        lv_anim_path_t path;
+        lv_anim_path_init(&path);
+        lv_anim_path_set_cb(&path, lv_anim_path_step);
+
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, ta);
@@ -647,8 +666,8 @@ void lv_textarea_set_cursor_pos(lv_obj_t * ta, int16_t pos)
         lv_anim_set_time(&a, ext->cursor.blink_time);
         lv_anim_set_playback_time(&a, ext->cursor.blink_time);
         lv_anim_set_values(&a, 1, 0);
-        lv_anim_set_path_cb(&a, lv_anim_path_step);
-        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
+        lv_anim_set_path(&a, &path);
+        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
         lv_anim_start(&a);
     }
 #endif
@@ -901,6 +920,10 @@ void lv_textarea_set_cursor_blink_time(lv_obj_t * ta, uint16_t time)
 #if LV_USE_ANIMATION
     if(ext->cursor.blink_time) {
         /*Reset cursor blink animation*/
+        lv_anim_path_t path;
+        lv_anim_path_init(&path);
+        lv_anim_path_set_cb(&path, lv_anim_path_step);
+
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, ta);
@@ -908,7 +931,7 @@ void lv_textarea_set_cursor_blink_time(lv_obj_t * ta, uint16_t time)
         lv_anim_set_time(&a, ext->cursor.blink_time);
         lv_anim_set_playback_time(&a, ext->cursor.blink_time);
         lv_anim_set_values(&a, 1, 0);
-        lv_anim_set_path_cb(&a, lv_anim_path_step);
+        lv_anim_set_path(&a, &path);
         lv_anim_start(&a);
     }
     else {
@@ -1351,7 +1374,7 @@ static lv_design_res_t lv_textarea_scrollable_design(lv_obj_t * scrl, const lv_a
         lv_draw_rect(&cur_area, clip_area, &cur_dsc);
 
         char letter_buf[8] = {0};
-        memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
+        lv_memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
 
         if(cur_dsc.bg_opa == LV_OPA_COVER) {
             lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_CURSOR);
@@ -1637,7 +1660,7 @@ static void pwd_char_hider(lv_obj_t * ta)
         char * txt_tmp = lv_mem_buf_get(enc_len * bullet_len + 1);
         uint16_t i;
         for(i = 0; i < enc_len; i++) {
-            memcpy(&txt_tmp[i * bullet_len], bullet, bullet_len);
+            lv_memcpy(&txt_tmp[i * bullet_len], bullet, bullet_len);
         }
 
         txt_tmp[i * bullet_len] = '\0';

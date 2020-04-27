@@ -138,7 +138,6 @@ void lv_list_clean(lv_obj_t * list)
 /*======================
  * Add/remove functions
  *=====================*/
-
 /**
  * Add a list element to the list
  * @param list pointer to list object
@@ -156,9 +155,14 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
     lv_coord_t pos_x_ori = lv_obj_get_x(list);
     lv_coord_t pos_y_ori = lv_obj_get_y(list);
 
+    lv_obj_t * scrl =  lv_page_get_scrl(list);
+    lv_obj_add_protect(scrl, LV_PROTECT_CHILD_CHG);
+
     /*Create a list element with the image an the text*/
     lv_obj_t * btn;
     btn = lv_btn_create(list, NULL);
+
+    lv_obj_add_protect(btn, LV_PROTECT_CHILD_CHG);
 
     /*Save the original signal function because it will be required in `lv_list_btn_signal`*/
     if(ancestor_btn_signal == NULL) ancestor_btn_signal = lv_obj_get_signal_cb(btn);
@@ -188,6 +192,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
 
     lv_obj_add_protect(btn, LV_PROTECT_PRESS_LOST);
     lv_obj_set_signal_cb(btn, lv_list_btn_signal);
+
 
 #if LV_USE_IMG != 0
     lv_obj_t * img = NULL;
@@ -224,6 +229,10 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
         }
     }
 #endif
+
+    lv_obj_clear_protect(scrl, LV_PROTECT_CHILD_CHG);
+    lv_obj_clear_protect(btn, LV_PROTECT_CHILD_CHG);
+    btn->signal_cb(btn, LV_SIGNAL_CHILD_CHG, NULL);
 
     lv_obj_set_pos(list, pos_x_ori, pos_y_ori);
 

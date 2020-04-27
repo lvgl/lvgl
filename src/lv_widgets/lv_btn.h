@@ -36,12 +36,13 @@ extern "C" {
 /** Possible states of a button.
  * It can be used not only by buttons but other button-like objects too*/
 enum {
+    LV_BTN_STATE_ACTIVE,
     LV_BTN_STATE_RELEASED,
     LV_BTN_STATE_PRESSED,
     LV_BTN_STATE_CHECKED_RELEASED,
     LV_BTN_STATE_CHECKED_PRESSED,
-    LV_BTN_STATE_DISABLED,
-    _LV_BTN_STATE_LAST, /* Number of states*/
+    _LV_BTN_STATE_LAST = LV_BTN_STATE_CHECKED_PRESSED + 1, /* Number of states*/
+    LV_BTN_STATE_DISABLED = 0x80
 };
 typedef uint8_t lv_btn_state_t;
 
@@ -153,6 +154,7 @@ static inline void lv_btn_set_fit(lv_obj_t * btn, lv_fit_t fit)
  * Get the current state of the button
  * @param btn pointer to a button object
  * @return the state of the button (from lv_btn_state_t enum)
+ * If the button is in disabled state `LV_BTN_STATE_DISABLED` will be ORed to the other button states.
  */
 lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn);
 

@@ -445,7 +445,7 @@ void lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
     }
 
     /* Copy the text into the new space*/
-    memcpy(txt_buf + pos, ins_txt, ins_len);
+    lv_memcpy_small(txt_buf + pos, ins_txt, ins_len);
 }
 
 /**
@@ -537,7 +537,7 @@ static uint32_t lv_txt_utf8_conv_wc(uint32_t c)
     if((c & 0x80) != 0) {
         uint32_t swapped;
         uint8_t c8[4];
-        memcpy(c8, &c, 4);
+        lv_memcpy_small(c8, &c, 4);
         swapped = (c8[0] << 24) + (c8[1] << 16) + (c8[2] << 8) + (c8[3]);
         uint8_t i;
         for(i = 0; i < 4; i++) {

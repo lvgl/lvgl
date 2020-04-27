@@ -909,11 +909,11 @@ static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color
     fg.ch.red = LV_MATH_MIN(tmp, 255);
 #endif
 
-    tmp = bg.ch.green + fg.ch.green;
 #if LV_COLOR_DEPTH == 8
     fg.ch.green = LV_MATH_MIN(tmp, 7);
 #elif LV_COLOR_DEPTH == 16
 #if LV_COLOR_16_SWAP == 0
+    tmp = bg.ch.green + fg.ch.green;
     fg.ch.green = LV_MATH_MIN(tmp, 63);
 #else
     tmp = (bg.ch.green_h << 3) + bg.ch.green_l + (fg.ch.green_h << 3) + fg.ch.green_l;

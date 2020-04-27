@@ -176,10 +176,10 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         for(i = 0; i < copy_ext->tab_cnt; i++) {
             lv_obj_t * new_tab = lv_tabview_add_tab(tabview, copy_ext->tab_name_ptr[i]);
             lv_obj_t * copy_tab = lv_tabview_get_tab(copy, i);
-            lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCRL), lv_obj_get_style_list(copy_tab,
-                                                                                                        LV_PAGE_PART_SCRL));
-            lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCRLBAR), lv_obj_get_style_list(copy_tab,
-                                                                                                           LV_PAGE_PART_SCRLBAR));
+            lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCROLLABLE), lv_obj_get_style_list(copy_tab,
+                                                                                                        LV_PAGE_PART_SCROLLABLE));
+            lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCROLLBAR), lv_obj_get_style_list(copy_tab,
+                                                                                                           LV_PAGE_PART_SCROLLBAR));
             lv_obj_refresh_style(new_tab, LV_STYLE_PROP_ALL);
         }
 
@@ -340,8 +340,8 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     }
 
     lv_coord_t cont_x;
-    lv_style_int_t scrl_inner = lv_obj_get_style_pad_inner(ext->content, LV_PAGE_PART_SCRL);
-    lv_style_int_t scrl_left = lv_obj_get_style_pad_left(ext->content, LV_PAGE_PART_SCRL);
+    lv_style_int_t scrl_inner = lv_obj_get_style_pad_inner(ext->content, LV_PAGE_PART_SCROLLABLE);
+    lv_style_int_t scrl_left = lv_obj_get_style_pad_left(ext->content, LV_PAGE_PART_SCROLLABLE);
 
     switch(ext->btns_pos) {
         default: /*default case is prevented in lv_tabview_set_btns_pos(), but here for safety*/
@@ -599,7 +599,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         if(info->part == LV_TABVIEW_PART_TAB_BG) info->result = lv_obj_get_state(ext->btns, LV_BTNMATRIX_PART_BG);
         else if(info->part == LV_TABVIEW_PART_TAB_BTN) info->result = lv_obj_get_state(ext->btns, LV_BTNMATRIX_PART_BTN);
         else if(info->part == LV_TABVIEW_PART_INDIC) info->result = lv_obj_get_state(ext->indic, LV_OBJ_PART_MAIN);
-        else if(info->part == LV_TABVIEW_PART_BG_SCRL) info->result = lv_obj_get_state(ext->content, LV_PAGE_PART_SCRL);
+        else if(info->part == LV_TABVIEW_PART_BG_SCRL) info->result = lv_obj_get_state(ext->content, LV_PAGE_PART_SCROLLABLE);
         return LV_RES_OK;
     }
 
@@ -652,16 +652,33 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
 
         /* The button matrix is not in a group (the tab view is in it) but it should handle the
          * group signals. So propagate the related signals to the button matrix manually*/
-        if(ext->btns) {
-            ext->btns->signal_cb(ext->btns, sign, param);
+        ext->btns->signal_cb(ext->btns, sign, param);
 
-            /*Make the active tab's button focused*/
-            if(sign == LV_SIGNAL_FOCUS) {
-                lv_btnmatrix_set_focused_btn(ext->btns, ext->tab_cur);
+        /*Make the active tab's button focused*/
+        if(sign == LV_SIGNAL_FOCUS) {
+            lv_btnmatrix_set_focused_btn(ext->btns, ext->tab_cur);
+        }
+
+        if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS) {
+            lv_state_t state = lv_obj_get_state(tabview, LV_TABVIEW_PART_BG);
+            if(state & LV_STATE_FOCUSED) {
+                lv_obj_set_state(ext->btns, LV_STATE_FOCUSED);
+                lv_obj_set_state(ext->indic, LV_STATE_FOCUSED);
+            } else {
+                lv_obj_clear_state(ext->btns, LV_STATE_FOCUSED);
+                lv_obj_clear_state(ext->indic, LV_STATE_FOCUSED);
+
+            }
+            if(state & LV_STATE_EDITED) {
+                lv_obj_set_state(ext->btns, LV_STATE_EDITED);
+                lv_obj_set_state(ext->indic, LV_STATE_EDITED);
+            } else {
+                lv_obj_clear_state(ext->btns, LV_STATE_EDITED);
+                lv_obj_clear_state(ext->indic, LV_STATE_EDITED);
+
             }
         }
     }
-
 
     return res;
 }
@@ -751,7 +768,7 @@ static lv_style_list_t * lv_tabview_get_style(lv_obj_t * tabview, uint8_t part)
             style_dsc_p = &tabview->style_list;
             break;
         case LV_TABVIEW_PART_BG_SCRL:
-            style_dsc_p = lv_obj_get_style_list(ext->content, LV_PAGE_PART_SCRL);
+            style_dsc_p = lv_obj_get_style_list(ext->content, LV_PAGE_PART_SCROLLABLE);
             break;
         case LV_TABVIEW_PART_TAB_BG:
             style_dsc_p = lv_obj_get_style_list(ext->btns, LV_BTNMATRIX_PART_BG);
@@ -782,6 +799,8 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
     uint16_t btn_id = lv_btnmatrix_get_active_btn(tab_btnm);
     if(btn_id == LV_BTNMATRIX_BTN_NONE) return;
 
+    if(lv_btnmatrix_get_btn_ctrl(tab_btnm, btn_id, LV_BTNMATRIX_CTRL_DISABLED)) return;
+
     lv_btnmatrix_clear_btn_ctrl_all(tab_btnm, LV_BTNMATRIX_CTRL_CHECK_STATE);
     lv_btnmatrix_set_btn_ctrl(tab_btnm, btn_id, LV_BTNMATRIX_CTRL_CHECK_STATE);
 
@@ -793,6 +812,12 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
 
     lv_res_t res = LV_RES_OK;
     if(id_prev != id_new) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
+
+#if LV_USE_GROUP
+    if(lv_indev_get_type(lv_indev_get_act()) == LV_INDEV_TYPE_ENCODER) {
+        lv_group_set_editing(lv_obj_get_group(tabview), false);
+    }
+#endif
 
     if(res != LV_RES_OK) return;
 }

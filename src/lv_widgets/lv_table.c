@@ -79,6 +79,7 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cell_data     = NULL;
     ext->col_cnt       = 0;
     ext->row_cnt       = 0;
+    ext->row_h         = NULL;
     ext->cell_types    = 1;
 
     uint16_t i;
@@ -199,8 +200,12 @@ void lv_table_set_row_cnt(lv_obj_t * table, uint16_t row_cnt)
         if(old_row_cnt < row_cnt) {
             uint16_t old_cell_cnt = old_row_cnt * ext->col_cnt;
             uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
-            memset(&ext->cell_data[old_cell_cnt], 0, (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
+            lv_memset_00(&ext->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
         }
+
+        ext->row_h = lv_mem_realloc(ext->row_h, ext->row_cnt * sizeof(ext->row_h[0]));
+        LV_ASSERT_MEM(ext->cell_data);
+        if(ext->cell_data == NULL) return;
     }
     else {
         lv_mem_free(ext->cell_data);
@@ -237,7 +242,7 @@ void lv_table_set_col_cnt(lv_obj_t * table, uint16_t col_cnt)
         if(old_col_cnt < col_cnt) {
             uint16_t old_cell_cnt = old_col_cnt * ext->row_cnt;
             uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
-            memset(&ext->cell_data[old_cell_cnt], 0, (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
+            lv_memset_00(&ext->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
         }
 
     }
@@ -652,29 +657,9 @@ lv_res_t lv_table_get_pressed_cell(lv_obj_t * table, uint16_t * row, uint16_t * 
 
         *row = 0;
         tmp = 0;
-        lv_style_int_t cell_left[LV_TABLE_CELL_STYLE_CNT];
-        lv_style_int_t cell_right[LV_TABLE_CELL_STYLE_CNT];
-        lv_style_int_t cell_top[LV_TABLE_CELL_STYLE_CNT];
-        lv_style_int_t cell_bottom[LV_TABLE_CELL_STYLE_CNT];
-        lv_style_int_t letter_space[LV_TABLE_CELL_STYLE_CNT];
-        lv_style_int_t line_space[LV_TABLE_CELL_STYLE_CNT];
-        const lv_font_t * font[LV_TABLE_CELL_STYLE_CNT];
-
-        uint16_t i;
-        for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
-            if((ext->cell_types & (1 << i)) == 0) continue; /*Skip unused cell types*/
-            cell_left[i] = lv_obj_get_style_pad_left(table, LV_TABLE_PART_CELL1 + i);
-            cell_right[i] = lv_obj_get_style_pad_right(table, LV_TABLE_PART_CELL1 + i);
-            cell_top[i] = lv_obj_get_style_pad_top(table, LV_TABLE_PART_CELL1 + i);
-            cell_bottom[i] = lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_CELL1 + i);
-            letter_space[i] = lv_obj_get_style_text_letter_space(table, LV_TABLE_PART_CELL1 + i);
-            line_space[i] = lv_obj_get_style_text_line_space(table, LV_TABLE_PART_CELL1 + i);
-            font[i] = lv_obj_get_style_text_font(table, LV_TABLE_PART_CELL1 + i);
-        }
 
         for(*row = 0; *row < ext->row_cnt; (*row)++) {
-            tmp += get_row_height(table, *row, font, letter_space, line_space,
-                    cell_left, cell_right, cell_top, cell_bottom);
+            tmp += ext->row_h[*row];
             if(y < tmp) break;
         }
     }
@@ -726,9 +711,6 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
         lv_style_int_t cell_right[LV_TABLE_CELL_STYLE_CNT];
         lv_style_int_t cell_top[LV_TABLE_CELL_STYLE_CNT];
         lv_style_int_t cell_bottom[LV_TABLE_CELL_STYLE_CNT];
-        lv_style_int_t letter_space[LV_TABLE_CELL_STYLE_CNT];
-        lv_style_int_t line_space[LV_TABLE_CELL_STYLE_CNT];
-        const lv_font_t * font[LV_TABLE_CELL_STYLE_CNT];
 
         uint16_t i;
         for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
@@ -746,9 +728,6 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
             cell_right[i] = lv_obj_get_style_pad_right(table, LV_TABLE_PART_CELL1 + i);
             cell_top[i] = lv_obj_get_style_pad_top(table, LV_TABLE_PART_CELL1 + i);
             cell_bottom[i] = lv_obj_get_style_pad_bottom(table, LV_TABLE_PART_CELL1 + i);
-            letter_space[i] = label_dsc[i].letter_space;
-            line_space[i] = label_dsc[i].line_space;
-            font[i] = label_dsc[i].font;
         }
 
         uint16_t col;
@@ -757,8 +736,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
         cell_area.y2 = table->coords.y1 + bg_top - 1;
         for(row = 0; row < ext->row_cnt; row++) {
-            lv_coord_t h_row = get_row_height(table, row, font, letter_space, line_space,
-                                              cell_left, cell_right, cell_top, cell_bottom);
+            lv_coord_t h_row = ext->row_h[row];
 
             cell_area.y1 = cell_area.y2 + 1;
             cell_area.y2 = cell_area.y1 + h_row - 1;
@@ -935,7 +913,8 @@ static lv_res_t lv_table_signal(lv_obj_t * table, lv_signal_t sign, void * param
             }
         }
 
-        if(ext->cell_data != NULL) lv_mem_free(ext->cell_data);
+        if(ext->cell_data) lv_mem_free(ext->cell_data);
+        if(ext->row_h) lv_mem_free(ext->row_h);
 
         for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
             lv_obj_clean_style_list(table, LV_TABLE_PART_CELL1 + i);
@@ -1018,8 +997,9 @@ static void refr_size(lv_obj_t * table)
 
 
     for(i = 0; i < ext->row_cnt; i++) {
-        h += get_row_height(table, i, font, letter_space, line_space,
+        ext->row_h[i] = get_row_height(table, i, font, letter_space, line_space,
                             cell_left, cell_right, cell_top, cell_bottom);
+        h += ext->row_h[i];
     }
 
     lv_style_int_t bg_top = lv_obj_get_style_pad_top(table, LV_TABLE_PART_BG);

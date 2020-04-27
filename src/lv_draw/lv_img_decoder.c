@@ -151,7 +151,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     }
 
     if(res == LV_RES_INV) {
-        memset(dsc, 0, sizeof(lv_img_decoder_dsc_t));
+        lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
     }
 
     return res;
@@ -201,7 +201,7 @@ lv_img_decoder_t * lv_img_decoder_create(void)
     LV_ASSERT_MEM(decoder);
     if(decoder == NULL) return NULL;
 
-    memset(decoder, 0, sizeof(lv_img_decoder_t));
+    lv_memset_00(decoder, sizeof(lv_img_decoder_t));
 
     return decoder;
 }
@@ -341,7 +341,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
                 LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
                 return LV_RES_INV;
             }
-            memset(dsc->user_data, 0, sizeof(lv_img_decoder_built_in_data_t));
+            lv_memset_00(dsc->user_data, sizeof(lv_img_decoder_built_in_data_t));
         }
 
         lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
@@ -353,7 +353,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             return LV_RES_INV;
         }
 
-        memcpy(user_data->f, &f, sizeof(f));
+        lv_memcpy_small(user_data->f, &f, sizeof(f));
 
 #else
         LV_LOG_WARN("Image built-in decoder cannot read file because LV_USE_FILESYSTEM = 0");
@@ -399,7 +399,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
                 lv_img_decoder_built_in_close(decoder, dsc);
                 return LV_RES_INV;
             }
-            memset(dsc->user_data, 0, sizeof(lv_img_decoder_built_in_data_t));
+            lv_memset_00(dsc->user_data, sizeof(lv_img_decoder_built_in_data_t));
         }
 
         lv_img_decoder_built_in_data_t * user_data = dsc->user_data;

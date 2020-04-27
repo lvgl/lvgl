@@ -44,6 +44,38 @@ print("\nGenerating 32 px")
 os.system("python built_in_font_gen.py --size 32 -o lv_font_montserrat_32.c --bpp 4")
 os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_montserrat_32.c')
 
+print("\nGenerating 34 px")
+os.system("python built_in_font_gen.py --size 34 -o lv_font_montserrat_34.c --bpp 4")
+os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_montserrat_34.c')
+
+print("\nGenerating 36 px")
+os.system("python built_in_font_gen.py --size 36 -o lv_font_montserrat_36.c --bpp 4")
+os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_montserrat_36.c')
+
+print("\nGenerating 38 px")
+os.system("python built_in_font_gen.py --size 38 -o lv_font_montserrat_38.c --bpp 4")
+os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_montserrat_38.c')
+
+print("\nGenerating 40 px")
+os.system("python built_in_font_gen.py --size 40 -o lv_font_montserrat_40.c --bpp 4")
+os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_montserrat_40.c')
+
+print("\nGenerating 42 px")
+os.system("python built_in_font_gen.py --size 42 -o lv_font_montserrat_42.c --bpp 4")
+os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_montserrat_42.c')
+
+print("\nGenerating 44 px")
+os.system("python built_in_font_gen.py --size 44 -o lv_font_montserrat_44.c --bpp 4")
+os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_montserrat_44.c')
+
+print("\nGenerating 46 px")
+os.system("python built_in_font_gen.py --size 46 -o lv_font_montserrat_46.c --bpp 4")
+os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_montserrat_46.c')
+
+print("\nGenerating 48 px")
+os.system("python built_in_font_gen.py --size 48 -o lv_font_montserrat_48.c --bpp 4")
+os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_montserrat_48.c')
+
 print("\nGenerating 12 px subpx")
 os.system("python built_in_font_gen.py --size 12 -o lv_font_montserrat_12_subpx.c --bpp 4 --subpx")
 os.system('sed -i \'s|#include "lvgl/lvgl.h"|#include "../../lvgl.h"|\' lv_font_montserrat_12_subpx.c')

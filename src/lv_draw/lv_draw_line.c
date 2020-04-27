@@ -45,7 +45,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
 
 void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
 {
-    memset(dsc, 0x00, sizeof(lv_draw_line_dsc_t));
+    lv_memset_00(dsc, sizeof(lv_draw_line_dsc_t));
     dsc->width = 1;
     dsc->opa = LV_OPA_COVER;
     dsc->color = LV_COLOR_BLACK;
@@ -145,7 +145,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
     if(simple_mode) {
         lv_blend_fill(clip, &draw_area,
                       dsc->color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
-                      LV_BLEND_MODE_NORMAL);
+                      dsc->blend_mode);
     }
     /*If there other mask apply it*/
     else {

@@ -59,7 +59,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
        dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
         uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
-        memcpy(&p_color, &buf_u8[px], sizeof(lv_color_t));
+        lv_memcpy_small(&p_color, &buf_u8[px], sizeof(lv_color_t));
 #if LV_COLOR_SIZE == 32
         p_color.ch.alpha = 0xFF; /*Only the color should be get so use a deafult alpha value*/
 #endif
@@ -246,12 +246,12 @@ void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR || dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
         uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
-        memcpy(&buf_u8[px], &c, px_size);
+        lv_memcpy_small(&buf_u8[px], &c, px_size);
     }
     else if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
         uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
-        memcpy(&buf_u8[px], &c, px_size - 1); /*-1 to not overwrite the alpha value*/
+        lv_memcpy_small(&buf_u8[px], &c, px_size - 1); /*-1 to not overwrite the alpha value*/
     }
     else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
         buf_u8 += sizeof(lv_color32_t) * 2; /*Skip the palette*/
@@ -319,7 +319,7 @@ void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color_t c)
     lv_color32_t c32;
     c32.full      = lv_color_to32(c);
     uint8_t * buf = (uint8_t *)dsc->data;
-    memcpy(&buf[id * sizeof(c32)], &c32, sizeof(c32));
+    lv_memcpy_small(&buf[id * sizeof(c32)], &c32, sizeof(c32));
 }
 
 /**
@@ -507,12 +507,12 @@ bool lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t
             px_size = LV_COLOR_SIZE >> 3;
 
             pxi     = dsc->cfg.src_w * ys_int * px_size + xs_int * px_size;
-            memcpy(&dsc->res.color, &src_u8[pxi], px_size);
+            lv_memcpy_small(&dsc->res.color, &src_u8[pxi], px_size);
         }
         else {
             px_size = LV_IMG_PX_SIZE_ALPHA_BYTE;
             pxi     = dsc->cfg.src_w * ys_int * px_size + xs_int * px_size;
-            memcpy(&dsc->res.color, &src_u8[pxi], px_size - 1);
+            lv_memcpy_small(&dsc->res.color, &src_u8[pxi], px_size - 1);
             dsc->res.opa = src_u8[pxi + px_size - 1];
         }
     }
@@ -669,9 +669,9 @@ static inline bool transform_anti_alias(lv_img_transform_dsc_t * dsc)
     lv_opa_t a11 = 0;
 
     if(dsc->tmp.native_color) {
-        memcpy(&c01, &src_u8[dsc->tmp.pxi + dsc->tmp.px_size * xn], sizeof(lv_color_t));
-        memcpy(&c10, &src_u8[dsc->tmp.pxi + dsc->cfg.src_w * dsc->tmp.px_size * yn], sizeof(lv_color_t));
-        memcpy(&c11, &src_u8[dsc->tmp.pxi + dsc->cfg.src_w * dsc->tmp.px_size * yn + dsc->tmp.px_size * xn],
+        lv_memcpy_small(&c01, &src_u8[dsc->tmp.pxi + dsc->tmp.px_size * xn], sizeof(lv_color_t));
+        lv_memcpy_small(&c10, &src_u8[dsc->tmp.pxi + dsc->cfg.src_w * dsc->tmp.px_size * yn], sizeof(lv_color_t));
+        lv_memcpy_small(&c11, &src_u8[dsc->tmp.pxi + dsc->cfg.src_w * dsc->tmp.px_size * yn + dsc->tmp.px_size * xn],
                sizeof(lv_color_t));
         if(dsc->tmp.has_alpha) {
             a10 = src_u8[dsc->tmp.pxi + dsc->tmp.px_size * xn + dsc->tmp.px_size - 1];

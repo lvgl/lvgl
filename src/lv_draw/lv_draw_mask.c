@@ -210,7 +210,7 @@ void lv_draw_mask_line_points_init(lv_draw_mask_line_param_t * param, lv_coord_t
     param->flat = (LV_MATH_ABS(p2x - p1x) > LV_MATH_ABS(p2y - p1y)) ? 1 : 0;
     param->yx_steep = 0;
     param->xy_steep = 0;
-    param->dsc.cb = (lv_draw_mask_cb_t)lv_draw_mask_line;
+    param->dsc.cb = (lv_draw_mask_xcb_t)lv_draw_mask_line;
     param->dsc.type = LV_DRAW_MASK_TYPE_LINE;
 
     int32_t dx = p2x - p1x;
@@ -328,7 +328,7 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
     param->cfg.end_angle = end_angle;
     param->cfg.vertex_p.x = vertex_x;
     param->cfg.vertex_p.y = vertex_y;
-    param->dsc.cb = (lv_draw_mask_cb_t)lv_draw_mask_angle;
+    param->dsc.cb = (lv_draw_mask_xcb_t)lv_draw_mask_angle;
     param->dsc.type = LV_DRAW_MASK_TYPE_ANGLE;
 
     if(start_angle >= 0 && start_angle < 180) {
@@ -375,7 +375,7 @@ void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area
     lv_area_copy(&param->cfg.rect, rect);
     param->cfg.radius = radius;
     param->cfg.outer = inv ? 1 : 0;
-    param->dsc.cb = (lv_draw_mask_cb_t)lv_draw_mask_radius;
+    param->dsc.cb = (lv_draw_mask_xcb_t)lv_draw_mask_radius;
     param->dsc.type = LV_DRAW_MASK_TYPE_RADIUS;
     param->y_prev = INT32_MIN;
     param->y_prev_x.f = 0;
@@ -401,7 +401,7 @@ void lv_draw_mask_fade_init(lv_draw_mask_fade_param_t * param, const lv_area_t *
     param->cfg.opa_bottom = opa_bottom;
     param->cfg.y_top = y_top;
     param->cfg.y_bottom = y_bottom;
-    param->dsc.cb = (lv_draw_mask_cb_t)lv_draw_mask_fade;
+    param->dsc.cb = (lv_draw_mask_xcb_t)lv_draw_mask_fade;
     param->dsc.type = LV_DRAW_MASK_TYPE_FADE;
 }
 
@@ -416,7 +416,7 @@ void lv_draw_mask_map_init(lv_draw_mask_map_param_t * param, const lv_area_t * c
 {
     lv_area_copy(&param->cfg.coords, coords);
     param->cfg.map = map;
-    param->dsc.cb = (lv_draw_mask_cb_t)lv_draw_mask_map;
+    param->dsc.cb = (lv_draw_mask_xcb_t)lv_draw_mask_map;
     param->dsc.type = LV_DRAW_MASK_TYPE_MAP;
 }
 

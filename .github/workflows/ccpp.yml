@@ -1,0 +1,17 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ dev-7.0 ]
+  pull_request:
+    branches: [ dev-7.0 ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run tests
+      run: cd tests; python ./build.py

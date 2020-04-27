@@ -118,7 +118,7 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_page_set_scrl_fit(new_tileview, LV_FIT_TIGHT);
 
-        lv_obj_reset_style_list(new_tileview, LV_PAGE_PART_SCRL);
+        lv_obj_reset_style_list(new_tileview, LV_PAGE_PART_SCROLLABLE);
         lv_theme_apply(new_tileview, LV_THEME_TILEVIEW);
     }
     /*Copy an existing tileview*/
@@ -233,13 +233,11 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
         lv_coord_t x_act = lv_obj_get_x(scrl);
         lv_coord_t y_act = lv_obj_get_y(scrl);
 
-
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, scrl);
         lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
         lv_anim_set_time(&a, ext->anim_time);
-        lv_anim_set_path_cb(&a, lv_anim_path_linear);
 
 
         if(x_coord != x_act) {
