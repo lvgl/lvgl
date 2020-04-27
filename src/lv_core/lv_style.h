@@ -216,16 +216,6 @@ typedef struct {
 
 typedef int16_t lv_style_int_t;
 
-/*A helper general function pointer*/
-typedef void(*_lv_style_prop_xcb_t)(void);
-
-/*A helper type to handle data pointers and function pointer is the same way.*/
-typedef union {
-    _lv_style_prop_xcb_t fptr;
-    const void * dptr;
-} _lv_style_fptr_dptr_t;
-
-
 typedef struct {
     lv_style_t ** style_list;
 #if LV_USE_ASSERT_STYLE
@@ -373,43 +363,8 @@ void _lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t op
  *       For example: `lv_style_set_border_width()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, _lv_style_fptr_dptr_t p);
+void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void * p);
 
-/**
- * Set a function pointer typed property in a style.
- * @param style pointer to a style where the property should be set
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_TRANSITION_PATH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param value the value to set
- * @note shouldn't be used directly. Use the specific property set functions instead.
- *       For example: `lv_style_set_border_width()`
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-static inline void _lv_style_set_func_ptr(lv_style_t * style, lv_style_property_t prop, _lv_style_prop_xcb_t p)
-{
-    _lv_style_fptr_dptr_t fd;
-    fd.dptr = NULL;
-    fd.fptr = p;
-    _lv_style_set_ptr(style, prop, fd);
-}
-
-/**
- * Set a data pointer typed property in a style.
- * @param style pointer to a style where the property should be set
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_TRANSITION_PATH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param value the value to set
- * @note shouldn't be used directly. Use the specific property set functions instead.
- *       For example: `lv_style_set_border_width()`
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-static inline void _lv_style_set_data_ptr(lv_style_t * style, lv_style_property_t prop, const void * p)
-{
-    _lv_style_fptr_dptr_t fd;
-    fd.fptr = NULL;
-    fd.dptr = p;
-    _lv_style_set_ptr(style, prop, fd);
-}
 
 
 /**
@@ -473,57 +428,6 @@ int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, vo
 int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void * res);
 
 /**
- * Get a pointer typed property from a style.
- * @param style pointer to a style from where the property should be get
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param res pointer to a buffer to store the result value
- * @return -1: the property wasn't found in the style.
- *         The matching state bits of the desired state (in `prop`) and the best matching property's state
- *         Higher value means match in higher precedence state.
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_style_get_transition_path()`
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-static inline int16_t _lv_style_get_func_ptr(const lv_style_t * style, lv_style_property_t prop, void * res)
-{
-    _lv_style_fptr_dptr_t fd_res;
-    fd_res.dptr = NULL;
-    fd_res.fptr = NULL;
-    lv_res_t r =  _lv_style_get_ptr(style, prop, &fd_res);
-
-    _lv_style_prop_xcb_t * res2 = (_lv_style_prop_xcb_t *)res;
-    *res2 = fd_res.fptr;
-    return r;
-}
-
-/**
- * Get a pointer typed property from a style.
- * @param style pointer to a style from where the property should be get
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param res pointer to a buffer to store the result value
- * @return -1: the property wasn't found in the style.
- *         The matching state bits of the desired state (in `prop`) and the best matching property's state
- *         Higher value means match in higher precedence state.
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_style_get_text_font()`
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-static inline int16_t _lv_style_get_data_ptr(const lv_style_t * style, lv_style_property_t prop, void * res)
-{
-    _lv_style_fptr_dptr_t fd_res;
-    fd_res.dptr = NULL;
-    fd_res.fptr = NULL;
-    lv_res_t r =  _lv_style_get_ptr(style, prop, &fd_res);
-
-    void ** res2 = (void **)res;
-    *res2 = (void *)fd_res.dptr;
-    return r;
-}
-
-
-/**
  * Get the local style of a style list
  * @param list pointer to a style list where the local property should be set
  * @return pointer to the local style if exists else `NULL`.
@@ -582,41 +486,8 @@ void lv_style_list_set_local_opa(lv_style_list_t * list, lv_style_property_t pro
  * @param value the value to set
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-void lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t prop, _lv_style_fptr_dptr_t value);
+void lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t prop, const void * value);
 
-/**
- * Set a local pointer typed property in a style list.
- * @param list pointer to a style list where the local property should be set
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_TRANSITION_PATH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param value the value to set
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-static inline void lv_style_list_set_local_func_ptr(lv_style_list_t * list, lv_style_property_t prop,
-                                                    _lv_style_prop_xcb_t value)
-{
-    _lv_style_fptr_dptr_t fd;
-    fd.dptr = NULL;
-    fd.fptr = value;
-    lv_style_list_set_local_ptr(list, prop, fd);
-}
-
-/**
- * Set a local pointer typed property in a style list.
- * @param list pointer to a style list where the local property should be set
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param value the value to set
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-static inline void lv_style_list_set_local_data_ptr(lv_style_list_t * list, lv_style_property_t prop,
-                                                    const void * value)
-{
-    _lv_style_fptr_dptr_t fd;
-    fd.fptr = NULL;
-    fd.dptr = value;
-    lv_style_list_set_local_ptr(list, prop, fd);
-}
 /**
  * Get an integer typed property from a style list.
  * It will return the property which match best with given state.
@@ -667,54 +538,9 @@ lv_res_t lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop,
  * @return LV_RES_OK: there was a matching property in the list
  *         LV_RES_INV: there was NO matching property in the list
  * @note for performance reasons it's not checked if the property really has pointer type
- * @note Do not use this function directly. Use `lv_style_list_get_func_ptr` or `lv_style_list_get_data_ptr`
  */
-lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop, _lv_style_fptr_dptr_t * res);
+lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop, const void ** res);
 
-
-/**
- * Get a function pointer typed property from a style list.
- * It will return the property which match best with given state.
- * @param list pointer to a style list from where the property should be get
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_TRANSITION_PATH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param res pointer to a buffer to store the result
- * @return LV_RES_OK: there was a matching property in the list
- *         LV_RES_INV: there was NO matching property in the list
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-static inline lv_res_t lv_style_list_get_func_ptr(lv_style_list_t * list, lv_style_property_t prop, void (**res)(void))
-{
-    _lv_style_fptr_dptr_t fd_res;
-    fd_res.dptr = NULL;
-    fd_res.fptr = NULL;
-    lv_res_t r =  lv_style_list_get_ptr(list, prop, &fd_res);
-
-    *res = fd_res.fptr;
-    return r;
-}
-
-/**
- * Get a data pointer typed property from a style list.
- * It will return the property which match best with given state.
- * @param list pointer to a style list from where the property should be get
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param res pointer to a buffer to store the result
- * @return LV_RES_OK: there was a matching property in the list
- *         LV_RES_INV: there was NO matching property in the list
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-static inline lv_res_t lv_style_list_get_data_ptr(lv_style_list_t * list, lv_style_property_t prop, const void ** res)
-{
-    _lv_style_fptr_dptr_t fd_res;
-    fd_res.dptr = NULL;
-    fd_res.fptr = NULL;
-    lv_res_t r =  lv_style_list_get_ptr(list, prop, &fd_res);
-
-    *res = fd_res.dptr;
-    return r;
-}
 
 /*************************
  *    GLOBAL VARIABLES

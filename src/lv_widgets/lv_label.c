@@ -1208,7 +1208,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, label);
-        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
+        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
         lv_anim_set_playback_delay(&a, (((lv_font_get_glyph_width(font, ' ', ' ') + letter_space) * 1000) /
                                         ext->anim_speed) *
                                    LV_LABEL_WAIT_CHAR_COUNT);
@@ -1291,7 +1291,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         lv_anim_t a;
         lv_anim_init(&a);
         lv_anim_set_var(&a, label);
-        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINIT);
+        lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
 
         bool hor_anim = false;
         if(size.x > lv_area_get_width(&txt_coords)) {

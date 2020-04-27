@@ -601,48 +601,7 @@ void _lv_obj_set_style_local_opa(lv_obj_t * obj, uint8_t type, lv_style_property
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, _lv_style_fptr_dptr_t value);
-
-/**
- * Set a local style property of a part of an object in a given state.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param the value to set
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_obj_style_get_trasition_path()`
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-static inline void _lv_obj_set_style_local_func_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop,
-                                                    _lv_style_prop_xcb_t value)
-{
-    _lv_style_fptr_dptr_t fd;
-    fd.fptr = value;
-    fd.dptr = NULL;
-    _lv_obj_set_style_local_ptr(obj, type, prop, fd);
-}
-/**
- * Set a local style property of a part of an object in a given state.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param the value to set
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_obj_style_get_text_font()`
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-static inline void _lv_obj_set_style_local_data_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop,
-                                                    const void * value)
-{
-    _lv_style_fptr_dptr_t fd;
-    fd.fptr = NULL;
-    fd.dptr = value;
-    _lv_obj_set_style_local_ptr(obj, type, prop, fd);
-}
+void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, const void * value);
 
 /**
  * Remove a local style property from a part of an object with a given state.
@@ -1148,52 +1107,7 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
  *       For example: `lv_obj_style_get_border_opa()`
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-_lv_style_fptr_dptr_t _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
-
-/**
- * Get a style property of a part of an object in the object's current state.
- * If there is a running transitions it is taken into account
- * @param obj pointer to an object
- * @param part the part of the object which style property should be get.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop the property to get. E.g. `LV_STYLE_TEXT_FONT`.
- *  The state of the object will be added internally
- * @return the value of the property of the given part in the current state.
- * If the property is not found a default value will be returned.
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_obj_style_get_trasition_path()`
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-static inline  _lv_style_prop_xcb_t _lv_obj_get_style_func_ptr(const lv_obj_t * obj, uint8_t part,
-                                                             lv_style_property_t prop)
-{
-    _lv_style_fptr_dptr_t fd;
-    fd = _lv_obj_get_style_ptr(obj, part, prop);
-    return fd.fptr;
-}
-
-/**
- * Get a style property of a part of an object in the object's current state.
- * If there is a running transitions it is taken into account
- * @param obj pointer to an object
- * @param part the part of the object which style property should be get.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop the property to get. E.g. `LV_STYLE_TEXT_FONT`.
- *  The state of the object will be added internally
- * @return the value of the property of the given part in the current state.
- * If the property is not found a default value will be returned.
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_obj_style_get_text_font()`
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-static inline const void * _lv_obj_get_style_data_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
-{
-    _lv_style_fptr_dptr_t fd;
-    fd = _lv_obj_get_style_ptr(obj, part, prop);
-    return fd.dptr;
-}
-
-
+const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
 /**
  * Get the local style of a part of an object.
