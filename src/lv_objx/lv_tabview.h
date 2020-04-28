@@ -163,9 +163,9 @@ void lv_tabview_set_btns_hidden(lv_obj_t * tabview, bool en);
  * @param tabview pointer to a tabview object
  * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
  */
-static inline void lv_tabview_set_sb_mode(lv_obj_t * list, lv_sb_mode_t mode)
+static inline void lv_tabview_set_sb_mode(lv_obj_t * tabview, lv_sb_mode_t mode)
 {
-    lv_page_set_sb_mode(list, mode);
+    lv_page_set_sb_mode(tabview, mode);
 }
 
 /*=====================
