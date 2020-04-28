@@ -137,24 +137,27 @@ void lv_btn_set_state(lv_obj_t * btn, lv_btn_state_t state)
 
     switch(state) {
         case LV_BTN_STATE_RELEASED:
-            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED);
+            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED | LV_STATE_DISABLED);
             break;
         case LV_BTN_STATE_PRESSED:
-            lv_obj_clear_state(btn, LV_STATE_CHECKED);
+            lv_obj_clear_state(btn, LV_STATE_CHECKED | LV_STATE_DISABLED);
             lv_obj_add_state(btn, LV_STATE_PRESSED);
             break;
         case LV_BTN_STATE_CHECKED_RELEASED:
             lv_obj_add_state(btn, LV_STATE_CHECKED);
-            lv_obj_clear_state(btn, LV_STATE_PRESSED);
+            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_DISABLED);
             break;
         case LV_BTN_STATE_CHECKED_PRESSED:
             lv_obj_add_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED);
+            lv_obj_clear_state(btn, LV_STATE_DISABLED);
             break;
         case LV_BTN_STATE_DISABLED:
+            lv_obj_clear_state(btn, LV_STATE_PRESSED | LV_STATE_CHECKED);
             lv_obj_add_state(btn, LV_STATE_DISABLED);
             break;
-        case LV_BTN_STATE_ACTIVE:
-            lv_obj_clear_state(btn, LV_STATE_DISABLED);
+        case LV_BTN_STATE_CHECKED_DISABLED:
+            lv_obj_clear_state(btn, LV_STATE_PRESSED);
+            lv_obj_add_state(btn, LV_STATE_DISABLED | LV_STATE_CHECKED);
             break;
     }
 }
@@ -193,15 +196,18 @@ lv_btn_state_t lv_btn_get_state(const lv_obj_t * btn)
 
     lv_state_t obj_state = lv_obj_get_state(btn, LV_BTN_PART_MAIN);
     lv_btn_state_t btn_state = 0;
-    if(obj_state & LV_STATE_DISABLED) btn_state = LV_BTN_STATE_DISABLED;
+
+    if(obj_state & LV_STATE_DISABLED) {
+        if(obj_state & LV_STATE_CHECKED) return LV_BTN_STATE_CHECKED_DISABLED;
+        else return LV_BTN_STATE_DISABLED;
+    }
 
     if(obj_state & LV_STATE_CHECKED) {
-        if(obj_state & LV_STATE_PRESSED) return btn_state | LV_BTN_STATE_CHECKED_PRESSED;
-        else return btn_state | LV_BTN_STATE_CHECKED_RELEASED;
-    }
-    else {
-        if(obj_state & LV_STATE_PRESSED) return btn_state | LV_BTN_STATE_PRESSED;
-        else return btn_state | LV_BTN_STATE_RELEASED;
+        if(obj_state & LV_STATE_PRESSED) return LV_BTN_STATE_CHECKED_PRESSED;
+        else return LV_BTN_STATE_CHECKED_RELEASED;
+    } else {
+        if(obj_state & LV_STATE_PRESSED) return LV_BTN_STATE_PRESSED;
+        else return LV_BTN_STATE_RELEASED;
     }
 }
 

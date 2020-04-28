@@ -36,13 +36,13 @@ extern "C" {
 /** Possible states of a button.
  * It can be used not only by buttons but other button-like objects too*/
 enum {
-    LV_BTN_STATE_ACTIVE,
     LV_BTN_STATE_RELEASED,
     LV_BTN_STATE_PRESSED,
+    LV_BTN_STATE_DISABLED,
     LV_BTN_STATE_CHECKED_RELEASED,
     LV_BTN_STATE_CHECKED_PRESSED,
-    _LV_BTN_STATE_LAST = LV_BTN_STATE_CHECKED_PRESSED + 1, /* Number of states*/
-    LV_BTN_STATE_DISABLED = 0x80
+    LV_BTN_STATE_CHECKED_DISABLED,
+    _LV_BTN_STATE_LAST, /* Number of states*/
 };
 typedef uint8_t lv_btn_state_t;
 
