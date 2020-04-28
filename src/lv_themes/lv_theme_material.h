@@ -46,7 +46,7 @@ typedef enum {
  * @return a pointer to reference this theme later
  */
 lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_secondary, uint32_t flags,
-                                    lv_font_t * font_small, lv_font_t * font_normal, lv_font_t * font_subtitle, lv_font_t * font_title);
+        const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle, const lv_font_t * font_title);
 /**********************
  *      MACROS
  **********************/

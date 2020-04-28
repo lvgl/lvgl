@@ -57,7 +57,7 @@ static lv_style_t opa_cover;
  * @return a pointer to reference this theme later
  */
 lv_theme_t * lv_theme_empty_init(lv_color_t color_primary, lv_color_t color_secondary, uint32_t flags,
-                                 lv_font_t * font_small, lv_font_t * font_normal, lv_font_t * font_subtitle, lv_font_t * font_title)
+        const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle, const lv_font_t * font_title)
 {
     lv_style_init(&opa_cover);
     lv_style_set_bg_opa(&opa_cover, LV_STATE_DEFAULT, LV_OPA_COVER);
