@@ -272,7 +272,7 @@ void lv_style_list_add_style(lv_style_list_t * list, lv_style_t * style);
  * @param style_list pointer to a style list
  * @param style pointer to a style to remove
  */
-void lv_style_list_remove_style(lv_style_list_t *, lv_style_t *);
+void lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * style);
 
 /**
  * Remove all styles added from style list, clear the local style, transition style and free all allocated memories.
