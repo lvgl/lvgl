@@ -182,6 +182,11 @@ typedef void * lv_group_user_data_t;
 e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #define LV_GPU_DMA2D_CMSIS_INCLUDE
 
+/* 1: Select PXP device for accleration on NXP RTxxx platforms. */
+#define LV_USE_GPU_NXP_PXP      0
+/* 1: Add default bare metal and FreeRTOS interrupt handling routines for PXP (lv_gpu_nxp_pxp_osa.c) */
+#define LV_USE_GPU_NXP_PXP_DEFAULT_OSA 0
+
 /* 1: Enable file system (might be required for images */
 #define LV_USE_FILESYSTEM       1
 #if LV_USE_FILESYSTEM
