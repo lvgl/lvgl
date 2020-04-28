@@ -117,7 +117,7 @@ void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options);
  * @param ddlist pointer to drop down list object
  * @param options a static string with '\n' separated options. E.g. "One\nTwo\nThree"
  */
-void lv_dropdown_set_static_options(lv_obj_t * ddlist, const char * options);
+void lv_dropdown_set_options_static(lv_obj_t * ddlist, const char * options);
 
 /**
  * Add an options to a drop down list from a string.  Only works for dynamic options.

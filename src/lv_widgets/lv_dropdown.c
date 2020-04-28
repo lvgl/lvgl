@@ -124,7 +124,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new drop down list drop down list*/
     if(copy == NULL) {
         lv_obj_set_width(ddlist, LV_DPX(150));
-        lv_dropdown_set_static_options(ddlist, "Option 1\nOption 2\nOption 3");
+        lv_dropdown_set_options_static(ddlist, "Option 1\nOption 2\nOption 3");
         lv_theme_apply(ddlist, LV_THEME_DROPDOWN);
     }
     /*Copy an existing drop down list*/
@@ -133,7 +133,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
         if(copy_ext->static_txt == 0)
             lv_dropdown_set_options(ddlist, lv_dropdown_get_options(copy));
         else
-            lv_dropdown_set_static_options(ddlist, lv_dropdown_get_options(copy));
+            lv_dropdown_set_options_static(ddlist, lv_dropdown_get_options(copy));
         ext->option_cnt        = copy_ext->option_cnt;
         ext->sel_opt_id     = copy_ext->sel_opt_id;
         ext->sel_opt_id_orig = copy_ext->sel_opt_id;
@@ -238,7 +238,7 @@ void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options)
  * @param ddlist pointer to drop down list object
  * @param options a staic string with '\n' separated options. E.g. "One\nTwo\nThree"
  */
-void lv_dropdown_set_static_options(lv_obj_t * ddlist, const char * options)
+void lv_dropdown_set_options_static(lv_obj_t * ddlist, const char * options)
 {
     LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
     LV_ASSERT_STR(options);
@@ -612,7 +612,7 @@ void lv_dropdown_open(lv_obj_t * ddlist)
     lv_page_set_scrl_fit(ext->page, LV_FIT_TIGHT);
 
     lv_obj_t * label = lv_label_create(ext->page, NULL);
-    lv_label_set_static_text(label, ext->options);
+    lv_label_set_text_static(label, ext->options);
 
     lv_cont_set_fit2(ext->page, LV_FIT_TIGHT, LV_FIT_NONE);
     lv_coord_t label_h = lv_obj_get_height(label);

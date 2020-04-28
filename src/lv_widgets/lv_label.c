@@ -140,7 +140,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
         if(copy_ext->static_txt == 0)
             lv_label_set_text(new_label, lv_label_get_text(copy));
         else
-            lv_label_set_static_text(new_label, lv_label_get_text(copy));
+            lv_label_set_text_static(new_label, lv_label_get_text(copy));
 
         /*In DOT mode save the text byte-to-byte because a '\0' can be in the middle*/
         if(copy_ext->long_mode == LV_LABEL_LONG_DOT) {
@@ -316,7 +316,7 @@ void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size
  * @param label pointer to a label object
  * @param text pointer to a text. NULL to refresh with the current text.
  */
-void lv_label_set_static_text(lv_obj_t * label, const char * text)
+void lv_label_set_text_static(lv_obj_t * label, const char * text)
 {
     LV_ASSERT_OBJ(label, LV_OBJX_NAME);
 

@@ -124,12 +124,12 @@ void lv_checkbox_set_text(lv_obj_t * cb, const char * txt)
  * @param cb pointer to a check box
  * @param txt the text of the check box. NULL to refresh with the current text.
  */
-void lv_checkbox_set_static_text(lv_obj_t * cb, const char * txt)
+void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt)
 {
     LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
 
     lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
-    lv_label_set_static_text(ext->label, txt);
+    lv_label_set_text_static(ext->label, txt);
 }
 
 /*=====================

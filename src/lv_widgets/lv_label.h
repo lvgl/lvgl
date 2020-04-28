@@ -150,7 +150,7 @@ void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size
  * @param label pointer to a label object
  * @param text pointer to a text. NULL to refresh with the current text.
  */
-void lv_label_set_static_text(lv_obj_t * label, const char * text);
+void lv_label_set_text_static(lv_obj_t * label, const char * text);
 
 /**
  * Set the behavior of the label with longer text then the object size
