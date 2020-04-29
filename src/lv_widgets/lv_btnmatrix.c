@@ -1141,12 +1141,31 @@ static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p)
     uint16_t i;
     lv_obj_get_coords(btnm, &btnm_cords);
 
+    lv_coord_t w = lv_obj_get_width(btnm);
+    lv_coord_t h = lv_obj_get_height(btnm);
+    lv_style_int_t pleft = lv_obj_get_style_pad_left(btnm, LV_BTNMATRIX_PART_BG);
+    lv_style_int_t pright = lv_obj_get_style_pad_right(btnm, LV_BTNMATRIX_PART_BG);
+    lv_style_int_t ptop = lv_obj_get_style_pad_top(btnm, LV_BTNMATRIX_PART_BG);
+    lv_style_int_t pbottom = lv_obj_get_style_pad_bottom(btnm, LV_BTNMATRIX_PART_BG);
+    lv_style_int_t pinner = lv_obj_get_style_pad_inner(btnm, LV_BTNMATRIX_PART_BG);
+
+    /*Get the half inner padding. Button look larger with this value. (+1 for rounding error)*/
+    pinner = (pinner / 2) + 1 + (pinner & 1);
+
     for(i = 0; i < ext->btn_cnt; i++) {
         lv_area_copy(&btn_area, &ext->button_areas[i]);
-        btn_area.x1 += btnm_cords.x1;
-        btn_area.y1 += btnm_cords.y1;
-        btn_area.x2 += btnm_cords.x1;
-        btn_area.y2 += btnm_cords.y1;
+        if(btn_area.x1 <= pleft) btn_area.x1 = btnm_cords.x1;
+        else btn_area.x1 += btnm_cords.x1 - pinner;
+
+        if(btn_area.y1 <= ptop) btn_area.y1 = btnm_cords.y1;
+        else btn_area.y1 += btnm_cords.y1 - pinner;
+
+        if(btn_area.x2 >= w - pright - 2) btn_area.x2 = btnm_cords.x2;  /*-2 for rounding error*/
+        else btn_area.x2 += btnm_cords.x1 + pinner;
+
+        if(btn_area.y2 >= h - pbottom - 2) btn_area.y2 = btnm_cords.y2; /*-2 for rounding error*/
+        else btn_area.y2 += btnm_cords.y1 + pinner;
+
         if(lv_area_is_point_on(&btn_area, p, 0) != false) {
             break;
         }
