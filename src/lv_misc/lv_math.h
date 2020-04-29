@@ -74,6 +74,14 @@ uint16_t lv_atan2(int x, int y);
  */
 uint32_t lv_sqrt(uint32_t num);
 
+/**
+ * Calculate the integer exponents.
+ * @param base
+ * @param power
+ * @return base raised to the power exponent
+ */
+int64_t lv_pow(int64_t base, int8_t exp);
+
 /**********************
  *      MACROS
  **********************/

@@ -32,7 +32,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_SPINBOX_MAX_DIGIT_COUNT 16
+#define LV_SPINBOX_MAX_DIGIT_COUNT 10
 
 /**********************
  *      TYPEDEFS
