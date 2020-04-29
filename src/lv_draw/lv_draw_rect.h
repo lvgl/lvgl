@@ -84,7 +84,7 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
 
 /**
  * Draw a rectangle

@@ -24,11 +24,11 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
                            lv_draw_line_dsc_t * dsc);
-static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
                           lv_draw_line_dsc_t * dsc);
-static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
                           lv_draw_line_dsc_t * dsc);
 
 /**********************
@@ -43,7 +43,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
 {
     lv_memset_00(dsc, sizeof(lv_draw_line_dsc_t));
     dsc->width = 1;
@@ -59,7 +59,7 @@ void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
  * @param style pointer to a line's style
  * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
                   lv_draw_line_dsc_t * dsc)
 {
     if(dsc->width == 0) return;
@@ -115,7 +115,7 @@ void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv
  *   STATIC FUNCTIONS
  **********************/
 
-static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
                           lv_draw_line_dsc_t * dsc)
 {
     lv_opa_t opa = dsc->opa;
@@ -215,7 +215,7 @@ static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, 
 }
 
 
-static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
                           lv_draw_line_dsc_t * dsc)
 {
     lv_opa_t opa = dsc->opa;
@@ -309,7 +309,7 @@ static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, 
 }
 
 
-static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
+LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
                            lv_draw_line_dsc_t * dsc)
 {
     /*Keep the great y in p1*/

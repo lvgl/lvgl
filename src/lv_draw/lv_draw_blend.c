@@ -31,7 +31,7 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
                         lv_color_t color, lv_opa_t opa,
                         const lv_opa_t * mask, lv_draw_mask_res_t mask_res);
 
-static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
+LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                         lv_color_t color, lv_opa_t opa,
                         const lv_opa_t * mask, lv_draw_mask_res_t mask_res);
 
@@ -43,7 +43,7 @@ static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
                        const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
                        const lv_opa_t * mask, lv_draw_mask_res_t mask_res);
 
-static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
+LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                        const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
                        const lv_opa_t * mask, lv_draw_mask_res_t mask_res);
 
@@ -115,7 +115,7 @@ mask_tmp_x++;
  * @param opa
  * @param mode
  */
-void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
+LV_ATTRIBUTE_FAST_MEM void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
                    lv_color_t color, lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_opa_t opa,
                    lv_blend_mode_t mode)
 {
@@ -169,7 +169,7 @@ void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
 }
 
 
-void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const lv_color_t * map_buf,
+LV_ATTRIBUTE_FAST_MEM void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area, const lv_color_t * map_buf,
                   lv_opa_t * mask, lv_draw_mask_res_t mask_res,
                   lv_opa_t opa, lv_blend_mode_t mode)
 {
@@ -262,7 +262,7 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
     }
 }
 
-static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
+LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                         lv_color_t color, lv_opa_t opa,
                         const lv_opa_t * mask, lv_draw_mask_res_t mask_res)
 {
@@ -598,7 +598,7 @@ static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
 }
 
 
-static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
+LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                        const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
                        const lv_opa_t * mask, lv_draw_mask_res_t mask_res)
 {

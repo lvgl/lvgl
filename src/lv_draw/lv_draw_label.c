@@ -32,9 +32,9 @@ typedef uint8_t cmd_state_t;
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const lv_font_t * font_p,
+LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const lv_font_t * font_p,
                            uint32_t letter, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
-static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
+LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                                const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
@@ -87,7 +87,7 @@ const uint8_t _lv_bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 1
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
 {
     lv_memset_00(dsc, sizeof(lv_draw_label_dsc_t));
     dsc->opa = LV_OPA_COVER;
@@ -106,7 +106,7 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
  * @param dsc pointer to draw descriptor
  * @param txt `\0` terminated text to write
  */
-void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
+LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
                    const char * txt, lv_draw_label_hint_t * hint)
 {
 
@@ -390,7 +390,7 @@ void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_lab
  * @param color color of letter
  * @param opa opacity of letter (0..255)
  */
-static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const lv_font_t * font_p,
+LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const lv_font_t * font_p,
                            uint32_t letter,
                            lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
@@ -443,7 +443,7 @@ static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area
 }
 
 
-static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
+LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                                const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     const uint8_t * bpp_opa_table_p;

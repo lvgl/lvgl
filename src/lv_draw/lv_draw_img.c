@@ -25,10 +25,10 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
+LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
                                  lv_draw_img_dsc_t * draw_dsc);
 
-static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p,
+LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p,
                         lv_draw_img_dsc_t * draw_dsc,
                         bool chroma_key, bool alpha_byte);
 
@@ -228,7 +228,7 @@ lv_img_src_t lv_img_src_get_type(const void * src)
  *   STATIC FUNCTIONS
  **********************/
 
-static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
+LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
                                  lv_draw_img_dsc_t * draw_dsc)
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
@@ -333,7 +333,7 @@ static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mas
  * @param zoom zoom factor
  * @param antialias anti-alias transformations (rotate, zoom) or not
  */
-static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p,
+LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p,
                         lv_draw_img_dsc_t * draw_dsc, bool chroma_key, bool alpha_byte)
 {
     /* Use the clip area as draw area*/

@@ -64,7 +64,7 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
 
 /**
  * Write a text
@@ -73,7 +73,7 @@ void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
  * @param dsc pointer to draw descriptor
  * @param txt `\0` terminated text to write
  */
-void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
+LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
                    const char * txt, lv_draw_label_hint_t * hint);
 
 /***********************

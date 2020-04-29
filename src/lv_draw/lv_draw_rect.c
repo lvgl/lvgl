@@ -28,14 +28,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
-static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
 static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
-static inline lv_color_t grad_get(lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
+LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
 #if LV_USE_SHADOW
-static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
-static void shadow_draw_corner_buf(const lv_area_t * coords,  uint16_t * sh_buf, lv_coord_t s, lv_coord_t r);
-static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf);
+LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords,  uint16_t * sh_buf, lv_coord_t s, lv_coord_t r);
+LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf);
 #endif
 static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
 static void draw_value(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
@@ -57,7 +57,7 @@ static int32_t sh_cache_r = -1;
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
 {
     lv_memset_00(dsc, sizeof(lv_draw_rect_dsc_t));
     dsc->bg_color = LV_COLOR_WHITE;
@@ -137,7 +137,7 @@ void lv_draw_px(const lv_point_t * point, const lv_area_t * clip_area, const lv_
  *   STATIC FUNCTIONS
  **********************/
 
-static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
 {
     if(dsc->bg_opa <= LV_OPA_MIN) return;
 
@@ -346,7 +346,7 @@ static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_re
 
 }
 
-static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
 {
     if(dsc->border_opa <= LV_OPA_MIN) return;
     if(dsc->border_width == 0) return;
@@ -559,7 +559,7 @@ static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_dra
     lv_mem_buf_release(mask_buf);
 }
 
-static inline lv_color_t grad_get(lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i)
+LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i)
 {
     int32_t min = (dsc->bg_main_color_stop * s) >> 8;
     if(i <= min) return dsc->bg_color;
@@ -575,7 +575,7 @@ static inline lv_color_t grad_get(lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coo
 }
 
 #if LV_USE_SHADOW
-static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
 {
     /*Check whether the shadow is visible*/
     if(dsc->shadow_width == 0) return;
@@ -1042,7 +1042,7 @@ static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_dra
  * @param sw shadow width
  * @param r radius
  */
-static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, lv_coord_t sw, lv_coord_t r)
+LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, lv_coord_t sw, lv_coord_t r)
 {
     int32_t sw_ori = sw;
     int32_t size = sw_ori  + r;
@@ -1125,7 +1125,7 @@ static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, 
 
 }
 
-static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf)
+LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf)
 {
     int32_t s_left = sw >> 1;
     int32_t s_right = (sw >> 1);

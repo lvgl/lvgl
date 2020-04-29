@@ -46,10 +46,10 @@ typedef struct {
  * @param style pointer to a line's style
  * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * mask,
+LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * mask,
                   lv_draw_line_dsc_t * dsc);
 
-void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
 
 /**********************
  *      MACROS
