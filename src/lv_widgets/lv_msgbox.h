@@ -120,14 +120,6 @@ void lv_msgbox_start_auto_close(lv_obj_t * mbox, uint16_t delay);
 void lv_msgbox_stop_auto_close(lv_obj_t * mbox);
 
 /**
- * Set a style of a message box
- * @param mbox pointer to a message box object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_msgbox_set_style(lv_obj_t * mbox, lv_msgbox_style_t type, const lv_style_t * style);
-
-/**
  * Set whether recoloring is enabled. Must be called after `lv_msgbox_add_btns`.
  * @param btnm pointer to button matrix object
  * @param en whether recoloring is enabled

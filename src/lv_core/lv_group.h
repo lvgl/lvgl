@@ -148,20 +148,6 @@ void lv_group_focus_freeze(lv_group_t * group, bool en);
 lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c);
 
 /**
- * Set a function for a group which will modify the object's style if it is in focus
- * @param group pointer to a group
- * @param style_mod_cb the style modifier function pointer
- */
-void lv_group_set_style_mod_cb(lv_group_t * group, lv_group_style_mod_cb_t style_mod_cb);
-
-/**
- * Set a function for a group which will modify the object's style if it is in focus in edit mode
- * @param group pointer to a group
- * @param style_mod_edit_cb the style modifier function pointer
- */
-void lv_group_set_style_mod_edit_cb(lv_group_t * group, lv_group_style_mod_cb_t style_mod_edit_cb);
-
-/**
  * Set a function for a group which will be called when a new object is focused
  * @param group pointer to a group
  * @param focus_cb the call back function or NULL if unused
@@ -221,20 +207,6 @@ lv_obj_t * lv_group_get_focused(const lv_group_t * group);
 lv_group_user_data_t * lv_group_get_user_data(lv_group_t * group);
 
 #endif
-
-/**
- * Get a the style modifier function of a group
- * @param group pointer to a group
- * @return pointer to the style modifier function
- */
-lv_group_style_mod_cb_t lv_group_get_style_mod_cb(const lv_group_t * group);
-
-/**
- * Get a the style modifier function of a group in edit mode
- * @param group pointer to a group
- * @return pointer to the style modifier function
- */
-lv_group_style_mod_cb_t lv_group_get_style_mod_edit_cb(const lv_group_t * group);
 
 /**
  * Get the focus callback function of a group

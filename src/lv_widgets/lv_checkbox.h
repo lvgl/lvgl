@@ -106,14 +106,6 @@ static inline void lv_checkbox_set_disabled(lv_obj_t * cb)
     lv_btn_set_state(cb, LV_BTN_STATE_DISABLED);
 }
 
-/**
- * Set a style of a check box
- * @param cb pointer to check box object
- * @param type which style should be set
- * @param style pointer to a style
- *  */
-void lv_checkbox_set_style(lv_obj_t * cb, lv_checkbox_style_t type, const lv_style_t * style);
-
 /*=====================
  * Getter functions
  *====================*/

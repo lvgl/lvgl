@@ -115,14 +115,6 @@ void lv_btnmatrix_set_ctrl_map(lv_obj_t * btnm, const lv_btnmatrix_ctrl_t ctrl_m
 void lv_btnmatrix_set_focused_btn(lv_obj_t * btnm, uint16_t id);
 
 /**
- * Set a style of a button matrix
- * @param btnm pointer to a button matrix object
- * @param type which style should be set
- * @param style pointer to a style
- */
-void lv_btnmatrix_set_style(lv_obj_t * btnm, lv_btnmatrix_part_t type, const lv_style_t * style);
-
-/**
  * Enable recoloring of button's texts
  * @param btnm pointer to button matrix object
  * @param en true: enable recoloring; false: disable

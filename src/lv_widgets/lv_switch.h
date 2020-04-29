@@ -91,22 +91,6 @@ void lv_switch_off(lv_obj_t * sw, lv_anim_enable_t anim);
 bool lv_switch_toggle(lv_obj_t * sw, lv_anim_enable_t anim);
 
 /**
- * Set an image to display on the knob of the switch.
- * @param sw pointer to a switch object
- * @param img_src pointer to an `lv_img_dsc_t` variable or a path to an image
- *        (not an `lv_img` object)
- */
-void lv_switch_set_knob_img(lv_obj_t * sw, const void * img_src);
-
-/**
- * Set an image to display on the knob of the switch when it's in ON state
- * @param sw pointer to a switch object
- * @param img_src pointer to an `lv_img_dsc_t` variable or a path to an image
- *        (not an `lv_img` object)
- */
-void lv_switch_set_knob_on_img(lv_obj_t * sw, const void * img_src);
-
-/**
  * Set the animation time of the switch
  * @param sw pointer to a  switch object
  * @param anim_time animation time
@@ -131,21 +115,7 @@ static inline bool lv_switch_get_state(const lv_obj_t * sw)
     lv_switch_ext_t * ext = (lv_switch_ext_t *)lv_obj_get_ext_attr(sw);
     return ext->state ? true : false;
 }
-/**
- * Get an image to display on the knob of the switch when it's in OFF state
- * @param sw pointer to a switch object
- * @return the image source: pointer to an `lv_img_dsc_t` variable or a path to an image
- *         (not an `lv_img` object)
- */
-const void * lv_slider_get_knob_off_img(lv_obj_t * sw, const void * img_src);
 
-/**
- * Get an image to display on the knob of the switch when it's in ON state
- * @param sw pointer to a switch object
- * @return the image source: pointer to an `lv_img_dsc_t` variable or a path to an image
- *         (not an `lv_img` object)
- */
-const void * lv_slider_get_knob_on_img(lv_obj_t * sw, const void * img_src);
 /**
  * Get the animation time of the switch
  * @param sw pointer to a  switch object

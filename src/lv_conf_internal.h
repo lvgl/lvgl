@@ -525,6 +525,9 @@
 #ifndef LV_FONT_MONTSERRAT_28_COMPRESSED
 #define LV_FONT_MONTSERRAT_28_COMPRESSED 0  /*bpp = 3*/
 #endif
+#ifndef LV_FONT_SIMSUN_16_CJK
+#define LV_FONT_SIMSUN_16_CJK            0  /*1000 most common CJK radicals*/
+#endif
 
 /*Pixel perfect monospace font
  * http://pelulamu.net/unscii/ */

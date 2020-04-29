@@ -212,13 +212,6 @@ lv_color_t lv_cpicker_get_color(lv_obj_t * cpicker);
  */
 bool lv_cpicker_get_knob_colored(lv_obj_t * cpicker);
 
-/**
- *  Whether the preview is enabled or not
- * @param cpicker pointer to colorpicker object
- * @return en true: preview is enabled; false: preview is disabled
- */
-bool lv_cpicker_get_preview(lv_obj_t * cpicker);
-
 /*=====================
  * Other functions
  *====================*/

@@ -186,13 +186,6 @@ const char * lv_win_get_title(const lv_obj_t * win);
 lv_obj_t * lv_win_get_content(const lv_obj_t * win);
 
 /**
- * Get the control button size of a window
- * @param win pointer to a window object
- * @return control button size
- */
-lv_coord_t lv_win_get_btn_size(const lv_obj_t * win);
-
-/**
  * Get the header height
  * @param win pointer to a window object
  * @return header height

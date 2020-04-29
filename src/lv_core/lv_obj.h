@@ -1198,20 +1198,6 @@ bool lv_obj_get_gesture_parent(const lv_obj_t * obj);
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj);
 
 /**
- * Get the opa scale enable parameter
- * @param obj pointer to an object
- * @return true: opa scaling is enabled for this object and all children; false: no opa scaling
- */
-lv_opa_t lv_obj_get_opa_scale_enable(const lv_obj_t * obj);
-
-/**
- * Get the opa scale parameter of an object
- * @param obj pointer to an object
- * @return opa scale [0..255]
- */
-lv_opa_t lv_obj_get_opa_scale(const lv_obj_t * obj);
-
-/**
  * Get the protect field of an object
  * @param obj pointer to an object
  * @return protect field ('OR'ed values of `lv_protect_t`)
