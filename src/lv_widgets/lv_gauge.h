@@ -35,7 +35,7 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef void (*lv_gauge_format_cb_t)(lv_obj_t * gauge, char buf[], int bufsize, int32_t value);
+typedef void (*lv_gauge_format_cb_t)(lv_obj_t * gauge, char * buf, int bufsize, int32_t value);
 
 /*Data of gauge*/
 typedef struct {
