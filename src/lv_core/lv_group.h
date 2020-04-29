@@ -184,14 +184,6 @@ void lv_group_set_click_focus(lv_group_t * group, bool en);
 void lv_group_set_wrap(lv_group_t * group, bool en);
 
 /**
- * Modify a style with the set 'style_mod' function. The input style remains unchanged.
- * @param group pointer to group
- * @param style pointer to a style to modify
- * @return a copy of the input style but modified with the 'style_mod' function
- */
-lv_style_t * lv_group_mod_style(lv_group_t * group, const lv_style_t * style);
-
-/**
  * Get the focused object or NULL if there isn't one
  * @param group pointer to a group
  * @return pointer to the focused object
