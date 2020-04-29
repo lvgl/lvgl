@@ -89,12 +89,6 @@ typedef uint8_t lv_tabview_part_t;
  */
 lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy);
 
-/**
- * Delete all children of the scrl object, without deleting scrl child.
- * @param tabview pointer to an object
- */
-void lv_tabview_clean(lv_obj_t * tabview);
-
 /*======================
  * Add/remove functions
  *=====================*/
@@ -106,6 +100,12 @@ void lv_tabview_clean(lv_obj_t * tabview);
  * @return pointer to the created page object (lv_page). You can create your content here
  */
 lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name);
+
+/**
+ * Delete all children of a tab created by `lv_tabview_add_tab`.
+ * @param tab pointer to a tab
+ */
+void lv_tabview_clean_tab(lv_obj_t * tab);
 
 /*=====================
  * Setter functions

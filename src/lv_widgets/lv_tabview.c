@@ -194,18 +194,6 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
     return tabview;
 }
 
-/**
- * Delete all children of the scrl object, without deleting scrl child.
- * @param tabview pointer to an object
- */
-void lv_tabview_clean(lv_obj_t * tabview)
-{
-    LV_ASSERT_OBJ(tabview, LV_OBJX_NAME);
-
-    lv_obj_t * scrl = lv_page_get_scrl(tabview);
-    lv_obj_clean(scrl);
-}
-
 /*======================
  * Add/remove functions
  *=====================*/
@@ -308,6 +296,18 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     lv_tabview_set_tab_act(tabview, ext->tab_cur, false);
 
     return h;
+}
+
+/**
+ * Delete all children of a tab created by `lv_tabview_add_tab`.
+ * @param tab pointer to a tab
+ */
+void lv_tabview_clean_tab(lv_obj_t * tab)
+{
+    LV_ASSERT_OBJ(tab, "lv_page");
+
+    lv_obj_t * scrl = lv_page_get_scrl(tab);
+    lv_obj_clean(scrl);
 }
 
 /*=====================
