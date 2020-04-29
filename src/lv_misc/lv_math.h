@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../lv_conf_internal.h"
 #include <stdint.h>
 
 /*********************
@@ -62,7 +63,7 @@ typedef struct {
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-int16_t lv_trigo_sin(int16_t angle);
+LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_sin(int16_t angle);
 
 /**
  * Calculate a value of a Cubic Bezier function.
@@ -93,7 +94,7 @@ uint16_t lv_atan2(int x, int y);
  * If root < 256: mask = 0x800
  * Else: mask = 0x8000
  */
-void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask);
+LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask);
 
 /**********************
  *      MACROS

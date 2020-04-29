@@ -104,6 +104,11 @@ typedef struct _disp_drv_t {
      * number of flushed pixels */
     void (*monitor_cb)(struct _disp_drv_t * disp_drv, uint32_t time, uint32_t px);
 
+    /** OPTIONAL: Called periodically while lvgl waits for operation to be completed.
+     * For example flushing or GPU
+     * User can execute very simple tasks here or yield the task */
+    void (*wait_cb)(struct _disp_drv_t * disp_drv);
+
 #if LV_USE_GPU
     /** OPTIONAL: Blend two memories using opacity (GPU only)*/
     void (*gpu_blend_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length,

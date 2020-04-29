@@ -50,7 +50,7 @@ static const int16_t sin0_90_table[] = {
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-int16_t lv_trigo_sin(int16_t angle)
+LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_sin(int16_t angle)
 {
     int16_t ret = 0;
     angle       = angle % 360;
@@ -111,7 +111,7 @@ int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
  * If root < 256: mask = 0x800
  * Else: mask = 0x8000
  */
-void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
+LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
 {
     x = x << 8; /*To get 4 bit precision. (sqrt(256) = 16 = 4 bit)*/
 

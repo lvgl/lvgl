@@ -263,6 +263,9 @@
 #ifndef LV_USE_GPU
 #define LV_USE_GPU              1
 #endif
+#ifndef LV_USE_GPU_STM32_DMA2D
+#define LV_USE_GPU_STM32_DMA2D  0
+#endif
 
 /* 1: Enable file system (might be required for images */
 #ifndef LV_USE_FILESYSTEM
@@ -337,6 +340,12 @@
  * font's bitmaps */
 #ifndef LV_ATTRIBUTE_LARGE_CONST
 #define LV_ATTRIBUTE_LARGE_CONST
+#endif
+
+/* Prefix performance critical functions to place them into a faster memory (e.g RAM)
+ * Uses 15-20 kB extra memory */
+#ifndef LV_ATTRIBUTE_FAST_MEM
+#define LV_ATTRIBUTE_FAST_MEM
 #endif
 
 /* Export integer constant to binding.

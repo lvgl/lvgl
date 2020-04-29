@@ -177,6 +177,7 @@ typedef void * lv_group_user_data_t;
 
 /* 1: Enable GPU interface*/
 #define LV_USE_GPU              1
+#define LV_USE_GPU_STM32_DMA2D  0
 
 /* 1: Enable file system (might be required for images */
 #define LV_USE_FILESYSTEM       1
@@ -232,6 +233,10 @@ typedef void * lv_img_decoder_user_data_t;
 /* Attribute to mark large constant arrays for example
  * font's bitmaps */
 #define LV_ATTRIBUTE_LARGE_CONST
+
+/* Prefix performance critical functions to place them into a faster memory (e.g RAM)
+ * Uses 15-20 kB extra memory */
+#define LV_ATTRIBUTE_FAST_MEM
 
 /* Export integer constant to binding.
  * This macro is used with constants in the form of LV_<CONST> that

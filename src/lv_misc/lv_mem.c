@@ -537,7 +537,7 @@ void lv_mem_buf_free_all(void)
  * @param src pointer to the source buffer
  * @param len number of byte to copy
  */
-void * lv_memcpy(void * dst, const void * src, size_t len)
+LV_ATTRIBUTE_FAST_MEM void * lv_memcpy(void * dst, const void * src, size_t len)
 {
     uint8_t * d8 = dst;
     const uint8_t * s8 = src;
@@ -602,7 +602,7 @@ void * lv_memcpy(void * dst, const void * src, size_t len)
  * @param v value to set [0..255]
  * @param len number of byte to set
  */
-void lv_memset(void * dst, uint8_t v, size_t len)
+LV_ATTRIBUTE_FAST_MEM void lv_memset(void * dst, uint8_t v, size_t len)
 {
 
     uint8_t * d8 = (uint8_t *) dst;
@@ -656,7 +656,7 @@ void lv_memset(void * dst, uint8_t v, size_t len)
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
-void lv_memset_00(void * dst, size_t len)
+LV_ATTRIBUTE_FAST_MEM void lv_memset_00(void * dst, size_t len)
 {
     uint8_t * d8 = (uint8_t *) dst;
     uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;
@@ -706,7 +706,7 @@ void lv_memset_00(void * dst, size_t len)
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
-void lv_memset_ff(void * dst, size_t len)
+LV_ATTRIBUTE_FAST_MEM void lv_memset_ff(void * dst, size_t len)
 {
     uint8_t * d8 = (uint8_t *) dst;
     uintptr_t d_align = (lv_uintptr_t) d8 & ALIGN_MASK;

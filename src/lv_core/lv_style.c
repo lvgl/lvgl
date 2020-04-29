@@ -35,7 +35,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop);
+LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop);
 static lv_style_t * get_alloc_local_style(lv_style_list_t * list);
 
 /**********************
@@ -1015,7 +1015,7 @@ lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop,
  * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
  * @return
  */
-static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop)
+LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop)
 {
     LV_ASSERT_STYLE(style);
 
