@@ -394,6 +394,7 @@ typedef void * lv_font_user_data_t;
 #define LV_USE_THEME_MATERIAL    1   /*A fast and impressive theme*/
 #define LV_USE_THEME_MONO        0   /*Mono-color theme for monochrome displays*/
 
+#define LV_THEME_DEFAULT_INCLUDE            <stdint.h>      /*Include a header for the init. function*/
 #define LV_THEME_DEFAULT_INIT               lv_theme_material_init
 #define LV_THEME_DEFAULT_COLOR_PRIMARY      LV_COLOR_RED
 #define LV_THEME_DEFAULT_COLOR_SECONDARY    LV_COLOR_BLUE

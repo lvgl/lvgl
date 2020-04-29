@@ -36,6 +36,8 @@
     #include LV_USER_DATA_FREE_INCLUDE
 #endif /* LV_USE_USER_DATA_FREE */
 
+#include LV_THEME_DEFAULT_INCLUDE
+
 /*********************
  *      DEFINES
  *********************/

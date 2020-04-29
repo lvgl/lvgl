@@ -589,6 +589,9 @@
 #define LV_USE_THEME_MONO        0   /*Mono-color theme for monochrome displays*/
 #endif
 
+#ifndef LV_THEME_DEFAULT_INCLUDE
+#define LV_THEME_DEFAULT_INCLUDE            <stdint.h>      /*Include a header for the init. function*/
+#endif
 #ifndef LV_THEME_DEFAULT_INIT
 #define LV_THEME_DEFAULT_INIT               lv_theme_material_init
 #endif
