@@ -38,8 +38,8 @@ As part of these updates, a lot of objects were reworked and the APIs have been 
 - more shadows options: *offset* and *spread*
 - gradient stop position to shift the gradient area and horizontal gradient 
 - `LV_BLEND_MODE_NORMAL/ADDITIVE/SUBTRACTIVE` blending modes
-- *clip_corner* to crop the content on the rounded corners
-- *text underline and strikethrough*
+- *clip corner*: crop the content on the rounded corners
+- *text underline* and *strikethrough*
 - dashed vertical and horizontal lines (*dash gap*, *dash_width*)
 - *outline*: a border-like part drawn out of the background. Can have spacing to the background.
 - *pattern*: display and image in the middle of the background or repeat it
