@@ -93,6 +93,8 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_obj_set_size(new_win, w, h);
 
+        ext->btn_w = LV_DPX(65);
+
         ext->page = lv_page_create(new_win, NULL);
         lv_obj_add_protect(ext->page, LV_PROTECT_PARENT);
         lv_page_set_scrlbar_mode(ext->page, LV_SCRLBAR_MODE_AUTO);
@@ -119,6 +121,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->title_txt    = lv_mem_alloc(strlen(copy_ext->title_txt) + 1);
         strcpy(ext->title_txt, copy_ext->title_txt);
         ext->page     = lv_page_create(new_win, copy_ext->page);
+        ext->btn_w     = copy_ext->btn_w;
 
         /*Copy the buttons*/
         lv_obj_t * child;
