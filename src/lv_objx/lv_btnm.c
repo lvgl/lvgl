@@ -447,7 +447,7 @@ void lv_btnm_set_btn_width(const lv_obj_t * btnm, uint16_t btn_id, uint8_t width
 /**
  * Make the button matrix like a selector widget (only one button may be toggled at a time).
  *
- * Toggling must be enabled on the buttons you want to be selected with `lv_btnm_set_ctrl` or
+ * Toggling must be enabled on the buttons you want to be selected with `lv_btnm_set_btn_ctrl` or
  * `lv_btnm_set_btn_ctrl_all`.
  *
  * @param btnm Button matrix object
