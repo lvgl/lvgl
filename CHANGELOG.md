@@ -1,7 +1,7 @@
 # Changelog
 
 ## v7.0.0 - under development
-Use the `dev-7.0` branch until the release.
+To try the new version use the `dev-7.0` branch of LVGL and the [Simulator](https://github.com/littlevgl/lv_sim_eclipse_sdl/tree/dev-7.0).
 
 ### Documentation
 The docs for v7 is available at https://docs.littlevgl.com/v7/en/html/index.html
@@ -106,6 +106,5 @@ The following object types are renamed:
 - First and foremost, create a new `lv_conf.h` based on `lv_conf_templ.h`.
 - To try the new version it suggested to use a simulator project and see the examples.
 - If you have a running project, the most difficult part of the migration is updating to the new style system. Unfortunately, there is no better way than manually updating to the new format.
-- 
-The other parts are mainly minor renames and refactoring. 
+- The other parts are mainly minor renames and refactoring as described above. 
 
