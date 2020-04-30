@@ -71,16 +71,16 @@ The following object types are renamed:
 - LV_LAYOUT_ROW_T/M/B -> LV_LAYOUT_ROW_TOP/MID/BOTTOM
 
 ### Reworked and improved object
-- dropdown: Completely reworked. Now creates a separate list when opened and can be dropped to down/up/left/right.
-- label: body_draw is removed, instead, if its style has a visible background/border/shadow etc it will be drawn. Padding really makes the object larger (not just virtually as before)
-- arc: got a bg_arc property to draw a background arc too.
-- btn: doesn't store styles for each state because it's done naturally in the new style system.
-- calendar: highlight the pressed datum. The used styles are changed: use LV_CALENDAR_PART_DATE normal for normal dates, checked for highlighted, focused for today, pressed for the being pressed. (checked+pressed, focused+pressed also work)
-- chart: only has LINE and COLUMN types because with new styles all the others can be described. LV_CHART_PART_SERIES sets the style of the series. bg_opa > 0 draws an area in LINE mode. LV_CHART_PART_SERIES_BG also added to set a different style for the series area. Padding in LV_CHART_PART_BG makes the series area smaller, and it ensures space for axis labels/numbers.
-- linemeter, gauge: can have background if the related style properties are set. Padding makes the scale/lines smaller. scale_border_width and scale_end_border_width allow to draw an arc on the outer part of the scale lines.
-- gauge: `lv_gauge_set_needle_img` allows use image as needle
-- canvas: allow drawing to true color alpha and alpha only canvas, add `lv_canvas_blur_hor/ver` and rename `lv_canvas_rotate` to `lv_canvas_transform`
-- textarea: If available in the font use bullet (`U+2022`) character in text area password 
+- `dropdown`: Completely reworked. Now creates a separate list when opened and can be dropped to down/up/left/right.
+- `label`: `body_draw` is removed, instead, if its style has a visible background/border/shadow etc it will be drawn. Padding really makes the object larger (not just virtually as before)
+- `arc`: can draw bacground too.
+- `btn`: doesn't store styles for each state because it's done naturally in the new style system.
+- `calendar`: highlight the pressed datum. The used styles are changed: use `LV_CALENDAR_PART_DATE` normal for normal dates, checked for highlighted, focused for today, pressed for the being pressed. (checked+pressed, focused+pressed also work)
+- `chart`: only has `LINE` and `COLUMN` types because with new styles all the others can be described. LV_CHART_PART_SERIES sets the style of the series. bg_opa > 0 draws an area in LINE mode. `LV_CHART_PART_SERIES_BG` also added to set a different style for the series area. Padding in `LV_CHART_PART_BG` makes the series area smaller, and it ensures space for axis labels/numbers.
+- `linemeter`, `gauge`: can have background if the related style properties are set. Padding makes the scale/lines smaller. scale_border_width and scale_end_border_width allow to draw an arc on the outer part of the scale lines.
+- `gauge`: `lv_gauge_set_needle_img` allows use image as needle
+- `canvas`: allow drawing to true color alpha and alpha only canvas, add `lv_canvas_blur_hor/ver` and rename `lv_canvas_rotate` to `lv_canvas_transform`
+- `textarea`: If available in the font use bullet (`U+2022`) character in text area password 
 
 ### New object types
 - `lv_objmask`: masks can be added to it. The children will be masked accordingly. 
