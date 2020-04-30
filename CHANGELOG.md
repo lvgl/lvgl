@@ -28,12 +28,12 @@ The API in this regard remained the same but some new functions were added:
 - `lv_img_set_pivot`: set the pivot point of rotation
 
 
-The new drawing engine brought new drawing features too. They are highlighted in "style" section.
+The new drawing engine brought new drawing features too. They are highlighted in the "style" section.
 
 ### New style system
-A old style system is replaced with new more flexible and lightweighted one. 
+The old style system is replaced with a new more flexible and lightweighted one. 
 It uses an approach similar to CSS: support cascading styles, inheriting properties and local style properties per object. 
-As part of this updates a lot of objects were reworked and the APIs have been changed. 
+As part of these updates, a lot of objects were reworked and the APIs have been changed. 
 
 - more shadows options: *offset* and *spread*
 - gradient stop position to shift the gradient area and horizontal gradient 
@@ -43,7 +43,7 @@ As part of this updates a lot of objects were reworked and the APIs have been ch
 - dashed vertical and horizontal lines (*dash gap*, *dash_width*)
 - *outline*: a border-like part drawn out of the background. Can have spacing to the background.
 - *pattern*: display and image in the middle of the background or repeat it
-- *value* display a text which is stored in the style. Can be used e.g. as a lighweighted text on buttons too.
+- *value* display a text which is stored in the style. It can be used e.g. as a lighweighted text on buttons too.
 - *margin*: similar to *padding* but used to keep space outside of the object
 
 Read the [Style](https://docs.littlevgl.com/v7/en/html/overview/style.html) section of the documentation to learn how the new styles system works.
@@ -77,7 +77,7 @@ The following object types are renamed:
 - btn: doesn't store styles for each state because it's done naturally in the new style system.
 - calendar: highlight the pressed datum. The used styles are changed: use LV_CALENDAR_PART_DATE normal for normal dates, checked for highlighted, focused for today, pressed for the being pressed. (checked+pressed, focused+pressed also work)
 - chart: only has LINE and COLUMN types because with new styles all the others can be described. LV_CHART_PART_SERIES sets the style of the series. bg_opa > 0 draws an area in LINE mode. LV_CHART_PART_SERIES_BG also added to set a different style for the series area. Padding in LV_CHART_PART_BG makes the series area smaller, and it ensures space for axis labels/numbers.
-- linemeter, gauge: can have background if the related style properties are set. Padding makes the scale/lines smaller. scale_border_width and scale_end_border_width allows to draw an arc on the outer part of the scale lines.
+- linemeter, gauge: can have background if the related style properties are set. Padding makes the scale/lines smaller. scale_border_width and scale_end_border_width allow to draw an arc on the outer part of the scale lines.
 - gauge: `lv_gauge_set_needle_img` allows use image as needle
 - canvas: allow drawing to true color alpha and alpha only canvas, add `lv_canvas_blur_hor/ver` and rename `lv_canvas_rotate` to `lv_canvas_transform`
 - textarea: If available in the font use bullet (`U+2022`) character in text area password 
@@ -86,25 +86,24 @@ The following object types are renamed:
 - `lv_objmask`: masks can be added to it. The children will be masked accordingly. 
 
 ### Others
-- Change the built in fonts to [Montserrat](https://fonts.google.com/specimen/Montserrat) and add built in fonts from 12 px to 48 px for every 2nd size.
+- Change the built-in fonts to [Montserrat](https://fonts.google.com/specimen/Montserrat) and add built-in fonts from 12 px to 48 px for every 2nd size.
 - Add example CJK and Arabic/Persian/Hebrew built-in font
-- Add ° and "bullet" to the builtin fonts
+- Add ° and "bullet" to the built-in fonts
 - Add Arabic/Persian script support: change the character according to its position in the text. 
 - Add `playback_time` to animations.
 - Add `repeat_count` to animations instead of the current "repeat forever".
 - Replace `LV_LAYOUT_PRETTY` with `LV_LAYOUT_PRETTY_TOP/MID/BOTTOM`
 
 ### Demos
-- [lv_examples](https://github.com/littlevgl/lv_examples) were reworked and new examples and demos were added
+- [lv_examples](https://github.com/littlevgl/lv_examples) was reworked and new examples and demos were added
 
 ### New release policy
 - Maintain this Changelog for every release
 - Save old major version in new branches. E.g. `release/v6`
-- Merge new features and fixes directly into `master` and release a path or minor releases every 2 weeks.
+- Merge new features and fixes directly into `master` and release a patch or minor releases every 2 weeks.
 
 ### Migrating from v6 to v7
 - First and foremost, create a new `lv_conf.h` based on `lv_conf_templ.h`.
-- To try the new version it suggested to use a simulator project and see the examples.
+- To try the new version it suggested using a simulator project and see the examples.
 - If you have a running project, the most difficult part of the migration is updating to the new style system. Unfortunately, there is no better way than manually updating to the new format.
 - The other parts are mainly minor renames and refactoring as described above. 
-
