@@ -390,10 +390,24 @@ typedef void * lv_font_user_data_t;
  *================*/
 
 /*Always enable at least on theme*/
-#define LV_USE_THEME_EMPTY       0   /*No theme, you can apply your styles as you need*/
-#define LV_USE_THEME_TEMPLATE    0   /*Simple to the create your theme based on it*/
-#define LV_USE_THEME_MATERIAL    1   /*A fast and impressive theme*/
-#define LV_USE_THEME_MONO        0   /*Mono-color theme for monochrome displays*/
+
+/*No theme, you can apply your styles as you need*/
+#define LV_USE_THEME_EMPTY       0
+
+/*Simple to the create your theme based on it*/
+#define LV_USE_THEME_TEMPLATE    0
+
+/* A fast and impressive theme.
+ * Flags:
+ * LV_THEME_MATERIAL_FLAG_LIGHT: light theme
+ * LV_THEME_MATERIAL_FLAG_DARK: dark theme*/
+#define LV_USE_THEME_MATERIAL    1
+
+/* Mono-color theme for monochrome displays.
+ * If LV_THEME_DEFAULT_COLOR_PRIMARY is LV_COLOR_BLACK the
+ * texts and borders will be black and the background will be
+ * white. Else the colors are inverted. */
+#define LV_USE_THEME_MONO        0
 
 #define LV_THEME_DEFAULT_INCLUDE            <stdint.h>      /*Include a header for the init. function*/
 #define LV_THEME_DEFAULT_INIT               lv_theme_material_init
@@ -501,10 +515,6 @@ typedef void * lv_obj_user_data_t;
 
 /*Button (dependencies: lv_cont*/
 #define LV_USE_BTN      1
-#if LV_USE_BTN != 0
-/*Enable button-state animations - draw a circle on click (dependencies: LV_USE_ANIMATION)*/
-#  define LV_BTN_INK_EFFECT   0
-#endif
 
 /*Button matrix (dependencies: -)*/
 #define LV_USE_BTNMATRIX     1
