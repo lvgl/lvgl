@@ -29,13 +29,16 @@
  *  STATIC PROTOTYPES
  **********************/
 LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
-LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv_area_t * clip,
+                                              lv_draw_rect_dsc_t * dsc);
 static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
 LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
 #if LV_USE_SHADOW
-LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
-LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords,  uint16_t * sh_buf, lv_coord_t s, lv_coord_t r);
-LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf);
+    LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip,
+    lv_draw_rect_dsc_t * dsc);
+    LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords,  uint16_t * sh_buf, lv_coord_t s,
+    lv_coord_t r);
+    LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf);
 #endif
 static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
 static void draw_value(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
@@ -44,9 +47,9 @@ static void draw_value(const lv_area_t * coords, const lv_area_t * clip, lv_draw
  *  STATIC VARIABLES
  **********************/
 #if LV_USE_SHADOW && LV_SHADOW_CACHE_SIZE
-static uint8_t sh_cache[LV_SHADOW_CACHE_SIZE * LV_SHADOW_CACHE_SIZE];
-static int32_t sh_cache_size = -1;
-static int32_t sh_cache_r = -1;
+    static uint8_t sh_cache[LV_SHADOW_CACHE_SIZE * LV_SHADOW_CACHE_SIZE];
+    static int32_t sh_cache_size = -1;
+    static int32_t sh_cache_r = -1;
 #endif
 
 /**********************
@@ -346,7 +349,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
 
 }
 
-LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv_area_t * clip,
+                                              lv_draw_rect_dsc_t * dsc)
 {
     if(dsc->border_opa <= LV_OPA_MIN) return;
     if(dsc->border_width == 0) return;
@@ -575,7 +579,8 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(lv_draw_rect_dsc_t * dsc
 }
 
 #if LV_USE_SHADOW
-LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip,
+                                              lv_draw_rect_dsc_t * dsc)
 {
     /*Check whether the shadow is visible*/
     if(dsc->shadow_width == 0) return;
@@ -650,7 +655,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
         /*Use the cache if available*/
         sh_buf = lv_mem_buf_get(corner_size * corner_size);
         lv_memcpy(sh_buf, sh_cache, corner_size * corner_size);
-    } else {
+    }
+    else {
         /*A larger buffer is required for calculation */
         sh_buf = lv_mem_buf_get(corner_size * corner_size * sizeof(uint16_t));
         shadow_draw_corner_buf(&sh_rect_area, (uint16_t *)sh_buf, dsc->shadow_width, r_sh);
@@ -717,7 +723,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                 if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
 
                 lv_blend_fill(clip, &fa, dsc->shadow_color, mask_buf,
-                        mask_res, opa, dsc->shadow_blend_mode);
+                              mask_res, opa, dsc->shadow_blend_mode);
                 fa.y1++;
                 fa.y2++;
                 sh_buf_tmp += corner_size;
@@ -754,7 +760,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                 if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
 
                 lv_blend_fill(clip, &fa, dsc->shadow_color, mask_buf,
-                        mask_res, opa, dsc->shadow_blend_mode);
+                              mask_res, opa, dsc->shadow_blend_mode);
                 fa.y1--;
                 fa.y2--;
                 sh_buf_tmp += corner_size;
@@ -789,13 +795,14 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
 
                 if(simple_mode) {
                     mask_res = LV_DRAW_MASK_RES_CHANGED;
-                } else {
+                }
+                else {
                     mask_res = lv_draw_mask_apply(mask_buf, fa.x1, fa.y1, w);
                     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
 
                 lv_blend_fill(clip, &fa,
-                        dsc->shadow_color, mask_buf, mask_res, dsc->shadow_opa, dsc->shadow_blend_mode);
+                              dsc->shadow_color, mask_buf, mask_res, dsc->shadow_opa, dsc->shadow_blend_mode);
                 fa.y1++;
                 fa.y2++;
             }
@@ -842,7 +849,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                 if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
 
                 lv_blend_fill(clip, &fa, dsc->shadow_color, mask_buf,
-                        mask_res, opa, dsc->shadow_blend_mode);
+                              mask_res, opa, dsc->shadow_blend_mode);
                 fa.y1++;
                 fa.y2++;
                 sh_buf_tmp += corner_size;
@@ -878,7 +885,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                 if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
 
                 lv_blend_fill(clip, &fa, dsc->shadow_color, mask_buf,
-                        mask_res, opa, dsc->shadow_blend_mode);
+                              mask_res, opa, dsc->shadow_blend_mode);
                 fa.y1--;
                 fa.y2--;
                 sh_buf_tmp += corner_size;
@@ -911,13 +918,14 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
                 lv_memcpy(mask_buf, sh_buf_tmp, w);
                 if(simple_mode) {
                     mask_res = LV_DRAW_MASK_RES_CHANGED;
-                } else {
+                }
+                else {
                     mask_res = lv_draw_mask_apply(mask_buf, fa.x1, fa.y1, w);
                     if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
                 }
 
                 lv_blend_fill(clip, &fa,
-                        dsc->shadow_color, mask_buf, mask_res, dsc->shadow_opa, dsc->shadow_blend_mode);
+                              dsc->shadow_color, mask_buf, mask_res, dsc->shadow_opa, dsc->shadow_blend_mode);
                 fa.y1++;
                 fa.y2++;
             }
@@ -951,7 +959,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
 
             if(simple_mode) {
                 mask_res = LV_DRAW_MASK_RES_CHANGED;
-            } else {
+            }
+            else {
                 mask_res = lv_draw_mask_apply(mask_buf, fa.x1, fa.y1, w);
                 if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
             }
@@ -990,7 +999,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
             lv_memset(mask_buf, opa_tmp, w);
             if(simple_mode) {
                 mask_res = LV_DRAW_MASK_RES_CHANGED;
-            } else {
+            }
+            else {
                 mask_res = lv_draw_mask_apply(mask_buf, fa.x1, fa.y1, w);
                 if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
             }
@@ -1024,7 +1034,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
             if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
 
             lv_blend_fill(clip, &fa, dsc->shadow_color, mask_buf,
-                    mask_res, LV_OPA_COVER, dsc->shadow_blend_mode);
+                          mask_res, LV_OPA_COVER, dsc->shadow_blend_mode);
             fa.y1++;
             fa.y2++;
         }
@@ -1042,7 +1052,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
  * @param sw shadow width
  * @param r radius
  */
-LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, lv_coord_t sw, lv_coord_t r)
+LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords, uint16_t * sh_buf, lv_coord_t sw,
+                                                         lv_coord_t r)
 {
     int32_t sw_ori = sw;
     int32_t size = sw_ori  + r;

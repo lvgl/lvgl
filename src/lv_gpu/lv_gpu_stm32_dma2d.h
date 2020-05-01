@@ -37,7 +37,8 @@ extern "C" {
  * @param fill_h height to fill in pixels
  * @note `buf_w - fill_w` is offset to the next line after fill
  */
-void lv_gpu_stm32_dma2d_fill(lv_color_t * buf, lv_coord_t buf_w, lv_color_t color, lv_coord_t fill_w, lv_coord_t fill_h);
+void lv_gpu_stm32_dma2d_fill(lv_color_t * buf, lv_coord_t buf_w, lv_color_t color, lv_coord_t fill_w,
+                             lv_coord_t fill_h);
 
 
 /**
@@ -51,7 +52,8 @@ void lv_gpu_stm32_dma2d_fill(lv_color_t * buf, lv_coord_t buf_w, lv_color_t colo
  * @param fill_h height to fill in pixels
  * @note `buf_w - fill_w` is offset to the next line after fill
  */
-void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t color, const lv_opa_t * mask, lv_opa_t opa, lv_coord_t fill_w, lv_coord_t fill_h);
+void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t color, const lv_opa_t * mask,
+                                  lv_opa_t opa, lv_coord_t fill_w, lv_coord_t fill_h);
 
 /**
  * Copy a map (typically RGB image) to a buffer
@@ -63,7 +65,8 @@ void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t
  * @param copy_h height of the area to copy in pixels
  * @note `map_w - fill_w` is offset to the next line after copy
  */
-void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h);
+void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_coord_t map_w,
+                             lv_coord_t copy_w, lv_coord_t copy_h);
 /**
  * Blend a map (e.g. ARGB image or RGB image with opacity) to a buffer
  * @param buf a buffer where `map` should be copied
@@ -75,7 +78,8 @@ void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_
  * @param copy_h height of the area to copy in pixels
  * @note `map_w - fill_w` is offset to the next line after copy
  */
-void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_opa_t opa, lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h);
+void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_opa_t opa,
+                              lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h);
 /**********************
  *      MACROS
  **********************/

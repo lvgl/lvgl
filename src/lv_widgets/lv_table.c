@@ -795,7 +795,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                 if((rect_dsc[cell_type].border_side & LV_BORDER_SIDE_RIGHT) && cell_area_border.x2 < table->coords.x2 - bg_right - 1) {
                     cell_area_border.x2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
                 }
-                if((rect_dsc[cell_type].border_side & LV_BORDER_SIDE_BOTTOM) && cell_area_border.y2 < table->coords.y2 - bg_bottom - 1) {
+                if((rect_dsc[cell_type].border_side & LV_BORDER_SIDE_BOTTOM) &&
+                   cell_area_border.y2 < table->coords.y2 - bg_bottom - 1) {
                     cell_area_border.y2 += rect_dsc[cell_type].border_width / 2 + (rect_dsc[cell_type].border_width & 0x1);
                 }
 
@@ -998,7 +999,7 @@ static void refr_size(lv_obj_t * table)
 
     for(i = 0; i < ext->row_cnt; i++) {
         ext->row_h[i] = get_row_height(table, i, font, letter_space, line_space,
-                            cell_left, cell_right, cell_top, cell_bottom);
+                                       cell_left, cell_right, cell_top, cell_bottom);
         h += ext->row_h[i];
     }
 

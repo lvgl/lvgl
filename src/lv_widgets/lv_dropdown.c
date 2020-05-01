@@ -631,7 +631,8 @@ void lv_dropdown_open(lv_obj_t * ddlist)
                 /*There is more space on the top, so make it drop up*/
                 dir = LV_DROPDOWN_DIR_UP;
                 list_h = ddlist->coords.y1;
-            } else {
+            }
+            else {
                 list_h = LV_VER_RES - ddlist->coords.y2;
             }
         }
@@ -643,7 +644,8 @@ void lv_dropdown_open(lv_obj_t * ddlist)
                 /*There is more space on the top, so make it drop up*/
                 dir = LV_DROPDOWN_DIR_DOWN;
                 list_h = LV_VER_RES - ddlist->coords.y2;
-            } else {
+            }
+            else {
                 list_h = ddlist->coords.y1;
             }
         }

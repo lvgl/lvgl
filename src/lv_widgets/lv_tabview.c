@@ -177,9 +177,9 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_obj_t * new_tab = lv_tabview_add_tab(tabview, copy_ext->tab_name_ptr[i]);
             lv_obj_t * copy_tab = lv_tabview_get_tab(copy, i);
             lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCROLLABLE), lv_obj_get_style_list(copy_tab,
-                                                                                                        LV_PAGE_PART_SCROLLABLE));
+                                                                                                              LV_PAGE_PART_SCROLLABLE));
             lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCROLLBAR), lv_obj_get_style_list(copy_tab,
-                                                                                                           LV_PAGE_PART_SCROLLBAR));
+                                                                                                             LV_PAGE_PART_SCROLLBAR));
             lv_obj_refresh_style(new_tab, LV_STYLE_PROP_ALL);
         }
 
@@ -664,7 +664,8 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
             if(state & LV_STATE_FOCUSED) {
                 lv_obj_set_state(ext->btns, LV_STATE_FOCUSED);
                 lv_obj_set_state(ext->indic, LV_STATE_FOCUSED);
-            } else {
+            }
+            else {
                 lv_obj_clear_state(ext->btns, LV_STATE_FOCUSED);
                 lv_obj_clear_state(ext->indic, LV_STATE_FOCUSED);
 
@@ -672,7 +673,8 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
             if(state & LV_STATE_EDITED) {
                 lv_obj_set_state(ext->btns, LV_STATE_EDITED);
                 lv_obj_set_state(ext->indic, LV_STATE_EDITED);
-            } else {
+            }
+            else {
                 lv_obj_clear_state(ext->btns, LV_STATE_EDITED);
                 lv_obj_clear_state(ext->indic, LV_STATE_EDITED);
 

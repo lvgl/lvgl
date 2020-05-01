@@ -24,12 +24,15 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
-                           lv_draw_line_dsc_t * dsc);
-LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
-                          lv_draw_line_dsc_t * dsc);
-LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
-                          lv_draw_line_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
+                                                 const lv_area_t * clip,
+                                                 lv_draw_line_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2,
+                                                const lv_area_t * clip,
+                                                lv_draw_line_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2,
+                                                const lv_area_t * clip,
+                                                lv_draw_line_dsc_t * dsc);
 
 /**********************
  *  STATIC VARIABLES
@@ -60,7 +63,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc)
  * @param opa_scale scale down all opacities by the factor
  */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
-                  lv_draw_line_dsc_t * dsc)
+                                        lv_draw_line_dsc_t * dsc)
 {
     if(dsc->width == 0) return;
     if(dsc->opa <= LV_OPA_MIN) return;
@@ -115,8 +118,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_poin
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
-                          lv_draw_line_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const lv_point_t * point2,
+                                                const lv_area_t * clip,
+                                                lv_draw_line_dsc_t * dsc)
 {
     lv_opa_t opa = dsc->opa;
 
@@ -215,8 +219,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
 }
 
 
-LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
-                          lv_draw_line_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const lv_point_t * point2,
+                                                const lv_area_t * clip,
+                                                lv_draw_line_dsc_t * dsc)
 {
     lv_opa_t opa = dsc->opa;
 
@@ -309,8 +314,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
 }
 
 
-LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * clip,
-                           lv_draw_line_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, const lv_point_t * point2,
+                                                 const lv_area_t * clip,
+                                                 lv_draw_line_dsc_t * dsc)
 {
     /*Keep the great y in p1*/
     lv_point_t p1;
@@ -447,8 +453,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
         }
         else {
             lv_blend_fill(&fill_area, clip,
-                    dsc->color, mask_buf, LV_DRAW_MASK_RES_CHANGED, dsc->opa,
-                    dsc->blend_mode);
+                          dsc->color, mask_buf, LV_DRAW_MASK_RES_CHANGED, dsc->opa,
+                          dsc->blend_mode);
 
             fill_area.y1 = fill_area.y2 + 1;
             fill_area.y2 = fill_area.y1;
@@ -460,9 +466,9 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
     /*Flush the last part*/
     if(fill_area.y1 != fill_area.y2) {
         fill_area.y2--;
-        lv_blend_fill( &fill_area, clip,
-                dsc->color, mask_buf, LV_DRAW_MASK_RES_CHANGED, dsc->opa,
-                dsc->blend_mode);
+        lv_blend_fill(&fill_area, clip,
+                      dsc->color, mask_buf, LV_DRAW_MASK_RES_CHANGED, dsc->opa,
+                      dsc->blend_mode);
 
     }
 

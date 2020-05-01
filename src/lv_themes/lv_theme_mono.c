@@ -45,43 +45,43 @@ static lv_style_t style_pad_small;
 static lv_style_t style_pad_inner;
 
 #if LV_USE_ARC
-static lv_style_t style_arc_bg, style_arc_indic;
+    static lv_style_t style_arc_bg, style_arc_indic;
 #endif
 
 #if LV_USE_LIST
-static lv_style_t style_list_btn;
+    static lv_style_t style_list_btn;
 #endif
 
 #if LV_USE_CALENDAR
-static lv_style_t style_calendar_date;
+    static lv_style_t style_calendar_date;
 #endif
 
 #if LV_USE_CHART
-static lv_style_t style_chart_series;
+    static lv_style_t style_chart_series;
 #endif
 
 #if LV_USE_LINEMETER
-static lv_style_t style_linemeter;
+    static lv_style_t style_linemeter;
 #endif
 
 #if LV_USE_GAUGE
-static lv_style_t style_gauge_needle, style_gauge_major;
+    static lv_style_t style_gauge_needle, style_gauge_major;
 #endif
 
 #if LV_USE_PAGE
-static lv_style_t style_sb;
+    static lv_style_t style_sb;
 #endif
 
 #if LV_USE_SPINNER
-static lv_style_t style_tick_line;
+    static lv_style_t style_tick_line;
 #endif
 
 #if LV_USE_TEXTAREA
-static lv_style_t style_ta_cursor;
+    static lv_style_t style_ta_cursor;
 #endif
 
 #if LV_USE_TABVIEW
-static lv_style_t style_tab_bg;
+    static lv_style_t style_tab_bg;
 #endif
 
 
@@ -113,8 +113,8 @@ static void basic_init(void)
     lv_style_set_bg_color(&style_bg, LV_STATE_DEFAULT, BG_COLOR);
     lv_style_set_border_width(&style_bg, LV_STATE_DEFAULT, BORDER_WIDTH);
     lv_style_set_border_color(&style_bg, LV_STATE_DEFAULT, FG_COLOR);
-    lv_style_set_line_width(&style_bg, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 100 , 1));
-    lv_style_set_scale_end_line_width(&style_bg, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 100 , 1));
+    lv_style_set_line_width(&style_bg, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 100, 1));
+    lv_style_set_scale_end_line_width(&style_bg, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 100, 1));
     lv_style_set_line_color(&style_bg, LV_STATE_DEFAULT, FG_COLOR);
     lv_style_set_scale_grad_color(&style_bg, LV_STATE_DEFAULT, FG_COLOR);
     lv_style_set_scale_end_color(&style_bg, LV_STATE_DEFAULT, FG_COLOR);
@@ -165,7 +165,7 @@ static void basic_init(void)
     lv_style_set_line_color(&style_fg_color, LV_STATE_DEFAULT, FG_COLOR);
 
     lv_style_init(&style_big_line_space);
-    lv_style_set_text_line_space(&style_big_line_space, LV_STATE_DEFAULT, LV_DPI/10);
+    lv_style_set_text_line_space(&style_big_line_space, LV_STATE_DEFAULT, LV_DPI / 10);
 
     lv_style_init(&style_pad_none);
     lv_style_set_pad_left(&style_pad_none, LV_STATE_DEFAULT, 0);
@@ -236,7 +236,8 @@ static void calendar_init(void)
     lv_style_set_value_font(&style_calendar_date, LV_STATE_CHECKED, LV_THEME_DEFAULT_FONT_TITLE);
     lv_style_set_value_align(&style_calendar_date, LV_STATE_CHECKED, LV_ALIGN_IN_TOP_RIGHT);
     lv_style_set_value_color(&style_calendar_date, LV_STATE_CHECKED, FG_COLOR);
-    lv_style_set_value_ofs_y(&style_calendar_date, LV_STATE_CHECKED, - lv_font_get_line_height(LV_THEME_DEFAULT_FONT_TITLE) / 4);
+    lv_style_set_value_ofs_y(&style_calendar_date, LV_STATE_CHECKED,
+                             - lv_font_get_line_height(LV_THEME_DEFAULT_FONT_TITLE) / 4);
     lv_style_set_bg_color(&style_calendar_date, LV_STATE_CHECKED, BG_COLOR);
     lv_style_set_text_color(&style_calendar_date, LV_STATE_CHECKED, FG_COLOR);
     lv_style_set_value_color(&style_calendar_date, LV_STATE_CHECKED | LV_STATE_PRESSED, BG_COLOR);
@@ -404,7 +405,7 @@ static void textarea_init(void)
 #if LV_USE_TEXTAREA
     lv_style_init(&style_ta_cursor);
     lv_style_set_bg_opa(&style_ta_cursor, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-    lv_style_set_border_width(&style_ta_cursor, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI/100, 1));
+    lv_style_set_border_width(&style_ta_cursor, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 100, 1));
     lv_style_set_border_side(&style_ta_cursor, LV_STATE_DEFAULT, LV_BORDER_SIDE_LEFT);
     lv_style_set_border_color(&style_ta_cursor, LV_STATE_DEFAULT, FG_COLOR);
 
@@ -485,7 +486,8 @@ static void win_init(void)
  * @return a pointer to reference this theme later
  */
 lv_theme_t * lv_theme_mono_init(lv_color_t color_primary, lv_color_t color_secondary, uint32_t flags,
-        const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle, const lv_font_t * font_title)
+                                const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle,
+                                const lv_font_t * font_title)
 {
     theme.color_primary = color_primary;
     theme.color_secondary = color_secondary;

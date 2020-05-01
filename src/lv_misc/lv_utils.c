@@ -85,7 +85,7 @@ char * lv_utils_num_to_str(int32_t num, char * buf)
  */
 char * lv_utils_num_to_str_fixed(int32_t num, int32_t decimals, char * buf, size_t bufsize)
 {
-    lv_snprintf(buf, bufsize, "%0*d", decimals+1, num);
+    lv_snprintf(buf, bufsize, "%0*d", decimals + 1, num);
     if(decimals > 0)
         lv_txt_ins(buf, strlen(buf) - decimals, decimal_separator);
     return buf;

@@ -36,7 +36,7 @@ typedef struct {
     int32_t cur_value;
     int32_t min_value;
     int32_t max_value;
-    uint8_t mirrored :1;
+    uint8_t mirrored : 1;
 } lv_linemeter_ext_t;
 
 /*Styles*/
@@ -99,7 +99,7 @@ void lv_linemeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle);
  * @param lmeter pointer to a line meter object
  * @param mirror mirror setting
  */
-void lv_linemeter_set_mirror(lv_obj_t *lmeter, bool mirror);
+void lv_linemeter_set_mirror(lv_obj_t * lmeter, bool mirror);
 
 /*=====================
  * Getter functions

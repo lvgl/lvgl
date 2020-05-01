@@ -140,7 +140,7 @@ void lv_task_set_period(lv_task_t * task, uint32_t period);
 void lv_task_ready(lv_task_t * task);
 
 /**
- * Set the number of times a task will repeat. 
+ * Set the number of times a task will repeat.
  * @param task pointer to a lv_task.
  * @param repeat_count -1 : infinity;  0 : stop ;  n>0: residual times
  */

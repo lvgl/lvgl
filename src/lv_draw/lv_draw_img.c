@@ -27,12 +27,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
-                                 lv_draw_img_dsc_t * draw_dsc);
+LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask,
+                                                       const void * src,
+                                                       lv_draw_img_dsc_t * draw_dsc);
 
-LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p,
-                        lv_draw_img_dsc_t * draw_dsc,
-                        bool chroma_key, bool alpha_byte);
+LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
+                                              const uint8_t * map_p,
+                                              lv_draw_img_dsc_t * draw_dsc,
+                                              bool chroma_key, bool alpha_byte);
 
 static void show_error(const lv_area_t * coords, const lv_area_t * clip_area, const char * msg);
 
@@ -230,8 +232,9 @@ lv_img_src_t lv_img_src_get_type(const void * src)
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask, const void * src,
-                                 lv_draw_img_dsc_t * draw_dsc)
+LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask,
+                                                       const void * src,
+                                                       lv_draw_img_dsc_t * draw_dsc)
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
@@ -335,8 +338,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
  * @param zoom zoom factor
  * @param antialias anti-alias transformations (rotate, zoom) or not
  */
-LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area, const uint8_t * map_p,
-                        lv_draw_img_dsc_t * draw_dsc, bool chroma_key, bool alpha_byte)
+LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
+                                              const uint8_t * map_p,
+                                              lv_draw_img_dsc_t * draw_dsc, bool chroma_key, bool alpha_byte)
 {
     /* Use the clip area as draw area*/
     lv_area_t draw_area;
@@ -403,7 +407,8 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                 int32_t disp_w = lv_area_get_width(disp_area);
                 lv_color_t * disp_buf = vdb->buf_act;
                 lv_color_t * disp_buf_first = disp_buf + disp_w * draw_area.y1 + draw_area.x1;
-                lv_gpu_stm32_dma2d_blend(disp_buf_first, disp_w, (const lv_color_t *)map_buf_tmp, draw_dsc->opa, map_w, draw_area_w, draw_area_h);
+                lv_gpu_stm32_dma2d_blend(disp_buf_first, disp_w, (const lv_color_t *)map_buf_tmp, draw_dsc->opa, map_w, draw_area_w,
+                                         draw_area_h);
                 return;
             }
 #endif
@@ -479,7 +484,8 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
             }
 
             lv_draw_mask_res_t mask_res;
-            mask_res = (alpha_byte || chroma_key || draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+            mask_res = (alpha_byte || chroma_key || draw_dsc->angle ||
+                        draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
 
 
             /*Prepare the `mask_buf`if there are other masks*/
@@ -502,7 +508,8 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                             if(px_opa < LV_OPA_MIN) {
                                 continue;
                             }
-                        } else {
+                        }
+                        else {
                             mask_buf[px_i] = 0xFF;
                         }
 
@@ -569,7 +576,8 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                     blend_area.y2 = blend_area.y1;
 
                     px_i = 0;
-                    mask_res = (alpha_byte || chroma_key || draw_dsc->angle || draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
+                    mask_res = (alpha_byte || chroma_key || draw_dsc->angle ||
+                                draw_dsc->zoom != LV_IMG_ZOOM_NONE) ? LV_DRAW_MASK_RES_CHANGED : LV_DRAW_MASK_RES_FULL_COVER;
 
                     /*Prepare the `mask_buf`if there are other masks*/
                     if(other_mask_cnt) {

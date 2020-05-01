@@ -215,7 +215,7 @@ static lv_design_res_t lv_led_design(lv_obj_t * led, const lv_area_t * clip_area
         rect_dsc.shadow_width = ((ext->bright - LV_LED_BRIGHT_MIN) * rect_dsc.shadow_width) /
                                 (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
         rect_dsc.shadow_spread = ((ext->bright - LV_LED_BRIGHT_MIN) * rect_dsc.shadow_spread) /
-                                (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
+                                 (LV_LED_BRIGHT_MAX - LV_LED_BRIGHT_MIN);
 
         lv_draw_rect(&led->coords, clip_area, &rect_dsc);
     }

@@ -652,24 +652,23 @@ void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color, lv_opa_t opa)
     lv_img_dsc_t * dsc = lv_canvas_get_img(canvas);
 
     if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
-    	uint32_t row_byte_cnt = (dsc->header.w + 7) >> 3;
-    	/*+8 skip the palette*/
-    	lv_memset((uint8_t*)dsc->data + 8, color.full ? 0xff : 0x00, row_byte_cnt * dsc->header.h);
+        uint32_t row_byte_cnt = (dsc->header.w + 7) >> 3;
+        /*+8 skip the palette*/
+        lv_memset((uint8_t *)dsc->data + 8, color.full ? 0xff : 0x00, row_byte_cnt * dsc->header.h);
     }
     else if(dsc->header.cf == LV_IMG_CF_ALPHA_1BIT) {
-    	uint32_t row_byte_cnt = (dsc->header.w + 7) >> 3;
-    	lv_memset((uint8_t*)dsc->data, opa > LV_OPA_50 ? 0xff : 0x00, row_byte_cnt * dsc->header.h);
+        uint32_t row_byte_cnt = (dsc->header.w + 7) >> 3;
+        lv_memset((uint8_t *)dsc->data, opa > LV_OPA_50 ? 0xff : 0x00, row_byte_cnt * dsc->header.h);
     }
-    else
-    {
-		uint32_t x;
-		uint32_t y;
-		for(y = 0; y < dsc->header.h; y++) {
-			for(x = 0; x < dsc->header.w; x++) {
-				lv_img_buf_set_px_color(dsc, x, y, color);
-				lv_img_buf_set_px_alpha(dsc, x, y, opa);
-			}
-		}
+    else {
+        uint32_t x;
+        uint32_t y;
+        for(y = 0; y < dsc->header.h; y++) {
+            for(x = 0; x < dsc->header.w; x++) {
+                lv_img_buf_set_px_color(dsc, x, y, color);
+                lv_img_buf_set_px_alpha(dsc, x, y, opa);
+            }
+        }
     }
 
     lv_obj_invalidate(canvas);

@@ -187,8 +187,8 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
     ext->sel_opt_id_ori = ext->sel_opt_id;
 
 
-//    refr_width(roller);
-//    refr_height(roller);
+    //    refr_width(roller);
+    //    refr_height(roller);
     refr_position(roller, LV_ANIM_OFF);
 }
 
@@ -648,10 +648,10 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     }
     else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {
 #if LV_USE_ANIMATION
-            lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
+        lv_anim_del(lv_page_get_scrl(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
-            refr_position(roller, false);
-            refr_width(roller);
+        refr_position(roller, false);
+        refr_width(roller);
 
     }
 
@@ -838,15 +838,15 @@ static void refr_width(lv_obj_t * roller)
     if(label == NULL) return;
 
     switch(lv_label_get_align(label)) {
-    case LV_LABEL_ALIGN_LEFT:
-        lv_obj_align(label, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0);
-        break;
-    case LV_LABEL_ALIGN_CENTER:
-        lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
-        break;
-    case LV_LABEL_ALIGN_RIGHT:
-        lv_obj_align(label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0);
-        break;
+        case LV_LABEL_ALIGN_LEFT:
+            lv_obj_align(label, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0);
+            break;
+        case LV_LABEL_ALIGN_CENTER:
+            lv_obj_align(label, NULL, LV_ALIGN_CENTER, 0, 0);
+            break;
+        case LV_LABEL_ALIGN_RIGHT:
+            lv_obj_align(label, NULL, LV_ALIGN_IN_RIGHT_MID, 0, 0);
+            break;
     }
 
 

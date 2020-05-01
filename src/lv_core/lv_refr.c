@@ -338,8 +338,8 @@ static void lv_refr_areas(void)
     int32_t last_i = 0;
     for(i = disp_refr->inv_p - 1; i >= 0; i--) {
         if(disp_refr->inv_area_joined[i] == 0) {
-        	last_i = i;
-        	break;
+            last_i = i;
+            break;
         }
     }
 
@@ -350,8 +350,8 @@ static void lv_refr_areas(void)
         /*Refresh the unjoined areas*/
         if(disp_refr->inv_area_joined[i] == 0) {
 
-        	if(i == last_i) disp_refr->driver.buffer->last_area = 1;
-        	disp_refr->driver.buffer->last_part = 0;
+            if(i == last_i) disp_refr->driver.buffer->last_area = 1;
+            disp_refr->driver.buffer->last_part = 0;
             lv_refr_area(&disp_refr->inv_areas[i]);
 
             if(disp_refr->driver.monitor_cb) px_num += lv_area_get_size(&disp_refr->inv_areas[i]);

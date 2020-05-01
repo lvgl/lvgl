@@ -558,8 +558,8 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
         /*If there is only one object in the row then align it to the middle*/
         else if(obj_num == 1) {
             lv_obj_align(child_rs, cont, LV_ALIGN_IN_TOP_MID,
-                    0,
-                    act_y + lv_obj_get_style_margin_top(child_rs, LV_OBJ_PART_MAIN));
+                         0,
+                         act_y + lv_obj_get_style_margin_top(child_rs, LV_OBJ_PART_MAIN));
         }
         /*If there are two object in the row then align them proportionally*/
         else if(obj_num == 2 && 0) {
@@ -571,27 +571,27 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
             switch(type) {
                 case LV_LAYOUT_PRETTY_TOP:
                     lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT,
-                            pad + lv_obj_get_style_margin_left(obj1, LV_OBJ_PART_MAIN),
-                            act_y + lv_obj_get_style_margin_top(obj1, LV_OBJ_PART_MAIN));
+                                 pad + lv_obj_get_style_margin_left(obj1, LV_OBJ_PART_MAIN),
+                                 act_y + lv_obj_get_style_margin_top(obj1, LV_OBJ_PART_MAIN));
                     lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT,
-                            -pad - lv_obj_get_style_margin_right(obj2, LV_OBJ_PART_MAIN),
-                            act_y + lv_obj_get_style_margin_top(obj2, LV_OBJ_PART_MAIN));
+                                 -pad - lv_obj_get_style_margin_right(obj2, LV_OBJ_PART_MAIN),
+                                 act_y + lv_obj_get_style_margin_top(obj2, LV_OBJ_PART_MAIN));
                     break;
                 case LV_LAYOUT_PRETTY_MID:
                     lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT,
-                            pad + lv_obj_get_style_margin_left(obj1, LV_OBJ_PART_MAIN),
-                            act_y + (h_row - lv_obj_get_height(obj1)) / 2 + lv_obj_get_style_margin_top(obj1, LV_OBJ_PART_MAIN));
+                                 pad + lv_obj_get_style_margin_left(obj1, LV_OBJ_PART_MAIN),
+                                 act_y + (h_row - lv_obj_get_height(obj1)) / 2 + lv_obj_get_style_margin_top(obj1, LV_OBJ_PART_MAIN));
                     lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT,
-                            -pad - lv_obj_get_style_margin_right(obj2, LV_OBJ_PART_MAIN),
-                            act_y + (h_row - lv_obj_get_height(obj2)) / 2 + lv_obj_get_style_margin_top(obj2, LV_OBJ_PART_MAIN));
+                                 -pad - lv_obj_get_style_margin_right(obj2, LV_OBJ_PART_MAIN),
+                                 act_y + (h_row - lv_obj_get_height(obj2)) / 2 + lv_obj_get_style_margin_top(obj2, LV_OBJ_PART_MAIN));
                     break;
                 case LV_LAYOUT_PRETTY_BOTTOM:
                     lv_obj_align(obj1, cont, LV_ALIGN_IN_TOP_LEFT,
-                            pad + lv_obj_get_style_margin_left(obj1, LV_OBJ_PART_MAIN),
-                            act_y + h_row - lv_obj_get_height(obj1) - lv_obj_get_style_margin_bottom(obj1, LV_OBJ_PART_MAIN));
+                                 pad + lv_obj_get_style_margin_left(obj1, LV_OBJ_PART_MAIN),
+                                 act_y + h_row - lv_obj_get_height(obj1) - lv_obj_get_style_margin_bottom(obj1, LV_OBJ_PART_MAIN));
                     lv_obj_align(obj2, cont, LV_ALIGN_IN_TOP_RIGHT,
-                            -pad - lv_obj_get_style_margin_right(obj2, LV_OBJ_PART_MAIN),
-                            act_y + h_row - lv_obj_get_height(obj2) - lv_obj_get_style_margin_bottom(obj2, LV_OBJ_PART_MAIN));
+                                 -pad - lv_obj_get_style_margin_right(obj2, LV_OBJ_PART_MAIN),
+                                 act_y + h_row - lv_obj_get_height(obj2) - lv_obj_get_style_margin_bottom(obj2, LV_OBJ_PART_MAIN));
                     break;
                 default:
                     break;
@@ -718,8 +718,7 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
         LV_LL_READ(cont->child_ll, child_i) {
             if(lv_obj_get_hidden(child_i) != false) continue;
 
-            if(ext->fit_left != LV_FIT_PARENT)
-            {
+            if(ext->fit_left != LV_FIT_PARENT) {
                 lv_style_int_t mleft = lv_obj_get_style_margin_left(child_i, LV_OBJ_PART_MAIN);
                 tight_area.x1 = LV_MATH_MIN(tight_area.x1, child_i->coords.x1 - mleft);
             }

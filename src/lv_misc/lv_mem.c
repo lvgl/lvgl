@@ -238,7 +238,8 @@ void lv_mem_free(const void * data)
             }
             e_next = ent_get_next(e_next);
         }
-    } else {
+    }
+    else {
         full_defrag_cnt = 0;
         lv_mem_defrag();
 
@@ -385,7 +386,7 @@ lv_res_t lv_mem_test(void)
         if(e->header.s.d_size > LV_MEM_SIZE) {
             return LV_RES_INV;
         }
-        uint8_t * e8 = (uint8_t*) e;
+        uint8_t * e8 = (uint8_t *) e;
         if(e8 + e->header.s.d_size > work_mem + LV_MEM_SIZE) {
             return LV_RES_INV;
         }
@@ -429,7 +430,8 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
     if(mon_p->free_size > 0) {
         mon_p->frag_pct   = (uint32_t)mon_p->free_biggest_size * 100U / mon_p->free_size;
         mon_p->frag_pct   = 100 - mon_p->frag_pct;
-    } else {
+    }
+    else {
         mon_p->frag_pct   = 0; /*no fragmentation if all the RAM is used*/
     }
 #endif

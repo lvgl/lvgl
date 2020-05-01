@@ -19,7 +19,7 @@ extern "C" {
  *********************/
 
 #if __STDC_VERSION__ >= 199901L  // If c99 or newer, use stdint.h to determine arch size
-#include <stdint.h> 
+#include <stdint.h>
 #endif
 
 
@@ -36,7 +36,7 @@ extern "C" {
 
 #endif
 
-          
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -53,8 +53,8 @@ typedef uint8_t lv_res_t;
 
 
 
-#if __STDC_VERSION__ >= 199901L  
-// If c99 or newer,  use the definition of uintptr_t directly from <stdint.h> 
+#if __STDC_VERSION__ >= 199901L
+// If c99 or newer,  use the definition of uintptr_t directly from <stdint.h>
 typedef uintptr_t lv_uintptr_t;
 
 #else

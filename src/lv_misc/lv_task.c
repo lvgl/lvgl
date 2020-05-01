@@ -341,7 +341,7 @@ void lv_task_ready(lv_task_t * task)
 }
 
 /**
- * Set the number of times a task will repeat. 
+ * Set the number of times a task will repeat.
  * @param task pointer to a lv_task.
  * @param repeat_count -1 : infinity;  0 : stop ;  n>0: residual times
  */
@@ -404,7 +404,7 @@ static bool lv_task_exec(lv_task_t * task)
             }
             if(task->repeat_count == 0) {
                 lv_task_del(task);
-            } 
+            }
         }
         exec = true;
     }

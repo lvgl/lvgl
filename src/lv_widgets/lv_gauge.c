@@ -197,53 +197,54 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int32_t value)
     int32_t old_value = ext->values[needle_id];
     ext->values[needle_id] = value;
 
-//    lv_obj_invalidate(gauge);
+    //    lv_obj_invalidate(gauge);
 
     lv_style_int_t pad = lv_obj_get_style_pad_inner(gauge, LV_GAUGE_PART_NEEDLE);
     lv_style_int_t left = lv_obj_get_style_pad_left(gauge, LV_GAUGE_PART_MAIN);
     lv_style_int_t right = lv_obj_get_style_pad_right(gauge, LV_GAUGE_PART_MAIN);
     lv_style_int_t top = lv_obj_get_style_pad_top(gauge, LV_GAUGE_PART_MAIN);
-     lv_coord_t r      = (lv_obj_get_width(gauge) - left - right) / 2 - pad;
-     lv_coord_t x_ofs  = gauge->coords.x1 + r + left + pad;
-     lv_coord_t y_ofs  = gauge->coords.y1 + r + top + pad;
-     uint16_t angle    = lv_linemeter_get_scale_angle(gauge);
-     int16_t angle_ofs = 90 + (360 - angle) / 2;
-     lv_point_t p_mid;
-     lv_point_t p_end;
-     lv_coord_t needle_w;
+    lv_coord_t r      = (lv_obj_get_width(gauge) - left - right) / 2 - pad;
+    lv_coord_t x_ofs  = gauge->coords.x1 + r + left + pad;
+    lv_coord_t y_ofs  = gauge->coords.y1 + r + top + pad;
+    uint16_t angle    = lv_linemeter_get_scale_angle(gauge);
+    int16_t angle_ofs = 90 + (360 - angle) / 2;
+    lv_point_t p_mid;
+    lv_point_t p_end;
+    lv_coord_t needle_w;
 
-     if(ext->needle_img) {
-         lv_img_header_t info;
-         lv_img_decoder_get_info(ext->needle_img, &info);
-         needle_w = info.h;
-     } else {
-         needle_w = lv_obj_get_style_line_width(gauge, LV_GAUGE_PART_NEEDLE);
-     }
+    if(ext->needle_img) {
+        lv_img_header_t info;
+        lv_img_decoder_get_info(ext->needle_img, &info);
+        needle_w = info.h;
+    }
+    else {
+        needle_w = lv_obj_get_style_line_width(gauge, LV_GAUGE_PART_NEEDLE);
+    }
 
-     p_mid.x = x_ofs;
-     p_mid.y = y_ofs;
-     /*Calculate the end point of a needle*/
-     int16_t needle_angle = (old_value - min) * angle / (max - min) + angle_ofs;
+    p_mid.x = x_ofs;
+    p_mid.y = y_ofs;
+    /*Calculate the end point of a needle*/
+    int16_t needle_angle = (old_value - min) * angle / (max - min) + angle_ofs;
 
-     p_end.y = (lv_trigo_sin(needle_angle) * r) / LV_TRIGO_SIN_MAX + y_ofs;
-     p_end.x = (lv_trigo_sin(needle_angle + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
+    p_end.y = (lv_trigo_sin(needle_angle) * r) / LV_TRIGO_SIN_MAX + y_ofs;
+    p_end.x = (lv_trigo_sin(needle_angle + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
 
-     lv_area_t a;
-     a.x1 = LV_MATH_MIN(p_mid.x, p_end.x) - needle_w;
-     a.y1 = LV_MATH_MIN(p_mid.y, p_end.y) - needle_w;
-     a.x2 = LV_MATH_MAX(p_mid.x, p_end.x) + needle_w;
-     a.y2 = LV_MATH_MAX(p_mid.y, p_end.y) + needle_w;
-     lv_obj_invalidate_area(gauge, &a);
+    lv_area_t a;
+    a.x1 = LV_MATH_MIN(p_mid.x, p_end.x) - needle_w;
+    a.y1 = LV_MATH_MIN(p_mid.y, p_end.y) - needle_w;
+    a.x2 = LV_MATH_MAX(p_mid.x, p_end.x) + needle_w;
+    a.y2 = LV_MATH_MAX(p_mid.y, p_end.y) + needle_w;
+    lv_obj_invalidate_area(gauge, &a);
 
-     needle_angle = (value - min) * angle / (max - min) + angle_ofs;
-     p_end.y = (lv_trigo_sin(needle_angle) * r) / LV_TRIGO_SIN_MAX + y_ofs;
-     p_end.x = (lv_trigo_sin(needle_angle + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
+    needle_angle = (value - min) * angle / (max - min) + angle_ofs;
+    p_end.y = (lv_trigo_sin(needle_angle) * r) / LV_TRIGO_SIN_MAX + y_ofs;
+    p_end.x = (lv_trigo_sin(needle_angle + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
 
-     a.x1 = LV_MATH_MIN(p_mid.x, p_end.x);
-     a.y1 = LV_MATH_MIN(p_mid.y, p_end.y);
-     a.x2 = LV_MATH_MAX(p_mid.x, p_end.x);
-     a.y2 = LV_MATH_MAX(p_mid.y, p_end.y);
-     lv_obj_invalidate_area(gauge, &a);
+    a.x1 = LV_MATH_MIN(p_mid.x, p_end.x);
+    a.y1 = LV_MATH_MIN(p_mid.y, p_end.y);
+    a.x2 = LV_MATH_MAX(p_mid.x, p_end.x);
+    a.y2 = LV_MATH_MAX(p_mid.y, p_end.y);
+    lv_obj_invalidate_area(gauge, &a);
 
 
 }
@@ -544,7 +545,7 @@ static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask)
             lv_utils_num_to_str(scale_act, scale_txt);
         else
             ext->format_cb(gauge, scale_txt, sizeof(scale_txt), scale_act);
-        
+
         lv_area_t label_cord;
         lv_point_t label_size;
         lv_txt_get_size(&label_size, scale_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space,

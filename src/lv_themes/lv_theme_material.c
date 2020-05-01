@@ -146,9 +146,9 @@ static lv_style_t pad_small;
 
 #if LV_USE_PAGE
     static lv_style_t sb;
-#if LV_USE_ANIMATION
-    static lv_style_t edge_flash;
-#endif
+    #if LV_USE_ANIMATION
+        static lv_style_t edge_flash;
+    #endif
 #endif
 
 #if LV_USE_ROLLER
@@ -236,7 +236,8 @@ static void basic_init(void)
     lv_style_set_bg_color(&bg_click, LV_STATE_PRESSED | LV_STATE_CHECKED, COLOR_BG_PR_CHK);
     lv_style_set_bg_color(&bg_click, LV_STATE_DISABLED, COLOR_BG_DIS);
     lv_style_set_border_width(&bg_click, LV_STATE_CHECKED, 0);
-    lv_style_set_border_color(&bg_click, LV_STATE_FOCUSED | LV_STATE_PRESSED, lv_color_darken(theme.color_primary, LV_OPA_20));
+    lv_style_set_border_color(&bg_click, LV_STATE_FOCUSED | LV_STATE_PRESSED, lv_color_darken(theme.color_primary,
+                                                                                              LV_OPA_20));
     lv_style_set_border_color(&bg_click, LV_STATE_PRESSED, COLOR_BG_BORDER_PR);
     lv_style_set_border_color(&bg_click, LV_STATE_CHECKED, COLOR_BG_BORDER_CHK);
     lv_style_set_border_color(&bg_click, LV_STATE_PRESSED | LV_STATE_CHECKED, COLOR_BG_BORDER_CHK_PR);
@@ -577,7 +578,7 @@ static void cpicker_init(void)
     lv_style_set_border_color(&cpicker_indic, LV_STATE_DEFAULT, LV_COLOR_GRAY);
     lv_style_set_border_color(&cpicker_indic, LV_STATE_FOCUSED, theme.color_primary);
     lv_style_set_border_color(&cpicker_indic, LV_STATE_EDITED, theme.color_secondary);
-    lv_style_set_pad_left(&cpicker_indic, LV_STATE_DEFAULT,LV_DPX(13));
+    lv_style_set_pad_left(&cpicker_indic, LV_STATE_DEFAULT, LV_DPX(13));
     lv_style_set_pad_right(&cpicker_indic, LV_STATE_DEFAULT, LV_DPX(13));
     lv_style_set_pad_top(&cpicker_indic, LV_STATE_DEFAULT, LV_DPX(13));
     lv_style_set_pad_bottom(&cpicker_indic, LV_STATE_DEFAULT, LV_DPX(13));
@@ -643,7 +644,7 @@ static void page_init(void)
 #if LV_USE_PAGE
     style_init_reset(&sb);
     lv_style_set_bg_opa(&sb, LV_STATE_DEFAULT, LV_OPA_COVER);
-    lv_style_set_bg_color(&sb, LV_STATE_DEFAULT,  (IS_LIGHT ? lv_color_hex(0xcccfd1) : lv_color_hex(0x777f85)));
+    lv_style_set_bg_color(&sb, LV_STATE_DEFAULT, (IS_LIGHT ? lv_color_hex(0xcccfd1) : lv_color_hex(0x777f85)));
     lv_style_set_radius(&sb, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
     lv_style_set_size(&sb, LV_STATE_DEFAULT, LV_DPX(7));
     lv_style_set_pad_right(&sb, LV_STATE_DEFAULT,  LV_DPX(7));
@@ -850,11 +851,12 @@ static void win_init(void)
  * @return a pointer to reference this theme later
  */
 lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_secondary, uint32_t flags,
-                                    const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle, const lv_font_t * font_title)
+                                    const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle,
+                                    const lv_font_t * font_title)
 {
 
     theme.color_primary = color_primary;
-    theme.color_secondary= color_secondary;
+    theme.color_secondary = color_secondary;
     theme.font_small = font_small;
     theme.font_normal = font_normal;
     theme.font_subtitle = font_subtitle;

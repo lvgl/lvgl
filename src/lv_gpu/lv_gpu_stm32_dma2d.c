@@ -17,21 +17,21 @@
  *********************/
 
 #if LV_COLOR_16_SWAP
-#error "Can't use DMA2D with LV_COLOR_16_SWAP 1"
+    #error "Can't use DMA2D with LV_COLOR_16_SWAP 1"
 #endif
 
 #if LV_COLOR_DEPTH == 8
-#error "Can't use DMA2D with LV_COLOR_DEPTH == 8"
+    #error "Can't use DMA2D with LV_COLOR_DEPTH == 8"
 #endif
 
 #if LV_COLOR_DEPTH == 16
-#define DMA2D_OUTPUT_FORMAT DMA2D_OUTPUT_RGB565
-#define DMA2D_INPUT_FORMAT DMA2D_INPUT_RGB565
+    #define DMA2D_OUTPUT_FORMAT DMA2D_OUTPUT_RGB565
+    #define DMA2D_INPUT_FORMAT DMA2D_INPUT_RGB565
 #elif LV_COLOR_DEPTH == 32
-#define DMA2D_OUTPUT_FORMAT DMA2D_OUTPUT_ARGB8888
-#define DMA2D_INPUT_FORMAT DMA2D_INPUT_ARGB8888
+    #define DMA2D_OUTPUT_FORMAT DMA2D_OUTPUT_ARGB8888
+    #define DMA2D_INPUT_FORMAT DMA2D_INPUT_ARGB8888
 #else
-/*Can't use GPU with other formats*/
+    /*Can't use GPU with other formats*/
 #endif
 
 /**********************
@@ -96,7 +96,8 @@ void lv_gpu_stm32_dma2d_fill(lv_color_t * buf, lv_coord_t buf_w, lv_color_t colo
  * @param fill_h height to fill in pixels
  * @note `buf_w - fill_w` is offset to the next line after fill
  */
-void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t color, const lv_opa_t * mask, lv_opa_t opa, lv_coord_t fill_w, lv_coord_t fill_h)
+void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t color, const lv_opa_t * mask,
+                                  lv_opa_t opa, lv_coord_t fill_w, lv_coord_t fill_h)
 {
     invalidate_cache();
 
@@ -124,7 +125,7 @@ void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t
     HAL_DMA2D_Init(&hdma2d);
     HAL_DMA2D_ConfigLayer(&hdma2d, 0);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
-    HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t) mask, (uint32_t) buf,  (uint32_t)buf, fill_w, fill_h);
+    HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t) mask, (uint32_t) buf, (uint32_t)buf, fill_w, fill_h);
     dma2d_wait();
 }
 
@@ -138,7 +139,8 @@ void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t
  * @param copy_h height of the area to copy in pixels
  * @note `map_w - fill_w` is offset to the next line after copy
  */
-void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h)
+void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_coord_t map_w,
+                             lv_coord_t copy_w, lv_coord_t copy_h)
 {
     invalidate_cache();
 
@@ -173,7 +175,8 @@ void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_
  * @param copy_h height of the area to copy in pixels
  * @note `map_w - fill_w` is offset to the next line after copy
  */
-void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_opa_t opa, lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h)
+void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_opa_t opa,
+                              lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h)
 {
     invalidate_cache();
 

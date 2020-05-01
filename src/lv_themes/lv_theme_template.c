@@ -334,7 +334,8 @@ static void win_init(void)
  * @return a pointer to reference this theme later
  */
 lv_theme_t * lv_theme_template_init(lv_color_t color_primary, lv_color_t color_secondary, uint32_t flags,
-        const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle, const lv_font_t * font_title)
+                                    const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle,
+                                    const lv_font_t * font_title)
 {
     theme.color_primary = color_primary;
     theme.color_secondary = color_secondary;

@@ -32,10 +32,12 @@ typedef uint8_t cmd_state_t;
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const lv_font_t * font_p,
-                           uint32_t letter, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
-                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
+LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
+                                                 const lv_font_t * font_p,
+                                                 uint32_t letter, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
+LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
+                                                     const lv_area_t * clip_area,
+                                                     const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
 
@@ -54,30 +56,31 @@ const uint8_t _lv_bpp1_opa_table[2]  = {0, 255};          /*Opacity mapping with
 const uint8_t _lv_bpp2_opa_table[4]  = {0, 85, 170, 255}; /*Opacity mapping with bpp = 2*/
 
 const uint8_t _lv_bpp3_opa_table[8]  = {0, 36,  73, 109,   /*Opacity mapping with bpp = 3*/
-        146, 182,  219, 255};
+                                        146, 182,  219, 255
+                                       };
 
 const uint8_t _lv_bpp4_opa_table[16] = {0,  17, 34,  51,  /*Opacity mapping with bpp = 4*/
-        68, 85, 102, 119,
-        136, 153, 170, 187,
-        204, 221, 238, 255
-};
+                                        68, 85, 102, 119,
+                                        136, 153, 170, 187,
+                                        204, 221, 238, 255
+                                       };
 const uint8_t _lv_bpp8_opa_table[256] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
-        48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
-        64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
-        80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
-        96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
-        112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127,
-        128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143,
-        144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
-        160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175,
-        176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191,
-        192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207,
-        208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223,
-        224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
-        240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
-};
+                                         16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+                                         32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
+                                         48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+                                         64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79,
+                                         80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
+                                         96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111,
+                                         112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127,
+                                         128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143,
+                                         144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159,
+                                         160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175,
+                                         176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191,
+                                         192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207,
+                                         208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223,
+                                         224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
+                                         240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255
+                                        };
 
 /**********************
  *      MACROS
@@ -107,7 +110,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
  * @param txt `\0` terminated text to write
  */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
-                   const char * txt, lv_draw_label_hint_t * hint)
+                                         const char * txt, lv_draw_label_hint_t * hint)
 {
 
     if(dsc->opa <= LV_OPA_MIN) return;
@@ -390,9 +393,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
  * @param color color of letter
  * @param opa opacity of letter (0..255)
  */
-LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area, const lv_font_t * font_p,
-                           uint32_t letter,
-                           lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
+LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const lv_area_t * clip_area,
+                                                 const lv_font_t * font_p,
+                                                 uint32_t letter,
+                                                 lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     if(opa < LV_OPA_MIN) return;
     if(opa > LV_OPA_MAX) opa = LV_OPA_COVER;
@@ -443,8 +447,9 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_letter(const lv_point_t * pos_p, const
 }
 
 
-LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
-                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
+LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g,
+                                                     const lv_area_t * clip_area,
+                                                     const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
     const uint8_t * bpp_opa_table_p;
     uint32_t bitmask_init;

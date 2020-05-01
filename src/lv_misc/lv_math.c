@@ -120,12 +120,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
     // http://ww1.microchip.com/...en/AppNotes/91040a.pdf
     do {
         trial = root + mask;
-        if ((uint32_t)trial * trial <= x) root = trial;
+        if((uint32_t)trial * trial <= x) root = trial;
         mask = mask >> 1;
     } while(mask);
 
     q->i = (uint32_t) root >> 4;
-    q->f = (uint32_t) (root & 0xf) << 4;
+    q->f = (uint32_t)(root & 0xf) << 4;
 }
 
 

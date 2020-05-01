@@ -576,7 +576,7 @@ static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask)
 
         /*scale angle (hue/sat/val) to linear coordinate*/
         lv_coord_t xi = (i * grad_w) / 360;
-        lv_coord_t xi2 = ((i+i_step) * grad_w) / 360;
+        lv_coord_t xi2 = ((i + i_step) * grad_w) / 360;
 
         rect_area.x1 = LV_MATH_MIN(grad_area.x1 + xi, grad_area.x1 + grad_w - i_step);
         rect_area.y1 = grad_area.y1;

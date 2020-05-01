@@ -506,8 +506,9 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t lv_color_mix_premult(uint16_t * p
  * @param res_color the result color
  * @param res_opa the result opacity
  */
-LV_ATTRIBUTE_FAST_MEM static inline void lv_color_mix_with_alpha(lv_color_t bg_color, lv_opa_t bg_opa, lv_color_t fg_color, lv_opa_t fg_opa,
-                                           lv_color_t * res_color, lv_opa_t * res_opa)
+LV_ATTRIBUTE_FAST_MEM static inline void lv_color_mix_with_alpha(lv_color_t bg_color, lv_opa_t bg_opa,
+                                                                 lv_color_t fg_color, lv_opa_t fg_opa,
+                                                                 lv_color_t * res_color, lv_opa_t * res_opa)
 {
     /* Pick the foreground if it's fully opaque or the Background is fully transparent*/
     if(fg_opa >= LV_OPA_MAX || bg_opa <= LV_OPA_MIN) {

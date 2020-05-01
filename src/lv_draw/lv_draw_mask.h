@@ -57,8 +57,9 @@ enum {
  * A common callback type for every mask type.
  * Used internally by the library.
  */
-typedef lv_draw_mask_res_t (*lv_draw_mask_xcb_t)(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                                void * p);
+typedef lv_draw_mask_res_t (*lv_draw_mask_xcb_t)(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
+                                                 lv_coord_t len,
+                                                 void * p);
 
 typedef uint8_t lv_draw_mask_line_side_t;
 
@@ -183,7 +184,8 @@ int16_t lv_draw_mask_add(void * param, void * custom_id);
  * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
  * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
  */
-LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len);
+LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
+                                                            lv_coord_t len);
 
 /**
  * Remove a mask with a given ID

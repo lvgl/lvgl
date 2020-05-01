@@ -164,7 +164,7 @@ void lv_arc_set_end_angle(lv_obj_t * arc, uint16_t end)
     LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
 
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
-    
+
     if(end > (ext->arc_angle_start + 360)) end = ext->arc_angle_start + 360;
 
     /*Too large move, the whole arc need to be invalidated anyway*/
@@ -254,7 +254,7 @@ void lv_arc_set_bg_end_angle(lv_obj_t * arc, uint16_t end)
     LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
 
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
-    
+
     if(end > (ext->bg_angle_start + 360)) end = ext->bg_angle_start + 360;
 
     /*Too large move, the whole arc need to be invalidated anyway*/
@@ -288,7 +288,7 @@ void lv_arc_set_bg_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
     LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
 
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
-    
+
     if(start > 360) start -= 360;
     if(end > (start + 360)) end = start + 360;
 
@@ -427,7 +427,8 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
         lv_draw_line_dsc_init(&arc_dsc);
         lv_obj_init_draw_line_dsc(arc, LV_ARC_PART_BG, &arc_dsc);
 
-        lv_draw_arc(x, y, r, ext->bg_angle_start + ext->rotation_angle, ext->bg_angle_end + ext->rotation_angle, clip_area, &arc_dsc);
+        lv_draw_arc(x, y, r, ext->bg_angle_start + ext->rotation_angle, ext->bg_angle_end + ext->rotation_angle, clip_area,
+                    &arc_dsc);
 
         lv_draw_line_dsc_init(&arc_dsc);
         lv_obj_init_draw_line_dsc(arc, LV_ARC_PART_INDIC, &arc_dsc);
@@ -439,7 +440,8 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
         lv_coord_t bottom_indic = lv_obj_get_style_pad_bottom(arc, LV_ARC_PART_INDIC);
         r -= LV_MATH_MAX4(left_indic, right_indic, top_indic, bottom_indic);
 
-        lv_draw_arc(x, y, r, ext->arc_angle_start + ext->rotation_angle, ext->arc_angle_end + ext->rotation_angle, clip_area, &arc_dsc);
+        lv_draw_arc(x, y, r, ext->arc_angle_start + ext->rotation_angle, ext->arc_angle_end + ext->rotation_angle, clip_area,
+                    &arc_dsc);
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
@@ -512,7 +514,7 @@ static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angl
 
     start_angle += ext->rotation_angle;
     end_angle += ext->rotation_angle;
-    
+
     if(start_angle >= 360) start_angle -= 360;
     if(end_angle >= 360) end_angle -= 360;
 

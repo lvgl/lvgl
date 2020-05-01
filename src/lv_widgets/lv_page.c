@@ -1352,7 +1352,8 @@ static void get_edge_flash_area(lv_obj_t * page, lv_area_t * flash_area, lv_coor
         flash_area->x2 = page->coords.x1 + state;
         flash_area->y1 = page->coords.y1 - page_h;
         flash_area->y2 = page->coords.y2 + page_h;
-    } else {
+    }
+    else {
         lv_area_set(flash_area, 0, 0, -1, -1);
     }
 }

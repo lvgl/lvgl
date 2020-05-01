@@ -105,7 +105,8 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_coord_t fit_w = lv_obj_get_width_fit(par);
         if(lv_disp_get_size_category(NULL) <= LV_DISP_SIZE_SMALL) {
             lv_obj_set_width(mbox, fit_w);
-        } else {
+        }
+        else {
             lv_obj_set_width(mbox, LV_MATH_MIN(fit_w, LV_DPX(400)));
         }
         lv_obj_align(mbox, NULL, LV_ALIGN_CENTER, 0, 0);
@@ -165,7 +166,8 @@ void lv_msgbox_add_btns(lv_obj_t * mbox, const char * btn_map[])
         lv_state_t state = lv_obj_get_state(mbox, LV_MSGBOX_PART_BG);
         if(state & LV_STATE_EDITED) {
             lv_obj_set_state(ext->btnm, LV_STATE_FOCUSED | LV_STATE_EDITED);
-        } else {
+        }
+        else {
             lv_obj_set_state(ext->btnm, LV_STATE_FOCUSED);
         }
 
@@ -480,13 +482,15 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
             lv_state_t state = lv_obj_get_state(mbox, LV_MSGBOX_PART_BG);
             if(state & LV_STATE_FOCUSED) {
                 lv_obj_set_state(ext->btnm, LV_STATE_FOCUSED);
-            } else {
+            }
+            else {
                 lv_obj_clear_state(ext->btnm, LV_STATE_FOCUSED);
 
             }
             if(state & LV_STATE_EDITED) {
                 lv_obj_set_state(ext->btnm, LV_STATE_EDITED);
-            } else {
+            }
+            else {
                 lv_obj_clear_state(ext->btnm, LV_STATE_EDITED);
 
             }

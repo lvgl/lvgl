@@ -40,30 +40,47 @@
 LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uint32_t px_num)
 {
     while(px_num > 16) {
-        *buf = color; buf++;
-        *buf = color; buf++;
-        *buf = color; buf++;
-        *buf = color; buf++;
+        *buf = color;
+        buf++;
+        *buf = color;
+        buf++;
+        *buf = color;
+        buf++;
+        *buf = color;
+        buf++;
 
-        *buf = color; buf++;
-        *buf = color; buf++;
-        *buf = color; buf++;
-        *buf = color; buf++;
+        *buf = color;
+        buf++;
+        *buf = color;
+        buf++;
+        *buf = color;
+        buf++;
+        *buf = color;
+        buf++;
 
-        *buf = color; buf++;
-        *buf = color; buf++;
-        *buf = color; buf++;
-        *buf = color; buf++;
+        *buf = color;
+        buf++;
+        *buf = color;
+        buf++;
+        *buf = color;
+        buf++;
+        *buf = color;
+        buf++;
 
-        *buf = color; buf++;
-        *buf = color; buf++;
-        *buf = color; buf++;
-        *buf = color; buf++;
+        *buf = color;
+        buf++;
+        *buf = color;
+        buf++;
+        *buf = color;
+        buf++;
+        *buf = color;
+        buf++;
 
         px_num -= 16;
     }
-    while(px_num ) {
-        *buf = color; buf++;
+    while(px_num) {
+        *buf = color;
+        buf++;
         px_num --;
     }
 }

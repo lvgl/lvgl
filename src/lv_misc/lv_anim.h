@@ -49,10 +49,10 @@ struct _lv_anim_path_t;
 /** Get the current value during an animation*/
 typedef lv_anim_value_t (*lv_anim_path_cb_t)(const struct _lv_anim_path_t *, const struct _lv_anim_t *);
 
-typedef struct _lv_anim_path_t{
+typedef struct _lv_anim_path_t {
     lv_anim_path_cb_t cb;
     void * user_data;
-}lv_anim_path_t;
+} lv_anim_path_t;
 
 
 

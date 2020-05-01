@@ -31,7 +31,7 @@ extern "C" {
  * V6.0 COMPATIBILITY
  *--------------------*/
 
-static inline void lv_task_once(lv_task_t *task)
+static inline void lv_task_once(lv_task_t * task)
 {
     lv_task_set_repeat_count(task, 1);
 }

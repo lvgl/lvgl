@@ -513,26 +513,26 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void 
         attr_goal.full = (prop >> 8) & 0xFFU;
 
         if(attr_found.bits.state == attr_goal.bits.state) {
-            lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &p, sizeof(const void * ));
+            lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &p, sizeof(const void *));
             return;
         }
     }
 
     /*Add new property if not exists yet*/
-    uint8_t new_prop_size = (sizeof(lv_style_property_t) + sizeof(const void * ));
+    uint8_t new_prop_size = (sizeof(lv_style_property_t) + sizeof(const void *));
     lv_style_property_t end_mark = _LV_STYLE_CLOSEING_PROP;
     uint8_t end_mark_size = sizeof(end_mark);
 
     uint16_t size = lv_style_get_mem_size(style);
     if(size == 0) size += end_mark_size;
 
-    size += sizeof(lv_style_property_t) + sizeof(const void * );
+    size += sizeof(lv_style_property_t) + sizeof(const void *);
     style->map = lv_mem_realloc(style->map, size);
     LV_ASSERT_MEM(style->map);
     if(style == NULL) return;
 
     lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
-    lv_memcpy_small(style->map + size - sizeof(const void * ) - end_mark_size, &p, sizeof(const void * ));
+    lv_memcpy_small(style->map + size - sizeof(const void *) - end_mark_size, &p, sizeof(const void *));
     lv_memcpy_small(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
 }
 

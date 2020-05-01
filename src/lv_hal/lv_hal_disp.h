@@ -52,10 +52,12 @@ typedef struct {
     void * buf_act;
     uint32_t size; /*In pixel count*/
     lv_area_t area;
-    volatile int flushing;      /*1: flushing is in progress. (It can't be a bitfield because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
-    volatile int flushing_last; /*1: It was the last chunk to flush. (It can't be a bitfield because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
-    volatile uint32_t last_area         :1; /*1: the last area is being rendered*/
-    volatile uint32_t last_part         :1; /*1: the last part of the current area is being rendered*/
+    volatile int
+    flushing;      /*1: flushing is in progress. (It can't be a bitfield because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
+    volatile int
+    flushing_last; /*1: It was the last chunk to flush. (It can't be a bitfield because when it's cleared from IRQ Read-Modify-Write issue might occur)*/
+    volatile uint32_t last_area         : 1; /*1: the last area is being rendered*/
+    volatile uint32_t last_part         : 1; /*1: the last part of the current area is being rendered*/
 } lv_disp_buf_t;
 
 /**
@@ -84,7 +86,7 @@ typedef struct _disp_drv_t {
     /** DPI (dot per inch) of the display.
      * Set to `LV_DPI` from `lv_Conf.h` by default.
      */
-    uint32_t dpi :10;
+    uint32_t dpi : 10;
 
     /** MANDATORY: Write the internal buffer (VDB) to the display. 'lv_disp_flush_ready()' has to be
      * called when finished */
@@ -163,7 +165,7 @@ typedef enum {
     LV_DISP_SIZE_MEDIUM,
     LV_DISP_SIZE_LARGE,
     LV_DISP_SIZE_EXTRA_LARGE,
-}lv_disp_size_t;
+} lv_disp_size_t;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -31,21 +31,28 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                            lv_draw_mask_line_param_t * param);
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                              lv_draw_mask_radius_param_t * param);
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                             lv_draw_mask_angle_param_t * param);
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                            lv_draw_mask_fade_param_t * param);
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                           lv_draw_mask_map_param_t * param);
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                  lv_coord_t abs_y, lv_coord_t len,
+                                                                  lv_draw_mask_line_param_t * param);
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                    lv_coord_t abs_y, lv_coord_t len,
+                                                                    lv_draw_mask_radius_param_t * param);
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                   lv_coord_t abs_y, lv_coord_t len,
+                                                                   lv_draw_mask_angle_param_t * param);
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                  lv_coord_t abs_y, lv_coord_t len,
+                                                                  lv_draw_mask_fade_param_t * param);
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                 lv_coord_t abs_y, lv_coord_t len,
+                                                                 lv_draw_mask_map_param_t * param);
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                         lv_draw_mask_line_param_t * p);
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                          lv_draw_mask_line_param_t * p);
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
+                                                               lv_coord_t len,
+                                                               lv_draw_mask_line_param_t * p);
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
+                                                                lv_coord_t len,
+                                                                lv_draw_mask_line_param_t * p);
 
 LV_ATTRIBUTE_FAST_MEM static inline lv_opa_t mask_mix(lv_opa_t mask_act, lv_opa_t mask_new);
 LV_ATTRIBUTE_FAST_MEM static inline void sqrt_approx(lv_sqrt_res_t * q, lv_sqrt_res_t * ref, uint32_t x);
@@ -99,7 +106,8 @@ int16_t lv_draw_mask_add(void * param, void * custom_id)
  * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
  * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
  */
-LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len)
+LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
+                                                            lv_coord_t len)
 {
     bool changed = false;
     lv_draw_mask_common_dsc_t * dsc;
@@ -425,8 +433,9 @@ void lv_draw_mask_map_init(lv_draw_mask_map_param_t * param, const lv_area_t * c
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                            lv_draw_mask_line_param_t * p)
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                  lv_coord_t abs_y, lv_coord_t len,
+                                                                  lv_draw_mask_line_param_t * p)
 {
     /*Make to points relative to the vertex*/
     abs_y -= p->origo.y;
@@ -484,8 +493,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_line(lv_opa_t * mas
     return res;
 }
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                         lv_draw_mask_line_param_t * p)
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
+                                                               lv_coord_t len,
+                                                               lv_draw_mask_line_param_t * p)
 {
     int32_t y_at_x;
     y_at_x = (int32_t)((int32_t)p->yx_steep * abs_x) >> 10;
@@ -600,8 +610,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_flat(lv_opa_t * mask_b
     return LV_DRAW_MASK_RES_CHANGED;
 }
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                          lv_draw_mask_line_param_t * p)
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
+                                                                lv_coord_t len,
+                                                                lv_draw_mask_line_param_t * p)
 {
     int32_t k;
     int32_t x_at_y;
@@ -742,8 +753,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t line_mask_steep(lv_opa_t * mask_
 }
 
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                             lv_draw_mask_angle_param_t * p)
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                   lv_coord_t abs_y, lv_coord_t len,
+                                                                   lv_draw_mask_angle_param_t * p)
 {
     int32_t rel_y = abs_y - p->cfg.vertex_p.y;
     int32_t rel_x = abs_x - p->cfg.vertex_p.x;
@@ -881,8 +893,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_angle(lv_opa_t * ma
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                              lv_draw_mask_radius_param_t * p)
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                    lv_coord_t abs_y, lv_coord_t len,
+                                                                    lv_draw_mask_radius_param_t * p)
 {
     bool outer = p->cfg.outer;
     int32_t radius = p->cfg.radius;
@@ -890,7 +903,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
     lv_area_copy(&rect, &p->cfg.rect);
 
     if(outer == false) {
-        if(abs_y < rect.y1 || abs_y >rect.y2) {
+        if(abs_y < rect.y1 || abs_y > rect.y2) {
             return LV_DRAW_MASK_RES_TRANSP;
         }
     }
@@ -961,11 +974,12 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
             if(y == p->y_prev) {
                 x0.f = p->y_prev_x.f;
                 x0.i = p->y_prev_x.i;
-            } else {
+            }
+            else {
                 lv_sqrt(r2 - (y * y), &x0, sqrt_mask);
             }
             lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1, sqrt_mask);
-            p->y_prev = y-1;
+            p->y_prev = y - 1;
             p->y_prev_x.f = x1.f;
             p->y_prev_x.i = x1.i;
         }
@@ -978,7 +992,8 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
             if((y - 1) == p->y_prev) {
                 x1.f = p->y_prev_x.f;
                 x1.i = p->y_prev_x.i;
-            } else {
+            }
+            else {
                 lv_sqrt(r2 - ((y - 1) * (y - 1)), &x1, sqrt_mask);
             }
 
@@ -1130,8 +1145,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_radius(lv_opa_t * m
 }
 
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                            lv_draw_mask_fade_param_t * p)
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                  lv_coord_t abs_y, lv_coord_t len,
+                                                                  lv_draw_mask_fade_param_t * p)
 {
     if(abs_y < p->cfg.coords.y1) return LV_DRAW_MASK_RES_FULL_COVER;
     if(abs_y > p->cfg.coords.y2) return LV_DRAW_MASK_RES_FULL_COVER;
@@ -1175,8 +1191,9 @@ LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_fade(lv_opa_t * mas
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t len,
-                                           lv_draw_mask_map_param_t * p)
+LV_ATTRIBUTE_FAST_MEM static lv_draw_mask_res_t lv_draw_mask_map(lv_opa_t * mask_buf, lv_coord_t abs_x,
+                                                                 lv_coord_t abs_y, lv_coord_t len,
+                                                                 lv_draw_mask_map_param_t * p)
 {
     /*Handle out of the mask cases*/
     if(abs_y < p->cfg.coords.y1) return LV_DRAW_MASK_RES_FULL_COVER;
@@ -1229,7 +1246,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void sqrt_approx(lv_sqrt_res_t * q, lv_sqrt_
     x = x << 8; /*Upscale for extra precision*/
 
     uint32_t raw = (ref->i << 4) + (ref->f >> 4);
-    uint32_t raw2 = raw*raw;
+    uint32_t raw2 = raw * raw;
 
     int32_t d = x - raw2;
     d = (int32_t)d / (int32_t)(2 * raw) + raw;

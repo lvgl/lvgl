@@ -126,9 +126,9 @@ void lv_linemeter_set_value(lv_obj_t * lmeter, int32_t value)
     ext->cur_value = ext->cur_value < ext->min_value ? ext->min_value : ext->cur_value;
 
     int16_t level_old =
-            (int32_t)((int32_t)(old_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
+        (int32_t)((int32_t)(old_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
     int16_t level_new =
-            (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
+        (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
 
     if(level_new == level_old) {
         return;
@@ -274,7 +274,8 @@ void lv_linemeter_set_angle_offset(lv_obj_t * lmeter, uint16_t angle)
  * @param lmeter pointer to a line meter object
  * @param mirror mirror setting
  */
-void lv_linemeter_set_mirror(lv_obj_t *lmeter, bool mirror) {
+void lv_linemeter_set_mirror(lv_obj_t * lmeter, bool mirror)
+{
     lv_linemeter_ext_t * ext = lv_obj_get_ext_attr(lmeter);
     if(ext->mirrored == mirror) return;
 

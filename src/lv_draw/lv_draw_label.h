@@ -74,7 +74,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
  * @param txt `\0` terminated text to write
  */
 LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
-                   const char * txt, lv_draw_label_hint_t * hint);
+                                         const char * txt, lv_draw_label_hint_t * hint);
 
 /***********************
  * GLOBAL VARIABLES
