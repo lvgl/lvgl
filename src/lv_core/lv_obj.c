@@ -2408,6 +2408,8 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
             return LV_DPI / 8;
         case LV_STYLE_BG_GRAD_STOP:
             return 255;
+        case LV_STYLE_TRANSFORM_ZOOM:
+            return LV_IMG_ZOOM_NONE;
     }
 
     return 0;
