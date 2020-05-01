@@ -136,15 +136,6 @@ void lv_label_set_text(lv_obj_t * label, const char * text);
 void lv_label_set_text_fmt(lv_obj_t * label, const char * fmt, ...);
 
 /**
- * Set a new text for a label from a character array. The array don't has to be '\0' terminated.
- * Memory will be allocated to store the array by the label.
- * @param label pointer to a label object
- * @param array array of characters or NULL to refresh the label
- * @param size the size of 'array' in bytes
- */
-void lv_label_set_array_text(lv_obj_t * label, const char * array, uint16_t size);
-
-/**
  * Set a static text. It will not be saved by the label so the 'text' variable
  * has to be 'alive' while the label exist.
  * @param label pointer to a label object
