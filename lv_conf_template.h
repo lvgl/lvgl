@@ -391,23 +391,26 @@ typedef void * lv_font_user_data_t;
 
 /*Always enable at least on theme*/
 
-/*No theme, you can apply your styles as you need*/
-#define LV_USE_THEME_EMPTY       0
+/* No theme, you can apply your styles as you need
+ * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
+ #define LV_USE_THEME_EMPTY       1
 
-/*Simple to the create your theme based on it*/
-#define LV_USE_THEME_TEMPLATE    0
+/*Simple to the create your theme based on it
+ * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
+ #define LV_USE_THEME_TEMPLATE    1
 
 /* A fast and impressive theme.
  * Flags:
  * LV_THEME_MATERIAL_FLAG_LIGHT: light theme
  * LV_THEME_MATERIAL_FLAG_DARK: dark theme*/
-#define LV_USE_THEME_MATERIAL    1
+ #define LV_USE_THEME_MATERIAL    1
 
 /* Mono-color theme for monochrome displays.
  * If LV_THEME_DEFAULT_COLOR_PRIMARY is LV_COLOR_BLACK the
  * texts and borders will be black and the background will be
- * white. Else the colors are inverted. */
-#define LV_USE_THEME_MONO        0
+ * white. Else the colors are inverted.
+ * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
+ #define LV_USE_THEME_MONO        1
 
 #define LV_THEME_DEFAULT_INCLUDE            <stdint.h>      /*Include a header for the init. function*/
 #define LV_THEME_DEFAULT_INIT               lv_theme_material_init

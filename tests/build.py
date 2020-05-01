@@ -215,6 +215,7 @@ all_obj_all_features = {
   "LV_USE_LOG":1,
   "LV_USE_THEME_MATERIAL":1,   
   "LV_USE_THEME_EMPTY":1,  
+  "LV_USE_THEME_MONO":1, 
   "LV_USE_THEME_TEMPLATE":1,  
   "LV_THEME_DEFAULT_INIT": "\\\"lv_theme_material_init\\\"",
   "LV_THEME_DEFAULT_COLOR_PRIMARY":      "\\\"LV_COLOR_RED\\\"",

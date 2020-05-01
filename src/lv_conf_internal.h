@@ -580,14 +580,16 @@
 
 /*Always enable at least on theme*/
 
-/*No theme, you can apply your styles as you need*/
+/* No theme, you can apply your styles as you need
+ * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
 #ifndef LV_USE_THEME_EMPTY
-#define LV_USE_THEME_EMPTY       0
+ #define LV_USE_THEME_EMPTY       1
 #endif
 
-/*Simple to the create your theme based on it*/
+/*Simple to the create your theme based on it
+ * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
 #ifndef LV_USE_THEME_TEMPLATE
-#define LV_USE_THEME_TEMPLATE    0
+ #define LV_USE_THEME_TEMPLATE    1
 #endif
 
 /* A fast and impressive theme.
@@ -595,15 +597,16 @@
  * LV_THEME_MATERIAL_FLAG_LIGHT: light theme
  * LV_THEME_MATERIAL_FLAG_DARK: dark theme*/
 #ifndef LV_USE_THEME_MATERIAL
-#define LV_USE_THEME_MATERIAL    1
+ #define LV_USE_THEME_MATERIAL    1
 #endif
 
 /* Mono-color theme for monochrome displays.
  * If LV_THEME_DEFAULT_COLOR_PRIMARY is LV_COLOR_BLACK the
  * texts and borders will be black and the background will be
- * white. Else the colors are inverted. */
+ * white. Else the colors are inverted.
+ * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
 #ifndef LV_USE_THEME_MONO
-#define LV_USE_THEME_MONO        0
+ #define LV_USE_THEME_MONO        1
 #endif
 
 #ifndef LV_THEME_DEFAULT_INCLUDE
