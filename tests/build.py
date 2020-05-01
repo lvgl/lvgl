@@ -205,6 +205,7 @@ all_obj_all_features = {
   "LV_HOR_RES_MAX":480,
   "LV_VER_RES_MAX":320,
   "LV_COLOR_DEPTH":32,
+  "LV_COLOR_SCREEN_TRANSP":1,
   "LV_USE_GROUP":1,
   "LV_USE_ANIMATION":1,
   "LV_ANTIALIAS":1,

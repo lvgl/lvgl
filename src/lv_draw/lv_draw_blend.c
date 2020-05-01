@@ -75,10 +75,10 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
 
 #define FILL_NORMAL_MASK_PX_SCR_TRANSP(out_x,  color)                                               \
     if(*mask_tmp_x) {          \
-        if(*mask_tmp_x == LV_OPA_COVER) disp_buf_tmp[out_x] = color;                                 \
-        else if(disp->driver.screen_transp) lv_color_mix_with_alpha(disp_buf_tmp[out_x], disp_buf_tmp[out_x].ch.alpha,              \
-                                                                        color, *mask_tmp_x, &disp_buf_tmp[out_x], &disp_buf_tmp[out_x].ch.alpha);           \
-        else disp_buf_tmp[out_x] = lv_color_mix(color, disp_buf_tmp[out_x], *mask_tmp_x);            \
+        if(*mask_tmp_x == LV_OPA_COVER) disp_buf_first[out_x] = color;                                 \
+        else if(disp->driver.screen_transp) lv_color_mix_with_alpha(disp_buf_first[out_x], disp_buf_first[out_x].ch.alpha,              \
+                                                                        color, *mask_tmp_x, &disp_buf_first[out_x], &disp_buf_first[out_x].ch.alpha);           \
+        else disp_buf_first[out_x] = lv_color_mix(color, disp_buf_first[out_x], *mask_tmp_x);            \
     }                                                                                                      \
     mask_tmp_x++;
 
@@ -92,10 +92,10 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
 
 #define MAP_NORMAL_MASK_PX_SCR_TRANSP(x)                        \
     if(*mask_tmp_x) {          \
-        if(*mask_tmp_x == LV_OPA_COVER) disp_buf_tmp[x] = map_buf_tmp[x];                                 \
-        else if(disp->driver.screen_transp) lv_color_mix_with_alpha(disp_buf_tmp[x], disp_buf_tmp[x].ch.alpha,              \
-                                                                        map_buf_tmp[x], *mask_tmp_x, &disp_buf_tmp[x], &disp_buf_tmp[x].ch.alpha);                  \
-        else disp_buf_tmp[x] = lv_color_mix(map_buf_tmp[x], disp_buf_tmp[x], *mask_tmp_x);            \
+        if(*mask_tmp_x == LV_OPA_COVER) disp_buf_first[x] = map_buf_first[x];                                 \
+        else if(disp->driver.screen_transp) lv_color_mix_with_alpha(disp_buf_first[x], disp_buf_first[x].ch.alpha,              \
+                                    map_buf_first[x], *mask_tmp_x, &disp_buf_first[x], &disp_buf_first[x].ch.alpha);                  \
+        else disp_buf_first[x] = lv_color_mix(map_buf_first[x], disp_buf_first[x], *mask_tmp_x);            \
     }                                                                                               \
     mask_tmp_x++;
 
@@ -668,9 +668,6 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
     const lv_color_t * map_buf_first = map_buf + map_w * (draw_area->y1 - (map_area->y1 - disp_area->y1));
     map_buf_first += (draw_area->x1 - (map_area->x1 - disp_area->x1));
 
-#if LV_COLOR_SCREEN_TRANSP
-    lv_opa_t opa_composed;
-#endif
 #if LV_COLOR_SCREEN_TRANSP || LV_USE_GPU
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
 #endif
