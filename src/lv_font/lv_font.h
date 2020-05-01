@@ -211,6 +211,14 @@ LV_FONT_DECLARE(lv_font_montserrat_12_subpx)
 LV_FONT_DECLARE(lv_font_unscii_8)
 #endif
 
+#if LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+LV_FONT_DECLARE(lv_font_dejavu_16_persian_hebrew)
+#endif
+
+#if LV_FONT_SIMSUN_16_CJK
+LV_FONT_DECLARE(lv_font_simsun_16_cjk)
+#endif
+
 /*Declare the custom (user defined) fonts*/
 #ifdef LV_FONT_CUSTOM_DECLARE
 LV_FONT_CUSTOM_DECLARE

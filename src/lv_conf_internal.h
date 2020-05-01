@@ -534,6 +534,9 @@
 #ifndef LV_FONT_MONTSERRAT_28_COMPRESSED
 #define LV_FONT_MONTSERRAT_28_COMPRESSED 0  /*bpp = 3*/
 #endif
+#ifndef LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+#define LV_FONT_DEJAVU_16_PERSIAN_HEBREW 0  /*Hebrew, Arabic, PErisan letters and all their forms*/
+#endif
 #ifndef LV_FONT_SIMSUN_16_CJK
 #define LV_FONT_SIMSUN_16_CJK            0  /*1000 most common CJK radicals*/
 #endif
