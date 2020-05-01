@@ -197,7 +197,7 @@ enum {
  **********************/
 
 typedef union {
-    struct {
+    union {
         uint8_t blue : 1;
         uint8_t green : 1;
         uint8_t red : 1;
