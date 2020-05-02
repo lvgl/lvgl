@@ -24,13 +24,13 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if LV_USE_ARABIC_PERSIAN_CHARS == 1
 static uint32_t lv_ap_get_char_index(uint16_t c);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 
-#if LV_USE_ARABIC_PERSIAN_CHARS == 1
 const ap_chars_map_t ap_chars_map[] = {
     /* {Key Offset, End, Beginning, Middle, Isolated, {conjunction}} */
     {1, 0xFE84, -1, 0, -1,  {1, 0}},    // أ

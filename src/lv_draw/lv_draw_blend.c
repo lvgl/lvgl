@@ -296,7 +296,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                                               const lv_opa_t * mask, lv_draw_mask_res_t mask_res)
 {
 
-#if LV_USE_GPU
+#if LV_USE_GPU || LV_COLOR_SCREEN_TRANSP
     lv_disp_t * disp = lv_refr_get_disp_refreshing();
 #endif
 
