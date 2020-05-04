@@ -660,6 +660,12 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 {
+    /* Die gracefully if i->btn_points is NULL */
+    if (i->btn_points == NULL) {
+        LV_LOG_WARN("indev_button_proc: btn_points was  NULL");
+        return;
+    }
+	
     i->proc.types.pointer.act_point.x = i->btn_points[data->btn_id].x;
     i->proc.types.pointer.act_point.y = i->btn_points[data->btn_id].y;
 
