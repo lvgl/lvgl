@@ -1011,6 +1011,7 @@ static void refr_size(lv_obj_t * table)
     h += bg_top + bg_bottom;
 
     lv_obj_set_size(table, w + 1, h + 1);
+    lv_obj_invalidate(table); /*Always invalidate even if the size hasn't changed*/
 }
 
 static lv_coord_t get_row_height(lv_obj_t * table, uint16_t row_id, const lv_font_t ** font,
