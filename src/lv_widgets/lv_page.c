@@ -141,14 +141,15 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->scrl                = lv_cont_create(page, copy_ext->scrl);
         lv_obj_set_signal_cb(ext->scrl, lv_page_scrollable_signal);
 
+        lv_style_list_copy(&ext->scrlbar.style, &copy_ext->scrlbar.style);
+#if LV_USE_ANIMATION
+        lv_style_list_copy(&ext->edge_flash.style, &copy_ext->edge_flash.style);
+#endif
+
         /* Add the signal function only if 'scrolling' is created
          * because everything has to be ready before any signal is received*/
         lv_obj_set_signal_cb(page, lv_page_signal);
         lv_obj_set_design_cb(page, lv_page_design);
-
-        //        lv_page_set_style(new_page, LV_PAGE_STYLE_BG, lv_page_get_style(copy, LV_PAGE_STYLE_BG));
-        //        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRL, lv_page_get_style(copy, LV_PAGE_STYLE_SCRL));
-        //        lv_page_set_style(new_page, LV_PAGE_STYLE_SCRLBAR, lv_page_get_style(copy, LV_PAGE_STYLE_SCRLBAR));
 
         lv_page_set_scrlbar_mode(page, copy_ext->scrlbar.mode);
     }
