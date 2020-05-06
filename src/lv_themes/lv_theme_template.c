@@ -24,7 +24,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name);
+static void theme_apply(lv_obj_t * obj, lv_theme_style_t name);
 
 
 /**********************
@@ -377,13 +377,13 @@ lv_theme_t * lv_theme_template_init(lv_color_t color_primary, lv_color_t color_s
     table_init();
     win_init();
 
-    theme.apply_xcb = lv_theme_material_apply;
+    theme.apply_xcb = theme_apply;
 
     return &theme;
 }
 
 
-void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
+void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
 {
     lv_style_list_t * list;
 
@@ -703,11 +703,11 @@ void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_LIST_PART_BG);
             lv_style_list_add_style(list, &style_bg);
 
-            lv_obj_clean_style_list(obj, LV_LIST_PART_SCRL);
-            list = lv_obj_get_style_list(obj, LV_LIST_PART_SCRL);
+            lv_obj_clean_style_list(obj, LV_LIST_PART_SCROLLABLE);
+            list = lv_obj_get_style_list(obj, LV_LIST_PART_SCROLLABLE);
 
-            lv_obj_clean_style_list(obj, LV_LIST_PART_SCRLBAR);
-            list = lv_obj_get_style_list(obj, LV_LIST_PART_SCRLBAR);
+            lv_obj_clean_style_list(obj, LV_LIST_PART_SCROLLBAR);
+            list = lv_obj_get_style_list(obj, LV_LIST_PART_SCROLLBAR);
             lv_style_list_add_style(list, &style_bg);
             break;
 

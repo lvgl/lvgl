@@ -850,10 +850,10 @@ void lv_theme_mono_apply(lv_obj_t * obj, lv_theme_style_t name)
             lv_style_list_add_style(list, &style_bg);
             lv_style_list_add_style(list, &style_pad_none);
 
-            lv_obj_clean_style_list(obj, LV_LIST_PART_SCRL);
+            lv_obj_clean_style_list(obj, LV_LIST_PART_SCROLLABLE);
 
-            lv_obj_clean_style_list(obj, LV_LIST_PART_SCRLBAR);
-            list = lv_obj_get_style_list(obj, LV_LIST_PART_SCRLBAR);
+            lv_obj_clean_style_list(obj, LV_LIST_PART_SCROLLBAR);
+            list = lv_obj_get_style_list(obj, LV_LIST_PART_SCROLLBAR);
             lv_style_list_add_style(list, &style_sb);
             break;
 

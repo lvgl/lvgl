@@ -2580,7 +2580,7 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
     switch(prop) {
         case LV_STYLE_TEXT_FONT:
         case LV_STYLE_VALUE_FONT:
-            return LV_THEME_DEFAULT_FONT_NORMAL;
+            return lv_theme_get_font_normal();
 #if LV_USE_ANIMATION
         case LV_STYLE_TRANSITION_PATH:
             return &lv_anim_path_def;

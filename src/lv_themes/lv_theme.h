@@ -141,6 +141,11 @@ typedef enum {
     LV_THEME_WIN,
     LV_THEME_WIN_BTN,   /*The buttons are initialized separately*/
 #endif
+
+    _LV_THEME_BUILTIN_LAST,
+    _LV_THEME_CUSTOM_START = _LV_THEME_BUILTIN_LAST,
+    _LV_THEME_CUSTOM_LAST = 0xFFFF,
+
 } lv_theme_style_t;
 
 typedef struct {

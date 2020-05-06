@@ -57,10 +57,10 @@ typedef struct {
 /** List styles. */
 enum {
     LV_LIST_PART_BG = LV_PAGE_PART_BG, /**< List background style */
-    LV_LIST_PART_SCRLBAR = LV_PAGE_PART_SCROLLBAR, /**< List scrollbar style. */
+    LV_LIST_PART_SCROLLBAR = LV_PAGE_PART_SCROLLBAR, /**< List scrollbar style. */
     LV_LIST_PART_EDGE_FLASH = LV_PAGE_PART_EDGE_FLASH, /**< List edge flash style. */
     _LV_LIST_PART_VIRTUAL_LAST = _LV_PAGE_PART_VIRTUAL_LAST,
-    LV_LIST_PART_SCRL = LV_PAGE_PART_SCROLLABLE, /**< List scrollable area style. */
+    LV_LIST_PART_SCROLLABLE = LV_PAGE_PART_SCROLLABLE, /**< List scrollable area style. */
     _LV_LIST_PART_REAL_LAST = _LV_PAGE_PART_REAL_LAST,
 };
 typedef uint8_t lv_list_style_t;

@@ -836,10 +836,10 @@ static lv_style_list_t * lv_list_get_style(lv_obj_t * list, uint8_t part)
         case LV_LIST_PART_BG:
             style_dsc_p = &list->style_list;
             break;
-        case LV_LIST_PART_SCRL:
+        case LV_LIST_PART_SCROLLABLE:
             style_dsc_p = &ext->page.scrl->style_list;
             break;
-        case LV_LIST_PART_SCRLBAR:
+        case LV_LIST_PART_SCROLLBAR:
             style_dsc_p = &ext->page.scrlbar.style;
             break;
 #if LV_USE_ANIMATION
