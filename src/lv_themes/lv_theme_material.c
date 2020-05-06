@@ -73,7 +73,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name);
+static void theme_apply(lv_obj_t * obj, lv_theme_style_t name);
 static void style_init_reset(lv_style_t * style);
 
 /**********************
@@ -895,7 +895,7 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
     table_init();
     win_init();
 
-    theme.apply_xcb = lv_theme_material_apply;
+    theme.apply_xcb = theme_apply;
 
     inited = true;
 
@@ -905,7 +905,7 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
 }
 
 
-void lv_theme_material_apply(lv_obj_t * obj, lv_theme_style_t name)
+static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
 {
     lv_style_list_t * list;
 

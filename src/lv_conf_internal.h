@@ -925,7 +925,7 @@
 
 /*Mask (dependencies: -)*/
 #ifndef LV_USE_OBJMASK
-#define LV_USE_OBJMASK  0
+#define LV_USE_OBJMASK  1
 #endif
 
 /*Message box (dependencies: lv_rect, lv_btnm, lv_label)*/

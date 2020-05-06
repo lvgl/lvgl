@@ -24,7 +24,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_theme_empty_apply(lv_obj_t * obj, lv_theme_style_t name);
+static void theme_apply(lv_obj_t * obj, lv_theme_style_t name);
 
 
 /**********************
@@ -63,12 +63,12 @@ lv_theme_t * lv_theme_empty_init(lv_color_t color_primary, lv_color_t color_seco
     lv_style_init(&opa_cover);
     lv_style_set_bg_opa(&opa_cover, LV_STATE_DEFAULT, LV_OPA_COVER);
 
-    theme.apply_xcb = lv_theme_empty_apply;
+    theme.apply_xcb = theme_apply;
     return &theme;
 }
 
 
-void lv_theme_empty_apply(lv_obj_t * obj, lv_theme_style_t name)
+void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
 {
     if(name == LV_THEME_SCR) {
         lv_obj_clean_style_list(obj, LV_OBJ_PART_MAIN);

@@ -612,7 +612,7 @@ typedef void * lv_obj_user_data_t;
 #endif
 
 /*Mask (dependencies: -)*/
-#define LV_USE_OBJMASK  0
+#define LV_USE_OBJMASK  1
 
 /*Message box (dependencies: lv_rect, lv_btnm, lv_label)*/
 #define LV_USE_MSGBOX     1

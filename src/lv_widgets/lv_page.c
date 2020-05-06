@@ -992,7 +992,6 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 lv_obj_set_drag_parent(scroller_page, false);
                 lv_obj_set_drag_parent(lv_page_get_scrl(scroller_page), false);
 
-                lv_page_ext_t * scroller_page_ext = lv_obj_get_ext_attr(scroller_page);
                 /*Hide scrollbars if required*/
                 if(scroller_page_ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) {
                     scroller_page_ext->scrlbar.hor_draw = 0;
