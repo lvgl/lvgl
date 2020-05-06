@@ -421,8 +421,8 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
         lv_coord_t r       = (LV_MATH_MIN(lv_obj_get_width(arc) - left_bg - right_bg,
                                           lv_obj_get_height(arc) - top_bg - bottom_bg)) / 2;
         lv_draw_line_dsc_t arc_dsc;
-            lv_coord_t x       = arc->coords.x1 + r + left_bg;
-            lv_coord_t y       = arc->coords.y1 + r + top_bg;
+        lv_coord_t x       = arc->coords.x1 + r + left_bg;
+        lv_coord_t y       = arc->coords.y1 + r + top_bg;
 
         if(r > 0) {
             lv_draw_line_dsc_init(&arc_dsc);
