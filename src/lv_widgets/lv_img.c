@@ -630,6 +630,8 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             img_dsc.zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
             img_dsc.zoom = (img_dsc.zoom * ext->zoom) >> 8;
 
+            if(img_dsc.zoom == 0) return LV_DESIGN_RES_OK;
+
             img_dsc.angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
             img_dsc.angle += ext->angle;
 
@@ -683,7 +685,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         }
     }
 
-    return true;
+    return LV_DESIGN_RES_OK;
 }
 
 /**

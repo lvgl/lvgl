@@ -1309,6 +1309,8 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop)
         case LV_STYLE_SIZE:
         case LV_STYLE_TRANSFORM_WIDTH:
         case LV_STYLE_TRANSFORM_HEIGHT:
+        case LV_STYLE_TRANSFORM_ANGLE:
+        case LV_STYLE_TRANSFORM_ZOOM:
         case LV_STYLE_PAD_TOP:
         case LV_STYLE_PAD_BOTTOM:
         case LV_STYLE_PAD_LEFT:

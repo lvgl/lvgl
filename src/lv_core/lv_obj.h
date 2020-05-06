@@ -1369,19 +1369,19 @@ void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay);
 
 /**
  * Helps to quickly declare an event callback function.
- * Will be expanded to: `void <name> (lv_obj_t * obj, lv_event_t e)`
+ * Will be expanded to: `static void <name> (lv_obj_t * obj, lv_event_t e)`
  *
  * Examples:
- * static LV_EVENT_CB_DECLARE(my_event1);  //Protoype declaration
+ * LV_EVENT_CB_DECLARE(my_event1);  //Protoype declaration
  *
- * static LV_EVENT_CB_DECLARE(my_event1)
+ * LV_EVENT_CB_DECLARE(my_event1)
  * {
  *   if(e == LV_EVENT_CLICKED) {
  *      lv_obj_set_hidden(obj ,true);
  *   }
  * }
  */
-#define LV_EVENT_CB_DECLARE(name) void name(lv_obj_t * obj, lv_event_t e)
+#define LV_EVENT_CB_DECLARE(name) static void name(lv_obj_t * obj, lv_event_t e)
 
 #ifdef __cplusplus
 } /* extern "C" */

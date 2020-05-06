@@ -112,7 +112,7 @@ void lv_anim_start(lv_anim_t * a)
 
     /*Set the start value*/
     if(new_anim->early_apply) {
-        if(new_anim->exec_cb) new_anim->exec_cb(new_anim->var, new_anim->start);
+        if(new_anim->exec_cb && new_anim->var) new_anim->exec_cb(new_anim->var, new_anim->start);
     }
 
     /* Creating an animation changed the linked list.
