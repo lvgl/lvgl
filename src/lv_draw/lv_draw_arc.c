@@ -75,6 +75,8 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     if(dsc->width == 0) return;
     if(start_angle == end_angle) return;
 
+    if(dsc->width > radius) dsc->width = radius;
+
     lv_draw_rect_dsc_t cir_dsc;
     lv_draw_rect_dsc_init(&cir_dsc);
     cir_dsc.radius = LV_RADIUS_CIRCLE;

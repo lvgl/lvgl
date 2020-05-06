@@ -420,18 +420,18 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
         lv_coord_t bottom_bg = lv_obj_get_style_pad_bottom(arc, LV_ARC_PART_BG);
         lv_coord_t r       = (LV_MATH_MIN(lv_obj_get_width(arc) - left_bg - right_bg,
                                           lv_obj_get_height(arc) - top_bg - bottom_bg)) / 2;
-        lv_coord_t x       = arc->coords.x1 + r + left_bg;
-        lv_coord_t y       = arc->coords.y1 + r + top_bg;
-
         lv_draw_line_dsc_t arc_dsc;
-        lv_draw_line_dsc_init(&arc_dsc);
-        lv_obj_init_draw_line_dsc(arc, LV_ARC_PART_BG, &arc_dsc);
+            lv_coord_t x       = arc->coords.x1 + r + left_bg;
+            lv_coord_t y       = arc->coords.y1 + r + top_bg;
 
-        lv_draw_arc(x, y, r, ext->bg_angle_start + ext->rotation_angle, ext->bg_angle_end + ext->rotation_angle, clip_area,
-                    &arc_dsc);
+        if(r > 0) {
+            lv_draw_line_dsc_init(&arc_dsc);
+            lv_obj_init_draw_line_dsc(arc, LV_ARC_PART_BG, &arc_dsc);
 
-        lv_draw_line_dsc_init(&arc_dsc);
-        lv_obj_init_draw_line_dsc(arc, LV_ARC_PART_INDIC, &arc_dsc);
+            lv_draw_arc(x, y, r, ext->bg_angle_start + ext->rotation_angle, ext->bg_angle_end + ext->rotation_angle, clip_area,
+                        &arc_dsc);
+        }
+
 
         /*make the indicator arc smaller or larger according to its greatest padding value*/
         lv_coord_t left_indic = lv_obj_get_style_pad_left(arc, LV_ARC_PART_INDIC);
@@ -440,8 +440,13 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
         lv_coord_t bottom_indic = lv_obj_get_style_pad_bottom(arc, LV_ARC_PART_INDIC);
         r -= LV_MATH_MAX4(left_indic, right_indic, top_indic, bottom_indic);
 
-        lv_draw_arc(x, y, r, ext->arc_angle_start + ext->rotation_angle, ext->arc_angle_end + ext->rotation_angle, clip_area,
-                    &arc_dsc);
+        if(r > 0) {
+            lv_draw_line_dsc_init(&arc_dsc);
+            lv_obj_init_draw_line_dsc(arc, LV_ARC_PART_INDIC, &arc_dsc);
+
+            lv_draw_arc(x, y, r, ext->arc_angle_start + ext->rotation_angle, ext->arc_angle_end + ext->rotation_angle, clip_area,
+                        &arc_dsc);
+        }
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
