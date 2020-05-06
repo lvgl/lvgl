@@ -16,6 +16,7 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_gc.h"
 #include "../lv_draw/lv_draw.h"
+#include "../lv_font/lv_font_fmt_txt.h"
 
 #if LV_USE_PERF_MONITOR
     #include "../lv_widgets/lv_label.h"
@@ -245,6 +246,7 @@ void lv_disp_refr_task(lv_task_t * task)
     }
 
     lv_mem_buf_free_all();
+    lv_font_clean_up_fmt_txt();
 
 #if LV_USE_PERF_MONITOR && LV_USE_LABEL
     static lv_obj_t * perf_label = NULL;

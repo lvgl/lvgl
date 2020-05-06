@@ -218,6 +218,11 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t lett
 bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t * dsc_out, uint32_t unicode_letter,
                                    uint32_t unicode_letter_next);
 
+/**
+ * Free the allocated memories.
+ */
+void lv_font_clean_up_fmt_txt(void);
+
 /**********************
  *      MACROS
  **********************/

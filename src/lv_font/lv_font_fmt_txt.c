@@ -47,7 +47,7 @@ static inline uint8_t rle_next(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
-
+static uint8_t * decompr_buf;
 static uint32_t rle_rdp;
 static const uint8_t * rle_in;
 static uint8_t rle_bpp;
@@ -88,19 +88,18 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
     }
     /*Handle compressed bitmap*/
     else {
-        static uint8_t * buf = NULL;
 
         uint32_t gsize = gdsc->box_w * gdsc->box_h;
         if(gsize == 0) return NULL;
 
-        if(lv_mem_get_size(buf) < gsize) {
-            buf = lv_mem_realloc(buf, gsize);
-            LV_ASSERT_MEM(buf);
-            if(buf == NULL) return NULL;
+        if(lv_mem_get_size(decompr_buf) < gsize) {
+            decompr_buf = lv_mem_realloc(decompr_buf, gsize);
+            LV_ASSERT_MEM(decompr_buf);
+            if(decompr_buf == NULL) return NULL;
         }
 
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], buf, gdsc->box_w, gdsc->box_h, (uint8_t)fdsc->bpp);
-        return buf;
+        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], decompr_buf, gdsc->box_w, gdsc->box_h, (uint8_t)fdsc->bpp);
+        return decompr_buf;
     }
 
     /*If not returned earlier then the letter is not found in this font*/
@@ -156,6 +155,17 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     if(is_tab) dsc_out->box_w = dsc_out->box_w * 2;
 
     return true;
+}
+
+/**
+ * Free the allocated memories.
+ */
+void lv_font_clean_up_fmt_txt(void)
+{
+    if(decompr_buf) {
+        lv_mem_free(decompr_buf);
+        decompr_buf = NULL;
+    }
 }
 
 /**********************
