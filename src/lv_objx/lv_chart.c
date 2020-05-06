@@ -1270,10 +1270,10 @@ static void lv_chart_draw_y_ticks(lv_obj_t * chart, const lv_area_t * mask, uint
         const lv_style_t * style = lv_obj_get_style(chart);
         lv_opa_t opa_scale       = lv_obj_get_opa_scale(chart);
 
-        uint8_t i;
-        uint8_t num_of_labels;
-        uint8_t num_scale_ticks;
-        int8_t major_tick_len, minor_tick_len;
+        uint32_t i;
+        uint32_t num_of_labels;
+        uint32_t num_scale_ticks;
+        int32_t major_tick_len, minor_tick_len;
         uint8_t iter_dir;
 
         lv_point_t p1;
@@ -1396,10 +1396,10 @@ static void lv_chart_draw_x_ticks(lv_obj_t * chart, const lv_area_t * mask)
         const lv_style_t * style = lv_obj_get_style(chart);
         lv_opa_t opa_scale       = lv_obj_get_opa_scale(chart);
 
-        uint8_t i;
-        uint8_t num_of_labels;
-        uint8_t num_scale_ticks;
-        uint8_t major_tick_len, minor_tick_len;
+        uint32_t i;
+        uint32_t num_of_labels;
+        uint32_t num_scale_ticks;
+        uint32_t major_tick_len, minor_tick_len;
         lv_chart_label_iterator_t iter;
         lv_point_t p1;
         lv_point_t p2;
