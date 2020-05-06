@@ -19,6 +19,7 @@
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_core/lv_indev.h"
+#include "../lv_core/lv_disp.h"
 #include "lv_img.h"
 
 /*********************
@@ -303,17 +304,17 @@ static lv_res_t lv_switch_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         if(res != LV_RES_OK) return res;
     }
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        lv_style_int_t knob_left = lv_obj_get_style_pad_left(sw,   LV_SLIDER_PART_KNOB);
-        lv_style_int_t knob_right = lv_obj_get_style_pad_right(sw,  LV_SLIDER_PART_KNOB);
-        lv_style_int_t knob_top = lv_obj_get_style_pad_top(sw,    LV_SLIDER_PART_KNOB);
-        lv_style_int_t knob_bottom = lv_obj_get_style_pad_bottom(sw, LV_SLIDER_PART_KNOB);
+        lv_style_int_t knob_left = lv_obj_get_style_pad_left(sw,   LV_SWITCH_PART_KNOB);
+        lv_style_int_t knob_right = lv_obj_get_style_pad_right(sw,  LV_SWITCH_PART_KNOB);
+        lv_style_int_t knob_top = lv_obj_get_style_pad_top(sw,    LV_SWITCH_PART_KNOB);
+        lv_style_int_t knob_bottom = lv_obj_get_style_pad_bottom(sw, LV_SWITCH_PART_KNOB);
 
         /* The smaller size is the knob diameter*/
         lv_coord_t knob_size = LV_MATH_MIN(lv_obj_get_width(sw), lv_obj_get_height(sw)) >> 1;
         knob_size += LV_MATH_MAX(LV_MATH_MAX(knob_left, knob_right), LV_MATH_MAX(knob_bottom, knob_top));
         knob_size += 2;         /*For rounding error*/
 
-        knob_size += lv_obj_get_draw_rect_ext_pad_size(sw, LV_SLIDER_PART_KNOB);
+        knob_size += lv_obj_get_draw_rect_ext_pad_size(sw, LV_SWITCH_PART_KNOB);
 
         /*Indic. size is handled by bar*/
         sw->ext_draw_pad = LV_MATH_MAX(sw->ext_draw_pad, knob_size);

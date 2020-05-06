@@ -10,6 +10,7 @@
 #if LV_USE_TABLE != 0
 
 #include "../lv_core/lv_debug.h"
+#include "../lv_core/lv_indev.h"
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_label.h"

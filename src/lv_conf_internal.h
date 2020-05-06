@@ -188,7 +188,7 @@
 
 /* Drag throw slow-down in [%]. Greater value -> faster slow-down */
 #ifndef LV_INDEV_DEF_DRAG_THROW
-#define LV_INDEV_DEF_DRAG_THROW           20
+#define LV_INDEV_DEF_DRAG_THROW           10
 #endif
 
 /* Long press time in milliseconds.

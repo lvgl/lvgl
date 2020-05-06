@@ -89,6 +89,7 @@ static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v);
 static void trans_anim_start_cb(lv_anim_t * a);
 static void trans_anim_ready_cb(lv_anim_t * a);
 static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
+static void fade_in_anim_ready(lv_anim_t * a);
 #endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static void lv_obj_del_async_cb(void * obj);
@@ -3335,6 +3336,7 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay)
     lv_anim_set_var(&a, obj);
     lv_anim_set_values(&a, LV_OPA_TRANSP, LV_OPA_COVER);
     lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)opa_scale_anim);
+    lv_anim_set_ready_cb(&a, fade_in_anim_ready);
     lv_anim_set_time(&a, time);
     lv_anim_set_delay(&a, delay);
     lv_anim_start(&a);
@@ -3946,6 +3948,11 @@ static void trans_anim_ready_cb(lv_anim_t * a)
 static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v)
 {
     lv_obj_set_style_local_opa_scale(obj, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, v);
+}
+
+static void fade_in_anim_ready(lv_anim_t * a)
+{
+    lv_style_remove_prop(lv_obj_get_local_style(a->var, LV_OBJ_PART_MAIN), LV_STYLE_OPA_SCALE);
 }
 
 #endif

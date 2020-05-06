@@ -6,11 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <stdint.h>
-#include "lv_theme.h"
-#include "lv_theme_material.h"
-#include "../lv_widgets/lv_img.h"
-#include "../lv_misc/lv_types.h"
+#include "../../lvgl.h" /*To see all the widgets*/
 
 #if LV_USE_THEME_MATERIAL
 
