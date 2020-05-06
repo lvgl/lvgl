@@ -387,7 +387,17 @@ static lv_design_res_t lv_bar_design(lv_obj_t * bar, const lv_area_t * clip_area
         lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
+        /*If the border is drawn later disable loading other properties*/
+        if(lv_obj_get_style_border_post(bar, LV_OBJ_PART_MAIN)) {
+            lv_draw_rect_dsc_t draw_dsc;
+            lv_draw_rect_dsc_init(&draw_dsc);
+            draw_dsc.bg_opa = LV_OPA_TRANSP;
+            draw_dsc.pattern_opa = LV_OPA_TRANSP;
+            draw_dsc.shadow_opa = LV_OPA_TRANSP;
+            lv_obj_init_draw_rect_dsc(bar, LV_OBJ_PART_MAIN, &draw_dsc);
 
+            lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
+        }
     }
     return LV_DESIGN_RES_OK;
 }
@@ -397,6 +407,11 @@ static void draw_bg(lv_obj_t * bar, const lv_area_t * clip_area)
     /*Simply draw the background*/
     lv_draw_rect_dsc_t draw_dsc;
     lv_draw_rect_dsc_init(&draw_dsc);
+    /*If the border is drawn later disable loading its properties*/
+     if(lv_obj_get_style_border_post(bar, LV_BAR_PART_BG)) {
+         draw_dsc.border_opa = LV_OPA_TRANSP;
+     }
+
     lv_obj_init_draw_rect_dsc(bar, LV_BAR_PART_BG, &draw_dsc);
     lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
 
