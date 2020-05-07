@@ -530,18 +530,86 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     } else if(sign == LV_SIGNAL_PRESSING) {
         lv_indev_get_point(param, &p);
         int16_t tmp = 0;
+        /*
+         * The formulas in the code below convert the touch coordinate (in the
+         * range of 0 to screen_width-1) to a slider value (in the slider's min
+         * to max value range). The following describes the basis for these
+         * formulas for the case of a horizontal slider.  It uses the following
+         * abbreviations:
+         *   x: X coordinate of touch (p.x)
+         *   x1: X coordinate of left edge of slider (slider->coords.x1)
+         *   w: slider width, in pixels
+         *   minv: slider's minimum value (ext->bar.min_value)
+         *   maxv: slider's maximum value (ext->bar.max_value)
+         *
+         * The basic formula for a slider at the left edge of the screen (zero-
+         * based X coordinate) and a zero-based slider range is:
+         *   x / w * maxv
+         *
+         * Correcting the order of operation to account for truncating integer
+         * division and biasing the numerator so that the integer division will
+         * round to the closest integer value:
+         *   (x * maxv + w / 2) / w
+         *
+         * Biasing the X input for a slider not at the left edge:
+         *   [(x - x1) * maxv + w / 2] / w
+         *
+         * And biasing the output for a non-zero-based slider range:
+         *   [(x - x1) * (maxv - minv) + w / 2] / w + minv
+         *
+         * This assumed a slider where the knob's center point moves along the
+         * slider's entire width, and the knob's body extends beyond the slider
+         * when at either end.  For the "knob in" case, where the full width of
+         * the knob is contained within the slider's boundary, the effective
+         * width of the slider must be reduced by the width of the knob (by the
+         * left half for when the knob is at the left end plus the right half
+         * for when the knob is at the right end).  Also, it is necessary to
+         * bias the touch coordinate by half the width of the knob.
+         *
+         * The modified formula for the "knob in" case adds the following
+         * abbreviation:
+         *   kw: knob's width; same as the slider's height (h)
+         *
+         * The adjusted formula is:
+         *  [(x - x1 - kw / 2) * (maxv - minv) + (w - kw) / 2] / (w - kw) + minv
+         *
+         * Note that, while the adjusted formula is identical to the prior
+         * formula when the knob width is 0, and the code could use a single
+         * computation and just set "kw" to zero for the non-knob-in case,
+         * separate computations are done for execution efficiency.
+         *
+         * Finally, for the cases of vertical sliders, the X coordinates are
+         * replaced with Y, and the slider width and height (knob width) are
+         * interchanged.
+         */
         if(w > h) {
-            lv_coord_t knob_w = h;
-            p.x -=
-                slider->coords.x1 + h / 2; /*Modify the point to shift with half knob (important on the start and end)*/
-            tmp = (int32_t)((int32_t)p.x * (ext->bar.max_value - ext->bar.min_value + 1)) / (w - knob_w);
-            tmp += ext->bar.min_value;
+            /*Horizontal slider*/
+            if(ext->knob_in == 0) {
+                lv_coord_t x1   = slider->coords.x1;
+                lv_coord_t minv = ext->bar.min_value;
+                lv_coord_t maxv = ext->bar.max_value;
+                tmp = (((int32_t)p.x - x1) * (maxv - minv) + w / 2) / w + minv;
+            } else {
+                lv_coord_t x1   = slider->coords.x1;
+                lv_coord_t minv = ext->bar.min_value;
+                lv_coord_t maxv = ext->bar.max_value;
+                lv_coord_t kw   = h;
+                tmp = (((int32_t)p.x - x1 - kw / 2) * (maxv - minv) + (w - kw) / 2) / (w - kw) + minv;
+            }
         } else {
-            lv_coord_t knob_h = w;
-            p.y -=
-                slider->coords.y1 + w / 2; /*Modify the point to shift with half knob (important on the start and end)*/
-            tmp = (int32_t)((int32_t)p.y * (ext->bar.max_value - ext->bar.min_value + 1)) / (h - knob_h);
-            tmp = ext->bar.max_value - tmp; /*Invert the value: smaller value means higher y*/
+            /*Vertical slider*/
+            if(ext->knob_in == 0) {
+                lv_coord_t y1   = slider->coords.y1;
+                lv_coord_t minv = ext->bar.min_value;
+                lv_coord_t maxv = ext->bar.max_value;
+                tmp = (((int32_t)p.y - y1) * (maxv - minv) + h / 2) / h + minv;
+            } else {
+                lv_coord_t y1   = slider->coords.y1;
+                lv_coord_t minv = ext->bar.min_value;
+                lv_coord_t maxv = ext->bar.max_value;
+                lv_coord_t kh   = w;
+                tmp = (((int32_t)p.y - y1 - kh / 2) * (maxv - minv) + (h - kh) / 2) / (h - kh) + minv;
+            }
         }
 
         if(tmp < ext->bar.min_value)
