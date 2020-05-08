@@ -125,7 +125,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
         return NULL;
     }
 
-    lv_memset_00(&disp, sizeof(lv_disp_t));
+    lv_memset_00(disp, sizeof(lv_disp_t));
     lv_memcpy(&disp->driver, driver, sizeof(lv_disp_drv_t));
 
     lv_ll_init(&disp->scr_ll, sizeof(lv_obj_t));
