@@ -66,7 +66,7 @@ typedef uint8_t lv_txt_cmd_state_t;
  * Get size of a text
  * @param size_res pointer to a 'point_t' variable to store the result
  * @param text pointer to a text
- * @param font pinter to font of the text
+ * @param font pointer to font of the text
  * @param letter_space letter space of the text
  * @param line_space line space of the text
  * @param flags settings for the text from 'txt_flag_t' enum
