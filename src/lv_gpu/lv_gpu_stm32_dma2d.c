@@ -10,7 +10,12 @@
 #include "../lv_core/lv_refr.h"
 
 #if LV_USE_GPU_STM32_DMA2D
-#include "stm32f7xx_hal.h"
+
+#if defined(STM32F4)
+#include "stm32f4xx_hal.h"
+#elif defiend(STM32F7)
+#include "stm32f4xx_hal.h"
+#endif
 
 /*********************
  *      DEFINES
@@ -154,9 +159,6 @@ void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_
     hdma2d.LayerCfg[1].InputAlpha = 0xFF;
     hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_FORMAT;
     hdma2d.LayerCfg[1].InputOffset = map_w - copy_w;
-#ifndef STM32F746G_DISCO
-    hdma2d.LayerCfg[1].AlphaInverted = DMA2D_REGULAR_ALPHA;
-#endif
 
     /* DMA2D Initialization */
     HAL_DMA2D_Init(&hdma2d);
@@ -191,18 +193,12 @@ void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color
     hdma2d.LayerCfg[0].AlphaMode = DMA2D_NO_MODIF_ALPHA;
     hdma2d.LayerCfg[0].InputColorMode = DMA2D_INPUT_FORMAT;
     hdma2d.LayerCfg[0].InputOffset = buf_w - copy_w;
-#ifndef STM32F746G_DISCO
-    hdma2d.LayerCfg[0].AlphaInverted = DMA2D_REGULAR_ALPHA;
-#endif
 
     /* Foreground layer */
     hdma2d.LayerCfg[1].AlphaMode = DMA2D_COMBINE_ALPHA;
     hdma2d.LayerCfg[1].InputAlpha = opa;
     hdma2d.LayerCfg[1].InputColorMode = DMA2D_INPUT_FORMAT;
     hdma2d.LayerCfg[1].InputOffset = map_w - copy_w;
-#ifndef STM32F746G_DISCO
-    hdma2d.LayerCfg[1].AlphaInverted = DMA2D_REGULAR_ALPHA;
-#endif
 
     /* DMA2D Initialization */
     HAL_DMA2D_Init(&hdma2d);

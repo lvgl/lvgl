@@ -261,7 +261,7 @@
 
 /* 1: Enable GPU interface*/
 #ifndef LV_USE_GPU
-#define LV_USE_GPU              1
+#define LV_USE_GPU              1   /*Only enables `gpu_fill_cb` and `gpu_blend_cb` in the disp. drv- */
 #endif
 #ifndef LV_USE_GPU_STM32_DMA2D
 #define LV_USE_GPU_STM32_DMA2D  0
