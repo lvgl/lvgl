@@ -220,6 +220,11 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->base_dir     = LV_BIDI_DIR_LTR;
 #endif
 
+        /*Set the callbacks*/
+        new_obj->signal_cb = lv_obj_signal;
+        new_obj->design_cb = lv_obj_design;
+        new_obj->event_cb = NULL;
+
         /*Set coordinates to full screen size*/
         new_obj->coords.x1    = 0;
         new_obj->coords.y1    = 0;
@@ -245,6 +250,11 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->base_dir     = LV_BIDI_DIR_LTR;
 #endif
 
+        /*Set the callbacks (signal:cb is required in `lv_obj_get_base_dir` if `LV_USE_ASSERT_OBJ` is enabled)*/
+        new_obj->signal_cb = lv_obj_signal;
+        new_obj->design_cb = lv_obj_design;
+        new_obj->event_cb = NULL;
+
         new_obj->coords.y1    = parent->coords.y1;
         new_obj->coords.y2    = parent->coords.y1 + LV_OBJ_DEF_HEIGHT;
         if(lv_obj_get_base_dir(new_obj) == LV_BIDI_DIR_RTL) {
@@ -260,10 +270,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
     lv_ll_init(&(new_obj->child_ll), sizeof(lv_obj_t));
 
-    /*Set the callbacks*/
-    new_obj->signal_cb = lv_obj_signal;
-    new_obj->design_cb = lv_obj_design;
-    new_obj->event_cb = NULL;
 
     new_obj->ext_draw_pad = 0;
 
@@ -2728,6 +2734,8 @@ bool lv_obj_get_parent_event(const lv_obj_t * obj)
 
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
 {
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
 #if LV_USE_BIDI
     const lv_obj_t * parent = obj;
 
