@@ -598,15 +598,16 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
             }
         } else {
             /*Vertical slider*/
+            /*Invert the value: smaller value means higher*/
             if(ext->knob_in == 0) {
                 lv_coord_t y1   = slider->coords.y1;
-                lv_coord_t minv = ext->bar.min_value;
-                lv_coord_t maxv = ext->bar.max_value;
+                lv_coord_t minv = ext->bar.max_value;
+                lv_coord_t maxv = ext->bar.min_value;
                 tmp = (((int32_t)p.y - y1) * (maxv - minv) + h / 2) / h + minv;
             } else {
                 lv_coord_t y1   = slider->coords.y1;
-                lv_coord_t minv = ext->bar.min_value;
-                lv_coord_t maxv = ext->bar.max_value;
+                lv_coord_t minv = ext->bar.max_value;
+                lv_coord_t maxv = ext->bar.min_value;
                 lv_coord_t kh   = w;
                 tmp = (((int32_t)p.y - y1 - kh / 2) * (maxv - minv) + (h - kh) / 2) / (h - kh) + minv;
             }
