@@ -331,10 +331,11 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
         if(w >= h) {
             lv_coord_t indic_w = w - bg_left - bg_right;
-            if(base_dir == LV_BIDI_DIR_RTL)
+            if(base_dir == LV_BIDI_DIR_RTL) {
                 new_value = (slider->coords.x2 - bg_right) - p.x; /*Make the point relative to the indicator*/
-            else
+            } else {
                 new_value = p.x - (slider->coords.x1 + bg_left); /*Make the point relative to the indicator*/
+            }
             new_value = (new_value * range) / indic_w;
             new_value += ext->bar.min_value;
         }

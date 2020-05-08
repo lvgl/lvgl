@@ -16,6 +16,7 @@
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_bidi.h"
+#include "../lv_misc/lv_txt_ap.h"
 #include "../lv_misc/lv_printf.h"
 #include "../lv_themes/lv_theme.h"
 
