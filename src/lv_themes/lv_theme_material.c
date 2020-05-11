@@ -393,10 +393,10 @@ static void slider_init(void)
     lv_style_set_bg_color(&slider_knob, LV_STATE_DEFAULT, IS_LIGHT ? theme.color_primary : LV_COLOR_WHITE);
     lv_style_set_value_color(&slider_knob, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x31404f) : LV_COLOR_WHITE);
     lv_style_set_radius(&slider_knob, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-    lv_style_set_pad_left(&slider_knob, LV_STATE_DEFAULT, LV_DPX(10));
-    lv_style_set_pad_right(&slider_knob, LV_STATE_DEFAULT, LV_DPX(10));
-    lv_style_set_pad_top(&slider_knob, LV_STATE_DEFAULT, LV_DPX(10));
-    lv_style_set_pad_bottom(&slider_knob, LV_STATE_DEFAULT, LV_DPX(10));
+    lv_style_set_pad_left(&slider_knob, LV_STATE_DEFAULT, LV_DPX(7));
+    lv_style_set_pad_right(&slider_knob, LV_STATE_DEFAULT, LV_DPX(7));
+    lv_style_set_pad_top(&slider_knob, LV_STATE_DEFAULT, LV_DPX(7));
+    lv_style_set_pad_bottom(&slider_knob, LV_STATE_DEFAULT, LV_DPX(7));
 
     style_init_reset(&slider_bg);
     lv_style_set_margin_left(&slider_bg, LV_STATE_DEFAULT, LV_DPX(15));
@@ -414,10 +414,10 @@ static void switch_init(void)
     lv_style_set_bg_opa(&sw_knob, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&sw_knob, LV_STATE_DEFAULT, LV_COLOR_WHITE);
     lv_style_set_radius(&sw_knob, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-    lv_style_set_pad_top(&sw_knob, LV_STATE_DEFAULT,    - LV_DPX(8));
-    lv_style_set_pad_bottom(&sw_knob, LV_STATE_DEFAULT, - LV_DPX(8));
-    lv_style_set_pad_left(&sw_knob, LV_STATE_DEFAULT,   - LV_DPX(8));
-    lv_style_set_pad_right(&sw_knob, LV_STATE_DEFAULT,  - LV_DPX(8));
+    lv_style_set_pad_top(&sw_knob, LV_STATE_DEFAULT,    - LV_DPX(4));
+    lv_style_set_pad_bottom(&sw_knob, LV_STATE_DEFAULT, - LV_DPX(4));
+    lv_style_set_pad_left(&sw_knob, LV_STATE_DEFAULT,   - LV_DPX(4));
+    lv_style_set_pad_right(&sw_knob, LV_STATE_DEFAULT,  - LV_DPX(4));
 #endif
 }
 
