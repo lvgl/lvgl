@@ -34,6 +34,13 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+
+static uint32_t lv_bidi_get_next_paragraph(const char * txt);
+static lv_bidi_dir_t lv_bidi_get_letter_dir(uint32_t letter);
+static bool lv_bidi_letter_is_weak(uint32_t letter);
+static bool lv_bidi_letter_is_rtl(uint32_t letter);
+static bool lv_bidi_letter_is_neutral(uint32_t letter);
+
 static lv_bidi_dir_t get_next_run(const char * txt, lv_bidi_dir_t base_dir, uint32_t max_len, uint32_t * len,
                                   uint16_t  * pos_conv_len);
 static void rtl_reverse(char * dest, const char * src, uint32_t len, uint16_t * pos_conv_out, uint16_t pos_conv_rd_base,
@@ -113,71 +120,6 @@ lv_bidi_dir_t lv_bidi_detect_base_dir(const char * txt)
     /*If there were no strong char earlier return with the default base dir */
     if(LV_BIDI_BASE_DIR_DEF == LV_BIDI_DIR_AUTO) return LV_BIDI_DIR_LTR;
     else return LV_BIDI_BASE_DIR_DEF;
-}
-/**
- * Get the direction of a character
- * @param letter an Unicode character
- * @return `LV_BIDI_DIR_RTL/LTR/WEAK/NEUTRAL`
- */
-lv_bidi_dir_t lv_bidi_get_letter_dir(uint32_t letter)
-{
-    if(lv_bidi_letter_is_rtl(letter)) return LV_BIDI_DIR_RTL;
-    if(lv_bidi_letter_is_neutral(letter)) return LV_BIDI_DIR_NEUTRAL;
-    if(lv_bidi_letter_is_weak(letter)) return LV_BIDI_DIR_WEAK;
-
-    return LV_BIDI_DIR_LTR;
-}
-/**
- * Tell whether a character is weak or not
- * @param letter an Unicode character
- * @return true/false
- */
-bool lv_bidi_letter_is_weak(uint32_t letter)
-{
-    uint32_t i = 0;
-    static const char weaks[] = "0123456789";
-
-    do {
-        uint32_t x = lv_txt_encoded_next(weaks, &i);
-        if(letter == x) {
-            return true;
-        }
-    } while(weaks[i] != '\0');
-
-    return false;
-}
-/**
- * Tell whether a character is RTL or not
- * @param letter an Unicode character
- * @return true/false
- */
-bool lv_bidi_letter_is_rtl(uint32_t letter)
-{
-    if(letter >= 0x5d0 && letter <= 0x5ea) return true;
-    if(letter == 0x202E) return true;               /*Unicode of LV_BIDI_RLO*/
-
-    /* Check for Persian and Arabic characters [https://en.wikipedia.org/wiki/Arabic_script_in_Unicode]*/
-    if(letter >= 0x600 && letter <= 0x6FF) return true;
-    if(letter >= 0xFB50 && letter <= 0xFDFF) return true;
-    if(letter >= 0xFE70 && letter <= 0xFEFF) return true;
-
-    return false;
-}
-
-/**
- * Tell whether a character is neutral or not
- * @param letter an Unicode character
- * @return true/false
- */
-bool lv_bidi_letter_is_neutral(uint32_t letter)
-{
-    uint16_t i;
-    static const char neutrals[] = " \t\n\r.,:;'\"`!?%/\\-=()[]{}<>@#&$|";
-    for(i = 0; neutrals[i] != '\0'; i++) {
-        if(letter == (uint32_t)neutrals[i]) return true;
-    }
-
-    return false;
 }
 
 /**
@@ -363,12 +305,16 @@ void lv_bidi_process_paragraph(const char * str_in, char * str_out, uint32_t len
     }
 }
 
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
 /**
  * Get the next paragraph from a text
  * @param txt the text to process
  * @return the length of the current paragraph in byte count
  */
-uint32_t lv_bidi_get_next_paragraph(const char * txt)
+static uint32_t lv_bidi_get_next_paragraph(const char * txt)
 {
     uint32_t i = 0;
 
@@ -381,9 +327,71 @@ uint32_t lv_bidi_get_next_paragraph(const char * txt)
     return i;
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
+/**
+ * Get the direction of a character
+ * @param letter an Unicode character
+ * @return `LV_BIDI_DIR_RTL/LTR/WEAK/NEUTRAL`
+ */
+static lv_bidi_dir_t lv_bidi_get_letter_dir(uint32_t letter)
+{
+    if(lv_bidi_letter_is_rtl(letter)) return LV_BIDI_DIR_RTL;
+    if(lv_bidi_letter_is_neutral(letter)) return LV_BIDI_DIR_NEUTRAL;
+    if(lv_bidi_letter_is_weak(letter)) return LV_BIDI_DIR_WEAK;
+
+    return LV_BIDI_DIR_LTR;
+}
+/**
+ * Tell whether a character is weak or not
+ * @param letter an Unicode character
+ * @return true/false
+ */
+static bool lv_bidi_letter_is_weak(uint32_t letter)
+{
+    uint32_t i = 0;
+    static const char weaks[] = "0123456789";
+
+    do {
+        uint32_t x = lv_txt_encoded_next(weaks, &i);
+        if(letter == x) {
+            return true;
+        }
+    } while(weaks[i] != '\0');
+
+    return false;
+}
+/**
+ * Tell whether a character is RTL or not
+ * @param letter an Unicode character
+ * @return true/false
+ */
+static bool lv_bidi_letter_is_rtl(uint32_t letter)
+{
+    if(letter >= 0x5d0 && letter <= 0x5ea) return true;
+    if(letter == 0x202E) return true;               /*Unicode of LV_BIDI_RLO*/
+
+    /* Check for Persian and Arabic characters [https://en.wikipedia.org/wiki/Arabic_script_in_Unicode]*/
+    if(letter >= 0x600 && letter <= 0x6FF) return true;
+    if(letter >= 0xFB50 && letter <= 0xFDFF) return true;
+    if(letter >= 0xFE70 && letter <= 0xFEFF) return true;
+
+    return false;
+}
+
+/**
+ * Tell whether a character is neutral or not
+ * @param letter an Unicode character
+ * @return true/false
+ */
+static bool lv_bidi_letter_is_neutral(uint32_t letter)
+{
+    uint16_t i;
+    static const char neutrals[] = " \t\n\r.,:;'\"`!?%/\\-=()[]{}<>@#&$|";
+    for(i = 0; neutrals[i] != '\0'; i++) {
+        if(letter == (uint32_t)neutrals[i]) return true;
+    }
+
+    return false;
+}
 
 static uint32_t get_txt_len(const char * txt, uint32_t max_len)
 {

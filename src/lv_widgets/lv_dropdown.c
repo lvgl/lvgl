@@ -867,7 +867,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
     else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_get_state_info_t * info = param;
         if(info->part == LV_DROPDOWN_PART_LIST ||
-           info->part == LV_DROPDOWN_PART_SCRLBAR ||
+           info->part == LV_DROPDOWN_PART_SCROLLBAR ||
            info->part == LV_DROPDOWN_PART_SELECTED) {
             info->result = lv_obj_get_state(ext->page, LV_PAGE_PART_BG);
         }
@@ -1085,7 +1085,7 @@ static lv_style_list_t * lv_dropdown_get_style(lv_obj_t * ddlist, uint8_t part)
         case LV_DROPDOWN_PART_LIST:
             style_dsc_p = &ext->style_page;
             break;
-        case LV_DROPDOWN_PART_SCRLBAR:
+        case LV_DROPDOWN_PART_SCROLLBAR:
             style_dsc_p = &ext->style_scrlbar;
             break;
         case LV_DROPDOWN_PART_SELECTED:

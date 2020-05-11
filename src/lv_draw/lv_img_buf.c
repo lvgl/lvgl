@@ -496,10 +496,6 @@ bool lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t
     if(ys_int >= dsc->cfg.src_h) return false;
     else if(ys_int < 0) return false;
 
-    /* If the fractional < 0x70 mix the source pixel with the left/top pixel
-     * If the fractional > 0x90 mix the source pixel with the right/bottom pixel
-     * In the 0x70..0x90 range use the unchanged source pixel */
-
     uint8_t px_size;
     uint32_t pxi;
     if(dsc->tmp.native_color) {

@@ -213,6 +213,26 @@ uint16_t lv_atan2(int x, int y)
     return degree;
 }
 
+/**
+ * Calculate the integer exponents.
+ * @param base
+ * @param power
+ * @return base raised to the power exponent
+ */
+int64_t lv_pow(int64_t base, int8_t exp)
+{
+	int64_t result = 1;
+    while (exp)
+    {
+        if (exp & 1)
+            result *= base;
+        exp >>= 1;
+        base *= base;
+    }
+
+    return result;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

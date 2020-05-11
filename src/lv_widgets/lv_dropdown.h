@@ -70,7 +70,7 @@ typedef struct {
 enum {
     LV_DROPDOWN_PART_MAIN = LV_OBJ_PART_MAIN,
     LV_DROPDOWN_PART_LIST = _LV_OBJ_PART_REAL_LAST,
-    LV_DROPDOWN_PART_SCRLBAR,
+    LV_DROPDOWN_PART_SCROLLBAR,
     LV_DROPDOWN_PART_SELECTED,
 };
 typedef uint8_t lv_dropdown_part_t;

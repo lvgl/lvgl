@@ -66,6 +66,8 @@ typedef struct {
     #define ALIGN_MASK  0x3
 #endif
 
+#define MEM_BUF_SMALL_SIZE 16
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -83,6 +85,13 @@ typedef struct {
 #endif
 
 static uint32_t zero_mem; /*Give the address of this variable if 0 byte should be allocated*/
+
+
+static uint8_t mem_buf1_32[MEM_BUF_SMALL_SIZE];
+static uint8_t mem_buf2_32[MEM_BUF_SMALL_SIZE];
+
+static lv_mem_buf_t mem_buf_small[] = {{.p = mem_buf1_32, .size = MEM_BUF_SMALL_SIZE, .used = 0},
+                                        {.p = mem_buf2_32, .size = MEM_BUF_SMALL_SIZE, .used = 0}};
 
 /**********************
  *      MACROS
@@ -472,14 +481,40 @@ void * lv_mem_buf_get(uint32_t size)
 {
     if(size == 0) return NULL;
 
-    /*Try to find a free buffer with suitable size */
+    /*Try small static buffers first*/
     uint8_t i;
-    for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
-        if(LV_GC_ROOT(_lv_mem_buf[i]).used == 0 && LV_GC_ROOT(_lv_mem_buf[i]).size >= size) {
-            LV_GC_ROOT(_lv_mem_buf[i]).used = 1;
-            return LV_GC_ROOT(_lv_mem_buf[i]).p;
+    if(size <= MEM_BUF_SMALL_SIZE) {
+        for(i = 0; i < sizeof(mem_buf_small) / sizeof(mem_buf_small[0]); i++) {
+            if(mem_buf_small[i].used == 0) {
+                mem_buf_small[i].used = 1;
+                return mem_buf_small[i].p;
+            }
         }
     }
+
+    /*Try to find a free buffer with suitable size */
+    int8_t i_guess = -1;
+    for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
+        if(LV_GC_ROOT(_lv_mem_buf[i]).used == 0 && LV_GC_ROOT(_lv_mem_buf[i]).size >= size) {
+            if(LV_GC_ROOT(_lv_mem_buf[i]).size == size) {
+                LV_GC_ROOT(_lv_mem_buf[i]).used = 1;
+                return LV_GC_ROOT(_lv_mem_buf[i]).p;
+            }
+            else if(i_guess < 0) {
+                i_guess = i;
+            }
+            /*If size of `i` is closer to `size` prefer it*/
+            else if(LV_GC_ROOT(_lv_mem_buf[i]).size < LV_GC_ROOT(_lv_mem_buf[i_guess]).size) {
+                i_guess = i;
+            }
+        }
+    }
+
+    if(i_guess >= 0) {
+        LV_GC_ROOT(_lv_mem_buf[i_guess]).used = 1;
+        return LV_GC_ROOT(_lv_mem_buf[i_guess]).p;
+  }
+
 
     /*Reallocate a free buffer*/
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
@@ -507,6 +542,15 @@ void * lv_mem_buf_get(uint32_t size)
 void lv_mem_buf_release(void * p)
 {
     uint8_t i;
+
+    /*Try small static buffers first*/
+    for(i = 0; i < sizeof(mem_buf_small) / sizeof(mem_buf_small[0]); i++) {
+        if(mem_buf_small[i].p == p) {
+            mem_buf_small[i].used = 0;
+            return;
+        }
+    }
+
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
         if(LV_GC_ROOT(_lv_mem_buf[i]).p == p) {
             LV_GC_ROOT(_lv_mem_buf[i]).used = 0;
@@ -523,6 +567,10 @@ void lv_mem_buf_release(void * p)
 void lv_mem_buf_free_all(void)
 {
     uint8_t i;
+    for(i = 0; i < sizeof(mem_buf_small) / sizeof(mem_buf_small[0]); i++) {
+        mem_buf_small[i].used = 0;
+    }
+
     for(i = 0; i < LV_MEM_BUF_MAX_NUM; i++) {
         if(LV_GC_ROOT(_lv_mem_buf[i]).p) {
             lv_mem_free(LV_GC_ROOT(_lv_mem_buf[i]).p);

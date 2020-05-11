@@ -121,8 +121,6 @@ LV_ATTRIBUTE_FAST_MEM void lv_blend_fill(const lv_area_t * clip_area, const lv_a
                                          lv_color_t color, lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_opa_t opa,
                                          lv_blend_mode_t mode)
 {
-    static int asd = 0;
-    asd++;
     /*Do not draw transparent things*/
     if(opa < LV_OPA_MIN) return;
     if(mask_res == LV_DRAW_MASK_RES_TRANSP) return;
@@ -464,8 +462,8 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 const lv_opa_t * mask_tmp_x = mask;
                 for(x = 0; x < draw_area_w; x++) {
                     if(*mask_tmp_x) {
-                        if(*mask_tmp_x != last_mask) opa_tmp = *mask_tmp_x == LV_OPA_COVER ? opa : (uint32_t)((uint32_t)(
-                                                                                                                      *mask_tmp_x) * opa) >> 8;
+                        if(*mask_tmp_x != last_mask) opa_tmp = *mask_tmp_x == LV_OPA_COVER ? opa :
+                                (uint32_t)((uint32_t)(*mask_tmp_x) * opa) >> 8;
                         if(*mask_tmp_x != last_mask || last_dest_color.full != disp_buf_first[x].full) {
 #if LV_COLOR_SCREEN_TRANSP
                             if(disp->driver.screen_transp) {
