@@ -882,8 +882,8 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
             lv_style_list_add_style(list, &style_bg);
             lv_style_list_add_style(list, &style_big_line_space);
 
-            lv_obj_clean_style_list(obj, LV_DROPDOWN_PART_SCRLBAR);
-            list = lv_obj_get_style_list(obj, LV_DROPDOWN_PART_SCRLBAR);
+            lv_obj_clean_style_list(obj, LV_DROPDOWN_PART_SCROLLBAR);
+            list = lv_obj_get_style_list(obj, LV_DROPDOWN_PART_SCROLLBAR);
             lv_style_list_add_style(list, &style_sb);
 
             lv_obj_clean_style_list(obj, LV_DROPDOWN_PART_SELECTED);
