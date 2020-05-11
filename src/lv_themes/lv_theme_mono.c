@@ -30,6 +30,7 @@ static lv_theme_t theme;
 
 static lv_style_t style_scr;
 static lv_style_t style_bg;
+static lv_style_t style_clip_corner;
 static lv_style_t style_btn;
 static lv_style_t style_round;
 static lv_style_t style_no_radius;
@@ -122,6 +123,10 @@ static void basic_init(void)
     lv_style_set_pad_top(&style_bg, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_bottom(&style_bg, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_inner(&style_bg, LV_STATE_DEFAULT, LV_DPI / 10);
+
+    lv_style_init(&style_clip_corner);
+    lv_style_set_clip_corner(&style_clip_corner, LV_STATE_DEFAULT, true);
+
 
     lv_style_init(&style_btn);
     lv_style_set_radius(&style_btn, LV_STATE_DEFAULT, RADIUS);
@@ -846,6 +851,7 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_LIST_PART_BG);
             lv_style_list_add_style(list, &style_bg);
             lv_style_list_add_style(list, &style_pad_none);
+            lv_style_list_add_style(list, &style_clip_corner);
 
             lv_obj_clean_style_list(obj, LV_LIST_PART_SCROLLABLE);
 
