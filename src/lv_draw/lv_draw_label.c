@@ -572,7 +572,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
             }
         }
 
-        if((uint32_t) mask_p + (row_end - row_start) < mask_buf_size) {
+        if((uint32_t) mask_p + (col_end - col_start) < mask_buf_size) {
             fill_area.y2 ++;
         }
         else {
@@ -776,7 +776,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
             }
         }
 
-        if((uint32_t) mask_p + (row_end - row_start) < mask_buf_size) {
+        if((uint32_t) mask_p + (col_end - col_start) < mask_buf_size) {
             map_area.y2 ++;
         }
         else {
