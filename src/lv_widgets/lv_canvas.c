@@ -895,7 +895,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
  * @param point_cnt number of points
  * @param style style of the line (`line` properties are used)
  */
-void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt,
+void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t point_cnt,
                          lv_draw_line_dsc_t * line_draw_dsc)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
@@ -958,7 +958,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t 
  * @param point_cnt number of points
  * @param style style of the polygon (`body.main_color` and `body.opa` is used)
  */
-void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt,
+void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32_t point_cnt,
                             lv_draw_rect_dsc_t * poly_draw_dsc)
 {
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
