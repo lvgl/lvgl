@@ -411,6 +411,8 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
     }
 }
 
+
+#if LV_USE_IMG_TRANSFORM
 /**
  * Initialize a descriptor to tranform an image
  * @param dsc pointer to an `lv_img_transform_dsc_t` variable whose `cfg` field is initialized
@@ -454,7 +456,7 @@ void lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
     dsc->res.opa = LV_OPA_COVER;
     dsc->res.color = dsc->cfg.color;
 }
-
+#endif
 
 /**
  * Get the area of a rectangle if its rotated and scaled
@@ -468,7 +470,7 @@ void lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
 void lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
                                      lv_point_t * pivot)
 {
-
+#if LV_USE_IMG_TRANSFORM
     int32_t angle_low = angle / 10;
     int32_t angle_hight = angle_low + 1;
     int32_t angle_rem = angle  - (angle_low * 10);
@@ -520,9 +522,15 @@ void lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h
     res->x2 = LV_MATH_MAX4(lb.x, lt.x, rb.x, rt.x);
     res->y1 = LV_MATH_MIN4(lb.y, lt.y, rb.y, rt.y);
     res->y2 = LV_MATH_MAX4(lb.y, lt.y, rb.y, rt.y);
-
+#else
+    res->x1 = 0;
+    res->y1 = 0;
+    res->x2 = w;
+    res->y2 = h;
+#endif
 }
 
+#if LV_USE_IMG_TRANSFORM
 /**
  * Continue transformation by taking the neighbors into account
  * @param dsc pointer to the transformation descriptor
@@ -642,6 +650,7 @@ bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc)
 
     return true;
 }
+#endif
 /**********************
  *   STATIC FUNCTIONS
  **********************/

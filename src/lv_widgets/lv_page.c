@@ -101,7 +101,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_style_list_init(&ext->scrlbar.style);
     ext->scrlbar.hor_draw = 0;
     ext->scrlbar.ver_draw = 0;
-    ext->scrlbar.mode     = LV_SCRLBAR_MODE_AUTO;
+    ext->scrlbar.mode     = LV_SCROLLBAR_MODE_AUTO;
 #if LV_USE_ANIMATION
     lv_style_list_init(&ext->edge_flash.style);
     ext->edge_flash.enabled   = 0;
@@ -131,7 +131,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_signal_cb(page, lv_page_signal);
         lv_obj_set_design_cb(page, lv_page_design);
 
-        lv_page_set_scrlbar_mode(page, ext->scrlbar.mode);
+        lv_page_set_scrollbar_mode(page, ext->scrlbar.mode);
 
         lv_theme_apply(page, LV_THEME_PAGE);
 
@@ -151,7 +151,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_signal_cb(page, lv_page_signal);
         lv_obj_set_design_cb(page, lv_page_design);
 
-        lv_page_set_scrlbar_mode(page, copy_ext->scrlbar.mode);
+        lv_page_set_scrollbar_mode(page, copy_ext->scrlbar.mode);
     }
 
 
@@ -170,7 +170,7 @@ void lv_page_clean(lv_obj_t * page)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 
-    lv_obj_t * scrl = lv_page_get_scrl(page);
+    lv_obj_t * scrl = lv_page_get_scrllable(page);
     lv_obj_clean(scrl);
 }
 
@@ -183,19 +183,19 @@ void lv_page_clean(lv_obj_t * page)
  * @param page pointer to a page object
  * @param sb_mode the new mode from 'lv_page_sb.mode_t' enum
  */
-void lv_page_set_scrlbar_mode(lv_obj_t * page, lv_scrlbar_mode_t sb_mode)
+void lv_page_set_scrollbar_mode(lv_obj_t * page, lv_scrollbar_mode_t sb_mode)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 
     lv_page_ext_t * ext = lv_obj_get_ext_attr(page);
     if(ext->scrlbar.mode == sb_mode) return;
 
-    if(sb_mode == LV_SCRLBAR_MODE_HIDE)
-        ext->scrlbar.mode |= LV_SCRLBAR_MODE_HIDE; /*Set the hidden flag*/
-    else if(sb_mode == LV_SCRLBAR_MODE_UNHIDE)
-        ext->scrlbar.mode &= (~LV_SCRLBAR_MODE_HIDE); /*Clear the hidden flag*/
+    if(sb_mode == LV_SCROLLBAR_MODE_HIDE)
+        ext->scrlbar.mode |= LV_SCROLLBAR_MODE_HIDE; /*Set the hidden flag*/
+    else if(sb_mode == LV_SCROLLBAR_MODE_UNHIDE)
+        ext->scrlbar.mode &= (~LV_SCROLLBAR_MODE_HIDE); /*Clear the hidden flag*/
     else {
-        if(ext->scrlbar.mode & LV_SCRLBAR_MODE_HIDE) sb_mode |= LV_SCRLBAR_MODE_HIDE;
+        if(ext->scrlbar.mode & LV_SCROLLBAR_MODE_HIDE) sb_mode |= LV_SCROLLBAR_MODE_HIDE;
         ext->scrlbar.mode = sb_mode;
     }
 
@@ -270,7 +270,7 @@ void lv_page_set_edge_flash(lv_obj_t * page, bool en)
  * @param page pointer to a page object
  * @return pointer to a container which is the scrollable part of the page
  */
-lv_obj_t * lv_page_get_scrl(const lv_obj_t * page)
+lv_obj_t * lv_page_get_scrllable(const lv_obj_t * page)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 
@@ -302,7 +302,7 @@ uint16_t lv_page_get_anim_time(const lv_obj_t * page)
  * @param page pointer to a page object
  * @return the mode from 'lv_page_sb.mode_t' enum
  */
-lv_scrlbar_mode_t lv_page_get_sb_mode(const lv_obj_t * page)
+lv_scrollbar_mode_t lv_page_get_scrollbar_mode(const lv_obj_t * page)
 {
     LV_ASSERT_OBJ(page, LV_OBJX_NAME);
 
@@ -435,7 +435,7 @@ lv_coord_t lv_page_get_height_grid(lv_obj_t * page, uint8_t div, uint8_t span)
  */
 bool lv_page_on_edge(lv_obj_t * page, lv_page_edge_t edge)
 {
-    lv_obj_t * scrl               = lv_page_get_scrl(page);
+    lv_obj_t * scrl               = lv_page_get_scrllable(page);
     lv_area_t page_coords;
     lv_area_t scrl_coords;
 
@@ -571,7 +571,7 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
  */
 void lv_page_scroll_hor(lv_obj_t * page, lv_coord_t dist)
 {
-    lv_obj_t * scrl = lv_page_get_scrl(page);
+    lv_obj_t * scrl = lv_page_get_scrllable(page);
 
 #if LV_USE_ANIMATION
     lv_anim_t a;
@@ -593,7 +593,7 @@ void lv_page_scroll_hor(lv_obj_t * page, lv_coord_t dist)
  */
 void lv_page_scroll_ver(lv_obj_t * page, lv_coord_t dist)
 {
-    lv_obj_t * scrl = lv_page_get_scrl(page);
+    lv_obj_t * scrl = lv_page_get_scrllable(page);
 
 #if LV_USE_ANIMATION
     lv_anim_t a;
@@ -707,11 +707,11 @@ static lv_design_res_t lv_page_design(lv_obj_t * page, const lv_area_t * clip_ar
             lv_draw_rect_dsc_t rect_dsc;
             lv_draw_rect_dsc_init(&rect_dsc);
             lv_obj_init_draw_rect_dsc(page, LV_PAGE_PART_SCROLLBAR, &rect_dsc);
-            if(ext->scrlbar.hor_draw && (ext->scrlbar.mode & LV_SCRLBAR_MODE_HIDE) == 0) {
+            if(ext->scrlbar.hor_draw && (ext->scrlbar.mode & LV_SCROLLBAR_MODE_HIDE) == 0) {
                 lv_draw_rect(&sb_hor_area, clip_area, &rect_dsc);
             }
 
-            if(ext->scrlbar.ver_draw && (ext->scrlbar.mode & LV_SCRLBAR_MODE_HIDE) == 0) {
+            if(ext->scrlbar.ver_draw && (ext->scrlbar.mode & LV_SCROLLBAR_MODE_HIDE) == 0) {
                 lv_draw_rect(&sb_ver_area, clip_area, &rect_dsc);
             }
         }
@@ -758,7 +758,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_get_state_info_t * info = param;
-        if(info->part == LV_PAGE_PART_SCROLLABLE) info->result = lv_obj_get_state(lv_page_get_scrl(page), LV_CONT_PART_MAIN);
+        if(info->part == LV_PAGE_PART_SCROLLABLE) info->result = lv_obj_get_state(lv_page_get_scrllable(page), LV_CONT_PART_MAIN);
         else info->result = lv_obj_get_state(page, info->part);
         return LV_RES_OK;
     }
@@ -948,7 +948,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         scrl_reposition(page);
     }
     else if(sign == LV_SIGNAL_DRAG_BEGIN) {
-        if(page_ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) {
+        if(page_ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) {
             scrlbar_refresh(page);
         }
     }
@@ -959,10 +959,10 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
             lv_page_ext_t * scroller_page_ext      = lv_obj_get_ext_attr(scroller_page);
             page_ext->scroll_prop_obj = NULL;
             lv_obj_set_drag_parent(scroller_page, false);
-            lv_obj_set_drag_parent(lv_page_get_scrl(scroller_page), false);
+            lv_obj_set_drag_parent(lv_page_get_scrllable(scroller_page), false);
 
             /*Hide scrollbars if required*/
-            if(scroller_page_ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) {
+            if(scroller_page_ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) {
                 lv_area_t sb_area_tmp;
                 if(scroller_page_ext->scrlbar.hor_draw) {
                     lv_area_copy(&sb_area_tmp, &scroller_page_ext->scrlbar.hor_area);
@@ -990,10 +990,10 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 scroller_page = scroller_ext->scroll_prop_obj;
                 scroller_ext->scroll_prop_obj = NULL;
                 lv_obj_set_drag_parent(scroller_page, false);
-                lv_obj_set_drag_parent(lv_page_get_scrl(scroller_page), false);
+                lv_obj_set_drag_parent(lv_page_get_scrllable(scroller_page), false);
 
                 /*Hide scrollbars if required*/
-                if(scroller_page_ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) {
+                if(scroller_page_ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) {
                     scroller_page_ext->scrlbar.hor_draw = 0;
                     scroller_page_ext->scrlbar.ver_draw = 0;
                     lv_obj_invalidate(scroller_page);
@@ -1003,7 +1003,7 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
 
         /*Hide scrollbars if required*/
-        if(page_ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) {
+        if(page_ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) {
             lv_area_t sb_area_tmp;
             if(page_ext->scrlbar.hor_draw) {
                 lv_area_copy(&sb_area_tmp, &page_ext->scrlbar.hor_area);
@@ -1112,7 +1112,7 @@ static void scrl_reposition(lv_obj_t * page)
 {
     /*Limit the position of the scrollable object to be always visible
      * (Do not let its edge inner then its parent respective edge)*/
-    lv_obj_t * scrl = lv_page_get_scrl(page);
+    lv_obj_t * scrl = lv_page_get_scrllable(page);
     lv_coord_t new_x = lv_obj_get_x(scrl);
     lv_coord_t new_y = lv_obj_get_y(scrl);
     bool refr_x      = false;
@@ -1209,9 +1209,9 @@ static void scrlbar_refresh(lv_obj_t * page)
     lv_coord_t sb_hor_pad = LV_MATH_MAX(sb_width, sb_right);
     lv_coord_t sb_ver_pad = LV_MATH_MAX(sb_width, sb_bottom);
 
-    if(ext->scrlbar.mode == LV_SCRLBAR_MODE_OFF) return;
+    if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_OFF) return;
 
-    if(ext->scrlbar.mode == LV_SCRLBAR_MODE_ON) {
+    if(ext->scrlbar.mode == LV_SCRILLBAR_MODE_ON) {
         ext->scrlbar.hor_draw = 1;
         ext->scrlbar.ver_draw = 1;
     }
@@ -1240,7 +1240,7 @@ static void scrlbar_refresh(lv_obj_t * page)
         lv_area_set_width(&ext->scrlbar.hor_area, obj_w - 2 * sb_hor_pad);
         lv_area_set_pos(&ext->scrlbar.hor_area, sb_hor_pad,
                         obj_h - sb_width - sb_bottom);
-        if(ext->scrlbar.mode == LV_SCRLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) ext->scrlbar.hor_draw = 0;
+        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.hor_draw = 0;
     }
     /*Smaller horizontal scrollbar*/
     else {
@@ -1255,7 +1255,7 @@ static void scrlbar_refresh(lv_obj_t * page)
                         (scrl_w + bg_left + bg_right - obj_w),
                         obj_h - sb_width - sb_bottom);
 
-        if(ext->scrlbar.mode == LV_SCRLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) ext->scrlbar.hor_draw = 1;
+        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.hor_draw = 1;
     }
 
     /*Full sized vertical scroll bar*/
@@ -1263,7 +1263,7 @@ static void scrlbar_refresh(lv_obj_t * page)
         lv_area_set_height(&ext->scrlbar.ver_area, obj_h - 2 * sb_ver_pad);
         lv_area_set_pos(&ext->scrlbar.ver_area,
                         obj_w - sb_width - sb_right, sb_ver_pad);
-        if(ext->scrlbar.mode == LV_SCRLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 0;
+        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 0;
     }
     /*Smaller vertical scroll bar*/
     else {
@@ -1278,7 +1278,7 @@ static void scrlbar_refresh(lv_obj_t * page)
                                       (obj_h - size_tmp - 2 * sb_ver_pad)) /
                         (scrl_h + bg_top + bg_bottom - obj_h));
 
-        if(ext->scrlbar.mode == LV_SCRLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCRLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 1;
+        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 1;
     }
 
     /*Invalidate the new scrollbar areas*/

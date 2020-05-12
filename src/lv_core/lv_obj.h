@@ -1324,7 +1324,7 @@ lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name);
 /**
  * Initialize a rectangle descriptor from an object's styles
  * @param obj pointer to an object
- * @param type type of style. E.g.  `LV_OBJ_PART_MAIN`, `LV_BTN_STYLE_REL` or `LV_PAGE_STYLE_SCRL`
+ * @param type type of style. E.g.  `LV_OBJ_PART_MAIN`, `LV_BTN_SLIDER_KOB`
  * @param draw_dsc the descriptor the initialize
  * @note Only the relevant fields will be set.
  * E.g. if `border width == 0` the other border properties won't be evaluated.

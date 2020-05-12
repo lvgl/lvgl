@@ -586,10 +586,10 @@ void lv_dropdown_open(lv_obj_t * ddlist)
 
     ext->page = lv_page_create(lv_obj_get_screen(ddlist), NULL);
     lv_obj_add_protect(ext->page, LV_PROTECT_POS | LV_PROTECT_CLICK_FOCUS);
-    lv_obj_add_protect(lv_page_get_scrl(ext->page), LV_PROTECT_CLICK_FOCUS);
+    lv_obj_add_protect(lv_page_get_scrllable(ext->page), LV_PROTECT_CLICK_FOCUS);
 
     if(ancestor_page_signal == NULL) ancestor_page_signal = lv_obj_get_signal_cb(ext->page);
-    if(ancestor_page_scrl_signal == NULL) ancestor_page_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(ext->page));
+    if(ancestor_page_scrl_signal == NULL) ancestor_page_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrllable(ext->page));
     if(ancestor_page_design == NULL) ancestor_page_design = lv_obj_get_design_cb(ext->page);
 
     lv_dropdown_page_ext_t * page_ext = lv_obj_allocate_ext_attr(ext->page, sizeof(lv_dropdown_page_ext_t));
@@ -603,7 +603,8 @@ void lv_dropdown_open(lv_obj_t * ddlist)
 
     lv_obj_set_design_cb(ext->page, lv_dropdown_page_design);
     lv_obj_set_signal_cb(ext->page, lv_dropdown_page_signal);
-    lv_obj_set_signal_cb(lv_page_get_scrl(ext->page), lv_dropdown_page_scrl_signal);
+    lv_obj_set_signal_cb(lv_page_get_scrllable(ext->page), lv_dropdown_page_scrl_signal);
+    lv_page_set_scrollbar_mode(ext->page, LV_SCRILLBAR_MODE_ON);
 
     lv_style_list_copy(lv_obj_get_style_list(ext->page, LV_PAGE_PART_BG), &ext->style_page);
     lv_style_list_copy(lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCROLLBAR), &ext->style_scrlbar);
@@ -849,11 +850,11 @@ static lv_design_res_t lv_dropdown_page_design(lv_obj_t * page, const lv_area_t 
             has_common = lv_area_intersect(&clip_area_core, clip_area, &ext->page->coords);
             if(has_common) {
                 if(ext->pr_opt_id != LV_DROPDOWN_PR_NONE) {
-                    draw_box_label(ddlist, clip_area, ext->pr_opt_id, LV_STATE_PRESSED);
+                    draw_box_label(ddlist, &clip_area_core, ext->pr_opt_id, LV_STATE_PRESSED);
                 }
 
                 if(ext->show_selected) {
-                    draw_box_label(ddlist, clip_area, ext->sel_opt_id, LV_STATE_DEFAULT);
+                    draw_box_label(ddlist, &clip_area_core, ext->sel_opt_id, LV_STATE_DEFAULT);
                 }
             }
         }
@@ -1022,7 +1023,7 @@ static lv_res_t lv_dropdown_page_signal(lv_obj_t * page, lv_signal_t sign, void 
          * (The scrollabel is scrolled the "select rectangle" is drawn on the bg too)*/
         lv_style_int_t left = lv_obj_get_style_pad_left(ddlist, LV_DROPDOWN_PART_LIST);
         lv_style_int_t right = lv_obj_get_style_pad_right(ddlist, LV_DROPDOWN_PART_LIST);
-        lv_obj_t * scrl = lv_page_get_scrl(page);
+        lv_obj_t * scrl = lv_page_get_scrllable(page);
         scrl->ext_draw_pad = LV_MATH_MAX3(scrl->ext_draw_pad, left, right);
     }
     else if(sign == LV_SIGNAL_RELEASED) {
@@ -1296,7 +1297,7 @@ static void position_to_selected(lv_obj_t * ddlist)
 
     const lv_font_t * font         = lv_obj_get_style_text_font(ddlist, LV_DROPDOWN_PART_LIST);
     lv_coord_t font_h              = lv_font_get_line_height(font);
-    lv_obj_t * scrl                = lv_page_get_scrl(ext->page);
+    lv_obj_t * scrl                = lv_page_get_scrllable(ext->page);
     lv_obj_t * label = get_label(ddlist);
     if(label == NULL) return;
 
@@ -1316,7 +1317,7 @@ static lv_obj_t * get_label(const lv_obj_t * ddlist)
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     if(ext->page == NULL) return NULL;
 
-    return lv_obj_get_child(lv_page_get_scrl(ext->page), NULL);
+    return lv_obj_get_child(lv_page_get_scrllable(ext->page), NULL);
 }
 
 #endif

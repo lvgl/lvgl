@@ -252,6 +252,11 @@
 #define LV_USE_OPA_SCALE        1
 #endif
 
+/* 1: Use image zoom and rotation*/
+#ifndef LV_USE_IMG_TRANSFORM
+#define LV_USE_IMG_TRANSFORM    1
+#endif
+
 /* 1: Enable object groups (for keyboard/encoder navigation) */
 #ifndef LV_USE_GROUP
 #define LV_USE_GROUP            1
@@ -283,6 +288,11 @@
 /*1: Show CPU usage and FPS count in the right bottom corner*/
 #ifndef LV_USE_PERF_MONITOR
 #define LV_USE_PERF_MONITOR     0
+#endif
+
+/*1: Use the functions and types from the older API if possible */
+#ifndef LV_USE_API_EXTENSION_V6
+#define LV_USE_API_EXTENSION_V6  1
 #endif
 
 /*========================

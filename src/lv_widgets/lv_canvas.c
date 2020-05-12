@@ -278,6 +278,7 @@ void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, u
                          lv_coord_t offset_y,
                          int32_t pivot_x, int32_t pivot_y, bool antialias)
 {
+#if LV_USE_IMG_TRANSFORM
     LV_ASSERT_OBJ(canvas, LV_OBJX_NAME);
     LV_ASSERT_NULL(img);
 
@@ -362,6 +363,9 @@ void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, u
     }
 
     lv_obj_invalidate(canvas);
+#else
+    LV_LOG_WARN("LV_USE_IMG_TRANSFORM is disabled in lv_conf.h");
+#endif
 }
 
 

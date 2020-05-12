@@ -30,6 +30,7 @@ extern "C" {
 /*---------------------
  * V6.0 COMPATIBILITY
  *--------------------*/
+#if LV_USE_API_EXTENSION_V6
 
 static inline void lv_task_once(lv_task_t * task)
 {
@@ -146,6 +147,36 @@ static inline void lv_roller_set_fix_width(lv_obj_t * roller, lv_coord_t w)
 
 
 #endif
+
+
+#if LV_USE_PAGE
+#define lv_scrlbar_mode_t lv_scrollbar_mode_t
+
+#define LV_SCRLBAR_MODE_OFF    LV_SCROLLBAR_MODE_OFF
+#define LV_SCRLBAR_MODE_ON     LV_SCRILLBAR_MODE_ON
+#define LV_SCRLBAR_MODE_DRAG   LV_SCROLLBAR_MODE_DRAG
+#define LV_SCRLBAR_MODE_AUTO   LV_SCROLLBAR_MODE_AUTO
+#define LV_SCRLBAR_MODE_HIDE   LV_SCROLLBAR_MODE_HIDE
+#define LV_SCRLBAR_MODE_UNHIDE LV_SCROLLBAR_MODE_UNHIDE
+
+
+static inline void lv_page_set_scrlbar_mode(lv_obj_t * page, lv_scrlbar_mode_t sb_mode)
+{
+    lv_page_set_scrollbar_mode(page, sb_mode);
+}
+static inline lv_scrollbar_mode_t lv_page_get_scrlbar_mode(lv_obj_t * page)
+{
+    return lv_page_get_scrollbar_mode(page);
+}
+
+
+static inline lv_obj_t * lv_page_get_scrl(lv_obj_t * page)
+{
+    return lv_page_get_scrllable(page);
+}
+#endif
+
+#endif /*LV_USE_API_EXTENSION_V6*/
 
 /**********************
  *      MACROS

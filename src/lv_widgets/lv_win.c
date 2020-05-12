@@ -97,7 +97,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 
         ext->page = lv_page_create(new_win, NULL);
         lv_obj_add_protect(ext->page, LV_PROTECT_PARENT);
-        lv_page_set_scrlbar_mode(ext->page, LV_SCRLBAR_MODE_AUTO);
+        lv_page_set_scrollbar_mode(ext->page, LV_SCROLLBAR_MODE_AUTO);
         lv_obj_clean_style_list(ext->page, LV_PAGE_PART_BG);
 
         /*Create a holder for the header*/
@@ -154,7 +154,7 @@ void lv_win_clean(lv_obj_t * win)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
 
-    lv_obj_t * scrl = lv_page_get_scrl(win);
+    lv_obj_t * scrl = lv_page_get_scrllable(win);
     lv_obj_clean(scrl);
 }
 
@@ -293,12 +293,12 @@ void lv_win_set_layout(lv_obj_t * win, lv_layout_t layout)
  * @param win pointer to a window object
  * @param sb_mode the new scroll bar mode from  'lv_sb_mode_t'
  */
-void lv_win_set_scrlbar_mode(lv_obj_t * win, lv_scrlbar_mode_t sb_mode)
+void lv_win_set_scrollbar_mode(lv_obj_t * win, lv_scrollbar_mode_t sb_mode)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
-    lv_page_set_scrlbar_mode(ext->page, sb_mode);
+    lv_page_set_scrollbar_mode(ext->page, sb_mode);
 }
 /**
  * Set focus animation duration on `lv_win_focus()`
@@ -418,12 +418,12 @@ lv_layout_t lv_win_get_layout(lv_obj_t * win)
  * @param win pointer to a window object
  * @return the scroll bar mode of the window (from 'lv_sb_mode_t')
  */
-lv_scrlbar_mode_t lv_win_get_sb_mode(lv_obj_t * win)
+lv_scrollbar_mode_t lv_win_get_sb_mode(lv_obj_t * win)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
-    return lv_page_get_sb_mode(ext->page);
+    return lv_page_get_scrollbar_mode(ext->page);
 }
 
 /**
@@ -448,7 +448,7 @@ lv_coord_t lv_win_get_width(lv_obj_t * win)
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
 
     lv_win_ext_t * ext            = lv_obj_get_ext_attr(win);
-    lv_obj_t * scrl               = lv_page_get_scrl(ext->page);
+    lv_obj_t * scrl               = lv_page_get_scrllable(ext->page);
     lv_coord_t left = lv_obj_get_style_pad_left(win, LV_WIN_PART_BG);
     lv_coord_t right = lv_obj_get_style_pad_left(win, LV_WIN_PART_BG);
 
@@ -547,7 +547,7 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
         lv_get_state_info_t * info = param;
-        if(info->part == LV_WIN_PART_CONTENT_SCROLLABLE) info->result = lv_obj_get_state(lv_page_get_scrl(ext->page),
+        if(info->part == LV_WIN_PART_CONTENT_SCROLLABLE) info->result = lv_obj_get_state(lv_page_get_scrllable(ext->page),
                                                                                              LV_CONT_PART_MAIN);
         else if(info->part == LV_WIN_PART_SCROLLBAR) info->result = lv_obj_get_state(ext->page, LV_PAGE_PART_SCROLLBAR);
         else if(info->part == LV_WIN_PART_HEADER) info->result = lv_obj_get_state(ext->header, LV_OBJ_PART_MAIN);

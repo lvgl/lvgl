@@ -129,18 +129,18 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->btns    = lv_btnmatrix_create(tabview, NULL);
         ext->indic   = lv_obj_create(ext->btns, NULL);
 
-        if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrl(ext->content));
-        lv_obj_set_signal_cb(lv_page_get_scrl(ext->content), tabview_scrl_signal);
+        if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrllable(ext->content));
+        lv_obj_set_signal_cb(lv_page_get_scrllable(ext->content), tabview_scrl_signal);
 
         lv_btnmatrix_set_map(ext->btns, tab_def);
         lv_obj_set_event_cb(ext->btns, tab_btnm_event_cb);
 
         lv_obj_set_click(ext->indic, false);
-        lv_obj_set_drag_dir(lv_page_get_scrl(ext->content), LV_DRAG_DIR_ONE);
+        lv_obj_set_drag_dir(lv_page_get_scrllable(ext->content), LV_DRAG_DIR_ONE);
 
-        lv_page_set_scrl_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_PARENT);
+        lv_page_set_scrllable_fit2(ext->content, LV_FIT_TIGHT, LV_FIT_PARENT);
         lv_page_set_scrl_layout(ext->content, LV_LAYOUT_ROW_TOP);
-        lv_page_set_scrlbar_mode(ext->content, LV_SCRLBAR_MODE_OFF);
+        lv_page_set_scrollbar_mode(ext->content, LV_SCROLLBAR_MODE_OFF);
 
         lv_obj_clean_style_list(ext->content, LV_PAGE_PART_BG);
 
@@ -165,8 +165,8 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->tab_name_ptr[0] = "";
         lv_btnmatrix_set_map(ext->btns, ext->tab_name_ptr);
 
-        lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_BG_SCRL), lv_obj_get_style_list(copy,
-                                                                                                          LV_TABVIEW_PART_BG_SCRL));
+        lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_BG_SCRLLABLE), lv_obj_get_style_list(copy,
+                                                                                                          LV_TABVIEW_PART_BG_SCRLLABLE));
         lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB_BG), lv_obj_get_style_list(copy,
                                                                                                          LV_TABVIEW_PART_TAB_BG));
         lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB_BTN), lv_obj_get_style_list(copy,
@@ -214,7 +214,7 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     /*Create the container page*/
     lv_obj_t * h = lv_page_create(ext->content, NULL);
     lv_obj_set_size(h, lv_obj_get_width(tabview), lv_obj_get_height(ext->content));
-    lv_page_set_scrlbar_mode(h, LV_SCRLBAR_MODE_AUTO);
+    lv_page_set_scrollbar_mode(h, LV_SCROLLBAR_MODE_AUTO);
     lv_page_set_scroll_propagation(h, true);
     lv_theme_apply(h, LV_THEME_TABVIEW_PAGE);
 
@@ -306,7 +306,7 @@ void lv_tabview_clean_tab(lv_obj_t * tab)
 {
     LV_ASSERT_OBJ(tab, "lv_page");
 
-    lv_obj_t * scrl = lv_page_get_scrl(tab);
+    lv_obj_t * scrl = lv_page_get_scrllable(tab);
     lv_obj_clean(scrl);
 }
 
@@ -357,15 +357,15 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
     }
 
     if(anim == LV_ANIM_OFF || lv_tabview_get_anim_time(tabview) == 0) {
-        lv_obj_set_x(lv_page_get_scrl(ext->content), cont_x);
+        lv_obj_set_x(lv_page_get_scrllable(ext->content), cont_x);
     }
 #if LV_USE_ANIMATION
     else {
         lv_anim_t a;
         lv_anim_init(&a);
-        lv_anim_set_var(&a, lv_page_get_scrl(ext->content));
+        lv_anim_set_var(&a, lv_page_get_scrllable(ext->content));
         lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)lv_obj_set_x);
-        lv_anim_set_values(&a, lv_obj_get_x(lv_page_get_scrl(ext->content)), cont_x);
+        lv_anim_set_values(&a, lv_obj_get_x(lv_page_get_scrllable(ext->content)), cont_x);
         lv_anim_set_time(&a, ext->anim_time);
         lv_anim_start(&a);
     }
@@ -529,7 +529,7 @@ lv_obj_t * lv_tabview_get_tab(const lv_obj_t * tabview, uint16_t id)
     LV_ASSERT_OBJ(tabview, LV_OBJX_NAME);
 
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
-    lv_obj_t * content_scrl = lv_page_get_scrl(ext->content);
+    lv_obj_t * content_scrl = lv_page_get_scrllable(ext->content);
     uint16_t i             = 0;
     lv_obj_t * page        = lv_obj_get_child_back(content_scrl, NULL);
 
@@ -599,7 +599,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         if(info->part == LV_TABVIEW_PART_TAB_BG) info->result = lv_obj_get_state(ext->btns, LV_BTNMATRIX_PART_BG);
         else if(info->part == LV_TABVIEW_PART_TAB_BTN) info->result = lv_obj_get_state(ext->btns, LV_BTNMATRIX_PART_BTN);
         else if(info->part == LV_TABVIEW_PART_INDIC) info->result = lv_obj_get_state(ext->indic, LV_OBJ_PART_MAIN);
-        else if(info->part == LV_TABVIEW_PART_BG_SCRL) info->result = lv_obj_get_state(ext->content, LV_PAGE_PART_SCROLLABLE);
+        else if(info->part == LV_TABVIEW_PART_BG_SCRLLABLE) info->result = lv_obj_get_state(ext->content, LV_PAGE_PART_SCROLLABLE);
         return LV_RES_OK;
     }
 
@@ -769,7 +769,7 @@ static lv_style_list_t * lv_tabview_get_style(lv_obj_t * tabview, uint8_t part)
         case LV_TABVIEW_PART_BG:
             style_dsc_p = &tabview->style_list;
             break;
-        case LV_TABVIEW_PART_BG_SCRL:
+        case LV_TABVIEW_PART_BG_SCRLLABLE:
             style_dsc_p = lv_obj_get_style_list(ext->content, LV_PAGE_PART_SCROLLABLE);
             break;
         case LV_TABVIEW_PART_TAB_BG:
@@ -963,10 +963,10 @@ static void refr_content_size(lv_obj_t * tabview)
     lv_obj_set_size(ext->content, cont_w, cont_h);
 
     /*Refresh the size of the tab pages too. `ext->content` has a layout to align the pages*/
-    lv_style_int_t bg_top = lv_obj_get_style_pad_top(tabview, LV_TABVIEW_PART_BG_SCRL);
-    lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(tabview, LV_TABVIEW_PART_BG_SCRL);
+    lv_style_int_t bg_top = lv_obj_get_style_pad_top(tabview, LV_TABVIEW_PART_BG_SCRLLABLE);
+    lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(tabview, LV_TABVIEW_PART_BG_SCRLLABLE);
     cont_h -= bg_top + bg_bottom;
-    lv_obj_t * content_scrl = lv_page_get_scrl(ext->content);
+    lv_obj_t * content_scrl = lv_page_get_scrllable(ext->content);
     lv_obj_t * pages = lv_obj_get_child(content_scrl, NULL);
     while(pages != NULL) {
         /*Be sure adjust only the pages (user can other things)*/

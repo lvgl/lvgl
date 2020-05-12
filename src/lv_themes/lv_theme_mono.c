@@ -779,7 +779,7 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_BG);
             lv_style_list_add_style(list, &style_scr);
 
-            lv_obj_clean_style_list(obj, LV_TABVIEW_PART_BG_SCRL);
+            lv_obj_clean_style_list(obj, LV_TABVIEW_PART_BG_SCRLLABLE);
 
             lv_obj_clean_style_list(obj, LV_TABVIEW_PART_TAB_BG);
             list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_TAB_BG);
@@ -811,8 +811,8 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_BG);
             lv_style_list_add_style(list, &style_bg);
 
-            lv_obj_clean_style_list(obj, LV_TILEVIEW_PART_SCRLBAR);
-            list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_SCRLBAR);
+            lv_obj_clean_style_list(obj, LV_TILEVIEW_PART_SCROLLBAR);
+            list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_SCROLLBAR);
             lv_style_list_add_style(list, &style_sb);
 
             lv_obj_clean_style_list(obj, LV_TILEVIEW_PART_EDGE_FLASH);
@@ -977,8 +977,8 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_TEXTAREA_PART_CURSOR);
             lv_style_list_add_style(list, &style_ta_cursor);
 
-            lv_obj_clean_style_list(obj, LV_TEXTAREA_PART_SCRLBAR);
-            list = lv_obj_get_style_list(obj, LV_TEXTAREA_PART_SCRLBAR);
+            lv_obj_clean_style_list(obj, LV_TEXTAREA_PART_SCROLLBAR);
+            list = lv_obj_get_style_list(obj, LV_TEXTAREA_PART_SCROLLBAR);
             lv_style_list_add_style(list, &style_sb);
             break;
 #endif

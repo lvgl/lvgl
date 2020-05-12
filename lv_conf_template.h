@@ -169,6 +169,9 @@ typedef void * lv_anim_user_data_t;
 /* 1: Use the `opa_scale` style property to set the opacity of an object and its children at once*/
 #define LV_USE_OPA_SCALE        1
 
+/* 1: Use image zoom and rotation*/
+#define LV_USE_IMG_TRANSFORM    1
+
 /* 1: Enable object groups (for keyboard/encoder navigation) */
 #define LV_USE_GROUP            1
 #if LV_USE_GROUP
@@ -191,6 +194,9 @@ typedef void * lv_fs_drv_user_data_t;
 
 /*1: Show CPU usage and FPS count in the right bottom corner*/
 #define LV_USE_PERF_MONITOR     0
+
+/*1: Use the functions and types from the older API if possible */
+#define LV_USE_API_EXTENSION_V6  1
 
 /*========================
  * Image decoder and cache

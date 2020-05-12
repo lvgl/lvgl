@@ -78,7 +78,7 @@ typedef struct {
 /** Possible text areas tyles. */
 enum {
     LV_TEXTAREA_PART_BG = LV_PAGE_PART_BG, /**< Text area background style */
-    LV_TEXTAREA_PART_SCRLBAR = LV_PAGE_PART_SCROLLBAR, /**< Scrollbar style */
+    LV_TEXTAREA_PART_SCROLLBAR = LV_PAGE_PART_SCROLLBAR, /**< Scrollbar style */
     LV_TEXTAREA_PART_EDGE_FLASH = LV_PAGE_PART_EDGE_FLASH, /**< Edge flash style */
     LV_TEXTAREA_PART_CURSOR = _LV_PAGE_PART_VIRTUAL_LAST, /**< Cursor style */
     LV_TEXTAREA_PART_PLACEHOLDER, /**< Placeholder style */
@@ -222,11 +222,11 @@ void lv_textarea_set_insert_replace(lv_obj_t * ta, const char * txt);
 /**
  * Set the scroll bar mode of a text area
  * @param ta pointer to a text area object
- * @param sb_mode the new mode from 'lv_page_sb_mode_t' enum
+ * @param sb_mode the new mode from 'lv_scrollbar_mode_t' enum
  */
-static inline void lv_textarea_set_sb_mode(lv_obj_t * ta, lv_scrlbar_mode_t mode)
+static inline void lv_textarea_set_sscrollbar_mode(lv_obj_t * ta, lv_scrollbar_mode_t mode)
 {
-    lv_page_set_scrlbar_mode(ta, mode);
+    lv_page_set_scrollbar_mode(ta, mode);
 }
 
 /**
@@ -348,11 +348,11 @@ uint16_t lv_textarea_get_max_length(lv_obj_t * ta);
 /**
  * Get the scroll bar mode of a text area
  * @param ta pointer to a text area object
- * @return scrollbar mode from 'lv_page_sb_mode_t' enum
+ * @return scrollbar mode from 'lv_scrollbar_mode_t' enum
  */
-static inline lv_scrlbar_mode_t lv_textarea_get_sb_mode(const lv_obj_t * ta)
+static inline lv_scrollbar_mode_t lv_textarea_get_scrollbar_mode(const lv_obj_t * ta)
 {
-    return lv_page_get_sb_mode(ta);
+    return lv_page_get_scrollbar_mode(ta);
 }
 
 /**
