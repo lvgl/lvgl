@@ -130,6 +130,23 @@ static inline bool lv_slider_get_sym(lv_obj_t * slider)
 
 #endif
 
+#if LV_USE_ROLLER
+
+/**
+ * Set a fixed width for the roller.
+ * @param roller pointer to a roller object
+ * @param w width
+ * @deprecated As of v7.0, you should use `lv_roller_set_auto_fit` and set the width normally instead.
+ */
+static inline void lv_roller_set_fix_width(lv_obj_t * roller, lv_coord_t w)
+{
+    lv_roller_set_auto_fit(roller, false);
+    lv_obj_set_width(roller, w);
+}
+
+
+#endif
+
 /**********************
  *      MACROS
  **********************/
