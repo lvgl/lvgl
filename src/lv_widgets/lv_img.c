@@ -596,8 +596,22 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         if(lv_obj_get_style_border_post(img, LV_OBJ_PART_MAIN)) {
             bg_dsc.border_opa = LV_OPA_TRANSP;
         }
+
+
+        int32_t zoom_final = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
+        zoom_final = (zoom_final * ext->zoom) >> 8;
+
+        if(zoom_final == 0) return LV_DESIGN_RES_OK;
+
+        int32_t angle_final = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
+        angle_final += ext->angle;
+
         lv_area_t bg_coords;
-        lv_area_copy(&bg_coords, &img_coords);
+        lv_img_buf_get_transformed_area(&bg_coords, lv_area_get_width(&img_coords), lv_area_get_height(&img_coords), angle_final, zoom_final, &ext->pivot);
+        bg_coords.x1 += img_coords.x1;
+        bg_coords.y1 += img_coords.y1;
+        bg_coords.x2 += img_coords.x1;
+        bg_coords.y2 += img_coords.y1;
         bg_coords.x1 -= lv_obj_get_style_pad_left(img, LV_IMG_PART_MAIN);
         bg_coords.x2 += lv_obj_get_style_pad_right(img, LV_IMG_PART_MAIN);
         bg_coords.y1 -= lv_obj_get_style_pad_top(img, LV_IMG_PART_MAIN);
@@ -628,13 +642,11 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             lv_draw_img_dsc_init(&img_dsc);
             lv_obj_init_draw_img_dsc(img, LV_IMG_PART_MAIN, &img_dsc);
 
-            img_dsc.zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
-            img_dsc.zoom = (img_dsc.zoom * ext->zoom) >> 8;
+            img_dsc.zoom = zoom_final;
 
             if(img_dsc.zoom == 0) return LV_DESIGN_RES_OK;
 
-            img_dsc.angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
-            img_dsc.angle += ext->angle;
+            img_dsc.angle =angle_final;
 
             img_dsc.pivot.x = ext->pivot.x;
             img_dsc.pivot.y = ext->pivot.y;
@@ -739,10 +751,11 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         if(transf_angle || transf_zoom != LV_IMG_ZOOM_NONE) {
             lv_area_t a;
             lv_img_buf_get_transformed_area(&a, ext->w, ext->h, transf_angle, transf_zoom, &ext->pivot);
-            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, - a.x1);
-            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, - a.y1);
-            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, a.x2 - ext->w);
-            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, a.y2 - ext->h);
+            lv_coord_t pad_ori = img->ext_draw_pad;
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori - a.x1);
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori - a.y1);
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori + a.x2 - ext->w);
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori + a.y2 - ext->h);
         }
 
         /*Handle the padding of the background*/
