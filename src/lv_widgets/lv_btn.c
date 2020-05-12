@@ -86,7 +86,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         /*Set layout if the button is not a screen*/
         if(par) {
-            lv_obj_set_size(btn, LV_DPI, LV_DPI / 2);
+            lv_obj_set_size(btn, LV_DPI, LV_DPI / 3);
             lv_btn_set_layout(btn, LV_LAYOUT_CENTER);
         }
 
