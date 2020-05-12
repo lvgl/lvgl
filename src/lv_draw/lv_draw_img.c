@@ -496,10 +496,12 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 
             int32_t x;
             int32_t y;
+            int32_t rot_y = disp_area->y1 + draw_area.y1 - map_area->y1;
             for(y = 0; y < draw_area_h; y++) {
                 map_px = map_buf_tmp;
                 uint32_t px_i_start = px_i;
 
+                int32_t rot_x = disp_area->x1 + draw_area.x1 - map_area->x1;
                 for(x = 0; x < draw_area_w; x++, map_px += px_size_byte, px_i++) {
 
                     if(transform == false) {
@@ -532,9 +534,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                     else {
                         /*Transform*/
                         bool ret;
-                        int32_t rot_x = x + (disp_area->x1 + draw_area.x1) - map_area->x1;
-                        int32_t rot_y = y + (disp_area->y1 + draw_area.y1) - map_area->y1;
-                        ret = lv_img_buf_transform(&trans_dsc, rot_x, rot_y);
+                        ret = lv_img_buf_transform(&trans_dsc, rot_x + x, rot_y + y);
                         if(ret == false) {
                             mask_buf[px_i] = LV_OPA_TRANSP;
                             continue;
