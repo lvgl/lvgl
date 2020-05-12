@@ -814,12 +814,19 @@ static lv_design_res_t lv_dropdown_page_design(lv_obj_t * page, const lv_area_t 
 
         /*Draw the boxes if the page is not being deleted*/
         if(ext->page) {
-            if(ext->pr_opt_id != LV_DROPDOWN_PR_NONE) {
-                draw_box(ddlist, clip_area, ext->pr_opt_id, LV_STATE_PRESSED);
-            }
+            /* Clip area might be too large too to shadow but
+             * the selected option can be drawn on only the background*/
+            lv_area_t clip_area_core;
+            bool has_common;
+            has_common = lv_area_intersect(&clip_area_core, clip_area, &ext->page->coords);
+            if(has_common) {
+                if(ext->pr_opt_id != LV_DROPDOWN_PR_NONE) {
+                    draw_box(ddlist, &clip_area_core, ext->pr_opt_id, LV_STATE_PRESSED);
+                }
 
-            if(ext->show_selected) {
-                draw_box(ddlist, clip_area, ext->sel_opt_id, LV_STATE_DEFAULT);
+                if(ext->show_selected) {
+                    draw_box(ddlist, &clip_area_core, ext->sel_opt_id, LV_STATE_DEFAULT);
+                }
             }
         }
     }
@@ -835,12 +842,19 @@ static lv_design_res_t lv_dropdown_page_design(lv_obj_t * page, const lv_area_t 
 
         /*Draw the box labels if the page is not being deleted*/
         if(ext->page) {
-            if(ext->pr_opt_id != LV_DROPDOWN_PR_NONE) {
-                draw_box_label(ddlist, clip_area, ext->pr_opt_id, LV_STATE_PRESSED);
-            }
+            /* Clip area might be too large too to shadow but
+             * the selected option can be drawn on only the background*/
+            lv_area_t clip_area_core;
+            bool has_common;
+            has_common = lv_area_intersect(&clip_area_core, clip_area, &ext->page->coords);
+            if(has_common) {
+                if(ext->pr_opt_id != LV_DROPDOWN_PR_NONE) {
+                    draw_box_label(ddlist, clip_area, ext->pr_opt_id, LV_STATE_PRESSED);
+                }
 
-            if(ext->show_selected) {
-                draw_box_label(ddlist, clip_area, ext->sel_opt_id, LV_STATE_DEFAULT);
+                if(ext->show_selected) {
+                    draw_box_label(ddlist, clip_area, ext->sel_opt_id, LV_STATE_DEFAULT);
+                }
             }
         }
     }
