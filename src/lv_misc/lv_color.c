@@ -39,6 +39,47 @@
 
 LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uint32_t px_num)
 {
+#if LV_COLOR_DEPTH == 16
+    uintptr_t buf_int = (uintptr_t) buf;
+    if(buf_int & 0x3) {
+        *buf = color;
+        buf++;
+        px_num--;
+    }
+
+    uint32_t c32 = color.full + (color.full << 16);
+    uint32_t * buf32 = (uint32_t *)buf;
+
+    while(px_num > 16) {
+        *buf32 = c32;
+        buf32++;
+        *buf32 = c32;
+        buf32++;
+        *buf32 = c32;
+        buf32++;
+        *buf32 = c32;
+        buf32++;
+
+        *buf32 = c32;
+        buf32++;
+        *buf32 = c32;
+        buf32++;
+        *buf32 = c32;
+        buf32++;
+        *buf32 = c32;
+        buf32++;
+
+        px_num -= 16;
+    }
+
+    buf = (lv_color_t *)buf32;
+
+    while(px_num) {
+        *buf = color;
+        buf++;
+        px_num --;
+    }
+#else
     while(px_num > 16) {
         *buf = color;
         buf++;
@@ -83,6 +124,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uin
         buf++;
         px_num --;
     }
+#endif
 }
 
 
