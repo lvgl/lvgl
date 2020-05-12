@@ -27,7 +27,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask,
+LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * clip_area,
                                                        const void * src,
                                                        lv_draw_img_dsc_t * draw_dsc);
 
@@ -230,7 +230,7 @@ lv_img_src_t lv_img_src_get_type(const void * src)
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * mask,
+LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * clip_area,
                                                        const void * src,
                                                        lv_draw_img_dsc_t * draw_dsc)
 {
@@ -246,7 +246,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
     if(cdsc->dec_dsc.error_msg != NULL) {
         LV_LOG_WARN("Image draw error");
 
-        show_error(coords, mask, cdsc->dec_dsc.error_msg);
+        show_error(coords, clip_area, cdsc->dec_dsc.error_msg);
     }
     /* The decoder could open the image and gave the entire uncompressed image.
      * Just draw it!*/
@@ -267,7 +267,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
 
         lv_area_t mask_com; /*Common area of mask and coords*/
         bool union_ok;
-        union_ok = lv_area_intersect(&mask_com, mask, &map_area_rot);
+        union_ok = lv_area_intersect(&mask_com, clip_area, &map_area_rot);
         if(union_ok == false) {
             return LV_RES_OK; /*Out of mask. There is nothing to draw so the image is drawn
                                  successfully.*/
@@ -279,7 +279,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
     else {
         lv_area_t mask_com; /*Common area of mask and coords*/
         bool union_ok;
-        union_ok = lv_area_intersect(&mask_com, mask, coords);
+        union_ok = lv_area_intersect(&mask_com, clip_area, coords);
         if(union_ok == false) {
             return LV_RES_OK; /*Out of mask. There is nothing to draw so the image is drawn
                                  successfully.*/
@@ -299,7 +299,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
         lv_res_t read_res;
         for(row = mask_com.y1; row <= mask_com.y2; row++) {
             lv_area_t mask_line;
-            union_ok = lv_area_intersect(&mask_line, mask, &line);
+            union_ok = lv_area_intersect(&mask_line, clip_area, &line);
             if(union_ok == false) continue;
 
             read_res = lv_img_decoder_read_line(&cdsc->dec_dsc, x, y, width, buf);

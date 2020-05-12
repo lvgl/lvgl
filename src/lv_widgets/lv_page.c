@@ -1211,7 +1211,7 @@ static void scrlbar_refresh(lv_obj_t * page)
 
     if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_OFF) return;
 
-    if(ext->scrlbar.mode == LV_SCRILLBAR_MODE_ON) {
+    if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_ON) {
         ext->scrlbar.hor_draw = 1;
         ext->scrlbar.ver_draw = 1;
     }

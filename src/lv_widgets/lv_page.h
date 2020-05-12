@@ -37,7 +37,7 @@ extern "C" {
 /** Scrollbar modes: shows when should the scrollbars be visible*/
 enum {
     LV_SCROLLBAR_MODE_OFF    = 0x0, /**< Never show scroll bars*/
-    LV_SCRILLBAR_MODE_ON     = 0x1, /**< Always show scroll bars*/
+    LV_SCROLLBAR_MODE_ON     = 0x1, /**< Always show scroll bars*/
     LV_SCROLLBAR_MODE_DRAG   = 0x2, /**< Show scroll bars when page is being dragged*/
     LV_SCROLLBAR_MODE_AUTO   = 0x3, /**< Show scroll bars when the scrollable container is large enough to be scrolled*/
     LV_SCROLLBAR_MODE_HIDE   = 0x4, /**< Hide the scroll bar temporally*/
