@@ -943,9 +943,18 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
 
         scrl_reposition(page);
+
+        lv_page_ext_t * ext      = lv_obj_get_ext_attr(page);
+
+        /*The scrollbars are important only if they are visible now or the scrollable's size has changed*/
+        if((ext->scrlbar.hor_draw || ext->scrlbar.ver_draw) ||
+           (lv_obj_get_width(scrl) != lv_area_get_width(param) || lv_obj_get_height(scrl) != lv_area_get_height(param))) {
+            scrlbar_refresh(page);
+        }
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         scrl_reposition(page);
+        scrlbar_refresh(page);
     }
     else if(sign == LV_SIGNAL_DRAG_BEGIN) {
         if(page_ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) {
@@ -1172,11 +1181,6 @@ static void scrl_reposition(lv_obj_t * page)
     if(refr_x || refr_y) {
         lv_obj_set_pos(scrl, new_x, new_y);
     }
-
-    lv_page_ext_t * ext      = lv_obj_get_ext_attr(page);
-
-    /*The scrollbars are important only if they are visible now*/
-    if(ext->scrlbar.hor_draw || ext->scrlbar.ver_draw) scrlbar_refresh(page);
 }
 
 /**

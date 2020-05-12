@@ -604,13 +604,11 @@ void lv_dropdown_open(lv_obj_t * ddlist)
     lv_obj_set_design_cb(ext->page, lv_dropdown_page_design);
     lv_obj_set_signal_cb(ext->page, lv_dropdown_page_signal);
     lv_obj_set_signal_cb(lv_page_get_scrllable(ext->page), lv_dropdown_page_scrl_signal);
-    lv_page_set_scrollbar_mode(ext->page, LV_SCROLLBAR_MODE_AUTO);
 
     lv_style_list_copy(lv_obj_get_style_list(ext->page, LV_PAGE_PART_BG), &ext->style_page);
     lv_style_list_copy(lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCROLLBAR), &ext->style_scrlbar);
     lv_obj_clean_style_list(ext->page, LV_PAGE_PART_SCROLLABLE);
     lv_obj_refresh_style(ext->page, LV_STYLE_PROP_ALL);
-
 
     lv_obj_t * label = lv_label_create(ext->page, NULL);
     lv_label_set_text_static(label, ext->options);
@@ -627,8 +625,8 @@ void lv_dropdown_open(lv_obj_t * ddlist)
     lv_style_int_t top = lv_obj_get_style_pad_top(ddlist, LV_DROPDOWN_PART_LIST);
     lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ddlist, LV_DROPDOWN_PART_LIST);
 
-    lv_coord_t list_h = label_h + top + bottom;
-
+    lv_coord_t list_fit_h = label_h + top + bottom;
+    lv_coord_t list_h = list_fit_h;
     if(list_h > ext->max_height) list_h = ext->max_height;
 
     lv_dropdown_dir_t dir = ext->dir;
@@ -659,6 +657,7 @@ void lv_dropdown_open(lv_obj_t * ddlist)
         }
     }
 
+    if(list_h > list_fit_h) list_h = list_fit_h;
     if(list_h > ext->max_height) list_h = ext->max_height;
 
     lv_obj_set_height(ext->page, list_h);
