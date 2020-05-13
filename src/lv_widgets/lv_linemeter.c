@@ -154,24 +154,24 @@ void lv_linemeter_set_value(lv_obj_t * lmeter, int32_t value)
     int32_t angle_old = (level_old * ext->scale_angle) / (ext->line_cnt - 1);
 
     /*Use smaller clip area only around the visible line*/
-    int32_t y_in_old  = (int32_t)((int32_t)lv_trigo_sin(angle_old + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
-    int32_t x_in_old  = (int32_t)((int32_t)lv_trigo_sin(angle_old + 90 + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
+    int32_t y_in_old  = (int32_t)((int32_t)_lv_trigo_sin(angle_old + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
+    int32_t x_in_old  = (int32_t)((int32_t)_lv_trigo_sin(angle_old + 90 + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
 
 
-    int32_t y_out_old  = (int32_t)((int32_t)lv_trigo_sin(angle_old + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
-    int32_t x_out_old  = (int32_t)((int32_t)lv_trigo_sin(angle_old + 90 + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
+    int32_t y_out_old  = (int32_t)((int32_t)_lv_trigo_sin(angle_old + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
+    int32_t x_out_old  = (int32_t)((int32_t)_lv_trigo_sin(angle_old + 90 + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
 
 
 
     int32_t angle_new = (level_new * ext->scale_angle) / (ext->line_cnt - 1);
 
     /*Use smaller clip area only around the visible line*/
-    int32_t y_in_new  = (int32_t)((int32_t)lv_trigo_sin(angle_new + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
-    int32_t x_in_new  = (int32_t)((int32_t)lv_trigo_sin(angle_new + 90 + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
+    int32_t y_in_new  = (int32_t)((int32_t)_lv_trigo_sin(angle_new + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
+    int32_t x_in_new  = (int32_t)((int32_t)_lv_trigo_sin(angle_new + 90 + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
 
 
-    int32_t y_out_new  = (int32_t)((int32_t)lv_trigo_sin(angle_new + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
-    int32_t x_out_new  = (int32_t)((int32_t)lv_trigo_sin(angle_new + 90 + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
+    int32_t y_out_new  = (int32_t)((int32_t)_lv_trigo_sin(angle_new + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
+    int32_t x_out_new  = (int32_t)((int32_t)_lv_trigo_sin(angle_new + 90 + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
 
     lv_area_t a;
     if(x_out_old < 0 && x_out_new < 0) {
@@ -447,12 +447,12 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         int32_t angle_rem = angle_upscale & 0xFF;
 
         /*Interpolate sine and cos*/
-        int32_t sin_low = lv_trigo_sin(angle_low + angle_ofs);
-        int32_t sin_high = lv_trigo_sin(angle_high + angle_ofs);
+        int32_t sin_low = _lv_trigo_sin(angle_low + angle_ofs);
+        int32_t sin_high = _lv_trigo_sin(angle_high + angle_ofs);
         int32_t sin_mid = (sin_low * (256 - angle_rem) + sin_high * angle_rem) >> 8;
 
-        int32_t cos_low = lv_trigo_sin(angle_low + 90 + angle_ofs);
-        int32_t cos_high = lv_trigo_sin(angle_high + 90 + angle_ofs);
+        int32_t cos_low = _lv_trigo_sin(angle_low + 90 + angle_ofs);
+        int32_t cos_high = _lv_trigo_sin(angle_high + 90 + angle_ofs);
         int32_t cos_mid = (cos_low * (256 - angle_rem) + cos_high * angle_rem) >> 8;
 
         /*Use the interpolated values to get x and y coordinates*/
@@ -490,14 +490,14 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
 #endif
 
         /*Use smaller clip area only around the visible line*/
-        int32_t y_in  = (int32_t)((int32_t)lv_trigo_sin(angle_normal + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
-        int32_t x_in  = (int32_t)((int32_t)lv_trigo_sin(angle_normal + 90 + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
+        int32_t y_in  = (int32_t)((int32_t)_lv_trigo_sin(angle_normal + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
+        int32_t x_in  = (int32_t)((int32_t)_lv_trigo_sin(angle_normal + 90 + angle_ofs) * r_in) >> LV_TRIGO_SHIFT;
 
         x_in += x_ofs;
         y_in += y_ofs;
 
-        int32_t y_out  = (int32_t)((int32_t)lv_trigo_sin(angle_normal + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
-        int32_t x_out  = (int32_t)((int32_t)lv_trigo_sin(angle_normal + 90 + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
+        int32_t y_out  = (int32_t)((int32_t)_lv_trigo_sin(angle_normal + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
+        int32_t x_out  = (int32_t)((int32_t)_lv_trigo_sin(angle_normal + 90 + angle_ofs) * r_out) >> LV_TRIGO_SHIFT;
 
         x_out += x_ofs;
         y_out += y_ofs;
@@ -508,7 +508,7 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         clip_sub.y1 = LV_MATH_MIN(y_in, y_out) - line_dsc.width;
         clip_sub.y2 = LV_MATH_MAX(y_in, y_out) + line_dsc.width;
 
-        if(lv_area_intersect(&clip_sub, &clip_sub, clip_area) == false) continue;
+        if(_lv_area_intersect(&clip_sub, &clip_sub, clip_area) == false) continue;
 
         lv_point_t p1;
         lv_point_t p2;

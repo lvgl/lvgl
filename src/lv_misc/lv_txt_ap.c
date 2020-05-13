@@ -92,7 +92,7 @@ const ap_chars_map_t ap_chars_map[] = {
 /**********************
 *   GLOBAL FUNCTIONS
 **********************/
-uint32_t lv_txt_ap_calc_bytes_cnt(const char * txt)
+uint32_t _lv_txt_ap_calc_bytes_cnt(const char * txt)
 {
     uint32_t txt_length = 0;
     uint32_t chars_cnt = 0;
@@ -100,12 +100,12 @@ uint32_t lv_txt_ap_calc_bytes_cnt(const char * txt)
     uint32_t i, j;
     uint32_t ch_enc;
 
-    txt_length = lv_txt_get_encoded_length(txt);
+    txt_length = _lv_txt_get_encoded_length(txt);
 
     i = 0;
     j = 0;
     while(i < txt_length) {
-        ch_enc = lv_txt_encoded_next(txt, &j);
+        ch_enc = _lv_txt_encoded_next(txt, &j);
         current_ap_idx = lv_ap_get_char_index(ch_enc);
 
         if(current_ap_idx != LV_UNDEF_ARABIC_PERSIAN_CHARS)
@@ -125,21 +125,21 @@ uint32_t lv_txt_ap_calc_bytes_cnt(const char * txt)
 }
 
 
-void lv_txt_ap_proc(const char * txt, char * txt_out)
+void _lv_txt_ap_proc(const char * txt, char * txt_out)
 {
     uint32_t txt_length = 0;
     uint32_t index_current, idx_next, idx_previous, i, j;
     uint32_t * ch_enc;
     char * txt_out_temp;
 
-    txt_length = lv_txt_get_encoded_length(txt);
+    txt_length = _lv_txt_get_encoded_length(txt);
 
     ch_enc = (uint32_t *)lv_mem_alloc(sizeof(uint32_t) * (txt_length + 1));
 
     i = 0;
     j = 0;
     while(j < txt_length)
-        ch_enc[j++] = lv_txt_encoded_next(txt, &i);
+        ch_enc[j++] = _lv_txt_encoded_next(txt, &i);
 
     ch_enc[j] = 0;
 

@@ -169,7 +169,7 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
         ext->mode = LV_ROLLER_MODE_INIFINITE;
 
         size_t opt_len = strlen(options) + 1; /*+1 to add '\n' after option lists*/
-        char * opt_extra = lv_mem_buf_get(opt_len * LV_ROLLER_INF_PAGES);
+        char * opt_extra = _lv_mem_buf_get(opt_len * LV_ROLLER_INF_PAGES);
         uint8_t i;
         for(i = 0; i < LV_ROLLER_INF_PAGES; i++) {
             strcpy(&opt_extra[opt_len * i], options);
@@ -177,7 +177,7 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
         }
         opt_extra[opt_len * LV_ROLLER_INF_PAGES - 1] = '\0';
         lv_label_set_text(label, opt_extra);
-        lv_mem_buf_release(opt_extra);
+        _lv_mem_buf_release(opt_extra);
 
         ext->sel_opt_id     = ((LV_ROLLER_INF_PAGES / 2) + 1) * ext->option_cnt;
 
@@ -442,7 +442,7 @@ static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * cli
         rect_area.x2 = roller->coords.x2;
         lv_area_t mask_sel;
         bool area_ok;
-        area_ok = lv_area_intersect(&mask_sel, clip_area, &rect_area);
+        area_ok = _lv_area_intersect(&mask_sel, clip_area, &rect_area);
         if(area_ok) {
             lv_obj_t * label = get_label(roller);
             lv_label_align_t label_align = lv_roller_get_align(roller);
@@ -692,7 +692,7 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * clip_area)
     half_mask.y1 -= roller->ext_draw_pad;
     half_mask.y2 = roller->coords.y1 + h / 2;
 
-    union_ok = lv_area_intersect(&half_mask, &half_mask, clip_area);
+    union_ok = _lv_area_intersect(&half_mask, &half_mask, clip_area);
     bg_dsc.bg_main_color_stop = bg_dsc.bg_main_color_stop / 2;
     bg_dsc.bg_grad_color_stop = 128 - (255 - bg_dsc.bg_grad_color_stop) / 2;
     if(union_ok) {
@@ -705,7 +705,7 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * clip_area)
     half_mask.y1 = roller->coords.y1 + h / 2;
     half_mask.y2 += roller->ext_draw_pad;
 
-    union_ok = lv_area_intersect(&half_mask, &half_mask, clip_area);
+    union_ok = _lv_area_intersect(&half_mask, &half_mask, clip_area);
     if(union_ok) {
         lv_color_t c = bg_dsc.bg_color;
         bg_dsc.bg_color = bg_dsc.bg_grad_color;
@@ -818,7 +818,7 @@ static lv_res_t release_handler(lv_obj_t * roller)
 
         uint32_t letter_cnt = 0;
         for(letter_cnt = 0; letter_cnt < letter_i; letter_cnt++) {
-            uint32_t letter = lv_txt_encoded_next(txt, &i);
+            uint32_t letter = _lv_txt_encoded_next(txt, &i);
             /*Count he lines to reach the clicked letter. But ignore the last '\n' because it
              * still belongs to the clicked line*/
             if(letter == '\n' && i_prev != letter_i) new_opt++;

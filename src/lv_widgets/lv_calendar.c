@@ -445,7 +445,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         lv_indev_get_point(indev, &p);
 
         /*If the header is pressed mark an arrow as pressed*/
-        if(lv_area_is_point_on(&header_area, &p, 0)) {
+        if(_lv_area_is_point_on(&header_area, &p, 0)) {
             if(p.x < header_area.x1 + lv_area_get_width(&header_area) / 2) {
                 if(ext->btn_pressing != -1) lv_obj_invalidate(calendar);
                 ext->btn_pressing = -1;
@@ -598,7 +598,7 @@ static bool calculate_touched_day(lv_obj_t * calendar, const lv_point_t * touche
     days_area.y1 = calendar->coords.y1 + get_header_height(calendar) + get_day_names_height(calendar) + top;
     days_area.y2 -= bottom;
 
-    if(lv_area_is_point_on(&days_area, touched_point, 0)) {
+    if(_lv_area_is_point_on(&days_area, touched_point, 0)) {
         lv_coord_t w  = (days_area.x2 - days_area.x1 + 1) / 7;
         lv_coord_t h  = (days_area.y2 - days_area.y1 + 1) / 6;
         uint8_t x_pos = 0;
@@ -693,7 +693,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
 
     /*Add the year + month name*/
     char txt_buf[64];
-    lv_utils_num_to_str(ext->showed_date.year, txt_buf);
+    _lv_utils_num_to_str(ext->showed_date.year, txt_buf);
     txt_buf[4] = ' ';
     txt_buf[5] = '\0';
     strcpy(&txt_buf[5], get_month_name(calendar, ext->showed_date.month));
@@ -724,7 +724,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     if(ext->btn_pressing > 0) calendar->state |= LV_STATE_PRESSED;
     else calendar->state &= ~(LV_STATE_PRESSED);
 
-    header_area.x1 = header_area.x2 - header_right - lv_txt_get_width(LV_SYMBOL_RIGHT, (uint16_t)strlen(LV_SYMBOL_RIGHT),
+    header_area.x1 = header_area.x2 - header_right - _lv_txt_get_width(LV_SYMBOL_RIGHT, (uint16_t)strlen(LV_SYMBOL_RIGHT),
                                                                       font, 0, LV_TXT_FLAG_NONE);
 
     lv_draw_label_dsc_init(&label_dsc);
@@ -912,7 +912,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
             lv_draw_rect(&box_area, clip_area, &rect_dsc);
 
             /*Write the day's number*/
-            lv_utils_num_to_str(day_cnt, buf);
+            _lv_utils_num_to_str(day_cnt, buf);
             lv_draw_label(&label_area, clip_area, &label_dsc, buf, NULL);
 
             /*Go to the next day*/

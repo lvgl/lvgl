@@ -511,7 +511,7 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
         lv_point_t txt_size;
 
 
-        lv_txt_get_size(&txt_size, ext->title_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+        _lv_txt_get_size(&txt_size, ext->title_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
                         label_dsc.flag);
 
         txt_area.x1 = header->coords.x1 + left;

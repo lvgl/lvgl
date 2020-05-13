@@ -117,7 +117,7 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
  * @param opa overall opacity in 0x00..0xff range
  * @param mode blend mode from `lv_blend_mode_t`
  */
-LV_ATTRIBUTE_FAST_MEM void lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
+LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_area_t * fill_area,
                                          lv_color_t color, lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_opa_t opa,
                                          lv_blend_mode_t mode)
 {
@@ -125,7 +125,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_blend_fill(const lv_area_t * clip_area, const lv_a
     if(opa < LV_OPA_MIN) return;
     if(mask_res == LV_DRAW_MASK_RES_TRANSP) return;
 
-    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
     const lv_area_t * disp_area = &vdb->area;
     lv_color_t * disp_buf = vdb->buf_act;
@@ -135,7 +135,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_blend_fill(const lv_area_t * clip_area, const lv_a
      * It is always the same or inside `fill_area` */
     lv_area_t draw_area;
     bool is_common;
-    is_common = lv_area_intersect(&draw_area, clip_area, fill_area);
+    is_common = _lv_area_intersect(&draw_area, clip_area, fill_area);
     if(!is_common) return;
 
     /* Now `draw_area` has absolute coordinates.
@@ -181,7 +181,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_blend_fill(const lv_area_t * clip_area, const lv_a
  * @param opa  overall opacity in 0x00..0xff range
  * @param mode blend mode from `lv_blend_mode_t`
  */
-LV_ATTRIBUTE_FAST_MEM void lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area,
+LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_area_t * map_area,
                                         const lv_color_t * map_buf,
                                         lv_opa_t * mask, lv_draw_mask_res_t mask_res,
                                         lv_opa_t opa, lv_blend_mode_t mode)
@@ -194,10 +194,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_blend_map(const lv_area_t * clip_area, const lv_ar
      * It is always the same or inside `fill_area` */
     lv_area_t draw_area;
     bool is_common;
-    is_common = lv_area_intersect(&draw_area, clip_area, map_area);
+    is_common = _lv_area_intersect(&draw_area, clip_area, map_area);
     if(!is_common) return;
 
-    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     lv_disp_buf_t * vdb = lv_disp_get_buf(disp);
     const lv_area_t * disp_area = &vdb->area;
     lv_color_t * disp_buf = vdb->buf_act;
@@ -241,7 +241,7 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
                         const lv_opa_t * mask, lv_draw_mask_res_t mask_res)
 {
 
-    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
 
     /*Get the width of the `disp_area` it will be used to go to the next line*/
     int32_t disp_w = lv_area_get_width(disp_area);
@@ -295,7 +295,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
 {
 
 #if LV_USE_GPU || LV_COLOR_SCREEN_TRANSP
-    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
 #endif
 
     /*Get the width of the `disp_area` it will be used to go to the next line*/
@@ -587,7 +587,7 @@ static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  cons
                        const lv_opa_t * mask, lv_draw_mask_res_t mask_res)
 
 {
-    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
 
     /*Get the width of the `disp_area` it will be used to go to the next line*/
     int32_t disp_w = lv_area_get_width(disp_area);
@@ -667,7 +667,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
     map_buf_first += (draw_area->x1 - (map_area->x1 - disp_area->x1));
 
 #if LV_COLOR_SCREEN_TRANSP || LV_USE_GPU
-    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
 #endif
 
     int32_t x;
@@ -696,7 +696,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
 
             /*Software rendering*/
             for(y = 0; y < draw_area_h; y++) {
-                lv_memcpy(disp_buf_first, map_buf_first, draw_area_w * sizeof(lv_color_t));
+                _lv_memcpy(disp_buf_first, map_buf_first, draw_area_w * sizeof(lv_color_t));
                 disp_buf_first += disp_w;
                 map_buf_first += map_w;
             }

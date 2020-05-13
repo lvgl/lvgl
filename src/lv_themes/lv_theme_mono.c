@@ -548,18 +548,18 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_SCR:
             lv_obj_clean_style_list(obj, LV_OBJ_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_OBJ_PART_MAIN);
-            lv_style_list_add_style(list, &style_scr);
+            _lv_style_list_add_style(list, &style_scr);
             break;
         case LV_THEME_OBJ:
             lv_obj_clean_style_list(obj, LV_OBJ_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_OBJ_PART_MAIN);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
             break;
 #if LV_USE_CONT
         case LV_THEME_CONT:
             lv_obj_clean_style_list(obj, LV_OBJ_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_CONT_PART_MAIN);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
             break;
 #endif
 
@@ -567,8 +567,8 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_BTN:
             lv_obj_clean_style_list(obj, LV_BTN_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_BTN_PART_MAIN);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_btn);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_btn);
             break;
 #endif
 
@@ -576,12 +576,12 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_BTNMATRIX:
             lv_obj_clean_style_list(obj, LV_BTNMATRIX_PART_BG);
             list = lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
 
             lv_obj_clean_style_list(obj, LV_BTNMATRIX_PART_BTN);
             list = lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BTN);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_btn);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_btn);
             break;
 #endif
 
@@ -589,13 +589,13 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_KEYBOARD:
             lv_obj_clean_style_list(obj, LV_KEYBOARD_PART_BG);
             list = lv_obj_get_style_list(obj, LV_KEYBOARD_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_pad_small);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_pad_small);
 
             lv_obj_clean_style_list(obj, LV_KEYBOARD_PART_BTN);
             list = lv_obj_get_style_list(obj, LV_KEYBOARD_PART_BTN);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_btn);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_btn);
             break;
 #endif
 
@@ -603,15 +603,15 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_BAR:
             lv_obj_clean_style_list(obj, LV_BAR_PART_BG);
             list = lv_obj_get_style_list(obj, LV_BAR_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_pad_none);
-            lv_style_list_add_style(list, &style_round);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_pad_none);
+            _lv_style_list_add_style(list, &style_round);
 
             lv_obj_clean_style_list(obj, LV_BAR_PART_INDIC);
             list = lv_obj_get_style_list(obj, LV_BAR_PART_INDIC);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_fg_color);
-            lv_style_list_add_style(list, &style_round);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_fg_color);
+            _lv_style_list_add_style(list, &style_round);
             break;
 #endif
 
@@ -619,20 +619,20 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_SWITCH:
             lv_obj_clean_style_list(obj, LV_SWITCH_PART_BG);
             list = lv_obj_get_style_list(obj, LV_SWITCH_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_pad_none);
-            lv_style_list_add_style(list, &style_round);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_pad_none);
+            _lv_style_list_add_style(list, &style_round);
 
             lv_obj_clean_style_list(obj, LV_SWITCH_PART_INDIC);
             list = lv_obj_get_style_list(obj, LV_SWITCH_PART_INDIC);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_fg_color);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_fg_color);
 
             lv_obj_clean_style_list(obj, LV_SWITCH_PART_KNOB);
             list = lv_obj_get_style_list(obj, LV_SWITCH_PART_KNOB);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_pad_none);
-            lv_style_list_add_style(list, &style_round);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_pad_none);
+            _lv_style_list_add_style(list, &style_round);
             break;
 #endif
 
@@ -675,11 +675,11 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_ARC:
             lv_obj_clean_style_list(obj, LV_ARC_PART_BG);
             list = lv_obj_get_style_list(obj, LV_ARC_PART_BG);
-            lv_style_list_add_style(list, &style_arc_bg);
+            _lv_style_list_add_style(list, &style_arc_bg);
 
             lv_obj_clean_style_list(obj, LV_ARC_PART_INDIC);
             list = lv_obj_get_style_list(obj, LV_ARC_PART_INDIC);
-            lv_style_list_add_style(list, &style_arc_indic);
+            _lv_style_list_add_style(list, &style_arc_indic);
             break;
 #endif
 
@@ -687,14 +687,14 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_SPINNER:
             lv_obj_clean_style_list(obj, LV_SPINNER_PART_BG);
             list = lv_obj_get_style_list(obj, LV_SPINNER_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_tick_line);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_tick_line);
 
             lv_obj_clean_style_list(obj, LV_SPINNER_PART_INDIC);
             list = lv_obj_get_style_list(obj, LV_SPINNER_PART_INDIC);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_fg_color);
-            lv_style_list_add_style(list, &style_tick_line);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_fg_color);
+            _lv_style_list_add_style(list, &style_tick_line);
             break;
 #endif
 
@@ -702,19 +702,19 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_SLIDER:
             lv_obj_clean_style_list(obj, LV_SLIDER_PART_BG);
             list = lv_obj_get_style_list(obj, LV_SLIDER_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_pad_none);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_pad_none);
 
             lv_obj_clean_style_list(obj, LV_SLIDER_PART_INDIC);
             list = lv_obj_get_style_list(obj, LV_SLIDER_PART_INDIC);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_fg_color);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_fg_color);
 
             lv_obj_clean_style_list(obj, LV_SLIDER_PART_KNOB);
             list = lv_obj_get_style_list(obj, LV_SLIDER_PART_KNOB);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_round);
-            lv_style_list_add_style(list, &style_pad_small);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_round);
+            _lv_style_list_add_style(list, &style_pad_small);
             break;
 #endif
 
@@ -722,12 +722,12 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_CHECKBOX:
             lv_obj_clean_style_list(obj, LV_CHECKBOX_PART_BG);
             list = lv_obj_get_style_list(obj, LV_CHECKBOX_PART_BG);
-            lv_style_list_add_style(list, &style_pad_small);
+            _lv_style_list_add_style(list, &style_pad_small);
 
             lv_obj_clean_style_list(obj, LV_CHECKBOX_PART_BULLET);
             list = lv_obj_get_style_list(obj, LV_CHECKBOX_PART_BULLET);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_btn);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_btn);
             break;
 #endif
 
@@ -735,18 +735,18 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_MSGBOX:
             lv_obj_clean_style_list(obj, LV_MSGBOX_PART_BG);
             list = lv_obj_get_style_list(obj, LV_MSGBOX_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
             break;
 
         case LV_THEME_MSGBOX_BTNS:
             lv_obj_clean_style_list(obj, LV_MSGBOX_PART_BTN_BG);
             list = lv_obj_get_style_list(obj, LV_MSGBOX_PART_BTN_BG);
-            lv_style_list_add_style(list, &style_pad_inner);
+            _lv_style_list_add_style(list, &style_pad_inner);
 
             lv_obj_clean_style_list(obj, LV_MSGBOX_PART_BTN);
             list = lv_obj_get_style_list(obj, LV_MSGBOX_PART_BTN);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_btn);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_btn);
             break;
 
 #endif
@@ -754,45 +754,45 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_LED:
             lv_obj_clean_style_list(obj, LV_LED_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_LED_PART_MAIN);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_round);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_round);
             break;
 #endif
 #if LV_USE_PAGE
         case LV_THEME_PAGE:
             lv_obj_clean_style_list(obj, LV_PAGE_PART_BG);
             list = lv_obj_get_style_list(obj, LV_PAGE_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
 
             lv_obj_clean_style_list(obj, LV_PAGE_PART_SCROLLABLE);
             list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCROLLABLE);
-            lv_style_list_add_style(list, &style_pad_inner);
+            _lv_style_list_add_style(list, &style_pad_inner);
 
             lv_obj_clean_style_list(obj, LV_PAGE_PART_SCROLLBAR);
             list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCROLLBAR);
-            lv_style_list_add_style(list, &style_sb);
+            _lv_style_list_add_style(list, &style_sb);
             break;
 #endif
 #if LV_USE_TABVIEW
         case LV_THEME_TABVIEW:
             lv_obj_clean_style_list(obj, LV_TABVIEW_PART_BG);
             list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_BG);
-            lv_style_list_add_style(list, &style_scr);
+            _lv_style_list_add_style(list, &style_scr);
 
             lv_obj_clean_style_list(obj, LV_TABVIEW_PART_BG_SCRLLABLE);
 
             lv_obj_clean_style_list(obj, LV_TABVIEW_PART_TAB_BG);
             list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_TAB_BG);
-            lv_style_list_add_style(list, &style_tab_bg);
-            lv_style_list_add_style(list, &style_pad_small);
+            _lv_style_list_add_style(list, &style_tab_bg);
+            _lv_style_list_add_style(list, &style_pad_small);
 
             lv_obj_clean_style_list(obj, LV_TABVIEW_PART_INDIC);
             list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_INDIC);
 
             lv_obj_clean_style_list(obj, LV_TABVIEW_PART_TAB_BTN);
             list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_TAB_BTN);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_btn);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_btn);
             break;
 
         case LV_THEME_TABVIEW_PAGE:
@@ -800,7 +800,7 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
 
             lv_obj_clean_style_list(obj, LV_PAGE_PART_SCROLLABLE);
             list = lv_obj_get_style_list(obj, LV_PAGE_PART_SCROLLABLE);
-            lv_style_list_add_style(list, &style_pad_normal);
+            _lv_style_list_add_style(list, &style_pad_normal);
 
             break;
 #endif
@@ -809,15 +809,15 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_TILEVIEW:
             lv_obj_clean_style_list(obj, LV_TILEVIEW_PART_BG);
             list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
 
             lv_obj_clean_style_list(obj, LV_TILEVIEW_PART_SCROLLBAR);
             list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_SCROLLBAR);
-            lv_style_list_add_style(list, &style_sb);
+            _lv_style_list_add_style(list, &style_sb);
 
             lv_obj_clean_style_list(obj, LV_TILEVIEW_PART_EDGE_FLASH);
             list = lv_obj_get_style_list(obj, LV_TILEVIEW_PART_EDGE_FLASH);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
             break;
 #endif
 
@@ -826,14 +826,14 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_ROLLER:
             lv_obj_clean_style_list(obj, LV_ROLLER_PART_BG);
             list = lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_big_line_space);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_big_line_space);
 
             lv_obj_clean_style_list(obj, LV_ROLLER_PART_SELECTED);
             list = lv_obj_get_style_list(obj, LV_ROLLER_PART_SELECTED);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_fg_color);
-            lv_style_list_add_style(list, &style_no_radius);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_fg_color);
+            _lv_style_list_add_style(list, &style_no_radius);
             break;
 #endif
 
@@ -849,23 +849,23 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_LIST:
             lv_obj_clean_style_list(obj, LV_LIST_PART_BG);
             list = lv_obj_get_style_list(obj, LV_LIST_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_pad_none);
-            lv_style_list_add_style(list, &style_clip_corner);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_pad_none);
+            _lv_style_list_add_style(list, &style_clip_corner);
 
             lv_obj_clean_style_list(obj, LV_LIST_PART_SCROLLABLE);
 
             lv_obj_clean_style_list(obj, LV_LIST_PART_SCROLLBAR);
             list = lv_obj_get_style_list(obj, LV_LIST_PART_SCROLLBAR);
-            lv_style_list_add_style(list, &style_sb);
+            _lv_style_list_add_style(list, &style_sb);
             break;
 
         case LV_THEME_LIST_BTN:
             lv_obj_clean_style_list(obj, LV_BTN_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_BTN_PART_MAIN);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_btn);
-            lv_style_list_add_style(list, &style_list_btn);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_btn);
+            _lv_style_list_add_style(list, &style_list_btn);
 
             break;
 #endif
@@ -874,23 +874,23 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_DROPDOWN:
             lv_obj_clean_style_list(obj, LV_DROPDOWN_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_DROPDOWN_PART_MAIN);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_btn);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_btn);
 
             lv_obj_clean_style_list(obj, LV_DROPDOWN_PART_LIST);
             list = lv_obj_get_style_list(obj, LV_DROPDOWN_PART_LIST);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_big_line_space);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_big_line_space);
 
             lv_obj_clean_style_list(obj, LV_DROPDOWN_PART_SCROLLBAR);
             list = lv_obj_get_style_list(obj, LV_DROPDOWN_PART_SCROLLBAR);
-            lv_style_list_add_style(list, &style_sb);
+            _lv_style_list_add_style(list, &style_sb);
 
             lv_obj_clean_style_list(obj, LV_DROPDOWN_PART_SELECTED);
             list = lv_obj_get_style_list(obj, LV_DROPDOWN_PART_SELECTED);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_fg_color);
-            lv_style_list_add_style(list, &style_no_radius);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_fg_color);
+            _lv_style_list_add_style(list, &style_no_radius);
             break;
 #endif
 
@@ -898,43 +898,43 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_CHART:
             lv_obj_clean_style_list(obj, LV_CHART_PART_BG);
             list = lv_obj_get_style_list(obj, LV_CHART_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
 
             lv_obj_clean_style_list(obj, LV_CHART_PART_SERIES_BG);
             list = lv_obj_get_style_list(obj, LV_CHART_PART_SERIES_BG);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_border_none);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_border_none);
 
             lv_obj_clean_style_list(obj, LV_CHART_PART_SERIES);
             list = lv_obj_get_style_list(obj, LV_CHART_PART_SERIES);
-            lv_style_list_add_style(list, &style_chart_series);
+            _lv_style_list_add_style(list, &style_chart_series);
             break;
 #endif
 #if LV_USE_TABLE
         case LV_THEME_TABLE:
             lv_obj_clean_style_list(obj, LV_TABLE_PART_BG);
             list = lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
 
             lv_obj_clean_style_list(obj, LV_TABLE_PART_CELL1);
             list = lv_obj_get_style_list(obj, LV_TABLE_PART_CELL1);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_no_radius);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_no_radius);
 
             lv_obj_clean_style_list(obj, LV_TABLE_PART_CELL2);
             list = lv_obj_get_style_list(obj, LV_TABLE_PART_CELL2);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_no_radius);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_no_radius);
 
             lv_obj_clean_style_list(obj, LV_TABLE_PART_CELL3);
             list = lv_obj_get_style_list(obj, LV_TABLE_PART_CELL3);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_no_radius);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_no_radius);
 
             lv_obj_clean_style_list(obj, LV_TABLE_PART_CELL4);
             list = lv_obj_get_style_list(obj, LV_TABLE_PART_CELL4);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_no_radius);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_no_radius);
             break;
 #endif
 
@@ -942,26 +942,26 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_WIN:
             lv_obj_clean_style_list(obj, LV_WIN_PART_BG);
             list = lv_obj_get_style_list(obj, LV_WIN_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
 
             lv_obj_clean_style_list(obj, LV_WIN_PART_SCROLLBAR);
             list = lv_obj_get_style_list(obj, LV_WIN_PART_SCROLLBAR);
-            lv_style_list_add_style(list, &style_sb);
+            _lv_style_list_add_style(list, &style_sb);
 
             lv_obj_clean_style_list(obj, LV_WIN_PART_CONTENT_SCROLLABLE);
             list = lv_obj_get_style_list(obj, LV_WIN_PART_CONTENT_SCROLLABLE);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
 
             lv_obj_clean_style_list(obj, LV_WIN_PART_HEADER);
             list = lv_obj_get_style_list(obj, LV_WIN_PART_HEADER);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
             break;
 
         case LV_THEME_WIN_BTN:
             lv_obj_clean_style_list(obj, LV_BTN_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_BTN_PART_MAIN);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_btn);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_btn);
             break;
 #endif
 
@@ -969,17 +969,17 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_TEXTAREA:
             lv_obj_clean_style_list(obj, LV_TEXTAREA_PART_BG);
             list = lv_obj_get_style_list(obj, LV_TEXTAREA_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
 
             lv_obj_clean_style_list(obj, LV_TEXTAREA_PART_PLACEHOLDER);
 
             lv_obj_clean_style_list(obj, LV_TEXTAREA_PART_CURSOR);
             list = lv_obj_get_style_list(obj, LV_TEXTAREA_PART_CURSOR);
-            lv_style_list_add_style(list, &style_ta_cursor);
+            _lv_style_list_add_style(list, &style_ta_cursor);
 
             lv_obj_clean_style_list(obj, LV_TEXTAREA_PART_SCROLLBAR);
             list = lv_obj_get_style_list(obj, LV_TEXTAREA_PART_SCROLLBAR);
-            lv_style_list_add_style(list, &style_sb);
+            _lv_style_list_add_style(list, &style_sb);
             break;
 #endif
 
@@ -988,21 +988,21 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_SPINBOX:
             lv_obj_clean_style_list(obj, LV_SPINBOX_PART_BG);
             list = lv_obj_get_style_list(obj, LV_SPINBOX_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
 
             lv_obj_clean_style_list(obj, LV_SPINBOX_PART_CURSOR);
             list = lv_obj_get_style_list(obj, LV_SPINBOX_PART_CURSOR);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_fg_color);
-            lv_style_list_add_style(list, &style_pad_none);
-            lv_style_list_add_style(list, &style_no_radius);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_fg_color);
+            _lv_style_list_add_style(list, &style_pad_none);
+            _lv_style_list_add_style(list, &style_no_radius);
             break;
 
         case LV_THEME_SPINBOX_BTN:
             lv_obj_clean_style_list(obj, LV_BTN_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_BTN_PART_MAIN);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_btn);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_btn);
             break;
 #endif
 
@@ -1010,37 +1010,37 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_CALENDAR:
             lv_obj_clean_style_list(obj, LV_CALENDAR_PART_BG);
             list = lv_obj_get_style_list(obj, LV_CALENDAR_PART_BG);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
 
             lv_obj_clean_style_list(obj, LV_CALENDAR_PART_DATE);
             list = lv_obj_get_style_list(obj, LV_CALENDAR_PART_DATE);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_btn);
-            lv_style_list_add_style(list, &style_pad_small);
-            lv_style_list_add_style(list, &style_border_none);
-            lv_style_list_add_style(list, &style_calendar_date);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_btn);
+            _lv_style_list_add_style(list, &style_pad_small);
+            _lv_style_list_add_style(list, &style_border_none);
+            _lv_style_list_add_style(list, &style_calendar_date);
 
             lv_obj_clean_style_list(obj, LV_CALENDAR_PART_HEADER);
             list = lv_obj_get_style_list(obj, LV_CALENDAR_PART_HEADER);
-            lv_style_list_add_style(list, &style_pad_normal);
-            lv_style_list_add_style(list, &style_border_none);
+            _lv_style_list_add_style(list, &style_pad_normal);
+            _lv_style_list_add_style(list, &style_border_none);
 
             lv_obj_clean_style_list(obj, LV_CALENDAR_PART_DAY_NAMES);
             list = lv_obj_get_style_list(obj, LV_CALENDAR_PART_DAY_NAMES);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_pad_small);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_pad_small);
             break;
 #endif
 #if LV_USE_CPICKER
         case LV_THEME_CPICKER:
             lv_obj_clean_style_list(obj, LV_CPICKER_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_CPICKER_PART_MAIN);
-            lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_bg);
 
             lv_obj_clean_style_list(obj, LV_CPICKER_PART_KNOB);
             list = lv_obj_get_style_list(obj, LV_CPICKER_PART_KNOB);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_round);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_round);
             break;
 #endif
 
@@ -1048,25 +1048,25 @@ static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_LINEMETER:
             lv_obj_clean_style_list(obj, LV_LINEMETER_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_LINEMETER_PART_MAIN);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_round);
-            lv_style_list_add_style(list, &style_linemeter);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_round);
+            _lv_style_list_add_style(list, &style_linemeter);
             break;
 #endif
 #if LV_USE_GAUGE
         case LV_THEME_GAUGE:
             lv_obj_clean_style_list(obj, LV_GAUGE_PART_MAIN);
             list = lv_obj_get_style_list(obj, LV_GAUGE_PART_MAIN);
-            lv_style_list_add_style(list, &style_bg);
-            lv_style_list_add_style(list, &style_round);
+            _lv_style_list_add_style(list, &style_bg);
+            _lv_style_list_add_style(list, &style_round);
 
             lv_obj_clean_style_list(obj, LV_GAUGE_PART_MAJOR);
             list = lv_obj_get_style_list(obj, LV_GAUGE_PART_MAJOR);
-            lv_style_list_add_style(list, &style_gauge_major);
+            _lv_style_list_add_style(list, &style_gauge_major);
 
             lv_obj_clean_style_list(obj, LV_GAUGE_PART_NEEDLE);
             list = lv_obj_get_style_list(obj, LV_GAUGE_PART_NEEDLE);
-            lv_style_list_add_style(list, &style_gauge_needle);
+            _lv_style_list_add_style(list, &style_gauge_needle);
             break;
 #endif
         default:

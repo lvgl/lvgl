@@ -81,7 +81,7 @@ typedef uint8_t lv_group_refocus_policy_t;
  * Init. the group module
  * @remarks Internal function, do not call directly.
  */
-void lv_group_init(void);
+void _lv_group_init(void);
 
 /**
  * Create a new object group

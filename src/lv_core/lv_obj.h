@@ -611,7 +611,7 @@ void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property
  *       For example: `lv_obj_style_remove_border_opa()`
  * @return true: the property was found and removed; false: teh property was not found
  */
-bool _lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
+bool lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
 /*-----------------
  * Attribute set

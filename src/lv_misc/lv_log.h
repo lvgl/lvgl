@@ -70,14 +70,14 @@ void lv_log_register_print_cb(lv_log_print_g_cb_t print_cb);
  * @param format printf-like format string
  * @param ... parameters for `format`
  */
-void lv_log_add(lv_log_level_t level, const char * file, int line, const char * func, const char * format, ...);
+void _lv_log_add(lv_log_level_t level, const char * file, int line, const char * func, const char * format, ...);
 
 /**********************
  *      MACROS
  **********************/
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_TRACE
-#define LV_LOG_TRACE(...) lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, __func__, __VA_ARGS__);
+#define LV_LOG_TRACE(...) _lv_log_add(LV_LOG_LEVEL_TRACE, __FILE__, __LINE__, __func__, __VA_ARGS__);
 #else
 #define LV_LOG_TRACE(...)                                                                                              \
     {                                                                                                                  \
@@ -86,7 +86,7 @@ void lv_log_add(lv_log_level_t level, const char * file, int line, const char * 
 #endif
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_INFO
-#define LV_LOG_INFO(...) lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, __func__, __VA_ARGS__);
+#define LV_LOG_INFO(...) _lv_log_add(LV_LOG_LEVEL_INFO, __FILE__, __LINE__, __func__, __VA_ARGS__);
 #else
 #define LV_LOG_INFO(...)                                                                                               \
     {                                                                                                                  \
@@ -95,7 +95,7 @@ void lv_log_add(lv_log_level_t level, const char * file, int line, const char * 
 #endif
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_WARN
-#define LV_LOG_WARN(...) lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, __func__, __VA_ARGS__);
+#define LV_LOG_WARN(...) _lv_log_add(LV_LOG_LEVEL_WARN, __FILE__, __LINE__, __func__, __VA_ARGS__);
 #else
 #define LV_LOG_WARN(...)                                                                                               \
     {                                                                                                                  \
@@ -104,7 +104,7 @@ void lv_log_add(lv_log_level_t level, const char * file, int line, const char * 
 #endif
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_ERROR
-#define LV_LOG_ERROR(...) lv_log_add(LV_LOG_LEVEL_ERROR, __FILE__, __LINE__, __func__, __VA_ARGS__);
+#define LV_LOG_ERROR(...) _lv_log_add(LV_LOG_LEVEL_ERROR, __FILE__, __LINE__, __func__, __VA_ARGS__);
 #else
 #define LV_LOG_ERROR(...)                                                                                              \
     {                                                                                                                  \
@@ -113,7 +113,7 @@ void lv_log_add(lv_log_level_t level, const char * file, int line, const char * 
 #endif
 
 #if LV_LOG_LEVEL <= LV_LOG_LEVEL_USER
-#define LV_LOG_USER(...) lv_log_add(LV_LOG_LEVEL_USER, __FILE__, __LINE__, __func__, __VA_ARGS__);
+#define LV_LOG_USER(...) _lv_log_add(LV_LOG_LEVEL_USER, __FILE__, __LINE__, __func__, __VA_ARGS__);
 #else
 #define LV_LOG_USER(...)                                                                                               \
     {                                                                                                                  \
@@ -124,7 +124,7 @@ void lv_log_add(lv_log_level_t level, const char * file, int line, const char * 
 #else /*LV_USE_LOG*/
 
 /*Do nothing if `LV_USE_LOG  0`*/
-#define lv_log_add(level, file, line, ...)                                                                             \
+#define _lv_log_add(level, file, line, ...)                                                                             \
     {                                                                                                                  \
         ;                                                                                                              \
     }

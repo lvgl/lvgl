@@ -145,10 +145,10 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
 
         /*In DOT mode save the text byte-to-byte because a '\0' can be in the middle*/
         if(copy_ext->long_mode == LV_LABEL_LONG_DOT) {
-            ext->text = lv_mem_realloc(ext->text, lv_mem_get_size(copy_ext->text));
+            ext->text = lv_mem_realloc(ext->text, _lv_mem_get_size(copy_ext->text));
             LV_ASSERT_MEM(ext->text);
             if(ext->text == NULL) return NULL;
-            lv_memcpy(ext->text, copy_ext->text, lv_mem_get_size(copy_ext->text));
+            _lv_memcpy(ext->text, copy_ext->text, _lv_mem_get_size(copy_ext->text));
         }
 
         if(copy_ext->dot_tmp_alloc && copy_ext->dot.tmp_ptr) {
@@ -156,7 +156,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
             lv_label_set_dot_tmp(new_label, ext->dot.tmp_ptr, len);
         }
         else {
-            lv_memcpy(ext->dot.tmp, copy_ext->dot.tmp, sizeof(ext->dot.tmp));
+            _lv_memcpy(ext->dot.tmp, copy_ext->dot.tmp, sizeof(ext->dot.tmp));
         }
         ext->dot_tmp_alloc = copy_ext->dot_tmp_alloc;
         ext->dot_end       = copy_ext->dot_end;
@@ -199,13 +199,13 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
         /*If set its own text then reallocate it (maybe its size changed)*/
 #if LV_USE_ARABIC_PERSIAN_CHARS
         /*Get the size of the text and process it*/
-        size_t len = lv_txt_ap_calc_bytes_cnt(text);
+        size_t len = _lv_txt_ap_calc_bytes_cnt(text);
 
         ext->text = lv_mem_realloc(ext->text, len);
         LV_ASSERT_MEM(ext->text);
         if(ext->text == NULL) return;
 
-        lv_txt_ap_proc(ext->text, ext->text);
+        _lv_txt_ap_proc(ext->text, ext->text);
 #else
         ext->text = lv_mem_realloc(ext->text, strlen(ext->text) + 1);
 #endif
@@ -222,13 +222,13 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
         /*Get the size of the text and process it*/
-        size_t len = lv_txt_ap_calc_bytes_cnt(text);
+        size_t len = _lv_txt_ap_calc_bytes_cnt(text);
 
         ext->text = lv_mem_alloc(len);
         LV_ASSERT_MEM(ext->text);
         if(ext->text == NULL) return;
 
-        lv_txt_ap_proc(text, ext->text);
+        _lv_txt_ap_proc(text, ext->text);
 #else
         /*Get the size of the text*/
         size_t len = strlen(text) + 1;
@@ -283,7 +283,7 @@ void lv_label_set_text_fmt(lv_obj_t * label, const char * fmt, ...)
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Put together the text according to the format string*/
-    char * raw_txt = lv_mem_buf_get(len + 1);
+    char * raw_txt = _lv_mem_buf_get(len + 1);
     LV_ASSERT_MEM(raw_txt);
     if(raw_txt == NULL) {
         va_end(ap2);
@@ -293,16 +293,16 @@ void lv_label_set_text_fmt(lv_obj_t * label, const char * fmt, ...)
     lv_vsnprintf(raw_txt, len + 1, fmt, ap2);
 
     /*Get the size of the Arabic text and process it*/
-    size_t len_ap = lv_txt_ap_calc_bytes_cnt(raw_txt);
+    size_t len_ap = _lv_txt_ap_calc_bytes_cnt(raw_txt);
     ext->text = lv_mem_alloc(len_ap + 1);
     LV_ASSERT_MEM(ext->text);
     if(ext->text == NULL) {
         va_end(ap2);
         return;
     }
-    lv_txt_ap_proc(raw_txt, ext->text);
+    _lv_txt_ap_proc(raw_txt, ext->text);
 
-    lv_mem_buf_release(raw_txt);
+    _lv_mem_buf_release(raw_txt);
 #else
     ext->text = lv_mem_alloc(len + 1);
     LV_ASSERT_MEM(ext->text);
@@ -517,7 +517,7 @@ lv_label_align_t lv_label_get_align(const lv_obj_t * label)
     if(align == LV_LABEL_ALIGN_AUTO) {
 #if LV_USE_BIDI
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(label);
-        if(base_dir == LV_BIDI_DIR_AUTO) base_dir = lv_bidi_detect_base_dir(ext->text);
+        if(base_dir == LV_BIDI_DIR_AUTO) base_dir = _lv_bidi_detect_base_dir(ext->text);
 
         if(base_dir == LV_BIDI_DIR_LTR) align = LV_LABEL_ALIGN_LEFT;
         else if(base_dir == LV_BIDI_DIR_RTL) align = LV_LABEL_ALIGN_RIGHT;
@@ -595,11 +595,11 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
     if(align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
     if(align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
 
-    uint16_t byte_id = lv_txt_encoded_get_byte_id(txt, char_id);
+    uint16_t byte_id = _lv_txt_encoded_get_byte_id(txt, char_id);
 
     /*Search the line of the index letter */;
     while(txt[new_line_start] != '\0') {
-        new_line_start += lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
+        new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
         if(byte_id < new_line_start || txt[new_line_start] == '\0')
             break; /*The line of 'index' letter begins at 'line_start'*/
 
@@ -625,15 +625,15 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
         bidi_txt =  &txt[line_start];
     }
     else {
-        uint16_t line_char_id = lv_txt_encoded_get_char_id(&txt[line_start], byte_id - line_start);
+        uint16_t line_char_id = _lv_txt_encoded_get_char_id(&txt[line_start], byte_id - line_start);
 
         bool is_rtl;
-        uint16_t visual_char_pos = lv_bidi_get_visual_pos(&txt[line_start], &mutable_bidi_txt, new_line_start - line_start,
+        uint16_t visual_char_pos = _lv_bidi_get_visual_pos(&txt[line_start], &mutable_bidi_txt, new_line_start - line_start,
                                                           lv_obj_get_base_dir(label), line_char_id, &is_rtl);
         bidi_txt = mutable_bidi_txt;
         if(is_rtl) visual_char_pos++;
 
-        visual_byte_pos = lv_txt_encoded_get_byte_id(bidi_txt, visual_char_pos);
+        visual_byte_pos = _lv_txt_encoded_get_byte_id(bidi_txt, visual_char_pos);
     }
 #else
     bidi_txt = &txt[line_start];
@@ -642,18 +642,18 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
 
 
     /*Calculate the x coordinate*/
-    lv_coord_t x = lv_txt_get_width(bidi_txt, visual_byte_pos, font, letter_space, flag);
+    lv_coord_t x = _lv_txt_get_width(bidi_txt, visual_byte_pos, font, letter_space, flag);
     if(char_id != line_start) x += letter_space;
 
     if(align == LV_LABEL_ALIGN_CENTER) {
         lv_coord_t line_w;
-        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
+        line_w = _lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
         x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
 
     }
     else if(align == LV_LABEL_ALIGN_RIGHT) {
         lv_coord_t line_w;
-        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
+        line_w = _lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
 
         x += lv_area_get_width(&txt_coords) - line_w;
     }
@@ -661,7 +661,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
     pos->y = y;
 
 #if LV_USE_BIDI
-    if(mutable_bidi_txt) lv_mem_buf_release(mutable_bidi_txt);
+    if(mutable_bidi_txt) _lv_mem_buf_release(mutable_bidi_txt);
 #endif
 }
 
@@ -703,14 +703,14 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 
     /*Search the line of the index letter */;
     while(txt[line_start] != '\0') {
-        new_line_start += lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
+        new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
 
         if(pos->y <= y + letter_height) {
             /*The line is found (stored in 'line_start')*/
             /* Include the NULL terminator in the last line */
             uint32_t tmp = new_line_start;
             uint32_t letter;
-            letter = lv_txt_encoded_prev(txt, &tmp);
+            letter = _lv_txt_encoded_prev(txt, &tmp);
             if(letter != '\n' && txt[new_line_start] == '\0') new_line_start++;
             break;
         }
@@ -720,10 +720,10 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     }
 
 #if LV_USE_BIDI
-    bidi_txt = lv_mem_buf_get(new_line_start - line_start + 1);
+    bidi_txt = _lv_mem_buf_get(new_line_start - line_start + 1);
     uint16_t txt_len = new_line_start - line_start;
     if(new_line_start > 0 && txt[new_line_start - 1] == '\0' && txt_len > 0) txt_len--;
-    lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_base_dir(label), NULL, 0);
+    _lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_base_dir(label), NULL, 0);
 #else
     bidi_txt = (char *)txt + line_start;
 #endif
@@ -732,12 +732,12 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     lv_coord_t x = 0;
     if(align == LV_LABEL_ALIGN_CENTER) {
         lv_coord_t line_w;
-        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
+        line_w = _lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
         x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
     }
     else if(align == LV_LABEL_ALIGN_RIGHT) {
         lv_coord_t line_w;
-        line_w = lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
+        line_w = _lv_txt_get_width(bidi_txt, new_line_start - line_start, font, letter_space, flag);
         x += lv_area_get_width(&txt_coords) - line_w;
     }
 
@@ -749,14 +749,14 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     if(new_line_start > 0) {
         while(i + line_start < new_line_start) {
             /* Get the current letter.*/
-            uint32_t letter = lv_txt_encoded_next(bidi_txt, &i);
+            uint32_t letter = _lv_txt_encoded_next(bidi_txt, &i);
 
             /*Get the next letter too for kerning*/
-            uint32_t letter_next = lv_txt_encoded_next(&bidi_txt[i], NULL);
+            uint32_t letter_next = _lv_txt_encoded_next(&bidi_txt[i], NULL);
 
             /*Handle the recolor command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
-                if(lv_txt_is_cmd(&cmd_state, bidi_txt[i]) != false) {
+                if(_lv_txt_is_cmd(&cmd_state, bidi_txt[i]) != false) {
                     continue; /*Skip the letter is it is part of a command*/
                 }
             }
@@ -776,15 +776,15 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 #if LV_USE_BIDI
     /*Handle Bidi*/
     bool is_rtl;
-    logical_pos = lv_bidi_get_logical_pos(&txt[line_start], NULL, txt_len, lv_obj_get_base_dir(label),
-                                          lv_txt_encoded_get_char_id(bidi_txt, i), &is_rtl);
+    logical_pos = _lv_bidi_get_logical_pos(&txt[line_start], NULL, txt_len, lv_obj_get_base_dir(label),
+                                          _lv_txt_encoded_get_char_id(bidi_txt, i), &is_rtl);
     if(is_rtl) logical_pos++;
-    lv_mem_buf_release(bidi_txt);
+    _lv_mem_buf_release(bidi_txt);
 #else
-    logical_pos = lv_txt_encoded_get_char_id(bidi_txt, i);
+    logical_pos = _lv_txt_encoded_get_char_id(bidi_txt, i);
 #endif
 
-    return  logical_pos + lv_txt_encoded_get_char_id(txt, line_start);
+    return  logical_pos + _lv_txt_encoded_get_char_id(txt, line_start);
 }
 
 /**
@@ -857,7 +857,7 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
 
     /*Search the line of the index letter */;
     while(txt[line_start] != '\0') {
-        new_line_start += lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
+        new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
 
         if(pos->y <= y + letter_height) break; /*The line is found (stored in 'line_start')*/
         y += letter_height + line_space;
@@ -870,12 +870,12 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
     lv_coord_t last_x = 0;
     if(align == LV_LABEL_ALIGN_CENTER) {
         lv_coord_t line_w;
-        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
+        line_w = _lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
         x += lv_area_get_width(&txt_coords) / 2 - line_w / 2;
     }
     else if(align == LV_LABEL_ALIGN_RIGHT) {
         lv_coord_t line_w;
-        line_w = lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
+        line_w = _lv_txt_get_width(&txt[line_start], new_line_start - line_start, font, letter_space, flag);
         x += lv_area_get_width(&txt_coords) - line_w;
     }
 
@@ -890,14 +890,14 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos)
         while(i <= new_line_start - 1) {
             /* Get the current letter
              * Be careful 'i' already points to the next character */
-            letter = lv_txt_encoded_next(txt, &i);
+            letter = _lv_txt_encoded_next(txt, &i);
 
             /*Get the next letter for kerning*/
-            letter_next = lv_txt_encoded_next(&txt[i], NULL);
+            letter_next = _lv_txt_encoded_next(&txt[i], NULL);
 
             /*Handle the recolor command*/
             if((flag & LV_TXT_FLAG_RECOLOR) != 0) {
-                if(lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
+                if(_lv_txt_is_cmd(&cmd_state, txt[i]) != false) {
                     continue; /*Skip the letter is it is part of a command*/
                 }
             }
@@ -961,20 +961,20 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt)
     if(ext->text == NULL) return;
 
     if(pos == LV_LABEL_POS_LAST) {
-        pos = lv_txt_get_encoded_length(ext->text);
+        pos = _lv_txt_get_encoded_length(ext->text);
     }
 
 #if LV_USE_BIDI
-    char * bidi_buf = lv_mem_buf_get(ins_len + 1);
+    char * bidi_buf = _lv_mem_buf_get(ins_len + 1);
     LV_ASSERT_MEM(bidi_buf);
     if(bidi_buf == NULL) return;
 
-    lv_bidi_process(txt, bidi_buf, lv_obj_get_base_dir(label));
-    lv_txt_ins(ext->text, pos, bidi_buf);
+    _lv_bidi_process(txt, bidi_buf, lv_obj_get_base_dir(label));
+    _lv_txt_ins(ext->text, pos, bidi_buf);
 
-    lv_mem_buf_release(bidi_buf);
+    _lv_mem_buf_release(bidi_buf);
 #else
-    lv_txt_ins(ext->text, pos, txt);
+    _lv_txt_ins(ext->text, pos, txt);
 #endif
     lv_label_refr_text(label);
 }
@@ -999,7 +999,7 @@ void lv_label_cut_text(lv_obj_t * label, uint32_t pos, uint32_t cnt)
 
     char * label_txt = lv_label_get_text(label);
     /*Delete the characters*/
-    lv_txt_cut(label_txt, pos, cnt);
+    _lv_txt_cut(label_txt, pos, cnt);
 
     /*Refresh the label*/
     lv_label_refr_text(label);
@@ -1046,7 +1046,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         get_txt_coords(label, &txt_coords);
 
         lv_area_t txt_clip;
-        bool is_common = lv_area_intersect(&txt_clip, clip_area, &txt_coords);
+        bool is_common = _lv_area_intersect(&txt_clip, clip_area, &txt_coords);
         if(!is_common) return LV_DESIGN_RES_OK;
 
         lv_label_align_t align = lv_label_get_align(label);
@@ -1073,7 +1073,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         if((ext->long_mode == LV_LABEL_LONG_SROLL || ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) &&
            (ext->align == LV_LABEL_ALIGN_CENTER || ext->align == LV_LABEL_ALIGN_RIGHT)) {
             lv_point_t size;
-            lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
+            _lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
                             LV_COORD_MAX, flag);
             if(size.x > lv_area_get_width(&txt_coords)) {
                 label_draw_dsc.flag &= ~LV_TXT_FLAG_RIGHT;
@@ -1094,7 +1094,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
 
         if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
             lv_point_t size;
-            lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
+            _lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
                             LV_COORD_MAX, flag);
 
             /*Draw the text again next to the original to make an circular effect */
@@ -1205,7 +1205,7 @@ static void lv_label_refr_text(lv_obj_t * label)
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
     if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
     if(ext->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TXT_FLAG_FIT;
-    lv_txt_get_size(&size, ext->text, font, letter_space, line_space, max_w, flag);
+    _lv_txt_get_size(&size, ext->text, font, letter_space, line_space, max_w, flag);
 
     /*Set the full size in expand mode*/
     if(ext->long_mode == LV_LABEL_LONG_EXPAND) {
@@ -1351,7 +1351,7 @@ static void lv_label_refr_text(lv_obj_t * label)
         if(size.y <= lv_area_get_height(&txt_coords)) { /*No dots are required, the text is short enough*/
             ext->dot_end = LV_LABEL_DOT_END_INV;
         }
-        else if(lv_txt_get_encoded_length(ext->text) <= LV_LABEL_DOT_NUM) {   /*Don't turn to dots all the characters*/
+        else if(_lv_txt_get_encoded_length(ext->text) <= LV_LABEL_DOT_NUM) {   /*Don't turn to dots all the characters*/
             ext->dot_end = LV_LABEL_DOT_END_INV;
         }
         else {
@@ -1368,9 +1368,9 @@ static void lv_label_refr_text(lv_obj_t * label)
 
             /*Be sure there is space for the dots*/
             size_t txt_len = strlen(ext->text);
-            uint32_t byte_id     = lv_txt_encoded_get_byte_id(ext->text, letter_id);
+            uint32_t byte_id     = _lv_txt_encoded_get_byte_id(ext->text, letter_id);
             while(byte_id + LV_LABEL_DOT_NUM > txt_len) {
-                byte_id -= lv_txt_encoded_size(&ext->text[byte_id]);
+                byte_id -= _lv_txt_encoded_size(&ext->text[byte_id]);
                 letter_id--;
             }
 
@@ -1379,8 +1379,8 @@ static void lv_label_refr_text(lv_obj_t * label)
             uint32_t i;
             uint8_t len          = 0;
             for(i = 0; i <= LV_LABEL_DOT_NUM; i++) {
-                len += lv_txt_encoded_size(&ext->text[byte_id]);
-                lv_txt_encoded_next(ext->text, &byte_id);
+                len += _lv_txt_encoded_size(&ext->text[byte_id]);
+                _lv_txt_encoded_next(ext->text, &byte_id);
             }
 
             if(lv_label_set_dot_tmp(label, &ext->text[byte_id_ori], len)) {
@@ -1411,7 +1411,7 @@ static void lv_label_revert_dots(lv_obj_t * label)
     if(ext->long_mode != LV_LABEL_LONG_DOT) return;
     if(ext->dot_end == LV_LABEL_DOT_END_INV) return;
     uint32_t letter_i = ext->dot_end - LV_LABEL_DOT_NUM;
-    uint32_t byte_i   = lv_txt_encoded_get_byte_id(ext->text, letter_i);
+    uint32_t byte_i   = _lv_txt_encoded_get_byte_id(ext->text, letter_i);
 
     /*Restore the characters*/
     uint8_t i      = 0;
@@ -1461,14 +1461,14 @@ static bool lv_label_set_dot_tmp(lv_obj_t * label, char * data, uint16_t len)
             LV_LOG_ERROR("Failed to allocate memory for dot_tmp_ptr");
             return false;
         }
-        lv_memcpy(ext->dot.tmp_ptr, data, len);
+        _lv_memcpy(ext->dot.tmp_ptr, data, len);
         ext->dot.tmp_ptr[len] = '\0';
         ext->dot_tmp_alloc    = true;
     }
     else {
         /* Characters can be directly stored in object */
         ext->dot_tmp_alloc = false;
-        lv_memcpy(ext->dot.tmp, data, len);
+        _lv_memcpy(ext->dot.tmp, data, len);
     }
     return true;
 }

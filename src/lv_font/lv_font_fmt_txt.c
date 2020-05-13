@@ -101,7 +101,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
         case 4: buf_size = (gsize + 1) >> 1;  break;
         }
 
-        if(lv_mem_get_size(decompr_buf) < buf_size) {
+        if(_lv_mem_get_size(decompr_buf) < buf_size) {
             decompr_buf = lv_mem_realloc(decompr_buf, buf_size);
             LV_ASSERT_MEM(decompr_buf);
             if(decompr_buf == NULL) return NULL;
@@ -169,7 +169,7 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
 /**
  * Free the allocated memories.
  */
-void lv_font_clean_up_fmt_txt(void)
+void _lv_font_clean_up_fmt_txt(void)
 {
     if(decompr_buf) {
         lv_mem_free(decompr_buf);
@@ -206,7 +206,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
             glyph_id = fdsc->cmaps[i].glyph_id_start + gid_ofs_8[rcp];
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY) {
-            uint8_t * p = lv_utils_bsearch(&rcp, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
+            uint8_t * p = _lv_utils_bsearch(&rcp, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
                                            sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
 
             if(p) {
@@ -216,7 +216,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
             }
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
-            uint8_t * p = lv_utils_bsearch(&rcp, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
+            uint8_t * p = _lv_utils_bsearch(&rcp, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
                                            sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
 
             if(p) {
@@ -253,7 +253,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
              * The pairs are ordered left_id first, then right_id secondly. */
             const uint8_t * g_ids = kdsc->glyph_ids;
             uint16_t g_id_both = (gid_right << 8) + gid_left; /*Create one number from the ids*/
-            uint8_t * kid_p = lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 2, kern_pair_8_compare);
+            uint8_t * kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 2, kern_pair_8_compare);
 
             /*If the `g_id_both` were found get its index from the pointer*/
             if(kid_p) {
@@ -267,7 +267,7 @@ static int8_t get_kern_value(const lv_font_t * font, uint32_t gid_left, uint32_t
              * The pairs are ordered left_id first, then right_id secondly. */
             const uint16_t * g_ids = kdsc->glyph_ids;
             lv_uintptr_t g_id_both = (uint32_t)((uint32_t)gid_right << 8) + gid_left; /*Create one number from the ids*/
-            uint8_t * kid_p = lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 4, kern_pair_16_compare);
+            uint8_t * kid_p = _lv_utils_bsearch(&g_id_both, g_ids, kdsc->pair_cnt, 4, kern_pair_16_compare);
 
             /*If the `g_id_both` were found get its index from the pointer*/
             if(kid_p) {
@@ -333,8 +333,8 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
 
     rle_init(in, bpp);
 
-    uint8_t * line_buf1 = lv_mem_buf_get(w);
-    uint8_t * line_buf2 = lv_mem_buf_get(w);
+    uint8_t * line_buf1 = _lv_mem_buf_get(w);
+    uint8_t * line_buf2 = _lv_mem_buf_get(w);
 
     decompress_line(line_buf1, w);
 
@@ -356,8 +356,8 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
         }
     }
 
-    lv_mem_buf_release(line_buf1);
-    lv_mem_buf_release(line_buf2);
+    _lv_mem_buf_release(line_buf1);
+    _lv_mem_buf_release(line_buf2);
 }
 
 /**

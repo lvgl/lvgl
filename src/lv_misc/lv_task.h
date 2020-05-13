@@ -75,7 +75,7 @@ typedef struct _lv_task_t {
 /**
  * Init the lv_task module
  */
-void lv_task_core_init(void);
+void _lv_task_core_init(void);
 
 //! @cond Doxygen_Suppress
 

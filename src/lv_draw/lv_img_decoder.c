@@ -59,9 +59,9 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
 /**
  * Initialize the image decoder module
  * */
-void lv_img_decoder_init(void)
+void _lv_img_decoder_init(void)
 {
-    lv_ll_init(&LV_GC_ROOT(_lv_img_defoder_ll), sizeof(lv_img_decoder_t));
+    _lv_ll_init(&LV_GC_ROOT(_lv_img_defoder_ll), sizeof(lv_img_decoder_t));
 
     lv_img_decoder_t * decoder;
 
@@ -92,7 +92,7 @@ lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header)
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
-    LV_LL_READ(LV_GC_ROOT(_lv_img_defoder_ll), d) {
+    _LV_LL_READ(LV_GC_ROOT(_lv_img_defoder_ll), d) {
         res = LV_RES_INV;
         if(d->info_cb) {
             res = d->info_cb(d, src, header);
@@ -133,7 +133,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     lv_res_t res = LV_RES_INV;
 
     lv_img_decoder_t * d;
-    LV_LL_READ(LV_GC_ROOT(_lv_img_defoder_ll), d) {
+    _LV_LL_READ(LV_GC_ROOT(_lv_img_defoder_ll), d) {
         /*Info an Open callbacks are required*/
         if(d->info_cb == NULL || d->open_cb == NULL) continue;
 
@@ -151,7 +151,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     }
 
     if(res == LV_RES_INV) {
-        lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
+        _lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
     }
 
     return res;
@@ -197,11 +197,11 @@ void lv_img_decoder_close(lv_img_decoder_dsc_t * dsc)
 lv_img_decoder_t * lv_img_decoder_create(void)
 {
     lv_img_decoder_t * decoder;
-    decoder = lv_ll_ins_head(&LV_GC_ROOT(_lv_img_defoder_ll));
+    decoder = _lv_ll_ins_head(&LV_GC_ROOT(_lv_img_defoder_ll));
     LV_ASSERT_MEM(decoder);
     if(decoder == NULL) return NULL;
 
-    lv_memset_00(decoder, sizeof(lv_img_decoder_t));
+    _lv_memset_00(decoder, sizeof(lv_img_decoder_t));
 
     return decoder;
 }
@@ -212,7 +212,7 @@ lv_img_decoder_t * lv_img_decoder_create(void)
  */
 void lv_img_decoder_delete(lv_img_decoder_t * decoder)
 {
-    lv_ll_remove(&LV_GC_ROOT(_lv_img_defoder_ll), decoder);
+    _lv_ll_remove(&LV_GC_ROOT(_lv_img_defoder_ll), decoder);
     lv_mem_free(decoder);
 }
 
@@ -341,7 +341,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
                 LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
                 return LV_RES_INV;
             }
-            lv_memset_00(dsc->user_data, sizeof(lv_img_decoder_built_in_data_t));
+            _lv_memset_00(dsc->user_data, sizeof(lv_img_decoder_built_in_data_t));
         }
 
         lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
@@ -353,7 +353,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
             return LV_RES_INV;
         }
 
-        lv_memcpy_small(user_data->f, &f, sizeof(f));
+        _lv_memcpy_small(user_data->f, &f, sizeof(f));
 
 #else
         LV_LOG_WARN("Image built-in decoder cannot read file because LV_USE_FILESYSTEM = 0");
@@ -399,7 +399,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
                 lv_img_decoder_built_in_close(decoder, dsc);
                 return LV_RES_INV;
             }
-            lv_memset_00(dsc->user_data, sizeof(lv_img_decoder_built_in_data_t));
+            _lv_memset_00(dsc->user_data, sizeof(lv_img_decoder_built_in_data_t));
         }
 
         lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
@@ -639,7 +639,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
 
 #if LV_USE_FILESYSTEM
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
-    uint8_t * fs_buf = lv_mem_buf_get(w);
+    uint8_t * fs_buf = _lv_mem_buf_get(w);
 #endif
 
     const uint8_t * data_tmp = NULL;
@@ -673,7 +673,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
         }
     }
 #if LV_USE_FILESYSTEM
-    lv_mem_buf_release(fs_buf);
+    _lv_mem_buf_release(fs_buf);
 #endif
     return LV_RES_OK;
 
@@ -727,7 +727,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
     lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
 
 #if LV_USE_FILESYSTEM
-    uint8_t * fs_buf = lv_mem_buf_get(w);
+    uint8_t * fs_buf = _lv_mem_buf_get(w);
 #endif
     const uint8_t * data_tmp = NULL;
     if(dsc->src_type == LV_IMG_SRC_VARIABLE) {
@@ -771,7 +771,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
         }
     }
 #if LV_USE_FILESYSTEM
-    lv_mem_buf_release(fs_buf);
+    _lv_mem_buf_release(fs_buf);
 #endif
     return LV_RES_OK;
 #else

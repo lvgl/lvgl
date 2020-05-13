@@ -54,9 +54,9 @@ static bool task_created;
 /**
  * Init the lv_task module
  */
-void lv_task_core_init(void)
+void _lv_task_core_init(void)
 {
-    lv_ll_init(&LV_GC_ROOT(_lv_task_ll), sizeof(lv_task_t));
+    _lv_ll_init(&LV_GC_ROOT(_lv_task_ll), sizeof(lv_task_t));
 
     task_list_changed = false;
     /*Initially enable the lv_task handling*/
@@ -100,11 +100,11 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
         end_flag                 = true;
         task_deleted             = false;
         task_created             = false;
-        LV_GC_ROOT(_lv_task_act) = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
+        LV_GC_ROOT(_lv_task_act) = _lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
         while(LV_GC_ROOT(_lv_task_act)) {
             /* The task might be deleted if it runs only once ('once = 1')
              * So get next element until the current is surely valid*/
-            next = lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), LV_GC_ROOT(_lv_task_act));
+            next = _lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), LV_GC_ROOT(_lv_task_act));
 
             /*We reach priority of the turned off task. There is nothing more to do.*/
             if(((lv_task_t *)LV_GC_ROOT(_lv_task_act))->prio == LV_TASK_PRIO_OFF) {
@@ -176,7 +176,7 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
     }
 
     time_till_next = LV_NO_TASK_READY;
-    next = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
+    next = _lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
     while(next) {
         if(next->prio != LV_TASK_PRIO_OFF) {
             uint32_t delay = lv_task_time_remaining(next);
@@ -184,7 +184,7 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void)
                 time_till_next = delay;
         }
 
-        next = lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), next); /*Find the next task*/
+        next = _lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), next); /*Find the next task*/
     }
 
     already_running = false; /*Release the mutex*/
@@ -203,11 +203,11 @@ lv_task_t * lv_task_create_basic(void)
     lv_task_t * tmp;
 
     /*Create task lists in order of priority from high to low*/
-    tmp = lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
+    tmp = _lv_ll_get_head(&LV_GC_ROOT(_lv_task_ll));
 
     /*It's the first task*/
     if(NULL == tmp) {
-        new_task = lv_ll_ins_head(&LV_GC_ROOT(_lv_task_ll));
+        new_task = _lv_ll_ins_head(&LV_GC_ROOT(_lv_task_ll));
         LV_ASSERT_MEM(new_task);
         if(new_task == NULL) return NULL;
     }
@@ -215,17 +215,17 @@ lv_task_t * lv_task_create_basic(void)
     else {
         do {
             if(tmp->prio <= DEF_PRIO) {
-                new_task = lv_ll_ins_prev(&LV_GC_ROOT(_lv_task_ll), tmp);
+                new_task = _lv_ll_ins_prev(&LV_GC_ROOT(_lv_task_ll), tmp);
                 LV_ASSERT_MEM(new_task);
                 if(new_task == NULL) return NULL;
                 break;
             }
-            tmp = lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), tmp);
+            tmp = _lv_ll_get_next(&LV_GC_ROOT(_lv_task_ll), tmp);
         } while(tmp != NULL);
 
         /*Only too high priority tasks were found. Add the task to the end*/
         if(tmp == NULL) {
-            new_task = lv_ll_ins_tail(&LV_GC_ROOT(_lv_task_ll));
+            new_task = _lv_ll_ins_tail(&LV_GC_ROOT(_lv_task_ll));
             LV_ASSERT_MEM(new_task);
             if(new_task == NULL) return NULL;
         }
@@ -286,7 +286,7 @@ void lv_task_set_cb(lv_task_t * task, lv_task_cb_t task_cb)
  */
 void lv_task_del(lv_task_t * task)
 {
-    lv_ll_remove(&LV_GC_ROOT(_lv_task_ll), task);
+    _lv_ll_remove(&LV_GC_ROOT(_lv_task_ll), task);
     task_list_changed = true;
 
     lv_mem_free(task);
@@ -305,16 +305,16 @@ void lv_task_set_prio(lv_task_t * task, lv_task_prio_t prio)
 
     /*Find the tasks with new priority*/
     lv_task_t * i;
-    LV_LL_READ(LV_GC_ROOT(_lv_task_ll), i) {
+    _LV_LL_READ(LV_GC_ROOT(_lv_task_ll), i) {
         if(i->prio <= prio) {
-            if(i != task) lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), task, i);
+            if(i != task) _lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), task, i);
             break;
         }
     }
 
     /*There was no such a low priority so far then add the node to the tail*/
     if(i == NULL) {
-        lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), task, NULL);
+        _lv_ll_move_before(&LV_GC_ROOT(_lv_task_ll), task, NULL);
     }
     task_list_changed = true;
 

@@ -253,7 +253,7 @@ void lv_canvas_copy_buf(lv_obj_t * canvas, const void * to_copy, lv_coord_t x, l
     uint8_t * to_copy8 = (uint8_t *)to_copy;
     lv_coord_t i;
     for(i = 0; i < h; i++) {
-        lv_memcpy((void *)&ext->dsc.data[px], to_copy8, w * px_size);
+        _lv_memcpy((void *)&ext->dsc.data[px], to_copy8, w * px_size);
         px += ext->dsc.header.w * px_size;
         to_copy8 += w * px_size;
     }
@@ -303,12 +303,12 @@ void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, u
     dsc.cfg.pivot_y = pivot_y;
     dsc.cfg.color = color;
     dsc.cfg.antialias = antialias;
-    lv_img_buf_transform_init(&dsc);
+    _lv_img_buf_transform_init(&dsc);
 
     for(y = -offset_y; y < dest_height - offset_y; y++) {
         for(x = -offset_x; x < dest_width - offset_x; x++) {
 
-            ret = lv_img_buf_transform(&dsc, x, y);
+            ret = _lv_img_buf_transform(&dsc, x, y);
 
             if(ret == false) continue;
 
@@ -408,7 +408,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
     bool has_alpha = lv_img_cf_has_alpha(ext->dsc.header.cf);
 
     lv_coord_t line_w = lv_img_buf_get_img_size(ext->dsc.header.w, 1, ext->dsc.header.cf);
-    uint8_t * line_buf = lv_mem_buf_get(line_w);
+    uint8_t * line_buf = _lv_mem_buf_get(line_w);
 
     lv_img_dsc_t line_img;
     line_img.data = line_buf;
@@ -429,7 +429,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 
         lv_color_t c;
         lv_opa_t opa = LV_OPA_TRANSP;
-        lv_memcpy(line_buf, &ext->dsc.data[y * line_w], line_w);
+        _lv_memcpy(line_buf, &ext->dsc.data[y * line_w], line_w);
 
 
         for(x = a.x1 - r_back; x <= a.x1 + r_front; x++) {
@@ -501,7 +501,7 @@ void lv_canvas_blur_hor(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
     }
     lv_obj_invalidate(canvas);
 
-    lv_mem_buf_release(line_buf);
+    _lv_mem_buf_release(line_buf);
 }
 
 
@@ -543,7 +543,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 
     bool has_alpha = lv_img_cf_has_alpha(ext->dsc.header.cf);
     lv_coord_t col_w = lv_img_buf_get_img_size(1, ext->dsc.header.h, ext->dsc.header.cf);
-    uint8_t * col_buf = lv_mem_buf_get(col_w);
+    uint8_t * col_buf = _lv_mem_buf_get(col_w);
     lv_img_dsc_t line_img;
 
     line_img.data = col_buf;
@@ -641,7 +641,7 @@ void lv_canvas_blur_ver(lv_obj_t * canvas, const lv_area_t * area, uint16_t r)
 
     lv_obj_invalidate(canvas);
 
-    lv_mem_buf_release(col_buf);
+    _lv_mem_buf_release(col_buf);
 }
 
 /**
@@ -658,11 +658,11 @@ void lv_canvas_fill_bg(lv_obj_t * canvas, lv_color_t color, lv_opa_t opa)
     if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
         uint32_t row_byte_cnt = (dsc->header.w + 7) >> 3;
         /*+8 skip the palette*/
-        lv_memset((uint8_t *)dsc->data + 8, color.full ? 0xff : 0x00, row_byte_cnt * dsc->header.h);
+        _lv_memset((uint8_t *)dsc->data + 8, color.full ? 0xff : 0x00, row_byte_cnt * dsc->header.h);
     }
     else if(dsc->header.cf == LV_IMG_CF_ALPHA_1BIT) {
         uint32_t row_byte_cnt = (dsc->header.w + 7) >> 3;
-        lv_memset((uint8_t *)dsc->data, opa > LV_OPA_50 ? 0xff : 0x00, row_byte_cnt * dsc->header.h);
+        _lv_memset((uint8_t *)dsc->data, opa > LV_OPA_50 ? 0xff : 0x00, row_byte_cnt * dsc->header.h);
     }
     else {
         uint32_t x;
@@ -714,7 +714,7 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     coords.y2 = y + h - 1;
 
     lv_disp_t disp;
-    lv_memset_00(&disp, sizeof(lv_disp_t));
+    _lv_memset_00(&disp, sizeof(lv_disp_t));
 
     lv_disp_buf_t disp_buf;
     lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
@@ -738,12 +738,12 @@ void lv_canvas_draw_rect(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     }
 #endif
 
-    lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
-    lv_refr_set_disp_refreshing(&disp);
+    lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
+    _lv_refr_set_disp_refreshing(&disp);
 
     lv_draw_rect(&coords, &mask, rect_dsc);
 
-    lv_refr_set_disp_refreshing(refr_ori);
+    _lv_refr_set_disp_refreshing(refr_ori);
 
     lv_obj_invalidate(canvas);
 }
@@ -786,7 +786,7 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
     coords.y2 = dsc->header.h - 1;
 
     lv_disp_t disp;
-    lv_memset_00(&disp, sizeof(lv_disp_t));
+    _lv_memset_00(&disp, sizeof(lv_disp_t));
 
     lv_disp_buf_t disp_buf;
     lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
@@ -800,8 +800,8 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 
     set_set_px_cb(&disp.driver, dsc->header.cf);
 
-    lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
-    lv_refr_set_disp_refreshing(&disp);
+    lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
+    _lv_refr_set_disp_refreshing(&disp);
 
     lv_txt_flag_t flag;
     switch(align) {
@@ -823,7 +823,7 @@ void lv_canvas_draw_text(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord
 
     lv_draw_label(&coords, &mask, label_draw_dsc, txt, NULL);
 
-    lv_refr_set_disp_refreshing(refr_ori);
+    _lv_refr_set_disp_refreshing(refr_ori);
 
     lv_obj_invalidate(canvas);
 }
@@ -868,7 +868,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
     coords.y2 = y + header.h - 1;
 
     lv_disp_t disp;
-    lv_memset_00(&disp, sizeof(lv_disp_t));
+    _lv_memset_00(&disp, sizeof(lv_disp_t));
 
     lv_disp_buf_t disp_buf;
     lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
@@ -882,12 +882,12 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
 
     set_set_px_cb(&disp.driver, dsc->header.cf);
 
-    lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
-    lv_refr_set_disp_refreshing(&disp);
+    lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
+    _lv_refr_set_disp_refreshing(&disp);
 
     lv_draw_img(&coords, &mask, src, img_draw_dsc);
 
-    lv_refr_set_disp_refreshing(refr_ori);
+    _lv_refr_set_disp_refreshing(refr_ori);
 
     lv_obj_invalidate(canvas);
 }
@@ -919,7 +919,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
     mask.y2 = dsc->header.h - 1;
 
     lv_disp_t disp;
-    lv_memset_00(&disp, sizeof(lv_disp_t));
+    _lv_memset_00(&disp, sizeof(lv_disp_t));
 
     lv_disp_buf_t disp_buf;
     lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
@@ -942,15 +942,15 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t 
     }
 #endif
 
-    lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
-    lv_refr_set_disp_refreshing(&disp);
+    lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
+    _lv_refr_set_disp_refreshing(&disp);
 
     uint32_t i;
     for(i = 0; i < point_cnt - 1; i++) {
         lv_draw_line(&points[i], &points[i + 1], &mask, line_draw_dsc);
     }
 
-    lv_refr_set_disp_refreshing(refr_ori);
+    _lv_refr_set_disp_refreshing(refr_ori);
 
     lv_obj_invalidate(canvas);
 }
@@ -983,7 +983,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
     mask.y2 = dsc->header.h - 1;
 
     lv_disp_t disp;
-    lv_memset_00(&disp, sizeof(lv_disp_t));
+    _lv_memset_00(&disp, sizeof(lv_disp_t));
 
     lv_disp_buf_t disp_buf;
     lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
@@ -1006,12 +1006,12 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
     }
 #endif
 
-    lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
-    lv_refr_set_disp_refreshing(&disp);
+    lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
+    _lv_refr_set_disp_refreshing(&disp);
 
     //    lv_draw_polygon(points, point_cnt, &mask, poly_draw_dsc);
 
-    lv_refr_set_disp_refreshing(refr_ori);
+    _lv_refr_set_disp_refreshing(refr_ori);
 
     lv_obj_invalidate(canvas);
 }
@@ -1047,7 +1047,7 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     mask.y2 = dsc->header.h - 1;
 
     lv_disp_t disp;
-    lv_memset_00(&disp, sizeof(lv_disp_t));
+    _lv_memset_00(&disp, sizeof(lv_disp_t));
 
     lv_disp_buf_t disp_buf;
     lv_disp_buf_init(&disp_buf, (void *)dsc->data, NULL, dsc->header.w * dsc->header.h);
@@ -1070,12 +1070,12 @@ void lv_canvas_draw_arc(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, lv_coord_
     }
 #endif
 
-    lv_disp_t * refr_ori = lv_refr_get_disp_refreshing();
-    lv_refr_set_disp_refreshing(&disp);
+    lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
+    _lv_refr_set_disp_refreshing(&disp);
 
     lv_draw_arc(x, y, r,  start_angle, end_angle, &mask, arc_draw_dsc);
 
-    lv_refr_set_disp_refreshing(refr_ori);
+    _lv_refr_set_disp_refreshing(refr_ori);
 
     lv_obj_invalidate(canvas);
 }

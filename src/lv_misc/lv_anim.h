@@ -108,7 +108,7 @@ typedef struct _lv_anim_t {
 /**
  * Init. the animation module
  */
-void lv_anim_core_init(void);
+void _lv_anim_core_init(void);
 
 /**
  * Initialize an animation variable.
@@ -198,7 +198,7 @@ static inline void lv_anim_set_custom_exec_cb(lv_anim_t * a, lv_anim_custom_exec
  */
 static inline void lv_anim_set_path(lv_anim_t * a, const lv_anim_path_t * path)
 {
-    lv_memcpy_small(&a->path, path, sizeof(lv_anim_path_t));
+    _lv_memcpy_small(&a->path, path, sizeof(lv_anim_path_t));
 }
 
 
@@ -274,7 +274,7 @@ void lv_anim_start(lv_anim_t * a);
  */
 static inline void lv_anim_path_init(lv_anim_path_t * path)
 {
-    lv_memset_00(path, sizeof(lv_anim_path_t));
+    _lv_memset_00(path, sizeof(lv_anim_path_t));
 }
 
 /**

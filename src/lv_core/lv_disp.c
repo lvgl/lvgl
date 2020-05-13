@@ -112,24 +112,7 @@ void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr)
 
     if(old_disp == disp) return;
 
-    lv_ll_chg_list(&old_disp->scr_ll, &disp->scr_ll, scr, true);
-}
-
-/**
- * Get a pointer to the screen refresher task to
- * modify its parameters with `lv_task_...` functions.
- * @param disp pointer to a display
- * @return pointer to the display refresher task. (NULL on error)
- */
-lv_task_t * lv_disp_get_refr_task(lv_disp_t * disp)
-{
-    if(!disp) disp = lv_disp_get_default();
-    if(!disp) {
-        LV_LOG_WARN("lv_disp_get_refr_task: no display registered");
-        return NULL;
-    }
-
-    return disp->refr_task;
+    _lv_ll_chg_list(&old_disp->scr_ll, &disp->scr_ll, scr, true);
 }
 
 /**
@@ -172,6 +155,24 @@ void lv_disp_trig_activity(lv_disp_t * disp)
     }
 
     disp->last_activity_time = lv_tick_get();
+}
+
+
+/**
+ * Get a pointer to the screen refresher task to
+ * modify its parameters with `lv_task_...` functions.
+ * @param disp pointer to a display
+ * @return pointer to the display refresher task. (NULL on error)
+ */
+lv_task_t * _lv_disp_get_refr_task(lv_disp_t * disp)
+{
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) {
+        LV_LOG_WARN("lv_disp_get_refr_task: no display registered");
+        return NULL;
+    }
+
+    return disp->refr_task;
 }
 
 /**********************

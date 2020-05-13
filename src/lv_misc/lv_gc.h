@@ -60,7 +60,7 @@ LV_ITERATE_ROOTS(LV_EXTERN_ROOT)
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_gc_clear_roots(void);
+void _lv_gc_clear_roots(void);
 
 /**********************
  *      MACROS

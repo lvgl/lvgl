@@ -79,7 +79,7 @@ void lv_area_set_height(lv_area_t * area_p, lv_coord_t h)
  * @param x the new x coordinate of the area
  * @param y the new y coordinate of the area
  */
-void lv_area_set_pos(lv_area_t * area_p, lv_coord_t x, lv_coord_t y)
+void _lv_area_set_pos(lv_area_t * area_p, lv_coord_t x, lv_coord_t y)
 {
     lv_coord_t w = lv_area_get_width(area_p);
     lv_coord_t h = lv_area_get_height(area_p);
@@ -110,7 +110,7 @@ uint32_t lv_area_get_size(const lv_area_t * area_p)
  * @param a2_p pointer to the second area
  * @return false: the two area has NO common parts, res_p is invalid
  */
-bool lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
+bool _lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     /* Get the smaller area from 'a1_p' and 'a2_p' */
     res_p->x1 = LV_MATH_MAX(a1_p->x1, a2_p->x1);
@@ -132,7 +132,7 @@ bool lv_area_intersect(lv_area_t * res_p, const lv_area_t * a1_p, const lv_area_
  * @param a1_p pointer to the first area
  * @param a2_p pointer to the second area
  */
-void lv_area_join(lv_area_t * a_res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
+void _lv_area_join(lv_area_t * a_res_p, const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     a_res_p->x1 = LV_MATH_MIN(a1_p->x1, a2_p->x1);
     a_res_p->y1 = LV_MATH_MIN(a1_p->y1, a2_p->y1);
@@ -147,7 +147,7 @@ void lv_area_join(lv_area_t * a_res_p, const lv_area_t * a1_p, const lv_area_t *
  * @param radius radius of area (e.g. for rounded rectangle)
  * @return false:the point is out of the area
  */
-bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coord_t radius)
+bool _lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coord_t radius)
 {
     /*First check the basic area*/
     bool is_on_rect = false;
@@ -174,7 +174,7 @@ bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coord
     corner_area.x2 = a_p->x1 + radius;
     corner_area.y1 = a_p->y1;
     corner_area.y2 = a_p->y1 + radius;
-    if(lv_area_is_point_on(&corner_area, p_p, 0)) {
+    if(_lv_area_is_point_on(&corner_area, p_p, 0)) {
         corner_area.x2 += radius;
         corner_area.y2 += radius;
         return lv_point_within_circle(&corner_area, p_p);
@@ -182,7 +182,7 @@ bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coord
     /*Bottom left*/
     corner_area.y1 = a_p->y2 - radius;
     corner_area.y2 = a_p->y2;
-    if(lv_area_is_point_on(&corner_area, p_p, 0)) {
+    if(_lv_area_is_point_on(&corner_area, p_p, 0)) {
         corner_area.x2 += radius;
         corner_area.y1 -= radius;
         return lv_point_within_circle(&corner_area, p_p);
@@ -190,7 +190,7 @@ bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coord
     /*Bottom right*/
     corner_area.x1 = a_p->x2 - radius;
     corner_area.x2 = a_p->x2;
-    if(lv_area_is_point_on(&corner_area, p_p, 0)) {
+    if(_lv_area_is_point_on(&corner_area, p_p, 0)) {
         corner_area.x1 -= radius;
         corner_area.y1 -= radius;
         return lv_point_within_circle(&corner_area, p_p);
@@ -198,7 +198,7 @@ bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coord
     /*Top right*/
     corner_area.y1 = a_p->y1;
     corner_area.y2 = a_p->y1 + radius;
-    if(lv_area_is_point_on(&corner_area, p_p, 0)) {
+    if(_lv_area_is_point_on(&corner_area, p_p, 0)) {
         corner_area.x1 -= radius;
         corner_area.y2 += radius;
         return lv_point_within_circle(&corner_area, p_p);
@@ -213,7 +213,7 @@ bool lv_area_is_point_on(const lv_area_t * a_p, const lv_point_t * p_p, lv_coord
  * @param a2_p pointer to an other area
  * @return false: a1_p and a2_p has no common parts
  */
-bool lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p)
+bool _lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p)
 {
     if((a1_p->x1 <= a2_p->x2) && (a1_p->x2 >= a2_p->x1) && (a1_p->y1 <= a2_p->y2) && (a1_p->y2 >= a2_p->y1)) {
         return true;
@@ -230,7 +230,7 @@ bool lv_area_is_on(const lv_area_t * a1_p, const lv_area_t * a2_p)
  * @param radius radius of `aholder_p` (e.g. for rounded rectangle)
  * @return true: `ain_p` is fully inside `aholder_p`
  */
-bool lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coord_t radius)
+bool _lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coord_t radius)
 {
     bool is_in = false;
 
@@ -246,34 +246,21 @@ bool lv_area_is_in(const lv_area_t * ain_p, const lv_area_t * aholder_p, lv_coor
 
     p.x = ain_p->x1;
     p.y = ain_p->y1;
-    if(lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
+    if(_lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
 
     p.x = ain_p->x2;
     p.y = ain_p->y1;
-    if(lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
+    if(_lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
 
     p.x = ain_p->x1;
     p.y = ain_p->y2;
-    if(lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
+    if(_lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
 
     p.x = ain_p->x2;
     p.y = ain_p->y2;
-    if(lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
+    if(_lv_area_is_point_on(aholder_p, &p, radius) == false) return false;
 
     return true;
-}
-
-/**
- * Increment or decrement an area's size by a single amount
- * @param a_p pointer to an area to grow
- * @param amount amount to increment the area, or negative to decrement
- */
-void lv_area_increment(lv_area_t * a_p, const lv_coord_t amount)
-{
-    a_p->x1 -= amount;
-    a_p->y1 -= amount;
-    a_p->x2 += amount;
-    a_p->y2 += amount;
 }
 
 /**
@@ -283,7 +270,7 @@ void lv_area_increment(lv_area_t * a_p, const lv_coord_t amount)
  * @param align `LV_ALIGN_...`
  * @param res x/y coordinates where `to_align` align area should be placed
  */
-void lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align_t align, lv_point_t * res)
+void _lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align_t align, lv_point_t * res)
 {
 
     switch(align) {

@@ -56,7 +56,7 @@ static lv_disp_t * disp_def;
  */
 void lv_disp_drv_init(lv_disp_drv_t * driver)
 {
-    lv_memset_00(driver, sizeof(lv_disp_drv_t));
+    _lv_memset_00(driver, sizeof(lv_disp_drv_t));
 
     driver->flush_cb         = NULL;
     driver->hor_res          = LV_HOR_RES_MAX;
@@ -103,7 +103,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver)
  */
 void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32_t size_in_px_cnt)
 {
-    lv_memset_00(disp_buf, sizeof(lv_disp_buf_t));
+    _lv_memset_00(disp_buf, sizeof(lv_disp_buf_t));
 
     disp_buf->buf1    = buf1;
     disp_buf->buf2    = buf2;
@@ -119,16 +119,16 @@ void lv_disp_buf_init(lv_disp_buf_t * disp_buf, void * buf1, void * buf2, uint32
  */
 lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 {
-    lv_disp_t * disp = lv_ll_ins_head(&LV_GC_ROOT(_lv_disp_ll));
+    lv_disp_t * disp = _lv_ll_ins_head(&LV_GC_ROOT(_lv_disp_ll));
     if(!disp) {
         LV_ASSERT_MEM(disp);
         return NULL;
     }
 
-    lv_memset_00(disp, sizeof(lv_disp_t));
-    lv_memcpy(&disp->driver, driver, sizeof(lv_disp_drv_t));
+    _lv_memset_00(disp, sizeof(lv_disp_t));
+    _lv_memcpy(&disp->driver, driver, sizeof(lv_disp_drv_t));
 
-    lv_ll_init(&disp->scr_ll, sizeof(lv_obj_t));
+    _lv_ll_init(&disp->scr_ll, sizeof(lv_obj_t));
     disp->last_activity_time = 0;
 
     if(disp_def == NULL) disp_def = disp;
@@ -137,7 +137,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
                                         new display*/
     /*Create a refresh task*/
-    disp->refr_task = lv_task_create(lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, LV_REFR_TASK_PRIO, disp);
+    disp->refr_task = lv_task_create(_lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, LV_REFR_TASK_PRIO, disp);
     LV_ASSERT_MEM(disp->refr_task);
     if(disp->refr_task == NULL) return NULL;
 
@@ -171,7 +171,7 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
     memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
 
     lv_obj_t * scr;
-    LV_LL_READ(disp->scr_ll, scr) {
+    _LV_LL_READ(disp->scr_ll, scr) {
         lv_obj_set_size(scr, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
     }
 }
@@ -195,10 +195,10 @@ void lv_disp_remove(lv_disp_t * disp)
         indev = lv_indev_get_next(indev);
     }
 
-    lv_ll_remove(&LV_GC_ROOT(_lv_disp_ll), disp);
+    _lv_ll_remove(&LV_GC_ROOT(_lv_disp_ll), disp);
     lv_mem_free(disp);
 
-    if(was_default) lv_disp_set_default(lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll)));
+    if(was_default) lv_disp_set_default(_lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll)));
 }
 
 /**
@@ -305,7 +305,7 @@ LV_ATTRIBUTE_FLUSH_READY void lv_disp_flush_ready(lv_disp_drv_t * disp_drv)
     /*If the screen is transparent initialize it when the flushing is ready*/
 #if LV_COLOR_SCREEN_TRANSP
     if(disp_drv->screen_transp) {
-        lv_memset_00(disp_drv->buffer->buf_act, disp_drv->buffer->size * sizeof(lv_color32_t));
+        _lv_memset_00(disp_drv->buffer->buf_act, disp_drv->buffer->size * sizeof(lv_color32_t));
     }
 #endif
 
@@ -333,9 +333,9 @@ LV_ATTRIBUTE_FLUSH_READY bool lv_disp_flush_is_last(lv_disp_drv_t * disp_drv)
 lv_disp_t * lv_disp_get_next(lv_disp_t * disp)
 {
     if(disp == NULL)
-        return lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll));
+        return _lv_ll_get_head(&LV_GC_ROOT(_lv_disp_ll));
     else
-        return lv_ll_get_next(&LV_GC_ROOT(_lv_disp_ll), disp);
+        return _lv_ll_get_next(&LV_GC_ROOT(_lv_disp_ll), disp);
 }
 
 /**
@@ -361,7 +361,7 @@ uint16_t lv_disp_get_inv_buf_size(lv_disp_t * disp)
  * Pop (delete) the last 'num' invalidated areas from the buffer
  * @param num number of areas to delete
  */
-void lv_disp_pop_from_inv_buf(lv_disp_t * disp, uint16_t num)
+void _lv_disp_pop_from_inv_buf(lv_disp_t * disp, uint16_t num)
 {
 
     if(disp->inv_p < num)

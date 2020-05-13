@@ -63,7 +63,7 @@ static lv_obj_t * indev_obj_act = NULL;
 /**
  * Initialize the display input device subsystem
  */
-void lv_indev_init(void)
+void _lv_indev_init(void)
 {
     lv_indev_reset(NULL, NULL); /*Reset all input devices*/
 }
@@ -72,7 +72,7 @@ void lv_indev_init(void)
  * Called periodically to read the input devices
  * @param param pointer to and input device to read
  */
-void lv_indev_read_task(lv_task_t * task)
+void _lv_indev_read_task(lv_task_t * task)
 {
     LV_LOG_TRACE("indev read task started");
 
@@ -90,7 +90,7 @@ void lv_indev_read_task(lv_task_t * task)
     bool more_to_read;
     do {
         /*Read the data*/
-        more_to_read = lv_indev_read(indev_act, &data);
+        more_to_read = _lv_indev_read(indev_act, &data);
 
         /*The active object might deleted even in the read function*/
         indev_proc_reset_query_handler(indev_act);
@@ -365,6 +365,15 @@ void lv_indev_wait_release(lv_indev_t * indev)
 }
 
 /**
+ * Gets a pointer to the currently active object in the currently processed input device.
+ * @return pointer to currently active object or NULL if no active object
+ */
+lv_obj_t * lv_indev_get_obj_act(void)
+{
+    return indev_obj_act;
+}
+
+/**
  * Get a pointer to the indev read task to
  * modify its parameters with `lv_task_...` functions.
  * @param indev pointer to an input device
@@ -378,15 +387,6 @@ lv_task_t * lv_indev_get_read_task(lv_disp_t * indev)
     }
 
     return indev->refr_task;
-}
-
-/**
- * Gets a pointer to the currently active object in the currently processed input device.
- * @return pointer to currently active object or NULL if no active object
- */
-lv_obj_t * lv_indev_get_obj_act(void)
-{
-    return indev_obj_act;
 }
 
 /**********************
@@ -658,7 +658,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
             /*On enter long press toggle edit mode.*/
             if(editable) {
                 /*Don't leave edit mode if there is only one object (nowhere to navigate)*/
-                if(lv_ll_is_empty(&g->obj_ll) == false) {
+                if(_lv_ll_is_empty(&g->obj_ll) == false) {
                     lv_group_set_editing(g, lv_group_get_editing(g) ? false : true); /*Toggle edit mode on long press*/
                 }
             }
@@ -695,7 +695,7 @@ static void indev_encoder_proc(lv_indev_t * i, lv_indev_data_t * data)
         /*An object is being edited and the button is released. */
         else if(g->editing) {
             /*Ignore long pressed enter release because it comes from mode switch*/
-            if(!i->proc.long_pr_sent || lv_ll_is_empty(&g->obj_ll)) {
+            if(!i->proc.long_pr_sent || _lv_ll_is_empty(&g->obj_ll)) {
                 indev_obj_act->signal_cb(indev_obj_act, LV_SIGNAL_RELEASED, NULL);
                 if(indev_reset_check(&i->proc)) return;
 
@@ -1060,7 +1060,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     if(lv_obj_hittest(obj, point)) {
         lv_obj_t * i;
 
-        LV_LL_READ(obj->child_ll, i) {
+        _LV_LL_READ(obj->child_ll, i) {
             found_p = lv_indev_search_obj(i, point);
 
             /*If a child was found then break*/
@@ -1305,7 +1305,7 @@ static void indev_drag(lv_indev_proc_t * proc)
                 lv_coord_t act_par_h = lv_obj_get_height(lv_obj_get_parent(drag_obj));
                 if(act_par_w == prev_par_w && act_par_h == prev_par_h) {
                     uint16_t new_inv_buf_size = lv_disp_get_inv_buf_size(indev_act->driver.disp);
-                    lv_disp_pop_from_inv_buf(indev_act->driver.disp, new_inv_buf_size - inv_buf_size);
+                    _lv_disp_pop_from_inv_buf(indev_act->driver.disp, new_inv_buf_size - inv_buf_size);
                 }
             }
 

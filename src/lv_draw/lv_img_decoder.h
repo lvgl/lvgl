@@ -135,7 +135,7 @@ typedef struct _lv_img_decoder_dsc {
 /**
  * Initialize the image decoder module
  */
-void lv_img_decoder_init(void);
+void _lv_img_decoder_init(void);
 
 /**
  * Get information about an image.
@@ -220,8 +220,6 @@ void lv_img_decoder_set_read_line_cb(lv_img_decoder_t * decoder, lv_img_decoder_
  * @param close_cb a function to close a decoding session
  */
 void lv_img_decoder_set_close_cb(lv_img_decoder_t * decoder, lv_img_decoder_close_f_t close_cb);
-
-
 
 /**
  * Get info about a built-in image

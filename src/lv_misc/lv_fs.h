@@ -104,7 +104,7 @@ typedef struct {
 /**
  * Initialize the File system interface
  */
-void lv_fs_init(void);
+void _lv_fs_init(void);
 
 /**
  * Initialize a file system driver with default values.

@@ -176,12 +176,12 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         if(copy_ext->pwd_tmp) {
-            uint16_t len = lv_mem_get_size(copy_ext->pwd_tmp);
+            uint16_t len = _lv_mem_get_size(copy_ext->pwd_tmp);
             ext->pwd_tmp = lv_mem_alloc(len);
             LV_ASSERT_MEM(ext->pwd_tmp);
             if(ext->pwd_tmp == NULL) return NULL;
 
-            lv_memcpy(ext->pwd_tmp, copy_ext->pwd_tmp, len);
+            _lv_memcpy(ext->pwd_tmp, copy_ext->pwd_tmp, len);
         }
 
         if(copy_ext->one_line) lv_textarea_set_one_line(ta, true);
@@ -252,7 +252,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
         return;
     }
 
-    uint32_t c_uni = lv_txt_encoded_next((const char *)&c, NULL);
+    uint32_t c_uni = _lv_txt_encoded_next((const char *)&c, NULL);
 
     if(char_is_accepted(ta, c_uni) == false) {
         LV_LOG_INFO("Character is no accepted by the text area (too long text or not in the "
@@ -281,7 +281,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
         LV_ASSERT_MEM(ext->pwd_tmp);
         if(ext->pwd_tmp == NULL) return;
 
-        lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, (const char *)letter_buf);
+        _lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, (const char *)letter_buf);
 
 #if LV_USE_ANIMATION
         /*Auto hide characters*/
@@ -343,8 +343,8 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
     if(lv_textarea_get_accepted_chars(ta) || lv_textarea_get_max_length(ta)) {
         uint32_t i = 0;
         while(txt[i] != '\0') {
-            uint32_t c = lv_txt_encoded_next(txt, &i);
-            lv_textarea_add_char(ta, lv_txt_unicode_to_encoded(c));
+            uint32_t c = _lv_txt_encoded_next(txt, &i);
+            lv_textarea_add_char(ta, _lv_txt_unicode_to_encoded(c));
         }
         return;
     }
@@ -368,7 +368,7 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
         LV_ASSERT_MEM(ext->pwd_tmp);
         if(ext->pwd_tmp == NULL) return;
 
-        lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, txt);
+        _lv_txt_ins(ext->pwd_tmp, ext->cursor.pos, txt);
 
 #if LV_USE_ANIMATION
         /*Auto hide characters*/
@@ -390,7 +390,7 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
     }
 
     /*Move the cursor after the new text*/
-    lv_textarea_set_cursor_pos(ta, lv_textarea_get_cursor_pos(ta) + lv_txt_get_encoded_length(txt));
+    lv_textarea_set_cursor_pos(ta, lv_textarea_get_cursor_pos(ta) + _lv_txt_get_encoded_length(txt));
 
     /*Revert the original edge flash state*/
     lv_textarea_set_edge_flash(ta, edge_flash_en);
@@ -427,7 +427,7 @@ void lv_textarea_del_char(lv_obj_t * ta)
     char * label_txt = lv_label_get_text(ext->label);
 
     /*Delete a character*/
-    lv_txt_cut(label_txt, ext->cursor.pos - 1, 1);
+    _lv_txt_cut(label_txt, ext->cursor.pos - 1, 1);
     /*Refresh the label*/
     lv_label_set_text(ext->label, label_txt);
     lv_textarea_clear_selection(ta);
@@ -446,8 +446,8 @@ void lv_textarea_del_char(lv_obj_t * ta)
     }
 
     if(ext->pwd_mode != 0) {
-        uint32_t byte_pos = lv_txt_encoded_get_byte_id(ext->pwd_tmp, ext->cursor.pos - 1);
-        lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, lv_txt_encoded_size(&label_txt[byte_pos]));
+        uint32_t byte_pos = _lv_txt_encoded_get_byte_id(ext->pwd_tmp, ext->cursor.pos - 1);
+        _lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, _lv_txt_encoded_size(&label_txt[byte_pos]));
 
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 1);
         LV_ASSERT_MEM(ext->pwd_tmp);
@@ -502,8 +502,8 @@ void lv_textarea_set_text(lv_obj_t * ta, const char * txt)
         }
         uint32_t i = 0;
         while(txt[i] != '\0') {
-            uint32_t c = lv_txt_encoded_next(txt, &i);
-            lv_textarea_add_char(ta, lv_txt_unicode_to_encoded(c));
+            uint32_t c = _lv_txt_encoded_next(txt, &i);
+            lv_textarea_add_char(ta, _lv_txt_unicode_to_encoded(c));
         }
     }
     else {
@@ -608,7 +608,7 @@ void lv_textarea_set_cursor_pos(lv_obj_t * ta, int16_t pos)
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->cursor.pos == pos) return;
 
-    uint16_t len = lv_txt_get_encoded_length(lv_label_get_text(ext->label));
+    uint16_t len = _lv_txt_get_encoded_length(lv_label_get_text(ext->label));
 
     if(pos < 0) pos = len + pos;
 
@@ -1374,7 +1374,7 @@ static lv_design_res_t lv_textarea_scrollable_design(lv_obj_t * scrl, const lv_a
         lv_draw_rect(&cur_area, clip_area, &cur_dsc);
 
         char letter_buf[8] = {0};
-        lv_memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
+        _lv_memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], _lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
 
         if(cur_dsc.bg_opa == LV_OPA_COVER) {
             lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_CURSOR);
@@ -1644,7 +1644,7 @@ static void pwd_char_hider(lv_obj_t * ta)
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->pwd_mode != 0) {
         char * txt  = lv_label_get_text(ext->label);
-        int16_t enc_len = lv_txt_get_encoded_length(txt);
+        int16_t enc_len = _lv_txt_get_encoded_length(txt);
         if(enc_len == 0) return;
 
         /*If the textarea's font has "bullet" character use it else fallback to "*"*/
@@ -1657,16 +1657,16 @@ static void pwd_char_hider(lv_obj_t * ta)
         else bullet = "*";
 
         size_t bullet_len = strlen(bullet);
-        char * txt_tmp = lv_mem_buf_get(enc_len * bullet_len + 1);
+        char * txt_tmp = _lv_mem_buf_get(enc_len * bullet_len + 1);
         uint16_t i;
         for(i = 0; i < enc_len; i++) {
-            lv_memcpy(&txt_tmp[i * bullet_len], bullet, bullet_len);
+            _lv_memcpy(&txt_tmp[i * bullet_len], bullet, bullet_len);
         }
 
         txt_tmp[i * bullet_len] = '\0';
 
         lv_label_set_text(ext->label, txt_tmp);
-        lv_mem_buf_release(txt_tmp);
+        _lv_mem_buf_release(txt_tmp);
     }
 }
 
@@ -1684,7 +1684,7 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
     if(ext->accapted_chars == NULL && ext->max_length == 0) return true;
 
     /*Too many characters?*/
-    if(ext->max_length > 0 && lv_txt_get_encoded_length(lv_textarea_get_text(ta)) >= ext->max_length) {
+    if(ext->max_length > 0 && _lv_txt_get_encoded_length(lv_textarea_get_text(ta)) >= ext->max_length) {
         return false;
     }
 
@@ -1693,7 +1693,7 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
         uint32_t i = 0;
 
         while(ext->accapted_chars[i] != '\0') {
-            uint32_t a = lv_txt_encoded_next(ext->accapted_chars, &i);
+            uint32_t a = _lv_txt_encoded_next(ext->accapted_chars, &i);
             if(a == c) return true; /*Accepted*/
         }
 
@@ -1716,9 +1716,9 @@ static void refr_cursor_area(lv_obj_t * ta)
     const char * txt = lv_label_get_text(ext->label);
 
     uint32_t byte_pos;
-    byte_pos = lv_txt_encoded_get_byte_id(txt, cur_pos);
+    byte_pos = _lv_txt_encoded_get_byte_id(txt, cur_pos);
 
-    uint32_t letter = lv_txt_encoded_next(&txt[byte_pos], NULL);
+    uint32_t letter = _lv_txt_encoded_next(&txt[byte_pos], NULL);
 
     lv_coord_t letter_h = lv_font_get_line_height(font);
 
@@ -1742,8 +1742,8 @@ static void refr_cursor_area(lv_obj_t * ta)
         letter_pos.y += letter_h + line_space;
 
         if(letter != '\0') {
-            byte_pos += lv_txt_encoded_size(&txt[byte_pos]);
-            letter = lv_txt_encoded_next(&txt[byte_pos], NULL);
+            byte_pos += _lv_txt_encoded_size(&txt[byte_pos]);
+            letter = _lv_txt_encoded_next(&txt[byte_pos], NULL);
         }
 
         if(letter == '\0' || letter == '\n' || letter == '\r') {

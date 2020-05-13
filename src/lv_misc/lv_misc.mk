@@ -1,4 +1,3 @@
-CSRCS += lv_circ.c
 CSRCS += lv_area.c
 CSRCS += lv_task.c
 CSRCS += lv_fs.c

@@ -65,7 +65,7 @@ static lv_disp_t * disp_refr; /*Display being refreshed*/
 /**
  * Initialize the screen refresh subsystem
  */
-void lv_refr_init(void)
+void _lv_refr_init(void)
 {
     /*Nothing to do*/
 }
@@ -84,13 +84,13 @@ void lv_refr_now(lv_disp_t * disp)
 #endif
 
     if(disp) {
-        lv_disp_refr_task(disp->refr_task);
+        _lv_disp_refr_task(disp->refr_task);
     }
     else {
         lv_disp_t * d;
         d = lv_disp_get_next(NULL);
         while(d) {
-            lv_disp_refr_task(d->refr_task);
+            _lv_disp_refr_task(d->refr_task);
             d = lv_disp_get_next(d);
         }
     }
@@ -102,7 +102,7 @@ void lv_refr_now(lv_disp_t * disp)
  * @param disp pointer to display where the area should be invalidated (NULL can be used if there is
  * only one display)
  */
-void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
+void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
 {
     if(!disp) disp = lv_disp_get_default();
     if(!disp) return;
@@ -122,7 +122,7 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
     lv_area_t com_area;
     bool suc;
 
-    suc = lv_area_intersect(&com_area, area_p, &scr_area);
+    suc = _lv_area_intersect(&com_area, area_p, &scr_area);
 
     /*The area is truncated to the screen*/
     if(suc != false) {
@@ -131,7 +131,7 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
         /*Save only if this area is not in one of the saved areas*/
         uint16_t i;
         for(i = 0; i < disp->inv_p; i++) {
-            if(lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return;
+            if(_lv_area_is_in(&com_area, &disp->inv_areas[i], 0) != false) return;
         }
 
         /*Save the area*/
@@ -151,7 +151,7 @@ void lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
  * Get the display which is being refreshed
  * @return the display being refreshed
  */
-lv_disp_t * lv_refr_get_disp_refreshing(void)
+lv_disp_t * _lv_refr_get_disp_refreshing(void)
 {
     return disp_refr;
 }
@@ -162,7 +162,7 @@ lv_disp_t * lv_refr_get_disp_refreshing(void)
  * It can be used to trick the drawing functions about there is an active display.
  * @param the display being refreshed
  */
-void lv_refr_set_disp_refreshing(lv_disp_t * disp)
+void _lv_refr_set_disp_refreshing(lv_disp_t * disp)
 {
     disp_refr = disp;
 }
@@ -171,7 +171,7 @@ void lv_refr_set_disp_refreshing(lv_disp_t * disp)
  * Called periodically to handle the refreshing
  * @param task pointer to the task itself
  */
-void lv_disp_refr_task(lv_task_t * task)
+void _lv_disp_refr_task(lv_task_t * task)
 {
     LV_LOG_TRACE("lv_refr_task: started");
 
@@ -226,7 +226,7 @@ void lv_disp_refr_task(lv_task_t * task)
                     uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) * sizeof(lv_color_t);
 
                     for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
-                        lv_memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
+                        _lv_memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
                         start_offs += hres * sizeof(lv_color_t);
                     }
                 }
@@ -234,8 +234,8 @@ void lv_disp_refr_task(lv_task_t * task)
         } /*End of true double buffer handling*/
 
         /*Clean up*/
-        lv_memset_00(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
-        lv_memset_00(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
+        _lv_memset_00(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
+        _lv_memset_00(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
         disp_refr->inv_p = 0;
 
         elaps = lv_tick_elaps(start);
@@ -245,8 +245,8 @@ void lv_disp_refr_task(lv_task_t * task)
         }
     }
 
-    lv_mem_buf_free_all();
-    lv_font_clean_up_fmt_txt();
+    _lv_mem_buf_free_all();
+    _lv_font_clean_up_fmt_txt();
 
 #if LV_USE_PERF_MONITOR && LV_USE_LABEL
     static lv_obj_t * perf_label = NULL;
@@ -308,11 +308,11 @@ static void lv_refr_join_area(void)
             }
 
             /*Check if the areas are on each other*/
-            if(lv_area_is_on(&disp_refr->inv_areas[join_in], &disp_refr->inv_areas[join_from]) == false) {
+            if(_lv_area_is_on(&disp_refr->inv_areas[join_in], &disp_refr->inv_areas[join_from]) == false) {
                 continue;
             }
 
-            lv_area_join(&joined_area, &disp_refr->inv_areas[join_in], &disp_refr->inv_areas[join_from]);
+            _lv_area_join(&joined_area, &disp_refr->inv_areas[join_in], &disp_refr->inv_areas[join_from]);
 
             /*Join two area only if the joined area size is smaller*/
             if(lv_area_get_size(&joined_area) < (lv_area_get_size(&disp_refr->inv_areas[join_in]) +
@@ -470,7 +470,7 @@ static void lv_refr_area_part(const lv_area_t * area_p)
     /*Get the new mask from the original area and the act. VDB
      It will be a part of 'area_p'*/
     lv_area_t start_mask;
-    lv_area_intersect(&start_mask, area_p, &vdb->area);
+    _lv_area_intersect(&start_mask, area_p, &vdb->area);
 
     /*Get the most top object which is not covered by others*/
     top_p = lv_refr_get_top_obj(&start_mask, lv_disp_get_scr_act(disp_refr));
@@ -500,13 +500,13 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     lv_obj_t * found_p = NULL;
 
     /*If this object is fully cover the draw area check the children too */
-    if(lv_area_is_in(area_p, &obj->coords, 0) && obj->hidden == 0) {
+    if(_lv_area_is_in(area_p, &obj->coords, 0) && obj->hidden == 0) {
         lv_design_res_t design_res = obj->design_cb ? obj->design_cb(obj, area_p,
                                                                      LV_DESIGN_COVER_CHK) : LV_DESIGN_RES_NOT_COVER;
         if(design_res == LV_DESIGN_RES_MASKED) return NULL;
 
         lv_obj_t * i;
-        LV_LL_READ(obj->child_ll, i) {
+        _LV_LL_READ(obj->child_ll, i) {
             found_p = lv_refr_get_top_obj(area_p, i);
 
             /*If a children is ok then break*/
@@ -551,12 +551,12 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
     /*Do until not reach the screen*/
     while(par != NULL) {
         /*object before border_p has to be redrawn*/
-        lv_obj_t * i = lv_ll_get_prev(&(par->child_ll), border_p);
+        lv_obj_t * i = _lv_ll_get_prev(&(par->child_ll), border_p);
 
         while(i != NULL) {
             /*Refresh the objects*/
             lv_refr_obj(i, mask_p);
-            i = lv_ll_get_prev(&(par->child_ll), i);
+            i = _lv_ll_get_prev(&(par->child_ll), i);
         }
 
         /*Call the post draw design function of the parents of the to object*/
@@ -592,7 +592,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     obj_area.y1 -= ext_size;
     obj_area.x2 += ext_size;
     obj_area.y2 += ext_size;
-    union_ok = lv_area_intersect(&obj_ext_mask, mask_ori_p, &obj_area);
+    union_ok = _lv_area_intersect(&obj_ext_mask, mask_ori_p, &obj_area);
 
     /*Draw the parent and its children only if they ore on 'mask_parent'*/
     if(union_ok != false) {
@@ -619,12 +619,12 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
 #endif
         /*Create a new 'obj_mask' without 'ext_size' because the children can't be visible there*/
         lv_obj_get_coords(obj, &obj_area);
-        union_ok = lv_area_intersect(&obj_mask, mask_ori_p, &obj_area);
+        union_ok = _lv_area_intersect(&obj_mask, mask_ori_p, &obj_area);
         if(union_ok != false) {
             lv_area_t mask_child; /*Mask from obj and its child*/
             lv_obj_t * child_p;
             lv_area_t child_area;
-            LV_LL_READ_BACK(obj->child_ll, child_p) {
+            _LV_LL_READ_BACK(obj->child_ll, child_p) {
                 lv_obj_get_coords(child_p, &child_area);
                 ext_size = child_p->ext_draw_pad;
                 child_area.x1 -= ext_size;
@@ -633,7 +633,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
                 child_area.y2 += ext_size;
                 /* Get the union (common parts) of original mask (from obj)
                  * and its child */
-                union_ok = lv_area_intersect(&mask_child, &obj_mask, &child_area);
+                union_ok = _lv_area_intersect(&mask_child, &obj_mask, &child_area);
 
                 /*If the parent and the child has common area then refresh the child */
                 if(union_ok) {
@@ -669,7 +669,7 @@ static void lv_refr_vdb_flush(void)
     else vdb->flushing_last = 0;
 
     /*Flush the rendered content to the display*/
-    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     if(disp->driver.flush_cb) disp->driver.flush_cb(&disp->driver, &vdb->area, vdb->buf_act);
 
     if(vdb->buf1 && vdb->buf2) {

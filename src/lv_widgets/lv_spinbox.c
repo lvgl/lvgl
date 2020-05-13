@@ -175,7 +175,7 @@ void lv_spinbox_set_digit_format(lv_obj_t * spinbox, uint8_t digit_count, uint8_
 
     if(digit_count < LV_SPINBOX_MAX_DIGIT_COUNT)
     {
-        uint64_t max_val = lv_pow(10, digit_count);
+        uint64_t max_val = _lv_pow(10, digit_count);
         if(ext->range_max > max_val - 1) ext->range_max = max_val - 1;
         if(ext->range_min < - max_val  + 1) ext->range_min = - max_val  + 1;
     }
@@ -525,7 +525,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
     lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
 
     char buf[LV_SPINBOX_MAX_DIGIT_COUNT + 8];
-    lv_memset_00(buf, sizeof(buf));
+    _lv_memset_00(buf, sizeof(buf));
     char * buf_p = buf;
     uint8_t cur_shift_left = 0;
 
@@ -548,7 +548,7 @@ static void lv_spinbox_updatevalue(lv_obj_t * spinbox)
 
     char digits[64];
     /*Convert the numbers to string (the sign is already handled so always covert positive number)*/
-    lv_utils_num_to_str(ext->value < 0 ? -ext->value : ext->value, digits);
+    _lv_utils_num_to_str(ext->value < 0 ? -ext->value : ext->value, digits);
 
     /*Add leading zeros*/
     int lz_cnt = ext->digit_count - (int)strlen(digits);

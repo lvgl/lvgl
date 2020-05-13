@@ -275,7 +275,7 @@ void lv_btnmatrix_set_ctrl_map(lv_obj_t * btnm, const lv_btnmatrix_ctrl_t ctrl_m
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
-    lv_memcpy(ext->ctrl_bits, ctrl_map, sizeof(lv_btnmatrix_ctrl_t) * ext->btn_cnt);
+    _lv_memcpy(ext->ctrl_bits, ctrl_map, sizeof(lv_btnmatrix_ctrl_t) * ext->btn_cnt);
 
     lv_btnmatrix_set_map(btnm, ext->map_p);
 }
@@ -739,7 +739,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
             lv_style_int_t line_space = draw_label_dsc_act->line_space;
             const char * txt = ext->map_p[txt_i];
             lv_point_t txt_size;
-            lv_txt_get_size(&txt_size, txt, font, letter_space,
+            _lv_txt_get_size(&txt_size, txt, font, letter_space,
                             line_space, lv_area_get_width(&area_btnm), txt_flag);
 
             area_tmp.x1 += (btn_w - txt_size.x) / 2;
@@ -1081,7 +1081,7 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char **
     LV_ASSERT_MEM(ext->ctrl_bits);
     if(ext->button_areas == NULL || ext->ctrl_bits == NULL) btn_cnt = 0;
 
-    lv_memset_00(ext->ctrl_bits, sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
+    _lv_memset_00(ext->ctrl_bits, sizeof(lv_btnmatrix_ctrl_t) * btn_cnt);
 
     ext->btn_cnt = btn_cnt;
 }
@@ -1166,7 +1166,7 @@ static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p)
         if(btn_area.y2 >= h - pbottom - 2) btn_area.y2 = btnm_cords.y2; /*-2 for rounding error*/
         else btn_area.y2 += btnm_cords.y1 + pinner;
 
-        if(lv_area_is_point_on(&btn_area, p, 0) != false) {
+        if(_lv_area_is_point_on(&btn_area, p, 0) != false) {
             break;
         }
     }

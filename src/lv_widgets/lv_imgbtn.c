@@ -73,10 +73,10 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(imgbtn);
 
     /*Initialize the allocated 'ext' */
-    lv_memset_00((void *)ext->img_src_mid, sizeof(ext->img_src_mid));
+    _lv_memset_00((void *)ext->img_src_mid, sizeof(ext->img_src_mid));
 #if LV_IMGBTN_TILED
-    lv_memset_00(ext->img_src_left, sizeof(ext->img_src_left));
-    lv_memset_00(ext->img_src_right, sizeof(ext->img_src_right));
+    _lv_memset_00(ext->img_src_left, sizeof(ext->img_src_left));
+    _lv_memset_00(ext->img_src_right, sizeof(ext->img_src_right));
 #endif
     ext->tiled = 0;
 
@@ -93,10 +93,10 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing image button*/
     else {
         lv_imgbtn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        lv_memcpy((void *)ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
+        _lv_memcpy((void *)ext->img_src_mid, copy_ext->img_src_mid, sizeof(ext->img_src_mid));
 #if LV_IMGBTN_TILED
-        lv_memcpy((void *)ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
-        lv_memcpy((void *)ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
+        _lv_memcpy((void *)ext->img_src_left, copy_ext->img_src_left, sizeof(ext->img_src_left));
+        _lv_memcpy((void *)ext->img_src_right, copy_ext->img_src_right, sizeof(ext->img_src_right));
 #endif
         ext->tiled = copy_ext->tiled;
         /*Refresh the style with new signal function*/
@@ -266,7 +266,7 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
         lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
         lv_design_res_t cover = LV_DESIGN_RES_NOT_COVER;
         if(ext->act_cf == LV_IMG_CF_TRUE_COLOR || ext->act_cf == LV_IMG_CF_RAW) {
-            cover = lv_area_is_in(clip_area, &imgbtn->coords, 0) ? LV_DESIGN_RES_COVER : LV_DESIGN_RES_NOT_COVER;
+            cover = _lv_area_is_in(clip_area, &imgbtn->coords, 0) ? LV_DESIGN_RES_COVER : LV_DESIGN_RES_NOT_COVER;
         }
 
         return cover;
@@ -420,7 +420,7 @@ static void refr_img(lv_obj_t * imgbtn)
     if(lv_img_src_get_type(src) == LV_IMG_SRC_SYMBOL) {
         const lv_font_t * font = lv_obj_get_style_text_font(imgbtn, LV_IMGBTN_PART_MAIN);
         header.h = lv_font_get_line_height(font);
-        header.w = lv_txt_get_width(src, (uint16_t)strlen(src), font, 0, LV_TXT_FLAG_NONE);
+        header.w = _lv_txt_get_width(src, (uint16_t)strlen(src), font, 0, LV_TXT_FLAG_NONE);
         header.always_zero = 0;
         header.cf = LV_IMG_CF_ALPHA_1BIT;
     }

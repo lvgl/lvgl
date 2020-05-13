@@ -75,7 +75,7 @@ bool lv_debug_check_obj_valid(const lv_obj_t * obj)
     lv_disp_t * disp = lv_disp_get_next(NULL);
     while(disp) {
         lv_obj_t * scr;
-        LV_LL_READ(disp->scr_ll, scr) {
+        _LV_LL_READ(disp->scr_ll, scr) {
 
             if(scr == obj) return true;
             bool found = obj_valid_child(scr, obj);
@@ -160,7 +160,7 @@ void lv_debug_log_error(const char * msg, uint64_t value)
         char * bufp = buf;
 
         /*Add the function name*/
-        lv_memcpy(bufp, msg, msg_len);
+        _lv_memcpy(bufp, msg, msg_len);
         bufp += msg_len;
 
         /*Add value in hey*/
@@ -200,7 +200,7 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
 {
     /*Check all children of `parent`*/
     lv_obj_t * child;
-    LV_LL_READ(parent->child_ll, child) {
+    _LV_LL_READ(parent->child_ll, child) {
         if(child == obj_to_find) return true;
 
         /*Check the children*/

@@ -376,7 +376,7 @@ static void lv_cont_layout_col(lv_obj_t * cont)
     lv_obj_add_protect(cont, LV_PROTECT_CHILD_CHG);
     /* Align the children */
     lv_coord_t last_cord = top;
-    LV_LL_READ_BACK(cont->child_ll, child) {
+    _LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
         lv_style_int_t mtop = lv_obj_get_style_margin_top(child, LV_OBJ_PART_MAIN);
         lv_style_int_t mbottom = lv_obj_get_style_margin_bottom(child, LV_OBJ_PART_MAIN);
@@ -432,7 +432,7 @@ static void lv_cont_layout_row(lv_obj_t * cont)
 
     lv_coord_t inner = lv_obj_get_style_pad_inner(cont, LV_CONT_PART_MAIN);
 
-    LV_LL_READ_BACK(cont->child_ll, child) {
+    _LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
         if(base_dir == LV_BIDI_DIR_RTL) lv_obj_align(child, cont, align, -last_cord, vpad_corr);
@@ -455,7 +455,7 @@ static void lv_cont_layout_center(lv_obj_t * cont)
     lv_coord_t h_tot         = 0;
 
     lv_coord_t inner = lv_obj_get_style_pad_inner(cont, LV_CONT_PART_MAIN);
-    LV_LL_READ(cont->child_ll, child) {
+    _LV_LL_READ(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
         h_tot += lv_obj_get_height(child) + inner;
         obj_num++;
@@ -471,7 +471,7 @@ static void lv_cont_layout_center(lv_obj_t * cont)
 
     /* Align the children */
     lv_coord_t last_cord = -(h_tot / 2);
-    LV_LL_READ_BACK(cont->child_ll, child) {
+    _LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
 
         lv_obj_align(child, cont, LV_ALIGN_CENTER, 0, last_cord + lv_obj_get_height(child) / 2);
@@ -498,7 +498,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
     /* Disable child change action because the children will be moved a lot
      * an unnecessary child change signals could be sent*/
 
-    child_rs = lv_ll_get_tail(&cont->child_ll); /*Set the row starter child*/
+    child_rs = _lv_ll_get_tail(&cont->child_ll); /*Set the row starter child*/
     if(child_rs == NULL) return;                /*Return if no child*/
 
     lv_obj_add_protect(cont, LV_PROTECT_CHILD_CHG);
@@ -523,7 +523,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
                     /*Step back one child because the last already not fit, so the previous is the
                      * closer*/
                     if(child_rc != NULL && obj_num != 0) {
-                        child_rc = lv_ll_get_next(&cont->child_ll, child_rc);
+                        child_rc = _lv_ll_get_next(&cont->child_ll, child_rc);
                     }
                     break;
                 }
@@ -537,7 +537,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
                 if(lv_obj_is_protected(child_rc, LV_PROTECT_FOLLOW))
                     break; /*If can not be followed by an other object then break here*/
             }
-            child_rc = lv_ll_get_prev(&cont->child_ll, child_rc); /*Load the next object*/
+            child_rc = _lv_ll_get_prev(&cont->child_ll, child_rc); /*Load the next object*/
             if(obj_num == 0)
                 child_rs = child_rc; /*If the first object was hidden (or too long) then set the
                                         next as first */
@@ -563,7 +563,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
         /*If there are two object in the row then align them proportionally*/
         else if(obj_num == 2 && 0) {
             lv_obj_t * obj1 = child_rs;
-            lv_obj_t * obj2 = lv_ll_get_prev(&cont->child_ll, child_rs);
+            lv_obj_t * obj2 = _lv_ll_get_prev(&cont->child_ll, child_rs);
             w_row           = lv_obj_get_width(obj1) + lv_obj_get_width(obj2);
             lv_coord_t pad  = (w_obj - w_row) / 3;
 
@@ -630,13 +630,13 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
                     act_x += lv_obj_get_width(child_tmp) + new_pinner + mleft + mright;
                 }
                 if(child_tmp == child_rc) break;
-                child_tmp = lv_ll_get_prev(&cont->child_ll, child_tmp);
+                child_tmp = _lv_ll_get_prev(&cont->child_ll, child_tmp);
             }
         }
 
         if(child_rc == NULL) break;
         act_y += pinner + h_row;           /*y increment*/
-        child_rs = lv_ll_get_prev(&cont->child_ll, child_rc); /*Go to the next object*/
+        child_rs = _lv_ll_get_prev(&cont->child_ll, child_rc); /*Go to the next object*/
         child_rc = child_rs;
     }
     lv_obj_clear_protect(cont, LV_PROTECT_CHILD_CHG);
@@ -661,7 +661,7 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
     lv_coord_t act_x = left;
     lv_coord_t act_y = lv_obj_get_style_pad_top(cont, LV_CONT_PART_MAIN);
     lv_obj_t * child;
-    LV_LL_READ_BACK(cont->child_ll, child) {
+    _LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
         lv_coord_t obj_w = lv_obj_get_width(child);
         if(act_x + inner + obj_w > w_fit) {
@@ -706,7 +706,7 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
     lv_obj_get_coords(cont, &ori);
     lv_obj_get_coords(cont, &tight_area);
 
-    bool has_children = lv_ll_is_empty(&cont->child_ll) ? false : true;
+    bool has_children = _lv_ll_is_empty(&cont->child_ll) ? false : true;
 
     if(has_children) {
         tight_area.x1 = LV_COORD_MAX;
@@ -714,7 +714,7 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
         tight_area.x2 = LV_COORD_MIN;
         tight_area.y2 = LV_COORD_MIN;
 
-        LV_LL_READ(cont->child_ll, child_i) {
+        _LV_LL_READ(cont->child_ll, child_i) {
             if(lv_obj_get_hidden(child_i) != false) continue;
 
             if(ext->fit_left != LV_FIT_PARENT) {
@@ -822,7 +822,7 @@ static void lv_cont_refr_autofit(lv_obj_t * cont)
         }
 
         /*Tell the children the parent's size has changed*/
-        LV_LL_READ(cont->child_ll, child_i) {
+        _LV_LL_READ(cont->child_ll, child_i) {
             child_i->signal_cb(child_i, LV_SIGNAL_PARENT_SIZE_CHG, &ori);
         }
     }

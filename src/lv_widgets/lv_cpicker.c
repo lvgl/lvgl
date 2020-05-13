@@ -491,10 +491,10 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask)
         line_dsc.color = angle_to_mode_color(cpicker, i);
 
         lv_point_t p[2];
-        p[0].x = cx + (r * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-        p[0].y = cy + (r * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
-        p[1].x = cx + ((r - cir_w_extra) * lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-        p[1].y = cy + ((r - cir_w_extra) * lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+        p[0].x = cx + (r * _lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+        p[0].y = cy + (r * _lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+        p[1].x = cx + ((r - cir_w_extra) * _lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+        p[1].y = cy + ((r - cir_w_extra) * _lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
 
         lv_draw_line(&p[0], &p[1], mask, &line_dsc);
     }
@@ -825,7 +825,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
             /*Set the angle only if pressed on the ring*/
             if(!on_ring) return res;
 
-            angle = lv_atan2(p.x, p.y) % 360;
+            angle = _lv_atan2(p.x, p.y) % 360;
         }
 
         lv_color_hsv_t hsv_cur;
@@ -896,7 +896,7 @@ static bool lv_cpicker_hit(lv_obj_t * cpicker, const lv_point_t * p)
 
 
     /*Valid clicks can be only in the circle*/
-    if(lv_area_is_point_on(&cpicker->coords, p, LV_RADIUS_CIRCLE)) return true;
+    if(_lv_area_is_point_on(&cpicker->coords, p, LV_RADIUS_CIRCLE)) return true;
     else return false;
 }
 
@@ -937,8 +937,8 @@ static void refr_knob_pos(lv_obj_t * cpicker)
         lv_style_int_t scale_w = lv_obj_get_style_scale_width(cpicker, LV_CPICKER_PART_MAIN);
         lv_coord_t r = (w - scale_w) / 2;
         uint16_t angle = get_angle(cpicker);
-        ext->knob.pos.x = (((int32_t)r * lv_trigo_sin(angle)) >> LV_TRIGO_SHIFT);
-        ext->knob.pos.y = (((int32_t)r * lv_trigo_sin(angle + 90)) >> LV_TRIGO_SHIFT);
+        ext->knob.pos.x = (((int32_t)r * _lv_trigo_sin(angle)) >> LV_TRIGO_SHIFT);
+        ext->knob.pos.y = (((int32_t)r * _lv_trigo_sin(angle + 90)) >> LV_TRIGO_SHIFT);
         ext->knob.pos.x = ext->knob.pos.x + w / 2;
         ext->knob.pos.y = ext->knob.pos.y + h / 2;
     }

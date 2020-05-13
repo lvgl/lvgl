@@ -63,7 +63,7 @@ typedef struct {
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_sin(int16_t angle);
+LV_ATTRIBUTE_FAST_MEM int16_t _lv_trigo_sin(int16_t angle);
 
 /**
  * Calculate a value of a Cubic Bezier function.
@@ -74,15 +74,15 @@ LV_ATTRIBUTE_FAST_MEM int16_t lv_trigo_sin(int16_t angle);
  * @param u3 end values in range of [0..LV_BEZIER_VAL_MAX]
  * @return the value calculated from the given parameters in range of [0..LV_BEZIER_VAL_MAX]
  */
-int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3);
+int32_t _lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3);
 
-/*
+/**
  * Calculate the atan2 of a vector.
  * @param x
  * @param y
  * @return the angle in degree calculated from the given parameters in range of [0..360]
  */
-uint16_t lv_atan2(int x, int y);
+uint16_t _lv_atan2(int x, int y);
 
 /**
  * Get the square root of a number
@@ -94,7 +94,7 @@ uint16_t lv_atan2(int x, int y);
  * If root < 256: mask = 0x800
  * Else: mask = 0x8000
  */
-LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask);
+LV_ATTRIBUTE_FAST_MEM void _lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask);
 
 /**
  * Calculate the integer exponents.
@@ -102,7 +102,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
  * @param power
  * @return base raised to the power exponent
  */
-int64_t lv_pow(int64_t base, int8_t exp);
+int64_t _lv_pow(int64_t base, int8_t exp);
 
 /**********************
  *      MACROS

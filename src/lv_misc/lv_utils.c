@@ -28,7 +28,6 @@
 /**********************
  *  STATIC VARIABLES
  **********************/
-static char decimal_separator[2] = ".";
 
 /**********************
  *      MACROS
@@ -44,7 +43,7 @@ static char decimal_separator[2] = ".";
  * @param buf pointer to a `char` buffer. The result will be stored here (max 10 elements)
  * @return same as `buf` (just for convenience)
  */
-char * lv_utils_num_to_str(int32_t num, char * buf)
+char * _lv_utils_num_to_str(int32_t num, char * buf)
 {
     if(num == 0) {
         buf[0] = '0';
@@ -75,31 +74,6 @@ char * lv_utils_num_to_str(int32_t num, char * buf)
     return buf;
 }
 
-/**
- * Convert a fixed point number to string
- * @param num a number
- * @param decimals number of digits after decimal point
- * @param buf pointer to a `char` buffer
- * @param bufsize length of buffer
- * @return same as `buf` (just for convenience)
- */
-char * lv_utils_num_to_str_fixed(int32_t num, int32_t decimals, char * buf, size_t bufsize)
-{
-    lv_snprintf(buf, bufsize, "%0*d", decimals + 1, num);
-    if(decimals > 0)
-        lv_txt_ins(buf, strlen(buf) - decimals, decimal_separator);
-    return buf;
-}
-
-/**
- * Set the decimal separator character used by lv_utils_num_to_str_fixed
- * @param separator the decimal separator char
- */
-void lv_utils_set_decimal_separator(char separator)
-{
-    decimal_separator[0] = separator;
-}
-
 /** Searches base[0] to base[n - 1] for an item that matches *key.
  *
  * @note The function cmp must return negative if its first
@@ -117,7 +91,7 @@ void lv_utils_set_decimal_separator(char separator)
  *
  * @return a pointer to a matching item, or NULL if none exists.
  */
-void * lv_utils_bsearch(const void * key, const void * base, uint32_t n, uint32_t size,
+void * _lv_utils_bsearch(const void * key, const void * base, uint32_t n, uint32_t size,
                         int32_t (*cmp)(const void * pRef, const void * pElement))
 {
     const char * middle;

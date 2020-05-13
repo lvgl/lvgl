@@ -71,7 +71,7 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
 
     bool is_common;
     lv_area_t poly_mask;
-    is_common = lv_area_intersect(&poly_mask, &poly_coords, clip_area);
+    is_common = _lv_area_intersect(&poly_mask, &poly_coords, clip_area);
     if(!is_common) return;
 
     /*Find the lowest point*/
@@ -85,7 +85,7 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
         }
     }
 
-    lv_draw_mask_line_param_t * mp = lv_mem_buf_get(sizeof(lv_draw_mask_line_param_t) * point_cnt);
+    lv_draw_mask_line_param_t * mp = _lv_mem_buf_get(sizeof(lv_draw_mask_line_param_t) * point_cnt);
     lv_draw_mask_line_param_t * mp_next = mp;
 
     int32_t i_prev_left = y_min_i;
@@ -156,7 +156,7 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
 
     lv_draw_mask_remove_custom(mp);
 
-    lv_mem_buf_release(mp);
+    _lv_mem_buf_release(mp);
 
 }
 

@@ -267,21 +267,21 @@ void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * lis
  * @param list pointer to a style list
  * @param style pointer to a style to add
  */
-void lv_style_list_add_style(lv_style_list_t * list, lv_style_t * style);
+void _lv_style_list_add_style(lv_style_list_t * list, lv_style_t * style);
 
 /**
  * Remove a style from a style list
  * @param style_list pointer to a style list
  * @param style pointer to a style to remove
  */
-void lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * style);
+void _lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * style);
 
 /**
  * Remove all styles added from style list, clear the local style, transition style and free all allocated memories.
  * Leave `ignore_trans` flag as it is.
  * @param list pointer to a style list.
  */
-void lv_style_list_reset(lv_style_list_t * style_list);
+void _lv_style_list_reset(lv_style_list_t * style_list);
 
 static inline lv_style_t * lv_style_list_get_style(lv_style_list_t * list, uint8_t id)
 {
@@ -301,7 +301,7 @@ void lv_style_reset(lv_style_t * style);
  * @param style pointer to a style
  * @return size of the properties in bytes
  */
-uint16_t lv_style_get_mem_size(const lv_style_t * style);
+uint16_t _lv_style_get_mem_size(const lv_style_t * style);
 
 /**
  * Copy a style to an other
@@ -366,8 +366,6 @@ void _lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t op
  * @note for performance reasons it's not checked if the property really has pointer type
  */
 void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void * p);
-
-
 
 /**
  * Get an integer typed property from a style.
@@ -441,14 +439,14 @@ lv_style_t * lv_style_list_get_local_style(lv_style_list_t * list);
  * @param list pointer to a style list where the local property should be set
  * @return pointer to the transition style if exists else `NULL`.
  */
-lv_style_t * lv_style_list_get_transition_style(lv_style_list_t * list);
+lv_style_t * _lv_style_list_get_transition_style(lv_style_list_t * list);
 
 /**
  * Allocate the transition style in a style list. If already exists simply return it.
  * @param list pointer to a style list
  * @return the transition style of a style list
  */
-lv_style_t * lv_style_list_add_trans_style(lv_style_list_t * list);
+lv_style_t * _lv_style_list_add_trans_style(lv_style_list_t * list);
 
 /**
  * Set a local integer typed property in a style list.
@@ -458,7 +456,7 @@ lv_style_t * lv_style_list_add_trans_style(lv_style_list_t * list);
  * @param value the value to set
  * @note for performance reasons it's not checked if the property really has integer type
  */
-void lv_style_list_set_local_int(lv_style_list_t * list, lv_style_property_t prop, lv_style_int_t value);
+void _lv_style_list_set_local_int(lv_style_list_t * list, lv_style_property_t prop, lv_style_int_t value);
 
 /**
  * Set a local color typed property in a style list.
@@ -468,7 +466,7 @@ void lv_style_list_set_local_int(lv_style_list_t * list, lv_style_property_t pro
  * @param value the value to set
  * @note for performance reasons it's not checked if the property really has color type
  */
-void lv_style_list_set_local_color(lv_style_list_t * list, lv_style_property_t prop, lv_color_t value);
+void _lv_style_list_set_local_color(lv_style_list_t * list, lv_style_property_t prop, lv_color_t value);
 
 /**
  * Set a local opacity typed property in a style list.
@@ -478,7 +476,7 @@ void lv_style_list_set_local_color(lv_style_list_t * list, lv_style_property_t p
  * @param value the value to set
  * @note for performance reasons it's not checked if the property really has opacity type
  */
-void lv_style_list_set_local_opa(lv_style_list_t * list, lv_style_property_t prop, lv_opa_t value);
+void _lv_style_list_set_local_opa(lv_style_list_t * list, lv_style_property_t prop, lv_opa_t value);
 
 /**
  * Set a local pointer typed property in a style list.
@@ -488,7 +486,7 @@ void lv_style_list_set_local_opa(lv_style_list_t * list, lv_style_property_t pro
  * @param value the value to set
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-void lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t prop, const void * value);
+void _lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t prop, const void * value);
 
 /**
  * Get an integer typed property from a style list.
@@ -501,7 +499,7 @@ void lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t pro
  *         LV_RES_INV: there was NO matching property in the list
  * @note for performance reasons it's not checked if the property really has integer type
  */
-lv_res_t lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop, lv_style_int_t * res);
+lv_res_t _lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop, lv_style_int_t * res);
 
 /**
  * Get a color typed property from a style list.
@@ -514,7 +512,7 @@ lv_res_t lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop,
  *         LV_RES_INV: there was NO matching property in the list
  * @note for performance reasons it's not checked if the property really has color type
  */
-lv_res_t lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t prop, lv_color_t * res);
+lv_res_t _lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t prop, lv_color_t * res);
 
 
 /**
@@ -528,7 +526,7 @@ lv_res_t lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t pro
  *         LV_RES_INV: there was NO matching property in the list
  * @note for performance reasons it's not checked if the property really has opacity type
  */
-lv_res_t lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop, lv_opa_t * res);
+lv_res_t _lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop, lv_opa_t * res);
 
 /**
  * Get a pointer typed property from a style list.
@@ -541,7 +539,7 @@ lv_res_t lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop,
  *         LV_RES_INV: there was NO matching property in the list
  * @note for performance reasons it's not checked if the property really has pointer type
  */
-lv_res_t lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop, const void ** res);
+lv_res_t _lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop, const void ** res);
 
 
 /*************************

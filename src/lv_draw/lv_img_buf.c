@@ -58,7 +58,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
        dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
         uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
-        lv_memcpy_small(&p_color, &buf_u8[px], sizeof(lv_color_t));
+        _lv_memcpy_small(&p_color, &buf_u8[px], sizeof(lv_color_t));
 #if LV_COLOR_SIZE == 32
         p_color.ch.alpha = 0xFF; /*Only the color should be get so use a deafult alpha value*/
 #endif
@@ -245,12 +245,12 @@ void lv_img_buf_set_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t y, lv_
     if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR || dsc->header.cf == LV_IMG_CF_TRUE_COLOR_CHROMA_KEYED) {
         uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
-        lv_memcpy_small(&buf_u8[px], &c, px_size);
+        _lv_memcpy_small(&buf_u8[px], &c, px_size);
     }
     else if(dsc->header.cf == LV_IMG_CF_TRUE_COLOR_ALPHA) {
         uint8_t px_size = lv_img_cf_get_px_size(dsc->header.cf) >> 3;
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
-        lv_memcpy_small(&buf_u8[px], &c, px_size - 1); /*-1 to not overwrite the alpha value*/
+        _lv_memcpy_small(&buf_u8[px], &c, px_size - 1); /*-1 to not overwrite the alpha value*/
     }
     else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
         buf_u8 += sizeof(lv_color32_t) * 2; /*Skip the palette*/
@@ -318,7 +318,7 @@ void lv_img_buf_set_palette(lv_img_dsc_t * dsc, uint8_t id, lv_color_t c)
     lv_color32_t c32;
     c32.full      = lv_color_to32(c);
     uint8_t * buf = (uint8_t *)dsc->data;
-    lv_memcpy_small(&buf[id * sizeof(c32)], &c32, sizeof(c32));
+    _lv_memcpy_small(&buf[id * sizeof(c32)], &c32, sizeof(c32));
 }
 
 /**
@@ -335,7 +335,7 @@ lv_img_dsc_t * lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
     if(dsc == NULL)
         return NULL;
 
-    lv_memset_00(dsc, sizeof(lv_img_dsc_t));
+    _lv_memset_00(dsc, sizeof(lv_img_dsc_t));
 
     /* Get image data size */
     dsc->data_size = lv_img_buf_get_img_size(w, h, cf);
@@ -350,7 +350,7 @@ lv_img_dsc_t * lv_img_buf_alloc(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
         lv_mem_free(dsc);
         return NULL;
     }
-    lv_memset_00((uint8_t *)dsc->data, dsc->data_size);
+    _lv_memset_00((uint8_t *)dsc->data, dsc->data_size);
 
     /* Fill in header */
     dsc->header.always_zero = 0;
@@ -417,7 +417,7 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
  * Initialize a descriptor to tranform an image
  * @param dsc pointer to an `lv_img_transform_dsc_t` variable whose `cfg` field is initialized
  */
-void lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
+void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
 {
     dsc->tmp.pivot_x_256 = dsc->cfg.pivot_x * 256;
     dsc->tmp.pivot_y_256 = dsc->cfg.pivot_y * 256;
@@ -426,11 +426,11 @@ void lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
     int32_t angle_hight = angle_low + 1;
     int32_t angle_rem = dsc->cfg.angle  - (angle_low * 10);
 
-    int32_t s1 = lv_trigo_sin(-angle_low);
-    int32_t s2 = lv_trigo_sin(-angle_hight);
+    int32_t s1 = _lv_trigo_sin(-angle_low);
+    int32_t s2 = _lv_trigo_sin(-angle_hight);
 
-    int32_t c1 = lv_trigo_sin(-angle_low + 90);
-    int32_t c2 = lv_trigo_sin(-angle_hight + 90);
+    int32_t c1 = _lv_trigo_sin(-angle_low + 90);
+    int32_t c2 = _lv_trigo_sin(-angle_hight + 90);
 
     dsc->tmp.sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
     dsc->tmp.cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
@@ -467,7 +467,7 @@ void lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
  * @param zoom zoom, (256 no zoom)
  * @param pivot x,y pivot coordinates of rotation
  */
-void lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
+void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
                                      lv_point_t * pivot)
 {
 #if LV_USE_IMG_TRANSFORM
@@ -475,11 +475,11 @@ void lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h
     int32_t angle_hight = angle_low + 1;
     int32_t angle_rem = angle  - (angle_low * 10);
 
-    int32_t s1 = lv_trigo_sin(angle_low);
-    int32_t s2 = lv_trigo_sin(angle_hight);
+    int32_t s1 = _lv_trigo_sin(angle_low);
+    int32_t s2 = _lv_trigo_sin(angle_hight);
 
-    int32_t c1 = lv_trigo_sin(angle_low + 90);
-    int32_t c2 = lv_trigo_sin(angle_hight + 90);
+    int32_t c1 = _lv_trigo_sin(angle_low + 90);
+    int32_t c2 = _lv_trigo_sin(angle_hight + 90);
 
     int32_t sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
     int32_t cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
@@ -591,9 +591,9 @@ bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc)
     lv_opa_t a11 = 0;
 
     if(dsc->tmp.native_color) {
-        lv_memcpy_small(&c01, &src_u8[dsc->tmp.pxi + dsc->tmp.px_size * xn], sizeof(lv_color_t));
-        lv_memcpy_small(&c10, &src_u8[dsc->tmp.pxi + dsc->cfg.src_w * dsc->tmp.px_size * yn], sizeof(lv_color_t));
-        lv_memcpy_small(&c11, &src_u8[dsc->tmp.pxi + dsc->cfg.src_w * dsc->tmp.px_size * yn + dsc->tmp.px_size * xn],
+        _lv_memcpy_small(&c01, &src_u8[dsc->tmp.pxi + dsc->tmp.px_size * xn], sizeof(lv_color_t));
+        _lv_memcpy_small(&c10, &src_u8[dsc->tmp.pxi + dsc->cfg.src_w * dsc->tmp.px_size * yn], sizeof(lv_color_t));
+        _lv_memcpy_small(&c11, &src_u8[dsc->tmp.pxi + dsc->cfg.src_w * dsc->tmp.px_size * yn + dsc->tmp.px_size * xn],
                         sizeof(lv_color_t));
         if(dsc->tmp.has_alpha) {
             a10 = src_u8[dsc->tmp.pxi + dsc->tmp.px_size * xn + dsc->tmp.px_size - 1];

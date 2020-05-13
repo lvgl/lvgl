@@ -27,7 +27,6 @@ extern "C" {
 
 #include "src/lv_core/lv_refr.h"
 #include "src/lv_core/lv_disp.h"
-#include "src/lv_core/lv_debug.h"
 
 #include "src/lv_themes/lv_theme.h"
 

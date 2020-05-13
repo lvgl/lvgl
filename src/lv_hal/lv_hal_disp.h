@@ -306,7 +306,7 @@ uint16_t lv_disp_get_inv_buf_size(lv_disp_t * disp);
  * Pop (delete) the last 'num' invalidated areas from the buffer
  * @param num number of areas to delete
  */
-void lv_disp_pop_from_inv_buf(lv_disp_t * disp, uint16_t num);
+void _lv_disp_pop_from_inv_buf(lv_disp_t * disp, uint16_t num);
 
 /**
  * Check the driver configuration if it's double buffered (both `buf1` and `buf2` are set)

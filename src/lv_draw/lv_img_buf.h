@@ -30,7 +30,6 @@ extern "C" {
 #define LV_IMG_PX_SIZE_ALPHA_BYTE 4
 #endif
 
-
 #define LV_IMG_BUF_SIZE_TRUE_COLOR(w, h) ((LV_COLOR_SIZE / 8) * w * h)
 #define LV_IMG_BUF_SIZE_TRUE_COLOR_CHROMA_KEYED(w, h) ((LV_COLOR_SIZE / 8) * w * h)
 #define LV_IMG_BUF_SIZE_TRUE_COLOR_ALPHA(w, h) (LV_IMG_PX_SIZE_ALPHA_BYTE * w * h)
@@ -257,7 +256,7 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf);
  * Initialize a descriptor to rotate an image
  * @param dsc pointer to an `lv_img_transform_dsc_t` variable whose `cfg` field is initialized
  */
-void lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc);
+void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc);
 
 /**
  * Continue transformation by taking the neighbors into account
@@ -274,7 +273,7 @@ bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc);
  * @return true: there is valid pixel on these x/y coordinates; false: the rotated pixel was out of the image
  * @note the result is written back to `dsc->res_color` and `dsc->res_opa`
  */
-static inline bool lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
+static inline bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
 {
     const uint8_t * src_u8 = dsc->cfg.src;
 
@@ -318,12 +317,12 @@ static inline bool lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t
             px_size = LV_COLOR_SIZE >> 3;
 
             pxi     = dsc->cfg.src_w * ys_int * px_size + xs_int * px_size;
-            lv_memcpy_small(&dsc->res.color, &src_u8[pxi], px_size);
+            _lv_memcpy_small(&dsc->res.color, &src_u8[pxi], px_size);
         }
         else {
             px_size = LV_IMG_PX_SIZE_ALPHA_BYTE;
             pxi     = dsc->cfg.src_w * ys_int * px_size + xs_int * px_size;
-            lv_memcpy_small(&dsc->res.color, &src_u8[pxi], px_size - 1);
+            _lv_memcpy_small(&dsc->res.color, &src_u8[pxi], px_size - 1);
             dsc->res.opa = src_u8[pxi + px_size - 1];
         }
     }
@@ -363,7 +362,7 @@ static inline bool lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t
  * @param zoom zoom, (256 no zoom)
  * @param pivot x,y pivot coordinates of rotation
  */
-void lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
+void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
                                      lv_point_t * pivot);
 
 /**********************

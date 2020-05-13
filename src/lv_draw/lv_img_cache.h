@@ -49,7 +49,7 @@ typedef struct {
  * @param style style of the image
  * @return pointer to the cache entry or NULL if can open the image
  */
-lv_img_cache_entry_t * lv_img_cache_open(const void * src, lv_color_t color);
+lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color);
 
 /**
  * Set the number of images to be cached.
