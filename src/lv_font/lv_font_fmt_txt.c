@@ -40,6 +40,7 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element);
 static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp);
 static inline void decompress_line(uint8_t * out, lv_coord_t w);
 static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len);
+static inline void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len);
 static inline void rle_init(const uint8_t * in,  uint8_t bpp);
 static inline uint8_t rle_next(void);
 
@@ -88,12 +89,20 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
     }
     /*Handle compressed bitmap*/
     else {
-
         uint32_t gsize = gdsc->box_w * gdsc->box_h;
         if(gsize == 0) return NULL;
 
-        if(lv_mem_get_size(decompr_buf) < gsize) {
-            decompr_buf = lv_mem_realloc(decompr_buf, gsize);
+        uint32_t buf_size = gsize;
+        /*Compute memory size needed to hold decompressed glyph, rounding up*/
+        switch(fdsc->bpp) {
+        case 1: buf_size = (gsize + 7) >> 3;  break;
+        case 2: buf_size = (gsize + 3) >> 2;  break;
+        case 3: buf_size = (gsize + 1) >> 1;  break;
+        case 4: buf_size = (gsize + 1) >> 1;  break;
+        }
+
+        if(lv_mem_get_size(decompr_buf) < buf_size) {
+            decompr_buf = lv_mem_realloc(decompr_buf, buf_size);
             LV_ASSERT_MEM(decompr_buf);
             if(decompr_buf == NULL) return NULL;
         }
@@ -150,7 +159,7 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
     dsc_out->box_w = gdsc->box_w;
     dsc_out->ofs_x = gdsc->ofs_x;
     dsc_out->ofs_y = gdsc->ofs_y;
-    dsc_out->bpp   = fdsc->bitmap_format == LV_FONT_FMT_TXT_PLAIN ? (uint8_t)fdsc->bpp : 8;
+    dsc_out->bpp   = (uint8_t)fdsc->bpp;
 
     if(is_tab) dsc_out->box_w = dsc_out->box_w * 2;
 
@@ -167,6 +176,7 @@ void lv_font_clean_up_fmt_txt(void)
         decompr_buf = NULL;
     }
 }
+
 
 /**********************
  *   STATIC FUNCTIONS
@@ -317,29 +327,11 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element)
  */
 static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp)
 {
-    rle_init(in, bpp);
+    uint32_t wrp = 0;
+    uint8_t wr_size = bpp;
+    if(bpp == 3) wr_size = 4;
 
-    const uint8_t * bpp_opa_table;
-    switch(bpp) {
-        case 1:
-            bpp_opa_table = _lv_bpp1_opa_table;
-            break;
-        case 2:
-            bpp_opa_table = _lv_bpp2_opa_table;
-            break;
-        case 3:
-            bpp_opa_table = _lv_bpp3_opa_table;
-            break;
-        case 4:
-            bpp_opa_table = _lv_bpp4_opa_table;
-            break;
-        case 8:
-            bpp_opa_table = _lv_bpp8_opa_table;
-            break;
-        default:
-            LV_LOG_WARN("Invalid bpp (%d)", bpp);
-            return;
-    }
+    rle_init(in, bpp);
 
     uint8_t * line_buf1 = lv_mem_buf_get(w);
     uint8_t * line_buf2 = lv_mem_buf_get(w);
@@ -350,8 +342,8 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
     lv_coord_t x;
 
     for(x = 0; x < w; x++) {
-        *out = bpp_opa_table[line_buf1[x]];
-        out++;
+        bits_write(out, wrp, line_buf1[x], bpp);
+        wrp += wr_size;
     }
 
     for(y = 1; y < h; y++) {
@@ -359,8 +351,8 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
 
         for(x = 0; x < w; x++) {
             line_buf1[x] = line_buf2[x] ^ line_buf1[x];
-            *out = bpp_opa_table[line_buf1[x]];
-            out++;
+            bits_write(out, wrp, line_buf1[x], bpp);
+            wrp += wr_size;
         }
     }
 
@@ -421,6 +413,55 @@ static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len
     else {
         return (in[byte_pos] >> (8 - bit_pos - len)) & bit_mask;
     }
+}
+
+/**
+ * Write `val` data to `bit_pos` position of `out`. The write can NOT cross byte boundary.
+ * @param out buffer where to write
+ * @param bit_pos bit index to write
+ * @param val value to write
+ * @param len length of bits to write from `val`. (Counted from the LSB).
+ * @note `len == 3` will be converted to `len = 4` and `val` will be upscaled too
+ */
+static inline void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len)
+{
+    if(len == 3) {
+        len = 4;
+        switch(val) {
+            case 0:
+                val = 0;
+                break;
+            case 1:
+                val = 2;
+                break;
+            case 2:
+                val = 4;
+                break;
+            case 3:
+                val = 6;
+                break;
+            case 4:
+                val = 9;
+                break;
+            case 5:
+                val = 11;
+                break;
+            case 6:
+                val = 13;
+                break;
+            case 7:
+                val = 15;
+                break;
+        }
+    }
+
+    uint16_t byte_pos = bit_pos >> 3;
+    bit_pos = bit_pos & 0x7;
+    bit_pos = 8 - bit_pos - len;
+
+    uint8_t bit_mask = (uint16_t)((uint16_t) 1 << len) - 1;
+    out[byte_pos] &= ((~bit_mask) << bit_pos);
+    out[byte_pos] |= (val << bit_pos);
 }
 
 static inline void rle_init(const uint8_t * in,  uint8_t bpp)
