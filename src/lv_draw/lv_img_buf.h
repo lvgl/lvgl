@@ -276,7 +276,7 @@ bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc);
  */
 static inline bool lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
 {
-    const uint8_t * src_u8 = dsc->cfg.src;
+    const uint8_t * src_u8 = (const uint8_t*)dsc->cfg.src;
 
     /*Get the target point relative coordinates to the pivot*/
     int32_t xt = x - dsc->cfg.pivot_x;
