@@ -1192,7 +1192,7 @@ static lv_chart_label_iterator_t lv_chart_create_label_iter(const char * list, u
  */
 static void lv_chart_get_next_label(lv_chart_label_iterator_t * iterator, char * buf)
 {
-    uint8_t label_len = 0;
+    uint32_t label_len = 0;
     if (iterator->is_reverse_iter) {
         const char * label_start;
         /* count the length of the current label*/
