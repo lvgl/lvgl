@@ -180,7 +180,12 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * cb, lv_signal_t sign, void * param
     if(sign == LV_SIGNAL_STYLE_CHG) {
         const lv_font_t * font = lv_obj_get_style_text_font(ext->label, LV_LABEL_PART_MAIN);
         lv_coord_t line_height = lv_font_get_line_height(font);
-        lv_obj_set_size(ext->bullet, line_height, line_height);
+        lv_coord_t leftp = lv_obj_get_style_pad_left(cb, LV_CHECKBOX_PART_BULLET);
+        lv_coord_t rightp = lv_obj_get_style_pad_right(cb, LV_CHECKBOX_PART_BULLET);
+        lv_coord_t topp = lv_obj_get_style_pad_top(cb, LV_CHECKBOX_PART_BULLET);
+        lv_coord_t bottomp = lv_obj_get_style_pad_bottom(cb, LV_CHECKBOX_PART_BULLET);
+
+        lv_obj_set_size(ext->bullet, line_height + leftp + rightp, line_height + topp + bottomp);
         lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CHECKBOX_PART_BG));
     }
     else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST ||

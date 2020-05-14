@@ -601,6 +601,10 @@ static void checkbox_init(void)
     lv_style_set_pattern_image(&cb_bullet, LV_STATE_CHECKED, LV_SYMBOL_OK);
     lv_style_set_pattern_recolor(&cb_bullet, LV_STATE_CHECKED, LV_COLOR_WHITE);
     lv_style_set_text_font(&cb_bullet, LV_STATE_CHECKED, theme.font_small);
+    lv_style_set_pad_left(&cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
+    lv_style_set_pad_right(&cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
+    lv_style_set_pad_top(&cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
+    lv_style_set_pad_bottom(&cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
 #endif
 }
 
