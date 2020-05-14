@@ -737,6 +737,7 @@ static void ddlist_init(void)
 
     style_init_reset(&ddlist_page);
     lv_style_set_text_line_space(&ddlist_page, LV_STATE_DEFAULT, LV_DPX(20));
+    lv_style_set_clip_corner(&ddlist_page, LV_STATE_DEFAULT, true);
 
     style_init_reset(&ddlist_sel);
     lv_style_set_bg_opa(&ddlist_sel, LV_STATE_DEFAULT, LV_OPA_COVER);
