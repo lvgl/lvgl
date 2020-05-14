@@ -62,7 +62,9 @@ typedef struct {
  * @param txt 0 terminated text to write
  * @param flag settings for the text from 'txt_flag_t' enum
  * @param offset text offset in x and y direction (NULL if unused)
- * @param sel_start start index of selected area (`LV_LABEL_TXT_SEL_OFF` if none)
+ * @param sel_start start index of selected area (`LV_DRAW_LABEL_NO_TXT_SEL` if none)
+ * @param hint pointer to a `lv_draw_label_hint_t` variable.
+ * It is managed by the drawer to speed up the drawing of very long texts (thousands of lines).
  * @param bidi_dir base direction of the text
  */
 void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
