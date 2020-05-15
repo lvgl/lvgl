@@ -188,7 +188,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 
     LV_ASSERT_STR(text);
 
-    if(ext->text == text) {
+    if(ext->text == text && ext->static_txt == 0) {
         /*If set its own text then reallocate it (maybe its size changed)*/
         ext->text = lv_mem_realloc(ext->text, strlen(ext->text) + 1);
         LV_ASSERT_MEM(ext->text);
