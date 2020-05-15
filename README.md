@@ -277,5 +277,5 @@ If you are interested in contributing to LVGL you can
 - **Help in the developement**. Check the [Open issues](https://github.com/lvgl/lvgl/issues) especially the ones with [Help wanted](https://github.com/lvgl/lvgl/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) label and tell your ideas about a topic or implement a feature.
 
 Before sending Pull requests, please read the following guides:
-- [Contributing guide](https://blog.lvgl.com/2018-12-06/contributing)
+- [Contributing guide](https://github.com/littlevgl/lvgl/blob/master/docs/CONTRIBUTING.md)
 - [Coding style guide](https://github.com/lvgl/lvgl/blob/master/docs/CODING_STYLE.md)
