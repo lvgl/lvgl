@@ -337,7 +337,7 @@ lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar)
 }
 
 /**
- * Get the the pressed date.
+ * Get the pressed date.
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` variable containing the pressed date.
  * `NULL` if not date pressed (e.g. the header)
@@ -351,7 +351,19 @@ lv_calendar_date_t * lv_calendar_get_pressed_date(const lv_obj_t * calendar)
 }
 
 /**
- * Get the the highlighted dates
+ * Get the year area pressed state.
+ * @param calendar pointer to a calendar object
+ * @return true if middle part of calendar header is pressed.
+ *       
+ */
+bool lv_calendar_get_year_pressed(const lv_obj_t * calendar) 
+{
+    LV_ASSERT_OBJ(calendar, LV_OBJX_NAME);
+    return ((lv_calendar_ext_t *)lv_obj_get_ext_attr (calendar))->year_pressing;
+}
+
+/**
+ * Get the highlighted dates
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` array containing the dates.
  */
@@ -503,15 +515,18 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         lv_point_t p;
         lv_indev_get_point(indev, &p);
 
-        /*If the header is pressed mark an arrow as pressed*/
+        /*If the right/left part of header is pressed mark an arrow as pressed*/
+		/*or middle part of header is pressed - change year event*/
         if(lv_area_is_point_on(&header_area, &p)) {
-            if(p.x < header_area.x1 + lv_area_get_width(&header_area) / 2) {
+            lv_coord_t w = lv_area_get_width(&header_area);
+            ext->year_pressing = 0;
+            if(p.x < header_area.x1 + (w / 3)) {
                 if(ext->btn_pressing != -1) lv_obj_invalidate(calendar);
                 ext->btn_pressing = -1;
-            } else {
+            } else if(p.x > header_area.x1 + (2*w / 3)) {
                 if(ext->btn_pressing != 1) lv_obj_invalidate(calendar);
                 ext->btn_pressing = 1;
-            }
+            } else ext->year_pressing = 1;
 
             ext->pressed_date.year  = 0;
             ext->pressed_date.month = 0;

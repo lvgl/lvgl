@@ -51,6 +51,7 @@ typedef struct
     lv_calendar_date_t * highlighted_dates; /*Apply different style on these days (pointer to an
                                                array defined by the user)*/
     int8_t btn_pressing;                    /*-1: prev month pressing, +1 next month pressing on the header*/
+    int8_t year_pressing;                   /*1: pressing on year area*/
     uint16_t highlighted_dates_num;          /*Number of elements in `highlighted_days`*/
     lv_calendar_date_t pressed_date;
     const char ** day_names;   /*Pointer to an array with the name of the days (NULL: use default names)*/
@@ -169,7 +170,7 @@ lv_calendar_date_t * lv_calendar_get_today_date(const lv_obj_t * calendar);
 lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar);
 
 /**
- * Get the the pressed date.
+ * Get the pressed date.
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` variable containing the pressed date.
  *         `NULL` if not date pressed (e.g. the header)
@@ -177,7 +178,15 @@ lv_calendar_date_t * lv_calendar_get_showed_date(const lv_obj_t * calendar);
 lv_calendar_date_t * lv_calendar_get_pressed_date(const lv_obj_t * calendar);
 
 /**
- * Get the the highlighted dates
+ * Get the year area pressed state.
+ * @param calendar pointer to a calendar object
+ * @return true if middle part of calendar header is pressed.
+ *       
+ */
+bool lv_calendar_get_year_pressed(const lv_obj_t * calendar); 
+
+/**
+ * Get the highlighted dates
  * @param calendar pointer to a calendar object
  * @return pointer to an `lv_calendar_date_t` array containing the dates.
  */
