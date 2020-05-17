@@ -211,6 +211,10 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 #if LV_USE_GROUP
         new_obj->group_p = NULL;
+#if LV_USE_GROUP_FOCUS_MODE
+        new_obj->group_focus_mode = LV_GROUP_FOCUS_NORMAL;
+        new_obj->group_focus_obj = NULL;
+#endif
 #endif
         /*Set attributes*/
         new_obj->click        = 0;
@@ -2048,11 +2052,30 @@ const lv_style_t * lv_obj_get_style(const lv_obj_t * obj)
         }
     }
 #if LV_USE_GROUP
-    if(obj->group_p) {
-        if(lv_group_get_focused(obj->group_p) == obj) {
-            style_act = lv_group_mod_style(obj->group_p, style_act);
-        }
+
+#if LV_USE_GROUP_FOCUS_MODE
+    if (obj->group_focus_mode == LV_GROUP_FOCUS_NORMAL) {
+#endif
+		if(obj->group_p) {
+			if(lv_group_get_focused(obj->group_p) == obj)
+			{
+				style_act = lv_group_mod_style(obj->group_p, style_act);
+			}
+		}
+
+#if LV_USE_GROUP_FOCUS_MODE
     }
+
+    if (obj->group_focus_mode == LV_GROUP_FOCUS_PARENT) {
+    	lv_obj_t * cf = obj->group_focus_obj;
+		if(cf->group_p) {
+			if (lv_group_get_focused(cf->group_p) == cf) {
+				style_act = lv_group_mod_style(cf->group_p, style_act);
+			}
+		}
+    }
+#endif
+
 #endif
 
     if(style_act == NULL) style_act = &lv_style_plain;

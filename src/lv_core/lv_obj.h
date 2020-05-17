@@ -184,6 +184,13 @@ enum {
 
 typedef uint8_t lv_drag_dir_t;
 
+enum {
+    LV_GROUP_FOCUS_NORMAL = 0x0, /**< Normal focus mode. */
+    LV_GROUP_FOCUS_CHILD  = 0x1, /**< Child focus mode, do not apply the focus style */
+	LV_GROUP_FOCUS_PARENT = 0x2, /**< Parent focus mode, apply focus style when child is focused */
+};
+typedef uint8_t lv_focus_mode_t;
+
 typedef struct _lv_obj_t
 {
     struct _lv_obj_t * par; /**< Pointer to the parent object*/
@@ -200,6 +207,10 @@ typedef struct _lv_obj_t
 
 #if LV_USE_GROUP != 0
     void * group_p; /**< Pointer to the group of the object*/
+#if LV_USE_GROUP_FOCUS_MODE
+    lv_focus_mode_t group_focus_mode;   /**< Group focus mode. */
+    struct _lv_obj_t * group_focus_obj; /**< Pointer to child or parent object. */
+#endif
 #endif
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY

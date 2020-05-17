@@ -124,6 +124,13 @@ void lv_group_remove_obj(lv_obj_t * obj);
 void lv_group_remove_all_objs(lv_group_t * group);
 
 /**
+ * Set focus parent for the object (focus style will apply to parent, when child is focused)
+ * @param child Child object
+ * @param parent Parent object
+ */
+void lv_group_set_focus_parent(lv_obj_t * child, lv_obj_t * parent);
+
+/**
  * Focus on an object (defocus the current)
  * @param obj pointer to an object to focus on
  */

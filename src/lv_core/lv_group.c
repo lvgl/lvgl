@@ -215,6 +215,22 @@ void lv_group_remove_all_objs(lv_group_t * group)
     lv_ll_clear(&(group->obj_ll));
 }
 
+#ifdef LV_USE_GROUP_FOCUS_MODE
+/**
+ * Set focus parent for the object (focus style will apply to parent, when child is focused)
+ * @param child Child object
+ * @param parent Parent object
+ */
+void lv_group_set_focus_parent(lv_obj_t * child, lv_obj_t * parent)
+{
+	child->group_focus_mode = LV_GROUP_FOCUS_CHILD;
+	child->group_focus_obj = parent;
+
+	parent->group_focus_mode = LV_GROUP_FOCUS_PARENT;
+	parent->group_focus_obj = child;
+}
+#endif
+
 /**
  * Focus on an object (defocus the current)
  * @param obj pointer to an object to focus on
@@ -362,6 +378,12 @@ void lv_group_set_editing(lv_group_t * group, bool edit)
         lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
         if(res != LV_RES_OK) return;
     }
+
+#ifdef LV_USE_GROUP_FOCUS_MODE
+    if (focused->group_focus_mode == LV_GROUP_FOCUS_CHILD)  {
+		lv_obj_invalidate(focused->group_focus_obj);
+    }
+#endif
 
     lv_obj_invalidate(focused);
 }
@@ -673,9 +695,21 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
         lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_DEFOCUSED, NULL);
         if(res != LV_RES_OK) return;
         lv_obj_invalidate(*group->obj_focus);
+
+#ifdef LV_USE_GROUP_FOCUS_MODE
+        if ((*group->obj_focus)->group_focus_mode == LV_GROUP_FOCUS_CHILD)  {
+    		lv_obj_invalidate((*group->obj_focus)->group_focus_obj);
+        }
+#endif
     }
 
     group->obj_focus = obj_next;
+
+#ifdef LV_USE_GROUP_FOCUS_MODE
+    if ((*group->obj_focus)->group_focus_mode == LV_GROUP_FOCUS_CHILD)  {
+		lv_obj_invalidate((*group->obj_focus)->group_focus_obj);
+    }
+#endif
 
     (*group->obj_focus)->signal_cb(*group->obj_focus, LV_SIGNAL_FOCUS, NULL);
     lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
