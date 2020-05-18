@@ -64,6 +64,8 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
+//! @cond Doxygen_Suppress
+
 LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
 
 /**
@@ -78,6 +80,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
 LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
                                          const char * txt, lv_draw_label_hint_t * hint);
 
+//! @endcond
 /***********************
  * GLOBAL VARIABLES
  ***********************/

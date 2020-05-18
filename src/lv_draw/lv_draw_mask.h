@@ -173,6 +173,9 @@ typedef struct _lv_draw_mask_map_param_t {
  */
 int16_t lv_draw_mask_add(void * param, void * custom_id);
 
+
+//! @cond Doxygen_Suppress
+
 /**
  * Apply the added buffers on a line. Used internally by the library's drawing routines.
  * @param mask_buf store the result mask here. Has to be `len` byte long. Should be initialized with `0xFF`.
@@ -186,6 +189,9 @@ int16_t lv_draw_mask_add(void * param, void * custom_id);
  */
 LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf, lv_coord_t abs_x, lv_coord_t abs_y,
                                                             lv_coord_t len);
+
+
+//! @endcond
 
 /**
  * Remove a mask with a given ID
@@ -203,11 +209,16 @@ void * lv_draw_mask_remove_id(int16_t id);
  */
 void * lv_draw_mask_remove_custom(void * custom_id);
 
+//! @cond Doxygen_Suppress
+
 /**
  * Count the currently added masks
  * @return number of active masks
  */
 LV_ATTRIBUTE_FAST_MEM uint8_t lv_draw_mask_get_cnt(void);
+
+
+//! @endcond
 
 /**
  *Initialize a line mask from two points.

@@ -58,12 +58,15 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
+//! @cond Doxygen_Suppress
 /**
  * Return with sinus of an angle
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
 LV_ATTRIBUTE_FAST_MEM int16_t _lv_trigo_sin(int16_t angle);
+
+//! @endcond
 
 /**
  * Calculate a value of a Cubic Bezier function.
@@ -84,6 +87,9 @@ int32_t _lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3);
  */
 uint16_t _lv_atan2(int x, int y);
 
+
+//! @cond Doxygen_Suppress
+
 /**
  * Get the square root of a number
  * @param x integer which square root should be calculatoed
@@ -95,6 +101,8 @@ uint16_t _lv_atan2(int x, int y);
  * Else: mask = 0x8000
  */
 LV_ATTRIBUTE_FAST_MEM void _lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask);
+
+//! @endcond
 
 /**
  * Calculate the integer exponents.

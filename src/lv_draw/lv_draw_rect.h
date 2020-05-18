@@ -86,6 +86,8 @@ typedef struct {
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
 
+//! @endcond
+
 /**
  * Draw a rectangle
  * @param coords the coordinates of the rectangle

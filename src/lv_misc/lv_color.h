@@ -426,6 +426,8 @@ static inline uint32_t lv_color_to32(lv_color_t color)
 }
 
 
+//! @cond Doxygen_Suppress
+
 /**
  * Mix two colors with a given ratio.
  * @param c1 the first color to mix (usually the foreground)
@@ -464,6 +466,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_premult(lv_color_t c, uint8_t 
 #endif
 
 }
+
 
 /**
  * Mix two colors with a given ratio. It runs faster then `lv_color_mix` but requires some pre computation.
@@ -558,6 +561,8 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_mix_with_alpha(lv_color_t bg_c
     }
 }
 
+//! @endcond
+
 /**
  * Get the brightness of a color
  * @param color a color
@@ -602,8 +607,12 @@ static inline lv_color_t lv_color_hex3(uint32_t c)
                          (uint8_t)((c & 0xF) | ((c & 0xF) << 4)));
 }
 
+
+//! @cond Doxygen_Suppress
+//!
 LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uint32_t px_num);
 
+//! @endcond
 lv_color_t lv_color_lighten(lv_color_t c, lv_opa_t lvl);
 
 lv_color_t lv_color_darken(lv_color_t c, lv_opa_t lvl);

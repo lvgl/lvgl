@@ -38,6 +38,7 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
+//! @cond Doxygen_Suppress
 /**
  * Draw a line
  * @param point1 first point of the line
@@ -50,6 +51,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_poin
                                         lv_draw_line_dsc_t * dsc);
 
 LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
+
+
+//! @endcond
 
 /**********************
  *      MACROS

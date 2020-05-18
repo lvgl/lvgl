@@ -133,6 +133,9 @@ void _lv_mem_buf_release(void * p);
  */
 void _lv_mem_buf_free_all(void);
 
+
+//! @cond Doxygen_Suppress
+
 /**
  * Same as `memcpy` but optimized for 4 byte operation.
  * @param dst pointer to the destination buffer
@@ -186,6 +189,8 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_00(void * dst, size_t len);
  * @param len number of byte to set
  */
 LV_ATTRIBUTE_FAST_MEM void _lv_memset_ff(void * dst, size_t len);
+
+//! @endcond
 
 /**********************
  *      MACROS
