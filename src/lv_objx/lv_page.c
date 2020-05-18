@@ -494,6 +494,14 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
     const lv_style_t * style      = lv_page_get_style(page, LV_PAGE_STYLE_BG);
     const lv_style_t * style_scrl = lv_page_get_style(page, LV_PAGE_STYLE_SCRL);
 
+
+#ifdef LV_USE_GROUP_FOCUS_MODE
+    /*If object use focus mode then target parent*/
+    if (obj->group_focus_mode == LV_GROUP_FOCUS_CHILD) {
+    	obj = obj->group_focus_obj;
+    }
+#endif
+
     /*If obj is higher then the page focus where the "error" is smaller*/
     lv_coord_t obj_y      = obj->coords.y1 - ext->scrl->coords.y1;
     lv_coord_t obj_h      = lv_obj_get_height(obj);
