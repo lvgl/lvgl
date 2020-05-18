@@ -83,7 +83,7 @@ static inline bool is_break_char(uint32_t letter);
  * Get size of a text
  * @param size_res pointer to a 'point_t' variable to store the result
  * @param text pointer to a text
- * @param font pinter to font of the text
+ * @param font pointer to font of the text
  * @param letter_space letter space of the text
  * @param txt.line_space line space of the text
  * @param flags settings for the text from 'txt_flag_t' enum

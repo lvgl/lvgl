@@ -225,7 +225,7 @@ static void invalidate_cache(void)
 
 static void dma2d_wait(void)
 {
-    lv_disp_t * disp = lv_refr_get_disp_refreshing();
+    lv_disp_t * disp = _lv_refr_get_disp_refreshing();
     while(HAL_DMA2D_PollForTransfer(&hdma2d, 0) == HAL_TIMEOUT) {
         if(disp->driver.wait_cb) disp->driver.wait_cb(&disp->driver);
     }

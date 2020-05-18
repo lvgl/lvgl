@@ -195,7 +195,7 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 
     LV_ASSERT_STR(text);
 
-    if(ext->text == text) {
+    if(ext->text == text && ext->static_txt == 0) {
         /*If set its own text then reallocate it (maybe its size changed)*/
 #if LV_USE_ARABIC_PERSIAN_CHARS
         /*Get the size of the text and process it*/
