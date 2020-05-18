@@ -1,6 +1,6 @@
 # Changelog
 
-## v7.0.0 - under development
+## v7.0.0 (18.05.2020)
 To try the new version use the `dev-7.0` branch of LVGL and the [Simulator](https://github.com/littlevgl/lv_sim_eclipse_sdl/tree/dev-7.0).
 
 ### Documentation
