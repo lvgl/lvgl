@@ -62,6 +62,8 @@
 #define BORDER_WIDTH            LV_DPX(2)
 #define IS_LIGHT (theme.flags & LV_THEME_MATERIAL_FLAG_LIGHT)
 
+#define PAD_DEF (lv_disp_get_size_category(NULL) <= LV_DISP_SIZE_MEDIUM ? LV_DPX(15) : (LV_DPX(30)))
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -209,11 +211,11 @@ static void basic_init(void)
     lv_style_set_image_recolor(&bg, LV_STATE_DEFAULT, COLOR_BG_TEXT);
     lv_style_set_line_color(&bg, LV_STATE_DEFAULT, COLOR_BG_TEXT);
     lv_style_set_line_width(&bg, LV_STATE_DEFAULT, 1);
-    lv_style_set_pad_left(&bg, LV_STATE_DEFAULT, LV_DPX(15) + BORDER_WIDTH);
-    lv_style_set_pad_right(&bg, LV_STATE_DEFAULT, LV_DPX(15) + BORDER_WIDTH);
-    lv_style_set_pad_top(&bg, LV_STATE_DEFAULT, LV_DPX(15) + BORDER_WIDTH);
-    lv_style_set_pad_bottom(&bg, LV_STATE_DEFAULT, LV_DPX(15) + BORDER_WIDTH);
-    lv_style_set_pad_inner(&bg, LV_STATE_DEFAULT, LV_DPX(15));
+    lv_style_set_pad_left(&bg, LV_STATE_DEFAULT, PAD_DEF + BORDER_WIDTH);
+    lv_style_set_pad_right(&bg, LV_STATE_DEFAULT, PAD_DEF + BORDER_WIDTH);
+    lv_style_set_pad_top(&bg, LV_STATE_DEFAULT, PAD_DEF + BORDER_WIDTH);
+    lv_style_set_pad_bottom(&bg, LV_STATE_DEFAULT, PAD_DEF + BORDER_WIDTH);
+    lv_style_set_pad_inner(&bg, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_transition_time(&bg, LV_STATE_DEFAULT, TRANSITION_TIME);
     lv_style_set_transition_prop_6(&bg, LV_STATE_DEFAULT, LV_STYLE_BORDER_COLOR);
 
@@ -299,14 +301,16 @@ static void basic_init(void)
     lv_style_set_transition_delay(&btn, LV_STATE_PRESSED, 0);
 
     style_init_reset(&pad_inner);
-    lv_style_set_pad_inner(&pad_inner, LV_STATE_DEFAULT, LV_DPX(20));
+
+    lv_style_set_pad_inner(&pad_inner, LV_STATE_DEFAULT, lv_disp_get_size_category(NULL) <= LV_DISP_MEDIUM_LIMIT ? LV_DPX(20) : LV_DPX(40));
 
     style_init_reset(&pad_small);
-    lv_style_set_pad_left(&pad_small, LV_STATE_DEFAULT,  LV_DPX(10));
-    lv_style_set_pad_right(&pad_small, LV_STATE_DEFAULT, LV_DPX(10));
-    lv_style_set_pad_top(&pad_small, LV_STATE_DEFAULT,  LV_DPX(10));
-    lv_style_set_pad_bottom(&pad_small, LV_STATE_DEFAULT, LV_DPX(10));
-    lv_style_set_pad_inner(&pad_small, LV_STATE_DEFAULT, LV_DPX(10));
+    lv_style_int_t pad_small_value = lv_disp_get_size_category(NULL) <= LV_DISP_MEDIUM_LIMIT ? LV_DPX(10) : LV_DPX(20);
+    lv_style_set_pad_left(&pad_small, LV_STATE_DEFAULT,  pad_small_value);
+    lv_style_set_pad_right(&pad_small, LV_STATE_DEFAULT, pad_small_value);
+    lv_style_set_pad_top(&pad_small, LV_STATE_DEFAULT,  pad_small_value);
+    lv_style_set_pad_bottom(&pad_small, LV_STATE_DEFAULT, pad_small_value);
+    lv_style_set_pad_inner(&pad_small, LV_STATE_DEFAULT, pad_small_value);
 }
 
 static void cont_init(void)
@@ -379,9 +383,9 @@ static void led_init(void)
     lv_style_set_border_opa(&led, LV_STATE_DEFAULT, LV_OPA_50);
     lv_style_set_border_color(&led, LV_STATE_DEFAULT, lv_color_lighten(theme.color_primary, LV_OPA_30));
     lv_style_set_radius(&led, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-    lv_style_set_shadow_width(&led, LV_STATE_DEFAULT, LV_DPX(20));
+    lv_style_set_shadow_width(&led, LV_STATE_DEFAULT, LV_DPX(15));
     lv_style_set_shadow_color(&led, LV_STATE_DEFAULT, theme.color_primary);
-    lv_style_set_shadow_spread(&led, LV_STATE_DEFAULT, LV_DPX(10));
+    lv_style_set_shadow_spread(&led, LV_STATE_DEFAULT, LV_DPX(5));
 #endif
 }
 
@@ -399,8 +403,8 @@ static void slider_init(void)
     lv_style_set_pad_bottom(&slider_knob, LV_STATE_DEFAULT, LV_DPX(7));
 
     style_init_reset(&slider_bg);
-    lv_style_set_margin_left(&slider_bg, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_margin_right(&slider_bg, LV_STATE_DEFAULT, LV_DPX(15));
+    lv_style_set_margin_left(&slider_bg, LV_STATE_DEFAULT, LV_DPX(10));
+    lv_style_set_margin_right(&slider_bg, LV_STATE_DEFAULT, LV_DPX(10));
     lv_style_set_margin_top(&slider_bg, LV_STATE_DEFAULT, LV_DPX(10));
     lv_style_set_margin_bottom(&slider_bg, LV_STATE_DEFAULT, LV_DPX(10));
 
@@ -523,17 +527,17 @@ static void calendar_init(void)
 #if LV_USE_CALENDAR
 
     style_init_reset(&calendar_header);
-    lv_style_set_pad_top(&calendar_header, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_left(&calendar_header, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_right(&calendar_header, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_bottom(&calendar_header, LV_STATE_DEFAULT, LV_DPX(15));
+    lv_style_set_pad_top(&calendar_header, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_left(&calendar_header, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_right(&calendar_header, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_bottom(&calendar_header, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_text_color(&calendar_header, LV_STATE_PRESSED, IS_LIGHT ? lv_color_hex(0x888888) : LV_COLOR_WHITE);
 
     style_init_reset(&calendar_daynames);
     lv_style_set_text_color(&calendar_daynames, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x31404f) : lv_color_hex3(0xeee));
-    lv_style_set_pad_left(&calendar_daynames, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_right(&calendar_daynames, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_bottom(&calendar_daynames, LV_STATE_DEFAULT, LV_DPX(15));
+    lv_style_set_pad_left(&calendar_daynames, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_right(&calendar_daynames, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_bottom(&calendar_daynames, LV_STATE_DEFAULT, PAD_DEF);
 
     style_init_reset(&calendar_date_nums);
     lv_style_set_radius(&calendar_date_nums, LV_STATE_DEFAULT, LV_DPX(4));
@@ -550,9 +554,9 @@ static void calendar_init(void)
     lv_style_set_border_side(&calendar_date_nums, LV_STATE_CHECKED, LV_BORDER_SIDE_LEFT);
     lv_style_set_border_color(&calendar_date_nums, LV_STATE_CHECKED, theme.color_primary);
     lv_style_set_pad_inner(&calendar_date_nums, LV_STATE_DEFAULT, LV_DPX(3));
-    lv_style_set_pad_left(&calendar_date_nums, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_right(&calendar_date_nums, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_bottom(&calendar_date_nums, LV_STATE_DEFAULT, LV_DPX(15));
+    lv_style_set_pad_left(&calendar_date_nums, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_right(&calendar_date_nums, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_bottom(&calendar_date_nums, LV_STATE_DEFAULT, PAD_DEF);
 #endif
 }
 
@@ -680,8 +684,8 @@ static void spinbox_init(void)
     lv_style_set_bg_opa(&spinbox_cursor, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&spinbox_cursor, LV_STATE_DEFAULT, theme.color_primary);
     lv_style_set_text_color(&spinbox_cursor, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_pad_top(&spinbox_cursor, LV_STATE_DEFAULT, LV_DPI);
-    lv_style_set_pad_bottom(&spinbox_cursor, LV_STATE_DEFAULT, LV_DPI);
+    lv_style_set_pad_top(&spinbox_cursor, LV_STATE_DEFAULT, LV_DPX(100));
+    lv_style_set_pad_bottom(&spinbox_cursor, LV_STATE_DEFAULT, LV_DPX(100));
 
 #endif
 }
@@ -718,13 +722,13 @@ static void list_init(void)
     lv_style_set_border_color(&list_btn, LV_STATE_FOCUSED, theme.color_primary);
     lv_style_set_border_width(&list_btn, LV_STATE_DEFAULT, 1);
 
-    lv_style_set_pad_left(&list_btn, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_right(&list_btn, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_top(&list_btn, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_bottom(&list_btn, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_inner(&list_btn, LV_STATE_DEFAULT, LV_DPX(15));
+    lv_style_set_pad_left(&list_btn, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_right(&list_btn, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_top(&list_btn, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_bottom(&list_btn, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_inner(&list_btn, LV_STATE_DEFAULT, PAD_DEF);
 
-    lv_style_set_transform_width(&list_btn, LV_STATE_DEFAULT, - LV_DPX(15));
+    lv_style_set_transform_width(&list_btn, LV_STATE_DEFAULT, - PAD_DEF);
     lv_style_set_transform_width(&list_btn, LV_STATE_PRESSED, 0);
     lv_style_set_transform_width(&list_btn, LV_STATE_CHECKED, 0);
     lv_style_set_transform_width(&list_btn, LV_STATE_DISABLED, 0);
@@ -799,11 +803,11 @@ static void tabview_init(void)
     lv_style_set_radius(&tabview_indic, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
 
     style_init_reset(&tabview_page_scrl);
-    lv_style_set_pad_top(&tabview_page_scrl, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_bottom(&tabview_page_scrl, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_left(&tabview_page_scrl, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_right(&tabview_page_scrl, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_inner(&tabview_page_scrl, LV_STATE_DEFAULT, LV_DPX(15));
+    lv_style_set_pad_top(&tabview_page_scrl, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_bottom(&tabview_page_scrl, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_left(&tabview_page_scrl, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_right(&tabview_page_scrl, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_inner(&tabview_page_scrl, LV_STATE_DEFAULT, PAD_DEF);
 #endif
 }
 
@@ -820,10 +824,10 @@ static void table_init(void)
     lv_style_set_border_color(&table_cell, LV_STATE_DEFAULT, COLOR_BG_BORDER);
     lv_style_set_border_width(&table_cell, LV_STATE_DEFAULT, 1);
     lv_style_set_border_side(&table_cell, LV_STATE_DEFAULT, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM);
-    lv_style_set_pad_left(&table_cell, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_right(&table_cell, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_top(&table_cell, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_bottom(&table_cell, LV_STATE_DEFAULT, LV_DPX(15));
+    lv_style_set_pad_left(&table_cell, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_right(&table_cell, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_top(&table_cell, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_bottom(&table_cell, LV_STATE_DEFAULT, PAD_DEF);
 
 #endif
 }

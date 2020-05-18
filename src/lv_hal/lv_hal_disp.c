@@ -274,7 +274,7 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp)
 uint32_t lv_disp_get_dpi(lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
-    if(disp == NULL) return 1;  /*Do not return 0 because it might be a divider*/
+    if(disp == NULL) return LV_DPI;  /*Do not return 0 because it might be a divider*/
     return disp->driver.dpi;
 }
 
@@ -286,9 +286,14 @@ uint32_t lv_disp_get_dpi(lv_disp_t * disp)
 lv_disp_size_t lv_disp_get_size_category(lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
-    if(disp == NULL) return LV_DISP_SIZE_SMALL;
 
-    uint32_t w = lv_disp_get_hor_res(disp) * 10 / disp->driver.dpi;
+    uint32_t w;
+    if(disp == NULL) w = LV_HOR_RES_MAX;
+    else w = lv_disp_get_hor_res(disp);
+
+    uint32_t dpi = lv_disp_get_dpi(disp);
+
+    w = w * 10 / dpi;
 
     if(w < LV_DISP_SMALL_LIMIT) return LV_DISP_SIZE_SMALL;
     if(w < LV_DISP_MEDIUM_LIMIT) return LV_DISP_SIZE_MEDIUM;

@@ -569,17 +569,20 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
     lv_img_ext_t * ext       = lv_obj_get_ext_attr(img);
 
     if(mode == LV_DESIGN_COVER_CHK) {
-        lv_design_res_t cover = LV_DESIGN_RES_NOT_COVER;
+
+        if(lv_obj_get_style_clip_corner(img, LV_IMG_PART_MAIN)) return LV_DESIGN_RES_MASKED;
+
         if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL ||
            ext->angle != 0) return LV_DESIGN_RES_NOT_COVER;
 
+        if(lv_obj_get_style_image_opa(img, LV_IMG_PART_MAIN) != LV_OPA_COVER) return LV_DESIGN_RES_NOT_COVER;
+
         if((ext->cf == LV_IMG_CF_TRUE_COLOR || ext->cf == LV_IMG_CF_RAW) && ext->angle == 0 && ext->zoom == LV_IMG_ZOOM_NONE) {
-            cover = _lv_area_is_in(clip_area, &img->coords, 0) ? LV_DESIGN_RES_COVER : LV_DESIGN_RES_NOT_COVER;
+            if(_lv_area_is_in(clip_area, &img->coords, 0) == false) return  LV_DESIGN_RES_NOT_COVER;
         }
 
-        if(lv_obj_get_style_image_opa(img, LV_IMG_PART_MAIN) < LV_OPA_MAX) return LV_DESIGN_RES_NOT_COVER;
 
-        return cover;
+        return LV_DESIGN_RES_COVER;
     }
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
