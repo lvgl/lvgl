@@ -81,7 +81,7 @@ void lv_port_fs_init(void)
     fs_init();
 
     /*---------------------------------------------------
-     * Register the file system interface  in LittlevGL
+     * Register the file system interface  in LVGL
      *--------------------------------------------------*/
 
     /* Add a simple drive to open images */

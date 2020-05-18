@@ -69,7 +69,7 @@ typedef struct _disp_drv_t {
     lv_coord_t ver_res; /**< Vertical resolution. */
 
     /** Pointer to a buffer initialized with `lv_disp_buf_init()`.
-     * LittlevGL will use this buffer(s) to draw the screens contents */
+     * LVGL will use this buffer(s) to draw the screens contents */
     lv_disp_buf_t * buffer;
 
 #if LV_ANTIALIAS
@@ -182,7 +182,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver);
 /**
  * Initialize a display buffer
  * @param disp_buf pointer `lv_disp_buf_t` variable to initialize
- * @param buf1 A buffer to be used by LittlevGL to draw the image.
+ * @param buf1 A buffer to be used by LVGL to draw the image.
  *             Always has to specified and can't be NULL.
  *             Can be an array allocated by the user. E.g. `static lv_color_t disp_buf1[1024 * 10]`
  *             Or a memory address e.g. in external SRAM
@@ -190,7 +190,7 @@ void lv_disp_drv_init(lv_disp_drv_t * driver);
  *             (sending to the display) parallel.
  *             In the `disp_drv->flush` you should use DMA or similar hardware to send
  *             the image to the display in the background.
- *             It lets LittlevGL to render next frame into the other buffer while previous is being
+ *             It lets LVGL to render next frame into the other buffer while previous is being
  * sent. Set to `NULL` if unused.
  * @param size_in_px_cnt size of the `buf1` and `buf2` in pixel count.
  */

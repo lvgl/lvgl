@@ -178,7 +178,7 @@ static inline void lv_anim_set_values(lv_anim_t * a, lv_anim_value_t start, lv_a
 /**
  * Similar to `lv_anim_set_exec_cb` but `lv_anim_custom_exec_cb_t` receives
  * `lv_anim_t * ` as its first parameter instead of `void *`.
- * This function might be used when LittlevGL is binded to other languages because
+ * This function might be used when LVGL is binded to other languages because
  * it's more consistent to have `lv_anim_t *` as first parameter.
  * The variable to animate can be stored in the animation's `user_sata`
  * @param a pointer to an initialized `lv_anim_t` variable

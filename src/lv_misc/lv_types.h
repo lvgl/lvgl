@@ -42,7 +42,7 @@ extern "C" {
  **********************/
 
 /**
- * LittlevGL error codes.
+ * LVGL error codes.
  */
 enum {
     LV_RES_INV = 0, /*Typically indicates that the object is deleted (become invalid) in the action

@@ -59,7 +59,7 @@ typedef uint8_t lv_font_fmt_txt_cmap_type_t;
 
 /* Map codepoints to a `glyph_dsc`s
  * Several formats are supported to optimize memory usage
- * See https://github.com/littlevgl/lv_font_conv/blob/master/doc/font_spec.md
+ * See https://github.com/lvgl/lv_font_conv/blob/master/doc/font_spec.md
  */
 typedef struct {
     /** First Unicode character for this range */
@@ -74,7 +74,7 @@ typedef struct {
 
     /*
     According the specification there are 4 formats:
-        https://github.com/littlevgl/lv_font_conv/blob/master/doc/font_spec.md
+        https://github.com/lvgl/lv_font_conv/blob/master/doc/font_spec.md
 
     For simplicity introduce "relative code point":
         rcp = codepoint - range_start

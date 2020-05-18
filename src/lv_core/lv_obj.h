@@ -33,11 +33,11 @@ extern "C" {
 
 /*Error check of lv_conf.h*/
 #if LV_HOR_RES_MAX == 0 || LV_VER_RES_MAX == 0
-#error "LittlevGL: LV_HOR_RES_MAX and LV_VER_RES_MAX must be greater than 0"
+#error "LVGL: LV_HOR_RES_MAX and LV_VER_RES_MAX must be greater than 0"
 #endif
 
 #if LV_ANTIALIAS > 1
-#error "LittlevGL: LV_ANTIALIAS can be only 0 or 1"
+#error "LVGL: LV_ANTIALIAS can be only 0 or 1"
 #endif
 
 #define LV_MAX_ANCESTOR_NUM 8
@@ -123,7 +123,7 @@ enum {
     LV_SIGNAL_STYLE_CHG,    /**< Object's style has changed */
     LV_SIGNAL_BASE_DIR_CHG, /**<The base dir has changed*/
     LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
-    LV_SIGNAL_GET_TYPE, /**< LittlevGL needs to retrieve the object's type */
+    LV_SIGNAL_GET_TYPE, /**< LVGL needs to retrieve the object's type */
     LV_SIGNAL_GET_STYLE, /**<Get the style of an object*/
     LV_SIGNAL_GET_STATE_DSC, /**<Get the state of the object*/
 

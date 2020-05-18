@@ -26,7 +26,7 @@ extern "C" {
  **********************/
 
 /**
- * A theme in LittlevGL consists of many styles bound together.
+ * A theme in LVGL consists of many styles bound together.
  *
  * There is a style for each object type, as well as a generic style for
  * backgrounds and panels.

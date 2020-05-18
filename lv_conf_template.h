@@ -330,8 +330,8 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 
 /* The built-in fonts contains the ASCII range and some Symbols with  4 bit-per-pixel.
  * The symbols are available via `LV_SYMBOL_...` defines
- * More info about fonts: https://docs.littlevgl.com/#Fonts
- * To create a new font go to: https://littlevgl.com/ttf-font-to-c-array
+ * More info about fonts: https://docs.lvgl.com/#Fonts
+ * To create a new font go to: https://lvgl.com/ttf-font-to-c-array
  */
 
 /* Montserrat fonts with bpp = 4
@@ -510,7 +510,7 @@ typedef void * lv_obj_user_data_t;
  *  LV OBJ X USAGE
  *================*/
 /*
- * Documentation of the object types: https://docs.littlevgl.com/#Object-types
+ * Documentation of the object types: https://docs.lvgl.com/#Object-types
  */
 
 /*Arc (dependencies: -)*/

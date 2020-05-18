@@ -100,7 +100,7 @@ typedef uint8_t lv_img_cf_t;
 
 
 /**
- * LittlevGL image header
+ * LVGL image header
  */
 typedef struct {
 

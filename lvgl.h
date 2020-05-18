@@ -75,11 +75,11 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-/*Current version of LittlevGL*/
+/*Current version of LVGL*/
 #define LVGL_VERSION_MAJOR   7
 #define LVGL_VERSION_MINOR   0
 #define LVGL_VERSION_PATCH   0
-#define LVGL_VERSION_INFO    "rc"
+#define LVGL_VERSION_INFO    ""
 
 /**********************
  *      TYPEDEFS

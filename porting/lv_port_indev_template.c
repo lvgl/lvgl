@@ -293,7 +293,7 @@ static bool keypad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
     if(act_key != 0) {
         data->state = LV_INDEV_STATE_PR;
 
-        /*Translate the keys to LittlevGL control characters according to your key definitions*/
+        /*Translate the keys to LVGL control characters according to your key definitions*/
         switch(act_key) {
         case 1:
             act_key = LV_KEY_NEXT;
