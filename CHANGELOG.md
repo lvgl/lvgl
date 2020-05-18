@@ -7,7 +7,6 @@ To try the new version use the `dev-7.0` branch of LVGL and the [Simulator](http
 The docs for v7 is available at https://docs.littlevgl.com/v7/en/html/index.html
 
 ### Legal changes
-*In progress*
 
 The name of the project is changed to LVGL and the new website is on https://lvgl.io
 
