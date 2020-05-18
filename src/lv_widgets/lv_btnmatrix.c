@@ -740,7 +740,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
             const char * txt = ext->map_p[txt_i];
             lv_point_t txt_size;
             _lv_txt_get_size(&txt_size, txt, font, letter_space,
-                            line_space, lv_area_get_width(&area_btnm), txt_flag);
+                             line_space, lv_area_get_width(&area_btnm), txt_flag);
 
             area_tmp.x1 += (btn_w - txt_size.x) / 2;
             area_tmp.y1 += (btn_h - txt_size.y) / 2;

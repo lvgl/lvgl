@@ -337,7 +337,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
         /*Set user data*/
 #if LV_USE_USER_DATA
-       _lv_memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
+        _lv_memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
 #endif
 
         /*Copy realign*/

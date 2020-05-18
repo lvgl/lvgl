@@ -288,7 +288,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
         int32_t width = lv_area_get_width(&mask_com);
 
         uint8_t  * buf = _lv_mem_buf_get(lv_area_get_width(&mask_com) *
-                                        LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
+                                         LV_IMG_PX_SIZE_ALPHA_BYTE);  /*+1 because of the possible alpha byte*/
 
         lv_area_t line;
         lv_area_copy(&line, &mask_com);
@@ -361,7 +361,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
     if(other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE &&
        chroma_key == false && alpha_byte == false && draw_dsc->recolor_opa == LV_OPA_TRANSP) {
         _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
-                     draw_dsc->blend_mode);
+                      draw_dsc->blend_mode);
     }
     /*In the other cases every pixel need to be checked one-by-one*/
     else {
@@ -429,7 +429,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
 #endif
                     }
 #if LV_COLOR_DEPTH == 32
-                        map2[px_i].ch.alpha = 0xFF;
+                    map2[px_i].ch.alpha = 0xFF;
 #endif
                 }
 

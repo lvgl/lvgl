@@ -91,7 +91,8 @@ static uint8_t mem_buf1_32[MEM_BUF_SMALL_SIZE];
 static uint8_t mem_buf2_32[MEM_BUF_SMALL_SIZE];
 
 static lv_mem_buf_t mem_buf_small[] = {{.p = mem_buf1_32, .size = MEM_BUF_SMALL_SIZE, .used = 0},
-                                        {.p = mem_buf2_32, .size = MEM_BUF_SMALL_SIZE, .used = 0}};
+    {.p = mem_buf2_32, .size = MEM_BUF_SMALL_SIZE, .used = 0}
+};
 
 /**********************
  *      MACROS
@@ -513,7 +514,7 @@ void * _lv_mem_buf_get(uint32_t size)
     if(i_guess >= 0) {
         LV_GC_ROOT(_lv_mem_buf[i_guess]).used = 1;
         return LV_GC_ROOT(_lv_mem_buf[i_guess]).p;
-  }
+    }
 
 
     /*Reallocate a free buffer*/

@@ -148,8 +148,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
     /*If there is no mask then simply draw a rectangle*/
     if(simple_mode) {
         _lv_blend_fill(clip, &draw_area,
-                      dsc->color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
-                      dsc->blend_mode);
+                       dsc->color, NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
+                       dsc->blend_mode);
     }
     /*If there other mask apply it*/
     else {
@@ -208,8 +208,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
             }
 
             _lv_blend_fill(clip, &fill_area,
-                          dsc->color, mask_buf, mask_res, dsc->opa,
-                          dsc->blend_mode);
+                           dsc->color, mask_buf, mask_res, dsc->opa,
+                           dsc->blend_mode);
 
             fill_area.y1++;
             fill_area.y2++;
@@ -249,8 +249,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
     /*If there is no mask then simply draw a rectangle*/
     if(simple_mode) {
         _lv_blend_fill(clip, &draw_area,
-                      dsc->color,  NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
-                      dsc->blend_mode);
+                       dsc->color,  NULL, LV_DRAW_MASK_RES_FULL_COVER, opa,
+                       dsc->blend_mode);
     }
     /*If there other mask apply it*/
     else {
@@ -303,8 +303,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
             }
 
             _lv_blend_fill(clip, &fill_area,
-                          dsc->color, mask_buf, mask_res, dsc->opa,
-                          LV_BLEND_MODE_NORMAL);
+                           dsc->color, mask_buf, mask_res, dsc->opa,
+                           LV_BLEND_MODE_NORMAL);
 
             fill_area.y1++;
             fill_area.y2++;
@@ -453,8 +453,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
         }
         else {
             _lv_blend_fill(&fill_area, clip,
-                          dsc->color, mask_buf, LV_DRAW_MASK_RES_CHANGED, dsc->opa,
-                          dsc->blend_mode);
+                           dsc->color, mask_buf, LV_DRAW_MASK_RES_CHANGED, dsc->opa,
+                           dsc->blend_mode);
 
             fill_area.y1 = fill_area.y2 + 1;
             fill_area.y2 = fill_area.y1;
@@ -467,8 +467,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
     if(fill_area.y1 != fill_area.y2) {
         fill_area.y2--;
         _lv_blend_fill(&fill_area, clip,
-                      dsc->color, mask_buf, LV_DRAW_MASK_RES_CHANGED, dsc->opa,
-                      dsc->blend_mode);
+                       dsc->color, mask_buf, LV_DRAW_MASK_RES_CHANGED, dsc->opa,
+                       dsc->blend_mode);
 
     }
 

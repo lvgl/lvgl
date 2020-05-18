@@ -629,7 +629,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
 
         bool is_rtl;
         uint16_t visual_char_pos = _lv_bidi_get_visual_pos(&txt[line_start], &mutable_bidi_txt, new_line_start - line_start,
-                                                          lv_obj_get_base_dir(label), line_char_id, &is_rtl);
+                                                           lv_obj_get_base_dir(label), line_char_id, &is_rtl);
         bidi_txt = mutable_bidi_txt;
         if(is_rtl) visual_char_pos++;
 
@@ -777,7 +777,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     /*Handle Bidi*/
     bool is_rtl;
     logical_pos = _lv_bidi_get_logical_pos(&txt[line_start], NULL, txt_len, lv_obj_get_base_dir(label),
-                                          _lv_txt_encoded_get_char_id(bidi_txt, i), &is_rtl);
+                                           _lv_txt_encoded_get_char_id(bidi_txt, i), &is_rtl);
     if(is_rtl) logical_pos++;
     _lv_mem_buf_release(bidi_txt);
 #else
@@ -1074,7 +1074,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
            (ext->align == LV_LABEL_ALIGN_CENTER || ext->align == LV_LABEL_ALIGN_RIGHT)) {
             lv_point_t size;
             _lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
-                            LV_COORD_MAX, flag);
+                             LV_COORD_MAX, flag);
             if(size.x > lv_area_get_width(&txt_coords)) {
                 label_draw_dsc.flag &= ~LV_TXT_FLAG_RIGHT;
                 label_draw_dsc.flag &= ~LV_TXT_FLAG_CENTER;
@@ -1095,7 +1095,7 @@ static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_
         if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
             lv_point_t size;
             _lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
-                            LV_COORD_MAX, flag);
+                             LV_COORD_MAX, flag);
 
             /*Draw the text again next to the original to make an circular effect */
             if(size.x > lv_area_get_width(&txt_coords)) {

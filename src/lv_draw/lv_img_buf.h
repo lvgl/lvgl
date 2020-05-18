@@ -275,7 +275,7 @@ bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc);
  */
 static inline bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_t x, lv_coord_t y)
 {
-    const uint8_t * src_u8 = (const uint8_t*)dsc->cfg.src;
+    const uint8_t * src_u8 = (const uint8_t *)dsc->cfg.src;
 
     /*Get the target point relative coordinates to the pivot*/
     int32_t xt = x - dsc->cfg.pivot_x;
@@ -293,7 +293,8 @@ static inline bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_
         yt *= dsc->tmp.zoom_inv;
         xs = xt + dsc->tmp.pivot_x_256;
         ys = yt + dsc->tmp.pivot_y_256;
-    } else {
+    }
+    else {
         xt *= dsc->tmp.zoom_inv;
         yt *= dsc->tmp.zoom_inv;
         xs = ((dsc->tmp.cosma * xt - dsc->tmp.sinma * yt) >> (LV_TRIGO_SHIFT)) + dsc->tmp.pivot_x_256;
@@ -363,7 +364,7 @@ static inline bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_
  * @param pivot x,y pivot coordinates of rotation
  */
 void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
-                                     lv_point_t * pivot);
+                                      lv_point_t * pivot);
 
 /**********************
  *      MACROS

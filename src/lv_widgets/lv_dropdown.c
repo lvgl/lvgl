@@ -589,7 +589,8 @@ void lv_dropdown_open(lv_obj_t * ddlist)
     lv_obj_add_protect(lv_page_get_scrllable(ext->page), LV_PROTECT_CLICK_FOCUS);
 
     if(ancestor_page_signal == NULL) ancestor_page_signal = lv_obj_get_signal_cb(ext->page);
-    if(ancestor_page_scrl_signal == NULL) ancestor_page_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrllable(ext->page));
+    if(ancestor_page_scrl_signal == NULL) ancestor_page_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrllable(
+                                                                                                   ext->page));
     if(ancestor_page_design == NULL) ancestor_page_design = lv_obj_get_design_cb(ext->page);
 
     lv_dropdown_page_ext_t * page_ext = lv_obj_allocate_ext_attr(ext->page, sizeof(lv_dropdown_page_ext_t));
@@ -739,7 +740,7 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
         txt = ext->dir != LV_DROPDOWN_DIR_LEFT ? opt_txt : ext->symbol;
         if(txt) {
             _lv_txt_get_size(&txt_size, txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
-                            label_dsc.flag);
+                             label_dsc.flag);
 
             txt_area.y1 = ddlist->coords.y1 + top;
             txt_area.y2 = txt_area.y1 + txt_size.y;
@@ -759,7 +760,7 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
         txt = ext->dir != LV_DROPDOWN_DIR_LEFT ? ext->symbol : opt_txt;
         if(txt) {
             _lv_txt_get_size(&txt_size, txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
-                            label_dsc.flag);
+                             label_dsc.flag);
             txt_area.y1 = ddlist->coords.y1 + top;
             txt_area.y2 = txt_area.y1 + txt_size.y;
 

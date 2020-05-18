@@ -725,7 +725,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     else calendar->state &= ~(LV_STATE_PRESSED);
 
     header_area.x1 = header_area.x2 - header_right - _lv_txt_get_width(LV_SYMBOL_RIGHT, (uint16_t)strlen(LV_SYMBOL_RIGHT),
-                                                                      font, 0, LV_TXT_FLAG_NONE);
+                                                                       font, 0, LV_TXT_FLAG_NONE);
 
     lv_draw_label_dsc_init(&label_dsc);
     lv_obj_init_draw_label_dsc(calendar, LV_CALENDAR_PART_HEADER, &label_dsc);

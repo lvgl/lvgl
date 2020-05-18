@@ -166,7 +166,7 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_btnmatrix_set_map(ext->btns, ext->tab_name_ptr);
 
         lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_BG_SCRLLABLE), lv_obj_get_style_list(copy,
-                                                                                                          LV_TABVIEW_PART_BG_SCRLLABLE));
+                                                                                                               LV_TABVIEW_PART_BG_SCRLLABLE));
         lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB_BG), lv_obj_get_style_list(copy,
                                                                                                          LV_TABVIEW_PART_TAB_BG));
         lv_style_list_copy(lv_obj_get_style_list(tabview, LV_TABVIEW_PART_TAB_BTN), lv_obj_get_style_list(copy,
@@ -599,7 +599,8 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         if(info->part == LV_TABVIEW_PART_TAB_BG) info->result = lv_obj_get_state(ext->btns, LV_BTNMATRIX_PART_BG);
         else if(info->part == LV_TABVIEW_PART_TAB_BTN) info->result = lv_obj_get_state(ext->btns, LV_BTNMATRIX_PART_BTN);
         else if(info->part == LV_TABVIEW_PART_INDIC) info->result = lv_obj_get_state(ext->indic, LV_OBJ_PART_MAIN);
-        else if(info->part == LV_TABVIEW_PART_BG_SCRLLABLE) info->result = lv_obj_get_state(ext->content, LV_PAGE_PART_SCROLLABLE);
+        else if(info->part == LV_TABVIEW_PART_BG_SCRLLABLE) info->result = lv_obj_get_state(ext->content,
+                                                                                                LV_PAGE_PART_SCROLLABLE);
         return LV_RES_OK;
     }
 

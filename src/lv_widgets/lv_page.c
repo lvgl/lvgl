@@ -758,7 +758,8 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_get_state_info_t * info = param;
-        if(info->part == LV_PAGE_PART_SCROLLABLE) info->result = lv_obj_get_state(lv_page_get_scrllable(page), LV_CONT_PART_MAIN);
+        if(info->part == LV_PAGE_PART_SCROLLABLE) info->result = lv_obj_get_state(lv_page_get_scrllable(page),
+                                                                                      LV_CONT_PART_MAIN);
         else info->result = lv_obj_get_state(page, info->part);
         return LV_RES_OK;
     }
@@ -1243,8 +1244,9 @@ static void scrlbar_refresh(lv_obj_t * page)
     if(scrl_w <= obj_w - bg_left - bg_right) {
         lv_area_set_width(&ext->scrlbar.hor_area, obj_w - 2 * sb_hor_pad);
         _lv_area_set_pos(&ext->scrlbar.hor_area, sb_hor_pad,
-                        obj_h - sb_width - sb_bottom);
-        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.hor_draw = 0;
+                         obj_h - sb_width - sb_bottom);
+        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO ||
+           ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.hor_draw = 0;
     }
     /*Smaller horizontal scrollbar*/
     else {
@@ -1254,20 +1256,22 @@ static void scrlbar_refresh(lv_obj_t * page)
         lv_area_set_width(&ext->scrlbar.hor_area, size_tmp);
 
         _lv_area_set_pos(&ext->scrlbar.hor_area,
-                        sb_hor_pad +
-                        (-(lv_obj_get_x(scrl) - bg_left) * (obj_w - size_tmp - 2 * sb_hor_pad)) /
-                        (scrl_w + bg_left + bg_right - obj_w),
-                        obj_h - sb_width - sb_bottom);
+                         sb_hor_pad +
+                         (-(lv_obj_get_x(scrl) - bg_left) * (obj_w - size_tmp - 2 * sb_hor_pad)) /
+                         (scrl_w + bg_left + bg_right - obj_w),
+                         obj_h - sb_width - sb_bottom);
 
-        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.hor_draw = 1;
+        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO ||
+           ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.hor_draw = 1;
     }
 
     /*Full sized vertical scroll bar*/
     if(scrl_h <= obj_h - bg_top - bg_bottom) {
         lv_area_set_height(&ext->scrlbar.ver_area, obj_h - 2 * sb_ver_pad);
         _lv_area_set_pos(&ext->scrlbar.ver_area,
-                        obj_w - sb_width - sb_right, sb_ver_pad);
-        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 0;
+                         obj_w - sb_width - sb_right, sb_ver_pad);
+        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO ||
+           ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 0;
     }
     /*Smaller vertical scroll bar*/
     else {
@@ -1277,12 +1281,13 @@ static void scrlbar_refresh(lv_obj_t * page)
         lv_area_set_height(&ext->scrlbar.ver_area, size_tmp);
 
         _lv_area_set_pos(&ext->scrlbar.ver_area,
-                        obj_w - sb_width - sb_right,
-                        sb_ver_pad + (-(lv_obj_get_y(scrl) - bg_left) *
-                                      (obj_h - size_tmp - 2 * sb_ver_pad)) /
-                        (scrl_h + bg_top + bg_bottom - obj_h));
+                         obj_w - sb_width - sb_right,
+                         sb_ver_pad + (-(lv_obj_get_y(scrl) - bg_left) *
+                                       (obj_h - size_tmp - 2 * sb_ver_pad)) /
+                         (scrl_h + bg_top + bg_bottom - obj_h));
 
-        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO || ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 1;
+        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO ||
+           ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 1;
     }
 
     /*Invalidate the new scrollbar areas*/

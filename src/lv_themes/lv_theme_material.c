@@ -302,7 +302,8 @@ static void basic_init(void)
 
     style_init_reset(&pad_inner);
 
-    lv_style_set_pad_inner(&pad_inner, LV_STATE_DEFAULT, lv_disp_get_size_category(NULL) <= LV_DISP_MEDIUM_LIMIT ? LV_DPX(20) : LV_DPX(40));
+    lv_style_set_pad_inner(&pad_inner, LV_STATE_DEFAULT,
+                           lv_disp_get_size_category(NULL) <= LV_DISP_MEDIUM_LIMIT ? LV_DPX(20) : LV_DPX(40));
 
     style_init_reset(&pad_small);
     lv_style_int_t pad_small_value = lv_disp_get_size_category(NULL) <= LV_DISP_MEDIUM_LIMIT ? LV_DPX(10) : LV_DPX(20);

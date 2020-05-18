@@ -212,7 +212,7 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
         lv_style_int_t line_space = lv_obj_get_style_text_line_space(img, LV_IMG_PART_MAIN);
         lv_point_t size;
         _lv_txt_get_size(&size, src_img, font, letter_space, line_space,
-                        LV_COORD_MAX, LV_TXT_FLAG_NONE);
+                         LV_COORD_MAX, LV_TXT_FLAG_NONE);
         header.w = size.x;
         header.h = size.y;
     }
@@ -609,7 +609,8 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         angle_final += ext->angle;
 
         lv_area_t bg_coords;
-        _lv_img_buf_get_transformed_area(&bg_coords, lv_area_get_width(&img_coords), lv_area_get_height(&img_coords), angle_final, zoom_final, &ext->pivot);
+        _lv_img_buf_get_transformed_area(&bg_coords, lv_area_get_width(&img_coords), lv_area_get_height(&img_coords),
+                                         angle_final, zoom_final, &ext->pivot);
         bg_coords.x1 += img_coords.x1;
         bg_coords.y1 += img_coords.y1;
         bg_coords.x2 += img_coords.x1;
@@ -648,7 +649,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
 
             if(img_dsc.zoom == 0) return LV_DESIGN_RES_OK;
 
-            img_dsc.angle =angle_final;
+            img_dsc.angle = angle_final;
 
             img_dsc.pivot.x = ext->pivot.x;
             img_dsc.pivot.y = ext->pivot.y;

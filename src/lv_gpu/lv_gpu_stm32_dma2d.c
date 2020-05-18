@@ -12,11 +12,11 @@
 #if LV_USE_GPU_STM32_DMA2D
 
 #if defined(STM32F4)
-  #include "stm32f4xx_hal.h"
+    #include "stm32f4xx_hal.h"
 #elif defined(STM32F7)
-  #include "stm32f7xx_hal.h"
+    #include "stm32f7xx_hal.h"
 #else
-  #error "Not supported STM32 family to use DMA2D"
+    #error "Not supported STM32 family to use DMA2D"
 #endif
 
 /*********************

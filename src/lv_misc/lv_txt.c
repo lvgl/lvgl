@@ -91,7 +91,7 @@ static inline bool is_break_char(uint32_t letter);
  * line breaks
  */
 void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
-                     lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag)
+                      lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag)
 {
     size_res->x = 0;
     size_res->y = 0;
@@ -119,7 +119,8 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
         }
 
         /*Calculate the the longest line*/
-        lv_coord_t act_line_length = _lv_txt_get_width(&text[line_start], new_line_start - line_start, font, letter_space, flag);
+        lv_coord_t act_line_length = _lv_txt_get_width(&text[line_start], new_line_start - line_start, font, letter_space,
+                                                       flag);
 
         size_res->x = LV_MATH_MAX(act_line_length, size_res->x);
         line_start  = new_line_start;
@@ -290,7 +291,7 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8 they are different)
  */
 uint16_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
-                              lv_coord_t letter_space, lv_coord_t max_width, lv_txt_flag_t flag)
+                               lv_coord_t letter_space, lv_coord_t max_width, lv_txt_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;
@@ -350,7 +351,7 @@ uint16_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
  * @return length of a char_num long text
  */
 lv_coord_t _lv_txt_get_width(const char * txt, uint16_t length, const lv_font_t * font, lv_coord_t letter_space,
-                            lv_txt_flag_t flag)
+                             lv_txt_flag_t flag)
 {
     if(txt == NULL) return 0;
     if(font == NULL) return 0;

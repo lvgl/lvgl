@@ -71,7 +71,7 @@ typedef uint8_t lv_txt_cmd_state_t;
  * line breaks
  */
 void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t * font, lv_coord_t letter_space,
-                     lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag);
+                      lv_coord_t line_space, lv_coord_t max_width, lv_txt_flag_t flag);
 
 /**
  * Get the next line of text. Check line length and break chars too.
@@ -85,7 +85,7 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
  * they are different)
  */
 uint16_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord_t letter_space, lv_coord_t max_width,
-                              lv_txt_flag_t flag);
+                               lv_txt_flag_t flag);
 
 /**
  * Give the length of a text with a given font
@@ -98,7 +98,7 @@ uint16_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coor
  * @return length of a char_num long text
  */
 lv_coord_t _lv_txt_get_width(const char * txt, uint16_t length, const lv_font_t * font, lv_coord_t letter_space,
-                            lv_txt_flag_t flag);
+                             lv_txt_flag_t flag);
 
 /**
  * Check next character in a string and decide if te character is part of the command or not

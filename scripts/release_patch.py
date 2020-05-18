@@ -186,4 +186,3 @@ docs_build()
 docs_commit_push(ver_str)
 
 clean_up()
-    

@@ -95,10 +95,18 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
         uint32_t buf_size = gsize;
         /*Compute memory size needed to hold decompressed glyph, rounding up*/
         switch(fdsc->bpp) {
-        case 1: buf_size = (gsize + 7) >> 3;  break;
-        case 2: buf_size = (gsize + 3) >> 2;  break;
-        case 3: buf_size = (gsize + 1) >> 1;  break;
-        case 4: buf_size = (gsize + 1) >> 1;  break;
+            case 1:
+                buf_size = (gsize + 7) >> 3;
+                break;
+            case 2:
+                buf_size = (gsize + 3) >> 2;
+                break;
+            case 3:
+                buf_size = (gsize + 1) >> 1;
+                break;
+            case 4:
+                buf_size = (gsize + 1) >> 1;
+                break;
         }
 
         if(_lv_mem_get_size(decompr_buf) < buf_size) {
@@ -207,7 +215,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY) {
             uint8_t * p = _lv_utils_bsearch(&rcp, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
-                                           sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
+                                            sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
 
             if(p) {
                 lv_uintptr_t ofs = (lv_uintptr_t)(p - (uint8_t *) fdsc->cmaps[i].unicode_list);
@@ -217,7 +225,7 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
             uint8_t * p = _lv_utils_bsearch(&rcp, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
-                                           sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
+                                            sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
 
             if(p) {
                 lv_uintptr_t ofs = (lv_uintptr_t)(p - (uint8_t *) fdsc->cmaps[i].unicode_list);

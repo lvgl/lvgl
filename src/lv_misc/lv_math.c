@@ -221,10 +221,9 @@ uint16_t _lv_atan2(int x, int y)
  */
 int64_t _lv_pow(int64_t base, int8_t exp)
 {
-	int64_t result = 1;
-    while (exp)
-    {
-        if (exp & 1)
+    int64_t result = 1;
+    while(exp) {
+        if(exp & 1)
             result *= base;
         exp >>= 1;
         base *= base;

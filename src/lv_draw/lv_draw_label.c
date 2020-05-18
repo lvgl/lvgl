@@ -135,7 +135,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         /*If EXAPND is enabled then not limit the text's width to the object's width*/
         lv_point_t p;
         _lv_txt_get_size(&p, txt, dsc->font, dsc->letter_space, dsc->line_space, LV_COORD_MAX,
-                        dsc->flag);
+                         dsc->flag);
         w = p.x;
     }
 
@@ -579,8 +579,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
         }
         else {
             _lv_blend_fill(clip_area, &fill_area,
-                          color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
-                          blend_mode);
+                           color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
+                           blend_mode);
 
             fill_area.y1 = fill_area.y2 + 1;
             fill_area.y2 = fill_area.y1;
@@ -596,8 +596,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
     if(fill_area.y1 != fill_area.y2) {
         fill_area.y2--;
         _lv_blend_fill(clip_area, &fill_area,
-                      color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
-                      blend_mode);
+                       color, mask_buf, LV_DRAW_MASK_RES_CHANGED, LV_OPA_COVER,
+                       blend_mode);
         mask_p = 0;
     }
 
