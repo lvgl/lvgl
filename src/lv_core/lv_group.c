@@ -229,6 +229,20 @@ void lv_group_set_focus_parent(lv_obj_t * child, lv_obj_t * parent)
 	parent->group_focus_mode = LV_GROUP_FOCUS_PARENT;
 	parent->group_focus_obj = child;
 }
+
+/**
+ * Remove focus mode from parent and child
+ * @param obj Child or Parent object
+ */
+void lv_group_remove_focus_mode(lv_obj_t * obj)
+{
+	obj->group_focus_mode = LV_GROUP_FOCUS_NORMAL;
+	obj->group_focus_obj->group_focus_mode = LV_GROUP_FOCUS_NORMAL;
+	obj->group_focus_obj->group_focus_obj = NULL;
+	obj->group_focus_obj = NULL;
+}
+
+
 #endif
 
 /**

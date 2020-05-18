@@ -424,6 +424,13 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
 #if LV_USE_GROUP
     lv_group_t * group = lv_obj_get_group(obj);
     if(group) lv_group_remove_obj(obj);
+
+#if LV_USE_GROUP_FOCUS_MODE
+    if (obj->group_focus_mode != LV_GROUP_FOCUS_NORMAL) {
+    	lv_group_remove_focus_mode(obj);
+    }
+
+#endif
 #endif
 
         /*Remove the animations from this object*/
