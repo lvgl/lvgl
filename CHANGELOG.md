@@ -1,5 +1,8 @@
 # Changelog
 
+## v7.0.1 (under development)
+*Available in the `master` branch*
+
 ## v7.0.0 (18.05.2020)
 
 ### Documentation
