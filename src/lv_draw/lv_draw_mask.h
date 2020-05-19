@@ -21,6 +21,7 @@ extern "C" {
  *      DEFINES
  *********************/
 #define LV_MASK_ID_INV  (-1)
+#define _LV_MASK_MAX_NUM     16
 
 /**********************
  *      TYPEDEFS
@@ -160,6 +161,13 @@ typedef struct _lv_draw_mask_map_param_t {
         const lv_opa_t * map;
     } cfg;
 } lv_draw_mask_map_param_t;
+
+typedef struct {
+    void * param;
+    void * custom_id;
+} _lv_draw_mask_saved_t;
+
+typedef _lv_draw_mask_saved_t _lv_draw_mask_saved_arr_t[_LV_MASK_MAX_NUM];
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -14,19 +14,15 @@
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
 #include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_gc.h"
 
 /*********************
  *      DEFINES
  *********************/
-#define LV_MASK_MAX_NUM     16
 
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-    void * param;
-    void * custom_id;
-} lv_mask_saved_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -60,7 +56,6 @@ LV_ATTRIBUTE_FAST_MEM static inline void sqrt_approx(lv_sqrt_res_t * q, lv_sqrt_
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_mask_saved_t mask_list[LV_MASK_MAX_NUM];
 
 /**********************
  *      MACROS
@@ -80,17 +75,17 @@ int16_t lv_draw_mask_add(void * param, void * custom_id)
 {
     /*Look for a free entry*/
     uint8_t i;
-    for(i = 0; i < LV_MASK_MAX_NUM; i++) {
-        if(mask_list[i].param == NULL) break;
+    for(i = 0; i < _LV_MASK_MAX_NUM; i++) {
+        if(_mask_list[i].param == NULL) break;
     }
 
-    if(i >= LV_MASK_MAX_NUM) {
+    if(i >= _LV_MASK_MAX_NUM) {
         LV_LOG_WARN("lv_mask_add: no place to add the mask");
         return LV_MASK_ID_INV;
     }
 
-    mask_list[i].param = param;
-    mask_list[i].custom_id = custom_id;
+    _mask_list[i].param = param;
+    _mask_list[i].custom_id = custom_id;
 
     return i;
 }
@@ -112,7 +107,7 @@ LV_ATTRIBUTE_FAST_MEM lv_draw_mask_res_t lv_draw_mask_apply(lv_opa_t * mask_buf,
     bool changed = false;
     lv_draw_mask_common_dsc_t * dsc;
 
-    lv_mask_saved_t * m = mask_list;
+    _lv_draw_mask_saved_t * m = _mask_list;
 
     while(m->param) {
         dsc = m->param;
@@ -138,9 +133,9 @@ void * lv_draw_mask_remove_id(int16_t id)
     void * p = NULL;
 
     if(id != LV_MASK_ID_INV) {
-        p = mask_list[id].param;
-        mask_list[id].param = NULL;
-        mask_list[id].custom_id = NULL;
+        p = _mask_list[id].param;
+        _mask_list[id].param = NULL;
+        _mask_list[id].custom_id = NULL;
     }
 
     return p;
@@ -156,11 +151,11 @@ void * lv_draw_mask_remove_custom(void * custom_id)
 {
     void * p = NULL;
     uint8_t i;
-    for(i = 0; i < LV_MASK_MAX_NUM; i++) {
-        if(mask_list[i].custom_id == custom_id) {
-            p = mask_list[i].param;
-            mask_list[i].param = NULL;
-            mask_list[i].custom_id = NULL;
+    for(i = 0; i < _LV_MASK_MAX_NUM; i++) {
+        if(_mask_list[i].custom_id == custom_id) {
+            p = _mask_list[i].param;
+            _mask_list[i].param = NULL;
+            _mask_list[i].custom_id = NULL;
         }
     }
     return p;
@@ -174,8 +169,8 @@ LV_ATTRIBUTE_FAST_MEM uint8_t lv_draw_mask_get_cnt(void)
 {
     uint8_t cnt = 0;
     uint8_t i;
-    for(i = 0; i < LV_MASK_MAX_NUM; i++) {
-        if(mask_list[i].param) cnt++;
+    for(i = 0; i < _LV_MASK_MAX_NUM; i++) {
+        if(_mask_list[i].param) cnt++;
     }
     return cnt;
 }
