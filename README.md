@@ -1,11 +1,11 @@
 <h1 align="center"> LVGL - Little and Versatile Graphics Library</h1>
 <p align="center">
 <a href="https://github.com/littlevgl/lvgl/blob/master/LICENCE.txt"><img src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
-<a href="https://github.com/littlevgl/lvgl/releases/tag/v7.0.0"><img src="https://img.shields.io/badge/version-6.1.2-blue.svg"></a>
+<a href="https://github.com/littlevgl/lvgl/releases/tag/v7.0.0"><img src="https://img.shields.io/badge/version-7.0.0-blue.svg"></a>
 </p>
 
 <p align="center">
-<img src="https://littlevgl.com/github/cover_ori_reduced_2.gif">
+<img src="https://lvgl.io/assets/images/img_1.png">
 </p>
 
 <p align="center">
