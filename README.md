@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-<img src="https://littlevgl.com/github/cover_ori_reduced_2.gif">
+<img src="https://lvgl.io/assets/images/img_1.png">
 </p>
 
 <p align="center">
