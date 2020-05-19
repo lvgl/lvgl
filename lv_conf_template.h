@@ -173,6 +173,10 @@ typedef void * lv_anim_user_data_t;
 #define LV_USE_GROUP            1
 #if LV_USE_GROUP
 typedef void * lv_group_user_data_t;
+
+/* 1: Enable to apply focus style to different object */
+#define LV_USE_GROUP_FOCUS_PARENT 1
+
 #endif  /*LV_USE_GROUP*/
 
 /* 1: Enable GPU interface*/

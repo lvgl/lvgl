@@ -149,6 +149,11 @@ void lv_group_remove_obj(lv_obj_t * obj)
 {
     lv_group_t * g = obj->group_p;
     if(g == NULL) return;
+
+#if LV_USE_GROUP_FOCUS_PARENT
+    lv_group_remove_focus_parent(obj);
+#endif
+
     if(g->obj_focus == NULL) return; /*Just to be sure (Not possible if there is at least one object in the group)*/
 
     /*Focus on the next object*/
@@ -201,6 +206,11 @@ void lv_group_remove_all_objs(lv_group_t * group)
     lv_obj_t ** obj;
     _LV_LL_READ(group->obj_ll, obj) {
         (*obj)->group_p = NULL;
+
+#if LV_USE_GROUP_FOCUS_PARENT
+        lv_group_remove_focus_parent(*obj);
+#endif
+
     }
 
     _lv_ll_clear(&(group->obj_ll));
@@ -531,5 +541,35 @@ static void obj_to_foreground(lv_obj_t * obj)
         lv_obj_move_foreground(last_top);
     }
 }
+
+
+#ifdef LV_USE_GROUP_FOCUS_PARENT
+/**
+ * Set focus parent for the object (focus style will apply to parent, when child is focused)
+ * @param child Child object
+ * @param parent Parent object
+ */
+void lv_group_set_focus_parent(lv_obj_t * child, lv_obj_t * parent)
+{
+	child->group_focus_parent = parent;
+
+	/*if the child is in focused state right now, set focus state to parent*/
+	if (lv_obj_is_focused(child))
+	{
+		lv_obj_clear_state(child, LV_STATE_FOCUSED | LV_STATE_EDITED);
+		lv_obj_set_state(parent, LV_STATE_FOCUSED);
+	}
+}
+
+/**
+ * Remove focus mode from child
+ * @param obj Child object
+ */
+void lv_group_remove_focus_parent(lv_obj_t * obj)
+{
+	obj->group_focus_parent = NULL;
+}
+
+#endif
 
 #endif /*LV_USE_GROUP != 0*/

@@ -297,6 +297,11 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 #if LV_USE_GROUP
     new_obj->group_p = NULL;
+
+#if LV_USE_GROUP_FOCUS_PARENT
+	new_obj->group_focus_parent = NULL;
+#endif
+
 #endif
 
     /*Set attributes*/
@@ -3613,14 +3618,37 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(lv_group_get_editing(lv_obj_get_group(obj))) {
             uint8_t state = LV_STATE_FOCUSED;
             state |= LV_STATE_EDITED;
+
+#if LV_USE_GROUP_FOCUS_PARENT
+            /*if using focus mode, change target to parent*/
+			if (obj->group_focus_parent) {
+				obj = obj->group_focus_parent;
+			}
+#endif
+
             lv_obj_add_state(obj, state);
         }
         else {
+
+#if LV_USE_GROUP_FOCUS_PARENT
+        	/*if using focus mode, change target to parent*/
+			if (obj->group_focus_parent) {
+				obj = obj->group_focus_parent;
+			}
+#endif
             lv_obj_add_state(obj, LV_STATE_FOCUSED);
             lv_obj_clear_state(obj, LV_STATE_EDITED);
         }
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
+
+#if LV_USE_GROUP_FOCUS_PARENT
+    	/*if using focus mode, change target to parent*/
+		if (obj->group_focus_parent) {
+			obj = obj->group_focus_parent;
+		}
+#endif
+
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
     }
 #endif

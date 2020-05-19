@@ -227,6 +227,11 @@ typedef struct _lv_obj_t {
 
 #if LV_USE_GROUP != 0
     void * group_p;
+
+#if LV_USE_GROUP_FOCUS_PARENT
+    struct _lv_obj_t * group_focus_parent; /**< Pointer to focus parent object. */
+#endif
+
 #endif
 
     uint8_t protect;            /**< Automatically happening actions can be prevented.
