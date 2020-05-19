@@ -228,7 +228,7 @@ bool lv_group_get_click_focus(const lv_group_t * group);
  */
 bool lv_group_get_wrap(lv_group_t * group);
 
-#ifdef LV_USE_GROUP_FOCUS_PARENT
+#if LV_USE_GROUP_FOCUS_PARENT
 /**
  * Set focus parent for the object (focus style will apply to parent, when child is focused)
  * @param child Child object

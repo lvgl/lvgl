@@ -257,6 +257,12 @@
 #define LV_USE_GROUP            1
 #endif
 #if LV_USE_GROUP
+
+/* 1: Enable to apply focus style to different object */
+#ifndef LV_USE_GROUP_FOCUS_PARENT
+#define LV_USE_GROUP_FOCUS_PARENT 1
+#endif
+
 #endif  /*LV_USE_GROUP*/
 
 /* 1: Enable GPU interface*/

@@ -543,7 +543,7 @@ static void obj_to_foreground(lv_obj_t * obj)
 }
 
 
-#ifdef LV_USE_GROUP_FOCUS_PARENT
+#if LV_USE_GROUP_FOCUS_PARENT
 /**
  * Set focus parent for the object (focus style will apply to parent, when child is focused)
  * @param child Child object
@@ -551,14 +551,13 @@ static void obj_to_foreground(lv_obj_t * obj)
  */
 void lv_group_set_focus_parent(lv_obj_t * child, lv_obj_t * parent)
 {
-	child->group_focus_parent = parent;
+    child->group_focus_parent = parent;
 
-	/*if the child is in focused state right now, set focus state to parent*/
-	if (lv_obj_is_focused(child))
-	{
-		lv_obj_clear_state(child, LV_STATE_FOCUSED | LV_STATE_EDITED);
-		lv_obj_set_state(parent, LV_STATE_FOCUSED);
-	}
+    /*if the child is in focused state right now, set focus state to parent*/
+    if(lv_obj_is_focused(child)) {
+        lv_obj_clear_state(child, LV_STATE_FOCUSED | LV_STATE_EDITED);
+        lv_obj_set_state(parent, LV_STATE_FOCUSED);
+    }
 }
 
 /**
@@ -567,7 +566,7 @@ void lv_group_set_focus_parent(lv_obj_t * child, lv_obj_t * parent)
  */
 void lv_group_remove_focus_parent(lv_obj_t * obj)
 {
-	obj->group_focus_parent = NULL;
+    obj->group_focus_parent = NULL;
 }
 
 #endif
