@@ -228,23 +228,6 @@ bool lv_group_get_click_focus(const lv_group_t * group);
  */
 bool lv_group_get_wrap(lv_group_t * group);
 
-#if LV_USE_GROUP_FOCUS_PARENT
-/**
- * Set focus parent for the object (focus style will apply to parent, when child is focused)
- * @param child Child object
- * @param parent Parent object
- */
-void lv_group_set_focus_parent(lv_obj_t * child, lv_obj_t * parent);
-
-/**
- * Remove focus mode from child
- * @param obj Child object
- */
-void lv_group_remove_focus_parent(lv_obj_t * obj);
-
-#endif
-
-
 /**********************
  *      MACROS
  **********************/
