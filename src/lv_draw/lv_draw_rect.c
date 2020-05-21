@@ -652,12 +652,12 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
 #if LV_SHADOW_CACHE_SIZE
     if(sh_cache_size == corner_size && sh_cache_r == r_sh) {
         /*Use the cache if available*/
-        sh_buf = lv_mem_buf_get(corner_size * corner_size);
+        sh_buf = _lv_mem_buf_get(corner_size * corner_size);
         _lv_memcpy(sh_buf, sh_cache, corner_size * corner_size);
     }
     else {
         /*A larger buffer is required for calculation */
-        sh_buf = lv_mem_buf_get(corner_size * corner_size * sizeof(uint16_t));
+        sh_buf = _lv_mem_buf_get(corner_size * corner_size * sizeof(uint16_t));
         shadow_draw_corner_buf(&sh_rect_area, (uint16_t *)sh_buf, dsc->shadow_width, r_sh);
 
         /*Cache the corner if it fits into the cache size*/
