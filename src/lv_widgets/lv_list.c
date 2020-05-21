@@ -658,7 +658,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         lv_indev_t * indev         = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_KEYPAD ||
-           (indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(list)))) {
+           ((indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_NAVIGATION) && lv_group_get_editing(lv_obj_get_group(list)))) {
             lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 
             /*The page receives the key presses so the events should be propagated to the selected
@@ -706,7 +706,7 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
         /*With ENCODER focus the button only in edit mode*/
         lv_group_t * g = lv_obj_get_group(list);
         if((indev_type == LV_INDEV_TYPE_KEYPAD) ||
-           (indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(g))) {
+           ((indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_ENCODER) && lv_group_get_editing(g))) {
             lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
             /* Select the last used button, or use the first no last button */
             if(ext->last_sel_btn) lv_list_focus_btn(list, ext->last_sel_btn);

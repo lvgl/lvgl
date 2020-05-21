@@ -472,7 +472,7 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
         if(sign == LV_SIGNAL_FOCUS) {
             lv_indev_t * indev         = lv_indev_get_act();
             lv_indev_type_t indev_type = lv_indev_get_type(indev);
-            if(indev_type == LV_INDEV_TYPE_ENCODER) {
+            if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_NAVIGATION) {
                 /*In navigation mode don't select any button but in edit mode select the fist*/
                 if(lv_group_get_editing(lv_obj_get_group(mbox))) lv_btnmatrix_set_focused_btn(ext->btnm, 0);
                 else lv_btnmatrix_set_focused_btn(ext->btnm, LV_BTNMATRIX_BTN_NONE);

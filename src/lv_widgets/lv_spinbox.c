@@ -411,7 +411,8 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
         /*If released with an ENCODER then move to the next digit*/
         lv_spinbox_ext_t * ext = lv_obj_get_ext_attr(spinbox);
         lv_indev_t * indev = lv_indev_get_act();
-        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
+        if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER ||
+        		lv_indev_get_type(indev) == LV_INDEV_TYPE_NAVIGATION) {
 #if LV_USE_GROUP
             if(lv_group_get_editing(lv_obj_get_group(spinbox))) {
                 if(ext->step > 1) {
@@ -468,13 +469,13 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
 
         uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
         if(c == LV_KEY_RIGHT) {
-            if(indev_type == LV_INDEV_TYPE_ENCODER)
+            if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_NAVIGATION)
                 lv_spinbox_increment(spinbox);
             else
                 lv_spinbox_step_next(spinbox);
         }
         else if(c == LV_KEY_LEFT) {
-            if(indev_type == LV_INDEV_TYPE_ENCODER)
+            if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_NAVIGATION)
                 lv_spinbox_decrement(spinbox);
             else
                 lv_spinbox_step_prev(spinbox);

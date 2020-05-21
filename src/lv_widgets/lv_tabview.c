@@ -638,7 +638,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
         lv_indev_t * indev         = lv_indev_get_act();
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         if(indev_type == LV_INDEV_TYPE_KEYPAD ||
-           (indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(lv_obj_get_group(tabview)))) {
+           ((indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_NAVIGATION) && lv_group_get_editing(lv_obj_get_group(tabview)))) {
             lv_event_send(ext->btns, LV_EVENT_CLICKED, lv_event_get_data());
         }
 #endif
@@ -817,7 +817,7 @@ static void tab_btnm_event_cb(lv_obj_t * tab_btnm, lv_event_t event)
     if(id_prev != id_new) res = lv_event_send(tabview, LV_EVENT_VALUE_CHANGED, &id_new);
 
 #if LV_USE_GROUP
-    if(lv_indev_get_type(lv_indev_get_act()) == LV_INDEV_TYPE_ENCODER) {
+    if(lv_indev_get_type(lv_indev_get_act()) == LV_INDEV_TYPE_ENCODER || lv_indev_get_type(lv_indev_get_act()) == LV_INDEV_TYPE_NAVIGATION) {
         lv_group_set_editing(lv_obj_get_group(tabview), false);
     }
 #endif

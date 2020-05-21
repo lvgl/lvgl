@@ -514,7 +514,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         /*Encoders need special handling*/
-        if(indev_type == LV_INDEV_TYPE_ENCODER) {
+        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_NAVIGATION) {
             /*In navigate mode revert the original value*/
             if(!editing) {
                 if(ext->sel_opt_id != ext->sel_opt_id_ori) {
@@ -787,10 +787,10 @@ static lv_res_t release_handler(lv_obj_t * roller)
 #if LV_USE_GROUP
     /*Leave edit mode once a new option is selected*/
     lv_indev_type_t indev_type = lv_indev_get_type(indev);
-    if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
+    if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD || indev_type == LV_INDEV_TYPE_NAVIGATION) {
         ext->sel_opt_id_ori = ext->sel_opt_id;
 
-        if(indev_type == LV_INDEV_TYPE_ENCODER) {
+        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_NAVIGATION) {
             lv_group_t * g      = lv_obj_get_group(roller);
             if(lv_group_get_editing(g)) {
                 lv_group_set_editing(g, false);

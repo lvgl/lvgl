@@ -916,7 +916,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
 
         /*Encoders need special handling*/
-        if(indev_type == LV_INDEV_TYPE_ENCODER) {
+        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_NAVIGATION) {
             /*Open the list if editing*/
             if(editing) lv_dropdown_open(ddlist);
             /*Close the list if navigating*/
@@ -939,7 +939,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
                 }
 #if LV_USE_GROUP
                 lv_indev_type_t indev_type = lv_indev_get_type(indev);
-                if(indev_type == LV_INDEV_TYPE_ENCODER) {
+                if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_NAVIGATION) {
                     lv_group_set_editing(lv_obj_get_group(ddlist), false);
                 }
 #endif
@@ -1214,7 +1214,7 @@ static lv_res_t page_release_handler(lv_obj_t * page)
     lv_indev_t * indev = lv_indev_get_act();
 #if LV_USE_GROUP
     /*Leave edit mode once a new item is selected*/
-    if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER) {
+    if(lv_indev_get_type(indev) == LV_INDEV_TYPE_ENCODER || lv_indev_get_type(indev) == LV_INDEV_TYPE_NAVIGATION) {
         ext->sel_opt_id_orig = ext->sel_opt_id;
         lv_group_t * g      = lv_obj_get_group(ddlist);
         if(lv_group_get_editing(g)) {

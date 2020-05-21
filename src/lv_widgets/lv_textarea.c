@@ -1798,7 +1798,8 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
     if(ext->cursor.hidden) return;
 
     if(lv_indev_get_type(click_source) == LV_INDEV_TYPE_KEYPAD ||
-       lv_indev_get_type(click_source) == LV_INDEV_TYPE_ENCODER) {
+       lv_indev_get_type(click_source) == LV_INDEV_TYPE_ENCODER ||
+	   lv_indev_get_type(click_source) == LV_INDEV_TYPE_NAVIGATION) {
         return;
     }
 

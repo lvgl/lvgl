@@ -758,7 +758,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
 
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
         lv_point_t p;
-        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
+        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_NAVIGATION || indev_type == LV_INDEV_TYPE_KEYPAD) {
             p.x = cpicker->coords.x1 + lv_obj_get_width(cpicker) / 2;
             p.y = cpicker->coords.y1 + lv_obj_get_height(cpicker) / 2;
         }

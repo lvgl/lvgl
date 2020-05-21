@@ -375,7 +375,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         lv_group_t * g             = lv_obj_get_group(slider);
         bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
-        if(indev_type == LV_INDEV_TYPE_ENCODER) {
+        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_NAVIGATION) {
             if(editing) lv_group_set_editing(g, false);
         }
 #endif
