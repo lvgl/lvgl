@@ -399,7 +399,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
             for(y = 0; y < draw_area_h; y++) {
                 const lv_opa_t * mask_tmp_x = mask;
 #if 0
-                for(x = draw_area->x1; x <= draw_area->x2; x++) {
+                for(x = 0; x < draw_area_w; x++) {
 #if LV_COLOR_SCREEN_TRANSP
                     FILL_NORMAL_MASK_PX_SCR_TRANSP(x, color)
 #else
@@ -740,7 +740,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
             for(y = 0; y < draw_area_h; y++) {
                 const lv_opa_t * mask_tmp_x = mask;
 #if 0
-                for(x = draw_area->x1; x <= draw_area->x2; x++) {
+                for(x = 0; x < draw_area_w; x++) {
                     MAP_NORMAL_MASK_PX(x);
                 }
 #else
