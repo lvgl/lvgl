@@ -38,7 +38,8 @@ extern "C" {
     f(lv_img_cache_entry_t*, _lv_img_cache_array)                  \
     f(lv_task_t*, _lv_task_act)                                    \
     f(lv_mem_buf_arr_t , _lv_mem_buf)                              \
-    f(_lv_draw_mask_saved_arr_t , _lv_draw_mask_list)                      \
+    f(_lv_draw_mask_saved_arr_t , _lv_draw_mask_list)              \
+    f(void * , _lv_theme_material_styles)              \
 
 #define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;
 #define LV_ROOTS LV_ITERATE_ROOTS(LV_DEFINE_ROOT)
