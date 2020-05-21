@@ -572,15 +572,33 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
 
         if(lv_obj_get_style_clip_corner(img, LV_IMG_PART_MAIN)) return LV_DESIGN_RES_MASKED;
 
-        if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL ||
-           ext->angle != 0) return LV_DESIGN_RES_NOT_COVER;
+        if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL) return LV_DESIGN_RES_NOT_COVER;
 
-        if(lv_obj_get_style_image_opa(img, LV_IMG_PART_MAIN) != LV_OPA_COVER) return LV_DESIGN_RES_NOT_COVER;
+        /*Non true color format might have "holes"*/
+        if(ext->cf != LV_IMG_CF_TRUE_COLOR && ext->cf != LV_IMG_CF_RAW != 0) return LV_DESIGN_RES_NOT_COVER;
 
-        if((ext->cf == LV_IMG_CF_TRUE_COLOR || ext->cf == LV_IMG_CF_RAW) && ext->angle == 0 && ext->zoom == LV_IMG_ZOOM_NONE) {
-            if(_lv_area_is_in(clip_area, &img->coords, 0) == false) return  LV_DESIGN_RES_NOT_COVER;
+        int32_t angle_final = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
+        angle_final += ext->angle;
+
+        if(angle_final == 0) return LV_DESIGN_RES_NOT_COVER;
+
+        int32_t zoom_final = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
+        zoom_final = (zoom_final * ext->zoom) >> 8;
+
+        if(zoom_final != LV_IMG_ZOOM_NONE) {
+            if(_lv_area_is_in(clip_area, &img->coords, 0) == false) return LV_DESIGN_RES_NOT_COVER;
+        } else {
+            lv_area_t a;
+            _lv_img_buf_get_transformed_area(&a, lv_obj_get_width(img), lv_obj_get_height(img), 0, zoom_final, &ext->pivot);
+            a.x1 += img->coords.x1;
+            a.y1 += img->coords.y1;
+            a.x2 += img->coords.x1;
+            a.y2 += img->coords.y1;
+
+            if(_lv_area_is_in(clip_area, &a, 0) == false) return LV_DESIGN_RES_NOT_COVER;
         }
 
+        if(lv_obj_get_style_image_opa(img, LV_IMG_PART_MAIN) != LV_OPA_COVER) return LV_DESIGN_RES_NOT_COVER;
 
         return LV_DESIGN_RES_COVER;
     }
