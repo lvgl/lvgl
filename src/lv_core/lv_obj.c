@@ -3604,7 +3604,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 
 
 /**
- * Get the really dragged object by taking `focus_parent` into account.
+ * Get the really focused object by taking `focus_parent` into account.
  * @param obj the start object
  * @return the object to really focus
  */
@@ -4040,5 +4040,4 @@ static void lv_event_mark_deleted(lv_obj_t * obj)
         t = t->prev;
     }
 }
-
 
