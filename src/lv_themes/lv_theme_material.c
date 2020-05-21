@@ -872,8 +872,10 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
                                     const lv_font_t * font_title)
 {
 
-    LV_GC_ROOT(_lv_theme_material_styles) = lv_mem_alloc(sizeof(theme_styles_t));
-    styles = (theme_styles_t *)LV_GC_ROOT(_lv_theme_material_styles);
+    if(!inited) {
+        LV_GC_ROOT(_lv_theme_material_styles) = lv_mem_alloc(sizeof(theme_styles_t));
+        styles = (theme_styles_t *)LV_GC_ROOT(_lv_theme_material_styles);
+    }
 
     theme.color_primary = color_primary;
     theme.color_secondary = color_secondary;
