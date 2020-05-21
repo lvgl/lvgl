@@ -575,7 +575,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         if(ext->src_type == LV_IMG_SRC_UNKNOWN || ext->src_type == LV_IMG_SRC_SYMBOL) return LV_DESIGN_RES_NOT_COVER;
 
         /*Non true color format might have "holes"*/
-        if(ext->cf != LV_IMG_CF_TRUE_COLOR && ext->cf != LV_IMG_CF_RAW != 0) return LV_DESIGN_RES_NOT_COVER;
+        if(ext->cf != LV_IMG_CF_TRUE_COLOR && ext->cf != LV_IMG_CF_RAW) return LV_DESIGN_RES_NOT_COVER;
 
         int32_t angle_final = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
         angle_final += ext->angle;
