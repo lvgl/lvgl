@@ -485,6 +485,9 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
     lv_anim_del(ext->scrl, (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
 
+    /*if using focus mode, change target to parent*/
+    obj = lv_obj_get_focused_obj(obj);
+
 
     /*If obj is higher then the page focus where the "error" is smaller*/
     lv_coord_t obj_y      = obj->coords.y1 - ext->scrl->coords.y1;
