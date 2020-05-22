@@ -1,3 +1,4 @@
+
 /**
  * @file lv_roller.c
  *
@@ -230,8 +231,17 @@ void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, lv_anim_enable_
 
     /*In infinite mode interpret the new ID relative to the currently visible "page"*/
     if(ext->mode == LV_ROLLER_MODE_INIFINITE) {
+        int32_t sel_opt_signed = sel_opt;
         uint16_t page = ext->sel_opt_id / LV_ROLLER_INF_PAGES;
-        sel_opt = page * LV_ROLLER_INF_PAGES + sel_opt;
+
+        /* `sel_opt` should be less than the number of options set by the user.
+         * If it's more then probably it's a reference from not the first page
+         * so normalize `sel_opt` */
+        if(page != 0) {
+            sel_opt_signed -= page * LV_ROLLER_INF_PAGES;
+        }
+
+        sel_opt = page * LV_ROLLER_INF_PAGES + sel_opt_signed;
     }
 
     ext->sel_opt_id     = sel_opt < ext->option_cnt ? sel_opt : ext->option_cnt - 1;
@@ -554,6 +564,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
             if(ext->sel_opt_id > 0) {
                 uint16_t ori_id = ext->sel_opt_id_ori; /*lv_roller_set_selceted will overwrite this*/
+
                 lv_roller_set_selected(roller, ext->sel_opt_id - 1, true);
                 ext->sel_opt_id_ori = ori_id;
             }
@@ -770,11 +781,6 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
 }
 
 
-/**
- * Called when a drop down list is released to open it or set new option
- * @param ddlist pointer to a drop down list object
- * @return LV_ACTION_RES_INV if the ddlist it deleted in the user callback else LV_ACTION_RES_OK
- */
 static lv_res_t release_handler(lv_obj_t * roller)
 {
 
