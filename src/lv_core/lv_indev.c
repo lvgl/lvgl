@@ -1092,8 +1092,9 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 static void indev_click_focus(lv_indev_proc_t * proc)
 {
     /*Handle click focus*/
+    lv_obj_t * obj_to_focus = lv_obj_get_focused_obj(indev_obj_act);
     if(lv_obj_is_protected(indev_obj_act, LV_PROTECT_CLICK_FOCUS) == false &&
-       proc->types.pointer.last_pressed != indev_obj_act) {
+       proc->types.pointer.last_pressed != obj_to_focus) {
 #if LV_USE_GROUP
         lv_group_t * g_act = lv_obj_get_group(indev_obj_act);
         lv_group_t * g_prev = proc->types.pointer.last_pressed ? lv_obj_get_group(proc->types.pointer.last_pressed) : NULL;
@@ -1172,7 +1173,7 @@ static void indev_click_focus(lv_indev_proc_t * proc)
         lv_event_send(indev_obj_act, LV_EVENT_FOCUSED, NULL);
         if(indev_reset_check(proc)) return;
 #endif
-        proc->types.pointer.last_pressed = indev_obj_act;
+        proc->types.pointer.last_pressed = obj_to_focus;
     }
 
 }
