@@ -15,7 +15,7 @@ LVGL provides everything you need to create embedded GUI with easy-to-use graphi
 <h4 align="center">
 <a href="https://lvgl.io">Website </a> &middot; 
 <a href="https://lvgl.io/demos">Live demo</a> &middot; 
-<a href="https://docs.littlevgl.com/v7/en/html/get-started/pc-simulator.html">Simulator</a> &middot; 
+<a href="https://docs.lvgl.io/v7/en/html/get-started/pc-simulator.html">Simulator</a> &middot; 
 <a href="https://forum.lvgl.io">Forum</a> &middot; 
 <a href="https://docs.lvgl.io/">Docs</a> &middot;
 <a href="https://blog.lvgl.io/">Blog</a>
@@ -81,7 +81,7 @@ Choose a project with your favourite IDE:
 
 |   Eclipse   |  CodeBlocks | Visual Studio | PlatformIO | Qt Creator |
 |-------------|-------------|---------------|-----------|------------|
-|  [![Eclipse](https://littlevgl.com/logo/ide/eclipse.jpg)](https://github.com/lvgl/pc_simulator_sdl_eclipse) | [![CodeBlocks](https://littlevgl.com/logo/ide/codeblocks.jpg)](https://github.com/lvgl/pc_simulator_win_codeblocks) | [![VisualStudio](https://littlevgl.com/logo/ide/visualstudio.jpg)](https://github.com/lvgl/visual_studio_2017_sdl_x64)   |   [![PlatformIO](https://littlevgl.com/logo/ide/platformio.jpg)](https://github.com/lvgl/pc_simulator_sdl_platformio) | [![QtCreator](https://littlevgl.com/logo/ide/qtcreator.jpg)](https://blog.lvgl.io/2019-01-03/qt-creator) |
+|  [![Eclipse](https://lvgl.io/public/assets/others/eclipse.jpg)](https://github.com/lvgl/pc_simulator_sdl_eclipse) | [![CodeBlocks](https://lvgl.io/public/assets/others/codeblocks.jpg)](https://github.com/lvgl/pc_simulator_win_codeblocks) | [![VisualStudio](https://lvgl.io/public/assets/others/visualstudio.jpg)](https://github.com/lvgl/visual_studio_2017_sdl_x64)   |   [![PlatformIO](https://lvgl.io/public/assets/others/platformio.jpg)](https://github.com/lvgl/pc_simulator_sdl_platformio) | [![QtCreator](https://lvgl.io/public/assets/others/qtcreator.jpg)](https://blog.lvgl.io/2019-01-03/qt-creator) |
 | Cross-platform<br>with SDL<br>(Recommended on<br>Linux and Mac) | Native Windows | Windows<br>with SDL | Cross-platform<br>with SDL | Cross-platform<br>with SDL |
 
 
