@@ -81,7 +81,7 @@ Choose a project with your favourite IDE:
 
 |   Eclipse   |  CodeBlocks | Visual Studio | PlatformIO | Qt Creator |
 |-------------|-------------|---------------|-----------|------------|
-|  [![Eclipse](https://lvgl.io/public/assets/others/eclipse.jpg)](https://github.com/lvgl/pc_simulator_sdl_eclipse) | [![CodeBlocks](https://lvgl.io/public/assets/others/codeblocks.jpg)](https://github.com/lvgl/pc_simulator_win_codeblocks) | [![VisualStudio](https://lvgl.io/public/assets/others/visualstudio.jpg)](https://github.com/lvgl/visual_studio_2017_sdl_x64)   |   [![PlatformIO](https://lvgl.io/public/assets/others/platformio.jpg)](https://github.com/lvgl/pc_simulator_sdl_platformio) | [![QtCreator](https://lvgl.io/public/assets/others/qtcreator.jpg)](https://blog.lvgl.io/2019-01-03/qt-creator) |
+|  [![Eclipse](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//eclipse.jpg)](https://github.com/lvgl/pc_simulator_sdl_eclipse) | [![CodeBlocks](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//codeblocks.jpg)](https://github.com/lvgl/pc_simulator_win_codeblocks) | [![VisualStudio](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//visualstudio.jpg)](https://github.com/lvgl/visual_studio_2017_sdl_x64)   |   [![PlatformIO](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//platformio.jpg)](https://github.com/lvgl/pc_simulator_sdl_platformio) | [![QtCreator](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//qtcreator.jpg)](https://blog.lvgl.io/2019-01-03/qt-creator) |
 | Cross-platform<br>with SDL<br>(Recommended on<br>Linux and Mac) | Native Windows | Windows<br>with SDL | Cross-platform<br>with SDL | Cross-platform<br>with SDL |
 
 
