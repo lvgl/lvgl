@@ -364,6 +364,15 @@ void lv_canvas_transform(lv_obj_t * canvas, lv_img_dsc_t * img, int16_t angle, u
 
     lv_obj_invalidate(canvas);
 #else
+    LV_UNUSED(canvas);
+    LV_UNUSED(img);
+    LV_UNUSED(angle);
+    LV_UNUSED(zoom);
+    LV_UNUSED(offset_x);
+    LV_UNUSED(offset_y);
+    LV_UNUSED(pivot_x);
+    LV_UNUSED(pivot_y);
+    LV_UNUSED(antialias);
     LV_LOG_WARN("LV_USE_IMG_TRANSFORM is disabled in lv_conf.h");
 #endif
 }
@@ -1009,7 +1018,7 @@ void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32
     lv_disp_t * refr_ori = _lv_refr_get_disp_refreshing();
     _lv_refr_set_disp_refreshing(&disp);
 
-    //    lv_draw_polygon(points, point_cnt, &mask, poly_draw_dsc);
+    lv_draw_polygon(points, point_cnt, &mask, poly_draw_dsc);
 
     _lv_refr_set_disp_refreshing(refr_ori);
 

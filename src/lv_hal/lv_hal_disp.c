@@ -257,6 +257,7 @@ lv_coord_t lv_disp_get_ver_res(lv_disp_t * disp)
 bool lv_disp_get_antialiasing(lv_disp_t * disp)
 {
 #if LV_ANTIALIAS == 0
+    LV_UNUSED(disp);
     return false;
 #else
     if(disp == NULL) disp = lv_disp_get_default();
@@ -271,7 +272,7 @@ bool lv_disp_get_antialiasing(lv_disp_t * disp)
  * @param disp pointer to a display (NULL to use the default display)
  * @return dpi of the display
  */
-uint32_t lv_disp_get_dpi(lv_disp_t * disp)
+lv_coord_t lv_disp_get_dpi(lv_disp_t * disp)
 {
     if(disp == NULL) disp = lv_disp_get_default();
     if(disp == NULL) return LV_DPI;  /*Do not return 0 because it might be a divider*/

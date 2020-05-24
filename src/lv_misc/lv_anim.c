@@ -224,6 +224,8 @@ void lv_anim_refr_now(void)
  */
 lv_anim_value_t lv_anim_path_linear(const lv_anim_path_t * path, const lv_anim_t * a)
 {
+    LV_UNUSED(path);
+
     /*Calculate the current step*/
     uint32_t step;
     if(a->time == a->act_time) {
@@ -250,6 +252,8 @@ lv_anim_value_t lv_anim_path_linear(const lv_anim_path_t * path, const lv_anim_t
  */
 lv_anim_value_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_t * a)
 {
+    LV_UNUSED(path);
+
     /*Calculate the current step*/
     uint32_t t;
     if(a->time == a->act_time)
@@ -274,6 +278,8 @@ lv_anim_value_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_
  */
 lv_anim_value_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim_t * a)
 {
+    LV_UNUSED(path);
+
     /*Calculate the current step*/
 
     uint32_t t;
@@ -299,6 +305,8 @@ lv_anim_value_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim
  */
 lv_anim_value_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_anim_t * a)
 {
+    LV_UNUSED(path);
+
     /*Calculate the current step*/
 
     uint32_t t;
@@ -324,6 +332,8 @@ lv_anim_value_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_a
  */
 lv_anim_value_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_anim_t * a)
 {
+    LV_UNUSED(path);
+
     /*Calculate the current step*/
 
     uint32_t t;
@@ -350,6 +360,8 @@ lv_anim_value_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_ani
  */
 lv_anim_value_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t * a)
 {
+    LV_UNUSED(path);
+
     /*Calculate the current step*/
     uint32_t t;
     if(a->time == a->act_time)
@@ -412,6 +424,8 @@ lv_anim_value_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t
  */
 lv_anim_value_t lv_anim_path_step(const lv_anim_path_t * path, const lv_anim_t * a)
 {
+    LV_UNUSED(path);
+
     if(a->act_time >= a->time)
         return a->end;
     else

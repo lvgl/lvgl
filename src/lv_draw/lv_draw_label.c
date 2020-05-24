@@ -758,7 +758,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
             }
 
             /*Go to the next column*/
-            if(col_bit < 8 - bpp) {
+            if(col_bit < (int32_t) (8 - bpp)) {
                 col_bit += bpp;
                 bitmask = bitmask >> bpp;
             }
@@ -778,7 +778,7 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
             }
         }
 
-        if((uint32_t) mask_p + (col_end - col_start) < mask_buf_size) {
+        if((int32_t) mask_p + (col_end - col_start) < mask_buf_size) {
             map_area.y2 ++;
         }
         else {

@@ -112,6 +112,9 @@ void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect
  */
 void lv_draw_px(const lv_point_t * point, const lv_area_t * clip_area, const lv_style_t * style)
 {
+    LV_UNUSED(point);
+    LV_UNUSED(clip_area);
+    LV_UNUSED(style);
     //    lv_opa_t opa = style->body.opa;
     //    if(opa_scale != LV_OPA_COVER) opa = (opa * opa_scale) >> 8;
     //
@@ -811,7 +814,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     /*Invert the shadow corner buffer and draw the corners on the left*/
     sh_buf_tmp = sh_buf ;
     for(y = 0; y < corner_size; y++) {
-        uint32_t x;
+        int32_t x;
         for(x = 0; x < corner_size / 2; x++) {
             lv_opa_t tmp = sh_buf_tmp[x];
             sh_buf_tmp[x] = sh_buf_tmp[corner_size - x - 1];

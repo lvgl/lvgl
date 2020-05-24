@@ -163,6 +163,7 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value, lv_anim_enable_t anim)
 
     if(ext->cur_value == new_value) return;
 #if LV_USE_ANIMATION == 0
+    LV_UNUSED(anim);
     ext->cur_value = new_value;
     lv_obj_invalidate(bar);
 #else
@@ -189,6 +190,7 @@ void lv_bar_set_start_value(lv_obj_t * bar, int16_t start_value, lv_anim_enable_
 
     if(ext->start_value == new_value) return;
 #if LV_USE_ANIMATION == 0
+    LV_UNUSED(anim);
     ext->start_value = new_value;
 #else
     lv_bar_set_value_with_anim(bar, new_value, &ext->start_value, &ext->start_value_anim, anim);

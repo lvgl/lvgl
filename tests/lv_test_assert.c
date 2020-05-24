@@ -48,9 +48,9 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static void read_png_file(png_img_t * p, const char* file_name);
-static void write_png_file(png_img_t * p, const char* file_name);
+//static void write_png_file(png_img_t * p, const char* file_name);
 static void png_release(png_img_t * p);
-static void process_file(png_img_t * p);
+//static void process_file(png_img_t * p);
 
 /**********************
  *  STATIC VARIABLES
@@ -254,59 +254,59 @@ static void read_png_file(png_img_t * p, const char* file_name)
 
     fclose(fp);
 }
-
-
-static void write_png_file(png_img_t * p, const char* file_name)
-{
-    /* create file */
-    FILE *fp = fopen(file_name, "wb");
-    if (!fp)
-        lv_test_exit("[write_png_file] File %s could not be opened for writing", file_name);
-
-
-    /* initialize stuff */
-    p->png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-
-    if (!p->png_ptr)
-        lv_test_exit("[write_png_file] png_create_write_struct failed");
-
-    p->info_ptr = png_create_info_struct(p->png_ptr);
-    if (!p->info_ptr)
-        lv_test_exit("[write_png_file] png_create_info_struct failed");
-
-    if (setjmp(png_jmpbuf(p->png_ptr)))
-        lv_test_exit("[write_png_file] Error during init_io");
-
-    png_init_io(p->png_ptr, fp);
-
-
-    /* write header */
-    if (setjmp(png_jmpbuf(p->png_ptr)))
-        lv_test_exit("[write_png_file] Error during writing header");
-
-    png_set_IHDR(p->png_ptr, p->info_ptr, p->width, p->height,
-            p->bit_depth, p->color_type, PNG_INTERLACE_NONE,
-            PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
-
-    png_write_info(p->png_ptr, p->info_ptr);
-
-
-    /* write bytes */
-    if (setjmp(png_jmpbuf(p->png_ptr)))
-        lv_test_exit("[write_png_file] Error during writing bytes");
-
-    png_write_image(p->png_ptr, p->row_pointers);
-
-
-    /* end write */
-    if (setjmp(png_jmpbuf(p->png_ptr)))
-        lv_test_exit("[write_png_file] Error during end of write");
-
-    png_write_end(p->png_ptr, NULL);
-
-    fclose(fp);
-}
-
+//
+//
+//static void write_png_file(png_img_t * p, const char* file_name)
+//{
+//    /* create file */
+//    FILE *fp = fopen(file_name, "wb");
+//    if (!fp)
+//        lv_test_exit("[write_png_file] File %s could not be opened for writing", file_name);
+//
+//
+//    /* initialize stuff */
+//    p->png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+//
+//    if (!p->png_ptr)
+//        lv_test_exit("[write_png_file] png_create_write_struct failed");
+//
+//    p->info_ptr = png_create_info_struct(p->png_ptr);
+//    if (!p->info_ptr)
+//        lv_test_exit("[write_png_file] png_create_info_struct failed");
+//
+//    if (setjmp(png_jmpbuf(p->png_ptr)))
+//        lv_test_exit("[write_png_file] Error during init_io");
+//
+//    png_init_io(p->png_ptr, fp);
+//
+//
+//    /* write header */
+//    if (setjmp(png_jmpbuf(p->png_ptr)))
+//        lv_test_exit("[write_png_file] Error during writing header");
+//
+//    png_set_IHDR(p->png_ptr, p->info_ptr, p->width, p->height,
+//            p->bit_depth, p->color_type, PNG_INTERLACE_NONE,
+//            PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+//
+//    png_write_info(p->png_ptr, p->info_ptr);
+//
+//
+//    /* write bytes */
+//    if (setjmp(png_jmpbuf(p->png_ptr)))
+//        lv_test_exit("[write_png_file] Error during writing bytes");
+//
+//    png_write_image(p->png_ptr, p->row_pointers);
+//
+//
+//    /* end write */
+//    if (setjmp(png_jmpbuf(p->png_ptr)))
+//        lv_test_exit("[write_png_file] Error during end of write");
+//
+//    png_write_end(p->png_ptr, NULL);
+//
+//    fclose(fp);
+//}
+//
 static void png_release(png_img_t * p)
 {
     int y;
@@ -314,30 +314,30 @@ static void png_release(png_img_t * p)
           free(p->row_pointers[y]);
       free(p->row_pointers);
 }
-
-static void process_file(png_img_t * p)
-{
-    if (png_get_color_type(p->png_ptr, p->info_ptr) == PNG_COLOR_TYPE_RGB)
-        lv_test_exit("[process_file] input file is PNG_COLOR_TYPE_RGB but must be PNG_COLOR_TYPE_RGBA "
-                "(lacks the alpha channel)");
-
-    if (png_get_color_type(p->png_ptr, p->info_ptr) != PNG_COLOR_TYPE_RGBA)
-        lv_test_exit("[process_file] color_type of input file must be PNG_COLOR_TYPE_RGBA (%d) (is %d)",
-                PNG_COLOR_TYPE_RGBA, png_get_color_type(p->png_ptr, p->info_ptr));
-
-    int x, y;
-    for (y=0; y<p->height; y++) {
-        png_byte* row = p->row_pointers[y];
-        for (x=0; x<p->width; x++) {
-            png_byte* ptr = &(row[x*4]);
-            printf("Pixel at position [ %d - %d ] has RGBA values: %d - %d - %d - %d\n",
-                    x, y, ptr[0], ptr[1], ptr[2], ptr[3]);
-
-            /* set red value to 0 and green value to the blue one */
-            ptr[0] = 0;
-            ptr[1] = ptr[2];
-        }
-    }
-}
+//
+//static void process_file(png_img_t * p)
+//{
+//    if (png_get_color_type(p->png_ptr, p->info_ptr) == PNG_COLOR_TYPE_RGB)
+//        lv_test_exit("[process_file] input file is PNG_COLOR_TYPE_RGB but must be PNG_COLOR_TYPE_RGBA "
+//                "(lacks the alpha channel)");
+//
+//    if (png_get_color_type(p->png_ptr, p->info_ptr) != PNG_COLOR_TYPE_RGBA)
+//        lv_test_exit("[process_file] color_type of input file must be PNG_COLOR_TYPE_RGBA (%d) (is %d)",
+//                PNG_COLOR_TYPE_RGBA, png_get_color_type(p->png_ptr, p->info_ptr));
+//
+//    int x, y;
+//    for (y=0; y<p->height; y++) {
+//        png_byte* row = p->row_pointers[y];
+//        for (x=0; x<p->width; x++) {
+//            png_byte* ptr = &(row[x*4]);
+//            printf("Pixel at position [ %d - %d ] has RGBA values: %d - %d - %d - %d\n",
+//                    x, y, ptr[0], ptr[1], ptr[2], ptr[3]);
+//
+//            /* set red value to 0 and green value to the blue one */
+//            ptr[0] = 0;
+//            ptr[1] = ptr[2];
+//        }
+//    }
+//}
 #endif
 

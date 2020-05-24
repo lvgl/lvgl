@@ -188,7 +188,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
             if(dashed) {
                 if(mask_res != LV_DRAW_MASK_RES_TRANSP) {
                     lv_style_int_t dash_cnt = dash_start;
-                    uint32_t i;
+                    lv_coord_t i;
                     for(i = 0; i < draw_area_w; i++, dash_cnt++) {
                         if(dash_cnt <= dsc->dash_width) {
                             int16_t diff = dsc->dash_width - dash_cnt;

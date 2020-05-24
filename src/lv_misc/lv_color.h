@@ -459,6 +459,7 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_premult(lv_color_t c, uint8_t 
     out[1] = (uint16_t) LV_COLOR_GET_G(c) * mix;
     out[2] = (uint16_t) LV_COLOR_GET_B(c) * mix;
 #else
+    (void) mix;
     /*Pre-multiplication can't be used with 1 bpp*/
     out[0] = LV_COLOR_GET_R(c);
     out[1] = LV_COLOR_GET_G(c);
