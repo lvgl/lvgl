@@ -6,10 +6,10 @@ LVGL_DIR ?= ${shell pwd}/../..
 LVGL_DIR_NAME ?= lvgl
 
 WARNINGS = -Werror -Wall -Wextra \
-						-Wshadow -Wundef -Wmaybe-uninitialized -Wmissing-prototypes -Wpointer-arith -Wuninitialized \
-					 -Wunreachable-code -Wreturn-type -Wmultichar -Wformat-security -Wdouble-promotion -Wclobbered -Wdeprecated  \
-						-Wempty-body -Wshift-negative-value -Wstack-usage=2048 \
-            -Wtype-limits -Wsizeof-pointer-memaccess
+           -Wshadow -Wundef -Wmaybe-uninitialized -Wmissing-prototypes -Wpointer-arith -Wuninitialized \
+           -Wunreachable-code -Wreturn-type -Wmultichar -Wformat-security -Wdouble-promotion -Wclobbered -Wdeprecated  \
+           -Wempty-body -Wshift-negative-value -Wstack-usage=2048 \
+           -Wtype-limits -Wsizeof-pointer-memaccess
 
 #-Wno-unused-value -Wno-unused-parameter 
 OPTIMIZATION ?= -O3 -g0
