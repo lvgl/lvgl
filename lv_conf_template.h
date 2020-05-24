@@ -25,7 +25,7 @@
 
 /* Color depth:
  * - 1:  1 byte per pixel
- * - 8:  RGB233
+ * - 8:  RGB332
  * - 16: RGB565
  * - 32: ARGB8888
  */
