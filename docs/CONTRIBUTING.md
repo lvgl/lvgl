@@ -37,7 +37,7 @@ We have some simple rules:
 
 ## How to send a pull request?
 
-Merging new code into LVGL, documentation, blog, and examples happens via *Pull requests*. If you are still not familiar with  Pull Requests (PR for short) here is a short guide. It's about the `lvgl` repository but world the same for other repositories too.
+Merging new code into LVGL, documentation, blog, and examples happens via *Pull requests*. If you are still not familiar with  Pull Requests (PR for short) here is a short guide. It's about the `lvgl` repository but it works the same way for other repositories too.
 1. **Fork** the [lvgl repository](https://github.com/lvgl/lvgl). To do this click the "Fork" button in the top right corner. It will "copy" the `lvgl` repository to your GitHub account (`https://github.com/your_name?tab=repositories`)
 2. **Clone**  the forked repository and add your changes
 3. **Create a PR** on GitHub from the page of your `lvgl` repository (`https://github.com/your_name/lvgl`) by hitting the "New pull request" button 
