@@ -112,6 +112,6 @@ If you implemented a new feature it's important to record it in the documentatio
 - Go to the [docs](https://github.com/lvgl/docs/tree/master/v7/en) repository and update the relevant part of the English documentation.
 - Go to the [examples](https://github.com/lvgl/lv_examples) repository and add a new file about the new feature in the related directory. 
 
-# Summary
+## Summary
 
 I hope you have taken a liking to contribute to LVGL. A helpful and friendly community is waiting for you! :) 
