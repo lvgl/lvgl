@@ -10,8 +10,8 @@ See how can you help to improve the graphics library and help others!**
 - [Help others in the Forum](help-others-in-the-forum)
 - [Improve or translate the documentation](#improve-or-translate-the-documentation)
 - [Write a blog post](#write-a-blog-post)
-- [Report or fixing bugs](#report-or-fixing-bugs)
-- [Suggest or implementing new features](#suggest-or-implementing-new-features)
+- [Report or fix bugs](#report-or-fix-bugs)
+- [Suggest or implement new features](#suggest-or-implement-new-features)
 - [Summary](#summary)
 
 
@@ -87,7 +87,7 @@ Note that a translation will be added to the documentation only if the following
 
 ## Write a blog post
 
-Have you ported LVGL to a new platform? Have you created a fancy GUI? Do you know a great trick? 
+Have you ported LVGL to a new platform or created a fancy GUI? Do you know a great trick? 
 You can share your knowledge on LVGL's blog! It's super easy to add your own post:
 - Fork and clone the [blog repository](https://github.com/lvgl/blog)
 - Add your post in Markdown to the `_posts` folder. 
@@ -96,10 +96,10 @@ You can share your knowledge on LVGL's blog! It's super easy to add your own pos
 
 The blog uses [Jekyll](https://jekyllrb.com/) to convert the `.md` files to a webpage. You can easily [run Jekyll offline](https://jekyllrb.com/docs/) to check your post before creating the Pull request
 
-## Report or fixing bugs
+## Report or fix bugs
 For simple bugfixes (typos, missing error handling, fixing a warning) it's fine to send a Pull request directly. However, for more complex bugs it's better to open an issue first. In the issue, you should describe how to reproduce the bug and add the minimal code snippet.
 
-## Suggest or implementing new features
+## Suggest or implement new features
 If you have a good idea don't hesitate to share with us. It's even better if you have time to deal with its implementation. Don't be afraid if you still don't know LVGL well enough. We will help you to get started. 
 
 To share your ideas use [Feature request](https://forum.lvgl.io/c/feature-request/9) category of the forum.
