@@ -60,7 +60,7 @@ Basically, every modern controller  (which is able to drive a display( is suitab
   - Dynamic data (heap): &gt; 2 KB (&gt; 16 kB is recommended if using several objects).
     Set by `LV_MEM_SIZE` in *lv_conf.h*. 
   - Display buffer:  &gt; *"Horizontal resolution"* pixels (&gt; 10 &times; *"Horizontal resolution"* is recommended) 
--  C99 or newer compiler
+- C99 or newer compiler
 
 *Note that the memory usage might vary depending on the architecture, compiler and build options.*
 
