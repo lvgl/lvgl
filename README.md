@@ -37,7 +37,7 @@ LVGL provides everything you need to create embedded GUI with easy-to-use graphi
 * **Advanced graphics** with animations, anti-aliasing, opacity, smooth scrolling
 * **Simultaneously use various input devices** touchscreen, mouse, keyboard, encoder, buttons, etc.
 * **Simultaneously use multiple displays** i.e. monochrome and color display
-* **Multi-language support** with UTF-8 encoding
+* **Multi-language support** with UTF-8 encoding, Bidirectional support, and Arabic text handling
 * **Fully customizable** graphical elements
 * **Hardware independent** to use with any microcontroller or display
 * **Scalable** to operate with little memory (64 kB Flash, 10 kB RAM)
@@ -50,14 +50,14 @@ LVGL provides everything you need to create embedded GUI with easy-to-use graphi
 * **Documentation** and API references
 
 ## Supported devices
-Basically, every modern controller - which is able to drive a display - is suitable to run LVGL. The minimal requirements:
+Basically, every modern controller  (which is able to drive a display( is suitable to run LVGL. The minimal requirements are:
 - 16, 32 or 64 bit microcontroller or processor
 - &gt; 16 MHz clock speed is recommended
 - Flash/ROM: &gt; 64 kB for the very essential components (&gt; 180 kB is recommended)
 - RAM: 
-  - Static RAM usage: ~8..16 kB depending on the used features and objects types
-  - Stack: &gt; 2kB (&gt; 4 kB is recommended)
-  - Dynamic data (heap): &gt; 4 KB (&gt; 16 kB is recommended if using several objects).
+  - Static RAM usage: ~2 kB depending on the used features and objects types
+  - Stack: &gt; 2kB (&gt; 8 kB is recommended)
+  - Dynamic data (heap): &gt; 2 KB (&gt; 16 kB is recommended if using several objects).
     Set by `LV_MEM_SIZE` in *lv_conf.h*. 
   - Display buffer:  &gt; *"Horizontal resolution"* pixels (&gt; 10 &times; *"Horizontal resolution"* is recommended) 
 -  C99 or newer compiler
