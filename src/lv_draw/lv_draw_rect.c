@@ -701,7 +701,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
 
     lv_area_t ca;
     bool has_com = _lv_area_intersect(&ca, &a, clip);
-    if(has_com) {
+    if(has_com && _lv_area_is_in(&a, &bg_coords, r_bg) == false) {
         /*Avoid overlap in the middle with large radius*/
         if(ca.y2 > h_half) ca.y2 = h_half;
         if(ca.x1 <= w_half) ca.x1 = w_half + 1;
@@ -737,7 +737,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     a.y2 = sh_area.y2;
 
     has_com = _lv_area_intersect(&ca, &a, clip);
-    if(has_com) {
+    if(has_com && _lv_area_is_in(&a, &bg_coords, r_bg) == false) {
         /*Avoid overlap in the middle with large radius*/
         if(ca.y1 <= h_half) ca.y1 = h_half + 1;
         if(ca.x1 <= w_half) ca.x1 = w_half + 1;
@@ -774,7 +774,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     a.y2 = sh_area.y2 - corner_size;
 
     has_com = _lv_area_intersect(&ca, &a, clip);
-    if(has_com) {
+    if(has_com && _lv_area_is_in(&a, &bg_coords, r_bg) == false) {
         if(simple_mode) ca.x1 = LV_MATH_MAX(ca.x1, coords->x2);
         /*Draw horizontal lines*/
         lv_coord_t w = lv_area_get_width(&ca);
@@ -827,7 +827,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     a.y2 = a.y1 + corner_size - 1;
 
     has_com = _lv_area_intersect(&ca, &a, clip);
-    if(has_com) {
+    if(has_com && _lv_area_is_in(&a, &bg_coords, r_bg) == false) {
         /*Avoid overlap in the middle with large radius*/
         if(ca.y2 > h_half) ca.y2 = h_half;
         if(ca.x2 > w_half) ca.x2 = w_half;
@@ -863,7 +863,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     a.y2 = sh_area.y2;
 
     has_com = _lv_area_intersect(&ca, &a, clip);
-    if(has_com) {
+    if(has_com && _lv_area_is_in(&a, &bg_coords, r_bg) == false) {
         /*Avoid overlap in the middle with large radius*/
         if(ca.y1 <= h_half) ca.y1 = h_half + 1;
         if(ca.x2 > w_half) ca.x2 = w_half;
@@ -899,8 +899,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     a.y2 = sh_area.y2 - corner_size;
 
     has_com = _lv_area_intersect(&ca, &a, clip);
-    if(has_com) {
-
+    if(has_com && _lv_area_is_in(&a, &bg_coords, r_bg) == false) {
         if(simple_mode) ca.x2 = LV_MATH_MIN(coords->x1, ca.x2);
         /*Draw vertical lines*/
         lv_coord_t w = lv_area_get_width(&ca);
@@ -938,7 +937,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     a.y2 = sh_area.y1 + corner_size - 1;
 
     has_com = _lv_area_intersect(&ca, &a, clip);
-    if(has_com) {
+    if(has_com && _lv_area_is_in(&a, &bg_coords, r_bg) == false) {
         if(simple_mode) ca.y2 = LV_MATH_MIN(ca.y2, coords->y1);
         /*Draw horizontal lines*/
         lv_coord_t w = lv_area_get_width(&ca);
@@ -980,7 +979,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     a.y2 = sh_area.y2;
 
     has_com = _lv_area_intersect(&ca, &a, clip);
-    if(has_com) {
+    if(has_com && _lv_area_is_in(&a, &bg_coords, r_bg) == false) {
         if(simple_mode) ca.y1 = LV_MATH_MAX(ca.y1, coords->y2);
         /*Draw horizontal lines*/
         lv_coord_t w = lv_area_get_width(&ca);
@@ -1019,7 +1018,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
     a.y2 = sh_area.y2 - corner_size;
 
     has_com = _lv_area_intersect(&ca, &a, clip);
-    if(has_com && simple_mode == false) {
+    if(has_com && simple_mode == false &&  _lv_area_is_in(&a, &bg_coords, r_bg) == false) {
         /*Draw horizontal lines*/
         lv_coord_t w = lv_area_get_width(&ca);
         lv_coord_t h = lv_area_get_height(&ca);
@@ -1033,7 +1032,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
             if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
 
             _lv_blend_fill(clip, &fa, dsc->shadow_color, mask_buf,
-                           mask_res, LV_OPA_COVER, dsc->shadow_blend_mode);
+                    mask_res, LV_OPA_COVER, dsc->shadow_blend_mode);
             fa.y1++;
             fa.y2++;
         }
