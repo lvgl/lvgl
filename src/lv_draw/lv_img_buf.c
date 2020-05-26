@@ -523,6 +523,9 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
     res->y1 = LV_MATH_MIN4(lb.y, lt.y, rb.y, rt.y);
     res->y2 = LV_MATH_MAX4(lb.y, lt.y, rb.y, rt.y);
 #else
+    LV_UNUSED(angle);
+    LV_UNUSED(zoom);
+    LV_UNUSED(pivot);
     res->x1 = 0;
     res->y1 = 0;
     res->x2 = w;

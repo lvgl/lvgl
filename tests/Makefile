@@ -5,13 +5,11 @@ CC ?= gcc
 LVGL_DIR ?= ${shell pwd}/../..
 LVGL_DIR_NAME ?= lvgl
 
-WARNINGS ?= -Werror -Wall -Wextra \
-						-Wshadow -Wundef -Wmaybe-uninitialized -Wmissing-prototypes -Wno-discarded-qualifiers \
-						-Wno-unused-function -Wno-error=strict-prototypes -Wpointer-arith -fno-strict-aliasing -Wno-error=cpp -Wuninitialized \
-						-Wno-unused-parameter -Wno-missing-field-initializers -Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default  \
-					  -Wreturn-type -Wmultichar -Wformat-security -Wno-ignored-qualifiers -Wno-error=pedantic -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated  \
-						-Wempty-body -Wshift-negative-value -Wstack-usage=2048 \
-            -Wtype-limits -Wsizeof-pointer-memaccess -Wpointer-arith
+WARNINGS = -Werror -Wall -Wextra \
+           -Wshadow -Wundef -Wmaybe-uninitialized -Wmissing-prototypes -Wpointer-arith -Wuninitialized \
+           -Wunreachable-code -Wreturn-type -Wmultichar -Wformat-security -Wdouble-promotion -Wclobbered -Wdeprecated  \
+           -Wempty-body -Wshift-negative-value -Wstack-usage=2048 \
+           -Wtype-limits -Wsizeof-pointer-memaccess
 
 #-Wno-unused-value -Wno-unused-parameter 
 OPTIMIZATION ?= -O3 -g0

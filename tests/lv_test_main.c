@@ -40,6 +40,8 @@ static void hal_init(void)
 
 static void dummy_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
+    LV_UNUSED(area);
+    LV_UNUSED(color_p);
     lv_disp_flush_ready(disp_drv);
 }
 

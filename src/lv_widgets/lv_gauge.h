@@ -246,7 +246,7 @@ static inline uint16_t lv_gauge_get_angle_offset(lv_obj_t * gauge)
  * @return pointer to an `lv_img_dsc_t` variable or a path to an image
  *        (not an `lv_img` object). `NULL` if not used.
  */
-const void * lv_gauge_get_needle_img(lv_obj_t * gauge, const void * img, lv_coord_t pivot_x, lv_coord_t pivot_y);
+const void * lv_gauge_get_needle_img(lv_obj_t * gauge);
 
 /**
  * Get the X coordinate of the rotation center of the needle image

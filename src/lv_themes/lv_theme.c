@@ -99,6 +99,15 @@ lv_color_t lv_theme_get_color_primary(void)
 }
 
 /**
+ * Get the secondary color of the theme
+ * @return the color
+ */
+lv_color_t lv_theme_get_color_secondary(void)
+{
+    return act_theme->color_secondary;
+}
+
+/**
  * Get the flags of the theme
  * @return the flags
  */

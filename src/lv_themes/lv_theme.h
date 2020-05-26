@@ -209,6 +209,12 @@ const lv_font_t * lv_theme_get_font_title(void);
 lv_color_t lv_theme_get_color_primary(void);
 
 /**
+ * Get the secondary color of the theme
+ * @return the color
+ */
+lv_color_t lv_theme_get_color_secondary(void);
+
+/**
  * Get the flags of the theme
  * @return the flags
  */

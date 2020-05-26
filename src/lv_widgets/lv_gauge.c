@@ -359,7 +359,7 @@ uint8_t lv_gauge_get_label_count(const lv_obj_t * gauge)
  * @return pointer to an `lv_img_dsc_t` variable or a path to an image
  *        (not an `lv_img` object). `NULL` if not used.
  */
-const void * lv_gauge_get_needle_img(lv_obj_t * gauge, const void * img, lv_coord_t pivot_x, lv_coord_t pivot_y)
+const void * lv_gauge_get_needle_img(lv_obj_t * gauge)
 {
     LV_ASSERT_OBJ(gauge, LV_OBJX_NAME);
 

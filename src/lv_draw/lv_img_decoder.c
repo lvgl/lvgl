@@ -568,6 +568,11 @@ static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * d
 
     return LV_RES_OK;
 #else
+    LV_UNUSED(dsc);
+    LV_UNUSED(x);
+    LV_UNUSED(y);
+    LV_UNUSED(len);
+    LV_UNUSED(buf);
     LV_LOG_WARN("Image built-in decoder cannot read file because LV_USE_FILESYSTEM = 0");
     return LV_RES_INV;
 #endif

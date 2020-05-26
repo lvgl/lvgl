@@ -654,7 +654,8 @@ void lv_page_start_edge_flash(lv_obj_t * page, lv_page_edge_t edge)
     }
 
 #else
-    (void)page; /*Unused*/
+    LV_UNUSED(page);
+    LV_UNUSED(edge);
 #endif
 }
 

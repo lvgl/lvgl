@@ -83,7 +83,7 @@ typedef struct _lv_anim_t {
     lv_anim_path_t path;         /**< Describe the path (curve) of animations*/
     int32_t start;               /**< Start value*/
     int32_t end;                 /**< End value*/
-    uint32_t time;               /**< Animation time in ms*/
+    int32_t time;               /**< Animation time in ms*/
     int32_t act_time;            /**< Current time in animation. Set to negative to make delay.*/
     uint32_t playback_delay;     /**< Wait before play back*/
     uint32_t playback_time;      /**< Duration of playback animation*/

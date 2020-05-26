@@ -11,7 +11,7 @@ optimization = '"-O3 -g0"'
 
 
 def build(name, defines):
-  global warnings, base_defines, optimization
+  global base_defines, optimization
 
   print("=============================")
   print(name)
