@@ -1173,7 +1173,9 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
 
         if(p2.y - label_dsc.font->line_height > mask->y2) return;
         if(p2.y + label_dsc.font->line_height < mask->y1) {
-            get_next_axis_label(&iter, buf);
+            if(is_tick_with_label(i, y_axis)) {
+                get_next_axis_label(&iter, buf);
+            }
             continue;
         }
 
