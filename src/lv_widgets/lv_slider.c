@@ -461,13 +461,13 @@ static void lv_slider_position_knob(lv_obj_t * slider, lv_area_t * knob_area, lv
 
     if(hor) {
         knob_area->x1 -= (knob_size >> 1);
-        knob_area->x2 = knob_area->x1 + knob_size;
+        knob_area->x2 = knob_area->x1 + knob_size - 1;
         knob_area->y1 = slider->coords.y1;
         knob_area->y2 = slider->coords.y2;
     }
     else {
         knob_area->y1 -= (knob_size >> 1);
-        knob_area->y2 = knob_area->y1 + knob_size;
+        knob_area->y2 = knob_area->y1 + knob_size - 1;
         knob_area->x1 = slider->coords.x1;
         knob_area->x2 = slider->coords.x2;
     }
