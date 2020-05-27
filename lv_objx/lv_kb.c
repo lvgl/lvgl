@@ -33,24 +33,24 @@ static lv_res_t lv_kb_def_action(lv_obj_t * kb, const char * txt);
 static lv_signal_func_t ancestor_signal;
 
 static const char * kb_map_lc[] = {
-    "\2051#", "\204q", "\204w", "\204e", "\204r", "\204t", "\204y", "\204u", "\204i", "\204o", "\204p", "\207Bksp", "\n",
-    "\226ABC", "\203a", "\203s", "\203d", "\203f", "\203g", "\203h", "\203j", "\203k", "\203l", "\207Enter", "\n",
+    "\204q", "\204w", "\204e", "\204r", "\204t", "\204y", "\204u", "\204i", "\204o", "\204p", "\207DEL", "\n",
+    "\203a", "\203s", "\203d", "\203f", "\203g", "\203h", "\203j", "\203k", "\203l", "\207ENT", "\n",
     "_", "-", "z", "x", "c", "v", "b", "n", "m", ".", ",", ":", "\n",
-    "\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
+    "\2021#", "\206 ", "\202ABC", ""
 };
 
 static const char * kb_map_uc[] = {
-    "\2051#", "\204Q", "\204W", "\204E", "\204R", "\204T", "\204Y", "\204U", "\204I", "\204O", "\204P", "\207Bksp", "\n",
-    "\226abc", "\203A", "\203S", "\203D", "\203F", "\203G", "\203H", "\203J", "\203K", "\203L", "\207Enter", "\n",
+    "\204Q", "\204W", "\204E", "\204R", "\204T", "\204Y", "\204U", "\204I", "\204O", "\204P", "\207DEL", "\n",
+    "\203A", "\203S", "\203D", "\203F", "\203G", "\203H", "\203J", "\203K", "\203L", "\207ENT", "\n",
     "_", "-", "Z", "X", "C", "V", "B", "N", "M", ".", ",", ":", "\n",
-    "\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
+    "\2021#", "\206 ", "\202abc", ""
 };
 
 static const char * kb_map_spec[] = {
-    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "\202Bksp", "\n",
-    "\222abc", "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\n",
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "\202DEL", "\n",
+    "+", "-", "/", "*", "=", "%", "!", "?", "#", "<", ">", "\202ENT", "\n",
     "\\", "@", "$", "(", ")", "{", "}", "[", "]", ";", "\"", "'", "\n",
-    "\202"SYMBOL_CLOSE, "\202"SYMBOL_LEFT, "\206 ", "\202"SYMBOL_RIGHT, "\202"SYMBOL_OK, ""
+    "\202abc", "\206 ", "\202ABC", ""
 };
 
 static const char * kb_map_num[] = {
@@ -420,7 +420,7 @@ static lv_res_t lv_kb_def_action(lv_obj_t * kb, const char * txt)
             lv_obj_del(kb);
         }
         return res;
-    } else if(strcmp(txt, SYMBOL_OK) == 0) {
+    } else if(strcmp(txt, SYMBOL_OK) == 0 || strcmp(txt, "ENT") == 0) {
         if(ext->ok_action) res = ext->ok_action(kb);
         else {
             lv_kb_set_ta(kb, NULL);         /*De-assign the text area to hide it cursor if needed*/
@@ -437,7 +437,7 @@ static lv_res_t lv_kb_def_action(lv_obj_t * kb, const char * txt)
     if(strcmp(txt, "Enter") == 0)lv_ta_add_char(ext->ta, '\n');
     else if(strcmp(txt, SYMBOL_LEFT) == 0) lv_ta_cursor_left(ext->ta);
     else if(strcmp(txt, SYMBOL_RIGHT) == 0) lv_ta_cursor_right(ext->ta);
-    else if(strcmp(txt, "Bksp") == 0)  lv_ta_del_char(ext->ta);
+    else if(strcmp(txt, "Bksp") == 0 || strcmp(txt, "DEL") == 0)  lv_ta_del_char(ext->ta);
     else if(strcmp(txt, "+/-") == 0) {
         uint16_t cur = lv_ta_get_cursor_pos(ext->ta);
         const char * ta_txt = lv_ta_get_text(ext->ta);
