@@ -17,6 +17,7 @@
 #include "../lv_misc/lv_gc.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_font/lv_font_fmt_txt.h"
+#include "../lv_gpu/lv_gpu_stm32_dma2d.h"
 
 #if LV_USE_PERF_MONITOR
     #include "../lv_widgets/lv_label.h"
@@ -210,8 +211,14 @@ void _lv_disp_refr_task(lv_task_t * task)
             /* With true double buffering the flushing should be only the address change of the
              * current frame buffer. Wait until the address change is ready and copy the changed
              * content to the other frame buffer (new active VDB) to keep the buffers synchronized*/
-            while(vdb->flushing)
-                ;
+            while(vdb->flushing);
+
+            lv_color_t * copy_buf = NULL;
+#if LV_USE_GPU_STM32_DMA2D
+            LV_UNUSED(copy_buf);
+#else
+            copy_buf = _lv_mem_buf_get(disp_refr->driver.hor_res * sizeof(lv_color_t));
+#endif
 
             uint8_t * buf_act = (uint8_t *)vdb->buf_act;
             uint8_t * buf_ina = (uint8_t *)vdb->buf_act == vdb->buf1 ? vdb->buf2 : vdb->buf1;
@@ -220,17 +227,30 @@ void _lv_disp_refr_task(lv_task_t * task)
             uint16_t a;
             for(a = 0; a < disp_refr->inv_p; a++) {
                 if(disp_refr->inv_area_joined[a] == 0) {
-                    lv_coord_t y;
                     uint32_t start_offs =
                         (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
+#if LV_USE_GPU_STM32_DMA2D
+                    lv_gpu_stm32_dma2d_copy((lv_color_t *)buf_act + start_offs, disp_refr->driver.hor_res,
+                                            (lv_color_t *)buf_ina + start_offs, disp_refr->driver.hor_res,
+                                            lv_area_get_width(&disp_refr->inv_areas[a]),
+                                            lv_area_get_height(&disp_refr->inv_areas[a]));
+#else
+
+                    lv_coord_t y;
                     uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) * sizeof(lv_color_t);
 
                     for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
-                        _lv_memcpy(buf_act + start_offs, buf_ina + start_offs, line_length);
+                        /* The frame buffer is probably in an external RAM where sequential access is much faster.
+                         * So first copy a line into a buffer and write it back the ext. RAM */
+                        _lv_memcpy(copy_buf, buf_ina + start_offs, line_length);
+                        _lv_memcpy(buf_act + start_offs, copy_buf, line_length);
                         start_offs += hres * sizeof(lv_color_t);
                     }
+#endif
                 }
             }
+
+            if(copy_buf) _lv_mem_buf_release(copy_buf);
         } /*End of true double buffer handling*/
 
         /*Clean up*/
