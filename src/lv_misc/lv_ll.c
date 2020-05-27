@@ -295,14 +295,13 @@ void * _lv_ll_get_tail(const lv_ll_t * ll_p)
  */
 void * _lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
 {
-    void * next = NULL;
+    if(ll_p == NULL) return NULL;
 
-    if(ll_p != NULL) {
-        const lv_ll_node_t * n_act_d = n_act;
-        _lv_memcpy_small(&next, n_act_d + LL_NEXT_P_OFFSET(ll_p), sizeof(void *));
-    }
-
-    return next;
+    /* Pointer to the next node is stored in the end of this node.
+     * Go there and return the address found there */
+    const lv_ll_node_t * n_act_d = n_act;
+    n_act_d += LL_NEXT_P_OFFSET(ll_p);
+    return *((lv_ll_node_t **)n_act_d);
 }
 
 /**
@@ -313,14 +312,13 @@ void * _lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
  */
 void * _lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act)
 {
-    void * prev = NULL;
+    if(ll_p == NULL) return NULL;
 
-    if(ll_p != NULL) {
-        const lv_ll_node_t * n_act_d = n_act;
-        _lv_memcpy_small(&prev, n_act_d + LL_PREV_P_OFFSET(ll_p), sizeof(void *));
-    }
-
-    return prev;
+    /* Pointer to the prev. node is stored in the end of this node.
+     * Go there and return the address found there */
+    const lv_ll_node_t * n_act_d = n_act;
+    n_act_d += LL_PREV_P_OFFSET(ll_p);
+    return *((lv_ll_node_t **)n_act_d);
 }
 
 /**
@@ -393,7 +391,7 @@ bool _lv_ll_is_empty(lv_ll_t * ll_p)
  **********************/
 
 /**
- * Set the 'pervious node pointer' of a node
+ * Set the previous node pointer of a node
  * @param ll_p pointer to linked list
  * @param act pointer to a node which prev. node pointer should be set
  * @param prev pointer to a node which should be the previous node before 'act'
@@ -402,11 +400,15 @@ static void node_set_prev(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * pre
 {
     if(act == NULL) return; /*Can't set the prev node of `NULL`*/
 
-    uint32_t node_p_size = sizeof(lv_ll_node_t *);
-    if(prev)
-        _lv_memcpy_small(act + LL_PREV_P_OFFSET(ll_p), &prev, node_p_size);
-    else
-        _lv_memset_00(act + LL_PREV_P_OFFSET(ll_p), node_p_size);
+    uint8_t * act8 = (uint8_t *) act;
+    uint8_t * prev8 = (uint8_t *) &prev;
+
+    act8 += LL_PREV_P_OFFSET(ll_p);
+
+    uint32_t i;
+    for(i = 0; i < sizeof(lv_ll_node_t *); i++) {
+        act8[i] = prev8[i];
+    }
 }
 
 /**
@@ -418,10 +420,13 @@ static void node_set_prev(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * pre
 static void node_set_next(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * next)
 {
     if(act == NULL) return; /*Can't set the next node of `NULL`*/
+    uint8_t * act8 = (uint8_t *) act;
+    uint8_t * prev8 = (uint8_t *) &next;
 
-    uint32_t node_p_size = sizeof(lv_ll_node_t *);
-    if(next)
-        _lv_memcpy_small(act + LL_NEXT_P_OFFSET(ll_p), &next, node_p_size);
-    else
-        _lv_memset_00(act + LL_NEXT_P_OFFSET(ll_p), node_p_size);
+    act8 += LL_NEXT_P_OFFSET(ll_p);
+
+    uint32_t i;
+    for(i = 0; i < sizeof(lv_ll_node_t *); i++) {
+        act8[i] = prev8[i];
+    }
 }
