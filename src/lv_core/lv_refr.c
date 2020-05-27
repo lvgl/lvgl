@@ -229,9 +229,9 @@ void _lv_disp_refr_task(lv_task_t * task)
                 if(disp_refr->inv_area_joined[a] == 0) {
                     uint32_t start_offs =
                         (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
-#if LV_USE_GPU_STM32_DMA2D
-                    lv_gpu_stm32_dma2d_copy((lv_color_t *)buf_act + start_offs, disp_refr->driver.hor_res,
-                                            (lv_color_t *)buf_ina + start_offs, disp_refr->driver.hor_res,
+#if LV_USE_GPU_STM32_DMA2D == 0
+                    lv_gpu_stm32_dma2d_copy((lv_color_t *)(buf_act + start_offs), disp_refr->driver.hor_res,
+                                            (lv_color_t *)(buf_ina + start_offs), disp_refr->driver.hor_res,
                                             lv_area_get_width(&disp_refr->inv_areas[a]),
                                             lv_area_get_height(&disp_refr->inv_areas[a]));
 #else
