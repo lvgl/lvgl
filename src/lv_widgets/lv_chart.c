@@ -1273,7 +1273,7 @@ static void draw_x_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
     else
         minor_tick_len = ext->x_axis.minor_tick_len;
 
-    if(h + y_ofs + label_dist > mask->y2) return;
+    if(h + y_ofs > mask->y2) return;
     if(h + y_ofs + label_dist  + label_dsc.font->line_height + major_tick_len < mask->y1) return;
 
     lv_draw_line_dsc_t line_dsc;
