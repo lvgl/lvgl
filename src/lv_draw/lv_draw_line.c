@@ -279,7 +279,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
 
         lv_style_int_t dash_start = 0;
         if(dashed) {
-            dash_start = (vdb->area.x1 + draw_area.x1) % (dsc->dash_gap + dsc->dash_width);
+            dash_start = (vdb->area.y1 + draw_area.y1) % (dsc->dash_gap + dsc->dash_width);
         }
 
         lv_style_int_t dash_cnt = dash_start;
