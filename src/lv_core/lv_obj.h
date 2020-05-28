@@ -502,13 +502,22 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
  *--------------------*/
 
 /**
- * Add a new stye to the style list of an object.
+ * Add a new style to the style list of an object.
  * @param obj pointer to an object
  * @param part the part of the object which style property should be set.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
  * @param style pointer to a style to add (Only its pointer will be saved)
  */
 void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style);
+
+/**
+ * Remove a style from the style list of an object.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param style pointer to a style to remove
+ */
+void lv_obj_remove_style(lv_obj_t * obj, uint8_t part, lv_style_t * style);
 
 /**
  * Reset a style to the default (empty) state.

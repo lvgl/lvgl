@@ -1132,7 +1132,7 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
  *--------------------*/
 
 /**
- * Add a new stye to the style list of an object.
+ * Add a new style to the style list of an object.
  * @param obj pointer to an object
  * @param part the part of the object which style property should be set.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
@@ -1144,11 +1144,35 @@ void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style)
 
     lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
     if(style_dsc == NULL) {
-        LV_LOG_WARN("lv_obj_add_style: can't find style with `type`");
+        LV_LOG_WARN("Can't find style with part: %d", part);
         return;
     }
 
     _lv_style_list_add_style(style_dsc, style);
+#if LV_USE_ANIMATION
+    trans_del(obj, part, 0xFF, NULL);
+#endif
+    lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
+}
+
+/**
+ * Remove a style from the style list of an object.
+ * @param obj pointer to an object
+ * @param part the part of the object which style property should be set.
+ * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
+ * @param style pointer to a style to remove
+ */
+void lv_obj_remove_style(lv_obj_t * obj, uint8_t part, lv_style_t * style)
+{
+    if(style == NULL) return;
+
+    lv_style_list_t * style_dsc = lv_obj_get_style_list(obj, part);
+    if(style_dsc == NULL) {
+        LV_LOG_WARN("Can't find style with part: %d", part);
+        return;
+    }
+
+    _lv_style_list_remove_style(style_dsc, style);
 #if LV_USE_ANIMATION
     trans_del(obj, part, 0xFF, NULL);
 #endif
