@@ -64,7 +64,7 @@ Basically, every modern controller  (which is able to drive a display( is suitab
 *Note that the memory usage might vary depending on the architecture, compiler and build options.*
 
 Just to mention some **platforms**:
-- STM32F1, STM32F3, [STM32F4](https://blog.lvgl.io/2017-07-15/stm32f429_disco_port), [STM32F7](https://github.com/lvgl/stm32f746_disco_no_os_sw4stm32)
+- STM32F1, STM32F3, [STM32F4](https://blog.lvgl.io/2017-07-15/stm32f429_disco_port), [STM32F7](https://github.com/lvgl/lv_port_stm32f746_disco_sw4stm32)
 - Microchip dsPIC33, PIC24, PIC32MX, PIC32MZ
 - NXP Kinetis, LPC, iMX
 - [Linux frame buffer](https://blog.lvgl.io/2018-01-03/linux_fb) (/dev/fb)
@@ -80,7 +80,7 @@ Choose a project with your favourite IDE:
 
 |   Eclipse   |  CodeBlocks | Visual Studio | PlatformIO | Qt Creator |
 |-------------|-------------|---------------|-----------|------------|
-|  [![Eclipse](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//eclipse.jpg)](https://github.com/lvgl/pc_simulator_sdl_eclipse) | [![CodeBlocks](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//codeblocks.jpg)](https://github.com/lvgl/pc_simulator_win_codeblocks) | [![VisualStudio](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//visualstudio.jpg)](https://github.com/lvgl/visual_studio_2017_sdl_x64)   |   [![PlatformIO](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//platformio.jpg)](https://github.com/lvgl/pc_simulator_sdl_platformio) | [![QtCreator](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//qtcreator.jpg)](https://blog.lvgl.io/2019-01-03/qt-creator) |
+|  [![Eclipse](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//eclipse.jpg)](https://github.com/lvgl/lv_sim_eclipse_sdl) | [![CodeBlocks](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//codeblocks.jpg)](https://github.com/lvgl/lv_sim_codeblocks_win) | [![VisualStudio](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//visualstudio.jpg)](https://github.com/lvgl/lv_sim_visual_studio_sdl) |   [![PlatformIO](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//platformio.jpg)](https://github.com/lvgl/lv_platformio) | [![QtCreator](https://raw.githubusercontent.com/lvgl/docs/master/v7/misc//qtcreator.jpg)](https://blog.lvgl.io/2019-01-03/qt-creator) |
 | Cross-platform<br>with SDL<br>(Recommended on<br>Linux and Mac) | Native Windows | Windows<br>with SDL | Cross-platform<br>with SDL | Cross-platform<br>with SDL |
 
 
