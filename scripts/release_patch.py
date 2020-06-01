@@ -26,7 +26,7 @@ def increment(s):
 
 def lvgl_clone():
 	title("lvgl: Clone")
-	cmd("git clone https://github.com/littlevgl/lvgl.git")
+	cmd("git clone https://github.com/lvgl/lvgl.git")
 	os.chdir("./lvgl")
 	cmd("git co master") 
 
@@ -53,7 +53,8 @@ def lvgl_update_version():
 		  
 		r = re.search(r'^#define LVGL_VERSION_PATCH ', i)
 		if r: 
-		  i, patch_ver = increment(i)
+		  m = lastNum.search(i)
+		  if m: patch_ver = m.group(1)
 		 
 		  
 		r = re.search(r'^#define LVGL_VERSION_INFO ', i)
@@ -113,8 +114,8 @@ def lvgl_update_api_docs():
 def docs_clone():
 	title("docs: Clone")
 	os.chdir("../")
-	cmd("git clone --recursive https://github.com/littlevgl/docs.git")
-	os.chdir("./docs")
+	cmd("git clone --recursive https://github.com/lvgl/docs.git")
+	os.chdir("./docs/v7")
 	cmd("git co master") 
 
 def docs_get_api():
@@ -181,7 +182,7 @@ lvgl_commit_push(ver_str)
 docs_clone()
 docs_get_api()
 docs_update_version(ver_str)
-docs_update_trans()
+#docs_update_trans() # Zanata is not working now
 docs_build()    
 docs_commit_push(ver_str)
 
