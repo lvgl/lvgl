@@ -72,7 +72,7 @@ def lvgl_update_version():
 	 
 	f.close()
 
-	f = open("./src/lv_version.h", "w")
+	f = open("./lvgl.h", "w")
 		  
 	f.write(outbuf)
 	f.close()
