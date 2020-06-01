@@ -72,7 +72,7 @@ typedef struct {
         char tmp[LV_LABEL_DOT_NUM + 1]; /* Directly store the characters if <=4 characters */
     } dot;
 
-    uint16_t dot_end;  /*The text end position in dot mode (Handled by the library)*/
+    uint32_t dot_end;  /*The text end position in dot mode (Handled by the library)*/
 
 #if LV_USE_ANIMATION
     uint16_t anim_speed; /*Speed of scroll and roll animation in px/sec unit*/
@@ -85,8 +85,8 @@ typedef struct {
 #endif
 
 #if LV_LABEL_TEXT_SEL
-    uint16_t sel_start;
-    uint16_t sel_end;
+    uint32_t sel_start;
+    uint32_t sel_end;
 #endif
 
     lv_label_long_mode_t long_mode : 3; /*Determinate what to do with the long texts*/
@@ -178,14 +178,14 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed);
  * @param label pointer to a label object.
  * @param index index to set. `LV_LABEL_TXT_SEL_OFF` to select nothing.
  */
-void lv_label_set_text_sel_start(lv_obj_t * label, uint16_t index);
+void lv_label_set_text_sel_start(lv_obj_t * label, uint32_t index);
 
 /**
  * @brief Set the selection end index.
  * @param label pointer to a label object.
  * @param index index to set. `LV_LABEL_TXT_SEL_OFF` to select nothing.
  */
-void lv_label_set_text_sel_end(lv_obj_t * label, uint16_t index);
+void lv_label_set_text_sel_end(lv_obj_t * label, uint32_t index);
 
 /*=====================
  * Getter functions
@@ -233,7 +233,7 @@ uint16_t lv_label_get_anim_speed(const lv_obj_t * label);
  * index (different in UTF-8)
  * @param pos store the result here (E.g. index = 0 gives 0;0 coordinates)
  */
-void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t * pos);
+void lv_label_get_letter_pos(const lv_obj_t * label, uint32_t index, lv_point_t * pos);
 
 /**
  * Get the index of letter on a relative point of a label
@@ -242,7 +242,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t index, lv_point_t 
  * @return the index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter)
  * Expressed in character index and not byte index (different in UTF-8)
  */
-uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos);
+uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos);
 
 /**
  * Check if a character is drawn under a point.
@@ -257,14 +257,14 @@ bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos);
  * @param label pointer to a label object.
  * @return selection start index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
  */
-uint16_t lv_label_get_text_sel_start(const lv_obj_t * label);
+uint32_t lv_label_get_text_sel_start(const lv_obj_t * label);
 
 /**
  * @brief Get the selection end index.
  * @param label pointer to a label object.
  * @return selection end index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
  */
-uint16_t lv_label_get_text_sel_end(const lv_obj_t * label);
+uint32_t lv_label_get_text_sel_end(const lv_obj_t * label);
 
 
 lv_style_list_t * lv_label_get_style(lv_obj_t * label, uint8_t type);

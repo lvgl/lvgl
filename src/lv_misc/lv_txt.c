@@ -169,7 +169,7 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
  * @param force Force return the fraction of the word that can fit in the provided space.
  * @return the index of the first char of the next word (in byte index not letter index. With UTF-8 they are different)
  */
-static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
+static uint32_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
                                      lv_coord_t letter_space, lv_coord_t max_width,
                                      lv_txt_flag_t flag, uint32_t * word_w_ptr, lv_txt_cmd_state_t * cmd_state, bool force)
 {
@@ -290,7 +290,7 @@ static uint16_t lv_txt_get_next_word(const char * txt, const lv_font_t * font,
  * @param flags settings for the text from 'txt_flag_type' enum
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8 they are different)
  */
-uint16_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
+uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
                                lv_coord_t letter_space, lv_coord_t max_width, lv_txt_flag_t flag)
 {
     if(txt == NULL) return 0;
@@ -350,7 +350,7 @@ uint16_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font,
  * @param flags settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
-lv_coord_t _lv_txt_get_width(const char * txt, uint16_t length, const lv_font_t * font, lv_coord_t letter_space,
+lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
                              lv_txt_flag_t flag)
 {
     if(txt == NULL) return 0;
