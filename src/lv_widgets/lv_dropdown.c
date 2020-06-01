@@ -304,7 +304,7 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint32_t pos
     /*Find the insert character position*/
     uint32_t insert_pos = old_len;
     if(pos != LV_DROPDOWN_POS_LAST) {
-        int opcnt = 0;
+        uint32_t opcnt = 0;
         for(insert_pos = 0; ext->options[insert_pos] != 0; insert_pos++) {
             if(opcnt == pos)
                 break;
@@ -489,7 +489,7 @@ uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * ddlist)
  * @param buf pointer to an array to store the string
  * @param buf_size size of `buf` in bytes. 0: to ignore it.
  */
-void lv_dropdown_get_selected_str(const lv_obj_t * ddlist, char * buf, uint16_t buf_size)
+void lv_dropdown_get_selected_str(const lv_obj_t * ddlist, char * buf, uint32_t buf_size)
 {
     LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
 

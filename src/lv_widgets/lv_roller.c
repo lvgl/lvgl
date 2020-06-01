@@ -310,7 +310,7 @@ uint16_t lv_roller_get_selected(const lv_obj_t * roller)
  * @param buf pointer to an array to store the string
  * @param buf_size size of `buf` in bytes. 0: to ignore it.
  */
-void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint16_t buf_size)
+void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint32_t buf_size)
 {
     LV_ASSERT_OBJ(roller, LV_OBJX_NAME);
 

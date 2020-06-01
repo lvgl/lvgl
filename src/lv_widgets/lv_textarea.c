@@ -606,13 +606,13 @@ void lv_textarea_set_cursor_pos(lv_obj_t * ta, int32_t pos)
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
-    if(ext->cursor.pos == pos) return;
+    if((uint32_t)ext->cursor.pos == (uint32_t)pos) return;
 
     uint32_t len = _lv_txt_get_encoded_length(lv_label_get_text(ext->label));
 
     if(pos < 0) pos = len + pos;
 
-    if(pos > len || pos == LV_TEXTAREA_CURSOR_LAST) pos = len;
+    if(pos > (int32_t)len || pos == LV_TEXTAREA_CURSOR_LAST) pos = len;
 
     ext->cursor.pos = pos;
 
@@ -1658,7 +1658,7 @@ static void pwd_char_hider(lv_obj_t * ta)
 
         size_t bullet_len = strlen(bullet);
         char * txt_tmp = _lv_mem_buf_get(enc_len * bullet_len + 1);
-        uint32_t i;
+        int32_t i;
         for(i = 0; i < enc_len; i++) {
             _lv_memcpy(&txt_tmp[i * bullet_len], bullet, bullet_len);
         }
