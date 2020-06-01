@@ -5,6 +5,7 @@
 
 ### Bugfixes
 - Make the Microptyhon working by adding the required variables as GC_ROOT
+- Prefix some internal API functions with `_` to reduce the API of LVGL 
 - Fix built-in SimSun CJK font
 - Fix UTF-8 encoding when `LV_USE_ARABIC_PERSIAN_CHARS` is enabled
 - Fix DMA2D usage when 32 bit images directly blended
