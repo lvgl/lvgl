@@ -4,6 +4,7 @@
 ## v7.0.2 (under developement)
 *Available in the `master` branch*
 
+- `lv_ta` fix wrong cursor positon when clicked after the last character
 
 ## v7.0.1 (01.06.2020)
 
