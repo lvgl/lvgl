@@ -19,7 +19,6 @@
 #include "../lv_misc/lv_printf.h"
 #include "../lv_themes/lv_theme.h"
 
-#undef LV_USE_BIDI
 /*********************
  *      DEFINES
  *********************/
