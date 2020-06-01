@@ -38,7 +38,7 @@
 #include <stdint.h>
 
 
-#define PRINTF_DISABLE_SUPPORT_FLOAT    1
+#define PRINTF_DISABLE_SUPPORT_FLOAT    LV_SPRINTF_DISABLE_FLOAT
 
 // 'ntoa' conversion buffer size, this must be big enough to hold one converted
 // numeric number including padded zeros (dynamically created on stack)

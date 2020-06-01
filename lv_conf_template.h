@@ -478,6 +478,8 @@ typedef void * lv_font_user_data_t;
 #  define LV_SPRINTF_INCLUDE <stdio.h>
 #  define lv_snprintf     snprintf
 #  define lv_vsnprintf    vsnprintf
+#else   /*!LV_SPRINTF_CUSTOM*/
+#  define LV_SPRINTF_DISABLE_FLOAT 1
 #endif  /*LV_SPRINTF_CUSTOM*/
 
 /*===================

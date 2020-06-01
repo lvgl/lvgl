@@ -721,6 +721,10 @@
 #ifndef lv_vsnprintf
 #  define lv_vsnprintf    vsnprintf
 #endif
+#else   /*!LV_SPRINTF_CUSTOM*/
+#ifndef LV_SPRINTF_DISABLE_FLOAT
+#  define LV_SPRINTF_DISABLE_FLOAT 1
+#endif
 #endif  /*LV_SPRINTF_CUSTOM*/
 
 /*===================
