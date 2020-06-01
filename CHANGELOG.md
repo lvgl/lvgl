@@ -1,7 +1,11 @@
 # Changelog
 
-## v7.0.1 (under development)
+
+## v7.0.2 (under developement)
 *Available in the `master` branch*
+
+
+## v7.0.1 (01.06.2020)
 
 ### Bugfixes
 - Make the Microptyhon working by adding the required variables as GC_ROOT
@@ -15,8 +19,8 @@
 - Improve DMA2D blending
 - Remove memcpy from `lv_ll` (caused issues with some optimization settings)
 - `lv_chart` fix X tick drawing
-- fix vertical dashed line drawing
-- some additonal minor fixes and formattings
+- Fix vertical dashed line drawing
+- Some additonal minor fixes and formattings
 
 ## v7.0.0 (18.05.2020)
 
