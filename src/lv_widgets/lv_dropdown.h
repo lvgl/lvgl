@@ -125,7 +125,7 @@ void lv_dropdown_set_options_static(lv_obj_t * ddlist, const char * options);
  * @param option a string without '\n'. E.g. "Four"
  * @param pos  the insert position, indexed from 0, LV_DROPDOWN_POS_LAST = end of string
  */
-void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos);
+void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint32_t pos);
 
 /**
  * Set the selected option
