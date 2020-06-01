@@ -206,10 +206,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 
     lv_opa_t opa = dsc->opa;
 
-    uint16_t sel_start = dsc->sel_start;
-    uint16_t sel_end = dsc->sel_end;
+    uint32_t sel_start = dsc->sel_start;
+    uint32_t sel_end = dsc->sel_end;
     if(sel_start > sel_end) {
-        uint16_t tmp = sel_start;
+        uint32_t tmp = sel_start;
         sel_start = sel_end;
         sel_end = tmp;
     }
@@ -225,7 +225,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 
     cmd_state_t cmd_state = CMD_STATE_WAIT;
     uint32_t i;
-    uint16_t par_start = 0;
+    uint32_t par_start = 0;
     lv_color_t recolor;
     int32_t letter_w;
 
@@ -250,11 +250,11 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
 #endif
 
         while(i < line_end - line_start) {
-            uint16_t logical_char_pos = 0;
+            uint32_t logical_char_pos = 0;
             if(sel_start != 0xFFFF && sel_end != 0xFFFF) {
 #if LV_USE_BIDI
                 logical_char_pos = _lv_txt_encoded_get_char_id(txt, line_start);
-                uint16_t t = _lv_txt_encoded_get_char_id(bidi_txt, i);
+                uint32_t t = _lv_txt_encoded_get_char_id(bidi_txt, i);
                 logical_char_pos += _lv_bidi_get_logical_pos(bidi_txt, NULL, line_end - line_start, dsc->bidi_dir, t, NULL);
 #else
                 logical_char_pos = _lv_txt_encoded_get_char_id(txt, line_start + i);

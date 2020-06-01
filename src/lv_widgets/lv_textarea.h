@@ -50,24 +50,24 @@ typedef struct {
     lv_style_list_t style_placeholder;
     char * pwd_tmp;              /*Used to store the original text in password mode*/
     const char * accapted_chars; /*Only these characters will be accepted. NULL: accept all*/
-    uint16_t max_length;         /*The max. number of characters. 0: no limit*/
+    uint32_t max_length;         /*The max. number of characters. 0: no limit*/
     uint16_t pwd_show_time;      /*Time to show characters in password mode before change them to '*' */
     struct {
         lv_style_list_t style;  /* Style of the cursor (NULL to use label's style)*/
         lv_coord_t valid_x;        /* Used when stepping up/down to a shorter line.
                                     * (Used by the library)*/
-        uint16_t pos;              /* The current cursor position
+        uint32_t pos;              /* The current cursor position
                                     * (0: before 1st letter; 1: before 2nd letter ...)*/
         uint16_t blink_time;       /*Blink period*/
         lv_area_t area;            /* Cursor area relative to the Text Area*/
-        uint16_t txt_byte_pos;     /* Byte index of the letter after (on) the cursor*/
+        uint32_t txt_byte_pos;     /* Byte index of the letter after (on) the cursor*/
         uint8_t state : 1;         /*Cursor is visible now or not (Handled by the library)*/
         uint8_t hidden : 1;        /*Cursor is hidden by he user */
         uint8_t click_pos : 1;     /*1: Enable positioning the cursor by clicking the text area*/
     } cursor;
 #if LV_LABEL_TEXT_SEL
-    uint16_t sel_start;  /*Temporary values for text selection*/
-    uint16_t sel_end;
+    uint32_t sel_start;  /*Temporary values for text selection*/
+    uint32_t sel_end;
     uint8_t text_sel_in_prog : 1; /*User is in process of selecting */
     uint8_t text_sel_en : 1;      /*Text can be selected on this text area*/
 #endif
@@ -156,7 +156,7 @@ void lv_textarea_set_placeholder_text(lv_obj_t * ta, const char * txt);
  *             < 0 : index from the end of the text
  *             LV_TEXTAREA_CURSOR_LAST: go after the last character
  */
-void lv_textarea_set_cursor_pos(lv_obj_t * ta, int16_t pos);
+void lv_textarea_set_cursor_pos(lv_obj_t * ta, int32_t pos);
 
 /**
  * Hide/Unhide the cursor.
@@ -207,7 +207,7 @@ void lv_textarea_set_accepted_chars(lv_obj_t * ta, const char * list);
  * @param ta pointer to  Text Area
  * @param num the maximal number of characters can be added (`lv_textarea_set_text` ignores it)
  */
-void lv_textarea_set_max_length(lv_obj_t * ta, uint16_t num);
+void lv_textarea_set_max_length(lv_obj_t * ta, uint32_t num);
 
 /**
  * In `LV_EVENT_INSERT` the text which planned to be inserted can be replaced by an other text.
@@ -301,7 +301,7 @@ lv_obj_t * lv_textarea_get_label(const lv_obj_t * ta);
  * @param ta pointer to a text area object
  * @return the cursor position
  */
-uint16_t lv_textarea_get_cursor_pos(const lv_obj_t * ta);
+uint32_t lv_textarea_get_cursor_pos(const lv_obj_t * ta);
 
 /**
  * Get whether the cursor is hidden or not
@@ -339,11 +339,11 @@ bool lv_textarea_get_one_line(const lv_obj_t * ta);
 const char * lv_textarea_get_accepted_chars(lv_obj_t * ta);
 
 /**
- * Set max length of a Text Area.
+ * Get max length of a Text Area.
  * @param ta pointer to  Text Area
  * @return the maximal number of characters to be add
  */
-uint16_t lv_textarea_get_max_length(lv_obj_t * ta);
+uint32_t lv_textarea_get_max_length(lv_obj_t * ta);
 
 /**
  * Get the scroll bar mode of a text area

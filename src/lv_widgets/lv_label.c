@@ -50,7 +50,7 @@ static void lv_label_revert_dots(lv_obj_t * label);
     static void lv_label_set_offset_y(lv_obj_t * label, lv_coord_t y);
 #endif
 
-static bool lv_label_set_dot_tmp(lv_obj_t * label, char * data, uint16_t len);
+static bool lv_label_set_dot_tmp(lv_obj_t * label, char * data, uint32_t len);
 static char * lv_label_get_dot_tmp(lv_obj_t * label);
 static void lv_label_dot_tmp_free(lv_obj_t * label);
 static void get_txt_coords(const lv_obj_t * label, lv_area_t * area);
@@ -151,7 +151,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         if(copy_ext->dot_tmp_alloc && copy_ext->dot.tmp_ptr) {
-            uint16_t len = (uint16_t)strlen(copy_ext->dot.tmp_ptr);
+            uint32_t len = (uint32_t)strlen(copy_ext->dot.tmp_ptr);
             lv_label_set_dot_tmp(new_label, ext->dot.tmp_ptr, len);
         }
         else {
@@ -441,7 +441,7 @@ void lv_label_set_anim_speed(lv_obj_t * label, uint16_t anim_speed)
 #endif
 }
 
-void lv_label_set_text_sel_start(lv_obj_t * label, uint16_t index)
+void lv_label_set_text_sel_start(lv_obj_t * label, uint32_t index)
 {
     LV_ASSERT_OBJ(label, LV_OBJX_NAME);
 
@@ -455,7 +455,7 @@ void lv_label_set_text_sel_start(lv_obj_t * label, uint16_t index)
 #endif
 }
 
-void lv_label_set_text_sel_end(lv_obj_t * label, uint16_t index)
+void lv_label_set_text_sel_end(lv_obj_t * label, uint32_t index)
 {
     LV_ASSERT_OBJ(label, LV_OBJX_NAME);
 
@@ -566,7 +566,7 @@ uint16_t lv_label_get_anim_speed(const lv_obj_t * label)
  * index (different in UTF-8)
  * @param pos store the result here (E.g. index = 0 gives 0;0 coordinates)
  */
-void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_t * pos)
+void lv_label_get_letter_pos(const lv_obj_t * label, uint32_t char_id, lv_point_t * pos)
 {
     LV_ASSERT_OBJ(label, LV_OBJX_NAME);
     LV_ASSERT_NULL(pos);
@@ -594,7 +594,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
     if(align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
     if(align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
 
-    uint16_t byte_id = _lv_txt_encoded_get_byte_id(txt, char_id);
+    uint32_t byte_id = _lv_txt_encoded_get_byte_id(txt, char_id);
 
     /*Search the line of the index letter */;
     while(txt[new_line_start] != '\0') {
@@ -615,7 +615,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
     }
 
     const char * bidi_txt;
-    uint16_t visual_byte_pos;
+    uint32_t visual_byte_pos;
 #if LV_USE_BIDI
     char * mutable_bidi_txt = NULL;
     /*Handle Bidi*/
@@ -624,10 +624,10 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
         bidi_txt =  &txt[line_start];
     }
     else {
-        uint16_t line_char_id = _lv_txt_encoded_get_char_id(&txt[line_start], byte_id - line_start);
+        uint32_t line_char_id = _lv_txt_encoded_get_char_id(&txt[line_start], byte_id - line_start);
 
         bool is_rtl;
-        uint16_t visual_char_pos = _lv_bidi_get_visual_pos(&txt[line_start], &mutable_bidi_txt, new_line_start - line_start,
+        uint32_t visual_char_pos = _lv_bidi_get_visual_pos(&txt[line_start], &mutable_bidi_txt, new_line_start - line_start,
                                                            lv_obj_get_base_dir(label), line_char_id, &is_rtl);
         bidi_txt = mutable_bidi_txt;
         if(is_rtl) visual_char_pos++;
@@ -671,7 +671,7 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint16_t char_id, lv_point_
  * @return the index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter)
  * Expressed in character index and not byte index (different in UTF-8)
  */
-uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
+uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 {
     LV_ASSERT_OBJ(label, LV_OBJX_NAME);
     LV_ASSERT_NULL(pos);
@@ -689,7 +689,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     lv_coord_t letter_height    = lv_font_get_line_height(font);
     lv_coord_t y             = 0;
     lv_txt_flag_t flag       = LV_TXT_FLAG_NONE;
-    uint16_t logical_pos;
+    uint32_t logical_pos;
     char * bidi_txt;
 
     if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
@@ -720,7 +720,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
 
 #if LV_USE_BIDI
     bidi_txt = _lv_mem_buf_get(new_line_start - line_start + 1);
-    uint16_t txt_len = new_line_start - line_start;
+    uint32_t txt_len = new_line_start - line_start;
     if(new_line_start > 0 && txt[new_line_start - 1] == '\0' && txt_len > 0) txt_len--;
     _lv_bidi_process_paragraph(txt + line_start, bidi_txt, txt_len, lv_obj_get_base_dir(label), NULL, 0);
 #else
@@ -792,7 +792,7 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
  * @param label pointer to a label object.
  * @return selection start index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
  */
-uint16_t lv_label_get_text_sel_start(const lv_obj_t * label)
+uint32_t lv_label_get_text_sel_start(const lv_obj_t * label)
 {
     LV_ASSERT_OBJ(label, LV_OBJX_NAME);
 
@@ -811,7 +811,7 @@ uint16_t lv_label_get_text_sel_start(const lv_obj_t * label)
  * @param label pointer to a label object.
  * @return selection end index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
  */
-uint16_t lv_label_get_text_sel_end(const lv_obj_t * label)
+uint32_t lv_label_get_text_sel_end(const lv_obj_t * label)
 {
     LV_ASSERT_OBJ(label, LV_OBJX_NAME);
 
@@ -1449,7 +1449,7 @@ static void lv_label_set_offset_y(lv_obj_t * label, lv_coord_t y)
  * @param len Number of characters to store.
  * @return true on success.
  */
-static bool lv_label_set_dot_tmp(lv_obj_t * label, char * data, uint16_t len)
+static bool lv_label_set_dot_tmp(lv_obj_t * label, char * data, uint32_t len)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
     lv_label_dot_tmp_free(label); /* Deallocate any existing space */

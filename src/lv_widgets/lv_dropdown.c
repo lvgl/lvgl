@@ -208,7 +208,7 @@ void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options)
 
     /*Count the '\n'-s to determine the number of options*/
     ext->option_cnt = 0;
-    uint16_t i;
+    uint32_t i;
     for(i = 0; options[i] != '\0'; i++) {
         if(options[i] == '\n') ext->option_cnt++;
     }
@@ -248,7 +248,7 @@ void lv_dropdown_set_options_static(lv_obj_t * ddlist, const char * options)
 
     /*Count the '\n'-s to determine the number of options*/
     ext->option_cnt = 0;
-    uint16_t i;
+    uint32_t i;
     for(i = 0; options[i] != '\0'; i++) {
         if(options[i] == '\n') ext->option_cnt++;
     }
@@ -271,7 +271,7 @@ void lv_dropdown_set_options_static(lv_obj_t * ddlist, const char * options)
  * @param option a string without '\n'. E.g. "Four"
  * @param pos the insert position, indexed from 0, LV_DROPDOWN_POS_LAST = end of string
  */
-void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos)
+void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint32_t pos)
 {
     LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
     LV_ASSERT_STR(option);
@@ -302,7 +302,7 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos
     ext->options[old_len] = 0;
 
     /*Find the insert character position*/
-    uint16_t insert_pos = old_len;
+    uint32_t insert_pos = old_len;
     if(pos != LV_DROPDOWN_POS_LAST) {
         int opcnt = 0;
         for(insert_pos = 0; ext->options[insert_pos] != 0; insert_pos++) {
@@ -495,15 +495,15 @@ void lv_dropdown_get_selected_str(const lv_obj_t * ddlist, char * buf, uint16_t 
 
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
 
-    uint16_t i;
-    uint16_t line        = 0;
+    uint32_t i;
+    uint32_t line        = 0;
     size_t txt_len     = strlen(ext->options);
 
     for(i = 0; i < txt_len && line != ext->sel_opt_id_orig; i++) {
         if(ext->options[i] == '\n') line++;
     }
 
-    uint16_t c;
+    uint32_t c;
     for(c = 0; i < txt_len && ext->options[i] != '\n'; c++, i++) {
         if(buf_size && c >= buf_size - 1) {
             LV_LOG_WARN("lv_dropdown_get_selected_str: the buffer was too small")
@@ -1266,7 +1266,7 @@ static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t x, lv_coord_t y)
     if(label == NULL) return 0;
     x -= label->coords.x1;
     y -= label->coords.y1;
-    uint16_t letter_i;
+    uint32_t letter_i;
 
     lv_point_t p = {x, y};
     letter_i = lv_label_get_letter_on(label, &p);

@@ -156,7 +156,7 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
 
     /*Count the '\n'-s to determine the number of options*/
     ext->option_cnt = 0;
-    uint16_t cnt;
+    uint32_t cnt;
     for(cnt = 0; options[cnt] != '\0'; cnt++) {
         if(options[cnt] == '\n') ext->option_cnt++;
     }
@@ -316,7 +316,7 @@ void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint16_t bu
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     lv_obj_t * label = get_label(roller);
-    uint16_t i;
+    uint32_t i;
     uint16_t line        = 0;
     const char * opt_txt = lv_label_get_text(label);
     size_t txt_len     = strlen(opt_txt);
@@ -325,7 +325,7 @@ void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint16_t bu
         if(opt_txt[i] == '\n') line++;
     }
 
-    uint16_t c;
+    uint32_t c;
     for(c = 0; i < txt_len && opt_txt[i] != '\n'; c++, i++) {
         if(buf_size && c >= buf_size - 1) {
             LV_LOG_WARN("lv_dropdown_get_selected_str: the buffer was too small")
@@ -403,7 +403,7 @@ const char * lv_roller_get_options(const lv_obj_t * roller)
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
  *                                  (return 'true' if yes)
  *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
+ *             LV_DESIGN_DRAW_POST: drawing after all children are drawn
  * @param return an element of `lv_design_res_t`
  */
 static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * clip_area, lv_design_mode_t mode)
@@ -556,14 +556,14 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(ext->sel_opt_id + 1 < ext->option_cnt) {
-                uint16_t ori_id = ext->sel_opt_id_ori; /*lv_roller_set_selceted will overwrite this*/
+                uint16_t ori_id = ext->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
                 lv_roller_set_selected(roller, ext->sel_opt_id + 1, true);
                 ext->sel_opt_id_ori = ori_id;
             }
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_UP) {
             if(ext->sel_opt_id > 0) {
-                uint16_t ori_id = ext->sel_opt_id_ori; /*lv_roller_set_selceted will overwrite this*/
+                uint16_t ori_id = ext->sel_opt_id_ori; /*lv_roller_set_selected will overwrite this*/
 
                 lv_roller_set_selected(roller, ext->sel_opt_id - 1, true);
                 ext->sel_opt_id_ori = ori_id;
@@ -645,7 +645,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
 
         ext->sel_opt_id     = id;
         ext->sel_opt_id_ori = id;
-        res                        = lv_event_send(roller, LV_EVENT_VALUE_CHANGED, &id);
+        res = lv_event_send(roller, LV_EVENT_VALUE_CHANGED, &id);
         if(res != LV_RES_OK) return res;
     }
     /*If picked an option by clicking then set it*/
@@ -815,7 +815,7 @@ static lv_res_t release_handler(lv_obj_t * roller)
         lv_indev_get_point(indev, &p);
         p.y -= label->coords.y1;
         p.x -= label->coords.x1;
-        uint16_t letter_i;
+        uint32_t letter_i;
         letter_i = lv_label_get_letter_on(label, &p);
 
         const char * txt  = lv_label_get_text(label);
