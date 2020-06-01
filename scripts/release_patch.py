@@ -30,10 +30,17 @@ def lvgl_clone():
 	os.chdir("./lvgl")
 	cmd("git co master") 
 
+def lvgl_format():
+  title("lvgl: Run code formatter")
+	os.chdir("./scripts")
+	cmd("./code-formatter.sh")
+	cmd("git ci -am 'Run code formatter'")
+	os.chdir("..")
+
 def lvgl_update_version():
 	title("lvgl: Update version number")
 
-	f = open("./src/lv_version.h", "r")
+	f = open("./lvgl.h", "r")
 		  
 	outbuf = ""
 	major_ver = -1
@@ -104,16 +111,68 @@ def lvgl_commit_push(v):
 	cmd('git tag -a ' + v + ' -m "Release ' + v +'"')
 	cmd('git push origin master')
 	cmd('git push origin ' + v)
+
+
+def lvgl_merge_to_release_branch(v):
+	title("lvgl: merge to release branch")
+	cmd('git co release/v7')
+	cmd('git merge master')
+	cmd('git push origin release/v7')
+	
 	
 def lvgl_update_api_docs():
 	title("lvgl: Update API with Doxygen")
 
 	cmd("cd scripts; doxygen");
+	os.chdir("../")
 
+
+def examples_clone():
+	title("examples: Clone")
+	cmd("git clone https://github.com/lvgl/lv_examples.git")
+	os.chdir("./lv_examples")
+	cmd("git co master") 
+
+def examples_commit_push(v):
+	title("examples: commit and push release")
+
+	cmd('git ci -am "Release ' + v + '"')
+	cmd('git tag -a ' + v + ' -m "Release ' + v +'"')
+	cmd('git push origin master')
+	cmd('git push origin ' + v)
+
+
+def examples_merge_to_release_branch(v):
+	title("examples: merge to release branch")
+	cmd('git co release/v7')
+	cmd('git merge master')
+	cmd('git push origin release/v7')
+	os.chdir("../")
+	
+	
+def drivers_clone():
+	title("drivers: Clone")
+	cmd("git clone https://github.com/lvgl/lv_drivers.git")
+	os.chdir("./lv_drivers")
+	cmd("git co master") 
+
+def drivers_commit_push(v):
+	title("drivers: commit and push release")
+
+	cmd('git ci -am "Release ' + v + '"')
+	cmd('git tag -a ' + v + ' -m "Release ' + v +'"')
+	cmd('git push origin master')
+	cmd('git push origin ' + v)
+
+def drivers_merge_to_release_branch(v):
+	title("drivers: merge to release branch")
+	cmd('git co release/v7')
+	cmd('git merge master')
+	cmd('git push origin release/v7')
+	os.chdir("../")
 
 def docs_clone():
 	title("docs: Clone")
-	os.chdir("../")
 	cmd("git clone --recursive https://github.com/lvgl/docs.git")
 	os.chdir("./docs/v7")
 	cmd("git co master") 
@@ -122,8 +181,7 @@ def docs_get_api():
 	title("docs: Get API files")
 	
 	cmd("rm -rf xml");	
-	cmd("cp -r ../lvgl/docs/api_doc/xml .");	
-
+	cmd("cp -r ../../lvgl/docs/api_doc/xml .");	
 
 def docs_update_version(v):
 	title("docs: Update version number")
@@ -170,14 +228,24 @@ def docs_commit_push(v):
 	
 def clean_up():
 	title("Clean up repos")
-	os.chdir("..")
-	cmd("rm -rf lvgl docs")
+	os.chdir("../..")
+	cmd("rm -rf lvgl docs lv_examples lv_drivers")
 
 lvgl_clone()
+lvgl_format()
 lvgl_update_api_docs()
 ver_str = lvgl_update_version()    
 lvgl_update_library_json(ver_str)
 lvgl_commit_push(ver_str)
+lvgl_merge_to_release_branch(ver_str)
+
+examples_clone()
+examples_commit_push(ver_str)
+examples_merge_to_release_branch(ver_str)
+
+drivers_clone()
+drivers_commit_push(ver_str)
+drivers_merge_to_release_branch(ver_str)
 
 docs_clone()
 docs_get_api()
