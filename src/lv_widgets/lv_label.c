@@ -8,7 +8,6 @@
  *********************/
 #include "lv_label.h"
 #if LV_USE_LABEL != 0
-
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_debug.h"
 #include "../lv_core/lv_group.h"
@@ -20,6 +19,7 @@
 #include "../lv_misc/lv_printf.h"
 #include "../lv_themes/lv_theme.h"
 
+#undef LV_USE_BIDI
 /*********************
  *      DEFINES
  *********************/
@@ -761,13 +761,14 @@ uint16_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
                 }
             }
 
-            x += lv_font_get_glyph_width(font, letter, letter_next);
+            lv_coord_t gw = lv_font_get_glyph_width(font, letter, letter_next);
 
-            /*Finish if the x position or the last char of the line is reached*/
-            if(pos->x < x || i + line_start == new_line_start ||  txt[i + line_start] == '\0') {
+            /*Finish if the x position or the last char of the next line is reached*/
+            if(pos->x < x + (gw >> 1) || i + line_start == new_line_start ||  txt[i_act + line_start] == '\0') {
                 i = i_act;
                 break;
             }
+            x += gw;
             x += letter_space;
             i_act = i;
         }
