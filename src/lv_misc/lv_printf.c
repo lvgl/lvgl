@@ -56,7 +56,7 @@
 
 // support for the floating point type (%f)
 // default: activated
-#ifndef PRINTF_DISABLE_SUPPORT_FLOAT
+#if !PRINTF_DISABLE_SUPPORT_FLOAT
     #define PRINTF_SUPPORT_FLOAT
 #endif
 
