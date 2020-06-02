@@ -56,7 +56,7 @@ void _lv_ll_init(lv_ll_t * ll_p, uint32_t node_size)
     node_size = (node_size + 7) & (~0x7);
 #else
     /*Round the size up to 4*/
-    node_size = node_size + 3 & (~0x3);
+    node_size = (node_size + 3) & (~0x3);
 #endif
 
     ll_p->n_size = node_size;
