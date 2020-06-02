@@ -401,14 +401,13 @@ static void node_set_prev(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * pre
     if(act == NULL) return; /*Can't set the prev node of `NULL`*/
 
     uint8_t * act8 = (uint8_t *) act;
-    uint8_t * prev8 = (uint8_t *) &prev;
 
     act8 += LL_PREV_P_OFFSET(ll_p);
 
-    uint32_t i;
-    for(i = 0; i < sizeof(lv_ll_node_t *); i++) {
-        act8[i] = prev8[i];
-    }
+    lv_ll_node_t ** act_node_p = (lv_ll_node_t **) act8;
+    lv_ll_node_t ** prev_node_p = (lv_ll_node_t **) &prev;
+
+    *act_node_p = *prev_node_p;
 }
 
 /**
@@ -421,12 +420,10 @@ static void node_set_next(lv_ll_t * ll_p, lv_ll_node_t * act, lv_ll_node_t * nex
 {
     if(act == NULL) return; /*Can't set the next node of `NULL`*/
     uint8_t * act8 = (uint8_t *) act;
-    uint8_t * prev8 = (uint8_t *) &next;
 
     act8 += LL_NEXT_P_OFFSET(ll_p);
+    lv_ll_node_t ** act_node_p = (lv_ll_node_t **) act8;
+    lv_ll_node_t ** next_node_p = (lv_ll_node_t **) &next;
 
-    uint32_t i;
-    for(i = 0; i < sizeof(lv_ll_node_t *); i++) {
-        act8[i] = prev8[i];
-    }
+    *act_node_p = *next_node_p;
 }
