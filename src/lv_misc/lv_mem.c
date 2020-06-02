@@ -157,16 +157,10 @@ void * lv_mem_alloc(size_t size)
 
 #ifdef LV_ARCH_64
     /*Round the size up to 8*/
-    if(size & 0x7) {
-        size = size & (~0x7);
-        size += 8;
-    }
+    size = (size + 7) & (~0x7);
 #else
     /*Round the size up to 4*/
-    if(size & 0x3) {
-        size = size & (~0x3);
-        size += 4;
-    }
+    size = (size + 3) & (~0x3);
 #endif
     void * alloc = NULL;
 
@@ -281,16 +275,10 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
 
 #ifdef LV_ARCH_64
     /*Round the size up to 8*/
-    if(new_size & 0x7) {
-        new_size = new_size & (~0x7);
-        new_size += 8;
-    }
+    new_size = (new_size + 7) & (~0x7);
 #else
     /*Round the size up to 4*/
-    if(new_size & 0x3) {
-        new_size = new_size & (~0x3);
-        new_size += 4;
-    }
+    new_size = (new_size + 3) & (~0x3);
 #endif
 
     /*data_p could be previously freed pointer (in this case it is invalid)*/
@@ -858,18 +846,13 @@ static void * ent_alloc(lv_mem_ent_t * e, size_t size)
  */
 static void ent_trunc(lv_mem_ent_t * e, size_t size)
 {
+
 #ifdef LV_ARCH_64
     /*Round the size up to 8*/
-    if(size & 0x7) {
-        size = size & (~0x7);
-        size += 8;
-    }
+    size = (size + 7) & (~0x7);
 #else
     /*Round the size up to 4*/
-    if(size & 0x3) {
-        size = size & (~0x3);
-        size += 4;
-    }
+    size = (size + 3) & (~0x3);
 #endif
 
     /*Don't let empty space only for a header without data*/

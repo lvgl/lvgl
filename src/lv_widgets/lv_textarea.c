@@ -176,7 +176,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         if(copy_ext->pwd_tmp) {
-            uint16_t len = _lv_mem_get_size(copy_ext->pwd_tmp);
+            uint32_t len = _lv_mem_get_size(copy_ext->pwd_tmp);
             ext->pwd_tmp = lv_mem_alloc(len);
             LV_ASSERT_MEM(ext->pwd_tmp);
             if(ext->pwd_tmp == NULL) return NULL;
@@ -407,7 +407,7 @@ void lv_textarea_del_char(lv_obj_t * ta)
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
-    uint16_t cur_pos  = ext->cursor.pos;
+    uint32_t cur_pos  = ext->cursor.pos;
 
     if(cur_pos == 0) return;
 
@@ -469,7 +469,7 @@ void lv_textarea_del_char_forward(lv_obj_t * ta)
 {
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
-    uint16_t cp = lv_textarea_get_cursor_pos(ta);
+    uint32_t cp = lv_textarea_get_cursor_pos(ta);
     lv_textarea_set_cursor_pos(ta, cp + 1);
     if(cp != lv_textarea_get_cursor_pos(ta)) lv_textarea_del_char(ta);
 }
@@ -601,18 +601,18 @@ void lv_textarea_set_placeholder_text(lv_obj_t * ta, const char * txt)
  *             < 0 : index from the end of the text
  *             LV_TEXTAREA_CURSOR_LAST: go after the last character
  */
-void lv_textarea_set_cursor_pos(lv_obj_t * ta, int16_t pos)
+void lv_textarea_set_cursor_pos(lv_obj_t * ta, int32_t pos)
 {
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
-    if(ext->cursor.pos == pos) return;
+    if((uint32_t)ext->cursor.pos == (uint32_t)pos) return;
 
-    uint16_t len = _lv_txt_get_encoded_length(lv_label_get_text(ext->label));
+    uint32_t len = _lv_txt_get_encoded_length(lv_label_get_text(ext->label));
 
     if(pos < 0) pos = len + pos;
 
-    if(pos > len || pos == LV_TEXTAREA_CURSOR_LAST) pos = len;
+    if(pos > (int32_t)len || pos == LV_TEXTAREA_CURSOR_LAST) pos = len;
 
     ext->cursor.pos = pos;
 
@@ -838,7 +838,7 @@ void lv_textarea_set_accepted_chars(lv_obj_t * ta, const char * list)
  * @param ta pointer to  Text Area
  * @param num the maximal number of characters can be added (`lv_textarea_set_text` ignores it)
  */
-void lv_textarea_set_max_length(lv_obj_t * ta, uint16_t num)
+void lv_textarea_set_max_length(lv_obj_t * ta, uint32_t num)
 {
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
@@ -1001,7 +1001,7 @@ lv_obj_t * lv_textarea_get_label(const lv_obj_t * ta)
  * @param ta pointer to a text area object
  * @return the cursor position
  */
-uint16_t lv_textarea_get_cursor_pos(const lv_obj_t * ta)
+uint32_t lv_textarea_get_cursor_pos(const lv_obj_t * ta)
 {
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
@@ -1080,7 +1080,7 @@ const char * lv_textarea_get_accepted_chars(lv_obj_t * ta)
  * @param ta pointer to  Text Area
  * @return the maximal number of characters to be add
  */
-uint16_t lv_textarea_get_max_length(lv_obj_t * ta)
+uint32_t lv_textarea_get_max_length(lv_obj_t * ta)
 {
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
@@ -1191,7 +1191,7 @@ void lv_textarea_cursor_right(lv_obj_t * ta)
 {
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
-    uint16_t cp = lv_textarea_get_cursor_pos(ta);
+    uint32_t cp = lv_textarea_get_cursor_pos(ta);
     cp++;
     lv_textarea_set_cursor_pos(ta, cp);
 }
@@ -1204,7 +1204,7 @@ void lv_textarea_cursor_left(lv_obj_t * ta)
 {
     LV_ASSERT_OBJ(ta, LV_OBJX_NAME);
 
-    uint16_t cp = lv_textarea_get_cursor_pos(ta);
+    uint32_t cp = lv_textarea_get_cursor_pos(ta);
     if(cp > 0) {
         cp--;
         lv_textarea_set_cursor_pos(ta, cp);
@@ -1236,7 +1236,7 @@ void lv_textarea_cursor_down(lv_obj_t * ta)
     /*Do not go below the last line*/
     if(pos.y < lv_obj_get_height(ext->label)) {
         /*Get the letter index on the new cursor position and set it*/
-        uint16_t new_cur_pos = lv_label_get_letter_on(ext->label, &pos);
+        uint32_t new_cur_pos = lv_label_get_letter_on(ext->label, &pos);
 
         lv_coord_t cur_valid_x_tmp = ext->cursor.valid_x; /*Cursor position set overwrites the valid positon */
         lv_textarea_set_cursor_pos(ta, new_cur_pos);
@@ -1266,7 +1266,7 @@ void lv_textarea_cursor_up(lv_obj_t * ta)
     pos.x = ext->cursor.valid_x;
 
     /*Get the letter index on the new cursor position and set it*/
-    uint16_t new_cur_pos       = lv_label_get_letter_on(ext->label, &pos);
+    uint32_t new_cur_pos       = lv_label_get_letter_on(ext->label, &pos);
     lv_coord_t cur_valid_x_tmp = ext->cursor.valid_x; /*Cursor position set overwrites the valid position */
     lv_textarea_set_cursor_pos(ta, new_cur_pos);
     ext->cursor.valid_x = cur_valid_x_tmp;
@@ -1644,7 +1644,7 @@ static void pwd_char_hider(lv_obj_t * ta)
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->pwd_mode != 0) {
         char * txt  = lv_label_get_text(ext->label);
-        int16_t enc_len = _lv_txt_get_encoded_length(txt);
+        int32_t enc_len = _lv_txt_get_encoded_length(txt);
         if(enc_len == 0) return;
 
         /*If the textarea's font has "bullet" character use it else fallback to "*"*/
@@ -1658,7 +1658,7 @@ static void pwd_char_hider(lv_obj_t * ta)
 
         size_t bullet_len = strlen(bullet);
         char * txt_tmp = _lv_mem_buf_get(enc_len * bullet_len + 1);
-        uint16_t i;
+        int32_t i;
         for(i = 0; i < enc_len; i++) {
             _lv_memcpy(&txt_tmp[i * bullet_len], bullet, bullet_len);
         }
@@ -1712,7 +1712,7 @@ static void refr_cursor_area(lv_obj_t * ta)
     const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_BG);
 
-    uint16_t cur_pos = lv_textarea_get_cursor_pos(ta);
+    uint32_t cur_pos = lv_textarea_get_cursor_pos(ta);
     const char * txt = lv_label_get_text(ext->label);
 
     uint32_t byte_pos;

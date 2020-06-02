@@ -33,8 +33,8 @@ typedef struct {
     lv_opa_t opa;
     lv_style_int_t line_space;
     lv_style_int_t letter_space;
-    uint16_t sel_start;
-    uint16_t sel_end;
+    uint32_t sel_start;
+    uint32_t sel_end;
     lv_coord_t ofs_x;
     lv_coord_t ofs_y;
     lv_bidi_dir_t bidi_dir;

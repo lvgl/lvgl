@@ -84,7 +84,7 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
  * @return the index of the first char of the new line (in byte index not letter index. With UTF-8
  * they are different)
  */
-uint16_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord_t letter_space, lv_coord_t max_width,
+uint32_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coord_t letter_space, lv_coord_t max_width,
                                lv_txt_flag_t flag);
 
 /**
@@ -97,7 +97,7 @@ uint16_t _lv_txt_get_next_line(const char * txt, const lv_font_t * font, lv_coor
  * @param flags settings for the text from 'txt_flag_t' enum
  * @return length of a char_num long text
  */
-lv_coord_t _lv_txt_get_width(const char * txt, uint16_t length, const lv_font_t * font, lv_coord_t letter_space,
+lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t * font, lv_coord_t letter_space,
                              lv_txt_flag_t flag);
 
 /**

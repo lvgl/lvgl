@@ -529,11 +529,11 @@ static bool anim_ready_handler(lv_anim_t * a)
     }
     /*If the animation is not deleted then restart it*/
     else {
-        a->act_time = -a->repeat_delay; /*Restart the animation*/
+        a->act_time = -(int32_t)(a->repeat_delay); /*Restart the animation*/
         /*Swap the start and end values in play back mode*/
         if(a->playback_time != 0) {
             /*If now turning back use the 'playback_pause*/
-            if(a->playback_now == 0) a->act_time = -a->playback_delay;
+            if(a->playback_now == 0) a->act_time = -(int32_t)(a->playback_delay);
 
             /*Toggle the play back state*/
             a->playback_now = a->playback_now == 0 ? 1 : 0;

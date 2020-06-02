@@ -440,7 +440,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
             if(txt[ext->ta.cursor.pos] == '.') {
                 lv_textarea_cursor_left(spinbox);
             }
-            else if(ext->ta.cursor.pos == txt_len) {
+            else if(ext->ta.cursor.pos == (uint32_t)txt_len) {
                 lv_textarea_set_cursor_pos(spinbox, txt_len - 1);
             }
             else if(ext->ta.cursor.pos == 0 && ext->range_min < 0) {

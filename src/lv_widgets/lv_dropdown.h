@@ -125,7 +125,7 @@ void lv_dropdown_set_options_static(lv_obj_t * ddlist, const char * options);
  * @param option a string without '\n'. E.g. "Four"
  * @param pos  the insert position, indexed from 0, LV_DROPDOWN_POS_LAST = end of string
  */
-void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint16_t pos);
+void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint32_t pos);
 
 /**
  * Set the selected option
@@ -201,7 +201,7 @@ uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * ddlist);
  * @param buf pointer to an array to store the string
  * @param buf_size size of `buf` in bytes. 0: to ignore it.
  */
-void lv_dropdown_get_selected_str(const lv_obj_t * ddlist, char * buf, uint16_t buf_size);
+void lv_dropdown_get_selected_str(const lv_obj_t * ddlist, char * buf, uint32_t buf_size);
 
 /**
  * Get the fix height value.
