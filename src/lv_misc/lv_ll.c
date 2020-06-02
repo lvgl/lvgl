@@ -51,18 +51,12 @@ void _lv_ll_init(lv_ll_t * ll_p, uint32_t node_size)
 {
     ll_p->head = NULL;
     ll_p->tail = NULL;
-#ifdef LV_MEM_ENV64
+#ifdef LV_ARCH_64
     /*Round the size up to 8*/
-    if(node_size & 0x7) {
-        node_size = node_size & (~0x7);
-        node_size += 8;
-    }
+    node_size = (node_size + 7) & (~0x7);
 #else
     /*Round the size up to 4*/
-    if(node_size & 0x3) {
-        node_size = node_size & (~0x3);
-        node_size += 4;
-    }
+    node_size = node_size + 3 & (~0x3);
 #endif
 
     ll_p->n_size = node_size;
