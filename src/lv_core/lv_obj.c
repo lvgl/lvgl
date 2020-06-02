@@ -310,7 +310,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->top          = 0;
     new_obj->protect      = LV_PROTECT_NONE;
     new_obj->parent_event = 0;
-    new_obj->gesture_parent = 1;
+    new_obj->gesture_parent = parent ? 1 : 0;
     new_obj->state = LV_STATE_DEFAULT;
 
     new_obj->ext_attr = NULL;

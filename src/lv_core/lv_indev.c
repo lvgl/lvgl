@@ -1426,12 +1426,13 @@ static void indev_gesture(lv_indev_proc_t * proc)
 
     lv_obj_t * gesture_obj = proc->types.pointer.act_obj;
 
-    /*If gesture parent is active check recursively the drag_parent attribute*/
+    /*If gesture parent is active check recursively the gesture attribute*/
     while(gesture_obj && lv_obj_get_gesture_parent(gesture_obj)) {
         gesture_obj = lv_obj_get_parent(gesture_obj);
     }
 
     if(gesture_obj == NULL) return;
+
 
     if((LV_MATH_ABS(proc->types.pointer.vect.x) < indev_act->driver.gesture_min_velocity) &&
        (LV_MATH_ABS(proc->types.pointer.vect.y) < indev_act->driver.gesture_min_velocity)) {
