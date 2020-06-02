@@ -160,7 +160,7 @@ void * lv_mem_alloc(size_t size)
     size = (size + 7) & (~0x7);
 #else
     /*Round the size up to 4*/
-    size = (size + 3) & (~0x7);
+    size = (size + 3) & (~0x3);
 #endif
     void * alloc = NULL;
 
@@ -278,7 +278,7 @@ void * lv_mem_realloc(void * data_p, size_t new_size)
     new_size = (new_size + 7) & (~0x7);
 #else
     /*Round the size up to 4*/
-    new_size = (new_size + 3) & (~0x7
+    new_size = (new_size + 3) & (~0x3);
 #endif
 
     /*data_p could be previously freed pointer (in this case it is invalid)*/
@@ -852,7 +852,7 @@ static void ent_trunc(lv_mem_ent_t * e, size_t size)
     size = (size + 7) & (~0x7);
 #else
     /*Round the size up to 4*/
-    size = (size + 3) & (~0x7
+    size = (size + 3) & (~0x3);
 #endif
 
     /*Don't let empty space only for a header without data*/
