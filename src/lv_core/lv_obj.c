@@ -171,16 +171,16 @@ void lv_init(void)
 void lv_deinit(void)
 {
     _lv_gc_clear_roots();
-#if LV_USE_LOG
-    lv_log_register_print_cb(NULL);
-#endif
+	
     lv_disp_set_default(NULL);
     _lv_mem_deinit();
     lv_initialized = false;
+	
+    LV_LOG_INFO("lv_deinit done");
+	
 #if LV_USE_LOG
     lv_log_register_print_cb(NULL);
 #endif
-    LV_LOG_INFO("lv_deinit done");
 }
 #endif
 
