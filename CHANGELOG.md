@@ -7,6 +7,7 @@
 - `lv_ta` fix wrong cursor positon when clicked after the last character
 - Change all text related indices from 16-bit to 32-bit integers throughout whole library. #1545
 - Fix gestures
+- Do not call `set_px_cb` for transparent pixel
 
 ## v7.0.1 (01.06.2020)
 
