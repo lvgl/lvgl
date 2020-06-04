@@ -734,6 +734,10 @@ static void list_init(void)
     lv_style_set_border_color(&styles->list_btn, LV_STATE_FOCUSED, theme.color_primary);
     lv_style_set_border_width(&styles->list_btn, LV_STATE_DEFAULT, 1);
 
+    lv_style_set_outline_color(&styles->list_btn, LV_STATE_FOCUSED, theme.color_secondary);
+    lv_style_set_outline_width(&styles->list_btn, LV_STATE_FOCUSED, BORDER_WIDTH);
+    lv_style_set_outline_pad(&styles->list_btn, LV_STATE_FOCUSED, -BORDER_WIDTH);
+
     lv_style_set_pad_left(&styles->list_btn, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_pad_right(&styles->list_btn, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_pad_top(&styles->list_btn, LV_STATE_DEFAULT, PAD_DEF);
@@ -741,9 +745,10 @@ static void list_init(void)
     lv_style_set_pad_inner(&styles->list_btn, LV_STATE_DEFAULT, PAD_DEF);
 
     lv_style_set_transform_width(&styles->list_btn, LV_STATE_DEFAULT, - PAD_DEF);
-    lv_style_set_transform_width(&styles->list_btn, LV_STATE_PRESSED, 0);
-    lv_style_set_transform_width(&styles->list_btn, LV_STATE_CHECKED, 0);
-    lv_style_set_transform_width(&styles->list_btn, LV_STATE_DISABLED, 0);
+    lv_style_set_transform_width(&styles->list_btn, LV_STATE_PRESSED, -BORDER_WIDTH);
+    lv_style_set_transform_width(&styles->list_btn, LV_STATE_CHECKED, -BORDER_WIDTH);
+    lv_style_set_transform_width(&styles->list_btn, LV_STATE_DISABLED, -BORDER_WIDTH);
+    lv_style_set_transform_width(&styles->list_btn, LV_STATE_FOCUSED, - BORDER_WIDTH);
 
     lv_style_set_transition_time(&styles->list_btn, LV_STATE_DEFAULT, TRANSITION_TIME);
     lv_style_set_transition_prop_6(&styles->list_btn, LV_STATE_DEFAULT, LV_STYLE_BG_COLOR);
