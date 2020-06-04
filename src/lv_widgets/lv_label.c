@@ -571,10 +571,17 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint32_t char_id, lv_point_
     LV_ASSERT_OBJ(label, LV_OBJX_NAME);
     LV_ASSERT_NULL(pos);
 
+    const char * txt         = lv_label_get_text(label);
+
+    if(txt[0] == '\0') {
+        pos->x = 0;
+        pos->y = 0;
+        return;
+    }
+
     lv_area_t txt_coords;
     get_txt_coords(label, &txt_coords);
 
-    const char * txt         = lv_label_get_text(label);
     lv_label_ext_t * ext     = lv_obj_get_ext_attr(label);
     uint32_t line_start      = 0;
     uint32_t new_line_start  = 0;
