@@ -140,6 +140,9 @@ void lv_init(void)
 #endif
 
     _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(lv_style_trans_t));
+    
+    _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
+    _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
     lv_theme_t * th = LV_THEME_DEFAULT_INIT(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY,
                                             LV_THEME_DEFAULT_FLAG,
@@ -148,9 +151,6 @@ void lv_init(void)
 
     /*Initialize the screen refresh system*/
     _lv_refr_init();
-
-    _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
-    _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
     /*Init the input device handling*/
     _lv_indev_init();
