@@ -1,17 +1,18 @@
 # Changelog
 
 
-## v7.0.2 (under developement)
+## v7.0.2 (under development)
 *Available in the `master` branch*
 
-- `lv_textarea` fix wrong cursor positon when clicked after the last character
+- `lv_textarea` fix wrong cursor position when clicked after the last character
 - Change all text related indices from 16-bit to 32-bit integers throughout whole library. #1545
 - Fix gestures
 - Do not call `set_px_cb` for transparent pixel
 - Fix list button focus in material theme
 - Fix crash when the a text area is cleared with the backspace of a keyboard
-- Add versionnumber to `lv_conf_template.h`
+- Add version number to `lv_conf_template.h`
 - Add log in true double buffering mode with `set_px_cb`
+- `lv_dropdown`: fix missing `LV_EVENT_VALUE_CHANGED` event when used with encoder
 
 ## v7.0.1 (01.06.2020)
 

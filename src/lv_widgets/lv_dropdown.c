@@ -935,6 +935,9 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
                 lv_dropdown_close(ddlist);
                 if(ext->sel_opt_id_orig != ext->sel_opt_id) {
                     ext->sel_opt_id_orig = ext->sel_opt_id;
+                    uint32_t id  = ext->sel_opt_id; /*Just to use uint32_t in event data*/
+                    lv_res_t res = lv_event_send(ddlist, LV_EVENT_VALUE_CHANGED, &id);
+                    if(res != LV_RES_OK) return res;
                     lv_obj_invalidate(ddlist);
                 }
 #if LV_USE_GROUP
