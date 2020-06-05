@@ -13,6 +13,7 @@
 - Add version number to `lv_conf_template.h`
 - Add log in true double buffering mode with `set_px_cb`
 - `lv_dropdown`: fix missing `LV_EVENT_VALUE_CHANGED` event when used with encoder
+- `lv_tileview`: fix if not the {0;0} tile is created first
 
 ## v7.0.1 (01.06.2020)
 
