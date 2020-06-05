@@ -35,6 +35,11 @@ extern "C" {
  **********************/
 
 /**
+ * Turn on the peripheral and set output color mode, this only needs to be done once
+ */
+void lv_gpu_stm32_dma2d_init(void);
+
+/**
  * Fill an area in the buffer with a color
  * @param buf a buffer which should be filled
  * @param buf_w width of the buffer in pixels

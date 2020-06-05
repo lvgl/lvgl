@@ -11,7 +11,7 @@
 
 #if LV_USE_GPU_STM32_DMA2D
 
-#include "stm32f429xx.h"
+#include LV_CPU_DMA2D_CMSIS_INCLUDE
 
 /*********************
  *      DEFINES
@@ -63,6 +63,9 @@ void lv_gpu_stm32_dma2d_init(void)
 {
     /* Enable DMA2D clock */
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
+
+    /* Delay after setting peripheral clock */
+    volatile uint32_t temp = RCC->AHB1ENR;
 
     /* set output colour mode */
     DMA2D->OPFCCR = DMA2D_COLOR_FORMAT;
