@@ -422,6 +422,23 @@ void lv_btnmatrix_set_one_check(lv_obj_t * btnm, bool one_chk)
     make_one_button_toggled(btnm, 0);
 }
 
+/**
+ * Set the align of the map text (left, right or center)
+ * @param btnm pointer to a btnmatrix object
+ * @param align LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
+ */
+void lv_btnmatrix_set_align(lv_obj_t* btnm, lv_label_align_t align)
+{
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
+    lv_btnmatrix_ext_t* ext = lv_obj_get_ext_attr(btnm);
+    if (ext->align == align) return;
+
+    ext->align = align;
+
+    lv_obj_invalidate(btnm);
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -563,6 +580,32 @@ bool lv_btnmatrix_get_one_check(const lv_obj_t * btnm)
     return ext->one_check;
 }
 
+/**
+ * Get the align attribute
+ * @param btnm pointer to a btnmatrix object
+ * @return LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
+ */
+lv_label_align_t lv_btnmatrix_get_align(const lv_obj_t* btnm)
+{
+    LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
+
+    lv_btnmatrix_ext_t* ext = lv_obj_get_ext_attr(btnm);
+
+    lv_label_align_t align = ext->align;
+
+    if (align == LV_LABEL_ALIGN_AUTO) {
+#if LV_USE_BIDI
+        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(btnm);
+        if (base_dir == LV_BIDI_DIR_RTL) align = LV_LABEL_ALIGN_RIGHT;
+        else align = LV_LABEL_ALIGN_LEFT;
+#else
+        align = LV_LABEL_ALIGN_LEFT;
+#endif
+    }
+
+    return align;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -598,7 +641,10 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
         uint16_t btn_i = 0;
         uint16_t txt_i = 0;
         lv_txt_flag_t txt_flag = LV_TXT_FLAG_NONE;
-        if(ext->recolor) txt_flag = LV_TXT_FLAG_RECOLOR;
+        if (ext->recolor) txt_flag |= LV_TXT_FLAG_RECOLOR;
+        lv_label_align_t align = lv_btnmatrix_get_align(btnm);
+        if (align == LV_LABEL_ALIGN_CENTER) txt_flag |= LV_TXT_FLAG_CENTER;
+        if (align == LV_LABEL_ALIGN_RIGHT) txt_flag |= LV_TXT_FLAG_RIGHT;
 
         lv_draw_rect_dsc_t draw_rect_rel_dsc;
         lv_draw_label_dsc_t draw_label_rel_dsc;
