@@ -10,6 +10,7 @@
 - Do not call `set_px_cb` for transparent pixel
 - Fix list button focus in material theme
 - Fix crash when the a text area is cleared with the backspace of a keyboard
+- Add versionnumber to `lv_conf_template.h`
 
 ## v7.0.1 (01.06.2020)
 
