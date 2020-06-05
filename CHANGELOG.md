@@ -11,6 +11,7 @@
 - Fix list button focus in material theme
 - Fix crash when the a text area is cleared with the backspace of a keyboard
 - Add versionnumber to `lv_conf_template.h`
+- Add log in true double buffering mode with `set_px_cb`
 
 ## v7.0.1 (01.06.2020)
 

@@ -202,55 +202,59 @@ void _lv_disp_refr_task(lv_task_t * task)
     if(disp_refr->inv_p != 0) {
         /* In true double buffered mode copy the refreshed areas to the new VDB to keep it up to date.
          * With set_px_cb we don't know anything about the buffer (even it's size) so skip copying.*/
-        if(lv_disp_is_true_double_buf(disp_refr) && disp_refr->driver.set_px_cb == NULL) {
-            lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
+        if(lv_disp_is_true_double_buf(disp_refr)) {
+            if(disp_refr->driver.set_px_cb) {
+                LV_LOG_WARN("Can't handle 2 screen sized buffers with set_px_cb. Display is not refreshed.");
+            } else {
+                lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
 
-            /*Flush the content of the VDB*/
-            lv_refr_vdb_flush();
+                /*Flush the content of the VDB*/
+                lv_refr_vdb_flush();
 
-            /* With true double buffering the flushing should be only the address change of the
-             * current frame buffer. Wait until the address change is ready and copy the changed
-             * content to the other frame buffer (new active VDB) to keep the buffers synchronized*/
-            while(vdb->flushing);
+                /* With true double buffering the flushing should be only the address change of the
+                 * current frame buffer. Wait until the address change is ready and copy the changed
+                 * content to the other frame buffer (new active VDB) to keep the buffers synchronized*/
+                while(vdb->flushing);
 
-            lv_color_t * copy_buf = NULL;
-#if LV_USE_GPU_STM32_DMA2D
-            LV_UNUSED(copy_buf);
-#else
-            copy_buf = _lv_mem_buf_get(disp_refr->driver.hor_res * sizeof(lv_color_t));
-#endif
+                lv_color_t * copy_buf = NULL;
+    #if LV_USE_GPU_STM32_DMA2D
+                LV_UNUSED(copy_buf);
+    #else
+                copy_buf = _lv_mem_buf_get(disp_refr->driver.hor_res * sizeof(lv_color_t));
+    #endif
 
-            uint8_t * buf_act = (uint8_t *)vdb->buf_act;
-            uint8_t * buf_ina = (uint8_t *)vdb->buf_act == vdb->buf1 ? vdb->buf2 : vdb->buf1;
+                uint8_t * buf_act = (uint8_t *)vdb->buf_act;
+                uint8_t * buf_ina = (uint8_t *)vdb->buf_act == vdb->buf1 ? vdb->buf2 : vdb->buf1;
 
-            lv_coord_t hres = lv_disp_get_hor_res(disp_refr);
-            uint16_t a;
-            for(a = 0; a < disp_refr->inv_p; a++) {
-                if(disp_refr->inv_area_joined[a] == 0) {
-                    uint32_t start_offs =
-                        (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
-#if LV_USE_GPU_STM32_DMA2D
-                    lv_gpu_stm32_dma2d_copy((lv_color_t *)(buf_act + start_offs), disp_refr->driver.hor_res,
-                                            (lv_color_t *)(buf_ina + start_offs), disp_refr->driver.hor_res,
-                                            lv_area_get_width(&disp_refr->inv_areas[a]),
-                                            lv_area_get_height(&disp_refr->inv_areas[a]));
-#else
+                lv_coord_t hres = lv_disp_get_hor_res(disp_refr);
+                uint16_t a;
+                for(a = 0; a < disp_refr->inv_p; a++) {
+                    if(disp_refr->inv_area_joined[a] == 0) {
+                        uint32_t start_offs =
+                            (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
+    #if LV_USE_GPU_STM32_DMA2D
+                        lv_gpu_stm32_dma2d_copy((lv_color_t *)(buf_act + start_offs), disp_refr->driver.hor_res,
+                                                (lv_color_t *)(buf_ina + start_offs), disp_refr->driver.hor_res,
+                                                lv_area_get_width(&disp_refr->inv_areas[a]),
+                                                lv_area_get_height(&disp_refr->inv_areas[a]));
+    #else
 
-                    lv_coord_t y;
-                    uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) * sizeof(lv_color_t);
+                        lv_coord_t y;
+                        uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) * sizeof(lv_color_t);
 
-                    for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
-                        /* The frame buffer is probably in an external RAM where sequential access is much faster.
-                         * So first copy a line into a buffer and write it back the ext. RAM */
-                        _lv_memcpy(copy_buf, buf_ina + start_offs, line_length);
-                        _lv_memcpy(buf_act + start_offs, copy_buf, line_length);
-                        start_offs += hres * sizeof(lv_color_t);
+                        for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
+                            /* The frame buffer is probably in an external RAM where sequential access is much faster.
+                             * So first copy a line into a buffer and write it back the ext. RAM */
+                            _lv_memcpy(copy_buf, buf_ina + start_offs, line_length);
+                            _lv_memcpy(buf_act + start_offs, copy_buf, line_length);
+                            start_offs += hres * sizeof(lv_color_t);
+                        }
+    #endif
                     }
-#endif
                 }
-            }
 
-            if(copy_buf) _lv_mem_buf_release(copy_buf);
+                if(copy_buf) _lv_mem_buf_release(copy_buf);
+            }
         } /*End of true double buffer handling*/
 
         /*Clean up*/
