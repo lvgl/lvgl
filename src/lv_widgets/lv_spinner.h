@@ -1,5 +1,5 @@
 /**
- * @file lv_preload.h
+ * @file lv_spinner.h
  *
  */
 
@@ -19,11 +19,11 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_ARC == 0
-#error "lv_preload: lv_arc is required. Enable it in lv_conf.h (LV_USE_ARC  1) "
+#error "lv_spinner: lv_arc is required. Enable it in lv_conf.h (LV_USE_ARC  1) "
 #endif
 
 #if LV_USE_ANIMATION == 0
-#error "lv_preload: animations are required. Enable it in lv_conf.h (LV_USE_ANIMATION  1) "
+#error "lv_spinner: animations are required. Enable it in lv_conf.h (LV_USE_ANIMATION  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
@@ -57,7 +57,7 @@ enum {
 };
 typedef uint8_t lv_spinner_dir_t;
 
-/*Data of pre loader*/
+/*Data of spinner*/
 typedef struct {
     lv_arc_ext_t arc; /*Ext. of ancestor*/
     /*New data for this type */
@@ -82,11 +82,11 @@ typedef uint8_t lv_spinner_style_t;
  **********************/
 
 /**
- * Create a pre loader objects
- * @param par pointer to an object, it will be the parent of the new pre loader
- * @param copy pointer to a pre loader object, if not NULL then the new object will be copied from
+ * Create a spinner object
+ * @param par pointer to an object, it will be the parent of the new spinner
+ * @param copy pointer to a spinner object, if not NULL then the new object will be copied from
  * it
- * @return pointer to the created pre loader
+ * @return pointer to the created spinner
  */
 lv_obj_t * lv_spinner_create(lv_obj_t * par, const lv_obj_t * copy);
 
@@ -96,17 +96,17 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Set the length of the spinning  arc in degrees
- * @param preload pointer to a preload object
+ * @param spinner pointer to a spinner object
  * @param deg length of the arc
  */
-void lv_spinner_set_arc_length(lv_obj_t * preload, lv_anim_value_t deg);
+void lv_spinner_set_arc_length(lv_obj_t * spinner, lv_anim_value_t deg);
 
 /**
  * Set the spin time of the arc
- * @param preload pointer to a preload object
+ * @param spinner pointer to a spinner object
  * @param time time of one round in milliseconds
  */
-void lv_spinner_set_spin_time(lv_obj_t * preload, uint16_t time);
+void lv_spinner_set_spin_time(lv_obj_t * spinner, uint16_t time);
 
 /*=====================
  * Setter functions
@@ -114,47 +114,47 @@ void lv_spinner_set_spin_time(lv_obj_t * preload, uint16_t time);
 
 /**
  * Set the animation type of a spinner.
- * @param preload pointer to pre loader object
- * @param type animation type of the preload
+ * @param spinner pointer to spinner object
+ * @param type animation type of the spinner
  *  */
-void lv_spinner_set_type(lv_obj_t * preload, lv_spinner_type_t type);
+void lv_spinner_set_type(lv_obj_t * spinner, lv_spinner_type_t type);
 
 /**
  * Set the animation direction of a spinner
- * @param preload pointer to pre loader object
- * @param direction animation direction of the preload
+ * @param spinner pointer to spinner object
+ * @param direction animation direction of the spinner
  */
-void lv_spinner_set_dir(lv_obj_t * preload, lv_spinner_dir_t dir);
+void lv_spinner_set_dir(lv_obj_t * spinner, lv_spinner_dir_t dir);
 
 /*=====================
  * Getter functions
  *====================*/
 
 /**
- * Get the arc length [degree] of the a pre loader
- * @param preload pointer to a pre loader object
+ * Get the arc length [degree] of the a spinner
+ * @param spinner pointer to a spinner object
  */
-lv_anim_value_t lv_spinner_get_arc_length(const lv_obj_t * preload);
+lv_anim_value_t lv_spinner_get_arc_length(const lv_obj_t * spinner);
 
 /**
  * Get the spin time of the arc
- * @param preload pointer to a pre loader object [milliseconds]
+ * @param spinner pointer to a spinner object [milliseconds]
  */
-uint16_t lv_spinner_get_spin_time(const lv_obj_t * preload);
+uint16_t lv_spinner_get_spin_time(const lv_obj_t * spinner);
 
 /**
  * Get the animation type of a spinner.
- * @param preload pointer to pre loader object
+ * @param spinner pointer to spinner object
  * @return animation type
  *  */
-lv_spinner_type_t lv_spinner_get_type(lv_obj_t * preload);
+lv_spinner_type_t lv_spinner_get_type(lv_obj_t * spinner);
 
 /**
  * Get the animation direction of a spinner
- * @param preload pointer to pre loader object
+ * @param spinner pointer to spinner object
  * @return animation direction
  */
-lv_spinner_dir_t lv_spinner_get_dir(lv_obj_t * preload);
+lv_spinner_dir_t lv_spinner_get_dir(lv_obj_t * spinner);
 
 /*=====================
  * Other functions
