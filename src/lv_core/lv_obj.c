@@ -3681,15 +3681,15 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
  * @param obj the start object
  * @return the object to really focus
  */
-lv_obj_t * lv_obj_get_focused_obj(lv_obj_t * obj)
+lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj)
 {
     if(obj == NULL) return NULL;
-    lv_obj_t * focus_obj = obj;
+    const lv_obj_t * focus_obj = obj;
     while(lv_obj_get_focus_parent(focus_obj) != false && focus_obj != NULL) {
     	focus_obj = lv_obj_get_parent(focus_obj);
     }
 
-    return focus_obj;
+    return (lv_obj_t*)focus_obj;
 }
 
 /**

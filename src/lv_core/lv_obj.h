@@ -687,6 +687,14 @@ void lv_obj_set_drag_throw(lv_obj_t * obj, bool en);
 void lv_obj_set_drag_parent(lv_obj_t * obj, bool en);
 
 /**
+* Enable to use parent for focus state.
+* When object is focused the parent will get the state instead (visual only)
+* @param obj pointer to an object
+* @param en true: enable the 'focus parent' for the object
+*/
+void lv_obj_set_focus_parent(lv_obj_t * obj, bool en);
+
+/**
 * Enable to use parent for gesture related operations.
 * If trying to gesture the object the parent will be moved instead
 * @param obj pointer to an object
@@ -1189,6 +1197,15 @@ bool lv_obj_get_drag_throw(const lv_obj_t * obj);
  */
 bool lv_obj_get_drag_parent(const lv_obj_t * obj);
 
+
+/**
+* Get the focus parent attribute of an object
+* @param obj pointer to an object
+* @return true: focus parent is enabled
+*/
+bool lv_obj_get_focus_parent(const lv_obj_t * obj);
+
+
 /**
  * Get the drag parent attribute of an object
  * @param obj pointer to an object
@@ -1321,26 +1338,11 @@ void * lv_obj_get_group(const lv_obj_t * obj);
 bool lv_obj_is_focused(const lv_obj_t * obj);
 
 /**
- * Get the really dragged object by taking `focus_parent` into account.
+ * Get the really focused object by taking `focus_parent` into account.
  * @param obj the start object
  * @return the object to really focus
  */
-lv_obj_t * lv_obj_get_focused_obj(lv_obj_t * obj);
-
-/**
-* Enable to use parent for focus state.
-* When object is focused the parent will get the state instead (visual only)
-* @param obj pointer to an object
-* @param en true: enable the 'focus parent' for the object
-*/
-void lv_obj_set_focus_parent(lv_obj_t * obj, bool en);
-
-/**
-* Get the focus parent attribute of an object
-* @param obj pointer to an object
-* @return true: focus parent is enabled
-*/
-bool lv_obj_get_focus_parent(const lv_obj_t * obj);
+lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj);
 
 /*-------------------
  * OTHER FUNCTIONS
