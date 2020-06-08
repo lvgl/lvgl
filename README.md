@@ -142,10 +142,12 @@ bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
 10. Call `lv_task_handler()` periodically every few milliseconds in the main `while(1)` loop, in Timer interrupt or in an Operation system task. 
 It will redraw the screen if required, handle input devices etc. 
 
+For more detailed desription visit the [Porting](https://docs.lvgl.io/v7/en/html/porting/index.html) section of the documentation.
 
 ## Learn the basics
 
-In this section you can read the very basics of LVGL. For a more detailed guide check the [Quick overview](https://docs.lvgl.io/v7/en/html/get-started/quick-overview.html#learn-the-basics) in the documentation. 
+In this section you can read the very basics of LVGL. 
+For a more detailed guide check the [Quick overview](https://docs.lvgl.io/v7/en/html/get-started/quick-overview.html#learn-the-basics) in the documentation. 
 
 ### Widgets (Objects)
 
