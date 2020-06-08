@@ -363,6 +363,12 @@
 #define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning
 #endif
 
+/* Prefix variables that are used in GPU accelerated operations, often these need to be
+ * placed in RAM sections that are DMA accessible */
+#ifndef LV_ATTRIBUTE_DMA
+#define LV_ATTRIBUTE_DMA
+#endif
+
 /*===================
  *  HAL settings
  *==================*/

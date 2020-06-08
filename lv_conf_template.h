@@ -249,6 +249,10 @@ typedef void * lv_img_decoder_user_data_t;
  */
 #define LV_EXPORT_CONST_INT(int_value) struct _silence_gcc_warning
 
+/* Prefix variables that are used in GPU accelerated operations, often these need to be
+ * placed in RAM sections that are DMA accessible */
+#define LV_ATTRIBUTE_DMA
+
 /*===================
  *  HAL settings
  *==================*/
