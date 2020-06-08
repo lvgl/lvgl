@@ -221,7 +221,8 @@ typedef struct _lv_obj_t {
     uint8_t top             : 1; /**< 1: If the object or its children is clicked it goes to the foreground*/
     uint8_t parent_event    : 1; /**< 1: Send the object's events to the parent too. */
     uint8_t adv_hittest     : 1; /**< 1: Use advanced hit-testing (slower) */
-    uint8_t gesture_parent : 1;  /**< 1: Parent will be gesture instead*/
+    uint8_t gesture_parent  : 1; /**< 1: Parent will be gesture instead*/
+    uint8_t focus_parent    : 1; /**< 1: Parent will be focused instead*/
 
     lv_drag_dir_t drag_dir  : 3; /**<  Which directions the object can be dragged in */
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
@@ -1318,6 +1319,28 @@ void * lv_obj_get_group(const lv_obj_t * obj);
  * @return true: the object is focused, false: the object is not focused or not in a group
  */
 bool lv_obj_is_focused(const lv_obj_t * obj);
+
+/**
+ * Get the really dragged object by taking `focus_parent` into account.
+ * @param obj the start object
+ * @return the object to really focus
+ */
+lv_obj_t * lv_obj_get_focused_obj(lv_obj_t * obj);
+
+/**
+* Enable to use parent for focus state.
+* When object is focused the parent will get the state instead (visual only)
+* @param obj pointer to an object
+* @param en true: enable the 'focus parent' for the object
+*/
+void lv_obj_set_focus_parent(lv_obj_t * obj, bool en);
+
+/**
+* Get the focus parent attribute of an object
+* @param obj pointer to an object
+* @return true: focus parent is enabled
+*/
+bool lv_obj_get_focus_parent(const lv_obj_t * obj);
 
 /*-------------------
  * OTHER FUNCTIONS
