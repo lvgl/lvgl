@@ -3,6 +3,7 @@
 ## v7.1.0 (under development)
 *Available in the `dev` branch*
 - Add `focus_parent` attribute to `lv_obj`
+- Allow using buttons in encoder input device
 
 ## v7.0.2 (under development)
 *Available in the `master` branch*
