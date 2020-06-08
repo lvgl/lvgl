@@ -447,7 +447,7 @@ void lv_textarea_del_char(lv_obj_t * ta)
 
     if(ext->pwd_mode != 0) {
         uint32_t byte_pos = _lv_txt_encoded_get_byte_id(ext->pwd_tmp, ext->cursor.pos - 1);
-        _lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, _lv_txt_encoded_size(&label_txt[byte_pos]));
+        _lv_txt_cut(ext->pwd_tmp, ext->cursor.pos - 1, _lv_txt_encoded_size(&ext->pwd_tmp[byte_pos]));
 
         ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 1);
         LV_ASSERT_MEM(ext->pwd_tmp);

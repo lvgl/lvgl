@@ -16,6 +16,7 @@
 - `lv_tileview`: fix if not the {0;0} tile is created first
 - `lv_debug`: restructure to allow asserting in from `lv_misc` too
 - add assert if `_lv_mem_buf_get()` fails
+- `lv_textarea`: fix character delete in password mode
 
 ## v7.0.1 (01.06.2020)
 
