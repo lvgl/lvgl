@@ -206,9 +206,9 @@ void * lv_mem_alloc(size_t size)
     }else{
       #if LV_MEM_CUSTOM == 0
       /* just a safety check, should always be true */
-      if ((uint32_t) alloc > (uint32_t) work_mem) {
-        if ((((uint32_t) alloc - (uint32_t) work_mem) + size) > mem_max_size) {
-          mem_max_size = ((uint32_t) alloc - (uint32_t) work_mem) + size;
+      if ((uintptr_t) alloc > (uintptr_t) work_mem) {
+        if ((((uintptr_t) alloc - (uintptr_t) work_mem) + size) > mem_max_size) {
+          mem_max_size = ((uintptr_t) alloc - (uintptr_t) work_mem) + size;
         }
       }
       #endif
