@@ -9,7 +9,7 @@
 #include "lv_arc.h"
 #if LV_USE_ARC != 0
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_arc.h"
 #include "../lv_themes/lv_theme.h"

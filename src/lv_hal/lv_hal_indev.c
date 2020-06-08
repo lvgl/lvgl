@@ -8,7 +8,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_hal/lv_hal_indev.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_misc/lv_mem.h"

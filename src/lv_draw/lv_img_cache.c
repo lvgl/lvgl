@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "lv_img_cache.h"
 #include "lv_img_decoder.h"
 #include "lv_draw_img.h"

@@ -11,7 +11,7 @@
 #include "lv_bar.h"
 #if LV_USE_BAR != 0
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_anim.h"

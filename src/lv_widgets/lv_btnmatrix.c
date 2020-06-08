@@ -9,7 +9,7 @@
 #include "lv_btnmatrix.h"
 #if LV_USE_BTNMATRIX != 0
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_refr.h"

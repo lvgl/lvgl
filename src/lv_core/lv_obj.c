@@ -11,7 +11,7 @@
 #include "lv_refr.h"
 #include "lv_group.h"
 #include "lv_disp.h"
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_anim.h"
@@ -92,6 +92,7 @@ static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
 static void fade_in_anim_ready(lv_anim_t * a);
 #endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
+static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
 
@@ -3405,6 +3406,52 @@ void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
 #endif
 }
 
+/**
+ * Check if any object has a given type
+ * @param obj pointer to an object
+ * @param obj_type type of the object. (e.g. "lv_btn")
+ * @return true: valid
+ */
+bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type)
+{
+    if(obj_type[0] == '\0') return true;
+
+    lv_obj_type_t types;
+    lv_obj_get_type((lv_obj_t *)obj, &types);
+
+    uint8_t i;
+    for(i = 0; i < LV_MAX_ANCESTOR_NUM; i++) {
+        if(types.type[i] == NULL) break;
+        if(strcmp(types.type[i], obj_type) == 0) return true;
+    }
+
+    return false;
+}
+
+/**
+ * Check if any object is still "alive", and part of the hierarchy
+ * @param obj pointer to an object
+ * @param obj_type type of the object. (e.g. "lv_btn")
+ * @return true: valid
+ */
+bool lv_debug_check_obj_valid(const lv_obj_t * obj)
+{
+    lv_disp_t * disp = lv_disp_get_next(NULL);
+    while(disp) {
+        lv_obj_t * scr;
+        _LV_LL_READ(disp->scr_ll, scr) {
+
+            if(scr == obj) return true;
+            bool found = obj_valid_child(scr, obj);
+            if(found) return true;
+        }
+
+        disp = lv_disp_get_next(disp);
+    }
+
+    return false;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
@@ -3999,6 +4046,21 @@ static void lv_event_mark_deleted(lv_obj_t * obj)
         if(t->obj == obj) t->deleted = true;
         t = t->prev;
     }
+}
+
+static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
+{
+    /*Check all children of `parent`*/
+    lv_obj_t * child;
+    _LV_LL_READ(parent->child_ll, child) {
+        if(child == obj_to_find) return true;
+
+        /*Check the children*/
+        bool found = obj_valid_child(child, obj_to_find);
+        if(found) return true;
+    }
+
+    return false;
 }
 
 

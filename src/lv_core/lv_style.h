@@ -19,6 +19,7 @@ extern "C" {
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_anim.h"
 #include "../lv_misc/lv_types.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw_blend.h"
 
 /*********************
@@ -541,6 +542,19 @@ lv_res_t _lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop
  */
 lv_res_t _lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop, const void ** res);
 
+/**
+ * Check whether a style is valid (initialized correctly)
+ * @param style pointer to a style
+ * @return true: valid
+ */
+bool lv_debug_check_style(const lv_style_t * style);
+
+/**
+ * Check whether a style list is valid (initialized correctly)
+ * @param style pointer to a style
+ * @return true: valid
+ */
+bool lv_debug_check_style_list(const lv_style_list_t * list);
 
 /*************************
  *    GLOBAL VARIABLES
@@ -561,6 +575,34 @@ lv_res_t _lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop
  */
 #define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_init(&name); lv_style_copy(&name, copy);
 
+
+
+#if LV_USE_DEBUG
+
+# ifndef LV_DEBUG_IS_STYLE
+#  define LV_DEBUG_IS_STYLE(style_p) (lv_debug_check_style(style_p))
+# endif
+
+# ifndef LV_DEBUG_IS_STYLE_LIST
+#  define LV_DEBUG_IS_STYLE_LIST(list_p) (lv_debug_check_style_list(list_p))
+# endif
+
+# if LV_USE_ASSERT_STYLE
+#  ifndef LV_ASSERT_STYLE
+#   define LV_ASSERT_STYLE(style_p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STYLE(style_p), "Invalid style", style_p);
+#  endif
+#  ifndef LV_ASSERT_STYLE_LIST
+#   define LV_ASSERT_STYLE_LIST(list_p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STYLE_LIST(list_p), "Invalid style list", list_p);
+#  endif
+# else
+#   define LV_ASSERT_STYLE(style_p) true
+#   define LV_ASSERT_STYLE_LIST(list_p) true
+# endif
+
+#else
+# define LV_ASSERT_STYLE(p) true
+# define LV_ASSERT_STYLE_LIST(p) true
+#endif
 
 #ifdef __cplusplus
 } /* extern "C" */

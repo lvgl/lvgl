@@ -9,7 +9,7 @@
 #include "lv_win.h"
 #if LV_USE_WIN != 0
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_core/lv_disp.h"
 

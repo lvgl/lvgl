@@ -9,7 +9,7 @@
 #include "lv_msgbox.h"
 #if LV_USE_MSGBOX != 0
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_disp.h"
 #include "../lv_themes/lv_theme.h"

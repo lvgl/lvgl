@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
-#include "../lv_core/lv_debug.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_anim.h"
 
@@ -1002,6 +1001,45 @@ lv_res_t _lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop
     if(weight >= 0)  return LV_RES_OK;
     else return LV_RES_INV;
 }
+
+/**
+ * Check whether a style is valid (initialized correctly)
+ * @param style pointer to a style
+ * @return true: valid
+ */
+bool lv_debug_check_style(const lv_style_t * style)
+{
+    if(style == NULL) return true;  /*NULL style is still valid*/
+
+#if LV_USE_ASSERT_STYLE
+    if(style->sentinel != LV_DEBUG_STYLE_SENTINEL_VALUE) {
+        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
+        return false;
+    }
+#endif
+
+    return true;
+}
+
+/**
+ * Check whether a style list is valid (initialized correctly)
+ * @param style pointer to a style
+ * @return true: valid
+ */
+bool lv_debug_check_style_list(const lv_style_list_t * list)
+{
+    if(list == NULL) return true;  /*NULL list is still valid*/
+
+#if LV_USE_ASSERT_STYLE
+    if(list->sentinel != LV_DEBUG_STYLE_LIST_SENTINEL_VALUE) {
+        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
+        return false;
+    }
+#endif
+
+    return true;
+}
+
 
 /**********************
  *   STATIC FUNCTIONS

@@ -9,7 +9,7 @@
 #include "lv_spinner.h"
 #if LV_USE_SPINNER != 0
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_rect.h"
 #include "../lv_draw/lv_draw_arc.h"

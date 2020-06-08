@@ -15,7 +15,7 @@
     #error "lv_sw: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER  1) "
 #endif
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_core/lv_indev.h"

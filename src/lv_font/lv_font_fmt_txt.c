@@ -8,7 +8,7 @@
  *********************/
 #include "lv_font.h"
 #include "lv_font_fmt_txt.h"
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_log.h"

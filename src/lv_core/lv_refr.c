@@ -221,7 +221,7 @@ void _lv_disp_refr_task(lv_task_t * task)
                 LV_UNUSED(copy_buf);
     #else
                 copy_buf = _lv_mem_buf_get(disp_refr->driver.hor_res * sizeof(lv_color_t));
-    #endif
+                #endif
 
                 uint8_t * buf_act = (uint8_t *)vdb->buf_act;
                 uint8_t * buf_ina = (uint8_t *)vdb->buf_act == vdb->buf1 ? vdb->buf2 : vdb->buf1;

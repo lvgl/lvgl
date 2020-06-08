@@ -10,7 +10,7 @@
 #include "lv_roller.h"
 #if LV_USE_ROLLER != 0
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_themes/lv_theme.h"

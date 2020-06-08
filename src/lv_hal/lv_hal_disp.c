@@ -14,7 +14,7 @@
 #include "lv_hal.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_gc.h"
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_core/lv_obj.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_themes/lv_theme.h"

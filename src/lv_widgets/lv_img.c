@@ -14,7 +14,7 @@
     #error "lv_img: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_img_decoder.h"
 #include "../lv_misc/lv_fs.h"

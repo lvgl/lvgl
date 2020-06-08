@@ -9,7 +9,7 @@
 #include "lv_fs.h"
 #if LV_USE_FILESYSTEM
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "lv_ll.h"
 #include <string.h>
 #include "lv_gc.h"

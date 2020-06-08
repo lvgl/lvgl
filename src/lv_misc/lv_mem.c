@@ -513,14 +513,13 @@ void * _lv_mem_buf_get(uint32_t size)
             /*if this fails you probably need to increase your LV_MEM_SIZE/heap size*/
             LV_GC_ROOT(_lv_mem_buf[i]).p = lv_mem_realloc(LV_GC_ROOT(_lv_mem_buf[i]).p, size);
             if(LV_GC_ROOT(_lv_mem_buf[i]).p == NULL) {
-                LV_LOG_ERROR("lv_mem_buf_get: Out of memory, can't allocate a new  buffer (increase your LV_MEM_SIZE/heap size)")
+                LV_DEBUG_ASSERT(false, "Out of memory, can't allocate a new  buffer (increase your LV_MEM_SIZE/heap size", 0x00);
             }
             return  LV_GC_ROOT(_lv_mem_buf[i]).p;
         }
     }
 
-    LV_LOG_ERROR("lv_mem_buf_get: no free buffer. Increase LV_DRAW_BUF_MAX_NUM.");
-
+    LV_DEBUG_ASSERT(false, "No free buffer. Increase LV_DRAW_BUF_MAX_NUM.", 0x00);
     return NULL;
 }
 

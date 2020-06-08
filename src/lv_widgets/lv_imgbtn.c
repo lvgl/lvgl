@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "lv_imgbtn.h"
 #include "lv_label.h"
@@ -350,7 +350,7 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
                 clip_center_area.y2 = coords.y2;
 
                 bool comm_res;
-                comm_res = lv_area_intersect(&clip_center_area, &clip_center_area, clip_area);
+                comm_res = _lv_area_intersect(&clip_center_area, &clip_center_area, clip_area);
                 if(comm_res) {
                     lv_coord_t obj_w = lv_obj_get_width(imgbtn);
                     lv_coord_t i;

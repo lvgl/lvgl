@@ -11,7 +11,7 @@
 #include "../lv_hal/lv_hal_disp.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_bidi.h"
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 
 /*********************
  *      DEFINES

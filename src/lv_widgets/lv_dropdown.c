@@ -9,7 +9,7 @@
 #include "lv_dropdown.h"
 #if LV_USE_DROPDOWN != 0
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_indev.h"

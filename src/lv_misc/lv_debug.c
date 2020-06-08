@@ -6,10 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_obj.h"
 #include "lv_debug.h"
 
 #if LV_USE_DEBUG
+
+#include "lv_mem.h"
+#include <string.h>
 
 /*********************
  *      DEFINES
@@ -28,7 +30,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static bool obj_valid_child(const lv_obj_t * parent, const  lv_obj_t * obj_to_find);
 
 /**********************
  *  STATIC VARIABLES
@@ -52,68 +53,6 @@ bool lv_debug_check_null(const void * p)
 bool lv_debug_check_mem_integrity(void)
 {
     return lv_mem_test() == LV_RES_OK ? true : false;
-}
-
-bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type)
-{
-    if(obj_type[0] == '\0') return true;
-
-    lv_obj_type_t types;
-    lv_obj_get_type((lv_obj_t *)obj, &types);
-
-    uint8_t i;
-    for(i = 0; i < LV_MAX_ANCESTOR_NUM; i++) {
-        if(types.type[i] == NULL) break;
-        if(strcmp(types.type[i], obj_type) == 0) return true;
-    }
-
-    return false;
-}
-
-bool lv_debug_check_obj_valid(const lv_obj_t * obj)
-{
-    lv_disp_t * disp = lv_disp_get_next(NULL);
-    while(disp) {
-        lv_obj_t * scr;
-        _LV_LL_READ(disp->scr_ll, scr) {
-
-            if(scr == obj) return true;
-            bool found = obj_valid_child(scr, obj);
-            if(found) return true;
-        }
-
-        disp = lv_disp_get_next(disp);
-    }
-
-    return false;
-}
-
-bool lv_debug_check_style(const lv_style_t * style)
-{
-    if(style == NULL) return true;  /*NULL style is still valid*/
-
-#if LV_USE_ASSERT_STYLE
-    if(style->sentinel != LV_DEBUG_STYLE_SENTINEL_VALUE) {
-        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
-        return false;
-    }
-#endif
-
-    return true;
-}
-
-bool lv_debug_check_style_list(const lv_style_list_t * list)
-{
-    if(list == NULL) return true;  /*NULL list is still valid*/
-
-#if LV_USE_ASSERT_STYLE
-    if(list->sentinel != LV_DEBUG_STYLE_LIST_SENTINEL_VALUE) {
-        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
-        return false;
-    }
-#endif
-
-    return true;
 }
 
 bool lv_debug_check_str(const void * str)
@@ -196,20 +135,6 @@ void lv_debug_log_error(const char * msg, uint64_t value)
  *   STATIC FUNCTIONS
  **********************/
 
-static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
-{
-    /*Check all children of `parent`*/
-    lv_obj_t * child;
-    _LV_LL_READ(parent->child_ll, child) {
-        if(child == obj_to_find) return true;
-
-        /*Check the children*/
-        bool found = obj_valid_child(child, obj_to_find);
-        if(found) return true;
-    }
-
-    return false;
-}
 
 #endif /*LV_USE_DEBUG*/
 

@@ -21,6 +21,7 @@ extern "C" {
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_hal/lv_hal.h"
 #include "../lv_draw/lv_draw_rect.h"
 #include "../lv_draw/lv_draw_label.h"
@@ -1369,6 +1370,23 @@ void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay);
  */
 void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay);
 
+/**
+ * Check if any object has a given type
+ * @param obj pointer to an object
+ * @param obj_type type of the object. (e.g. "lv_btn")
+ * @return true: valid
+ */
+bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
+
+/**
+ * Check if any object is still "alive", and part of the hierarchy
+ * @param obj pointer to an object
+ * @param obj_type type of the object. (e.g. "lv_btn")
+ * @return true: valid
+ */
+bool lv_debug_check_obj_valid(const lv_obj_t * obj);
+
+
 /**********************
  *      MACROS
  **********************/
@@ -1388,6 +1406,32 @@ void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay);
  * }
  */
 #define LV_EVENT_CB_DECLARE(name) static void name(lv_obj_t * obj, lv_event_t e)
+
+
+#if LV_USE_DEBUG
+
+# ifndef LV_DEBUG_IS_OBJ
+#  define LV_DEBUG_IS_OBJ(obj_p, obj_type) (lv_debug_check_null(obj_p) &&      \
+                                          lv_debug_check_obj_valid(obj_p) && \
+                                          lv_debug_check_obj_type(obj_p, obj_type))
+# endif
+
+
+# if LV_USE_ASSERT_OBJ
+#  ifndef LV_ASSERT_OBJ
+#   define LV_ASSERT_OBJ(obj_p, obj_type) LV_DEBUG_ASSERT(LV_DEBUG_IS_OBJ(obj_p, obj_type), "Invalid object", obj_p);
+#  endif
+# else /* LV_USE_ASSERT_OBJ == 0 */
+#  if LV_USE_ASSERT_NULL /*Use at least LV_ASSERT_NULL if enabled*/
+#    define LV_ASSERT_OBJ(obj_p, obj_type) LV_ASSERT_NULL(obj_p)
+#  else
+#    define LV_ASSERT_OBJ(obj_p, obj_type) true
+#  endif
+# endif
+#else
+# define LV_ASSERT_OBJ(obj, obj_type) true
+#endif
+
 
 #ifdef __cplusplus
 } /* extern "C" */

@@ -9,7 +9,7 @@
 #include "lv_spinbox.h"
 
 #if LV_USE_SPINBOX != 0
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_utils.h"

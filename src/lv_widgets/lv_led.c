@@ -9,7 +9,7 @@
 #include "lv_led.h"
 #if LV_USE_LED != 0
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_draw.h"
 

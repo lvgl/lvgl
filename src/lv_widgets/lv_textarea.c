@@ -10,7 +10,7 @@
 #if LV_USE_TEXTAREA != 0
 
 #include <string.h>
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_draw/lv_draw.h"

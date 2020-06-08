@@ -9,7 +9,7 @@
  *********************/
 #include <stddef.h>
 #include "lv_task.h"
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_hal/lv_hal_tick.h"
 #include "lv_gc.h"
 

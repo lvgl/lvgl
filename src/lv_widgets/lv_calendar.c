@@ -9,7 +9,7 @@
 #include "lv_calendar.h"
 #if LV_USE_CALENDAR != 0
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_hal/lv_hal_indev.h"
 #include "../lv_misc/lv_utils.h"

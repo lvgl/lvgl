@@ -15,7 +15,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 //#include "lv_templ.h" /*TODO uncomment this*/
 
 #if defined(LV_USE_TEMPL) && LV_USE_TEMPL != 0

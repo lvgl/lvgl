@@ -9,7 +9,7 @@
 #include "lv_chart.h"
 #if LV_USE_CHART != 0
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_math.h"

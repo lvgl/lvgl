@@ -11,7 +11,7 @@
 #if LV_USE_ANIMATION
 #include <stddef.h>
 #include <string.h>
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_hal/lv_hal_tick.h"
 #include "lv_task.h"
 #include "lv_math.h"

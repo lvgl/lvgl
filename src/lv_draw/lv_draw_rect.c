@@ -11,7 +11,7 @@
 #include "lv_draw_mask.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_core/lv_refr.h"
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 
 /*********************
  *      DEFINES
