@@ -28,6 +28,7 @@ LVGL provides everything you need to create embedded GUI with easy-to-use graphi
 - [Add LVGL to your project](#add-lvgl-to-your-project)
 - [Learn the basics](#learn-the-basics)
 - [Examples](#examples)
+- [Release policy](#release-policy)
 - [Contributing](#contributing)
 
 
@@ -262,6 +263,25 @@ label.set_text("Button")
 lv.scr_load(scr)
 ```
 
+## Release policy
+LVGL follows the rules of [Semantic versioning](https://semver.org/):
+- Major versions for incompatible API changes. E.g. v5.0.0, v6.0.0
+- Minor version for new but backward-compatible functionalities. E.g. v6.1.0, v6.2.0
+- Patch version for backward-compatible bug fixes. E.g. v6.1.1, v6.1.2
+
+Branches:
+- `master` most recent version, patches are merged directly here. 
+- `dev` merge new features here until they are merged into `master`.
+- `release/vX` there is a branch for every major version to allow adding specific, not forward compatible fixes.
+
+LVGL has a monthly periodic release cycle.
+- **1st Tuesday of the month** 
+  - Make a major, minor, or patch release from `master` depending on the new features.
+  - After that merge only patches into `master` and add new features into the `dev`.
+- **3rd Tuesday of the month** 
+  - Make a patch release from `master`.
+  - After that merge the new features from the `dev` to `master` branch. 
+  - In the rest of the month merge only patches into `master` and new features into `dev` branch.
 ## Contributing
 To ask questions please use the [Forum](https://forum.lvgl.io).
 For development-related things (bug reports, feature suggestions) use [GitHub's Issue tracker](https://github.com/lvgl/lvgl/issues). 
