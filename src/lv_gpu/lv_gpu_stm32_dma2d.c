@@ -11,7 +11,7 @@
 
 #if LV_USE_GPU_STM32_DMA2D
 
-#include LV_CPU_DMA2D_CMSIS_INCLUDE
+#include LV_GPU_DMA2D_CMSIS_INCLUDE
 
 /*********************
  *      DEFINES
