@@ -169,6 +169,7 @@ void lv_win_clean(lv_obj_t * win)
  * Add control button to the header of the window
  * @param win pointer to a window object
  * @param img_src an image source ('lv_img_t' variable, path to file or a symbol)
+ * @param alignment button alignment on the header
  * @return pointer to the created button object
  */
 lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, uint8_t alignment)
