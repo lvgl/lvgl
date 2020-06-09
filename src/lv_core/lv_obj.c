@@ -38,6 +38,10 @@
 
 #include LV_THEME_DEFAULT_INCLUDE
 
+#if LV_USE_GPU_STM32_DMA2D
+#include "../lv_gpu/lv_gpu_stm32_dma2d.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -138,6 +142,11 @@ void lv_init(void)
 
 #if LV_USE_GROUP
     _lv_group_init();
+#endif
+
+#if LV_USE_GPU_STM32_DMA2D
+    /*Initialize DMA2D GPU*/
+    lv_gpu_stm32_dma2d_init();
 #endif
 
     _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(lv_style_trans_t));

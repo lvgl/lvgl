@@ -60,6 +60,10 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
  *  STATIC VARIABLES
  **********************/
 
+#if LV_USE_GPU || LV_USE_GPU_STM32_DMA2D
+LV_ATTRIBUTE_DMA static lv_color_t blend_buf[LV_HOR_RES_MAX];
+#endif
+
 /**********************
  *      MACROS
  **********************/
@@ -338,7 +342,6 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
         else {
 #if LV_USE_GPU
             if(disp->driver.gpu_blend_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
-                static lv_color_t blend_buf[LV_HOR_RES_MAX];
                 for(x = 0; x < draw_area_w ; x++) blend_buf[x].full = color.full;
 
                 for(y = draw_area->y1; y <= draw_area->y2; y++) {
@@ -352,7 +355,6 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
 
 #if LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
-                static lv_color_t blend_buf[LV_HOR_RES_MAX] = {0};
                 if(blend_buf[0].full != color.full) lv_color_fill(blend_buf, color, LV_HOR_RES_MAX);
 
                 lv_coord_t line_h = LV_HOR_RES_MAX / draw_area_w;
