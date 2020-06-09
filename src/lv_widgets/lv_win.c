@@ -169,7 +169,7 @@ void lv_win_clean(lv_obj_t * win)
  * @param img_src an image source ('lv_img_t' variable, path to file or a symbol)
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src)
+lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, uint8_t alignment)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
     LV_ASSERT_NULL(img_src);
