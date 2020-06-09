@@ -31,6 +31,8 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
 static lv_style_list_t * lv_win_get_style(lv_obj_t * win, uint8_t part);
 static void lv_win_realign(lv_obj_t * win);
 static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const lv_obj_t * copy);
+static void lv_win_btn_set_alignment(lv_obj_t * par, const uint8_t alignment);
+static uint8_t lv_win_btn_get_alignment(const lv_obj_t * par);
 
 /**********************
  *  STATIC VARIABLES
@@ -177,6 +179,8 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, uint8_t alignmen
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
     lv_obj_t * btn = lv_win_btn_create(ext->header, NULL);
+    lv_win_btn_set_alignment(btn, alignment);
+
     lv_theme_apply(btn, LV_THEME_WIN_BTN);
     lv_coord_t btn_size = lv_obj_get_height_fit(ext->header);
     lv_obj_set_size(btn, btn_size, btn_size);
@@ -691,10 +695,13 @@ static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(win_btn);
     if(ancestor_header_design == NULL) ancestor_header_design = lv_obj_get_design_cb(win_btn);
 
-    ext->alignment_in_header = LV_WIN_BTN_ALIGNEMT_RIGHT;
+    ext->alignment_in_header = LV_WIN_BTN_ALIGNMENT_RIGHT;
 
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
+    	lv_obj_set_click(win_btn, true);
+    	lv_win_btn_set_alignment(win_btn, LV_WIN_BTN_ALIGNMENT_RIGHT);
+
         lv_theme_apply(win_btn, LV_THEME_BTN);
     }
     /*Copy 'copy'*/
@@ -709,6 +716,20 @@ static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_INFO("win btn created");
 
 	return win_btn;
+}
+
+static void lv_win_btn_set_alignment(lv_obj_t * win_btn, const uint8_t alignment)
+{
+    lv_win_btn_ext_t * ext = lv_obj_get_ext_attr(win_btn);
+
+    ext->alignment_in_header = alignment;
+}
+
+static uint8_t lv_win_btn_get_alignment(const lv_obj_t * win_btn)
+{
+    lv_win_btn_ext_t * ext = lv_obj_get_ext_attr(win_btn);
+
+    return ext->alignment_in_header;
 }
 
 #endif
