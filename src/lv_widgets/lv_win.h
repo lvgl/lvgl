@@ -80,8 +80,8 @@ typedef struct {
 } lv_win_btn_ext_t;
 
 enum {
-	LV_WIN_BTN_ALIGNEMT_RIGHT = 0, 	/**< Align button to right of the header */
-	LV_WIN_BTN_ALIGNEMT_LEFT	/**< Align button to left of the header */
+	LV_WIN_BTN_ALIGNMENT_RIGHT = 0, 	/**< Align button to right of the header */
+	LV_WIN_BTN_ALIGNMENT_LEFT	/**< Align button to left of the header */
 };
 
 /**********************
