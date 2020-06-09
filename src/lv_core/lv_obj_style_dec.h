@@ -199,6 +199,99 @@ _LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_COLOR, scale_end_color, lv_color_t, _col
 
 #undef _LV_OBJ_STYLE_SET_GET_DECLARE
 
+
+static inline void lv_obj_set_style_local_pad_all(lv_obj_t * obj, uint8_t part, lv_state_t state, lv_style_int_t value)
+{
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_PAD_TOP | (state << 8), value);
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_PAD_BOTTOM | (state << 8), value);
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_PAD_LEFT | (state << 8), value);
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_PAD_RIGHT | (state << 8), value);
+}
+
+
+static inline void lv_style_set_pad_all(lv_style_t * style, lv_state_t state, lv_style_int_t value)
+{
+    _lv_style_set_int(style, LV_STYLE_PAD_TOP | (state << 8), value);
+    _lv_style_set_int(style, LV_STYLE_PAD_BOTTOM | (state << 8), value);
+    _lv_style_set_int(style, LV_STYLE_PAD_LEFT | (state << 8), value);
+    _lv_style_set_int(style, LV_STYLE_PAD_RIGHT | (state << 8), value);
+}
+
+
+static inline void lv_obj_set_style_local_pad_hor(lv_obj_t * obj, uint8_t part, lv_state_t state, lv_style_int_t value)
+{
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_PAD_LEFT | (state << 8), value);
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_PAD_RIGHT | (state << 8), value);
+}
+
+
+static inline void lv_style_set_pad_hor(lv_style_t * style, lv_state_t state, lv_style_int_t value)
+{
+    _lv_style_set_int(style, LV_STYLE_PAD_LEFT | (state << 8), value);
+    _lv_style_set_int(style, LV_STYLE_PAD_RIGHT | (state << 8), value);
+}
+
+
+static inline void lv_obj_set_style_local_pad_ver(lv_obj_t * obj, uint8_t part, lv_state_t state, lv_style_int_t value)
+{
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_PAD_TOP | (state << 8), value);
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_PAD_BOTTOM | (state << 8), value);
+}
+
+
+static inline void lv_style_set_pad_ver(lv_style_t * style, lv_state_t state, lv_style_int_t value)
+{
+    _lv_style_set_int(style, LV_STYLE_PAD_TOP | (state << 8), value);
+    _lv_style_set_int(style, LV_STYLE_PAD_BOTTOM | (state << 8), value);
+}
+
+
+static inline void lv_obj_set_style_local_margin_all(lv_obj_t * obj, uint8_t part, lv_state_t state, lv_style_int_t value)
+{
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_MARGIN_TOP | (state << 8), value);
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_MARGIN_BOTTOM | (state << 8), value);
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_MARGIN_LEFT | (state << 8), value);
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_MARGIN_RIGHT | (state << 8), value);
+}
+
+
+static inline void lv_style_set_margin_all(lv_style_t * style, lv_state_t state, lv_style_int_t value)
+{
+    _lv_style_set_int(style, LV_STYLE_MARGIN_TOP | (state << 8), value);
+    _lv_style_set_int(style, LV_STYLE_MARGIN_BOTTOM | (state << 8), value);
+    _lv_style_set_int(style, LV_STYLE_MARGIN_LEFT | (state << 8), value);
+    _lv_style_set_int(style, LV_STYLE_MARGIN_RIGHT | (state << 8), value);
+}
+
+
+static inline void lv_obj_set_style_local_margin_hor(lv_obj_t * obj, uint8_t part, lv_state_t state, lv_style_int_t value)
+{
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_MARGIN_LEFT | (state << 8), value);
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_MARGIN_RIGHT | (state << 8), value);
+}
+
+
+static inline void lv_style_set_margin_hor(lv_style_t * style, lv_state_t state, lv_style_int_t value)
+{
+    _lv_style_set_int(style, LV_STYLE_MARGIN_LEFT | (state << 8), value);
+    _lv_style_set_int(style, LV_STYLE_MARGIN_RIGHT | (state << 8), value);
+}
+
+
+static inline void lv_obj_set_style_local_margin_ver(lv_obj_t * obj, uint8_t part, lv_state_t state, lv_style_int_t value)
+{
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_MARGIN_TOP | (state << 8), value);
+    _lv_obj_set_style_local_int(obj, part, LV_STYLE_MARGIN_BOTTOM | (state << 8), value);
+}
+
+
+static inline void lv_style_set_margin_ver(lv_style_t * style, lv_state_t state, lv_style_int_t value)
+{
+    _lv_style_set_int(style, LV_STYLE_MARGIN_TOP | (state << 8), value);
+    _lv_style_set_int(style, LV_STYLE_MARGIN_BOTTOM | (state << 8), value);
+}
+
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
