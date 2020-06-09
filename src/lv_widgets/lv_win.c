@@ -30,6 +30,7 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param);
 static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_style_list_t * lv_win_get_style(lv_obj_t * win, uint8_t part);
 static void lv_win_realign(lv_obj_t * win);
+static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**********************
  *  STATIC VARIABLES
@@ -175,7 +176,7 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src)
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
-    lv_obj_t * btn = lv_btn_create(ext->header, NULL);
+    lv_obj_t * btn = lv_win_btn_create(ext->header, NULL);
     lv_theme_apply(btn, LV_THEME_WIN_BTN);
     lv_coord_t btn_size = lv_obj_get_height_fit(ext->header);
     lv_obj_set_size(btn, btn_size, btn_size);
@@ -667,6 +668,47 @@ static void lv_win_realign(lv_obj_t * win)
 
     lv_obj_set_size(ext->page, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
     lv_obj_align(ext->page, ext->header, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+}
+
+static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const lv_obj_t * copy)
+{
+	LV_LOG_TRACE("win btn create started");
+
+	lv_obj_t * win_btn;
+
+	win_btn = lv_btn_create(par, copy);
+    LV_ASSERT_MEM(win_btn);
+    if(win_btn == NULL) return NULL;
+
+    /*Allocate the extended data*/
+    lv_win_btn_ext_t * ext = lv_obj_allocate_ext_attr(win_btn, sizeof(lv_win_btn_ext_t));
+    LV_ASSERT_MEM(ext);
+    if(ext == NULL) {
+        lv_obj_del(win_btn);
+        return NULL;
+    }
+
+    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(win_btn);
+    if(ancestor_header_design == NULL) ancestor_header_design = lv_obj_get_design_cb(win_btn);
+
+    ext->alignment_in_header = LV_WIN_BTN_ALIGNEMT_RIGHT;
+
+    /*If no copy do the basic initialization*/
+    if(copy == NULL) {
+        lv_theme_apply(win_btn, LV_THEME_BTN);
+    }
+    /*Copy 'copy'*/
+    else {
+        lv_win_btn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        ext->alignment_in_header= copy_ext->alignment_in_header;
+
+        /*Refresh the style with new signal function*/
+        lv_obj_refresh_style(win_btn, LV_STYLE_PROP_ALL);
+    }
+
+    LV_LOG_INFO("win btn created");
+
+	return win_btn;
 }
 
 #endif
