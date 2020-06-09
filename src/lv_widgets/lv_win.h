@@ -69,6 +69,21 @@ enum {
     _LV_WIN_PART_REAL_LAST
 };
 
+/** Extended data of win_btn*/
+typedef struct {
+    /** Ext. of ancestor*/
+    lv_btn_ext_t btn;
+
+    /** Which side of the header should the button be aligned to.
+     * 0: Align to right (default), 1: Align to left */
+    uint8_t alignment_in_header : 1;
+} lv_win_btn_ext_t;
+
+enum {
+	LV_WIN_BTN_ALIGNEMT_RIGHT = 0, 	/**< Align button to right of the header */
+	LV_WIN_BTN_ALIGNEMT_LEFT	/**< Align button to left of the header */
+};
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
