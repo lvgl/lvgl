@@ -7,6 +7,7 @@
 - Add `focus_parent` attribute to `lv_obj`
 - Allow using buttons in encoder input device
 - Add lv_btnmatrix_set/get_align capability
+- DMA2D: Remove dependency on ST CubeMX HAL
 
 ### Bugfixes
 - None
