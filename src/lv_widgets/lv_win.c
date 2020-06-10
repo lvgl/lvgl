@@ -767,9 +767,6 @@ static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const lv_obj_t * copy)
         return NULL;
     }
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(win_btn);
-    if(ancestor_header_design == NULL) ancestor_header_design = lv_obj_get_design_cb(win_btn);
-
     ext->alignment_in_header = LV_WIN_BTN_ALIGN_RIGHT;
 
     /*If no copy do the basic initialization*/
