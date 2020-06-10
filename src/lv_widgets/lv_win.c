@@ -23,6 +23,22 @@
  *      TYPEDEFS
  **********************/
 
+/** Extended data of win_btn*/
+typedef struct {
+    /** Ext. of ancestor*/
+    lv_btn_ext_t btn;
+
+    /** Which side of the header should the button be aligned to.
+     * 0: Align to right (default), 1: Align to left */
+    uint8_t alignment_in_header : 1;
+} lv_win_btn_ext_t;
+
+enum {
+	LV_WIN_BTN_ALIGN_RIGHT = 0, 	/**< Align button to right of the header */
+	LV_WIN_BTN_ALIGN_LEFT	/**< Align button to left of the header */
+};
+typedef uint8_t lv_win_btn_align_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -31,8 +47,8 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
 static lv_style_list_t * lv_win_get_style(lv_obj_t * win, uint8_t part);
 static void lv_win_realign(lv_obj_t * win);
 static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const lv_obj_t * copy);
-static void lv_win_btn_set_alignment(lv_obj_t * par, const uint8_t alignment);
-static uint8_t lv_win_btn_get_alignment(const lv_obj_t * par);
+static void lv_win_btn_set_alignment(lv_obj_t * par, const lv_win_btn_align_t alignment);
+static lv_win_btn_align_t lv_win_btn_get_alignment(const lv_obj_t * par);
 
 /**********************
  *  STATIC VARIABLES
@@ -180,7 +196,7 @@ lv_obj_t * lv_win_add_btn_right(lv_obj_t * win, const void * img_src)
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
     lv_obj_t * btn = lv_win_btn_create(ext->header, NULL);
-    lv_win_btn_set_alignment(btn, LV_WIN_BTN_ALIGNMENT_RIGHT);
+    lv_win_btn_set_alignment(btn, LV_WIN_BTN_ALIGN_RIGHT);
 
     lv_theme_apply(btn, LV_THEME_WIN_BTN);
     lv_coord_t btn_size = lv_obj_get_height_fit(ext->header);
@@ -209,7 +225,7 @@ lv_obj_t * lv_win_add_btn_left(lv_obj_t * win, const void * img_src)
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
     lv_obj_t * btn = lv_win_btn_create(ext->header, NULL);
-    lv_win_btn_set_alignment(btn, LV_WIN_BTN_ALIGNMENT_LEFT);
+    lv_win_btn_set_alignment(btn, LV_WIN_BTN_ALIGN_LEFT);
 
     lv_theme_apply(btn, LV_THEME_WIN_BTN);
     lv_coord_t btn_size = lv_obj_get_height_fit(ext->header);
@@ -697,7 +713,7 @@ static void lv_win_realign(lv_obj_t * win)
         lv_obj_set_size(btn, btn_h, btn_w);
         uint8_t btn_alignment = lv_win_btn_get_alignment(btn);
 
-        if (LV_WIN_BTN_ALIGNMENT_RIGHT == btn_alignment) {
+        if (LV_WIN_BTN_ALIGN_RIGHT == btn_alignment) {
             if (is_header_right_side_empty) {
                 /* Align the button to the right of the header */
                 lv_obj_align(btn, ext->header, LV_ALIGN_IN_RIGHT_MID, -header_right, 0);
@@ -710,7 +726,7 @@ static void lv_win_realign(lv_obj_t * win)
 
             btn_prev_at_right = btn;
         }
-        else if (LV_WIN_BTN_ALIGNMENT_LEFT == btn_alignment) {
+        else if (LV_WIN_BTN_ALIGN_LEFT == btn_alignment) {
             if (is_header_left_side_empty) {
                 /* Align the button to the right of the header */
                 lv_obj_align(btn, ext->header, LV_ALIGN_IN_LEFT_MID, header_left, 0);
@@ -754,12 +770,12 @@ static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const lv_obj_t * copy)
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(win_btn);
     if(ancestor_header_design == NULL) ancestor_header_design = lv_obj_get_design_cb(win_btn);
 
-    ext->alignment_in_header = LV_WIN_BTN_ALIGNMENT_RIGHT;
+    ext->alignment_in_header = LV_WIN_BTN_ALIGN_RIGHT;
 
     /*If no copy do the basic initialization*/
     if(copy == NULL) {
     	lv_obj_set_click(win_btn, true);
-    	lv_win_btn_set_alignment(win_btn, LV_WIN_BTN_ALIGNMENT_RIGHT);
+    	lv_win_btn_set_alignment(win_btn, LV_WIN_BTN_ALIGN_RIGHT);
 
         lv_theme_apply(win_btn, LV_THEME_BTN);
     }
