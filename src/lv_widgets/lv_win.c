@@ -565,9 +565,30 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
         _lv_txt_get_size(&txt_size, ext->title_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
                          label_dsc.flag);
 
-        txt_area.x1 = header->coords.x1 + left;
+        /* Get the numbers of buttons at the left of the window header
+         * so we can align the window title after them */
+        size_t btns_at_left_side = 0;
+
+        lv_obj_t * btn = NULL;
+
+        lv_coord_t btn_h = lv_obj_get_height_fit(header);
+        lv_coord_t btn_w = ext->btn_w != 0 ? ext->btn_w : btn_h;
+
+        /*Refresh the size of all control buttons*/
+        btn = lv_obj_get_child_back(ext->header, NULL);
+        while(btn != NULL) {
+            if (LV_WIN_BTN_ALIGN_LEFT == lv_win_btn_get_alignment(btn)) {
+                btns_at_left_side++;
+            }
+
+            btn = lv_obj_get_child_back(header, btn);
+        }
+
+        lv_coord_t left_btn_offset = btns_at_left_side * btn_w;
+
+        txt_area.x1 = header->coords.x1 + left + left_btn_offset;
         txt_area.y1 = header->coords.y1 + (lv_obj_get_height(header) - txt_size.y) / 2;
-        txt_area.x2 = txt_area.x1 + txt_size.x;
+        txt_area.x2 = txt_area.x1 + txt_size.x  + left_btn_offset;
         txt_area.y2 = txt_area.y1 + txt_size.y;
 
         lv_draw_label(&txt_area, clip_area, &label_dsc, ext->title_txt, NULL);
