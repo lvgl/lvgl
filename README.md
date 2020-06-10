@@ -50,7 +50,7 @@ LVGL provides everything you need to create embedded GUI with easy-to-use graphi
 * **Documentation** and API references
 
 ## Supported devices
-Basically, every modern controller  (which is able to drive a display( is suitable to run LVGL. The minimal requirements are:
+Basically, every modern controller  (which is able to drive a display) is suitable to run LVGL. The minimal requirements are:
 - 16, 32 or 64 bit microcontroller or processor
 - &gt; 16 MHz clock speed is recommended
 - Flash/ROM: &gt; 64 kB for the very essential components (&gt; 180 kB is recommended)
@@ -90,11 +90,11 @@ Choose a project with your favourite IDE:
 The steps below show how to setup LVGL on an embedded system with a display and a touchpad. 
 You can use the [Simulators](https://docs.lvgl.io/v7/en/html/get-started/pc-simulator) to get ready to use projects which can be run on your PC. 
 
-1. [Download](https://lvgl.com/developers) or [Clone](https://github.com/lvgl/lvgl) the library
+1. [Download](https://github.com/lvgl/lvgl/archive/master.zip) or [Clone](https://github.com/lvgl/lvgl) the library
 2. Copy the `lvgl` folder into your project
-3. Copy `lvgl/lv_conf_template.h` as `lv_conf.h` next to the `lvgl` folder and set at least `LV_HOR_RES_MAX`, `LV_VER_RES_MAX` and `LV_COLOR_DEPTH`. Don't forget to **change the `#if 0` statement near the top of the file to `#if 1`**, otherwise you will get compilation errors.
+3. Copy `lvgl/lv_conf_template.h` as `lv_conf.h` next to the `lvgl` folder, change the `#if 0` statement near the top of the file to `#if 1` and set at least `LV_HOR_RES_MAX`, `LV_VER_RES_MAX` and `LV_COLOR_DEPTH`.
 4. Include `lvgl/lvgl.h` where you need to use LVGL related functions.
-5. Call `lv_tick_inc(x)` every `x` milliseconds **in a Timer or Task** (`x` should be between 1 and 10). It is required for the internal timing of LVGL.
+5. Call `lv_tick_inc(x)` every `x` milliseconds (should be 1..10) in a Timer or Task. It is required for the internal timing of LVGL.
 6. Call `lv_init()`
 7. Create a display buffer for LVGL
 ```c
@@ -102,7 +102,7 @@ static lv_disp_buf_t disp_buf;
 static lv_color_t buf[LV_HOR_RES_MAX * 10];                     /*Declare a buffer for 10 lines*/
 lv_disp_buf_init(&disp_buf, buf, NULL, LV_HOR_RES_MAX * 10);    /*Initialize the display buffer*/
 ```
-8. Implement and register a function which can **copy a pixel array** to an area of your display:
+8. Implement and register a function which can copy a pixel array to an area of your display:
 ```c
 lv_disp_drv_t disp_drv;               /*Descriptor of a display driver*/
 lv_disp_drv_init(&disp_drv);          /*Basic initialization*/
@@ -115,7 +115,7 @@ void my_disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_
     int32_t x, y;
     for(y = area->y1; y <= area->y2; y++) {
         for(x = area->x1; x <= area->x2; x++) {
-            set_pixel(x, y, *color_p);  /* Put a pixel to the display.*/
+            my_set_pixel(x, y, *color_p);  /* Put a pixel to the display.*/
             color_p++;
         }
     }
@@ -124,7 +124,7 @@ void my_disp_flush(lv_disp_t * disp, const lv_area_t * area, lv_color_t * color_
 }
     
 ```
-9. Implement and register a function which can **read an input device**. E.g. for a touch pad:
+9. Implement and register a function which can read an input device. E.g. for a touch pad:
 ```c
 lv_indev_drv_init(&indev_drv);             /*Descriptor of a input device driver*/
 indev_drv.type = LV_INDEV_TYPE_POINTER;    /*Touch pad is a pointer-like device*/
@@ -133,16 +133,8 @@ lv_indev_drv_register(&indev_drv);         /*Finally register the driver*/
 
 bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
 {
-    static lv_coord_t last_x = 0;
-    static lv_coord_t last_y = 0;
-
-    /*Save the state and save the pressed coordinate*/
-    data->state = touchpad_is_pressed() ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL; 
-    if(data->state == LV_INDEV_STATE_PR) touchpad_get_xy(&last_x, &last_y);
-   
-    /*Set the coordinates (if released use the last pressed coordinates)*/
-    data->point.x = last_x;
-    data->point.y = last_y;
+    data->state = my_touchpad_is_pressed() ? LV_INDEV_STATE_PR : LV_INDEV_STATE_REL; 
+    if(data->state == LV_INDEV_STATE_PR) touchpad_get_xy(&data->point.x, &data->point.y);
 
     return false; /*Return `false` because we are not buffering and no more data to read*/
 }
@@ -150,20 +142,22 @@ bool my_touchpad_read(lv_indev_drv_t * indev_driver, lv_indev_data_t * data)
 10. Call `lv_task_handler()` periodically every few milliseconds in the main `while(1)` loop, in Timer interrupt or in an Operation system task. 
 It will redraw the screen if required, handle input devices etc. 
 
+For more detailed desription visit the [Porting](https://docs.lvgl.io/v7/en/html/porting/index.html) section of the documentation.
 
 ## Learn the basics
 
-In this section you can ready the very basics. For a more detailed guide check the [Quick overview](https://docs.lvgl.io/v7/en/html/get-started/quick-overview.html#learn-the-basics) in the documentation. 
+In this section you can read the very basics of LVGL. 
+For a more detailed guide check the [Quick overview](https://docs.lvgl.io/v7/en/html/get-started/quick-overview.html#learn-the-basics) in the documentation. 
 
 ### Widgets (Objects)
 
-The graphical elements like Buttons, Labels, Sliders, Charts etc are called objects in LittelvGL. Go to [Object types](https://docs.lvgl.io/v7/en/html/widgets/index) to see the full list of available types.
+The graphical elements like Buttons, Labels, Sliders, Charts etc are called objects or widgets in LVGL. Go to [Widgets](https://docs.lvgl.io/v7/en/html/widgets/index) to see the full list of available types.
 
 Every object has a parent object. The child object moves with the parent and if you delete the parent the children will be deleted too. Children can be visible only on their parent.
 
 The *screen* are the "root" parents. To get the current screen call `lv_scr_act()`.
 
-You can create a new object with `lv_<type>_create(parent, obj_to_copy)`. It will return an `lv_obj_t *` variable which should be used as a reference to the object to set its parameters. 
+You can create a new object with `lv_<type>_create(parent, obj_to_copy)`. It will return an `lv_obj_t *` variable which should be used as a reference to the object to set its parameters later. 
 The first parameter is the desired *parent*, the second parameters can be an object to copy (`NULL` if unused). 
 For example:
 ```c
@@ -177,15 +171,22 @@ lv_obj_set_y(btn1, 10);
 lv_obj_set_size(btn1, 200, 50);
 ```
 
-The objects has type specific parameters too which can be set by `lv_<type>_set_<paramters_name>(obj, <value>)` functions. For example:
+The objects have type specific parameters too which can be set by `lv_<type>_set_<paramters_name>(obj, <value>)` functions. For example:
 ```c
 lv_slider_set_value(slider1, 70, LV_ANIM_ON);
 ```
 
 To see the full API visit the documentation of the object types or the related header file (e.g. `lvgl/src/lv_objx/lv_slider.h`).
 
+
+To create a new screen pass `NULL` as the fisrt paramater of a *create* function:
+```c
+lv_obj_t * scr2 = lv_obj_create(NULL, NULL);    /*Create a screen*/
+lv_scr_load(scr2);                              /*Load the new screen*/
+```
+
 ### Styles
-Widgets are created with a default appearance but it can be changed by adding new styles to the object. A new style can be created like this:
+Widgets are created with a default appearance but it can be changed by adding new styles to them. A new style can be created like this:
 ```c
 static lv_style_t style1; /*Should be static, global or dynamically allocated*/
 lv_style_init(&style1);
@@ -193,15 +194,15 @@ lv_style_set_bg_color(&style1, LV_STATE_DEFAULT, LV_COLOR_RED);  /*Default backg
 lv_style_set_bg_color(&style1, LV_STATE_PRESSED, LV_COLOR_BLUE); /*Pressed background color*/
 ```
 
-The wigedt have *parts* which can be referenced via `LV_<TYPE>_PART_<PART_NAME>`. E.g. `LV_BRN_PART_MAIN` or `LV_SLIDER_PART_KNOB`. See the documentation of the widgets to see the exisitng parts.
+The wigedt have *parts* which can be referenced via `LV_<TYPE>_PART_<PART_NAME>`. E.g. `LV_BTN_PART_MAIN` or `LV_SLIDER_PART_KNOB`. See the documentation of the widgets to see the exisitng parts.
 
 To add the style to a button:
-```
+```c
 lv_obj_add_style(btn1, LV_BTN_PART_MAIN, &style1);
 ```
 
-To remove all styles from an object use:
-```c
+To remove all styles from a part of an object:
+```cc
 lv_obj_reset_style_list(obj, LV_OBJ_PART_MAIN);
 ```
 
@@ -211,7 +212,7 @@ Learn more in [Style overview](https://docs.lvgl.io/v7/en/html/overview/style) s
 Events are used to inform the user if something has happened with an object. You can assign a callback to an object which will be called if the object is clicked, released, dragged, being deleted etc. It should look like this: 
 
 ```c
-lv_obj_set_event_cb(btn, btn_event_cb);                 /*Assign a callback to the button*/
+lv_obj_set_event_cb(btn, btn_event_cb);     /*Assign a callback to the button*/
 
 ...
 
@@ -282,6 +283,7 @@ LVGL has a monthly periodic release cycle.
   - Make a patch release from `master`.
   - After that merge the new features from the `dev` to `master` branch. 
   - In the rest of the month merge only patches into `master` and new features into `dev` branch.
+  
 ## Contributing
 To ask questions please use the [Forum](https://forum.lvgl.io).
 For development-related things (bug reports, feature suggestions) use [GitHub's Issue tracker](https://github.com/lvgl/lvgl/issues). 

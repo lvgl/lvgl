@@ -12,7 +12,7 @@
 ### Bugfixes
 - None
 
-## v7.0.2 (under development)
+## v7.0.2 (under development, planned: 16.06.2020)
 *Available in the `master` branch*
 
 - `lv_textarea` fix wrong cursor position when clicked after the last character

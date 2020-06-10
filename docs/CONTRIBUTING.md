@@ -1,9 +1,6 @@
 # Contributing to LVGL
 
-**Do you have some free time to spend with programming?
-Are you working on an embedded GUI project with LVGL?
-See how can you help to improve the graphics library and help others!**
-
+Thank you for considering contributing to LVGL. If you have some spare time to spend with programming you will certainly find a way to helpimproving LVGL. Do not afraid to take the first step! Everybody is welcome independently from gender, age, color, location, or skill level. So don't be shy, pick a point from the list below that you are interested in, and let's go! :rocket: 
 
 - [Overview](#overview)
 - [How to send a pull request?](#how-to-send-a-pull-request) 
@@ -20,7 +17,7 @@ See how can you help to improve the graphics library and help others!**
 There are many ways to join the community. If you have some time to work with us you will surely find something that fits you! You can:
 - **Help others** in the [Forum](https://forum.lvgl.io).
 - **Inspire people** by speaking about your project in [My project](https://forum.lvgl.io/c/my-projects) category in the Forum.
-- **Improve and/or translate the documentation.** Go to the [Documentation](https://github.com/lvgl/docs) repository to learn more
+- **Improve and/or translate the documentation.** Go to the [Documentation](https://github.com/lvgl/docs) repository to learn more.
 - **Write a blog post** about your experiences. See how to do it in the [Blog](https://github.com/lvgl/blog) repository
 - **Report and/or fix bugs** in [GitHub's issue tracker](https://github.com/lvgl/lvgl/issues)
 - **Help the development**. Check the [Open issues](https://github.com/lvgl/lvgl/issues) especially the ones with [Help wanted](https://github.com/lvgl/lvgl/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) label and tell your ideas about a topic or implement a feature.
