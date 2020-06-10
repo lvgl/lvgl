@@ -172,7 +172,7 @@ void lv_win_clean(lv_obj_t * win)
  * @param alignment button alignment on the header
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, uint8_t alignment)
+lv_obj_t * lv_win_add_btn_right(lv_obj_t * win, const void * img_src)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
     LV_ASSERT_NULL(img_src);
@@ -180,7 +180,36 @@ lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src, uint8_t alignmen
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
     lv_obj_t * btn = lv_win_btn_create(ext->header, NULL);
-    lv_win_btn_set_alignment(btn, alignment);
+    lv_win_btn_set_alignment(btn, LV_WIN_BTN_ALIGNMENT_RIGHT);
+
+    lv_theme_apply(btn, LV_THEME_WIN_BTN);
+    lv_coord_t btn_size = lv_obj_get_height_fit(ext->header);
+    lv_obj_set_size(btn, btn_size, btn_size);
+
+    lv_obj_t * img = lv_img_create(btn, NULL);
+    lv_obj_set_click(img, false);
+    lv_img_set_src(img, img_src);
+
+    lv_win_realign(win);
+
+    return btn;
+}
+
+/**
+ * Add control button on the left side of the window header
+ * @param win pointer to a window object
+ * @param img_src an image source ('lv_img_t' variable, path to file or a symbol)
+ * @return pointer to the created button object
+ */
+lv_obj_t * lv_win_add_btn_left(lv_obj_t * win, const void * img_src)
+{
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+    LV_ASSERT_NULL(img_src);
+
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+
+    lv_obj_t * btn = lv_win_btn_create(ext->header, NULL);
+    lv_win_btn_set_alignment(btn, LV_WIN_BTN_ALIGNMENT_LEFT);
 
     lv_theme_apply(btn, LV_THEME_WIN_BTN);
     lv_coord_t btn_size = lv_obj_get_height_fit(ext->header);
