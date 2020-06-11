@@ -552,7 +552,8 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
         lv_obj_t * win = lv_obj_get_parent(header);
         lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
-        lv_style_int_t left = lv_obj_get_style_pad_left(header, LV_OBJ_PART_MAIN);
+        lv_style_int_t header_left = lv_obj_get_style_pad_left(win, LV_WIN_PART_HEADER);
+        lv_style_int_t header_inner = lv_obj_get_style_pad_inner(win, LV_WIN_PART_HEADER);
 
         lv_draw_label_dsc_t label_dsc;
         lv_draw_label_dsc_init(&label_dsc);
@@ -561,32 +562,27 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
         lv_area_t txt_area;
         lv_point_t txt_size;
 
-
         _lv_txt_get_size(&txt_size, ext->title_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
                          label_dsc.flag);
-
-        /* Get the numbers of buttons at the left of the window header
-         * so we can align the window title after them */
-        size_t btns_at_left_side = 0;
 
         lv_obj_t * btn = NULL;
 
         lv_coord_t btn_h = lv_obj_get_height_fit(header);
         lv_coord_t btn_w = ext->btn_w != 0 ? ext->btn_w : btn_h;
 
-        /*Refresh the size of all control buttons*/
+        /*Get x position of the title (should be on the right of the buttons on the left)*/
+
+        lv_coord_t left_btn_offset = 0;
         btn = lv_obj_get_child_back(ext->header, NULL);
         while(btn != NULL) {
             if (LV_WIN_BTN_ALIGN_LEFT == lv_win_btn_get_alignment(btn)) {
-                btns_at_left_side++;
+                left_btn_offset += btn_w + header_inner;
             }
 
             btn = lv_obj_get_child_back(header, btn);
         }
 
-        lv_coord_t left_btn_offset = btns_at_left_side * btn_w;
-
-        txt_area.x1 = header->coords.x1 + left + left_btn_offset;
+        txt_area.x1 = header->coords.x1 + header_left + left_btn_offset;
         txt_area.y1 = header->coords.y1 + (lv_obj_get_height(header) - txt_size.y) / 2;
         txt_area.x2 = txt_area.x1 + txt_size.x  + left_btn_offset;
         txt_area.y2 = txt_area.y1 + txt_size.y;
@@ -731,7 +727,7 @@ static void lv_win_realign(lv_obj_t * win)
     /*Refresh the size of all control buttons*/
     btn = lv_obj_get_child_back(ext->header, NULL);
     while(btn != NULL) {
-        lv_obj_set_size(btn, btn_h, btn_w);
+        lv_obj_set_size(btn, btn_w, btn_h);
         uint8_t btn_alignment = lv_win_btn_get_alignment(btn);
 
         if (LV_WIN_BTN_ALIGN_RIGHT == btn_alignment) {
