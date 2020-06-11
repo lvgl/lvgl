@@ -46,7 +46,7 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param);
 static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_style_list_t * lv_win_get_style(lv_obj_t * win, uint8_t part);
 static void lv_win_realign(lv_obj_t * win);
-static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const lv_obj_t * copy);
+static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const void * img_src);
 static void lv_win_btn_set_alignment(lv_obj_t * par, const lv_win_btn_align_t alignment);
 static lv_win_btn_align_t lv_win_btn_get_alignment(const lv_obj_t * par);
 
@@ -195,16 +195,8 @@ lv_obj_t * lv_win_add_btn_right(lv_obj_t * win, const void * img_src)
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
-    lv_obj_t * btn = lv_win_btn_create(ext->header, NULL);
+    lv_obj_t * btn = lv_win_btn_create(ext->header, img_src);
     lv_win_btn_set_alignment(btn, LV_WIN_BTN_ALIGN_RIGHT);
-
-    lv_theme_apply(btn, LV_THEME_WIN_BTN);
-    lv_coord_t btn_size = lv_obj_get_height_fit(ext->header);
-    lv_obj_set_size(btn, btn_size, btn_size);
-
-    lv_obj_t * img = lv_img_create(btn, NULL);
-    lv_obj_set_click(img, false);
-    lv_img_set_src(img, img_src);
 
     lv_win_realign(win);
 
@@ -224,16 +216,8 @@ lv_obj_t * lv_win_add_btn_left(lv_obj_t * win, const void * img_src)
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
-    lv_obj_t * btn = lv_win_btn_create(ext->header, NULL);
+    lv_obj_t * btn = lv_win_btn_create(ext->header, img_src);
     lv_win_btn_set_alignment(btn, LV_WIN_BTN_ALIGN_LEFT);
-
-    lv_theme_apply(btn, LV_THEME_WIN_BTN);
-    lv_coord_t btn_size = lv_obj_get_height_fit(ext->header);
-    lv_obj_set_size(btn, btn_size, btn_size);
-
-    lv_obj_t * img = lv_img_create(btn, NULL);
-    lv_obj_set_click(img, false);
-    lv_img_set_src(img, img_src);
 
     lv_win_realign(win);
 
@@ -766,13 +750,13 @@ static void lv_win_realign(lv_obj_t * win)
     lv_obj_align(ext->page, ext->header, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
 }
 
-static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const lv_obj_t * copy)
+static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const void * img_src)
 {
 	LV_LOG_TRACE("win btn create started");
 
 	lv_obj_t * win_btn;
 
-	win_btn = lv_btn_create(par, copy);
+	win_btn = lv_btn_create(par, NULL);
     LV_ASSERT_MEM(win_btn);
     if(win_btn == NULL) return NULL;
 
@@ -786,21 +770,16 @@ static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->alignment_in_header = LV_WIN_BTN_ALIGN_RIGHT;
 
-    /*If no copy do the basic initialization*/
-    if(copy == NULL) {
-    	lv_obj_set_click(win_btn, true);
-    	lv_win_btn_set_alignment(win_btn, LV_WIN_BTN_ALIGN_RIGHT);
+    lv_obj_set_click(win_btn, true);
+    lv_win_btn_set_alignment(win_btn, LV_WIN_BTN_ALIGN_RIGHT);
 
-        lv_theme_apply(win_btn, LV_THEME_BTN);
-    }
-    /*Copy 'copy'*/
-    else {
-        lv_win_btn_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->alignment_in_header= copy_ext->alignment_in_header;
+    lv_theme_apply(win_btn, LV_THEME_WIN_BTN);
+    lv_coord_t btn_size = lv_obj_get_height_fit(par);
+    lv_obj_set_size(win_btn, btn_size, btn_size);
 
-        /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(win_btn, LV_STYLE_PROP_ALL);
-    }
+    lv_obj_t * img = lv_img_create(win_btn, NULL);
+    lv_obj_set_click(img, false);
+    lv_img_set_src(img, img_src);
 
     LV_LOG_INFO("win btn created");
 
