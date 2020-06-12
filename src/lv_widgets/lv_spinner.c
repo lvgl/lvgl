@@ -56,22 +56,22 @@ static lv_design_cb_t ancestor_design;
  **********************/
 
 /**
- * Create a pre loader object
- * @param par pointer to an object, it will be the parent of the new pre loader
- * @param copy pointer to a pre loader object, if not NULL then the new object will be copied from
+ * Create a spinner object
+ * @param par pointer to an object, it will be the parent of the new spinner
+ * @param copy pointer to a spinner object, if not NULL then the new object will be copied from
  * it
- * @return pointer to the created pre loader
+ * @return pointer to the created spinner
  */
 lv_obj_t * lv_spinner_create(lv_obj_t * par, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("spinner create started");
 
-    /*Create the ancestor of pre loader*/
+    /*Create the ancestor of spinner*/
     lv_obj_t * spinner = lv_arc_create(par, copy);
     LV_ASSERT_MEM(spinner);
     if(spinner == NULL) return NULL;
 
-    /*Allocate the pre loader type specific extended data*/
+    /*Allocate the spinner type specific extended data*/
     lv_spinner_ext_t * ext = lv_obj_allocate_ext_attr(spinner, sizeof(lv_spinner_ext_t));
     LV_ASSERT_MEM(ext);
     if(ext == NULL) {
@@ -154,7 +154,7 @@ void lv_spinner_set_spin_time(lv_obj_t * spinner, uint16_t time)
 
 /**
  * Set the animation type of a spinnereer.
- * @param spinner pointer to pre loader object
+ * @param spinner pointer to spinner object
  * @param type animation type of the spinner
  *  */
 void lv_spinner_set_type(lv_obj_t * spinner, lv_spinner_type_t type)
@@ -230,8 +230,8 @@ void lv_spinner_set_dir(lv_obj_t * spinner, lv_spinner_dir_t dir)
  *====================*/
 
 /**
- * Get the arc length [degree] of the a pre loader
- * @param spinner pointer to a pre loader object
+ * Get the arc length [degree] of the a spinner
+ * @param spinner pointer to a spinner object
  */
 lv_anim_value_t lv_spinner_get_arc_length(const lv_obj_t * spinner)
 {
@@ -243,7 +243,7 @@ lv_anim_value_t lv_spinner_get_arc_length(const lv_obj_t * spinner)
 
 /**
  * Get the spin time of the arc
- * @param spinner pointer to a pre loader object [milliseconds]
+ * @param spinner pointer to a spinner object [milliseconds]
  */
 uint16_t lv_spinner_get_spin_time(const lv_obj_t * spinner)
 {
@@ -255,7 +255,7 @@ uint16_t lv_spinner_get_spin_time(const lv_obj_t * spinner)
 
 /**
  * Get the animation type of a spinnereer.
- * @param spinner pointer to pre loader object
+ * @param spinner pointer to spinner object
  * @return animation type
  *  */
 lv_spinner_type_t lv_spinner_get_type(lv_obj_t * spinner)
@@ -301,8 +301,8 @@ void lv_spinner_anim_cb(void * ptr, lv_anim_value_t val)
  **********************/
 
 /**
- * Signal function of the pre loader
- * @param spinner pointer to a pre loader object
+ * Signal function of the spinner
+ * @param spinner pointer to a spinner object
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
