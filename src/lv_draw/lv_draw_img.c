@@ -548,7 +548,9 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                             mask_buf[px_i] = 0xFF;
                         }
 
-#if LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 1
+                        c.full = map_px[0];
+#elif LV_COLOR_DEPTH == 8
                         c.full =  map_px[0];
 #elif LV_COLOR_DEPTH == 16
                         c.full =  map_px[0] + (map_px[1] << 8);
