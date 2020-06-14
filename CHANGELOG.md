@@ -17,6 +17,7 @@
 - `lv_debug`: restructure to allow asserting in from `lv_misc` too
 - add assert if `_lv_mem_buf_get()` fails
 - `lv_textarea`: fix character delete in password mode
+- Update `LV_OPA_MIN` and `LV_OPA_MAX` to widen the opacity processed range
 
 ## v7.0.1 (01.06.2020)
 
