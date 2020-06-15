@@ -260,8 +260,8 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
+    lv_slider_type_t type = lv_slider_get_type(slider);
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
-    lv_point_t p;
 
     /* Advanced hit testing: react only on dragging the knob(s) */
     if (LV_SIGNAL_HIT_TEST == sign) {
@@ -269,19 +269,21 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
         /* Ordinary slider: was the knob area hit? */
         info->result = _lv_area_is_point_on(&ext->right_knob_area, info->point, 0);
-        /* Range type has wwo knobs: check the other knob too */
-        if (lv_slider_get_type(slider) == LV_SLIDER_TYPE_RANGE) {
-            info->result |= _lv_area_is_point_on(&ext->left_knob_area, info->point, 0);
+
+        /* There's still a change we have a hit, if we have another knob */
+        if (false == info->result && LV_SLIDER_TYPE_RANGE == type) {
+            info->result = _lv_area_is_point_on(&ext->left_knob_area, info->point, 0);
         }
     }
 
+    lv_point_t p;
+
     if(sign == LV_SIGNAL_PRESSED) {
         ext->dragging = true;
-        if(lv_slider_get_type(slider) < LV_SLIDER_TYPE_RANGE) {
-            /* Normal and symmetrical types */
+        if(LV_SLIDER_TYPE_NORMAL == type || LV_SLIDER_TYPE_SYMMETRICAL == type) {
             ext->value_to_set = &ext->bar.cur_value;
         }
-        else if(lv_slider_get_type(slider) == LV_SLIDER_TYPE_RANGE) {
+        else if(LV_SLIDER_TYPE_RANGE == type) {
             lv_indev_get_point(param, &p);
             bool hor = lv_obj_get_width(slider) >= lv_obj_get_height(slider);
             lv_bidi_dir_t base_dir = lv_obj_get_base_dir(slider);
