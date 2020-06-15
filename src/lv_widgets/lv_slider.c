@@ -263,9 +263,22 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
     lv_point_t p;
 
+    /* Advanced hit testing: react only on dragging the knob(s) */
+    if (LV_SIGNAL_HIT_TEST == sign) {
+        lv_hit_test_info_t *info = param;
+
+        /* Ordinary slider: was the knob area hit? */
+        info->result = _lv_area_is_point_on(&ext->right_knob_area, info->point, 0);
+        /* Range type has wwo knobs: check the other knob too */
+        if (lv_slider_get_type(slider) == LV_SLIDER_TYPE_RANGE) {
+            info->result |= _lv_area_is_point_on(&ext->left_knob_area, info->point, 0);
+        }
+    }
+
     if(sign == LV_SIGNAL_PRESSED) {
         ext->dragging = true;
-        if(lv_slider_get_type(slider) == LV_SLIDER_TYPE_NORMAL) {
+        if(lv_slider_get_type(slider) < LV_SLIDER_TYPE_RANGE) {
+            /* Normal and symmetrical types */
             ext->value_to_set = &ext->bar.cur_value;
         }
         else if(lv_slider_get_type(slider) == LV_SLIDER_TYPE_RANGE) {
