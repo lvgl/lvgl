@@ -631,11 +631,10 @@ uint16_t lv_chart_get_point_count(const lv_obj_t * chart)
 
 /**
  * Get the current index of the x-axis start point in the data array
- * @param chart             pointer to a chart object
  * @param ser 				pointer to a data series on 'chart'
  * @return 					the index of the current x start point in the data array
  */
-uint16_t lv_chart_get_x_start_point(lv_obj_t * chart, lv_chart_series_t * ser)
+uint16_t lv_chart_get_x_start_point(lv_chart_series_t * ser)
 {
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
     LV_ASSERT_NULL(ser);
