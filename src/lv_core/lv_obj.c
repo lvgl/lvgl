@@ -838,7 +838,7 @@ void lv_obj_set_height_fit(lv_obj_t * obj, lv_coord_t h)
 
 /**
  * Set the width of an object by taking the left and right margin into account.
- * The object width will be `obj_w = w - margon_left - margin_right`
+ * The object width will be `obj_w = w - margin_left - margin_right`
  * @param obj pointer to an object
  * @param w new height including margins
  */
@@ -852,7 +852,7 @@ void lv_obj_set_width_margin(lv_obj_t * obj, lv_coord_t w)
 
 /**
  * Set the height of an object by taking the top and bottom margin into account.
- * The object height will be `obj_h = h - margon_top - margin_bottom`
+ * The object height will be `obj_h = h - margin_top - margin_bottom`
  * @param obj pointer to an object
  * @param h new height including margins
  */
@@ -1073,7 +1073,7 @@ void lv_obj_realign(lv_obj_t * obj)
         lv_obj_align(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
 #else
     (void)obj;
-    LV_LOG_WARN("lv_obj_realaign: no effect because LV_USE_OBJ_REALIGN = 0");
+    LV_LOG_WARN("lv_obj_realign: no effect because LV_USE_OBJ_REALIGN = 0");
 #endif
 }
 
@@ -1314,7 +1314,7 @@ void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t part, lv_style_property
  * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
  * @note shouldn't be used directly. Use the specific property remove functions instead.
  *       For example: `lv_obj_style_remove_border_opa()`
- * @return true: the property was found and removed; false: teh property was not found
+ * @return true: the property was found and removed; false: the property was not found
  */
 bool lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
@@ -1483,7 +1483,7 @@ void lv_obj_set_top(lv_obj_t * obj, bool en)
 /**
  * Enable the dragging of an object
  * @param obj pointer to an object
- * @param en true: make the object dragable
+ * @param en true: make the object draggable
  */
 void lv_obj_set_drag(lv_obj_t * obj, bool en)
 {
@@ -2193,7 +2193,7 @@ lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
 
 /**
  * Get the height of an object by taking the top and bottom margin into account.
- * The returned height will be `obj_h + margon_top + margin_bottom`
+ * The returned height will be `obj_h + margin_top + margin_bottom`
  * @param obj pointer to an object
  * @return the height including thee margins
  */
@@ -2207,7 +2207,7 @@ lv_coord_t lv_obj_get_height_margin(lv_obj_t * obj)
 
 /**
  * Get the width of an object by taking the left and right margin into account.
- * The returned width will be `obj_w + margon_left + margin_right`
+ * The returned width will be `obj_w + margin_left + margin_right`
  * @param obj pointer to an object
  * @return the height including thee margins
  */
@@ -2679,7 +2679,7 @@ bool lv_obj_get_click(const lv_obj_t * obj)
 /**
  * Get the top enable attribute of an object
  * @param obj pointer to an object
- * @return true: the auto top feture is enabled
+ * @return true: the auto top feature is enabled
  */
 bool lv_obj_get_top(const lv_obj_t * obj)
 {
@@ -2691,7 +2691,7 @@ bool lv_obj_get_top(const lv_obj_t * obj)
 /**
  * Get the drag enable attribute of an object
  * @param obj pointer to an object
- * @return true: the object is dragable
+ * @return true: the object is draggable
  */
 bool lv_obj_get_drag(const lv_obj_t * obj)
 {
@@ -2810,7 +2810,7 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part)
 
     /*If a real part is asked, then use the object's signal to get its state.
      * A real object can be in different state then the main part
-     * and only the object itseld knows who to get it's state. */
+     * and only the object itself knows who to get it's state. */
     lv_get_state_info_t info;
     info.part = part;
     info.result = LV_STATE_DEFAULT;
@@ -3284,7 +3284,7 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t 
 
 /**
  * Get the required extra size (around the object's part) to draw shadow, outline, value etc.
- * @param obj poinr to an object
+ * @param obj pointer to an object
  * @param part part of the object
  */
 lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
@@ -3796,7 +3796,7 @@ static void base_dir_refr_children(lv_obj_t * obj)
  * @param part the part of the object to apply the transaction
  * @param prev_state the previous state of the objects
  * @param new_state the new state of the object
- * @return pointer to the allocated `the transaction` variable or `NULL` if no transtion created
+ * @return pointer to the allocated `the transaction` variable or `NULL` if no transition created
  */
 static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state,
                                        lv_state_t new_state)
@@ -3901,12 +3901,12 @@ static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop,
 }
 
 /**
- * Remove the transition from objectt's part's property.
+ * Remove the transition from object's part's property.
  * - Remove the transition from `_lv_obj_style_trans_ll` and free it
  * - Delete pending transitions
  * @param obj pointer to an object which transition(s) should be removed
  * @param part a part of object or 0xFF to remove from all parts
- * @param prop a property or 0xFF to remove all porpeties
+ * @param prop a property or 0xFF to remove all properties
  * @param tr_limit delete transitions only "older" then this. `NULL` is not used
  */
 static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv_style_trans_t * tr_limit)

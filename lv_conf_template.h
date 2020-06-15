@@ -498,7 +498,7 @@ typedef void * lv_obj_user_data_t;
 #endif
 #endif
 
-/*1: enable `lv_obj_realaign()` based on `lv_obj_align()` parameters*/
+/*1: enable `lv_obj_realign()` based on `lv_obj_align()` parameters*/
 #define LV_USE_OBJ_REALIGN          1
 
 /* Enable to make the object clickable on a larger area.

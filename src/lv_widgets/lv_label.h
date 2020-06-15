@@ -247,7 +247,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos);
 /**
  * Check if a character is drawn under a point.
  * @param label Label object
- * @param pos Point to check for characte under
+ * @param pos Point to check for character under
  * @return whether a character is drawn under the point
  */
 bool lv_label_is_char_under_pos(const lv_obj_t * label, lv_point_t * pos);

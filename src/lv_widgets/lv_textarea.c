@@ -1238,7 +1238,7 @@ void lv_textarea_cursor_down(lv_obj_t * ta)
         /*Get the letter index on the new cursor position and set it*/
         uint32_t new_cur_pos = lv_label_get_letter_on(ext->label, &pos);
 
-        lv_coord_t cur_valid_x_tmp = ext->cursor.valid_x; /*Cursor position set overwrites the valid positon */
+        lv_coord_t cur_valid_x_tmp = ext->cursor.valid_x; /*Cursor position set overwrites the valid position */
         lv_textarea_set_cursor_pos(ta, new_cur_pos);
         ext->cursor.valid_x = cur_valid_x_tmp;
     }
@@ -1674,7 +1674,7 @@ static void pwd_char_hider(lv_obj_t * ta)
  * Test an unicode character if it is accepted or not. Checks max length and accepted char list.
  * @param ta pointer to a test area object
  * @param c an unicode character
- * @return true: accapted; false: rejected
+ * @return true: accepted; false: rejected
  */
 static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
 {

@@ -791,7 +791,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
                                                                           &proc->types.pointer.act_point);
         new_obj_searched = true;
     }
-    /*If a dragable or a protected object was the last then keep it*/
+    /*If a draggable or a protected object was the last then keep it*/
     else {
     }
 
@@ -1049,7 +1049,7 @@ static void indev_proc_reset_query_handler(lv_indev_t * indev)
 /**
  * Search the most top, clickable object by a point
  * @param obj pointer to a start object, typically the screen
- * @param point pointer to a point for searhing the most top child
+ * @param point pointer to a point for searching the most top child
  * @return pointer to the found object or NULL if there was no suitable object
  */
 lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
@@ -1086,7 +1086,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 }
 
 /**
- * Handle focus/defocus on click for POINTER inpt devices
+ * Handle focus/defocus on click for POINTER input devices
  * @param proc pointer to the state of the indev
  */
 static void indev_click_focus(lv_indev_proc_t * proc)
@@ -1399,7 +1399,7 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
 
 /**
  * Get the really dragged object by taking `drag_parent` into account.
- * @param obj the start obejct
+ * @param obj the start object
  * @return the object to really drag
  */
 static lv_obj_t * get_dragged_obj(lv_obj_t * obj)

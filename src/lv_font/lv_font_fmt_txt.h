@@ -135,7 +135,7 @@ typedef struct {
           2  Get the class of the left and right glyphs as `left_class` and `right_class`
               left_class = left_class_mapping[glyph_id_left];
               right_class = right_class_mapping[glyph_id_right];
-          3. value = class_pair_values[(left_class-1)*right_class_cnt + (righ_class-1)]
+          3. value = class_pair_values[(left_class-1)*right_class_cnt + (right_class-1)]
         */
 
     const int8_t * class_pair_values;    /*left_class_num * right_class_num value*/
@@ -155,7 +155,7 @@ typedef enum {
 
 /*Describe store additional data for fonts */
 typedef struct {
-    /*The bitmaps os all glyphs*/
+    /*The bitmaps of all glyphs*/
     const uint8_t * glyph_bitmap;
 
     /*Describe the glyphs*/
