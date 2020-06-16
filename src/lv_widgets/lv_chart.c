@@ -636,7 +636,6 @@ uint16_t lv_chart_get_point_count(const lv_obj_t * chart)
  */
 uint16_t lv_chart_get_x_start_point(lv_chart_series_t * ser)
 {
-    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
     LV_ASSERT_NULL(ser);
 
     return(ser->start_point);
