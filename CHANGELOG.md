@@ -23,6 +23,7 @@
 - Fix typo in the API `scrllable` -> `scrollable`
 - `tabview` by default allow auto expanding the page only to right and bottom (#1573)
 - fix crash when drawing gradient to the same color
+- chart: fix memory leak
 
 ## v7.0.1 (01.06.2020)
 

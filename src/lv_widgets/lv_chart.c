@@ -650,9 +650,10 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
     if(sign == LV_SIGNAL_CLEANUP) {
-        lv_coord_t ** datal;
-        _LV_LL_READ(ext->series_ll, datal) {
-            lv_mem_free(*datal);
+        lv_chart_series_t * ser;
+        _LV_LL_READ(ext->series_ll, ser) {
+            lv_mem_free(ser->points);
+            lv_mem_free(ser);
         }
         _lv_ll_clear(&ext->series_ll);
 
