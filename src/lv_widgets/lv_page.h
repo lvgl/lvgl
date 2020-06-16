@@ -171,7 +171,7 @@ void lv_page_set_edge_flash(lv_obj_t * page, bool en);
  * @param bottom bottom fit policy from `lv_fit_t`
  */
 static inline void lv_page_set_scrollable_fit4(lv_obj_t * page, lv_fit_t left, lv_fit_t right, lv_fit_t top,
-                                              lv_fit_t bottom)
+                                               lv_fit_t bottom)
 {
     lv_cont_set_fit4(lv_page_get_scrollable(page), left, right, top, bottom);
 }

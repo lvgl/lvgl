@@ -785,7 +785,8 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     uint32_t cid = _lv_txt_encoded_get_char_id(bidi_txt, i);
     if(txt[line_start + cid] == '\0') {
         logical_pos = i;
-    } else {
+    }
+    else {
         bool is_rtl;
         logical_pos = _lv_bidi_get_logical_pos(&txt[line_start], NULL,
                                                txt_len, lv_obj_get_base_dir(label), cid, &is_rtl);
