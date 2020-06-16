@@ -32,10 +32,10 @@ def lvgl_clone():
 
 def lvgl_format():
   title("lvgl: Run code formatter")
-	os.chdir("./scripts")
-	cmd("./code-formatter.sh")
-	cmd("git ci -am 'Run code formatter'")
-	os.chdir("..")
+  os.chdir("./scripts")
+  cmd("./code-formatter.sh")
+  cmd("git ci -am 'Run code formatter'")
+  os.chdir("..")
 
 def lvgl_update_version():
 	title("lvgl: Update version number")
