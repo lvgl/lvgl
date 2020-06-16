@@ -499,6 +499,9 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
+        lv_obj_t * label = get_label(roller);
+        /*Be sure the label's style is updated before processing the roller*/
+        if(label) lv_signal_send(label, LV_SIGNAL_STYLE_CHG, NULL);
         refr_height(roller);
         refr_width(roller);
         refr_position(roller, false);
