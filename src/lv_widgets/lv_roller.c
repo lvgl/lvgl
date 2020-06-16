@@ -76,7 +76,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_ASSERT_MEM(roller);
     if(roller == NULL) return NULL;
 
-    if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrllable(roller));
+    if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrollable(roller));
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(roller);
 
     /*Allocate the roller type specific extended data*/
@@ -104,9 +104,9 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_t * label = lv_label_create(roller, NULL);
         lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
 
-        lv_obj_t * scrl = lv_page_get_scrllable(roller);
+        lv_obj_t * scrl = lv_page_get_scrollable(roller);
         lv_obj_set_drag(scrl, true);
-        lv_page_set_scrllable_fit2(roller, LV_FIT_PARENT, LV_FIT_NONE); /*Height is specified directly*/
+        lv_page_set_scrollable_fit2(roller, LV_FIT_PARENT, LV_FIT_NONE); /*Height is specified directly*/
         lv_roller_set_anim_time(roller, LV_ROLLER_DEF_ANIM_TIME);
         lv_roller_set_options(roller, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
 
@@ -123,7 +123,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_roller_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_roller_set_options(roller, lv_roller_get_options(copy), copy_ext->mode);
         ext->auto_fit = copy_ext->auto_fit;
-        lv_obj_t * scrl = lv_page_get_scrllable(roller);
+        lv_obj_t * scrl = lv_page_get_scrollable(roller);
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
     }
 
@@ -511,7 +511,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         if(lv_obj_get_width(roller) != lv_area_get_width(param) ||
            lv_obj_get_height(roller) != lv_area_get_height(param)) {
 #if LV_USE_ANIMATION
-            lv_anim_del(lv_page_get_scrllable(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
+            lv_anim_del(lv_page_get_scrollable(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
             refr_position(roller, false);
             refr_width(roller);
@@ -662,7 +662,7 @@ static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, 
     }
     else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {
 #if LV_USE_ANIMATION
-        lv_anim_del(lv_page_get_scrllable(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
+        lv_anim_del(lv_page_get_scrollable(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
         refr_position(roller, false);
         refr_width(roller);
@@ -743,7 +743,7 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
     anim_en = LV_ANIM_OFF;
 #endif
 
-    lv_obj_t * roller_scrl         = lv_page_get_scrllable(roller);
+    lv_obj_t * roller_scrl         = lv_page_get_scrollable(roller);
     lv_roller_ext_t * ext          = lv_obj_get_ext_attr(roller);
     const lv_font_t * font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);
     lv_style_int_t line_space = lv_obj_get_style_text_line_space(roller, LV_ROLLER_PART_BG);
@@ -878,10 +878,10 @@ static void refr_height(lv_obj_t * roller)
     lv_obj_t * label = get_label(roller);
     if(label == NULL) return;
 
-    lv_obj_set_height(lv_page_get_scrllable(roller), lv_obj_get_height(label) + lv_obj_get_height(roller));
+    lv_obj_set_height(lv_page_get_scrollable(roller), lv_obj_get_height(label) + lv_obj_get_height(roller));
 
 #if LV_USE_ANIMATION
-    lv_anim_del(lv_page_get_scrllable(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
+    lv_anim_del(lv_page_get_scrollable(roller), (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
     refr_position(roller, LV_ANIM_OFF);
 }
@@ -919,7 +919,7 @@ static void inf_normalize(void * scrl)
 
 static lv_obj_t * get_label(const lv_obj_t * roller)
 {
-    lv_obj_t * scrl = lv_page_get_scrllable(roller);
+    lv_obj_t * scrl = lv_page_get_scrollable(roller);
     if(scrl == NULL) return NULL;   /*The roller is being deleted, the scrollable already not exists*/
     return lv_obj_get_child(scrl, NULL);
 }

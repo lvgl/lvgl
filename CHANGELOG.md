@@ -20,6 +20,8 @@
 - Update `LV_OPA_MIN` and `LV_OPA_MAX` to widen the opacity processed range
 - `lv_btnm` fix sending events for hidden buttons
 - `lv_gaguge` make `lv_gauge_set_angle_offset` offset the labels and needles too
+- Fix typo in the API `scrllable` -> `scrollable`
+- `tabview`: by default allow auto expanding the page only left and bottom directions. (#1573)
 
 ## v7.0.1 (01.06.2020)
 
