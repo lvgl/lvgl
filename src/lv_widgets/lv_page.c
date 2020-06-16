@@ -806,7 +806,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
                 lv_obj_t * tmp = child;
                 child          = lv_obj_get_child(page, child); /*Get the next child before move this*/
 
-                /* Reposition the child to take padding into account (Only if it's on (0;0) or (width;height) coordinates now)
+                /* Reposition the child to take padding into account
                  * It's required to keep new the object on the same coordinate if FIT is enabled.*/
                 if((tmp->coords.x1 == page->coords.x1)  &&
                    (fit_left == LV_FIT_TIGHT || fit_left == LV_FIT_MAX) &&
