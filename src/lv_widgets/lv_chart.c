@@ -743,6 +743,7 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
         lv_chart_series_t * ser;
         _LV_LL_READ(ext->series_ll, ser) {
             if(!ser->ext_buf_assigned) lv_mem_free(ser->points);
+            lv_mem_free(ser);
         }
         _lv_ll_clear(&ext->series_ll);
 
