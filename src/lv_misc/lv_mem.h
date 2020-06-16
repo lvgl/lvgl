@@ -41,6 +41,7 @@ typedef struct {
     uint32_t free_size; /**< Size of available memory */
     uint32_t free_biggest_size;
     uint32_t used_cnt;
+    uint32_t max_used; /**< Max size of Heap memory used */
     uint8_t used_pct; /**< Percentage used */
     uint8_t frag_pct; /**< Amount of fragmentation */
 } lv_mem_monitor_t;

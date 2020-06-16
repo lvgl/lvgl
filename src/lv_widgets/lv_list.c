@@ -712,6 +712,11 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
             if(ext->last_sel_btn) lv_list_focus_btn(list, ext->last_sel_btn);
             else lv_list_focus_btn(list, lv_list_get_next_btn(list, NULL));
         }
+        if(indev_type == LV_INDEV_TYPE_ENCODER && lv_group_get_editing(g) == false) {
+            lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+            if(ext->act_sel_btn) lv_obj_clear_state(ext->act_sel_btn, LV_STATE_PRESSED);
+            if(ext->last_sel_btn) lv_obj_clear_state(ext->last_sel_btn, LV_STATE_PRESSED);
+        }
 #endif
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
@@ -811,8 +816,10 @@ static lv_res_t lv_list_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * para
     else if(sign == LV_SIGNAL_CLEANUP) {
 #if LV_USE_GROUP
         lv_obj_t * list = lv_obj_get_parent(lv_obj_get_parent(btn));
+        lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
         lv_obj_t * sel  = lv_list_get_btn_selected(list);
         if(sel == btn) lv_list_focus_btn(list, lv_list_get_next_btn(list, btn));
+        if(ext->last_sel_btn == btn) ext->last_sel_btn = NULL;
 #endif
     }
 

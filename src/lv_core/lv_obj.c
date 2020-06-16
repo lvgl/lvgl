@@ -38,6 +38,10 @@
 
 #include LV_THEME_DEFAULT_INCLUDE
 
+#if LV_USE_GPU_STM32_DMA2D
+#include "../lv_gpu/lv_gpu_stm32_dma2d.h"
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -138,6 +142,11 @@ void lv_init(void)
 
 #if LV_USE_GROUP
     _lv_group_init();
+#endif
+
+#if LV_USE_GPU_STM32_DMA2D
+    /*Initialize DMA2D GPU*/
+    lv_gpu_stm32_dma2d_init();
 #endif
 
     _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(lv_style_trans_t));
@@ -298,6 +307,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 #if LV_USE_GROUP
     new_obj->group_p = NULL;
+
 #endif
 
     /*Set attributes*/
@@ -312,6 +322,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->protect      = LV_PROTECT_NONE;
     new_obj->parent_event = 0;
     new_obj->gesture_parent = parent ? 1 : 0;
+    new_obj->focus_parent  = 0;
     new_obj->state = LV_STATE_DEFAULT;
 
     new_obj->ext_attr = NULL;
@@ -1544,6 +1555,31 @@ void lv_obj_set_gesture_parent(lv_obj_t * obj, bool en)
 }
 
 /**
+* Enable to use parent for focus state.
+* When object is focused the parent will get the state instead (visual only)
+* @param obj pointer to an object
+* @param en true: enable the 'focus parent' for the object
+*/
+void lv_obj_set_focus_parent(lv_obj_t * obj, bool en)
+{
+	if (lv_obj_is_focused(obj)) {
+    	if (en)	{
+    		obj->focus_parent = 1;
+			lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
+			lv_obj_set_state(lv_obj_get_focused_obj(obj), LV_STATE_FOCUSED);
+		}
+    	else {
+			lv_obj_clear_state(lv_obj_get_focused_obj(obj), LV_STATE_FOCUSED | LV_STATE_EDITED);
+			lv_obj_set_state(obj, LV_STATE_FOCUSED);
+			obj->focus_parent = 0;
+    	}
+    }
+	else {
+		obj->focus_parent = (en == true ? 1 : 0);
+	}
+}
+
+/**
  * Propagate the events to the parent too
  * @param obj pointer to an object
  * @param en true: enable the event propagation
@@ -2745,6 +2781,16 @@ bool lv_obj_get_gesture_parent(const lv_obj_t * obj)
 }
 
 /**
+* Get the focus parent attribute of an object
+* @param obj pointer to an object
+* @return true: focus parent is enabled
+*/
+bool lv_obj_get_focus_parent(const lv_obj_t * obj)
+{
+    return obj->focus_parent == 0 ? false : true;
+}
+
+/**
  * Get the drag parent attribute of an object
  * @param obj pointer to an object
  * @return true: drag parent is enabled
@@ -3638,6 +3684,23 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
     return LV_DESIGN_RES_OK;
 }
 
+
+/**
+ * Get the really focused object by taking `focus_parent` into account.
+ * @param obj the start object
+ * @return the object to really focus
+ */
+lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj)
+{
+    if(obj == NULL) return NULL;
+    const lv_obj_t * focus_obj = obj;
+    while(lv_obj_get_focus_parent(focus_obj) != false && focus_obj != NULL) {
+    	focus_obj = lv_obj_get_parent(focus_obj);
+    }
+
+    return (lv_obj_t*)focus_obj;
+}
+
 /**
  * Signal function of the basic object
  * @param obj pointer to an object
@@ -3686,14 +3749,26 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(lv_group_get_editing(lv_obj_get_group(obj))) {
             uint8_t state = LV_STATE_FOCUSED;
             state |= LV_STATE_EDITED;
+
+            /*if using focus mode, change target to parent*/
+            obj = lv_obj_get_focused_obj(obj);
+
             lv_obj_add_state(obj, state);
         }
         else {
+
+            /*if using focus mode, change target to parent*/
+            obj = lv_obj_get_focused_obj(obj);
+
             lv_obj_add_state(obj, LV_STATE_FOCUSED);
             lv_obj_clear_state(obj, LV_STATE_EDITED);
         }
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
+
+        /*if using focus mode, change target to parent*/
+        obj = lv_obj_get_focused_obj(obj);
+
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
     }
 #endif
@@ -4062,5 +4137,4 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
 
     return false;
 }
-
 
