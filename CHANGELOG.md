@@ -1,8 +1,7 @@
 # Changelog
 
 
-## v7.0.2 (under development, planned: 16.06.2020)
-*Available in the `master` branch*
+## v7.0.2 (16.06.2020)
 
 - `lv_textarea` fix wrong cursor position when clicked after the last character
 - Change all text related indices from 16-bit to 32-bit integers throughout whole library. #1545
