@@ -384,7 +384,7 @@ static inline void decompress_line(uint8_t * out, lv_coord_t w)
 /**
  * Read bits from an input buffer. The read can cross byte boundary.
  * @param in the input buffer to read from.
- * @param bit_pos index of teh first bit to read.
+ * @param bit_pos index of the first bit to read.
  * @param len number of bits to read (must be <= 8).
  * @return the read bits
  */

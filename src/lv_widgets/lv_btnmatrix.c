@@ -568,7 +568,7 @@ bool lv_btnmatrix_get_one_check(const lv_obj_t * btnm)
  **********************/
 
 /**
- * Handle the drawing related tasks of the button matrixs
+ * Handle the drawing related tasks of the button matrix
  * @param btnm pointer to a button matrix object
  * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area

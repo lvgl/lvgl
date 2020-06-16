@@ -189,7 +189,7 @@ static inline void lv_page_set_scrollable_fit2(lv_obj_t * page, lv_fit_t hor, lv
 }
 
 /**
- * Set the fit policyin all 4 direction at once.
+ * Set the fit policy in all 4 direction at once.
  * It tell how to change the page size automatically.
  * @param page pointer to a button object
  * @param fit fit policy from `lv_fit_t`
@@ -270,7 +270,7 @@ lv_coord_t lv_page_get_height_fit(lv_obj_t * page);
 
 /**
  * Divide the width of the object and get the width of a given number of columns.
- * Take into account the paddings of the background and scrollbale too.
+ * Take into account the paddings of the background and scrollable too.
  * @param page pointer to an object
  * @param div indicates how many columns are assumed.
  * If 1 the width will be set the the parent's width
@@ -283,7 +283,7 @@ lv_coord_t lv_page_get_width_grid(lv_obj_t * page, uint8_t div, uint8_t span);
 
 /**
  * Divide the height of the object and get the width of a given number of columns.
- * Take into account the paddings of the background and scrollbale too.
+ * Take into account the paddings of the background and scrollable too.
  * @param page pointer to an object
  * @param div indicates how many rows are assumed.
  * If 1 the height will be set the the parent's height

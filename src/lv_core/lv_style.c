@@ -1119,7 +1119,7 @@ static lv_style_t * get_alloc_local_style(lv_style_list_t * list)
     }
     lv_style_init(local_style);
 
-    /*Add the local style to the furst place*/
+    /*Add the local style to the first place*/
     _lv_style_list_add_style(list, local_style);
     list->has_local = 1;
 

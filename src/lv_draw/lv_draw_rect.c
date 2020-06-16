@@ -275,7 +275,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
             }
 
             /* If there is not other mask and drawing the corner area split the drawing to corner and middle areas
-             * because it the middle mask shuldn't be taken into account (therefore its faster)*/
+             * because it the middle mask shouldn't be taken into account (therefore its faster)*/
             if(simple_mode && split &&
                (y < coords_bg.y1 + rout + 1 ||
                 y > coords_bg.y2 - rout - 1)) {

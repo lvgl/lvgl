@@ -542,7 +542,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         }
         else {
             ext->sel_opt_id_ori = ext->sel_opt_id; /*Save the current value. Used to revert this state if
-                                                                    ENTER wont't be pressed*/
+                                                                    ENTER won't be pressed*/
         }
 #endif
     }
@@ -608,7 +608,7 @@ static lv_style_list_t * lv_roller_get_style(lv_obj_t * roller, uint8_t part)
 
 /**
  * Signal function of the scrollable part of the roller.
- * @param roller_scrl ointer to the scrollable part of roller (page)
+ * @param roller_scrl pointer to the scrollable part of roller (page)
  * @param sign a signal type from lv_signal_t enum
  * @param param pointer to a signal specific variable
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
@@ -751,7 +751,7 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
     lv_coord_t h                   = lv_obj_get_height(roller);
     uint16_t anim_time             = lv_roller_get_anim_time(roller);
 
-    /* Normally the animtaion's `end_cb` sets correct position of the roller is infinite.
+    /* Normally the animation's `end_cb` sets correct position of the roller is infinite.
      * But without animations do it manually*/
     if(anim_en == LV_ANIM_OFF || anim_time == 0) {
         inf_normalize(roller_scrl);
@@ -870,7 +870,7 @@ static void refr_width(lv_obj_t * roller)
 }
 
 /**
- * Refresh the height of the roller and the scrolable
+ * Refresh the height of the roller and the scrollable
  * @param roller pointer to roller
  */
 static void refr_height(lv_obj_t * roller)
@@ -887,7 +887,7 @@ static void refr_height(lv_obj_t * roller)
 }
 
 /**
- * Set the middle page for the roller if inifinte is enabled
+ * Set the middle page for the roller if infinite is enabled
  * @param scrl pointer to the roller's scrollable (lv_obj_t *)
  */
 static void inf_normalize(void * scrl)
