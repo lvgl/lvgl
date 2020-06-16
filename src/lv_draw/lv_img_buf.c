@@ -528,8 +528,8 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
     LV_UNUSED(pivot);
     res->x1 = 0;
     res->y1 = 0;
-    res->x2 = w;
-    res->y2 = h;
+    res->x2 = w - 1;
+    res->y2 = h - 1;
 #endif
 }
 
