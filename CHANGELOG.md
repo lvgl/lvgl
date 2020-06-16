@@ -29,6 +29,9 @@
 - `lv_debug`: restructure to allow asserting in from `lv_misc` too
 - add assert if `_lv_mem_buf_get()` fails
 - `lv_textarea`: fix character delete in password mode
+- Update `LV_OPA_MIN` and `LV_OPA_MAX` to widen the opacity processed range
+- `lv_btnm` fix sending events for hidden buttons
+- `lv_gaguge` make ` + lv_gauge_set_angle_offset` offset the labels and needles too
 
 ## v7.0.1 (01.06.2020)
 
