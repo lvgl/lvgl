@@ -191,6 +191,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     }
 
     ser->start_point = 0;
+    ser->ext_buf_assigned = false;
 
     uint16_t i;
     lv_coord_t * p_tmp = ser->points;
