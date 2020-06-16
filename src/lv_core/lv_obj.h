@@ -1411,8 +1411,8 @@ bool lv_debug_check_obj_valid(const lv_obj_t * obj);
 
 # ifndef LV_DEBUG_IS_OBJ
 #  define LV_DEBUG_IS_OBJ(obj_p, obj_type) (lv_debug_check_null(obj_p) &&      \
-                                          lv_debug_check_obj_valid(obj_p) && \
-                                          lv_debug_check_obj_type(obj_p, obj_type))
+                                            lv_debug_check_obj_valid(obj_p) && \
+                                            lv_debug_check_obj_type(obj_p, obj_type))
 # endif
 
 

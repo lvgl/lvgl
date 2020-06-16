@@ -1047,7 +1047,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv
             if(mask_res == LV_DRAW_MASK_RES_FULL_COVER) mask_res = LV_DRAW_MASK_RES_CHANGED;
 
             _lv_blend_fill(clip, &fa, dsc->shadow_color, mask_buf,
-                    mask_res, LV_OPA_COVER, dsc->shadow_blend_mode);
+                           mask_res, LV_OPA_COVER, dsc->shadow_blend_mode);
             fa.y1++;
             fa.y2++;
         }

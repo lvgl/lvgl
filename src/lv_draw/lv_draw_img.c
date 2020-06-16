@@ -458,9 +458,9 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
         /*Most complicated case: transform or other mask or chroma keyed*/
         else {
             /*Build the image and a mask line-by-line*/
-             uint32_t mask_buf_size = lv_area_get_size(&draw_area) > LV_HOR_RES_MAX ? LV_HOR_RES_MAX : lv_area_get_size(&draw_area);
-             lv_color_t * map2 = _lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
-             lv_opa_t * mask_buf = _lv_mem_buf_get(mask_buf_size);
+            uint32_t mask_buf_size = lv_area_get_size(&draw_area) > LV_HOR_RES_MAX ? LV_HOR_RES_MAX : lv_area_get_size(&draw_area);
+            lv_color_t * map2 = _lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
+            lv_opa_t * mask_buf = _lv_mem_buf_get(mask_buf_size);
 
 #if LV_USE_IMG_TRANSFORM
             lv_img_transform_dsc_t trans_dsc;

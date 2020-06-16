@@ -141,7 +141,7 @@ void lv_init(void)
 #endif
 
     _lv_ll_init(&LV_GC_ROOT(_lv_obj_style_trans_ll), sizeof(lv_style_trans_t));
-    
+
     _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
     _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
 
@@ -172,13 +172,13 @@ void lv_init(void)
 void lv_deinit(void)
 {
     _lv_gc_clear_roots();
-	
+
     lv_disp_set_default(NULL);
     _lv_mem_deinit();
     lv_initialized = false;
-	
+
     LV_LOG_INFO("lv_deinit done");
-	
+
 #if LV_USE_LOG
     lv_log_register_print_cb(NULL);
 #endif
