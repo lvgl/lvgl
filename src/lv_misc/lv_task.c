@@ -248,19 +248,21 @@ lv_task_t * lv_task_create_basic(void)
 
 /**
  * Create a new lv_task
- * @param task_cb a callback which is the task itself. It will be called periodically.
+ * @param task_xcb a callback which is the task itself. It will be called periodically.
+ *                 (the 'x' in the argument name indicates that its not a fully generic function because it not follows
+ *                  the `func_name(object, callback, ...)` convention)
  * @param period call period in ms unit
  * @param prio priority of the task (LV_TASK_PRIO_OFF means the task is stopped)
  * @param user_data custom parameter
  * @return pointer to the new task
  */
-lv_task_t * lv_task_create(lv_task_cb_t task_cb, uint32_t period, lv_task_prio_t prio, void * user_data)
+lv_task_t * lv_task_create(lv_task_cb_t task_xcb, uint32_t period, lv_task_prio_t prio, void * user_data)
 {
     lv_task_t * new_task = lv_task_create_basic();
     LV_ASSERT_MEM(new_task);
     if(new_task == NULL) return NULL;
 
-    lv_task_set_cb(new_task, task_cb);
+    lv_task_set_cb(new_task, task_xcb);
     lv_task_set_period(new_task, period);
     lv_task_set_prio(new_task, prio);
     new_task->user_data = user_data;
