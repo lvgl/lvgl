@@ -79,7 +79,7 @@ typedef struct {
 typedef struct {
     /*No inherited ext*/ /*Ext. of ancestor*/
     /*New data for this type */
-    lv_ll_t series_ll;    /*Linked list for the data line pointers (stores lv_chart_dl_t)*/
+    lv_ll_t series_ll;    /*Linked list for the data line pointers (stores lv_chart_series_t)*/
     lv_coord_t ymin;      /*y min value (used to scale the data)*/
     lv_coord_t ymax;      /*y max value (used to scale the data)*/
     uint8_t hdiv_cnt;     /*Number of horizontal division lines*/
