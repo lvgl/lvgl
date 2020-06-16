@@ -79,7 +79,7 @@ typedef struct {
 typedef struct {
     /*No inherited ext*/ /*Ext. of ancestor*/
     /*New data for this type */
-    lv_ll_t series_ll;    /*Linked list for the data line pointers (stores lv_chart_dl_t)*/
+    lv_ll_t series_ll;    /*Linked list for the data line pointers (stores lv_chart_series_t)*/
     lv_coord_t ymin;      /*y min value (used to scale the data)*/
     lv_coord_t ymax;      /*y max value (used to scale the data)*/
     uint8_t hdiv_cnt;     /*Number of horizontal division lines*/
@@ -127,9 +127,9 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy);
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color);
 
 /**
- * Clear the point of a serie
+ * Clear the point of a series
  * @param chart pointer to a chart object
- * @param serie pointer to the chart's serie to clear
+ * @param serie pointer to the chart's series to clear
  */
 void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie);
 

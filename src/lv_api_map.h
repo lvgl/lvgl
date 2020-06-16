@@ -172,7 +172,7 @@ static inline lv_scrollbar_mode_t lv_page_get_scrlbar_mode(lv_obj_t * page)
 
 static inline lv_obj_t * lv_page_get_scrl(lv_obj_t * page)
 {
-    return lv_page_get_scrllable(page);
+    return lv_page_get_scrollable(page);
 }
 #endif
 

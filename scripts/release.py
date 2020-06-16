@@ -32,10 +32,10 @@ def lvgl_clone():
 
 def lvgl_format():
   title("lvgl: Run code formatter")
-	os.chdir("./scripts")
-	cmd("./code-formatter.sh")
-	cmd("git ci -am 'Run code formatter'")
-	os.chdir("..")
+  os.chdir("./scripts")
+  cmd("./code-format.sh")
+  cmd("git ci -am 'Run code formatter'")
+  os.chdir("..")
 
 def lvgl_update_version():
 	title("lvgl: Update version number")
@@ -123,13 +123,13 @@ def lvgl_merge_to_release_branch(v):
 	cmd('git co release/v7')
 	cmd('git merge master')
 	cmd('git push origin release/v7')
+	os.chdir("../")
 	
 	
 def lvgl_update_api_docs():
 	title("lvgl: Update API with Doxygen")
 
 	cmd("cd scripts; doxygen");
-	os.chdir("../")
 
 
 def examples_clone():

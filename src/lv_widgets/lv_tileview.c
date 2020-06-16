@@ -80,7 +80,7 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(new_tileview);
-    if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrllable(new_tileview));
+    if(ancestor_scrl_signal == NULL) ancestor_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrollable(new_tileview));
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(new_tileview);
 
     /*Initialize the allocated 'ext' */
@@ -94,7 +94,7 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(new_tileview, lv_tileview_signal);
-    lv_obj_set_signal_cb(lv_page_get_scrllable(new_tileview), lv_tileview_scrl_signal);
+    lv_obj_set_signal_cb(lv_page_get_scrollable(new_tileview), lv_tileview_scrl_signal);
 
     /*Init the new tileview*/
     if(copy == NULL) {
@@ -113,10 +113,10 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
         }
 
         lv_obj_set_size(new_tileview, w, h);
-        lv_obj_set_drag_throw(lv_page_get_scrllable(new_tileview), true);
-        lv_obj_set_drag_dir(lv_page_get_scrllable(new_tileview), LV_DRAG_DIR_ONE);
+        lv_obj_set_drag_throw(lv_page_get_scrollable(new_tileview), true);
+        lv_obj_set_drag_dir(lv_page_get_scrollable(new_tileview), LV_DRAG_DIR_ONE);
 
-        lv_page_set_scrllable_fit(new_tileview, LV_FIT_MAX);
+        lv_page_set_scrollable_fit(new_tileview, LV_FIT_MAX);
 
         lv_obj_reset_style_list(new_tileview, LV_PAGE_PART_SCROLLABLE);
         lv_theme_apply(new_tileview, LV_THEME_TILEVIEW);
@@ -168,7 +168,7 @@ void lv_tileview_add_element(lv_obj_t * tileview, lv_obj_t * element)
  * @param tileview pointer to a Tileview object
  * @param valid_pos array width the indices. E.g. `lv_point_t p[] = {{0,0}, {1,0}, {1,1}`.
  * Only the pointer is saved so can't be a local variable.
- * @param valid_pos_cnt numner of elements in `valid_pos` array
+ * @param valid_pos_cnt number of elements in `valid_pos` array
  */
 void lv_tileview_set_valid_positions(lv_obj_t * tileview, const lv_point_t valid_pos[], uint16_t valid_pos_cnt)
 {
@@ -228,7 +228,7 @@ void lv_tileview_set_tile_act(lv_obj_t * tileview, lv_coord_t x, lv_coord_t y, l
 
     lv_coord_t x_coord = -x * lv_obj_get_width(tileview);
     lv_coord_t y_coord = -y * lv_obj_get_height(tileview);
-    lv_obj_t * scrl    = lv_page_get_scrllable(tileview);
+    lv_obj_t * scrl    = lv_page_get_scrollable(tileview);
     if(anim) {
 #if LV_USE_ANIMATION
         lv_coord_t x_act = lv_obj_get_x(scrl);
@@ -400,7 +400,7 @@ static void drag_end_handler(lv_obj_t * tileview)
     lv_indev_t * indev      = lv_indev_get_act();
     lv_point_t point_act;
     lv_indev_get_point(indev, &point_act);
-    lv_obj_t * scrl = lv_page_get_scrllable(tileview);
+    lv_obj_t * scrl = lv_page_get_scrollable(tileview);
     lv_point_t p;
 
     p.x = -(scrl->coords.x1 - lv_obj_get_width(tileview) / 2);

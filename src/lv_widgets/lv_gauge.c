@@ -519,7 +519,7 @@ static void lv_gauge_draw_labels(lv_obj_t * gauge, const lv_area_t * mask)
     lv_coord_t y_ofs         = gauge->coords.y1 + r + top + scale_width + txt_pad;
     int16_t scale_angle      = lv_linemeter_get_scale_angle(gauge);
     uint16_t label_num       = ext->label_count;
-    int16_t angle_ofs        = 90 + (360 - scale_angle) / 2;
+    int16_t angle_ofs        = 90 + (360 - scale_angle) / 2 + lv_gauge_get_angle_offset(gauge);
     int32_t min              = lv_gauge_get_min_value(gauge);
     int32_t max              = lv_gauge_get_max_value(gauge);
 
@@ -578,7 +578,7 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
     lv_coord_t x_ofs  = gauge->coords.x1 + r + left + pad;
     lv_coord_t y_ofs  = gauge->coords.y1 + r + top + pad;
     uint16_t angle    = lv_linemeter_get_scale_angle(gauge);
-    int16_t angle_ofs = 90 + (360 - angle) / 2;
+    int16_t angle_ofs = 90 + (360 - angle) / 2 + lv_gauge_get_angle_offset(gauge);
     int16_t min       = lv_gauge_get_min_value(gauge);
     int16_t max       = lv_gauge_get_max_value(gauge);
     lv_point_t p_mid;

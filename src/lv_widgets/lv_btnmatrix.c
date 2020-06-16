@@ -611,7 +611,7 @@ lv_label_align_t lv_btnmatrix_get_align(const lv_obj_t* btnm)
  **********************/
 
 /**
- * Handle the drawing related tasks of the button matrixs
+ * Handle the drawing related tasks of the button matrix
  * @param btnm pointer to a button matrix object
  * @param clip_area the object will be drawn only in this area
  * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
@@ -867,11 +867,11 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
         }
 #endif
 
-        if(ext->btn_id_act != LV_BTNMATRIX_BTN_NONE) {
-            if(button_is_click_trig(ext->ctrl_bits[ext->btn_id_act]) == false &&
-               button_is_inactive(ext->ctrl_bits[ext->btn_id_act]) == false &&
-               button_is_hidden(ext->ctrl_bits[ext->btn_id_act]) == false) {
-                uint32_t b = ext->btn_id_act;
+        if(ext->btn_id_pr != LV_BTNMATRIX_BTN_NONE) {
+            if(button_is_click_trig(ext->ctrl_bits[ext->btn_id_pr]) == false &&
+               button_is_inactive(ext->ctrl_bits[ext->btn_id_pr]) == false &&
+               button_is_hidden(ext->ctrl_bits[ext->btn_id_pr]) == false) {
+                uint32_t b = ext->btn_id_pr;
                 res        = lv_event_send(btnm, LV_EVENT_VALUE_CHANGED, &b);
             }
         }
@@ -890,21 +890,22 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
             if(ext->btn_id_pr != LV_BTNMATRIX_BTN_NONE) {
                 invalidate_button_area(btnm, ext->btn_id_pr);
             }
+
+            ext->btn_id_pr  = btn_pr;
+            ext->btn_id_act = btn_pr;
+
             lv_indev_reset_long_press(param); /*Start the log press time again on the new button*/
             if(btn_pr != LV_BTNMATRIX_BTN_NONE &&
                button_is_inactive(ext->ctrl_bits[btn_pr]) == false &&
                button_is_hidden(ext->ctrl_bits[btn_pr]) == false) {
                 /* Send VALUE_CHANGED for the newly pressed button */
-                uint32_t b = ext->btn_id_act;
+                uint32_t b = btn_pr;
                 res        = lv_event_send(btnm, LV_EVENT_VALUE_CHANGED, &b);
                 if(res == LV_RES_OK) {
                     invalidate_button_area(btnm, btn_pr);
                 }
             }
         }
-
-        ext->btn_id_pr  = btn_pr;
-        ext->btn_id_act = btn_pr;
     }
     else if(sign == LV_SIGNAL_RELEASED) {
         if(ext->btn_id_pr != LV_BTNMATRIX_BTN_NONE) {
@@ -970,6 +971,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
             /*In navigation mode don't select any button but in edit mode select the fist*/
             if(lv_group_get_editing(lv_obj_get_group(btnm))) {
                 ext->btn_id_focused = 0;
+                ext->btn_id_act = ext->btn_id_focused;
             }
             else {
                 ext->btn_id_focused = LV_BTNMATRIX_BTN_NONE;
@@ -977,9 +979,9 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
         }
         else if(indev_type == LV_INDEV_TYPE_KEYPAD) {
             ext->btn_id_focused = 0;
+            ext->btn_id_act = ext->btn_id_focused;
         }
 
-        ext->btn_id_act = ext->btn_id_focused;
 #endif
     }
     else if(sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_LEAVE) {

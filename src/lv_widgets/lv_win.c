@@ -173,7 +173,7 @@ void lv_win_clean(lv_obj_t * win)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
 
-    lv_obj_t * scrl = lv_page_get_scrllable(win);
+    lv_obj_t * scrl = lv_page_get_scrollable(win);
     lv_obj_clean(scrl);
 }
 
@@ -230,7 +230,7 @@ lv_obj_t * lv_win_add_btn_left(lv_obj_t * win, const void * img_src)
 
 /**
  * Can be assigned to a window control button to close the window
- * @param btn pointer to the control button on teh widows header
+ * @param btn pointer to the control button on the widows header
  * @param evet the event type
  */
 void lv_win_close_event_cb(lv_obj_t * btn, lv_event_t event)
@@ -483,7 +483,7 @@ lv_coord_t lv_win_get_width(lv_obj_t * win)
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
 
     lv_win_ext_t * ext            = lv_obj_get_ext_attr(win);
-    lv_obj_t * scrl               = lv_page_get_scrllable(ext->page);
+    lv_obj_t * scrl               = lv_page_get_scrollable(ext->page);
     lv_coord_t left = lv_obj_get_style_pad_left(win, LV_WIN_PART_BG);
     lv_coord_t right = lv_obj_get_style_pad_left(win, LV_WIN_PART_BG);
 
@@ -599,7 +599,7 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_GET_STATE_DSC) {
         lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
         lv_get_state_info_t * info = param;
-        if(info->part == LV_WIN_PART_CONTENT_SCROLLABLE) info->result = lv_obj_get_state(lv_page_get_scrllable(ext->page),
+        if(info->part == LV_WIN_PART_CONTENT_SCROLLABLE) info->result = lv_obj_get_state(lv_page_get_scrollable(ext->page),
                                                                                              LV_CONT_PART_MAIN);
         else if(info->part == LV_WIN_PART_SCROLLBAR) info->result = lv_obj_get_state(ext->page, LV_PAGE_PART_SCROLLBAR);
         else if(info->part == LV_WIN_PART_HEADER) info->result = lv_obj_get_state(ext->header, LV_OBJ_PART_MAIN);

@@ -88,9 +88,9 @@ LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void);
 //! @endcond
 
 /**
- * Create an "empty" task. It needs to initialzed with at least
+ * Create an "empty" task. It needs to initialized with at least
  * `lv_task_set_cb` and `lv_task_set_period`
- * @return pointer to the craeted task
+ * @return pointer to the created task
  */
 lv_task_t * lv_task_create_basic(void);
 

@@ -71,8 +71,8 @@ lv_bidi_dir_t _lv_bidi_detect_base_dir(const char * txt);
  * Can be `NULL` is unused
  * @param len length of the line in character count
  * @param base_dir base direction of the text: `LV_BIDI_DIR_LTR` or `LV_BIDI_DIR_RTL`
- * @param vicual_pos the visual character position which logical position should be get
- * @param is_rtl tell the the char at `viasual_pos` is RTL or LTR context
+ * @param visual_pos the visual character position which logical position should be get
+ * @param is_rtl tell the the char at `visual_pos` is RTL or LTR context
  * @return the logical character position
  */
 uint16_t _lv_bidi_get_logical_pos(const char * str_in, char ** bidi_txt, uint32_t len, lv_bidi_dir_t base_dir,
@@ -97,7 +97,7 @@ uint16_t _lv_bidi_get_visual_pos(const char * str_in, char ** bidi_txt, uint16_t
  * Bidi process a paragraph of text
  * @param str_in the string to process
  * @param str_out store the result here
- * @param len length of teh text
+ * @param len length of the text
  * @param base_dir base dir of the text
  * @param pos_conv_out an `uint16_t` array to store the related logical position of the character.
  * Can be `NULL` is unused

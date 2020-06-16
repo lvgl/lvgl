@@ -117,7 +117,7 @@ void lv_page_clean(lv_obj_t * page);
  * @param page pointer to a page object
  * @return pointer to a container which is the scrollable part of the page
  */
-lv_obj_t * lv_page_get_scrllable(const lv_obj_t * page);
+lv_obj_t * lv_page_get_scrollable(const lv_obj_t * page);
 
 /**
  * Get the animation time
@@ -170,10 +170,10 @@ void lv_page_set_edge_flash(lv_obj_t * page, bool en);
  * @param top bottom fit policy from `lv_fit_t`
  * @param bottom bottom fit policy from `lv_fit_t`
  */
-static inline void lv_page_set_scrllable_fit4(lv_obj_t * page, lv_fit_t left, lv_fit_t right, lv_fit_t top,
-                                              lv_fit_t bottom)
+static inline void lv_page_set_scrollable_fit4(lv_obj_t * page, lv_fit_t left, lv_fit_t right, lv_fit_t top,
+                                               lv_fit_t bottom)
 {
-    lv_cont_set_fit4(lv_page_get_scrllable(page), left, right, top, bottom);
+    lv_cont_set_fit4(lv_page_get_scrollable(page), left, right, top, bottom);
 }
 
 /**
@@ -183,20 +183,20 @@ static inline void lv_page_set_scrllable_fit4(lv_obj_t * page, lv_fit_t left, lv
  * @param hot horizontal fit policy from `lv_fit_t`
  * @param ver vertical fit policy from `lv_fit_t`
  */
-static inline void lv_page_set_scrllable_fit2(lv_obj_t * page, lv_fit_t hor, lv_fit_t ver)
+static inline void lv_page_set_scrollable_fit2(lv_obj_t * page, lv_fit_t hor, lv_fit_t ver)
 {
-    lv_cont_set_fit2(lv_page_get_scrllable(page), hor, ver);
+    lv_cont_set_fit2(lv_page_get_scrollable(page), hor, ver);
 }
 
 /**
- * Set the fit policyin all 4 direction at once.
+ * Set the fit policy in all 4 direction at once.
  * It tell how to change the page size automatically.
  * @param page pointer to a button object
  * @param fit fit policy from `lv_fit_t`
  */
-static inline void lv_page_set_scrllable_fit(lv_obj_t * page, lv_fit_t fit)
+static inline void lv_page_set_scrollable_fit(lv_obj_t * page, lv_fit_t fit)
 {
-    lv_cont_set_fit(lv_page_get_scrllable(page), fit);
+    lv_cont_set_fit(lv_page_get_scrollable(page), fit);
 }
 
 /**
@@ -206,7 +206,7 @@ static inline void lv_page_set_scrllable_fit(lv_obj_t * page, lv_fit_t fit)
  */
 static inline void lv_page_set_scrl_width(lv_obj_t * page, lv_coord_t w)
 {
-    lv_obj_set_width(lv_page_get_scrllable(page), w);
+    lv_obj_set_width(lv_page_get_scrollable(page), w);
 }
 
 /**
@@ -216,7 +216,7 @@ static inline void lv_page_set_scrl_width(lv_obj_t * page, lv_coord_t w)
  */
 static inline void lv_page_set_scrl_height(lv_obj_t * page, lv_coord_t h)
 {
-    lv_obj_set_height(lv_page_get_scrllable(page), h);
+    lv_obj_set_height(lv_page_get_scrollable(page), h);
 }
 
 /**
@@ -226,7 +226,7 @@ static inline void lv_page_set_scrl_height(lv_obj_t * page, lv_coord_t h)
  */
 static inline void lv_page_set_scrl_layout(lv_obj_t * page, lv_layout_t layout)
 {
-    lv_cont_set_layout(lv_page_get_scrllable(page), layout);
+    lv_cont_set_layout(lv_page_get_scrollable(page), layout);
 }
 
 /*=====================
@@ -270,7 +270,7 @@ lv_coord_t lv_page_get_height_fit(lv_obj_t * page);
 
 /**
  * Divide the width of the object and get the width of a given number of columns.
- * Take into account the paddings of the background and scrollbale too.
+ * Take into account the paddings of the background and scrollable too.
  * @param page pointer to an object
  * @param div indicates how many columns are assumed.
  * If 1 the width will be set the the parent's width
@@ -283,7 +283,7 @@ lv_coord_t lv_page_get_width_grid(lv_obj_t * page, uint8_t div, uint8_t span);
 
 /**
  * Divide the height of the object and get the width of a given number of columns.
- * Take into account the paddings of the background and scrollbale too.
+ * Take into account the paddings of the background and scrollable too.
  * @param page pointer to an object
  * @param div indicates how many rows are assumed.
  * If 1 the height will be set the the parent's height
@@ -301,7 +301,7 @@ lv_coord_t lv_page_get_height_grid(lv_obj_t * page, uint8_t div, uint8_t span);
  */
 static inline lv_coord_t lv_page_get_scrl_width(const lv_obj_t * page)
 {
-    return lv_obj_get_width(lv_page_get_scrllable(page));
+    return lv_obj_get_width(lv_page_get_scrollable(page));
 }
 
 /**
@@ -311,7 +311,7 @@ static inline lv_coord_t lv_page_get_scrl_width(const lv_obj_t * page)
  */
 static inline lv_coord_t lv_page_get_scrl_height(const lv_obj_t * page)
 {
-    return lv_obj_get_height(lv_page_get_scrllable(page));
+    return lv_obj_get_height(lv_page_get_scrollable(page));
 }
 
 /**
@@ -321,7 +321,7 @@ static inline lv_coord_t lv_page_get_scrl_height(const lv_obj_t * page)
  */
 static inline lv_layout_t lv_page_get_scrl_layout(const lv_obj_t * page)
 {
-    return lv_cont_get_layout(lv_page_get_scrllable(page));
+    return lv_cont_get_layout(lv_page_get_scrollable(page));
 }
 
 /**
@@ -331,7 +331,7 @@ static inline lv_layout_t lv_page_get_scrl_layout(const lv_obj_t * page)
  */
 static inline lv_fit_t lv_page_get_scrl_fit_left(const lv_obj_t * page)
 {
-    return lv_cont_get_fit_left(lv_page_get_scrllable(page));
+    return lv_cont_get_fit_left(lv_page_get_scrollable(page));
 }
 
 /**
@@ -341,7 +341,7 @@ static inline lv_fit_t lv_page_get_scrl_fit_left(const lv_obj_t * page)
  */
 static inline lv_fit_t lv_page_get_scrl_fit_right(const lv_obj_t * page)
 {
-    return lv_cont_get_fit_right(lv_page_get_scrllable(page));
+    return lv_cont_get_fit_right(lv_page_get_scrollable(page));
 }
 
 /**
@@ -351,7 +351,7 @@ static inline lv_fit_t lv_page_get_scrl_fit_right(const lv_obj_t * page)
  */
 static inline lv_fit_t lv_page_get_scrl_fit_top(const lv_obj_t * page)
 {
-    return lv_cont_get_fit_top(lv_page_get_scrllable(page));
+    return lv_cont_get_fit_top(lv_page_get_scrollable(page));
 }
 
 /**
@@ -361,7 +361,7 @@ static inline lv_fit_t lv_page_get_scrl_fit_top(const lv_obj_t * page)
  */
 static inline lv_fit_t lv_page_get_scrl_fit_bottom(const lv_obj_t * page)
 {
-    return lv_cont_get_fit_bottom(lv_page_get_scrllable(page));
+    return lv_cont_get_fit_bottom(lv_page_get_scrollable(page));
 }
 
 /*=====================

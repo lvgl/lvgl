@@ -155,7 +155,7 @@ lv_res_t lv_group_send_data(lv_group_t * group, uint32_t c);
 void lv_group_set_focus_cb(lv_group_t * group, lv_group_focus_cb_t focus_cb);
 
 /**
- * Set whether the next or previous item in a group is focused if the currently focussed obj is
+ * Set whether the next or previous item in a group is focused if the currently focused obj is
  * deleted.
  * @param group pointer to a group
  * @param new refocus policy enum
