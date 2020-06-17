@@ -536,6 +536,9 @@ typedef void * lv_obj_user_data_t;
 
 /*Calendar (dependencies: -)*/
 #define LV_USE_CALENDAR 1
+#if LV_USE_CALENDAR
+#  define LV_CALENDAR_WEEK_STARTS_MONDAY    0
+#endif
 
 /*Canvas (dependencies: lv_img)*/
 #define LV_USE_CANVAS   1
