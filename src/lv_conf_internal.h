@@ -799,6 +799,11 @@
 #ifndef LV_USE_CALENDAR
 #define LV_USE_CALENDAR 1
 #endif
+#if LV_USE_CALENDAR
+#ifndef LV_CALENDAR_WEEK_STARTS_MONDAY
+#  define LV_CALENDAR_WEEK_STARTS_MONDAY    0
+#endif
+#endif
 
 /*Canvas (dependencies: lv_img)*/
 #ifndef LV_USE_CANVAS
