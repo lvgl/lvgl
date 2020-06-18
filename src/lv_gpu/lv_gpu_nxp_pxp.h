@@ -41,6 +41,12 @@
  *      DEFINES
  *********************/
 
+/* PXP module instance to use */
+#define PXP_ID PXP
+
+/* PXP interrupt line ID  */
+#define PXP_IRQ_ID PXP_IRQn
+
 /* Minimum area for image copy with 100% opacity to be handled by PXP */
 #ifndef GPU_NXP_PXP_BLIT_SIZE_LIMIT
 #define GPU_NXP_PXP_BLIT_SIZE_LIMIT 1
@@ -64,6 +70,20 @@
 /**********************
  *      TYPEDEFS
  **********************/
+/**
+ * NXP PXP device configuration - call-backs used for
+ * interrupt init/wait/deinit.
+ */
+typedef struct {
+    /** Callback for PXP interrupt initialization */
+    lv_res_t (*pxp_interrupt_init)(void);
+
+    /** Callback for PXP interrupt de-initialization */
+    void (*pxp_interrupt_deinit)(void);
+
+    /** Callback that should start PXP and wait for operation complete */
+    void (*pxp_run)(void);
+} lv_nxp_pxp_cfg_t;
 
 /**********************
  *  STATIC VARIABLES
@@ -80,8 +100,10 @@
 /**
  * Reset and initialize PXP device. This function should be called as a part
  * of display init sequence.
+ *
+ * @return LV_RES_OK: PXP init ok; LV_RES_INV: init error. See error log for more information.
  */
-void lv_gpu_nxp_pxp_init(void);
+lv_res_t lv_gpu_nxp_pxp_init(lv_nxp_pxp_cfg_t *cfg);
 
 /**
  * Disable PXP device. Should be called during display deinit sequence.

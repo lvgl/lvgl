@@ -73,14 +73,13 @@
  **********************/
 
 static void lv_gpu_nxp_pxp_run(void);
-static void lv_gpu_nxp_pxp_blit_recolor(lv_color_t * dest, lv_coord_t dest_width, const lv_color_t * src, lv_coord_t src_width,
-                                 lv_coord_t copy_width, lv_coord_t copy_height, lv_opa_t opa, lv_color_t recolor, lv_opa_t recolorOpa);
+static void lv_gpu_nxp_pxp_blit_recolor(lv_color_t * dest, lv_coord_t dest_width, const lv_color_t * src,
+                                        lv_coord_t src_width,
+                                        lv_coord_t copy_width, lv_coord_t copy_height, lv_opa_t opa, lv_color_t recolor, lv_opa_t recolorOpa);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-
-static volatile bool s_pxpIdle;
 
 static bool colorKeyEnabled = false;
 static uint32_t colorKey = 0x0;
@@ -88,6 +87,8 @@ static uint32_t colorKey = 0x0;
 static bool recolorEnabled = false;
 static lv_color_t recolor = {.full = 0x0};
 static lv_opa_t recolorOpa = 0x0;
+
+static lv_nxp_pxp_cfg_t pxp_cfg;
 
 /**********************
  *      MACROS
@@ -100,14 +101,30 @@ static lv_opa_t recolorOpa = 0x0;
 /**
  * Reset and initialize PXP device. This function should be called as a part
  * of display init sequence.
+ *
+ * @return LV_RES_OK: PXP init ok; LV_RES_INV: init error. See error log for more information.
  */
-void lv_gpu_nxp_pxp_init(void)
+lv_res_t lv_gpu_nxp_pxp_init(lv_nxp_pxp_cfg_t * cfg)
 {
+    if(!cfg || !cfg->pxp_interrupt_deinit || !cfg->pxp_interrupt_init || !cfg->pxp_run) {
+        LV_LOG_ERROR("PXP configuration error. Check callback pointers.");
+        return LV_RES_INV;
+    }
+
     PXP_Init(PXP);
     PXP_EnableCsc1(PXP, false); /* Disable CSC1, it is enabled by default. */
     PXP_EnableInterrupts(PXP, kPXP_CompleteInterruptEnable);
-    NVIC_EnableIRQ(PXP_IRQn);
+
+    pxp_cfg = *cfg;
+    if(pxp_cfg.pxp_interrupt_init() != LV_RES_OK) {
+        PXP_Deinit(PXP);
+        LV_LOG_ERROR("PXP interrupt init error. Check pxp_interrupt_init callback.");
+        return LV_RES_INV;
+    }
+
     colorKey = lv_color_to32(LV_COLOR_TRANSP);
+
+    return LV_RES_OK;
 }
 
 /**
@@ -115,22 +132,11 @@ void lv_gpu_nxp_pxp_init(void)
  */
 void lv_gpu_nxp_pxp_deinit(void)
 {
-    NVIC_DisableIRQ(PXP_IRQn);
+    pxp_cfg.pxp_interrupt_deinit();
     PXP_DisableInterrupts(PXP, kPXP_CompleteInterruptEnable);
     PXP_Deinit(PXP_ID);
 }
 
-/**
- * PXP device interrupt handler. Used internally to check PXP
- * task completion status.
- */
-void PXP_IRQHandler(void)
-{
-    if(kPXP_CompleteFlag & PXP_GetStatusFlags(PXP)) {
-        PXP_ClearStatusFlags(PXP, kPXP_CompleteFlag);
-        s_pxpIdle = true;
-    }
-}
 
 /**
  * Fill area, with optional opacity.
@@ -288,7 +294,8 @@ void lv_gpu_nxp_pxp_blit(lv_color_t * dest, lv_coord_t dest_width, const lv_colo
     outputBufferConfig.height         = copy_height;
     PXP_SetOutputBufferConfig(PXP_ID, &outputBufferConfig);
 
-    DCACHE_CleanInvalidateByRange(outputBufferConfig.buffer0Addr, outputBufferConfig.height * outputBufferConfig.pitchBytes);
+    DCACHE_CleanInvalidateByRange(outputBufferConfig.buffer0Addr,
+                                  outputBufferConfig.height * outputBufferConfig.pitchBytes);
 
     lv_gpu_nxp_pxp_run(); /* Start PXP task */
 }
@@ -342,17 +349,11 @@ void lv_gpu_nxp_pxp_disable_recolor(void)
  * @brief Start PXP job and wait for results
  *
  * Function used internally to start PXP task according current device
- * configuration. It waits for PXP complete by polling.
+ * configuration.
  */
 static void lv_gpu_nxp_pxp_run(void)
 {
-    s_pxpIdle = false;
-
-    PXP_EnableInterrupts(PXP_ID, kPXP_CompleteInterruptEnable);
-    PXP_Start(PXP_ID);
-
-    while(false == s_pxpIdle)
-        ;
+    pxp_cfg.pxp_run();
 }
 
 /**
@@ -370,8 +371,9 @@ static void lv_gpu_nxp_pxp_run(void)
  * @param[in] recolor recolor value
  * @param[in] recolorOpa effect opacity
  */
-static void lv_gpu_nxp_pxp_blit_recolor(lv_color_t * dest, lv_coord_t dest_width, const lv_color_t * src, lv_coord_t src_width,
-                                 lv_coord_t copy_width, lv_coord_t copy_height, lv_opa_t opa, lv_color_t recolor, lv_opa_t recolorOpa)
+static void lv_gpu_nxp_pxp_blit_recolor(lv_color_t * dest, lv_coord_t dest_width, const lv_color_t * src,
+                                        lv_coord_t src_width,
+                                        lv_coord_t copy_width, lv_coord_t copy_height, lv_opa_t opa, lv_color_t recolor, lv_opa_t recolorOpa)
 {
     pxp_output_buffer_config_t outputBufferConfig;
     pxp_as_buffer_config_t asBufferConfig;
