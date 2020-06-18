@@ -471,6 +471,15 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
                                       lv_point_t * pivot)
 {
 #if LV_USE_IMG_TRANSFORM
+    if(angle == 0 && zoom == LV_IMG_ZOOM_NONE) {
+        res->x1 = 0;
+        res->y1 = 0;
+        res->x2 = w - 1;
+        res->y2 = h - 1;
+        return;
+
+    }
+
     int32_t angle_low = angle / 10;
     int32_t angle_hight = angle_low + 1;
     int32_t angle_rem = angle  - (angle_low * 10);
