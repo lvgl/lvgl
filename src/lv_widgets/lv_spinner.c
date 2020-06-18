@@ -153,7 +153,7 @@ void lv_spinner_set_spin_time(lv_obj_t * spinner, uint16_t time)
  *====================*/
 
 /**
- * Set the animation type of a spinnereer.
+ * Set the animation type of a spinner.
  * @param spinner pointer to spinner object
  * @param type animation type of the spinner
  *  */
@@ -254,7 +254,7 @@ uint16_t lv_spinner_get_spin_time(const lv_obj_t * spinner)
 }
 
 /**
- * Get the animation type of a spinnereer.
+ * Get the animation type of a spinner.
  * @param spinner pointer to spinner object
  * @return animation type
  *  */

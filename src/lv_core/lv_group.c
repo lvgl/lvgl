@@ -242,7 +242,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
                 if(res != LV_RES_OK) return;
                 lv_obj_invalidate(*g->obj_focus);
 
-                /*If the object or its parent has `top == true` bring it to the foregorund*/
+                /*If the object or its parent has `top == true` bring it to the foreground*/
                 obj_to_foreground(*g->obj_focus);
             }
             break;
@@ -508,7 +508,7 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
     lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
     if(res != LV_RES_OK) return;
 
-    /*If the object or its parent has `top == true` bring it to the foregorund*/
+    /*If the object or its parent has `top == true` bring it to the foreground*/
     obj_to_foreground(*group->obj_focus);
 
     lv_obj_invalidate(*group->obj_focus);

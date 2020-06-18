@@ -113,7 +113,7 @@ lv_obj_t * lv_win_add_btn_left(lv_obj_t * win, const void * img_src);
 
 /**
  * Can be assigned to a window control button to close the window
- * @param btn pointer to the control button on teh widows header
+ * @param btn pointer to the control button on the widows header
  * @param evet the event type
  */
 void lv_win_close_event_cb(lv_obj_t * btn, lv_event_t event);

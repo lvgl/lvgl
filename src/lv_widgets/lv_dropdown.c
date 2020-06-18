@@ -237,7 +237,7 @@ void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options)
 /**
  * Set the options in a drop down list from a string
  * @param ddlist pointer to drop down list object
- * @param options a staic string with '\n' separated options. E.g. "One\nTwo\nThree"
+ * @param options a static string with '\n' separated options. E.g. "One\nTwo\nThree"
  */
 void lv_dropdown_set_options_static(lv_obj_t * ddlist, const char * options)
 {
@@ -586,10 +586,10 @@ void lv_dropdown_open(lv_obj_t * ddlist)
 
     ext->page = lv_page_create(lv_obj_get_screen(ddlist), NULL);
     lv_obj_add_protect(ext->page, LV_PROTECT_POS | LV_PROTECT_CLICK_FOCUS);
-    lv_obj_add_protect(lv_page_get_scrllable(ext->page), LV_PROTECT_CLICK_FOCUS);
+    lv_obj_add_protect(lv_page_get_scrollable(ext->page), LV_PROTECT_CLICK_FOCUS);
 
     if(ancestor_page_signal == NULL) ancestor_page_signal = lv_obj_get_signal_cb(ext->page);
-    if(ancestor_page_scrl_signal == NULL) ancestor_page_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrllable(
+    if(ancestor_page_scrl_signal == NULL) ancestor_page_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrollable(
                                                                                                    ext->page));
     if(ancestor_page_design == NULL) ancestor_page_design = lv_obj_get_design_cb(ext->page);
 
@@ -604,7 +604,7 @@ void lv_dropdown_open(lv_obj_t * ddlist)
 
     lv_obj_set_design_cb(ext->page, lv_dropdown_page_design);
     lv_obj_set_signal_cb(ext->page, lv_dropdown_page_signal);
-    lv_obj_set_signal_cb(lv_page_get_scrllable(ext->page), lv_dropdown_page_scrl_signal);
+    lv_obj_set_signal_cb(lv_page_get_scrollable(ext->page), lv_dropdown_page_scrl_signal);
 
     lv_style_list_copy(lv_obj_get_style_list(ext->page, LV_PAGE_PART_BG), &ext->style_page);
     lv_style_list_copy(lv_obj_get_style_list(ext->page, LV_PAGE_PART_SCROLLBAR), &ext->style_scrlbar);
@@ -1023,10 +1023,10 @@ static lv_res_t lv_dropdown_page_signal(lv_obj_t * page, lv_signal_t sign, void 
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /* Make possible to draw on the full width of the background to redraw the selected rectangle
          * when the ddlist is scrolled in fix height mode.
-         * (The scrollabel is scrolled the "select rectangle" is drawn on the bg too)*/
+         * (The scrollable is scrolled then "select rectangle" is drawn on the bg too)*/
         lv_style_int_t left = lv_obj_get_style_pad_left(ddlist, LV_DROPDOWN_PART_LIST);
         lv_style_int_t right = lv_obj_get_style_pad_right(ddlist, LV_DROPDOWN_PART_LIST);
-        lv_obj_t * scrl = lv_page_get_scrllable(page);
+        lv_obj_t * scrl = lv_page_get_scrollable(page);
         scrl->ext_draw_pad = LV_MATH_MAX3(scrl->ext_draw_pad, left, right);
     }
     else if(sign == LV_SIGNAL_RELEASED) {
@@ -1081,7 +1081,7 @@ static lv_res_t lv_dropdown_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, 
     else  if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /* Make possible to draw on the full width of the background to redraw the selected rectangle
          * when the ddlist is scrolled in fix height mode.
-         * (The scrollabel is scrolled the "select rectangle" is drawn on the bg too)*/
+         * (The scrollable is scrolled then "select rectangle" is drawn on the bg too)*/
         lv_style_int_t left = lv_obj_get_style_pad_left(ddlist, LV_DROPDOWN_PART_LIST);
         lv_style_int_t right = lv_obj_get_style_pad_right(ddlist, LV_DROPDOWN_PART_LIST);
         scrl->ext_draw_pad = LV_MATH_MAX3(scrl->ext_draw_pad, left, right);
@@ -1300,7 +1300,7 @@ static void position_to_selected(lv_obj_t * ddlist)
 
     const lv_font_t * font         = lv_obj_get_style_text_font(ddlist, LV_DROPDOWN_PART_LIST);
     lv_coord_t font_h              = lv_font_get_line_height(font);
-    lv_obj_t * scrl                = lv_page_get_scrllable(ext->page);
+    lv_obj_t * scrl                = lv_page_get_scrollable(ext->page);
     lv_obj_t * label = get_label(ddlist);
     if(label == NULL) return;
 
@@ -1320,7 +1320,7 @@ static lv_obj_t * get_label(const lv_obj_t * ddlist)
     lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
     if(ext->page == NULL) return NULL;
 
-    return lv_obj_get_child(lv_page_get_scrllable(ext->page), NULL);
+    return lv_obj_get_child(lv_page_get_scrollable(ext->page), NULL);
 }
 
 #endif

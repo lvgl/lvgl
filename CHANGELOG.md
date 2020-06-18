@@ -13,8 +13,7 @@
 ### Bugfixes
 - None
 
-## v7.0.2 (under development, planned: 16.06.2020)
-*Available in the `master` branch*
+## v7.0.2 (16.06.2020)
 
 - `lv_textarea` fix wrong cursor position when clicked after the last character
 - Change all text related indices from 16-bit to 32-bit integers throughout whole library. #1545
@@ -31,7 +30,11 @@
 - `lv_textarea`: fix character delete in password mode
 - Update `LV_OPA_MIN` and `LV_OPA_MAX` to widen the opacity processed range
 - `lv_btnm` fix sending events for hidden buttons
-- `lv_gaguge` make ` + lv_gauge_set_angle_offset` offset the labels and needles too
+- `lv_gaguge` make `lv_gauge_set_angle_offset` offset the labels and needles too
+- Fix typo in the API `scrllable` -> `scrollable`
+- `tabview` by default allow auto expanding the page only to right and bottom (#1573)
+- fix crash when drawing gradient to the same color
+- chart: fix memory leak
 
 ## v7.0.1 (01.06.2020)
 

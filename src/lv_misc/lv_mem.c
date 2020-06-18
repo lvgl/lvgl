@@ -108,7 +108,7 @@ static lv_mem_buf_t mem_buf_small[] = {{.p = mem_buf1_32, .size = MEM_BUF_SMALL_
  **********************/
 
 /**
- * Initiaiize the dyn_mem module (work memory and other variables)
+ * Initialize the dyn_mem module (work memory and other variables)
  */
 void _lv_mem_init(void)
 {

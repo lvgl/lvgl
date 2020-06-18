@@ -134,7 +134,7 @@ void * _lv_ll_ins_tail(lv_ll_t * ll_p)
 
     if(n_new != NULL) {
         node_set_next(ll_p, n_new, NULL);       /*No next after the new tail*/
-        node_set_prev(ll_p, n_new, ll_p->tail); /*The prev. before new is tho old tail*/
+        node_set_prev(ll_p, n_new, ll_p->tail); /*The prev. before new is the old tail*/
         if(ll_p->tail != NULL) {                /*If there is old tail then the new comes after it*/
             node_set_next(ll_p, ll_p->tail, n_new);
         }
@@ -333,7 +333,7 @@ uint32_t _lv_ll_get_len(const lv_ll_t * ll_p)
 }
 
 /**
- * Move a nodw before an other node in the same linked list
+ * Move a node before an other node in the same linked list
  * @param ll_p pointer to a linked list
  * @param n_act pointer to node to move
  * @param n_after pointer to a node which should be after `n_act`

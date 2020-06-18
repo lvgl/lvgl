@@ -72,7 +72,7 @@ lv_disp_t * _lv_refr_get_disp_refreshing(void);
 
 /**
  * Set the display which is being refreshed.
- * It shouldn1t be used directly by the user.
+ * It shouldn't be used directly by the user.
  * It can be used to trick the drawing functions about there is an active display.
  * @param the display being refreshed
  */

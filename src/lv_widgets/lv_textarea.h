@@ -75,7 +75,7 @@ typedef struct {
     uint8_t one_line : 1; /*One line mode (ignore line breaks)*/
 } lv_textarea_ext_t;
 
-/** Possible text areas tyles. */
+/** Possible text areas styles. */
 enum {
     LV_TEXTAREA_PART_BG = LV_PAGE_PART_BG, /**< Text area background style */
     LV_TEXTAREA_PART_SCROLLBAR = LV_PAGE_PART_SCROLLBAR, /**< Scrollbar style */

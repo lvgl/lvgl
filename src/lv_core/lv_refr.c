@@ -159,7 +159,7 @@ lv_disp_t * _lv_refr_get_disp_refreshing(void)
 
 /**
  * Set the display which is being refreshed.
- * It shouldn1t be used directly by the user.
+ * It shouldn't be used directly by the user.
  * It can be used to trick the drawing functions about there is an active display.
  * @param the display being refreshed
  */
@@ -205,7 +205,8 @@ void _lv_disp_refr_task(lv_task_t * task)
         if(lv_disp_is_true_double_buf(disp_refr)) {
             if(disp_refr->driver.set_px_cb) {
                 LV_LOG_WARN("Can't handle 2 screen sized buffers with set_px_cb. Display is not refreshed.");
-            } else {
+            }
+            else {
                 lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
 
                 /*Flush the content of the VDB*/
@@ -217,11 +218,11 @@ void _lv_disp_refr_task(lv_task_t * task)
                 while(vdb->flushing);
 
                 lv_color_t * copy_buf = NULL;
-    #if LV_USE_GPU_STM32_DMA2D
+#if LV_USE_GPU_STM32_DMA2D
                 LV_UNUSED(copy_buf);
-    #else
+#else
                 copy_buf = _lv_mem_buf_get(disp_refr->driver.hor_res * sizeof(lv_color_t));
-                #endif
+#endif
 
                 uint8_t * buf_act = (uint8_t *)vdb->buf_act;
                 uint8_t * buf_ina = (uint8_t *)vdb->buf_act == vdb->buf1 ? vdb->buf2 : vdb->buf1;
@@ -232,12 +233,12 @@ void _lv_disp_refr_task(lv_task_t * task)
                     if(disp_refr->inv_area_joined[a] == 0) {
                         uint32_t start_offs =
                             (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
-    #if LV_USE_GPU_STM32_DMA2D
+#if LV_USE_GPU_STM32_DMA2D
                         lv_gpu_stm32_dma2d_copy((lv_color_t *)(buf_act + start_offs), disp_refr->driver.hor_res,
                                                 (lv_color_t *)(buf_ina + start_offs), disp_refr->driver.hor_res,
                                                 lv_area_get_width(&disp_refr->inv_areas[a]),
                                                 lv_area_get_height(&disp_refr->inv_areas[a]));
-    #else
+#else
 
                         lv_coord_t y;
                         uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) * sizeof(lv_color_t);
@@ -249,7 +250,7 @@ void _lv_disp_refr_task(lv_task_t * task)
                             _lv_memcpy(buf_act + start_offs, copy_buf, line_length);
                             start_offs += hres * sizeof(lv_color_t);
                         }
-    #endif
+#endif
                     }
                 }
 

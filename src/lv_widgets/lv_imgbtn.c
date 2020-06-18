@@ -430,7 +430,7 @@ static void refr_img(lv_obj_t * imgbtn)
 
     if(info_res == LV_RES_OK) {
         ext->act_cf = header.cf;
-        if(ext->tiled) lv_obj_set_height(imgbtn, header.h); /*Keep the suer defined width*/
+        if(ext->tiled) lv_obj_set_height(imgbtn, header.h); /*Keep the sure defined width*/
         else  lv_obj_set_size(imgbtn, header.w, header.h);
     }
     else {

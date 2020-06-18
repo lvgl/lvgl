@@ -273,7 +273,7 @@ static void fill_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  con
             for(x = draw_area->x1; x <= draw_area->x2; x++) {
                 if(mask_tmp[x]) {
                     disp->driver.set_px_cb(&disp->driver, (void *)disp_buf, disp_w, x, y, color,
-                            (uint32_t)((uint32_t)opa * mask_tmp[x]) >> 8);
+                                           (uint32_t)((uint32_t)opa * mask_tmp[x]) >> 8);
                 }
             }
             mask_tmp += draw_area_w;

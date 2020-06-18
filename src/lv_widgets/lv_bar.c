@@ -148,7 +148,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
  * Set a new value on the bar
  * @param bar pointer to a bar object
  * @param value new value
- * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediatelly
+ * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
 void lv_bar_set_value(lv_obj_t * bar, int16_t value, lv_anim_enable_t anim)
 {
@@ -175,7 +175,7 @@ void lv_bar_set_value(lv_obj_t * bar, int16_t value, lv_anim_enable_t anim)
  * Set a new start value on the bar
  * @param bar pointer to a bar object
  * @param value new start value
- * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediatelly
+ * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
 void lv_bar_set_start_value(lv_obj_t * bar, int16_t start_value, lv_anim_enable_t anim)
 {

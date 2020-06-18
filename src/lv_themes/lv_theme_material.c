@@ -73,8 +73,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct
-{
+typedef struct {
     lv_style_t scr;
     lv_style_t bg;
     lv_style_t bg_click;
@@ -83,96 +82,96 @@ typedef struct
     lv_style_t pad_inner;
     lv_style_t pad_small;
 
-    #if LV_USE_ARC
-        lv_style_t arc_indic;
-        lv_style_t arc_bg;
-    #endif
+#if LV_USE_ARC
+    lv_style_t arc_indic;
+    lv_style_t arc_bg;
+#endif
 
-    #if LV_USE_BAR
-        lv_style_t bar_bg;
-        lv_style_t bar_indic;
-    #endif
+#if LV_USE_BAR
+    lv_style_t bar_bg;
+    lv_style_t bar_indic;
+#endif
 
-    #if LV_USE_CALENDAR
-        lv_style_t calendar_date_nums, calendar_header, calendar_daynames;
-    #endif
+#if LV_USE_CALENDAR
+    lv_style_t calendar_date_nums, calendar_header, calendar_daynames;
+#endif
 
-    #if LV_USE_CPICKER
-        lv_style_t cpicker_bg, cpicker_indic;
-    #endif
+#if LV_USE_CPICKER
+    lv_style_t cpicker_bg, cpicker_indic;
+#endif
 
-    #if LV_USE_CHART
-        lv_style_t chart_bg, chart_series_bg, chart_series;
-    #endif
+#if LV_USE_CHART
+    lv_style_t chart_bg, chart_series_bg, chart_series;
+#endif
 
-    #if LV_USE_CHECKBOX
-        lv_style_t cb_bg, cb_bullet;
-    #endif
+#if LV_USE_CHECKBOX
+    lv_style_t cb_bg, cb_bullet;
+#endif
 
-    #if LV_USE_DROPDOWN
-        lv_style_t ddlist_page, ddlist_sel;
-    #endif
+#if LV_USE_DROPDOWN
+    lv_style_t ddlist_page, ddlist_sel;
+#endif
 
-    #if LV_USE_GAUGE
-        lv_style_t gauge_main, gauge_strong, gauge_needle;
-    #endif
+#if LV_USE_GAUGE
+    lv_style_t gauge_main, gauge_strong, gauge_needle;
+#endif
 
-    #if LV_USE_KEYBOARD
-        lv_style_t kb_bg;
-    #endif
+#if LV_USE_KEYBOARD
+    lv_style_t kb_bg;
+#endif
 
-    #if LV_USE_LED
-        lv_style_t led;
-    #endif
+#if LV_USE_LED
+    lv_style_t led;
+#endif
 
-    #if LV_USE_LINEMETER
-        lv_style_t lmeter;
-    #endif
+#if LV_USE_LINEMETER
+    lv_style_t lmeter;
+#endif
 
-    #if LV_USE_LIST
-        lv_style_t list_bg, list_btn;
-    #endif
+#if LV_USE_LIST
+    lv_style_t list_bg, list_btn;
+#endif
 
-    #if LV_USE_MSGBOX
-        lv_style_t mbox_bg;
-    #endif
+#if LV_USE_MSGBOX
+    lv_style_t mbox_bg;
+#endif
 
-    #if LV_USE_PAGE
-        lv_style_t sb;
-        #if LV_USE_ANIMATION
-            lv_style_t edge_flash;
-        #endif
-    #endif
+#if LV_USE_PAGE
+    lv_style_t sb;
+#if LV_USE_ANIMATION
+    lv_style_t edge_flash;
+#endif
+#endif
 
-    #if LV_USE_ROLLER
-        lv_style_t roller_bg, roller_sel;
-    #endif
+#if LV_USE_ROLLER
+    lv_style_t roller_bg, roller_sel;
+#endif
 
-    #if LV_USE_SLIDER
-        lv_style_t slider_knob, slider_bg;
-    #endif
+#if LV_USE_SLIDER
+    lv_style_t slider_knob, slider_bg;
+#endif
 
-    #if LV_USE_SPINBOX
-        lv_style_t spinbox_cursor;
-    #endif
+#if LV_USE_SPINBOX
+    lv_style_t spinbox_cursor;
+#endif
 
-    #if LV_USE_SWITCH
-        lv_style_t sw_knob;
-    #endif
+#if LV_USE_SWITCH
+    lv_style_t sw_knob;
+#endif
 
-    #if LV_USE_TABLE
-        lv_style_t table_cell;
-    #endif
+#if LV_USE_TABLE
+    lv_style_t table_cell;
+#endif
 
-    #if LV_USE_TABVIEW || LV_USE_WIN
-        lv_style_t tabview_btns, tabview_btns_bg, tabview_indic, tabview_page_scrl;
-    #endif
+#if LV_USE_TABVIEW || LV_USE_WIN
+    lv_style_t tabview_btns, tabview_btns_bg, tabview_indic, tabview_page_scrl;
+#endif
 
-    #if LV_USE_TEXTAREA
-        lv_style_t ta_cursor, ta_placeholder;
-    #endif
+#if LV_USE_TEXTAREA
+    lv_style_t ta_cursor, ta_placeholder;
+#endif
 
-}theme_styles_t;
+} theme_styles_t;
 
 /**********************
  *  STATIC PROTOTYPES
@@ -246,7 +245,7 @@ static void basic_init(void)
     lv_style_set_bg_color(&styles->bg_click, LV_STATE_DISABLED, COLOR_BG_DIS);
     lv_style_set_border_width(&styles->bg_click, LV_STATE_CHECKED, 0);
     lv_style_set_border_color(&styles->bg_click, LV_STATE_FOCUSED | LV_STATE_PRESSED, lv_color_darken(theme.color_primary,
-                                                                                              LV_OPA_20));
+                                                                                                      LV_OPA_20));
     lv_style_set_border_color(&styles->bg_click, LV_STATE_PRESSED, COLOR_BG_BORDER_PR);
     lv_style_set_border_color(&styles->bg_click, LV_STATE_CHECKED, COLOR_BG_BORDER_CHK);
     lv_style_set_border_color(&styles->bg_click, LV_STATE_PRESSED | LV_STATE_CHECKED, COLOR_BG_BORDER_CHK_PR);
@@ -546,21 +545,24 @@ static void calendar_init(void)
     lv_style_set_text_color(&styles->calendar_header, LV_STATE_PRESSED, IS_LIGHT ? lv_color_hex(0x888888) : LV_COLOR_WHITE);
 
     style_init_reset(&styles->calendar_daynames);
-    lv_style_set_text_color(&styles->calendar_daynames, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x31404f) : lv_color_hex3(0xeee));
+    lv_style_set_text_color(&styles->calendar_daynames, LV_STATE_DEFAULT,
+                            IS_LIGHT ? lv_color_hex(0x31404f) : lv_color_hex3(0xeee));
     lv_style_set_pad_left(&styles->calendar_daynames, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_pad_right(&styles->calendar_daynames, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_pad_bottom(&styles->calendar_daynames, LV_STATE_DEFAULT, PAD_DEF);
 
     style_init_reset(&styles->calendar_date_nums);
     lv_style_set_radius(&styles->calendar_date_nums, LV_STATE_DEFAULT, LV_DPX(4));
-    lv_style_set_text_color(&styles->calendar_date_nums, LV_STATE_CHECKED, IS_LIGHT ? lv_color_hex(0x31404f) : LV_COLOR_WHITE);
+    lv_style_set_text_color(&styles->calendar_date_nums, LV_STATE_CHECKED,
+                            IS_LIGHT ? lv_color_hex(0x31404f) : LV_COLOR_WHITE);
 
     lv_style_set_bg_opa(&styles->calendar_date_nums, LV_STATE_CHECKED, IS_LIGHT ? LV_OPA_20 : LV_OPA_40);
     lv_style_set_bg_opa(&styles->calendar_date_nums, LV_STATE_PRESSED, LV_OPA_20);
     lv_style_set_bg_opa(&styles->calendar_date_nums, LV_STATE_FOCUSED, LV_OPA_COVER);
     lv_style_set_text_color(&styles->calendar_date_nums, LV_STATE_FOCUSED, LV_COLOR_WHITE);
     lv_style_set_bg_color(&styles->calendar_date_nums, LV_STATE_FOCUSED, theme.color_primary);
-    lv_style_set_bg_color(&styles->calendar_date_nums, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x666666) : LV_COLOR_WHITE);
+    lv_style_set_bg_color(&styles->calendar_date_nums, LV_STATE_DEFAULT,
+                          IS_LIGHT ? lv_color_hex(0x666666) : LV_COLOR_WHITE);
     lv_style_set_bg_color(&styles->calendar_date_nums, LV_STATE_CHECKED, theme.color_primary);
     lv_style_set_border_width(&styles->calendar_date_nums, LV_STATE_CHECKED, 2);
     lv_style_set_border_side(&styles->calendar_date_nums, LV_STATE_CHECKED, LV_BORDER_SIDE_LEFT);
@@ -684,7 +686,8 @@ static void textarea_init(void)
     lv_style_set_border_side(&styles->ta_cursor, LV_STATE_DEFAULT, LV_BORDER_SIDE_LEFT);
 
     style_init_reset(&styles->ta_placeholder);
-    lv_style_set_text_color(&styles->ta_placeholder, LV_STATE_DEFAULT, IS_LIGHT ? COLOR_BG_TEXT_DIS : lv_color_hex(0xa1adbd));
+    lv_style_set_text_color(&styles->ta_placeholder, LV_STATE_DEFAULT,
+                            IS_LIGHT ? COLOR_BG_TEXT_DIS : lv_color_hex(0xa1adbd));
 #endif
 }
 

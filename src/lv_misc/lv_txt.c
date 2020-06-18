@@ -147,7 +147,7 @@ void _lv_txt_get_size(lv_point_t * size_res, const char * text, const lv_font_t 
  *
  * If the first character is a break character, returns the next index.
  *
- * Example calls from lv_txt_get_next_line() assuming sufficent max_width and
+ * Example calls from lv_txt_get_next_line() assuming sufficient max_width and
  * txt = "Test text\n"
  *        0123456789
  *

@@ -24,21 +24,20 @@
  *      TYPEDEFS
  **********************/
 
-typedef struct
-{
-lv_style_t scr;
-lv_style_t bg;
-lv_style_t clip_corner;
-lv_style_t btn;
-lv_style_t round;
-lv_style_t no_radius;
-lv_style_t fg_color;
-lv_style_t border_none;
-lv_style_t big_line_space;       /*In roller or dropdownlist*/
-lv_style_t pad_none;
-lv_style_t pad_normal;
-lv_style_t pad_small;
-lv_style_t pad_inner;
+typedef struct {
+    lv_style_t scr;
+    lv_style_t bg;
+    lv_style_t clip_corner;
+    lv_style_t btn;
+    lv_style_t round;
+    lv_style_t no_radius;
+    lv_style_t fg_color;
+    lv_style_t border_none;
+    lv_style_t big_line_space;       /*In roller or dropdownlist*/
+    lv_style_t pad_none;
+    lv_style_t pad_normal;
+    lv_style_t pad_small;
+    lv_style_t pad_inner;
 
 #if LV_USE_ARC
     lv_style_t arc_bg, arc_indic;
@@ -79,7 +78,7 @@ lv_style_t pad_inner;
 #if LV_USE_TABVIEW
     lv_style_t tab_bg;
 #endif
-}theme_styles_t;
+} theme_styles_t;
 
 /**********************
  *  STATIC PROTOTYPES

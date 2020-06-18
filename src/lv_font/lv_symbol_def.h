@@ -9,7 +9,7 @@ extern "C" {
 #include "../lv_conf_internal.h"
 
 /*-------------------------------
- * Symbols from FontAwsome font
+ * Symbols from FontAwesome font
  *-----------------------------*/
 
 /* In the font converter use this list as range:

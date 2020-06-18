@@ -91,7 +91,7 @@ enum {
     LV_EVENT_DRAG_BEGIN,
     LV_EVENT_DRAG_END,
     LV_EVENT_DRAG_THROW_BEGIN,
-    LV_EVENT_GESTURE,           /**< The object has been getture*/
+    LV_EVENT_GESTURE,           /**< The object has been gesture*/
     LV_EVENT_KEY,
     LV_EVENT_FOCUSED,
     LV_EVENT_DEFOCUSED,
@@ -210,7 +210,7 @@ typedef struct _lv_obj_t {
     lv_area_t ext_click_pad;   /**< Extra click padding area. */
 #endif
 
-    lv_coord_t ext_draw_pad; /**< EXTtend the size in every direction for drawing. */
+    lv_coord_t ext_draw_pad; /**< EXTend the size in every direction for drawing. */
 
     /*Attributes and states*/
     uint8_t click           : 1; /**< 1: Can be pressed by an input device*/
@@ -441,7 +441,7 @@ void lv_obj_set_height_fit(lv_obj_t * obj, lv_coord_t h);
 
 /**
  * Set the width of an object by taking the left and right margin into account.
- * The object width will be `obj_w = w - margon_left - margin_right`
+ * The object width will be `obj_w = w - margin_left - margin_right`
  * @param obj pointer to an object
  * @param w new height including margins
  */
@@ -449,7 +449,7 @@ void lv_obj_set_width_margin(lv_obj_t * obj, lv_coord_t w);
 
 /**
  * Set the height of an object by taking the top and bottom margin into account.
- * The object height will be `obj_h = h - margon_top - margin_bottom`
+ * The object height will be `obj_h = h - margin_top - margin_bottom`
  * @param obj pointer to an object
  * @param h new height including margins
  */
@@ -620,7 +620,7 @@ void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property
  * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
  * @note shouldn't be used directly. Use the specific property remove functions instead.
  *       For example: `lv_obj_style_remove_border_opa()`
- * @return true: the property was found and removed; false: teh property was not found
+ * @return true: the property was found and removed; false: the property was not found
  */
 bool lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
@@ -660,7 +660,7 @@ void lv_obj_set_top(lv_obj_t * obj, bool en);
 /**
  * Enable the dragging of an object
  * @param obj pointer to an object
- * @param en true: make the object dragable
+ * @param en true: make the object draggable
  */
 void lv_obj_set_drag(lv_obj_t * obj, bool en);
 
@@ -857,7 +857,6 @@ lv_obj_t * lv_obj_get_screen(const lv_obj_t * obj);
 
 /**
  * Get the display of an object
- * @param scr pointer to an object
  * @return pointer the object's display
  */
 lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj);
@@ -966,7 +965,7 @@ lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj);
 
 /**
  * Get the height of an object by taking the top and bottom margin into account.
- * The returned height will be `obj_h + margon_top + margin_bottom`
+ * The returned height will be `obj_h + margin_top + margin_bottom`
  * @param obj pointer to an object
  * @return the height including thee margins
  */
@@ -974,7 +973,7 @@ lv_coord_t lv_obj_get_height_margin(lv_obj_t * obj);
 
 /**
  * Get the width of an object by taking the left and right margin into account.
- * The returned width will be `obj_w + margon_left + margin_right`
+ * The returned width will be `obj_w + margin_left + margin_right`
  * @param obj pointer to an object
  * @return the height including thee margins
  */
@@ -1053,7 +1052,7 @@ lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj);
  *---------------*/
 
 /**
- * Get the style list of an obejct's part.
+ * Get the style list of an object's part.
  * @param obj pointer to an object.
  * @param part part the part of the object which style list should be get.
  * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
@@ -1172,7 +1171,7 @@ bool lv_obj_get_top(const lv_obj_t * obj);
 /**
  * Get the drag enable attribute of an object
  * @param obj pointer to an object
- * @return true: the object is dragable
+ * @return true: the object is draggable
  */
 bool lv_obj_get_drag(const lv_obj_t * obj);
 
@@ -1374,7 +1373,7 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t 
 
 /**
  * Get the required extra size (around the object's part) to draw shadow, outline, value etc.
- * @param obj poinr to an object
+ * @param obj pointer to an object
  * @param part part of the object
  */
 lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part);
@@ -1421,7 +1420,7 @@ bool lv_debug_check_obj_valid(const lv_obj_t * obj);
  * Will be expanded to: `static void <name> (lv_obj_t * obj, lv_event_t e)`
  *
  * Examples:
- * LV_EVENT_CB_DECLARE(my_event1);  //Protoype declaration
+ * LV_EVENT_CB_DECLARE(my_event1);  //Prototype declaration
  *
  * LV_EVENT_CB_DECLARE(my_event1)
  * {
@@ -1437,8 +1436,8 @@ bool lv_debug_check_obj_valid(const lv_obj_t * obj);
 
 # ifndef LV_DEBUG_IS_OBJ
 #  define LV_DEBUG_IS_OBJ(obj_p, obj_type) (lv_debug_check_null(obj_p) &&      \
-                                          lv_debug_check_obj_valid(obj_p) && \
-                                          lv_debug_check_obj_type(obj_p, obj_type))
+                                            lv_debug_check_obj_valid(obj_p) && \
+                                            lv_debug_check_obj_type(obj_p, obj_type))
 # endif
 
 

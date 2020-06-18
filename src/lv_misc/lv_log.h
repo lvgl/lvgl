@@ -56,7 +56,7 @@ typedef void (*lv_log_print_g_cb_t)(lv_log_level_t level, const char *, uint32_t
 /**
  * Register custom print/write function to call when a log is added.
  * It can format its "File path", "Line number" and "Description" as required
- * and send the formatted log message to a consol or serial port.
+ * and send the formatted log message to a console or serial port.
  * @param print_cb a function pointer to print a log
  */
 void lv_log_register_print_cb(lv_log_print_g_cb_t print_cb);

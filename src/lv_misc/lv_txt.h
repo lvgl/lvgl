@@ -101,7 +101,7 @@ lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t 
                              lv_txt_flag_t flag);
 
 /**
- * Check next character in a string and decide if te character is part of the command or not
+ * Check next character in a string and decide if the character is part of the command or not
  * @param state pointer to a txt_cmd_state_t variable which stores the current state of command
  * processing
  * @param c the current character

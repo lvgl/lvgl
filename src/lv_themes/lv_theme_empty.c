@@ -26,7 +26,7 @@
  **********************/
 typedef struct {
     lv_style_t opa_cover;
-}theme_styles_t;
+} theme_styles_t;
 
 /**********************
  *  STATIC PROTOTYPES

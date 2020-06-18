@@ -148,7 +148,7 @@ void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t
  * @param buf a buffer where map should be copied
  * @param buf_w width of the buffer in pixels
  * @param map an "image" to copy
- * @param map_w width of teh map in pixels
+ * @param map_w width of the map in pixels
  * @param copy_w width of the area to copy in pixels (<= buf_w)
  * @param copy_h height of the area to copy in pixels
  * @note `map_w - fill_w` is offset to the next line after copy
@@ -178,7 +178,7 @@ void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_
  * @param buf_w width of the buffer in pixels
  * @param map an "image" to copy
  * @param opa opacity of `map`
- * @param map_w width of teh map in pixels
+ * @param map_w width of the map in pixels
  * @param copy_w width of the area to copy in pixels (<= buf_w)
  * @param copy_h height of the area to copy in pixels
  * @note `map_w - fill_w` is offset to the next line after copy

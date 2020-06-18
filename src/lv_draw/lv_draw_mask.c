@@ -95,12 +95,12 @@ int16_t lv_draw_mask_add(void * param, void * custom_id)
 }
 
 /**
- * Apply the added buffers on a line. Used internally by the library's drawing routins.
+ * Apply the added buffers on a line. Used internally by the library's drawing routines.
  * @param mask_buf store the result mask here. Has to be `len` byte long. Should be initialized with `0xFF`.
  * @param abs_x absolute X coordinate where the line to calculate start
  * @param abs_y absolute Y coordinate where the line to calculate start
  * @param len length of the line to calculate (in pixel count)
- * @return Oneof these values:
+ * @return One of these values:
  * - `LV_DRAW_MASK_RES_FULL_TRANSP`: the whole line is transparent. `mask_buf` is not set to zero
  * - `LV_DRAW_MASK_RES_FULL_COVER`: the whole line is fully visible. `mask_buf` is unchanged
  * - `LV_DRAW_MASK_RES_CHANGED`: `mask_buf` has changed, it shows the desired opacity of each pixel in the given line
@@ -272,8 +272,8 @@ void lv_draw_mask_line_points_init(lv_draw_mask_line_param_t * param, lv_coord_t
 /**
  *Initialize a line mask from a point and an angle.
  * @param param pointer to a `lv_draw_mask_param_t` to initialize
- * @param px X coordiante of a point of the line
- * @param py X coordiante of a point of the line
+ * @param px X coordinate of a point of the line
+ * @param py X coordinate of a point of the line
  * @param angle right 0 deg, bottom: 90
  * @param side and element of `lv_draw_mask_line_side_t` to describe which side to keep.
  * With `LV_DRAW_MASK_LINE_SIDE_LEFT/RIGHT` and horizontal line all pixels are kept
@@ -370,7 +370,7 @@ void lv_draw_mask_angle_init(lv_draw_mask_angle_param_t * param, lv_coord_t vert
  * @param param param pointer to a `lv_draw_mask_param_t` to initialize
  * @param rect coordinates of the rectangle to affect (absolute coordinates)
  * @param radius radius of the rectangle
- * @param inv: true: keep the pixels inside teh rectangle; keep teh pixels outside of the rectangle
+ * @param inv: true: keep the pixels inside the rectangle; keep the pixels outside of the rectangle
  */
 void lv_draw_mask_radius_init(lv_draw_mask_radius_param_t * param, const lv_area_t * rect, lv_coord_t radius, bool inv)
 {

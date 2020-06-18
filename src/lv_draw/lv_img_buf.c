@@ -60,7 +60,7 @@ lv_color_t lv_img_buf_get_px_color(lv_img_dsc_t * dsc, lv_coord_t x, lv_coord_t 
         uint32_t px     = dsc->header.w * y * px_size + x * px_size;
         _lv_memcpy_small(&p_color, &buf_u8[px], sizeof(lv_color_t));
 #if LV_COLOR_SIZE == 32
-        p_color.ch.alpha = 0xFF; /*Only the color should be get so use a deafult alpha value*/
+        p_color.ch.alpha = 0xFF; /*Only the color should be get so use a default alpha value*/
 #endif
     }
     else if(dsc->header.cf == LV_IMG_CF_INDEXED_1BIT) {
@@ -414,7 +414,7 @@ uint32_t lv_img_buf_get_img_size(lv_coord_t w, lv_coord_t h, lv_img_cf_t cf)
 
 #if LV_USE_IMG_TRANSFORM
 /**
- * Initialize a descriptor to tranform an image
+ * Initialize a descriptor to transform an image
  * @param dsc pointer to an `lv_img_transform_dsc_t` variable whose `cfg` field is initialized
  */
 void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
@@ -528,8 +528,8 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
     LV_UNUSED(pivot);
     res->x1 = 0;
     res->y1 = 0;
-    res->x2 = w;
-    res->y2 = h;
+    res->x2 = w - 1;
+    res->y2 = h - 1;
 #endif
 }
 
@@ -545,7 +545,7 @@ bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc)
     /*Get the fractional part of the source pixel*/
     int xs_fract = dsc->tmp.xs & 0xff;
     int ys_fract = dsc->tmp.ys & 0xff;
-    int32_t xn;      /*x neightboor*/
+    int32_t xn;      /*x neighbor*/
     lv_opa_t xr; /*x mix ratio*/
 
     if(xs_fract < 0x70) {
@@ -563,7 +563,7 @@ bool _lv_img_buf_transform_anti_alias(lv_img_transform_dsc_t * dsc)
         xr = 0xFF;
     }
 
-    int32_t yn;      /*x neightboor*/
+    int32_t yn;      /*x neighbor*/
     lv_opa_t yr; /*x mix ratio*/
 
     if(ys_fract < 0x70) {
