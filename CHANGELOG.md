@@ -1,7 +1,7 @@
 # Changelog
 
-## v7.1.0 (under development)
-*Available in the `dev` branch*
+## v7.1.0 (planned on 07.07.2020)
+*Available in the `master` branch*
 
 ### New features
 - Add `focus_parent` attribute to `lv_obj`
