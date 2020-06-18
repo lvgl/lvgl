@@ -79,6 +79,8 @@ his list shows the recommended way of learning the library:
 
 ## Examples 
 
+For more examples see the [lv_examples](https://github.com/lvgl/lv_examples) repository.
+
 ### Button with label
 ```c
 lv_obj_t * btn = lv_btn_create(lv_scr_act(), NULL);     /*Add a button the current screen*/
