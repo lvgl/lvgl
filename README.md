@@ -98,7 +98,7 @@ void btn_event_cb(lv_obj_t * btn, lv_event_t event)
     }
 }
 ```
-![LVGL button with label example](https://docs.lvgl.io/v7/en/misc/simple_button_example.gif)
+![LVGL button with label example](https://raw.githubusercontent.com/lvgl/docs/latest/misc/simple_button_example.gif)
 
 ### LVGL from Micropython
 Learn more about [Micropython](https://docs.lvgl.io/en/html/get-started/micropython).
