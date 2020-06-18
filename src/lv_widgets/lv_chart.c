@@ -651,7 +651,7 @@ uint16_t lv_chart_get_x_start_point(lv_chart_series_t * ser)
 lv_coord_t lv_chart_get_point_id(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id)
 {
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
-    LV_ASSERT_NULL(serie);
+    LV_ASSERT_NULL(ser);
 
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if( id >= ext->point_cnt ) id = 0;
