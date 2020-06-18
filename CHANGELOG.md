@@ -5,6 +5,12 @@ Available in the `dev` branch
 
 ### New features
 - Add `LV_CALENDAR_WEEK_STARTS_MONDAY`
+- Add `lv_chart_set_x_start_point()` function - Set the index of the x-axis start point in the data array
+- Add `lv_chart_set_ext_array()` function - Set an external array of data points to use for the chart
+- Add `lv_chart_set_point_id()` function - Set an individual point value in the chart series directly based on index
+- Add `lv_chart_get_x_start_point()` function - Get the current index of the x-axis start point in the data array
+- Add `lv_chart_get_point_id()` funtion - Get an individual point value in the chart series directly based on index
+- Add `ext_buf_assigned` bit field to `lv_chart_series_t` structure - it's true if external buffer is assigned to series
 
 ## v7.1.0 (planned on 07.07.2020)
 *Available in the `master` branch*
