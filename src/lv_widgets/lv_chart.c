@@ -191,6 +191,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     }
 
     ser->start_point = 0;
+    ser->ext_buf_assigned = false;
 
     uint16_t i;
     lv_coord_t * p_tmp = ser->points;
@@ -741,7 +742,9 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_chart_series_t * ser;
         _LV_LL_READ(ext->series_ll, ser) {
-            lv_mem_free(ser->points);
+
+            if(!ser->ext_buf_assigned) lv_mem_free(ser->points);
+
             lv_mem_free(ser);
         }
         _lv_ll_clear(&ext->series_ll);
