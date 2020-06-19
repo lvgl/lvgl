@@ -12,6 +12,7 @@ Available in the `dev` branch
 - Add `lv_chart_get_point_id()` funtion - Get an individual point value in the chart series directly based on index
 - Add `ext_buf_assigned` bit field to `lv_chart_series_t` structure - it's true if external buffer is assigned to series
 - Allow setting different font for the selected text in `lv_roller`
+- Add `theme->apply_cb` to replace `theme->apply_xcb` to make it compatible with the Micropython binding
 
 ## v7.1.0 (planned on 07.07.2020)
 *Available in the `master` branch*

@@ -176,7 +176,7 @@ typedef struct {
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void theme_apply(lv_obj_t * obj, lv_theme_style_t name);
+static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name);
 static void style_init_reset(lv_style_t * style);
 
 /**********************
@@ -928,7 +928,8 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
     table_init();
     win_init();
 
-    theme.apply_xcb = theme_apply;
+    theme.apply_xcb = NULL;
+    theme.apply_cb = theme_apply;
 
     inited = true;
 
@@ -938,8 +939,10 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
 }
 
 
-static void theme_apply(lv_obj_t * obj, lv_theme_style_t name)
+static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 {
+    LV_UNUSED(th);
+
     lv_style_list_t * list;
 
     switch(name) {
