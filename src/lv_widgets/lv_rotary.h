@@ -50,24 +50,21 @@ typedef struct {
     /*Ext. of ancestor*/
     lv_arc_ext_t arc;
     /*New data for this type*/
-    lv_btn_ext_t btn;
-    lv_rotary_type_t type;
-    lv_style_list_t style_bg; /* Style of the background */
-    lv_style_list_t style_indic; /* Style of the indicator */
     lv_style_list_t style_knob; /* Style of the knob */
     int16_t cur_value; /*Current value of the rotary*/
     int16_t min_value; /*Minimum value of the rotary*/
     int16_t max_value; /*Maximum value of the rotary*/
-    int16_t start_value; /*Start value of the rotary*/
-    int16_t value_to_set; /*Start value of the rotary*/
-    bool dragging;
+    int16_t * value_to_set; /*Start value of the rotary*/
+    uint16_t dragging   :1;
+    uint16_t sym        :1;
 } lv_rotary_ext_t;
 
 /** Built-in styles of rotary*/
 enum {
-    LV_ROTARY_PART_BG, /** Rotary background style. */
-    LV_ROTARY_PART_INDIC, /** Rotary indicator (filled area) style. */
-    LV_ROTARY_PART_KNOB, /** Rotary knob style. */
+    LV_ROTARY_PART_BG = LV_ARC_PART_BG, /** Rotary background style. */
+    LV_ROTARY_PART_INDIC = LV_ARC_PART_INDIC, /** Rotary indicator (filled area) style. */
+    LV_ROTARY_PART_KNOB = _LV_ARC_PART_VIRTUAL_LAST, /** Rotary knob style. */
+    _LV_ROTARY_PART_VIRTUAL_LAST
 };
 
 /**********************
@@ -95,14 +92,6 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy);
 void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim);
 
 /**
- * Set a new value for the left knob of a rotary
- * @param rotary pointer to a rotary object
- * @param left_value new value
- * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
- */
-void lv_rotary_set_start_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim);
-
-/**
  * Set minimum and the maximum values of a rotary
  * @param rotary pointer to the rotary object
  * @param min minimum value
@@ -116,7 +105,7 @@ void lv_rotary_set_range(lv_obj_t * rotary, int16_t min, int16_t max);
  * @param rotary pointer to a rotary object
  * @param en true: enable disable symmetric behavior; false: disable
  */
-void lv_rotary_set_type(lv_obj_t * rotary, lv_rotary_type_t type);
+void lv_rotary_set_symmetric(lv_obj_t * rotary, bool en);
 
 /**
  * Set the start angle of rotary indicator. 0 deg: right, 90 bottom, etc.
@@ -231,13 +220,6 @@ static inline uint16_t lv_rotary_get_bg_angle_end(lv_obj_t * rotary) {
 int16_t lv_rotary_get_value(const lv_obj_t * rotary);
 
 /**
- * Get the value of the left knob of a rotary
- * @param rotary pointer to a rotary object
- * @return the start value of the rotary
- */
-int16_t lv_rotary_get_start_value(const lv_obj_t * rotary);
-
-/**
  * Get the minimum value of a rotary
  * @param rotary pointer to a rotary object
  * @return the minimum value of the rotary
@@ -263,11 +245,10 @@ bool lv_rotary_is_dragged(const lv_obj_t * rotary);
  * @param rotary pointer to a rotary object
  * @return true: symmetric is enabled; false: disable
  */
-static inline lv_rotary_type_t lv_rotary_get_type(lv_obj_t * rotary)
+static inline bool lv_rotary_get_symmetric(lv_obj_t * rotary)
 {
-    lv_rotary_type_t type = lv_rotary_get_type(rotary);
-    if(type == LV_ROTARY_TYPE_NORMAL)
-        return LV_ROTARY_TYPE_NORMAL;
+    lv_rotary_ext_t * ext = lv_obj_get_ext_attr(rotary);
+    return ext->sym;
 }
 
 /**********************

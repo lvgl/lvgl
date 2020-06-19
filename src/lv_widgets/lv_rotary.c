@@ -86,10 +86,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cur_value = 0;
     ext->min_value = 0;
     ext->max_value = 0;
-    ext->start_value = 0;
     ext->dragging = false;
-    lv_style_list_init(&ext->style_bg);
-    lv_style_list_init(&ext->style_indic);
     lv_style_list_init(&ext->style_knob);
 
     /*The signal and design functions are not copied so set them here*/
@@ -111,10 +108,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->cur_value = copy_ext->cur_value;
         ext->min_value = copy_ext->min_value;
         ext->max_value = copy_ext->max_value;
-        ext->start_value = copy_ext->start_value;
         ext->dragging = copy_ext->dragging;
-        lv_style_list_copy(&ext->style_bg, &copy_ext->style_bg);
-        lv_style_list_copy(&ext->style_indic, &copy_ext->style_indic);
         lv_style_list_copy(&ext->style_knob, &copy_ext->style_knob);
 
         lv_obj_refresh_style(rotary, LV_OBJ_PART_ALL);
@@ -163,20 +157,6 @@ void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
 }
 
 /**
- * Set a new value for the left knob of a rotary
- * @param rotary pointer to a rotary object
- * @param left_value new value
- * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
- */
-void lv_rotary_set_start_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim)
-{
-    LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
-
-    lv_rotary_ext_t * ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
-    ext->start_value = value;
-}
-
-/**
  * Set minimum and the maximum values of a rotary
  * @param rotary pointer to the rotary object
  * @param min minimum value
@@ -208,12 +188,12 @@ void lv_rotary_set_range(lv_obj_t * rotary, int16_t min, int16_t max)
  * @param rotary pointer to a rotary object
  * @param en true: enable disable symmetric behavior; false: disable
  */
-void lv_rotary_set_type(lv_obj_t * rotary, lv_rotary_type_t type)
+void lv_rotary_set_symmetric(lv_obj_t * rotary, bool en)
 {
     LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
 
     lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
-    ext->type = type;
+    ext->sym = en;
 
     lv_obj_invalidate(rotary);
 }
@@ -233,19 +213,6 @@ int16_t lv_rotary_get_value(const lv_obj_t * rotary)
 
     lv_rotary_ext_t * ext = lv_obj_get_ext_attr(rotary);
     return ext->cur_value;
-}
-
-/**
- * Get the value of the left knob of a rotary
- * @param rotary pointer to a rotary object
- * @return the start value of the rotary
- */
-int16_t lv_rotary_get_start_value(const lv_obj_t * rotary)
-{
-    LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
-
-    lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
-    return ext->start_value;
 }
 
 /**
@@ -349,9 +316,6 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
 
     if(sign == LV_SIGNAL_PRESSED) {
         ext->dragging = true;
-        if(lv_rotary_get_type(rotary) == LV_ROTARY_TYPE_NORMAL) {
-            ext->value_to_set = &ext->cur_value;
-        }
     }
     else if(sign == LV_SIGNAL_PRESSING && ext->value_to_set != NULL) {
         lv_indev_get_point(param, &p);
@@ -408,10 +372,10 @@ static lv_style_list_t * lv_rotary_get_style(lv_obj_t * rotary, uint8_t part)
 
     switch(part) {
         case LV_ROTARY_PART_BG:
-            style_dsc_p = &ext->style_bg;
+            style_dsc_p = lv_obj_get_style_list(rotary, LV_ARC_PART_BG);
             break;
         case LV_ROTARY_PART_INDIC:
-            style_dsc_p = &ext->style_indic;
+            style_dsc_p = lv_obj_get_style_list(rotary, LV_ARC_PART_INDIC);
             break;
         case LV_ROTARY_PART_KNOB:
             style_dsc_p = &ext->style_knob;
@@ -425,10 +389,6 @@ static lv_style_list_t * lv_rotary_get_style(lv_obj_t * rotary, uint8_t part)
 
 static void draw_knob(lv_obj_t * rotary, const lv_area_t * clip_area)
 {
-    lv_bidi_dir_t base_dir = lv_obj_get_base_dir(rotary);
-
-    lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
-
     lv_coord_t left_bg = lv_obj_get_style_pad_left(rotary, LV_ROTARY_PART_BG);
     lv_coord_t right_bg = lv_obj_get_style_pad_right(rotary, LV_ROTARY_PART_BG);
     lv_coord_t top_bg = lv_obj_get_style_pad_top(rotary, LV_ROTARY_PART_BG);
