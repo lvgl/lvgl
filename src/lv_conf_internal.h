@@ -992,8 +992,9 @@
 #endif
 
 /*Rotary (dependencies: lv_arc, lv_btn)*/
-#define LV_USE_ROTARY     1
-
+#ifndef LV_USE_ROTARY
+#define LV_USE_ROTARY    1
+#endif
 /*Slider (dependencies: lv_bar)*/
 #ifndef LV_USE_SLIDER
 #define LV_USE_SLIDER    1
