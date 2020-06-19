@@ -26,8 +26,6 @@ extern "C" {
 #error "lv_rotary: lv_btn is required. Enable it in lv_conf.h (LV_USE_BTN  1) "
 #endif
 
-#define LV_ROTARY_KNOB_SIZE_MIN  4   /* cannot make the knob smaller then this [px] */
-
 #include "../lv_core/lv_obj.h"
 #include "lv_arc.h"
 #include "lv_btn.h"
@@ -35,6 +33,8 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+
+#define LV_ROTARY_KNOB_SIZE_MIN  4   /* cannot make the knob smaller then this [px] */
 
 /**********************
  *      TYPEDEFS

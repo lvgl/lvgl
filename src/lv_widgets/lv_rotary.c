@@ -10,7 +10,7 @@
 #include "lv_rotary.h"
 #if LV_USE_ROTARY != 0
 
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_indev.h"
 #include "../lv_draw/lv_draw.h"
