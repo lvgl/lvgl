@@ -265,7 +265,7 @@ bool lv_rotary_is_dragged(const lv_obj_t * rotary);
  */
 static inline lv_rotary_type_t lv_rotary_get_type(lv_obj_t * rotary)
 {
-    lv_bar_type_t type = lv_bar_get_type(rotary);
+    lv_rotary_type_t type = lv_rotary_get_type(rotary);
     if(type == LV_ROTARY_TYPE_NORMAL)
         return LV_ROTARY_TYPE_NORMAL;
 }
