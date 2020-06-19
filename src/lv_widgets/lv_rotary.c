@@ -440,7 +440,7 @@ static void draw_knob(lv_obj_t * rotary, const lv_area_t * clip_area)
     lv_draw_rect_dsc_t knob_rect_dsc;
     lv_coord_t center_x = rotary->coords.x1 + r + left_bg;
     lv_coord_t center_y = rotary->coords.y1 + r + top_bg;
-    lv_coord_t knob_inner = lv_obj_get_style_pad_inner(rotary, LV_ROTARY_PART_KNOB)
+    lv_coord_t knob_inner = lv_obj_get_style_pad_inner(rotary, LV_ROTARY_PART_KNOB);
 
     if(r > 0) {
         knob_area.x1 = center_x - r + indic_width + knob_inner;
