@@ -247,7 +247,7 @@ bool lv_rotary_is_dragged(const lv_obj_t * rotary);
  */
 static inline bool lv_rotary_get_symmetric(lv_obj_t * rotary)
 {
-    lv_rotary_ext_t * ext = lv_obj_get_ext_attr(rotary);
+    lv_rotary_ext_t * ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
     return ext->sym;
 }
 
