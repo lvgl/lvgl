@@ -100,7 +100,6 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_ext_click_area(rotary, 0, 0, LV_DPI / 10, LV_DPI / 10);
 
         lv_theme_apply(rotary, LV_THEME_ROTARY);
-        lv_obj_set_height(rotary, LV_DPI / 15);
     }
     /*Copy an existing rotary*/
     else {
@@ -371,12 +370,6 @@ static lv_style_list_t * lv_rotary_get_style(lv_obj_t * rotary, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-        case LV_ROTARY_PART_BG:
-            style_dsc_p = lv_obj_get_style_list(rotary, LV_ARC_PART_BG);
-            break;
-        case LV_ROTARY_PART_INDIC:
-            style_dsc_p = lv_obj_get_style_list(rotary, LV_ARC_PART_INDIC);
-            break;
         case LV_ROTARY_PART_KNOB:
             style_dsc_p = &ext->style_knob;
             break;
