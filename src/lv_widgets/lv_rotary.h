@@ -55,7 +55,7 @@ enum {
     LV_ROTARY_STATE_CHECKED_DISABLED = LV_BTN_STATE_CHECKED_DISABLED,
     _LV_ROTARY_STATE_LAST = _LV_BTN_STATE_LAST, /* Number of states*/
 };
-typedef uint8_t lv_btn_state_t;
+typedef uint8_t lv_rotary_state_t;
 
 /*Data of rotary*/
 typedef struct {
