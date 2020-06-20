@@ -128,7 +128,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask
     q->f = (uint32_t)(root & 0xf) << 4;
 }
 
-
 /**
  * Calculate the atan2 of a vector.
  * @param x
@@ -230,6 +229,22 @@ int64_t _lv_pow(int64_t base, int8_t exp)
     }
 
     return result;
+}
+
+/**
+ * Get the mapped of a number given an imput and output range
+ * @param x integer which mapped value should be calculated
+ * @param min_in min input range
+ * @param max_in max input range
+ * @param in min output range
+ * @param out max output range
+ */
+LV_ATTRIBUTE_FAST_MEM int16_t _lv_map(int16_t x, int16_t min_in, int16_t max_in, int16_t min, int16_t max)
+{
+    int16_t slope = (max - min) / (max_in - min_in);
+    int16_t bias = min - slope * min_in;
+    
+    return bias + slope * x;
 }
 
 /**********************

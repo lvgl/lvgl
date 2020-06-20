@@ -31,8 +31,6 @@ extern "C" {
 
 #define LV_MATH_UDIV255(x) ((uint32_t)((uint32_t) (x) * 0x8081) >> 0x17)
 
-#define LV_MATH_MAP(a, min_in, max_in, min, max) (min - (((max - min) / (max_in - min_in)) * min_in) + (((max - min) / (max_in - min_in)) * a))
-
 #define LV_IS_SIGNED(t) (((t)(-1)) < ((t) 0))
 #define LV_UMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0xFULL << ((sizeof(t) * 8ULL) - 4ULL)))
 #define LV_SMAX_OF(t) (((0x1ULL << ((sizeof(t) * 8ULL) - 1ULL)) - 1ULL) | (0x7ULL << ((sizeof(t) * 8ULL) - 4ULL)))
@@ -113,6 +111,16 @@ LV_ATTRIBUTE_FAST_MEM void _lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask
  * @return base raised to the power exponent
  */
 int64_t _lv_pow(int64_t base, int8_t exp);
+
+/**
+ * Get the mapped of a number given an imput and output range
+ * @param x integer which mapped value should be calculated
+ * @param min_in min input range
+ * @param max_in max input range
+ * @param in min output range
+ * @param out max output range
+ */
+LV_ATTRIBUTE_FAST_MEM int16_t _lv_map(int16_t x, int16_t min_in, int16_t max_in, int16_t min, int16_t max);
 
 /**********************
  *      MACROS
