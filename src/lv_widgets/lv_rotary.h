@@ -82,7 +82,8 @@ enum {
 
 /** Custom events of rotary*/
 enum {
-    LV_EVENT_ROTARY_TOGGLED = _LV_EVENT_LAST
+    LV_EVENT_ROTARY_TOGGLED = _LV_EVENT_LAST,
+    _LV_EVENT_ROTARY_LAST
 };
 typedef uint8_t lv_rotary_event_t;
 
@@ -197,7 +198,7 @@ static inline void lv_rotary_set_rotation(lv_obj_t * rotary, uint16_t rotation_a
  * @param rotary pointer to a rotary object
  * @param tgl true: enable toggled states, false: disable
  */
-void lv_rotary_set_checkable(lv_obj_t * rotary, bool tgl)
+void lv_rotary_set_checkable(lv_obj_t * rotary, bool tgl);
 
 /**
  * Set the state of the rotary
