@@ -304,7 +304,7 @@ static inline lv_btn_state_t lv_rotary_get_state(const lv_obj_t * rotary) {
  * @param rotary pointer to a rotary object
  * @return true: toggle enabled, false: disabled
  */
-bool lv_rotary_get_checkable(const lv_obj_t * rotary)
+bool lv_rotary_get_checkable(const lv_obj_t * rotary);
 
 /**********************
  *      MACROS
