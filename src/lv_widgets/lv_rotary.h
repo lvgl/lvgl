@@ -80,6 +80,12 @@ enum {
     _LV_ROTARY_PART_VIRTUAL_LAST
 };
 
+/** Custom events of rotary*/
+enum {
+    LV_EVENT_ROTARY_TOGGLED = _LV_EVENT_LAST,
+    _LV_EVENT_ROTARY_LAST
+};
+typedef uint8_t lv_rotary_event_t;
 
 /**********************
  * GLOBAL PROTOTYPES

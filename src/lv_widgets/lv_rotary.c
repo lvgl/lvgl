@@ -365,7 +365,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
                 toggled = 1;
             }
 
-            res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, &toggled); /** non-NULL indicates toggle event*/
+            res = lv_event_send(rotary, LV_EVENT_ROTARY_TOGGLED, &toggled);
             if(res != LV_RES_OK) return res;
         }
 
