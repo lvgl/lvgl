@@ -45,6 +45,18 @@ enum {
 };
 typedef uint8_t lv_rotary_type_t;
 
+/** Possible states of a rotary.*/
+enum {
+    LV_ROTARY_STATE_RELEASED = LV_BTN_STATE_RELEASED,
+    LV_ROTARY_STATE_PRESSED = LV_BTN_STATE_PRESSED,
+    LV_ROTARY_STATE_DISABLED = LV_BTN_STATE_DISABLED,
+    LV_ROTARY_STATE_CHECKED_RELEASED = LV_BTN_STATE_CHECKED_RELEASED,
+    LV_ROTARY_STATE_CHECKED_PRESSED = LV_BTN_STATE_CHECKED_PRESSED,
+    LV_ROTARY_STATE_CHECKED_DISABLED = LV_BTN_STATE_CHECKED_DISABLED,
+    _LV_ROTARY_STATE_LAST = _LV_BTN_STATE_LAST, /* Number of states*/
+};
+typedef uint8_t lv_btn_state_t;
+
 /*Data of rotary*/
 typedef struct {
     /*Ext. of ancestor*/
@@ -170,6 +182,16 @@ static inline void lv_rotary_set_bg_angles(lv_obj_t * rotary, uint16_t start, ui
  */
 static inline void lv_rotary_set_rotation(lv_obj_t * rotary, uint16_t rotation_angle) {
     lv_arc_set_rotation(rotary, rotation_angle);
+}
+
+/**
+ * Set the state of the rotary
+ * @param rotary pointer to a rotary object
+ * @param state the new state of the rotary (from lv_rotary_state_t enum)
+ */
+void lv_rotary_set_state(lv_obj_t * rotary, lv_rotary_state_t state)
+{
+    lv_btn_set_state(rotary, state);
 }
 
 /*=====================
