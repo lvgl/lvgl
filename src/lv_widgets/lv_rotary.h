@@ -63,6 +63,7 @@ typedef struct {
     lv_arc_ext_t arc;
     /*New data for this type*/
     lv_style_list_t style_knob; /* Style of the knob */
+    lv_area_t knob_area; /* Area of the knob */
     int16_t cur_value; /*Current value of the rotary*/
     int16_t min_value; /*Minimum value of the rotary*/
     int16_t max_value; /*Maximum value of the rotary*/

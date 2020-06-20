@@ -344,14 +344,14 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
     else if(sign == LV_SIGNAL_PRESSING && ext->last_drag_x != NULL) {
         lv_indev_get_point(param, &p);
 
-        if (ext->right_knob_area.y1 < p.y && p.y < ext->right_knob_area.y2) {
-            if (p.x > ext->last_drag_x && p.x < ext->right_knob_area.x2) {
+        if (ext->knob_area.y1 < p.y && p.y < ext->knob_area.y2) {
+            if (p.x > ext->last_drag_x && p.x < ext->knob_area.x2) {
                 ext->last_drag_x = p.x;
                 lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + 1, LV_ANIM_ON);
                 res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return res;
             }
-            else if (p.x < ext->last_drag_x && p.x > ext->right_knob_area.x1) {
+            else if (p.x < ext->last_drag_x && p.x > ext->knob_area.x1) {
                 ext->last_drag_x = p.x;
                 lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) - 1, LV_ANIM_ON);
                 res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
@@ -445,6 +445,8 @@ static void draw_knob(lv_obj_t * rotary, const lv_area_t * clip_area)
 
         lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
     }
+
+    lv_area_copy(&ext->knob_area, &knob_area);
 }
 
 #endif
