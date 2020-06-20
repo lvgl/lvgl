@@ -150,7 +150,7 @@ void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
             ext->min_value, 
             ext->max_value, 
             ext->arc.arc_angle_start, 
-            ext->arc.arc_angle_start + 360
+            ext->arc.bg_angle_end
         )
     );
 }
