@@ -189,7 +189,7 @@ static inline void lv_rotary_set_rotation(lv_obj_t * rotary, uint16_t rotation_a
  * @param rotary pointer to a rotary object
  * @param state the new state of the rotary (from lv_rotary_state_t enum)
  */
-void lv_rotary_set_state(lv_obj_t * rotary, lv_rotary_state_t state)
+static inline void lv_rotary_set_state(lv_obj_t * rotary, lv_rotary_state_t state)
 {
     lv_btn_set_state(rotary, state);
 }
