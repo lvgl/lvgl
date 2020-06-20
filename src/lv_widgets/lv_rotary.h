@@ -66,10 +66,9 @@ typedef struct {
     int16_t cur_value; /*Current value of the rotary*/
     int16_t min_value; /*Minimum value of the rotary*/
     int16_t max_value; /*Maximum value of the rotary*/
-    int16_t * value_to_set; /*Start value of the rotary*/
     uint16_t dragging   :1;
+    lv_coord_t last_drag_x; /*Last drag x coordintate of the rotary*/
     uint16_t sym        :1;
-    uint8_t checkable   :1; /* 1: Toggle enabled*/
 } lv_rotary_ext_t;
 
 /** Built-in styles of rotary*/
@@ -77,15 +76,9 @@ enum {
     LV_ROTARY_PART_BG = LV_ARC_PART_BG, /** Rotary background style. */
     LV_ROTARY_PART_INDIC = LV_ARC_PART_INDIC, /** Rotary indicator (filled area) style. */
     LV_ROTARY_PART_KNOB = _LV_ARC_PART_VIRTUAL_LAST, /** Rotary knob style. */
-    _LV_ROTARY_PART_VIRTUAL_LAST
+    _LV_ROTARY_PART_VIRTUAL_LAST,
+    _LV_ROTARY_PART_REAL_LAST = _LV_ARC_PART_REAL_LAST
 };
-
-/** Custom events of rotary*/
-enum {
-    LV_EVENT_ROTARY_TOGGLED = _LV_EVENT_LAST,
-    _LV_EVENT_ROTARY_LAST
-};
-typedef uint8_t lv_rotary_event_t;
 
 /**********************
  * GLOBAL PROTOTYPES

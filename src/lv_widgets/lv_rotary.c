@@ -33,8 +33,6 @@
 static lv_design_res_t lv_rotary_design(lv_obj_t * rotary, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * param);
 static lv_style_list_t * lv_rotary_get_style(lv_obj_t * rotary, uint8_t part);
-// static void draw_bg(lv_obj_t * rotary, const lv_area_t * clip_area);
-// static void draw_indic(lv_obj_t * rotary, const lv_area_t * clip_area);
 static void draw_knob(lv_obj_t * rotary, const lv_area_t * clip_area);
 
 /**********************
@@ -343,31 +341,23 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
     if(sign == LV_SIGNAL_PRESSED) {
         ext->dragging = true;
     }
-    else if(sign == LV_SIGNAL_PRESSING && ext->value_to_set != NULL) {
+    else if(sign == LV_SIGNAL_PRESSING && ext->last_drag_x != NULL) {
         lv_indev_get_point(param, &p);
 
-        // TODO: get new_value and set
+        if (ext->right_knob_area.y1 < p.y && p.y < ext->right_knob_area.y2) {
+            if (p.x > ext->last_drag_x && p.x < ext->right_knob_area.x2) {
+                lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + 1, LV_ANIM_ON);
+            }
+            else if (p.x < ext->last_drag_x && p.x > ext->right_knob_area.x1) {
+                lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) - 1, LV_ANIM_ON);
+            }
+        }
+
+        ext->last_drag_x = p.x;
     }
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         ext->dragging = false;
         ext->value_to_set = NULL;
-
-        /*If not dragged and it was not long press action then
-         *change state and run the action*/
-        if(lv_indev_is_dragging(param) == false && tgl) {
-            uint32_t toggled = 0;
-            if(lv_obj_get_state(rotary, LV_ROTARY_PART_KNOB) & LV_STATE_CHECKED) {
-                lv_btn_set_state(rotary, LV_ROTARY_STATE_RELEASED);
-                toggled = 0;
-            }
-            else {
-                lv_btn_set_state(rotary, LV_ROTARY_STATE_CHECKED_RELEASED);
-                toggled = 1;
-            }
-
-            res = lv_event_send(rotary, LV_EVENT_ROTARY_TOGGLED, &toggled);
-            if(res != LV_RES_OK) return res;
-        }
 
 #if LV_USE_GROUP
         /*Leave edit mode if released. (No need to wait for LONG_PRESS) */
