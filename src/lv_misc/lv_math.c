@@ -241,8 +241,8 @@ int64_t _lv_pow(int64_t base, int8_t exp)
  */
 LV_ATTRIBUTE_FAST_MEM int16_t _lv_map(int16_t x, float min_in, float max_in, float min, float max)
 {
-    int16_t slope = (max - min) / (max_in - min_in);
-    int16_t bias = min - slope * min_in;
+    float slope = (max - min) / (max_in - min_in);
+    float bias = min - slope * min_in;
     
     return bias + slope * x;
 }
