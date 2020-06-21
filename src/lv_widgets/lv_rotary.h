@@ -187,27 +187,12 @@ static inline void lv_rotary_set_rotation(lv_obj_t * rotary, uint16_t rotation_a
 }
 
 /**
- * Enable the toggled states
- * @param rotary pointer to a rotary object
- * @param tgl true: enable toggled states, false: disable
- */
-void lv_rotary_set_checkable(lv_obj_t * rotary, bool tgl);
-
-/**
  * Set the state of the rotary
  * @param rotary pointer to a rotary object
  * @param state the new state of the rotary (from lv_rotary_state_t enum)
  */
 static inline void lv_rotary_set_state(lv_obj_t * rotary, lv_rotary_state_t state) {
     lv_btn_set_state(rotary, state);
-}
-
-/**
- * Toggle the state of the rotary (ON->OFF, OFF->ON)
- * @param rotary pointer to a rotary object
- */
-static inline void lv_rotary_toggle(lv_obj_t * rotary) {
-    lv_btn_toggle(rotary);
 }
 
 /*=====================
@@ -298,13 +283,6 @@ static inline bool lv_rotary_get_symmetric(lv_obj_t * rotary)
 static inline lv_btn_state_t lv_rotary_get_state(const lv_obj_t * rotary) {
     return lv_btn_get_state(rotary);
 }
-
-/**
- * Get the toggle enable attribute of the rotary
- * @param rotary pointer to a rotary object
- * @return true: toggle enabled, false: disabled
- */
-bool lv_rotary_get_checkable(const lv_obj_t * rotary);
 
 /**********************
  *      MACROS

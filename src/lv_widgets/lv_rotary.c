@@ -85,7 +85,6 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->min_value = 0;
     ext->max_value = 0;
     ext->dragging = false;
-    ext->checkable = 0;
     lv_style_list_init(&ext->style_knob);
 
     /*The signal and design functions are not copied so set them here*/
@@ -108,7 +107,6 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->max_value = copy_ext->max_value;
         ext->dragging = copy_ext->dragging;
         ext->sym = copy_ext->sym;
-        ext->checkable = copy_ext->checkable;
         lv_style_list_copy(&ext->style_knob, &copy_ext->style_knob);
 
         lv_obj_refresh_style(rotary, LV_OBJ_PART_ALL);
@@ -193,20 +191,6 @@ void lv_rotary_set_symmetric(lv_obj_t * rotary, bool en)
     lv_obj_invalidate(rotary);
 }
 
-/**
- * Enable the toggled states
- * @param rotary pointer to a button object
- * @param tgl true: enable toggled states, false: disable
- */
-void lv_rotary_set_checkable(lv_obj_t * rotary, bool tgl)
-{
-    LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
-
-    lv_rotary_ext_t * ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
-
-    ext->checkable = tgl != false ? 1 : 0;
-}
-
 /*=====================
  * Getter functions
  *====================*/
@@ -261,20 +245,6 @@ bool lv_rotary_is_dragged(const lv_obj_t * rotary)
 
     lv_rotary_ext_t * ext = lv_obj_get_ext_attr(rotary);
     return ext->dragging;
-}
-
-/**
- * Get the toggle enable attribute of the rotary
- * @param rotary pointer to a rotary object
- * @return true: toggle enabled, false: disabled
- */
-bool lv_rotary_get_checkable(const lv_obj_t * rotary)
-{
-    LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
-
-    lv_rotary_ext_t * ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
-
-    return ext->checkable != 0 ? true : false;
 }
 
 /**********************
@@ -334,7 +304,6 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
-    bool tgl = lv_rotary_get_checkable(rotary);
     lv_rotary_ext_t * ext = lv_obj_get_ext_attr(rotary);
     lv_point_t p;
 
