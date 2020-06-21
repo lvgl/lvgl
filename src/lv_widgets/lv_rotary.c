@@ -150,8 +150,8 @@ void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
     if (ext->reverse) {
         lv_arc_set_start_angle(
             rotary,
-            _lv_map(ext->cur_value, ext->min_value, ext->max_value, 
-                    360 + ext->arc.bg_angle_end, ext->arc.bg_angle_start)
+            _lv_map(ext->cur_value, ext->max_value, ext->min_value, 
+                    ext->arc.arc_angle_start, 360 + ext->arc.bg_angle_end)
         );
     } else {
         lv_arc_set_end_angle(
