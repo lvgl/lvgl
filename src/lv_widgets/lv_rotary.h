@@ -67,9 +67,11 @@ typedef struct {
     int16_t cur_value; /*Current value of the rotary*/
     int16_t min_value; /*Minimum value of the rotary*/
     int16_t max_value; /*Maximum value of the rotary*/
-    uint16_t dragging   :1;
     lv_coord_t last_drag_x; /*Last drag x coordintate of the rotary*/
-    uint16_t sym        :1;
+    uint16_t dragging    :1;
+    uint16_t sym         :1;
+    uint16_t sensitivity :1;
+
 } lv_rotary_ext_t;
 
 /** Built-in styles of rotary*/
@@ -120,6 +122,14 @@ void lv_rotary_set_range(lv_obj_t * rotary, int16_t min, int16_t max);
  * @param en true: enable disable symmetric behavior; false: disable
  */
 void lv_rotary_set_symmetric(lv_obj_t * rotary, bool en);
+
+/**
+ * Set the sesitivity of rotary knob increments
+ * position.
+ * @param rotary pointer to a rotary object
+ * @param sensitivity increment multiplier
+ */
+void lv_rotary_set_sensitivity(lv_obj_t * rotary, uint16_t sensitivity);
 
 /**
  * Set the start angle of rotary indicator. 0 deg: right, 90 bottom, etc.
