@@ -151,7 +151,7 @@ void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
         lv_arc_set_start_angle(
             rotary,
             _lv_map(ext->cur_value, ext->min_value, ext->max_value, 
-                    ext->arc.arc_angle_end, ext->arc.bg_angle_start)
+                    360 + ext->arc.bg_angle_end, ext->arc.bg_angle_start)
         );
     } else {
         lv_arc_set_end_angle(
@@ -215,10 +215,8 @@ void lv_rotary_set_reverse(lv_obj_t * rotary, bool reverse)
     LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
 
     lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
+
     ext->reverse = reverse;
-
-    uint16_t end = ext->arc.arc_angle_end;
-
     ext->arc.arc_angle_end = ext->arc.bg_angle_end;
     
     lv_rotary_set_value(rotary, ext->cur_value, false);
