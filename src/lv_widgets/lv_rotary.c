@@ -380,7 +380,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         lv_indev_get_point(param, &p);
         lv_coord_t drag_x_diff = p.x -ext->last_drag_x;
 
-        if (abs(drag_x_diff) > ext->threshold) {
+        if (LV_MATH_ABS(drag_x_diff) > ext->threshold) {
             if (drag_x_diff > 0) drag_x_diff = ext->threshold;
             else drag_x_diff = -ext->threshold;
         }
