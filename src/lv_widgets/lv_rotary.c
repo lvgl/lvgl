@@ -332,7 +332,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
     }
     else if(sign == LV_SIGNAL_PRESSING) {
         lv_indev_get_point(param, &p);
-        lv_coord_t drag_x_diff = ext->last_drag_x - p.x;
+        lv_coord_t drag_x_diff = p.x - ext->last_drag_x;
         
         ext->last_drag_x = p.x;
         if (ext->knob_area.y1 < p.y && p.y < ext->knob_area.y2) {
