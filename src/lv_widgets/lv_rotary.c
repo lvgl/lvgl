@@ -331,7 +331,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
     }
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         ext->dragging = false;
-        ext->value_to_set = NULL;
+        ext->last_drag_x = NULL;
 
 #if LV_USE_GROUP
         /*Leave edit mode if released. (No need to wait for LONG_PRESS) */

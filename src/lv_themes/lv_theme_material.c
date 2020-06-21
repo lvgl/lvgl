@@ -815,7 +815,6 @@ static void rotary_init(void)
 
     style_init_reset(&styles->rotary_knob);
     lv_style_set_bg_color(&styles->rotary_knob, LV_STATE_CHECKED, COLOR_BTN);
-    lv_style_set_border_opa(&styles->rotary_knob, LV_STATE_CHECKED, COLOR_BTN_BORDER);
     lv_style_set_text_color(&styles->rotary_knob, LV_STATE_CHECKED,  IS_LIGHT ? lv_color_hex(0x31404f) : lv_color_hex(0xffffff));
     lv_style_set_value_color(&styles->rotary_knob, LV_STATE_CHECKED,  IS_LIGHT ? lv_color_hex(0x31404f) : lv_color_hex(0xffffff));
     lv_style_set_bg_opa(&styles->rotary_knob, LV_STATE_DEFAULT, LV_OPA_COVER);
