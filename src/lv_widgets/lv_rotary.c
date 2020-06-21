@@ -85,6 +85,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->min_value = 0;
     ext->max_value = 0;
     ext->dragging = false;
+    ext->sensitivity = 1;
     lv_style_list_init(&ext->style_knob);
 
     /*The signal and design functions are not copied so set them here*/
