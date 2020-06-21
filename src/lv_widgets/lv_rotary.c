@@ -316,17 +316,18 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
     }
     else if(sign == LV_SIGNAL_PRESSING) {
         lv_indev_get_point(param, &p);
-
+        lv_coord_t drag_x_diff = ext->last_drag - p.x;
+        
+        ext->last_drag_x = p.x;
         if (ext->knob_area.y1 < p.y && p.y < ext->knob_area.y2) {
-            if (p.x > ext->last_drag_x && p.x < ext->knob_area.x2) {
-                ext->last_drag_x = p.x;
-                lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + 1, LV_ANIM_ON);
+            if (drag_x_diff > 0 && p.x < ext->knob_area.x2) {
+                lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_x_diff, LV_ANIM_ON);
                 res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return res;
             }
-            else if (p.x < ext->last_drag_x && p.x > ext->knob_area.x1) {
+            else if (drag_x_diff < 0 && p.x > ext->knob_area.x1) {
                 ext->last_drag_x = p.x;
-                lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) - 1, LV_ANIM_ON);
+                lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_x_diff, LV_ANIM_ON);
                 res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return res;
             }
