@@ -2455,7 +2455,7 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
         res = _lv_style_list_get_int(dsc, prop, &value_act);
         if(res == LV_RES_OK) return value_act;
 
-        if(attr.bits.inherit == 0) break;
+        if(LV_ATTR_INHERIT(attr.full) == 0) break;
 
         /*If not found, check the `MAIN` style first*/
         if(part != LV_OBJ_PART_MAIN) {
@@ -2518,7 +2518,7 @@ lv_color_t _lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_
         res = _lv_style_list_get_color(dsc, prop, &value_act);
         if(res == LV_RES_OK) return value_act;
 
-        if(attr.bits.inherit == 0) break;
+        if(LV_ATTR_INHERIT(attr.full) == 0) break;
 
         /*If not found, check the `MAIN` style first*/
         if(part != LV_OBJ_PART_MAIN) {
@@ -2574,7 +2574,7 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
         res = _lv_style_list_get_opa(dsc, prop, &value_act);
         if(res == LV_RES_OK) return value_act;
 
-        if(attr.bits.inherit == 0) break;
+        if(LV_ATTR_INHERIT(attr.full) == 0) break;
 
         /*If not found, check the `MAIN` style first*/
         if(part != LV_OBJ_PART_MAIN) {
@@ -2631,7 +2631,7 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
         res = _lv_style_list_get_ptr(dsc, prop, &value_act);
         if(res == LV_RES_OK)  return value_act;
 
-        if(attr.bits.inherit == 0) break;
+        if(LV_ATTR_INHERIT(attr.full) == 0) break;
 
         /*If not found, check the `MAIN` style first*/
         if(part != LV_OBJ_PART_MAIN) {
@@ -4137,4 +4137,3 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
 
     return false;
 }
-

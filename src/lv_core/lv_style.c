@@ -111,7 +111,7 @@ bool lv_style_remove_prop(lv_style_t * style, lv_style_property_t prop)
         attr_found.full = get_style_prop_attr(style, id);
         attr_goal.full = (prop >> 8) & 0xFFU;
 
-        if(attr_found.bits.state == attr_goal.bits.state) {
+        if(LV_ATTR_STATE(attr_found.full) == LV_ATTR_STATE(attr_goal.full)) {
             uint32_t map_size = _lv_style_get_mem_size(style);
             uint8_t prop_size = get_prop_size(prop);
 
@@ -368,7 +368,7 @@ void _lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_in
         attr_found.full = get_style_prop_attr(style, id);
         attr_goal.full = (prop >> 8) & 0xFFU;
 
-        if(attr_found.bits.state == attr_goal.bits.state) {
+        if(LV_ATTR_STATE(attr_found.full) == LV_ATTR_STATE(attr_goal.full)) {
             _lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &value, sizeof(lv_style_int_t));
             return;
         }
@@ -414,7 +414,7 @@ void _lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_
         attr_found.full = get_style_prop_attr(style, id);
         attr_goal.full = (prop >> 8) & 0xFFU;
 
-        if(attr_found.bits.state == attr_goal.bits.state) {
+        if(LV_ATTR_STATE(attr_found.full) == LV_ATTR_STATE(attr_goal.full)) {
             _lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &color, sizeof(lv_color_t));
             return;
         }
@@ -461,7 +461,7 @@ void _lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t op
         attr_found.full = get_style_prop_attr(style, id);
         attr_goal.full = (prop >> 8) & 0xFFU;
 
-        if(attr_found.bits.state == attr_goal.bits.state) {
+        if(LV_ATTR_STATE(attr_found.full) == LV_ATTR_STATE(attr_goal.full)) {
             _lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &opa, sizeof(lv_opa_t));
             return;
         }
@@ -508,7 +508,7 @@ void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void 
         attr_found.full = get_style_prop_attr(style, id);
         attr_goal.full = (prop >> 8) & 0xFFU;
 
-        if(attr_found.bits.state == attr_goal.bits.state) {
+        if(LV_ATTR_STATE(attr_found.full) == LV_ATTR_STATE(attr_goal.full)) {
             _lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &p, sizeof(const void *));
             return;
         }
@@ -562,7 +562,7 @@ int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, vo
         lv_style_attr_t attr_goal;
         attr_goal.full = (prop >> 8) & 0xFF;
 
-        return attr_act.bits.state & attr_goal.bits.state;
+        return LV_ATTR_STATE(attr_act.full) & LV_ATTR_STATE(attr_goal.full);
     }
 }
 
@@ -599,7 +599,7 @@ int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, vo
         lv_style_attr_t attr_goal;
         attr_goal.full = (prop >> 8) & 0xFF;
 
-        return attr_act.bits.state & attr_goal.bits.state;
+        return LV_ATTR_STATE(attr_act.full) & LV_ATTR_STATE(attr_goal.full);
     }
 }
 
@@ -633,7 +633,7 @@ int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, 
         lv_style_attr_t attr_goal;
         attr_goal.full = (prop >> 8) & 0xFF;
 
-        return attr_act.bits.state & attr_goal.bits.state;
+        return LV_ATTR_STATE(attr_act.full) & LV_ATTR_STATE(attr_goal.full);
     }
 }
 
@@ -668,7 +668,7 @@ int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, vo
         lv_style_attr_t attr_goal;
         attr_goal.full = (prop >> 8) & 0xFF;
 
-        return attr_act.bits.state & attr_goal.bits.state;
+        return LV_ATTR_STATE(attr_act.full) & LV_ATTR_STATE(attr_goal.full);
     }
 }
 
@@ -1072,16 +1072,16 @@ LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t 
             attr_i.full = get_style_prop_attr(style, i);
 
             /*If the state perfectly matches return this property*/
-            if(attr_i.bits.state == attr.bits.state) {
+            if(LV_ATTR_STATE(attr_i.full) == LV_ATTR_STATE(attr.full)) {
                 return i;
             }
             /* Be sure the property not specifies other state than the requested.
              * E.g. For HOVER+PRESS, HOVER only is OK, but HOVER+FOCUS not*/
-            else if((attr_i.bits.state & (~attr.bits.state)) == 0) {
+            else if((LV_ATTR_STATE(attr_i.full) & (~LV_ATTR_STATE(attr.full))) == 0) {
                 /* Use this property if it describes better the requested state than the current candidate.
                  * E.g. for HOVER+FOCUS+PRESS prefer HOVER+FOCUS over FOCUS*/
-                if(attr_i.bits.state > weight) {
-                    weight = attr_i.bits.state;
+                if(LV_ATTR_STATE(attr_i.full) > weight) {
+                    weight = LV_ATTR_STATE(attr_i.full);
                     id_guess = i;
                 }
             }
