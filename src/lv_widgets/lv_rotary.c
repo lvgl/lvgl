@@ -109,6 +109,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->dragging = copy_ext->dragging;
         ext->sym = copy_ext->sym;
         ext->sensitivity = copy_ext->sensitivity;
+        ext->threshold = copy_ext->threshold;
         lv_style_list_copy(&ext->style_knob, &copy_ext->style_knob);
 
         lv_obj_refresh_style(rotary, LV_OBJ_PART_ALL);
@@ -173,6 +174,8 @@ void lv_rotary_set_range(lv_obj_t * rotary, int16_t min, int16_t max)
     if(ext->cur_value > max) {
         ext->cur_value = max;
     }
+
+    ext->threshold = (abs(ext->min_value) + abs(ext->max_value)) / 10;
     
     lv_rotary_set_value(rotary, ext->cur_value, false);
 }
@@ -334,12 +337,12 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         lv_indev_get_point(param, &p);
         lv_coord_t drag_x_diff = p.x -ext->last_drag_x;
 
-        if (abs(drag_x_diff) > abs(ext->sensitivity)) {
-            if (drag_x_diff > 0) drag_x_diff = ext->sensitivity;
-            else drag_x_diff = -ext->sensitivity;
+        if (abs(drag_x_diff) > ext->threshold) {
+            if (drag_x_diff > 0) drag_x_diff = ext->threshold;
+            else drag_x_diff = -ext->threshold;
         }
         ext->last_drag_x = p.x;
-        
+
         if (ext->knob_area.y1 < p.y && p.y < ext->knob_area.y2) {
             if (drag_x_diff > 0 && p.x < ext->knob_area.x2) {
                 lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_x_diff * ext->sensitivity, LV_ANIM_ON);
