@@ -72,6 +72,7 @@ typedef struct {
     lv_coord_t last_drag_x; /*Last drag x coordintate of the rotary*/
     uint16_t dragging    :1;
     uint16_t sym         :1;
+    uint16_t reverse     :1;
 
 } lv_rotary_ext_t;
 
@@ -123,6 +124,14 @@ void lv_rotary_set_range(lv_obj_t * rotary, int16_t min, int16_t max);
  * @param en true: enable disable symmetric behavior; false: disable
  */
 void lv_rotary_set_symmetric(lv_obj_t * rotary, bool en);
+
+/**
+ * Reverse rotary behavior. The indicator will grow from arc end instead of arc start.
+ * position.
+ * @param rotary pointer to a rotary object
+ * @param reverse true: enable disable reverse behavior; false: disable
+ */
+void lv_rotary_set_reverse(lv_obj_t * rotary, bool reverse);
 
 /**
  * Set the sesitivity of rotary knob increments

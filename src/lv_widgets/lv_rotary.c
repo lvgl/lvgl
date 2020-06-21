@@ -84,9 +84,9 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cur_value = 0;
     ext->min_value = 0;
     ext->max_value = 0;
-    ext->dragging = false;
     ext->sensitivity = 1;
     ext->threshold = 1;
+    ext->dragging = false;
     lv_style_list_init(&ext->style_knob);
 
     /*The signal and design functions are not copied so set them here*/
@@ -107,10 +107,11 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->cur_value = copy_ext->cur_value;
         ext->min_value = copy_ext->min_value;
         ext->max_value = copy_ext->max_value;
-        ext->dragging = copy_ext->dragging;
-        ext->sym = copy_ext->sym;
         ext->sensitivity = copy_ext->sensitivity;
         ext->threshold = copy_ext->threshold;
+        ext->dragging = copy_ext->dragging;
+        ext->sym = copy_ext->sym;
+        ext->reverse = copy_ext->reverse;
         lv_style_list_copy(&ext->style_knob, &copy_ext->style_knob);
 
         lv_obj_refresh_style(rotary, LV_OBJ_PART_ALL);
@@ -146,11 +147,19 @@ void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
     
     ext->cur_value = new_value;
 
-    lv_arc_set_end_angle(
-        rotary,
-        _lv_map(ext->cur_value, ext->min_value, ext->max_value, 
-                ext->arc.arc_angle_start, 360 + ext->arc.bg_angle_end)
-    );
+    if (ext->reverse) {
+        lv_arc_set_start_angle(
+            rotary,
+            _lv_map(ext->cur_value, ext->min_value, ext->max_value, 
+                    ext->arc.arc_angle_start, ext->arc.bg_angle_start)
+        );
+    } else {
+        lv_arc_set_end_angle(
+            rotary,
+            _lv_map(ext->cur_value, ext->min_value, ext->max_value, 
+                    ext->arc.arc_angle_start, 360 + ext->arc.bg_angle_end)
+        );
+    }
 }
 
 /**
@@ -191,6 +200,27 @@ void lv_rotary_set_symmetric(lv_obj_t * rotary, bool en)
 
     lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
     ext->sym = en;
+
+    lv_obj_invalidate(rotary);
+}
+
+/**
+ * Reverse rotary behavior. The indicator will grow from arc end instead of arc start.
+ * position.
+ * @param rotary pointer to a rotary object
+ * @param reverse true: enable disable reverse behavior; false: disable
+ */
+void lv_rotary_set_reverse(lv_obj_t * rotary, bool reverse)
+{
+    LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
+
+    lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
+    ext->reverse = reverse;
+
+    uint16_t end = ext->arc.arc_angle_end;
+
+    ext->arc.arc_angle_end = ext->arc.bg_angle_end;
+    ext->arc.arc_angle_start= end;
 
     lv_obj_invalidate(rotary);
 }
