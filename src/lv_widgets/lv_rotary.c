@@ -215,11 +215,13 @@ void lv_rotary_set_reverse(lv_obj_t * rotary, bool reverse)
     LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
 
     lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
-
-    ext->reverse = reverse;
-    ext->arc.arc_angle_end = ext->arc.bg_angle_end;
+    int16_t val = ext->cur_value;
     
-    lv_rotary_set_value(rotary, ext->cur_value, false);
+    ext->cur_value = -1; /** Force set_value handling*/
+    ext->reverse = reverse;
+    
+    lv_rotary_set_end_angle(rotary, ext->arc.bg_angle_end);
+    lv_rotary_set_value(rotary, val, false);
 }
 
 /**
