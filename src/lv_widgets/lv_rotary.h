@@ -133,6 +133,14 @@ void lv_rotary_set_symmetric(lv_obj_t * rotary, bool en);
 void lv_rotary_set_sensitivity(lv_obj_t * rotary, uint16_t sensitivity);
 
 /**
+ * Set the threshold of rotary knob increments
+ * position.
+ * @param rotary pointer to a rotary object
+ * @param threshold increment threshold
+ */
+void lv_rotary_set_threshold(lv_obj_t * rotary, uint16_t threshold);
+
+/**
  * Set the start angle of rotary indicator. 0 deg: right, 90 bottom, etc.
  * @param arc pointer to an arc object
  * @param start the start angle

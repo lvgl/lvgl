@@ -86,6 +86,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->max_value = 0;
     ext->dragging = false;
     ext->sensitivity = 1;
+    ext->threshold = 1;
     lv_style_list_init(&ext->style_knob);
 
     /*The signal and design functions are not copied so set them here*/
@@ -175,8 +176,6 @@ void lv_rotary_set_range(lv_obj_t * rotary, int16_t min, int16_t max)
         ext->cur_value = max;
     }
 
-    ext->threshold = (abs(ext->min_value) + abs(ext->max_value)) / 10;
-    
     lv_rotary_set_value(rotary, ext->cur_value, false);
 }
 
@@ -208,6 +207,20 @@ void lv_rotary_set_sensitivity(lv_obj_t * rotary, uint16_t sensitivity)
 
     lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
     ext->sensitivity = sensitivity;
+}
+
+/**
+ * Set the threshold of rotary knob increments
+ * position.
+ * @param rotary pointer to a rotary object
+ * @param threshold increment threshold
+ */
+void lv_rotary_set_threshold(lv_obj_t * rotary, uint16_t threshold)
+{
+    LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
+
+    lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
+    ext->threshold = threshold;
 }
 
 /*=====================
