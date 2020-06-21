@@ -308,9 +308,13 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
     lv_point_t p;
 
     if(sign == LV_SIGNAL_PRESSED) {
+        lv_indev_get_point(param, &p);
+
+        ext->last_drag_x = p.x;
         ext->dragging = true;
+
     }
-    else if(sign == LV_SIGNAL_PRESSING && ext->last_drag_x != NULL) {
+    else if(sign == LV_SIGNAL_PRESSING) {
         lv_indev_get_point(param, &p);
 
         if (ext->knob_area.y1 < p.y && p.y < ext->knob_area.y2) {
@@ -331,7 +335,6 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
     }
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         ext->dragging = false;
-        ext->last_drag_x = NULL;
 
 #if LV_USE_GROUP
         /*Leave edit mode if released. (No need to wait for LONG_PRESS) */
