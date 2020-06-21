@@ -153,7 +153,7 @@ static inline void lv_roller_set_fix_width(lv_obj_t * roller, lv_coord_t w)
 #define lv_scrlbar_mode_t lv_scrollbar_mode_t
 
 #define LV_SCRLBAR_MODE_OFF    LV_SCROLLBAR_MODE_OFF
-#define LV_SCRLBAR_MODE_ON     LV_SCRILLBAR_MODE_ON
+#define LV_SCRLBAR_MODE_ON     LV_SCROLLBAR_MODE_ON
 #define LV_SCRLBAR_MODE_DRAG   LV_SCROLLBAR_MODE_DRAG
 #define LV_SCRLBAR_MODE_AUTO   LV_SCROLLBAR_MODE_AUTO
 #define LV_SCRLBAR_MODE_HIDE   LV_SCROLLBAR_MODE_HIDE
