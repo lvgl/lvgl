@@ -35,7 +35,7 @@
  *  STATIC PROTOTYPES
  **********************/
 LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop);
-static inline lv_style_t * get_alloc_local_style(lv_style_list_t * list);
+static lv_style_t * get_alloc_local_style(lv_style_list_t * list);
 static inline void style_resize(lv_style_t *style, size_t sz);
 static inline lv_style_property_t get_style_prop(const lv_style_t *style, size_t idx);
 static inline uint8_t get_style_prop_id(const lv_style_t *style, size_t idx);
@@ -330,17 +330,18 @@ void lv_style_reset(lv_style_t * style)
  * @param style pointer to a style
  * @return size of the properties in bytes
  */
-uint16_t
-_lv_style_get_mem_size(const lv_style_t *style)
+uint16_t _lv_style_get_mem_size(const lv_style_t * style)
 {
     LV_ASSERT_STYLE(style);
 
     if(style->map == NULL) return 0;
+
     size_t i = 0;
     uint8_t prop_id;
     while((prop_id = get_style_prop_id(style, i)) != _LV_STYLE_CLOSEING_PROP) {
         i = get_next_prop_index(prop_id, i);
     }
+
     return i + sizeof(lv_style_property_t);
 }
 
@@ -1063,7 +1064,7 @@ LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t 
     int16_t id_guess = -1;
 
     size_t i = 0;
-    
+
     uint8_t prop_id;    
     while((prop_id = get_style_prop_id(style, i)) != _LV_STYLE_CLOSEING_PROP) {
         if(prop_id == id_to_find) {
@@ -1087,7 +1088,6 @@ LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t 
         }
 
         i = get_next_prop_index(prop_id, i);
-
     }
 
     return id_guess;
@@ -1098,7 +1098,7 @@ LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t 
  * @param list pointer to a style list
  * @return pointer to the local style
  */
-static inline lv_style_t * get_alloc_local_style(lv_style_list_t * list)
+static lv_style_t * get_alloc_local_style(lv_style_list_t * list)
 {
     LV_ASSERT_STYLE_LIST(list);
 
