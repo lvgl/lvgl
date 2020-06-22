@@ -81,14 +81,10 @@ enum {
 
 typedef uint8_t lv_text_decor_t;
 
-typedef struct {
-    uint8_t full;
-} lv_style_attr_t;
+typedef uint8_t lv_style_attr_t;
 
-//typedef uint8_t lv_style_attr_t;
-
-#define LV_ATTR_INHERIT(f) ((f)&0xA0)
-#define LV_ATTR_STATE(f) ((f)&0x3F)
+#define LV_STYLE_ATTR_GET_INHERIT(f) ((f)&0xA0)
+#define LV_STYLE_ATTR_GET_STATE(f) ((f)&0x3F)
 
 #define LV_STYLE_ID_VALUE 0x0   /*max 9 pcs*/
 #define LV_STYLE_ID_COLOR 0x9   /*max 3 pcs*/
