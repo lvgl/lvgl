@@ -102,10 +102,26 @@ typedef uint8_t lv_img_cf_t;
 /**
  * LVGL image header
  */
+/* The first 8 bit is very important to distinguish the different source types.
+ * For more info see `lv_img_get_src_type()` in lv_img.c 
+ * On big endian systems the order is reversed so cf and always_zero must be at
+ * the end of the struct.
+ * */
+#if LV_BIG_ENDIAN_SYSTEM
 typedef struct {
 
-    /* The first 8 bit is very important to distinguish the different source types.
-     * For more info see `lv_img_get_src_type()` in lv_img.c */
+    uint32_t h : 11; /*Height of     the image map*/
+    uint32_t w : 11; /*Width of the image map*/
+    uint32_t reserved : 2; /*Reserved to be used later*/
+    uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
+                                 non-printable character*/
+    uint32_t cf : 5;          /* Color format: See `lv_img_color_format_t`*/
+
+
+} lv_img_header_t;
+#else
+typedef struct {
+
     uint32_t cf : 5;          /* Color format: See `lv_img_color_format_t`*/
     uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
                                  non-printable character*/
@@ -115,7 +131,7 @@ typedef struct {
     uint32_t w : 11; /*Width of the image map*/
     uint32_t h : 11; /*Height of     the image map*/
 } lv_img_header_t;
-
+#endif
 
 /** Image header it is compatible with
  * the result from image converter utility*/

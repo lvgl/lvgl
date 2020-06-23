@@ -222,6 +222,10 @@ typedef void * lv_img_decoder_user_data_t;
 /*=====================
  *  Compiler settings
  *====================*/
+
+/* For big endian systems set to 1 */
+#define LV_BIG_ENDIAN_SYSTEM    0
+
 /* Define a custom attribute to `lv_tick_inc` function */
 #define LV_ATTRIBUTE_TICK_INC
 
