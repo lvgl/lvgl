@@ -16,6 +16,7 @@ Available in the `dev` branch
 
 ## v7.1.0 (planned on 07.07.2020)
 *Available in the `master` branch*
+- Change some lv_style_t methods to support big endian hardware.
 
 ### New features
 - Add `focus_parent` attribute to `lv_obj`
