@@ -87,6 +87,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->sensitivity = 1;
     ext->threshold = 1;
     ext->dragging = false;
+    ext->type = LV_ROTARY_TYPE_NORMAL;
     lv_style_list_init(&ext->style_knob);
 
     /*The signal and design functions are not copied so set them here*/
@@ -110,8 +111,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->sensitivity = copy_ext->sensitivity;
         ext->threshold = copy_ext->threshold;
         ext->dragging = copy_ext->dragging;
-        ext->sym = copy_ext->sym;
-        ext->reverse = copy_ext->reverse;
+        ext->type = copy_ext->type;
         lv_style_list_copy(&ext->style_knob, &copy_ext->style_knob);
 
         lv_obj_refresh_style(rotary, LV_OBJ_PART_ALL);
