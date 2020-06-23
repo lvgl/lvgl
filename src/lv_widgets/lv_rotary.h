@@ -41,7 +41,9 @@ extern "C" {
  **********************/
 
 enum {
-    LV_ROTARY_TYPE_NORMAL
+    LV_ROTARY_TYPE_NORMAL,
+    LV_ROTARY_TYPE_SYMMETRIC,
+    LV_ROTARY_TYPE_REVERSE
 };
 typedef uint8_t lv_rotary_type_t;
 
@@ -71,8 +73,7 @@ typedef struct {
     int16_t threshold; /*Increment threshold of the rotary*/
     lv_coord_t last_drag_x; /*Last drag x coordintate of the rotary*/
     uint16_t dragging    :1;
-    uint16_t sym         :1;
-    uint16_t reverse     :1;
+    uint16_t type        :2;
 
 } lv_rotary_ext_t;
 
@@ -118,14 +119,6 @@ void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
 void lv_rotary_set_range(lv_obj_t * rotary, int16_t min, int16_t max);
 
 /**
- * Make the rotary symmetric to zero. The indicator will grow from zero instead of the minimum
- * position.
- * @param rotary pointer to a rotary object
- * @param en true: enable disable symmetric behavior; false: disable
- */
-void lv_rotary_set_symmetric(lv_obj_t * rotary, bool en);
-
-/**
  * Reverse rotary behavior. The indicator will grow from arc end instead of arc start.
  * position.
  * @param rotary pointer to a rotary object
@@ -148,6 +141,13 @@ void lv_rotary_set_sensitivity(lv_obj_t * rotary, uint16_t sensitivity);
  * @param threshold increment threshold
  */
 void lv_rotary_set_threshold(lv_obj_t * rotary, uint16_t threshold);
+
+/**
+ * Set the type of rotary.
+ * @param rotary pointer to rotary object
+ * @param type rotary type
+ */
+void lv_rotary_set_type(lv_obj_t * rotary, lv_rotary_type_t type);
 
 /**
  * Set the start angle of rotary indicator. 0 deg: right, 90 bottom, etc.
@@ -292,15 +292,11 @@ int16_t lv_rotary_get_max_value(const lv_obj_t * rotary);
 bool lv_rotary_is_dragged(const lv_obj_t * rotary);
 
 /**
- * Get whether the rotary is symmetric or not.
+ * Get whether the rotary is type or not.
  * @param rotary pointer to a rotary object
- * @return true: symmetric is enabled; false: disable
+ * @return rotary type
  */
-static inline bool lv_rotary_get_symmetric(lv_obj_t * rotary)
-{
-    lv_rotary_ext_t * ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
-    return ext->sym;
-}
+lv_rotary_type_t lv_rotary_get_type(const lv_obj_t * rotary);
 
 /**
  * Get the current state of the rotary
@@ -308,7 +304,7 @@ static inline bool lv_rotary_get_symmetric(lv_obj_t * rotary)
  * @return the state of the rotary (from lv_rotary_state_t enum).
  * If the rotary is in disabled state `LV_ROTARY_STATE_DISABLED` will be ORed to the other rotary states.
  */
-static inline lv_btn_state_t lv_rotary_get_state(const lv_obj_t * rotary) {
+static inline lv_rotary_state_t lv_rotary_get_state(const lv_obj_t * rotary) {
     return lv_btn_get_state(rotary);
 }
 
