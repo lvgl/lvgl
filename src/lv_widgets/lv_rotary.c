@@ -147,16 +147,16 @@ void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
     
     ext->cur_value = new_value;
 
+    uint16_t bg_midpoint, range_midpoint;
     switch(ext->type) {
         case LV_ROTARY_TYPE_SYMMETRIC:
-            uint16_t bg_midpoint;
             if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) {
                 bg_midpoint = (ext->arc.bg_angle_start + ext->arc.bg_angle_end + 360) / 2;
             } else {
                 bg_midpoint = (ext->arc.bg_angle_start + ext->arc.bg_angle_end) / 2;
             }
             
-            int16_t range_midpoint = (ext->min_value + ext->max_value) / 2;
+            range_midpoint = (ext->min_value + ext->max_value) / 2;
             if (ext->cur_value < range_midpoint) {
                 lv_arc_set_start_angle(
                     rotary,
@@ -256,9 +256,9 @@ void lv_rotary_set_type(lv_obj_t * rotary, lv_rotary_type_t type)
     ext->type = type;
     ext->cur_value = -1; /** Force set_value handling*/
     
+    uint16_t bg_midpoint;
     switch(ext->type) {
         case LV_ROTARY_TYPE_SYMMETRIC:
-            uint16_t bg_midpoint;
             if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) {
                 bg_midpoint = (ext->arc.bg_angle_start + ext->arc.bg_angle_end + 360) / 2;
             } else {
