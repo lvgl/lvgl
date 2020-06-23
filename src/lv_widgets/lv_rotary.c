@@ -127,6 +127,40 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
  *====================*/
 
 /**
+ * Set the type of rotary.
+ * @param rotary pointer to rotary object
+ * @param type rotary type
+ */
+void lv_rotary_set_type(lv_obj_t * rotary, lv_rotary_type_t type)
+{
+    LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
+
+    lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
+    int16_t val = ext->cur_value;
+    
+    ext->type = type;
+    ext->cur_value = -1; /** Force set_value handling*/
+    
+    int16_t bg_end, bg_midpoint;
+    if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) bg_end = ext->arc.bg_angle_end + 360;
+
+    switch(ext->type) {
+        case LV_ROTARY_TYPE_SYMMETRIC:
+            bg_midpoint = (ext->arc.bg_angle_start + bg_end) / 2;
+            lv_rotary_set_start_angle(rotary, bg_midpoint);
+            lv_rotary_set_end_angle(rotary, bg_midpoint);
+            break;
+        case LV_ROTARY_TYPE_REVERSE:
+            lv_rotary_set_end_angle(rotary, ext->arc.bg_angle_end);
+            break;
+        default: /** LV_ROTARY_TYPE_NORMAL*/
+            lv_rotary_set_start_angle(rotary, ext->arc.bg_angle_start);
+    }
+
+    lv_rotary_set_value(rotary, val, false);
+}
+
+/**
  * Set a new value on the rotary
  * @param rotary pointer to a rotary object
  * @param value new value
@@ -144,30 +178,27 @@ void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
     new_value = new_value < ext->min_value ? ext->min_value : new_value;
 
     if(ext->cur_value == new_value) return;
-    
     ext->cur_value = new_value;
 
-    uint16_t bg_midpoint, range_midpoint;
+    int16_t bg_end, bg_midpoint, range_midpoint;
+    if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) bg_end = ext->arc.bg_angle_end + 360;
+    
     switch(ext->type) {
         case LV_ROTARY_TYPE_SYMMETRIC:
-            if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) {
-                bg_midpoint = (ext->arc.bg_angle_start + ext->arc.bg_angle_end + 360) / 2;
-            } else {
-                bg_midpoint = (ext->arc.bg_angle_start + ext->arc.bg_angle_end) / 2;
-            }
-            
-            range_midpoint = (ext->min_value + ext->max_value) / 2;
+            bg_midpoint = (ext->arc.bg_angle_start + bg_end) / 2;
+            range_midpoint = (int32_t)(ext->min_value + ext->max_value) / 2;
+
             if (ext->cur_value < range_midpoint) {
                 lv_arc_set_start_angle(
                     rotary,
-                    _lv_map(ext->cur_value, ext->max_value, ext->min_value, 
+                    _lv_map(ext->cur_value, ext->min_value, range_midpoint, 
                             ext->arc.bg_angle_start, bg_midpoint)
                 );
-            } else if (ext->cur_value > range_midpoint) {
+            } else {
                 lv_arc_set_start_angle(
                     rotary,
-                    _lv_map(ext->cur_value, ext->max_value, ext->min_value, 
-                            ext->arc.bg_angle_start, bg_midpoint)
+                    _lv_map(ext->cur_value, range_midpoint, ext->max_value, 
+                            bg_midpoint, bg_end)
                 );
             }
             break;
@@ -175,14 +206,14 @@ void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
             lv_arc_set_start_angle(
                 rotary,
                 _lv_map(ext->cur_value, ext->max_value, ext->min_value, 
-                        360 + ext->arc.bg_angle_end, ext->arc.bg_angle_start)
+                        bg_end, ext->arc.bg_angle_start)
             );
             break;
         default: /** LV_ROTARY_TYPE_NORMAL*/
             lv_arc_set_end_angle(
                 rotary,
                 _lv_map(ext->cur_value, ext->min_value, ext->max_value, 
-                        ext->arc.arc_angle_start, 360 + ext->arc.bg_angle_end)
+                        ext->arc.bg_angle_start, bg_end)
             );
     }
 }
@@ -239,42 +270,6 @@ void lv_rotary_set_threshold(lv_obj_t * rotary, uint16_t threshold)
 
     lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
     ext->threshold = threshold;
-}
-
-/**
- * Set the type of rotary.
- * @param rotary pointer to rotary object
- * @param type rotary type
- */
-void lv_rotary_set_type(lv_obj_t * rotary, lv_rotary_type_t type)
-{
-    LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
-
-    lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
-    int16_t val = ext->cur_value;
-    
-    ext->type = type;
-    ext->cur_value = -1; /** Force set_value handling*/
-    
-    uint16_t bg_midpoint;
-    switch(ext->type) {
-        case LV_ROTARY_TYPE_SYMMETRIC:
-            if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) {
-                bg_midpoint = (ext->arc.bg_angle_start + ext->arc.bg_angle_end + 360) / 2;
-            } else {
-                bg_midpoint = (ext->arc.bg_angle_start + ext->arc.bg_angle_end) / 2;
-            }
-            lv_rotary_set_start_angle(rotary, bg_midpoint);
-            lv_rotary_set_start_angle(rotary, bg_midpoint);
-            break;
-        case LV_ROTARY_TYPE_REVERSE:
-            lv_rotary_set_end_angle(rotary, ext->arc.bg_angle_end);
-            break;
-        default: /** LV_ROTARY_TYPE_NORMAL*/
-            lv_rotary_set_start_angle(rotary, ext->arc.bg_angle_start);
-    }
-
-    lv_rotary_set_value(rotary, val, false);
 }
 
 /*=====================

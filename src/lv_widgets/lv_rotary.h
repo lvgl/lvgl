@@ -66,6 +66,7 @@ typedef struct {
     /*New data for this type*/
     lv_style_list_t style_knob; /* Style of the knob */
     lv_area_t knob_area; /* Area of the knob */
+    uint16_t type        :2;
     int16_t cur_value; /*Current value of the rotary*/
     int16_t min_value; /*Minimum value of the rotary*/
     int16_t max_value; /*Maximum value of the rotary*/
@@ -73,7 +74,6 @@ typedef struct {
     int16_t threshold; /*Increment threshold of the rotary*/
     lv_coord_t last_drag_x; /*Last drag x coordintate of the rotary*/
     uint16_t dragging    :1;
-    uint16_t type        :2;
 
 } lv_rotary_ext_t;
 
@@ -101,6 +101,13 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy);
 /*=====================
  * Setter functions
  *====================*/
+
+/**
+ * Set the type of rotary.
+ * @param rotary pointer to rotary object
+ * @param type rotary type
+ */
+void lv_rotary_set_type(lv_obj_t * rotary, lv_rotary_type_t type);
 
 /**
  * Set a new value on the rotary
@@ -141,13 +148,6 @@ void lv_rotary_set_sensitivity(lv_obj_t * rotary, uint16_t sensitivity);
  * @param threshold increment threshold
  */
 void lv_rotary_set_threshold(lv_obj_t * rotary, uint16_t threshold);
-
-/**
- * Set the type of rotary.
- * @param rotary pointer to rotary object
- * @param type rotary type
- */
-void lv_rotary_set_type(lv_obj_t * rotary, lv_rotary_type_t type);
 
 /**
  * Set the start angle of rotary indicator. 0 deg: right, 90 bottom, etc.
@@ -264,6 +264,13 @@ static inline uint16_t lv_rotary_get_bg_angle_end(lv_obj_t * rotary) {
 }
 
 /**
+ * Get whether the rotary is type or not.
+ * @param rotary pointer to a rotary object
+ * @return rotary type
+ */
+lv_rotary_type_t lv_rotary_get_type(const lv_obj_t * rotary);
+
+/**
  * Get the value of the of a rotary
  * @param rotary pointer to a rotary object
  * @return the value of the of the rotary
@@ -290,13 +297,6 @@ int16_t lv_rotary_get_max_value(const lv_obj_t * rotary);
  * @return true: drag in progress false: not dragged
  */
 bool lv_rotary_is_dragged(const lv_obj_t * rotary);
-
-/**
- * Get whether the rotary is type or not.
- * @param rotary pointer to a rotary object
- * @return rotary type
- */
-lv_rotary_type_t lv_rotary_get_type(const lv_obj_t * rotary);
 
 /**
  * Get the current state of the rotary
