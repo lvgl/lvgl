@@ -195,7 +195,7 @@ void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
                             ext->arc.bg_angle_start, bg_midpoint)
                 );
             } else {
-                lv_arc_set_start_angle(
+                lv_arc_set_end_angle(
                     rotary,
                     _lv_map(ext->cur_value, range_midpoint, ext->max_value, 
                             bg_midpoint, bg_end)
