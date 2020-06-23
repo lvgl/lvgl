@@ -168,6 +168,14 @@ void lv_init(void)
     _lv_img_decoder_init();
     lv_img_cache_set_size(LV_IMG_CACHE_DEF_SIZE);
 
+    /*Test if the IDE has UTF-8 encoding*/
+    char * txt = "Á";
+
+    uint8_t * txt_u8 = (uint8_t *) txt;
+    if(txt_u8[0] != 0xc3 || txt_u8[1] != 0x81 || txt_u8[2] != 0x00) {
+        LV_LOG_WARN("The strings has no UTF-8 encoding. Some characters won't be displayed.")
+    }
+
     lv_initialized = true;
     LV_LOG_INFO("lv_init ready");
 }

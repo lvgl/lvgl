@@ -9,6 +9,7 @@
 - Add lv_btnmatrix_set/get_align capability
 - DMA2D: Remove dependency on ST CubeMX HAL
 - Added `max_used` propriety to `lv_mem_monitor_t` struct
+- In `lv_init` test if the the strings are UTF-8 encoded.
 
 ### Bugfixes
 - None
