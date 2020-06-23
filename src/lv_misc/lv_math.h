@@ -120,7 +120,7 @@ int64_t _lv_pow(int64_t base, int8_t exp);
  * @param in min output range
  * @param out max output range
  */
-LV_ATTRIBUTE_FAST_MEM int16_t _lv_map(int16_t x, float min_in, float max_in, float min, float max);
+LV_ATTRIBUTE_FAST_MEM int16_t _lv_map(int16_t x, int16_t min_in, int16_t max_in, int16_t min, int16_t max);
 
 /**********************
  *      MACROS
