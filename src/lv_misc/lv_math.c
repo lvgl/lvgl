@@ -241,10 +241,10 @@ int64_t _lv_pow(int64_t base, int8_t exp)
  */
 LV_ATTRIBUTE_FAST_MEM int16_t _lv_map(int16_t x, int16_t min_in, int16_t max_in, int16_t min, int16_t max)
 {
-    uint32_t slope = ((uint32_t)(max - min) * 1000) / (uint32_t)(max_in - min_in); /** times 1000 to avoid rounding errors*/
-    uint32_t bias = min - (slope * min_in) / 1000;
+    int32_t slope = ((int32_t)(max - min) * 10000) / (int32_t)(max_in - min_in); /** times 10000 to avoid rounding errors*/
+    int32_t bias = (int32_t)(min * 10000) - slope * min_in;
     
-    return bias + (slope * x) / 1000;
+    return (bias + slope * x) / 10000;
 }
 
 /**********************
