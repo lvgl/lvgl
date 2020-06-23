@@ -141,7 +141,7 @@ void lv_rotary_set_type(lv_obj_t * rotary, lv_rotary_type_t type)
     ext->type = type;
     ext->cur_value = -1; /** Force set_value handling*/
     
-    int16_t bg_end, bg_midpoint;
+    int16_t bg_midpoint, bg_end = ext->arc.bg_angle_end;
     if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) bg_end = ext->arc.bg_angle_end + 360;
 
     switch(ext->type) {
@@ -180,7 +180,7 @@ void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
     if(ext->cur_value == new_value) return;
     ext->cur_value = new_value;
 
-    int16_t bg_end, bg_midpoint, range_midpoint;
+    int16_t bg_midpoint, range_midpoint, bg_end = ext->arc.bg_angle_end;
     if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) bg_end = ext->arc.bg_angle_end + 360;
     
     switch(ext->type) {
