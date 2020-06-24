@@ -14,6 +14,7 @@
 
 ### Bugfixes
 - `lv_img` fix invalidation area when angle or zoom changes
+- Update the style handling to support Big endian MCUs
 
 ## v7.0.2 (16.06.2020)
 
