@@ -805,7 +805,7 @@ static void rotary_init(void)
     lv_style_set_pad_inner(&styles->rotary_bg, LV_STATE_DEFAULT, LV_DPX(6));
     lv_style_set_border_width(&styles->rotary_bg, LV_STATE_DEFAULT, LV_DPX(2));
     lv_style_set_line_color(&styles->rotary_bg, LV_STATE_DEFAULT, COLOR_BG_SEC);
-    lv_style_set_line_width(&styles->rotary_bg, LV_STATE_DEFAULT, LV_DPX(2));
+    lv_style_set_line_width(&styles->rotary_bg, LV_STATE_DEFAULT, LV_DPX(8));
     lv_style_set_line_rounded(&styles->rotary_bg, LV_STATE_DEFAULT, true);
 
     style_init_reset(&styles->rotary_indic);
