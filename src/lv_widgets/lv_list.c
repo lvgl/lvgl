@@ -462,7 +462,6 @@ lv_obj_t * lv_list_get_next_btn(const lv_obj_t * list, lv_obj_t * prev_btn)
  */
 int32_t lv_list_get_btn_index(const lv_obj_t * list, const lv_obj_t * btn)
 {
-    LV_ASSERT_OBJ(list, LV_OBJX_NAME);
     LV_ASSERT_OBJ(btn, "lv_btn");
 
     int index = 0;
@@ -470,6 +469,8 @@ int32_t lv_list_get_btn_index(const lv_obj_t * list, const lv_obj_t * btn)
         /* no list provided, assuming btn is part of a list */
         list = lv_obj_get_parent(lv_obj_get_parent(btn));
     }
+    LV_ASSERT_OBJ(list, LV_OBJX_NAME);
+    
     lv_obj_t * e = lv_list_get_next_btn(list, NULL);
     while(e != NULL) {
         if(e == btn) {
