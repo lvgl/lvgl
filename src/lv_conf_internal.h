@@ -266,6 +266,11 @@
 #ifndef LV_USE_GPU_STM32_DMA2D
 #define LV_USE_GPU_STM32_DMA2D  0
 #endif
+/*If enabling LV_USE_GPU_STM32_DMA2D, LV_GPU_DMA2D_CMSIS_INCLUDE must be defined to include path of CMSIS header of target processor
+e.g. "stm32f769xx.h" or "stm32f429xx.h" */
+#ifndef LV_GPU_DMA2D_CMSIS_INCLUDE
+#define LV_GPU_DMA2D_CMSIS_INCLUDE
+#endif
 
 /* 1: Enable file system (might be required for images */
 #ifndef LV_USE_FILESYSTEM
@@ -319,6 +324,12 @@
 /*=====================
  *  Compiler settings
  *====================*/
+
+/* For big endian systems set to 1 */
+#ifndef LV_BIG_ENDIAN_SYSTEM
+#define LV_BIG_ENDIAN_SYSTEM    0
+#endif
+
 /* Define a custom attribute to `lv_tick_inc` function */
 #ifndef LV_ATTRIBUTE_TICK_INC
 #define LV_ATTRIBUTE_TICK_INC
@@ -474,7 +485,7 @@
 
 /* The built-in fonts contains the ASCII range and some Symbols with  4 bit-per-pixel.
  * The symbols are available via `LV_SYMBOL_...` defines
- * More info about fonts: https://docs.lvgl.com/#Fonts
+ * More info about fonts: https://docs.lvgl.io/v7/en/html/overview/font.html
  * To create a new font go to: https://lvgl.com/ttf-font-to-c-array
  */
 
@@ -684,14 +695,14 @@
 #define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN 3
 #endif
 
-/* The control character to use for signaling text recoloring. */
+/* The control character to use for signalling text recoloring. */
 #ifndef LV_TXT_COLOR_CMD
 #define LV_TXT_COLOR_CMD "#"
 #endif
 
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
- * The direction will be processed according to the Unicode Bidirectional Algorithm:
+ * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
  * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
 #ifndef LV_USE_BIDI
 #define LV_USE_BIDI     0
