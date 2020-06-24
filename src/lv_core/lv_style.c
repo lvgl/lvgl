@@ -557,7 +557,7 @@ int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, vo
     else {
         _lv_memcpy_small(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(lv_style_int_t));
         lv_style_attr_t attr_act;
-        attr_act = get_style_prop_attr(style, id + 1);
+        attr_act = get_style_prop_attr(style, id);
 
         lv_style_attr_t attr_goal;
         attr_goal = (prop >> 8) & 0xFF;
