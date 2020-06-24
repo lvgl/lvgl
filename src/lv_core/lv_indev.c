@@ -1183,11 +1183,6 @@ static void indev_click_focus(lv_indev_proc_t * proc)
         }
         /*The object are not in the same group (in different group or one in not a group)*/
         else {
-            /*Focus to the act. its group*/
-            if(g_act) {
-                lv_group_focus_obj(indev_obj_act);
-                if(indev_reset_check(proc)) return;
-            }
             /*If the prev. obj. is not in a group then defocus it.*/
             if(g_prev == NULL && proc->types.pointer.last_pressed) {
                 lv_signal_send(proc->types.pointer.last_pressed, LV_SIGNAL_DEFOCUS, NULL);
@@ -1213,12 +1208,18 @@ static void indev_click_focus(lv_indev_proc_t * proc)
                         if(indev_reset_check(proc)) return;
                     }
                 }
+            }
 
+            /*Focus to the act. in its group*/
+             if(g_act) {
+                 lv_group_focus_obj(indev_obj_act);
+                 if(indev_reset_check(proc)) return;
+             } else {
                 lv_signal_send(indev_obj_act, LV_SIGNAL_FOCUS, NULL);
                 if(indev_reset_check(proc)) return;
                 lv_event_send(indev_obj_act, LV_EVENT_FOCUSED, NULL);
                 if(indev_reset_check(proc)) return;
-            }
+             }
         }
 #else
         if(proc->types.pointer.last_pressed) {

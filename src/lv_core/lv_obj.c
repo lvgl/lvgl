@@ -3752,7 +3752,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         lv_obj_clear_state(obj, LV_STATE_PRESSED);
     }
-#if LV_USE_GROUP
     else if(sign == LV_SIGNAL_FOCUS) {
         if(lv_group_get_editing(lv_obj_get_group(obj))) {
             uint8_t state = LV_STATE_FOCUSED;
@@ -3779,7 +3778,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
     }
-#endif
     else if(sign == LV_SIGNAL_CLEANUP) {
         lv_obj_clean_style_list(obj, LV_OBJ_PART_MAIN);
     }

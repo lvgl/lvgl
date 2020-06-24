@@ -1054,10 +1054,16 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
         }
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
-        res = lv_signal_send(page, LV_SIGNAL_DEFOCUS, NULL);
-        if(res != LV_RES_OK) return res;
-        res = lv_event_send(page, LV_EVENT_DEFOCUSED, NULL);
-        if(res != LV_RES_OK) return res;
+        bool in_group = false;
+#if LV_USE_GROUP
+        in_group =  lv_obj_get_group(page) ? true : false;
+#endif
+        if(in_group == false) {
+            res = lv_signal_send(page, LV_SIGNAL_DEFOCUS, NULL);
+            if(res != LV_RES_OK) return res;
+            res = lv_event_send(page, LV_EVENT_DEFOCUSED, NULL);
+            if(res != LV_RES_OK) return res;
+        }
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         page_ext->scrl = NULL;
