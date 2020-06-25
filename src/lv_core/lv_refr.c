@@ -490,7 +490,8 @@ static void lv_refr_area_part(const lv_area_t * area_p)
         }
     }
 
-    lv_obj_t * top_p;
+    lv_obj_t * top_act_scr = NULL;
+    lv_obj_t * top_prev_scr = NULL;
 
     /*Get the new mask from the original area and the act. VDB
      It will be a part of 'area_p'*/
@@ -498,10 +499,36 @@ static void lv_refr_area_part(const lv_area_t * area_p)
     _lv_area_intersect(&start_mask, area_p, &vdb->area);
 
     /*Get the most top object which is not covered by others*/
-    top_p = lv_refr_get_top_obj(&start_mask, lv_disp_get_scr_act(disp_refr));
+    top_act_scr = lv_refr_get_top_obj(&start_mask, lv_disp_get_scr_act(disp_refr));
+    if(disp_refr->prev_scr) {
+        top_prev_scr = lv_refr_get_top_obj(&start_mask, disp_refr->prev_scr);
+    }
 
+    /*Draw a display background if there is no top object*/
+    if(top_act_scr == NULL && top_prev_scr == NULL) {
+        lv_draw_rect_dsc_t dsc;
+        lv_draw_rect_dsc_init(&dsc);
+        dsc.bg_color = LV_COLOR_RED;
+
+        lv_draw_rect(&start_mask, &start_mask, &dsc);
+    }
+    /*Refresh the previous screen if any*/
+    if(disp_refr->prev_scr) {
+        /*Get the most top object which is not covered by others*/
+        if(top_prev_scr == NULL) {
+            top_prev_scr = disp_refr->prev_scr;
+        }
+        /*Do the refreshing from the top object*/
+        lv_refr_obj_and_children(top_prev_scr, &start_mask);
+
+    }
+
+
+    if(top_act_scr == NULL) {
+         top_act_scr = disp_refr->act_scr;
+     }
     /*Do the refreshing from the top object*/
-    lv_refr_obj_and_children(top_p, &start_mask);
+    lv_refr_obj_and_children(top_act_scr, &start_mask);
 
     /*Also refresh top and sys layer unconditionally*/
     lv_refr_obj_and_children(lv_disp_get_layer_top(disp_refr), &start_mask);

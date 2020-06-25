@@ -20,6 +20,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void scr_load_anim_start(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -115,6 +116,21 @@ void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr)
     _lv_ll_chg_list(&old_disp->scr_ll, &disp->scr_ll, scr, true);
 }
 
+void lv_scr_load_anim(lv_obj_t * scr)
+{
+    lv_disp_t * d = lv_obj_get_disp(scr);
+
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) lv_obj_set_x);
+    lv_anim_set_start_cb(&a, scr_load_anim_start);
+    lv_anim_set_time(&a, 2000);
+    lv_anim_set_delay(&a, 1000);
+    lv_anim_set_values(&a, lv_disp_get_hor_res(d), 0);
+    lv_anim_set_var(&a, scr);
+    lv_anim_start(&a);
+}
+
 /**
  * Get elapsed time since last user activity on a display (e.g. click)
  * @param disp pointer to an display (NULL to get the overall smallest inactivity)
@@ -178,3 +194,8 @@ lv_task_t * _lv_disp_get_refr_task(lv_disp_t * disp)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void scr_load_anim_start(lv_anim_t * a)
+{
+    lv_disp_load_scr(a->var);
+}
