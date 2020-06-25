@@ -24,6 +24,19 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+typedef enum {
+    LV_SCR_LOAD_ANIM_NONE,
+    LV_SCR_LOAD_ANIM_OVER_LEFT,
+    LV_SCR_LOAD_ANIM_OVER_RIGHT,
+    LV_SCR_LOAD_ANIM_OVER_TOP,
+    LV_SCR_LOAD_ANIM_OVER_BOTTOM,
+    LV_SCR_LOAD_ANIM_MOVE_LEFT,
+    LV_SCR_LOAD_ANIM_MOVE_RIGHT,
+    LV_SCR_LOAD_ANIM_MOVE_TOP,
+    LV_SCR_LOAD_ANIM_MOVE_BOTTOM,
+    LV_SCR_LOAD_ANIM_FADE_ON,
+}lv_scr_load_anim_t;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -35,6 +48,14 @@ extern "C" {
  * @return pointer to the active screen object (loaded by 'lv_scr_load()')
  */
 lv_obj_t * lv_disp_get_scr_act(lv_disp_t * disp);
+
+/**
+ * Return with a pointer to the previous screen. Only used during screen transitions.
+ * @param disp pointer to display which previous screen should be get. (NULL to use the default
+ * screen)
+ * @return pointer to the previous screen object or NULL if not used now
+ */
+lv_obj_t * lv_disp_get_scr_prev(lv_disp_t * disp);
 
 /**
  * Make a screen active
@@ -64,6 +85,41 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
  */
 void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr);
 
+
+/**
+ * Set the background color of a display
+ * @param disp pointer to a display
+ * @param color color of the background
+ */
+void lv_disp_set_bg_color(lv_disp_t * disp, lv_color_t color);
+
+/**
+ * Set the background image of a display
+ * @param disp pointer to a display
+ * @param img_src path to file or pointer to an `lv_img_dsc_t` variable
+ */
+void lv_disp_set_bg_image(lv_disp_t * disp, const void *  img_src);
+
+/**
+ * Opacity of the background
+ * @param disp pointer to a display
+ * @param opa opacity (0..255)
+ */
+void lv_disp_set_bg_opa(lv_disp_t * disp, lv_opa_t opa);
+
+#if LV_USE_ANIMATION
+
+/**
+ * Switch screen with animation
+ * @param scr pointer to the new screen to load
+ * @param anim_type type of the animation from `lv_scr_load_anim_t`. E.g.  `LV_SCR_LOAD_ANIM_MOVE_LEFT`
+ * @param time time of the animation
+ * @param delay delay before the transition
+ * @param auto_del true: automatically delete the old screen
+ */
+void lv_scr_load_anim(lv_obj_t * scr, lv_scr_load_anim_t anim_type, uint32_t time, uint32_t delay, bool auto_del);
+
+#endif
 /**
  * Get elapsed time since last user activity on a display (e.g. click)
  * @param disp pointer to an display (NULL to get the overall smallest inactivity)
@@ -122,8 +178,6 @@ static inline void lv_scr_load(lv_obj_t * scr)
     lv_disp_load_scr(scr);
 }
 
-
-void lv_scr_load_anim(lv_obj_t * scr);
 
 /**********************
  *      MACROS

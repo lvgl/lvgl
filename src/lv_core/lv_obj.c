@@ -501,10 +501,12 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 
     if(lv_obj_get_hidden(obj)) return;
 
-    /*Invalidate the object only if it belongs to the 'LV_GC_ROOT(_lv_act_scr)'*/
+    /*Invalidate the object only if it belongs to the curent or previous'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
     lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
-    if(obj_scr == lv_disp_get_scr_act(disp) || obj_scr == lv_disp_get_layer_top(disp) ||
+    if(obj_scr == lv_disp_get_scr_act(disp) ||
+       obj_scr == lv_disp_get_scr_prev(disp) ||
+       obj_scr == lv_disp_get_layer_top(disp) ||
        obj_scr == lv_disp_get_layer_sys(disp)) {
 
         /*Truncate the area to the object*/

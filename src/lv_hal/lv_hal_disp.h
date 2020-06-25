@@ -146,10 +146,16 @@ typedef struct _disp_t {
 
     /** Screens of the display*/
     lv_ll_t scr_ll;
-    struct _lv_obj_t * act_scr; /**< Currently active screen on this display */
-    struct _lv_obj_t * prev_scr; /**< Previous screen. Used during screen animations */
+    struct _lv_obj_t * act_scr;   /**< Currently active screen on this display */
+    struct _lv_obj_t * prev_scr;  /**< Previous screen. Used during screen animations */
     struct _lv_obj_t * top_layer; /**< @see lv_disp_get_layer_top */
     struct _lv_obj_t * sys_layer; /**< @see lv_disp_get_layer_sys */
+
+    uint8_t del_prev  :1;         /**< 1: Automatically delete the previous screen when the screen load animation is ready */
+
+    lv_color_t bg_color;          /**< Default display color when screens are transparent*/
+    const void * bg_img;       /**< An image source to display as wallpaper*/
+    lv_opa_t bg_opa;              /**<Opacity of the background color or wallpaper */
 
     /** Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];

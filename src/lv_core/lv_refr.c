@@ -506,11 +506,28 @@ static void lv_refr_area_part(const lv_area_t * area_p)
 
     /*Draw a display background if there is no top object*/
     if(top_act_scr == NULL && top_prev_scr == NULL) {
-        lv_draw_rect_dsc_t dsc;
-        lv_draw_rect_dsc_init(&dsc);
-        dsc.bg_color = LV_COLOR_RED;
+        if(disp_refr->bg_img) {
+            lv_draw_img_dsc_t dsc;
+            lv_draw_img_dsc_init(&dsc);
+            dsc.opa = disp_refr->bg_opa;
+            lv_img_header_t header;
+            lv_res_t res;
+            res = lv_img_decoder_get_info(disp_refr->bg_img, &header);
+            if(res == LV_RES_OK) {
+                lv_area_t a;
+                lv_area_set(&a, 0, 0, header.w - 1, header.h - 1);
+                lv_draw_img(&a, &start_mask, disp_refr->bg_img, &dsc);
+            } else {
+                LV_LOG_WARN("Can't draw the background image")
+            }
+        } else {
+            lv_draw_rect_dsc_t dsc;
+            lv_draw_rect_dsc_init(&dsc);
+            dsc.bg_color = disp_refr->bg_color;
+            dsc.bg_opa = disp_refr->bg_opa;
+            lv_draw_rect(&start_mask, &start_mask, &dsc);
 
-        lv_draw_rect(&start_mask, &start_mask, &dsc);
+        }
     }
     /*Refresh the previous screen if any*/
     if(disp_refr->prev_scr) {

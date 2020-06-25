@@ -89,6 +89,9 @@ void _lv_img_decoder_init(void)
 lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header)
 {
     header->always_zero = 0;
+    header->h = 0;
+    header->w = 0;
+    header->cf = LV_IMG_CF_UNKNOWN;
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
