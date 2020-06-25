@@ -25,6 +25,7 @@ Available in the `dev` branch
 - DMA2D: Remove dependency on ST CubeMX HAL
 - Added `max_used` propriety to `lv_mem_monitor_t` struct
 - In `lv_init` test if the the strings are UTF-8 encoded.
+- Add `user_data` to themes
 
 ### Bugfixes
 - `lv_img` fix invalidation area when angle or zoom changes
