@@ -155,6 +155,7 @@ typedef struct {
     const lv_font_t * font_subtitle;
     const lv_font_t * font_title;
     uint32_t flags;
+    lv_theme_user_data_t  user_data;
 } lv_theme_t;
 
 /**********************
