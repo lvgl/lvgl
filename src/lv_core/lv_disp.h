@@ -211,6 +211,11 @@ static inline void lv_scr_load(lv_obj_t * scr)
  */
 #define LV_DPX(n)   LV_MATH_MAX((( lv_disp_get_dpi(NULL) * (n) + 80) / 160), 1) /*+80 for rounding*/
 
+static inline lv_coord_t lv_dpx(lv_coord_t n)
+{
+    return LV_DPX(n);
+}
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
