@@ -403,60 +403,39 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
 
     if(sign == LV_SIGNAL_PRESSED) {
         lv_indev_get_point(param, &p);
-        lv_indev_get_point(lv_indev_get_act(), &ext->last_press_point);
+
+        ext->last_drag_x = p.x;
         ext->dragging = true;
+
     }
     else if(sign == LV_SIGNAL_PRESSING) {
-        lv_indev_t * indev = lv_indev_get_act();
-        if(indev == NULL) return res;
+        lv_indev_get_point(param, &p);
+        lv_coord_t drag_x_diff = p.x -ext->last_drag_x;
 
-        lv_indev_type_t indev_type = lv_indev_get_type(indev);
-        lv_point_t p;
-        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
-            p.x = rotary->coords.x1 + lv_obj_get_width(rotary) / 2;
-            p.y = rotary->coords.y1 + lv_obj_get_height(rotary) / 2;
+        if (LV_MATH_ABS(drag_x_diff) > ext->threshold) {
+            if (drag_x_diff > 0) drag_x_diff = ext->threshold;
+            else drag_x_diff = -ext->threshold;
         }
-        else {
-            lv_indev_get_point(indev, &p);
+        ext->last_drag_x = p.x;
+
+        if (ext->knob_area.y1 < p.y && p.y < ext->knob_area.y2) {
+            if (drag_x_diff > 0 && p.x < ext->knob_area.x2) {
+                lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_x_diff * ext->sensitivity, LV_ANIM_ON);
+                res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
+                if(res != LV_RES_OK) return res;
+            }
+            else if (drag_x_diff < 0 && p.x > ext->knob_area.x1) {
+                ext->last_drag_x = p.x;
+                lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_x_diff * ext->sensitivity, LV_ANIM_ON);
+                res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
+                if(res != LV_RES_OK) return res;
+            }
         }
 
-        if((LV_MATH_ABS(p.x - ext->last_press_point.x) > indev->driver.drag_limit / 2) ||
-           (LV_MATH_ABS(p.y - ext->last_press_point.y) > indev->driver.drag_limit / 2)) {
-            ext->last_press_point.x = p.x;
-            ext->last_press_point.y = p.y;
-        }
-
-        /*Make point 0 relative to the rotary*/
-        p.x -= rotary->coords.x1;
-        p.y -= rotary->coords.y1;
-
-        /*Ignore pressing in the inner area*/
-        int16_t angle;
-        lv_coord_t r_in = lv_area_get_width(&ext->knob_area) / 2;
-
-        p.x -= r_in;
-        p.y -= r_in;
-        bool on_ring = true;
-        if(p.x * p.x + p.y * p.y < r_in * r_in) {
-            return res; /*Set the angle only if pressed on the ring*/
-        }
-        angle = _lv_atan2(p.x, p.y) % 360;
-        
-        int16_t bg_end = ext->arc.bg_angle_end;
-        if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) {
-            bg_end = ext->arc.bg_angle_end + 360;
-            if (angle < ext->arc.bg_angle_start) angle += 360;
-        } 
-
-        lv_rotary_set_value(
-            rotary,
-            _lv_map(angle, ext->arc.bg_angle_start, bg_end,
-                    ext->min_value, ext->max_value),
-            LV_ANIM_OFF
-        );
     }
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         ext->dragging = false;
+
 #if LV_USE_GROUP
         /*Leave edit mode if released. (No need to wait for LONG_PRESS) */
         lv_group_t * g             = lv_obj_get_group(rotary);
@@ -466,6 +445,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
             if(editing) lv_group_set_editing(g, false);
         }
 #endif
+
     }
     else if(sign == LV_SIGNAL_CONTROL) {
         char c = *((char *)param);
