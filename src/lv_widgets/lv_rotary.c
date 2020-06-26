@@ -166,18 +166,18 @@ void lv_rotary_set_type(lv_obj_t * rotary, lv_rotary_type_t type)
  * @param value new value
  * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
-void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim)
+bool lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim)
 {
     LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
 
     lv_rotary_ext_t * ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
-    if(ext->cur_value == value) return;
+    if(ext->cur_value == value) return false;
 
     int16_t new_value;
     new_value = value > ext->max_value ? ext->max_value : value;
     new_value = new_value < ext->min_value ? ext->min_value : new_value;
 
-    if(ext->cur_value == new_value) return;
+    if(ext->cur_value == new_value) return false;
     ext->cur_value = new_value;
 
     int16_t bg_midpoint, range_midpoint, bg_end = ext->arc.bg_angle_end;
@@ -216,6 +216,7 @@ void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
                         ext->arc.bg_angle_start, bg_end)
             );
     }
+    return true;
 }
 
 /**
@@ -420,15 +421,17 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
 
         if (ext->knob_area.y1 < p.y && p.y < ext->knob_area.y2) {
             if (drag_x_diff > 0 && p.x < ext->knob_area.x2) {
-                lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_x_diff * ext->sensitivity, LV_ANIM_ON);
-                res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
-                if(res != LV_RES_OK) return res;
+                if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_x_diff * ext->sensitivity, LV_ANIM_ON)) {
+                    res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
+                    if(res != LV_RES_OK) return res;
+                }
             }
             else if (drag_x_diff < 0 && p.x > ext->knob_area.x1) {
                 ext->last_drag_x = p.x;
-                lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_x_diff * ext->sensitivity, LV_ANIM_ON);
-                res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
-                if(res != LV_RES_OK) return res;
+                if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_x_diff * ext->sensitivity, LV_ANIM_ON)) {
+                    res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
+                    if(res != LV_RES_OK) return res;
+                }
             }
         }
     }
@@ -450,14 +453,16 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         char c = *((char *)param);
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
-            lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + ext->sensitivity, LV_ANIM_ON);
-            res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return res;
+            if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + ext->sensitivity, LV_ANIM_ON)) {
+                res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
+                if(res != LV_RES_OK) return res;
+            }
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
-            lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) - ext->sensitivity, LV_ANIM_ON);
-            res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return res;
+            if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) - ext->sensitivity, LV_ANIM_ON)) {
+                res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
+                if(res != LV_RES_OK) return res;
+            }
         }
     }
     else if(sign == LV_SIGNAL_CLEANUP) {

@@ -114,8 +114,9 @@ void lv_rotary_set_type(lv_obj_t * rotary, lv_rotary_type_t type);
  * @param rotary pointer to a rotary object
  * @param value new value
  * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
+ * @return true if value changed, otw false
  */
-void lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim);
+bool lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim);
 
 /**
  * Set minimum and the maximum values of a rotary
