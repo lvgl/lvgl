@@ -412,14 +412,19 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         lv_coord_t drag_x_diff = p.x -ext->last_press_point.x;
         lv_coord_t drag_y_diff = p.y -ext->last_press_point.y;
 
+        if (LV_MATH_ABS(drag_x_diff) > ext->threshold) {
+            if (drag_x_diff > 0) drag_x_diff = ext->threshold;
+            else drag_x_diff = -ext->threshold;
+        }
+        if (LV_MATH_ABS(drag_y_diff) > ext->threshold) {
+            if (drag_y_diff > 0) drag_x_diff = ext->threshold;
+            else drag_y_diff = -ext->threshold;
+        }
+        ext->last_press_point.x = ext->last_press_point.x + drag_x_diff;
+        ext->last_press_point.y = ext->last_press_point.y + drag_y_diff;
+
         if (LV_MATH_ABS(drag_x_diff) > LV_MATH_ABS(drag_y_diff)) drag_diff = drag_x_diff;
         else drag_diff = drag_y_diff;
-
-        if (LV_MATH_ABS(drag_diff) > ext->threshold) {
-            if (drag_diff > 0) drag_diff = ext->threshold;
-            else drag_diff = -ext->threshold;
-        }
-        ext->last_drag_x = p.x;
 
         if (ext->knob_area.y1 < p.y && p.y < ext->knob_area.y2) {
             if (drag_diff > 0 && p.x < ext->knob_area.x2) {
