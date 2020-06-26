@@ -420,8 +420,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
             if (drag_y_diff > 0) drag_x_diff = ext->threshold;
             else drag_y_diff = -ext->threshold;
         }
-        ext->last_press_point.x = ext->last_press_point.x + drag_x_diff;
-        ext->last_press_point.y = ext->last_press_point.y + drag_y_diff;
+        ext->last_press_point = p;
 
         if (LV_MATH_ABS(drag_x_diff) > LV_MATH_ABS(drag_y_diff)) drag_diff = drag_x_diff;
         else drag_diff = drag_y_diff;
