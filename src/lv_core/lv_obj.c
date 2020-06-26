@@ -968,7 +968,7 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
 
-    obj_align_core(obj, base, align, true, true, x_ofs, y_ofs);
+    obj_align_origo_core(obj, base, align, true, true, x_ofs, y_ofs);
 
 #if LV_USE_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
@@ -978,6 +978,49 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
     obj->realign.base        = base;
     obj->realign.origo_align = 1;
 #endif
+}
+
+/**
+ * Align an object's middle point to an other object horizontally.
+ * @param obj pointer to an object to align
+ * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
+ * @param align type of alignment (see 'lv_align_t' enum)
+ * @param x_ofs x coordinate offset after alignment
+ */
+void lv_obj_align_origo_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    if(base == NULL) {
+        base = lv_obj_get_parent(obj);
+    }
+
+    LV_ASSERT_OBJ(base, LV_OBJX_NAME);
+
+
+    obj_align_origo_core(obj, base, align, true, false, x_ofs, 0);
+}
+
+
+/**
+ * Align an object's middle point to an other object vertically.
+ * @param obj pointer to an object to align
+ * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
+ * @param align type of alignment (see 'lv_align_t' enum)
+ * @param y_ofs y coordinate offset after alignment
+ */
+void lv_obj_align_origo_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    if(base == NULL) {
+        base = lv_obj_get_parent(obj);
+    }
+
+    LV_ASSERT_OBJ(base, LV_OBJX_NAME);
+
+
+    obj_align_origo_core(obj, base, align, true, false, 0, y_ofs);
 }
 
 /**
