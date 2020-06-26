@@ -72,7 +72,7 @@ typedef struct {
     int16_t max_value; /*Maximum value of the rotary*/
     int16_t sensitivity; /*Increment multiplier of the rotary*/
     int16_t threshold; /*Increment threshold of the rotary*/
-    lv_coord_t last_drag_x; /*Last drag x coordintate of the rotary*/
+    lv_point_t last_press_point; /*Last drag point of the rotary*/
     uint16_t dragging    :1;
 
 } lv_rotary_ext_t;

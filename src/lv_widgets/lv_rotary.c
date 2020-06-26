@@ -403,32 +403,34 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
     lv_point_t p;
 
     if(sign == LV_SIGNAL_PRESSED) {
-        lv_indev_get_point(param, &p);
-
-        ext->last_drag_x = p.x;
+        lv_indev_get_point(lv_indev_get_act(), &ext->last_press_point);
         ext->dragging = true;
-
     }
     else if(sign == LV_SIGNAL_PRESSING) {
         lv_indev_get_point(param, &p);
-        lv_coord_t drag_x_diff = p.x -ext->last_drag_x;
+        lv_coord_t drag_diff;
+        lv_coord_t drag_x_diff = p.x -ext->last_press_point.x;
+        lv_coord_t drag_y_diff = p.y -ext->last_press_point.y;
 
-        if (LV_MATH_ABS(drag_x_diff) > ext->threshold) {
-            if (drag_x_diff > 0) drag_x_diff = ext->threshold;
-            else drag_x_diff = -ext->threshold;
+        if (LV_MATH_ABS(drag_x_diff) > LV_MATH_ABS(drag_y_diff)) drag_diff = drag_x_diff;
+        else drag_diff = drag_y_diff;
+
+        if (LV_MATH_ABS(drag_diff) > ext->threshold) {
+            if (drag_diff > 0) drag_diff = ext->threshold;
+            else drag_diff = -ext->threshold;
         }
         ext->last_drag_x = p.x;
 
         if (ext->knob_area.y1 < p.y && p.y < ext->knob_area.y2) {
-            if (drag_x_diff > 0 && p.x < ext->knob_area.x2) {
-                if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_x_diff * ext->sensitivity, LV_ANIM_ON)) {
+            if (drag_diff > 0 && p.x < ext->knob_area.x2) {
+                if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_diff * ext->sensitivity, LV_ANIM_ON)) {
                     res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
                     if(res != LV_RES_OK) return res;
                 }
             }
-            else if (drag_x_diff < 0 && p.x > ext->knob_area.x1) {
+            else if (drag_diff < 0 && p.x > ext->knob_area.x1) {
                 ext->last_drag_x = p.x;
-                if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_x_diff * ext->sensitivity, LV_ANIM_ON)) {
+                if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_diff * ext->sensitivity, LV_ANIM_ON)) {
                     res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
                     if(res != LV_RES_OK) return res;
                 }
