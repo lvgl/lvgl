@@ -11,6 +11,8 @@ Available in the `dev` branch
 - Add `lv_chart_get_x_start_point()` function - Get the current index of the x-axis start point in the data array
 - Add `lv_chart_get_point_id()` function - Get an individual point value in the chart series directly based on index
 - Add `ext_buf_assigned` bit field to `lv_chart_series_t` structure - it's true if external buffer is assigned to series
+- Add `lv_chart_set_series_axis()` to assign series to primary or secondary axis
+- Add `lv_chart_set_y_range()` to allow setting range of secondary y axis (based on `lv_chart_set_range` but extended with an axis parameter)
 - Allow setting different font for the selected text in `lv_roller`
 - Add `theme->apply_cb` to replace `theme->apply_xcb` to make it compatible with the MicroPython binding
 - Add `lv_theme_set_base()` to allow easy extension of built-in (or any) themes.

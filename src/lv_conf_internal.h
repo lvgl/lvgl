@@ -289,6 +289,9 @@
 #ifndef LV_USE_API_EXTENSION_V6
 #define LV_USE_API_EXTENSION_V6  1
 #endif
+#ifndef LV_USE_API_EXTENSION_V7
+#define LV_USE_API_EXTENSION_V7  1
+#endif
 
 /*========================
  * Image decoder and cache

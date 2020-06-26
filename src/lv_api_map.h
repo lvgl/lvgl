@@ -176,17 +176,33 @@ static inline lv_obj_t * lv_page_get_scrl(lv_obj_t * page)
 }
 #endif
 
+
+#endif /*LV_USE_API_EXTENSION_V6*/
+
+
+
+
+/*---------------------
+ * V7.0 COMPATIBILITY
+ *--------------------*/
+#if LV_USE_API_EXTENSION_V7
 #if LV_USE_WIN
 
 static inline lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src)
 {
-	return lv_win_add_btn_right(win, img_src);
+    return lv_win_add_btn_right(win, img_src);
 }
 
 #endif
 
-#endif /*LV_USE_API_EXTENSION_V6*/
+#if LV_USE_CHART
+static inline void lv_chart_set_range(lv_obj_t * chart, lv_coord_t ymin, lv_coord_t ymax)
+{
+    lv_chart_set_y_range(chart, LV_CHART_AXIS_PRIMARY_Y, ymin,  ymax);
+}
+#endif
 
+#endif /*LV_USE_API_EXTENSION_V6*/
 /**********************
  *      MACROS
  **********************/
