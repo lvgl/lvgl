@@ -2,7 +2,6 @@
 
 ## v7.1.0 (planned on 07.07.2020)
 *Available in the `master` branch*
-- Change some lv_style_t methods to support big endian hardware.
 
 ### New features
 - Add `focus_parent` attribute to `lv_obj`
@@ -16,6 +15,8 @@
 ### Bugfixes
 - `lv_img` fix invalidation area when angle or zoom changes
 - Update the style handling to support Big endian MCUs
+- Change some methods to support big endian hardware.
+- Add LV_BIG_ENDIAN_SYSTEM flag to lv_conf.h in order to fix displaying images on big endian systems.
 
 ## v7.0.2 (16.06.2020)
 
