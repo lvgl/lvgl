@@ -114,7 +114,7 @@ typedef enum {
 #endif
 #if LV_USE_SPINBOX
     LV_THEME_SPINBOX,
-    LV_THEME_SPINBOX_BTN,   /*Button extra for spinbox*/
+    LV_THEME_SPINBOX_BTN,   /*Control button for the spinbox*/
 #endif
 #if LV_USE_SPINNER
     LV_THEME_SPINNER,
@@ -149,6 +149,7 @@ typedef enum {
 typedef struct _lv_theme_t {
     void (*apply_xcb)(lv_obj_t *, lv_theme_style_t); /*Deprecated: use `apply_cb` instead*/
     void (*apply_cb)(struct _lv_theme_t *, lv_obj_t *, lv_theme_style_t);
+    struct _lv_theme_t * base_theme;    /**< Apply the current theme's style on top of this theme.*/
     lv_color_t color_primary;
     lv_color_t color_secondary;
     const lv_font_t * font_small;
@@ -176,9 +177,21 @@ void lv_theme_set_act(lv_theme_t * th);
  */
 lv_theme_t * lv_theme_get_act(void);
 
-
+/**
+ * Apply the active theme on an object
+ * @param obj pointer to an object
+ * @param name the name of the theme element to apply. E.g. `LV_THEME_BTN`
+ */
 void lv_theme_apply(lv_obj_t * obj, lv_theme_style_t name);
 
+/**
+ * Set a base theme for a theme.
+ * The styles from the base them will be added before the styles of the current theme.
+ * Arbitrary long chain of themes can be created by setting base themes.
+ * @param new pointer to theme which base should be set
+ * @param base pointer to the base theme
+ */
+void lv_theme_set_base(lv_theme_t * new, lv_theme_t * base);
 
 /**
  * Get the small font of the theme
@@ -221,7 +234,6 @@ lv_color_t lv_theme_get_color_secondary(void);
  * @return the flags
  */
 uint32_t lv_theme_get_flags(void);
-
 
 /**********************
  *    MACROS

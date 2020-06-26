@@ -47,6 +47,9 @@ extern "C" {
 #define LV_EXT_CLICK_AREA_TINY  1
 #define LV_EXT_CLICK_AREA_FULL  2
 
+#define _LV_OBJ_PART_VIRTUAL_FIRST 0x01
+#define _LV_OBJ_PART_REAL_FIRST    0x40
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -247,8 +250,8 @@ typedef struct _lv_obj_t {
 
 enum {
     LV_OBJ_PART_MAIN,
-    _LV_OBJ_PART_VIRTUAL_LAST = 0x01,
-    _LV_OBJ_PART_REAL_LAST =    0x40,
+    _LV_OBJ_PART_VIRTUAL_LAST = _LV_OBJ_PART_VIRTUAL_FIRST,
+    _LV_OBJ_PART_REAL_LAST =    _LV_OBJ_PART_REAL_FIRST,
     LV_OBJ_PART_ALL = 0xFF,
 };
 

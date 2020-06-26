@@ -44,7 +44,6 @@ static inline void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint
 static inline void rle_init(const uint8_t * in,  uint8_t bpp);
 static inline uint8_t rle_next(void);
 
-
 /**********************
  *  STATIC VARIABLES
  **********************/

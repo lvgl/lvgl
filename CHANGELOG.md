@@ -9,10 +9,11 @@ Available in the `dev` branch
 - Add `lv_chart_set_ext_array()` function - Set an external array of data points to use for the chart
 - Add `lv_chart_set_point_id()` function - Set an individual point value in the chart series directly based on index
 - Add `lv_chart_get_x_start_point()` function - Get the current index of the x-axis start point in the data array
-- Add `lv_chart_get_point_id()` funtion - Get an individual point value in the chart series directly based on index
+- Add `lv_chart_get_point_id()` function - Get an individual point value in the chart series directly based on index
 - Add `ext_buf_assigned` bit field to `lv_chart_series_t` structure - it's true if external buffer is assigned to series
 - Allow setting different font for the selected text in `lv_roller`
-- Add `theme->apply_cb` to replace `theme->apply_xcb` to make it compatible with the Micropython binding
+- Add `theme->apply_cb` to replace `theme->apply_xcb` to make it compatible with the MicroPython binding
+- Add `lv_theme_set_base()` to allow easy extension of built-in (or any) themes.
 
 ## v7.1.0 (planned on 07.07.2020)
 *Available in the `master` branch*
