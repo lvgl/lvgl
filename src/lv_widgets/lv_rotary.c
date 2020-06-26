@@ -434,7 +434,6 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
                 }
             }
             else if (drag_diff < 0 && p.x > ext->knob_area.x1) {
-                ext->last_drag_x = p.x;
                 if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_diff * ext->sensitivity, LV_ANIM_ON)) {
                     res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
                     if(res != LV_RES_OK) return res;
