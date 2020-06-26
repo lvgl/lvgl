@@ -15,8 +15,9 @@ Available in the `dev` branch
 - Add `lv_chart_set_y_range()` to allow setting range of secondary y axis (based on `lv_chart_set_range` but extended with an axis parameter)
 - Allow setting different font for the selected text in `lv_roller`
 - Add `theme->apply_cb` to replace `theme->apply_xcb` to make it compatible with the MicroPython binding
-- Add `lv_theme_set_base()` to allow easy extension of built-in (or any) themes.
+- Add `lv_theme_set_base()` to allow easy extension of built-in (or any) themes
 - Add `lv_obj_align_x()` and `lv_obj_align_y()` functions
+- Add `lv_obj_align_origo_x()` and `lv_obj_align_origo_y()` functions
 
 ## v7.1.0 (planned on 07.07.2020)
 *Available in the `master` branch*
