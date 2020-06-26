@@ -85,7 +85,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->min_value = 0;
     ext->max_value = 0;
     ext->sensitivity = 1;
-    ext->threshold = 1;
+    ext->threshold = 10;
     ext->dragging = false;
     ext->type = LV_ROTARY_TYPE_NORMAL;
     lv_style_list_init(&ext->style_knob);
@@ -194,7 +194,9 @@ bool lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
                     _lv_map(ext->cur_value, ext->min_value, range_midpoint, 
                             ext->arc.bg_angle_start, bg_midpoint)
                 );
+                lv_arc_set_end_angle(rotary, bg_midpoint);
             } else {
+                lv_arc_set_start_angle(rotary, bg_midpoint);
                 lv_arc_set_end_angle(
                     rotary,
                     _lv_map(ext->cur_value, range_midpoint, ext->max_value, 
@@ -407,32 +409,6 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         ext->dragging = true;
     }
     else if(sign == LV_SIGNAL_PRESSING) {
-        // lv_indev_get_point(param, &p);
-        // lv_coord_t drag_diff;
-        // lv_coord_t drag_x_diff = p.x -ext->last_press_point.x;
-
-        // if (LV_MATH_ABS(drag_x_diff) > ext->threshold) {
-        //     if (drag_x_diff > 0) drag_x_diff = ext->threshold;
-        //     else drag_x_diff = -ext->threshold;
-        // }
-        // drag_diff = drag_x_diff;
-        // ext->last_press_point = p;
-
-        // if (ext->knob_area.y1 < p.y && p.y < ext->knob_area.y2) {
-        //     if (drag_diff > 0 && p.x < ext->knob_area.x2) {
-        //         if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_diff * ext->sensitivity, LV_ANIM_ON)) {
-        //             res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
-        //             if(res != LV_RES_OK) return res;
-        //         }
-        //     }
-        //     else if (drag_diff < 0 && p.x > ext->knob_area.x1) {
-        //         if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_diff * ext->sensitivity, LV_ANIM_ON)) {
-        //             res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
-        //             if(res != LV_RES_OK) return res;
-        //         }
-        //     }
-        // }
-
         lv_indev_t * indev = lv_indev_get_act();
         if(indev == NULL) return res;
 
@@ -471,24 +447,26 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
 
         p.x -= r_in;
         p.y -= r_in;
-        bool on_ring = true;
         if(p.x * p.x + p.y * p.y < r_in * r_in) {
             return res; /*Set the angle only if pressed on the ring*/
         }
-        angle = _lv_atan2(p.x, p.y) % 360;
-        
-        int16_t bg_end = ext->arc.bg_angle_end;
+
+        int16_t bg_midpoint, bg_zero, bg_end = ext->arc.bg_angle_end;
         if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) {
             bg_end = ext->arc.bg_angle_end + 360;
-            if (angle < ext->arc.bg_angle_start) angle += 360;
-        } 
+        }
+        bg_zero = (((ext->arc.bg_angle_start + bg_end) / 2) + 180) % 360;
 
-        lv_rotary_set_value(
-            rotary,
-            _lv_map(angle, ext->arc.bg_angle_start, bg_end,
-                    ext->min_value, ext->max_value),
-            LV_ANIM_OFF
-        );
+        angle = (_lv_atan2(p.x, p.y) + bg_zero) % 360;
+        if (bg_end > 360 && angle < ext->arc.bg_angle_start) angle += 360;
+
+        int16_t new_value = _lv_map(angle, ext->arc.bg_angle_start, bg_end, ext->max_value, ext->min_value);
+        if (LV_MATH_ABS(ext->cur_value - new_value) < ext->threshold) {
+            if (lv_rotary_set_value(rotary, new_value, LV_ANIM_OFF)) {
+                res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
+                if(res != LV_RES_OK) return res;
+            }
+        }
     }
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         ext->dragging = false;
