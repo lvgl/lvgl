@@ -405,7 +405,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         lv_indev_get_point(param, &p);
 
         lv_indev_get_point(lv_indev_get_act(), &ext->last_press_point);
-        res = double_click_reset(cpicker);
+        res = double_click_reset(rotary);
         if(res != LV_RES_OK) return res;
         ext->dragging = true;
     }
