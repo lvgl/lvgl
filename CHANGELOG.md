@@ -16,6 +16,7 @@ Available in the `dev` branch
 - Allow setting different font for the selected text in `lv_roller`
 - Add `theme->apply_cb` to replace `theme->apply_xcb` to make it compatible with the MicroPython binding
 - Add `lv_theme_set_base()` to allow easy extension of built-in (or any) themes.
+- Add `lv_obj_align_x()` and `lv_obj_align_y()` functions
 
 ## v7.1.0 (planned on 07.07.2020)
 *Available in the `master` branch*
