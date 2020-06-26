@@ -98,7 +98,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_click(rotary, true);
         lv_obj_add_protect(rotary, LV_PROTECT_PRESS_LOST);
-        
+        lv_obj_set_ext_click_area(rotary, LV_DPI / 10, LV_DPI / 10, LV_DPI / 10, LV_DPI / 10);
 
         lv_theme_apply(rotary, LV_THEME_ROTARY);
     }
@@ -579,7 +579,6 @@ static void draw_knob(lv_obj_t * rotary, const lv_area_t * clip_area)
         lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
     }
     
-    lv_obj_set_ext_click_area(rotary, knob_area.x1, knob_area.x2, knob_area.y1, knob_area.y2);
     lv_area_copy(&ext->knob_area, &knob_area);
 }
 
