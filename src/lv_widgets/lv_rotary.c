@@ -435,9 +435,8 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         p.y -= rotary->coords.y1;
 
         /*Ignore pressing in the inner area*/
-        uint16_t w = lv_obj_get_width(rotary);
         int16_t angle;
-        lv_coord_t r_in = lv_area_get_width(ext->knob_area) / 2;
+        lv_coord_t r_in = lv_area_get_width(&ext->knob_area) / 2;
 
         p.x -= r_in;
         p.y -= r_in;
@@ -456,7 +455,8 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         lv_rotary_set_value(
             rotary,
             _lv_map(angle, ext->arc.bg_angle_start, bg_end,
-                    ext->min_value, ext->max_value)
+                    ext->min_value, ext->max_value),
+            LV_ANIM_OFF
         );
     }
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
