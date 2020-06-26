@@ -98,7 +98,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_obj_set_click(rotary, true);
         lv_obj_add_protect(rotary, LV_PROTECT_PRESS_LOST);
-        lv_obj_set_ext_click_area(rotary, 0, 0, LV_DPI / 10, LV_DPI / 10);
+        
 
         lv_theme_apply(rotary, LV_THEME_ROTARY);
     }
@@ -407,31 +407,88 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         ext->dragging = true;
     }
     else if(sign == LV_SIGNAL_PRESSING) {
-        lv_indev_get_point(param, &p);
-        lv_coord_t drag_diff;
-        lv_coord_t drag_x_diff = p.x -ext->last_press_point.x;
+        // lv_indev_get_point(param, &p);
+        // lv_coord_t drag_diff;
+        // lv_coord_t drag_x_diff = p.x -ext->last_press_point.x;
+
+        // if (LV_MATH_ABS(drag_x_diff) > ext->threshold) {
+        //     if (drag_x_diff > 0) drag_x_diff = ext->threshold;
+        //     else drag_x_diff = -ext->threshold;
+        // }
+        // drag_diff = drag_x_diff;
+        // ext->last_press_point = p;
+
+        // if (ext->knob_area.y1 < p.y && p.y < ext->knob_area.y2) {
+        //     if (drag_diff > 0 && p.x < ext->knob_area.x2) {
+        //         if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_diff * ext->sensitivity, LV_ANIM_ON)) {
+        //             res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
+        //             if(res != LV_RES_OK) return res;
+        //         }
+        //     }
+        //     else if (drag_diff < 0 && p.x > ext->knob_area.x1) {
+        //         if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_diff * ext->sensitivity, LV_ANIM_ON)) {
+        //             res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
+        //             if(res != LV_RES_OK) return res;
+        //         }
+        //     }
+        // }
+
+        lv_indev_t * indev = lv_indev_get_act();
+        if(indev == NULL) return res;
+
+        lv_indev_type_t indev_type = lv_indev_get_type(indev);
+        lv_point_t p;
+        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
+            p.x = rotary->coords.x1 + lv_obj_get_width(rotary) / 2;
+            p.y = rotary->coords.y1 + lv_obj_get_height(rotary) / 2;
+        }
+        else {
+            lv_indev_get_point(indev, &p);
+        }
+
+        lv_coord_t drag_x_diff = p.x - ext->last_press_point.x;
+        lv_coord_t drag_y_diff = p.y - ext->last_press_point.y;
 
         if (LV_MATH_ABS(drag_x_diff) > ext->threshold) {
-            if (drag_x_diff > 0) drag_x_diff = ext->threshold;
-            else drag_x_diff = -ext->threshold;
+            if (drag_x_diff > 0) p.x = ext->last_press_point.x + ext->threshold;
+            else p.x = ext->last_press_point.x - ext->threshold;
         }
-        drag_diff = drag_x_diff;
-        ext->last_press_point = p;
+        if (LV_MATH_ABS(drag_y_diff) > ext->threshold) {
+            if (drag_y_diff > 0) p.y = ext->last_press_point.y + ext->threshold;
+            else p.y = ext->last_press_point.y - ext->threshold;
+        }
 
-        if (ext->knob_area.y1 < p.y && p.y < ext->knob_area.y2) {
-            if (drag_diff > 0 && p.x < ext->knob_area.x2) {
-                if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_diff * ext->sensitivity, LV_ANIM_ON)) {
-                    res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
-                    if(res != LV_RES_OK) return res;
-                }
-            }
-            else if (drag_diff < 0 && p.x > ext->knob_area.x1) {
-                if (lv_rotary_set_value(rotary, lv_rotary_get_value(rotary) + drag_diff * ext->sensitivity, LV_ANIM_ON)) {
-                    res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
-                    if(res != LV_RES_OK) return res;
-                }
-            }
+        ext->last_press_point.x = p.x;
+        ext->last_press_point.y = p.y;
+
+        /*Make point 0 relative to the rotary*/
+        p.x -= rotary->coords.x1;
+        p.y -= rotary->coords.y1;
+
+        /*Ignore pressing in the inner area*/
+        int16_t angle;
+        lv_coord_t r_in = lv_area_get_width(&ext->knob_area) / 2;
+
+        p.x -= r_in;
+        p.y -= r_in;
+        bool on_ring = true;
+        if(p.x * p.x + p.y * p.y < r_in * r_in) {
+            return res; /*Set the angle only if pressed on the ring*/
         }
+        angle = _lv_atan2(p.x, p.y) % 360;
+        
+        int16_t bg_end = ext->arc.bg_angle_end;
+        if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) {
+            bg_end = ext->arc.bg_angle_end + 360;
+            if (angle < ext->arc.bg_angle_start) angle += 360;
+        } 
+
+        lv_rotary_set_value(
+            rotary,
+            _lv_map(angle, ext->arc.bg_angle_start, bg_end,
+                    ext->min_value, ext->max_value),
+            LV_ANIM_OFF
+        );
     }
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         ext->dragging = false;
@@ -522,6 +579,7 @@ static void draw_knob(lv_obj_t * rotary, const lv_area_t * clip_area)
         lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
     }
     
+    lv_obj_set_ext_click_area(rotary, knob_area.x1, knob_area.x2, knob_area.y1, knob_area.y2);
     lv_area_copy(&ext->knob_area, &knob_area);
 }
 
