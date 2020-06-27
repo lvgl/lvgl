@@ -69,6 +69,30 @@ void lv_theme_apply(lv_obj_t * obj, lv_theme_style_t name)
     apply_theme(act_theme, obj, name);
 }
 
+/**
+ * Copy a theme to an other or initialize a theme
+ * @param theme pointer to a theme to initialize
+ * @param copy pointer to a theme to copy
+ *             or `NULL` to initialize `theme` to empty
+ */
+void lv_theme_copy(lv_theme_t * theme, const lv_theme_t * copy)
+{
+    _lv_memset_00(theme, sizeof(lv_theme_t));
+
+    if(copy) {
+        theme->font_small = copy->font_small;
+        theme->font_normal = copy->font_normal;
+        theme->font_subtitle = copy->font_subtitle;
+        theme->font_title = copy->font_title;
+        theme->color_primary = copy->color_primary;
+        theme->color_secondary = copy->color_secondary;
+        theme->flags = copy->flags;
+        theme->base = copy->base;
+        theme->apply_cb = copy->apply_cb;
+        theme->apply_xcb = copy->apply_xcb;
+    }
+
+}
 
 /**
  * Set a base theme for a theme.
@@ -79,7 +103,7 @@ void lv_theme_apply(lv_obj_t * obj, lv_theme_style_t name)
  */
 void lv_theme_set_base(lv_theme_t * new, lv_theme_t * base)
 {
-    new->base_theme = base;
+    new->base = base;
 }
 
 /**
@@ -151,8 +175,8 @@ uint32_t lv_theme_get_flags(void)
 
 static void apply_theme(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 {
-    if(th->base_theme) {
-        apply_theme(th->base_theme, obj, name);
+    if(th->base) {
+        apply_theme(th->base, obj, name);
     }
 
     /*apply_xcb is deprecated, use apply_cb instead*/

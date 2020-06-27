@@ -146,10 +146,15 @@ typedef enum {
 
 } lv_theme_style_t;
 
+struct _lv_theme_t;
+
+typedef void (*lv_theme_apply_cb_t)(struct _lv_theme_t *, lv_obj_t *, lv_theme_style_t);
+typedef void (*lv_theme_apply_xcb_t)(lv_obj_t *, lv_theme_style_t); /*Deprecated: use `apply_cb` instead*/
+
 typedef struct _lv_theme_t {
-    void (*apply_xcb)(lv_obj_t *, lv_theme_style_t); /*Deprecated: use `apply_cb` instead*/
-    void (*apply_cb)(struct _lv_theme_t *, lv_obj_t *, lv_theme_style_t);
-    struct _lv_theme_t * base_theme;    /**< Apply the current theme's style on top of this theme.*/
+    lv_theme_apply_cb_t apply_cb;
+    lv_theme_apply_xcb_t apply_xcb; /*Deprecated: use `apply_cb` instead*/
+    struct _lv_theme_t * base;    /**< Apply the current theme's style on top of this theme.*/
     lv_color_t color_primary;
     lv_color_t color_secondary;
     const lv_font_t * font_small;
@@ -183,6 +188,14 @@ lv_theme_t * lv_theme_get_act(void);
  * @param name the name of the theme element to apply. E.g. `LV_THEME_BTN`
  */
 void lv_theme_apply(lv_obj_t * obj, lv_theme_style_t name);
+
+/**
+ * Copy a theme to an other or initialize a theme
+ * @param theme pointer to a theme to initialize
+ * @param copy pointer to a theme to copy
+ *             or `NULL` to initialize `theme` to empty
+ */
+void lv_theme_copy(lv_theme_t * theme, const lv_theme_t * copy);
 
 /**
  * Set a base theme for a theme.
