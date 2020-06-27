@@ -107,6 +107,17 @@ void lv_theme_set_base(lv_theme_t * new, lv_theme_t * base)
 }
 
 /**
+ * Set a callback for a theme.
+ * The callback is used to add styles to different objects
+ * @param theme pointer to theme which callback should be set
+ * @param cb pointer to the callback
+ */
+void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb)
+{
+    theme->apply_cb = apply_cb;
+}
+
+/**
  * Get the small font of the theme
  * @return pointer to the font
  */
