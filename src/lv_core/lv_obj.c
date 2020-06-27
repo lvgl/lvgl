@@ -3244,8 +3244,9 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * 
     draw_dsc->pivot.y = lv_area_get_height(&obj->coords) / 2;
 
     draw_dsc->recolor_opa = lv_obj_get_style_image_recolor_opa(obj, part);
-    draw_dsc->recolor = lv_obj_get_style_image_recolor(obj, part);
-
+    if(draw_dsc->recolor_opa > 0) {
+        draw_dsc->recolor = lv_obj_get_style_image_recolor(obj, part);
+    }
 #if LV_USE_BLEND_MODES
     draw_dsc->blend_mode = lv_obj_get_style_image_blend_mode(obj, part);
 #endif
@@ -4244,4 +4245,3 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
 
     return false;
 }
-
