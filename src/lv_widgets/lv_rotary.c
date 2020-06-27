@@ -402,7 +402,6 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_rotary_ext_t * ext = lv_obj_get_ext_attr(rotary);
-    lv_point_t p;
 
     if(sign == LV_SIGNAL_PRESSED) {
         lv_indev_get_point(lv_indev_get_act(), &ext->last_press_point);
@@ -422,18 +421,6 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
             lv_indev_get_point(indev, &p);
         }
 
-        lv_coord_t drag_x_diff = p.x - ext->last_press_point.x;
-        lv_coord_t drag_y_diff = p.y - ext->last_press_point.y;
-
-        if (LV_MATH_ABS(drag_x_diff) > ext->threshold) {
-            if (drag_x_diff > 0) p.x = ext->last_press_point.x + ext->threshold;
-            else p.x = ext->last_press_point.x - ext->threshold;
-        }
-        if (LV_MATH_ABS(drag_y_diff) > ext->threshold) {
-            if (drag_y_diff > 0) p.y = ext->last_press_point.y + ext->threshold;
-            else p.y = ext->last_press_point.y - ext->threshold;
-        }
-
         ext->last_press_point.x = p.x;
         ext->last_press_point.y = p.y;
 
@@ -451,7 +438,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
             return res; /*Set the angle only if pressed on the ring*/
         }
 
-        int16_t bg_midpoint, bg_zero, bg_end = ext->arc.bg_angle_end;
+        int16_t bg_zero, bg_end = ext->arc.bg_angle_end;
         if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) {
             bg_end = ext->arc.bg_angle_end + 360;
         }
