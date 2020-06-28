@@ -645,12 +645,17 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
 #endif
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
+#if LV_USE_GROUP
         bool * editable = (bool *)param;
         *editable       = true;
+#endif
     }
 
-    if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROL || sign == LV_SIGNAL_PRESSED  ||
-       sign == LV_SIGNAL_RELEASED) {
+    if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS ||
+#if LV_USE_GROUP
+       sign == LV_SIGNAL_CONTROL ||
+#endif
+       sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED) {
 
         /* The button matrix is not in a group (the tab view is in it) but it should handle the
          * group signals. So propagate the related signals to the button matrix manually*/
