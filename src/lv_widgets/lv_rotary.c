@@ -207,8 +207,8 @@ bool lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
         case LV_ROTARY_TYPE_REVERSE:
             lv_arc_set_start_angle(
                 rotary,
-                _lv_map(ext->cur_value, ext->max_value, ext->min_value, 
-                        bg_end, ext->arc.bg_angle_start)
+                _lv_map(ext->cur_value, ext->min_value, ext->max_value,
+                        ext->arc.bg_angle_start, bg_end)
             );
             break;
         default: /** LV_ROTARY_TYPE_NORMAL*/
@@ -403,51 +403,48 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
 
     lv_rotary_ext_t * ext = lv_obj_get_ext_attr(rotary);
 
-    if(sign == LV_SIGNAL_PRESSED) {
-        lv_indev_get_point(lv_indev_get_act(), &ext->last_press_point);
-        ext->dragging = true;
-    }
-    else if(sign == LV_SIGNAL_PRESSING) {
+    if(sign == LV_SIGNAL_PRESSING) {
         lv_indev_t * indev = lv_indev_get_act();
         if(indev == NULL) return res;
 
+        /*Handle only pointers here*/
         lv_indev_type_t indev_type = lv_indev_get_type(indev);
+        if(indev_type != LV_INDEV_TYPE_POINTER) return res;
+
         lv_point_t p;
-        if(indev_type == LV_INDEV_TYPE_ENCODER || indev_type == LV_INDEV_TYPE_KEYPAD) {
-            p.x = rotary->coords.x1 + lv_obj_get_width(rotary) / 2;
-            p.y = rotary->coords.y1 + lv_obj_get_height(rotary) / 2;
+        lv_indev_get_point(indev, &p);
+
+        /*Make point relative to the rotary's center*/
+        lv_coord_t w_half = lv_obj_get_width(rotary) / 2;
+        p.x -= rotary->coords.x1 + w_half;
+        p.y -= rotary->coords.y1 + w_half;
+
+        /*Enter dragging mode if pressed out of the knob*/
+        if(ext->dragging == false) {
+            lv_coord_t r_in = lv_area_get_width(&ext->knob_area) / 2;
+
+            if(p.x * p.x + p.y * p.y > r_in * r_in) {
+                ext->dragging = true;
+            }
         }
-        else {
-            lv_indev_get_point(indev, &p);
-        }
 
-        ext->last_press_point.x = p.x;
-        ext->last_press_point.y = p.y;
+        /*It must be in "dragging" mode to turn the arc*/
+        if(ext->dragging == false) return res;
 
-        /*Make point 0 relative to the rotary*/
-        p.x -= rotary->coords.x1;
-        p.y -= rotary->coords.y1;
-
-        /*Ignore pressing in the inner area*/
+        /*Calculate the angle of the pressed point*/
         int16_t angle;
-        lv_coord_t r_in = lv_area_get_width(&ext->knob_area) / 2;
-
-        p.x -= r_in;
-        p.y -= r_in;
-        if(p.x * p.x + p.y * p.y < r_in * r_in) {
-            return res; /*Set the angle only if pressed on the ring*/
-        }
-
-        int16_t bg_zero, bg_end = ext->arc.bg_angle_end;
+        int16_t bg_end = ext->arc.bg_angle_end;
         if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) {
             bg_end = ext->arc.bg_angle_end + 360;
         }
-        bg_zero = (((ext->arc.bg_angle_start + bg_end) / 2) + 180) % 360;
 
-        angle = (_lv_atan2(p.x, p.y) + bg_zero) % 360;
-        if (bg_end > 360 && angle < ext->arc.bg_angle_start) angle += 360;
+        angle = 360 - _lv_atan2(p.x, p.y) + 90; /*Some transformation is required*/
+        if(angle < ext->arc.bg_angle_start) angle = ext->arc.bg_angle_start;
+        if(angle > bg_end) angle = bg_end;
 
-        int16_t new_value = _lv_map(angle, ext->arc.bg_angle_start, bg_end, ext->max_value, ext->min_value);
+        int16_t new_value = _lv_map(angle, ext->arc.bg_angle_start, bg_end, ext->min_value, ext->max_value);
+
+        /*Set the new value if it's larger than the threshold*/
         if (LV_MATH_ABS(ext->cur_value - new_value) < ext->threshold) {
             if (lv_rotary_set_value(rotary, new_value, LV_ANIM_OFF)) {
                 res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
