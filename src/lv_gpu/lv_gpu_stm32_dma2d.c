@@ -27,9 +27,9 @@
 #endif
 
 #if LV_COLOR_DEPTH == 16
-    #define DMA2D_COLOR_FORMAT DMA2D_RGB565
+    #define LV_DMA2D_COLOR_FORMAT LV_DMA2D_RGB565
 #elif LV_COLOR_DEPTH == 32
-    #define DMA2D_COLOR_FORMAT DMA2D_ARGB8888
+    #define LV_DMA2D_COLOR_FORMAT LV_DMA2D_ARGB8888
 #else
     /*Can't use GPU with other formats*/
 #endif
@@ -68,7 +68,7 @@ void lv_gpu_stm32_dma2d_init(void)
     volatile uint32_t temp = RCC->AHB1ENR;
 
     /* set output colour mode */
-    DMA2D->OPFCCR = DMA2D_COLOR_FORMAT;
+    DMA2D->OPFCCR = LV_DMA2D_COLOR_FORMAT;
 }
 
 /**
@@ -160,7 +160,7 @@ void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_
 
     DMA2D->CR = 0;
     /* copy output colour mode, this register controls both input and output colour format */
-    DMA2D->FGPFCCR = DMA2D_COLOR_FORMAT;
+    DMA2D->FGPFCCR = LV_DMA2D_COLOR_FORMAT;
     DMA2D->FGMAR = (uint32_t)map;
     DMA2D->FGOR = map_w - copy_w;
     DMA2D->OMAR = (uint32_t)buf;
@@ -189,11 +189,11 @@ void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color
     invalidate_cache();
     DMA2D->CR = 0x20000;
 
-    DMA2D->BGPFCCR = DMA2D_COLOR_FORMAT;
+    DMA2D->BGPFCCR = LV_DMA2D_COLOR_FORMAT;
     DMA2D->BGMAR = (uint32_t)buf;
     DMA2D->BGOR = buf_w - copy_w;
 
-    DMA2D->FGPFCCR = (uint32_t)DMA2D_COLOR_FORMAT
+    DMA2D->FGPFCCR = (uint32_t)LV_DMA2D_COLOR_FORMAT
     /* alpha mode 2, replace with foreground * alpha value */
     | (2 << DMA2D_FGPFCCR_AM_Pos)
     /* alpha value */
