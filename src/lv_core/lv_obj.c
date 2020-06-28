@@ -1061,6 +1061,65 @@ void lv_obj_set_auto_realign(lv_obj_t * obj, bool en)
 #endif
 }
 
+/**
+ * Moves all children with horizontally or vertically.
+ * It doesn't take into account any limits so any values are possible
+ * @param obj pointer to an object whose children should be moved
+ * @param x pixel to move horizontally
+ * @param y pixels to move vertically
+ */
+void lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
+{
+    obj->scroll.x += x;
+    obj->scroll.y += y;
+
+    refresh_children_position(obj, x, y);
+}
+/**
+ * Moves all children with horizontally or vertically.
+ * Limits the scroll to the bounding box of the children.
+ * @param obj pointer to an object whose children should be moved
+ * @param x pixel to move horizontally
+ * @param y pixels to move vertically
+ */
+void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en)
+{
+    obj->scroll.x += x;
+    obj->scroll.y += y;
+
+    refresh_children_position(obj, x, y);
+}
+
+/**
+ * Scroll the a given x coordinate to the left side of obj.
+ * @param obj pointer to an object which should be scrolled
+ * @param x the x coordinate to scroll to
+ * @param y the y coordinate to scroll to
+ */
+void lv_obj_scroll_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en)
+{
+
+}
+
+/**
+ * Scroll the a given x coordinate to the left side of obj.
+ * @param obj pointer to an object which should be scrolled
+ * @param x the x coordinate to scroll to
+ */
+void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en)
+{
+//    refresh_children_position(obj, x, y);
+}
+
+/**
+ * Scroll the a given y coordinate to the top side of obj.
+ * @param obj pointer to an object which should be scrolled
+ * @param y the y coordinate to scroll to
+ */
+void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
+{
+//    refresh_children_position(obj, x, y);
+}
 
 /**
  * Set the size of an extended clickable area

@@ -198,6 +198,7 @@ typedef struct _lv_obj_t {
     lv_ll_t child_ll;       /**< Linked list to store the children objects*/
 
     lv_area_t coords; /**< Coordinates of the object (x1, y1, x2, y2)*/
+    lv_point_t scroll; /**< The current X/Y scroll offset*/
 
     lv_event_cb_t event_cb; /**< Event callback function */
     lv_signal_cb_t signal_cb; /**< Object type specific signal function*/
