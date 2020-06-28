@@ -18,6 +18,7 @@ Available in the `dev` branch
 - Add `lv_theme_set_base()` to allow easy extension of built-in (or any) themes
 - Add `lv_obj_align_x()` and `lv_obj_align_y()` functions
 - Add `lv_obj_align_origo_x()` and `lv_obj_align_origo_y()` functions
+- Support compressed fonts without pre-filter to gain some speed by sacrificing some memory
 
 ## v7.1.0 (planned on 07.07.2020)
 *Available in the `master` branch*
