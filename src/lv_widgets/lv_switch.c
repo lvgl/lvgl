@@ -296,12 +296,14 @@ static lv_res_t lv_switch_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
 
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) lv_switch_on(sw, LV_ANIM_ON);
         else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) lv_switch_off(sw, LV_ANIM_ON);
 
         res   = lv_event_send(sw, LV_EVENT_VALUE_CHANGED, NULL);
         if(res != LV_RES_OK) return res;
+#endif
     }
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         lv_style_int_t knob_left = lv_obj_get_style_pad_left(sw,   LV_SWITCH_PART_KNOB);
@@ -320,8 +322,10 @@ static lv_res_t lv_switch_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         sw->ext_draw_pad = LV_MATH_MAX(sw->ext_draw_pad, knob_size);
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
+#if LV_USE_GROUP
         bool * editable = (bool *)param;
         *editable       = false; /*The ancestor slider is editable the switch is not*/
+#endif
     }
 
     return res;

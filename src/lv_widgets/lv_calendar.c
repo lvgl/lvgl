@@ -515,6 +515,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         lv_obj_invalidate(calendar);
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         uint8_t c               = *((uint8_t *)param);
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
@@ -537,6 +538,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
             }
             lv_obj_invalidate(calendar);
         }
+#endif
     }
 
     return res;

@@ -859,6 +859,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         refr_ext_draw_pad(page);
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         uint32_t c = *((uint32_t *)param);
 
         if(c == LV_KEY_DOWN) {
@@ -883,10 +884,13 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             else
                 lv_page_scroll_hor(page, lv_obj_get_width(page) / 4);
         }
+#endif
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
+#if LV_USE_GROUP
         bool * editable = (bool *)param;
         *editable       = true;
+#endif
     }
 
     return res;
