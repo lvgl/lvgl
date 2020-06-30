@@ -29,7 +29,7 @@
  *  STATIC VARIABLES
  **********************/
 static uint32_t sys_time = 0;
-static volatile uint32_t tick_irq_flag;
+static volatile uint8_t tick_irq_flag;
 
 /**********************
  *      MACROS

@@ -394,10 +394,10 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #if LV_TICK_CUSTOM == 1
 #ifndef LV_TICK_CUSTOM_INCLUDE
-#define LV_TICK_CUSTOM_INCLUDE  "something.h"       /*Header for the sys time function*/
+#define LV_TICK_CUSTOM_INCLUDE  "Arduino.h"       /*Header for the sys time function*/
 #endif
 #ifndef LV_TICK_CUSTOM_SYS_TIME_EXPR
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())     /*Expression evaluating to current systime in ms*/
+#define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())     /*Expression evaluating to current sys time in ms*/
 #endif
 #endif   /*LV_TICK_CUSTOM*/
 
