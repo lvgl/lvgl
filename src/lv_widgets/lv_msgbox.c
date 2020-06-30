@@ -412,6 +412,7 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
 {
     lv_res_t res;
 
+#if LV_USE_GROUP
     /*Translate LV_KEY_UP/DOWN to LV_KEY_LEFT/RIGHT */
     char c_trans = 0;
     if(sign == LV_SIGNAL_CONTROL) {
@@ -421,6 +422,7 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
 
         param = &c_trans;
     }
+#endif
 
     if(sign == LV_SIGNAL_GET_STYLE) {
         lv_get_style_info_t * info = param;
@@ -460,8 +462,11 @@ static lv_res_t lv_msgbox_signal(lv_obj_t * mbox, lv_signal_t sign, void * param
             if(btn_id != LV_BTNMATRIX_BTN_NONE) lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &btn_id);
         }
     }
-    else if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROL ||
-            sign == LV_SIGNAL_GET_EDITABLE) {
+    else if(
+#if LV_USE_GROUP
+        sign == LV_SIGNAL_CONTROL || sign == LV_SIGNAL_GET_EDITABLE ||
+#endif
+        sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS) {
         if(ext->btnm) {
             ext->btnm->signal_cb(ext->btnm, sign, param);
         }

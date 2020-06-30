@@ -645,8 +645,10 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
         ext->title_txt  = NULL;
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         /*Forward all the control signals to the page*/
         ext->page->signal_cb(ext->page, sign, param);
+#endif
     }
 
     return res;

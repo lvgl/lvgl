@@ -221,7 +221,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
 
 /**
  * Insert a character to the current cursor position.
- * To add a wide char, e.g. 'Á' use `lv_txt_encoded_conv_wc('Á')`
+ * To add a wide char, e.g. 'Á' use `_lv_txt_encoded_conv_wc('Á')`
  * @param ta pointer to a text area object
  * @param c a character (e.g. 'a')
  */
@@ -1466,6 +1466,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
         }
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
         if(c == LV_KEY_RIGHT)
             lv_textarea_cursor_right(ta);
@@ -1486,10 +1487,13 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
         else {
             lv_textarea_add_char(ta, c);
         }
+#endif
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
+#if LV_USE_GROUP
         bool * editable = (bool *)param;
         *editable       = true;
+#endif
     }
     else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESS_LOST ||
             sign == LV_SIGNAL_RELEASED) {

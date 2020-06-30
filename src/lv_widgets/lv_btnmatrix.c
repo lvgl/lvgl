@@ -992,6 +992,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
         ext->btn_id_act = LV_BTNMATRIX_BTN_NONE;
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT) {
             if(ext->btn_id_focused == LV_BTNMATRIX_BTN_NONE)
@@ -1059,10 +1060,13 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
             ext->btn_id_act = ext->btn_id_focused;
             lv_obj_invalidate(btnm);
         }
+#endif
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
+#if LV_USE_GROUP
         bool * editable = (bool *)param;
         *editable       = true;
+#endif
     }
     return res;
 }

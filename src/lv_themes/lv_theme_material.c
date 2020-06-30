@@ -792,6 +792,39 @@ static void roller_init(void)
 static void tabview_init(void)
 {
 #if LV_USE_TABVIEW != 0
+#endif
+}
+
+static void tileview_init(void)
+{
+#if LV_USE_TILEVIEW != 0
+#endif
+}
+
+static void table_init(void)
+{
+#if LV_USE_TABLE != 0
+    style_init_reset(&styles->table_cell);
+    lv_style_set_border_color(&styles->table_cell, LV_STATE_DEFAULT, COLOR_BG_BORDER);
+    lv_style_set_border_width(&styles->table_cell, LV_STATE_DEFAULT, 1);
+    lv_style_set_border_side(&styles->table_cell, LV_STATE_DEFAULT, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM);
+    lv_style_set_pad_left(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_right(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_top(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_bottom(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
+
+#endif
+}
+
+static void win_init(void)
+{
+#if LV_USE_WIN != 0
+#endif
+}
+
+static void tabview_win_shared_init(void)
+{
+#if LV_USE_TABVIEW || LV_USE_WIN
     style_init_reset(&styles->tabview_btns_bg);
     lv_style_set_bg_opa(&styles->tabview_btns_bg, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->tabview_btns_bg, LV_STATE_DEFAULT, COLOR_BG);
@@ -828,34 +861,6 @@ static void tabview_init(void)
     lv_style_set_pad_left(&styles->tabview_page_scrl, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_pad_right(&styles->tabview_page_scrl, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_pad_inner(&styles->tabview_page_scrl, LV_STATE_DEFAULT, PAD_DEF);
-#endif
-}
-
-static void tileview_init(void)
-{
-#if LV_USE_TILEVIEW != 0
-#endif
-}
-
-static void table_init(void)
-{
-#if LV_USE_TABLE != 0
-    style_init_reset(&styles->table_cell);
-    lv_style_set_border_color(&styles->table_cell, LV_STATE_DEFAULT, COLOR_BG_BORDER);
-    lv_style_set_border_width(&styles->table_cell, LV_STATE_DEFAULT, 1);
-    lv_style_set_border_side(&styles->table_cell, LV_STATE_DEFAULT, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM);
-    lv_style_set_pad_left(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
-    lv_style_set_pad_right(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
-    lv_style_set_pad_top(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
-    lv_style_set_pad_bottom(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
-
-#endif
-}
-
-static void win_init(void)
-{
-#if LV_USE_WIN != 0
-
 #endif
 }
 
@@ -927,6 +932,7 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
     tileview_init();
     table_init();
     win_init();
+    tabview_win_shared_init();
 
     theme.apply_xcb = NULL;
     theme.apply_cb = theme_apply;
