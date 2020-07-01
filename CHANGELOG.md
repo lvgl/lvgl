@@ -17,6 +17,7 @@
 - Update the style handling to support Big endian MCUs
 - Change some methods to support big endian hardware.
 - Add LV_BIG_ENDIAN_SYSTEM flag to lv_conf.h in order to fix displaying images on big endian systems.
+- Fix inserting chars in text area in big endian hardware.
 
 ## v7.0.2 (16.06.2020)
 
