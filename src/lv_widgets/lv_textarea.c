@@ -231,9 +231,17 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    uint32_t letter_buf[2];
-    letter_buf[0] = c;
-    letter_buf[1] = '\0';
+    const char *letter_buf;
+
+    uint32_t u32_buf[2];
+    u32_buf[0] = c;
+    u32_buf[1] = 0;
+    
+    letter_buf = (char*)&u32_buf;
+
+#if LV_BIG_ENDIAN_SYSTEM
+    if (c != 0) while (*letter_buf == 0) ++letter_buf;
+#endif
 
     ta_insert_replace = NULL;
     lv_event_send(ta, LV_EVENT_INSERT, letter_buf);
@@ -241,7 +249,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
         if(ta_insert_replace[0] == '\0') return; /*Drop this text*/
 
         /*Add the replaced text directly it's different from the original*/
-        if(strcmp(ta_insert_replace, (char *)letter_buf)) {
+        if(strcmp(ta_insert_replace, letter_buf)) {
             lv_textarea_add_text(ta, ta_insert_replace);
             return;
         }
@@ -272,7 +280,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
         if(txt[0] == '\0') lv_obj_invalidate(ta);
     }
 
-    lv_label_ins_text(ext->label, ext->cursor.pos, (const char *)letter_buf); /*Insert the character*/
+    lv_label_ins_text(ext->label, ext->cursor.pos, letter_buf); /*Insert the character*/
     lv_textarea_clear_selection(ta);                                                /*Clear selection*/
 
     if(ext->pwd_mode != 0) {
