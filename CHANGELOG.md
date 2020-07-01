@@ -31,11 +31,14 @@ Available in the `dev` branch
 - In `lv_init` test if the the strings are UTF-8 encoded.
 - Add `user_data` to themes
 - Add LV_BIG_ENDIAN_SYSTEM flag to lv_conf.h in order to fix displaying images on big endian systems.
+- Add inline function lv_checkbox_get_state(const lv_obj_t * cb) to extend the checkbox functionality.
+- Add inline function lv_checkbox_set_state(const lv_obj_t * cb, lv_btn_state_t state ) to extend the checkbox functionality.
 
 ### Bugfixes
 - `lv_img` fix invalidation area when angle or zoom changes
 - Update the style handling to support Big endian MCUs
 - Change some methods to support big endian hardware.
+- remove use of c++ keyword 'new' in parameter of function lv_theme_set_base().
 
 ## v7.0.2 (16.06.2020)
 

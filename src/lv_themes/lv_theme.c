@@ -98,12 +98,12 @@ void lv_theme_copy(lv_theme_t * theme, const lv_theme_t * copy)
  * Set a base theme for a theme.
  * The styles from the base them will be added before the styles of the current theme.
  * Arbitrary long chain of themes can be created by setting base themes.
- * @param new pointer to theme which base should be set
+ * @param new_theme pointer to theme which base should be set
  * @param base pointer to the base theme
  */
-void lv_theme_set_base(lv_theme_t * new, lv_theme_t * base)
+void lv_theme_set_base(lv_theme_t * new_theme, lv_theme_t * base)
 {
-    new->base = base;
+    new_theme->base = base;
 }
 
 /**
