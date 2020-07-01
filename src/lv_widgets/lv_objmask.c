@@ -171,7 +171,7 @@ void lv_objmask_remove_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask)
     else {
         lv_mem_free(mask->param);
         _lv_ll_remove(&ext->mask_ll, mask);
-        lv_mem_free(mask); //houxiaogang
+        lv_mem_free(mask);
     }
 
     lv_obj_invalidate(objmask);
