@@ -123,11 +123,16 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing roller*/
     else {
+        lv_label_create(roller, get_label(copy));
+
         lv_roller_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_roller_set_options(roller, lv_roller_get_options(copy), copy_ext->mode);
         ext->auto_fit = copy_ext->auto_fit;
         lv_obj_t * scrl = lv_page_get_scrollable(roller);
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
+
+        lv_style_list_copy(&ext->style_sel, &copy_ext->style_sel);
+        lv_obj_refresh_style(roller, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("roller created");
