@@ -96,6 +96,8 @@ static void trans_anim_start_cb(lv_anim_t * a);
 static void trans_anim_ready_cb(lv_anim_t * a);
 static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
 static void fade_in_anim_ready(lv_anim_t * a);
+static void scroll_anim_x_cb(lv_obj_t * obj, lv_anim_value_t v);
+static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v);
 #endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
@@ -1074,6 +1076,7 @@ void lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->scroll.y += y;
 
     refresh_children_position(obj, x, y);
+    lv_obj_invalidate(obj);
 }
 /**
  * Moves all children with horizontally or vertically.
@@ -1084,10 +1087,37 @@ void lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
  */
 void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en)
 {
-    obj->scroll.x += x;
-    obj->scroll.y += y;
 
-    refresh_children_position(obj, x, y);
+    if(x == 0 && y == 0) return;
+
+    if(anim_en == LV_ANIM_ON) {
+        lv_disp_t * d = lv_obj_get_disp(obj);
+        lv_anim_t a;
+        lv_anim_init(&a);
+        lv_anim_set_var(&a, obj);
+
+        if(x) {
+            lv_anim_set_time(&a, lv_anim_speed_to_time(lv_disp_get_hor_res(d), 0, y));
+            lv_anim_set_values(&a, obj->scroll.x, obj->scroll.x + x);
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) scroll_anim_x_cb);
+            lv_anim_start(&a);
+        }
+
+
+        if(y) {
+            lv_anim_set_time(&a, lv_anim_speed_to_time(lv_disp_get_ver_res(d), 0, y));
+            lv_anim_set_values(&a, obj->scroll.y, obj->scroll.y + y);
+            lv_anim_set_exec_cb(&a,  (lv_anim_exec_xcb_t) scroll_anim_y_cb);
+            lv_anim_start(&a);
+        }
+
+    } else {
+        lv_obj_scroll_by_raw(obj, x, y);
+    }
+
+
+
+
 }
 
 /**
@@ -1118,7 +1148,7 @@ void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en)
  */
 void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
 {
-//    refresh_children_position(obj, x, y);
+    lv_obj_scroll_by(obj, 0, y - obj->scroll.y, anim_en);
 }
 
 /**
@@ -2126,6 +2156,37 @@ void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * cords_p)
 }
 
 /**
+ * Get a bounding which includes all the the children.
+ * `margin` of the children also taken into account and makes the box larger (if positive)
+ * @param obj pointer to an object
+ * @param coords pointer to an area to store the coordinates
+ * @return LV_RES_INV: `obj` has no children and `coords` can't be set; `LV_RES_OK`: success
+ */
+lv_res_t lv_obj_get_children_box(const lv_obj_t * obj, lv_area_t * coords)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    coords->x1 = LV_COORD_MAX;
+    coords->y1 = LV_COORD_MAX;
+    coords->x2 = LV_COORD_MIN;
+    coords->y2 = LV_COORD_MIN;
+
+    lv_obj_t * child = lv_obj_get_child(obj, NULL);
+    if(child == NULL) return LV_RES_INV;
+
+    while(child) {
+        coords->x1 = LV_MATH_MIN(coords->x1, child->coords.x1 - lv_obj_get_style_margin_left(child, LV_OBJ_PART_MAIN));
+        coords->y1 = LV_MATH_MIN(coords->y1, child->coords.y1 - lv_obj_get_style_margin_top(child, LV_OBJ_PART_MAIN));
+        coords->x2 = LV_MATH_MAX(coords->x2, child->coords.x2 + lv_obj_get_style_margin_right(child, LV_OBJ_PART_MAIN));
+        coords->y2 = LV_MATH_MAX(coords->y2, child->coords.y2 + lv_obj_get_style_margin_bottom(child, LV_OBJ_PART_MAIN));
+
+        child = lv_obj_get_child(obj, child);
+    }
+
+    return LV_RES_OK;
+}
+
+/**
  * Reduce area retried by `lv_obj_get_coords()` the get graphically usable area of an object.
  * (Without the size of the border or other extra graphical elements)
  * @param coords_p store the result area here
@@ -2759,6 +2820,18 @@ lv_drag_dir_t lv_obj_get_drag_dir(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     return obj->drag_dir;
+}
+
+/**
+ * Get the directions an object can be scrolled
+ * @param obj pointer to an object
+ * @return bitwise OR of allowed directions an object can be dragged in
+ */
+lv_drag_dir_t lv_obj_get_scroll_dir(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    return obj->scroll_dir;
 }
 
 /**
@@ -3738,6 +3811,17 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         /*Return 'invalid' if the child change signal is not enabled*/
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
     }
+    else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
+
+        lv_area_t child_box;
+        lv_obj_get_children_box(obj, &child_box);
+        if(obj->scroll.y > 0) {
+            lv_obj_scroll_to_y(obj, 0, LV_ANIM_ON);
+        }
+        else if(child_box.y2 < obj->coords.y2) {
+            lv_obj_scroll_by(obj, 0, -(child_box.y2 - obj->coords.y2), LV_ANIM_ON);
+        }
+    }
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         lv_coord_t d = lv_obj_get_draw_rect_ext_pad_size(obj, LV_OBJ_PART_MAIN);
         obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, d);
@@ -4278,6 +4362,15 @@ static void fade_in_anim_ready(lv_anim_t * a)
     lv_style_remove_prop(lv_obj_get_local_style(a->var, LV_OBJ_PART_MAIN), LV_STYLE_OPA_SCALE);
 }
 
+
+static void scroll_anim_x_cb(lv_obj_t * obj, lv_anim_value_t v)
+{
+}
+
+static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v)
+{
+    lv_obj_scroll_by_raw(obj, 0, v - obj->scroll.y);
+}
 #endif
 
 static void lv_event_mark_deleted(lv_obj_t * obj)

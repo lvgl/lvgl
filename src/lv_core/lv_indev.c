@@ -1245,15 +1245,20 @@ static void indev_click_focus(lv_indev_proc_t * proc)
  */
 static void indev_drag(lv_indev_proc_t * proc)
 {
-    lv_obj_t * drag_obj    = get_dragged_obj(proc->types.pointer.act_obj);
-    bool drag_just_started = false;
 
-    if(drag_obj == NULL) return;
+    bool scrollable = true;
 
-    if(lv_obj_get_drag(drag_obj) == false) return;
+    /*Get which object to drad/scroll*/
+    lv_obj_t * target_obj = get_dragged_obj(proc->types.pointer.act_obj);
+    if(target_obj == NULL) return;
 
+    lv_drag_dir_t dirs = LV_DRAG_DIR_VER; //scrollable ? lv_obj_get_scroll_dir(target_obj) : lv_obj_get_drag_dir(target_obj);
 
-    lv_drag_dir_t allowed_dirs = lv_obj_get_drag_dir(drag_obj);
+    bool just_started = false;
+
+    /*Get the coordinates of the object and modify them*/
+    lv_coord_t act_x = lv_obj_get_x(target_obj);
+    lv_coord_t act_y = lv_obj_get_y(target_obj);
 
     /*Count the movement by drag*/
     if(proc->types.pointer.drag_limit_out == 0) {
@@ -1263,15 +1268,15 @@ static void indev_drag(lv_indev_proc_t * proc)
         /*Enough move?*/
         bool hor_en = false;
         bool ver_en = false;
-        if(allowed_dirs == LV_DRAG_DIR_HOR || allowed_dirs == LV_DRAG_DIR_BOTH) {
+        if(dirs == LV_DRAG_DIR_HOR || dirs == LV_DRAG_DIR_BOTH) {
             hor_en = true;
         }
 
-        if(allowed_dirs == LV_DRAG_DIR_VER || allowed_dirs == LV_DRAG_DIR_BOTH) {
+        if(dirs == LV_DRAG_DIR_VER || dirs == LV_DRAG_DIR_BOTH) {
             ver_en = true;
         }
 
-        if(allowed_dirs == LV_DRAG_DIR_ONE) {
+        if(dirs == LV_DRAG_DIR_ONE) {
             if(LV_MATH_ABS(proc->types.pointer.drag_sum.x) > LV_MATH_ABS(proc->types.pointer.drag_sum.y)) {
                 hor_en = true;
             }
@@ -1284,102 +1289,77 @@ static void indev_drag(lv_indev_proc_t * proc)
         if((hor_en && LV_MATH_ABS(proc->types.pointer.drag_sum.x) >= indev_act->driver.drag_limit) ||
            (ver_en && LV_MATH_ABS(proc->types.pointer.drag_sum.y) >= indev_act->driver.drag_limit)) {
             proc->types.pointer.drag_limit_out = 1;
-            drag_just_started                   = true;
+            just_started = true;
+            if(dirs == LV_DRAG_DIR_ONE) {
+                proc->types.pointer.drag_dir = hor_en ? LV_DRAG_DIR_HOR : LV_DRAG_DIR_VER;
+            } else {
+                proc->types.pointer.drag_dir = dirs;
+            }
+
+            /*The was no move due to drag limit. Compensate it now.*/
+            if(!hor_en)  proc->types.pointer.drag_sum.x = 0;
+            if(!ver_en)  proc->types.pointer.drag_sum.y = 0;
+
+            act_x += proc->types.pointer.drag_sum.x;
+            act_y += proc->types.pointer.drag_sum.y;
         }
     }
 
     /*If the drag limit is exceeded handle the dragging*/
     if(proc->types.pointer.drag_limit_out != 0) {
-        /*Set new position if the vector is not zero*/
+        /*Set new position or scroll if the vector is not zero*/
         if(proc->types.pointer.vect.x != 0 || proc->types.pointer.vect.y != 0) {
 
-            lv_coord_t prev_x     = drag_obj->coords.x1;
-            lv_coord_t prev_y     = drag_obj->coords.y1;
-            lv_coord_t prev_par_w = lv_obj_get_width(lv_obj_get_parent(drag_obj));
-            lv_coord_t prev_par_h = lv_obj_get_height(lv_obj_get_parent(drag_obj));
+            lv_coord_t prev_x     = target_obj->coords.x1;
+            lv_coord_t prev_y     = target_obj->coords.y1;
 
-            /*Get the coordinates of the object and modify them*/
-            lv_coord_t act_x = lv_obj_get_x(drag_obj);
-            lv_coord_t act_y = lv_obj_get_y(drag_obj);
-
-            if(allowed_dirs == LV_DRAG_DIR_BOTH) {
-                if(drag_just_started) {
-                    proc->types.pointer.drag_dir = LV_DRAG_DIR_BOTH;
-                    act_x += proc->types.pointer.drag_sum.x;
-                    act_y += proc->types.pointer.drag_sum.y;
-                }
-            }
-            else if(allowed_dirs == LV_DRAG_DIR_HOR) {
-                if(drag_just_started) {
-                    proc->types.pointer.drag_dir = LV_DRAG_DIR_HOR;
-                    proc->types.pointer.drag_sum.y = 0;
-                    act_x += proc->types.pointer.drag_sum.x;
-                }
-            }
-            else if(allowed_dirs == LV_DRAG_DIR_VER) {
-                if(drag_just_started) {
-                    proc->types.pointer.drag_dir = LV_DRAG_DIR_VER;
-                    proc->types.pointer.drag_sum.x = 0;
-                    act_y += proc->types.pointer.drag_sum.y;
-                }
-            }
-            else if(allowed_dirs == LV_DRAG_DIR_ONE) {
-                if(drag_just_started) {
-                    if(LV_MATH_ABS(proc->types.pointer.drag_sum.x) > LV_MATH_ABS(proc->types.pointer.drag_sum.y)) {
-                        proc->types.pointer.drag_dir = LV_DRAG_DIR_HOR;
-                        proc->types.pointer.drag_sum.y = 0;
-                        act_x += proc->types.pointer.drag_sum.x;
-                    }
-                    else {
-                        proc->types.pointer.drag_dir = LV_DRAG_DIR_VER;
-                        proc->types.pointer.drag_sum.x = 0;
-                        act_y += proc->types.pointer.drag_sum.y;
-                    }
-                }
-            }
-
-            /*Move the object*/
-            if(allowed_dirs == LV_DRAG_DIR_HOR ||
-               allowed_dirs == LV_DRAG_DIR_BOTH ||
-               (allowed_dirs == LV_DRAG_DIR_ONE &&
-                LV_MATH_ABS(proc->types.pointer.drag_sum.x) > LV_MATH_ABS(proc->types.pointer.drag_sum.y))) {
-                act_x += proc->types.pointer.vect.x;
-            }
-            if(allowed_dirs == LV_DRAG_DIR_VER ||
-               allowed_dirs == LV_DRAG_DIR_BOTH ||
-               (allowed_dirs == LV_DRAG_DIR_ONE &&
-                LV_MATH_ABS(proc->types.pointer.drag_sum.x) < LV_MATH_ABS(proc->types.pointer.drag_sum.y))) {
-                act_y += proc->types.pointer.vect.y;
-            }
+            /*Move the object. `drag_sum` is zerod out for *disabled direction*/
+            if(proc->types.pointer.drag_sum.x) act_x += proc->types.pointer.vect.x;
+            if(proc->types.pointer.drag_sum.y) act_y += proc->types.pointer.vect.y;
 
             uint16_t inv_buf_size =
                 lv_disp_get_inv_buf_size(indev_act->driver.disp); /*Get the number of currently invalidated areas*/
 
-            lv_obj_set_pos(drag_obj, act_x, act_y);
-            proc->types.pointer.drag_in_prog = 1;
-
-            /*If the object didn't moved then clear the invalidated areas*/
-            if(drag_obj->coords.x1 == prev_x && drag_obj->coords.y1 == prev_y) {
-                /*In a special case if the object is moved on a page and
-                 * the scrollable has fit == true and the object is dragged of the page then
-                 * while its coordinate is not changing only the parent's size is reduced */
-                lv_coord_t act_par_w = lv_obj_get_width(lv_obj_get_parent(drag_obj));
-                lv_coord_t act_par_h = lv_obj_get_height(lv_obj_get_parent(drag_obj));
-                if(act_par_w == prev_par_w && act_par_h == prev_par_h) {
-                    uint16_t new_inv_buf_size = lv_disp_get_inv_buf_size(indev_act->driver.disp);
-                    _lv_disp_pop_from_inv_buf(indev_act->driver.disp, new_inv_buf_size - inv_buf_size);
+            if(scrollable) {
+                lv_area_t child_box;
+                lv_obj_get_children_box(target_obj, &child_box);
+                lv_coord_t diff_y = proc->types.pointer.vect.y;
+                if(target_obj->scroll.y > 0 && diff_y > 0) {
+                    diff_y = diff_y / 2;
                 }
+                if(child_box.y2 < target_obj->coords.y2 && diff_y < 0) {
+                    diff_y = diff_y / 2;
+                }
+
+                lv_obj_scroll_by(target_obj, 0, diff_y, LV_ANIM_OFF);
+            } else {
+                lv_obj_set_pos(target_obj, act_x, act_y);
             }
 
-            /*Set the drag in progress flag*/
-            /*Send the drag begin signal on first move*/
-            if(drag_just_started) {
-                drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_BEGIN, indev_act);
-                if(indev_reset_check(proc)) return;
-
-                lv_event_send(drag_obj, LV_EVENT_DRAG_BEGIN, NULL);
-                if(indev_reset_check(proc)) return;
-            }
+            proc->types.pointer.drag_in_prog = 1;
+//
+//            /*If the object didn't moved then clear the invalidated areas*/
+//            if(target_obj->coords.x1 == prev_x && target_obj->coords.y1 == prev_y) {
+//                /*In a special case if the object is moved on a page and
+//                 * the scrollable has fit == true and the object is dragged of the page then
+//                 * while its coordinate is not changing only the parent's size is reduced */
+//                lv_coord_t act_par_w = lv_obj_get_width(lv_obj_get_parent(target_obj));
+//                lv_coord_t act_par_h = lv_obj_get_height(lv_obj_get_parent(target_obj));
+//                if(act_par_w == prev_par_w && act_par_h == prev_par_h) {
+//                    uint16_t new_inv_buf_size = lv_disp_get_inv_buf_size(indev_act->driver.disp);
+//                    _lv_disp_pop_from_inv_buf(indev_act->driver.disp, new_inv_buf_size - inv_buf_size);
+//                }
+//            }
+//
+//            /*Set the drag in progress flag*/
+//            /*Send the drag begin signal on first move*/
+//            if(just_started) {
+//                target_obj->signal_cb(target_obj, LV_SIGNAL_DRAG_BEGIN, indev_act);
+//                if(indev_reset_check(proc)) return;
+//
+//                lv_event_send(target_obj, LV_EVENT_DRAG_BEGIN, NULL);
+//                if(indev_reset_check(proc)) return;
+//            }
 
         }
     }
@@ -1466,12 +1446,16 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
  */
 static lv_obj_t * get_dragged_obj(lv_obj_t * obj)
 {
+
+    return obj;
+
     if(obj == NULL) return NULL;
     lv_obj_t * drag_obj = obj;
     while(lv_obj_get_drag_parent(drag_obj) != false && drag_obj != NULL) {
         drag_obj = lv_obj_get_parent(drag_obj);
     }
 
+    if(lv_obj_get_drag(drag_obj) == false) return NULL;
     return drag_obj;
 }
 

@@ -228,7 +228,8 @@ typedef struct _lv_obj_t {
     uint8_t gesture_parent  : 1; /**< 1: Parent will be gesture instead*/
     uint8_t focus_parent    : 1; /**< 1: Parent will be focused instead*/
 
-    lv_drag_dir_t drag_dir  : 3; /**<  Which directions the object can be dragged in */
+    lv_drag_dir_t drag_dir    : 3; /**< In which directions the object can be dragged */
+    lv_drag_dir_t scroll_dir  : 3; /**< In which directions the object can be scrolled */
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
 
 #if LV_USE_GROUP != 0
@@ -1222,6 +1223,13 @@ bool lv_obj_get_drag(const lv_obj_t * obj);
  * @return bitwise OR of allowed directions an object can be dragged in
  */
 lv_drag_dir_t lv_obj_get_drag_dir(const lv_obj_t * obj);
+
+/**
+ * Get the directions an object can be scrolled
+ * @param obj pointer to an object
+ * @return bitwise OR of allowed directions an object can be dragged in
+ */
+lv_drag_dir_t lv_obj_get_scroll_dir(const lv_obj_t * obj);
 
 /**
  * Get the drag throw enable attribute of an object
