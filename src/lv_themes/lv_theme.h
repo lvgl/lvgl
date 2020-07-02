@@ -201,10 +201,18 @@ void lv_theme_copy(lv_theme_t * theme, const lv_theme_t * copy);
  * Set a base theme for a theme.
  * The styles from the base them will be added before the styles of the current theme.
  * Arbitrary long chain of themes can be created by setting base themes.
- * @param new pointer to theme which base should be set
+ * @param new_theme pointer to theme which base should be set
  * @param base pointer to the base theme
  */
-void lv_theme_set_base(lv_theme_t * new, lv_theme_t * base);
+void lv_theme_set_base(lv_theme_t * new_theme, lv_theme_t * base);
+
+/**
+ * Set an apply callback for a theme.
+ * The apply callback is used to add styles to different objects
+ * @param theme pointer to theme which callback should be set
+ * @param apply_cb pointer to the callback
+ */
+void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb);
 
 /**
  * Get the small font of the theme

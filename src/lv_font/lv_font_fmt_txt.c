@@ -37,7 +37,7 @@ static int32_t unicode_list_compare(const void * ref, const void * element);
 static int32_t kern_pair_8_compare(const void * ref, const void * element);
 static int32_t kern_pair_16_compare(const void * ref, const void * element);
 
-static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp);
+static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp, bool prefilter);
 static inline void decompress_line(uint8_t * out, lv_coord_t w);
 static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len);
 static inline void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len);
@@ -114,7 +114,8 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
             if(decompr_buf == NULL) return NULL;
         }
 
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], decompr_buf, gdsc->box_w, gdsc->box_h, (uint8_t)fdsc->bpp);
+        bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED ? true : false;
+        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], decompr_buf, gdsc->box_w, gdsc->box_h, (uint8_t)fdsc->bpp, prefilter);
         return decompr_buf;
     }
 
@@ -333,8 +334,9 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element)
  * @param out buffer to store the result
  * @param px_num number of pixels in the glyph (width * height)
  * @param bpp bit per pixel (bpp = 3 will be converted to bpp = 4)
+ * @param prefilter true: the lines are XORed
  */
-static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp)
+static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp, bool prefilter)
 {
     uint32_t wrp = 0;
     uint8_t wr_size = bpp;
@@ -343,7 +345,12 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
     rle_init(in, bpp);
 
     uint8_t * line_buf1 = _lv_mem_buf_get(w);
-    uint8_t * line_buf2 = _lv_mem_buf_get(w);
+
+    uint8_t * line_buf2 = NULL;
+
+    if(prefilter) {
+        line_buf2= _lv_mem_buf_get(w);
+    }
 
     decompress_line(line_buf1, w);
 
@@ -356,12 +363,21 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
     }
 
     for(y = 1; y < h; y++) {
-        decompress_line(line_buf2, w);
+        if(prefilter) {
+            decompress_line(line_buf2, w);
 
-        for(x = 0; x < w; x++) {
-            line_buf1[x] = line_buf2[x] ^ line_buf1[x];
-            bits_write(out, wrp, line_buf1[x], bpp);
-            wrp += wr_size;
+            for(x = 0; x < w; x++) {
+                line_buf1[x] = line_buf2[x] ^ line_buf1[x];
+                bits_write(out, wrp, line_buf1[x], bpp);
+                wrp += wr_size;
+            }
+        } else {
+            decompress_line(line_buf1, w);
+
+            for(x = 0; x < w; x++) {
+                bits_write(out, wrp, line_buf1[x], bpp);
+                wrp += wr_size;
+            }
         }
     }
 

@@ -221,7 +221,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
 
 /**
  * Insert a character to the current cursor position.
- * To add a wide char, e.g. 'Á' use `lv_txt_encoded_conv_wc('Á')`
+ * To add a wide char, e.g. 'Á' use `_lv_txt_encoded_conv_wc('Á')`
  * @param ta pointer to a text area object
  * @param c a character (e.g. 'a')
  */
@@ -231,9 +231,17 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    uint32_t letter_buf[2];
-    letter_buf[0] = c;
-    letter_buf[1] = '\0';
+    const char *letter_buf;
+
+    uint32_t u32_buf[2];
+    u32_buf[0] = c;
+    u32_buf[1] = 0;
+    
+    letter_buf = (char*)&u32_buf;
+
+#if LV_BIG_ENDIAN_SYSTEM
+    if (c != 0) while (*letter_buf == 0) ++letter_buf;
+#endif
 
     ta_insert_replace = NULL;
     lv_event_send(ta, LV_EVENT_INSERT, letter_buf);
@@ -241,7 +249,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
         if(ta_insert_replace[0] == '\0') return; /*Drop this text*/
 
         /*Add the replaced text directly it's different from the original*/
-        if(strcmp(ta_insert_replace, (char *)letter_buf)) {
+        if(strcmp(ta_insert_replace, letter_buf)) {
             lv_textarea_add_text(ta, ta_insert_replace);
             return;
         }
@@ -272,7 +280,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
         if(txt[0] == '\0') lv_obj_invalidate(ta);
     }
 
-    lv_label_ins_text(ext->label, ext->cursor.pos, (const char *)letter_buf); /*Insert the character*/
+    lv_label_ins_text(ext->label, ext->cursor.pos, letter_buf); /*Insert the character*/
     lv_textarea_clear_selection(ta);                                                /*Clear selection*/
 
     if(ext->pwd_mode != 0) {
@@ -1466,6 +1474,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
         }
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
         if(c == LV_KEY_RIGHT)
             lv_textarea_cursor_right(ta);
@@ -1486,10 +1495,13 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
         else {
             lv_textarea_add_char(ta, c);
         }
+#endif
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
+#if LV_USE_GROUP
         bool * editable = (bool *)param;
         *editable       = true;
+#endif
     }
     else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESS_LOST ||
             sign == LV_SIGNAL_RELEASED) {

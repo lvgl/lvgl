@@ -123,11 +123,16 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing roller*/
     else {
+        lv_label_create(roller, get_label(copy));
+
         lv_roller_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_roller_set_options(roller, lv_roller_get_options(copy), copy_ext->mode);
         ext->auto_fit = copy_ext->auto_fit;
         lv_obj_t * scrl = lv_page_get_scrollable(roller);
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
+
+        lv_style_list_copy(&ext->style_sel, &copy_ext->style_sel);
+        lv_obj_refresh_style(roller, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("roller created");
@@ -574,13 +579,16 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
 
     /* Include the ancient signal function */
     if(sign != LV_SIGNAL_CONTROL) { /*Don't let the page to scroll on keys*/
+#if LV_USE_GROUP
         res = ancestor_signal(roller, sign, param);
         if(res != LV_RES_OK) return res;
+#endif
     }
 
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    LV_UNUSED(ext);
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_t * label = get_label(roller);
@@ -640,6 +648,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
 #endif
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(ext->sel_opt_id + 1 < ext->option_cnt) {
@@ -656,6 +665,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
                 ext->sel_opt_id_ori = ori_id;
             }
         }
+#endif
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         lv_obj_clean_style_list(roller, LV_ROLLER_PART_SELECTED);

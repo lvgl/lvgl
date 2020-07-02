@@ -407,6 +407,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         char c = *((char *)param);
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
@@ -419,13 +420,16 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
             res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
+#endif
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         lv_obj_clean_style_list(slider, LV_SLIDER_PART_KNOB);
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
+#if LV_USE_GROUP
         bool * editable = (bool *)param;
         *editable       = true;
+#endif
     }
 
     return res;

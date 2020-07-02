@@ -394,10 +394,10 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #if LV_TICK_CUSTOM == 1
 #ifndef LV_TICK_CUSTOM_INCLUDE
-#define LV_TICK_CUSTOM_INCLUDE  "something.h"       /*Header for the sys time function*/
+#define LV_TICK_CUSTOM_INCLUDE  "Arduino.h"         /*Header for the system time function*/
 #endif
 #ifndef LV_TICK_CUSTOM_SYS_TIME_EXPR
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())     /*Expression evaluating to current systime in ms*/
+#define LV_TICK_CUSTOM_SYS_TIME_EXPR (millis())     /*Expression evaluating to current system time in ms*/
 #endif
 #endif   /*LV_TICK_CUSTOM*/
 
@@ -641,10 +641,10 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #define LV_THEME_DEFAULT_INIT               lv_theme_material_init
 #endif
 #ifndef LV_THEME_DEFAULT_COLOR_PRIMARY
-#define LV_THEME_DEFAULT_COLOR_PRIMARY      LV_COLOR_RED
+#define LV_THEME_DEFAULT_COLOR_PRIMARY      lv_color_hex(0x01a2b1)
 #endif
 #ifndef LV_THEME_DEFAULT_COLOR_SECONDARY
-#define LV_THEME_DEFAULT_COLOR_SECONDARY    LV_COLOR_BLUE
+#define LV_THEME_DEFAULT_COLOR_SECONDARY    lv_color_hex(0x44d1b6)
 #endif
 #ifndef LV_THEME_DEFAULT_FLAG
 #define LV_THEME_DEFAULT_FLAG               LV_THEME_MATERIAL_FLAG_LIGHT
@@ -705,7 +705,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
- * The direction will be processed according to the Unicode Bidirectional Algorithm:
+ * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
  * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
 #ifndef LV_USE_BIDI
 #define LV_USE_BIDI     0

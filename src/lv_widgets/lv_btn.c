@@ -289,6 +289,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
             if(lv_btn_get_checkable(btn)) {
@@ -309,6 +310,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
                 if(res != LV_RES_OK) return res;
             }
         }
+#endif
     }
 
     return res;
