@@ -1111,7 +1111,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
     _lv_mem_buf_release(mask_line);
 
     if(sw == 1) {
-        uint32_t i;
+        int32_t i;
         lv_opa_t * res_buf = (lv_opa_t *)sh_buf;
         for(i = 0; i < size * size; i++) {
             res_buf[i] = (sh_buf[i] >> SHADOW_UPSACALE_SHIFT);
@@ -1140,7 +1140,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
 
         shadow_blur_corner(size, sw, sh_buf);
     }
-    uint32_t x;
+    int32_t x;
     lv_opa_t * res_buf = (lv_opa_t *)sh_buf;
     for(x = 0; x < size * size; x++) {
         res_buf[x] = sh_buf[x];
