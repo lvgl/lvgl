@@ -34,7 +34,7 @@ extern "C" {
  * @param style style for of the triangle
  * @param opa_scale scale down all opacities by the factor (0..255)
  */
-void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
+void lv_draw_triangle(const lv_point_t points[], const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale);
 
 /**
  * Draw a polygon from triangles. Only convex polygons are supported
@@ -44,7 +44,7 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
  * @param style style of the polygon
  * @param opa_scale scale down all opacities by the factor (0..255)
  */
-void lv_draw_polygon(const lv_point_t * points, uint32_t point_cnt, const lv_area_t * mask, const lv_style_t * style,
+void lv_draw_polygon(const lv_point_t points[], uint32_t point_cnt, const lv_area_t * mask, const lv_style_t * style,
                      lv_opa_t opa_scale);
 
 /**********************

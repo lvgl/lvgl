@@ -213,7 +213,7 @@ void lv_canvas_draw_img(lv_obj_t * canvas, lv_coord_t x, lv_coord_t y, const voi
  * @param point_cnt number of points
  * @param style style of the line (`line` properties are used)
  */
-void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt, const lv_style_t * style);
+void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t points[], uint32_t point_cnt, const lv_style_t * style);
 
 /**
  * Draw a polygon on the canvas
@@ -222,7 +222,7 @@ void lv_canvas_draw_line(lv_obj_t * canvas, const lv_point_t * points, uint32_t 
  * @param point_cnt number of points
  * @param style style of the polygon (`body.main_color` and `body.opa` is used)
  */
-void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t * points, uint32_t point_cnt, const lv_style_t * style);
+void lv_canvas_draw_polygon(lv_obj_t * canvas, const lv_point_t points[], uint32_t point_cnt, const lv_style_t * style);
 
 /**
  * Draw an arc on the canvas

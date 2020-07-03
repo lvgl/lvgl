@@ -43,7 +43,7 @@ static void point_swap(lv_point_t * p1, lv_point_t * p2);
  * @param style style for of the triangle
  * @param opa_scale scale down all opacities by the factor (0..255)
  */
-void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
+void lv_draw_triangle(const lv_point_t points[], const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale)
 {
     /*Return if the triangle is degenerated*/
     if(points[0].x == points[1].x && points[0].y == points[1].y) return;
@@ -85,7 +85,7 @@ void lv_draw_triangle(const lv_point_t * points, const lv_area_t * mask, const l
  * @param style style of the polygon
  * @param opa_scale scale down all opacities by the factor (0..255)
  */
-void lv_draw_polygon(const lv_point_t * points, uint32_t point_cnt, const lv_area_t * mask, const lv_style_t * style,
+void lv_draw_polygon(const lv_point_t points[], uint32_t point_cnt, const lv_area_t * mask, const lv_style_t * style,
                      lv_opa_t opa_scale)
 {
     if(point_cnt < 3) return;
