@@ -793,21 +793,24 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_HIT_TEST) {
         lv_hit_test_info_t * info = param;
-        if(ext->zoom != 256 && ext->angle == 0) {
-            lv_coord_t origin_width = lv_area_get_width(&img->coords);
-            lv_coord_t origin_height = lv_area_get_height(&img->coords);
-            lv_coord_t scaled_width = (origin_width * ext->zoom + 255) / 256;
-            lv_coord_t scaled_height = (origin_height * ext->zoom + 255) / 256;
+        lv_style_int_t zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
+        zoom = (zoom * ext->zoom) >> 8;
 
-            lv_coord_t width_offset = (origin_width - scaled_width) / 2;
-            lv_coord_t height_offset = (origin_height - scaled_height) / 2;
+        lv_style_int_t angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
+        angle += ext->angle;
+
+        /* If the object is exactly image sized (not cropped, not mosaic) and transformed
+         * perform hit test on it's transformed area */
+        if(ext->w == lv_obj_get_width(img) && ext->h == lv_obj_get_height(img) &&
+           (zoom != LV_IMG_ZOOM_NONE || angle != 0 || ext->pivot.x != ext->w / 2 || ext->pivot.y != ext->h / 2)) {
 
             lv_area_t coords;
-            lv_area_copy(&coords, &img->coords);
-            coords.x1 += width_offset;
-            coords.x2 -= width_offset;
-            coords.y1 += height_offset;
-            coords.y2 -= height_offset;
+            _lv_img_buf_get_transformed_area(&coords, ext->w, ext->h, angle, zoom, &ext->pivot);
+            coords.x1 += img->coords.x1;
+            coords.y1 += img->coords.y1;
+            coords.x2 += img->coords.x1;
+            coords.y2 += img->coords.y1;
+
             info->result = _lv_area_is_point_on(&coords, info->point, 0);
         }
         else
