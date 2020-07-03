@@ -123,7 +123,10 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_label_create(roller, get_label(copy));
 
         lv_roller_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        lv_roller_set_options(roller, lv_roller_get_options(copy), copy_ext->mode);
+        ext->mode = copy_ext->mode;
+        ext->option_cnt = copy_ext->option_cnt;
+        ext->sel_opt_id = copy_ext->sel_opt_id;
+        ext->sel_opt_id_ori = copy_ext->sel_opt_id;
         ext->auto_fit = copy_ext->auto_fit;
         lv_obj_t * scrl = lv_page_get_scrollable(roller);
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
@@ -185,7 +188,7 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
         lv_label_set_text(label, opt_extra);
         _lv_mem_buf_release(opt_extra);
 
-        ext->sel_opt_id     = ((LV_ROLLER_INF_PAGES / 2) + 1) * ext->option_cnt;
+        ext->sel_opt_id     = ((LV_ROLLER_INF_PAGES / 2) + 0) * ext->option_cnt;
 
         ext->option_cnt = ext->option_cnt * LV_ROLLER_INF_PAGES;
     }
@@ -908,10 +911,11 @@ static void inf_normalize(void * scrl)
 
     if(ext->mode == LV_ROLLER_MODE_INIFINITE) {
         uint16_t real_id_cnt = ext->option_cnt / LV_ROLLER_INF_PAGES;
-
         ext->sel_opt_id = ext->sel_opt_id % real_id_cnt;
-
         ext->sel_opt_id += (LV_ROLLER_INF_PAGES / 2) * real_id_cnt; /*Select the middle page*/
+
+        ext->sel_opt_id_ori = ext->sel_opt_id % real_id_cnt;
+        ext->sel_opt_id_ori += (LV_ROLLER_INF_PAGES / 2) * real_id_cnt; /*Select the middle page*/
 
         /*Move to the new id*/
         const lv_font_t * font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);
