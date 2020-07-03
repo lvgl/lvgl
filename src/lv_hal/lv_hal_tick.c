@@ -6,17 +6,11 @@
 /*********************
  *      INCLUDES
  *********************/
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
-
 #include "lv_hal_tick.h"
 #include <stddef.h>
 
 #if LV_TICK_CUSTOM == 1
-#include LV_TICK_CUSTOM_INCLUDE
+    #include LV_TICK_CUSTOM_INCLUDE
 #endif
 
 /*********************
@@ -87,7 +81,8 @@ uint32_t lv_tick_elaps(uint32_t prev_tick)
     /*If there is no overflow in sys_time simple subtract*/
     if(act_time >= prev_tick) {
         prev_tick = act_time - prev_tick;
-    } else {
+    }
+    else {
         prev_tick = UINT32_MAX - prev_tick + 1;
         prev_tick += act_time;
     }

@@ -9,7 +9,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_port_indev_templ.h"
+#include "lv_port_indev_template.h"
 
 /*********************
  *      DEFINES
@@ -140,14 +140,14 @@ void lv_port_indev_init(void)
 
     /*Register a encoder input device*/
     lv_indev_drv_init(&indev_drv);
-    indev_drv.type = LV_INDEV_TYPE_KEYPAD;
+    indev_drv.type = LV_INDEV_TYPE_ENCODER;
     indev_drv.read_cb = encoder_read;
     indev_encoder = lv_indev_drv_register(&indev_drv);
 
     /* Later you should create group(s) with `lv_group_t * group = lv_group_create()`,
      * add objects to the group with `lv_group_add_obj(group, obj)`
      * and assign this input device to group to navigate in it:
-     * `lv_indev_set_group(indev_keypad, group);` */
+     * `lv_indev_set_group(indev_encoder, group);` */
 
     /*------------------
      * Button
@@ -293,7 +293,7 @@ static bool keypad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
     if(act_key != 0) {
         data->state = LV_INDEV_STATE_PR;
 
-        /*Translate the keys to LittlevGL control characters according to your key definitions*/
+        /*Translate the keys to LVGL control characters according to your key definitions*/
         switch(act_key) {
         case 1:
             act_key = LV_KEY_NEXT;

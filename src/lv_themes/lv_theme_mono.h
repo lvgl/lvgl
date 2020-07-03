@@ -13,11 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+#include "../lv_conf_internal.h"
 
 #if LV_USE_THEME_MONO
 
@@ -33,20 +29,21 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-/**
- * Initialize the mono theme
- * @param hue [0..360] hue value from HSV color space to define the theme's base color
- * @param font pointer to a font (NULL to use the default)
- * @return pointer to the initialized theme
- */
-lv_theme_t * lv_theme_mono_init(uint16_t hue, lv_font_t * font);
 
 /**
- * Get a pointer to the theme
- * @return pointer to the theme
+ * Initialize the mono theme.
+ * @param color_primary the primary color of the theme
+ * @param color_secondary the secondary color for the theme
+ * @param flags ORed flags starting with `LV_THEME_DEF_FLAG_...`
+ * @param font_small pointer to a small font
+ * @param font_normal pointer to a normal font
+ * @param font_subtitle pointer to a large font
+ * @param font_title pointer to a extra large font
+ * @return a pointer to reference this theme later
  */
-lv_theme_t * lv_theme_get_mono(void);
-
+lv_theme_t * lv_theme_mono_init(lv_color_t color_primary, lv_color_t color_secondary, uint32_t flags,
+                                const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle,
+                                const lv_font_t * font_title);
 /**********************
  *      MACROS
  **********************/
@@ -57,4 +54,4 @@ lv_theme_t * lv_theme_get_mono(void);
 } /* extern "C" */
 #endif
 
-#endif /*LV_THEME_MONO_H*/
+#endif /*LV_THEME_TEMPLATE_H*/

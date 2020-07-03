@@ -65,14 +65,6 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
 void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr);
 
 /**
- * Get a pointer to the screen refresher task to
- * modify its parameters with `lv_task_...` functions.
- * @param disp pointer to a display
- * @return pointer to the display refresher task. (NULL on error)
- */
-lv_task_t * lv_disp_get_refr_task(lv_disp_t * disp);
-
-/**
  * Get elapsed time since last user activity on a display (e.g. click)
  * @param disp pointer to an display (NULL to get the overall smallest inactivity)
  * @return elapsed ticks (milliseconds) since the last activity
@@ -84,6 +76,14 @@ uint32_t lv_disp_get_inactive_time(const lv_disp_t * disp);
  * @param disp pointer to an display (NULL to use the default display)
  */
 void lv_disp_trig_activity(lv_disp_t * disp);
+
+/**
+ * Get a pointer to the screen refresher task to
+ * modify its parameters with `lv_task_...` functions.
+ * @param disp pointer to a display
+ * @return pointer to the display refresher task. (NULL on error)
+ */
+lv_task_t * _lv_disp_get_refr_task(lv_disp_t * disp);
 
 /*------------------------------------------------
  * To improve backward compatibility
@@ -144,6 +144,15 @@ static inline void lv_scr_load(lv_obj_t * scr)
  */
 #define LV_VER_RES lv_disp_get_ver_res(lv_disp_get_default())
 #endif
+
+
+/**
+ * Same as Android's DIP. (Different name is chosen to avoid mistype between LV_DPI and LV_DIP)
+ * 1 dip is 1 px on a 160 DPI screen
+ * 1 dip is 2 px on a 320 DPI screen
+ * https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
+ */
+#define LV_DPX(n)   LV_MATH_MAX((( lv_disp_get_dpi(NULL) * (n) + 80) / 160), 1) /*+80 for rounding*/
 
 #ifdef __cplusplus
 } /* extern "C" */

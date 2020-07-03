@@ -6,7 +6,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "../lv_core/lv_debug.h"
+#include "../lv_misc/lv_debug.h"
 #include "lv_img_cache.h"
 #include "lv_img_decoder.h"
 #include "lv_draw_img.h"
@@ -14,7 +14,7 @@
 #include "../lv_misc/lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
-#include LV_GC_INCLUDE
+    #include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 /*********************
  *      DEFINES
@@ -30,7 +30,7 @@
 #define LV_IMG_CACHE_LIFE_LIMIT 1000
 
 #if LV_IMG_CACHE_DEF_SIZE < 1
-#error "LV_IMG_CACHE_DEF_SIZE must be >= 1. See lv_conf.h"
+    #error "LV_IMG_CACHE_DEF_SIZE must be >= 1. See lv_conf.h"
 #endif
 
 /**********************
@@ -62,7 +62,7 @@ static uint16_t entry_cnt;
  * @param style style of the image
  * @return pointer to the cache entry or NULL if can open the image
  */
-lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * style)
+lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color)
 {
     if(entry_cnt == 0) {
         LV_LOG_WARN("lv_img_cache_open: the cache size is 0");
@@ -85,8 +85,9 @@ lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * st
         bool match = false;
         lv_img_src_t src_type = lv_img_src_get_type(cache[i].dec_dsc.src);
         if(src_type == LV_IMG_SRC_VARIABLE) {
-            if(cache[i].dec_dsc.src == src) match = true;
-        } else if(src_type == LV_IMG_SRC_FILE) {
+            if(cache[i].dec_dsc.src == src && cache[i].dec_dsc.color.full == color.full) match = true;
+        }
+        else if(src_type == LV_IMG_SRC_FILE) {
             if(strcmp(cache[i].dec_dsc.src, src) == 0) match = true;
         }
 
@@ -116,7 +117,8 @@ lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * st
         if(cached_src->dec_dsc.src) {
             lv_img_decoder_close(&cached_src->dec_dsc);
             LV_LOG_INFO("image draw: cache miss, close and reuse an entry");
-        } else {
+        }
+        else {
             LV_LOG_INFO("image draw: cache miss, cached to an empty entry");
         }
 
@@ -124,12 +126,12 @@ lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * st
         uint32_t t_start;
         t_start                          = lv_tick_get();
         cached_src->dec_dsc.time_to_open = 0;
-        lv_res_t open_res                = lv_img_decoder_open(&cached_src->dec_dsc, src, style);
+        lv_res_t open_res                = lv_img_decoder_open(&cached_src->dec_dsc, src, color);
         if(open_res == LV_RES_INV) {
             LV_LOG_WARN("Image draw cannot open the image resource");
             lv_img_decoder_close(&cached_src->dec_dsc);
-            memset(&cached_src->dec_dsc, 0, sizeof(lv_img_decoder_dsc_t));
-            memset(cached_src, 0, sizeof(lv_img_cache_entry_t));
+            _lv_memset_00(&cached_src->dec_dsc, sizeof(lv_img_decoder_dsc_t));
+            _lv_memset_00(cached_src, sizeof(lv_img_cache_entry_t));
             cached_src->life = INT32_MIN; /*Make the empty entry very "weak" to force its use  */
             return NULL;
         }
@@ -173,8 +175,8 @@ void lv_img_cache_set_size(uint16_t new_entry_cnt)
     /*Clean the cache*/
     uint16_t i;
     for(i = 0; i < entry_cnt; i++) {
-        memset(&LV_GC_ROOT(_lv_img_cache_array)[i].dec_dsc, 0, sizeof(lv_img_decoder_dsc_t));
-        memset(&LV_GC_ROOT(_lv_img_cache_array)[i], 0, sizeof(lv_img_cache_entry_t));
+        _lv_memset_00(&LV_GC_ROOT(_lv_img_cache_array)[i].dec_dsc, sizeof(lv_img_decoder_dsc_t));
+        _lv_memset_00(&LV_GC_ROOT(_lv_img_cache_array)[i], sizeof(lv_img_cache_entry_t));
     }
 }
 
@@ -195,8 +197,8 @@ void lv_img_cache_invalidate_src(const void * src)
                 lv_img_decoder_close(&cache[i].dec_dsc);
             }
 
-            memset(&cache[i].dec_dsc, 0, sizeof(lv_img_decoder_dsc_t));
-            memset(&cache[i], 0, sizeof(lv_img_cache_entry_t));
+            _lv_memset_00(&cache[i].dec_dsc, sizeof(lv_img_decoder_dsc_t));
+            _lv_memset_00(&cache[i], sizeof(lv_img_cache_entry_t));
         }
     }
 }

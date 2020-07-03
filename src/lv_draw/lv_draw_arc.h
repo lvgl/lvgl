@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw.h"
+#include "lv_draw_line.h"
 
 /*********************
  *      DEFINES
@@ -38,8 +38,8 @@ extern "C" {
  * @param style style of the arc (`body.thickness`, `body.main_color`, `body.opa` is used)
  * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius, const lv_area_t * mask,
-                 uint16_t start_angle, uint16_t end_angle, const lv_style_t * style, lv_opa_t opa_scale);
+void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
+                 const lv_area_t * clip_area, lv_draw_line_dsc_t * dsc);
 
 /**********************
  *      MACROS

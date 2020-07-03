@@ -10,10 +10,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,12 +37,7 @@
 extern "C" {
 #endif
 
-
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+#include "../lv_conf_internal.h"
 
 #if LV_SPRINTF_CUSTOM == 0
 
@@ -59,8 +54,8 @@ extern "C" {
  *         null character. A value equal or larger than count indicates truncation. Only when the returned value
  *         is non-negative and less than count, the string has been completely written.
  */
-int  lv_snprintf(char* buffer, size_t count, const char* format, ...);
-int lv_vsnprintf(char* buffer, size_t count, const char* format, va_list va);
+int  lv_snprintf(char * buffer, size_t count, const char * format, ...);
+int lv_vsnprintf(char * buffer, size_t count, const char * format, va_list va);
 
 #else
 #include LV_SPRINTF_INCLUDE

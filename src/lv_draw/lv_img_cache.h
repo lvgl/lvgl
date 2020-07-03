@@ -25,11 +25,10 @@ extern "C" {
 
 /**
  * When loading images from the network it can take a long time to download and decode the image.
- * 
+ *
  * To avoid repeating this heavy load images can be cached.
  */
-typedef struct
-{
+typedef struct {
     lv_img_decoder_dsc_t dec_dsc; /**< Image information */
 
     /** Count the cache entries's life. Add `time_tio_open` to `life` when the entry is used.
@@ -50,7 +49,7 @@ typedef struct
  * @param style style of the image
  * @return pointer to the cache entry or NULL if can open the image
  */
-lv_img_cache_entry_t * lv_img_cache_open(const void * src, const lv_style_t * style);
+lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color);
 
 /**
  * Set the number of images to be cached.

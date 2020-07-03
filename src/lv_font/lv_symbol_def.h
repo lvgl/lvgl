@@ -5,19 +5,20 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+
+#include "../lv_conf_internal.h"
+
+/*-------------------------------
+ * Symbols from FontAwesome font
+ *-----------------------------*/
 
 /* In the font converter use this list as range:
-      61441, 61448, 61451, 61452, 61452, 61453, 61457, 61459, 61461, 61465,
-      61468, 61473, 61478, 61479, 61480, 61502, 61512, 61515, 61516, 61517,
-      61521, 61522, 61523, 61524, 61543, 61544, 61550, 61552, 61553, 61556,
-      61559, 61560, 61561, 61563, 61587, 61589, 61636, 61637, 61639, 61671,
-      61674, 61683, 61724, 61732, 61787, 61931, 62016, 62017, 62018, 62019,
-      62020, 62087, 62099, 62212, 62189, 62810, 63426, 63650
+      61441, 61448, 61451, 61452, 61453, 61457, 61459, 61461, 61465, 61468,
+      61473, 61478, 61479, 61480, 61502, 61512, 61515, 61516, 61517, 61521,
+      61522, 61523, 61524, 61543, 61544, 61550, 61552, 61553, 61556, 61559,
+      61560, 61561, 61563, 61587, 61589, 61636, 61637, 61639, 61671, 61674,
+      61683, 61724, 61732, 61787, 61931, 62016, 62017, 62018, 62019, 62020,
+      62087, 62099, 62212, 62189, 62810, 63426, 63650
 */
 
 #define LV_SYMBOL_AUDIO           "\xef\x80\x81" /*61441, 0xF001*/
@@ -81,6 +82,11 @@ extern "C" {
 /** Invalid symbol at (U+F8FF). If written before a string then `lv_img` will show it as a label*/
 #define LV_SYMBOL_DUMMY           "\xEF\xA3\xBF"
 
+/*-------------------------------
+ * Symbols from "normal" font
+ *-----------------------------*/
+#define LV_SYMBOL_BULLET          "\xE2\x80\xA2"   /*20042, 0x2022*/
+
 /*
  * The following list is generated using
  * cat src/lv_misc/lv_symbol_def.h | sed -E -n 's/^#define\s+(LV_SYMBOL_\w+).*"$/    _LV_STR_\1,/p'
@@ -93,7 +99,6 @@ enum {
     _LV_STR_SYMBOL_CLOSE,
     _LV_STR_SYMBOL_POWER,
     _LV_STR_SYMBOL_SETTINGS,
-    _LV_STR_SYMBOL_TRASH,
     _LV_STR_SYMBOL_HOME,
     _LV_STR_SYMBOL_DOWNLOAD,
     _LV_STR_SYMBOL_DRIVE,
@@ -113,6 +118,8 @@ enum {
     _LV_STR_SYMBOL_RIGHT,
     _LV_STR_SYMBOL_PLUS,
     _LV_STR_SYMBOL_MINUS,
+    _LV_STR_SYMBOL_EYE_OPEN,
+    _LV_STR_SYMBOL_EYE_CLOSE,
     _LV_STR_SYMBOL_WARNING,
     _LV_STR_SYMBOL_SHUFFLE,
     _LV_STR_SYMBOL_UP,
@@ -125,6 +132,7 @@ enum {
     _LV_STR_SYMBOL_COPY,
     _LV_STR_SYMBOL_SAVE,
     _LV_STR_SYMBOL_CHARGE,
+    _LV_STR_SYMBOL_PASTE,
     _LV_STR_SYMBOL_BELL,
     _LV_STR_SYMBOL_KEYBOARD,
     _LV_STR_SYMBOL_GPS,
@@ -135,7 +143,12 @@ enum {
     _LV_STR_SYMBOL_BATTERY_2,
     _LV_STR_SYMBOL_BATTERY_1,
     _LV_STR_SYMBOL_BATTERY_EMPTY,
+    _LV_STR_SYMBOL_USB,
     _LV_STR_SYMBOL_BLUETOOTH,
+    _LV_STR_SYMBOL_TRASH,
+    _LV_STR_SYMBOL_BACKSPACE,
+    _LV_STR_SYMBOL_SD_CARD,
+    _LV_STR_SYMBOL_NEW_LINE,
     _LV_STR_SYMBOL_DUMMY,
 };
 

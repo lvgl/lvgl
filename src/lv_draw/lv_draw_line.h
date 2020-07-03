@@ -13,6 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
+#include "../lv_core/lv_style.h"
 
 /*********************
  *      DEFINES
@@ -21,11 +22,23 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    lv_color_t color;
+    lv_style_int_t width;
+    lv_style_int_t dash_width;
+    lv_style_int_t dash_gap;
+    lv_opa_t opa;
+    lv_blend_mode_t blend_mode  : 2;
+    uint8_t round_start : 1;
+    uint8_t round_end   : 1;
+    uint8_t raw_end     : 1;    /*Do not bother with perpendicular line ending is it's not visible for any reason*/
+} lv_draw_line_dsc_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
+//! @cond Doxygen_Suppress
 /**
  * Draw a line
  * @param point1 first point of the line
@@ -34,8 +47,13 @@ extern "C" {
  * @param style pointer to a line's style
  * @param opa_scale scale down all opacities by the factor
  */
-void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * mask,
-                  const lv_style_t * style, lv_opa_t opa_scale);
+LV_ATTRIBUTE_FAST_MEM void lv_draw_line(const lv_point_t * point1, const lv_point_t * point2, const lv_area_t * mask,
+                                        lv_draw_line_dsc_t * dsc);
+
+LV_ATTRIBUTE_FAST_MEM void lv_draw_line_dsc_init(lv_draw_line_dsc_t * dsc);
+
+
+//! @endcond
 
 /**********************
  *      MACROS

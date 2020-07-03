@@ -33,7 +33,7 @@ extern "C" {
  * @param buf pointer to a `char` buffer. The result will be stored here (max 10 elements)
  * @return same as `buf` (just for convenience)
  */
-char * lv_utils_num_to_str(int32_t num, char * buf);
+char * _lv_utils_num_to_str(int32_t num, char * buf);
 
 /** Searches base[0] to base[n - 1] for an item that matches *key.
  *
@@ -52,8 +52,8 @@ char * lv_utils_num_to_str(int32_t num, char * buf);
  *
  * @return a pointer to a matching item, or NULL if none exists.
  */
-void * lv_utils_bsearch(const void * key, const void * base, uint32_t n, uint32_t size,
-                        int32_t (*cmp)(const void * pRef, const void * pElement));
+void * _lv_utils_bsearch(const void * key, const void * base, uint32_t n, uint32_t size,
+                         int32_t (*cmp)(const void * pRef, const void * pElement));
 
 /**********************
  *      MACROS
