@@ -376,7 +376,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
             if(!ext->drag_right_en && indev->proc.types.pointer.vect.x < 0 && x < -(ext->act_id.x * w)) {
                 lv_page_start_edge_flash(tileview, LV_PAGE_EDGE_RIGHT);
-                lv_obj_set_x(scrl, -ext->act_id.x * w + top);
+                lv_obj_set_x(scrl, -ext->act_id.x * w + left);
             }
 
             /*Apply the drag constraints*/
