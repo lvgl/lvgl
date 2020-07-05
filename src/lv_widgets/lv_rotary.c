@@ -88,7 +88,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->sensitivity = 1;
     ext->dragging = false;
     ext->threshold = 360;
-    ext->last_timestamp = lv_tick_get();
+    ext->last_tick = lv_tick_get();
     ext->last_angle = ext->arc.arc_angle_end;
     lv_style_list_init(&ext->style_knob);
 
@@ -114,7 +114,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->sensitivity = copy_ext->sensitivity;
         ext->dragging = copy_ext->dragging;
         ext->threshold = copy_ext->threshold;
-        ext->last_timestamp = copy_ext->last_timestamp;
+        ext->last_tick = copy_ext->last_tick;
         ext->last_angle = copy_ext->last_angle;
         lv_style_list_copy(&ext->style_knob, &copy_ext->style_knob);
 
@@ -439,8 +439,8 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
 
         /*Calculate the slew rate limited angle based on threshold (degrees/sec)*/
         int16_t delta_angle = angle - ext->last_angle;
-        uint32_t delta_ts_milli = lv_tick_elaps(ext->last_timestamp);
-        int16_t delta_angle_threshold = (ext->threshold * 1000) / delta_ts_milli;
+        uint32_t delta_tick = lv_get_tick() - ext->last_tick;
+        int16_t delta_angle_threshold = (ext->threshold * 1000) / delta_tick;
 
         if (delta_angle > delta_angle_threshold) {
             delta_angle = delta_angle_threshold;
@@ -449,7 +449,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         }
 
         angle = ext->last_angle + delta_angle; /*Apply the limited angle change*/
-        ext->last_timestamp = lv_tick_get(); /*Cache timestamp for the next iteration*/
+        ext->last_tick = lv_tick_get(); /*Cache timestamp for the next iteration*/
 
         int16_t new_value = _lv_map(angle, ext->arc.bg_angle_start, bg_end, ext->min_value, ext->max_value);
 
