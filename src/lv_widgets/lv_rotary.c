@@ -420,6 +420,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
 
             if(p.x * p.x + p.y * p.y > r_in * r_in) {
                 ext->dragging = true;
+                ext->last_tick = lv_tick_get(); /*Capture timestamp at dragging start*/
             }
         }
 
@@ -451,9 +452,8 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         angle = ext->last_angle + delta_angle; /*Apply the limited angle change*/
         ext->last_tick = lv_tick_get(); /*Cache timestamp for the next iteration*/
 
-        int16_t new_value = _lv_map(angle, ext->arc.bg_angle_start, bg_end, ext->min_value, ext->max_value);
-
         /*Set the new value*/
+        int16_t new_value = _lv_map(angle, ext->arc.bg_angle_start, bg_end, ext->min_value, ext->max_value);
         if (lv_rotary_set_value(rotary, new_value, LV_ANIM_OFF)) {
             res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
