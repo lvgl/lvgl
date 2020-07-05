@@ -211,7 +211,7 @@ bool lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
             angle = _lv_map(ext->cur_value, ext->min_value, ext->max_value, ext->arc.bg_angle_start, bg_end);
             lv_arc_set_end_angle(rotary, angle);
     }
-    ext->last_angle = angle; /*Cache angle slew rate limiting*/
+    ext->last_angle = angle; /*Cache angle for slew rate limiting*/
 
     return true;
 }
@@ -454,7 +454,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
 
         /*Set the new value*/
         int16_t new_value = _lv_map(angle, ext->arc.bg_angle_start, bg_end, ext->min_value, ext->max_value);
-        if (lv_rotary_set_value(rotary, new_value, LV_ANIM_OFF)) {
+        if (lv_rotary_set_value(rotary, new_value, LV_ANIM_OFF)) {  /*set_value caches the last_angle for the next interation*/
             res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
