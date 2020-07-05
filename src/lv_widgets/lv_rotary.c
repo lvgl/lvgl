@@ -81,13 +81,15 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->arc.bg_angle_end = 45;
     ext->arc.arc_angle_start = 135;
     ext->arc.arc_angle_end = 270;
+    ext->type = LV_ROTARY_TYPE_NORMAL;
     ext->cur_value = 0;
     ext->min_value = 0;
     ext->max_value = 0;
     ext->sensitivity = 1;
-    ext->threshold = 10;
     ext->dragging = false;
-    ext->type = LV_ROTARY_TYPE_NORMAL;
+    ext->threshold = 360;
+    ext->last_timestamp = lv_tick_get();
+    ext->last_angle = ext->arc.arc_angle_end;
     lv_style_list_init(&ext->style_knob);
 
     /*The signal and design functions are not copied so set them here*/
@@ -105,13 +107,15 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Copy an existing rotary*/
     else {
         lv_rotary_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+        ext->type = copy_ext->type;
         ext->cur_value = copy_ext->cur_value;
         ext->min_value = copy_ext->min_value;
         ext->max_value = copy_ext->max_value;
         ext->sensitivity = copy_ext->sensitivity;
-        ext->threshold = copy_ext->threshold;
         ext->dragging = copy_ext->dragging;
-        ext->type = copy_ext->type;
+        ext->threshold = copy_ext->threshold;
+        ext->last_timestamp = copy_ext->last_timestamp;
+        ext->last_angle = copy_ext->last_angle;
         lv_style_list_copy(&ext->style_knob, &copy_ext->style_knob);
 
         lv_obj_refresh_style(rotary, LV_OBJ_PART_ALL);
@@ -183,41 +187,32 @@ bool lv_rotary_set_value(lv_obj_t * rotary, int16_t value, lv_anim_enable_t anim
     int16_t bg_midpoint, range_midpoint, bg_end = ext->arc.bg_angle_end;
     if (ext->arc.bg_angle_end < ext->arc.bg_angle_start) bg_end = ext->arc.bg_angle_end + 360;
     
+    int16_t angle;
     switch(ext->type) {
         case LV_ROTARY_TYPE_SYMMETRIC:
             bg_midpoint = (ext->arc.bg_angle_start + bg_end) / 2;
             range_midpoint = (int32_t)(ext->min_value + ext->max_value) / 2;
 
             if (ext->cur_value < range_midpoint) {
-                lv_arc_set_start_angle(
-                    rotary,
-                    _lv_map(ext->cur_value, ext->min_value, range_midpoint, 
-                            ext->arc.bg_angle_start, bg_midpoint)
-                );
+                angle = _lv_map(ext->cur_value, ext->min_value, range_midpoint, ext->arc.bg_angle_start, bg_midpoint);
+                lv_arc_set_start_angle(rotary, angle);
                 lv_arc_set_end_angle(rotary, bg_midpoint);
             } else {
+                angle = _lv_map(ext->cur_value, range_midpoint, ext->max_value, bg_midpoint, bg_end);
                 lv_arc_set_start_angle(rotary, bg_midpoint);
-                lv_arc_set_end_angle(
-                    rotary,
-                    _lv_map(ext->cur_value, range_midpoint, ext->max_value, 
-                            bg_midpoint, bg_end)
-                );
+                lv_arc_set_end_angle(rotary, angle);
             }
             break;
         case LV_ROTARY_TYPE_REVERSE:
-            lv_arc_set_start_angle(
-                rotary,
-                _lv_map(ext->cur_value, ext->min_value, ext->max_value,
-                        ext->arc.bg_angle_start, bg_end)
-            );
+            angle = _lv_map(ext->cur_value, ext->min_value, ext->max_value, ext->arc.bg_angle_start, bg_end);
+            lv_arc_set_start_angle(rotary, angle);
             break;
         default: /** LV_ROTARY_TYPE_NORMAL*/
-            lv_arc_set_end_angle(
-                rotary,
-                _lv_map(ext->cur_value, ext->min_value, ext->max_value, 
-                        ext->arc.bg_angle_start, bg_end)
-            );
+            angle = _lv_map(ext->cur_value, ext->min_value, ext->max_value, ext->arc.bg_angle_start, bg_end);
+            lv_arc_set_end_angle(rotary, angle);
     }
+    ext->last_angle = angle; /*Cache angle slew rate limiting*/
+
     return true;
 }
 
@@ -442,7 +437,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         if(angle < ext->arc.bg_angle_start) angle = ext->arc.bg_angle_start;
         if(angle > bg_end) angle = bg_end;
 
-        /*Calculate the slew rate limited angle delta the threshold (degrees/sec)*/
+        /*Calculate the slew rate limited angle based on threshold (degrees/sec)*/
         int16_t delta_angle = angle - ext->last_angle;
         uint16_t delta_ts_milli = lv_tick_get() - ext->last_timestamp;
         int16_t delta_angle_threshold = (ext->threshold * 1000) / delta_ts_milli;
@@ -454,16 +449,14 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         }
 
         angle = ext->last_angle + delta_angle; /*Apply the limited angle change*/
-        ext->last_angle = angle; /*Cache angle for the next iteration*/
+        // ext->last_angle = angle; /*Cache angle for the next iteration*/
 
         int16_t new_value = _lv_map(angle, ext->arc.bg_angle_start, bg_end, ext->min_value, ext->max_value);
 
-        /*Set the new value if it's larger than the threshold*/
-        if (LV_MATH_ABS(ext->cur_value - new_value) < ext->threshold) {
-            if (lv_rotary_set_value(rotary, new_value, LV_ANIM_OFF)) {
-                res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
-                if(res != LV_RES_OK) return res;
-            }
+        /*Set the new value*/
+        if (lv_rotary_set_value(rotary, new_value, LV_ANIM_OFF)) {
+            res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
+            if(res != LV_RES_OK) return res;
         }
     }
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
