@@ -439,7 +439,7 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
 
         /*Calculate the slew rate limited angle based on threshold (degrees/sec)*/
         int16_t delta_angle = angle - ext->last_angle;
-        uint32_t delta_tick = lv_tick_get() - ext->last_tick;
+        uint32_t delta_tick = lv_tick_elaps(ext->last_tick);
         int16_t delta_angle_threshold = (ext->threshold * 1000) / delta_tick;
 
         if (delta_angle > delta_angle_threshold) {
