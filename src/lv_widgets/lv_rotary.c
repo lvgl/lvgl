@@ -442,6 +442,20 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         if(angle < ext->arc.bg_angle_start) angle = ext->arc.bg_angle_start;
         if(angle > bg_end) angle = bg_end;
 
+        /*Calculate the slew rate limited angle delta the threshold (degrees/sec)*/
+        int16_t delta_angle = angle - ext->last_angle;
+        uint16_t delta_ts_milli = lv_tick_get() - ext->last_timestamp;
+        int16_t delta_angle_threshold = (ext->threshold * 1000) / delta_ts_milli;
+
+        if (delta_angle > delta_angle_threshold) {
+            delta_angle = delta_angle_threshold;
+        } else if (delta_angle < -delta_angle_threshold) {
+            delta_angle = -delta_angle_threshold;
+        }
+
+        angle = ext->last_angle + delta_angle; /*Apply the limited angle change*/
+        ext->last_angle = angle; /*Cache angle for the next iteration*/
+
         int16_t new_value = _lv_map(angle, ext->arc.bg_angle_start, bg_end, ext->min_value, ext->max_value);
 
         /*Set the new value if it's larger than the threshold*/
