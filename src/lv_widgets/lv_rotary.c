@@ -82,12 +82,12 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->arc.arc_angle_start = 135;
     ext->arc.arc_angle_end = 270;
     ext->type = LV_ROTARY_TYPE_NORMAL;
-    ext->cur_value = 0;
+    ext->cur_value = -1;
     ext->min_value = 0;
-    ext->max_value = 0;
+    ext->max_value = 100;
     ext->sensitivity = 1;
     ext->dragging = false;
-    ext->threshold = 360;
+    ext->chg_rate = 360;
     ext->last_tick = lv_tick_get();
     ext->last_angle = ext->arc.arc_angle_end;
     lv_style_list_init(&ext->style_knob);
@@ -101,7 +101,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_click(rotary, true);
         lv_obj_add_protect(rotary, LV_PROTECT_PRESS_LOST);
         lv_obj_set_ext_click_area(rotary, LV_DPI / 10, LV_DPI / 10, LV_DPI / 10, LV_DPI / 10);
-
+        lv_rotary_set_value(rotary, ext->min_value, LV_ANIM_OFF);
         lv_theme_apply(rotary, LV_THEME_ROTARY);
     }
     /*Copy an existing rotary*/
@@ -113,7 +113,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->max_value = copy_ext->max_value;
         ext->sensitivity = copy_ext->sensitivity;
         ext->dragging = copy_ext->dragging;
-        ext->threshold = copy_ext->threshold;
+        ext->chg_rate = copy_ext->chg_rate;
         ext->last_tick = copy_ext->last_tick;
         ext->last_angle = copy_ext->last_angle;
         lv_style_list_copy(&ext->style_knob, &copy_ext->style_knob);
@@ -262,12 +262,12 @@ void lv_rotary_set_sensitivity(lv_obj_t * rotary, uint16_t sensitivity)
  * @param rotary pointer to a rotary object
  * @param threshold increment threshold
  */
-void lv_rotary_set_threshold(lv_obj_t * rotary, uint16_t threshold)
+void lv_rotary_set_chg_rate(lv_obj_t * rotary, uint16_t rate)
 {
     LV_ASSERT_OBJ(rotary, LV_OBJX_NAME);
 
     lv_rotary_ext_t *ext = (lv_rotary_ext_t *)lv_obj_get_ext_attr(rotary);
-    ext->threshold = threshold;
+    ext->chg_rate = rate;
 }
 
 /*=====================
@@ -438,15 +438,15 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         if(angle < ext->arc.bg_angle_start) angle = ext->arc.bg_angle_start;
         if(angle > bg_end) angle = bg_end;
 
-        /*Calculate the slew rate limited angle based on threshold (degrees/sec)*/
+        /*Calculate the slew rate limited angle based on change rate (degrees/sec)*/
         int16_t delta_angle = angle - ext->last_angle;
         uint32_t delta_tick = lv_tick_elaps(ext->last_tick);
-        int16_t delta_angle_threshold = (ext->threshold * delta_tick) / 1000;
+        int16_t delta_angle_max = (ext->chg_rate * delta_tick) / 1000;
 
-        if (delta_angle > delta_angle_threshold) {
-            delta_angle = delta_angle_threshold;
-        } else if (delta_angle < -delta_angle_threshold) {
-            delta_angle = -delta_angle_threshold;
+        if (delta_angle > delta_angle_max) {
+            delta_angle = delta_angle_max;
+        } else if (delta_angle < -delta_angle_max) {
+            delta_angle = -delta_angle_max;
         }
 
         angle = ext->last_angle + delta_angle; /*Apply the limited angle change*/

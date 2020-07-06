@@ -72,7 +72,7 @@ typedef struct {
     int16_t max_value; /*Maximum value of the rotary*/
     int16_t sensitivity; /*Control signal increment multiplier of the rotary*/
     uint16_t dragging    :1;
-    uint16_t threshold; /*Drag angle rate of change threshold of the rotary (degrees/sec)*/
+    uint16_t chg_rate; /*Drag angle rate of change of the rotary (degrees/sec)*/
     int32_t last_tick; /*Last dragging event timestamp of the rotary*/
     int16_t last_angle; /*Last dragging angle of the rotary*/
 } lv_rotary_ext_t;
@@ -148,7 +148,7 @@ void lv_rotary_set_sensitivity(lv_obj_t * rotary, uint16_t sensitivity);
  * @param rotary pointer to a rotary object
  * @param threshold increment threshold
  */
-void lv_rotary_set_threshold(lv_obj_t * rotary, uint16_t threshold);
+void lv_rotary_set_chg_rate(lv_obj_t * rotary, uint16_t threshold);
 
 /**
  * Set the start angle of rotary indicator. 0 deg: right, 90 bottom, etc.
