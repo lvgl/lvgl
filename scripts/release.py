@@ -11,18 +11,10 @@ def title(t):
    
 def cmd(c):
 	print("\n" + c)
-	os.system(c)		   
-   
-
-def increment(s):
-    """ look for the last sequence of number(s) in a string and increment """
-    m = lastNum.search(s)
-    if m:
-        next = str(int(m.group(1))+1)
-        start, end = m.span(1)
-        s = s[:max(end-len(next), start)] + next + s[end:]
-    return s, str(next)
-
+	r = os.system(c)		   
+  if r:
+    print("Exit due to previous error")
+    exit(r)
 
 def lvgl_clone():
 	title("lvgl: Clone")
@@ -179,14 +171,16 @@ def drivers_merge_to_release_branch(v):
 def docs_clone():
 	title("docs: Clone")
 	cmd("git clone --recursive https://github.com/lvgl/docs.git")
-	os.chdir("./docs/v7")
-	cmd("git co master") 
+	os.chdir("./docs")
 
 def docs_get_api():
 	title("docs: Get API files")
 	
+	cmd("git co latest") 
 	cmd("rm -rf xml");	
 	cmd("cp -r ../../lvgl/docs/api_doc/xml .");	
+	cmd("git add xml");
+	cmd('git commit -m "update API"')	
 
 def docs_update_version(v):
 	title("docs: Update version number")
@@ -212,6 +206,8 @@ def docs_update_version(v):
 		  
 	f.write(outbuf)
 	f.close()
+	cmd("git add conf.py")
+	cmd('git ci -m "update conf.py to ' + v '"')
 
 def docs_update_trans():
 	title("docs: Update translations")
@@ -219,17 +215,8 @@ def docs_update_trans():
 
 def docs_build():
 	title("docs: Build")
-	cmd("./build.py clean")
-
-	
-def docs_commit_push(v):
-	title("docs: Commit release")
-
-	cmd('git add .')
-	cmd('git ci -am "Release ' + v + '"')
-	cmd('git tag -a ' + v + ' -m "Release ' + v +'"')
-	cmd('git push origin master')
-	cmd('git push origin ' + v)
+	cmd("git checkout master")
+	cmd("./update.py latest")
 	
 def clean_up():
 	title("Clean up repos")
@@ -258,6 +245,5 @@ docs_get_api()
 docs_update_version(ver_str)
 #docs_update_trans() # Zanata is not working now
 docs_build()    
-docs_commit_push(ver_str)
 
 clean_up()
