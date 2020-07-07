@@ -5,7 +5,7 @@ Available in the `dev` branch
 
 ## v7.2.0 (planned on 21.07.2020)
 *Available in the `master` branch*
-
+ 
 ### New features
 - Add `LV_CALENDAR_WEEK_STARTS_MONDAY`
 - Add `lv_chart_set_x_start_point()` function - Set the index of the x-axis start point in the data array
