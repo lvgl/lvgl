@@ -5,7 +5,7 @@ pullRequestOpened: |
   To ensure that all licensing criteria is met all repositories of the LVGL project apply a process called DCO (Developer's Certificate of Origin). 
   
   The text of DCO can be read here: https://developercertificate.org/
-  For a more detailed description see the [Documentation](https://docs.lvgl.io/latest/en/html/contributing/index.html#dco) site.
+  For a more detailed description see the [Documentation](https://docs.lvgl.io/latest/en/html/contributing/index.html#developer-certification-of-origin-dco) site.
   
   By contributing to any repositories of the LVGL project you state that your contribution corresponds with the DCO.
   
