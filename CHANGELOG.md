@@ -1,7 +1,10 @@
 # Changelog
 
-## v7.2.0 (planned on 04.08.2020)
+## v7.3.0 (planned on 04.08.2020)
 Available in the `dev` branch
+
+## v7.2.0 (planned on 21.07.2020)
+*Available in the `master` branch*
 
 ### New features
 - Add `LV_CALENDAR_WEEK_STARTS_MONDAY`
@@ -19,8 +22,7 @@ Available in the `dev` branch
 - Add `lv_obj_align_x()` and `lv_obj_align_y()` functions
 - Add `lv_obj_align_origo_x()` and `lv_obj_align_origo_y()` functions
 
-## v7.1.0 (planned on 07.07.2020)
-*Available in the `master` branch*
+## v7.1.0 (07.07.2020)
 
 ### New features
 - Add `focus_parent` attribute to `lv_obj`
