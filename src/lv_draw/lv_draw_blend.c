@@ -61,7 +61,7 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
  **********************/
 
 #if LV_USE_GPU || LV_USE_GPU_STM32_DMA2D
-LV_ATTRIBUTE_DMA static lv_color_t blend_buf[LV_HOR_RES_MAX];
+    LV_ATTRIBUTE_DMA static lv_color_t blend_buf[LV_HOR_RES_MAX];
 #endif
 
 /**********************

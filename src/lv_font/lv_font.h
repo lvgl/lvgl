@@ -174,7 +174,7 @@ LV_FONT_DECLARE(lv_font_montserrat_32)
 #if LV_FONT_MONTSERRAT_34
 LV_FONT_DECLARE(lv_font_montserrat_34)
 #endif
-   
+
 #if LV_FONT_MONTSERRAT_36
 LV_FONT_DECLARE(lv_font_montserrat_36)
 #endif
