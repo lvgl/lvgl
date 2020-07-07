@@ -194,10 +194,10 @@ void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color
     DMA2D->BGOR = buf_w - copy_w;
 
     DMA2D->FGPFCCR = (uint32_t)LV_DMA2D_COLOR_FORMAT
-    /* alpha mode 2, replace with foreground * alpha value */
-    | (2 << DMA2D_FGPFCCR_AM_Pos)
-    /* alpha value */
-    | (opa << DMA2D_FGPFCCR_ALPHA_Pos);
+                     /* alpha mode 2, replace with foreground * alpha value */
+                     | (2 << DMA2D_FGPFCCR_AM_Pos)
+                     /* alpha value */
+                     | (opa << DMA2D_FGPFCCR_ALPHA_Pos);
     DMA2D->FGMAR = (uint32_t)map;
     DMA2D->FGOR = map_w - copy_w;
 

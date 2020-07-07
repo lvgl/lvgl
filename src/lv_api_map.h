@@ -180,7 +180,7 @@ static inline lv_obj_t * lv_page_get_scrl(lv_obj_t * page)
 
 static inline lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src)
 {
-	return lv_win_add_btn_right(win, img_src);
+    return lv_win_add_btn_right(win, img_src);
 }
 
 #endif

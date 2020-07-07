@@ -39,7 +39,7 @@
 #include LV_THEME_DEFAULT_INCLUDE
 
 #if LV_USE_GPU_STM32_DMA2D
-#include "../lv_gpu/lv_gpu_stm32_dma2d.h"
+    #include "../lv_gpu/lv_gpu_stm32_dma2d.h"
 #endif
 
 /*********************
@@ -1570,21 +1570,21 @@ void lv_obj_set_gesture_parent(lv_obj_t * obj, bool en)
 */
 void lv_obj_set_focus_parent(lv_obj_t * obj, bool en)
 {
-	if (lv_obj_is_focused(obj)) {
-    	if (en)	{
-    		obj->focus_parent = 1;
-			lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
-			lv_obj_set_state(lv_obj_get_focused_obj(obj), LV_STATE_FOCUSED);
-		}
-    	else {
-			lv_obj_clear_state(lv_obj_get_focused_obj(obj), LV_STATE_FOCUSED | LV_STATE_EDITED);
-			lv_obj_set_state(obj, LV_STATE_FOCUSED);
-			obj->focus_parent = 0;
-    	}
+    if(lv_obj_is_focused(obj)) {
+        if(en) {
+            obj->focus_parent = 1;
+            lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
+            lv_obj_set_state(lv_obj_get_focused_obj(obj), LV_STATE_FOCUSED);
+        }
+        else {
+            lv_obj_clear_state(lv_obj_get_focused_obj(obj), LV_STATE_FOCUSED | LV_STATE_EDITED);
+            lv_obj_set_state(obj, LV_STATE_FOCUSED);
+            obj->focus_parent = 0;
+        }
     }
-	else {
-		obj->focus_parent = (en == true ? 1 : 0);
-	}
+    else {
+        obj->focus_parent = (en == true ? 1 : 0);
+    }
 }
 
 /**
@@ -3704,10 +3704,10 @@ lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj)
     if(obj == NULL) return NULL;
     const lv_obj_t * focus_obj = obj;
     while(lv_obj_get_focus_parent(focus_obj) != false && focus_obj != NULL) {
-    	focus_obj = lv_obj_get_parent(focus_obj);
+        focus_obj = lv_obj_get_parent(focus_obj);
     }
 
-    return (lv_obj_t*)focus_obj;
+    return (lv_obj_t *)focus_obj;
 }
 
 /**

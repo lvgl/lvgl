@@ -196,9 +196,9 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
     ext->sel_opt_id_ori = ext->sel_opt_id;
 
 
-        refr_height(roller);
-        refr_width(roller);
-//    refr_position(roller, LV_ANIM_OFF);
+    refr_height(roller);
+    refr_width(roller);
+    //    refr_position(roller, LV_ANIM_OFF);
 }
 
 /**

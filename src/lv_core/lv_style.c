@@ -36,10 +36,10 @@
  **********************/
 LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop);
 static lv_style_t * get_alloc_local_style(lv_style_list_t * list);
-static inline void style_resize(lv_style_t *style, size_t sz);
-static inline lv_style_property_t get_style_prop(const lv_style_t *style, size_t idx);
-static inline uint8_t get_style_prop_id(const lv_style_t *style, size_t idx);
-static inline uint8_t get_style_prop_attr(const lv_style_t *style, size_t idx);
+static inline void style_resize(lv_style_t * style, size_t sz);
+static inline lv_style_property_t get_style_prop(const lv_style_t * style, size_t idx);
+static inline uint8_t get_style_prop_id(const lv_style_t * style, size_t idx);
+static inline uint8_t get_style_prop_attr(const lv_style_t * style, size_t idx);
 static inline size_t get_prop_size(uint8_t prop_id);
 static inline size_t get_next_prop_index(uint8_t prop_id, size_t id);
 
@@ -1065,7 +1065,7 @@ LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t 
 
     size_t i = 0;
 
-    uint8_t prop_id;    
+    uint8_t prop_id;
     while((prop_id = get_style_prop_id(style, i)) != _LV_STYLE_CLOSEING_PROP) {
         if(prop_id == id_to_find) {
             lv_style_attr_t attr_i;
@@ -1124,7 +1124,7 @@ static lv_style_t * get_alloc_local_style(lv_style_list_t * list)
  * @param style pointer to the style to be resized.
  * @param size new size
  */
-static inline void style_resize(lv_style_t *style, size_t sz)
+static inline void style_resize(lv_style_t * style, size_t sz)
 {
     style->map = lv_mem_realloc(style->map, sz);
 }
@@ -1135,10 +1135,10 @@ static inline void style_resize(lv_style_t *style, size_t sz)
  * @param idx index of the style in style->map
  * @return property in style->map + idx
  */
-static inline lv_style_property_t get_style_prop(const lv_style_t *style, size_t idx)
+static inline lv_style_property_t get_style_prop(const lv_style_t * style, size_t idx)
 {
     lv_style_property_t prop;
-    uint8_t *prop_p = (uint8_t*)&prop;
+    uint8_t * prop_p = (uint8_t *)&prop;
     prop_p[0] = style->map[idx];
     prop_p[1] = style->map[idx + 1];
     return prop;
@@ -1150,7 +1150,7 @@ static inline lv_style_property_t get_style_prop(const lv_style_t *style, size_t
  * @param idx index of the style in style->map
  * @return id of property in style->map + idx
  */
-static inline uint8_t get_style_prop_id(const lv_style_t *style, size_t idx)
+static inline uint8_t get_style_prop_id(const lv_style_t * style, size_t idx)
 {
     return get_style_prop(style, idx) & 0xFF;
 }
@@ -1161,7 +1161,7 @@ static inline uint8_t get_style_prop_id(const lv_style_t *style, size_t idx)
  * @param idx index of the style in style->map
  * @return attribute of property in style->map + idx
  */
-static inline uint8_t get_style_prop_attr(const lv_style_t *style, size_t idx)
+static inline uint8_t get_style_prop_attr(const lv_style_t * style, size_t idx)
 {
     return ((get_style_prop(style, idx) >> 8) & 0xFFU);
 }
