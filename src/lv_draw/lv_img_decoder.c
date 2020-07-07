@@ -153,10 +153,6 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
         if(res == LV_RES_OK) break;
     }
 
-    if(res == LV_RES_INV) {
-        _lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
-    }
-
     return res;
 }
 
