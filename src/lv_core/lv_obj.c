@@ -103,6 +103,7 @@ static void lv_event_mark_deleted(lv_obj_t * obj);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
+static lv_res_t get_scrollbar_area(lv_obj_t * obj, lv_area_t * sbv);
 
 /**********************
  *  STATIC VARIABLES
@@ -1076,6 +1077,7 @@ void lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->scroll.y += y;
 
     refresh_children_position(obj, x, y);
+    lv_signal_send(obj, LV_SIGNAL_SCROLLED, NULL);
     lv_obj_invalidate(obj);
 }
 /**
@@ -1103,11 +1105,14 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
             lv_anim_start(&a);
         }
 
-
         if(y) {
-            lv_anim_set_time(&a, lv_anim_speed_to_time(lv_disp_get_ver_res(d), 0, y));
+            lv_anim_path_t path;
+            lv_anim_path_init(&path);
+            lv_anim_path_set_cb(&path, lv_anim_path_ease_out);
+            lv_anim_set_time(&a, lv_anim_speed_to_time((lv_disp_get_ver_res(d) * 3) >> 2, 0, y));
             lv_anim_set_values(&a, obj->scroll.y, obj->scroll.y + y);
             lv_anim_set_exec_cb(&a,  (lv_anim_exec_xcb_t) scroll_anim_y_cb);
+            lv_anim_set_path(&a, &path);
             lv_anim_start(&a);
         }
 
@@ -3740,6 +3745,14 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
             lv_draw_mask_add(mp, obj + 8);
         }
+
+            lv_area_t sb;
+            if(get_scrollbar_area(obj, &sb)) {
+                lv_draw_rect_dsc_t sb_rect_dsc;
+                lv_draw_rect_dsc_init(&sb_rect_dsc);
+                sb_rect_dsc.bg_color = LV_COLOR_RED;
+                lv_draw_rect(&sb, clip_area, &sb_rect_dsc);
+            }
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
         if(lv_obj_get_style_clip_corner(obj, LV_OBJ_PART_MAIN)) {
@@ -3810,6 +3823,9 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_CHILD_CHG) {
         /*Return 'invalid' if the child change signal is not enabled*/
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
+    }
+    else if(sign == LV_SIGNAL_SCROLLED) {
+
     }
     else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
 
@@ -4397,3 +4413,41 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
 
     return false;
 }
+
+static lv_res_t get_scrollbar_area(lv_obj_t * obj, lv_area_t * sbv)
+{
+    lv_coord_t obj_h = lv_obj_get_height(obj);
+
+    lv_area_t child_box;
+    lv_res_t res = lv_obj_get_children_box(obj, &child_box);
+    if(res != LV_RES_OK) return res;
+
+    lv_coord_t content_h = (child_box.y2 - obj->scroll.y) - obj->coords.y1 ;
+    if(content_h < obj_h) {
+        return LV_RES_INV;
+    }
+    lv_coord_t sb_h = (obj_h * obj_h) / content_h;
+    if(sb_h != 150) {
+        volatile int x = 0;
+    }
+    lv_coord_t rem = obj_h - sb_h;  /*Remaining size from the scrollbar track that is not the scrollbar itself*/
+    lv_coord_t scroll_h = content_h - obj_h; /*The size of the content which can be really scrolled*/
+    if(scroll_h <= 0) {
+        sbv->y1 = obj->coords.y1;
+        sbv->y2 = obj->coords.y2;
+        sbv->x2 = obj->coords.x2;
+        sbv->x1 = sbv->x2 - 10;
+        return LV_RES_OK;
+    }
+    lv_coord_t sb_y = (rem * (child_box.y2 - obj->coords.y2)) / scroll_h;
+    printf("overflow: sb_h: %d, y: %d\n", sb_h, sb_y);
+
+    sbv->y1 = obj->coords.y1 + sb_y;
+    sbv->y2 = sbv->y1 + sb_h;
+    sbv->x2 = obj->coords.x2;
+    sbv->x1 = sbv->x2 - 10;
+
+    return LV_RES_OK;
+}
+
+
