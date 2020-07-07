@@ -87,7 +87,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->max_value = 100;
     ext->sensitivity = 1;
     ext->dragging = false;
-    ext->chg_rate = 360;
+    ext->chg_rate = 540;
     ext->last_tick = lv_tick_get();
     ext->last_angle = ext->arc.arc_angle_end;
     lv_style_list_init(&ext->style_knob);
@@ -101,7 +101,7 @@ lv_obj_t * lv_rotary_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_click(rotary, true);
         lv_obj_add_protect(rotary, LV_PROTECT_PRESS_LOST);
         lv_obj_set_ext_click_area(rotary, LV_DPI / 10, LV_DPI / 10, LV_DPI / 10, LV_DPI / 10);
-        lv_rotary_set_value(rotary, ext->min_value, LV_ANIM_OFF);
+        lv_rotary_set_value(rotary, 50, LV_ANIM_OFF);
         lv_theme_apply(rotary, LV_THEME_ROTARY);
     }
     /*Copy an existing rotary*/
@@ -450,13 +450,25 @@ static lv_res_t lv_rotary_signal(lv_obj_t * rotary, lv_signal_t sign, void * par
         }
 
         angle = ext->last_angle + delta_angle; /*Apply the limited angle change*/
-        ext->last_tick = lv_tick_get(); /*Cache timestamp for the next iteration*/
+
+        /*Rounding for symmetry*/
+        int32_t round = ((bg_end - ext->arc.bg_angle_start) * 8) / (ext->max_value - ext->min_value);
+        round = (round + 4) >> 4;
+        angle += round;
 
         /*Set the new value*/
         int16_t new_value = _lv_map(angle, ext->arc.bg_angle_start, bg_end, ext->min_value, ext->max_value);
-        if (lv_rotary_set_value(rotary, new_value, LV_ANIM_OFF)) {  /*set_value caches the last_angle for the next interation*/
-            res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
-            if(res != LV_RES_OK) return res;
+        if(new_value != lv_rotary_get_value(rotary)) {
+            ext->last_tick = lv_tick_get(); /*Cache timestamp for the next iteration*/
+            if (lv_rotary_set_value(rotary, new_value, LV_ANIM_OFF)) {  /*set_value caches the last_angle for the next interation*/
+                res = lv_event_send(rotary, LV_EVENT_VALUE_CHANGED, NULL);
+                if(res != LV_RES_OK) return res;
+            }
+        }
+
+        /*Don1't let the elapsed time to big while sitting on an end point*/
+        if(new_value == ext->min_value || new_value == ext->max_value) {
+            ext->last_tick = lv_tick_get(); /*Cache timestamp for the next iteration*/
         }
     }
     else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
