@@ -12,7 +12,7 @@
 LVGL provides everything you need to create embedded GUI with easy-to-use graphical elements, beautiful visual effects and low memory footprint. 
 </p>
 
-<h4 align="center">
+<h4 align="center"> 
 <a href="https://lvgl.io">Website </a> &middot; 
 <a href="https://lvgl.io/demos">Online demo</a> &middot; 
 <a href="https://docs.lvgl.io/">Docs</a> &middot; 
