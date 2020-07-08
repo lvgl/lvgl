@@ -3849,6 +3849,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             lv_draw_mask_add(mp, obj + 8);
         }
 
+        if(lv_obj_get_screen(obj) == lv_scr_act()) {
             lv_area_t sb;
             if(get_scrollbar_area(obj, &sb)) {
                 lv_draw_rect_dsc_t sb_rect_dsc;
@@ -3856,6 +3857,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
                 sb_rect_dsc.bg_color = LV_COLOR_RED;
                 lv_draw_rect(&sb, clip_area, &sb_rect_dsc);
             }
+        }
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
         if(lv_obj_get_style_clip_corner(obj, LV_OBJ_PART_MAIN)) {
@@ -4548,6 +4550,8 @@ static lv_res_t get_scrollbar_area(lv_obj_t * obj, lv_area_t * sbv)
         return LV_RES_OK;
     }
     lv_coord_t sb_y = (rem * (child_box.y2 - obj->coords.y2)) / scroll_h;
+    sb_y = rem - sb_y;
+
 
     sbv->y1 = obj->coords.y1 + sb_y;
     sbv->y2 = sbv->y1 + sb_h;

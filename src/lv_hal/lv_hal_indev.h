@@ -52,6 +52,7 @@ typedef uint8_t lv_indev_state_t;
 
 
 enum {
+    LV_DRAG_DIR_NONE = 0x0, /**< Object can't be dragged to any directions. */
     LV_DRAG_DIR_HOR = 0x1, /**< Object can be dragged horizontally. */
     LV_DRAG_DIR_VER = 0x2, /**< Object can be dragged vertically. */
     LV_DRAG_DIR_BOTH = 0x3, /**< Object can be dragged in all directions. */
