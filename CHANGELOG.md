@@ -3,6 +3,10 @@
 ## v7.3.0 (planned on 04.08.2020)
 Available in the `dev` branch
 
+### New features
+- Add `lv_task_get_next`
+- Add `lv_event_send_refresh`, `lv_event_send_refresh_recursive`, `lv_event_queue_refresh_recursive` to easily send `LV_EVENT_REFRESH` to object
+
 ## v7.2.0 (planned on 21.07.2020)
 *Available in the `master` branch*
 

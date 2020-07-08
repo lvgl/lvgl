@@ -98,6 +98,7 @@ static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
 static void fade_in_anim_ready(lv_anim_t * a);
 #endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
+static void refresh_event_task_cb(lv_task_t * t);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
@@ -1750,6 +1751,71 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
     res = lv_event_send_func(obj->event_cb, obj, event, data);
     return res;
 }
+
+/**
+ * Send LV_EVENT_REFRESH event to an object
+ * @param obj point to an obejct. (Can NOT be NULL)
+ * @return LV_RES_OK: success, LV_RES_INV: to object become invalid (e.g. deleted) due to this event.
+ */
+lv_res_t lv_event_send_refresh(lv_obj_t * obj)
+{
+    return lv_event_send(obj, LV_EVENT_REFRESH, NULL);
+}
+
+/**
+ * Send LV_EVENT_REFRESH event to an object all of its children.
+ * @param obj pointer to an object or NULL to refresh all objects of all displays
+ */
+void lv_event_send_refresh_recursive(lv_obj_t * obj)
+{
+    if(obj == NULL) {
+        /*If no obj specified refresh all screen of all displays */
+        lv_disp_t * d = lv_disp_get_next(NULL);
+        while(d) {
+            lv_obj_t * scr = _lv_ll_get_head(&d->scr_ll);
+            while(scr) {
+                lv_event_send_refresh_recursive(scr);
+                scr = _lv_ll_get_next(&d->scr_ll, scr);
+            }
+            lv_event_send_refresh_recursive(d->top_layer);
+            lv_event_send_refresh_recursive(d->sys_layer);
+
+            d = lv_disp_get_next(d);
+        }
+    } else {
+
+        lv_res_t res = lv_event_send_refresh(obj);
+        if(res != LV_RES_OK) return; /*If invalid returned do not check the children*/
+
+        lv_obj_t * child = lv_obj_get_child(obj, NULL);
+        while(child) {
+            lv_event_send_refresh_recursive(child);
+
+            child = lv_obj_get_child(obj, child);
+        }
+    }
+}
+
+/**
+ * Queue the sending of LV_EVENT_REFRESH event to an object all of its children.
+ * The events won't be sent immediately but after `LV_DISP_DEF_REFR_PERIOD` delay.
+ * It is useful to refresh object only on a reasonable rate if this function is called very often.
+ * @param obj pointer to an object or NULL to refresh all objects of all displays
+ */
+void lv_event_queue_refresh_recursive(lv_obj_t * obj)
+{
+    lv_task_t * t = lv_task_get_next(NULL);
+    while(t) {
+        /* REturn if a refresh is already queued for this object*/
+        if(t->task_cb == refresh_event_task_cb && t->user_data == obj) return;
+        t = lv_task_get_next(t);
+    }
+
+    /*No queued task for this object so create one now*/
+    t = lv_task_create(refresh_event_task_cb, LV_DISP_DEF_REFR_PERIOD, LV_TASK_PRIO_MID, obj);
+    lv_task_set_repeat_count(t, 1);
+}
+
 
 /**
  * Call an event function with an object, event, and data.
@@ -4229,6 +4295,11 @@ static void lv_event_mark_deleted(lv_obj_t * obj)
         if(t->obj == obj) t->deleted = true;
         t = t->prev;
     }
+}
+
+static void refresh_event_task_cb(lv_task_t * t)
+{
+    lv_event_send_refresh_recursive(t->user_data);
 }
 
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
