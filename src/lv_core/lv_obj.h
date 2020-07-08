@@ -122,7 +122,6 @@ enum {
     /*General signals*/
     LV_SIGNAL_CLEANUP, /**< Object is being deleted */
     LV_SIGNAL_CHILD_CHG, /**< Child was removed/added */
-    LV_SIGNAL_SCROLLED, /**< Object coordinates/size have changed */
     LV_SIGNAL_COORD_CHG, /**< Object coordinates/size have changed */
     LV_SIGNAL_PARENT_SIZE_CHG, /**< Parent's size has changed */
     LV_SIGNAL_STYLE_CHG,    /**< Object's style has changed */
@@ -140,6 +139,9 @@ enum {
     LV_SIGNAL_RELEASED,          /**< User pressed object for a short period of time, then released it. Not called if dragged. */
     LV_SIGNAL_LONG_PRESS,        /**< Object has been pressed for at least `LV_INDEV_LONG_PRESS_TIME`.  Not called if dragged.*/
     LV_SIGNAL_LONG_PRESS_REP,    /**< Called after `LV_INDEV_LONG_PRESS_TIME` in every `LV_INDEV_LONG_PRESS_REP_TIME` ms.  Not called if dragged.*/
+    LV_SIGNAL_SCROLL_BEGIN,      /**< The scrolling has just begun  */
+    LV_SIGNAL_SCROLL,            /**< The object has been scrolled */
+    LV_SIGNAL_SCROLL_END,        /**< The scrolling has ended */
     LV_SIGNAL_DRAG_BEGIN,
     LV_SIGNAL_DRAG_THROW_BEGIN,
     LV_SIGNAL_DRAG_END,

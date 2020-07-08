@@ -1259,7 +1259,6 @@ static void indev_drag(lv_indev_proc_t * proc)
     if(target_obj == NULL) return;
 
     lv_drag_dir_t dirs = LV_DRAG_DIR_VER; //scrollable ? lv_obj_get_scroll_dir(target_obj) : lv_obj_get_drag_dir(target_obj);
-
     bool just_started = false;
 
     /*Get the coordinates of the object and modify them*/
@@ -1379,67 +1378,94 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
 {
     if(proc->types.pointer.drag_in_prog == 0) return;
 
-    lv_obj_t * drag_obj = get_dragged_obj(proc->types.pointer.last_obj);
 
-    if(drag_obj == NULL) return;
+    bool scrollable = true;
+
+    /*Get which object to drad/scroll*/
+    lv_obj_t * target_obj = get_dragged_obj(proc->types.pointer.last_obj);
+    if(target_obj == NULL) return;
 
     /*Return if the drag throw is not enabled*/
-    if(lv_obj_get_drag_throw(drag_obj) == false) {
-        proc->types.pointer.drag_in_prog = 0;
-        drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
-        if(indev_reset_check(proc)) return;
-
-        lv_event_send(drag_obj, LV_EVENT_DRAG_END, NULL);
-        return;
-    }
-
-    lv_drag_dir_t allowed_dirs = lv_obj_get_drag_dir(drag_obj);
+//    if(lv_obj_get_drag_throw(target_obj) == false) {
+//        proc->types.pointer.drag_in_prog = 0;
+//        target_obj->signal_cb(target_obj, scrollable ? LV_SIGNAL_SCROLL_END : LV_SIGNAL_DRAG_END, indev_act);
+//        if(indev_reset_check(proc)) return;
+//
+//        lv_event_send(target_obj, LV_EVENT_DRAG_END, NULL);
+//        return;
+//    }
 
     /*Reduce the vectors*/
     proc->types.pointer.drag_throw_vect.x =
-        proc->types.pointer.drag_throw_vect.x * (100 - indev_act->driver.drag_throw) / 100;
+        proc->types.pointer.drag_throw_vect.x * (100 - indev_act->driver.drag_throw) / 30;
     proc->types.pointer.drag_throw_vect.y =
-        proc->types.pointer.drag_throw_vect.y * (100 - indev_act->driver.drag_throw) / 100;
+        proc->types.pointer.drag_throw_vect.y * (100 - indev_act->driver.drag_throw) / 30;
 
-    if(proc->types.pointer.drag_throw_vect.x != 0 || proc->types.pointer.drag_throw_vect.y != 0) {
+    switch(proc->types.pointer.drag_dir) {
+    case LV_DRAG_DIR_HOR:
+        proc->types.pointer.drag_throw_vect.y = 0;
+        break;
+    case LV_DRAG_DIR_VER:
+        proc->types.pointer.drag_throw_vect.x = 0;
+        break;
+    }
+
+    lv_area_t child_box;
+    lv_obj_get_children_box(target_obj, &child_box);
+
+
+    if((target_obj->scroll.y < 0 && child_box.y2 > target_obj->coords.y2) &&
+       (proc->types.pointer.drag_throw_vect.x != 0 || proc->types.pointer.drag_throw_vect.y != 0)) {
         /*Get the coordinates and modify them*/
-        lv_area_t coords_ori;
-        lv_obj_get_coords(drag_obj, &coords_ori);
-        lv_coord_t act_x = lv_obj_get_x(drag_obj) + proc->types.pointer.drag_throw_vect.x;
-        lv_coord_t act_y = lv_obj_get_y(drag_obj) + proc->types.pointer.drag_throw_vect.y;
+        if(scrollable) {
+            if(target_obj->scroll.y + proc->types.pointer.drag_throw_vect.y > 0) {
+                proc->types.pointer.drag_throw_vect.y = 0;
+                lv_obj_scroll_to_y(target_obj, 0, LV_ANIM_OFF);
+            }
 
-        if(allowed_dirs == LV_DRAG_DIR_BOTH) lv_obj_set_pos(drag_obj, act_x, act_y);
-        else if(allowed_dirs == LV_DRAG_DIR_HOR) lv_obj_set_x(drag_obj, act_x);
-        else if(allowed_dirs == LV_DRAG_DIR_VER) lv_obj_set_y(drag_obj, act_y);
-        else if(allowed_dirs == LV_DRAG_DIR_ONE) {
-            if(proc->types.pointer.drag_sum.x) lv_obj_set_x(drag_obj, act_x);
-            else lv_obj_set_y(drag_obj, act_y);
+            if(child_box.y2 + proc->types.pointer.drag_throw_vect.y < target_obj->coords.y2) {
+                proc->types.pointer.drag_throw_vect.y = 0;
+                lv_obj_scroll_by(target_obj, 0, -(child_box.y2 - target_obj->coords.y2), LV_ANIM_OFF);
+            }
+
+
+                lv_obj_scroll_by(target_obj, proc->types.pointer.drag_throw_vect.x, proc->types.pointer.drag_throw_vect.y);
+        } else {
+            lv_area_t coords_ori;
+            lv_obj_get_coords(target_obj, &coords_ori);
+
+            lv_coord_t act_x = lv_obj_get_x(target_obj) + proc->types.pointer.drag_throw_vect.x;
+            lv_coord_t act_y = lv_obj_get_y(target_obj) + proc->types.pointer.drag_throw_vect.y;
+            lv_obj_set_pos(target_obj, act_x, act_y);
+
+            lv_area_t coords_new;
+            lv_obj_get_coords(target_obj, &coords_new);
+
+            /*If non of the coordinates are changed then do not continue throwing*/
+            if((coords_ori.x1 == coords_new.x1 || proc->types.pointer.drag_throw_vect.x == 0) &&
+                    (coords_ori.y1 == coords_new.y1 || proc->types.pointer.drag_throw_vect.y == 0)) {
+                proc->types.pointer.drag_in_prog      = 0;
+                proc->types.pointer.vect.x            = 0;
+                proc->types.pointer.vect.y            = 0;
+                proc->types.pointer.drag_throw_vect.x = 0;
+                proc->types.pointer.drag_throw_vect.y = 0;
+                target_obj->signal_cb(target_obj, LV_SIGNAL_DRAG_END, indev_act);
+                if(indev_reset_check(proc)) return;
+
+                lv_event_send(target_obj, LV_EVENT_DRAG_END, NULL);
+                if(indev_reset_check(proc)) return;
+            }
+
         }
-        lv_area_t coord_new;
-        lv_obj_get_coords(drag_obj, &coord_new);
 
-        /*If non of the coordinates are changed then do not continue throwing*/
-        if((coords_ori.x1 == coord_new.x1 || proc->types.pointer.drag_throw_vect.x == 0) &&
-           (coords_ori.y1 == coord_new.y1 || proc->types.pointer.drag_throw_vect.y == 0)) {
-            proc->types.pointer.drag_in_prog      = 0;
-            proc->types.pointer.vect.x            = 0;
-            proc->types.pointer.vect.y            = 0;
-            proc->types.pointer.drag_throw_vect.x = 0;
-            proc->types.pointer.drag_throw_vect.y = 0;
-            drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
-            if(indev_reset_check(proc)) return;
-
-            lv_event_send(drag_obj, LV_EVENT_DRAG_END, NULL);
-            if(indev_reset_check(proc)) return;
-        }
     }
     /*If the types.pointer.vectors become 0 -> types.pointer.drag_in_prog = 0 and send a drag end
        signal*/
     else {
         proc->types.pointer.drag_in_prog = 0;
-        drag_obj->signal_cb(drag_obj, LV_SIGNAL_DRAG_END, indev_act);
+        target_obj->signal_cb(target_obj, scrollable ? LV_SIGNAL_SCROLL_END : LV_SIGNAL_DRAG_END, indev_act);
         if(indev_reset_check(proc)) return;
-        lv_event_send(drag_obj, LV_EVENT_DRAG_END, NULL);
+        lv_event_send(target_obj, LV_EVENT_DRAG_END, NULL);
         if(indev_reset_check(proc)) return;
     }
 }

@@ -1078,7 +1078,7 @@ void lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->scroll.y += y;
 
     refresh_children_position(obj, x, y);
-    lv_signal_send(obj, LV_SIGNAL_SCROLLED, NULL);
+    lv_signal_send(obj, LV_SIGNAL_SCROLL, NULL);
     lv_obj_invalidate(obj);
 }
 /**
@@ -3890,10 +3890,10 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         /*Return 'invalid' if the child change signal is not enabled*/
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
     }
-    else if(sign == LV_SIGNAL_SCROLLED) {
+    else if(sign == LV_SIGNAL_SCROLL) {
 
     }
-    else if(sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED) {
+    else if(sign == LV_SIGNAL_SCROLL_END) {
 
         lv_area_t child_box;
         lv_obj_get_children_box(obj, &child_box);
@@ -4511,7 +4511,6 @@ static lv_res_t get_scrollbar_area(lv_obj_t * obj, lv_area_t * sbv)
         return LV_RES_OK;
     }
     lv_coord_t sb_y = (rem * (child_box.y2 - obj->coords.y2)) / scroll_h;
-    printf("overflow: sb_h: %d, y: %d\n", sb_h, sb_y);
 
     sbv->y1 = obj->coords.y1 + sb_y;
     sbv->y2 = sbv->y1 + sb_h;
