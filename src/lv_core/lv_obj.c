@@ -1763,7 +1763,7 @@ lv_res_t lv_event_send_refresh(lv_obj_t * obj)
 }
 
 /**
- * Send LV_EVENT_REFRESH event to an object all of its children.
+ * Send LV_EVENT_REFRESH event to an object and all of its children.
  * @param obj pointer to an object or NULL to refresh all objects of all displays
  */
 void lv_event_send_refresh_recursive(lv_obj_t * obj)
@@ -1797,7 +1797,7 @@ void lv_event_send_refresh_recursive(lv_obj_t * obj)
 }
 
 /**
- * Queue the sending of LV_EVENT_REFRESH event to an object all of its children.
+ * Queue the sending of LV_EVENT_REFRESH event to an object and all of its children.
  * The events won't be sent immediately but after `LV_DISP_DEF_REFR_PERIOD` delay.
  * It is useful to refresh object only on a reasonable rate if this function is called very often.
  * @param obj pointer to an object or NULL to refresh all objects of all displays
