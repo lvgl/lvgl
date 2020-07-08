@@ -139,6 +139,7 @@ typedef struct _lv_indev_proc_t {
             struct _lv_obj_t * act_obj;      /*The object being pressed*/
             struct _lv_obj_t * last_obj;     /*The last object which was pressed (used by drag_throw and
                                                 other post-release event)*/
+            struct _lv_obj_t * drag_obj;      /*The object being pressed*/
             struct _lv_obj_t * last_pressed; /*The lastly pressed object*/
 
             lv_gesture_dir_t gesture_dir;

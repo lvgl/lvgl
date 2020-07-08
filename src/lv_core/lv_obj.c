@@ -1157,6 +1157,43 @@ void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
     lv_obj_scroll_by(obj, 0, y - obj->scroll.y, anim_en);
 }
 
+
+/**
+ * Return the height of the area above the parent.
+ * That is the number of pixels the object can be scrolled down.
+ * Normally positive but can be negative when scrolled inside.
+ * @param obj
+ * @return
+ */
+lv_coord_t lv_obj_get_scroll_top(lv_obj_t * obj)
+{
+    return -obj->scroll.y;
+}
+
+/**
+ * Return the height of the area below the parent.
+ * That is the number of pixels the object can be scrolled up.
+ * Normally positive but can be negative when scrolled inside.
+ * @param obj
+ * @return
+ */
+lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_coord_t y2 = LV_COORD_MIN;
+
+    lv_obj_t * child = lv_obj_get_child(obj, NULL);
+    if(child == NULL) return 0;
+
+    while(child) {
+        y2 = LV_MATH_MAX(y2, child->coords.y2 + lv_obj_get_style_margin_bottom(child, LV_OBJ_PART_MAIN));
+        child = lv_obj_get_child(obj, child);
+    }
+
+    return y2 - obj->coords.y2;
+}
+
 /**
  * Set the size of an extended clickable area
  * If TINY mode is used, only the largest of the horizontal and vertical padding
