@@ -1,7 +1,14 @@
 # Changelog
 
-## v7.2.0 (planned on 04.08.2020)
+## v7.3.0 (planned on 04.08.2020)
 Available in the `dev` branch
+
+### New features
+- Add `lv_task_get_next`
+- Add `lv_event_send_refresh`, `lv_event_send_refresh_recursive`, `lv_event_queue_refresh_recursive` to easily send `LV_EVENT_REFRESH` to object
+
+## v7.2.0 (planned on 21.07.2020)
+*Available in the `master` branch*
 
 ### New features
 - Add `LV_CALENDAR_WEEK_STARTS_MONDAY`
@@ -19,8 +26,11 @@ Available in the `dev` branch
 - Add `lv_obj_align_x()` and `lv_obj_align_y()` functions
 - Add `lv_obj_align_origo_x()` and `lv_obj_align_origo_y()` functions
 
-## v7.1.0 (planned on 07.07.2020)
-*Available in the `master` branch*
+### Bugfixes
+- `tileview` fix navigation when not screen sized
+- Use 14px font by default to for better compatibility with smaller displays 
+
+## v7.1.0 (07.07.2020)
 
 ### New features
 - Add `focus_parent` attribute to `lv_obj`
@@ -65,6 +75,7 @@ Available in the `dev` branch
 - `tabview` by default allow auto expanding the page only to right and bottom (#1573)
 - fix crash when drawing gradient to the same color
 - chart: fix memory leak
+- `img`: improve hit test for transformed images
 
 ## v7.0.1 (01.06.2020)
 

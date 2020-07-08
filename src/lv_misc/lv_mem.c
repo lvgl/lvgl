@@ -87,7 +87,7 @@ typedef struct {
 static uint32_t zero_mem; /*Give the address of this variable if 0 byte should be allocated*/
 
 #if LV_MEM_CUSTOM == 0
-static uint32_t mem_max_size; /*Tracks the maximum total size of memory ever used from the internal heap*/ 
+    static uint32_t mem_max_size; /*Tracks the maximum total size of memory ever used from the internal heap*/
 #endif
 
 static uint8_t mem_buf1_32[MEM_BUF_SMALL_SIZE];
@@ -125,7 +125,7 @@ void _lv_mem_init(void)
 #else
     work_mem = (uint8_t *)LV_MEM_ADR;
 #endif
-    
+
     lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
     full->header.s.used = 0;
     /*The total mem size id reduced by the first header and the close patterns */
@@ -205,16 +205,17 @@ void * lv_mem_alloc(size_t size)
 #endif
 
     if(alloc == NULL) {
-      LV_LOG_WARN("Couldn't allocate memory");
-    }else{
-      #if LV_MEM_CUSTOM == 0
-      /* just a safety check, should always be true */
-      if ((uintptr_t) alloc > (uintptr_t) work_mem) {
-        if ((((uintptr_t) alloc - (uintptr_t) work_mem) + size) > mem_max_size) {
-          mem_max_size = ((uintptr_t) alloc - (uintptr_t) work_mem) + size;
+        LV_LOG_WARN("Couldn't allocate memory");
+    }
+    else {
+#if LV_MEM_CUSTOM == 0
+        /* just a safety check, should always be true */
+        if((uintptr_t) alloc > (uintptr_t) work_mem) {
+            if((((uintptr_t) alloc - (uintptr_t) work_mem) + size) > mem_max_size) {
+                mem_max_size = ((uintptr_t) alloc - (uintptr_t) work_mem) + size;
+            }
         }
-      }
-      #endif
+#endif
     }
 
     return alloc;

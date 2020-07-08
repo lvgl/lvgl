@@ -231,16 +231,16 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    const char *letter_buf;
+    const char * letter_buf;
 
     uint32_t u32_buf[2];
     u32_buf[0] = c;
     u32_buf[1] = 0;
-    
-    letter_buf = (char*)&u32_buf;
+
+    letter_buf = (char *)&u32_buf;
 
 #if LV_BIG_ENDIAN_SYSTEM
-    if (c != 0) while (*letter_buf == 0) ++letter_buf;
+    if(c != 0) while(*letter_buf == 0) ++letter_buf;
 #endif
 
     ta_insert_replace = NULL;

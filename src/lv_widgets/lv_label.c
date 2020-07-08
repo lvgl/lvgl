@@ -577,15 +577,15 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint32_t char_id, lv_point_
     if(txt[0] == '\0') {
         pos->y = 0;
         switch(align) {
-        case LV_LABEL_ALIGN_LEFT:
-            pos->x = 0;
-            break;
-        case LV_LABEL_ALIGN_RIGHT:
-            pos->x = lv_obj_get_width(label);
-            break;
-        case LV_LABEL_ALIGN_CENTER:
-            pos->x = lv_obj_get_width(label) / 2;
-            break;
+            case LV_LABEL_ALIGN_LEFT:
+                pos->x = 0;
+                break;
+            case LV_LABEL_ALIGN_RIGHT:
+                pos->x = lv_obj_get_width(label);
+                break;
+            case LV_LABEL_ALIGN_CENTER:
+                pos->x = lv_obj_get_width(label) / 2;
+                break;
         }
         return;
     }

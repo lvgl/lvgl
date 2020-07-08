@@ -103,7 +103,7 @@ typedef uint8_t lv_img_cf_t;
  * LVGL image header
  */
 /* The first 8 bit is very important to distinguish the different source types.
- * For more info see `lv_img_get_src_type()` in lv_img.c 
+ * For more info see `lv_img_get_src_type()` in lv_img.c
  * On big endian systems the order is reversed so cf and always_zero must be at
  * the end of the struct.
  * */
