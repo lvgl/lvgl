@@ -80,13 +80,13 @@ def lvgl_update_library_json(v):
   title("lvgl: Update version number in library.json")
 
   f = open("./library.json", "r")
-      
+  vn = v[1:]    
   outbuf = ""
       
   for i in f.read().splitlines():
     r = re.search(r'"version": ', i)
     if r: 
-      i = '    "version": "' + v + '",'
+      i = '    "version": "' + vn + '",'
        
     outbuf += i + '\n'
    
