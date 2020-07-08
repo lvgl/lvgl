@@ -26,6 +26,10 @@ Available in the `dev` branch
 - Add `lv_obj_align_x()` and `lv_obj_align_y()` functions
 - Add `lv_obj_align_origo_x()` and `lv_obj_align_origo_y()` functions
 
+### Bugfixes
+- `tileview` fix navigation when not screen sized
+- Use 14px font by default to for better compatibility with smaller displays 
+
 ## v7.1.0 (07.07.2020)
 
 ### New features
