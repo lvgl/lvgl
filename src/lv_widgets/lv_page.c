@@ -402,7 +402,7 @@ lv_coord_t lv_page_get_width_grid(lv_obj_t * page, uint8_t div, uint8_t span)
 }
 
 /**
- * Divide the height of the object and get the width of a given number of columns.
+ * Divide the height of the object and get the height of a given number of rows.
  * Take into account the paddings of the background and scrollable too.
  * @param obj pointer to an object
  * @param div indicates how many rows are assumed.
