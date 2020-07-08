@@ -294,9 +294,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #ifndef LV_USE_API_EXTENSION_V6
 #define LV_USE_API_EXTENSION_V6  1
 #endif
-#ifndef LV_USE_API_EXTENSION_V7
-#define LV_USE_API_EXTENSION_V7  1
-#endif
 
 /*========================
  * Image decoder and cache
@@ -498,10 +495,10 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #define LV_FONT_MONTSERRAT_12    0
 #endif
 #ifndef LV_FONT_MONTSERRAT_14
-#define LV_FONT_MONTSERRAT_14    0
+#define LV_FONT_MONTSERRAT_14    1
 #endif
 #ifndef LV_FONT_MONTSERRAT_16
-#define LV_FONT_MONTSERRAT_16    1
+#define LV_FONT_MONTSERRAT_16    0
 #endif
 #ifndef LV_FONT_MONTSERRAT_18
 #define LV_FONT_MONTSERRAT_18    0
@@ -650,16 +647,16 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #define LV_THEME_DEFAULT_FLAG               LV_THEME_MATERIAL_FLAG_LIGHT
 #endif
 #ifndef LV_THEME_DEFAULT_FONT_SMALL
-#define LV_THEME_DEFAULT_FONT_SMALL         &lv_font_montserrat_16
+#define LV_THEME_DEFAULT_FONT_SMALL         &lv_font_montserrat_14
 #endif
 #ifndef LV_THEME_DEFAULT_FONT_NORMAL
-#define LV_THEME_DEFAULT_FONT_NORMAL        &lv_font_montserrat_16
+#define LV_THEME_DEFAULT_FONT_NORMAL        &lv_font_montserrat_14
 #endif
 #ifndef LV_THEME_DEFAULT_FONT_SUBTITLE
-#define LV_THEME_DEFAULT_FONT_SUBTITLE      &lv_font_montserrat_16
+#define LV_THEME_DEFAULT_FONT_SUBTITLE      &lv_font_montserrat_14
 #endif
 #ifndef LV_THEME_DEFAULT_FONT_TITLE
-#define LV_THEME_DEFAULT_FONT_TITLE         &lv_font_montserrat_16
+#define LV_THEME_DEFAULT_FONT_TITLE         &lv_font_montserrat_14
 #endif
 
 /*=================

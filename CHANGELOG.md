@@ -24,6 +24,7 @@ Available in the `dev` branch
 
 ### Bugfixes
 - `tileview` fix navigation when not screen sized
+- Use 14px font by default to for better compatibility with smaller displays 
 
 ## v7.1.0 (07.07.2020)
 
