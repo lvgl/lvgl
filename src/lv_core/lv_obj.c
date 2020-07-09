@@ -3535,6 +3535,16 @@ static void obj_del_core(lv_obj_t * obj)
     /*Let the user free the resources used in `LV_EVENT_DELETE`*/
     lv_event_send(obj, LV_EVENT_DELETE, NULL);
 
+    /*Delete queued refresh queries*/
+    lv_task_t * t = lv_task_get_next(NULL);
+    while(t) {
+        if(t->user_data == obj && t->task_cb == refresh_event_task_cb) {
+            lv_task_del(t);
+            break;
+        }
+        t = lv_task_get_next(t);
+    }
+
     /*Delete from the group*/
 #if LV_USE_GROUP
     lv_group_t * group = lv_obj_get_group(obj);
