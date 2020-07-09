@@ -1505,6 +1505,9 @@ static void invalidate_lines(lv_obj_t * chart, uint16_t i)
 
     lv_area_t coords;
     lv_area_copy(&coords, &series_area);
+    coords.y1 -= line_width + point_radius;
+    coords.y2 += line_width + point_radius;
+
     if(i < ext->point_cnt - 1) {
         coords.x1 = ((w * i) / (ext->point_cnt - 1)) + x_ofs - line_width - point_radius;
         coords.x2 = ((w * (i + 1)) / (ext->point_cnt - 1)) + x_ofs + line_width + point_radius;
