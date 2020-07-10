@@ -126,9 +126,9 @@ void lv_linemeter_set_value(lv_obj_t * lmeter, int32_t value)
     ext->cur_value = ext->cur_value < ext->min_value ? ext->min_value : ext->cur_value;
 
     int16_t level_old =
-        (int32_t)((int32_t)(old_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
+        (int32_t)((int32_t)(old_value - ext->min_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value);
     int16_t level_new =
-        (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
+        (int32_t)((int32_t)(ext->cur_value - ext->min_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value);
 
     if(level_new == level_old) {
         return;
@@ -393,7 +393,7 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
     lv_coord_t y_ofs  = lmeter->coords.y1 + r_out + top;
     int16_t angle_ofs = ext->angle_ofs + 90 + (360 - ext->scale_angle) / 2;
     int16_t level =
-        (int32_t)((int32_t)(ext->cur_value - ext->min_value) * ext->line_cnt) / (ext->max_value - ext->min_value);
+        (int32_t)((int32_t)(ext->cur_value - ext->min_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value);
     uint8_t i;
 
     lv_color_t main_color = lv_obj_get_style_line_color(lmeter, part);
@@ -519,7 +519,8 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         p1.x = x_out_extra;
         p1.y = y_out_extra;
 
-        if(i >= level) {
+        /* Set the color of the lines */
+        if(i > level) {
             line_dsc.color = end_color;
             line_dsc.width = end_line_width;
         }
@@ -543,7 +544,7 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         lv_style_int_t end_border_width = lv_obj_get_style_scale_end_border_width(lmeter, part);
 
         if(border_width || end_border_width) {
-            int16_t end_angle = (level * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs - 1;
+            int16_t end_angle = ((level + 1) * ext->scale_angle) / (ext->line_cnt - 1) + angle_ofs;
             lv_draw_line_dsc_t arc_dsc;
             lv_draw_line_dsc_init(&arc_dsc);
             lv_obj_init_draw_line_dsc(lmeter, part, &arc_dsc);
@@ -559,8 +560,6 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
                 arc_dsc.color = end_color;
                 lv_draw_arc(x_ofs, y_ofs, r_out, end_angle, (angle_ofs + ext->scale_angle) % 360, clip_area, &arc_dsc);
             }
-
-
         }
     }
 
@@ -570,7 +569,6 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#include <stdlib.h>
 
 /**
  * Handle the drawing related tasks of the line meters
