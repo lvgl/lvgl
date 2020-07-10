@@ -539,7 +539,7 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
     lv_draw_mask_remove_id(mask_out_id);
 #endif
 
-    if(part == LV_LINEMETER_PART_MAIN) {
+    if(part == LV_LINEMETER_PART_MAIN && level + 1 < ext->line_cnt - 1) {
         lv_style_int_t border_width = lv_obj_get_style_scale_border_width(lmeter, part);
         lv_style_int_t end_border_width = lv_obj_get_style_scale_end_border_width(lmeter, part);
 
