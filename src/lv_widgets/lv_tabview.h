@@ -120,6 +120,14 @@ void lv_tabview_clean_tab(lv_obj_t * tab);
 void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t anim);
 
 /**
+ * Set the name of a tab.
+ * @param tabview pointer to Tab view object
+ * @param id index of a tab to load
+ * @param name new tab name
+ */
+void lv_tabview_set_tab_name(lv_obj_t * tabview, uint16_t id, char * name);
+
+/**
  * Set the animation time of tab view when a new tab is loaded
  * @param tabview pointer to Tab view object
  * @param anim_time time of animation in milliseconds
