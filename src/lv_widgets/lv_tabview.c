@@ -451,29 +451,29 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 /**
  * Set the name of a tab.
  * @param tabview pointer to Tab view object
- * @param id index of a tab to load
+ * @param id index of the tab the name should be set
  * @param name new tab name
  */
 void lv_tabview_set_tab_name(lv_obj_t *tabview, uint16_t id, char *name)
 {
   LV_ASSERT_OBJ(tabview, LV_OBJX_NAME);
 
-  // get tabview's ext pointer which contains the tab name pointer list
+  /* get tabview's ext pointer which contains the tab name pointer list */
   lv_tabview_ext_t *ext = lv_obj_get_ext_attr(tabview);
 
-  // check for valid tab index
+  /* check for valid tab index */
   if (ext->tab_cnt > id)
   {
-    // reallocate memory for new tab name (use reallocate due to mostly the size didn't change much)
+    /* reallocate memory for new tab name (use reallocate due to mostly the size didn't change much) */
     char *str = lv_mem_realloc((void *)ext->tab_name_ptr[id], strlen(name) + 1);
     LV_ASSERT_MEM(str);
 
-    // store new tab name at allocated memory
+    /* store new tab name at allocated memory */
     strcpy(str, name);
-    // update pointer
+    /* update pointer  */
     ext->tab_name_ptr[id] = str;
 
-    // force redrawing of the tab headers
+    /* force redrawing of the tab headers */
     lv_obj_invalidate(ext->btns);
   }
 }

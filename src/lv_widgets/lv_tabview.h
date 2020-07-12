@@ -122,7 +122,7 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 /**
  * Set the name of a tab.
  * @param tabview pointer to Tab view object
- * @param id index of a tab to load
+ * @param id index of the tab the name should be set
  * @param name new tab name
  */
 void lv_tabview_set_tab_name(lv_obj_t * tabview, uint16_t id, char * name);
