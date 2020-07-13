@@ -6,6 +6,7 @@ Available in the `dev` branch
 ### New features
 - Add `lv_task_get_next`
 - Add `lv_event_send_refresh`, `lv_event_send_refresh_recursive`, `lv_event_queue_refresh_recursive` to easily send `LV_EVENT_REFRESH` to object
+- Add `lv_tabview_set_tab_name()` function - used to change a tab's name
 
 ## v7.2.0 (planned on 21.07.2020)
 *Available in the `master` branch*
@@ -25,7 +26,6 @@ Available in the `dev` branch
 - Add `lv_theme_set_base()` to allow easy extension of built-in (or any) themes
 - Add `lv_obj_align_x()` and `lv_obj_align_y()` functions
 - Add `lv_obj_align_origo_x()` and `lv_obj_align_origo_y()` functions
-- Add `lv_tabview_set_tab_name()` function - used to change a tab's name
 
 ### Bugfixes
 - `tileview` fix navigation when not screen sized
