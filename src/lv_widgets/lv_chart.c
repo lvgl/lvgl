@@ -783,13 +783,15 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
 
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_chart_series_t * ser;
-        _LV_LL_READ(ext->series_ll, ser) {
+        while( ext->series_ll.head != NULL ) {
+        	ser =_lv_ll_get_head(&ext->series_ll);
 
-            if(!ser->ext_buf_assigned) lv_mem_free(ser->points);
+        	if(!ser->ext_buf_assigned) lv_mem_free(ser->points);
 
-            lv_mem_free(ser);
-        }
-        _lv_ll_clear(&ext->series_ll);
+			_lv_ll_remove(&ext->series_ll, ser);
+			lv_mem_free(ser);
+		}
+		_lv_ll_clear(&ext->series_ll);
 
         lv_obj_clean_style_list(chart, LV_CHART_PART_SERIES);
         lv_obj_clean_style_list(chart, LV_CHART_PART_SERIES_BG);
