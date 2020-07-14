@@ -16,27 +16,27 @@ LVGL provides everything you need to create embedded GUI with easy-to-use graphi
 <a href="https://lvgl.io">Website </a> &middot; 
 <a href="https://lvgl.io/demos">Online demo</a> &middot; 
 <a href="https://docs.lvgl.io/">Docs</a> &middot; 
-<a href="https://forum.lvgl.io">Forum</a> &middot;
+<a href="https://forum.lvgl.io">Forum</a>
 </h4>
 
 ---
 
 ## Features
-* Powerful building blocks: buttons, charts, lists, sliders, images, etc.
+* Powerful [building blocks](https://docs.lvgl.io/latest/en/html/widgets/index.html): buttons, charts, lists, sliders, images, etc.
 * Advanced graphics: animations, anti-aliasing, opacity, smooth scrolling
-* Simultaneously use various input devices: touchscreen, mouse, keyboard, encoder, buttons, etc.
-* Simultaneously use multiple displays: e.g. monochrome and color display
-* Multi-language support with UTF-8 encoding, Bidirectional support, and Arabic text handling
-* Fully customizable graphical elements via CSS-like styles
+* Use [various input devices](https://docs.lvgl.io/latest/en/html/overview/indev.html): touchscreen, mouse, keyboard, encoder, buttons, etc.
+* Use [multiple displays](https://docs.lvgl.io/latest/en/html/overview/display.html): e.g. monochrome and color display
 * Hardware independent to use with any microcontroller or display
 * Scalable to operate with little memory (64 kB Flash, 10 kB RAM)
+* Multi-language support with UTF-8 handling, Bidirectional and Arabic script support
+* Fully customizable graphical elements via [CSS-like styles](https://docs.lvgl.io/latest/en/html/overview/style.html)
 * OS, External memory and GPU are supported but not required
-* Single frame buffer operation even with advances graphical effects
+* Smooth rendering even with a [single frame buffer](https://docs.lvgl.io/latest/en/html/porting/display.html)
 * Written in C for maximal compatibility (C++ compatible)
 * Micropython Binding exposes [LVGL API in Micropython](https://blog.lvgl.io/2019-02-20/micropython-bindings)
-* Simulator to develop on PC without embedded hardware
-* Tutorials, examples, themes for rapid development
-* Documentation and API references
+* [Simulator](https://docs.lvgl.io/latest/en/html/get-started/pc-simulator.html) to develop on PC without embedded hardware
+* [Examples](lv_examples) and tutorials for rapid development
+* [Documentation](http://docs.lvgl.io/) and API references
 
 ## Supported devices
 Basically, every modern controller (which is able to drive a display) is suitable to run LVGL. The minimal requirements are:
