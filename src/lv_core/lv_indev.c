@@ -1259,7 +1259,7 @@ static void indev_drag(lv_indev_proc_t * proc)
         /*Go until find the object or parent scrollable in this direction*/
         while(proc->types.pointer.drag_obj) {
             /*Get which object to drad/scroll*/
-            lv_drag_dir_t dirs = LV_DRAG_DIR_VER; //scrollable ? lv_obj_get_scroll_dir(target_obj) : lv_obj_get_drag_dir(target_obj);
+            lv_drag_dir_t dirs = LV_DRAG_DIR_ONE; //scrollable ? lv_obj_get_scroll_dir(target_obj) : lv_obj_get_drag_dir(target_obj);
 
             /*Enough move?*/
             bool hor_en = false;
@@ -1282,16 +1282,32 @@ static void indev_drag(lv_indev_proc_t * proc)
 
             lv_coord_t st = lv_obj_get_scroll_top(proc->types.pointer.drag_obj);
             lv_coord_t sb = lv_obj_get_scroll_bottom(proc->types.pointer.drag_obj);
+            lv_coord_t sl = lv_obj_get_scroll_left(proc->types.pointer.drag_obj);
+            lv_coord_t sr = lv_obj_get_scroll_right(proc->types.pointer.drag_obj);
 
-            if((up_en    && proc->types.pointer.drag_sum.y >=   indev_act->driver.drag_limit) ||
-               (down_en  && proc->types.pointer.drag_sum.y <= - indev_act->driver.drag_limit))
+            bool ver_scrollable = st > 0 || sb > 0 ? true : false;
+            bool hor_scrollable = sl > 0 || sr > 0 ? true : false;
+
+            if(ver_scrollable &&
+               ((up_en    && proc->types.pointer.drag_sum.y >=   indev_act->driver.drag_limit) ||
+                (down_en  && proc->types.pointer.drag_sum.y <= - indev_act->driver.drag_limit)))
             {
                 scroll_candidate_obj = proc->types.pointer.drag_obj;
                 dirs_candidate = LV_DRAG_DIR_VER;
             }
 
+            if(hor_scrollable &&
+              ((left_en    && proc->types.pointer.drag_sum.x >=   indev_act->driver.drag_limit) ||
+               (right_en  && proc->types.pointer.drag_sum.x <= - indev_act->driver.drag_limit)))
+            {
+                scroll_candidate_obj = proc->types.pointer.drag_obj;
+                dirs_candidate = LV_DRAG_DIR_HOR;
+            }
+
             if(st <= 0) up_en = false;
             if(sb <= 0) down_en = false;
+            if(sl <= 0) left_en = false;
+            if(sr <= 0) right_en = false;
 
 
             /*If a move is greater then LV_DRAG_LIMIT then begin the drag*/
@@ -1350,15 +1366,16 @@ static void indev_drag(lv_indev_proc_t * proc)
             if(scrollable) {
                 lv_area_t child_box;
                 lv_obj_get_children_box(obj, &child_box);
-                lv_coord_t diff_y = proc->types.pointer.vect.y;
-                if(obj->scroll.y > 0 && diff_y > 0) {
-                    diff_y = diff_y / 2;
+                lv_coord_t diff_y = proc->types.pointer.drag_dir == LV_DRAG_DIR_VER ? proc->types.pointer.vect.y : 0;
+                lv_coord_t diff_x = proc->types.pointer.drag_dir == LV_DRAG_DIR_HOR ? proc->types.pointer.vect.x : 0;
+                if(obj->scroll.x > 0 && diff_x > 0) {
+                    diff_x = diff_x / 2;
                 }
                 if(child_box.y2 < obj->coords.y2 && diff_y < 0) {
                     diff_y = diff_y / 2;
                 }
 
-                lv_obj_scroll_by(obj, 0, diff_y, LV_ANIM_OFF);
+                lv_obj_scroll_by(obj, diff_x, diff_y, LV_ANIM_OFF);
             } else {
                 lv_obj_set_pos(obj, act_x, act_y);
             }
@@ -1425,8 +1442,14 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
 
     switch(proc->types.pointer.drag_dir) {
         case LV_DRAG_DIR_HOR:
+        {
             proc->types.pointer.drag_throw_vect.y = 0;
+            lv_coord_t sl = lv_obj_get_scroll_left(target_obj);
+            lv_coord_t sr = lv_obj_get_scroll_right(target_obj);
+            /*If scrolled inside reduce faster*/
+            if(sl < 0 || sr < 0) proc->types.pointer.drag_throw_vect.x = proc->types.pointer.drag_throw_vect.x >> 1;
             break;
+        }
         case LV_DRAG_DIR_VER:
         {
             proc->types.pointer.drag_throw_vect.x = 0;
@@ -1438,21 +1461,9 @@ static void indev_drag_throw(lv_indev_proc_t * proc)
         }
     }
 
-
-
     if((proc->types.pointer.drag_throw_vect.x != 0 || proc->types.pointer.drag_throw_vect.y != 0)) {
         /*Get the coordinates and modify them*/
         if(scrollable) {
-//            if(target_obj->scroll.y + proc->types.pointer.drag_throw_vect.y > 0) {
-//                proc->types.pointer.drag_throw_vect.y = 0;
-//                lv_obj_scroll_to_y(target_obj, 0, LV_ANIM_OFF);
-//            }
-//
-//            if(child_box.y2 + proc->types.pointer.drag_throw_vect.y < target_obj->coords.y2) {
-//                proc->types.pointer.drag_throw_vect.y = 0;
-//                lv_obj_scroll_by(target_obj, 0, -(child_box.y2 - target_obj->coords.y2), LV_ANIM_OFF);
-//            }
-
             lv_obj_scroll_by(target_obj, proc->types.pointer.drag_throw_vect.x, proc->types.pointer.drag_throw_vect.y, LV_ANIM_OFF);
         } else {
             lv_area_t coords_ori;

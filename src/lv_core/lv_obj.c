@@ -104,7 +104,8 @@ static void refresh_event_task_cb(lv_task_t * t);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
-static lv_res_t get_scrollbar_area(lv_obj_t * obj, lv_area_t * sbv);
+static lv_res_t get_ver_scrollbar_area(lv_obj_t * obj, lv_area_t * sbv);
+static lv_res_t get_hor_scrollbar_area(lv_obj_t * obj, lv_area_t * sbh);
 
 /**********************
  *  STATIC VARIABLES
@@ -1099,31 +1100,28 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
         lv_anim_init(&a);
         lv_anim_set_var(&a, obj);
 
+        lv_anim_path_t path;
+        lv_anim_path_init(&path);
+        lv_anim_path_set_cb(&path, lv_anim_path_ease_out);
+
         if(x) {
-            lv_anim_set_time(&a, lv_anim_speed_to_time(lv_disp_get_hor_res(d), 0, y));
+            lv_anim_set_time(&a, lv_anim_speed_to_time(lv_disp_get_hor_res(d), 0, x));
             lv_anim_set_values(&a, obj->scroll.x, obj->scroll.x + x);
             lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) scroll_anim_x_cb);
+            lv_anim_set_path(&a, &path);
             lv_anim_start(&a);
         }
 
         if(y) {
-            lv_anim_path_t path;
-            lv_anim_path_init(&path);
-            lv_anim_path_set_cb(&path, lv_anim_path_ease_out);
             lv_anim_set_time(&a, lv_anim_speed_to_time((lv_disp_get_ver_res(d) * 3) >> 2, 0, y));
             lv_anim_set_values(&a, obj->scroll.y, obj->scroll.y + y);
             lv_anim_set_exec_cb(&a,  (lv_anim_exec_xcb_t) scroll_anim_y_cb);
             lv_anim_set_path(&a, &path);
             lv_anim_start(&a);
         }
-
     } else {
         lv_obj_scroll_by_raw(obj, x, y);
     }
-
-
-
-
 }
 
 /**
@@ -1144,7 +1142,7 @@ void lv_obj_scroll_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
  */
 void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en)
 {
-//    refresh_children_position(obj, x, y);
+    lv_obj_scroll_by(obj, x - obj->scroll.x, 0, anim_en);
 }
 
 /**
@@ -1192,6 +1190,42 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
     }
 
     return y2 - obj->coords.y2;
+}
+
+/**
+ * Return the weight of the area on the left the parent.
+ * That is the number of pixels the object can be scrolled down.
+ * Normally positive but can be negative when scrolled inside.
+ * @param obj
+ * @return
+ */
+lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
+{
+    return -obj->scroll.x;
+}
+
+/**
+ * Return the width of the area below the object.
+ * That is the number of pixels the object can be scrolled left.
+ * Normally positive but can be negative when scrolled inside.
+ * @param obj
+ * @return
+ */
+lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_coord_t x2 = LV_COORD_MIN;
+
+    lv_obj_t * child = lv_obj_get_child(obj, NULL);
+    if(child == NULL) return 0;
+
+    while(child) {
+        x2 = LV_MATH_MAX(x2, child->coords.x2 + lv_obj_get_style_margin_right(child, LV_OBJ_PART_MAIN));
+        child = lv_obj_get_child(obj, child);
+    }
+
+    return x2 - obj->coords.x2;
 }
 
 /**
@@ -3851,10 +3885,17 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 
         if(lv_obj_get_screen(obj) == lv_scr_act()) {
             lv_area_t sb;
-            if(get_scrollbar_area(obj, &sb)) {
+            if(get_ver_scrollbar_area(obj, &sb)) {
                 lv_draw_rect_dsc_t sb_rect_dsc;
                 lv_draw_rect_dsc_init(&sb_rect_dsc);
                 sb_rect_dsc.bg_color = LV_COLOR_RED;
+                lv_draw_rect(&sb, clip_area, &sb_rect_dsc);
+            }
+
+            if(get_hor_scrollbar_area(obj, &sb)) {
+                lv_draw_rect_dsc_t sb_rect_dsc;
+                lv_draw_rect_dsc_init(&sb_rect_dsc);
+                sb_rect_dsc.bg_color = LV_COLOR_BLUE;
                 lv_draw_rect(&sb, clip_area, &sb_rect_dsc);
             }
         }
@@ -3934,13 +3975,30 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_SCROLL_END) {
 
-        lv_area_t child_box;
-        lv_obj_get_children_box(obj, &child_box);
-        if(obj->scroll.y > 0) {
-            lv_obj_scroll_to_y(obj, 0, LV_ANIM_ON);
+//        lv_area_t child_box;
+//        lv_obj_get_children_box(obj, &child_box);
+
+        lv_coord_t st = lv_obj_get_scroll_top(obj);
+        lv_coord_t sb = lv_obj_get_scroll_bottom(obj);
+        lv_coord_t sl = lv_obj_get_scroll_left(obj);
+        lv_coord_t sr = lv_obj_get_scroll_right(obj);
+
+        /*Revert if scrolled in*/
+        if(st > 0 || sb > 0) { /*Is vertically scrollable*/
+            if(st < 0) {
+                lv_obj_scroll_by(obj, 0, st, LV_ANIM_ON);
+            }
+            else if(sb < 0) {
+                lv_obj_scroll_by(obj, 0, -sb, LV_ANIM_ON);
+            }
         }
-        else if(child_box.y2 < obj->coords.y2) {
-            lv_obj_scroll_by(obj, 0, -(child_box.y2 - obj->coords.y2), LV_ANIM_ON);
+        if(sl > 0 || sr > 0) { /*Is horizontally scrollable*/
+            if(sl < 0) {
+                lv_obj_scroll_by(obj, sl, 0, LV_ANIM_ON);
+            }
+            else if(sr < 0) {
+                lv_obj_scroll_by(obj, -sr, 0, LV_ANIM_ON);
+            }
         }
     }
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
@@ -4486,6 +4544,7 @@ static void fade_in_anim_ready(lv_anim_t * a)
 
 static void scroll_anim_x_cb(lv_obj_t * obj, lv_anim_value_t v)
 {
+    lv_obj_scroll_by_raw(obj, v - obj->scroll.x, 0);
 }
 
 static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v)
@@ -4524,7 +4583,7 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
     return false;
 }
 
-static lv_res_t get_scrollbar_area(lv_obj_t * obj, lv_area_t * sbv)
+static lv_res_t get_ver_scrollbar_area(lv_obj_t * obj, lv_area_t * sbv)
 {
     lv_coord_t obj_h = lv_obj_get_height(obj);
 
@@ -4537,9 +4596,6 @@ static lv_res_t get_scrollbar_area(lv_obj_t * obj, lv_area_t * sbv)
         return LV_RES_INV;
     }
     lv_coord_t sb_h = (obj_h * obj_h) / content_h;
-    if(sb_h != 150) {
-        volatile int x = 0;
-    }
     lv_coord_t rem = obj_h - sb_h;  /*Remaining size from the scrollbar track that is not the scrollbar itself*/
     lv_coord_t scroll_h = content_h - obj_h; /*The size of the content which can be really scrolled*/
     if(scroll_h <= 0) {
@@ -4557,6 +4613,39 @@ static lv_res_t get_scrollbar_area(lv_obj_t * obj, lv_area_t * sbv)
     sbv->y2 = sbv->y1 + sb_h;
     sbv->x2 = obj->coords.x2;
     sbv->x1 = sbv->x2 - 10;
+
+    return LV_RES_OK;
+}
+
+static lv_res_t get_hor_scrollbar_area(lv_obj_t * obj, lv_area_t * sbh)
+{
+    lv_coord_t obj_w = lv_obj_get_width(obj);
+
+    lv_area_t child_box;
+    lv_res_t res = lv_obj_get_children_box(obj, &child_box);
+    if(res != LV_RES_OK) return res;
+
+    lv_coord_t content_w = (child_box.x2 - obj->scroll.x) - obj->coords.x1 ;
+    if(content_w < obj_w) {
+        return LV_RES_INV;
+    }
+    lv_coord_t sb_h = (obj_w * obj_w) / content_w;
+    lv_coord_t rem = obj_w - sb_h;  /*Remaining size from the scrollbar track that is not the scrollbar itself*/
+    lv_coord_t scroll_w = content_w - obj_w; /*The size of the content which can be really scrolled*/
+    if(scroll_w <= 0) {
+        sbh->y2 = obj->coords.y2;
+        sbh->y1 = sbh->y2 - 10;
+        sbh->x2 = obj->coords.x2;
+        sbh->x1 = obj->coords.x1;
+        return LV_RES_OK;
+    }
+    lv_coord_t sb_x = (rem * (child_box.x2 - obj->coords.x2)) / scroll_w;
+    sb_x = rem - sb_x;
+
+    sbh->x1 = obj->coords.x1 + sb_x;
+    sbh->x2 = sbh->x1 + sb_h;
+    sbh->y2 = obj->coords.y2;
+    sbh->y1 = sbh->y2 - 10;
 
     return LV_RES_OK;
 }

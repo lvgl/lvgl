@@ -595,6 +595,24 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj);
 
 
 /**
+ * Return the weight of the area on the left the parent.
+ * That is the number of pixels the object can be scrolled down.
+ * Normally positive but can be negative when scrolled inside.
+ * @param obj
+ * @return
+ */
+lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj);
+
+/**
+ * Return the width of the area below the object.
+ * That is the number of pixels the object can be scrolled left.
+ * Normally positive but can be negative when scrolled inside.
+ * @param obj
+ * @return
+ */
+lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj);
+
+/**
  * Set the size of an extended clickable area
  * @param obj pointer to an object
  * @param left extended clickable are on the left [px]
