@@ -230,6 +230,7 @@ typedef struct _lv_obj_t {
     uint8_t adv_hittest     : 1; /**< 1: Use advanced hit-testing (slower) */
     uint8_t gesture_parent  : 1; /**< 1: Parent will be gesture instead*/
     uint8_t focus_parent    : 1; /**< 1: Parent will be focused instead*/
+    lv_drag_dir_t scroll_elastic  : 3; /**< In which directions the object can be scrolled */
 
     lv_drag_dir_t drag_dir    : 3; /**< In which directions the object can be dragged */
     lv_drag_dir_t scroll_dir  : 3; /**< In which directions the object can be scrolled */
