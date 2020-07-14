@@ -98,7 +98,6 @@ static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
 static void fade_in_anim_ready(lv_anim_t * a);
 #endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
-static void refresh_event_task_cb(lv_task_t * t);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
@@ -1794,26 +1793,6 @@ void lv_event_send_refresh_recursive(lv_obj_t * obj)
             child = lv_obj_get_child(obj, child);
         }
     }
-}
-
-/**
- * Queue the sending of LV_EVENT_REFRESH event to an object and all of its children.
- * The events won't be sent immediately but after `LV_DISP_DEF_REFR_PERIOD` delay.
- * It is useful to refresh object only on a reasonable rate if this function is called very often.
- * @param obj pointer to an object or NULL to refresh all objects of all displays
- */
-void lv_event_queue_refresh_recursive(lv_obj_t * obj)
-{
-    lv_task_t * t = lv_task_get_next(NULL);
-    while(t) {
-        /* REturn if a refresh is already queued for this object*/
-        if(t->task_cb == refresh_event_task_cb && t->user_data == obj) return;
-        t = lv_task_get_next(t);
-    }
-
-    /*No queued task for this object so create one now*/
-    t = lv_task_create(refresh_event_task_cb, LV_DISP_DEF_REFR_PERIOD, LV_TASK_PRIO_MID, obj);
-    lv_task_set_repeat_count(t, 1);
 }
 
 
@@ -3535,16 +3514,6 @@ static void obj_del_core(lv_obj_t * obj)
     /*Let the user free the resources used in `LV_EVENT_DELETE`*/
     lv_event_send(obj, LV_EVENT_DELETE, NULL);
 
-    /*Delete queued refresh queries*/
-    lv_task_t * t = lv_task_get_next(NULL);
-    while(t) {
-        if(t->user_data == obj && t->task_cb == refresh_event_task_cb) {
-            lv_task_del(t);
-            break;
-        }
-        t = lv_task_get_next(t);
-    }
-
     /*Delete from the group*/
 #if LV_USE_GROUP
     lv_group_t * group = lv_obj_get_group(obj);
@@ -4305,11 +4274,6 @@ static void lv_event_mark_deleted(lv_obj_t * obj)
         if(t->obj == obj) t->deleted = true;
         t = t->prev;
     }
-}
-
-static void refresh_event_task_cb(lv_task_t * t)
-{
-    lv_event_send_refresh_recursive(t->user_data);
 }
 
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
