@@ -46,35 +46,34 @@ Basically, every modern controller (which is able to drive a display) is suitabl
 - RAM: 
   - Static RAM usage: ~2 kB depending on the used features and objects types
   - Stack: &gt; 2kB (&gt; 8 kB is recommended)
-  - Dynamic data (heap): &gt; 2 KB (&gt; 16 kB is recommended if using several objects).
-    Set by `LV_MEM_SIZE` in *lv_conf.h*. 
+  - Dynamic data (heap): &gt; 2 KB (&gt; 16 kB is recommended if using several objects)
   - Display buffer:  &gt; *"Horizontal resolution"* pixels (&gt; 10 &times; *"Horizontal resolution"* is recommended) 
 - C99 or newer compiler
 
 *Note that the memory usage might vary depending on the architecture, compiler and build options.*
 
 Just to mention some platforms:
-- STM32F1, STM32F3, [STM32F4](https://blog.lvgl.io/2017-07-15/stm32f429_disco_port), [STM32F7](https://github.com/lvgl/lv_port_stm32f746_disco_sw4stm32), STM32L4
+- STM32F1, STM32F3, STM32F4, STM32F7, STM32L4, STM32L5, STM32H7
 - Microchip dsPIC33, PIC24, PIC32MX, PIC32MZ
 - NXP: Kinetis, LPC, iMX, iMX RT
 - [Linux frame buffer](https://blog.lvgl.io/2018-01-03/linux_fb) (/dev/fb)
 - [Raspberry PI](http://www.vk3erw.com/index.php/16-software/63-raspberry-pi-official-7-touchscreen-and-littlevgl)
 - [Espressif ESP32](https://github.com/lvgl/lv_port_esp32)
-- [Infineon aurix](https://github.com/lvgl/lv_port_aurix)
-- Nordic NRF52
-- Quectell M66
+- [Infineon Aurix](https://github.com/lvgl/lv_port_aurix)
+- Nordic NRF52 Bluetooth modules
+- Quectell modems
 
 ## Get started
-his list shows the recommended way of learning the library:
+This list shows the recommended way of learning the library:
 1. Check the [Online demos](https://lvgl.io/demos) to see LVGL in action (3 minutes)
 2. Read the [Introduction](https://docs.lvgl.io/latest/en/html/intro/index.html) page of the documentation (5 minutes)
-3. Read the [Quick overview](https://docs.lvgl.io/latest/en/html/get-started/quick-overview.html) page of the documentation (15 minutes)
+3. Get familiar with the basics on the [Quick overview](https://docs.lvgl.io/latest/en/html/get-started/quick-overview.html) page (15 minutes)
 4. Set up a [Simulator](https://docs.lvgl.io/latest/en/html/get-started/pc-simulator.html) (10 minutes)
 5. Try out some [Examples](https://github.com/lvgl/lv_examples/)
 6. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/latest/en/html/porting/index.html) guide or check the ready to use [Projects](https://github.com/lvgl?q=lv_port_&type=&language=)
 7. Read the [Overview](https://docs.lvgl.io/latest/en/html/overview/index.html) page to get a better understanding of the library. (2-3 hours)
 8. Check the documentation of the [Widgets](https://docs.lvgl.io/latest/en/html/widgets/index.html) to see their features and usage
-9. If you have questions got to the [Forum](http://forum.lvgl.io/)
+9. If you have questions go to the [Forum](http://forum.lvgl.io/)
 10. Read the [Contributing](https://docs.lvgl.io/latest/en/html/contributing/index.html) guide to see how you can help to improve LVGL (15 minutes) 
 
 ## Examples 
@@ -117,4 +116,6 @@ lv.scr_load(scr)
 ```
 
 ## Contributing
+LVGL is an open project and contribution is very welcome. There are many ways to contribute from simply speaking about your project, through writing examples, improving the documentation, fixing bugs to hosing your own project under in LVGL.
+
 For a detailed description of contribution opportunities visit the [Contributing](https://docs.lvgl.io/latest/en/html/contributing/index.html) section of the documentation.
