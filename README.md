@@ -38,17 +38,60 @@ LVGL provides everything you need to create embedded GUI with easy-to-use graphi
 * [Examples](lv_examples) and tutorials for rapid development
 * [Documentation](http://docs.lvgl.io/) and API references
 
-## Supported devices
+## Requirements
 Basically, every modern controller (which is able to drive a display) is suitable to run LVGL. The minimal requirements are:
-- 16, 32 or 64 bit microcontroller or processor
-- &gt; 16 MHz clock speed is recommended
-- Flash/ROM: &gt; 64 kB for the very essential components (&gt; 180 kB is recommended)
-- RAM: 
-  - Static RAM usage: ~2 kB depending on the used features and objects types
-  - Stack: &gt; 2kB (&gt; 8 kB is recommended)
-  - Dynamic data (heap): &gt; 2 KB (&gt; 16 kB is recommended if using several objects)
-  - Display buffer:  &gt; *"Horizontal resolution"* pixels (&gt; 10 &times; *"Horizontal resolution"* is recommended) 
-- C99 or newer compiler
+
+<table>
+  <tr>
+    <td> <strong>Name</strong> </td>
+    <td><strong>Minimal</strong></td>
+    <td><strong>Recommended</strong></td>
+  </tr>
+  <tr>
+    <td><strong>Architecture</strong></td>
+    <td colspan="2">16, 32 or 64 bit microcontroller or processor</td>
+  </tr>
+  <tr>
+    <td> <strong>Clock</strong></td>
+    <td> &gt; 16 MHz </td>
+    <td> &gt; 48 MHz</td>
+  </tr>
+  
+  <tr>
+    <td> <strong>Flash/ROM</strong></td>
+    <td> &gt; 64 kB </td>
+    <td> &gt; 180 MHz</td>
+  </tr>
+  
+  <tr>
+    <td> <strong>Static RAM</strong></td>
+    <td> &gt; 2 kB </td>
+    <td> &gt; 4 kB</td>
+  </tr>
+  
+  <tr>
+    <td> <strong>Stack</strong></td>
+    <td> &gt; 2 kB </td>
+    <td> &gt; 8 kB</td>
+  </tr>
+  
+  <tr>
+    <td> <strong>Heap</strong></td>
+    <td> &gt; 2 kB </td>
+    <td> &gt; 16 kB</td>
+  </tr>
+  
+  <tr>
+    <td> <strong>Display buffer</strong></td>
+    <td> &gt; 1 &times; <em>hor. res.</em> pixels </td>
+    <td> &gt; 10 &times; <em>hor. res.</em> pixels </td>
+  </tr>
+  
+  <tr>
+    <td> <strong>Compiler</strong></td>
+    <td colspan="2"> C99 or newer </td>
+  </tr>
+</table>
 
 *Note that the memory usage might vary depending on the architecture, compiler and build options.*
 
