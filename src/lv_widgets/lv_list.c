@@ -767,6 +767,11 @@ static lv_res_t lv_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
                 if(btn) lv_list_focus_btn(list, btn);
             }
         }
+        else if(c == LV_KEY_ESC) {
+            lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
+            /* Handle ESC/Cancel event */
+            res = lv_event_send(ext->act_sel_btn, LV_EVENT_CANCEL, NULL);
+        }
 #endif
     }
     return res;
