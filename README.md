@@ -60,7 +60,7 @@ Basically, every modern controller (which is able to drive a display) is suitabl
   <tr>
     <td> <strong>Flash/ROM</strong></td>
     <td> &gt; 64 kB </td>
-    <td> &gt; 180 MHz</td>
+    <td> &gt; 180 kB</td>
   </tr>
   
   <tr>
@@ -100,11 +100,11 @@ Just to mention some platforms:
 - Microchip dsPIC33, PIC24, PIC32MX, PIC32MZ
 - NXP: Kinetis, LPC, iMX, iMX RT
 - [Linux frame buffer](https://blog.lvgl.io/2018-01-03/linux_fb) (/dev/fb)
-- [Raspberry PI](http://www.vk3erw.com/index.php/16-software/63-raspberry-pi-official-7-touchscreen-and-littlevgl)
+- [Raspberry Pi](http://www.vk3erw.com/index.php/16-software/63-raspberry-pi-official-7-touchscreen-and-littlevgl)
 - [Espressif ESP32](https://github.com/lvgl/lv_port_esp32)
 - [Infineon Aurix](https://github.com/lvgl/lv_port_aurix)
 - Nordic NRF52 Bluetooth modules
-- Quectell modems
+- Quectel modems
 
 ## Get started
 This list shows the recommended way of learning the library:
@@ -114,7 +114,7 @@ This list shows the recommended way of learning the library:
 4. Set up a [Simulator](https://docs.lvgl.io/latest/en/html/get-started/pc-simulator.html) (10 minutes)
 5. Try out some [Examples](https://github.com/lvgl/lv_examples/)
 6. Port LVGL to a board. See the [Porting](https://docs.lvgl.io/latest/en/html/porting/index.html) guide or check the ready to use [Projects](https://github.com/lvgl?q=lv_port_&type=&language=)
-7. Read the [Overview](https://docs.lvgl.io/latest/en/html/overview/index.html) page to get a better understanding of the library. (2-3 hours)
+7. Read the [Overview](https://docs.lvgl.io/latest/en/html/overview/index.html) page to get a better understanding of the library (2-3 hours)
 8. Check the documentation of the [Widgets](https://docs.lvgl.io/latest/en/html/widgets/index.html) to see their features and usage
 9. If you have questions go to the [Forum](http://forum.lvgl.io/)
 10. Read the [Contributing](https://docs.lvgl.io/latest/en/html/contributing/index.html) guide to see how you can help to improve LVGL (15 minutes) 
