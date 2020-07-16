@@ -36,9 +36,11 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                                               lv_color_t color, lv_opa_t opa,
                                               const lv_opa_t * mask, lv_draw_mask_res_t mask_res);
 
+#if LV_USE_BLEND_MODES
 static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                          lv_color_t color, lv_opa_t opa,
                          const lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_blend_mode_t mode);
+#endif
 
 static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                        const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
@@ -49,12 +51,14 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                                              const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
                                              const lv_opa_t * mask, lv_draw_mask_res_t mask_res);
 
+#if LV_USE_BLEND_MODES
 static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                         const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
                         const lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_blend_mode_t mode);
 
 static inline lv_color_t color_blend_true_color_additive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
 static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_color_t bg, lv_opa_t opa);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -167,9 +171,11 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_
     else if(mode == LV_BLEND_MODE_NORMAL) {
         fill_normal(disp_area, disp_buf, &draw_area, color, opa, mask, mask_res);
     }
+#if LV_USE_BLEND_MODES
     else {
         fill_blended(disp_area, disp_buf, &draw_area, color, opa, mask, mask_res, mode);
     }
+#endif
 }
 
 /**
@@ -230,9 +236,11 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_a
     else if(mode == LV_BLEND_MODE_NORMAL) {
         map_normal(disp_area, disp_buf, &draw_area, map_area, map_buf, opa, mask, mask_res);
     }
+#if LV_USE_BLEND_MODES
     else {
         map_blended(disp_area, disp_buf, &draw_area, map_area, map_buf, opa, mask, mask_res, mode);
     }
+#endif
 }
 
 
@@ -515,7 +523,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
     }
 }
 
-
+#if LV_USE_BLEND_MODES
 /**
  * Fill an area with a color but apply blending algorithms
  * @param disp_area the current display area (destination area)
@@ -606,6 +614,7 @@ static void fill_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  co
         }
     }
 }
+#endif
 
 static void map_set_px(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                        const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
@@ -845,7 +854,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
         }
     }
 }
-
+#if LV_USE_BLEND_MODES
 static void map_blended(const lv_area_t * disp_area, lv_color_t * disp_buf,  const lv_area_t * draw_area,
                         const lv_area_t * map_area, const lv_color_t * map_buf, lv_opa_t opa,
                         const lv_opa_t * mask, lv_draw_mask_res_t mask_res, lv_blend_mode_t mode)
@@ -996,3 +1005,4 @@ static inline lv_color_t color_blend_true_color_subtractive(lv_color_t fg, lv_co
 
     return lv_color_mix(fg, bg, opa);
 }
+#endif
