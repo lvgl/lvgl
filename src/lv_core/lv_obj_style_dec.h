@@ -197,7 +197,7 @@ _LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_LINE_WIDTH, scale_end_line_width, lv_sty
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_GRAD_COLOR, scale_grad_color, lv_color_t, _color, nonscalar)
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCALE_END_COLOR, scale_end_color, lv_color_t, _color, nonscalar)
 
-_LV_OBJ_STYLE_SET_GET_DECLARE(SCROLLBAR_WIDTH, scrollbar_width, lv_style_int_t, _int, scalar)
+_LV_OBJ_STYLE_SET_GET_DECLARE(SCROLLBAR_TICKNESS, scrollbar_tickness, lv_style_int_t, _int, scalar)
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCROLLBAR_SPACE_SIDE, scrollbar_space_side, lv_style_int_t, _int, scalar)
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCROLLBAR_SPACE_END, scrollbar_space_end, lv_style_int_t, _int, scalar)
 _LV_OBJ_STYLE_SET_GET_DECLARE(SCROLLBAR_RADIUS, scrollbar_radius, lv_style_int_t, _int, scalar)
