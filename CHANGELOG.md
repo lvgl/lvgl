@@ -31,7 +31,8 @@ Available in the `dev` branch
 - `tileview` fix navigation when not screen sized
 - Use 14px font by default to for better compatibility with smaller displays 
 - `linemeter` fix conversation of current value to "level"
-- fix drawing on right border
+- Fix drawing on right border
+- Set the cursor image non clickable by default
 
 ## v7.1.0 (07.07.2020)
 
