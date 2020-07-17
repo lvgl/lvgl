@@ -1559,4 +1559,3 @@ static void draw_value(const lv_area_t * coords, const lv_area_t * clip, lv_draw
 
     lv_draw_label(&value_area, clip, &label_dsc, dsc->value_str, NULL);
 }
-
