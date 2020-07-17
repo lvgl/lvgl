@@ -628,7 +628,7 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
     _LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
         lv_coord_t obj_w = lv_obj_get_width(child);
-        if(act_x + inner + obj_w > w_fit) {
+        if(act_x + obj_w > w_fit + left) {
             act_x = left;
             act_y += y_ofs;
         }
