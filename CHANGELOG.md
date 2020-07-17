@@ -28,6 +28,7 @@ Available in the `dev` branch
 - `linemeter` fix conversation of current value to "level"
 - Fix drawing on right border
 - Set the cursor image non clickable by default
+- Improve mono theme when used with keyboard or encoder
 
 ## v7.1.0 (07.07.2020)
 
