@@ -11,6 +11,9 @@
 - Add `lv_event_send_refresh`, `lv_event_send_refresh_recursive` to easily send `LV_EVENT_REFRESH` to object
 - Add `lv_tabview_set_tab_name()` function - used to change a tab's name
 
+### Bugfixes
+- Do not print for missing glyph if its height OR width is zero.
+
 ## v7.2.0 (21.07.2020)
 
 ### New features
