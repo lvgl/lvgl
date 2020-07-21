@@ -151,7 +151,8 @@ typedef struct _disp_t {
     struct _lv_obj_t * top_layer; /**< @see lv_disp_get_layer_top */
     struct _lv_obj_t * sys_layer; /**< @see lv_disp_get_layer_sys */
 
-    uint8_t del_prev  :1;         /**< 1: Automatically delete the previous screen when the screen load animation is ready */
+uint8_t del_prev  :
+    1;        /**< 1: Automatically delete the previous screen when the screen load animation is ready */
 
     lv_color_t bg_color;          /**< Default display color when screens are transparent*/
     const void * bg_img;       /**< An image source to display as wallpaper*/
