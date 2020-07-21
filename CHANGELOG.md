@@ -3,6 +3,8 @@
 ## v7.4.0 (planned on 18.08.2020)
 *Available in the `dev` branch*
 
+- Reduce code size by adding: `LV_USE_FONT_COMPRESSED` and `LV_FONT_USE_SUBPX` and applying some optimization
+
 ## v7.3.0 (planned on 04.08.2020)
 *Available in the `master` branch*
 

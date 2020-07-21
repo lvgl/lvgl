@@ -396,11 +396,15 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
  */
 #define LV_USE_FONT_COMPRESSED 1
 
+/* Enable subpixel rendering */
+#define LV_USE_FONT_SUBPX 1
+#if LV_USE_FONT_SUBPX
 /* Set the pixel order of the display.
  * Important only if "subpx fonts" are used.
  * With "normal" font it doesn't matter.
  */
 #define LV_FONT_SUBPX_BGR    0
+#endif
 
 /*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
 typedef void * lv_font_user_data_t;
