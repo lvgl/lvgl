@@ -244,7 +244,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
 #endif
 
     ta_insert_replace = NULL;
-    lv_event_send(ta, LV_EVENT_INSERT, letter_buf);
+    
     if(ta_insert_replace) {
         if(ta_insert_replace[0] == '\0') return; /*Drop this text*/
 
@@ -267,6 +267,8 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
                     "accepted list)");
         return;
     }
+    
+    lv_event_send(ta, LV_EVENT_INSERT, letter_buf);
 
     /*If a new line was added it shouldn't show edge flash effect*/
     bool edge_flash_en = lv_textarea_get_edge_flash(ta);
@@ -334,7 +336,6 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     ta_insert_replace = NULL;
-    lv_event_send(ta, LV_EVENT_INSERT, txt);
     if(ta_insert_replace) {
         if(ta_insert_replace[0] == '\0') return; /*Drop this text*/
 
@@ -356,7 +357,8 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
         }
         return;
     }
-
+    
+    lv_event_send(ta, LV_EVENT_INSERT, txt);
     /*If a new line was added it shouldn't show edge flash effect*/
     bool edge_flash_en = lv_textarea_get_edge_flash(ta);
     lv_textarea_set_edge_flash(ta, false);
