@@ -221,6 +221,14 @@ static void basic_init(void)
     lv_style_set_image_recolor(&styles->bg, LV_STATE_DEFAULT, COLOR_BG_TEXT);
     lv_style_set_line_color(&styles->bg, LV_STATE_DEFAULT, COLOR_BG_TEXT);
     lv_style_set_line_width(&styles->bg, LV_STATE_DEFAULT, 1);
+
+    lv_style_set_scrollbar_bg_opa(&styles->bg, LV_STATE_DEFAULT, LV_OPA_COVER);
+    lv_style_set_scrollbar_bg_color(&styles->bg, LV_STATE_DEFAULT, (IS_LIGHT ? lv_color_hex(0xcccfd1) : lv_color_hex(0x777f85)));
+    lv_style_set_scrollbar_radius(&styles->bg, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
+    lv_style_set_scrollbar_tickness(&styles->bg, LV_STATE_DEFAULT, LV_DPX(7));
+    lv_style_set_scrollbar_space_side(&styles->bg, LV_STATE_DEFAULT,  LV_DPX(7));
+    lv_style_set_scrollbar_space_end(&styles->bg, LV_STATE_DEFAULT,  LV_DPX(7));
+
     lv_style_set_pad_left(&styles->bg, LV_STATE_DEFAULT, PAD_DEF + BORDER_WIDTH);
     lv_style_set_pad_right(&styles->bg, LV_STATE_DEFAULT, PAD_DEF + BORDER_WIDTH);
     lv_style_set_pad_top(&styles->bg, LV_STATE_DEFAULT, PAD_DEF + BORDER_WIDTH);
