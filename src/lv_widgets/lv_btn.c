@@ -273,7 +273,7 @@ static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
     if(sign == LV_SIGNAL_RELEASED) {
         /*If not dragged and it was not long press action then
          *change state and run the action*/
-        if(lv_indev_is_dragging(param) == false && tgl) {
+        if(lv_indev_get_scroll_dir(param) == LV_SCROLL_DIR_NONE && tgl) {
             uint32_t toggled = 0;
             if(lv_obj_get_state(btn, LV_BTN_PART_MAIN) & LV_STATE_CHECKED) {
                 lv_btn_set_state(btn, LV_BTN_STATE_RELEASED);

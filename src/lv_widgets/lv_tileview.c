@@ -380,7 +380,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
             }
 
             /*Apply the drag constraints*/
-            lv_drag_dir_t drag_dir = indev->proc.types.pointer.drag_dir;
+            lv_scroll_dir_t drag_dir = indev->proc.types.pointer.drag_dir;
             if(drag_dir == LV_DRAG_DIR_HOR)
                 lv_obj_set_y(scrl, -ext->act_id.y * lv_obj_get_height(tileview) + top);
             else if(drag_dir == LV_DRAG_DIR_VER)
@@ -406,7 +406,7 @@ static void drag_end_handler(lv_obj_t * tileview)
     p.x = -(lv_obj_get_x(scrl) - lv_obj_get_width(tileview) / 2);
     p.y = -(lv_obj_get_y(scrl) - lv_obj_get_height(tileview) / 2);
 
-    lv_drag_dir_t drag_dir = indev->proc.types.pointer.drag_dir;
+    lv_scroll_dir_t drag_dir = indev->proc.types.pointer.drag_dir;
     /*From the drag vector (drag throw) predict the end position*/
     if(drag_dir & LV_DRAG_DIR_HOR) {
         lv_point_t vect;

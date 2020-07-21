@@ -768,8 +768,8 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
             lv_indev_get_point(indev, &p);
         }
 
-        if((LV_MATH_ABS(p.x - ext->last_press_point.x) > indev->driver.drag_limit / 2) ||
-           (LV_MATH_ABS(p.y - ext->last_press_point.y) > indev->driver.drag_limit / 2)) {
+        if((LV_MATH_ABS(p.x - ext->last_press_point.x) > indev->driver.scroll_limit / 2) ||
+           (LV_MATH_ABS(p.y - ext->last_press_point.y) > indev->driver.scroll_limit / 2)) {
             ext->last_change_time = lv_tick_get();
             ext->last_press_point.x = p.x;
             ext->last_press_point.y = p.y;

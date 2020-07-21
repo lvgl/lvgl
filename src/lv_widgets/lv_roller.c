@@ -885,7 +885,7 @@ static lv_res_t release_handler(lv_obj_t * roller)
 {
 
     /*If there was dragging `DRAG_END` signal will refresh the position and update the selected option*/
-    if(lv_indev_is_dragging(lv_indev_get_act())) return LV_RES_OK;
+    if(lv_indev_is_scrolling(lv_indev_get_act())) return LV_RES_OK;
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
 

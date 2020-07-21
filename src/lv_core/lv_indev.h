@@ -120,35 +120,27 @@ lv_gesture_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev);
 uint32_t lv_indev_get_key(const lv_indev_t * indev);
 
 /**
- * Check if there is dragging with an input device or not (for LV_INDEV_TYPE_POINTER and
+ * Check the current scroll direction of an input device (for LV_INDEV_TYPE_POINTER and
  * LV_INDEV_TYPE_BUTTON)
  * @param indev pointer to an input device
- * @return true: drag is in progress
+ * @return LV_SCROLL_DIR_NONE: no scrolling now
+ *         LV_SCROLL_DIR_HOR/VER
  */
-bool lv_indev_is_dragging(const lv_indev_t * indev);
+lv_scroll_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev);
 
 /**
- * Get the vector of dragging of an input device (for LV_INDEV_TYPE_POINTER and
+ * Get the movement vector of an input device (for LV_INDEV_TYPE_POINTER and
  * LV_INDEV_TYPE_BUTTON)
  * @param indev pointer to an input device
- * @param point pointer to a point to store the vector
+ * @param point pointer to a point to store the types.pointer.vector
  */
 void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point);
-
-/**
- * Manually finish dragging.
- * `LV_SIGNAL_DRAG_END` and `LV_EVENT_DRAG_END` will be sent.
- * @param indev pointer to an input device
- * @return `LV_RES_INV` if the object being dragged was deleted. Else `LV_RES_OK`.
- */
-lv_res_t lv_indev_finish_drag(lv_indev_t * indev);
 
 /**
  * Do nothing until the next release
  * @param indev pointer to an input device
  */
 void lv_indev_wait_release(lv_indev_t * indev);
-
 
 /**
  * Gets a pointer to the currently active object in indev proc functions.

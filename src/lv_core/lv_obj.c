@@ -329,10 +329,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     /*Set attributes*/
     new_obj->adv_hittest  = 0;
     new_obj->click        = 1;
-    new_obj->drag         = 0;
-    new_obj->drag_throw   = 0;
-    new_obj->drag_parent  = 0;
-    new_obj->drag_dir     = LV_DRAG_DIR_BOTH;
+    new_obj->scroll_mode  = LV_SCROLL_MODE_AUTO;
     new_obj->hidden       = 0;
     new_obj->top          = 0;
     new_obj->protect      = LV_PROTECT_NONE;
@@ -340,6 +337,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->gesture_parent = parent ? 1 : 0;
     new_obj->focus_parent  = 0;
     new_obj->state = LV_STATE_DEFAULT;
+    new_obj->scroll.x = 0;
+    new_obj->scroll.y = 0;
 
     new_obj->ext_attr = NULL;
 
@@ -384,10 +383,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         /*Copy attributes*/
         new_obj->adv_hittest  = copy->adv_hittest;
         new_obj->click        = copy->click;
-        new_obj->drag         = copy->drag;
-        new_obj->drag_dir     = copy->drag_dir;
-        new_obj->drag_throw   = copy->drag_throw;
-        new_obj->drag_parent  = copy->drag_parent;
+        new_obj->scroll_mode  = copy->scroll_mode;
         new_obj->hidden       = copy->hidden;
         new_obj->top          = copy->top;
         new_obj->parent_event = copy->parent_event;
@@ -1613,55 +1609,17 @@ void lv_obj_set_top(lv_obj_t * obj, bool en)
 }
 
 /**
- * Enable the dragging of an object
+ * Set how the scrollbars should behave.
  * @param obj pointer to an object
- * @param en true: make the object draggable
+ * @param mode: LV_SCROLL_MODE_ON/OFF/AUTO/ACTIVE
  */
-void lv_obj_set_drag(lv_obj_t * obj, bool en)
+void lv_obj_set_scroll_mode(lv_obj_t * obj, lv_scroll_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(en == true) lv_obj_set_click(obj, true); /*Drag is useless without enabled clicking*/
-    obj->drag = (en == true ? 1 : 0);
-}
-
-/**
- * Set the directions an object can be dragged in
- * @param obj pointer to an object
- * @param drag_dir bitwise OR of allowed directions an object can be dragged in
- */
-void lv_obj_set_drag_dir(lv_obj_t * obj, lv_drag_dir_t drag_dir)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    obj->drag_dir = drag_dir;
-
-    if(obj->drag_dir != 0) lv_obj_set_drag(obj, true); /*Drag direction requires drag*/
-}
-
-/**
- * Enable the throwing of an object after is is dragged
- * @param obj pointer to an object
- * @param en true: enable the drag throw
- */
-void lv_obj_set_drag_throw(lv_obj_t * obj, bool en)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    obj->drag_throw = (en == true ? 1 : 0);
-}
-
-/**
- * Enable to use parent for drag related operations.
- * If trying to drag the object the parent will be moved instead
- * @param obj pointer to an object
- * @param en true: enable the 'drag parent' for the object
- */
-void lv_obj_set_drag_parent(lv_obj_t * obj, bool en)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    obj->drag_parent = (en == true ? 1 : 0);
+    if(obj->scroll_mode == mode) return;
+    obj->scroll_mode = mode;
+    lv_obj_invalidate(obj);
 }
 
 /**
@@ -2944,61 +2902,15 @@ bool lv_obj_get_top(const lv_obj_t * obj)
 }
 
 /**
- * Get the drag enable attribute of an object
+ * Get how the scrollbars should behave.
  * @param obj pointer to an object
- * @return true: the object is draggable
+ * @return mode: LV_SCROLL_MODE_ON/OFF/AUTO/ACTIVE
  */
-bool lv_obj_get_drag(const lv_obj_t * obj)
+lv_scroll_mode_t lv_obj_get_scroll_mode(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    return obj->drag == 0 ? false : true;
-}
-
-/**
- * Get the directions an object can be dragged
- * @param obj pointer to an object
- * @return bitwise OR of allowed directions an object can be dragged in
- */
-lv_drag_dir_t lv_obj_get_drag_dir(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return obj->drag_dir;
-}
-
-/**
- * Get the directions an object can be scrolled
- * @param obj pointer to an object
- * @return bitwise OR of allowed directions an object can be dragged in
- */
-lv_drag_dir_t lv_obj_get_scroll_dir(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return obj->scroll_dir;
-}
-
-/**
- * Get the drag throw enable attribute of an object
- * @param obj pointer to an object
- * @return true: drag throw is enabled
- */
-bool lv_obj_get_drag_throw(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return obj->drag_throw == 0 ? false : true;
-}
-
-/**
- * Get the drag parent attribute of an object
- * @param obj pointer to an object
- * @return true: drag parent is enabled
- */
-bool lv_obj_get_drag_parent(const lv_obj_t * obj)
-{
-    return obj->drag_parent == 0 ? false : true;
+    return obj->scroll_mode;
 }
 
 /**
@@ -3022,9 +2934,9 @@ bool lv_obj_get_focus_parent(const lv_obj_t * obj)
 }
 
 /**
- * Get the drag parent attribute of an object
+ * Get the parent event attribute of an object
  * @param obj pointer to an object
- * @return true: drag parent is enabled
+ * @return true: parent event is enabled
  */
 bool lv_obj_get_parent_event(const lv_obj_t * obj)
 {
