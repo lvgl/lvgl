@@ -161,6 +161,9 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     lv_obj_set_click(disp->top_layer, false);
     lv_obj_set_click(disp->sys_layer, false);
 
+    lv_obj_set_scroll_mode(disp->top_layer, LV_SCROLL_MODE_OFF);
+    lv_obj_set_scroll_mode(disp->sys_layer, LV_SCROLL_MODE_OFF);
+
     lv_obj_invalidate(disp->act_scr);
 
     disp_def = disp_def_tmp; /*Revert the default display*/

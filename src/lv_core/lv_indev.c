@@ -299,6 +299,18 @@ lv_scroll_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev)
     if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) return false;
     return indev->proc.types.pointer.scroll_dir;
 }
+/**
+ * Get the currently scrolled object (for LV_INDEV_TYPE_POINTER and
+ * LV_INDEV_TYPE_BUTTON)
+ * @param indev pointer to an input device
+ * @return pointer to the currently scrolled object or NULL if no scrolling by this indev
+ */
+lv_obj_t * lv_indev_get_scroll_obj(const lv_indev_t * indev)
+{
+    if(indev == NULL) return NULL;
+    if(indev->driver.type != LV_INDEV_TYPE_POINTER && indev->driver.type != LV_INDEV_TYPE_BUTTON) return NULL;
+    return indev->proc.types.pointer.scroll_obj;
+}
 
 /**
  * Get the movement vector of an input device (for LV_INDEV_TYPE_POINTER and
