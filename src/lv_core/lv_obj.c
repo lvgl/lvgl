@@ -1754,6 +1754,51 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
 }
 
 /**
+ * Send LV_EVENT_REFRESH event to an object
+ * @param obj point to an obejct. (Can NOT be NULL)
+ * @return LV_RES_OK: success, LV_RES_INV: to object become invalid (e.g. deleted) due to this event.
+ */
+lv_res_t lv_event_send_refresh(lv_obj_t * obj)
+{
+    return lv_event_send(obj, LV_EVENT_REFRESH, NULL);
+}
+
+/**
+ * Send LV_EVENT_REFRESH event to an object and all of its children.
+ * @param obj pointer to an object or NULL to refresh all objects of all displays
+ */
+void lv_event_send_refresh_recursive(lv_obj_t * obj)
+{
+    if(obj == NULL) {
+        /*If no obj specified refresh all screen of all displays */
+        lv_disp_t * d = lv_disp_get_next(NULL);
+        while(d) {
+            lv_obj_t * scr = _lv_ll_get_head(&d->scr_ll);
+            while(scr) {
+                lv_event_send_refresh_recursive(scr);
+                scr = _lv_ll_get_next(&d->scr_ll, scr);
+            }
+            lv_event_send_refresh_recursive(d->top_layer);
+            lv_event_send_refresh_recursive(d->sys_layer);
+
+            d = lv_disp_get_next(d);
+        }
+    } else {
+
+        lv_res_t res = lv_event_send_refresh(obj);
+        if(res != LV_RES_OK) return; /*If invalid returned do not check the children*/
+
+        lv_obj_t * child = lv_obj_get_child(obj, NULL);
+        while(child) {
+            lv_event_send_refresh_recursive(child);
+
+            child = lv_obj_get_child(obj, child);
+        }
+    }
+}
+
+
+/**
  * Call an event function with an object, event, and data.
  * @param event_xcb an event callback function. If `NULL` `LV_RES_OK` will return without any actions.
  *        (the 'x' in the argument name indicates that its not a fully generic function because it not follows
