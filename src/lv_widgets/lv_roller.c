@@ -474,12 +474,15 @@ static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * cli
 
             /*Get the size of the "selected text"*/
             lv_point_t res_p;
-            _lv_txt_get_size(&res_p, lv_label_get_text(label), label_dsc.font, label_dsc.letter_space, label_dsc.line_space, lv_obj_get_width(roller), LV_TXT_FLAG_EXPAND);
+            _lv_txt_get_size(&res_p, lv_label_get_text(label), label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
+                             lv_obj_get_width(roller), LV_TXT_FLAG_EXPAND);
 
             /*Move the selected label proportionally with the background label*/
             lv_coord_t roller_h = lv_obj_get_height(roller);
-            int32_t label_y_prop = label->coords.y1 - (roller_h / 2 + roller->coords.y1); /*label offset from the middle line of the roller*/
-            label_y_prop = (label_y_prop << 14) / lv_obj_get_height(label); /*Proportional position from the middle line (upscaled)*/
+            int32_t label_y_prop = label->coords.y1 - (roller_h / 2 +
+                                                       roller->coords.y1); /*label offset from the middle line of the roller*/
+            label_y_prop = (label_y_prop << 14) / lv_obj_get_height(
+                               label); /*Proportional position from the middle line (upscaled)*/
 
             /*Apply a correction with different line heights*/
             const lv_font_t * normal_label_font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);

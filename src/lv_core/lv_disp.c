@@ -23,9 +23,9 @@
  **********************/
 
 #if LV_USE_ANIMATION
-static void scr_load_anim_start(lv_anim_t * a);
-static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
-static void scr_anim_ready(lv_anim_t * a);
+    static void scr_load_anim_start(lv_anim_t * a);
+    static void opa_scale_anim(lv_obj_t * obj, lv_anim_value_t v);
+    static void scr_anim_ready(lv_anim_t * a);
 #endif
 
 /**********************
@@ -166,7 +166,7 @@ void lv_disp_set_bg_color(lv_disp_t * disp, lv_color_t color)
  * @param disp pointer to a display
  * @param img_src path to file or pointer to an `lv_img_dsc_t` variable
  */
-void lv_disp_set_bg_image(lv_disp_t * disp, const void *  img_src)
+void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src)
 {
     if(!disp) disp = lv_disp_get_default();
     if(!disp) {
@@ -248,60 +248,60 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
     lv_anim_set_delay(&a_old, delay);
 
     switch(anim_type) {
-    case LV_SCR_LOAD_ANIM_NONE:
-        /* Create a dummy animation to apply the delay*/
-        lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_x);
-        lv_anim_set_values(&a_new, 0, 0);
-        break;
-    case LV_SCR_LOAD_ANIM_OVER_LEFT:
-        lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_x);
-        lv_anim_set_values(&a_new, lv_disp_get_hor_res(d), 0);
-        break;
-    case LV_SCR_LOAD_ANIM_OVER_RIGHT:
-        lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_x);
-        lv_anim_set_values(&a_new, -lv_disp_get_hor_res(d), 0);
-        break;
-    case LV_SCR_LOAD_ANIM_OVER_TOP:
-        lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_y);
-        lv_anim_set_values(&a_new, lv_disp_get_ver_res(d), 0);
-        break;
-    case LV_SCR_LOAD_ANIM_OVER_BOTTOM:
-        lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_y);
-        lv_anim_set_values(&a_new, -lv_disp_get_ver_res(d), 0);
-        break;
-    case LV_SCR_LOAD_ANIM_MOVE_LEFT:
-        lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_x);
-        lv_anim_set_values(&a_new, lv_disp_get_hor_res(d), 0);
+        case LV_SCR_LOAD_ANIM_NONE:
+            /* Create a dummy animation to apply the delay*/
+            lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_x);
+            lv_anim_set_values(&a_new, 0, 0);
+            break;
+        case LV_SCR_LOAD_ANIM_OVER_LEFT:
+            lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_x);
+            lv_anim_set_values(&a_new, lv_disp_get_hor_res(d), 0);
+            break;
+        case LV_SCR_LOAD_ANIM_OVER_RIGHT:
+            lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_x);
+            lv_anim_set_values(&a_new, -lv_disp_get_hor_res(d), 0);
+            break;
+        case LV_SCR_LOAD_ANIM_OVER_TOP:
+            lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_y);
+            lv_anim_set_values(&a_new, lv_disp_get_ver_res(d), 0);
+            break;
+        case LV_SCR_LOAD_ANIM_OVER_BOTTOM:
+            lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_y);
+            lv_anim_set_values(&a_new, -lv_disp_get_ver_res(d), 0);
+            break;
+        case LV_SCR_LOAD_ANIM_MOVE_LEFT:
+            lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_x);
+            lv_anim_set_values(&a_new, lv_disp_get_hor_res(d), 0);
 
-        lv_anim_set_exec_cb(&a_old, (lv_anim_exec_xcb_t) lv_obj_set_x);
-        lv_anim_set_values(&a_old, 0, -lv_disp_get_hor_res(d));
-        break;
-    case LV_SCR_LOAD_ANIM_MOVE_RIGHT:
-        lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_x);
-        lv_anim_set_values(&a_new, -lv_disp_get_hor_res(d), 0);
+            lv_anim_set_exec_cb(&a_old, (lv_anim_exec_xcb_t) lv_obj_set_x);
+            lv_anim_set_values(&a_old, 0, -lv_disp_get_hor_res(d));
+            break;
+        case LV_SCR_LOAD_ANIM_MOVE_RIGHT:
+            lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_x);
+            lv_anim_set_values(&a_new, -lv_disp_get_hor_res(d), 0);
 
-        lv_anim_set_exec_cb(&a_old, (lv_anim_exec_xcb_t) lv_obj_set_x);
-        lv_anim_set_values(&a_old, 0, lv_disp_get_hor_res(d));
-        break;
-    case LV_SCR_LOAD_ANIM_MOVE_TOP:
-        lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_y);
-        lv_anim_set_values(&a_new, lv_disp_get_ver_res(d), 0);
+            lv_anim_set_exec_cb(&a_old, (lv_anim_exec_xcb_t) lv_obj_set_x);
+            lv_anim_set_values(&a_old, 0, lv_disp_get_hor_res(d));
+            break;
+        case LV_SCR_LOAD_ANIM_MOVE_TOP:
+            lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_y);
+            lv_anim_set_values(&a_new, lv_disp_get_ver_res(d), 0);
 
-        lv_anim_set_exec_cb(&a_old, (lv_anim_exec_xcb_t) lv_obj_set_y);
-        lv_anim_set_values(&a_old, 0, -lv_disp_get_ver_res(d));
-        break;
-    case LV_SCR_LOAD_ANIM_MOVE_BOTTOM:
-        lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_y);
-        lv_anim_set_values(&a_new, -lv_disp_get_ver_res(d), 0);
+            lv_anim_set_exec_cb(&a_old, (lv_anim_exec_xcb_t) lv_obj_set_y);
+            lv_anim_set_values(&a_old, 0, -lv_disp_get_ver_res(d));
+            break;
+        case LV_SCR_LOAD_ANIM_MOVE_BOTTOM:
+            lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) lv_obj_set_y);
+            lv_anim_set_values(&a_new, -lv_disp_get_ver_res(d), 0);
 
-        lv_anim_set_exec_cb(&a_old, (lv_anim_exec_xcb_t) lv_obj_set_y);
-        lv_anim_set_values(&a_old, 0, lv_disp_get_ver_res(d));
-        break;
+            lv_anim_set_exec_cb(&a_old, (lv_anim_exec_xcb_t) lv_obj_set_y);
+            lv_anim_set_values(&a_old, 0, lv_disp_get_ver_res(d));
+            break;
 
-    case LV_SCR_LOAD_ANIM_FADE_ON:
-        lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) opa_scale_anim);
-        lv_anim_set_values(&a_new, LV_OPA_TRANSP, LV_OPA_COVER);
-        break;
+        case LV_SCR_LOAD_ANIM_FADE_ON:
+            lv_anim_set_exec_cb(&a_new, (lv_anim_exec_xcb_t) opa_scale_anim);
+            lv_anim_set_values(&a_new, LV_OPA_TRANSP, LV_OPA_COVER);
+            break;
     }
 
     lv_anim_start(&a_new);
