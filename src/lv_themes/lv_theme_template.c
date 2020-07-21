@@ -81,7 +81,7 @@ static void basic_init(void)
     lv_style_set_bg_color(&styles->btn, LV_STATE_PRESSED, lv_color_hex3(0xccc));
     lv_style_set_bg_color(&styles->btn, LV_STATE_CHECKED, theme.color_primary);
     lv_style_set_bg_color(&styles->btn, LV_STATE_CHECKED | LV_STATE_PRESSED, lv_color_darken(theme.color_primary,
-                                                         LV_OPA_30));
+                                                                                             LV_OPA_30));
     lv_style_set_bg_color(&styles->btn, LV_STATE_DISABLED, LV_COLOR_SILVER);
     lv_style_set_text_color(&styles->btn, LV_STATE_DISABLED, LV_COLOR_GRAY);
     lv_style_set_image_recolor(&styles->btn, LV_STATE_DISABLED, LV_COLOR_GRAY);
@@ -345,8 +345,8 @@ static void win_init(void)
  * @return a pointer to reference this theme later
  */
 lv_theme_t * lv_theme_template_init(lv_color_t color_primary, lv_color_t color_secondary, uint32_t flags,
-                        const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle,
-                        const lv_font_t * font_title)
+                                    const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle,
+                                    const lv_font_t * font_title)
 {
 
     /* This trick is required only to avoid the garbage collection of

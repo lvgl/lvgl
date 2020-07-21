@@ -85,8 +85,10 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
 static void report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
-static void obj_align_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, bool x_set, bool y_set, lv_coord_t x_ofs, lv_coord_t y_ofs);
-static void obj_align_origo_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,  bool x_set, bool y_set, lv_coord_t x_ofs, lv_coord_t y_ofs);
+static void obj_align_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, bool x_set, bool y_set,
+                           lv_coord_t x_ofs, lv_coord_t y_ofs);
+static void obj_align_origo_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,  bool x_set, bool y_set,
+                                 lv_coord_t x_ofs, lv_coord_t y_ofs);
 #if LV_USE_ANIMATION
 static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state,
                                        lv_state_t new_state);
@@ -3863,7 +3865,8 @@ static void base_dir_refr_children(lv_obj_t * obj)
     }
 }
 
-static void obj_align_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, bool x_set, bool y_set, lv_coord_t x_ofs, lv_coord_t y_ofs)
+static void obj_align_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, bool x_set, bool y_set,
+                           lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     lv_point_t new_pos;
     _lv_area_align(&base->coords, &obj->coords, align, &new_pos);
@@ -3882,7 +3885,8 @@ static void obj_align_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t ali
     else if(y_set) lv_obj_set_y(obj, new_pos.y);
 }
 
-static void obj_align_origo_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,  bool x_set, bool y_set, lv_coord_t x_ofs, lv_coord_t y_ofs)
+static void obj_align_origo_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,  bool x_set, bool y_set,
+                                 lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     lv_coord_t new_x = lv_obj_get_x(obj);
     lv_coord_t new_y = lv_obj_get_y(obj);

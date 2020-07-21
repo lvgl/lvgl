@@ -1070,11 +1070,11 @@ static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day)
     uint32_t a = month < 3 ? 1 : 0;
     uint32_t b = year - a;
 
-    #if LV_CALENDAR_WEEK_STARTS_MONDAY
+#if LV_CALENDAR_WEEK_STARTS_MONDAY
     uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400) - 1) % 7;
-    #else
+#else
     uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400)) % 7;
-    #endif
+#endif
 
     return day_of_week;
 }
