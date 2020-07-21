@@ -517,10 +517,12 @@ static void lv_refr_area_part(const lv_area_t * area_p)
                 lv_area_t a;
                 lv_area_set(&a, 0, 0, header.w - 1, header.h - 1);
                 lv_draw_img(&a, &start_mask, disp_refr->bg_img, &dsc);
-            } else {
+            }
+            else {
                 LV_LOG_WARN("Can't draw the background image")
             }
-        } else {
+        }
+        else {
             lv_draw_rect_dsc_t dsc;
             lv_draw_rect_dsc_init(&dsc);
             dsc.bg_color = disp_refr->bg_color;
@@ -542,8 +544,8 @@ static void lv_refr_area_part(const lv_area_t * area_p)
 
 
     if(top_act_scr == NULL) {
-         top_act_scr = disp_refr->act_scr;
-     }
+        top_act_scr = disp_refr->act_scr;
+    }
     /*Do the refreshing from the top object*/
     lv_refr_obj_and_children(top_act_scr, &start_mask);
 

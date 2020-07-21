@@ -390,7 +390,7 @@ static inline uint32_t lv_color_to32(lv_color_t color)
 {
 #if LV_COLOR_DEPTH == 1
     if(color.full == 0)
-        return 0;
+        return 0xFF000000;
     else
         return 0xFFFFFFFF;
 #elif LV_COLOR_DEPTH == 8

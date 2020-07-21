@@ -191,7 +191,7 @@ static void apply_theme(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
     }
 
     /*apply_xcb is deprecated, use apply_cb instead*/
-    if (th->apply_xcb) {
+    if(th->apply_xcb) {
         th->apply_xcb(obj, name);
     }
     else if(th->apply_cb) {

@@ -116,7 +116,8 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
         }
 
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED ? true : false;
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], decompr_buf, gdsc->box_w, gdsc->box_h, (uint8_t)fdsc->bpp, prefilter);
+        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], decompr_buf, gdsc->box_w, gdsc->box_h, (uint8_t)fdsc->bpp,
+                   prefilter);
         return decompr_buf;
 #else /* !LV_USE_FONT_COMPRESSED */
         return NULL;
@@ -353,7 +354,7 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
     uint8_t * line_buf2 = NULL;
 
     if(prefilter) {
-        line_buf2= _lv_mem_buf_get(w);
+        line_buf2 = _lv_mem_buf_get(w);
     }
 
     decompress_line(line_buf1, w);
@@ -375,7 +376,8 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
                 bits_write(out, wrp, line_buf1[x], bpp);
                 wrp += wr_size;
             }
-        } else {
+        }
+        else {
             decompress_line(line_buf1, w);
 
             for(x = 0; x < w; x++) {

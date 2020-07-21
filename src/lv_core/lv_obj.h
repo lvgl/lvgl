@@ -823,6 +823,20 @@ void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb);
  */
 lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data);
 
+
+/**
+ * Send LV_EVENT_REFRESH event to an object
+ * @param obj point to an obejct. (Can NOT be NULL)
+ * @return LV_RES_OK: success, LV_RES_INV: to object become invalid (e.g. deleted) due to this event.
+ */
+lv_res_t lv_event_send_refresh(lv_obj_t * obj);
+
+/**
+ * Send LV_EVENT_REFRESH event to an object and all of its children
+ * @param obj pointer to an object or NULL to refresh all objects of all displays
+ */
+void lv_event_send_refresh_recursive(lv_obj_t * obj);
+
 /**
  * Call an event function with an object, event, and data.
  * @param event_xcb an event callback function. If `NULL` `LV_RES_OK` will return without any actions.
