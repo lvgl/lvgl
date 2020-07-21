@@ -171,7 +171,7 @@ def drivers_merge_to_release_branch(v):
 
 def docs_clone():
   title("docs: Clone")
-  #cmd("git clone --recursive https://github.com/lvgl/docs.git")
+  cmd("git clone --recursive https://github.com/lvgl/docs.git")
   os.chdir("./docs")
 
 def docs_get_api():
