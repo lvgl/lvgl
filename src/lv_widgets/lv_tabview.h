@@ -59,6 +59,8 @@ typedef struct {
     lv_point_t point_last;
     uint16_t tab_cur;
     uint16_t tab_cnt;
+    uint16_t tab_height;
+    uint16_t tab_width;
 #if LV_USE_ANIMATION
     uint16_t anim_time;
 #endif
@@ -120,12 +122,26 @@ void lv_tabview_clean_tab(lv_obj_t * tab);
 void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t anim);
 
 /**
+ * Set tab height
+ * @param tabview pointer to Tab view object
+ * @param height height of a tab (0 for auto)
+ */
+void lv_tabview_set_tab_height(lv_obj_t * tabview, uint16_t height);
+
+/**
  * Set the name of a tab.
  * @param tabview pointer to Tab view object
  * @param id index of the tab the name should be set
  * @param name new tab name
  */
 void lv_tabview_set_tab_name(lv_obj_t * tabview, uint16_t id, char * name);
+
+/**
+ * Set tab width
+ * @param tabview pointer to Tab view object
+ * @param width width of a tab (0 for auto)
+ */
+void lv_tabview_set_tab_width(lv_obj_t * tabview, uint16_t width);
 
 /**
  * Set the animation time of tab view when a new tab is loaded
@@ -158,6 +174,21 @@ uint16_t lv_tabview_get_tab_act(const lv_obj_t * tabview);
  * @return tab count
  */
 uint16_t lv_tabview_get_tab_count(const lv_obj_t * tabview);
+
+/**
+ * Get tab height
+ * @param tabview pointer to Tab view object
+ * @return tab height
+ */
+uint16_t lv_tabview_get_tab_height(const lv_obj_t * tabview);
+
+/**
+ * Get tab width
+ * @param tabview pointer to Tab view object
+ * @return tab width
+ */
+uint16_t lv_tabview_get_tab_width(const lv_obj_t * tabview);
+
 /**
  * Get the page (content area) of a tab
  * @param tabview pointer to Tab view object
