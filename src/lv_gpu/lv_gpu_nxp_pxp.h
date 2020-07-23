@@ -30,6 +30,10 @@
 #ifndef LV_SRC_LV_GPU_LV_GPU_NXP_PXP_H_
 #define LV_SRC_LV_GPU_LV_GPU_NXP_PXP_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*********************
  *      INCLUDES
  *********************/
@@ -172,5 +176,9 @@ void lv_gpu_nxp_pxp_disable_recolor(void);
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif /* LV_SRC_LV_GPU_LV_GPU_NXP_PXP_H_ */

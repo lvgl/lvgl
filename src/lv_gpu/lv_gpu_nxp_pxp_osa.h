@@ -30,10 +30,18 @@
 #ifndef LV_SRC_LV_GPU_LV_GPU_NXP_PXP_OSA_H_
 #define LV_SRC_LV_GPU_LV_GPU_NXP_PXP_OSA_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "lv_conf.h"
 
 #if LV_USE_GPU && LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_DEFAULT_OSA
 extern lv_nxp_pxp_cfg_t pxp_default_cfg;
+#endif
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
 
 #endif /* LV_SRC_LV_GPU_LV_GPU_NXP_PXP_OSA_H_ */
