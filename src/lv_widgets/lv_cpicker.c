@@ -48,6 +48,13 @@
 
 #define TRI_OFFSET 2
 
+/* The OUTER_MASK_WIDTH define is required to assist with the placing of a mask over the outer ring of the widget as when the
+ * multicoloured radial lines are calculated for the outer ring of the widget their lengths are jittering because of the
+ * integer based arithmetic. From tests the maximum delta was found to be 2 so the current value is set to 3 to achieve
+ * appropriate masking.
+ */
+#define OUTER_MASK_WIDTH 3
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -486,10 +493,10 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask)
     /* Mask outer ring of widget to tidy up ragged edges of lines while drawing outer ring */
     lv_area_t mask_area_out;
     lv_area_copy( &mask_area_out, &cpicker->coords);
-    mask_area_out.x1 += 3;
-    mask_area_out.x2 -= 3;
-    mask_area_out.y1 += 3;
-    mask_area_out.y2 -= 3;
+    mask_area_out.x1 += OUTER_MASK_WIDTH;
+    mask_area_out.x2 -= OUTER_MASK_WIDTH;
+    mask_area_out.y1 += OUTER_MASK_WIDTH;
+    mask_area_out.y2 -= OUTER_MASK_WIDTH;
     lv_draw_mask_radius_param_t mask_out_param;
     lv_draw_mask_radius_init(&mask_out_param, &mask_area_out, LV_RADIUS_CIRCLE, false);
     int16_t mask_out_id = lv_draw_mask_add(&mask_out_param, 0);
