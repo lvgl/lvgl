@@ -52,7 +52,7 @@ enum {
 typedef uint8_t lv_fs_res_t;
 
 /**
- * Filesystem mode.
+ * File open mode.
  */
 enum {
     LV_FS_MODE_WR = 0x01,
@@ -60,18 +60,28 @@ enum {
 };
 typedef uint8_t lv_fs_mode_t;
 
+
+/**
+ * Seek modes.
+ */
+enum {
+    LV_FS_SEEK_SET = 0x01,
+    LV_FS_SEEK_CUR = 0x02,
+    LV_FS_SEEK_END = 0x03,
+};
+typedef uint8_t lv_fs_whence_t;
+
 typedef struct _lv_fs_drv_t {
     char letter;
-    uint16_t file_size;
     uint16_t rddir_size;
     bool (*ready_cb)(struct _lv_fs_drv_t * drv);
 
-    lv_fs_res_t (*open_cb)(struct _lv_fs_drv_t * drv, void * file_p, const char * path, lv_fs_mode_t mode);
+    void * (*open_cb)(struct _lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode);
     lv_fs_res_t (*close_cb)(struct _lv_fs_drv_t * drv, void * file_p);
     lv_fs_res_t (*remove_cb)(struct _lv_fs_drv_t * drv, const char * fn);
     lv_fs_res_t (*read_cb)(struct _lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br);
     lv_fs_res_t (*write_cb)(struct _lv_fs_drv_t * drv, void * file_p, const void * buf, uint32_t btw, uint32_t * bw);
-    lv_fs_res_t (*seek_cb)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t pos);
+    lv_fs_res_t (*seek_cb)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t pos, lv_fs_whence_t whence);
     lv_fs_res_t (*tell_cb)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p);
     lv_fs_res_t (*trunc_cb)(struct _lv_fs_drv_t * drv, void * file_p);
     lv_fs_res_t (*size_cb)(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * size_p);
@@ -143,7 +153,7 @@ bool lv_fs_is_ready(char letter);
  * @param mode read: FS_MODE_RD, write: FS_MODE_WR, both: FS_MODE_RD | FS_MODE_WR
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_open(lv_fs_file_t * file_p, const char * path, lv_fs_mode_t mode);
+void * lv_fs_open(const char * path, lv_fs_mode_t mode);
 
 /**
  * Close an already opened file
@@ -185,7 +195,7 @@ lv_fs_res_t lv_fs_write(lv_fs_file_t * file_p, const void * buf, uint32_t btw, u
  * @param pos the new position expressed in bytes index (0: start of file)
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
-lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos);
+lv_fs_res_t lv_fs_seek(lv_fs_file_t * file_p, uint32_t pos, lv_fs_whence_t whence);
 
 /**
  * Give the position of the read write pointer
