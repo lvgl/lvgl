@@ -15,6 +15,7 @@
 - Do not print warning for missing glyph if its height OR width is zero.
 - Prevent duplicated sending of `LV_EVENT_INSERT` from text area
 - Tidy outer edges of cpicker widget.
+- Remove duplicated lines from `lv_tabview_add_tab`
 
 ## v7.2.0 (21.07.2020)
 
