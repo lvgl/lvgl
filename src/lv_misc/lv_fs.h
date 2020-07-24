@@ -65,9 +65,9 @@ typedef uint8_t lv_fs_mode_t;
  * Seek modes.
  */
 enum {
-    LV_FS_SEEK_SET = 0x01,
-    LV_FS_SEEK_CUR = 0x02,
-    LV_FS_SEEK_END = 0x03,
+    LV_FS_SEEK_SET = 0x00,
+    LV_FS_SEEK_CUR = 0x01,
+    LV_FS_SEEK_END = 0x02,
 };
 typedef uint8_t lv_fs_whence_t;
 
