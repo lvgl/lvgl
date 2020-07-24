@@ -21,6 +21,8 @@ Planned to September/October 2020
   - Work in progress
 - Simplified File system interface ([feat/new_fs_api](https://github.com/lvgl/lvgl/tree/feat/new-fs-api) branch) to make porting easier
   - Work in progress
+- Add new label alignment modes
+  - See [#1656](https://github.com/lvgl/lvgl/issues/1656)
 
 ## Ideas
 - ...
