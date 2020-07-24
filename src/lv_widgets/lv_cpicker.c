@@ -483,6 +483,17 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask)
     uint16_t i;
     lv_coord_t cir_w = lv_obj_get_style_scale_width(cpicker, LV_CPICKER_PART_MAIN);
 
+    /* Mask outer ring of widget to tidy up ragged edges of lines while drawing outer ring */
+    lv_area_t mask_area_out;
+    lv_area_copy( &mask_area_out, &cpicker->coords);
+    mask_area_out.x1 += 3;
+    mask_area_out.x2 -= 3;
+    mask_area_out.y1 += 3;
+    mask_area_out.y2 -= 3;
+    lv_draw_mask_radius_param_t mask_out_param;
+    lv_draw_mask_radius_init(&mask_out_param, &mask_area_out, LV_RADIUS_CIRCLE, false);
+    int16_t mask_out_id = lv_draw_mask_add(&mask_out_param, 0);
+
     /* The inner line ends will be masked out.
      * So make lines a little bit longer because the masking makes a more even result */
     lv_coord_t cir_w_extra = cir_w + line_dsc.width;
@@ -491,17 +502,15 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask)
         line_dsc.color = angle_to_mode_color(cpicker, i);
 
         lv_point_t p[2];
-        p[0].x = cx + ((r-2) * _lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-        p[0].y = cy + ((r-2) * _lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
-        p[1].x = cx + ((r-2 - cir_w_extra) * _lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
-        p[1].y = cy + ((r-2 - cir_w_extra) * _lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+        p[0].x = cx + (r * _lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+        p[0].y = cy + (r * _lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
+        p[1].x = cx + ((r - cir_w_extra) * _lv_trigo_sin(i) >> LV_TRIGO_SHIFT);
+        p[1].y = cy + ((r - cir_w_extra) * _lv_trigo_sin(i + 90) >> LV_TRIGO_SHIFT);
 
-        /* We use the r-2 value here to keep the lines inside the bounds of the circle as the integer based arithmetic
-         * is not a 100% using the trigonometric functions
-         */
         lv_draw_line(&p[0], &p[1], mask, &line_dsc);
     }
-
+    /* Now remove mask to continue with inner part */
+    lv_draw_mask_remove_id(mask_out_id);
 
     /*Mask out the inner area*/
     lv_draw_rect_dsc_t bg_dsc;
@@ -527,13 +536,6 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask)
     area_mid.y2 -= inner;
 
     lv_draw_rect(&area_mid, mask, &bg_dsc);
-
-    /*Tidy outside of colour picker, the way the outer ring has to be drawn it cannot mask well so this draws a clean edge around it */
-    lv_draw_line_dsc_t tidy_dsc;
-    lv_draw_line_dsc_init(&tidy_dsc);
-    tidy_dsc.width = 3;
-    tidy_dsc.color = lv_obj_get_style_bg_color(cpicker, LV_CPICKER_PART_MAIN);
-    lv_draw_arc(cx, cy, r,  0, 360,  mask, &tidy_dsc);
 }
 
 static void draw_rect_grad(lv_obj_t * cpicker, const lv_area_t * mask)
