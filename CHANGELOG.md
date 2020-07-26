@@ -10,6 +10,7 @@
 - Add `lv_task_get_next`
 - Add `lv_event_send_refresh`, `lv_event_send_refresh_recursive` to easily send `LV_EVENT_REFRESH` to object
 - Add `lv_tabview_set_tab_name()` function - used to change a tab's name
+- Add `LV_THEME_MATERIAL_FLAG_NO_TRANSITION` and `LV_THEME_MATERIAL_FLAG_NO_FOCUS` flags
 
 ### Bugfixes
 - Do not print warning for missing glyph if its height OR width is zero.
