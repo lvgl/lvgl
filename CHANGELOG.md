@@ -17,7 +17,8 @@
 - Prevent duplicated sending of `LV_EVENT_INSERT` from text area
 - Tidy outer edges of cpicker widget.
 - Remove duplicated lines from `lv_tabview_add_tab`
-- "btnmatrix: hadle combined states of buttons (e.g. chacked + disabled)"
+- btnmatrix: hadle combined states of buttons (e.g. chacked + disabled)
+- textarea: fix typo in lv_textarea_set_sscrollbar_mode
 
 
 ## v7.2.0 (21.07.2020)
