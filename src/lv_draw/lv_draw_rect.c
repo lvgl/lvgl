@@ -418,10 +418,6 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
         /*Create a mask if there is a radius*/
         lv_opa_t * mask_buf = _lv_mem_buf_get(draw_area_w);
 
-        uint8_t other_mask_cnt = lv_draw_mask_get_cnt();
-        bool simple_mode = true;
-        if(other_mask_cnt) simple_mode = false;
-
         /*Create mask for the outer area*/
         int16_t mask_rout_id = LV_MASK_ID_INV;
         lv_draw_mask_radius_param_t mask_rout_param;
