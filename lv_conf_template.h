@@ -391,11 +391,20 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
  * but with > 10,000 characters if you see issues probably you need to enable it.*/
 #define LV_FONT_FMT_TXT_LARGE   0
 
+/* Enables/disables support for compressed fonts. If it's disabled, compressed
+ * glyphs cannot be processed by the library and won't be rendered.
+ */
+#define LV_USE_FONT_COMPRESSED 1
+
+/* Enable subpixel rendering */
+#define LV_USE_FONT_SUBPX 1
+#if LV_USE_FONT_SUBPX
 /* Set the pixel order of the display.
  * Important only if "subpx fonts" are used.
  * With "normal" font it doesn't matter.
  */
 #define LV_FONT_SUBPX_BGR    0
+#endif
 
 /*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
 typedef void * lv_font_user_data_t;

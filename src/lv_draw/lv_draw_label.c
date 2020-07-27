@@ -607,6 +607,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
 static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_dsc_t * g, const lv_area_t * clip_area,
                               const uint8_t * map_p, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode)
 {
+#if LV_USE_FONT_SUBPX
     const uint8_t * bpp_opa_table;
     uint32_t bitmask_init;
     uint32_t bitmask;
@@ -806,6 +807,9 @@ static void draw_letter_subpx(lv_coord_t pos_x, lv_coord_t pos_y, lv_font_glyph_
 
     _lv_mem_buf_release(mask_buf);
     _lv_mem_buf_release(color_buf);
+#else
+    LV_LOG_WARN("Can't draw sub-pixel rendered letter because LV_USE_FONT_SUBPX == 0 in lv_conf.h");
+#endif
 }
 
 

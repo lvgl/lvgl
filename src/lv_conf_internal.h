@@ -589,12 +589,25 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #define LV_FONT_FMT_TXT_LARGE   0
 #endif
 
+/* Enables/disables support for compressed fonts. If it's disabled, compressed
+ * glyphs cannot be processed by the library and won't be rendered.
+ */
+#ifndef LV_USE_FONT_COMPRESSED
+#define LV_USE_FONT_COMPRESSED 1
+#endif
+
+/* Enable subpixel rendering */
+#ifndef LV_USE_FONT_SUBPX
+#define LV_USE_FONT_SUBPX 1
+#endif
+#if LV_USE_FONT_SUBPX
 /* Set the pixel order of the display.
  * Important only if "subpx fonts" are used.
  * With "normal" font it doesn't matter.
  */
 #ifndef LV_FONT_SUBPX_BGR
 #define LV_FONT_SUBPX_BGR    0
+#endif
 #endif
 
 /*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
