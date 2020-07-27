@@ -3,8 +3,6 @@
 ## v7.4.0 (planned on 18.08.2020)
 *Available in the `dev` branch*
 
-- Reduce code size by adding: `LV_USE_FONT_COMPRESSED` and `LV_FONT_USE_SUBPX` and applying some optimization
-
 ## v7.3.0 (planned on 04.08.2020)
 *Available in the `master` branch*
 
@@ -13,6 +11,8 @@
 - Add `lv_event_send_refresh`, `lv_event_send_refresh_recursive` to easily send `LV_EVENT_REFRESH` to object
 - Add `lv_tabview_set_tab_name()` function - used to change a tab's name
 - Add `LV_THEME_MATERIAL_FLAG_NO_TRANSITION` and `LV_THEME_MATERIAL_FLAG_NO_FOCUS` flags
+- Reduce code size by adding: `LV_USE_FONT_COMPRESSED` and `LV_FONT_USE_SUBPX` and applying some optimization
+
 
 ### Bugfixes
 - Do not print warning for missing glyph if its height OR width is zero.
