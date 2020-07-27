@@ -149,7 +149,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_label_set_text(ext->label, "Text area");
         lv_obj_set_click(ext->label, false);
         lv_obj_set_size(ta, LV_TEXTAREA_DEF_WIDTH, LV_TEXTAREA_DEF_HEIGHT);
-        lv_textarea_set_sscrollbar_mode(ta, LV_SCROLLBAR_MODE_DRAG);
+        lv_textarea_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_DRAG);
 
         lv_obj_reset_style_list(ta, LV_PAGE_PART_SCROLLABLE);
         lv_theme_apply(ta, LV_THEME_TEXTAREA);

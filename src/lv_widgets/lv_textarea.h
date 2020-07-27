@@ -224,7 +224,7 @@ void lv_textarea_set_insert_replace(lv_obj_t * ta, const char * txt);
  * @param ta pointer to a text area object
  * @param sb_mode the new mode from 'lv_scrollbar_mode_t' enum
  */
-static inline void lv_textarea_set_sscrollbar_mode(lv_obj_t * ta, lv_scrollbar_mode_t mode)
+static inline void lv_textarea_set_scrollbar_mode(lv_obj_t * ta, lv_scrollbar_mode_t mode)
 {
     lv_page_set_scrollbar_mode(ta, mode);
 }
