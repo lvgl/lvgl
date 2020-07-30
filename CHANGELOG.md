@@ -21,6 +21,7 @@
 - Remove duplicated lines from `lv_tabview_add_tab`
 - btnmatrix: hadle combined states of buttons (e.g. chacked + disabled)
 - textarea: fix typo in lv_textarea_set_sscrollbar_mode
+- gauge: fix image needle drawing
 
 
 ## v7.2.0 (21.07.2020)
