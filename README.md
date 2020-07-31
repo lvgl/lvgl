@@ -78,7 +78,7 @@ Basically, every modern controller (which is able to drive a display) is suitabl
   <tr>
     <td> <strong>Heap</strong></td>
     <td> &gt; 2 kB </td>
-    <td> &gt; 16 kB</td>
+    <td> &gt; 8 kB</td>
   </tr>
   
   <tr>
