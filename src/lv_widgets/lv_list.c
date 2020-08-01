@@ -495,7 +495,7 @@ uint16_t lv_list_get_size(const lv_obj_t * list)
     lv_obj_t * btn = lv_list_get_next_btn(list, NULL);
     while(btn) {
         size++;
-        btn = lv_list_get_next_btn(list, NULL);
+        btn = lv_list_get_next_btn(list, btn);
     }
     return size;
 }
