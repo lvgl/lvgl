@@ -22,6 +22,7 @@
 - btnmatrix: hadle combined states of buttons (e.g. chacked + disabled)
 - textarea: fix typo in lv_textarea_set_sscrollbar_mode
 - gauge: fix image needle drawing
+- fix using freed memory in _lv_style_list_remove_style
 
 
 ## v7.2.0 (21.07.2020)
