@@ -105,7 +105,7 @@ static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
 static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop);
 static void update_style_cache_children(lv_obj_t * obj);
-static void invalidate_style_cache(lv_obj_t * obj, uint8_t part);
+static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -505,43 +505,11 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(lv_obj_get_hidden(obj)) return;
+    lv_area_t area_tmp;
+    lv_area_copy(&area_tmp, area);
+    bool visible = lv_obj_area_is_visible(obj, &area_tmp);
 
-    /*Invalidate the object only if it belongs to the curent or previous'*/
-    lv_obj_t * obj_scr = lv_obj_get_screen(obj);
-    lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
-    if(obj_scr == lv_disp_get_scr_act(disp) ||
-       obj_scr == lv_disp_get_scr_prev(disp) ||
-       obj_scr == lv_disp_get_layer_top(disp) ||
-       obj_scr == lv_disp_get_layer_sys(disp)) {
-
-        /*Truncate the area to the object*/
-        lv_area_t obj_coords;
-        lv_coord_t ext_size = obj->ext_draw_pad;
-        lv_area_copy(&obj_coords, &obj->coords);
-        obj_coords.x1 -= ext_size;
-        obj_coords.y1 -= ext_size;
-        obj_coords.x2 += ext_size;
-        obj_coords.y2 += ext_size;
-
-        bool is_common;
-        lv_area_t area_trunc;
-
-        is_common = _lv_area_intersect(&area_trunc, area, &obj_coords);
-        if(is_common == false) return;  /*The area is not on the object*/
-
-        /*Truncate recursively to the parents*/
-        lv_obj_t * par = lv_obj_get_parent(obj);
-        while(par != NULL) {
-            is_common = _lv_area_intersect(&area_trunc, &area_trunc, &par->coords);
-            if(is_common == false) break;       /*If no common parts with parent break;*/
-            if(lv_obj_get_hidden(par)) return; /*If the parent is hidden then the child is hidden and won't be drawn*/
-
-            par = lv_obj_get_parent(par);
-        }
-
-        if(is_common) _lv_inv_area(disp, &area_trunc);
-    }
+    if(visible) _lv_inv_area(lv_obj_get_disp(obj), &area_tmp);
 }
 
 /**
@@ -564,6 +532,74 @@ void lv_obj_invalidate(const lv_obj_t * obj)
     lv_obj_invalidate_area(obj, &obj_coords);
 
 }
+
+/**
+ * Tell whether an area of an object is visible (even partially) now or not
+ * @param obj pointer to an object
+ * @param area the are to check. The visible part of the area will be written back here.
+ * @return true: visible; false: not visible (hidden, out of parent, on other screen, etc)
+ */
+bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
+{
+    if(lv_obj_get_hidden(obj)) return false;
+
+    /*Invalidate the object only if it belongs to the curent or previous'*/
+    lv_obj_t * obj_scr = lv_obj_get_screen(obj);
+    lv_disp_t * disp   = lv_obj_get_disp(obj_scr);
+    if(obj_scr == lv_disp_get_scr_act(disp) ||
+       obj_scr == lv_disp_get_scr_prev(disp) ||
+       obj_scr == lv_disp_get_layer_top(disp) ||
+       obj_scr == lv_disp_get_layer_sys(disp)) {
+
+        /*Truncate the area to the object*/
+        lv_area_t obj_coords;
+        lv_coord_t ext_size = obj->ext_draw_pad;
+        lv_area_copy(&obj_coords, &obj->coords);
+        obj_coords.x1 -= ext_size;
+        obj_coords.y1 -= ext_size;
+        obj_coords.x2 += ext_size;
+        obj_coords.y2 += ext_size;
+
+        bool is_common;
+
+        is_common = _lv_area_intersect(area, area, &obj_coords);
+        if(is_common == false) return false;  /*The area is not on the object*/
+
+        /*Truncate recursively to the parents*/
+        lv_obj_t * par = lv_obj_get_parent(obj);
+        while(par != NULL) {
+            is_common = _lv_area_intersect(area, area, &par->coords);
+            if(is_common == false) return false;       /*If no common parts with parent break;*/
+            if(lv_obj_get_hidden(par)) return false; /*If the parent is hidden then the child is hidden and won't be drawn*/
+
+            par = lv_obj_get_parent(par);
+        }
+    }
+
+    return true;
+}
+
+/**
+ * Tell whether an object is visible (even partially) now or not
+ * @param obj pointer to an object
+ * @return true: visible; false: not visible (hidden, out of parent, on other screen, etc)
+ */
+bool lv_obj_is_visible(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_area_t obj_coords;
+    lv_coord_t ext_size = obj->ext_draw_pad;
+    lv_area_copy(&obj_coords, &obj->coords);
+    obj_coords.x1 -= ext_size;
+    obj_coords.y1 -= ext_size;
+    obj_coords.x2 += ext_size;
+    obj_coords.y2 += ext_size;
+
+    return lv_obj_area_is_visible(obj, &obj_coords);
+
+}
+
 /*=====================
  * Setter functions
  *====================*/
@@ -1302,7 +1338,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t prop
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    invalidate_style_cache(obj, part);
+    invalidate_style_cache(obj, part, prop);
 
     /*If a real style refresh is required*/
     bool real_refr = false;
@@ -2472,16 +2508,10 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
                 if(list->text_line_space_zero) def = true;
                 break;
             case LV_STYLE_TRANSFORM_ANGLE:
-                if(list->transform_angle_zero) def = true;
-                break;
             case LV_STYLE_TRANSFORM_WIDTH:
-                if(list->transform_width_zero) def = true;
-                break;
             case LV_STYLE_TRANSFORM_HEIGHT:
-                if(list->transform_height_zero) def = true;
-                break;
             case LV_STYLE_TRANSFORM_ZOOM:
-                if(list->transform_zoom_zero) def = true;
+                if(list->transform_all_zero) def = true;
                 break;
             case LV_STYLE_BORDER_WIDTH:
                 if(list->border_width_zero) def = true;
@@ -2495,9 +2525,28 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
             case LV_STYLE_SHADOW_WIDTH:
                 if(list->shadow_width_zero) def = true;
                 break;
+            case LV_STYLE_PAD_TOP:
+            case LV_STYLE_PAD_BOTTOM:
+            case LV_STYLE_PAD_LEFT:
+            case LV_STYLE_PAD_RIGHT:
+                if(list->pad_all_zero) def = true;
+                break;
+            case LV_STYLE_BG_BLEND_MODE:
+            case LV_STYLE_BORDER_BLEND_MODE:
+            case LV_STYLE_IMAGE_BLEND_MODE:
+            case LV_STYLE_LINE_BLEND_MODE:
+            case LV_STYLE_OUTLINE_BLEND_MODE:
+            case LV_STYLE_PATTERN_BLEND_MODE:
+            case LV_STYLE_SHADOW_BLEND_MODE:
+            case LV_STYLE_TEXT_BLEND_MODE:
+            case LV_STYLE_VALUE_BLEND_MODE:
+                if(list->blend_mode_all_normal) def = true;
+                break;
             }
 
-            if(def) break;
+            if(def) {
+                break;
+            }
         }
 
         lv_state_t state = lv_obj_get_state(parent, part);
@@ -2624,7 +2673,7 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
             bool def = false;
             switch(prop & (~LV_STYLE_STATE_MASK)) {
             case LV_STYLE_OPA_SCALE:
-                if(list->opa_scale_transp) def = true;
+                if(list->opa_scale_cover) def = true;
                 break;
             case LV_STYLE_BG_OPA:
                 if(list->bg_opa_transp) def = true;
@@ -2633,7 +2682,10 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
                 if(list->img_recolor_opa_transp) def = true;
                 break;
             }
-            if(def) break;
+
+            if(def) {
+                break;
+            }
         }
 
 
@@ -2699,14 +2751,19 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
             bool def = false;
             switch(prop  & (~LV_STYLE_STATE_MASK)) {
             case LV_STYLE_VALUE_STR:
-                if(list->opa_scale_transp) def = true;
+                if(list->value_txt_str) def = true;
                 break;
             case LV_STYLE_PATTERN_IMAGE:
                 if(list->pattern_img_null) def = true;
                 break;
+            case LV_STYLE_TEXT_FONT:
+                if(list->text_font_normal) def = true;
+                break;
             }
 
-            if(def) break;
+            if(def) {
+                break;
+            }
         }
 
         lv_state_t state = lv_obj_get_state(parent, part);
@@ -4378,17 +4435,11 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
     return false;
 }
 
-/**
- * Update the cache of style list
- * @param obj pointer to an obejct
- * @param part the part of the object
- * @param prop the property which triggered the update
- */
-static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
+static bool style_prop_is_cacheble(lv_style_property_t prop)
 {
 
-    bool cachable;
     switch(prop) {
+    case LV_STYLE_PROP_ALL:
     case LV_STYLE_BG_GRAD_DIR:
     case LV_STYLE_CLIP_CORNER:
     case LV_STYLE_TEXT_LETTER_SPACE:
@@ -4406,23 +4457,50 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
     case LV_STYLE_IMAGE_RECOLOR_OPA:
     case LV_STYLE_VALUE_STR:
     case LV_STYLE_PATTERN_IMAGE:
-        cachable = true;
+    case LV_STYLE_PAD_TOP:
+    case LV_STYLE_PAD_BOTTOM:
+    case LV_STYLE_PAD_LEFT:
+    case LV_STYLE_PAD_RIGHT:
+    case LV_STYLE_BG_BLEND_MODE:
+    case LV_STYLE_BORDER_BLEND_MODE:
+    case LV_STYLE_IMAGE_BLEND_MODE:
+    case LV_STYLE_LINE_BLEND_MODE:
+    case LV_STYLE_OUTLINE_BLEND_MODE:
+    case LV_STYLE_PATTERN_BLEND_MODE:
+    case LV_STYLE_SHADOW_BLEND_MODE:
+    case LV_STYLE_TEXT_BLEND_MODE:
+    case LV_STYLE_VALUE_BLEND_MODE:
+        return true;
         break;
     default:
-        cachable = false;
+        return false;
     }
+}
 
-    if(!cachable) return;
+/**
+ * Update the cache of style list
+ * @param obj pointer to an obejct
+ * @param part the part of the object
+ * @param prop the property which triggered the update
+ */
+static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
+{
+    if(style_prop_is_cacheble(prop) == false) return;
 
     lv_style_list_t * list = lv_obj_get_style_list(obj, part);
 
     bool ignore_cache_ori = list->ignore_cache;
     list->ignore_cache = 1;
 
-    list->opa_scale_transp    = lv_obj_get_style_opa_scale(obj, part) == LV_OPA_TRANSP ? 1 : 0;
+#if LV_USE_OPA_SCALE
+    list->opa_scale_cover    = lv_obj_get_style_opa_scale(obj, part) == LV_OPA_COVER ? 1 : 0;
+#else
+    list->opa_scale_cover    = 1;
+#endif
     list->text_decor_none    = lv_obj_get_style_text_decor(obj, part) == LV_TEXT_DECOR_NONE ? 1 : 0;
     list->text_letter_space_zero    = lv_obj_get_style_text_letter_space(obj, part) == 0 ? 1 : 0;
     list->text_line_space_zero    = lv_obj_get_style_text_line_space(obj, part) == 0 ? 1 : 0;
+    list->text_font_normal    = lv_obj_get_style_text_font(obj, part) == LV_THEME_DEFAULT_FONT_NORMAL ? 1 : 0;
 
     list->bg_grad_dir_none  = lv_obj_get_style_bg_grad_dir(obj, part) == LV_GRAD_DIR_NONE ? 1 : 0;
     list->bg_opa_transp     = lv_obj_get_style_bg_opa(obj, part) == LV_OPA_TRANSP ? 1 : 0;
@@ -4433,12 +4511,42 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
     list->outline_width_zero    = lv_obj_get_style_outline_width(obj, part) == 0 ? 1 : 0;
     list->pattern_img_null    = lv_obj_get_style_pattern_image(obj, part) == NULL ? 1 : 0;
     list->shadow_width_zero    = lv_obj_get_style_shadow_width(obj, part) == 0 ? 1 : 0;
-    list->transform_angle_zero    = lv_obj_get_style_transform_angle(obj, part) == 0 ? 1 : 0;
-    list->transform_height_zero    = lv_obj_get_style_transform_width(obj, part) == 0 ? 1 : 0;
-    list->transform_width_zero    = lv_obj_get_style_transform_height(obj, part) == 0 ? 1 : 0;
-    list->transform_zoom_zero    = lv_obj_get_style_transform_zoom(obj, part) == LV_IMG_ZOOM_NONE ? 1 : 0;
     list->value_txt_str    = lv_obj_get_style_value_str(obj, part) == NULL ? 1 : 0;
 
+
+    list->transform_all_zero  = 1;
+    if(lv_obj_get_style_transform_angle(obj, part) != 0 ||
+       lv_obj_get_style_transform_width(obj, part) != 0 ||
+       lv_obj_get_style_transform_height(obj, part) != 0 ||
+       lv_obj_get_style_transform_zoom(obj, part) != LV_IMG_ZOOM_NONE)
+    {
+        list->transform_all_zero  = 0;
+    }
+
+    list->pad_all_zero  = 1;
+    if(lv_obj_get_style_pad_top(obj, part) != 0 ||
+        lv_obj_get_style_pad_bottom(obj, part) != 0 ||
+        lv_obj_get_style_pad_left(obj, part) != 0 ||
+        lv_obj_get_style_pad_right(obj, part) != 0)
+    {
+        list->pad_all_zero  = 0;
+    }
+
+    list->blend_mode_all_normal = 1;
+#if LV_USE_BLEND_MODES
+    if(lv_obj_get_style_bg_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+            lv_obj_get_style_border_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+            lv_obj_get_style_pattern_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+            lv_obj_get_style_outline_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+            lv_obj_get_style_value_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+            lv_obj_get_style_text_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+            lv_obj_get_style_line_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+            lv_obj_get_style_image_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+            lv_obj_get_style_shadow_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL)
+    {
+        list->blend_mode_all_normal = 0;
+    }
+#endif
     list->ignore_cache = ignore_cache_ori;
     list->valid_cache = 1;
 }
@@ -4473,15 +4581,15 @@ static void update_style_cache_children(lv_obj_t * obj)
         bool ignore_cache_ori = list->ignore_cache;
         list->ignore_cache = 1;
 
-        list->opa_scale_transp    = lv_obj_get_style_opa_scale(obj, part) == LV_OPA_TRANSP ? 1 : 0;
+        list->opa_scale_cover    = lv_obj_get_style_opa_scale(obj, part) == LV_OPA_COVER ? 1 : 0;
         list->text_decor_none    = lv_obj_get_style_text_decor(obj, part) == LV_TEXT_DECOR_NONE ? 1 : 0;
         list->text_letter_space_zero    = lv_obj_get_style_text_letter_space(obj, part) == 0 ? 1 : 0;
         list->text_line_space_zero    = lv_obj_get_style_text_line_space(obj, part) == 0 ? 1 : 0;
+        list->text_font_normal    = lv_obj_get_style_text_font(obj, part) == lv_theme_get_font_normal() ? 1 : 0;
         list->img_recolor_opa_transp    = lv_obj_get_style_image_recolor_opa(obj, part) == LV_OPA_TRANSP ? 1 : 0;
 
         list->ignore_cache = ignore_cache_ori;
     }
-
 
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
     while(child) {
@@ -4496,8 +4604,10 @@ static void update_style_cache_children(lv_obj_t * obj)
  * The cache will be updated when a cached property asked nest time
  * @param obj pointer to an object
  */
-static void invalidate_style_cache(lv_obj_t * obj, uint8_t part)
+static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
+    if(style_prop_is_cacheble(prop) == false) return;
+
     if(part != LV_OBJ_PART_ALL) {
         lv_style_list_t * list = lv_obj_get_style_list(obj, part);
         if(list == NULL) return;

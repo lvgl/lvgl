@@ -227,19 +227,18 @@ typedef struct {
     uint32_t skip_trans    :1;       /*1: Temporally skip the transition style if any*/
     uint32_t ignore_trans  :1;       /*1: Mark that this style list shouldn't receive transitions at all*/
     uint32_t valid_cache   :1;      /*1: The cache is invalid and needs to be updated*/
-    uint8_t ignore_cache   :1;       /**1: Ignore style cache while getting value of properties*/
+    uint32_t ignore_cache  :1;       /**1: Ignore style cache while getting value of properties*/
 
-    uint32_t opa_scale_transp      :1;
+    uint32_t opa_scale_cover      :1;
     uint32_t clip_corner_off       :1;
-    uint32_t transform_width_zero  :1;
-    uint32_t transform_height_zero :1;
-    uint32_t transform_angle_zero  :1;
-    uint32_t transform_zoom_zero   :1;
+    uint32_t transform_all_zero  :1;
     uint32_t bg_opa_transp :1;
     uint32_t bg_grad_dir_none :1;
+    uint32_t blend_mode_all_normal :1;
     uint32_t border_width_zero :1;
     uint32_t outline_width_zero :1;
     uint32_t pattern_img_null :1;
+    uint32_t pad_all_zero :1;
     uint32_t shadow_width_zero :1;
     uint32_t value_txt_str :1;
     uint32_t line_width_zerop :1;
@@ -247,6 +246,7 @@ typedef struct {
     uint32_t text_letter_space_zero :1;
     uint32_t text_line_space_zero :1;
     uint32_t text_decor_none :1;
+    uint32_t text_font_normal :1;
 } lv_style_list_t;
 
 /**********************

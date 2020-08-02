@@ -353,6 +353,22 @@ void lv_obj_invalidate_area(const lv_obj_t * obj, const lv_area_t * area);
  */
 void lv_obj_invalidate(const lv_obj_t * obj);
 
+
+/**
+ * Tell whether an area of an object is visible (even partially) now or not
+ * @param obj pointer to an object
+ * @param area the are to check. The visible part of the area will be written back here.
+ * @return true: visible; false: not visible (hidden, out of parent, on other screen, etc)
+ */
+bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area);
+
+/**
+ * Tell whether an object is visible (even partially) now or not
+ * @param obj pointer to an object
+ * @return true: visible; false: not visible (hidden, out of parent, on other screen, etc)
+ */
+bool lv_obj_is_visible(const lv_obj_t * obj);
+
 /*=====================
  * Setter functions
  *====================*/

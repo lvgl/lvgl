@@ -515,6 +515,9 @@ static lv_style_list_t * lv_arc_get_style(lv_obj_t * arc, uint8_t part)
 
 static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle)
 {
+    /*Skip this complicated invalidation if the arc is not visible*/
+    if(lv_obj_is_visible(arc) == false) return;
+
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     start_angle += ext->rotation_angle;
