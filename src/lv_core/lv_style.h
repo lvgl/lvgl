@@ -221,11 +221,32 @@ typedef struct {
 #if LV_USE_ASSERT_STYLE
     uint32_t sentinel;
 #endif
-    uint8_t style_cnt;
-    uint8_t has_local    : 1;
-    uint8_t has_trans    : 1;
-    uint8_t skip_trans   : 1;       /*1: Temporally skip the transition style if any*/
-    uint8_t ignore_trans   : 1;     /*1: Mark that this style list shouldn't receive transitions at all*/
+    uint32_t style_cnt     :7;
+    uint32_t has_local     :1;
+    uint32_t has_trans     :1;
+    uint32_t skip_trans    :1;       /*1: Temporally skip the transition style if any*/
+    uint32_t ignore_trans  :1;       /*1: Mark that this style list shouldn't receive transitions at all*/
+    uint32_t ignore_cache  :1;       /*1: Ignore cache while getting value of properties*/
+    uint32_t valid_cache  :1;      /*1: The cache is invalid and needs to be updated*/
+
+    uint32_t opa_scale_transp      :1;
+    uint32_t clip_corner_off       :1;
+    uint32_t transform_width_zero  :1;
+    uint32_t transform_height_zero :1;
+    uint32_t transform_angle_zero  :1;
+    uint32_t transform_zoom_zero   :1;
+    uint32_t bg_opa_transp :1;
+    uint32_t bg_grad_dir_none :1;
+    uint32_t border_width_zero :1;
+    uint32_t outline_width_zero :1;
+    uint32_t pattern_img_null :1;
+    uint32_t shadow_width_zero :1;
+    uint32_t value_txt_str :1;
+    uint32_t line_width_zerop :1;
+    uint32_t img_recolor_opa_transp :1;
+    uint32_t text_letter_space_zero :1;
+    uint32_t text_line_space_zero :1;
+    uint32_t text_decor_none :1;
 } lv_style_list_t;
 
 /**********************

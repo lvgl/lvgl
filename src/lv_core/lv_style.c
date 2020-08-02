@@ -1052,6 +1052,9 @@ bool lv_debug_check_style_list(const lv_style_list_t * list)
  */
 LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop)
 {
+    static uint32_t c = 0;
+    c++;
+    if(c % 100 == 0) printf("%d\n", c);
     LV_ASSERT_STYLE(style);
 
     if(style->map == NULL) return -1;
