@@ -101,7 +101,7 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_style_list_copy(&ext->style_arc, &copy_ext->style_arc);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(arc, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(arc, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("arc created");

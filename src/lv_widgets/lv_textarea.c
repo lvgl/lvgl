@@ -187,7 +187,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         if(copy_ext->one_line) lv_textarea_set_one_line(ta, true);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(ta, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(ta, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
 #if LV_USE_ANIMATION

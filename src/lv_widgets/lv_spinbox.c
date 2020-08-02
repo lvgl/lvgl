@@ -106,7 +106,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_spinbox_set_rollover(spinbox, copy_ext->rollover);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(spinbox, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(spinbox, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     lv_spinbox_updatevalue(spinbox);

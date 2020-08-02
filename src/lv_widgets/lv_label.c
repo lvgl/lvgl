@@ -161,7 +161,7 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->dot_end       = copy_ext->dot_end;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_label, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(new_label, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("label created");

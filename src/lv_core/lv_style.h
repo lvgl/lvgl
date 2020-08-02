@@ -226,8 +226,8 @@ typedef struct {
     uint32_t has_trans     :1;
     uint32_t skip_trans    :1;       /*1: Temporally skip the transition style if any*/
     uint32_t ignore_trans  :1;       /*1: Mark that this style list shouldn't receive transitions at all*/
-    uint32_t ignore_cache  :1;       /*1: Ignore cache while getting value of properties*/
-    uint32_t valid_cache  :1;      /*1: The cache is invalid and needs to be updated*/
+    uint32_t valid_cache   :1;      /*1: The cache is invalid and needs to be updated*/
+    uint8_t ignore_cache   :1;       /**1: Ignore style cache while getting value of properties*/
 
     uint32_t opa_scale_transp      :1;
     uint32_t clip_corner_off       :1;

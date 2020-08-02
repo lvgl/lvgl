@@ -586,7 +586,7 @@ void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part);
  * @param obj pointer to an object
  * @param prop `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property. It is used to optimize what needs to be refreshed.
  */
-void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop);
+void lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 
 /**
  * Notify all object if a style is modified
@@ -594,20 +594,6 @@ void lv_obj_refresh_style(lv_obj_t * obj, lv_style_property_t prop);
  *               (NULL to notify all objects)
  */
 void lv_obj_report_style_mod(lv_style_t * style);
-
-/**
- * Update the cache of style list
- * @param obj pointer to an obejct
- * @param part the part of the object
- */
-void _lv_obj_update_style_cache(lv_obj_t * obj, uint8_t part);
-
-/**
- * Mark the object and all of it's children's style lists as invalid.
- * The cache will be updated when a cached property asked nest time
- * @param obj pointer to an object
- */
-void _lv_obj_invalidate_style_cache(lv_obj_t * obj);
 
 /**
  * Set a local style property of a part of an object in a given state.

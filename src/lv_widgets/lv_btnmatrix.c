@@ -660,6 +660,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
 
         /*The state changes without re-caching the styles, disable the use of cache*/
         lv_state_t state_ori = btnm->state;
+        _lv_obj_disable_style_cahcing(btnm, true);
         btnm->state = LV_STATE_DEFAULT;
         lv_draw_rect_dsc_init(&draw_rect_rel_dsc);
         lv_draw_label_dsc_init(&draw_label_rel_dsc);
@@ -667,6 +668,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
         lv_obj_init_draw_label_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_label_rel_dsc);
         draw_label_rel_dsc.flag = txt_flag;
         btnm->state = state_ori;
+        _lv_obj_disable_style_cahcing(btnm, false);
 
         bool chk_inited = false;
         bool disabled_inited = false;
@@ -700,12 +702,14 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
             if(tgl_state) {
                 if(!chk_inited) {
                     btnm->state = LV_STATE_CHECKED;
+                    _lv_obj_disable_style_cahcing(btnm, true);
                     lv_draw_rect_dsc_init(&draw_rect_chk_dsc);
                     lv_draw_label_dsc_init(&draw_label_chk_dsc);
                     lv_obj_init_draw_rect_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_rect_chk_dsc);
                     lv_obj_init_draw_label_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_label_chk_dsc);
                     draw_label_chk_dsc.flag = txt_flag;
                     btnm->state = state_ori;
+                    _lv_obj_disable_style_cahcing(btnm, false);
                     chk_inited = true;
                 }
             }
@@ -713,12 +717,14 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
             if(button_is_inactive(ext->ctrl_bits[btn_i])) {
                 if(!disabled_inited) {
                     btnm->state = LV_STATE_DISABLED;
+                    _lv_obj_disable_style_cahcing(btnm, true);
                     lv_draw_rect_dsc_init(&draw_rect_ina_dsc);
                     lv_draw_label_dsc_init(&draw_label_ina_dsc);
                     lv_obj_init_draw_rect_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_rect_ina_dsc);
                     lv_obj_init_draw_label_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_label_ina_dsc);
                     draw_label_ina_dsc.flag = txt_flag;
                     btnm->state = state_ori;
+                    _lv_obj_disable_style_cahcing(btnm, false);
                     disabled_inited = true;
                 }
                 draw_rect_dsc_act = &draw_rect_ina_dsc;
