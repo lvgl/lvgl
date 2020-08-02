@@ -2454,8 +2454,7 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
     const lv_obj_t * parent = obj;
     while(parent) {
         lv_style_list_t * list = lv_obj_get_style_list(parent, part);
-
-        if(!list->ignore_cache) {
+        if(!list->ignore_cache && list->style_cnt > 0) {
             if(!list->valid_cache) update_style_cache((lv_obj_t*)parent, part, prop  & (~LV_STYLE_STATE_MASK));
 
             bool def = false;
@@ -2620,7 +2619,7 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
     while(parent) {
         lv_style_list_t * list = lv_obj_get_style_list(parent, part);
 
-        if(!list->ignore_cache) {
+        if(!list->ignore_cache && list->style_cnt > 0) {
             if(!list->valid_cache) update_style_cache((lv_obj_t*)parent, part, prop  & (~LV_STYLE_STATE_MASK));
             bool def = false;
             switch(prop & (~LV_STYLE_STATE_MASK)) {
@@ -2695,7 +2694,7 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
     while(parent) {
         lv_style_list_t * list = lv_obj_get_style_list(parent, part);
 
-        if(!list->ignore_cache) {
+        if(!list->ignore_cache && list->style_cnt > 0) {
             if(!list->valid_cache) update_style_cache((lv_obj_t*)parent, part, prop  & (~LV_STYLE_STATE_MASK));
             bool def = false;
             switch(prop  & (~LV_STYLE_STATE_MASK)) {
@@ -4482,6 +4481,14 @@ static void update_style_cache_children(lv_obj_t * obj)
 
         list->ignore_cache = ignore_cache_ori;
     }
+
+
+    lv_obj_t * child = lv_obj_get_child(obj, NULL);
+    while(child) {
+        update_style_cache_children(child);
+        child = lv_obj_get_child(obj, child);
+    }
+
 }
 
 /**
@@ -4491,9 +4498,23 @@ static void update_style_cache_children(lv_obj_t * obj)
  */
 static void invalidate_style_cache(lv_obj_t * obj, uint8_t part)
 {
-    lv_style_list_t * list = lv_obj_get_style_list(obj, part);
-    if(list == NULL) return;
-    list->valid_cache = 0;
+    if(part != LV_OBJ_PART_ALL) {
+        lv_style_list_t * list = lv_obj_get_style_list(obj, part);
+        if(list == NULL) return;
+        list->valid_cache = 0;
+    } else {
+
+        for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
+            lv_style_list_t * list = lv_obj_get_style_list(obj, part);
+            if(list == NULL) break;
+            list->valid_cache = 0;
+        }
+        for(part = _LV_OBJ_PART_REAL_FIRST; part < 0xFF; part++) {
+               lv_style_list_t * list = lv_obj_get_style_list(obj, part);
+               if(list == NULL) break;
+               list->valid_cache = 0;
+           }
+    }
 
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
     while(child) {
