@@ -2502,10 +2502,8 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
                 if(list->clip_corner_off) def = true;
                 break;
             case LV_STYLE_TEXT_LETTER_SPACE:
-                if(list->text_letter_space_zero) def = true;
-                break;
             case LV_STYLE_TEXT_LINE_SPACE:
-                if(list->text_line_space_zero) def = true;
+                if(list->text_space_zero) def = true;
                 break;
             case LV_STYLE_TRANSFORM_ANGLE:
             case LV_STYLE_TRANSFORM_WIDTH:
@@ -2516,11 +2514,17 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
             case LV_STYLE_BORDER_WIDTH:
                 if(list->border_width_zero) def = true;
                 break;
-            case LV_STYLE_LINE_WIDTH:
-                if(list->line_width_zero) def = true;
+            case LV_STYLE_BORDER_SIDE:
+                if(list->border_side_full) def = true;
+                break;
+            case LV_STYLE_BORDER_POST:
+                if(list->border_post_off) def = true;
                 break;
             case LV_STYLE_OUTLINE_WIDTH:
                 if(list->outline_width_zero) def = true;
+                break;
+            case LV_STYLE_RADIUS:
+                if(list->radius_zero) def = true;
                 break;
             case LV_STYLE_SHADOW_WIDTH:
                 if(list->shadow_width_zero) def = true;
@@ -2676,6 +2680,7 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
                 if(list->opa_scale_cover) def = true;
                 break;
             case LV_STYLE_BG_OPA:
+                if(list->bg_opa_cover) return LV_OPA_COVER;     /*Special case, not the default value is used*/
                 if(list->bg_opa_transp) def = true;
                 break;
             case LV_STYLE_IMAGE_RECOLOR_OPA:
@@ -4449,11 +4454,13 @@ static bool style_prop_is_cacheble(lv_style_property_t prop)
     case LV_STYLE_TRANSFORM_HEIGHT:
     case LV_STYLE_TRANSFORM_ZOOM:
     case LV_STYLE_BORDER_WIDTH:
-    case LV_STYLE_LINE_WIDTH:
     case LV_STYLE_OUTLINE_WIDTH:
+    case LV_STYLE_RADIUS:
     case LV_STYLE_SHADOW_WIDTH:
     case LV_STYLE_OPA_SCALE:
     case LV_STYLE_BG_OPA:
+    case LV_STYLE_BORDER_SIDE:
+    case LV_STYLE_BORDER_POST:
     case LV_STYLE_IMAGE_RECOLOR_OPA:
     case LV_STYLE_VALUE_STR:
     case LV_STYLE_PATTERN_IMAGE:
@@ -4498,18 +4505,28 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
     list->opa_scale_cover    = 1;
 #endif
     list->text_decor_none    = lv_obj_get_style_text_decor(obj, part) == LV_TEXT_DECOR_NONE ? 1 : 0;
-    list->text_letter_space_zero    = lv_obj_get_style_text_letter_space(obj, part) == 0 ? 1 : 0;
-    list->text_line_space_zero    = lv_obj_get_style_text_line_space(obj, part) == 0 ? 1 : 0;
     list->text_font_normal    = lv_obj_get_style_text_font(obj, part) == LV_THEME_DEFAULT_FONT_NORMAL ? 1 : 0;
 
+    list->text_space_zero = 1;
+    if(lv_obj_get_style_text_letter_space(obj, part) != 0 ||
+       lv_obj_get_style_text_line_space(obj, part) != 0) {
+        list->text_space_zero = 0;
+    }
+
+
+    lv_opa_t bg_opa = lv_obj_get_style_bg_opa(obj, part);
+    list->bg_opa_transp    = bg_opa == LV_OPA_TRANSP ? 1 : 0;
+    list->bg_opa_cover     = bg_opa == LV_OPA_COVER ? 1 : 0;
+
     list->bg_grad_dir_none  = lv_obj_get_style_bg_grad_dir(obj, part) == LV_GRAD_DIR_NONE ? 1 : 0;
-    list->bg_opa_transp     = lv_obj_get_style_bg_opa(obj, part) == LV_OPA_TRANSP ? 1 : 0;
     list->border_width_zero = lv_obj_get_style_border_width(obj, part) == 0 ? 1 : 0;
+    list->border_side_full = lv_obj_get_style_border_side(obj, part) == LV_BORDER_SIDE_FULL ? 1 : 0;
+    list->border_post_off = lv_obj_get_style_border_post(obj, part) == 0 ? 1 : 0;
     list->clip_corner_off   = lv_obj_get_style_clip_corner(obj, part) == false ? 1 : 0;
     list->img_recolor_opa_transp    = lv_obj_get_style_image_recolor_opa(obj, part) == LV_OPA_TRANSP ? 1 : 0;
-    list->line_width_zero    = lv_obj_get_style_line_width(obj, part) == 0 ? 1 : 0;
     list->outline_width_zero    = lv_obj_get_style_outline_width(obj, part) == 0 ? 1 : 0;
     list->pattern_img_null    = lv_obj_get_style_pattern_image(obj, part) == NULL ? 1 : 0;
+    list->radius_zero    = lv_obj_get_style_radius(obj, part) == 0 ? 1 : 0;
     list->shadow_width_zero    = lv_obj_get_style_shadow_width(obj, part) == 0 ? 1 : 0;
     list->value_txt_str    = lv_obj_get_style_value_str(obj, part) == NULL ? 1 : 0;
 
@@ -4583,10 +4600,14 @@ static void update_style_cache_children(lv_obj_t * obj)
 
         list->opa_scale_cover    = lv_obj_get_style_opa_scale(obj, part) == LV_OPA_COVER ? 1 : 0;
         list->text_decor_none    = lv_obj_get_style_text_decor(obj, part) == LV_TEXT_DECOR_NONE ? 1 : 0;
-        list->text_letter_space_zero    = lv_obj_get_style_text_letter_space(obj, part) == 0 ? 1 : 0;
-        list->text_line_space_zero    = lv_obj_get_style_text_line_space(obj, part) == 0 ? 1 : 0;
         list->text_font_normal    = lv_obj_get_style_text_font(obj, part) == lv_theme_get_font_normal() ? 1 : 0;
         list->img_recolor_opa_transp    = lv_obj_get_style_image_recolor_opa(obj, part) == LV_OPA_TRANSP ? 1 : 0;
+
+        list->text_space_zero = 1;
+        if(lv_obj_get_style_text_letter_space(obj, part) != 0 ||
+                lv_obj_get_style_text_line_space(obj, part) != 0) {
+            list->text_space_zero = 0;
+        }
 
         list->ignore_cache = ignore_cache_ori;
     }
