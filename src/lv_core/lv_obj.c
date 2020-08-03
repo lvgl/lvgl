@@ -4444,6 +4444,7 @@ static bool style_prop_is_cacheble(lv_style_property_t prop)
     case LV_STYLE_CLIP_CORNER:
     case LV_STYLE_TEXT_LETTER_SPACE:
     case LV_STYLE_TEXT_LINE_SPACE:
+    case LV_STYLE_TEXT_FONT:
     case LV_STYLE_TRANSFORM_ANGLE:
     case LV_STYLE_TRANSFORM_WIDTH:
     case LV_STYLE_TRANSFORM_HEIGHT:
