@@ -32,6 +32,7 @@ extern "C" {
 void lv_test_print(const char * s, ...);
 void lv_test_exit(const char * s, ...);
 void lv_test_error(const char * s, ...);
+void lv_test_assert_true(int32_t expression, const char * s);
 void lv_test_assert_int_eq(int32_t n1, int32_t n2, const char * s);
 void lv_test_assert_int_gt(int32_t n_ref, int32_t n_act, const char * s);
 void lv_test_assert_int_lt(int32_t n_ref, int32_t n_act, const char * s);

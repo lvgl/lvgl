@@ -30,6 +30,7 @@ CSRCS += lv_test_assert.c
 CSRCS += lv_test_core/lv_test_core.c
 CSRCS += lv_test_core/lv_test_obj.c
 CSRCS += lv_test_core/lv_test_style.c
+CSRCS += lv_test_core/lv_test_font_loader.c
 
 OBJEXT ?= .o
 

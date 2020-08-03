@@ -97,6 +97,15 @@ void lv_test_error(const char * s, ...)
     exit(1);
 }
 
+void lv_test_assert_true(int32_t expression, const char * s)
+{
+    if(!expression) {
+        lv_test_error("   FAIL: %s. (Expected: not zero)", s, expression);
+    } else {
+        lv_test_print("   PASS: %s. (Expected: not zero)", s, expression);
+    }
+}
+
 void lv_test_assert_int_eq(int32_t n_ref, int32_t n_act, const char * s)
 {
     if(n_ref != n_act) {
