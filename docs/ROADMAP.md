@@ -25,4 +25,10 @@ Planned to September/October 2020
   - See [#1656](https://github.com/lvgl/lvgl/issues/1656)
 
 ## Ideas
-- ...
+- Unit testing (gtest?). See [#1658](https://github.com/lvgl/lvgl/issues/1658)
+- Benchmarking (gem5?). See [#1660](https://github.com/lvgl/lvgl/issues/1660)
+- CPP binding. See [Forum](https://forum.lvgl.io/t/is-it-possible-to-officially-support-optional-cpp-api/2736)
+- Optmize font decompression
+- Switch to RGBA colors in styles
+- Need coverage report for tests
+- Need static analize (via coverity.io or somehing else). 
