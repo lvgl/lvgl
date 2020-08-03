@@ -2517,7 +2517,7 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
                 if(list->border_width_zero) def = true;
                 break;
             case LV_STYLE_LINE_WIDTH:
-                if(list->line_width_zerop) def = true;
+                if(list->line_width_zero) def = true;
                 break;
             case LV_STYLE_OUTLINE_WIDTH:
                 if(list->outline_width_zero) def = true;
@@ -3283,9 +3283,9 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
         }
     }
 
-    if(draw_dsc->border_opa != LV_OPA_TRANSP) {
-        draw_dsc->border_width = lv_obj_get_style_border_width(obj, part);
-        if(draw_dsc->border_width) {
+    draw_dsc->border_width = lv_obj_get_style_border_width(obj, part);
+    if(draw_dsc->border_width) {
+        if(draw_dsc->border_opa != LV_OPA_TRANSP) {
             draw_dsc->border_opa = lv_obj_get_style_border_opa(obj, part);
             if(draw_dsc->border_opa > LV_OPA_MIN) {
                 draw_dsc->border_side = lv_obj_get_style_border_side(obj, part);
@@ -3297,10 +3297,9 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
         }
     }
 
-
-    if(draw_dsc->outline_opa != LV_OPA_TRANSP) {
-        draw_dsc->outline_width = lv_obj_get_style_outline_width(obj, part);
-        if(draw_dsc->outline_width) {
+    draw_dsc->outline_width = lv_obj_get_style_outline_width(obj, part);
+    if(draw_dsc->outline_width) {
+        if(draw_dsc->outline_opa != LV_OPA_TRANSP) {
             draw_dsc->outline_opa = lv_obj_get_style_outline_opa(obj, part);
             if(draw_dsc->outline_opa > LV_OPA_MIN) {
                 draw_dsc->outline_pad = lv_obj_get_style_outline_pad(obj, part);
@@ -3312,9 +3311,9 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
         }
     }
 
-    if(draw_dsc->pattern_opa != LV_OPA_TRANSP) {
-        draw_dsc->pattern_image = lv_obj_get_style_pattern_image(obj, part);
-        if(draw_dsc->pattern_image) {
+    draw_dsc->pattern_image = lv_obj_get_style_pattern_image(obj, part);
+    if(draw_dsc->pattern_image) {
+        if(draw_dsc->pattern_opa != LV_OPA_TRANSP) {
             draw_dsc->pattern_opa = lv_obj_get_style_pattern_opa(obj, part);
             if(draw_dsc->pattern_opa > LV_OPA_MIN) {
                 draw_dsc->pattern_recolor_opa = lv_obj_get_style_pattern_recolor_opa(obj, part);
@@ -3333,9 +3332,9 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
         }
     }
 #if LV_USE_SHADOW
-    if(draw_dsc->shadow_opa > LV_OPA_MIN) {
-        draw_dsc->shadow_width = lv_obj_get_style_shadow_width(obj, part);
-        if(draw_dsc->shadow_width) {
+    draw_dsc->shadow_width = lv_obj_get_style_shadow_width(obj, part);
+    if(draw_dsc->shadow_width) {
+        if(draw_dsc->shadow_opa > LV_OPA_MIN) {
             draw_dsc->shadow_opa = lv_obj_get_style_shadow_opa(obj, part);
             if(draw_dsc->shadow_opa > LV_OPA_MIN) {
                 draw_dsc->shadow_ofs_x = lv_obj_get_style_shadow_ofs_x(obj, part);
@@ -3350,9 +3349,9 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
     }
 #endif
 
-    if(draw_dsc->value_opa > LV_OPA_MIN) {
-        draw_dsc->value_str = lv_obj_get_style_value_str(obj, part);
-        if(draw_dsc->value_str) {
+    draw_dsc->value_str = lv_obj_get_style_value_str(obj, part);
+    if(draw_dsc->value_str) {
+        if(draw_dsc->value_opa > LV_OPA_MIN) {
             draw_dsc->value_opa = lv_obj_get_style_value_opa(obj, part);
             if(draw_dsc->value_opa > LV_OPA_MIN) {
                 draw_dsc->value_ofs_x = lv_obj_get_style_value_ofs_x(obj, part);
@@ -3441,6 +3440,9 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * 
 
 void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t * draw_dsc)
 {
+    draw_dsc->width = lv_obj_get_style_line_width(obj, part);
+    if(draw_dsc->width == 0) return;
+
     draw_dsc->opa = lv_obj_get_style_line_opa(obj, part);
     if(draw_dsc->opa <= LV_OPA_MIN)  return;
 
@@ -3451,9 +3453,6 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t 
     }
     if(draw_dsc->opa <= LV_OPA_MIN)  return;
 #endif
-
-    draw_dsc->width = lv_obj_get_style_line_width(obj, part);
-    if(draw_dsc->width == 0) return;
 
     draw_dsc->color = lv_obj_get_style_line_color(obj, part);
 
@@ -4505,10 +4504,10 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
 
     list->bg_grad_dir_none  = lv_obj_get_style_bg_grad_dir(obj, part) == LV_GRAD_DIR_NONE ? 1 : 0;
     list->bg_opa_transp     = lv_obj_get_style_bg_opa(obj, part) == LV_OPA_TRANSP ? 1 : 0;
-    list->border_width_zero = lv_obj_get_style_border_width(obj, part) == LV_OPA_TRANSP ? 1 : 0;
+    list->border_width_zero = lv_obj_get_style_border_width(obj, part) == 0 ? 1 : 0;
     list->clip_corner_off   = lv_obj_get_style_clip_corner(obj, part) == false ? 1 : 0;
     list->img_recolor_opa_transp    = lv_obj_get_style_image_recolor_opa(obj, part) == LV_OPA_TRANSP ? 1 : 0;
-    list->line_width_zerop    = lv_obj_get_style_line_width(obj, part) == 0 ? 1 : 0;
+    list->line_width_zero    = lv_obj_get_style_line_width(obj, part) == 0 ? 1 : 0;
     list->outline_width_zero    = lv_obj_get_style_outline_width(obj, part) == 0 ? 1 : 0;
     list->pattern_img_null    = lv_obj_get_style_pattern_image(obj, part) == NULL ? 1 : 0;
     list->shadow_width_zero    = lv_obj_get_style_shadow_width(obj, part) == 0 ? 1 : 0;
