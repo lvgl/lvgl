@@ -500,8 +500,8 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
     lv_style_int_t scrl_top = lv_obj_get_style_pad_top(ext->scrl, LV_CONT_PART_MAIN);
     lv_style_int_t scrl_bottom = lv_obj_get_style_pad_bottom(ext->scrl, LV_CONT_PART_MAIN);
 
-    lv_coord_t top_err = -(scrlable_y + (obj_y - scrl_top - bg_top) - scrl_top);
-    lv_coord_t bot_err = scrlable_y + (obj_y + scrl_bottom + bg_bottom) + scrl_bottom + obj_h - page_h;
+    lv_coord_t top_err = -((scrlable_y + obj_y) - bg_top);
+    lv_coord_t bot_err = scrlable_y + obj_y + obj_h - (page_h - bg_bottom);
 
     /*Out of the page on the top*/
     if((obj_h <= page_h && top_err > 0) || (obj_h > page_h && top_err < bot_err)) {
@@ -529,8 +529,8 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
     lv_style_int_t scrl_left = lv_obj_get_style_pad_top(ext->scrl, LV_CONT_PART_MAIN);
     lv_style_int_t scrl_right = lv_obj_get_style_pad_bottom(ext->scrl, LV_CONT_PART_MAIN);
 
-    lv_coord_t left_err  = -(scrlable_x + (obj_x - scrl_left - bg_left) - scrl_left);
-    lv_coord_t right_err = scrlable_x + (obj_x + scrl_right + bg_right) + scrl_right + obj_w - page_w;
+    lv_coord_t left_err  = -((scrlable_x + obj_x) - bg_left);
+    lv_coord_t right_err = scrlable_x + obj_x + obj_w - (page_w - bg_right);
 
     /*Out of the page on the left*/
     if((obj_w <= page_w && left_err > 0) || (obj_w > page_w && left_err < right_err)) {
