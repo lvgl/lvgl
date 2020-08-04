@@ -249,7 +249,7 @@ drivers_merge_to_release_branch(ver_str)
 docs_clone()
 docs_get_api()
 docs_update_version(ver_str)
-docs_merge_to_release_branch(v)
+docs_merge_to_release_branch(ver_str)
 docs_build()    
 
 clean_up()
