@@ -87,7 +87,7 @@ static void refresh_children_style(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
 static void obj_align_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, bool x_set, bool y_set,
                            lv_coord_t x_ofs, lv_coord_t y_ofs);
-static void obj_align_origo_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,  bool x_set, bool y_set,
+static void obj_align_mid_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,  bool x_set, bool y_set,
                                  lv_coord_t x_ofs, lv_coord_t y_ofs);
 #if LV_USE_ANIMATION
 static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state,
@@ -911,7 +911,7 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
     obj->realign.xofs        = x_ofs;
     obj->realign.yofs        = y_ofs;
     obj->realign.base        = base;
-    obj->realign.origo_align = 0;
+    obj->realign.mid_align = 0;
 #endif
 }
 
@@ -959,7 +959,7 @@ void lv_obj_align_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_
  * @param x_ofs x coordinate offset after alignment
  * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
+void lv_obj_align_mid(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -970,7 +970,7 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
 
-    obj_align_origo_core(obj, base, align, true, true, x_ofs, y_ofs);
+    obj_align_mid_core(obj, base, align, true, true, x_ofs, y_ofs);
 
 #if LV_USE_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
@@ -978,7 +978,7 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
     obj->realign.xofs        = x_ofs;
     obj->realign.yofs        = y_ofs;
     obj->realign.base        = base;
-    obj->realign.origo_align = 1;
+    obj->realign.mid_align = 1;
 #endif
 }
 
@@ -989,7 +989,7 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
  * @param align type of alignment (see 'lv_align_t' enum)
  * @param x_ofs x coordinate offset after alignment
  */
-void lv_obj_align_origo_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs)
+void lv_obj_align_mid_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1000,7 +1000,7 @@ void lv_obj_align_origo_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t alig
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
 
-    obj_align_origo_core(obj, base, align, true, false, x_ofs, 0);
+    obj_align_mid_core(obj, base, align, true, false, x_ofs, 0);
 }
 
 
@@ -1011,7 +1011,7 @@ void lv_obj_align_origo_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t alig
  * @param align type of alignment (see 'lv_align_t' enum)
  * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align_origo_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs)
+void lv_obj_align_mid_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1022,7 +1022,7 @@ void lv_obj_align_origo_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t alig
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
 
-    obj_align_origo_core(obj, base, align, true, false, 0, y_ofs);
+    obj_align_mid_core(obj, base, align, true, false, 0, y_ofs);
 }
 
 /**
@@ -1034,8 +1034,8 @@ void lv_obj_realign(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
 #if LV_USE_OBJ_REALIGN
-    if(obj->realign.origo_align)
-        lv_obj_align_origo(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
+    if(obj->realign.mid_align)
+        lv_obj_align_mid(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
     else
         lv_obj_align(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
 #else
@@ -3893,7 +3893,7 @@ static void obj_align_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t ali
     else if(y_set) lv_obj_set_y(obj, new_pos.y);
 }
 
-static void obj_align_origo_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,  bool x_set, bool y_set,
+static void obj_align_mid_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,  bool x_set, bool y_set,
                                  lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     lv_coord_t new_x = lv_obj_get_x(obj);
