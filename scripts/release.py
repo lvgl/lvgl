@@ -215,6 +215,7 @@ def docs_merge_to_release_branch(v):
   title("docs: merge to release branch")
   cmd('git co release/v7 --')
   cmd('git clean -fd .')
+  cmd('rm -f LVGL.pdf')	#To avoide possible merge conflict
   cmd('git merge latest')
   cmd('git push origin release/v7')
 
