@@ -213,12 +213,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         sel_start = sel_end;
         sel_end = tmp;
     }
-
     lv_draw_line_dsc_t line_dsc;
+    dsc->decor  = LV_TEXT_DECOR_UNDERLINE;
     if((dsc->decor & LV_TEXT_DECOR_UNDERLINE) || (dsc->decor & LV_TEXT_DECOR_STRIKETHROUGH)) {
         lv_draw_line_dsc_init(&line_dsc);
         line_dsc.color = dsc->color;
-        line_dsc.width = (dsc->font->line_height + 5) / 10;    /*+5 for rounding*/
+        line_dsc.width = font->underline_thickness;
         line_dsc.opa = dsc->opa;
         line_dsc.blend_mode = dsc->blend_mode;
     }
@@ -342,7 +342,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
             lv_point_t p1;
             lv_point_t p2;
             p1.x = pos_x_start;
-            p1.y = pos.y + dsc->font->line_height - dsc->font->base_line + line_dsc.width / 2 + 1;
+            p1.y = pos.y + dsc->font->line_height - dsc->font->base_line - font->underline_position;
             p2.x = pos.x;
             p2.y = p1.y;
             lv_draw_line(&p1, &p2, mask, &line_dsc);

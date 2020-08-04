@@ -1,10 +1,12 @@
 # Changelog
 
-## v7.4.0 (planned on 18.08.2020)
+## v7.4.0 (planned on 01.09.2020)
 *Available in the `dev` branch*
 
-## v7.3.0 (planned on 04.08.2020)
+## v7.3.1 (planned on 18.08.2020)
 *Available in the `master` branch*
+
+## v7.3.0 (04.08.2020)
 
 ### New features
 - Add `lv_task_get_next`
