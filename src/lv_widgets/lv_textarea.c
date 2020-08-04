@@ -246,7 +246,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
 
     lv_res_t res = insert_handler(ta, letter_buf);
     if(res != LV_RES_OK) return;
-    
+
     if(ext->one_line && (c == '\n' || c == '\r')) {
         LV_LOG_INFO("Text area: line break ignored in one-line mode");
         return;
@@ -259,7 +259,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
                     "accepted list)");
         return;
     }
-    
+
 
     /*If a new line was added it shouldn't show edge flash effect*/
     bool edge_flash_en = lv_textarea_get_edge_flash(ta);
@@ -337,7 +337,7 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
         }
         return;
     }
-    
+
     lv_res_t res = insert_handler(ta, txt);
     if(res != LV_RES_OK) return;
 

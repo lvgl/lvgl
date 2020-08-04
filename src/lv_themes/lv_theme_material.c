@@ -211,7 +211,8 @@ static void basic_init(void)
     lv_style_set_bg_opa(&styles->bg, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->bg, LV_STATE_DEFAULT, COLOR_BG);
     lv_style_set_border_color(&styles->bg, LV_STATE_DEFAULT, COLOR_BG_BORDER);
-    if((theme.flags & LV_THEME_MATERIAL_FLAG_NO_FOCUS) == 0)lv_style_set_border_color(&styles->bg, LV_STATE_FOCUSED, theme.color_primary);
+    if((theme.flags & LV_THEME_MATERIAL_FLAG_NO_FOCUS) == 0)lv_style_set_border_color(&styles->bg, LV_STATE_FOCUSED,
+                                                                                          theme.color_primary);
     lv_style_set_border_color(&styles->bg, LV_STATE_EDITED, theme.color_secondary);
     lv_style_set_border_width(&styles->bg, LV_STATE_DEFAULT, BORDER_WIDTH);
     lv_style_set_border_post(&styles->bg, LV_STATE_DEFAULT, true);

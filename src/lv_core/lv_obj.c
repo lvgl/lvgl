@@ -1783,7 +1783,8 @@ void lv_event_send_refresh_recursive(lv_obj_t * obj)
 
             d = lv_disp_get_next(d);
         }
-    } else {
+    }
+    else {
 
         lv_res_t res = lv_event_send_refresh(obj);
         if(res != LV_RES_OK) return; /*If invalid returned do not check the children*/
