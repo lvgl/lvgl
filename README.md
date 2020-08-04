@@ -78,7 +78,7 @@ Basically, every modern controller (which is able to drive a display) is suitabl
   <tr>
     <td> <strong>Heap</strong></td>
     <td> &gt; 2 kB </td>
-    <td> &gt; 16 kB</td>
+    <td> &gt; 8 kB</td>
   </tr>
   
   <tr>
@@ -145,7 +145,7 @@ void btn_event_cb(lv_obj_t * btn, lv_event_t event)
 ![LVGL button with label example](https://raw.githubusercontent.com/lvgl/docs/latest/misc/simple_button_example.gif)
 
 ### LVGL from Micropython
-Learn more about [Micropython](https://docs.lvgl.io/en/html/get-started/micropython).
+Learn more about [Micropython](https://docs.lvgl.io/latest/en/html/get-started/micropython.html).
 ```python
 # Create a Button and a Label
 scr = lv.obj()

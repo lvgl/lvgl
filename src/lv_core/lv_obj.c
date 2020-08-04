@@ -1783,7 +1783,8 @@ void lv_event_send_refresh_recursive(lv_obj_t * obj)
 
             d = lv_disp_get_next(d);
         }
-    } else {
+    }
+    else {
 
         lv_res_t res = lv_event_send_refresh(obj);
         if(res != LV_RES_OK) return; /*If invalid returned do not check the children*/
@@ -3157,7 +3158,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
         }
     }
 
-
+#if LV_USE_OUTLINE
     if(draw_dsc->outline_opa != LV_OPA_TRANSP) {
         draw_dsc->outline_width = lv_obj_get_style_outline_width(obj, part);
         if(draw_dsc->outline_width) {
@@ -3171,7 +3172,9 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
 #endif
         }
     }
+#endif
 
+#if LV_USE_PATTERN
     if(draw_dsc->pattern_opa != LV_OPA_TRANSP) {
         draw_dsc->pattern_image = lv_obj_get_style_pattern_image(obj, part);
         if(draw_dsc->pattern_image) {
@@ -3192,6 +3195,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
             }
         }
     }
+#endif
+
 #if LV_USE_SHADOW
     if(draw_dsc->shadow_opa > LV_OPA_MIN) {
         draw_dsc->shadow_width = lv_obj_get_style_shadow_width(obj, part);
@@ -3210,6 +3215,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
     }
 #endif
 
+#if LV_USE_VALUE_STR
     if(draw_dsc->value_opa > LV_OPA_MIN) {
         draw_dsc->value_str = lv_obj_get_style_value_str(obj, part);
         if(draw_dsc->value_str) {
@@ -3228,6 +3234,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
             }
         }
     }
+#endif
 
 #if LV_USE_OPA_SCALE
     if(opa_scale < LV_OPA_MAX) {

@@ -10,10 +10,27 @@
 - Add `lv_task_get_next`
 - Add `lv_event_send_refresh`, `lv_event_send_refresh_recursive` to easily send `LV_EVENT_REFRESH` to object
 - Add `lv_tabview_set_tab_name()` function - used to change a tab's name
+- Add `LV_THEME_MATERIAL_FLAG_NO_TRANSITION` and `LV_THEME_MATERIAL_FLAG_NO_FOCUS` flags
+- Reduce code size by adding: `LV_USE_FONT_COMPRESSED`, `LV_FONT_USE_SUBPX`, `LV_USE_OUTLINE`, `LV_USE_PATTERN`, `LV_USE_VALUE_STR`  and applying some optimization
+- Add `LV_MEMCPY_MEMSET_STD` to use standard `memcpy` and `memset`
+
+
+### Bugfixes
+- Do not print warning for missing glyph if its height OR width is zero.
+- Prevent duplicated sending of `LV_EVENT_INSERT` from text area
+- Tidy outer edges of cpicker widget.
+- Remove duplicated lines from `lv_tabview_add_tab`
+- btnmatrix: hadle combined states of buttons (e.g. chacked + disabled)
+- textarea: fix typo in lv_textarea_set_sscrollbar_mode
+- gauge: fix image needle drawing
+- fix using freed memory in _lv_style_list_remove_style
+
 
 ## v7.2.0 (21.07.2020)
 
 ### New features
+- Add screen transitions with `lv_scr_load_anim()`
+- Add display background color, wallpaper and opacity. Shown when the screen is transparent. Can be used with `lv_disp_set_bg_opa/color/image()`.
 - Add `LV_CALENDAR_WEEK_STARTS_MONDAY`
 - Add `lv_chart_set_x_start_point()` function - Set the index of the x-axis start point in the data array
 - Add `lv_chart_set_ext_array()` function - Set an external array of data points to use for the chart

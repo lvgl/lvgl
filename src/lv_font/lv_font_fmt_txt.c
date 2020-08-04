@@ -88,6 +88,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
     }
     /*Handle compressed bitmap*/
     else {
+#if LV_USE_FONT_COMPRESSED
         uint32_t gsize = gdsc->box_w * gdsc->box_h;
         if(gsize == 0) return NULL;
 
@@ -118,6 +119,9 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
         decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], decompr_buf, gdsc->box_w, gdsc->box_h, (uint8_t)fdsc->bpp,
                    prefilter);
         return decompr_buf;
+#else /* !LV_USE_FONT_COMPRESSED */
+        return NULL;
+#endif
     }
 
     /*If not returned earlier then the letter is not found in this font*/
