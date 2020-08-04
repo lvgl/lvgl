@@ -3676,6 +3676,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             draw_dsc.bg_opa = LV_OPA_TRANSP;
             draw_dsc.pattern_opa = LV_OPA_TRANSP;
             draw_dsc.shadow_opa = LV_OPA_TRANSP;
+            draw_dsc.value_opa = LV_OPA_TRANSP;
             lv_obj_init_draw_rect_dsc(obj, LV_OBJ_PART_MAIN, &draw_dsc);
 
             lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_OBJ_PART_MAIN);

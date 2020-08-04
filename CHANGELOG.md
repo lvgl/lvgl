@@ -4,7 +4,9 @@
 *Available in the `dev` branch*
 
 ## v7.3.1 (planned on 18.08.2020)
-*Available in the `master` branch*
+
+### Bugfix
+- Fix drawing value string twice
 
 ## v7.3.0 (04.08.2020)
 
