@@ -149,7 +149,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_label_set_text(ext->label, "Text area");
         lv_obj_set_click(ext->label, false);
         lv_obj_set_size(ta, LV_TEXTAREA_DEF_WIDTH, LV_TEXTAREA_DEF_HEIGHT);
-        lv_textarea_set_sscrollbar_mode(ta, LV_SCROLLBAR_MODE_DRAG);
+        lv_textarea_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_DRAG);
 
         lv_obj_reset_style_list(ta, LV_PAGE_PART_SCROLLABLE);
         lv_theme_apply(ta, LV_THEME_TEXTAREA);
@@ -246,7 +246,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
 
     lv_res_t res = insert_handler(ta, letter_buf);
     if(res != LV_RES_OK) return;
-    
+
     if(ext->one_line && (c == '\n' || c == '\r')) {
         LV_LOG_INFO("Text area: line break ignored in one-line mode");
         return;
@@ -259,7 +259,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
                     "accepted list)");
         return;
     }
-    
+
 
     /*If a new line was added it shouldn't show edge flash effect*/
     bool edge_flash_en = lv_textarea_get_edge_flash(ta);
@@ -337,7 +337,7 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
         }
         return;
     }
-    
+
     lv_res_t res = insert_handler(ta, txt);
     if(res != LV_RES_OK) return;
 

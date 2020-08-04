@@ -26,8 +26,10 @@ extern "C" {
  **********************/
 enum {
     LV_BLEND_MODE_NORMAL,
+#if LV_USE_BLEND_MODES
     LV_BLEND_MODE_ADDITIVE,
     LV_BLEND_MODE_SUBTRACTIVE,
+#endif
 };
 
 typedef uint8_t lv_blend_mode_t;
