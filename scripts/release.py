@@ -210,10 +210,18 @@ def docs_update_version(v):
   cmd("git add conf.py")
   cmd('git ci -m "update conf.py to ' + v + '"')
 
+
+def docs_merge_to_release_branch(v):
+  title("docs: merge to release branch")
+  cmd('git co release/v7 --')
+  cmd('git clean -fd .')
+  cmd('git merge latest')
+  cmd('git push origin release/v7')
+
 def docs_build():
   title("docs: Build")
   cmd("git checkout master")
-  cmd("./update.py latest")
+  cmd("./update.py latest release/v7")
   
 def clean_up():
   title("Clean up repos")
@@ -240,6 +248,7 @@ drivers_merge_to_release_branch(ver_str)
 docs_clone()
 docs_get_api()
 docs_update_version(ver_str)
+docs_merge_to_release_branch(v):
 docs_build()    
 
 clean_up()
