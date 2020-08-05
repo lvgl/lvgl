@@ -207,23 +207,23 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 /**
  * Clear the point of a series
  * @param chart pointer to a chart object
- * @param serie pointer to the chart's series to clear
+ * @param series pointer to the chart's series to clear
  */
-void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie)
+void lv_chart_clear_series(lv_obj_t * chart, lv_chart_series_t * series)
 {
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
-    LV_ASSERT_NULL(serie);
+    LV_ASSERT_NULL(series);
 
-    if(chart == NULL || serie == NULL) return;
+    if(chart == NULL || series == NULL) return;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext == NULL) return;
 
     uint32_t i;
     for(i = 0; i < ext->point_cnt; i++) {
-        serie->points[i] = LV_CHART_POINT_DEF;
+        series->points[i] = LV_CHART_POINT_DEF;
     }
 
-    serie->start_point = 0;
+    series->start_point = 0;
 }
 
 /*=====================
@@ -311,44 +311,44 @@ void lv_chart_set_point_count(lv_obj_t * chart, uint16_t point_cnt)
     if(point_cnt < 1) point_cnt = 1;
 
     _LV_LL_READ_BACK(ext->series_ll, ser) {
-    	if( !ser->ext_buf_assigned ) {
-			if(ser->start_point != 0) {
-				lv_coord_t * new_points = lv_mem_alloc(sizeof(lv_coord_t) * point_cnt);
-				LV_ASSERT_MEM(new_points);
-				if(new_points == NULL) return;
+        if(!ser->ext_buf_assigned) {
+            if(ser->start_point != 0) {
+                lv_coord_t * new_points = lv_mem_alloc(sizeof(lv_coord_t) * point_cnt);
+                LV_ASSERT_MEM(new_points);
+                if(new_points == NULL) return;
 
-				if(point_cnt >= point_cnt_old) {
-					for(i = 0; i < point_cnt_old; i++) {
-						new_points[i] =
-							ser->points[(i + ser->start_point) % point_cnt_old]; /*Copy old contents to new array*/
-					}
-					for(i = point_cnt_old; i < point_cnt; i++) {
-						new_points[i] = def; /*Fill up the rest with default value*/
-					}
-				}
-				else {
-					for(i = 0; i < point_cnt; i++) {
-						new_points[i] =
-							ser->points[(i + ser->start_point) % point_cnt_old]; /*Copy old contents to new array*/
-					}
-				}
+                if(point_cnt >= point_cnt_old) {
+                    for(i = 0; i < point_cnt_old; i++) {
+                        new_points[i] =
+                            ser->points[(i + ser->start_point) % point_cnt_old]; /*Copy old contents to new array*/
+                    }
+                    for(i = point_cnt_old; i < point_cnt; i++) {
+                        new_points[i] = def; /*Fill up the rest with default value*/
+                    }
+                }
+                else {
+                    for(i = 0; i < point_cnt; i++) {
+                        new_points[i] =
+                            ser->points[(i + ser->start_point) % point_cnt_old]; /*Copy old contents to new array*/
+                    }
+                }
 
-				/*Switch over pointer from old to new*/
-				lv_mem_free(ser->points);
-				ser->points = new_points;
-			}
-			else {
-				ser->points = lv_mem_realloc(ser->points, sizeof(lv_coord_t) * point_cnt);
-				LV_ASSERT_MEM(ser->points);
-				if(ser->points == NULL) return;
-				/*Initialize the new points*/
-				if(point_cnt > point_cnt_old) {
-					for(i = point_cnt_old - 1; i < point_cnt; i++) {
-						ser->points[i] = def;
-					}
-				}
-			}
-    	}
+                /*Switch over pointer from old to new*/
+                lv_mem_free(ser->points);
+                ser->points = new_points;
+            }
+            else {
+                ser->points = lv_mem_realloc(ser->points, sizeof(lv_coord_t) * point_cnt);
+                LV_ASSERT_MEM(ser->points);
+                if(ser->points == NULL) return;
+                /*Initialize the new points*/
+                if(point_cnt > point_cnt_old) {
+                    for(i = point_cnt_old - 1; i < point_cnt; i++) {
+                        ser->points[i] = def;
+                    }
+                }
+            }
+        }
         ser->start_point = 0;
     }
 
@@ -552,8 +552,8 @@ void lv_chart_set_secondary_y_tick_texts(lv_obj_t * chart, const char * list_of_
 /**
  * Set the index of the x-axis start point in the data array
  * @param chart             pointer to a chart object
- * @param ser 				pointer to a data series on 'chart'
- * @param id    			the index of the x point in the data array
+ * @param ser               pointer to a data series on 'chart'
+ * @param id                the index of the x point in the data array
  */
 void lv_chart_set_x_start_point(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id)
 {
@@ -563,7 +563,7 @@ void lv_chart_set_x_start_point(lv_obj_t * chart, lv_chart_series_t * ser, uint1
     if(chart == NULL || ser == NULL) return;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext == NULL) return;
-    if( id >= ext->point_cnt ) return;
+    if(id >= ext->point_cnt) return;
     ser->start_point = id;
 }
 
@@ -571,9 +571,9 @@ void lv_chart_set_x_start_point(lv_obj_t * chart, lv_chart_series_t * ser, uint1
  * Set an external array of data points to use for the chart
  * NOTE: It is the users responsibility to make sure the point_cnt matches the external array size.
  * @param chart             pointer to a chart object
- * @param ser 				pointer to a data series on 'chart'
- * @param array				external array of points for chart
- * @param point_cnt			number of external points in the array
+ * @param ser               pointer to a data series on 'chart'
+ * @param array             external array of points for chart
+ * @param point_cnt         number of external points in the array
  */
 void lv_chart_set_ext_array(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t array[], uint16_t point_cnt)
 {
@@ -582,7 +582,7 @@ void lv_chart_set_ext_array(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_
 
     if(chart == NULL || ser == NULL) return;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-    if( !ser->ext_buf_assigned && ser->points ) lv_mem_free(ser->points);
+    if(!ser->ext_buf_assigned && ser->points) lv_mem_free(ser->points);
     ser->ext_buf_assigned = true;
     ser->points = array;
     ext->point_cnt = point_cnt;
@@ -591,9 +591,9 @@ void lv_chart_set_ext_array(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_
 /**
  * Set an individual point y value in the chart series directly based on index
  * @param chart             pointer to a chart object
- * @param ser 				pointer to a data series on 'chart'
- * @param value				value to assign to array point
- * @param id				the index of the x point in the array
+ * @param ser               pointer to a data series on 'chart'
+ * @param value             value to assign to array point
+ * @param id                the index of the x point in the array
  */
 void lv_chart_set_point_id(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t value, uint16_t id)
 {
@@ -603,7 +603,7 @@ void lv_chart_set_point_id(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t
     if(chart == NULL || ser == NULL) return;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext == NULL) return;
-    if( id >= ext->point_cnt ) return;
+    if(id >= ext->point_cnt) return;
     ser->points[id] = value;
 }
 
@@ -623,7 +623,7 @@ void lv_chart_set_series_axis(lv_obj_t * chart, lv_chart_series_t * ser, lv_char
         return;
     }
 
-    if( ser->y_axis == axis) return;
+    if(ser->y_axis == axis) return;
 
     ser->y_axis = axis;
     lv_chart_refresh(chart);
@@ -661,8 +661,8 @@ uint16_t lv_chart_get_point_count(const lv_obj_t * chart)
 
 /**
  * Get the current index of the x-axis start point in the data array
- * @param ser 				pointer to a data series on 'chart'
- * @return 					the index of the current x start point in the data array
+ * @param ser               pointer to a data series on 'chart'
+ * @return                  the index of the current x start point in the data array
  */
 uint16_t lv_chart_get_x_start_point(lv_chart_series_t * ser)
 {
@@ -674,9 +674,9 @@ uint16_t lv_chart_get_x_start_point(lv_chart_series_t * ser)
 /**
  * Get an individual point y value in the chart series directly based on index
  * @param chart             pointer to a chart object
- * @param ser 				pointer to a data series on 'chart'
- * @param id				the index of the x point in the array
- * @return					value of array point at index id
+ * @param ser               pointer to a data series on 'chart'
+ * @param id                the index of the x point in the array
+ * @return                  value of array point at index id
  */
 lv_coord_t lv_chart_get_point_id(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id)
 {
@@ -684,7 +684,7 @@ lv_coord_t lv_chart_get_point_id(lv_obj_t * chart, lv_chart_series_t * ser, uint
     LV_ASSERT_NULL(ser);
 
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-    if( id >= ext->point_cnt ) id = 0;
+    if(id >= ext->point_cnt) id = 0;
     return(ser->points[id]);
 
 }
@@ -783,10 +783,12 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
 
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_chart_series_t * ser;
-        _LV_LL_READ(ext->series_ll, ser) {
+        while(ext->series_ll.head != NULL) {
+            ser = _lv_ll_get_head(&ext->series_ll);
 
             if(!ser->ext_buf_assigned) lv_mem_free(ser->points);
 
+            _lv_ll_remove(&ext->series_ll, ser);
             lv_mem_free(ser);
         }
         _lv_ll_clear(&ext->series_ll);
@@ -1505,6 +1507,9 @@ static void invalidate_lines(lv_obj_t * chart, uint16_t i)
 
     lv_area_t coords;
     lv_area_copy(&coords, &series_area);
+    coords.y1 -= line_width + point_radius;
+    coords.y2 += line_width + point_radius;
+
     if(i < ext->point_cnt - 1) {
         coords.x1 = ((w * i) / (ext->point_cnt - 1)) + x_ofs - line_width - point_radius;
         coords.x2 = ((w * (i + 1)) / (ext->point_cnt - 1)) + x_ofs + line_width + point_radius;

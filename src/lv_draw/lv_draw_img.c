@@ -407,7 +407,6 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                 return;
             }
 #endif
-            /*Build the image and a mask line-by-line*/
             uint32_t mask_buf_size = lv_area_get_size(&draw_area) > LV_HOR_RES_MAX ? LV_HOR_RES_MAX : lv_area_get_size(&draw_area);
             lv_color_t * map2 = _lv_mem_buf_get(mask_buf_size * sizeof(lv_color_t));
             lv_opa_t * mask_buf = _lv_mem_buf_get(mask_buf_size);
@@ -420,7 +419,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                     lv_opa_t px_opa = map_px[LV_IMG_PX_SIZE_ALPHA_BYTE - 1];
                     mask_buf[px_i] = px_opa;
                     if(px_opa) {
-#if LV_COLOR_DEPTH == 8
+#if LV_COLOR_DEPTH == 8 || LV_COLOR_DEPTH == 1
                         map2[px_i].full =  map_px[0];
 #elif LV_COLOR_DEPTH == 16
                         map2[px_i].full =  map_px[0] + (map_px[1] << 8);

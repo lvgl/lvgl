@@ -164,7 +164,7 @@ typedef struct {
     lv_coord_t yofs;
     lv_align_t align;
     uint8_t auto_realign : 1;
-    uint8_t origo_align : 1; /**< 1: the origo (center of the object) was aligned with
+    uint8_t mid_align : 1; /**< 1: the origo (center of the object) was aligned with
                                 `lv_obj_align_origo`*/
 } lv_realign_t;
 #endif
@@ -502,7 +502,7 @@ void lv_obj_align_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_
  * @param x_ofs x coordinate offset after alignment
  * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
+void lv_obj_align_mid(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
 
 
 /**
@@ -512,7 +512,7 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
  * @param align type of alignment (see 'lv_align_t' enum)
  * @param x_ofs x coordinate offset after alignment
  */
-void lv_obj_align_origo_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs);
+void lv_obj_align_mid_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs);
 
 /**
  * Align an object's middle point to an other object vertically.
@@ -521,7 +521,7 @@ void lv_obj_align_origo_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t alig
  * @param align type of alignment (see 'lv_align_t' enum)
  * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align_origo_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs);
+void lv_obj_align_mid_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs);
 
 /**
  * Realign the object based on the last `lv_obj_align` parameters.
@@ -900,14 +900,6 @@ lv_res_t lv_event_send_refresh(lv_obj_t * obj);
  * @param obj pointer to an object or NULL to refresh all objects of all displays
  */
 void lv_event_send_refresh_recursive(lv_obj_t * obj);
-
-/**
- * Queue the sending of LV_EVENT_REFRESH event to an object and all of its children.
- * The events won't be sent immediately but after `LV_DISP_DEF_REFR_PERIOD` delay.
- * It is useful to refresh object only on a reasonable rate if this function is called very often.
- * @param obj pointer to an object or NULL to refresh all objects of all displays
- */
-void lv_event_queue_refresh_recursive(lv_obj_t * obj);
 
 /**
  * Call an event function with an object, event, and data.

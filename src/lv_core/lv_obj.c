@@ -86,8 +86,10 @@ static void refresh_children_position(lv_obj_t * obj, lv_coord_t x_diff, lv_coor
 static void report_style_mod_core(void * style_p, lv_obj_t * obj);
 static void refresh_children_style(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
-static void obj_align_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, bool x_set, bool y_set, lv_coord_t x_ofs, lv_coord_t y_ofs);
-static void obj_align_origo_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,  bool x_set, bool y_set, lv_coord_t x_ofs, lv_coord_t y_ofs);
+static void obj_align_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, bool x_set, bool y_set,
+                           lv_coord_t x_ofs, lv_coord_t y_ofs);
+static void obj_align_mid_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,  bool x_set, bool y_set,
+                                 lv_coord_t x_ofs, lv_coord_t y_ofs);
 #if LV_USE_ANIMATION
 static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state,
                                        lv_state_t new_state);
@@ -101,7 +103,6 @@ static void scroll_anim_x_cb(lv_obj_t * obj, lv_anim_value_t v);
 static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v);
 #endif
 static void lv_event_mark_deleted(lv_obj_t * obj);
-static void refresh_event_task_cb(lv_task_t * t);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
@@ -911,7 +912,7 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
     obj->realign.xofs        = x_ofs;
     obj->realign.yofs        = y_ofs;
     obj->realign.base        = base;
-    obj->realign.origo_align = 0;
+    obj->realign.mid_align = 0;
 #endif
 }
 
@@ -959,7 +960,7 @@ void lv_obj_align_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_
  * @param x_ofs x coordinate offset after alignment
  * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
+void lv_obj_align_mid(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -970,7 +971,7 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
 
-    obj_align_origo_core(obj, base, align, true, true, x_ofs, y_ofs);
+    obj_align_mid_core(obj, base, align, true, true, x_ofs, y_ofs);
 
 #if LV_USE_OBJ_REALIGN
     /*Save the last align parameters to use them in `lv_obj_realign`*/
@@ -978,7 +979,7 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
     obj->realign.xofs        = x_ofs;
     obj->realign.yofs        = y_ofs;
     obj->realign.base        = base;
-    obj->realign.origo_align = 1;
+    obj->realign.mid_align = 1;
 #endif
 }
 
@@ -989,7 +990,7 @@ void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
  * @param align type of alignment (see 'lv_align_t' enum)
  * @param x_ofs x coordinate offset after alignment
  */
-void lv_obj_align_origo_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs)
+void lv_obj_align_mid_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1000,7 +1001,7 @@ void lv_obj_align_origo_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t alig
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
 
-    obj_align_origo_core(obj, base, align, true, false, x_ofs, 0);
+    obj_align_mid_core(obj, base, align, true, false, x_ofs, 0);
 }
 
 
@@ -1011,7 +1012,7 @@ void lv_obj_align_origo_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t alig
  * @param align type of alignment (see 'lv_align_t' enum)
  * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align_origo_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs)
+void lv_obj_align_mid_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1022,7 +1023,7 @@ void lv_obj_align_origo_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t alig
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
 
-    obj_align_origo_core(obj, base, align, true, false, 0, y_ofs);
+    obj_align_mid_core(obj, base, align, true, false, 0, y_ofs);
 }
 
 /**
@@ -1034,8 +1035,8 @@ void lv_obj_realign(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
 #if LV_USE_OBJ_REALIGN
-    if(obj->realign.origo_align)
-        lv_obj_align_origo(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
+    if(obj->realign.mid_align)
+        lv_obj_align_mid(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
     else
         lv_obj_align(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
 #else
@@ -1906,7 +1907,8 @@ void lv_event_send_refresh_recursive(lv_obj_t * obj)
 
             d = lv_disp_get_next(d);
         }
-    } else {
+    }
+    else {
 
         lv_res_t res = lv_event_send_refresh(obj);
         if(res != LV_RES_OK) return; /*If invalid returned do not check the children*/
@@ -1918,26 +1920,6 @@ void lv_event_send_refresh_recursive(lv_obj_t * obj)
             child = lv_obj_get_child(obj, child);
         }
     }
-}
-
-/**
- * Queue the sending of LV_EVENT_REFRESH event to an object and all of its children.
- * The events won't be sent immediately but after `LV_DISP_DEF_REFR_PERIOD` delay.
- * It is useful to refresh object only on a reasonable rate if this function is called very often.
- * @param obj pointer to an object or NULL to refresh all objects of all displays
- */
-void lv_event_queue_refresh_recursive(lv_obj_t * obj)
-{
-    lv_task_t * t = lv_task_get_next(NULL);
-    while(t) {
-        /* REturn if a refresh is already queued for this object*/
-        if(t->task_cb == refresh_event_task_cb && t->user_data == obj) return;
-        t = lv_task_get_next(t);
-    }
-
-    /*No queued task for this object so create one now*/
-    t = lv_task_create(refresh_event_task_cb, LV_DISP_DEF_REFR_PERIOD, LV_TASK_PRIO_MID, obj);
-    lv_task_set_repeat_count(t, 1);
 }
 
 
@@ -3299,7 +3281,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
         }
     }
 
-
+#if LV_USE_OUTLINE
     if(draw_dsc->outline_opa != LV_OPA_TRANSP) {
         draw_dsc->outline_width = lv_obj_get_style_outline_width(obj, part);
         if(draw_dsc->outline_width) {
@@ -3313,7 +3295,9 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
 #endif
         }
     }
+#endif
 
+#if LV_USE_PATTERN
     if(draw_dsc->pattern_opa != LV_OPA_TRANSP) {
         draw_dsc->pattern_image = lv_obj_get_style_pattern_image(obj, part);
         if(draw_dsc->pattern_image) {
@@ -3334,6 +3318,8 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
             }
         }
     }
+#endif
+
 #if LV_USE_SHADOW
     if(draw_dsc->shadow_opa > LV_OPA_MIN) {
         draw_dsc->shadow_width = lv_obj_get_style_shadow_width(obj, part);
@@ -3352,6 +3338,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
     }
 #endif
 
+#if LV_USE_VALUE_STR
     if(draw_dsc->value_opa > LV_OPA_MIN) {
         draw_dsc->value_str = lv_obj_get_style_value_str(obj, part);
         if(draw_dsc->value_str) {
@@ -3370,6 +3357,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
             }
         }
     }
+#endif
 
 #if LV_USE_OPA_SCALE
     if(opa_scale < LV_OPA_MAX) {
@@ -3815,6 +3803,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             draw_dsc.bg_opa = LV_OPA_TRANSP;
             draw_dsc.pattern_opa = LV_OPA_TRANSP;
             draw_dsc.shadow_opa = LV_OPA_TRANSP;
+            draw_dsc.value_opa = LV_OPA_TRANSP;
             lv_obj_init_draw_rect_dsc(obj, LV_OBJ_PART_MAIN, &draw_dsc);
 
             lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_OBJ_PART_MAIN);
@@ -4044,7 +4033,8 @@ static void base_dir_refr_children(lv_obj_t * obj)
     }
 }
 
-static void obj_align_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, bool x_set, bool y_set, lv_coord_t x_ofs, lv_coord_t y_ofs)
+static void obj_align_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, bool x_set, bool y_set,
+                           lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     lv_point_t new_pos;
     _lv_area_align(&base->coords, &obj->coords, align, &new_pos);
@@ -4063,7 +4053,8 @@ static void obj_align_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t ali
     else if(y_set) lv_obj_set_y(obj, new_pos.y);
 }
 
-static void obj_align_origo_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,  bool x_set, bool y_set, lv_coord_t x_ofs, lv_coord_t y_ofs)
+static void obj_align_mid_core(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,  bool x_set, bool y_set,
+                                 lv_coord_t x_ofs, lv_coord_t y_ofs)
 {
     lv_coord_t new_x = lv_obj_get_x(obj);
     lv_coord_t new_y = lv_obj_get_y(obj);
@@ -4465,11 +4456,6 @@ static void lv_event_mark_deleted(lv_obj_t * obj)
         if(t->obj == obj) t->deleted = true;
         t = t->prev;
     }
-}
-
-static void refresh_event_task_cb(lv_task_t * t)
-{
-    lv_event_send_refresh_recursive(t->user_data);
 }
 
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)

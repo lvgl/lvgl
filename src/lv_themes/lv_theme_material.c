@@ -64,8 +64,9 @@
 #define COLOR_BG_SEC_TEXT       (IS_LIGHT ? lv_color_hex(0x31404f) : lv_color_hex(0xa5a8ad))
 #define COLOR_BG_SEC_TEXT_DIS   (IS_LIGHT ? lv_color_hex(0xaaaaaa) : lv_color_hex(0xa5a8ad))
 
-#define TRANSITION_TIME         150
+#define TRANSITION_TIME         ((theme.flags & LV_THEME_MATERIAL_FLAG_NO_TRANSITION) ? 0 : 150)
 #define BORDER_WIDTH            LV_DPX(2)
+#define OUTLINE_WIDTH           ((theme.flags & LV_THEME_MATERIAL_FLAG_NO_FOCUS) ? 0 : LV_DPX(2))
 #define IS_LIGHT (theme.flags & LV_THEME_MATERIAL_FLAG_LIGHT)
 
 #define PAD_DEF (lv_disp_get_size_category(NULL) <= LV_DISP_SIZE_MEDIUM ? LV_DPX(15) : (LV_DPX(30)))
@@ -210,7 +211,8 @@ static void basic_init(void)
     lv_style_set_bg_opa(&styles->bg, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->bg, LV_STATE_DEFAULT, COLOR_BG);
     lv_style_set_border_color(&styles->bg, LV_STATE_DEFAULT, COLOR_BG_BORDER);
-    lv_style_set_border_color(&styles->bg, LV_STATE_FOCUSED, theme.color_primary);
+    if((theme.flags & LV_THEME_MATERIAL_FLAG_NO_FOCUS) == 0)lv_style_set_border_color(&styles->bg, LV_STATE_FOCUSED,
+                                                                                          theme.color_primary);
     lv_style_set_border_color(&styles->bg, LV_STATE_EDITED, theme.color_secondary);
     lv_style_set_border_width(&styles->bg, LV_STATE_DEFAULT, BORDER_WIDTH);
     lv_style_set_border_post(&styles->bg, LV_STATE_DEFAULT, true);
@@ -306,7 +308,7 @@ static void basic_init(void)
     lv_style_set_pad_top(&styles->btn, LV_STATE_DEFAULT, LV_DPX(15));
     lv_style_set_pad_bottom(&styles->btn, LV_STATE_DEFAULT, LV_DPX(15));
     lv_style_set_pad_inner(&styles->btn, LV_STATE_DEFAULT, LV_DPX(20));
-    lv_style_set_outline_width(&styles->btn, LV_STATE_DEFAULT, 3);
+    lv_style_set_outline_width(&styles->btn, LV_STATE_DEFAULT, OUTLINE_WIDTH);
     lv_style_set_outline_opa(&styles->btn, LV_STATE_DEFAULT, LV_OPA_0);
     lv_style_set_outline_opa(&styles->btn, LV_STATE_FOCUSED, LV_OPA_50);
     lv_style_set_outline_color(&styles->btn, LV_STATE_DEFAULT, theme.color_primary);
@@ -365,7 +367,7 @@ static void bar_init(void)
     lv_style_set_outline_color(&styles->bar_bg, LV_STATE_EDITED, theme.color_secondary);
     lv_style_set_outline_opa(&styles->bar_bg, LV_STATE_DEFAULT, LV_OPA_TRANSP);
     lv_style_set_outline_opa(&styles->bar_bg, LV_STATE_FOCUSED, LV_OPA_50);
-    lv_style_set_outline_width(&styles->bar_bg, LV_STATE_DEFAULT, 3);
+    lv_style_set_outline_width(&styles->bar_bg, LV_STATE_DEFAULT, OUTLINE_WIDTH);
     lv_style_set_transition_time(&styles->bar_bg, LV_STATE_DEFAULT, TRANSITION_TIME);
     lv_style_set_transition_prop_6(&styles->bar_bg, LV_STATE_DEFAULT, LV_STYLE_OUTLINE_OPA);
 
@@ -616,7 +618,7 @@ static void checkbox_init(void)
     lv_style_set_outline_color(&styles->cb_bg, LV_STATE_DEFAULT, theme.color_primary);
     lv_style_set_outline_opa(&styles->cb_bg, LV_STATE_DEFAULT, LV_OPA_TRANSP);
     lv_style_set_outline_opa(&styles->cb_bg, LV_STATE_FOCUSED, LV_OPA_50);
-    lv_style_set_outline_width(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(3));
+    lv_style_set_outline_width(&styles->cb_bg, LV_STATE_DEFAULT, OUTLINE_WIDTH);
     lv_style_set_outline_pad(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(10));
     lv_style_set_transition_time(&styles->cb_bg, LV_STATE_DEFAULT, TRANSITION_TIME);
     lv_style_set_transition_prop_6(&styles->cb_bg, LV_STATE_DEFAULT, LV_STYLE_OUTLINE_OPA);
@@ -746,7 +748,7 @@ static void list_init(void)
     lv_style_set_border_width(&styles->list_btn, LV_STATE_DEFAULT, 1);
 
     lv_style_set_outline_color(&styles->list_btn, LV_STATE_FOCUSED, theme.color_secondary);
-    lv_style_set_outline_width(&styles->list_btn, LV_STATE_FOCUSED, BORDER_WIDTH);
+    lv_style_set_outline_width(&styles->list_btn, LV_STATE_FOCUSED, OUTLINE_WIDTH);
     lv_style_set_outline_pad(&styles->list_btn, LV_STATE_FOCUSED, -BORDER_WIDTH);
 
     lv_style_set_pad_left(&styles->list_btn, LV_STATE_DEFAULT, PAD_DEF);

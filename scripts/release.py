@@ -80,13 +80,13 @@ def lvgl_update_library_json(v):
   title("lvgl: Update version number in library.json")
 
   f = open("./library.json", "r")
-      
+  vn = v[1:]    
   outbuf = ""
       
   for i in f.read().splitlines():
     r = re.search(r'"version": ', i)
     if r: 
-      i = '    "version": "' + v + '",'
+      i = '    "version": "' + vn + '",'
        
     outbuf += i + '\n'
    
@@ -171,7 +171,7 @@ def drivers_merge_to_release_branch(v):
 
 def docs_clone():
   title("docs: Clone")
-  #cmd("git clone --recursive https://github.com/lvgl/docs.git")
+  cmd("git clone --recursive https://github.com/lvgl/docs.git")
   os.chdir("./docs")
 
 def docs_get_api():
@@ -210,10 +210,19 @@ def docs_update_version(v):
   cmd("git add conf.py")
   cmd('git ci -m "update conf.py to ' + v + '"')
 
+
+def docs_merge_to_release_branch(v):
+  title("docs: merge to release branch")
+  cmd('git co release/v7 --')
+  cmd('git clean -fd .')
+  cmd('rm -f LVGL.pdf')	#To avoide possible merge conflict
+  cmd('git merge latest')
+  cmd('git push origin release/v7')
+
 def docs_build():
   title("docs: Build")
   cmd("git checkout master")
-  cmd("./update.py latest")
+  cmd("./update.py latest release/v7")
   
 def clean_up():
   title("Clean up repos")
@@ -240,6 +249,7 @@ drivers_merge_to_release_branch(ver_str)
 docs_clone()
 docs_get_api()
 docs_update_version(ver_str)
+docs_merge_to_release_branch(ver_str)
 docs_build()    
 
 clean_up()

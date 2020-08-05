@@ -139,9 +139,9 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color);
 /**
  * Clear the point of a series
  * @param chart pointer to a chart object
- * @param serie pointer to the chart's series to clear
+ * @param series pointer to the chart's series to clear
  */
-void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie);
+void lv_chart_clear_series(lv_obj_t * chart, lv_chart_series_t * series);
 
 /*=====================
  * Setter functions
@@ -276,8 +276,8 @@ void lv_chart_set_y_tick_texts(lv_obj_t * chart, const char * list_of_values, ui
 /**
  * Set the index of the x-axis start point in the data array
  * @param chart             pointer to a chart object
- * @param ser 				pointer to a data series on 'chart'
- * @param id    			the index of the x point in the data array
+ * @param ser               pointer to a data series on 'chart'
+ * @param id                the index of the x point in the data array
  */
 void lv_chart_set_x_start_point(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id);
 
@@ -285,17 +285,17 @@ void lv_chart_set_x_start_point(lv_obj_t * chart, lv_chart_series_t * ser, uint1
  * Set an external array of data points to use for the chart
  * NOTE: It is the users responsibility to make sure the point_cnt matches the external array size.
  * @param chart             pointer to a chart object
- * @param ser 				pointer to a data series on 'chart'
- * @param array				external array of points for chart
+ * @param ser               pointer to a data series on 'chart'
+ * @param array             external array of points for chart
  */
-void lv_chart_set_ext_array(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t array[], uint16_t point_cnt );
+void lv_chart_set_ext_array(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t array[], uint16_t point_cnt);
 
 /**
  * Set an individual point value in the chart series directly based on index
  * @param chart             pointer to a chart object
- * @param ser 				pointer to a data series on 'chart'
- * @param value				value to assign to array point
- * @param id				the index of the x point in the array
+ * @param ser               pointer to a data series on 'chart'
+ * @param value             value to assign to array point
+ * @param id                the index of the x point in the array
  */
 void lv_chart_set_point_id(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t value, uint16_t id);
 
@@ -327,17 +327,17 @@ uint16_t lv_chart_get_point_count(const lv_obj_t * chart);
 
 /**
  * get the current index of the x-axis start point in the data array
- * @param ser 				pointer to a data series on 'chart'
- * @return 					the index of the current x start point in the data array
+ * @param ser               pointer to a data series on 'chart'
+ * @return                  the index of the current x start point in the data array
  */
 uint16_t lv_chart_get_x_start_point(lv_chart_series_t * ser);
 
 /**
  * Get an individual point value in the chart series directly based on index
  * @param chart             pointer to a chart object
- * @param ser 				pointer to a data series on 'chart'
- * @param id				the index of the x point in the array
- * @return					value of array point at index id
+ * @param ser               pointer to a data series on 'chart'
+ * @param id                the index of the x point in the array
+ * @return                  value of array point at index id
  */
 lv_coord_t lv_chart_get_point_id(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id);
 

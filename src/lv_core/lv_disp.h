@@ -35,7 +35,7 @@ typedef enum {
     LV_SCR_LOAD_ANIM_MOVE_TOP,
     LV_SCR_LOAD_ANIM_MOVE_BOTTOM,
     LV_SCR_LOAD_ANIM_FADE_ON,
-}lv_scr_load_anim_t;
+} lv_scr_load_anim_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -98,7 +98,7 @@ void lv_disp_set_bg_color(lv_disp_t * disp, lv_color_t color);
  * @param disp pointer to a display
  * @param img_src path to file or pointer to an `lv_img_dsc_t` variable
  */
-void lv_disp_set_bg_image(lv_disp_t * disp, const void *  img_src);
+void lv_disp_set_bg_image(lv_disp_t * disp, const void  * img_src);
 
 /**
  * Opacity of the background

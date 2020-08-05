@@ -580,7 +580,7 @@ bool lv_debug_check_style_list(const lv_style_list_t * list);
  *     lv_style_init(&my_style);
  *     lv_style_copy(&my_style, &style_to_copy);
  */
-#define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_init(&name); lv_style_copy(&name, copy);
+#define LV_STYLE_CREATE(name, copy_p) static lv_style_t name; lv_style_init(&name); lv_style_copy(&name, copy_p);
 
 
 
