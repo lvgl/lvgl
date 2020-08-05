@@ -12,6 +12,8 @@
 - Add `lv_tabview_set_tab_name()` function - used to change a tab's name
 - Add `LV_THEME_MATERIAL_FLAG_NO_TRANSITION` and `LV_THEME_MATERIAL_FLAG_NO_FOCUS` flags
 - Reduce code size by adding: `LV_USE_FONT_COMPRESSED` and `LV_FONT_USE_SUBPX` and applying some optimization
+- Add `lv_font_load()` function - Loads a `lv_font_t` object from a binary font file
+- Add `lv_font_free()` function - Frees the memory allocated by the `lv_font_load()` function
 
 
 ### Bugfixes

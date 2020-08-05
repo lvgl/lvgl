@@ -80,6 +80,11 @@ static int read_bits(bit_iterator_t *it, int n_bits, lv_fs_res_t * res);
  *   GLOBAL FUNCTIONS
  **********************/
 
+/**
+ * Loads a `lv_font_t` object from a binary font file
+ * @param font_name filename where the font file is located
+ * @return a pointer to the font or NULL in case of error
+ */
 lv_font_t * lv_font_load(const char * font_name)
 {
     bool success = false;
@@ -107,6 +112,10 @@ lv_font_t * lv_font_load(const char * font_name)
 }
 
 
+/**
+ * Frees the memory allocated by the `lv_font_load()` function
+ * @param font lv_font_t object created by the lv_font_load function
+ */
 void lv_font_free(lv_font_t * font)
 {
     if(NULL != font) {
@@ -227,7 +236,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
 
     font->dsc = font_dsc;
 
-    // header
+    /* header */
     int32_t header_length = read_label(fp, 0, "head");
     if (header_length < 0) {
         return false;
@@ -251,7 +260,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
     font_dsc->kern_scale = font_header.kerning_scale;
     font_dsc->bitmap_format = font_header.compression_id;
 
-    // cmaps
+    /* cmaps */
     uint32_t cmaps_start = header_length;
     int32_t cmaps_length = read_label(fp, cmaps_start, "cmap");
     if (cmaps_length < 0) {
@@ -326,7 +335,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
         }
     }
 
-    // loca
+    /* loca */
     uint32_t loca_start = cmaps_start + cmaps_length;
     int32_t loca_length = read_label(fp, loca_start, "loca");
     if (loca_length < 0) {
@@ -370,7 +379,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
         return false;
     }
 
-    // glyph
+    /* glyph */
     uint32_t glyph_start = loca_start + loca_length;
     int32_t glyph_length = read_label(fp, glyph_start, "glyf");
     if (glyph_length < 0) {
@@ -409,10 +418,10 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
                 break;
             }
 
-            // TODO: understand how to interpret advance_width_format
-            if(font_header.advance_width_format == 0) { // uint
+            /* TODO: understand how to interpret advance_width_format */
+            if(font_header.advance_width_format == 0) { /* uint */
             }
-            else if(font_header.advance_width_format == 1) { // unsigned with 4 bits fractional part
+            else if(font_header.advance_width_format == 1) { /* unsigned with 4 bits fractional part */
             }
             else {
                 LV_LOG_WARN("error unknown advance_width_format");
@@ -538,14 +547,14 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
 
     memset(kern_classes, 0, sizeof(lv_font_fmt_txt_kern_classes_t));
 
-    font_dsc->kern_dsc = kern_classes; // TODO: review
-    font_dsc->kern_classes = 1; // TODO: review this
+    font_dsc->kern_dsc = kern_classes; /* TODO: review */
+    font_dsc->kern_classes = 1; /* TODO: review this */
 
-    if(0 == kern_format_type) { // sorted pairs
+    if(0 == kern_format_type) { /* sorted pairs */
         LV_LOG_WARN("kern_format_type 0 not supported yet!");
         return false;
     }
-    else if(3 == kern_format_type) { // array M*N of classes
+    else if(3 == kern_format_type) { /* array M*N of classes */
 
         uint16_t kern_class_mapping_length;
         uint8_t kern_table_rows;
