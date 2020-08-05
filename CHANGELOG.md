@@ -8,6 +8,7 @@
 ### Bugfixes
 - Fix drawing value string twice
 - Rename  `lv_chart_clear_serie` to `lv_chart_clear_series` and `lv_obj_align_origo` to `lv_obj_align_mid`
+- Add linemeter's mirror feature again
 
 ## v7.3.0 (04.08.2020)
 
