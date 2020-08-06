@@ -34,7 +34,7 @@
 
 #include "lv_conf.h"
 
-#if LV_USE_GPU && LV_USE_GPU_NXP_PXP
+#if LV_USE_GPU_NXP_PXP
 
 #include "lvgl.h"
 #include "lv_gpu_nxp_pxp.h"

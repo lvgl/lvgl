@@ -12,12 +12,10 @@
 #include "../lv_hal/lv_hal_disp.h"
 #include "../lv_core/lv_refr.h"
 
-#if LV_USE_GPU 
 #if LV_USE_GPU_NXP_PXP
 #include "../lv_gpu/lv_gpu_nxp_pxp.h"
 #elif LV_USE_GPU_STM32_DMA2D
 #include "../lv_gpu/lv_gpu_stm32_dma2d.h"
-#endif
 #endif
 
 /*********************
@@ -339,8 +337,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 disp->driver.gpu_fill_cb(&disp->driver, disp_buf, disp_w, draw_area, color);
                 return;
             }
-#endif 
-#if LV_USE_GPU_NXP_PXP
+#elif LV_USE_GPU_NXP_PXP
             if(lv_area_get_size(draw_area) >= GPU_NXP_PXP_FILL_SIZE_LIMIT) {
                 lv_gpu_nxp_pxp_fill(disp_buf, disp_w, draw_area, color, opa);
                 return;
@@ -359,13 +356,13 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
         }
         /*No mask with opacity*/
         else {
-#if LV_USE_GPU
+
 #if LV_USE_GPU_NXP_PXP
             if(lv_area_get_size(draw_area) >= GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT) {
                 lv_gpu_nxp_pxp_fill(disp_buf, disp_w, draw_area, color, opa);
                 return;
             }
-#endif
+#elif LV_USE_GPU
             if(disp->driver.gpu_blend_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
                 for(x = 0; x < draw_area_w ; x++) blend_buf[x].full = color.full;
 

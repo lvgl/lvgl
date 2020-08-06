@@ -24,12 +24,12 @@ Several drawing features in LVGL can be offloaded to PXP engine. In order to use
   - Initialize PXP module before LVGL library. Default configuration structure for callbacks can be used: 
  
 ```c
-      #if LV_USE_GPU && LV_USE_GPU_NXP_PXP
+      #if LV_USE_GPU_NXP_PXP
         #include "lv_gpu/lv_gpu_nxp_pxp.h"
         #include "lv_gpu/lv_gpu_nxp_pxp_osa.h"
       #endif
       . . .
-      #if LV_USE_GPU & LV_USE_GPU_NXP_PXP
+      #if LV_USE_GPU_NXP_PXP
         if (lv_gpu_nxp_pxp_init(&pxp_default_cfg) != LV_RES_OK) {
             PRINTF("PXP init error. STOP.\n");
             for ( ; ; ) ;

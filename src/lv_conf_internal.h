@@ -272,6 +272,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #define LV_GPU_DMA2D_CMSIS_INCLUDE
 #endif
 
+/*1: Use PXP for CPU offload on NXP RTxxx platforms */
+#ifndef LV_USE_GPU_NXP_PXP
+#define LV_USE_GPU_NXP_PXP      0
+#endif
+/* 1: Add default bare metal and FreeRTOS interrupt handling routines for PXP (lv_gpu_nxp_pxp_osa.c) */
+#ifndef LV_USE_GPU_NXP_PXP_DEFAULT_OSA
+#define LV_USE_GPU_NXP_PXP_DEFAULT_OSA 0
+#endif
+
 /* 1: Enable file system (might be required for images */
 #ifndef LV_USE_FILESYSTEM
 #define LV_USE_FILESYSTEM       1
