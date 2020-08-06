@@ -27,31 +27,32 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
+LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_area_t * clip,
+                                          const lv_draw_rect_dsc_t * dsc);
 LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv_area_t * clip,
-                                              lv_draw_rect_dsc_t * dsc);
+                                              const lv_draw_rect_dsc_t * dsc);
 
 #if LV_USE_OUTLINE
-    static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
+    static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
 #endif
 #if LV_USE_SHADOW
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip,
-                                              lv_draw_rect_dsc_t * dsc);
+                                              const lv_draw_rect_dsc_t * dsc);
 LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coords,  uint16_t * sh_buf, lv_coord_t s,
                                                          lv_coord_t r);
 LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t sw, uint16_t * sh_ups_buf);
 #endif
 
 #if LV_USE_PATTERN
-    static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
+    static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
 #endif
 
 #if LV_USE_VALUE_STR
-    static void draw_value_str(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc);
+    static void draw_value_str(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
 #endif
 static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * area_outer, const lv_area_t * clip,
                              lv_coord_t radius, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
-LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
+LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
 
 /**********************
  *  STATIC VARIABLES
@@ -96,9 +97,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
  * Draw a rectangle
  * @param coords the coordinates of the rectangle
  * @param mask the rectangle will be drawn only in this mask
- * @param style pointer to a style
+ * @param dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
+void lv_draw_rect(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
 {
     if(lv_area_get_height(coords) < 1 || lv_area_get_width(coords) < 1) return;
 #if LV_USE_SHADOW
@@ -162,7 +163,8 @@ void lv_draw_px(const lv_point_t * point, const lv_area_t * clip_area, const lv_
  *   STATIC FUNCTIONS
  **********************/
 
-LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
+LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_area_t * clip,
+                                          const lv_draw_rect_dsc_t * dsc)
 {
     if(dsc->bg_opa <= LV_OPA_MIN) return;
 
@@ -384,7 +386,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_bg(const lv_area_t * coords, const lv_are
 }
 
 LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv_area_t * clip,
-                                              lv_draw_rect_dsc_t * dsc)
+                                              const lv_draw_rect_dsc_t * dsc)
 {
     if(dsc->border_opa <= LV_OPA_MIN) return;
     if(dsc->border_width == 0) return;
@@ -502,7 +504,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
     }
 }
 
-LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i)
+LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i)
 {
     int32_t min = (dsc->bg_main_color_stop * s) >> 8;
     if(i <= min) return dsc->bg_color;
@@ -519,7 +521,7 @@ LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(lv_draw_rect_dsc_t * dsc
 
 #if LV_USE_SHADOW
 LV_ATTRIBUTE_FAST_MEM static void draw_shadow(const lv_area_t * coords, const lv_area_t * clip,
-                                              lv_draw_rect_dsc_t * dsc)
+                                              const lv_draw_rect_dsc_t * dsc)
 {
     /*Check whether the shadow is visible*/
     if(dsc->shadow_width == 0) return;
@@ -1148,7 +1150,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
 #endif
 
 #if LV_USE_OUTLINE
-static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
+static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
 {
     if(dsc->outline_opa <= LV_OPA_MIN) return;
     if(dsc->outline_width == 0) return;
@@ -1178,9 +1180,8 @@ static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, lv_dr
 }
 #endif
 
-
 #if LV_USE_PATTERN
-static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
+static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
 {
     if(dsc->pattern_image == NULL) return;
     if(dsc->pattern_opa <= LV_OPA_MIN) return;
@@ -1284,7 +1285,7 @@ static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, lv_dr
 
 
 #if LV_USE_VALUE_STR
-static void draw_value_str(const lv_area_t * coords, const lv_area_t * clip, lv_draw_rect_dsc_t * dsc)
+static void draw_value_str(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
 {
     if(dsc->value_str == NULL) return;
     if(dsc->value_opa <= LV_OPA_MIN) return;

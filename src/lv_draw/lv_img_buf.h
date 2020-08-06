@@ -380,7 +380,7 @@ static inline bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_
  * @param pivot x,y pivot coordinates of rotation
  */
 void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
-                                      lv_point_t * pivot);
+                                      const lv_point_t * pivot);
 
 /**********************
  *      MACROS
