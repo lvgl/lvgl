@@ -29,11 +29,11 @@
  **********************/
 LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * clip_area,
                                                        const void * src,
-                                                       lv_draw_img_dsc_t * draw_dsc);
+                                                       const lv_draw_img_dsc_t * draw_dsc);
 
 LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                                               const uint8_t * map_p,
-                                              lv_draw_img_dsc_t * draw_dsc,
+                                              const lv_draw_img_dsc_t * draw_dsc,
                                               bool chroma_key, bool alpha_byte);
 
 static void show_error(const lv_area_t * coords, const lv_area_t * clip_area, const char * msg);
@@ -65,13 +65,9 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc)
  * @param coords the coordinates of the image
  * @param mask the image will be drawn only in this area
  * @param src pointer to a lv_color_t array which contains the pixels of the image
- * @param style style of the image
- * @param angle rotation angle of the image
- * @param center rotation center of the image
- * @param antialias anti-alias transformations (rotate, zoom) or not
- * @param opa_scale scale down all opacities by the factor
+ * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
-void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src, lv_draw_img_dsc_t * dsc)
+void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src, const lv_draw_img_dsc_t * dsc)
 {
     if(src == NULL) {
         LV_LOG_WARN("Image draw: src is NULL");
@@ -232,7 +228,7 @@ lv_img_src_t lv_img_src_get_type(const void * src)
 
 LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords, const lv_area_t * clip_area,
                                                        const void * src,
-                                                       lv_draw_img_dsc_t * draw_dsc)
+                                                       const lv_draw_img_dsc_t * draw_dsc)
 {
     if(draw_dsc->opa <= LV_OPA_MIN) return LV_RES_OK;
 
@@ -327,18 +323,14 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
  * @param cords_p coordinates the color map
  * @param mask_p the map will drawn only on this area  (truncated to VDB area)
  * @param map_p pointer to a lv_color_t array
- * @param opa opacity of the map
+ * @param draw_dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  * @param chroma_keyed true: enable transparency of LV_IMG_LV_COLOR_TRANSP color pixels
  * @param alpha_byte true: extra alpha byte is inserted for every pixel
- * @param style style of the image
- * @param angle angle in degree
- * @param pivot center of rotation
- * @param zoom zoom factor
- * @param antialias anti-alias transformations (rotate, zoom) or not
  */
 LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const lv_area_t * clip_area,
                                               const uint8_t * map_p,
-                                              lv_draw_img_dsc_t * draw_dsc, bool chroma_key, bool alpha_byte)
+                                              const lv_draw_img_dsc_t * draw_dsc,
+                                              bool chroma_key, bool alpha_byte)
 {
     /* Use the clip area as draw area*/
     lv_area_t draw_area;
