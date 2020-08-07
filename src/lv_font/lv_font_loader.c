@@ -6,7 +6,6 @@
 /*********************
  *      INCLUDES
  *********************/
-#if LV_USE_FILESYSTEM
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -14,6 +13,8 @@
 #include "../lvgl.h"
 #include "../lv_misc/lv_fs.h"
 #include "lv_font_loader.h"
+
+#if LV_USE_FILESYSTEM
 
 
 /**********************
@@ -101,7 +102,7 @@ lv_font_t * lv_font_load(const char * font_name)
 
     if (!success)
     {
-        LV_LOG_WARN("Error opening font file: %s\n", font_name);
+        LV_LOG_WARN("Error loading font file: %s\n", font_name);
         lv_font_free(font);
         font = NULL;
     }
@@ -220,7 +221,7 @@ static int read_label(lv_fs_file_t *fp, int start, const char *label)
     if(lv_fs_read(fp, &length, 4, NULL) != LV_FS_RES_OK
             || lv_fs_read(fp, buf, 4, NULL) != LV_FS_RES_OK
             || memcmp(label, buf, 4) != 0) {
-        LV_LOG_WARN("Error reading '%s'.", label);
+        LV_LOG_WARN("Error reading '%s' label.", label);
         return -1;
     }
 
@@ -408,20 +409,31 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
 
         bit_iterator_t bit_it = init_bit_iterator(fp);
 
-        if(font_header.advance_width_bits == 0) {
+        /*
+         * TODO: understand how to interpret advance_width_format
+         * When it is set to zero, in my understanding should be used the default value,
+         * and no data should be written on the advance_width, but it is not occurring.
+         *
+         * The following code is not working for most monospaced fonts.
+         */
+
+        /*if(font_header.advance_width_bits == 0) {
             gdsc->adv_w = font_header.default_advance_width;
         }
-        else {
-            gdsc->adv_w = read_bits(&bit_it, font_header.advance_width_bits, &res);
-            if(res != LV_FS_RES_OK) {
-                failed = true;
-                break;
-            }
-
-            /* TODO: understand how to interpret advance_width_format */
+        else */ {
             if(font_header.advance_width_format == 0) { /* uint */
+                gdsc->adv_w = 16 * read_bits(&bit_it, 4, &res); // TODO: review the number of bits that should be read
+                if(res != LV_FS_RES_OK) {
+                    failed = true;
+                    break;
+                }
             }
             else if(font_header.advance_width_format == 1) { /* unsigned with 4 bits fractional part */
+                gdsc->adv_w = read_bits(&bit_it, font_header.advance_width_bits, &res);
+                if(res != LV_FS_RES_OK) {
+                    failed = true;
+                    break;
+                }
             }
             else {
                 LV_LOG_WARN("error unknown advance_width_format");
@@ -525,8 +537,11 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
         return false;
     }
 
-    if(lv_fs_seek(fp, glyph_start + glyph_length) != LV_FS_RES_OK) {
-        return false;
+    if (font_header.tables_count < 4) {
+        font_dsc->kern_dsc = NULL;
+        font_dsc->kern_classes = 0;
+        font_dsc->kern_scale = 0;
+        return true;
     }
 
     uint32_t kern_start = glyph_start + glyph_length;

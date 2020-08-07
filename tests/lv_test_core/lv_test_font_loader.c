@@ -44,8 +44,8 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2);
 
 void lv_test_font_loader(void)
 {
-    lv_font_t * font = lv_font_load("f:lv_font_montserrat_12.bin");
-    compare_fonts(&lv_font_montserrat_12, font);
+    lv_font_t * montserrat_12_bin = lv_font_load("f:lv_font_montserrat_12.bin");
+    compare_fonts(&lv_font_montserrat_12, montserrat_12_bin);
 }
 
 static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
@@ -109,22 +109,26 @@ static int compare_fonts(lv_font_t * f1, lv_font_t * f2)
     // kern_dsc
     lv_font_fmt_txt_kern_classes_t * kern1 = (lv_font_fmt_txt_kern_classes_t *) dsc1->kern_dsc;
     lv_font_fmt_txt_kern_classes_t * kern2 = (lv_font_fmt_txt_kern_classes_t *) dsc2->kern_dsc;
+    if (kern1 != NULL && kern2 != NULL) {
+        lv_test_assert_int_eq(kern1->right_class_cnt, kern2->right_class_cnt, "right_class_cnt");
+        lv_test_assert_int_eq(kern1->left_class_cnt, kern2->left_class_cnt, "left_class_cnt");
 
-    lv_test_assert_int_eq(kern1->right_class_cnt, kern2->right_class_cnt, "right_class_cnt");
-    lv_test_assert_int_eq(kern1->left_class_cnt, kern2->left_class_cnt, "left_class_cnt");
+        for(int i = 0; i < kern1->left_class_cnt; ++i) {
+            lv_test_assert_int_eq(kern1->left_class_mapping[i],
+                    kern2->left_class_mapping[i], "left_class_mapping");
+        }
+        for(int i = 0; i < kern1->right_class_cnt; ++i) {
+            lv_test_assert_int_eq(kern1->right_class_mapping[i],
+                    kern2->right_class_mapping[i], "right_class_mapping");
+        }
 
-    for(int i = 0; i < kern1->left_class_cnt; ++i) {
-        lv_test_assert_int_eq(kern1->left_class_mapping[i],
-                      kern2->left_class_mapping[i], "left_class_mapping");
+        for(int i = 0; i < kern1->right_class_cnt * kern1->left_class_cnt; ++i) {
+            lv_test_assert_int_eq(kern1->class_pair_values[i],
+                    kern2->class_pair_values[i], "class_pair_values");
+        }
     }
-    for(int i = 0; i < kern1->right_class_cnt; ++i) {
-        lv_test_assert_int_eq(kern1->right_class_mapping[i],
-                      kern2->right_class_mapping[i], "right_class_mapping");
-    }
-
-    for(int i = 0; i < kern1->right_class_cnt * kern1->left_class_cnt; ++i) {
-        lv_test_assert_int_eq(kern1->class_pair_values[i],
-                      kern2->class_pair_values[i], "class_pair_values");
+    else {
+        lv_test_assert_ptr_eq(kern1, kern2, "kern");
     }
 
     // TODO: glyph_bitmap
