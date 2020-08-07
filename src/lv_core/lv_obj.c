@@ -856,7 +856,7 @@ void lv_obj_set_height_fit(lv_obj_t * obj, lv_coord_t h)
     lv_style_int_t ptop = lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN);
     lv_style_int_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
 
-    lv_obj_set_width(obj, h - ptop - pbottom);
+    lv_obj_set_height(obj, h - ptop - pbottom);
 }
 
 /**
