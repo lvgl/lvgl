@@ -1104,7 +1104,7 @@ static lv_style_t * get_alloc_local_style(lv_style_list_t * list)
 {
     LV_ASSERT_STYLE_LIST(list);
 
-    if(list->has_local) return lv_style_list_get_style(list, 0);
+    if(list->has_local) return lv_style_list_get_style(list, list->has_trans ? 1 : 0);
 
     lv_style_t * local_style = lv_mem_alloc(sizeof(lv_style_t));
     LV_ASSERT_MEM(local_style);
