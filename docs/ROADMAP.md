@@ -7,7 +7,7 @@ This list indicates only the current intention and can be changed.
 ## v8
 Planned to September/October 2020
 - New scrolling:
-  - See [feat/new-scroll]((https://github.com/lvgl/lvgl/tree/feat/new-scroll) branch and  [#1614](https://github.com/lvgl/lvgl/issues/1614)) issue.
+  - See [feat/new-scroll](https://github.com/lvgl/lvgl/tree/feat/new-scroll) branch and  [#1614](https://github.com/lvgl/lvgl/issues/1614)) issue.
   - Remove `lv_page` and support scrolling on `lv_obj`
   - Support "elastic" scrolling when scrolled in
   - Support scroll chaining among any objects types (not only `lv_pages`s)
@@ -25,4 +25,11 @@ Planned to September/October 2020
   - See [#1656](https://github.com/lvgl/lvgl/issues/1656)
 
 ## Ideas
-- ...
+- Unit testing (gtest?). See [#1658](https://github.com/lvgl/lvgl/issues/1658)
+- Benchmarking (gem5?). See [#1660](https://github.com/lvgl/lvgl/issues/1660)
+- CPP binding. See [Forum](https://forum.lvgl.io/t/is-it-possible-to-officially-support-optional-cpp-api/2736)
+- Optmize font decompression
+- Switch to RGBA colors in styles
+- Need coverage report for tests
+- Need static analize (via coverity.io or somehing else)
+- Support dot_begin and dot_middle long modes for labels

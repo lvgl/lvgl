@@ -1,17 +1,26 @@
 # Changelog
 
-## v7.4.0 (planned on 18.08.2020)
+## v7.4.0 (planned on 01.09.2020)
 *Available in the `dev` branch*
 
-## v7.3.0 (planned on 04.08.2020)
-*Available in the `master` branch*
+## v7.3.1 (planned on 18.08.2020)
+
+### Bugfixes
+- Fix drawing value string twice
+- Rename  `lv_chart_clear_serie` to `lv_chart_clear_series` and `lv_obj_align_origo` to `lv_obj_align_mid`
+- Add linemeter's mirror feature again
+- Fix text decor (udnerline strikethrough) with older versions of font converter
+- Fix setting local style property multiple times 
+
+## v7.3.0 (04.08.2020)
 
 ### New features
 - Add `lv_task_get_next`
 - Add `lv_event_send_refresh`, `lv_event_send_refresh_recursive` to easily send `LV_EVENT_REFRESH` to object
 - Add `lv_tabview_set_tab_name()` function - used to change a tab's name
 - Add `LV_THEME_MATERIAL_FLAG_NO_TRANSITION` and `LV_THEME_MATERIAL_FLAG_NO_FOCUS` flags
-- Reduce code size by adding: `LV_USE_FONT_COMPRESSED` and `LV_FONT_USE_SUBPX` and applying some optimization
+- Reduce code size by adding: `LV_USE_FONT_COMPRESSED`, `LV_FONT_USE_SUBPX`, `LV_USE_OUTLINE`, `LV_USE_PATTERN`, `LV_USE_VALUE_STR`  and applying some optimization
+- Add `LV_MEMCPY_MEMSET_STD` to use standard `memcpy` and `memset`
 
 
 ### Bugfixes
@@ -22,6 +31,7 @@
 - btnmatrix: hadle combined states of buttons (e.g. chacked + disabled)
 - textarea: fix typo in lv_textarea_set_sscrollbar_mode
 - gauge: fix image needle drawing
+- fix using freed memory in _lv_style_list_remove_style
 
 
 ## v7.2.0 (21.07.2020)

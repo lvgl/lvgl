@@ -257,7 +257,7 @@ void _lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * style)
         return;
     }
 
-    lv_style_t ** new_classes = lv_mem_realloc(list->style_list, sizeof(lv_style_t *) * (list->style_cnt - 1));
+    lv_style_t ** new_classes = lv_mem_alloc(sizeof(lv_style_t *) * (list->style_cnt - 1));
     LV_ASSERT_MEM(new_classes);
     if(new_classes == NULL) {
         LV_LOG_WARN("lv_style_list_remove_style: couldn't reallocate class list");
@@ -270,6 +270,8 @@ void _lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * style)
         j++;
 
     }
+
+    lv_mem_free(list->style_list);
 
     list->style_cnt--;
     list->style_list = new_classes;
@@ -1102,7 +1104,7 @@ static lv_style_t * get_alloc_local_style(lv_style_list_t * list)
 {
     LV_ASSERT_STYLE_LIST(list);
 
-    if(list->has_local) return lv_style_list_get_style(list, 0);
+    if(list->has_local) return lv_style_list_get_style(list, list->has_trans ? 1 : 0);
 
     lv_style_t * local_style = lv_mem_alloc(sizeof(lv_style_t));
     LV_ASSERT_MEM(local_style);

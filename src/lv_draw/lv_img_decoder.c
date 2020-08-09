@@ -559,7 +559,7 @@ static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * d
     }
     uint32_t btr = len * (px_size >> 3);
     uint32_t br  = 0;
-    lv_fs_read(user_data->f, buf, btr, &br);
+    res = lv_fs_read(user_data->f, buf, btr, &br);
     if(res != LV_FS_RES_OK || btr != br) {
         LV_LOG_WARN("Built-in image decoder read failed");
         return LV_RES_INV;
