@@ -365,11 +365,11 @@ lv_obj_t * lv_list_get_btn_label(const lv_obj_t * btn)
 {
     LV_ASSERT_OBJ(btn, "lv_btn");
 
-    lv_obj_t * label = lv_obj_get_child(btn, NULL);
+    lv_obj_t * label = lv_obj_get_child_back(btn, NULL);
     if(label == NULL) return NULL;
 
     while(lv_list_is_list_label(label) == false) {
-        label = lv_obj_get_child(btn, label);
+        label = lv_obj_get_child_back(btn, label);
         if(label == NULL) break;
     }
 
@@ -386,11 +386,11 @@ lv_obj_t * lv_list_get_btn_img(const lv_obj_t * btn)
     LV_ASSERT_OBJ(btn, "lv_btn");
 
 #if LV_USE_IMG != 0
-    lv_obj_t * img = lv_obj_get_child(btn, NULL);
+    lv_obj_t * img = lv_obj_get_child_back(btn, NULL);
     if(img == NULL) return NULL;
 
     while(lv_list_is_list_img(img) == false) {
-        img = lv_obj_get_child(btn, img);
+        img = lv_obj_get_child_back(btn, img);
         if(img == NULL) break;
     }
 

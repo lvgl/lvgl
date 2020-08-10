@@ -12,6 +12,7 @@
 - Fix text decor (udnerline strikethrough) with older versions of font converter
 - Fix setting local style property multiple times 
 - Add missing background drawing and radius handling to image button
+- Allow adding extra label to list buttons
 
 ## v7.3.0 (04.08.2020)
 
