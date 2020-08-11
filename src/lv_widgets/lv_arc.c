@@ -32,7 +32,9 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
 static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param);
 static lv_style_list_t * lv_arc_get_style(lv_obj_t * arc, uint8_t part);
 static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle);
-static void get_areas(lv_obj_t * arc, lv_point_t * center, lv_coord_t * arc_r, lv_area_t * knob_area);
+static void get_center(lv_obj_t * arc, lv_point_t * center, lv_coord_t * arc_r);
+static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area);
+static bool has_large_knob(lv_obj_t * arc);
 
 /**********************
  *  STATIC VARIABLES
@@ -631,8 +633,7 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
 
         lv_point_t center;
         lv_coord_t arc_r;
-        lv_area_t knob_area;
-        get_areas(arc, &center, &arc_r, &knob_area);
+        get_center(arc, &center, &arc_r);
 
         /*Draw the background arc*/
         lv_draw_line_dsc_t arc_dsc;
@@ -650,16 +651,18 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
         lv_coord_t right_indic = lv_obj_get_style_pad_right(arc, LV_ARC_PART_INDIC);
         lv_coord_t top_indic = lv_obj_get_style_pad_top(arc, LV_ARC_PART_INDIC);
         lv_coord_t bottom_indic = lv_obj_get_style_pad_bottom(arc, LV_ARC_PART_INDIC);
-        arc_r -= LV_MATH_MAX4(left_indic, right_indic, top_indic, bottom_indic);
+        lv_coord_t indic_r = arc_r - LV_MATH_MAX4(left_indic, right_indic, top_indic, bottom_indic);
 
-        if(arc_r > 0) {
+        if(indic_r > 0) {
             lv_draw_line_dsc_init(&arc_dsc);
             lv_obj_init_draw_line_dsc(arc, LV_ARC_PART_INDIC, &arc_dsc);
 
-            lv_draw_arc(center.x, center.y, arc_r, ext->arc_angle_start + ext->rotation_angle, ext->arc_angle_end + ext->rotation_angle, clip_area,
+            lv_draw_arc(center.x, center.y, indic_r, ext->arc_angle_start + ext->rotation_angle, ext->arc_angle_end + ext->rotation_angle, clip_area,
                         &arc_dsc);
         }
 
+        lv_area_t knob_area;
+        get_knob_area(arc, &center, arc_r, &knob_area);
 
         lv_draw_rect_dsc_t knob_rect_dsc;
         lv_draw_rect_dsc_init(&knob_rect_dsc);
@@ -714,8 +717,7 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
         /*Make point relative to the arc's center*/
         lv_point_t center;
         lv_coord_t r;
-        lv_area_t knob_area;
-        get_areas(arc, &center, &r, &knob_area);
+        get_center(arc, &center, &r);
 
         p.x -=  center.x;
         p.y -=  center.y;
@@ -724,6 +726,7 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
         if(ext->dragging == false) {
             lv_coord_t indic_width = lv_obj_get_style_line_width(arc, LV_ARC_PART_INDIC);
             r -=  indic_width;
+            r -= r / 2; /*Add some more sensitive area*/
             if(p.x * p.x + p.y * p.y > r * r) {
                 ext->dragging = true;
                 ext->last_tick = lv_tick_get(); /*Capture timestamp at dragging start*/
@@ -849,6 +852,13 @@ static lv_style_list_t * lv_arc_get_style(lv_obj_t * arc, uint8_t part)
 
 static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle)
 {
+    /* If the knob is large it's much harder to find which area to invalidate.
+     * For simplicity invalidate the whole arc in this case*/
+    if(has_large_knob(arc)) {
+        lv_obj_invalidate(arc);
+        return;
+    }
+
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     start_angle += ext->rotation_angle;
@@ -953,7 +963,7 @@ static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angl
 }
 
 
-static void get_areas(lv_obj_t * arc, lv_point_t * center, lv_coord_t * arc_r, lv_area_t * knob_area)
+static void get_center(lv_obj_t * arc, lv_point_t * center, lv_coord_t * arc_r)
 {
     lv_coord_t left_bg = lv_obj_get_style_pad_left(arc, LV_ARC_PART_BG);
     lv_coord_t right_bg = lv_obj_get_style_pad_right(arc, LV_ARC_PART_BG);
@@ -970,17 +980,53 @@ static void get_areas(lv_obj_t * arc, lv_point_t * center, lv_coord_t * arc_r, l
 
     lv_coord_t indic_width = lv_obj_get_style_line_width(arc, LV_ARC_PART_INDIC);
     r -= indic_width;
+}
+
+static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area)
+{
+    lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
+
+    lv_coord_t indic_width = lv_obj_get_style_line_width(arc, LV_ARC_PART_INDIC);
+    lv_coord_t indic_width_half = indic_width / 2;
+    r -= indic_width_half;
+
+    uint16_t angle = ext->rotation_angle;
+    if(ext->type == LV_ARC_TYPE_NORMAL) {
+        angle += ext->arc_angle_end;
+    } else if(ext->type == LV_ARC_TYPE_REVERSE) {
+        angle += ext->arc_angle_start;
+    } else if(ext->type == LV_ARC_TYPE_SYMMETRIC) {
+        int32_t range_midpoint = (int32_t)(ext->min_value + ext->max_value) / 2;
+        if(ext->cur_value < range_midpoint) angle += ext->arc_angle_start;
+        else angle += ext->arc_angle_end;
+    }
+    lv_coord_t knob_x = (r * _lv_trigo_sin(angle + 90)) >> LV_TRIGO_SHIFT;
+    lv_coord_t knob_y = (r * _lv_trigo_sin(angle)) >> LV_TRIGO_SHIFT;
 
     lv_coord_t left_knob = lv_obj_get_style_pad_left(arc, LV_ARC_PART_KNOB);
     lv_coord_t right_knob = lv_obj_get_style_pad_right(arc, LV_ARC_PART_KNOB);
     lv_coord_t top_knob = lv_obj_get_style_pad_top(arc, LV_ARC_PART_KNOB);
     lv_coord_t bottom_knob = lv_obj_get_style_pad_bottom(arc, LV_ARC_PART_KNOB);
 
-    knob_area->x1 = center->x - r + left_knob;
-    knob_area->x2 = center->x + r - right_knob;
-    knob_area->y1 = center->y - r + top_knob;
-    knob_area->y2 = center->y + r - bottom_knob;
+    knob_area->x1 = center->x + knob_x - left_knob - indic_width_half;
+    knob_area->x2 = center->x + knob_x + right_knob + indic_width_half;
+    knob_area->y1 = center->y + knob_y - top_knob - indic_width_half;
+    knob_area->y2 = center->y + knob_y + bottom_knob + indic_width_half;
 }
 
+static bool has_large_knob(lv_obj_t * arc)
+{
+    if(lv_obj_get_style_pad_left(arc, LV_ARC_PART_KNOB) > 0) return true;
+    if(lv_obj_get_style_pad_right(arc, LV_ARC_PART_KNOB) > 0) return true;
+    if(lv_obj_get_style_pad_top(arc, LV_ARC_PART_KNOB) > 0) return true;
+    if(lv_obj_get_style_pad_bottom(arc, LV_ARC_PART_KNOB) > 0) return true;
+    if(lv_obj_get_style_shadow_width(arc, LV_ARC_PART_KNOB) > 0) return true;
+    if(lv_obj_get_style_shadow_ofs_x(arc, LV_ARC_PART_KNOB) > 0) return true;
+    if(lv_obj_get_style_shadow_ofs_y(arc, LV_ARC_PART_KNOB) > 0) return true;
+    if(lv_obj_get_style_outline_width(arc, LV_ARC_PART_KNOB) > 0) return true;
+    if(lv_obj_get_style_value_str(arc, LV_ARC_PART_KNOB) != NULL) return true;
+
+    return false;
+}
 
 #endif
