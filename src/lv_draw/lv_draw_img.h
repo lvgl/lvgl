@@ -53,13 +53,9 @@ void lv_draw_img_dsc_init(lv_draw_img_dsc_t * dsc);
  * @param coords the coordinates of the image
  * @param mask the image will be drawn only in this area
  * @param src pointer to a lv_color_t array which contains the pixels of the image
- * @param style style of the image
- * @param angle rotation angle of the image
- * @param center rotation center of the image
- * @param antialias anti-alias transformations (rotate, zoom) or not
- * @param opa_scale scale down all opacities by the factor
+ * @param dsc pointer to an initialized `lv_draw_img_dsc_t` variable
  */
-void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src, lv_draw_img_dsc_t * dsc);
+void lv_draw_img(const lv_area_t * coords, const lv_area_t * mask, const void * src, const lv_draw_img_dsc_t * dsc);
 
 /**
  * Get the type of an image source

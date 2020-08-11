@@ -435,6 +435,10 @@ void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
     dsc->tmp.sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
     dsc->tmp.cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
 
+    /*Use smaller value to avoid overflow*/
+    dsc->tmp.sinma = dsc->tmp.sinma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+    dsc->tmp.cosma = dsc->tmp.cosma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+
     dsc->tmp.chroma_keyed = lv_img_cf_is_chroma_keyed(dsc->cfg.cf) ? 1 : 0;
     dsc->tmp.has_alpha = lv_img_cf_has_alpha(dsc->cfg.cf) ? 1 : 0;
     if(dsc->cfg.cf == LV_IMG_CF_TRUE_COLOR || dsc->cfg.cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
@@ -468,7 +472,7 @@ void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
  * @param pivot x,y pivot coordinates of rotation
  */
 void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
-                                      lv_point_t * pivot)
+                                      const lv_point_t * pivot)
 {
 #if LV_USE_IMG_TRANSFORM
     if(angle == 0 && zoom == LV_IMG_ZOOM_NONE) {
@@ -493,6 +497,10 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
     int32_t sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
     int32_t cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
 
+    /*Use smaller value to avoid overflow*/
+    sinma = sinma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+    cosma = cosma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+
     lv_point_t lt;
     lv_point_t rt;
     lv_point_t lb;
@@ -509,23 +517,23 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
 
     xt = a.x1;
     yt = a.y1;
-    lt.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
-    lt.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+    lt.x = ((cosma * xt - sinma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
+    lt.y = ((sinma * xt + cosma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
 
     xt = a.x2;
     yt = a.y1;
-    rt.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
-    rt.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+    rt.x = ((cosma * xt - sinma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
+    rt.y = ((sinma * xt + cosma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
 
     xt = a.x1;
     yt = a.y2;
-    lb.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
-    lb.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+    lb.x = ((cosma * xt - sinma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
+    lb.y = ((sinma * xt + cosma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
 
     xt = a.x2;
     yt = a.y2;
-    rb.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
-    rb.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+    rb.x = ((cosma * xt - sinma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
+    rb.y = ((sinma * xt + cosma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
 
     res->x1 = LV_MATH_MIN4(lb.x, lt.x, rb.x, rt.x);
     res->x2 = LV_MATH_MAX4(lb.x, lt.x, rb.x, rt.x);

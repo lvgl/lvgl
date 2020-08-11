@@ -427,12 +427,12 @@ void lv_btnmatrix_set_one_check(lv_obj_t * btnm, bool one_chk)
  * @param btnm pointer to a btnmatrix object
  * @param align LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
  */
-void lv_btnmatrix_set_align(lv_obj_t* btnm, lv_label_align_t align)
+void lv_btnmatrix_set_align(lv_obj_t * btnm, lv_label_align_t align)
 {
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
-    lv_btnmatrix_ext_t* ext = lv_obj_get_ext_attr(btnm);
-    if (ext->align == align) return;
+    lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
+    if(ext->align == align) return;
 
     ext->align = align;
 
@@ -585,18 +585,18 @@ bool lv_btnmatrix_get_one_check(const lv_obj_t * btnm)
  * @param btnm pointer to a btnmatrix object
  * @return LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
  */
-lv_label_align_t lv_btnmatrix_get_align(const lv_obj_t* btnm)
+lv_label_align_t lv_btnmatrix_get_align(const lv_obj_t * btnm)
 {
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
-    lv_btnmatrix_ext_t* ext = lv_obj_get_ext_attr(btnm);
+    lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
     lv_label_align_t align = ext->align;
 
-    if (align == LV_LABEL_ALIGN_AUTO) {
+    if(align == LV_LABEL_ALIGN_AUTO) {
 #if LV_USE_BIDI
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(btnm);
-        if (base_dir == LV_BIDI_DIR_RTL) align = LV_LABEL_ALIGN_RIGHT;
+        if(base_dir == LV_BIDI_DIR_RTL) align = LV_LABEL_ALIGN_RIGHT;
         else align = LV_LABEL_ALIGN_LEFT;
 #else
         align = LV_LABEL_ALIGN_LEFT;
@@ -641,10 +641,10 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
         uint16_t btn_i = 0;
         uint16_t txt_i = 0;
         lv_txt_flag_t txt_flag = LV_TXT_FLAG_NONE;
-        if (ext->recolor) txt_flag |= LV_TXT_FLAG_RECOLOR;
+        if(ext->recolor) txt_flag |= LV_TXT_FLAG_RECOLOR;
         lv_label_align_t align = lv_btnmatrix_get_align(btnm);
-        if (align == LV_LABEL_ALIGN_CENTER) txt_flag |= LV_TXT_FLAG_CENTER;
-        if (align == LV_LABEL_ALIGN_RIGHT) txt_flag |= LV_TXT_FLAG_RIGHT;
+        if(align == LV_LABEL_ALIGN_CENTER) txt_flag |= LV_TXT_FLAG_CENTER;
+        if(align == LV_LABEL_ALIGN_RIGHT) txt_flag |= LV_TXT_FLAG_RIGHT;
 
         lv_draw_rect_dsc_t draw_rect_rel_dsc;
         lv_draw_label_dsc_t draw_label_rel_dsc;
@@ -658,7 +658,6 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
         lv_draw_rect_dsc_t draw_rect_tmp_dsc;
         lv_draw_label_dsc_t draw_label_tmp_dsc;
 
-        /*The state changes without re-caching the styles, disable the use of cache*/
         lv_state_t state_ori = btnm->state;
         btnm->state = LV_STATE_DEFAULT;
         lv_draw_rect_dsc_init(&draw_rect_rel_dsc);
@@ -695,9 +694,20 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
             /*Choose the style*/
             lv_draw_rect_dsc_t * draw_rect_dsc_act;
             lv_draw_label_dsc_t * draw_label_dsc_act;
-            bool tgl_state = button_get_tgl_state(ext->ctrl_bits[btn_i]);
+            lv_state_t btn_state = LV_STATE_DEFAULT;
+            if(button_get_tgl_state(ext->ctrl_bits[btn_i])) btn_state |= LV_STATE_CHECKED;
+            if(button_is_inactive(ext->ctrl_bits[btn_i])) btn_state |= LV_STATE_DISABLED;
+            if(btn_i == ext->btn_id_pr) btn_state |= LV_STATE_PRESSED;
+            if(btn_i == ext->btn_id_focused) {
+                btn_state |= LV_STATE_FOCUSED;
+                if(state_ori & LV_STATE_EDITED) btn_state |= LV_STATE_EDITED;
+            }
 
-            if(tgl_state) {
+            if(btn_state == LV_STATE_DEFAULT) {
+                draw_rect_dsc_act = &draw_rect_rel_dsc;
+                draw_label_dsc_act = &draw_label_rel_dsc;
+            }
+            else if(btn_state == LV_STATE_CHECKED) {
                 if(!chk_inited) {
                     btnm->state = LV_STATE_CHECKED;
                     lv_draw_rect_dsc_init(&draw_rect_chk_dsc);
@@ -708,9 +718,10 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
                     btnm->state = state_ori;
                     chk_inited = true;
                 }
+                draw_rect_dsc_act = &draw_rect_chk_dsc;
+                draw_label_dsc_act = &draw_label_chk_dsc;
             }
-
-            if(button_is_inactive(ext->ctrl_bits[btn_i])) {
+            else if(btn_state == LV_STATE_CHECKED) {
                 if(!disabled_inited) {
                     btnm->state = LV_STATE_DISABLED;
                     lv_draw_rect_dsc_init(&draw_rect_ina_dsc);
@@ -724,21 +735,9 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
                 draw_rect_dsc_act = &draw_rect_ina_dsc;
                 draw_label_dsc_act = &draw_label_ina_dsc;
             }
-            /*Simple released or checked buttons button*/
-            else if(btn_i != ext->btn_id_pr && btn_i != ext->btn_id_focused) {
-                draw_rect_dsc_act = tgl_state ? &draw_rect_chk_dsc : &draw_rect_rel_dsc;
-                draw_label_dsc_act = tgl_state ? &draw_label_chk_dsc : &draw_label_rel_dsc;
-            }
-            /*Focused and/or pressed + checked or released button*/
+            /*In other cases get the styles directly without caching them*/
             else {
-                btnm->state = LV_STATE_DEFAULT;
-                if(tgl_state) btnm->state = LV_STATE_CHECKED;
-                if(ext->btn_id_pr == btn_i) btnm->state |= LV_STATE_PRESSED;
-                if(ext->btn_id_focused == btn_i) {
-                    btnm->state |= LV_STATE_FOCUSED;
-                    if(state_ori & LV_STATE_EDITED) btnm->state |= LV_STATE_EDITED;
-                }
-
+                btnm->state = btn_state;
                 lv_draw_rect_dsc_init(&draw_rect_tmp_dsc);
                 lv_draw_label_dsc_init(&draw_label_tmp_dsc);
                 lv_obj_init_draw_rect_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_rect_tmp_dsc);
@@ -992,6 +991,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
         ext->btn_id_act = LV_BTNMATRIX_BTN_NONE;
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT) {
             if(ext->btn_id_focused == LV_BTNMATRIX_BTN_NONE)
@@ -1059,10 +1059,13 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
             ext->btn_id_act = ext->btn_id_focused;
             lv_obj_invalidate(btnm);
         }
+#endif
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
+#if LV_USE_GROUP
         bool * editable = (bool *)param;
         *editable       = true;
+#endif
     }
     return res;
 }

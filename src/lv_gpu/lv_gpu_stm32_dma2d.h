@@ -20,11 +20,11 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define DMA2D_ARGB8888 0
-#define DMA2D_RGB888 1
-#define DMA2D_RGB565 2
-#define DMA2D_ARGB1555 3
-#define DMA2D_ARGB4444 4
+#define LV_DMA2D_ARGB8888 0
+#define LV_DMA2D_RGB888 1
+#define LV_DMA2D_RGB565 2
+#define LV_DMA2D_ARGB1555 3
+#define LV_DMA2D_ARGB4444 4
 
 /**********************
  *      TYPEDEFS

@@ -60,6 +60,7 @@ static void pwd_char_hider(lv_obj_t * ta);
 static bool char_is_accepted(lv_obj_t * ta, uint32_t c);
 static void refr_cursor_area(lv_obj_t * ta);
 static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_indev_t * click_source);
+static lv_res_t insert_handler(lv_obj_t * ta, const char * txt);
 
 /**********************
  *  STATIC VARIABLES
@@ -148,7 +149,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_label_set_text(ext->label, "Text area");
         lv_obj_set_click(ext->label, false);
         lv_obj_set_size(ta, LV_TEXTAREA_DEF_WIDTH, LV_TEXTAREA_DEF_HEIGHT);
-        lv_textarea_set_sscrollbar_mode(ta, LV_SCROLLBAR_MODE_DRAG);
+        lv_textarea_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_DRAG);
 
         lv_obj_reset_style_list(ta, LV_PAGE_PART_SCROLLABLE);
         lv_theme_apply(ta, LV_THEME_TEXTAREA);
@@ -221,7 +222,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
 
 /**
  * Insert a character to the current cursor position.
- * To add a wide char, e.g. 'Á' use `lv_txt_encoded_conv_wc('Á')`
+ * To add a wide char, e.g. 'Á' use `_lv_txt_encoded_conv_wc('Á')`
  * @param ta pointer to a text area object
  * @param c a character (e.g. 'a')
  */
@@ -231,21 +232,20 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    uint32_t letter_buf[2];
-    letter_buf[0] = c;
-    letter_buf[1] = '\0';
+    const char * letter_buf;
 
-    ta_insert_replace = NULL;
-    lv_event_send(ta, LV_EVENT_INSERT, letter_buf);
-    if(ta_insert_replace) {
-        if(ta_insert_replace[0] == '\0') return; /*Drop this text*/
+    uint32_t u32_buf[2];
+    u32_buf[0] = c;
+    u32_buf[1] = 0;
 
-        /*Add the replaced text directly it's different from the original*/
-        if(strcmp(ta_insert_replace, (char *)letter_buf)) {
-            lv_textarea_add_text(ta, ta_insert_replace);
-            return;
-        }
-    }
+    letter_buf = (char *)&u32_buf;
+
+#if LV_BIG_ENDIAN_SYSTEM
+    if(c != 0) while(*letter_buf == 0) ++letter_buf;
+#endif
+
+    lv_res_t res = insert_handler(ta, letter_buf);
+    if(res != LV_RES_OK) return;
 
     if(ext->one_line && (c == '\n' || c == '\r')) {
         LV_LOG_INFO("Text area: line break ignored in one-line mode");
@@ -260,6 +260,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
         return;
     }
 
+
     /*If a new line was added it shouldn't show edge flash effect*/
     bool edge_flash_en = lv_textarea_get_edge_flash(ta);
     lv_textarea_set_edge_flash(ta, false);
@@ -272,7 +273,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
         if(txt[0] == '\0') lv_obj_invalidate(ta);
     }
 
-    lv_label_ins_text(ext->label, ext->cursor.pos, (const char *)letter_buf); /*Insert the character*/
+    lv_label_ins_text(ext->label, ext->cursor.pos, letter_buf); /*Insert the character*/
     lv_textarea_clear_selection(ta);                                                /*Clear selection*/
 
     if(ext->pwd_mode != 0) {
@@ -325,18 +326,6 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    ta_insert_replace = NULL;
-    lv_event_send(ta, LV_EVENT_INSERT, txt);
-    if(ta_insert_replace) {
-        if(ta_insert_replace[0] == '\0') return; /*Drop this text*/
-
-        /*Add the replaced text directly it's different from the original*/
-        if(strcmp(ta_insert_replace, txt)) {
-            lv_textarea_add_text(ta, ta_insert_replace);
-            return;
-        }
-    }
-
     if(ext->pwd_mode != 0) pwd_char_hider(ta); /*Make sure all the current text contains only '*'*/
 
     /*Add the character one-by-one if not all characters are accepted or there is character limit.*/
@@ -348,6 +337,9 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
         }
         return;
     }
+
+    lv_res_t res = insert_handler(ta, txt);
+    if(res != LV_RES_OK) return;
 
     /*If a new line was added it shouldn't show edge flash effect*/
     bool edge_flash_en = lv_textarea_get_edge_flash(ta);
@@ -411,18 +403,10 @@ void lv_textarea_del_char(lv_obj_t * ta)
 
     if(cur_pos == 0) return;
 
-    ta_insert_replace = NULL;
     char del_buf[2]   = {LV_KEY_DEL, '\0'};
-    lv_event_send(ta, LV_EVENT_INSERT, del_buf);
-    if(ta_insert_replace) {
-        if(ta_insert_replace[0] == '\0') return; /*Drop this text*/
 
-        /*Add the replaced text directly it's different from the original*/
-        if(strcmp(ta_insert_replace, del_buf)) {
-            lv_textarea_add_text(ta, ta_insert_replace);
-            return;
-        }
-    }
+    lv_res_t res = insert_handler(ta, del_buf);
+    if(res != LV_RES_OK) return;
 
     char * label_txt = lv_label_get_text(ext->label);
 
@@ -1466,6 +1450,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
         }
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
         if(c == LV_KEY_RIGHT)
             lv_textarea_cursor_right(ta);
@@ -1486,10 +1471,13 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
         else {
             lv_textarea_add_char(ta, c);
         }
+#endif
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
+#if LV_USE_GROUP
         bool * editable = (bool *)param;
         *editable       = true;
+#endif
     }
     else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESS_LOST ||
             sign == LV_SIGNAL_RELEASED) {
@@ -1901,6 +1889,23 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
 
     if(sign == LV_SIGNAL_PRESSED) lv_textarea_set_cursor_pos(ta, char_id_at_click);
 #endif
+}
+
+static lv_res_t insert_handler(lv_obj_t * ta, const char * txt)
+{
+    ta_insert_replace = NULL;
+    lv_event_send(ta, LV_EVENT_INSERT, txt);
+    if(ta_insert_replace) {
+        if(ta_insert_replace[0] == '\0') return LV_RES_INV; /*Drop this text*/
+
+        /*Add the replaced text directly it's different from the original*/
+        if(strcmp(ta_insert_replace, txt)) {
+            lv_textarea_add_text(ta, ta_insert_replace);
+            return LV_RES_INV;
+        }
+    }
+
+    return LV_RES_OK;
 }
 
 #endif

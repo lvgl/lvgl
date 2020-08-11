@@ -89,6 +89,9 @@ void _lv_img_decoder_init(void)
 lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header)
 {
     header->always_zero = 0;
+    header->h = 0;
+    header->w = 0;
+    header->cf = LV_IMG_CF_UNKNOWN;
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
@@ -148,10 +151,6 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
 
         /*Opened successfully. It is a good decoder to for this image source*/
         if(res == LV_RES_OK) break;
-    }
-
-    if(res == LV_RES_INV) {
-        _lv_memset_00(dsc, sizeof(lv_img_decoder_dsc_t));
     }
 
     return res;
@@ -560,7 +559,7 @@ static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * d
     }
     uint32_t btr = len * (px_size >> 3);
     uint32_t br  = 0;
-    lv_fs_read(user_data->f, buf, btr, &br);
+    res = lv_fs_read(user_data->f, buf, btr, &br);
     if(res != LV_FS_RES_OK || btr != br) {
         LV_LOG_WARN("Built-in image decoder read failed");
         return LV_RES_INV;

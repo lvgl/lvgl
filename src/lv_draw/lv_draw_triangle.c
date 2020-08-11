@@ -40,7 +40,7 @@
  * @param clip_area the triangle will be drawn only in this area
  * @param draw_dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_triangle(const lv_point_t points[], const lv_area_t * clip_area, lv_draw_rect_dsc_t * draw_dsc)
+void lv_draw_triangle(const lv_point_t points[], const lv_area_t * clip_area, const lv_draw_rect_dsc_t * draw_dsc)
 {
     lv_draw_polygon(points, 3, clip_area, draw_dsc);
 }
@@ -53,7 +53,7 @@ void lv_draw_triangle(const lv_point_t points[], const lv_area_t * clip_area, lv
  * @param draw_dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
 void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_area_t * clip_area,
-                     lv_draw_rect_dsc_t * draw_dsc)
+                     const lv_draw_rect_dsc_t * draw_dsc)
 {
     if(point_cnt < 3) return;
     if(points == NULL) return;

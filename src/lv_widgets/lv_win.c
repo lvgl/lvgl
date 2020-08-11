@@ -34,8 +34,8 @@ typedef struct {
 } lv_win_btn_ext_t;
 
 enum {
-	LV_WIN_BTN_ALIGN_RIGHT = 0, 	/**< Align button to right of the header */
-	LV_WIN_BTN_ALIGN_LEFT	/**< Align button to left of the header */
+    LV_WIN_BTN_ALIGN_RIGHT = 0,     /**< Align button to right of the header */
+    LV_WIN_BTN_ALIGN_LEFT   /**< Align button to left of the header */
 };
 typedef uint8_t lv_win_btn_align_t;
 
@@ -559,7 +559,7 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
         lv_coord_t left_btn_offset = 0;
         btn = lv_obj_get_child_back(ext->header, NULL);
         while(btn != NULL) {
-            if (LV_WIN_BTN_ALIGN_LEFT == lv_win_btn_get_alignment(btn)) {
+            if(LV_WIN_BTN_ALIGN_LEFT == lv_win_btn_get_alignment(btn)) {
                 left_btn_offset += btn_w + header_inner;
             }
 
@@ -645,8 +645,10 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
         ext->title_txt  = NULL;
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         /*Forward all the control signals to the page*/
         ext->page->signal_cb(ext->page, sign, param);
+#endif
     }
 
     return res;
@@ -714,26 +716,28 @@ static void lv_win_realign(lv_obj_t * win)
         lv_obj_set_size(btn, btn_w, btn_h);
         uint8_t btn_alignment = lv_win_btn_get_alignment(btn);
 
-        if (LV_WIN_BTN_ALIGN_RIGHT == btn_alignment) {
-            if (is_header_right_side_empty) {
+        if(LV_WIN_BTN_ALIGN_RIGHT == btn_alignment) {
+            if(is_header_right_side_empty) {
                 /* Align the button to the right of the header */
                 lv_obj_align(btn, ext->header, LV_ALIGN_IN_RIGHT_MID, -header_right, 0);
 
                 is_header_right_side_empty = false;
-            } else {
+            }
+            else {
                 /* Align the button to the left of the previous button */
-        		lv_obj_align(btn, btn_prev_at_right, LV_ALIGN_OUT_LEFT_MID, -header_inner, 0);
+                lv_obj_align(btn, btn_prev_at_right, LV_ALIGN_OUT_LEFT_MID, -header_inner, 0);
             }
 
             btn_prev_at_right = btn;
         }
-        else if (LV_WIN_BTN_ALIGN_LEFT == btn_alignment) {
-            if (is_header_left_side_empty) {
+        else if(LV_WIN_BTN_ALIGN_LEFT == btn_alignment) {
+            if(is_header_left_side_empty) {
                 /* Align the button to the right of the header */
                 lv_obj_align(btn, ext->header, LV_ALIGN_IN_LEFT_MID, header_left, 0);
 
                 is_header_left_side_empty = false;
-            } else {
+            }
+            else {
                 /* Align the button to the right of the previous button */
                 lv_obj_align(btn, btn_prev_at_left, LV_ALIGN_OUT_RIGHT_MID, header_inner, 0);
             }
@@ -752,11 +756,11 @@ static void lv_win_realign(lv_obj_t * win)
 
 static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const void * img_src)
 {
-	LV_LOG_TRACE("win btn create started");
+    LV_LOG_TRACE("win btn create started");
 
-	lv_obj_t * win_btn;
+    lv_obj_t * win_btn;
 
-	win_btn = lv_btn_create(par, NULL);
+    win_btn = lv_btn_create(par, NULL);
     LV_ASSERT_MEM(win_btn);
     if(win_btn == NULL) return NULL;
 
@@ -783,7 +787,7 @@ static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const void * img_src)
 
     LV_LOG_INFO("win btn created");
 
-	return win_btn;
+    return win_btn;
 }
 
 static void lv_win_btn_set_alignment(lv_obj_t * win_btn, const uint8_t alignment)

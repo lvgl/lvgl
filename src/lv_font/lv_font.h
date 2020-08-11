@@ -71,6 +71,10 @@ typedef struct _lv_font_struct {
     lv_coord_t line_height;         /**< The real line height where any text fits*/
     lv_coord_t base_line;           /**< Base line measured from the top of the line_height*/
     uint8_t subpx  : 2;             /**< An element of `lv_font_subpx_t`*/
+
+    int8_t underline_position;      /**< Distance between the top of the underline and base line (< 0 means below the base line)*/
+    int8_t  underline_thickness;     /**< Thickness of the underline*/
+
     void * dsc;                     /**< Store implementation specific or run_time data or caching here*/
 #if LV_USE_USER_DATA
     lv_font_user_data_t user_data;  /**< Custom user data for font. */
@@ -169,6 +173,10 @@ LV_FONT_DECLARE(lv_font_montserrat_30)
 
 #if LV_FONT_MONTSERRAT_32
 LV_FONT_DECLARE(lv_font_montserrat_32)
+#endif
+
+#if LV_FONT_MONTSERRAT_34
+LV_FONT_DECLARE(lv_font_montserrat_34)
 #endif
 
 #if LV_FONT_MONTSERRAT_36

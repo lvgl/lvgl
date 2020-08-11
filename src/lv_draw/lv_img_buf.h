@@ -48,6 +48,8 @@ extern "C" {
 
 #define LV_IMG_ZOOM_NONE   256
 
+#define _LV_TRANSFORM_TRIGO_SHIFT 10
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -102,10 +104,26 @@ typedef uint8_t lv_img_cf_t;
 /**
  * LVGL image header
  */
+/* The first 8 bit is very important to distinguish the different source types.
+ * For more info see `lv_img_get_src_type()` in lv_img.c
+ * On big endian systems the order is reversed so cf and always_zero must be at
+ * the end of the struct.
+ * */
+#if LV_BIG_ENDIAN_SYSTEM
 typedef struct {
 
-    /* The first 8 bit is very important to distinguish the different source types.
-     * For more info see `lv_img_get_src_type()` in lv_img.c */
+    uint32_t h : 11; /*Height of     the image map*/
+    uint32_t w : 11; /*Width of the image map*/
+    uint32_t reserved : 2; /*Reserved to be used later*/
+    uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
+                                 non-printable character*/
+    uint32_t cf : 5;          /* Color format: See `lv_img_color_format_t`*/
+
+
+} lv_img_header_t;
+#else
+typedef struct {
+
     uint32_t cf : 5;          /* Color format: See `lv_img_color_format_t`*/
     uint32_t always_zero : 3; /*It the upper bits of the first byte. Always zero to look like a
                                  non-printable character*/
@@ -115,7 +133,7 @@ typedef struct {
     uint32_t w : 11; /*Width of the image map*/
     uint32_t h : 11; /*Height of     the image map*/
 } lv_img_header_t;
-
+#endif
 
 /** Image header it is compatible with
  * the result from image converter utility*/
@@ -285,8 +303,8 @@ static inline bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_
     int32_t ys;
     if(dsc->cfg.zoom == LV_IMG_ZOOM_NONE) {
         /*Get the source pixel from the upscaled image*/
-        xs = ((dsc->tmp.cosma * xt - dsc->tmp.sinma * yt) >> (LV_TRIGO_SHIFT - 8)) + dsc->tmp.pivot_x_256;
-        ys = ((dsc->tmp.sinma * xt + dsc->tmp.cosma * yt) >> (LV_TRIGO_SHIFT - 8)) + dsc->tmp.pivot_y_256;
+        xs = ((dsc->tmp.cosma * xt - dsc->tmp.sinma * yt) >> (_LV_TRANSFORM_TRIGO_SHIFT - 8)) + dsc->tmp.pivot_x_256;
+        ys = ((dsc->tmp.sinma * xt + dsc->tmp.cosma * yt) >> (_LV_TRANSFORM_TRIGO_SHIFT - 8)) + dsc->tmp.pivot_y_256;
     }
     else if(dsc->cfg.angle == 0) {
         xt *= dsc->tmp.zoom_inv;
@@ -297,8 +315,8 @@ static inline bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_
     else {
         xt *= dsc->tmp.zoom_inv;
         yt *= dsc->tmp.zoom_inv;
-        xs = ((dsc->tmp.cosma * xt - dsc->tmp.sinma * yt) >> (LV_TRIGO_SHIFT)) + dsc->tmp.pivot_x_256;
-        ys = ((dsc->tmp.sinma * xt + dsc->tmp.cosma * yt) >> (LV_TRIGO_SHIFT)) + dsc->tmp.pivot_y_256;
+        xs = ((dsc->tmp.cosma * xt - dsc->tmp.sinma * yt) >> (_LV_TRANSFORM_TRIGO_SHIFT)) + dsc->tmp.pivot_x_256;
+        ys = ((dsc->tmp.sinma * xt + dsc->tmp.cosma * yt) >> (_LV_TRANSFORM_TRIGO_SHIFT)) + dsc->tmp.pivot_y_256;
     }
 
     /*Get the integer part of the source pixel*/
@@ -364,7 +382,7 @@ static inline bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_
  * @param pivot x,y pivot coordinates of rotation
  */
 void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
-                                      lv_point_t * pivot);
+                                      const lv_point_t * pivot);
 
 /**********************
  *      MACROS

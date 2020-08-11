@@ -153,7 +153,7 @@ static inline void lv_roller_set_fix_width(lv_obj_t * roller, lv_coord_t w)
 #define lv_scrlbar_mode_t lv_scrollbar_mode_t
 
 #define LV_SCRLBAR_MODE_OFF    LV_SCROLLBAR_MODE_OFF
-#define LV_SCRLBAR_MODE_ON     LV_SCRILLBAR_MODE_ON
+#define LV_SCRLBAR_MODE_ON     LV_SCROLLBAR_MODE_ON
 #define LV_SCRLBAR_MODE_DRAG   LV_SCROLLBAR_MODE_DRAG
 #define LV_SCRLBAR_MODE_AUTO   LV_SCROLLBAR_MODE_AUTO
 #define LV_SCRLBAR_MODE_HIDE   LV_SCROLLBAR_MODE_HIDE
@@ -176,17 +176,55 @@ static inline lv_obj_t * lv_page_get_scrl(lv_obj_t * page)
 }
 #endif
 
+
+#endif /*LV_USE_API_EXTENSION_V6*/
+
+
+
+
+/*---------------------
+ * V7.0 COMPATIBILITY
+ *--------------------*/
+#if LV_USE_API_EXTENSION_V7
 #if LV_USE_WIN
 
 static inline lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src)
 {
-	return lv_win_add_btn_right(win, img_src);
+    return lv_win_add_btn_right(win, img_src);
 }
 
 #endif
 
-#endif /*LV_USE_API_EXTENSION_V6*/
+#if LV_USE_CHART
+static inline void lv_chart_set_range(lv_obj_t * chart, lv_coord_t ymin, lv_coord_t ymax)
+{
+    lv_chart_set_y_range(chart, LV_CHART_AXIS_PRIMARY_Y, ymin,  ymax);
+}
 
+
+static inline void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * series)
+{
+    lv_chart_clear_series(chart, series);
+}
+
+#endif
+
+static inline void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
+{
+    lv_obj_align_mid(obj, base, align, x_ofs, y_ofs);
+}
+
+static inline void lv_obj_align_origo_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs)
+{
+    lv_obj_align_mid_y(obj, base, align, x_ofs);
+}
+
+static inline void lv_obj_align_origo_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs)
+{
+    lv_obj_align_mid_y(obj, base, align, y_ofs);
+}
+
+#endif /*LV_USE_API_EXTENSION_V6*/
 /**********************
  *      MACROS
  **********************/

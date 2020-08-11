@@ -1,7 +1,71 @@
 # Changelog
 
-## v7.1.0 (planned on 07.07.2020)
-*Available in the `master` branch*
+## v7.4.0 (planned on 01.09.2020)
+*Available in the `dev` branch*
+
+## v7.3.1 (planned on 18.08.2020)
+
+### Bugfixes
+- Fix drawing value string twice
+- Rename  `lv_chart_clear_serie` to `lv_chart_clear_series` and `lv_obj_align_origo` to `lv_obj_align_mid`
+- Add linemeter's mirror feature again
+- Fix text decor (udnerline strikethrough) with older versions of font converter
+- Fix setting local style property multiple times 
+- Add missing background drawing and radius handling to image button
+- Allow adding extra label to list buttons
+- Fix overflow in large image transformations
+
+## v7.3.0 (04.08.2020)
+
+### New features
+- Add `lv_task_get_next`
+- Add `lv_event_send_refresh`, `lv_event_send_refresh_recursive` to easily send `LV_EVENT_REFRESH` to object
+- Add `lv_tabview_set_tab_name()` function - used to change a tab's name
+- Add `LV_THEME_MATERIAL_FLAG_NO_TRANSITION` and `LV_THEME_MATERIAL_FLAG_NO_FOCUS` flags
+- Reduce code size by adding: `LV_USE_FONT_COMPRESSED`, `LV_FONT_USE_SUBPX`, `LV_USE_OUTLINE`, `LV_USE_PATTERN`, `LV_USE_VALUE_STR`  and applying some optimization
+- Add `LV_MEMCPY_MEMSET_STD` to use standard `memcpy` and `memset`
+
+
+### Bugfixes
+- Do not print warning for missing glyph if its height OR width is zero.
+- Prevent duplicated sending of `LV_EVENT_INSERT` from text area
+- Tidy outer edges of cpicker widget.
+- Remove duplicated lines from `lv_tabview_add_tab`
+- btnmatrix: hadle combined states of buttons (e.g. chacked + disabled)
+- textarea: fix typo in lv_textarea_set_sscrollbar_mode
+- gauge: fix image needle drawing
+- fix using freed memory in _lv_style_list_remove_style
+
+
+## v7.2.0 (21.07.2020)
+
+### New features
+- Add screen transitions with `lv_scr_load_anim()`
+- Add display background color, wallpaper and opacity. Shown when the screen is transparent. Can be used with `lv_disp_set_bg_opa/color/image()`.
+- Add `LV_CALENDAR_WEEK_STARTS_MONDAY`
+- Add `lv_chart_set_x_start_point()` function - Set the index of the x-axis start point in the data array
+- Add `lv_chart_set_ext_array()` function - Set an external array of data points to use for the chart
+- Add `lv_chart_set_point_id()` function - Set an individual point value in the chart series directly based on index
+- Add `lv_chart_get_x_start_point()` function - Get the current index of the x-axis start point in the data array
+- Add `lv_chart_get_point_id()` function - Get an individual point value in the chart series directly based on index
+- Add `ext_buf_assigned` bit field to `lv_chart_series_t` structure - it's true if external buffer is assigned to series
+- Add `lv_chart_set_series_axis()` to assign series to primary or secondary axis
+- Add `lv_chart_set_y_range()` to allow setting range of secondary y axis (based on `lv_chart_set_range` but extended with an axis parameter)
+- Allow setting different font for the selected text in `lv_roller`
+- Add `theme->apply_cb` to replace `theme->apply_xcb` to make it compatible with the MicroPython binding
+- Add `lv_theme_set_base()` to allow easy extension of built-in (or any) themes
+- Add `lv_obj_align_x()` and `lv_obj_align_y()` functions
+- Add `lv_obj_align_origo_x()` and `lv_obj_align_origo_y()` functions
+
+### Bugfixes
+- `tileview` fix navigation when not screen sized
+- Use 14px font by default to for better compatibility with smaller displays 
+- `linemeter` fix conversation of current value to "level"
+- Fix drawing on right border
+- Set the cursor image non clickable by default
+- Improve mono theme when used with keyboard or encoder
+
+## v7.1.0 (07.07.2020)
 
 ### New features
 - Add `focus_parent` attribute to `lv_obj`
@@ -9,12 +73,23 @@
 - Add lv_btnmatrix_set/get_align capability
 - DMA2D: Remove dependency on ST CubeMX HAL
 - Added `max_used` propriety to `lv_mem_monitor_t` struct
+- In `lv_init` test if the the strings are UTF-8 encoded.
+- Add `user_data` to themes
+- Add LV_BIG_ENDIAN_SYSTEM flag to lv_conf.h in order to fix displaying images on big endian systems.
+- Add inline function lv_checkbox_get_state(const lv_obj_t * cb) to extend the checkbox functionality.
+- Add inline function lv_checkbox_set_state(const lv_obj_t * cb, lv_btn_state_t state ) to extend the checkbox functionality.
 
 ### Bugfixes
-- None
+- `lv_img` fix invalidation area when angle or zoom changes
+- Update the style handling to support Big endian MCUs
+- Change some methods to support big endian hardware.
+- remove use of c++ keyword 'new' in parameter of function lv_theme_set_base().
+- Add LV_BIG_ENDIAN_SYSTEM flag to lv_conf.h in order to fix displaying images on big endian systems.
+- Fix inserting chars in text area in big endian hardware.
 
 ## v7.0.2 (16.06.2020)
 
+### Bugfixes
 - `lv_textarea` fix wrong cursor position when clicked after the last character
 - Change all text related indices from 16-bit to 32-bit integers throughout whole library. #1545
 - Fix gestures
@@ -35,6 +110,7 @@
 - `tabview` by default allow auto expanding the page only to right and bottom (#1573)
 - fix crash when drawing gradient to the same color
 - chart: fix memory leak
+- `img`: improve hit test for transformed images
 
 ## v7.0.1 (01.06.2020)
 

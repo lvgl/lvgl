@@ -57,7 +57,11 @@ static uint8_t is_leap_year(uint32_t year);
  **********************/
 static lv_signal_cb_t ancestor_signal;
 static lv_design_cb_t ancestor_design;
+#if LV_CALENDAR_WEEK_STARTS_MONDAY != 0
+static const char * day_name[7]    = {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"};
+#else
 static const char * day_name[7]    = {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"};
+#endif
 static const char * month_name[12] = {"January", "February", "March",     "April",   "May",      "June",
                                       "July",    "August",   "September", "October", "November", "December"
                                      };
@@ -515,6 +519,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         lv_obj_invalidate(calendar);
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         uint8_t c               = *((uint8_t *)param);
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
@@ -537,6 +542,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
             }
             lv_obj_invalidate(calendar);
         }
+#endif
     }
 
     return res;
@@ -1057,14 +1063,18 @@ static uint8_t is_leap_year(uint32_t year)
  * @param year a year
  * @param month a  month
  * @param day a day
- * @return [0..6] which means [Sun..Sat]
+ * @return [0..6] which means [Sun..Sat] or [Mon..Sun] depending on LV_CALENDAR_WEEK_STARTS_MONDAY
  */
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day)
 {
     uint32_t a = month < 3 ? 1 : 0;
     uint32_t b = year - a;
 
+#if LV_CALENDAR_WEEK_STARTS_MONDAY
+    uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400) - 1) % 7;
+#else
     uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400)) % 7;
+#endif
 
     return day_of_week;
 }
