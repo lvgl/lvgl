@@ -578,7 +578,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         int32_t angle_final = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
         angle_final += ext->angle;
 
-        if(angle_final == 0) return LV_DESIGN_RES_NOT_COVER;
+        if(angle_final != 0) return LV_DESIGN_RES_NOT_COVER;
 
         int32_t zoom_final = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
         zoom_final = (zoom_final * ext->zoom) >> 8;
