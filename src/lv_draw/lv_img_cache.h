@@ -46,7 +46,7 @@ typedef struct {
  * The image will be left open meaning if the image decoder open callback allocated memory then it will remain.
  * The image is closed if a new image is opened and the new image takes its place in the cache.
  * @param src source of the image. Path to file or pointer to an `lv_img_dsc_t` variable
- * @param style style of the image
+ * @param color color of the image
  * @return pointer to the cache entry or NULL if can open the image
  */
 lv_img_cache_entry_t * _lv_img_cache_open(const void * src, lv_color_t color);
