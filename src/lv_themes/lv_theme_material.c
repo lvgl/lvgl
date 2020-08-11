@@ -86,6 +86,7 @@ typedef struct {
 #if LV_USE_ARC
     lv_style_t arc_indic;
     lv_style_t arc_bg;
+    lv_style_t arc_knob;
 #endif
 
 #if LV_USE_BAR
@@ -146,10 +147,6 @@ typedef struct {
 
 #if LV_USE_ROLLER
     lv_style_t roller_bg, roller_sel;
-#endif
-
-#if LV_USE_ROTARY
-    lv_style_t rotary_bg, rotary_indic, rotary_knob;
 #endif
 
 #if LV_USE_SLIDER
@@ -509,6 +506,14 @@ static void arc_init(void)
     lv_style_set_line_color(&styles->arc_bg, LV_STATE_DEFAULT, COLOR_BG_SEC);
     lv_style_set_line_width(&styles->arc_bg, LV_STATE_DEFAULT, LV_DPX(25));
     lv_style_set_line_rounded(&styles->arc_bg, LV_STATE_DEFAULT, true);
+
+    style_init_reset(&styles->arc_knob);
+    lv_style_set_radius(&styles->arc_knob, LV_STATE_DEFAULT,   LV_RADIUS_CIRCLE);
+    lv_style_set_pad_top(&styles->arc_knob, LV_STATE_DEFAULT,  LV_DPX(10));
+    lv_style_set_pad_bottom(&styles->arc_knob, LV_STATE_DEFAULT,  LV_DPX(10));
+    lv_style_set_pad_left(&styles->arc_knob, LV_STATE_DEFAULT,    LV_DPX(10));
+    lv_style_set_pad_right(&styles->arc_knob, LV_STATE_DEFAULT,   LV_DPX(10));
+
 #endif
 }
 
@@ -795,41 +800,6 @@ static void roller_init(void)
 #endif
 }
 
-static void rotary_init(void)
-{
-#if LV_USE_ROTARY != 0
-    style_init_reset(&styles->rotary_bg);
-    lv_style_set_clip_corner(&styles->rotary_bg, LV_STATE_DEFAULT, true);
-    lv_style_set_pad_left(&styles->rotary_bg, LV_STATE_DEFAULT, LV_DPX(6));
-    lv_style_set_pad_right(&styles->rotary_bg, LV_STATE_DEFAULT, LV_DPX(6));
-    lv_style_set_pad_top(&styles->rotary_bg, LV_STATE_DEFAULT, LV_DPX(6));
-    lv_style_set_pad_bottom(&styles->rotary_bg, LV_STATE_DEFAULT, LV_DPX(6));
-    lv_style_set_pad_inner(&styles->rotary_bg, LV_STATE_DEFAULT, LV_DPX(6));
-    lv_style_set_border_width(&styles->rotary_bg, LV_STATE_DEFAULT, LV_DPX(2));
-    lv_style_set_line_color(&styles->rotary_bg, LV_STATE_DEFAULT, COLOR_BG_SEC);
-    lv_style_set_line_width(&styles->rotary_bg, LV_STATE_DEFAULT, LV_DPX(8));
-    lv_style_set_line_rounded(&styles->rotary_bg, LV_STATE_DEFAULT, true);
-
-    style_init_reset(&styles->rotary_indic);
-    lv_style_set_line_color(&styles->rotary_indic, LV_STATE_DEFAULT, theme.color_primary);
-    lv_style_set_line_width(&styles->rotary_indic, LV_STATE_DEFAULT, LV_DPX(8));
-    lv_style_set_line_rounded(&styles->rotary_indic, LV_STATE_DEFAULT, true);
-
-    style_init_reset(&styles->rotary_knob);
-    lv_style_set_bg_color(&styles->rotary_knob, LV_STATE_CHECKED, COLOR_BTN);
-    lv_style_set_text_color(&styles->rotary_knob, LV_STATE_CHECKED,  IS_LIGHT ? lv_color_hex(0x31404f) : lv_color_hex(0xffffff));
-    lv_style_set_value_color(&styles->rotary_knob, LV_STATE_CHECKED,  IS_LIGHT ? lv_color_hex(0x31404f) : lv_color_hex(0xffffff));
-    lv_style_set_bg_opa(&styles->rotary_knob, LV_STATE_DEFAULT, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->rotary_knob, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_radius(&styles->rotary_knob, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-    lv_style_set_pad_top(&styles->rotary_knob, LV_STATE_DEFAULT,    - LV_DPX(4));
-    lv_style_set_pad_bottom(&styles->rotary_knob, LV_STATE_DEFAULT, - LV_DPX(4));
-    lv_style_set_pad_left(&styles->rotary_knob, LV_STATE_DEFAULT,   - LV_DPX(4));
-    lv_style_set_pad_right(&styles->rotary_knob, LV_STATE_DEFAULT,  - LV_DPX(4));
-    lv_style_set_pad_inner(&styles->rotary_knob, LV_STATE_DEFAULT,  LV_DPX(6));
-#endif
-}
-
 static void tabview_init(void)
 {
 #if LV_USE_TABVIEW != 0
@@ -969,7 +939,6 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
     list_init();
     ddlist_init();
     roller_init();
-    rotary_init();
     tabview_init();
     tileview_init();
     table_init();
@@ -1099,6 +1068,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
             list = lv_obj_get_style_list(obj, LV_ARC_PART_INDIC);
             _lv_style_list_add_style(list, &styles->arc_indic);
+
+            list = lv_obj_get_style_list(obj, LV_ARC_PART_KNOB);
+            _lv_style_list_add_style(list, &styles->bg);
+            _lv_style_list_add_style(list, &styles->bg_click);
+            _lv_style_list_add_style(list, &styles->arc_knob);
             break;
 #endif
 
@@ -1222,27 +1196,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
             list = lv_obj_get_style_list(obj, LV_ROLLER_PART_SELECTED);
             _lv_style_list_add_style(list, &styles->roller_sel);
-            break;
-#endif
-
-#if LV_USE_ROTARY
-        case LV_THEME_ROTARY:
-            lv_obj_clean_style_list(obj, LV_ROTARY_PART_BG);
-            list = lv_obj_get_style_list(obj, LV_ROTARY_PART_BG);
-            _lv_style_list_add_style(list, &styles->bg);
-            _lv_style_list_add_style(list, &styles->arc_bg);
-            _lv_style_list_add_style(list, &styles->rotary_bg);
-
-            lv_obj_clean_style_list(obj, LV_ROTARY_PART_INDIC);
-            list = lv_obj_get_style_list(obj, LV_ROTARY_PART_INDIC);
-            _lv_style_list_add_style(list, &styles->arc_indic);
-            _lv_style_list_add_style(list, &styles->rotary_indic);
-
-            lv_obj_clean_style_list(obj, LV_ROTARY_PART_KNOB);
-            list = lv_obj_get_style_list(obj, LV_ROTARY_PART_KNOB);
-            _lv_style_list_add_style(list, &styles->btn);
-            _lv_style_list_add_style(list, &styles->rotary_knob);
-
             break;
 #endif
 
