@@ -1,4 +1,5 @@
 CSRCS += lv_arc.c
+CSRCS += lv_anim_img.c
 CSRCS += lv_bar.c
 CSRCS += lv_checkbox.c
 CSRCS += lv_cpicker.c

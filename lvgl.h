@@ -44,6 +44,7 @@ extern "C" {
 #include "src/lv_font/lv_font_fmt_txt.h"
 #include "src/lv_misc/lv_printf.h"
 
+#include "src/lv_widgets/lv_anim_img.h"
 #include "src/lv_widgets/lv_btn.h"
 #include "src/lv_widgets/lv_imgbtn.h"
 #include "src/lv_widgets/lv_img.h"

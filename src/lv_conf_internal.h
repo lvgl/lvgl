@@ -1463,6 +1463,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
+/*Arc (dependencies: -)*/
+#ifndef LV_USE_ANIM_IMG
+#  ifdef CONFIG_LV_USE_ANIM_IMG
+#    define LV_USE_ANIM_IMG CONFIG_LV_USE_ANIM_IMG
+#  else
+#    define  LV_USE_ANIM_IMG      1
+#  endif
+#endif
+
 /*Bar (dependencies: -)*/
 #ifndef LV_USE_BAR
 #  ifdef CONFIG_LV_USE_BAR
