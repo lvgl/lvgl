@@ -23,6 +23,7 @@ int main(void)
 }
 
 
+#if LV_USE_FILESYSTEM
 static lv_fs_res_t open_cb(struct _lv_fs_drv_t * drv, void * file_p, const char * path, lv_fs_mode_t mode)
 {
     (void) drv;
@@ -77,6 +78,7 @@ static bool ready_cb(struct _lv_fs_drv_t * drv)
     (void) drv;
     return true;
 }
+#endif
 
 static void hal_init(void)
 {
@@ -91,6 +93,7 @@ static void hal_init(void)
     disp_drv.flush_cb = dummy_flush_cb;
     lv_disp_drv_register(&disp_drv);
 
+#if LV_USE_FILESYSTEM
     lv_fs_drv_t drv;
     lv_fs_drv_init(&drv);                     /*Basic initialization*/
 
@@ -103,9 +106,9 @@ static void hal_init(void)
     drv.seek_cb = seek_cb;                 /*Callback to seek in a file (Move cursor) */
     drv.tell_cb = tell_cb;                 /*Callback to tell the cursor position  */
 
-    lv_fs_drv_register(&drv);                 /*Finally register the drive*/    
+    lv_fs_drv_register(&drv);                 /*Finally register the drive*/
+#endif
 }
-
 
 static void dummy_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
