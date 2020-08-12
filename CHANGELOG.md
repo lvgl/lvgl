@@ -26,6 +26,7 @@
 - Add `lv_tabview_set_tab_name()` function - used to change a tab's name
 - Add `LV_THEME_MATERIAL_FLAG_NO_TRANSITION` and `LV_THEME_MATERIAL_FLAG_NO_FOCUS` flags
 - Reduce code size by adding: `LV_USE_FONT_COMPRESSED` and `LV_FONT_USE_SUBPX` and applying some optimization
+- Add `LV_MEMCPY_MEMSET_STD` to use standard `memcpy` and `memset`
 
 ### Bugfixes
 - Do not print warning for missing glyph if its height OR width is zero.
