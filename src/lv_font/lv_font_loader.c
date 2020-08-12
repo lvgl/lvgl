@@ -495,10 +495,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
     font->line_height = font_header.ascent - font_header.descent;
     font->get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt;
     font->get_glyph_bitmap = lv_font_get_bitmap_fmt_txt;
-
-#if !(LVGL_VERSION_MAJOR == 6 && LVGL_VERSION_MINOR == 0)
     font->subpx = LV_FONT_SUBPX_NONE;
-#endif
 
     font_dsc->bpp = font_header.bits_per_pixel;
     font_dsc->kern_scale = font_header.kerning_scale;
