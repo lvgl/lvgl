@@ -40,6 +40,7 @@ void lv_test_assert_str_eq(const char * str1, const char * str2, const char * s)
 void lv_test_assert_ptr_eq(const void * p_ref, const void * p_act, const char * s);
 void lv_test_assert_color_eq(lv_color_t c_ref, lv_color_t c_act, const char * s);
 void lv_test_assert_img_eq(const char * ref_img_fn, const char * s);
+void lv_test_assert_array_eq(const uint8_t *p_ref, const uint8_t *p_act, int32_t size, const char * s);
 
 /**********************
  *      MACROS

@@ -143,6 +143,17 @@ void lv_test_assert_str_eq(const char * s_ref, const char * s_act, const char * 
     }
 }
 
+
+void lv_test_assert_array_eq(const uint8_t *p_ref, const uint8_t *p_act, int32_t size, const char * s)
+{
+    if(memcmp(p_ref, p_act, size) != 0) {
+        lv_test_error("   FAIL: %s. (Expected: all %d bytes should be equal)", s, size);
+    } else {
+        lv_test_print("   PASS: %s. (Expected: all %d bytes should be equal)", s, size);
+    }
+}
+
+
 void lv_test_assert_ptr_eq(const void * p_ref, const void * p_act, const char * s)
 {
     if(p_ref != p_act) {
