@@ -114,7 +114,7 @@ lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header)
  *  1) File name: E.g. "S:folder/img1.png" (The drivers needs to registered via `lv_fs_add_drv()`)
  *  2) Variable: Pointer to an `lv_img_dsc_t` variable
  *  3) Symbol: E.g. `LV_SYMBOL_OK`
- * @param color the color of the image
+ * @param color The color of the image with `LV_IMG_CF_ALPHA_...`
  * @return LV_RES_OK: opened the image. `dsc->img_data` and `dsc->header` are set.
  *         LV_RES_INV: none of the registered image decoders were able to open the image.
  */
