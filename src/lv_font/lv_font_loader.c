@@ -102,6 +102,11 @@ lv_font_t * lv_font_load(const char * font_name)
 
     if(!success) {
         LV_LOG_WARN("Error loading font file: %s\n", font_name);
+        /* 
+         * When `lvgl_load_font` fails it can leak some pointers.
+         * All non-null pointers can be assumed as allocated and
+         * `lv_font_free` should free them correctly.
+         */
         lv_font_free(font);
         font = NULL;
     }
@@ -471,6 +476,18 @@ static int32_t load_glyph(lv_fs_file_t * fp, lv_font_fmt_txt_dsc_t * font_dsc,
     return glyph_length;
 }
 
+/*
+ * Loads a `lv_font_t` from a binary file, given a `lv_fs_file_t`.
+ *
+ * Memory allocations on `lvgl_load_font` should be immediately zeroed and
+ * the pointer should be set on the `lv_font_t` data before any possible return.
+ *
+ * When something fails, it returns `false` and the memory on the `lv_font_t`
+ * still needs to be freed using `lv_font_free`.
+ *
+ * `lv_font_free` will assume that all non-null pointers are allocated and
+ * should be freed.
+ */
 static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
 {
     lv_font_fmt_txt_dsc_t * font_dsc = (lv_font_fmt_txt_dsc_t *)
