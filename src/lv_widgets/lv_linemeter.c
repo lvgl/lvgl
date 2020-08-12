@@ -392,14 +392,14 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
     lv_coord_t x_ofs  = lmeter->coords.x1 + r_out + left;
     lv_coord_t y_ofs  = lmeter->coords.y1 + r_out + top;
     int16_t angle_ofs = ext->angle_ofs + 90 + (360 - ext->scale_angle) / 2;
-    int16_t level =
-        (int32_t)((int32_t)(ext->cur_value - ext->min_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value);
+    int16_t level = ext->mirrored ?
+            (int32_t)((int32_t)(ext->max_value - ext->cur_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value) :
+            (int32_t)((int32_t)(ext->cur_value - ext->min_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value);
     uint8_t i;
 
     lv_color_t main_color = lv_obj_get_style_line_color(lmeter, part);
     lv_color_t grad_color = lv_obj_get_style_scale_grad_color(lmeter, part);
     lv_color_t end_color = lv_obj_get_style_scale_end_color(lmeter, part);
-
 
     lv_draw_line_dsc_t line_dsc;
     lv_draw_line_dsc_init(&line_dsc);
@@ -520,11 +520,10 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         p1.y = y_out_extra;
 
         /* Set the color of the lines */
-        if(i > level) {
+        if((!ext->mirrored && i >= level) || (ext->mirrored && i <= level)) {
             line_dsc.color = end_color;
             line_dsc.width = end_line_width;
-        }
-        else {
+        } else {
             line_dsc.color = lv_color_mix(grad_color, main_color, (255 * i) / ext->line_cnt);
         }
 

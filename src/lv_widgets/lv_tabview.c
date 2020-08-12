@@ -440,28 +440,27 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
  * @param id index of the tab the name should be set
  * @param name new tab name
  */
-void lv_tabview_set_tab_name(lv_obj_t *tabview, uint16_t id, char *name)
+void lv_tabview_set_tab_name(lv_obj_t * tabview, uint16_t id, char * name)
 {
-  LV_ASSERT_OBJ(tabview, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(tabview, LV_OBJX_NAME);
 
-  /* get tabview's ext pointer which contains the tab name pointer list */
-  lv_tabview_ext_t *ext = lv_obj_get_ext_attr(tabview);
+    /* get tabview's ext pointer which contains the tab name pointer list */
+    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
 
-  /* check for valid tab index */
-  if (ext->tab_cnt > id)
-  {
-    /* reallocate memory for new tab name (use reallocate due to mostly the size didn't change much) */
-    char *str = lv_mem_realloc((void *)ext->tab_name_ptr[id], strlen(name) + 1);
-    LV_ASSERT_MEM(str);
+    /* check for valid tab index */
+    if(ext->tab_cnt > id) {
+        /* reallocate memory for new tab name (use reallocate due to mostly the size didn't change much) */
+        char * str = lv_mem_realloc((void *)ext->tab_name_ptr[id], strlen(name) + 1);
+        LV_ASSERT_MEM(str);
 
-    /* store new tab name at allocated memory */
-    strcpy(str, name);
-    /* update pointer  */
-    ext->tab_name_ptr[id] = str;
+        /* store new tab name at allocated memory */
+        strcpy(str, name);
+        /* update pointer  */
+        ext->tab_name_ptr[id] = str;
 
-    /* force redrawing of the tab headers */
-    lv_obj_invalidate(ext->btns);
-  }
+        /* force redrawing of the tab headers */
+        lv_obj_invalidate(ext->btns);
+    }
 }
 
 /**

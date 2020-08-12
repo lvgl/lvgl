@@ -1,8 +1,4 @@
 <h1 align="center"> LVGL - Light and Versatile Graphics Library</h1>
-<p align="center">
-<a href="https://github.com/lvgl/lvgl/blob/master/LICENCE.txt"><img src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
-<a href="https://github.com/lvgl/lvgl/releases/tag/v7.0.0"><img src="https://img.shields.io/badge/version-7.1.0-blue.svg"></a>
-</p>
 
 <p align="center">
 <img src="https://lvgl.io/assets/images/img_1.png">

@@ -95,7 +95,7 @@ lv_theme_t * lv_theme_empty_init(lv_color_t color_primary, lv_color_t color_seco
 }
 
 
-void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
+static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 {
     LV_UNUSED(th);
     if(name == LV_THEME_SCR) {

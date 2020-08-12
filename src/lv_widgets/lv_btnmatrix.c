@@ -706,7 +706,8 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
             if(btn_state == LV_STATE_DEFAULT) {
                 draw_rect_dsc_act = &draw_rect_rel_dsc;
                 draw_label_dsc_act = &draw_label_rel_dsc;
-            } else if(btn_state == LV_STATE_CHECKED) {
+            }
+            else if(btn_state == LV_STATE_CHECKED) {
                 if(!chk_inited) {
                     btnm->state = LV_STATE_CHECKED;
                     lv_draw_rect_dsc_init(&draw_rect_chk_dsc);
@@ -719,7 +720,8 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
                 }
                 draw_rect_dsc_act = &draw_rect_chk_dsc;
                 draw_label_dsc_act = &draw_label_chk_dsc;
-            } else if(btn_state == LV_STATE_CHECKED) {
+            }
+            else if(btn_state == LV_STATE_CHECKED) {
                 if(!disabled_inited) {
                     btnm->state = LV_STATE_DISABLED;
                     lv_draw_rect_dsc_init(&draw_rect_ina_dsc);

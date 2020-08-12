@@ -578,7 +578,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         int32_t angle_final = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
         angle_final += ext->angle;
 
-        if(angle_final == 0) return LV_DESIGN_RES_NOT_COVER;
+        if(angle_final != 0) return LV_DESIGN_RES_NOT_COVER;
 
         int32_t zoom_final = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
         zoom_final = (zoom_final * ext->zoom) >> 8;
@@ -620,8 +620,6 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         int32_t zoom_final = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
         zoom_final = (zoom_final * ext->zoom) >> 8;
 
-        if(zoom_final == 0) return LV_DESIGN_RES_OK;
-
         int32_t angle_final = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
         angle_final += ext->angle;
 
@@ -638,6 +636,8 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         bg_coords.y2 += lv_obj_get_style_pad_bottom(img, LV_IMG_PART_MAIN);
 
         lv_draw_rect(&bg_coords, clip_area, &bg_dsc);
+
+        if(zoom_final == 0) return LV_DESIGN_RES_OK;
 
         if(lv_obj_get_style_clip_corner(img, LV_OBJ_PART_MAIN)) {
             lv_draw_mask_radius_param_t * mp = _lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
@@ -705,15 +705,33 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             _lv_mem_buf_release(param);
         }
 
-        lv_draw_rect_dsc_t draw_dsc;
-        lv_draw_rect_dsc_init(&draw_dsc);
-
         /*If the border is drawn later disable loading other properties*/
         if(lv_obj_get_style_border_post(img, LV_OBJ_PART_MAIN)) {
+            lv_draw_rect_dsc_t draw_dsc;
+            lv_draw_rect_dsc_init(&draw_dsc);
             draw_dsc.bg_opa = LV_OPA_TRANSP;
             draw_dsc.pattern_opa = LV_OPA_TRANSP;
             draw_dsc.shadow_opa = LV_OPA_TRANSP;
             lv_obj_init_draw_rect_dsc(img, LV_OBJ_PART_MAIN, &draw_dsc);
+
+            int32_t zoom_final = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
+            zoom_final = (zoom_final * ext->zoom) >> 8;
+
+            int32_t angle_final = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
+            angle_final += ext->angle;
+
+            lv_area_t bg_coords;
+            _lv_img_buf_get_transformed_area(&bg_coords, lv_area_get_width(&img->coords), lv_area_get_height(&img->coords),
+                                             angle_final, zoom_final, &ext->pivot);
+            bg_coords.x1 += img->coords.x1;
+            bg_coords.y1 += img->coords.y1;
+            bg_coords.x2 += img->coords.x1;
+            bg_coords.y2 += img->coords.y1;
+            bg_coords.x1 -= lv_obj_get_style_pad_left(img, LV_IMG_PART_MAIN);
+            bg_coords.x2 += lv_obj_get_style_pad_right(img, LV_IMG_PART_MAIN);
+            bg_coords.y1 -= lv_obj_get_style_pad_top(img, LV_IMG_PART_MAIN);
+            bg_coords.y2 += lv_obj_get_style_pad_bottom(img, LV_IMG_PART_MAIN);
+
             lv_draw_rect(&img->coords, clip_area, &draw_dsc);
         }
     }

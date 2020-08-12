@@ -147,6 +147,12 @@
 #endif
 #endif     /*LV_MEM_CUSTOM*/
 
+/* Use the standard memcpy and memset instead of LVGL's own functions.
+ * The standard functions might or might not be faster depending on their implementation. */
+#ifndef LV_MEMCPY_MEMSET_STD
+#define LV_MEMCPY_MEMSET_STD    0
+#endif
+
 /* Garbage Collector settings
  * Used if lvgl is binded to higher level language and the memory is managed by that language */
 #ifndef LV_ENABLE_GC
@@ -223,7 +229,7 @@
 
 #endif
 
-/* 1: Enable shadow drawing*/
+/* 1: Enable shadow drawing on rectangles*/
 #ifndef LV_USE_SHADOW
 #define LV_USE_SHADOW           1
 #endif
@@ -235,6 +241,21 @@
 #ifndef LV_SHADOW_CACHE_SIZE
 #define LV_SHADOW_CACHE_SIZE    0
 #endif
+#endif
+
+/*1: enable outline drawing on rectangles*/
+#ifndef LV_USE_OUTLINE
+#define LV_USE_OUTLINE  1
+#endif
+
+/*1: enable pattern drawing on rectangles*/
+#ifndef LV_USE_PATTERN
+#define LV_USE_PATTERN  1
+#endif
+
+/*1: enable value string drawing on rectangles*/
+#ifndef LV_USE_VALUE_STR
+#define LV_USE_VALUE_STR    1
 #endif
 
 /* 1: Use other blend modes than normal (`LV_BLEND_MODE_...`)*/
@@ -633,7 +654,10 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 /* A fast and impressive theme.
  * Flags:
  * LV_THEME_MATERIAL_FLAG_LIGHT: light theme
- * LV_THEME_MATERIAL_FLAG_DARK: dark theme*/
+ * LV_THEME_MATERIAL_FLAG_DARK: dark theme
+ * LV_THEME_MATERIAL_FLAG_NO_TRANSITION: disable transitions (state change animations)
+ * LV_THEME_MATERIAL_FLAG_NO_FOCUS: disable indication of focused state)
+ * */
 #ifndef LV_USE_THEME_MATERIAL
  #define LV_USE_THEME_MATERIAL    1
 #endif

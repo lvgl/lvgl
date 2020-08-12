@@ -492,7 +492,7 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask)
 
     /* Mask outer ring of widget to tidy up ragged edges of lines while drawing outer ring */
     lv_area_t mask_area_out;
-    lv_area_copy( &mask_area_out, &cpicker->coords);
+    lv_area_copy(&mask_area_out, &cpicker->coords);
     mask_area_out.x1 += OUTER_MASK_WIDTH;
     mask_area_out.x2 -= OUTER_MASK_WIDTH;
     mask_area_out.y1 += OUTER_MASK_WIDTH;

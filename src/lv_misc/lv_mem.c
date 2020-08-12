@@ -586,6 +586,7 @@ void _lv_mem_buf_free_all(void)
     }
 }
 
+#if LV_MEMCPY_MEMSET_STD == 0
 /**
  * Same as `memcpy` but optimized for 4 byte operation.
  * @param dst pointer to the destination buffer
@@ -652,7 +653,6 @@ LV_ATTRIBUTE_FAST_MEM void * _lv_memcpy(void * dst, const void * src, size_t len
 
 /**
  * Same as `memset` but optimized for 4 byte operation.
- * `dst` should be word aligned else normal `memcpy` will be used
  * @param dst pointer to the destination buffer
  * @param v value to set [0..255]
  * @param len number of byte to set
@@ -707,7 +707,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset(void * dst, uint8_t v, size_t len)
 
 /**
  * Same as `memset(dst, 0x00, len)` but optimized for 4 byte operation.
- * `dst` should be word aligned else normal `memcpy` will be used
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
@@ -757,7 +756,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_00(void * dst, size_t len)
 
 /**
  * Same as `memset(dst, 0xFF, len)` but optimized for 4 byte operation.
- * `dst` should be word aligned else normal `memcpy` will be used
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
@@ -805,6 +803,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_ff(void * dst, size_t len)
     }
 }
 
+#endif /*LV_MEMCPY_MEMSET_STD*/
 
 /**********************
  *   STATIC FUNCTIONS
