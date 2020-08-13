@@ -6,9 +6,9 @@
 - arc: add set value by click feature
 - arc: add `LV_ARC_PART_KNOB` similarly to slider
 - send gestures even is the the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function. 
-
 - Add `lv_font_load()` function - Loads a `lv_font_t` object from a binary font file
 - Add `lv_font_free()` function - Frees the memory allocated by the `lv_font_load()` function
+- Add style caching to reduce acces time of properties with default value
 
 ## v7.3.1 (planned on 18.08.2020)
 
