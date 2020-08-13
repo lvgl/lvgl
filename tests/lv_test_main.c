@@ -23,6 +23,63 @@ int main(void)
 }
 
 
+#if LV_USE_FILESYSTEM
+static lv_fs_res_t open_cb(struct _lv_fs_drv_t * drv, void * file_p, const char * path, lv_fs_mode_t mode)
+{
+    (void) drv;
+    (void) mode;
+
+    FILE * fp = fopen(path, "rb"); // only reading is supported
+
+    *((FILE **)file_p) = fp;
+    return NULL == fp ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
+}
+
+static lv_fs_res_t close_cb(struct _lv_fs_drv_t * drv, void * file_p)
+{
+    (void) drv;
+
+    FILE * fp = *((FILE **) file_p);
+    fclose(fp);
+    return LV_FS_RES_OK;
+}
+
+static lv_fs_res_t read_cb(struct _lv_fs_drv_t * drv, void * file_p, void * buf, uint32_t btr, uint32_t * br)
+{
+    (void) drv;
+
+    FILE * fp = *((FILE **) file_p);
+    *br = fread(buf, 1, btr, fp);
+    return (*br <= 0) ? LV_FS_RES_UNKNOWN : LV_FS_RES_OK;
+}
+
+static lv_fs_res_t seek_cb(struct _lv_fs_drv_t * drv, void * file_p, uint32_t pos)
+{
+    (void) drv;
+
+    FILE * fp = *((FILE **) file_p);
+    fseek (fp, pos, SEEK_SET);
+
+    return LV_FS_RES_OK;
+}
+
+static lv_fs_res_t tell_cb(struct _lv_fs_drv_t * drv, void * file_p, uint32_t * pos_p)
+{
+    (void) drv;
+
+    FILE * fp = *((FILE **) file_p);
+    *pos_p = ftell(fp);
+
+    return LV_FS_RES_OK;
+}
+
+static bool ready_cb(struct _lv_fs_drv_t * drv)
+{
+    (void) drv;
+    return true;
+}
+#endif
+
 static void hal_init(void)
 {
     static lv_disp_buf_t disp_buf;
@@ -35,8 +92,23 @@ static void hal_init(void)
     disp_drv.buffer = &disp_buf;
     disp_drv.flush_cb = dummy_flush_cb;
     lv_disp_drv_register(&disp_drv);
-}
 
+#if LV_USE_FILESYSTEM
+    lv_fs_drv_t drv;
+    lv_fs_drv_init(&drv);                     /*Basic initialization*/
+
+    drv.letter = 'f';                         /*An uppercase letter to identify the drive */
+    drv.file_size = sizeof(FILE *);   /*Size required to store a file object*/
+    drv.ready_cb = ready_cb;               /*Callback to tell if the drive is ready to use */
+    drv.open_cb = open_cb;                 /*Callback to open a file */
+    drv.close_cb = close_cb;               /*Callback to close a file */
+    drv.read_cb = read_cb;                 /*Callback to read a file */
+    drv.seek_cb = seek_cb;                 /*Callback to seek in a file (Move cursor) */
+    drv.tell_cb = tell_cb;                 /*Callback to tell the cursor position  */
+
+    lv_fs_drv_register(&drv);                 /*Finally register the drive*/
+#endif
+}
 
 static void dummy_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
