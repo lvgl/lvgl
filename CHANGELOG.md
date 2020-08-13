@@ -1,7 +1,11 @@
 # Changelog
 
 ## v7.4.0 (planned on 01.09.2020)
+
+### New features
 - arc: add set value by click feature
+- arc: add `LV_ARC_PART_KNOB` similarly to slider
+- send gestures even is the the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function. 
 
 ## v7.3.1 (planned on 18.08.2020)
 
