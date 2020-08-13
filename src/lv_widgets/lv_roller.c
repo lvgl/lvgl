@@ -135,7 +135,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
 
         lv_style_list_copy(&ext->style_sel, &copy_ext->style_sel);
-        lv_obj_refresh_style(roller, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(roller, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("roller created");

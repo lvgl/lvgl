@@ -100,7 +100,7 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
         ext->tiled = copy_ext->tiled;
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(imgbtn, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(imgbtn, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("image button created");

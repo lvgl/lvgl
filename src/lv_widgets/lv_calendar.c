@@ -705,6 +705,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     strcpy(&txt_buf[5], get_month_name(calendar, ext->showed_date.month));
 
     calendar->state = LV_STATE_DEFAULT;
+    _lv_obj_disable_style_caching(calendar, true);
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
@@ -738,6 +739,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     lv_draw_label(&header_area, mask, &label_dsc, LV_SYMBOL_RIGHT, NULL);
 
     calendar->state = state_ori;    /*Restore the state*/
+    _lv_obj_disable_style_caching(calendar, false);
 }
 
 /**
@@ -810,6 +812,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
     /*The state changes without re-caching the styles, disable the use of cache*/
     lv_state_t state_ori = calendar->state;
     calendar->state = LV_STATE_DEFAULT;
+    _lv_obj_disable_style_caching(calendar, true);
 
     lv_state_t month_state = LV_STATE_DISABLED;
 
@@ -856,6 +859,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
 
         if(box_area.y1 > clip_area->y2) {
             calendar->state = state_ori;
+            _lv_obj_disable_style_caching(calendar, false);
             return;
         }
 
@@ -926,6 +930,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
         }
     }
     calendar->state = state_ori;
+    _lv_obj_disable_style_caching(calendar, false);
 
 
 }

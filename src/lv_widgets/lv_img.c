@@ -121,7 +121,7 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_img_set_src(img, copy_ext->src);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(img, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(img, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("image created");
