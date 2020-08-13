@@ -31,10 +31,9 @@
 static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param);
 static lv_style_list_t * lv_arc_get_style(lv_obj_t * arc, uint8_t part);
-static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle);
+static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, lv_arc_part_t part);
 static void get_center(lv_obj_t * arc, lv_point_t * center, lv_coord_t * arc_r);
 static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area);
-static bool has_large_knob(lv_obj_t * arc);
 
 /**********************
  *  STATIC VARIABLES
@@ -166,11 +165,11 @@ void lv_arc_set_start_angle(lv_obj_t * arc, uint16_t start)
     }
     /*Only a smaller incremental move*/
     else if(ext->arc_angle_start > ext->arc_angle_end && start > ext->arc_angle_end) {
-        inv_arc_area(arc, LV_MATH_MIN(ext->arc_angle_start, start), LV_MATH_MAX(ext->arc_angle_start, start));
+        inv_arc_area(arc, LV_MATH_MIN(ext->arc_angle_start, start), LV_MATH_MAX(ext->arc_angle_start, start), LV_ARC_PART_INDIC);
     }
     /*Only a smaller incremental move*/
     else  if(ext->arc_angle_start < ext->arc_angle_end && start < ext->arc_angle_end) {
-        inv_arc_area(arc, LV_MATH_MIN(ext->arc_angle_start, start), LV_MATH_MAX(ext->arc_angle_start, start));
+        inv_arc_area(arc, LV_MATH_MIN(ext->arc_angle_start, start), LV_MATH_MAX(ext->arc_angle_start, start), LV_ARC_PART_INDIC);
     }
     /*Crossing the start angle makes the whole arc change*/
     else {
@@ -199,11 +198,11 @@ void lv_arc_set_end_angle(lv_obj_t * arc, uint16_t end)
     }
     /*Only a smaller incremental move*/
     else if(ext->arc_angle_end > ext->arc_angle_start && end > ext->arc_angle_start) {
-        inv_arc_area(arc, LV_MATH_MIN(ext->arc_angle_end, end), LV_MATH_MAX(ext->arc_angle_end, end));
+        inv_arc_area(arc, LV_MATH_MIN(ext->arc_angle_end, end), LV_MATH_MAX(ext->arc_angle_end, end), LV_ARC_PART_INDIC);
     }
     /*Only a smaller incremental move*/
     else  if(ext->arc_angle_end < ext->arc_angle_start && end < ext->arc_angle_start) {
-        inv_arc_area(arc, LV_MATH_MIN(ext->arc_angle_end, end), LV_MATH_MAX(ext->arc_angle_end, end));
+        inv_arc_area(arc, LV_MATH_MIN(ext->arc_angle_end, end), LV_MATH_MAX(ext->arc_angle_end, end), LV_ARC_PART_INDIC);
     }
     /*Crossing the end angle makes the whole arc change*/
     else {
@@ -229,12 +228,12 @@ void lv_arc_set_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
     if(start > 360) start -= 360;
     if(end > (start + 360)) end = start + 360;
 
-    inv_arc_area(arc, ext->arc_angle_start, ext->arc_angle_end);
+    inv_arc_area(arc, ext->arc_angle_start, ext->arc_angle_end, LV_ARC_PART_INDIC);
 
     ext->arc_angle_start = start;
     ext->arc_angle_end = end;
 
-    inv_arc_area(arc, ext->arc_angle_start, ext->arc_angle_end);
+    inv_arc_area(arc, ext->arc_angle_start, ext->arc_angle_end, LV_ARC_PART_INDIC);
 }
 
 /**
@@ -256,11 +255,11 @@ void lv_arc_set_bg_start_angle(lv_obj_t * arc, uint16_t start)
     }
     /*Only a smaller incremental move*/
     else if(ext->bg_angle_start > ext->bg_angle_end && start > ext->bg_angle_end) {
-        inv_arc_area(arc, LV_MATH_MIN(ext->bg_angle_start, start), LV_MATH_MAX(ext->bg_angle_start, start));
+        inv_arc_area(arc, LV_MATH_MIN(ext->bg_angle_start, start), LV_MATH_MAX(ext->bg_angle_start, start), LV_ARC_PART_BG);
     }
     /*Only a smaller incremental move*/
     else  if(ext->bg_angle_start < ext->bg_angle_end && start < ext->bg_angle_end) {
-        inv_arc_area(arc, LV_MATH_MIN(ext->bg_angle_start, start), LV_MATH_MAX(ext->bg_angle_start, start));
+        inv_arc_area(arc, LV_MATH_MIN(ext->bg_angle_start, start), LV_MATH_MAX(ext->bg_angle_start, start), LV_ARC_PART_BG);
     }
     /*Crossing the start angle makes the whole arc change*/
     else {
@@ -289,11 +288,11 @@ void lv_arc_set_bg_end_angle(lv_obj_t * arc, uint16_t end)
     }
     /*Only a smaller incremental move*/
     else if(ext->bg_angle_end > ext->bg_angle_start && end > ext->bg_angle_start) {
-        inv_arc_area(arc, LV_MATH_MIN(ext->bg_angle_end, end), LV_MATH_MAX(ext->bg_angle_end, end));
+        inv_arc_area(arc, LV_MATH_MIN(ext->bg_angle_end, end), LV_MATH_MAX(ext->bg_angle_end, end), LV_ARC_PART_BG);
     }
     /*Only a smaller incremental move*/
     else  if(ext->bg_angle_end < ext->bg_angle_start && end < ext->bg_angle_start) {
-        inv_arc_area(arc, LV_MATH_MIN(ext->bg_angle_end, end), LV_MATH_MAX(ext->bg_angle_end, end));
+        inv_arc_area(arc, LV_MATH_MIN(ext->bg_angle_end, end), LV_MATH_MAX(ext->bg_angle_end, end), LV_ARC_PART_BG);
     }
     /*Crossing the end angle makes the whole arc change*/
     else {
@@ -318,12 +317,12 @@ void lv_arc_set_bg_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
     if(start > 360) start -= 360;
     if(end > (start + 360)) end = start + 360;
 
-    inv_arc_area(arc, ext->bg_angle_start, ext->bg_angle_end);
+    inv_arc_area(arc, ext->bg_angle_start, ext->bg_angle_end, LV_ARC_PART_BG);
 
     ext->bg_angle_start = start;
     ext->bg_angle_end = end;
 
-    inv_arc_area(arc, ext->bg_angle_start, ext->bg_angle_end);
+    inv_arc_area(arc, ext->bg_angle_start, ext->bg_angle_end, LV_ARC_PART_BG);
 }
 
 /**
@@ -850,15 +849,8 @@ static lv_style_list_t * lv_arc_get_style(lv_obj_t * arc, uint8_t part)
     return style_dsc_p;
 }
 
-static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle)
+static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, lv_arc_part_t part)
 {
-    /* If the knob is large it's much harder to find which area to invalidate.
-     * For simplicity invalidate the whole arc in this case*/
-    if(has_large_knob(arc)) {
-        lv_obj_invalidate(arc);
-        return;
-    }
-
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     start_angle += ext->rotation_angle;
@@ -877,10 +869,26 @@ static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angl
     lv_coord_t rout       = (LV_MATH_MIN(lv_obj_get_width(arc) - left - right, lv_obj_get_height(arc) - top - bottom)) / 2;
     lv_coord_t x       = arc->coords.x1 + rout + left;
     lv_coord_t y       = arc->coords.y1 + rout + top;
-    lv_style_int_t w = lv_obj_get_style_line_width(arc, LV_ARC_PART_INDIC);
-    lv_style_int_t rounded = lv_obj_get_style_line_rounded(arc, LV_ARC_PART_INDIC);
+    lv_style_int_t w = lv_obj_get_style_line_width(arc, part);
+    lv_style_int_t rounded = lv_obj_get_style_line_rounded(arc, part);
     lv_coord_t rin       = rout - w;
-    lv_coord_t extra_area = rounded ? w / 2 + 2 : 0;
+    lv_coord_t extra_area = 0;
+
+    extra_area = rounded ? w / 2 + 2 : 0;
+
+    if(part == LV_ARC_PART_INDIC && lv_style_list_get_style(&ext->style_knob, 0) != NULL) {
+        lv_coord_t knob_extra_size = lv_obj_get_draw_rect_ext_pad_size(arc, LV_ARC_PART_KNOB);
+
+        lv_coord_t knob_left = lv_obj_get_style_pad_left(arc, LV_ARC_PART_KNOB);
+        lv_coord_t knob_right = lv_obj_get_style_pad_right(arc, LV_ARC_PART_KNOB);
+        lv_coord_t knob_top = lv_obj_get_style_pad_top(arc, LV_ARC_PART_KNOB);
+        lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(arc, LV_ARC_PART_KNOB);
+
+        knob_extra_size += LV_MATH_MAX4(knob_left, knob_right, knob_top, knob_bottom);
+
+        extra_area = LV_MATH_MAX(extra_area, w / 2 + 2 + knob_extra_size);
+
+    }
 
     lv_area_t inv_area;
 
@@ -962,7 +970,6 @@ static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angl
     }
 }
 
-
 static void get_center(lv_obj_t * arc, lv_point_t * center, lv_coord_t * arc_r)
 {
     lv_coord_t left_bg = lv_obj_get_style_pad_left(arc, LV_ARC_PART_BG);
@@ -1012,21 +1019,6 @@ static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t 
     knob_area->x2 = center->x + knob_x + right_knob + indic_width_half;
     knob_area->y1 = center->y + knob_y - top_knob - indic_width_half;
     knob_area->y2 = center->y + knob_y + bottom_knob + indic_width_half;
-}
-
-static bool has_large_knob(lv_obj_t * arc)
-{
-    if(lv_obj_get_style_pad_left(arc, LV_ARC_PART_KNOB) > 0) return true;
-    if(lv_obj_get_style_pad_right(arc, LV_ARC_PART_KNOB) > 0) return true;
-    if(lv_obj_get_style_pad_top(arc, LV_ARC_PART_KNOB) > 0) return true;
-    if(lv_obj_get_style_pad_bottom(arc, LV_ARC_PART_KNOB) > 0) return true;
-    if(lv_obj_get_style_shadow_width(arc, LV_ARC_PART_KNOB) > 0) return true;
-    if(lv_obj_get_style_shadow_ofs_x(arc, LV_ARC_PART_KNOB) > 0) return true;
-    if(lv_obj_get_style_shadow_ofs_y(arc, LV_ARC_PART_KNOB) > 0) return true;
-    if(lv_obj_get_style_outline_width(arc, LV_ARC_PART_KNOB) > 0) return true;
-    if(lv_obj_get_style_value_str(arc, LV_ARC_PART_KNOB) != NULL) return true;
-
-    return false;
 }
 
 #endif
