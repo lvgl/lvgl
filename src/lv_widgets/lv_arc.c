@@ -765,11 +765,12 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
         angle += round;
 
         /*Set the new value*/
+        int16_t old_value = ext->cur_value;
         int16_t new_value = _lv_map(angle, ext->bg_angle_start, bg_end, ext->min_value, ext->max_value);
         if(new_value != lv_arc_get_value(arc)) {
             ext->last_tick = lv_tick_get(); /*Cache timestamp for the next iteration*/
             lv_arc_set_value(arc, new_value); /*set_value caches the last_angle for the next iteration*/
-            if(new_value != ext->cur_value) {
+            if(new_value != old_value) {
                 res = lv_event_send(arc, LV_EVENT_VALUE_CHANGED, NULL);
                 if(res != LV_RES_OK) return res;
             }
