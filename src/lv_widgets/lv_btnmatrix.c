@@ -20,6 +20,7 @@
  *      DEFINES
  *********************/
 #define LV_OBJX_NAME "lv_btnmatrix"
+#define BTN_EXTRA_CLICK_AREA_MAX (LV_DPI / 4)
 
 /**********************
  *      TYPEDEFS
@@ -1203,18 +1204,23 @@ static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p)
     /*Get the half inner padding. Button look larger with this value. (+1 for rounding error)*/
     pinner = (pinner / 2) + 1 + (pinner & 1);
 
+    pinner = LV_MATH_MIN(pinner, BTN_EXTRA_CLICK_AREA_MAX);
+    pright = LV_MATH_MIN(pright, BTN_EXTRA_CLICK_AREA_MAX);
+    ptop = LV_MATH_MIN(ptop, BTN_EXTRA_CLICK_AREA_MAX);
+    pbottom = LV_MATH_MIN(pbottom, BTN_EXTRA_CLICK_AREA_MAX);
+
     for(i = 0; i < ext->btn_cnt; i++) {
         lv_area_copy(&btn_area, &ext->button_areas[i]);
-        if(btn_area.x1 <= pleft) btn_area.x1 = btnm_cords.x1;
+        if(btn_area.x1 <= pleft) btn_area.x1 += btnm_cords.x1 - LV_MATH_MIN(pleft, BTN_EXTRA_CLICK_AREA_MAX);
         else btn_area.x1 += btnm_cords.x1 - pinner;
 
-        if(btn_area.y1 <= ptop) btn_area.y1 = btnm_cords.y1;
+        if(btn_area.y1 <= ptop) btn_area.y1 += btnm_cords.y1 - LV_MATH_MIN(ptop, BTN_EXTRA_CLICK_AREA_MAX);
         else btn_area.y1 += btnm_cords.y1 - pinner;
 
-        if(btn_area.x2 >= w - pright - 2) btn_area.x2 = btnm_cords.x2;  /*-2 for rounding error*/
+        if(btn_area.x2 >= w - pright - 2) btn_area.x2 += btnm_cords.x1 + LV_MATH_MIN(pright, BTN_EXTRA_CLICK_AREA_MAX);  /*-2 for rounding error*/
         else btn_area.x2 += btnm_cords.x1 + pinner;
 
-        if(btn_area.y2 >= h - pbottom - 2) btn_area.y2 = btnm_cords.y2; /*-2 for rounding error*/
+        if(btn_area.y2 >= h - pbottom - 2) btn_area.y2 += btnm_cords.y1 + LV_MATH_MIN(pbottom, BTN_EXTRA_CLICK_AREA_MAX); /*-2 for rounding error*/
         else btn_area.y2 += btnm_cords.y1 + pinner;
 
         if(_lv_area_is_point_on(&btn_area, p, 0) != false) {
