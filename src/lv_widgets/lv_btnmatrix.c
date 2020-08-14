@@ -912,7 +912,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
             /*Toggle the button if enabled*/
             if(button_is_tgl_enabled(ext->ctrl_bits[ext->btn_id_pr]) &&
                !button_is_inactive(ext->ctrl_bits[ext->btn_id_pr])) {
-                if(button_get_tgl_state(ext->ctrl_bits[ext->btn_id_pr])) {
+                if(button_get_tgl_state(ext->ctrl_bits[ext->btn_id_pr]) && !ext->one_check) {
                     ext->ctrl_bits[ext->btn_id_pr] &= (~LV_BTNMATRIX_CTRL_CHECK_STATE);
                 }
                 else {
