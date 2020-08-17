@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for LVGL v7.3.0
+ * Configuration file for v7.3.0
  */
 
 /*
