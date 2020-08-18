@@ -244,9 +244,7 @@ bool lv_cpicker_set_hsv(lv_obj_t * cpicker, lv_color_hsv_t hsv)
 
     refr_knob_pos(cpicker);
 
-    if(ext->type == LV_CPICKER_TYPE_DISC) {
-        lv_obj_invalidate(cpicker);
-    }
+    lv_obj_invalidate(cpicker);
 
     return true;
 }
