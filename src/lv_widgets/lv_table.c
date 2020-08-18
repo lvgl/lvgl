@@ -196,7 +196,8 @@ void lv_table_set_row_cnt(lv_obj_t * table, uint16_t row_cnt)
         ext->row_h = lv_mem_realloc(ext->row_h, ext->row_cnt * sizeof(ext->row_h[0]));
         LV_ASSERT_MEM(ext->row_h);
         if(ext->row_h == NULL) return;
-    } else {
+    }
+    else {
         lv_mem_free(ext->row_h);
         ext->row_h = NULL;
     }

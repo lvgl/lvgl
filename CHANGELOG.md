@@ -10,7 +10,7 @@
 - Add `lv_font_free()` function - Frees the memory allocated by the `lv_font_load()` function
 - Add style caching to reduce acces time of properties with default value
 
-## v7.3.1 (planned on 18.08.2020)
+## v7.3.1 (18.08.2020)
 
 ### Bugfixes
 - Fix drawing value string twice
