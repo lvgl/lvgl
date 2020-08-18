@@ -110,7 +110,7 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_table_set_col_cnt(table, copy_ext->col_cnt);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(table, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(table, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("table created");

@@ -180,11 +180,11 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
                                                                                                               LV_PAGE_PART_SCROLLABLE));
             lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCROLLBAR), lv_obj_get_style_list(copy_tab,
                                                                                                              LV_PAGE_PART_SCROLLBAR));
-            lv_obj_refresh_style(new_tab, LV_STYLE_PROP_ALL);
+            lv_obj_refresh_style(new_tab, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
         }
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(tabview, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(tabview, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     tabview_realign(tabview);

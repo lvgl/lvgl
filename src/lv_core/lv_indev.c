@@ -1490,7 +1490,6 @@ static lv_obj_t * get_dragged_obj(lv_obj_t * obj)
 static void indev_gesture(lv_indev_proc_t * proc)
 {
 
-    if(proc->types.pointer.drag_in_prog) return;
     if(proc->types.pointer.gesture_sent) return;
 
     lv_obj_t * gesture_obj = proc->types.pointer.act_obj;

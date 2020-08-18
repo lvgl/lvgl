@@ -86,6 +86,7 @@ typedef struct {
 #if LV_USE_ARC
     lv_style_t arc_indic;
     lv_style_t arc_bg;
+    lv_style_t arc_knob;
 #endif
 
 #if LV_USE_BAR
@@ -505,6 +506,14 @@ static void arc_init(void)
     lv_style_set_line_color(&styles->arc_bg, LV_STATE_DEFAULT, COLOR_BG_SEC);
     lv_style_set_line_width(&styles->arc_bg, LV_STATE_DEFAULT, LV_DPX(25));
     lv_style_set_line_rounded(&styles->arc_bg, LV_STATE_DEFAULT, true);
+
+    style_init_reset(&styles->arc_knob);
+    lv_style_set_radius(&styles->arc_knob, LV_STATE_DEFAULT,   LV_RADIUS_CIRCLE);
+    lv_style_set_pad_top(&styles->arc_knob, LV_STATE_DEFAULT,  LV_DPX(0));
+    lv_style_set_pad_bottom(&styles->arc_knob, LV_STATE_DEFAULT,  LV_DPX(0));
+    lv_style_set_pad_left(&styles->arc_knob, LV_STATE_DEFAULT,    LV_DPX(0));
+    lv_style_set_pad_right(&styles->arc_knob, LV_STATE_DEFAULT,   LV_DPX(0));
+
 #endif
 }
 
@@ -620,6 +629,9 @@ static void checkbox_init(void)
     lv_style_set_radius(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(4));
     lv_style_set_pattern_image(&styles->cb_bullet, LV_STATE_CHECKED, LV_SYMBOL_OK);
     lv_style_set_pattern_recolor(&styles->cb_bullet, LV_STATE_CHECKED, LV_COLOR_WHITE);
+    lv_style_set_pattern_opa(&styles->cb_bullet, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+    lv_style_set_pattern_opa(&styles->cb_bullet, LV_STATE_CHECKED, LV_OPA_COVER);
+    lv_style_set_transition_prop_3(&styles->cb_bullet, LV_STATE_DEFAULT, LV_STYLE_PATTERN_OPA);
     lv_style_set_text_font(&styles->cb_bullet, LV_STATE_CHECKED, theme.font_small);
     lv_style_set_pad_left(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
     lv_style_set_pad_right(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
@@ -1059,6 +1071,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
             list = lv_obj_get_style_list(obj, LV_ARC_PART_INDIC);
             _lv_style_list_add_style(list, &styles->arc_indic);
+
+            list = lv_obj_get_style_list(obj, LV_ARC_PART_KNOB);
+            _lv_style_list_add_style(list, &styles->bg);
+            _lv_style_list_add_style(list, &styles->bg_click);
+            _lv_style_list_add_style(list, &styles->arc_knob);
             break;
 #endif
 
@@ -1184,7 +1201,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             _lv_style_list_add_style(list, &styles->roller_sel);
             break;
 #endif
-
 
 #if LV_USE_OBJMASK
         case LV_THEME_OBJMASK:
@@ -1368,7 +1384,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             break;
     }
 
-    lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
+    lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
 }
 
 /**********************
