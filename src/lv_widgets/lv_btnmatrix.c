@@ -726,7 +726,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
                 draw_rect_dsc_act = &draw_rect_chk_dsc;
                 draw_label_dsc_act = &draw_label_chk_dsc;
             }
-            else if(btn_state == LV_STATE_CHECKED) {
+            else if(btn_state == LV_STATE_DISABLED) {
                 if(!disabled_inited) {
                     btnm->state = LV_STATE_DISABLED;
                     _lv_obj_disable_style_caching(btnm, true);
@@ -745,6 +745,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
             /*In other cases get the styles directly without caching them*/
             else {
                 btnm->state = btn_state;
+                _lv_obj_disable_style_caching(btnm, true);
                 lv_draw_rect_dsc_init(&draw_rect_tmp_dsc);
                 lv_draw_label_dsc_init(&draw_label_tmp_dsc);
                 lv_obj_init_draw_rect_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_rect_tmp_dsc);
@@ -752,8 +753,8 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
                 draw_label_tmp_dsc.flag = txt_flag;
                 draw_rect_dsc_act = &draw_rect_tmp_dsc;
                 draw_label_dsc_act = &draw_label_tmp_dsc;
-
                 btnm->state = state_ori;
+                _lv_obj_disable_style_caching(btnm, false);
             }
 
             lv_style_int_t border_part_ori = draw_rect_dsc_act->border_side;
