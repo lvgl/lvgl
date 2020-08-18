@@ -98,14 +98,15 @@ def define_set(fn, name, value):
     f.close()
     
 def clone_repos():
+    cmd("rm -fr " + workdir)
+    cmd("mkdir " + workdir)
+    os.chdir(workdir)
+
     #For debuging just copy the repos
-    #cmd("rm -fr " + workdir)
-    #cmd("mkdir " + workdir)
-    #os.chdir(workdir)
     #cmd("cp -a ../repos/. .")
     #return
 
-    cmd("git clone " + upstream("lvgl-1") + " lvgl; cd lvgl; git checkout master")
+    cmd("git clone " + upstream("lvgl") + " lvgl; cd lvgl; git checkout master")
     cmd("git clone " + upstream("lv_examples") + "; cd lv_examples; git checkout master")
     cmd("git clone " + upstream("lv_drivers") + "; cd lv_drivers; git checkout master")
     cmd("git clone --recurse-submodules " + upstream("docs") + "; cd docs; git checkout master")
