@@ -3,7 +3,7 @@
 ## v7.4.0 (planned on 01.09.2020)
 *Available in the `dev` branch*
 
-## v7.3.1 (planned on 18.08.2020)
+## v7.3.1 (18.08.2020)
 
 ### Bugfixes
 - Fix drawing value string twice
