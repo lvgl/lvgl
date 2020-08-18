@@ -17,6 +17,7 @@
 - Fix overflow in large image transformations
 - Limit extra button click area of button matrix's buttons. With large paddings it was counter intuitive. (Gaps are mapped to button when clicked).
 - Fix color picker invalidation in rectangle mode
+- Init disabled days to gray color in calendar
 
 ## v7.3.0 (04.08.2020)
 
