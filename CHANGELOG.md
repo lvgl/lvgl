@@ -10,7 +10,7 @@
 - Add `lv_font_free()` function - Frees the memory allocated by the `lv_font_load()` function
 - Add style caching to reduce acces time of properties with default value
 
-## v7.3.1 (planned on 18.08.2020)
+## v7.3.1 (18.08.2020)
 
 ### Bugfixes
 - Fix drawing value string twice
@@ -25,6 +25,7 @@
 - Limit extra button click area of button matrix's buttons. With large paddings it was counter intuitive. (Gaps are mapped to button when clicked).
 - Fix `lv_btnmatrix_set_one_check` not forcing exactly one button to be checked
 - Fix color picker invalidation in rectangle mode
+- Init disabled days to gray color in calendar
 
 ## v7.3.0 (04.08.2020)
 

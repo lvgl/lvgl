@@ -209,7 +209,8 @@ static inline void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * se
 
 #endif
 
-static inline void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
+static inline void lv_obj_align_origo(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs,
+                                      lv_coord_t y_ofs)
 {
     lv_obj_align_mid(obj, base, align, x_ofs, y_ofs);
 }

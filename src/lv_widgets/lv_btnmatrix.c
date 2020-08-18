@@ -1223,10 +1223,12 @@ static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p)
         if(btn_area.y1 <= ptop) btn_area.y1 += btnm_cords.y1 - LV_MATH_MIN(ptop, BTN_EXTRA_CLICK_AREA_MAX);
         else btn_area.y1 += btnm_cords.y1 - pinner;
 
-        if(btn_area.x2 >= w - pright - 2) btn_area.x2 += btnm_cords.x1 + LV_MATH_MIN(pright, BTN_EXTRA_CLICK_AREA_MAX);  /*-2 for rounding error*/
+        if(btn_area.x2 >= w - pright - 2) btn_area.x2 += btnm_cords.x1 + LV_MATH_MIN(pright,
+                                                                                         BTN_EXTRA_CLICK_AREA_MAX);  /*-2 for rounding error*/
         else btn_area.x2 += btnm_cords.x1 + pinner;
 
-        if(btn_area.y2 >= h - pbottom - 2) btn_area.y2 += btnm_cords.y1 + LV_MATH_MIN(pbottom, BTN_EXTRA_CLICK_AREA_MAX); /*-2 for rounding error*/
+        if(btn_area.y2 >= h - pbottom - 2) btn_area.y2 += btnm_cords.y1 + LV_MATH_MIN(pbottom,
+                                                                                          BTN_EXTRA_CLICK_AREA_MAX); /*-2 for rounding error*/
         else btn_area.y2 += btnm_cords.y1 + pinner;
 
         if(_lv_area_is_point_on(&btn_area, p, 0) != false) {
