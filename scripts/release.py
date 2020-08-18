@@ -110,7 +110,7 @@ def clone_repos():
     cmd("git clone " + upstream("lv_examples") + "; cd lv_examples; git checkout master")
     cmd("git clone " + upstream("lv_drivers") + "; cd lv_drivers; git checkout master")
     cmd("git clone --recurse-submodules " + upstream("docs") + "; cd docs; git checkout master")
-    cmd("git clone " + upstream("blog") + "; cd lv_drivers; git checkout blog")
+    cmd("git clone " + upstream("blog") + "; cd blog; git checkout master")
 
 def get_lvgl_version(br):
     print("Get LVGL's version")
@@ -313,10 +313,10 @@ def publish_master():
     
     
 def merge_to_dev():
-    merge_cmd = "git checkout dev; git merge master -X ours; git checkout master"
+    merge_cmd = "git checkout dev; git pull origin dev; git merge master -X ours; git checkout master"
     cmd("cd lvgl; " + merge_cmd)    
     
-    merge_cmd = "git checkout dev; git merge latest -X ours; git checkout master"
+    merge_cmd = "git checkout dev --;  git pull origin dev; git merge latest -X ours; git checkout master"
     cmd("cd docs; " + merge_cmd)    
     
     
@@ -324,7 +324,7 @@ def merge_from_dev():
     merge_cmd = "git checkout master; git merge dev;"
     cmd("cd lvgl; " + merge_cmd)    
     
-    merge_cmd = "git checkout latest; git merge dev;"
+    merge_cmd = "git checkout latest -- ; git merge dev;"
     cmd("cd docs; " + merge_cmd)    
         
 
