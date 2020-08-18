@@ -475,12 +475,11 @@ static void anim_task(lv_task_t * param)
                 if(a->path.cb) new_value = a->path.cb(&a->path, a);
                 else new_value = lv_anim_path_linear(&a->path, a);
 
-				if(new_value != a->current)
-                {
-                	a->current = new_value;
-					/*Apply the calculated value*/
-					if(a->exec_cb) a->exec_cb(a->var, new_value);
-				}
+                if(new_value != a->current) {
+                    a->current = new_value;
+                    /*Apply the calculated value*/
+                    if(a->exec_cb) a->exec_cb(a->var, new_value);
+                }
 
                 /*If the time is elapsed the animation is ready*/
                 if(a->act_time >= a->time) {
