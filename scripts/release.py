@@ -395,12 +395,12 @@ def docs_update_dev_version():
     os.chdir("../")
 
 
-def publish_dev():   
+def publish_dev_and_master():   
     pub_cmd = "git checkout dev; git push origin dev"
     cmd("cd lvgl; " + pub_cmd)    
+    pub_cmd = "git checkout master; git push origin master"
+    cmd("cd lvgl; " + pub_cmd)    
 
-    pub_cmd = "git checkout dev; git push origin dev"
-    cmd("cd docs; " + pub_cmd)    
     cmd("cd docs; git checkout master; ./update.py latest dev")
 
 def cleanup():
@@ -463,7 +463,7 @@ if __name__ == '__main__':
 
         lvgl_update_dev_version()
         docs_update_dev_version()
-        publish_dev()
+        publish_dev_and_master()
         
     cleanup()
     
