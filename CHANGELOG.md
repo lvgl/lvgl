@@ -24,6 +24,7 @@
 - Fix overflow in large image transformations
 - Limit extra button click area of button matrix's buttons. With large paddings it was counter intuitive. (Gaps are mapped to button when clicked).
 - Fix `lv_btnmatrix_set_one_check` not forcing exactly one button to be checked
+- Fix color picker invalidation in rectangle mode
 
 ## v7.3.0 (04.08.2020)
 
