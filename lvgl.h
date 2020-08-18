@@ -10,6 +10,16 @@
 extern "C" {
 #endif
 
+
+/***************************
+ * CURRENT VERSION OF LVGL
+ ***************************/
+/*Current version of LVGL*/
+#define LVGL_VERSION_MAJOR   7
+#define LVGL_VERSION_MINOR   4
+#define LVGL_VERSION_PATCH   0
+#define LVGL_VERSION_INFO "dev"
+
 /*********************
  *      INCLUDES
  *********************/
@@ -76,11 +86,6 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-/*Current version of LVGL*/
-#define LVGL_VERSION_MAJOR   7
-#define LVGL_VERSION_MINOR   4
-#define LVGL_VERSION_PATCH   0
-#define LVGL_VERSION_INFO "dev"
 
 /**********************
  *      TYPEDEFS
