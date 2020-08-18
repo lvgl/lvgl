@@ -52,7 +52,7 @@ from os import path
 from datetime import date
 import sys
 
-upstream_org_url = "https://github.com/kisvegabor/"
+upstream_org_url = "https://github.com/lvgl/"
 workdir = "./release_tmp"
 
 ver_major = -1
@@ -98,11 +98,12 @@ def define_set(fn, name, value):
     f.close()
     
 def clone_repos():
-    cmd("rm -fr " + workdir)
-    cmd("mkdir " + workdir)
-    os.chdir(workdir)
-    cmd("cp -a ../repos/. .")
-    return
+    #For debuging just copy the repos
+    #cmd("rm -fr " + workdir)
+    #cmd("mkdir " + workdir)
+    #os.chdir(workdir)
+    #cmd("cp -a ../repos/. .")
+    #return
 
     cmd("git clone " + upstream("lvgl-1") + " lvgl; cd lvgl; git checkout master")
     cmd("git clone " + upstream("lv_examples") + "; cd lv_examples; git checkout master")
