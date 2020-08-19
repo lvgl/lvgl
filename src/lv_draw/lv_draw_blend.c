@@ -138,7 +138,13 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_fill(const lv_area_t * clip_area, const lv_
     const lv_area_t * disp_area = &vdb->area;
     lv_color_t * disp_buf = vdb->buf_act;
 
-
+#if LV_USE_GPU
+    if (disp->driver.gpu_wait_cb)
+    {
+        disp->driver.gpu_wait_cb(&disp->driver);
+    }
+#endif
+    
     /* Get clipped fill area which is the real draw area.
      * It is always the same or inside `fill_area` */
     lv_area_t draw_area;
@@ -212,6 +218,13 @@ LV_ATTRIBUTE_FAST_MEM void _lv_blend_map(const lv_area_t * clip_area, const lv_a
     const lv_area_t * disp_area = &vdb->area;
     lv_color_t * disp_buf = vdb->buf_act;
 
+#if LV_USE_GPU
+    if (disp->driver.gpu_wait_cb)
+    {
+        disp->driver.gpu_wait_cb(&disp->driver);
+    }
+#endif   
+    
     /* Now `draw_area` has absolute coordinates.
      * Make it relative to `disp_area` to simplify draw to `disp_buf`*/
     draw_area.x1 -= disp_area->x1;

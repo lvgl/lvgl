@@ -112,6 +112,9 @@ typedef struct _disp_drv_t {
     void (*wait_cb)(struct _disp_drv_t * disp_drv);
 
 #if LV_USE_GPU
+
+    void (*gpu_wait_cb)(struct _disp_drv_t * disp_drv);
+
     /** OPTIONAL: Blend two memories using opacity (GPU only)*/
     void (*gpu_blend_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length,
                          lv_opa_t opa);
