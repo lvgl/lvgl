@@ -271,7 +271,7 @@ def blog_add_post():
     today = date.today()
     d = today.strftime("%Y-%m-%d")
     
-    f = open(d + "_release_" + ver_str + ".md", "w")
+    f = open(d + "-release_" + ver_str + ".md", "w")
     f.write(post)
     f.close()
     
@@ -303,7 +303,6 @@ def publish_master():
     cmd("cd lvgl; " + pub_cmd)    
     cmd("cd lv_examples; " + pub_cmd)    
     cmd("cd lv_drivers; " + pub_cmd)    
-    cmd("cd blog; " + pub_cmd)    
 
     pub_cmd = "git push origin latest; git push origin " + ver_str
     cmd("cd docs; " + pub_cmd)    
