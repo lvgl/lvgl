@@ -307,15 +307,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->ext_click_pad_ver = 0;
 #endif
 
-    /*Init realign*/
-#if LV_USE_OBJ_REALIGN
-    new_obj->realign.align        = LV_ALIGN_CENTER;
-    new_obj->realign.xofs         = 0;
-    new_obj->realign.yofs         = 0;
-    new_obj->realign.base         = NULL;
-    new_obj->realign.auto_realign = 0;
-#endif
-
     /*Init. user date*/
 #if LV_USE_USER_DATA
     _lv_memset_00(&new_obj->user_data, sizeof(lv_obj_user_data_t));
@@ -366,15 +357,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         /*Set user data*/
 #if LV_USE_USER_DATA
         _lv_memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
-#endif
-
-        /*Copy realign*/
-#if LV_USE_OBJ_REALIGN
-        new_obj->realign.align        = copy->realign.align;
-        new_obj->realign.xofs         = copy->realign.xofs;
-        new_obj->realign.yofs         = copy->realign.yofs;
-        new_obj->realign.base         = copy->realign.base;
-        new_obj->realign.auto_realign = copy->realign.auto_realign;
 #endif
 
         /*Only copy the `event_cb`. `signal_cb` and `design_cb` will be copied in the derived
@@ -678,24 +660,20 @@ void lv_obj_move_background(lv_obj_t * obj)
  * Coordinate set
  * ------------------*/
 
-/**
- * Set relative the position of an object (relative to the parent)
- * @param obj pointer to an object
- * @param x new distance from the left side of the parent
- * @param y new distance from the top of the parent
- */
-void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
+static void refr_pos(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * par = obj->parent;
 
+    lv_coord_t x = obj->x_set;
+    lv_coord_t y = obj->y_set;
     if(par) {
-        x = x + par->coords.x1;
-        y = y + par->coords.y1;
-    }
+        lv_coord_t pad_left = lv_obj_get_style_pad_left(par, LV_OBJ_PART_MAIN);
+        lv_coord_t pad_top = lv_obj_get_style_pad_top(par, LV_OBJ_PART_MAIN);
 
+        x += pad_left + par->coords.x1 - lv_obj_get_scroll_left(par);
+        y += pad_top + par->coords.y1 - lv_obj_get_scroll_top(par);
+    }
 
     /*Calculate and set the movement*/
     lv_point_t diff;
@@ -732,6 +710,23 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 }
 
 /**
+ * Set relative the position of an object (relative to the parent)
+ * @param obj pointer to an object
+ * @param x new distance from the left side of the parent
+ * @param y new distance from the top of the parent
+ */
+void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    obj->x_set = x;
+    obj->y_set = y;
+
+    refr_pos(obj);
+
+}
+
+/**
  * Set the x coordinate of a object
  * @param obj pointer to an object
  * @param x new distance from the left side from the parent
@@ -755,15 +750,27 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
     lv_obj_set_pos(obj, lv_obj_get_x(obj), y);
 }
 
-/**
- * Set the size of an object
- * @param obj pointer to an object
- * @param w new width
- * @param h new height
- */
-void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
+static void refr_size(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_coord_t w = 0;
+    lv_coord_t h = 0;
+
+
+    if(LV_COORD_IS_AUTO(obj->w_set)) {
+        lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
+        lv_coord_t scroll_right = lv_obj_get_scroll_right(obj);
+        w = lv_obj_get_width(obj) + scroll_right;
+    } else {
+        w = obj->w_set;
+    }
+
+    if(LV_COORD_IS_AUTO(obj->h_set)) {
+        lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
+        lv_coord_t scroll_bottom = lv_obj_get_scroll_bottom(obj);
+        h = lv_obj_get_height(obj) + scroll_bottom;
+    } else {
+        h = obj->h_set;
+    }
 
     /* Do nothing if the size is not changed */
     /* It is very important else recursive resizing can
@@ -803,11 +810,22 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
+}
 
-    /*Automatically realign the object if required*/
-#if LV_USE_OBJ_REALIGN
-    if(obj->realign.auto_realign) lv_obj_realign(obj);
-#endif
+/**
+ * Set the size of an object
+ * @param obj pointer to an object
+ * @param w new width
+ * @param h new height
+ */
+void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    obj->w_set = w;
+    obj->h_set = h;
+
+    refr_size(obj);
 }
 
 /**
@@ -905,163 +923,6 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
     obj_align_core(obj, base, align, true, true, x_ofs, y_ofs);
-
-#if LV_USE_OBJ_REALIGN
-    /*Save the last align parameters to use them in `lv_obj_realign`*/
-    obj->realign.align       = align;
-    obj->realign.xofs        = x_ofs;
-    obj->realign.yofs        = y_ofs;
-    obj->realign.base        = base;
-    obj->realign.mid_align = 0;
-#endif
-}
-
-/**
- * Align an object to an other object horizontally.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_ofs x coordinate offset after alignment
- */
-void lv_obj_align_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    if(base == NULL) base = lv_obj_get_parent(obj);
-
-    LV_ASSERT_OBJ(base, LV_OBJX_NAME);
-
-    obj_align_core(obj, base, align, true, false, x_ofs, 0);
-}
-
-/**
- * Align an object to an other object vertically.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param y_ofs y coordinate offset after alignment
- */
-void lv_obj_align_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    if(base == NULL) base = lv_obj_get_parent(obj);
-
-    LV_ASSERT_OBJ(base, LV_OBJX_NAME);
-
-    obj_align_core(obj, base, align, true, false, 0, y_ofs);
-}
-
-/**
- * Align an object's middle point to an other object.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_ofs x coordinate offset after alignment
- * @param y_ofs y coordinate offset after alignment
- */
-void lv_obj_align_mid(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    if(base == NULL) {
-        base = lv_obj_get_parent(obj);
-    }
-
-    LV_ASSERT_OBJ(base, LV_OBJX_NAME);
-
-
-    obj_align_mid_core(obj, base, align, true, true, x_ofs, y_ofs);
-
-#if LV_USE_OBJ_REALIGN
-    /*Save the last align parameters to use them in `lv_obj_realign`*/
-    obj->realign.align       = align;
-    obj->realign.xofs        = x_ofs;
-    obj->realign.yofs        = y_ofs;
-    obj->realign.base        = base;
-    obj->realign.mid_align = 1;
-#endif
-}
-
-/**
- * Align an object's middle point to an other object horizontally.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_ofs x coordinate offset after alignment
- */
-void lv_obj_align_mid_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    if(base == NULL) {
-        base = lv_obj_get_parent(obj);
-    }
-
-    LV_ASSERT_OBJ(base, LV_OBJX_NAME);
-
-
-    obj_align_mid_core(obj, base, align, true, false, x_ofs, 0);
-}
-
-
-/**
- * Align an object's middle point to an other object vertically.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param y_ofs y coordinate offset after alignment
- */
-void lv_obj_align_mid_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    if(base == NULL) {
-        base = lv_obj_get_parent(obj);
-    }
-
-    LV_ASSERT_OBJ(base, LV_OBJX_NAME);
-
-
-    obj_align_mid_core(obj, base, align, true, false, 0, y_ofs);
-}
-
-/**
- * Realign the object based on the last `lv_obj_align` parameters.
- * @param obj pointer to an object
- */
-void lv_obj_realign(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-#if LV_USE_OBJ_REALIGN
-    if(obj->realign.mid_align)
-        lv_obj_align_mid(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
-    else
-        lv_obj_align(obj, obj->realign.base, obj->realign.align, obj->realign.xofs, obj->realign.yofs);
-#else
-    (void)obj;
-    LV_LOG_WARN("lv_obj_realign: no effect because LV_USE_OBJ_REALIGN = 0");
-#endif
-}
-
-/**
- * Enable the automatic realign of the object when its size has changed based on the last
- * `lv_obj_align` parameters.
- * @param obj pointer to an object
- * @param en true: enable auto realign; false: disable auto realign
- */
-void lv_obj_set_auto_realign(lv_obj_t * obj, bool en)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-#if LV_USE_OBJ_REALIGN
-    obj->realign.auto_realign = en ? 1 : 0;
-#else
-    (void)obj;
-    (void)en;
-    LV_LOG_WARN("lv_obj_set_auto_realign: no effect because LV_USE_OBJ_REALIGN = 0");
-#endif
 }
 
 /**
@@ -1103,7 +964,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
         lv_anim_path_set_cb(&path, lv_anim_path_ease_out);
 
         if(x) {
-            lv_anim_set_time(&a, lv_anim_speed_to_time(lv_disp_get_hor_res(d), 0, x));
+            lv_anim_set_time(&a, lv_anim_speed_to_time((lv_disp_get_hor_res(d) * 3) >> 2, 0, x));
             lv_anim_set_values(&a, obj->scroll.x, obj->scroll.x + x);
             lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) scroll_anim_x_cb);
             lv_anim_set_path(&a, &path);
@@ -1140,7 +1001,7 @@ void lv_obj_scroll_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
  */
 void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en)
 {
-    lv_obj_scroll_by(obj, x - obj->scroll.x, 0, anim_en);
+    lv_obj_scroll_by(obj, -x - obj->scroll.x, 0, anim_en);
 }
 
 /**
@@ -1150,7 +1011,7 @@ void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en)
  */
 void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
 {
-    lv_obj_scroll_by(obj, 0, y - obj->scroll.y, anim_en);
+    lv_obj_scroll_by(obj, 0,  -y - obj->scroll.y, anim_en);
 }
 
 
@@ -2302,7 +2163,9 @@ lv_coord_t lv_obj_get_x(const lv_obj_t * obj)
     lv_coord_t rel_x;
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent) {
-        rel_x             = obj->coords.x1 - parent->coords.x1;
+        rel_x   = obj->coords.x1 - parent->coords.x1;
+        rel_x += lv_obj_get_scroll_left(parent);
+        rel_x -= lv_obj_get_style_pad_left(parent, LV_OBJ_PART_MAIN);
     }
     else {
         rel_x = obj->coords.x1;
@@ -2322,7 +2185,9 @@ lv_coord_t lv_obj_get_y(const lv_obj_t * obj)
     lv_coord_t rel_y;
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent) {
-        rel_y             = obj->coords.y1 - parent->coords.y1;
+        rel_y = obj->coords.y1 - parent->coords.y1;
+        rel_y += lv_obj_get_scroll_top(parent);
+        rel_y -= lv_obj_get_style_pad_top(parent, LV_OBJ_PART_MAIN);
     }
     else {
         rel_y = obj->coords.y1;
@@ -2452,23 +2317,6 @@ lv_coord_t lv_obj_get_height_grid(lv_obj_t * obj, uint8_t div, uint8_t span)
 
     r = r * span + (span - 1) * pinner;
     return r;
-}
-
-/**
- * Get the automatic realign property of the object.
- * @param obj pointer to an object
- * @return  true: auto realign is enabled; false: auto realign is disabled
- */
-bool lv_obj_get_auto_realign(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-#if LV_USE_OBJ_REALIGN
-    return obj->realign.auto_realign ? true : false;
-#else
-    (void)obj;
-    return false;
-#endif
 }
 
 /**
@@ -3898,13 +3746,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_coord_t d = lv_obj_get_draw_rect_ext_pad_size(obj, LV_OBJ_PART_MAIN);
         obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, d);
     }
-#if LV_USE_OBJ_REALIGN
-    else if(sign == LV_SIGNAL_PARENT_SIZE_CHG) {
-        if(obj->realign.auto_realign) {
-            lv_obj_realign(obj);
-        }
-    }
-#endif
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_refresh_ext_draw_pad(obj);
     }
@@ -3999,6 +3840,7 @@ static void report_style_mod_core(void * style, lv_obj_t * obj)
     }
 
 }
+
 
 /**
  * Recursively refresh the style of the children. Go deeper until a not NULL style is found
@@ -4512,7 +4354,7 @@ static void scrollbar_draw(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_coord_t sr = lv_obj_get_scroll_right(obj);
 
     /*Return if too small content to scroll*/
-    if(sm == LV_SCROLL_MODE_AUTO && st <= 0  && sb <= 0 && sl <= 0  && sl <= 0) {
+    if(sm == LV_SCROLL_MODE_AUTO && st <= 0  && sb <= 0 && sl <= 0  && sr <= 0) {
         return;
     }
 

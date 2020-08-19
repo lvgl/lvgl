@@ -1292,7 +1292,7 @@ static void indev_scroll_handler(lv_indev_proc_t * proc)
             if(lv_obj_get_scroll_top(scroll_obj) < 0) diff_y = diff_y / 2;
             if(lv_obj_get_scroll_bottom(scroll_obj) < 0) diff_y = diff_y / 2;
         }
-        lv_obj_scroll_by(scroll_obj, diff_x, diff_y, LV_ANIM_OFF);
+        lv_obj_scroll_by_raw(scroll_obj, diff_x, diff_y);
     }
 }
 
@@ -1335,7 +1335,7 @@ static void indev_scroll_throw_handler(lv_indev_proc_t * proc)
     }
 
     if((proc->types.pointer.scroll_throw_vect.x != 0 || proc->types.pointer.scroll_throw_vect.y != 0)) {
-        lv_obj_scroll_by(scroll_obj, proc->types.pointer.scroll_throw_vect.x, proc->types.pointer.scroll_throw_vect.y, LV_ANIM_OFF);
+        lv_obj_scroll_by_raw(scroll_obj, proc->types.pointer.scroll_throw_vect.x, proc->types.pointer.scroll_throw_vect.y);
     }
     /*If the vectors become 0 then finish scrolling
        signal*/

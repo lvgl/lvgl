@@ -157,18 +157,6 @@ typedef uint8_t lv_signal_t;
 
 typedef lv_res_t (*lv_signal_cb_t)(struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
-#if LV_USE_OBJ_REALIGN
-typedef struct {
-    const struct _lv_obj_t * base;
-    lv_coord_t xofs;
-    lv_coord_t yofs;
-    lv_align_t align;
-    uint8_t auto_realign : 1;
-    uint8_t mid_align : 1; /**< 1: the origo (center of the object) was aligned with
-                                `lv_obj_align_origo`*/
-} lv_realign_t;
-#endif
-
 /*Protect some attributes (max. 8 bit)*/
 enum {
     LV_PROTECT_NONE      = 0x00,
@@ -237,6 +225,10 @@ typedef struct _lv_obj_t {
     uint8_t focus_parent    : 1; /**< 1: Parent will be focused instead*/
     lv_scroll_mode_t scroll_mode :2; /**< How to display scrollbars*/
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
+    lv_coord_t x_set;
+    lv_coord_t y_set;
+    lv_coord_t w_set;
+    lv_coord_t h_set;
 
 #if LV_USE_GROUP != 0
     void * group_p;
@@ -245,10 +237,6 @@ typedef struct _lv_obj_t {
     uint8_t protect;            /**< Automatically happening actions can be prevented.
                                      'OR'ed values from `lv_protect_t`*/
     lv_state_t state;
-
-#if LV_USE_OBJ_REALIGN
-    lv_realign_t realign;       /**< Information about the last call to ::lv_obj_align. */
-#endif
 
 #if LV_USE_USER_DATA
     lv_obj_user_data_t user_data; /**< Custom user data for object. */
@@ -475,67 +463,6 @@ void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h);
  * @param y_ofs y coordinate offset after alignment
  */
 void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
-
-/**
- * Align an object to an other object horizontally.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_ofs x coordinate offset after alignment
- */
-void lv_obj_align_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs);
-
-/**
- * Align an object to an other object vertically.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param y_ofs y coordinate offset after alignment
- */
-void lv_obj_align_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs);
-
-/**
- * Align an object to an other object.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_ofs x coordinate offset after alignment
- * @param y_ofs y coordinate offset after alignment
- */
-void lv_obj_align_mid(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
-
-
-/**
- * Align an object's middle point to an other object horizontally.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_ofs x coordinate offset after alignment
- */
-void lv_obj_align_mid_x(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs);
-
-/**
- * Align an object's middle point to an other object vertically.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param y_ofs y coordinate offset after alignment
- */
-void lv_obj_align_mid_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs);
-
-/**
- * Realign the object based on the last `lv_obj_align` parameters.
- * @param obj pointer to an object
- */
-void lv_obj_realign(lv_obj_t * obj);
-
-/**
- * Enable the automatic realign of the object when its size has changed based on the last
- * `lv_obj_align` parameters.
- * @param obj pointer to an object
- * @param en true: enable auto realign; false: disable auto realign
- */
-void lv_obj_set_auto_realign(lv_obj_t * obj, bool en);
 
 /**
  * Moves all children with horizontally or vertically.
@@ -1122,13 +1049,6 @@ lv_coord_t lv_obj_get_width_grid(lv_obj_t * obj, uint8_t div, uint8_t span);
  * @return the height according to the given parameters
  */
 lv_coord_t lv_obj_get_height_grid(lv_obj_t * obj, uint8_t div, uint8_t span);
-
-/**
- * Get the automatic realign property of the object.
- * @param obj pointer to an object
- * @return  true: auto realign is enabled; false: auto realign is disabled
- */
-bool lv_obj_get_auto_realign(const lv_obj_t * obj);
 
 /**
  * Get the left padding of extended clickable area

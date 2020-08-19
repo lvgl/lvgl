@@ -208,6 +208,13 @@ void _lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align
  *      MACROS
  **********************/
 
+#define LV_COORD_PX(x)  (x)
+#define LV_COORD_AUTO (LV_COORD_MAX - 100)
+
+#define LV_COORD_IS_PX(x)  (((x) < LV_COORD_MAX - 1000) ? true : false)
+#define LV_COORD_IS_AUTO(x) (((x) == LV_COORD_MAX - 100) ? true : false)
+
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
