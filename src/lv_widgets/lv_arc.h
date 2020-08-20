@@ -160,14 +160,6 @@ void lv_arc_set_value(lv_obj_t * arc, int16_t value);
 void lv_arc_set_range(lv_obj_t * arc, int16_t min, int16_t max);
 
 /**
- * Reverse arc behavior. The indicator will grow from arc end instead of arc start.
- * position.
- * @param arc pointer to a arc object
- * @param reverse true: enable disable reverse behavior; false: disable
- */
-void lv_arc_set_reverse(lv_obj_t * arc, bool reverse);
-
-/**
  * Set the threshold of arc knob increments
  * position.
  * @param arc pointer to a arc object
