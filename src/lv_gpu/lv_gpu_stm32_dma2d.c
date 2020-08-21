@@ -7,6 +7,7 @@
  *      INCLUDES
  *********************/
 #include "lv_gpu_stm32_dma2d.h"
+#include "../lv_core/lv_disp.h"
 #include "../lv_core/lv_refr.h"
 
 #if LV_USE_GPU_STM32_DMA2D
@@ -41,7 +42,6 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void invalidate_cache(void);
 static void dma2d_wait(void);
 
 /**********************
@@ -82,7 +82,7 @@ void lv_gpu_stm32_dma2d_init(void)
  */
 void lv_gpu_stm32_dma2d_fill(lv_color_t * buf, lv_coord_t buf_w, lv_color_t color, lv_coord_t fill_w, lv_coord_t fill_h)
 {
-    invalidate_cache();
+    lv_disp_invalidate_cache(NULL);
 
     DMA2D->CR = 0x30000;
     DMA2D->OMAR = (uint32_t)buf;
@@ -112,7 +112,7 @@ void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t
                                   lv_opa_t opa, lv_coord_t fill_w, lv_coord_t fill_h)
 {
 #if 0
-    invalidate_cache();
+    lv_disp_invalidate_cache(NULL);
 
     /* Configure the DMA2D Mode, Color Mode and line output offset */
     hdma2d.Init.Mode         = DMA2D_M2M_BLEND;
@@ -156,7 +156,7 @@ void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t
 void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_coord_t map_w,
                              lv_coord_t copy_w, lv_coord_t copy_h)
 {
-    invalidate_cache();
+    lv_disp_invalidate_cache(NULL);
 
     DMA2D->CR = 0;
     /* copy output colour mode, this register controls both input and output colour format */
@@ -186,7 +186,7 @@ void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_
 void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_opa_t opa,
                               lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h)
 {
-    invalidate_cache();
+    lv_disp_invalidate_cache(NULL);
     DMA2D->CR = 0x20000;
 
     DMA2D->BGPFCCR = LV_DMA2D_COLOR_FORMAT;
@@ -213,15 +213,6 @@ void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-
-static void invalidate_cache(void)
-{
-#if __DCACHE_PRESENT
-    if(SCB->CCR & (uint32_t)SCB_CCR_DC_Msk) {
-        SCB_CleanInvalidateDCache();
-    }
-#endif
-}
 
 static void dma2d_wait(void)
 {
