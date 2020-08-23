@@ -3801,7 +3801,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         lv_draw_rect_dsc_init(&draw_dsc);
         /*If the border is drawn later disable loading its properties*/
         if(lv_obj_get_style_border_post(obj, LV_OBJ_PART_MAIN)) {
-            draw_dsc.border_opa = LV_OPA_TRANSP;
+            draw_dsc.border_post = 1;
         }
 
         lv_obj_init_draw_rect_dsc(obj, LV_OBJ_PART_MAIN, &draw_dsc);
