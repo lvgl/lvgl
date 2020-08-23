@@ -1332,6 +1332,7 @@ bool lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_prope
 /**
  * Notify an object (and its children) about its style is modified
  * @param obj pointer to an object
+ * @param part the part of the object which style property should be refreshed.
  * @param prop `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property. It is used to optimize what needs to be refreshed.
  */
 void lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
@@ -3801,7 +3802,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         lv_draw_rect_dsc_init(&draw_dsc);
         /*If the border is drawn later disable loading its properties*/
         if(lv_obj_get_style_border_post(obj, LV_OBJ_PART_MAIN)) {
-            draw_dsc.border_opa = LV_OPA_TRANSP;
+            draw_dsc.border_post = 1;
         }
 
         lv_obj_init_draw_rect_dsc(obj, LV_OBJ_PART_MAIN, &draw_dsc);

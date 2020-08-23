@@ -743,6 +743,7 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
         }
 
         angle = 360 - _lv_atan2(p.x, p.y) + 90; /*Some transformation is required*/
+        angle -= ext->rotation_angle;
         if(angle < ext->bg_angle_start) angle = ext->bg_angle_start;
         if(angle > bg_end) angle = bg_end;
 
