@@ -87,6 +87,7 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->min_value = 0;
     ext->max_value = 100;
     ext->dragging = false;
+    ext->adjustable = false;
     ext->chg_rate = 540;
     ext->last_tick = lv_tick_get();
     ext->last_angle = ext->arc_angle_end;
@@ -119,6 +120,7 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->min_value = copy_ext->min_value;
         ext->max_value = copy_ext->max_value;
         ext->dragging = copy_ext->dragging;
+        ext->adjustable = copy_ext->adjustable;
         ext->chg_rate = copy_ext->chg_rate;
         ext->last_tick = copy_ext->last_tick;
         ext->last_angle = copy_ext->last_angle;
@@ -465,6 +467,24 @@ void lv_arc_set_chg_rate(lv_obj_t * arc, uint16_t rate)
     ext->chg_rate = rate;
 }
 
+/**
+ * Set whether the arc is adjustable.
+ * @param arc pointer to a arc object
+ * @param adjustable whether the arc has a knob that can be dragged
+ */
+void lv_arc_set_adjustable(lv_obj_t * arc, bool adjustable)
+{
+    LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
+
+    lv_arc_ext_t *ext = (lv_arc_ext_t *)lv_obj_get_ext_attr(arc);
+    if(ext->adjustable == adjustable)
+        return;
+
+    ext->adjustable = adjustable;
+    if(!adjustable)
+        ext->dragging = false;
+    lv_obj_invalidate(arc);
+}
 
 /*=====================
  * Getter functions
@@ -592,6 +612,19 @@ lv_arc_type_t lv_arc_get_type(const lv_obj_t * arc)
     return ext->type;
 }
 
+/**
+ * Get whether the arc is adjustable.
+ * @param arc pointer to a arc object
+ * @return whether the arc has a knob that can be dragged
+ */
+bool lv_arc_get_adjustable(lv_obj_t * arc)
+{
+    LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
+
+    lv_arc_ext_t *ext = (lv_arc_ext_t *)lv_obj_get_ext_attr(arc);
+    return ext->adjustable;
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -660,14 +693,16 @@ static lv_design_res_t lv_arc_design(lv_obj_t * arc, const lv_area_t * clip_area
                         &arc_dsc);
         }
 
-        lv_area_t knob_area;
-        get_knob_area(arc, &center, arc_r, &knob_area);
+        if(ext->adjustable) {
+            lv_area_t knob_area;
+            get_knob_area(arc, &center, arc_r, &knob_area);
 
-        lv_draw_rect_dsc_t knob_rect_dsc;
-        lv_draw_rect_dsc_init(&knob_rect_dsc);
-        lv_obj_init_draw_rect_dsc(arc, LV_ARC_PART_KNOB, &knob_rect_dsc);
+            lv_draw_rect_dsc_t knob_rect_dsc;
+            lv_draw_rect_dsc_init(&knob_rect_dsc);
+            lv_obj_init_draw_rect_dsc(arc, LV_ARC_PART_KNOB, &knob_rect_dsc);
 
-        lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
+            lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
+        }
 
     }
     /*Post draw when the children are drawn*/
@@ -703,6 +738,9 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
     lv_arc_ext_t * ext = lv_obj_get_ext_attr(arc);
 
     if(sign == LV_SIGNAL_PRESSING) {
+        /* Only adjustable arcs can be dragged */
+        if(!ext->adjustable) return res;
+
         lv_indev_t * indev = lv_indev_get_act();
         if(indev == NULL) return res;
 
@@ -797,6 +835,8 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
 
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+        if(!ext->adjustable) return res;
+
         char c = *((char *)param);
 
         int16_t old_value = ext->cur_value;

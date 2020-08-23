@@ -50,6 +50,7 @@ typedef struct {
     int16_t max_value; /*Maximum value of the arc*/
     uint16_t dragging    :1;
     uint16_t type        :2;
+    uint16_t adjustable  :1;
     uint16_t chg_rate; /*Drag angle rate of change of the arc (degrees/sec)*/
     uint32_t last_tick; /*Last dragging event timestamp of the arc*/
     int16_t last_angle; /*Last dragging angle of the arc*/
@@ -167,6 +168,13 @@ void lv_arc_set_range(lv_obj_t * arc, int16_t min, int16_t max);
  */
 void lv_arc_set_chg_rate(lv_obj_t * arc, uint16_t threshold);
 
+/**
+ * Set whether the arc is adjustable.
+ * @param arc pointer to a arc object
+ * @param adjustable whether the arc has a knob that can be dragged
+ */
+void lv_arc_set_adjustable(lv_obj_t * arc, bool adjustable);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -233,6 +241,13 @@ int16_t lv_arc_get_max_value(const lv_obj_t * arc);
  * @return true: drag in progress false: not dragged
  */
 bool lv_arc_is_dragged(const lv_obj_t * arc);
+
+/**
+ * Get whether the arc is adjustable.
+ * @param arc pointer to a arc object
+ * @return whether the arc has a knob that can be dragged
+ */
+bool lv_arc_get_adjustable(lv_obj_t * arc);
 
 /*=====================
  * Other functions
