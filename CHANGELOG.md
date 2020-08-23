@@ -10,6 +10,9 @@
 - Add `lv_font_free()` function - Frees the memory allocated by the `lv_font_load()` function
 - Add style caching to reduce acces time of properties with default value
 
+### Bugfixes
+- Fix color bleeding on border drawing
+
 ## v7.3.1 (18.08.2020)
 
 ### Bugfixes

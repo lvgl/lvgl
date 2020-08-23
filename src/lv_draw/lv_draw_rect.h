@@ -41,6 +41,7 @@ typedef struct {
     lv_style_int_t border_side;
     lv_opa_t border_opa;
     lv_blend_mode_t border_blend_mode;
+    uint8_t border_post :1;         /*There is a border it will be drawn later. */
 
     /*Outline*/
     lv_color_t outline_color;
