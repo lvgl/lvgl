@@ -230,28 +230,26 @@ void _lv_disp_refr_task(lv_task_t * task)
                 lv_coord_t hres = lv_disp_get_hor_res(disp_refr);
                 uint16_t a;
                 for(a = 0; a < disp_refr->inv_p; a++) {
-                    if(disp_refr->inv_area_joined[a] == 0) {
-                        uint32_t start_offs =
-                            (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
+                    uint32_t start_offs =
+                        (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
 #if LV_USE_GPU_STM32_DMA2D
-                        lv_gpu_stm32_dma2d_copy((lv_color_t *)(buf_act + start_offs), disp_refr->driver.hor_res,
-                                                (lv_color_t *)(buf_ina + start_offs), disp_refr->driver.hor_res,
-                                                lv_area_get_width(&disp_refr->inv_areas[a]),
-                                                lv_area_get_height(&disp_refr->inv_areas[a]));
+                    lv_gpu_stm32_dma2d_copy((lv_color_t *)(buf_act + start_offs), disp_refr->driver.hor_res,
+                                            (lv_color_t *)(buf_ina + start_offs), disp_refr->driver.hor_res,
+                                            lv_area_get_width(&disp_refr->inv_areas[a]),
+                                            lv_area_get_height(&disp_refr->inv_areas[a]));
 #else
 
-                        lv_coord_t y;
-                        uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) * sizeof(lv_color_t);
+                    lv_coord_t y;
+                    uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) * sizeof(lv_color_t);
 
-                        for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
-                            /* The frame buffer is probably in an external RAM where sequential access is much faster.
-                             * So first copy a line into a buffer and write it back the ext. RAM */
-                            _lv_memcpy(copy_buf, buf_ina + start_offs, line_length);
-                            _lv_memcpy(buf_act + start_offs, copy_buf, line_length);
-                            start_offs += hres * sizeof(lv_color_t);
-                        }
-#endif
+                    for(y = disp_refr->inv_areas[a].y1; y <= disp_refr->inv_areas[a].y2; y++) {
+                        /* The frame buffer is probably in an external RAM where sequential access is much faster.
+                         * So first copy a line into a buffer and write it back the ext. RAM */
+                        _lv_memcpy(copy_buf, buf_ina + start_offs, line_length);
+                        _lv_memcpy(buf_act + start_offs, copy_buf, line_length);
+                        start_offs += hres * sizeof(lv_color_t);
                     }
+#endif
                 }
 
                 if(copy_buf) _lv_mem_buf_release(copy_buf);
@@ -260,7 +258,6 @@ void _lv_disp_refr_task(lv_task_t * task)
 
         /*Clean up*/
         _lv_memset_00(disp_refr->inv_areas, sizeof(disp_refr->inv_areas));
-        _lv_memset_00(disp_refr->inv_area_joined, sizeof(disp_refr->inv_area_joined));
         disp_refr->inv_p = 0;
 
         elaps = lv_tick_elaps(start);
@@ -317,39 +314,43 @@ void _lv_disp_refr_task(lv_task_t * task)
 /**
  * Join the areas which has got common parts
  */
-static void lv_refr_join_area(void)
-{
-    uint32_t join_from;
-    uint32_t join_in;
-    lv_area_t joined_area;
-    for(join_in = 0; join_in < disp_refr->inv_p; join_in++) {
-        if(disp_refr->inv_area_joined[join_in] != 0) continue;
+static void lv_refr_join_area(void)  {
+      uint32_t join_from;
+      uint32_t join_in;
+      uint32_t diff;  // a badly named variable, counting the number of joined areas within an outer cycle
+      lv_area_t joined_area;
 
-        /*Check all areas to join them in 'join_in'*/
-        for(join_from = 0; join_from < disp_refr->inv_p; join_from++) {
-            /*Handle only unjoined areas and ignore itself*/
-            if(disp_refr->inv_area_joined[join_from] != 0 || join_in == join_from) {
-                continue;
-            }
+      if (disp_refr->inv_p == 0) return; // sanity
 
-            /*Check if the areas are on each other*/
-            if(_lv_area_is_on(&disp_refr->inv_areas[join_in], &disp_refr->inv_areas[join_from]) == false) {
-                continue;
-            }
+      for(join_in = 0; join_in < disp_refr->inv_p - 1; join_in++) {
 
-            _lv_area_join(&joined_area, &disp_refr->inv_areas[join_in], &disp_refr->inv_areas[join_from]);
+          diff = 0;
+          /*Check all areas to join them in 'join_in'*/
+          for(join_from = join_in + 1; join_from < disp_refr->inv_p; join_from++) {
 
-            /*Join two area only if the joined area size is smaller*/
-            if(lv_area_get_size(&joined_area) < (lv_area_get_size(&disp_refr->inv_areas[join_in]) +
-                                                 lv_area_get_size(&disp_refr->inv_areas[join_from]))) {
-                lv_area_copy(&disp_refr->inv_areas[join_in], &joined_area);
+              // move if there was some joining previously, to effectively remove the joined areas
+              if (diff) {
+                lv_area_copy(&disp_refr->inv_areas[join_from - diff], &disp_refr->inv_areas[join_from]);
+              }
 
-                /*Mark 'join_form' is joined into 'join_in'*/
-                disp_refr->inv_area_joined[join_from] = 1;
-            }
-        }
-    }
-}
+              /*Check if the areas are on each other*/
+              if(lv_area_is_on(&disp_refr->inv_areas[join_in], &disp_refr->inv_areas[join_from]) == false) {
+                  continue;
+              }
+
+              lv_area_join(&joined_area, &disp_refr->inv_areas[join_in], &disp_refr->inv_areas[join_from]);
+
+              /*Join two area only if the joined area size is smaller*/
+              if(lv_area_get_size(&joined_area) < (lv_area_get_size(&disp_refr->inv_areas[join_in]) +
+                                                   lv_area_get_size(&disp_refr->inv_areas[join_from]))) {
+                  lv_area_copy(&disp_refr->inv_areas[join_in], &joined_area);
+                  diff++;
+              }
+          }
+          disp_refr->inv_p -= diff;
+      }
+  }
+
 
 /**
  * Refresh the joined areas
@@ -362,27 +363,17 @@ static void lv_refr_areas(void)
 
     /*Find the last area which will be drawn*/
     int32_t i;
-    int32_t last_i = 0;
-    for(i = disp_refr->inv_p - 1; i >= 0; i--) {
-        if(disp_refr->inv_area_joined[i] == 0) {
-            last_i = i;
-            break;
-        }
-    }
 
     disp_refr->driver.buffer->last_area = 0;
     disp_refr->driver.buffer->last_part = 0;
 
     for(i = 0; i < disp_refr->inv_p; i++) {
         /*Refresh the unjoined areas*/
-        if(disp_refr->inv_area_joined[i] == 0) {
+        if(i == disp_refr->inv_p - 1) disp_refr->driver.buffer->last_area = 1;
+        disp_refr->driver.buffer->last_part = 0;
+        lv_refr_area(&disp_refr->inv_areas[i]);
 
-            if(i == last_i) disp_refr->driver.buffer->last_area = 1;
-            disp_refr->driver.buffer->last_part = 0;
-            lv_refr_area(&disp_refr->inv_areas[i]);
-
-            if(disp_refr->driver.monitor_cb) px_num += lv_area_get_size(&disp_refr->inv_areas[i]);
-        }
+        if(disp_refr->driver.monitor_cb) px_num += lv_area_get_size(&disp_refr->inv_areas[i]);
     }
 }
 

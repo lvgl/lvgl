@@ -160,7 +160,6 @@ uint8_t del_prev  :
 
     /** Invalidated (marked to redraw) areas*/
     lv_area_t inv_areas[LV_INV_BUF_SIZE];
-    uint8_t inv_area_joined[LV_INV_BUF_SIZE];
     uint32_t inv_p : 10;
 
     /*Miscellaneous data*/
