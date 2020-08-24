@@ -383,18 +383,18 @@ void lv_arc_set_type(lv_obj_t * arc, lv_arc_type_t type)
  * @param arc pointer to a arc object
  * @param value new value
  */
-void lv_arc_set_value(lv_obj_t * arc, int16_t value)
+void lv_arc_set_value(lv_obj_t * arc, int16_t value, bool range_change)
 {
     LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
 
     lv_arc_ext_t * ext = (lv_arc_ext_t *)lv_obj_get_ext_attr(arc);
-    if(ext->cur_value == value) return;
+    if(!range_change && ext->cur_value == value) return;
 
     int16_t new_value;
     new_value = value > ext->max_value ? ext->max_value : value;
     new_value = new_value < ext->min_value ? ext->min_value : new_value;
 
-    if(ext->cur_value == new_value) return;
+    if(!range_change && ext->cur_value == new_value) return;
     ext->cur_value = new_value;
 
     int16_t bg_midpoint, range_midpoint, bg_end = ext->bg_angle_end;
@@ -450,7 +450,7 @@ void lv_arc_set_range(lv_obj_t * arc, int16_t min, int16_t max)
         ext->cur_value = max;
     }
 
-    lv_arc_set_value(arc, ext->cur_value);
+    lv_arc_set_value(arc, ext->cur_value, true);
 }
 
 /**
