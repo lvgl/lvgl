@@ -383,7 +383,7 @@ void lv_arc_set_type(lv_obj_t * arc, lv_arc_type_t type)
  * @param arc pointer to a arc object
  * @param value new value
  */
-void lv_arc_set_value(lv_obj_t * arc, int16_t value, bool range_change)
+void lv_arc_set_value(lv_obj_t * arc, int16_t value, bool range_change=false)
 {
     LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
 
