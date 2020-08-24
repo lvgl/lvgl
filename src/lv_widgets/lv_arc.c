@@ -24,7 +24,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
-void value_update(lv_obj_t * arc)
+void value_update(lv_obj_t * arc);
 
 /**********************
  *  STATIC PROTOTYPES
