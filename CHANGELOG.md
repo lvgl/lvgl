@@ -15,7 +15,7 @@
 - Fix using 'LV_SCROLLBAR_UNHIDE' after 'LV_SCROLLBAR_ON'
 - Fix croping of last column/row if an image is zoomed
 - Fix zooming and rotateing mosaic images7
-- Fix deleting tabview with LEF/RIGHT tab position
+- Fix deleting tabview with LEFT/RIGHT tab position
 
 ## v7.3.1 (18.08.2020)
 
