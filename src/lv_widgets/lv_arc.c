@@ -86,6 +86,7 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->cur_value = -1;
     ext->min_value = 0;
     ext->max_value = 100;
+    ext->range_change = false;
     ext->dragging = false;
     ext->adjustable = false;
     ext->chg_rate = 540;
@@ -119,6 +120,7 @@ lv_obj_t * lv_arc_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->cur_value = copy_ext->cur_value;
         ext->min_value = copy_ext->min_value;
         ext->max_value = copy_ext->max_value;
+        ext->range_change = copy_ext->range_change;
         ext->dragging = copy_ext->dragging;
         ext->adjustable = copy_ext->adjustable;
         ext->chg_rate = copy_ext->chg_rate;
@@ -453,7 +455,7 @@ void lv_arc_set_range(lv_obj_t * arc, int16_t min, int16_t max)
     }
 
     ext->range_change = true;
-    lv_arc_set_value(arc, ext->cur_value, true);
+    lv_arc_set_value(arc, ext->cur_value);
 }
 
 /**
