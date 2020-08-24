@@ -48,7 +48,6 @@ typedef struct {
     int16_t cur_value; /*Current value of the arc*/
     int16_t min_value; /*Minimum value of the arc*/
     int16_t max_value; /*Maximum value of the arc*/
-    int16_t range_change; /*Flag to indicate the arc range has changed, but the value was not updated yet*/
     uint16_t dragging    :1;
     uint16_t type        :2;
     uint16_t adjustable  :1;
