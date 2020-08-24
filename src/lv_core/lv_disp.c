@@ -353,14 +353,14 @@ void lv_disp_trig_activity(lv_disp_t * disp)
 }
 
 /**
- * Invalidate any CPU cache that is related to the display.
+ * Clean any CPU cache that is related to the display.
  * @param disp pointer to an display (NULL to use the default display)
  */
-void lv_disp_invalidate_cache(lv_disp_t * disp)
+void lv_disp_clean_dcache(lv_disp_t * disp)
 {
     if(!disp) disp = lv_disp_get_default();
     if(!disp) {
-      LV_LOG_WARN("lv_disp_invalidate_cache: no display registered");
+      LV_LOG_WARN("lv_disp_clean_dcache: no display registered");
       return;
     }
 
