@@ -174,7 +174,7 @@ typedef struct {
         uint8_t has_alpha : 1;
         uint8_t native_color : 1;
 
-        uint16_t zoom_inv;
+        uint32_t zoom_inv;
 
         /*Runtime data*/
         lv_coord_t xs;

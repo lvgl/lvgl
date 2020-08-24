@@ -13,6 +13,7 @@
 ### Bugfixes
 - Fix color bleeding on border drawing
 - Fix using 'LV_SCROLLBAR_UNHIDE' after 'LV_SCROLLBAR_ON'
+- Fix croping of last column/row if an image is zoomed
 
 ## v7.3.1 (18.08.2020)
 
