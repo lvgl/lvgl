@@ -100,7 +100,7 @@ lv_obj_t * lv_switch_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_switch_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
 
         lv_style_list_copy(&ext->style_knob, &copy_ext->style_knob);
-        lv_obj_refresh_style(sw, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(sw, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     /*Refresh the style with new signal function*/

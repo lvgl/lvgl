@@ -152,7 +152,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
         _lv_memcpy(&ext->secondary_y_axis, &ext_copy->secondary_y_axis, sizeof(lv_chart_axis_cfg_t));
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(chart, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(chart, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("chart created");
@@ -207,23 +207,23 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 /**
  * Clear the point of a series
  * @param chart pointer to a chart object
- * @param serie pointer to the chart's series to clear
+ * @param series pointer to the chart's series to clear
  */
-void lv_chart_clear_serie(lv_obj_t * chart, lv_chart_series_t * serie)
+void lv_chart_clear_series(lv_obj_t * chart, lv_chart_series_t * series)
 {
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
-    LV_ASSERT_NULL(serie);
+    LV_ASSERT_NULL(series);
 
-    if(chart == NULL || serie == NULL) return;
+    if(chart == NULL || series == NULL) return;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(ext == NULL) return;
 
     uint32_t i;
     for(i = 0; i < ext->point_cnt; i++) {
-        serie->points[i] = LV_CHART_POINT_DEF;
+        series->points[i] = LV_CHART_POINT_DEF;
     }
 
-    serie->start_point = 0;
+    series->start_point = 0;
 }
 
 /*=====================

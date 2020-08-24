@@ -112,7 +112,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->layout              = copy_ext->layout;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(cont, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(cont, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("container created");

@@ -23,6 +23,10 @@ Planned to September/October 2020
   - Work in progress
 - Add new label alignment modes
   - See [#1656](https://github.com/lvgl/lvgl/issues/1656)
+- Remove the align parameter from `lv_canvas_draw_text`
+
+## v9
+- Simplify `group`s. Discussion is [here](https://forum.lvgl.io/t/lv-group-tabindex/2927/3).
 
 ## Ideas
 - Unit testing (gtest?). See [#1658](https://github.com/lvgl/lvgl/issues/1658)
@@ -31,4 +35,5 @@ Planned to September/October 2020
 - Optmize font decompression
 - Switch to RGBA colors in styles
 - Need coverage report for tests
-- Need static analize (via coverity.io or somehing else). 
+- Need static analize (via coverity.io or somehing else)
+- Support dot_begin and dot_middle long modes for labels
