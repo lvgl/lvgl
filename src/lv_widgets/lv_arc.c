@@ -24,6 +24,7 @@
 /**********************
  *      TYPEDEFS
  **********************/
+void value_update(lv_obj_t * arc)
 
 /**********************
  *  STATIC PROTOTYPES
@@ -385,6 +386,8 @@ void lv_arc_set_type(lv_obj_t * arc, lv_arc_type_t type)
  */
 void value_update(lv_obj_t * arc)
 {
+    lv_arc_ext_t *ext = (lv_arc_ext_t *)lv_obj_get_ext_attr(arc);
+
     int16_t bg_midpoint, range_midpoint, bg_end = ext->bg_angle_end;
     if (ext->bg_angle_end < ext->bg_angle_start) bg_end = ext->bg_angle_end + 360;
 
