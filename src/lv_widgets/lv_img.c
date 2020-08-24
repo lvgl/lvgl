@@ -303,8 +303,10 @@ void lv_img_set_pivot(lv_obj_t * img, lv_coord_t pivot_x, lv_coord_t pivot_y)
     lv_style_int_t transf_angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
     transf_angle += ext->angle;
 
+    lv_coord_t w = lv_obj_get_width(img);
+    lv_coord_t h = lv_obj_get_height(img);
     lv_area_t a;
-    _lv_img_buf_get_transformed_area(&a, ext->w, ext->h, transf_angle, transf_zoom, &ext->pivot);
+    _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, transf_zoom, &ext->pivot);
     a.x1 += img->coords.x1;
     a.y1 += img->coords.y1;
     a.x2 += img->coords.x1;
@@ -315,7 +317,7 @@ void lv_img_set_pivot(lv_obj_t * img, lv_coord_t pivot_x, lv_coord_t pivot_y)
     ext->pivot.y = pivot_y;
     lv_obj_refresh_ext_draw_pad(img);
 
-    _lv_img_buf_get_transformed_area(&a, ext->w, ext->h, transf_angle, transf_zoom, &ext->pivot);
+    _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, transf_zoom, &ext->pivot);
     a.x1 += img->coords.x1;
     a.y1 += img->coords.y1;
     a.x2 += img->coords.x1;
@@ -341,8 +343,10 @@ void lv_img_set_angle(lv_obj_t * img, int16_t angle)
 
     lv_style_int_t transf_angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
 
+    lv_coord_t w = lv_obj_get_width(img);
+    lv_coord_t h = lv_obj_get_height(img);
     lv_area_t a;
-    _lv_img_buf_get_transformed_area(&a, ext->w, ext->h, transf_angle + ext->angle, transf_zoom, &ext->pivot);
+    _lv_img_buf_get_transformed_area(&a, w, h, transf_angle + ext->angle, transf_zoom, &ext->pivot);
     a.x1 += img->coords.x1;
     a.y1 += img->coords.y1;
     a.x2 += img->coords.x1;
@@ -352,7 +356,7 @@ void lv_img_set_angle(lv_obj_t * img, int16_t angle)
     ext->angle = angle;
     lv_obj_refresh_ext_draw_pad(img);
 
-    _lv_img_buf_get_transformed_area(&a, ext->w, ext->h, transf_angle + ext->angle, transf_zoom, &ext->pivot);
+    _lv_img_buf_get_transformed_area(&a, w, h, transf_angle + ext->angle, transf_zoom, &ext->pivot);
     a.x1 += img->coords.x1;
     a.y1 += img->coords.y1;
     a.x2 += img->coords.x1;
@@ -382,8 +386,10 @@ void lv_img_set_zoom(lv_obj_t * img, uint16_t zoom)
     lv_style_int_t transf_angle = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
     transf_angle += ext->angle;
 
+    lv_coord_t w = lv_obj_get_width(img);
+    lv_coord_t h = lv_obj_get_height(img);
     lv_area_t a;
-    _lv_img_buf_get_transformed_area(&a, ext->w, ext->h, transf_angle, (transf_zoom * ext->zoom) >> 8, &ext->pivot);
+    _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, (transf_zoom * ext->zoom) >> 8, &ext->pivot);
     a.x1 += img->coords.x1;
     a.y1 += img->coords.y1;
     a.x2 += img->coords.x1;
@@ -393,7 +399,7 @@ void lv_img_set_zoom(lv_obj_t * img, uint16_t zoom)
     ext->zoom = zoom;
     lv_obj_refresh_ext_draw_pad(img);
 
-    _lv_img_buf_get_transformed_area(&a, ext->w, ext->h, transf_angle, (transf_zoom * ext->zoom) >> 8, &ext->pivot);
+    _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, (transf_zoom * ext->zoom) >> 8, &ext->pivot);
     a.x1 += img->coords.x1;
     a.y1 += img->coords.y1;
     a.x2 += img->coords.x1;
@@ -602,9 +608,6 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
     }
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         if(ext->h == 0 || ext->w == 0) return true;
-        lv_area_t img_coords;
-
-        lv_obj_get_coords(img, &img_coords);
 
         lv_draw_rect_dsc_t bg_dsc;
         lv_draw_rect_dsc_init(&bg_dsc);
@@ -622,13 +625,16 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         int32_t angle_final = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
         angle_final += ext->angle;
 
+        lv_coord_t obj_w = lv_obj_get_width(img);
+        lv_coord_t obj_h = lv_obj_get_height(img);
+
         lv_area_t bg_coords;
-        _lv_img_buf_get_transformed_area(&bg_coords, lv_area_get_width(&img_coords), lv_area_get_height(&img_coords),
+        _lv_img_buf_get_transformed_area(&bg_coords, obj_w, obj_h,
                                          angle_final, zoom_final, &ext->pivot);
-        bg_coords.x1 += img_coords.x1;
-        bg_coords.y1 += img_coords.y1;
-        bg_coords.x2 += img_coords.x1;
-        bg_coords.y2 += img_coords.y1;
+        bg_coords.x1 += img->coords.x1;
+        bg_coords.y1 += img->coords.y1;
+        bg_coords.x2 += img->coords.x1;
+        bg_coords.y2 += img->coords.y1;
         bg_coords.x1 -= lv_obj_get_style_pad_left(img, LV_IMG_PART_MAIN);
         bg_coords.x2 += lv_obj_get_style_pad_right(img, LV_IMG_PART_MAIN);
         bg_coords.y1 -= lv_obj_get_style_pad_top(img, LV_IMG_PART_MAIN);
@@ -649,12 +655,6 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         }
 
         if(ext->src_type == LV_IMG_SRC_FILE || ext->src_type == LV_IMG_SRC_VARIABLE) {
-            img_coords.x1 += ext->offset.x;
-            img_coords.y1 += ext->offset.y;
-
-            if(img_coords.x1 > img->coords.x1) img_coords.x1 -= ext->w;
-            if(img_coords.y1 > img->coords.y1) img_coords.y1 -= ext->h;
-
             LV_LOG_TRACE("lv_img_design: start to draw image");
 
             lv_draw_img_dsc_t img_dsc;
@@ -671,15 +671,37 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             img_dsc.pivot.y = ext->pivot.y;
             img_dsc.antialias = ext->antialias;
 
-            lv_area_t cords_tmp;
-            cords_tmp.y1 = img_coords.y1;
-            cords_tmp.y2 = img_coords.y1 + ext->h - 1;
+            lv_coord_t zoomed_src_w = (int32_t)((int32_t)ext->w * zoom_final) >> 8;
+            lv_coord_t zoomed_src_h = (int32_t)((int32_t)ext->h * zoom_final) >> 8;
+            lv_area_t zommed_coords;
+            lv_obj_get_coords(img, &zommed_coords);
 
-            for(; cords_tmp.y1 <= img_coords.y2; cords_tmp.y1 += ext->h, cords_tmp.y2 += ext->h) {
-                cords_tmp.x1 = img_coords.x1;
-                cords_tmp.x2 = img_coords.x1 + ext->w - 1;
-                for(; cords_tmp.x1 <= img_coords.x2; cords_tmp.x1 += ext->w, cords_tmp.x2 += ext->w) {
-                    lv_draw_img(&cords_tmp, clip_area, ext->src, &img_dsc);
+            zommed_coords.x1 += (int32_t)((int32_t)ext->offset.x * zoom_final) >> 8;
+            zommed_coords.y1 += (int32_t)((int32_t)ext->offset.y * zoom_final) >> 8;
+            zommed_coords.x2 = zommed_coords.x1 + ((int32_t)((int32_t)(obj_w - 1) * zoom_final) >> 8);
+            zommed_coords.y2 = zommed_coords.y1 + ((int32_t)((int32_t)(obj_h - 1) * zoom_final) >> 8);
+
+            if(zommed_coords.x1 > img->coords.x1) zommed_coords.x1 -= ext->w;
+            if(zommed_coords.y1 > img->coords.y1) zommed_coords.y1 -= ext->h;
+
+            lv_area_t clip_real;
+            _lv_img_buf_get_transformed_area(&clip_real, lv_obj_get_width(img), lv_obj_get_height(img), angle_final, zoom_final, &ext->pivot);
+            clip_real.x1 += img->coords.x1;
+            clip_real.x2 += img->coords.x1;
+            clip_real.y1 += img->coords.y1;
+            clip_real.y2 += img->coords.y1;
+
+            if(_lv_area_intersect(&clip_real, &clip_real, clip_area) == false) return LV_DESIGN_RES_OK;
+
+            lv_area_t coords_tmp;
+            coords_tmp.y1 = zommed_coords.y1;
+            coords_tmp.y2 = zommed_coords.y1 + ext->h - 1;
+
+            for(; coords_tmp.y1 <= zommed_coords.y2; coords_tmp.y1 += zoomed_src_h, coords_tmp.y2 += zoomed_src_h) {
+                coords_tmp.x1 = zommed_coords.x1;
+                coords_tmp.x2 = zommed_coords.x1 + ext->w - 1;
+                for(; coords_tmp.x1 <= zommed_coords.x2; coords_tmp.x1 += zoomed_src_w, coords_tmp.x2 += zoomed_src_w) {
+                    lv_draw_img(&coords_tmp, &clip_real, ext->src, &img_dsc);
                 }
             }
         }
@@ -690,7 +712,7 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             lv_obj_init_draw_label_dsc(img, LV_IMG_PART_MAIN, &label_dsc);
 
             label_dsc.color = lv_obj_get_style_image_recolor(img, LV_IMG_PART_MAIN);
-            lv_draw_label(&img_coords, clip_area, &label_dsc, ext->src, NULL);
+            lv_draw_label(&img->coords, clip_area, &label_dsc, ext->src, NULL);
         }
         else {
             /*Trigger the error handler of image drawer*/
@@ -787,12 +809,14 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         /*If the image has angle provide enough room for the rotated corners */
         if(transf_angle || transf_zoom != LV_IMG_ZOOM_NONE) {
             lv_area_t a;
-            _lv_img_buf_get_transformed_area(&a, ext->w, ext->h, transf_angle, transf_zoom, &ext->pivot);
+            lv_coord_t w = lv_obj_get_width(img);
+            lv_coord_t h = lv_obj_get_height(img);
+            _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, transf_zoom, &ext->pivot);
             lv_coord_t pad_ori = img->ext_draw_pad;
             img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori - a.x1);
             img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori - a.y1);
-            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori + a.x2 - ext->w);
-            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori + a.y2 - ext->h);
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori + a.x2 - w);
+            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori + a.y2 - h);
         }
 
         /*Handle the padding of the background*/
@@ -821,8 +845,10 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         if(ext->w == lv_obj_get_width(img) && ext->h == lv_obj_get_height(img) &&
            (zoom != LV_IMG_ZOOM_NONE || angle != 0 || ext->pivot.x != ext->w / 2 || ext->pivot.y != ext->h / 2)) {
 
+            lv_coord_t w = lv_obj_get_width(img);
+            lv_coord_t h = lv_obj_get_height(img);
             lv_area_t coords;
-            _lv_img_buf_get_transformed_area(&coords, ext->w, ext->h, angle, zoom, &ext->pivot);
+            _lv_img_buf_get_transformed_area(&coords, w, h, angle, zoom, &ext->pivot);
             coords.x1 += img->coords.x1;
             coords.y1 += img->coords.y1;
             coords.x2 += img->coords.x1;
