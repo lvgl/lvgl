@@ -49,7 +49,7 @@ extern "C" {
 #define LV_IMG_ZOOM_NONE   256
 
 #define _LV_TRANSFORM_TRIGO_SHIFT 10
-#define _LV_ZOOM_INV_UPSCALE 4
+#define _LV_ZOOM_INV_UPSCALE 5
 
 /**********************
  *      TYPEDEFS
@@ -314,8 +314,8 @@ static inline bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_
         ys = yt + dsc->tmp.pivot_y_256;
     }
     else {
-        xt *= dsc->tmp.zoom_inv;
-        yt *= dsc->tmp.zoom_inv;
+        xt = (xt * dsc->tmp.zoom_inv) >> _LV_ZOOM_INV_UPSCALE;
+        yt = (yt * dsc->tmp.zoom_inv) >> _LV_ZOOM_INV_UPSCALE;
         xs = ((dsc->tmp.cosma * xt - dsc->tmp.sinma * yt) >> (_LV_TRANSFORM_TRIGO_SHIFT)) + dsc->tmp.pivot_x_256;
         ys = ((dsc->tmp.sinma * xt + dsc->tmp.cosma * yt) >> (_LV_TRANSFORM_TRIGO_SHIFT)) + dsc->tmp.pivot_y_256;
     }
