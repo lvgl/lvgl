@@ -317,10 +317,11 @@ void _lv_disp_refr_task(lv_task_t * task)
 static void lv_refr_join_area(void)  {
       uint32_t join_from;
       uint32_t join_in;
-      uint32_t diff;  // a badly named variable, counting the number of joined areas within an outer cycle
+      uint32_t diff; /* a badly named variable, counting the number of joined areas within an outer cycle */
       lv_area_t joined_area;
 
-      if (disp_refr->inv_p == 0) return; // sanity
+      /* Sanity */
+      if (disp_refr->inv_p == 0) return;
 
       for(join_in = 0; join_in < disp_refr->inv_p - 1; join_in++) {
 
@@ -328,7 +329,7 @@ static void lv_refr_join_area(void)  {
           /*Check all areas to join them in 'join_in'*/
           for(join_from = join_in + 1; join_from < disp_refr->inv_p; join_from++) {
 
-              // move if there was some joining previously, to effectively remove the joined areas
+              /* Move if there was some joining previously, to effectively remove the joined areas */
               if (diff) {
                 lv_area_copy(&disp_refr->inv_areas[join_from - diff], &disp_refr->inv_areas[join_from]);
               }
