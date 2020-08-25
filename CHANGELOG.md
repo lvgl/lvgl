@@ -14,8 +14,9 @@
 - Fix color bleeding on border drawing
 - Fix using 'LV_SCROLLBAR_UNHIDE' after 'LV_SCROLLBAR_ON'
 - Fix croping of last column/row if an image is zoomed
-- Fix zooming and rotateing mosaic images7
+- Fix zooming and rotateing mosaic images
 - Fix deleting tabview with LEFT/RIGHT tab position
+- Fix btnmatrix to not send event when CLICK_TRIG = true and the cursor slid from a pressed button
 
 ## v7.3.1 (18.08.2020)
 
