@@ -202,7 +202,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
     lv_btn_set_style(liste, LV_BTN_STYLE_TGL_PR, ext->styles_btn[LV_BTN_STATE_TGL_PR]);
     lv_btn_set_style(liste, LV_BTN_STYLE_INA, ext->styles_btn[LV_BTN_STATE_INA]);
 
-    lv_page_glue_obj(liste, true);
+    lv_page_glue_obj(list, liste, true);
     lv_btn_set_layout(liste, LV_LAYOUT_ROW_M);
 
     lv_layout_t list_layout = lv_list_get_layout(list);

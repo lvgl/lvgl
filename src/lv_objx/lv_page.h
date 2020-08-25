@@ -373,7 +373,7 @@ bool lv_page_on_edge(lv_obj_t * page, lv_page_edge_t edge);
  * @param obj pointer to an object on a page
  * @param glue true: enable glue, false: disable glue
  */
-void lv_page_glue_obj(lv_obj_t * obj, bool glue);
+void lv_page_glue_obj(lv_obj_t * page, lv_obj_t * obj, bool glue);
 
 /**
  * Focus on an object. It ensures that the object will be visible on the page.
