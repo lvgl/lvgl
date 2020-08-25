@@ -904,12 +904,13 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
             lv_indev_reset_long_press(param); /*Start the log press time again on the new button*/
             if(btn_pr != LV_BTNMATRIX_BTN_NONE &&
                button_is_inactive(ext->ctrl_bits[btn_pr]) == false &&
-               button_is_hidden(ext->ctrl_bits[btn_pr]) == false) {
+               button_is_hidden(ext->ctrl_bits[btn_pr]) == false)
+            {
+                invalidate_button_area(btnm, btn_pr);
                 /* Send VALUE_CHANGED for the newly pressed button */
-                uint32_t b = btn_pr;
-                res        = lv_event_send(btnm, LV_EVENT_VALUE_CHANGED, &b);
-                if(res == LV_RES_OK) {
-                    invalidate_button_area(btnm, btn_pr);
+                if(button_is_click_trig(ext->ctrl_bits[btn_pr]) == false) {
+                    uint32_t b = btn_pr;
+                    lv_event_send(btnm, LV_EVENT_VALUE_CHANGED, &b);
                 }
             }
         }
