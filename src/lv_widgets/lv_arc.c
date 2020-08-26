@@ -34,6 +34,7 @@ static lv_style_list_t * lv_arc_get_style(lv_obj_t * arc, uint8_t part);
 static void inv_arc_area(lv_obj_t * arc, uint16_t start_angle, uint16_t end_angle, lv_arc_part_t part);
 static void get_center(lv_obj_t * arc, lv_point_t * center, lv_coord_t * arc_r);
 static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t r, lv_area_t * knob_area);
+static void value_update(lv_obj_t * arc);
 
 /**********************
  *  STATIC VARIABLES
