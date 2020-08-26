@@ -97,6 +97,15 @@ void lv_test_error(const char * s, ...)
     exit(1);
 }
 
+void lv_test_assert_true(int32_t expression, const char * s)
+{
+    if(!expression) {
+        lv_test_error("   FAIL: %s. (Expected: not zero)", s, expression);
+    } else {
+        lv_test_print("   PASS: %s. (Expected: not zero)", s, expression);
+    }
+}
+
 void lv_test_assert_int_eq(int32_t n_ref, int32_t n_act, const char * s)
 {
     if(n_ref != n_act) {
@@ -133,6 +142,17 @@ void lv_test_assert_str_eq(const char * s_ref, const char * s_act, const char * 
         lv_test_print("   PASS: %s. (Expected: %s)", s, s_ref);
     }
 }
+
+
+void lv_test_assert_array_eq(const uint8_t *p_ref, const uint8_t *p_act, int32_t size, const char * s)
+{
+    if(memcmp(p_ref, p_act, size) != 0) {
+        lv_test_error("   FAIL: %s. (Expected: all %d bytes should be equal)", s, size);
+    } else {
+        lv_test_print("   PASS: %s. (Expected: all %d bytes should be equal)", s, size);
+    }
+}
+
 
 void lv_test_assert_ptr_eq(const void * p_ref, const void * p_act, const char * s)
 {

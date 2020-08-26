@@ -151,7 +151,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_style_list_copy(&ext->knob.style_list, &copy_ext->knob.style_list);
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(cpicker, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(cpicker, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
     refr_knob_pos(cpicker);
 
@@ -244,9 +244,7 @@ bool lv_cpicker_set_hsv(lv_obj_t * cpicker, lv_color_hsv_t hsv)
 
     refr_knob_pos(cpicker);
 
-    if(ext->type == LV_CPICKER_TYPE_DISC) {
-        lv_obj_invalidate(cpicker);
-    }
+    lv_obj_invalidate(cpicker);
 
     return true;
 }

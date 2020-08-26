@@ -112,6 +112,17 @@ LV_ATTRIBUTE_FAST_MEM void _lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask
  */
 int64_t _lv_pow(int64_t base, int8_t exp);
 
+/**
+ * Get the mapped of a number given an input and output range
+ * @param x integer which mapped value should be calculated
+ * @param min_in min input range
+ * @param max_in max input range
+ * @param min_out max output range
+ * @param max_out max output range
+ * @return the mapped number
+ */
+int16_t _lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min, int32_t max);
+
 /**********************
  *      MACROS
  **********************/

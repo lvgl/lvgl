@@ -20,6 +20,7 @@
  *      DEFINES
  *********************/
 #define LV_OBJX_NAME "lv_btnmatrix"
+#define BTN_EXTRA_CLICK_AREA_MAX (LV_DPI / 4)
 
 /**********************
  *      TYPEDEFS
@@ -659,6 +660,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
         lv_draw_label_dsc_t draw_label_tmp_dsc;
 
         lv_state_t state_ori = btnm->state;
+        _lv_obj_disable_style_caching(btnm, true);
         btnm->state = LV_STATE_DEFAULT;
         lv_draw_rect_dsc_init(&draw_rect_rel_dsc);
         lv_draw_label_dsc_init(&draw_label_rel_dsc);
@@ -666,6 +668,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
         lv_obj_init_draw_label_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_label_rel_dsc);
         draw_label_rel_dsc.flag = txt_flag;
         btnm->state = state_ori;
+        _lv_obj_disable_style_caching(btnm, false);
 
         bool chk_inited = false;
         bool disabled_inited = false;
@@ -710,26 +713,30 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
             else if(btn_state == LV_STATE_CHECKED) {
                 if(!chk_inited) {
                     btnm->state = LV_STATE_CHECKED;
+                    _lv_obj_disable_style_caching(btnm, true);
                     lv_draw_rect_dsc_init(&draw_rect_chk_dsc);
                     lv_draw_label_dsc_init(&draw_label_chk_dsc);
                     lv_obj_init_draw_rect_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_rect_chk_dsc);
                     lv_obj_init_draw_label_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_label_chk_dsc);
                     draw_label_chk_dsc.flag = txt_flag;
                     btnm->state = state_ori;
+                    _lv_obj_disable_style_caching(btnm, false);
                     chk_inited = true;
                 }
                 draw_rect_dsc_act = &draw_rect_chk_dsc;
                 draw_label_dsc_act = &draw_label_chk_dsc;
             }
-            else if(btn_state == LV_STATE_CHECKED) {
+            else if(btn_state == LV_STATE_DISABLED) {
                 if(!disabled_inited) {
                     btnm->state = LV_STATE_DISABLED;
+                    _lv_obj_disable_style_caching(btnm, true);
                     lv_draw_rect_dsc_init(&draw_rect_ina_dsc);
                     lv_draw_label_dsc_init(&draw_label_ina_dsc);
                     lv_obj_init_draw_rect_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_rect_ina_dsc);
                     lv_obj_init_draw_label_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_label_ina_dsc);
                     draw_label_ina_dsc.flag = txt_flag;
                     btnm->state = state_ori;
+                    _lv_obj_disable_style_caching(btnm, false);
                     disabled_inited = true;
                 }
                 draw_rect_dsc_act = &draw_rect_ina_dsc;
@@ -738,6 +745,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
             /*In other cases get the styles directly without caching them*/
             else {
                 btnm->state = btn_state;
+                _lv_obj_disable_style_caching(btnm, true);
                 lv_draw_rect_dsc_init(&draw_rect_tmp_dsc);
                 lv_draw_label_dsc_init(&draw_label_tmp_dsc);
                 lv_obj_init_draw_rect_dsc(btnm, LV_BTNMATRIX_PART_BTN, &draw_rect_tmp_dsc);
@@ -745,8 +753,8 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
                 draw_label_tmp_dsc.flag = txt_flag;
                 draw_rect_dsc_act = &draw_rect_tmp_dsc;
                 draw_label_dsc_act = &draw_label_tmp_dsc;
-
                 btnm->state = state_ori;
+                _lv_obj_disable_style_caching(btnm, false);
             }
 
             lv_style_int_t border_part_ori = draw_rect_dsc_act->border_side;
@@ -897,11 +905,11 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
             if(btn_pr != LV_BTNMATRIX_BTN_NONE &&
                button_is_inactive(ext->ctrl_bits[btn_pr]) == false &&
                button_is_hidden(ext->ctrl_bits[btn_pr]) == false) {
+                invalidate_button_area(btnm, btn_pr);
                 /* Send VALUE_CHANGED for the newly pressed button */
-                uint32_t b = btn_pr;
-                res        = lv_event_send(btnm, LV_EVENT_VALUE_CHANGED, &b);
-                if(res == LV_RES_OK) {
-                    invalidate_button_area(btnm, btn_pr);
+                if(button_is_click_trig(ext->ctrl_bits[btn_pr]) == false) {
+                    uint32_t b = btn_pr;
+                    lv_event_send(btnm, LV_EVENT_VALUE_CHANGED, &b);
                 }
             }
         }
@@ -911,7 +919,7 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
             /*Toggle the button if enabled*/
             if(button_is_tgl_enabled(ext->ctrl_bits[ext->btn_id_pr]) &&
                !button_is_inactive(ext->ctrl_bits[ext->btn_id_pr])) {
-                if(button_get_tgl_state(ext->ctrl_bits[ext->btn_id_pr])) {
+                if(button_get_tgl_state(ext->ctrl_bits[ext->btn_id_pr]) && !ext->one_check) {
                     ext->ctrl_bits[ext->btn_id_pr] &= (~LV_BTNMATRIX_CTRL_CHECK_STATE);
                 }
                 else {
@@ -1203,18 +1211,25 @@ static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p)
     /*Get the half inner padding. Button look larger with this value. (+1 for rounding error)*/
     pinner = (pinner / 2) + 1 + (pinner & 1);
 
+    pinner = LV_MATH_MIN(pinner, BTN_EXTRA_CLICK_AREA_MAX);
+    pright = LV_MATH_MIN(pright, BTN_EXTRA_CLICK_AREA_MAX);
+    ptop = LV_MATH_MIN(ptop, BTN_EXTRA_CLICK_AREA_MAX);
+    pbottom = LV_MATH_MIN(pbottom, BTN_EXTRA_CLICK_AREA_MAX);
+
     for(i = 0; i < ext->btn_cnt; i++) {
         lv_area_copy(&btn_area, &ext->button_areas[i]);
-        if(btn_area.x1 <= pleft) btn_area.x1 = btnm_cords.x1;
+        if(btn_area.x1 <= pleft) btn_area.x1 += btnm_cords.x1 - LV_MATH_MIN(pleft, BTN_EXTRA_CLICK_AREA_MAX);
         else btn_area.x1 += btnm_cords.x1 - pinner;
 
-        if(btn_area.y1 <= ptop) btn_area.y1 = btnm_cords.y1;
+        if(btn_area.y1 <= ptop) btn_area.y1 += btnm_cords.y1 - LV_MATH_MIN(ptop, BTN_EXTRA_CLICK_AREA_MAX);
         else btn_area.y1 += btnm_cords.y1 - pinner;
 
-        if(btn_area.x2 >= w - pright - 2) btn_area.x2 = btnm_cords.x2;  /*-2 for rounding error*/
+        if(btn_area.x2 >= w - pright - 2) btn_area.x2 += btnm_cords.x1 + LV_MATH_MIN(pright,
+                                                                                         BTN_EXTRA_CLICK_AREA_MAX);  /*-2 for rounding error*/
         else btn_area.x2 += btnm_cords.x1 + pinner;
 
-        if(btn_area.y2 >= h - pbottom - 2) btn_area.y2 = btnm_cords.y2; /*-2 for rounding error*/
+        if(btn_area.y2 >= h - pbottom - 2) btn_area.y2 += btnm_cords.y1 + LV_MATH_MIN(pbottom,
+                                                                                          BTN_EXTRA_CLICK_AREA_MAX); /*-2 for rounding error*/
         else btn_area.y2 += btnm_cords.y1 + pinner;
 
         if(_lv_area_is_point_on(&btn_area, p, 0) != false) {

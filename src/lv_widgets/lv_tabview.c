@@ -180,11 +180,11 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
                                                                                                               LV_PAGE_PART_SCROLLABLE));
             lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCROLLBAR), lv_obj_get_style_list(copy_tab,
                                                                                                              LV_PAGE_PART_SCROLLBAR));
-            lv_obj_refresh_style(new_tab, LV_STYLE_PROP_ALL);
+            lv_obj_refresh_style(new_tab, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
         }
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(tabview, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(tabview, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     tabview_realign(tabview);
@@ -628,7 +628,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     if(sign == LV_SIGNAL_CLEANUP) {
         uint8_t i;
-        for(i = 0; ext->tab_name_ptr[i][0] != '\0'; i++) lv_mem_free(ext->tab_name_ptr[i]);
+        for(i = 0; ext->tab_name_ptr[i][0] != '\0' && ext->tab_name_ptr[i][0] != '\n'; i++) lv_mem_free(ext->tab_name_ptr[i]);
 
         lv_mem_free(ext->tab_name_ptr);
         ext->tab_name_ptr = NULL;

@@ -65,17 +65,18 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness,
  * @param mask the arc will be drawn only in this mask
  * @param start_angle the start angle of the arc (0 deg on the bottom, 90 deg on the right)
  * @param end_angle the end angle of the arc
- * @param style style of the arc (`body.thickness`, `body.main_color`, `body.opa` is used)
- * @param opa_scale scale down all opacities by the factor
+ * @param clip_area the arc will be drawn only in this area
+ * @param dsc pointer to an initialized `lv_draw_line_dsc_t` variable
  */
 void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uint16_t start_angle, uint16_t end_angle,
-                 const lv_area_t * clip_area, lv_draw_line_dsc_t * dsc)
+                 const lv_area_t * clip_area, const lv_draw_line_dsc_t * dsc)
 {
     if(dsc->opa <= LV_OPA_MIN) return;
     if(dsc->width == 0) return;
     if(start_angle == end_angle) return;
 
-    if(dsc->width > radius) dsc->width = radius;
+    lv_style_int_t width = dsc->width;
+    if(width > radius) width = radius;
 
     lv_draw_rect_dsc_t cir_dsc;
     lv_draw_rect_dsc_init(&cir_dsc);
@@ -83,7 +84,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
     cir_dsc.bg_opa = LV_OPA_TRANSP;
     cir_dsc.border_opa = dsc->opa;
     cir_dsc.border_color = dsc->color;
-    cir_dsc.border_width = dsc->width;
+    cir_dsc.border_width = width;
     cir_dsc.border_blend_mode = dsc->blend_mode;
 
     lv_area_t area;
@@ -123,7 +124,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
         q_dsc.end_angle = end_angle;
         q_dsc.start_quarter = (start_angle / 90) & 0x3;
         q_dsc.end_quarter = (end_angle / 90) & 0x3;
-        q_dsc.width = dsc->width;
+        q_dsc.width = width;
         q_dsc.draw_dsc =  &cir_dsc;
         q_dsc.draw_area = &area;
         q_dsc.clip_area = clip_area;
@@ -146,7 +147,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
 
         lv_area_t round_area;
         if(dsc->round_start) {
-            get_rounded_area(start_angle, radius, dsc->width, &round_area);
+            get_rounded_area(start_angle, radius, width, &round_area);
             round_area.x1 += center_x;
             round_area.x2 += center_x;
             round_area.y1 += center_y;
@@ -156,7 +157,7 @@ void lv_draw_arc(lv_coord_t center_x, lv_coord_t center_y, uint16_t radius,  uin
         }
 
         if(dsc->round_end) {
-            get_rounded_area(end_angle, radius, dsc->width, &round_area);
+            get_rounded_area(end_angle, radius, width, &round_area);
             round_area.x1 += center_x;
             round_area.x2 += center_x;
             round_area.y1 += center_y;

@@ -10,7 +10,7 @@ To get all this to work you have to setup TFT_eSPI to work with your TFT display
 
 LVGL library has its own configuration file called `lv_conf.h`. When LVGL is installed to followings needs to be done to configure it:
 1. Go to directory of the installed Arduno libraries
-2. Go to `lvgl` and copy `lv_conf_template.h` as `lvgl.h` next to the `lvgl` folder.
+2. Go to `lvgl` and copy `lv_conf_template.h` as `lv_conf.h` next to the `src` folder.
 3. Open `lv_conf.h` and change the first `#if 0` to `#if 1`
 4. Set the resolution of your display in `LV_HOR_RES_MAX` and `LV_VER_RES_MAX`
 5. Set the color depth of you display in `LV_COLOR_DEPTH`

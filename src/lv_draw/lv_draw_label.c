@@ -111,8 +111,10 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
  * @param hint pointer to a `lv_draw_label_hint_t` variable.
  * It is managed by the drawer to speed up the drawing of very long texts (thousands of lines).
  */
-LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, lv_draw_label_dsc_t * dsc,
-                                         const char * txt, lv_draw_label_hint_t * hint)
+LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask,
+                                         const lv_draw_label_dsc_t * dsc,
+                                         const char * txt,
+                                         lv_draw_label_hint_t * hint)
 {
 
     if(dsc->opa <= LV_OPA_MIN) return;
@@ -214,11 +216,11 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
         sel_end = tmp;
     }
     lv_draw_line_dsc_t line_dsc;
-    dsc->decor  = LV_TEXT_DECOR_UNDERLINE;
+
     if((dsc->decor & LV_TEXT_DECOR_UNDERLINE) || (dsc->decor & LV_TEXT_DECOR_STRIKETHROUGH)) {
         lv_draw_line_dsc_init(&line_dsc);
         line_dsc.color = dsc->color;
-        line_dsc.width = font->underline_thickness;
+        line_dsc.width = font->underline_thickness ? font->underline_thickness : LV_MATH_MAX(font->line_height / 10, 1);
         line_dsc.opa = dsc->opa;
         line_dsc.blend_mode = dsc->blend_mode;
     }
