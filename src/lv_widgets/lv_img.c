@@ -687,7 +687,8 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             if(zommed_coords.y1 > img->coords.y1) zommed_coords.y1 -= ext->h;
 
             lv_area_t clip_real;
-            _lv_img_buf_get_transformed_area(&clip_real, lv_obj_get_width(img), lv_obj_get_height(img), angle_final, zoom_final, &ext->pivot);
+            _lv_img_buf_get_transformed_area(&clip_real, lv_obj_get_width(img), lv_obj_get_height(img), angle_final, zoom_final,
+                                             &ext->pivot);
             clip_real.x1 += img->coords.x1;
             clip_real.x2 += img->coords.x1;
             clip_real.y1 += img->coords.y1;

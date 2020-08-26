@@ -48,8 +48,8 @@ typedef struct {
     int16_t cur_value; /*Current value of the arc*/
     int16_t min_value; /*Minimum value of the arc*/
     int16_t max_value; /*Maximum value of the arc*/
-    uint16_t dragging    :1;
-    uint16_t type        :2;
+    uint16_t dragging    : 1;
+    uint16_t type        : 2;
     uint16_t chg_rate; /*Drag angle rate of change of the arc (degrees/sec)*/
     uint32_t last_tick; /*Last dragging event timestamp of the arc*/
     int16_t last_angle; /*Last dragging angle of the arc*/
