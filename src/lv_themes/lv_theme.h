@@ -109,9 +109,6 @@ typedef enum {
 #if LV_USE_ROLLER
     LV_THEME_ROLLER,
 #endif
-#if LV_USE_ROTARY
-    LV_THEME_ROTARY,
-#endif
 #if LV_USE_SLIDER
     LV_THEME_SLIDER,
 #endif
