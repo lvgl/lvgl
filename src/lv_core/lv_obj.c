@@ -106,15 +106,12 @@ static void lv_event_mark_deleted(lv_obj_t * obj);
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find);
 static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
-<<<<<<< HEAD
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc);
 static void scrollbar_draw(lv_obj_t * obj, const lv_area_t * clip_area);
-
-=======
 static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop);
 static void update_style_cache_children(lv_obj_t * obj);
 static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
->>>>>>> master
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -4484,7 +4481,7 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
     return false;
 }
 
-<<<<<<< HEAD
+
 static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc)
 {
     lv_draw_rect_dsc_init(dsc);
@@ -4648,7 +4645,7 @@ static void scrollbar_draw(lv_obj_t * obj, const lv_area_t * clip_area)
     }
 }
 
-=======
+
 static bool style_prop_is_cacheble(lv_style_property_t prop)
 {
 
@@ -4846,5 +4843,3 @@ static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_proper
         child = lv_obj_get_child(obj, child);
     }
 }
->>>>>>> master
-
