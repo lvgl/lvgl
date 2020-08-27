@@ -9,6 +9,7 @@
 - Add `lv_font_load()` function - Loads a `lv_font_t` object from a binary font file
 - Add `lv_font_free()` function - Frees the memory allocated by the `lv_font_load()` function
 - Add style caching to reduce acces time of properties with default value
+- Add `clean_dcache_cb` and `lv_disp_clean_dcache` to enable users to use their own cache management function
 
 ### Bugfixes
 - Fix color bleeding on border drawing

@@ -352,6 +352,21 @@ void lv_disp_trig_activity(lv_disp_t * disp)
     disp->last_activity_time = lv_tick_get();
 }
 
+/**
+ * Clean any CPU cache that is related to the display.
+ * @param disp pointer to an display (NULL to use the default display)
+ */
+void lv_disp_clean_dcache(lv_disp_t * disp)
+{
+    if(!disp) disp = lv_disp_get_default();
+    if(!disp) {
+      LV_LOG_WARN("lv_disp_clean_dcache: no display registered");
+      return;
+    }
+
+    if(disp->driver.clean_dcache_cb)
+      disp->driver.clean_dcache_cb(&disp->driver);
+}
 
 /**
  * Get a pointer to the screen refresher task to
