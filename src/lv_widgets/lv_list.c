@@ -170,7 +170,7 @@ lv_obj_t * lv_list_add_btn(lv_obj_t * list, const void * img_src, const char * t
     /*Set the default styles*/
     lv_theme_apply(btn, LV_THEME_LIST_BTN);
 
-    lv_page_glue_obj(btn, true);
+    lv_page_glue_obj(list, btn, true);
     lv_btn_set_layout(btn, LV_LAYOUT_ROW_MID);
 
     lv_layout_t list_layout = lv_list_get_layout(list);

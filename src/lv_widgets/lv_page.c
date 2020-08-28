@@ -457,10 +457,11 @@ bool lv_page_on_edge(lv_obj_t * page, lv_page_edge_t edge)
 
 /**
  * Glue the object to the page. After it the page can be moved (dragged) with this object too.
+ * @param page pointer to a page object
  * @param obj pointer to an object on a page
  * @param glue true: enable glue, false: disable glue
  */
-void lv_page_glue_obj(lv_obj_t * obj, bool glue)
+void lv_page_glue_obj(lv_obj_t * page, lv_obj_t * obj, bool glue)
 {
     lv_obj_set_drag_parent(obj, glue);
     lv_obj_set_drag(obj, glue);

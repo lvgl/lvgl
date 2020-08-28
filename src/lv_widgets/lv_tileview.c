@@ -156,7 +156,7 @@ void lv_tileview_add_element(lv_obj_t * tileview, lv_obj_t * element)
     LV_ASSERT_OBJ(tileview, LV_OBJX_NAME);
     LV_ASSERT_NULL(tileview);
 
-    lv_page_glue_obj(element, true);
+    lv_page_glue_obj(tileview, element, true);
 }
 
 /*=====================
