@@ -102,7 +102,7 @@ lv_font_t * lv_font_load(const char * font_name)
 
     if(!success) {
         LV_LOG_WARN("Error loading font file: %s\n", font_name);
-        /* 
+        /*
          * When `lvgl_load_font` fails it can leak some pointers.
          * All non-null pointers can be assumed as allocated and
          * `lv_font_free` should free them correctly.
