@@ -741,12 +741,7 @@ static void lv_refr_vdb_flush(void)
 
     /*Flush the rendered content to the display*/
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
-#if LV_USE_GPU
-    if (disp->driver.gpu_wait_cb)
-    {
-        disp->driver.gpu_wait_cb(&disp->driver);
-    }
-#endif   
+    if (disp->driver.gpu_wait_cb) disp->driver.gpu_wait_cb(&disp->driver);
 
     if(disp->driver.flush_cb) disp->driver.flush_cb(&disp->driver, &vdb->area, vdb->buf_act);
 

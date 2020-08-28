@@ -111,9 +111,10 @@ typedef struct _disp_drv_t {
      * User can execute very simple tasks here or yield the task */
     void (*wait_cb)(struct _disp_drv_t * disp_drv);
 
-#if LV_USE_GPU
-
+    /** OPTIONAL: called to check whether gpu is idle */
     void (*gpu_wait_cb)(struct _disp_drv_t * disp_drv);
+
+#if LV_USE_GPU
 
     /** OPTIONAL: Blend two memories using opacity (GPU only)*/
     void (*gpu_blend_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length,
