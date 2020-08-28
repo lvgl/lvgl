@@ -19,6 +19,7 @@
 - Fix zooming and rotateing mosaic images
 - Fix deleting tabview with LEFT/RIGHT tab position
 - Fix btnmatrix to not send event when CLICK_TRIG = true and the cursor slid from a pressed button
+- Fix roller width if selected text is larger than the normal
 
 ## v7.3.1 (18.08.2020)
 
