@@ -699,19 +699,25 @@ void lv_obj_move_background(lv_obj_t * obj)
  * Coordinate set
  * ------------------*/
 
-static void refr_pos(lv_obj_t * obj)
+static void refr_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
     /*Convert x and y to absolute coordinates*/
     lv_obj_t * par = obj->parent;
 
-    lv_coord_t x = obj->x_set;
-    lv_coord_t y = obj->y_set;
     if(par) {
         lv_coord_t pad_left = lv_obj_get_style_pad_left(par, LV_OBJ_PART_MAIN);
         lv_coord_t pad_top = lv_obj_get_style_pad_top(par, LV_OBJ_PART_MAIN);
 
         x += pad_left + par->coords.x1 - lv_obj_get_scroll_left(par);
         y += pad_top + par->coords.y1 - lv_obj_get_scroll_top(par);
+    } else {
+        /*If no parent then it's screen but screen can't be on a grid*/
+        if(_GRID_IS_CELL(obj->x_set) || _GRID_IS_CELL(obj->x_set)) {
+            obj->x_set = 0;
+            obj->y_set = 0;
+            x = 0;
+            y = 0;
+        }
     }
 
     /*Calculate and set the movement*/
@@ -748,75 +754,17 @@ static void refr_pos(lv_obj_t * obj)
     lv_obj_invalidate(obj);
 }
 
-/**
- * Set relative the position of an object (relative to the parent)
- * @param obj pointer to an object
- * @param x new distance from the left side of the parent
- * @param y new distance from the top of the parent
- */
-void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
+
+static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    obj->x_set = x;
-    obj->y_set = y;
-
-    refr_pos(obj);
-
-}
-
-/**
- * Set the x coordinate of a object
- * @param obj pointer to an object
- * @param x new distance from the left side from the parent
- */
-void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_obj_set_pos(obj, x, lv_obj_get_y(obj));
-}
-
-/**
- * Set the y coordinate of a object
- * @param obj pointer to an object
- * @param y new distance from the top of the parent
- */
-void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_obj_set_pos(obj, lv_obj_get_x(obj), y);
-}
-
-static void refr_size(lv_obj_t * obj)
-{
-    lv_coord_t w = 0;
-    lv_coord_t h = 0;
-
-
-    if(LV_COORD_IS_AUTO(obj->w_set)) {
-        lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
-        lv_coord_t scroll_right = lv_obj_get_scroll_right(obj);
-        w = lv_obj_get_width(obj) + scroll_right;
-    } else {
-        w = obj->w_set;
-    }
-
-    if(LV_COORD_IS_AUTO(obj->h_set)) {
-        lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
-        lv_coord_t scroll_bottom = lv_obj_get_scroll_bottom(obj);
-        h = lv_obj_get_height(obj) + scroll_bottom;
-    } else {
-        h = obj->h_set;
-    }
 
     /* Do nothing if the size is not changed */
     /* It is very important else recursive resizing can
      * occur without size change*/
     if(lv_obj_get_width(obj) == w && lv_obj_get_height(obj) == h) {
-        return;
+        return false;
     }
+
 
     /*Invalidate the original area*/
     lv_obj_invalidate(obj);
@@ -849,6 +797,121 @@ static void refr_size(lv_obj_t * obj)
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
+
+    return true;
+}
+
+
+
+static void lv_grid_refresh_item_pos(lv_obj_t * obj)
+{
+    /*Calculate the grid*/
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    lv_coord_t * col_dsc;
+    lv_coord_t * row_dsc;
+    uint8_t col_num;
+    uint8_t row_num;
+    _lv_grid_calc_t calc;
+    grid_calc(parent->grid, &calc);
+
+    uint8_t col_pos = _GRID_GET_CELL_POS(obj->x_set);
+    uint8_t col_span = _GRID_GET_CELL_SPAN(obj->x_set);
+    uint8_t row_pos = _GRID_GET_CELL_POS(obj->y_set);
+    uint8_t row_span = _GRID_GET_CELL_SPAN(obj->y_set);
+
+    lv_coord_t col_w = calc.col_dsc[col_pos + col_span] - calc.col_dsc[col_pos];
+    lv_coord_t row_h = calc.row_dsc[row_pos + row_span] - calc.row_dsc[row_pos];
+
+    uint8_t x_flag = _GRID_GET_CELL_FLAG(obj->x_set);
+    uint8_t y_flag = _GRID_GET_CELL_FLAG(obj->y_set);
+
+    lv_coord_t x;
+    lv_coord_t y;
+    lv_coord_t w = lv_obj_get_width(obj);
+    lv_coord_t h = lv_obj_get_height(obj);
+
+    switch(x_flag) {
+        case LV_GRID_START:
+            x = calc.col_dsc[col_pos];
+            break;
+        case LV_GRID_STRETCH:
+            x = calc.col_dsc[col_pos];
+            w = col_w;
+            break;
+        case LV_GRID_CENTER:
+            x = calc.col_dsc[col_pos] + (col_w - w) / 2;
+            break;
+        case LV_GRID_END:
+            x = calc.col_dsc[col_pos + 1] - lv_obj_get_width(obj);
+            break;
+    }
+
+    switch(y_flag) {
+        case LV_GRID_START:
+            y = calc.row_dsc[row_pos];
+            break;
+        case LV_GRID_STRETCH:
+            y = calc.row_dsc[row_pos];
+            h = row_h;
+            break;
+        case LV_GRID_CENTER:
+            y = calc.row_dsc[row_pos] + (row_h - h) / 2;
+            break;
+        case LV_GRID_END:
+            y = calc.row_dsc[row_pos + 1] - lv_obj_get_height(obj);
+            break;
+    }
+
+    refr_pos(obj, x, y);
+    refr_size(obj, w, h);
+
+    grid_calc_free(&calc);
+}
+
+
+/**
+ * Set relative the position of an object (relative to the parent)
+ * @param obj pointer to an object
+ * @param x new distance from the left side of the parent
+ * @param y new distance from the top of the parent
+ */
+void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    obj->x_set = x;
+    obj->y_set = y;
+
+    /*If the object is on a grid item let grid to position it. */
+    if(_GRID_IS_CELL(obj->x_set) && _GRID_IS_CELL(obj->x_set)) {
+        lv_grid_refresh_item_pos(obj);
+    } else {
+        refr_pos(obj, x, y);
+    }
+}
+
+/**
+ * Set the x coordinate of a object
+ * @param obj pointer to an object
+ * @param x new distance from the left side from the parent
+ */
+void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_obj_set_pos(obj, x, lv_obj_get_y(obj));
+}
+
+/**
+ * Set the y coordinate of a object
+ * @param obj pointer to an object
+ * @param y new distance from the top of the parent
+ */
+void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_obj_set_pos(obj, lv_obj_get_x(obj), y);
 }
 
 /**
@@ -864,7 +927,52 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     obj->w_set = w;
     obj->h_set = h;
 
-    refr_size(obj);
+    /*If the object is a grid element and stretched, prevent settings its size */
+    bool x_stretch = false;
+    bool y_stretch = false;
+    x_stretch = _GRID_GET_CELL_FLAG(obj->x_set) == LV_GRID_STRETCH ? true : false;
+    y_stretch = _GRID_GET_CELL_FLAG(obj->y_set) == LV_GRID_STRETCH ? true : false;
+
+    if(x_stretch && y_stretch) return;
+
+    lv_coord_t grid_w = 0;
+    lv_coord_t grid_h = 0;
+    if(((LV_COORD_IS_AUTO(obj->w_set) && !x_stretch) ||
+        (LV_COORD_IS_AUTO(obj->h_set) && !y_stretch))) {
+        _lv_grid_calc_t calc;
+        grid_calc(obj->grid, &calc);
+        grid_w = calc.col_dsc[calc.col_dsc_len - 1];
+        grid_h = calc.row_dsc[calc.row_dsc_len - 1];
+        grid_calc_free(&calc);
+    }
+
+
+    if(x_stretch) w = lv_obj_get_width(obj);
+    else {
+        if(LV_COORD_IS_AUTO(obj->w_set)) {
+            lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
+            lv_coord_t scroll_right = lv_obj_get_scroll_right(obj);
+            w = lv_obj_get_width(obj) + scroll_right;
+            w = LV_MATH_MAX(w, grid_w);
+        }
+    }
+
+    if(y_stretch) h = lv_obj_get_height(obj);
+    else {
+        if(LV_COORD_IS_AUTO(obj->h_set) && !x_stretch) {
+            lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
+            lv_coord_t scroll_bottom = lv_obj_get_scroll_bottom(obj);
+            h = lv_obj_get_height(obj) + scroll_bottom;
+            h = LV_MATH_MAX(h, grid_h);
+        }
+    }
+
+    bool chg = refr_size(obj, w, h);
+
+    /*Refresh the position in the grid item if required*/
+    if(chg && (_GRID_IS_CELL(obj->x_set) || _GRID_IS_CELL(obj->y_set))) {
+        lv_grid_refresh_item_pos(obj);
+    }
 }
 
 /**

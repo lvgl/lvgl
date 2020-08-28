@@ -18,6 +18,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 #include "lv_style.h"
+#include "lv_align.h"
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"
@@ -242,6 +243,8 @@ typedef struct _lv_obj_t {
 #if LV_USE_USER_DATA
     lv_obj_user_data_t user_data; /**< Custom user data for object. */
 #endif
+
+    lv_grid_t * grid;
 
 } lv_obj_t;
 
