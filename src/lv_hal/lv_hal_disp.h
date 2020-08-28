@@ -114,7 +114,7 @@ typedef struct _disp_drv_t {
     /** OPTIONAL: Called when lvgl needs any CPU cache that affects rendering to be cleaned */
     void (*clean_dcache_cb)(struct _disp_drv_t * disp_drv);
 
-    /** OPTIONAL: called to check whether gpu is idle */
+    /** OPTIONAL: called to wait while the gpu is working */
     void (*gpu_wait_cb)(struct _disp_drv_t * disp_drv);
 
 #if LV_USE_GPU
