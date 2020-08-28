@@ -271,7 +271,7 @@ def blog_add_post():
     today = date.today()
     d = today.strftime("%Y-%m-%d")
     
-    f = open(d + "_release_" + ver_str + ".md", "w")
+    f = open(d + "-release_" + ver_str + ".md", "w")
     f.write(post)
     f.close()
     

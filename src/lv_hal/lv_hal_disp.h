@@ -111,6 +111,9 @@ typedef struct _disp_drv_t {
      * User can execute very simple tasks here or yield the task */
     void (*wait_cb)(struct _disp_drv_t * disp_drv);
 
+    /** OPTIONAL: Called when lvgl needs any CPU cache that affects rendering to be cleaned */
+    void (*clean_dcache_cb)(struct _disp_drv_t * disp_drv);
+
     /** OPTIONAL: called to check whether gpu is idle */
     void (*gpu_wait_cb)(struct _disp_drv_t * disp_drv);
 

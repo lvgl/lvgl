@@ -1332,6 +1332,7 @@ bool lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_prope
 /**
  * Notify an object (and its children) about its style is modified
  * @param obj pointer to an object
+ * @param part the part of the object which style property should be refreshed.
  * @param prop `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property. It is used to optimize what needs to be refreshed.
  */
 void lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
@@ -1441,10 +1442,10 @@ void _lv_obj_disable_style_caching(lv_obj_t * obj, bool dis)
         list->ignore_cache = dis;
     }
     for(part = _LV_OBJ_PART_REAL_FIRST; part < 0xFF; part++) {
-           lv_style_list_t * list = lv_obj_get_style_list(obj, part);
-           if(list == NULL) break;
-           list->ignore_cache = dis;
-       }
+        lv_style_list_t * list = lv_obj_get_style_list(obj, part);
+        if(list == NULL) break;
+        list->ignore_cache = dis;
+    }
 }
 
 /*-----------------
@@ -2511,61 +2512,61 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
     while(parent) {
         lv_style_list_t * list = lv_obj_get_style_list(parent, part);
         if(!list->ignore_cache && list->style_cnt > 0) {
-            if(!list->valid_cache) update_style_cache((lv_obj_t*)parent, part, prop  & (~LV_STYLE_STATE_MASK));
+            if(!list->valid_cache) update_style_cache((lv_obj_t *)parent, part, prop  & (~LV_STYLE_STATE_MASK));
 
             bool def = false;
             switch(prop  & (~LV_STYLE_STATE_MASK)) {
-            case LV_STYLE_BG_GRAD_DIR:
-                if(list->bg_grad_dir_none) def = true;
-                break;
-            case LV_STYLE_CLIP_CORNER:
-                if(list->clip_corner_off) def = true;
-                break;
-            case LV_STYLE_TEXT_LETTER_SPACE:
-            case LV_STYLE_TEXT_LINE_SPACE:
-                if(list->text_space_zero) def = true;
-                break;
-            case LV_STYLE_TRANSFORM_ANGLE:
-            case LV_STYLE_TRANSFORM_WIDTH:
-            case LV_STYLE_TRANSFORM_HEIGHT:
-            case LV_STYLE_TRANSFORM_ZOOM:
-                if(list->transform_all_zero) def = true;
-                break;
-            case LV_STYLE_BORDER_WIDTH:
-                if(list->border_width_zero) def = true;
-                break;
-            case LV_STYLE_BORDER_SIDE:
-                if(list->border_side_full) def = true;
-                break;
-            case LV_STYLE_BORDER_POST:
-                if(list->border_post_off) def = true;
-                break;
-            case LV_STYLE_OUTLINE_WIDTH:
-                if(list->outline_width_zero) def = true;
-                break;
-            case LV_STYLE_RADIUS:
-                if(list->radius_zero) def = true;
-                break;
-            case LV_STYLE_SHADOW_WIDTH:
-                if(list->shadow_width_zero) def = true;
-                break;
-            case LV_STYLE_PAD_TOP:
-            case LV_STYLE_PAD_BOTTOM:
-            case LV_STYLE_PAD_LEFT:
-            case LV_STYLE_PAD_RIGHT:
-                if(list->pad_all_zero) def = true;
-                break;
-            case LV_STYLE_BG_BLEND_MODE:
-            case LV_STYLE_BORDER_BLEND_MODE:
-            case LV_STYLE_IMAGE_BLEND_MODE:
-            case LV_STYLE_LINE_BLEND_MODE:
-            case LV_STYLE_OUTLINE_BLEND_MODE:
-            case LV_STYLE_PATTERN_BLEND_MODE:
-            case LV_STYLE_SHADOW_BLEND_MODE:
-            case LV_STYLE_TEXT_BLEND_MODE:
-            case LV_STYLE_VALUE_BLEND_MODE:
-                if(list->blend_mode_all_normal) def = true;
-                break;
+                case LV_STYLE_BG_GRAD_DIR:
+                    if(list->bg_grad_dir_none) def = true;
+                    break;
+                case LV_STYLE_CLIP_CORNER:
+                    if(list->clip_corner_off) def = true;
+                    break;
+                case LV_STYLE_TEXT_LETTER_SPACE:
+                case LV_STYLE_TEXT_LINE_SPACE:
+                    if(list->text_space_zero) def = true;
+                    break;
+                case LV_STYLE_TRANSFORM_ANGLE:
+                case LV_STYLE_TRANSFORM_WIDTH:
+                case LV_STYLE_TRANSFORM_HEIGHT:
+                case LV_STYLE_TRANSFORM_ZOOM:
+                    if(list->transform_all_zero) def = true;
+                    break;
+                case LV_STYLE_BORDER_WIDTH:
+                    if(list->border_width_zero) def = true;
+                    break;
+                case LV_STYLE_BORDER_SIDE:
+                    if(list->border_side_full) def = true;
+                    break;
+                case LV_STYLE_BORDER_POST:
+                    if(list->border_post_off) def = true;
+                    break;
+                case LV_STYLE_OUTLINE_WIDTH:
+                    if(list->outline_width_zero) def = true;
+                    break;
+                case LV_STYLE_RADIUS:
+                    if(list->radius_zero) def = true;
+                    break;
+                case LV_STYLE_SHADOW_WIDTH:
+                    if(list->shadow_width_zero) def = true;
+                    break;
+                case LV_STYLE_PAD_TOP:
+                case LV_STYLE_PAD_BOTTOM:
+                case LV_STYLE_PAD_LEFT:
+                case LV_STYLE_PAD_RIGHT:
+                    if(list->pad_all_zero) def = true;
+                    break;
+                case LV_STYLE_BG_BLEND_MODE:
+                case LV_STYLE_BORDER_BLEND_MODE:
+                case LV_STYLE_IMAGE_BLEND_MODE:
+                case LV_STYLE_LINE_BLEND_MODE:
+                case LV_STYLE_OUTLINE_BLEND_MODE:
+                case LV_STYLE_PATTERN_BLEND_MODE:
+                case LV_STYLE_SHADOW_BLEND_MODE:
+                case LV_STYLE_TEXT_BLEND_MODE:
+                case LV_STYLE_VALUE_BLEND_MODE:
+                    if(list->blend_mode_all_normal) def = true;
+                    break;
             }
 
             if(def) {
@@ -2693,19 +2694,19 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
         lv_style_list_t * list = lv_obj_get_style_list(parent, part);
 
         if(!list->ignore_cache && list->style_cnt > 0) {
-            if(!list->valid_cache) update_style_cache((lv_obj_t*)parent, part, prop  & (~LV_STYLE_STATE_MASK));
+            if(!list->valid_cache) update_style_cache((lv_obj_t *)parent, part, prop  & (~LV_STYLE_STATE_MASK));
             bool def = false;
             switch(prop & (~LV_STYLE_STATE_MASK)) {
-            case LV_STYLE_OPA_SCALE:
-                if(list->opa_scale_cover) def = true;
-                break;
-            case LV_STYLE_BG_OPA:
-                if(list->bg_opa_cover) return LV_OPA_COVER;     /*Special case, not the default value is used*/
-                if(list->bg_opa_transp) def = true;
-                break;
-            case LV_STYLE_IMAGE_RECOLOR_OPA:
-                if(list->img_recolor_opa_transp) def = true;
-                break;
+                case LV_STYLE_OPA_SCALE:
+                    if(list->opa_scale_cover) def = true;
+                    break;
+                case LV_STYLE_BG_OPA:
+                    if(list->bg_opa_cover) return LV_OPA_COVER;     /*Special case, not the default value is used*/
+                    if(list->bg_opa_transp) def = true;
+                    break;
+                case LV_STYLE_IMAGE_RECOLOR_OPA:
+                    if(list->img_recolor_opa_transp) def = true;
+                    break;
             }
 
             if(def) {
@@ -2772,18 +2773,18 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
         lv_style_list_t * list = lv_obj_get_style_list(parent, part);
 
         if(!list->ignore_cache && list->style_cnt > 0) {
-            if(!list->valid_cache) update_style_cache((lv_obj_t*)parent, part, prop  & (~LV_STYLE_STATE_MASK));
+            if(!list->valid_cache) update_style_cache((lv_obj_t *)parent, part, prop  & (~LV_STYLE_STATE_MASK));
             bool def = false;
             switch(prop  & (~LV_STYLE_STATE_MASK)) {
-            case LV_STYLE_VALUE_STR:
-                if(list->value_txt_str) def = true;
-                break;
-            case LV_STYLE_PATTERN_IMAGE:
-                if(list->pattern_img_null) def = true;
-                break;
-            case LV_STYLE_TEXT_FONT:
-                if(list->text_font_normal) def = true;
-                break;
+                case LV_STYLE_VALUE_STR:
+                    if(list->value_txt_str) def = true;
+                    break;
+                case LV_STYLE_PATTERN_IMAGE:
+                    if(list->pattern_img_null) def = true;
+                    break;
+                case LV_STYLE_TEXT_FONT:
+                    if(list->text_font_normal) def = true;
+                    break;
             }
 
             if(def) {
@@ -3801,7 +3802,7 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         lv_draw_rect_dsc_init(&draw_dsc);
         /*If the border is drawn later disable loading its properties*/
         if(lv_obj_get_style_border_post(obj, LV_OBJ_PART_MAIN)) {
-            draw_dsc.border_opa = LV_OPA_TRANSP;
+            draw_dsc.border_post = 1;
         }
 
         lv_obj_init_draw_rect_dsc(obj, LV_OBJ_PART_MAIN, &draw_dsc);
@@ -4471,44 +4472,44 @@ static bool style_prop_is_cacheble(lv_style_property_t prop)
 {
 
     switch(prop) {
-    case LV_STYLE_PROP_ALL:
-    case LV_STYLE_BG_GRAD_DIR:
-    case LV_STYLE_CLIP_CORNER:
-    case LV_STYLE_TEXT_LETTER_SPACE:
-    case LV_STYLE_TEXT_LINE_SPACE:
-    case LV_STYLE_TEXT_FONT:
-    case LV_STYLE_TRANSFORM_ANGLE:
-    case LV_STYLE_TRANSFORM_WIDTH:
-    case LV_STYLE_TRANSFORM_HEIGHT:
-    case LV_STYLE_TRANSFORM_ZOOM:
-    case LV_STYLE_BORDER_WIDTH:
-    case LV_STYLE_OUTLINE_WIDTH:
-    case LV_STYLE_RADIUS:
-    case LV_STYLE_SHADOW_WIDTH:
-    case LV_STYLE_OPA_SCALE:
-    case LV_STYLE_BG_OPA:
-    case LV_STYLE_BORDER_SIDE:
-    case LV_STYLE_BORDER_POST:
-    case LV_STYLE_IMAGE_RECOLOR_OPA:
-    case LV_STYLE_VALUE_STR:
-    case LV_STYLE_PATTERN_IMAGE:
-    case LV_STYLE_PAD_TOP:
-    case LV_STYLE_PAD_BOTTOM:
-    case LV_STYLE_PAD_LEFT:
-    case LV_STYLE_PAD_RIGHT:
-    case LV_STYLE_BG_BLEND_MODE:
-    case LV_STYLE_BORDER_BLEND_MODE:
-    case LV_STYLE_IMAGE_BLEND_MODE:
-    case LV_STYLE_LINE_BLEND_MODE:
-    case LV_STYLE_OUTLINE_BLEND_MODE:
-    case LV_STYLE_PATTERN_BLEND_MODE:
-    case LV_STYLE_SHADOW_BLEND_MODE:
-    case LV_STYLE_TEXT_BLEND_MODE:
-    case LV_STYLE_VALUE_BLEND_MODE:
-        return true;
-        break;
-    default:
-        return false;
+        case LV_STYLE_PROP_ALL:
+        case LV_STYLE_BG_GRAD_DIR:
+        case LV_STYLE_CLIP_CORNER:
+        case LV_STYLE_TEXT_LETTER_SPACE:
+        case LV_STYLE_TEXT_LINE_SPACE:
+        case LV_STYLE_TEXT_FONT:
+        case LV_STYLE_TRANSFORM_ANGLE:
+        case LV_STYLE_TRANSFORM_WIDTH:
+        case LV_STYLE_TRANSFORM_HEIGHT:
+        case LV_STYLE_TRANSFORM_ZOOM:
+        case LV_STYLE_BORDER_WIDTH:
+        case LV_STYLE_OUTLINE_WIDTH:
+        case LV_STYLE_RADIUS:
+        case LV_STYLE_SHADOW_WIDTH:
+        case LV_STYLE_OPA_SCALE:
+        case LV_STYLE_BG_OPA:
+        case LV_STYLE_BORDER_SIDE:
+        case LV_STYLE_BORDER_POST:
+        case LV_STYLE_IMAGE_RECOLOR_OPA:
+        case LV_STYLE_VALUE_STR:
+        case LV_STYLE_PATTERN_IMAGE:
+        case LV_STYLE_PAD_TOP:
+        case LV_STYLE_PAD_BOTTOM:
+        case LV_STYLE_PAD_LEFT:
+        case LV_STYLE_PAD_RIGHT:
+        case LV_STYLE_BG_BLEND_MODE:
+        case LV_STYLE_BORDER_BLEND_MODE:
+        case LV_STYLE_IMAGE_BLEND_MODE:
+        case LV_STYLE_LINE_BLEND_MODE:
+        case LV_STYLE_OUTLINE_BLEND_MODE:
+        case LV_STYLE_PATTERN_BLEND_MODE:
+        case LV_STYLE_SHADOW_BLEND_MODE:
+        case LV_STYLE_TEXT_BLEND_MODE:
+        case LV_STYLE_VALUE_BLEND_MODE:
+            return true;
+            break;
+        default:
+            return false;
     }
 }
 
@@ -4563,32 +4564,29 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
     if(lv_obj_get_style_transform_angle(obj, part) != 0 ||
        lv_obj_get_style_transform_width(obj, part) != 0 ||
        lv_obj_get_style_transform_height(obj, part) != 0 ||
-       lv_obj_get_style_transform_zoom(obj, part) != LV_IMG_ZOOM_NONE)
-    {
+       lv_obj_get_style_transform_zoom(obj, part) != LV_IMG_ZOOM_NONE) {
         list->transform_all_zero  = 0;
     }
 
     list->pad_all_zero  = 1;
     if(lv_obj_get_style_pad_top(obj, part) != 0 ||
-        lv_obj_get_style_pad_bottom(obj, part) != 0 ||
-        lv_obj_get_style_pad_left(obj, part) != 0 ||
-        lv_obj_get_style_pad_right(obj, part) != 0)
-    {
+       lv_obj_get_style_pad_bottom(obj, part) != 0 ||
+       lv_obj_get_style_pad_left(obj, part) != 0 ||
+       lv_obj_get_style_pad_right(obj, part) != 0) {
         list->pad_all_zero  = 0;
     }
 
     list->blend_mode_all_normal = 1;
 #if LV_USE_BLEND_MODES
     if(lv_obj_get_style_bg_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
-            lv_obj_get_style_border_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
-            lv_obj_get_style_pattern_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
-            lv_obj_get_style_outline_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
-            lv_obj_get_style_value_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
-            lv_obj_get_style_text_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
-            lv_obj_get_style_line_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
-            lv_obj_get_style_image_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
-            lv_obj_get_style_shadow_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL)
-    {
+       lv_obj_get_style_border_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+       lv_obj_get_style_pattern_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+       lv_obj_get_style_outline_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+       lv_obj_get_style_value_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+       lv_obj_get_style_text_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+       lv_obj_get_style_line_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+       lv_obj_get_style_image_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL ||
+       lv_obj_get_style_shadow_blend_mode(obj, part) != LV_BLEND_MODE_NORMAL) {
         list->blend_mode_all_normal = 0;
     }
 #endif
@@ -4618,7 +4616,7 @@ static void update_style_cache_children(lv_obj_t * obj)
 
         list->text_space_zero = 1;
         if(lv_obj_get_style_text_letter_space(obj, part) != 0 ||
-                lv_obj_get_style_text_line_space(obj, part) != 0) {
+           lv_obj_get_style_text_line_space(obj, part) != 0) {
             list->text_space_zero = 0;
         }
 
@@ -4646,7 +4644,8 @@ static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_proper
         lv_style_list_t * list = lv_obj_get_style_list(obj, part);
         if(list == NULL) return;
         list->valid_cache = 0;
-    } else {
+    }
+    else {
 
         for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
             lv_style_list_t * list = lv_obj_get_style_list(obj, part);
@@ -4654,10 +4653,10 @@ static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_proper
             list->valid_cache = 0;
         }
         for(part = _LV_OBJ_PART_REAL_FIRST; part < 0xFF; part++) {
-               lv_style_list_t * list = lv_obj_get_style_list(obj, part);
-               if(list == NULL) break;
-               list->valid_cache = 0;
-           }
+            lv_style_list_t * list = lv_obj_get_style_list(obj, part);
+            if(list == NULL) break;
+            list->valid_cache = 0;
+        }
     }
 
     lv_obj_t * child = lv_obj_get_child(obj, NULL);

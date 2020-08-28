@@ -41,7 +41,7 @@ enum {
     LV_SCROLLBAR_MODE_DRAG   = 0x2, /**< Show scroll bars when page is being dragged*/
     LV_SCROLLBAR_MODE_AUTO   = 0x3, /**< Show scroll bars when the scrollable container is large enough to be scrolled*/
     LV_SCROLLBAR_MODE_HIDE   = 0x4, /**< Hide the scroll bar temporally*/
-    LV_SCROLLBAR_MODE_UNHIDE = 0x5, /**< Unhide the previously hidden scroll bar. Recover original mode too*/
+    LV_SCROLLBAR_MODE_UNHIDE = 0x8, /**< Unhide the previously hidden scroll bar. Recover original mode too*/
 };
 typedef uint8_t lv_scrollbar_mode_t;
 
