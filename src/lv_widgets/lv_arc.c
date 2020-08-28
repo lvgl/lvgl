@@ -400,39 +400,7 @@ void lv_arc_set_value(lv_obj_t * arc, int16_t value)
     if(ext->cur_value == new_value) return;
     ext->cur_value = new_value;
 
-<<<<<<< HEAD
     value_update(arc);
-=======
-    int16_t bg_midpoint, range_midpoint, bg_end = ext->bg_angle_end;
-    if(ext->bg_angle_end < ext->bg_angle_start) bg_end = ext->bg_angle_end + 360;
-
-    int16_t angle;
-    switch(ext->type) {
-        case LV_ARC_TYPE_SYMMETRIC:
-            bg_midpoint = (ext->bg_angle_start + bg_end) / 2;
-            range_midpoint = (int32_t)(ext->min_value + ext->max_value) / 2;
-
-            if(ext->cur_value < range_midpoint) {
-                angle = _lv_map(ext->cur_value, ext->min_value, range_midpoint, ext->bg_angle_start, bg_midpoint);
-                lv_arc_set_start_angle(arc, angle);
-                lv_arc_set_end_angle(arc, bg_midpoint);
-            }
-            else {
-                angle = _lv_map(ext->cur_value, range_midpoint, ext->max_value, bg_midpoint, bg_end);
-                lv_arc_set_start_angle(arc, bg_midpoint);
-                lv_arc_set_end_angle(arc, angle);
-            }
-            break;
-        case LV_ARC_TYPE_REVERSE:
-            angle = _lv_map(ext->cur_value, ext->min_value, ext->max_value, ext->bg_angle_start, bg_end);
-            lv_arc_set_start_angle(arc, angle);
-            break;
-        default: /** LV_ARC_TYPE_NORMAL*/
-            angle = _lv_map(ext->cur_value, ext->min_value, ext->max_value, ext->bg_angle_start, bg_end);
-            lv_arc_set_end_angle(arc, angle);
-    }
-    ext->last_angle = angle; /*Cache angle for slew rate limiting*/
->>>>>>> master
 }
 
 /**
