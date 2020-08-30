@@ -295,6 +295,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
             new_obj->coords.x1    = parent->coords.x1;
             new_obj->coords.x2    = parent->coords.x1 + LV_OBJ_DEF_WIDTH;
         }
+        new_obj->w_set = lv_area_get_width(&new_obj->coords);
+        new_obj->h_set = lv_area_get_height(&new_obj->coords);
     }
 
 
@@ -389,6 +391,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
             lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
         }
     }
+
+    lv_obj_set_pos(new_obj, 0, 0);
 
     /*Send a signal to the parent to notify it about the new child*/
     if(parent != NULL) {
@@ -641,7 +645,7 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     }
 
     /*Notify the original parent because one of its children is lost*/
-    old_par->signal_cb(old_par, LV_SIGNAL_CHILD_CHG, NULL);
+    old_par->signal_cb(old_par, LV_SIGNAL_CHILD_CHG, obj);
 
     /*Notify the new parent about the child*/
     parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
@@ -699,17 +703,17 @@ void lv_obj_move_background(lv_obj_t * obj)
  * Coordinate set
  * ------------------*/
 
-static void refr_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
+static void move_obj_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_parent)
 {
     /*Convert x and y to absolute coordinates*/
-    lv_obj_t * par = obj->parent;
+    lv_obj_t * parent = obj->parent;
 
-    if(par) {
-        lv_coord_t pad_left = lv_obj_get_style_pad_left(par, LV_OBJ_PART_MAIN);
-        lv_coord_t pad_top = lv_obj_get_style_pad_top(par, LV_OBJ_PART_MAIN);
+    if(parent) {
+        lv_coord_t pad_left = lv_obj_get_style_pad_left(parent, LV_OBJ_PART_MAIN);
+        lv_coord_t pad_top = lv_obj_get_style_pad_top(parent, LV_OBJ_PART_MAIN);
 
-        x += pad_left + par->coords.x1 - lv_obj_get_scroll_left(par);
-        y += pad_top + par->coords.y1 - lv_obj_get_scroll_top(par);
+        x += pad_left + parent->coords.x1 - lv_obj_get_scroll_left(parent);
+        y += pad_top + parent->coords.y1 - lv_obj_get_scroll_top(parent);
     } else {
         /*If no parent then it's screen but screen can't be on a grid*/
         if(_GRID_IS_CELL(obj->x_set) || _GRID_IS_CELL(obj->x_set)) {
@@ -748,7 +752,7 @@ static void refr_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->signal_cb(obj, LV_SIGNAL_COORD_CHG, &ori);
 
     /*Send a signal to the parent too*/
-    if(par) par->signal_cb(par, LV_SIGNAL_CHILD_CHG, obj);
+    if(parent && notify_parent) parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
@@ -757,15 +761,12 @@ static void refr_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 
 static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 {
-
     /* Do nothing if the size is not changed */
     /* It is very important else recursive resizing can
      * occur without size change*/
     if(lv_obj_get_width(obj) == w && lv_obj_get_height(obj) == h) {
         return false;
     }
-
-
     /*Invalidate the original area*/
     lv_obj_invalidate(obj);
 
@@ -797,77 +798,165 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
-
     return true;
 }
 
+bool lv_obj_is_grid_item(lv_obj_t * obj);
+static void lv_grid_full_refr(lv_obj_t * cont);
 
-
-static void lv_grid_refresh_item_pos(lv_obj_t * obj)
+static void _grid_item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc)
 {
-    /*Calculate the grid*/
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_coord_t * col_dsc;
-    lv_coord_t * row_dsc;
-    uint8_t col_num;
-    uint8_t row_num;
-    _lv_grid_calc_t calc;
-    grid_calc(parent->grid, &calc);
+    if(lv_obj_is_grid_item(item) == false) return;
 
-    uint8_t col_pos = _GRID_GET_CELL_POS(obj->x_set);
-    uint8_t col_span = _GRID_GET_CELL_SPAN(obj->x_set);
-    uint8_t row_pos = _GRID_GET_CELL_POS(obj->y_set);
-    uint8_t row_span = _GRID_GET_CELL_SPAN(obj->y_set);
+    uint8_t col_pos;
+    uint8_t col_span;
+    uint8_t row_pos;
+    uint8_t row_span;
 
-    lv_coord_t col_w = calc.col_dsc[col_pos + col_span] - calc.col_dsc[col_pos];
-    lv_coord_t row_h = calc.row_dsc[row_pos + row_span] - calc.row_dsc[row_pos];
+    if(cont->grid->row_dsc && cont->grid->col_dsc) {
+        col_pos = _GRID_GET_CELL_POS(item->x_set);
+        col_span = _GRID_GET_CELL_SPAN(item->x_set);
+        row_pos = _GRID_GET_CELL_POS(item->y_set);
+        row_span = _GRID_GET_CELL_SPAN(item->y_set);
+    } else {
+        col_span = 1;
+        row_span = 1;
 
-    uint8_t x_flag = _GRID_GET_CELL_FLAG(obj->x_set);
-    uint8_t y_flag = _GRID_GET_CELL_FLAG(obj->y_set);
+        uint32_t child_id = 0;
+        lv_obj_t * child = lv_obj_get_child_back(cont, NULL);
+
+        while(child) {
+            if(child == item) break;
+            if(_GRID_IS_CELL(child->x_set) && _GRID_IS_CELL(child->y_set)) {
+                child_id++;
+            }
+            child = lv_obj_get_child_back(cont, child);
+        }
+
+        col_pos = child_id % cont->grid->col_dsc_len;
+        row_pos = child_id / cont->grid->col_dsc_len;
+    }
+
+    lv_coord_t col_w = calc->col_dsc[col_pos + col_span] - calc->col_dsc[col_pos];
+    lv_coord_t row_h = calc->row_dsc[row_pos + row_span] - calc->row_dsc[row_pos];
+
+    uint8_t x_flag = _GRID_GET_CELL_FLAG(item->x_set);
+    uint8_t y_flag = _GRID_GET_CELL_FLAG(item->y_set);
 
     lv_coord_t x;
     lv_coord_t y;
-    lv_coord_t w = lv_obj_get_width(obj);
-    lv_coord_t h = lv_obj_get_height(obj);
+    lv_coord_t w = lv_obj_get_width(item);
+    lv_coord_t h = lv_obj_get_height(item);
 
     switch(x_flag) {
         case LV_GRID_START:
-            x = calc.col_dsc[col_pos];
+            x = calc->col_dsc[col_pos];
             break;
         case LV_GRID_STRETCH:
-            x = calc.col_dsc[col_pos];
+            x = calc->col_dsc[col_pos];
             w = col_w;
+            item->w_set = LV_SIZE_STRETCH;
             break;
         case LV_GRID_CENTER:
-            x = calc.col_dsc[col_pos] + (col_w - w) / 2;
+            x = calc->col_dsc[col_pos] + (col_w - w) / 2;
             break;
         case LV_GRID_END:
-            x = calc.col_dsc[col_pos + 1] - lv_obj_get_width(obj);
+            x = calc->col_dsc[col_pos + 1] - lv_obj_get_width(item);
             break;
     }
 
     switch(y_flag) {
         case LV_GRID_START:
-            y = calc.row_dsc[row_pos];
+            y = calc->row_dsc[row_pos];
             break;
         case LV_GRID_STRETCH:
-            y = calc.row_dsc[row_pos];
+            y = calc->row_dsc[row_pos];
+            item->h_set = LV_SIZE_STRETCH;
             h = row_h;
             break;
         case LV_GRID_CENTER:
-            y = calc.row_dsc[row_pos] + (row_h - h) / 2;
+            y = calc->row_dsc[row_pos] + (row_h - h) / 2;
             break;
         case LV_GRID_END:
-            y = calc.row_dsc[row_pos + 1] - lv_obj_get_height(obj);
+            y = calc->row_dsc[row_pos + 1] - lv_obj_get_height(item);
             break;
     }
 
-    refr_pos(obj, x, y);
-    refr_size(obj, w, h);
+    /*Set a new size if required*/
+    if(lv_obj_get_width(item) != w || lv_obj_get_height(item) != h) {
+        lv_area_t old_coords;
+        lv_area_copy(&old_coords, &item->coords);
+        lv_obj_invalidate(item);
+        lv_area_set_width(&item->coords, w);
+        lv_area_set_height(&item->coords, h);
+        lv_obj_invalidate(item);
+        item->signal_cb(item, LV_SIGNAL_COORD_CHG, &old_coords);
+
+        /* If a children is a grid container and has an FR field it also needs to be updated
+         * because the FR cell size will change with child size change. */
+        lv_obj_t * child = lv_obj_get_child(item, NULL);
+        while(child) {
+            if(_lv_grid_has_fr_col(child) || _lv_grid_has_fr_row(child)) {
+                lv_grid_full_refr(child);
+            }
+            child = lv_obj_get_child(item, child);
+        }
+    }
+
+    move_obj_to(item, x, y, false);
+}
+
+bool lv_obj_is_content_sensitive(lv_obj_t * item)
+{
+    if(lv_obj_is_grid_item(item) == false) return false;
+    lv_obj_t * cont = lv_obj_get_parent(item);
+
+    if(cont->grid->col_dsc == NULL && _GRID_GET_CELL_FLAG(item->x_set) == LV_GRID_STRETCH) return true;
+    if(cont->grid->row_dsc == NULL && _GRID_GET_CELL_FLAG(item->y_set) == LV_GRID_STRETCH) return true;
+
+    return false;
+}
+
+static void lv_grid_full_refr(lv_obj_t * cont)
+{
+    /*Calculate the grid*/
+    if(cont->grid == NULL) return;
+    _lv_grid_calc_t calc;
+    grid_calc(cont, &calc);
+
+    lv_obj_t * item = lv_obj_get_child_back(cont, NULL);
+    while(item) {
+        _grid_item_repos(cont, item, &calc);
+        item = lv_obj_get_child_back(cont, item);
+    }
+    grid_calc_free(&calc);
+
+    if(cont->w_set == LV_SIZE_AUTO || cont->h_set == LV_SIZE_AUTO) {
+        lv_obj_set_size(cont, cont->w_set, cont->h_set);
+    }
+}
+
+static void lv_grid_item_refr_pos(lv_obj_t * item)
+{
+    /*Calculate the grid*/
+    lv_obj_t * cont = lv_obj_get_parent(item);
+    if(cont->grid == NULL) return;
+    _lv_grid_calc_t calc;
+    grid_calc(cont, &calc);
+
+    _grid_item_repos(cont, item, &calc);
 
     grid_calc_free(&calc);
 }
 
+bool lv_obj_is_grid_item(lv_obj_t * obj)
+{
+    lv_obj_t * cont = lv_obj_get_parent(obj);
+    if(cont == NULL) return false;
+    if(cont->grid == NULL) return false;
+    if(_GRID_IS_CELL(obj->x_set) && _GRID_IS_CELL(obj->y_set)) return true;
+    return false;
+}
 
 /**
  * Set relative the position of an object (relative to the parent)
@@ -882,11 +971,34 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->x_set = x;
     obj->y_set = y;
 
-    /*If the object is on a grid item let grid to position it. */
-    if(_GRID_IS_CELL(obj->x_set) && _GRID_IS_CELL(obj->x_set)) {
-        lv_grid_refresh_item_pos(obj);
+    bool gi = lv_obj_is_grid_item(obj);
+
+    /*For consistency set the size to stretched if the objects is stretched on the grid*/
+    if(gi) {
+        if(_GRID_GET_CELL_FLAG(obj->x_set) == LV_GRID_STRETCH) obj->w_set = LV_SIZE_STRETCH;
+        if(_GRID_GET_CELL_FLAG(obj->y_set) == LV_GRID_STRETCH) obj->h_set = LV_SIZE_STRETCH;
+    }
+
+    /*If not grid item but has grid position set the position to 0*/
+    if(!gi) {
+        if(_GRID_IS_CELL(x)) {
+            obj->x_set = 0;
+            x = 0;
+        }
+        if(_GRID_IS_CELL(y)) {
+            obj->y_set = 0;
+            y = 0;
+        }
+    }
+
+    /*If the object is on a grid item let the grid to position it. */
+    if(gi) {
+        lv_obj_t * cont = lv_obj_get_parent(obj);
+        /*If added to a grid with auto flow refresh the whole grid else just this item*/
+        if(cont->grid->col_dsc == NULL || cont->grid->row_dsc == NULL) lv_grid_full_refr(cont);
+        else lv_grid_item_refr_pos(obj);
     } else {
-        refr_pos(obj, x, y);
+        move_obj_to(obj, x, y, true);
     }
 }
 
@@ -914,6 +1026,52 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
     lv_obj_set_pos(obj, lv_obj_get_x(obj), y);
 }
 
+void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w, lv_coord_t * h)
+{
+    if(!w && !h) return;
+
+    static uint32_t cnt = 0;
+    printf("auto_size: %d\n", cnt);
+    cnt++;
+    /*If no other effect the auto-size of zero by default*/
+    if(w) *w = 0;
+    if(h) *h = 0;
+
+    /*Get the grid size of the object has a defined grid*/
+    lv_coord_t grid_w = 0;
+    lv_coord_t grid_h = 0;
+    if(obj->grid) {
+        _lv_grid_calc_t calc;
+        grid_calc(obj, &calc);
+        grid_w = calc.col_dsc[calc.col_dsc_len - 1];
+        grid_h = calc.row_dsc[calc.row_dsc_len - 1];
+        grid_calc_free(&calc);
+    }
+
+    /*Get the children's most right and bottom position*/
+    lv_coord_t children_w = 0;
+    lv_coord_t children_h = 0;
+    if(w) {
+        lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
+        lv_coord_t scroll_right = lv_obj_get_scroll_right(obj);
+        children_w = lv_obj_get_width(obj) + scroll_right;
+    }
+
+    if(h) {
+        static uint32_t cnt = 0;
+//        printf("auto_size_scrl: %d\n", cnt);
+        cnt++;
+        lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
+        lv_coord_t scroll_bottom = lv_obj_get_scroll_bottom(obj);
+        children_h = lv_obj_get_height(obj) + scroll_bottom;
+    }
+
+
+    /*auto_size = max(gird_size, children_size)*/
+    if(w) *w = LV_MATH_MAX(children_w, grid_w);
+    if(h) *h = LV_MATH_MAX(children_h, grid_h);
+}
+
 /**
  * Set the size of an object
  * @param obj pointer to an object
@@ -924,55 +1082,47 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
+    bool gi = lv_obj_is_grid_item(obj);
+    bool x_stretch = false;
+    bool y_stretch = false;
+
+    if(gi) {
+        x_stretch = _GRID_GET_CELL_FLAG(obj->x_set) == LV_GRID_STRETCH ? true : false;
+        y_stretch = _GRID_GET_CELL_FLAG(obj->y_set) == LV_GRID_STRETCH ? true : false;
+        if(x_stretch) w = LV_SIZE_STRETCH;
+        if(y_stretch) h = LV_SIZE_STRETCH;
+    }
+
     obj->w_set = w;
     obj->h_set = h;
 
-    /*If the object is a grid element and stretched, prevent settings its size */
-    bool x_stretch = false;
-    bool y_stretch = false;
-    x_stretch = _GRID_GET_CELL_FLAG(obj->x_set) == LV_GRID_STRETCH ? true : false;
-    y_stretch = _GRID_GET_CELL_FLAG(obj->y_set) == LV_GRID_STRETCH ? true : false;
-
+    /*If both streched it was alraedy managed by the grid*/
     if(x_stretch && y_stretch) return;
 
-    lv_coord_t grid_w = 0;
-    lv_coord_t grid_h = 0;
-    if(((LV_COORD_IS_AUTO(obj->w_set) && !x_stretch) ||
-        (LV_COORD_IS_AUTO(obj->h_set) && !y_stretch))) {
-        _lv_grid_calc_t calc;
-        grid_calc(obj->grid, &calc);
-        grid_w = calc.col_dsc[calc.col_dsc_len - 1];
-        grid_h = calc.row_dsc[calc.row_dsc_len - 1];
-        grid_calc_free(&calc);
-    }
-
-
     if(x_stretch) w = lv_obj_get_width(obj);
-    else {
-        if(LV_COORD_IS_AUTO(obj->w_set)) {
-            lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
-            lv_coord_t scroll_right = lv_obj_get_scroll_right(obj);
-            w = lv_obj_get_width(obj) + scroll_right;
-            w = LV_MATH_MAX(w, grid_w);
-        }
-    }
-
     if(y_stretch) h = lv_obj_get_height(obj);
-    else {
-        if(LV_COORD_IS_AUTO(obj->h_set) && !x_stretch) {
-            lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
-            lv_coord_t scroll_bottom = lv_obj_get_scroll_bottom(obj);
-            h = lv_obj_get_height(obj) + scroll_bottom;
-            h = LV_MATH_MAX(h, grid_h);
-        }
+
+    /*Calculate the required auto sizes*/
+    bool x_auto = obj->w_set == LV_SIZE_AUTO ? true : false;
+    bool y_auto = obj->h_set == LV_SIZE_AUTO ? true : false;
+
+    lv_coord_t auto_w;
+    lv_coord_t auto_h;
+    if(x_auto && y_auto) {
+        _lv_obj_calc_auto_size(obj, &auto_w, &auto_h);
+        w = auto_w;
+        h = auto_h;
+    }
+    else if(x_auto) {
+        _lv_obj_calc_auto_size(obj, &auto_w, NULL);
+        w = auto_w;
+    }
+    else if(y_auto) {
+        _lv_obj_calc_auto_size(obj, NULL, &auto_h);
+        h = auto_h;
     }
 
     bool chg = refr_size(obj, w, h);
-
-    /*Refresh the position in the grid item if required*/
-    if(chg && (_GRID_IS_CELL(obj->x_set) || _GRID_IS_CELL(obj->y_set))) {
-        lv_grid_refresh_item_pos(obj);
-    }
 }
 
 /**
@@ -1528,7 +1678,7 @@ void lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t prop
             case LV_STYLE_MARGIN_BOTTOM:
             case LV_STYLE_MARGIN_LEFT:
             case LV_STYLE_MARGIN_RIGHT:
-                if(obj->parent) obj->parent->signal_cb(obj->parent, LV_SIGNAL_CHILD_CHG, NULL);
+                if(obj->parent) obj->parent->signal_cb(obj->parent, LV_SIGNAL_CHILD_CHG, obj);
                 break;
         }
 
@@ -3909,8 +4059,6 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
         }
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
-
-
         scrollbar_draw(obj, clip_area);
 
         if(lv_obj_get_style_clip_corner(obj, LV_OBJ_PART_MAIN)) {
@@ -3979,9 +4127,34 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
     lv_res_t res = LV_RES_OK;
 
-    if(sign == LV_SIGNAL_CHILD_CHG) {
+    if(sign == LV_SIGNAL_COORD_CHG) {
+        if((lv_area_get_width(param) != lv_obj_get_width(obj) && _lv_grid_has_fr_col(obj)) ||
+           (lv_area_get_height(param) != lv_obj_get_height(obj) && _lv_grid_has_fr_row(obj)))
+        {
+            lv_grid_full_refr(obj);
+        }
+    }
+    else if(sign == LV_SIGNAL_CHILD_CHG) {
         /*Return 'invalid' if the child change signal is not enabled*/
         if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
+
+        if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
+            lv_obj_set_size(obj, obj->w_set, obj->h_set);
+        }
+
+        if(obj->grid) {
+            lv_obj_t * child = param;
+            if(child) {
+                if(lv_obj_is_grid_item(child)) lv_grid_full_refr(obj);
+            } else {
+                lv_grid_full_refr(obj);
+            }
+        }
+
+//        else if(lv_obj_is_content_sensitive(obj)) {
+//                lv_grid_full_refr(lv_obj_get_parent(obj));
+//        }
+
     }
     else if(sign == LV_SIGNAL_SCROLL) {
 

@@ -422,6 +422,9 @@ void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x);
  */
 void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y);
 
+
+void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w, lv_coord_t * h);
+
 /**
  * Set the size of an object
  * @param obj pointer to an object

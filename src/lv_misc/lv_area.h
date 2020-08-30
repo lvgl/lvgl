@@ -210,10 +210,11 @@ void _lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align
  **********************/
 
 #define LV_COORD_PX(x)  (x)
-#define LV_COORD_AUTO (LV_COORD_MAX - 1)
+#define LV_SIZE_AUTO (LV_COORD_MAX - 1)
+#define LV_SIZE_STRETCH (LV_COORD_MAX - 2)
 
-#define LV_COORD_IS_PX(x)  (((x) < LV_COORD_MAX) ? true : false)
-#define LV_COORD_IS_AUTO(x) (((x) == LV_COORD_AUTO) ? true : false)
+#define LV_COORD_IS_PX(x)  (((x) < LV_COORD_MAX - 2) ? true : false)
+#define LV_COORD_IS_AUTO(x) (((x) == LV_SIZE_AUTO) ? true : false)
 
 
 #ifdef __cplusplus

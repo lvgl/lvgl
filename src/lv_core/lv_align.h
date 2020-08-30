@@ -44,14 +44,13 @@ extern "C" {
 
 #define _GRID_CELL_SIZE_PX    0     /* The cell size is set in pixels*/
 #define _GRID_CELL_SIZE_FR    1     /* The cell size is set in free units*/
-#define _GRID_CELL_SIZE_AUTO  2     /* The cell size is automatically set to content*/
 
 #define LV_GRID_FR(x)   (LV_COORD_MAX + (x))
-#define LV_GRID_AUTO    LV_COORD_AUTO
 
 #define _GRID_IS_PX(x) ((_GRID_IS_FR(x) == false) && (_GRID_IS_AUTO(x) == false) ? true : false)
 #define _GRID_IS_FR(x) (x > LV_COORD_MAX ? true : false)
 #define _GRID_IS_AUTO(x) (x == LV_GRID_AUTO ? true : false)
+#define _GRID_GET_FR(x) ((x) - LV_COORD_MAX)
 
 
 /**
@@ -62,7 +61,6 @@ extern "C" {
 #define LV_GRID_CELL_END(pos, span)     ((LV_COORD_MAX + (pos) + (span << _GRID_CELL_SHIFT)) | _GRID_CELL_FLAG(LV_GRID_END))
 #define LV_GRID_CELL_CENTER(pos, span)  ((LV_COORD_MAX + (pos) + (span << _GRID_CELL_SHIFT)) | _GRID_CELL_FLAG(LV_GRID_CENTER))
 #define LV_GRID_CELL_STRETCH(pos, span) ((LV_COORD_MAX + (pos) + (span << _GRID_CELL_SHIFT)) | _GRID_CELL_FLAG(LV_GRID_STRETCH))
-
 /**
  * Special LV_GRID_CELL position to flow the object automatically.
  * Both X (column) and Y (row) value needs to be AUTO or explicitly specified*/
@@ -74,6 +72,9 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+/* Can't include lv_obj.h because it includes this header file */
+struct _lv_obj_t;
 
 /**
  * Describe how to flow LV_GRID_POS_AUTO elements
@@ -97,8 +98,8 @@ typedef struct {
 typedef struct {
     lv_coord_t * col_dsc;
     lv_coord_t * row_dsc;
-    uint8_t col_dsc_len;
-    uint8_t row_dsc_len;
+    uint32_t col_dsc_len;
+    uint32_t row_dsc_len;
 }_lv_grid_calc_t;
 
 /**********************
@@ -111,13 +112,13 @@ void lv_grid_set_template(lv_grid_t * grid, const lv_coord_t * col_dsc, const lv
 
 void lv_grid_set_place_content(lv_grid_t * grid, uint8_t col_place, uint8_t row_place);
 
-void grid_calc(lv_grid_t * grid, _lv_grid_calc_t * calc);
+void grid_calc(struct _lv_obj_t * obj, _lv_grid_calc_t * calc);
 
 void grid_calc_free(_lv_grid_calc_t * calc);
 
-uint8_t _lv_grid_get_col_type(lv_grid_t * grid, uint32_t row);
+bool _lv_grid_has_fr_col(struct _lv_obj_t * obj);
 
-uint8_t _lv_grid_get_row_type(lv_grid_t * grid, uint32_t col);
+bool _lv_grid_has_fr_row(struct _lv_obj_t * obj);
 
 /**********************
  *      MACROS
