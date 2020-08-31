@@ -584,17 +584,16 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
     }
 
     /* Include the ancient signal function */
-    if(sign == LV_SIGNAL_CHILD_CHG || sign == LV_SIGNAL_GET_TYPE) {
-        res = ancestor_signal(roller, sign, param);
-        if(res != LV_RES_OK) return res;
-        if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
-    }
-    else if(sign != LV_SIGNAL_CONTROL) { /*Don't let the page to scroll on keys*/
 #if LV_USE_GROUP
+    if(sign != LV_SIGNAL_CONTROL) { /*Don't let the page to scroll on keys*/
+#else
+    if(sign == LV_SIGNAL_CHILD_CHG || sign == LV_SIGNAL_GET_TYPE) {
+#endif
         res = ancestor_signal(roller, sign, param);
         if(res != LV_RES_OK) return res;
-#endif
     }
+
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
     LV_UNUSED(ext);
