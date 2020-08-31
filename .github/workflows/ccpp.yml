@@ -14,5 +14,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run tests
-      run: apt-get install libpng-dev
-      run: cd tests; python ./build.py
+      run: apt-get install libpng-dev; cd tests; python ./build.py
