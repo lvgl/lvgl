@@ -52,8 +52,9 @@ from os import path
 from datetime import date
 import sys
 
-upstream_org_url = "https://github.com/lvgl/"
+upstream_org_url = "https://github.com/kisvegabor/"
 workdir = "./release_tmp"
+proj_list = [ "lv_sim_eclipse_sdl"]
 
 ver_major = -1
 ver_minor = -1
@@ -111,6 +112,12 @@ def clone_repos():
     cmd("git clone " + upstream("lv_drivers") + "; cd lv_drivers; git checkout master")
     cmd("git clone --recurse-submodules " + upstream("docs") + "; cd docs; git checkout master")
     cmd("git clone " + upstream("blog") + "; cd blog; git checkout master")
+
+    for p in proj_list:
+        cmd("git clone " + upstream(p) + " --recurse-submodules ; cd " + p + "; git checkout master")
+        
+    exit(1)    
+        
 
 def get_lvgl_version(br):
     print("Get LVGL's version")
@@ -403,6 +410,42 @@ def publish_dev_and_master():
 
     cmd("cd docs; git checkout master; ./update.py latest dev")
 
+def projs_update():
+    global proj_list, release_br, ver_str
+    for p in proj_list:
+        os.chdir("./" + p)
+        cmd('git checkout origin master')
+        print(p + ": upadte lvgl");
+        cmd("cd lvgl; git co " + release_br + "; git pull orogin " + release_br)
+        cmd("cp -f lvgl/lv_conf_template.h lv_conf.h")
+        cmd("sed -i -r 's/#if 0/#if 1/' lv_conf.h")
+        d = {}
+        with open("conf_dsc.txt") as f:
+            for line in f:
+                (key, val) = line.split()
+                d[key] = val
+
+        for k,v in d:
+            define_set("lv_conf.h", k, v)        
+            
+        if os.path.exists("lv_examples"): 
+            print(p + ": upadte lvlv_examplesgl");
+            cmd("cd lv_examples; git co " + release_br + "; git pull orogin " + release_br)
+            
+        if os.path.exists("lv_drivers"): 
+            print(p + ": upadte lv_drivers");
+            cmd("cd lv_drivers " + release_br + "; git pull orogin " + release_br)
+
+        msg = 'Update to ' + ver_str
+        cmd("git add .")
+        cmd('git commit -am "' + msg +  '"')
+        cmd('git push origin master')
+        cmd("git tag -a " + ver_str + " -m '" + msg + "' " )
+        cmd('git push origin ' + ver_str)
+        
+        os.chdir("../")
+        
+
 def cleanup():
     os.chdir("../")
     cmd("rm -fr " + workdir)
@@ -465,5 +508,6 @@ if __name__ == '__main__':
         docs_update_dev_version()
         publish_dev_and_master()
         
+    projs_update()    
     cleanup()
     
