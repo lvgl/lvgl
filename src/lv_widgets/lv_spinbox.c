@@ -389,13 +389,17 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
     }
 
     /* Include the ancient signal function */
+    if(sign == LV_SIGNAL_GET_TYPE) {
+        res = ancestor_signal(spinbox, sign, param);
+        if(res != LV_RES_OK) return res;
+        return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
+    }
     if(sign != LV_SIGNAL_CONTROL) {
 #if LV_USE_GROUP
         res = ancestor_signal(spinbox, sign, param);
         if(res != LV_RES_OK) return res;
 #endif
     }
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
 
     if(sign == LV_SIGNAL_CLEANUP) {
