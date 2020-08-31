@@ -580,6 +580,9 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         /*Non true color format might have "holes"*/
         if(ext->cf != LV_IMG_CF_TRUE_COLOR && ext->cf != LV_IMG_CF_RAW) return LV_DESIGN_RES_NOT_COVER;
 
+        /*With not LV_OPA_COVER images acn't cover an area */
+        if(lv_obj_get_style_image_opa(img, LV_IMG_PART_MAIN) != LV_OPA_COVER) return LV_DESIGN_RES_NOT_COVER;
+
         int32_t angle_final = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
         angle_final += ext->angle;
 
@@ -601,8 +604,6 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
 
             if(_lv_area_is_in(clip_area, &a, 0) == false) return LV_DESIGN_RES_NOT_COVER;
         }
-
-        if(lv_obj_get_style_image_opa(img, LV_IMG_PART_MAIN) != LV_OPA_COVER) return LV_DESIGN_RES_NOT_COVER;
 
         return LV_DESIGN_RES_COVER;
     }

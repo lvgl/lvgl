@@ -31,6 +31,7 @@ CSRCS += lv_test_core/lv_test_core.c
 CSRCS += lv_test_core/lv_test_obj.c
 CSRCS += lv_test_core/lv_test_style.c
 CSRCS += lv_test_core/lv_test_font_loader.c
+CSRCS += lv_test_widgets/lv_test_label.c
 CSRCS += lv_test_fonts/font_1.c
 CSRCS += lv_test_fonts/font_2.c
 CSRCS += lv_test_fonts/font_3.c
