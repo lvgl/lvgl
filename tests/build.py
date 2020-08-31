@@ -294,8 +294,8 @@ advanced_features = {
   "LV_MEM_CUSTOM":1,
   "LV_HOR_RES_MAX":800,
   "LV_VER_RES_MAX":480,
-  "LV_COLOR_DEPTH":16,
-  "LV_COLOR_16_SWAP":1,
+  "LV_COLOR_DEPTH":32,
+  "LV_COLOR_16_SWAP":0,
   "LV_COLOR_SCREEN_TRANSP":1,
   "LV_USE_GROUP":1,
   "LV_USE_ANIMATION":1,
@@ -305,9 +305,6 @@ advanced_features = {
   "LV_USE_IMG_TRANSFORM":1,
   "LV_USE_API_EXTENSION_V6":1,
   "LV_USE_USER_DATA":1,
-  "LV_USE_USER_DATA_FREE":1,
-  "LV_USER_DATA_FREE_INCLUDE":"\\\"<stdio.h>\\\"",
-  "LV_USER_DATA_FREE": "\\\"free\\\"",
   "LV_IMG_CACHE_DEF_SIZE":32,
   "LV_USE_LOG":1,
   "LV_USE_THEME_MATERIAL":1,  
@@ -382,7 +379,8 @@ advanced_features = {
 
 build("Minimal monochrome", minimal_monochrome)
 build("All objects, minimal features", all_obj_minimal_features)
-build("All objects, all features", all_obj_all_features)
+build("All objects, all common features", all_obj_all_features)
+build("All objects, with advanced features", advanced_features)
   
 
 
