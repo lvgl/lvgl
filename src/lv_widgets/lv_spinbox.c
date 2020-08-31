@@ -389,11 +389,7 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
     }
 
     /* Include the ancient signal function */
-#if LV_USE_GROUP
-    if(sign != LV_SIGNAL_CONTROL) { /*Don't let the page to scroll on keys*/
-#else
-    if(sign == LV_SIGNAL_GET_TYPE) {
-#endif
+    if(sign != LV_SIGNAL_CONTROL) {
         res = ancestor_signal(spinbox, sign, param);
         if(res != LV_RES_OK) return res;
     }
