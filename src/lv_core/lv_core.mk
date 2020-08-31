@@ -1,3 +1,4 @@
+CSRCS += lv_grid.c
 CSRCS += lv_group.c
 CSRCS += lv_indev.c
 CSRCS += lv_disp.c

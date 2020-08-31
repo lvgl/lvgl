@@ -18,7 +18,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdbool.h>
 #include "lv_style.h"
-#include "lv_align.h"
+#include "lv_grid.h"
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"

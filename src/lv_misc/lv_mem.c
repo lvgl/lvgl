@@ -73,7 +73,7 @@ typedef struct {
  **********************/
 #if LV_MEM_CUSTOM == 0
     static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e);
-    static void * ent_alloc(lv_mem_ent_t * e, size_t size);
+    static inline void * ent_alloc(lv_mem_ent_t * e, size_t size);
     static void ent_trunc(lv_mem_ent_t * e, size_t size);
 #endif
 
@@ -84,9 +84,9 @@ typedef struct {
     static uint8_t * work_mem;
 #endif
 
-static uint32_t zero_mem; /*Give the address of this variable if 0 byte should be allocated*/
-
+static uint32_t zero_mem;   /*Give the address of this variable if 0 byte should be allocated*/
 #if LV_MEM_CUSTOM == 0
+    static uint8_t * last_mem;  /*Address of the last valid byte*/
     static uint32_t mem_max_size; /*Tracks the maximum total size of memory ever used from the internal heap*/
 #endif
 
@@ -125,7 +125,7 @@ void _lv_mem_init(void)
 #else
     work_mem = (uint8_t *)LV_MEM_ADR;
 #endif
-
+    last_mem = &work_mem[LV_MEM_SIZE - 1];
     lv_mem_ent_t * full = (lv_mem_ent_t *)work_mem;
     full->header.s.used = 0;
     /*The total mem size id reduced by the first header and the close patterns */
@@ -176,13 +176,11 @@ void * lv_mem_alloc(size_t size)
     do {
         /* Get the next entry*/
         e = ent_get_next(e);
-
+        if( e == NULL) break;
         /*If there is next entry then try to allocate there*/
-        if(e != NULL) {
-            alloc = ent_alloc(e, size);
-        }
-        /* End if there is not next entry OR the alloc. is successful*/
-    } while(e != NULL && alloc == NULL);
+        if(!e->header.s.used && e->header.s.d_size >= size) alloc = ent_alloc(e, size);
+        /* End if the alloc. is successful*/
+    } while(alloc == NULL);
 
 #else
     /*Use custom, user defined malloc function*/
@@ -817,19 +815,15 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_ff(void * dst, size_t len)
  */
 static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e)
 {
-    lv_mem_ent_t * next_e = NULL;
-
-    if(act_e == NULL) { /*NULL means: get the first entry*/
-        next_e = (lv_mem_ent_t *)work_mem;
-    }
-    else {   /*Get the next entry */
+    /*NULL means: get the first entry; else get the next after `act_e`*/
+    if(act_e == NULL) return (lv_mem_ent_t *)work_mem;
+    else {
         uint8_t * data = &act_e->first_data;
-        next_e         = (lv_mem_ent_t *)&data[act_e->header.s.d_size];
+        lv_mem_ent_t * next_e = (lv_mem_ent_t *)&data[act_e->header.s.d_size];
 
-        if(&next_e->first_data >= &work_mem[LV_MEM_SIZE]) next_e = NULL;
+        if(&next_e->first_data > last_mem) return NULL;
+        else return next_e;
     }
-
-    return next_e;
 }
 
 /**
@@ -838,20 +832,23 @@ static lv_mem_ent_t * ent_get_next(lv_mem_ent_t * act_e)
  * @param size size of the new memory in bytes
  * @return pointer to the allocated memory or NULL if not enough memory in the entry
  */
-static void * ent_alloc(lv_mem_ent_t * e, size_t size)
+static inline void * ent_alloc(lv_mem_ent_t * e, size_t size)
 {
-    void * alloc = NULL;
-    /*If the memory is free and big enough then use it */
-    if(e->header.s.used == 0 && e->header.s.d_size >= size) {
+//    static uint32_t cnt = 0;
+//
+////    if((cnt & 0xFFFF) == 0)
+//        printf("alloc: %d\n", cnt);
+//    cnt++;
+//
+
+
         /*Truncate the entry to the desired size */
         ent_trunc(e, size);
         e->header.s.used = 1;
 
         /*Save the allocated data*/
-        alloc = &e->first_data;
-    }
+        return &e->first_data;
 
-    return alloc;
 }
 
 /**

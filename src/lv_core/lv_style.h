@@ -231,7 +231,7 @@ typedef struct {
 #if LV_USE_ASSERT_STYLE
     uint32_t sentinel;
 #endif
-    uint32_t style_cnt     : 6;
+    uint32_t style_cnt     : 5;
     uint32_t has_local     : 1;
     uint32_t has_trans     : 1;
     uint32_t skip_trans    : 1;      /*1: Temporally skip the transition style if any*/
@@ -244,6 +244,7 @@ typedef struct {
     uint32_t clip_corner_off       : 1;
     uint32_t transform_all_zero  : 1;
     uint32_t pad_all_zero : 1;
+    uint32_t margin_all_zero : 1;
     uint32_t blend_mode_all_normal : 1;
     uint32_t bg_opa_transp : 1;
     uint32_t bg_opa_cover : 1;

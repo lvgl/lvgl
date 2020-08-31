@@ -249,37 +249,6 @@ void _lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool h
     }
 }
 
-/**
- * Return with head node of the linked list
- * @param ll_p pointer to linked list
- * @return pointer to the head of 'll_p'
- */
-void * _lv_ll_get_head(const lv_ll_t * ll_p)
-{
-    void * head = NULL;
-
-    if(ll_p != NULL) {
-        head = ll_p->head;
-    }
-
-    return head;
-}
-
-/**
- * Return with tail node of the linked list
- * @param ll_p pointer to linked list
- * @return pointer to the head of 'll_p'
- */
-void * _lv_ll_get_tail(const lv_ll_t * ll_p)
-{
-    void * tail = NULL;
-
-    if(ll_p != NULL) {
-        tail = ll_p->tail;
-    }
-
-    return tail;
-}
 
 /**
  * Return with the pointer of the next node after 'n_act'
@@ -289,8 +258,6 @@ void * _lv_ll_get_tail(const lv_ll_t * ll_p)
  */
 void * _lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
 {
-    if(ll_p == NULL) return NULL;
-
     /* Pointer to the next node is stored in the end of this node.
      * Go there and return the address found there */
     const lv_ll_node_t * n_act_d = n_act;
@@ -306,8 +273,6 @@ void * _lv_ll_get_next(const lv_ll_t * ll_p, const void * n_act)
  */
 void * _lv_ll_get_prev(const lv_ll_t * ll_p, const void * n_act)
 {
-    if(ll_p == NULL) return NULL;
-
     /* Pointer to the prev. node is stored in the end of this node.
      * Go there and return the address found there */
     const lv_ll_node_t * n_act_d = n_act;

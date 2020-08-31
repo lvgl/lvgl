@@ -1044,6 +1044,7 @@ bool lv_debug_check_style_list(const lv_style_list_t * list)
  *   STATIC FUNCTIONS
  **********************/
 
+static uint32_t stat[256];
 /**
  * Get a property's index (byte index in `style->map`) from a style.
  * Return best matching property's index considering the state of `prop`
@@ -1066,6 +1067,12 @@ LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t 
     int16_t id_guess = -1;
 
     size_t i = 0;
+
+    stat[prop & 0xFF]++;
+//
+//    if((prop & 0xFF) == LV_STYLE_PAD_TOP) {
+//        printf("pad top\n");
+//    }
 
     uint8_t prop_id;
     while((prop_id = get_style_prop_id(style, i)) != _LV_STYLE_CLOSEING_PROP) {

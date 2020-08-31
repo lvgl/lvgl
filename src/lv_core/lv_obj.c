@@ -49,6 +49,10 @@
 #define LV_OBJ_DEF_WIDTH    (LV_DPX(100))
 #define LV_OBJ_DEF_HEIGHT   (LV_DPX(50))
 #define SCROLLBAR_MIN_SIZE (LV_DPX(10))
+#define SCROLL_ANIM_TIME_MIN 100    /*ms*/
+#define SCROLL_ANIM_TIME_MAX 300    /*ms*/
+
+#define GRID_DEBUG  1 /*Draw rectangles on grid cells*/
 
 /**********************
  *      TYPEDEFS
@@ -804,14 +808,14 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
 bool lv_obj_is_grid_item(lv_obj_t * obj);
 static void lv_grid_full_refr(lv_obj_t * cont);
 
-static void _grid_item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc)
+static void _grid_item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc, uint32_t * child_id_ext, lv_point_t * grid_abs)
 {
     if(lv_obj_is_grid_item(item) == false) return;
 
-    uint8_t col_pos;
-    uint8_t col_span;
-    uint8_t row_pos;
-    uint8_t row_span;
+    uint32_t col_pos;
+    uint32_t col_span;
+    uint32_t row_pos;
+    uint32_t row_span;
 
     if(cont->grid->row_dsc && cont->grid->col_dsc) {
         col_pos = _GRID_GET_CELL_POS(item->x_set);
@@ -823,18 +827,26 @@ static void _grid_item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t *
         row_span = 1;
 
         uint32_t child_id = 0;
-        lv_obj_t * child = lv_obj_get_child_back(cont, NULL);
+        if(child_id_ext) child_id = *child_id_ext;
+        else {
+            lv_obj_t * child = lv_obj_get_child_back(cont, NULL);
 
-        while(child) {
-            if(child == item) break;
-            if(_GRID_IS_CELL(child->x_set) && _GRID_IS_CELL(child->y_set)) {
-                child_id++;
+            while(child) {
+                if(child == item) break;
+                if(_GRID_IS_CELL(child->x_set) && _GRID_IS_CELL(child->y_set)) {
+                    child_id++;
+                }
+                child = lv_obj_get_child_back(cont, child);
             }
-            child = lv_obj_get_child_back(cont, child);
         }
 
-        col_pos = child_id % cont->grid->col_dsc_len;
-        row_pos = child_id / cont->grid->col_dsc_len;
+        if(cont->grid->row_dsc == NULL) {
+            col_pos = child_id % cont->grid->col_dsc_len;
+            row_pos = child_id / cont->grid->col_dsc_len;
+        } else {
+            col_pos = child_id / cont->grid->row_dsc_len;
+            row_pos = child_id % cont->grid->row_dsc_len;
+        }
     }
 
     lv_coord_t col_w = calc->col_dsc[col_pos + col_span] - calc->col_dsc[col_pos];
@@ -902,19 +914,12 @@ static void _grid_item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t *
             child = lv_obj_get_child(item, child);
         }
     }
+    bool moved = true;
+    if(grid_abs) {
+        if(grid_abs->x + x == item->coords.x1 && grid_abs->y + y == item->coords.y1) moved = false;
+    }
 
-    move_obj_to(item, x, y, false);
-}
-
-bool lv_obj_is_content_sensitive(lv_obj_t * item)
-{
-    if(lv_obj_is_grid_item(item) == false) return false;
-    lv_obj_t * cont = lv_obj_get_parent(item);
-
-    if(cont->grid->col_dsc == NULL && _GRID_GET_CELL_FLAG(item->x_set) == LV_GRID_STRETCH) return true;
-    if(cont->grid->row_dsc == NULL && _GRID_GET_CELL_FLAG(item->y_set) == LV_GRID_STRETCH) return true;
-
-    return false;
+    if(moved) move_obj_to(item, x, y, false);
 }
 
 static void lv_grid_full_refr(lv_obj_t * cont)
@@ -924,9 +929,21 @@ static void lv_grid_full_refr(lv_obj_t * cont)
     _lv_grid_calc_t calc;
     grid_calc(cont, &calc);
 
+    /* Calculate the grids absolute x and y coordinates.
+     * It will be used as helper during item repositioning to avoid calculating this value for every children*/
+    lv_point_t grid_abs;
+    lv_coord_t pad_left = lv_obj_get_style_pad_left(cont, LV_OBJ_PART_MAIN);
+    lv_coord_t pad_top = lv_obj_get_style_pad_top(cont, LV_OBJ_PART_MAIN);
+    grid_abs.x = pad_left + cont->coords.x1 - lv_obj_get_scroll_left(cont);
+    grid_abs.y = pad_top + cont->coords.y1 - lv_obj_get_scroll_top(cont);
+
+    uint32_t child_id = 0;
     lv_obj_t * item = lv_obj_get_child_back(cont, NULL);
     while(item) {
-        _grid_item_repos(cont, item, &calc);
+        if(_GRID_IS_CELL(item->x_set) && _GRID_IS_CELL(item->y_set)) {
+            _grid_item_repos(cont, item, &calc, &child_id, &grid_abs);
+            child_id++;
+        }
         item = lv_obj_get_child_back(cont, item);
     }
     grid_calc_free(&calc);
@@ -944,7 +961,7 @@ static void lv_grid_item_refr_pos(lv_obj_t * item)
     _lv_grid_calc_t calc;
     grid_calc(cont, &calc);
 
-    _grid_item_repos(cont, item, &calc);
+    _grid_item_repos(cont, item, &calc, NULL, NULL);
 
     grid_calc_free(&calc);
 }
@@ -993,10 +1010,18 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 
     /*If the object is on a grid item let the grid to position it. */
     if(gi) {
+        lv_area_t old_area;
+        lv_area_copy(&old_area, &obj->coords);
+        lv_grid_item_refr_pos(obj);
+
         lv_obj_t * cont = lv_obj_get_parent(obj);
-        /*If added to a grid with auto flow refresh the whole grid else just this item*/
-        if(cont->grid->col_dsc == NULL || cont->grid->row_dsc == NULL) lv_grid_full_refr(cont);
-        else lv_grid_item_refr_pos(obj);
+
+        /*If the item was moved and grid is implicit in the changed direction refresh the whole grid.*/
+        if((cont->grid->col_dsc == NULL && (old_area.x1 != obj->coords.x1 || old_area.x2 != obj->coords.x2)) ||
+           (cont->grid->row_dsc == NULL && (old_area.y1 != obj->coords.y1 || old_area.y2 != obj->coords.y2)))
+        {
+            lv_grid_full_refr(cont);
+        }
     } else {
         move_obj_to(obj, x, y, true);
     }
@@ -1030,9 +1055,10 @@ void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w, lv_coord_t * h)
 {
     if(!w && !h) return;
 
-    static uint32_t cnt = 0;
-    printf("auto_size: %d\n", cnt);
-    cnt++;
+//    static uint32_t cnt = 0;
+//    printf("auto_size: %d\n", cnt);
+//    cnt++;
+
     /*If no other effect the auto-size of zero by default*/
     if(w) *w = 0;
     if(h) *h = 0;
@@ -1043,8 +1069,8 @@ void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w, lv_coord_t * h)
     if(obj->grid) {
         _lv_grid_calc_t calc;
         grid_calc(obj, &calc);
-        grid_w = calc.col_dsc[calc.col_dsc_len - 1];
-        grid_h = calc.row_dsc[calc.row_dsc_len - 1];
+        grid_w = calc.col_dsc[calc.col_dsc_len - 1] + lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN) +  + lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
+        grid_h = calc.row_dsc[calc.row_dsc_len - 1] + lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN) + lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);;
         grid_calc_free(&calc);
     }
 
@@ -1058,9 +1084,6 @@ void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w, lv_coord_t * h)
     }
 
     if(h) {
-        static uint32_t cnt = 0;
-//        printf("auto_size_scrl: %d\n", cnt);
-        cnt++;
         lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
         lv_coord_t scroll_bottom = lv_obj_get_scroll_bottom(obj);
         children_h = lv_obj_get_height(obj) + scroll_bottom;
@@ -1122,7 +1145,7 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
         h = auto_h;
     }
 
-    bool chg = refr_size(obj, w, h);
+    refr_size(obj, w, h);
 }
 
 /**
@@ -1261,7 +1284,10 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
         lv_anim_path_set_cb(&path, lv_anim_path_ease_out);
 
         if(x) {
-            lv_anim_set_time(&a, lv_anim_speed_to_time((lv_disp_get_hor_res(d) * 3) >> 2, 0, x));
+            uint32_t t = lv_anim_speed_to_time((lv_disp_get_hor_res(d) * 3) >> 2, 0, x);
+            if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
+            if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
+            lv_anim_set_time(&a, t);
             lv_anim_set_values(&a, obj->scroll.x, obj->scroll.x + x);
             lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) scroll_anim_x_cb);
             lv_anim_set_path(&a, &path);
@@ -1269,7 +1295,10 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
         }
 
         if(y) {
-            lv_anim_set_time(&a, lv_anim_speed_to_time((lv_disp_get_ver_res(d) * 3) >> 2, 0, y));
+            uint32_t t = lv_anim_speed_to_time((lv_disp_get_ver_res(d) * 3) >> 2, 0, y);
+            if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
+            if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
+            lv_anim_set_time(&a, t);
             lv_anim_set_values(&a, obj->scroll.y, obj->scroll.y + y);
             lv_anim_set_exec_cb(&a,  (lv_anim_exec_xcb_t) scroll_anim_y_cb);
             lv_anim_set_path(&a, &path);
@@ -2332,16 +2361,7 @@ lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, const lv_obj_t * child)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_t * result = NULL;
-
-    if(child == NULL) {
-        result = _lv_ll_get_head(&obj->child_ll);
-    }
-    else {
-        result = _lv_ll_get_next(&obj->child_ll, child);
-    }
-
-    return result;
+    return child ? _lv_ll_get_next(&obj->child_ll, child) : _lv_ll_get_head(&obj->child_ll);
 }
 
 /**
@@ -2355,16 +2375,7 @@ lv_obj_t * lv_obj_get_child_back(const lv_obj_t * obj, const lv_obj_t * child)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_t * result = NULL;
-
-    if(child == NULL) {
-        result = _lv_ll_get_tail(&obj->child_ll);
-    }
-    else {
-        result = _lv_ll_get_prev(&obj->child_ll, child);
-    }
-
-    return result;
+    return child ? _lv_ll_get_prev(&obj->child_ll, child) : _lv_ll_get_tail(&obj->child_ll);
 }
 
 /**
@@ -2817,6 +2828,12 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
                 case LV_STYLE_PAD_LEFT:
                 case LV_STYLE_PAD_RIGHT:
                     if(list->pad_all_zero) def = true;
+                    break;
+                case LV_STYLE_MARGIN_TOP:
+                case LV_STYLE_MARGIN_BOTTOM:
+                case LV_STYLE_MARGIN_LEFT:
+                case LV_STYLE_MARGIN_RIGHT:
+                    if(list->margin_all_zero) def = true;
                     break;
                 case LV_STYLE_BG_BLEND_MODE:
                 case LV_STYLE_BORDER_BLEND_MODE:
@@ -4086,6 +4103,47 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             coords.y2 += h;
             lv_draw_rect(&coords, clip_area, &draw_dsc);
         }
+
+#if GRID_DEBUG
+        /*Draw the grid cells*/
+        if(obj->grid) {
+            _lv_grid_calc_t calc;
+            grid_calc(obj, &calc);
+
+            /*Create a color unique to this object. */
+            lv_color_t c = lv_color_hex(((lv_uintptr_t) obj) & 0xFFFFFF);
+
+            lv_draw_rect_dsc_t grid_rect_dsc;
+            lv_draw_rect_dsc_init(&grid_rect_dsc);
+            grid_rect_dsc.bg_color = c;
+            grid_rect_dsc.bg_opa = LV_OPA_20;
+            grid_rect_dsc.border_width = 2;
+            grid_rect_dsc.border_color = c;
+            grid_rect_dsc.border_opa = LV_OPA_70;
+
+            lv_point_t grid_abs;
+            lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
+            lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN);
+            grid_abs.x = pad_left + obj->coords.x1 - lv_obj_get_scroll_left(obj);
+            grid_abs.y = pad_top + obj->coords.y1 - lv_obj_get_scroll_top(obj);
+
+            uint32_t row;
+            uint32_t col;
+            for(row = 0; row < calc.row_dsc_len - 1; row ++) {
+                for(col = 0; col < calc.col_dsc_len - 1; col ++) {
+                    lv_area_t a;
+                    a.x1 = grid_abs.x + calc.col_dsc[col];
+                    a.x2 = grid_abs.x + calc.col_dsc[col + 1];
+                    a.y1 = grid_abs.y + calc.row_dsc[row];
+                    a.y2 = grid_abs.y + calc.row_dsc[row + 1];
+                    lv_draw_rect(&a, clip_area, &grid_rect_dsc);
+                }
+            }
+
+
+            grid_calc_free(&calc);
+        }
+#endif
     }
 
     return LV_DESIGN_RES_OK;
@@ -4194,6 +4252,17 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, d);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
+        lv_obj_t * child = lv_obj_get_child(obj, NULL);
+        while(child) {
+            lv_obj_set_pos(child, child->x_set, child->y_set);
+            child = lv_obj_get_child(obj, child);
+        }
+
+
+        if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
+            lv_obj_set_size(obj, obj->w_set, obj->h_set);
+        }
+//        if(lv_obj_is_grid_item(obj)) lv_grid_full_refr(lv_obj_get_parent(obj));
         lv_obj_refresh_ext_draw_pad(obj);
     }
     else if(sign == LV_SIGNAL_PRESSED) {
@@ -4956,6 +5025,10 @@ static bool style_prop_is_cacheble(lv_style_property_t prop)
         case LV_STYLE_PAD_BOTTOM:
         case LV_STYLE_PAD_LEFT:
         case LV_STYLE_PAD_RIGHT:
+        case LV_STYLE_MARGIN_TOP:
+        case LV_STYLE_MARGIN_BOTTOM:
+        case LV_STYLE_MARGIN_LEFT:
+        case LV_STYLE_MARGIN_RIGHT:
         case LV_STYLE_BG_BLEND_MODE:
         case LV_STYLE_BORDER_BLEND_MODE:
         case LV_STYLE_IMAGE_BLEND_MODE:
@@ -5033,6 +5106,14 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
        lv_obj_get_style_pad_left(obj, part) != 0 ||
        lv_obj_get_style_pad_right(obj, part) != 0) {
         list->pad_all_zero  = 0;
+    }
+
+    list->margin_all_zero  = 1;
+    if(lv_obj_get_style_margin_top(obj, part) != 0 ||
+       lv_obj_get_style_margin_bottom(obj, part) != 0 ||
+       lv_obj_get_style_margin_left(obj, part) != 0 ||
+       lv_obj_get_style_margin_right(obj, part) != 0) {
+        list->margin_all_zero  = 0;
     }
 
     list->blend_mode_all_normal = 1;

@@ -678,7 +678,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         draw_dsc.bg_color.full = debug_color.full;
         draw_dsc.bg_opa = LV_OPA_20;
         draw_dsc.border_width = 2;
-        draw_dsc.border_opa = LV_OPA_50;
+        draw_dsc.border_opa = LV_OPA_70;
         draw_dsc.border_color.full = (debug_color.full + 0x13) * 9;
 
         lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &draw_dsc);

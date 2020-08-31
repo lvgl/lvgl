@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_ALIGN_H
-#define LV_ALIGN_H
+#ifndef LV_GRID_H
+#define LV_GRID_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -128,4 +128,4 @@ bool _lv_grid_has_fr_row(struct _lv_obj_t * obj);
 } /* extern "C" */
 #endif
 
-#endif /*LV_ALIGN_H*/
+#endif /*LV_GRID_H*/
