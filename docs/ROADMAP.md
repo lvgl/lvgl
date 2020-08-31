@@ -21,8 +21,6 @@ Planned to September/October 2020
   - Work in progress
 - Simplified File system interface ([feat/new_fs_api](https://github.com/lvgl/lvgl/tree/feat/new-fs-api) branch) to make porting easier
   - Work in progress
-- Add new label alignment modes
-  - See [#1656](https://github.com/lvgl/lvgl/issues/1656)
 - Remove the align parameter from `lv_canvas_draw_text`
 
 ## v9
@@ -37,3 +35,4 @@ Planned to September/October 2020
 - Need coverage report for tests
 - Need static analize (via coverity.io or somehing else)
 - Support dot_begin and dot_middle long modes for labels
+- Add new label alignment modes. [#1656](https://github.com/lvgl/lvgl/issues/1656)
