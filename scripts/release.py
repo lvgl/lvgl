@@ -450,12 +450,13 @@ def cleanup():
     cmd("rm -fr " + workdir)
 
 if __name__ == '__main__':
-    if(len(sys.argv) != 2):
-        print("Argument error. Usage ./release.py bugfix | minor | major") 
-        #exit(1)
-        
-    #dev_prepare = sys.argv[1]
     dev_prepare = 'minor'
+    if(len(sys.argv) != 2):
+        print("Missing argument. Usage ./release.py bugfix | minor | major")
+        print("Use minor by deafult")
+    else:      
+        dev_prepare = sys.argv[1]
+    
     if not (dev_prepare in prepare_type): 
         print("Invalid argument. Usage ./release.py bugfix | minor | major") 
         exit(1)
