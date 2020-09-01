@@ -423,6 +423,7 @@ void lv_arc_set_value(lv_obj_t * arc, int16_t value)
             break;
         default: /** LV_ARC_TYPE_NORMAL*/
             angle = _lv_map(ext->cur_value, ext->min_value, ext->max_value, ext->bg_angle_start, bg_end);
+            lv_arc_set_start_angle(arc, ext->bg_angle_start);
             lv_arc_set_end_angle(arc, angle);
     }
     ext->last_angle = angle; /*Cache angle for slew rate limiting*/
