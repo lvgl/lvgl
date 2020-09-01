@@ -1,5 +1,9 @@
 # Changelog
 
+## v7.6.0 (TBD)
+
+### New features
+
 ## v7.5.0 (planned at 15.09.2020)
 
 ### New features
