@@ -305,6 +305,17 @@ def update_release_branches():
     cmd("cd docs; " + merge_cmd)
     
 def publish_master():   
+    
+    #Merge LVGL master to dev first to avoid "merge-to-dev.yml" running asynchronous
+    os.chdir("./lvgl")
+    cmd("git checkout dev")
+    cmd("git merge master -X theirs")
+    cmd("git add .")
+    cmd("git commit -am 'Merge master'")
+    cmd("git push origin dev")
+    cmd("git checkout master")    
+    os.chdir("../")
+    
     pub_cmd = "git push origin master; git push origin " + ver_str
     cmd("cd lvgl; " + pub_cmd)    
     cmd("cd lv_examples; " + pub_cmd)    
