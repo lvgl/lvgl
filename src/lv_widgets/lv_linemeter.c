@@ -76,6 +76,7 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->line_cnt    = 18;
     ext->scale_angle = 240;
     ext->angle_ofs = 0;
+    ext->mirrored = 0;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(linemeter, lv_linemeter_signal);
