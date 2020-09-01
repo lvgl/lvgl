@@ -348,7 +348,7 @@ def lvgl_update_master_version():
     templ = fnmatch.filter(os.listdir('.'), '*templ*')
     if templ[0]:    
         print("Updating version in " + templ[0])
-        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+/"+ ver_str +"/' " + templ[0])
+        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/"+ ver_str +"/' " + templ[0])
     
     
     cmd("git commit -am 'Update version'")
@@ -381,7 +381,7 @@ def lvgl_update_dev_version():
     templ = fnmatch.filter(os.listdir('.'), '*templ*')
     if templ[0]:    
         print("Updating version in " + templ[0])
-        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+/"+ dev_ver_str +"/' " + templ[0])
+        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/"+ dev_ver_str +"/' " + templ[0])
     
     
     cmd("git commit -am 'Update dev version'")
