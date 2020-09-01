@@ -485,7 +485,6 @@ void lv_obj_clean(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
-    lv_obj_t * child_next;
     while(child) {
         lv_obj_del(child);
         child = lv_obj_get_child(obj, NULL);    /*Get the new first child*/
