@@ -52,7 +52,7 @@ from os import path
 from datetime import date
 import sys
 
-upstream_org_url = "https://github.com/kisvegabor/"
+upstream_org_url = "https://github.com/lvgl/"
 workdir = "./release_tmp"
 proj_list = [ "lv_sim_eclipse_sdl"]
 
@@ -105,10 +105,10 @@ def clone_repos():
     os.chdir(workdir)
 
     #For debuging just copy the repos
-    cmd("cp -a ../repos/. .")
-    return
+    #cmd("cp -a ../repos/. .")
+    #return
 
-    cmd("git clone " + upstream("lvgl") + " lvgl; cd lvgl; git checkout master")
+    cmd("git clone " + upstream("lvgl") + "; cd lvgl; git checkout master")
     cmd("git clone " + upstream("lv_examples") + "; cd lv_examples; git checkout master")
     cmd("git clone " + upstream("lv_drivers") + "; cd lv_drivers; git checkout master")
     cmd("git clone --recurse-submodules " + upstream("docs") + "; cd docs; git checkout master")
