@@ -311,7 +311,7 @@ def publish_master():
     cmd("git checkout dev")
     cmd("git merge master -X theirs")
     cmd("git add .")
-    cmd("git commit -am 'Merge master'")
+    cmd("git commit -am 'Merge master'", False)
     cmd("git push origin dev")
     cmd("git checkout master")    
     os.chdir("../")
@@ -322,8 +322,8 @@ def publish_master():
     cmd("cd lv_drivers; " + pub_cmd)    
 
     pub_cmd = "git push origin latest; git push origin " + ver_str
-    cmd("cd docs; " + pub_cmd)    
-    cmd("cd docs; git checkout master; ./update.py " + release_br)
+    cmd("cd docs; " + pub_cmd)
+    cmd("cd docs; git checkout master; python 2.7 ./update.py " + release_br)
     
     pub_cmd = "git push origin master"
     cmd("cd blog; " + pub_cmd)    
@@ -384,9 +384,9 @@ def lvgl_update_dev_version():
     os.chdir("./lvgl")
 
     cmd("git checkout dev")
-    define_set("./lvgl.h", "LVGL_VERSION_MAJOR", ver_major)
-    define_set("./lvgl.h", "LVGL_VERSION_MINOR", ver_minor)
-    define_set("./lvgl.h", "LVGL_VERSION_PATCH", ver_patch)
+    define_set("./lvgl.h", "LVGL_VERSION_MAJOR", str(ver_major))
+    define_set("./lvgl.h", "LVGL_VERSION_MINOR", str(ver_minor))
+    define_set("./lvgl.h", "LVGL_VERSION_PATCH", str(ver_patch))
     define_set("./lvgl.h", "LVGL_VERSION_INFO", "\"dev\"")
     
     templ = fnmatch.filter(os.listdir('.'), '*templ*')
@@ -418,7 +418,7 @@ def publish_dev_and_master():
     pub_cmd = "git checkout master; git push origin master"
     cmd("cd lvgl; " + pub_cmd)    
 
-    cmd("cd docs; git checkout master; ./update.py latest dev")
+    cmd("cd docs; git checkout master; python 2.7 ./update.py latest dev")
 
 def projs_update():
     global proj_list, release_br, ver_str
@@ -471,7 +471,7 @@ if __name__ == '__main__':
     if not (dev_prepare in prepare_type): 
         print("Invalid argument. Usage ./release.py bugfix | minor | major") 
         exit(1)
-        
+     
     clone_repos()
     get_lvgl_version("master")
     lvgl_prepare()
@@ -509,9 +509,9 @@ if __name__ == '__main__':
             ver_minor = "0"
             ver_patch = "0"
                 
-        dev_ver_str = "v" + ver_major + "." + ver_minor + "." + ver_patch + "-dev"
+        dev_ver_str = "v" + str(ver_major) + "." + str(ver_minor) + "." + str(ver_patch) + "-dev"
         
-        print("Prepare minor version " + ver_str)
+        print("Prepare minor version " + dev_ver_str)
 
         merge_to_dev()
         merge_from_dev()
