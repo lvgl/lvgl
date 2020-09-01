@@ -1,5 +1,14 @@
 # Changelog
 
+## v7.5.0 (planned at 15.09.2020)
+
+### New features
+- Add `clean_dcache_cb` and `lv_disp_clean_dcache` to enable users to use their own cache management function
+- Add `gpu_wait_cb` to wait until the GPU is working. It allows to run CPU a wait only when the rendered data is needed.
+
+### Bugfixes
+
+
 ## v7.4.0 (01.09.2020)
 
 The main new features of v7.4 are run-time font loading, style caching and arc knob with value setting by click.
