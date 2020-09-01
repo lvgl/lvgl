@@ -52,8 +52,9 @@ from os import path
 from datetime import date
 import sys
 
-upstream_org_url = "https://github.com/lvgl/"
+upstream_org_url = "https://github.com/kisvegabor/"
 workdir = "./release_tmp"
+proj_list = [ "lv_sim_eclipse_sdl"]
 
 ver_major = -1
 ver_minor = -1
@@ -81,11 +82,12 @@ def cmd(c, exit_on_err = True):
 def define_set(fn, name, value):    
     print("In " + fn + " set " + name + " to " + value)
     
-    new_content = ""
+    new_content = ""      
+    s = r'^ *# *define +' + str(name).rstrip()
+    
     f = open(fn, "r")
-      
     for i in f.read().splitlines():
-        r = re.search(r'^ *# *define +' + name, i)
+        r = re.search(s, i)
         if r: 
             d = i.split("define")
             i = d[0] + "define " + name + " " + value 
@@ -103,14 +105,18 @@ def clone_repos():
     os.chdir(workdir)
 
     #For debuging just copy the repos
-    #cmd("cp -a ../repos/. .")
-    #return
+    cmd("cp -a ../repos/. .")
+    return
 
     cmd("git clone " + upstream("lvgl") + " lvgl; cd lvgl; git checkout master")
     cmd("git clone " + upstream("lv_examples") + "; cd lv_examples; git checkout master")
     cmd("git clone " + upstream("lv_drivers") + "; cd lv_drivers; git checkout master")
     cmd("git clone --recurse-submodules " + upstream("docs") + "; cd docs; git checkout master")
     cmd("git clone " + upstream("blog") + "; cd blog; git checkout master")
+
+    for p in proj_list:
+        cmd("git clone " + upstream(p) + " --recurse-submodules ; cd " + p + "; git checkout master")
+        
 
 def get_lvgl_version(br):
     print("Get LVGL's version")
@@ -403,6 +409,42 @@ def publish_dev_and_master():
 
     cmd("cd docs; git checkout master; ./update.py latest dev")
 
+def projs_update():
+    global proj_list, release_br, ver_str
+    for p in proj_list:
+        os.chdir("./" + p)
+        cmd('git checkout master')
+        print(p + ": upadte lvgl");
+        cmd("cd lvgl; git co " + release_br + "; git pull origin " + release_br)
+        cmd("cp -f lvgl/lv_conf_template.h lv_conf.h")
+        cmd("sed -i -r 's/#if 0/#if 1/' lv_conf.h")  # Enable lv_conf.h
+        d = {}
+        with open("confdef.txt") as f:
+            for line in f:
+                (key, val) = line.rstrip().split('\t')
+                d[key] = val
+
+        for k,v in d.items():
+            define_set("lv_conf.h", str(k), str(v))        
+            
+        if os.path.exists("lv_examples"): 
+            print(p + ": upadte lv_examples");
+            cmd("cd lv_examples; git co " + release_br + "; git pull origin " + release_br)
+            
+        if os.path.exists("lv_drivers"): 
+            print(p + ": upadte lv_drivers");
+            cmd("cd lv_drivers " + release_br + "; git pull origin " + release_br)
+
+        msg = 'Update to ' + ver_str
+        cmd("git add .")
+        cmd('git commit -am "' + msg +  '"')
+        cmd('git push origin master')
+        cmd("git tag -a " + ver_str + " -m '" + msg + "' " )
+        cmd('git push origin ' + ver_str)
+        
+        os.chdir("../")
+        
+
 def cleanup():
     os.chdir("../")
     cmd("rm -fr " + workdir)
@@ -410,15 +452,21 @@ def cleanup():
 if __name__ == '__main__':
     if(len(sys.argv) != 2):
         print("Argument error. Usage ./release.py bugfix | minor | major") 
-        exit(1)
+        #exit(1)
         
-    dev_prepare = sys.argv[1]
+    #dev_prepare = sys.argv[1]
+    dev_prepare = 'minor'
     if not (dev_prepare in prepare_type): 
         print("Invalid argument. Usage ./release.py bugfix | minor | major") 
         exit(1)
         
     clone_repos()
     get_lvgl_version("master")
+    
+    projs_update()    
+    
+    exit(1);
+    
     lvgl_prepare()
     lv_examples_prepare() 
     lv_drivers_prepare()
@@ -465,5 +513,6 @@ if __name__ == '__main__':
         docs_update_dev_version()
         publish_dev_and_master()
         
+    projs_update()    
     cleanup()
     
