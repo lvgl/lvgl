@@ -462,11 +462,6 @@ if __name__ == '__main__':
         
     clone_repos()
     get_lvgl_version("master")
-    
-    projs_update()    
-    
-    exit(1);
-    
     lvgl_prepare()
     lv_examples_prepare() 
     lv_drivers_prepare()
