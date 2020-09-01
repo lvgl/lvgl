@@ -1,6 +1,6 @@
 # Changelog
 
-## v7.4.0 (planned on 01.09.2020)
+## v7.4.0 (01.09.2020)
 
 The main new features of v7.4 are run-time font loading, style caching and arc knob with value setting by click.
 
