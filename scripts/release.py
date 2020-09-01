@@ -52,7 +52,7 @@ from os import path
 from datetime import date
 import sys
 
-upstream_org_url = "https://github.com/kisvegabor/"
+upstream_org_url = "https://github.com/lvgl/"
 workdir = "./release_tmp"
 proj_list = [ "lv_sim_eclipse_sdl"]
 
@@ -105,10 +105,10 @@ def clone_repos():
     os.chdir(workdir)
 
     #For debuging just copy the repos
-    cmd("cp -a ../repos/. .")
-    return
+    #cmd("cp -a ../repos/. .")
+    #return
 
-    cmd("git clone " + upstream("lvgl") + " lvgl; cd lvgl; git checkout master")
+    cmd("git clone " + upstream("lvgl") + "; cd lvgl; git checkout master")
     cmd("git clone " + upstream("lv_examples") + "; cd lv_examples; git checkout master")
     cmd("git clone " + upstream("lv_drivers") + "; cd lv_drivers; git checkout master")
     cmd("git clone --recurse-submodules " + upstream("docs") + "; cd docs; git checkout master")
@@ -348,7 +348,7 @@ def lvgl_update_master_version():
     templ = fnmatch.filter(os.listdir('.'), '*templ*')
     if templ[0]:    
         print("Updating version in " + templ[0])
-        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+/"+ ver_str +"/' " + templ[0])
+        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/"+ ver_str +"/' " + templ[0])
     
     
     cmd("git commit -am 'Update version'")
@@ -381,7 +381,7 @@ def lvgl_update_dev_version():
     templ = fnmatch.filter(os.listdir('.'), '*templ*')
     if templ[0]:    
         print("Updating version in " + templ[0])
-        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+/"+ dev_ver_str +"/' " + templ[0])
+        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/"+ dev_ver_str +"/' " + templ[0])
     
     
     cmd("git commit -am 'Update dev version'")
@@ -450,23 +450,19 @@ def cleanup():
     cmd("rm -fr " + workdir)
 
 if __name__ == '__main__':
-    if(len(sys.argv) != 2):
-        print("Argument error. Usage ./release.py bugfix | minor | major") 
-        #exit(1)
-        
-    #dev_prepare = sys.argv[1]
     dev_prepare = 'minor'
+    if(len(sys.argv) != 2):
+        print("Missing argument. Usage ./release.py bugfix | minor | major")
+        print("Use minor by deafult")
+    else:      
+        dev_prepare = sys.argv[1]
+    
     if not (dev_prepare in prepare_type): 
         print("Invalid argument. Usage ./release.py bugfix | minor | major") 
         exit(1)
         
     clone_repos()
     get_lvgl_version("master")
-    
-    projs_update()    
-    
-    exit(1);
-    
     lvgl_prepare()
     lv_examples_prepare() 
     lv_drivers_prepare()
