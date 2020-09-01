@@ -605,6 +605,11 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             if(_lv_area_is_in(clip_area, &a, 0) == false) return LV_DESIGN_RES_NOT_COVER;
         }
 
+#if LV_USE_BLEND_MODES
+        if(lv_obj_get_style_bg_blend_mode(img, LV_IMG_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DESIGN_RES_NOT_COVER;
+        if(lv_obj_get_style_img_blend_mode(img, LV_IMG_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DESIGN_RES_NOT_COVER;
+#endif
+
         return LV_DESIGN_RES_COVER;
     }
     else if(mode == LV_DESIGN_DRAW_MAIN) {
