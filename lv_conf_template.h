@@ -653,7 +653,7 @@ typedef void * lv_obj_user_data_t;
  * 1: Some extra precision
  * 2: Best precision
  */
-#  define LV_LINEMETER_PRECISE    0
+#  define LV_LINEMETER_PRECISE    1
 #endif
 
 /*Mask (dependencies: -)*/

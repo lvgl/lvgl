@@ -487,11 +487,8 @@ void lv_obj_clean(lv_obj_t * obj)
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
     lv_obj_t * child_next;
     while(child) {
-        /* Read the next child before deleting the current
-         * because the next couldn't be read from a deleted (invalid) node*/
-        child_next = lv_obj_get_child(obj, child);
         lv_obj_del(child);
-        child = child_next;
+        child = lv_obj_get_child(obj, NULL);    /*Get the new first child*/
     }
 }
 
@@ -3709,17 +3706,13 @@ static void obj_del_core(lv_obj_t * obj)
 
     /*Recursively delete the children*/
     lv_obj_t * i;
-    lv_obj_t * i_next;
     i = _lv_ll_get_head(&(obj->child_ll));
     while(i != NULL) {
-        /*Get the next object before delete this*/
-        i_next = _lv_ll_get_next(&(obj->child_ll), i);
-
-        /*Call the recursive del to the child too*/
+        /*Call the recursive delete to the child too*/
         obj_del_core(i);
 
-        /*Set i to the next node*/
-        i = i_next;
+        /*Set i to the new head node*/
+        i = _lv_ll_get_head(&(obj->child_ll));
     }
 
     lv_event_mark_deleted(obj);
