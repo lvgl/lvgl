@@ -329,14 +329,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
     /*Set attributes*/
     new_obj->adv_hittest  = 0;
-    new_obj->click        = 1;
     new_obj->scroll_mode  = LV_SCROLL_MODE_AUTO;
-    new_obj->hidden       = 0;
-    new_obj->top          = 0;
-    new_obj->protect      = LV_PROTECT_NONE;
-    new_obj->parent_event = 0;
-    new_obj->gesture_parent = parent ? 1 : 0;
-    new_obj->focus_parent  = 0;
+    new_obj->flags = LV_OBJ_FLAG_CLICKABLE;
+    if(parent) new_obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
     new_obj->state = LV_STATE_DEFAULT;
     new_obj->scroll.x = 0;
     new_obj->scroll.y = 0;
@@ -374,14 +369,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
         /*Copy attributes*/
         new_obj->adv_hittest  = copy->adv_hittest;
-        new_obj->click        = copy->click;
+        new_obj->flags        = copy->flags;
         new_obj->scroll_mode  = copy->scroll_mode;
-        new_obj->hidden       = copy->hidden;
-        new_obj->top          = copy->top;
-        new_obj->parent_event = copy->parent_event;
-
-        new_obj->protect      = copy->protect;
-        new_obj->gesture_parent = copy->gesture_parent;
 
 #if LV_USE_GROUP
         /*Add to the same group*/
@@ -533,7 +522,7 @@ void lv_obj_invalidate(const lv_obj_t * obj)
  */
 bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 {
-    if(lv_obj_get_hidden(obj)) return false;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return false;
 
     /*Invalidate the object only if it belongs to the curent or previous'*/
     lv_obj_t * obj_scr = lv_obj_get_screen(obj);
@@ -562,7 +551,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
         while(par != NULL) {
             is_common = _lv_area_intersect(area, area, &par->coords);
             if(is_common == false) return false;       /*If no common parts with parent break;*/
-            if(lv_obj_get_hidden(par)) return false; /*If the parent is hidden then the child is hidden and won't be drawn*/
+            if(lv_obj_has_flag(par, LV_OBJ_FLAG_HIDDEN)) return false; /*If the parent is hidden then the child is hidden and won't be drawn*/
 
             par = lv_obj_get_parent(par);
         }
@@ -793,12 +782,6 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     /*Send a signal to the parent too*/
     lv_obj_t * par = lv_obj_get_parent(obj);
     if(par != NULL) par->signal_cb(par, LV_SIGNAL_CHILD_CHG, obj);
-
-    /*Tell the children the parent's size has changed*/
-    lv_obj_t * i;
-    _LV_LL_READ(obj->child_ll, i) {
-        i->signal_cb(i, LV_SIGNAL_PARENT_SIZE_CHG,  &ori);
-    }
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
@@ -1764,25 +1747,6 @@ void _lv_obj_disable_style_caching(lv_obj_t * obj, bool dis)
  *----------------*/
 
 /**
- * Hide an object. It won't be visible and clickable.
- * @param obj pointer to an object
- * @param en true: hide the object
- */
-void lv_obj_set_hidden(lv_obj_t * obj, bool en)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    if(!obj->hidden) lv_obj_invalidate(obj); /*Invalidate when not hidden (hidden objects are ignored) */
-
-    obj->hidden = en == false ? 0 : 1;
-
-    if(!obj->hidden) lv_obj_invalidate(obj); /*Invalidate when not hidden (hidden objects are ignored) */
-
-    lv_obj_t * par = lv_obj_get_parent(obj);
-    if(par) par->signal_cb(par, LV_SIGNAL_CHILD_CHG, obj);
-}
-
-/**
  * Set whether advanced hit-testing is enabled on an object
  * @param obj pointer to an object
  * @param en true: advanced hit-testing is enabled
@@ -1792,31 +1756,6 @@ void lv_obj_set_adv_hittest(lv_obj_t * obj, bool en)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     obj->adv_hittest = en == false ? 0 : 1;
-}
-
-/**
- * Enable or disable the clicking of an object
- * @param obj pointer to an object
- * @param en true: make the object clickable
- */
-void lv_obj_set_click(lv_obj_t * obj, bool en)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    obj->click = (en == true ? 1 : 0);
-}
-
-/**
- * Enable to bring this object to the foreground if it
- * or any of its children is clicked
- * @param obj pointer to an object
- * @param en true: enable the auto top feature
- */
-void lv_obj_set_top(lv_obj_t * obj, bool en)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    obj->top = (en == true ? 1 : 0);
 }
 
 /**
@@ -1831,54 +1770,6 @@ void lv_obj_set_scroll_mode(lv_obj_t * obj, lv_scroll_mode_t mode)
     if(obj->scroll_mode == mode) return;
     obj->scroll_mode = mode;
     lv_obj_invalidate(obj);
-}
-
-/**
-* Enable to use parent for gesture related operations.
-* If trying to gesture the object the parent will be moved instead
-* @param obj pointer to an object
-* @param en true: enable the 'gesture parent' for the object
-*/
-void lv_obj_set_gesture_parent(lv_obj_t * obj, bool en)
-{
-    obj->gesture_parent = (en == true ? 1 : 0);
-}
-
-/**
-* Enable to use parent for focus state.
-* When object is focused the parent will get the state instead (visual only)
-* @param obj pointer to an object
-* @param en true: enable the 'focus parent' for the object
-*/
-void lv_obj_set_focus_parent(lv_obj_t * obj, bool en)
-{
-    if(lv_obj_is_focused(obj)) {
-        if(en) {
-            obj->focus_parent = 1;
-            lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
-            lv_obj_set_state(lv_obj_get_focused_obj(obj), LV_STATE_FOCUSED);
-        }
-        else {
-            lv_obj_clear_state(lv_obj_get_focused_obj(obj), LV_STATE_FOCUSED | LV_STATE_EDITED);
-            lv_obj_set_state(obj, LV_STATE_FOCUSED);
-            obj->focus_parent = 0;
-        }
-    }
-    else {
-        obj->focus_parent = (en == true ? 1 : 0);
-    }
-}
-
-/**
- * Propagate the events to the parent too
- * @param obj pointer to an object
- * @param en true: enable the event propagation
- */
-void lv_obj_set_parent_event(lv_obj_t * obj, bool en)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    obj->parent_event = (en == true ? 1 : 0);
 }
 
 /**
@@ -1903,30 +1794,23 @@ void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
     base_dir_refr_children(obj);
 }
 
-/**
- * Set a bit or bits in the protect filed
- * @param obj pointer to an object
- * @param prot 'OR'-ed values from `lv_protect_t`
- */
-void lv_obj_add_protect(lv_obj_t * obj, uint8_t prot)
+
+void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    obj->protect |= prot;
+    obj->flags |= f;
 }
 
-/**
- * Clear a bit or bits in the protect filed
- * @param obj pointer to an object
- * @param prot 'OR'-ed values from `lv_protect_t`
- */
-void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot)
+
+
+void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    prot = (~prot) & 0xFF;
-    obj->protect &= prot;
+    obj->flags &= (~f);
 }
+
 
 /**
  * Set the state (fully overwrite) of an object.
@@ -2000,6 +1884,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
 
 }
+
 
 /**
  * Add a given state or states to the object. The other state bits will remain unchanged.
@@ -2185,7 +2070,7 @@ lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t 
     }
 
     if(obj) {
-        if(obj->parent_event && obj->parent) {
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
             lv_res_t res = lv_event_send(obj->parent, event, data);
             if(res != LV_RES_OK) {
                 return LV_RES_INV;
@@ -3124,16 +3009,11 @@ lv_style_t * lv_obj_get_local_style(lv_obj_t * obj, uint8_t part)
  * Attribute get
  *----------------*/
 
-/**
- * Get the hidden attribute of an object
- * @param obj pointer to an object
- * @return true: the object is hidden
- */
-bool lv_obj_get_hidden(const lv_obj_t * obj)
+bool lv_obj_has_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    return obj->hidden == 0 ? false : true;
+    return obj->flags & f ? true : false;
 }
 
 /**
@@ -3148,29 +3028,6 @@ bool lv_obj_get_adv_hittest(const lv_obj_t * obj)
     return obj->adv_hittest == 0 ? false : true;
 }
 
-/**
- * Get the click enable attribute of an object
- * @param obj pointer to an object
- * @return true: the object is clickable
- */
-bool lv_obj_get_click(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return obj->click == 0 ? false : true;
-}
-
-/**
- * Get the top enable attribute of an object
- * @param obj pointer to an object
- * @return true: the auto top feature is enabled
- */
-bool lv_obj_get_top(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return obj->top == 0 ? false : true;
-}
 
 /**
  * Get how the scrollbars should behave.
@@ -3183,39 +3040,6 @@ lv_scroll_mode_t lv_obj_get_scroll_mode(lv_obj_t * obj)
 
     return obj->scroll_mode;
 }
-
-/**
-* Get the gesture parent attribute of an object
-* @param obj pointer to an object
-* @return true: gesture parent is enabled
-*/
-bool lv_obj_get_gesture_parent(const lv_obj_t * obj)
-{
-    return obj->gesture_parent == 0 ? false : true;
-}
-
-/**
-* Get the focus parent attribute of an object
-* @param obj pointer to an object
-* @return true: focus parent is enabled
-*/
-bool lv_obj_get_focus_parent(const lv_obj_t * obj)
-{
-    return obj->focus_parent == 0 ? false : true;
-}
-
-/**
- * Get the parent event attribute of an object
- * @param obj pointer to an object
- * @return true: parent event is enabled
- */
-bool lv_obj_get_parent_event(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return obj->parent_event == 0 ? false : true;
-}
-
 
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
 {
@@ -3235,31 +3059,6 @@ lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
     (void) obj;  /*Unused*/
     return LV_BIDI_DIR_LTR;
 #endif
-}
-
-/**
- * Get the protect field of an object
- * @param obj pointer to an object
- * @return protect field ('OR'ed values of `lv_protect_t`)
- */
-uint8_t lv_obj_get_protect(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return obj->protect;
-}
-
-/**
- * Check at least one bit of a given protect bitfield is set
- * @param obj pointer to an object
- * @param prot protect bits to test ('OR'ed values of `lv_protect_t`)
- * @return false: none of the given bits are set, true: at least one bit is set
- */
-bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return (obj->protect & prot) == 0 ? false : true;
 }
 
 lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part)
@@ -4159,7 +3958,7 @@ lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj)
 {
     if(obj == NULL) return NULL;
     const lv_obj_t * focus_obj = obj;
-    while(lv_obj_get_focus_parent(focus_obj) != false && focus_obj != NULL) {
+    while(lv_obj_has_flag(focus_obj, LV_OBJ_FLAG_FOCUS_BUBBLE) != false && focus_obj != NULL) {
         focus_obj = lv_obj_get_parent(focus_obj);
     }
 
@@ -4193,9 +3992,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_CHILD_CHG) {
-        /*Return 'invalid' if the child change signal is not enabled*/
-        if(lv_obj_is_protected(obj, LV_PROTECT_CHILD_CHG) != false) res = LV_RES_INV;
-
         if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
         }
@@ -4208,11 +4004,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
                 lv_grid_full_refr(obj);
             }
         }
-
-//        else if(lv_obj_is_content_sensitive(obj)) {
-//                lv_grid_full_refr(lv_obj_get_parent(obj));
-//        }
-
     }
     else if(sign == LV_SIGNAL_SCROLL) {
 
@@ -4252,11 +4043,13 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, d);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_obj_t * child = lv_obj_get_child(obj, NULL);
-        while(child) {
-            lv_obj_set_pos(child, child->x_set, child->y_set);
-            child = lv_obj_get_child(obj, child);
-        }
+        if(lv_obj_is_grid_item(obj)) lv_grid_full_refr(obj);
+
+//        lv_obj_t * child = lv_obj_get_child(obj, NULL);
+//        while(child) {
+//            lv_obj_set_pos(child, child->x_set, child->y_set);
+//            child = lv_obj_get_child(obj, child);
+//        }
 
 
         if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {

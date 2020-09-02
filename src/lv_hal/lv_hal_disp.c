@@ -158,8 +158,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp->sys_layer = lv_obj_create(NULL, NULL); /*Create sys layer on the display*/
     lv_obj_reset_style_list(disp->top_layer, LV_OBJ_PART_MAIN);
     lv_obj_reset_style_list(disp->sys_layer, LV_OBJ_PART_MAIN);
-    lv_obj_set_click(disp->top_layer, false);
-    lv_obj_set_click(disp->sys_layer, false);
+    lv_obj_clear_flag(disp->top_layer, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(disp->sys_layer, LV_OBJ_FLAG_CLICKABLE);
 
     lv_obj_set_scroll_mode(disp->top_layer, LV_SCROLL_MODE_OFF);
     lv_obj_set_scroll_mode(disp->sys_layer, LV_SCROLL_MODE_OFF);

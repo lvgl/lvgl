@@ -126,7 +126,6 @@ enum {
     LV_SIGNAL_CLEANUP, /**< Object is being deleted */
     LV_SIGNAL_CHILD_CHG, /**< Child was removed/added */
     LV_SIGNAL_COORD_CHG, /**< Object coordinates/size have changed */
-    LV_SIGNAL_PARENT_SIZE_CHG, /**< Parent's size has changed */
     LV_SIGNAL_STYLE_CHG,    /**< Object's style has changed */
     LV_SIGNAL_BASE_DIR_CHG, /**<The base dir has changed*/
     LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
@@ -159,19 +158,6 @@ typedef uint8_t lv_signal_t;
 
 typedef lv_res_t (*lv_signal_cb_t)(struct _lv_obj_t * obj, lv_signal_t sign, void * param);
 
-/*Protect some attributes (max. 8 bit)*/
-enum {
-    LV_PROTECT_NONE      = 0x00,
-    LV_PROTECT_CHILD_CHG = 0x01,   /**< Disable the child change signal. Used by the library*/
-    LV_PROTECT_PARENT    = 0x02,   /**< Prevent automatic parent change (e.g. in lv_page)*/
-    LV_PROTECT_POS       = 0x04,   /**< Prevent automatic positioning (e.g. in lv_cont layout)*/
-    LV_PROTECT_FOLLOW    = 0x08,   /**< Prevent the object be followed in automatic ordering (e.g. in
-                                      lv_cont PRETTY layout)*/
-    LV_PROTECT_PRESS_LOST = 0x10,  /**< If the `indev` was pressing this object but swiped out while
-                                      pressing do not search other object.*/
-    LV_PROTECT_CLICK_FOCUS = 0x20, /**< Prevent focusing the object by clicking on it*/
-};
-typedef uint8_t lv_protect_t;
 
 enum {
     LV_STATE_DEFAULT   =  0x00,
@@ -184,6 +170,35 @@ enum {
 };
 
 typedef uint8_t lv_state_t;
+
+enum {
+    LV_SCROLL_SNAP_OFF,
+    LV_SCROLL_SNAP_NORMAL,
+    LV_SCROLL_SNAP_ALWAYS,
+};
+
+typedef uint8_t lv_scroll_snap_t;
+
+enum {
+    LV_SCROLL_SNAP_ALIGN_START,
+    LV_SCROLL_SNAP_ALIGN_END,
+    LV_SCROLL_SNAP_ALIGN_CENTER
+};
+typedef uint8_t lv_scroll_snap_align_t;
+
+
+enum {
+    LV_OBJ_FLAG_HIDDEN,
+    LV_OBJ_FLAG_CLICKABLE,
+    LV_OBJ_FLAG_SCROLLABLE,
+    LV_OBJ_FLAG_SCROLL_ELASTIC,
+    LV_OBJ_FLAG_SCROLL_MOMENTUM,
+    LV_OBJ_FLAG_PRESS_LOCK,
+    LV_OBJ_FLAG_EVENT_BUBBLE,
+    LV_OBJ_FLAG_GESTURE_BUBBLE,
+    LV_OBJ_FLAG_FOCUS_BUBBLE,
+};
+typedef uint16_t lv_obj_flag_t;
 
 /** Scrollbar modes: shows when should the scrollbars be visible*/
 enum {
@@ -218,15 +233,16 @@ typedef struct _lv_obj_t {
     lv_coord_t ext_draw_pad; /**< EXTend the size in every direction for drawing. */
 
     /*Attributes and states*/
-    uint8_t click           : 1; /**< 1: Can be pressed by an input device*/
-    uint8_t hidden          : 1; /**< 1: Object is hidden*/
-    uint8_t top             : 1; /**< 1: If the object or its children is clicked it goes to the foreground*/
-    uint8_t parent_event    : 1; /**< 1: Send the object's events to the parent too. */
-    uint8_t adv_hittest     : 1; /**< 1: Use advanced hit-testing (slower) */
-    uint8_t gesture_parent  : 1; /**< 1: Parent will be gesture instead*/
-    uint8_t focus_parent    : 1; /**< 1: Parent will be focused instead*/
+    lv_obj_flag_t flags     : 9;
     lv_scroll_mode_t scroll_mode :2; /**< How to display scrollbars*/
+    lv_scroll_snap_t snap_x : 2;
+    lv_scroll_snap_t snap_y : 2;
+    lv_scroll_snap_align_t snap_align_x : 2;
+    lv_scroll_snap_align_t snap_align_y : 2;
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
+    uint8_t adv_hittest     : 1; /**< 1: Use advanced hit-testing (slower) */
+    lv_state_t state;
+
     lv_coord_t x_set;
     lv_coord_t y_set;
     lv_coord_t w_set;
@@ -236,9 +252,6 @@ typedef struct _lv_obj_t {
     void * group_p;
 #endif
 
-    uint8_t protect;            /**< Automatically happening actions can be prevented.
-                                     'OR'ed values from `lv_protect_t`*/
-    lv_state_t state;
 
 #if LV_USE_USER_DATA
     lv_obj_user_data_t user_data; /**< Custom user data for object. */
@@ -712,41 +725,12 @@ void _lv_obj_disable_style_caching(lv_obj_t * obj, bool dis);
  *----------------*/
 
 /**
- * Hide an object. It won't be visible and clickable.
- * @param obj pointer to an object
- * @param en true: hide the object
- */
-void lv_obj_set_hidden(lv_obj_t * obj, bool en);
-
-/**
  * Set whether advanced hit-testing is enabled on an object
  * @param obj pointer to an object
  * @param en true: advanced hit-testing is enabled
  */
 void lv_obj_set_adv_hittest(lv_obj_t * obj, bool en);
 
-/**
- * Enable or disable the clicking of an object
- * @param obj pointer to an object
- * @param en true: make the object clickable
- */
-void lv_obj_set_click(lv_obj_t * obj, bool en);
-
-/**
- * Enable to bring this object to the foreground if it
- * or any of its children is clicked
- * @param obj pointer to an object
- * @param en true: enable the auto top feature
- */
-void lv_obj_set_top(lv_obj_t * obj, bool en);
-
-/**
-* Enable to use parent for focus state.
-* When object is focused the parent will get the state instead (visual only)
-* @param obj pointer to an object
-* @param en true: enable the 'focus parent' for the object
-*/
-void lv_obj_set_focus_parent(lv_obj_t * obj, bool en);
 
 /**
  * Set how the scrollbars should behave.
@@ -756,40 +740,14 @@ void lv_obj_set_focus_parent(lv_obj_t * obj, bool en);
 void lv_obj_set_scroll_mode(lv_obj_t * obj, lv_scroll_mode_t mode);
 
 /**
-* Enable to use parent for gesture related operations.
-* If trying to gesture the object the parent will be moved instead
-* @param obj pointer to an object
-* @param en true: enable the 'gesture parent' for the object
-*/
-void lv_obj_set_gesture_parent(lv_obj_t * obj, bool en);
-
-/**
- * Propagate the events to the parent too
- * @param obj pointer to an object
- * @param en true: enable the event propagation
- */
-void lv_obj_set_parent_event(lv_obj_t * obj, bool en);
-
-/**
  * Set the base direction of the object
  * @param obj pointer to an object
  * @param dir the new base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
  */
 void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir);
 
-/**
- * Set a bit or bits in the protect filed
- * @param obj pointer to an object
- * @param prot 'OR'-ed values from `lv_protect_t`
- */
-void lv_obj_add_protect(lv_obj_t * obj, uint8_t prot);
-
-/**
- * Clear a bit or bits in the protect filed
- * @param obj pointer to an object
- * @param prot 'OR'-ed values from `lv_protect_t`
- */
-void lv_obj_clear_protect(lv_obj_t * obj, uint8_t prot);
+void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
+void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
  * Set the state (fully overwrite) of an object.
@@ -1208,12 +1166,8 @@ lv_style_t * lv_obj_get_local_style(lv_obj_t * obj, uint8_t part);
  * Attribute get
  *----------------*/
 
-/**
- * Get the hidden attribute of an object
- * @param obj pointer to an object
- * @return true: the object is hidden
- */
-bool lv_obj_get_hidden(const lv_obj_t * obj);
+
+bool lv_obj_has_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
  * Get whether advanced hit-testing is enabled on an object
@@ -1222,58 +1176,7 @@ bool lv_obj_get_hidden(const lv_obj_t * obj);
  */
 bool lv_obj_get_adv_hittest(const lv_obj_t * obj);
 
-/**
- * Get the click enable attribute of an object
- * @param obj pointer to an object
- * @return true: the object is clickable
- */
-bool lv_obj_get_click(const lv_obj_t * obj);
-
-/**
- * Get the top enable attribute of an object
- * @param obj pointer to an object
- * @return true: the auto top feature is enabled
- */
-bool lv_obj_get_top(const lv_obj_t * obj);
-
-/**
-* Get the focus parent attribute of an object
-* @param obj pointer to an object
-* @return true: focus parent is enabled
-*/
-bool lv_obj_get_focus_parent(const lv_obj_t * obj);
-
-/**
- * Get the parent event attribute of an object
- * @param obj pointer to an object
- * @return true: parent event is enabled
- */
-bool lv_obj_get_parent_event(const lv_obj_t * obj);
-
-/**
-* Get the gesture parent attribute of an object
-* @param obj pointer to an object
-* @return true: gesture parent is enabled
-*/
-bool lv_obj_get_gesture_parent(const lv_obj_t * obj);
-
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj);
-
-/**
- * Get the protect field of an object
- * @param obj pointer to an object
- * @return protect field ('OR'ed values of `lv_protect_t`)
- */
-uint8_t lv_obj_get_protect(const lv_obj_t * obj);
-
-/**
- * Check at least one bit of a given protect bitfield is set
- * @param obj pointer to an object
- * @param prot protect bits to test ('OR'ed values of `lv_protect_t`)
- * @return false: none of the given bits are set, true: at least one bit is set
- */
-bool lv_obj_is_protected(const lv_obj_t * obj, uint8_t prot);
-
 
 lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part);
 

@@ -212,7 +212,7 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
     indev->cursor = cur_obj;
     lv_obj_set_parent(indev->cursor, lv_disp_get_layer_sys(indev->driver.disp));
     lv_obj_set_pos(indev->cursor, indev->proc.types.pointer.act_point.x, indev->proc.types.pointer.act_point.y);
-    lv_obj_set_click(indev->cursor, false);
+    lv_obj_add_flag(indev->cursor, LV_OBJ_FLAG_CLICKABLE);
 }
 
 #if LV_USE_GROUP
@@ -831,7 +831,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
     }
     /*If there is last object but it is not scrolled and not protected also search*/
     else if(proc->types.pointer.scroll_obj == NULL &&
-            lv_obj_is_protected(indev_obj_act, LV_PROTECT_PRESS_LOST) == false) {
+            lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_PRESS_LOCK) == false) {
         indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_sys(disp), &proc->types.pointer.act_point);
         if(indev_obj_act == NULL) indev_obj_act = lv_indev_search_obj(lv_disp_get_layer_top(disp),
                                                                           &proc->types.pointer.act_point);
@@ -883,19 +883,6 @@ static void indev_proc_press(lv_indev_proc_t * proc)
             proc->types.pointer.gesture_sum.y  = 0;
             proc->types.pointer.vect.x         = 0;
             proc->types.pointer.vect.y         = 0;
-
-            /*Search for 'top' attribute*/
-            lv_obj_t * i        = indev_obj_act;
-            lv_obj_t * last_top = NULL;
-            while(i != NULL) {
-                if(i->top) last_top = i;
-                i = lv_obj_get_parent(i);
-            }
-
-            if(last_top != NULL) {
-                /*Move the last_top object to the foreground*/
-                lv_obj_move_foreground(last_top);
-            }
 
             /*Send a signal about the press*/
             lv_signal_send(indev_obj_act, LV_SIGNAL_PRESSED, indev_act);
@@ -1079,10 +1066,10 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 
         /*If then the children was not ok, and this obj is clickable
          * and it or its parent is not hidden then save this object*/
-        if(found_p == NULL && lv_obj_get_click(obj) != false) {
+        if(found_p == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CLICKABLE)) {
             lv_obj_t * hidden_i = obj;
             while(hidden_i != NULL) {
-                if(lv_obj_get_hidden(hidden_i) == true) break;
+                if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN) == true) break;
                 hidden_i = lv_obj_get_parent(hidden_i);
             }
             /*No parent found with hidden == true*/
@@ -1101,7 +1088,7 @@ static void indev_click_focus(lv_indev_proc_t * proc)
 {
     /*Handle click focus*/
     lv_obj_t * obj_to_focus = lv_obj_get_focused_obj(indev_obj_act);
-    if(lv_obj_is_protected(indev_obj_act, LV_PROTECT_CLICK_FOCUS) == false &&
+    if(lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_PRESS_LOCK) == false &&
        proc->types.pointer.last_pressed != obj_to_focus) {
 #if LV_USE_GROUP
         lv_group_t * g_act = lv_obj_get_group(indev_obj_act);
@@ -1362,7 +1349,7 @@ static void indev_gesture(lv_indev_proc_t * proc)
     lv_obj_t * gesture_obj = proc->types.pointer.act_obj;
 
     /*If gesture parent is active check recursively the gesture attribute*/
-    while(gesture_obj && lv_obj_get_gesture_parent(gesture_obj)) {
+    while(gesture_obj && lv_obj_has_flag(gesture_obj, LV_OBJ_FLAG_GESTURE_BUBBLE)) {
         gesture_obj = lv_obj_get_parent(gesture_obj);
     }
 

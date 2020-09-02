@@ -50,11 +50,10 @@ typedef uint8_t lv_indev_type_t;
 enum { LV_INDEV_STATE_REL = 0, LV_INDEV_STATE_PR };
 typedef uint8_t lv_indev_state_t;
 
-
 enum {
-    LV_SCROLL_DIR_NONE = 0x0, /**< Object can't be dragged to any directions. */
-    LV_SCROLL_DIR_HOR = 0x1, /**< Object can be dragged horizontally. */
-    LV_SCROLL_DIR_VER = 0x2, /**< Object can be dragged vertically. */
+    LV_SCROLL_DIR_NONE,
+    LV_SCROLL_DIR_HOR,
+    LV_SCROLL_DIR_VER,
 };
 
 typedef uint8_t lv_scroll_dir_t;

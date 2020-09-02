@@ -216,7 +216,7 @@ static void calc_implicit_cols(lv_obj_t * cont, _lv_grid_calc_t * calc)
 
     uint32_t child_cnt = lv_obj_count_children(cont);
 
-    uint32_t col_cnt = (child_cnt / grid->row_dsc_len) + 1;
+    uint32_t col_cnt = ((child_cnt + grid->row_dsc_len - 1) / grid->row_dsc_len) + 1; /*+ grid->row_dsc_len - 1 to round up*/
     /* If `col_dsc_buf_used`, nested a call of this func. will release `col_dsc_buf_used` because it think it taken it.
      * So mark that if the buffer was taken in this call*/
     bool col_dsc_buf_mine = false;
@@ -272,7 +272,7 @@ static void calc_implicit_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
 
     lv_grid_t * grid = cont->grid;
     uint32_t child_cnt = lv_obj_count_children(cont);
-    uint32_t row_cnt = (child_cnt / grid->col_dsc_len) + 1;
+    uint32_t row_cnt = ((child_cnt + grid->col_dsc_len - 1) / grid->col_dsc_len) + 1; /*+ grid->col_dsc_len - 1 to round up*/
     bool row_dsc_buf_mine = false;
     /*At worst case all children is gird item prepare place for all of them*/
     lv_coord_t * rows_h;

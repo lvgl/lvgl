@@ -571,7 +571,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     lv_obj_t * found_p = NULL;
 
     /*If this object is fully cover the draw area check the children too */
-    if(_lv_area_is_in(area_p, &obj->coords, 0) && obj->hidden == 0) {
+    if(_lv_area_is_in(area_p, &obj->coords, 0) && (obj->flags & LV_OBJ_FLAG_HIDDEN) == 0) {
         lv_design_res_t design_res = obj->design_cb ? obj->design_cb(obj, area_p,
                                                                      LV_DESIGN_COVER_CHK) : LV_DESIGN_RES_NOT_COVER;
         if(design_res == LV_DESIGN_RES_MASKED) return NULL;
@@ -649,7 +649,7 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
 static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
 {
     /*Do not refresh hidden objects*/
-    if(obj->hidden != 0) return;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
     bool union_ok; /* Store the return value of area_union */
     /* Truncate the original mask to the coordinates of the parent

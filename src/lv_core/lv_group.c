@@ -31,7 +31,6 @@
 static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *),
                             void * (*move)(const lv_ll_t *, const void *));
 static void lv_group_refocus(lv_group_t * g);
-static void obj_to_foreground(lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -241,9 +240,6 @@ void lv_group_focus_obj(lv_obj_t * obj)
                 lv_res_t res = lv_event_send(*g->obj_focus, LV_EVENT_FOCUSED, NULL);
                 if(res != LV_RES_OK) return;
                 lv_obj_invalidate(*g->obj_focus);
-
-                /*If the object or its parent has `top == true` bring it to the foreground*/
-                obj_to_foreground(*g->obj_focus);
             }
             break;
         }
@@ -490,7 +486,7 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
         if(obj_next == NULL) continue;
 
         /*Hidden objects don't receive focus*/
-        if(!lv_obj_get_hidden(*obj_next)) break;
+        if(lv_obj_has_flag(*obj_next, LV_OBJ_FLAG_HIDDEN) == false) break;
     }
 
     if(obj_next == group->obj_focus) return; /*There's only one visible object and it's already focused*/
@@ -508,28 +504,10 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
     lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
     if(res != LV_RES_OK) return;
 
-    /*If the object or its parent has `top == true` bring it to the foreground*/
-    obj_to_foreground(*group->obj_focus);
-
     lv_obj_invalidate(*group->obj_focus);
 
     if(group->focus_cb) group->focus_cb(group);
 }
 
-static void obj_to_foreground(lv_obj_t * obj)
-{
-    /*Search for 'top' attribute*/
-    lv_obj_t * i        = obj;
-    lv_obj_t * last_top = NULL;
-    while(i != NULL) {
-        if(i->top != 0) last_top = i;
-        i = lv_obj_get_parent(i);
-    }
-
-    if(last_top != NULL) {
-        /*Move the last_top object to the foreground*/
-        lv_obj_move_foreground(last_top);
-    }
-}
 
 #endif /*LV_USE_GROUP != 0*/
