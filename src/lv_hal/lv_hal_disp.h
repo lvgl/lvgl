@@ -111,7 +111,14 @@ typedef struct _disp_drv_t {
      * User can execute very simple tasks here or yield the task */
     void (*wait_cb)(struct _disp_drv_t * disp_drv);
 
+    /** OPTIONAL: Called when lvgl needs any CPU cache that affects rendering to be cleaned */
+    void (*clean_dcache_cb)(struct _disp_drv_t * disp_drv);
+
+    /** OPTIONAL: called to wait while the gpu is working */
+    void (*gpu_wait_cb)(struct _disp_drv_t * disp_drv);
+
 #if LV_USE_GPU
+
     /** OPTIONAL: Blend two memories using opacity (GPU only)*/
     void (*gpu_blend_cb)(struct _disp_drv_t * disp_drv, lv_color_t * dest, const lv_color_t * src, uint32_t length,
                          lv_opa_t opa);

@@ -15,7 +15,7 @@ extern "C" {
  * CURRENT VERSION OF LVGL
  ***************************/
 #define LVGL_VERSION_MAJOR   7
-#define LVGL_VERSION_MINOR   4
+#define LVGL_VERSION_MINOR   5
 #define LVGL_VERSION_PATCH   0
 #define LVGL_VERSION_INFO "dev"
 
@@ -81,6 +81,8 @@ extern "C" {
 #include "src/lv_draw/lv_img_cache.h"
 
 #include "src/lv_api_map.h"
+
+//#define LV_BUILD_TEST 1
 
 /*********************
  *      DEFINES

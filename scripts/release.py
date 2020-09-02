@@ -54,6 +54,7 @@ import sys
 
 upstream_org_url = "https://github.com/lvgl/"
 workdir = "./release_tmp"
+proj_list = [ "lv_sim_eclipse_sdl"]
 
 ver_major = -1
 ver_minor = -1
@@ -81,11 +82,12 @@ def cmd(c, exit_on_err = True):
 def define_set(fn, name, value):    
     print("In " + fn + " set " + name + " to " + value)
     
-    new_content = ""
+    new_content = ""      
+    s = r'^ *# *define +' + str(name).rstrip()
+    
     f = open(fn, "r")
-      
     for i in f.read().splitlines():
-        r = re.search(r'^ *# *define +' + name, i)
+        r = re.search(s, i)
         if r: 
             d = i.split("define")
             i = d[0] + "define " + name + " " + value 
@@ -106,11 +108,15 @@ def clone_repos():
     #cmd("cp -a ../repos/. .")
     #return
 
-    cmd("git clone " + upstream("lvgl") + " lvgl; cd lvgl; git checkout master")
+    cmd("git clone " + upstream("lvgl") + "; cd lvgl; git checkout master")
     cmd("git clone " + upstream("lv_examples") + "; cd lv_examples; git checkout master")
     cmd("git clone " + upstream("lv_drivers") + "; cd lv_drivers; git checkout master")
     cmd("git clone --recurse-submodules " + upstream("docs") + "; cd docs; git checkout master")
     cmd("git clone " + upstream("blog") + "; cd blog; git checkout master")
+
+    for p in proj_list:
+        cmd("git clone " + upstream(p) + " --recurse-submodules ; cd " + p + "; git checkout master")
+        
 
 def get_lvgl_version(br):
     print("Get LVGL's version")
@@ -299,14 +305,25 @@ def update_release_branches():
     cmd("cd docs; " + merge_cmd)
     
 def publish_master():   
+    
+    #Merge LVGL master to dev first to avoid "merge-to-dev.yml" running asynchronous
+    os.chdir("./lvgl")
+    cmd("git checkout dev")
+    cmd("git merge master -X theirs")
+    cmd("git add .")
+    cmd("git commit -am 'Merge master'", False)
+    cmd("git push origin dev")
+    cmd("git checkout master")    
+    os.chdir("../")
+    
     pub_cmd = "git push origin master; git push origin " + ver_str
     cmd("cd lvgl; " + pub_cmd)    
     cmd("cd lv_examples; " + pub_cmd)    
     cmd("cd lv_drivers; " + pub_cmd)    
 
     pub_cmd = "git push origin latest; git push origin " + ver_str
-    cmd("cd docs; " + pub_cmd)    
-    cmd("cd docs; git checkout master; ./update.py " + release_br)
+    cmd("cd docs; " + pub_cmd)
+    cmd("cd docs; git checkout master; python 2.7 ./update.py " + release_br)
     
     pub_cmd = "git push origin master"
     cmd("cd blog; " + pub_cmd)    
@@ -342,7 +359,7 @@ def lvgl_update_master_version():
     templ = fnmatch.filter(os.listdir('.'), '*templ*')
     if templ[0]:    
         print("Updating version in " + templ[0])
-        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+/"+ ver_str +"/' " + templ[0])
+        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/"+ ver_str +"/' " + templ[0])
     
     
     cmd("git commit -am 'Update version'")
@@ -367,15 +384,15 @@ def lvgl_update_dev_version():
     os.chdir("./lvgl")
 
     cmd("git checkout dev")
-    define_set("./lvgl.h", "LVGL_VERSION_MAJOR", ver_major)
-    define_set("./lvgl.h", "LVGL_VERSION_MINOR", ver_minor)
-    define_set("./lvgl.h", "LVGL_VERSION_PATCH", ver_patch)
+    define_set("./lvgl.h", "LVGL_VERSION_MAJOR", str(ver_major))
+    define_set("./lvgl.h", "LVGL_VERSION_MINOR", str(ver_minor))
+    define_set("./lvgl.h", "LVGL_VERSION_PATCH", str(ver_patch))
     define_set("./lvgl.h", "LVGL_VERSION_INFO", "\"dev\"")
     
     templ = fnmatch.filter(os.listdir('.'), '*templ*')
     if templ[0]:    
         print("Updating version in " + templ[0])
-        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+/"+ dev_ver_str +"/' " + templ[0])
+        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/"+ dev_ver_str +"/' " + templ[0])
     
     
     cmd("git commit -am 'Update dev version'")
@@ -401,22 +418,60 @@ def publish_dev_and_master():
     pub_cmd = "git checkout master; git push origin master"
     cmd("cd lvgl; " + pub_cmd)    
 
-    cmd("cd docs; git checkout master; ./update.py latest dev")
+    cmd("cd docs; git checkout master; python 2.7 ./update.py latest dev")
+
+def projs_update():
+    global proj_list, release_br, ver_str
+    for p in proj_list:
+        os.chdir("./" + p)
+        cmd('git checkout master')
+        print(p + ": upadte lvgl");
+        cmd("cd lvgl; git co " + release_br + "; git pull origin " + release_br)
+        cmd("cp -f lvgl/lv_conf_template.h lv_conf.h")
+        cmd("sed -i -r 's/#if 0/#if 1/' lv_conf.h")  # Enable lv_conf.h
+        d = {}
+        with open("confdef.txt") as f:
+            for line in f:
+                (key, val) = line.rstrip().split('\t')
+                d[key] = val
+
+        for k,v in d.items():
+            define_set("lv_conf.h", str(k), str(v))        
+            
+        if os.path.exists("lv_examples"): 
+            print(p + ": upadte lv_examples");
+            cmd("cd lv_examples; git co " + release_br + "; git pull origin " + release_br)
+            
+        if os.path.exists("lv_drivers"): 
+            print(p + ": upadte lv_drivers");
+            cmd("cd lv_drivers " + release_br + "; git pull origin " + release_br)
+
+        msg = 'Update to ' + ver_str
+        cmd("git add .")
+        cmd('git commit -am "' + msg +  '"')
+        cmd('git push origin master')
+        cmd("git tag -a " + ver_str + " -m '" + msg + "' " )
+        cmd('git push origin ' + ver_str)
+        
+        os.chdir("../")
+        
 
 def cleanup():
     os.chdir("../")
     cmd("rm -fr " + workdir)
 
 if __name__ == '__main__':
+    dev_prepare = 'minor'
     if(len(sys.argv) != 2):
-        print("Argument error. Usage ./release.py bugfix | minor | major") 
-        exit(1)
-        
-    dev_prepare = sys.argv[1]
+        print("Missing argument. Usage ./release.py bugfix | minor | major")
+        print("Use minor by deafult")
+    else:      
+        dev_prepare = sys.argv[1]
+    
     if not (dev_prepare in prepare_type): 
         print("Invalid argument. Usage ./release.py bugfix | minor | major") 
         exit(1)
-        
+     
     clone_repos()
     get_lvgl_version("master")
     lvgl_prepare()
@@ -454,9 +509,9 @@ if __name__ == '__main__':
             ver_minor = "0"
             ver_patch = "0"
                 
-        dev_ver_str = "v" + ver_major + "." + ver_minor + "." + ver_patch + "-dev"
+        dev_ver_str = "v" + str(ver_major) + "." + str(ver_minor) + "." + str(ver_patch) + "-dev"
         
-        print("Prepare minor version " + ver_str)
+        print("Prepare minor version " + dev_ver_str)
 
         merge_to_dev()
         merge_from_dev()
@@ -465,5 +520,6 @@ if __name__ == '__main__':
         docs_update_dev_version()
         publish_dev_and_master()
         
+    projs_update()    
     cleanup()
     

@@ -580,6 +580,9 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
         /*Non true color format might have "holes"*/
         if(ext->cf != LV_IMG_CF_TRUE_COLOR && ext->cf != LV_IMG_CF_RAW) return LV_DESIGN_RES_NOT_COVER;
 
+        /*With not LV_OPA_COVER images acn't cover an area */
+        if(lv_obj_get_style_image_opa(img, LV_IMG_PART_MAIN) != LV_OPA_COVER) return LV_DESIGN_RES_NOT_COVER;
+
         int32_t angle_final = lv_obj_get_style_transform_angle(img, LV_IMG_PART_MAIN);
         angle_final += ext->angle;
 
@@ -602,7 +605,10 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             if(_lv_area_is_in(clip_area, &a, 0) == false) return LV_DESIGN_RES_NOT_COVER;
         }
 
-        if(lv_obj_get_style_image_opa(img, LV_IMG_PART_MAIN) != LV_OPA_COVER) return LV_DESIGN_RES_NOT_COVER;
+#if LV_USE_BLEND_MODES
+        if(lv_obj_get_style_bg_blend_mode(img, LV_IMG_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DESIGN_RES_NOT_COVER;
+        if(lv_obj_get_style_image_blend_mode(img, LV_IMG_PART_MAIN) != LV_BLEND_MODE_NORMAL) return LV_DESIGN_RES_NOT_COVER;
+#endif
 
         return LV_DESIGN_RES_COVER;
     }
@@ -672,7 +678,9 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             img_dsc.antialias = ext->antialias;
 
             lv_coord_t zoomed_src_w = (int32_t)((int32_t)ext->w * zoom_final) >> 8;
+            if(zoomed_src_w <= 0) return LV_DESIGN_RES_OK;
             lv_coord_t zoomed_src_h = (int32_t)((int32_t)ext->h * zoom_final) >> 8;
+            if(zoomed_src_h <= 0) return LV_DESIGN_RES_OK;
             lv_area_t zommed_coords;
             lv_obj_get_coords(img, &zommed_coords);
 
@@ -685,7 +693,8 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             if(zommed_coords.y1 > img->coords.y1) zommed_coords.y1 -= ext->h;
 
             lv_area_t clip_real;
-            _lv_img_buf_get_transformed_area(&clip_real, lv_obj_get_width(img), lv_obj_get_height(img), angle_final, zoom_final, &ext->pivot);
+            _lv_img_buf_get_transformed_area(&clip_real, lv_obj_get_width(img), lv_obj_get_height(img), angle_final, zoom_final,
+                                             &ext->pivot);
             clip_real.x1 += img->coords.x1;
             clip_real.x2 += img->coords.x1;
             clip_real.y1 += img->coords.y1;
@@ -697,10 +706,10 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             coords_tmp.y1 = zommed_coords.y1;
             coords_tmp.y2 = zommed_coords.y1 + ext->h - 1;
 
-            for(; coords_tmp.y1 <= zommed_coords.y2; coords_tmp.y1 += zoomed_src_h, coords_tmp.y2 += zoomed_src_h) {
+            for(; coords_tmp.y1 < zommed_coords.y2; coords_tmp.y1 += zoomed_src_h, coords_tmp.y2 += zoomed_src_h) {
                 coords_tmp.x1 = zommed_coords.x1;
                 coords_tmp.x2 = zommed_coords.x1 + ext->w - 1;
-                for(; coords_tmp.x1 <= zommed_coords.x2; coords_tmp.x1 += zoomed_src_w, coords_tmp.x2 += zoomed_src_w) {
+                for(; coords_tmp.x1 < zommed_coords.x2; coords_tmp.x1 += zoomed_src_w, coords_tmp.x2 += zoomed_src_w) {
                     lv_draw_img(&coords_tmp, &clip_real, ext->src, &img_dsc);
                 }
             }

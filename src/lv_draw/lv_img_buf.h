@@ -308,14 +308,14 @@ static inline bool _lv_img_buf_transform(lv_img_transform_dsc_t * dsc, lv_coord_
         ys = ((dsc->tmp.sinma * xt + dsc->tmp.cosma * yt) >> (_LV_TRANSFORM_TRIGO_SHIFT - 8)) + dsc->tmp.pivot_y_256;
     }
     else if(dsc->cfg.angle == 0) {
-        xt = (xt * dsc->tmp.zoom_inv) >> _LV_ZOOM_INV_UPSCALE;
-        yt = (yt * dsc->tmp.zoom_inv) >> _LV_ZOOM_INV_UPSCALE;
+        xt = (int32_t)((int32_t)xt * dsc->tmp.zoom_inv) >> _LV_ZOOM_INV_UPSCALE;
+        yt = (int32_t)((int32_t)yt * dsc->tmp.zoom_inv) >> _LV_ZOOM_INV_UPSCALE;
         xs = xt + dsc->tmp.pivot_x_256;
         ys = yt + dsc->tmp.pivot_y_256;
     }
     else {
-        xt = (xt * dsc->tmp.zoom_inv) >> _LV_ZOOM_INV_UPSCALE;
-        yt = (yt * dsc->tmp.zoom_inv) >> _LV_ZOOM_INV_UPSCALE;
+        xt = (int32_t)((int32_t)xt * dsc->tmp.zoom_inv) >> _LV_ZOOM_INV_UPSCALE;
+        yt = (int32_t)((int32_t)yt * dsc->tmp.zoom_inv) >> _LV_ZOOM_INV_UPSCALE;
         xs = ((dsc->tmp.cosma * xt - dsc->tmp.sinma * yt) >> (_LV_TRANSFORM_TRIGO_SHIFT)) + dsc->tmp.pivot_x_256;
         ys = ((dsc->tmp.sinma * xt + dsc->tmp.cosma * yt) >> (_LV_TRANSFORM_TRIGO_SHIFT)) + dsc->tmp.pivot_y_256;
     }
