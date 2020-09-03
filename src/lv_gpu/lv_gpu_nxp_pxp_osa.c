@@ -33,7 +33,7 @@
 
 #include "lv_conf.h"
 
-#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_DEFAULT_OSA
+#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
 
 #include "lv_gpu_nxp_pxp.h"
 #include "fsl_pxp.h"
@@ -163,4 +163,4 @@ lv_nxp_pxp_cfg_t pxp_default_cfg = {
     .pxp_run = _lv_gpu_nxp_pxp_run
 };
 
-#endif /* LV_USE_GPU && LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_DEFAULT_OSA */
+#endif /* LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT */

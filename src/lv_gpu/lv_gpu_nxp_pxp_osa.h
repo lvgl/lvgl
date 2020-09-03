@@ -36,7 +36,7 @@ extern "C" {
 
 #include "lv_conf.h"
 
-#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_DEFAULT_OSA
+#if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
 extern lv_nxp_pxp_cfg_t pxp_default_cfg;
 #endif
 
