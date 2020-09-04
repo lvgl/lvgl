@@ -7,7 +7,7 @@
 - Add `gpu_wait_cb` to wait until the GPU is working. It allows to run CPU a wait only when the rendered data is needed.
 
 ### Bugfixes
-
+- Fix unexpeted DEFOCUS on lv_page when clicking to bg after the scrollable
 
 ## v7.4.0 (01.09.2020)
 
