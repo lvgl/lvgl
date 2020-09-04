@@ -392,6 +392,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
         new_obj->protect      = copy->protect;
         new_obj->gesture_parent = copy->gesture_parent;
+        new_obj->focus_parent = copy->focus_parent;
 
 #if LV_USE_GROUP
         /*Add to the same group*/
