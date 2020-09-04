@@ -9,6 +9,7 @@
 ### Bugfixes
 - Fix unexpeted DEFOCUS on lv_page when clicking to bg after the scrollable
 - Fix `lv_obj_del` and `lv_obj_clean` if the children list changed during deletion.
+- Adjust button matrix button width to include padding when spanning multiple units.
 
 ## v7.4.0 (01.09.2020)
 
