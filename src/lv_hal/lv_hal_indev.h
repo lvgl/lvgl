@@ -139,6 +139,7 @@ typedef struct _lv_indev_proc_t {
                                                 other post-release event)*/
             struct _lv_obj_t * scroll_obj;      /*The object being scrolled*/
             struct _lv_obj_t * last_pressed; /*The lastly pressed object*/
+            lv_area_t scroll_area;
 
             lv_gesture_dir_t gesture_dir;
             lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/

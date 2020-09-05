@@ -95,7 +95,7 @@ enum {
     LV_EVENT_SCROLL_BEGIN,
     LV_EVENT_SCROLL_THROW_BEGIN,
     LV_EVENT_SCROLL_END,
-    LV_EVENT_SCROLL,
+    LV_EVENT_SCROLLED,
     LV_EVENT_GESTURE,           /**< The object has been gesture*/
     LV_EVENT_KEY,
     LV_EVENT_FOCUSED,
@@ -123,15 +123,15 @@ typedef void (*lv_event_cb_t)(struct _lv_obj_t * obj, lv_event_t event);
   * on the object. */
 enum {
     /*General signals*/
-    LV_SIGNAL_CLEANUP, /**< Object is being deleted */
-    LV_SIGNAL_CHILD_CHG, /**< Child was removed/added */
-    LV_SIGNAL_COORD_CHG, /**< Object coordinates/size have changed */
-    LV_SIGNAL_STYLE_CHG,    /**< Object's style has changed */
-    LV_SIGNAL_BASE_DIR_CHG, /**<The base dir has changed*/
+    LV_SIGNAL_CLEANUP,           /**< Object is being deleted */
+    LV_SIGNAL_CHILD_CHG,         /**< Child was removed/added */
+    LV_SIGNAL_COORD_CHG,         /**< Object coordinates/size have changed */
+    LV_SIGNAL_STYLE_CHG,         /**< Object's style has changed */
+    LV_SIGNAL_BASE_DIR_CHG,      /**<The base dir has changed*/
     LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
-    LV_SIGNAL_GET_TYPE, /**< LVGL needs to retrieve the object's type */
-    LV_SIGNAL_GET_STYLE, /**<Get the style of an object*/
-    LV_SIGNAL_GET_STATE_DSC, /**<Get the state of the object*/
+    LV_SIGNAL_GET_TYPE,          /**< LVGL needs to retrieve the object's type */
+    LV_SIGNAL_GET_STYLE,         /**<Get the style of an object*/
+    LV_SIGNAL_GET_STATE_DSC,     /**<Get the state of the object*/
 
     /*Input device related*/
     LV_SIGNAL_HIT_TEST,          /**< Advanced hit-testing */
@@ -172,14 +172,7 @@ enum {
 typedef uint8_t lv_state_t;
 
 enum {
-    LV_SCROLL_SNAP_OFF,
-    LV_SCROLL_SNAP_NORMAL,
-    LV_SCROLL_SNAP_ALWAYS,
-};
-
-typedef uint8_t lv_scroll_snap_t;
-
-enum {
+    LV_SCROLL_SNAP_ALIGN_NONE,
     LV_SCROLL_SNAP_ALIGN_START,
     LV_SCROLL_SNAP_ALIGN_END,
     LV_SCROLL_SNAP_ALIGN_CENTER
@@ -188,15 +181,16 @@ typedef uint8_t lv_scroll_snap_align_t;
 
 
 enum {
-    LV_OBJ_FLAG_HIDDEN,
-    LV_OBJ_FLAG_CLICKABLE,
-    LV_OBJ_FLAG_SCROLLABLE,
-    LV_OBJ_FLAG_SCROLL_ELASTIC,
-    LV_OBJ_FLAG_SCROLL_MOMENTUM,
-    LV_OBJ_FLAG_PRESS_LOCK,
-    LV_OBJ_FLAG_EVENT_BUBBLE,
-    LV_OBJ_FLAG_GESTURE_BUBBLE,
-    LV_OBJ_FLAG_FOCUS_BUBBLE,
+    LV_OBJ_FLAG_HIDDEN          = (1 << 0),
+    LV_OBJ_FLAG_CLICKABLE       = (1 << 1),
+    LV_OBJ_FLAG_SCROLLABLE      = (1 << 2),
+    LV_OBJ_FLAG_SCROLL_ELASTIC  = (1 << 3),
+    LV_OBJ_FLAG_SCROLL_MOMENTUM = (1 << 4),
+    LV_OBJ_FLAG_SCROLL_STOP     = (1 << 5),
+    LV_OBJ_FLAG_PRESS_LOCK      = (1 << 6),
+    LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 7),
+    LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 8),
+    LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 9),
 };
 typedef uint16_t lv_obj_flag_t;
 
@@ -235,12 +229,11 @@ typedef struct _lv_obj_t {
     /*Attributes and states*/
     lv_obj_flag_t flags     : 9;
     lv_scroll_mode_t scroll_mode :2; /**< How to display scrollbars*/
-    lv_scroll_snap_t snap_x : 2;
-    lv_scroll_snap_t snap_y : 2;
     lv_scroll_snap_align_t snap_align_x : 2;
     lv_scroll_snap_align_t snap_align_y : 2;
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
     uint8_t adv_hittest     : 1; /**< 1: Use advanced hit-testing (slower) */
+
     lv_state_t state;
 
     lv_coord_t x_set;
@@ -548,7 +541,7 @@ void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en);
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_top(lv_obj_t * obj);
+lv_coord_t lv_obj_get_scroll_top(const lv_obj_t * obj);
 
 /**
  * Return the height of the area below the parent.
@@ -557,7 +550,7 @@ lv_coord_t lv_obj_get_scroll_top(lv_obj_t * obj);
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj);
+lv_coord_t lv_obj_get_scroll_bottom(const lv_obj_t * obj);
 
 
 /**
@@ -567,7 +560,7 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj);
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj);
+lv_coord_t lv_obj_get_scroll_left(const lv_obj_t * obj);
 
 /**
  * Return the width of the area below the object.
@@ -576,7 +569,7 @@ lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj);
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj);
+lv_coord_t lv_obj_get_scroll_right(const lv_obj_t * obj);
 
 /**
  * Set the size of an extended clickable area

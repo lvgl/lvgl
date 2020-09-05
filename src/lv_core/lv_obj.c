@@ -1241,7 +1241,8 @@ void lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->scroll.y += y;
 
     refresh_children_position(obj, x, y);
-    lv_signal_send(obj, LV_SIGNAL_SCROLL, NULL);
+    lv_res_t res = lv_signal_send(obj, LV_SIGNAL_SCROLL, NULL);
+    if(res != LV_RES_OK) return;
     lv_obj_invalidate(obj);
 }
 /**
@@ -1331,7 +1332,7 @@ void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_top(lv_obj_t * obj)
+lv_coord_t lv_obj_get_scroll_top(const lv_obj_t * obj)
 {
     return -obj->scroll.y;
 }
@@ -1343,7 +1344,7 @@ lv_coord_t lv_obj_get_scroll_top(lv_obj_t * obj)
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
+lv_coord_t lv_obj_get_scroll_bottom(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1367,7 +1368,7 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
+lv_coord_t lv_obj_get_scroll_left(const lv_obj_t * obj)
 {
     return -obj->scroll.x;
 }
@@ -1379,7 +1380,7 @@ lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
+lv_coord_t lv_obj_get_scroll_right(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -4006,33 +4007,10 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_SCROLL) {
-
+        res = lv_event_send(obj, LV_EVENT_SCROLLED, NULL);
+        if(res != LV_RES_OK) return res;
     }
     else if(sign == LV_SIGNAL_SCROLL_END) {
-
-        lv_coord_t st = lv_obj_get_scroll_top(obj);
-        lv_coord_t sb = lv_obj_get_scroll_bottom(obj);
-        lv_coord_t sl = lv_obj_get_scroll_left(obj);
-        lv_coord_t sr = lv_obj_get_scroll_right(obj);
-
-        /*Revert if scrolled in*/
-        if(st > 0 || sb > 0) { /*Is vertically scrollable*/
-            if(st < 0) {
-                lv_obj_scroll_by(obj, 0, st, LV_ANIM_ON);
-            }
-            else if(sb < 0) {
-                lv_obj_scroll_by(obj, 0, -sb, LV_ANIM_ON);
-            }
-        }
-        if(sl > 0 || sr > 0) { /*Is horizontally scrollable*/
-            if(sl < 0) {
-                lv_obj_scroll_by(obj, sl, 0, LV_ANIM_ON);
-            }
-            else if(sr < 0) {
-                lv_obj_scroll_by(obj, -sr, 0, LV_ANIM_ON);
-            }
-        }
-
         if(lv_obj_get_scroll_mode(obj) == LV_SCROLL_MODE_ACTIVE) {
             lv_obj_invalidate(obj);
         }
@@ -4045,11 +4023,13 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         if(lv_obj_is_grid_item(obj)) lv_grid_full_refr(obj);
 
-//        lv_obj_t * child = lv_obj_get_child(obj, NULL);
-//        while(child) {
-//            lv_obj_set_pos(child, child->x_set, child->y_set);
-//            child = lv_obj_get_child(obj, child);
-//        }
+        lv_obj_t * child = lv_obj_get_child(obj, NULL);
+        while(child) {
+            if(_GRID_IS_CELL(child->x_set) && _GRID_IS_CELL(child->y_set)) {
+                lv_obj_set_pos(child, child->x_set, child->y_set);
+            }
+            child = lv_obj_get_child(obj, child);
+        }
 
 
         if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
