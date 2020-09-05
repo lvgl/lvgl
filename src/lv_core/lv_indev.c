@@ -1256,13 +1256,12 @@ static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coo
         child = lv_obj_get_child_back(obj, child);
     }
 
-    printf("child cnt: %d\n", cc);
-
     return dist == LV_COORD_MAX ? 0 : -dist;
 }
 
 static void scroll_limit(lv_indev_proc_t * proc, lv_coord_t * diff_x, lv_coord_t * diff_y)
 {
+    lv_obj_t * obj = proc->types.pointer.scroll_obj;
     if(diff_y) {
         if(proc->types.pointer.scroll_sum.y + *diff_y < proc->types.pointer.scroll_area.y1) {
            *diff_y = proc->types.pointer.scroll_area.y1 - proc->types.pointer.scroll_sum.y;
@@ -1301,8 +1300,16 @@ static void indev_scroll_handler(lv_indev_proc_t * proc)
 
         proc->types.pointer.scroll_obj = proc->types.pointer.act_obj;
 
-        /*Go until find an scrollable object in the current direction*/
+        /* Go until find an scrollable object in the current direction
+         * More precisely:
+         *  1. Check the pressed object and all of its ancestors and try to find an object which is scrollable
+         *  2. Scrollable means it has some content out of it's area
+         *  3. If an object can be scrolled into the current direction then use it ("real match"")
+         *  4. If can be scrolled on the current axis (hor/ver) save it as candidate (at least show an elastic scroll effect)
+         *  5. Use the last candidate. Always the "deepest" parent or the object from point 3 */
         while(proc->types.pointer.scroll_obj) {
+
+            /*Decide if it's a horizontal or vertical scroll*/
             bool hor_en = false;
             bool ver_en = false;
             if(LV_MATH_ABS(proc->types.pointer.scroll_sum.x) > LV_MATH_ABS(proc->types.pointer.scroll_sum.y)) {
@@ -1312,28 +1319,38 @@ static void indev_scroll_handler(lv_indev_proc_t * proc)
                 ver_en = true;
             }
 
+            /*Consider both up-down or left/right scrollable according to the current direction*/
             bool up_en = ver_en;
             bool down_en = ver_en;
             bool left_en = hor_en;
             bool right_en = hor_en;
 
+            /*The object might have disabled some directions.*/
+            lv_dir_t scroll_dir = proc->types.pointer.scroll_obj->scroll_dir;
+            if((scroll_dir & LV_DIR_LEFT) == 0) left_en = false;
+            if((scroll_dir & LV_DIR_RIGHT) == 0) right_en = false;
+            if((scroll_dir & LV_DIR_TOP) == 0) up_en = false;
+            if((scroll_dir & LV_DIR_BOTTOM) == 0) down_en = false;
+
+            /*The object is scrollable to a direction if its content overflow in that direction. */
             lv_coord_t st = lv_obj_get_scroll_top(proc->types.pointer.scroll_obj);
             lv_coord_t sb = lv_obj_get_scroll_bottom(proc->types.pointer.scroll_obj);
             lv_coord_t sl = lv_obj_get_scroll_left(proc->types.pointer.scroll_obj);
             lv_coord_t sr = lv_obj_get_scroll_right(proc->types.pointer.scroll_obj);
 
-            bool ver_scrollable = st > 0 || sb > 0 ? true : false;
-            bool hor_scrollable = sl > 0 || sr > 0 ? true : false;
-
-            if(ver_scrollable &&
-               ((up_en    && proc->types.pointer.scroll_sum.y >=   indev_act->driver.scroll_limit) ||
-                (down_en  && proc->types.pointer.scroll_sum.y <= - indev_act->driver.scroll_limit)))
+            /* If this object is scrollable into the current scroll direction then save it as a candidate.
+             * It's important only to be scrollable on the current axis (hor/ver) because if the scroll
+             * is propagated to this object it can show at least elastic scroll effect.
+             * But if not hor/ver scrollable do not scroll it at all (so it's not a good candidate) */
+            if((st > 0 || sb > 0)  &&
+              ((up_en    && proc->types.pointer.scroll_sum.y >= indev_act->driver.scroll_limit) ||
+               (down_en  && proc->types.pointer.scroll_sum.y <= - indev_act->driver.scroll_limit)))
             {
                 scroll_candidate_obj = proc->types.pointer.scroll_obj;
                 dirs_candidate = LV_SCROLL_DIR_VER;
             }
 
-            if(hor_scrollable &&
+            if((sl > 0 || sr > 0)  &&
               ((left_en    && proc->types.pointer.scroll_sum.x >=   indev_act->driver.scroll_limit) ||
                (right_en  && proc->types.pointer.scroll_sum.x <= - indev_act->driver.scroll_limit)))
             {
@@ -1341,19 +1358,23 @@ static void indev_scroll_handler(lv_indev_proc_t * proc)
                 dirs_candidate = LV_SCROLL_DIR_HOR;
             }
 
+            /**/
             if(st <= 0) up_en = false;
             if(sb <= 0) down_en = false;
             if(sl <= 0) left_en = false;
             if(sr <= 0) right_en = false;
 
+            /*If the object really can be scrolled into the current direction the use it. */
             if((left_en  && proc->types.pointer.scroll_sum.x >=   indev_act->driver.scroll_limit) ||
                (right_en && proc->types.pointer.scroll_sum.x <= - indev_act->driver.scroll_limit) ||
                (up_en    && proc->types.pointer.scroll_sum.y >=   indev_act->driver.scroll_limit) ||
                (down_en  && proc->types.pointer.scroll_sum.y <= - indev_act->driver.scroll_limit))
             {
                 proc->types.pointer.scroll_dir = hor_en ? LV_SCROLL_DIR_HOR : LV_SCROLL_DIR_VER;
-                break;  /*It's good scrollable object, use it*/
+                break;
             }
+
+            /*Try the parent */
             proc->types.pointer.scroll_obj = lv_obj_get_parent(proc->types.pointer.scroll_obj);
         }
 
@@ -1381,7 +1402,6 @@ static void indev_scroll_handler(lv_indev_proc_t * proc)
             case LV_SCROLL_SNAP_ALIGN_START:
                 proc->types.pointer.scroll_area.y1 = find_snap_point_y(obj, obj->coords.y1 + 1, LV_COORD_MAX, 0);
                 proc->types.pointer.scroll_area.y2 = find_snap_point_y(obj, LV_COORD_MIN, obj->coords.y1 - 1, 0);
-                printf("%d, %d\n", proc->types.pointer.scroll_area.y1, proc->types.pointer.scroll_area.y2);
                 break;
             case LV_SCROLL_SNAP_ALIGN_END:
                 proc->types.pointer.scroll_area.y1 = find_snap_point_y(obj, obj->coords.y2, LV_COORD_MAX, 0);
@@ -1440,6 +1460,12 @@ static void indev_scroll_handler(lv_indev_proc_t * proc)
             if(lv_obj_get_scroll_top(scroll_obj) < 0) diff_y = diff_y / 2;
             if(lv_obj_get_scroll_bottom(scroll_obj) < 0) diff_y = diff_y / 2;
         }
+
+
+        if((scroll_obj->scroll_dir & LV_DIR_LEFT) == 0 && diff_x > 0) diff_x = 0;
+        if((scroll_obj->scroll_dir & LV_DIR_RIGHT) == 0 && diff_x < 0) diff_x = 0;
+        if((scroll_obj->scroll_dir & LV_DIR_TOP) == 0 && diff_y > 0) diff_y = 0;
+        if((scroll_obj->scroll_dir & LV_DIR_BOTTOM) == 0 && diff_y < 0) diff_y = 0;
 
         /*Respect the scroll limit area*/
         scroll_limit(proc, &diff_x, &diff_y);

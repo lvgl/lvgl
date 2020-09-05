@@ -172,6 +172,19 @@ enum {
 typedef uint8_t lv_state_t;
 
 enum {
+    LV_DIR_NONE     = 0x00,
+    LV_DIR_LEFT     = (1 << 0),
+    LV_DIR_RIGHT    = (1 << 1),
+    LV_DIR_TOP      = (1 << 2),
+    LV_DIR_BOTTOM   = (1 << 3),
+    LV_DIR_HOR      = LV_DIR_LEFT | LV_DIR_RIGHT,
+    LV_DIR_VER      = LV_DIR_TOP | LV_DIR_BOTTOM,
+    LV_DIR_ALL      = LV_DIR_HOR | LV_DIR_VER,
+};
+
+typedef uint8_t lv_dir_t;
+
+enum {
     LV_SCROLL_SNAP_ALIGN_NONE,
     LV_SCROLL_SNAP_ALIGN_START,
     LV_SCROLL_SNAP_ALIGN_END,
@@ -231,6 +244,7 @@ typedef struct _lv_obj_t {
     lv_scroll_mode_t scroll_mode :2; /**< How to display scrollbars*/
     lv_scroll_snap_align_t snap_align_x : 2;
     lv_scroll_snap_align_t snap_align_y : 2;
+    lv_scroll_dir_t scroll_dir :4;
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
     uint8_t adv_hittest     : 1; /**< 1: Use advanced hit-testing (slower) */
 
