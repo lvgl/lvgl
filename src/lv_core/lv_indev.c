@@ -9,11 +9,11 @@
 #include "lv_indev.h"
 #include "lv_disp.h"
 #include "lv_obj.h"
-#include "lv_scroll.h"
+#include "lv_indev_scroll.h"
+#include "lv_group.h"
+#include "lv_refr.h"
 
 #include "../lv_hal/lv_hal_tick.h"
-#include "../lv_core/lv_group.h"
-#include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_task.h"
 #include "../lv_misc/lv_math.h"
 

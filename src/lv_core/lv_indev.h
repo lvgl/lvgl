@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "lv_obj.h"
 #include "../lv_hal/lv_hal_indev.h"
-#include "../lv_core/lv_group.h"
+#include "lv_group.h"
 
 /*********************
  *      DEFINES

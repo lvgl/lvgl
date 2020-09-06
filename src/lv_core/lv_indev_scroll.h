@@ -1,10 +1,10 @@
 /**
- * @file lv_scroll.h
+ * @file lv_indev_scroll.h
  *
  */
 
-#ifndef LV_SCROLL_H
-#define LV_SCROLL_H
+#ifndef LV_INDEV_SCROLL_H
+#define LV_INDEV_SCROLL_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,4 +48,4 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc);
 } /* extern "C" */
 #endif
 
-#endif /*LV_SCROLL_H*/
+#endif /*LV_INDEV_SCROLL_H*/

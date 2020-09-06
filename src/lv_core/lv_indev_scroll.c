@@ -6,8 +6,8 @@
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_scroll.h"
 #include "lv_indev.h"
+#include "lv_indev_scroll.h"
 
 /*********************
  *      DEFINES
@@ -228,7 +228,7 @@ void _lv_scroll_handler(lv_indev_proc_t * proc)
         /*Respect the scroll limit area*/
         scroll_limit_diff(proc, &diff_x, &diff_y);
 
-        lv_obj_scroll_by_raw(scroll_obj, diff_x, diff_y);
+        _lv_obj_scroll_by_raw(scroll_obj, diff_x, diff_y);
         proc->types.pointer.scroll_sum.x += diff_x;
         proc->types.pointer.scroll_sum.y += diff_y;
     }
@@ -265,7 +265,7 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
                 proc->types.pointer.scroll_throw_vect.y = proc->types.pointer.scroll_throw_vect.y >> 1;
             }
 
-            lv_obj_scroll_by_raw(scroll_obj, 0, proc->types.pointer.scroll_throw_vect.y);
+            _lv_obj_scroll_by_raw(scroll_obj, 0, proc->types.pointer.scroll_throw_vect.y);
         }
         /*With snapping find the nearest snap point and scroll there*/
         else {
@@ -291,7 +291,7 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
                 proc->types.pointer.scroll_throw_vect.x = proc->types.pointer.scroll_throw_vect.x >> 1;
             }
 
-            lv_obj_scroll_by_raw(scroll_obj, proc->types.pointer.scroll_throw_vect.x, 0);
+            _lv_obj_scroll_by_raw(scroll_obj, proc->types.pointer.scroll_throw_vect.x, 0);
         }
         /*With snapping find the nearest snap point and scroll there*/
         else {

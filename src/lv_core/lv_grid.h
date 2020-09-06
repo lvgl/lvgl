@@ -75,6 +75,7 @@ extern "C" {
 
 /* Can't include lv_obj.h because it includes this header file */
 struct _lv_obj_t;
+typedef struct _lv_obj_t lv_obj_t;
 
 /**
  * Describe how to flow LV_GRID_POS_AUTO elements
@@ -119,6 +120,12 @@ void grid_calc_free(_lv_grid_calc_t * calc);
 bool _lv_grid_has_fr_col(struct _lv_obj_t * obj);
 
 bool _lv_grid_has_fr_row(struct _lv_obj_t * obj);
+
+void lv_grid_full_refr(lv_obj_t * cont);
+
+void lv_grid_item_refr_pos(lv_obj_t * item);
+
+bool _lv_obj_is_grid_item(lv_obj_t * obj);
 
 /**********************
  *      MACROS

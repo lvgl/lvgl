@@ -184,14 +184,6 @@ enum {
 
 typedef uint8_t lv_dir_t;
 
-enum {
-    LV_SCROLL_SNAP_ALIGN_NONE,
-    LV_SCROLL_SNAP_ALIGN_START,
-    LV_SCROLL_SNAP_ALIGN_END,
-    LV_SCROLL_SNAP_ALIGN_CENTER
-};
-typedef uint8_t lv_scroll_snap_align_t;
-
 
 enum {
     LV_OBJ_FLAG_HIDDEN          = (1 << 0),
@@ -207,14 +199,10 @@ enum {
 };
 typedef uint16_t lv_obj_flag_t;
 
-/** Scrollbar modes: shows when should the scrollbars be visible*/
-enum {
-    LV_SCROLL_MODE_OFF    = 0x0, /**< Never show scroll bars*/
-    LV_SCROLL_MODE_ON     = 0x1, /**< Always show scroll bars*/
-    LV_SCROLL_MODE_ACTIVE = 0x2, /**< Show scroll bars when object is being scrolled*/
-    LV_SCROLL_MODE_AUTO   = 0x3, /**< Show scroll bars when the content is large enough to be scrolled*/
-};
-typedef uint8_t lv_scroll_mode_t;
+
+#include "lv_obj_pos.h"
+#include "lv_obj_scroll.h"
+
 
 typedef struct _lv_obj_t {
     struct _lv_obj_t * parent; /**< Pointer to the parent object*/
@@ -421,171 +409,6 @@ void lv_obj_move_background(lv_obj_t * obj);
  * ------------------*/
 
 /**
- * Set relative the position of an object (relative to the parent)
- * @param obj pointer to an object
- * @param x new distance from the left side of the parent
- * @param y new distance from the top of the parent
- */
-void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
-
-/**
- * Set the x coordinate of a object
- * @param obj pointer to an object
- * @param x new distance from the left side from the parent
- */
-void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x);
-
-/**
- * Set the y coordinate of a object
- * @param obj pointer to an object
- * @param y new distance from the top of the parent
- */
-void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y);
-
-
-void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w, lv_coord_t * h);
-
-/**
- * Set the size of an object
- * @param obj pointer to an object
- * @param w new width
- * @param h new height
- */
-void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
-
-/**
- * Set the width of an object
- * @param obj pointer to an object
- * @param w new width
- */
-void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w);
-
-/**
- * Set the height of an object
- * @param obj pointer to an object
- * @param h new height
- */
-void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
-
-/**
- * Set the width reduced by the left and right padding.
- * @param obj pointer to an object
- * @param w the width without paddings
- */
-void lv_obj_set_width_fit(lv_obj_t * obj, lv_coord_t w);
-
-/**
- * Set the height reduced by the top and bottom padding.
- * @param obj pointer to an object
- * @param h the height without paddings
- */
-void lv_obj_set_height_fit(lv_obj_t * obj, lv_coord_t h);
-
-/**
- * Set the width of an object by taking the left and right margin into account.
- * The object width will be `obj_w = w - margin_left - margin_right`
- * @param obj pointer to an object
- * @param w new height including margins
- */
-void lv_obj_set_width_margin(lv_obj_t * obj, lv_coord_t w);
-
-/**
- * Set the height of an object by taking the top and bottom margin into account.
- * The object height will be `obj_h = h - margin_top - margin_bottom`
- * @param obj pointer to an object
- * @param h new height including margins
- */
-void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h);
-
-/**
- * Align an object to an other object.
- * @param obj pointer to an object to align
- * @param base pointer to an object (if NULL the parent is used). 'obj' will be aligned to it.
- * @param align type of alignment (see 'lv_align_t' enum)
- * @param x_ofs x coordinate offset after alignment
- * @param y_ofs y coordinate offset after alignment
- */
-void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
-
-/**
- * Moves all children with horizontally or vertically.
- * It doesn't take into account any limits so any values are possible
- * @param obj pointer to an object whose children should be moved
- * @param x pixel to move horizontally
- * @param y pixels to move vertically
- */
-void lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
-
-/**
- * Moves all children with horizontally or vertically.
- * Limits the scroll to the bounding box of the children.
- * @param obj pointer to an object whose children should be moved
- * @param x pixel to move horizontally
- * @param y pixels to move vertically
- */
-void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en);
-
-/**
- * Scroll the a given x coordinate to the left side of obj.
- * @param obj pointer to an object which should be scrolled
- * @param x the x coordinate to scroll to
- * @param y the y coordinate to scroll to
- */
-void lv_obj_scroll_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en);
-
-/**
- * Scroll the a given x coordinate to the left side of obj.
- * @param obj pointer to an object which should be scrolled
- * @param x the x coordinate to scroll to
- */
-void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en);
-
-/**
- * Scroll the a given y coordinate to the top side of obj.
- * @param obj pointer to an object which should be scrolled
- * @param y the y coordinate to scroll to
- */
-void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en);
-
-
-/**
- * Return the height of the area above the parent.
- * That is the number of pixels the object can be scrolled down.
- * Normally positive but can be negative when scrolled inside.
- * @param obj
- * @return
- */
-lv_coord_t lv_obj_get_scroll_top(const lv_obj_t * obj);
-
-/**
- * Return the height of the area below the parent.
- * That is the number of pixels the object can be scrolled up.
- * Normally positive but can be negative when scrolled inside.
- * @param obj
- * @return
- */
-lv_coord_t lv_obj_get_scroll_bottom(const lv_obj_t * obj);
-
-
-/**
- * Return the weight of the area on the left the parent.
- * That is the number of pixels the object can be scrolled down.
- * Normally positive but can be negative when scrolled inside.
- * @param obj
- * @return
- */
-lv_coord_t lv_obj_get_scroll_left(const lv_obj_t * obj);
-
-/**
- * Return the width of the area below the object.
- * That is the number of pixels the object can be scrolled left.
- * Normally positive but can be negative when scrolled inside.
- * @param obj
- * @return
- */
-lv_coord_t lv_obj_get_scroll_right(const lv_obj_t * obj);
-
-/**
  * Set the size of an extended clickable area
  * @param obj pointer to an object
  * @param left extended clickable are on the left [px]
@@ -599,134 +422,6 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
  * Appearance set
  *--------------------*/
 
-/**
- * Add a new style to the style list of an object.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param style pointer to a style to add (Only its pointer will be saved)
- */
-void lv_obj_add_style(lv_obj_t * obj, uint8_t part, lv_style_t * style);
-
-/**
- * Remove a style from the style list of an object.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param style pointer to a style to remove
- */
-void lv_obj_remove_style(lv_obj_t * obj, uint8_t part, lv_style_t * style);
-
-/**
- * Reset a style to the default (empty) state.
- * Release all used memories and cancel pending related transitions.
- * Typically used in `LV_SIGN_CLEAN_UP.
- * @param obj pointer to an object
- * @param part the part of the object which style list should be reseted.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- */
-void lv_obj_clean_style_list(lv_obj_t * obj, uint8_t part);
-
-/**
- * Reset a style to the default (empty) state.
- * Release all used memories and cancel pending related transitions.
- * Also notifies the object about the style change.
- * @param obj pointer to an object
- * @param part the part of the object which style list should be reseted.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- */
-void lv_obj_reset_style_list(lv_obj_t * obj, uint8_t part);
-
-/**
- * Notify an object (and its children) about its style is modified
- * @param obj pointer to an object
- * @param prop `LV_STYLE_PROP_ALL` or an `LV_STYLE_...` property. It is used to optimize what needs to be refreshed.
- */
-void lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
-
-/**
- * Notify all object if a style is modified
- * @param style pointer to a style. Only the objects with this style will be notified
- *               (NULL to notify all objects)
- */
-void lv_obj_report_style_mod(lv_style_t * style);
-
-/**
- * Set a local style property of a part of an object in a given state.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_BORDER_COLOR | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param the value to set
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_obj_style_get_border_opa()`
- * @note for performance reasons it's not checked if the property really has color type
- */
-void _lv_obj_set_style_local_color(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_color_t color);
-
-/**
- * Set a local style property of a part of an object in a given state.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param the value to set
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_obj_style_get_border_opa()`
- * @note for performance reasons it's not checked if the property really has integer type
- */
-void _lv_obj_set_style_local_int(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_style_int_t value);
-
-/**
- * Set a local style property of a part of an object in a given state.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_BORDER_OPA | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param the value to set
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_obj_style_get_border_opa()`
- * @note for performance reasons it's not checked if the property really has opacity type
- */
-void _lv_obj_set_style_local_opa(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, lv_opa_t opa);
-
-/**
- * Set a local style property of a part of an object in a given state.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @param the value to set
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_obj_style_get_border_opa()`
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-void _lv_obj_set_style_local_ptr(lv_obj_t * obj, uint8_t type, lv_style_property_t prop, const void * value);
-
-/**
- * Remove a local style property from a part of an object with a given state.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be removed.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop a style property ORed with a state.
- * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
- * @note shouldn't be used directly. Use the specific property remove functions instead.
- *       For example: `lv_obj_style_remove_border_opa()`
- * @return true: the property was found and removed; false: the property was not found
- */
-bool lv_obj_remove_style_local_prop(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
-
-/**
- * Enable/disable the use of style cahche for an object
- * @param obj pointer to an object
- * @param dis true: disable; false: enable (re-enable)
- */
-void _lv_obj_disable_style_caching(lv_obj_t * obj, bool dis);
-
 /*-----------------
  * Attribute set
  *----------------*/
@@ -737,14 +432,6 @@ void _lv_obj_disable_style_caching(lv_obj_t * obj, bool dis);
  * @param en true: advanced hit-testing is enabled
  */
 void lv_obj_set_adv_hittest(lv_obj_t * obj, bool en);
-
-
-/**
- * Set how the scrollbars should behave.
- * @param obj pointer to an object
- * @param mode: LV_SCROLL_MODE_ON/OFF/AUTO/ACTIVE
- */
-void lv_obj_set_scroll_mode(lv_obj_t * obj, lv_scroll_mode_t mode);
 
 /**
  * Set the base direction of the object
@@ -783,14 +470,6 @@ void lv_obj_add_state(lv_obj_t * obj, lv_state_t state);
  */
 void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state);
 
-#if LV_USE_ANIMATION
-/**
- * Finish all pending transitions on a part of an object
- * @param obj pointer to an object
- * @param part part of the object, e.g `LV_BRN_PART_MAIN` or `LV_OBJ_PART_ALL` for all parts
- */
-void lv_obj_finish_transitions(lv_obj_t * obj, uint8_t part);
-#endif
 
 /**
  * Set a an event handler function for an object.
@@ -948,104 +627,6 @@ uint16_t lv_obj_count_children_recursive(const lv_obj_t * obj);
  *--------------------*/
 
 /**
- * Copy the coordinates of an object to an area
- * @param obj pointer to an object
- * @param cords_p pointer to an area to store the coordinates
- */
-void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * cords_p);
-
-/**
- * Reduce area retried by `lv_obj_get_coords()` the get graphically usable area of an object.
- * (Without the size of the border or other extra graphical elements)
- * @param coords_p store the result area here
- */
-void lv_obj_get_inner_coords(const lv_obj_t * obj, lv_area_t * coords_p);
-
-/**
- * Get the x coordinate of object
- * @param obj pointer to an object
- * @return distance of 'obj' from the left side of its parent
- */
-lv_coord_t lv_obj_get_x(const lv_obj_t * obj);
-
-/**
- * Get the y coordinate of object
- * @param obj pointer to an object
- * @return distance of 'obj' from the top of its parent
- */
-lv_coord_t lv_obj_get_y(const lv_obj_t * obj);
-
-/**
- * Get the width of an object
- * @param obj pointer to an object
- * @return the width
- */
-lv_coord_t lv_obj_get_width(const lv_obj_t * obj);
-
-/**
- * Get the height of an object
- * @param obj pointer to an object
- * @return the height
- */
-lv_coord_t lv_obj_get_height(const lv_obj_t * obj);
-
-/**
- * Get that width reduced by the left and right padding.
- * @param obj pointer to an object
- * @return the width which still fits into the container
- */
-lv_coord_t lv_obj_get_width_fit(const lv_obj_t * obj);
-
-/**
- * Get that height reduced by the top an bottom padding.
- * @param obj pointer to an object
- * @return the height which still fits into the container
- */
-lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj);
-
-/**
- * Get the height of an object by taking the top and bottom margin into account.
- * The returned height will be `obj_h + margin_top + margin_bottom`
- * @param obj pointer to an object
- * @return the height including thee margins
- */
-lv_coord_t lv_obj_get_height_margin(lv_obj_t * obj);
-
-/**
- * Get the width of an object by taking the left and right margin into account.
- * The returned width will be `obj_w + margin_left + margin_right`
- * @param obj pointer to an object
- * @return the height including thee margins
- */
-lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj);
-
-/**
- * Divide the width of the object and get the width of a given number of columns.
- * Take paddings into account.
- * @param obj pointer to an object
- * @param div indicates how many columns are assumed.
- * If 1 the width will be set the the parent's width
- * If 2 only half parent width - inner padding of the parent
- * If 3 only third parent width - 2 * inner padding of the parent
- * @param span how many columns are combined
- * @return the width according to the given parameters
- */
-lv_coord_t lv_obj_get_width_grid(lv_obj_t * obj, uint8_t div, uint8_t span);
-
-/**
- * Divide the height of the object and get the width of a given number of columns.
- * Take paddings into account.
- * @param obj pointer to an object
- * @param div indicates how many rows are assumed.
- * If 1 the height will be set the the parent's height
- * If 2 only half parent height - inner padding of the parent
- * If 3 only third parent height - 2 * inner padding of the parent
- * @param span how many rows are combined
- * @return the height according to the given parameters
- */
-lv_coord_t lv_obj_get_height_grid(lv_obj_t * obj, uint8_t div, uint8_t span);
-
-/**
  * Get the left padding of extended clickable area
  * @param obj pointer to an object
  * @return the extended left padding
@@ -1084,97 +665,13 @@ lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj);
  * Appearance get
  *---------------*/
 
-/**
- * Get the style list of an object's part.
- * @param obj pointer to an object.
- * @param part part the part of the object which style list should be get.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @return pointer to the style list. (Can be `NULL`)
- */
-lv_style_list_t * lv_obj_get_style_list(const lv_obj_t * obj, uint8_t part);
-
-/**
- * Get a style property of a part of an object in the object's current state.
- * If there is a running transitions it is taken into account
- * @param obj pointer to an object
- * @param part the part of the object which style property should be get.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop the property to get. E.g. `LV_STYLE_BORDER_WIDTH`.
- *  The state of the object will be added internally
- * @return the value of the property of the given part in the current state.
- * If the property is not found a default value will be returned.
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_obj_style_get_border_width()`
- * @note for performance reasons it's not checked if the property really has integer type
- */
-lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
-
-/**
- * Get a style property of a part of an object in the object's current state.
- * If there is a running transitions it is taken into account
- * @param obj pointer to an object
- * @param part the part of the object which style property should be get.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop the property to get. E.g. `LV_STYLE_BORDER_COLOR`.
- *  The state of the object will be added internally
- * @return the value of the property of the given part in the current state.
- * If the property is not found a default value will be returned.
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_obj_style_get_border_color()`
- * @note for performance reasons it's not checked if the property really has color type
- */
-lv_color_t _lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
-
-/**
- * Get a style property of a part of an object in the object's current state.
- * If there is a running transitions it is taken into account
- * @param obj pointer to an object
- * @param part the part of the object which style property should be get.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop the property to get. E.g. `LV_STYLE_BORDER_OPA`.
- *  The state of the object will be added internally
- * @return the value of the property of the given part in the current state.
- * If the property is not found a default value will be returned.
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_obj_style_get_border_opa()`
- * @note for performance reasons it's not checked if the property really has opacity type
- */
-lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
-
-/**
- * Get a style property of a part of an object in the object's current state.
- * If there is a running transitions it is taken into account
- * @param obj pointer to an object
- * @param part the part of the object which style property should be get.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @param prop the property to get. E.g. `LV_STYLE_TEXT_FONT`.
- *  The state of the object will be added internally
- * @return the value of the property of the given part in the current state.
- * If the property is not found a default value will be returned.
- * @note shouldn't be used directly. Use the specific property get functions instead.
- *       For example: `lv_obj_style_get_border_opa()`
- * @note for performance reasons it's not checked if the property really has pointer type
- */
-const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
-
-/**
- * Get the local style of a part of an object.
- * @param obj pointer to an object
- * @param part the part of the object which style property should be set.
- * E.g. `LV_OBJ_PART_MAIN`, `LV_BTN_PART_MAIN`, `LV_SLIDER_PART_KNOB`
- * @return pointer to the local style if exists else `NULL`.
- */
-lv_style_t * lv_obj_get_local_style(lv_obj_t * obj, uint8_t part);
-
-
-#include "lv_obj_style_dec.h"
 
 /*-----------------
  * Attribute get
  *----------------*/
 
 
-bool lv_obj_has_flag(lv_obj_t * obj, lv_obj_flag_t f);
+bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
  * Get whether advanced hit-testing is enabled on an object
@@ -1326,21 +823,6 @@ void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t 
  */
 lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part);
 
-/**
- * Fade in (from transparent to fully cover) an object and all its children using an `opa_scale` animation.
- * @param obj the object to fade in
- * @param time duration of the animation [ms]
- * @param delay wait before the animation starts [ms]
- */
-void lv_obj_fade_in(lv_obj_t * obj, uint32_t time, uint32_t delay);
-
-/**
- * Fade out (from fully cover to transparent) an object and all its children using an `opa_scale` animation.
- * @param obj the object to fade in
- * @param time duration of the animation [ms]
- * @param delay wait before the animation starts [ms]
- */
-void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay);
 
 /**
  * Check if any object has a given type
@@ -1358,6 +840,9 @@ bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
  */
 bool lv_debug_check_obj_valid(const lv_obj_t * obj);
 
+void _lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
+
+#include "lv_obj_style.h"
 
 /**********************
  *      MACROS
