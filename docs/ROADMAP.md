@@ -21,6 +21,7 @@ Planned to September/October 2020
   - Work in progress
 - Simplified File system interface ([feat/new_fs_api](https://github.com/lvgl/lvgl/tree/feat/new-fs-api) branch) to make porting easier
   - Work in progress
+- RGB888 support [#1722](https://github.com/lvgl/lvgl/issues/1722)  
 - Remove the align parameter from `lv_canvas_draw_text`
 
 ## v9
