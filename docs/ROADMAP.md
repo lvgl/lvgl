@@ -12,23 +12,24 @@ Planned to September/October 2020
   - Support "elastic" scrolling when scrolled in
   - Support scroll chaining among any objects types (not only `lv_pages`s)
   - Remove `lv_drag`. Similar effect can be achieved by setting the position in `LV_EVENT_PRESSING`
-  - Add snapping?
+  - Add snapping
+  - Add snap stop to scroll max 1 snap point
   - Already working
 - New layouts:
   - See [#1615](https://github.com/lvgl/lvgl/issues/1615) issue
-  - [CSS Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)-like layout support
-  - Besides setting width/height in `px` add support to `partent percentage` and `screen percentage`.
+  - [CSS Grid](https://css-tricks.com/snippets/css/a-guide-to-grid/)-like layout support
   - Work in progress
 - Simplified File system interface ([feat/new_fs_api](https://github.com/lvgl/lvgl/tree/feat/new-fs-api) branch) to make porting easier
   - Work in progress
+- RGB888 support [#1722](https://github.com/lvgl/lvgl/issues/1722)  
 - Remove the align parameter from `lv_canvas_draw_text`
 
 ## v9
-- Simplify `group`s. Discussion is [here](https://forum.lvgl.io/t/lv-group-tabindex/2927/3).
-
-## Ideas
+- Simplify `group`s. Discussion is [here](https://forum.lvgl.io/t/lv-group-tabindex/2927/3).7
 - Unit testing (gtest?). See [#1658](https://github.com/lvgl/lvgl/issues/1658)
 - Benchmarking (gem5?). See [#1660](https://github.com/lvgl/lvgl/issues/1660)
+
+## Ideas
 - CPP binding. See [Forum](https://forum.lvgl.io/t/is-it-possible-to-officially-support-optional-cpp-api/2736)
 - Optmize font decompression
 - Switch to RGBA colors in styles

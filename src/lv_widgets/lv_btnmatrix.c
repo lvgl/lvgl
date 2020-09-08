@@ -208,7 +208,7 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
         /*Only deal with the non empty lines*/
         if(btn_cnt != 0) {
             /*Calculate the width of all units*/
-            lv_coord_t all_unit_w = max_w - ((btn_cnt - 1) * inner);
+            lv_coord_t all_unit_w = max_w - ((unit_cnt - 1) * inner);
 
             /*Set the button size and positions and set the texts*/
             uint16_t i;
@@ -216,19 +216,20 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
 
             unit_act_cnt = 0;
             for(i = 0; i < btn_cnt; i++) {
+                uint8_t btn_unit_w = get_button_width(ext->ctrl_bits[btn_i]);
                 /* one_unit_w = all_unit_w / unit_cnt
                  * act_unit_w = one_unit_w * button_width
                  * do this two operations but the multiply first to divide a greater number */
-                lv_coord_t act_unit_w = (all_unit_w * get_button_width(ext->ctrl_bits[btn_i])) / unit_cnt;
+                lv_coord_t act_unit_w = (all_unit_w * btn_unit_w) / unit_cnt + inner * (btn_unit_w - 1);
                 act_unit_w--; /*-1 because e.g. width = 100 means 101 pixels (0..100)*/
 
                 /*Always recalculate act_x because of rounding errors */
                 if(base_dir == LV_BIDI_DIR_RTL)  {
-                    act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * inner;
+                    act_x = (unit_act_cnt * all_unit_w) / unit_cnt + unit_act_cnt * inner;
                     act_x = lv_obj_get_width(btnm) - right - act_x - act_unit_w - 1;
                 }
                 else {
-                    act_x = (unit_act_cnt * all_unit_w) / unit_cnt + i * inner +
+                    act_x = (unit_act_cnt * all_unit_w) / unit_cnt + unit_act_cnt * inner +
                             left;
                 }
                 /* Set the button's area.
@@ -243,7 +244,7 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
                     lv_area_set(&ext->button_areas[btn_i], act_x, act_y, act_x + act_unit_w, act_y + btn_h);
                 }
 
-                unit_act_cnt += get_button_width(ext->ctrl_bits[btn_i]);
+                unit_act_cnt += btn_unit_w;
 
                 i_tot++;
                 btn_i++;
