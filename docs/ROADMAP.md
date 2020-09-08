@@ -22,13 +22,13 @@ Planned to September/October 2020
 - Simplified File system interface ([feat/new_fs_api](https://github.com/lvgl/lvgl/tree/feat/new-fs-api) branch) to make porting easier
   - Work in progress
 - Remove the align parameter from `lv_canvas_draw_text`
+- RGB888 support [#1722](https://github.com/lvgl/lvgl/issues/1722)  
 
 ## v8.1
 - Add radio button widget
 
 ## v9
 - Simplify `group`s. Discussion is [here](https://forum.lvgl.io/t/lv-group-tabindex/2927/3).7
-- RGB888 support [#1722](https://github.com/lvgl/lvgl/issues/1722)  
 - Unit testing (gtest?). See [#1658](https://github.com/lvgl/lvgl/issues/1658)
 - Benchmarking (gem5?). See [#1660](https://github.com/lvgl/lvgl/issues/1660)
 
