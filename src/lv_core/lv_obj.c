@@ -76,6 +76,42 @@ typedef struct {
     } end_value;
 } lv_style_trans_t;
 
+typedef struct {
+    lv_draw_rect_dsc_t rect;
+    lv_draw_label_dsc_t label;
+    lv_draw_line_dsc_t line;
+    lv_draw_img_dsc_t img;
+    lv_style_int_t pad_top;
+    lv_style_int_t pad_bottom;
+    lv_style_int_t pad_right;
+    lv_style_int_t pad_left;
+    lv_style_int_t pad_inner;
+    lv_style_int_t margin_top;
+    lv_style_int_t margin_bottom;
+    lv_style_int_t margin_left;
+    lv_style_int_t margin_right;
+    lv_style_int_t size;
+    lv_style_int_t transform_width;
+    lv_style_int_t transform_height;
+    lv_style_int_t transform_angle;
+    lv_style_int_t transform_zoom;
+    lv_style_int_t scale_width;
+    lv_style_int_t scale_border_width;
+    lv_style_int_t scale_end_border_width;
+    lv_style_int_t scale_end_line_width;
+    lv_color_t scale_grad_color;
+    lv_color_t scale_end_color;
+    lv_opa_t opa_scale;
+    uint32_t clip_corder :1;
+    uint32_t border_post :1;
+}style_snapshot_t;
+
+typedef enum {
+    STYLE_COMPARE_SAME,
+    STYLE_COMPARE_VISUAL_DIFF,
+    STYLE_COMPARE_DIFF,
+} style_snapshot_res_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -106,6 +142,10 @@ static void obj_del_core(lv_obj_t * obj);
 static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop);
 static void update_style_cache_children(lv_obj_t * obj);
 static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
+static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot);
+static style_snapshot_res_t style_snapshot_compare(style_snapshot_t * shot1, style_snapshot_t * shot2);
+
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -1670,9 +1710,49 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
 #else
     lv_state_t prev_state = obj->state;
-    obj->state = new_state;
-
+    style_snapshot_res_t cmp_res = STYLE_COMPARE_SAME;
     uint8_t part;
+    for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
+        lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
+        if(style_list == NULL) break;   /*No more style lists*/
+        obj->state = prev_state;
+        style_snapshot_t shot_pre;
+        style_snapshot(obj, part, &shot_pre);
+        obj->state = new_state;
+        style_snapshot_t shot_post;
+        style_snapshot(obj, part, &shot_post);
+
+        style_snapshot_res_t r = style_snapshot_compare(&shot_pre, &shot_post);
+        if(r == STYLE_COMPARE_DIFF) {
+            cmp_res = STYLE_COMPARE_DIFF;
+            break;
+        }
+        if(r == STYLE_COMPARE_VISUAL_DIFF) {
+            cmp_res = STYLE_COMPARE_VISUAL_DIFF;
+        }
+    }
+    for(part = _LV_OBJ_PART_REAL_FIRST; part < 0xFF; part++) {
+        lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
+        if(style_list == NULL) break;   /*No more style lists*/
+        obj->state = prev_state;
+        style_snapshot_t shot_pre;
+        style_snapshot(obj, part, &shot_pre);
+        obj->state = new_state;
+        style_snapshot_t shot_post;
+        style_snapshot(obj, part, &shot_post);
+
+        style_snapshot_res_t r = style_snapshot_compare(&shot_pre, &shot_post);
+        if(r == STYLE_COMPARE_DIFF) {
+            cmp_res = STYLE_COMPARE_DIFF;
+            break;
+        }
+        if(r == STYLE_COMPARE_VISUAL_DIFF) {
+            cmp_res = STYLE_COMPARE_VISUAL_DIFF;
+        }
+    }
+
+    if(cmp_res == STYLE_COMPARE_SAME) return;
+
     for(part = 0; part < _LV_OBJ_PART_REAL_LAST; part++) {
         lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
         if(style_list == NULL) break;   /*No more style lists*/
@@ -1718,8 +1798,9 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
             }
         }
-        lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
+        if(cmp_res == STYLE_COMPARE_DIFF) lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
     }
+    if(cmp_res == STYLE_COMPARE_VISUAL_DIFF) lv_obj_invalidate(obj);
 #endif
 
 
@@ -4659,3 +4740,80 @@ static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_proper
     }
 }
 
+static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot)
+{
+    _lv_obj_disable_style_caching(obj, true);
+    _lv_memset_00(shot, sizeof(style_snapshot_t));
+    lv_draw_rect_dsc_init(&shot->rect);
+    lv_draw_label_dsc_init(&shot->label);
+    lv_draw_img_dsc_init(&shot->img);
+    lv_draw_line_dsc_init(&shot->line);
+
+    lv_obj_init_draw_rect_dsc(obj, part, &shot->rect);
+    lv_obj_init_draw_label_dsc(obj, part, &shot->label);
+    lv_obj_init_draw_img_dsc(obj, part, &shot->img);
+    lv_obj_init_draw_line_dsc(obj, part, &shot->line);
+
+
+    shot->pad_top = lv_obj_get_style_pad_top(obj, part);
+    shot->pad_bottom = lv_obj_get_style_pad_bottom(obj, part);
+    shot->pad_right = lv_obj_get_style_pad_right(obj, part);
+    shot->pad_left = lv_obj_get_style_pad_left(obj, part);
+    shot->pad_inner = lv_obj_get_style_pad_inner(obj, part);
+    shot->margin_top = lv_obj_get_style_margin_top(obj, part);
+    shot->margin_bottom = lv_obj_get_style_margin_bottom(obj, part);
+    shot->margin_left = lv_obj_get_style_margin_left(obj, part);
+    shot->margin_right = lv_obj_get_style_margin_right(obj, part);
+    shot->size = lv_obj_get_style_size(obj, part);
+    shot->transform_width = lv_obj_get_style_transform_width(obj, part);
+    shot->transform_height = lv_obj_get_style_transform_height(obj, part);
+    shot->transform_angle = lv_obj_get_style_transform_angle(obj, part);
+    shot->transform_zoom = lv_obj_get_style_transform_zoom(obj, part);
+    shot->scale_width = lv_obj_get_style_scale_width(obj, part);
+    shot->scale_border_width = lv_obj_get_style_scale_border_width(obj, part);
+    shot->scale_end_border_width = lv_obj_get_style_scale_end_border_width(obj, part);
+    shot->scale_end_line_width = lv_obj_get_style_scale_end_line_width(obj, part);
+    shot->scale_grad_color = lv_obj_get_style_scale_grad_color(obj, part);
+    shot->scale_end_color = lv_obj_get_style_scale_end_color(obj, part);
+    shot->opa_scale = lv_obj_get_style_opa_scale(obj, part);
+    shot->clip_corder = lv_obj_get_style_clip_corner(obj, part);
+    shot->border_post  = lv_obj_get_style_border_post(obj, part);
+
+    _lv_obj_disable_style_caching(obj, false);
+}
+
+static style_snapshot_res_t style_snapshot_compare(style_snapshot_t * shot1, style_snapshot_t * shot2)
+{
+    if(memcmp(shot1, shot2, sizeof(style_snapshot_t)) == 0) return STYLE_COMPARE_SAME;
+
+
+    if(shot1->pad_top != shot2->pad_top) return STYLE_COMPARE_DIFF;
+    if(shot1->pad_bottom != shot2->pad_bottom) return STYLE_COMPARE_DIFF;
+    if(shot1->pad_left != shot2->pad_right) return STYLE_COMPARE_DIFF;
+    if(shot1->pad_right != shot2->pad_right) return STYLE_COMPARE_DIFF;
+    if(shot1->pad_top != shot2->pad_top) return STYLE_COMPARE_DIFF;
+    if(shot1->pad_inner != shot2->pad_inner) return STYLE_COMPARE_DIFF;
+    if(shot1->margin_top != shot2->margin_top) return STYLE_COMPARE_DIFF;
+    if(shot1->margin_bottom != shot2->margin_bottom) return STYLE_COMPARE_DIFF;
+    if(shot1->margin_left != shot2->margin_right) return STYLE_COMPARE_DIFF;
+    if(shot1->margin_right != shot2->margin_right) return STYLE_COMPARE_DIFF;
+    if(shot1->margin_top != shot2->margin_top) return STYLE_COMPARE_DIFF;
+    if(shot1->transform_width != shot2->transform_width) return STYLE_COMPARE_DIFF;
+    if(shot1->transform_height != shot2->transform_height) return STYLE_COMPARE_DIFF;
+    if(shot1->transform_angle != shot2->transform_angle) return STYLE_COMPARE_DIFF;
+    if(shot1->transform_zoom != shot2->transform_zoom) return STYLE_COMPARE_DIFF;
+    if(shot1->rect.outline_width != shot2->rect.outline_width) return STYLE_COMPARE_DIFF;
+    if(shot1->rect.outline_pad != shot2->rect.outline_pad) return STYLE_COMPARE_DIFF;
+    if(shot1->rect.value_font != shot2->rect.value_font) return STYLE_COMPARE_DIFF;
+    if(shot1->rect.value_align != shot2->rect.value_align) return STYLE_COMPARE_DIFF;
+    if(shot1->rect.value_font != shot2->rect.value_font) return STYLE_COMPARE_DIFF;
+    if(shot1->rect.shadow_spread != shot2->rect.shadow_spread) return STYLE_COMPARE_DIFF;
+    if(shot1->rect.shadow_width != shot2->rect.shadow_width) return STYLE_COMPARE_DIFF;
+    if(shot1->rect.shadow_ofs_x != shot2->rect.shadow_ofs_x) return STYLE_COMPARE_DIFF;
+    if(shot1->rect.shadow_ofs_y != shot2->rect.shadow_ofs_y) return STYLE_COMPARE_DIFF;
+
+    /*If not returned earlier its just a visual difference, a simple redraw is enough*/
+    return STYLE_COMPARE_VISUAL_DIFF;
+
+
+}
