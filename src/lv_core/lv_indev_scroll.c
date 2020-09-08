@@ -1,5 +1,5 @@
 /**
- * @file lv_scroll.c
+ * @file lv_indev_scroll.c
  *
  */
 

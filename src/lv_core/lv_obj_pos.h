@@ -22,10 +22,7 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
-
-/* Can't include lv_obj.h because it includes this header file */
 struct _lv_obj_t;
-typedef struct _lv_obj_t lv_obj_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -34,79 +31,82 @@ typedef struct _lv_obj_t lv_obj_t;
 /**
  * Set relative the position of an object (relative to the parent)
  * @param obj pointer to an object
- * @param x new distance from the left side of the parent
- * @param y new distance from the top of the parent
+ * @param x new distance from the left side of the parent plus the parent's left padding or a grid cell
+ * @param y new distance from the top side of the parent  plus the parent's right padding or a grid cell
+ * @note Zero value value means place the object is on the left padding of the parent, and not on the left edge.
+ * @note A grid cell can be and explicit placement with cell position and span:
+ *         `LV_GRID_CELL_START/END/CENTER/STRETCH(pos, span)`
+ *       or "auto" to place the object on the grid in the creation order of other children
+ *       `LV_GRID_AUTO_START/END/CENTER/STRETCH`
+ * @note to use grid placement the parent needs have a defined grid with `lv_obj_set_grid`
  */
-void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
+void lv_obj_set_pos(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
 
 /**
  * Set the x coordinate of a object
  * @param obj pointer to an object
- * @param x new distance from the left side from the parent
+ * @param x new distance from the left side from the parent plus the parent's left padding or a grid cell
  */
-void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x);
+void lv_obj_set_x(struct _lv_obj_t * obj, lv_coord_t x);
 
 /**
  * Set the y coordinate of a object
  * @param obj pointer to an object
- * @param y new distance from the top of the parent
+ * @param y new distance from the top of the parent  plus the parent's top padding or a grid cell
  */
-void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y);
-
-
-void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w, lv_coord_t * h);
+void lv_obj_set_y(struct _lv_obj_t * obj, lv_coord_t y);
 
 /**
- * Set the size of an object
+ * Set the size of an object.
  * @param obj pointer to an object
- * @param w new width
- * @param h new height
+ * @param w new width in pixels or `LV_SIZE_AUTO` to set the size to involve all children
+ * @param h new height  in pixels or `LV_SIZE_AUTO` to set the size to involve all children
  */
-void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
+void lv_obj_set_size(struct _lv_obj_t * obj, lv_coord_t w, lv_coord_t h);
 
 /**
  * Set the width of an object
  * @param obj pointer to an object
- * @param w new width
+ * @param w new width in pixels or `LV_SIZE_AUTO` to set the size to involve all children
  */
-void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w);
+void lv_obj_set_width(struct _lv_obj_t * obj, lv_coord_t w);
 
 /**
  * Set the height of an object
  * @param obj pointer to an object
- * @param h new height
+ * @param h new height in pixels or `LV_SIZE_AUTO` to set the size to involve all children
  */
-void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h);
+void lv_obj_set_height(struct _lv_obj_t * obj, lv_coord_t h);
 
 /**
  * Set the width reduced by the left and right padding.
  * @param obj pointer to an object
- * @param w the width without paddings
+ * @param w the width without paddings in pixels
  */
-void lv_obj_set_content_width(lv_obj_t * obj, lv_coord_t w);
+void lv_obj_set_content_width(struct _lv_obj_t * obj, lv_coord_t w);
 
 /**
  * Set the height reduced by the top and bottom padding.
  * @param obj pointer to an object
- * @param h the height without paddings
+ * @param h the height without paddings in pixels
  */
-void lv_obj_set_content_height(lv_obj_t * obj, lv_coord_t h);
+void lv_obj_set_content_height(struct _lv_obj_t * obj, lv_coord_t h);
 
 /**
  * Set the width of an object by taking the left and right margin into account.
  * The object width will be `obj_w = w - margin_left - margin_right`
  * @param obj pointer to an object
- * @param w new height including margins
+ * @param w new height including margins in pixels
  */
-void lv_obj_set_width_margin(lv_obj_t * obj, lv_coord_t w);
+void lv_obj_set_width_margin(struct _lv_obj_t * obj, lv_coord_t w);
 
 /**
  * Set the height of an object by taking the top and bottom margin into account.
  * The object height will be `obj_h = h - margin_top - margin_bottom`
  * @param obj pointer to an object
- * @param h new height including margins
+ * @param h new height including margins in pixels
  */
-void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h);
+void lv_obj_set_height_margin(struct _lv_obj_t * obj, lv_coord_t h);
 
 /**
  * Align an object to an other object.
@@ -116,120 +116,120 @@ void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h);
  * @param x_ofs x coordinate offset after alignment
  * @param y_ofs y coordinate offset after alignment
  */
-void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
-
+void lv_obj_align(struct _lv_obj_t * obj, const struct _lv_obj_t * base, lv_align_t align, lv_coord_t x_ofs, lv_coord_t y_ofs);
 
 /**
  * Copy the coordinates of an object to an area
  * @param obj pointer to an object
- * @param cords_p pointer to an area to store the coordinates
+ * @param coords_out pointer to an area to store the coordinates
  */
-void lv_obj_get_coords(const lv_obj_t * obj, lv_area_t * cords_p);
+void lv_obj_get_coords(const struct _lv_obj_t * obj, lv_area_t * coords_out);
 
 /**
  * Reduce area retried by `lv_obj_get_coords()` the get graphically usable area of an object.
  * (Without the size of the border or other extra graphical elements)
- * @param coords_p store the result area here
+ * @param coords_out store the result area here
  */
-void lv_obj_get_inner_coords(const lv_obj_t * obj, lv_area_t * coords_p);
+void lv_obj_get_inner_coords(const struct _lv_obj_t * obj, lv_area_t * coords_out);
 
 /**
- * Get the x coordinate of object
+ * Get the x coordinate of object.
  * @param obj pointer to an object
- * @return distance of 'obj' from the left side of its parent
+ * @return distance of 'obj' from the left side of its parent plus the parent's left padding
+ * @note Zero return value means the object is on the left padding of the parent, and not on the left edge.
+ * @note Scrolling of the parent doesn't change the returned value.
+ * @note The returned value is always the distance from the parent even if the position is grid cell or other special value.
  */
-lv_coord_t lv_obj_get_x(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_x(const struct _lv_obj_t * obj);
 
 /**
- * Get the y coordinate of object
+ * Get the y coordinate of object.
  * @param obj pointer to an object
- * @return distance of 'obj' from the top of its parent
+ * @return distance of 'obj' from the top side of its parent plus the parent's top padding
+ * @note Zero return value means the object is on the top padding of the parent, and not on the top edge.
+ * @note Scrolling of the parent doesn't change the returned value.
+ * @note The returned value is always the distance from the parent even if the position is grid cell or other special value.
  */
-lv_coord_t lv_obj_get_y(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_y(const struct _lv_obj_t * obj);
 
 /**
  * Get the width of an object
  * @param obj pointer to an object
- * @return the width
+ * @return the width in pixels
+ * @note The returned value is always the width in pixels even if the width is set to `LV_SIZE_AUTO` or other special value.
  */
-lv_coord_t lv_obj_get_width(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_width(const struct _lv_obj_t * obj);
 
 /**
  * Get the height of an object
  * @param obj pointer to an object
- * @return the height
+ * @return the height in pixels
+ * @note The returned value is always the width in pixels even if the width is set to `LV_SIZE_AUTO` or other special value.
  */
-lv_coord_t lv_obj_get_height(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_height(const struct _lv_obj_t * obj);
 
 /**
  * Get that width reduced by the left and right padding.
  * @param obj pointer to an object
- * @return the width which still fits into the container
+ * @return the width which still fits into the container without causing overflow
  */
-lv_coord_t lv_obj_get_width_fit(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_width_fit(const struct _lv_obj_t * obj);
 
 /**
  * Get that height reduced by the top an bottom padding.
  * @param obj pointer to an object
- * @return the height which still fits into the container
+ * @return the height which still fits into the container without causing overflow
  */
-lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_height_fit(const struct _lv_obj_t * obj);
 
 /**
  * Get the height of an object by taking the top and bottom margin into account.
  * The returned height will be `obj_h + margin_top + margin_bottom`
  * @param obj pointer to an object
- * @return the height including thee margins
+ * @return the height including the margins
  */
-lv_coord_t lv_obj_get_height_margin(lv_obj_t * obj);
+lv_coord_t lv_obj_get_height_margin(struct _lv_obj_t * obj);
 
 /**
  * Get the width of an object by taking the left and right margin into account.
  * The returned width will be `obj_w + margin_left + margin_right`
  * @param obj pointer to an object
- * @return the height including thee margins
+ * @return the height including the margins
  */
-lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj);
-
+lv_coord_t lv_obj_get_width_margin(struct _lv_obj_t * obj);
 
 /**
- * Check if a given screen-space point is on an object's coordinates.
- *
- * This method is intended to be used mainly by advanced hit testing algorithms to check
- * whether the point is even within the object (as an optimization).
- * @param obj object to check
- * @param point screen-space point
- */
-bool lv_obj_is_point_on_coords(lv_obj_t * obj, const lv_point_t * point);
-
-/**
- * Divide the width of the object and get the width of a given number of columns.
- * Take paddings into account.
+ * Calculate the "auto size". It's `auto_size = max(gird_size, children_size)`
  * @param obj pointer to an object
- * @param div indicates how many columns are assumed.
- * If 1 the width will be set the the parent's width
- * If 2 only half parent width - inner padding of the parent
- * If 3 only third parent width - 2 * inner padding of the parent
- * @param span how many columns are combined
- * @return the width according to the given parameters
+ * @param w_out store the width here. NULL to not calculate width
+ * @param h_out store the height here. NULL to not calculate height
  */
-lv_coord_t lv_obj_get_width_grid(lv_obj_t * obj, uint8_t div, uint8_t span);
+void _lv_obj_calc_auto_size(struct _lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_out);
 
 /**
- * Divide the height of the object and get the width of a given number of columns.
- * Take paddings into account.
- * @param obj pointer to an object
- * @param div indicates how many rows are assumed.
- * If 1 the height will be set the the parent's height
- * If 2 only half parent height - inner padding of the parent
- * If 3 only third parent height - 2 * inner padding of the parent
- * @param span how many rows are combined
- * @return the height according to the given parameters
+ * Move an object to a given x and y coordinate.
+ * It's the core function to move objects but user should use `lv_obj_set_pos/x/y/..` etc.
+ * @param obj pointer to an object to move
+ * @param x the new x coordinate in pixels
+ * @param y the new y coordinate in pixels
+ * @param notify_parent true: send `LV_SIGNAL_CHILD_CHG` to the parent if `obj` moved; false: do not notify the parent
  */
-lv_coord_t lv_obj_get_height_grid(lv_obj_t * obj, uint8_t div, uint8_t span);
+void _lv_obj_move_to(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_parent);
 
-void _lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_parent);
+/**
+ * Reposition the children of an object. (Called recursively)
+ * @param obj pointer to an object which children will be repositioned
+ * @param x_diff x coordinate shift
+ * @param y_diff y coordinate shift
+ */
+void _lv_obj_move_children_by(struct _lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
 
+/**
+ * Check if an object is valid grid item or not.
+ * @param obj pointer to an object to check
+ * @return true: grid item; false: not grid item
+ */
+bool _lv_obj_is_grid_item(struct _lv_obj_t * obj);
 /**********************
  *      MACROS
  **********************/

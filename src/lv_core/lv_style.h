@@ -45,6 +45,10 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
 #define LV_STYLE_PROP_ALL 0xFF
 
+#if LV_STYLE_CACHE_LEVEL >= 2
+#define _LV_STLYE_CAHCE_INT_MAX 63
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -236,9 +240,12 @@ typedef struct {
     uint32_t has_trans     : 1;
     uint32_t skip_trans    : 1;      /*1: Temporally skip the transition style if any*/
     uint32_t ignore_trans  : 1;      /*1: Mark that this style list shouldn't receive transitions at all*/
+
+#if LV_STYLE_CACHE_LEVEL >= 1
     uint32_t valid_cache   : 1;      /*1: The cache is valid and can be used*/
     uint32_t ignore_cache  : 1;      /*1: Ignore cache while getting value of properties*/
 
+    /*32 properties*/
     uint32_t radius_zero : 1;
     uint32_t opa_scale_cover      : 1;
     uint32_t clip_corner_off       : 1;
@@ -248,7 +255,6 @@ typedef struct {
     uint32_t blend_mode_all_normal : 1;
     uint32_t bg_opa_transp : 1;
     uint32_t bg_opa_cover : 1;
-    uint32_t bg_grad_dir_none : 1;
 
     uint32_t border_width_zero : 1;
     uint32_t border_side_full : 1;
@@ -263,6 +269,13 @@ typedef struct {
     uint32_t text_space_zero : 1;
     uint32_t text_decor_none : 1;
     uint32_t text_font_normal : 1;
+#endif
+
+#if LV_STYLE_CACHE_LEVEL >= 2
+    uint32_t pad_top :6;
+    uint32_t pad_left :6;
+#endif
+
 } lv_style_list_t;
 
 /**********************

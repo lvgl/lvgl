@@ -11,6 +11,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_obj"
 
 /**********************
  *      TYPEDEFS
@@ -61,30 +62,29 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     }
 
     /*If not grid item but has grid position set the position to 0*/
-    if(!gi) {
-        if(_GRID_IS_CELL(x)) {
-            obj->x_set = 0;
-            x = 0;
-        }
-        if(_GRID_IS_CELL(y)) {
-            obj->y_set = 0;
-            y = 0;
-        }
-    }
+//    if(!gi) {
+//        if(_GRID_IS_CELL(x)) {
+//            obj->x_set = 0;
+//            x = 0;
+//        }
+//        if(_GRID_IS_CELL(y)) {
+//            obj->y_set = 0;
+//            y = 0;
+//        }
+//    }
 
     /*If the object is on a grid item let the grid to position it. */
     if(gi) {
-        lv_area_t old_area;
-        lv_area_copy(&old_area, &obj->coords);
-        lv_grid_item_refr_pos(obj);
-
         lv_obj_t * cont = lv_obj_get_parent(obj);
 
-        /*If the item was moved and grid is implicit in the changed direction refresh the whole grid.*/
-        if((cont->grid->col_dsc == NULL && (old_area.x1 != obj->coords.x1 || old_area.x2 != obj->coords.x2)) ||
-           (cont->grid->row_dsc == NULL && (old_area.y1 != obj->coords.y1 || old_area.y2 != obj->coords.y2)))
+        /*If the item was moved on an implicit grid the whole grid can change so refresh the full grid.*/
+        if(cont->grid->col_dsc == NULL || cont->grid->row_dsc == NULL)
         {
-            lv_grid_full_refr(cont);
+            _lv_grid_full_refresh(cont);
+        }
+        /*On explicit grids the grid itself doesn't depend on the items, so just position the item*/
+        else {
+            lv_grid_item_refr_pos(obj);
         }
     } else {
         _lv_obj_move_to(obj, x, y, true);
@@ -443,40 +443,6 @@ lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj)
 }
 
 /**
- * Check if a given screen-space point is on an object's coordinates.
- *
- * This method is intended to be used mainly by advanced hit testing algorithms to check
- * whether the point is even within the object (as an optimization).
- * @param obj object to check
- * @param point screen-space point
- */
-bool lv_obj_is_point_on_coords(lv_obj_t * obj, const lv_point_t * point)
-{
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
-    lv_area_t ext_area;
-    ext_area.x1 = obj->coords.x1 - obj->ext_click_pad_hor;
-    ext_area.x2 = obj->coords.x2 + obj->ext_click_pad_hor;
-    ext_area.y1 = obj->coords.y1 - obj->ext_click_pad_ver;
-    ext_area.y2 = obj->coords.y2 + obj->ext_click_pad_ver;
-
-    if(!_lv_area_is_point_on(&ext_area, point, 0)) {
-#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
-    lv_area_t ext_area;
-    ext_area.x1 = obj->coords.x1 - obj->ext_click_pad.x1;
-    ext_area.x2 = obj->coords.x2 + obj->ext_click_pad.x2;
-    ext_area.y1 = obj->coords.y1 - obj->ext_click_pad.y1;
-    ext_area.y2 = obj->coords.y2 + obj->ext_click_pad.y2;
-
-    if(!_lv_area_is_point_on(&ext_area, point, 0)) {
-#else
-    if(!_lv_area_is_point_on(&obj->coords, point, 0)) {
-#endif
-        return false;
-    }
-    return true;
-}
-
-/**
  * Calculate the "auto size". It's `auto_size = max(gird_size, children_size)`
  * @param obj pointer to an object
  * @param w_out store the width here. NULL to not calculate width
@@ -485,6 +451,8 @@ bool lv_obj_is_point_on_coords(lv_obj_t * obj, const lv_point_t * point)
 void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_out)
 {
     if(!w_out && !h_out) return;
+
+//    printf("auto size\n");
 
     /*If no other effect the auto-size of zero by default*/
     if(w_out) *w_out = 0;
@@ -495,10 +463,10 @@ void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_o
     lv_coord_t grid_h = 0;
     if(obj->grid) {
         _lv_grid_calc_t calc;
-        grid_calc(obj, &calc);
+        _lv_grid_calc(obj, &calc);
         grid_w = calc.col_dsc[calc.col_dsc_len - 1] + lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN) +  + lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
         grid_h = calc.row_dsc[calc.row_dsc_len - 1] + lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN) + lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);;
-        grid_calc_free(&calc);
+        _lv_grid_calc_free(&calc);
     }
 
     /*Get the children's most right and bottom position*/

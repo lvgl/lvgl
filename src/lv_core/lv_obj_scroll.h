@@ -25,7 +25,6 @@ extern "C" {
  **********************/
 
 struct _lv_obj_t;
-typedef struct _lv_obj_t lv_obj_t;
 
 /** Scrollbar modes: shows when should the scrollbars be visible*/
 enum {
@@ -54,14 +53,14 @@ typedef uint8_t lv_scroll_snap_align_t;
  * @param obj pointer to an object
  * @param mode: LV_SCROLL_MODE_ON/OFF/AUTO/ACTIVE
  */
-void lv_obj_set_scroll_mode(lv_obj_t * obj, lv_scroll_mode_t mode);
+void lv_obj_set_scroll_mode(struct _lv_obj_t * obj, lv_scroll_mode_t mode);
 
 /**
  * Get how the scrollbars should behave.
  * @param obj pointer to an object
  * @return mode: LV_SCROLL_MODE_ON/OFF/AUTO/ACTIVE
  */
-lv_scroll_mode_t lv_obj_get_scroll_mode(lv_obj_t * obj);
+lv_scroll_mode_t lv_obj_get_scroll_mode(struct _lv_obj_t * obj);
 
 /**
  * Moves all children with horizontally or vertically.
@@ -70,7 +69,7 @@ lv_scroll_mode_t lv_obj_get_scroll_mode(lv_obj_t * obj);
  * @param x pixel to move horizontally
  * @param y pixels to move vertically
  */
-void _lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
+void _lv_obj_scroll_by_raw(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
 
 /**
  * Moves all children with horizontally or vertically.
@@ -79,7 +78,7 @@ void _lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
  * @param x pixel to move horizontally
  * @param y pixels to move vertically
  */
-void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en);
+void lv_obj_scroll_by(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en);
 
 /**
  * Scroll the a given x coordinate to the left side of obj.
@@ -87,21 +86,21 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
  * @param x the x coordinate to scroll to
  * @param y the y coordinate to scroll to
  */
-void lv_obj_scroll_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en);
+void lv_obj_scroll_to(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en);
 
 /**
  * Scroll the a given x coordinate to the left side of obj.
  * @param obj pointer to an object which should be scrolled
  * @param x the x coordinate to scroll to
  */
-void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en);
+void lv_obj_scroll_to_x(struct _lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en);
 
 /**
  * Scroll the a given y coordinate to the top side of obj.
  * @param obj pointer to an object which should be scrolled
  * @param y the y coordinate to scroll to
  */
-void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en);
+void lv_obj_scroll_to_y(struct _lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en);
 
 
 /**
@@ -111,7 +110,7 @@ void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en);
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_top(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_scroll_top(const struct _lv_obj_t * obj);
 
 /**
  * Return the height of the area below the parent.
@@ -120,7 +119,7 @@ lv_coord_t lv_obj_get_scroll_top(const lv_obj_t * obj);
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_bottom(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_scroll_bottom(const struct _lv_obj_t * obj);
 
 
 /**
@@ -130,7 +129,7 @@ lv_coord_t lv_obj_get_scroll_bottom(const lv_obj_t * obj);
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_left(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_scroll_left(const struct _lv_obj_t * obj);
 
 /**
  * Return the width of the area below the object.
@@ -139,7 +138,7 @@ lv_coord_t lv_obj_get_scroll_left(const lv_obj_t * obj);
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_right(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_scroll_right(const struct _lv_obj_t * obj);
 
 
 /**********************

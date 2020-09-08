@@ -18,6 +18,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_obj"
 
 /**********************
  *      TYPEDEFS
@@ -53,10 +54,12 @@ static void trans_anim_start_cb(lv_anim_t * a);
 static void trans_anim_ready_cb(lv_anim_t * a);
 #endif
 
+#if LV_STYLE_CACHE_LEVEL >= 1
 static bool style_prop_is_cacheable(lv_style_property_t prop);
 static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop);
 static void update_style_cache_children(lv_obj_t * obj);
 static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
+#endif
 static void fade_anim_cb(lv_obj_t * obj, lv_anim_value_t v);
 static void fade_in_anim_ready(lv_anim_t * a);
 
@@ -251,6 +254,7 @@ lv_style_list_t * _lv_obj_get_style_list(const lv_obj_t * obj, uint8_t part)
  */
 void _lv_obj_disable_style_caching(lv_obj_t * obj, bool dis)
 {
+#if LV_STYLE_CACHE_LEVEL >= 1
     uint8_t part;
     for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
         lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
@@ -262,6 +266,10 @@ void _lv_obj_disable_style_caching(lv_obj_t * obj, bool dis)
         if(list == NULL) break;
         list->ignore_cache = dis;
     }
+#else
+    LV_UNUSED(obj);
+    LV_UNUSED(dis);
+#endif
 }
 
 
@@ -291,14 +299,12 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
     const lv_obj_t * parent = obj;
     while(parent) {
         lv_style_list_t * list = _lv_obj_get_style_list(parent, part);
+#if LV_STYLE_CACHE_LEVEL >= 1
         if(!list->ignore_cache && list->style_cnt > 0) {
             if(!list->valid_cache) update_style_cache((lv_obj_t *)parent, part, prop  & (~LV_STYLE_STATE_MASK));
 
             bool def = false;
             switch(prop  & (~LV_STYLE_STATE_MASK)) {
-                case LV_STYLE_BG_GRAD_DIR:
-                    if(list->bg_grad_dir_none) def = true;
-                    break;
                 case LV_STYLE_CLIP_CORNER:
                     if(list->clip_corner_off) def = true;
                     break;
@@ -331,8 +337,16 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
                     if(list->shadow_width_zero) def = true;
                     break;
                 case LV_STYLE_PAD_TOP:
+                    if(list->pad_all_zero) def = true;
+                    else if(list->pad_top) return list->pad_top;
+                    break;
                 case LV_STYLE_PAD_BOTTOM:
+                    if(list->pad_all_zero) def = true;
+                    break;
                 case LV_STYLE_PAD_LEFT:
+                    if(list->pad_all_zero) def = true;
+                    else if(list->pad_left) return list->pad_left;
+                    break;
                 case LV_STYLE_PAD_RIGHT:
                     if(list->pad_all_zero) def = true;
                     break;
@@ -359,6 +373,7 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
                 break;
             }
         }
+#endif
 
         lv_state_t state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
@@ -480,7 +495,7 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
     const lv_obj_t * parent = obj;
     while(parent) {
         lv_style_list_t * list = _lv_obj_get_style_list(parent, part);
-
+#if LV_STYLE_CACHE_LEVEL >= 1
         if(!list->ignore_cache && list->style_cnt > 0) {
             if(!list->valid_cache) update_style_cache((lv_obj_t *)parent, part, prop  & (~LV_STYLE_STATE_MASK));
             bool def = false;
@@ -501,7 +516,7 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
                 break;
             }
         }
-
+#endif
 
         lv_state_t state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
@@ -559,7 +574,7 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
     const lv_obj_t * parent = obj;
     while(parent) {
         lv_style_list_t * list = _lv_obj_get_style_list(parent, part);
-
+#if LV_STYLE_CACHE_LEVEL >= 1
         if(!list->ignore_cache && list->style_cnt > 0) {
             if(!list->valid_cache) update_style_cache((lv_obj_t *)parent, part, prop  & (~LV_STYLE_STATE_MASK));
             bool def = false;
@@ -579,7 +594,7 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
                 break;
             }
         }
-
+#endif
         lv_state_t state = lv_obj_get_state(parent, part);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
@@ -748,8 +763,9 @@ void _lv_obj_reset_style_list_no_refr(lv_obj_t * obj, uint8_t part)
 void _lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
+#if LV_STYLE_CACHE_LEVEL >= 1
     invalidate_style_cache(obj, part, prop);
+#endif
 
     /*If a real style refresh is required*/
     bool real_refr = false;
@@ -1145,12 +1161,12 @@ static void trans_anim_ready_cb(lv_anim_t * a)
 
 #endif
 
+#if LV_STYLE_CACHE_LEVEL >= 1
+
 static bool style_prop_is_cacheable(lv_style_property_t prop)
 {
-
     switch(prop) {
         case LV_STYLE_PROP_ALL:
-        case LV_STYLE_BG_GRAD_DIR:
         case LV_STYLE_CLIP_CORNER:
         case LV_STYLE_TEXT_LETTER_SPACE:
         case LV_STYLE_TEXT_LINE_SPACE:
@@ -1228,7 +1244,6 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
     list->bg_opa_transp    = bg_opa == LV_OPA_TRANSP ? 1 : 0;
     list->bg_opa_cover     = bg_opa == LV_OPA_COVER ? 1 : 0;
 
-    list->bg_grad_dir_none  = lv_obj_get_style_bg_grad_dir(obj, part) == LV_GRAD_DIR_NONE ? 1 : 0;
     list->border_width_zero = lv_obj_get_style_border_width(obj, part) == 0 ? 1 : 0;
     list->border_side_full = lv_obj_get_style_border_side(obj, part) == LV_BORDER_SIDE_FULL ? 1 : 0;
     list->border_post_off = lv_obj_get_style_border_post(obj, part) == 0 ? 1 : 0;
@@ -1250,8 +1265,16 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
     }
 
     list->pad_all_zero  = 1;
-    if(lv_obj_get_style_pad_top(obj, part) != 0 ||
-       lv_obj_get_style_pad_bottom(obj, part) != 0 ||
+    lv_style_int_t pad_top = lv_obj_get_style_pad_top(obj, part);
+    lv_style_int_t pad_left = lv_obj_get_style_pad_left(obj, part);
+#if LV_STYLE_CACHE_LEVEL >= 2
+    list->pad_top = 0;
+    list->pad_left = 0;
+    if(pad_top > 0 && pad_top <= _LV_STLYE_CAHCE_INT_MAX) list->pad_top = pad_top;
+    if(pad_left > 0 && pad_left <= _LV_STLYE_CAHCE_INT_MAX) list->pad_left = pad_left;
+#endif
+    if(pad_top != 0 ||
+       pad_left != 0 ||
        lv_obj_get_style_pad_left(obj, part) != 0 ||
        lv_obj_get_style_pad_right(obj, part) != 0) {
         list->pad_all_zero  = 0;
@@ -1354,6 +1377,8 @@ static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_proper
         child = lv_obj_get_child(obj, child);
     }
 }
+#endif /*LV_STYLE_CACHE_LEVEL >= 1*/
+
 
 static void fade_anim_cb(lv_obj_t * obj, lv_anim_value_t v)
 {

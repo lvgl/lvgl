@@ -12,6 +12,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_obj"
 #define SCROLL_ANIM_TIME_MIN 100    /*ms*/
 #define SCROLL_ANIM_TIME_MAX 300    /*ms*/
 

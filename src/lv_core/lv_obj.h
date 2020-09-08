@@ -57,7 +57,6 @@ extern "C" {
 
 struct _lv_obj_t;
 
-
 /** Design modes */
 enum {
     LV_DESIGN_DRAW_MAIN, /**< Draw the main portion of the object */
@@ -196,12 +195,15 @@ enum {
     LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 7),
     LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 8),
     LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 9),
+    LV_OBJ_FLAG_ADV_HITTEST     = (1 << 10),
 };
 typedef uint16_t lv_obj_flag_t;
 
 
 #include "lv_obj_pos.h"
 #include "lv_obj_scroll.h"
+#include "lv_obj_style.h"
+#include "lv_obj_draw.h"
 
 
 typedef struct _lv_obj_t {
@@ -219,8 +221,7 @@ typedef struct _lv_obj_t {
     lv_style_list_t  style_list;
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
-    uint8_t ext_click_pad_hor; /**< Extra click padding in horizontal direction */
-    uint8_t ext_click_pad_ver; /**< Extra click padding in vertical direction */
+    uint8_t ext_click_pad; /**< Extra click padding in all direction */
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
     lv_area_t ext_click_pad;   /**< Extra click padding area. */
 #endif
@@ -228,13 +229,12 @@ typedef struct _lv_obj_t {
     lv_coord_t ext_draw_pad; /**< EXTend the size in every direction for drawing. */
 
     /*Attributes and states*/
-    lv_obj_flag_t flags     : 9;
+    lv_obj_flag_t flags;
     lv_scroll_mode_t scroll_mode :2; /**< How to display scrollbars*/
     lv_scroll_snap_align_t snap_align_x : 2;
     lv_scroll_snap_align_t snap_align_y : 2;
     lv_scroll_dir_t scroll_dir :4;
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
-    uint8_t adv_hittest     : 1; /**< 1: Use advanced hit-testing (slower) */
 
     lv_state_t state;
 
@@ -427,13 +427,6 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
  *----------------*/
 
 /**
- * Set whether advanced hit-testing is enabled on an object
- * @param obj pointer to an object
- * @param en true: advanced hit-testing is enabled
- */
-void lv_obj_set_adv_hittest(lv_obj_t * obj, bool en);
-
-/**
  * Set the base direction of the object
  * @param obj pointer to an object
  * @param dir the new base direction. `LV_BIDI_DIR_LTR/RTL/AUTO/INHERIT`
@@ -441,6 +434,7 @@ void lv_obj_set_adv_hittest(lv_obj_t * obj, bool en);
 void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir);
 
 void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f);
+
 void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f);
 
 /**
@@ -528,7 +522,6 @@ const void * lv_event_get_data(void);
  */
 void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb);
 
-
 /**
  * Send an event to the object
  * @param obj pointer to an object
@@ -555,13 +548,6 @@ void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb);
  * @return pointer to the allocated ext
  */
 void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
-
-/**
- * Send a 'LV_SIGNAL_REFR_EXT_SIZE' signal to the object to refresh the extended draw area.
- * he object needs to be invalidated by `lv_obj_invalidate(obj)` manually after this function.
- * @param obj pointer to an object
- */
-void lv_obj_refresh_ext_draw_pad(lv_obj_t * obj);
 
 /*=======================
  * Getter functions
@@ -627,58 +613,36 @@ uint16_t lv_obj_count_children_recursive(const lv_obj_t * obj);
  *--------------------*/
 
 /**
- * Get the left padding of extended clickable area
+ * Get the extended extended clickable area in a direction
  * @param obj pointer to an object
+ * @param dir in which direction get the extended area (`LV_DIR_LEFT/RIGHT/TOP`)
  * @return the extended left padding
  */
-lv_coord_t lv_obj_get_ext_click_pad_left(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_ext_click_area(const lv_obj_t * obj, lv_dir_t dir);
+
 
 /**
- * Get the right padding of extended clickable area
- * @param obj pointer to an object
- * @return the extended right padding
+ * Check if a given screen-space point is on an object's coordinates.
+ * This method is intended to be used mainly by advanced hit testing algorithms to check
+ * whether the point is even within the object (as an optimization).
+ * @param obj object to check
+ * @param point screen-space point
  */
-lv_coord_t lv_obj_get_ext_click_pad_right(const lv_obj_t * obj);
+bool _lv_obj_is_click_point_on(lv_obj_t * obj, const lv_point_t * point);
 
 /**
- * Get the top padding of extended clickable area
- * @param obj pointer to an object
- * @return the extended top padding
+ * Hit-test an object given a particular point in screen space.
+ * @param obj object to hit-test
+ * @param point screen-space point
+ * @return true if the object is considered under the point
  */
-lv_coord_t lv_obj_get_ext_click_pad_top(const lv_obj_t * obj);
-
-/**
- * Get the bottom padding of extended clickable area
- * @param obj pointer to an object
- * @return the extended bottom padding
- */
-lv_coord_t lv_obj_get_ext_click_pad_bottom(const lv_obj_t * obj);
-
-/**
- * Get the extended size attribute of an object
- * @param obj pointer to an object
- * @return the extended size attribute
- */
-lv_coord_t lv_obj_get_ext_draw_pad(const lv_obj_t * obj);
-
-/*-----------------
- * Appearance get
- *---------------*/
-
+bool lv_obj_hit_test(lv_obj_t * obj, lv_point_t * point);
 
 /*-----------------
  * Attribute get
  *----------------*/
 
-
 bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
-
-/**
- * Get whether advanced hit-testing is enabled on an object
- * @param obj pointer to an object
- * @return true: advanced hit-testing is enabled
- */
-bool lv_obj_get_adv_hittest(const lv_obj_t * obj);
 
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj);
 
@@ -710,22 +674,12 @@ lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj);
  *-----------------*/
 
 /**
- * Check if a given screen-space point is on an object's coordinates.
- *
- * This method is intended to be used mainly by advanced hit testing algorithms to check
- * whether the point is even within the object (as an optimization).
- * @param obj object to check
- * @param point screen-space point
- */
-bool lv_obj_is_point_on_coords(lv_obj_t * obj, const lv_point_t * point);
-
-/**
  * Hit-test an object given a particular point in screen space.
  * @param obj object to hit-test
  * @param point screen-space point
  * @return true if the object is considered under the point
  */
-bool lv_obj_hittest(lv_obj_t * obj, lv_point_t * point);
+bool lv_obj_hit_test(lv_obj_t * obj, lv_point_t * point);
 
 /**
  * Get the ext pointer
@@ -786,7 +740,7 @@ bool lv_obj_is_focused(const lv_obj_t * obj);
  * @param obj the start object
  * @return the object to really focus
  */
-lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj);
+lv_obj_t * _lv_obj_get_focused_obj(const lv_obj_t * obj);
 
 /*-------------------
  * OTHER FUNCTIONS
@@ -798,30 +752,7 @@ lv_obj_t * lv_obj_get_focused_obj(const lv_obj_t * obj);
  * @param name name of the object. E.g. "lv_btn". (Only the pointer is saved)
  * @return LV_RES_OK
  */
-lv_res_t lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name);
-
-/**
- * Initialize a rectangle descriptor from an object's styles
- * @param obj pointer to an object
- * @param type type of style. E.g.  `LV_OBJ_PART_MAIN`, `LV_BTN_SLIDER_KOB`
- * @param draw_dsc the descriptor the initialize
- * @note Only the relevant fields will be set.
- * E.g. if `border width == 0` the other border properties won't be evaluated.
- */
-void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t type, lv_draw_rect_dsc_t * draw_dsc);
-
-void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t type, lv_draw_label_dsc_t * draw_dsc);
-
-void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * draw_dsc);
-
-void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t * draw_dsc);
-
-/**
- * Get the required extra size (around the object's part) to draw shadow, outline, value etc.
- * @param obj pointer to an object
- * @param part part of the object
- */
-lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part);
+lv_res_t _lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name);
 
 
 /**
@@ -830,7 +761,7 @@ lv_coord_t lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part);
  * @param obj_type type of the object. (e.g. "lv_btn")
  * @return true: valid
  */
-bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
+bool _lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
 
 /**
  * Check if any object is still "alive", and part of the hierarchy
@@ -838,11 +769,7 @@ bool lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type);
  * @param obj_type type of the object. (e.g. "lv_btn")
  * @return true: valid
  */
-bool lv_debug_check_obj_valid(const lv_obj_t * obj);
-
-void _lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff);
-
-#include "lv_obj_style.h"
+bool _lv_debug_check_obj_valid(const lv_obj_t * obj);
 
 /**********************
  *      MACROS
@@ -869,8 +796,8 @@ void _lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_di
 
 # ifndef LV_DEBUG_IS_OBJ
 #  define LV_DEBUG_IS_OBJ(obj_p, obj_type) (lv_debug_check_null(obj_p) &&      \
-                                            lv_debug_check_obj_valid(obj_p) && \
-                                            lv_debug_check_obj_type(obj_p, obj_type))
+                                            _lv_debug_check_obj_valid(obj_p) && \
+                                            _lv_debug_check_obj_type(obj_p, obj_type))
 # endif
 
 

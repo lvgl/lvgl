@@ -113,15 +113,15 @@ void lv_grid_set_template(lv_grid_t * grid, const lv_coord_t * col_dsc, const lv
 
 void lv_grid_set_place_content(lv_grid_t * grid, uint8_t col_place, uint8_t row_place);
 
-void grid_calc(struct _lv_obj_t * obj, _lv_grid_calc_t * calc);
+void _lv_grid_calc(struct _lv_obj_t * obj, _lv_grid_calc_t * calc);
 
-void grid_calc_free(_lv_grid_calc_t * calc);
+void _lv_grid_calc_free(_lv_grid_calc_t * calc);
 
 bool _lv_grid_has_fr_col(struct _lv_obj_t * obj);
 
 bool _lv_grid_has_fr_row(struct _lv_obj_t * obj);
 
-void lv_grid_full_refr(lv_obj_t * cont);
+void _lv_grid_full_refresh(lv_obj_t * cont);
 
 void lv_grid_item_refr_pos(lv_obj_t * item);
 

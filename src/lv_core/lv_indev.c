@@ -1053,7 +1053,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     lv_obj_t * found_p = NULL;
 
     /*If the point is on this object check its children too*/
-    if(lv_obj_hittest(obj, point)) {
+    if(lv_obj_hit_test(obj, point)) {
         lv_obj_t * i;
 
         _LV_LL_READ(obj->child_ll, i) {
@@ -1088,7 +1088,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 static void indev_click_focus(lv_indev_proc_t * proc)
 {
     /*Handle click focus*/
-    lv_obj_t * obj_to_focus = lv_obj_get_focused_obj(indev_obj_act);
+    lv_obj_t * obj_to_focus = _lv_obj_get_focused_obj(indev_obj_act);
     if(lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_PRESS_LOCK) == false &&
        proc->types.pointer.last_pressed != obj_to_focus) {
 #if LV_USE_GROUP
