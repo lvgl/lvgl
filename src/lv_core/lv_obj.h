@@ -252,7 +252,7 @@ typedef struct _lv_obj_t {
     lv_obj_user_data_t user_data; /**< Custom user data for object. */
 #endif
 
-    lv_grid_t * grid;
+    const lv_grid_t * grid;
 
 } lv_obj_t;
 

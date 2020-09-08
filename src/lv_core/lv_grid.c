@@ -12,6 +12,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJX_NAME "lv_obj"
 #define CALC_DSC_BUF_SIZE   8
 
 /**********************
@@ -31,6 +32,7 @@ static void calc_explicit_rows(lv_obj_t * cont, _lv_grid_calc_t * calc);
 static void calc_implicit_cols(lv_obj_t * cont, _lv_grid_calc_t * calc);
 static void calc_implicit_rows(lv_obj_t * cont, _lv_grid_calc_t * calc);
 static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc, item_repos_hint_t * hint);
+static void report_grid_change_core(const lv_grid_t * grid, lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -47,6 +49,50 @@ static bool row_dsc_buf_used;
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+/**
+ * Set a grid for an object
+ * @param obj pointer to an object
+ * @param grid the grid to set
+ */
+void lv_obj_set_grid(lv_obj_t * obj, const lv_grid_t * grid)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    obj->grid = grid;
+    _lv_grid_full_refresh(obj);
+}
+
+/**
+ * Get the grid of an object
+ * @param obj pointer to an object
+ * @return the grid, NULL if no grid
+ */
+const lv_grid_t * lv_obj_get_grid(lv_obj_t * obj, const lv_grid_t * grid)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    return obj->grid;
+}
+
+
+/**
+ * Notify all object if a style is modified
+ * @param grid pointer to a grid. Only the objects with this grid will be notified
+ *               (NULL to notify all objects with any grid)
+ */
+void lv_obj_report_grid_change(const lv_grid_t * grid)
+{
+    lv_disp_t * d = lv_disp_get_next(NULL);
+
+    while(d) {
+        lv_obj_t * i;
+        _LV_LL_READ(d->scr_ll, i) {
+            report_grid_change_core(grid, i);
+        }
+        d = lv_disp_get_next(d);
+    }
+}
 
 /**
  * Calculate the grid cells coordinates
@@ -534,4 +580,22 @@ static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc,
     }
 
     if(moved) _lv_obj_move_to(item, x, y, false);
+}
+
+
+/**
+ * Refresh the grid of all children of an object. (Called recursively)
+ * @param grid refresh objects only with this grid.
+ * @param obj pointer to an object
+ */
+static void report_grid_change_core(const lv_grid_t * grid, lv_obj_t * obj)
+{
+    if(obj->grid == grid || (obj->grid && grid == NULL)) _lv_grid_full_refresh(obj);
+
+    lv_obj_t * child = lv_obj_get_child(obj, NULL);
+    while(child) {
+        report_grid_change_core(grid, child);
+        child = lv_obj_get_child(obj, child);
+    }
+
 }

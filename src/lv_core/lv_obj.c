@@ -1852,9 +1852,11 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         if(_lv_obj_is_grid_item(obj)) _lv_grid_full_refresh(obj);
 
+        if(obj->grid) _lv_grid_full_refresh(obj);
+
         lv_obj_t * child = lv_obj_get_child(obj, NULL);
         while(child) {
-            if(_GRID_IS_CELL(child->x_set) && _GRID_IS_CELL(child->y_set)) {
+            if(!_GRID_IS_CELL(child->x_set) || !_GRID_IS_CELL(child->y_set)) {
                 lv_obj_set_pos(child, child->x_set, child->y_set);
             }
             child = lv_obj_get_child(obj, child);
