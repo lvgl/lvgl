@@ -62,16 +62,14 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     }
 
     /*If not grid item but has grid position set the position to 0*/
-//    if(!gi) {
-//        if(_GRID_IS_CELL(x)) {
-//            obj->x_set = 0;
-//            x = 0;
-//        }
-//        if(_GRID_IS_CELL(y)) {
-//            obj->y_set = 0;
-//            y = 0;
-//        }
-//    }
+    if(!gi) {
+        if(_GRID_IS_CELL(x)) {
+            x = 0;
+        }
+        if(_GRID_IS_CELL(y)) {
+            y = 0;
+        }
+    }
 
     /*If the object is on a grid item let the grid to position it. */
     if(gi) {

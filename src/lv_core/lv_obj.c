@@ -727,7 +727,6 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
     obj->flags &= (~f);
 }
 
-
 /**
  * Set the state (fully overwrite) of an object.
  * If specified in the styles a transition animation will be started
