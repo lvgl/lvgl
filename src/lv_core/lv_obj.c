@@ -1731,25 +1731,6 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
             cmp_res = STYLE_COMPARE_VISUAL_DIFF;
         }
     }
-    for(part = _LV_OBJ_PART_REAL_FIRST; part < 0xFF; part++) {
-        lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
-        if(style_list == NULL) break;   /*No more style lists*/
-        obj->state = prev_state;
-        style_snapshot_t shot_pre;
-        style_snapshot(obj, part, &shot_pre);
-        obj->state = new_state;
-        style_snapshot_t shot_post;
-        style_snapshot(obj, part, &shot_post);
-
-        style_snapshot_res_t r = style_snapshot_compare(&shot_pre, &shot_post);
-        if(r == STYLE_COMPARE_DIFF) {
-            cmp_res = STYLE_COMPARE_DIFF;
-            break;
-        }
-        if(r == STYLE_COMPARE_VISUAL_DIFF) {
-            cmp_res = STYLE_COMPARE_VISUAL_DIFF;
-        }
-    }
 
     if(cmp_res == STYLE_COMPARE_SAME) return;
 
