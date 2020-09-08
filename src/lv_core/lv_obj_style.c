@@ -1218,6 +1218,8 @@ static bool style_prop_is_cacheable(lv_style_property_t prop)
  */
 static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
 {
+    printf("update cache\n");
+
     if(style_prop_is_cacheable(prop) == false) return;
 
     lv_style_list_t * list = _lv_obj_get_style_list(obj, part);

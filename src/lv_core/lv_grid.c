@@ -13,7 +13,6 @@
  *      DEFINES
  *********************/
 #define LV_OBJX_NAME "lv_obj"
-#define CALC_DSC_BUF_SIZE   8
 
 /**********************
  *      TYPEDEFS
@@ -37,10 +36,6 @@ static void report_grid_change_core(const lv_grid_t * grid, lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_coord_t col_dsc_calc_buf[CALC_DSC_BUF_SIZE];
-static lv_coord_t row_dsc_calc_buf[CALC_DSC_BUF_SIZE];
-static bool col_dsc_buf_used;
-static bool row_dsc_buf_used;
 
 /**********************
  *      MACROS
@@ -118,6 +113,9 @@ void _lv_grid_calc(struct _lv_obj_t * obj, _lv_grid_calc_t * calc_out)
         calc_explicit_rows(obj, calc_out);
     }
 
+    calc_out->grid_w = calc_out->x[calc_out->col_num - 1] + calc_out->w[calc_out->col_num - 1] - calc_out->x[0];
+    calc_out->grid_h = calc_out->y[calc_out->row_num - 1] + calc_out->h[calc_out->row_num - 1] - calc_out->y[0];
+
 }
 
 /**
@@ -126,8 +124,10 @@ void _lv_grid_calc(struct _lv_obj_t * obj, _lv_grid_calc_t * calc_out)
  */
 void _lv_grid_calc_free(_lv_grid_calc_t * calc)
 {
-    _lv_mem_buf_release(calc->col_dsc);
-    _lv_mem_buf_release(calc->row_dsc);
+    _lv_mem_buf_release(calc->x);
+    _lv_mem_buf_release(calc->y);
+    _lv_mem_buf_release(calc->w);
+    _lv_mem_buf_release(calc->h);
 }
 
 /**
@@ -226,16 +226,12 @@ void lv_grid_item_refr_pos(lv_obj_t * item)
 
 static void calc_explicit_cols(lv_obj_t * cont, _lv_grid_calc_t * calc)
 {
-    lv_grid_t * grid = cont->grid;
+    const lv_grid_t * grid = cont->grid;
     uint32_t i;
 
-    lv_coord_t * cols_w;
-    if(!col_dsc_buf_used && grid->col_dsc_len <= CALC_DSC_BUF_SIZE) {
-        cols_w = col_dsc_calc_buf;
-        col_dsc_buf_used = true;
-    } else {
-        cols_w = _lv_mem_buf_get(sizeof(lv_coord_t) * grid->col_dsc_len);
-    }
+    calc->col_num = grid->col_dsc_len;
+    calc->x = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->col_num);
+    calc->w = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->col_num);
 
     uint32_t col_fr_cnt = 0;
     lv_coord_t grid_w = 0;
@@ -245,7 +241,7 @@ static void calc_explicit_cols(lv_obj_t * cont, _lv_grid_calc_t * calc)
         lv_coord_t x = grid->col_dsc[i];
         if(_GRID_IS_FR(x)) col_fr_cnt += _GRID_GET_FR(x);
         else {
-            cols_w[i] = x;
+            calc->w[i] = x;
             grid_w += x;
         }
     }
@@ -256,38 +252,28 @@ static void calc_explicit_cols(lv_obj_t * cont, _lv_grid_calc_t * calc)
     for(i = 0; i < grid->col_dsc_len; i++) {
         lv_coord_t x = grid->col_dsc[i];
         if(_GRID_IS_FR(x)) {
-            if(auto_w) cols_w[i] = 0;   /*Fr is considered zero if the cont has auto width*/
+            if(auto_w) calc->w[i] = 0;   /*Fr is considered zero if the cont has auto width*/
             else {
                 lv_coord_t f = _GRID_GET_FR(x);
-                cols_w[i] = (free_w * f) / col_fr_cnt;
+                calc->w[i] = (free_w * f) / col_fr_cnt;
             }
         }
     }
 
-    calc->col_dsc_len = grid->col_dsc_len + 1;
-    calc->col_dsc = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->col_dsc_len);
-
-    calc->col_dsc[0] = 0;
-    for(i = 0; i < grid->col_dsc_len; i++) {
-        calc->col_dsc[i + 1] = calc->col_dsc[i] + cols_w[i];
+    calc->x[0] = 0;
+    for(i = 0; i < grid->col_dsc_len - 1; i++) {
+        calc->x[i + 1] = calc->x[i] + calc->w[i];
     }
-
-    if(col_dsc_buf_used) col_dsc_buf_used = false ;
-    else _lv_mem_buf_release(cols_w);
 }
 
 static void calc_explicit_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
 {
-    lv_grid_t * grid = cont->grid;
+    const lv_grid_t * grid = cont->grid;
     uint32_t i;
 
-    lv_coord_t * rows_h;
-    if(!row_dsc_buf_used && grid->row_dsc_len <= CALC_DSC_BUF_SIZE) {
-        rows_h = row_dsc_calc_buf;
-        row_dsc_buf_used = true;
-    } else {
-        rows_h = _lv_mem_buf_get(sizeof(lv_coord_t) * grid->row_dsc_len);
-    }
+    calc->row_num = grid->row_dsc_len;
+    calc->y = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->row_num);
+    calc->h = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->row_num);
 
     uint32_t row_fr_cnt = 0;
     lv_coord_t grid_h = 0;
@@ -299,7 +285,7 @@ static void calc_explicit_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
         lv_coord_t x = grid->row_dsc[i];
         if(_GRID_IS_FR(x)) row_fr_cnt += _GRID_GET_FR(x);
         else {
-            rows_h[i] = x;
+            calc->h[i] = x;
             grid_h += x;
         }
     }
@@ -309,137 +295,100 @@ static void calc_explicit_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
     for(i = 0; i < grid->row_dsc_len; i++) {
         lv_coord_t x = grid->row_dsc[i];
         if(_GRID_IS_FR(x)) {
-            if(auto_h) rows_h[i] = 0;   /*Fr is considered zero if the obj has auto height*/
+            if(auto_h) calc->h[i] = 0;   /*Fr is considered zero if the obj has auto height*/
             else {
                 lv_coord_t f = _GRID_GET_FR(x);
-                rows_h[i] = (free_h * f) / row_fr_cnt;
+                calc->h[i] = (free_h * f) / row_fr_cnt;
             }
         }
     }
 
-    calc->row_dsc_len = grid->row_dsc_len + 1;
-    calc->row_dsc = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->row_dsc_len);
+    calc->y[0] = 0;
 
-    calc->row_dsc[0] = 0;
-
-
-    for(i = 0; i < grid->row_dsc_len; i++) {
-        calc->row_dsc[i + 1] = calc->row_dsc[i] + rows_h[i];
+    for(i = 0; i < calc->row_num - 1; i++) {
+        calc->y[i + 1] = calc->y[i] + calc->h[i];
     }
-
-    if(row_dsc_buf_used) row_dsc_buf_used = false;
-    else _lv_mem_buf_release(rows_h);
 }
 
 
 static void calc_implicit_cols(lv_obj_t * cont, _lv_grid_calc_t * calc)
 {
-    lv_grid_t * grid = cont->grid;
+    const lv_grid_t * grid = cont->grid;
 
     uint32_t child_cnt = lv_obj_count_children(cont);
 
-    uint32_t col_cnt = ((child_cnt + grid->row_dsc_len - 1) / grid->row_dsc_len) + 1; /*+ grid->row_dsc_len - 1 to round up*/
-    /* If `col_dsc_buf_used`, nested a call of this func. will release `col_dsc_buf_used` because it think it taken it.
-     * So mark that if the buffer was taken in this call*/
-    bool col_dsc_buf_mine = false;
-    /*At worst case all children is gird item prepare place for all of them*/
-    lv_coord_t * cols_w;
-    if(!col_dsc_buf_used && col_cnt <= CALC_DSC_BUF_SIZE) {
-        cols_w = col_dsc_calc_buf;
-        col_dsc_buf_used = true;
-        col_dsc_buf_mine = true;
-    } else {
-        cols_w = _lv_mem_buf_get(sizeof(lv_coord_t) * col_cnt);
-    }
+    calc->col_num = ((child_cnt + grid->row_dsc_len - 1) / grid->row_dsc_len) + 1; /*+ grid->row_dsc_len - 1 to round up*/
+    calc->w  = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->col_num);
+    calc->x = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->col_num);
 
     uint32_t i;
 
     lv_obj_t * child = lv_obj_get_child_back(cont, NULL);
     uint32_t row_i = 0;
     uint32_t col_i = 0;
-    cols_w[0] = 0;
+    calc->w[0] = 0;
     while(child) {
         if(_GRID_IS_CELL(child->x_set) && _GRID_IS_CELL(child->y_set)) {
             lv_coord_t w;
             if(_GRID_GET_CELL_FLAG(child->x_set) == LV_GRID_STRETCH) _lv_obj_calc_auto_size(child,  &w, NULL);
             else w = lv_obj_get_width(child);
-            cols_w[col_i] = LV_MATH_MAX(cols_w[col_i], w);
+            calc->w[col_i] = LV_MATH_MAX(calc->w[col_i], w);
             row_i++;
             if(row_i == grid->row_dsc_len) {
                 row_i = 0;
                 col_i++;
-                cols_w[col_i] = 0;
+                calc->w[col_i] = 0;
             }
         }
         child = lv_obj_get_child_back(cont, child);
     }
 
 
-    calc->col_dsc_len = col_cnt + 1;
-    calc->col_dsc = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->col_dsc_len);
+    calc->x[0] = 0;
 
-    calc->col_dsc[0] = 0;
-
-    for(i = 0; i < col_cnt; i++) {
-        calc->col_dsc[i + 1] = calc->col_dsc[i] + cols_w[i];
+    for(i = 0; i < calc->col_num - 1; i++) {
+        calc->x[i + 1] = calc->x[i] + calc->w[i];
     }
-
-    if(col_dsc_buf_used && col_dsc_buf_mine) col_dsc_buf_used = false;
-    else _lv_mem_buf_release(cols_w);
 }
 
 
 static void calc_implicit_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
 {
 
-    lv_grid_t * grid = cont->grid;
+    const lv_grid_t * grid = cont->grid;
     uint32_t child_cnt = lv_obj_count_children(cont);
-    uint32_t row_cnt = ((child_cnt + grid->col_dsc_len - 1) / grid->col_dsc_len) + 1; /*+ grid->col_dsc_len - 1 to round up*/
-    bool row_dsc_buf_mine = false;
-    /*At worst case all children is gird item prepare place for all of them*/
-    lv_coord_t * rows_h;
-    if(!row_dsc_buf_used && row_cnt <= CALC_DSC_BUF_SIZE) {
-        rows_h = row_dsc_calc_buf;
-        row_dsc_buf_used = true;
-        row_dsc_buf_mine = true;
-    } else {
-        rows_h = _lv_mem_buf_get(sizeof(lv_coord_t) * row_cnt);
-    }
+    calc->row_num  = ((child_cnt + grid->col_dsc_len - 1) / grid->col_dsc_len) + 1; /*+ grid->col_dsc_len - 1 to round up*/
+    calc->h = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->row_num);
+    calc->y = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->row_num);
 
     uint32_t i;
 
     lv_obj_t * child = lv_obj_get_child_back(cont, NULL);
     uint32_t col_i = 0;
     uint32_t row_i = 0;
-    rows_h[0] = 0;
+    calc->h[0] = 0;
     while(child) {
         if(_GRID_IS_CELL(child->x_set) && _GRID_IS_CELL(child->y_set)) {
             lv_coord_t h;
             if(_GRID_GET_CELL_FLAG(child->y_set) == LV_GRID_STRETCH) _lv_obj_calc_auto_size(child,  NULL, &h);
             else h = lv_obj_get_height(child);
-            rows_h[row_i] = LV_MATH_MAX(rows_h[row_i], h);
+            calc->h[row_i] = LV_MATH_MAX(calc->h[row_i], h);
             col_i++;
             if(col_i == grid->col_dsc_len) {
                 col_i = 0;
                 row_i++;
-                rows_h[row_i] = 0;
+                calc->h[row_i] = 0;
             }
         }
         child = lv_obj_get_child_back(cont, child);
     }
 
 
-    calc->row_dsc_len = row_cnt + 1;
-    calc->row_dsc = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->row_dsc_len);
+    calc->y[0] = 0;
 
-    calc->row_dsc[0] = 0;
-
-    for(i = 0; i < row_cnt; i++) {
-        calc->row_dsc[i + 1] = calc->row_dsc[i] + rows_h[i];
+    for(i = 0; i < calc->row_num; i++) {
+        calc->y[i + 1] = calc->y[i] + calc->h[i];
     }
-
-    if(row_dsc_buf_used && row_dsc_buf_mine) row_dsc_buf_used = false;
-    else _lv_mem_buf_release(rows_h);
 }
 
 
@@ -509,8 +458,13 @@ static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc,
         }
     }
 
-    lv_coord_t col_w = calc->col_dsc[col_pos + col_span] - calc->col_dsc[col_pos];
-    lv_coord_t row_h = calc->row_dsc[row_pos + row_span] - calc->row_dsc[row_pos];
+    lv_coord_t col_x1 = calc->x[col_pos];
+    lv_coord_t col_x2 = calc->x[col_pos + col_span - 1] + calc->w[col_pos + col_span - 1];
+    lv_coord_t col_w = col_x2 - col_x1;
+
+    lv_coord_t row_y1 = calc->y[row_pos];
+    lv_coord_t row_y2 = calc->y[row_pos + row_span - 1] + calc->h[col_pos + col_span - 1];
+    lv_coord_t row_h = row_y2 - row_y1;
 
     uint8_t x_flag = _GRID_GET_CELL_FLAG(item->x_set);
     uint8_t y_flag = _GRID_GET_CELL_FLAG(item->y_set);
@@ -522,35 +476,35 @@ static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc,
 
     switch(x_flag) {
         case LV_GRID_START:
-            x = calc->col_dsc[col_pos];
+            x = calc->x[col_pos];
             break;
         case LV_GRID_STRETCH:
-            x = calc->col_dsc[col_pos];
+            x = calc->x[col_pos];
             w = col_w;
             item->w_set = LV_SIZE_STRETCH;
             break;
         case LV_GRID_CENTER:
-            x = calc->col_dsc[col_pos] + (col_w - w) / 2;
+            x = calc->x[col_pos] + (col_w - w) / 2;
             break;
         case LV_GRID_END:
-            x = calc->col_dsc[col_pos + 1] - lv_obj_get_width(item);
+            x = calc->x[col_pos + 1] - lv_obj_get_width(item);
             break;
     }
 
     switch(y_flag) {
         case LV_GRID_START:
-            y = calc->row_dsc[row_pos];
+            y = calc->y[row_pos];
             break;
         case LV_GRID_STRETCH:
-            y = calc->row_dsc[row_pos];
+            y = calc->y[row_pos];
             item->h_set = LV_SIZE_STRETCH;
             h = row_h;
             break;
         case LV_GRID_CENTER:
-            y = calc->row_dsc[row_pos] + (row_h - h) / 2;
+            y = calc->y[row_pos] + (row_h - h) / 2;
             break;
         case LV_GRID_END:
-            y = calc->row_dsc[row_pos + 1] - lv_obj_get_height(item);
+            y = calc->y[row_pos + 1] - lv_obj_get_height(item);
             break;
     }
 

@@ -462,8 +462,8 @@ void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_o
     if(obj->grid) {
         _lv_grid_calc_t calc;
         _lv_grid_calc(obj, &calc);
-        grid_w = calc.col_dsc[calc.col_dsc_len - 1] + lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN) +  + lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
-        grid_h = calc.row_dsc[calc.row_dsc_len - 1] + lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN) + lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);;
+        grid_w = calc.grid_w + lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN) + lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
+        grid_h = calc.grid_h + lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN) +  lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
         _lv_grid_calc_free(&calc);
     }
 

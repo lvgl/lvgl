@@ -97,10 +97,14 @@ typedef struct {
 }lv_grid_t;
 
 typedef struct {
-    lv_coord_t * col_dsc;
-    lv_coord_t * row_dsc;
-    uint32_t col_dsc_len;
-    uint32_t row_dsc_len;
+    lv_coord_t * x;
+    lv_coord_t * y;
+    lv_coord_t * w;
+    lv_coord_t * h;
+    uint32_t col_num;
+    uint32_t row_num;
+    lv_coord_t grid_w;
+    lv_coord_t grid_h;
 }_lv_grid_calc_t;
 
 /**********************

@@ -1854,6 +1854,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
         if(obj->grid) _lv_grid_full_refresh(obj);
 
+        /*Reposition non grid objects on by one*/
         lv_obj_t * child = lv_obj_get_child(obj, NULL);
         while(child) {
             if(!_GRID_IS_CELL(child->x_set) || !_GRID_IS_CELL(child->y_set)) {
@@ -1861,7 +1862,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             }
             child = lv_obj_get_child(obj, child);
         }
-
 
         if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
