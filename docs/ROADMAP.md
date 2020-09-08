@@ -4,6 +4,9 @@ This is a summary for thenew fatures of the major releases and a collection of i
 
 This list indicates only the current intention and can be changed.
 
+## v8.1
+- Add radio button widget
+
 ## v8
 Planned to September/October 2020
 - New scrolling:
