@@ -284,7 +284,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     /*Set attributes*/
     new_obj->scroll_mode  = LV_SCROLL_MODE_AUTO;
     new_obj->scroll_dir  = LV_DIR_ALL;
-    new_obj->flags = LV_OBJ_FLAG_CLICKABLE;
+    new_obj->flags = LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SNAPABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE;
     if(parent) new_obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
     new_obj->state = LV_STATE_DEFAULT;
     new_obj->scroll.x = 0;

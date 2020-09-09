@@ -19,8 +19,8 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_GRID_CENTER              0
-#define LV_GRID_START               1
+#define LV_GRID_START               0
+#define LV_GRID_CENTER              1
 #define LV_GRID_END                 2
 #define LV_GRID_STRETCH             3
 #define LV_GRID_SPACE_EVENLY        4
@@ -93,7 +93,8 @@ typedef struct {
     lv_coord_t col_gap;
     lv_coord_t row_gap;
     lv_grid_flow_t flow;
-    uint8_t place_content;
+    uint8_t col_place;
+    uint8_t row_place;
 }lv_grid_t;
 
 typedef struct {

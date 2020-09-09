@@ -187,15 +187,17 @@ typedef uint8_t lv_dir_t;
 enum {
     LV_OBJ_FLAG_HIDDEN          = (1 << 0),
     LV_OBJ_FLAG_CLICKABLE       = (1 << 1),
-    LV_OBJ_FLAG_SCROLLABLE      = (1 << 2),
-    LV_OBJ_FLAG_SCROLL_ELASTIC  = (1 << 3),
-    LV_OBJ_FLAG_SCROLL_MOMENTUM = (1 << 4),
-    LV_OBJ_FLAG_SCROLL_STOP     = (1 << 5),
-    LV_OBJ_FLAG_PRESS_LOCK      = (1 << 6),
-    LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 7),
-    LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 8),
-    LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 9),
-    LV_OBJ_FLAG_ADV_HITTEST     = (1 << 10),
+    LV_OBJ_FLAG_CLICK_FOCUSABLE       = (1 << 2),
+    LV_OBJ_FLAG_SCROLLABLE      = (1 << 3),
+    LV_OBJ_FLAG_SCROLL_ELASTIC  = (1 << 4),
+    LV_OBJ_FLAG_SCROLL_MOMENTUM = (1 << 5),
+    LV_OBJ_FLAG_SCROLL_STOP     = (1 << 6),
+    LV_OBJ_FLAG_SNAPABLE        = (1 << 7),
+    LV_OBJ_FLAG_PRESS_LOCK      = (1 << 8),
+    LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 9),
+    LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 10),
+    LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 11),
+    LV_OBJ_FLAG_ADV_HITTEST     = (1 << 12),
 };
 typedef uint16_t lv_obj_flag_t;
 

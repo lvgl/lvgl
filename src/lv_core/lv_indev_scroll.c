@@ -356,30 +356,33 @@ static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coo
 
     lv_obj_t * child = lv_obj_get_child_back(obj, NULL);
     while(child) {
-        lv_coord_t x_child = 0;
-        lv_coord_t x_parent = 0;
-        switch(obj->snap_align_x) {
-        case LV_SCROLL_SNAP_ALIGN_START:
-            x_child = child->coords.x1;
-            x_parent = obj->coords.x1;
-            break;
-        case LV_SCROLL_SNAP_ALIGN_END:
-            x_child = child->coords.x2;
-            x_parent = obj->coords.x2;
-            break;
-        case LV_SCROLL_SNAP_ALIGN_CENTER:
-            x_child = child->coords.x1 + lv_area_get_width(&child->coords) / 2;
-            x_parent = obj->coords.x1 + lv_area_get_width(&obj->coords) / 2;
-        }
+        if(lv_obj_has_flag(child, LV_OBJ_FLAG_SNAPABLE)) {
+            lv_coord_t x_child = 0;
+            lv_coord_t x_parent = 0;
+            switch(obj->snap_align_x) {
+            case LV_SCROLL_SNAP_ALIGN_START:
+                x_child = child->coords.x1;
+                x_parent = obj->coords.x1;
+                break;
+            case LV_SCROLL_SNAP_ALIGN_END:
+                x_child = child->coords.x2;
+                x_parent = obj->coords.x2;
+                break;
+            case LV_SCROLL_SNAP_ALIGN_CENTER:
+                x_child = child->coords.x1 + lv_area_get_width(&child->coords) / 2;
+                x_parent = obj->coords.x1 + lv_area_get_width(&obj->coords) / 2;
+            }
 
-        x_child += ofs;
-        if(x_child >= min && x_child <= max) {
-            lv_coord_t x = x_child -  x_parent;
-            if(LV_MATH_ABS(x) < LV_MATH_ABS(dist)) dist = x;
+            x_child += ofs;
+            if(x_child >= min && x_child <= max) {
+                lv_coord_t x = x_child -  x_parent;
+                if(LV_MATH_ABS(x) < LV_MATH_ABS(dist)) dist = x;
+            }
         }
 
         child = lv_obj_get_child_back(obj, child);
     }
+    LV_ASSERT_MEM_INTEGRITY();
 
     return dist == LV_COORD_MAX ? 0: -dist;
 }
@@ -399,35 +402,36 @@ static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coo
 
     lv_coord_t dist = LV_COORD_MAX;
 
-    uint32_t cc = 0;
     lv_obj_t * child = lv_obj_get_child_back(obj, NULL);
     while(child) {
-        cc++;
-        lv_coord_t y_child = 0;
-        lv_coord_t y_parent = 0;
-        switch(obj->snap_align_y) {
-        case LV_SCROLL_SNAP_ALIGN_START:
-            y_child = child->coords.y1;
-            y_parent = obj->coords.y1;
-            break;
-        case LV_SCROLL_SNAP_ALIGN_END:
-            y_child = child->coords.y2;
-            y_parent = obj->coords.y2;
-            break;
-        case LV_SCROLL_SNAP_ALIGN_CENTER:
-            y_child = child->coords.y1 + lv_area_get_height(&child->coords) / 2;
-            y_parent = obj->coords.y1 + lv_area_get_height(&obj->coords) / 2;
-        }
+        if(lv_obj_has_flag(child, LV_OBJ_FLAG_SNAPABLE)) {
+            lv_coord_t y_child = 0;
+            lv_coord_t y_parent = 0;
+            switch(obj->snap_align_y) {
+            case LV_SCROLL_SNAP_ALIGN_START:
+                y_child = child->coords.y1;
+                y_parent = obj->coords.y1;
+                break;
+            case LV_SCROLL_SNAP_ALIGN_END:
+                y_child = child->coords.y2;
+                y_parent = obj->coords.y2;
+                break;
+            case LV_SCROLL_SNAP_ALIGN_CENTER:
+                y_child = child->coords.y1 + lv_area_get_height(&child->coords) / 2;
+                y_parent = obj->coords.y1 + lv_area_get_height(&obj->coords) / 2;
+            }
 
-        y_child += ofs;
-        if(y_child >= min && y_child <= max) {
-            lv_coord_t y = y_child -  y_parent;
-            if(LV_MATH_ABS(y) < LV_MATH_ABS(dist)) dist = y;
+            y_child += ofs;
+            if(y_child >= min && y_child <= max) {
+                lv_coord_t y = y_child -  y_parent;
+                if(LV_MATH_ABS(y) < LV_MATH_ABS(dist)) dist = y;
+            }
         }
 
         child = lv_obj_get_child_back(obj, child);
     }
 
+    LV_ASSERT_MEM_INTEGRITY();
     return dist == LV_COORD_MAX ? 0 : -dist;
 }
 

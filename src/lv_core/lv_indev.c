@@ -1089,7 +1089,7 @@ static void indev_click_focus(lv_indev_proc_t * proc)
 {
     /*Handle click focus*/
     lv_obj_t * obj_to_focus = _lv_obj_get_focused_obj(indev_obj_act);
-    if(lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_PRESS_LOCK) == false &&
+    if(lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_CLICK_FOCUSABLE) &&
        proc->types.pointer.last_pressed != obj_to_focus) {
 #if LV_USE_GROUP
         lv_group_t * g_act = lv_obj_get_group(indev_obj_act);
