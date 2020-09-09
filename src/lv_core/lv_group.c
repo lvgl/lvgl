@@ -328,9 +328,9 @@ void lv_group_set_editing(lv_group_t * group, bool edit)
         focused->signal_cb(focused, LV_SIGNAL_FOCUS, NULL); /*Focus again to properly leave/open edit/navigate mode*/
         lv_res_t res = lv_event_send(*group->obj_focus, LV_EVENT_FOCUSED, NULL);
         if(res != LV_RES_OK) return;
-    }
 
-    lv_obj_invalidate(focused);
+        lv_obj_invalidate(focused);
+    }
 }
 
 /**

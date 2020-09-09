@@ -59,7 +59,6 @@ typedef struct _lv_event_temp_data {
     struct _lv_event_temp_data * prev;
 } lv_event_temp_data_t;
 
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -418,13 +417,9 @@ void lv_obj_clean(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
-    lv_obj_t * child_next;
     while(child) {
-        /* Read the next child before deleting the current
-         * because the next couldn't be read from a deleted (invalid) node*/
-        child_next = lv_obj_get_child(obj, child);
         lv_obj_del(child);
-        child = child_next;
+        child = lv_obj_get_child(obj, NULL);    /*Get the new first child*/
     }
 }
 
@@ -727,6 +722,8 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
     obj->flags &= (~f);
 }
 
+
+
 /**
  * Set the state (fully overwrite) of an object.
  * If specified in the styles a transition animation will be started
@@ -745,10 +742,16 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     _lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
 #else
     lv_state_t prev_state = obj->state;
+
+    _lv_style_state_cmp_t cmp_res = _lv_obj_style_state_compare(obj, prev_state, new_state);
+
     obj->state = new_state;
 
+    /*If there is no difference in styles there is nothing else to do*/
+    if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
+
     uint8_t part;
-    for(part = 0; part < _LV_OBJ_PART_REAL_LAST; part++) {
+    for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
         lv_style_list_t * style_list = _lv_obj_get_style_list(obj, part);
         if(style_list == NULL) break;   /*No more style lists*/
         if(style_list->ignore_trans) continue;
@@ -773,8 +776,12 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
             }
         }
-        _lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
+
+        if(cmp_res == _LV_STYLE_STATE_CMP_DIFF) _lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
     }
+
+    if(cmp_res == _LV_STYLE_STATE_CMP_VISUAL_DIFF) lv_obj_invalidate(obj);
+
 #endif
 
 
@@ -946,6 +953,7 @@ lv_res_t lv_event_send_func(lv_event_cb_t event_xcb, lv_obj_t * obj, lv_event_t 
 
     if(obj) {
         if(lv_obj_has_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE) && obj->parent) {
+
             lv_res_t res = lv_event_send(obj->parent, event, data);
             if(res != LV_RES_OK) {
                 return LV_RES_INV;
@@ -1587,17 +1595,13 @@ static void obj_del_core(lv_obj_t * obj)
 
     /*Recursively delete the children*/
     lv_obj_t * i;
-    lv_obj_t * i_next;
     i = _lv_ll_get_head(&(obj->child_ll));
     while(i != NULL) {
-        /*Get the next object before delete this*/
-        i_next = _lv_ll_get_next(&(obj->child_ll), i);
-
-        /*Call the recursive del to the child too*/
+        /*Call the recursive delete to the child too*/
         obj_del_core(i);
 
-        /*Set i to the next node*/
-        i = i_next;
+        /*Set i to the new head node*/
+        i = _lv_ll_get_head(&(obj->child_ll));
     }
 
     lv_event_mark_deleted(obj);

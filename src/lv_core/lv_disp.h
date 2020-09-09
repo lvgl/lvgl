@@ -134,6 +134,12 @@ uint32_t lv_disp_get_inactive_time(const lv_disp_t * disp);
 void lv_disp_trig_activity(lv_disp_t * disp);
 
 /**
+ * Clean any CPU cache that is related to the display.
+ * @param disp pointer to an display (NULL to use the default display)
+ */
+void lv_disp_clean_dcache(lv_disp_t * disp);
+
+/**
  * Get a pointer to the screen refresher task to
  * modify its parameters with `lv_task_...` functions.
  * @param disp pointer to a display

@@ -585,10 +585,8 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
 
     /* Include the ancient signal function */
     if(sign != LV_SIGNAL_CONTROL) { /*Don't let the page to scroll on keys*/
-#if LV_USE_GROUP
         res = ancestor_signal(roller, sign, param);
         if(res != LV_RES_OK) return res;
-#endif
     }
 
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
@@ -965,6 +963,18 @@ static void refr_width(lv_obj_t * roller)
 
     lv_style_int_t left = lv_obj_get_style_pad_left(roller, LV_ROLLER_PART_BG);
     lv_style_int_t right = lv_obj_get_style_pad_right(roller, LV_ROLLER_PART_BG);
+
+    const lv_font_t * base_font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);
+    const lv_font_t * sel_font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_SELECTED);
+
+    /*The selected text might be larger to get its size*/
+    if(base_font != sel_font) {
+        lv_coord_t letter_sp = lv_obj_get_style_text_letter_space(roller, LV_ROLLER_PART_SELECTED);
+        lv_coord_t line_sp = lv_obj_get_style_text_line_space(roller, LV_ROLLER_PART_SELECTED);
+        lv_point_t p;
+        _lv_txt_get_size(&p, lv_label_get_text(label), sel_font, letter_sp, line_sp, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+        if(label_w < p.x)label_w = p.x;
+    }
 
     lv_obj_set_width(roller, label_w + left + right);
 }

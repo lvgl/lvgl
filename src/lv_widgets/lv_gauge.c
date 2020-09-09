@@ -619,7 +619,6 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
             lv_draw_img_dsc_t img_dsc;
             lv_draw_img_dsc_init(&img_dsc);
             lv_obj_init_draw_img_dsc(gauge, LV_GAUGE_PART_MAIN, &img_dsc);
-            img_dsc.recolor_opa = LV_OPA_COVER;
             img_dsc.pivot.x = ext->needle_img_pivot.x;
             img_dsc.pivot.y = ext->needle_img_pivot.y;
 

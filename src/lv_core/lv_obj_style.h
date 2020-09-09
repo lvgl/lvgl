@@ -26,7 +26,12 @@ extern "C" {
  **********************/
 /* Can't include lv_obj.h because it includes this header file */
 struct _lv_obj_t;
-typedef struct _lv_obj_t lv_obj_t;
+
+typedef enum {
+    _LV_STYLE_STATE_CMP_SAME,           /*The style properties in the 2 states are identical*/
+    _LV_STYLE_STATE_CMP_VISUAL_DIFF,    /*The differences can be shown with a simple redraw*/
+    _LV_STYLE_STATE_CMP_DIFF,           /*There are larger differences, the objects need to ne notfied*/
+} _lv_style_state_cmp_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -292,6 +297,16 @@ void _lv_obj_remove_style_trans(lv_obj_t * obj);
  */
 void _lv_obj_create_style_transition(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state,
                                        lv_state_t new_state, uint32_t time, uint32_t delay, lv_anim_path_t * path);
+
+/**
+ * Compare the style properties of an object in 2 different states
+ * @param obj pointer to an object
+ * @param state1 a state
+ * @param state2 an other state
+ * @return an element of `_lv_style_state_cmp_t`
+ */
+_lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2);
+
 #endif
 
 
