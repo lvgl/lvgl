@@ -94,7 +94,7 @@ fout.write(
 '''
 
 /*If running without lv_conf.h add typdesf with default value*/
-#if !defined(LV_CONF_SKIP) && !defined(CONFIG_LV_CONF_SKIP)
+#if defined(LV_CONF_SKIP) || defined(CONFIG_LV_CONF_SKIP)
 
   /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
   typedef int16_t lv_coord_t;
