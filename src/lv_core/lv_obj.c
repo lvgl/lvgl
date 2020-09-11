@@ -1785,7 +1785,6 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     if(cmp_res == STYLE_COMPARE_VISUAL_DIFF) lv_obj_invalidate(obj);
 #endif
 
-
 }
 
 /**
