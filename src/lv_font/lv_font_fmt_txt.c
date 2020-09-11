@@ -11,9 +11,14 @@
 #include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_types.h"
+#include "../lv_misc/lv_gc.h"
 #include "../lv_misc/lv_log.h"
 #include "../lv_misc/lv_utils.h"
 #include "../lv_misc/lv_mem.h"
+
+#if defined(LV_GC_INCLUDE)
+    #include LV_GC_INCLUDE
+#endif /* LV_ENABLE_GC */
 
 /*********************
  *      DEFINES
@@ -47,7 +52,6 @@ static inline uint8_t rle_next(void);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static uint8_t * decompr_buf;
 static uint32_t rle_rdp;
 static const uint8_t * rle_in;
 static uint8_t rle_bpp;
@@ -109,16 +113,16 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
                 break;
         }
 
-        if(_lv_mem_get_size(decompr_buf) < buf_size) {
-            decompr_buf = lv_mem_realloc(decompr_buf, buf_size);
-            LV_ASSERT_MEM(decompr_buf);
-            if(decompr_buf == NULL) return NULL;
+        if(_lv_mem_get_size(_lv_font_decompr_buf) < buf_size) {
+            _lv_font_decompr_buf = lv_mem_realloc(_lv_font_decompr_buf, buf_size);
+            LV_ASSERT_MEM(_lv_font_decompr_buf);
+            if(_lv_font_decompr_buf == NULL) return NULL;
         }
 
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED ? true : false;
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], decompr_buf, gdsc->box_w, gdsc->box_h, (uint8_t)fdsc->bpp,
+        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], _lv_font_decompr_buf, gdsc->box_w, gdsc->box_h, (uint8_t)fdsc->bpp,
                    prefilter);
-        return decompr_buf;
+        return _lv_font_decompr_buf;
 #else /* !LV_USE_FONT_COMPRESSED */
         return NULL;
 #endif
@@ -184,9 +188,9 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
  */
 void _lv_font_clean_up_fmt_txt(void)
 {
-    if(decompr_buf) {
-        lv_mem_free(decompr_buf);
-        decompr_buf = NULL;
+    if(_lv_font_decompr_buf) {
+        lv_mem_free(_lv_font_decompr_buf);
+        _lv_font_decompr_buf = NULL;
     }
 }
 

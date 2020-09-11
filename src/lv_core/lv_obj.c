@@ -3878,8 +3878,21 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             lv_draw_mask_radius_param_t * mp = _lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
 
             lv_coord_t r = lv_obj_get_style_radius(obj, LV_OBJ_PART_MAIN);
+            /* If it has border make the clip area 1 px smaller to avoid color bleeding
+             * The border will cover the minimal issue on the edges*/
+            if(draw_dsc.border_post && draw_dsc.border_opa >= LV_OPA_MIN && draw_dsc.border_width > 0) {
+                lv_area_t cc_area;
+                cc_area.x1 = obj->coords.x1 + 1;
+                cc_area.y1 = obj->coords.y1 + 1;
+                cc_area.x2 = obj->coords.x2 - 1;
+                cc_area.y2 = obj->coords.y2 - 1;
+                lv_draw_mask_radius_init(mp, &cc_area, r, false);
+            }
+            /*If no border use the full size.*/
+            else {
+                lv_draw_mask_radius_init(mp, &obj->coords, r, false);
+            }
 
-            lv_draw_mask_radius_init(mp, &obj->coords, r, false);
             /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
             lv_draw_mask_add(mp, obj + 8);
         }
