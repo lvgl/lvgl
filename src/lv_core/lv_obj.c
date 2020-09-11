@@ -142,9 +142,10 @@ static void obj_del_core(lv_obj_t * obj);
 static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop);
 static void update_style_cache_children(lv_obj_t * obj);
 static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
+#if LV_USE_ANIMATION
 static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot);
 static style_snapshot_res_t style_snapshot_compare(style_snapshot_t * shot1, style_snapshot_t * shot2);
-
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -4753,6 +4754,7 @@ static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_proper
     }
 }
 
+#if LV_USE_ANIMATION
 static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot)
 {
     _lv_obj_disable_style_caching(obj, true);
@@ -4827,6 +4829,5 @@ static style_snapshot_res_t style_snapshot_compare(style_snapshot_t * shot1, sty
 
     /*If not returned earlier its just a visual difference, a simple redraw is enough*/
     return STYLE_COMPARE_VISUAL_DIFF;
-
-
 }
+#endif
