@@ -43,6 +43,8 @@ extern "C" {
     f(void * , _lv_theme_template_styles)                          \
     f(void * , _lv_theme_mono_styles)                              \
     f(void * , _lv_theme_empty_styles)                             \
+    f(uint8_t *, _lv_font_decompr_buf)                             \
+
 
 #define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;
 #define LV_ROOTS LV_ITERATE_ROOTS(LV_DEFINE_ROOT)
