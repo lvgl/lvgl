@@ -124,7 +124,7 @@ lv_obj_t * lv_gauge_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->format_cb   = copy_ext->format_cb;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(gauge, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(gauge, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("gauge created");
@@ -619,7 +619,6 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
             lv_draw_img_dsc_t img_dsc;
             lv_draw_img_dsc_init(&img_dsc);
             lv_obj_init_draw_img_dsc(gauge, LV_GAUGE_PART_MAIN, &img_dsc);
-            img_dsc.recolor_opa = LV_OPA_COVER;
             img_dsc.pivot.x = ext->needle_img_pivot.x;
             img_dsc.pivot.y = ext->needle_img_pivot.y;
 

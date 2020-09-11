@@ -1,9 +1,38 @@
 # Changelog
 
-## v7.4.0 (planned on 01.09.2020)
-*Available in the `dev` branch*
+## v7.5.0 (planned at 15.09.2020)
 
-## v7.3.1 (planned on 18.08.2020)
+### New features
+- Add `clean_dcache_cb` and `lv_disp_clean_dcache` to enable users to use their own cache management function
+- Add `gpu_wait_cb` to wait until the GPU is working. It allows to run CPU a wait only when the rendered data is needed.
+
+### Bugfixes
+- Fix unexpeted DEFOCUS on lv_page when clicking to bg after the scrollable
+- Fix `lv_obj_del` and `lv_obj_clean` if the children list changed during deletion.
+- Adjust button matrix button width to include padding when spanning multiple units.
+
+## v7.4.0 (01.09.2020)
+
+The main new features of v7.4 are run-time font loading, style caching and arc knob with value setting by click.
+
+### New features
+- Add `lv_font_load()` function - Loads a `lv_font_t` object from a binary font file
+- Add `lv_font_free()` function - Frees the memory allocated by the `lv_font_load()` function
+- Add style caching to reduce acces time of properties with default value
+- arc: add set value by click feature
+- arc: add `LV_ARC_PART_KNOB` similarly to slider
+- send gestures even is the the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function. 
+
+### Bugfixes
+- Fix color bleeding on border drawing
+- Fix using 'LV_SCROLLBAR_UNHIDE' after 'LV_SCROLLBAR_ON'
+- Fix croping of last column/row if an image is zoomed
+- Fix zooming and rotateing mosaic images
+- Fix deleting tabview with LEFT/RIGHT tab position
+- Fix btnmatrix to not send event when CLICK_TRIG = true and the cursor slid from a pressed button
+- Fix roller width if selected text is larger than the normal
+
+## v7.3.1 (18.08.2020)
 
 ### Bugfixes
 - Fix drawing value string twice
@@ -11,6 +40,14 @@
 - Add linemeter's mirror feature again
 - Fix text decor (udnerline strikethrough) with older versions of font converter
 - Fix setting local style property multiple times 
+- Add missing background drawing and radius handling to image button
+- Allow adding extra label to list buttons
+- Fix crash if `lv_table_set_col_cnt` is called before `lv_table_set_row_cnt` for the first time
+- Fix overflow in large image transformations
+- Limit extra button click area of button matrix's buttons. With large paddings it was counter intuitive. (Gaps are mapped to button when clicked).
+- Fix `lv_btnmatrix_set_one_check` not forcing exactly one button to be checked
+- Fix color picker invalidation in rectangle mode
+- Init disabled days to gray color in calendar
 
 ## v7.3.0 (04.08.2020)
 
@@ -19,9 +56,8 @@
 - Add `lv_event_send_refresh`, `lv_event_send_refresh_recursive` to easily send `LV_EVENT_REFRESH` to object
 - Add `lv_tabview_set_tab_name()` function - used to change a tab's name
 - Add `LV_THEME_MATERIAL_FLAG_NO_TRANSITION` and `LV_THEME_MATERIAL_FLAG_NO_FOCUS` flags
-- Reduce code size by adding: `LV_USE_FONT_COMPRESSED`, `LV_FONT_USE_SUBPX`, `LV_USE_OUTLINE`, `LV_USE_PATTERN`, `LV_USE_VALUE_STR`  and applying some optimization
+- Reduce code size by adding: `LV_USE_FONT_COMPRESSED` and `LV_FONT_USE_SUBPX` and applying some optimization
 - Add `LV_MEMCPY_MEMSET_STD` to use standard `memcpy` and `memset`
-
 
 ### Bugfixes
 - Do not print warning for missing glyph if its height OR width is zero.

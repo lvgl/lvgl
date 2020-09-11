@@ -76,6 +76,7 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->line_cnt    = 18;
     ext->scale_angle = 240;
     ext->angle_ofs = 0;
+    ext->mirrored = 0;
 
     /*The signal and design functions are not copied so set them here*/
     lv_obj_set_signal_cb(linemeter, lv_linemeter_signal);
@@ -96,7 +97,7 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->cur_value             = copy_ext->cur_value;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(linemeter, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(linemeter, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("line meter created");
@@ -393,8 +394,8 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
     lv_coord_t y_ofs  = lmeter->coords.y1 + r_out + top;
     int16_t angle_ofs = ext->angle_ofs + 90 + (360 - ext->scale_angle) / 2;
     int16_t level = ext->mirrored ?
-            (int32_t)((int32_t)(ext->max_value - ext->cur_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value) :
-            (int32_t)((int32_t)(ext->cur_value - ext->min_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value);
+                    (int32_t)((int32_t)(ext->max_value - ext->cur_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value) :
+                    (int32_t)((int32_t)(ext->cur_value - ext->min_value) * (ext->line_cnt - 1)) / (ext->max_value - ext->min_value);
     uint8_t i;
 
     lv_color_t main_color = lv_obj_get_style_line_color(lmeter, part);
@@ -523,7 +524,8 @@ void lv_linemeter_draw_scale(lv_obj_t * lmeter, const lv_area_t * clip_area, uin
         if((!ext->mirrored && i >= level) || (ext->mirrored && i <= level)) {
             line_dsc.color = end_color;
             line_dsc.width = end_line_width;
-        } else {
+        }
+        else {
             line_dsc.color = lv_color_mix(grad_color, main_color, (255 * i) / ext->line_cnt);
         }
 

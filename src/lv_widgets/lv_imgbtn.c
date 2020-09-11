@@ -100,7 +100,7 @@ lv_obj_t * lv_imgbtn_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
         ext->tiled = copy_ext->tiled;
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(imgbtn, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(imgbtn, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("image button created");
@@ -273,7 +273,38 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        ancestor_design(imgbtn, clip_area, mode);
+        lv_area_t img_coords;
+
+        lv_obj_get_coords(imgbtn, &img_coords);
+
+        lv_draw_rect_dsc_t bg_dsc;
+        lv_draw_rect_dsc_init(&bg_dsc);
+        lv_obj_init_draw_rect_dsc(imgbtn, LV_IMGBTN_PART_MAIN, &bg_dsc);
+
+        /*If the border is drawn later disable loading its properties*/
+        if(lv_obj_get_style_border_post(imgbtn, LV_OBJ_PART_MAIN)) {
+            bg_dsc.border_opa = LV_OPA_TRANSP;
+        }
+
+        lv_area_t bg_coords;
+        lv_area_copy(&bg_coords, &img_coords);
+        bg_coords.x1 -= lv_obj_get_style_pad_left(imgbtn, LV_IMGBTN_PART_MAIN);
+        bg_coords.x2 += lv_obj_get_style_pad_right(imgbtn, LV_IMGBTN_PART_MAIN);
+        bg_coords.y1 -= lv_obj_get_style_pad_top(imgbtn, LV_IMGBTN_PART_MAIN);
+        bg_coords.y2 += lv_obj_get_style_pad_bottom(imgbtn, LV_IMGBTN_PART_MAIN);
+
+        lv_draw_rect(&bg_coords, clip_area, &bg_dsc);
+
+        if(lv_obj_get_style_clip_corner(imgbtn, LV_OBJ_PART_MAIN)) {
+            lv_draw_mask_radius_param_t * mp = _lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
+
+            lv_coord_t r = lv_obj_get_style_radius(imgbtn, LV_OBJ_PART_MAIN);
+
+            lv_draw_mask_radius_init(mp, &bg_coords, r, false);
+            /*Add the mask and use `img+8` as custom id. Don't use `obj` directly because it might be used by the user*/
+            lv_draw_mask_add(mp, imgbtn + 8);
+        }
+
         /*Just draw an image*/
         lv_imgbtn_ext_t * ext    = lv_obj_get_ext_attr(imgbtn);
         lv_btn_state_t state     = lv_imgbtn_get_state(imgbtn);
@@ -374,6 +405,31 @@ static lv_design_res_t lv_imgbtn_design(lv_obj_t * imgbtn, const lv_area_t * cli
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
+        if(lv_obj_get_style_clip_corner(imgbtn, LV_OBJ_PART_MAIN)) {
+            lv_draw_mask_radius_param_t * param = lv_draw_mask_remove_custom(imgbtn + 8);
+            _lv_mem_buf_release(param);
+        }
+
+        lv_draw_rect_dsc_t draw_dsc;
+        lv_draw_rect_dsc_init(&draw_dsc);
+
+        /*If the border is drawn later disable loading other properties*/
+        if(lv_obj_get_style_border_post(imgbtn, LV_OBJ_PART_MAIN)) {
+            draw_dsc.bg_opa = LV_OPA_TRANSP;
+            draw_dsc.pattern_opa = LV_OPA_TRANSP;
+            draw_dsc.shadow_opa = LV_OPA_TRANSP;
+            lv_obj_init_draw_rect_dsc(imgbtn, LV_OBJ_PART_MAIN, &draw_dsc);
+
+
+            lv_area_t bg_coords;
+            lv_area_copy(&bg_coords, &imgbtn->coords);
+            bg_coords.x1 -= lv_obj_get_style_pad_left(imgbtn, LV_IMGBTN_PART_MAIN);
+            bg_coords.x2 += lv_obj_get_style_pad_right(imgbtn, LV_IMGBTN_PART_MAIN);
+            bg_coords.y1 -= lv_obj_get_style_pad_top(imgbtn, LV_IMGBTN_PART_MAIN);
+            bg_coords.y2 += lv_obj_get_style_pad_bottom(imgbtn, LV_IMGBTN_PART_MAIN);
+
+            lv_draw_rect(&bg_coords, clip_area, &draw_dsc);
+        }
     }
 
     return LV_DESIGN_RES_OK;
@@ -399,6 +455,18 @@ static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * par
         /* If the style changed then the button was clicked, released etc. so probably the state was
          * changed as well Set the new image for the new state.*/
         refr_img(imgbtn);
+    }
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+        /*Handle the padding of the background*/
+        lv_style_int_t left = lv_obj_get_style_pad_left(imgbtn, LV_IMGBTN_PART_MAIN);
+        lv_style_int_t right = lv_obj_get_style_pad_right(imgbtn, LV_IMGBTN_PART_MAIN);
+        lv_style_int_t top = lv_obj_get_style_pad_top(imgbtn, LV_IMGBTN_PART_MAIN);
+        lv_style_int_t bottom = lv_obj_get_style_pad_bottom(imgbtn, LV_IMGBTN_PART_MAIN);
+
+        imgbtn->ext_draw_pad = LV_MATH_MAX(imgbtn->ext_draw_pad, left);
+        imgbtn->ext_draw_pad = LV_MATH_MAX(imgbtn->ext_draw_pad, right);
+        imgbtn->ext_draw_pad = LV_MATH_MAX(imgbtn->ext_draw_pad, top);
+        imgbtn->ext_draw_pad = LV_MATH_MAX(imgbtn->ext_draw_pad, bottom);
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/

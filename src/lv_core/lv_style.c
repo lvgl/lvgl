@@ -875,7 +875,8 @@ lv_res_t _lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t pr
 
     int16_t weight = -1;
 
-    lv_color_t value_act = { 0 };
+    lv_color_t value_act;
+    value_act.full = 0;
 
     int16_t ci;
     for(ci = 0; ci < list->style_cnt; ci++) {
@@ -1038,7 +1039,6 @@ bool lv_debug_check_style_list(const lv_style_list_t * list)
 
     return true;
 }
-
 
 /**********************
  *   STATIC FUNCTIONS

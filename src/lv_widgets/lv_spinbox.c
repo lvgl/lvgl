@@ -106,7 +106,7 @@ lv_obj_t * lv_spinbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_spinbox_set_rollover(spinbox, copy_ext->rollover);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(spinbox, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(spinbox, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     lv_spinbox_updatevalue(spinbox);
@@ -390,10 +390,8 @@ static lv_res_t lv_spinbox_signal(lv_obj_t * spinbox, lv_signal_t sign, void * p
 
     /* Include the ancient signal function */
     if(sign != LV_SIGNAL_CONTROL) {
-#if LV_USE_GROUP
         res = ancestor_signal(spinbox, sign, param);
         if(res != LV_RES_OK) return res;
-#endif
     }
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 

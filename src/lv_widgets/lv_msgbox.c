@@ -127,7 +127,7 @@ lv_obj_t * lv_msgbox_create(lv_obj_t * par, const lv_obj_t * copy)
         if(copy_ext->btnm) ext->btnm = lv_btnmatrix_create(mbox, copy_ext->btnm);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(mbox, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(mbox, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("message box created");

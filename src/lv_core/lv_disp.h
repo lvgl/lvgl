@@ -134,6 +134,12 @@ uint32_t lv_disp_get_inactive_time(const lv_disp_t * disp);
 void lv_disp_trig_activity(lv_disp_t * disp);
 
 /**
+ * Clean any CPU cache that is related to the display.
+ * @param disp pointer to an display (NULL to use the default display)
+ */
+void lv_disp_clean_dcache(lv_disp_t * disp);
+
+/**
  * Get a pointer to the screen refresher task to
  * modify its parameters with `lv_task_...` functions.
  * @param disp pointer to a display
@@ -209,7 +215,7 @@ static inline void lv_scr_load(lv_obj_t * scr)
  * 1 dip is 2 px on a 320 DPI screen
  * https://stackoverflow.com/questions/2025282/what-is-the-difference-between-px-dip-dp-and-sp
  */
-#define LV_DPX(n)   LV_MATH_MAX((( lv_disp_get_dpi(NULL) * (n) + 80) / 160), 1) /*+80 for rounding*/
+#define LV_DPX(n)   (n == 0 ? 0 :LV_MATH_MAX((( lv_disp_get_dpi(NULL) * (n) + 80) / 160), 1)) /*+80 for rounding*/
 
 static inline lv_coord_t lv_dpx(lv_coord_t n)
 {

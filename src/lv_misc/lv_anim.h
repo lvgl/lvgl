@@ -82,6 +82,7 @@ typedef struct _lv_anim_t {
     lv_anim_ready_cb_t ready_cb; /**< Call it when the animation is ready*/
     lv_anim_path_t path;         /**< Describe the path (curve) of animations*/
     int32_t start;               /**< Start value*/
+    int32_t current;             /**< Current value */
     int32_t end;                 /**< End value*/
     int32_t time;               /**< Animation time in ms*/
     int32_t act_time;            /**< Current time in animation. Set to negative to make delay.*/
@@ -171,6 +172,7 @@ static inline void lv_anim_set_delay(lv_anim_t * a, uint32_t delay)
 static inline void lv_anim_set_values(lv_anim_t * a, lv_anim_value_t start, lv_anim_value_t end)
 {
     a->start = start;
+    a->current = start;
     a->end   = end;
 }
 
