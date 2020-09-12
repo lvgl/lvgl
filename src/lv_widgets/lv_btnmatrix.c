@@ -178,7 +178,7 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
     }
 
     lv_coord_t btn_h = max_h - ((line_cnt - 1) * inner);
-    btn_h            = btn_h / line_cnt;
+    btn_h            = (btn_h + line_cnt / 2) / line_cnt;
     btn_h--; /*-1 because e.g. height = 100 means 101 pixels (0..100)*/
 
     /* Count the units and the buttons in a line
