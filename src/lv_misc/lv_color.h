@@ -613,6 +613,10 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 #endif
 #endif /* __cplusplus */
 
+#ifndef __LV_COLOR_HAS_MODERN_CPP
+#define __LV_COLOR_HAS_MODERN_CPP 0
+#endif
+
 #if __LV_COLOR_HAS_MODERN_CPP
 /* Fix msvc compiler error C4576 inside C++ code */
 #define _LV_COLOR_MAKE_TYPE_HELPER lv_color_t
