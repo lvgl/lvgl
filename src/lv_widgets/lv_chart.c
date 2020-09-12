@@ -51,6 +51,7 @@ static lv_style_list_t * lv_chart_get_style(lv_obj_t * chart, uint8_t part);
 static void draw_series_bg(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * mask);
 static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area);
 static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area);
+static void draw_cursors(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area);
 static void draw_axes(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * mask);
 static void invalidate_lines(lv_obj_t * chart, uint16_t i);
 static void invalidate_columns(lv_obj_t * chart, uint16_t i);
@@ -98,6 +99,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     _lv_ll_init(&ext->series_ll, sizeof(lv_chart_series_t));
+    _lv_ll_init(&ext->cursors_ll, sizeof(lv_chart_cursor_t));
 
     uint8_t i;
     for(i = 0; i < _LV_CHART_AXIS_LAST; i++) {
@@ -122,6 +124,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
 
     lv_style_list_init(&ext->style_series_bg);
     lv_style_list_init(&ext->style_series);
+    lv_style_list_init(&ext->style_cursors);
 
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(chart);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(chart);
@@ -140,6 +143,7 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_style_list_copy(&ext->style_series, &ext_copy->style_series);
         lv_style_list_copy(&ext->style_series_bg, &ext_copy->style_series_bg);
+        lv_style_list_copy(&ext->style_cursors, &ext_copy->style_cursors);
 
         ext->type       = ext_copy->type;
         ext->hdiv_cnt   = ext_copy->hdiv_cnt;
@@ -202,6 +206,23 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     }
 
     return ser;
+}
+
+lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * chart, lv_color_t color, lv_cursor_direction_t axis)
+{
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+
+    lv_chart_ext_t * ext    = lv_obj_get_ext_attr(chart);
+    lv_chart_cursor_t * cursor = _lv_ll_ins_head(&ext->cursors_ll);
+    LV_ASSERT_MEM(cursor);
+    if(cursor == NULL) return NULL;
+
+    cursor->point.x = 0U;
+    cursor->point.y = LV_CHART_POINT_DEF;
+    cursor->color = color;
+    cursor->axis = axis;
+
+    return cursor;
 }
 
 /**
@@ -629,6 +650,14 @@ void lv_chart_set_series_axis(lv_obj_t * chart, lv_chart_series_t * ser, lv_char
     lv_chart_refresh(chart);
 }
 
+void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t point)
+{
+	LV_ASSERT_NULL(cursor);
+	LV_UNUSED(chart);
+
+	cursor->point = point;
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -702,6 +731,64 @@ lv_chart_axis_t lv_chart_get_series_axis(lv_obj_t * chart, lv_chart_series_t * s
 
     return ser->y_axis;
 }
+
+lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor)
+{
+    LV_ASSERT_NULL(cursor);
+    LV_UNUSED(chart);
+
+    return cursor->point;
+}
+
+uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coord)
+{
+    lv_area_t series_area;
+    get_series_area(chart, &series_area);
+
+    lv_coord_t w = lv_area_get_width(&series_area);
+    coord.x -= lv_obj_get_style_pad_left(chart, LV_CHART_PART_BG);
+
+    uint16_t id = 0;
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+
+    if(coord.x < 0) {
+	    id = 0;
+    } else if(coord.x > w) {
+	    id = ext->point_cnt - 1;
+    } else {
+	    id = coord.x * (ext->point_cnt - 1) / w;
+    }
+
+    return id;
+}
+
+lv_point_t lv_chart_get_coord_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id)
+{
+	LV_ASSERT_NULL(chart);
+	LV_ASSERT_NULL(ser);
+
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+	if(ext == NULL) return;
+	if(id >= ext->point_cnt) return;
+
+	lv_area_t series_area;
+	get_series_area(chart, &series_area);
+
+	lv_coord_t w = lv_area_get_width(&series_area);
+	lv_coord_t h = lv_area_get_height(&series_area);
+
+	lv_point_t point = {0};
+	point.x = (w * id) / (ext->point_cnt - 1);
+
+	int32_t y_tmp = (int32_t)((int32_t)ser->points[id] - ext->ymin[ser->y_axis]) * h;
+	y_tmp = y_tmp / (ext->ymax[ser->y_axis] - ext->ymin[ser->y_axis]);
+	point.y  = h - y_tmp;
+
+	return point;
+
+
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -753,6 +840,7 @@ static lv_design_res_t lv_chart_design(lv_obj_t * chart, const lv_area_t * clip_
         lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
         if(ext->type & LV_CHART_TYPE_LINE) draw_series_line(chart, &series_area, clip_area);
         if(ext->type & LV_CHART_TYPE_COLUMN) draw_series_column(chart, &series_area, clip_area);
+        draw_cursors(chart, &series_area, clip_area);
 
     }
     return LV_DESIGN_RES_OK;
@@ -794,6 +882,7 @@ static lv_res_t lv_chart_signal(lv_obj_t * chart, lv_signal_t sign, void * param
         _lv_ll_clear(&ext->series_ll);
 
         lv_obj_clean_style_list(chart, LV_CHART_PART_SERIES);
+        lv_obj_clean_style_list(chart, LV_CHART_PART_CURSOR);
         lv_obj_clean_style_list(chart, LV_CHART_PART_SERIES_BG);
     }
 
@@ -823,6 +912,9 @@ static lv_style_list_t * lv_chart_get_style(lv_obj_t * chart, uint8_t part)
             break;
         case LV_CHART_PART_SERIES:
             style_dsc_p = &ext->style_series;
+            break;
+        case LV_CHART_PART_CURSOR:
+            style_dsc_p = &ext->style_cursors;
             break;
         default:
             style_dsc_p = NULL;
@@ -1118,6 +1210,76 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
             }
         }
     }
+}
+
+/**
+ * Draw the cursors as lines on a chart
+ * @param obj pointer to chart object
+ */
+static void draw_cursors(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area)
+{
+    lv_area_t series_mask;
+    bool mask_ret = _lv_area_intersect(&series_mask, series_area, clip_area);
+    if(mask_ret == false) return;
+
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    if(_lv_ll_is_empty(&ext->cursors_ll)) return;
+
+    lv_point_t p1;
+    lv_point_t p2;
+    lv_chart_cursor_t * cursor;
+
+    lv_draw_line_dsc_t line_dsc;
+    lv_draw_line_dsc_init(&line_dsc);
+    lv_obj_init_draw_line_dsc(chart, LV_CHART_PART_CURSOR, &line_dsc);
+
+    lv_draw_rect_dsc_t point_dsc;
+    lv_draw_rect_dsc_init(&point_dsc);
+    point_dsc.bg_opa = line_dsc.opa;
+    point_dsc.radius = LV_RADIUS_CIRCLE;
+
+    lv_coord_t point_radius = lv_obj_get_style_size(chart, LV_CHART_PART_CURSOR);
+
+    /*Do not bother with line ending is the point will over it*/
+    if(point_radius > line_dsc.width / 2) line_dsc.raw_end = 1;
+
+    /*Go through all cursor lines*/
+    _LV_LL_READ_BACK(ext->cursors_ll, cursor) {
+	line_dsc.color = cursor->color;
+	point_dsc.bg_color = cursor->color;
+
+	if(cursor->axis | LV_CHART_CURSOR_DIRECTION_HOR) {
+		p1.x = series_area->x1;
+		p1.y = series_area->y1 + cursor->point.y;
+		p2.x = p1.x + cursor->point.x;
+		p2.y = p1.y;
+		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
+	}
+
+	if(cursor->axis | LV_CHART_CURSOR_DIRECTION_VER) {
+
+		p1.x = series_area->x1 + cursor->point.x;
+		p1.y = series_area->y1 + cursor->point.y;
+		p2.x = p1.x;
+		p2.y = series_area->y2;
+		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
+	}
+
+	if(point_radius) {
+		lv_area_t point_area;
+
+		point_area.x1 = series_area->x1 + cursor->point.x - point_radius;
+		point_area.x2 = series_area->x1 + cursor->point.x + point_radius;
+
+		point_area.y1 = series_area->y1 + cursor->point.y - point_radius;
+		point_area.y2 = series_area->y1 + cursor->point.y + point_radius;
+
+		/*Don't limit to `series_mask` to get full circles on the ends*/
+		lv_draw_rect(&point_area, clip_area, &point_dsc);
+	 }
+
+    }
+
 }
 
 /**
