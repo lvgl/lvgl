@@ -218,7 +218,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
 
     if(g->frozen != 0) return;
 
-    if(obj == *g->obj_focus) return;
+    if(g->obj_focus != NULL && obj == *g->obj_focus) return;
 
     /*On defocus edit mode must be leaved*/
     lv_group_set_editing(g, false);
