@@ -598,7 +598,7 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 
 #ifdef __cplusplus
 /**
-* MSVC compiler’s definition of the __cplusplus indicating 199711L regardless to C++ standard version
+* MSVC compiler's definition of the __cplusplus indicating 199711L regardless to C++ standard version
 * see https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-cplusplus
 * so we use _MSC_VER macro unstead of __cplusplus
 */
