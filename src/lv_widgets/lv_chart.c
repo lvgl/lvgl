@@ -656,6 +656,7 @@ void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_
 	LV_UNUSED(chart);
 
 	cursor->point = point;
+	lv_chart_refresh(chart);
 }
 
 /*=====================
