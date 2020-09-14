@@ -1024,7 +1024,7 @@ void lv_obj_align_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_
 
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
-    obj_align_core(obj, base, align, true, false, 0, y_ofs);
+    obj_align_core(obj, base, align, false, true, 0, y_ofs);
 }
 
 /**
@@ -1098,7 +1098,7 @@ void lv_obj_align_mid_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align,
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
 
-    obj_align_mid_core(obj, base, align, true, false, 0, y_ofs);
+    obj_align_mid_core(obj, base, align, false, true, 0, y_ofs);
 }
 
 /**
