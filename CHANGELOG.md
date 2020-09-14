@@ -24,7 +24,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 - Add style caching to reduce acces time of properties with default value
 - arc: add set value by click feature
 - arc: add `LV_ARC_PART_KNOB` similarly to slider
-- send gestures even is the the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function. 
+- send gestures even if the the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function. 
 
 ### Bugfixes
 - Fix color bleeding on border drawing
