@@ -14,6 +14,7 @@
 - Add `decmopr_buf` to GC roots
 - Fix divisioin by zero in draw_pattern (lv_draw_rect.c) if the image or letter is not found
 - Fix drawing images with 1 px height or width
+- Fix selectiion of options with non-ASCII letters in dropdown list 
 
 ## v7.4.0 (01.09.2020)
 
