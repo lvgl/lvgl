@@ -13,6 +13,7 @@
 - Add rounding to btnmatrix line height calculation
 - Add `decmopr_buf` to GC roots
 - Fix divisioin by zero in draw_pattern (lv_draw_rect.c) if the image or letter is not found
+- Fix drawing images with 1 px height or width
 
 ## v7.4.0 (01.09.2020)
 
