@@ -818,6 +818,20 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 
 /* Montserrat fonts with bpp = 4
  * https://fonts.google.com/specimen/Montserrat  */
+#ifndef LV_FONT_MONTSERRAT_8
+#  ifdef CONFIG_LV_FONT_MONTSERRAT_8
+#    define LV_FONT_MONTSERRAT_8 CONFIG_LV_FONT_MONTSERRAT_8
+#  else
+#    define  LV_FONT_MONTSERRAT_8     0
+#  endif
+#endif
+#ifndef LV_FONT_MONTSERRAT_10
+#  ifdef CONFIG_LV_FONT_MONTSERRAT_10
+#    define LV_FONT_MONTSERRAT_10 CONFIG_LV_FONT_MONTSERRAT_10
+#  else
+#    define  LV_FONT_MONTSERRAT_10    0
+#  endif
+#endif
 #ifndef LV_FONT_MONTSERRAT_12
 #  ifdef CONFIG_LV_FONT_MONTSERRAT_12
 #    define LV_FONT_MONTSERRAT_12 CONFIG_LV_FONT_MONTSERRAT_12

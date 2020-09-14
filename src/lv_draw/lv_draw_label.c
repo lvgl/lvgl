@@ -220,7 +220,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
     if((dsc->decor & LV_TEXT_DECOR_UNDERLINE) || (dsc->decor & LV_TEXT_DECOR_STRIKETHROUGH)) {
         lv_draw_line_dsc_init(&line_dsc);
         line_dsc.color = dsc->color;
-        line_dsc.width = font->underline_thickness ? font->underline_thickness : LV_MATH_MAX(font->line_height / 10, 1);
+        line_dsc.width = font->underline_thickness ? font->underline_thickness : 1;
         line_dsc.opa = dsc->opa;
         line_dsc.blend_mode = dsc->blend_mode;
     }
