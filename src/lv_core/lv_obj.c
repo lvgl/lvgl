@@ -142,10 +142,8 @@ static void obj_del_core(lv_obj_t * obj);
 static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop);
 static void update_style_cache_children(lv_obj_t * obj);
 static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
-#if LV_USE_ANIMATION
 static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot);
 static style_snapshot_res_t style_snapshot_compare(style_snapshot_t * shot1, style_snapshot_t * shot2);
-#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -1706,10 +1704,6 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-#if LV_USE_ANIMATION == 0
-    obj->state = new_state;
-    lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
-#else
     lv_state_t prev_state = obj->state;
     style_snapshot_res_t cmp_res = STYLE_COMPARE_SAME;
     uint8_t part;
@@ -1733,7 +1727,14 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
         }
     }
 
+    obj->state = new_state;
+
     if(cmp_res == STYLE_COMPARE_SAME) return;
+
+#if LV_USE_ANIMATION == 0
+    if(cmp_res == STYLE_COMPARE_DIFF) lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
+    else if(cmp_res == STYLE_COMPARE_VISUAL_DIFF) lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
+#else
 
     for(part = 0; part < _LV_OBJ_PART_REAL_LAST; part++) {
         lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
@@ -4734,7 +4735,6 @@ static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_proper
     }
 }
 
-#if LV_USE_ANIMATION
 static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot)
 {
     _lv_obj_disable_style_caching(obj, true);
@@ -4810,4 +4810,3 @@ static style_snapshot_res_t style_snapshot_compare(style_snapshot_t * shot1, sty
     /*If not returned earlier its just a visual difference, a simple redraw is enough*/
     return STYLE_COMPARE_VISUAL_DIFF;
 }
-#endif
