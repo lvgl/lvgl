@@ -77,14 +77,6 @@ extern "C" {
 struct _lv_obj_t;
 typedef struct _lv_obj_t lv_obj_t;
 
-/**
- * Describe how to flow LV_GRID_POS_AUTO elements
- */
-typedef enum {
-    LV_GRID_FLOW_COLUMN, /**Fill each column and add now columns if required*/
-    LV_GRID_FLOW_ROW,    /**Fill each row and add now rows if required*/
-}lv_grid_flow_t;
-
 typedef struct {
     const lv_coord_t * col_dsc;
     const lv_coord_t * row_dsc;
@@ -92,7 +84,6 @@ typedef struct {
     uint8_t row_dsc_len;
     lv_coord_t col_gap;
     lv_coord_t row_gap;
-    lv_grid_flow_t flow;
     uint8_t col_place;
     uint8_t row_place;
 }lv_grid_t;
@@ -118,6 +109,28 @@ void lv_grid_set_template(lv_grid_t * grid, const lv_coord_t * col_dsc, const lv
 
 void lv_grid_set_place_content(lv_grid_t * grid, uint8_t col_place, uint8_t row_place);
 
+/**
+ * Set a grid for an object
+ * @param obj pointer to an object
+ * @param grid the grid to set
+ */
+void lv_obj_set_grid(lv_obj_t * obj, const lv_grid_t * grid);
+
+/**
+ * Get the grid of an object
+ * @param obj pointer to an object
+ * @return the grid, NULL if no grid
+ */
+const lv_grid_t * lv_obj_get_grid(lv_obj_t * obj, const lv_grid_t * grid);
+
+
+/**
+ * Notify all object if a style is modified
+ * @param grid pointer to a grid. Only the objects with this grid will be notified
+ *               (NULL to notify all objects with any grid)
+ */
+void lv_obj_report_grid_change(const lv_grid_t * grid);
+
 void _lv_grid_calc(struct _lv_obj_t * obj, _lv_grid_calc_t * calc);
 
 void _lv_grid_calc_free(_lv_grid_calc_t * calc);
@@ -131,6 +144,12 @@ void _lv_grid_full_refresh(lv_obj_t * cont);
 void lv_grid_item_refr_pos(lv_obj_t * item);
 
 bool _lv_obj_is_grid_item(lv_obj_t * obj);
+
+
+/**********************
+ * GLOBAL VARIABLES
+ **********************/
+extern const lv_grid_t lv_grid_center;
 
 /**********************
  *      MACROS

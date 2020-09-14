@@ -1058,7 +1058,7 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
 static void report_style_change_core(void * style, lv_obj_t * obj)
 {
     uint8_t part;
-    for(part = 0; part != _LV_OBJ_PART_REAL_LAST; part++) {
+    for(part = 0; part < _LV_OBJ_PART_SPACIAL_START; part++) {
         lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
         if(list == NULL) break;
 
@@ -1288,6 +1288,7 @@ static _lv_style_state_cmp_t style_snapshot_compare(style_snapshot_t * shot1, st
     if(shot1->transform_zoom != shot2->transform_zoom) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->rect.outline_width != shot2->rect.outline_width) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->rect.outline_pad != shot2->rect.outline_pad) return _LV_STYLE_STATE_CMP_DIFF;
+    if(shot1->rect.outline_opa != shot2->rect.outline_opa) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->rect.value_font != shot2->rect.value_font) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->rect.value_align != shot2->rect.value_align) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->rect.value_font != shot2->rect.value_font) return _LV_STYLE_STATE_CMP_DIFF;
@@ -1358,10 +1359,6 @@ static bool style_prop_is_cacheable(lv_style_property_t prop)
  */
 static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
 {
-    static uint32_t cnt = 0;
-    cnt++;
-    printf("update cache: %d\n", cnt);
-
     if(style_prop_is_cacheable(prop) == false) return;
 
     lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
@@ -1458,7 +1455,7 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
 static void update_style_cache_children(lv_obj_t * obj)
 {
     uint8_t part;
-    for(part = 0; part != _LV_OBJ_PART_REAL_LAST; part++) {
+    for(part = 0; part < _LV_OBJ_PART_SPACIAL_START; part++) {
         lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
         if(list == NULL) break;
 

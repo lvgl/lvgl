@@ -193,7 +193,7 @@ lv_coord_t lv_obj_get_scroll_bottom(const lv_obj_t * obj)
         child = lv_obj_get_child(obj, child);
     }
 
-    return y2 - obj->coords.y2 + lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
+    return y2 - (obj->coords.y2 - lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN));
 }
 
 /**
@@ -229,7 +229,7 @@ lv_coord_t lv_obj_get_scroll_right(const lv_obj_t * obj)
         child = lv_obj_get_child(obj, child);
     }
 
-    return x2 - obj->coords.x2  + lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
+    return x2 - (obj->coords.x2 - lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN));
 }
 
 /**********************

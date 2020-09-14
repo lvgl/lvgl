@@ -180,10 +180,9 @@ void lv_deinit(void)
  * Create a basic object
  * @param parent pointer to a parent object.
  *                  If NULL then a screen will be created
- * @param copy pointer to a base object, if not NULL then the new object will be copied from it
  * @return pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
+lv_obj_t * lv_obj_create(lv_obj_t * parent)
 {
     lv_obj_t * new_obj = NULL;
 
@@ -277,7 +276,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 #if LV_USE_GROUP
     new_obj->group_p = NULL;
-
 #endif
 
     /*Set attributes*/
@@ -292,49 +290,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->ext_attr = NULL;
 
     lv_style_list_init(&new_obj->style_list);
-    if(copy == NULL) {
-        if(parent != NULL) lv_theme_apply(new_obj, LV_THEME_OBJ);
-        else  lv_theme_apply(new_obj, LV_THEME_SCR);
-    }
-    else {
-        lv_style_list_copy(&new_obj->style_list, &copy->style_list);
-    }
-    /*Copy the attributes if required*/
-    if(copy != NULL) {
-        lv_area_copy(&new_obj->coords, &copy->coords);
-        new_obj->ext_draw_pad = copy->ext_draw_pad;
-
-#if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
-        lv_area_copy(&new_obj->ext_click_pad, &copy->ext_click_pad);
-#elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
-        new_obj->ext_click_pad = copy->ext_click_pad;
-#endif
-
-        /*Set user data*/
-#if LV_USE_USER_DATA
-        _lv_memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
-#endif
-
-        /*Only copy the `event_cb`. `signal_cb` and `design_cb` will be copied in the derived
-         * object type (e.g. `lv_btn`)*/
-        new_obj->event_cb = copy->event_cb;
-
-        /*Copy attributes*/
-        new_obj->flags        = copy->flags;
-        new_obj->scroll_mode  = copy->scroll_mode;
-
-#if LV_USE_GROUP
-        /*Add to the same group*/
-        if(copy->group_p != NULL) {
-            lv_group_add_obj(copy->group_p, new_obj);
-        }
-#endif
-
-        /*Set the same coordinates for non screen objects*/
-        if(lv_obj_get_parent(copy) != NULL && parent != NULL) {
-            lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
-        }
-    }
+    if(parent != NULL) lv_theme_apply(new_obj, LV_THEME_OBJ);
+    else  lv_theme_apply(new_obj, LV_THEME_SCR);
 
     lv_obj_set_pos(new_obj, 0, 0);
 
@@ -1298,18 +1255,7 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(part < _LV_OBJ_PART_REAL_LAST) return ((lv_obj_t *)obj)->state;
-
-    /*If a real part is asked, then use the object's signal to get its state.
-     * A real object can be in different state then the main part
-     * and only the object itself knows who to get it's state. */
-    lv_get_state_info_t info;
-    info.part = part;
-    info.result = LV_STATE_DEFAULT;
-    lv_signal_send((lv_obj_t *)obj, LV_SIGNAL_GET_STATE_DSC, &info);
-
-    return info.result;
-
+    return ((lv_obj_t *)obj)->state;
 }
 
 /**
@@ -1808,75 +1754,59 @@ static void base_dir_refr_children(lv_obj_t * obj)
  */
 static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
+    lv_res_t res = LV_RES_OK;
+
     if(sign == LV_SIGNAL_GET_STYLE) {
         lv_get_style_info_t * info = param;
         if(info->part == LV_OBJ_PART_MAIN) info->result = &obj->style_list;
         else info->result = NULL;
         return LV_RES_OK;
     }
-    else if(sign == LV_SIGNAL_GET_TYPE) return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
-
-    lv_res_t res = LV_RES_OK;
-
-    if(sign == LV_SIGNAL_COORD_CHG) {
-        if((lv_area_get_width(param) != lv_obj_get_width(obj) && _lv_grid_has_fr_col(obj)) ||
-           (lv_area_get_height(param) != lv_obj_get_height(obj) && _lv_grid_has_fr_row(obj)))
-        {
-            _lv_grid_full_refresh(obj);
-        }
-    }
-    else if(sign == LV_SIGNAL_CHILD_CHG) {
-        if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
-            lv_obj_set_size(obj, obj->w_set, obj->h_set);
-        }
-
-        if(obj->grid) {
-            lv_obj_t * child = param;
-            if(child) {
-                if(_lv_obj_is_grid_item(child)) _lv_grid_full_refresh(obj);
-            } else {
-                _lv_grid_full_refresh(obj);
-            }
-        }
-    }
-    else if(sign == LV_SIGNAL_SCROLL) {
-        res = lv_event_send(obj, LV_EVENT_SCROLLED, NULL);
-        if(res != LV_RES_OK) return res;
-    }
-    else if(sign == LV_SIGNAL_SCROLL_END) {
-        if(lv_obj_get_scroll_mode(obj) == LV_SCROLL_MODE_ACTIVE) {
-            lv_obj_invalidate(obj);
-        }
-
-    }
-    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        lv_coord_t d = 0;//_lv_obj_get_draw_rect_ext_pad_size(obj, LV_OBJ_PART_MAIN);
-        obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, d);
-    }
-    else if(sign == LV_SIGNAL_STYLE_CHG) {
-        if(_lv_obj_is_grid_item(obj)) _lv_grid_full_refresh(obj);
-
-        if(obj->grid) _lv_grid_full_refresh(obj);
-
-        /*Reposition non grid objects on by one*/
-        lv_obj_t * child = lv_obj_get_child(obj, NULL);
-        while(child) {
-            if(!_GRID_IS_CELL(child->x_set) || !_GRID_IS_CELL(child->y_set)) {
-                lv_obj_set_pos(child, child->x_set, child->y_set);
-            }
-            child = lv_obj_get_child(obj, child);
-        }
-
-        if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
-            lv_obj_set_size(obj, obj->w_set, obj->h_set);
-        }
-        _lv_obj_refresh_ext_draw_pad(obj);
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
     }
     else if(sign == LV_SIGNAL_PRESSED) {
         lv_obj_add_state(obj, LV_STATE_PRESSED);
     }
-    else if(sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
+    else if(sign == LV_SIGNAL_RELEASED) {
         lv_obj_clear_state(obj, LV_STATE_PRESSED);
+
+        /*Go the checked state if enabled*/
+        if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
+            uint32_t toggled = 0;
+            if(!(lv_obj_get_state(obj, LV_OBJ_PART_MAIN) & LV_STATE_CHECKED)) {
+                lv_obj_add_state(obj, LV_STATE_CHECKED);
+                toggled = 0;
+            }
+            else {
+                lv_obj_clear_state(obj, LV_STATE_CHECKED);
+                toggled = 1;
+            }
+
+            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &toggled);
+            if(res != LV_RES_OK) return res;
+        }
+    }
+    else if(sign == LV_SIGNAL_PRESS_LOST) {
+        lv_obj_clear_state(obj, LV_STATE_PRESSED);
+    }
+    else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
+        if(lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
+            uint32_t state = 0;
+            char c = *((char *)param);
+            if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
+                lv_obj_set_state(obj, LV_STATE_CHECKED);
+                state = 1;
+            }
+            else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
+                lv_obj_clear_state(obj, LV_STATE_CHECKED);
+                state = 0;
+            }
+            res = lv_event_send(obj, LV_EVENT_VALUE_CHANGED, &state);
+            if(res != LV_RES_OK) return res;
+        }
+#endif
     }
     else if(sign == LV_SIGNAL_FOCUS) {
         bool editing = false;
@@ -1907,6 +1837,59 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         obj = _lv_obj_get_focused_obj(obj);
 
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
+    }
+    else if(sign == LV_SIGNAL_COORD_CHG) {
+        if((lv_area_get_width(param) != lv_obj_get_width(obj) && _lv_grid_has_fr_col(obj)) ||
+           (lv_area_get_height(param) != lv_obj_get_height(obj) && _lv_grid_has_fr_row(obj)))
+        {
+            _lv_grid_full_refresh(obj);
+        }
+    }
+    else if(sign == LV_SIGNAL_CHILD_CHG) {
+        if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
+            lv_obj_set_size(obj, obj->w_set, obj->h_set);
+        }
+
+        if(obj->grid) {
+            lv_obj_t * child = param;
+            if(child) {
+                if(_lv_obj_is_grid_item(child)) _lv_grid_full_refresh(obj);
+            } else {
+                _lv_grid_full_refresh(obj);
+            }
+        }
+    }
+    else if(sign == LV_SIGNAL_SCROLL) {
+        res = lv_event_send(obj, LV_EVENT_SCROLLED, NULL);
+        if(res != LV_RES_OK) return res;
+    }
+    else if(sign == LV_SIGNAL_SCROLL_END) {
+        if(lv_obj_get_scroll_mode(obj) == LV_SCROLL_MODE_ACTIVE) {
+            lv_obj_invalidate(obj);
+        }
+    }
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+        lv_coord_t d = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_OBJ_PART_MAIN);
+        obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, d);
+    }
+    else if(sign == LV_SIGNAL_STYLE_CHG) {
+        if(_lv_obj_is_grid_item(obj)) _lv_grid_full_refresh(obj);
+
+        if(obj->grid) _lv_grid_full_refresh(obj);
+
+        /*Reposition non grid objects on by one*/
+        lv_obj_t * child = lv_obj_get_child(obj, NULL);
+        while(child) {
+            if(!_GRID_IS_CELL(child->x_set) || !_GRID_IS_CELL(child->y_set)) {
+                lv_obj_set_pos(child, child->x_set, child->y_set);
+            }
+            child = lv_obj_get_child(obj, child);
+        }
+
+        if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
+            lv_obj_set_size(obj, obj->w_set, obj->h_set);
+        }
+        _lv_obj_refresh_ext_draw_pad(obj);
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         _lv_obj_reset_style_list_no_refr(obj, LV_OBJ_PART_MAIN);

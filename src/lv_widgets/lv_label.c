@@ -70,16 +70,15 @@ static lv_signal_cb_t ancestor_signal;
 
 /**
  * Create a label objects
- * @param par pointer to an object, it will be the parent of the new label
- * @param copy pointer to a label object, if not NULL then the new object will be copied from it
+ * @param parent pointer to an object, it will be the parent of the new label
  * @return pointer to the created button
  */
-lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
+lv_obj_t * lv_label_create(lv_obj_t * parent)
 {
     LV_LOG_TRACE("label create started");
 
     /*Create a basic object*/
-    lv_obj_t * new_label = lv_obj_create(par, copy);
+    lv_obj_t * new_label = lv_obj_create(parent);
     LV_ASSERT_MEM(new_label);
     if(new_label == NULL) return NULL;
 
@@ -120,49 +119,14 @@ lv_obj_t * lv_label_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->dot.tmp_ptr   = NULL;
     ext->dot_tmp_alloc = 0;
 
-
     lv_obj_set_design_cb(new_label, lv_label_design);
     lv_obj_set_signal_cb(new_label, lv_label_signal);
 
     /*Init the new label*/
-    if(copy == NULL) {
-        lv_theme_apply(new_label, LV_THEME_LABEL);
-        lv_obj_clear_flag(new_label, LV_OBJ_FLAG_CLICKABLE);
-        lv_label_set_long_mode(new_label, LV_LABEL_LONG_EXPAND);
-        lv_label_set_text(new_label, "Text");
-    }
-    /*Copy 'copy' if not NULL*/
-    else {
-        lv_label_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        lv_label_set_long_mode(new_label, lv_label_get_long_mode(copy));
-        lv_label_set_recolor(new_label, lv_label_get_recolor(copy));
-        lv_label_set_align(new_label, lv_label_get_align(copy));
-        if(copy_ext->static_txt == 0)
-            lv_label_set_text(new_label, lv_label_get_text(copy));
-        else
-            lv_label_set_text_static(new_label, lv_label_get_text(copy));
-
-        /*In DOT mode save the text byte-to-byte because a '\0' can be in the middle*/
-        if(copy_ext->long_mode == LV_LABEL_LONG_DOT) {
-            ext->text = lv_mem_realloc(ext->text, _lv_mem_get_size(copy_ext->text));
-            LV_ASSERT_MEM(ext->text);
-            if(ext->text == NULL) return NULL;
-            _lv_memcpy(ext->text, copy_ext->text, _lv_mem_get_size(copy_ext->text));
-        }
-
-        if(copy_ext->dot_tmp_alloc && copy_ext->dot.tmp_ptr) {
-            uint32_t len = (uint32_t)strlen(copy_ext->dot.tmp_ptr);
-            lv_label_set_dot_tmp(new_label, ext->dot.tmp_ptr, len);
-        }
-        else {
-            _lv_memcpy(ext->dot.tmp, copy_ext->dot.tmp, sizeof(ext->dot.tmp));
-        }
-        ext->dot_tmp_alloc = copy_ext->dot_tmp_alloc;
-        ext->dot_end       = copy_ext->dot_end;
-
-        /*Refresh the style with new signal function*/
-        _lv_obj_refresh_style(new_label, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
-    }
+    lv_theme_apply(new_label, LV_THEME_LABEL);
+    lv_obj_clear_flag(new_label, LV_OBJ_FLAG_CLICKABLE);
+    lv_label_set_long_mode(new_label, LV_LABEL_LONG_EXPAND);
+    lv_label_set_text(new_label, "Text");
 
     LV_LOG_INFO("label created");
 

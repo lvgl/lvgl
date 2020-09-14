@@ -37,6 +37,12 @@ static void report_grid_change_core(const lv_grid_t * grid, lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static const lv_coord_t lv_grid_1_dsc[1] = {LV_GRID_FR(1)};
+const lv_grid_t lv_grid_center = {
+        .col_dsc = lv_grid_1_dsc,
+        .col_dsc_len = 1,
+        .col_place = LV_GRID_CENTER,
+        .row_place = LV_GRID_CENTER};
 
 /**********************
  *      MACROS
@@ -99,6 +105,10 @@ void lv_obj_report_grid_change(const lv_grid_t * grid)
 void _lv_grid_calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
 {
     if(cont->grid == NULL) return;
+    if(lv_obj_get_child(cont, NULL) == NULL) {
+        _lv_memset_00(calc_out, sizeof(_lv_grid_calc_t));
+        return;
+    }
 //    printf("calc: %d, %d\n", obj->grid->col_dsc_len, obj->grid->row_dsc_len);
 
     if(cont->grid->col_dsc && cont->grid->row_dsc) {

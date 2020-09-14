@@ -130,7 +130,6 @@ enum {
     LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
     LV_SIGNAL_GET_TYPE,          /**< LVGL needs to retrieve the object's type */
     LV_SIGNAL_GET_STYLE,         /**<Get the style of an object*/
-    LV_SIGNAL_GET_STATE_DSC,     /**<Get the state of the object*/
 
     /*Input device related*/
     LV_SIGNAL_HIT_TEST,          /**< Advanced hit-testing */
@@ -187,17 +186,18 @@ typedef uint8_t lv_dir_t;
 enum {
     LV_OBJ_FLAG_HIDDEN          = (1 << 0),
     LV_OBJ_FLAG_CLICKABLE       = (1 << 1),
-    LV_OBJ_FLAG_CLICK_FOCUSABLE       = (1 << 2),
-    LV_OBJ_FLAG_SCROLLABLE      = (1 << 3),
-    LV_OBJ_FLAG_SCROLL_ELASTIC  = (1 << 4),
-    LV_OBJ_FLAG_SCROLL_MOMENTUM = (1 << 5),
-    LV_OBJ_FLAG_SCROLL_STOP     = (1 << 6),
-    LV_OBJ_FLAG_SNAPABLE        = (1 << 7),
-    LV_OBJ_FLAG_PRESS_LOCK      = (1 << 8),
-    LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 9),
-    LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 10),
-    LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 11),
-    LV_OBJ_FLAG_ADV_HITTEST     = (1 << 12),
+    LV_OBJ_FLAG_CLICK_FOCUSABLE = (1 << 2),
+    LV_OBJ_FLAG_CHECKABLE       = (1 << 3),
+    LV_OBJ_FLAG_SCROLLABLE      = (1 << 4),
+    LV_OBJ_FLAG_SCROLL_ELASTIC  = (1 << 5),
+    LV_OBJ_FLAG_SCROLL_MOMENTUM = (1 << 6),
+    LV_OBJ_FLAG_SCROLL_STOP     = (1 << 7),
+    LV_OBJ_FLAG_SNAPABLE        = (1 << 8),
+    LV_OBJ_FLAG_PRESS_LOCK      = (1 << 9),
+    LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 10),
+    LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 11),
+    LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 12),
+    LV_OBJ_FLAG_ADV_HITTEST     = (1 << 13),
 };
 typedef uint16_t lv_obj_flag_t;
 
@@ -260,8 +260,7 @@ typedef struct _lv_obj_t {
 
 enum {
     LV_OBJ_PART_MAIN,
-    _LV_OBJ_PART_VIRTUAL_LAST = _LV_OBJ_PART_VIRTUAL_FIRST,
-    _LV_OBJ_PART_REAL_LAST =    _LV_OBJ_PART_REAL_FIRST,
+    _LV_OBJ_PART_SPACIAL_START =   0x80,
     LV_OBJ_PART_ALL = 0xFF,
 };
 
@@ -282,11 +281,6 @@ typedef struct {
     uint8_t part;
     lv_style_list_t * result;
 } lv_get_style_info_t;
-
-typedef struct {
-    uint8_t part;
-    lv_state_t result;
-} lv_get_state_info_t;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -314,10 +308,9 @@ void lv_deinit(void);
  * Create a basic object
  * @param parent pointer to a parent object.
  *                  If NULL then a screen will be created
- * @param copy pointer to a base object, if not NULL then the new object will be copied from it
  * @return pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
+lv_obj_t * lv_obj_create(lv_obj_t * parent);
 
 /**
  * Delete 'obj' and all of its children
