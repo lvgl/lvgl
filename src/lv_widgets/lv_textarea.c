@@ -303,7 +303,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
             lv_anim_set_path(&a, &path);
             lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
             lv_anim_start(&a);
-		}
+        }
 
 #else
         pwd_char_hider(ta);
@@ -386,7 +386,7 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
             lv_anim_set_path(&a, &path);
             lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
             lv_anim_start(&a);
-		}
+        }
 #else
         pwd_char_hider(ta);
 #endif
@@ -544,7 +544,7 @@ void lv_textarea_set_text(lv_obj_t * ta, const char * txt)
             lv_anim_set_path(&a, &path);
             lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
             lv_anim_start(&a);
-		}
+        }
 #else
         pwd_char_hider(ta);
 #endif
