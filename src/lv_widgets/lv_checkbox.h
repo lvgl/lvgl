@@ -40,18 +40,17 @@ extern "C" {
 
 /*Data of check box*/
 typedef struct {
-    lv_btn_ext_t bg_btn; /*Ext. of ancestor*/
-    /*New data for this type */
-    lv_obj_t * bullet; /*Pointer to button*/
+    /*No inherited ext, derived from the base object */
+
+    /*New data for this widget */
+    lv_obj_t * text; /*Pointer to button*/
     lv_obj_t * label;  /*Pointer to label*/
 } lv_checkbox_ext_t;
 
 /** Checkbox styles. */
 enum {
-    LV_CHECKBOX_PART_BG = LV_BTN_PART_MAIN,  /**< Style of object background. */
+    LV_CHECKBOX_PART_MAIN = LV_OBJ_PART_MAIN,  /**< Style of object background. */
     _LV_CHECKBOX_PART_VIRTUAL_LAST,
-    LV_CHECKBOX_PART_BULLET = _LV_BTN_PART_REAL_LAST, /**< Style of box (released). */
-    _LV_CHECKBOX_PART_REAL_LAST
 };
 typedef uint8_t lv_checkbox_style_t;
 

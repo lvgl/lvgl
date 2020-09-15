@@ -239,14 +239,14 @@ static void clear_styles(lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_BAR
         case LV_THEME_BAR:
-            _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_BG);
+            _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_MAIN);
             _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_INDIC);
             break;
 #endif
 
 #if LV_USE_SWITCH
         case LV_THEME_SWITCH:
-            _lv_obj_reset_style_list_no_refr(obj, LV_SWITCH_PART_BG);
+            _lv_obj_reset_style_list_no_refr(obj, LV_SWITCH_PART_MAIN);
             _lv_obj_reset_style_list_no_refr(obj, LV_SWITCH_PART_INDIC);
             _lv_obj_reset_style_list_no_refr(obj, LV_SWITCH_PART_KNOB);
             break;
@@ -298,7 +298,7 @@ static void clear_styles(lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_SLIDER
         case LV_THEME_SLIDER:
-            _lv_obj_reset_style_list_no_refr(obj, LV_SLIDER_PART_BG);
+            _lv_obj_reset_style_list_no_refr(obj, LV_SLIDER_PART_MAIN);
             _lv_obj_reset_style_list_no_refr(obj, LV_SLIDER_PART_INDIC);
             _lv_obj_reset_style_list_no_refr(obj, LV_SLIDER_PART_KNOB);
             break;

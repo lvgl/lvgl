@@ -19,10 +19,9 @@ extern "C" {
 
 /*Testing of dependencies*/
 #if LV_USE_SLIDER == 0
-#error "lv_sw: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER  1)"
+#error "lv_switch: lv_slider is required. Enable it in lv_conf.h (LV_USE_SLIDER  1)"
 #endif
 
-#include "../lv_core/lv_obj.h"
 #include "lv_bar.h"
 
 /*********************
@@ -44,7 +43,7 @@ typedef struct {
  * Switch parts.
  */
 enum {
-    LV_SWITCH_PART_BG = LV_BAR_PART_BG,                 /**< Switch background. */
+    LV_SWITCH_PART_MAIN = LV_BAR_PART_MAIN,                 /**< Switch background. */
     LV_SWITCH_PART_INDIC = LV_BAR_PART_INDIC,           /**< Switch fill area. */
     LV_SWITCH_PART_KNOB = _LV_BAR_PART_VIRTUAL_LAST,    /**< Switch knob. */
     _LV_SWITCH_PART_VIRTUAL_LAST
@@ -58,11 +57,12 @@ typedef uint8_t lv_switch_part_t;
 
 /**
  * Create a switch objects
- * @param par pointer to an object, it will be the parent of the new switch
- * @param copy pointer to a switch object, if not NULL then the new object will be copied from it
+ * @param parent pointer to an object, it will be the parent of the new switch
+ * @param copy DEPRECATED, will be removed in v9.
+ *             Pointer to an other switch to copy.
  * @return pointer to the created switch
  */
-lv_obj_t * lv_switch_create(lv_obj_t * par, const lv_obj_t * copy);
+lv_obj_t * lv_switch_create(lv_obj_t * parent, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions

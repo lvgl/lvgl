@@ -71,14 +71,16 @@ static lv_signal_cb_t ancestor_signal;
 /**
  * Create a label objects
  * @param parent pointer to an object, it will be the parent of the new label
+ * @param copy DEPRECATED, will be removed in v9.
+ *             Pointer to an other label to copy.
  * @return pointer to the created button
  */
-lv_obj_t * lv_label_create(lv_obj_t * parent)
+lv_obj_t * lv_label_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("label create started");
 
     /*Create a basic object*/
-    lv_obj_t * new_label = lv_obj_create(parent);
+    lv_obj_t * new_label = lv_obj_create(parent, copy);
     LV_ASSERT_MEM(new_label);
     if(new_label == NULL) return NULL;
 

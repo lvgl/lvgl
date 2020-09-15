@@ -49,15 +49,17 @@ static lv_signal_cb_t ancestor_signal;
 /**
  * Create a button object
  * @param parent pointer to an object, it will be the parent of the new button
+ * @param copy DEPRECATED, will be removed in v9.
+ *             Pointer to an other button to copy.
  * @return pointer to the created button
  */
-lv_obj_t * lv_btn_create(lv_obj_t * parent)
+lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("button create started");
 
     lv_obj_t * btn;
 
-    btn = lv_obj_create(parent);
+    btn = lv_obj_create(parent, copy);
     LV_ASSERT_MEM(btn);
     if(btn == NULL) return NULL;
 
@@ -65,13 +67,15 @@ lv_obj_t * lv_btn_create(lv_obj_t * parent)
 
     lv_obj_set_signal_cb(btn, lv_btn_signal);
 
-    /*Set layout if the button is not a screen*/
-    if(parent) {
-        lv_obj_set_size(btn, LV_DPI, LV_DPI / 3);
-        lv_obj_set_grid(btn, &lv_grid_center);
-    }
+    if(copy == NULL) {
+        /*Set layout if the button is not a screen*/
+        if(parent) {
+            lv_obj_set_size(btn, LV_DPI, LV_DPI / 3);
+            lv_obj_set_grid(btn, &lv_grid_center);
+        }
 
-    lv_theme_apply(btn, LV_THEME_BTN);
+        lv_theme_apply(btn, LV_THEME_BTN);
+    }
 
     LV_LOG_INFO("button created");
 

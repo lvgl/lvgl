@@ -461,7 +461,7 @@ void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_BAR
         case LV_THEME_BAR:
-            list = _lv_obj_get_style_list(obj, LV_BAR_PART_BG);
+            list = _lv_obj_get_style_list(obj, LV_BAR_PART_MAIN);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->tight);
 
@@ -473,7 +473,7 @@ void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_SWITCH
         case LV_THEME_SWITCH:
-            list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_BG);
+            list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_MAIN);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->tight);
             _lv_style_list_add_style(list, &styles->round);
@@ -548,7 +548,7 @@ void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_SLIDER
         case LV_THEME_SLIDER:
-            list = _lv_obj_get_style_list(obj, LV_SLIDER_PART_BG);
+            list = _lv_obj_get_style_list(obj, LV_SLIDER_PART_MAIN);
             _lv_style_list_add_style(list, &styles->bg);
 
             list = _lv_obj_get_style_list(obj, LV_SLIDER_PART_INDIC);

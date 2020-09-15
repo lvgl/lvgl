@@ -381,13 +381,7 @@ static void slider_init(void)
 static void switch_init(void)
 {
 #if LV_USE_SWITCH != 0
-    style_init_reset(&styles->sb);
-    lv_style_set_bg_opa(&styles->sb, LV_STATE_DEFAULT, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->sb, LV_STATE_DEFAULT, FG_COLOR);
-    lv_style_set_radius(&styles->sb, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-    lv_style_set_pad_right(&styles->sb, LV_STATE_DEFAULT, LV_DPI / 30);
-    lv_style_set_pad_bottom(&styles->sb, LV_STATE_DEFAULT, LV_DPI / 30);
-    lv_style_set_size(&styles->sb, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 25, 3));
+
 #endif
 }
 
@@ -620,7 +614,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_BAR
         case LV_THEME_BAR:
-            list = _lv_obj_get_style_list(obj, LV_BAR_PART_BG);
+            list = _lv_obj_get_style_list(obj, LV_BAR_PART_MAIN);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->pad_none);
             _lv_style_list_add_style(list, &styles->round);
@@ -634,7 +628,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_SWITCH
         case LV_THEME_SWITCH:
-            list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_BG);
+            list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_MAIN);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->pad_none);
             _lv_style_list_add_style(list, &styles->round);
@@ -705,7 +699,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_SLIDER
         case LV_THEME_SLIDER:
-            list = _lv_obj_get_style_list(obj, LV_SLIDER_PART_BG);
+            list = _lv_obj_get_style_list(obj, LV_SLIDER_PART_MAIN);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->pad_none);
 

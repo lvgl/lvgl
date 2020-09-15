@@ -308,9 +308,12 @@ void lv_deinit(void);
  * Create a basic object
  * @param parent pointer to a parent object.
  *                  If NULL then a screen will be created
+ *
+ * @param copy DEPRECATED, will be removed in v9.
+ *             Pointer to an other base object to copy.
  * @return pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent);
+lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy);
 
 /**
  * Delete 'obj' and all of its children

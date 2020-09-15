@@ -180,9 +180,12 @@ void lv_deinit(void)
  * Create a basic object
  * @param parent pointer to a parent object.
  *                  If NULL then a screen will be created
+ *
+ * @param copy DEPRECATED, will be removed in v9.
+ *             Pointer to an other base object to copy.
  * @return pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent)
+lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
 {
     lv_obj_t * new_obj = NULL;
 
@@ -290,9 +293,47 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent)
     new_obj->ext_attr = NULL;
 
     lv_style_list_init(&new_obj->style_list);
-    if(parent != NULL) lv_theme_apply(new_obj, LV_THEME_OBJ);
-    else  lv_theme_apply(new_obj, LV_THEME_SCR);
+    lv_style_list_init(&new_obj->style_list);
+     if(copy == NULL) {
+         if(parent != NULL) lv_theme_apply(new_obj, LV_THEME_OBJ);
+         else  lv_theme_apply(new_obj, LV_THEME_SCR);
+     }
+     else {
+         lv_style_list_copy(&new_obj->style_list, &copy->style_list);
+     }
+     /*Copy the attributes if required*/
+     if(copy != NULL) {
+         lv_area_copy(&new_obj->coords, &copy->coords);
+         new_obj->ext_draw_pad = copy->ext_draw_pad;
 
+ #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
+         lv_area_copy(&new_obj->ext_click_pad, &copy->ext_click_pad);
+ #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
+         new_obj->ext_click_pad = copy->ext_click_pad;
+ #endif
+
+         /*Set user data*/
+ #if LV_USE_USER_DATA
+         _lv_memcpy(&new_obj->user_data, &copy->user_data, sizeof(lv_obj_user_data_t));
+ #endif
+         /*Only copy the `event_cb`. `signal_cb` and `design_cb` will be copied in the derived
+          * object type (e.g. `lv_btn`)*/
+         new_obj->event_cb = copy->event_cb;
+
+         new_obj->flags  = copy->flags;
+
+ #if LV_USE_GROUP
+         /*Add to the same group*/
+         if(copy->group_p != NULL) {
+             lv_group_add_obj(copy->group_p, new_obj);
+         }
+ #endif
+
+         /*Set the same coordinates for non screen objects*/
+         if(lv_obj_get_parent(copy) != NULL && parent != NULL) {
+             lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
+         }
+     }
     lv_obj_set_pos(new_obj, 0, 0);
 
     /*Send a signal to the parent to notify it about the new child*/

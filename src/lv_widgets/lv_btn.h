@@ -40,9 +40,11 @@ typedef uint8_t lv_btn_part_t;
 /**
  * Create a button object
  * @param parent pointer to an object, it will be the parent of the new button
+ * @param copy DEPRECATED, will be removed in v9.
+ *             Pointer to an other button to copy.
  * @return pointer to the created button
  */
-lv_obj_t * lv_btn_create(lv_obj_t * parent);
+lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions
