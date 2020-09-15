@@ -208,7 +208,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     return ser;
 }
 
-lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * chart, lv_color_t color, lv_cursor_direction_t axis)
+lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * chart, lv_color_t color, lv_cursor_direction_t axes)
 {
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
 
@@ -220,7 +220,7 @@ lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * chart, lv_color_t color, lv_
     cursor->point.x = 0U;
     cursor->point.y = LV_CHART_POINT_DEF;
     cursor->color = color;
-    cursor->axis = axis;
+    cursor->axes = axes;
 
     return cursor;
 }
@@ -1215,7 +1215,8 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
 
 /**
  * Draw the cursors as lines on a chart
- * @param obj pointer to chart object
+ * @param chart pointer to chart object
+ * @param clip_area the object will be drawn only in this area
  */
 static void draw_cursors(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * clip_area)
 {
@@ -1249,7 +1250,7 @@ static void draw_cursors(lv_obj_t * chart, const lv_area_t * series_area, const 
 	line_dsc.color = cursor->color;
 	point_dsc.bg_color = cursor->color;
 
-	if(cursor->axis | LV_CHART_CURSOR_DIRECTION_HOR) {
+	if(cursor->axes & LV_CHART_CURSOR_DIRECTION_PRIMARY_HOR) {
 		p1.x = series_area->x1;
 		p1.y = series_area->y1 + cursor->point.y;
 		p2.x = p1.x + cursor->point.x;
@@ -1257,12 +1258,29 @@ static void draw_cursors(lv_obj_t * chart, const lv_area_t * series_area, const 
 		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
 	}
 
-	if(cursor->axis | LV_CHART_CURSOR_DIRECTION_VER) {
+	if(cursor->axes & LV_CHART_CURSOR_DIRECTION_PRIMARY_VER) {
 
 		p1.x = series_area->x1 + cursor->point.x;
 		p1.y = series_area->y1 + cursor->point.y;
 		p2.x = p1.x;
 		p2.y = series_area->y2;
+		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
+	}
+
+	if(cursor->axes & LV_CHART_CURSOR_DIRECTION_SECONDARY_HOR) {
+		p1.x = series_area->x1 + cursor->point.x;
+		p1.y = series_area->y1 + cursor->point.y;
+		p2.x = series_area->x2;
+		p2.y = p1.y;
+		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
+	}
+
+	if(cursor->axes & LV_CHART_CURSOR_DIRECTION_SECONDARY_VER) {
+
+		p1.x = series_area->x1 + cursor->point.x;
+		p1.y = series_area->y1;
+		p2.x = p1.x;
+		p2.y = series_area->y1 + cursor->point.y;
 		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
 	}
 
