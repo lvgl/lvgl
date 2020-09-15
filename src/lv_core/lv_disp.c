@@ -360,12 +360,12 @@ void lv_disp_clean_dcache(lv_disp_t * disp)
 {
     if(!disp) disp = lv_disp_get_default();
     if(!disp) {
-      LV_LOG_WARN("lv_disp_clean_dcache: no display registered");
-      return;
+        LV_LOG_WARN("lv_disp_clean_dcache: no display registered");
+        return;
     }
 
     if(disp->driver.clean_dcache_cb)
-      disp->driver.clean_dcache_cb(&disp->driver);
+        disp->driver.clean_dcache_cb(&disp->driver);
 }
 
 /**
