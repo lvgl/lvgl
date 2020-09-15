@@ -402,16 +402,6 @@ void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
         return;
     }
 
-    lv_coord_t st = lv_obj_get_scroll_top(obj);
-    lv_coord_t sb = lv_obj_get_scroll_bottom(obj);
-    lv_coord_t sl = lv_obj_get_scroll_left(obj);
-    lv_coord_t sr = lv_obj_get_scroll_right(obj);
-
-    /*Return if too small content to scroll*/
-    if(sm == LV_SCROLL_MODE_AUTO && st <= 0  && sb <= 0 && sl <= 0  && sr <= 0) {
-        return;
-    }
-
     /*If there is no indev scrolling this object but the moe is active return*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
     if(sm == LV_SCROLL_MODE_ACTIVE) {
@@ -426,6 +416,16 @@ void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
         if(!found) {
             return;
         }
+    }
+
+    lv_coord_t st = lv_obj_get_scroll_top(obj);
+    lv_coord_t sb = lv_obj_get_scroll_bottom(obj);
+    lv_coord_t sl = lv_obj_get_scroll_left(obj);
+    lv_coord_t sr = lv_obj_get_scroll_right(obj);
+
+    /*Return if too small content to scroll*/
+    if(sm == LV_SCROLL_MODE_AUTO && st <= 0  && sb <= 0 && sl <= 0  && sr <= 0) {
+        return;
     }
 
     lv_coord_t end_space = lv_obj_get_style_scrollbar_space_end(obj, LV_OBJ_PART_MAIN);

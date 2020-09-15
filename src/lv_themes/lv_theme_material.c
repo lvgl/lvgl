@@ -645,6 +645,7 @@ static void checkbox_init(void)
     lv_style_set_pad_right(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
     lv_style_set_pad_top(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
     lv_style_set_pad_bottom(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
+    lv_style_set_margin_right(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(6));
 #endif
 }
 
@@ -1107,7 +1108,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_CHECKBOX
         case LV_THEME_CHECKBOX:
-            list = _lv_obj_get_style_list(obj, LV_CHECKBOX_PART_BG);
+            list = _lv_obj_get_style_list(obj, LV_CHECKBOX_PART_MAIN);
             _lv_style_list_add_style(list, &styles->cb_bg);
 
             list = _lv_obj_get_style_list(obj, LV_CHECKBOX_PART_BULLET);

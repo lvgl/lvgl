@@ -126,10 +126,11 @@ enum {
     LV_SIGNAL_CHILD_CHG,         /**< Child was removed/added */
     LV_SIGNAL_COORD_CHG,         /**< Object coordinates/size have changed */
     LV_SIGNAL_STYLE_CHG,         /**< Object's style has changed */
-    LV_SIGNAL_BASE_DIR_CHG,      /**<The base dir has changed*/
+    LV_SIGNAL_BASE_DIR_CHG,      /**< The base dir has changed*/
     LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
     LV_SIGNAL_GET_TYPE,          /**< LVGL needs to retrieve the object's type */
-    LV_SIGNAL_GET_STYLE,         /**<Get the style of an object*/
+    LV_SIGNAL_GET_STYLE,         /**< Get the style of an object*/
+    LV_SIGNAL_GET_SELF_SIZE,     /**< If there are virtual content on the widget get it's size*/
 
     /*Input device related*/
     LV_SIGNAL_HIT_TEST,          /**< Advanced hit-testing */
@@ -313,7 +314,7 @@ void lv_deinit(void);
  *             Pointer to an other base object to copy.
  * @return pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy);
+lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
 
 /**
  * Delete 'obj' and all of its children
@@ -644,7 +645,7 @@ bool lv_obj_has_flag(const lv_obj_t * obj, lv_obj_flag_t f);
 
 lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj);
 
-lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part);
+lv_state_t lv_obj_get_state(const lv_obj_t * obj);
 
 /**
  * Get the signal function of an object

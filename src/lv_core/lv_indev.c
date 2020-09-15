@@ -848,7 +848,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
     }
 
     /*Do not use disabled objects*/
-    if(indev_obj_act && (lv_obj_get_state(indev_obj_act, LV_OBJ_PART_MAIN) & LV_STATE_DISABLED)) {
+    if(indev_obj_act && (lv_obj_get_state(indev_obj_act) & LV_STATE_DISABLED)) {
         indev_obj_act = proc->types.pointer.act_obj;
     }
 

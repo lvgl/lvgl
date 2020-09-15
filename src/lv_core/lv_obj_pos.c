@@ -441,7 +441,7 @@ lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj)
 }
 
 /**
- * Calculate the "auto size". It's `auto_size = max(gird_size, children_size)`
+ * Calculate the "auto size". It's `auto_size = max(gird_size, children_size, self_size)`
  * @param obj pointer to an object
  * @param w_out store the width here. NULL to not calculate width
  * @param h_out store the height here. NULL to not calculate height
@@ -473,15 +473,16 @@ void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_o
     if(w_out) {
         lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
         lv_coord_t scroll_right = lv_obj_get_scroll_right(obj);
-        children_w = lv_obj_get_width(obj) + scroll_right;
+        lv_coord_t scroll_left = lv_obj_get_scroll_left(obj);
+        children_w = lv_obj_get_width(obj) + scroll_right + scroll_left;
     }
 
     if(h_out) {
         lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
         lv_coord_t scroll_bottom = lv_obj_get_scroll_bottom(obj);
-        children_h = lv_obj_get_height(obj) + scroll_bottom;
+        lv_coord_t scroll_top = lv_obj_get_scroll_top(obj);
+        children_h = lv_obj_get_height(obj) + scroll_bottom + scroll_top ;
     }
-
 
     /*auto_size = max(gird_size, children_size)*/
     if(w_out) *w_out = LV_MATH_MAX(children_w, grid_w);
@@ -585,6 +586,18 @@ bool _lv_obj_is_grid_item(lv_obj_t * obj)
     return false;
 }
 
+/**
+ * Get the size of the virtual content on an object
+ * (E.g. some texts which are "just drawn" and there is not real object behind them)
+ * @param obj pointer to an object
+ * @param p store the result size here
+ */
+void _lv_obj_get_self_size(lv_obj_t * obj, lv_point_t * p)
+{
+    p->x = 0;
+    p->y = 0;
+    lv_signal_send(obj, LV_SIGNAL_GET_SELF_SIZE, p);
+}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -613,7 +626,8 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     lv_area_t ori;
     lv_obj_get_coords(obj, &ori);
 
-    /*Set the length and height*/
+    /* Set the length and height
+     * Be sure the content is not scrolled in an invalid position on the new size*/
     obj->coords.y2 = obj->coords.y1 + h - 1;
     if(lv_obj_get_base_dir(obj) == LV_BIDI_DIR_RTL) {
         obj->coords.x1 = obj->coords.x2 - w + 1;

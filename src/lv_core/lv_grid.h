@@ -143,8 +143,6 @@ void _lv_grid_full_refresh(lv_obj_t * cont);
 
 void lv_grid_item_refr_pos(lv_obj_t * item);
 
-bool _lv_obj_is_grid_item(lv_obj_t * obj);
-
 
 /**********************
  * GLOBAL VARIABLES

@@ -27,8 +27,6 @@ extern "C" {
 #endif
 
 #include "../lv_core/lv_obj.h"
-#include "lv_btn.h"
-#include "lv_label.h"
 
 /*********************
  *      DEFINES
@@ -43,13 +41,15 @@ typedef struct {
     /*No inherited ext, derived from the base object */
 
     /*New data for this widget */
-    lv_obj_t * text; /*Pointer to button*/
-    lv_obj_t * label;  /*Pointer to label*/
+    lv_style_list_t style_bullet;
+    char * text;              /*Pointer to button*/
+    uint32_t static_txt :1;
 } lv_checkbox_ext_t;
 
 /** Checkbox styles. */
 enum {
     LV_CHECKBOX_PART_MAIN = LV_OBJ_PART_MAIN,  /**< Style of object background. */
+    LV_CHECKBOX_PART_BULLET,                   /**< Style of the bullet */
     _LV_CHECKBOX_PART_VIRTUAL_LAST,
 };
 typedef uint8_t lv_checkbox_style_t;
@@ -74,7 +74,7 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy);
  * Set the text of a check box. `txt` will be copied and may be deallocated
  * after this function returns.
  * @param cb pointer to a check box
- * @param txt the text of the check box. NULL to refresh with the current text.
+ * @param txt the text of the check box.
  */
 void lv_checkbox_set_text(lv_obj_t * cb, const char * txt);
 
@@ -82,7 +82,7 @@ void lv_checkbox_set_text(lv_obj_t * cb, const char * txt);
  * Set the text of a check box. `txt` must not be deallocated during the life
  * of this checkbox.
  * @param cb pointer to a check box
- * @param txt the text of the check box. NULL to refresh with the current text.
+ * @param txt the text of the check box.
  */
 void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt);
 
@@ -93,27 +93,21 @@ void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt);
  */
 static inline void lv_checkbox_set_checked(lv_obj_t * cb, bool checked)
 {
-    lv_btn_set_state(cb, checked ? LV_BTN_STATE_CHECKED_RELEASED : LV_BTN_STATE_RELEASED);
+    if(checked) lv_obj_set_state(cb, LV_STATE_CHECKED);
+    else lv_obj_clear_state(cb, LV_STATE_CHECKED);
 }
 
 /**
  * Make the check box inactive (disabled)
  * @param cb pointer to a check box object
+ * @param dis true; make the checkbox disabled; false: make the chackbox active
  */
-static inline void lv_checkbox_set_disabled(lv_obj_t * cb)
+static inline void lv_checkbox_set_disabled(lv_obj_t * cb, bool dis)
 {
-    lv_btn_set_state(cb, LV_BTN_STATE_DISABLED);
+    if(dis) lv_obj_set_state(cb, LV_STATE_DISABLED);
+    else lv_obj_clear_state(cb, LV_STATE_DISABLED);
 }
 
-/**
- * Set the state of a check box
- * @param cb pointer to a check box object
- * @param state the new state of the check box (from lv_btn_state_t enum)
- */
-static inline void lv_checkbox_set_state(lv_obj_t * cb, lv_btn_state_t state)
-{
-    lv_btn_set_state(cb, state);
-}
 /*=====================
  * Getter functions
  *====================*/
@@ -132,7 +126,7 @@ const char * lv_checkbox_get_text(const lv_obj_t * cb);
  */
 static inline bool lv_checkbox_is_checked(const lv_obj_t * cb)
 {
-    return lv_btn_get_state(cb) == LV_BTN_STATE_RELEASED ? false : true;
+    return lv_obj_get_state(cb) & LV_STATE_CHECKED ? true : false;
 }
 
 /**
@@ -140,19 +134,9 @@ static inline bool lv_checkbox_is_checked(const lv_obj_t * cb)
  * @param cb pointer to a check box object
  * @return true: inactive; false: not inactive
  */
-static inline bool lv_checkbox_is_inactive(const lv_obj_t * cb)
+static inline bool lv_checkbox_is_disabled(const lv_obj_t * cb)
 {
-    return lv_btn_get_state(cb) == LV_BTN_STATE_DISABLED ? true : false;
-}
-
-/**
- * Get the current state of a check box
- * @param cb pointer to a check box object
- * @return the state of the check box (from lv_btn_state_t enum)
- */
-static inline lv_btn_state_t lv_checkbox_get_state(const lv_obj_t * cb)
-{
-    return lv_btn_get_state(cb);
+    return lv_obj_get_state(cb) & LV_STATE_DISABLED ? true : false;
 }
 
 /**********************

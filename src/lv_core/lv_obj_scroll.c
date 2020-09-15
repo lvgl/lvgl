@@ -183,17 +183,26 @@ lv_coord_t lv_obj_get_scroll_bottom(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_coord_t y2 = LV_COORD_MIN;
+    lv_coord_t child_res = LV_COORD_MIN;
 
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
-    if(child == NULL) return 0;
+    if(child) {
+        lv_coord_t y2 = LV_COORD_MIN;
+        while(child) {
+            y2 = LV_MATH_MAX(y2, child->coords.y2 + lv_obj_get_style_margin_bottom(child, LV_OBJ_PART_MAIN));
+            child = lv_obj_get_child(obj, child);
+        }
 
-    while(child) {
-        y2 = LV_MATH_MAX(y2, child->coords.y2 + lv_obj_get_style_margin_bottom(child, LV_OBJ_PART_MAIN));
-        child = lv_obj_get_child(obj, child);
+        child_res = y2;
     }
 
-    return y2 - (obj->coords.y2 - lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN));
+    lv_point_t self_size;
+    _lv_obj_get_self_size(obj, &self_size);
+    self_size.y += obj->coords.y1 + lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN) + obj->scroll.y;
+
+    lv_coord_t y_max = LV_MATH_MAX(child_res, self_size.y) - obj->coords.y2;
+
+    return y_max + lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
 }
 
 /**
@@ -217,19 +226,30 @@ lv_coord_t lv_obj_get_scroll_left(const lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_scroll_right(const lv_obj_t * obj)
 {
+    static uint32_t cnt = 0;
+    printf("scrl right: %d\n", cnt);
+    cnt++;
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_coord_t x2 = LV_COORD_MIN;
-
+    lv_coord_t child_res = LV_COORD_MIN;
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
-    if(child == NULL) return 0;
+    if(child) {
+        lv_coord_t x2 = LV_COORD_MIN;
+        while(child) {
+            x2 = LV_MATH_MAX(x2, child->coords.x2 + lv_obj_get_style_margin_right(child, LV_OBJ_PART_MAIN));
+            child = lv_obj_get_child(obj, child);
+        }
+        child_res = x2;
 
-    while(child) {
-        x2 = LV_MATH_MAX(x2, child->coords.x2 + lv_obj_get_style_margin_right(child, LV_OBJ_PART_MAIN));
-        child = lv_obj_get_child(obj, child);
     }
 
-    return x2 - (obj->coords.x2 - lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN));
+    lv_point_t self_size;
+    _lv_obj_get_self_size(obj, &self_size);
+    self_size.x += obj->coords.x1 + lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN) + obj->scroll.x;
+
+    lv_coord_t x_max = LV_MATH_MAX(child_res, self_size.x) - obj->coords.x2;
+
+    return x_max + lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
 }
 
 /**********************

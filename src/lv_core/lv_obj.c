@@ -185,7 +185,7 @@ void lv_deinit(void)
  *             Pointer to an other base object to copy.
  * @return pointer to the new object
  */
-lv_obj_t * lv_obj_create(lv_obj_t * parent, lv_obj_t * copy)
+lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     lv_obj_t * new_obj = NULL;
 
@@ -775,10 +775,9 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
             }
         }
 
-        if(cmp_res == _LV_STYLE_STATE_CMP_DIFF) _lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
     }
-
-    if(cmp_res == _LV_STYLE_STATE_CMP_VISUAL_DIFF) lv_obj_invalidate(obj);
+    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF) _lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
+    else if(cmp_res == _LV_STYLE_STATE_CMP_VISUAL_DIFF) lv_obj_invalidate(obj);
 
 #endif
 
@@ -1292,7 +1291,7 @@ lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
 #endif
 }
 
-lv_state_t lv_obj_get_state(const lv_obj_t * obj, uint8_t part)
+lv_state_t lv_obj_get_state(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1815,7 +1814,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         /*Go the checked state if enabled*/
         if(lv_indev_get_scroll_obj(param) == NULL && lv_obj_has_flag(obj, LV_OBJ_FLAG_CHECKABLE)) {
             uint32_t toggled = 0;
-            if(!(lv_obj_get_state(obj, LV_OBJ_PART_MAIN) & LV_STATE_CHECKED)) {
+            if(!(lv_obj_get_state(obj) & LV_STATE_CHECKED)) {
                 lv_obj_add_state(obj, LV_STATE_CHECKED);
                 toggled = 0;
             }
@@ -1880,8 +1879,8 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {
-        if((lv_area_get_width(param) != lv_obj_get_width(obj) && _lv_grid_has_fr_col(obj)) ||
-           (lv_area_get_height(param) != lv_obj_get_height(obj) && _lv_grid_has_fr_row(obj)))
+        if(param && ((lv_area_get_width(param) != lv_obj_get_width(obj) && _lv_grid_has_fr_col(obj)) ||
+                     (lv_area_get_height(param) != lv_obj_get_height(obj) && _lv_grid_has_fr_row(obj))))
         {
             _lv_grid_full_refresh(obj);
         }

@@ -409,7 +409,7 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
         }
 #endif
 
-        lv_state_t state = lv_obj_get_state(parent, part);
+        lv_state_t state = lv_obj_get_state(parent);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
         res = _lv_style_list_get_int(list, prop, &value_act);
@@ -474,7 +474,7 @@ lv_color_t _lv_obj_get_style_color(const lv_obj_t * obj, uint8_t part, lv_style_
     while(parent) {
         lv_style_list_t * list = _lv_obj_get_style_list(parent, part);
 
-        lv_state_t state = lv_obj_get_state(parent, part);
+        lv_state_t state = lv_obj_get_state(parent);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
         res = _lv_style_list_get_color(list, prop, &value_act);
@@ -552,7 +552,7 @@ lv_opa_t _lv_obj_get_style_opa(const lv_obj_t * obj, uint8_t part, lv_style_prop
         }
 #endif
 
-        lv_state_t state = lv_obj_get_state(parent, part);
+        lv_state_t state = lv_obj_get_state(parent);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
         res = _lv_style_list_get_opa(list, prop, &value_act);
@@ -629,7 +629,7 @@ const void * _lv_obj_get_style_ptr(const lv_obj_t * obj, uint8_t part, lv_style_
             }
         }
 #endif
-        lv_state_t state = lv_obj_get_state(parent, part);
+        lv_state_t state = lv_obj_get_state(parent);
         prop = (uint16_t)prop_ori + ((uint16_t)state << LV_STYLE_STATE_POS);
 
         res = _lv_style_list_get_ptr(list, prop, &value_act);
@@ -1279,7 +1279,7 @@ static _lv_style_state_cmp_t style_snapshot_compare(style_snapshot_t * shot1, st
     if(shot1->pad_inner != shot2->pad_inner) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->margin_top != shot2->margin_top) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->margin_bottom != shot2->margin_bottom) return _LV_STYLE_STATE_CMP_DIFF;
-    if(shot1->margin_left != shot2->margin_right) return _LV_STYLE_STATE_CMP_DIFF;
+    if(shot1->margin_left != shot2->margin_left) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->margin_right != shot2->margin_right) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->margin_top != shot2->margin_top) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->transform_width != shot2->transform_width) return _LV_STYLE_STATE_CMP_DIFF;
