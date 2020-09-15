@@ -1675,7 +1675,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  * 2: Best precision
  */
 #ifndef LV_LINEMETER_PRECISE
-#  define LV_LINEMETER_PRECISE    1
+#  ifdef CONFIG_LV_LINEMETER_PRECISE
+#    define LV_LINEMETER_PRECISE CONFIG_LV_LINEMETER_PRECISE
+#  else
+#    define  LV_LINEMETER_PRECISE    1
+#  endif
 #endif
 #endif
 
@@ -1773,6 +1777,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  else
 #    define  LV_ROLLER_INF_PAGES         7
 #  endif
+#endif
 #endif
 
 /*Slider (dependencies: lv_bar)*/
