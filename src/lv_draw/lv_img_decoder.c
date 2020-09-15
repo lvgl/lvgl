@@ -342,16 +342,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         }
 
         lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
-        user_data->f = lv_mem_alloc(sizeof(f));
-        LV_ASSERT_MEM(user_data->f);
-        if(user_data->f == NULL) {
-            LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
-            lv_img_decoder_built_in_close(decoder, dsc);
-            return LV_RES_INV;
-        }
-
-        _lv_memcpy_small(user_data->f, &f, sizeof(f));
-
+        user_data->f = f;
 #else
         LV_LOG_WARN("Image built-in decoder cannot read file because LV_USE_FILESYSTEM = 0");
         return LV_RES_INV;
@@ -523,7 +514,6 @@ void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_ds
 #if LV_USE_FILESYSTEM
         if(user_data->f) {
             lv_fs_close(user_data->f);
-            lv_mem_free(user_data->f);
         }
 #endif
         if(user_data->palette) lv_mem_free(user_data->palette);
