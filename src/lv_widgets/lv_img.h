@@ -103,10 +103,10 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y);
  * Set the rotation center of the image.
  * The image will be rotated around this point
  * @param img pointer to an image object
- * @param pivot_x rotation center x of the image
- * @param pivot_y rotation center y of the image
+ * @param x rotation center x of the image
+ * @param y rotation center y of the image
  */
-void lv_img_set_pivot(lv_obj_t * img, lv_coord_t pivot_x, lv_coord_t pivot_y);
+void lv_img_set_pivot(lv_obj_t * img, lv_coord_t x, lv_coord_t y);
 
 /**
  * Set the rotation angle of the image.
@@ -145,13 +145,6 @@ void lv_img_set_antialias(lv_obj_t * img, bool antialias);
  * @return the image source (symbol, file name or C array)
  */
 const void * lv_img_get_src(lv_obj_t * img);
-
-/**
- * Get the name of the file set for an image
- * @param img pointer to an image
- * @return file name
- */
-const char * lv_img_get_file_name(const lv_obj_t * img);
 
 /**
  * Get the auto size enable attribute
