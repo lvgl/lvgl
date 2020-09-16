@@ -586,19 +586,6 @@ bool _lv_obj_is_grid_item(lv_obj_t * obj)
     return false;
 }
 
-/**
- * Get the size of the virtual content on an object
- * (E.g. some texts which are "just drawn" and there is not real object behind them)
- * @param obj pointer to an object
- * @param p store the result size here
- */
-void _lv_obj_get_self_size(lv_obj_t * obj, lv_point_t * p)
-{
-    p->x = 0;
-    p->y = 0;
-    lv_signal_send(obj, LV_SIGNAL_GET_SELF_SIZE, p);
-}
-
 /**********************
  *   STATIC FUNCTIONS
  **********************/

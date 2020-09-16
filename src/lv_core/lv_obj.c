@@ -284,7 +284,11 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     /*Set attributes*/
     new_obj->scroll_mode  = LV_SCROLL_MODE_AUTO;
     new_obj->scroll_dir  = LV_DIR_ALL;
-    new_obj->flags = LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_SNAPABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE;
+    new_obj->flags = LV_OBJ_FLAG_CLICKABLE;
+    new_obj->flags |= LV_OBJ_FLAG_SNAPABLE;
+    new_obj->flags |= LV_OBJ_FLAG_PRESS_LOCK;
+    new_obj->flags |= LV_OBJ_FLAG_CLICK_FOCUSABLE;
+    new_obj->flags |= LV_OBJ_FLAG_SCROLLABLE;
     if(parent) new_obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
     new_obj->state = LV_STATE_DEFAULT;
     new_obj->scroll.x = 0;
@@ -1890,6 +1894,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
         }
 
+        /*If the changed children was a grid item refresh this objects grid*/
         if(obj->grid) {
             lv_obj_t * child = param;
             if(child) {

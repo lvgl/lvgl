@@ -130,7 +130,6 @@ enum {
     LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
     LV_SIGNAL_GET_TYPE,          /**< LVGL needs to retrieve the object's type */
     LV_SIGNAL_GET_STYLE,         /**< Get the style of an object*/
-    LV_SIGNAL_GET_SELF_SIZE,     /**< If there are virtual content on the widget get it's size*/
 
     /*Input device related*/
     LV_SIGNAL_HIT_TEST,          /**< Advanced hit-testing */

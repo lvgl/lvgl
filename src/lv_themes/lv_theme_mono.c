@@ -37,7 +37,6 @@ typedef struct {
     lv_style_t pad_none;
     lv_style_t pad_normal;
     lv_style_t pad_small;
-    lv_style_t pad_inner;
     lv_style_t txt_underline;
 
 #if LV_USE_ARC
@@ -137,7 +136,6 @@ static void basic_init(void)
     lv_style_set_pad_right(&styles->bg, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_top(&styles->bg, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_bottom(&styles->bg, LV_STATE_DEFAULT, LV_DPI / 10);
-    lv_style_set_pad_inner(&styles->bg, LV_STATE_DEFAULT, LV_DPI / 10);
 
     style_init_reset(&styles->clip_corner);
     lv_style_set_clip_corner(&styles->clip_corner, LV_STATE_DEFAULT, true);
@@ -190,24 +188,18 @@ static void basic_init(void)
     lv_style_set_pad_right(&styles->pad_none, LV_STATE_DEFAULT, 0);
     lv_style_set_pad_top(&styles->pad_none, LV_STATE_DEFAULT, 0);
     lv_style_set_pad_bottom(&styles->pad_none, LV_STATE_DEFAULT, 0);
-    lv_style_set_pad_inner(&styles->pad_none, LV_STATE_DEFAULT, 0);
 
     style_init_reset(&styles->pad_normal);
     lv_style_set_pad_left(&styles->pad_normal, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_right(&styles->pad_normal, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_top(&styles->pad_normal, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_bottom(&styles->pad_normal, LV_STATE_DEFAULT, LV_DPI / 10);
-    lv_style_set_pad_inner(&styles->pad_normal, LV_STATE_DEFAULT, LV_DPI / 10);
 
     style_init_reset(&styles->pad_small);
     lv_style_set_pad_left(&styles->pad_small, LV_STATE_DEFAULT, LV_DPI / 20);
     lv_style_set_pad_right(&styles->pad_small, LV_STATE_DEFAULT, LV_DPI / 20);
     lv_style_set_pad_top(&styles->pad_small, LV_STATE_DEFAULT, LV_DPI / 20);
     lv_style_set_pad_bottom(&styles->pad_small, LV_STATE_DEFAULT, LV_DPI / 20);
-    lv_style_set_pad_inner(&styles->pad_small, LV_STATE_DEFAULT, LV_DPI / 20);
-
-    style_init_reset(&styles->pad_inner);
-    lv_style_set_pad_inner(&styles->pad_inner, LV_STATE_DEFAULT, LV_DPI / 15);
 
     style_init_reset(&styles->txt_underline);
     lv_style_set_text_decor(&styles->txt_underline, LV_STATE_FOCUSED, LV_TEXT_DECOR_UNDERLINE);
@@ -590,7 +582,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_BTNMATRIX
         case LV_THEME_BTNMATRIX:
-            list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BG);
+            list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_MAIN);
             _lv_style_list_add_style(list, &styles->bg);
 
             list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BTN);

@@ -26,7 +26,7 @@ extern "C" {
 #error "lv_cb: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
-#include "../lv_core/lv_obj.h"
+#include "lv_label.h"
 
 /*********************
  *      DEFINES
@@ -38,12 +38,10 @@ extern "C" {
 
 /*Data of check box*/
 typedef struct {
-    /*No inherited ext, derived from the base object */
+    lv_label_ext_t label_ext;
 
     /*New data for this widget */
     lv_style_list_t style_bullet;
-    char * text;              /*Pointer to button*/
-    uint32_t static_txt :1;
 } lv_checkbox_ext_t;
 
 /** Checkbox styles. */
@@ -70,21 +68,28 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy);
  * Setter functions
  *====================*/
 
+
 /**
  * Set the text of a check box. `txt` will be copied and may be deallocated
  * after this function returns.
  * @param cb pointer to a check box
- * @param txt the text of the check box.
+ * @param txt the text of the check box. NULL to refresh with the current text.
  */
-void lv_checkbox_set_text(lv_obj_t * cb, const char * txt);
+static inline void lv_checkbox_set_text(lv_obj_t * cb, const char * txt)
+{
+    lv_label_set_text(cb, txt);
+}
 
 /**
  * Set the text of a check box. `txt` must not be deallocated during the life
  * of this checkbox.
  * @param cb pointer to a check box
- * @param txt the text of the check box.
+ * @param txt the text of the check box. NULL to refresh with the current text.
  */
-void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt);
+static inline void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt)
+{
+    lv_label_set_text_static(cb, txt);
+}
 
 /**
  * Set the state of the check box
@@ -117,7 +122,10 @@ static inline void lv_checkbox_set_disabled(lv_obj_t * cb, bool dis)
  * @param cb pointer to check box object
  * @return pointer to the text of the check box
  */
-const char * lv_checkbox_get_text(const lv_obj_t * cb);
+static inline const char * lv_checkbox_get_text(const lv_obj_t * cb)
+{
+    return lv_label_get_text(cb);
+}
 
 /**
  * Get the current state of the check box

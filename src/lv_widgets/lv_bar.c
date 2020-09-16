@@ -42,7 +42,6 @@ static lv_design_res_t lv_bar_design(lv_obj_t * bar, const lv_area_t * clip_area
 static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
 static lv_style_list_t * lv_bar_get_style(lv_obj_t * bar, uint8_t part);
 
-static void draw_bg(lv_obj_t * bar, const lv_area_t * clip_area);
 static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area);
 
 #if LV_USE_ANIMATION
@@ -112,6 +111,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * parent, lv_obj_t * copy)
 
     if(copy == NULL) {
         lv_obj_clear_flag(bar, LV_OBJ_FLAG_CHECKABLE);
+        lv_obj_clear_flag(bar, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_set_size(bar, LV_DPI * 2, LV_DPI / 10);
         lv_bar_set_value(bar, ext->cur_value, false);
 
@@ -370,7 +370,8 @@ static lv_design_res_t lv_bar_design(lv_obj_t * bar, const lv_area_t * clip_area
         return ancestor_design(bar, clip_area, mode);
     }
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-        draw_bg(bar, clip_area);
+//        draw_bg(bar, clip_area);
+        ancestor_design(bar, clip_area, mode);
         draw_indic(bar, clip_area);
 
         /*Get the value and draw it after the indicator*/
@@ -385,38 +386,9 @@ static lv_design_res_t lv_bar_design(lv_obj_t * bar, const lv_area_t * clip_area
         lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
-        /*If the border is drawn later disable loading other properties*/
-        if(lv_obj_get_style_border_post(bar, LV_OBJ_PART_MAIN)) {
-            lv_draw_rect_dsc_t draw_dsc;
-            lv_draw_rect_dsc_init(&draw_dsc);
-            draw_dsc.bg_opa = LV_OPA_TRANSP;
-            draw_dsc.pattern_opa = LV_OPA_TRANSP;
-            draw_dsc.outline_opa = LV_OPA_TRANSP;
-            draw_dsc.shadow_opa = LV_OPA_TRANSP;
-            draw_dsc.value_opa = LV_OPA_TRANSP;
-            lv_obj_init_draw_rect_dsc(bar, LV_OBJ_PART_MAIN, &draw_dsc);
-
-            lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
-        }
+        ancestor_design(bar, clip_area, mode);
     }
     return LV_DESIGN_RES_OK;
-}
-
-static void draw_bg(lv_obj_t * bar, const lv_area_t * clip_area)
-{
-    /*Simply draw the background*/
-    lv_draw_rect_dsc_t draw_dsc;
-    lv_draw_rect_dsc_init(&draw_dsc);
-    /*If the border is drawn later disable loading its properties*/
-    if(lv_obj_get_style_border_post(bar, LV_BAR_PART_MAIN)) {
-        draw_dsc.border_opa = LV_OPA_TRANSP;
-    }
-
-    /*value will be drawn later*/
-    draw_dsc.value_opa = LV_OPA_TRANSP;
-    lv_obj_init_draw_rect_dsc(bar, LV_BAR_PART_MAIN, &draw_dsc);
-    lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
-
 }
 
 static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area)

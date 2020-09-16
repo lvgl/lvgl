@@ -75,7 +75,6 @@ static void basic_init(void)
     lv_style_set_pad_right(&styles->bg, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_top(&styles->bg, LV_STATE_DEFAULT, LV_DPI / 10);
     lv_style_set_pad_bottom(&styles->bg, LV_STATE_DEFAULT, LV_DPI / 10);
-    lv_style_set_pad_inner(&styles->bg, LV_STATE_DEFAULT, LV_DPI / 10);
 
     style_init_reset(&styles->btn);
     lv_style_set_bg_color(&styles->btn, LV_STATE_PRESSED, lv_color_hex3(0xccc));
@@ -108,7 +107,6 @@ static void basic_init(void)
     lv_style_set_pad_right(&styles->tight, LV_STATE_DEFAULT, 0);
     lv_style_set_pad_top(&styles->tight, LV_STATE_DEFAULT, 0);
     lv_style_set_pad_bottom(&styles->tight, LV_STATE_DEFAULT, 0);
-    lv_style_set_pad_inner(&styles->tight, LV_STATE_DEFAULT, 0);
 }
 
 static void arc_init(void)
@@ -439,7 +437,7 @@ void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_BTNMATRIX
         case LV_THEME_BTNMATRIX:
-            list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BG);
+            list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_MAIN);
             _lv_style_list_add_style(list, &styles->bg);
 
             list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BTN);

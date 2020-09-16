@@ -231,14 +231,6 @@ void _lv_obj_move_children_by(struct _lv_obj_t * obj, lv_coord_t x_diff, lv_coor
  */
 bool _lv_obj_is_grid_item(struct _lv_obj_t * obj);
 
-/**
- * Get the size of the virtual content on an object
- * (E.g. some texts which are "just drawn" and there is not real object behind them)
- * @param obj pointer to an object
- * @param p store the result size here
- */
-void _lv_obj_get_self_size(lv_obj_t * obj, lv_point_t * p);
-
 /**********************
  *      MACROS
  **********************/

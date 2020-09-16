@@ -815,7 +815,6 @@ void _lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t pro
         case LV_STYLE_PAD_BOTTOM:
         case LV_STYLE_PAD_LEFT:
         case LV_STYLE_PAD_RIGHT:
-        case LV_STYLE_PAD_INNER:
         case LV_STYLE_MARGIN_TOP:
         case LV_STYLE_MARGIN_BOTTOM:
         case LV_STYLE_MARGIN_LEFT:
@@ -1243,7 +1242,6 @@ static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot
     shot->pad_bottom = lv_obj_get_style_pad_bottom(obj, part);
     shot->pad_right = lv_obj_get_style_pad_right(obj, part);
     shot->pad_left = lv_obj_get_style_pad_left(obj, part);
-    shot->pad_inner = lv_obj_get_style_pad_inner(obj, part);
     shot->margin_top = lv_obj_get_style_margin_top(obj, part);
     shot->margin_bottom = lv_obj_get_style_margin_bottom(obj, part);
     shot->margin_left = lv_obj_get_style_margin_left(obj, part);
@@ -1276,7 +1274,6 @@ static _lv_style_state_cmp_t style_snapshot_compare(style_snapshot_t * shot1, st
     if(shot1->pad_left != shot2->pad_right) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->pad_right != shot2->pad_right) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->pad_top != shot2->pad_top) return _LV_STYLE_STATE_CMP_DIFF;
-    if(shot1->pad_inner != shot2->pad_inner) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->margin_top != shot2->margin_top) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->margin_bottom != shot2->margin_bottom) return _LV_STYLE_STATE_CMP_DIFF;
     if(shot1->margin_left != shot2->margin_left) return _LV_STYLE_STATE_CMP_DIFF;

@@ -397,6 +397,8 @@ void _lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
  */
 void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
 {
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE) == false) return;
+
     lv_scroll_dir_t sm = lv_obj_get_scroll_mode(obj);
     if(sm == LV_SCROLL_MODE_OFF) {
         return;

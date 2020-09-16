@@ -66,6 +66,10 @@ void _lv_scroll_handler(lv_indev_proc_t * proc)
          *  4. If can be scrolled on the current axis (hor/ver) save it as candidate (at least show an elastic scroll effect)
          *  5. Use the last candidate. Always the "deepest" parent or the object from point 3 */
         while(proc->types.pointer.scroll_obj) {
+            if(lv_obj_has_flag(proc->types.pointer.scroll_obj, LV_OBJ_FLAG_SCROLLABLE) == false) {
+                proc->types.pointer.scroll_obj = lv_obj_get_parent(proc->types.pointer.scroll_obj);
+                continue;
+            }
 
             /*Decide if it's a horizontal or vertical scroll*/
             bool hor_en = false;

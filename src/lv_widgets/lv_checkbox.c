@@ -54,7 +54,7 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("check box create started");
 
     /*Create the ancestor basic object*/
-    lv_obj_t * cb = lv_obj_create(par, copy);
+    lv_obj_t * cb = lv_label_create(par, copy);
     LV_ASSERT_MEM(cb);
     if(cb == NULL) return NULL;
 
@@ -68,8 +68,6 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy)
         return NULL;
     }
 
-    ext->static_txt = 1;
-    ext->text = "Check box";
     lv_style_list_init(&ext->style_bullet);
 
     lv_obj_set_signal_cb(cb, lv_checkbox_signal);
@@ -77,9 +75,9 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new checkbox object*/
     if(copy == NULL) {
+        lv_label_set_text_static(cb, "Check box");
         lv_theme_apply(cb, LV_THEME_CHECKBOX);
         lv_obj_add_flag(cb, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_set_size(cb, LV_SIZE_AUTO, LV_SIZE_AUTO);
 
     }
     else {
@@ -87,12 +85,6 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_checkbox_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_style_list_copy(&ext->style_bullet, &copy_ext->style_bullet);
 
-        ext->static_txt = copy_ext->static_txt;
-        if(copy_ext->static_txt) ext->text = copy_ext->text;
-        else {
-            ext->text = lv_mem_alloc(strlen(copy_ext->text) + 1);
-            strcpy(ext->text, copy_ext->text);
-        }
         /*Refresh the style with new signal function*/
         _lv_obj_refresh_style(cb, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
@@ -106,65 +98,9 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy)
  * Setter functions
  *====================*/
 
-/**
- * Set the text of a check box. `txt` will be copied and may be deallocated
- * after this function returns.
- * @param cb pointer to a check box
- * @param txt the text of the check box. NULL to refresh with the current text.
- */
-void lv_checkbox_set_text(lv_obj_t * cb, const char * txt)
-{
-    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
-
-    lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
-    if(ext->static_txt) {
-        ext->static_txt = 0;
-        ext->text = NULL;
-    }
-
-    ext->text = lv_mem_realloc(ext->text, strlen(txt) + 1);
-    strcpy(ext->text, txt);
-
-    lv_signal_send(cb, LV_SIGNAL_CHILD_CHG, NULL);
-
-}
-
-/**
- * Set the text of a check box. `txt` must not be deallocated during the life
- * of this checkbox.
- * @param cb pointer to a check box
- * @param txt the text of the check box. NULL to refresh with the current text.
- */
-void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt)
-{
-    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
-
-    lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
-    if(ext->static_txt == 0)  {
-        ext->static_txt = 1;
-        lv_mem_free(ext->text);
-        ext->text = NULL;
-    }
-
-    ext->text = txt;
-}
-
 /*=====================
  * Getter functions
  *====================*/
-
-/**
- * Get the text of a check box
- * @param cb pointer to check box object
- * @return pointer to the text of the check box
- */
-const char * lv_checkbox_get_text(const lv_obj_t * cb)
-{
-    LV_ASSERT_OBJ(cb, LV_OBJX_NAME);
-
-    lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
-    return ext->text;
-}
 
 /**********************
  *   STATIC FUNCTIONS
@@ -192,19 +128,12 @@ static lv_design_res_t lv_checkbox_design(lv_obj_t * cb, const lv_area_t * clip_
         lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
 
         const lv_font_t * font = lv_obj_get_style_text_font(cb, LV_CHECKBOX_PART_MAIN);
-        lv_style_int_t letter_sp = lv_obj_get_style_text_letter_space(cb, LV_CHECKBOX_PART_MAIN);
-        lv_style_int_t line_sp = lv_obj_get_style_text_line_space(cb, LV_CHECKBOX_PART_MAIN);
-       lv_coord_t line_height = lv_font_get_line_height(font);
+        lv_coord_t line_height = lv_font_get_line_height(font);
 
-        lv_coord_t bg_leftp = lv_obj_get_style_pad_left(cb, LV_CHECKBOX_PART_MAIN);
-        lv_coord_t bg_rightp = lv_obj_get_style_pad_right(cb, LV_CHECKBOX_PART_MAIN);
         lv_coord_t bg_topp = lv_obj_get_style_pad_top(cb, LV_CHECKBOX_PART_MAIN);
-        lv_coord_t bg_bottomp = lv_obj_get_style_pad_bottom(cb, LV_CHECKBOX_PART_MAIN);
 
         lv_coord_t bullet_leftm = lv_obj_get_style_margin_left(cb, LV_CHECKBOX_PART_BULLET);
-        lv_coord_t bullet_rightm = lv_obj_get_style_margin_right(cb, LV_CHECKBOX_PART_BULLET);
         lv_coord_t bullet_topm = lv_obj_get_style_margin_top(cb, LV_CHECKBOX_PART_BULLET);
-        lv_coord_t bullet_bottomm = lv_obj_get_style_margin_bottom(cb, LV_CHECKBOX_PART_BULLET);
 
         lv_coord_t bullet_leftp = lv_obj_get_style_pad_left(cb, LV_CHECKBOX_PART_BULLET);
         lv_coord_t bullet_rightp = lv_obj_get_style_pad_right(cb, LV_CHECKBOX_PART_BULLET);
@@ -215,27 +144,12 @@ static lv_design_res_t lv_checkbox_design(lv_obj_t * cb, const lv_area_t * clip_
         lv_draw_rect_dsc_init(&bullet_dsc);
         lv_obj_init_draw_rect_dsc(cb, LV_CHECKBOX_PART_BULLET, &bullet_dsc);
         lv_area_t bullet_area;
-        bullet_area.x1 = cb->coords.x1 + bg_leftp + bullet_leftm;
-        bullet_area.x2 = bullet_area.x1 + line_height + bullet_leftp + bullet_rightp;
-        bullet_area.y1 = cb->coords.y1 + bg_topp + bullet_topm;
-        bullet_area.y2 = bullet_area.y1 + line_height + bullet_topp + bullet_bottomp;
+        bullet_area.x1 = cb->coords.x1 + bullet_leftm;
+        bullet_area.x2 = bullet_area.x1 + line_height + bullet_leftp + bullet_rightp - 1;
+        bullet_area.y1 = cb->coords.y1 + bg_topp - bullet_topp + bullet_topm;
+        bullet_area.y2 = bullet_area.y1 + line_height + bullet_topp + bullet_bottomp - 1;
 
         lv_draw_rect(&bullet_area, clip_area, &bullet_dsc);
-
-        lv_point_t text_size;
-        _lv_txt_get_size(&text_size, ext->text, font, letter_sp, line_sp, LV_COORD_MAX, LV_TXT_FLAG_RECOLOR);
-
-        lv_coord_t y_ofs = (lv_area_get_height(&bullet_area) - line_height) / 2;    /*Align the text to the bullet's center line*/
-        lv_area_t text_area;
-        text_area.x1 = bullet_area.x2 + bullet_rightm;
-        text_area.x2 = text_area.x1 + text_size.x;
-        text_area.y1 = bullet_area.y1 + bg_topp + y_ofs;
-        text_area.y2 = text_area.y1 + text_size.y;
-
-        lv_draw_label_dsc_t label_dsc;
-        lv_draw_label_dsc_init(&label_dsc);
-        lv_obj_init_draw_label_dsc(cb, LV_CHECKBOX_PART_MAIN, &label_dsc);
-        lv_draw_label(&text_area, clip_area, &label_dsc, ext->text, NULL);
     } else {
         ancestor_design(cb, clip_area, mode);
     }
@@ -266,33 +180,6 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * cb, lv_signal_t sign, void * param
     }
     else if (sign == LV_SIGNAL_GET_TYPE) {
         return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
-    }
-    else if (sign == LV_SIGNAL_GET_SELF_SIZE) {
-        const lv_font_t * font = lv_obj_get_style_text_font(cb, LV_CHECKBOX_PART_MAIN);
-        lv_style_int_t letter_sp = lv_obj_get_style_text_letter_space(cb, LV_CHECKBOX_PART_MAIN);
-        lv_style_int_t line_sp = lv_obj_get_style_text_line_space(cb, LV_CHECKBOX_PART_MAIN);
-        lv_point_t text_size;
-        _lv_txt_get_size(&text_size, ext->text, font, letter_sp, line_sp, LV_COORD_MAX, LV_TXT_FLAG_RECOLOR);
-
-        lv_coord_t line_height = lv_font_get_line_height(font);
-
-        lv_coord_t bullet_leftm = lv_obj_get_style_margin_left(cb, LV_CHECKBOX_PART_BULLET);
-        lv_coord_t bullet_rightm = lv_obj_get_style_margin_right(cb, LV_CHECKBOX_PART_BULLET);
-        lv_coord_t bullet_topm = lv_obj_get_style_margin_top(cb, LV_CHECKBOX_PART_BULLET);
-        lv_coord_t bullet_bottomm = lv_obj_get_style_margin_bottom(cb, LV_CHECKBOX_PART_BULLET);
-
-        lv_coord_t bullet_leftp = lv_obj_get_style_pad_left(cb, LV_CHECKBOX_PART_BULLET);
-        lv_coord_t bullet_rightp = lv_obj_get_style_pad_right(cb, LV_CHECKBOX_PART_BULLET);
-        lv_coord_t bullet_topp = lv_obj_get_style_pad_top(cb, LV_CHECKBOX_PART_BULLET);
-        lv_coord_t bullet_bottomp = lv_obj_get_style_pad_bottom(cb, LV_CHECKBOX_PART_BULLET);
-
-        lv_point_t bullet_size;
-        bullet_size.x = line_height + bullet_leftm + bullet_rightm + bullet_leftp + bullet_rightp;
-        bullet_size.y = line_height + bullet_topm + bullet_bottomm + bullet_topp + bullet_bottomp;
-
-        lv_point_t * size_res = param;
-        size_res->x = bullet_size.x + text_size.x;
-        size_res->y = LV_MATH_MAX(bullet_size.y, text_size.y);
     }
 
     return res;

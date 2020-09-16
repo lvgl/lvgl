@@ -80,7 +80,6 @@ typedef struct {
     lv_style_t bg_click;
     lv_style_t bg_sec;
     lv_style_t btn;
-    lv_style_t pad_inner;
     lv_style_t pad_small;
 
 #if LV_USE_ARC
@@ -92,6 +91,10 @@ typedef struct {
 #if LV_USE_BAR
     lv_style_t bar_bg;
     lv_style_t bar_indic;
+#endif
+
+#if LV_USE_BTNMATRIX
+    lv_style_t btnmatrix_btn;
 #endif
 
 #if LV_USE_CALENDAR
@@ -236,7 +239,6 @@ static void basic_init(void)
     lv_style_set_pad_right(&styles->bg, LV_STATE_DEFAULT, PAD_DEF + BORDER_WIDTH);
     lv_style_set_pad_top(&styles->bg, LV_STATE_DEFAULT, PAD_DEF + BORDER_WIDTH);
     lv_style_set_pad_bottom(&styles->bg, LV_STATE_DEFAULT, PAD_DEF + BORDER_WIDTH);
-    lv_style_set_pad_inner(&styles->bg, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_transition_time(&styles->bg, LV_STATE_DEFAULT, TRANSITION_TIME);
     lv_style_set_transition_prop_6(&styles->bg, LV_STATE_DEFAULT, LV_STYLE_BORDER_COLOR);
 
@@ -308,7 +310,6 @@ static void basic_init(void)
     lv_style_set_pad_right(&styles->btn, LV_STATE_DEFAULT, LV_DPX(40));
     lv_style_set_pad_top(&styles->btn, LV_STATE_DEFAULT, LV_DPX(15));
     lv_style_set_pad_bottom(&styles->btn, LV_STATE_DEFAULT, LV_DPX(15));
-    lv_style_set_pad_inner(&styles->btn, LV_STATE_DEFAULT, LV_DPX(20));
     lv_style_set_outline_width(&styles->btn, LV_STATE_DEFAULT, OUTLINE_WIDTH);
     lv_style_set_outline_opa(&styles->btn, LV_STATE_DEFAULT, LV_OPA_0);
     lv_style_set_outline_opa(&styles->btn, LV_STATE_FOCUSED, LV_OPA_50);
@@ -321,18 +322,12 @@ static void basic_init(void)
     lv_style_set_transition_delay(&styles->btn, LV_STATE_DEFAULT, TRANSITION_TIME);
     lv_style_set_transition_delay(&styles->btn, LV_STATE_PRESSED, 0);
 
-    style_init_reset(&styles->pad_inner);
-
-    lv_style_set_pad_inner(&styles->pad_inner, LV_STATE_DEFAULT,
-                           lv_disp_get_size_category(NULL) <= LV_DISP_MEDIUM_LIMIT ? LV_DPX(20) : LV_DPX(40));
-
     style_init_reset(&styles->pad_small);
     lv_style_int_t pad_small_value = lv_disp_get_size_category(NULL) <= LV_DISP_MEDIUM_LIMIT ? LV_DPX(10) : LV_DPX(20);
     lv_style_set_pad_left(&styles->pad_small, LV_STATE_DEFAULT,  pad_small_value);
     lv_style_set_pad_right(&styles->pad_small, LV_STATE_DEFAULT, pad_small_value);
     lv_style_set_pad_top(&styles->pad_small, LV_STATE_DEFAULT,  pad_small_value);
     lv_style_set_pad_bottom(&styles->pad_small, LV_STATE_DEFAULT, pad_small_value);
-    lv_style_set_pad_inner(&styles->pad_small, LV_STATE_DEFAULT, pad_small_value);
 }
 
 static void cont_init(void)
@@ -346,6 +341,14 @@ static void btn_init(void)
 {
 #if LV_USE_BTN != 0
 
+#endif
+}
+
+static void btnmatrix_init(void)
+{
+#if LV_USE_BTNMATRIX != 0
+    style_init_reset(&styles->btnmatrix_btn);
+    lv_style_set_margin_all(&styles->btnmatrix_btn, LV_STATE_DEFAULT, LV_DPX(10));
 #endif
 }
 
@@ -623,12 +626,14 @@ static void checkbox_init(void)
 #if LV_USE_CHECKBOX != 0
     style_init_reset(&styles->cb_bg);
     lv_style_set_radius(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(4));
-    lv_style_set_pad_inner(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(10));
+    lv_style_set_pad_left(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(30));
+    lv_style_set_pad_top(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(3));
+    lv_style_set_pad_bottom(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(3));
     lv_style_set_outline_color(&styles->cb_bg, LV_STATE_DEFAULT, theme.color_primary);
     lv_style_set_outline_opa(&styles->cb_bg, LV_STATE_DEFAULT, LV_OPA_TRANSP);
     lv_style_set_outline_opa(&styles->cb_bg, LV_STATE_FOCUSED, LV_OPA_50);
     lv_style_set_outline_width(&styles->cb_bg, LV_STATE_DEFAULT, OUTLINE_WIDTH);
-    lv_style_set_outline_pad(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(10));
+    lv_style_set_outline_pad(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(6));
     lv_style_set_transition_time(&styles->cb_bg, LV_STATE_DEFAULT, TRANSITION_TIME);
     lv_style_set_transition_prop_6(&styles->cb_bg, LV_STATE_DEFAULT, LV_STYLE_OUTLINE_OPA);
 
@@ -647,10 +652,6 @@ static void checkbox_init(void)
     lv_style_set_pad_bottom(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
     lv_style_set_margin_right(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(6));
 #endif
-}
-
-static void btnmatrix_init(void)
-{
 }
 
 static void keyboard_init(void)
@@ -927,6 +928,7 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
     basic_init();
     cont_init();
     btn_init();
+    btnmatrix_init();
     label_init();
     bar_init();
     img_init();
@@ -942,7 +944,6 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
     calendar_init();
     cpicker_init();
     checkbox_init();
-    btnmatrix_init();
     keyboard_init();
     msgbox_init();
     page_init();
@@ -996,13 +997,14 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_BTNMATRIX
         case LV_THEME_BTNMATRIX:
-            list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BG);
+            list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_MAIN);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->pad_small);
 
             list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BTN);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->bg_click);
+            _lv_style_list_add_style(list, &styles->btnmatrix_btn);
             break;
 #endif
 
