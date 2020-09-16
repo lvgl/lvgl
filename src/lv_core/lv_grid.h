@@ -46,11 +46,15 @@ extern "C" {
 #define _GRID_CELL_SIZE_FR    1     /* The cell size is set in free units*/
 
 #define LV_GRID_FR(x)   (LV_COORD_MAX + (x))
+#define LV_GRID_FILL(x)   (LV_COORD_MAX + 256 + (x))
 
-#define _GRID_IS_PX(x) ((_GRID_IS_FR(x) == false) && (_GRID_IS_AUTO(x) == false) ? true : false)
-#define _GRID_IS_FR(x) (x > LV_COORD_MAX ? true : false)
-#define _GRID_IS_AUTO(x) (x == LV_GRID_AUTO ? true : false)
-#define _GRID_GET_FR(x) ((x) - LV_COORD_MAX)
+#define _GRID_FR_MAX        256
+#define _GRID_IS_PX(x)      ((_GRID_IS_FR(x) == false) && (_GRID_IS_AUTO(x) == false) ? true : false)
+#define _GRID_IS_FR(x)      ((x) > LV_COORD_MAX && (x) <  LV_COORD_MAX + _GRID_FR_MAX ? true : false)
+#define _GRID_IS_FILL(x)    ((x) > LV_COORD_MAX + _GRID_FR_MAX ? true : false)
+#define _GRID_IS_AUTO(x)    (x == LV_GRID_AUTO ? true : false)
+#define _GRID_GET_FR(x)     ((x) - LV_COORD_MAX)
+#define _GRID_GET_FILL(x)     ((x) - LV_COORD_MAX - _GRID_FR_MAX)
 
 
 /**
@@ -86,6 +90,7 @@ typedef struct {
     lv_coord_t row_gap;
     uint8_t col_place;
     uint8_t row_place;
+
 }lv_grid_t;
 
 typedef struct {
@@ -138,6 +143,20 @@ void _lv_grid_calc_free(_lv_grid_calc_t * calc);
 bool _lv_grid_has_fr_col(struct _lv_obj_t * obj);
 
 bool _lv_grid_has_fr_row(struct _lv_obj_t * obj);
+
+
+/**
+ * Check if the object's grid columns are "fill" type
+ * @param obj pointer to an object
+ * @return true: fill type; false: not fill type
+ */
+bool _lv_grid_has_fill_col(struct _lv_obj_t * obj);
+/**
+ * Check if the object's grid rows are "fill" type
+ * @param obj pointer to an object
+ * @return true: fill type; false: not fill type
+ */
+bool _lv_grid_has_fill_row(struct _lv_obj_t * obj);
 
 void _lv_grid_full_refresh(lv_obj_t * cont);
 

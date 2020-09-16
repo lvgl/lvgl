@@ -120,8 +120,8 @@ void _lv_grid_calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
         calc_implicit_rows(cont, calc_out);
     }
     else if(!cont->grid->col_dsc && cont->grid->row_dsc) {
-        calc_implicit_cols(cont, calc_out);
         calc_explicit_rows(cont, calc_out);
+        calc_implicit_cols(cont, calc_out);
     }
 
     bool auto_w = cont->w_set == LV_SIZE_AUTO ? true : false;
@@ -182,6 +182,37 @@ bool _lv_grid_has_fr_row(struct _lv_obj_t * obj)
 
     return false;
 }
+
+/**
+ * Check if the object's grid columns are "fill" type
+ * @param obj pointer to an object
+ * @return true: fill type; false: not fill type
+ */
+bool _lv_grid_has_fill_col(struct _lv_obj_t * obj)
+{
+    if(obj->grid == NULL) return false;
+    if(obj->grid->col_dsc == NULL)  return false;
+    if(obj->grid->col_dsc_len != 1)  return false;
+    if(_GRID_IS_FILL(obj->grid->col_dsc[0]) == false) return false;
+
+    return true;
+}
+
+/**
+ * Check if the object's grid rows are "fill" type
+ * @param obj pointer to an object
+ * @return true: fill type; false: not fill type
+ */
+bool _lv_grid_has_fill_row(struct _lv_obj_t * obj)
+{
+    if(obj->grid == NULL) return false;
+    if(obj->grid->row_dsc == NULL)  return false;
+    if(obj->grid->row_dsc_len != 1)  return false;
+    if(_GRID_IS_FILL(obj->grid->row_dsc[0]) == false) return false;
+
+    return true;
+}
+
 
 /**
  * Refresh the all grid item on a container
@@ -246,33 +277,52 @@ static void calc_explicit_cols(lv_obj_t * cont, _lv_grid_calc_t * calc)
     const lv_grid_t * grid = cont->grid;
     uint32_t i;
 
-    calc->col_num = grid->col_dsc_len;
+    lv_coord_t cont_w = lv_obj_get_width_fit(cont);
+    bool filled = false;
+    if(grid->col_dsc_len == 1 && _GRID_IS_FILL(grid->col_dsc[0])) filled = true;
+
+    if(filled) {
+        lv_coord_t fill_w = _GRID_GET_FILL(grid->col_dsc[0]);
+        /* Get number of tracks fitting to the content
+         * Add the gap to cont_w because here is no gap after the last track so compensate it*/
+        calc->col_num = (cont_w + grid->col_gap) / (fill_w + grid->col_gap);
+    } else {
+        calc->col_num = grid->col_dsc_len;
+    }
     calc->x = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->col_num);
     calc->w = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->col_num);
 
-    uint32_t col_fr_cnt = 0;
-    lv_coord_t grid_w = 0;
-    bool auto_w = cont->w_set == LV_SIZE_AUTO ? true : false;
-
-    for(i = 0; i < grid->col_dsc_len; i++) {
-        lv_coord_t x = grid->col_dsc[i];
-        if(_GRID_IS_FR(x)) col_fr_cnt += _GRID_GET_FR(x);
-        else {
-            calc->w[i] = x;
-            grid_w += x;
+    /*If filled, it's simple: every track has fill size*/
+    if(filled) {
+        lv_coord_t fill_w = _GRID_GET_FILL(grid->col_dsc[0]);
+        for(i = 0; i < calc->col_num; i++) {
+            calc->w[i] = fill_w;
         }
-    }
+    } else {
+        uint32_t col_fr_cnt = 0;
+        lv_coord_t grid_w = 0;
+        bool auto_w = cont->w_set == LV_SIZE_AUTO ? true : false;
 
-    lv_coord_t cont_w = lv_obj_get_width_fit(cont) - grid->col_gap * (grid->col_dsc_len - 1);
-    lv_coord_t free_w = cont_w - grid_w;
-
-    for(i = 0; i < grid->col_dsc_len; i++) {
-        lv_coord_t x = grid->col_dsc[i];
-        if(_GRID_IS_FR(x)) {
-            if(auto_w) calc->w[i] = 0;   /*Fr is considered zero if the cont has auto width*/
+        for(i = 0; i < calc->col_num; i++) {
+            lv_coord_t x = grid->col_dsc[i];
+            if(_GRID_IS_FR(x)) col_fr_cnt += _GRID_GET_FR(x);
             else {
-                lv_coord_t f = _GRID_GET_FR(x);
-                calc->w[i] = (free_w * f) / col_fr_cnt;
+                calc->w[i] = x;
+                grid_w += x;
+            }
+        }
+
+        cont_w -= grid->col_gap * (calc->col_num - 1);
+        lv_coord_t free_w = cont_w - grid_w;
+
+        for(i = 0; i < calc->col_num; i++) {
+            lv_coord_t x = grid->col_dsc[i];
+            if(_GRID_IS_FR(x)) {
+                if(auto_w) calc->w[i] = 0;   /*Fr is considered zero if the cont has auto width*/
+                else {
+                    lv_coord_t f = _GRID_GET_FR(x);
+                    calc->w[i] = (free_w * f) / col_fr_cnt;
+                }
             }
         }
     }
@@ -355,7 +405,7 @@ static void calc_implicit_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
 
     const lv_grid_t * grid = cont->grid;
     uint32_t child_cnt = lv_obj_count_children(cont);
-    calc->row_num  = ((child_cnt + grid->col_dsc_len - 1) / grid->col_dsc_len); /*+ grid->col_dsc_len - 1 to round up*/
+    calc->row_num  = ((child_cnt + calc->col_num - 1) / calc->col_num); /*+ grid->col_dsc_len - 1 to round up*/
     calc->h = _lv_mem_buf_get(sizeof(lv_coord_t) * (calc->row_num + 1));   /*+1 to allow some limit checks later*/
     calc->y = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->row_num);
 
@@ -370,7 +420,7 @@ static void calc_implicit_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
             else h = lv_obj_get_height(child);
             calc->h[row_i] = LV_MATH_MAX(calc->h[row_i], h);
             col_i++;
-            if(col_i == grid->col_dsc_len) {
+            if(col_i == calc->col_num) {
                 col_i = 0;
                 row_i++;
                 calc->h[row_i] = 0;
@@ -413,12 +463,12 @@ static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc,
 
             if(cont->grid->row_dsc == NULL) {
                 hint->col++;
-                if(hint->col >= cont->grid->col_dsc_len) {
+                if(hint->col >= calc->col_num) {
                     hint->col = 0;
                     hint->row++;
                 }
             } else {
-                if(hint->row >= cont->grid->row_dsc_len) {
+                if(hint->row >= calc->row_num) {
                     hint->row = 0;
                     hint->col++;
                 }
@@ -438,11 +488,11 @@ static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc,
             }
 
             if(cont->grid->row_dsc == NULL) {
-                col_pos = child_id % cont->grid->col_dsc_len;
-                row_pos = child_id / cont->grid->col_dsc_len;
+                col_pos = child_id % calc->col_num;
+                row_pos = child_id / calc->col_num;
             } else {
-                col_pos = child_id / cont->grid->row_dsc_len;
-                row_pos = child_id % cont->grid->row_dsc_len;
+                col_pos = child_id / calc->row_num;
+                row_pos = child_id % calc->row_num;
             }
         }
     }
@@ -452,7 +502,7 @@ static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc,
     lv_coord_t col_w = col_x2 - col_x1;
 
     lv_coord_t row_y1 = calc->y[row_pos];
-    lv_coord_t row_y2 = calc->y[row_pos + row_span - 1] + calc->h[col_pos + col_span - 1];
+    lv_coord_t row_y2 = calc->y[row_pos + row_span - 1] + calc->h[row_pos + row_span - 1];
     lv_coord_t row_h = row_y2 - row_y1;
 
     uint8_t x_flag = _GRID_GET_CELL_FLAG(item->x_set);
@@ -549,6 +599,7 @@ static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t plac
         /*With spaced placements gap will be calculated from the remaining space*/
         if(place == LV_GRID_SPACE_AROUND || place == LV_GRID_SPACE_BETWEEN || place == LV_GRID_SPACE_EVENLY) {
             gap = 0;
+            if(track_num == 1) place = LV_GRID_CENTER;
         }
 
         /*Get the full grid size with gap*/

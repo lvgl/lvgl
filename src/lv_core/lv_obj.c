@@ -1883,8 +1883,14 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {
-        if(param && ((lv_area_get_width(param) != lv_obj_get_width(obj) && _lv_grid_has_fr_col(obj)) ||
-                     (lv_area_get_height(param) != lv_obj_get_height(obj) && _lv_grid_has_fr_row(obj))))
+            bool col_fr =   _lv_grid_has_fr_col(obj);
+            bool col_fill = _lv_grid_has_fill_col(obj);
+            bool row_fr =   _lv_grid_has_fr_row(obj);
+            bool row_fill = _lv_grid_has_fill_row(obj);
+
+            if(param == NULL ||
+              (lv_area_get_width(param) != lv_obj_get_width(obj) && (col_fr || col_fill)) ||
+              (lv_area_get_height(param) != lv_obj_get_height(obj) && (row_fr || row_fill)))
         {
             _lv_grid_full_refresh(obj);
         }
