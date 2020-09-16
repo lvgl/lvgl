@@ -113,16 +113,17 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
                 break;
         }
 
-        if(_lv_mem_get_size(_lv_font_decompr_buf) < buf_size) {
-            _lv_font_decompr_buf = lv_mem_realloc(_lv_font_decompr_buf, buf_size);
-            LV_ASSERT_MEM(_lv_font_decompr_buf);
-            if(_lv_font_decompr_buf == NULL) return NULL;
+        if(_lv_mem_get_size(LV_GC_ROOT(_lv_font_decompr_buf)) < buf_size) {
+            LV_GC_ROOT(_lv_font_decompr_buf) = lv_mem_realloc(LV_GC_ROOT(_lv_font_decompr_buf), buf_size);
+            LV_ASSERT_MEM(LV_GC_ROOT(_lv_font_decompr_buf));
+            if(LV_GC_ROOT(_lv_font_decompr_buf) == NULL) return NULL;
         }
 
         bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED ? true : false;
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], _lv_font_decompr_buf, gdsc->box_w, gdsc->box_h, (uint8_t)fdsc->bpp,
+        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], LV_GC_ROOT(_lv_font_decompr_buf), gdsc->box_w, gdsc->box_h,
+                   (uint8_t)fdsc->bpp,
                    prefilter);
-        return _lv_font_decompr_buf;
+        return LV_GC_ROOT(_lv_font_decompr_buf);
 #else /* !LV_USE_FONT_COMPRESSED */
         return NULL;
 #endif
@@ -188,9 +189,9 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
  */
 void _lv_font_clean_up_fmt_txt(void)
 {
-    if(_lv_font_decompr_buf) {
-        lv_mem_free(_lv_font_decompr_buf);
-        _lv_font_decompr_buf = NULL;
+    if(LV_GC_ROOT(_lv_font_decompr_buf)) {
+        lv_mem_free(LV_GC_ROOT(_lv_font_decompr_buf));
+        LV_GC_ROOT(_lv_font_decompr_buf) = NULL;
     }
 }
 

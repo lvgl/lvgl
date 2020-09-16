@@ -303,7 +303,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
             lv_anim_set_path(&a, &path);
             lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
             lv_anim_start(&a);
-		}
+        }
 
 #else
         pwd_char_hider(ta);
@@ -386,7 +386,7 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
             lv_anim_set_path(&a, &path);
             lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
             lv_anim_start(&a);
-		}
+        }
 #else
         pwd_char_hider(ta);
 #endif
@@ -544,7 +544,7 @@ void lv_textarea_set_text(lv_obj_t * ta, const char * txt)
             lv_anim_set_path(&a, &path);
             lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
             lv_anim_start(&a);
-		}
+        }
 #else
         pwd_char_hider(ta);
 #endif
@@ -1484,6 +1484,8 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
             lv_textarea_set_cursor_pos(ta, 0);
         else if(c == LV_KEY_END)
             lv_textarea_set_cursor_pos(ta, LV_TEXTAREA_CURSOR_LAST);
+        else if(c == LV_KEY_ENTER && lv_textarea_get_one_line(ta))
+            lv_event_send(ta, LV_EVENT_APPLY, NULL);
         else {
             lv_textarea_add_char(ta, c);
         }

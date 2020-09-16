@@ -1281,10 +1281,12 @@ static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t x, lv_coord_t y)
     y -= label->coords.y1;
     uint32_t letter_i;
 
+    const char * txt = lv_label_get_text(label);
+
     lv_point_t p = {x, y};
     letter_i = lv_label_get_letter_on(label, &p);
+    uint32_t letter_i_byte_pos = _lv_txt_encoded_get_byte_id(txt, letter_i);
     uint16_t opt  = 0;
-    const char * txt  = lv_label_get_text(label);
     uint32_t i        = 0;
     uint32_t i_prev   = 0;
 
@@ -1293,7 +1295,7 @@ static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t x, lv_coord_t y)
         uint32_t letter = _lv_txt_encoded_next(txt, &i);
         /*Count the lines to reach the clicked letter. But ignore the last '\n' because it
          * still belongs to the clicked line*/
-        if(letter == '\n' && i_prev != letter_i) opt++;
+        if(letter == '\n' && i_prev != letter_i_byte_pos) opt++;
         i_prev = i;
     }
 

@@ -1229,6 +1229,9 @@ static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, const
         return;
     }
 
+    /*Can't draw zero sized images*/
+    if(img_w == 0 || img_h == 0) return;
+
     lv_area_t coords_tmp;
 
     if(dsc->pattern_repeat) {

@@ -452,7 +452,7 @@ void lv_arc_set_adjustable(lv_obj_t * arc, bool adjustable)
 {
     LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
 
-    lv_arc_ext_t *ext = (lv_arc_ext_t *)lv_obj_get_ext_attr(arc);
+    lv_arc_ext_t * ext = (lv_arc_ext_t *)lv_obj_get_ext_attr(arc);
     if(ext->adjustable == adjustable)
         return;
 
@@ -597,7 +597,7 @@ bool lv_arc_get_adjustable(lv_obj_t * arc)
 {
     LV_ASSERT_OBJ(arc, LV_OBJX_NAME);
 
-    lv_arc_ext_t *ext = (lv_arc_ext_t *)lv_obj_get_ext_attr(arc);
+    lv_arc_ext_t * ext = (lv_arc_ext_t *)lv_obj_get_ext_attr(arc);
     return ext->adjustable;
 }
 
@@ -1053,10 +1053,10 @@ static void get_knob_area(lv_obj_t * arc, const lv_point_t * center, lv_coord_t 
  */
 static void value_update(lv_obj_t * arc)
 {
-    lv_arc_ext_t *ext = (lv_arc_ext_t *)lv_obj_get_ext_attr(arc);
+    lv_arc_ext_t * ext = (lv_arc_ext_t *)lv_obj_get_ext_attr(arc);
 
     int16_t bg_midpoint, range_midpoint, bg_end = ext->bg_angle_end;
-    if (ext->bg_angle_end < ext->bg_angle_start) bg_end = ext->bg_angle_end + 360;
+    if(ext->bg_angle_end < ext->bg_angle_start) bg_end = ext->bg_angle_end + 360;
 
     int16_t angle;
     switch(ext->type) {
@@ -1064,11 +1064,12 @@ static void value_update(lv_obj_t * arc)
             bg_midpoint = (ext->bg_angle_start + bg_end) / 2;
             range_midpoint = (int32_t)(ext->min_value + ext->max_value) / 2;
 
-            if (ext->cur_value < range_midpoint) {
+            if(ext->cur_value < range_midpoint) {
                 angle = _lv_map(ext->cur_value, ext->min_value, range_midpoint, ext->bg_angle_start, bg_midpoint);
                 lv_arc_set_start_angle(arc, angle);
                 lv_arc_set_end_angle(arc, bg_midpoint);
-            } else {
+            }
+            else {
                 angle = _lv_map(ext->cur_value, range_midpoint, ext->max_value, bg_midpoint, bg_end);
                 lv_arc_set_start_angle(arc, bg_midpoint);
                 lv_arc_set_end_angle(arc, angle);
@@ -1081,6 +1082,7 @@ static void value_update(lv_obj_t * arc)
         default: /** LV_ARC_TYPE_NORMAL*/
             angle = _lv_map(ext->cur_value, ext->min_value, ext->max_value, ext->bg_angle_start, bg_end);
             lv_arc_set_end_angle(arc, angle);
+            lv_arc_set_start_angle(arc, ext->bg_angle_start);
     }
     ext->last_angle = angle; /*Cache angle for slew rate limiting*/
 }

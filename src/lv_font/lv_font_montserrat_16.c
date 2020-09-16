@@ -2400,6 +2400,10 @@ lv_font_t lv_font_montserrat_16 = {
 #if !(LVGL_VERSION_MAJOR == 6 && LVGL_VERSION_MINOR == 0)
     .subpx = LV_FONT_SUBPX_NONE,
 #endif
+#if LV_VERSION_CHECK(7, 4, 0)
+    .underline_position = -1,
+    .underline_thickness = 1,
+#endif
     .dsc = &font_dsc           /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
 };
 
