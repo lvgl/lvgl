@@ -71,9 +71,9 @@ typedef struct {
 
 /*Parts of the table*/
 enum {
-    LV_TABLE_PART_BG,     /* Because of this member, LV_PART.*CELL1 has enum value of 1,
-    LV_TABLE_PART_CELL1,     LV_PART.*CELL2 has an enum value of 2 and so on upto the maximum
-    LV_TABLE_PART_CELL2,     number of styles specified by LV_TABLE_CELL_STYLE_CNT */
+    LV_TABLE_PART_BG,     /* Because of this member, LV_PART.*CELL1 has enum value of 1,        */
+    LV_TABLE_PART_CELL1,  /*   LV_PART.*CELL2 has an enum value of 2 and so on upto the maximum */
+    LV_TABLE_PART_CELL2,  /*   number of styles specified by LV_TABLE_CELL_STYLE_CNT            */
     LV_TABLE_PART_CELL3,
     LV_TABLE_PART_CELL4,  /* CELL 5-16 are not needed to be defined, the values in this enum
                              are there for backward compatibility */
