@@ -948,31 +948,6 @@ static lv_style_list_t * lv_table_get_style(lv_obj_t * table, uint8_t part)
 
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
 
-#if 0 /* OBSOLETE: retained in pull request to clarify the change */
-    lv_style_list_t * style_dsc_p;
-
-    switch(part) {
-        case LV_TABLE_PART_BG:
-            style_dsc_p = &table->style_list;
-            break;
-        case LV_TABLE_PART_CELL1:
-            style_dsc_p = &ext->cell_style[0];
-            break;
-        case LV_TABLE_PART_CELL2:
-            style_dsc_p = &ext->cell_style[1];
-            break;
-        case LV_TABLE_PART_CELL3:
-            style_dsc_p = &ext->cell_style[2];
-            break;
-        case LV_TABLE_PART_CELL4:
-            style_dsc_p = &ext->cell_style[3];
-            break;
-        default:
-            style_dsc_p = NULL;
-    }
-
-    return style_dsc_p;
-#else
     /* Because of the presence of LV_TABLE_PART_BG, LV_TABLE_PART_CELL<i> has an integer value
        of <i>. This comes in useful to extend above code with more cell types as follows */
     if ( part == LV_TABLE_PART_BG ) {
@@ -980,8 +955,8 @@ static lv_style_list_t * lv_table_get_style(lv_obj_t * table, uint8_t part)
     } else if (part >= 1 && part <= LV_TABLE_CELL_STYLE_CNT ) {
       return &ext->cell_style[part-1];
     }
+
     return NULL;
-#endif
 }
 
 static void refr_size(lv_obj_t * table)
