@@ -3,9 +3,9 @@
 ## v7.6.0 (TBD)
 
 ### New features
-- Check wheter the any style property has changed on a state change to decide if any redraw is required
+- Check wheter any style property has changed on a state change to decide if any redraw is required
 
-## v7.5.0 (planned at 15.09.2020)
+## v7.5.0 (15.09.2020)
 
 ### New features
 - Add `clean_dcache_cb` and `lv_disp_clean_dcache` to enable users to use their own cache management function
