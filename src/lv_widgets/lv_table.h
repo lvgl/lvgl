@@ -32,7 +32,12 @@ extern "C" {
 #define LV_TABLE_COL_MAX 12
 #endif
 
-#define LV_TABLE_CELL_STYLE_CNT 4
+/* 
+   Maximum allowable value of LV_TABLE_CELL_STYLE_CNT is 16 
+   because of restriction of lv_table_cell_format_t.type to no more than
+   4 bits so that lv_table_cell_format_t.s will not exceed 8 bits
+*/
+#define LV_TABLE_CELL_STYLE_CNT 16
 /**********************
  *      TYPEDEFS
  **********************/
@@ -46,7 +51,7 @@ typedef union {
     struct {
         uint8_t align : 2;
         uint8_t right_merge : 1;
-        uint8_t type : 2;
+        uint8_t type : 4; // upto 16 values
         uint8_t crop : 1;
     } s;
     uint8_t format_byte;
@@ -61,16 +66,17 @@ typedef struct {
     lv_coord_t * row_h;
     lv_style_list_t cell_style[LV_TABLE_CELL_STYLE_CNT];
     lv_coord_t col_w[LV_TABLE_COL_MAX];
-    uint8_t cell_types : 4; /*Keep track which cell types exists to avoid dealing with unused ones*/
+    uint16_t cell_types : LV_TABLE_CELL_STYLE_CNT; /*Keep track which cell types exists to avoid dealing with unused ones*/
 } lv_table_ext_t;
 
 /*Parts of the table*/
 enum {
-    LV_TABLE_PART_BG,
-    LV_TABLE_PART_CELL1,
-    LV_TABLE_PART_CELL2,
+    LV_TABLE_PART_BG,     /* Because of this member, LV_PART.*CELL1 has enum value of 1,
+    LV_TABLE_PART_CELL1,     LV_PART.*CELL2 has an enum value of 2 and so on upto the maximum
+    LV_TABLE_PART_CELL2,     number of styles specified by LV_TABLE_CELL_STYLE_CNT */
     LV_TABLE_PART_CELL3,
-    LV_TABLE_PART_CELL4,
+    LV_TABLE_PART_CELL4,  /* CELL 5-16 are not needed to be defined, the values in this enum
+                             are there for backward compatibility */
 };
 
 /**********************
