@@ -763,7 +763,7 @@ uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coor
     return id;
 }
 
-lv_point_t lv_chart_get_coord_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id)
+lv_coord_t lv_chart_get_x_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id)
 {
 	LV_ASSERT_NULL(chart);
 	LV_ASSERT_NULL(ser);
@@ -776,18 +776,32 @@ lv_point_t lv_chart_get_coord_from_index(lv_obj_t * chart, lv_chart_series_t * s
 	get_series_area(chart, &series_area);
 
 	lv_coord_t w = lv_area_get_width(&series_area);
+
+	lv_coord_t x = {0};
+	x = (w * id) / (ext->point_cnt - 1);
+
+	return x;
+}
+
+lv_coord_t lv_chart_get_y_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id)
+{
+	LV_ASSERT_NULL(chart);
+	LV_ASSERT_NULL(ser);
+
+	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+	if(ext == NULL) return;
+	if(id >= ext->point_cnt) return;
+
+	lv_area_t series_area;
+	get_series_area(chart, &series_area);
+
 	lv_coord_t h = lv_area_get_height(&series_area);
 
-	lv_point_t point = {0};
-	point.x = (w * id) / (ext->point_cnt - 1);
+	int32_t y = (int32_t)((int32_t)ser->points[id] - ext->ymin[ser->y_axis]) * h;
+	y = y / (ext->ymax[ser->y_axis] - ext->ymin[ser->y_axis]);
+	y  = h - y;
 
-	int32_t y_tmp = (int32_t)((int32_t)ser->points[id] - ext->ymin[ser->y_axis]) * h;
-	y_tmp = y_tmp / (ext->ymax[ser->y_axis] - ext->ymin[ser->y_axis]);
-	point.y  = h - y_tmp;
-
-	return point;
-
-
+	return (lv_coord_t)y;
 }
 
 /*=====================
@@ -1266,7 +1280,7 @@ static void draw_cursors(lv_obj_t * chart, const lv_area_t * series_area, const 
 		p2.y = series_area->y1 + cursor->point.y;
 		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
 	}
-	
+
 	if(cursor->axes & LV_CHART_CURSOR_LEFT) {
 		p1.x = series_area->x1;
 		p1.y = series_area->y1 + cursor->point.y;

@@ -371,7 +371,8 @@ lv_coord_t lv_chart_get_point_id(lv_obj_t * chart, lv_chart_series_t * ser, uint
 lv_chart_axis_t lv_chart_get_series_axis(lv_obj_t * chart, lv_chart_series_t * ser);
 lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor);
 uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coord);
-lv_point_t lv_chart_get_coord_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id);
+lv_coord_t lv_chart_get_x_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id);
+lv_coord_t lv_chart_get_y_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id);
 /*=====================
  * Other functions
  *====================*/
