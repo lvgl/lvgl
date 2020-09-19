@@ -1250,24 +1250,7 @@ static void draw_cursors(lv_obj_t * chart, const lv_area_t * series_area, const 
 	line_dsc.color = cursor->color;
 	point_dsc.bg_color = cursor->color;
 
-	if(cursor->axes & LV_CHART_CURSOR_DIRECTION_PRIMARY_HOR) {
-		p1.x = series_area->x1;
-		p1.y = series_area->y1 + cursor->point.y;
-		p2.x = p1.x + cursor->point.x;
-		p2.y = p1.y;
-		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
-	}
-
-	if(cursor->axes & LV_CHART_CURSOR_DIRECTION_PRIMARY_VER) {
-
-		p1.x = series_area->x1 + cursor->point.x;
-		p1.y = series_area->y1 + cursor->point.y;
-		p2.x = p1.x;
-		p2.y = series_area->y2;
-		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
-	}
-
-	if(cursor->axes & LV_CHART_CURSOR_DIRECTION_SECONDARY_HOR) {
+	if(cursor->axes & LV_CHART_CURSOR_RIGHT) {
 		p1.x = series_area->x1 + cursor->point.x;
 		p1.y = series_area->y1 + cursor->point.y;
 		p2.x = series_area->x2;
@@ -1275,12 +1258,29 @@ static void draw_cursors(lv_obj_t * chart, const lv_area_t * series_area, const 
 		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
 	}
 
-	if(cursor->axes & LV_CHART_CURSOR_DIRECTION_SECONDARY_VER) {
+	if(cursor->axes & LV_CHART_CURSOR_UP) {
 
 		p1.x = series_area->x1 + cursor->point.x;
 		p1.y = series_area->y1;
 		p2.x = p1.x;
 		p2.y = series_area->y1 + cursor->point.y;
+		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
+	}
+	
+	if(cursor->axes & LV_CHART_CURSOR_LEFT) {
+		p1.x = series_area->x1;
+		p1.y = series_area->y1 + cursor->point.y;
+		p2.x = p1.x + cursor->point.x;
+		p2.y = p1.y;
+		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
+	}
+
+	if(cursor->axes & LV_CHART_CURSOR_DOWN) {
+
+		p1.x = series_area->x1 + cursor->point.x;
+		p1.y = series_area->y1 + cursor->point.y;
+		p2.x = p1.x;
+		p2.y = series_area->y2;
 		lv_draw_line(&p1, &p2, &series_mask, &line_dsc);
 	}
 
