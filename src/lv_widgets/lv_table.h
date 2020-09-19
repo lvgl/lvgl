@@ -100,6 +100,15 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy);
 void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const char * txt);
 
 /**
+ * Set the value of a cell.  Memory will be allocated to store the text by the table.
+ * @param table pointer to a Table object
+ * @param row id of the row [0 .. row_cnt -1]
+ * @param col id of the column [0 .. col_cnt -1]
+ * @param fmt `printf`-like format
+ */
+void lv_table_set_cell_value_fmt(lv_obj_t * table, uint16_t row, uint16_t col, const char * fmt, ...);
+
+/**
  * Set the number of rows
  * @param table table pointer to a Table object
  * @param row_cnt number of rows
