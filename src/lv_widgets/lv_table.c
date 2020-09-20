@@ -263,7 +263,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * table, uint16_t row, uint16_t col, c
         return;
     }
 
-    ext->cell_data[cell][len - 1] = 0; /* Ensure NULL termination */
+    ext->cell_data[cell][len + 1] = 0; /* Ensure NULL termination */
 
     lv_vsnprintf(&ext->cell_data[cell][1], len + 1, fmt, ap2);
 #endif
