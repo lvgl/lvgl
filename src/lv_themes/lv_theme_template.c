@@ -728,6 +728,7 @@ void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 #endif
 #if LV_USE_TABLE
         case LV_THEME_TABLE:
+        {
             list = lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
             _lv_style_list_add_style(list, &styles->bg);
 
@@ -739,8 +740,8 @@ void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
               list = lv_obj_get_style_list(obj, idx);
               _lv_style_list_add_style(list, &styles->bg);
             }
-
             break;
+         }
 #endif
 
 #if LV_USE_WIN
