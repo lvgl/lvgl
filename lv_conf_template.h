@@ -710,9 +710,6 @@ typedef void * lv_obj_user_data_t;
 #if LV_USE_TABLE
 #  define LV_TABLE_COL_MAX    12
 #  define LV_TABLE_CELL_STYLE_CNT 4
-#  if (LV_TABLE_CELL_STYLE_CNT > 16)
-#    error LV_TABLE_CELL_STYLE_CNT cannot exceed 16
-#  endif
 #endif
 
 
