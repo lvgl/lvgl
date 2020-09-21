@@ -37,7 +37,12 @@ extern "C" {
    because of restriction of lv_table_cell_format_t.type to no more than
    4 bits so that lv_table_cell_format_t.s will not exceed 8 bits
 */
-#define LV_TABLE_CELL_STYLE_CNT 16
+#ifndef LV_TABLE_CELL_STYLE_CNT 
+#  define LV_TABLE_CELL_STYLE_CNT 4
+#endif
+#if (LV_TABLE_CELL_STYLE_CNT > 16)
+#  error LV_TABLE_CELL_STYLE_CNT cannot exceed 16
+#endif
 /**********************
  *      TYPEDEFS
  **********************/
