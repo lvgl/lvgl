@@ -225,7 +225,7 @@ static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
 {
     int value = read_bits(it, n_bits, res);
     if(value & (1 << (n_bits - 1))) {
-        for(int bit = n_bits; bit < 8; ++bit) {
+        for(int bit = n_bits; bit < 16; ++bit) {
             value |= (1 << bit);
         }
     }
