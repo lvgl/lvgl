@@ -4058,8 +4058,9 @@ static void report_style_mod_core(void * style, lv_obj_t * obj)
 
         uint8_t ci;
         for(ci = 0; ci < list->style_cnt; ci++) {
-            lv_style_t * class = lv_style_list_get_style(list, ci);
-            if(class == style || style == NULL) {
+            /* changed class to _class to allow compilation as c++ */
+            lv_style_t * _class = lv_style_list_get_style(list, ci);
+            if(_class == style || style == NULL) { 
                 lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
                 break;
             }

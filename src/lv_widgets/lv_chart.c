@@ -1358,7 +1358,8 @@ static void draw_y_ticks(lv_obj_t * chart, const lv_area_t * series_area, const 
                                  LV_COORD_MAX, LV_TXT_FLAG_CENTER);
 
                 /* set the area at some distance of the major tick len left of the tick */
-                lv_area_t a = {.y1 = p2.y - size.y / 2, .y2 = p2.y + size.y / 2};
+                /* changed to explicit member initialization to allow compilation as c++ */
+                lv_area_t a; a.y1 = p2.y - size.y / 2; a.y2 = p2.y + size.y / 2;
 
                 if(which_axis == LV_CHART_AXIS_PRIMARY_Y) {
                     a.x1 = p2.x - size.x - label_dist;
