@@ -260,7 +260,6 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
         return;
     }
 
-
     /*If a new line was added it shouldn't show edge flash effect*/
     bool edge_flash_en = lv_textarea_get_edge_flash(ta);
     lv_textarea_set_edge_flash(ta, false);
