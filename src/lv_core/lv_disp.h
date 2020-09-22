@@ -184,7 +184,6 @@ static inline void lv_scr_load(lv_obj_t * scr)
     lv_disp_load_scr(scr);
 }
 
-
 /**********************
  *      MACROS
  **********************/
