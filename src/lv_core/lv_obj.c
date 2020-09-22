@@ -360,7 +360,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
 #if LV_USE_GROUP
     new_obj->group_p = NULL;
-
 #endif
 
     /*Set attributes*/
