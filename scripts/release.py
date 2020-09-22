@@ -456,7 +456,7 @@ def cleanup():
     cmd("rm -fr " + workdir)
 
 if __name__ == '__main__':
-    dev_prepare = 'minor'
+    dev_prepare = 'bugfix'
     if(len(sys.argv) != 2):
         print("Missing argument. Usage ./release.py bugfix | minor | major")
         print("Use minor by deafult")
@@ -474,7 +474,7 @@ if __name__ == '__main__':
     dev_ver_patch = ver_patch
     dev_ver_str = ver_str
     
-   get_lvgl_version("master")
+    get_lvgl_version("master")
     
     lvgl_prepare()
     lv_examples_prepare() 
@@ -496,13 +496,6 @@ if __name__ == '__main__':
         lvgl_update_master_version()
         docs_update_latest_version()
 
-        get_lvgl_version("dev")
-        dev_ver_str = "v" + ver_major + "." + ver_minor + "." + ver_patch + "-dev"
-        merge_to_dev()
-        
-        lvgl_update_dev_version()
-        docs_update_dev_version()
-        publish_dev()
     else:
         #merge_from_dev()
         
