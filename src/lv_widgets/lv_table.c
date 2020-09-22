@@ -170,15 +170,26 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
         format.s.crop        = 0;
     }
 
-    ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    /*Get the size of the Arabic text and process it*/
+    size_t len_ap = _lv_txt_ap_calc_bytes_cnt(txt);
+    ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], len_ap + 1);
     LV_ASSERT_MEM(ext->cell_data[cell]);
     if(ext->cell_data[cell] == NULL) return;
 
-    strcpy(ext->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
+    _lv_txt_ap_proc(txt, &ext->cell_data[cell][1]);
+#else
+    ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
+	LV_ASSERT_MEM(ext->cell_data[cell]);
+	if(ext->cell_data[cell] == NULL) return;
+
+	strcpy(ext->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
+#endif
 
     ext->cell_data[cell][0] = format.format_byte;
     refr_size(table);
 }
+
 
 /**
  * Set the value of a cell.  Memory will be allocated to store the text by the table.
