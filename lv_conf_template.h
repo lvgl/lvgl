@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v7.6.0-dev
+ * Configuration file for v7.7.0-dev
  */
 
 /*
@@ -361,6 +361,8 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 
 /* Montserrat fonts with bpp = 4
  * https://fonts.google.com/specimen/Montserrat  */
+#define LV_FONT_MONTSERRAT_8     0
+#define LV_FONT_MONTSERRAT_10    0
 #define LV_FONT_MONTSERRAT_12    0
 #define LV_FONT_MONTSERRAT_14    1
 #define LV_FONT_MONTSERRAT_16    0
@@ -645,6 +647,7 @@ typedef void * lv_obj_user_data_t;
 #define LV_USE_TABLE    1
 #if LV_USE_TABLE
 #  define LV_TABLE_COL_MAX    12
+#  define LV_TABLE_CELL_STYLE_CNT 4
 #endif
 
 /*==================

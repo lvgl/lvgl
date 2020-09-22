@@ -152,8 +152,7 @@ static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * cli
     }
     /*Draw the object*/
     else if(mode == LV_DESIGN_DRAW_MAIN) {
-
-        /*The ancestor design function will draw the background and the indicator.
+        /* The ancestor design function will draw the background and the indicator.
          * It also sets ext->bar.indic_area*/
         ancestor_design(slider, clip_area, mode);
 

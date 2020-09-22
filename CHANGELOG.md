@@ -1,20 +1,35 @@
 # Changelog
 
-## v7.6.0 (TBD)
+## v7.7.0 (22.09.2020)
 
 ### New features
-- Check wheter the any style property has changed on a state change to decide if any redraw is required
 
-## v7.5.0 (planned at 15.09.2020)
+### Bugfixes
+
+## v7.6.0 (22.09.2020)
+
+### New features
+- Check whether any style property has changed on a state change to decide if any redraw is required
+
+### Bugfixes
+- Fix selection of options with non-ASCII letters in dropdown list 
+- Fix font loader to support LV_FONT_FMT_TXT_LARGE
+
+## v7.5.0 (15.09.2020)
 
 ### New features
 - Add `clean_dcache_cb` and `lv_disp_clean_dcache` to enable users to use their own cache management function
 - Add `gpu_wait_cb` to wait until the GPU is working. It allows to run CPU a wait only when the rendered data is needed.
+- Add 10px and 8ox built in fonts
 
 ### Bugfixes
 - Fix unexpeted DEFOCUS on lv_page when clicking to bg after the scrollable
 - Fix `lv_obj_del` and `lv_obj_clean` if the children list changed during deletion.
 - Adjust button matrix button width to include padding when spanning multiple units.
+- Add rounding to btnmatrix line height calculation
+- Add `decmopr_buf` to GC roots
+- Fix divisioin by zero in draw_pattern (lv_draw_rect.c) if the image or letter is not found
+- Fix drawing images with 1 px height or width
 
 ## v7.4.0 (01.09.2020)
 
@@ -26,7 +41,7 @@ The main new features of v7.4 are run-time font loading, style caching and arc k
 - Add style caching to reduce acces time of properties with default value
 - arc: add set value by click feature
 - arc: add `LV_ARC_PART_KNOB` similarly to slider
-- send gestures even is the the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function. 
+- send gestures even if the the obejct was dragged. User can check dragging with `lv_indev_is_dragging(lv_indev_act())` in the event function. 
 
 ### Bugfixes
 - Fix color bleeding on border drawing

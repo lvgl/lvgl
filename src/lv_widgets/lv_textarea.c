@@ -286,19 +286,24 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
 
 #if LV_USE_ANIMATION
         /*Auto hide characters*/
-        lv_anim_path_t path;
-        lv_anim_path_init(&path);
-        lv_anim_path_set_cb(&path, lv_anim_path_step);
+        if(ext->pwd_show_time == 0) {
+            pwd_char_hider(ta);
+        }
+        else {
+            lv_anim_path_t path;
+            lv_anim_path_init(&path);
+            lv_anim_path_set_cb(&path, lv_anim_path_step);
 
-        lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_var(&a, ta);
-        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)pwd_char_hider_anim);
-        lv_anim_set_time(&a, ext->pwd_show_time);
-        lv_anim_set_values(&a, 0, 1);
-        lv_anim_set_path(&a, &path);
-        lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
-        lv_anim_start(&a);
+            lv_anim_t a;
+            lv_anim_init(&a);
+            lv_anim_set_var(&a, ta);
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)pwd_char_hider_anim);
+            lv_anim_set_time(&a, ext->pwd_show_time);
+            lv_anim_set_values(&a, 0, 1);
+            lv_anim_set_path(&a, &path);
+            lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
+            lv_anim_start(&a);
+        }
 
 #else
         pwd_char_hider(ta);
@@ -364,18 +369,24 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
 
 #if LV_USE_ANIMATION
         /*Auto hide characters*/
-        lv_anim_path_t path;
-        lv_anim_path_init(&path);
-        lv_anim_path_set_cb(&path, lv_anim_path_step);
-        lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_var(&a, ta);
-        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)pwd_char_hider_anim);
-        lv_anim_set_time(&a, ext->pwd_show_time);
-        lv_anim_set_values(&a, 0, 1);
-        lv_anim_set_path(&a, &path);
-        lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
-        lv_anim_start(&a);
+        if(ext->pwd_show_time == 0) {
+            pwd_char_hider(ta);
+        }
+        else {
+            lv_anim_path_t path;
+            lv_anim_path_init(&path);
+            lv_anim_path_set_cb(&path, lv_anim_path_step);
+
+            lv_anim_t a;
+            lv_anim_init(&a);
+            lv_anim_set_var(&a, ta);
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)pwd_char_hider_anim);
+            lv_anim_set_time(&a, ext->pwd_show_time);
+            lv_anim_set_values(&a, 0, 1);
+            lv_anim_set_path(&a, &path);
+            lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
+            lv_anim_start(&a);
+        }
 #else
         pwd_char_hider(ta);
 #endif
@@ -516,19 +527,24 @@ void lv_textarea_set_text(lv_obj_t * ta, const char * txt)
 
 #if LV_USE_ANIMATION
         /*Auto hide characters*/
-        lv_anim_path_t path;
-        lv_anim_path_init(&path);
-        lv_anim_path_set_cb(&path, lv_anim_path_step);
+        if(ext->pwd_show_time == 0) {
+            pwd_char_hider(ta);
+        }
+        else {
+            lv_anim_path_t path;
+            lv_anim_path_init(&path);
+            lv_anim_path_set_cb(&path, lv_anim_path_step);
 
-        lv_anim_t a;
-        lv_anim_init(&a);
-        lv_anim_set_var(&a, ta);
-        lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)pwd_char_hider_anim);
-        lv_anim_set_time(&a, ext->pwd_show_time);
-        lv_anim_set_values(&a, 0, 1);
-        lv_anim_set_path(&a, &path);
-        lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
-        lv_anim_start(&a);
+            lv_anim_t a;
+            lv_anim_init(&a);
+            lv_anim_set_var(&a, ta);
+            lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t)pwd_char_hider_anim);
+            lv_anim_set_time(&a, ext->pwd_show_time);
+            lv_anim_set_values(&a, 0, 1);
+            lv_anim_set_path(&a, &path);
+            lv_anim_set_ready_cb(&a, pwd_char_hider_anim_ready);
+            lv_anim_start(&a);
+        }
 #else
         pwd_char_hider(ta);
 #endif

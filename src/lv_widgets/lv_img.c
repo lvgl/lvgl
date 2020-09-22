@@ -690,10 +690,10 @@ static lv_design_res_t lv_img_design(lv_obj_t * img, const lv_area_t * clip_area
             coords_tmp.y1 = zommed_coords.y1;
             coords_tmp.y2 = zommed_coords.y1 + ext->h - 1;
 
-            for(; coords_tmp.y1 < zommed_coords.y2; coords_tmp.y1 += zoomed_src_h, coords_tmp.y2 += zoomed_src_h) {
+            for(; coords_tmp.y1 <= zommed_coords.y2; coords_tmp.y1 += zoomed_src_h, coords_tmp.y2 += zoomed_src_h) {
                 coords_tmp.x1 = zommed_coords.x1;
                 coords_tmp.x2 = zommed_coords.x1 + ext->w - 1;
-                for(; coords_tmp.x1 < zommed_coords.x2; coords_tmp.x1 += zoomed_src_w, coords_tmp.x2 += zoomed_src_w) {
+                for(; coords_tmp.x1 <= zommed_coords.x2; coords_tmp.x1 += zoomed_src_w, coords_tmp.x2 += zoomed_src_w) {
                     lv_draw_img(&coords_tmp, &clip_real, ext->src, &img_dsc);
                 }
             }

@@ -654,10 +654,14 @@ void lv_label_get_letter_pos(const lv_obj_t * label, uint32_t char_id, lv_point_
  * @return the index of the letter on the 'pos_p' point (E.g. on 0;0 is the 0. letter)
  * Expressed in character index and not byte index (different in UTF-8)
  */
-uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
+uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos_in)
 {
     LV_ASSERT_OBJ(label, LV_OBJX_NAME);
-    LV_ASSERT_NULL(pos);
+    LV_ASSERT_NULL(pos_in);
+
+    lv_point_t pos;
+    pos.x = pos_in->x - lv_obj_get_style_pad_left(label, LV_LABEL_PART_MAIN);
+    pos.y = pos_in->y - lv_obj_get_style_pad_top(label, LV_LABEL_PART_MAIN);
 
     lv_area_t txt_coords;
     get_txt_coords(label, &txt_coords);
@@ -687,7 +691,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
     while(txt[line_start] != '\0') {
         new_line_start += _lv_txt_get_next_line(&txt[line_start], font, letter_space, max_w, flag);
 
-        if(pos->y <= y + letter_height) {
+        if(pos.y <= y + letter_height) {
             /*The line is found (stored in 'line_start')*/
             /* Include the NULL terminator in the last line */
             uint32_t tmp = new_line_start;
@@ -746,7 +750,7 @@ uint32_t lv_label_get_letter_on(const lv_obj_t * label, lv_point_t * pos)
             lv_coord_t gw = lv_font_get_glyph_width(font, letter, letter_next);
 
             /*Finish if the x position or the last char of the next line is reached*/
-            if(pos->x < x + (gw >> 1) || i + line_start == new_line_start ||  txt[i_act + line_start] == '\0') {
+            if(pos.x < x + gw || i + line_start == new_line_start ||  txt[i_act + line_start] == '\0') {
                 i = i_act;
                 break;
             }

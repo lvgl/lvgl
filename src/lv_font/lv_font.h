@@ -131,6 +131,14 @@ static inline lv_coord_t lv_font_get_line_height(const lv_font_t * font_p)
 
 #define LV_FONT_DECLARE(font_name) extern lv_font_t font_name;
 
+#if LV_FONT_MONTSERRAT_8
+LV_FONT_DECLARE(lv_font_montserrat_8)
+#endif
+
+#if LV_FONT_MONTSERRAT_10
+LV_FONT_DECLARE(lv_font_montserrat_10)
+#endif
+
 #if LV_FONT_MONTSERRAT_12
 LV_FONT_DECLARE(lv_font_montserrat_12)
 #endif

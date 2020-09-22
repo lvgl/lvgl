@@ -596,8 +596,29 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
     return (uint8_t)(bright >> 3);
 }
 
-#ifdef __cplusplus
-/* Fix of msvc 2019 compiler error C4576 inside C++ code */
+#if defined(__cplusplus) && !defined(_LV_COLOR_HAS_MODERN_CPP)
+/**
+* MSVC compiler's definition of the __cplusplus indicating 199711L regardless to C++ standard version
+* see https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-cplusplus
+* so we use _MSC_VER macro unstead of __cplusplus
+*/
+#ifdef _MSC_VER
+#if _MSC_VER >= 1900 /* Visual Studio 2015 */
+#define _LV_COLOR_HAS_MODERN_CPP 1
+#endif
+#else
+#if __cplusplus >= 201103L
+#define _LV_COLOR_HAS_MODERN_CPP 1
+#endif
+#endif
+#endif /* __cplusplus */
+
+#ifndef _LV_COLOR_HAS_MODERN_CPP
+#define _LV_COLOR_HAS_MODERN_CPP 0
+#endif
+
+#if _LV_COLOR_HAS_MODERN_CPP
+/* Fix msvc compiler error C4576 inside C++ code */
 #define _LV_COLOR_MAKE_TYPE_HELPER lv_color_t
 #else
 #define _LV_COLOR_MAKE_TYPE_HELPER (lv_color_t)

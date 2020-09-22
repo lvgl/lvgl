@@ -60,6 +60,10 @@ ver_major = -1
 ver_minor = -1
 ver_patch = -1
 
+dev_ver_major = -1
+dev_ver_minor = -1
+dev_ver_patch = -1
+
 ver_str = ""
 dev_ver_str = ""
 release_br = ""
@@ -103,19 +107,19 @@ def clone_repos():
     cmd("rm -fr " + workdir)
     cmd("mkdir " + workdir)
     os.chdir(workdir)
-
+    
     #For debuging just copy the repos
     #cmd("cp -a ../repos/. .")
     #return
 
-    cmd("git clone " + upstream("lvgl") + "; cd lvgl; git checkout master")
-    cmd("git clone " + upstream("lv_examples") + "; cd lv_examples; git checkout master")
-    cmd("git clone " + upstream("lv_drivers") + "; cd lv_drivers; git checkout master")
-    cmd("git clone --recurse-submodules " + upstream("docs") + "; cd docs; git checkout master")
-    cmd("git clone " + upstream("blog") + "; cd blog; git checkout master")
+    cmd("git clone " + upstream("lvgl") + "; cd lvgl; git checkout master; git remote update origin --prune; ")
+    cmd("git clone " + upstream("lv_examples") + "; cd lv_examples; git checkout master; git remote update origin --prune; ")
+    cmd("git clone " + upstream("lv_drivers") + "; cd lv_drivers; git checkout master; git remote update origin --prune; ")
+    cmd("git clone --recurse-submodules " + upstream("docs") + "; cd docs; git checkout master; git remote update origin --prune; ")
+    cmd("git clone " + upstream("blog") + "; cd blog; git checkout master; git remote update origin --prune; ")
 
     for p in proj_list:
-        cmd("git clone " + upstream(p) + " --recurse-submodules ; cd " + p + "; git checkout master")
+        cmd("git clone " + upstream(p) + " --recurse-submodules ; cd " + p + "; git checkout master; git remote update origin --prune; ")
         
 
 def get_lvgl_version(br):
@@ -309,7 +313,7 @@ def publish_master():
     #Merge LVGL master to dev first to avoid "merge-to-dev.yml" running asynchronous
     os.chdir("./lvgl")
     cmd("git checkout dev")
-    cmd("git merge master -X theirs")
+    cmd("git merge master -X ours")
     cmd("git add .")
     cmd("git commit -am 'Merge master'", False)
     cmd("git push origin dev")
@@ -320,28 +324,15 @@ def publish_master():
     cmd("cd lvgl; " + pub_cmd)    
     cmd("cd lv_examples; " + pub_cmd)    
     cmd("cd lv_drivers; " + pub_cmd)    
-
-    pub_cmd = "git push origin latest; git push origin " + ver_str
-    cmd("cd docs; " + pub_cmd)
-    cmd("cd docs; git checkout master; python 2.7 ./update.py " + release_br)
     
     pub_cmd = "git push origin master"
-    cmd("cd blog; " + pub_cmd)    
-    
-    
-def merge_to_dev():
-    merge_cmd = "git checkout dev; git pull origin dev; git merge master -X ours; git checkout master"
-    cmd("cd lvgl; " + merge_cmd)    
-    
-    merge_cmd = "git checkout dev --;  git pull origin dev; git merge latest -X ours; git checkout master"
-    cmd("cd docs; " + merge_cmd)    
-    
+    cmd("cd blog; " + pub_cmd)      
     
 def merge_from_dev():
     merge_cmd = "git checkout master; git merge dev;"
     cmd("cd lvgl; " + merge_cmd)    
     
-    merge_cmd = "git checkout latest -- ; git merge dev;"
+    merge_cmd = "git checkout latest -- ; git merge dev -X theirs --no-edit;"
     cmd("cd docs; " + merge_cmd)    
         
 
@@ -418,8 +409,6 @@ def publish_dev_and_master():
     pub_cmd = "git checkout master; git push origin master"
     cmd("cd lvgl; " + pub_cmd)    
 
-    cmd("cd docs; git checkout master; python 2.7 ./update.py latest dev")
-
 def projs_update():
     global proj_list, release_br, ver_str
     for p in proj_list:
@@ -454,14 +443,16 @@ def projs_update():
         cmd('git push origin ' + ver_str)
         
         os.chdir("../")
-        
+
+def docs_update_all():
+    cmd("cd docs; git checkout master; python 2.7 ./update.py master dev " + release_br)        
 
 def cleanup():
     os.chdir("../")
     cmd("rm -fr " + workdir)
 
 if __name__ == '__main__':
-    dev_prepare = 'minor'
+    dev_prepare = 'bugfix'
     if(len(sys.argv) != 2):
         print("Missing argument. Usage ./release.py bugfix | minor | major")
         print("Use minor by deafult")
@@ -473,7 +464,14 @@ if __name__ == '__main__':
         exit(1)
      
     clone_repos()
+    get_lvgl_version("dev")
+    dev_ver_major = ver_major
+    dev_ver_minor = ver_minor
+    dev_ver_patch = ver_patch
+    dev_ver_str = ver_str
+    
     get_lvgl_version("master")
+    
     lvgl_prepare()
     lv_examples_prepare() 
     lv_drivers_prepare()
@@ -482,7 +480,9 @@ if __name__ == '__main__':
     add_tags()
     update_release_branches()
     publish_master()
- 
+     
+    projs_update()    
+    
     if dev_prepare == 'bugfix': 
         ver_patch = str(int(ver_patch) + 1)
         ver_str = "v" + ver_major + "." + ver_minor + "." + ver_patch + "-dev"    
@@ -492,15 +492,11 @@ if __name__ == '__main__':
         lvgl_update_master_version()
         docs_update_latest_version()
 
-        get_lvgl_version("dev")
-        dev_ver_str = "v" + ver_major + "." + ver_minor + "." + ver_patch + "-dev"
-        merge_to_dev()
-        
-        lvgl_update_dev_version()
-        docs_update_dev_version()
-        publish_dev()
     else:
-        get_lvgl_version("dev")
+        #merge_from_dev()
+        
+        get_lvgl_version("master")
+        
         if dev_prepare == 'minor': 
             ver_minor = str(int(ver_minor) + 1)
             ver_patch = "0"
@@ -513,13 +509,10 @@ if __name__ == '__main__':
         
         print("Prepare minor version " + dev_ver_str)
 
-        merge_to_dev()
-        merge_from_dev()
-
         lvgl_update_dev_version()
         docs_update_dev_version()
         publish_dev_and_master()
         
-    projs_update()    
+    docs_update_all();
     cleanup()
     
