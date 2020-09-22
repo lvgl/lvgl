@@ -276,7 +276,9 @@ bool lv_list_remove(const lv_obj_t * list, uint16_t index)
 void lv_list_focus_btn(lv_obj_t * list, lv_obj_t * btn)
 {
     LV_ASSERT_OBJ(list, LV_OBJX_NAME);
-    if(btn) LV_ASSERT_OBJ(btn, "lv_btn");
+    if(btn) {
+        LV_ASSERT_OBJ(btn, "lv_btn");
+    }
 
     lv_list_ext_t * ext = lv_obj_get_ext_attr(list);
 

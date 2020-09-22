@@ -189,7 +189,9 @@ lv_obj_t * lv_keyboard_create(lv_obj_t * par, const lv_obj_t * copy)
 void lv_keyboard_set_textarea(lv_obj_t * kb, lv_obj_t * ta)
 {
     LV_ASSERT_OBJ(kb, LV_OBJX_NAME);
-    if(ta) LV_ASSERT_OBJ(ta, "lv_textarea");
+    if(ta) {
+        LV_ASSERT_OBJ(ta, "lv_textarea");
+    }
 
     lv_keyboard_ext_t * ext = lv_obj_get_ext_attr(kb);
 

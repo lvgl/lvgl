@@ -961,7 +961,6 @@ static lv_style_list_t * lv_table_get_style(lv_obj_t * table, uint8_t part)
 
 static void refr_size(lv_obj_t * table)
 {
-
     lv_coord_t h = 0;
     lv_coord_t w = 0;
 

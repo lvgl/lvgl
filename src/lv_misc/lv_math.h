@@ -42,8 +42,6 @@ extern "C" {
 #define LV_BEZIER_VAL_MAX 1024 /**< Max time in Bezier functions (not [0..1] to use integers) */
 #define LV_BEZIER_VAL_SHIFT 10 /**< log2(LV_BEZIER_VAL_MAX): used to normalize up scaled values*/
 
-
-
 /**********************
  *      TYPEDEFS
  **********************/

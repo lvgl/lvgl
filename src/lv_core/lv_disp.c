@@ -120,7 +120,6 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp)
     return disp->sys_layer;
 }
 
-
 /**
  * Assign a screen to a display.
  * @param disp pointer to a display where to assign the screen
