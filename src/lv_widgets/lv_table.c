@@ -217,7 +217,7 @@ void lv_table_set_cell_value_fmt(lv_obj_t * table, uint16_t row, uint16_t col, c
         else if(base_dir == LV_BIDI_DIR_RTL) format.s.align = LV_LABEL_ALIGN_RIGHT;
         else if(base_dir == LV_BIDI_DIR_AUTO)
 #if LV_USE_BIDI
-            format.s.align = _lv_bidi_detect_base_dir(txt);
+            format.s.align = _lv_bidi_detect_base_dir(fmt);
 #else
             format.s.align = LV_LABEL_ALIGN_LEFT;
 #endif
