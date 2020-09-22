@@ -107,7 +107,7 @@ def clone_repos():
     cmd("rm -fr " + workdir)
     cmd("mkdir " + workdir)
     os.chdir(workdir)
-
+    
     #For debuging just copy the repos
     #cmd("cp -a ../repos/. .")
     #return
@@ -324,10 +324,6 @@ def publish_master():
     cmd("cd lvgl; " + pub_cmd)    
     cmd("cd lv_examples; " + pub_cmd)    
     cmd("cd lv_drivers; " + pub_cmd)    
-
-    pub_cmd = "git push origin latest; git push origin " + ver_str
-    cmd("cd docs; " + pub_cmd)
-    cmd("cd docs; git checkout master; python 2.7 ./update.py " + release_br)
     
     pub_cmd = "git push origin master"
     cmd("cd blog; " + pub_cmd)      
@@ -413,8 +409,6 @@ def publish_dev_and_master():
     pub_cmd = "git checkout master; git push origin master"
     cmd("cd lvgl; " + pub_cmd)    
 
-    cmd("cd docs; git checkout master; python 2.7 ./update.py latest dev")
-
 def projs_update():
     global proj_list, release_br, ver_str
     for p in proj_list:
@@ -449,7 +443,9 @@ def projs_update():
         cmd('git push origin ' + ver_str)
         
         os.chdir("../")
-        
+
+def docs_update_all():
+    cmd("cd docs; git checkout master; python 2.7 ./update.py master dev " + release_br)        
 
 def cleanup():
     os.chdir("../")
@@ -517,5 +513,6 @@ if __name__ == '__main__':
         docs_update_dev_version()
         publish_dev_and_master()
         
+    docs_update_all();
     cleanup()
     
