@@ -778,7 +778,21 @@ lv_coord_t lv_chart_get_x_from_index(lv_obj_t * chart, lv_chart_series_t * ser, 
 	lv_coord_t w = lv_area_get_width(&series_area);
 
 	lv_coord_t x = {0};
-	x = (w * id) / (ext->point_cnt - 1);
+
+	if(ext->type & LV_CHART_TYPE_LINE) {
+		x = (w * id) / (ext->point_cnt - 1);
+	} else if(ext->type & LV_CHART_TYPE_COLUMN) {
+		lv_coord_t col_w = w / ((_lv_ll_get_len(&ext->series_ll) + 1) * ext->point_cnt); /* Suppose + 1 series as separator*/
+		lv_chart_series_t * itr_ser = NULL;
+		x = (int32_t)((int32_t)w * id) / ext->point_cnt + (col_w / 2);
+
+		 _LV_LL_READ_BACK(ext->series_ll, itr_ser) {
+			 if(itr_ser == ser) break;
+			 x += col_w;
+		 }
+
+		 x = x + (col_w / 2);
+	}
 
 	return x;
 }
