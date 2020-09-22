@@ -102,9 +102,9 @@ typedef struct {
     lv_color_t scale_grad_color;
     lv_color_t scale_end_color;
     lv_opa_t opa_scale;
-    uint32_t clip_corder :1;
-    uint32_t border_post :1;
-}style_snapshot_t;
+    uint32_t clip_corder : 1;
+    uint32_t border_post : 1;
+} style_snapshot_t;
 
 typedef enum {
     STYLE_COMPARE_SAME,
