@@ -1,5 +1,11 @@
 # Changelog
 
+## v7.7.0 (22.09.2020)
+
+### New features
+
+### Bugfixes
+
 ## v7.6.0 (22.09.2020)
 
 ### New features
