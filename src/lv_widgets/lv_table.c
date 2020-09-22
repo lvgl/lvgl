@@ -14,6 +14,7 @@
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_label.h"
+#include "../lv_misc/lv_printf.h"
 #include "../lv_themes/lv_theme.h"
 
 /*********************
