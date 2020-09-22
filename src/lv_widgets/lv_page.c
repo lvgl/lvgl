@@ -132,7 +132,6 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_obj_set_signal_cb(page, lv_page_signal);
         lv_obj_set_design_cb(page, lv_page_design);
 
-
         lv_page_set_scrollbar_mode(page, ext->scrlbar.mode);
 
         lv_theme_apply(page, LV_THEME_PAGE);
