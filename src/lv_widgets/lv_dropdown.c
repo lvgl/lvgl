@@ -825,9 +825,7 @@ static lv_design_res_t lv_dropdown_page_design(lv_obj_t * page, const lv_area_t 
                     draw_box(ddlist, &clip_area_core, ext->pr_opt_id, LV_STATE_PRESSED);
                 }
 
-                if(ext->show_selected) {
-                    draw_box(ddlist, &clip_area_core, ext->sel_opt_id, LV_STATE_DEFAULT);
-                }
+                draw_box(ddlist, &clip_area_core, ext->sel_opt_id, LV_STATE_DEFAULT);
             }
         }
     }
@@ -853,9 +851,7 @@ static lv_design_res_t lv_dropdown_page_design(lv_obj_t * page, const lv_area_t 
                     draw_box_label(ddlist, &clip_area_core, ext->pr_opt_id, LV_STATE_PRESSED);
                 }
 
-                if(ext->show_selected) {
-                    draw_box_label(ddlist, &clip_area_core, ext->sel_opt_id, LV_STATE_DEFAULT);
-                }
+                draw_box_label(ddlist, &clip_area_core, ext->sel_opt_id, LV_STATE_DEFAULT);
             }
         }
     }
