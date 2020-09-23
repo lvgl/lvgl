@@ -18,15 +18,11 @@ extern "C" {
 #if LV_USE_DROPDOWN != 0
 
 /*Testing of dependencies*/
-#if LV_USE_PAGE == 0
-#error "lv_ddlist: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE  1) "
-#endif
 
 #if LV_USE_LABEL == 0
 #error "lv_ddlist: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
-#include "../lv_widgets/lv_page.h"
 #include "../lv_widgets/lv_label.h"
 
 /*********************
@@ -38,40 +34,29 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-enum {
-    LV_DROPDOWN_DIR_DOWN,
-    LV_DROPDOWN_DIR_UP,
-    LV_DROPDOWN_DIR_LEFT,
-    LV_DROPDOWN_DIR_RIGHT,
-};
-
-typedef uint8_t lv_dropdown_dir_t;
-
 /*Data of drop down list*/
 typedef struct {
     /*New data for this type */
-    lv_obj_t * page;             /*The dropped down list*/
+    lv_obj_t * list;             /*The dropped down list*/
     const char * text;           /*Text to display on the ddlist's button*/
     const char * symbol;         /*Arrow or other icon when the drop-down list is closed*/
     char * options;
     lv_style_list_t style_selected; /*Style of the selected option*/
-    lv_style_list_t style_page;     /*Style of the dropped down list*/
-    lv_style_list_t style_scrlbar; /*Style of the scroll bar*/
+    lv_style_list_t style_list;     /*Style of the dropped down list*/
     lv_coord_t max_height;        /*Height of the ddlist when opened. (0: auto-size)*/
     uint16_t option_cnt;          /*Number of options*/
     uint16_t sel_opt_id;          /*Index of the currently selected option*/
     uint16_t sel_opt_id_orig;     /*Store the original index on focus*/
     uint16_t pr_opt_id;             /*Index of the currently pressed option*/
-    lv_dropdown_dir_t dir         : 2;
-    uint8_t show_selected  : 1;
+    lv_dir_t dir         : 4;
     uint8_t static_txt : 1;
 } lv_dropdown_ext_t;
 
 enum {
     LV_DROPDOWN_PART_MAIN = LV_OBJ_PART_MAIN,
-    LV_DROPDOWN_PART_LIST = _LV_OBJ_PART_REAL_LAST,
-    LV_DROPDOWN_PART_SCROLLBAR,
+    LV_DROPDOWN_PART_LIST,
     LV_DROPDOWN_PART_SELECTED,
+    _LV_DROPDOWN_PART_LAST
 };
 typedef uint8_t lv_dropdown_part_t;
 
@@ -99,7 +84,7 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy);
 void lv_dropdown_set_text(lv_obj_t * ddlist, const char * txt);
 
 /**
- * Clear any options in a drop down list.  Static or dynamic.
+ * Clear all options in a drop down list.  Static or dynamic.
  * @param ddlist pointer to drop down list object
  */
 void lv_dropdown_clear_options(lv_obj_t * ddlist);
@@ -138,9 +123,9 @@ void lv_dropdown_set_selected(lv_obj_t * ddlist, uint16_t sel_opt);
 /**
  * Set the direction of the a drop down list
  * @param ddlist pointer to a drop down list object
- * @param dir LV_DROPDOWN_DIR_LEF/RIGHT/TOP/BOTTOM
+ * @param dir LV_DIR_LEFT/RIGHT/TOP/BOTTOM
  */
-void lv_dropdown_set_dir(lv_obj_t * ddlist, lv_dropdown_dir_t dir);
+void lv_dropdown_set_dir(lv_obj_t * ddlist, lv_dir_t dir);
 
 /**
  * Set the maximal height for the drop down list
@@ -155,13 +140,6 @@ void lv_dropdown_set_max_height(lv_obj_t * ddlist, lv_coord_t h);
  * @param symbol a text like `LV_SYMBOL_DOWN` or NULL to not draw icon
  */
 void lv_dropdown_set_symbol(lv_obj_t * ddlist, const char * symbol);
-
-/**
- * Set whether the ddlist highlight the last selected option and display its text or not
- * @param ddlist pointer to a drop down list object
- * @param show true/false
- */
-void lv_dropdown_set_show_selected(lv_obj_t * ddlist, bool show);
 
 /*=====================
  * Getter functions
@@ -222,14 +200,7 @@ const char * lv_dropdown_get_symbol(lv_obj_t * ddlist);
  * @param ddlist pointer to drop down list object
  * @return the symbol or NULL if not enabled
  */
-lv_dropdown_dir_t lv_dropdown_get_dir(const lv_obj_t * ddlist);
-
-/**
- * Get whether the ddlist highlight the last selected option and display its text or not
- * @param ddlist pointer to a drop down list object
- * @return true/false
- */
-bool lv_dropdown_get_show_selected(lv_obj_t * ddlist);
+lv_dir_t lv_dropdown_get_dir(const lv_obj_t * ddlist);
 
 /*=====================
  * Other functions

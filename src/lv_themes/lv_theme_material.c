@@ -1241,9 +1241,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->ddlist_page);
 
-            list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_SCROLLBAR);
-            _lv_style_list_add_style(list, &styles->sb);
-
             list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_SELECTED);
             _lv_style_list_add_style(list, &styles->ddlist_sel);
             break;
@@ -1266,22 +1263,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 #endif
 #if LV_USE_TABLE
         case LV_THEME_TABLE:
-<<<<<<< HEAD
-            list = _lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
-            _lv_style_list_add_style(list, &styles->bg);
-
-            list = _lv_obj_get_style_list(obj, LV_TABLE_PART_CELL1);
-            _lv_style_list_add_style(list, &styles->table_cell);
-
-            list = _lv_obj_get_style_list(obj, LV_TABLE_PART_CELL2);
-            _lv_style_list_add_style(list, &styles->table_cell);
-
-            list = _lv_obj_get_style_list(obj, LV_TABLE_PART_CELL3);
-            _lv_style_list_add_style(list, &styles->table_cell);
-
-            list = _lv_obj_get_style_list(obj, LV_TABLE_PART_CELL4);
-            _lv_style_list_add_style(list, &styles->table_cell);
-=======
         {
             list = lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
             _lv_style_list_add_style(list, &styles->bg);
@@ -1294,7 +1275,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
               list = lv_obj_get_style_list(obj, idx);
              _lv_style_list_add_style(list, &styles->table_cell);
             }
->>>>>>> dev
             break;
         }
 #endif

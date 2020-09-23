@@ -388,7 +388,6 @@ static void clear_styles(lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_DROPDOWN:
             _lv_obj_reset_style_list_no_refr(obj, LV_DROPDOWN_PART_MAIN);
             _lv_obj_reset_style_list_no_refr(obj, LV_DROPDOWN_PART_LIST);
-            _lv_obj_reset_style_list_no_refr(obj, LV_DROPDOWN_PART_SCROLLBAR);
             _lv_obj_reset_style_list_no_refr(obj, LV_DROPDOWN_PART_SELECTED);
             break;
 #endif

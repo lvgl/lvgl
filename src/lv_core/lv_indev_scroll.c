@@ -120,7 +120,6 @@ void _lv_scroll_handler(lv_indev_proc_t * proc)
                 dirs_candidate = LV_SCROLL_DIR_HOR;
             }
 
-            /**/
             if(st <= 0) up_en = false;
             if(sb <= 0) down_en = false;
             if(sl <= 0) left_en = false;
@@ -202,6 +201,12 @@ void _lv_scroll_handler(lv_indev_proc_t * proc)
                 break;
             }
         }
+
+        lv_signal_send(obj, LV_SIGNAL_SCROLL_BEGIN, indev_act);
+        if(proc->reset_query) return;
+        lv_event_send(obj, LV_EVENT_SCROLL_BEGIN, indev_act);
+        if(proc->reset_query) return;
+
     }
 
     /*If there is no scroll object there is nothing to do*/
