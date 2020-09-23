@@ -126,8 +126,8 @@ void lv_switch_on(lv_obj_t * sw, lv_anim_enable_t anim)
 #if LV_USE_ANIMATION == 0
     anim = LV_ANIM_OFF;
 #endif
-    lv_switch_ext_t * ext = lv_obj_get_ext_attr(sw);
-    ext->state = 1;
+    if(lv_bar_get_value(sw) == 1)
+        return;
     lv_bar_set_value(sw, 1, anim);
     lv_obj_add_state(sw, LV_STATE_CHECKED);
 }
@@ -144,8 +144,8 @@ void lv_switch_off(lv_obj_t * sw, lv_anim_enable_t anim)
 #if LV_USE_ANIMATION == 0
     anim = LV_ANIM_OFF;
 #endif
-    lv_switch_ext_t * ext = lv_obj_get_ext_attr(sw);
-    ext->state = 0;
+    if(lv_bar_get_value(sw) == 0)
+        return;
     lv_bar_set_value(sw, 0, anim);
     lv_obj_clear_state(sw, LV_STATE_CHECKED);
 }
