@@ -22,7 +22,6 @@ Planned to September/October 2020
 - Simplified File system interface ([feat/new_fs_api](https://github.com/lvgl/lvgl/tree/feat/new-fs-api) branch) to make porting easier
   - Work in progress
 - Remove the align parameter from `lv_canvas_draw_text`
-- RGB888 support [#1722](https://github.com/lvgl/lvgl/issues/1722)  
 
 ## v8.1
 - Add radio button widget
@@ -34,6 +33,7 @@ Planned to September/October 2020
 - Consider direct binary font format support
 
 ## Ideas
+- RGB888 support [#1722](https://github.com/lvgl/lvgl/issues/1722)  
 - CPP binding. See [Forum](https://forum.lvgl.io/t/is-it-possible-to-officially-support-optional-cpp-api/2736)
 - Optmize font decompression
 - Switch to RGBA colors in styles
