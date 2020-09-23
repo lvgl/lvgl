@@ -769,8 +769,10 @@ lv_coord_t lv_chart_get_x_from_index(lv_obj_t * chart, lv_chart_series_t * ser, 
 	LV_ASSERT_NULL(ser);
 
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-	if(ext == NULL) return;
-	if(id >= ext->point_cnt) return;
+	if(id >= ext->point_cnt) {
+		LV_LOG_WARN("Invalid index: %d", id);
+		return 0;
+	}
 
 	lv_area_t series_area;
 	get_series_area(chart, &series_area);
@@ -803,8 +805,10 @@ lv_coord_t lv_chart_get_y_from_index(lv_obj_t * chart, lv_chart_series_t * ser, 
 	LV_ASSERT_NULL(ser);
 
 	lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-	if(ext == NULL) return;
-	if(id >= ext->point_cnt) return;
+	if(id >= ext->point_cnt) {
+		LV_LOG_WARN("Invalid index: %d", id);
+		return 0;
+	}
 
 	lv_area_t series_area;
 	get_series_area(chart, &series_area);
