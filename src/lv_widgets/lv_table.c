@@ -14,6 +14,7 @@
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_draw/lv_draw_label.h"
+#include "../lv_misc/lv_printf.h"
 #include "../lv_themes/lv_theme.h"
 
 /*********************
@@ -169,11 +170,117 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
         format.s.crop        = 0;
     }
 
-    ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    /*Get the size of the Arabic text and process it*/
+    size_t len_ap = _lv_txt_ap_calc_bytes_cnt(txt);
+    ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], len_ap + 1);
     LV_ASSERT_MEM(ext->cell_data[cell]);
     if(ext->cell_data[cell] == NULL) return;
 
-    strcpy(ext->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
+    _lv_txt_ap_proc(txt, &ext->cell_data[cell][1]);
+#else
+    ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
+	LV_ASSERT_MEM(ext->cell_data[cell]);
+	if(ext->cell_data[cell] == NULL) return;
+
+	strcpy(ext->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
+#endif
+
+    ext->cell_data[cell][0] = format.format_byte;
+    refr_size(table);
+}
+
+
+/**
+ * Set the value of a cell.  Memory will be allocated to store the text by the table.
+ * @param table pointer to a Table object
+ * @param row id of the row [0 .. row_cnt -1]
+ * @param col id of the column [0 .. col_cnt -1]
+ * @param fmt `printf`-like format
+ */
+void lv_table_set_cell_value_fmt(lv_obj_t * table, uint16_t row, uint16_t col, const char * fmt, ...)
+{
+    LV_ASSERT_OBJ(table, LV_OBJX_NAME);
+    LV_ASSERT_STR(fmt);
+
+    lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
+    if(col >= ext->col_cnt) {
+        LV_LOG_WARN("lv_table_set_cell_value: invalid column");
+        return;
+    }
+
+    /*Auto expand*/
+    if(row >= ext->row_cnt) {
+        lv_table_set_row_cnt(table, row + 1);
+    }
+
+    uint32_t cell = row * ext->col_cnt + col;
+    lv_table_cell_format_t format;
+
+    /*Save the format byte*/
+    if(ext->cell_data[cell]) {
+        format.format_byte = ext->cell_data[cell][0];
+    }
+    /*Initialize the format byte*/
+    else {
+        lv_bidi_dir_t base_dir = lv_obj_get_base_dir(table);
+        if(base_dir == LV_BIDI_DIR_LTR) format.s.align = LV_LABEL_ALIGN_LEFT;
+        else if(base_dir == LV_BIDI_DIR_RTL) format.s.align = LV_LABEL_ALIGN_RIGHT;
+        else if(base_dir == LV_BIDI_DIR_AUTO)
+#if LV_USE_BIDI
+            format.s.align = _lv_bidi_detect_base_dir(fmt);
+#else
+            format.s.align = LV_LABEL_ALIGN_LEFT;
+#endif
+        format.s.right_merge = 0;
+        format.s.type        = 0;
+        format.s.crop        = 0;
+    }
+
+    va_list ap, ap2;
+	va_start(ap, fmt);
+	va_copy(ap2, ap);
+
+	/*Allocate space for the new text by using trick from C99 standard section 7.19.6.12 */
+	uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
+	va_end(ap);
+
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    /*Put together the text according to the format string*/
+    char * raw_txt = _lv_mem_buf_get(len + 1);
+    LV_ASSERT_MEM(raw_txt);
+    if(raw_txt == NULL) {
+        va_end(ap2);
+        return;
+    }
+
+    lv_vsnprintf(raw_txt, len + 1, fmt, ap2);
+
+    /*Get the size of the Arabic text and process it*/
+    size_t len_ap = _lv_txt_ap_calc_bytes_cnt(raw_txt);
+    ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], len_ap + 1);
+    LV_ASSERT_MEM(ext->cell_data[cell]);
+    if(ext->cell_data[cell] == NULL) {
+        va_end(ap2);
+        return;
+    }
+    _lv_txt_ap_proc(raw_txt, &ext->cell_data[cell][1]);
+
+    _lv_mem_buf_release(raw_txt);
+#else
+    ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], len + 2); /*+1: trailing '\0; +1: format byte*/
+    LV_ASSERT_MEM(ext->cell_data[cell]);
+    if(ext->cell_data[cell] == NULL) {
+        va_end(ap2);
+        return;
+    }
+
+    ext->cell_data[cell][len + 1] = 0; /* Ensure NULL termination */
+
+    lv_vsnprintf(&ext->cell_data[cell][1], len + 1, fmt, ap2);
+#endif
+
+    va_end(ap2);
 
     ext->cell_data[cell][0] = format.format_byte;
     refr_size(table);
