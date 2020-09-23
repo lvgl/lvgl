@@ -92,7 +92,6 @@ static _lv_style_state_cmp_t style_snapshot_compare(style_snapshot_t * shot1, st
 static bool style_prop_is_cacheable(lv_style_property_t prop);
 static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop);
 static void update_style_cache_children(lv_obj_t * obj);
-static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
 #endif
 static void fade_anim_cb(lv_obj_t * obj, lv_anim_value_t v);
 static void fade_in_anim_ready(lv_anim_t * a);
@@ -306,6 +305,44 @@ void _lv_obj_disable_style_caching(lv_obj_t * obj, bool dis)
 #endif
 }
 
+
+#if LV_STYLE_CACHE_LEVEL > 0
+
+/**
+ * Mark the object and all of it's children's style lists as invalid.
+ * The cache will be updated when a cached property asked nest time
+ * @param obj pointer to an object
+ */
+void _lv_obj_invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
+{
+    if(style_prop_is_cacheable(prop) == false) return;
+
+    if(part != LV_OBJ_PART_ALL) {
+        lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
+        if(list == NULL) return;
+        list->valid_cache = 0;
+    }
+    else {
+
+        for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
+            lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
+            if(list == NULL) break;
+            list->valid_cache = 0;
+        }
+        for(part = _LV_OBJ_PART_REAL_FIRST; part < 0xFF; part++) {
+            lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
+            if(list == NULL) break;
+            list->valid_cache = 0;
+        }
+    }
+
+    lv_obj_t * child = lv_obj_get_child(obj, NULL);
+    while(child) {
+        update_style_cache_children(child);
+        child = lv_obj_get_child(obj, child);
+    }
+}
+#endif /*LV_STYLE_CACHE_LEVEL >= 1*/
 
 /**
  * Get a style property of a part of an object in the object's current state.
@@ -798,7 +835,7 @@ void _lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t pro
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 #if LV_STYLE_CACHE_LEVEL >= 1
-    invalidate_style_cache(obj, part, prop);
+    _lv_obj_invalidate_style_cache(obj, part, prop);
 #endif
 
     /*If a real style refresh is required*/
@@ -1481,40 +1518,6 @@ static void update_style_cache_children(lv_obj_t * obj)
 
 }
 
-/**
- * Mark the object and all of it's children's style lists as invalid.
- * The cache will be updated when a cached property asked nest time
- * @param obj pointer to an object
- */
-static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_property_t prop)
-{
-    if(style_prop_is_cacheable(prop) == false) return;
-
-    if(part != LV_OBJ_PART_ALL) {
-        lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
-        if(list == NULL) return;
-        list->valid_cache = 0;
-    }
-    else {
-
-        for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
-            lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
-            if(list == NULL) break;
-            list->valid_cache = 0;
-        }
-        for(part = _LV_OBJ_PART_REAL_FIRST; part < 0xFF; part++) {
-            lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
-            if(list == NULL) break;
-            list->valid_cache = 0;
-        }
-    }
-
-    lv_obj_t * child = lv_obj_get_child(obj, NULL);
-    while(child) {
-        update_style_cache_children(child);
-        child = lv_obj_get_child(obj, child);
-    }
-}
 #endif /*LV_STYLE_CACHE_LEVEL >= 1*/
 
 

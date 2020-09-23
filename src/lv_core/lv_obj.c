@@ -778,6 +778,9 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
             }
         }
+        if(cmp_res == _LV_STYLE_STATE_CMP_VISUAL_DIFF) {
+            _lv_obj_invalidate_style_cache(obj, part, LV_STYLE_PROP_ALL);
+        }
 
     }
     if(cmp_res == _LV_STYLE_STATE_CMP_DIFF) _lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);

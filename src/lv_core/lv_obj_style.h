@@ -127,6 +127,17 @@ lv_style_list_t * _lv_obj_get_style_list(const lv_obj_t * obj, uint8_t part);
  */
 void _lv_obj_disable_style_caching(lv_obj_t * obj, bool dis);
 
+
+#if LV_STYLE_CACHE_LEVEL > 0
+
+/**
+ * Mark the object and all of it's children's style lists as invalid.
+ * The cache will be updated when a cached property asked nest time
+ * @param obj pointer to an object
+ */
+void _lv_obj_invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_property_t prop);
+#endif
+
 /**
  * Get a style property of a part of an object in the object's current state.
  * If there is a running transitions it is taken into account

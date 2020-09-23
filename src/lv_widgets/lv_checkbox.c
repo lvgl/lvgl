@@ -78,6 +78,7 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_label_set_text_static(cb, "Check box");
         lv_theme_apply(cb, LV_THEME_CHECKBOX);
         lv_obj_add_flag(cb, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_flag(cb, LV_OBJ_FLAG_CHECKABLE);
 
     }
     else {
