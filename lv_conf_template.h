@@ -195,6 +195,17 @@ typedef void * lv_group_user_data_t;
 e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #define LV_GPU_DMA2D_CMSIS_INCLUDE
 
+/*1: Use PXP for CPU off-load on NXP RTxxx platforms */
+#define LV_USE_GPU_NXP_PXP      0
+
+/*1: Add default bare metal and FreeRTOS interrupt handling routines for PXP (lv_gpu_nxp_pxp_osa.c)
+ *   and call lv_gpu_nxp_pxp_init() automatically during lv_init(). Note that symbol FSL_RTOS_FREE_RTOS
+ *   has to be defined in order to use FreeRTOS OSA, otherwise bare-metal implementation is selected.
+ *0: lv_gpu_nxp_pxp_init() has to be called manually before lv_init()
+ * */
+#define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
+
+
 /* 1: Enable file system (might be required for images */
 #define LV_USE_FILESYSTEM       1
 #if LV_USE_FILESYSTEM
