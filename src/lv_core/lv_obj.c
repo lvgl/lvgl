@@ -1793,8 +1793,16 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
             }
         }
         if(cmp_res == STYLE_COMPARE_DIFF) lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
+
+        if(cmp_res == STYLE_COMPARE_VISUAL_DIFF) {
+            invalidate_style_cache(obj, part, LV_STYLE_PROP_ALL);
+        }
     }
-    if(cmp_res == STYLE_COMPARE_VISUAL_DIFF) lv_obj_invalidate(obj);
+
+    if(cmp_res == STYLE_COMPARE_VISUAL_DIFF) {
+        lv_obj_invalidate(obj);
+    }
+
 #endif
 
 }
