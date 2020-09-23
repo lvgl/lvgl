@@ -5,6 +5,8 @@
 ### New features
 - Add PXP GPU support (for NXP MCUs)
 - Allow max. 16 cell types for table
+- Add `lv_table_set_text_fmt()`
+
 
 ### Bugfixes
 
