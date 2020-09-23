@@ -747,7 +747,6 @@ uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coor
     get_series_area(chart, &series_area);
 
     lv_coord_t w = lv_area_get_width(&series_area);
-    coord.x -= lv_obj_get_style_pad_left(chart, LV_CHART_PART_BG);
 
     uint16_t id = 0;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
