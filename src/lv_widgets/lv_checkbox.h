@@ -94,7 +94,7 @@ void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt);
  */
 static inline void lv_checkbox_set_checked(lv_obj_t * cb, bool checked)
 {
-    lv_btn_set_state(cb, checked ? LV_BTN_STATE_CHECKED_RELEASED : LV_BTN_STATE_RELEASED);
+    lv_btn_set_state(cb, checked ? LV_BTN_STATE_CHECKED_PRESSED : LV_BTN_STATE_RELEASED);
 }
 
 /**
