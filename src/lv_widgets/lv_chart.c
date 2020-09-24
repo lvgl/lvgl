@@ -55,7 +55,6 @@ static void draw_cursors(lv_obj_t * chart, const lv_area_t * series_area, const 
 static void draw_axes(lv_obj_t * chart, const lv_area_t * series_area, const lv_area_t * mask);
 static void invalidate_lines(lv_obj_t * chart, uint16_t i);
 static void invalidate_columns(lv_obj_t * chart, uint16_t i);
-static void get_series_area(lv_obj_t * chart, lv_area_t * series_area);
 static void get_next_axis_label(lv_chart_label_iterator_t * iterator, char * buf);
 static inline bool is_tick_with_label(uint8_t tick_num, lv_chart_axis_cfg_t * axis);
 static lv_chart_label_iterator_t create_axis_label_iter(const char * list, uint8_t iterator_dir);
@@ -819,6 +818,20 @@ lv_coord_t lv_chart_get_y_from_index(lv_obj_t * chart, lv_chart_series_t * ser, 
 	y  = h - y;
 
 	return (lv_coord_t)y;
+}
+
+/**
+ * Get an individual point y value in the chart series directly based on index
+ * @param chart             pointer to a chart object
+ * @param series_area       pointer to an area variable that the result will put in.
+ */
+void get_series_area(lv_obj_t * chart, lv_area_t * series_area)
+{
+    lv_area_copy(series_area, &chart->coords);
+    series_area->x1 += lv_obj_get_style_pad_left(chart, LV_CHART_PART_BG);
+    series_area->x2 -= lv_obj_get_style_pad_right(chart, LV_CHART_PART_BG);
+    series_area->y1 += lv_obj_get_style_pad_top(chart, LV_CHART_PART_BG);
+    series_area->y2 -= lv_obj_get_style_pad_bottom(chart, LV_CHART_PART_BG);
 }
 
 /*=====================
@@ -1762,15 +1775,6 @@ static void invalidate_columns(lv_obj_t * chart, uint16_t i)
     col_a.x2 = col_a.x1 + col_w;
 
     _lv_inv_area(lv_obj_get_disp(chart), &col_a);
-}
-
-static void get_series_area(lv_obj_t * chart, lv_area_t * series_area)
-{
-    lv_area_copy(series_area, &chart->coords);
-    series_area->x1 += lv_obj_get_style_pad_left(chart, LV_CHART_PART_BG);
-    series_area->x2 -= lv_obj_get_style_pad_right(chart, LV_CHART_PART_BG);
-    series_area->y1 += lv_obj_get_style_pad_top(chart, LV_CHART_PART_BG);
-    series_area->y2 -= lv_obj_get_style_pad_bottom(chart, LV_CHART_PART_BG);
 }
 
 #endif

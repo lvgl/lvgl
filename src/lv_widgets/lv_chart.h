@@ -369,6 +369,14 @@ lv_coord_t lv_chart_get_point_id(lv_obj_t * chart, lv_chart_series_t * ser, uint
  * @return `LV_CHART_AXIS_PRIMARY_Y` or `LV_CHART_AXIS_SECONDARY_Y`
  */
 lv_chart_axis_t lv_chart_get_series_axis(lv_obj_t * chart, lv_chart_series_t * ser);
+
+/**
+ * Get an individual point y value in the chart series directly based on index
+ * @param chart             pointer to a chart object
+ * @param series_area       pointer to an area variable that the result will put in.
+ */
+void get_series_area(lv_obj_t * chart, lv_area_t * series_area);
+
 lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor);
 uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coord);
 lv_coord_t lv_chart_get_x_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id);
