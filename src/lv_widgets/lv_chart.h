@@ -375,7 +375,7 @@ lv_chart_axis_t lv_chart_get_series_axis(lv_obj_t * chart, lv_chart_series_t * s
  * @param chart             pointer to a chart object
  * @param series_area       pointer to an area variable that the result will put in.
  */
-void get_series_area(lv_obj_t * chart, lv_area_t * series_area);
+void lv_chart_get_series_area(lv_obj_t * chart, lv_area_t * series_area);
 
 lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor);
 uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coord);

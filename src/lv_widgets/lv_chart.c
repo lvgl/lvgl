@@ -743,7 +743,7 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
 uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coord)
 {
     lv_area_t series_area;
-    get_series_area(chart, &series_area);
+    lv_chart_get_series_area(chart, &series_area);
 
     lv_coord_t w = lv_area_get_width(&series_area);
 
@@ -773,7 +773,7 @@ lv_coord_t lv_chart_get_x_from_index(lv_obj_t * chart, lv_chart_series_t * ser, 
 	}
 
 	lv_area_t series_area;
-	get_series_area(chart, &series_area);
+	lv_chart_get_series_area(chart, &series_area);
 
 	lv_coord_t w = lv_area_get_width(&series_area);
 
@@ -809,7 +809,7 @@ lv_coord_t lv_chart_get_y_from_index(lv_obj_t * chart, lv_chart_series_t * ser, 
 	}
 
 	lv_area_t series_area;
-	get_series_area(chart, &series_area);
+	lv_chart_get_series_area(chart, &series_area);
 
 	lv_coord_t h = lv_area_get_height(&series_area);
 
@@ -825,7 +825,7 @@ lv_coord_t lv_chart_get_y_from_index(lv_obj_t * chart, lv_chart_series_t * ser, 
  * @param chart             pointer to a chart object
  * @param series_area       pointer to an area variable that the result will put in.
  */
-void get_series_area(lv_obj_t * chart, lv_area_t * series_area)
+void lv_chart_get_series_area(lv_obj_t * chart, lv_area_t * series_area)
 {
     lv_area_copy(series_area, &chart->coords);
     series_area->x1 += lv_obj_get_style_pad_left(chart, LV_CHART_PART_BG);
@@ -876,7 +876,7 @@ static lv_design_res_t lv_chart_design(lv_obj_t * chart, const lv_area_t * clip_
         lv_draw_rect(&chart->coords, clip_area, &bg_dsc);
 
         lv_area_t series_area;
-        get_series_area(chart, &series_area);
+        lv_chart_get_series_area(chart, &series_area);
 
         draw_series_bg(chart, &series_area, clip_area);
         draw_axes(chart, &series_area, clip_area);
@@ -1722,7 +1722,7 @@ static void invalidate_lines(lv_obj_t * chart, uint16_t i)
     if(i >= ext->point_cnt) return;
 
     lv_area_t series_area;
-    get_series_area(chart, &series_area);
+    lv_chart_get_series_area(chart, &series_area);
 
     lv_coord_t w     = lv_area_get_width(&series_area);
     lv_coord_t x_ofs = series_area.x1;
@@ -1759,7 +1759,7 @@ static void invalidate_columns(lv_obj_t * chart, uint16_t i)
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
     lv_area_t series_area;
-    get_series_area(chart, &series_area);
+    lv_chart_get_series_area(chart, &series_area);
 
     lv_area_t col_a;
     lv_coord_t w     = lv_area_get_width(&series_area);
