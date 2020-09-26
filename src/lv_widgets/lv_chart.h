@@ -327,6 +327,13 @@ void lv_chart_set_point_id(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t
  */
 void lv_chart_set_series_axis(lv_obj_t * chart, lv_chart_series_t * ser, lv_chart_axis_t axis);
 
+/**
+ * Set the coordinate of the cursor with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object.
+ * @param cursor pointer to the cursor.
+ * @param point the new coordinate of cursor.
+ */
 void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t point);
 /*=====================
  * Getter functions
@@ -377,9 +384,41 @@ lv_chart_axis_t lv_chart_get_series_axis(lv_obj_t * chart, lv_chart_series_t * s
  */
 void lv_chart_get_series_area(lv_obj_t * chart, lv_area_t * series_area);
 
+/**
+ * Get the coordinate of the cursor with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object
+ * @param cursor pointer to cursor
+ * @return coordinate of the cursor as lv_point_t
+ */
 lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor);
+
+/**
+ * Get the nearest index we have in the left side of a point on series area.
+ * @param chart pointer to a chart object
+ * @param coord the coordination of the point.
+ * @return the index in found.
+ */
 uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coord);
+
+/**
+ * Get the x coordinate of the an index with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object
+ * @param ser pointer to series
+ * @param id the index.
+ * @return x coordinate of index
+ */
 lv_coord_t lv_chart_get_x_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id);
+
+/**
+ * Get the y coordinate of the an index with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object
+ * @param ser pointer to series
+ * @param id the index.
+ * @return y coordinate of index
+ */
 lv_coord_t lv_chart_get_y_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id);
 /*=====================
  * Other functions

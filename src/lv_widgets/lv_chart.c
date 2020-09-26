@@ -649,6 +649,13 @@ void lv_chart_set_series_axis(lv_obj_t * chart, lv_chart_series_t * ser, lv_char
     lv_chart_refresh(chart);
 }
 
+/**
+ * Set the coordinate of the cursor with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object.
+ * @param cursor pointer to the cursor.
+ * @param point the new coordinate of cursor.
+ */
 void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t point)
 {
 	LV_ASSERT_NULL(cursor);
@@ -732,6 +739,13 @@ lv_chart_axis_t lv_chart_get_series_axis(lv_obj_t * chart, lv_chart_series_t * s
     return ser->y_axis;
 }
 
+/**
+ * Get the coordinate of the cursor with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object
+ * @param cursor pointer to cursor
+ * @return coordinate of the cursor as lv_point_t
+ */
 lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor)
 {
     LV_ASSERT_NULL(cursor);
@@ -740,6 +754,12 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
     return cursor->point;
 }
 
+/**
+ * Get the nearest index we have in the left side of a point on series area.
+ * @param chart pointer to a chart object
+ * @param coord the coordination of the point.
+ * @return the index in found.
+ */
 uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coord)
 {
     lv_area_t series_area;
@@ -761,6 +781,14 @@ uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coor
     return id;
 }
 
+/**
+ * Get the x coordinate of the an index with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object
+ * @param ser pointer to series
+ * @param id the index.
+ * @return x coordinate of index
+ */
 lv_coord_t lv_chart_get_x_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id)
 {
 	LV_ASSERT_NULL(chart);
@@ -797,6 +825,14 @@ lv_coord_t lv_chart_get_x_from_index(lv_obj_t * chart, lv_chart_series_t * ser, 
 	return x;
 }
 
+/**
+ * Get the y coordinate of the an index with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object
+ * @param ser pointer to series
+ * @param id the index.
+ * @return y coordinate of index
+ */
 lv_coord_t lv_chart_get_y_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id)
 {
 	LV_ASSERT_NULL(chart);
@@ -821,9 +857,9 @@ lv_coord_t lv_chart_get_y_from_index(lv_obj_t * chart, lv_chart_series_t * ser, 
 }
 
 /**
- * Get an individual point y value in the chart series directly based on index
- * @param chart             pointer to a chart object
- * @param series_area       pointer to an area variable that the result will put in.
+ * Get the series area of a chart.
+ * @param chart  pointer to a chart object
+ * @param series_area  pointer to an area variable that the result will be put in.
  */
 void lv_chart_get_series_area(lv_obj_t * chart, lv_area_t * series_area)
 {
