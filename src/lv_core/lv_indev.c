@@ -991,16 +991,6 @@ static void indev_proc_release(lv_indev_proc_t * proc)
         lv_event_send(indev_obj_act, LV_EVENT_RELEASED, NULL);
         if(indev_reset_check(proc)) return;
 
-
-        /*Send SCROLL_THROW_BEGIN signal and event*/
-        if(scroll_obj) {
-            lv_signal_send(scroll_obj, LV_SIGNAL_SCROLL_THROW_BEGIN, indev_act);
-            if(indev_reset_check(proc)) return;
-
-            lv_event_send(indev_obj_act, LV_EVENT_SCROLL_THROW_BEGIN, indev_act);
-            if(indev_reset_check(proc)) return;
-        }
-
         proc->types.pointer.act_obj = NULL;
         proc->pr_timestamp          = 0;
         proc->longpr_rep_timestamp  = 0;

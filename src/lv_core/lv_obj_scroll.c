@@ -220,9 +220,6 @@ lv_coord_t lv_obj_get_scroll_left(const lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_scroll_right(const lv_obj_t * obj)
 {
-    static uint32_t cnt = 0;
-    printf("scrl right: %d\n", cnt);
-    cnt++;
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     lv_coord_t child_res = LV_COORD_MIN;

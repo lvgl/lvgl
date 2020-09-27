@@ -98,7 +98,7 @@ void lv_obj_set_x(lv_obj_t * obj, lv_coord_t x)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_set_pos(obj, x, lv_obj_get_y(obj));
+    lv_obj_set_pos(obj, x, obj->y_set);
 }
 
 /**
@@ -110,7 +110,7 @@ void lv_obj_set_y(lv_obj_t * obj, lv_coord_t y)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_set_pos(obj, lv_obj_get_x(obj), y);
+    lv_obj_set_pos(obj, obj->x_set, y);
 }
 
 /**
@@ -175,7 +175,7 @@ void lv_obj_set_width(lv_obj_t * obj, lv_coord_t w)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_set_size(obj, w, lv_obj_get_height(obj));
+    lv_obj_set_size(obj, w, obj->h_set);
 }
 
 /**
@@ -187,7 +187,7 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_set_size(obj, lv_obj_get_width(obj), h);
+    lv_obj_set_size(obj, obj->w_set, h);
 }
 
 /**

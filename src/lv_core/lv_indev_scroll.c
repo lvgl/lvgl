@@ -353,6 +353,37 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
     }
 }
 
+/**
+ * Predict where would a scroll throw end
+ * @param indev pointer to an input device
+ * @param dir `LV_DIR_VER` or `LV_DIR_HOR`
+ * @return the difference compared to the current position when the throw would be finished
+ */
+lv_coord_t _lv_scroll_throw_predict(lv_indev_t * indev, lv_dir_t dir)
+{
+    if(indev == NULL) return 0;
+    lv_coord_t v;
+    switch(dir) {
+    case LV_DIR_VER:
+        v = indev->proc.types.pointer.scroll_throw_vect.y;
+        break;
+    case LV_DIR_HOR:
+        v = indev->proc.types.pointer.scroll_throw_vect.x;
+        break;
+    default:
+        return 0;
+    }
+
+    lv_coord_t scroll_throw = indev->driver.scroll_throw;
+    lv_coord_t sum = 0;
+    while(v) {
+        sum += v;
+        v = v * (100 - scroll_throw) / 100;
+    }
+
+    return sum;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/

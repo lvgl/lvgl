@@ -1914,7 +1914,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_SCROLL) {
-        res = lv_event_send(obj, LV_EVENT_SCROLLED, NULL);
+        res = lv_event_send(obj, LV_EVENT_SCROLL, NULL);
         if(res != LV_RES_OK) return res;
     }
     else if(sign == LV_SIGNAL_SCROLL_END) {

@@ -92,9 +92,8 @@ enum {
     LV_EVENT_CLICKED,             /**< Called on release if not scrolled (regardless to long press)*/
     LV_EVENT_RELEASED,            /**< Called in every cases when the object has been released*/
     LV_EVENT_SCROLL_BEGIN,
-    LV_EVENT_SCROLL_THROW_BEGIN,
     LV_EVENT_SCROLL_END,
-    LV_EVENT_SCROLLED,
+    LV_EVENT_SCROLL,
     LV_EVENT_GESTURE,           /**< The object has been gesture*/
     LV_EVENT_KEY,
     LV_EVENT_FOCUSED,
@@ -142,7 +141,6 @@ enum {
     LV_SIGNAL_SCROLL_BEGIN,      /**< The scrolling has just begun  */
     LV_SIGNAL_SCROLL,            /**< The object has been scrolled */
     LV_SIGNAL_SCROLL_END,        /**< The scrolling has ended */
-    LV_SIGNAL_SCROLL_THROW_BEGIN,/**< Scroll throw started*/
     LV_SIGNAL_GESTURE,          /**< The object has been gesture*/
     LV_SIGNAL_LEAVE,            /**< Another object is clicked or chosen via an input device */
 
