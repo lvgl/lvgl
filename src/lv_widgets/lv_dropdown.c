@@ -588,6 +588,8 @@ void lv_dropdown_open(lv_obj_t * ddlist)
     lv_obj_add_protect(ext->page, LV_PROTECT_POS | LV_PROTECT_CLICK_FOCUS);
     lv_obj_add_protect(lv_page_get_scrollable(ext->page), LV_PROTECT_CLICK_FOCUS);
 
+    lv_obj_set_base_dir(ext->page, lv_obj_get_base_dir(ddlist));
+
     if(ancestor_page_signal == NULL) ancestor_page_signal = lv_obj_get_signal_cb(ext->page);
     if(ancestor_page_scrl_signal == NULL) ancestor_page_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrollable(
                                                                                                    ext->page));
