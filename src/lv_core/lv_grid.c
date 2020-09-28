@@ -385,7 +385,10 @@ static void calc_implicit_cols(lv_obj_t * cont, _lv_grid_calc_t * calc)
     while(child) {
         if(_GRID_IS_CELL(child->x_set) && _GRID_IS_CELL(child->y_set)) {
             lv_coord_t w;
-            if(_GRID_GET_CELL_FLAG(child->x_set) == LV_GRID_STRETCH) _lv_obj_calc_auto_size(child,  &w, NULL);
+            if(_GRID_GET_CELL_FLAG(child->x_set) == LV_GRID_STRETCH) {
+                lv_obj_scroll_to_x(child, 0, LV_ANIM_OFF);
+                _lv_obj_calc_auto_size(child,  &w, NULL);
+            }
             else w = lv_obj_get_width(child);
             calc->w[col_i] = LV_MATH_MAX(calc->w[col_i], w);
             row_i++;
@@ -416,7 +419,10 @@ static void calc_implicit_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
     while(child) {
         if(_GRID_IS_CELL(child->x_set) && _GRID_IS_CELL(child->y_set)) {
             lv_coord_t h;
-            if(_GRID_GET_CELL_FLAG(child->y_set) == LV_GRID_STRETCH) _lv_obj_calc_auto_size(child,  NULL, &h);
+            if(_GRID_GET_CELL_FLAG(child->y_set) == LV_GRID_STRETCH) {
+                lv_obj_scroll_to_y(child, 0, LV_ANIM_OFF);
+                _lv_obj_calc_auto_size(child,  NULL, &h);
+            }
             else h = lv_obj_get_height(child);
             calc->h[row_i] = LV_MATH_MAX(calc->h[row_i], h);
             col_i++;

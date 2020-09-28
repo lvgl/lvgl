@@ -38,20 +38,22 @@ static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * cli
 static lv_design_res_t lv_roller_label_design(lv_obj_t * label, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_style_list_t * lv_roller_get_style(lv_obj_t * roller, uint8_t part);
 static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * param);
+static lv_res_t lv_roller_label_signal(lv_obj_t * label, lv_signal_t sign, void * param);
 static void refr_position(lv_obj_t * roller, lv_anim_enable_t animen);
 static lv_res_t release_handler(lv_obj_t * roller);
 static void inf_normalize(lv_obj_t * roller_scrl);
 static lv_obj_t * get_label(const lv_obj_t * roller);
+static lv_coord_t get_selected_label_width(const lv_obj_t * roller);
 #if LV_USE_ANIMATION
     static void scroll_anim_ready_cb(lv_anim_t * a);
 #endif
-static void draw_bg(lv_obj_t * roller, const lv_area_t * clip_area);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
 static lv_signal_cb_t ancestor_signal;
 static lv_design_cb_t ancestor_design;
+static lv_signal_cb_t ancestor_label_signal;
 static lv_design_cb_t ancestor_label_design;
 
 /**********************
@@ -95,8 +97,6 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_style_list_init(&ext->style_sel);
 
     /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(roller, lv_roller_signal);
-    lv_obj_set_design_cb(roller, lv_roller_design);
 
     /*Init the new roller roller*/
     if(copy == NULL) {
@@ -106,8 +106,14 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_obj_t * label = lv_label_create(roller, NULL);
         lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
+
         if(ancestor_label_design == NULL) ancestor_label_design = lv_obj_get_design_cb(label);
+        if(ancestor_label_signal == NULL) ancestor_label_signal = lv_obj_get_signal_cb(label);
         lv_obj_set_design_cb(label, lv_roller_label_design);
+        lv_obj_set_signal_cb(label, lv_roller_label_signal);
+
+        lv_obj_set_signal_cb(roller, lv_roller_signal);
+        lv_obj_set_design_cb(roller, lv_roller_design);
 
         lv_roller_set_options(roller, "Option 1\nOption 2\nOption 3\nOption 4\nOption 5", LV_ROLLER_MODE_NORMAL);
 
@@ -117,13 +123,19 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing roller*/
     else {
-        lv_label_create(roller, get_label(copy));
+        lv_obj_t * label = lv_label_create(roller, get_label(copy));
 
         lv_roller_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->mode = copy_ext->mode;
         ext->option_cnt = copy_ext->option_cnt;
         ext->sel_opt_id = copy_ext->sel_opt_id;
         ext->sel_opt_id_ori = copy_ext->sel_opt_id;
+
+        lv_obj_set_design_cb(label, lv_roller_label_design);
+        lv_obj_set_signal_cb(label, lv_roller_label_signal);
+
+        lv_obj_set_signal_cb(roller, lv_roller_signal);
+        lv_obj_set_design_cb(roller, lv_roller_design);
 
         lv_style_list_copy(&ext->style_sel, &copy_ext->style_sel);
         _lv_obj_refresh_style(roller, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
@@ -189,6 +201,10 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
     }
 
     ext->sel_opt_id_ori = ext->sel_opt_id;
+
+    /*If the selected text has larger font the label needs some extra draw padding to draw it.*/
+    _lv_obj_refresh_ext_draw_pad(label);
+
 }
 
 /**
@@ -204,6 +220,7 @@ void lv_roller_set_align(lv_obj_t * roller, lv_label_align_t align)
     if(label == NULL) return; /*Probably the roller is being deleted if the label is NULL.*/
 
     lv_label_set_align(label, align);
+    refr_position(roller, LV_ANIM_OFF);
 }
 
 /**
@@ -562,12 +579,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
     res = ancestor_signal(roller, sign, param);
     if(res != LV_RES_OK) return res;
 
-    int32_t id            = -1;
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
-
-    const lv_font_t * font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);
-    lv_style_int_t line_space = lv_obj_get_style_text_line_space(roller, LV_ROLLER_PART_BG);
-    lv_coord_t font_h         = lv_font_get_line_height(font);
 
     /* Include the ancient signal function */
     if(sign == LV_SIGNAL_GET_STYLE) {
@@ -578,10 +590,15 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
     else if(sign == LV_SIGNAL_GET_TYPE) {
         return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
     }
+    else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
+        lv_point_t * p = param;
+        p->x =  get_selected_label_width(roller);
+    }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_t * label = get_label(roller);
         /*Be sure the label's style is updated before processing the roller*/
         if(label) lv_signal_send(label, LV_SIGNAL_STYLE_CHG, NULL);
+        lv_obj_set_width(roller, roller->w_set);
         refr_position(roller, false);
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {
@@ -667,12 +684,31 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
         _lv_obj_reset_style_list_no_refr(roller, LV_ROLLER_PART_SELECTED);
     }
 
+    return res;
+}
 
-    /*Position the scrollable according to the new selected option*/
-    if(id != -1) {
-        refr_position(roller, LV_ANIM_ON);
+/**
+ * Signal function of the roller's label
+ * @param label pointer to a roller's label object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_roller_label_signal(lv_obj_t * label, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    /* Include the ancient signal function */
+    res = ancestor_label_signal(label, sign, param);
+    if(res != LV_RES_OK) return res;
+
+    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+        /*If the selected text has a larger font it needs some extra space to draw it*/
+        lv_obj_t * roller = lv_obj_get_parent(label);
+        lv_coord_t sel_w = get_selected_label_width(roller);
+        lv_coord_t label_w = lv_obj_get_width(label);
+        label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, sel_w - label_w);
     }
-
 
     return res;
 }
@@ -705,60 +741,6 @@ static lv_style_list_t * lv_roller_get_style(lv_obj_t * roller, uint8_t part)
 }
 
 /**
- * Draw a rectangle which has gradient on its top and bottom
- * @param roller pointer to a roller object
- * @param clip_area pointer to the current mask (from the design function)
- */
-static void draw_bg(lv_obj_t * roller, const lv_area_t * clip_area)
-{
-    lv_draw_rect_dsc_t bg_dsc;
-    lv_draw_rect_dsc_init(&bg_dsc);
-    lv_obj_init_draw_rect_dsc(roller, LV_ROLLER_PART_BG, &bg_dsc);
-
-    /*With non-vertical gradient simply draw the background*/
-    if(bg_dsc.bg_grad_dir == LV_GRAD_DIR_NONE) {
-        lv_draw_rect(&roller->coords, clip_area, &bg_dsc);
-        return;
-    }
-
-    /*With vertical gradient mirror it*/
-    lv_area_t half_mask;
-    lv_coord_t h = lv_obj_get_height(roller);
-    bool union_ok;
-
-    lv_area_copy(&half_mask, &roller->coords);
-    half_mask.x1 -= roller->ext_draw_pad; /*Add ext size too (e.g. because of shadow draw) */
-    half_mask.x2 += roller->ext_draw_pad;
-    half_mask.y1 -= roller->ext_draw_pad;
-    half_mask.y2 = roller->coords.y1 + h / 2;
-
-    union_ok = _lv_area_intersect(&half_mask, &half_mask, clip_area);
-    bg_dsc.bg_main_color_stop = bg_dsc.bg_main_color_stop / 2;
-    bg_dsc.bg_grad_color_stop = 128 - (255 - bg_dsc.bg_grad_color_stop) / 2;
-    if(union_ok) {
-        lv_draw_rect(&roller->coords, &half_mask, &bg_dsc);
-    }
-
-    lv_area_copy(&half_mask, &roller->coords);
-    half_mask.x1 -= roller->ext_draw_pad; /*Revert ext. size adding*/
-    half_mask.x2 += roller->ext_draw_pad;
-    half_mask.y1 = roller->coords.y1 + h / 2;
-    half_mask.y2 += roller->ext_draw_pad;
-
-    union_ok = _lv_area_intersect(&half_mask, &half_mask, clip_area);
-    if(union_ok) {
-        lv_color_t c = bg_dsc.bg_color;
-        bg_dsc.bg_color = bg_dsc.bg_grad_color;
-        bg_dsc.bg_grad_color = c;
-
-        bg_dsc.bg_main_color_stop += 127;
-        bg_dsc.bg_grad_color_stop += 127;
-        lv_draw_rect(&roller->coords, &half_mask, &bg_dsc);
-    }
-}
-
-
-/**
  * Refresh the position of the roller. It uses the id stored in: ext->ddlist.selected_option_id
  * @param roller pointer to a roller object
  * @param anim_en LV_ANIM_ON: refresh with animation; LV_ANOM_OFF: without animation
@@ -771,6 +753,19 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
 #if LV_USE_ANIMATION == 0
     anim_en = LV_ANIM_OFF;
 #endif
+
+    lv_label_align_t align = lv_label_get_align(label);
+    switch(align) {
+    case LV_LABEL_ALIGN_CENTER:
+        lv_obj_set_x(label, (lv_obj_get_width_fit(roller) - lv_obj_get_width(label)) / 2);
+        break;
+    case LV_LABEL_ALIGN_RIGHT:
+        lv_obj_set_x(label, lv_obj_get_width_fit(roller) - lv_obj_get_width(label));
+        break;
+    case LV_LABEL_ALIGN_LEFT:
+        lv_obj_set_x(label, 0);
+        break;
+    }
 
     lv_roller_ext_t * ext          = lv_obj_get_ext_attr(roller);
     const lv_font_t * font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);
@@ -927,6 +922,20 @@ static void inf_normalize(lv_obj_t * roller)
 static lv_obj_t * get_label(const lv_obj_t * roller)
 {
     return lv_obj_get_child(roller, NULL);
+}
+
+
+static lv_coord_t get_selected_label_width(const lv_obj_t * roller)
+{
+    lv_obj_t * label = get_label(roller);
+    if(label == NULL) return 0;
+
+    const lv_font_t * font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_SELECTED);
+    lv_style_int_t letter_space = lv_obj_get_style_text_letter_space(roller, LV_ROLLER_PART_SELECTED);
+    const char * txt = lv_label_get_text(label);
+    lv_point_t size;
+    _lv_txt_get_size(&size, txt, font, letter_space, 0, LV_COORD_MAX,  LV_TXT_FLAG_NONE);
+    return size.x;
 }
 
 #if LV_USE_ANIMATION

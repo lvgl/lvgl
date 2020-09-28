@@ -147,6 +147,10 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     bool x_auto = obj->w_set == LV_SIZE_AUTO ? true : false;
     bool y_auto = obj->h_set == LV_SIZE_AUTO ? true : false;
 
+    /*Be sure the object is not scrolled when it has auto size*/
+    if(x_auto) lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
+    if(y_auto) lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
+
     lv_coord_t auto_w;
     lv_coord_t auto_h;
     if(x_auto && y_auto) {
@@ -471,17 +475,15 @@ void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_o
     lv_coord_t children_w = 0;
     lv_coord_t children_h = 0;
     if(w_out) {
-        lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
         lv_coord_t scroll_right = lv_obj_get_scroll_right(obj);
         lv_coord_t scroll_left = lv_obj_get_scroll_left(obj);
         children_w = lv_obj_get_width(obj) + scroll_right + scroll_left;
     }
 
     if(h_out) {
-        lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
         lv_coord_t scroll_bottom = lv_obj_get_scroll_bottom(obj);
         lv_coord_t scroll_top = lv_obj_get_scroll_top(obj);
-        children_h = lv_obj_get_height(obj) + scroll_bottom + scroll_top ;
+        children_h = lv_obj_get_height(obj) + scroll_bottom + scroll_top;
     }
 
     /*auto_size = max(gird_size, children_size)*/

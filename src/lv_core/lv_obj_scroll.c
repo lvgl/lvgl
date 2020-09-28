@@ -234,7 +234,16 @@ lv_coord_t lv_obj_get_scroll_right(const lv_obj_t * obj)
 
     }
 
-    return child_res - obj->coords.x2 + lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
+    lv_coord_t pad_right = lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
+    lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
+
+    child_res -= (obj->coords.x2 - pad_right);
+
+    lv_point_t p = {0, 0};
+    lv_signal_send(obj, LV_SIGNAL_GET_SELF_SIZE, &p);
+    p.x = p.x - (lv_obj_get_width(obj) - pad_right - pad_left);
+    p.x += obj->scroll.x;
+    return LV_MATH_MAX(child_res, p.x);
 }
 
 /**********************
