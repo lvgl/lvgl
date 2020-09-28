@@ -19,6 +19,7 @@
 - Fix selection of options with non-ASCII letters in dropdown list 
 - Fix font loader to support LV_FONT_FMT_TXT_LARGE
 - Fix BIDI support in dropdown list
+- Fix copying base dir in lv_obj_craete
 
 ## v7.5.0 (15.09.2020)
 
