@@ -3512,6 +3512,7 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
 
     if(draw_dsc->sel_start != LV_DRAW_LABEL_NO_TXT_SEL && draw_dsc->sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
        draw_dsc->sel_color = lv_obj_get_style_text_sel_color(obj, part);
+       draw_dsc->sel_font_color = lv_obj_get_style_text_sel_font_color(obj, part);
     }
 
 #if LV_USE_BIDI

@@ -99,6 +99,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc)
     dsc->sel_start = LV_DRAW_LABEL_NO_TXT_SEL;
     dsc->sel_end = LV_DRAW_LABEL_NO_TXT_SEL;
     dsc->sel_color = LV_COLOR_BLUE;
+    dsc->sel_font_color = LV_COLOR_BLACK;
     dsc->bidi_dir = LV_BIDI_DIR_LTR;
 }
 
@@ -320,6 +321,7 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area
                     sel_coords.x2 = pos.x + letter_w + dsc->letter_space - 1;
                     sel_coords.y2 = pos.y + line_height - 1;
                     lv_draw_rect(&sel_coords, mask, &draw_dsc_sel);
+                    color = dsc->sel_font_color;
                 }
             }
 
