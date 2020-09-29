@@ -1255,6 +1255,9 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             _lv_style_list_add_style(list, &styles->pad_small);
             _lv_style_list_add_style(list, &styles->chart_series_bg);
 
+            list = lv_obj_get_style_list(obj, LV_CHART_PART_CURSOR);
+            _lv_style_list_add_style(list, &styles->chart_series_bg);
+
             list = lv_obj_get_style_list(obj, LV_CHART_PART_SERIES);
             _lv_style_list_add_style(list, &styles->chart_series);
             break;

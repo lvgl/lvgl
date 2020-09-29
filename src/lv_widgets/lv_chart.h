@@ -154,7 +154,14 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy);
  */
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color);
 
-lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * chart, lv_color_t color, lv_cursor_direction_t axes);
+/**
+ * Add a cursor with a given color
+ * @param chart pointer to chart object
+ * @param color color of the cursor
+ * @param dir direction of the cursor. `LV_CHART_CURSOR_RIGHT/LEFT/TOP/DOWN`. OR-ed vaéues are possible
+ * @return pointer to the created cursor
+ */
+lv_chart_cursor_t * lv_chart_add_cursor(lv_obj_t * chart, lv_color_t color, lv_cursor_direction_t dir);
 
 /**
  * Clear the point of a series
@@ -332,9 +339,11 @@ void lv_chart_set_series_axis(lv_obj_t * chart, lv_chart_series_t * ser, lv_char
  * to the origin of series area of the chart.
  * @param chart pointer to a chart object.
  * @param cursor pointer to the cursor.
- * @param point the new coordinate of cursor.
+ * @param point the new coordinate of cursor relative to the series area
  */
-void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t point);
+void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * point);
+
+
 /*=====================
  * Getter functions
  *====================*/
@@ -394,12 +403,12 @@ void lv_chart_get_series_area(lv_obj_t * chart, lv_area_t * series_area);
 lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor);
 
 /**
- * Get the nearest index we have in the left side of a point on series area.
+ * Get the nearest index to an X coordinate
  * @param chart pointer to a chart object
- * @param coord the coordination of the point.
- * @return the index in found.
+ * @param coord the coordination of the point relative to the series area.
+ * @return the found index
  */
-uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coord);
+uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_coord_t x);
 
 /**
  * Get the x coordinate of the an index with respect
@@ -420,6 +429,7 @@ lv_coord_t lv_chart_get_x_from_index(lv_obj_t * chart, lv_chart_series_t * ser, 
  * @return y coordinate of index
  */
 lv_coord_t lv_chart_get_y_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id);
+
 /*=====================
  * Other functions
  *====================*/

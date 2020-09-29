@@ -654,14 +654,15 @@ void lv_chart_set_series_axis(lv_obj_t * chart, lv_chart_series_t * ser, lv_char
  * to the origin of series area of the chart.
  * @param chart pointer to a chart object.
  * @param cursor pointer to the cursor.
- * @param point the new coordinate of cursor.
+ * @param point the new coordinate of cursor relative to the series area
  */
-void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t point)
+void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * point)
 {
 	LV_ASSERT_NULL(cursor);
 	LV_UNUSED(chart);
 
-	cursor->point = point;
+	cursor->point.x = point->x;
+	cursor->point.y = point->y;
 	lv_chart_refresh(chart);
 }
 
@@ -755,30 +756,25 @@ lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * curso
 }
 
 /**
- * Get the nearest index we have in the left side of a point on series area.
+ * Get the nearest index to an X coordinate
  * @param chart pointer to a chart object
- * @param coord the coordination of the point.
- * @return the index in found.
+ * @param coord the coordination of the point relative to the series area.
+ * @return the found index
  */
-uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coord)
+uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_coord_t x)
 {
     lv_area_t series_area;
     lv_chart_get_series_area(chart, &series_area);
 
     lv_coord_t w = lv_area_get_width(&series_area);
-
-    uint16_t id = 0;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
 
-    if(coord.x < 0) {
-	    id = 0;
-    } else if(coord.x > w) {
-	    id = ext->point_cnt - 1;
-    } else {
-	    id = coord.x * (ext->point_cnt - 1) / w;
-    }
+    if(x < 0) return 0;
+    if(x > w) return ext->point_cnt - 1;
+    if(ext->type == LV_CHART_TYPE_LINE) return (x * (ext->point_cnt - 1) + w / 2) / w;
+    if(ext->type == LV_CHART_TYPE_COLUMN) return (x * ext->point_cnt) / w;
 
-    return id;
+    return 0;
 }
 
 /**
@@ -805,21 +801,25 @@ lv_coord_t lv_chart_get_x_from_index(lv_obj_t * chart, lv_chart_series_t * ser, 
 
 	lv_coord_t w = lv_area_get_width(&series_area);
 
-	lv_coord_t x = {0};
+	lv_coord_t x = 0;
+
 
 	if(ext->type & LV_CHART_TYPE_LINE) {
 		x = (w * id) / (ext->point_cnt - 1);
 	} else if(ext->type & LV_CHART_TYPE_COLUMN) {
 		lv_coord_t col_w = w / ((_lv_ll_get_len(&ext->series_ll) + 1) * ext->point_cnt); /* Suppose + 1 series as separator*/
 		lv_chart_series_t * itr_ser = NULL;
-		x = (int32_t)((int32_t)w * id) / ext->point_cnt + (col_w / 2);
+		lv_style_int_t col_space = lv_obj_get_style_pad_inner(chart, LV_CHART_PART_SERIES);
 
-		 _LV_LL_READ_BACK(ext->series_ll, itr_ser) {
-			 if(itr_ser == ser) break;
-			 x += col_w;
-		 }
+		x = (int32_t)((int32_t)w * id) / ext->point_cnt;
+		x += col_w / 2; /*Start offset*/
 
-		 x = x + (col_w / 2);
+		_LV_LL_READ_BACK(ext->series_ll, itr_ser) {
+		    if(itr_ser == ser) break;
+		    x += col_w;
+		}
+
+		x += (col_w - col_space) / 2;
 	}
 
 	return x;
