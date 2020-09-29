@@ -61,6 +61,15 @@ enum {
 };
 typedef uint8_t lv_chart_axis_t;
 
+enum {
+    LV_CHART_CURSOR_NONE = 0x00,
+	LV_CHART_CURSOR_RIGHT    = 0x01,
+    LV_CHART_CURSOR_UP    = 0x02,
+    LV_CHART_CURSOR_LEFT    = 0x04,
+    LV_CHART_CURSOR_DOWN    = 0x08
+};
+typedef uint8_t lv_cursor_direction_t;
+
 typedef struct {
     lv_coord_t * points;
     lv_color_t color;
@@ -68,6 +77,12 @@ typedef struct {
     uint8_t ext_buf_assigned : 1;
     lv_chart_axis_t y_axis  : 1;
 } lv_chart_series_t;
+
+typedef struct {
+    lv_point_t point;
+    lv_color_t color;
+    lv_cursor_direction_t axes  : 4;
+} lv_chart_cursor_t;
 
 /** Data of axis */
 enum {
@@ -90,6 +105,7 @@ typedef struct {
     /*No inherited ext*/ /*Ext. of ancestor*/
     /*New data for this type */
     lv_ll_t series_ll;    /*Linked list for the data line pointers (stores lv_chart_series_t)*/
+    lv_ll_t cursors_ll;    /*Linked list for the cursor pointers (stores lv_chart_cursor_t)*/
     lv_coord_t ymin[_LV_CHART_AXIS_LAST];      /*y min values for both axis (used to scale the data)*/
     lv_coord_t ymax[_LV_CHART_AXIS_LAST];      /*y max values for both axis  (used to scale the data)*/
     uint8_t hdiv_cnt;     /*Number of horizontal division lines*/
@@ -97,6 +113,7 @@ typedef struct {
     uint16_t point_cnt;   /*Point number in a data line*/
     lv_style_list_t style_series_bg;
     lv_style_list_t style_series;
+    lv_style_list_t style_cursors;
     lv_chart_type_t type; /*Line, column or point chart (from 'lv_chart_type_t')*/
     lv_chart_axis_cfg_t y_axis;
     lv_chart_axis_cfg_t x_axis;
@@ -108,7 +125,8 @@ typedef struct {
 enum {
     LV_CHART_PART_BG = LV_OBJ_PART_MAIN,
     LV_CHART_PART_SERIES_BG = _LV_OBJ_PART_VIRTUAL_LAST,
-    LV_CHART_PART_SERIES
+    LV_CHART_PART_SERIES,
+    LV_CHART_PART_CURSOR
 };
 
 /**********************
@@ -135,6 +153,8 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy);
  * @return pointer to the allocated data series
  */
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color);
+
+lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * chart, lv_color_t color, lv_cursor_direction_t axes);
 
 /**
  * Clear the point of a series
@@ -307,6 +327,14 @@ void lv_chart_set_point_id(lv_obj_t * chart, lv_chart_series_t * ser, lv_coord_t
  */
 void lv_chart_set_series_axis(lv_obj_t * chart, lv_chart_series_t * ser, lv_chart_axis_t axis);
 
+/**
+ * Set the coordinate of the cursor with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object.
+ * @param cursor pointer to the cursor.
+ * @param point the new coordinate of cursor.
+ */
+void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t point);
 /*=====================
  * Getter functions
  *====================*/
@@ -349,6 +377,49 @@ lv_coord_t lv_chart_get_point_id(lv_obj_t * chart, lv_chart_series_t * ser, uint
  */
 lv_chart_axis_t lv_chart_get_series_axis(lv_obj_t * chart, lv_chart_series_t * ser);
 
+/**
+ * Get an individual point y value in the chart series directly based on index
+ * @param chart             pointer to a chart object
+ * @param series_area       pointer to an area variable that the result will put in.
+ */
+void lv_chart_get_series_area(lv_obj_t * chart, lv_area_t * series_area);
+
+/**
+ * Get the coordinate of the cursor with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object
+ * @param cursor pointer to cursor
+ * @return coordinate of the cursor as lv_point_t
+ */
+lv_point_t lv_chart_get_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor);
+
+/**
+ * Get the nearest index we have in the left side of a point on series area.
+ * @param chart pointer to a chart object
+ * @param coord the coordination of the point.
+ * @return the index in found.
+ */
+uint16_t lv_chart_get_nearest_index_from_coord(lv_obj_t * chart, lv_point_t coord);
+
+/**
+ * Get the x coordinate of the an index with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object
+ * @param ser pointer to series
+ * @param id the index.
+ * @return x coordinate of index
+ */
+lv_coord_t lv_chart_get_x_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id);
+
+/**
+ * Get the y coordinate of the an index with respect
+ * to the origin of series area of the chart.
+ * @param chart pointer to a chart object
+ * @param ser pointer to series
+ * @param id the index.
+ * @return y coordinate of index
+ */
+lv_coord_t lv_chart_get_y_from_index(lv_obj_t * chart, lv_chart_series_t * ser, uint16_t id);
 /*=====================
  * Other functions
  *====================*/
