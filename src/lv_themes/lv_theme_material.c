@@ -626,9 +626,6 @@ static void checkbox_init(void)
 #if LV_USE_CHECKBOX != 0
     style_init_reset(&styles->cb_bg);
     lv_style_set_radius(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(4));
-    lv_style_set_pad_left(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(30));
-    lv_style_set_pad_top(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(3));
-    lv_style_set_pad_bottom(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(3));
     lv_style_set_outline_color(&styles->cb_bg, LV_STATE_DEFAULT, theme.color_primary);
     lv_style_set_outline_opa(&styles->cb_bg, LV_STATE_DEFAULT, LV_OPA_TRANSP);
     lv_style_set_outline_opa(&styles->cb_bg, LV_STATE_FOCUSED, LV_OPA_50);

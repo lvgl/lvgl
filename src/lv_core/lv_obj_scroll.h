@@ -119,7 +119,7 @@ lv_coord_t lv_obj_get_scroll_top(const struct _lv_obj_t * obj);
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_bottom(const struct _lv_obj_t * obj);
+lv_coord_t lv_obj_get_scroll_bottom(struct _lv_obj_t * obj);
 
 
 /**
@@ -138,7 +138,7 @@ lv_coord_t lv_obj_get_scroll_left(const struct _lv_obj_t * obj);
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_right(const struct _lv_obj_t * obj);
+lv_coord_t lv_obj_get_scroll_right(struct _lv_obj_t * obj);
 
 
 /**********************

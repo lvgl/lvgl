@@ -445,6 +445,43 @@ lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj)
 }
 
 /**
+ * Get the width of the virtual content of an object
+ * @param obj pointer to an objects
+ * @return the width of the virtually drawn content
+ */
+lv_coord_t _lv_obj_get_self_width(lv_obj_t * obj)
+{
+    lv_point_t p = {0, LV_COORD_MIN};
+    lv_signal_send((lv_obj_t * )obj, LV_SIGNAL_GET_SELF_SIZE, &p);
+    return p.x;
+}
+
+/**
+ * Get the height of the virtual content of an object
+ * @param obj pointer to an objects
+ * @return the width of the virtually drawn content
+ */
+lv_coord_t _lv_obj_get_self_height(lv_obj_t * obj)
+{
+    lv_point_t p = {LV_COORD_MIN, 0};
+    lv_signal_send((lv_obj_t * )obj, LV_SIGNAL_GET_SELF_SIZE, &p);
+    return p.y;
+}
+
+/**
+ * Handle if the size of the internal (virtual) content of an object has changed.
+ * @param obj pointer to an object
+ * @return false: nothing happened; true: refresh happened
+ */
+bool _lv_obj_handle_self_size_chg(lv_obj_t * obj)
+{
+    if(obj->w_set != LV_SIZE_AUTO && obj->h_set == LV_SIZE_AUTO) return false;
+
+    lv_obj_set_size(obj, obj->w_set, obj->h_set);
+    return true;
+}
+
+/**
  * Calculate the "auto size". It's `auto_size = max(gird_size, children_size, self_size)`
  * @param obj pointer to an object
  * @param w_out store the width here. NULL to not calculate width

@@ -199,6 +199,27 @@ lv_coord_t lv_obj_get_height_margin(struct _lv_obj_t * obj);
 lv_coord_t lv_obj_get_width_margin(struct _lv_obj_t * obj);
 
 /**
+ * Get the width of the virtual content of an object
+ * @param obj pointer to an objects
+ * @return the width of the virtually drawn content
+ */
+lv_coord_t _lv_obj_get_self_width(lv_obj_t * obj);
+
+/**
+ * Get the height of the virtual content of an object
+ * @param obj pointer to an objects
+ * @return the width of the virtually drawn content
+ */
+lv_coord_t _lv_obj_get_self_height(lv_obj_t * obj);
+
+/**
+ * Handle if the size of the internal (virtual) content of an object has changed.
+ * @param obj pointer to an object
+ * @return false: nothing happened; true: refresh happened
+ */
+bool _lv_obj_handle_self_size_chg(lv_obj_t * obj);
+
+/**
  * Calculate the "auto size". It's `auto_size = max(gird_size, children_size)`
  * @param obj pointer to an object
  * @param w_out store the width here. NULL to not calculate width
