@@ -549,10 +549,12 @@ static void calendar_init(void)
 #if LV_USE_CALENDAR
 
     style_init_reset(&styles->calendar_header);
-    lv_style_set_pad_top(&styles->calendar_header, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_top(&styles->calendar_header, LV_STATE_DEFAULT, 0);
     lv_style_set_pad_left(&styles->calendar_header, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_pad_right(&styles->calendar_header, LV_STATE_DEFAULT, PAD_DEF);
-    lv_style_set_pad_bottom(&styles->calendar_header, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_pad_bottom(&styles->calendar_header, LV_STATE_DEFAULT, 0);
+    lv_style_set_margin_top(&styles->calendar_header, LV_STATE_DEFAULT, PAD_DEF);
+    lv_style_set_margin_bottom(&styles->calendar_header, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_text_color(&styles->calendar_header, LV_STATE_PRESSED, IS_LIGHT ? lv_color_hex(0x888888) : LV_COLOR_WHITE);
 
     style_init_reset(&styles->calendar_daynames);
