@@ -84,7 +84,6 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->angle = 0;
     ext->zoom = LV_IMG_ZOOM_NONE;
     ext->antialias = LV_ANTIALIAS ? 1 : 0;
-    ext->auto_size = 1;
     ext->offset.x  = 0;
     ext->offset.y  = 0;
     ext->pivot.x = 0;
@@ -102,23 +101,15 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
         /* Enable auto size for non screens
          * because image screens are wallpapers
          * and must be screen sized*/
-        if(par != NULL) {
-            ext->auto_size = 1;
-        }
-        else {
-            ext->auto_size = 0;
-        }
+        if(par) lv_obj_set_size(img, LV_SIZE_AUTO, LV_SIZE_AUTO);
     }
     else {
         lv_img_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        ext->auto_size     = copy_ext->auto_size;
-        ext->zoom          = copy_ext->zoom;
-        ext->angle         = copy_ext->angle;
-        ext->antialias     = copy_ext->antialias;
-        ext->offset.x     = copy_ext->offset.x;
-        ext->offset.y     = copy_ext->offset.y;
-        ext->pivot.x     = copy_ext->pivot.x;
-        ext->pivot.y     = copy_ext->pivot.y;
+        ext->zoom      = copy_ext->zoom;
+        ext->angle     = copy_ext->angle;
+        ext->antialias = copy_ext->antialias;
+        ext->offset  = copy_ext->offset;
+        ext->pivot   = copy_ext->pivot;
         lv_img_set_src(img, copy_ext->src);
 
         /*Refresh the style with new signal function*/
@@ -142,6 +133,8 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy)
 void lv_img_set_src(lv_obj_t * img, const void * src_img)
 {
     LV_ASSERT_OBJ(img, LV_OBJX_NAME);
+
+    lv_obj_invalidate(img);
 
     lv_img_src_t src_type = lv_img_src_get_type(src_img);
     lv_img_ext_t * ext    = lv_obj_get_ext_attr(img);
@@ -225,29 +218,12 @@ void lv_img_set_src(lv_obj_t * img, const void * src_img)
     ext->pivot.x = header.w / 2;
     ext->pivot.y = header.h / 2;
 
-    if(lv_img_get_auto_size(img) != false) {
-        lv_obj_set_size(img, ext->w, ext->h);
-    }
+    _lv_obj_handle_self_size_chg(img);
 
     /*Provide enough room for the rotated corners*/
     if(ext->angle || ext->zoom != LV_IMG_ZOOM_NONE) _lv_obj_refresh_ext_draw_pad(img);
 
     lv_obj_invalidate(img);
-}
-
-/**
- * Enable the auto size feature.
- * If enabled the object size will be same as the picture size.
- * @param img pointer to an image
- * @param en true: auto size enable, false: auto size disable
- */
-void lv_img_set_auto_size(lv_obj_t * img, bool en)
-{
-    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
-
-    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
-
-    ext->auto_size = (en == false ? 0 : 1);
 }
 
 /**
@@ -438,20 +414,6 @@ const void * lv_img_get_src(lv_obj_t * img)
     lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
 
     return ext->src;
-}
-
-/**
- * Get the auto size enable attribute
- * @param img pointer to an image
- * @return true: auto size is enabled, false: auto size is disabled
- */
-bool lv_img_get_auto_size(const lv_obj_t * img)
-{
-    LV_ASSERT_OBJ(img, LV_OBJX_NAME);
-
-    lv_img_ext_t * ext = lv_obj_get_ext_attr(img);
-
-    return ext->auto_size == 0 ? false : true;
 }
 
 /**
@@ -848,6 +810,11 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         }
         else
             info->result = _lv_obj_is_click_point_on(img, info->point);
+    }
+    else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
+        lv_point_t * p = param;
+        p->x = ext->w;
+        p->y = ext->h;
     }
 
     return res;
