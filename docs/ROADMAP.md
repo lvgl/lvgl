@@ -31,6 +31,7 @@ Planned to September/October 2020
 - Unit testing (gtest?). See [#1658](https://github.com/lvgl/lvgl/issues/1658)
 - Benchmarking (gem5?). See [#1660](https://github.com/lvgl/lvgl/issues/1660)
 - Consider direct binary font format support
+- Remove the copy paramter from create functions
 
 ## Ideas
 - Text node. See [#1701](https://github.com/lvgl/lvgl/issues/1701#issuecomment-699479408)
