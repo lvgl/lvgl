@@ -438,6 +438,9 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
                 case LV_STYLE_VALUE_BLEND_MODE:
                     if(list->blend_mode_all_normal) def = true;
                     break;
+                case LV_STYLE_TEXT_DECOR:
+                     if(list->text_decor_none) def = true;
+                     break;
             }
 
             if(def) {
@@ -1346,6 +1349,7 @@ static bool style_prop_is_cacheable(lv_style_property_t prop)
         case LV_STYLE_TEXT_LETTER_SPACE:
         case LV_STYLE_TEXT_LINE_SPACE:
         case LV_STYLE_TEXT_FONT:
+        case LV_STYLE_TEXT_DECOR:
         case LV_STYLE_TRANSFORM_ANGLE:
         case LV_STYLE_TRANSFORM_WIDTH:
         case LV_STYLE_TRANSFORM_HEIGHT:

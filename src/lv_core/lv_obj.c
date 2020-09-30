@@ -289,6 +289,8 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->flags |= LV_OBJ_FLAG_PRESS_LOCK;
     new_obj->flags |= LV_OBJ_FLAG_CLICK_FOCUSABLE;
     new_obj->flags |= LV_OBJ_FLAG_SCROLLABLE;
+    new_obj->flags |= LV_OBJ_FLAG_SCROLL_ELASTIC;
+    new_obj->flags |= LV_OBJ_FLAG_SCROLL_MOMENTUM;
     if(parent) new_obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
     new_obj->state = LV_STATE_DEFAULT;
     new_obj->scroll.x = 0;

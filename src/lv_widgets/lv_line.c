@@ -71,7 +71,6 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
 
     ext->point_num   = 0;
     ext->point_array = NULL;
-    ext->auto_size   = 1;
     ext->y_inv       = 0;
 
     lv_obj_set_design_cb(line, lv_line_design);
@@ -79,23 +78,19 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new line*/
     if(copy == NULL) {
-        lv_obj_set_size(line, LV_DPI,
-                        LV_DPI);          /*Auto size is enables, but set default size until no points are added*/
-
-        lv_obj_set_click(line, false);
+        lv_obj_set_size(line, LV_SIZE_AUTO, LV_SIZE_AUTO);
+        lv_obj_clear_flag(line, LV_OBJ_FLAG_CLICKABLE);
 
         lv_theme_apply(line, LV_THEME_LINE);
     }
     /*Copy an existing object*/
     else {
         lv_line_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        lv_line_set_auto_size(line, lv_line_get_auto_size(copy));
         lv_line_set_y_invert(line, lv_line_get_y_invert(copy));
-        lv_line_set_auto_size(line, lv_line_get_auto_size(copy));
         lv_line_set_points(line, copy_ext->point_array, copy_ext->point_num);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(line, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
+        _lv_obj_refresh_style(line, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("line created");
@@ -122,39 +117,9 @@ void lv_line_set_points(lv_obj_t * line, const lv_point_t point_a[], uint16_t po
     ext->point_array    = point_a;
     ext->point_num      = point_num;
 
-    if(point_num > 0 && ext->auto_size != 0) {
-        uint16_t i;
-        lv_coord_t xmax = LV_COORD_MIN;
-        lv_coord_t ymax = LV_COORD_MIN;
-        for(i = 0; i < point_num; i++) {
-            xmax = LV_MATH_MAX(point_a[i].x, xmax);
-            ymax = LV_MATH_MAX(point_a[i].y, ymax);
-        }
-
-        lv_style_int_t line_width = lv_obj_get_style_line_width(line, LV_LINE_PART_MAIN);
-        lv_obj_set_size(line, xmax + line_width, ymax + line_width);
-    }
+    _lv_obj_handle_self_size_chg(line);
 
     lv_obj_invalidate(line);
-}
-
-/**
- * Enable (or disable) the auto-size option. The size of the object will fit to its points.
- * (set width to x max and height to y max)
- * @param line pointer to a line object
- * @param en true: auto size is enabled, false: auto size is disabled
- */
-void lv_line_set_auto_size(lv_obj_t * line, bool en)
-{
-    LV_ASSERT_OBJ(line, LV_OBJX_NAME);
-
-    lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
-    if(ext->auto_size == en) return;
-
-    ext->auto_size = en == false ? 0 : 1;
-
-    /*Refresh the object*/
-    if(en) lv_line_set_points(line, ext->point_array, ext->point_num);
 }
 
 /**
@@ -179,20 +144,6 @@ void lv_line_set_y_invert(lv_obj_t * line, bool en)
 /*=====================
  * Getter functions
  *====================*/
-
-/**
- * Get the auto size attribute
- * @param line pointer to a line object
- * @return true: auto size is enabled, false: disabled
- */
-bool lv_line_get_auto_size(const lv_obj_t * line)
-{
-    LV_ASSERT_OBJ(line, LV_OBJX_NAME);
-
-    lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
-
-    return ext->auto_size == 0 ? false : true;
-}
 
 /**
  * Get the y inversion attribute
@@ -234,8 +185,8 @@ static lv_design_res_t lv_line_design(lv_obj_t * line, const lv_area_t * clip_ar
 
         lv_area_t area;
         lv_obj_get_coords(line, &area);
-        lv_coord_t x_ofs = area.x1;
-        lv_coord_t y_ofs = area.y1;
+        lv_coord_t x_ofs = area.x1 - lv_obj_get_scroll_top(line);
+        lv_coord_t y_ofs = area.y1 - lv_obj_get_scroll_left(line);
         lv_point_t p1;
         lv_point_t p2;
         lv_coord_t h = lv_obj_get_height(line);
@@ -280,12 +231,33 @@ static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
     /* Include the ancient signal function */
     res = ancestor_signal(line, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
-
-    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    if(sign == LV_SIGNAL_GET_TYPE) {
+        return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
+    }
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*The corner of the skew lines is out of the intended area*/
         lv_style_int_t line_width = lv_obj_get_style_line_width(line, LV_LINE_PART_MAIN);
         if(line->ext_draw_pad < line_width) line->ext_draw_pad = line_width;
+    }
+    else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
+        lv_line_ext_t * ext = lv_obj_get_ext_attr(line);
+
+        lv_point_t * p = param;
+        lv_coord_t w = 0;
+        lv_coord_t h = 0;
+        if(ext->point_num > 0) {
+            uint16_t i;
+            for(i = 0; i < ext->point_num; i++) {
+                w = LV_MATH_MAX(ext->point_array[i].x, w);
+                h = LV_MATH_MAX(ext->point_array[i].y, h);
+            }
+
+            lv_style_int_t line_width = lv_obj_get_style_line_width(line, LV_LINE_PART_MAIN);
+            w += line_width;
+            h += line_width;
+            p->x = w;
+            p->y = h;
+        }
     }
 
     return res;

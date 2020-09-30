@@ -103,7 +103,8 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->row_h[0] = LV_DPI; /*It will be overwritten when the theme is applied*/
         ext->cell_data = lv_mem_realloc(ext->cell_data, ext->row_cnt * ext->col_cnt * sizeof(char *));
 
-        lv_obj_set_size(table, LV_SIZE_AUTO, 80);
+        lv_obj_set_size(table, 80, 80);
+//        lv_obj_set_size(table, LV_SIZE_AUTO, LV_SIZE_AUTO);
 
         lv_theme_apply(table, LV_THEME_TABLE);
     }
@@ -710,6 +711,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
         uint16_t cell = 0;
 
         cell_area.y2 = table->coords.y1 + bg_top - 1 - lv_obj_get_scroll_top(table);
+        lv_coord_t scroll_left = lv_obj_get_scroll_left(table);
         for(row = 0; row < ext->row_cnt; row++) {
             lv_coord_t h_row = ext->row_h[row];
 
@@ -718,7 +720,7 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
             if(cell_area.y1 > clip_area->y2) return LV_DESIGN_RES_OK;
 
-            cell_area.x2 = table->coords.x1 + bg_left - 1;
+            cell_area.x2 = table->coords.x1 + bg_left - 1 - scroll_left;
 
             for(col = 0; col < ext->col_cnt; col++) {
 

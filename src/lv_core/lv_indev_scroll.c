@@ -12,6 +12,7 @@
 /*********************
  *      DEFINES
  *********************/
+#define ELASTIC_SLOWNESS_FACTOR 4   /*Scrolling on elastic parts are slower by this factor*/
 
 /**********************
  *      TYPEDEFS
@@ -26,6 +27,7 @@ static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coo
 static void scroll_limit_diff(lv_indev_proc_t * proc, lv_coord_t * diff_x, lv_coord_t * diff_y);
 static lv_coord_t scroll_throw_predict_y(lv_indev_proc_t * proc);
 static lv_coord_t scroll_throw_predict_x(lv_indev_proc_t * proc);
+static lv_coord_t elastic_diff(lv_obj_t * obj, lv_coord_t diff, lv_coord_t scroll_start, lv_coord_t scroll_end);
 
 /**********************
  *  STATIC VARIABLES
@@ -219,15 +221,14 @@ void _lv_scroll_handler(lv_indev_proc_t * proc)
         lv_coord_t diff_y = 0;
 
         if(proc->types.pointer.scroll_dir == LV_SCROLL_DIR_HOR) {
-            diff_x = proc->types.pointer.vect.x;
-            if(lv_obj_get_scroll_right(scroll_obj) < 0) diff_x = diff_x / 2;
-            if(lv_obj_get_scroll_left(scroll_obj) < 0) diff_x = diff_x / 2;
+            lv_coord_t sr = lv_obj_get_scroll_right(scroll_obj);
+            lv_coord_t sl = lv_obj_get_scroll_left(scroll_obj);
+            diff_x = elastic_diff(scroll_obj, proc->types.pointer.vect.x, sl, sr);
         } else {
-            diff_y = proc->types.pointer.vect.y;
-            if(lv_obj_get_scroll_top(scroll_obj) < 0) diff_y = diff_y / 2;
-            if(lv_obj_get_scroll_bottom(scroll_obj) < 0) diff_y = diff_y / 2;
+            lv_coord_t st = lv_obj_get_scroll_top(scroll_obj);
+            lv_coord_t sb = lv_obj_get_scroll_bottom(scroll_obj);
+            diff_y = elastic_diff(scroll_obj, proc->types.pointer.vect.y, st, sb);
         }
-
 
         if((scroll_obj->scroll_dir & LV_DIR_LEFT) == 0 && diff_x > 0) diff_x = 0;
         if((scroll_obj->scroll_dir & LV_DIR_RIGHT) == 0 && diff_x < 0) diff_x = 0;
@@ -252,27 +253,28 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
 {
     lv_obj_t * scroll_obj = proc->types.pointer.scroll_obj;
     if(scroll_obj == NULL) return;
+    if(proc->types.pointer.scroll_dir == LV_SCROLL_DIR_NONE) return;
+
 
     lv_indev_t * indev_act = lv_indev_get_act();
     lv_coord_t scroll_throw =  indev_act->driver.scroll_throw;
 
-    if(proc->types.pointer.scroll_dir == LV_SCROLL_DIR_NONE) {
-        return;
+    if(lv_obj_has_flag(scroll_obj, LV_OBJ_FLAG_SCROLL_MOMENTUM) == false) {
+        proc->types.pointer.scroll_throw_vect.y = 0;
+        proc->types.pointer.scroll_throw_vect.x = 0;
     }
-    else if(proc->types.pointer.scroll_dir == LV_SCROLL_DIR_VER) {
+
+    if(proc->types.pointer.scroll_dir == LV_SCROLL_DIR_VER) {
         proc->types.pointer.scroll_throw_vect.x = 0;
         /*If no snapping "throw"*/
         if(scroll_obj->snap_align_y == LV_SCROLL_SNAP_ALIGN_NONE) {
             proc->types.pointer.scroll_throw_vect.y =
                     proc->types.pointer.scroll_throw_vect.y * (100 - scroll_throw) / 100;
 
-            lv_coord_t st = lv_obj_get_scroll_top(scroll_obj);
             lv_coord_t sb = lv_obj_get_scroll_bottom(scroll_obj);
+            lv_coord_t st = lv_obj_get_scroll_top(scroll_obj);
 
-            /*If scrolled inside reduce faster*/
-            if(st < 0 || sb < 0) {
-                proc->types.pointer.scroll_throw_vect.y = proc->types.pointer.scroll_throw_vect.y >> 1;
-            }
+             proc->types.pointer.scroll_throw_vect.y = elastic_diff(scroll_obj, proc->types.pointer.scroll_throw_vect.y, st, sb);
 
             _lv_obj_scroll_by_raw(scroll_obj, 0, proc->types.pointer.scroll_throw_vect.y);
         }
@@ -295,10 +297,7 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
             lv_coord_t sl = lv_obj_get_scroll_left(scroll_obj);
             lv_coord_t sr = lv_obj_get_scroll_right(scroll_obj);
 
-            /*If scrolled inside reduce faster*/
-            if(sl < 0 || sr < 0) {
-                proc->types.pointer.scroll_throw_vect.x = proc->types.pointer.scroll_throw_vect.x >> 1;
-            }
+            proc->types.pointer.scroll_throw_vect.x = elastic_diff(scroll_obj, proc->types.pointer.scroll_throw_vect.x, sl ,sr);
 
             _lv_obj_scroll_by_raw(scroll_obj, proc->types.pointer.scroll_throw_vect.x, 0);
         }
@@ -344,12 +343,13 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
             }
         }
 
-        proc->types.pointer.scroll_dir = LV_SCROLL_DIR_NONE;
-        proc->types.pointer.scroll_obj = NULL;
         lv_signal_send(scroll_obj, LV_SIGNAL_SCROLL_END, indev_act);
         if(proc->reset_query) return;
         lv_event_send(scroll_obj, LV_EVENT_SCROLL_END, indev_act);
         if(proc->reset_query) return;
+
+        proc->types.pointer.scroll_dir = LV_SCROLL_DIR_NONE;
+        proc->types.pointer.scroll_obj = NULL;
     }
 }
 
@@ -529,5 +529,20 @@ static lv_coord_t scroll_throw_predict_x(lv_indev_proc_t * proc)
         x = x * (100 - scroll_throw) / 100;
     }
     return move;
+}
+
+static lv_coord_t elastic_diff(lv_obj_t * obj, lv_coord_t diff, lv_coord_t scroll_start, lv_coord_t scroll_end)
+{
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLL_ELASTIC)) {
+        /*Elastic scroll if scrolled in*/
+        if(scroll_end < 0) diff = (diff + ELASTIC_SLOWNESS_FACTOR / 2) / ELASTIC_SLOWNESS_FACTOR;
+        else if(scroll_start < 0) diff = (diff + ELASTIC_SLOWNESS_FACTOR / 2) / ELASTIC_SLOWNESS_FACTOR;
+    } else {
+        /*Scroll back to the boundary id required*/
+        if(scroll_end + diff < 0) diff = - scroll_end;
+        if(scroll_start - diff < 0) diff = scroll_start;
+    }
+
+    return diff;
 }
 
