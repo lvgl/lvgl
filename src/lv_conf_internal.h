@@ -10,6 +10,12 @@
 
 #include <stdint.h>
 
+#if defined __has_include
+  #if __has_include("lv_conf.h")
+    #define LV_CONF_INCLUDE_SIMPLE
+  #endif
+#endif
+
 /*If lv_conf.h is not skipped include it*/
 #if !defined(LV_CONF_SKIP) && !defined(CONFIG_LV_CONF_SKIP)
 #  if defined(LV_CONF_PATH)											/*If there is a path defined for lv_conf.h use it*/
@@ -19,8 +25,6 @@
 #    undef __LV_TO_STR_AUX
 #    undef __LV_TO_STR
 #  elif defined(LV_CONF_INCLUDE_SIMPLE)        /*Or simply include lv_conf.h is enabled*/
-#    include "lv_conf.h"
-#  elif __has_include("lv_conf.h")
 #    include "lv_conf.h"
 #  else
 #    include "../../lv_conf.h"                 /*Else assume lv_conf.h is next to the lvgl folder */
