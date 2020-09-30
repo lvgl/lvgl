@@ -11,9 +11,9 @@
 #include <stdint.h>
 
 #if defined __has_include
-  #if __has_include("lv_conf.h")
-    #define LV_CONF_INCLUDE_SIMPLE
-  #endif
+#  if __has_include("lv_conf.h")
+#    define LV_CONF_INCLUDE_SIMPLE
+#  endif
 #endif
 
 /*If lv_conf.h is not skipped include it*/
