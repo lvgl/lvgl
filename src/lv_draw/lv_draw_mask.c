@@ -1,7 +1,3 @@
-
-
-
-
 /**
  * @file lv_mask.c
  *

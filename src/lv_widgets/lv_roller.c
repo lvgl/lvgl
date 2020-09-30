@@ -1,4 +1,3 @@
-
 /**
  * @file lv_roller.c
  *

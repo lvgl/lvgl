@@ -705,6 +705,7 @@ static void lv_bar_set_value_with_anim(lv_obj_t * bar, int16_t new_value, int16_
             anim_info->anim_start = anim_info->anim_end;
             anim_info->anim_end   = new_value;
         }
+        *value_ptr = new_value;
         /* Stop the previous animation if it exists */
         lv_anim_del(anim_info, NULL);
 

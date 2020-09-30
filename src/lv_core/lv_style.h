@@ -641,13 +641,13 @@ bool lv_debug_check_style_list(const lv_style_list_t * list);
 #   define LV_ASSERT_STYLE_LIST(list_p) LV_DEBUG_ASSERT(LV_DEBUG_IS_STYLE_LIST(list_p), "Invalid style list", list_p);
 #  endif
 # else
-#   define LV_ASSERT_STYLE(style_p) true
-#   define LV_ASSERT_STYLE_LIST(list_p) true
+#   define LV_ASSERT_STYLE(style_p)
+#   define LV_ASSERT_STYLE_LIST(list_p)
 # endif
 
 #else
-# define LV_ASSERT_STYLE(p) true
-# define LV_ASSERT_STYLE_LIST(p) true
+# define LV_ASSERT_STYLE(p)
+# define LV_ASSERT_STYLE_LIST(p)
 #endif
 
 #ifdef __cplusplus

@@ -36,7 +36,6 @@ typedef struct {
     lv_bar_ext_t bar; /*Ext. of ancestor*/
     /*New data for this type */
     lv_style_list_t style_knob; /*Style of the knob*/
-    uint8_t state   : 1; /*The current state*/
 } lv_switch_ext_t;
 
 /**
@@ -112,8 +111,7 @@ static inline void lv_switch_set_anim_time(lv_obj_t * sw, uint16_t anim_time)
  */
 static inline bool lv_switch_get_state(const lv_obj_t * sw)
 {
-    lv_switch_ext_t * ext = (lv_switch_ext_t *)lv_obj_get_ext_attr(sw);
-    return ext->state ? true : false;
+    return lv_bar_get_value(sw) == 1 ? true : false;
 }
 
 /**

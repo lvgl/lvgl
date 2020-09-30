@@ -12,12 +12,17 @@
 #include "../lv_hal/lv_hal_disp.h"
 #include "../lv_core/lv_refr.h"
 
+#if LV_USE_GPU_NXP_PXP
+#include "../lv_gpu/lv_gpu_nxp_pxp.h"
+#elif LV_USE_GPU_STM32_DMA2D
 #include "../lv_gpu/lv_gpu_stm32_dma2d.h"
+#endif
 
 /*********************
  *      DEFINES
  *********************/
 #define GPU_SIZE_LIMIT      240
+
 
 /**********************
  *      TYPEDEFS
@@ -335,9 +340,12 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 disp->driver.gpu_fill_cb(&disp->driver, disp_buf, disp_w, draw_area, color);
                 return;
             }
-#endif
-
-#if LV_USE_GPU_STM32_DMA2D
+#elif LV_USE_GPU_NXP_PXP
+            if(lv_area_get_size(draw_area) >= GPU_NXP_PXP_FILL_SIZE_LIMIT) {
+                lv_gpu_nxp_pxp_fill(disp_buf, disp_w, draw_area, color, opa);
+                return;
+            }
+#elif LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
                 lv_gpu_stm32_dma2d_fill(disp_buf_first, disp_w, color, draw_area_w, draw_area_h);
                 return;
@@ -351,7 +359,13 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
         }
         /*No mask with opacity*/
         else {
-#if LV_USE_GPU
+
+#if LV_USE_GPU_NXP_PXP
+            if(lv_area_get_size(draw_area) >= GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT) {
+                lv_gpu_nxp_pxp_fill(disp_buf, disp_w, draw_area, color, opa);
+                return;
+            }
+#elif LV_USE_GPU
             if(disp->driver.gpu_blend_cb && lv_area_get_size(draw_area) > GPU_SIZE_LIMIT) {
                 for(x = 0; x < draw_area_w ; x++) blend_buf[x].full = color.full;
 
@@ -726,11 +740,16 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
 #endif
 
         if(opa > LV_OPA_MAX) {
-#if LV_USE_GPU_STM32_DMA2D
-            if(lv_area_get_size(draw_area) >= 240) {
-                lv_gpu_stm32_dma2d_copy(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h);
-                return;
-            }
+#if LV_USE_GPU_NXP_PXP
+        if (lv_area_get_size(draw_area) >= GPU_NXP_PXP_BLIT_SIZE_LIMIT) {
+            lv_gpu_nxp_pxp_blit(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h, opa);
+            return;
+        }
+#elif LV_USE_GPU_STM32_DMA2D
+        if(lv_area_get_size(draw_area) >= 240) {
+            lv_gpu_stm32_dma2d_copy(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h);
+            return;
+        }
 #endif
 
             /*Software rendering*/
@@ -741,7 +760,12 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
             }
         }
         else {
-#if LV_USE_GPU_STM32_DMA2D
+#if LV_USE_GPU_NXP_PXP
+            if (lv_area_get_size(draw_area) >= GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT) {
+                lv_gpu_nxp_pxp_blit(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h, opa);
+                return;
+            }
+#elif LV_USE_GPU_STM32_DMA2D
             if(lv_area_get_size(draw_area) >= 240) {
                 lv_gpu_stm32_dma2d_blend(disp_buf_first, disp_w, map_buf_first, opa, map_w, draw_area_w, draw_area_h);
                 return;

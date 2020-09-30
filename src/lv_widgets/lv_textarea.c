@@ -247,7 +247,6 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
         return;
     }
 
-
     if(ext->pwd_mode != 0) pwd_char_hider(ta); /*Make sure all the current text contains only '*'*/
 
     /*If the textarea is empty, invalidate it to hide the placeholder*/

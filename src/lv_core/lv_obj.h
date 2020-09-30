@@ -806,11 +806,11 @@ bool _lv_debug_check_obj_valid(const lv_obj_t * obj);
 #  if LV_USE_ASSERT_NULL /*Use at least LV_ASSERT_NULL if enabled*/
 #    define LV_ASSERT_OBJ(obj_p, obj_type) LV_ASSERT_NULL(obj_p)
 #  else
-#    define LV_ASSERT_OBJ(obj_p, obj_type) true
+#    define LV_ASSERT_OBJ(obj_p, obj_type)
 #  endif
 # endif
 #else
-# define LV_ASSERT_OBJ(obj, obj_type) true
+# define LV_ASSERT_OBJ(obj, obj_type)
 #endif
 
 
