@@ -234,10 +234,10 @@ typedef struct {
     uint32_t clip_corner_off       : 1;
     uint32_t transform_all_zero  : 1;
     uint32_t pad_all_zero : 1;
+    uint32_t margin_all_zero : 1;
     uint32_t blend_mode_all_normal : 1;
     uint32_t bg_opa_transp : 1;
     uint32_t bg_opa_cover : 1;
-    uint32_t bg_grad_dir_none : 1;
 
     uint32_t border_width_zero : 1;
     uint32_t border_side_full : 1;

@@ -2597,9 +2597,6 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
 
             bool def = false;
             switch(prop  & (~LV_STYLE_STATE_MASK)) {
-                case LV_STYLE_BG_GRAD_DIR:
-                    if(list->bg_grad_dir_none) def = true;
-                    break;
                 case LV_STYLE_CLIP_CORNER:
                     if(list->clip_corner_off) def = true;
                     break;
@@ -2637,6 +2634,12 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
                 case LV_STYLE_PAD_RIGHT:
                     if(list->pad_all_zero) def = true;
                     break;
+                case LV_STYLE_MARGIN_TOP:
+                case LV_STYLE_MARGIN_BOTTOM:
+                case LV_STYLE_MARGIN_LEFT:
+                case LV_STYLE_MARGIN_RIGHT:
+                    if(list->margin_all_zero) def = true;
+                    break;
                 case LV_STYLE_BG_BLEND_MODE:
                 case LV_STYLE_BORDER_BLEND_MODE:
                 case LV_STYLE_IMAGE_BLEND_MODE:
@@ -2647,6 +2650,9 @@ lv_style_int_t _lv_obj_get_style_int(const lv_obj_t * obj, uint8_t part, lv_styl
                 case LV_STYLE_TEXT_BLEND_MODE:
                 case LV_STYLE_VALUE_BLEND_MODE:
                     if(list->blend_mode_all_normal) def = true;
+                    break;
+                case LV_STYLE_TEXT_DECOR:
+                    if(list->text_decor_none) def = true;
                     break;
             }
 
@@ -4564,7 +4570,6 @@ static bool style_prop_is_cacheble(lv_style_property_t prop)
 
     switch(prop) {
         case LV_STYLE_PROP_ALL:
-        case LV_STYLE_BG_GRAD_DIR:
         case LV_STYLE_CLIP_CORNER:
         case LV_STYLE_TEXT_LETTER_SPACE:
         case LV_STYLE_TEXT_LINE_SPACE:
@@ -4588,6 +4593,10 @@ static bool style_prop_is_cacheble(lv_style_property_t prop)
         case LV_STYLE_PAD_BOTTOM:
         case LV_STYLE_PAD_LEFT:
         case LV_STYLE_PAD_RIGHT:
+        case LV_STYLE_MARGIN_TOP:
+        case LV_STYLE_MARGIN_BOTTOM:
+        case LV_STYLE_MARGIN_LEFT:
+        case LV_STYLE_MARGIN_RIGHT:
         case LV_STYLE_BG_BLEND_MODE:
         case LV_STYLE_BORDER_BLEND_MODE:
         case LV_STYLE_IMAGE_BLEND_MODE:
@@ -4638,7 +4647,6 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
     list->bg_opa_transp    = bg_opa == LV_OPA_TRANSP ? 1 : 0;
     list->bg_opa_cover     = bg_opa == LV_OPA_COVER ? 1 : 0;
 
-    list->bg_grad_dir_none  = lv_obj_get_style_bg_grad_dir(obj, part) == LV_GRAD_DIR_NONE ? 1 : 0;
     list->border_width_zero = lv_obj_get_style_border_width(obj, part) == 0 ? 1 : 0;
     list->border_side_full = lv_obj_get_style_border_side(obj, part) == LV_BORDER_SIDE_FULL ? 1 : 0;
     list->border_post_off = lv_obj_get_style_border_post(obj, part) == 0 ? 1 : 0;
@@ -4665,6 +4673,14 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
        lv_obj_get_style_pad_left(obj, part) != 0 ||
        lv_obj_get_style_pad_right(obj, part) != 0) {
         list->pad_all_zero  = 0;
+    }
+
+    list->margin_all_zero  = 1;
+    if(lv_obj_get_style_margin_top(obj, part) != 0 ||
+       lv_obj_get_style_margin_bottom(obj, part) != 0 ||
+       lv_obj_get_style_margin_left(obj, part) != 0 ||
+       lv_obj_get_style_margin_right(obj, part) != 0) {
+        list->margin_all_zero  = 0;
     }
 
     list->blend_mode_all_normal = 1;
