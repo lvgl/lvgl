@@ -424,10 +424,9 @@ static void clear_styles(lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_TEXTAREA
         case LV_THEME_TEXTAREA:
-            _lv_obj_reset_style_list_no_refr(obj, LV_TEXTAREA_PART_BG);
+            _lv_obj_reset_style_list_no_refr(obj, LV_TEXTAREA_PART_MAIN);
             _lv_obj_reset_style_list_no_refr(obj, LV_TEXTAREA_PART_PLACEHOLDER);
             _lv_obj_reset_style_list_no_refr(obj, LV_TEXTAREA_PART_CURSOR);
-            _lv_obj_reset_style_list_no_refr(obj, LV_TEXTAREA_PART_SCROLLBAR);
             break;
 #endif
 

@@ -166,7 +166,6 @@ void lv_grid_item_refr_pos(lv_obj_t * item);
 /**********************
  * GLOBAL VARIABLES
  **********************/
-extern const lv_grid_t lv_grid_center;
 
 /**********************
  *      MACROS

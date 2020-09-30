@@ -18,16 +18,11 @@ extern "C" {
 #if LV_USE_TEXTAREA != 0
 
 /*Testing of dependencies*/
-#if LV_USE_PAGE == 0
-#error "lv_ta: lv_page is required. Enable it in lv_conf.h (LV_USE_PAGE  1) "
-#endif
-
 #if LV_USE_LABEL == 0
 #error "lv_ta: lv_label is required. Enable it in lv_conf.h (LV_USE_LABEL  1) "
 #endif
 
 #include "../lv_core/lv_obj.h"
-#include "lv_page.h"
 #include "lv_label.h"
 
 /*********************
@@ -43,7 +38,6 @@ LV_EXPORT_CONST_INT(LV_TEXTAREA_CURSOR_LAST);
 
 /*Data of text area*/
 typedef struct {
-    lv_page_ext_t page; /*Ext. of ancestor*/
     /*New data for this type */
     lv_obj_t * label;            /*Label of the text area*/
     char * placeholder_txt;      /*Place holder label. only visible if text is an empty string*/
@@ -77,15 +71,12 @@ typedef struct {
 
 /** Possible text areas styles. */
 enum {
-    LV_TEXTAREA_PART_BG = LV_PAGE_PART_BG, /**< Text area background style */
-    LV_TEXTAREA_PART_SCROLLBAR = LV_PAGE_PART_SCROLLBAR, /**< Scrollbar style */
-    LV_TEXTAREA_PART_EDGE_FLASH = LV_PAGE_PART_EDGE_FLASH, /**< Edge flash style */
-    LV_TEXTAREA_PART_CURSOR = _LV_PAGE_PART_VIRTUAL_LAST, /**< Cursor style */
+    LV_TEXTAREA_PART_MAIN,        /**< Text area background style */
+    LV_TEXTAREA_PART_CURSOR,      /**< Cursor style */
     LV_TEXTAREA_PART_PLACEHOLDER, /**< Placeholder style */
     _LV_TEXTAREA_PART_VIRTUAL_LAST,
-
-    _LV_TEXTAREA_PART_REAL_LAST = _LV_PAGE_PART_REAL_LAST,
 };
+
 typedef uint8_t lv_textarea_style_t;
 
 /**********************
@@ -220,37 +211,6 @@ void lv_textarea_set_max_length(lv_obj_t * ta, uint32_t num);
 void lv_textarea_set_insert_replace(lv_obj_t * ta, const char * txt);
 
 /**
- * Set the scroll bar mode of a text area
- * @param ta pointer to a text area object
- * @param sb_mode the new mode from 'lv_scrollbar_mode_t' enum
- */
-static inline void lv_textarea_set_scrollbar_mode(lv_obj_t * ta, lv_scrollbar_mode_t mode)
-{
-    lv_page_set_scrollbar_mode(ta, mode);
-}
-
-/**
- * Enable the scroll propagation feature. If enabled then the Text area will move its parent if
- * there is no more space to scroll.
- * @param ta pointer to a Text area
- * @param en true or false to enable/disable scroll propagation
- */
-static inline void lv_textarea_set_scroll_propagation(lv_obj_t * ta, bool en)
-{
-    lv_page_set_scroll_propagation(ta, en);
-}
-
-/**
- * Enable the edge flash effect. (Show an arc when the an edge is reached)
- * @param page pointer to a Text Area
- * @param en true or false to enable/disable end flash
- */
-static inline void lv_textarea_set_edge_flash(lv_obj_t * ta, bool en)
-{
-    lv_page_set_edge_flash(ta, en);
-}
-
-/**
  * Enable/disable selection mode.
  * @param ta pointer to a text area object
  * @param en true or false to enable/disable selection mode
@@ -344,36 +304,6 @@ const char * lv_textarea_get_accepted_chars(lv_obj_t * ta);
  * @return the maximal number of characters to be add
  */
 uint32_t lv_textarea_get_max_length(lv_obj_t * ta);
-
-/**
- * Get the scroll bar mode of a text area
- * @param ta pointer to a text area object
- * @return scrollbar mode from 'lv_scrollbar_mode_t' enum
- */
-static inline lv_scrollbar_mode_t lv_textarea_get_scrollbar_mode(const lv_obj_t * ta)
-{
-    return lv_page_get_scrollbar_mode(ta);
-}
-
-/**
- * Get the scroll propagation property
- * @param ta pointer to a Text area
- * @return true or false
- */
-static inline bool lv_textarea_get_scroll_propagation(lv_obj_t * ta)
-{
-    return lv_page_get_scroll_propagation(ta);
-}
-
-/**
- * Get the scroll propagation property
- * @param ta pointer to a Text area
- * @return true or false
- */
-static inline bool lv_textarea_get_edge_flash(lv_obj_t * ta)
-{
-    return lv_page_get_edge_flash(ta);
-}
 
 /**
  * Find whether text is selected or not.

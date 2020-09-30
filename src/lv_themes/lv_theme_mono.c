@@ -865,7 +865,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 #if LV_USE_TABLE
         case LV_THEME_TABLE:
         {
-            list = lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
+            list = _lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
             _lv_style_list_add_style(list, &styles->bg);
 
             int idx = 1; /* start value should be 1, not zero, since cell styles
@@ -873,7 +873,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
                             in the enum (lv_table.h) */
                          /* declaring idx outside loop to work with older compilers */
             for (; idx <= LV_TABLE_CELL_STYLE_CNT; idx ++ ) {
-              list = lv_obj_get_style_list(obj, idx);
+              list = _lv_obj_get_style_list(obj, idx);
               _lv_style_list_add_style(list, &styles->bg);
               _lv_style_list_add_style(list, &styles->no_radius);
             }
@@ -905,14 +905,11 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
 
 #if LV_USE_TEXTAREA
         case LV_THEME_TEXTAREA:
-            list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_BG);
+            list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_MAIN);
             _lv_style_list_add_style(list, &styles->bg);
 
             list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_CURSOR);
             _lv_style_list_add_style(list, &styles->ta_cursor);
-
-            list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_SCROLLBAR);
-            _lv_style_list_add_style(list, &styles->sb);
             break;
 #endif
 

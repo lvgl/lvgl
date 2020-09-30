@@ -41,8 +41,9 @@ extern "C" {
 #  define LV_TABLE_CELL_STYLE_CNT 4
 #endif
 #if (LV_TABLE_CELL_STYLE_CNT > 16)
-#  error LV_TABLE_CELL_STYLE_CNT cannot exceed 16
+#  error "LV_TABLE_CELL_STYLE_CNT cannot exceed 16"
 #endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -70,7 +71,7 @@ typedef struct {
     char ** cell_data;
     lv_coord_t * row_h;
     lv_style_list_t cell_style[LV_TABLE_CELL_STYLE_CNT];
-    lv_coord_t col_w[LV_TABLE_COL_MAX];
+    lv_coord_t * col_w;
     uint16_t cell_types : LV_TABLE_CELL_STYLE_CNT; /*Keep track which cell types exists to avoid dealing with unused ones*/
 } lv_table_ext_t;
 

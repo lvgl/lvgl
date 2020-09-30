@@ -37,12 +37,6 @@ static void report_grid_change_core(const lv_grid_t * grid, lv_obj_t * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static const lv_coord_t lv_grid_1_dsc[1] = {LV_GRID_FR(1)};
-const lv_grid_t lv_grid_center = {
-        .col_dsc = lv_grid_1_dsc,
-        .col_dsc_len = 1,
-        .col_place = LV_GRID_CENTER,
-        .row_place = LV_GRID_CENTER};
 
 /**********************
  *      MACROS
