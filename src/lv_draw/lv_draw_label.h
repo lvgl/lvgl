@@ -29,7 +29,7 @@ extern "C" {
 typedef struct {
     lv_color_t color;
     lv_color_t sel_color;
-    lv_color_t sel_font_color;
+    lv_color_t sel_bg_color;
     const lv_font_t * font;
     lv_opa_t opa;
     lv_style_int_t line_space;
