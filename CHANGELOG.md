@@ -6,7 +6,7 @@
 - Add PXP GPU support (for NXP MCUs)
 - Allow max. 16 cell types for table
 - Add `lv_table_set_text_fmt()`
-
+- Use margin on calendar header to set distances and padding to the size of the header.
 
 ### Bugfixes
 
