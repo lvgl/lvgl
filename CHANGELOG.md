@@ -3,9 +3,9 @@
 ## v7.6.1 (06.10.2020)
 
 ### Bugfixes
-- 
 - Fix BIDI support in dropdown list
 - Fix copying base dir in `lv_obj_create`
+- Handle sub pixel rendering is font loader
 
 ## v7.6.0 (22.09.2020)
 
