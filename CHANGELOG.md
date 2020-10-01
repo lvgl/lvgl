@@ -1,5 +1,6 @@
 # Changelog
 
+
 ## v7.7.0 (06.10.2020)
 
 ### New features
@@ -10,6 +11,15 @@
 
 ### Bugfixes
 
+## v7.6.1 (06.10.2020)
+
+### Bugfixes
+- Fix BIDI support in dropdown list
+- Fix copying base dir in `lv_obj_create`
+- Handle sub pixel rendering in font loader
+- Fix transitions with style caching
+
+
 ## v7.6.0 (22.09.2020)
 
 ### New features
@@ -18,8 +28,6 @@
 ### Bugfixes
 - Fix selection of options with non-ASCII letters in dropdown list 
 - Fix font loader to support LV_FONT_FMT_TXT_LARGE
-- Fix BIDI support in dropdown list
-- Fix copying base dir in lv_obj_craete
 
 ## v7.5.0 (15.09.2020)
 
