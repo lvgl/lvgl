@@ -45,30 +45,30 @@ extern "C" {
  *      DEFINES
  *********************/
 
-/* PXP module instance to use */
-#define PXP_ID PXP
+/** PXP module instance to use */
+#define LV_GPU_NXP_PXP_ID PXP
 
-/* PXP interrupt line ID  */
-#define PXP_IRQ_ID PXP_IRQn
+/** PXP interrupt line ID  */
+#define LV_GPU_NXP_PXP_IRQ_ID PXP_IRQn
 
-/* Minimum area for image copy with 100% opacity to be handled by PXP */
-#ifndef GPU_NXP_PXP_BLIT_SIZE_LIMIT
-#define GPU_NXP_PXP_BLIT_SIZE_LIMIT 1
+#ifndef LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT
+/** Minimum area (in pixels) for image copy with 100% opacity to be handled by PXP */
+#define LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT 32
 #endif
 
-/* Minimum area for image copy with transparency to be handled by PXP */
-#ifndef GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT
-#define GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT 16
+#ifndef LV_GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT
+/** Minimum area (in pixels) for image copy with transparency to be handled by PXP */
+#define LV_GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT 16
 #endif
 
-/* Minimum area to be filled by PXP with 100% opacity */
-#ifndef GPU_NXP_PXP_FILL_SIZE_LIMIT
-#define GPU_NXP_PXP_FILL_SIZE_LIMIT 64
+#ifndef LV_GPU_NXP_PXP_FILL_SIZE_LIMIT
+/** Minimum area (in pixels) to be filled by PXP with 100% opacity */
+#define LV_GPU_NXP_PXP_FILL_SIZE_LIMIT 64
 #endif
 
-/* Minimum area to be filled by PXP with transparency */
-#ifndef GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT
-#define GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT 32
+#ifndef LV_GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT
+/** Minimum area (in pixels) to be filled by PXP with transparency */
+#define LV_GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT 32
 #endif
 
 /**********************
