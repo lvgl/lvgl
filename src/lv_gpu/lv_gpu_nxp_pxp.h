@@ -107,7 +107,7 @@ typedef struct {
  *
  * @return LV_RES_OK: PXP init ok; LV_RES_INV: init error. See error log for more information.
  */
-lv_res_t lv_gpu_nxp_pxp_init(lv_nxp_pxp_cfg_t *cfg);
+lv_res_t lv_gpu_nxp_pxp_init(lv_nxp_pxp_cfg_t * cfg);
 
 /**
  * Disable PXP device. Should be called during display deinit sequence.
@@ -123,7 +123,8 @@ void lv_gpu_nxp_pxp_deinit(void);
  * @param[in] color color
  * @param[in] opa transparency of the color
  */
-void lv_gpu_nxp_pxp_fill(lv_color_t *dest_buf, lv_coord_t dest_width, const lv_area_t *fill_area, lv_color_t color, lv_opa_t opa);
+void lv_gpu_nxp_pxp_fill(lv_color_t * dest_buf, lv_coord_t dest_width, const lv_area_t * fill_area, lv_color_t color,
+                         lv_opa_t opa);
 
 
 
@@ -143,7 +144,8 @@ void lv_gpu_nxp_pxp_fill(lv_color_t *dest_buf, lv_coord_t dest_width, const lv_a
  * @param[in] copy_h height of area to be copied from src to dest
  * @param[in] opa opacity of the result
  */
-void lv_gpu_nxp_pxp_blit(lv_color_t * dest, lv_coord_t dest_width, const lv_color_t * src, lv_coord_t src_width, lv_coord_t copy_width, lv_coord_t copy_height, lv_opa_t opa);
+void lv_gpu_nxp_pxp_blit(lv_color_t * dest, lv_coord_t dest_width, const lv_color_t * src, lv_coord_t src_width,
+                         lv_coord_t copy_width, lv_coord_t copy_height, lv_opa_t opa);
 
 
 /**
