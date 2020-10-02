@@ -16,7 +16,7 @@
 #if LV_USE_GPU_STM32_DMA2D
 #include "../lv_gpu/lv_gpu_stm32_dma2d.h"
 #elif LV_USE_GPU_NXP_PXP
-#include "../lv_gpu/lv_gpu_nxp_pxp.h"
+    #include "../lv_gpu/lv_gpu_nxp_pxp.h"
 #endif
 
 /*********************
@@ -360,18 +360,19 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
     }
 #if LV_USE_GPU_NXP_PXP
     /* Simple case without masking and transformations */
-    else if (other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE && alpha_byte == false &&
+    else if(other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE && alpha_byte == false &&
             chroma_key == true && draw_dsc->recolor_opa == LV_OPA_TRANSP) { /* copy with color keying (+ alpha) */
-            lv_gpu_nxp_pxp_enable_color_key();
-            _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
-                         draw_dsc->blend_mode);
-            lv_gpu_nxp_pxp_disable_color_key();
-    } else if (other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE && alpha_byte == false &&
+        lv_gpu_nxp_pxp_enable_color_key();
+        _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
+                      draw_dsc->blend_mode);
+        lv_gpu_nxp_pxp_disable_color_key();
+    }
+    else if(other_mask_cnt == 0 && draw_dsc->angle == 0 && draw_dsc->zoom == LV_IMG_ZOOM_NONE && alpha_byte == false &&
             chroma_key == false && draw_dsc->recolor_opa != LV_OPA_TRANSP) { /* copy with recolor (+ alpha) */
-            lv_gpu_nxp_pxp_enable_recolor(draw_dsc->recolor, draw_dsc->recolor_opa);
-            _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
-                         draw_dsc->blend_mode);
-            lv_gpu_nxp_pxp_disable_recolor();
+        lv_gpu_nxp_pxp_enable_recolor(draw_dsc->recolor, draw_dsc->recolor_opa);
+        _lv_blend_map(clip_area, map_area, (lv_color_t *)map_p, NULL, LV_DRAW_MASK_RES_FULL_COVER, draw_dsc->opa,
+                      draw_dsc->blend_mode);
+        lv_gpu_nxp_pxp_disable_recolor();
     }
 #endif
     /*In the other cases every pixel need to be checked one-by-one*/

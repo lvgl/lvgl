@@ -28,8 +28,8 @@
 #include <string.h>
 
 #if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
-    #include "lv_gpu/lv_gpu_nxp_pxp.h"
-    #include "lv_gpu/lv_gpu_nxp_pxp_osa.h"
+    #include "../lv_gpu/lv_gpu_nxp_pxp.h"
+    #include "../lv_gpu/lv_gpu_nxp_pxp_osa.h"
 #endif
 
 #if defined(LV_GC_INCLUDE)
@@ -200,9 +200,9 @@ void lv_init(void)
 #endif
 
 #if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
-    if (lv_gpu_nxp_pxp_init(&pxp_default_cfg) != LV_RES_OK) {
+    if(lv_gpu_nxp_pxp_init(&pxp_default_cfg) != LV_RES_OK) {
         LV_LOG_ERROR("PXP init error. STOP.\n");
-        for ( ; ; ) ;
+        for(; ;) ;
     }
 #endif
 

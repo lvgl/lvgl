@@ -13,7 +13,7 @@
 #include "../lv_core/lv_refr.h"
 
 #if LV_USE_GPU_NXP_PXP
-#include "../lv_gpu/lv_gpu_nxp_pxp.h"
+    #include "../lv_gpu/lv_gpu_nxp_pxp.h"
 #elif LV_USE_GPU_STM32_DMA2D
 #include "../lv_gpu/lv_gpu_stm32_dma2d.h"
 #endif
@@ -341,7 +341,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 return;
             }
 #elif LV_USE_GPU_NXP_PXP
-            if(lv_area_get_size(draw_area) >= GPU_NXP_PXP_FILL_SIZE_LIMIT) {
+            if(lv_area_get_size(draw_area) >= LV_GPU_NXP_PXP_FILL_SIZE_LIMIT) {
                 lv_gpu_nxp_pxp_fill(disp_buf, disp_w, draw_area, color, opa);
                 return;
             }
@@ -361,7 +361,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
         else {
 
 #if LV_USE_GPU_NXP_PXP
-            if(lv_area_get_size(draw_area) >= GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT) {
+            if(lv_area_get_size(draw_area) >= LV_GPU_NXP_PXP_FILL_OPA_SIZE_LIMIT) {
                 lv_gpu_nxp_pxp_fill(disp_buf, disp_w, draw_area, color, opa);
                 return;
             }
@@ -741,10 +741,10 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
 
         if(opa > LV_OPA_MAX) {
 #if LV_USE_GPU_NXP_PXP
-        if (lv_area_get_size(draw_area) >= GPU_NXP_PXP_BLIT_SIZE_LIMIT) {
-            lv_gpu_nxp_pxp_blit(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h, opa);
-            return;
-        }
+            if(lv_area_get_size(draw_area) >= LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT) {
+                lv_gpu_nxp_pxp_blit(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h, opa);
+                return;
+            }
 #elif LV_USE_GPU_STM32_DMA2D
         if(lv_area_get_size(draw_area) >= 240) {
             lv_gpu_stm32_dma2d_copy(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h);
@@ -761,7 +761,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
         }
         else {
 #if LV_USE_GPU_NXP_PXP
-            if (lv_area_get_size(draw_area) >= GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT) {
+            if(lv_area_get_size(draw_area) >= LV_GPU_NXP_PXP_BLIT_OPA_SIZE_LIMIT) {
                 lv_gpu_nxp_pxp_blit(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h, opa);
                 return;
             }
