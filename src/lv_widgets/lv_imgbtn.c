@@ -468,6 +468,9 @@ static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * par
         imgbtn->ext_draw_pad = LV_MATH_MAX(imgbtn->ext_draw_pad, top);
         imgbtn->ext_draw_pad = LV_MATH_MAX(imgbtn->ext_draw_pad, bottom);
     }
+    else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
+        refr_img(imgbtn);
+    }
     else if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
     }
