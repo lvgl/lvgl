@@ -18,6 +18,7 @@
 - Fix copying base dir in `lv_obj_create`
 - Handle sub pixel rendering in font loader
 - Fix transitions with style caching
+- Fix click focus
 
 
 ## v7.6.0 (22.09.2020)
