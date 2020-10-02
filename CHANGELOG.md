@@ -20,6 +20,8 @@
 - Handle sub pixel rendering in font loader
 - Fix transitions with style caching
 - Fix click focus
+- Fix imgbtn image switching with empty style
+- Material theme: do not set the text font to allow easy global font change
 
 
 ## v7.6.0 (22.09.2020)
