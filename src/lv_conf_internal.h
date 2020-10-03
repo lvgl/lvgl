@@ -12,7 +12,9 @@
 
 #if defined __has_include
 #  if __has_include("lv_conf.h")
+#   ifndef LV_CONF_INCLUDE_SIMPLE
 #    define LV_CONF_INCLUDE_SIMPLE
+#   endif
 #  endif
 #endif
 
