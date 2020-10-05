@@ -28,8 +28,8 @@
 #include <string.h>
 
 #if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
-    #include "lv_gpu/lv_gpu_nxp_pxp.h"
-    #include "lv_gpu/lv_gpu_nxp_pxp_osa.h"
+    #include "../lv_gpu/lv_gpu_nxp_pxp.h"
+    #include "../lv_gpu/lv_gpu_nxp_pxp_osa.h"
 #endif
 
 #if defined(LV_GC_INCLUDE)
@@ -200,9 +200,9 @@ void lv_init(void)
 #endif
 
 #if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
-    if (lv_gpu_nxp_pxp_init(&pxp_default_cfg) != LV_RES_OK) {
+    if(lv_gpu_nxp_pxp_init(&pxp_default_cfg) != LV_RES_OK) {
         LV_LOG_ERROR("PXP init error. STOP.\n");
-        for ( ; ; ) ;
+        for(; ;) ;
     }
 #endif
 
@@ -1742,12 +1742,15 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
     obj->state = new_state;
 
-    if(cmp_res == STYLE_COMPARE_SAME) return;
+    if(cmp_res == STYLE_COMPARE_SAME) {
+        return;
+    }
 
 #if LV_USE_ANIMATION == 0
     if(cmp_res == STYLE_COMPARE_DIFF) lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
     else if(cmp_res == STYLE_COMPARE_VISUAL_DIFF) lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
 #else
+
 
     for(part = 0; part < _LV_OBJ_PART_REAL_LAST; part++) {
         lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
@@ -3523,7 +3526,8 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
     draw_dsc->font = lv_obj_get_style_text_font(obj, part);
 
     if(draw_dsc->sel_start != LV_DRAW_LABEL_NO_TXT_SEL && draw_dsc->sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
-        draw_dsc->color = lv_obj_get_style_text_sel_color(obj, part);
+       draw_dsc->sel_color = lv_obj_get_style_text_sel_color(obj, part);
+       draw_dsc->sel_bg_color = lv_obj_get_style_text_sel_bg_color(obj, part);
     }
 
 #if LV_USE_BIDI
@@ -4307,14 +4311,18 @@ static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop,
     lv_style_list_t * style_list = lv_obj_get_style_list(obj, part);
     lv_style_t * style_trans = _lv_style_list_get_transition_style(style_list);
 
+    bool cahche_ori = style_list->ignore_cache;
+
     /*Get the previous and current values*/
     if((prop & 0xF) < LV_STYLE_ID_COLOR) { /*Int*/
         style_list->skip_trans = 1;
+        style_list->ignore_cache = 1;
         obj->state = prev_state;
         lv_style_int_t int1 = _lv_obj_get_style_int(obj, part, prop);
         obj->state = new_state;
         lv_style_int_t int2 =  _lv_obj_get_style_int(obj, part, prop);
         style_list->skip_trans = 0;
+        style_list->ignore_cache = cahche_ori;
 
         if(int1 == int2)  return NULL;
         obj->state = prev_state;
@@ -4339,11 +4347,13 @@ static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop,
     }
     else if((prop & 0xF) < LV_STYLE_ID_OPA) { /*Color*/
         style_list->skip_trans = 1;
+        style_list->ignore_cache = 1;
         obj->state = prev_state;
         lv_color_t c1 = _lv_obj_get_style_color(obj, part, prop);
         obj->state = new_state;
         lv_color_t c2 =  _lv_obj_get_style_color(obj, part, prop);
         style_list->skip_trans = 0;
+        style_list->ignore_cache = cahche_ori;
 
         if(c1.full == c2.full) return NULL;
         obj->state = prev_state;
@@ -4359,11 +4369,13 @@ static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop,
     }
     else if((prop & 0xF) < LV_STYLE_ID_PTR) { /*Opa*/
         style_list->skip_trans = 1;
+        style_list->ignore_cache = 1;
         obj->state = prev_state;
         lv_opa_t o1 = _lv_obj_get_style_opa(obj, part, prop);
         obj->state = new_state;
         lv_opa_t o2 =  _lv_obj_get_style_opa(obj, part, prop);
         style_list->skip_trans = 0;
+        style_list->ignore_cache = cahche_ori;
 
         if(o1 == o2) return NULL;
 
@@ -4381,10 +4393,12 @@ static lv_style_trans_t * trans_create(lv_obj_t * obj, lv_style_property_t prop,
     else {      /*Ptr*/
         obj->state = prev_state;
         style_list->skip_trans = 1;
+        style_list->ignore_cache = 1;
         const void * p1 = _lv_obj_get_style_ptr(obj, part, prop);
         obj->state = new_state;
         const void * p2 = _lv_obj_get_style_ptr(obj, part, prop);
         style_list->skip_trans = 0;
+        style_list->ignore_cache = cahche_ori;
 
         if(memcmp(&p1, &p2, sizeof(const void *)) == 0)  return NULL;
         obj->state = prev_state;
@@ -4782,6 +4796,10 @@ static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot
     lv_draw_img_dsc_init(&shot->img);
     lv_draw_line_dsc_init(&shot->line);
 
+    lv_style_list_t * list = lv_obj_get_style_list(obj, part);
+    bool trans_ori = list->skip_trans;
+    list->skip_trans = 1;
+
     lv_obj_init_draw_rect_dsc(obj, part, &shot->rect);
     lv_obj_init_draw_label_dsc(obj, part, &shot->label);
     lv_obj_init_draw_img_dsc(obj, part, &shot->img);
@@ -4813,6 +4831,7 @@ static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot
     shot->border_post  = lv_obj_get_style_border_post(obj, part);
 
     _lv_obj_disable_style_caching(obj, false);
+    list->skip_trans = trans_ori;
 }
 
 static style_snapshot_res_t style_snapshot_compare(style_snapshot_t * shot1, style_snapshot_t * shot2)
