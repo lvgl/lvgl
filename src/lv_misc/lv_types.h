@@ -18,7 +18,7 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#if __STDC_VERSION__ >= 199901L  // If c99 or newer, use stdint.h to determine arch size
+#if defined(__cplusplus) || __STDC_VERSION__ >= 199901L  // If c99 or newer, use stdint.h to determine arch size
 #include <stdint.h>
 #endif
 
@@ -53,7 +53,7 @@ typedef uint8_t lv_res_t;
 
 
 
-#if __STDC_VERSION__ >= 199901L
+#if defined(__cplusplus) || __STDC_VERSION__ >= 199901L
 // If c99 or newer,  use the definition of uintptr_t directly from <stdint.h>
 typedef uintptr_t lv_uintptr_t;
 
