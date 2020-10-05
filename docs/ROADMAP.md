@@ -34,6 +34,7 @@ Planned to September/October 2020
 - Remove the copy paramter from create functions
 
 ## Ideas
+- lv_mem_alloc_aligned(size, align)
 - Text node. See [#1701](https://github.com/lvgl/lvgl/issues/1701#issuecomment-699479408)
 - RGB888 support [#1722](https://github.com/lvgl/lvgl/issues/1722)  
 - CPP binding. See [Forum](https://forum.lvgl.io/t/is-it-possible-to-officially-support-optional-cpp-api/2736)
