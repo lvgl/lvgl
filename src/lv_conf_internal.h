@@ -490,6 +490,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
 #endif
 
+/*1: Use VG-Lite for CPU offload on NXP RTxxx platforms */
+#ifndef LV_USE_GPU_NXP_VG_LITE
+#define LV_USE_GPU_NXP_VG_LITE   0
+#endif
+
 /* 1: Enable file system (might be required for images */
 #ifndef LV_USE_FILESYSTEM
 #  ifdef CONFIG_LV_USE_FILESYSTEM
@@ -614,9 +619,16 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
+/* Required alignment size for buffers */
+#ifndef LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#define LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#endif
+
 /* With size optimization (-Os) the compiler might not align data to
- * 4 or 8 byte boundary. This alignment will be explicitly applied where needed.
- * E.g. __attribute__((aligned(4))) */
+ * 4 or 8 byte boundary. Some HW may need even 32 or 64 bytes.
+ * This alignment will be explicitly applied where needed.
+ * LV_ATTRIBUTE_MEM_ALIGN_SIZE should be used to specify required align size.
+ * E.g. __attribute__((aligned(LV_ATTRIBUTE_MEM_ALIGN_SIZE))) */
 #ifndef LV_ATTRIBUTE_MEM_ALIGN
 #  ifdef CONFIG_LV_ATTRIBUTE_MEM_ALIGN
 #    define LV_ATTRIBUTE_MEM_ALIGN CONFIG_LV_ATTRIBUTE_MEM_ALIGN
