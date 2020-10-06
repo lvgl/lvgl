@@ -145,7 +145,8 @@ void lv_checkbox_set_checked(lv_obj_t * cb, bool checked)
     if(checked) {
         lv_obj_add_state(ext->bullet, LV_STATE_CHECKED);
         lv_obj_add_state(ext->label, LV_STATE_CHECKED);
-    } else {
+    }
+    else {
         lv_obj_clear_state(ext->bullet, LV_STATE_CHECKED);
         lv_obj_clear_state(ext->label, LV_STATE_CHECKED);
     }

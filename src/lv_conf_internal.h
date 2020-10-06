@@ -10,14 +10,6 @@
 
 #include <stdint.h>
 
-#if defined __has_include
-#  if __has_include("lv_conf.h")
-#   ifndef LV_CONF_INCLUDE_SIMPLE
-#    define LV_CONF_INCLUDE_SIMPLE
-#   endif
-#  endif
-#endif
-
 /*If lv_conf.h is not skipped include it*/
 #if !defined(LV_CONF_SKIP) && !defined(CONFIG_LV_CONF_SKIP)
 #  if defined(LV_CONF_PATH)											/*If there is a path defined for lv_conf.h use it*/
@@ -1259,7 +1251,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
- * The direction will be processed according to the Unicode Bidirectional Algorithm:
+ * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
  * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
 #ifndef LV_USE_BIDI
 #  ifdef CONFIG_LV_USE_BIDI
