@@ -424,7 +424,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_skew(const lv_point_t * point1, cons
 
     /*Draw the background line by line*/
     int32_t h;
-    size_t mask_buf_size = LV_MATH_MIN(lv_area_get_size(&draw_area), LV_HOR_RES_MAX);
+    lv_coord_t hor_res = lv_disp_get_hor_res(disp);
+    size_t mask_buf_size = LV_MATH_MIN(lv_area_get_size(&draw_area), hor_res);
     lv_opa_t * mask_buf = _lv_mem_buf_get(mask_buf_size);
 
     lv_area_t fill_area;
