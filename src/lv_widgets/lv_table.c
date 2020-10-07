@@ -848,6 +848,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
         uint16_t row;
         uint16_t cell = 0;
 
+        bool rtl = lv_obj_get_base_dir(table) == LV_BIDI_DIR_RTL ? true : false;
+
         cell_area.y2 = table->coords.y1 + bg_top - 1;
         for(row = 0; row < ext->row_cnt; row++) {
             lv_coord_t h_row = ext->row_h[row];
@@ -857,7 +859,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
             if(cell_area.y1 > clip_area->y2) return LV_DESIGN_RES_OK;
 
-            cell_area.x2 = table->coords.x1 + bg_left - 1;
+            if(rtl) cell_area.x1 = table->coords.x2 - bg_right - 1;
+            else cell_area.x2 = table->coords.x1 + bg_left - 1;
 
             for(col = 0; col < ext->col_cnt; col++) {
 
@@ -872,15 +875,21 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     format.s.crop        = 1;
                 }
 
-                cell_area.x1 = cell_area.x2 + 1;
-                cell_area.x2 = cell_area.x1 + ext->col_w[col] - 1;
+                if(rtl) {
+                    cell_area.x2 = cell_area.x1 - 1;
+                    cell_area.x1 = cell_area.x2 - ext->col_w[col] + 1;
+                } else {
+                    cell_area.x1 = cell_area.x2 + 1;
+                    cell_area.x2 = cell_area.x1 + ext->col_w[col] - 1;
+                }
 
                 uint16_t col_merge = 0;
                 for(col_merge = 0; col_merge + col < ext->col_cnt - 1; col_merge++) {
                     if(ext->cell_data[cell + col_merge] != NULL) {
                         format.format_byte = ext->cell_data[cell + col_merge][0];
                         if(format.s.right_merge)
-                            cell_area.x2 += ext->col_w[col + col_merge + 1];
+                            if(rtl) cell_area.x1 -= ext->col_w[col + col_merge + 1];
+                            else cell_area.x2 += ext->col_w[col + col_merge + 1];
                         else
                             break;
                     }

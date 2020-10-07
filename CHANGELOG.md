@@ -14,6 +14,7 @@
 ### Bugfixes
 - Theme update to support text selection background
 - Fix imgbtn state change
+- Support RTL in table (draw columns right to left)
 
 ## v7.6.1 (06.10.2020)
 
