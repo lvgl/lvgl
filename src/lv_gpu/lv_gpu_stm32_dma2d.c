@@ -63,7 +63,13 @@ static void dma2d_wait(void);
 void lv_gpu_stm32_dma2d_init(void)
 {
     /* Enable DMA2D clock */
+#if defined(STM32F4) || defined(STM32F7)
     RCC->AHB1ENR |= RCC_AHB1ENR_DMA2DEN;
+#elif  defined(STM32H7)
+    RCC->AHB3ENR |= RCC_AHB3ENR_DMA2DEN;
+#else
+# warning "LVGL can't enable the clock of DMA2D"
+#endif    
 
     /* Delay after setting peripheral clock */
     volatile uint32_t temp = RCC->AHB1ENR;
