@@ -13,6 +13,7 @@
 
 ### Bugfixes
 - Theme update to support text selection background
+- Fix imgbtn state change
 
 ## v7.6.1 (06.10.2020)
 

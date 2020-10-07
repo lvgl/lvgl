@@ -170,6 +170,26 @@ void lv_imgbtn_set_src_tiled(lv_obj_t * imgbtn, lv_btn_state_t state, const void
 
 #endif
 
+/**
+ * Set the state of the image button
+ * @param imgbtn pointer to an image button object
+ * @param state the new state of the button (from lv_btn_state_t enum)
+ */
+void lv_imgbtn_set_state(lv_obj_t * imgbtn, lv_btn_state_t state)
+{
+    lv_btn_set_state(imgbtn, state);
+    refr_img(imgbtn);
+}
+
+/**
+ * Toggle the state of the image button (ON->OFF, OFF->ON)
+ * @param imgbtn pointer to a image button object
+ */
+void lv_imgbtn_toggle(lv_obj_t * imgbtn)
+{
+    lv_imgbtn_toggle(imgbtn);
+    refr_img(imgbtn);
+}
 /*=====================
  * Getter functions
  *====================*/
