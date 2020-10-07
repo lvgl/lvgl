@@ -823,7 +823,7 @@ static void table_init(void)
     style_init_reset(&styles->table_cell);
     lv_style_set_border_color(&styles->table_cell, LV_STATE_DEFAULT, COLOR_BG_BORDER);
     lv_style_set_border_width(&styles->table_cell, LV_STATE_DEFAULT, 1);
-    lv_style_set_border_side(&styles->table_cell, LV_STATE_DEFAULT, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM);
+//    lv_style_set_border_side(&styles->table_cell, LV_STATE_DEFAULT, LV_BORDER_SIDE_TOP | LV_BORDER_SIDE_BOTTOM);
     lv_style_set_pad_left(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_pad_right(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
     lv_style_set_pad_top(&styles->table_cell, LV_STATE_DEFAULT, PAD_DEF);
