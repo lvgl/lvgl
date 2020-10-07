@@ -524,7 +524,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_letter_normal(lv_coord_t pos_x, lv_coord_
     uint32_t col_bit;
     col_bit = bit_ofs & 0x7; /* "& 0x7" equals to "% 8" just faster */
 
-    uint32_t mask_buf_size = box_w * box_h > LV_HOR_RES_MAX ? LV_HOR_RES_MAX : box_w * box_h;
+    lv_coord_t hor_res = lv_disp_get_hor_res(_lv_refr_get_disp_refreshing());
+    uint32_t mask_buf_size = box_w * box_h > hor_res ? hor_res : box_w * box_h;
     lv_opa_t * mask_buf = _lv_mem_buf_get(mask_buf_size);
     int32_t mask_p = 0;
 
