@@ -12,6 +12,7 @@
 - Add `text_sel_bg` style proeprty
 
 ### Bugfixes
+- Theme update to support text selection background
 
 ## v7.6.1 (06.10.2020)
 

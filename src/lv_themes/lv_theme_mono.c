@@ -115,6 +115,8 @@ static void basic_init(void)
     lv_style_set_bg_opa(&styles->scr, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->scr, LV_STATE_DEFAULT, BG_COLOR);
     lv_style_set_text_color(&styles->scr, LV_STATE_DEFAULT, FG_COLOR);
+    lv_style_set_text_sel_color(&styles->scr, LV_STATE_DEFAULT, BG_COLOR);
+    lv_style_set_text_sel_bg_color(&styles->scr, LV_STATE_DEFAULT, FG_COLOR);
     lv_style_set_value_color(&styles->scr, LV_STATE_DEFAULT, FG_COLOR);
 
     style_init_reset(&styles->bg);
