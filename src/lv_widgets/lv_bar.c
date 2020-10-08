@@ -130,7 +130,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_style_list_copy(&ext->style_indic, &ext_copy->style_indic);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(bar, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(bar, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
 
         lv_bar_set_value(bar, ext->cur_value, LV_ANIM_OFF);
     }
@@ -395,7 +395,9 @@ static lv_design_res_t lv_bar_design(lv_obj_t * bar, const lv_area_t * clip_area
             lv_draw_rect_dsc_init(&draw_dsc);
             draw_dsc.bg_opa = LV_OPA_TRANSP;
             draw_dsc.pattern_opa = LV_OPA_TRANSP;
+            draw_dsc.outline_opa = LV_OPA_TRANSP;
             draw_dsc.shadow_opa = LV_OPA_TRANSP;
+            draw_dsc.value_opa = LV_OPA_TRANSP;
             lv_obj_init_draw_rect_dsc(bar, LV_OBJ_PART_MAIN, &draw_dsc);
 
             lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
@@ -414,6 +416,8 @@ static void draw_bg(lv_obj_t * bar, const lv_area_t * clip_area)
         draw_dsc.border_opa = LV_OPA_TRANSP;
     }
 
+    /*value will be drawn later*/
+    draw_dsc.value_opa = LV_OPA_TRANSP;
     lv_obj_init_draw_rect_dsc(bar, LV_BAR_PART_BG, &draw_dsc);
     lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
 
@@ -733,6 +737,7 @@ static void lv_bar_set_value_with_anim(lv_obj_t * bar, int16_t new_value, int16_
             anim_info->anim_start = anim_info->anim_end;
             anim_info->anim_end   = new_value;
         }
+        *value_ptr = new_value;
         /* Stop the previous animation if it exists */
         lv_anim_del(anim_info, NULL);
 

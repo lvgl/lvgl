@@ -48,6 +48,13 @@
 
 #define TRI_OFFSET 2
 
+/* The OUTER_MASK_WIDTH define is required to assist with the placing of a mask over the outer ring of the widget as when the
+ * multicoloured radial lines are calculated for the outer ring of the widget their lengths are jittering because of the
+ * integer based arithmetic. From tests the maximum delta was found to be 2 so the current value is set to 3 to achieve
+ * appropriate masking.
+ */
+#define OUTER_MASK_WIDTH 3
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -144,7 +151,7 @@ lv_obj_t * lv_cpicker_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_style_list_copy(&ext->knob.style_list, &copy_ext->knob.style_list);
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(cpicker, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(cpicker, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
     refr_knob_pos(cpicker);
 
@@ -237,9 +244,7 @@ bool lv_cpicker_set_hsv(lv_obj_t * cpicker, lv_color_hsv_t hsv)
 
     refr_knob_pos(cpicker);
 
-    if(ext->type == LV_CPICKER_TYPE_DISC) {
-        lv_obj_invalidate(cpicker);
-    }
+    lv_obj_invalidate(cpicker);
 
     return true;
 }
@@ -483,6 +488,17 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask)
     uint16_t i;
     lv_coord_t cir_w = lv_obj_get_style_scale_width(cpicker, LV_CPICKER_PART_MAIN);
 
+    /* Mask outer ring of widget to tidy up ragged edges of lines while drawing outer ring */
+    lv_area_t mask_area_out;
+    lv_area_copy(&mask_area_out, &cpicker->coords);
+    mask_area_out.x1 += OUTER_MASK_WIDTH;
+    mask_area_out.x2 -= OUTER_MASK_WIDTH;
+    mask_area_out.y1 += OUTER_MASK_WIDTH;
+    mask_area_out.y2 -= OUTER_MASK_WIDTH;
+    lv_draw_mask_radius_param_t mask_out_param;
+    lv_draw_mask_radius_init(&mask_out_param, &mask_area_out, LV_RADIUS_CIRCLE, false);
+    int16_t mask_out_id = lv_draw_mask_add(&mask_out_param, 0);
+
     /* The inner line ends will be masked out.
      * So make lines a little bit longer because the masking makes a more even result */
     lv_coord_t cir_w_extra = cir_w + line_dsc.width;
@@ -498,7 +514,8 @@ static void draw_disc_grad(lv_obj_t * cpicker, const lv_area_t * mask)
 
         lv_draw_line(&p[0], &p[1], mask, &line_dsc);
     }
-
+    /* Now remove mask to continue with inner part */
+    lv_draw_mask_remove_id(mask_out_id);
 
     /*Mask out the inner area*/
     lv_draw_rect_dsc_t bg_dsc;
@@ -701,6 +718,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
         lv_obj_invalidate(cpicker);
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         uint32_t c = *((uint32_t *)param); /*uint32_t because can be UTF-8*/
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
@@ -745,6 +763,7 @@ static lv_res_t lv_cpicker_signal(lv_obj_t * cpicker, lv_signal_t sign, void * p
                 if(res != LV_RES_OK) return res;
             }
         }
+#endif
     }
     else if(sign == LV_SIGNAL_PRESSED) {
         ext->last_change_time = lv_tick_get();

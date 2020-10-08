@@ -112,7 +112,7 @@ lv_obj_t * lv_cont_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->layout              = copy_ext->layout;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(cont, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(cont, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("container created");
@@ -628,7 +628,7 @@ static void lv_cont_layout_grid(lv_obj_t * cont)
     _LV_LL_READ_BACK(cont->child_ll, child) {
         if(lv_obj_get_hidden(child) != false || lv_obj_is_protected(child, LV_PROTECT_POS) != false) continue;
         lv_coord_t obj_w = lv_obj_get_width(child);
-        if(act_x + inner + obj_w > w_fit) {
+        if(act_x + obj_w > w_fit + left) {
             act_x = left;
             act_y += y_ofs;
         }

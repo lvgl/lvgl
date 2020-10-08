@@ -11,9 +11,14 @@
 #include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_types.h"
+#include "../lv_misc/lv_gc.h"
 #include "../lv_misc/lv_log.h"
 #include "../lv_misc/lv_utils.h"
 #include "../lv_misc/lv_mem.h"
+
+#if defined(LV_GC_INCLUDE)
+    #include LV_GC_INCLUDE
+#endif /* LV_ENABLE_GC */
 
 /*********************
  *      DEFINES
@@ -37,18 +42,16 @@ static int32_t unicode_list_compare(const void * ref, const void * element);
 static int32_t kern_pair_8_compare(const void * ref, const void * element);
 static int32_t kern_pair_16_compare(const void * ref, const void * element);
 
-static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp);
+static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp, bool prefilter);
 static inline void decompress_line(uint8_t * out, lv_coord_t w);
 static inline uint8_t get_bits(const uint8_t * in, uint32_t bit_pos, uint8_t len);
 static inline void bits_write(uint8_t * out, uint32_t bit_pos, uint8_t val, uint8_t len);
 static inline void rle_init(const uint8_t * in,  uint8_t bpp);
 static inline uint8_t rle_next(void);
 
-
 /**********************
  *  STATIC VARIABLES
  **********************/
-static uint8_t * decompr_buf;
 static uint32_t rle_rdp;
 static const uint8_t * rle_in;
 static uint8_t rle_bpp;
@@ -89,6 +92,7 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
     }
     /*Handle compressed bitmap*/
     else {
+#if LV_USE_FONT_COMPRESSED
         uint32_t gsize = gdsc->box_w * gdsc->box_h;
         if(gsize == 0) return NULL;
 
@@ -109,14 +113,20 @@ const uint8_t * lv_font_get_bitmap_fmt_txt(const lv_font_t * font, uint32_t unic
                 break;
         }
 
-        if(_lv_mem_get_size(decompr_buf) < buf_size) {
-            decompr_buf = lv_mem_realloc(decompr_buf, buf_size);
-            LV_ASSERT_MEM(decompr_buf);
-            if(decompr_buf == NULL) return NULL;
+        if(_lv_mem_get_size(LV_GC_ROOT(_lv_font_decompr_buf)) < buf_size) {
+            LV_GC_ROOT(_lv_font_decompr_buf) = lv_mem_realloc(LV_GC_ROOT(_lv_font_decompr_buf), buf_size);
+            LV_ASSERT_MEM(LV_GC_ROOT(_lv_font_decompr_buf));
+            if(LV_GC_ROOT(_lv_font_decompr_buf) == NULL) return NULL;
         }
 
-        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], decompr_buf, gdsc->box_w, gdsc->box_h, (uint8_t)fdsc->bpp);
-        return decompr_buf;
+        bool prefilter = fdsc->bitmap_format == LV_FONT_FMT_TXT_COMPRESSED ? true : false;
+        decompress(&fdsc->glyph_bitmap[gdsc->bitmap_index], LV_GC_ROOT(_lv_font_decompr_buf), gdsc->box_w, gdsc->box_h,
+                   (uint8_t)fdsc->bpp,
+                   prefilter);
+        return LV_GC_ROOT(_lv_font_decompr_buf);
+#else /* !LV_USE_FONT_COMPRESSED */
+        return NULL;
+#endif
     }
 
     /*If not returned earlier then the letter is not found in this font*/
@@ -179,9 +189,9 @@ bool lv_font_get_glyph_dsc_fmt_txt(const lv_font_t * font, lv_font_glyph_dsc_t *
  */
 void _lv_font_clean_up_fmt_txt(void)
 {
-    if(decompr_buf) {
-        lv_mem_free(decompr_buf);
-        decompr_buf = NULL;
+    if(LV_GC_ROOT(_lv_font_decompr_buf)) {
+        lv_mem_free(LV_GC_ROOT(_lv_font_decompr_buf));
+        LV_GC_ROOT(_lv_font_decompr_buf) = NULL;
     }
 }
 
@@ -214,7 +224,8 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
             glyph_id = fdsc->cmaps[i].glyph_id_start + gid_ofs_8[rcp];
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_TINY) {
-            uint8_t * p = _lv_utils_bsearch(&rcp, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
+            uint16_t key = rcp;
+            uint8_t * p = _lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
                                             sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
 
             if(p) {
@@ -224,7 +235,8 @@ static uint32_t get_glyph_dsc_id(const lv_font_t * font, uint32_t letter)
             }
         }
         else if(fdsc->cmaps[i].type == LV_FONT_FMT_TXT_CMAP_SPARSE_FULL) {
-            uint8_t * p = _lv_utils_bsearch(&rcp, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
+            uint16_t key = rcp;
+            uint8_t * p = _lv_utils_bsearch(&key, fdsc->cmaps[i].unicode_list, fdsc->cmaps[i].list_length,
                                             sizeof(fdsc->cmaps[i].unicode_list[0]), unicode_list_compare);
 
             if(p) {
@@ -332,8 +344,9 @@ static int32_t kern_pair_16_compare(const void * ref, const void * element)
  * @param out buffer to store the result
  * @param px_num number of pixels in the glyph (width * height)
  * @param bpp bit per pixel (bpp = 3 will be converted to bpp = 4)
+ * @param prefilter true: the lines are XORed
  */
-static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp)
+static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord_t h, uint8_t bpp, bool prefilter)
 {
     uint32_t wrp = 0;
     uint8_t wr_size = bpp;
@@ -342,7 +355,12 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
     rle_init(in, bpp);
 
     uint8_t * line_buf1 = _lv_mem_buf_get(w);
-    uint8_t * line_buf2 = _lv_mem_buf_get(w);
+
+    uint8_t * line_buf2 = NULL;
+
+    if(prefilter) {
+        line_buf2 = _lv_mem_buf_get(w);
+    }
 
     decompress_line(line_buf1, w);
 
@@ -355,12 +373,22 @@ static void decompress(const uint8_t * in, uint8_t * out, lv_coord_t w, lv_coord
     }
 
     for(y = 1; y < h; y++) {
-        decompress_line(line_buf2, w);
+        if(prefilter) {
+            decompress_line(line_buf2, w);
 
-        for(x = 0; x < w; x++) {
-            line_buf1[x] = line_buf2[x] ^ line_buf1[x];
-            bits_write(out, wrp, line_buf1[x], bpp);
-            wrp += wr_size;
+            for(x = 0; x < w; x++) {
+                line_buf1[x] = line_buf2[x] ^ line_buf1[x];
+                bits_write(out, wrp, line_buf1[x], bpp);
+                wrp += wr_size;
+            }
+        }
+        else {
+            decompress_line(line_buf1, w);
+
+            for(x = 0; x < w; x++) {
+                bits_write(out, wrp, line_buf1[x], bpp);
+                wrp += wr_size;
+            }
         }
     }
 

@@ -20,6 +20,10 @@ extern "C" {
 #include "lv_log.h"
 #include "lv_types.h"
 
+#if LV_MEMCPY_MEMSET_STD
+#include <string.h>
+#endif
+
 /*********************
  *      DEFINES
  *********************/
@@ -41,6 +45,7 @@ typedef struct {
     uint32_t free_size; /**< Size of available memory */
     uint32_t free_biggest_size;
     uint32_t used_cnt;
+    uint32_t max_used; /**< Max size of Heap memory used */
     uint8_t used_pct; /**< Percentage used */
     uint8_t frag_pct; /**< Amount of fragmentation */
 } lv_mem_monitor_t;
@@ -136,6 +141,62 @@ void _lv_mem_buf_free_all(void);
 
 //! @cond Doxygen_Suppress
 
+#if LV_MEMCPY_MEMSET_STD
+
+/**
+ * Wrapper for the standard memcpy
+ * @param dst pointer to the destination buffer
+ * @param src pointer to the source buffer
+ * @param len number of byte to copy
+ */
+static inline void * _lv_memcpy(void * dst, const void * src, size_t len)
+{
+    return memcpy(dst, src, len);
+}
+
+/**
+ * Wrapper for the standard memcpy
+ * @param dst pointer to the destination buffer
+ * @param src pointer to the source buffer
+ * @param len number of byte to copy
+ */
+static inline void * _lv_memcpy_small(void * dst, const void * src, size_t len)
+{
+    return memcpy(dst, src, len);
+}
+
+/**
+ * Wrapper for the standard memset
+ * @param dst pointer to the destination buffer
+ * @param v value to set [0..255]
+ * @param len number of byte to set
+ */
+static inline void _lv_memset(void * dst, uint8_t v, size_t len)
+{
+    memset(dst, v, len);
+}
+
+/**
+ * Wrapper for the standard memset with fixed 0x00 value
+ * @param dst pointer to the destination buffer
+ * @param len number of byte to set
+ */
+static inline void _lv_memset_00(void * dst, size_t len)
+{
+    memset(dst, 0x00, len);
+}
+
+/**
+ * Wrapper for the standard memset with fixed 0xFF value
+ * @param dst pointer to the destination buffer
+ * @param len number of byte to set
+ */
+static inline void _lv_memset_ff(void * dst, size_t len)
+{
+    memset(dst, 0xFF, len);
+}
+
+#else
 /**
  * Same as `memcpy` but optimized for 4 byte operation.
  * @param dst pointer to the destination buffer
@@ -167,7 +228,6 @@ LV_ATTRIBUTE_FAST_MEM static inline void * _lv_memcpy_small(void * dst, const vo
 
 /**
  * Same as `memset` but optimized for 4 byte operation.
- * `dst` should be word aligned else normal `memcpy` will be used
  * @param dst pointer to the destination buffer
  * @param v value to set [0..255]
  * @param len number of byte to set
@@ -176,7 +236,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset(void * dst, uint8_t v, size_t len);
 
 /**
  * Same as `memset(dst, 0x00, len)` but optimized for 4 byte operation.
- * `dst` should be word aligned else normal `memcpy` will be used
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
@@ -184,13 +243,15 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_00(void * dst, size_t len);
 
 /**
  * Same as `memset(dst, 0xFF, len)` but optimized for 4 byte operation.
- * `dst` should be word aligned else normal `memcpy` will be used
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
 LV_ATTRIBUTE_FAST_MEM void _lv_memset_ff(void * dst, size_t len);
 
 //! @endcond
+
+#endif
+
 
 /**********************
  *      MACROS

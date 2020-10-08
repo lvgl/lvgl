@@ -26,6 +26,14 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
+enum {
+    LV_ARC_TYPE_NORMAL,
+    LV_ARC_TYPE_SYMMETRIC,
+    LV_ARC_TYPE_REVERSE
+};
+typedef uint8_t lv_arc_type_t;
+
 /*Data of arc*/
 typedef struct {
     /*New data for this type */
@@ -35,14 +43,25 @@ typedef struct {
     uint16_t bg_angle_start;
     uint16_t bg_angle_end;
     lv_style_list_t style_arc;
+    lv_style_list_t style_knob; /* Style of the knob */
+
+    int16_t cur_value; /*Current value of the arc*/
+    int16_t min_value; /*Minimum value of the arc*/
+    int16_t max_value; /*Maximum value of the arc*/
+    uint16_t dragging    : 1;
+    uint16_t type        : 2;
+    uint16_t adjustable  : 1;
+    uint16_t chg_rate; /*Drag angle rate of change of the arc (degrees/sec)*/
+    uint32_t last_tick; /*Last dragging event timestamp of the arc*/
+    int16_t last_angle; /*Last dragging angle of the arc*/
 } lv_arc_ext_t;
 
 /*Parts of the arc*/
 enum {
     LV_ARC_PART_BG = LV_OBJ_PART_MAIN,
     LV_ARC_PART_INDIC,
+    LV_ARC_PART_KNOB,
     _LV_ARC_PART_VIRTUAL_LAST,
-
     _LV_ARC_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,
 };
 typedef uint8_t lv_arc_part_t;
@@ -118,6 +137,44 @@ void lv_arc_set_bg_angles(lv_obj_t * arc, uint16_t start, uint16_t end);
  */
 void lv_arc_set_rotation(lv_obj_t * arc, uint16_t rotation_angle);
 
+
+/**
+ * Set the type of arc.
+ * @param arc pointer to arc object
+ * @param type arc type
+ */
+void lv_arc_set_type(lv_obj_t * arc, lv_arc_type_t type);
+
+/**
+ * Set a new value on the arc
+ * @param arc pointer to a arc object
+ * @param value new value
+ */
+void lv_arc_set_value(lv_obj_t * arc, int16_t value);
+
+/**
+ * Set minimum and the maximum values of a arc
+ * @param arc pointer to the arc object
+ * @param min minimum value
+ * @param max maximum value
+ */
+void lv_arc_set_range(lv_obj_t * arc, int16_t min, int16_t max);
+
+/**
+ * Set the threshold of arc knob increments
+ * position.
+ * @param arc pointer to a arc object
+ * @param threshold increment threshold
+ */
+void lv_arc_set_chg_rate(lv_obj_t * arc, uint16_t threshold);
+
+/**
+ * Set whether the arc is adjustable.
+ * @param arc pointer to a arc object
+ * @param adjustable whether the arc has a knob that can be dragged
+ */
+void lv_arc_set_adjustable(lv_obj_t * arc, bool adjustable);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -149,6 +206,48 @@ uint16_t lv_arc_get_bg_angle_start(lv_obj_t * arc);
  * @return the end angle [0..360]
  */
 uint16_t lv_arc_get_bg_angle_end(lv_obj_t * arc);
+
+/**
+ * Get whether the arc is type or not.
+ * @param arc pointer to a arc object
+ * @return arc type
+ */
+lv_arc_type_t lv_arc_get_type(const lv_obj_t * arc);
+
+/**
+ * Get the value of the of a arc
+ * @param arc pointer to a arc object
+ * @return the value of the of the arc
+ */
+int16_t lv_arc_get_value(const lv_obj_t * arc);
+
+/**
+ * Get the minimum value of a arc
+ * @param arc pointer to a arc object
+ * @return the minimum value of the arc
+ */
+int16_t lv_arc_get_min_value(const lv_obj_t * arc);
+
+/**
+ * Get the maximum value of a arc
+ * @param arc pointer to a arc object
+ * @return the maximum value of the arc
+ */
+int16_t lv_arc_get_max_value(const lv_obj_t * arc);
+
+/**
+ * Give the arc is being dragged or not
+ * @param arc pointer to a arc object
+ * @return true: drag in progress false: not dragged
+ */
+bool lv_arc_is_dragged(const lv_obj_t * arc);
+
+/**
+ * Get whether the arc is adjustable.
+ * @param arc pointer to a arc object
+ * @return whether the arc has a knob that can be dragged
+ */
+bool lv_arc_get_adjustable(lv_obj_t * arc);
 
 /*=====================
  * Other functions

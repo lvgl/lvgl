@@ -205,7 +205,8 @@ void _lv_disp_refr_task(lv_task_t * task)
         if(lv_disp_is_true_double_buf(disp_refr)) {
             if(disp_refr->driver.set_px_cb) {
                 LV_LOG_WARN("Can't handle 2 screen sized buffers with set_px_cb. Display is not refreshed.");
-            } else {
+            }
+            else {
                 lv_disp_buf_t * vdb = lv_disp_get_buf(disp_refr);
 
                 /*Flush the content of the VDB*/
@@ -217,11 +218,11 @@ void _lv_disp_refr_task(lv_task_t * task)
                 while(vdb->flushing);
 
                 lv_color_t * copy_buf = NULL;
-    #if LV_USE_GPU_STM32_DMA2D
+#if LV_USE_GPU_STM32_DMA2D
                 LV_UNUSED(copy_buf);
-    #else
+#else
                 copy_buf = _lv_mem_buf_get(disp_refr->driver.hor_res * sizeof(lv_color_t));
-                #endif
+#endif
 
                 uint8_t * buf_act = (uint8_t *)vdb->buf_act;
                 uint8_t * buf_ina = (uint8_t *)vdb->buf_act == vdb->buf1 ? vdb->buf2 : vdb->buf1;
@@ -232,12 +233,12 @@ void _lv_disp_refr_task(lv_task_t * task)
                     if(disp_refr->inv_area_joined[a] == 0) {
                         uint32_t start_offs =
                             (hres * disp_refr->inv_areas[a].y1 + disp_refr->inv_areas[a].x1) * sizeof(lv_color_t);
-    #if LV_USE_GPU_STM32_DMA2D
+#if LV_USE_GPU_STM32_DMA2D
                         lv_gpu_stm32_dma2d_copy((lv_color_t *)(buf_act + start_offs), disp_refr->driver.hor_res,
                                                 (lv_color_t *)(buf_ina + start_offs), disp_refr->driver.hor_res,
                                                 lv_area_get_width(&disp_refr->inv_areas[a]),
                                                 lv_area_get_height(&disp_refr->inv_areas[a]));
-    #else
+#else
 
                         lv_coord_t y;
                         uint32_t line_length = lv_area_get_width(&disp_refr->inv_areas[a]) * sizeof(lv_color_t);
@@ -249,7 +250,7 @@ void _lv_disp_refr_task(lv_task_t * task)
                             _lv_memcpy(buf_act + start_offs, copy_buf, line_length);
                             start_offs += hres * sizeof(lv_color_t);
                         }
-    #endif
+#endif
                     }
                 }
 
@@ -489,7 +490,8 @@ static void lv_refr_area_part(const lv_area_t * area_p)
         }
     }
 
-    lv_obj_t * top_p;
+    lv_obj_t * top_act_scr = NULL;
+    lv_obj_t * top_prev_scr = NULL;
 
     /*Get the new mask from the original area and the act. VDB
      It will be a part of 'area_p'*/
@@ -497,10 +499,55 @@ static void lv_refr_area_part(const lv_area_t * area_p)
     _lv_area_intersect(&start_mask, area_p, &vdb->area);
 
     /*Get the most top object which is not covered by others*/
-    top_p = lv_refr_get_top_obj(&start_mask, lv_disp_get_scr_act(disp_refr));
+    top_act_scr = lv_refr_get_top_obj(&start_mask, lv_disp_get_scr_act(disp_refr));
+    if(disp_refr->prev_scr) {
+        top_prev_scr = lv_refr_get_top_obj(&start_mask, disp_refr->prev_scr);
+    }
 
+    /*Draw a display background if there is no top object*/
+    if(top_act_scr == NULL && top_prev_scr == NULL) {
+        if(disp_refr->bg_img) {
+            lv_draw_img_dsc_t dsc;
+            lv_draw_img_dsc_init(&dsc);
+            dsc.opa = disp_refr->bg_opa;
+            lv_img_header_t header;
+            lv_res_t res;
+            res = lv_img_decoder_get_info(disp_refr->bg_img, &header);
+            if(res == LV_RES_OK) {
+                lv_area_t a;
+                lv_area_set(&a, 0, 0, header.w - 1, header.h - 1);
+                lv_draw_img(&a, &start_mask, disp_refr->bg_img, &dsc);
+            }
+            else {
+                LV_LOG_WARN("Can't draw the background image")
+            }
+        }
+        else {
+            lv_draw_rect_dsc_t dsc;
+            lv_draw_rect_dsc_init(&dsc);
+            dsc.bg_color = disp_refr->bg_color;
+            dsc.bg_opa = disp_refr->bg_opa;
+            lv_draw_rect(&start_mask, &start_mask, &dsc);
+
+        }
+    }
+    /*Refresh the previous screen if any*/
+    if(disp_refr->prev_scr) {
+        /*Get the most top object which is not covered by others*/
+        if(top_prev_scr == NULL) {
+            top_prev_scr = disp_refr->prev_scr;
+        }
+        /*Do the refreshing from the top object*/
+        lv_refr_obj_and_children(top_prev_scr, &start_mask);
+
+    }
+
+
+    if(top_act_scr == NULL) {
+        top_act_scr = disp_refr->act_scr;
+    }
     /*Do the refreshing from the top object*/
-    lv_refr_obj_and_children(top_p, &start_mask);
+    lv_refr_obj_and_children(top_act_scr, &start_mask);
 
     /*Also refresh top and sys layer unconditionally*/
     lv_refr_obj_and_children(lv_disp_get_layer_top(disp_refr), &start_mask);
@@ -525,9 +572,14 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 
     /*If this object is fully cover the draw area check the children too */
     if(_lv_area_is_in(area_p, &obj->coords, 0) && obj->hidden == 0) {
-        lv_design_res_t design_res = obj->design_cb ? obj->design_cb(obj, area_p,
-                                                                     LV_DESIGN_COVER_CHK) : LV_DESIGN_RES_NOT_COVER;
+        lv_design_res_t design_res = obj->design_cb(obj, area_p, LV_DESIGN_COVER_CHK);
         if(design_res == LV_DESIGN_RES_MASKED) return NULL;
+
+#if LV_USE_OPA_SCALE
+        if(design_res == LV_DESIGN_RES_COVER && lv_obj_get_style_opa_scale(obj, LV_OBJ_PART_MAIN) != LV_OPA_COVER) {
+            design_res = LV_DESIGN_RES_NOT_COVER;
+        }
+#endif
 
         lv_obj_t * i;
         _LV_LL_READ(obj->child_ll, i) {
@@ -694,6 +746,8 @@ static void lv_refr_vdb_flush(void)
 
     /*Flush the rendered content to the display*/
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    if(disp->driver.gpu_wait_cb) disp->driver.gpu_wait_cb(&disp->driver);
+
     if(disp->driver.flush_cb) disp->driver.flush_cb(&disp->driver, &vdb->area, vdb->buf_act);
 
     if(vdb->buf1 && vdb->buf2) {

@@ -435,6 +435,10 @@ void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
     dsc->tmp.sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
     dsc->tmp.cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
 
+    /*Use smaller value to avoid overflow*/
+    dsc->tmp.sinma = dsc->tmp.sinma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+    dsc->tmp.cosma = dsc->tmp.cosma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+
     dsc->tmp.chroma_keyed = lv_img_cf_is_chroma_keyed(dsc->cfg.cf) ? 1 : 0;
     dsc->tmp.has_alpha = lv_img_cf_has_alpha(dsc->cfg.cf) ? 1 : 0;
     if(dsc->cfg.cf == LV_IMG_CF_TRUE_COLOR || dsc->cfg.cf == LV_IMG_CF_TRUE_COLOR_ALPHA ||
@@ -451,7 +455,9 @@ void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
     dsc->tmp.img_dsc.header.w = dsc->cfg.src_w;
     dsc->tmp.img_dsc.header.h = dsc->cfg.src_h;
 
-    dsc->tmp.zoom_inv = (256 * 256) / dsc->cfg.zoom;
+    /* The inverse of the zoom will be sued during the transformation
+     *  + dsc->cfg.zoom / 2 for rounding*/
+    dsc->tmp.zoom_inv = (((256 * 256) << _LV_ZOOM_INV_UPSCALE) + dsc->cfg.zoom / 2) / dsc->cfg.zoom;
 
     dsc->res.opa = LV_OPA_COVER;
     dsc->res.color = dsc->cfg.color;
@@ -468,9 +474,31 @@ void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
  * @param pivot x,y pivot coordinates of rotation
  */
 void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t h, int16_t angle, uint16_t zoom,
-                                      lv_point_t * pivot)
+                                      const lv_point_t * pivot)
 {
 #if LV_USE_IMG_TRANSFORM
+    if(angle == 0 && zoom == LV_IMG_ZOOM_NONE) {
+        res->x1 = 0;
+        res->y1 = 0;
+        res->x2 = w - 1;
+        res->y2 = h - 1;
+        return;
+    }
+
+
+    res->x1 = (((-pivot->x) * zoom) >> 8) - 1;
+    res->y1 = (((-pivot->y) * zoom) >> 8) - 1;
+    res->x2 = (((w - pivot->x) * zoom) >> 8) + 2;
+    res->y2 = (((h - pivot->y) * zoom) >> 8) + 2;
+
+    if(angle == 0) {
+        res->x1 += pivot->x;
+        res->y1 += pivot->y;
+        res->x2 += pivot->x;
+        res->y2 += pivot->y;
+        return;
+    }
+
     int32_t angle_low = angle / 10;
     int32_t angle_hight = angle_low + 1;
     int32_t angle_rem = angle  - (angle_low * 10);
@@ -484,6 +512,10 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
     int32_t sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
     int32_t cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
 
+    /*Use smaller value to avoid overflow*/
+    sinma = sinma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+    cosma = cosma >> (LV_TRIGO_SHIFT - _LV_TRANSFORM_TRIGO_SHIFT);
+
     lv_point_t lt;
     lv_point_t rt;
     lv_point_t lb;
@@ -492,31 +524,25 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
     lv_coord_t xt;
     lv_coord_t yt;
 
-    lv_area_t a;
-    a.x1 = ((-pivot->x) * zoom) >> 8;
-    a.y1 = ((-pivot->y) * zoom) >> 8;
-    a.x2 = ((w - pivot->x) * zoom) >> 8;
-    a.y2 = ((h - pivot->y) * zoom) >> 8;
+    xt = res->x1;
+    yt = res->y1;
+    lt.x = ((cosma * xt - sinma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
+    lt.y = ((sinma * xt + cosma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
 
-    xt = a.x1;
-    yt = a.y1;
-    lt.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
-    lt.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+    xt = res->x2;
+    yt = res->y1;
+    rt.x = ((cosma * xt - sinma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
+    rt.y = ((sinma * xt + cosma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
 
-    xt = a.x2;
-    yt = a.y1;
-    rt.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
-    rt.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+    xt = res->x1;
+    yt = res->y2;
+    lb.x = ((cosma * xt - sinma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
+    lb.y = ((sinma * xt + cosma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
 
-    xt = a.x1;
-    yt = a.y2;
-    lb.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
-    lb.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
-
-    xt = a.x2;
-    yt = a.y2;
-    rb.x = ((cosma * xt - sinma * yt) >> LV_TRIGO_SHIFT) + pivot->x;
-    rb.y = ((sinma * xt + cosma * yt) >> LV_TRIGO_SHIFT) + pivot->y;
+    xt = res->x2;
+    yt = res->y2;
+    rb.x = ((cosma * xt - sinma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->x;
+    rb.y = ((sinma * xt + cosma * yt) >> _LV_TRANSFORM_TRIGO_SHIFT) + pivot->y;
 
     res->x1 = LV_MATH_MIN4(lb.x, lt.x, rb.x, rt.x);
     res->x2 = LV_MATH_MAX4(lb.x, lt.x, rb.x, rt.x);
@@ -528,8 +554,8 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
     LV_UNUSED(pivot);
     res->x1 = 0;
     res->y1 = 0;
-    res->x2 = w;
-    res->y2 = h;
+    res->x2 = w - 1;
+    res->y2 = h - 1;
 #endif
 }
 

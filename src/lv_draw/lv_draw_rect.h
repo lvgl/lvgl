@@ -41,6 +41,7 @@ typedef struct {
     lv_style_int_t border_side;
     lv_opa_t border_opa;
     lv_blend_mode_t border_blend_mode;
+    uint8_t border_post : 1;        /*There is a border it will be drawn later. */
 
     /*Outline*/
     lv_color_t outline_color;
@@ -92,9 +93,9 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc);
  * Draw a rectangle
  * @param coords the coordinates of the rectangle
  * @param mask the rectangle will be drawn only in this mask
- * @param style pointer to a style
+ * @param dsc pointer to an initialized `lv_draw_rect_dsc_t` variable
  */
-void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, lv_draw_rect_dsc_t * dsc);
+void lv_draw_rect(const lv_area_t * coords, const lv_area_t * mask, const lv_draw_rect_dsc_t * dsc);
 
 /**
  * Draw a pixel

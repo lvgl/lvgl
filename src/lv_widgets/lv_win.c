@@ -23,6 +23,22 @@
  *      TYPEDEFS
  **********************/
 
+/** Extended data of win_btn*/
+typedef struct {
+    /** Ext. of ancestor*/
+    lv_btn_ext_t btn;
+
+    /** Which side of the header should the button be aligned to.
+     * 0: Align to right (default), 1: Align to left */
+    uint8_t alignment_in_header : 1;
+} lv_win_btn_ext_t;
+
+enum {
+    LV_WIN_BTN_ALIGN_RIGHT = 0,     /**< Align button to right of the header */
+    LV_WIN_BTN_ALIGN_LEFT   /**< Align button to left of the header */
+};
+typedef uint8_t lv_win_btn_align_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -30,6 +46,9 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param);
 static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_style_list_t * lv_win_get_style(lv_obj_t * win, uint8_t part);
 static void lv_win_realign(lv_obj_t * win);
+static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const void * img_src);
+static void lv_win_btn_set_alignment(lv_obj_t * par, const lv_win_btn_align_t alignment);
+static lv_win_btn_align_t lv_win_btn_get_alignment(const lv_obj_t * par);
 
 /**********************
  *  STATIC VARIABLES
@@ -137,7 +156,7 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
     }
 
     /*Refresh the style with new signal function*/
-    lv_obj_refresh_style(new_win, LV_STYLE_PROP_ALL);
+    lv_obj_refresh_style(new_win, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
 
     lv_win_realign(new_win);
 
@@ -166,23 +185,39 @@ void lv_win_clean(lv_obj_t * win)
  * Add control button to the header of the window
  * @param win pointer to a window object
  * @param img_src an image source ('lv_img_t' variable, path to file or a symbol)
+ * @param alignment button alignment on the header
  * @return pointer to the created button object
  */
-lv_obj_t * lv_win_add_btn(lv_obj_t * win, const void * img_src)
+lv_obj_t * lv_win_add_btn_right(lv_obj_t * win, const void * img_src)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
     LV_ASSERT_NULL(img_src);
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
-    lv_obj_t * btn = lv_btn_create(ext->header, NULL);
-    lv_theme_apply(btn, LV_THEME_WIN_BTN);
-    lv_coord_t btn_size = lv_obj_get_height_fit(ext->header);
-    lv_obj_set_size(btn, btn_size, btn_size);
+    lv_obj_t * btn = lv_win_btn_create(ext->header, img_src);
+    lv_win_btn_set_alignment(btn, LV_WIN_BTN_ALIGN_RIGHT);
 
-    lv_obj_t * img = lv_img_create(btn, NULL);
-    lv_obj_set_click(img, false);
-    lv_img_set_src(img, img_src);
+    lv_win_realign(win);
+
+    return btn;
+}
+
+/**
+ * Add control button on the left side of the window header
+ * @param win pointer to a window object
+ * @param img_src an image source ('lv_img_t' variable, path to file or a symbol)
+ * @return pointer to the created button object
+ */
+lv_obj_t * lv_win_add_btn_left(lv_obj_t * win, const void * img_src)
+{
+    LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+    LV_ASSERT_NULL(img_src);
+
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+
+    lv_obj_t * btn = lv_win_btn_create(ext->header, img_src);
+    lv_win_btn_set_alignment(btn, LV_WIN_BTN_ALIGN_LEFT);
 
     lv_win_realign(win);
 
@@ -501,7 +536,8 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
         lv_obj_t * win = lv_obj_get_parent(header);
         lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
-        lv_style_int_t left = lv_obj_get_style_pad_left(header, LV_OBJ_PART_MAIN);
+        lv_style_int_t header_left = lv_obj_get_style_pad_left(win, LV_WIN_PART_HEADER);
+        lv_style_int_t header_inner = lv_obj_get_style_pad_inner(win, LV_WIN_PART_HEADER);
 
         lv_draw_label_dsc_t label_dsc;
         lv_draw_label_dsc_init(&label_dsc);
@@ -510,13 +546,29 @@ static lv_design_res_t lv_win_header_design(lv_obj_t * header, const lv_area_t *
         lv_area_t txt_area;
         lv_point_t txt_size;
 
-
         _lv_txt_get_size(&txt_size, ext->title_txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
                          label_dsc.flag);
 
-        txt_area.x1 = header->coords.x1 + left;
+        lv_obj_t * btn = NULL;
+
+        lv_coord_t btn_h = lv_obj_get_height_fit(header);
+        lv_coord_t btn_w = ext->btn_w != 0 ? ext->btn_w : btn_h;
+
+        /*Get x position of the title (should be on the right of the buttons on the left)*/
+
+        lv_coord_t left_btn_offset = 0;
+        btn = lv_obj_get_child_back(ext->header, NULL);
+        while(btn != NULL) {
+            if(LV_WIN_BTN_ALIGN_LEFT == lv_win_btn_get_alignment(btn)) {
+                left_btn_offset += btn_w + header_inner;
+            }
+
+            btn = lv_obj_get_child_back(header, btn);
+        }
+
+        txt_area.x1 = header->coords.x1 + header_left + left_btn_offset;
         txt_area.y1 = header->coords.y1 + (lv_obj_get_height(header) - txt_size.y) / 2;
-        txt_area.x2 = txt_area.x1 + txt_size.x;
+        txt_area.x2 = txt_area.x1 + txt_size.x  + left_btn_offset;
         txt_area.y2 = txt_area.y1 + txt_size.y;
 
         lv_draw_label(&txt_area, clip_area, &label_dsc, ext->title_txt, NULL);
@@ -593,8 +645,10 @@ static lv_res_t lv_win_signal(lv_obj_t * win, lv_signal_t sign, void * param)
         ext->title_txt  = NULL;
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         /*Forward all the control signals to the page*/
         ext->page->signal_cb(ext->page, sign, param);
+#endif
     }
 
     return res;
@@ -644,29 +698,110 @@ static void lv_win_realign(lv_obj_t * win)
     lv_obj_set_width(ext->header, lv_obj_get_width(win));
 
     lv_obj_t * btn;
-    lv_obj_t * btn_prev = NULL;
+    lv_obj_t * btn_prev_at_left = NULL;
+    lv_obj_t * btn_prev_at_right = NULL;
+
+    bool is_header_right_side_empty = true;
+    bool is_header_left_side_empty = true;
+
     lv_coord_t btn_h = lv_obj_get_height_fit(ext->header);
     lv_coord_t btn_w = ext->btn_w != 0 ? ext->btn_w : btn_h;
     lv_style_int_t header_inner = lv_obj_get_style_pad_inner(win, LV_WIN_PART_HEADER);
     lv_style_int_t header_right = lv_obj_get_style_pad_right(win, LV_WIN_PART_HEADER);
+    lv_style_int_t header_left = lv_obj_get_style_pad_left(win, LV_WIN_PART_HEADER);
+
     /*Refresh the size of all control buttons*/
     btn = lv_obj_get_child_back(ext->header, NULL);
     while(btn != NULL) {
-        lv_obj_set_size(btn, btn_h, btn_w);
-        if(btn_prev == NULL) {
-            lv_obj_align(btn, ext->header, LV_ALIGN_IN_RIGHT_MID, -header_right, 0);
+        lv_obj_set_size(btn, btn_w, btn_h);
+        uint8_t btn_alignment = lv_win_btn_get_alignment(btn);
+
+        if(LV_WIN_BTN_ALIGN_RIGHT == btn_alignment) {
+            if(is_header_right_side_empty) {
+                /* Align the button to the right of the header */
+                lv_obj_align(btn, ext->header, LV_ALIGN_IN_RIGHT_MID, -header_right, 0);
+
+                is_header_right_side_empty = false;
+            }
+            else {
+                /* Align the button to the left of the previous button */
+                lv_obj_align(btn, btn_prev_at_right, LV_ALIGN_OUT_LEFT_MID, -header_inner, 0);
+            }
+
+            btn_prev_at_right = btn;
         }
-        else {
-            lv_obj_align(btn, btn_prev, LV_ALIGN_OUT_LEFT_MID, - header_inner, 0);
+        else if(LV_WIN_BTN_ALIGN_LEFT == btn_alignment) {
+            if(is_header_left_side_empty) {
+                /* Align the button to the right of the header */
+                lv_obj_align(btn, ext->header, LV_ALIGN_IN_LEFT_MID, header_left, 0);
+
+                is_header_left_side_empty = false;
+            }
+            else {
+                /* Align the button to the right of the previous button */
+                lv_obj_align(btn, btn_prev_at_left, LV_ALIGN_OUT_RIGHT_MID, header_inner, 0);
+            }
+
+            btn_prev_at_left = btn;
         }
-        btn_prev = btn;
-        btn      = lv_obj_get_child_back(ext->header, btn);
+
+        btn = lv_obj_get_child_back(ext->header, btn);
     }
 
     lv_obj_set_pos(ext->header, 0, 0);
 
     lv_obj_set_size(ext->page, lv_obj_get_width(win), lv_obj_get_height(win) - lv_obj_get_height(ext->header));
     lv_obj_align(ext->page, ext->header, LV_ALIGN_OUT_BOTTOM_LEFT, 0, 0);
+}
+
+static lv_obj_t * lv_win_btn_create(lv_obj_t * par, const void * img_src)
+{
+    LV_LOG_TRACE("win btn create started");
+
+    lv_obj_t * win_btn;
+
+    win_btn = lv_btn_create(par, NULL);
+    LV_ASSERT_MEM(win_btn);
+    if(win_btn == NULL) return NULL;
+
+    /*Allocate the extended data*/
+    lv_win_btn_ext_t * ext = lv_obj_allocate_ext_attr(win_btn, sizeof(lv_win_btn_ext_t));
+    LV_ASSERT_MEM(ext);
+    if(ext == NULL) {
+        lv_obj_del(win_btn);
+        return NULL;
+    }
+
+    ext->alignment_in_header = LV_WIN_BTN_ALIGN_RIGHT;
+
+    lv_obj_set_click(win_btn, true);
+    lv_win_btn_set_alignment(win_btn, LV_WIN_BTN_ALIGN_RIGHT);
+
+    lv_theme_apply(win_btn, LV_THEME_WIN_BTN);
+    lv_coord_t btn_size = lv_obj_get_height_fit(par);
+    lv_obj_set_size(win_btn, btn_size, btn_size);
+
+    lv_obj_t * img = lv_img_create(win_btn, NULL);
+    lv_obj_set_click(img, false);
+    lv_img_set_src(img, img_src);
+
+    LV_LOG_INFO("win btn created");
+
+    return win_btn;
+}
+
+static void lv_win_btn_set_alignment(lv_obj_t * win_btn, const uint8_t alignment)
+{
+    lv_win_btn_ext_t * ext = lv_obj_get_ext_attr(win_btn);
+
+    ext->alignment_in_header = alignment;
+}
+
+static uint8_t lv_win_btn_get_alignment(const lv_obj_t * win_btn)
+{
+    lv_win_btn_ext_t * ext = lv_obj_get_ext_attr(win_btn);
+
+    return ext->alignment_in_header;
 }
 
 #endif

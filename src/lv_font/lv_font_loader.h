@@ -1,10 +1,10 @@
 /**
- * @file lv_test_obj.h
+ * @file lv_font_loader.h
  *
  */
 
-#ifndef LV_TEST_CONT_H
-#define LV_TEST_CONT_H
+#ifndef LV_FONT_LOADER_H
+#define LV_FONT_LOADER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,7 +25,13 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
-void lv_test_cont(void);
+
+#if LV_USE_FILESYSTEM
+
+lv_font_t * lv_font_load(const char * fontName);
+void lv_font_free(lv_font_t * font);
+
+#endif
 
 /**********************
  *      MACROS
@@ -35,4 +41,4 @@ void lv_test_cont(void);
 } /* extern "C" */
 #endif
 
-#endif /*LV_TEST_CONT_H*/
+#endif /*LV_FONT_LOADER_H*/

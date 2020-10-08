@@ -20,6 +20,12 @@ extern "C" {
  *      DEFINES
  *********************/
 
+#define LV_DMA2D_ARGB8888 0
+#define LV_DMA2D_RGB888 1
+#define LV_DMA2D_RGB565 2
+#define LV_DMA2D_ARGB1555 3
+#define LV_DMA2D_ARGB4444 4
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -27,6 +33,11 @@ extern "C" {
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
+
+/**
+ * Turn on the peripheral and set output color mode, this only needs to be done once
+ */
+void lv_gpu_stm32_dma2d_init(void);
 
 /**
  * Fill an area in the buffer with a color

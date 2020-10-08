@@ -118,6 +118,7 @@ lv_obj_t * lv_page_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new page object*/
     if(copy == NULL) {
         ext->scrl = lv_cont_create(page, NULL);
+        lv_obj_set_focus_parent(ext->scrl, true);
         lv_obj_set_drag(ext->scrl, true);
         lv_obj_set_drag_throw(ext->scrl, true);
         lv_obj_add_protect(ext->scrl, LV_PROTECT_PARENT | LV_PROTECT_PRESS_LOST);
@@ -402,7 +403,7 @@ lv_coord_t lv_page_get_width_grid(lv_obj_t * page, uint8_t div, uint8_t span)
 }
 
 /**
- * Divide the height of the object and get the width of a given number of columns.
+ * Divide the height of the object and get the height of a given number of rows.
  * Take into account the paddings of the background and scrollable too.
  * @param obj pointer to an object
  * @param div indicates how many rows are assumed.
@@ -485,6 +486,9 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
     lv_anim_del(ext->scrl, (lv_anim_exec_xcb_t)lv_obj_set_y);
 #endif
 
+    /*if using focus mode, change target to parent*/
+    obj = lv_obj_get_focused_obj(obj);
+
 
     /*If obj is higher then the page focus where the "error" is smaller*/
     lv_coord_t obj_y      = obj->coords.y1 - ext->scrl->coords.y1;
@@ -492,13 +496,13 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
     lv_coord_t scrlable_y = lv_obj_get_y(ext->scrl);
     lv_coord_t page_h     = lv_obj_get_height(page);
 
-    lv_coord_t top_err = -(scrlable_y + obj_y);
-    lv_coord_t bot_err = scrlable_y + obj_y + obj_h - page_h;
-
     lv_style_int_t bg_top = lv_obj_get_style_pad_top(page, LV_PAGE_PART_BG);
     lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(page, LV_PAGE_PART_BG);
     lv_style_int_t scrl_top = lv_obj_get_style_pad_top(ext->scrl, LV_CONT_PART_MAIN);
     lv_style_int_t scrl_bottom = lv_obj_get_style_pad_bottom(ext->scrl, LV_CONT_PART_MAIN);
+
+    lv_coord_t top_err = -((scrlable_y + obj_y) - bg_top);
+    lv_coord_t bot_err = scrlable_y + obj_y + obj_h - (page_h - bg_bottom);
 
     /*Out of the page on the top*/
     if((obj_h <= page_h && top_err > 0) || (obj_h > page_h && top_err < bot_err)) {
@@ -521,13 +525,13 @@ void lv_page_focus(lv_obj_t * page, const lv_obj_t * obj, lv_anim_enable_t anim_
     lv_coord_t scrlable_x = lv_obj_get_x(ext->scrl);
     lv_coord_t page_w     = lv_obj_get_width(page);
 
-    lv_coord_t left_err  = -(scrlable_x + obj_x);
-    lv_coord_t right_err = scrlable_x + obj_x + obj_w - page_w;
-
     lv_style_int_t bg_left = lv_obj_get_style_pad_left(page, LV_PAGE_PART_BG);
     lv_style_int_t bg_right = lv_obj_get_style_pad_right(page, LV_PAGE_PART_BG);
     lv_style_int_t scrl_left = lv_obj_get_style_pad_top(ext->scrl, LV_CONT_PART_MAIN);
     lv_style_int_t scrl_right = lv_obj_get_style_pad_bottom(ext->scrl, LV_CONT_PART_MAIN);
+
+    lv_coord_t left_err  = -((scrlable_x + obj_x) - bg_left);
+    lv_coord_t right_err = scrlable_x + obj_x + obj_w - (page_w - bg_right);
 
     /*Out of the page on the left*/
     if((obj_w <= page_w && left_err > 0) || (obj_w > page_w && left_err < right_err)) {
@@ -856,6 +860,7 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
         refr_ext_draw_pad(page);
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         uint32_t c = *((uint32_t *)param);
 
         if(c == LV_KEY_DOWN) {
@@ -880,10 +885,13 @@ static lv_res_t lv_page_signal(lv_obj_t * page, lv_signal_t sign, void * param)
             else
                 lv_page_scroll_hor(page, lv_obj_get_width(page) / 4);
         }
+#endif
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
+#if LV_USE_GROUP
         bool * editable = (bool *)param;
         *editable       = true;
+#endif
     }
 
     return res;
@@ -1035,26 +1043,6 @@ static lv_res_t lv_page_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, voi
                 page_ext->scrlbar.ver_draw = 0;
             }
         }
-    }
-    else if(sign == LV_SIGNAL_FOCUS) {
-#if LV_USE_GROUP
-        if(lv_obj_get_group(page)) {
-            lv_group_focus_obj(page);
-        }
-        else
-#endif
-        {
-            res = lv_signal_send(page, LV_SIGNAL_FOCUS, NULL);
-            if(res != LV_RES_OK) return res;
-            res = lv_event_send(page, LV_EVENT_FOCUSED, NULL);
-            if(res != LV_RES_OK) return res;
-        }
-    }
-    else if(sign == LV_SIGNAL_DEFOCUS) {
-        res = lv_signal_send(page, LV_SIGNAL_DEFOCUS, NULL);
-        if(res != LV_RES_OK) return res;
-        res = lv_event_send(page, LV_EVENT_DEFOCUSED, NULL);
-        if(res != LV_RES_OK) return res;
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         page_ext->scrl = NULL;

@@ -106,7 +106,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy);
 
 /**
  * Insert a character to the current cursor position.
- * To add a wide char, e.g. 'Á' use `lv_txt_encoded_conv_wc('Á')`
+ * To add a wide char, e.g. 'Á' use `_lv_txt_encoded_conv_wc('Á')`
  * @param ta pointer to a text area object
  * @param c a character (e.g. 'a')
  */
@@ -224,7 +224,7 @@ void lv_textarea_set_insert_replace(lv_obj_t * ta, const char * txt);
  * @param ta pointer to a text area object
  * @param sb_mode the new mode from 'lv_scrollbar_mode_t' enum
  */
-static inline void lv_textarea_set_sscrollbar_mode(lv_obj_t * ta, lv_scrollbar_mode_t mode)
+static inline void lv_textarea_set_scrollbar_mode(lv_obj_t * ta, lv_scrollbar_mode_t mode)
 {
     lv_page_set_scrollbar_mode(ta, mode);
 }

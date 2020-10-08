@@ -143,6 +143,11 @@ bool _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data)
     else if(indev->driver.type == LV_INDEV_TYPE_KEYPAD) {
         data->key = indev->proc.types.keypad.last_key;
     }
+    /*For compatibility assume that used button was enter (encoder push) */
+    else if(indev->driver.type == LV_INDEV_TYPE_ENCODER) {
+        data->key = LV_KEY_ENTER;
+        data->enc_diff = 0;
+    }
 
     if(indev->driver.read_cb) {
         LV_LOG_TRACE("idnev read started");

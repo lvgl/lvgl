@@ -1,4 +1,3 @@
-
 /**
  * @file lv_roller.c
  *
@@ -33,6 +32,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_design_res_t lv_roller_label_design(lv_obj_t * label, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_roller_scrl_signal(lv_obj_t * roller_scrl, lv_signal_t sign, void * param);
 static lv_style_list_t * lv_roller_get_style(lv_obj_t * roller, uint8_t part);
 static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * param);
@@ -51,6 +51,7 @@ static void draw_bg(lv_obj_t * roller, const lv_area_t * clip_area);
  *  STATIC VARIABLES
  **********************/
 static lv_signal_cb_t ancestor_signal;
+static lv_design_cb_t ancestor_label_design;
 static lv_signal_cb_t ancestor_scrl_signal;
 
 /**********************
@@ -103,7 +104,8 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
 
         lv_obj_t * label = lv_label_create(roller, NULL);
         lv_label_set_align(label, LV_LABEL_ALIGN_CENTER);
-
+        if(ancestor_label_design == NULL) ancestor_label_design = lv_obj_get_design_cb(label);
+        lv_obj_set_design_cb(label, lv_roller_label_design);
         lv_obj_t * scrl = lv_page_get_scrollable(roller);
         lv_obj_set_drag(scrl, true);
         lv_page_set_scrollable_fit2(roller, LV_FIT_PARENT, LV_FIT_NONE); /*Height is specified directly*/
@@ -120,11 +122,19 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     }
     /*Copy an existing roller*/
     else {
+        lv_label_create(roller, get_label(copy));
+
         lv_roller_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        lv_roller_set_options(roller, lv_roller_get_options(copy), copy_ext->mode);
+        ext->mode = copy_ext->mode;
+        ext->option_cnt = copy_ext->option_cnt;
+        ext->sel_opt_id = copy_ext->sel_opt_id;
+        ext->sel_opt_id_ori = copy_ext->sel_opt_id;
         ext->auto_fit = copy_ext->auto_fit;
         lv_obj_t * scrl = lv_page_get_scrollable(roller);
         lv_obj_set_signal_cb(scrl, lv_roller_scrl_signal);
+
+        lv_style_list_copy(&ext->style_sel, &copy_ext->style_sel);
+        lv_obj_refresh_style(roller, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("roller created");
@@ -180,17 +190,15 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
         lv_label_set_text(label, opt_extra);
         _lv_mem_buf_release(opt_extra);
 
-        ext->sel_opt_id     = ((LV_ROLLER_INF_PAGES / 2) + 1) * ext->option_cnt;
+        ext->sel_opt_id     = ((LV_ROLLER_INF_PAGES / 2) + 0) * ext->option_cnt;
 
         ext->option_cnt = ext->option_cnt * LV_ROLLER_INF_PAGES;
     }
 
     ext->sel_opt_id_ori = ext->sel_opt_id;
 
-
-    //    refr_width(roller);
-    //    refr_height(roller);
-    refr_position(roller, LV_ANIM_OFF);
+    refr_height(roller);
+    refr_width(roller);
 }
 
 /**
@@ -408,7 +416,6 @@ const char * lv_roller_get_options(const lv_obj_t * roller)
  */
 static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
-    /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
         return LV_DESIGN_RES_NOT_COVER;
     }
@@ -441,13 +448,13 @@ static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * cli
         lv_draw_label_dsc_init(&label_dsc);
         lv_obj_init_draw_label_dsc(roller, LV_ROLLER_PART_SELECTED, &label_dsc);
 
-        lv_coord_t font_h        = lv_font_get_line_height(label_dsc.font);
+        lv_coord_t bg_font_h        = lv_font_get_line_height(lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG));
 
-        /*Redraw the text on the selected area with a different color*/
+        /*Redraw the text on the selected area*/
         lv_area_t rect_area;
-        rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - label_dsc.line_space / 2;
-        if((font_h & 0x1) && (label_dsc.line_space & 0x1)) rect_area.y1--; /*Compensate the two rounding error*/
-        rect_area.y2 = rect_area.y1 + font_h + label_dsc.line_space - 1;
+        rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - bg_font_h / 2 - label_dsc.line_space / 2;
+        if((bg_font_h & 0x1) && (label_dsc.line_space & 0x1)) rect_area.y1--; /*Compensate the two rounding error*/
+        rect_area.y2 = rect_area.y1 + bg_font_h + label_dsc.line_space - 1;
         rect_area.x1 = roller->coords.x1;
         rect_area.x2 = roller->coords.x2;
         lv_area_t mask_sel;
@@ -464,7 +471,94 @@ static lv_design_res_t lv_roller_design(lv_obj_t * roller, const lv_area_t * cli
                 label_dsc.flag |= LV_TXT_FLAG_RIGHT;
             }
 
-            lv_draw_label(&label->coords, &mask_sel, &label_dsc, lv_label_get_text(label), NULL);
+            /*Get the size of the "selected text"*/
+            lv_point_t res_p;
+            _lv_txt_get_size(&res_p, lv_label_get_text(label), label_dsc.font, label_dsc.letter_space, label_dsc.line_space,
+                             lv_obj_get_width(roller), LV_TXT_FLAG_EXPAND);
+
+            /*Move the selected label proportionally with the background label*/
+            lv_coord_t roller_h = lv_obj_get_height(roller);
+            int32_t label_y_prop = label->coords.y1 - (roller_h / 2 +
+                                                       roller->coords.y1); /*label offset from the middle line of the roller*/
+            label_y_prop = (label_y_prop << 14) / lv_obj_get_height(
+                               label); /*Proportional position from the middle line (upscaled)*/
+
+            /*Apply a correction with different line heights*/
+            const lv_font_t * normal_label_font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);
+            lv_coord_t corr = (label_dsc.font->line_height - normal_label_font->line_height) / 2;
+
+            /*Apply the proportional position to the selected text*/
+            res_p.y -= corr;
+            int32_t label_sel_y = roller_h / 2 + roller->coords.y1;
+            label_sel_y += (label_y_prop * res_p.y) >> 14;
+            label_sel_y -= corr;
+
+            /*Draw the selected text*/
+            lv_area_t label_sel_area;
+            label_sel_area.x1 = label->coords.x1;
+            label_sel_area.y1 = label_sel_y;
+            label_sel_area.x2 = label->coords.x2;
+            label_sel_area.y2 = label_sel_area.y1 + res_p.y;
+
+            label_dsc.flag |= LV_TXT_FLAG_EXPAND;
+            lv_draw_label(&label_sel_area, &mask_sel, &label_dsc, lv_label_get_text(label), NULL);
+        }
+    }
+
+    return LV_DESIGN_RES_OK;
+}
+
+
+/**
+ * Handle the drawing related tasks of the roller's label
+ * @param roller pointer to an object
+ * @param clip_area the object will be drawn only in this area
+ * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ *                                  (return 'true' if yes)
+ *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after all children are drawn
+ * @param return an element of `lv_design_res_t`
+ */
+static lv_design_res_t lv_roller_label_design(lv_obj_t * label, const lv_area_t * clip_area, lv_design_mode_t mode)
+{
+    if(mode == LV_DESIGN_COVER_CHK) {
+        return ancestor_label_design(label, clip_area, mode);
+    }
+    /*Draw the object*/
+    else if(mode == LV_DESIGN_DRAW_MAIN) {
+        /* Split the drawing of the label into  an upper (above the selected area)
+         * and a lower (below the selected area)*/
+        lv_obj_t * roller = lv_obj_get_parent(lv_obj_get_parent(label));
+        const lv_font_t * font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);
+        lv_style_int_t line_space = lv_obj_get_style_text_line_space(roller, LV_ROLLER_PART_BG);
+        lv_coord_t font_h        = lv_font_get_line_height(font);
+
+        lv_area_t rect_area;
+        rect_area.y1 = roller->coords.y1 + lv_obj_get_height(roller) / 2 - font_h / 2 - line_space / 2;
+        if((font_h & 0x1) && (line_space & 0x1)) rect_area.y1--; /*Compensate the two rounding error*/
+        rect_area.y2 = rect_area.y1 + font_h + line_space - 1;
+        lv_area_t roller_coords;
+        lv_obj_get_coords(roller, &roller_coords);
+        lv_obj_get_inner_coords(roller, &roller_coords);
+
+        rect_area.x1 = roller_coords.x1;
+        rect_area.x2 = roller_coords.x2;
+
+        lv_area_t clip2;
+        clip2.x1 = label->coords.x1;
+        clip2.y1 = label->coords.y1;
+        clip2.x2 = label->coords.x2;
+        clip2.y2 = rect_area.y1;
+        if(_lv_area_intersect(&clip2, clip_area, &clip2)) {
+            ancestor_label_design(label, &clip2, mode);
+        }
+
+        clip2.x1 = label->coords.x1;
+        clip2.y1 = rect_area.y2;
+        clip2.x2 = label->coords.x2;
+        clip2.y2 = label->coords.y2;
+        if(_lv_area_intersect(&clip2, clip_area, &clip2)) {
+            ancestor_label_design(label, &clip2, mode);
         }
     }
 
@@ -497,6 +591,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
     if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_roller_ext_t * ext = lv_obj_get_ext_attr(roller);
+    LV_UNUSED(ext);
 
     if(sign == LV_SIGNAL_STYLE_CHG) {
         lv_obj_t * label = get_label(roller);
@@ -556,6 +651,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
 #endif
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT || c == LV_KEY_DOWN) {
             if(ext->sel_opt_id + 1 < ext->option_cnt) {
@@ -572,6 +668,7 @@ static lv_res_t lv_roller_signal(lv_obj_t * roller, lv_signal_t sign, void * par
                 ext->sel_opt_id_ori = ori_id;
             }
         }
+#endif
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
         lv_obj_clean_style_list(roller, LV_ROLLER_PART_SELECTED);
@@ -751,7 +848,7 @@ static void refr_position(lv_obj_t * roller, lv_anim_enable_t anim_en)
     lv_coord_t h                   = lv_obj_get_height(roller);
     uint16_t anim_time             = lv_roller_get_anim_time(roller);
 
-    /* Normally the animation's `end_cb` sets correct position of the roller is infinite.
+    /* Normally the animation's `end_cb` sets correct position of the roller if infinite.
      * But without animations do it manually*/
     if(anim_en == LV_ANIM_OFF || anim_time == 0) {
         inf_normalize(roller_scrl);
@@ -866,6 +963,18 @@ static void refr_width(lv_obj_t * roller)
     lv_style_int_t left = lv_obj_get_style_pad_left(roller, LV_ROLLER_PART_BG);
     lv_style_int_t right = lv_obj_get_style_pad_right(roller, LV_ROLLER_PART_BG);
 
+    const lv_font_t * base_font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);
+    const lv_font_t * sel_font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_SELECTED);
+
+    /*The selected text might be larger to get its size*/
+    if(base_font != sel_font) {
+        lv_coord_t letter_sp = lv_obj_get_style_text_letter_space(roller, LV_ROLLER_PART_SELECTED);
+        lv_coord_t line_sp = lv_obj_get_style_text_line_space(roller, LV_ROLLER_PART_SELECTED);
+        lv_point_t p;
+        _lv_txt_get_size(&p, lv_label_get_text(label), sel_font, letter_sp, line_sp, LV_COORD_MAX, LV_TXT_FLAG_NONE);
+        if(label_w < p.x)label_w = p.x;
+    }
+
     lv_obj_set_width(roller, label_w + left + right);
 }
 
@@ -898,10 +1007,11 @@ static void inf_normalize(void * scrl)
 
     if(ext->mode == LV_ROLLER_MODE_INIFINITE) {
         uint16_t real_id_cnt = ext->option_cnt / LV_ROLLER_INF_PAGES;
-
         ext->sel_opt_id = ext->sel_opt_id % real_id_cnt;
-
         ext->sel_opt_id += (LV_ROLLER_INF_PAGES / 2) * real_id_cnt; /*Select the middle page*/
+
+        ext->sel_opt_id_ori = ext->sel_opt_id % real_id_cnt;
+        ext->sel_opt_id_ori += (LV_ROLLER_INF_PAGES / 2) * real_id_cnt; /*Select the middle page*/
 
         /*Move to the new id*/
         const lv_font_t * font = lv_obj_get_style_text_font(roller, LV_ROLLER_PART_BG);

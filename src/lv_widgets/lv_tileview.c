@@ -133,7 +133,7 @@ lv_obj_t * lv_tileview_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(new_tileview, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(new_tileview, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("tileview created");
@@ -376,7 +376,7 @@ static lv_res_t lv_tileview_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void 
 
             if(!ext->drag_right_en && indev->proc.types.pointer.vect.x < 0 && x < -(ext->act_id.x * w)) {
                 lv_page_start_edge_flash(tileview, LV_PAGE_EDGE_RIGHT);
-                lv_obj_set_x(scrl, -ext->act_id.x * w + top);
+                lv_obj_set_x(scrl, -ext->act_id.x * w + left);
             }
 
             /*Apply the drag constraints*/
@@ -403,8 +403,8 @@ static void drag_end_handler(lv_obj_t * tileview)
     lv_obj_t * scrl = lv_page_get_scrollable(tileview);
     lv_point_t p;
 
-    p.x = -(scrl->coords.x1 - lv_obj_get_width(tileview) / 2);
-    p.y = -(scrl->coords.y1 - lv_obj_get_height(tileview) / 2);
+    p.x = -(lv_obj_get_x(scrl) - lv_obj_get_width(tileview) / 2);
+    p.y = -(lv_obj_get_y(scrl) - lv_obj_get_height(tileview) / 2);
 
     lv_drag_dir_t drag_dir = indev->proc.types.pointer.drag_dir;
     /*From the drag vector (drag throw) predict the end position*/

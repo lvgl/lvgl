@@ -105,12 +105,12 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_table_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         for(i = 0; i < LV_TABLE_CELL_STYLE_CNT; i++) {
             lv_style_list_copy(&ext->cell_style[i], &copy_ext->cell_style[i]);
-            lv_table_set_row_cnt(table, copy_ext->row_cnt);
-            lv_table_set_col_cnt(table, copy_ext->col_cnt);
         }
+        lv_table_set_row_cnt(table, copy_ext->row_cnt);
+        lv_table_set_col_cnt(table, copy_ext->col_cnt);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(table, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(table, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("table created");
@@ -192,6 +192,16 @@ void lv_table_set_row_cnt(lv_obj_t * table, uint16_t row_cnt)
     uint16_t old_row_cnt = ext->row_cnt;
     ext->row_cnt         = row_cnt;
 
+    if(ext->row_cnt > 0) {
+        ext->row_h = lv_mem_realloc(ext->row_h, ext->row_cnt * sizeof(ext->row_h[0]));
+        LV_ASSERT_MEM(ext->row_h);
+        if(ext->row_h == NULL) return;
+    }
+    else {
+        lv_mem_free(ext->row_h);
+        ext->row_h = NULL;
+    }
+
     if(ext->row_cnt > 0 && ext->col_cnt > 0) {
         ext->cell_data = lv_mem_realloc(ext->cell_data, ext->row_cnt * ext->col_cnt * sizeof(char *));
         LV_ASSERT_MEM(ext->cell_data);
@@ -203,10 +213,6 @@ void lv_table_set_row_cnt(lv_obj_t * table, uint16_t row_cnt)
             uint32_t new_cell_cnt = ext->col_cnt * ext->row_cnt;
             _lv_memset_00(&ext->cell_data[old_cell_cnt], (new_cell_cnt - old_cell_cnt) * sizeof(ext->cell_data[0]));
         }
-
-        ext->row_h = lv_mem_realloc(ext->row_h, ext->row_cnt * sizeof(ext->row_h[0]));
-        LV_ASSERT_MEM(ext->cell_data);
-        if(ext->cell_data == NULL) return;
     }
     else {
         lv_mem_free(ext->cell_data);
@@ -972,6 +978,10 @@ static void refr_size(lv_obj_t * table)
     lv_coord_t w = 0;
 
     lv_table_ext_t * ext = lv_obj_get_ext_attr(table);
+    if(ext->row_cnt == 0 || ext->col_cnt == 0) {
+        lv_obj_set_size(table, w, h);
+        return;
+    }
 
     uint16_t i;
     for(i = 0; i < ext->col_cnt; i++) {

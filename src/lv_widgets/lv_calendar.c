@@ -57,7 +57,11 @@ static uint8_t is_leap_year(uint32_t year);
  **********************/
 static lv_signal_cb_t ancestor_signal;
 static lv_design_cb_t ancestor_design;
+#if LV_CALENDAR_WEEK_STARTS_MONDAY != 0
+static const char * day_name[7]    = {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"};
+#else
 static const char * day_name[7]    = {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"};
+#endif
 static const char * month_name[12] = {"January", "February", "March",     "April",   "May",      "June",
                                       "July",    "August",   "September", "October", "November", "December"
                                      };
@@ -515,6 +519,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
         lv_obj_invalidate(calendar);
     }
     else if(sign == LV_SIGNAL_CONTROL) {
+#if LV_USE_GROUP
         uint8_t c               = *((uint8_t *)param);
         lv_calendar_ext_t * ext = lv_obj_get_ext_attr(calendar);
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
@@ -537,6 +542,7 @@ static lv_res_t lv_calendar_signal(lv_obj_t * calendar, lv_signal_t sign, void *
             }
             lv_obj_invalidate(calendar);
         }
+#endif
     }
 
     return res;
@@ -699,6 +705,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     strcpy(&txt_buf[5], get_month_name(calendar, ext->showed_date.month));
 
     calendar->state = LV_STATE_DEFAULT;
+    _lv_obj_disable_style_caching(calendar, true);
 
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
@@ -732,6 +739,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     lv_draw_label(&header_area, mask, &label_dsc, LV_SYMBOL_RIGHT, NULL);
 
     calendar->state = state_ori;    /*Restore the state*/
+    _lv_obj_disable_style_caching(calendar, false);
 }
 
 /**
@@ -804,6 +812,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
     /*The state changes without re-caching the styles, disable the use of cache*/
     lv_state_t state_ori = calendar->state;
     calendar->state = LV_STATE_DEFAULT;
+    _lv_obj_disable_style_caching(calendar, true);
 
     lv_state_t month_state = LV_STATE_DISABLED;
 
@@ -850,6 +859,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
 
         if(box_area.y1 > clip_area->y2) {
             calendar->state = state_ori;
+            _lv_obj_disable_style_caching(calendar, false);
             return;
         }
 
@@ -920,6 +930,7 @@ static void draw_dates(lv_obj_t * calendar, const lv_area_t * clip_area)
         }
     }
     calendar->state = state_ori;
+    _lv_obj_disable_style_caching(calendar, false);
 
 
 }
@@ -1057,14 +1068,18 @@ static uint8_t is_leap_year(uint32_t year)
  * @param year a year
  * @param month a  month
  * @param day a day
- * @return [0..6] which means [Sun..Sat]
+ * @return [0..6] which means [Sun..Sat] or [Mon..Sun] depending on LV_CALENDAR_WEEK_STARTS_MONDAY
  */
 static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day)
 {
     uint32_t a = month < 3 ? 1 : 0;
     uint32_t b = year - a;
 
+#if LV_CALENDAR_WEEK_STARTS_MONDAY
+    uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400) - 1) % 7;
+#else
     uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400)) % 7;
+#endif
 
     return day_of_week;
 }

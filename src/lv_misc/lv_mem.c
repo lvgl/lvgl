@@ -86,6 +86,9 @@ typedef struct {
 
 static uint32_t zero_mem; /*Give the address of this variable if 0 byte should be allocated*/
 
+#if LV_MEM_CUSTOM == 0
+    static uint32_t mem_max_size; /*Tracks the maximum total size of memory ever used from the internal heap*/
+#endif
 
 static uint8_t mem_buf1_32[MEM_BUF_SMALL_SIZE];
 static uint8_t mem_buf2_32[MEM_BUF_SMALL_SIZE];
@@ -118,6 +121,7 @@ void _lv_mem_init(void)
     /*Allocate a large array to store the dynamically allocated data*/
     static LV_MEM_ATTR MEM_UNIT work_mem_int[LV_MEM_SIZE / sizeof(MEM_UNIT)];
     work_mem = (uint8_t *)work_mem_int;
+    mem_max_size = 0;
 #else
     work_mem = (uint8_t *)LV_MEM_ADR;
 #endif
@@ -200,7 +204,19 @@ void * lv_mem_alloc(size_t size)
     if(alloc != NULL) _lv_memset(alloc, 0xaa, size);
 #endif
 
-    if(alloc == NULL) LV_LOG_WARN("Couldn't allocate memory");
+    if(alloc == NULL) {
+        LV_LOG_WARN("Couldn't allocate memory");
+    }
+    else {
+#if LV_MEM_CUSTOM == 0
+        /* just a safety check, should always be true */
+        if((uintptr_t) alloc > (uintptr_t) work_mem) {
+            if((((uintptr_t) alloc - (uintptr_t) work_mem) + size) > mem_max_size) {
+                mem_max_size = ((uintptr_t) alloc - (uintptr_t) work_mem) + size;
+            }
+        }
+#endif
+    }
 
     return alloc;
 }
@@ -424,6 +440,7 @@ void lv_mem_monitor(lv_mem_monitor_t * mon_p)
         e = ent_get_next(e);
     }
     mon_p->total_size = LV_MEM_SIZE;
+    mon_p->max_used = mem_max_size;
     mon_p->used_pct   = 100 - (100U * mon_p->free_size) / mon_p->total_size;
     if(mon_p->free_size > 0) {
         mon_p->frag_pct   = (uint32_t)mon_p->free_biggest_size * 100U / mon_p->free_size;
@@ -569,6 +586,7 @@ void _lv_mem_buf_free_all(void)
     }
 }
 
+#if LV_MEMCPY_MEMSET_STD == 0
 /**
  * Same as `memcpy` but optimized for 4 byte operation.
  * @param dst pointer to the destination buffer
@@ -635,7 +653,6 @@ LV_ATTRIBUTE_FAST_MEM void * _lv_memcpy(void * dst, const void * src, size_t len
 
 /**
  * Same as `memset` but optimized for 4 byte operation.
- * `dst` should be word aligned else normal `memcpy` will be used
  * @param dst pointer to the destination buffer
  * @param v value to set [0..255]
  * @param len number of byte to set
@@ -690,7 +707,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset(void * dst, uint8_t v, size_t len)
 
 /**
  * Same as `memset(dst, 0x00, len)` but optimized for 4 byte operation.
- * `dst` should be word aligned else normal `memcpy` will be used
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
@@ -740,7 +756,6 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_00(void * dst, size_t len)
 
 /**
  * Same as `memset(dst, 0xFF, len)` but optimized for 4 byte operation.
- * `dst` should be word aligned else normal `memcpy` will be used
  * @param dst pointer to the destination buffer
  * @param len number of byte to set
  */
@@ -788,6 +803,7 @@ LV_ATTRIBUTE_FAST_MEM void _lv_memset_ff(void * dst, size_t len)
     }
 }
 
+#endif /*LV_MEMCPY_MEMSET_STD*/
 
 /**********************
  *   STATIC FUNCTIONS

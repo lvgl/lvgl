@@ -180,11 +180,11 @@ lv_obj_t * lv_tabview_create(lv_obj_t * par, const lv_obj_t * copy)
                                                                                                               LV_PAGE_PART_SCROLLABLE));
             lv_style_list_copy(lv_obj_get_style_list(new_tab, LV_PAGE_PART_SCROLLBAR), lv_obj_get_style_list(copy_tab,
                                                                                                              LV_PAGE_PART_SCROLLBAR));
-            lv_obj_refresh_style(new_tab, LV_STYLE_PROP_ALL);
+            lv_obj_refresh_style(new_tab, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
         }
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(tabview, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(tabview, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     tabview_realign(tabview);
@@ -229,20 +229,6 @@ lv_obj_t * lv_tabview_add_tab(lv_obj_t * tabview, const char * name)
     strcpy(name_dm, name);
 
     ext->tab_cnt++;
-
-    switch(ext->btns_pos) {
-        case LV_TABVIEW_TAB_POS_TOP:
-        case LV_TABVIEW_TAB_POS_BOTTOM:
-            ext->tab_name_ptr = lv_mem_realloc((void *)ext->tab_name_ptr, sizeof(char *) * (ext->tab_cnt + 1));
-            break;
-        case LV_TABVIEW_TAB_POS_LEFT:
-        case LV_TABVIEW_TAB_POS_RIGHT:
-            ext->tab_name_ptr = lv_mem_realloc((void *)ext->tab_name_ptr, sizeof(char *) * (ext->tab_cnt * 2));
-            break;
-    }
-
-    LV_ASSERT_MEM(ext->tab_name_ptr);
-    if(ext->tab_name_ptr == NULL) return NULL;
 
     /* FIXME: It is not possible yet to switch tab button position from/to top/bottom from/to left/right at runtime.
      * Method: clean extra \n when switch from LV_TABVIEW_BTNS_POS_LEFT or LV_TABVIEW_BTNS_POS_RIGHT
@@ -449,6 +435,35 @@ void lv_tabview_set_tab_act(lv_obj_t * tabview, uint16_t id, lv_anim_enable_t an
 }
 
 /**
+ * Set the name of a tab.
+ * @param tabview pointer to Tab view object
+ * @param id index of the tab the name should be set
+ * @param name new tab name
+ */
+void lv_tabview_set_tab_name(lv_obj_t * tabview, uint16_t id, char * name)
+{
+    LV_ASSERT_OBJ(tabview, LV_OBJX_NAME);
+
+    /* get tabview's ext pointer which contains the tab name pointer list */
+    lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
+
+    /* check for valid tab index */
+    if(ext->tab_cnt > id) {
+        /* reallocate memory for new tab name (use reallocate due to mostly the size didn't change much) */
+        char * str = lv_mem_realloc((void *)ext->tab_name_ptr[id], strlen(name) + 1);
+        LV_ASSERT_MEM(str);
+
+        /* store new tab name at allocated memory */
+        strcpy(str, name);
+        /* update pointer  */
+        ext->tab_name_ptr[id] = str;
+
+        /* force redrawing of the tab headers */
+        lv_obj_invalidate(ext->btns);
+    }
+}
+
+/**
  * Set the animation time of tab view when a new tab is loaded
  * @param tabview pointer to Tab view object
  * @param anim_time_ms time of animation in milliseconds
@@ -613,7 +628,7 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
     lv_tabview_ext_t * ext = lv_obj_get_ext_attr(tabview);
     if(sign == LV_SIGNAL_CLEANUP) {
         uint8_t i;
-        for(i = 0; ext->tab_name_ptr[i][0] != '\0'; i++) lv_mem_free(ext->tab_name_ptr[i]);
+        for(i = 0; ext->tab_name_ptr[i][0] != '\0' && ext->tab_name_ptr[i][0] != '\n'; i++) lv_mem_free(ext->tab_name_ptr[i]);
 
         lv_mem_free(ext->tab_name_ptr);
         ext->tab_name_ptr = NULL;
@@ -645,12 +660,17 @@ static lv_res_t lv_tabview_signal(lv_obj_t * tabview, lv_signal_t sign, void * p
 #endif
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
+#if LV_USE_GROUP
         bool * editable = (bool *)param;
         *editable       = true;
+#endif
     }
 
-    if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS || sign == LV_SIGNAL_CONTROL || sign == LV_SIGNAL_PRESSED  ||
-       sign == LV_SIGNAL_RELEASED) {
+    if(sign == LV_SIGNAL_FOCUS || sign == LV_SIGNAL_DEFOCUS ||
+#if LV_USE_GROUP
+       sign == LV_SIGNAL_CONTROL ||
+#endif
+       sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED) {
 
         /* The button matrix is not in a group (the tab view is in it) but it should handle the
          * group signals. So propagate the related signals to the button matrix manually*/

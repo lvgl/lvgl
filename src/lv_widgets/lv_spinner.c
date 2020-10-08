@@ -106,7 +106,7 @@ lv_obj_t * lv_spinner_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->time                   = copy_ext->time;
         ext->anim_dir               = copy_ext->anim_dir;
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(spinner, LV_STYLE_PROP_ALL);
+        lv_obj_refresh_style(spinner, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     lv_spinner_set_type(spinner, ext->anim_type);

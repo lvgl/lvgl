@@ -436,6 +436,8 @@ void _lv_txt_ins(char * txt_buf, uint32_t pos, const char * ins_txt)
 {
     size_t old_len = strlen(txt_buf);
     size_t ins_len = strlen(ins_txt);
+    if(ins_len == 0) return;
+
     size_t new_len = ins_len + old_len;
     pos              = _lv_txt_encoded_get_byte_id(txt_buf, pos); /*Convert to byte index instead of letter index*/
 
@@ -534,6 +536,7 @@ static uint32_t lv_txt_unicode_to_utf8(uint32_t letter_uni)
  */
 static uint32_t lv_txt_utf8_conv_wc(uint32_t c)
 {
+#if LV_BIG_ENDIAN_SYSTEM == 0
     /*Swap the bytes (UTF-8 is big endian, but the MCUs are little endian)*/
     if((c & 0x80) != 0) {
         uint32_t swapped;
@@ -547,7 +550,7 @@ static uint32_t lv_txt_utf8_conv_wc(uint32_t c)
         }
         c = swapped;
     }
-
+#endif
     return c;
 }
 
