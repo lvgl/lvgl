@@ -626,7 +626,7 @@ static inline uint8_t lv_color_brightness(lv_color_t color)
 
 /* The most simple macro to create a color from R,G and B values */
 #if LV_COLOR_DEPTH == 1
-#define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{.full = (uint8_t)((b8 >> 7) | (g8 >> 7) | (r8 >> 7))})
+#define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER {{(b8 >> 7) | (g8 >> 7) | (r8 >> 7)}})
 #elif LV_COLOR_DEPTH == 8
 #define LV_COLOR_MAKE(r8, g8, b8) (_LV_COLOR_MAKE_TYPE_HELPER{{(uint8_t)((b8 >> 6) & 0x3U), (uint8_t)((g8 >> 5) & 0x7U), (uint8_t)((r8 >> 5) & 0x7U)}})
 #elif LV_COLOR_DEPTH == 16
