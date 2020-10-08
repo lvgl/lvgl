@@ -566,25 +566,34 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
             lv_coord_t new_pinner = (w_obj - w_row) / (obj_num - 1);
             lv_coord_t act_x    = pleft; /*x init*/
             child_tmp           = child_rs;
+            lv_align_t align;
+            int32_t inv;
+            if(lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL) {
+                align = LV_ALIGN_IN_TOP_RIGHT;
+                inv = -1;
+            } else {
+                align = LV_ALIGN_IN_TOP_LEFT;
+                inv = 1;
+            }
             while(child_tmp != NULL) {
                 if(lv_obj_get_hidden(child_tmp) == false && lv_obj_is_protected(child_tmp, LV_PROTECT_POS) == false) {
                     lv_coord_t mleft = lv_obj_get_style_margin_left(child_tmp, LV_OBJ_PART_MAIN);
                     lv_coord_t mright = lv_obj_get_style_margin_right(child_tmp, LV_OBJ_PART_MAIN);
                     switch(type) {
                         case LV_LAYOUT_PRETTY_TOP:
-                            lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT,
-                                         act_x + mleft,
+                            lv_obj_align(child_tmp, cont, align,
+                                        inv * (act_x + mleft),
                                          act_y + lv_obj_get_style_margin_top(child_tmp, LV_OBJ_PART_MAIN));
                             break;
                         case LV_LAYOUT_PRETTY_MID:
-                            lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT,
-                                         act_x + mleft,
+                            lv_obj_align(child_tmp, cont, align,
+                                         inv * (act_x + mleft),
                                          act_y + (h_row - lv_obj_get_height(child_tmp)) / 2);
 
                             break;
                         case LV_LAYOUT_PRETTY_BOTTOM:
-                            lv_obj_align(child_tmp, cont, LV_ALIGN_IN_TOP_LEFT,
-                                         act_x + mleft,
+                            lv_obj_align(child_tmp, cont, align,
+                                         inv * (act_x + mleft),
                                          act_y + h_row - lv_obj_get_height(child_tmp) - lv_obj_get_style_margin_bottom(child_tmp, LV_OBJ_PART_MAIN));
                             break;
                         default:
