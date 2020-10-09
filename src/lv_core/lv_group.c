@@ -488,8 +488,9 @@ static void focus_next_core(lv_group_t * group, void * (*begin)(const lv_ll_t *)
         can_move = true;
 
         if(obj_next == NULL) continue;
+        if(lv_obj_get_state(*obj_next, LV_OBJ_PART_MAIN) & LV_STATE_DISABLED) continue;
 
-        /*Hidden objects don't receive focus*/
+        /*Hidden and disabled objects don't receive focus*/
         if(!lv_obj_get_hidden(*obj_next)) break;
     }
 
