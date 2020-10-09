@@ -16,6 +16,7 @@
 - Fix imgbtn state change
 - Support RTL in table (draw columns right to left)
 - Support RTL in pretty layout (draw columns right to left)
+- Skip objects in groups if they are in disabled state
 
 ## v7.6.1 (06.10.2020)
 
