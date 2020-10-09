@@ -60,6 +60,7 @@ zephyr_library_sources(
     src/lv_font/lv_font.c
     src/lv_font/lv_font_dejavu_16_persian_hebrew
     src/lv_font/lv_font_fmt_txt.c
+    src/lv_font/lv_font_loader.c
     src/lv_font/lv_font_montserrat_12.c
     src/lv_font/lv_font_montserrat_12_subpx.c
     src/lv_font/lv_font_montserrat_14.c
