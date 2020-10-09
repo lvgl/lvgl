@@ -553,9 +553,9 @@ LV_ATTRIBUTE_FAST_MEM static inline void lv_color_mix_with_alpha(lv_color_t bg_c
         /*Save the parameters and the result. If they will be asked again don't compute again*/
         static lv_opa_t fg_opa_save     = 0;
         static lv_opa_t bg_opa_save     = 0;
-        static lv_color_t fg_color_save = {.full = 0};
-        static lv_color_t bg_color_save = {.full = 0};
-        static lv_color_t res_color_saved = {.full = 0};
+        static lv_color_t fg_color_save = { 0 };
+        static lv_color_t bg_color_save = { 0 };
+        static lv_color_t res_color_saved = { 0 };
         static lv_opa_t res_opa_saved = 0;
 
         if(fg_opa != fg_opa_save || bg_opa != bg_opa_save || fg_color.full != fg_color_save.full ||
