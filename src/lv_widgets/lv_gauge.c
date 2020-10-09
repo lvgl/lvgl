@@ -207,7 +207,7 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int32_t value)
     lv_coord_t x_ofs  = gauge->coords.x1 + r + left + pad;
     lv_coord_t y_ofs  = gauge->coords.y1 + r + top + pad;
     uint16_t angle    = lv_linemeter_get_scale_angle(gauge);
-    int16_t angle_ofs = 90 + (360 - angle) / 2;
+    int16_t angle_ofs = 90 + (360 - angle) / 2 + lv_gauge_get_angle_offset(gauge);
     lv_point_t p_mid;
     lv_point_t p_end;
     lv_coord_t needle_w;
@@ -240,10 +240,10 @@ void lv_gauge_set_value(lv_obj_t * gauge, uint8_t needle_id, int32_t value)
     p_end.y = (_lv_trigo_sin(needle_angle) * r) / LV_TRIGO_SIN_MAX + y_ofs;
     p_end.x = (_lv_trigo_sin(needle_angle + 90) * r) / LV_TRIGO_SIN_MAX + x_ofs;
 
-    a.x1 = LV_MATH_MIN(p_mid.x, p_end.x);
-    a.y1 = LV_MATH_MIN(p_mid.y, p_end.y);
-    a.x2 = LV_MATH_MAX(p_mid.x, p_end.x);
-    a.y2 = LV_MATH_MAX(p_mid.y, p_end.y);
+    a.x1 = LV_MATH_MIN(p_mid.x, p_end.x) - needle_w;
+    a.y1 = LV_MATH_MIN(p_mid.y, p_end.y) - needle_w;
+    a.x2 = LV_MATH_MAX(p_mid.x, p_end.x) + needle_w;
+    a.y2 = LV_MATH_MAX(p_mid.y, p_end.y) + needle_w;
     lv_obj_invalidate_area(gauge, &a);
 
 

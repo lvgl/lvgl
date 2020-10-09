@@ -107,11 +107,7 @@ def clone_repos():
     cmd("rm -fr " + workdir)
     cmd("mkdir " + workdir)
     os.chdir(workdir)
-
-    #For debuging just copy the repos
-    #cmd("cp -a ../repos/. .")
-    #return
-
+    
     cmd("git clone " + upstream("lvgl") + "; cd lvgl; git checkout master; git remote update origin --prune; ")
     cmd("git clone " + upstream("lv_examples") + "; cd lv_examples; git checkout master; git remote update origin --prune; ")
     cmd("git clone " + upstream("lv_drivers") + "; cd lv_drivers; git checkout master; git remote update origin --prune; ")
@@ -324,10 +320,6 @@ def publish_master():
     cmd("cd lvgl; " + pub_cmd)    
     cmd("cd lv_examples; " + pub_cmd)    
     cmd("cd lv_drivers; " + pub_cmd)    
-
-    pub_cmd = "git push origin latest; git push origin " + ver_str
-    cmd("cd docs; " + pub_cmd)
-    cmd("cd docs; git checkout master; python 2.7 ./update.py " + release_br)
     
     pub_cmd = "git push origin master"
     cmd("cd blog; " + pub_cmd)      
@@ -413,8 +405,6 @@ def publish_dev_and_master():
     pub_cmd = "git checkout master; git push origin master"
     cmd("cd lvgl; " + pub_cmd)    
 
-    cmd("cd docs; git checkout master; python 2.7 ./update.py latest dev")
-
 def projs_update():
     global proj_list, release_br, ver_str
     for p in proj_list:
@@ -449,7 +439,9 @@ def projs_update():
         cmd('git push origin ' + ver_str)
         
         os.chdir("../")
-        
+
+def docs_update_all():
+    cmd("cd docs; git checkout master; python 2.7 ./update.py master dev " + release_br)        
 
 def cleanup():
     os.chdir("../")
@@ -474,7 +466,7 @@ if __name__ == '__main__':
     dev_ver_patch = ver_patch
     dev_ver_str = ver_str
     
-   get_lvgl_version("master")
+    get_lvgl_version("master")
     
     lvgl_prepare()
     lv_examples_prepare() 
@@ -486,6 +478,10 @@ if __name__ == '__main__':
     publish_master()
      
     projs_update()    
+    dev_ver_major = "7"
+    dev_ver_minor = "7"
+    dev_ver_patch = "0"
+    dev_ver_str = "v7.7.0"
     
     if dev_prepare == 'bugfix': 
         ver_patch = str(int(ver_patch) + 1)
@@ -496,23 +492,15 @@ if __name__ == '__main__':
         lvgl_update_master_version()
         docs_update_latest_version()
 
-        get_lvgl_version("dev")
-        dev_ver_str = "v" + ver_major + "." + ver_minor + "." + ver_patch + "-dev"
-        merge_to_dev()
-        
-        lvgl_update_dev_version()
-        docs_update_dev_version()
-        publish_dev()
     else:
-        #merge_from_dev()
-        
-        get_lvgl_version("master")
+        merge_from_dev()
         
         if dev_prepare == 'minor': 
-            ver_minor = str(int(ver_minor) + 1)
+            ver_major = dev_ver_major
+            ver_minor = str(int(dev_ver_minor) + 1)
             ver_patch = "0"
         else:
-            ver_major = str(int(ver_major) + 1)
+            ver_major = str(int(dev_ver_major) + 1)
             ver_minor = "0"
             ver_patch = "0"
                 
@@ -524,5 +512,6 @@ if __name__ == '__main__':
         docs_update_dev_version()
         publish_dev_and_master()
         
+    docs_update_all();
     cleanup()
     

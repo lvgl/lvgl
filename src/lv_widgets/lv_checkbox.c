@@ -132,6 +132,71 @@ void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt)
     lv_label_set_text_static(ext->label, txt);
 }
 
+/**
+ * Set the state of the check box
+ * @param cb pointer to a check box object
+ * @param checked true: make the check box checked; false: make it unchecked
+ */
+void lv_checkbox_set_checked(lv_obj_t * cb, bool checked)
+{
+    lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
+    lv_btn_set_state(cb, checked ? LV_BTN_STATE_CHECKED_RELEASED : LV_BTN_STATE_RELEASED);
+
+    if(checked) {
+        lv_obj_add_state(ext->bullet, LV_STATE_CHECKED);
+        lv_obj_add_state(ext->label, LV_STATE_CHECKED);
+    }
+    else {
+        lv_obj_clear_state(ext->bullet, LV_STATE_CHECKED);
+        lv_obj_clear_state(ext->label, LV_STATE_CHECKED);
+    }
+
+    lv_obj_clear_state(ext->bullet, LV_STATE_DISABLED);
+    lv_obj_clear_state(ext->label, LV_STATE_DISABLED);
+
+#if LV_USE_ANIMATION
+    lv_obj_finish_transitions(cb, LV_CHECKBOX_PART_BG);
+    lv_obj_finish_transitions(ext->bullet, LV_OBJ_PART_MAIN);
+#endif
+}
+
+
+/**
+ * Make the check box inactive (disabled)
+ * @param cb pointer to a check box object
+ */
+void lv_checkbox_set_disabled(lv_obj_t * cb)
+{
+    lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
+    lv_btn_set_state(cb, LV_BTN_STATE_DISABLED);
+
+    lv_obj_add_state(ext->bullet, LV_STATE_DISABLED);
+    lv_obj_add_state(ext->label, LV_STATE_DISABLED);
+
+#if LV_USE_ANIMATION
+    lv_obj_finish_transitions(cb, LV_CHECKBOX_PART_BG);
+    lv_obj_finish_transitions(ext->bullet, LV_OBJ_PART_MAIN);
+#endif
+}
+
+/**
+ * Set the state of a check box
+ * @param cb pointer to a check box object
+ * @param state the new state of the check box (from lv_btn_state_t enum)
+ */
+void lv_checkbox_set_state(lv_obj_t * cb, lv_btn_state_t state)
+{
+    lv_checkbox_ext_t * ext = lv_obj_get_ext_attr(cb);
+    lv_btn_set_state(cb, state);
+    lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CHECKBOX_PART_BG));
+    lv_obj_set_state(ext->bullet, lv_obj_get_state(cb, LV_CHECKBOX_PART_BG));
+
+#if LV_USE_ANIMATION
+    lv_obj_finish_transitions(cb, LV_CHECKBOX_PART_BG);
+    lv_obj_finish_transitions(ext->bullet, LV_OBJ_PART_MAIN);
+#endif
+}
+
 /*=====================
  * Getter functions
  *====================*/

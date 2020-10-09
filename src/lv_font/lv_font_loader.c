@@ -225,7 +225,7 @@ static int read_bits_signed(bit_iterator_t * it, int n_bits, lv_fs_res_t * res)
 {
     int value = read_bits(it, n_bits, res);
     if(value & (1 << (n_bits - 1))) {
-        for(int bit = n_bits; bit < 8; ++bit) {
+        for(int bit = n_bits; bit < 16; ++bit) {
             value |= (1 << bit);
         }
     }
@@ -512,7 +512,7 @@ static bool lvgl_load_font(lv_fs_file_t * fp, lv_font_t * font)
     font->line_height = font_header.ascent - font_header.descent;
     font->get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt;
     font->get_glyph_bitmap = lv_font_get_bitmap_fmt_txt;
-    font->subpx = LV_FONT_SUBPX_NONE;
+    font->subpx = font_header.subpixels_mode;
 
     font_dsc->bpp = font_header.bits_per_pixel;
     font_dsc->kern_scale = font_header.kerning_scale;

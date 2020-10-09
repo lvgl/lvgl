@@ -120,7 +120,6 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp)
     return disp->sys_layer;
 }
 
-
 /**
  * Assign a screen to a display.
  * @param disp pointer to a display where to assign the screen
@@ -317,12 +316,6 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
  */
 uint32_t lv_disp_get_inactive_time(const lv_disp_t * disp)
 {
-    if(!disp) disp = lv_disp_get_default();
-    if(!disp) {
-        LV_LOG_WARN("lv_disp_get_inactive_time: no display registered");
-        return 0;
-    }
-
     if(disp) return lv_tick_elaps(disp->last_activity_time);
 
     lv_disp_t * d;

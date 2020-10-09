@@ -1,11 +1,44 @@
 # Changelog
 
-## v7.6.0 (TBD)
+
+## v7.7.0 (06.10.2020)
 
 ### New features
-- Check wheter the any style property has changed on a state change to decide if any redraw is required
+- Add PXP GPU support (for NXP MCUs)
+- Add VG-Lite GPU support (for NXP MCUs)
+- Allow max. 16 cell types for table
+- Add `lv_table_set_text_fmt()`
+- Use margin on calendar header to set distances and padding to the size of the header
+- Add `text_sel_bg` style proeprty
 
-## v7.5.0 (planned at 15.09.2020)
+### Bugfixes
+- Theme update to support text selection background
+- Fix imgbtn state change
+- Support RTL in table (draw columns right to left)
+- Support RTL in pretty layout (draw columns right to left)
+
+## v7.6.1 (06.10.2020)
+
+### Bugfixes
+- Fix BIDI support in dropdown list
+- Fix copying base dir in `lv_obj_create`
+- Handle sub pixel rendering in font loader
+- Fix transitions with style caching
+- Fix click focus
+- Fix imgbtn image switching with empty style
+- Material theme: do not set the text font to allow easy global font change
+
+
+## v7.6.0 (22.09.2020)
+
+### New features
+- Check whether any style property has changed on a state change to decide if any redraw is required
+
+### Bugfixes
+- Fix selection of options with non-ASCII letters in dropdown list 
+- Fix font loader to support LV_FONT_FMT_TXT_LARGE
+
+## v7.5.0 (15.09.2020)
 
 ### New features
 - Add `clean_dcache_cb` and `lv_disp_clean_dcache` to enable users to use their own cache management function
@@ -20,7 +53,6 @@
 - Add `decmopr_buf` to GC roots
 - Fix divisioin by zero in draw_pattern (lv_draw_rect.c) if the image or letter is not found
 - Fix drawing images with 1 px height or width
-- Fix selectiion of options with non-ASCII letters in dropdown list 
 
 ## v7.4.0 (01.09.2020)
 

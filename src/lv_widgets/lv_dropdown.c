@@ -588,6 +588,8 @@ void lv_dropdown_open(lv_obj_t * ddlist)
     lv_obj_add_protect(ext->page, LV_PROTECT_POS | LV_PROTECT_CLICK_FOCUS);
     lv_obj_add_protect(lv_page_get_scrollable(ext->page), LV_PROTECT_CLICK_FOCUS);
 
+    lv_obj_set_base_dir(ext->page, lv_obj_get_base_dir(ddlist));
+
     if(ancestor_page_signal == NULL) ancestor_page_signal = lv_obj_get_signal_cb(ext->page);
     if(ancestor_page_scrl_signal == NULL) ancestor_page_scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrollable(
                                                                                                    ext->page));
@@ -675,6 +677,10 @@ void lv_dropdown_open(lv_obj_t * ddlist)
             lv_obj_set_y(ext->page, lv_obj_get_y(ext->page) - (ext->page->coords.y2 - LV_VER_RES));
         }
     }
+
+    if(lv_label_get_align(label) == LV_LABEL_ALIGN_RIGHT) {
+        lv_obj_set_x(label, lv_obj_get_width_fit(ext->page) - lv_obj_get_width(label));
+    }
 }
 
 /**
@@ -737,7 +743,11 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
 
         const char * txt;
 
-        txt = ext->dir != LV_DROPDOWN_DIR_LEFT ? opt_txt : ext->symbol;
+        bool rev = false;
+        if(ext->dir == LV_DROPDOWN_DIR_LEFT) rev = true;
+        if(lv_obj_get_base_dir(ddlist) == LV_BIDI_DIR_RTL) rev = true;
+
+        txt = rev ? ext->symbol : opt_txt;
         if(txt) {
             _lv_txt_get_size(&txt_size, txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
                              label_dsc.flag);
@@ -757,7 +767,7 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
             lv_draw_label(&txt_area, clip_area, &label_dsc, txt, NULL);
         }
 
-        txt = ext->dir != LV_DROPDOWN_DIR_LEFT ? ext->symbol : opt_txt;
+        txt = rev ? opt_txt : ext->symbol;
         if(txt) {
             _lv_txt_get_size(&txt_size, txt, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
                              label_dsc.flag);
@@ -825,9 +835,7 @@ static lv_design_res_t lv_dropdown_page_design(lv_obj_t * page, const lv_area_t 
                     draw_box(ddlist, &clip_area_core, ext->pr_opt_id, LV_STATE_PRESSED);
                 }
 
-                if(ext->show_selected) {
-                    draw_box(ddlist, &clip_area_core, ext->sel_opt_id, LV_STATE_DEFAULT);
-                }
+                draw_box(ddlist, &clip_area_core, ext->sel_opt_id, LV_STATE_DEFAULT);
             }
         }
     }
@@ -853,9 +861,7 @@ static lv_design_res_t lv_dropdown_page_design(lv_obj_t * page, const lv_area_t 
                     draw_box_label(ddlist, &clip_area_core, ext->pr_opt_id, LV_STATE_PRESSED);
                 }
 
-                if(ext->show_selected) {
-                    draw_box_label(ddlist, &clip_area_core, ext->sel_opt_id, LV_STATE_DEFAULT);
-                }
+                draw_box_label(ddlist, &clip_area_core, ext->sel_opt_id, LV_STATE_DEFAULT);
             }
         }
     }
