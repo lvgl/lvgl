@@ -5,7 +5,7 @@
 ### New features
 -  make DMA2D non blocking 
 
-## v7.7.0 (06.10.2020)
+## v7.7.0 (20.10.2020)
 
 ### New features
 - Add PXP GPU support (for NXP MCUs)
@@ -22,6 +22,7 @@
 - Support RTL in pretty layout (draw columns right to left)
 - Skip objects in groups if they are in disabled state
 - Fix dropdown selection with RTL basedirection
+- Fix rectangle border drawing with large width
 
 ## v7.6.1 (06.10.2020)
 
