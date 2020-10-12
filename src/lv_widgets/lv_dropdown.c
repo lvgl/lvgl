@@ -53,7 +53,7 @@ static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id
 static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
 static lv_res_t page_release_handler(lv_obj_t * page);
 static void page_press_handler(lv_obj_t * page);
-static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t x, lv_coord_t y);
+static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t y);
 static void position_to_selected(lv_obj_t * ddlist);
 static lv_obj_t * get_label(const lv_obj_t * ddlist);
 
@@ -1246,7 +1246,7 @@ static lv_res_t page_release_handler(lv_obj_t * page)
     if(lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON) {
         lv_point_t p;
         lv_indev_get_point(indev, &p);
-        ext->sel_opt_id     = get_id_on_point(ddlist, p.x, p.y);
+        ext->sel_opt_id     = get_id_on_point(ddlist, p.y);
         ext->sel_opt_id_orig = ext->sel_opt_id;
     }
 
@@ -1274,12 +1274,12 @@ static void page_press_handler(lv_obj_t * page)
     if(indev && (lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON)) {
         lv_point_t p;
         lv_indev_get_point(indev, &p);
-        ext->pr_opt_id = get_id_on_point(ddlist, p.x, p.y);
+        ext->pr_opt_id = get_id_on_point(ddlist, p.y);
         lv_obj_invalidate(page);
     }
 }
 
-static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t x, lv_coord_t y)
+static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t y)
 {
     lv_obj_t * label = get_label(ddlist);
     if(label == NULL) return 0;
