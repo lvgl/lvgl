@@ -43,7 +43,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static void invalidate_cache(void);
-static void dma2d_wait(void);
+static void wait_finish(void);
 
 /**********************
  *  STATIC VARIABLES
@@ -101,7 +101,7 @@ void lv_gpu_stm32_dma2d_fill(lv_color_t * buf, lv_coord_t buf_w, lv_color_t colo
     /* start transfer */
     DMA2D->CR |= DMA2D_CR_START_Msk;
 
-    dma2d_wait();
+    wait_finish();
 }
 
 /**
@@ -146,7 +146,7 @@ void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t
     HAL_DMA2D_ConfigLayer(&hdma2d, 0);
     HAL_DMA2D_ConfigLayer(&hdma2d, 1);
     HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t) mask, (uint32_t) buf, (uint32_t)buf, fill_w, fill_h);
-    dma2d_wait();
+    wait_finish();
 #endif
 }
 
@@ -176,7 +176,7 @@ void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_
 
     /* start transfer */
     DMA2D->CR |= DMA2D_CR_START_Msk;
-    dma2d_wait();
+    wait_finish();
 }
 
 /**
@@ -214,7 +214,18 @@ void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color
 
     /* start transfer */
     DMA2D->CR |= DMA2D_CR_START_Msk;
-    dma2d_wait();
+    wait_finish();
+}
+
+void lv_gpu_stm32_dma2d_wait_cb(lv_disp_drv_t * drv)
+{
+    if(drv && drv->wait_cb) {
+        while(DMA2D->CR & DMA2D_CR_START_Msk) {
+            drv->wait_cb(drv);
+        }
+    } else {
+        while(DMA2D->CR & DMA2D_CR_START_Msk);
+    }
 }
 
 /**********************
@@ -232,9 +243,11 @@ static void invalidate_cache(void)
     }
 }
 
-static void dma2d_wait(void)
+static void wait_finish(void)
 {
     lv_disp_t * disp = _lv_refr_get_disp_refreshing();
+    if(disp->driver.gpu_wait_cb) return;
+
     while(DMA2D->CR & DMA2D_CR_START_Msk) {
         if(disp->driver.wait_cb) disp->driver.wait_cb(&disp->driver);
     }

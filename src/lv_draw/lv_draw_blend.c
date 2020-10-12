@@ -401,6 +401,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 lv_coord_t line_h = LV_HOR_RES_MAX / draw_area_w;
                 for(y = 0; y <= draw_area_h - line_h; y += line_h) {
                     lv_gpu_stm32_dma2d_blend(disp_buf_first, disp_w, blend_buf, opa, draw_area_w, draw_area_w, line_h);
+                    lv_gpu_stm32_dma2d_wait_cb(NULL);
                     disp_buf_first += disp_w * line_h;
                 }
 
@@ -757,7 +758,6 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
 
         if(opa > LV_OPA_MAX) {
 #if LV_USE_GPU_NXP_PXP
-<<<<<<< HEAD
         if (lv_area_get_size(draw_area) >= GPU_NXP_PXP_BLIT_SIZE_LIMIT) {
             lv_gpu_nxp_pxp_blit(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h, opa);
             return;
@@ -792,11 +792,6 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                     return;
                 }
                 /* Fall down to SW render in case of error */
-=======
-            if(lv_area_get_size(draw_area) >= LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT) {
-                lv_gpu_nxp_pxp_blit(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h, opa);
-                return;
->>>>>>> 4c7a2ae0b7d8f564b22e7774039f6cbe5385926c
             }
 #elif LV_USE_GPU_STM32_DMA2D
         if(lv_area_get_size(draw_area) >= 240) {
