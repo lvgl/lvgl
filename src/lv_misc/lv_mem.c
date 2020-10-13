@@ -25,7 +25,7 @@
  *********************/
 /*Add memory junk on alloc (0xaa) and free(0xbb) (just for testing purposes)*/
 #ifndef LV_MEM_ADD_JUNK
-    #define LV_MEM_ADD_JUNK 0
+    #define LV_MEM_ADD_JUNK 1
 #endif
 
 #ifndef LV_MEM_FULL_DEFRAG_CNT

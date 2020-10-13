@@ -264,19 +264,120 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
-    lv_point_t new_pos;
-    _lv_area_align(&base->coords, &obj->coords, align, &new_pos);
+//    lv_point_t new_pos;
+//    _lv_area_align(&base->coords, &obj->coords, align, &new_pos);
 
-    /*Bring together the coordination system of base and obj*/
-    lv_obj_t * par        = lv_obj_get_parent(obj);
-    lv_coord_t par_abs_x  = par->coords.x1;
-    lv_coord_t par_abs_y  = par->coords.y1;
-    new_pos.x += x_ofs;
-    new_pos.y += y_ofs;
-    new_pos.x -= par_abs_x;
-    new_pos.y -= par_abs_y;
 
-    lv_obj_set_pos(obj, new_pos.x, new_pos.y);
+    lv_coord_t x;
+    lv_coord_t y;
+    switch(align) {
+    case LV_ALIGN_CENTER:
+        x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width_fit(obj) / 2;
+        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height_fit(obj) / 2;
+        break;
+    case LV_ALIGN_IN_TOP_LEFT:
+        x = 0;
+        y = 0;
+        break;
+    case LV_ALIGN_IN_TOP_MID:
+        x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width_fit(obj) / 2;
+        y = 0;
+        break;
+
+    case LV_ALIGN_IN_TOP_RIGHT:
+        x = lv_obj_get_width_fit(base) - lv_obj_get_width_fit(obj);
+        y = 0;
+        break;
+
+    case LV_ALIGN_IN_BOTTOM_LEFT:
+        x = 0;
+        y = lv_obj_get_height_fit(base) - lv_obj_get_height_fit(obj);
+        break;
+    case LV_ALIGN_IN_BOTTOM_MID:
+        x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width_fit(obj) / 2;
+        y = lv_obj_get_height_fit(base) - lv_obj_get_height_fit(obj);
+        break;
+
+    case LV_ALIGN_IN_BOTTOM_RIGHT:
+        x = lv_obj_get_width_fit(base) - lv_obj_get_width_fit(obj);
+        y = lv_obj_get_height_fit(base) - lv_obj_get_height_fit(obj);
+        break;
+
+    case LV_ALIGN_IN_LEFT_MID:
+        x = 0;
+        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height_fit(obj) / 2;
+        break;
+
+    case LV_ALIGN_IN_RIGHT_MID:
+        x = lv_obj_get_width_fit(base) - lv_obj_get_width_fit(obj);
+        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height_fit(obj) / 2;
+        break;
+
+    case LV_ALIGN_OUT_TOP_LEFT:
+        x = 0;
+        y = -lv_obj_get_height_fit(obj);
+        break;
+
+    case LV_ALIGN_OUT_TOP_MID:
+        x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width_fit(obj) / 2;
+        y = -lv_obj_get_height_fit(obj);
+        break;
+
+    case LV_ALIGN_OUT_TOP_RIGHT:
+        x = lv_obj_get_width_fit(base) - lv_obj_get_width_fit(obj);
+        y = -lv_obj_get_height_fit(obj);
+        break;
+
+    case LV_ALIGN_OUT_BOTTOM_LEFT:
+        x = 0;
+        y = lv_obj_get_height_fit(base);
+        break;
+
+    case LV_ALIGN_OUT_BOTTOM_MID:
+        x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width_fit(obj) / 2;
+        y = lv_obj_get_height_fit(base);
+        break;
+
+    case LV_ALIGN_OUT_BOTTOM_RIGHT:
+        x = lv_obj_get_width_fit(base) - lv_obj_get_width_fit(obj);
+        y = lv_obj_get_height_fit(base);
+        break;
+
+    case LV_ALIGN_OUT_LEFT_TOP:
+        x = -lv_obj_get_width_fit(obj);
+        y = 0;
+        break;
+
+    case LV_ALIGN_OUT_LEFT_MID:
+        x = -lv_obj_get_width_fit(obj);
+        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height_fit(obj) / 2;
+        break;
+
+    case LV_ALIGN_OUT_LEFT_BOTTOM:
+        x = -lv_obj_get_width_fit(obj);
+        y = lv_obj_get_height_fit(base) - lv_obj_get_height_fit(obj);
+        break;
+
+    case LV_ALIGN_OUT_RIGHT_TOP:
+        x = lv_obj_get_width_fit(base);
+        y = 0;
+        break;
+
+    case LV_ALIGN_OUT_RIGHT_MID:
+        x = lv_obj_get_width_fit(base);
+        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height_fit(obj) / 2;
+        break;
+
+    case LV_ALIGN_OUT_RIGHT_BOTTOM:
+        x = lv_obj_get_width_fit(base);
+        y = lv_obj_get_height_fit(base) - lv_obj_get_height_fit(obj);
+        break;
+    }
+
+    x += x_ofs;
+    y += y_ofs;
+
+    lv_obj_set_pos(obj, x, y);
 }
 
 

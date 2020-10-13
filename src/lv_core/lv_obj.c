@@ -48,7 +48,7 @@
 #define LV_OBJX_NAME "lv_obj"
 #define LV_OBJ_DEF_WIDTH    (LV_DPX(100))
 #define LV_OBJ_DEF_HEIGHT   (LV_DPX(50))
-#define GRID_DEBUG  0 /*Draw rectangles on grid cells*/
+#define GRID_DEBUG  1 /*Draw rectangles on grid cells*/
 
 /**********************
  *      TYPEDEFS
@@ -1759,13 +1759,13 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 
             uint32_t row;
             uint32_t col;
-            for(row = 0; row < calc.row_dsc_len - 1; row ++) {
-                for(col = 0; col < calc.col_dsc_len - 1; col ++) {
+            for(row = 0; row < calc.row_num; row ++) {
+                for(col = 0; col < calc.col_num; col ++) {
                     lv_area_t a;
-                    a.x1 = grid_abs.x + calc.col_dsc[col];
-                    a.x2 = grid_abs.x + calc.col_dsc[col + 1];
-                    a.y1 = grid_abs.y + calc.row_dsc[row];
-                    a.y2 = grid_abs.y + calc.row_dsc[row + 1];
+                    a.x1 = grid_abs.x + calc.x[col];
+                    a.x2 = a.x1 + calc.w[col];
+                    a.y1 = grid_abs.y + calc.y[row];
+                    a.y2 = a.y1 + calc.h[row];
                     lv_draw_rect(&a, clip_area, &grid_rect_dsc);
                 }
             }
@@ -1914,6 +1914,17 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
                 _lv_grid_full_refresh(obj);
             }
         }
+
+        /* If the parent has an implicit grid in a direction and this object (whose child has changed)
+         * is stretched in that direction then the grid of the parent might have changed because
+         * the track size of implicit grids with stretched cells is calculated from the children bounding box.*/
+        lv_obj_t * par = lv_obj_get_parent(obj);
+        if(par && _lv_obj_is_grid_item(obj) &&
+                ((par->grid->col_dsc == NULL && _GRID_GET_CELL_FLAG(obj->x_set) == LV_GRID_STRETCH) ||
+                (par->grid->row_dsc == NULL && _GRID_GET_CELL_FLAG(obj->y_set) == LV_GRID_STRETCH))) {
+            _lv_grid_full_refresh(par);
+        }
+
     }
     else if(sign == LV_SIGNAL_SCROLL) {
         res = lv_event_send(obj, LV_EVENT_SCROLL, NULL);

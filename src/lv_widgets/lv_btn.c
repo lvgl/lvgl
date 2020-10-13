@@ -71,6 +71,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
         /*Set layout if the button is not a screen*/
         if(parent) {
             lv_obj_set_size(btn, LV_DPI, LV_DPI / 3);
+            lv_obj_clear_flag(btn, LV_OBJ_FLAG_SCROLLABLE);
         }
 
         lv_theme_apply(btn, LV_THEME_BTN);
