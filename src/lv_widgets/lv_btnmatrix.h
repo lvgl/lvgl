@@ -42,6 +42,7 @@ enum {
     LV_BTNMATRIX_CTRL_CHECKABLE  = 0x0040, /**< Button *can* be toggled. */
     LV_BTNMATRIX_CTRL_CHECKED    = 0x0080, /**< Button is currently toggled (e.g. checked). */
     LV_BTNMATRIX_CTRL_CLICK_TRIG = 0x0100, /**< 1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS*/
+    LV_BTNMATRIX_CTRL_TYPE_2 =     0x0200, /**< Render the button with `LV_BTNMATRIX_PART_BTN2` style*/
 };
 typedef uint16_t lv_btnmatrix_ctrl_t;
 
@@ -52,7 +53,8 @@ typedef struct {
     const char ** map_p;                              /*Pointer to the current map*/
     lv_area_t * button_areas;                         /*Array of areas of buttons*/
     lv_btnmatrix_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
-    lv_style_list_t style_btn;                     /*Styles of buttons in each state*/
+    lv_style_list_t style_btn;                        /*Styles of buttons in each state*/
+    lv_style_list_t style_btn2;                       /*Styles of buttons in each state with LV_BTNMATRIX_CTRL_TYPE_2 control*/
     uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
     uint16_t btn_id_pr;                               /*Index of the currently pressed button or LV_BTNMATRIX_BTN_NONE*/
     uint16_t btn_id_focused;                          /*Index of the currently focused button or LV_BTNMATRIX_BTN_NONE*/
@@ -65,6 +67,7 @@ typedef struct {
 enum {
     LV_BTNMATRIX_PART_MAIN,
     LV_BTNMATRIX_PART_BTN,
+    LV_BTNMATRIX_PART_BTN_2,
 };
 typedef uint8_t lv_btnmatrix_part_t;
 
@@ -127,7 +130,7 @@ void lv_btnmatrix_set_recolor(const lv_obj_t * btnm, bool en);
  * @param btnm pointer to button matrix object
  * @param btn_id 0 based index of the button to modify. (Not counting new lines)
  */
-void lv_btnmatrix_set_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl);
+void lv_btnmatrix_set_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl);
 
 /**
  * Clear the attributes of a button of the button matrix
