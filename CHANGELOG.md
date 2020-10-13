@@ -23,6 +23,7 @@
 - Skip objects in groups if they are in disabled state
 - Fix dropdown selection with RTL basedirection
 - Fix rectangle border drawing with large width
+- Fix `lv_win_clean()`
 
 ## v7.6.1 (06.10.2020)
 
