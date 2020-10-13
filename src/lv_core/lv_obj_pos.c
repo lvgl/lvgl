@@ -315,57 +315,57 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
     case LV_ALIGN_OUT_TOP_LEFT:
         x = 0;
-        y = -lv_obj_get_height_fit(obj);
+        y = -lv_obj_get_height(obj);
         break;
 
     case LV_ALIGN_OUT_TOP_MID:
-        x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width_fit(obj) / 2;
-        y = -lv_obj_get_height_fit(obj);
+        x = lv_obj_get_width(base) / 2 - lv_obj_get_width(obj) / 2;
+        y = -lv_obj_get_height(obj);
         break;
 
     case LV_ALIGN_OUT_TOP_RIGHT:
-        x = lv_obj_get_width_fit(base) - lv_obj_get_width_fit(obj);
-        y = -lv_obj_get_height_fit(obj);
+        x = lv_obj_get_width(base) - lv_obj_get_width(obj);
+        y = -lv_obj_get_height(obj);
         break;
 
     case LV_ALIGN_OUT_BOTTOM_LEFT:
         x = 0;
-        y = lv_obj_get_height_fit(base);
+        y = lv_obj_get_height(base);
         break;
 
     case LV_ALIGN_OUT_BOTTOM_MID:
-        x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width_fit(obj) / 2;
-        y = lv_obj_get_height_fit(base);
+        x = lv_obj_get_width(base) / 2 - lv_obj_get_width(obj) / 2;
+        y = lv_obj_get_height(base);
         break;
 
     case LV_ALIGN_OUT_BOTTOM_RIGHT:
-        x = lv_obj_get_width_fit(base) - lv_obj_get_width_fit(obj);
-        y = lv_obj_get_height_fit(base);
+        x = lv_obj_get_width(base) - lv_obj_get_width(obj);
+        y = lv_obj_get_height(base);
         break;
 
     case LV_ALIGN_OUT_LEFT_TOP:
-        x = -lv_obj_get_width_fit(obj);
+        x = -lv_obj_get_width(obj);
         y = 0;
         break;
 
     case LV_ALIGN_OUT_LEFT_MID:
-        x = -lv_obj_get_width_fit(obj);
-        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height_fit(obj) / 2;
+        x = -lv_obj_get_width(obj);
+        y = lv_obj_get_height(base) / 2 - lv_obj_get_height(obj) / 2;
         break;
 
     case LV_ALIGN_OUT_LEFT_BOTTOM:
-        x = -lv_obj_get_width_fit(obj);
-        y = lv_obj_get_height_fit(base) - lv_obj_get_height_fit(obj);
+        x = -lv_obj_get_width(obj);
+        y = lv_obj_get_height(base) - lv_obj_get_height(obj);
         break;
 
     case LV_ALIGN_OUT_RIGHT_TOP:
-        x = lv_obj_get_width_fit(base);
+        x = lv_obj_get_width(base);
         y = 0;
         break;
 
     case LV_ALIGN_OUT_RIGHT_MID:
-        x = lv_obj_get_width_fit(base);
-        y = lv_obj_get_height_fit(base) / 2 - lv_obj_get_height_fit(obj) / 2;
+        x = lv_obj_get_width(base);
+        y = lv_obj_get_height(base) / 2 - lv_obj_get_height(obj) / 2;
         break;
 
     case LV_ALIGN_OUT_RIGHT_BOTTOM:

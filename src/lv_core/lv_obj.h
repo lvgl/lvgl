@@ -593,6 +593,14 @@ lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, const lv_obj_t * child);
 lv_obj_t * lv_obj_get_child_back(const lv_obj_t * obj, const lv_obj_t * child);
 
 /**
+ * Get the Nth child of a an object. 0th is the lastly created.
+ * @param obj pointer to an object whose children should be get
+ * @param id of a child
+ * @return the child or `NULL` if `id` was greater then the `number of children - 1`
+ */
+lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, uint32_t id);
+
+/**
  * Count the children of an object (only children directly on 'obj')
  * @param obj pointer to an object
  * @return children number of 'obj'
