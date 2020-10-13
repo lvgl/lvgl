@@ -272,27 +272,44 @@ static void calc_explicit_cols(lv_obj_t * cont, _lv_grid_calc_t * calc)
     uint32_t i;
 
     lv_coord_t cont_w = lv_obj_get_width_fit(cont);
-    bool filled = false;
-    if(grid->col_dsc_len == 1 && _GRID_IS_FILL(grid->col_dsc[0])) filled = true;
+    bool fill = false;
+    bool all = false;
+    if(grid->col_dsc_len == 1 && _GRID_IS_FILL(grid->col_dsc[0])) fill = true;
+    if(grid->col_dsc_len == 1 && _GRID_IS_REPEAT(grid->col_dsc[0])) all = true;
 
-    if(filled) {
+    if(fill) {
         lv_coord_t fill_w = _GRID_GET_FILL(grid->col_dsc[0]);
         /* Get number of tracks fitting to the content
          * Add the gap to cont_w because here is no gap after the last track so compensate it*/
         calc->col_num = (cont_w + grid->col_gap) / (fill_w + grid->col_gap);
-    } else {
+    }
+    if(all) {
+        calc->col_num = lv_obj_count_children(cont);
+    }
+    else {
         calc->col_num = grid->col_dsc_len;
     }
     calc->x = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->col_num);
     calc->w = _lv_mem_buf_get(sizeof(lv_coord_t) * calc->col_num);
 
     /*If filled, it's simple: every track has fill size*/
-    if(filled) {
+    if(fill) {
         lv_coord_t fill_w = _GRID_GET_FILL(grid->col_dsc[0]);
         for(i = 0; i < calc->col_num; i++) {
             calc->w[i] = fill_w;
         }
-    } else {
+    }
+    /*If repeated, it's simple: every track has the "repeat size"*/
+    else if(all) {
+        lv_coord_t rep_w;
+        if(grid->col_dsc[0] == LV_GRID_REPEAT_FIT) rep_w = lv_obj_get_width_fit(cont);
+        else rep_w = _GRID_GET_REPEAT(grid->col_dsc[0]);
+
+        for(i = 0; i < calc->col_num; i++) {
+            calc->w[i] = rep_w;
+        }
+    }
+    else {
         uint32_t col_fr_cnt = 0;
         lv_coord_t grid_w = 0;
         bool auto_w = cont->w_set == LV_SIZE_AUTO ? true : false;
@@ -468,6 +485,7 @@ static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc,
                     hint->row++;
                 }
             } else {
+                hint->row++;
                 if(hint->row >= calc->row_num) {
                     hint->row = 0;
                     hint->col++;

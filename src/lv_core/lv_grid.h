@@ -30,7 +30,7 @@ extern "C" {
 /**
  * Some helper defines
  * */
-#define _GRID_IS_CELL(c)        ((c) > LV_COORD_MAX ? true : false)
+#define _GRID_IS_CELL(c)        ((c) >= LV_COORD_MAX ? true : false)
 #define _GRID_CELL_SHIFT        5
 #define _GRID_CELL_MAX          ((1 << _GRID_CELL_SHIFT) - 1)
 #define _GRID_CELL_POS_MASK     ((1 << _GRID_CELL_SHIFT) - 1)
@@ -45,16 +45,26 @@ extern "C" {
 #define _GRID_CELL_SIZE_PX    0     /* The cell size is set in pixels*/
 #define _GRID_CELL_SIZE_FR    1     /* The cell size is set in free units*/
 
-#define LV_GRID_FR(x)   (LV_COORD_MAX + (x))
-#define LV_GRID_FILL(x)   (LV_COORD_MAX + 256 + (x))
+#define _GRID_FR_MAX            256
+#define _GRID_FILL_MAX          2048
+#define _GRID_REPEAT_MAX           2048
+#define _GRID_FR_START        (LV_COORD_MAX)
+#define _GRID_FILL_START      (_GRID_FR_START + _GRID_FR_MAX)
+#define _GRID_REPEAT_START    (_GRID_FILL_START + _GRID_FILL_MAX)
 
-#define _GRID_FR_MAX        256
+#define LV_GRID_FR(x)     (_GRID_FR_START + (x))
+#define LV_GRID_FILL(x)   (_GRID_FILL_START + (x))
+#define LV_GRID_REPEAT(x) (_GRID_REPEAT_START + (x))
+#define LV_GRID_REPEAT_FIT (_GRID_REPEAT_START + _GRID_REPEAT_MAX - 1)
+
 #define _GRID_IS_PX(x)      ((_GRID_IS_FR(x) == false) && (_GRID_IS_AUTO(x) == false) ? true : false)
-#define _GRID_IS_FR(x)      ((x) > LV_COORD_MAX && (x) <  LV_COORD_MAX + _GRID_FR_MAX ? true : false)
-#define _GRID_IS_FILL(x)    ((x) > LV_COORD_MAX + _GRID_FR_MAX ? true : false)
+#define _GRID_IS_FR(x)      ((x) > _GRID_FR_START && (x) <  _GRID_FILL_START ? true : false)
+#define _GRID_IS_FILL(x)    ((x) > _GRID_FILL_START && (x) < _GRID_REPEAT_START ? true : false)
+#define _GRID_IS_REPEAT(x)  ((x) > _GRID_REPEAT_START  ? true : false)
 #define _GRID_IS_AUTO(x)    (x == LV_GRID_AUTO ? true : false)
 #define _GRID_GET_FR(x)     ((x) - LV_COORD_MAX)
-#define _GRID_GET_FILL(x)     ((x) - LV_COORD_MAX - _GRID_FR_MAX)
+#define _GRID_GET_FILL(x)     ((x) - _GRID_FILL_START)
+#define _GRID_GET_REPEAT(x)     ((x) - _GRID_REPEAT_START)
 
 
 /**
@@ -90,7 +100,6 @@ typedef struct {
     lv_coord_t row_gap;
     uint8_t col_place;
     uint8_t row_place;
-
 }lv_grid_t;
 
 typedef struct {
