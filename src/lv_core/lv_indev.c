@@ -211,7 +211,7 @@ void lv_indev_set_cursor(lv_indev_t * indev, lv_obj_t * cur_obj)
     indev->cursor = cur_obj;
     lv_obj_set_parent(indev->cursor, lv_disp_get_layer_sys(indev->driver.disp));
     lv_obj_set_pos(indev->cursor, indev->proc.types.pointer.act_point.x, indev->proc.types.pointer.act_point.y);
-    lv_obj_add_flag(indev->cursor, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(indev->cursor, LV_OBJ_FLAG_CLICKABLE);
 }
 
 #if LV_USE_GROUP
