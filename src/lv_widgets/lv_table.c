@@ -103,9 +103,9 @@ lv_obj_t * lv_table_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->col_w[0] = LV_DPI;
         ext->row_h[0] = LV_DPI; /*It will be overwritten when the theme is applied*/
         ext->cell_data = lv_mem_realloc(ext->cell_data, ext->row_cnt * ext->col_cnt * sizeof(char *));
+        ext->cell_data[0] = NULL;
 
-        lv_obj_set_size(table, 80, 80);
-//        lv_obj_set_size(table, LV_SIZE_AUTO, LV_SIZE_AUTO);
+        lv_obj_set_size(table, LV_SIZE_AUTO, LV_SIZE_AUTO);
 
         lv_theme_apply(table, LV_THEME_TABLE);
     }
