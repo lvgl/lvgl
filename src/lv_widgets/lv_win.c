@@ -172,8 +172,9 @@ lv_obj_t * lv_win_create(lv_obj_t * par, const lv_obj_t * copy)
 void lv_win_clean(lv_obj_t * win)
 {
     LV_ASSERT_OBJ(win, LV_OBJX_NAME);
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
-    lv_obj_t * scrl = lv_page_get_scrollable(win);
+    lv_obj_t * scrl = lv_page_get_scrollable(ext->page);
     lv_obj_clean(scrl);
 }
 
