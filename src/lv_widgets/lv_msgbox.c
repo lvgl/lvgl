@@ -199,6 +199,26 @@ void lv_msgbox_set_text(lv_obj_t * mbox, const char * txt)
 }
 
 /**
+ * Set a formatted text for the message box
+ * @param mbox pointer to a message box
+ * @param fmt `printf`-like format
+ */
+void lv_msgbox_set_text_fmt(lv_obj_t * mbox, const char * fmt, ...)
+{
+    LV_ASSERT_OBJ(mbox, LV_OBJX_NAME);
+    LV_ASSERT_STR(fmt);
+
+    lv_msgbox_ext_t * ext = lv_obj_get_ext_attr(mbox);
+
+    va_list args;
+    va_start (args, fmt);
+    lv_label_set_text_fmt(ext->text, fmt, args);
+    va_end (args);
+
+    mbox_realign(mbox);
+}
+
+/**
  * Set animation duration
  * @param mbox pointer to a message box object
  * @param anim_time animation length in  milliseconds (0: no animation)
