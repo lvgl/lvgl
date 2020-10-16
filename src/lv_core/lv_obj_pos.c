@@ -259,10 +259,6 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
-//    lv_point_t new_pos;
-//    _lv_area_align(&base->coords, &obj->coords, align, &new_pos);
-
-
     lv_coord_t x;
     lv_coord_t y;
     switch(align) {
@@ -280,7 +276,7 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
         break;
 
     case LV_ALIGN_IN_TOP_RIGHT:
-        x = lv_obj_get_width_fit(base) - lv_obj_get_width_fit(obj);
+        x = lv_obj_get_width(base) - lv_obj_get_width(obj);
         y = 0;
         break;
 
@@ -369,8 +365,8 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
         break;
     }
 
-    x += x_ofs;
-    y += y_ofs;
+    x += x_ofs + base->coords.x1;
+    y += y_ofs + base->coords.y1;
 
     lv_obj_set_pos(obj, x, y);
 }

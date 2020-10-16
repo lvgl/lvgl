@@ -76,6 +76,7 @@
  **********************/
 typedef struct {
     lv_style_t scr;
+    lv_style_t sb;
     lv_style_t bg;
     lv_style_t bg_click;
     lv_style_t bg_sec;
@@ -202,6 +203,13 @@ static bool inited;
 
 static void basic_init(void)
 {
+    lv_style_set_scrollbar_bg_opa(&styles->sb, LV_STATE_DEFAULT, LV_OPA_COVER);
+    lv_style_set_scrollbar_bg_color(&styles->sb, LV_STATE_DEFAULT, (IS_LIGHT ? lv_color_hex(0xcccfd1) : lv_color_hex(0x777f85)));
+    lv_style_set_scrollbar_radius(&styles->sb, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
+    lv_style_set_scrollbar_tickness(&styles->sb, LV_STATE_DEFAULT, LV_DPX(7));
+    lv_style_set_scrollbar_space_side(&styles->sb, LV_STATE_DEFAULT,  LV_DPX(7));
+    lv_style_set_scrollbar_space_end(&styles->sb, LV_STATE_DEFAULT,  LV_DPX(7));
+
     style_init_reset(&styles->scr);
     lv_style_set_bg_opa(&styles->scr, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->scr, LV_STATE_DEFAULT, COLOR_SCR);
@@ -227,13 +235,6 @@ static void basic_init(void)
     lv_style_set_image_recolor(&styles->bg, LV_STATE_DEFAULT, COLOR_BG_TEXT);
     lv_style_set_line_color(&styles->bg, LV_STATE_DEFAULT, COLOR_BG_TEXT);
     lv_style_set_line_width(&styles->bg, LV_STATE_DEFAULT, 1);
-
-    lv_style_set_scrollbar_bg_opa(&styles->bg, LV_STATE_DEFAULT, LV_OPA_COVER);
-    lv_style_set_scrollbar_bg_color(&styles->bg, LV_STATE_DEFAULT, (IS_LIGHT ? lv_color_hex(0xcccfd1) : lv_color_hex(0x777f85)));
-    lv_style_set_scrollbar_radius(&styles->bg, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-    lv_style_set_scrollbar_tickness(&styles->bg, LV_STATE_DEFAULT, LV_DPX(7));
-    lv_style_set_scrollbar_space_side(&styles->bg, LV_STATE_DEFAULT,  LV_DPX(7));
-    lv_style_set_scrollbar_space_end(&styles->bg, LV_STATE_DEFAULT,  LV_DPX(7));
 
     lv_style_set_pad_left(&styles->bg, LV_STATE_DEFAULT, PAD_DEF + BORDER_WIDTH);
     lv_style_set_pad_right(&styles->bg, LV_STATE_DEFAULT, PAD_DEF + BORDER_WIDTH);
@@ -979,10 +980,12 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_SCR:
             list = _lv_obj_get_style_list(obj, LV_OBJ_PART_MAIN);
             _lv_style_list_add_style(list, &styles->scr);
+            _lv_style_list_add_style(list, &styles->sb);
             break;
         case LV_THEME_OBJ:
             list = _lv_obj_get_style_list(obj, LV_OBJ_PART_MAIN);
             _lv_style_list_add_style(list, &styles->bg);
+            _lv_style_list_add_style(list, &styles->sb);
             break;
 
 #if LV_USE_BTN
@@ -1070,6 +1073,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             list = _lv_obj_get_style_list(obj, LV_ARC_PART_BG);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->arc_bg);
+            _lv_style_list_add_style(list, &styles->sb);
 
             list = _lv_obj_get_style_list(obj, LV_ARC_PART_INDIC);
             _lv_style_list_add_style(list, &styles->arc_indic);
@@ -1109,6 +1113,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
         case LV_THEME_CHECKBOX:
             list = _lv_obj_get_style_list(obj, LV_CHECKBOX_PART_MAIN);
             _lv_style_list_add_style(list, &styles->cb_bg);
+            _lv_style_list_add_style(list, &styles->sb);
 
             list = _lv_obj_get_style_list(obj, LV_CHECKBOX_PART_BULLET);
             _lv_style_list_add_style(list, &styles->btn);
@@ -1198,6 +1203,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             list = _lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->roller_bg);
+            _lv_style_list_add_style(list, &styles->sb);
 
             list = _lv_obj_get_style_list(obj, LV_ROLLER_PART_SELECTED);
             _lv_style_list_add_style(list, &styles->roller_sel);
@@ -1237,6 +1243,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_LIST);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->ddlist_page);
+            _lv_style_list_add_style(list, &styles->sb);
 
             list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_SELECTED);
             _lv_style_list_add_style(list, &styles->ddlist_sel);
@@ -1263,6 +1270,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
         {
             list = _lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
             _lv_style_list_add_style(list, &styles->bg);
+            _lv_style_list_add_style(list, &styles->sb);
 
             int idx = 1; /* start value should be 1, not zero, since cell styles 
                             start at 1 due to presence of LV_TABLE_PART_BG=0
@@ -1302,6 +1310,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_MAIN);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->pad_small);
+            _lv_style_list_add_style(list, &styles->sb);
 
             list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_PLACEHOLDER);
             _lv_style_list_add_style(list, &styles->ta_placeholder);

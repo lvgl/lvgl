@@ -1915,12 +1915,13 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
 
         if(w_new || h_new) {
-            lv_coord_t cont_w = lv_obj_get_width_fit(obj);
-            lv_coord_t cont_h = lv_obj_get_height_fit(obj);
             lv_obj_t * child;
             _LV_LL_READ(obj->child_ll, child) {
-                if(LV_COORD_IS_PCT(child->w_set) && w_new) lv_obj_set_width(child, (LV_COORD_GET_PCT(child->w_set) * cont_w) / 100);
-                if(LV_COORD_IS_PCT(child->h_set) && h_new) lv_obj_set_height(child, (LV_COORD_GET_PCT(child->h_set) * cont_h) / 100);
+                if((LV_COORD_IS_PCT(child->w_set) && w_new) ||
+                        (LV_COORD_IS_PCT(child->h_set) && h_new))
+                {
+                    lv_obj_set_size(child, child->w_set, child->h_set);
+                }
             }
             if(obj->grid) _lv_grid_full_refresh(obj);
             if(obj->flex_dir) _lv_flex_refresh(obj);

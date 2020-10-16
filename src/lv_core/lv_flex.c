@@ -38,7 +38,7 @@ static void place_content(lv_coord_t place, lv_coord_t max_size, lv_coord_t trac
 
 void lv_obj_set_flex_cont(lv_obj_t * obj, lv_flex_dir_t flex_dir)
 {
-    if(obj->flex_dir != flex_dir) return;
+    if(obj->flex_dir == flex_dir) return;
 
     obj->flex_dir = flex_dir;
     _lv_flex_refresh(obj);
@@ -170,9 +170,12 @@ static lv_obj_t * find_track_end(lv_obj_t * cont, lv_obj_t * item_start, lv_dir_
 
 static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * item_last, lv_dir_t main_dir, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t track_size, lv_coord_t grow_unit)
 {
-    lv_coord_t(*get_main_size)(const lv_obj_t *) = (main_dir == LV_DIR_HOR ? lv_obj_get_width_margin : lv_obj_get_height_margin);
-    void (*set_main_size)(lv_obj_t *, lv_coord_t) = (main_dir == LV_DIR_HOR ? lv_obj_set_width_margin : lv_obj_set_height_margin);
-    lv_coord_t(*get_cross_size)(const lv_obj_t *) = (main_dir ==  LV_DIR_VER ? lv_obj_get_width_margin : lv_obj_get_height_margin);
+    lv_coord_t(*obj_get_main_size)(const lv_obj_t *) = (main_dir == LV_DIR_HOR ? lv_obj_get_width_margin : lv_obj_get_height_margin);
+    lv_coord_t(*obj_get_cross_size)(const lv_obj_t *) = (main_dir ==  LV_DIR_VER ? lv_obj_get_width_margin : lv_obj_get_height_margin);
+    void (*area_set_main_size)(lv_area_t *, lv_coord_t) = (main_dir == LV_DIR_HOR ? lv_area_set_width : lv_area_set_height);
+    lv_coord_t (*area_get_main_size)(const lv_area_t *) = (main_dir == LV_DIR_HOR ? lv_area_get_width : lv_area_get_height);
+    lv_coord_t (*get_margin_start)(const lv_obj_t *, uint8_t part) = (main_dir == LV_DIR_HOR ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);
+    lv_coord_t (*get_margin_end)(const lv_obj_t *, uint8_t part) = (main_dir == LV_DIR_HOR ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
 
     lv_coord_t main_pos = 0;
     /*Reposition the children*/
@@ -189,17 +192,25 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
         lv_coord_t main_size = (main_dir == LV_DIR_HOR ? item->w_set : item->h_set);
         if(_LV_FLEX_GET_GROW(main_size)) {
             lv_coord_t s =  _LV_FLEX_GET_GROW(main_size) * grow_unit;
-            set_main_size(item, s);
+            s -= get_margin_start(item, LV_OBJ_PART_MAIN) + get_margin_start(item, LV_OBJ_PART_MAIN);
+            if(s != area_get_main_size(&item->coords)) {
+                lv_area_t old_coords;
+                lv_area_copy(&old_coords, &item->coords);
+                lv_obj_invalidate(item);
+                area_set_main_size(&item->coords, s);
+                lv_obj_invalidate(item);
+                item->signal_cb(item, LV_SIGNAL_COORD_CHG, &old_coords);
+            }
         }
 
         lv_coord_t cross_pos = 0;
         lv_coord_t cross_set = (main_dir == LV_DIR_HOR ? item->y_set : item->x_set);
         switch(cross_set) {
         case LV_FLEX_CENTER:
-            cross_pos = (track_size - get_cross_size(item)) / 2;
+            cross_pos = (track_size - obj_get_cross_size(item)) / 2;
             break;
         case LV_FLEX_END:
-            cross_pos = track_size - get_cross_size(item);
+            cross_pos = track_size - obj_get_cross_size(item);
             break;
         }
 
@@ -220,7 +231,7 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
             item->coords.y2 += diff_y;
             _lv_obj_move_children_by(item, diff_x, diff_y);
         }
-        main_pos += get_main_size(item);
+        main_pos += obj_get_main_size(item);
         item = _lv_ll_get_prev(&cont->child_ll, item);
     }
 }
