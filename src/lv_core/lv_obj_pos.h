@@ -33,11 +33,11 @@ struct _lv_obj_t;
  * @param obj pointer to an object
  * @param x new distance from the left side of the parent plus the parent's left padding or a grid cell
  * @param y new distance from the top side of the parent  plus the parent's right padding or a grid cell
- * @note Zero value value means place the object is on the left padding of the parent, and not on the left edge.
- * @note A grid cell can be and explicit placement with cell position and span:
- *         `LV_GRID_CELL_START/END/CENTER/STRETCH(pos, span)`
- *       or "auto" to place the object on the grid in the creation order of other children
- *       `LV_GRID_AUTO_START/END/CENTER/STRETCH`
+ * @note Zero value value means place the object on the left/top padding of the parent, and not on the left/top edge.
+ * @note For grid cells: `LV_GRID_CELL_START/END/CENTER/STRETCH(pos, span)`
+ *       For flex items: `LV_FLEX_POS/START/END/CENTER`
+ *       For percentage size: `LV_SIZE_PCT(pct)`
+ *       For auto size (to set size to children size): `LV_SIZE_AUTO`
  * @note to use grid placement the parent needs have a defined grid with `lv_obj_set_grid`
  */
 void lv_obj_set_pos(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
@@ -188,7 +188,7 @@ lv_coord_t lv_obj_get_height_fit(const struct _lv_obj_t * obj);
  * @param obj pointer to an object
  * @return the height including the margins
  */
-lv_coord_t lv_obj_get_height_margin(struct _lv_obj_t * obj);
+lv_coord_t lv_obj_get_height_margin(const struct _lv_obj_t * obj);
 
 /**
  * Get the width of an object by taking the left and right margin into account.
@@ -196,28 +196,28 @@ lv_coord_t lv_obj_get_height_margin(struct _lv_obj_t * obj);
  * @param obj pointer to an object
  * @return the height including the margins
  */
-lv_coord_t lv_obj_get_width_margin(struct _lv_obj_t * obj);
+lv_coord_t lv_obj_get_width_margin(const struct _lv_obj_t * obj);
 
 /**
  * Get the width of the virtual content of an object
  * @param obj pointer to an objects
  * @return the width of the virtually drawn content
  */
-lv_coord_t _lv_obj_get_self_width(lv_obj_t * obj);
+lv_coord_t _lv_obj_get_self_width(struct _lv_obj_t * obj);
 
 /**
  * Get the height of the virtual content of an object
  * @param obj pointer to an objects
  * @return the width of the virtually drawn content
  */
-lv_coord_t _lv_obj_get_self_height(lv_obj_t * obj);
+lv_coord_t _lv_obj_get_self_height(struct _lv_obj_t * obj);
 
 /**
  * Handle if the size of the internal (virtual) content of an object has changed.
  * @param obj pointer to an object
  * @return false: nothing happened; true: refresh happened
  */
-bool _lv_obj_handle_self_size_chg(lv_obj_t * obj);
+bool _lv_obj_handle_self_size_chg(struct _lv_obj_t * obj);
 
 /**
  * Calculate the "auto size". It's `auto_size = max(gird_size, children_size)`
@@ -251,6 +251,8 @@ void _lv_obj_move_children_by(struct _lv_obj_t * obj, lv_coord_t x_diff, lv_coor
  * @return true: grid item; false: not grid item
  */
 bool _lv_obj_is_grid_item(struct _lv_obj_t * obj);
+
+bool _lv_obj_is_flex_item(struct _lv_obj_t * obj);
 
 /**********************
  *      MACROS

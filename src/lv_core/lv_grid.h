@@ -19,6 +19,15 @@ extern "C" {
  *      DEFINES
  *********************/
 
+/**
+ * Some helper defines
+ * */
+#define _LV_GRID_CELL_SHIFT        4
+#define _LV_GRID_CELL_POS_MASK     ((1 << _LV_GRID_CELL_SHIFT) - 1)
+#define _LV_GRID_CELL_SPAN_MASK    (_LV_GRID_CELL_POS_MASK << _LV_GRID_CELL_SHIFT)
+#define _LV_GRID_CELL_FLAG_MASK    (_LV_GRID_CELL_POS_MASK << (2 * _LV_GRID_CELL_SHIFT))
+#define _LV_GRID_CELL_PLACE(b)      ((b) << (_LV_GRID_CELL_SHIFT * 2))
+
 #define LV_GRID_START               0
 #define LV_GRID_CENTER              1
 #define LV_GRID_END                 2
@@ -27,61 +36,18 @@ extern "C" {
 #define LV_GRID_SPACE_AROUND        5
 #define LV_GRID_SPACE_BETWEEN       6
 
-/**
- * Some helper defines
- * */
-#define _GRID_IS_CELL(c)        ((c) >= LV_COORD_MAX ? true : false)
-#define _GRID_CELL_SHIFT        5
-#define _GRID_CELL_MAX          ((1 << _GRID_CELL_SHIFT) - 1)
-#define _GRID_CELL_POS_MASK     ((1 << _GRID_CELL_SHIFT) - 1)
-#define _GRID_CELL_SPAN_MASK    (_GRID_CELL_POS_MASK << _GRID_CELL_SHIFT)
-#define _GRID_CELL_FLAG_MASK    (_GRID_CELL_POS_MASK << (2 * _GRID_CELL_SHIFT))
-#define _GRID_CELL_FLAG(b)      ((b) << (_GRID_CELL_SHIFT * 2))
-#define _GRID_CELL_AUTO         _GRID_CELL_MAX
-#define _GRID_GET_CELL_POS(c)   ((c) & _GRID_CELL_POS_MASK)
-#define _GRID_GET_CELL_SPAN(c)  (((c) & _GRID_CELL_SPAN_MASK) >> _GRID_CELL_SHIFT)
-#define _GRID_GET_CELL_FLAG(c)  ((c) >> (_GRID_CELL_SHIFT * 2) & 0x3)
+#define LV_GRID_CELL_START(pos, span)   (_LV_COORD_GRID((pos) | ((span) << (_LV_GRID_CELL_SHIFT)) | _LV_GRID_CELL_PLACE(LV_GRID_START)))
+#define LV_GRID_CELL_END(pos, span)     (_LV_COORD_GRID((pos) | ((span) << (_LV_GRID_CELL_SHIFT)) | _LV_GRID_CELL_PLACE(LV_GRID_END)))
+#define LV_GRID_CELL_CENTER(pos, span)  (_LV_COORD_GRID((pos) | ((span) << (_LV_GRID_CELL_SHIFT)) | _LV_GRID_CELL_PLACE(LV_GRID_CENTER)))
+#define LV_GRID_CELL_STRETCH(pos, span) (_LV_COORD_GRID((pos) | ((span) << (_LV_GRID_CELL_SHIFT)) | _LV_GRID_CELL_PLACE(LV_GRID_STRETCH)))
 
-#define _GRID_CELL_SIZE_PX    0     /* The cell size is set in pixels*/
-#define _GRID_CELL_SIZE_FR    1     /* The cell size is set in free units*/
+#define LV_GRID_GET_CELL_POS(c)   ((c) & _LV_GRID_CELL_POS_MASK)
+#define LV_GRID_GET_CELL_SPAN(c)  (((c) & _LV_GRID_CELL_SPAN_MASK) >> _LV_GRID_CELL_SHIFT)
+#define LV_GRID_GET_CELL_PLACE(c)  ((c) >> (_LV_GRID_CELL_SHIFT * 2) & 0x7)
 
-#define _GRID_FR_MAX            256
-#define _GRID_FILL_MAX          2048
-#define _GRID_REPEAT_MAX           2048
-#define _GRID_FR_START        (LV_COORD_MAX)
-#define _GRID_FILL_START      (_GRID_FR_START + _GRID_FR_MAX)
-#define _GRID_REPEAT_START    (_GRID_FILL_START + _GRID_FILL_MAX)
-
-#define LV_GRID_FR(x)     (_GRID_FR_START + (x))
-#define LV_GRID_FILL(x)   (_GRID_FILL_START + (x))
-#define LV_GRID_REPEAT(x) (_GRID_REPEAT_START + (x))
-#define LV_GRID_REPEAT_FIT (_GRID_REPEAT_START + _GRID_REPEAT_MAX - 1)
-
-#define _GRID_IS_PX(x)      ((_GRID_IS_FR(x) == false) && (_GRID_IS_AUTO(x) == false) ? true : false)
-#define _GRID_IS_FR(x)      ((x) > _GRID_FR_START && (x) <  _GRID_FILL_START ? true : false)
-#define _GRID_IS_FILL(x)    ((x) > _GRID_FILL_START && (x) < _GRID_REPEAT_START ? true : false)
-#define _GRID_IS_REPEAT(x)  ((x) > _GRID_REPEAT_START  ? true : false)
-#define _GRID_IS_AUTO(x)    (x == LV_GRID_AUTO ? true : false)
-#define _GRID_GET_FR(x)     ((x) - LV_COORD_MAX)
-#define _GRID_GET_FILL(x)     ((x) - _GRID_FILL_START)
-#define _GRID_GET_REPEAT(x)     ((x) - _GRID_REPEAT_START)
-
-
-/**
- * Define a grid cell with position and span.
- * Can be used like `lv_obj_set_pos(btn, LV_GRID_CELL(3,2), LV_GRID_CELL(2,1))`
- */
-#define LV_GRID_CELL_START(pos, span)   ((LV_COORD_MAX + (pos) + (span << _GRID_CELL_SHIFT)) | _GRID_CELL_FLAG(LV_GRID_START))
-#define LV_GRID_CELL_END(pos, span)     ((LV_COORD_MAX + (pos) + (span << _GRID_CELL_SHIFT)) | _GRID_CELL_FLAG(LV_GRID_END))
-#define LV_GRID_CELL_CENTER(pos, span)  ((LV_COORD_MAX + (pos) + (span << _GRID_CELL_SHIFT)) | _GRID_CELL_FLAG(LV_GRID_CENTER))
-#define LV_GRID_CELL_STRETCH(pos, span) ((LV_COORD_MAX + (pos) + (span << _GRID_CELL_SHIFT)) | _GRID_CELL_FLAG(LV_GRID_STRETCH))
-/**
- * Special LV_GRID_CELL position to flow the object automatically.
- * Both X (column) and Y (row) value needs to be AUTO or explicitly specified*/
-#define LV_GRID_AUTO_START      LV_GRID_CELL_START(_GRID_CELL_AUTO, 0)
-#define LV_GRID_AUTO_END        LV_GRID_CELL_END(_GRID_CELL_AUTO, 0)
-#define LV_GRID_AUTO_CENTER     LV_GRID_CELL_CENTER(_GRID_CELL_AUTO, 0)
-#define LV_GRID_AUTO_STRETCH    LV_GRID_CELL_STRETCH(_GRID_CELL_AUTO, 0)
+#define LV_GRID_FR(x)          (_LV_COORD_GRID(x))
+#define LV_GRID_IS_FR(x)       (LV_COORD_IS_GRID(x))
+#define LV_GRID_GET_FR(x)      (LV_COORD_GET_GRID(x))
 
 /**********************
  *      TYPEDEFS
@@ -153,19 +119,6 @@ bool _lv_grid_has_fr_col(struct _lv_obj_t * obj);
 
 bool _lv_grid_has_fr_row(struct _lv_obj_t * obj);
 
-
-/**
- * Check if the object's grid columns are "fill" type
- * @param obj pointer to an object
- * @return true: fill type; false: not fill type
- */
-bool _lv_grid_has_fill_col(struct _lv_obj_t * obj);
-/**
- * Check if the object's grid rows are "fill" type
- * @param obj pointer to an object
- * @return true: fill type; false: not fill type
- */
-bool _lv_grid_has_fill_row(struct _lv_obj_t * obj);
 
 void _lv_grid_full_refresh(lv_obj_t * cont);
 

@@ -1906,19 +1906,31 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {
-            bool col_fr =   _lv_grid_has_fr_col(obj);
-            bool col_fill = _lv_grid_has_fill_col(obj);
-            bool row_fr =   _lv_grid_has_fr_row(obj);
-            bool row_fill = _lv_grid_has_fill_row(obj);
 
-            if(param == NULL ||
-              (lv_area_get_width(param) != lv_obj_get_width(obj) && (col_fr || col_fill)) ||
-              (lv_area_get_height(param) != lv_obj_get_height(obj) && (row_fr || row_fill)))
-        {
-            _lv_grid_full_refresh(obj);
+        bool w_new = true;
+        bool h_new = true;
+        if(param) {
+            if(lv_area_get_width(param) == lv_obj_get_width(obj)) w_new = false;
+            if(lv_area_get_height(param) == lv_obj_get_height(obj)) h_new = false;
+        }
+
+        if(w_new || h_new) {
+            lv_coord_t cont_w = lv_obj_get_width_fit(obj);
+            lv_coord_t cont_h = lv_obj_get_height_fit(obj);
+            lv_obj_t * child;
+            _LV_LL_READ(obj->child_ll, child) {
+                if(LV_COORD_IS_PCT(child->w_set) && w_new) lv_obj_set_width(child, (LV_COORD_GET_PCT(child->w_set) * cont_w) / 100);
+                if(LV_COORD_IS_PCT(child->h_set) && h_new) lv_obj_set_height(child, (LV_COORD_GET_PCT(child->h_set) * cont_h) / 100);
+            }
+            if(obj->grid) _lv_grid_full_refresh(obj);
+            if(obj->flex_dir) _lv_flex_refresh(obj);
         }
     }
     else if(sign == LV_SIGNAL_CHILD_CHG) {
+        if(param == NULL || _lv_obj_is_flex_item(param)) {
+            _lv_flex_refresh(obj);
+        }
+
         if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
         }
@@ -1931,16 +1943,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             } else {
                 _lv_grid_full_refresh(obj);
             }
-        }
-
-        /* If the parent has an implicit grid in a direction and this object (whose child has changed)
-         * is stretched in that direction then the grid of the parent might have changed because
-         * the track size of implicit grids with stretched cells is calculated from the children bounding box.*/
-        lv_obj_t * par = lv_obj_get_parent(obj);
-        if(par && _lv_obj_is_grid_item(obj) &&
-                ((par->grid->col_dsc == NULL && _GRID_GET_CELL_FLAG(obj->x_set) == LV_GRID_STRETCH) ||
-                (par->grid->row_dsc == NULL && _GRID_GET_CELL_FLAG(obj->y_set) == LV_GRID_STRETCH))) {
-            _lv_grid_full_refresh(par);
         }
 
     }
@@ -1965,7 +1967,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         /*Reposition non grid objects on by one*/
         lv_obj_t * child = lv_obj_get_child(obj, NULL);
         while(child) {
-            if(!_GRID_IS_CELL(child->x_set) || !_GRID_IS_CELL(child->y_set)) {
+            if(!LV_COORD_IS_GRID(child->x_set) || !LV_COORD_IS_GRID(child->y_set)) {
                 lv_obj_set_pos(child, child->x_set, child->y_set);
             }
             child = lv_obj_get_child(obj, child);

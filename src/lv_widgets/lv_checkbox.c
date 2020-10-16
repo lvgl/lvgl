@@ -118,9 +118,7 @@ void lv_checkbox_set_text(lv_obj_t * cb, const char * txt)
     strcpy(ext->txt, txt);
     ext->static_txt = 0;
 
-    if(cb->w_set == LV_SIZE_AUTO || cb->h_set == LV_SIZE_AUTO) {
-        lv_obj_set_size(cb, cb->w_set, cb->h_set);
-    }
+    _lv_obj_handle_self_size_chg(cb);
 }
 
 /**
@@ -138,9 +136,7 @@ void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt)
     ext->txt = txt;
     ext->static_txt = 1;
 
-    if(cb->w_set == LV_SIZE_AUTO || cb->h_set == LV_SIZE_AUTO) {
-        lv_obj_set_size(cb, cb->w_set, cb->h_set);
-    }
+    _lv_obj_handle_self_size_chg(cb);
 }
 
 /**

@@ -209,13 +209,33 @@ void _lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align
  *      MACROS
  **********************/
 
-#define LV_COORD_PX(x)  (x)
-#define LV_SIZE_AUTO (LV_COORD_MAX - 1)
-#define LV_SIZE_STRETCH (LV_COORD_MAX - 2)
+#define _LV_COORD_TYPE_SHIFT    (13)
+#define _LV_COORD_TYPE_MASK     (3 << _LV_COORD_TYPE_SHIFT)
+#define _LV_COORD_TYPE_PX       (0 << _LV_COORD_TYPE_SHIFT)
+#define _LV_COORD_TYPE_GRID     (1 << _LV_COORD_TYPE_SHIFT)
+#define _LV_COORD_TYPE_FLEX     (2 << _LV_COORD_TYPE_SHIFT)
+#define _LV_COORD_TYPE_SPEC     (3 << _LV_COORD_TYPE_SHIFT)
 
-#define LV_COORD_IS_PX(x)  (((x) < LV_COORD_MAX - 2) ? true : false)
-#define LV_COORD_IS_AUTO(x) (((x) == LV_SIZE_AUTO) ? true : false)
+#define LV_COORD_IS_PX(x)   ((((x) & _LV_COORD_TYPE_MASK) == _LV_COORD_TYPE_PX) ? true : false)
+#define LV_COORD_IS_GRID(x) ((((x) & _LV_COORD_TYPE_MASK) == _LV_COORD_TYPE_GRID) ? true : false)
+#define LV_COORD_IS_FLEX(x) ((((x) & _LV_COORD_TYPE_MASK) == _LV_COORD_TYPE_FLEX) ? true : false)
+#define LV_COORD_IS_SPEC(x) ((((x) & _LV_COORD_TYPE_MASK) == _LV_COORD_TYPE_SPEC) ? true : false)
 
+#define LV_COORD_GET_PX(x)   ((x) & ~(_LV_COORD_TYPE_MASK))
+#define LV_COORD_GET_GRID(x) ((x) & ~(_LV_COORD_TYPE_MASK))
+#define LV_COORD_GET_FLEX(x) ((x) & ~(_LV_COORD_TYPE_MASK))
+#define LV_COORD_GET_SPEC(x) ((x) & ~(_LV_COORD_TYPE_MASK))
+
+#define _LV_COORD_GRID(x) (_LV_COORD_TYPE_GRID | (x))
+#define _LV_COORD_FELX(x) (_LV_COORD_TYPE_FLEX | (x))
+#define _LV_COORD_SPEC(x) (_LV_COORD_TYPE_SPEC | (x))
+
+/*Special coordinates*/
+#define LV_COORD_PCT(x)      _LV_COORD_SPEC((x))
+#define LV_COORD_IS_PCT(x)   ((LV_COORD_IS_SPEC(x) && LV_COORD_GET_SPEC(x) <= 1000) ? true : false)
+#define LV_COORD_GET_PCT(x)  LV_COORD_GET_SPEC(x)
+#define LV_SIZE_AUTO        _LV_COORD_SPEC(1001)
+#define LV_SIZE_STRETCH     _LV_COORD_SPEC(1002)
 
 #ifdef __cplusplus
 } /* extern "C" */

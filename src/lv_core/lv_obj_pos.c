@@ -54,36 +54,30 @@ void lv_obj_set_pos(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     obj->y_set = y;
 
     bool gi = _lv_obj_is_grid_item(obj);
+    bool fi = _lv_obj_is_flex_item(obj);
 
     /*For consistency set the size to stretched if the objects is stretched on the grid*/
     if(gi) {
-        if(_GRID_GET_CELL_FLAG(obj->x_set) == LV_GRID_STRETCH) obj->w_set = LV_SIZE_STRETCH;
-        if(_GRID_GET_CELL_FLAG(obj->y_set) == LV_GRID_STRETCH) obj->h_set = LV_SIZE_STRETCH;
+        if(LV_GRID_GET_CELL_PLACE(obj->x_set) == LV_GRID_STRETCH) obj->w_set = LV_SIZE_STRETCH;
+        if(LV_GRID_GET_CELL_PLACE(obj->y_set) == LV_GRID_STRETCH) obj->h_set = LV_SIZE_STRETCH;
     }
 
-    /*If not grid item but has grid position set the position to 0*/
+    /*If not grid or flex item but has grid or flex position set the position to 0*/
     if(!gi) {
-        if(_GRID_IS_CELL(x)) {
-            x = 0;
-        }
-        if(_GRID_IS_CELL(y)) {
-            y = 0;
-        }
+        if(LV_COORD_IS_GRID(x)) x = 0;
+        if(LV_COORD_IS_GRID(y)) y = 0;
+    }
+
+    if(!fi) {
+        if(LV_COORD_IS_FLEX(x)) x = 0;
+        if(LV_COORD_IS_FLEX(y)) y = 0;
     }
 
     /*If the object is on a grid item let the grid to position it. */
     if(gi) {
-        lv_obj_t * cont = lv_obj_get_parent(obj);
-
-        /*If the item was moved on an implicit grid the whole grid can change so refresh the full grid.*/
-        if(cont->grid->col_dsc == NULL || cont->grid->row_dsc == NULL)
-        {
-            _lv_grid_full_refresh(cont);
-        }
-        /*On explicit grids the grid itself doesn't depend on the items, so just position the item*/
-        else {
-            lv_grid_item_refr_pos(obj);
-        }
+        lv_grid_item_refr_pos(obj);
+    } else if(fi) {
+        _lv_flex_refresh(lv_obj_get_parent(obj));
     } else {
         _lv_obj_move_to(obj, x, y, true);
     }
@@ -124,12 +118,13 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     bool gi = _lv_obj_is_grid_item(obj);
+    bool fi = _lv_obj_is_flex_item(obj);
     bool x_stretch = false;
     bool y_stretch = false;
 
     if(gi) {
-        x_stretch = _GRID_GET_CELL_FLAG(obj->x_set) == LV_GRID_STRETCH ? true : false;
-        y_stretch = _GRID_GET_CELL_FLAG(obj->y_set) == LV_GRID_STRETCH ? true : false;
+        x_stretch = LV_GRID_GET_CELL_PLACE(obj->x_set) == LV_GRID_STRETCH ? true : false;
+        y_stretch = LV_GRID_GET_CELL_PLACE(obj->y_set) == LV_GRID_STRETCH ? true : false;
         if(x_stretch) w = LV_SIZE_STRETCH;
         if(y_stretch) h = LV_SIZE_STRETCH;
     }
@@ -137,7 +132,7 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     obj->w_set = w;
     obj->h_set = h;
 
-    /*If both stretched it was already managed by the grid*/
+    /*If both stretched the size is managed by the grid*/
     if(x_stretch && y_stretch) return;
 
     if(x_stretch) w = lv_obj_get_width(obj);
@@ -151,20 +146,20 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     if(x_auto) lv_obj_scroll_to_x(obj, 0, LV_ANIM_OFF);
     if(y_auto) lv_obj_scroll_to_y(obj, 0, LV_ANIM_OFF);
 
-    lv_coord_t auto_w;
-    lv_coord_t auto_h;
-    if(x_auto && y_auto) {
-        _lv_obj_calc_auto_size(obj, &auto_w, &auto_h);
-        w = auto_w;
-        h = auto_h;
-    }
-    else if(x_auto) {
-        _lv_obj_calc_auto_size(obj, &auto_w, NULL);
-        w = auto_w;
-    }
-    else if(y_auto) {
-        _lv_obj_calc_auto_size(obj, NULL, &auto_h);
-        h = auto_h;
+    if(x_auto && y_auto) _lv_obj_calc_auto_size(obj, &w, &h);
+    else if(x_auto) _lv_obj_calc_auto_size(obj, &w, NULL);
+    else if(y_auto) _lv_obj_calc_auto_size(obj, NULL, &h);
+
+    /*Calculate the required auto sizes*/
+    bool pct_w = LV_COORD_IS_PCT(obj->w_set) ? true : false;
+    bool pct_h = LV_COORD_IS_PCT(obj->h_set) ? true : false;
+
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    if(parent) {
+        lv_coord_t cont_w = lv_obj_get_width_fit(parent);
+        lv_coord_t cont_h = lv_obj_get_height_fit(parent);
+        if(pct_w) w = (LV_COORD_GET_PCT(obj->w_set) * cont_w) / 100;
+        if(pct_h) h = (LV_COORD_GET_PCT(obj->h_set) * cont_h) / 100;
     }
 
     refr_size(obj, w, h);
@@ -523,7 +518,7 @@ lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the height including the margins
  */
-lv_coord_t lv_obj_get_height_margin(lv_obj_t * obj)
+lv_coord_t lv_obj_get_height_margin(const lv_obj_t * obj)
 {
     lv_style_int_t mtop = lv_obj_get_style_margin_top(obj, LV_OBJ_PART_MAIN);
     lv_style_int_t mbottom = lv_obj_get_style_margin_bottom(obj, LV_OBJ_PART_MAIN);
@@ -537,7 +532,7 @@ lv_coord_t lv_obj_get_height_margin(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return the height including the margins
  */
-lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj)
+lv_coord_t lv_obj_get_width_margin(const lv_obj_t * obj)
 {
     lv_style_int_t mleft = lv_obj_get_style_margin_left(obj, LV_OBJ_PART_MAIN);
     lv_style_int_t mright = lv_obj_get_style_margin_right(obj, LV_OBJ_PART_MAIN);
@@ -550,7 +545,7 @@ lv_coord_t lv_obj_get_width_margin(lv_obj_t * obj)
  * @param obj pointer to an objects
  * @return the width of the virtually drawn content
  */
-lv_coord_t _lv_obj_get_self_width(lv_obj_t * obj)
+lv_coord_t _lv_obj_get_self_width(struct _lv_obj_t * obj)
 {
     lv_point_t p = {0, LV_COORD_MIN};
     lv_signal_send((lv_obj_t * )obj, LV_SIGNAL_GET_SELF_SIZE, &p);
@@ -562,7 +557,7 @@ lv_coord_t _lv_obj_get_self_width(lv_obj_t * obj)
  * @param obj pointer to an objects
  * @return the width of the virtually drawn content
  */
-lv_coord_t _lv_obj_get_self_height(lv_obj_t * obj)
+lv_coord_t _lv_obj_get_self_height(struct _lv_obj_t * obj)
 {
     lv_point_t p = {LV_COORD_MIN, 0};
     lv_signal_send((lv_obj_t * )obj, LV_SIGNAL_GET_SELF_SIZE, &p);
@@ -574,7 +569,7 @@ lv_coord_t _lv_obj_get_self_height(lv_obj_t * obj)
  * @param obj pointer to an object
  * @return false: nothing happened; true: refresh happened
  */
-bool _lv_obj_handle_self_size_chg(lv_obj_t * obj)
+bool _lv_obj_handle_self_size_chg(struct _lv_obj_t * obj)
 {
     if(obj->w_set != LV_SIZE_AUTO && obj->h_set == LV_SIZE_AUTO) return false;
 
@@ -650,7 +645,7 @@ void _lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_par
         y += pad_top + parent->coords.y1 - lv_obj_get_scroll_top(parent);
     } else {
         /*If no parent then it's screen but screen can't be on a grid*/
-        if(_GRID_IS_CELL(obj->x_set) || _GRID_IS_CELL(obj->x_set)) {
+        if(LV_COORD_IS_GRID(obj->x_set) || LV_COORD_IS_GRID(obj->x_set)) {
             obj->x_set = 0;
             obj->y_set = 0;
             x = 0;
@@ -722,9 +717,29 @@ bool _lv_obj_is_grid_item(lv_obj_t * obj)
     lv_obj_t * cont = lv_obj_get_parent(obj);
     if(cont == NULL) return false;
     if(cont->grid == NULL) return false;
-    if(_GRID_IS_CELL(obj->x_set) && _GRID_IS_CELL(obj->y_set)) return true;
-    return false;
+    if(cont->grid->col_dsc == NULL) return false;
+    if(cont->grid->row_dsc == NULL) return false;
+    if(cont->grid->row_dsc_len == 0) return false;
+    if(cont->grid->col_dsc_len == 0) return false;
+    if(LV_COORD_IS_GRID(obj->x_set) == false || LV_COORD_IS_GRID(obj->y_set) == false) return false;
+    return true;
 }
+
+
+/**
+ * Check if an object is valid grid item or not.
+ * @param obj pointer to an object to check
+ * @return true: grid item; false: not grid item
+ */
+bool _lv_obj_is_flex_item(struct _lv_obj_t * obj)
+{
+    lv_obj_t * cont = lv_obj_get_parent(obj);
+    if(cont == NULL) return false;
+    if(cont->flex_dir == LV_FLEX_DIR_NONE) return false;
+    if(LV_COORD_IS_FLEX(obj->x_set) == false || LV_COORD_IS_FLEX(obj->y_set) == false) return false;
+    return true;
+}
+
 
 /**********************
  *   STATIC FUNCTIONS
@@ -752,6 +767,13 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     /*Save the original coordinates*/
     lv_area_t ori;
     lv_obj_get_coords(obj, &ori);
+
+    /* Grow size is managed by the flexbox in `LV_SIGNAL_CHILD_CHG`
+     * So the real current value now.
+     * w or h has `LV_FLEX_GROW(x)` value which is a very large special value
+     * so it should be avoided to use such a special value as width*/
+    if(_LV_FLEX_GET_GROW(obj->w_set)) w = lv_obj_get_width(obj);
+    if(_LV_FLEX_GET_GROW(obj->h_set)) h = lv_obj_get_height(obj);
 
     /* Set the length and height
      * Be sure the content is not scrolled in an invalid position on the new size*/

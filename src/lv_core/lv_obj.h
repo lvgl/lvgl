@@ -19,6 +19,7 @@ extern "C" {
 #include <stdbool.h>
 #include "lv_style.h"
 #include "lv_grid.h"
+#include "lv_flex.h"
 #include "../lv_misc/lv_types.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"
@@ -254,6 +255,8 @@ typedef struct _lv_obj_t {
 #endif
 
     const lv_grid_t * grid;
+
+    uint8_t flex_dir;
 
 } lv_obj_t;
 
