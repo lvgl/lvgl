@@ -34,9 +34,11 @@ Planned to September/October 2020
 - Remove the copy paramter from create functions
 
 ## Ideas
+- 9-patch support for `lv_imgbtn`.
 - lv_mem_alloc_aligned(size, align)
 - Text node. See [#1701](https://github.com/lvgl/lvgl/issues/1701#issuecomment-699479408)
-- RGB888 support [#1722](https://github.com/lvgl/lvgl/issues/1722)  
+- RGB888 support [#1722](https://github.com/lvgl/lvgl/issues/1722)
+- Consider ARGB4444, ARGB1555 format
 - CPP binding. See [Forum](https://forum.lvgl.io/t/is-it-possible-to-officially-support-optional-cpp-api/2736)
 - Optmize font decompression
 - Switch to RGBA colors in styles
