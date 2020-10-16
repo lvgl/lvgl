@@ -6,6 +6,10 @@ This list indicates only the current intention and can be changed.
 
 ## v8
 Planned to September/October 2020
+- Create an `lv_components` repository for compley widgets
+   - It makes the core LVGL leaner
+   - In `lv_components` we can have a lot and specific widgets
+   - Good place for contribution
 - New scrolling:
   - See [feat/new-scroll](https://github.com/lvgl/lvgl/tree/feat/new-scroll) branch and  [#1614](https://github.com/lvgl/lvgl/issues/1614)) issue.
   - Remove `lv_page` and support scrolling on `lv_obj`
@@ -23,7 +27,7 @@ Planned to September/October 2020
 - Simplified File system interface ([feat/new_fs_api](https://github.com/lvgl/lvgl/tree/feat/new-fs-api) branch) to make porting easier
   - Work in progress
 - Remove the align parameter from `lv_canvas_draw_text`
-- MAke the `copy` parameter of `create` functions deprecated
+- Make the `copy` parameter of `create` functions deprecated
 
 ## v8.1
 - Add radio button widget
