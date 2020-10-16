@@ -87,7 +87,7 @@ def define_set(fn, name, value):
     print("In " + fn + " set " + name + " to " + value)
     
     new_content = ""      
-    s = r'^ *# *define +' + str(name).rstrip()
+    s = r'^ *# *define +' + str(name).rstrip() + ' +'
     
     f = open(fn, "r")
     for i in f.read().splitlines():
