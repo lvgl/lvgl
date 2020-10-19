@@ -134,6 +134,7 @@ typedef struct _lv_indev_proc_t {
             lv_point_t vect; /**< Difference between `act_point` and `last_point`. */
             lv_point_t scroll_sum; /*Count the dragged pixels to check LV_INDEV_DEF_DRAG_LIMIT*/
             lv_point_t scroll_throw_vect;
+            lv_point_t scroll_throw_vect_ori;
             struct _lv_obj_t * act_obj;      /*The object being pressed*/
             struct _lv_obj_t * last_obj;     /*The last object which was pressed (used by drag_throw and
                                                 other post-release event)*/

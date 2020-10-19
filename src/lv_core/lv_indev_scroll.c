@@ -215,10 +215,10 @@ lv_coord_t _lv_scroll_throw_predict(lv_indev_t * indev, lv_dir_t dir)
     lv_coord_t v;
     switch(dir) {
     case LV_DIR_VER:
-        v = indev->proc.types.pointer.scroll_throw_vect.y;
+        v = indev->proc.types.pointer.scroll_throw_vect_ori.y;
         break;
     case LV_DIR_HOR:
-        v = indev->proc.types.pointer.scroll_throw_vect.x;
+        v = indev->proc.types.pointer.scroll_throw_vect_ori.x;
         break;
     default:
         return 0;

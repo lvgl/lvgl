@@ -136,7 +136,8 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
  */
 void lv_obj_scroll_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en)
 {
-
+    lv_obj_scroll_to_x(obj, x, anim_en);
+    lv_obj_scroll_to_y(obj, y, anim_en);
 }
 
 /**
@@ -256,6 +257,22 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
     self_w += obj->scroll.x;
 
     return LV_MATH_MAX(child_res, self_w);
+}
+
+/**
+ * Get the X and Y coordinates where the scrolling would end for this object if a scrolling animation is in progress.
+ * In no scrolling animation give the current `left` or `top` scroll position.
+ * @param obj pointer to an object
+ * @param end poinr to point to store the result
+ */
+void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end)
+{
+    lv_anim_t * a;
+    a = lv_anim_get(obj, (lv_anim_exec_xcb_t)scroll_anim_x_cb);
+    end->x = a ? -a->end : lv_obj_get_scroll_left(obj);
+
+    a = lv_anim_get(obj, (lv_anim_exec_xcb_t)scroll_anim_y_cb);
+    end->y = a ? -a->end : lv_obj_get_scroll_top(obj);
 }
 
 /**********************

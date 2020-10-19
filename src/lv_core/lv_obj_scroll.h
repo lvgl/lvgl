@@ -140,6 +140,13 @@ lv_coord_t lv_obj_get_scroll_left(const struct _lv_obj_t * obj);
  */
 lv_coord_t lv_obj_get_scroll_right(struct _lv_obj_t * obj);
 
+/**
+ * Get the X and Y coordinates where the scrolling would end for this object if a scrolling animation is in progress.
+ * In no scrolling animation give the current `left` or `top` scroll position.
+ * @param obj pointer to an object
+ * @param end poinr to point to store the result
+ */
+void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end);
 
 /**********************
  *      MACROS

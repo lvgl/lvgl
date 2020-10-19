@@ -158,8 +158,8 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     if(parent) {
         lv_coord_t cont_w = lv_obj_get_width_fit(parent);
         lv_coord_t cont_h = lv_obj_get_height_fit(parent);
-        if(pct_w) w = (LV_COORD_GET_PCT(obj->w_set) * cont_w) / 100;
-        if(pct_h) h = (LV_COORD_GET_PCT(obj->h_set) * cont_h) / 100;
+        if(pct_w) w = (_LV_COORD_GET_PCT(obj->w_set) * cont_w) / 100;
+        if(pct_h) h = (_LV_COORD_GET_PCT(obj->h_set) * cont_h) / 100;
     }
 
     refr_size(obj, w, h);

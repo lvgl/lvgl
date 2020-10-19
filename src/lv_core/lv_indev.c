@@ -910,6 +910,8 @@ static void indev_proc_press(lv_indev_proc_t * proc)
     proc->types.pointer.scroll_throw_vect.x += (proc->types.pointer.vect.x * 4) >> 3;
     proc->types.pointer.scroll_throw_vect.y += (proc->types.pointer.vect.y * 4) >> 3;
 
+    proc->types.pointer.scroll_throw_vect_ori = proc->types.pointer.scroll_throw_vect;
+
     if(indev_obj_act) {
         lv_signal_send(indev_obj_act, LV_SIGNAL_PRESSING, indev_act);
         if(indev_reset_check(proc)) return;

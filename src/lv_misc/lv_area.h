@@ -233,7 +233,7 @@ void _lv_area_align(const lv_area_t * base, const lv_area_t * to_align, lv_align
 /*Special coordinates*/
 #define LV_COORD_PCT(x)      _LV_COORD_SPEC((x))
 #define LV_COORD_IS_PCT(x)   ((LV_COORD_IS_SPEC(x) && LV_COORD_GET_SPEC(x) <= 1000) ? true : false)
-#define LV_COORD_GET_PCT(x)  LV_COORD_GET_SPEC(x)
+#define _LV_COORD_GET_PCT(x)  LV_COORD_GET_SPEC(x)
 #define LV_SIZE_AUTO        _LV_COORD_SPEC(1001)
 #define LV_SIZE_STRETCH     _LV_COORD_SPEC(1002)
 
