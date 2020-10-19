@@ -6,6 +6,10 @@ This list indicates only the current intention and can be changed.
 
 ## v8
 Planned to September/October 2020
+- Create an `lv_components` repository for compley widgets
+   - It makes the core LVGL leaner
+   - In `lv_components` we can have a lot and specific widgets
+   - Good place for contribution
 - New scrolling:
   - See [feat/new-scroll](https://github.com/lvgl/lvgl/tree/feat/new-scroll) branch and  [#1614](https://github.com/lvgl/lvgl/issues/1614)) issue.
   - Remove `lv_page` and support scrolling on `lv_obj`
@@ -18,10 +22,12 @@ Planned to September/October 2020
 - New layouts:
   - See [#1615](https://github.com/lvgl/lvgl/issues/1615) issue
   - [CSS Grid](https://css-tricks.com/snippets/css/a-guide-to-grid/)-like layout support
-  - Work in progress
+  - [CSS Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)-like layout support
+  - Remove `lv_cont` and support layouts on `lv_obj`
 - Simplified File system interface ([feat/new_fs_api](https://github.com/lvgl/lvgl/tree/feat/new-fs-api) branch) to make porting easier
   - Work in progress
 - Remove the align parameter from `lv_canvas_draw_text`
+- Make the `copy` parameter of `create` functions deprecated
 
 ## v8.1
 - Add radio button widget
@@ -32,6 +38,11 @@ Planned to September/October 2020
 - Benchmarking (gem5?). See [#1660](https://github.com/lvgl/lvgl/issues/1660)
 - Consider direct binary font format support
 - Remove the copy paramter from create functions
+- Style selectors and style-based states See [#1832](https://github.com/lvgl/lvgl/issues/1832)
+
+## v10
+- Remove property level states
+
 
 ## Ideas
 - 9-patch support for `lv_imgbtn`.
