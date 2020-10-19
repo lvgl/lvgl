@@ -208,7 +208,7 @@ typedef uint16_t lv_obj_flag_t;
 #include "lv_obj_draw.h"
 
 
-typedef struct _lv_obj_t {
+struct _lv_obj_t {
     struct _lv_obj_t * parent; /**< Pointer to the parent object*/
     lv_ll_t child_ll;       /**< Linked list to store the children objects*/
 
@@ -258,7 +258,7 @@ typedef struct _lv_obj_t {
 
     uint8_t flex_dir;
 
-} lv_obj_t;
+};
 
 enum {
     LV_OBJ_PART_MAIN,
