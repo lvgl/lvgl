@@ -478,7 +478,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 
 /*1: Use PXP for CPU off-load on NXP RTxxx platforms */
 #ifndef LV_USE_GPU_NXP_PXP
-#define LV_USE_GPU_NXP_PXP      0
+#  ifdef CONFIG_LV_USE_GPU_NXP_PXP
+#    define LV_USE_GPU_NXP_PXP CONFIG_LV_USE_GPU_NXP_PXP
+#  else
+#    define  LV_USE_GPU_NXP_PXP      0
+#  endif
 #endif
 
 /*1: Add default bare metal and FreeRTOS interrupt handling routines for PXP (lv_gpu_nxp_pxp_osa.c)
@@ -487,12 +491,20 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  *0: lv_gpu_nxp_pxp_init() has to be called manually before lv_init()
  * */
 #ifndef LV_USE_GPU_NXP_PXP_AUTO_INIT
-#define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
+#  ifdef CONFIG_LV_USE_GPU_NXP_PXP_AUTO_INIT
+#    define LV_USE_GPU_NXP_PXP_AUTO_INIT CONFIG_LV_USE_GPU_NXP_PXP_AUTO_INIT
+#  else
+#    define  LV_USE_GPU_NXP_PXP_AUTO_INIT 0
+#  endif
 #endif
 
 /*1: Use VG-Lite for CPU offload on NXP RTxxx platforms */
 #ifndef LV_USE_GPU_NXP_VG_LITE
-#define LV_USE_GPU_NXP_VG_LITE   0
+#  ifdef CONFIG_LV_USE_GPU_NXP_VG_LITE
+#    define LV_USE_GPU_NXP_VG_LITE CONFIG_LV_USE_GPU_NXP_VG_LITE
+#  else
+#    define  LV_USE_GPU_NXP_VG_LITE   0
+#  endif
 #endif
 
 /* 1: Enable file system (might be required for images */
@@ -621,7 +633,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 
 /* Required alignment size for buffers */
 #ifndef LV_ATTRIBUTE_MEM_ALIGN_SIZE
-#define LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#  ifdef CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#    define LV_ATTRIBUTE_MEM_ALIGN_SIZE CONFIG_LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#  else
+#    define  LV_ATTRIBUTE_MEM_ALIGN_SIZE
+#  endif
 #endif
 
 /* With size optimization (-Os) the compiler might not align data to
@@ -1874,7 +1890,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #    define  LV_TABLE_COL_MAX    12
 #  endif
 #endif
+#ifndef LV_TABLE_CELL_STYLE_CNT
+#  ifdef CONFIG_LV_TABLE_CELL_STYLE_CNT
+#    define LV_TABLE_CELL_STYLE_CNT CONFIG_LV_TABLE_CELL_STYLE_CNT
+#  else
+#    define  LV_TABLE_CELL_STYLE_CNT 4
+#  endif
 #endif
+#endif
+
 
 /*Tab (dependencies: lv_page, lv_btnm)*/
 #ifndef LV_USE_TABVIEW

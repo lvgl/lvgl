@@ -51,7 +51,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
     static void draw_value_str(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc);
 #endif
 static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * area_outer, const lv_area_t * clip,
-                                 lv_coord_t radius, bool radius_is_in, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
+                             lv_coord_t radius, bool radius_is_in, lv_color_t color, lv_opa_t opa, lv_blend_mode_t blend_mode);
 LV_ATTRIBUTE_FAST_MEM static inline lv_color_t grad_get(const lv_draw_rect_dsc_t * dsc, lv_coord_t s, lv_coord_t i);
 
 /**********************
@@ -410,7 +410,8 @@ LV_ATTRIBUTE_FAST_MEM static void draw_border(const lv_area_t * coords, const lv
     area_inner.y2 -= ((dsc->border_side & LV_BORDER_SIDE_BOTTOM) ? dsc->border_width : - (dsc->border_width + rout));
 
     if(dsc->border_side == LV_BORDER_SIDE_FULL) {
-        draw_full_border(&area_inner, coords, clip, dsc->radius, false, dsc->border_color, dsc->border_opa, dsc->border_blend_mode);
+        draw_full_border(&area_inner, coords, clip, dsc->radius, false, dsc->border_color, dsc->border_opa,
+                         dsc->border_blend_mode);
     }
     else {
         lv_opa_t opa = dsc->border_opa;
@@ -1347,7 +1348,8 @@ static void draw_full_border(const lv_area_t * area_inner, const lv_area_t * are
 
         /*Get the outer area*/
         rout = rin + border_width;
-    } else {
+    }
+    else {
         rout = radius;
         int32_t short_side = LV_MATH_MIN(coords_out_w, coords_out_h);
         if(rout > short_side >> 1) rout = short_side >> 1;

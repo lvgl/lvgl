@@ -571,7 +571,8 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
             if(lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL) {
                 align = LV_ALIGN_IN_TOP_RIGHT;
                 inv = -1;
-            } else {
+            }
+            else {
                 align = LV_ALIGN_IN_TOP_LEFT;
                 inv = 1;
             }
@@ -582,7 +583,7 @@ static void lv_cont_layout_pretty(lv_obj_t * cont)
                     switch(type) {
                         case LV_LAYOUT_PRETTY_TOP:
                             lv_obj_align(child_tmp, cont, align,
-                                        inv * (act_x + mleft),
+                                         inv * (act_x + mleft),
                                          act_y + lv_obj_get_style_margin_top(child_tmp, LV_OBJ_PART_MAIN));
                             break;
                         case LV_LAYOUT_PRETTY_MID:

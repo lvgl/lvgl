@@ -131,7 +131,7 @@ lv_res_t lv_gpu_nxp_vglite_fill(lv_color_t * dest_buf, lv_coord_t dest_width, lv
 
 
         err |= vg_lite_init_path(&path, VG_LITE_S16, VG_LITE_LOW, sizeof(path_data), path_data,
-                                   fill_area->x1, fill_area->y1, fill_area->x2 + 1, fill_area->y2 + 1);
+                                 fill_area->x1, fill_area->y1, fill_area->x2 + 1, fill_area->y2 + 1);
         if(err != VG_LITE_SUCCESS)  {
 #if LV_GPU_NXP_VG_LITE_LOG_ERRORS
             LV_LOG_ERROR("vg_lite_init_path() failed.");
@@ -194,9 +194,9 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
         return LV_RES_OK; /* Nothing to BLIT */
     }
 
-    if (!blit) {
-    	/* Wrong parameter */
-    	return LV_RES_INV;
+    if(!blit) {
+        /* Wrong parameter */
+        return LV_RES_INV;
     }
 
     /* Wrap src/dst buffer into VG-Lite buffer */
@@ -230,8 +230,8 @@ lv_res_t lv_gpu_nxp_vglite_blit(lv_gpu_nxp_vglite_blit_info_t * blit)
     uint32_t color;
     vg_lite_blend_t blend;
     if(blit->opa >= LV_OPA_MAX) {
-    	color = 0x0;
-    	blend = VG_LITE_BLEND_NONE;
+        color = 0x0;
+        blend = VG_LITE_BLEND_NONE;
     }
     else {
         color = ((blit->opa) << 24) | ((blit->opa) << 16) | ((blit->opa) << 8) | (blit->opa);
