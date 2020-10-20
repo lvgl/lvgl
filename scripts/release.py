@@ -54,7 +54,7 @@ import sys
 
 upstream_org_url = "https://github.com/lvgl/"
 workdir = "./release_tmp"
-proj_list = [ "lv_sim_eclipse_sdl"]
+proj_list = [ "lv_sim_eclipse_sdl", "lv_sim_emscripten"]
 
 ver_major = -1
 ver_minor = -1
