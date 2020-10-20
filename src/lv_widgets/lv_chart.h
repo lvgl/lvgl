@@ -63,7 +63,7 @@ typedef uint8_t lv_chart_axis_t;
 
 enum {
     LV_CHART_CURSOR_NONE = 0x00,
-	LV_CHART_CURSOR_RIGHT    = 0x01,
+    LV_CHART_CURSOR_RIGHT    = 0x01,
     LV_CHART_CURSOR_UP    = 0x02,
     LV_CHART_CURSOR_LEFT    = 0x04,
     LV_CHART_CURSOR_DOWN    = 0x08

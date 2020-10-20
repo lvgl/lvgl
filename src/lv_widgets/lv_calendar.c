@@ -651,9 +651,9 @@ static lv_coord_t get_header_height(lv_obj_t * calendar)
 {
     const lv_font_t * font = lv_obj_get_style_text_font(calendar, LV_CALENDAR_PART_HEADER);
     lv_style_int_t top = lv_obj_get_style_margin_top(calendar, LV_CALENDAR_PART_HEADER) +
-    		lv_obj_get_style_pad_top(calendar, LV_CALENDAR_PART_HEADER);
+                         lv_obj_get_style_pad_top(calendar, LV_CALENDAR_PART_HEADER);
     lv_style_int_t bottom = lv_obj_get_style_margin_bottom(calendar, LV_CALENDAR_PART_HEADER) +
-    		lv_obj_get_style_pad_bottom(calendar, LV_CALENDAR_PART_HEADER);
+                            lv_obj_get_style_pad_bottom(calendar, LV_CALENDAR_PART_HEADER);
 
     return lv_font_get_line_height(font) + top + bottom;
 }
@@ -690,7 +690,7 @@ static void draw_header(lv_obj_t * calendar, const lv_area_t * mask)
     header_area.x2 = calendar->coords.x2;
     header_area.y1 = calendar->coords.y1 + lv_obj_get_style_margin_top(calendar, LV_CALENDAR_PART_HEADER);
     header_area.y2 = header_area.y1 + lv_obj_get_style_pad_top(calendar, LV_CALENDAR_PART_HEADER) +
-    		lv_font_get_line_height(font) + lv_obj_get_style_pad_bottom(calendar, LV_CALENDAR_PART_HEADER);
+                     lv_font_get_line_height(font) + lv_obj_get_style_pad_bottom(calendar, LV_CALENDAR_PART_HEADER);
 
     lv_draw_rect_dsc_t header_rect_dsc;
     lv_draw_rect_dsc_init(&header_rect_dsc);
