@@ -5,6 +5,9 @@
 ### New features
 -  make DMA2D non blocking 
 
+## v7.7.1 (04.11.2020)
+### Bugfixes
+
 ## v7.7.0 (20.10.2020)
 
 ### New features
