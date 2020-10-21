@@ -9,7 +9,7 @@
 #include "lv_txt.h"
 #include "lv_math.h"
 #include "lv_log.h"
-
+#include "lv_debug.h"
 /*********************
  *      DEFINES
  *********************/
@@ -471,6 +471,50 @@ void _lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
     for(i = pos; i <= old_len - len; i++) {
         txt[i] = txt[i + len];
     }
+}
+
+/**
+ * return a new formatted text. Memory will be allocated to store the text.
+ * @param fmt `printf`-like format
+ * @return pointer to the allocated text string.
+ */
+char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
+{
+    /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12 */
+    uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
+    char * text = 0;
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    /*Put together the text according to the format string*/
+    char * raw_txt = _lv_mem_buf_get(len + 1);
+    LV_ASSERT_MEM(raw_txt);
+    if(raw_txt == NULL) {
+        return NULL;
+    }
+
+    lv_vsnprintf(raw_txt, len + 1, fmt, ap);
+
+    /*Get the size of the Arabic text and process it*/
+    size_t len_ap = _lv_txt_ap_calc_bytes_cnt(raw_txt);
+    text = lv_mem_alloc(len_ap + 1);
+    LV_ASSERT_MEM(text);
+    if(text == NULL) {
+        return NULL;
+    }
+    _lv_txt_ap_proc(raw_txt, text);
+
+    _lv_mem_buf_release(raw_txt);
+#else
+    text = lv_mem_alloc(len + 1);
+    LV_ASSERT_MEM(text);
+    if(text == NULL) {
+        return NULL;
+    }
+    text[len - 1] = 0; /* Ensure NULL termination */
+
+    lv_vsnprintf(text, len + 1, fmt, ap);
+#endif
+
+    return text;
 }
 
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8
