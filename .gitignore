@@ -1,3 +1,4 @@
+scripts/release/__pycache__
 **/*.o
 **/*bin
 **/*.swp
