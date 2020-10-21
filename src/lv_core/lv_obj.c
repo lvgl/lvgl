@@ -3526,8 +3526,8 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
     draw_dsc->font = lv_obj_get_style_text_font(obj, part);
 
     if(draw_dsc->sel_start != LV_DRAW_LABEL_NO_TXT_SEL && draw_dsc->sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
-       draw_dsc->sel_color = lv_obj_get_style_text_sel_color(obj, part);
-       draw_dsc->sel_bg_color = lv_obj_get_style_text_sel_bg_color(obj, part);
+        draw_dsc->sel_color = lv_obj_get_style_text_sel_color(obj, part);
+        draw_dsc->sel_bg_color = lv_obj_get_style_text_sel_bg_color(obj, part);
     }
 
 #if LV_USE_BIDI
@@ -4091,7 +4091,7 @@ static void report_style_mod_core(void * style, lv_obj_t * obj)
         for(ci = 0; ci < list->style_cnt; ci++) {
             /* changed class to _class to allow compilation as c++ */
             lv_style_t * _class = lv_style_list_get_style(list, ci);
-            if(_class == style || style == NULL) { 
+            if(_class == style || style == NULL) {
                 lv_obj_refresh_style(obj, part, LV_STYLE_PROP_ALL);
                 break;
             }

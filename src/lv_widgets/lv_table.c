@@ -180,10 +180,10 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
     _lv_txt_ap_proc(txt, &ext->cell_data[cell][1]);
 #else
     ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
-	LV_ASSERT_MEM(ext->cell_data[cell]);
-	if(ext->cell_data[cell] == NULL) return;
+    LV_ASSERT_MEM(ext->cell_data[cell]);
+    if(ext->cell_data[cell] == NULL) return;
 
-	strcpy(ext->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
+    strcpy(ext->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
 #endif
 
     ext->cell_data[cell][0] = format.format_byte;
@@ -238,12 +238,12 @@ void lv_table_set_cell_value_fmt(lv_obj_t * table, uint16_t row, uint16_t col, c
     }
 
     va_list ap, ap2;
-	va_start(ap, fmt);
-	va_copy(ap2, ap);
+    va_start(ap, fmt);
+    va_copy(ap2, ap);
 
-	/*Allocate space for the new text by using trick from C99 standard section 7.19.6.12 */
-	uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
-	va_end(ap);
+    /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12 */
+    uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
+    va_end(ap);
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Put together the text according to the format string*/
@@ -878,7 +878,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                 if(rtl) {
                     cell_area.x2 = cell_area.x1 - 1;
                     cell_area.x1 = cell_area.x2 - ext->col_w[col] + 1;
-                } else {
+                }
+                else {
                     cell_area.x1 = cell_area.x2 + 1;
                     cell_area.x2 = cell_area.x1 + ext->col_w[col] - 1;
                 }
@@ -1066,10 +1067,11 @@ static lv_style_list_t * lv_table_get_style(lv_obj_t * table, uint8_t part)
 
     /* Because of the presence of LV_TABLE_PART_BG, LV_TABLE_PART_CELL<i> has an integer value
        of <i>. This comes in useful to extend above code with more cell types as follows */
-    if ( part == LV_TABLE_PART_BG ) {
-      return &table->style_list;
-    } else if (part >= 1 && part <= LV_TABLE_CELL_STYLE_CNT ) {
-      return &ext->cell_style[part-1];
+    if(part == LV_TABLE_PART_BG) {
+        return &table->style_list;
+    }
+    else if(part >= 1 && part <= LV_TABLE_CELL_STYLE_CNT) {
+        return &ext->cell_style[part - 1];
     }
 
     return NULL;
