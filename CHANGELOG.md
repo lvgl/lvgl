@@ -1,14 +1,44 @@
 # Changelog
 
-## v7.7.0 (06.10.2020)
+## v7.8.0 (20.10.2020)
+
+### New features
+-  make DMA2D non blocking 
+
+## v7.7.1 (04.11.2020)
+### Bugfixes
+
+## v7.7.0 (20.10.2020)
 
 ### New features
 - Add PXP GPU support (for NXP MCUs)
+- Add VG-Lite GPU support (for NXP MCUs)
 - Allow max. 16 cell types for table
 - Add `lv_table_set_text_fmt()`
-
+- Use margin on calendar header to set distances and padding to the size of the header
+- Add `text_sel_bg` style proeprty
 
 ### Bugfixes
+- Theme update to support text selection background
+- Fix imgbtn state change
+- Support RTL in table (draw columns right to left)
+- Support RTL in pretty layout (draw columns right to left)
+- Skip objects in groups if they are in disabled state
+- Fix dropdown selection with RTL basedirection
+- Fix rectangle border drawing with large width
+- Fix `lv_win_clean()`
+
+## v7.6.1 (06.10.2020)
+
+### Bugfixes
+- Fix BIDI support in dropdown list
+- Fix copying base dir in `lv_obj_create`
+- Handle sub pixel rendering in font loader
+- Fix transitions with style caching
+- Fix click focus
+- Fix imgbtn image switching with empty style
+- Material theme: do not set the text font to allow easy global font change
+
 
 ## v7.6.0 (22.09.2020)
 
@@ -18,8 +48,6 @@
 ### Bugfixes
 - Fix selection of options with non-ASCII letters in dropdown list 
 - Fix font loader to support LV_FONT_FMT_TXT_LARGE
-- Fix BIDI support in dropdown list
-- Fix copying base dir in lv_obj_craete
 
 ## v7.5.0 (15.09.2020)
 

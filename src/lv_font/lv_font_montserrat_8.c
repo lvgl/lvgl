@@ -3,14 +3,14 @@
 /*******************************************************************************
  * Size: 8 px
  * Bpp: 4
- * Opts: --bpp 4 --size 8 --font ../Montserrat-Medium.ttf -r 0x20-0x7F,0xB0,0x2022 --font ../FontAwesome5-Solid+Brands+Regular.woff -r 61441,61448,61451,61452,61452,61453,61457,61459,61461,61465,61468,61473,61478,61479,61480,61502,61512,61515,61516,61517,61521,61522,61523,61524,61543,61544,61550,61552,61553,61556,61559,61560,61561,61563,61587,61589,61636,61637,61639,61671,61674,61683,61724,61732,61787,61931,62016,62017,62018,62019,62020,62087,62099,62212,62189,62810,63426,63650 --no-compress --no-prefilter --force-fast-kern-format --format lvgl -o ..\generated_fonts/font_2.c
+ * Opts: --no-compress --no-prefilter --bpp 4 --size 8 --font Montserrat-Medium.ttf -r 0x20-0x7F,0xB0,0x2022 --font FontAwesome5-Solid+Brands+Regular.woff -r 61441,61448,61451,61452,61452,61453,61457,61459,61461,61465,61468,61473,61478,61479,61480,61502,61512,61515,61516,61517,61521,61522,61523,61524,61543,61544,61550,61552,61553,61556,61559,61560,61561,61563,61587,61589,61636,61637,61639,61671,61674,61683,61724,61732,61787,61931,62016,62017,62018,62019,62020,62087,62099,62212,62189,62810,63426,63650 --format lvgl -o lv_font_montserrat_8.c --force-fast-kern-format
  ******************************************************************************/
 
-#ifndef FONT_2
-#define FONT_2 1
+#ifndef LV_FONT_MONTSERRAT_8
+    #define LV_FONT_MONTSERRAT_8 1
 #endif
 
-#if FONT_2
+#if LV_FONT_MONTSERRAT_8
 
 /*-----------------
  *    BITMAPS
@@ -918,8 +918,7 @@ static const uint16_t unicode_list_1[] = {
 };
 
 /*Collect the unicode lists and glyph_id offsets*/
-static const lv_font_fmt_txt_cmap_t cmaps[] =
-{
+static const lv_font_fmt_txt_cmap_t cmaps[] = {
     {
         .range_start = 32, .range_length = 95, .glyph_id_start = 1,
         .unicode_list = NULL, .glyph_id_ofs_list = NULL, .list_length = 0, .type = LV_FONT_FMT_TXT_CMAP_FORMAT0_TINY
@@ -936,8 +935,7 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
 
 
 /*Map glyph_ids to kern left classes*/
-static const uint8_t kern_left_class_mapping[] =
-{
+static const uint8_t kern_left_class_mapping[] = {
     0, 0, 1, 2, 0, 3, 4, 5,
     2, 6, 7, 8, 9, 10, 9, 10,
     11, 12, 0, 13, 14, 15, 16, 17,
@@ -961,8 +959,7 @@ static const uint8_t kern_left_class_mapping[] =
 };
 
 /*Map glyph_ids to kern right classes*/
-static const uint8_t kern_right_class_mapping[] =
-{
+static const uint8_t kern_right_class_mapping[] = {
     0, 0, 1, 2, 0, 3, 4, 5,
     2, 6, 7, 8, 9, 10, 9, 10,
     11, 12, 13, 14, 15, 16, 17, 12,
@@ -986,8 +983,7 @@ static const uint8_t kern_right_class_mapping[] =
 };
 
 /*Kern values between classes*/
-static const int8_t kern_class_values[] =
-{
+static const int8_t kern_class_values[] = {
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 1, 0, 0, 0,
     0, 1, 0, 0, 0, 0, 0, 0,
@@ -1366,8 +1362,7 @@ static const int8_t kern_class_values[] =
 
 
 /*Collect the kern class' data in one place*/
-static const lv_font_fmt_txt_kern_classes_t kern_classes =
-{
+static const lv_font_fmt_txt_kern_classes_t kern_classes = {
     .class_pair_values   = kern_class_values,
     .left_class_mapping  = kern_left_class_mapping,
     .right_class_mapping = kern_right_class_mapping,
@@ -1398,7 +1393,7 @@ static lv_font_fmt_txt_dsc_t font_dsc = {
  *----------------*/
 
 /*Initialize a public general font descriptor*/
-lv_font_t font_2 = {
+lv_font_t lv_font_montserrat_8 = {
     .get_glyph_dsc = lv_font_get_glyph_dsc_fmt_txt,    /*Function pointer to get glyph's data*/
     .get_glyph_bitmap = lv_font_get_bitmap_fmt_txt,    /*Function pointer to get glyph's bitmap*/
     .line_height = 10,          /*The maximum line height required by the font*/
@@ -1406,8 +1401,14 @@ lv_font_t font_2 = {
 #if !(LVGL_VERSION_MAJOR == 6 && LVGL_VERSION_MINOR == 0)
     .subpx = LV_FONT_SUBPX_NONE,
 #endif
+#if LV_VERSION_CHECK(7, 4, 0)
+    .underline_position = -1,
+    .underline_thickness = 0,
+#endif
     .dsc = &font_dsc           /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
 };
 
-#endif /*#if FONT_2*/
+
+
+#endif /*#if LV_FONT_MONTSERRAT_8*/
 

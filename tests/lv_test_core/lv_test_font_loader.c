@@ -7,12 +7,12 @@
  *      INCLUDES
  *********************/
 
-#include "lvgl/lvgl.h"
+#include "../../lvgl.h"
 #if LV_BUILD_TEST
 #include "../lv_test_assert.h"
-#include "lvgl/src/lv_font/lv_font_fmt_txt.h"
-#include "lvgl/src/lv_font/lv_font.h"
-#include "lvgl/src/lv_font/lv_font_loader.h"
+#include "../src/lv_font/lv_font_fmt_txt.h"
+#include "../src/lv_font/lv_font.h"
+#include "../src/lv_font/lv_font_loader.h"
 
 #include "lv_test_font_loader.h" 
 

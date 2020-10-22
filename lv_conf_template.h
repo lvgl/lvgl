@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v7.7.0-dev
+ * Configuration file for v7.7.1-dev
  */
 
 /*
@@ -205,6 +205,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  * */
 #define LV_USE_GPU_NXP_PXP_AUTO_INIT 0
 
+/*1: Use VG-Lite for CPU offload on NXP RTxxx platforms */
+#define LV_USE_GPU_NXP_VG_LITE   0
 
 /* 1: Enable file system (might be required for images */
 #define LV_USE_FILESYSTEM       1
@@ -260,9 +262,14 @@ typedef void * lv_img_decoder_user_data_t;
 /* Define a custom attribute to `lv_disp_flush_ready` function */
 #define LV_ATTRIBUTE_FLUSH_READY
 
+/* Required alignment size for buffers */
+#define LV_ATTRIBUTE_MEM_ALIGN_SIZE
+
 /* With size optimization (-Os) the compiler might not align data to
- * 4 or 8 byte boundary. This alignment will be explicitly applied where needed.
- * E.g. __attribute__((aligned(4))) */
+ * 4 or 8 byte boundary. Some HW may need even 32 or 64 bytes.
+ * This alignment will be explicitly applied where needed.
+ * LV_ATTRIBUTE_MEM_ALIGN_SIZE should be used to specify required align size.
+ * E.g. __attribute__((aligned(LV_ATTRIBUTE_MEM_ALIGN_SIZE))) */
 #define LV_ATTRIBUTE_MEM_ALIGN
 
 /* Attribute to mark large constant arrays for example

@@ -716,21 +716,20 @@ void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             break;
 #endif
 #if LV_USE_TABLE
-        case LV_THEME_TABLE:
-        {
-            list = _lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
-            _lv_style_list_add_style(list, &styles->bg);
+        case LV_THEME_TABLE: {
+                list = _lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
+                _lv_style_list_add_style(list, &styles->bg);
 
-            int idx = 1; /* start value should be 1, not zero, since cell styles
+                int idx = 1; /* start value should be 1, not zero, since cell styles
                             start at 1 due to presence of LV_TABLE_PART_BG=0
                             in the enum (lv_table.h) */
-                         /* declaring idx outside loop to work with older compilers */
-            for (; idx <= LV_TABLE_CELL_STYLE_CNT; idx ++ ) {
-              list = _lv_obj_get_style_list(obj, idx);
-              _lv_style_list_add_style(list, &styles->bg);
+                /* declaring idx outside loop to work with older compilers */
+                for(; idx <= LV_TABLE_CELL_STYLE_CNT; idx ++) {
+                    list = _lv_obj_get_style_list(obj, idx);
+                    _lv_style_list_add_style(list, &styles->bg);
+                }
+                break;
             }
-            break;
-         }
 #endif
 
 #if LV_USE_WIN

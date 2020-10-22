@@ -32,12 +32,12 @@ extern "C" {
 #define LV_TABLE_COL_MAX 12
 #endif
 
-/* 
-   Maximum allowable value of LV_TABLE_CELL_STYLE_CNT is 16 
+/*
+   Maximum allowable value of LV_TABLE_CELL_STYLE_CNT is 16
    because of restriction of lv_table_cell_format_t.type to no more than
    4 bits so that lv_table_cell_format_t.s will not exceed 8 bits
 */
-#ifndef LV_TABLE_CELL_STYLE_CNT 
+#ifndef LV_TABLE_CELL_STYLE_CNT
 #  define LV_TABLE_CELL_STYLE_CNT 4
 #endif
 #if (LV_TABLE_CELL_STYLE_CNT > 16)

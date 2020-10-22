@@ -183,10 +183,10 @@ void lv_table_set_cell_value(lv_obj_t * table, uint16_t row, uint16_t col, const
     _lv_txt_ap_proc(txt, &ext->cell_data[cell][1]);
 #else
     ext->cell_data[cell] = lv_mem_realloc(ext->cell_data[cell], strlen(txt) + 2); /*+1: trailing '\0; +1: format byte*/
-	LV_ASSERT_MEM(ext->cell_data[cell]);
-	if(ext->cell_data[cell] == NULL) return;
+    LV_ASSERT_MEM(ext->cell_data[cell]);
+    if(ext->cell_data[cell] == NULL) return;
 
-	strcpy(ext->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
+    strcpy(ext->cell_data[cell] + 1, txt);  /*+1 to skip the format byte*/
 #endif
 
     ext->cell_data[cell][0] = format.format_byte;
@@ -241,12 +241,12 @@ void lv_table_set_cell_value_fmt(lv_obj_t * table, uint16_t row, uint16_t col, c
     }
 
     va_list ap, ap2;
-	va_start(ap, fmt);
-	va_copy(ap2, ap);
+    va_start(ap, fmt);
+    va_copy(ap2, ap);
 
-	/*Allocate space for the new text by using trick from C99 standard section 7.19.6.12 */
-	uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
-	va_end(ap);
+    /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12 */
+    uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
+    va_end(ap);
 
 #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Put together the text according to the format string*/
@@ -819,6 +819,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
         cell_area.y2 = table->coords.y1 + bg_top - 1 - lv_obj_get_scroll_top(table);
         lv_coord_t scroll_left = lv_obj_get_scroll_left(table);
+        bool rtl = lv_obj_get_base_dir(table) == LV_BIDI_DIR_RTL ? true : false;
+
         for(row = 0; row < ext->row_cnt; row++) {
             lv_coord_t h_row = ext->row_h[row];
 
@@ -827,7 +829,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
             if(cell_area.y1 > clip_area->y2) return LV_DESIGN_RES_OK;
 
-            cell_area.x2 = table->coords.x1 + bg_left - 1 - scroll_left;
+            if(rtl) cell_area.x1 = table->coords.x2 - bg_right - 1 - scroll_left;
+            else cell_area.x2 = table->coords.x1 + bg_left - 1 - scroll_left;
 
             for(col = 0; col < ext->col_cnt; col++) {
 
@@ -842,15 +845,22 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
                     format.s.crop        = 1;
                 }
 
-                cell_area.x1 = cell_area.x2 + 1;
-                cell_area.x2 = cell_area.x1 + ext->col_w[col] - 1;
+                if(rtl) {
+                    cell_area.x2 = cell_area.x1 - 1;
+                    cell_area.x1 = cell_area.x2 - ext->col_w[col] + 1;
+                }
+                else {
+                    cell_area.x1 = cell_area.x2 + 1;
+                    cell_area.x2 = cell_area.x1 + ext->col_w[col] - 1;
+                }
 
                 uint16_t col_merge = 0;
                 for(col_merge = 0; col_merge + col < ext->col_cnt - 1; col_merge++) {
                     if(ext->cell_data[cell + col_merge] != NULL) {
                         format.format_byte = ext->cell_data[cell + col_merge][0];
                         if(format.s.right_merge)
-                            cell_area.x2 += ext->col_w[col + col_merge + 1];
+                            if(rtl) cell_area.x1 -= ext->col_w[col + col_merge + 1];
+                            else cell_area.x2 += ext->col_w[col + col_merge + 1];
                         else
                             break;
                     }
@@ -1042,10 +1052,11 @@ static lv_style_list_t * lv_table_get_style(lv_obj_t * table, uint8_t part)
 
     /* Because of the presence of LV_TABLE_PART_BG, LV_TABLE_PART_CELL<i> has an integer value
        of <i>. This comes in useful to extend above code with more cell types as follows */
-    if ( part == LV_TABLE_PART_BG ) {
-      return &table->style_list;
-    } else if (part >= 1 && part <= LV_TABLE_CELL_STYLE_CNT ) {
-      return &ext->cell_style[part-1];
+    if(part == LV_TABLE_PART_BG) {
+        return &table->style_list;
+    }
+    else if(part >= 1 && part <= LV_TABLE_CELL_STYLE_CNT) {
+        return &ext->cell_style[part - 1];
     }
 
     return NULL;
