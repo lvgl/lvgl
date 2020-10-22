@@ -25,7 +25,11 @@
 #  endif
 #endif
 
+
 /* clang-format off */
+
+/*Handle special Kconfig options*/
+#include "lv_conf_kconfig.h"
 
 #include <stdint.h>
 
