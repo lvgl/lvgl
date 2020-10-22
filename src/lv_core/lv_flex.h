@@ -32,12 +32,12 @@ extern "C" {
  **********************/
 
 typedef enum {
-    LV_FLEX_START = _LV_COORD_FELX(0),
-    LV_FLEX_END = _LV_COORD_FELX(1),
-    LV_FLEX_CENTER = _LV_COORD_FELX(2),
-    LV_FLEX_SPACE_EVENLY = _LV_COORD_FELX(3),
-    LV_FLEX_SPACE_AROUND = _LV_COORD_FELX(4),
-    LV_FLEX_SPACE_BETWEEN = _LV_COORD_FELX(5),
+    LV_FLEX_START,
+    LV_FLEX_END,
+    LV_FLEX_CENTER,
+    LV_FLEX_SPACE_EVENLY,
+    LV_FLEX_SPACE_AROUND,
+    LV_FLEX_SPACE_BETWEEN,
 }lv_flex_place_t;
 
 typedef enum {
@@ -50,7 +50,7 @@ typedef enum {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_obj_set_flex_cont(lv_obj_t * obj, lv_flex_dir_t flex_dir);
+void lv_obj_set_flex_cont(lv_obj_t * obj, lv_flex_dir_t flex_dir, lv_flex_place_t flex_place);
 void lv_obj_set_flex_item(lv_obj_t * obj, lv_flex_place_t place);
 void _lv_flex_refresh(lv_obj_t * cont);
 

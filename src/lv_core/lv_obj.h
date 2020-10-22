@@ -256,7 +256,9 @@ struct _lv_obj_t {
 
     const lv_grid_t * grid;
 
-    uint8_t flex_dir;
+    uint8_t flex_dir   : 4;
+    uint8_t flex_place : 4;
+
 
 };
 

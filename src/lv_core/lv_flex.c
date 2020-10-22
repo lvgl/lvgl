@@ -36,17 +36,19 @@ static void place_content(lv_coord_t place, lv_coord_t max_size, lv_coord_t trac
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_obj_set_flex_cont(lv_obj_t * obj, lv_flex_dir_t flex_dir)
+void lv_obj_set_flex_cont(lv_obj_t * obj, lv_flex_dir_t flex_dir, lv_flex_place_t flex_place)
 {
     if(obj->flex_dir == flex_dir) return;
 
     obj->flex_dir = flex_dir;
+    obj->flex_place = flex_place;
     _lv_flex_refresh(obj);
 }
 
 void lv_obj_set_flex_item(lv_obj_t * obj, lv_flex_place_t place)
 {
-    lv_obj_set_pos(obj, place, place);
+    lv_coord_t f  = _LV_COORD_FELX(place);
+    lv_obj_set_pos(obj, f, f);
 }
 
 void _lv_flex_refresh(lv_obj_t * cont)
@@ -62,7 +64,7 @@ void _lv_flex_refresh(lv_obj_t * cont)
 
     lv_coord_t * cross_pos = (main_dir == LV_DIR_HOR ? &abs_y : &abs_x);
 
-    lv_coord_t row_place = LV_FLEX_START;
+    lv_coord_t place = cont->flex_place;
     lv_coord_t all_track_size = 0;
     lv_coord_t gap = 0;
     uint32_t row_cnt = 0;
@@ -72,7 +74,7 @@ void _lv_flex_refresh(lv_obj_t * cont)
     lv_obj_t * next_track_first_item;
     bool rev = cont->flex_dir & LV_FLEX_REVERSE;
 
-    if(row_place != LV_FLEX_START) {
+    if(place != LV_FLEX_START) {
         track_first_item =  rev ? _lv_ll_get_head(&cont->child_ll) : _lv_ll_get_tail(&cont->child_ll);
 
         while(track_first_item) {
@@ -84,7 +86,7 @@ void _lv_flex_refresh(lv_obj_t * cont)
         }
 
         lv_coord_t max_cross_size = (main_dir == LV_DIR_HOR ? lv_obj_get_height_fit(cont) : lv_obj_get_width_fit(cont));
-        place_content(row_place, max_cross_size, all_track_size,row_cnt, cross_pos, &gap);
+        place_content(place, max_cross_size, all_track_size,row_cnt, cross_pos, &gap);
     }
 
     track_first_item =  rev ? _lv_ll_get_head(&cont->child_ll) : _lv_ll_get_tail(&cont->child_ll);
