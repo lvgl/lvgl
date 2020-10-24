@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-Generates a checker file for lv_conf.h from lv_conf_templ.h define all the not defined values
+Generates a checker file for lv_conf.h from lv_conf_template.h define all the not defined values
 '''
 
 
