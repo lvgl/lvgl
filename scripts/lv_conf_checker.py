@@ -27,13 +27,16 @@ fout.write(
 #define LV_CONF_INTERNAL_H
 /* clang-format off */
 
-/*Handle special Kconfig options*/
-#include "lv_conf_kconfig.h"
-
 #include <stdint.h>
 
+#if defined (ESP_PLATFORM)
+#include "sdkconfig.h"
+#include "esp_attr.h"
+#include "lv_conf_kconfig.h"
+#endif
+
 /*If lv_conf.h is not skipped include it*/
-#if !defined(LV_CONF_SKIP) && !defined(CONFIG_LV_CONF_SKIP)
+#if !defined(LV_CONF_SKIP)
 #  if defined(LV_CONF_PATH)											/*If there is a path defined for lv_conf.h use it*/
 #    define __LV_TO_STR_AUX(x) #x
 #    define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
@@ -97,7 +100,7 @@ fout.write(
 '''
 
 /*If running without lv_conf.h add typdesf with default value*/
-#if defined(LV_CONF_SKIP) || defined(CONFIG_LV_CONF_SKIP)
+#if defined(LV_CONF_SKIP)
 
   /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
   typedef int16_t lv_coord_t;
