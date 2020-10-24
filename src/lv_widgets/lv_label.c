@@ -42,7 +42,6 @@
  **********************/
 static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param);
 static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_area, lv_design_mode_t mode);
-static void lv_label_refr_text(lv_obj_t * label);
 static void lv_label_revert_dots(lv_obj_t * label);
 
 #if LV_USE_ANIMATION
@@ -267,54 +266,14 @@ void lv_label_set_text_fmt(lv_obj_t * label, const char * fmt, ...)
     }
 
     if(ext->text != NULL && ext->static_txt == 0) {
-        lv_mem_free(ext->text);
-        ext->text = NULL;
+    	lv_mem_free(ext->text);
+    	ext->text = NULL;
     }
 
-
-    va_list ap, ap2;
-    va_start(ap, fmt);
-    va_copy(ap2, ap);
-
-    /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12 */
-    uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
-    va_end(ap);
-
-#if LV_USE_ARABIC_PERSIAN_CHARS
-    /*Put together the text according to the format string*/
-    char * raw_txt = _lv_mem_buf_get(len + 1);
-    LV_ASSERT_MEM(raw_txt);
-    if(raw_txt == NULL) {
-        va_end(ap2);
-        return;
-    }
-
-    lv_vsnprintf(raw_txt, len + 1, fmt, ap2);
-
-    /*Get the size of the Arabic text and process it*/
-    size_t len_ap = _lv_txt_ap_calc_bytes_cnt(raw_txt);
-    ext->text = lv_mem_alloc(len_ap + 1);
-    LV_ASSERT_MEM(ext->text);
-    if(ext->text == NULL) {
-        va_end(ap2);
-        return;
-    }
-    _lv_txt_ap_proc(raw_txt, ext->text);
-
-    _lv_mem_buf_release(raw_txt);
-#else
-    ext->text = lv_mem_alloc(len + 1);
-    LV_ASSERT_MEM(ext->text);
-    if(ext->text == NULL) {
-        va_end(ap2);
-        return;
-    }
-    ext->text[len - 1] = 0; /* Ensure NULL termination */
-
-    lv_vsnprintf(ext->text, len + 1, fmt, ap2);
-#endif
-
-    va_end(ap2);
+    va_list args;
+    va_start (args, fmt);
+    ext->text = _lv_txt_set_text_vfmt(fmt, args);
+    va_end(args);
     ext->static_txt = 0; /*Now the text is dynamically allocated*/
 
     lv_label_refr_text(label);
@@ -1032,185 +991,11 @@ void lv_label_cut_text(lv_obj_t * label, uint32_t pos, uint32_t cnt)
     lv_label_refr_text(label);
 }
 
-/**********************
- *   STATIC FUNCTIONS
- **********************/
-
-/**
- * Handle the drawing related tasks of the labels
- * @param label pointer to a label object
- * @param clip_area the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @param return an element of `lv_design_res_t`
- */
-static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_area, lv_design_mode_t mode)
-{
-    /* A label never covers an area */
-    if(mode == LV_DESIGN_COVER_CHK)
-        return LV_DESIGN_RES_NOT_COVER;
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
-        lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-
-        lv_coord_t w = lv_obj_get_style_transform_width(label, LV_LABEL_PART_MAIN);
-        lv_coord_t h = lv_obj_get_style_transform_height(label, LV_LABEL_PART_MAIN);
-        lv_area_t bg_coords;
-        lv_area_copy(&bg_coords, &label->coords);
-        bg_coords.x1 -= w;
-        bg_coords.x2 += w;
-        bg_coords.y1 -= h;
-        bg_coords.y2 += h;
-
-        lv_draw_rect_dsc_t draw_rect_dsc;
-        lv_draw_rect_dsc_init(&draw_rect_dsc);
-        lv_obj_init_draw_rect_dsc(label, LV_LABEL_PART_MAIN, &draw_rect_dsc);
-
-        lv_draw_rect(&bg_coords, clip_area, &draw_rect_dsc);
-
-        lv_area_t txt_coords;
-        get_txt_coords(label, &txt_coords);
-
-        lv_area_t txt_clip;
-        bool is_common = _lv_area_intersect(&txt_clip, clip_area, &txt_coords);
-        if(!is_common) return LV_DESIGN_RES_OK;
-
-        lv_label_align_t align = lv_label_get_align(label);
-
-        lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
-        if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
-        if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
-        if(ext->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TXT_FLAG_FIT;
-        if(align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
-        if(align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
-
-        lv_draw_label_dsc_t label_draw_dsc;
-        lv_draw_label_dsc_init(&label_draw_dsc);
-
-        label_draw_dsc.sel_start = lv_label_get_text_sel_start(label);
-        label_draw_dsc.sel_end = lv_label_get_text_sel_end(label);
-        label_draw_dsc.ofs_x = ext->offset.x;
-        label_draw_dsc.ofs_y = ext->offset.y;
-        label_draw_dsc.flag = flag;
-        lv_obj_init_draw_label_dsc(label, LV_LABEL_PART_MAIN, &label_draw_dsc);
-
-        /* In SCROLL and SCROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
-         * (In addition they will result misalignment is this case)*/
-        if((ext->long_mode == LV_LABEL_LONG_SROLL || ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) &&
-           (ext->align == LV_LABEL_ALIGN_CENTER || ext->align == LV_LABEL_ALIGN_RIGHT)) {
-            lv_point_t size;
-            _lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
-                             LV_COORD_MAX, flag);
-            if(size.x > lv_area_get_width(&txt_coords)) {
-                label_draw_dsc.flag &= ~LV_TXT_FLAG_RIGHT;
-                label_draw_dsc.flag &= ~LV_TXT_FLAG_CENTER;
-            }
-        }
-#if LV_LABEL_LONG_TXT_HINT
-        lv_draw_label_hint_t * hint = &ext->hint;
-        if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC || lv_area_get_height(&txt_coords) < LV_LABEL_HINT_HEIGHT_LIMIT)
-            hint = NULL;
-
-#else
-        /*Just for compatibility*/
-        lv_draw_label_hint_t * hint = NULL;
-#endif
-
-        lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, ext->text, hint);
-
-        if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
-            lv_point_t size;
-            _lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
-                             LV_COORD_MAX, flag);
-
-            /*Draw the text again next to the original to make an circular effect */
-            if(size.x > lv_area_get_width(&txt_coords)) {
-                label_draw_dsc.ofs_x = ext->offset.x + size.x +
-                                       lv_font_get_glyph_width(label_draw_dsc.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
-                label_draw_dsc.ofs_y = ext->offset.y;
-
-                lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, ext->text, hint);
-            }
-
-            /*Draw the text again below the original to make an circular effect */
-            if(size.y > lv_area_get_height(&txt_coords)) {
-                label_draw_dsc.ofs_x = ext->offset.x;
-                label_draw_dsc.ofs_y = ext->offset.y + size.y + lv_font_get_line_height(label_draw_dsc.font);
-
-                lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, ext->text, hint);
-            }
-        }
-    }
-
-    return LV_DESIGN_RES_OK;
-}
-
-/**
- * Signal function of the label
- * @param label pointer to a label object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
-static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param)
-{
-    lv_res_t res;
-
-    if(sign == LV_SIGNAL_GET_STYLE) {
-        lv_get_style_info_t * info = param;
-        info->result = lv_label_get_style(label, info->part);
-        if(info->result != NULL) return LV_RES_OK;
-        else return ancestor_signal(label, sign, param);
-    }
-
-    /* Include the ancient signal function */
-    res = ancestor_signal(label, sign, param);
-    if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
-
-    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
-    if(sign == LV_SIGNAL_CLEANUP) {
-        if(ext->static_txt == 0) {
-            lv_mem_free(ext->text);
-            ext->text = NULL;
-        }
-        lv_label_dot_tmp_free(label);
-    }
-    else if(sign == LV_SIGNAL_STYLE_CHG) {
-        /*Revert dots for proper refresh*/
-        lv_label_revert_dots(label);
-        lv_label_refr_text(label);
-    }
-    else if(sign == LV_SIGNAL_COORD_CHG) {
-        if(lv_area_get_width(&label->coords) != lv_area_get_width(param) ||
-           lv_area_get_height(&label->coords) != lv_area_get_height(param)) {
-            lv_label_revert_dots(label);
-            lv_label_refr_text(label);
-        }
-    }
-    else if(sign == LV_SIGNAL_BASE_DIR_CHG) {
-#if LV_USE_BIDI
-        if(ext->static_txt == 0) lv_label_set_text(label, NULL);
-#endif
-    }
-    else if(sign == LV_SIGNAL_GET_TYPE) {
-        lv_obj_type_t * buf = param;
-        uint8_t i;
-        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-            if(buf->type[i] == NULL) break;
-        }
-        buf->type[i] = "lv_label";
-    }
-
-    return res;
-}
-
 /**
  * Refresh the label with its text stored in its extended data
  * @param label pointer to a label object
  */
-static void lv_label_refr_text(lv_obj_t * label)
+void lv_label_refr_text(lv_obj_t * label)
 {
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
@@ -1430,6 +1215,180 @@ static void lv_label_refr_text(lv_obj_t * label)
     }
 
     lv_obj_invalidate(label);
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+/**
+ * Handle the drawing related tasks of the labels
+ * @param label pointer to a label object
+ * @param clip_area the object will be drawn only in this area
+ * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
+ *                                  (return 'true' if yes)
+ *             LV_DESIGN_DRAW: draw the object (always return 'true')
+ *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
+ * @param return an element of `lv_design_res_t`
+ */
+static lv_design_res_t lv_label_design(lv_obj_t * label, const lv_area_t * clip_area, lv_design_mode_t mode)
+{
+    /* A label never covers an area */
+    if(mode == LV_DESIGN_COVER_CHK)
+        return LV_DESIGN_RES_NOT_COVER;
+    else if(mode == LV_DESIGN_DRAW_MAIN) {
+        lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+
+        lv_coord_t w = lv_obj_get_style_transform_width(label, LV_LABEL_PART_MAIN);
+        lv_coord_t h = lv_obj_get_style_transform_height(label, LV_LABEL_PART_MAIN);
+        lv_area_t bg_coords;
+        lv_area_copy(&bg_coords, &label->coords);
+        bg_coords.x1 -= w;
+        bg_coords.x2 += w;
+        bg_coords.y1 -= h;
+        bg_coords.y2 += h;
+
+        lv_draw_rect_dsc_t draw_rect_dsc;
+        lv_draw_rect_dsc_init(&draw_rect_dsc);
+        lv_obj_init_draw_rect_dsc(label, LV_LABEL_PART_MAIN, &draw_rect_dsc);
+
+        lv_draw_rect(&bg_coords, clip_area, &draw_rect_dsc);
+
+        lv_area_t txt_coords;
+        get_txt_coords(label, &txt_coords);
+
+        lv_area_t txt_clip;
+        bool is_common = _lv_area_intersect(&txt_clip, clip_area, &txt_coords);
+        if(!is_common) return LV_DESIGN_RES_OK;
+
+        lv_label_align_t align = lv_label_get_align(label);
+
+        lv_txt_flag_t flag = LV_TXT_FLAG_NONE;
+        if(ext->recolor != 0) flag |= LV_TXT_FLAG_RECOLOR;
+        if(ext->expand != 0) flag |= LV_TXT_FLAG_EXPAND;
+        if(ext->long_mode == LV_LABEL_LONG_EXPAND) flag |= LV_TXT_FLAG_FIT;
+        if(align == LV_LABEL_ALIGN_CENTER) flag |= LV_TXT_FLAG_CENTER;
+        if(align == LV_LABEL_ALIGN_RIGHT) flag |= LV_TXT_FLAG_RIGHT;
+
+        lv_draw_label_dsc_t label_draw_dsc;
+        lv_draw_label_dsc_init(&label_draw_dsc);
+
+        label_draw_dsc.sel_start = lv_label_get_text_sel_start(label);
+        label_draw_dsc.sel_end = lv_label_get_text_sel_end(label);
+        label_draw_dsc.ofs_x = ext->offset.x;
+        label_draw_dsc.ofs_y = ext->offset.y;
+        label_draw_dsc.flag = flag;
+        lv_obj_init_draw_label_dsc(label, LV_LABEL_PART_MAIN, &label_draw_dsc);
+
+        /* In SCROLL and SCROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
+         * (In addition they will result misalignment is this case)*/
+        if((ext->long_mode == LV_LABEL_LONG_SROLL || ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) &&
+           (ext->align == LV_LABEL_ALIGN_CENTER || ext->align == LV_LABEL_ALIGN_RIGHT)) {
+            lv_point_t size;
+            _lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
+                             LV_COORD_MAX, flag);
+            if(size.x > lv_area_get_width(&txt_coords)) {
+                label_draw_dsc.flag &= ~LV_TXT_FLAG_RIGHT;
+                label_draw_dsc.flag &= ~LV_TXT_FLAG_CENTER;
+            }
+        }
+#if LV_LABEL_LONG_TXT_HINT
+        lv_draw_label_hint_t * hint = &ext->hint;
+        if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC || lv_area_get_height(&txt_coords) < LV_LABEL_HINT_HEIGHT_LIMIT)
+            hint = NULL;
+
+#else
+        /*Just for compatibility*/
+        lv_draw_label_hint_t * hint = NULL;
+#endif
+
+        lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, ext->text, hint);
+
+        if(ext->long_mode == LV_LABEL_LONG_SROLL_CIRC) {
+            lv_point_t size;
+            _lv_txt_get_size(&size, ext->text, label_draw_dsc.font, label_draw_dsc.letter_space, label_draw_dsc.line_space,
+                             LV_COORD_MAX, flag);
+
+            /*Draw the text again next to the original to make an circular effect */
+            if(size.x > lv_area_get_width(&txt_coords)) {
+                label_draw_dsc.ofs_x = ext->offset.x + size.x +
+                                       lv_font_get_glyph_width(label_draw_dsc.font, ' ', ' ') * LV_LABEL_WAIT_CHAR_COUNT;
+                label_draw_dsc.ofs_y = ext->offset.y;
+
+                lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, ext->text, hint);
+            }
+
+            /*Draw the text again below the original to make an circular effect */
+            if(size.y > lv_area_get_height(&txt_coords)) {
+                label_draw_dsc.ofs_x = ext->offset.x;
+                label_draw_dsc.ofs_y = ext->offset.y + size.y + lv_font_get_line_height(label_draw_dsc.font);
+
+                lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, ext->text, hint);
+            }
+        }
+    }
+
+    return LV_DESIGN_RES_OK;
+}
+
+/**
+ * Signal function of the label
+ * @param label pointer to a label object
+ * @param sign a signal type from lv_signal_t enum
+ * @param param pointer to a signal specific variable
+ * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
+ */
+static lv_res_t lv_label_signal(lv_obj_t * label, lv_signal_t sign, void * param)
+{
+    lv_res_t res;
+
+    if(sign == LV_SIGNAL_GET_STYLE) {
+        lv_get_style_info_t * info = param;
+        info->result = lv_label_get_style(label, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+        else return ancestor_signal(label, sign, param);
+    }
+
+    /* Include the ancient signal function */
+    res = ancestor_signal(label, sign, param);
+    if(res != LV_RES_OK) return res;
+    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
+
+    lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
+    if(sign == LV_SIGNAL_CLEANUP) {
+        if(ext->static_txt == 0) {
+            lv_mem_free(ext->text);
+            ext->text = NULL;
+        }
+        lv_label_dot_tmp_free(label);
+    }
+    else if(sign == LV_SIGNAL_STYLE_CHG) {
+        /*Revert dots for proper refresh*/
+        lv_label_revert_dots(label);
+        lv_label_refr_text(label);
+    }
+    else if(sign == LV_SIGNAL_COORD_CHG) {
+        if(lv_area_get_width(&label->coords) != lv_area_get_width(param) ||
+           lv_area_get_height(&label->coords) != lv_area_get_height(param)) {
+            lv_label_revert_dots(label);
+            lv_label_refr_text(label);
+        }
+    }
+    else if(sign == LV_SIGNAL_BASE_DIR_CHG) {
+#if LV_USE_BIDI
+        if(ext->static_txt == 0) lv_label_set_text(label, NULL);
+#endif
+    }
+    else if(sign == LV_SIGNAL_GET_TYPE) {
+        lv_obj_type_t * buf = param;
+        uint8_t i;
+        for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
+            if(buf->type[i] == NULL) break;
+        }
+        buf->type[i] = "lv_label";
+    }
+
+    return res;
 }
 
 static void lv_label_revert_dots(lv_obj_t * label)

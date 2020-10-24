@@ -225,7 +225,7 @@ void lv_msgbox_set_text_fmt(lv_obj_t * mbox, const char * fmt, ...)
 	va_list args;
 	va_start (args, fmt);
 	label_ext->text = _lv_txt_set_text_vfmt(fmt, args);
-	va_end (args);
+	va_end(args);
 	lv_label_refr_text(msgbox_ext->text);
 	mbox_realign(mbox);
 }
