@@ -32,8 +32,9 @@ fout.write(
 #if defined (ESP_PLATFORM)
 #include "sdkconfig.h"
 #include "esp_attr.h"
-#include "lv_conf_kconfig.h"
 #endif
+
+#include "lv_conf_kconfig.h"
 
 /*If lv_conf.h is not skipped include it*/
 #if !defined(LV_CONF_SKIP)
