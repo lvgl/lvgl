@@ -401,6 +401,7 @@ LV_ATTRIBUTE_FAST_MEM static void fill_normal(const lv_area_t * disp_area, lv_co
                 lv_coord_t line_h = LV_HOR_RES_MAX / draw_area_w;
                 for(y = 0; y <= draw_area_h - line_h; y += line_h) {
                     lv_gpu_stm32_dma2d_blend(disp_buf_first, disp_w, blend_buf, opa, draw_area_w, draw_area_w, line_h);
+                    lv_gpu_stm32_dma2d_wait_cb(NULL);
                     disp_buf_first += disp_w * line_h;
                 }
 
