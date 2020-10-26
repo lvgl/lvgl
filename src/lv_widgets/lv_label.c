@@ -1383,13 +1383,22 @@ static void lv_label_refr_text(lv_obj_t * label)
         }
         else {
             lv_point_t p;
+            lv_coord_t y_overed;
             p.x = lv_area_get_width(&txt_coords) -
                   (lv_font_get_glyph_width(font, '.', '.') + letter_space) *
                   LV_LABEL_DOT_NUM; /*Shrink with dots*/
             p.y = lv_area_get_height(&txt_coords);
-            p.y -= p.y %
-                   (lv_font_get_line_height(font) + line_space); /*Round down to the last line*/
-            p.y -= line_space;                                               /*Trim the last line space*/
+            y_overed = p.y %
+                       (lv_font_get_line_height(font) + line_space); /*Round down to the last line*/
+            if (y_overed >= lv_font_get_line_height(font)) {
+                p.y -= y_overed;
+                p.y += lv_font_get_line_height(font);
+            }
+            else {
+                p.y -= y_overed;
+                p.y -= line_space;
+            }
+
             uint32_t letter_id = lv_label_get_letter_on(label, &p);
 
 
