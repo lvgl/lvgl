@@ -187,7 +187,7 @@ void lv_imgbtn_set_state(lv_obj_t * imgbtn, lv_btn_state_t state)
  */
 void lv_imgbtn_toggle(lv_obj_t * imgbtn)
 {
-    lv_imgbtn_toggle(imgbtn);
+    lv_btn_toggle(imgbtn);
     refr_img(imgbtn);
 }
 /*=====================
