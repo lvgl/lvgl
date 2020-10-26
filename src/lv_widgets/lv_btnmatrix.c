@@ -101,6 +101,7 @@ lv_obj_t * lv_btnmatrix_create(lv_obj_t * par, const lv_obj_t * copy)
     lv_style_list_init(&ext->style_btn);
     lv_style_list_init(&ext->style_btn2);
     ext->style_btn.ignore_trans = 1;
+    ext->style_btn2.ignore_trans = 1;
 
     if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(btnm);
 

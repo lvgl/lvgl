@@ -256,10 +256,7 @@ struct _lv_obj_t {
 
     const lv_grid_t * grid;
 
-    uint8_t flex_dir   : 4;
-    uint8_t flex_place : 4;
-
-
+    lv_flex_cont_t flex_cont;
 };
 
 enum {
@@ -604,6 +601,15 @@ lv_obj_t * lv_obj_get_child_back(const lv_obj_t * obj, const lv_obj_t * child);
  * @return the child or `NULL` if `id` was greater then the `number of children - 1`
  */
 lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, uint32_t id);
+
+/**
+ * Get the child index of an object.
+ * If this object is the firstly created child of its parent 0 will be return.
+ * If its the second child return 1, etc.
+ * @param obj pointer to an object whose index should be get
+ * @return the child index of the object.
+ */
+uint32_t lv_obj_get_child_id(const lv_obj_t * obj);
 
 /**
  * Count the children of an object (only children directly on 'obj')

@@ -732,7 +732,7 @@ bool _lv_obj_is_flex_item(struct _lv_obj_t * obj)
 {
     lv_obj_t * cont = lv_obj_get_parent(obj);
     if(cont == NULL) return false;
-    if(cont->flex_dir == LV_FLEX_DIR_NONE) return false;
+    if(cont->flex_cont.dir == LV_FLEX_DIR_NONE) return false;
     if(LV_COORD_IS_FLEX(obj->x_set) == false || LV_COORD_IS_FLEX(obj->y_set) == false) return false;
     return true;
 }

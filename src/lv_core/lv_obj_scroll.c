@@ -207,9 +207,6 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
     self_h = self_h - (lv_obj_get_height(obj) - pad_top - pad_bottom);
     self_h += obj->scroll.y;
     return LV_MATH_MAX(child_res, self_h);
-
-
-    return child_res - obj->coords.y2 + lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
 }
 
 /**

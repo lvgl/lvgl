@@ -1140,7 +1140,7 @@ lv_obj_t * lv_obj_get_child_back(const lv_obj_t * obj, const lv_obj_t * child)
 }
 
 /**
- * Get the Nth child of a an object. 0th is the lastly created.
+ * Get the Nth child of an object. 0th is the lastly created.
  * @param obj pointer to an object whose children should be get
  * @param id of a child
  * @return the child or `NULL` if `id` was greater then the `number of children - 1`
@@ -1149,14 +1149,39 @@ lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, uint32_t id)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_t * child = lv_obj_get_child(obj, NULL);
+    lv_obj_t * child = lv_obj_get_child_back(obj, NULL);
     uint32_t i;
     for(i = 0; i < id; i++) {
-        child = lv_obj_get_child(obj, child);
+        child = lv_obj_get_child_back(obj, child);
     }
 
     return child;
 }
+
+/**
+ * Get the child index of an object.
+ * If this object is the firstly created child of its parent 0 will be return.
+ * If its the second child return 1, etc.
+ * @param obj pointer to an object whose index should be get
+ * @return the child index of the object.
+ */
+uint32_t lv_obj_get_child_id(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+    if(parent == NULL) return 0;
+
+    uint32_t id = 0;
+    lv_obj_t * child = lv_obj_get_child_back(parent, NULL);
+    while(child) {
+        if(child == obj) return id;
+        id++;
+        child = lv_obj_get_child_back(parent, child);
+    }
+    return id;
+}
+
 /**
  * Count the children of an object (only children directly on 'obj')
  * @param obj pointer to an object
@@ -1924,7 +1949,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
                 }
             }
             if(obj->grid) _lv_grid_full_refresh(obj);
-            if(obj->flex_dir) _lv_flex_refresh(obj);
+            if(obj->flex_cont.dir) _lv_flex_refresh(obj);
         }
     }
     else if(sign == LV_SIGNAL_CHILD_CHG) {
