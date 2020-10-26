@@ -42,7 +42,6 @@ enum {
     LV_CHART_TYPE_NONE     = 0x00, /**< Don't draw the series*/
     LV_CHART_TYPE_LINE     = 0x01, /**< Connect the points with lines*/
     LV_CHART_TYPE_COLUMN   = 0x02, /**< Draw columns*/
-    LV_CHART_TYPE_SCATTER  = 0x03, /**< X/Y chart, points and/or lines*/
 };
 typedef uint8_t lv_chart_type_t;
 
