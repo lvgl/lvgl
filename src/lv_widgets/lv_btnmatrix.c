@@ -272,14 +272,22 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
  *                 An element of the map should look like e.g.:
  *                 `ctrl_map[0] = width | LV_BTNMATRIX_CTRL_NO_REPEAT |  LV_BTNMATRIX_CTRL_TGL_ENABLE`
  */
-void lv_btnmatrix_set_ctrl_map(lv_obj_t * btnm, const lv_btnmatrix_ctrl_t ctrl_map[])
+void lv_btnmatrix_set_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl)
 {
     LV_ASSERT_OBJ(btnm, LV_OBJX_NAME);
 
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
-    _lv_memcpy(ext->ctrl_bits, ctrl_map, sizeof(lv_btnmatrix_ctrl_t) * ext->btn_cnt);
 
-    lv_btnmatrix_set_map(btnm, ext->map_p);
+    if(btn_id >= ext->btn_cnt) return;
+
+    /*Uncheck all buttons if required*/
+    if(ext->one_check && (ctrl & LV_BTNMATRIX_CTRL_CHECK_STATE)) {
+        lv_btnmatrix_clear_btn_ctrl_all(btnm, LV_BTNMATRIX_CTRL_CHECK_STATE);
+        ext->btn_id_act = btn_id;
+    }
+
+    ext->ctrl_bits[btn_id] |= ctrl;
+    invalidate_button_area(btnm, btn_id);
 }
 
 /**
