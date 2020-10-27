@@ -127,7 +127,7 @@ void lv_btnmatrix_set_recolor(const lv_obj_t * btnm, bool en);
  * @param btnm pointer to button matrix object
  * @param btn_id 0 based index of the button to modify. (Not counting new lines)
  */
-void lv_btnmatrix_set_btn_ctrl(const lv_obj_t * btnm, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl);
+void lv_btnmatrix_set_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl);
 
 /**
  * Clear the attributes of a button of the button matrix
