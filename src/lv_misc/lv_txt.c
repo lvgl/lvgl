@@ -509,7 +509,7 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
     if(text == NULL) {
         return NULL;
     }
-    text[len - 1] = 0; /* Ensure NULL termination */
+    text[len] = 0; /* Ensure NULL termination */
 
     lv_vsnprintf(text, len + 1, fmt, ap);
 #endif
