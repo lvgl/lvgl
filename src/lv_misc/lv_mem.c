@@ -172,11 +172,27 @@ void * lv_mem_alloc(size_t size)
 
 #if LV_MEM_CUSTOM == 0
 
+    lv_mem_monitor_t mon;
+    lv_mem_monitor(&mon);
     alloc = alloc_core(size);
+    printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
+           (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
+           (int)mon.free_biggest_size);
+    lv_mem_defrag();
 
     if(alloc == NULL) {
         LV_LOG_WARN("Perform defrag");
+
+        lv_mem_monitor(&mon);
+        printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
+               (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
+               (int)mon.free_biggest_size);
         lv_mem_defrag();
+
+        lv_mem_monitor(&mon);
+        printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
+               (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
+               (int)mon.free_biggest_size);
         alloc = alloc_core(size);
     }
 
@@ -230,13 +246,18 @@ void lv_mem_free(const void * data)
     _lv_memset((void *)data, 0xbb, _lv_mem_get_size(data));
 #endif
 
-/*Use custom, user defined free function*/
-#if LV_MEM_CUSTOM
 
 #if LV_ENABLE_GC == 0
     /*e points to the header*/
     lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data - sizeof(lv_mem_header_t));
+#endif
+
+/*Use custom, user defined free function*/
+#if LV_MEM_CUSTOM == 0
     e->header.s.used = 0;
+#else
+#if LV_ENABLE_GC == 0
+    /*e points to the header*/
     LV_MEM_CUSTOM_FREE(e);
 #else
     LV_MEM_CUSTOM_FREE((void *)data);
