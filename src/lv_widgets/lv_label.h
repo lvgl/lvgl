@@ -186,7 +186,6 @@ void lv_label_set_text_sel_start(lv_obj_t * label, uint32_t index);
  * @param index index to set. `LV_LABEL_TXT_SEL_OFF` to select nothing.
  */
 void lv_label_set_text_sel_end(lv_obj_t * label, uint32_t index);
-
 /*=====================
  * Getter functions
  *====================*/
@@ -290,6 +289,12 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt);
  * @param cnt number of characters to cut
  */
 void lv_label_cut_text(lv_obj_t * label, uint32_t pos, uint32_t cnt);
+
+/**
+ * Refresh the label with its text stored in its extended data
+ * @param label pointer to a label object
+ */
+void lv_label_refr_text(lv_obj_t * label);
 
 /**********************
  *      MACROS
