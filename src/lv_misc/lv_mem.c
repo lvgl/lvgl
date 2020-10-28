@@ -171,17 +171,16 @@ void * lv_mem_alloc(size_t size)
     void * alloc = NULL;
 
 #if LV_MEM_CUSTOM == 0
-
-    lv_mem_monitor_t mon;
-    lv_mem_monitor(&mon);
+    static uint32_t defr = 0;
+    defr++;
+    if(defr > LV_MEM_FULL_DEFRAG_CNT) {
+        defr = 0;
+        lv_mem_defrag();
+    }
     alloc = alloc_core(size);
-    printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
-           (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
-           (int)mon.free_biggest_size);
-    lv_mem_defrag();
-
     if(alloc == NULL) {
         LV_LOG_WARN("Perform defrag");
+        lv_mem_monitor_t mon;
 
         lv_mem_monitor(&mon);
         printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
