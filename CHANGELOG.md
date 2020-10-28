@@ -3,6 +3,7 @@
 ## v7.7.1 (04.11.2020)
 ### Bugfixes
 - Respect btnmatrix's `one_check` in `lv_btnmatrix_set_btn_ctrl`
+- Gauge: make the needle images to use the styles from `LV_GAUGE_PART_PART`
 
 ## v7.7.0 (20.10.2020)
 
