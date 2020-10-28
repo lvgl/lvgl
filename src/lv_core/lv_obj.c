@@ -896,11 +896,9 @@ void lv_event_send_refresh_recursive(lv_obj_t * obj)
         lv_res_t res = lv_event_send_refresh(obj);
         if(res != LV_RES_OK) return; /*If invalid returned do not check the children*/
 
-        lv_obj_t * child = lv_obj_get_child(obj, NULL);
-        while(child) {
+        lv_obj_t * child;
+        _LV_LL_READ(obj->child_ll, child) {
             lv_event_send_refresh_recursive(child);
-
-            child = lv_obj_get_child(obj, child);
         }
     }
 }
@@ -1173,11 +1171,11 @@ uint32_t lv_obj_get_child_id(const lv_obj_t * obj)
     if(parent == NULL) return 0;
 
     uint32_t id = 0;
-    lv_obj_t * child = lv_obj_get_child_back(parent, NULL);
-    while(child) {
+    lv_obj_t * child;
+
+    _LV_LL_READ_BACK(obj->child_ll, child) {
         if(child == obj) return id;
         id++;
-        child = lv_obj_get_child_back(parent, child);
     }
     return id;
 }
@@ -1187,7 +1185,7 @@ uint32_t lv_obj_get_child_id(const lv_obj_t * obj)
  * @param obj pointer to an object
  * @return children number of 'obj'
  */
-uint16_t lv_obj_count_children(const lv_obj_t * obj)
+uint32_t lv_obj_count_children(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1203,7 +1201,7 @@ uint16_t lv_obj_count_children(const lv_obj_t * obj)
  * @param obj pointer to an object
  * @return children number of 'obj'
  */
-uint16_t lv_obj_count_children_recursive(const lv_obj_t * obj)
+uint32_t lv_obj_count_children_recursive(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1509,6 +1507,24 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
 #endif
 }
 
+/**
+ * Tell if an object is an instance of a certain widget type or not
+ * @param obj pointer to an object
+ * @param type_str the type to check. The name of the widget's type, g.g. "lv_label", "lv_btn", etc
+ * @return true: `obj` has the given type
+ * @note Not only the "final" type matters. Therefore every widget has "lv_obj" type and "lv_slider" is an "lv_bar" too.
+ */
+bool lv_obj_is_instance_of(lv_obj_t * obj, const char * type_str)
+{
+    lv_obj_type_t type;
+    lv_obj_get_type(obj, &type);
+    uint8_t cnt;
+    for(cnt = 0; cnt < LV_MAX_ANCESTOR_NUM; cnt++) {
+        if(type.type[cnt] == NULL) break;
+        if(!strcmp(type.type[cnt], type_str)) return true;
+    }
+    return false;
+}
 
 /*-------------------
  * OTHER FUNCTIONS
@@ -1610,7 +1626,8 @@ static void lv_obj_del_async_cb(void * obj)
 static void obj_del_core(lv_obj_t * obj)
 {
     /*Let the user free the resources used in `LV_EVENT_DELETE`*/
-    lv_event_send(obj, LV_EVENT_DELETE, NULL);
+    lv_res_t res = lv_event_send(obj, LV_EVENT_DELETE, NULL);
+    if(res == LV_RES_INV) return;
 
     /*Delete from the group*/
 #if LV_USE_GROUP
@@ -1825,15 +1842,11 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 static void base_dir_refr_children(lv_obj_t * obj)
 {
     lv_obj_t * child;
-    child = lv_obj_get_child(obj, NULL);
-
-    while(child) {
+    _LV_LL_READ(obj->child_ll, child) {
         if(child->base_dir == LV_BIDI_DIR_INHERIT) {
             lv_signal_send(child, LV_SIGNAL_BASE_DIR_CHG, NULL);
             base_dir_refr_children(child);
         }
-
-        child = lv_obj_get_child(obj, child);
     }
 }
 
@@ -1991,12 +2004,12 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(obj->grid) _lv_grid_full_refresh(obj);
 
         /*Reposition non grid objects on by one*/
-        lv_obj_t * child = lv_obj_get_child(obj, NULL);
-        while(child) {
+        lv_obj_t * child;
+
+        _LV_LL_READ(obj->child_ll, child) {
             if(!LV_COORD_IS_GRID(child->x_set) || !LV_COORD_IS_GRID(child->y_set)) {
                 lv_obj_set_pos(child, child->x_set, child->y_set);
             }
-            child = lv_obj_get_child(obj, child);
         }
 
         if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {

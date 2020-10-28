@@ -616,13 +616,13 @@ uint32_t lv_obj_get_child_id(const lv_obj_t * obj);
  * @param obj pointer to an object
  * @return children number of 'obj'
  */
-uint16_t lv_obj_count_children(const lv_obj_t * obj);
+uint32_t lv_obj_count_children(const lv_obj_t * obj);
 
 /** Recursively count the children of an object
  * @param obj pointer to an object
  * @return children number of 'obj'
  */
-uint16_t lv_obj_count_children_recursive(const lv_obj_t * obj);
+uint32_t lv_obj_count_children_recursive(const lv_obj_t * obj);
 
 /*---------------------
  * Coordinate get
@@ -750,6 +750,15 @@ void * lv_obj_get_group(const lv_obj_t * obj);
  * @return true: the object is focused, false: the object is not focused or not in a group
  */
 bool lv_obj_is_focused(const lv_obj_t * obj);
+
+/**
+ * Tell if an object is an instance of a certain widget type or not
+ * @param obj pointer to an object
+ * @param type_str the type to check. The name of the widget's type, g.g. "lv_label", "lv_btn", etc
+ * @return true: `obj` has the given type
+ * @note Not only the "final" type matters. Therefore every widget has "lv_obj" type and "lv_slider" is an "lv_bar" too.
+ */
+bool lv_obj_is_instance_of(lv_obj_t * obj, const char * type_str);
 
 /**
  * Get the really focused object by taking `focus_parent` into account.

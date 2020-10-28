@@ -1454,7 +1454,7 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
 #endif
     if(pad_top != 0 ||
        pad_left != 0 ||
-       lv_obj_get_style_pad_left(obj, part) != 0 ||
+       lv_obj_get_style_pad_bottom(obj, part) != 0 ||
        lv_obj_get_style_pad_right(obj, part) != 0) {
         list->pad_all_zero  = 0;
     }

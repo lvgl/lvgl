@@ -196,8 +196,7 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
         }
 
         lv_coord_t row_y1 = top + (max_h_no_gap * row) / row_cnt + row * row_gap;
-        lv_coord_t row_y2 = top + (max_h_no_gap * (row + 1)) / row_cnt + row * row_gap;
-
+        lv_coord_t row_y2 = top + (max_h_no_gap * (row + 1)) / row_cnt + row * row_gap - 1;
 
         /*Set the button size and positions*/
         lv_coord_t max_w_no_gap = max_w - (col_gap * (btn_cnt - 1));
@@ -209,7 +208,7 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
             uint32_t btn_u = get_button_width(ext->ctrl_bits[btn_tot_i]);
 
             lv_coord_t btn_x1 = left + (max_w_no_gap * row_unit_cnt) / unit_cnt + btn * col_gap;
-            lv_coord_t btn_x2 = left + (max_w_no_gap * (row_unit_cnt + btn_u)) / unit_cnt + btn * col_gap;
+            lv_coord_t btn_x2 = left + (max_w_no_gap * (row_unit_cnt + btn_u)) / unit_cnt + btn * col_gap - 1;
 
             /*If RTL start from the right*/
             if(base_dir == LV_BIDI_DIR_RTL) {
