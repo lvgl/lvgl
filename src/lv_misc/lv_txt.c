@@ -6,10 +6,12 @@
 /*********************
  *      INCLUDES
  *********************/
+#include <stdarg.h>
 #include "lv_txt.h"
 #include "lv_math.h"
 #include "lv_log.h"
 #include "lv_debug.h"
+
 /*********************
  *      DEFINES
  *********************/
