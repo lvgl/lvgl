@@ -438,18 +438,22 @@ void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_coord_t obj_w = lv_obj_get_width(obj);
 
     bool ver_draw = false;
-    if((sm == LV_SCROLL_MODE_ON) ||
-       (sm == LV_SCROLL_MODE_AUTO && (st > 0 || sb > 0)) ||
-       (sm == LV_SCROLL_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_VER)) {
+    if((obj->scroll_dir & LV_DIR_VER) &&
+       ((sm == LV_SCROLL_MODE_ON) ||
+        (sm == LV_SCROLL_MODE_AUTO && (st > 0 || sb > 0)) ||
+        (sm == LV_SCROLL_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_VER))) {
         ver_draw = true;
     }
 
+
     bool hor_draw = false;
-    if((sm == LV_SCROLL_MODE_ON) ||
-       (sm == LV_SCROLL_MODE_AUTO && (sl > 0 || sr > 0)) ||
-       (sm == LV_SCROLL_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_HOR)) {
+    if((obj->scroll_dir & LV_DIR_HOR) &&
+          ((sm == LV_SCROLL_MODE_ON) ||
+           (sm == LV_SCROLL_MODE_AUTO && (sl > 0 || sr > 0)) ||
+           (sm == LV_SCROLL_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_HOR))) {
         hor_draw = true;
     }
+
 
     lv_coord_t ver_reg_space = ver_draw ? tickness + side_space : 0;
     lv_coord_t hor_req_space = hor_draw ? tickness + side_space : 0;

@@ -162,7 +162,7 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
 lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb)
 {
     lv_anim_t * a;
-    _LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_anim_ll), a) {
         if(a->var == var && a->exec_cb == exec_cb) {
             return a;
         }
@@ -179,7 +179,7 @@ uint16_t lv_anim_count_running(void)
 {
     uint16_t cnt = 0;
     lv_anim_t * a;
-    _LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) cnt++;
+    _LV_LL_READ(&LV_GC_ROOT(_lv_anim_ll), a) cnt++;
 
     return cnt;
 }
@@ -444,7 +444,7 @@ static void anim_task(lv_task_t * param)
     (void)param;
 
     lv_anim_t * a;
-    _LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_anim_ll), a) {
         a->has_run = 0;
     }
 

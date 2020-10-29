@@ -203,6 +203,7 @@ static bool inited;
 
 static void basic_init(void)
 {
+    style_init_reset(&styles->sb);
     lv_style_set_scrollbar_bg_opa(&styles->sb, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_scrollbar_bg_color(&styles->sb, LV_STATE_DEFAULT, (IS_LIGHT ? lv_color_hex(0xcccfd1) : lv_color_hex(0x777f85)));
     lv_style_set_scrollbar_radius(&styles->sb, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);

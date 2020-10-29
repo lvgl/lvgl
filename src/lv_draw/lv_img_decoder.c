@@ -95,7 +95,7 @@ lv_res_t lv_img_decoder_get_info(const char * src, lv_img_header_t * header)
 
     lv_res_t res = LV_RES_INV;
     lv_img_decoder_t * d;
-    _LV_LL_READ(LV_GC_ROOT(_lv_img_defoder_ll), d) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_img_defoder_ll), d) {
         res = LV_RES_INV;
         if(d->info_cb) {
             res = d->info_cb(d, src, header);
@@ -136,7 +136,7 @@ lv_res_t lv_img_decoder_open(lv_img_decoder_dsc_t * dsc, const void * src, lv_co
     lv_res_t res = LV_RES_INV;
 
     lv_img_decoder_t * d;
-    _LV_LL_READ(LV_GC_ROOT(_lv_img_defoder_ll), d) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_img_defoder_ll), d) {
         /*Info an Open callbacks are required*/
         if(d->info_cb == NULL || d->open_cb == NULL) continue;
 

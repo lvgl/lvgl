@@ -208,12 +208,17 @@ typedef uint16_t lv_obj_flag_t;
 #include "lv_obj_draw.h"
 
 
-struct _lv_obj_t {
-    struct _lv_obj_t * parent; /**< Pointer to the parent object*/
+typedef struct {
     lv_ll_t child_ll;       /**< Linked list to store the children objects*/
+    lv_point_t scroll; /**< The current X/Y scroll offset*/
+}lv_obj_rare_attr_t;
+
+
+struct _lv_obj_t {
+    lv_obj_rare_attr_t * rare_attr;
+    struct _lv_obj_t * parent; /**< Pointer to the parent object*/
 
     lv_area_t coords; /**< Coordinates of the object (x1, y1, x2, y2)*/
-    lv_point_t scroll; /**< The current X/Y scroll offset*/
 
     lv_event_cb_t event_cb; /**< Event callback function */
     lv_signal_cb_t signal_cb; /**< Object type specific signal function*/
@@ -548,6 +553,7 @@ void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb);
  */
 void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
 
+lv_obj_rare_attr_t * lv_obj_allocate_rare_attr(lv_obj_t * obj);
 /*=======================
  * Getter functions
  *======================*/
@@ -759,6 +765,8 @@ bool lv_obj_is_focused(const lv_obj_t * obj);
  * @note Not only the "final" type matters. Therefore every widget has "lv_obj" type and "lv_slider" is an "lv_bar" too.
  */
 bool lv_obj_is_instance_of(lv_obj_t * obj, const char * type_str);
+
+lv_ll_t * _lv_obj_get_child_ll(const lv_obj_t * obj) ;
 
 /**
  * Get the really focused object by taking `focus_parent` into account.

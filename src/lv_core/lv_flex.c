@@ -73,6 +73,7 @@ void _lv_flex_refresh(lv_obj_t * cont)
     lv_coord_t abs_x = cont->coords.x1 + lv_obj_get_style_pad_left(cont, LV_OBJ_PART_MAIN) - lv_obj_get_scroll_left(cont);
     lv_coord_t abs_y = cont->coords.y1 + lv_obj_get_style_pad_top(cont, LV_OBJ_PART_MAIN) - lv_obj_get_scroll_top(cont);
 
+    lv_ll_t * ll = _lv_obj_get_child_ll(cont);
     lv_coord_t * cross_pos = (row ? &abs_y : &abs_x);
 
     lv_coord_t place = cont->flex_cont.place;
@@ -92,7 +93,7 @@ void _lv_flex_refresh(lv_obj_t * cont)
     bool rev = cont->flex_cont.dir & LV_FLEX_REVERSE;
 
     if(place != LV_FLEX_START) {
-        track_first_item =  rev ? _lv_ll_get_head(&cont->child_ll) : _lv_ll_get_tail(&cont->child_ll);
+        track_first_item =  rev ? _lv_ll_get_head(ll) : _lv_ll_get_tail(ll);
 
         while(track_first_item) {
             /*Search the first item of the next row */
@@ -106,7 +107,7 @@ void _lv_flex_refresh(lv_obj_t * cont)
         place_content(place, max_cross_size, all_track_size,row_cnt, cross_pos, &gap);
     }
 
-    track_first_item =  rev ? _lv_ll_get_head(&cont->child_ll) : _lv_ll_get_tail(&cont->child_ll);
+    track_first_item =  rev ? _lv_ll_get_head(ll) : _lv_ll_get_tail(ll);
     while(track_first_item) {
         /*Search the first item of the next row */
         next_track_first_item = find_track_end(cont, track_first_item, max_main_size, &grow_unit, &track_size);
@@ -131,6 +132,8 @@ static lv_obj_t * find_track_end(lv_obj_t * cont, lv_obj_t * item_start, lv_coor
     void * (*ll_iter)(const lv_ll_t * , const void *) = dir & LV_FLEX_REVERSE ? _lv_ll_get_next : _lv_ll_get_prev;
     bool wrap = dir & LV_FLEX_WRAP ? true : false;
 
+    lv_ll_t * ll = _lv_obj_get_child_ll(cont);
+
     lv_coord_t grow_sum = 0;
     lv_coord_t used_size = 0;
     lv_coord_t gap = cont->flex_cont.gap;
@@ -143,7 +146,7 @@ static lv_obj_t * find_track_end(lv_obj_t * cont, lv_obj_t * item_start, lv_coor
         /*Ignore non-flex items*/
         lv_coord_t main_set = (row ? item->x_set : item->y_set);
         if(LV_COORD_IS_FLEX(main_set) == false) {
-            item = ll_iter(&cont->child_ll, item);
+            item = ll_iter(ll, item);
             continue;
         }
 
@@ -158,7 +161,7 @@ static lv_obj_t * find_track_end(lv_obj_t * cont, lv_obj_t * item_start, lv_coor
         }
         *track_cross_size = LV_MATH_MAX(get_cross_size(item), *track_cross_size);
 
-        item = ll_iter(&cont->child_ll, item);
+        item = ll_iter(ll, item);
     }
 
     if(used_size > 0) used_size -= gap; /*There is no gap after the last item*/
@@ -173,7 +176,7 @@ static lv_obj_t * find_track_end(lv_obj_t * cont, lv_obj_t * item_start, lv_coor
 
     /*Have at least one item in a row*/
     if(item && item == item_start) {
-        item = ll_iter(&cont->child_ll, item);
+        item = ll_iter(ll, item);
         if(item) *track_cross_size = get_cross_size(item);
     }
 
@@ -193,6 +196,7 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
     lv_style_int_t (*get_margin_end)(const lv_obj_t *, uint8_t part) = (row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
     void * (*ll_iter)(const lv_ll_t * , const void *) = dir & LV_FLEX_REVERSE ? _lv_ll_get_next : _lv_ll_get_prev;
 
+    lv_ll_t * ll = _lv_obj_get_child_ll(cont);
     lv_coord_t gap = cont->flex_cont.gap;
     lv_coord_t main_pos = 0;
     /*Reposition the children*/
@@ -202,7 +206,7 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
         /*Ignore non-flex items*/
         lv_coord_t main_set = (row ? item->x_set : item->y_set);
         if(LV_COORD_IS_FLEX(main_set) == false) {
-            item = ll_iter(&cont->child_ll, item);
+            item = ll_iter(ll, item);
             continue;
         }
 
@@ -253,7 +257,7 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
             _lv_obj_move_children_by(item, diff_x, diff_y);
         }
         main_pos += obj_get_main_size(item) + gap;
-        item = ll_iter(&cont->child_ll, item);
+        item = ll_iter(ll, item);
     }
 }
 

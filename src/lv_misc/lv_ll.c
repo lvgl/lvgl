@@ -156,6 +156,8 @@ void * _lv_ll_ins_tail(lv_ll_t * ll_p)
  */
 void _lv_ll_remove(lv_ll_t * ll_p, void * node_p)
 {
+    if(ll_p == NULL) return;
+
     if(_lv_ll_get_head(ll_p) == node_p) {
         /*The new head will be the node after 'n_act'*/
         ll_p->head = _lv_ll_get_next(ll_p, node_p);
@@ -249,7 +251,27 @@ void _lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool h
     }
 }
 
+/**
+ * Return with head node of the linked list
+ * @param ll_p pointer to linked list
+ * @return pointer to the head of 'll_p'
+ */
+void * _lv_ll_get_head(const lv_ll_t * ll_p)
+{
+    if(ll_p == NULL) return NULL;
+    return ll_p->head;
+}
 
+/**
+ * Return with tail node of the linked list
+ * @param ll_p pointer to linked list
+ * @return pointer to the head of 'll_p'
+ */
+void * _lv_ll_get_tail(const lv_ll_t * ll_p)
+{
+    if(ll_p == NULL) return NULL;
+    return ll_p->tail;
+}
 /**
  * Return with the pointer of the next node after 'n_act'
  * @param ll_p pointer to linked list

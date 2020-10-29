@@ -694,7 +694,8 @@ void _lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_par
 void _lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff)
 {
     lv_obj_t * i;
-    _LV_LL_READ(obj->child_ll, i) {
+    lv_ll_t * ll = _lv_obj_get_child_ll(obj);
+    _LV_LL_READ(ll, i) {
         i->coords.x1 += x_diff;
         i->coords.y1 += y_diff;
         i->coords.x2 += x_diff;

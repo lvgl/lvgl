@@ -582,7 +582,8 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 #endif
 
         lv_obj_t * i;
-        _LV_LL_READ(obj->child_ll, i) {
+        lv_ll_t * ll = _lv_obj_get_child_ll(obj);
+        _LV_LL_READ(ll, i) {
             found_p = lv_refr_get_top_obj(area_p, i);
 
             /*If a children is ok then break*/
@@ -626,13 +627,14 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
 
     /*Do until not reach the screen*/
     while(par != NULL) {
+        lv_ll_t * ll = _lv_obj_get_child_ll(par);
         /*object before border_p has to be redrawn*/
-        lv_obj_t * i = _lv_ll_get_prev(&(par->child_ll), border_p);
+        lv_obj_t * i = _lv_ll_get_prev(ll, border_p);
 
         while(i != NULL) {
             /*Refresh the objects*/
             lv_refr_obj(i, mask_p);
-            i = _lv_ll_get_prev(&(par->child_ll), i);
+            i = _lv_ll_get_prev(ll, i);
         }
 
         /*Call the post draw design function of the parents of the to object*/
@@ -700,7 +702,8 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
             lv_area_t mask_child; /*Mask from obj and its child*/
             lv_obj_t * child_p;
             lv_area_t child_area;
-            _LV_LL_READ_BACK(obj->child_ll, child_p) {
+            lv_ll_t * ll = _lv_obj_get_child_ll(obj);
+            _LV_LL_READ_BACK(ll, child_p) {
                 lv_obj_get_coords(child_p, &child_area);
                 ext_size = child_p->ext_draw_pad;
                 child_area.x1 -= ext_size;

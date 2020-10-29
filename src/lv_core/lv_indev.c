@@ -1048,7 +1048,8 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
     if(lv_obj_hit_test(obj, point)) {
         lv_obj_t * i;
 
-        _LV_LL_READ(obj->child_ll, i) {
+        lv_ll_t * ll = _lv_obj_get_child_ll(obj);
+        _LV_LL_READ(ll, i) {
             found_p = lv_indev_search_obj(i, point);
 
             /*If a child was found then break*/

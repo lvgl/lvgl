@@ -188,7 +188,7 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
     memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
 
     lv_obj_t * scr;
-    _LV_LL_READ(disp->scr_ll, scr) {
+    _LV_LL_READ(&disp->scr_ll, scr) {
         lv_obj_set_size(scr, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
     }
 }

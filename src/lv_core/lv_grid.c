@@ -81,7 +81,7 @@ void lv_obj_report_grid_change(const lv_grid_t * grid)
 
     while(d) {
         lv_obj_t * i;
-        _LV_LL_READ(d->scr_ll, i) {
+        _LV_LL_READ(&d->scr_ll, i) {
             report_grid_change_core(grid, i);
         }
         d = lv_disp_get_next(d);

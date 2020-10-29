@@ -191,7 +191,7 @@ void lv_obj_report_style_change(lv_style_t * style)
 
     while(d) {
         lv_obj_t * i;
-        _LV_LL_READ(d->scr_ll, i) {
+        _LV_LL_READ(&d->scr_ll, i) {
             report_style_change_core(style, i);
         }
         d = lv_disp_get_next(d);
@@ -1247,7 +1247,7 @@ static void trans_anim_ready_cb(lv_anim_t * a)
      * It allows changing it by normal styles*/
     bool running = false;
     lv_style_trans_t * tr_i;
-    _LV_LL_READ(LV_GC_ROOT(_lv_obj_style_trans_ll), tr_i) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_obj_style_trans_ll), tr_i) {
         if(tr_i != tr && tr_i->obj == tr->obj && tr_i->part == tr->part && tr_i->prop == tr->prop) {
             running = true;
         }

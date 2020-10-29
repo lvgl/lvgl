@@ -92,7 +92,7 @@ void lv_group_del(lv_group_t * group)
 
     /*Remove the objects from the group*/
     lv_obj_t ** obj;
-    _LV_LL_READ(group->obj_ll, obj) {
+    _LV_LL_READ(&group->obj_ll, obj) {
         (*obj)->group_p = NULL;
     }
 
@@ -111,7 +111,7 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
     if(group == NULL) return;
     /*Do not add the object twice*/
     lv_obj_t ** obj_i;
-    _LV_LL_READ(group->obj_ll, obj_i) {
+    _LV_LL_READ(&group->obj_ll, obj_i) {
         if((*obj_i) == obj) {
             LV_LOG_INFO("lv_group_add_obj: the object is already added to this group");
             return;
@@ -173,7 +173,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
 
     /*Search the object and remove it from its group */
     lv_obj_t ** i;
-    _LV_LL_READ(g->obj_ll, i) {
+    _LV_LL_READ(&g->obj_ll, i) {
         if(*i == obj) {
             _lv_ll_remove(&g->obj_ll, i);
             lv_mem_free(i);
@@ -198,7 +198,7 @@ void lv_group_remove_all_objs(lv_group_t * group)
 
     /*Remove the objects from the group*/
     lv_obj_t ** obj;
-    _LV_LL_READ(group->obj_ll, obj) {
+    _LV_LL_READ(&group->obj_ll, obj) {
         (*obj)->group_p = NULL;
     }
 
@@ -223,7 +223,7 @@ void lv_group_focus_obj(lv_obj_t * obj)
     lv_group_set_editing(g, false);
 
     lv_obj_t ** i;
-    _LV_LL_READ(g->obj_ll, i) {
+    _LV_LL_READ(&g->obj_ll, i) {
         if(*i == obj) {
             if(g->obj_focus != NULL) {
                 (*g->obj_focus)->signal_cb(*g->obj_focus, LV_SIGNAL_DEFOCUS, NULL);

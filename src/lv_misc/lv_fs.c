@@ -503,7 +503,7 @@ lv_fs_drv_t * lv_fs_get_drv(char letter)
 {
     lv_fs_drv_t * drv;
 
-    _LV_LL_READ(LV_GC_ROOT(_lv_drv_ll), drv) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_drv_ll), drv) {
         if(drv->letter == letter) {
             return drv;
         }
@@ -521,7 +521,7 @@ char * lv_fs_get_letters(char * buf)
     lv_fs_drv_t * drv;
     uint8_t i = 0;
 
-    _LV_LL_READ(LV_GC_ROOT(_lv_drv_ll), drv) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_drv_ll), drv) {
         buf[i] = drv->letter;
         i++;
     }

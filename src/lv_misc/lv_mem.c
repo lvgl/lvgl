@@ -29,7 +29,7 @@
 #endif
 
 #ifndef LV_MEM_FULL_DEFRAG_CNT
-    #define LV_MEM_FULL_DEFRAG_CNT 32
+    #define LV_MEM_FULL_DEFRAG_CNT 64
 #endif
 
 #ifdef LV_ARCH_64

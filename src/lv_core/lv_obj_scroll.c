@@ -73,8 +73,13 @@ lv_scroll_mode_t lv_obj_get_scroll_mode(lv_obj_t * obj)
  */
 void _lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
-    obj->scroll.x += x;
-    obj->scroll.y += y;
+    if(x == 0 && y == 0) return;
+
+    if(obj->rare_attr == NULL) {
+        obj->rare_attr = lv_obj_allocate_rare_attr(obj);
+    }
+    obj->rare_attr->scroll.x += x;
+    obj->rare_attr->scroll.y += y;
 
     _lv_obj_move_children_by(obj, x, y);
     lv_res_t res = lv_signal_send(obj, LV_SIGNAL_SCROLL, NULL);
@@ -107,7 +112,8 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
             if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
             if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
             lv_anim_set_time(&a, t);
-            lv_anim_set_values(&a, obj->scroll.x, obj->scroll.x + x);
+            lv_coord_t sl = lv_obj_get_scroll_left(obj);
+            lv_anim_set_values(&a, -sl, -sl + x);
             lv_anim_set_exec_cb(&a, (lv_anim_exec_xcb_t) scroll_anim_x_cb);
             lv_anim_set_path(&a, &path);
             lv_anim_start(&a);
@@ -118,7 +124,8 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
             if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
             if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
             lv_anim_set_time(&a, t);
-            lv_anim_set_values(&a, obj->scroll.y, obj->scroll.y + y);
+            lv_coord_t st = lv_obj_get_scroll_top(obj);
+            lv_anim_set_values(&a, -st, -st + y);
             lv_anim_set_exec_cb(&a,  (lv_anim_exec_xcb_t) scroll_anim_y_cb);
             lv_anim_set_path(&a, &path);
             lv_anim_start(&a);
@@ -147,7 +154,7 @@ void lv_obj_scroll_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
  */
 void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en)
 {
-    lv_obj_scroll_by(obj, -x - obj->scroll.x, 0, anim_en);
+    lv_obj_scroll_by(obj, -x + lv_obj_get_scroll_left(obj), 0, anim_en);
 }
 
 /**
@@ -157,7 +164,7 @@ void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en)
  */
 void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
 {
-    lv_obj_scroll_by(obj, 0,  -y - obj->scroll.y, anim_en);
+    lv_obj_scroll_by(obj, 0,  -y + lv_obj_get_scroll_top(obj), anim_en);
 }
 
 
@@ -170,7 +177,8 @@ void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
  */
 lv_coord_t lv_obj_get_scroll_top(const lv_obj_t * obj)
 {
-    return -obj->scroll.y;
+    if(obj->rare_attr == NULL) return 0;
+    return -obj->rare_attr->scroll.y;
 }
 
 /**
@@ -205,7 +213,7 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
 
     lv_coord_t self_h = _lv_obj_get_self_height(obj);
     self_h = self_h - (lv_obj_get_height(obj) - pad_top - pad_bottom);
-    self_h += obj->scroll.y;
+    self_h -= lv_obj_get_scroll_top(obj);
     return LV_MATH_MAX(child_res, self_h);
 }
 
@@ -218,7 +226,8 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_scroll_left(const lv_obj_t * obj)
 {
-    return -obj->scroll.x;
+    if(obj->rare_attr == NULL) return 0;
+    return -obj->rare_attr->scroll.x;
 }
 
 /**
@@ -251,7 +260,7 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
 
     lv_coord_t self_w = _lv_obj_get_self_width(obj);
     self_w = self_w - (lv_obj_get_width(obj) - pad_right - pad_left);
-    self_w += obj->scroll.x;
+    self_w -= lv_obj_get_scroll_left(obj);
 
     return LV_MATH_MAX(child_res, self_w);
 }
@@ -278,10 +287,10 @@ void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end)
 
 static void scroll_anim_x_cb(lv_obj_t * obj, lv_anim_value_t v)
 {
-    _lv_obj_scroll_by_raw(obj, v - obj->scroll.x, 0);
+    _lv_obj_scroll_by_raw(obj, v + lv_obj_get_scroll_left(obj), 0);
 }
 
 static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v)
 {
-    _lv_obj_scroll_by_raw(obj, 0, v - obj->scroll.y);
+    _lv_obj_scroll_by_raw(obj, 0, v + lv_obj_get_scroll_top(obj));
 }

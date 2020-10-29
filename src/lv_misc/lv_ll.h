@@ -98,20 +98,14 @@ void _lv_ll_chg_list(lv_ll_t * ll_ori_p, lv_ll_t * ll_new_p, void * node, bool h
  * @param ll_p pointer to linked list
  * @return pointer to the head of 'll_p'
  */
-static inline void * _lv_ll_get_head(const lv_ll_t * ll_p)
-{
-    return ll_p->head;
-}
+void * _lv_ll_get_head(const lv_ll_t * ll_p);
 
 /**
  * Return with tail node of the linked list
  * @param ll_p pointer to linked list
  * @return pointer to the head of 'll_p'
  */
-static inline void * _lv_ll_get_tail(const lv_ll_t * ll_p)
-{
-    return ll_p->tail;
-}
+void * _lv_ll_get_tail(const lv_ll_t * ll_p);
 
 /**
  * Return with the pointer of the next node after 'n_act'
@@ -163,9 +157,9 @@ bool _lv_ll_is_empty(lv_ll_t * ll_p);
  *      MACROS
  **********************/
 
-#define _LV_LL_READ(list, i) for(i = _lv_ll_get_head(&list); i != NULL; i = _lv_ll_get_next(&list, i))
+#define _LV_LL_READ(list, i) for((i) = _lv_ll_get_head(list); i != NULL; (i) = _lv_ll_get_next(list, i))
 
-#define _LV_LL_READ_BACK(list, i) for(i = _lv_ll_get_tail(&list); i != NULL; i = _lv_ll_get_prev(&list, i))
+#define _LV_LL_READ_BACK(list, i) for(i = _lv_ll_get_tail(list); i != NULL; i = _lv_ll_get_prev(list, i))
 
 #ifdef __cplusplus
 } /* extern "C" */
