@@ -170,20 +170,6 @@ enum {
 typedef uint8_t lv_state_t;
 
 enum {
-    LV_DIR_NONE     = 0x00,
-    LV_DIR_LEFT     = (1 << 0),
-    LV_DIR_RIGHT    = (1 << 1),
-    LV_DIR_TOP      = (1 << 2),
-    LV_DIR_BOTTOM   = (1 << 3),
-    LV_DIR_HOR      = LV_DIR_LEFT | LV_DIR_RIGHT,
-    LV_DIR_VER      = LV_DIR_TOP | LV_DIR_BOTTOM,
-    LV_DIR_ALL      = LV_DIR_HOR | LV_DIR_VER,
-};
-
-typedef uint8_t lv_dir_t;
-
-
-enum {
     LV_OBJ_FLAG_HIDDEN          = (1 << 0),
     LV_OBJ_FLAG_CLICKABLE       = (1 << 1),
     LV_OBJ_FLAG_CLICK_FOCUSABLE = (1 << 2),
@@ -210,22 +196,21 @@ typedef uint16_t lv_obj_flag_t;
 
 typedef struct {
     lv_ll_t child_ll;       /**< Linked list to store the children objects*/
-    lv_point_t scroll; /**< The current X/Y scroll offset*/
-}lv_obj_rare_attr_t;
 
+#if LV_USE_GROUP != 0
+    void * group_p;
+#endif
 
-struct _lv_obj_t {
-    lv_obj_rare_attr_t * rare_attr;
-    struct _lv_obj_t * parent; /**< Pointer to the parent object*/
+#if LV_USE_USER_DATA
+    lv_obj_user_data_t user_data; /**< Custom user data for object. */
+#endif
 
-    lv_area_t coords; /**< Coordinates of the object (x1, y1, x2, y2)*/
+    const lv_grid_t * grid;
 
     lv_event_cb_t event_cb; /**< Event callback function */
-    lv_signal_cb_t signal_cb; /**< Object type specific signal function*/
-    lv_design_cb_t design_cb; /**< Object type specific design function*/
 
-    void * ext_attr;            /**< Object type specific extended data*/
-    lv_style_list_t  style_list;
+    lv_flex_cont_t flex_cont;
+    lv_point_t scroll; /**< The current X/Y scroll offset*/
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     uint8_t ext_click_pad; /**< Extra click padding in all direction */
@@ -233,15 +218,28 @@ struct _lv_obj_t {
     lv_area_t ext_click_pad;   /**< Extra click padding area. */
 #endif
 
-    lv_coord_t ext_draw_pad; /**< EXTend the size in every direction for drawing. */
-
-    /*Attributes and states*/
-    lv_obj_flag_t flags;
     lv_scroll_mode_t scroll_mode :2; /**< How to display scrollbars*/
     lv_scroll_snap_align_t snap_align_x : 2;
     lv_scroll_snap_align_t snap_align_y : 2;
     lv_scroll_dir_t scroll_dir :4;
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
+}lv_obj_spec_attr_t;
+
+
+struct _lv_obj_t {
+    lv_obj_spec_attr_t * spec_attr;
+    struct _lv_obj_t * parent; /**< Pointer to the parent object*/
+
+    lv_area_t coords; /**< Coordinates of the object (x1, y1, x2, y2)*/
+
+    lv_signal_cb_t signal_cb; /**< Object type specific signal function*/
+    lv_design_cb_t design_cb; /**< Object type specific design function*/
+
+    void * ext_attr;            /**< Object type specific extended data*/
+    lv_style_list_t  style_list;
+
+    /*Attributes and states*/
+    lv_obj_flag_t flags;
 
     lv_state_t state;
 
@@ -250,18 +248,7 @@ struct _lv_obj_t {
     lv_coord_t w_set;
     lv_coord_t h_set;
 
-#if LV_USE_GROUP != 0
-    void * group_p;
-#endif
-
-
-#if LV_USE_USER_DATA
-    lv_obj_user_data_t user_data; /**< Custom user data for object. */
-#endif
-
-    const lv_grid_t * grid;
-
-    lv_flex_cont_t flex_cont;
+    lv_coord_t ext_draw_pad; /**< EXTend the size in every direction for drawing. */
 };
 
 enum {
@@ -553,7 +540,7 @@ void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb);
  */
 void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
 
-lv_obj_rare_attr_t * lv_obj_allocate_rare_attr(lv_obj_t * obj);
+lv_obj_spec_attr_t * lv_obj_allocate_rare_attr(lv_obj_t * obj);
 /*=======================
  * Getter functions
  *======================*/

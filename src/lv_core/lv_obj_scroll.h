@@ -55,12 +55,6 @@ typedef uint8_t lv_scroll_snap_align_t;
  */
 void lv_obj_set_scroll_mode(struct _lv_obj_t * obj, lv_scroll_mode_t mode);
 
-/**
- * Get how the scrollbars should behave.
- * @param obj pointer to an object
- * @return mode: LV_SCROLL_MODE_ON/OFF/AUTO/ACTIVE
- */
-lv_scroll_mode_t lv_obj_get_scroll_mode(struct _lv_obj_t * obj);
 
 /**
  * Moves all children with horizontally or vertically.
@@ -147,6 +141,16 @@ lv_coord_t lv_obj_get_scroll_right(struct _lv_obj_t * obj);
  * @param end poinr to point to store the result
  */
 void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end);
+
+
+lv_dir_t lv_obj_get_scroll_dir(const struct _lv_obj_t * obj);
+void lv_obj_set_scroll_dir(struct _lv_obj_t * obj, lv_dir_t dir);
+lv_scroll_mode_t lv_obj_get_scroll_mode(const struct _lv_obj_t * obj);
+lv_scroll_snap_align_t lv_obj_get_snap_align_x(const struct _lv_obj_t * obj);
+void lv_obj_set_snap_align_x(struct _lv_obj_t * obj, lv_scroll_snap_align_t align);
+lv_scroll_snap_align_t lv_obj_get_snap_align_y(const struct _lv_obj_t * obj);
+void lv_obj_set_snap_align_y(struct _lv_obj_t * obj, lv_scroll_snap_align_t align);
+
 
 /**********************
  *      MACROS

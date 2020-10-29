@@ -407,6 +407,7 @@ static bool lv_task_exec(lv_task_t * task)
         task_deleted   = false;
         task_created   = false;
         if(task->task_cb) task->task_cb(task);
+        LV_ASSERT_MEM_INTEGRITY();
 
         /*Delete if it was a one shot lv_task*/
         if(task_deleted == false) { /*The task might be deleted by itself as well*/

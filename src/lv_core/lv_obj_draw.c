@@ -437,8 +437,10 @@ void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_coord_t obj_h = lv_obj_get_height(obj);
     lv_coord_t obj_w = lv_obj_get_width(obj);
 
+    lv_scroll_dir_t dir = lv_obj_get_scroll_dir(obj);
+
     bool ver_draw = false;
-    if((obj->scroll_dir & LV_DIR_VER) &&
+    if((dir & LV_DIR_VER) &&
        ((sm == LV_SCROLL_MODE_ON) ||
         (sm == LV_SCROLL_MODE_AUTO && (st > 0 || sb > 0)) ||
         (sm == LV_SCROLL_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_VER))) {
@@ -447,7 +449,7 @@ void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
 
 
     bool hor_draw = false;
-    if((obj->scroll_dir & LV_DIR_HOR) &&
+    if((dir & LV_DIR_HOR) &&
           ((sm == LV_SCROLL_MODE_ON) ||
            (sm == LV_SCROLL_MODE_AUTO && (sl > 0 || sr > 0)) ||
            (sm == LV_SCROLL_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_HOR))) {

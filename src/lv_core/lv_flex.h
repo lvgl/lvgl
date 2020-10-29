@@ -48,8 +48,10 @@ typedef enum {
 
 typedef struct {
     lv_coord_t gap;
-    uint32_t place      :4;
-    uint32_t dir        :4;
+    uint8_t dir        :2;
+    uint8_t wrap       :1;
+    uint8_t rev        :1;
+    uint8_t place      :3;
 }lv_flex_cont_t;
 
 /**********************
@@ -59,6 +61,12 @@ typedef struct {
 void lv_obj_set_flex_cont(lv_obj_t * obj, lv_flex_dir_t flex_dir, lv_flex_place_t flex_place);
 void lv_obj_set_flex_gap(lv_obj_t * obj, lv_coord_t gap);
 void lv_obj_set_flex_item(lv_obj_t * obj, lv_flex_place_t place);
+
+lv_flex_dir_t lv_obj_get_flex_dir(const lv_obj_t * obj);
+lv_flex_place_t lv_obj_get_flex_place(const lv_obj_t * obj);
+bool lv_obj_get_flex_wrap(const lv_obj_t * obj);
+bool lv_obj_get_flex_reverse(const lv_obj_t * obj);
+lv_coord_t lv_obj_get_flex_gap(const lv_obj_t * obj);
 void _lv_flex_refresh(lv_obj_t * cont);
 
 /**********************

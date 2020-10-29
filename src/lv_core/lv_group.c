@@ -93,7 +93,7 @@ void lv_group_del(lv_group_t * group)
     /*Remove the objects from the group*/
     lv_obj_t ** obj;
     _LV_LL_READ(&group->obj_ll, obj) {
-        (*obj)->group_p = NULL;
+        if((*obj)->spec_attr) (*obj)->spec_attr->group_p = NULL;
     }
 
     _lv_ll_clear(&(group->obj_ll));
@@ -119,15 +119,18 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
     }
 
     /*If the object is already in a group and focused then defocus it*/
-    if(obj->group_p) {
+    lv_group_t * group_cur = lv_obj_get_group(obj);
+    if(group_cur) {
         if(lv_obj_is_focused(obj)) {
-            lv_group_refocus(obj->group_p);
+            lv_group_refocus(group_cur);
 
             LV_LOG_INFO("lv_group_add_obj: assign object to an other group");
         }
     }
 
-    obj->group_p     = group;
+    if(obj->spec_attr == NULL) lv_obj_allocate_rare_attr(obj);
+    obj->spec_attr->group_p = group;
+
     lv_obj_t ** next = _lv_ll_ins_tail(&group->obj_ll);
     LV_ASSERT_MEM(next);
     if(next == NULL) return;
@@ -146,7 +149,7 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
  */
 void lv_group_remove_obj(lv_obj_t * obj)
 {
-    lv_group_t * g = obj->group_p;
+    lv_group_t * g = lv_obj_get_group(obj);
     if(g == NULL) return;
     if(g->obj_focus == NULL) return; /*Just to be sure (Not possible if there is at least one object in the group)*/
 
@@ -177,7 +180,7 @@ void lv_group_remove_obj(lv_obj_t * obj)
         if(*i == obj) {
             _lv_ll_remove(&g->obj_ll, i);
             lv_mem_free(i);
-            obj->group_p = NULL;
+            if(obj->spec_attr) obj->spec_attr->group_p = NULL;
             break;
         }
     }
@@ -199,7 +202,7 @@ void lv_group_remove_all_objs(lv_group_t * group)
     /*Remove the objects from the group*/
     lv_obj_t ** obj;
     _LV_LL_READ(&group->obj_ll, obj) {
-        (*obj)->group_p = NULL;
+        if((*obj)->spec_attr) (*obj)->spec_attr->group_p = NULL;
     }
 
     _lv_ll_clear(&(group->obj_ll));
@@ -212,7 +215,7 @@ void lv_group_remove_all_objs(lv_group_t * group)
 void lv_group_focus_obj(lv_obj_t * obj)
 {
     if(obj == NULL) return;
-    lv_group_t * g = obj->group_p;
+    lv_group_t * g = lv_obj_get_group(obj);
     if(g == NULL) return;
 
     if(g->frozen != 0) return;

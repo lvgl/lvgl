@@ -161,6 +161,11 @@ void * lv_mem_alloc(size_t size)
         return &zero_mem;
     }
 
+//    last_ent = NULL;
+    static uint32_t c = 0;
+    c++;
+//    if(c%10 == 0) printf("alloc:%d\n", c);
+
 #ifdef LV_ARCH_64
     /*Round the size up to 8*/
     size = (size + 7) & (~0x7);
@@ -171,27 +176,10 @@ void * lv_mem_alloc(size_t size)
     void * alloc = NULL;
 
 #if LV_MEM_CUSTOM == 0
-    static uint32_t defr = 0;
-    defr++;
-    if(defr > LV_MEM_FULL_DEFRAG_CNT) {
-        defr = 0;
-        lv_mem_defrag();
-    }
     alloc = alloc_core(size);
     if(alloc == NULL) {
-        LV_LOG_WARN("Perform defrag");
-        lv_mem_monitor_t mon;
-
-        lv_mem_monitor(&mon);
-        printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
-               (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
-               (int)mon.free_biggest_size);
+        LV_LOG_TRACE("No more memory, try to defrag");
         lv_mem_defrag();
-
-        lv_mem_monitor(&mon);
-        printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
-               (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
-               (int)mon.free_biggest_size);
         alloc = alloc_core(size);
     }
 
@@ -216,7 +204,12 @@ void * lv_mem_alloc(size_t size)
 #endif
 
     if(alloc == NULL) {
-        LV_LOG_WARN("Couldn't allocate memory");
+        LV_LOG_WARN("Couldn't allocate memory (%d bytes)", size);
+        lv_mem_monitor_t mon;
+        lv_mem_monitor(&mon);
+        LV_LOG_WARN("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
+               (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
+               (int)mon.free_biggest_size);
     }
     else {
 #if LV_MEM_CUSTOM == 0
@@ -241,19 +234,23 @@ void lv_mem_free(const void * data)
     if(data == &zero_mem) return;
     if(data == NULL) return;
 
-#if LV_MEM_ADD_JUNK
-    _lv_memset((void *)data, 0xbb, _lv_mem_get_size(data));
-#endif
-
-
 #if LV_ENABLE_GC == 0
     /*e points to the header*/
     lv_mem_ent_t * e = (lv_mem_ent_t *)((uint8_t *)data - sizeof(lv_mem_header_t));
+#  if LV_MEM_ADD_JUNK
+    _lv_memset((void *)data, 0xbb, _lv_mem_get_size(data));
+#  endif
 #endif
 
-/*Use custom, user defined free function*/
 #if LV_MEM_CUSTOM == 0
     e->header.s.used = 0;
+
+    static uint32_t defr = 0;
+    defr++;
+    if(defr > LV_MEM_FULL_DEFRAG_CNT) {
+        defr = 0;
+        lv_mem_defrag();
+    }
 #else
 #if LV_ENABLE_GC == 0
     /*e points to the header*/
@@ -387,7 +384,7 @@ lv_res_t lv_mem_test(void)
     lv_mem_ent_t * e;
     e = ent_get_next(NULL);
     while(e) {
-        if(e->header.s.d_size > LV_MEM_SIZE) {
+        if( e->header.s.d_size > LV_MEM_SIZE) {
             return LV_RES_INV;
         }
         uint8_t * e8 = (uint8_t *) e;

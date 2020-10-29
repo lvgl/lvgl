@@ -593,7 +593,7 @@ void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_o
     /*Get the grid size of the object has a defined grid*/
     lv_coord_t grid_w = 0;
     lv_coord_t grid_h = 0;
-    if(obj->grid) {
+    if(lv_obj_get_grid(obj)) {
         _lv_grid_calc_t calc;
         _lv_grid_calc(obj, &calc);
         grid_w = calc.grid_w + lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN) + lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
@@ -714,11 +714,12 @@ bool _lv_obj_is_grid_item(lv_obj_t * obj)
 {
     lv_obj_t * cont = lv_obj_get_parent(obj);
     if(cont == NULL) return false;
-    if(cont->grid == NULL) return false;
-    if(cont->grid->col_dsc == NULL) return false;
-    if(cont->grid->row_dsc == NULL) return false;
-    if(cont->grid->row_dsc_len == 0) return false;
-    if(cont->grid->col_dsc_len == 0) return false;
+    const lv_grid_t * g = lv_obj_get_grid(obj);
+    if(g == NULL) return false;
+    if(g->col_dsc == NULL) return false;
+    if(g->row_dsc == NULL) return false;
+    if(g->row_dsc_len == 0) return false;
+    if(g->col_dsc_len == 0) return false;
     if(LV_COORD_IS_GRID(obj->x_set) == false || LV_COORD_IS_GRID(obj->y_set) == false) return false;
     return true;
 }
@@ -733,7 +734,7 @@ bool _lv_obj_is_flex_item(struct _lv_obj_t * obj)
 {
     lv_obj_t * cont = lv_obj_get_parent(obj);
     if(cont == NULL) return false;
-    if(cont->flex_cont.dir == LV_FLEX_DIR_NONE) return false;
+    if(lv_obj_get_flex_dir(cont) == LV_FLEX_DIR_NONE) return false;
     if(LV_COORD_IS_FLEX(obj->x_set) == false || LV_COORD_IS_FLEX(obj->y_set) == false) return false;
     return true;
 }

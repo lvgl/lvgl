@@ -81,10 +81,11 @@ void _lv_scroll_handler(lv_indev_proc_t * proc)
             diff_y = elastic_diff(scroll_obj, proc->types.pointer.vect.y, st, sb);
         }
 
-        if((scroll_obj->scroll_dir & LV_DIR_LEFT) == 0 && diff_x > 0) diff_x = 0;
-        if((scroll_obj->scroll_dir & LV_DIR_RIGHT) == 0 && diff_x < 0) diff_x = 0;
-        if((scroll_obj->scroll_dir & LV_DIR_TOP) == 0 && diff_y > 0) diff_y = 0;
-        if((scroll_obj->scroll_dir & LV_DIR_BOTTOM) == 0 && diff_y < 0) diff_y = 0;
+        lv_dir_t scroll_dir = lv_obj_get_scroll_dir(scroll_obj);
+        if((scroll_dir & LV_DIR_LEFT) == 0 && diff_x > 0) diff_x = 0;
+        if((scroll_dir & LV_DIR_RIGHT) == 0 && diff_x < 0) diff_x = 0;
+        if((scroll_dir & LV_DIR_TOP) == 0 && diff_y > 0) diff_y = 0;
+        if((scroll_dir & LV_DIR_BOTTOM) == 0 && diff_y < 0) diff_y = 0;
 
         /*Respect the scroll limit area*/
         scroll_limit_diff(proc, &diff_x, &diff_y);
@@ -115,10 +116,13 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
         proc->types.pointer.scroll_throw_vect.x = 0;
     }
 
+    lv_scroll_snap_align_t align_x = lv_obj_get_snap_align_x(scroll_obj);
+    lv_scroll_snap_align_t align_y = lv_obj_get_snap_align_y(scroll_obj);
+
     if(proc->types.pointer.scroll_dir == LV_SCROLL_DIR_VER) {
         proc->types.pointer.scroll_throw_vect.x = 0;
         /*If no snapping "throw"*/
-        if(scroll_obj->snap_align_y == LV_SCROLL_SNAP_ALIGN_NONE) {
+        if(align_y == LV_SCROLL_SNAP_ALIGN_NONE) {
             proc->types.pointer.scroll_throw_vect.y =
                     proc->types.pointer.scroll_throw_vect.y * (100 - scroll_throw) / 100;
 
@@ -141,7 +145,7 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
     else if(proc->types.pointer.scroll_dir == LV_SCROLL_DIR_HOR) {
         proc->types.pointer.scroll_throw_vect.y = 0;
         /*If no snapping "throw"*/
-        if(scroll_obj->snap_align_x == LV_SCROLL_SNAP_ALIGN_NONE) {
+        if(align_x == LV_SCROLL_SNAP_ALIGN_NONE) {
             proc->types.pointer.scroll_throw_vect.x =
                     proc->types.pointer.scroll_throw_vect.x * (100 - scroll_throw) / 100;
 
@@ -166,7 +170,7 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
     if(proc->types.pointer.scroll_throw_vect.x == 0 && proc->types.pointer.scroll_throw_vect.y == 0) {
         /*Revert if scrolled in*/
         /*If vertically scrollable and not controlled by snap*/
-        if(scroll_obj->snap_align_y == LV_SCROLL_SNAP_ALIGN_NONE) {
+        if(align_y == LV_SCROLL_SNAP_ALIGN_NONE) {
             lv_coord_t st = lv_obj_get_scroll_top(scroll_obj);
             lv_coord_t sb = lv_obj_get_scroll_bottom(scroll_obj);
             if(st > 0 || sb > 0) {
@@ -180,7 +184,7 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
         }
 
         /*If horizontally scrollable and not controlled by snap*/
-        if(scroll_obj->snap_align_x == LV_SCROLL_SNAP_ALIGN_NONE) {
+        if(align_x == LV_SCROLL_SNAP_ALIGN_NONE) {
             lv_coord_t sl = lv_obj_get_scroll_left(scroll_obj);
             lv_coord_t sr = lv_obj_get_scroll_right(scroll_obj);
             if (sl > 0 || sr > 0) {
@@ -276,7 +280,7 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
         bool right_en = hor_en;
 
         /*The object might have disabled some directions.*/
-        lv_dir_t scroll_dir = obj_act->scroll_dir;
+        lv_dir_t scroll_dir = lv_obj_get_scroll_dir(obj_act);
         if((scroll_dir & LV_DIR_LEFT) == 0) left_en = false;
         if((scroll_dir & LV_DIR_RIGHT) == 0) right_en = false;
         if((scroll_dir & LV_DIR_TOP) == 0) up_en = false;
@@ -347,7 +351,7 @@ static void init_scroll_limits(lv_indev_proc_t * proc)
     }
     /*With STOP limit the scrolling to the perv and next snap point*/
     else {
-        switch(obj->snap_align_y) {
+        switch(lv_obj_get_snap_align_y(obj)) {
         case LV_SCROLL_SNAP_ALIGN_START:
             proc->types.pointer.scroll_area.y1 = find_snap_point_y(obj, obj->coords.y1 + 1, LV_COORD_MAX, 0);
             proc->types.pointer.scroll_area.y2 = find_snap_point_y(obj, LV_COORD_MIN, obj->coords.y1 - 1, 0);
@@ -368,7 +372,7 @@ static void init_scroll_limits(lv_indev_proc_t * proc)
             break;
         }
 
-        switch(obj->snap_align_x) {
+        switch(lv_obj_get_snap_align_x(obj)) {
         case LV_SCROLL_SNAP_ALIGN_START:
             proc->types.pointer.scroll_area.x1 = find_snap_point_x(obj, obj->coords.x1, LV_COORD_MAX, 0);
             proc->types.pointer.scroll_area.x2 = find_snap_point_x(obj, LV_COORD_MIN, obj->coords.x1, 0);
@@ -399,7 +403,8 @@ static void init_scroll_limits(lv_indev_proc_t * proc)
 
 static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coord_t max, lv_coord_t ofs)
 {
-    if(obj->snap_align_x == LV_SCROLL_SNAP_ALIGN_NONE) return 0;
+    lv_scroll_snap_align_t align = lv_obj_get_snap_align_x(obj);
+    if(align == LV_SCROLL_SNAP_ALIGN_NONE) return 0;
 
     lv_coord_t dist = LV_COORD_MAX;
 
@@ -408,7 +413,7 @@ static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coo
         if(lv_obj_has_flag(child, LV_OBJ_FLAG_SNAPABLE)) {
             lv_coord_t x_child = 0;
             lv_coord_t x_parent = 0;
-            switch(obj->snap_align_x) {
+            switch(align) {
             case LV_SCROLL_SNAP_ALIGN_START:
                 x_child = child->coords.x1;
                 x_parent = obj->coords.x1;
@@ -431,7 +436,6 @@ static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coo
 
         child = lv_obj_get_child_back(obj, child);
     }
-    LV_ASSERT_MEM_INTEGRITY();
 
     return dist == LV_COORD_MAX ? 0: -dist;
 }
@@ -447,7 +451,8 @@ static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coo
  */
 static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coord_t max, lv_coord_t ofs)
 {
-    if(obj->snap_align_y == LV_SCROLL_SNAP_ALIGN_NONE) return 0;
+    lv_scroll_snap_align_t align = lv_obj_get_snap_align_y(obj);
+    if(align == LV_SCROLL_SNAP_ALIGN_NONE) return 0;
 
     lv_coord_t dist = LV_COORD_MAX;
 
@@ -456,7 +461,7 @@ static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coo
         if(lv_obj_has_flag(child, LV_OBJ_FLAG_SNAPABLE)) {
             lv_coord_t y_child = 0;
             lv_coord_t y_parent = 0;
-            switch(obj->snap_align_y) {
+            switch(align) {
             case LV_SCROLL_SNAP_ALIGN_START:
                 y_child = child->coords.y1;
                 y_parent = obj->coords.y1;
@@ -480,7 +485,6 @@ static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coo
         child = lv_obj_get_child_back(obj, child);
     }
 
-    LV_ASSERT_MEM_INTEGRITY();
     return dist == LV_COORD_MAX ? 0 : -dist;
 }
 

@@ -47,21 +47,11 @@ void lv_obj_set_scroll_mode(lv_obj_t * obj, lv_scroll_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(obj->scroll_mode == mode) return;
-    obj->scroll_mode = mode;
+    lv_obj_allocate_rare_attr(obj);
+
+    if(obj->spec_attr->scroll_mode == mode) return;
+    obj->spec_attr->scroll_mode = mode;
     lv_obj_invalidate(obj);
-}
-
-/**
- * Get how the scrollbars should behave.
- * @param obj pointer to an object
- * @return mode: LV_SCROLL_MODE_ON/OFF/AUTO/ACTIVE
- */
-lv_scroll_mode_t lv_obj_get_scroll_mode(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return obj->scroll_mode;
 }
 
 /**
@@ -75,11 +65,11 @@ void _lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 {
     if(x == 0 && y == 0) return;
 
-    if(obj->rare_attr == NULL) {
-        obj->rare_attr = lv_obj_allocate_rare_attr(obj);
+    if(obj->spec_attr == NULL) {
+        obj->spec_attr = lv_obj_allocate_rare_attr(obj);
     }
-    obj->rare_attr->scroll.x += x;
-    obj->rare_attr->scroll.y += y;
+    obj->spec_attr->scroll.x += x;
+    obj->spec_attr->scroll.y += y;
 
     _lv_obj_move_children_by(obj, x, y);
     lv_res_t res = lv_signal_send(obj, LV_SIGNAL_SCROLL, NULL);
@@ -177,8 +167,8 @@ void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
  */
 lv_coord_t lv_obj_get_scroll_top(const lv_obj_t * obj)
 {
-    if(obj->rare_attr == NULL) return 0;
-    return -obj->rare_attr->scroll.y;
+    if(obj->spec_attr == NULL) return 0;
+    return -obj->spec_attr->scroll.y;
 }
 
 /**
@@ -226,8 +216,8 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_scroll_left(const lv_obj_t * obj)
 {
-    if(obj->rare_attr == NULL) return 0;
-    return -obj->rare_attr->scroll.x;
+    if(obj->spec_attr == NULL) return 0;
+    return -obj->spec_attr->scroll.x;
 }
 
 /**
@@ -280,6 +270,52 @@ void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end)
     a = lv_anim_get(obj, (lv_anim_exec_xcb_t)scroll_anim_y_cb);
     end->y = a ? -a->end : lv_obj_get_scroll_top(obj);
 }
+
+lv_dir_t lv_obj_get_scroll_dir(const struct _lv_obj_t * obj)
+{
+    if(obj->spec_attr) return obj->spec_attr->scroll_dir;
+    else return LV_DIR_ALL;
+}
+
+void lv_obj_set_scroll_dir(struct _lv_obj_t * obj, lv_dir_t dir)
+{
+    lv_obj_allocate_rare_attr(obj);
+
+    if(dir != obj->spec_attr->scroll_dir) {
+        obj->spec_attr->scroll_dir = dir;
+        lv_obj_invalidate(obj);
+    }
+}
+
+lv_scroll_mode_t lv_obj_get_scroll_mode(const struct _lv_obj_t * obj)
+{
+    if(obj->spec_attr) return obj->spec_attr->scroll_mode;
+    else return LV_SCROLL_MODE_AUTO;
+}
+
+lv_scroll_snap_align_t lv_obj_get_snap_align_x(const struct _lv_obj_t * obj)
+{
+    if(obj->spec_attr) return obj->spec_attr->snap_align_x;
+    else return LV_SCROLL_SNAP_ALIGN_NONE;
+}
+void lv_obj_set_snap_align_x(struct _lv_obj_t * obj, lv_scroll_snap_align_t align)
+{
+    lv_obj_allocate_rare_attr(obj);
+    obj->spec_attr->snap_align_x = align;
+}
+
+lv_scroll_snap_align_t lv_obj_get_snap_align_y(const struct _lv_obj_t * obj)
+{
+    if(obj->spec_attr) return obj->spec_attr->snap_align_y;
+    else return LV_SCROLL_SNAP_ALIGN_NONE;
+}
+
+void lv_obj_set_snap_align_y(struct _lv_obj_t * obj, lv_scroll_snap_align_t align)
+{
+    lv_obj_allocate_rare_attr(obj);
+    obj->spec_attr->snap_align_y = align;
+}
+
 
 /**********************
  *   STATIC FUNCTIONS

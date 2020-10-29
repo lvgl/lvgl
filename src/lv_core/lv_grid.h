@@ -101,7 +101,7 @@ void lv_obj_set_grid(lv_obj_t * obj, const lv_grid_t * grid);
  * @param obj pointer to an object
  * @return the grid, NULL if no grid
  */
-const lv_grid_t * lv_obj_get_grid(lv_obj_t * obj, const lv_grid_t * grid);
+const lv_grid_t * lv_obj_get_grid(lv_obj_t * obj);
 
 
 /**
