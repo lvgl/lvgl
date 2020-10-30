@@ -1,0 +1,1284 @@
+# Kconfig file for LVGL v7.7.1
+
+menu "LVGL configuration"
+    
+    config LV_HOR_RES_MAX
+        int "Maximal horizontal resolution to support by the library."
+        default 480
+
+    config LV_VER_RES_MAX
+        int "Maximal vertical resolution to support by the library."
+        default 320
+
+    choice
+        prompt "Color depth."
+        default LV_COLOR_DEPTH_16
+        help
+            Color depth to be used.
+
+        config LV_COLOR_DEPTH_32
+            bool "32: ARGB8888"
+        config LV_COLOR_DEPTH_16
+            bool "16: RGB565"
+        config LV_COLOR_DEPTH_8
+            bool "8: RGB232"
+        config LV_COLOR_DEPTH_1
+            bool "1: 1 byte per pixel"
+    endchoice
+
+    config LV_COLOR_DEPTH
+        int
+        default 1 if LV_COLOR_DEPTH_1
+        default 8 if LV_COLOR_DEPTH_8
+        default 16 if LV_COLOR_DEPTH_16
+        default 32 if LV_COLOR_DEPTH_32
+    
+    config LV_COLOR_16_SWAP
+        bool "Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)."
+        default y
+
+    config LV_COLOR_SCREEN_TRANSP
+        bool "Enable screen transparency."
+        help
+            Useful for OSD or other overlapping GUIs.
+            Requires `LV_COLOR_DEPTH = 32` colors and the screen's style
+            should be modified: `style.body.opa = ...`.
+
+    choice
+        prompt "Images pixels with this color will not be drawn (with chroma keying)."
+        default LV_COLOR_TRANSP_LIME
+        
+        config LV_COLOR_TRANSP_WHITE
+            bool "Color transp. white"
+        config LV_COLOR_TRANSP_SILVER
+            bool "Color transp. silver"
+        config LV_COLOR_TRANSP_GRAY
+            bool "Color transp. gray"
+        config LV_COLOR_TRANSP_BLACK
+            bool "Color transp. black"
+        config LV_COLOR_TRANSP_RED
+            bool "Color transp. red"
+        config LV_cOLOR_TRANSP_MAROON
+            bool "Color transp. maroon"
+        config LV_COLOR_TRANSP_YELLOW
+            bool "Color transp. yellow"
+        config LV_COLOR_TRANSP_OLIVE
+            bool "Color transp. olive"
+        config LV_COLOR_TRANSP_LIME
+            bool "Color transp. lime"
+        config LV_COLOR_TRANSP_GREEN
+            bool "Color transp. green"
+        config LV_COLOR_TRANSP_CYAN
+            bool "Color transp. cyan"
+        config LV_COLOR_TRANSP_AQUA
+            bool "Color transp. aqua"
+        config LV_COLOR_TRANSP_TEAL
+            bool "Color transp. teal"
+        config LV_COLOR_TRANSP_BLUE
+            bool "Color transp. blue"
+        config LV_COLOR_TRANSP_NAVY
+            bool "Color transp. navy"
+        config LV_COLOR_TRANSP_MAGENTA
+            bool "Color transp. magenta"
+        config LV_COLOR_TRANSP_PURPLE
+            bool "Color transp. purple"
+        config LV_COLOR_TRANSP_ORANGE
+            bool "Color transp. orange"
+    endchoice
+        
+    config LV_COLOR_TRANSP_HEX
+        hex
+        default 0xFFFFFF if LV_COLOR_TRANSP_WHITE
+        default 0xC0C0C0 if LV_COLOR_TRANSP_SILVER
+        default 0x808080 if LV_COLOR_TRANSP_GRAY
+        default 0x000000 if LV_COLOR_TRANSP_BLACK
+        default 0xFF0000 if LV_COLOR_TRANSP_RED
+        default 0x800000 if LV_COLOR_TRANSP_MAROON
+        default 0xFFFF00 if LV_COLOR_TRANSP_YELLOW
+        default 0x808000 if LV_COLOR_TRANSP_OLIVE
+        default 0x00FF00 if LV_COLOR_TRANSP_LIME
+        default 0x008000 if LV_COLOR_TRANSP_GREEN
+        default 0x00FFFF if LV_COLOR_TRANSP_CYAN
+        default 0x00FFFF if LV_COLOR_TRANSP_AQUA
+        default 0x008080 if LV_COLOR_TRANSP_TEAL
+        default 0x0000FF if LV_COLOR_TRANSP_BLUE
+        default 0x000080 if LV_COLOR_TRANSP_NAVY
+        default 0xFF00FF if LV_COLOR_TRANSP_MAGENTA
+        default 0x800080 if LV_COLOR_TRANSP_PURPLE
+        default 0xFFA500 if LV_COLOR_TRANSP_ORANGE
+
+    config LV_ANTIALIAS
+        bool "Enable anti-aliasing (lines, and radiuses will be smoothed)."
+        default y
+
+    config LV_DISP_DEF_REFR_PERIOD
+        int "Default display refresh period (ms)."
+        default 30
+        help
+            Can be changed in the display driver (`lv_disp_drv_t`).
+
+    config LV_DPI
+        int "DPI (Dots per inch in px)."
+        default 130
+
+    config LV_DISP_SMALL_LIMIT
+        int "Small display limit"
+        default 30
+        help
+            According to the width of the display (hor. res. / dpi) the
+            displays fall in 4 categories. This is the upper limit for small
+            displays.
+
+    config LV_DISP_MEDIUM_LIMIT
+        int "Medium display limit"
+        default 50
+        help
+            According to the width of the display (hor. res. / dpi) the
+            displays fall in 4 categories. This is the upper limit for medium
+            displays.
+    
+    config LV_DISP_LARGE_LIMIT
+        int "Large display limit"
+        default 70
+        help
+            According to the width of the display (hor. res. / dpi) the
+            displays fall in 4 categories. This is the upper limit for large
+            displays.
+    
+    menu "Memory manager settings"
+	config LV_MEM_SIZE
+	    int
+	    prompt "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
+	    range 2 128
+	    default 32
+    endmenu
+    
+    menu "Indev device settings"
+        config LV_INDEV_DEF_READ_PERIOD
+            int "Input device read period [ms]."
+            default 30
+        config LV_INDEV_DEF_DRAG_LIMIT
+            int "Drag threshold in pixels."
+            default 10
+        config LV_INDEV_DEF_DRAG_THROW
+            int "Drag throw slow-down in [%]. Greater value -> faster slow down."
+            default 10
+        config LV_INDEV_DEF_LONG_PRESS_TIME
+            int "Long press time [ms]. Time to send 'LV_EVENT_LONG_PRESSED'."
+            default 400
+        config LV_INDEV_DEF_LONG_PRESS_REP_TIME
+            int "Repeated trigger period in long press [ms]. Time between 'LV_EVENT_LONG_PRESSED_REPEAT'."
+            default 100
+        config LV_INDEV_DEF_GESTURE_LIMIT
+            int "Gesture threshold in pixels."
+            default 50
+        config LV_INDEV_DEF_GESTURE_MIN_VELOCITY
+            int "Gesture min velocity at release before swipe (pixels)."
+            default 3
+
+    endmenu
+    
+    menu "Feature usage"
+        config LV_USE_ANIMATION
+            bool "Enable the Animations."
+            default y
+        config LV_USE_SHADOW
+            bool "Enable shadow drawing."
+            default y
+        config LV_SHADOW_CACHE_SIZE
+            int "Shadow cache size"
+            depends on LV_USE_SHADOW
+            default 0
+            help
+                Allow buffering some shadow calculation
+                LV_SHADOW_CACHE_SIZE is the max. shadow size to buffer,
+                where shadow size is `shadow_width + radius`
+                Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost.
+        config LV_USE_OUTLINE
+            bool "Enable outline drawing on rectangles."
+            default y
+        config LV_USE_PATTERN
+            bool "Enable pattern drawing on rectangles."
+            default y
+        config LV_USE_VALUE_STR
+            bool "Enable value string drawing on rectangles."
+            default y
+        config LV_USE_BLEND_MODES
+            bool "Use other blend modes then normal (LV_BLEND_MODE_...)."
+            default y
+        config LV_USE_OPA_SCALE
+            bool "Use the 'opa_scale' style property to set the opacity of an object and it's children at once."
+            default y
+        config LV_USE_IMG_TRANSFORM
+            bool "Use image zoom and rotation."
+            default y
+        config LV_USE_GROUP
+            bool "Enable object groups (for keyboard/encoder navigation)."
+            default y
+        config LV_USE_GPU
+            bool "Enable GPU interface (only enabled 'gpu_fill_cb' and 'gpu_blend_cb' in the disp. drv."
+            default y
+        config LV_USE_GPU_STM32_DMA2D
+            bool "Enable STM32 DMA2D."
+        config LV_GPU_DMA2D_CMSIS_INCLUDE
+            string "include path of CMSIS header of target processor"
+            default ""
+            help
+                e.g. "stm32f769xx.h" or "stm32f429xx.h"
+        config LV_USE_GPU_NXP_PXP
+            bool "Use PXP for CPU off-load on NXP RTxxx platforms."
+        config LV_USE_GPU_NXP_PXP_AUTO_INIT
+            bool "Call lv_gpu_nxp_pxp_init() automatically or manually."
+            help
+                1: Add default bare metal and FreeRTOS interrupt handling
+                routines for PXP (lv_gpu_nxp_pxp_osa.c) and call
+                lv_gpu_nxp_pxp_init() automatically during lv_init().
+                Note that symbol FSL_RTOS_FREE_RTOS has to be defined in order
+                to use FreeRTOS OSA, otherwise bare-metal implementation is
+                selected.
+                0: lv_gpu_nxp_pxp_init() has to be called manually before
+                lv_init().
+        config LV_USE_GPU_NXP_VG_LITE
+            bool "Use VG-Lite for CPU off-load on NXP RTxxx platforms."
+        config LV_USE_FILESYSTEM
+            bool "Enable file system (might be required for images."
+            default y
+        config LV_USE_USER_DATA
+            bool "Add a 'user_data' to drivers and objects."
+        config LV_USE_PERF_MONITOR
+            bool "Show CPU usage and FPS count in the right bottom corner."
+        config LV_USE_API_EXTENSION_V6
+            bool "Use the functions and types from the older API if possible."
+            default y
+        config LV_USE_API_EXTENSION_V7
+            bool "Use the functions and types from the older API if possible."
+            default y
+    endmenu
+    
+    menu "Image decoder and cache"
+        config LV_IMG_CF_INDEXED
+            bool "Enable indexed (pallete) images."
+            default y
+        config LV_IMG_CF_ALPHA
+            bool "Enable alpha indexed images."
+            default y
+        config LV_IMG_CACHE_DEF_SIZE
+            int "Default image cache size."
+            default 1
+            help
+                Image caching keeps the images opened. If only the built-in
+                image formats are used there is no real advantage of caching.
+                (I.e. no new image decoder is added)
+
+                With complex image decoders (e.g. PNG or JPG) caching can
+                save the continuous open/decode of images.
+                However the opened images might consume additional RAM.
+                LV_IMG_CACHE_DEF_SIZE must be >= 1
+    endmenu
+
+    menu "Compiler settings"
+        config LV_BIG_ENDIAN_SYSTEM
+            bool "For big endian systems set to 1"
+    endmenu
+
+    menu "Log Settings"
+        config LV_USE_LOG
+            bool "Enable the log module"
+
+        choice
+            bool "Default log verbosity" if LV_USE_LOG
+            default LV_LOG_LEVEL_INFO
+            help
+                Specify how important log should be added.
+
+            config LV_LOG_LEVEL_TRACE
+                bool "Trace - Detailed information"
+            config LV_LOG_LEVEL_INFO 
+                bool "Info  - Log important events"
+            config LV_LOG_LEVEL_WARN 
+                bool "Warn  - Log if something unwanted happened"
+            config LV_LOG_LEVEL_ERROR
+                bool "Error - Only critical issues"
+            config LV_LOG_LEVEL_NONE 
+                bool "None  - Do not log anything"
+        endchoice
+
+        config LV_LOG_LEVEL
+            int
+            default 0 if LV_LOG_LEVEL_TRACE
+            default 1 if LV_LOG_LEVEL_INFO
+            default 2 if LV_LOG_LEVEL_WARN
+            default 3 if LV_LOG_LEVEL_ERROR
+            default 4 if LV_LOG_LEVEL_USER
+            default 5 if LV_LOG_LEVEL_NONE
+
+        config LV_LOG_PRINTF
+            bool "Print the log with 'printf'" if LV_USE_LOG
+            default y
+            help
+                Use printf for log output. 
+                If not set the user needs to register a callback with `lv_log_register_print_cb`.
+
+    endmenu
+    
+    menu "Debug Settings"
+        config LV_USE_DEBUG
+            bool "Enable Debug"
+            default y
+        
+        config LV_USE_ASSERT_NULL
+            bool "Check if the parameter is NULL. (Quite fast)"
+            default y
+
+        config LV_USE_ASSERT_MEM
+            bool "Checks is the memory is successfully allocated or no. (Quite fast)"
+            default y
+
+        config LV_USE_ASSERT_MEM_INTEGRITY
+            bool "Check the integrity of `lv_mem` after critical operations. (Slow)"
+            
+        config LV_USE_ASSERT_STR
+            bool "Search for NULL, very long strings, invalid characters, and unnatural repetitions. (Slow)"
+            help 
+                If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled).
+            
+        config LV_USE_ASSERT_OBJ
+            bool "Check NULL, the object's type and existence (e.g. not deleted). (Quite slow)."
+            help 
+                If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled)
+            
+        config LV_USE_ASSERT_STYLE
+            bool "Check if the styles are properly initialized. (Fast)"
+    endmenu
+    
+    menu "Font usage"
+        config LV_FONT_FMT_TXT_LARGE
+            bool "Enable it if you have fonts with a lot of characters."
+            help
+                The limit depends on the font size, font face and bpp
+                but with > 10,000 characters if you see issues probably you
+                need to enable it.
+
+        config LV_FONT_SUBPX_BGR
+            bool "Use BGR instead RGB for sub-pixel rendering."
+            help
+                Set the pixel order of the display.
+                Important only if "subpx fonts" are used.
+                With "normal" font it doesn't matter.
+        
+        menu "Enable built-in fonts"
+            config LV_FONT_MONTSERRAT_8
+                bool "Enable Montserrat 8"
+            config LV_FONT_MONTSERRAT_10
+                bool "Enable Montserrat 10"
+            config LV_FONT_MONTSERRAT_12
+                bool "Enable Montserrat 12"
+            config LV_FONT_MONTSERRAT_14
+                bool "Enable Montserrat 14"
+            config LV_FONT_MONTSERRAT_16
+                bool "Enable Montserrat 16"
+                default y
+            config LV_FONT_MONTSERRAT_18
+                bool "Enable Montserrat 18"
+            config LV_FONT_MONTSERRAT_20
+                bool "Enable Montserrat 20"
+            config LV_FONT_MONTSERRAT_22
+                bool "Enable Montserrat 22"
+            config LV_FONT_MONTSERRAT_24
+                bool "Enable Montserrat 24"
+            config LV_FONT_MONTSERRAT_26
+                bool "Enable Montserrat 26"
+            config LV_FONT_MONTSERRAT_28
+                bool "Enable Montserrat 28"
+            config LV_FONT_MONTSERRAT_30
+                bool "Enable Montserrat 30"
+            config LV_FONT_MONTSERRAT_32
+                bool "Enable Montserrat 32"
+            config LV_FONT_MONTSERRAT_34
+                bool "Enable Montserrat 34"
+            config LV_FONT_MONTSERRAT_36
+                bool "Enable Montserrat 36"
+            config LV_FONT_MONTSERRAT_38
+                bool "Enable Montserrat 38"
+            config LV_FONT_MONTSERRAT_40
+                bool "Enable Montserrat 40"
+            config LV_FONT_MONTSERRAT_42
+                bool "Enable Montserrat 42"
+            config LV_FONT_MONTSERRAT_44
+                bool "Enable Montserrat 44"
+            config LV_FONT_MONTSERRAT_46
+                bool "Enable Montserrat 46"
+            config LV_FONT_MONTSERRAT_48
+                bool "Enable Montserrat 48"
+            config LV_FONT_UNSCII_8
+                bool "Enable UNSCII 8 (Perfect monospace font)"
+            config LV_FONT_MONTSERRAT12SUBPX
+                bool "Enable Montserrat 12 sub-pixel"
+            config LV_FONT_MONTSERRAT28COMPRESSED
+                bool "Enable Montserrat 28 compressed"
+            config LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+                bool "Enable Dejavu 16 Persian, Hebrew, Arabic letters"
+            config LV_FONT_SIMSUN_16_CJK
+                bool "Enable Simsun 16 CJK"
+        endmenu
+
+        choice LV_FONT_DEFAULT_SMALL
+            prompt "Select theme default small font"
+            default LV_FONT_DEFAULT_SMALL_MONTSERRAT_16
+            help
+                Select theme default small font
+
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_8
+                bool "Montserrat 8"
+                select LV_FONT_MONTSERRAT_8
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_10
+                bool "Montserrat 10"
+                select LV_FONT_MONTSERRAT_10
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_12
+                bool "Montserrat 12"
+                select LV_FONT_MONTSERRAT_12
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_14
+                bool "Montserrat 14"
+                select LV_FONT_MONTSERRAT_14
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_16
+                bool "Montserrat 16"
+                select LV_FONT_MONTSERRAT_16
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_18
+                bool "Montserrat 18"
+                select LV_FONT_MONTSERRAT_18
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_20
+                bool "Montserrat 20"
+                select LV_FONT_MONTSERRAT_20
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_22
+                bool "Montserrat 22"
+                select LV_FONT_MONTSERRAT_22
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_24
+                bool "Montserrat 24"
+                select LV_FONT_MONTSERRAT_24
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_26
+                bool "Montserrat 26"
+                select LV_FONT_MONTSERRAT_26
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_28
+                bool "Montserrat 28"
+                select LV_FONT_MONTSERRAT_28
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_30
+                bool "Montserrat 30"
+                select LV_FONT_MONTSERRAT_30
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_32
+                bool "Montserrat 32"
+                select LV_FONT_MONTSERRAT_32
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_34
+                bool "Montserrat 34"
+                select LV_FONT_MONTSERRAT_34
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_36
+                bool "Montserrat 36"
+                select LV_FONT_MONTSERRAT_36
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_38
+                bool "Montserrat 38"
+                select LV_FONT_MONTSERRAT_38
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_40
+                bool "Montserrat 40"
+                select LV_FONT_MONTSERRAT_40
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_42
+                bool "Montserrat 42"
+                select LV_FONT_MONTSERRAT_42
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_44
+                bool "Montserrat 44"
+                select LV_FONT_MONTSERRAT_44
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_46
+                bool "Montserrat 46"
+                select LV_FONT_MONTSERRAT_46
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT_48
+                bool "Montserrat 48"
+                select LV_FONT_MONTSERRAT_48
+            config LV_FONT_DEFAULT_SMALL_UNSCII_8
+                bool "UNSCII 8 (Perfect monospace font)"
+                select LV_FONT_UNSCII_8
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT12SUBPX
+                bool "Montserrat 12 sub-pixel"
+                select LV_FONT_MONTSERRAT12SUBPX
+            config LV_FONT_DEFAULT_SMALL_MONTSERRAT28COMPRESSED
+                bool "Montserrat 28 compressed"
+                select LV_FONT_MONTSERRAT28COMPRESSED
+            config LV_FONT_DEFAULT_SMALL_DEJAVU_16_PERSIAN_HEBREW
+                bool "Dejavu 16 Persian, Hebrew, Arabic letters"
+                select LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+            config LV_FONT_DEFAULT_SMALL_SIMSUN_16_CJK
+                bool "Simsun 16 CJK"
+                select LV_FONT_SIMSUN_16_CJK
+        endchoice
+        
+        choice LV_FONT_DEFAULT_NORMAL
+            prompt "Select theme default normal font"
+            default LV_FONT_DEFAULT_NORMAL_MONTSERRAT_16
+            help
+                Select theme default normal font
+
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_8
+                bool "Montserrat 8"
+                select LV_FONT_MONTSERRAT_8
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_10
+                bool "Montserrat 10"
+                select LV_FONT_MONTSERRAT_10
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_12
+                bool "Montserrat 12"
+                select LV_FONT_MONTSERRAT_12
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_14
+                bool "Montserrat 14"
+                select LV_FONT_MONTSERRAT_14
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_16
+                bool "Montserrat 16"
+                select LV_FONT_MONTSERRAT_16
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_18
+                bool "Montserrat 18"
+                select LV_FONT_MONTSERRAT_18
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_20
+                bool "Montserrat 20"
+                select LV_FONT_MONTSERRAT_20
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_22
+                bool "Montserrat 22"
+                select LV_FONT_MONTSERRAT_22
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_24
+                bool "Montserrat 24"
+                select LV_FONT_MONTSERRAT_24
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_26
+                bool "Montserrat 26"
+                select LV_FONT_MONTSERRAT_26
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_28
+                bool "Montserrat 28"
+                select LV_FONT_MONTSERRAT_28
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_30
+                bool "Montserrat 30"
+                select LV_FONT_MONTSERRAT_30
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_32
+                bool "Montserrat 32"
+                select LV_FONT_MONTSERRAT_32
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_34
+                bool "Montserrat 34"
+                select LV_FONT_MONTSERRAT_34
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_36
+                bool "Montserrat 36"
+                select LV_FONT_MONTSERRAT_36
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_38
+                bool "Montserrat 38"
+                select LV_FONT_MONTSERRAT_38
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_40
+                bool "Montserrat 40"
+                select LV_FONT_MONTSERRAT_40
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_42
+                bool "Montserrat 42"
+                select LV_FONT_MONTSERRAT_42
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_44
+                bool "Montserrat 44"
+                select LV_FONT_MONTSERRAT_44
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_46
+                bool "Montserrat 46"
+                select LV_FONT_MONTSERRAT_46
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT_48
+                bool "Montserrat 48"
+                select LV_FONT_MONTSERRAT_48
+            config LV_FONT_DEFAULT_NORMAL_UNSCII_8
+                bool "UNSCII 8 (Perfect monospace font)"
+                select LV_FONT_UNSCII_8
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT12SUBPX
+                bool "Montserrat 12 sub-pixel"
+                select LV_FONT_MONTSERRAT12SUBPX
+            config LV_FONT_DEFAULT_NORMAL_MONTSERRAT28COMPRESSED
+                bool "Montserrat 28 compressed"
+                select LV_FONT_MONTSERRAT28COMPRESSED
+            config LV_FONT_DEFAULT_NORMAL_DEJAVU_16_PERSIAN_HEBREW
+                bool "Dejavu 16 Persian, Hebrew, Arabic letters"
+                select LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+            config LV_FONT_DEFAULT_NORMAL_SIMSUN_16_CJK
+                bool "Simsun 16 CJK"
+                select LV_FONT_SIMSUN_16_CJK
+        endchoice
+        
+        choice LV_FONT_DEFAULT_SUBTITLE
+            prompt "Select theme default subtitle font"
+            default LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_16
+            help
+                Select theme default subtitle font
+
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_8
+                bool "Montserrat 8"
+                select LV_FONT_MONTSERRAT_8
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_10
+                bool "Montserrat 10"
+                select LV_FONT_MONTSERRAT_10
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_12
+                bool "Montserrat 12"
+                select LV_FONT_MONTSERRAT_12
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_14
+                bool "Montserrat 14"
+                select LV_FONT_MONTSERRAT_14
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_16
+                bool "Montserrat 16"
+                select LV_FONT_MONTSERRAT_16
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_18
+                bool "Montserrat 18"
+                select LV_FONT_MONTSERRAT_18
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_20
+                bool "Montserrat 20"
+                select LV_FONT_MONTSERRAT_20
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_22
+                bool "Montserrat 22"
+                select LV_FONT_MONTSERRAT_22
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_24
+                bool "Montserrat 24"
+                select LV_FONT_MONTSERRAT_24
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_26
+                bool "Montserrat 26"
+                select LV_FONT_MONTSERRAT_26
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_28
+                bool "Montserrat 28"
+                select LV_FONT_MONTSERRAT_28
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_30
+                bool "Montserrat 30"
+                select LV_FONT_MONTSERRAT_30
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_32
+                bool "Montserrat 32"
+                select LV_FONT_MONTSERRAT_32
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_34
+                bool "Montserrat 34"
+                select LV_FONT_MONTSERRAT_34
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_36
+                bool "Montserrat 36"
+                select LV_FONT_MONTSERRAT_36
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_38
+                bool "Montserrat 38"
+                select LV_FONT_MONTSERRAT_38
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_40
+                bool "Montserrat 40"
+                select LV_FONT_MONTSERRAT_40
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_42
+                bool "Montserrat 42"
+                select LV_FONT_MONTSERRAT_42
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_44
+                bool "Montserrat 44"
+                select LV_FONT_MONTSERRAT_44
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_46
+                bool "Montserrat 46"
+                select LV_FONT_MONTSERRAT_46
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_48
+                bool "Montserrat 48"
+                select LV_FONT_MONTSERRAT_48
+            config LV_FONT_DEFAULT_SUBTITLE_UNSCII_8
+                bool "UNSCII 8 (Perfect monospace font)"
+                select LV_FONT_UNSCII_8
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT12SUBPX
+                bool "Montserrat 12 sub-pixel"
+                select LV_FONT_MONTSERRAT12SUBPX
+            config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT28COMPRESSED
+                bool "Montserrat 28 compressed"
+                select LV_FONT_MONTSERRAT28COMPRESSED
+            config LV_FONT_DEFAULT_SUBTITLE_DEJAVU_16_PERSIAN_HEBREW
+                bool "Dejavu 16 Persian, Hebrew, Arabic letters"
+                select LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+            config LV_FONT_DEFAULT_SUBTITLE_SIMSUN_16_CJK
+                bool "Simsun 16 CJK"
+                select LV_FONT_SIMSUN_16_CJK
+        endchoice
+        
+        choice LV_FONT_DEFAULT_TITLE
+            prompt "Select theme default title font"
+            default LV_FONT_DEFAULT_TITLE_MONTSERRAT_16
+            help
+                Select theme default title font
+
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_8
+                bool "Montserrat 8"
+                select LV_FONT_MONTSERRAT_8
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_12
+                bool "Montserrat 12"
+                select LV_FONT_MONTSERRAT_12
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_14
+                bool "Montserrat 14"
+                select LV_FONT_MONTSERRAT_14
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_16
+                bool "Montserrat 16"
+                select LV_FONT_MONTSERRAT_16
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_18
+                bool "Montserrat 18"
+                select LV_FONT_MONTSERRAT_18
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_20
+                bool "Montserrat 20"
+                select LV_FONT_MONTSERRAT_20
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_22
+                bool "Montserrat 22"
+                select LV_FONT_MONTSERRAT_22
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_24
+                bool "Montserrat 24"
+                select LV_FONT_MONTSERRAT_24
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_26
+                bool "Montserrat 26"
+                select LV_FONT_MONTSERRAT_26
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_28
+                bool "Montserrat 28"
+                select LV_FONT_MONTSERRAT_28
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_30
+                bool "Montserrat 30"
+                select LV_FONT_MONTSERRAT_30
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_32
+                bool "Montserrat 32"
+                select LV_FONT_MONTSERRAT_32
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_34
+                bool "Montserrat 34"
+                select LV_FONT_MONTSERRAT_34
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_36
+                bool "Montserrat 36"
+                select LV_FONT_MONTSERRAT_36
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_38
+                bool "Montserrat 38"
+                select LV_FONT_MONTSERRAT_38
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_40
+                bool "Montserrat 40"
+                select LV_FONT_MONTSERRAT_40
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_42
+                bool "Montserrat 42"
+                select LV_FONT_MONTSERRAT_42
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_44
+                bool "Montserrat 44"
+                select LV_FONT_MONTSERRAT_44
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_46
+                bool "Montserrat 46"
+                select LV_FONT_MONTSERRAT_46
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT_48
+                bool "Montserrat 48"
+                select LV_FONT_MONTSERRAT_48
+            config LV_FONT_DEFAULT_TITLE_UNSCII_8
+                bool "UNSCII 8 (Perfect monospace font)"
+                select LV_FONT_UNSCII_8
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT12SUBPX
+                bool "Montserrat 12 sub-pixel"
+                select LV_FONT_MONTSERRAT12SUBPX
+            config LV_FONT_DEFAULT_TITLE_MONTSERRAT28COMPRESSED
+                bool "Montserrat 28 compressed"
+                select LV_FONT_MONTSERRAT28COMPRESSED
+            config LV_FONT_DEFAULT_TITLE_DEJAVU_16_PERSIAN_HEBREW
+                bool "Dejavu 16 Persian, Hebrew, Arabic letters"
+                select LV_FONT_DEJAVU_16_PERSIAN_HEBREW
+            config LV_FONT_DEFAULT_TITLE_SIMSUN_16_CJK
+                bool "Simsun 16 CJK"
+                select LV_FONT_SIMSUN_16_CJK
+        endchoice
+    endmenu
+
+    menu "Theme usage"
+	menu "Enable theme usage, always enable at least one theme"
+            config LV_THEME_EMPTY
+                bool "Empty: No theme, you can apply your styles as you need."
+            config LV_THEME_TEMPLATE
+                bool "Template: Simple to create your theme based on it."
+            config LV_THEME_MATERIAL
+                bool "Material: A fast and impressive theme."
+                default y
+            config LV_THEME_MONO
+                bool "Mono: Mono-color theme for monochrome displays"
+	endmenu
+
+        choice LV_THEME_DEFAULT_INIT
+            prompt "Select theme default init"
+            default LV_THEME_DEFAULT_INIT_MATERIAL
+            help
+                Select theme default init
+
+            config LV_THEME_DEFAULT_INIT_EMPTY
+                bool "Default init for empty theme"
+                select LV_THEME_EMPTY
+            config LV_THEME_DEFAULT_INIT_TEMPLATE
+                bool "Default init for template theme"
+                select LV_THEME_TEMPLATE
+            config LV_THEME_DEFAULT_INIT_MATERIAL
+                bool "Default init for material theme"
+                select LV_THEME_MATERIAL
+            config LV_THEME_DEFAULT_INIT_MONO
+                bool "Default init for mono theme"
+                select LV_THEME_MONO
+        endchoice
+        
+        choice
+            prompt "Select theme default primary color"
+            default LV_THEME_DEFAULT_PRIMARY_COLOR_RED if !LV_THEME_DEFAULT_INIT_MONO
+            default LV_THEME_DEFAULT_PRIMARY_COLOR_BLACK if LV_THEME_DEFAULT_INIT_MONO
+            help
+                Select theme default primary color.
+            
+            if LV_THEME_DEFAULT_INIT_MONO
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_WHITE
+                bool "Default primary color white"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_BLACK
+                bool "Default primary color black"
+            endif
+
+            if !LV_THEME_DEFAULT_INIT_MONO
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_WHITE
+                bool "Default primary color white"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_SILVER
+                bool "Default primary color silver"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_GRAY
+                bool "Default primary color gray"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_BLACK
+                bool "Default primary color black"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_RED
+                bool "Default primary color red"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_MAROON
+                bool "Default primary color maroon"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_YELLOW
+                bool "Default primary color yellow"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_OLIVE
+                bool "Default primary color olive"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_LIME
+                bool "Default primary color lime"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_GREEN
+                bool "Default primary color green"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_CYAN
+                bool "Default primary color cyan"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_AQUA
+                bool "Default primary color aqua"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_TEAL
+                bool "Default primary color teal"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_BLUE
+                bool "Default primary color blue"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_NAVY
+                bool "Default primary color navy"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_MAGENTA
+                bool "Default primary color magenta"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_PURPLE
+                bool "Default primary color purple"
+            config LV_THEME_DEFAULT_PRIMARY_COLOR_ORANGE
+                bool "Default primary color orange"
+            endif
+        endchoice
+        
+        config LV_THEME_DEFAULT_COLOR_PRIMARY
+            hex
+            default 0xFFFFFF if LV_THEME_DEFAULT_PRIMARY_COLOR_WHITE
+            default 0xC0C0C0 if LV_THEME_DEFAULT_PRIMARY_COLOR_SILVER
+            default 0x808080 if LV_THEME_DEFAULT_PRIMARY_COLOR_GRAY
+            default 0x000000 if LV_THEME_DEFAULT_PRIMARY_COLOR_BLACK
+            default 0xFF0000 if LV_THEME_DEFAULT_PRIMARY_COLOR_RED
+            default 0x800000 if LV_THEME_DEFAULT_PRIMARY_COLOR_MAROON
+            default 0xFFFF00 if LV_THEME_DEFAULT_PRIMARY_COLOR_YELLOW
+            default 0x808000 if LV_THEME_DEFAULT_PRIMARY_COLOR_OLIVE
+            default 0x00FF00 if LV_THEME_DEFAULT_PRIMARY_COLOR_LIME
+            default 0x008000 if LV_THEME_DEFAULT_PRIMARY_COLOR_GREEN
+            default 0x00FFFF if LV_THEME_DEFAULT_PRIMARY_COLOR_CYAN
+            default 0x00FFFF if LV_THEME_DEFAULT_PRIMARY_COLOR_AQUA
+            default 0x008080 if LV_THEME_DEFAULT_PRIMARY_COLOR_TEAL
+            default 0x0000FF if LV_THEME_DEFAULT_PRIMARY_COLOR_BLUE
+            default 0x000080 if LV_THEME_DEFAULT_PRIMARY_COLOR_NAVY
+            default 0xFF00FF if LV_THEME_DEFAULT_PRIMARY_COLOR_MAGENTA
+            default 0x800080 if LV_THEME_DEFAULT_PRIMARY_COLOR_PURPLE
+            default 0xFFA500 if LV_THEME_DEFAULT_PRIMARY_COLOR_ORANGE
+        
+        choice
+            prompt "Select theme default secondary color"
+            default LV_THEME_DEFAULT_SECONDARY_COLOR_BLUE if !LV_THEME_DEFAULT_INIT_MONO
+            default LV_THEME_DEFAULT_SECONDARY_COLOR_WHITE if LV_THEME_DEFAULT_INIT_MONO
+            help
+                Select theme default secondary color.
+
+            if LV_THEME_DEFAULT_INIT_MONO
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_WHITE
+                bool "Default secondary color white"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_BLACK
+                bool "Default secondary color black"
+            endif
+
+            if !LV_THEME_DEFAULT_INIT_MONO
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_WHITE
+                bool "Default secondary color white"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_SILVER
+                bool "Default secondary color silver"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_GRAY
+                bool "Default secondary color gray"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_BLACK
+                bool "Default secondary color black"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_RED
+                bool "Default secondary color red"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_MAROON
+                bool "Default secondary color maroon"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_YELLOW
+                bool "Default secondary color yellow"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_OLIVE
+                bool "Default secondary color olive"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_LIME
+                bool "Default secondary color lime"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_GREEN
+                bool "Default secondary color green"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_CYAN
+                bool "Default secondary color cyan"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_AQUA
+                bool "Default secondary color aqua"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_TEAL
+                bool "Default secondary color teal"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_BLUE
+                bool "Default secondary color blue"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_NAVY
+                bool "Default secondary color navy"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_MAGENTA
+                bool "Default secondary color magenta"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_PURPLE
+                bool "Default secondary color purple"
+            config LV_THEME_DEFAULT_SECONDARY_COLOR_ORANGE
+                bool "Default secondary color orange"
+            endif
+        endchoice
+ 
+        config LV_THEME_DEFAULT_COLOR_SECONDARY
+            hex
+            default 0xFFFFFF if LV_THEME_DEFAULT_SECONDARY_COLOR_WHITE
+            default 0xC0C0C0 if LV_THEME_DEFAULT_SECONDARY_COLOR_SILVER
+            default 0x808080 if LV_THEME_DEFAULT_SECONDARY_COLOR_GRAY
+            default 0x000000 if LV_THEME_DEFAULT_SECONDARY_COLOR_BLACK
+            default 0xFF0000 if LV_THEME_DEFAULT_SECONDARY_COLOR_RED
+            default 0x800000 if LV_THEME_DEFAULT_SECONDARY_COLOR_MAROON
+            default 0xFFFF00 if LV_THEME_DEFAULT_SECONDARY_COLOR_YELLOW
+            default 0x808000 if LV_THEME_DEFAULT_SECONDARY_COLOR_OLIVE
+            default 0x00FF00 if LV_THEME_DEFAULT_SECONDARY_COLOR_LIME
+            default 0x008000 if LV_THEME_DEFAULT_SECONDARY_COLOR_GREEN
+            default 0x00FFFF if LV_THEME_DEFAULT_SECONDARY_COLOR_CYAN
+            default 0x00FFFF if LV_THEME_DEFAULT_SECONDARY_COLOR_AQUA
+            default 0x008080 if LV_THEME_DEFAULT_SECONDARY_COLOR_TEAL
+            default 0x0000FF if LV_THEME_DEFAULT_SECONDARY_COLOR_BLUE
+            default 0x000080 if LV_THEME_DEFAULT_SECONDARY_COLOR_NAVY
+            default 0xFF00FF if LV_THEME_DEFAULT_SECONDARY_COLOR_MAGENTA
+            default 0x800080 if LV_THEME_DEFAULT_SECONDARY_COLOR_PURPLE
+            default 0xFFA500 if LV_THEME_DEFAULT_SECONDARY_COLOR_ORANGE
+        
+        choice LV_THEME_DEFAULT_FLAG
+            depends on LV_THEME_MATERIAL
+            
+            prompt "Select theme default flag"
+            default LV_THEME_DEFAULT_FLAG_LIGHT
+            help
+                Select theme default flag
+
+            config LV_THEME_DEFAULT_FLAG_LIGHT
+                bool "Light theme"
+                depends on LV_THEME_MATERIAL
+            config LV_THEME_DEFAULT_FLAG_DARK
+                bool "Dark theme"
+                depends on LV_THEME_MATERIAL
+        endchoice
+
+    endmenu
+
+    menu "Text Settings"
+        choice LV_TXT_ENC
+            prompt "Select a character encoding for strings"
+            help
+                Select a character encoding for strings. Your IDE or editor should have the same character encoding.
+            default LV_TXT_ENC_UTF8
+
+            config LV_TXT_ENC_UTF8
+                bool "UTF8"
+            config LV_TXT_ENC_ASCII
+                bool "ASCII"
+        endchoice
+
+        config LV_TXT_BREAK_CHARS
+            string "Can break (wrap) texts on these chars"
+            default " ,.;:-_"
+        
+        config LV_TXT_LINE_BREAK_LONG_LEN
+            int "Line break long length"
+            default 0
+            help
+                If a word is at least this long, will break wherever 'prettiest'. 
+                To disable, set to a value <= 0.
+        
+        config LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
+            int "Min num chars before break"
+            default 3
+            help
+                Minimum number of characters in a long word to put on a line before a break.
+                Depends on LV_TXT_LINE_BREAK_LONG_LEN
+                
+        config LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
+            int "Min num chars after break"
+            default 3
+            help
+                Minimum number of characters in a long word to put on a line after a break.
+                Depends on LV_TXT_LINE_BREAK_LONG_LEN
+                        
+        config LV_TXT_COLOR_CMD
+            string "The control character to use for signalling text recoloring"
+            default "#"
+
+        config LV_USE_BIDI
+            bool "Support bidirectional texts"
+            help 
+                Allows mixing Left-to-Right and Right-to-Left texts.
+                The direction will be processed according to the Unicode Bidirectioanl Algorithm:
+                https://www.w3.org/International/articles/inline-bidi-markup/uba-basics
+        
+        choice
+            prompt "Set the default BIDI direction"
+            default LV_BIDI_DIR_AUTO
+            depends on LV_USE_BIDI
+
+            config LV_BIDI_DIR_LTR
+                bool "Left-to-Right"
+            config LV_BIDI_DIR_RTL
+                bool "Right-to-Left"
+            config LV_BIDI_DIR_AUTO
+                bool "Detect texts base direction"
+        endchoice
+
+        config LV_USE_ARABIC_PERSIAN_CHARS
+            bool "Enable Arabic/Persian processing"
+            help 
+                In these languages characters should be replaced with
+                an other form based on their position in the text.
+
+        config LV_SPRINTF_CUSTOM
+        bool "Change the built-in (v)snprintf functions"
+
+        config LV_SPRINTF_DISABLE_FLOAT
+            bool "Disable float in built-in (v)snprintf functions" if !LV_SPRINTF_CUSTOM 
+    endmenu
+
+    menu "Widgets"
+        config LV_USE_OBJ_REALIGN
+            bool "Enable `lv_obj_realign()` based on `lv_obj_align()` parameters."
+            default y
+        
+        choice
+            prompt "Enable to make the object clickable on a larger area."
+            default LV_USE_EXT_CLICK_AREA_TINY
+
+            config LV_USE_EXT_CLICK_AREA_OFF
+                bool "Disable this feature."
+            config LV_USE_EXT_CLICK_AREA_TINY
+                bool "The extra area can be adjusted horizontally and vertically (0..255px)."
+            config LV_USE_EXT_CLICK_AREA_FULL
+                bool "The extra area can be adjusted in all 4 directions (-32k..+32k px)."
+        endchoice
+
+        config LV_USE_ARC
+            bool "Arc."
+            default y
+        config LV_USE_BAR
+            bool "Bar."
+            default y
+       config LV_USE_BTN
+           bool "Button. Dependencies: lv_cont."
+           select LV_USE_CONT
+           default y
+       config LV_USE_BTNMATRIX
+           bool "Button matrix."
+           default y
+       config LV_USE_CALENDAR
+           bool "Calendar."
+           default y
+       config LV_CALENDAR_WEEK_STARTS_MONDAY
+           bool "Calendar week starts monday."
+       config LV_USE_CANVAS
+           bool "Canvas. Dependencies: lv_img."
+           select LV_USE_IMG
+           default y
+       config LV_USE_CHECKBOX
+           bool "Check Box. Dependencies: lv_btn, lv_label."
+           select LV_USE_BTN
+           select LV_USE_LABEL
+           default y
+       config LV_USE_CHART
+           bool "Chart."
+           default y
+       config LV_CHART_AXIS_TICK_MAX_LEN
+           int "Chart axis tick label max len."
+           depends on LV_USE_CHART
+           default 256
+       config LV_USE_CONT
+           bool "Container."
+           default y
+       config LV_USE_CPICKER
+           bool "Color picker."
+           default y
+       config LV_USE_DROPDOWN
+           bool "Drop down list. Dependencies: lv_page, lv_label, lv_symbol_def.h."
+           select LV_USE_PAGE
+           select LV_USE_LABEL
+           default y
+       config LV_DROPDOWN_DEF_ANIM_TIME
+           int "Drop down animation time. 0: no animation."
+           depends on LV_USE_DROPBOX
+           default 200
+       config LV_USE_GAUGE
+           bool "Gauge. Dependencies: lv_bar, lv_linemeter."
+           select LV_USE_BAR
+           select LV_USE_LINEMETER
+           default y
+       config LV_USE_IMG
+           bool "Image. Dependencies: lv_label."
+           select LV_USE_LABEL
+           default y
+       config LV_USE_IMGBTN
+           bool "Image button. Dependencies: lv_btn."
+           select LV_USE_BTN
+           default y
+       config LV_IMGBTN_TILED
+           bool "Use imgbtn tiled."
+           depends on LV_USE_IMGBTN
+       config LV_USE_KEYBOARD
+           bool "Keyboard. Dependencies: lv_btnm."
+           select LV_USE_BTNM
+           default y
+       config LV_USE_LABEL
+           bool "Label."
+           default y
+       config LV_LABEL_DEF_SCROLL_SPEED
+           int "Hor. or ver. scroll speed [px/sec] in LV_LABEL_LONG_ROLL/ROLL_CIRC mode."
+           default 25
+       config LV_LABEL_WAIT_CHAR_COUNT
+           int "Waiting period at beginning/end of animation cycle."
+           default 3
+       config LV_LABEL_TEXT_SEL
+           bool "Enable selecting text of the label."
+       config LV_LABEL_LONG_TXT_HINT
+           bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts."
+       config LV_USE_LED
+           bool "LED."
+           default y
+       config LV_LED_BRIGHT_MIN
+           int "LED minimal brightness."
+           range 0 255
+           default 120
+       config LV_LED_BRIGHT_MAX
+           int "LED maximal brightness."
+           range 0 255
+           default 255
+       config LV_USE_LINE
+           bool "Line."
+           default y
+       config LV_USE_LIST
+           bool "List. Dependencies: lv_page, lv_btn, lv_label, lv_img."
+           select LV_USE_PAGE
+           select LV_USE_BTN
+           select LV_USE_LABEL
+           select LV_USE_IMG
+           default y
+       config LV_LIST_DEF_ANIM_TIME
+           int "List default animation time of focusing to a list element [ms]. 0: no animation."
+           default 100
+       config LV_USE_LINEMETER
+           bool "Line meter."
+           default y
+       choice
+           prompt "Draw line more precisely at cost of performance."
+           default LV_LINEMETER_PRECISE_NO_EXTRA_PRECISION
+           config LV_LINEMETER_PRECISE_NO_EXTRA_PRECISION
+               bool "0: No extra precision."
+           config LV_LINEMETER_PRECISE_SOME_EXTRA_PRECISION
+               bool "1: Some extra precision."
+           config LV_LINEMETER_PRECISE_BEST_PRECISION
+               bool "2: Best precision."
+       endchoice
+       config LV_USE_OBJMASK
+           bool "Mask."
+           default y
+       config LV_USE_MSGBOX
+           bool "Message box. Dependencies: lv_rect, lv_btnm, lv_label."
+           select LV_USE_RECT
+           select LV_USE_BTNM
+           select LV_USE_LABEL
+           default y
+       config LV_USE_PAGE
+           bool "Page. Dependencies: lv_cont."
+           select LV_USE_CONT
+           default y
+       config LV_PAGE_DEF_ANIM_TIME
+           int "Focus default animation time [ms]. 0: No animation."
+           default 100
+       config LV_USE_SPINNER
+           bool "Spinner. Dependencies: lv_arc, lv_anim."
+           select LV_USE_ARC
+           select LV_USE_ANIM
+           default y
+       config LV_SPINNER_DEF_ARC_LENGTH
+           int "Spinner def. arc length [deg]."
+           default 60
+       config LV_SPINNER_DEF_SPIN_TIME
+           int "Spinner def. spin time [ms]."
+           default 1000
+       choice
+           prompt "Type of spinner (animation type)."
+           default LV_SPINNER_TYPE_SPINNING_ARC
+           config LV_SPINNER_TYPE_SPINNING_ARC
+               bool "0: Spinner type spinning arc."
+           config LV_SPINNER_TYPE_FILLSPIN_ARC
+               bool "0: Spinner type fillspin arc."
+           config LV_SPINNER_TYPE_CONSTANT_ARC
+               bool "0: Spinner type constant arc."
+       endchoice
+       config LV_USE_ROLLER
+           bool "Roller. Dependencies: lv_page."
+           select LV_USE_PAGE
+           default y
+       config LV_ROLLER_DEF_ANIM_TIME
+           int "Focus animation time [ms]. 0: no animation."
+           default 200
+       config LV_ROLLER_INF_PAGES
+           int "Number of extra 'pages' when the controller is infinite."
+           default 7
+       config LV_USE_SLIDER
+           bool "Slider. Dependencies: lv_bar."
+           select LV_USE_BAR
+           default y
+       config LV_USE_SPINBOX
+           bool "Spinbox. Dependencies: lv_ta."
+           select LV_USE_TEXTAREA
+           default y
+       config LV_USE_SWITCH
+           bool "Switch. Dependencies: lv_slider."
+           select LV_USE_SLIDER
+           default y
+       config LV_USE_TEXTAREA
+           bool "Text area. Dependencies: lv_label, lv_page."
+           select LV_USE_LABEL
+           select LV_USE_PAGE
+           default y
+       config LV_TEXTAREA_DEF_CURSOR_BLINK_TIME
+           int "Text area def. cursor blink time [ms]."
+           default 400
+       config LV_TEXTAREA_DEF_PWN_SHOW_TIME
+           int "Text area def. pwn show time [ms]."
+           default 1500
+       config LV_USE_TABLE
+           bool "Table. Dependencies: lv_label."
+           select LV_USE_LABEL
+           default y
+       config LV_TABLE_COL_MAX
+           int "Table col max."
+           default 12
+       config LV_TABLE_CELL_STYLE_CNT
+           int "Table cell style count."
+           default 4
+       config LV_USE_TABVIEW
+           bool "Tab. Dependencies: lv_page, lv_btnm."
+           select LV_USE_PAGE
+           select LV_USE_BTNM
+           default y
+       config LV_TABVIEW_DEF_ANIM_TIME
+           int "Time of slide animation [ms]. 0: No animation."
+           default 300
+       config LV_USE_TILEVIEW
+           bool "Tileview. Dependencies: lv_page."
+           select LV_USE_PAGE
+           default y
+       config LV_TILEVIEW_DEF_ANIM_TIME
+           int "Time of slide animation [ms]. 0: No animation."
+           default 300
+       config LV_USE_WIN
+           bool "Window. Dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page."
+           select LV_USE_CONT
+           select LV_USE_BTN
+           select LV_USE_LABEL
+           select LV_USE_IMG
+           select LV_USE_PAGE
+           default y
+    endmenu
+
+endmenu
