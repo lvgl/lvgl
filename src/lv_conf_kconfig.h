@@ -16,6 +16,18 @@ extern "C" {
 #endif
 
 /*******************
+ * LV COLOR TRANSP
+ *******************/
+
+#ifndef LV_COLOR_TRANSP
+ #if defined (CONFIG_LV_COLOR_TRANSP_HEX)
+  #define CONFIG_LV_COLOR_TRANSP    lv_color_hex(CONFIG_LV_COLOR_TRANSP_HEX)
+ #else
+  #define CONFIG_LV_COLOR_TRANSP    LV_COLOR_LIME
+ #endif
+#endif
+
+/*******************
  * THEME SELECTION
  *******************/
  
