@@ -44,68 +44,13 @@ menu "LVGL configuration"
             Requires `LV_COLOR_DEPTH = 32` colors and the screen's style
             should be modified: `style.body.opa = ...`.
 
-    choice
-        prompt "Images pixels with this color will not be drawn (with chroma keying)."
-        default LV_COLOR_TRANSP_LIME
-        
-        config LV_COLOR_TRANSP_WHITE
-            bool "Color transp. white"
-        config LV_COLOR_TRANSP_SILVER
-            bool "Color transp. silver"
-        config LV_COLOR_TRANSP_GRAY
-            bool "Color transp. gray"
-        config LV_COLOR_TRANSP_BLACK
-            bool "Color transp. black"
-        config LV_COLOR_TRANSP_RED
-            bool "Color transp. red"
-        config LV_cOLOR_TRANSP_MAROON
-            bool "Color transp. maroon"
-        config LV_COLOR_TRANSP_YELLOW
-            bool "Color transp. yellow"
-        config LV_COLOR_TRANSP_OLIVE
-            bool "Color transp. olive"
-        config LV_COLOR_TRANSP_LIME
-            bool "Color transp. lime"
-        config LV_COLOR_TRANSP_GREEN
-            bool "Color transp. green"
-        config LV_COLOR_TRANSP_CYAN
-            bool "Color transp. cyan"
-        config LV_COLOR_TRANSP_AQUA
-            bool "Color transp. aqua"
-        config LV_COLOR_TRANSP_TEAL
-            bool "Color transp. teal"
-        config LV_COLOR_TRANSP_BLUE
-            bool "Color transp. blue"
-        config LV_COLOR_TRANSP_NAVY
-            bool "Color transp. navy"
-        config LV_COLOR_TRANSP_MAGENTA
-            bool "Color transp. magenta"
-        config LV_COLOR_TRANSP_PURPLE
-            bool "Color transp. purple"
-        config LV_COLOR_TRANSP_ORANGE
-            bool "Color transp. orange"
-    endchoice
-        
-    config LV_COLOR_TRANSP_HEX
-        hex
-        default 0xFFFFFF if LV_COLOR_TRANSP_WHITE
-        default 0xC0C0C0 if LV_COLOR_TRANSP_SILVER
-        default 0x808080 if LV_COLOR_TRANSP_GRAY
-        default 0x000000 if LV_COLOR_TRANSP_BLACK
-        default 0xFF0000 if LV_COLOR_TRANSP_RED
-        default 0x800000 if LV_COLOR_TRANSP_MAROON
-        default 0xFFFF00 if LV_COLOR_TRANSP_YELLOW
-        default 0x808000 if LV_COLOR_TRANSP_OLIVE
-        default 0x00FF00 if LV_COLOR_TRANSP_LIME
-        default 0x008000 if LV_COLOR_TRANSP_GREEN
-        default 0x00FFFF if LV_COLOR_TRANSP_CYAN
-        default 0x00FFFF if LV_COLOR_TRANSP_AQUA
-        default 0x008080 if LV_COLOR_TRANSP_TEAL
-        default 0x0000FF if LV_COLOR_TRANSP_BLUE
-        default 0x000080 if LV_COLOR_TRANSP_NAVY
-        default 0xFF00FF if LV_COLOR_TRANSP_MAGENTA
-        default 0x800080 if LV_COLOR_TRANSP_PURPLE
-        default 0xFFA500 if LV_COLOR_TRANSP_ORANGE
+    config LV_COLOR_TRANSP
+        hex "Images pixels with this color will not be drawn (with chroma keying)."
+        depends on LV_COLOR_SCREEN_TRANSP
+        range 0x000000 0xFFFFFF
+        default 0x00FF00
+        help
+            See lv_misc/lv_color.h for some color values examples.
 
     config LV_ANTIALIAS
         bool "Enable anti-aliasing (lines, and radiuses will be smoothed)."
