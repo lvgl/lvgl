@@ -2,6 +2,12 @@
 
 menu "LVGL configuration"
     
+    # Define CONFIG_LV_CONF_SKIP so we can use LVGL
+    # without lv_conf.h file, the lv_conf_internal.h and
+    # lv_conf_kconfig.h files are used instead.
+    config LV_CONF_SKIP
+        defult y
+
     config LV_HOR_RES_MAX
         int "Maximal horizontal resolution to support by the library."
         default 480
