@@ -97,7 +97,11 @@ void lv_obj_scroll_to_x(struct _lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t a
 void lv_obj_scroll_to_y(struct _lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en);
 
 
+lv_coord_t lv_obj_get_scroll_x(const struct _lv_obj_t * obj);
+
+lv_coord_t lv_obj_get_scroll_y(const struct _lv_obj_t * obj);
 /**
+ *
  * Return the height of the area above the parent.
  * That is the number of pixels the object can be scrolled down.
  * Normally positive but can be negative when scrolled inside.

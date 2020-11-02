@@ -36,20 +36,45 @@ static void place_content(lv_coord_t place, lv_coord_t max_size, lv_coord_t trac
  *   GLOBAL FUNCTIONS
  **********************/
 
-void lv_obj_set_flex_cont(lv_obj_t * obj, lv_flex_dir_t flex_dir, lv_flex_place_t flex_place)
+void lv_obj_set_flex_dir(lv_obj_t * obj, lv_flex_dir_t flex_dir)
 {
-    if(obj->spec_attr == NULL) lv_obj_allocate_rare_attr(obj);
+    lv_obj_allocate_rare_attr(obj);
 
-    if(obj->spec_attr->flex_cont.dir == flex_dir && obj->spec_attr->flex_cont.place == flex_place) return;
+    if(obj->spec_attr->flex_cont.dir == flex_dir) return;
 
     obj->spec_attr->flex_cont.dir = flex_dir & 0x3;
     obj->spec_attr->flex_cont.wrap = flex_dir & LV_FLEX_WRAP ? 1 : 0;
     obj->spec_attr->flex_cont.rev = flex_dir & LV_FLEX_REVERSE ? 1 : 0;
-    obj->spec_attr->flex_cont.place = flex_place;
-
     _lv_flex_refresh(obj);
 }
 
+/**
+ * Set how to place the tracks below/next to each other.
+ * For ROW direction it means how to place the rows vertically.
+ * For COLUMN direction it means how to place the column horizontally.
+ * @param obj point to a flex container
+ * @param place the placement type. Can be any element of `lv_flex_place_t`.
+ * @note if the base direction is RTL and the direction is ROW, LV_FLEX_START means the right side
+ */
+void lv_obj_set_flex_track_place(lv_obj_t * obj, lv_flex_place_t place)
+{
+    lv_obj_allocate_rare_attr(obj);
+    if(obj->spec_attr->flex_cont.place == place) return;
+
+    obj->spec_attr->flex_cont.place = place;
+
+    _lv_flex_refresh(obj);
+
+}
+
+/**
+ * Set a gap in the main direction.
+ * For ROW direction it means adding gap horizontally between the items.
+ * For COLUMN direction it means adding gap vertically between the items.
+ * @param obj pointer to an object (flex container)
+ * @param gap the gap in pixels
+ * @note By default the objects are packed tightly after each other
+ */
 void lv_obj_set_flex_gap(lv_obj_t * obj, lv_coord_t gap)
 {
     if(obj->spec_attr == NULL) lv_obj_allocate_rare_attr(obj);
@@ -61,7 +86,32 @@ void lv_obj_set_flex_gap(lv_obj_t * obj, lv_coord_t gap)
     _lv_flex_refresh(obj);
 }
 
-void lv_obj_set_flex_item(lv_obj_t * obj, lv_flex_place_t place)
+/**
+ * Make an object flex item, i.e. allow setting it's coordinate according to the parent's flex settings.
+ * @param obj pointer to an object
+ */
+void lv_obj_set_flex_item(lv_obj_t * obj, bool en)
+{
+    if(en) {
+        lv_coord_t f  = _LV_COORD_FELX(LV_FLEX_START);
+        lv_obj_set_pos(obj, f, f);
+    } else {
+        lv_obj_set_pos(obj, lv_obj_get_x(obj), lv_obj_get_y(obj));
+    }
+}
+
+/**
+ * Set how the place the item in it's track in the cross direction.
+ * It has a visible effect only if the objects in the same track has different size in the cross direction.
+ * For ROW direction it means how to place the objects vertically in their row.
+ * For COLUMN direction it means how to place the objects horizontally in their column.
+ * @param obj pointer to a flex item
+ * @param place:
+ *   - `LV_FLEX_START` top/left (in case of RTL base direction right)
+ *   - `LV_FLEX_CENTER` center
+ *   - `LV_FLEX_END` bottom/right (in case of RTL base direction left)
+ */
+void lv_obj_set_flex_item_place(lv_obj_t * obj, lv_flex_place_t place)
 {
     lv_coord_t f  = _LV_COORD_FELX(place);
     lv_obj_set_pos(obj, f, f);
@@ -103,11 +153,12 @@ void _lv_flex_refresh(lv_obj_t * cont)
 
     if(dir == LV_FLEX_DIR_NONE) return;
 
+    bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
     bool row = dir == LV_FLEX_DIR_ROW ? true : false;
     /*Count the grow units and free space*/
     lv_coord_t max_main_size = (row ? lv_obj_get_width_fit(cont) : lv_obj_get_height_fit(cont));
-    lv_coord_t abs_x = cont->coords.x1 + lv_obj_get_style_pad_left(cont, LV_OBJ_PART_MAIN) - lv_obj_get_scroll_left(cont);
-    lv_coord_t abs_y = cont->coords.y1 + lv_obj_get_style_pad_top(cont, LV_OBJ_PART_MAIN) - lv_obj_get_scroll_top(cont);
+    lv_coord_t abs_y = cont->coords.y1 + lv_obj_get_style_pad_top(cont, LV_OBJ_PART_MAIN) - lv_obj_get_scroll_y(cont);
+    lv_coord_t abs_x = cont->coords.x1 + lv_obj_get_style_pad_left(cont, LV_OBJ_PART_MAIN) - lv_obj_get_scroll_x(cont);
 
     lv_coord_t place = lv_obj_get_flex_place(cont);
     lv_ll_t * ll = _lv_obj_get_child_ll(cont);
@@ -117,6 +168,11 @@ void _lv_flex_refresh(lv_obj_t * cont)
        (!row && cont->w_set == LV_SIZE_AUTO))
     {
         place = LV_FLEX_START;
+    }
+
+    if(rtl && !row) {
+        if(place == LV_FLEX_START) place = LV_FLEX_END;
+        else if(place == LV_FLEX_END) place = LV_FLEX_START;
     }
 
     lv_coord_t all_track_size = 0;
@@ -144,14 +200,26 @@ void _lv_flex_refresh(lv_obj_t * cont)
     }
 
     track_first_item =  rev ? _lv_ll_get_head(ll) : _lv_ll_get_tail(ll);
+
+    if(rtl && !row) {
+         *cross_pos += all_track_size;
+    }
+
     while(track_first_item) {
         /*Search the first item of the next row */
         next_track_first_item = find_track_end(cont, track_first_item, max_main_size, &grow_unit, &track_size);
 
+        if(rtl && !row) {
+            *cross_pos -= track_size;
+        }
         children_repos(cont, track_first_item, next_track_first_item, abs_x, abs_y, track_size, grow_unit);
-
         track_first_item = next_track_first_item;
-        *cross_pos += track_size + gap;
+
+        if(rtl && !row) {
+            *cross_pos -=  gap;
+        } else {
+            *cross_pos += track_size + gap;
+        }
     }
     LV_ASSERT_MEM_INTEGRITY();
 
@@ -236,6 +304,10 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
     lv_style_int_t (*get_margin_end)(const lv_obj_t *, uint8_t part) = (row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
     void * (*ll_iter)(const lv_ll_t * , const void *) = rev ? _lv_ll_get_next : _lv_ll_get_prev;
 
+    bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
+
+    if(row && rtl) abs_x += lv_obj_get_width_fit(cont);
+
     lv_ll_t * ll = _lv_obj_get_child_ll(cont);
     lv_coord_t main_pos = 0;
     /*Reposition the children*/
@@ -274,19 +346,14 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
             break;
         }
 
-        lv_coord_t diff_x;
-        lv_coord_t diff_y;
-        if(row) {
-            cross_pos += lv_obj_get_style_margin_top(item, LV_OBJ_PART_MAIN);
-            main_pos += lv_obj_get_style_margin_left(item, LV_OBJ_PART_MAIN);
-            diff_x = abs_x + main_pos - item->coords.x1;
-            diff_y = abs_y + cross_pos - item->coords.y1;
-        } else {
-            main_pos += lv_obj_get_style_margin_top(item, LV_OBJ_PART_MAIN);
-            cross_pos += lv_obj_get_style_margin_left(item, LV_OBJ_PART_MAIN);
-            diff_x = abs_x + cross_pos - item->coords.x1;
-            diff_y = abs_y + main_pos - item->coords.y1;
+        if(row && rtl) {
+            main_pos -= obj_get_main_size(item) + gap;
         }
+
+        lv_coord_t diff_x = abs_x - item->coords.x1 + lv_obj_get_style_margin_left(item, LV_OBJ_PART_MAIN);
+        lv_coord_t diff_y = abs_y - item->coords.y1 + lv_obj_get_style_margin_top(item, LV_OBJ_PART_MAIN);
+        diff_x += row ? main_pos : cross_pos;
+        diff_y += row ? cross_pos : main_pos;
 
         if(diff_x || diff_y) {
             item->coords.x1 += diff_x;
@@ -295,7 +362,10 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
             item->coords.y2 += diff_y;
             _lv_obj_move_children_by(item, diff_x, diff_y);
         }
-        main_pos += obj_get_main_size(item) + gap;
+
+        if(!(row && rtl)) {
+            main_pos += obj_get_main_size(item) + gap;
+        }
         item = ll_iter(ll, item);
     }
 }

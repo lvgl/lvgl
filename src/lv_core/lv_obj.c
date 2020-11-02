@@ -1824,8 +1824,8 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             lv_point_t grid_abs;
             lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
             lv_coord_t pad_top = lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN);
-            grid_abs.x = pad_left + obj->coords.x1 - lv_obj_get_scroll_left(obj);
-            grid_abs.y = pad_top + obj->coords.y1 - lv_obj_get_scroll_top(obj);
+            grid_abs.x = pad_left + obj->coords.x1 - lv_obj_get_scroll_x(obj);
+            grid_abs.y = pad_top + obj->coords.y1 - lv_obj_get_scroll_y(obj);
 
             uint32_t row;
             uint32_t col;

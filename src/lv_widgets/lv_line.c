@@ -185,8 +185,8 @@ static lv_design_res_t lv_line_design(lv_obj_t * line, const lv_area_t * clip_ar
 
         lv_area_t area;
         lv_obj_get_coords(line, &area);
-        lv_coord_t x_ofs = area.x1 - lv_obj_get_scroll_top(line);
-        lv_coord_t y_ofs = area.y1 - lv_obj_get_scroll_left(line);
+        lv_coord_t x_ofs = area.x1 - lv_obj_get_scroll_x(line);
+        lv_coord_t y_ofs = area.y1 - lv_obj_get_scroll_y(line);
         lv_point_t p1;
         lv_point_t p2;
         lv_coord_t h = lv_obj_get_height(line);

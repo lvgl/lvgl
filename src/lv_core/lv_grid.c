@@ -192,8 +192,8 @@ void _lv_grid_full_refresh(lv_obj_t * cont)
      * It will be used as helper during item repositioning to avoid calculating this value for every children*/
     lv_coord_t pad_left = lv_obj_get_style_pad_left(cont, LV_OBJ_PART_MAIN);
     lv_coord_t pad_top = lv_obj_get_style_pad_top(cont, LV_OBJ_PART_MAIN);
-    hint.grid_abs.x = pad_left + cont->coords.x1 - lv_obj_get_scroll_left(cont);
-    hint.grid_abs.y = pad_top + cont->coords.y1 - lv_obj_get_scroll_top(cont);
+    hint.grid_abs.x = pad_left + cont->coords.x1 - lv_obj_get_scroll_x(cont);
+    hint.grid_abs.y = pad_top + cont->coords.y1 - lv_obj_get_scroll_y(cont);
 
     lv_obj_t * item = lv_obj_get_child_back(cont, NULL);
     while(item) {

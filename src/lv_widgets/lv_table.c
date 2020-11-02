@@ -817,8 +817,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
         uint16_t row;
         uint16_t cell = 0;
 
-        cell_area.y2 = table->coords.y1 + bg_top - 1 - lv_obj_get_scroll_top(table);
-        lv_coord_t scroll_left = lv_obj_get_scroll_left(table);
+        cell_area.y2 = table->coords.y1 + bg_top - 1 - lv_obj_get_scroll_y(table);
+        lv_coord_t scroll_x = lv_obj_get_scroll_x(table);
         bool rtl = lv_obj_get_base_dir(table) == LV_BIDI_DIR_RTL ? true : false;
 
         for(row = 0; row < ext->row_cnt; row++) {
@@ -829,8 +829,8 @@ static lv_design_res_t lv_table_design(lv_obj_t * table, const lv_area_t * clip_
 
             if(cell_area.y1 > clip_area->y2) return LV_DESIGN_RES_OK;
 
-            if(rtl) cell_area.x1 = table->coords.x2 - bg_right - 1 - scroll_left;
-            else cell_area.x2 = table->coords.x1 + bg_left - 1 - scroll_left;
+            if(rtl) cell_area.x1 = table->coords.x2 - bg_right - 1 - scroll_x;
+            else cell_area.x2 = table->coords.x1 + bg_left - 1 - scroll_x;
 
             for(col = 0; col < ext->col_cnt; col++) {
 

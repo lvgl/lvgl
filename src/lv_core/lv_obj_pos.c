@@ -419,7 +419,7 @@ lv_coord_t lv_obj_get_x(const lv_obj_t * obj)
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent) {
         rel_x   = obj->coords.x1 - parent->coords.x1;
-        rel_x += lv_obj_get_scroll_left(parent);
+        rel_x += lv_obj_get_scroll_x(parent);
         rel_x -= lv_obj_get_style_pad_left(parent, LV_OBJ_PART_MAIN);
     }
     else {
@@ -444,7 +444,7 @@ lv_coord_t lv_obj_get_y(const lv_obj_t * obj)
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent) {
         rel_y = obj->coords.y1 - parent->coords.y1;
-        rel_y += lv_obj_get_scroll_top(parent);
+        rel_y += lv_obj_get_scroll_y(parent);
         rel_y -= lv_obj_get_style_pad_top(parent, LV_OBJ_PART_MAIN);
     }
     else {
@@ -638,8 +638,8 @@ void _lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_par
         lv_coord_t pad_left = lv_obj_get_style_pad_left(parent, LV_OBJ_PART_MAIN);
         lv_coord_t pad_top = lv_obj_get_style_pad_top(parent, LV_OBJ_PART_MAIN);
 
-        x += pad_left + parent->coords.x1 - lv_obj_get_scroll_left(parent);
-        y += pad_top + parent->coords.y1 - lv_obj_get_scroll_top(parent);
+        x += pad_left + parent->coords.x1 - lv_obj_get_scroll_x(parent);
+        y += pad_top + parent->coords.y1 - lv_obj_get_scroll_y(parent);
     } else {
         /*If no parent then it's screen but screen can't be on a grid*/
         if(LV_COORD_IS_GRID(obj->x_set) || LV_COORD_IS_GRID(obj->x_set)) {

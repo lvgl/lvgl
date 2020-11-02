@@ -58,9 +58,46 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_obj_set_flex_cont(lv_obj_t * obj, lv_flex_dir_t flex_dir, lv_flex_place_t flex_place);
+void lv_obj_set_flex_dir(lv_obj_t * obj, lv_flex_dir_t flex_dir);
+
+/**
+ * Set how to place the tracks below/next to each other.
+ * For ROW direction it means how to place the rows vertically.
+ * For COLUMN direction it means how to place the column horizontally.
+ * @param obj point to a flex container
+ * @param place the placement type. Can be any element of `lv_flex_place_t`.
+ * @note if the base direction is RTL and the direction is ROW, LV_FLEX_START means the right side
+ */
+void lv_obj_set_flex_track_place(lv_obj_t * obj, lv_flex_place_t place);
+
+/**
+ * Set a gap in the main direction.
+ * For ROW direction it means adding gap horizontally between the items.
+ * For COLUMN direction it means adding gap vertically between the items.
+ * @param obj pointer to an object (flex container)
+ * @param gap the gap in pixels
+ * @note By default the objects are packed tightly after each other
+ */
 void lv_obj_set_flex_gap(lv_obj_t * obj, lv_coord_t gap);
-void lv_obj_set_flex_item(lv_obj_t * obj, lv_flex_place_t place);
+
+/**
+ * Make an object flex item, i.e. allow setting it's coordinate according to the parent's flex settings.
+ * @param obj pointer to an object
+ */
+void lv_obj_set_flex_item(lv_obj_t * obj, bool en);
+
+/**
+ * Set how the place the item in it's track in the cross direction.
+ * It has a visible effect only if the objects in the same track has different size in the cross direction.
+ * For ROW direction it means how to place the objects vertically in their row.
+ * For COLUMN direction it means how to place the objects horizontally in their column.
+ * @param obj pointer to a flex item
+ * @param place:
+ *   - `LV_FLEX_START` top/left (in case of RTL base direction right)
+ *   - `LV_FLEX_CENTER` center
+ *   - `LV_FLEX_END` bottom/right (in case of RTL base direction left)
+ */
+void lv_obj_set_flex_item_place(lv_obj_t * obj, lv_flex_place_t place);
 
 lv_flex_dir_t lv_obj_get_flex_dir(const lv_obj_t * obj);
 lv_flex_place_t lv_obj_get_flex_place(const lv_obj_t * obj);
