@@ -9,6 +9,7 @@
 ### Bugfixes
 - Respect btnmatrix's `one_check` in `lv_btnmatrix_set_btn_ctrl`
 - Gauge: make the needle images to use the styles from `LV_GAUGE_PART_PART`
+- Group: fix in `lv_group_remove_obj` to handle deleting hidden obejcts correctly
 
 ## v7.7.0 (20.10.2020)
 
