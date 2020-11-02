@@ -6,7 +6,7 @@ menu "LVGL configuration"
     # without lv_conf.h file, the lv_conf_internal.h and
     # lv_conf_kconfig.h files are used instead.
     config LV_CONF_SKIP
-        defult y
+        default y
 
     config LV_HOR_RES_MAX
         int "Maximal horizontal resolution to support by the library."
@@ -41,7 +41,6 @@ menu "LVGL configuration"
     
     config LV_COLOR_16_SWAP
         bool "Swap the 2 bytes of RGB565 color. Useful if the display has a 8 bit interface (e.g. SPI)."
-        default y
 
     config LV_COLOR_SCREEN_TRANSP
         bool "Enable screen transparency."
@@ -60,7 +59,7 @@ menu "LVGL configuration"
 
     config LV_ANTIALIAS
         bool "Enable anti-aliasing (lines, and radiuses will be smoothed)."
-        default y
+        default y if !LV_CONF_MINIMAL
 
     config LV_DISP_DEF_REFR_PERIOD
         int "Default display refresh period (ms)."
@@ -132,10 +131,10 @@ menu "LVGL configuration"
     menu "Feature usage"
         config LV_USE_ANIMATION
             bool "Enable the Animations."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_USE_SHADOW
             bool "Enable shadow drawing."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_SHADOW_CACHE_SIZE
             int "Shadow cache size"
             depends on LV_USE_SHADOW
@@ -147,28 +146,28 @@ menu "LVGL configuration"
                 Caching has LV_SHADOW_CACHE_SIZE^2 RAM cost.
         config LV_USE_OUTLINE
             bool "Enable outline drawing on rectangles."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_USE_PATTERN
             bool "Enable pattern drawing on rectangles."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_USE_VALUE_STR
             bool "Enable value string drawing on rectangles."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_USE_BLEND_MODES
             bool "Use other blend modes then normal (LV_BLEND_MODE_...)."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_USE_OPA_SCALE
             bool "Use the 'opa_scale' style property to set the opacity of an object and it's children at once."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_USE_IMG_TRANSFORM
             bool "Use image zoom and rotation."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_USE_GROUP
             bool "Enable object groups (for keyboard/encoder navigation)."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_USE_GPU
             bool "Enable GPU interface (only enabled 'gpu_fill_cb' and 'gpu_blend_cb' in the disp. drv."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_USE_GPU_STM32_DMA2D
             bool "Enable STM32 DMA2D."
         config LV_GPU_DMA2D_CMSIS_INCLUDE
@@ -193,26 +192,26 @@ menu "LVGL configuration"
             bool "Use VG-Lite for CPU off-load on NXP RTxxx platforms."
         config LV_USE_FILESYSTEM
             bool "Enable file system (might be required for images."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_USE_USER_DATA
             bool "Add a 'user_data' to drivers and objects."
         config LV_USE_PERF_MONITOR
             bool "Show CPU usage and FPS count in the right bottom corner."
         config LV_USE_API_EXTENSION_V6
             bool "Use the functions and types from the older API if possible."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_USE_API_EXTENSION_V7
             bool "Use the functions and types from the older API if possible."
-            default y
+            default y if !LV_CONF_MINIMAL
     endmenu
     
     menu "Image decoder and cache"
         config LV_IMG_CF_INDEXED
             bool "Enable indexed (pallete) images."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_IMG_CF_ALPHA
             bool "Enable alpha indexed images."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_IMG_CACHE_DEF_SIZE
             int "Default image cache size."
             default 1
@@ -265,7 +264,6 @@ menu "LVGL configuration"
 
         config LV_LOG_PRINTF
             bool "Print the log with 'printf'" if LV_USE_LOG
-            default y
             help
                 Use printf for log output. 
                 If not set the user needs to register a callback with `lv_log_register_print_cb`.
@@ -275,15 +273,14 @@ menu "LVGL configuration"
     menu "Debug Settings"
         config LV_USE_DEBUG
             bool "Enable Debug"
-            default y
         
         config LV_USE_ASSERT_NULL
             bool "Check if the parameter is NULL. (Quite fast)"
-            default y
+            default y if !LV_CONF_MINIMAL
 
         config LV_USE_ASSERT_MEM
             bool "Checks is the memory is successfully allocated or no. (Quite fast)"
-            default y
+            default y if !LV_CONF_MINIMAL
 
         config LV_USE_ASSERT_MEM_INTEGRITY
             bool "Check the integrity of `lv_mem` after critical operations. (Slow)"
@@ -326,9 +323,9 @@ menu "LVGL configuration"
                 bool "Enable Montserrat 12"
             config LV_FONT_MONTSERRAT_14
                 bool "Enable Montserrat 14"
+                default y
             config LV_FONT_MONTSERRAT_16
                 bool "Enable Montserrat 16"
-                default y
             config LV_FONT_MONTSERRAT_18
                 bool "Enable Montserrat 18"
             config LV_FONT_MONTSERRAT_20
@@ -719,11 +716,12 @@ menu "LVGL configuration"
 	menu "Enable theme usage, always enable at least one theme"
             config LV_THEME_EMPTY
                 bool "Empty: No theme, you can apply your styles as you need."
+                default y if LV_CONF_MINIMAL
             config LV_THEME_TEMPLATE
                 bool "Template: Simple to create your theme based on it."
             config LV_THEME_MATERIAL
                 bool "Material: A fast and impressive theme."
-                default y
+                default y if !LV_CONF_MINIMAL
             config LV_THEME_MONO
                 bool "Mono: Mono-color theme for monochrome displays"
 	endmenu
@@ -787,7 +785,8 @@ menu "LVGL configuration"
             prompt "Select a character encoding for strings"
             help
                 Select a character encoding for strings. Your IDE or editor should have the same character encoding.
-            default LV_TXT_ENC_UTF8
+            default LV_TXT_ENC_UTF8 if !LV_CONF_MINIMAL
+            default LV_TXT_ENC_ASCII if LV_CONF_MINIMAL
 
             config LV_TXT_ENC_UTF8
                 bool "UTF8"
@@ -860,7 +859,7 @@ menu "LVGL configuration"
     menu "Widgets"
         config LV_USE_OBJ_REALIGN
             bool "Enable `lv_obj_realign()` based on `lv_obj_align()` parameters."
-            default y
+            default y if !LV_CONF_MINIMAL
         
         choice
             prompt "Enable to make the object clickable on a larger area."
@@ -876,49 +875,49 @@ menu "LVGL configuration"
 
         config LV_USE_ARC
             bool "Arc."
-            default y
+            default y if !LV_CONF_MINIMAL
         config LV_USE_BAR
             bool "Bar."
-            default y
+            default y if !LV_CONF_MINIMAL
        config LV_USE_BTN
            bool "Button. Dependencies: lv_cont."
            select LV_USE_CONT
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_BTNMATRIX
            bool "Button matrix."
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_CALENDAR
            bool "Calendar."
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_CALENDAR_WEEK_STARTS_MONDAY
            bool "Calendar week starts monday."
        config LV_USE_CANVAS
            bool "Canvas. Dependencies: lv_img."
            select LV_USE_IMG
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_CHECKBOX
            bool "Check Box. Dependencies: lv_btn, lv_label."
            select LV_USE_BTN
            select LV_USE_LABEL
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_CHART
            bool "Chart."
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_CHART_AXIS_TICK_MAX_LEN
            int "Chart axis tick label max len."
            depends on LV_USE_CHART
            default 256
        config LV_USE_CONT
            bool "Container."
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_CPICKER
            bool "Color picker."
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_DROPDOWN
            bool "Drop down list. Dependencies: lv_page, lv_label, lv_symbol_def.h."
            select LV_USE_PAGE
            select LV_USE_LABEL
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_DROPDOWN_DEF_ANIM_TIME
            int "Drop down animation time. 0: no animation."
            depends on LV_USE_DROPBOX
@@ -927,25 +926,25 @@ menu "LVGL configuration"
            bool "Gauge. Dependencies: lv_bar, lv_linemeter."
            select LV_USE_BAR
            select LV_USE_LINEMETER
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_IMG
            bool "Image. Dependencies: lv_label."
            select LV_USE_LABEL
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_IMGBTN
            bool "Image button. Dependencies: lv_btn."
            select LV_USE_BTN
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_IMGBTN_TILED
            bool "Use imgbtn tiled."
            depends on LV_USE_IMGBTN
        config LV_USE_KEYBOARD
            bool "Keyboard. Dependencies: lv_btnm."
            select LV_USE_BTNM
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_LABEL
            bool "Label."
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_LABEL_DEF_SCROLL_SPEED
            int "Hor. or ver. scroll speed [px/sec] in LV_LABEL_LONG_ROLL/ROLL_CIRC mode."
            default 25
@@ -958,7 +957,7 @@ menu "LVGL configuration"
            bool "Store extra some info in labels (12 bytes) to speed up drawing of very long texts."
        config LV_USE_LED
            bool "LED."
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_LED_BRIGHT_MIN
            int "LED minimal brightness."
            range 0 255
@@ -969,20 +968,20 @@ menu "LVGL configuration"
            default 255
        config LV_USE_LINE
            bool "Line."
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_LIST
            bool "List. Dependencies: lv_page, lv_btn, lv_label, lv_img."
            select LV_USE_PAGE
            select LV_USE_BTN
            select LV_USE_LABEL
            select LV_USE_IMG
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_LIST_DEF_ANIM_TIME
            int "List default animation time of focusing to a list element [ms]. 0: no animation."
            default 100
        config LV_USE_LINEMETER
            bool "Line meter."
-           default y
+           default y if !LV_CONF_MINIMAL
        choice
            prompt "Draw line more precisely at cost of performance."
            default LV_LINEMETER_PRECISE_NO_EXTRA_PRECISION
@@ -995,17 +994,17 @@ menu "LVGL configuration"
        endchoice
        config LV_USE_OBJMASK
            bool "Mask."
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_MSGBOX
            bool "Message box. Dependencies: lv_rect, lv_btnm, lv_label."
            select LV_USE_RECT
            select LV_USE_BTNM
            select LV_USE_LABEL
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_PAGE
            bool "Page. Dependencies: lv_cont."
            select LV_USE_CONT
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_PAGE_DEF_ANIM_TIME
            int "Focus default animation time [ms]. 0: No animation."
            default 100
@@ -1013,7 +1012,7 @@ menu "LVGL configuration"
            bool "Spinner. Dependencies: lv_arc, lv_anim."
            select LV_USE_ARC
            select LV_USE_ANIM
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_SPINNER_DEF_ARC_LENGTH
            int "Spinner def. arc length [deg]."
            default 60
@@ -1033,7 +1032,7 @@ menu "LVGL configuration"
        config LV_USE_ROLLER
            bool "Roller. Dependencies: lv_page."
            select LV_USE_PAGE
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_ROLLER_DEF_ANIM_TIME
            int "Focus animation time [ms]. 0: no animation."
            default 200
@@ -1043,20 +1042,20 @@ menu "LVGL configuration"
        config LV_USE_SLIDER
            bool "Slider. Dependencies: lv_bar."
            select LV_USE_BAR
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_SPINBOX
            bool "Spinbox. Dependencies: lv_ta."
            select LV_USE_TEXTAREA
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_SWITCH
            bool "Switch. Dependencies: lv_slider."
            select LV_USE_SLIDER
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_USE_TEXTAREA
            bool "Text area. Dependencies: lv_label, lv_page."
            select LV_USE_LABEL
            select LV_USE_PAGE
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_TEXTAREA_DEF_CURSOR_BLINK_TIME
            int "Text area def. cursor blink time [ms]."
            default 400
@@ -1066,7 +1065,7 @@ menu "LVGL configuration"
        config LV_USE_TABLE
            bool "Table. Dependencies: lv_label."
            select LV_USE_LABEL
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_TABLE_COL_MAX
            int "Table col max."
            default 12
@@ -1077,14 +1076,14 @@ menu "LVGL configuration"
            bool "Tab. Dependencies: lv_page, lv_btnm."
            select LV_USE_PAGE
            select LV_USE_BTNM
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_TABVIEW_DEF_ANIM_TIME
            int "Time of slide animation [ms]. 0: No animation."
            default 300
        config LV_USE_TILEVIEW
            bool "Tileview. Dependencies: lv_page."
            select LV_USE_PAGE
-           default y
+           default y if !LV_CONF_MINIMAL
        config LV_TILEVIEW_DEF_ANIM_TIME
            int "Time of slide animation [ms]. 0: No animation."
            default 300
@@ -1095,7 +1094,7 @@ menu "LVGL configuration"
            select LV_USE_LABEL
            select LV_USE_IMG
            select LV_USE_PAGE
-           default y
+           default y if !LV_CONF_MINIMAL
     endmenu
 
 endmenu
