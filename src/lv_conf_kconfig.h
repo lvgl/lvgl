@@ -14,7 +14,11 @@ extern "C" {
 #include "sdkconfig.h"
 #include "esp_attr.h"
 #endif
-
+    
+#ifdef __NuttX__
+#include <nuttx/config.h>
+#endif
+    
 /*******************
  * LV COLOR TRANSP
  *******************/
