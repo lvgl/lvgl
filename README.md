@@ -1,4 +1,4 @@
-<h1 align="center"> LVGL - Light and Versatile Graphics Library</h1>
+<h1 align="center"> LVGL - Light and Versatile Graphics Library</h1> 
 
 <p align="center">
 <img src="https://lvgl.io/assets/images/img_1.png">
