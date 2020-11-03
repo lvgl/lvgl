@@ -1,5 +1,8 @@
 # Changelog
 
+## v7.7.2 (Planned to 28.11.2020)
+### Bugfixes
+
 ## v7.7.1 (04.11.2020)
 ### Bugfixes
 - Respect btnmatrix's `one_check` in `lv_btnmatrix_set_btn_ctrl`
