@@ -277,6 +277,7 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
     lv_coord_t(*obj_get_main_size)(const lv_obj_t *) = (row ? lv_obj_get_width_margin : lv_obj_get_height_margin);
     lv_coord_t(*obj_get_cross_size)(const lv_obj_t *) = (!row ? lv_obj_get_width_margin : lv_obj_get_height_margin);
     void (*area_set_main_size)(lv_area_t *, lv_coord_t) = (row ? lv_area_set_width : lv_area_set_height);
+    void (*area_set_cross_size)(lv_area_t *, lv_coord_t) = (!row ? lv_area_set_width : lv_area_set_height);
     lv_coord_t (*area_get_main_size)(const lv_area_t *) = (!row ? lv_area_get_width : lv_area_get_height);
     lv_style_int_t (*get_margin_start)(const lv_obj_t *, uint8_t part) = (row ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);
     lv_style_int_t (*get_margin_end)(const lv_obj_t *, uint8_t part) = (row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
@@ -300,16 +301,23 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
         }
 
         lv_coord_t main_size = (row ? item->w_set : item->h_set);
-        if(_LV_FLEX_GET_GROW(main_size)) {
-            lv_coord_t s =  _LV_FLEX_GET_GROW(main_size) * grow_unit;
-            s -= get_margin_start(item, LV_OBJ_PART_MAIN) + get_margin_end(item, LV_OBJ_PART_MAIN);
-            if(s != area_get_main_size(&item->coords)) {
-                lv_area_t old_coords;
-                lv_area_copy(&old_coords, &item->coords);
-                lv_obj_invalidate(item);
+        if(_LV_FLEX_GET_GROW(main_size) || LV_COORD_GET_FLEX(main_set) == LV_FLEX_PLACE_STRETCH) {
+            lv_area_t old_coords;
+            lv_area_copy(&old_coords, &item->coords);
+
+            if(_LV_FLEX_GET_GROW(main_size)) {
+                lv_coord_t s = _LV_FLEX_GET_GROW(main_size) * grow_unit;
+                s -= get_margin_start(item, LV_OBJ_PART_MAIN) + get_margin_end(item, LV_OBJ_PART_MAIN);
                 area_set_main_size(&item->coords, s);
+            }
+            if(LV_COORD_GET_FLEX(main_set) == LV_FLEX_PLACE_STRETCH) {
+                area_set_cross_size(&item->coords, track_size);
+            }
+
+            if(lv_area_get_height(&old_coords) != area_get_main_size(&item->coords)) {
                 lv_obj_invalidate(item);
                 item->signal_cb(item, LV_SIGNAL_COORD_CHG, &old_coords);
+                lv_obj_invalidate(item);
             }
         }
 
