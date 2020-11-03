@@ -8,7 +8,18 @@
 #define LV_CONF_INTERNAL_H
 /* clang-format off */
 
+/*Handle special Kconfig options*/
+#include "lv_conf_kconfig.h"
+
 #include <stdint.h>
+
+#if defined __has_include
+#  if __has_include("lv_conf.h")
+#   ifndef LV_CONF_INCLUDE_SIMPLE
+#    define LV_CONF_INCLUDE_SIMPLE
+#   endif
+#  endif
+#endif
 
 /*If lv_conf.h is not skipped include it*/
 #if !defined(LV_CONF_SKIP) && !defined(CONFIG_LV_CONF_SKIP)

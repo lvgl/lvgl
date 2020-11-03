@@ -586,8 +586,15 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
     uint8_t i;
 
     lv_draw_line_dsc_t line_dsc;
-    lv_draw_line_dsc_init(&line_dsc);
-    lv_obj_init_draw_line_dsc(gauge, LV_GAUGE_PART_NEEDLE, &line_dsc);
+    lv_draw_img_dsc_t img_dsc;
+    if(ext->needle_img == NULL) {
+        lv_draw_line_dsc_init(&line_dsc);
+        lv_obj_init_draw_line_dsc(gauge, LV_GAUGE_PART_NEEDLE, &line_dsc);
+    }
+    else {
+        lv_draw_img_dsc_init(&img_dsc);
+        lv_obj_init_draw_img_dsc(gauge, LV_GAUGE_PART_NEEDLE, &img_dsc);
+    }
 
     p_mid.x = x_ofs;
     p_mid.y = y_ofs;
@@ -616,14 +623,10 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
             a.y1 = gauge->coords.y1 + lv_area_get_height(&gauge->coords) / 2  - ext->needle_img_pivot.y;
             a.x2 = a.x1 + info.w - 1;
             a.y2 = a.y1 + info.h - 1;
-            lv_draw_img_dsc_t img_dsc;
-            lv_draw_img_dsc_init(&img_dsc);
-            lv_obj_init_draw_img_dsc(gauge, LV_GAUGE_PART_MAIN, &img_dsc);
             img_dsc.pivot.x = ext->needle_img_pivot.x;
             img_dsc.pivot.y = ext->needle_img_pivot.y;
 
-            if(ext->needle_colors != NULL)
-                img_dsc.recolor = ext->needle_colors[i];
+            if(ext->needle_colors != NULL) img_dsc.recolor = ext->needle_colors[i];
 
             needle_angle = (needle_angle * 10);
             if(needle_angle > 3600) needle_angle -= 3600;

@@ -1,5 +1,10 @@
 # Changelog
 
+## v7.7.1 (04.11.2020)
+### Bugfixes
+- Respect btnmatrix's `one_check` in `lv_btnmatrix_set_btn_ctrl`
+- Gauge: make the needle images to use the styles from `LV_GAUGE_PART_PART`
+- Group: fix in `lv_group_remove_obj` to handle deleting hidden obejcts correctly
 
 ## v7.7.0 (20.10.2020)
 
@@ -310,7 +315,7 @@ The following object types are renamed:
 - Merge new features and fixes directly into `master` and release a patch or minor releases every 2 weeks.
 
 ### Migrating from v6 to v7
-- First and foremost, create a new `lv_conf.h` based on `lv_conf_templ.h`.
+- First and foremost, create a new `lv_conf.h` based on `lv_conf_template.h`.
 - To try the new version it suggested using a simulator project and see the examples.
 - If you have a running project, the most difficult part of the migration is updating to the new style system. Unfortunately, there is no better way than manually updating to the new format.
 - The other parts are mainly minor renames and refactoring as described above. 
