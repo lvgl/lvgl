@@ -43,8 +43,8 @@ void lv_obj_set_flex_dir(lv_obj_t * obj, lv_flex_dir_t flex_dir)
     if(obj->spec_attr->flex_cont.dir == flex_dir) return;
 
     obj->spec_attr->flex_cont.dir = flex_dir & 0x3;
-    obj->spec_attr->flex_cont.wrap = flex_dir & LV_FLEX_WRAP ? 1 : 0;
-    obj->spec_attr->flex_cont.rev = flex_dir & LV_FLEX_REVERSE ? 1 : 0;
+    obj->spec_attr->flex_cont.wrap = flex_dir & _LV_FLEX_WRAP ? 1 : 0;
+    obj->spec_attr->flex_cont.rev = flex_dir & _LV_FLEX_REVERSE ? 1 : 0;
     _lv_flex_refresh(obj);
 }
 

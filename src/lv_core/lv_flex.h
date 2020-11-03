@@ -24,8 +24,8 @@ extern "C" {
 
 #define _LV_FLEX_GET_GROW(v) (LV_COORD_IS_FLEX(v) ? LV_COORD_GET_FLEX(v) : 0)
 
-#define LV_FLEX_WRAP       (1 << 2)
-#define LV_FLEX_REVERSE    (1 << 3)
+#define _LV_FLEX_WRAP       (1 << 2)
+#define _LV_FLEX_REVERSE    (1 << 3)
 
 /**********************
  *      TYPEDEFS
@@ -42,8 +42,14 @@ typedef enum {
 
 typedef enum {
     LV_FLEX_DIR_NONE,
-    LV_FLEX_DIR_ROW,
-    LV_FLEX_DIR_COLUMN,
+    LV_FLEX_DIR_ROW = 0x01,
+    LV_FLEX_DIR_COLUMN = 0x02,
+    LV_FLEX_DIR_ROW_WRAP = LV_FLEX_DIR_ROW | _LV_FLEX_WRAP,
+    LV_FLEX_DIR_ROW_REVERSE = LV_FLEX_DIR_ROW | _LV_FLEX_REVERSE,
+    LV_FLEX_DIR_ROW_WRAP_REVERSE = LV_FLEX_DIR_ROW | _LV_FLEX_WRAP | _LV_FLEX_REVERSE,
+    LV_FLEX_DIR_COLUMN_WRAP = LV_FLEX_DIR_COLUMN | _LV_FLEX_WRAP,
+    LV_FLEX_DIR_COLUMN_REVERSE = LV_FLEX_DIR_COLUMN | _LV_FLEX_REVERSE,
+    LV_FLEX_DIR_COLUMN_WRAP_REVERSE = LV_FLEX_DIR_COLUMN | _LV_FLEX_WRAP | _LV_FLEX_REVERSE,
 }lv_flex_dir_t;
 
 typedef struct {
