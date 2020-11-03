@@ -34,7 +34,7 @@ extern "C" {
 /*******************
  * THEME SELECTION
  *******************/
- 
+
 #ifndef LV_THEME_DEFAULT_INIT
  #if defined (CONFIG_LV_THEME_DEFAULT_INIT_EMPTY)
   #define CONFIG_LV_THEME_DEFAULT_INIT               lv_theme_empty_init
@@ -51,7 +51,7 @@ extern "C" {
  * FONT SELECTION
  *******************/
 
-/* NOTE: In Kconfig instead of `LV_THEME_DEFAULT_FONT_SMALL` 
+/* NOTE: In Kconfig instead of `LV_THEME_DEFAULT_FONT_SMALL`
  *       `CONFIG_LV_THEME_DEFAULT_FONT_SMALL_<font_name>` is defined
  *       hence the large selection with if-s
  */

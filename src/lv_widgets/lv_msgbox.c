@@ -205,29 +205,29 @@ void lv_msgbox_set_text(lv_obj_t * mbox, const char * txt)
  */
 void lv_msgbox_set_text_fmt(lv_obj_t * mbox, const char * fmt, ...)
 {
-	LV_ASSERT_OBJ(mbox, LV_OBJX_NAME);
-	LV_ASSERT_STR(fmt);
+    LV_ASSERT_OBJ(mbox, LV_OBJX_NAME);
+    LV_ASSERT_STR(fmt);
 
-	lv_msgbox_ext_t * msgbox_ext = lv_obj_get_ext_attr(mbox);
-	lv_label_ext_t * label_ext = lv_obj_get_ext_attr(msgbox_ext->text);
+    lv_msgbox_ext_t * msgbox_ext = lv_obj_get_ext_attr(mbox);
+    lv_label_ext_t * label_ext = lv_obj_get_ext_attr(msgbox_ext->text);
 
-	/*If text is NULL then refresh */
-	if(fmt == NULL) {
-		lv_label_refr_text(msgbox_ext->text);
-		return;
-	}
+    /*If text is NULL then refresh */
+    if(fmt == NULL) {
+        lv_label_refr_text(msgbox_ext->text);
+        return;
+    }
 
-	if(label_ext->text != NULL) {
-		lv_mem_free(label_ext->text);
-		label_ext->text = NULL;
-	}
+    if(label_ext->text != NULL) {
+        lv_mem_free(label_ext->text);
+        label_ext->text = NULL;
+    }
 
-	va_list args;
-	va_start (args, fmt);
-	label_ext->text = _lv_txt_set_text_vfmt(fmt, args);
-	va_end(args);
-	lv_label_refr_text(msgbox_ext->text);
-	mbox_realign(mbox);
+    va_list args;
+    va_start(args, fmt);
+    label_ext->text = _lv_txt_set_text_vfmt(fmt, args);
+    va_end(args);
+    lv_label_refr_text(msgbox_ext->text);
+    mbox_realign(mbox);
 }
 
 /**
