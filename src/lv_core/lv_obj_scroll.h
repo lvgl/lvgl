@@ -108,7 +108,7 @@ lv_coord_t lv_obj_get_scroll_y(const struct _lv_obj_t * obj);
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_top(const struct _lv_obj_t * obj);
+lv_coord_t lv_obj_get_scroll_top(struct _lv_obj_t * obj);
 
 /**
  * Return the height of the area below the parent.
@@ -127,7 +127,7 @@ lv_coord_t lv_obj_get_scroll_bottom(struct _lv_obj_t * obj);
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_left(const struct _lv_obj_t * obj);
+lv_coord_t lv_obj_get_scroll_left(struct _lv_obj_t * obj);
 
 /**
  * Return the width of the area below the object.

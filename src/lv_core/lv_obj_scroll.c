@@ -176,7 +176,7 @@ lv_coord_t lv_obj_get_scroll_y(const lv_obj_t * obj)
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_top(const lv_obj_t * obj)
+lv_coord_t lv_obj_get_scroll_top(lv_obj_t * obj)
 {
     if(obj->spec_attr == NULL) return 0;
     return -obj->spec_attr->scroll.y;
@@ -225,7 +225,7 @@ lv_coord_t lv_obj_get_scroll_bottom(lv_obj_t * obj)
  * @param obj
  * @return
  */
-lv_coord_t lv_obj_get_scroll_left(const lv_obj_t * obj)
+lv_coord_t lv_obj_get_scroll_left(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -235,30 +235,29 @@ lv_coord_t lv_obj_get_scroll_left(const lv_obj_t * obj)
         if(obj->spec_attr == NULL) return 0;
         return -obj->spec_attr->scroll.x;
     }
+
     /*With RTL base direction scrolling the left is normal so find the left most coordinate*/
-    else {
-        lv_coord_t pad_right = lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
-         lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
+    lv_coord_t pad_right = lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
+    lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
 
-        lv_coord_t child_res = 0;
-        lv_obj_t * child = lv_obj_get_child(obj, NULL);
-        if(child) {
-            lv_coord_t x1 = LV_COORD_MAX;
-            while(child) {
-                x1 = LV_MATH_MIN(x1, child->coords.x1 - lv_obj_get_style_margin_left(child, LV_OBJ_PART_MAIN));
-                child = lv_obj_get_child(obj, child);
-            }
-            child_res = x1;
-
-            child_res = (obj->coords.x1 + pad_left) - child_res;
+    lv_coord_t child_res = 0;
+    lv_obj_t * child = lv_obj_get_child(obj, NULL);
+    if(child) {
+        lv_coord_t x1 = LV_COORD_MAX;
+        while(child) {
+            x1 = LV_MATH_MIN(x1, child->coords.x1 - lv_obj_get_style_margin_left(child, LV_OBJ_PART_MAIN));
+            child = lv_obj_get_child(obj, child);
         }
+        child_res = x1;
 
-        lv_coord_t self_w = _lv_obj_get_self_width(obj);
-        self_w = self_w - (lv_obj_get_width(obj) - pad_right - pad_left);
-        self_w -= lv_obj_get_scroll_x(obj);
-
-        return LV_MATH_MAX(child_res, self_w);
+        child_res = (obj->coords.x1 + pad_left) - child_res;
     }
+
+    lv_coord_t self_w = _lv_obj_get_self_width(obj);
+    self_w = self_w - (lv_obj_get_width(obj) - pad_right - pad_left);
+    self_w -= lv_obj_get_scroll_x(obj);
+
+    return LV_MATH_MAX(child_res, self_w);
 }
 
 /**
@@ -272,8 +271,14 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    /* Unlike `scroll_left`, `scroll_right` should be calculated regardless to the base direction.
-     * It's because `scroll_x` is always measured from the left side of the object hence there is no information about right side. */
+    /* With RTL base dir can't scroll to the object out on the right.
+     * So simply use the current scroll position as "right size"*/
+    if(lv_obj_get_base_dir(obj) == LV_BIDI_DIR_RTL) {
+        if(obj->spec_attr == NULL) return 0;
+        return obj->spec_attr->scroll.x;
+    }
+
+    /*With other base direction (LTR) scrolling to the right is normal so find the right most coordinate*/
     lv_coord_t child_res = LV_COORD_MIN;
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
     if(child) {
@@ -292,14 +297,9 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
     child_res -= (obj->coords.x2 - pad_right);
 
     lv_coord_t self_w;
-    /*With RTL base dir self_width is handled in `scroll_right`*/
-    if(lv_obj_get_base_dir(obj) != LV_BIDI_DIR_RTL) {
-        self_w = _lv_obj_get_self_width(obj);
-        self_w = self_w - (lv_obj_get_width(obj) - pad_right - pad_left);
-        self_w -= lv_obj_get_scroll_x(obj);
-    } else {
-        self_w = LV_COORD_MIN;
-    }
+    self_w = _lv_obj_get_self_width(obj);
+    self_w = self_w - (lv_obj_get_width(obj) - pad_right - pad_left);
+    self_w -= lv_obj_get_scroll_x(obj);
     return LV_MATH_MAX(child_res, self_w);
 }
 
