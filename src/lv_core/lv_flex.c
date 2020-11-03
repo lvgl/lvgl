@@ -24,6 +24,10 @@ static lv_obj_t * find_track_end(lv_obj_t * cont, lv_obj_t * item_start, lv_coor
 static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * item_last, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t track_size, lv_coord_t grow_unit);
 static void place_content(lv_coord_t place, lv_coord_t max_size, lv_coord_t track_size, lv_coord_t track_cnt, lv_coord_t * start_pos, lv_coord_t * gap);
 
+static lv_flex_dir_t get_dir(const lv_obj_t * obj);
+static bool get_rev(const lv_obj_t * obj);
+static bool get_wrap(const lv_obj_t * obj);
+
 /**********************
  *  STATIC VARIABLES
  **********************/
@@ -35,6 +39,10 @@ static void place_content(lv_coord_t place, lv_coord_t max_size, lv_coord_t trac
 /**********************
  *   GLOBAL FUNCTIONS
  **********************/
+
+/*=====================
+ * Setter functions
+ *====================*/
 
 void lv_obj_set_flex_dir(lv_obj_t * obj, lv_flex_dir_t flex_dir)
 {
@@ -48,14 +56,6 @@ void lv_obj_set_flex_dir(lv_obj_t * obj, lv_flex_dir_t flex_dir)
     _lv_flex_refresh(obj);
 }
 
-/**
- * Set how to place the tracks below/next to each other.
- * For ROW direction it means how to place the rows vertically.
- * For COLUMN direction it means how to place the column horizontally.
- * @param obj point to a flex container
- * @param place the placement type. Can be any element of `lv_flex_place_t`.
- * @note if the base direction is RTL and the direction is ROW, LV_FLEX_START means the right side
- */
 void lv_obj_set_flex_track_place(lv_obj_t * obj, lv_flex_place_t place)
 {
     lv_obj_allocate_rare_attr(obj);
@@ -64,17 +64,8 @@ void lv_obj_set_flex_track_place(lv_obj_t * obj, lv_flex_place_t place)
     obj->spec_attr->flex_cont.place = place;
 
     _lv_flex_refresh(obj);
-
 }
 
-/**
- * Set a gap in the main direction.
- * For ROW direction it means adding gap horizontally between the items.
- * For COLUMN direction it means adding gap vertically between the items.
- * @param obj pointer to an object (flex container)
- * @param gap the gap in pixels
- * @note By default the objects are packed tightly after each other
- */
 void lv_obj_set_flex_gap(lv_obj_t * obj, lv_coord_t gap)
 {
     if(obj->spec_attr == NULL) lv_obj_allocate_rare_attr(obj);
@@ -86,36 +77,29 @@ void lv_obj_set_flex_gap(lv_obj_t * obj, lv_coord_t gap)
     _lv_flex_refresh(obj);
 }
 
-/**
- * Make an object flex item, i.e. allow setting it's coordinate according to the parent's flex settings.
- * @param obj pointer to an object
- */
 void lv_obj_set_flex_item(lv_obj_t * obj, bool en)
 {
     if(en) {
-        lv_coord_t f  = _LV_COORD_FELX(LV_FLEX_START);
+        lv_coord_t f  = _LV_COORD_FELX(LV_FLEX_PLACE_START);
         lv_obj_set_pos(obj, f, f);
     } else {
         lv_obj_set_pos(obj, lv_obj_get_x(obj), lv_obj_get_y(obj));
     }
 }
 
-/**
- * Set how the place the item in it's track in the cross direction.
- * It has a visible effect only if the objects in the same track has different size in the cross direction.
- * For ROW direction it means how to place the objects vertically in their row.
- * For COLUMN direction it means how to place the objects horizontally in their column.
- * @param obj pointer to a flex item
- * @param place:
- *   - `LV_FLEX_START` top/left (in case of RTL base direction right)
- *   - `LV_FLEX_CENTER` center
- *   - `LV_FLEX_END` bottom/right (in case of RTL base direction left)
- */
 void lv_obj_set_flex_item_place(lv_obj_t * obj, lv_flex_place_t place)
 {
-    lv_coord_t f  = _LV_COORD_FELX(place);
-    lv_obj_set_pos(obj, f, f);
+    if(place == LV_FLEX_PLACE_NONE) {
+        lv_obj_set_pos(obj, lv_obj_get_x(obj), lv_obj_get_x(obj));
+    } else {
+        lv_coord_t f  = _LV_COORD_FELX(place);
+        lv_obj_set_pos(obj, f, f);
+    }
 }
+
+/*=====================
+ * Getter functions
+ *====================*/
 
 lv_flex_dir_t lv_obj_get_flex_dir(const lv_obj_t * obj)
 {
@@ -123,22 +107,10 @@ lv_flex_dir_t lv_obj_get_flex_dir(const lv_obj_t * obj)
     else return LV_FLEX_DIR_NONE;
 }
 
-lv_flex_place_t lv_obj_get_flex_place(const lv_obj_t * obj)
+lv_flex_place_t lv_obj_get_flex_track_place(const lv_obj_t * obj)
 {
     if(obj->spec_attr) return obj->spec_attr->flex_cont.place;
-    else return LV_FLEX_START;
-}
-
-bool lv_obj_get_flex_wrap(const lv_obj_t * obj)
-{
-    if(obj->spec_attr) return obj->spec_attr->flex_cont.wrap;
-    else return false;
-}
-
-bool lv_obj_get_flex_reverse(const lv_obj_t * obj)
-{
-    if(obj->spec_attr) return obj->spec_attr->flex_cont.rev;
-    else return false;
+    else return LV_FLEX_PLACE_START;
 }
 
 lv_coord_t lv_obj_get_flex_gap(const lv_obj_t * obj)
@@ -147,9 +119,16 @@ lv_coord_t lv_obj_get_flex_gap(const lv_obj_t * obj)
     else return 0;
 }
 
+lv_flex_place_t lv_obj_get_flex_item_place(lv_obj_t * obj)
+{
+    lv_coord_t x = lv_obj_get_x(obj);
+    if(LV_COORD_IS_FLEX(x)) return LV_COORD_GET_FLEX(x);
+    else return LV_FLEX_PLACE_NONE;
+}
+
 void _lv_flex_refresh(lv_obj_t * cont)
 {
-    lv_flex_dir_t dir = lv_obj_get_flex_dir(cont);
+    lv_flex_dir_t dir = get_dir(cont);
 
     if(dir == LV_FLEX_DIR_NONE) return;
 
@@ -160,19 +139,19 @@ void _lv_flex_refresh(lv_obj_t * cont)
     lv_coord_t abs_y = cont->coords.y1 + lv_obj_get_style_pad_top(cont, LV_OBJ_PART_MAIN) - lv_obj_get_scroll_y(cont);
     lv_coord_t abs_x = cont->coords.x1 + lv_obj_get_style_pad_left(cont, LV_OBJ_PART_MAIN) - lv_obj_get_scroll_x(cont);
 
-    lv_coord_t place = lv_obj_get_flex_place(cont);
+    lv_coord_t place = lv_obj_get_flex_track_place(cont);
     lv_ll_t * ll = _lv_obj_get_child_ll(cont);
     lv_coord_t * cross_pos = (row ? &abs_y : &abs_x);
 
     if((row && cont->h_set == LV_SIZE_AUTO) ||
        (!row && cont->w_set == LV_SIZE_AUTO))
     {
-        place = LV_FLEX_START;
+        place = LV_FLEX_PLACE_START;
     }
 
     if(rtl && !row) {
-        if(place == LV_FLEX_START) place = LV_FLEX_END;
-        else if(place == LV_FLEX_END) place = LV_FLEX_START;
+        if(place == LV_FLEX_PLACE_START) place = LV_FLEX_PLACE_END;
+        else if(place == LV_FLEX_PLACE_END) place = LV_FLEX_PLACE_START;
     }
 
     lv_coord_t all_track_size = 0;
@@ -182,9 +161,9 @@ void _lv_flex_refresh(lv_obj_t * cont)
     lv_coord_t track_size;
     lv_obj_t * track_first_item;
     lv_obj_t * next_track_first_item;
-    bool rev = lv_obj_get_flex_reverse(cont);
+    bool rev = get_rev(cont);
 
-    if(place != LV_FLEX_START) {
+    if(place != LV_FLEX_PLACE_START) {
         track_first_item =  rev ? _lv_ll_get_head(ll) : _lv_ll_get_tail(ll);
 
         while(track_first_item) {
@@ -222,7 +201,6 @@ void _lv_flex_refresh(lv_obj_t * cont)
         }
     }
     LV_ASSERT_MEM_INTEGRITY();
-
 }
 
 /**********************
@@ -231,10 +209,10 @@ void _lv_flex_refresh(lv_obj_t * cont)
 
 static lv_obj_t * find_track_end(lv_obj_t * cont, lv_obj_t * item_start, lv_coord_t max_size, lv_coord_t * grow_unit, lv_coord_t * track_cross_size)
 {
-    bool wrap = lv_obj_get_flex_wrap(cont);
-    bool rev = lv_obj_get_flex_reverse(cont);
+    bool wrap = get_wrap(cont);
+    bool rev = get_rev(cont);
     lv_coord_t gap = lv_obj_get_flex_gap(cont);
-    bool row = lv_obj_get_flex_dir(cont) == LV_FLEX_DIR_ROW ? true : false;
+    bool row = get_dir(cont) == LV_FLEX_DIR_ROW ? true : false;
     lv_coord_t(*get_main_size)(const lv_obj_t *) = (row ? lv_obj_get_width_margin : lv_obj_get_height_margin);
     lv_coord_t(*get_cross_size)(const lv_obj_t *) = (!row ? lv_obj_get_width_margin : lv_obj_get_height_margin);
     void * (*ll_iter)(const lv_ll_t * , const void *) = rev ? _lv_ll_get_next : _lv_ll_get_prev;
@@ -292,9 +270,9 @@ static lv_obj_t * find_track_end(lv_obj_t * cont, lv_obj_t * item_start, lv_coor
 
 static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * item_last, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t track_size, lv_coord_t grow_unit)
 {
-    bool rev = lv_obj_get_flex_reverse(cont);
+    bool rev = get_rev(cont);
     lv_coord_t gap = lv_obj_get_flex_gap(cont);
-    bool row = lv_obj_get_flex_dir(cont) == LV_FLEX_DIR_ROW ? true : false;
+    bool row = get_dir(cont) == LV_FLEX_DIR_ROW ? true : false;
 
     lv_coord_t(*obj_get_main_size)(const lv_obj_t *) = (row ? lv_obj_get_width_margin : lv_obj_get_height_margin);
     lv_coord_t(*obj_get_cross_size)(const lv_obj_t *) = (!row ? lv_obj_get_width_margin : lv_obj_get_height_margin);
@@ -338,10 +316,10 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
         lv_coord_t cross_pos = 0;
         lv_coord_t cross_set = (row ? item->y_set : item->x_set);
         switch(LV_COORD_GET_FLEX(cross_set)) {
-        case LV_FLEX_CENTER:
+        case LV_FLEX_PLACE_CENTER:
             cross_pos = (track_size - obj_get_cross_size(item)) / 2;
             break;
-        case LV_FLEX_END:
+        case LV_FLEX_PLACE_END:
             cross_pos = track_size - obj_get_cross_size(item);
             break;
         }
@@ -370,38 +348,55 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
     }
 }
 
-
 static void place_content(lv_coord_t place, lv_coord_t max_size, lv_coord_t track_size, lv_coord_t track_cnt, lv_coord_t * start_pos, lv_coord_t * gap)
 {
     if(track_cnt <= 1) {
         switch(place) {
-            case LV_FLEX_SPACE_BETWEEN:
-            case LV_FLEX_SPACE_AROUND:
-            case LV_FLEX_SPACE_EVENLY:
-                place = LV_FLEX_CENTER;
+            case LV_FLEX_PLACE_SPACE_BETWEEN:
+            case LV_FLEX_PLACE_SPACE_AROUND:
+            case LV_FLEX_PLACE_SPACE_EVENLY:
+                place = LV_FLEX_PLACE_CENTER;
                 break;
         }
     }
 
     switch(place) {
-    case LV_FLEX_CENTER:
+    case LV_FLEX_PLACE_CENTER:
         *start_pos += (max_size - track_size) / 2;
         break;
-    case LV_FLEX_END:
+    case LV_FLEX_PLACE_END:
         *start_pos += max_size - track_size;
         break;
-    case LV_FLEX_SPACE_BETWEEN:
+    case LV_FLEX_PLACE_SPACE_BETWEEN:
        *gap = (lv_coord_t)(max_size - track_size) / (lv_coord_t)(track_cnt - 1);
        break;
-   case LV_FLEX_SPACE_AROUND:
+   case LV_FLEX_PLACE_SPACE_AROUND:
        *gap += (lv_coord_t)(max_size - track_size) / (lv_coord_t)(track_cnt);
        *start_pos += *gap / 2;
        break;
-   case LV_FLEX_SPACE_EVENLY:
+   case LV_FLEX_PLACE_SPACE_EVENLY:
        *gap = (lv_coord_t)(max_size - track_size) / (lv_coord_t)(track_cnt + 1);
        *start_pos += *gap;
        break;
    default:
        *gap = 0;
     }
+}
+
+static lv_flex_dir_t get_dir(const lv_obj_t * obj)
+{
+    if(obj->spec_attr) return obj->spec_attr->flex_cont.dir;
+    else return false;
+}
+
+static bool get_rev(const lv_obj_t * obj)
+{
+    if(obj->spec_attr) return obj->spec_attr->flex_cont.rev;
+    else return false;
+}
+
+static bool get_wrap(const lv_obj_t * obj)
+{
+    if(obj->spec_attr) return obj->spec_attr->flex_cont.wrap;
+    else return false;
 }

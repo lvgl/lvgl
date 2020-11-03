@@ -13,7 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_grid.h"
+#include "../lv_misc/lv_area.h"
 
 /*********************
  *      DEFINES
@@ -31,24 +31,28 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
+/* Can't include lv_obj.h because it includes this header file */
+struct _lv_obj_t;
+
 typedef enum {
-    LV_FLEX_START,
-    LV_FLEX_END,
-    LV_FLEX_CENTER,
-    LV_FLEX_SPACE_EVENLY,
-    LV_FLEX_SPACE_AROUND,
-    LV_FLEX_SPACE_BETWEEN,
+    LV_FLEX_PLACE_NONE,
+    LV_FLEX_PLACE_START,
+    LV_FLEX_PLACE_END,
+    LV_FLEX_PLACE_CENTER,
+    LV_FLEX_PLACE_SPACE_EVENLY,
+    LV_FLEX_PLACE_SPACE_AROUND,
+    LV_FLEX_PLACE_SPACE_BETWEEN,
 }lv_flex_place_t;
 
 typedef enum {
     LV_FLEX_DIR_NONE,
-    LV_FLEX_DIR_ROW = 0x01,
-    LV_FLEX_DIR_COLUMN = 0x02,
-    LV_FLEX_DIR_ROW_WRAP = LV_FLEX_DIR_ROW | _LV_FLEX_WRAP,
-    LV_FLEX_DIR_ROW_REVERSE = LV_FLEX_DIR_ROW | _LV_FLEX_REVERSE,
-    LV_FLEX_DIR_ROW_WRAP_REVERSE = LV_FLEX_DIR_ROW | _LV_FLEX_WRAP | _LV_FLEX_REVERSE,
-    LV_FLEX_DIR_COLUMN_WRAP = LV_FLEX_DIR_COLUMN | _LV_FLEX_WRAP,
-    LV_FLEX_DIR_COLUMN_REVERSE = LV_FLEX_DIR_COLUMN | _LV_FLEX_REVERSE,
+    LV_FLEX_DIR_ROW                 = 0x01,
+    LV_FLEX_DIR_COLUMN              = 0x02,
+    LV_FLEX_DIR_ROW_WRAP            = LV_FLEX_DIR_ROW | _LV_FLEX_WRAP,
+    LV_FLEX_DIR_ROW_REVERSE         = LV_FLEX_DIR_ROW | _LV_FLEX_REVERSE,
+    LV_FLEX_DIR_ROW_WRAP_REVERSE    = LV_FLEX_DIR_ROW | _LV_FLEX_WRAP | _LV_FLEX_REVERSE,
+    LV_FLEX_DIR_COLUMN_WRAP         = LV_FLEX_DIR_COLUMN | _LV_FLEX_WRAP,
+    LV_FLEX_DIR_COLUMN_REVERSE      = LV_FLEX_DIR_COLUMN | _LV_FLEX_REVERSE,
     LV_FLEX_DIR_COLUMN_WRAP_REVERSE = LV_FLEX_DIR_COLUMN | _LV_FLEX_WRAP | _LV_FLEX_REVERSE,
 }lv_flex_dir_t;
 
@@ -64,7 +68,18 @@ typedef struct {
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_obj_set_flex_dir(lv_obj_t * obj, lv_flex_dir_t flex_dir);
+/*=====================
+ * Setter functions
+ *====================*/
+
+/**
+ * Makes an object a flex container by setting the direction of the layout.
+ * The children explicitly needs to be made flex items with
+ * `lv_obj_set_flex_item()` or `lv_obj_set_flex_item_place()`
+ * @param obj pointer to an object
+ * @param flex_dir the flex direction, an element of `lv_flex_dir_t`
+ */
+void lv_obj_set_flex_dir(struct _lv_obj_t * obj, lv_flex_dir_t flex_dir);
 
 /**
  * Set how to place the tracks below/next to each other.
@@ -74,7 +89,7 @@ void lv_obj_set_flex_dir(lv_obj_t * obj, lv_flex_dir_t flex_dir);
  * @param place the placement type. Can be any element of `lv_flex_place_t`.
  * @note if the base direction is RTL and the direction is ROW, LV_FLEX_START means the right side
  */
-void lv_obj_set_flex_track_place(lv_obj_t * obj, lv_flex_place_t place);
+void lv_obj_set_flex_track_place(struct _lv_obj_t * obj, lv_flex_place_t place);
 
 /**
  * Set a gap in the main direction.
@@ -84,13 +99,13 @@ void lv_obj_set_flex_track_place(lv_obj_t * obj, lv_flex_place_t place);
  * @param gap the gap in pixels
  * @note By default the objects are packed tightly after each other
  */
-void lv_obj_set_flex_gap(lv_obj_t * obj, lv_coord_t gap);
+void lv_obj_set_flex_gap(struct _lv_obj_t * obj, lv_coord_t gap);
 
 /**
  * Make an object flex item, i.e. allow setting it's coordinate according to the parent's flex settings.
  * @param obj pointer to an object
  */
-void lv_obj_set_flex_item(lv_obj_t * obj, bool en);
+void lv_obj_set_flex_item(struct _lv_obj_t * obj, bool en);
 
 /**
  * Set how the place the item in it's track in the cross direction.
@@ -99,18 +114,50 @@ void lv_obj_set_flex_item(lv_obj_t * obj, bool en);
  * For COLUMN direction it means how to place the objects horizontally in their column.
  * @param obj pointer to a flex item
  * @param place:
- *   - `LV_FLEX_START` top/left (in case of RTL base direction right)
- *   - `LV_FLEX_CENTER` center
- *   - `LV_FLEX_END` bottom/right (in case of RTL base direction left)
+ *   - `LV_FLEX_PLACE_START` top/left (in case of RTL base direction right)
+ *   - `LV_FLEX_PLACE_CENTER` center
+ *   - `LV_FLEX_PLACE_END` bottom/right (in case of RTL base direction left)
  */
-void lv_obj_set_flex_item_place(lv_obj_t * obj, lv_flex_place_t place);
+void lv_obj_set_flex_item_place(struct _lv_obj_t * obj, lv_flex_place_t place);
 
-lv_flex_dir_t lv_obj_get_flex_dir(const lv_obj_t * obj);
-lv_flex_place_t lv_obj_get_flex_place(const lv_obj_t * obj);
-bool lv_obj_get_flex_wrap(const lv_obj_t * obj);
-bool lv_obj_get_flex_reverse(const lv_obj_t * obj);
-lv_coord_t lv_obj_get_flex_gap(const lv_obj_t * obj);
-void _lv_flex_refresh(lv_obj_t * cont);
+/*=====================
+ * Getter functions
+ *====================*/
+
+/**
+ * Get the flex direction of an object
+ * @param obj pointer to an object
+ * @return the flex direction of `obj`
+ */
+lv_flex_dir_t lv_obj_get_flex_dir(const struct _lv_obj_t * obj);
+
+/**
+ * Get the track placement of a flex container
+ * @param obj pointer to an object
+ * @return the track placement
+ */
+lv_flex_place_t lv_obj_get_flex_track_place(const struct _lv_obj_t * obj);
+/**
+ * Get flex gap
+ * @param obj pointer to an flex container
+ * @return the gap in pixels
+ */
+lv_coord_t lv_obj_get_flex_gap(const struct _lv_obj_t * obj);
+
+/**
+ * Get how the flex item is placed in its track in the cross direction.
+ * For ROW direction it means how the item is placed vertically in its row.
+ * For COLUMN direction it means how the item is placed horizontally in its column.
+ * @param obj pointer to a flex item
+ * @return `LV_FLEX_PLACE_NONE/START/CENTER/END`
+ */
+lv_flex_place_t lv_obj_get_flex_item_place(struct _lv_obj_t * obj);
+/**
+ * Rearrange the flex items of a flex container
+ * @param cont pointer to a flex container object
+ */
+void _lv_flex_refresh(struct _lv_obj_t * cont);
+
 
 /**********************
  *      MACROS
