@@ -400,7 +400,7 @@ static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc,
             x = calc->x[col_pos] + (col_w - (item_w + margin_left - margin_right)) / 2;
             break;
         case LV_GRID_END:
-            x = calc->x[col_pos + 1] - lv_obj_get_width(item) - margin_right;
+            x = calc->x[col_pos] + col_w - lv_obj_get_width(item) - margin_right;
             break;
     }
 
@@ -417,7 +417,7 @@ static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc,
             y = calc->y[row_pos] + (row_h - (item_h + margin_top + margin_bottom)) / 2;
             break;
         case LV_GRID_END:
-            y = calc->y[row_pos + 1] - lv_obj_get_height(item) - margin_bottom;
+            y = calc->y[row_pos] + row_h - lv_obj_get_height(item) - margin_bottom;
             break;
     }
 
@@ -504,6 +504,8 @@ static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t plac
         pos_array[i + 1] = pos_array[i] + size_array[i] + gap;
     }
 
+    lv_coord_t total_gird_size = pos_array[track_num - 1] + size_array[track_num - 1] - pos_array[0];
+
     if(reverse) {
         for(i = 0; i < track_num; i++) {
             pos_array[i] = cont_size - pos_array[i] - size_array[i];
@@ -512,7 +514,7 @@ static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t plac
     }
 
     /*Return the full size of the grid*/
-    return pos_array[track_num - 1] + size_array[track_num - 1] - pos_array[0];
+    return total_gird_size;
 }
 
 

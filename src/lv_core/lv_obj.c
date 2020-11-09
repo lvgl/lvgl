@@ -1986,17 +1986,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(obj->w_set == LV_SIZE_AUTO || obj->h_set == LV_SIZE_AUTO) {
             lv_obj_set_size(obj, obj->w_set, obj->h_set);
         }
-
-        /*If the changed children was a grid item refresh this objects grid*/
-        if(lv_obj_get_grid(obj)) {
-            lv_obj_t * child = param;
-            if(child) {
-                if(_lv_obj_is_grid_item(child)) _lv_grid_full_refresh(obj);
-            } else {
-                _lv_grid_full_refresh(obj);
-            }
-        }
-
     }
     else if(sign == LV_SIGNAL_SCROLL) {
         res = lv_event_send(obj, LV_EVENT_SCROLL, NULL);

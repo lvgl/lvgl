@@ -575,7 +575,7 @@ bool _lv_obj_handle_self_size_chg(struct _lv_obj_t * obj)
 }
 
 /**
- * Calculate the "auto size". It's `auto_size = max(gird_size, children_size, self_size)`
+ * Calculate the "auto size". It's `auto_size = max(children_size, self_size)`
  * @param obj pointer to an object
  * @param w_out store the width here. NULL to not calculate width
  * @param h_out store the height here. NULL to not calculate height
@@ -583,42 +583,18 @@ bool _lv_obj_handle_self_size_chg(struct _lv_obj_t * obj)
 void _lv_obj_calc_auto_size(lv_obj_t * obj, lv_coord_t * w_out, lv_coord_t * h_out)
 {
     if(!w_out && !h_out) return;
-
-//    printf("auto size\n");
-
-    /*If no other effect the auto-size of zero by default*/
-    if(w_out) *w_out = 0;
-    if(h_out) *h_out = 0;
-
-    /*Get the grid size of the object has a defined grid*/
-    lv_coord_t grid_w = 0;
-    lv_coord_t grid_h = 0;
-    if(lv_obj_get_grid(obj)) {
-        _lv_grid_calc_t calc;
-        _lv_grid_calc(obj, &calc);
-        grid_w = calc.grid_w + lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN) + lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
-        grid_h = calc.grid_h + lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN) +  lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
-        _lv_grid_calc_free(&calc);
-    }
-
-    /*Get the children's most right and bottom position*/
-    lv_coord_t children_w = 0;
-    lv_coord_t children_h = 0;
+    /*Get the bounding box of the children*/
     if(w_out) {
         lv_coord_t scroll_right = lv_obj_get_scroll_right(obj);
         lv_coord_t scroll_left = lv_obj_get_scroll_left(obj);
-        children_w = lv_obj_get_width(obj) + scroll_right + scroll_left;
+        *w_out = lv_obj_get_width(obj) + scroll_right + scroll_left;
     }
 
     if(h_out) {
         lv_coord_t scroll_bottom = lv_obj_get_scroll_bottom(obj);
         lv_coord_t scroll_top = lv_obj_get_scroll_top(obj);
-        children_h = lv_obj_get_height(obj) + scroll_bottom + scroll_top;
+        *h_out = lv_obj_get_height(obj) + scroll_bottom + scroll_top;
     }
-
-    /*auto_size = max(gird_size, children_size)*/
-    if(w_out) *w_out = LV_MATH_MAX(children_w, grid_w);
-    if(h_out) *h_out = LV_MATH_MAX(children_h, grid_h);
 }
 
 /**
