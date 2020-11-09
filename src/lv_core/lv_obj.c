@@ -48,7 +48,7 @@
 #define LV_OBJX_NAME "lv_obj"
 #define LV_OBJ_DEF_WIDTH    (LV_DPX(100))
 #define LV_OBJ_DEF_HEIGHT   (LV_DPX(50))
-#define GRID_DEBUG  1 /*Draw rectangles on grid cells*/
+#define GRID_DEBUG          0   /*Draw rectangles on grid cells*/
 
 /**********************
  *      TYPEDEFS
@@ -1318,8 +1318,8 @@ lv_bidi_dir_t lv_obj_get_base_dir(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(obj->spec_attr == NULL) return LV_BIDI_DIR_LTR;
 #if LV_USE_BIDI
+    if(obj->spec_attr == NULL) return LV_BIDI_DIR_LTR;
     const lv_obj_t * parent = obj;
 
     while(parent) {
@@ -1811,15 +1811,17 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             _lv_grid_calc(obj, &calc);
 
             /*Create a color unique to this object. */
-            lv_color_t c = lv_color_hex(((lv_uintptr_t) obj) & 0xFFFFFF);
+            uint32_t cx = ((lv_uintptr_t) obj) & 0xFFFFFF;
+            cx = (cx & 0xff) ^ ((cx >> 8) & 0xff) ^ ((cx >> 16) & 0xff) ^ ((cx >> 24) & 0xff);
+            lv_color_t c = lv_color_hsv_to_rgb(cx & 0xff, 100, 100);
 
             lv_draw_rect_dsc_t grid_rect_dsc;
             lv_draw_rect_dsc_init(&grid_rect_dsc);
             grid_rect_dsc.bg_color = c;
-            grid_rect_dsc.bg_opa = LV_OPA_20;
+            grid_rect_dsc.bg_opa = LV_OPA_10;
             grid_rect_dsc.border_width = 2;
             grid_rect_dsc.border_color = c;
-            grid_rect_dsc.border_opa = LV_OPA_70;
+            grid_rect_dsc.border_opa = LV_OPA_30;
 
             lv_point_t grid_abs;
             lv_coord_t pad_left = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);

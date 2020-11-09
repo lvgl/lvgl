@@ -85,9 +85,11 @@ typedef struct {
 
 void lv_grid_init(lv_grid_t * grid);
 
-void lv_grid_set_template(lv_grid_t * grid, const lv_coord_t * col_dsc, const lv_coord_t * row_dsc);
+void lv_grid_set_template(lv_grid_t * grid, const lv_coord_t * col_dsc, uint8_t col_cnt, const lv_coord_t * row_dsc, uint8_t row_cnt);
 
-void lv_grid_set_place_content(lv_grid_t * grid, uint8_t col_place, uint8_t row_place);
+void lv_grid_set_place(lv_grid_t * grid, uint8_t col_place, uint8_t row_place);
+
+void lv_grid_set_gap(lv_grid_t * grid, lv_coord_t col_gap, uint8_t row_gap);
 
 /**
  * Set a grid for an object
@@ -103,6 +105,7 @@ void lv_obj_set_grid(lv_obj_t * obj, const lv_grid_t * grid);
  */
 const lv_grid_t * lv_obj_get_grid(lv_obj_t * obj);
 
+void lv_obj_set_grid_cell(lv_obj_t * obj, lv_coord_t col_pos, lv_coord_t row_pos);
 
 /**
  * Notify all object if a style is modified

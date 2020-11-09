@@ -714,7 +714,7 @@ bool _lv_obj_is_grid_item(lv_obj_t * obj)
 {
     lv_obj_t * cont = lv_obj_get_parent(obj);
     if(cont == NULL) return false;
-    const lv_grid_t * g = lv_obj_get_grid(obj);
+    const lv_grid_t * g = lv_obj_get_grid(cont);
     if(g == NULL) return false;
     if(g->col_dsc == NULL) return false;
     if(g->row_dsc == NULL) return false;
