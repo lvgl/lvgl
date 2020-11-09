@@ -1191,7 +1191,7 @@ void lv_label_refr_text(lv_obj_t * label)
             size_t txt_len = strlen(ext->text);
             uint32_t byte_id     = _lv_txt_encoded_get_byte_id(ext->text, letter_id);
             while(byte_id + LV_LABEL_DOT_NUM > txt_len) {
-                byte_id -= _lv_txt_encoded_size(&ext->text[byte_id]);
+                _lv_txt_encoded_prev(ext->text, &byte_id);
                 letter_id--;
             }
 

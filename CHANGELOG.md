@@ -2,6 +2,7 @@
 
 ## v7.7.2 (Planned to 28.11.2020)
 ### Bugfixes
+- label: Repair calculate back `dot` character logical error which cause infinite loop.
 
 ## v7.7.1 (04.11.2020)
 ### Bugfixes
