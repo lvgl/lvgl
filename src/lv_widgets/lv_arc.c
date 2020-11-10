@@ -273,6 +273,8 @@ void lv_arc_set_bg_start_angle(lv_obj_t * arc, uint16_t start)
     }
 
     ext->bg_angle_start = start;
+
+    value_update(arc);
 }
 
 /**
@@ -305,6 +307,8 @@ void lv_arc_set_bg_end_angle(lv_obj_t * arc, uint16_t end)
         lv_obj_invalidate(arc);
     }
 
+    value_update(arc);
+
     ext->bg_angle_end = end;
 }
 
@@ -329,6 +333,8 @@ void lv_arc_set_bg_angles(lv_obj_t * arc, uint16_t start, uint16_t end)
     ext->bg_angle_end = end;
 
     inv_arc_area(arc, ext->bg_angle_start, ext->bg_angle_end, LV_ARC_PART_BG);
+
+    value_update(arc);
 }
 
 /**
