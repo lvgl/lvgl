@@ -559,13 +559,12 @@ void lv_dropdown_open(lv_obj_t * ddlist)
 
     lv_obj_t * label = lv_label_create(ext->list, NULL);
     lv_label_set_text_static(label, ext->options);
+    lv_obj_set_width(ext->list, LV_SIZE_AUTO);
 
     /*Set smaller width to the width of the button*/
-    if(lv_obj_get_width(ext->list) < lv_obj_get_width(ddlist) &&
+    if(lv_obj_get_width(ext->list) < lv_obj_get_width_fit(ddlist) &&
        (ext->dir == LV_DIR_TOP || ext->dir == LV_DIR_BOTTOM)) {
         lv_obj_set_width(ext->list, lv_obj_get_width(ddlist));
-    } else {
-        lv_obj_set_width(ext->list, LV_SIZE_AUTO);
     }
 
     lv_coord_t label_h = lv_obj_get_height(label);
@@ -1198,6 +1197,11 @@ static void position_to_selected(lv_obj_t * ddlist)
 
     lv_coord_t line_y1 = ext->sel_opt_id * (font_h + line_space);
 
+    /*Do not allow scrolling in*/
+    lv_coord_t bottom_diff = ext->list->coords.y2 - lv_obj_get_style_pad_bottom(ext->list, LV_OBJ_PART_MAIN) - (label->coords.y2 - line_y1);
+    if(bottom_diff > 0) line_y1 -= bottom_diff;
+
+    /*Scroll to the selected option*/
     lv_obj_scroll_to_y(ext->list, line_y1, LV_ANIM_OFF);
     lv_obj_invalidate(ext->list);
 }
