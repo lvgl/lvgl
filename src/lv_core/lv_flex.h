@@ -62,7 +62,8 @@ typedef struct {
     uint8_t dir        :2;
     uint8_t wrap       :1;
     uint8_t rev        :1;
-    uint8_t place      :3;
+    uint8_t item_place      :3;
+    uint8_t track_place      :3;
 }lv_flex_cont_t;
 
 /**********************
@@ -83,24 +84,13 @@ typedef struct {
 void lv_obj_set_flex_dir(struct _lv_obj_t * obj, lv_flex_dir_t flex_dir);
 
 /**
- * Set how to place the tracks below/next to each other.
- * For ROW direction it means how to place the rows vertically.
- * For COLUMN direction it means how to place the column horizontally.
+ * Set how to place the items and the tracks
  * @param obj point to a flex container
- * @param place the placement type. Can be any element of `lv_flex_place_t`.
+ * @param item_place tells how to distribute the free space among the items in the same track
+ * @param track_place tells how to distribute the free space among the tracks
  * @note if the base direction is RTL and the direction is ROW, LV_FLEX_START means the right side
  */
-void lv_obj_set_flex_track_place(struct _lv_obj_t * obj, lv_flex_place_t place);
-
-/**
- * Set a gap in the main direction.
- * For ROW direction it means adding gap horizontally between the items.
- * For COLUMN direction it means adding gap vertically between the items.
- * @param obj pointer to an object (flex container)
- * @param gap the gap in pixels
- * @note By default the objects are packed tightly after each other
- */
-void lv_obj_set_flex_gap(struct _lv_obj_t * obj, lv_coord_t gap);
+void lv_obj_set_flex_place(struct _lv_obj_t * obj, lv_flex_place_t item_place, lv_flex_place_t track_place);
 
 /**
  * Make an object flex item, i.e. allow setting it's coordinate according to the parent's flex settings.
@@ -133,17 +123,18 @@ void lv_obj_set_flex_item_place(struct _lv_obj_t * obj, lv_flex_place_t place);
 lv_flex_dir_t lv_obj_get_flex_dir(const struct _lv_obj_t * obj);
 
 /**
+ * Get the item placement of a flex container
+ * @param obj pointer to an object
+ * @return the item placement
+ */
+lv_flex_place_t lv_obj_get_flex_item_place(const struct _lv_obj_t * obj);
+
+/**
  * Get the track placement of a flex container
  * @param obj pointer to an object
  * @return the track placement
  */
 lv_flex_place_t lv_obj_get_flex_track_place(const struct _lv_obj_t * obj);
-/**
- * Get flex gap
- * @param obj pointer to an flex container
- * @return the gap in pixels
- */
-lv_coord_t lv_obj_get_flex_gap(const struct _lv_obj_t * obj);
 
 /**
  * Get how the flex item is placed in its track in the cross direction.
@@ -152,7 +143,7 @@ lv_coord_t lv_obj_get_flex_gap(const struct _lv_obj_t * obj);
  * @param obj pointer to a flex item
  * @return `LV_FLEX_PLACE_NONE/START/CENTER/END`
  */
-lv_flex_place_t lv_obj_get_flex_item_place(struct _lv_obj_t * obj);
+lv_flex_place_t lv_obj_get_flex_self_place(struct _lv_obj_t * obj);
 /**
  * Rearrange the flex items of a flex container
  * @param cont pointer to a flex container object
