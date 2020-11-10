@@ -9,6 +9,7 @@
 ## v7.7.2 (Planned to 28.11.2020)
 ### Bugfixes
 - fix(draw_triangle): fix polygon/triangle drawing when the order of points is counter-clockwise
+- fix(btnmatrix): fix setting the same map with modified pointers
 
 ## v7.7.1 (04.11.2020)
 ### Bugfixes
