@@ -49,6 +49,10 @@ typedef uint8_t lv_snap_align_t;
  * GLOBAL PROTOTYPES
  **********************/
 
+/*=====================
+ * Setter functions
+ *====================*/
+
 /**
  * Set how the scrollbars should behave.
  * @param obj pointer to an object
@@ -172,6 +176,55 @@ lv_coord_t lv_obj_get_scroll_right(struct _lv_obj_t * obj);
  * @param end poinr to point to store the result
  */
 void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end);
+
+/*=====================
+ * Other functions
+ *====================*/
+
+/**
+ * The most basic function to scroll by a given amount of pixels
+ * @param obj pointer to an object to scroll
+ * @param x pixels to scroll horizontally
+ * @param y pixels to scroll vertically
+ * @note > 0 value means scroll right/bottom (show the right/bottom content)
+ */
+void _lv_obj_scroll_by_raw(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y);
+
+/**
+ *
+ * Scroll by a given amount of pixels
+ * @param obj pointer to an object to scroll
+ * @param x pixels to scroll horizontally
+ * @param y pixels to scroll vertically
+ * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
+ * @note > 0 value means scroll right/bottom (show the right/bottom content)
+ */
+void lv_obj_scroll_by(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en);
+
+/**
+ * Scroll to a given coordinate on an object
+ * @param obj pointer to an object to scroll
+ * @param x pixels to scroll horizontally
+ * @param y pixels to scroll vertically
+ * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
+ */
+void lv_obj_scroll_to(struct _lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en);
+
+/**
+ * Scroll to a given X coordinate on an object
+ * @param obj pointer to an object to scroll
+ * @param x pixels to scroll horizontally
+ * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
+ */
+void lv_obj_scroll_to_x(struct _lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en);
+
+/**
+ * Scroll to a given X coordinate on an object
+ * @param obj pointer to an object to scroll
+ * @param y pixels to scroll vertically
+ * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
+ */
+void lv_obj_scroll_to_y(struct _lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en);
 
 /**********************
  *      MACROS
