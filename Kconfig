@@ -9,6 +9,7 @@ menu "LVGL configuration"
     # without lv_conf.h file, the lv_conf_internal.h and
     # lv_conf_kconfig.h files are used instead.
     config LV_CONF_SKIP
+        bool
         default y
 
     config LV_HOR_RES_MAX
