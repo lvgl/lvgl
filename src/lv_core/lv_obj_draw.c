@@ -568,6 +568,12 @@ static lv_res_t scrollbar_init_draw_dsc(lv_obj_t * obj, lv_draw_rect_dsc_t * dsc
         }
     }
 
+    lv_opa_t opa_scale = lv_obj_get_style_opa_scale(obj, LV_OBJ_PART_MAIN);
+    if(opa_scale < LV_OPA_MAX) {
+        dsc->bg_opa = (dsc->bg_opa * opa_scale) >> 8;
+        dsc->border_opa = (dsc->bg_opa * opa_scale) >> 8;
+    }
+
     if(dsc->bg_opa != LV_OPA_TRANSP || dsc->border_opa != LV_OPA_TRANSP) {
         dsc->radius = lv_obj_get_style_scrollbar_radius(obj, LV_OBJ_PART_MAIN);
         return LV_RES_OK;
