@@ -1,6 +1,6 @@
 /**
  * @file lv_conf.h
- * Configuration file for v7.7.1-dev
+ * Configuration file for v7.7.2-dev
  */
 
 /*
@@ -410,6 +410,7 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 /*Pixel perfect monospace font
  * http://pelulamu.net/unscii/ */
 #define LV_FONT_UNSCII_8     0
+#define LV_FONT_UNSCII_16     0
 
 /* Optionally declare your custom fonts here.
  * You can use these fonts as default font too

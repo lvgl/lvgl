@@ -3,12 +3,18 @@
 ## v7.8.0 (20.10.2020)
 
 ### New features
--  make DMA2D non blocking 
+- make DMA2D non blocking 
+- add unscii-16 built-in font
+
+## v7.7.2 (Planned to 28.11.2020)
+### Bugfixes
+- fix(draw_triangle): fix polygon/triangle drawing when the order of points is counter-clockwise
 
 ## v7.7.1 (04.11.2020)
 ### Bugfixes
 - Respect btnmatrix's `one_check` in `lv_btnmatrix_set_btn_ctrl`
 - Gauge: make the needle images to use the styles from `LV_GAUGE_PART_PART`
+- Group: fix in `lv_group_remove_obj` to handle deleting hidden obejcts correctly
 
 ## v7.7.0 (20.10.2020)
 

@@ -483,7 +483,11 @@ void _lv_txt_cut(char * txt, uint32_t pos, uint32_t len)
 char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
 {
     /*Allocate space for the new text by using trick from C99 standard section 7.19.6.12 */
-    uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap);
+    va_list ap_copy;
+    va_copy(ap_copy, ap);
+    uint32_t len = lv_vsnprintf(NULL, 0, fmt, ap_copy);
+    va_end(ap_copy);
+
     char * text = 0;
 #if LV_USE_ARABIC_PERSIAN_CHARS
     /*Put together the text according to the format string*/

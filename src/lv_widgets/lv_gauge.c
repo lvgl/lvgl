@@ -590,7 +590,8 @@ static void lv_gauge_draw_needle(lv_obj_t * gauge, const lv_area_t * clip_area)
     if(ext->needle_img == NULL) {
         lv_draw_line_dsc_init(&line_dsc);
         lv_obj_init_draw_line_dsc(gauge, LV_GAUGE_PART_NEEDLE, &line_dsc);
-    } else {
+    }
+    else {
         lv_draw_img_dsc_init(&img_dsc);
         lv_obj_init_draw_img_dsc(gauge, LV_GAUGE_PART_NEEDLE, &img_dsc);
     }
