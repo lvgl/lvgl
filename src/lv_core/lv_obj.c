@@ -265,34 +265,40 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
     lv_style_list_init(&new_obj->style_list);
     lv_style_list_init(&new_obj->style_list);
-     if(copy == NULL) {
-         if(parent != NULL) lv_theme_apply(new_obj, LV_THEME_OBJ);
-         else  lv_theme_apply(new_obj, LV_THEME_SCR);
-     }
-     else {
-         lv_style_list_copy(&new_obj->style_list, &copy->style_list);
-     }
-     /*Copy the attributes if required*/
-     if(copy != NULL) {
-         lv_area_copy(&new_obj->coords, &copy->coords);
-         new_obj->ext_draw_pad = copy->ext_draw_pad;
+    if(copy == NULL) {
+        if(parent != NULL) lv_theme_apply(new_obj, LV_THEME_OBJ);
+        else  lv_theme_apply(new_obj, LV_THEME_SCR);
+    }
+    else {
+        lv_style_list_copy(&new_obj->style_list, &copy->style_list);
+    }
+    /*Copy the attributes if required*/
+    if(copy != NULL) {
+        lv_area_copy(&new_obj->coords, &copy->coords);
+        new_obj->ext_draw_pad = copy->ext_draw_pad;
 
-         new_obj->flags  = copy->flags;
+        new_obj->flags  = copy->flags;
+        if(copy->spec_attr) {
+            lv_obj_allocate_rare_attr(new_obj);
+            _lv_memcpy_small(new_obj->spec_attr, copy->spec_attr, sizeof(lv_obj_spec_attr_t));
+        }
+#if LV_USE_GROUP
+        /*Add to the same group*/
+        if(copy->spec_attr && copy->spec_attr->group_p) {
+            new_obj->spec_attr->group_p = NULL; /*It was simply copied */
+            lv_group_add_obj(copy->spec_attr->group_p, new_obj);
+        }
+#endif
 
- #if LV_USE_GROUP
-         /*Add to the same group*/
-         if(copy->spec_attr && copy->spec_attr->group_p) {
-             lv_group_add_obj(copy->spec_attr->group_p, new_obj);
-         }
- #endif
+        /*Set the same coordinates for non screen objects*/
+        if(lv_obj_get_parent(copy) != NULL && parent != NULL) {
+            lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
+            lv_obj_set_size(new_obj, lv_obj_get_width(copy), lv_obj_get_height(copy));
 
-         /*Set the same coordinates for non screen objects*/
-         if(lv_obj_get_parent(copy) != NULL && parent != NULL) {
-             lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
-         }
-     }
-    lv_obj_set_pos(new_obj, 0, 0);
-
+        }
+    } else {
+        lv_obj_set_pos(new_obj, 0, 0);
+    }
     /*Send a signal to the parent to notify it about the new child*/
     if(parent != NULL) {
         parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, new_obj);
@@ -2001,9 +2007,11 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, d);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
-        if(_lv_obj_is_grid_item(obj)) _lv_grid_full_refresh(obj);
-
+        if(_lv_obj_is_grid_item(obj)) lv_grid_item_refr_pos(obj);
         if(lv_obj_get_grid(obj)) _lv_grid_full_refresh(obj);
+
+        if(_lv_obj_is_flex_item(obj)) _lv_flex_refresh(lv_obj_get_parent(obj));
+        if(lv_obj_get_flex_dir(obj)) _lv_flex_refresh(obj);
 
         /*Reposition non grid objects on by one*/
         lv_obj_t * child;
