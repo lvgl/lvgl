@@ -122,12 +122,19 @@ void lv_obj_set_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     bool x_stretch = false;
     bool y_stretch = false;
 
+    /*Use `LV_SIZE_STRETCH` value if the layout changes the size of the object*/
     if(gi) {
-        x_stretch = LV_GRID_GET_CELL_PLACE(obj->x_set) == LV_GRID_STRETCH ? true : false;
-        y_stretch = LV_GRID_GET_CELL_PLACE(obj->y_set) == LV_GRID_STRETCH ? true : false;
-        if(x_stretch) w = LV_SIZE_STRETCH;
-        if(y_stretch) h = LV_SIZE_STRETCH;
+        if(LV_GRID_GET_CELL_PLACE(obj->x_set)) x_stretch = true;
+        if(LV_GRID_GET_CELL_PLACE(obj->y_set)) y_stretch = true;
     }
+    if(fi) {
+        lv_obj_t * parent = lv_obj_get_parent(obj);
+        if(parent->spec_attr->flex_cont.dir == LV_FLEX_DIR_ROW && LV_COORD_GET_FLEX(obj->y_set) == LV_FLEX_PLACE_STRETCH) y_stretch = true;
+        if(parent->spec_attr->flex_cont.dir == LV_FLEX_DIR_COLUMN && LV_COORD_GET_FLEX(obj->x_set) == LV_FLEX_PLACE_STRETCH) x_stretch = true;
+    }
+
+    if(x_stretch) w = LV_SIZE_STRETCH;
+    if(y_stretch) h = LV_SIZE_STRETCH;
 
     obj->w_set = w;
     obj->h_set = h;
