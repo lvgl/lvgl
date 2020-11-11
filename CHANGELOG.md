@@ -12,6 +12,7 @@
 - fix(btnmatrix): fix setting the same map with modified pointers
 - fix(arc) fix and improve arc dragging
 - label: Repair calculate back `dot` character logical error which cause infinite loop.
+- fix(theme_material): remove the bottom border from tabview header
 
 ## v7.7.1 (04.11.2020)
 ### Bugfixes
