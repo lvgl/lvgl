@@ -364,6 +364,8 @@ menu "LVGL configuration"
                 bool "Enable Montserrat 48"
             config LV_FONT_UNSCII_8
                 bool "Enable UNSCII 8 (Perfect monospace font)"
+            config LV_FONT_UNSCII_16
+                bool "Enable UNSCII 16 (Perfect monospace font)"
             config LV_FONT_MONTSERRAT12SUBPX
                 bool "Enable Montserrat 12 sub-pixel"
             config LV_FONT_MONTSERRAT28COMPRESSED
@@ -446,6 +448,9 @@ menu "LVGL configuration"
             config LV_FONT_DEFAULT_SMALL_UNSCII_8
                 bool "UNSCII 8 (Perfect monospace font)"
                 select LV_FONT_UNSCII_8
+            config LV_FONT_DEFAULT_SMALL_UNSCII_16
+                bool "UNSCII 16 (Perfect monospace font)"
+                select LV_FONT_UNSCII_16
             config LV_FONT_DEFAULT_SMALL_MONTSERRAT12SUBPX
                 bool "Montserrat 12 sub-pixel"
                 select LV_FONT_MONTSERRAT12SUBPX
@@ -532,6 +537,9 @@ menu "LVGL configuration"
             config LV_FONT_DEFAULT_NORMAL_UNSCII_8
                 bool "UNSCII 8 (Perfect monospace font)"
                 select LV_FONT_UNSCII_8
+            config LV_FONT_DEFAULT_NORMAL_UNSCII_16
+                bool "UNSCII 16 (Perfect monospace font)"
+                select LV_FONT_UNSCII_16
             config LV_FONT_DEFAULT_NORMAL_MONTSERRAT12SUBPX
                 bool "Montserrat 12 sub-pixel"
                 select LV_FONT_MONTSERRAT12SUBPX
@@ -618,6 +626,9 @@ menu "LVGL configuration"
             config LV_FONT_DEFAULT_SUBTITLE_UNSCII_8
                 bool "UNSCII 8 (Perfect monospace font)"
                 select LV_FONT_UNSCII_8
+            config LV_FONT_DEFAULT_SUBTITLE_UNSCII_16
+                bool "UNSCII 16 (Perfect monospace font)"
+                select LV_FONT_UNSCII_16
             config LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT12SUBPX
                 bool "Montserrat 12 sub-pixel"
                 select LV_FONT_MONTSERRAT12SUBPX
@@ -701,6 +712,9 @@ menu "LVGL configuration"
             config LV_FONT_DEFAULT_TITLE_UNSCII_8
                 bool "UNSCII 8 (Perfect monospace font)"
                 select LV_FONT_UNSCII_8
+            config LV_FONT_DEFAULT_TITLE_UNSCII_16
+                bool "UNSCII 16 (Perfect monospace font)"
+                select LV_FONT_UNSCII_16
             config LV_FONT_DEFAULT_TITLE_MONTSERRAT12SUBPX
                 bool "Montserrat 12 sub-pixel"
                 select LV_FONT_MONTSERRAT12SUBPX

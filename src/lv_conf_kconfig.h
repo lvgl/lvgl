@@ -120,6 +120,8 @@ extern "C" {
   #define CONFIG_LV_THEME_DEFAULT_FONT_SMALL         &lv_font_montserrat_48
  #elif defined CONFIG_LV_FONT_DEFAULT_SMALL_UNSCII_8
   #define CONFIG_LV_THEME_DEFAULT_FONT_SMALL         &lv_font_unscii_8
+ #elif defined CONFIG_LV_FONT_DEFAULT_SMALL_UNSCII_16
+  #define CONFIG_LV_THEME_DEFAULT_FONT_SMALL         &lv_font_unscii_16
  #elif defined CONFIG_LV_FONT_DEFAULT_SMALL_MONTSERRAT12SUBPX
   #define CONFIG_LV_THEME_DEFAULT_FONT_SMALL         &lv_font_montserrat_12_subpx
  #elif defined CONFIG_LV_FONT_DEFAULT_SMALL_MONTSERRAT28COMPRESSED
@@ -179,6 +181,8 @@ extern "C" {
   #define CONFIG_LV_THEME_DEFAULT_FONT_NORMAL         &lv_font_montserrat_48
  #elif defined CONFIG_LV_FONT_DEFAULT_NORMAL_UNSCII_8
   #define CONFIG_LV_THEME_DEFAULT_FONT_NORMAL         &lv_font_unscii_8
+ #elif defined CONFIG_LV_FONT_DEFAULT_NORMAL_UNSCII_16
+  #define CONFIG_LV_THEME_DEFAULT_FONT_NORMAL         &lv_font_unscii_16
  #elif defined CONFIG_LV_FONT_DEFAULT_NORMAL_MONTSERRAT12SUBPX
   #define CONFIG_LV_THEME_DEFAULT_FONT_NORMAL         &lv_font_montserrat_12_subpx
  #elif defined CONFIG_LV_FONT_DEFAULT_NORMAL_MONTSERRAT28COMPRESSED
@@ -238,6 +242,8 @@ extern "C" {
   #define CONFIG_LV_THEME_DEFAULT_FONT_SUBTITLE         &lv_font_montserrat_48
  #elif defined CONFIG_LV_FONT_DEFAULT_SUBTITLE_UNSCII_8
   #define CONFIG_LV_THEME_DEFAULT_FONT_SUBTITLE         &lv_font_unscii_8
+ #elif defined CONFIG_LV_FONT_DEFAULT_SUBTITLE_UNSCII_16
+  #define CONFIG_LV_THEME_DEFAULT_FONT_SUBTITLE         &lv_font_unscii_16
  #elif defined CONFIG_LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT12SUBPX
   #define CONFIG_LV_THEME_DEFAULT_FONT_SUBTITLE         &lv_font_montserrat_12_subpx
  #elif defined CONFIG_LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT28COMPRESSED
@@ -297,6 +303,8 @@ extern "C" {
   #define CONFIG_LV_THEME_DEFAULT_FONT_TITLE         &lv_font_montserrat_48
  #elif defined CONFIG_LV_FONT_DEFAULT_TITLE_UNSCII_8
   #define CONFIG_LV_THEME_DEFAULT_FONT_TITLE         &lv_font_unscii_8
+ #elif defined CONFIG_LV_FONT_DEFAULT_TITLE_UNSCII_16
+  #define CONFIG_LV_THEME_DEFAULT_FONT_TITLE         &lv_font_unscii_16
  #elif defined CONFIG_LV_FONT_DEFAULT_TITLE_MONTSERRAT12SUBPX
   #define CONFIG_LV_THEME_DEFAULT_FONT_TITLE         &lv_font_montserrat_12_subpx
  #elif defined CONFIG_LV_FONT_DEFAULT_TITLE_MONTSERRAT28COMPRESSED
