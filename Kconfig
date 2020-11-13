@@ -202,10 +202,10 @@ menu "LVGL configuration"
         config LV_USE_PERF_MONITOR
             bool "Show CPU usage and FPS count in the right bottom corner."
         config LV_USE_API_EXTENSION_V6
-            bool "Use the functions and types from the older API if possible."
+            bool "Use the functions and types from the older (v6) API if possible."
             default y if !LV_CONF_MINIMAL
         config LV_USE_API_EXTENSION_V7
-            bool "Use the functions and types from the older API if possible."
+            bool "Use the functions and types from the older (v7) API if possible."
             default y if !LV_CONF_MINIMAL
     endmenu
     
