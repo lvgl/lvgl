@@ -254,7 +254,9 @@ bool lv_list_remove(const lv_obj_t * list, uint16_t index)
     uint16_t count = 0;
     lv_obj_t * e   = lv_list_get_next_btn(list, NULL);
     while(e != NULL) {
+#if LV_USE_GROUP
         if(e == ext->last_sel_btn) ext->last_sel_btn = NULL;
+#endif
         if(e == ext->act_sel_btn) ext->act_sel_btn = NULL;
 
         if(count == index) {
