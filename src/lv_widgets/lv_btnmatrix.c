@@ -43,7 +43,6 @@ static bool button_get_tgl_state(lv_btnmatrix_ctrl_t ctrl_bits);
 static uint16_t get_button_from_point(lv_obj_t * btnm, lv_point_t * p);
 static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char ** map);
 static void invalidate_button_area(const lv_obj_t * btnm, uint16_t btn_idx);
-static bool maps_are_identical(const char ** map1, const char ** map2);
 static void make_one_button_toggled(lv_obj_t * btnm, uint16_t btn_idx);
 
 /**********************
@@ -152,11 +151,9 @@ void lv_btnmatrix_set_map(lv_obj_t * btnm, const char * map[])
      * set/allocation when map hasn't changed.
      */
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
-    if(!maps_are_identical(ext->map_p, map)) {
 
-        /*Analyze the map and create the required number of buttons*/
-        allocate_btn_areas_and_controls(btnm, map);
-    }
+    /*Analyze the map and create the required number of buttons*/
+    allocate_btn_areas_and_controls(btnm, map);
     ext->map_p = map;
 
     /*Set size and positions of the buttons*/
@@ -1132,6 +1129,10 @@ static void allocate_btn_areas_and_controls(const lv_obj_t * btnm, const char **
 
     lv_btnmatrix_ext_t * ext = lv_obj_get_ext_attr(btnm);
 
+    /*Do not allocate memory for the same amount of buttons*/
+    if(btn_cnt == ext->btn_cnt) return;
+
+
     if(ext->button_areas != NULL) {
         lv_mem_free(ext->button_areas);
         ext->button_areas = NULL;
@@ -1267,25 +1268,6 @@ static void invalidate_button_area(const lv_obj_t * btnm, uint16_t btn_idx)
     btn_area.y2 += btnm_area.y1;
 
     lv_obj_invalidate_area(btnm, &btn_area);
-}
-
-/**
- * Compares two button matrix maps for equality
- * @param map1 map to compare
- * @param map2 map to compare
- * @return true if maps are identical in length and content
- */
-static bool maps_are_identical(const char ** map1, const char ** map2)
-{
-    if(map1 == map2) return true;
-    if(map1 == NULL || map2 == NULL) return map1 == map2;
-
-    uint16_t i = 0;
-    while(map1[i][0] != '\0' && map2[i][0] != '\0') {
-        if(strcmp(map1[i], map2[i]) != 0) return false;
-        i++;
-    }
-    return map1[i][0] == '\0' && map2[i][0] == '\0';
 }
 
 /**
