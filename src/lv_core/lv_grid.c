@@ -81,7 +81,7 @@ void lv_obj_set_grid(lv_obj_t * obj, const lv_grid_t * grid)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(obj->spec_attr == NULL) lv_obj_allocate_rare_attr(obj);
+    if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
     obj->spec_attr->grid = grid;
 
     _lv_grid_full_refresh(obj);

@@ -53,7 +53,7 @@ static bool get_wrap(const lv_obj_t * obj);
 
 void lv_obj_set_flex_dir(lv_obj_t * obj, lv_flex_dir_t flex_dir)
 {
-    lv_obj_allocate_rare_attr(obj);
+    lv_obj_allocate_spec_attr(obj);
 
     if(obj->spec_attr->flex_cont.dir == flex_dir) return;
 
@@ -65,7 +65,7 @@ void lv_obj_set_flex_dir(lv_obj_t * obj, lv_flex_dir_t flex_dir)
 
 void lv_obj_set_flex_place(lv_obj_t * obj, lv_flex_place_t item_place, lv_flex_place_t track_place)
 {
-    lv_obj_allocate_rare_attr(obj);
+    lv_obj_allocate_spec_attr(obj);
     if(obj->spec_attr->flex_cont.item_place == item_place &&
        obj->spec_attr->flex_cont.track_place == track_place) {
         return;
@@ -79,7 +79,7 @@ void lv_obj_set_flex_place(lv_obj_t * obj, lv_flex_place_t item_place, lv_flex_p
 
 void lv_obj_set_flex_gap(lv_obj_t * obj, lv_coord_t gap)
 {
-    if(obj->spec_attr == NULL) lv_obj_allocate_rare_attr(obj);
+    if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
 
     if(obj->spec_attr->flex_cont.gap == gap) return;
 

@@ -219,7 +219,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         LV_LOG_TRACE("Object create started");
         LV_ASSERT_OBJ(parent, LV_OBJX_NAME);
         if(parent->spec_attr == NULL) {
-            parent->spec_attr = lv_obj_allocate_rare_attr(parent);
+            parent->spec_attr = lv_obj_allocate_spec_attr(parent);
         }
         new_obj = _lv_ll_ins_head(&parent->spec_attr->child_ll);
         LV_ASSERT_MEM(new_obj);
@@ -275,7 +275,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 
         new_obj->flags  = copy->flags;
         if(copy->spec_attr) {
-            lv_obj_allocate_rare_attr(new_obj);
+            lv_obj_allocate_spec_attr(new_obj);
             _lv_memcpy_small(new_obj->spec_attr, copy->spec_attr, sizeof(lv_obj_spec_attr_t));
         }
 #if LV_USE_GROUP
@@ -516,7 +516,7 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     lv_obj_invalidate(obj);
 
     if(parent->spec_attr == NULL) {
-        parent->spec_attr = lv_obj_allocate_rare_attr(parent);
+        parent->spec_attr = lv_obj_allocate_spec_attr(parent);
     }
 
     lv_obj_t * old_par = obj->parent;
@@ -623,13 +623,13 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
-    if(obj->spec_attr == NULL) lv_obj_allocate_rare_attr(obj);
+    if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
     objrare_attr->->ext_click_pad.x1 = left;
     objrare_attr->->ext_click_pad.x2 = right;
     objrare_attr->->ext_click_pad.y1 = top;
     objrare_attr->->ext_click_pad.y2 = bottom;
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
-    if(obj->spec_attr == NULL) lv_obj_allocate_rare_attr(obj);
+    if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
     obj->spec_attr->ext_click_pad = LV_MATH_MAX4(left, right, top, bottom);
 #else
     LV_UNUSED(obj);
@@ -672,7 +672,7 @@ void lv_obj_set_base_dir(lv_obj_t * obj, lv_bidi_dir_t dir)
         return;
     }
 
-    lv_obj_allocate_rare_attr(obj);
+    lv_obj_allocate_spec_attr(obj);
     obj->spec_attr->base_dir = dir;
     lv_signal_send(obj, LV_SIGNAL_BASE_DIR_CHG, NULL);
 
@@ -812,7 +812,7 @@ void lv_obj_clear_state(lv_obj_t * obj, lv_state_t state)
 void lv_obj_set_event_cb(lv_obj_t * obj, lv_event_cb_t event_cb)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    if(obj->spec_attr == NULL) obj->spec_attr = lv_obj_allocate_rare_attr(obj);
+    if(obj->spec_attr == NULL) obj->spec_attr = lv_obj_allocate_spec_attr(obj);
 
     obj->spec_attr->event_cb = event_cb;
 }
@@ -1024,7 +1024,7 @@ void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size)
  * @return pointer to the allocated ext.
  * If out of memory NULL is returned and the original ext is preserved
  */
-lv_obj_spec_attr_t * lv_obj_allocate_rare_attr(lv_obj_t * obj)
+lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
@@ -1478,7 +1478,7 @@ void lv_obj_set_user_data(lv_obj_t * obj, lv_obj_user_data_t data)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(obj->spec_attr == NULL) lv_obj_allocate_rare_attr(obj);
+    if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
     _lv_memcpy(&obj->spec_attr->user_data, &data, sizeof(lv_obj_user_data_t));
 }
 #endif

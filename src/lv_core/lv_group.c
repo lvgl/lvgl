@@ -128,7 +128,7 @@ void lv_group_add_obj(lv_group_t * group, lv_obj_t * obj)
         }
     }
 
-    if(obj->spec_attr == NULL) lv_obj_allocate_rare_attr(obj);
+    if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
     obj->spec_attr->group_p = group;
 
     lv_obj_t ** next = _lv_ll_ins_tail(&group->obj_ll);

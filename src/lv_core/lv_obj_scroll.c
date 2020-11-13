@@ -46,7 +46,7 @@ void lv_obj_set_scroll_mode(lv_obj_t * obj, lv_scroll_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_allocate_rare_attr(obj);
+    lv_obj_allocate_spec_attr(obj);
 
     if(obj->spec_attr->scroll_mode == mode) return;
     obj->spec_attr->scroll_mode = mode;
@@ -55,7 +55,7 @@ void lv_obj_set_scroll_mode(lv_obj_t * obj, lv_scroll_mode_t mode)
 
 void lv_obj_set_scroll_dir(struct _lv_obj_t * obj, lv_dir_t dir)
 {
-    lv_obj_allocate_rare_attr(obj);
+    lv_obj_allocate_spec_attr(obj);
 
     if(dir != obj->spec_attr->scroll_dir) {
         obj->spec_attr->scroll_dir = dir;
@@ -65,13 +65,13 @@ void lv_obj_set_scroll_dir(struct _lv_obj_t * obj, lv_dir_t dir)
 
 void lv_obj_set_snap_align_x(struct _lv_obj_t * obj, lv_snap_align_t align)
 {
-    lv_obj_allocate_rare_attr(obj);
+    lv_obj_allocate_spec_attr(obj);
     obj->spec_attr->snap_align_x = align;
 }
 
 void lv_obj_set_snap_align_y(struct _lv_obj_t * obj, lv_snap_align_t align)
 {
-    lv_obj_allocate_rare_attr(obj);
+    lv_obj_allocate_spec_attr(obj);
     obj->spec_attr->snap_align_y = align;
 }
 
@@ -240,7 +240,7 @@ void _lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
     if(x == 0 && y == 0) return;
 
     if(obj->spec_attr == NULL) {
-        obj->spec_attr = lv_obj_allocate_rare_attr(obj);
+        obj->spec_attr = lv_obj_allocate_spec_attr(obj);
     }
     obj->spec_attr->scroll.x += x;
     obj->spec_attr->scroll.y += y;

@@ -545,7 +545,7 @@ void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb);
  */
 void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size);
 
-lv_obj_spec_attr_t * lv_obj_allocate_rare_attr(lv_obj_t * obj);
+lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj);
 /*=======================
  * Getter functions
  *======================*/

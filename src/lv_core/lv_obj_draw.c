@@ -395,7 +395,7 @@ void _lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
     /* Allocate spec. attrs. only if the result is not zero.
      * Zero is the default value if the spec. attr. are not defined. */
     else if(s != 0) {
-        lv_obj_allocate_rare_attr(obj);
+        lv_obj_allocate_spec_attr(obj);
         obj->spec_attr->ext_draw_pad = s;
     }
 }
