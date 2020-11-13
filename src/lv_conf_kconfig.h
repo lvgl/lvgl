@@ -18,7 +18,17 @@ extern "C" {
 #ifdef __NuttX__
 #include <nuttx/config.h>
 #endif
-    
+
+/*******************
+ * LV_MEM_SIZE
+ *******************/
+
+#ifndef LV_MEM_SIZE
+ #if defined (CONFIG_LV_MEM_SIZE_BYTES)
+  #define CONFIG_LV_MEM_SIZE    (CONFIG_LV_MEM_SIZE_BYTES * 1024U)
+ #endif
+#endif
+
 /*******************
  * LV COLOR TRANSP
  *******************/

@@ -100,7 +100,7 @@ menu "LVGL configuration"
             displays.
     
     menu "Memory manager settings"
-	config LV_MEM_SIZE
+	config LV_MEM_SIZE_BYTES
 	    int
 	    prompt "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
 	    range 2 128
