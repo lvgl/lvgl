@@ -754,6 +754,7 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
     }
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
 
+        lv_coord_t * s = param;
         lv_style_int_t transf_zoom = lv_obj_get_style_transform_zoom(img, LV_IMG_PART_MAIN);
         transf_zoom = (transf_zoom * ext->zoom) >> 8;
 
@@ -766,11 +767,11 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
             lv_coord_t w = lv_obj_get_width(img);
             lv_coord_t h = lv_obj_get_height(img);
             _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, transf_zoom, &ext->pivot);
-            lv_coord_t pad_ori = img->ext_draw_pad;
-            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori - a.x1);
-            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori - a.y1);
-            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori + a.x2 - w);
-            img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, pad_ori + a.y2 - h);
+            lv_coord_t pad_ori = *s;
+            *s = LV_MATH_MAX(*s, pad_ori - a.x1);
+            *s = LV_MATH_MAX(*s, pad_ori - a.y1);
+            *s = LV_MATH_MAX(*s, pad_ori + a.x2 - w);
+            *s = LV_MATH_MAX(*s, pad_ori + a.y2 - h);
         }
 
         /*Handle the padding of the background*/
@@ -779,10 +780,10 @@ static lv_res_t lv_img_signal(lv_obj_t * img, lv_signal_t sign, void * param)
         lv_style_int_t top = lv_obj_get_style_pad_top(img, LV_IMG_PART_MAIN);
         lv_style_int_t bottom = lv_obj_get_style_pad_bottom(img, LV_IMG_PART_MAIN);
 
-        img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, left);
-        img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, right);
-        img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, top);
-        img->ext_draw_pad = LV_MATH_MAX(img->ext_draw_pad, bottom);
+        *s = LV_MATH_MAX(*s, left);
+        *s = LV_MATH_MAX(*s, right);
+        *s = LV_MATH_MAX(*s, top);
+        *s = LV_MATH_MAX(*s, bottom);
     }
     else if(sign == LV_SIGNAL_HIT_TEST) {
         lv_hit_test_info_t * info = param;

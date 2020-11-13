@@ -664,7 +664,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     lv_area_t obj_mask;
     lv_area_t obj_ext_mask;
     lv_area_t obj_area;
-    lv_coord_t ext_size = obj->ext_draw_pad;
+    lv_coord_t ext_size = _lv_obj_get_ext_draw_pad(obj);
     lv_obj_get_coords(obj, &obj_area);
     obj_area.x1 -= ext_size;
     obj_area.y1 -= ext_size;
@@ -705,7 +705,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
             lv_ll_t * ll = _lv_obj_get_child_ll(obj);
             _LV_LL_READ_BACK(ll, child_p) {
                 lv_obj_get_coords(child_p, &child_area);
-                ext_size = child_p->ext_draw_pad;
+                ext_size = _lv_obj_get_ext_draw_pad(child_p);
                 child_area.x1 -= ext_size;
                 child_area.y1 -= ext_size;
                 child_area.x2 += ext_size;

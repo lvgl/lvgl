@@ -237,7 +237,8 @@ static lv_res_t lv_line_signal(lv_obj_t * line, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*The corner of the skew lines is out of the intended area*/
         lv_style_int_t line_width = lv_obj_get_style_line_width(line, LV_LINE_PART_MAIN);
-        if(line->ext_draw_pad < line_width) line->ext_draw_pad = line_width;
+        lv_coord_t * s = param;
+        if(*s < line_width) *s = line_width;
     }
     else if(sign == LV_SIGNAL_GET_SELF_SIZE) {
         lv_line_ext_t * ext = lv_obj_get_ext_attr(line);

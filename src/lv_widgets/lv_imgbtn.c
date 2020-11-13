@@ -465,10 +465,11 @@ static lv_res_t lv_imgbtn_signal(lv_obj_t * imgbtn, lv_signal_t sign, void * par
         lv_style_int_t top = lv_obj_get_style_pad_top(imgbtn, LV_IMGBTN_PART_MAIN);
         lv_style_int_t bottom = lv_obj_get_style_pad_bottom(imgbtn, LV_IMGBTN_PART_MAIN);
 
-        imgbtn->ext_draw_pad = LV_MATH_MAX(imgbtn->ext_draw_pad, left);
-        imgbtn->ext_draw_pad = LV_MATH_MAX(imgbtn->ext_draw_pad, right);
-        imgbtn->ext_draw_pad = LV_MATH_MAX(imgbtn->ext_draw_pad, top);
-        imgbtn->ext_draw_pad = LV_MATH_MAX(imgbtn->ext_draw_pad, bottom);
+        lv_coord_t * s = param;
+        *s = LV_MATH_MAX(*s, left);
+        *s = LV_MATH_MAX(*s, right);
+        *s = LV_MATH_MAX(*s, top);
+        *s = LV_MATH_MAX(*s, bottom);
     }
     else if(sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_RELEASED || sign == LV_SIGNAL_PRESS_LOST) {
         refr_img(imgbtn);

@@ -314,7 +314,8 @@ static lv_res_t lv_switch_signal(lv_obj_t * sw, lv_signal_t sign, void * param)
         knob_size += _lv_obj_get_draw_rect_ext_pad_size(sw, LV_SWITCH_PART_KNOB);
 
         /*Indic. size is handled by bar*/
-        sw->ext_draw_pad = LV_MATH_MAX(sw->ext_draw_pad, knob_size);
+        lv_coord_t * s = param;
+        *s = LV_MATH_MAX(*s, knob_size);
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
 #if LV_USE_GROUP

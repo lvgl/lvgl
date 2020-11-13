@@ -404,7 +404,8 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         knob_size += _lv_obj_get_draw_rect_ext_pad_size(slider, LV_SLIDER_PART_KNOB);
 
         /*Indic. size is handled by bar*/
-        slider->ext_draw_pad = LV_MATH_MAX(slider->ext_draw_pad, knob_size);
+        lv_coord_t * s = param;
+        *s  = LV_MATH_MAX(*s, knob_size);
 
     }
     else if(sign == LV_SIGNAL_CONTROL) {

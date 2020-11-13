@@ -703,10 +703,11 @@ static lv_res_t lv_roller_label_signal(lv_obj_t * label, lv_signal_t sign, void 
 
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         /*If the selected text has a larger font it needs some extra space to draw it*/
+        lv_coord_t * s = param;
         lv_obj_t * roller = lv_obj_get_parent(label);
         lv_coord_t sel_w = get_selected_label_width(roller);
         lv_coord_t label_w = lv_obj_get_width(label);
-        label->ext_draw_pad = LV_MATH_MAX(label->ext_draw_pad, sel_w - label_w);
+        *s = LV_MATH_MAX(*s, sel_w - label_w);
     }
 
     return res;

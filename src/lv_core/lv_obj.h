@@ -211,6 +211,7 @@ typedef struct {
 
     lv_flex_cont_t flex_cont;
     lv_point_t scroll; /**< The current X/Y scroll offset*/
+    lv_coord_t ext_draw_pad; /**< EXTend the size in every direction for drawing. */
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     uint8_t ext_click_pad; /**< Extra click padding in all direction */
@@ -230,7 +231,6 @@ struct _lv_obj_t {
     lv_obj_spec_attr_t * spec_attr;
     struct _lv_obj_t * parent; /**< Pointer to the parent object*/
 
-    lv_area_t coords; /**< Coordinates of the object (x1, y1, x2, y2)*/
 
     lv_signal_cb_t signal_cb; /**< Object type specific signal function*/
     lv_design_cb_t design_cb; /**< Object type specific design function*/
@@ -240,15 +240,13 @@ struct _lv_obj_t {
 
     /*Attributes and states*/
     lv_obj_flag_t flags;
-
     lv_state_t state;
 
+    lv_area_t coords; /**< Coordinates of the object (x1, y1, x2, y2)*/
     lv_coord_t x_set;
     lv_coord_t y_set;
     lv_coord_t w_set;
     lv_coord_t h_set;
-
-    lv_coord_t ext_draw_pad; /**< EXTend the size in every direction for drawing. */
 };
 
 enum {
@@ -408,6 +406,13 @@ void lv_obj_move_background(lv_obj_t * obj);
  * @param bottom extended clickable are on the bottom [px]
  */
 void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right, lv_coord_t top, lv_coord_t bottom);
+
+/**
+ * Get the extended draw area of an object.
+ * @param obj pointer to an object
+ * @return the size extended draw area around the real coordinates
+ */
+lv_coord_t _lv_obj_get_ext_draw_pad(const lv_obj_t * obj);
 
 /*---------------------
  * Appearance set

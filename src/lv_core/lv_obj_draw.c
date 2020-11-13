@@ -385,9 +385,19 @@ void _lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    obj->ext_draw_pad = 0;
-    obj->signal_cb(obj, LV_SIGNAL_REFR_EXT_DRAW_PAD, NULL);
+    lv_coord_t s = 0;
+    obj->signal_cb(obj, LV_SIGNAL_REFR_EXT_DRAW_PAD, &s);
 
+    /*Store the result if the special attrs already allocated*/
+    if(obj->spec_attr) {
+        obj->spec_attr = s;
+    }
+    /* Allocate spec. attrs. only if the result is not zero.
+     * Zero is the default value if the spec. attr. are not defined. */
+    else if(s != 0) {
+        lv_obj_allocate_rare_attr(obj);
+        obj->spec_attr->ext_draw_pad = s;
+    }
 }
 
 /**

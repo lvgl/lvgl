@@ -247,9 +247,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         new_obj->h_set = lv_area_get_height(&new_obj->coords);
     }
 
-
-    new_obj->ext_draw_pad = 0;
-
     /*Set attributes*/
     new_obj->flags = LV_OBJ_FLAG_CLICKABLE;
     new_obj->flags |= LV_OBJ_FLAG_SNAPABLE;
@@ -275,7 +272,6 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     /*Copy the attributes if required*/
     if(copy != NULL) {
         lv_area_copy(&new_obj->coords, &copy->coords);
-        new_obj->ext_draw_pad = copy->ext_draw_pad;
 
         new_obj->flags  = copy->flags;
         if(copy->spec_attr) {
@@ -411,7 +407,7 @@ void lv_obj_invalidate(const lv_obj_t * obj)
 
     /*Truncate the area to the object*/
     lv_area_t obj_coords;
-    lv_coord_t ext_size = obj->ext_draw_pad;
+    lv_coord_t ext_size = _lv_obj_get_ext_draw_pad(obj);
     lv_area_copy(&obj_coords, &obj->coords);
     obj_coords.x1 -= ext_size;
     obj_coords.y1 -= ext_size;
@@ -442,7 +438,7 @@ bool lv_obj_area_is_visible(const lv_obj_t * obj, lv_area_t * area)
 
         /*Truncate the area to the object*/
         lv_area_t obj_coords;
-        lv_coord_t ext_size = obj->ext_draw_pad;
+        lv_coord_t ext_size = _lv_obj_get_ext_draw_pad(obj);
         lv_area_copy(&obj_coords, &obj->coords);
         obj_coords.x1 -= ext_size;
         obj_coords.y1 -= ext_size;
@@ -478,7 +474,7 @@ bool lv_obj_is_visible(const lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     lv_area_t obj_coords;
-    lv_coord_t ext_size = obj->ext_draw_pad;
+    lv_coord_t ext_size = _lv_obj_get_ext_draw_pad(obj);
     lv_area_copy(&obj_coords, &obj->coords);
     obj_coords.x1 -= ext_size;
     obj_coords.y1 -= ext_size;
@@ -644,6 +640,16 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
 #endif
 }
 
+/**
+ * Get the extended draw area of an object.
+ * @param obj pointer to an object
+ * @return the size extended draw area around the real coordinates
+ */
+lv_coord_t _lv_obj_get_ext_draw_pad(const lv_obj_t * obj)
+{
+    if(obj->spec_attr) return obj->spec_attr->ext_draw_pad;
+    else return 0;
+}
 /*---------------------
  * Appearance set
  *--------------------*/
@@ -2003,8 +2009,9 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+        lv_coord_t * s = param;
         lv_coord_t d = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_OBJ_PART_MAIN);
-        obj->ext_draw_pad = LV_MATH_MAX(obj->ext_draw_pad, d);
+        *s = LV_MATH_MAX(*s, d);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         if(_lv_obj_is_grid_item(obj)) lv_grid_item_refr_pos(obj);

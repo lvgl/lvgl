@@ -631,7 +631,8 @@ static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param)
         indic_size = _lv_obj_get_draw_rect_ext_pad_size(bar, LV_BAR_PART_INDIC);
 
         /*Bg size is handled by lv_obj*/
-        bar->ext_draw_pad = LV_MATH_MAX(bar->ext_draw_pad, indic_size);
+        lv_coord_t * s = param;
+        *s = LV_MATH_MAX(*s, indic_size);
 
     }
     if(sign == LV_SIGNAL_CLEANUP) {
