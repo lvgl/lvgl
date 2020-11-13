@@ -7,6 +7,7 @@
 - fix(arc) fix and improve arc dragging
 - label: Repair calculate back `dot` character logical error which cause infinite loop.
 - fix(theme_material): remove the bottom border from tabview header
+- fix(imgbtn) guess a the closest availabe state with valid src
 
 ## v7.7.1 (04.11.2020)
 ### Bugfixes
