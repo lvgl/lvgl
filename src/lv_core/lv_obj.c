@@ -1900,7 +1900,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data)
 
 /**
  * Send LV_EVENT_REFRESH event to an object
- * @param obj point to an obejct. (Can NOT be NULL)
+ * @param obj point to an object. (Can NOT be NULL)
  * @return LV_RES_OK: success, LV_RES_INV: to object become invalid (e.g. deleted) due to this event.
  */
 lv_res_t lv_event_send_refresh(lv_obj_t * obj)
@@ -4629,7 +4629,7 @@ static bool style_prop_is_cacheble(lv_style_property_t prop)
 
 /**
  * Update the cache of style list
- * @param obj pointer to an obejct
+ * @param obj pointer to an object
  * @param part the part of the object
  * @param prop the property which triggered the update
  */
