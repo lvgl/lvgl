@@ -18,7 +18,17 @@ extern "C" {
 #ifdef __NuttX__
 #include <nuttx/config.h>
 #endif
-    
+
+/*******************
+ * LV_MEM_SIZE
+ *******************/
+
+#ifndef LV_MEM_SIZE
+ #if defined (CONFIG_LV_MEM_SIZE_BYTES)
+  #define CONFIG_LV_MEM_SIZE    (CONFIG_LV_MEM_SIZE_BYTES * 1024U)
+ #endif
+#endif
+
 /*******************
  * LV COLOR TRANSP
  *******************/
@@ -43,7 +53,23 @@ extern "C" {
  #elif defined (CONFIG_LV_THEME_DEFAULT_INIT_MATERIAL)
   #define CONFIG_LV_THEME_DEFAULT_INIT               lv_theme_material_init
  #elif defined (CONFIG_LV_THEME_DEFAULT_INIT_MONO)
-  #define CONFIG_LV_THEME_DEFAULT_INIT               lv_theme_mono_init
+  #define LV_THEME_DEFAULT_INIT                      lv_theme_mono_init
+ #endif
+#endif
+
+/*******************
+ * COLOR SELECTION
+ *******************/
+ 
+#ifndef LV_THEME_DEFAULT_COLOR_PRIMARY
+ #ifdef CONFIG_LV_THEME_DEFAULT_COLOR_PRIMARY
+  #define LV_THEME_DEFAULT_COLOR_PRIMARY lv_color_hex(CONFIG_LV_THEME_DEFAULT_COLOR_PRIMARY) 
+ #endif
+#endif
+ 
+#ifndef LV_THEME_DEFAULT_COLOR_SECONDARY
+ #ifdef CONFIG_LV_THEME_DEFAULT_COLOR_SECONDARY
+  #define LV_THEME_DEFAULT_COLOR_SECONDARY lv_color_hex(CONFIG_LV_THEME_DEFAULT_COLOR_SECONDARY) 
  #endif
 #endif
 
@@ -104,6 +130,8 @@ extern "C" {
   #define CONFIG_LV_THEME_DEFAULT_FONT_SMALL         &lv_font_montserrat_48
  #elif defined CONFIG_LV_FONT_DEFAULT_SMALL_UNSCII_8
   #define CONFIG_LV_THEME_DEFAULT_FONT_SMALL         &lv_font_unscii_8
+ #elif defined CONFIG_LV_FONT_DEFAULT_SMALL_UNSCII_16
+  #define CONFIG_LV_THEME_DEFAULT_FONT_SMALL         &lv_font_unscii_16
  #elif defined CONFIG_LV_FONT_DEFAULT_SMALL_MONTSERRAT12SUBPX
   #define CONFIG_LV_THEME_DEFAULT_FONT_SMALL         &lv_font_montserrat_12_subpx
  #elif defined CONFIG_LV_FONT_DEFAULT_SMALL_MONTSERRAT28COMPRESSED
@@ -163,6 +191,8 @@ extern "C" {
   #define CONFIG_LV_THEME_DEFAULT_FONT_NORMAL         &lv_font_montserrat_48
  #elif defined CONFIG_LV_FONT_DEFAULT_NORMAL_UNSCII_8
   #define CONFIG_LV_THEME_DEFAULT_FONT_NORMAL         &lv_font_unscii_8
+ #elif defined CONFIG_LV_FONT_DEFAULT_NORMAL_UNSCII_16
+  #define CONFIG_LV_THEME_DEFAULT_FONT_NORMAL         &lv_font_unscii_16
  #elif defined CONFIG_LV_FONT_DEFAULT_NORMAL_MONTSERRAT12SUBPX
   #define CONFIG_LV_THEME_DEFAULT_FONT_NORMAL         &lv_font_montserrat_12_subpx
  #elif defined CONFIG_LV_FONT_DEFAULT_NORMAL_MONTSERRAT28COMPRESSED
@@ -222,6 +252,8 @@ extern "C" {
   #define CONFIG_LV_THEME_DEFAULT_FONT_SUBTITLE         &lv_font_montserrat_48
  #elif defined CONFIG_LV_FONT_DEFAULT_SUBTITLE_UNSCII_8
   #define CONFIG_LV_THEME_DEFAULT_FONT_SUBTITLE         &lv_font_unscii_8
+ #elif defined CONFIG_LV_FONT_DEFAULT_SUBTITLE_UNSCII_16
+  #define CONFIG_LV_THEME_DEFAULT_FONT_SUBTITLE         &lv_font_unscii_16
  #elif defined CONFIG_LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT12SUBPX
   #define CONFIG_LV_THEME_DEFAULT_FONT_SUBTITLE         &lv_font_montserrat_12_subpx
  #elif defined CONFIG_LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT28COMPRESSED
@@ -281,6 +313,8 @@ extern "C" {
   #define CONFIG_LV_THEME_DEFAULT_FONT_TITLE         &lv_font_montserrat_48
  #elif defined CONFIG_LV_FONT_DEFAULT_TITLE_UNSCII_8
   #define CONFIG_LV_THEME_DEFAULT_FONT_TITLE         &lv_font_unscii_8
+ #elif defined CONFIG_LV_FONT_DEFAULT_TITLE_UNSCII_16
+  #define CONFIG_LV_THEME_DEFAULT_FONT_TITLE         &lv_font_unscii_16
  #elif defined CONFIG_LV_FONT_DEFAULT_TITLE_MONTSERRAT12SUBPX
   #define CONFIG_LV_THEME_DEFAULT_FONT_TITLE         &lv_font_montserrat_12_subpx
  #elif defined CONFIG_LV_FONT_DEFAULT_TITLE_MONTSERRAT28COMPRESSED
