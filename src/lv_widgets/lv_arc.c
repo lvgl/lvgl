@@ -785,7 +785,8 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
         if(LV_MATH_ABS(delta_angle) > 180) {
             if(ext->min_close) angle = 0;
             else angle = deg_range;
-        } else {
+        }
+        else {
             if(angle < deg_range / 2) ext->min_close = 1;
             else ext->min_close = 0;
         }

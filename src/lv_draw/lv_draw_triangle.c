@@ -115,7 +115,7 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
     lv_coord_t dyr = points[i_next_right].y - points[y_min_i].y;
 
     bool inv = false;
-    if(dyl*dxr < dyr*dxl) inv = true;
+    if(dyl * dxr < dyr * dxl) inv = true;
 
     do {
         if(!inv) {
