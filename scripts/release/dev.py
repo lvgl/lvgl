@@ -63,7 +63,7 @@ def make(mode):
             ver[1] = str(int(ver[1]) + 1)
             ver[2] = '0'   
              
-        lvgl_upadte_ver(ver, "dev")
+        lvgl_update_ver(ver, "dev")
         docs_update_ver(ver, "dev")
          
 if __name__ == '__main__':

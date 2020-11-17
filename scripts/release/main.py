@@ -43,7 +43,7 @@ def cleanup():
 
 if __name__ == '__main__':
     prepare_type = ['major', 'minor', 'bugfix']
-    dev_prepare = 'bugfix'    
+    dev_prepare = 'minor'    
 
 #    if(len(sys.argv) != 2):
 #        print("Missing argument. Usage ./release.py bugfix | minor | major")
@@ -55,9 +55,9 @@ if __name__ == '__main__':
         print("Invalid argument. Usage ./release.py bugfix | minor | major") 
         exit(1)
      
+    os.chdir(workdir)
     clone_repos()
     release.make()
-    os.chdir(workdir)
     for p in proj_list:
         proj.make(p, True)
        
