@@ -66,9 +66,7 @@ static void draw_cursor(lv_obj_t * ta, const lv_area_t * clip_area);
  *  STATIC VARIABLES
  **********************/
 static lv_design_cb_t ancestor_design;
-static lv_design_cb_t scrl_design;
 static lv_signal_cb_t ancestor_signal;
-static lv_signal_cb_t scrl_signal;
 static const char * ta_insert_replace;
 
 /**********************
@@ -577,11 +575,8 @@ void lv_textarea_set_cursor_pos(lv_obj_t * ta, int32_t pos)
     ext->cursor.pos = pos;
 
     /*Position the label to make the cursor visible*/
-    lv_obj_t * label_par = lv_obj_get_parent(ext->label);
     lv_point_t cur_pos;
     const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
-    lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_MAIN);
-    lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_MAIN);
     lv_area_t label_cords;
     lv_area_t ta_cords;
     lv_label_get_letter_pos(ext->label, pos, &cur_pos);
@@ -591,24 +586,13 @@ void lv_textarea_set_cursor_pos(lv_obj_t * ta, int32_t pos)
     /*Check the top*/
     lv_coord_t font_h = lv_font_get_line_height(font);
     if(cur_pos.y < lv_obj_get_scroll_top(ta)) {
-        lv_obj_scroll_to_y(label_par, cur_pos.y, LV_ANIM_ON);
+        lv_obj_scroll_to_y(ta, cur_pos.y, LV_ANIM_ON);
     }
-
-//    /*Check the bottom*/
-//    if(label_cords.y1 + cur_pos.y + font_h + bottom > ta_cords.y2) {
-//        lv_obj_set_y(label_par, -(cur_pos.y - lv_obj_get_height(ta) + font_h + top + bottom));
-//    }
-//    /*Check the left (use the font_h as general unit)*/
-//    if(lv_obj_get_x(label_par) + cur_pos.x < font_h) {
-//        lv_obj_set_x(label_par, -cur_pos.x + font_h);
-//    }
-//
-//    lv_style_int_t right = lv_obj_get_style_pad_right(ta, LV_TEXTAREA_PART_MAIN);
-//    lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_MAIN);
-//    /*Check the right (use the font_h as general unit)*/
-//    if(label_cords.x1 + cur_pos.x + font_h + right > ta_cords.x2) {
-//        lv_obj_set_x(label_par, -(cur_pos.x - lv_obj_get_width(ta) + font_h + left + right));
-//    }
+    /*Check the bottom*/
+    lv_coord_t h = lv_obj_get_height_fit(ta);
+    if(cur_pos.y + font_h - lv_obj_get_scroll_top(ta) > h) {
+        lv_obj_scroll_to_y(ta, cur_pos.y - h + font_h, LV_ANIM_ON);
+    }
 
     ext->cursor.valid_x = cur_pos.x;
 
