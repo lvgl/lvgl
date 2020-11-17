@@ -123,7 +123,7 @@ typedef struct {
 /*Parts of the chart*/
 enum {
     LV_CHART_PART_BG = LV_OBJ_PART_MAIN,
-    LV_CHART_PART_SERIES_BG = _LV_OBJ_PART_VIRTUAL_LAST,
+    LV_CHART_PART_SERIES_BG,
     LV_CHART_PART_SERIES,
     LV_CHART_PART_CURSOR
 };

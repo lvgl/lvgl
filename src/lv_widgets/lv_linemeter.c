@@ -97,7 +97,7 @@ lv_obj_t * lv_linemeter_create(lv_obj_t * par, const lv_obj_t * copy)
         ext->cur_value             = copy_ext->cur_value;
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(linemeter, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
+        _lv_obj_refresh_style(linemeter, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("line meter created");
@@ -616,14 +616,10 @@ static lv_res_t lv_linemeter_signal(lv_obj_t * lmeter, lv_signal_t sign, void * 
     /* Include the ancient signal function */
     res = ancestor_signal(lmeter, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         /*Nothing to cleanup. (No dynamically allocated memory in 'ext')*/
-    }
-    else if(sign == LV_SIGNAL_STYLE_CHG) {
-        lv_obj_refresh_ext_draw_pad(lmeter);
-        lv_obj_invalidate(lmeter);
     }
 
     return res;

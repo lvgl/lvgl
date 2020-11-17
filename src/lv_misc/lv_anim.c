@@ -162,7 +162,7 @@ bool lv_anim_del(void * var, lv_anim_exec_xcb_t exec_cb)
 lv_anim_t * lv_anim_get(void * var, lv_anim_exec_xcb_t exec_cb)
 {
     lv_anim_t * a;
-    _LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_anim_ll), a) {
         if(a->var == var && a->exec_cb == exec_cb) {
             return a;
         }
@@ -179,7 +179,7 @@ uint16_t lv_anim_count_running(void)
 {
     uint16_t cnt = 0;
     lv_anim_t * a;
-    _LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) cnt++;
+    _LV_LL_READ(&LV_GC_ROOT(_lv_anim_ll), a) cnt++;
 
     return cnt;
 }
@@ -260,7 +260,7 @@ lv_anim_value_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_
     else
         t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
-    int32_t step = _lv_bezier3(t, 0, 1, 1, 1024);
+    int32_t step = _lv_bezier3(t, 0, 0, 1024 * 1 / 3, 1024);
 
     int32_t new_value;
     new_value = (int32_t)step * (a->end - a->start);
@@ -287,7 +287,7 @@ lv_anim_value_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim
     else
         t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
-    int32_t step = _lv_bezier3(t, 0, 1023, 1023, 1024);
+    int32_t step = _lv_bezier3(t, 0, 1024 * 2 / 3, 1024, 1024);
 
     int32_t new_value;
     new_value = (int32_t)step * (a->end - a->start);
@@ -314,7 +314,7 @@ lv_anim_value_t lv_anim_path_ease_in_out(const lv_anim_path_t * path, const lv_a
     else
         t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
-    int32_t step = _lv_bezier3(t, 0, 100, 924, 1024);
+    int32_t step = _lv_bezier3(t, 0, 64, 1024 - 64, 1024);
 
     int32_t new_value;
     new_value = (int32_t)step * (a->end - a->start);
@@ -444,7 +444,7 @@ static void anim_task(lv_task_t * param)
     (void)param;
 
     lv_anim_t * a;
-    _LV_LL_READ(LV_GC_ROOT(_lv_anim_ll), a) {
+    _LV_LL_READ(&LV_GC_ROOT(_lv_anim_ll), a) {
         a->has_run = 0;
     }
 

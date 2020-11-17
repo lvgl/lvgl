@@ -54,7 +54,7 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("object mask create started");
 
     /*Create the ancestor of object mask*/
-    lv_obj_t * objmask = lv_cont_create(par, copy);
+    lv_obj_t * objmask = lv_obj_create(par, copy);
     LV_ASSERT_MEM(objmask);
     if(objmask == NULL) return NULL;
 
@@ -86,7 +86,7 @@ lv_obj_t * lv_objmask_create(lv_obj_t * par, const lv_obj_t * copy)
         /* lv_objmask_ext_t * copy_ext = lv_obj_get_ext_attr(copy); */
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(objmask, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
+        _lv_obj_refresh_style(objmask, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
     LV_LOG_INFO("object mask created");
@@ -161,7 +161,7 @@ void lv_objmask_remove_mask(lv_obj_t * objmask, lv_objmask_mask_t * mask)
     /*Remove all masks*/
     if(mask == NULL) {
         lv_objmask_mask_t * m;
-        _LV_LL_READ(ext->mask_ll, m) {
+        _LV_LL_READ(&ext->mask_ll, m) {
             lv_mem_free(m->param);
         }
 
@@ -226,7 +226,7 @@ static lv_design_res_t lv_objmask_design(lv_obj_t * objmask, const lv_area_t * c
 
         lv_objmask_mask_t * m;
 
-        _LV_LL_READ(ext->mask_ll, m) {
+        _LV_LL_READ(&ext->mask_ll, m) {
             lv_draw_mask_common_dsc_t * dsc = m->param;
 
             if(dsc->type == LV_DRAW_MASK_TYPE_LINE) {
@@ -293,11 +293,9 @@ static lv_design_res_t lv_objmask_design(lv_obj_t * objmask, const lv_area_t * c
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
         lv_objmask_ext_t * ext = lv_obj_get_ext_attr(objmask);
-
-
         lv_objmask_mask_t * m;
 
-        _LV_LL_READ(ext->mask_ll, m) {
+        _LV_LL_READ(&ext->mask_ll, m) {
             void * param;
             param = lv_draw_mask_remove_custom(m->param);
             _lv_mem_buf_release(param);
@@ -322,12 +320,12 @@ static lv_res_t lv_objmask_signal(lv_obj_t * objmask, lv_signal_t sign, void * p
     /* Include the ancient signal function */
     res = ancestor_signal(objmask, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     if(sign == LV_SIGNAL_CLEANUP) {
         lv_objmask_ext_t * ext = lv_obj_get_ext_attr(objmask);
         lv_objmask_mask_t * i;
-        _LV_LL_READ(ext->mask_ll, i) {
+        _LV_LL_READ(&ext->mask_ll, i) {
             if(i->param) {
                 lv_mem_free(i->param);
                 i->param = NULL;

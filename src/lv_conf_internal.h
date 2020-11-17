@@ -1490,24 +1490,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-/*Calendar (dependencies: -)*/
-#ifndef LV_USE_CALENDAR
-#  ifdef CONFIG_LV_USE_CALENDAR
-#    define LV_USE_CALENDAR CONFIG_LV_USE_CALENDAR
-#  else
-#    define  LV_USE_CALENDAR 1
-#  endif
-#endif
-#if LV_USE_CALENDAR
-#ifndef LV_CALENDAR_WEEK_STARTS_MONDAY
-#  ifdef CONFIG_LV_CALENDAR_WEEK_STARTS_MONDAY
-#    define LV_CALENDAR_WEEK_STARTS_MONDAY CONFIG_LV_CALENDAR_WEEK_STARTS_MONDAY
-#  else
-#    define  LV_CALENDAR_WEEK_STARTS_MONDAY    0
-#  endif
-#endif
-#endif
-
 /*Canvas (dependencies: lv_img)*/
 #ifndef LV_USE_CANVAS
 #  ifdef CONFIG_LV_USE_CANVAS
@@ -1542,24 +1524,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #    define  LV_CHART_AXIS_TICK_LABEL_MAX_LEN    256
 #  endif
 #endif
-#endif
-
-/*Container (dependencies: -*/
-#ifndef LV_USE_CONT
-#  ifdef CONFIG_LV_USE_CONT
-#    define LV_USE_CONT CONFIG_LV_USE_CONT
-#  else
-#    define  LV_USE_CONT     1
-#  endif
-#endif
-
-/*Color picker (dependencies: -*/
-#ifndef LV_USE_CPICKER
-#  ifdef CONFIG_LV_USE_CPICKER
-#    define LV_USE_CPICKER CONFIG_LV_USE_CPICKER
-#  else
-#    define  LV_USE_CPICKER   1
-#  endif
 #endif
 
 /*Drop down list (dependencies: lv_page, lv_label, lv_symbol_def.h)*/
@@ -1618,15 +1582,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #endif
 
-/*Keyboard (dependencies: lv_btnm)*/
-#ifndef LV_USE_KEYBOARD
-#  ifdef CONFIG_LV_USE_KEYBOARD
-#    define LV_USE_KEYBOARD CONFIG_LV_USE_KEYBOARD
-#  else
-#    define  LV_USE_KEYBOARD       1
-#  endif
-#endif
-
 /*Label (dependencies: -*/
 #ifndef LV_USE_LABEL
 #  ifdef CONFIG_LV_USE_LABEL
@@ -1673,31 +1628,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #endif
 
-/*LED (dependencies: -)*/
-#ifndef LV_USE_LED
-#  ifdef CONFIG_LV_USE_LED
-#    define LV_USE_LED CONFIG_LV_USE_LED
-#  else
-#    define  LV_USE_LED      1
-#  endif
-#endif
-#if LV_USE_LED
-#ifndef LV_LED_BRIGHT_MIN
-#  ifdef CONFIG_LV_LED_BRIGHT_MIN
-#    define LV_LED_BRIGHT_MIN CONFIG_LV_LED_BRIGHT_MIN
-#  else
-#    define  LV_LED_BRIGHT_MIN  120      /*Minimal brightness*/
-#  endif
-#endif
-#ifndef LV_LED_BRIGHT_MAX
-#  ifdef CONFIG_LV_LED_BRIGHT_MAX
-#    define LV_LED_BRIGHT_MAX CONFIG_LV_LED_BRIGHT_MAX
-#  else
-#    define  LV_LED_BRIGHT_MAX  255     /*Maximal brightness*/
-#  endif
-#endif
-#endif
-
 /*Line (dependencies: -*/
 #ifndef LV_USE_LINE
 #  ifdef CONFIG_LV_USE_LINE
@@ -1707,49 +1637,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-/*List (dependencies: lv_page, lv_btn, lv_label, (lv_img optionally for icons ))*/
-#ifndef LV_USE_LIST
-#  ifdef CONFIG_LV_USE_LIST
-#    define LV_USE_LIST CONFIG_LV_USE_LIST
-#  else
-#    define  LV_USE_LIST     1
-#  endif
-#endif
-#if LV_USE_LIST != 0
-/*Default animation time of focusing to a list element [ms] (0: no animation)  */
-#ifndef LV_LIST_DEF_ANIM_TIME
-#  ifdef CONFIG_LV_LIST_DEF_ANIM_TIME
-#    define LV_LIST_DEF_ANIM_TIME CONFIG_LV_LIST_DEF_ANIM_TIME
-#  else
-#    define  LV_LIST_DEF_ANIM_TIME  100
-#  endif
-#endif
-#endif
-
-/*Line meter (dependencies: *;)*/
-#ifndef LV_USE_LINEMETER
-#  ifdef CONFIG_LV_USE_LINEMETER
-#    define LV_USE_LINEMETER CONFIG_LV_USE_LINEMETER
-#  else
-#    define  LV_USE_LINEMETER   1
-#  endif
-#endif
-#if LV_USE_LINEMETER
-/* Draw line more precisely at cost of performance.
- * Useful if there are lot of lines any minor are visible
- * 0: No extra precision
- * 1: Some extra precision
- * 2: Best precision
- */
-#ifndef LV_LINEMETER_PRECISE
-#  ifdef CONFIG_LV_LINEMETER_PRECISE
-#    define LV_LINEMETER_PRECISE CONFIG_LV_LINEMETER_PRECISE
-#  else
-#    define  LV_LINEMETER_PRECISE    1
-#  endif
-#endif
-#endif
-
 /*Mask (dependencies: -)*/
 #ifndef LV_USE_OBJMASK
 #  ifdef CONFIG_LV_USE_OBJMASK
@@ -1757,66 +1644,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  else
 #    define  LV_USE_OBJMASK  1
 #  endif
-#endif
-
-/*Message box (dependencies: lv_rect, lv_btnm, lv_label)*/
-#ifndef LV_USE_MSGBOX
-#  ifdef CONFIG_LV_USE_MSGBOX
-#    define LV_USE_MSGBOX CONFIG_LV_USE_MSGBOX
-#  else
-#    define  LV_USE_MSGBOX     1
-#  endif
-#endif
-
-/*Page (dependencies: lv_cont)*/
-#ifndef LV_USE_PAGE
-#  ifdef CONFIG_LV_USE_PAGE
-#    define LV_USE_PAGE CONFIG_LV_USE_PAGE
-#  else
-#    define  LV_USE_PAGE     1
-#  endif
-#endif
-#if LV_USE_PAGE != 0
-/*Focus default animation time [ms] (0: no animation)*/
-#ifndef LV_PAGE_DEF_ANIM_TIME
-#  ifdef CONFIG_LV_PAGE_DEF_ANIM_TIME
-#    define LV_PAGE_DEF_ANIM_TIME CONFIG_LV_PAGE_DEF_ANIM_TIME
-#  else
-#    define  LV_PAGE_DEF_ANIM_TIME     400
-#  endif
-#endif
-#endif
-
-/*Preload (dependencies: lv_arc, lv_anim)*/
-#ifndef LV_USE_SPINNER
-#  ifdef CONFIG_LV_USE_SPINNER
-#    define LV_USE_SPINNER CONFIG_LV_USE_SPINNER
-#  else
-#    define  LV_USE_SPINNER      1
-#  endif
-#endif
-#if LV_USE_SPINNER != 0
-#ifndef LV_SPINNER_DEF_ARC_LENGTH
-#  ifdef CONFIG_LV_SPINNER_DEF_ARC_LENGTH
-#    define LV_SPINNER_DEF_ARC_LENGTH CONFIG_LV_SPINNER_DEF_ARC_LENGTH
-#  else
-#    define  LV_SPINNER_DEF_ARC_LENGTH   60      /*[deg]*/
-#  endif
-#endif
-#ifndef LV_SPINNER_DEF_SPIN_TIME
-#  ifdef CONFIG_LV_SPINNER_DEF_SPIN_TIME
-#    define LV_SPINNER_DEF_SPIN_TIME CONFIG_LV_SPINNER_DEF_SPIN_TIME
-#  else
-#    define  LV_SPINNER_DEF_SPIN_TIME    1000    /*[ms]*/
-#  endif
-#endif
-#ifndef LV_SPINNER_DEF_ANIM
-#  ifdef CONFIG_LV_SPINNER_DEF_ANIM
-#    define LV_SPINNER_DEF_ANIM CONFIG_LV_SPINNER_DEF_ANIM
-#  else
-#    define  LV_SPINNER_DEF_ANIM         LV_SPINNER_TYPE_SPINNING_ARC
-#  endif
-#endif
 #endif
 
 /*Roller (dependencies: lv_ddlist)*/
@@ -1853,15 +1680,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #    define LV_USE_SLIDER CONFIG_LV_USE_SLIDER
 #  else
 #    define  LV_USE_SLIDER    1
-#  endif
-#endif
-
-/*Spinbox (dependencies: lv_ta)*/
-#ifndef LV_USE_SPINBOX
-#  ifdef CONFIG_LV_USE_SPINBOX
-#    define LV_USE_SPINBOX CONFIG_LV_USE_SPINBOX
-#  else
-#    define  LV_USE_SPINBOX       1
 #  endif
 #endif
 
@@ -1924,53 +1742,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #endif
 
-
-/*Tab (dependencies: lv_page, lv_btnm)*/
-#ifndef LV_USE_TABVIEW
-#  ifdef CONFIG_LV_USE_TABVIEW
-#    define LV_USE_TABVIEW CONFIG_LV_USE_TABVIEW
-#  else
-#    define  LV_USE_TABVIEW      1
-#  endif
-#endif
-#  if LV_USE_TABVIEW != 0
-/*Time of slide animation [ms] (0: no animation)*/
-#ifndef LV_TABVIEW_DEF_ANIM_TIME
-#  ifdef CONFIG_LV_TABVIEW_DEF_ANIM_TIME
-#    define LV_TABVIEW_DEF_ANIM_TIME CONFIG_LV_TABVIEW_DEF_ANIM_TIME
-#  else
-#    define  LV_TABVIEW_DEF_ANIM_TIME    300
-#  endif
-#endif
-#endif
-
-/*Tileview (dependencies: lv_page) */
-#ifndef LV_USE_TILEVIEW
-#  ifdef CONFIG_LV_USE_TILEVIEW
-#    define LV_USE_TILEVIEW CONFIG_LV_USE_TILEVIEW
-#  else
-#    define  LV_USE_TILEVIEW     1
-#  endif
-#endif
-#if LV_USE_TILEVIEW
-/*Time of slide animation [ms] (0: no animation)*/
-#ifndef LV_TILEVIEW_DEF_ANIM_TIME
-#  ifdef CONFIG_LV_TILEVIEW_DEF_ANIM_TIME
-#    define LV_TILEVIEW_DEF_ANIM_TIME CONFIG_LV_TILEVIEW_DEF_ANIM_TIME
-#  else
-#    define  LV_TILEVIEW_DEF_ANIM_TIME   300
-#  endif
-#endif
-#endif
-
-/*Window (dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page)*/
-#ifndef LV_USE_WIN
-#  ifdef CONFIG_LV_USE_WIN
-#    define LV_USE_WIN CONFIG_LV_USE_WIN
-#  else
-#    define  LV_USE_WIN      1
-#  endif
-#endif
 
 /*==================
  * Non-user section

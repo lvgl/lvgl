@@ -13,6 +13,7 @@
 #include "../lv_misc/lv_debug.h"
 #include "../lv_core/lv_group.h"
 #include "../lv_core/lv_refr.h"
+#include "../lv_core/lv_indev.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_anim.h"
@@ -46,10 +47,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_design_res_t lv_textarea_design(lv_obj_t * ta, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_design_res_t lv_textarea_scrollable_design(lv_obj_t * scrl, const lv_area_t * clip_area,
-                                                     lv_design_mode_t mode);
 static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param);
-static lv_res_t lv_textarea_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
 static lv_style_list_t * lv_textarea_get_style(lv_obj_t * ta, uint8_t part);
 #if LV_USE_ANIMATION
     static void cursor_blink_anim(lv_obj_t * ta, lv_anim_value_t show);
@@ -61,6 +59,8 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c);
 static void refr_cursor_area(lv_obj_t * ta);
 static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_indev_t * click_source);
 static lv_res_t insert_handler(lv_obj_t * ta, const char * txt);
+static void draw_placeholder(lv_obj_t * ta, const lv_area_t * clip_area);
+static void draw_cursor(lv_obj_t * ta, const lv_area_t * clip_area);
 
 /**********************
  *  STATIC VARIABLES
@@ -90,14 +90,12 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
     LV_LOG_TRACE("text area create started");
 
     /*Create the ancestor object*/
-    lv_obj_t * ta = lv_page_create(par, copy);
+    lv_obj_t * ta = lv_obj_create(par, copy);
     LV_ASSERT_MEM(ta);
     if(ta == NULL) return NULL;
 
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(ta);
     if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(ta);
-    if(scrl_signal == NULL) scrl_signal = lv_obj_get_signal_cb(lv_page_get_scrollable(ta));
-    if(scrl_design == NULL) scrl_design = lv_obj_get_design_cb(lv_page_get_scrollable(ta));
 
     /*Allocate the object type specific extended data*/
     lv_textarea_ext_t * ext = lv_obj_allocate_ext_attr(ta, sizeof(lv_textarea_ext_t));
@@ -134,30 +132,19 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
 #endif
 
     lv_obj_set_signal_cb(ta, lv_textarea_signal);
-    lv_obj_set_signal_cb(lv_page_get_scrollable(ta), lv_textarea_scrollable_signal);
     lv_obj_set_design_cb(ta, lv_textarea_design);
 
     /*Init the new text area object*/
     if(copy == NULL) {
-        lv_page_set_scrollable_fit2(ta, LV_FIT_PARENT, LV_FIT_TIGHT);
-
         ext->label = lv_label_create(ta, NULL);
-
-        lv_obj_set_design_cb(ext->page.scrl, lv_textarea_scrollable_design);
-
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
         lv_label_set_text(ext->label, "Text area");
-        lv_obj_set_click(ext->label, false);
         lv_obj_set_size(ta, LV_TEXTAREA_DEF_WIDTH, LV_TEXTAREA_DEF_HEIGHT);
-        lv_textarea_set_scrollbar_mode(ta, LV_SCROLLBAR_MODE_DRAG);
-
-        lv_obj_reset_style_list(ta, LV_PAGE_PART_SCROLLABLE);
         lv_theme_apply(ta, LV_THEME_TEXTAREA);
 
     }
     /*Copy an existing object*/
     else {
-        lv_obj_set_design_cb(ext->page.scrl, lv_textarea_scrollable_design);
         lv_textarea_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->label             = lv_label_create(ta, copy_ext->label);
         ext->pwd_mode          = copy_ext->pwd_mode;
@@ -188,7 +175,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         if(copy_ext->one_line) lv_textarea_set_one_line(ta, true);
 
         /*Refresh the style with new signal function*/
-        lv_obj_refresh_style(ta, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
+        _lv_obj_refresh_style(ta, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
 
 #if LV_USE_ANIMATION
@@ -260,10 +247,6 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
         return;
     }
 
-    /*If a new line was added it shouldn't show edge flash effect*/
-    bool edge_flash_en = lv_textarea_get_edge_flash(ta);
-    lv_textarea_set_edge_flash(ta, false);
-
     if(ext->pwd_mode != 0) pwd_char_hider(ta); /*Make sure all the current text contains only '*'*/
 
     /*If the textarea is empty, invalidate it to hide the placeholder*/
@@ -312,9 +295,6 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
     /*Move the cursor after the new character*/
     lv_textarea_set_cursor_pos(ta, lv_textarea_get_cursor_pos(ta) + 1);
 
-    /*Revert the original edge flash state*/
-    lv_textarea_set_edge_flash(ta, edge_flash_en);
-
     lv_event_send(ta, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
@@ -344,10 +324,6 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
 
     lv_res_t res = insert_handler(ta, txt);
     if(res != LV_RES_OK) return;
-
-    /*If a new line was added it shouldn't show edge flash effect*/
-    bool edge_flash_en = lv_textarea_get_edge_flash(ta);
-    lv_textarea_set_edge_flash(ta, false);
 
     /*If the textarea is empty, invalidate it to hide the placeholder*/
     if(ext->placeholder_txt) {
@@ -394,9 +370,6 @@ void lv_textarea_add_text(lv_obj_t * ta, const char * txt)
     /*Move the cursor after the new text*/
     lv_textarea_set_cursor_pos(ta, lv_textarea_get_cursor_pos(ta) + _lv_txt_get_encoded_length(txt));
 
-    /*Revert the original edge flash state*/
-    lv_textarea_set_edge_flash(ta, edge_flash_en);
-
     lv_event_send(ta, LV_EVENT_VALUE_CHANGED, NULL);
 }
 
@@ -431,12 +404,6 @@ void lv_textarea_del_char(lv_obj_t * ta)
     if(ext->placeholder_txt) {
         const char * txt = lv_label_get_text(ext->label);
         if(txt[0] == '\0') lv_obj_invalidate(ta);
-    }
-
-    /*Don't let 'width == 0' because cursor will not be visible*/
-    if(lv_obj_get_width(ext->label) == 0) {
-        lv_style_int_t border_width = lv_obj_get_style_border_width(ta, LV_TEXTAREA_PART_CURSOR);
-        lv_obj_set_width(ext->label, border_width == 0 ? 1 : border_width);
     }
 
     if(ext->pwd_mode != 0) {
@@ -510,12 +477,6 @@ void lv_textarea_set_text(lv_obj_t * ta, const char * txt)
     if(ext->placeholder_txt) {
         const char * txt_act = lv_label_get_text(ext->label);
         if(txt_act[0] == '\0') lv_obj_invalidate(ta);
-    }
-
-    /*Don't let 'width == 0' because the cursor will not be visible*/
-    if(lv_obj_get_width(ext->label) == 0) {
-        lv_style_int_t border_width = lv_obj_get_style_border_width(ta, LV_TEXTAREA_PART_CURSOR);
-        lv_obj_set_width(ext->label, border_width == 0 ? 1 : border_width);
     }
 
     if(ext->pwd_mode != 0) {
@@ -618,9 +579,9 @@ void lv_textarea_set_cursor_pos(lv_obj_t * ta, int32_t pos)
     /*Position the label to make the cursor visible*/
     lv_obj_t * label_par = lv_obj_get_parent(ext->label);
     lv_point_t cur_pos;
-    const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
-    lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_BG);
-    lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_BG);
+    const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
+    lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_MAIN);
+    lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_MAIN);
     lv_area_t label_cords;
     lv_area_t ta_cords;
     lv_label_get_letter_pos(ext->label, pos, &cur_pos);
@@ -629,25 +590,25 @@ void lv_textarea_set_cursor_pos(lv_obj_t * ta, int32_t pos)
 
     /*Check the top*/
     lv_coord_t font_h = lv_font_get_line_height(font);
-    if(lv_obj_get_y(label_par) + cur_pos.y < 0) {
-        lv_obj_set_y(label_par, -cur_pos.y + top);
+    if(cur_pos.y < lv_obj_get_scroll_top(ta)) {
+        lv_obj_scroll_to_y(label_par, cur_pos.y, LV_ANIM_ON);
     }
 
-    /*Check the bottom*/
-    if(label_cords.y1 + cur_pos.y + font_h + bottom > ta_cords.y2) {
-        lv_obj_set_y(label_par, -(cur_pos.y - lv_obj_get_height(ta) + font_h + top + bottom));
-    }
-    /*Check the left (use the font_h as general unit)*/
-    if(lv_obj_get_x(label_par) + cur_pos.x < font_h) {
-        lv_obj_set_x(label_par, -cur_pos.x + font_h);
-    }
-
-    lv_style_int_t right = lv_obj_get_style_pad_right(ta, LV_TEXTAREA_PART_BG);
-    lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_BG);
-    /*Check the right (use the font_h as general unit)*/
-    if(label_cords.x1 + cur_pos.x + font_h + right > ta_cords.x2) {
-        lv_obj_set_x(label_par, -(cur_pos.x - lv_obj_get_width(ta) + font_h + left + right));
-    }
+//    /*Check the bottom*/
+//    if(label_cords.y1 + cur_pos.y + font_h + bottom > ta_cords.y2) {
+//        lv_obj_set_y(label_par, -(cur_pos.y - lv_obj_get_height(ta) + font_h + top + bottom));
+//    }
+//    /*Check the left (use the font_h as general unit)*/
+//    if(lv_obj_get_x(label_par) + cur_pos.x < font_h) {
+//        lv_obj_set_x(label_par, -cur_pos.x + font_h);
+//    }
+//
+//    lv_style_int_t right = lv_obj_get_style_pad_right(ta, LV_TEXTAREA_PART_MAIN);
+//    lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_MAIN);
+//    /*Check the right (use the font_h as general unit)*/
+//    if(label_cords.x1 + cur_pos.x + font_h + right > ta_cords.x2) {
+//        lv_obj_set_x(label_par, -(cur_pos.x - lv_obj_get_width(ta) + font_h + left + right));
+//    }
 
     ext->cursor.valid_x = cur_pos.x;
 
@@ -756,27 +717,20 @@ void lv_textarea_set_one_line(lv_obj_t * ta, bool en)
     lv_label_align_t old_align = lv_label_get_align(ext->label);
 
     if(en) {
-        lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_BG);
-        lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_BG);
-        lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_BG);
-        const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
+        const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
         lv_coord_t font_h              = lv_font_get_line_height(font);
 
         ext->one_line = 1;
-        lv_page_set_scrollable_fit2(ta, LV_FIT_MAX, LV_FIT_PARENT);
-        lv_obj_set_height(ta, font_h + top + bottom);
+        lv_obj_set_content_height(ta, font_h);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_EXPAND);
-        lv_obj_set_pos(lv_page_get_scrollable(ta), left, top);
+        lv_obj_scroll_to(ta, 0, 0, LV_ANIM_OFF);
     }
     else {
-        lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_BG);
-        lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_BG);
         ext->one_line = 0;
-        lv_page_set_scrollable_fit2(ta, LV_FIT_PARENT, LV_FIT_TIGHT);
         lv_label_set_long_mode(ext->label, LV_LABEL_LONG_BREAK);
 
         lv_obj_set_height(ta, LV_TEXTAREA_DEF_HEIGHT);
-        lv_obj_set_pos(lv_page_get_scrollable(ta), left, top);
+        lv_obj_scroll_to(ta, 0, 0, LV_ANIM_OFF);
     }
 
     /* `refr_cursor_area` is called at the end of lv_ta_set_text_align */
@@ -803,15 +757,13 @@ void lv_textarea_set_text_align(lv_obj_t * ta, lv_label_align_t align)
         /*Normal left align. Just let the text expand*/
         if(align == LV_LABEL_ALIGN_LEFT) {
             lv_label_set_long_mode(label, LV_LABEL_LONG_EXPAND);
-            lv_page_set_scrollable_fit2(ta, LV_FIT_MAX, LV_FIT_PARENT);
             lv_label_set_align(label, align);
         }
         /*Else use fix label width equal to the Text area width*/
         else {
             lv_label_set_long_mode(label, LV_LABEL_LONG_CROP);
-            lv_obj_set_width(label, lv_page_get_width_fit(ta));
+            lv_obj_set_width(label, lv_obj_get_width_fit(ta));
             lv_label_set_align(label, align);
-            lv_page_set_scrollable_fit2(ta, LV_FIT_PARENT, LV_FIT_PARENT);
         }
     }
 
@@ -1226,8 +1178,8 @@ void lv_textarea_cursor_down(lv_obj_t * ta)
 
     /*Increment the y with one line and keep the valid x*/
 
-    lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_BG);
-    const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
+    lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_MAIN);
+    const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     pos.y += font_h + line_space + 1;
     pos.x = ext->cursor.valid_x;
@@ -1258,8 +1210,8 @@ void lv_textarea_cursor_up(lv_obj_t * ta)
     lv_label_get_letter_pos(ext->label, lv_textarea_get_cursor_pos(ta), &pos);
 
     /*Decrement the y with one line and keep the valid x*/
-    lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_BG);
-    const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
+    lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_MAIN);
+    const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
     lv_coord_t font_h              = lv_font_get_line_height(font);
     pos.y -= font_h + line_space - 1;
     pos.x = ext->cursor.valid_x;
@@ -1294,100 +1246,13 @@ static lv_design_res_t lv_textarea_design(lv_obj_t * ta, const lv_area_t * clip_
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         /*Draw the object*/
         ancestor_design(ta, clip_area, mode);
+        draw_placeholder(ta, clip_area);
 
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
         ancestor_design(ta, clip_area, mode);
+        draw_cursor(ta, clip_area);
     }
-    return LV_DESIGN_RES_OK;
-}
-
-/**
- * An extended scrollable design of the page. Calls the normal design function and draws a cursor.
- * @param scrl pointer to the scrollable part of the Text area
- * @param clip_area  the object will be drawn only in this area
- * @param mode LV_DESIGN_COVER_CHK: only check if the object fully covers the 'mask_p' area
- *                                  (return 'true' if yes)
- *             LV_DESIGN_DRAW_MAIN: draw the object (always return 'true')
- *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
- * @return return true/false, depends on 'mode'
- */
-static lv_design_res_t lv_textarea_scrollable_design(lv_obj_t * scrl, const lv_area_t * clip_area,
-                                                     lv_design_mode_t mode)
-{
-    if(mode == LV_DESIGN_COVER_CHK) {
-        /*Return false if the object is not covers the mask_p area*/
-        return scrl_design(scrl, clip_area, mode);
-    }
-    else if(mode == LV_DESIGN_DRAW_MAIN) {
-        /*Draw the object*/
-        scrl_design(scrl, clip_area, mode);
-    }
-    else if(mode == LV_DESIGN_DRAW_POST) {
-        scrl_design(scrl, clip_area, mode);
-
-        lv_obj_t * ta     = lv_obj_get_parent(scrl);
-        lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
-        const char * txt = lv_label_get_text(ext->label);
-
-        /*Draw the place holder*/
-        if(txt[0] == '\0' && ext->placeholder_txt && ext->placeholder_txt[0] != 0) {
-            lv_draw_label_dsc_t ph_dsc;
-            lv_draw_label_dsc_init(&ph_dsc);
-            lv_obj_init_draw_label_dsc(ta, LV_TEXTAREA_PART_PLACEHOLDER, &ph_dsc);
-            switch(lv_label_get_align(ext->label)) {
-                case LV_LABEL_ALIGN_CENTER:
-                    ph_dsc.flag |= LV_TXT_FLAG_CENTER;
-                    break;
-                case LV_LABEL_ALIGN_RIGHT:
-                    ph_dsc.flag |= LV_TXT_FLAG_RIGHT;
-                    break;
-                default:
-                    break;
-            }
-
-            if(ext->one_line) ph_dsc.flag |= LV_TXT_FLAG_EXPAND;
-
-            lv_draw_label(&scrl->coords, clip_area, &ph_dsc, ext->placeholder_txt, NULL);
-        }
-
-        /*Draw the cursor*/
-
-        if(ext->cursor.hidden || ext->cursor.state == 0) {
-            return LV_DESIGN_RES_OK; /*The cursor is not visible now*/
-        }
-
-        lv_draw_rect_dsc_t cur_dsc;
-        lv_draw_rect_dsc_init(&cur_dsc);
-        lv_obj_init_draw_rect_dsc(ta, LV_TEXTAREA_PART_CURSOR, &cur_dsc);
-
-        /*Draw he cursor according to the type*/
-        lv_area_t cur_area;
-        lv_area_copy(&cur_area, &ext->cursor.area);
-
-        cur_area.x1 += ext->label->coords.x1;
-        cur_area.y1 += ext->label->coords.y1;
-        cur_area.x2 += ext->label->coords.x1;
-        cur_area.y2 += ext->label->coords.y1;
-
-        lv_draw_rect(&cur_area, clip_area, &cur_dsc);
-
-        char letter_buf[8] = {0};
-        _lv_memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], _lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
-
-        if(cur_dsc.bg_opa == LV_OPA_COVER) {
-            lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_CURSOR);
-            lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_CURSOR);
-            cur_area.x1 += left;
-            cur_area.y1 += top;
-
-            lv_draw_label_dsc_t cur_label_dsc;
-            lv_draw_label_dsc_init(&cur_label_dsc);
-            lv_obj_init_draw_label_dsc(ta, LV_TEXTAREA_PART_CURSOR, &cur_label_dsc);
-            lv_draw_label(&cur_area, clip_area, &cur_label_dsc, letter_buf, NULL);
-        }
-    }
-
     return LV_DESIGN_RES_OK;
 }
 
@@ -1401,41 +1266,38 @@ static lv_design_res_t lv_textarea_scrollable_design(lv_obj_t * scrl, const lv_a
 static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param)
 {
     lv_res_t res;
-    if(sign == LV_SIGNAL_GET_STYLE) {
-        lv_get_style_info_t * info = param;
-        info->result = lv_textarea_get_style(ta, info->part);
-        if(info->result != NULL) return LV_RES_OK;
-        else return ancestor_signal(ta, sign, param);
-    }
-    else if(sign == LV_SIGNAL_GET_STATE_DSC) {
-        return ancestor_signal(ta, sign, param);
-    }
-
     /* Include the ancient signal function */
     res = ancestor_signal(ta, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
-    if(sign == LV_SIGNAL_CLEANUP) {
+
+    if(sign == LV_SIGNAL_GET_TYPE) {
+        return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
+    }
+    else if(sign == LV_SIGNAL_GET_STYLE) {
+        lv_get_style_info_t * info = param;
+        info->result = lv_textarea_get_style(ta, info->part);
+        if(info->result != NULL) return LV_RES_OK;
+    }
+    else if(sign == LV_SIGNAL_CLEANUP) {
         if(ext->pwd_tmp != NULL) lv_mem_free(ext->pwd_tmp);
         if(ext->placeholder_txt != NULL) lv_mem_free(ext->placeholder_txt);
 
         ext->pwd_tmp = NULL;
         ext->placeholder_txt = NULL;
 
-        lv_obj_clean_style_list(ta, LV_TEXTAREA_PART_CURSOR);
-        lv_obj_clean_style_list(ta, LV_TEXTAREA_PART_PLACEHOLDER);
+        _lv_obj_reset_style_list_no_refr(ta, LV_TEXTAREA_PART_CURSOR);
+        _lv_obj_reset_style_list_no_refr(ta, LV_TEXTAREA_PART_PLACEHOLDER);
 
         /* (The created label will be deleted automatically) */
-
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {
         if(ext->label) {
             if(ext->one_line) {
-                lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_BG);
-                lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_BG);
-                const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
+                lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_MAIN);
+                lv_style_int_t bottom = lv_obj_get_style_pad_bottom(ta, LV_TEXTAREA_PART_MAIN);
+                const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
 
                 /*In one line mode refresh the Text Area height because 'vpad' can modify it*/
                 lv_coord_t font_h              = lv_font_get_line_height(font);
@@ -1444,7 +1306,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
             }
             else {
                 /*In not one line mode refresh the Label width because 'hpad' can modify it*/
-                lv_obj_set_width(ext->label, lv_page_get_width_fit(ta));
+                lv_obj_set_width(ext->label, lv_obj_get_width_fit(ta));
                 lv_obj_set_pos(ext->label, 0, 0); /*Be sure the Label is in the correct position*/
 
             }
@@ -1456,7 +1318,7 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
         /*Set the label width according to the text area width*/
         if(ext->label) {
             if(lv_obj_get_width(ta) != lv_area_get_width(param) || lv_obj_get_height(ta) != lv_area_get_height(param)) {
-                lv_obj_set_width(ext->label, lv_page_get_width_fit(ta));
+                lv_obj_set_width(ext->label, lv_obj_get_width_fit(ta));
                 lv_obj_set_pos(ext->label, 0, 0);
                 lv_label_set_text(ext->label, NULL); /*Refresh the label*/
 
@@ -1504,57 +1366,6 @@ static lv_res_t lv_textarea_signal(lv_obj_t * ta, lv_signal_t sign, void * param
 }
 
 /**
- * Signal function of the scrollable part of the text area
- * @param scrl pointer to scrollable part of a text area object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
-static lv_res_t lv_textarea_scrollable_signal(lv_obj_t * scrl, lv_signal_t sign, void * param)
-{
-    lv_res_t res;
-
-    /* Include the ancient signal function */
-    res = scrl_signal(scrl, sign, param);
-
-    if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, "");
-
-    lv_obj_t * ta     = lv_obj_get_parent(scrl);
-    lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
-
-    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        /*Set ext. size because the cursor might be out of this object*/
-        lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_BG);
-        const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
-        lv_coord_t font_h              = lv_font_get_line_height(font);
-        scrl->ext_draw_pad             = LV_MATH_MAX(scrl->ext_draw_pad, line_space + font_h);
-    }
-    else if(sign == LV_SIGNAL_COORD_CHG) {
-        /*Set the label width according to the text area width*/
-        if(ext->label) {
-            if(lv_obj_get_width(scrl) != lv_area_get_width(param) ||
-               lv_obj_get_height(scrl) != lv_area_get_height(param)) {
-
-                lv_obj_set_width(ext->label, lv_page_get_width_fit(ta));
-                lv_obj_set_pos(ext->label, 0, 0);
-
-                lv_label_set_text(ext->label, NULL); /*Refresh the label*/
-                refr_cursor_area(ta);
-            }
-
-        }
-
-    }
-    else if(sign == LV_SIGNAL_PRESSING || sign == LV_SIGNAL_PRESSED || sign == LV_SIGNAL_PRESS_LOST ||
-            sign == LV_SIGNAL_RELEASED) {
-        update_cursor_position_on_click(ta, sign, (lv_indev_t *)param);
-    }
-
-    return res;
-}
-
-/**
  * Get the style descriptor of a part of the object
  * @param page pointer the object
  * @param part the part from `lv_textarea_part_t`. (LV_TEXTAREA_PART_...)
@@ -1568,20 +1379,12 @@ static lv_style_list_t * lv_textarea_get_style(lv_obj_t * ta, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-        case LV_TEXTAREA_PART_BG:
+        case LV_TEXTAREA_PART_MAIN:
             style_dsc_p = &ta->style_list;
-            break;
-        case LV_TEXTAREA_PART_SCROLLBAR:
-            style_dsc_p = &ext->page.scrlbar.style;
             break;
         case LV_TEXTAREA_PART_CURSOR:
             style_dsc_p = &ext->cursor.style;
             break;
-#if LV_USE_ANIMATION
-        case LV_TEXTAREA_PART_EDGE_FLASH:
-            style_dsc_p = &ext->page.edge_flash.style;
-            break;
-#endif
         case LV_TEXTAREA_PART_PLACEHOLDER:
             style_dsc_p = &ext->style_placeholder;
             break;
@@ -1653,7 +1456,7 @@ static void pwd_char_hider(lv_obj_t * ta)
         if(enc_len == 0) return;
 
         /*If the textarea's font has "bullet" character use it else fallback to "*"*/
-        const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
+        const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
         lv_font_glyph_dsc_t g;
         bool has_bullet;
         has_bullet = lv_font_get_glyph_dsc(font, &g, LV_TEXTAREA_PWD_BULLET_UNICODE, 0);
@@ -1714,8 +1517,8 @@ static void refr_cursor_area(lv_obj_t * ta)
 {
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_BG);
-    lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_BG);
+    const lv_font_t * font = lv_obj_get_style_text_font(ta, LV_TEXTAREA_PART_MAIN);
+    lv_style_int_t line_space = lv_obj_get_style_text_line_space(ta, LV_TEXTAREA_PART_MAIN);
 
     uint32_t cur_pos = lv_textarea_get_cursor_pos(ta);
     const char * txt = lv_label_get_text(ext->label);
@@ -1795,7 +1598,6 @@ static void refr_cursor_area(lv_obj_t * ta)
 
 static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_indev_t * click_source)
 {
-
     if(click_source == NULL) return;
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
@@ -1923,6 +1725,74 @@ static lv_res_t insert_handler(lv_obj_t * ta, const char * txt)
     }
 
     return LV_RES_OK;
+}
+
+static void draw_placeholder(lv_obj_t * ta, const lv_area_t * clip_area)
+{
+    lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
+    const char * txt = lv_label_get_text(ext->label);
+
+    /*Draw the place holder*/
+    if(txt[0] == '\0' && ext->placeholder_txt && ext->placeholder_txt[0] != 0) {
+        lv_draw_label_dsc_t ph_dsc;
+        lv_draw_label_dsc_init(&ph_dsc);
+        lv_obj_init_draw_label_dsc(ta, LV_TEXTAREA_PART_PLACEHOLDER, &ph_dsc);
+        switch(lv_label_get_align(ext->label)) {
+        case LV_LABEL_ALIGN_CENTER:
+            ph_dsc.flag |= LV_TXT_FLAG_CENTER;
+            break;
+        case LV_LABEL_ALIGN_RIGHT:
+            ph_dsc.flag |= LV_TXT_FLAG_RIGHT;
+            break;
+        default:
+            break;
+        }
+
+        if(ext->one_line) ph_dsc.flag |= LV_TXT_FLAG_EXPAND;
+
+        lv_draw_label(&ta->coords, clip_area, &ph_dsc, ext->placeholder_txt, NULL);
+    }
+}
+
+static void draw_cursor(lv_obj_t * ta, const lv_area_t * clip_area)
+{
+    lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
+    const char * txt = lv_label_get_text(ext->label);
+
+    /*Draw the cursor*/
+    if(ext->cursor.hidden || ext->cursor.state == 0) {
+        return; /*The cursor is not visible now*/
+    }
+
+    lv_draw_rect_dsc_t cur_dsc;
+    lv_draw_rect_dsc_init(&cur_dsc);
+    lv_obj_init_draw_rect_dsc(ta, LV_TEXTAREA_PART_CURSOR, &cur_dsc);
+
+    /*Draw he cursor according to the type*/
+    lv_area_t cur_area;
+    lv_area_copy(&cur_area, &ext->cursor.area);
+
+    cur_area.x1 += ext->label->coords.x1;
+    cur_area.y1 += ext->label->coords.y1;
+    cur_area.x2 += ext->label->coords.x1;
+    cur_area.y2 += ext->label->coords.y1;
+
+    lv_draw_rect(&cur_area, clip_area, &cur_dsc);
+
+    char letter_buf[8] = {0};
+    _lv_memcpy(letter_buf, &txt[ext->cursor.txt_byte_pos], _lv_txt_encoded_size(&txt[ext->cursor.txt_byte_pos]));
+
+    if(cur_dsc.bg_opa == LV_OPA_COVER) {
+        lv_style_int_t left = lv_obj_get_style_pad_left(ta, LV_TEXTAREA_PART_CURSOR);
+        lv_style_int_t top = lv_obj_get_style_pad_top(ta, LV_TEXTAREA_PART_CURSOR);
+        cur_area.x1 += left;
+        cur_area.y1 += top;
+
+        lv_draw_label_dsc_t cur_label_dsc;
+        lv_draw_label_dsc_init(&cur_label_dsc);
+        lv_obj_init_draw_label_dsc(ta, LV_TEXTAREA_PART_CURSOR, &cur_label_dsc);
+        lv_draw_label(&cur_area, clip_area, &cur_label_dsc, letter_buf, NULL);
+    }
 }
 
 #endif

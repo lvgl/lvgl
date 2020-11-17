@@ -18,7 +18,6 @@ extern "C" {
 #if LV_USE_OBJMASK != 0
 
 #include "../lv_core/lv_obj.h"
-#include "../lv_widgets/lv_cont.h"
 
 /*********************
  *      DEFINES
@@ -34,7 +33,6 @@ typedef struct {
 
 /*Data of object mask*/
 typedef struct {
-    lv_cont_ext_t cont; /*Ext. of ancestor*/
     /*New data for this type */
     lv_ll_t mask_ll;    /*Store the created masks*/
 

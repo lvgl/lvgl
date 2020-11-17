@@ -19,7 +19,6 @@ extern "C" {
 
 #include "../lv_core/lv_obj.h"
 #include "../lv_misc/lv_anim.h"
-#include "lv_cont.h"
 #include "lv_btn.h"
 #include "lv_label.h"
 
@@ -80,7 +79,7 @@ typedef struct {
 
 /** Bar parts */
 enum {
-    LV_BAR_PART_BG, /** Bar background style. */
+    LV_BAR_PART_MAIN, /** Bar background style. */
     LV_BAR_PART_INDIC, /** Bar fill area style. */
     _LV_BAR_PART_VIRTUAL_LAST
 };
@@ -93,10 +92,11 @@ typedef uint8_t lv_bar_part_t;
 /**
  * Create a bar objects
  * @param par pointer to an object, it will be the parent of the new bar
- * @param copy pointer to a bar object, if not NULL then the new object will be copied from it
+ * @param copy DEPRECATED, will be removed in v9.
+ *             Pointer to an other bar to copy.
  * @return pointer to the created bar
  */
-lv_obj_t * lv_bar_create(lv_obj_t * par, const lv_obj_t * copy);
+lv_obj_t * lv_bar_create(lv_obj_t * parent, lv_obj_t * copy);
 
 /*=====================
  * Setter functions

@@ -41,7 +41,7 @@ static void lv_slider_draw_knob(lv_obj_t * slider, const lv_area_t * knob_area, 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_design_cb_t ancestor_design_f;
+static lv_design_cb_t ancestor_design;
 static lv_signal_cb_t ancestor_signal;
 
 /**********************
@@ -54,20 +54,21 @@ static lv_signal_cb_t ancestor_signal;
 
 /**
  * Create a slider objects
- * @param par pointer to an object, it will be the parent of the new slider
- * @param copy pointer to a slider object, if not NULL then the new object will be copied from it
+ * @param parent pointer to an object, it will be the parent of the new slider
+ * @param copy DEPRECATED, will be removed in v9.
+ *             Pointer to an other slider to copy.
  * @return pointer to the created slider
  */
-lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
+lv_obj_t * lv_slider_create(lv_obj_t * parent, lv_obj_t * copy)
 {
     LV_LOG_TRACE("slider create started");
 
     /*Create the ancestor slider*/
-    lv_obj_t * slider = lv_bar_create(par, copy);
+    lv_obj_t * slider = lv_bar_create(parent, copy);
     LV_ASSERT_MEM(slider);
     if(slider == NULL) return NULL;
 
-    if(ancestor_design_f == NULL) ancestor_design_f = lv_obj_get_design_cb(slider);
+    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(slider);
     if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(slider);
 
     /*Allocate the slider type specific extended data*/
@@ -89,22 +90,19 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 
     /*Init the new slider slider*/
     if(copy == NULL) {
-        lv_obj_set_click(slider, true);
-        lv_obj_add_protect(slider, LV_PROTECT_PRESS_LOST);
-        lv_obj_set_ext_click_area(slider, 0, 0, LV_DPI / 10, LV_DPI / 10);
-
         lv_theme_apply(slider, LV_THEME_SLIDER);
+        lv_obj_add_flag(slider, LV_OBJ_FLAG_CHECKABLE);
+        lv_obj_set_ext_click_area(slider, 0, 0, LV_DPI / 10, LV_DPI / 10);
         lv_obj_set_height(slider, LV_DPI / 15);
-    }
-    /*Copy an existing slider*/
-    else {
+    } else {
         lv_slider_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         lv_style_list_copy(&ext->style_knob, &copy_ext->style_knob);
         lv_area_copy(&ext->left_knob_area, &copy_ext->left_knob_area);
         lv_area_copy(&ext->right_knob_area, &copy_ext->right_knob_area);
 
-        lv_obj_refresh_style(slider, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
+        _lv_obj_refresh_style(slider, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
     }
+
 
     LV_LOG_INFO("slider created");
 
@@ -118,17 +116,6 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
 /*=====================
  * Getter functions
  *====================*/
-
-/**
- * Get the value of a slider
- * @param slider pointer to a slider object
- * @return the value of the slider
- */
-int16_t lv_slider_get_value(const lv_obj_t * slider)
-{
-    LV_ASSERT_OBJ(slider, LV_OBJX_NAME);
-    return lv_bar_get_value(slider);
-}
 
 /**
  * Give the slider is being dragged or not
@@ -167,7 +154,7 @@ static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * cli
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         /* The ancestor design function will draw the background and the indicator.
          * It also sets ext->bar.indic_area*/
-        ancestor_design_f(slider, clip_area, mode);
+        ancestor_design(slider, clip_area, mode);
 
         lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(slider);
@@ -230,7 +217,7 @@ static lv_design_res_t lv_slider_design(lv_obj_t * slider, const lv_area_t * cli
     }
     /*Post draw when the children are drawn*/
     else if(mode == LV_DESIGN_DRAW_POST) {
-        return ancestor_design_f(slider, clip_area, mode);
+        return ancestor_design(slider, clip_area, mode);
     }
 
     return LV_DESIGN_RES_OK;
@@ -257,7 +244,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
     /* Include the ancient signal function */
     res = ancestor_signal(slider, sign, param);
     if(res != LV_RES_OK) return res;
-    if(sign == LV_SIGNAL_GET_TYPE) return lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
+    if(sign == LV_SIGNAL_GET_TYPE) return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
     lv_slider_type_t type = lv_slider_get_type(slider);
     lv_slider_ext_t * ext = lv_obj_get_ext_attr(slider);
@@ -333,10 +320,10 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         lv_coord_t w = lv_obj_get_width(slider);
         lv_coord_t h = lv_obj_get_height(slider);
 
-        lv_style_int_t bg_left = lv_obj_get_style_pad_left(slider,   LV_SLIDER_PART_BG);
-        lv_style_int_t bg_right = lv_obj_get_style_pad_right(slider,  LV_SLIDER_PART_BG);
-        lv_style_int_t bg_top = lv_obj_get_style_pad_top(slider,    LV_SLIDER_PART_BG);
-        lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(slider, LV_SLIDER_PART_BG);
+        lv_style_int_t bg_left = lv_obj_get_style_pad_left(slider,   LV_SLIDER_PART_MAIN);
+        lv_style_int_t bg_right = lv_obj_get_style_pad_right(slider,  LV_SLIDER_PART_MAIN);
+        lv_style_int_t bg_top = lv_obj_get_style_pad_top(slider,    LV_SLIDER_PART_MAIN);
+        lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(slider, LV_SLIDER_PART_MAIN);
 
         int32_t range = ext->bar.max_value - ext->bar.min_value;
         int16_t new_value = 0;
@@ -414,10 +401,11 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         knob_size += LV_MATH_MAX(LV_MATH_MAX(knob_left, knob_right), LV_MATH_MAX(knob_bottom, knob_top));
         knob_size += 2;         /*For rounding error*/
 
-        knob_size += lv_obj_get_draw_rect_ext_pad_size(slider, LV_SLIDER_PART_KNOB);
+        knob_size += _lv_obj_get_draw_rect_ext_pad_size(slider, LV_SLIDER_PART_KNOB);
 
         /*Indic. size is handled by bar*/
-        slider->ext_draw_pad = LV_MATH_MAX(slider->ext_draw_pad, knob_size);
+        lv_coord_t * s = param;
+        *s  = LV_MATH_MAX(*s, knob_size);
 
     }
     else if(sign == LV_SIGNAL_CONTROL) {
@@ -437,7 +425,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 #endif
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
-        lv_obj_clean_style_list(slider, LV_SLIDER_PART_KNOB);
+        _lv_obj_reset_style_list_no_refr(slider, LV_SLIDER_PART_KNOB);
     }
     else if(sign == LV_SIGNAL_GET_EDITABLE) {
 #if LV_USE_GROUP
@@ -458,7 +446,7 @@ static lv_style_list_t * lv_slider_get_style(lv_obj_t * slider, uint8_t part)
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
-        case LV_SLIDER_PART_BG:
+        case LV_SLIDER_PART_MAIN:
             style_dsc_p = &slider->style_list;
             break;
         case LV_SLIDER_PART_INDIC:

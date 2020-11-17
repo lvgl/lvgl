@@ -43,7 +43,6 @@ typedef struct {
 enum {
     LV_LINEMETER_PART_MAIN,
     _LV_LINEMETER_PART_VIRTUAL_LAST,
-    _LV_LINEMETER_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,
 };
 typedef uint8_t lv_linemeter_part_t;
 
