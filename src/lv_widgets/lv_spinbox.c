@@ -198,6 +198,8 @@ void lv_spinbox_set_step(lv_obj_t * spinbox, uint32_t step)
     if(ext == NULL) return;
 
     ext->step = step;
+
+    lv_spinbox_updatevalue(spinbox);
 }
 
 /**

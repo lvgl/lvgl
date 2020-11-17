@@ -850,7 +850,7 @@ lv_res_t lv_event_send(lv_obj_t * obj, lv_event_t event, const void * data);
 
 /**
  * Send LV_EVENT_REFRESH event to an object
- * @param obj point to an obejct. (Can NOT be NULL)
+ * @param obj point to an object. (Can NOT be NULL)
  * @return LV_RES_OK: success, LV_RES_INV: to object become invalid (e.g. deleted) due to this event.
  */
 lv_res_t lv_event_send_refresh(lv_obj_t * obj);

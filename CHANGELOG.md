@@ -1,6 +1,16 @@
 # Changelog
 
-## v7.7.1 (04.11.2020)
+## v7.7.2 (Planned to 17.11.2020)
+### Bugfixes
+- fix(draw_triangle): fix polygon/triangle drawing when the order of points is counter-clockwise
+- fix(btnmatrix): fix setting the same map with modified pointers
+- fix(arc) fix and improve arc dragging
+- label: Repair calculate back `dot` character logical error which cause infinite loop.
+- fix(theme_material): remove the bottom border from tabview header
+- fix(imgbtn) guess a the closest availabe state with valid src
+- fix(spinbox) update cursor position in lv_spinbox_set_step 
+
+## v7.7.1 (03.11.2020)
 ### Bugfixes
 - Respect btnmatrix's `one_check` in `lv_btnmatrix_set_btn_ctrl`
 - Gauge: make the needle images to use the styles from `LV_GAUGE_PART_PART`

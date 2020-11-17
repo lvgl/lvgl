@@ -341,7 +341,7 @@ lv_anim_value_t lv_anim_path_overshoot(const lv_anim_path_t * path, const lv_ani
     else
         t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
-    int32_t step = _lv_bezier3(t, 0, 1000, 2000, 1024);
+    int32_t step = _lv_bezier3(t, 0, 1000, 1300, 1024);
 
     int32_t new_value;
     new_value = (int32_t)step * (a->end - a->start);
