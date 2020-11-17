@@ -543,26 +543,26 @@ static lv_btn_state_t suggest_state(lv_obj_t * imgbtn, lv_btn_state_t state)
     lv_imgbtn_ext_t * ext = lv_obj_get_ext_attr(imgbtn);
     if(ext->img_src_mid[state] == NULL) {
         switch(state) {
-        case LV_BTN_STATE_PRESSED:
-            if(ext->img_src_mid[LV_BTN_STATE_RELEASED]) return LV_BTN_STATE_RELEASED;
-            break;
-        case LV_BTN_STATE_CHECKED_RELEASED:
-            if(ext->img_src_mid[LV_BTN_STATE_RELEASED]) return LV_BTN_STATE_RELEASED;
-            break;
-        case LV_BTN_STATE_CHECKED_PRESSED:
-            if(ext->img_src_mid[LV_BTN_STATE_CHECKED_RELEASED]) return LV_BTN_STATE_CHECKED_RELEASED;
-            if(ext->img_src_mid[LV_BTN_STATE_PRESSED]) return LV_BTN_STATE_PRESSED;
-            if(ext->img_src_mid[LV_BTN_STATE_RELEASED]) return LV_BTN_STATE_RELEASED;
-            break;
-        case LV_BTN_STATE_DISABLED:
-            if(ext->img_src_mid[LV_BTN_STATE_RELEASED]) return LV_BTN_STATE_RELEASED;
-            break;
-        case LV_BTN_STATE_CHECKED_DISABLED:
-            if(ext->img_src_mid[LV_BTN_STATE_CHECKED_RELEASED]) return LV_BTN_STATE_CHECKED_RELEASED;
-            if(ext->img_src_mid[LV_BTN_STATE_RELEASED]) return LV_BTN_STATE_RELEASED;
-            break;
-        default:
-            break;
+            case LV_BTN_STATE_PRESSED:
+                if(ext->img_src_mid[LV_BTN_STATE_RELEASED]) return LV_BTN_STATE_RELEASED;
+                break;
+            case LV_BTN_STATE_CHECKED_RELEASED:
+                if(ext->img_src_mid[LV_BTN_STATE_RELEASED]) return LV_BTN_STATE_RELEASED;
+                break;
+            case LV_BTN_STATE_CHECKED_PRESSED:
+                if(ext->img_src_mid[LV_BTN_STATE_CHECKED_RELEASED]) return LV_BTN_STATE_CHECKED_RELEASED;
+                if(ext->img_src_mid[LV_BTN_STATE_PRESSED]) return LV_BTN_STATE_PRESSED;
+                if(ext->img_src_mid[LV_BTN_STATE_RELEASED]) return LV_BTN_STATE_RELEASED;
+                break;
+            case LV_BTN_STATE_DISABLED:
+                if(ext->img_src_mid[LV_BTN_STATE_RELEASED]) return LV_BTN_STATE_RELEASED;
+                break;
+            case LV_BTN_STATE_CHECKED_DISABLED:
+                if(ext->img_src_mid[LV_BTN_STATE_CHECKED_RELEASED]) return LV_BTN_STATE_CHECKED_RELEASED;
+                if(ext->img_src_mid[LV_BTN_STATE_RELEASED]) return LV_BTN_STATE_RELEASED;
+                break;
+            default:
+                break;
         }
     }
 
