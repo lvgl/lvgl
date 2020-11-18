@@ -62,8 +62,8 @@ typedef struct {
     uint8_t dir        :2;
     uint8_t wrap       :1;
     uint8_t rev        :1;
-    uint8_t item_place      :3;
-    uint8_t track_place      :3;
+    uint8_t main_place      :3;
+    uint8_t cross_place      :3;
 }lv_flex_cont_t;
 
 /**********************
@@ -85,12 +85,19 @@ void lv_obj_set_flex_dir(struct _lv_obj_t * obj, lv_flex_dir_t flex_dir);
 
 /**
  * Set how to place the items and the tracks
- * @param obj point to a flex container
- * @param item_place tells how to distribute the free space among the items in the same track
- * @param track_place tells how to distribute the free space among the tracks
+ * @param obj pointer to a flex container
+ * @param main_place tells how to distribute the free space among the items in the same track
+ * @param cross_place tells how to distribute the free space among the tracks
  * @note if the base direction is RTL and the direction is ROW, LV_FLEX_START means the right side
  */
-void lv_obj_set_flex_place(struct _lv_obj_t * obj, lv_flex_place_t item_place, lv_flex_place_t track_place);
+void lv_obj_set_flex_place(struct _lv_obj_t * obj, lv_flex_place_t main_place, lv_flex_place_t cross_place);
+
+/**
+ * Set a minimal gap between items in the main direction.
+ * @param obj pointer to a flex container
+ * @param gap the gap in pixels
+ */
+void lv_obj_set_flex_gap(struct _lv_obj_t * obj, lv_coord_t gap);
 
 /**
  * Make an object flex item, i.e. allow setting it's coordinate according to the parent's flex settings.

@@ -63,16 +63,16 @@ void lv_obj_set_flex_dir(lv_obj_t * obj, lv_flex_dir_t flex_dir)
     _lv_flex_refresh(obj);
 }
 
-void lv_obj_set_flex_place(lv_obj_t * obj, lv_flex_place_t item_place, lv_flex_place_t track_place)
+void lv_obj_set_flex_place(lv_obj_t * obj, lv_flex_place_t main_place, lv_flex_place_t cross_place)
 {
     lv_obj_allocate_spec_attr(obj);
-    if(obj->spec_attr->flex_cont.item_place == item_place &&
-       obj->spec_attr->flex_cont.track_place == track_place) {
+    if(obj->spec_attr->flex_cont.main_place == main_place &&
+       obj->spec_attr->flex_cont.cross_place == cross_place) {
         return;
     }
 
-    obj->spec_attr->flex_cont.item_place = item_place;
-    obj->spec_attr->flex_cont.track_place = track_place;
+    obj->spec_attr->flex_cont.main_place = main_place;
+    obj->spec_attr->flex_cont.cross_place = cross_place;
 
     _lv_flex_refresh(obj);
 }
@@ -120,13 +120,13 @@ lv_flex_dir_t lv_obj_get_flex_dir(const lv_obj_t * obj)
 
 lv_flex_place_t lv_obj_get_flex_item_place(const lv_obj_t * obj)
 {
-    if(obj->spec_attr) return obj->spec_attr->flex_cont.item_place;
+    if(obj->spec_attr) return obj->spec_attr->flex_cont.main_place;
     else return LV_FLEX_PLACE_START;
 }
 
 lv_flex_place_t lv_obj_get_flex_track_place(const lv_obj_t * obj)
 {
-    if(obj->spec_attr) return obj->spec_attr->flex_cont.track_place;
+    if(obj->spec_attr) return obj->spec_attr->flex_cont.cross_place;
     else return LV_FLEX_PLACE_START;
 }
 
@@ -157,7 +157,7 @@ void _lv_flex_refresh(lv_obj_t * cont)
     lv_coord_t abs_x = cont->coords.x1 + lv_obj_get_style_pad_left(cont, LV_OBJ_PART_MAIN) - lv_obj_get_scroll_x(cont);
 
     lv_flex_place_t cross_place = lv_obj_get_flex_track_place(cont);
-    lv_flex_place_t main_place = cont->spec_attr->flex_cont.item_place;
+    lv_flex_place_t main_place = cont->spec_attr->flex_cont.main_place;
     lv_ll_t * ll = _lv_obj_get_child_ll(cont);
     lv_coord_t * cross_pos = (row ? &abs_y : &abs_x);
 

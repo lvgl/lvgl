@@ -131,7 +131,7 @@ void lv_obj_report_grid_change(const lv_grid_t * grid)
  */
 void _lv_grid_calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
 {
-    lv_grid_t * g = lv_obj_get_grid(cont);
+    const lv_grid_t * g = lv_obj_get_grid(cont);
     if(g == NULL) return;
     if(g->col_dsc == NULL || g->row_dsc == NULL) return;
     if(g->col_dsc_len == 0 || g->row_dsc_len == 0) return;
@@ -176,7 +176,7 @@ void _lv_grid_calc_free(_lv_grid_calc_t * calc)
  */
 bool _lv_grid_has_fr_col(struct _lv_obj_t * obj)
 {
-    lv_grid_t * g = lv_obj_get_grid(obj);
+    const lv_grid_t * g = lv_obj_get_grid(obj);
     if(g->col_dsc == NULL)  return false;
 
     uint32_t i;
@@ -194,7 +194,7 @@ bool _lv_grid_has_fr_col(struct _lv_obj_t * obj)
  */
 bool _lv_grid_has_fr_row(struct _lv_obj_t * obj)
 {
-    lv_grid_t * g = lv_obj_get_grid(obj);
+    const lv_grid_t * g = lv_obj_get_grid(obj);
     if(g == NULL) return false;
     if(g->row_dsc == NULL)  return false;
 

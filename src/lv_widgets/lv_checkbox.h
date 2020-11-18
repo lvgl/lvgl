@@ -35,7 +35,7 @@ extern "C" {
 typedef struct {
     /*New data for this widget */
     lv_style_list_t style_bullet;
-    char * txt;
+    const char * txt;
     uint32_t static_txt :1;
 } lv_checkbox_ext_t;
 

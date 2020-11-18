@@ -15,6 +15,7 @@
 #include "../lv_core/lv_refr.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_txt.h"
+#include "../lv_misc/lv_txt_ap.h"
 
 /*********************
  *      DEFINES
