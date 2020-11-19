@@ -15,6 +15,7 @@
 #include "../lv_core/lv_refr.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_txt.h"
+#include "../lv_misc/lv_txt_ap.h"
 
 /*********************
  *      DEFINES
@@ -804,7 +805,7 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
             /*Get the size of the Arabic text and process it*/
             size_t len_ap = _lv_txt_ap_calc_bytes_cnt(txt);
             if(len_ap < txt_ap_size) {
-                _lv_txt_ap_proc(txt_ap, txt);
+                _lv_txt_ap_proc(txt, txt_ap);
                 txt = txt_ap;
             }
 #endif
