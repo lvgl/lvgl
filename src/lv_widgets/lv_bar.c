@@ -73,7 +73,7 @@ static lv_signal_cb_t ancestor_signal;
  *             Pointer to an other bar to copy.
  * @return pointer to the created bar
  */
-lv_obj_t * lv_bar_create(lv_obj_t * parent, lv_obj_t * copy)
+lv_obj_t * lv_bar_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("lv_bar create started");
 

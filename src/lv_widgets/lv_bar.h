@@ -96,7 +96,7 @@ typedef uint8_t lv_bar_part_t;
  *             Pointer to an other bar to copy.
  * @return pointer to the created bar
  */
-lv_obj_t * lv_bar_create(lv_obj_t * parent, lv_obj_t * copy);
+lv_obj_t * lv_bar_create(lv_obj_t * parent, const lv_obj_t * copy);
 
 /*=====================
  * Setter functions

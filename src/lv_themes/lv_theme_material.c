@@ -654,7 +654,6 @@ lv_theme_t * lv_theme_material_init(lv_color_t color_primary, lv_color_t color_s
     spinner_init();
     chart_init();
     checkbox_init();
-    keyboard_init();
     textarea_init();
     ddlist_init();
     roller_init();
