@@ -201,10 +201,6 @@ typedef struct {
     void * group_p;
 #endif
 
-#if LV_USE_USER_DATA
-    lv_obj_user_data_t user_data; /**< Custom user data for object. */
-#endif
-
     const lv_grid_t * grid;
 
     lv_event_cb_t event_cb; /**< Event callback function */
@@ -237,6 +233,11 @@ struct _lv_obj_t {
     lv_design_cb_t design_cb; /**< Object type specific design function*/
 
     void * ext_attr;            /**< Object type specific extended data*/
+
+#if LV_USE_USER_DATA
+    lv_obj_user_data_t user_data; /**< Custom user data for object. */
+#endif
+
     lv_style_list_t  style_list;
 
     /*Attributes and states*/

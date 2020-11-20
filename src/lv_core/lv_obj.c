@@ -1448,10 +1448,8 @@ void lv_obj_get_type(const lv_obj_t * obj, lv_obj_type_t * buf)
  */
 lv_obj_user_data_t lv_obj_get_user_data(const lv_obj_t * obj)
 {
-    static lv_obj_user_data_t empty = {0};
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    if(obj->spec_attr) return obj->spec_attr->user_data;
-    else return empty;
+    return obj->user_data;
 }
 
 /**
@@ -1463,8 +1461,7 @@ lv_obj_user_data_t * lv_obj_get_user_data_ptr(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(obj->spec_attr) return obj->spec_attr->user_data;
-    return &obj->spec_attr->user_data;
+    return &obj->user_data;
 }
 
 /**
@@ -1476,8 +1473,7 @@ void lv_obj_set_user_data(lv_obj_t * obj, lv_obj_user_data_t data)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
-    _lv_memcpy(&obj->spec_attr->user_data, &data, sizeof(lv_obj_user_data_t));
+    _lv_memcpy(&obj->user_data, &data, sizeof(lv_obj_user_data_t));
 }
 #endif
 
