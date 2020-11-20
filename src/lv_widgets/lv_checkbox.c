@@ -139,30 +139,6 @@ void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt)
     _lv_obj_handle_self_size_chg(cb);
 }
 
-/**
- * Set the state of the check box
- * @param cb pointer to a check box object
- * @param checked true: make the check box checked; false: make it unchecked
- */
-void lv_checkbox_set_checked(lv_obj_t * cb, bool checked)
-{
-    if(checked) lv_obj_set_state(cb, LV_STATE_CHECKED);
-    else lv_obj_clear_state(cb, LV_STATE_CHECKED);
-    _lv_obj_remove_style_trans(cb);
-}
-
-/**
- * Make the check box inactive (disabled)
- * @param cb pointer to a check box object
- * @param dis true; make the checkbox disabled; false: make the chackbox active
- */
-void lv_checkbox_set_disabled(lv_obj_t * cb, bool dis)
-{
-    if(dis) lv_obj_set_state(cb, LV_STATE_DISABLED);
-    else lv_obj_clear_state(cb, LV_STATE_DISABLED);
-    _lv_obj_remove_style_trans(cb);
-}
-
 /*=====================
  * Getter functions
  *====================*/

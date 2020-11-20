@@ -35,7 +35,7 @@ extern "C" {
 typedef struct {
     /*New data for this widget */
     lv_style_list_t style_bullet;
-    const char * txt;
+    char * txt;
     uint32_t static_txt :1;
 } lv_checkbox_ext_t;
 
@@ -64,42 +64,31 @@ lv_obj_t * lv_checkbox_create(lv_obj_t * par, const lv_obj_t * copy);
  *====================*/
 
 /**
- * Set the state of the check box
- * @param cb pointer to a check box object
- * @param checked true: make the check box checked; false: make it unchecked
+ * Set the text of a check box. `txt` will be copied and may be deallocated
+ * after this function returns.
+ * @param cb pointer to a check box
+ * @param txt the text of the check box. NULL to refresh with the current text.
  */
-void lv_checkbox_set_checked(lv_obj_t * cb, bool checked);
+void lv_checkbox_set_text(lv_obj_t * cb, const char * txt);
 
 /**
- * Make the check box inactive (disabled)
- * @param cb pointer to a check box object
- * @param dis true; make the checkbox disabled; false: make the checkbox active
+ * Set the text of a check box. `txt` must not be deallocated during the life
+ * of this checkbox.
+ * @param cb pointer to a check box
+ * @param txt the text of the check box. NULL to refresh with the current text.
  */
-void lv_checkbox_set_disabled(lv_obj_t * cb, bool dis);
+void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt);
 
 /*=====================
  * Getter functions
  *====================*/
 
 /**
- * Get the current state of the check box
- * @param cb pointer to a check box object
- * @return true: checked; false: not checked
+ * Get the text of a check box
+ * @param cb pointer to check box object
+ * @return pointer to the text of the check box
  */
-static inline bool lv_checkbox_is_checked(const lv_obj_t * cb)
-{
-    return lv_obj_get_state(cb) & LV_STATE_CHECKED ? true : false;
-}
-
-/**
- * Get whether the check box is inactive or not.
- * @param cb pointer to a check box object
- * @return true: inactive; false: not inactive
- */
-static inline bool lv_checkbox_is_disabled(const lv_obj_t * cb)
-{
-    return lv_obj_get_state(cb) & LV_STATE_DISABLED ? true : false;
-}
+const char * lv_checkbox_get_text(const lv_obj_t * cb);
 
 /**********************
  *      MACROS
