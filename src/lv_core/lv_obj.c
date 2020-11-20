@@ -1041,7 +1041,7 @@ lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
 
         obj->spec_attr->scroll_dir = LV_DIR_ALL;
         obj->spec_attr->base_dir = LV_BIDI_DIR_INHERIT;
-        obj->spec_attr->scroll_mode = LV_SCROLL_MODE_AUTO;
+        obj->spec_attr->scrollbar_mode = LV_SCROLLBAR_MODE_AUTO;
 
     }
     return obj->spec_attr;
@@ -2002,7 +2002,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(res != LV_RES_OK) return res;
     }
     else if(sign == LV_SIGNAL_SCROLL_END) {
-        if(lv_obj_get_scroll_mode(obj) == LV_SCROLL_MODE_ACTIVE) {
+        if(lv_obj_get_scrollbar_mode(obj) == LV_SCROLLBAR_MODE_ACTIVE) {
             lv_obj_invalidate(obj);
         }
     }

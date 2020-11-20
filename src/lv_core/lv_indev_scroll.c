@@ -258,6 +258,9 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
      *  5. Use the last candidate. Always the "deepest" parent or the object from point 3 */
     lv_obj_t * obj_act = proc->types.pointer.act_obj;
     while(obj_act) {
+        /*Halt search on a scroll freeze object*/
+        if(lv_obj_get_scroll_freeze(obj_act)) return NULL;
+
         if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLLABLE) == false) {
             obj_act = lv_obj_get_parent(obj_act);
             continue;

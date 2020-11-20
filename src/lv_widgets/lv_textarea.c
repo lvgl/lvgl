@@ -1633,7 +1633,7 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
             ext->sel_start    = char_id_at_click;
             ext->sel_end      = LV_LABEL_TEXT_SEL_OFF;
             ext->text_sel_in_prog = 1;
-            lv_obj_set_drag(lv_page_get_scrollable(ta), false);
+            lv_obj_set_scroll_freeze(ta, true);
         }
         else if(ext->text_sel_in_prog && sign == LV_SIGNAL_PRESSING) {
             /*Input device may be moving. Store the end position */
@@ -1641,7 +1641,7 @@ static void update_cursor_position_on_click(lv_obj_t * ta, lv_signal_t sign, lv_
         }
         else if(ext->text_sel_in_prog && (sign == LV_SIGNAL_PRESS_LOST || sign == LV_SIGNAL_RELEASED)) {
             /*Input device is released. Check if anything was selected.*/
-            lv_obj_set_drag(lv_page_get_scrollable(ta), true);
+            lv_obj_set_scroll_freeze(ta, false);
         }
     }
 

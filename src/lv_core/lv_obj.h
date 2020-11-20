@@ -219,10 +219,11 @@ typedef struct {
     lv_area_t ext_click_pad;   /**< Extra click padding area. */
 #endif
 
-    lv_scroll_mode_t scroll_mode :2; /**< How to display scrollbars*/
+    lv_scrollbar_mode_t scrollbar_mode :2; /**< How to display scrollbars*/
     lv_snap_align_t snap_align_x : 2;
     lv_snap_align_t snap_align_y : 2;
     lv_scroll_dir_t scroll_dir :4;
+    uint8_t scroll_freeze :1;    /**< 1: Do not allow scrolling on this object and do not propagate the scroll to parent */
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
 }lv_obj_spec_attr_t;
 

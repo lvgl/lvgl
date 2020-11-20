@@ -44,14 +44,14 @@ static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v);
  * Setter functions
  *====================*/
 
-void lv_obj_set_scroll_mode(lv_obj_t * obj, lv_scroll_mode_t mode)
+void lv_obj_set_scrollbar_mode(lv_obj_t * obj, lv_scrollbar_mode_t mode)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     lv_obj_allocate_spec_attr(obj);
 
-    if(obj->spec_attr->scroll_mode == mode) return;
-    obj->spec_attr->scroll_mode = mode;
+    if(obj->spec_attr->scrollbar_mode == mode) return;
+    obj->spec_attr->scrollbar_mode = mode;
     lv_obj_invalidate(obj);
 }
 
@@ -61,7 +61,15 @@ void lv_obj_set_scroll_dir(struct _lv_obj_t * obj, lv_dir_t dir)
 
     if(dir != obj->spec_attr->scroll_dir) {
         obj->spec_attr->scroll_dir = dir;
-        lv_obj_invalidate(obj);
+    }
+}
+
+void lv_obj_set_scroll_freeze(struct _lv_obj_t * obj, bool en)
+{
+    lv_obj_allocate_spec_attr(obj);
+
+    if(en != obj->spec_attr->scroll_freeze) {
+        obj->spec_attr->scroll_freeze = en;
     }
 }
 
@@ -81,16 +89,22 @@ void lv_obj_set_snap_align_y(struct _lv_obj_t * obj, lv_snap_align_t align)
  * Getter functions
  *====================*/
 
-lv_scroll_mode_t lv_obj_get_scroll_mode(const struct _lv_obj_t * obj)
+lv_scrollbar_mode_t lv_obj_get_scrollbar_mode(const struct _lv_obj_t * obj)
 {
-    if(obj->spec_attr) return obj->spec_attr->scroll_mode;
-    else return LV_SCROLL_MODE_AUTO;
+    if(obj->spec_attr) return obj->spec_attr->scrollbar_mode;
+    else return LV_SCROLLBAR_MODE_AUTO;
 }
 
 lv_dir_t lv_obj_get_scroll_dir(const struct _lv_obj_t * obj)
 {
     if(obj->spec_attr) return obj->spec_attr->scroll_dir;
     else return LV_DIR_ALL;
+}
+
+bool lv_obj_get_scroll_freeze(struct _lv_obj_t * obj)
+{
+    if(obj->spec_attr) return obj->spec_attr->scroll_freeze;
+    else return false;
 }
 
 lv_snap_align_t lv_obj_get_snap_align_x(const struct _lv_obj_t * obj)

@@ -161,8 +161,8 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     lv_obj_clear_flag(disp->top_layer, LV_OBJ_FLAG_CLICKABLE);
     lv_obj_clear_flag(disp->sys_layer, LV_OBJ_FLAG_CLICKABLE);
 
-    lv_obj_set_scroll_mode(disp->top_layer, LV_SCROLL_MODE_OFF);
-    lv_obj_set_scroll_mode(disp->sys_layer, LV_SCROLL_MODE_OFF);
+    lv_obj_set_scrollbar_mode(disp->top_layer, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_scrollbar_mode(disp->sys_layer, LV_SCROLLBAR_MODE_OFF);
 
     lv_obj_invalidate(disp->act_scr);
 

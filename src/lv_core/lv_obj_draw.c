@@ -409,14 +409,14 @@ void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
 {
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE) == false) return;
 
-    lv_scroll_dir_t sm = lv_obj_get_scroll_mode(obj);
-    if(sm == LV_SCROLL_MODE_OFF) {
+    lv_scroll_dir_t sm = lv_obj_get_scrollbar_mode(obj);
+    if(sm == LV_SCROLLBAR_MODE_OFF) {
         return;
     }
 
     /*If there is no indev scrolling this object but the moe is active return*/
     lv_indev_t * indev = lv_indev_get_next(NULL);
-    if(sm == LV_SCROLL_MODE_ACTIVE) {
+    if(sm == LV_SCROLLBAR_MODE_ACTIVE) {
         bool found = false;
         while(indev) {
             if(lv_indev_get_scroll_obj(indev) == obj) {
@@ -436,7 +436,7 @@ void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_coord_t sr = lv_obj_get_scroll_right(obj);
 
     /*Return if too small content to scroll*/
-    if(sm == LV_SCROLL_MODE_AUTO && st <= 0  && sb <= 0 && sl <= 0  && sr <= 0) {
+    if(sm == LV_SCROLLBAR_MODE_AUTO && st <= 0  && sb <= 0 && sl <= 0  && sr <= 0) {
         return;
     }
 
@@ -451,18 +451,18 @@ void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
 
     bool ver_draw = false;
     if((dir & LV_DIR_VER) &&
-       ((sm == LV_SCROLL_MODE_ON) ||
-        (sm == LV_SCROLL_MODE_AUTO && (st > 0 || sb > 0)) ||
-        (sm == LV_SCROLL_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_VER))) {
+       ((sm == LV_SCROLLBAR_MODE_ON) ||
+        (sm == LV_SCROLLBAR_MODE_AUTO && (st > 0 || sb > 0)) ||
+        (sm == LV_SCROLLBAR_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_VER))) {
         ver_draw = true;
     }
 
 
     bool hor_draw = false;
     if((dir & LV_DIR_HOR) &&
-          ((sm == LV_SCROLL_MODE_ON) ||
-           (sm == LV_SCROLL_MODE_AUTO && (sl > 0 || sr > 0)) ||
-           (sm == LV_SCROLL_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_HOR))) {
+          ((sm == LV_SCROLLBAR_MODE_ON) ||
+           (sm == LV_SCROLLBAR_MODE_AUTO && (sl > 0 || sr > 0)) ||
+           (sm == LV_SCROLLBAR_MODE_ACTIVE && lv_indev_get_scroll_dir(indev) == LV_SCROLL_DIR_HOR))) {
         hor_draw = true;
     }
 

@@ -29,12 +29,12 @@ struct _lv_obj_t;
 
 /** Scrollbar modes: shows when should the scrollbars be visible*/
 enum {
-    LV_SCROLL_MODE_OFF    = 0x0, /**< Never show scroll bars*/
-    LV_SCROLL_MODE_ON     = 0x1, /**< Always show scroll bars*/
-    LV_SCROLL_MODE_ACTIVE = 0x2, /**< Show scroll bars when object is being scrolled*/
-    LV_SCROLL_MODE_AUTO   = 0x3, /**< Show scroll bars when the content is large enough to be scrolled*/
+    LV_SCROLLBAR_MODE_OFF    = 0x0, /**< Never show scroll bars*/
+    LV_SCROLLBAR_MODE_ON     = 0x1, /**< Always show scroll bars*/
+    LV_SCROLLBAR_MODE_ACTIVE = 0x2, /**< Show scroll bars when object is being scrolled*/
+    LV_SCROLLBAR_MODE_AUTO   = 0x3, /**< Show scroll bars when the content is large enough to be scrolled*/
 };
-typedef uint8_t lv_scroll_mode_t;
+typedef uint8_t lv_scrollbar_mode_t;
 
 
 enum {
@@ -58,7 +58,7 @@ typedef uint8_t lv_snap_align_t;
  * @param obj pointer to an object
  * @param mode: LV_SCROLL_MODE_ON/OFF/AUTO/ACTIVE
  */
-void lv_obj_set_scroll_mode(struct _lv_obj_t * obj, lv_scroll_mode_t mode);
+void lv_obj_set_scrollbar_mode(struct _lv_obj_t * obj, lv_scrollbar_mode_t mode);
 
 /**
  * Set the object in which directions can be scrolled
@@ -66,6 +66,14 @@ void lv_obj_set_scroll_mode(struct _lv_obj_t * obj, lv_scroll_mode_t mode);
  * @param dir the allow scroll directions. An element or OR-ed values of `lv_dir_t`
  */
 void lv_obj_set_scroll_dir(struct _lv_obj_t * obj, lv_dir_t dir);
+
+/**
+ * If enabled do not allow scrolling on this object and do not propagate the scroll to parent
+ * @param obj pointer to an object
+ * @param en true: enable scroll freeze; false: disable
+ */
+void lv_obj_set_scroll_freeze(struct _lv_obj_t * obj, bool en);
+
 
 /**
  * Set where to snap the children when scrolling ends horizontally
@@ -90,7 +98,7 @@ void lv_obj_set_snap_align_y(struct _lv_obj_t * obj, lv_snap_align_t align);
  * @param obj pointer to an object
  * @return the current scroll mode from `lv_scroll_mode_t`
  */
-lv_scroll_mode_t lv_obj_get_scroll_mode(const struct _lv_obj_t * obj);
+lv_scrollbar_mode_t lv_obj_get_scrollbar_mode(const struct _lv_obj_t * obj);
 
 /**
  * Get the object in which directions can be scrolled
@@ -98,6 +106,13 @@ lv_scroll_mode_t lv_obj_get_scroll_mode(const struct _lv_obj_t * obj);
  * @param dir the allow scroll directions. An element or OR-ed values of `lv_dir_t`
  */
 lv_dir_t lv_obj_get_scroll_dir(const struct _lv_obj_t * obj);
+
+/**
+ * Get whether scroll freeze is enabled or not
+ * @param obj pointer to an object
+ * @return true: scroll freeze is enabled; false: disabled
+ */
+bool lv_obj_get_scroll_freeze(struct _lv_obj_t * obj);
 
 /**
  * Get where to snap the children when scrolling ends horizontally
