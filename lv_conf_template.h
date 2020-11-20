@@ -20,8 +20,8 @@
  *====================*/
 
 /* Maximal horizontal and vertical resolution to support by the library.*/
-#define LV_HOR_RES_MAX          (480)
-#define LV_VER_RES_MAX          (320)
+#define LV_HOR_RES_DEF          (480)
+#define LV_VER_RES_DEF          (320)
 
 /* Color depth:
  * - 1:  1 byte per pixel
@@ -453,10 +453,6 @@ typedef void * lv_font_user_data_t;
  * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
 #define LV_USE_THEME_EMPTY       1
 
-/*Simple to the create your theme based on it
- * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
-#define LV_USE_THEME_TEMPLATE    1
-
 /* A fast and impressive theme.
  * Flags:
  * LV_THEME_MATERIAL_FLAG_LIGHT: light theme
@@ -556,9 +552,6 @@ typedef void * lv_obj_user_data_t;
 #endif
 #endif
 
-/*1: enable `lv_obj_realign()` based on `lv_obj_align()` parameters*/
-#define LV_USE_OBJ_REALIGN          1
-
 /* Enable to make the object clickable on a larger area.
  * LV_EXT_CLICK_AREA_OFF or 0: Disable this feature
  * LV_EXT_CLICK_AREA_TINY: The extra area can be adjusted horizontally and vertically (0..255 px)
@@ -635,6 +628,9 @@ typedef void * lv_obj_user_data_t;
 
 /*Line (dependencies: -*/
 #define LV_USE_LINE     1
+
+/*Linemeter (dependencies: -*/
+#define LV_USE_LINEMETER     1
 
 /*Mask (dependencies: -)*/
 #define LV_USE_OBJMASK  1
