@@ -277,13 +277,12 @@ lv_res_t lv_img_decoder_built_in_info(lv_img_decoder_t * decoder, const void * s
     }
 #if LV_USE_FILESYSTEM
     else if(src_type == LV_IMG_SRC_FILE) {
-        lv_fs_file_t file;
-        lv_fs_res_t res;
+        lv_fs_file_t * f;
         uint32_t rn;
-        res = lv_fs_open(&file, src, LV_FS_MODE_RD);
-        if(res == LV_FS_RES_OK) {
-            res = lv_fs_read(&file, header, sizeof(lv_img_header_t), &rn);
-            lv_fs_close(&file);
+        f = lv_fs_open(src, LV_FS_MODE_RD);
+        if(f) {
+            lv_fs_res_t res = lv_fs_read(f, header, sizeof(lv_img_header_t), &rn);
+            lv_fs_close(f);
             if(res != LV_FS_RES_OK || rn != sizeof(lv_img_header_t)) {
                 LV_LOG_WARN("Image get info get read file header");
                 return LV_RES_INV;
@@ -325,9 +324,8 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         /*Support only "*.bin" files*/
         if(strcmp(lv_fs_get_ext(dsc->src), "bin")) return LV_RES_INV;
 
-        lv_fs_file_t f;
-        lv_fs_res_t res = lv_fs_open(&f, dsc->src, LV_FS_MODE_RD);
-        if(res != LV_FS_RES_OK) {
+        lv_fs_file_t * f = lv_fs_open(dsc->src, LV_FS_MODE_RD);
+        if(f == NULL) {
             LV_LOG_WARN("Built-in image decoder can't open the file");
             return LV_RES_INV;
         }
@@ -344,16 +342,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         }
 
         lv_img_decoder_built_in_data_t * user_data = dsc->user_data;
-        user_data->f = lv_mem_alloc(sizeof(f));
-        LV_ASSERT_MEM(user_data->f);
-        if(user_data->f == NULL) {
-            LV_LOG_ERROR("img_decoder_built_in_open: out of memory");
-            lv_img_decoder_built_in_close(decoder, dsc);
-            return LV_RES_INV;
-        }
-
-        _lv_memcpy_small(user_data->f, &f, sizeof(f));
-
+        user_data->f = f;
 #else
         LV_LOG_WARN("Image built-in decoder cannot read file because LV_USE_FILESYSTEM = 0");
         return LV_RES_INV;
@@ -415,7 +404,7 @@ lv_res_t lv_img_decoder_built_in_open(lv_img_decoder_t * decoder, lv_img_decoder
         if(dsc->src_type == LV_IMG_SRC_FILE) {
             /*Read the palette from file*/
 #if LV_USE_FILESYSTEM
-            lv_fs_seek(user_data->f, 4); /*Skip the header*/
+            lv_fs_seek(user_data->f, 4, LV_FS_SEEK_SET); /*Skip the header*/
             lv_color32_t cur_color;
             uint32_t i;
             for(i = 0; i < palette_size; i++) {
@@ -525,7 +514,6 @@ void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_ds
 #if LV_USE_FILESYSTEM
         if(user_data->f) {
             lv_fs_close(user_data->f);
-            lv_mem_free(user_data->f);
         }
 #endif
         if(user_data->palette) lv_mem_free(user_data->palette);
@@ -552,7 +540,7 @@ static lv_res_t lv_img_decoder_built_in_line_true_color(lv_img_decoder_dsc_t * d
 
     uint32_t pos = ((y * dsc->header.w + x) * px_size) >> 3;
     pos += 4; /*Skip the header*/
-    res = lv_fs_seek(user_data->f, pos);
+    res = lv_fs_seek(user_data->f, pos, LV_FS_SEEK_SET);
     if(res != LV_FS_RES_OK) {
         LV_LOG_WARN("Built-in image decoder seek failed");
         return LV_RES_INV;
@@ -654,7 +642,7 @@ static lv_res_t lv_img_decoder_built_in_line_alpha(lv_img_decoder_dsc_t * dsc, l
     }
     else {
 #if LV_USE_FILESYSTEM
-        lv_fs_seek(user_data->f, ofs + 4); /*+4 to skip the header*/
+        lv_fs_seek(user_data->f, ofs + 4, LV_FS_SEEK_SET); /*+4 to skip the header*/
         lv_fs_read(user_data->f, fs_buf, w, NULL);
         data_tmp = fs_buf;
 #else
@@ -740,7 +728,7 @@ static lv_res_t lv_img_decoder_built_in_line_indexed(lv_img_decoder_dsc_t * dsc,
     }
     else {
 #if LV_USE_FILESYSTEM
-        lv_fs_seek(user_data->f, ofs + 4); /*+4 to skip the header*/
+        lv_fs_seek(user_data->f, ofs + 4, LV_FS_SEEK_SET); /*+4 to skip the header*/
         lv_fs_read(user_data->f, fs_buf, w, NULL);
         data_tmp = fs_buf;
 #else
