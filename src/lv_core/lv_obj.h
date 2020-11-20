@@ -725,7 +725,7 @@ lv_obj_user_data_t lv_obj_get_user_data(const lv_obj_t * obj);
  * @param obj pointer to an object
  * @return pointer to the user data
  */
-lv_obj_user_data_t * lv_obj_get_user_data_ptr(const lv_obj_t * obj);
+lv_obj_user_data_t * lv_obj_get_user_data_ptr(lv_obj_t * obj);
 
 /**
  * Set the object's user data. The data will be copied.
