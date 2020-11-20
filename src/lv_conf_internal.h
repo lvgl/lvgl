@@ -52,18 +52,18 @@
  *====================*/
 
 /* Maximal horizontal and vertical resolution to support by the library.*/
-#ifndef LV_HOR_RES_MAX
-#  ifdef CONFIG_LV_HOR_RES_MAX
-#    define LV_HOR_RES_MAX CONFIG_LV_HOR_RES_MAX
+#ifndef LV_HOR_RES_DEF
+#  ifdef CONFIG_LV_HOR_RES_DEF
+#    define LV_HOR_RES_DEF CONFIG_LV_HOR_RES_DEF
 #  else
-#    define  LV_HOR_RES_MAX          (480)
+#    define  LV_HOR_RES_DEF          (480)
 #  endif
 #endif
-#ifndef LV_VER_RES_MAX
-#  ifdef CONFIG_LV_VER_RES_MAX
-#    define LV_VER_RES_MAX CONFIG_LV_VER_RES_MAX
+#ifndef LV_VER_RES_DEF
+#  ifdef CONFIG_LV_VER_RES_DEF
+#    define LV_VER_RES_DEF CONFIG_LV_VER_RES_DEF
 #  else
-#    define  LV_VER_RES_MAX          (320)
+#    define  LV_VER_RES_DEF          (320)
 #  endif
 #endif
 
@@ -1149,16 +1149,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-/*Simple to the create your theme based on it
- * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
-#ifndef LV_USE_THEME_TEMPLATE
-#  ifdef CONFIG_LV_USE_THEME_TEMPLATE
-#    define LV_USE_THEME_TEMPLATE CONFIG_LV_USE_THEME_TEMPLATE
-#  else
-#    define  LV_USE_THEME_TEMPLATE    1
-#  endif
-#endif
-
 /* A fast and impressive theme.
  * Flags:
  * LV_THEME_MATERIAL_FLAG_LIGHT: light theme
@@ -1392,6 +1382,24 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #endif  /*LV_SPRINTF_CUSTOM*/
 
+/*=================
+ * STYLE SETTINGS
+ *================*/
+
+/* Enable/Disable caching some information about the most common style properties.
+ * Results in faster drawing but has some memory cost per object per part.
+ * LEVEL 0: no caching
+ * LEVEL 1: mark if a property is different from its default value (uses 4 extra byte)
+ * LEVEL 2: LEVEL 1 + cache the value of some common properties (uses 8 extra bytes)
+ */
+#ifndef LV_STYLE_CACHE_LEVEL
+#  ifdef CONFIG_LV_STYLE_CACHE_LEVEL
+#    define LV_STYLE_CACHE_LEVEL CONFIG_LV_STYLE_CACHE_LEVEL
+#  else
+#    define  LV_STYLE_CACHE_LEVEL   0   /*Cache level*/
+#  endif
+#endif
+
 /*===================
  *  LV_OBJ SETTINGS
  *==================*/
@@ -1423,15 +1431,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 #endif
-#endif
-
-/*1: enable `lv_obj_realign()` based on `lv_obj_align()` parameters*/
-#ifndef LV_USE_OBJ_REALIGN
-#  ifdef CONFIG_LV_USE_OBJ_REALIGN
-#    define LV_USE_OBJ_REALIGN CONFIG_LV_USE_OBJ_REALIGN
-#  else
-#    define  LV_USE_OBJ_REALIGN          1
-#  endif
 #endif
 
 /* Enable to make the object clickable on a larger area.
@@ -1637,6 +1636,30 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
+/*Linemeter (dependencies: -*/
+#ifndef LV_USE_LINEMETER
+#  ifdef CONFIG_LV_USE_LINEMETER
+#    define LV_USE_LINEMETER CONFIG_LV_USE_LINEMETER
+#  else
+#    define  LV_USE_LINEMETER     1
+#  endif
+#endif
+#if LV_USE_LINEMETER
+
+/* Set how precisely should the lines of the line meter be calculated.
+ * Higher precision means slower rendering.
+ * 0: normal
+ * 1: extra precision in the inner ring
+ * 2. extra precision on the outer ring too
+ */
+#ifndef LV_LINEMETER_PRECISE
+#  ifdef CONFIG_LV_LINEMETER_PRECISE
+#    define LV_LINEMETER_PRECISE CONFIG_LV_LINEMETER_PRECISE
+#  else
+#    define  LV_LINEMETER_PRECISE  1
+#  endif
+#endif
+#endif
 /*Mask (dependencies: -)*/
 #ifndef LV_USE_OBJMASK
 #  ifdef CONFIG_LV_USE_OBJMASK
@@ -1741,7 +1764,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 #endif
-
 
 /*==================
  * Non-user section

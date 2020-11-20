@@ -309,6 +309,8 @@ void _lv_obj_remove_style_trans(lv_obj_t * obj);
 void _lv_obj_create_style_transition(lv_obj_t * obj, lv_style_property_t prop, uint8_t part, lv_state_t prev_state,
                                        lv_state_t new_state, uint32_t time, uint32_t delay, lv_anim_path_t * path);
 
+#endif
+
 /**
  * Compare the style properties of an object in 2 different states
  * @param obj pointer to an object
@@ -318,7 +320,6 @@ void _lv_obj_create_style_transition(lv_obj_t * obj, lv_style_property_t prop, u
  */
 _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2);
 
-#endif
 
 
 /**********************

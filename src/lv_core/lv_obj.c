@@ -624,10 +624,10 @@ void lv_obj_set_ext_click_area(lv_obj_t * obj, lv_coord_t left, lv_coord_t right
 
 #if LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_FULL
     if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
-    objrare_attr->->ext_click_pad.x1 = left;
-    objrare_attr->->ext_click_pad.x2 = right;
-    objrare_attr->->ext_click_pad.y1 = top;
-    objrare_attr->->ext_click_pad.y2 = bottom;
+    obj->spec_attr->ext_click_pad.x1 = left;
+    obj->spec_attr->ext_click_pad.x2 = right;
+    obj->spec_attr->ext_click_pad.y1 = top;
+    obj->spec_attr->ext_click_pad.y2 = bottom;
 #elif LV_USE_EXT_CLICK_AREA == LV_EXT_CLICK_AREA_TINY
     if(obj->spec_attr == NULL) lv_obj_allocate_spec_attr(obj);
     obj->spec_attr->ext_click_pad = LV_MATH_MAX4(left, right, top, bottom);
@@ -1255,13 +1255,13 @@ lv_coord_t lv_obj_get_ext_click_area(const lv_obj_t * obj, lv_dir_t dir)
 #else
     switch(dir) {
     case LV_DIR_LEFT:
-        return obj->ext_click_pad.x1;
+        return obj->spec_attr->ext_click_pad.x1;
     case LV_DIR_RIGHT:
-        return obj->ext_click_pad.x2;
+        return obj->spec_attr->ext_click_pad.x2;
     case LV_DIR_TOP:
-        return obj->ext_click_pad.y1;
+        return obj->spec_attr->ext_click_pad.y1;
     case LV_DIR_BOTTOM:
-        return obj->ext_click_pad.y2;
+        return obj->spec_attr->ext_click_pad.y2;
     default:
         return 0;
     }
@@ -1406,8 +1406,6 @@ lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj)
  */
 void * lv_obj_get_ext_attr(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
     return obj->ext_attr;
 }
 

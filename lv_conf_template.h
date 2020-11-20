@@ -536,6 +536,18 @@ typedef void * lv_font_user_data_t;
 #  define LV_SPRINTF_DISABLE_FLOAT 1
 #endif  /*LV_SPRINTF_CUSTOM*/
 
+/*=================
+ * STYLE SETTINGS
+ *================*/
+
+/* Enable/Disable caching some information about the most common style properties.
+ * Results in faster drawing but has some memory cost per object per part.
+ * LEVEL 0: no caching
+ * LEVEL 1: mark if a property is different from its default value (uses 4 extra byte)
+ * LEVEL 2: LEVEL 1 + cache the value of some common properties (uses 8 extra bytes)
+ */
+#define LV_STYLE_CACHE_LEVEL   0   /*Cache level*/
+
 /*===================
  *  LV_OBJ SETTINGS
  *==================*/
@@ -631,7 +643,16 @@ typedef void * lv_obj_user_data_t;
 
 /*Linemeter (dependencies: -*/
 #define LV_USE_LINEMETER     1
+#if LV_USE_LINEMETER
 
+/* Set how precisely should the lines of the line meter be calculated.
+ * Higher precision means slower rendering.
+ * 0: normal
+ * 1: extra precision in the inner ring
+ * 2. extra precision on the outer ring too
+ */
+#  define LV_LINEMETER_PRECISE  1
+#endif
 /*Mask (dependencies: -)*/
 #define LV_USE_OBJMASK  1
 

@@ -242,28 +242,6 @@ static void btnmatrix_init(void)
 #endif
 }
 
-
-static void calendar_init(void)
-{
-#if LV_USE_CALENDAR
-    style_init_reset(&styles->calendar_date);
-    lv_style_set_value_str(&styles->calendar_date, LV_STATE_CHECKED, LV_SYMBOL_BULLET);
-    lv_style_set_value_font(&styles->calendar_date, LV_STATE_CHECKED, LV_THEME_DEFAULT_FONT_TITLE);
-    lv_style_set_value_align(&styles->calendar_date, LV_STATE_CHECKED, LV_ALIGN_IN_TOP_RIGHT);
-    lv_style_set_value_color(&styles->calendar_date, LV_STATE_CHECKED, FG_COLOR);
-    lv_style_set_value_ofs_y(&styles->calendar_date, LV_STATE_CHECKED,
-                             - lv_font_get_line_height(LV_THEME_DEFAULT_FONT_TITLE) / 4);
-    lv_style_set_bg_color(&styles->calendar_date, LV_STATE_CHECKED, BG_COLOR);
-    lv_style_set_text_color(&styles->calendar_date, LV_STATE_CHECKED, FG_COLOR);
-    lv_style_set_value_color(&styles->calendar_date, LV_STATE_CHECKED | LV_STATE_PRESSED, BG_COLOR);
-    lv_style_set_bg_color(&styles->calendar_date, LV_STATE_CHECKED | LV_STATE_PRESSED, FG_COLOR);
-    lv_style_set_text_color(&styles->calendar_date, LV_STATE_CHECKED | LV_STATE_PRESSED, BG_COLOR);
-    lv_style_set_border_width(&styles->calendar_date, LV_STATE_FOCUSED, BORDER_WIDTH);
-    lv_style_set_pad_inner(&styles->calendar_date, LV_STATE_DEFAULT, LV_MATH_MAX(LV_DPI / 100, 1));
-
-#endif
-}
-
 static void chart_init(void)
 {
 #if LV_USE_CHART
@@ -275,29 +253,12 @@ static void chart_init(void)
 #endif
 }
 
-
-static void cpicker_init(void)
-{
-#if LV_USE_CPICKER
-
-#endif
-}
-
 static void checkbox_init(void)
 {
 #if LV_USE_CHECKBOX != 0
 
 #endif
 }
-
-
-static void cont_init(void)
-{
-#if LV_USE_CONT != 0
-
-#endif
-}
-
 
 static void gauge_init(void)
 {
@@ -351,20 +312,6 @@ static void line_init(void)
 #endif
 }
 
-static void led_init(void)
-{
-#if LV_USE_LED != 0
-
-#endif
-}
-
-static void page_init(void)
-{
-#if LV_USE_PAGE
-
-#endif
-}
-
 static void slider_init(void)
 {
 #if LV_USE_SLIDER != 0
@@ -379,36 +326,6 @@ static void switch_init(void)
 #endif
 }
 
-
-static void spinbox_init(void)
-{
-#if LV_USE_SPINBOX
-
-#endif
-}
-
-
-static void spinner_init(void)
-{
-#if LV_USE_SPINNER != 0
-
-#endif
-}
-
-static void keyboard_init(void)
-{
-#if LV_USE_KEYBOARD
-
-#endif
-}
-
-static void msgbox_init(void)
-{
-#if LV_USE_MSGBOX
-
-#endif
-}
-
 static void textarea_init(void)
 {
 #if LV_USE_TEXTAREA
@@ -418,18 +335,6 @@ static void textarea_init(void)
     lv_style_set_border_side(&styles->ta_cursor, LV_STATE_DEFAULT, LV_BORDER_SIDE_LEFT);
     lv_style_set_border_color(&styles->ta_cursor, LV_STATE_DEFAULT, FG_COLOR);
 
-#endif
-}
-
-static void list_init(void)
-{
-#if LV_USE_LIST != 0
-    style_init_reset(&styles->list_btn);
-    lv_style_set_bg_opa(&styles->list_btn, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-    lv_style_set_bg_opa(&styles->list_btn, LV_STATE_PRESSED, LV_OPA_COVER);
-    lv_style_set_bg_opa(&styles->list_btn, LV_STATE_CHECKED, LV_OPA_COVER);
-    lv_style_set_radius(&styles->list_btn, LV_STATE_DEFAULT, 0);
-    lv_style_set_border_side(&styles->list_btn, LV_STATE_DEFAULT, LV_BORDER_SIDE_BOTTOM);
 #endif
 }
 
@@ -447,37 +352,12 @@ static void roller_init(void)
 #endif
 }
 
-static void tabview_init(void)
-{
-#if LV_USE_TABVIEW != 0
-    style_init_reset(&styles->tab_bg);
-    lv_style_set_border_width(&styles->tab_bg, LV_STATE_DEFAULT, BORDER_WIDTH);
-    lv_style_set_border_color(&styles->tab_bg, LV_STATE_DEFAULT, FG_COLOR);
-    lv_style_set_border_side(&styles->tab_bg, LV_STATE_DEFAULT, LV_BORDER_SIDE_BOTTOM);
-
-#endif
-}
-
-static void tileview_init(void)
-{
-#if LV_USE_TILEVIEW != 0
-#endif
-}
-
 static void table_init(void)
 {
 #if LV_USE_TABLE != 0
 
 #endif
 }
-
-static void win_init(void)
-{
-#if LV_USE_WIN != 0
-
-#endif
-}
-
 
 /**********************
  *   GLOBAL FUNCTIONS
@@ -516,36 +396,23 @@ lv_theme_t * lv_theme_mono_init(lv_color_t color_primary, lv_color_t color_secon
     theme.flags = flags;
 
     basic_init();
-    cont_init();
     btn_init();
     label_init();
     bar_init();
     img_init();
     line_init();
-    led_init();
     slider_init();
     switch_init();
     linemeter_init();
     gauge_init();
     arc_init();
-    spinner_init();
     chart_init();
-    calendar_init();
-    cpicker_init();
     checkbox_init();
     btnmatrix_init();
-    keyboard_init();
-    msgbox_init();
-    page_init();
     textarea_init();
-    spinbox_init();
-    list_init();
     ddlist_init();
     roller_init();
-    tabview_init();
-    tileview_init();
     table_init();
-    win_init();
 
     theme.apply_xcb = NULL;
     theme.apply_cb = theme_apply;

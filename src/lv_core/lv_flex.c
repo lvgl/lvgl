@@ -314,7 +314,7 @@ static void children_repos(lv_obj_t * cont, lv_obj_t * item_first, lv_obj_t * it
     lv_ll_t * ll = _lv_obj_get_child_ll(cont);
     lv_coord_t main_pos = 0;
 
-    lv_coord_t place_gap;
+    lv_coord_t place_gap = 0;
     place_content(main_place, max_main_size, t->track_main_size, t->item_cnt, &main_pos, &place_gap);
     /*Reposition the children*/
     lv_obj_t * item = item_first;   /*Just to use a shorter name*/

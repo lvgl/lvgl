@@ -23,8 +23,10 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+#if LV_USE_ANIMATION
 static void scroll_anim_x_cb(lv_obj_t * obj, lv_anim_value_t v);
 static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v);
+#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -223,12 +225,17 @@ lv_coord_t lv_obj_get_scroll_right(lv_obj_t * obj)
 
 void lv_obj_get_scroll_end(struct _lv_obj_t  * obj, lv_point_t * end)
 {
+#if LV_USE_ANIMATION
     lv_anim_t * a;
     a = lv_anim_get(obj, (lv_anim_exec_xcb_t)scroll_anim_x_cb);
     end->x = a ? -a->end : lv_obj_get_scroll_x(obj);
 
     a = lv_anim_get(obj, (lv_anim_exec_xcb_t)scroll_anim_y_cb);
     end->y = a ? -a->end : lv_obj_get_scroll_y(obj);
+#else
+    end->x = lv_obj_get_scroll_x(obj);
+    end->y = lv_obj_get_scroll_y(obj);
+#endif
 }
 
 /*=====================
@@ -254,8 +261,11 @@ void _lv_obj_scroll_by_raw(lv_obj_t * obj, lv_coord_t x, lv_coord_t y)
 void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable_t anim_en)
 {
     if(x == 0 && y == 0) return;
-
+#if LV_USE_ANIMATION == 0
+    anim_en = LV_ANIM_OFF;
+#endif
     if(anim_en == LV_ANIM_ON) {
+#if LV_USE_ANIMATION
         lv_disp_t * d = lv_obj_get_disp(obj);
         lv_anim_t a;
         lv_anim_init(&a);
@@ -288,6 +298,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
             lv_anim_set_path(&a, &path);
             lv_anim_start(&a);
         }
+#endif
     } else {
         _lv_obj_scroll_by_raw(obj, x, y);
     }
@@ -313,6 +324,7 @@ void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
  *   STATIC FUNCTIONS
  **********************/
 
+#if LV_USE_ANIMATION
 static void scroll_anim_x_cb(lv_obj_t * obj, lv_anim_value_t v)
 {
     _lv_obj_scroll_by_raw(obj, v + lv_obj_get_scroll_x(obj), 0);
@@ -322,3 +334,4 @@ static void scroll_anim_y_cb(lv_obj_t * obj, lv_anim_value_t v)
 {
     _lv_obj_scroll_by_raw(obj, 0, v + lv_obj_get_scroll_y(obj));
 }
+#endif

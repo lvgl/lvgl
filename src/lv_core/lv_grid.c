@@ -28,7 +28,7 @@ typedef struct {
  **********************/
 static void calc_cols(lv_obj_t * cont, _lv_grid_calc_t * calc);
 static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * calc);
-static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc, item_repos_hint_t * hint);
+static void item_repos(lv_obj_t * item, _lv_grid_calc_t * calc, item_repos_hint_t * hint);
 static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t place, lv_coord_t gap, uint32_t track_num, lv_coord_t * size_array, lv_coord_t * pos_array, bool reverse);
 static void report_grid_change_core(const lv_grid_t * grid, lv_obj_t * obj);
 
@@ -231,7 +231,7 @@ void _lv_grid_full_refresh(lv_obj_t * cont)
     lv_obj_t * item = lv_obj_get_child_back(cont, NULL);
     while(item) {
         if(LV_COORD_IS_GRID(item->x_set) && LV_COORD_IS_GRID(item->y_set)) {
-            item_repos(cont, item, &calc, &hint);
+            item_repos(item, &calc, &hint);
         }
         item = lv_obj_get_child_back(cont, item);
     }
@@ -256,7 +256,7 @@ void lv_grid_item_refr_pos(lv_obj_t * item)
     _lv_grid_calc_t calc;
     _lv_grid_calc(cont, &calc);
 
-    item_repos(cont, item, &calc, NULL);
+    item_repos(item, &calc, NULL);
 
     _lv_grid_calc_free(&calc);
 }
@@ -345,13 +345,12 @@ static void calc_rows(lv_obj_t * cont, _lv_grid_calc_t * calc)
 
 /**
  * Reposition a grid item in its cell
- * @param cont a grid container object
  * @param item a grid item to reposition
  * @param calc the calculated grid of `cont`
  * @param child_id_ext helper value if the ID of the child is know (order from the oldest) else -1
  * @param grid_abs helper value, the absolute position of the grid, NULL if unknown
  */
-static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc, item_repos_hint_t * hint)
+static void item_repos(lv_obj_t * item, _lv_grid_calc_t * calc, item_repos_hint_t * hint)
 {
     if(_lv_obj_is_grid_item(item) == false) return;
 
@@ -388,6 +387,7 @@ static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc,
     lv_coord_t margin_right = lv_obj_get_style_margin_right(item, LV_OBJ_PART_MAIN);
 
     switch(x_flag) {
+        default:
         case LV_GRID_START:
             x = calc->x[col_pos] + margin_left;
             break;
@@ -405,6 +405,7 @@ static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc,
     }
 
     switch(y_flag) {
+        default:
         case LV_GRID_START:
             y = calc->y[row_pos] + margin_top;
             break;
@@ -455,7 +456,7 @@ static void item_repos(lv_obj_t * cont, lv_obj_t * item, _lv_grid_calc_t * calc,
 static lv_coord_t grid_place(lv_coord_t cont_size,  bool auto_size, uint8_t place, lv_coord_t gap, uint32_t track_num, lv_coord_t * size_array, lv_coord_t * pos_array, bool reverse)
 {
     lv_coord_t grid_size = 0;
-    int32_t i;
+    uint32_t i;
 
     if(auto_size) {
         pos_array[0] = 0;

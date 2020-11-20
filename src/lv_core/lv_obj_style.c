@@ -84,17 +84,17 @@ static void trans_del(lv_obj_t * obj, uint8_t part, lv_style_property_t prop, lv
 static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v);
 static void trans_anim_start_cb(lv_anim_t * a);
 static void trans_anim_ready_cb(lv_anim_t * a);
+static void fade_anim_cb(lv_obj_t * obj, lv_anim_value_t v);
+static void fade_in_anim_ready(lv_anim_t * a);
+#endif
 static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot);
 static _lv_style_state_cmp_t style_snapshot_compare(style_snapshot_t * shot1, style_snapshot_t * shot2);
-#endif
 
 #if LV_STYLE_CACHE_LEVEL >= 1
 static bool style_prop_is_cacheable(lv_style_property_t prop);
 static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop);
 static void update_style_cache_children(lv_obj_t * obj);
 #endif
-static void fade_anim_cb(lv_obj_t * obj, lv_anim_value_t v);
-static void fade_in_anim_ready(lv_anim_t * a);
 
 /**********************
  *  STATIC VARIABLES
@@ -839,6 +839,8 @@ void _lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t pro
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 #if LV_STYLE_CACHE_LEVEL >= 1
     _lv_obj_invalidate_style_cache(obj, part, prop);
+#else
+    LV_UNUSED(part);
 #endif
 
     /*If a real style refresh is required*/
@@ -915,7 +917,11 @@ void _lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t pro
  */
 void _lv_obj_remove_style_trans(lv_obj_t * obj)
 {
+#if LV_USE_ANIMATION
     trans_del(obj, 0xFF, 0xFF, NULL);
+#else
+    LV_UNUSED(obj);
+#endif
 }
 
 #if LV_USE_ANIMATION
@@ -1263,6 +1269,18 @@ static void trans_anim_ready_cb(lv_anim_t * a)
     lv_mem_free(tr);
 }
 
+static void fade_anim_cb(lv_obj_t * obj, lv_anim_value_t v)
+{
+    lv_obj_set_style_local_opa_scale(obj, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, v);
+}
+
+static void fade_in_anim_ready(lv_anim_t * a)
+{
+    lv_style_remove_prop(_lv_obj_get_local_style(a->var, LV_OBJ_PART_MAIN), LV_STYLE_OPA_SCALE);
+}
+
+#endif
+
 static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot)
 {
     _lv_obj_disable_style_caching(obj, true);
@@ -1337,7 +1355,7 @@ static _lv_style_state_cmp_t style_snapshot_compare(style_snapshot_t * shot1, st
     /*If not returned earlier its just a visual difference, a simple redraw is enough*/
     return _LV_STYLE_STATE_CMP_VISUAL_DIFF;
 }
-#endif
+
 
 #if LV_STYLE_CACHE_LEVEL >= 1
 
@@ -1524,13 +1542,3 @@ static void update_style_cache_children(lv_obj_t * obj)
 
 #endif /*LV_STYLE_CACHE_LEVEL >= 1*/
 
-
-static void fade_anim_cb(lv_obj_t * obj, lv_anim_value_t v)
-{
-    lv_obj_set_style_local_opa_scale(obj, LV_OBJ_PART_MAIN, LV_STATE_DEFAULT, v);
-}
-
-static void fade_in_anim_ready(lv_anim_t * a)
-{
-    lv_style_remove_prop(_lv_obj_get_local_style(a->var, LV_OBJ_PART_MAIN), LV_STYLE_OPA_SCALE);
-}

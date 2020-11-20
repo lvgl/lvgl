@@ -223,7 +223,6 @@ uint32_t lv_theme_get_flags(void);
  *     POST INCLUDE
  *********************/
 #include "lv_theme_empty.h"
-#include "lv_theme_template.h"
 #include "lv_theme_material.h"
 #include "lv_theme_mono.h"
 

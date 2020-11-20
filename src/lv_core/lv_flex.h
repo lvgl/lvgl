@@ -144,6 +144,12 @@ lv_flex_place_t lv_obj_get_flex_item_place(const struct _lv_obj_t * obj);
 lv_flex_place_t lv_obj_get_flex_track_place(const struct _lv_obj_t * obj);
 
 /**
+ * Get the minimal gap between flex item in the main direction
+ * @param obj pointer to a flex container
+ * @return the gap
+ */
+lv_coord_t lv_obj_get_flex_gap(const struct _lv_obj_t * obj);
+/**
  * Get how the flex item is placed in its track in the cross direction.
  * For ROW direction it means how the item is placed vertically in its row.
  * For COLUMN direction it means how the item is placed horizontally in its column.

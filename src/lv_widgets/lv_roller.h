@@ -151,7 +151,12 @@ lv_label_align_t lv_roller_get_align(const lv_obj_t * roller);
  */
 const char * lv_roller_get_options(const lv_obj_t * roller);
 
-
+/**
+ * Get the animation time of the roller
+ * @param roller pointer to a roller object
+ * @return the animation time in milliseconds
+ */
+uint32_t lv_roller_get_anim_time(lv_obj_t * roller);
 
 /**********************
  *      MACROS

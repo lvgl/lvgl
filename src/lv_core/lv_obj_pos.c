@@ -266,8 +266,8 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
 
     LV_ASSERT_OBJ(base, LV_OBJX_NAME);
 
-    lv_coord_t x;
-    lv_coord_t y;
+    lv_coord_t x = 0;
+    lv_coord_t y = 0;
     switch(align) {
     case LV_ALIGN_CENTER:
         x = lv_obj_get_width(base) / 2 - lv_obj_get_width(obj) / 2;

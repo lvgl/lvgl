@@ -133,7 +133,7 @@ void lv_checkbox_set_text_static(lv_obj_t * cb, const char * txt)
 
     if(!ext->static_txt) lv_mem_free(ext->txt);
 
-    ext->txt = txt;
+    ext->txt = (char*)txt;
     ext->static_txt = 1;
 
     _lv_obj_handle_self_size_chg(cb);
