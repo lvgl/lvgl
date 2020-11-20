@@ -5,7 +5,7 @@ This is a summary for thenew fatures of the major releases and a collection of i
 This list indicates only the current intention and can be changed.
 
 ## v8
-Planned to September/October 2020
+Planned to November/December 2020
 - Create an `lv_components` repository for compley widgets
    - It makes the core LVGL leaner
    - In `lv_components` we can have a lot and specific widgets
