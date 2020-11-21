@@ -211,6 +211,13 @@ static uint32_t lv_ap_get_char_index(uint16_t c)
     for(uint8_t i = 0; ap_chars_map[i].char_end_form; i++) {
         if(c == (ap_chars_map[i].char_offset + LV_AP_ALPHABET_BASE_CODE))
             return i;
+        else if (c == ap_chars_map[i].char_end_form                                                 //is it an End form
+                || c == (ap_chars_map[i].char_end_form + ap_chars_map[i].char_begining_form_offset)     //is it a Begining form
+                || c == (ap_chars_map[i].char_end_form + ap_chars_map[i].char_middle_form_offset)       //is it a middle form
+                || c == (ap_chars_map[i].char_end_form + ap_chars_map[i].char_isolated_form_offset))    //is it an isolated form
+        {
+            return i;
+        }
     }
     return LV_UNDEF_ARABIC_PERSIAN_CHARS;
 }
