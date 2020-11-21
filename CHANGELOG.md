@@ -9,6 +9,7 @@
 
 ### Bugfixes
 - fix(btnmatrix) handle arabic texts in button matrices
+- fix(indev) disabled object shouldn't absorb clicks but let the parent to be clicked
 
 ## v7.7.2 (Planned to 17.11.2020)
 ### Bugfixes
