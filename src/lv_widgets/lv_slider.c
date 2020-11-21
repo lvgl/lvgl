@@ -59,7 +59,7 @@ static lv_signal_cb_t ancestor_signal;
  *             Pointer to an other slider to copy.
  * @return pointer to the created slider
  */
-lv_obj_t * lv_slider_create(lv_obj_t * parent, lv_obj_t * copy)
+lv_obj_t * lv_slider_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     LV_LOG_TRACE("slider create started");
 
