@@ -53,7 +53,7 @@ menu "LVGL configuration"
             Requires `LV_COLOR_DEPTH = 32` colors and the screen's style
             should be modified: `style.body.opa = ...`.
 
-    config LV_COLOR_TRANSP
+    config LV_COLOR_TRANSP_HEX
         hex "Images pixels with this color will not be drawn (with chroma keying)."
         depends on LV_COLOR_SCREEN_TRANSP
         range 0x000000 0xFFFFFF
