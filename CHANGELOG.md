@@ -10,6 +10,8 @@
 ### Bugfixes
 - fix(btnmatrix) handle arabic texts in button matrices
 - fix(indev) disabled object shouldn't absorb clicks but let the parent to be clicked
+- fix(arabic) support processing again already processed texts with _lv_txt_ap_proc
+- fix(textarea) support Arabic letter connections
 
 ## v7.7.2 (Planned to 17.11.2020)
 ### Bugfixes

@@ -151,11 +151,8 @@ void lv_label_set_text(lv_obj_t * label, const char * text)
 
     lv_label_ext_t * ext = lv_obj_get_ext_attr(label);
 
-    /*If text is NULL then refresh */
-    if(text == NULL) {
-        lv_label_refr_text(label);
-        return;
-    }
+    /*If text is NULL then just refresh with the current text */
+    if(text == NULL) text = ext->text;
 
     LV_ASSERT_STR(text);
 
@@ -928,7 +925,7 @@ void lv_label_ins_text(lv_obj_t * label, uint32_t pos, const char * txt)
 #else
     _lv_txt_ins(ext->text, pos, txt);
 #endif
-    lv_label_refr_text(label);
+    lv_label_set_text(label, NULL);
 }
 
 /**
