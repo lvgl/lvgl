@@ -11,6 +11,7 @@ LVGL provides everything you need to create embedded GUI with easy-to-use graphi
 <h4 align="center">
 <a href="https://lvgl.io">Website </a> &middot; 
 <a href="https://lvgl.io/demos">Online demo</a> &middot; 
+<a href="https://lvgl.github.io/lv_examples/">Nightly demos</a> &middot; 
 <a href="https://docs.lvgl.io/">Docs</a> &middot; 
 <a href="https://forum.lvgl.io">Forum</a>
 </h4>
