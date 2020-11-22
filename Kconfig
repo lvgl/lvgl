@@ -327,7 +327,7 @@ menu "LVGL configuration"
                 bool "Enable Montserrat 12"
             config LV_FONT_MONTSERRAT_14
                 bool "Enable Montserrat 14"
-                default y
+                default y if !LV_CONF_MINIMAL
             config LV_FONT_MONTSERRAT_16
                 bool "Enable Montserrat 16"
             config LV_FONT_MONTSERRAT_18
@@ -364,6 +364,7 @@ menu "LVGL configuration"
                 bool "Enable Montserrat 48"
             config LV_FONT_UNSCII_8
                 bool "Enable UNSCII 8 (Perfect monospace font)"
+                default y if LV_CONF_MINIMAL
             config LV_FONT_UNSCII_16
                 bool "Enable UNSCII 16 (Perfect monospace font)"
             config LV_FONT_MONTSERRAT12SUBPX
@@ -378,7 +379,8 @@ menu "LVGL configuration"
 
         choice LV_FONT_DEFAULT_SMALL
             prompt "Select theme default small font"
-            default LV_FONT_DEFAULT_SMALL_MONTSERRAT_16
+            default LV_FONT_DEFAULT_SMALL_MONTSERRAT_16 if !LV_CONF_MINIMAL
+            default LV_FONT_DEFAULT_SMALL_UNSCII_8 if LV_CONF_MINIMAL
             help
                 Select theme default small font
 
@@ -467,7 +469,8 @@ menu "LVGL configuration"
         
         choice LV_FONT_DEFAULT_NORMAL
             prompt "Select theme default normal font"
-            default LV_FONT_DEFAULT_NORMAL_MONTSERRAT_16
+            default LV_FONT_DEFAULT_NORMAL_MONTSERRAT_16 if !LV_CONF_MINIMAL
+            default LV_FONT_DEFAULT_NORMAL_UNSCII_8 if LV_CONF_MINIMAL
             help
                 Select theme default normal font
 
@@ -556,7 +559,8 @@ menu "LVGL configuration"
         
         choice LV_FONT_DEFAULT_SUBTITLE
             prompt "Select theme default subtitle font"
-            default LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_16
+            default LV_FONT_DEFAULT_SUBTITLE_MONTSERRAT_16 if !LV_CONF_MINIMAL
+            default LV_FONT_DEFAULT_SUBTITLE_UNSCII_8 if LV_CONF_MINIMAL
             help
                 Select theme default subtitle font
 
@@ -645,7 +649,8 @@ menu "LVGL configuration"
         
         choice LV_FONT_DEFAULT_TITLE
             prompt "Select theme default title font"
-            default LV_FONT_DEFAULT_TITLE_MONTSERRAT_16
+            default LV_FONT_DEFAULT_TITLE_MONTSERRAT_16 if !LV_CONF_MINIMAL
+            default LV_FONT_DEFAULT_TITLE_UNSCII_8 if LV_CONF_MINIMAL
             help
                 Select theme default title font
 
@@ -746,7 +751,8 @@ menu "LVGL configuration"
 
         choice LV_THEME_DEFAULT_INIT
             prompt "Select theme default init"
-            default LV_THEME_DEFAULT_INIT_MATERIAL
+            default LV_THEME_DEFAULT_INIT_MATERIAL if !LV_CONF_MINIMAL
+            default LV_THEME_DEFAULT_INIT_EMPTY if LV_CONF_MINIMAL
             help
                 Select theme default init
 
