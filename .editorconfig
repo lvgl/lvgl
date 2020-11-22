@@ -1,4 +1,4 @@
-[*.{c,h}]
+[*.{c,h,ino}]
 indent_style = space
 indent_size = 4
 end_of_line = lf
