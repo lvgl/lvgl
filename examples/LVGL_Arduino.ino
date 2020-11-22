@@ -92,7 +92,7 @@ void setup()
 
     /* Set the touchscreen calibration data,
      the actual data for your display can be aquired using
-     the Generich -> Touch_calibrate example from the TFT_eSPI library */
+     the Generic -> Touch_calibrate example from the TFT_eSPI library */
     uint16_t calData[5] = {275, 3620, 264, 3532, 1};
     tft.setTouch(calData);
 
