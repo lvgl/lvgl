@@ -1,8 +1,9 @@
 #include <lvgl.h>
 #include <TFT_eSPI.h>
 /* If you want to use the LVGL examples,
-   make sure to install the lv_examples Arduino library */
-#include <lv_examples.h>
+   make sure to install the lv_examples Arduino library
+   and uncomment the following line.
+#include <lv_examples.h> */
 
 TFT_eSPI tft = TFT_eSPI(); /* TFT instance */
 static lv_disp_buf_t disp_buf;
@@ -114,9 +115,9 @@ void setup()
     indev_drv.read_cb = my_touchpad_read;
     lv_indev_drv_register(&indev_drv);
 
-    /* Try an example from the lv_examples repository
-     https://github.com/lvgl/lv_examples */
-    lv_ex_btn_1();
+    /* Try an example from the lv_examples Arduino library
+       make sure to include it as written above.
+    lv_ex_btn_1(); */
 }
 
 void loop()
