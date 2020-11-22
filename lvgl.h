@@ -68,8 +68,6 @@ extern "C" {
 
 #include "src/lv_api_map.h"
 
-//#define LV_BUILD_TEST 1
-
 /*********************
  *      DEFINES
  *********************/
