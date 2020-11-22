@@ -108,9 +108,9 @@ enum {
  * Macros for all existing  color depths
  * to set/get values of the color channels
  *------------------------------------------*/
-# define LV_COLOR_SET_R1(c, v) (c).ch.red = (uint8_t)((v) & 0x1);
-# define LV_COLOR_SET_G1(c, v) (c).ch.green = (uint8_t)((v) & 0x1);
-# define LV_COLOR_SET_B1(c, v) (c).ch.blue = (uint8_t)((v) & 0x1);
+# define LV_COLOR_SET_R1(c, v) (c).ch.red = (uint8_t)((v) & 0x1)
+# define LV_COLOR_SET_G1(c, v) (c).ch.green = (uint8_t)((v) & 0x1)
+# define LV_COLOR_SET_B1(c, v) (c).ch.blue = (uint8_t)((v) & 0x1)
 # define LV_COLOR_SET_A1(c, v)
 
 # define LV_COLOR_GET_R1(c) (c).ch.red
