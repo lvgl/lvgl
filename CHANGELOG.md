@@ -1,6 +1,6 @@
 # Changelog
 
-## v7.8.0 (01.12.2020)
+## v7.8.0 (Planned to 12.01.2020)
 
 ### New features
 - make DMA2D non blocking 
@@ -15,7 +15,7 @@
 - fix(dropdown) support Arabic letter connections
 - fix(value_str) support Arabic letter connections in value string property
 
-## v7.7.2 (Planned to 17.11.2020)
+## v7.7.2 (17.11.2020)
 ### Bugfixes
 - fix(draw_triangle): fix polygon/triangle drawing when the order of points is counter-clockwise
 - fix(btnmatrix): fix setting the same map with modified pointers
