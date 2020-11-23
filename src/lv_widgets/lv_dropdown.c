@@ -18,6 +18,7 @@
 #include "../lv_font/lv_symbol_def.h"
 #include "../lv_misc/lv_anim.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_txt_ap.h"
 #include <string.h>
 
 /*********************
@@ -211,7 +212,12 @@ void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options)
     ext->sel_opt_id_orig = 0;
 
     /*Allocate space for the new text*/
+#if LV_USE_ARABIC_PERSIAN_CHARS == 0
     size_t len = strlen(options) + 1;
+#else
+    size_t len = _lv_txt_ap_calc_bytes_cnt(options) + 1;
+#endif
+
     if(ext->options != NULL && ext->static_txt == 0) {
         lv_mem_free(ext->options);
         ext->options = NULL;
@@ -222,7 +228,11 @@ void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options)
     LV_ASSERT_MEM(ext->options);
     if(ext->options == NULL) return;
 
+#if LV_USE_ARABIC_PERSIAN_CHARS == 0
     strcpy(ext->options, options);
+#else
+    _lv_txt_ap_proc(options, ext->options);
+#endif
 
     /*Now the text is dynamically allocated*/
     ext->static_txt = 0;

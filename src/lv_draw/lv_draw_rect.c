@@ -10,6 +10,7 @@
 #include "lv_draw_blend.h"
 #include "lv_draw_mask.h"
 #include "../lv_misc/lv_math.h"
+#include "../lv_misc/lv_txt_ap.h"
 #include "../lv_core/lv_refr.h"
 #include "../lv_misc/lv_debug.h"
 
@@ -1295,8 +1296,16 @@ static void draw_value_str(const lv_area_t * coords, const lv_area_t * clip, con
     if(dsc->value_str == NULL) return;
     if(dsc->value_opa <= LV_OPA_MIN) return;
 
+#if LV_USE_ARABIC_PERSIAN_CHARS == 0
+    const char * str = dsc->value_str;
+#else
+    uint32_t str_len =  _lv_txt_ap_calc_bytes_cnt(dsc->value_str);
+    char * str = _lv_mem_buf_get(str_len + 1);
+    _lv_txt_ap_proc(dsc->value_str, str);
+#endif
+
     lv_point_t s;
-    _lv_txt_get_size(&s, dsc->value_str, dsc->value_font, dsc->value_letter_space, dsc->value_line_space, LV_COORD_MAX,
+    _lv_txt_get_size(&s, str, dsc->value_font, dsc->value_letter_space, dsc->value_line_space, LV_COORD_MAX,
                      LV_TXT_FLAG_NONE);
 
     lv_area_t value_area;
@@ -1321,7 +1330,7 @@ static void draw_value_str(const lv_area_t * coords, const lv_area_t * clip, con
     label_dsc.color = dsc->value_color;
     label_dsc.opa = dsc->value_opa;
 
-    lv_draw_label(&value_area, clip, &label_dsc, dsc->value_str, NULL);
+    lv_draw_label(&value_area, clip, &label_dsc, str, NULL);
 }
 #endif
 
