@@ -44,13 +44,11 @@ extern "C" {
 #endif
 
 #define LV_MAX_ANCESTOR_NUM 8
+#define _LV_OBJ_PART_MAX    128
 
 #define LV_EXT_CLICK_AREA_OFF   0
 #define LV_EXT_CLICK_AREA_TINY  1
 #define LV_EXT_CLICK_AREA_FULL  2
-
-#define _LV_OBJ_PART_VIRTUAL_FIRST 0x01
-#define _LV_OBJ_PART_REAL_FIRST    0x40
 
 /**********************
  *      TYPEDEFS

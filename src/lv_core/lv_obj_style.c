@@ -289,12 +289,7 @@ void _lv_obj_disable_style_caching(lv_obj_t * obj, bool dis)
 {
 #if LV_STYLE_CACHE_LEVEL >= 1
     uint8_t part;
-    for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
-        lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
-        if(list == NULL) break;
-        list->ignore_cache = dis;
-    }
-    for(part = _LV_OBJ_PART_REAL_FIRST; part < 0xFF; part++) {
+    for(part = 0; part < _LV_OBJ_PART_MAX; part++) {
         lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
         if(list == NULL) break;
         list->ignore_cache = dis;
@@ -324,12 +319,7 @@ void _lv_obj_invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_prope
     }
     else {
 
-        for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
-            lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
-            if(list == NULL) break;
-            list->valid_cache = 0;
-        }
-        for(part = _LV_OBJ_PART_REAL_FIRST; part < 0xFF; part++) {
+        for(part = 0; part < _LV_OBJ_PART_MAX; part++) {
             lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
             if(list == NULL) break;
             list->valid_cache = 0;
@@ -1071,7 +1061,7 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
 {
     _lv_style_state_cmp_t res = _LV_STYLE_STATE_CMP_SAME;
     uint8_t part;
-    for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
+    for(part = 0; part < _LV_OBJ_PART_MAX; part++) {
         lv_style_list_t * style_list = _lv_obj_get_style_list(obj, part);
         if(style_list == NULL) break;   /*No more style lists*/
 
@@ -1511,7 +1501,7 @@ static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop)
 static void update_style_cache_children(lv_obj_t * obj)
 {
     uint8_t part;
-    for(part = 0; part < _LV_OBJ_PART_SPACIAL_START; part++) {
+    for(part = 0; part < _LV_OBJ_PART_MAX; part++) {
         lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
         if(list == NULL) break;
 

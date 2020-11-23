@@ -727,7 +727,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
 
     uint8_t part;
-    for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
+    for(part = 0; part < _LV_OBJ_PART_MAX; part++) {
         lv_style_list_t * style_list = _lv_obj_get_style_list(obj, part);
         if(style_list == NULL) break;   /*No more style lists*/
         if(style_list->ignore_trans) continue;
