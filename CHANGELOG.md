@@ -1,6 +1,6 @@
 # Changelog
 
-## v7.8.0 (Planned to 12.01.2020)
+## v7.8.0 (Planned to 01.12.2020)
 
 ### New features
 - make DMA2D non blocking 
