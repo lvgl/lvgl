@@ -1318,7 +1318,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
- * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
+ * The direction will be processed according to the Unicode Bidirectional Algorithm:
  * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
 #ifndef LV_USE_BIDI
 #  ifdef CONFIG_LV_USE_BIDI
