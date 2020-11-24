@@ -257,7 +257,7 @@ typedef void * lv_img_decoder_user_data_t;
 #define LV_ATTRIBUTE_TICK_INC
 
 /* Define a custom attribute to `lv_task_handler` function */
-#define LV_ATTRIBUTE_TASK_HANDLER
+#define LV_ATTRIBUTE_TMR_HANDLER
 
 /* Define a custom attribute to `lv_disp_flush_ready` function */
 #define LV_ATTRIBUTE_FLUSH_READY
