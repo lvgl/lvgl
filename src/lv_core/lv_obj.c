@@ -20,8 +20,6 @@
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_gc.h"
 #include "../lv_misc/lv_math.h"
-#include "../lv_misc/lv_gc.h"
-#include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
 #include "../lv_hal/lv_hal.h"
 #include <stdint.h>
