@@ -145,7 +145,7 @@ void lv_disp_clean_dcache(lv_disp_t * disp);
  * @param disp pointer to a display
  * @return pointer to the display refresher task. (NULL on error)
  */
-lv_task_t * _lv_disp_get_refr_task(lv_disp_t * disp);
+lv_tmr_t * _lv_disp_get_refr_task(lv_disp_t * disp);
 
 /*------------------------------------------------
  * To improve backward compatibility

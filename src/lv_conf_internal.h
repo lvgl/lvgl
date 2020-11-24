@@ -632,11 +632,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 
 /* Define a custom attribute to `lv_task_handler` function */
-#ifndef LV_ATTRIBUTE_TASK_HANDLER
-#  ifdef CONFIG_LV_ATTRIBUTE_TASK_HANDLER
-#    define LV_ATTRIBUTE_TASK_HANDLER CONFIG_LV_ATTRIBUTE_TASK_HANDLER
+#ifndef LV_ATTRIBUTE_TMR_HANDLER
+#  ifdef CONFIG_LV_ATTRIBUTE_TMR_HANDLER
+#    define LV_ATTRIBUTE_TMR_HANDLER CONFIG_LV_ATTRIBUTE_TMR_HANDLER
 #  else
-#    define  LV_ATTRIBUTE_TASK_HANDLER
+#    define  LV_ATTRIBUTE_TMR_HANDLER
 #  endif
 #endif
 

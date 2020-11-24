@@ -27,6 +27,11 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
+static LV_ATTRIBUTE_TMR_HANDLER uint32_t lv_task_handler(void)
+{
+    return lv_tmr_handler();
+}
+
 /**********************
  *      MACROS
  **********************/

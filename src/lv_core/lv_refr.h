@@ -82,7 +82,7 @@ void _lv_refr_set_disp_refreshing(lv_disp_t * disp);
  * Called periodically to handle the refreshing
  * @param task pointer to the task itself
  */
-void _lv_disp_refr_task(lv_task_t * task);
+void _lv_disp_refr_task(lv_tmr_t * task);
 
 /**********************
  *   STATIC FUNCTIONS

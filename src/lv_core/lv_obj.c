@@ -15,7 +15,7 @@
 #include "../lv_themes/lv_theme.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_anim.h"
-#include "../lv_misc/lv_task.h"
+#include "../lv_misc/lv_tmr.h"
 #include "../lv_misc/lv_async.h"
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_gc.h"
@@ -100,7 +100,7 @@ void lv_init(void)
 
     /*Initialize the lv_misc modules*/
     _lv_mem_init();
-    _lv_task_core_init();
+    _lv_tmr_core_init();
 
 #if LV_USE_FILESYSTEM
     _lv_fs_init();

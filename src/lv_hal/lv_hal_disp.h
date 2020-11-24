@@ -21,7 +21,7 @@ extern "C" {
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_ll.h"
-#include "../lv_misc/lv_task.h"
+#include "../lv_misc/lv_tmr.h"
 
 /*********************
  *      DEFINES
@@ -149,7 +149,7 @@ typedef struct _disp_t {
     lv_disp_drv_t driver;
 
     /**< A task which periodically checks the dirty areas and refreshes them*/
-    lv_task_t * refr_task;
+    lv_tmr_t * refr_task;
 
     /** Screens of the display*/
     lv_ll_t scr_ll;

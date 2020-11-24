@@ -38,7 +38,7 @@ void _lv_indev_init(void);
  * Called periodically to read the input devices
  * @param task pointer to the task itself
  */
-void _lv_indev_read_task(lv_task_t * task);
+void _lv_indev_read_task(lv_tmr_t * task);
 
 /**
  * Get the currently processed input device. Can be used in action functions too.
@@ -171,7 +171,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point);
  * @param indev pointer to an inout device
  * @return pointer to the indev read refresher task. (NULL on error)
  */
-lv_task_t * lv_indev_get_read_task(lv_disp_t * indev);
+lv_tmr_t * lv_indev_get_read_task(lv_disp_t * indev);
 
 /**********************
  *      MACROS

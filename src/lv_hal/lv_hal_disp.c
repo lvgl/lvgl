@@ -137,7 +137,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
                                         new display*/
     /*Create a refresh task*/
-    disp->refr_task = lv_task_create(_lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, LV_REFR_TASK_PRIO, disp);
+    disp->refr_task = lv_tmr_create(_lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, disp);
     LV_ASSERT_MEM(disp->refr_task);
     if(disp->refr_task == NULL) return NULL;
 
@@ -168,7 +168,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
 
     disp_def = disp_def_tmp; /*Revert the default display*/
 
-    lv_task_ready(disp->refr_task); /*Be sure the screen will be refreshed immediately on start up*/
+    lv_tmr_ready(disp->refr_task); /*Be sure the screen will be refreshed immediately on start up*/
 
     /*Can't handle this case later so add an error*/
     if(lv_disp_is_true_double_buf(disp) && disp->driver.set_px_cb) {

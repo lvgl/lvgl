@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_task.h"
+#include "lv_tmr.h"
 #include "lv_types.h"
 
 /*********************

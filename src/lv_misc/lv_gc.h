@@ -17,7 +17,7 @@ extern "C" {
 #include <stdbool.h>
 #include "lv_mem.h"
 #include "lv_ll.h"
-#include "lv_task.h"
+#include "lv_tmr.h"
 #include "../lv_draw/lv_img_cache.h"
 #include "../lv_draw/lv_draw_mask.h"
 
@@ -26,7 +26,7 @@ extern "C" {
  *********************/
 
 #define LV_ITERATE_ROOTS(f) \
-    f(lv_ll_t, _lv_task_ll)  /*Linked list to store the lv_tasks*/ \
+    f(lv_ll_t, _lv_tmr_ll)  /*Linked list to store the lv_tmr-s*/ \
     f(lv_ll_t, _lv_disp_ll)  /*Linked list of screens*/            \
     f(lv_ll_t, _lv_indev_ll) /*Linked list of screens*/            \
     f(lv_ll_t, _lv_drv_ll)                                         \
@@ -36,11 +36,10 @@ extern "C" {
     f(lv_ll_t, _lv_img_defoder_ll)                                 \
     f(lv_ll_t, _lv_obj_style_trans_ll)                             \
     f(lv_img_cache_entry_t*, _lv_img_cache_array)                  \
-    f(lv_task_t*, _lv_task_act)                                    \
+    f(lv_tmr_t*, _lv_tmr_act)                                      \
     f(lv_mem_buf_arr_t , _lv_mem_buf)                              \
     f(_lv_draw_mask_saved_arr_t , _lv_draw_mask_list)              \
     f(void * , _lv_theme_material_styles)                          \
-    f(void * , _lv_theme_template_styles)                          \
     f(void * , _lv_theme_mono_styles)                              \
     f(void * , _lv_theme_empty_styles)                             \
     f(uint8_t *, _lv_font_decompr_buf)                             \

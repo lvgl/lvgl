@@ -11,7 +11,7 @@
 #include "lv_disp.h"
 #include "../lv_hal/lv_hal_tick.h"
 #include "../lv_hal/lv_hal_disp.h"
-#include "../lv_misc/lv_task.h"
+#include "../lv_misc/lv_tmr.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_gc.h"
@@ -144,7 +144,7 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
             lv_area_copy(&disp->inv_areas[disp->inv_p], &scr_area);
         }
         disp->inv_p++;
-        lv_task_set_prio(disp->refr_task, LV_REFR_TASK_PRIO);
+        lv_tmr_pause(disp->refr_task, false);
     }
 }
 
@@ -172,20 +172,20 @@ void _lv_refr_set_disp_refreshing(lv_disp_t * disp)
  * Called periodically to handle the refreshing
  * @param task pointer to the task itself
  */
-void _lv_disp_refr_task(lv_task_t * task)
+void _lv_disp_refr_task(lv_tmr_t * tmr)
 {
     LV_LOG_TRACE("lv_refr_task: started");
 
     uint32_t start = lv_tick_get();
     uint32_t elaps = 0;
 
-    disp_refr = task->user_data;
+    disp_refr = tmr->user_data;
 
 #if LV_USE_PERF_MONITOR == 0
     /* Ensure the task does not run again automatically.
      * This is done before refreshing in case refreshing invalidates something else.
      */
-    lv_task_set_prio(task, LV_TASK_PRIO_OFF);
+    lv_tmr_pause(tmr, true);
 #endif
 
     /*Do nothing if there is no active screen*/
