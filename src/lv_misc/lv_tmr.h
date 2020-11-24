@@ -108,6 +108,13 @@ void lv_tmr_pause(lv_tmr_t * tmr, bool pause);
 void lv_tmr_set_cb(lv_tmr_t * tmr, lv_tmr_cb_t tmr_cb);
 
 /**
+ * Set new period for a lv_tmr
+ * @param tmr pointer to a lv_tmr
+ * @param period the new period
+ */
+void lv_tmr_set_period(lv_tmr_t * tmr, uint32_t period);
+
+/**
  * Make a lv_tmr ready. It will not wait its period.
  * @param tmr pointer to a lv_tmr.
  */

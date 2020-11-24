@@ -62,7 +62,7 @@ void _lv_tmr_core_init(void)
  * Call it  periodically to handle lv_tmrs.
  * @return the time after which it must be called again
  */
-LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_tmr_handler(void)
+LV_ATTRIBUTE_TMR_HANDLER uint32_t lv_tmr_handler(void)
 {
     LV_LOG_TRACE("lv_tmr_handler started");
 
@@ -172,7 +172,6 @@ lv_tmr_t * lv_tmr_create_basic(void)
  *                 (the 'x' in the argument name indicates that its not a fully generic function because it not follows
  *                  the `func_name(object, callback, ...)` convention)
  * @param period call period in ms unit
- * @param prio priority of the tmr (LV_TASK_PRIO_OFF means the tmr is stopped)
  * @param user_data custom parameter
  * @return pointer to the new tmr
  */

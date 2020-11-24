@@ -1,6 +1,8 @@
 CSRCS += lv_font.c
 CSRCS += lv_font_fmt_txt.c
 CSRCS += lv_font_loader.c
+CSRCS += lv_font_montserrat_8.c
+CSRCS += lv_font_montserrat_10.c
 CSRCS += lv_font_montserrat_12.c
 CSRCS += lv_font_montserrat_14.c
 CSRCS += lv_font_montserrat_16.c
@@ -23,6 +25,7 @@ CSRCS += lv_font_montserrat_48.c
 CSRCS += lv_font_montserrat_12_subpx.c
 CSRCS += lv_font_montserrat_28_compressed.c
 CSRCS += lv_font_unscii_8.c
+CSRCS += lv_font_unscii_16.c
 CSRCS += lv_font_dejavu_16_persian_hebrew.c
 
 DEPPATH += --dep-path $(LVGL_DIR)/$(LVGL_DIR_NAME)/src/lv_font

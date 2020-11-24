@@ -71,9 +71,6 @@ typedef enum {
 #if LV_USE_LABEL
     LV_THEME_LABEL,
 #endif
-#if LV_USE_LED
-    LV_THEME_LED,
-#endif
 #if LV_USE_LINE
     LV_THEME_LINE,
 #endif
