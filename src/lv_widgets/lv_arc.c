@@ -865,6 +865,12 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
         _lv_obj_reset_style_list_no_refr(arc, LV_ARC_PART_KNOB);
         _lv_obj_reset_style_list_no_refr(arc, LV_ARC_PART_INDIC);
     }
+    else if(sign == LV_SIGNAL_GET_EDITABLE) {
+#if LV_USE_GROUP
+        bool * editable = (bool *)param;
+        *editable = true;
+#endif
+    }
 
     return res;
 }
