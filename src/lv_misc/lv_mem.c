@@ -536,7 +536,7 @@ void * _lv_mem_buf_get(uint32_t size)
         }
     }
 
-    LV_DEBUG_ASSERT(false, "No free buffer. Increase LV_DRAW_BUF_MAX_NUM.", 0x00);
+    LV_DEBUG_ASSERT(false, "No free buffer. Increase LV_MEM_BUF_MAX_NUM.", 0x00);
     return NULL;
 }
 
