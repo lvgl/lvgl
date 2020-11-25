@@ -788,18 +788,27 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
         return;
     }
 
-    i->proc.types.pointer.act_point.x = i->btn_points[data->btn_id].x;
-    i->proc.types.pointer.act_point.y = i->btn_points[data->btn_id].y;
+    lv_coord_t x = i->btn_points[data->btn_id].x;
+    lv_coord_t y = i->btn_points[data->btn_id].y;
 
-    /*Still the same point is pressed*/
-    if(i->proc.types.pointer.last_point.x == i->proc.types.pointer.act_point.x &&
-       i->proc.types.pointer.last_point.y == i->proc.types.pointer.act_point.y && data->state == LV_INDEV_STATE_PR) {
-        indev_proc_press(&i->proc);
+    /*If a new point comes always make a release*/
+    if(data->state == LV_INDEV_STATE_PR) {
+        if(i->proc.types.pointer.last_point.x != x ||
+           i->proc.types.pointer.last_point.y != y) {
+            indev_proc_release(&i->proc);
+        }
     }
-    else {
-        /*If a new point comes always make a release*/
-        indev_proc_release(&i->proc);
-    }
+
+    if(indev_reset_check(&i->proc)) return;
+
+    /*Save the new points*/
+    i->proc.types.pointer.act_point.x = x;
+    i->proc.types.pointer.act_point.y = y;
+
+    if(data->state == LV_INDEV_STATE_PR) indev_proc_press(&i->proc);
+    else indev_proc_release(&i->proc);
+
+    if(indev_reset_check(&i->proc)) return;
 
     i->proc.types.pointer.last_point.x = i->proc.types.pointer.act_point.x;
     i->proc.types.pointer.last_point.y = i->proc.types.pointer.act_point.y;
