@@ -394,20 +394,11 @@ static void get_rounded_area(int16_t angle, lv_coord_t radius, uint8_t tickness,
     int32_t thick_half = tickness / 2;
     uint8_t thick_corr = (tickness & 0x01) ? 0 : 1;
 
-    int32_t rx_corr;
-    int32_t ry_corr;
-
-    if(angle > 90 && angle < 270) rx_corr = 0;
-    else  rx_corr = 0;
-
-    if(angle > 0 && angle < 180) ry_corr = 0;
-    else  ry_corr = 0;
-
     int32_t cir_x;
     int32_t cir_y;
 
-    cir_x = ((radius - rx_corr - thick_half) * _lv_trigo_sin(90 - angle)) >> (LV_TRIGO_SHIFT - ps);
-    cir_y = ((radius - ry_corr - thick_half) * _lv_trigo_sin(angle)) >> (LV_TRIGO_SHIFT - ps);
+    cir_x = ((radius - thick_half) * _lv_trigo_sin(90 - angle)) >> (LV_TRIGO_SHIFT - ps);
+    cir_y = ((radius - thick_half) * _lv_trigo_sin(angle)) >> (LV_TRIGO_SHIFT - ps);
 
     /* Actually the center of the pixel need to be calculated so apply 1/2 px offset*/
     if(cir_x > 0) {
