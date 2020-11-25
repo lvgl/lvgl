@@ -81,6 +81,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Initialize the allocated 'ext' */
     ext->value_to_set = NULL;
     ext->dragging = 0;
+    ext->right_knob_focus = 0;
     lv_style_list_init(&ext->style_knob);
 
     /*The signal and design functions are not copied so set them here*/
@@ -390,10 +391,19 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         bool editing               = lv_group_get_editing(g);
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
-            if(editing) lv_group_set_editing(g, false);
+            if(editing) {
+                if(ext->right_knob_focus == 0) ext->right_knob_focus = 1;
+                else {
+                    ext->right_knob_focus = 0;
+                    lv_group_set_editing(g, false);
+                }
+            }
         }
 #endif
 
+    }
+    else if(sign == LV_SIGNAL_FOCUS) {
+        ext->right_knob_focus = 0;
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {
         /* The knob size depends on slider size.
@@ -425,12 +435,16 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         char c = *((char *)param);
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
-            lv_slider_set_value(slider, lv_slider_get_value(slider) + 1, LV_ANIM_ON);
+            if(ext->right_knob_focus) lv_slider_set_value(slider, lv_slider_get_value(slider) + 1, LV_ANIM_ON);
+            else lv_slider_set_left_value(slider, lv_slider_get_left_value(slider) + 1, LV_ANIM_ON);
+
             res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
-            lv_slider_set_value(slider, lv_slider_get_value(slider) - 1, LV_ANIM_ON);
+            if(ext->right_knob_focus) lv_slider_set_value(slider, lv_slider_get_value(slider) - 1, LV_ANIM_ON);
+            else lv_slider_set_left_value(slider, lv_slider_get_left_value(slider) - 1, LV_ANIM_ON);
+
             res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }

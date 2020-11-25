@@ -16,6 +16,7 @@
 - fix(value_str) support Arabic letter connections in value string property
 - fix(indev) in LV_INDEV_TYPE_BUTTON recognize 1 cycle long presses too
 - fix(arc) make arc work with encoder
+- fix(slider) adjusting the left knob too with encoder
 
 ## v7.7.2 (17.11.2020)
 ### Bugfixes
