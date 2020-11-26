@@ -392,9 +392,13 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         lv_indev_type_t indev_type = lv_indev_get_type(lv_indev_get_act());
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             if(editing) {
-                if(ext->right_knob_focus == 0) ext->right_knob_focus = 1;
-                else {
-                    ext->right_knob_focus = 0;
+                if(lv_slider_get_type(slider) == LV_SLIDER_TYPE_RANGE) {
+                    if(ext->right_knob_focus == 0) ext->right_knob_focus = 1;
+                    else {
+                        ext->right_knob_focus = 0;
+                        lv_group_set_editing(g, false);
+                    }
+                } else {
                     lv_group_set_editing(g, false);
                 }
             }
