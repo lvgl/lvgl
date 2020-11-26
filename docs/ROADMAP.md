@@ -59,3 +59,4 @@ Planned to November/December 2020
 - Need static analize (via coverity.io or somehing else)
 - Support dot_begin and dot_middle long modes for labels
 - Add new label alignment modes. [#1656](https://github.com/lvgl/lvgl/issues/1656)
+- Support larger images: [#1892](https://github.com/lvgl/lvgl/issues/1892)
