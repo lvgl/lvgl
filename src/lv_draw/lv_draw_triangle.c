@@ -58,29 +58,50 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
     if(point_cnt < 3) return;
     if(points == NULL) return;
 
-    int16_t i;
+    /*Join adjacent points if they are on the same coordinate*/
+    lv_point_t * p = _lv_mem_buf_get(point_cnt * sizeof(lv_point_t));
+    if(p == NULL) return;
+    uint32_t i;
+    uint32_t pcnt = 0;
+    p[0] = points[0];
+    for(i = 0; i < point_cnt - 1; i++) {
+        if(points[i].x != points[i+1].x && points[i].y != points[i+1].y) {
+            p[pcnt] = points[i];
+            pcnt++;
+        }
+    }
+    /*The first and the last points are also adjacent */
+    if(points[0].x != points[point_cnt - 1].x && points[0].y != points[point_cnt - 1].y) {
+        p[pcnt] = points[point_cnt - 1];
+        pcnt++;
+    }
+
+    point_cnt = pcnt;
+    if(point_cnt < 3) return;
+
     lv_area_t poly_coords = {.x1 = LV_COORD_MAX, .y1 = LV_COORD_MAX, .x2 = LV_COORD_MIN, .y2 = LV_COORD_MIN};
 
     for(i = 0; i < point_cnt; i++) {
-        poly_coords.x1 = LV_MATH_MIN(poly_coords.x1, points[i].x);
-        poly_coords.y1 = LV_MATH_MIN(poly_coords.y1, points[i].y);
-        poly_coords.x2 = LV_MATH_MAX(poly_coords.x2, points[i].x);
-        poly_coords.y2 = LV_MATH_MAX(poly_coords.y2, points[i].y);
+        poly_coords.x1 = LV_MATH_MIN(poly_coords.x1, p[i].x);
+        poly_coords.y1 = LV_MATH_MIN(poly_coords.y1, p[i].y);
+        poly_coords.x2 = LV_MATH_MAX(poly_coords.x2, p[i].x);
+        poly_coords.y2 = LV_MATH_MAX(poly_coords.y2, p[i].y);
     }
-
 
     bool is_common;
     lv_area_t poly_mask;
     is_common = _lv_area_intersect(&poly_mask, &poly_coords, clip_area);
-    if(!is_common) return;
-
+    if(!is_common) {
+        _lv_mem_buf_release(p);
+        return;
+    }
     /*Find the lowest point*/
-    lv_coord_t y_min = points[0].y;
+    lv_coord_t y_min = p[0].y;
     int16_t y_min_i = 0;
 
     for(i = 1; i < point_cnt; i++) {
-        if(points[i].y < y_min) {
-            y_min = points[i].y;
+        if(p[i].y < y_min) {
+            y_min = p[i].y;
             y_min_i = i;
         }
     }
@@ -109,10 +130,10 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
      *   dy_left/dx_left < dy_right/dx_right
      *   dy_left * dx_right < dy_right * dx_left
      */
-    lv_coord_t dxl = points[i_next_left].x - points[y_min_i].x;
-    lv_coord_t dxr = points[i_next_right].x - points[y_min_i].x;
-    lv_coord_t dyl = points[i_next_left].y - points[y_min_i].y;
-    lv_coord_t dyr = points[i_next_right].y - points[y_min_i].y;
+    lv_coord_t dxl = p[i_next_left].x - p[y_min_i].x;
+    lv_coord_t dxr = p[i_next_right].x - p[y_min_i].x;
+    lv_coord_t dyl = p[i_next_left].y - p[y_min_i].y;
+    lv_coord_t dyr = p[i_next_right].y - p[y_min_i].y;
 
     bool inv = false;
     if(dyl * dxr < dyr * dxl) inv = true;
@@ -133,11 +154,11 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
             if(i_next_right < 0) i_next_right = point_cnt + i_next_right;
         }
 
-        if(points[i_next_left].y >=  points[i_prev_left].y) {
-            if(points[i_next_left].y != points[i_prev_left].y &&
-               points[i_next_left].x !=  points[i_prev_left].x) {
-                lv_draw_mask_line_points_init(mp_next, points[i_prev_left].x, points[i_prev_left].y,
-                                              points[i_next_left].x, points[i_next_left].y,
+        if(p[i_next_left].y >=  p[i_prev_left].y) {
+            if(p[i_next_left].y != p[i_prev_left].y &&
+               p[i_next_left].x !=  p[i_prev_left].x) {
+                lv_draw_mask_line_points_init(mp_next, p[i_prev_left].x, p[i_prev_left].y,
+                                              p[i_next_left].x, p[i_next_left].y,
                                               LV_DRAW_MASK_LINE_SIDE_RIGHT);
                 lv_draw_mask_add(mp_next, mp);
                 mp_next++;
@@ -148,12 +169,12 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
 
         if(mask_cnt == point_cnt) break;
 
-        if(points[i_next_right].y >=  points[i_prev_right].y) {
-            if(points[i_next_right].y != points[i_prev_right].y &&
-               points[i_next_right].x !=  points[i_prev_right].x) {
+        if(p[i_next_right].y >=  p[i_prev_right].y) {
+            if(p[i_next_right].y != p[i_prev_right].y &&
+               p[i_next_right].x !=  p[i_prev_right].x) {
 
-                lv_draw_mask_line_points_init(mp_next, points[i_prev_right].x, points[i_prev_right].y,
-                                              points[i_next_right].x, points[i_next_right].y,
+                lv_draw_mask_line_points_init(mp_next, p[i_prev_right].x, p[i_prev_right].y,
+                                              p[i_next_right].x, p[i_next_right].y,
                                               LV_DRAW_MASK_LINE_SIDE_LEFT);
                 lv_draw_mask_add(mp_next, mp);
                 mp_next++;
@@ -169,6 +190,7 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
     lv_draw_mask_remove_custom(mp);
 
     _lv_mem_buf_release(mp);
+    _lv_mem_buf_release(p);
 
 }
 
