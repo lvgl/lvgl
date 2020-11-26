@@ -362,7 +362,7 @@ lv_anim_value_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t
     LV_UNUSED(path);
 
     /*Calculate the current step*/
-    uint32_t t;
+    int32_t t;
     if(a->time == a->act_time)
         t = 1024;
     else
@@ -381,31 +381,32 @@ lv_anim_value_t lv_anim_path_bounce(const lv_anim_path_t * path, const lv_anim_t
         t -= 408;
         t    = t * 5; /*to [0..1024] range*/
         t    = 1024 - t;
-        diff = diff / 6;
+        diff = diff / 20;
     }
     else if(t >= 614 && t < 819) {
         /*Fall back*/
         t -= 614;
         t    = t * 5; /*to [0..1024] range*/
-        diff = diff / 6;
+        diff = diff / 20;
     }
     else if(t >= 819 && t < 921) {
         /*Second bounce back*/
         t -= 819;
         t    = t * 10; /*to [0..1024] range*/
         t    = 1024 - t;
-        diff = diff / 16;
+        diff = diff / 40;
     }
     else if(t >= 921 && t <= 1024) {
         /*Fall back*/
         t -= 921;
         t    = t * 10; /*to [0..1024] range*/
-        diff = diff / 16;
+        diff = diff / 40;
     }
 
     if(t > 1024) t = 1024;
+    if(t < 0) t = 0;
 
-    int32_t step = _lv_bezier3(t, 1024, 1024, 800, 0);
+    int32_t step = _lv_bezier3(t, 1024, 800, 500, 0);
 
     int32_t new_value;
     new_value = (int32_t)step * diff;
