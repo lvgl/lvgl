@@ -61,23 +61,26 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
     /*Join adjacent points if they are on the same coordinate*/
     lv_point_t * p = _lv_mem_buf_get(point_cnt * sizeof(lv_point_t));
     if(p == NULL) return;
-    uint32_t i;
-    uint32_t pcnt = 0;
+    uint16_t i;
+    uint16_t pcnt = 0;
     p[0] = points[0];
     for(i = 0; i < point_cnt - 1; i++) {
-        if(points[i].x != points[i+1].x && points[i].y != points[i+1].y) {
+        if(points[i].x != points[i+1].x ||points[i].y != points[i+1].y) {
             p[pcnt] = points[i];
             pcnt++;
         }
     }
     /*The first and the last points are also adjacent */
-    if(points[0].x != points[point_cnt - 1].x && points[0].y != points[point_cnt - 1].y) {
+    if(points[0].x != points[point_cnt - 1].x || points[0].y != points[point_cnt - 1].y) {
         p[pcnt] = points[point_cnt - 1];
         pcnt++;
     }
 
     point_cnt = pcnt;
-    if(point_cnt < 3) return;
+    if(point_cnt < 3) {
+        _lv_mem_buf_release(p);
+        return;
+    }
 
     lv_area_t poly_coords = {.x1 = LV_COORD_MAX, .y1 = LV_COORD_MAX, .x2 = LV_COORD_MIN, .y2 = LV_COORD_MIN};
 
