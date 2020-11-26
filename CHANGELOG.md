@@ -17,6 +17,8 @@
 - fix(indev) in LV_INDEV_TYPE_BUTTON recognize 1 cycle long presses too
 - fix(arc) make arc work with encoder
 - fix(slider) adjusting the left knob too with encoder
+- fix reference to LV_DRAW_BUF_MAX_NUM in lv_mem.c
+- fix(polygon draw) join adjacent points if they are on the same coordinate
 
 ## v7.7.2 (17.11.2020)
 ### Bugfixes
