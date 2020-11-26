@@ -241,7 +241,7 @@ static void invalidate_cache(void)
     if(disp->driver.clean_dcache_cb) disp->driver.clean_dcache_cb(&disp->driver);
     else {
 #if __CORTEX_M >= 0x07
-    	if((SCB->CCR) & (1<<((uint32_t)SCB_CCR_DC_Msk)))
+    	if((SCB->CCR) & (uint32_t)SCB_CCR_DC_Msk)
     		SCB_CleanInvalidateDCache();
 #endif
     }
