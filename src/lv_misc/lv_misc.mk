@@ -1,5 +1,5 @@
 CSRCS += lv_area.c
-CSRCS += lv_tmr.c
+CSRCS += lv_timer.c
 CSRCS += lv_fs.c
 CSRCS += lv_anim.c
 CSRCS += lv_mem.c
