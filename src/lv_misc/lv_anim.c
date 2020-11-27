@@ -13,7 +13,7 @@
 #include <string.h>
 #include "../lv_misc/lv_debug.h"
 #include "../lv_hal/lv_hal_tick.h"
-#include "lv_tmr.h"
+#include <lvgl/src/lv_misc/lv_timer.h>
 #include "lv_math.h"
 #include "lv_gc.h"
 
@@ -34,7 +34,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void anim_task(lv_tmr_t * param);
+static void anim_task(lv_timer_t * param);
 static void anim_mark_list_change(void);
 static bool anim_ready_handler(lv_anim_t * a);
 
@@ -43,7 +43,7 @@ static bool anim_ready_handler(lv_anim_t * a);
  **********************/
 static uint32_t last_task_run;
 static bool anim_list_changed;
-static lv_tmr_t * _lv_anim_tmr;
+static lv_timer_t * _lv_anim_tmr;
 const lv_anim_path_t lv_anim_path_def = {.cb = lv_anim_path_linear};
 
 /**********************
@@ -61,7 +61,7 @@ void _lv_anim_core_init(void)
 {
     _lv_ll_init(&LV_GC_ROOT(_lv_anim_ll), sizeof(lv_anim_t));
     last_task_run = lv_tick_get();
-    _lv_anim_tmr = lv_tmr_create(anim_task, LV_DISP_DEF_REFR_PERIOD, NULL);
+    _lv_anim_tmr = lv_timer_create(anim_task, LV_DISP_DEF_REFR_PERIOD, NULL);
     anim_mark_list_change(); /*Turn off the animation task*/
     anim_list_changed = false; /*The list has not actually changed*/
 }
@@ -438,7 +438,7 @@ lv_anim_value_t lv_anim_path_step(const lv_anim_path_t * path, const lv_anim_t *
  * Periodically handle the animations.
  * @param param unused
  */
-static void anim_task(lv_tmr_t * param)
+static void anim_task(lv_timer_t * param)
 {
     (void)param;
 
@@ -554,8 +554,8 @@ static void anim_mark_list_change(void)
 {
     anim_list_changed = true;
     if(_lv_ll_get_head(&LV_GC_ROOT(_lv_anim_ll)) == NULL)
-        lv_tmr_pause(_lv_anim_tmr, true);
+        lv_timer_pause(_lv_anim_tmr, true);
     else
-        lv_tmr_pause(_lv_anim_tmr, false);
+        lv_timer_pause(_lv_anim_tmr, false);
 }
 #endif

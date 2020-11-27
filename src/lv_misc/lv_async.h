@@ -14,7 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lv_tmr.h"
+#include <lvgl/src/lv_misc/lv_timer.h>
 #include "lv_types.h"
 
 /*********************

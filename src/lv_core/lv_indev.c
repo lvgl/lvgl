@@ -14,7 +14,7 @@
 #include "lv_refr.h"
 
 #include "../lv_hal/lv_hal_tick.h"
-#include "../lv_misc/lv_tmr.h"
+#include "../lv_misc/lv_timer.h"
 #include "../lv_misc/lv_math.h"
 
 /*********************
@@ -70,7 +70,7 @@ void _lv_indev_init(void)
  * Called periodically to read the input devices
  * @param param pointer to and input device to read
  */
-void _lv_indev_read_task(lv_tmr_t * task)
+void _lv_indev_read_task(lv_timer_t * task)
 {
     LV_LOG_TRACE("indev read task started");
 
@@ -361,7 +361,7 @@ lv_obj_t * lv_indev_get_obj_act(void)
  * @param indev pointer to an input device
  * @return pointer to the indev read refresher task. (NULL on error)
  */
-lv_tmr_t * lv_indev_get_read_task(lv_disp_t * indev)
+lv_timer_t * lv_indev_get_read_task(lv_disp_t * indev)
 {
     if(!indev) {
         LV_LOG_WARN("lv_indev_get_read_task: indev was NULL");
