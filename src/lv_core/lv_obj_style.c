@@ -312,18 +312,10 @@ void _lv_obj_invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_prope
 {
     if(style_prop_is_cacheable(prop) == false) return;
 
-    if(part != LV_OBJ_PART_ALL) {
+    for(part = 0; part < _LV_OBJ_PART_MAX; part++) {
         lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
-        if(list == NULL) return;
+        if(list == NULL) break;
         list->valid_cache = 0;
-    }
-    else {
-
-        for(part = 0; part < _LV_OBJ_PART_MAX; part++) {
-            lv_style_list_t * list = _lv_obj_get_style_list(obj, part);
-            if(list == NULL) break;
-            list->valid_cache = 0;
-        }
     }
 
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
