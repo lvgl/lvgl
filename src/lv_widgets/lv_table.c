@@ -467,6 +467,8 @@ void lv_table_set_cell_type(lv_obj_t * table, uint16_t row, uint16_t col, uint8_
     ext->cell_data[cell][0] = format.format_byte;
 
     ext->cell_types |= 1 << type;
+
+    lv_obj_invalidate(table);
 }
 
 /**
