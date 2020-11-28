@@ -176,12 +176,14 @@ enum {
     LV_OBJ_FLAG_SCROLL_ELASTIC  = (1 << 5),
     LV_OBJ_FLAG_SCROLL_MOMENTUM = (1 << 6),
     LV_OBJ_FLAG_SCROLL_STOP     = (1 << 7),
-    LV_OBJ_FLAG_SNAPABLE        = (1 << 8),
-    LV_OBJ_FLAG_PRESS_LOCK      = (1 << 9),
-    LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 10),
-    LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 11),
-    LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 12),
-    LV_OBJ_FLAG_ADV_HITTEST     = (1 << 13),
+    LV_OBJ_FLAG_SCROLL_FREEZE   = (1 << 8), /** Do not allow scrolling on this object and do not propagate the scroll to parent */
+    LV_OBJ_FLAG_SNAPABLE        = (1 << 9),
+    LV_OBJ_FLAG_PRESS_LOCK      = (1 << 10),
+    LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 11),
+    LV_OBJ_FLAG_GESTURE_BUBBLE  = (1 << 12),
+    LV_OBJ_FLAG_FOCUS_BUBBLE    = (1 << 13),
+    LV_OBJ_FLAG_FOCUS_SCROLL    = (1 << 14), /** Automatically scroll the focused object's ancestors to make the focused object visible*/
+    LV_OBJ_FLAG_ADV_HITTEST     = (1 << 15),
 };
 typedef uint16_t lv_obj_flag_t;
 
@@ -217,7 +219,6 @@ typedef struct {
     lv_snap_align_t snap_align_x : 2;
     lv_snap_align_t snap_align_y : 2;
     lv_scroll_dir_t scroll_dir :4;
-    uint8_t scroll_freeze :1;    /**< 1: Do not allow scrolling on this object and do not propagate the scroll to parent */
     lv_bidi_dir_t base_dir  : 2; /**< Base direction of texts related to this object */
 }lv_obj_spec_attr_t;
 
@@ -333,7 +334,6 @@ void lv_obj_del_async(struct _lv_obj_t * obj);
  * @param obj pointer to an object
  */
 void lv_obj_clean(lv_obj_t * obj);
-
 
 /**
  * Mark an area of an object as invalid.

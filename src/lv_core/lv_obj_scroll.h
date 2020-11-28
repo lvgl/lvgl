@@ -68,14 +68,6 @@ void lv_obj_set_scrollbar_mode(struct _lv_obj_t * obj, lv_scrollbar_mode_t mode)
 void lv_obj_set_scroll_dir(struct _lv_obj_t * obj, lv_dir_t dir);
 
 /**
- * If enabled do not allow scrolling on this object and do not propagate the scroll to parent
- * @param obj pointer to an object
- * @param en true: enable scroll freeze; false: disable
- */
-void lv_obj_set_scroll_freeze(struct _lv_obj_t * obj, bool en);
-
-
-/**
  * Set where to snap the children when scrolling ends horizontally
  * @param obj pointer to an object
  * @param align the snap align to set from `lv_snap_align_t`
@@ -106,13 +98,6 @@ lv_scrollbar_mode_t lv_obj_get_scrollbar_mode(const struct _lv_obj_t * obj);
  * @param dir the allow scroll directions. An element or OR-ed values of `lv_dir_t`
  */
 lv_dir_t lv_obj_get_scroll_dir(const struct _lv_obj_t * obj);
-
-/**
- * Get whether scroll freeze is enabled or not
- * @param obj pointer to an object
- * @return true: scroll freeze is enabled; false: disabled
- */
-bool lv_obj_get_scroll_freeze(struct _lv_obj_t * obj);
 
 /**
  * Get where to snap the children when scrolling ends horizontally
@@ -240,6 +225,14 @@ void lv_obj_scroll_to_x(struct _lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t a
  * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
  */
 void lv_obj_scroll_to_y(struct _lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en);
+
+/**
+ * Scroll to an object
+ * @param obj pointer to a parent whose children should be scrolled
+ * @param child pointer to an object to which scrolling should happen
+ * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
+ */
+void lv_obj_scroll_to_obj(struct _lv_obj_t * obj, struct _lv_obj_t * child, lv_anim_enable_t anim_en);
 
 /**********************
  *      MACROS

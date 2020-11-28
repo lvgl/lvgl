@@ -100,6 +100,7 @@ lv_obj_t * lv_roller_create(lv_obj_t * par, const lv_obj_t * copy)
     /*Init the new roller roller*/
     if(copy == NULL) {
         lv_obj_clear_flag(roller, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_add_flag(roller, LV_OBJ_FLAG_SCROLL_FREEZE);
         ext->anim_time = LV_ROLLER_DEF_ANIM_TIME;
         lv_obj_set_width(roller, LV_SIZE_AUTO);
 

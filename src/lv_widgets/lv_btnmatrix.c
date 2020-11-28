@@ -970,16 +970,22 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             /*In navigation mode don't select any button but in edit mode select the fist*/
             if(lv_group_get_editing(lv_obj_get_group(btnm))) {
-                ext->btn_id_focused = 0;
-                ext->btn_id_act = 0;
+                uint32_t b = 0;
+                while(button_is_hidden(ext->ctrl_bits[b]) || button_is_inactive(ext->ctrl_bits[b])) b++;
+                ext->btn_id_focused = b;
+                ext->btn_id_act = b;
             }
             else {
                 ext->btn_id_focused = LV_BTNMATRIX_BTN_NONE;
             }
         }
         else if(indev_type == LV_INDEV_TYPE_KEYPAD) {
-            ext->btn_id_focused = 0;
-            ext->btn_id_act = 0;
+            uint32_t b = 0;
+            while(button_is_hidden(ext->ctrl_bits[b]) || button_is_inactive(ext->ctrl_bits[b])) {
+                b++;
+            }
+            ext->btn_id_focused = b;
+            ext->btn_id_act = b;
         }
 
 #endif
@@ -995,17 +1001,27 @@ static lv_res_t lv_btnmatrix_signal(lv_obj_t * btnm, lv_signal_t sign, void * pa
 #if LV_USE_GROUP
         char c = *((char *)param);
         if(c == LV_KEY_RIGHT) {
-            if(ext->btn_id_focused == LV_BTNMATRIX_BTN_NONE)
-                ext->btn_id_focused = 0;
-            else
+            if(ext->btn_id_focused == LV_BTNMATRIX_BTN_NONE)  ext->btn_id_focused = 0;
+            else ext->btn_id_focused++;
+            if(ext->btn_id_focused >= ext->btn_cnt) ext->btn_id_focused = 0;
+
+            while(button_is_hidden(ext->ctrl_bits[ext->btn_id_focused]) || button_is_inactive(ext->ctrl_bits[ext->btn_id_focused])) {
                 ext->btn_id_focused++;
-            if(ext->btn_id_focused >= ext->btn_cnt - 1) ext->btn_id_focused = ext->btn_cnt - 1;
+                if(ext->btn_id_focused >= ext->btn_cnt) ext->btn_id_focused = 0;
+            }
+
             ext->btn_id_act = ext->btn_id_focused;
             lv_obj_invalidate(btnm);
         }
         else if(c == LV_KEY_LEFT) {
             if(ext->btn_id_focused == LV_BTNMATRIX_BTN_NONE) ext->btn_id_focused = 0;
             if(ext->btn_id_focused > 0) ext->btn_id_focused--;
+
+            while(button_is_hidden(ext->ctrl_bits[ext->btn_id_focused]) || button_is_inactive(ext->ctrl_bits[ext->btn_id_focused])) {
+                if(ext->btn_id_focused > 0) ext->btn_id_focused--;
+                else ext->btn_id_focused = ext->btn_cnt - 1;
+            }
+
             ext->btn_id_act = ext->btn_id_focused;
             lv_obj_invalidate(btnm);
         }

@@ -253,6 +253,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
     new_obj->flags |= LV_OBJ_FLAG_SCROLLABLE;
     new_obj->flags |= LV_OBJ_FLAG_SCROLL_ELASTIC;
     new_obj->flags |= LV_OBJ_FLAG_SCROLL_MOMENTUM;
+    new_obj->flags |= LV_OBJ_FLAG_FOCUS_SCROLL;
     if(parent) new_obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
     new_obj->state = LV_STATE_DEFAULT;
 
@@ -275,6 +276,7 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
         if(copy->spec_attr) {
             lv_obj_allocate_spec_attr(new_obj);
             _lv_memcpy_small(new_obj->spec_attr, copy->spec_attr, sizeof(lv_obj_spec_attr_t));
+            _lv_ll_init(&new_obj->spec_attr->child_ll, sizeof(lv_obj_t)); /*Make the child list empty*/
         }
 #if LV_USE_GROUP
         /*Add to the same group*/
@@ -1930,6 +1932,14 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 #endif
     }
     else if(sign == LV_SIGNAL_FOCUS) {
+        lv_obj_t * parent = lv_obj_get_parent(obj);
+        lv_obj_t * child = obj;
+        while(parent && lv_obj_has_flag(child, LV_OBJ_FLAG_FOCUS_SCROLL)) {
+            lv_obj_scroll_to_obj(parent, child, LV_ANIM_ON);
+            child = parent;
+            parent = lv_obj_get_parent(parent);
+        }
+
         bool editing = false;
 #if LV_USE_GROUP
         editing = lv_group_get_editing(lv_obj_get_group(obj));
@@ -1953,14 +1963,12 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
-
         /*if using focus mode, change target to parent*/
         obj = _lv_obj_get_focused_obj(obj);
 
         lv_obj_clear_state(obj, LV_STATE_FOCUSED | LV_STATE_EDITED);
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {
-
         bool w_new = true;
         bool h_new = true;
         if(param) {

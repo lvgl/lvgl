@@ -93,6 +93,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * parent, const lv_obj_t * copy)
     if(copy == NULL) {
         lv_theme_apply(slider, LV_THEME_SLIDER);
         lv_obj_add_flag(slider, LV_OBJ_FLAG_CHECKABLE);
+        lv_obj_add_flag(slider, LV_OBJ_FLAG_SCROLL_FREEZE);
         lv_obj_set_ext_click_area(slider, 0, 0, LV_DPI / 10, LV_DPI / 10);
         lv_obj_set_height(slider, LV_DPI / 15);
     } else {
@@ -403,7 +404,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
          * During the drawing method the ext. size is used by the knob so refresh the ext. size.*/
         if(lv_obj_get_width(slider) != lv_area_get_width(param) ||
            lv_obj_get_height(slider) != lv_area_get_height(param)) {
-            slider->signal_cb(slider, LV_SIGNAL_REFR_EXT_DRAW_PAD, NULL);
+            _lv_obj_refresh_ext_draw_pad(slider);
         }
     }
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
