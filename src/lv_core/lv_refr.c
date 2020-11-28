@@ -54,6 +54,10 @@ static void lv_refr_vdb_flush(void);
  **********************/
 static uint32_t px_num;
 static lv_disp_t * disp_refr; /*Display being refreshed*/
+#if LV_USE_PERF_MONITOR
+static uint32_t fps_sum_cnt;
+static uint32_t fps_sum_all;
+#endif
 
 /**********************
  *      MACROS
@@ -290,17 +294,28 @@ void _lv_disp_refr_task(lv_task_t * task)
     }
 
     static uint32_t perf_last_time = 0;
-    static uint32_t elaps_max = 1;
+    static uint32_t elaps_sum = 0;
+    static uint32_t frame_cnt = 0;
     if(lv_tick_elaps(perf_last_time) < 300) {
-        elaps_max = LV_MATH_MAX(elaps, elaps_max);
+        if(px_num > 5000) {
+            elaps_sum += elaps;
+            frame_cnt ++;
+        }
     }
     else {
         perf_last_time = lv_tick_get();
-        uint32_t fps = 1000 / (elaps_max == 0 ? 1 : elaps_max);
-        elaps_max = 1;
         uint32_t fps_limit = 1000 / disp_refr->refr_task->period;
+        uint32_t fps;
+
+        if(elaps_sum == 0) elaps_sum = 1;
+        if(frame_cnt == 0) fps = fps_limit;
+        else fps = (1000 * frame_cnt) / elaps_sum;
+        elaps_sum = 0;
+        frame_cnt = 0;
         if(fps > fps_limit) fps = fps_limit;
 
+        fps_sum_all += fps;
+        fps_sum_cnt ++;
         uint32_t cpu = 100 - lv_task_get_idle();
         lv_label_set_text_fmt(perf_label, "%d FPS\n%d%% CPU", fps, cpu);
         lv_obj_align(perf_label, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
@@ -309,6 +324,13 @@ void _lv_disp_refr_task(lv_task_t * task)
 
     LV_LOG_TRACE("lv_refr_task: ready");
 }
+
+#if LV_USE_PERF_MONITOR
+uint32_t lv_refr_get_fps_avg(void)
+{
+    return fps_sum_all / fps_sum_cnt;
+}
+#endif
 
 /**********************
  *   STATIC FUNCTIONS
@@ -381,7 +403,7 @@ static void lv_refr_areas(void)
             disp_refr->driver.buffer->last_part = 0;
             lv_refr_area(&disp_refr->inv_areas[i]);
 
-            if(disp_refr->driver.monitor_cb) px_num += lv_area_get_size(&disp_refr->inv_areas[i]);
+            px_num += lv_area_get_size(&disp_refr->inv_areas[i]);
         }
     }
 }

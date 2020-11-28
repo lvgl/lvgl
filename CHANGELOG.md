@@ -6,6 +6,7 @@
 - make DMA2D non blocking 
 - add unscii-16 built-in font
 - add KConfig
+- add lv_refr_get_fps_avg()
 
 ### Bugfixes
 - fix(btnmatrix) handle arabic texts in button matrices
