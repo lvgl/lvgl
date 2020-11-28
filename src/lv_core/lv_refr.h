@@ -78,6 +78,14 @@ lv_disp_t * _lv_refr_get_disp_refreshing(void);
  */
 void _lv_refr_set_disp_refreshing(lv_disp_t * disp);
 
+#if LV_USE_PERF_MONITOR
+/**
+ * Get the average FPS since start up
+ * @return the average FPS
+ */
+uint32_t lv_refr_get_fps_avg(void);
+#endif
+
 /**
  * Called periodically to handle the refreshing
  * @param task pointer to the task itself

@@ -367,20 +367,20 @@ void lv_img_set_zoom(lv_obj_t * img, uint16_t zoom)
     lv_coord_t h = lv_obj_get_height(img);
     lv_area_t a;
     _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, (transf_zoom * ext->zoom) >> 8, &ext->pivot);
-    a.x1 += img->coords.x1;
-    a.y1 += img->coords.y1;
-    a.x2 += img->coords.x1;
-    a.y2 += img->coords.y1;
+    a.x1 += img->coords.x1 - 1;
+    a.y1 += img->coords.y1 - 1;
+    a.x2 += img->coords.x1 + 1;
+    a.y2 += img->coords.y1 + 1;
     lv_obj_invalidate_area(img, &a);
 
     ext->zoom = zoom;
     _lv_obj_refresh_ext_draw_pad(img);
 
     _lv_img_buf_get_transformed_area(&a, w, h, transf_angle, (transf_zoom * ext->zoom) >> 8, &ext->pivot);
-    a.x1 += img->coords.x1;
-    a.y1 += img->coords.y1;
-    a.x2 += img->coords.x1;
-    a.y2 += img->coords.y1;
+    a.x1 += img->coords.x1 - 1;
+    a.y1 += img->coords.y1 - 1;
+    a.x2 += img->coords.x1 + 1;
+    a.y2 += img->coords.y1 + 1;
     lv_obj_invalidate_area(img, &a);
 }
 

@@ -82,7 +82,7 @@ lv_obj_t * lv_slider_create(lv_obj_t * parent, const lv_obj_t * copy)
     /*Initialize the allocated 'ext' */
     ext->value_to_set = NULL;
     ext->dragging = 0;
-    ext->right_knob_focus = 0;
+    ext->left_knob_focus = 0;
     lv_style_list_init(&ext->style_knob);
 
     /*The signal and design functions are not copied so set them here*/
@@ -315,6 +315,8 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         }
     }
     else if(sign == LV_SIGNAL_PRESSING && ext->value_to_set != NULL) {
+        if(lv_indev_get_type(param) != LV_INDEV_TYPE_POINTER) return res;
+
         lv_indev_get_point(param, &p);
         lv_bidi_dir_t base_dir = lv_obj_get_base_dir(slider);
 
@@ -380,9 +382,9 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         if(indev_type == LV_INDEV_TYPE_ENCODER) {
             if(editing) {
                 if(lv_slider_get_type(slider) == LV_SLIDER_TYPE_RANGE) {
-                    if(ext->right_knob_focus == 0) ext->right_knob_focus = 1;
+                    if(ext->left_knob_focus == 0) ext->left_knob_focus = 1;
                     else {
-                        ext->right_knob_focus = 0;
+                        ext->left_knob_focus = 0;
                         lv_group_set_editing(g, false);
                     }
                 } else {
@@ -394,7 +396,7 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
 
     }
     else if(sign == LV_SIGNAL_FOCUS) {
-        ext->right_knob_focus = 0;
+        ext->left_knob_focus = 0;
     }
     else if(sign == LV_SIGNAL_COORD_CHG) {
         /* The knob size depends on slider size.
@@ -427,14 +429,14 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
         char c = *((char *)param);
 
         if(c == LV_KEY_RIGHT || c == LV_KEY_UP) {
-            if(ext->right_knob_focus) lv_slider_set_value(slider, lv_slider_get_value(slider) + 1, LV_ANIM_ON);
+            if(!ext->left_knob_focus) lv_slider_set_value(slider, lv_slider_get_value(slider) + 1, LV_ANIM_ON);
             else lv_slider_set_left_value(slider, lv_slider_get_left_value(slider) + 1, LV_ANIM_ON);
 
             res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
         else if(c == LV_KEY_LEFT || c == LV_KEY_DOWN) {
-            if(ext->right_knob_focus) lv_slider_set_value(slider, lv_slider_get_value(slider) - 1, LV_ANIM_ON);
+            if(!ext->left_knob_focus) lv_slider_set_value(slider, lv_slider_get_value(slider) - 1, LV_ANIM_ON);
             else lv_slider_set_left_value(slider, lv_slider_get_left_value(slider) - 1, LV_ANIM_ON);
 
             res = lv_event_send(slider, LV_EVENT_VALUE_CHANGED, NULL);
