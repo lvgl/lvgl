@@ -715,8 +715,9 @@ void lv_textarea_set_pwd_mode(lv_obj_t * ta, bool en)
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
     if(ext->pwd_mode == en) return;
 
+    ext->pwd_mode = en == false ? 0 : 1;
     /*Pwd mode is now enabled*/
-    if(ext->pwd_mode == 0 && en != false) {
+    if(en != false) {
         char * txt   = lv_label_get_text(ext->label);
         size_t len = strlen(txt);
         ext->pwd_tmp = lv_mem_alloc(len + 1);
@@ -730,14 +731,12 @@ void lv_textarea_set_pwd_mode(lv_obj_t * ta, bool en)
         lv_textarea_clear_selection(ta);
     }
     /*Pwd mode is now disabled*/
-    else if(ext->pwd_mode == 1 && en == false) {
+    else {
         lv_textarea_clear_selection(ta);
         lv_label_set_text(ext->label, ext->pwd_tmp);
         lv_mem_free(ext->pwd_tmp);
         ext->pwd_tmp = NULL;
     }
-
-    ext->pwd_mode = en == false ? 0 : 1;
 
     refr_cursor_area(ta);
 }
