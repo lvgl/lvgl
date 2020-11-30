@@ -20,8 +20,8 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void construct(void * inst, lv_base_class_t * dsc);
-static void base_construct(void * inst);
+static void lv_class_construct(void * inst, lv_base_class_t * dsc);
+static void lv_class_base_construct(void * inst);
 
 /**********************
  *  STATIC VARIABLES
@@ -46,7 +46,7 @@ void _lv_class_init(void * class_p, uint32_t class_size, uint32_t instance_size,
    if(bc) _lv_memcpy(c, base_p, bc->_class_size);
 
   c->base_p = base_p; /*Save the base to allow accessing its methods later*/
-  c->constructor_cb = base_construct;
+  c->constructor_cb = lv_class_base_construct;
   c->_instance_size = instance_size;
   c->_class_size = class_size;
   c->_inited = 1;
@@ -60,7 +60,7 @@ void * _lv_class_new(void * class_p)
   instance->class_p = class_p;
 
   /*Call the constructor of base classes and this class*/
-  construct(instance, class_p);
+  lv_class_construct(instance, class_p);
   instance->_dynamic = 1;
   return instance;
 }
@@ -73,9 +73,9 @@ void * _lv_class_new(void * class_p)
  * @param inst pointer to an instance
  * @param dsc pointer to the class dsc whose constructor should be called
  */
-static void construct(void * inst, lv_base_class_t * dsc)
+static void lv_class_construct(void * inst, lv_base_class_t * dsc)
 {
-    if(dsc->base_p) construct(inst, dsc->base_p);
+    if(dsc->base_p) lv_class_construct(inst, dsc->base_p);
 
     if(dsc->constructor_cb) dsc->constructor_cb(inst);
 }
@@ -84,7 +84,7 @@ static void construct(void * inst, lv_base_class_t * dsc)
  * Constructor of the base class. Just zero out the instance
  * @param inst pointer to an instance
  */
-static void base_construct(void * inst)
+static void lv_class_base_construct(void * inst)
 {
     lv_base_t * base_inst = inst;
     void * class_p = base_inst->class_p;
