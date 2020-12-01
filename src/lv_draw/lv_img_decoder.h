@@ -267,4 +267,4 @@ void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_ds
 } /* extern "C" */
 #endif
 
-#endif /*LV_TEMPL_H*/
+#endif /*LV_IMG_DECODER_H*/
