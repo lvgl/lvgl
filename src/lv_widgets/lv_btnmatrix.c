@@ -15,6 +15,7 @@
 #include "../lv_core/lv_refr.h"
 #include "../lv_themes/lv_theme.h"
 #include "../lv_misc/lv_txt.h"
+#include "../lv_misc/lv_txt_ap.h"
 
 /*********************
  *      DEFINES
@@ -680,6 +681,10 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
         lv_style_int_t padding_top = lv_obj_get_style_pad_top(btnm, LV_BTNMATRIX_PART_BG);
         lv_style_int_t padding_bottom = lv_obj_get_style_pad_bottom(btnm, LV_BTNMATRIX_PART_BG);
 
+#if LV_USE_ARABIC_PERSIAN_CHARS
+        const size_t txt_ap_size = 256 ;
+        char * txt_ap = _lv_mem_buf_get(txt_ap_size);
+#endif
         for(btn_i = 0; btn_i < ext->btn_cnt; btn_i++, txt_i++) {
             /*Search the next valid text in the map*/
             while(strcmp(ext->map_p[txt_i], "\n") == 0) {
@@ -795,6 +800,16 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
             lv_style_int_t letter_space = draw_label_dsc_act->letter_space;
             lv_style_int_t line_space = draw_label_dsc_act->line_space;
             const char * txt = ext->map_p[txt_i];
+
+#if LV_USE_ARABIC_PERSIAN_CHARS
+            /*Get the size of the Arabic text and process it*/
+            size_t len_ap = _lv_txt_ap_calc_bytes_cnt(txt);
+            if(len_ap < txt_ap_size) {
+                _lv_txt_ap_proc(txt, txt_ap);
+                txt = txt_ap;
+            }
+#endif
+
             lv_point_t txt_size;
             _lv_txt_get_size(&txt_size, txt, font, letter_space,
                              line_space, lv_area_get_width(&area_btnm), txt_flag);
@@ -806,6 +821,10 @@ static lv_design_res_t lv_btnmatrix_design(lv_obj_t * btnm, const lv_area_t * cl
 
             lv_draw_label(&area_tmp, clip_area, draw_label_dsc_act, txt, NULL);
         }
+
+#if LV_USE_ARABIC_PERSIAN_CHARS
+        _lv_mem_buf_release(txt_ap);
+#endif
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
         ancestor_design_f(btnm, clip_area, mode);

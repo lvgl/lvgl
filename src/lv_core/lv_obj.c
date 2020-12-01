@@ -20,8 +20,6 @@
 #include "../lv_misc/lv_fs.h"
 #include "../lv_misc/lv_gc.h"
 #include "../lv_misc/lv_math.h"
-#include "../lv_misc/lv_gc.h"
-#include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_log.h"
 #include "../lv_hal/lv_hal.h"
 #include <stdint.h>
@@ -4761,24 +4759,18 @@ static void invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_proper
 {
     if(style_prop_is_cacheble(prop) == false) return;
 
-    if(part != LV_OBJ_PART_ALL) {
+    for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
         lv_style_list_t * list = lv_obj_get_style_list(obj, part);
-        if(list == NULL) return;
+        if(list == NULL) break;
         list->valid_cache = 0;
     }
-    else {
 
-        for(part = 0; part < _LV_OBJ_PART_REAL_FIRST; part++) {
-            lv_style_list_t * list = lv_obj_get_style_list(obj, part);
-            if(list == NULL) break;
-            list->valid_cache = 0;
-        }
-        for(part = _LV_OBJ_PART_REAL_FIRST; part < 0xFF; part++) {
-            lv_style_list_t * list = lv_obj_get_style_list(obj, part);
-            if(list == NULL) break;
-            list->valid_cache = 0;
-        }
+    for(part = _LV_OBJ_PART_REAL_FIRST; part < 0xFF; part++) {
+        lv_style_list_t * list = lv_obj_get_style_list(obj, part);
+        if(list == NULL) break;
+        list->valid_cache = 0;
     }
+
 
     lv_obj_t * child = lv_obj_get_child(obj, NULL);
     while(child) {

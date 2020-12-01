@@ -8,11 +8,22 @@
 #define LV_CONF_INTERNAL_H
 /* clang-format off */
 
-/*Handle special Kconfig options*/
-#include "lv_conf_kconfig.h"
-
 #include <stdint.h>
 
+/* Add ESP-IDF related includes */
+#if defined (ESP_PLATFORM)
+#  include "sdkconfig.h"
+#  include "esp_attr.h"
+#endif
+
+/* Handle special Kconfig options */
+#include "lv_conf_kconfig.h"
+
+#ifdef CONFIG_LV_CONF_SKIP
+#define LV_CONF_SKIP
+#endif
+
+/* If "lv_conf.h" is available from here try to use it later.*/
 #if defined __has_include
 #  if __has_include("lv_conf.h")
 #   ifndef LV_CONF_INCLUDE_SIMPLE
@@ -22,7 +33,7 @@
 #endif
 
 /*If lv_conf.h is not skipped include it*/
-#if !defined(LV_CONF_SKIP) && !defined(CONFIG_LV_CONF_SKIP)
+#if !defined(LV_CONF_SKIP)
 #  if defined(LV_CONF_PATH)											/*If there is a path defined for lv_conf.h use it*/
 #    define __LV_TO_STR_AUX(x) #x
 #    define __LV_TO_STR(x) __LV_TO_STR_AUX(x)
@@ -1058,6 +1069,13 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #    define  LV_FONT_UNSCII_8     0
 #  endif
 #endif
+#ifndef LV_FONT_UNSCII_16
+#  ifdef CONFIG_LV_FONT_UNSCII_16
+#    define LV_FONT_UNSCII_16 CONFIG_LV_FONT_UNSCII_16
+#  else
+#    define  LV_FONT_UNSCII_16     0
+#  endif
+#endif
 
 /* Optionally declare your custom fonts here.
  * You can use these fonts as default font too
@@ -1975,7 +1993,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 
 
 /*If running without lv_conf.h add typdesf with default value*/
-#if defined(LV_CONF_SKIP) || defined(CONFIG_LV_CONF_SKIP)
+#if defined(LV_CONF_SKIP)
 
   /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
   typedef int16_t lv_coord_t;

@@ -15,6 +15,7 @@ extern "C" {
  *********************/
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"
+#include "../lv_hal/lv_hal_disp.h"
 
 /*********************
  *      DEFINES
@@ -91,6 +92,14 @@ void lv_gpu_stm32_dma2d_copy(lv_color_t * buf, lv_coord_t buf_w, const lv_color_
  */
 void lv_gpu_stm32_dma2d_blend(lv_color_t * buf, lv_coord_t buf_w, const lv_color_t * map, lv_opa_t opa,
                               lv_coord_t map_w, lv_coord_t copy_w, lv_coord_t copy_h);
+
+
+/**
+ * Can be used as `gpu_wait_cb` in display driver to
+ * let the MCU run while the GPU is working
+ */
+void lv_gpu_stm32_dma2d_wait_cb(lv_disp_drv_t * drv);
+
 /**********************
  *      MACROS
  **********************/

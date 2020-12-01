@@ -49,6 +49,7 @@ typedef struct {
     lv_area_t right_knob_area;
     int16_t * value_to_set; /* Which bar value to set */
     uint8_t dragging : 1;       /*1: the slider is being dragged*/
+    uint8_t left_knob_focus : 1; /*1: with encoder now the right knob can be adjusted*/
 } lv_slider_ext_t;
 
 /** Built-in styles of slider*/

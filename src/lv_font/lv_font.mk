@@ -1,6 +1,8 @@
 CSRCS += lv_font.c
 CSRCS += lv_font_fmt_txt.c
 CSRCS += lv_font_loader.c
+CSRCS += lv_font_montserrat_8.c
+CSRCS += lv_font_montserrat_10.c
 CSRCS += lv_font_montserrat_12.c
 CSRCS += lv_font_montserrat_14.c
 CSRCS += lv_font_montserrat_16.c

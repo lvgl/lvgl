@@ -1,6 +1,30 @@
 # Changelog
 
-## v7.7.2 (Planned to 17.11.2020)
+## v7.8.0 (Planned to 01.12.2020)
+
+### New features
+- make DMA2D non blocking 
+- add unscii-16 built-in font
+- add KConfig
+- add lv_refr_get_fps_avg()
+
+### Bugfixes
+- fix(btnmatrix) handle arabic texts in button matrices
+- fix(indev) disabled object shouldn't absorb clicks but let the parent to be clicked
+- fix(arabic) support processing again already processed texts with _lv_txt_ap_proc
+- fix(textarea) support Arabic letter connections
+- fix(dropdown) support Arabic letter connections
+- fix(value_str) support Arabic letter connections in value string property
+- fix(indev) in LV_INDEV_TYPE_BUTTON recognize 1 cycle long presses too
+- fix(arc) make arc work with encoder
+- fix(slider) adjusting the left knob too with encoder
+- fix reference to LV_DRAW_BUF_MAX_NUM in lv_mem.c
+- fix(polygon draw) join adjacent points if they are on the same coordinate
+- fix(linemeter) fix invalidation when setting new value 
+- fix(table) add missing invalidation when changeing cell type
+- refactor(roller) rename LV_ROLLER_MODE_INIFINITE -> LV_ROLLER_MODE_INFINITE
+
+## v7.7.2 (17.11.2020)
 ### Bugfixes
 - fix(draw_triangle): fix polygon/triangle drawing when the order of points is counter-clockwise
 - fix(btnmatrix): fix setting the same map with modified pointers
