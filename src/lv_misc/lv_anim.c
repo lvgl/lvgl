@@ -13,7 +13,7 @@
 #include <string.h>
 #include "../lv_misc/lv_debug.h"
 #include "../lv_hal/lv_hal_tick.h"
-#include <lvgl/src/lv_misc/lv_timer.h>
+#include "lv_timer.h"
 #include "lv_math.h"
 #include "lv_gc.h"
 

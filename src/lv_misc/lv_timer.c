@@ -5,7 +5,7 @@
 /*********************
  *      INCLUDES
  *********************/
-#include <lvgl/src/lv_misc/lv_timer.h>
+#include "lv_timer.h"
 #include <stddef.h>
 #include "../lv_misc/lv_debug.h"
 #include "../lv_hal/lv_hal_tick.h"
