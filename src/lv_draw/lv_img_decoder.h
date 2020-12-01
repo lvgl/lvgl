@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_IMG_DEOCER_H
-#define LV_IMG_DEOCER_H
+#ifndef LV_IMG_DECODER_H
+#define LV_IMG_DECODER_H
 
 #ifdef __cplusplus
 extern "C" {

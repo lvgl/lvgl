@@ -1,5 +1,5 @@
 /**
- * @file lv_bifi.h
+ * @file lv_bidi.h
  *
  */
 

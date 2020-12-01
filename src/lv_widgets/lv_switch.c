@@ -117,7 +117,7 @@ lv_obj_t * lv_switch_create(lv_obj_t * par, const lv_obj_t * copy)
 /**
  * Turn ON the switch
  * @param sw pointer to a switch object
- * @param anim LV_ANOM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
+ * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
 void lv_switch_on(lv_obj_t * sw, lv_anim_enable_t anim)
 {
