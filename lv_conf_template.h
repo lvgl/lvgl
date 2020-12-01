@@ -1,6 +1,10 @@
 /**
  * @file lv_conf.h
+<<<<<<< HEAD
  * Configuration file for v8.0.0-dev
+=======
+ * Configuration file for v7.8.1-dev
+>>>>>>> master
  */
 
 /*
