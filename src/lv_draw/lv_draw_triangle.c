@@ -65,7 +65,7 @@ void lv_draw_polygon(const lv_point_t points[], uint16_t point_cnt, const lv_are
     uint16_t pcnt = 0;
     p[0] = points[0];
     for(i = 0; i < point_cnt - 1; i++) {
-        if(points[i].x != points[i+1].x ||points[i].y != points[i+1].y) {
+        if(points[i].x != points[i + 1].x || points[i].y != points[i + 1].y) {
             p[pcnt] = points[i];
             pcnt++;
         }
