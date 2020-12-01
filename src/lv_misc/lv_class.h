@@ -18,14 +18,17 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define lv_base_class_dsc          \
+#define LV_CLASS_MIXIN_EMPTY
+
+#define _lv_base_class_dsc          \
    void(*constructor_cb)(void * inst);    \
    void(*descructor_cb)(void * inst);    \
    uint32_t _instance_size;    \
    uint32_t _class_size;       \
    uint32_t _inited :1;
 
-#define lv_base_data
+#define _lv_base_data   \
+   uint32_t _dynamic :1;
 
 /**********************
  *      TYPEDEFS
@@ -34,12 +37,14 @@ extern "C" {
 typedef struct _lv_base_class_t
 {
     struct _lv_base_class_t * base_p;
-    lv_base_class_dsc
+    void * (*create)(void);
+    void (*create_static)(void *);
+    _lv_base_class_dsc
 }lv_base_class_t;
 
 typedef struct {
     lv_base_class_t * class_p;
-    uint32_t _dynamic :1;
+    _lv_base_data
 } lv_base_t;
 
 /**********************
@@ -62,7 +67,10 @@ void _lv_class_init(void * class_p, uint32_t class_size, uint32_t instance_size,
  */
 void * _lv_class_new(void * class_p);
 
-extern lv_base_class_t lv_base_class;
+
+void lv_class_construct(void * inst, lv_base_class_t * dsc);
+
+extern lv_base_class_t lv_base;
 
 /**********************
  *      MACROS
@@ -71,40 +79,30 @@ extern lv_base_class_t lv_base_class;
 /**
  * Start class declaration
  */
-#define LV_CLASS_DECLARE_START(classname, basename)    \
+#define LV_CLASS_DECLARE_START(classname, basename)     \
 struct _##classname##_t;                                \
 struct _##classname##_class_t;                          \
 
 /**
  * End class declaration
  */
-#define LV_CLASS_DECLARE_END(classname, basename)      \
-typedef struct _##classname##_class_t {                 \
-  basename##_class_t * base_p;                         \
-  classname##_class_dsc                                 \
-}classname##_class_t;                                   \
+#define LV_CLASS_DECLARE_END(classname, basename)        \
+typedef struct _##classname##_class_t {                  \
+  basename##_class_t * base_p;                           \
+  _##classname##_create;                                    \
+  _##classname##_create_static;                             \
+  _##classname##_class_dsc                                  \
+}classname##_class_t;                                    \
                                                          \
-typedef struct _##classname##_t {                       \
-  classname##_class_t * class_p;                        \
-  classname##_data                                      \
+typedef struct _##classname##_t {                        \
+  classname##_class_t * class_p;                         \
+  _##classname##_data                                       \
 } classname##_t;
 
 /**
  * Initialize a class. Need to be called only once for every class
  */
-#define LV_CLASS_INIT(classname, basename)   _lv_class_init(&(classname##_class), sizeof(classname##_class_t), sizeof(classname##_t), &(basename##_class));
-
-/**
- * Dynamically create a new instance of a class
- * Usage: person_t * p1 = LV_CLASS_NEW(person);
- */
-#define LV_CLASS_NEW(classname) _lv_class_new(&classname##_class)
-
-/**
- * Create a local instance of a class
- * Usage:LV_CLASS_NEW_LOCAL(p1, person); -> Creates a person_t p1 variable;
- */
-#define LV_CLASS_NEW_LOCAL(varname, classname) classname##_t varname = {.class_p = &classname##_class}; varname.class_p->constructor_cb(&varname);
+#define LV_CLASS_INIT(classname, basename)   _lv_class_init(&(classname), sizeof(classname##_class_t), sizeof(classname##_t), &(basename));
 
 
 #ifdef __cplusplus

@@ -20,13 +20,12 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void lv_class_construct(void * inst, lv_base_class_t * dsc);
 static void lv_class_base_construct(void * inst);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-lv_base_class_t lv_base_class;
+lv_base_class_t lv_base;
 
 /**********************
  *      MACROS
@@ -64,21 +63,36 @@ void * _lv_class_new(void * class_p)
   instance->_dynamic = 1;
   return instance;
 }
-/**********************
- *   STATIC FUNCTIONS
- **********************/
+
+void * _lv_class_new_static(void * class_p, void * instance)
+{
+  lv_base_class_t * base_class_p = class_p;
+  lv_base_t * base_inst = instance;
+  _lv_memset_00(base_inst, base_class_p->_instance_size);
+  base_inst->class_p = class_p;
+
+  /*Call the constructor of base classes and this class*/
+  lv_class_construct(instance, class_p);
+  base_inst->_dynamic = 0;
+  return instance;
+}
 
 /**
  * Recursively call all constructor of base(s). Starting from the the oldest.
  * @param inst pointer to an instance
  * @param dsc pointer to the class dsc whose constructor should be called
  */
-static void lv_class_construct(void * inst, lv_base_class_t * dsc)
+void lv_class_construct(void * inst, lv_base_class_t * dsc)
 {
     if(dsc->base_p) lv_class_construct(inst, dsc->base_p);
 
     if(dsc->constructor_cb) dsc->constructor_cb(inst);
 }
+
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
 
 /**
  * Constructor of the base class. Just zero out the instance
