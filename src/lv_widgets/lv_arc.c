@@ -860,12 +860,14 @@ static lv_res_t lv_arc_signal(lv_obj_t * arc, lv_signal_t sign, void * param)
             res = lv_event_send(arc, LV_EVENT_VALUE_CHANGED, NULL);
             if(res != LV_RES_OK) return res;
         }
-    }else if(sign == LV_SIGNAL_GET_EDITABLE) {
+    }
+    else if(sign == LV_SIGNAL_GET_EDITABLE) {
 #if LV_USE_GROUP
         bool * editable = (bool *)param;
         *editable = true;
 #endif
-    }else if(sign == LV_SIGNAL_CLEANUP) {
+    }
+    else if(sign == LV_SIGNAL_CLEANUP) {
         lv_obj_clean_style_list(arc, LV_ARC_PART_KNOB);
         lv_obj_clean_style_list(arc, LV_ARC_PART_INDIC);
     }

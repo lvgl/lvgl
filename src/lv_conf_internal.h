@@ -19,6 +19,10 @@
 /* Handle special Kconfig options */
 #include "lv_conf_kconfig.h"
 
+#ifdef CONFIG_LV_CONF_SKIP
+#define LV_CONF_SKIP
+#endif
+
 /* If "lv_conf.h" is available from here try to use it later.*/
 #if defined __has_include
 #  if __has_include("lv_conf.h")
@@ -1318,7 +1322,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
- * The direction will be processed according to the Unicode Bidirectional Algorithm:
+ * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
  * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
 #ifndef LV_USE_BIDI
 #  ifdef CONFIG_LV_USE_BIDI

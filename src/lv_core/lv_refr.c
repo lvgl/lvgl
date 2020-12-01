@@ -55,8 +55,8 @@ static void lv_refr_vdb_flush(void);
 static uint32_t px_num;
 static lv_disp_t * disp_refr; /*Display being refreshed*/
 #if LV_USE_PERF_MONITOR
-static uint32_t fps_sum_cnt;
-static uint32_t fps_sum_all;
+    static uint32_t fps_sum_cnt;
+    static uint32_t fps_sum_all;
 #endif
 
 /**********************

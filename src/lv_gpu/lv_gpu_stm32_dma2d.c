@@ -226,7 +226,8 @@ void lv_gpu_stm32_dma2d_wait_cb(lv_disp_drv_t * drv)
         while(DMA2D->CR & DMA2D_CR_START_Msk) {
             drv->wait_cb(drv);
         }
-    } else {
+    }
+    else {
         while(DMA2D->CR & DMA2D_CR_START_Msk);
     }
 }
@@ -241,8 +242,8 @@ static void invalidate_cache(void)
     if(disp->driver.clean_dcache_cb) disp->driver.clean_dcache_cb(&disp->driver);
     else {
 #if __CORTEX_M >= 0x07
-    	if((SCB->CCR) & (uint32_t)SCB_CCR_DC_Msk)
-    		SCB_CleanInvalidateDCache();
+        if((SCB->CCR) & (uint32_t)SCB_CCR_DC_Msk)
+            SCB_CleanInvalidateDCache();
 #endif
     }
 }
