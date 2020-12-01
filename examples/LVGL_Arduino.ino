@@ -43,35 +43,20 @@ bool my_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 
     bool touched = tft.getTouch(&touchX, &touchY, 600);
 
-    if (!touched)
-    {
-        data->state = LV_INDEV_STATE_REL;
-        return false;
-    }
-    else
-    {
-        data->state = LV_INDEV_STATE_PR;
-    }
-
-    if (touchX > screenWidth || touchY > screenHeight)
-    {
-        Serial.println("Y or y outside of expected parameters..");
-        Serial.print("y:");
-        Serial.print(touchX);
-        Serial.print(" x:");
-        Serial.print(touchY);
-    }
-    else
-    {
-        /*Set the coordinates*/
-        data->point.x = touchX;
-        data->point.y = touchY;
-
-        Serial.print("Data x");
-        Serial.println(touchX);
-
-        Serial.print("Data y");
-        Serial.println(touchY);
+    if(!touched) {
+      data->state = LV_INDEV_STATE_REL;
+    } else {
+      data->state = LV_INDEV_STATE_PR;
+	    
+      /*Set the coordinates*/
+      data->point.x = touchX;
+      data->point.y = touchY;
+  
+      Serial.print("Data x");
+      Serial.println(touchX);
+      
+      Serial.print("Data y");
+      Serial.println(touchY);
     }
 
     return false; /*Return `false` because we are not buffering and no more data to read*/
