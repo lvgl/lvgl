@@ -27,7 +27,9 @@ Planned to November/December 2020
 - Simplified File system interface ([feat/new_fs_api](https://github.com/lvgl/lvgl/tree/feat/new-fs-api) branch) to make porting easier
   - Work in progress
 - Remove the align parameter from `lv_canvas_draw_text`
-- Make the `copy` parameter of `create` functions deprecated
+- Remove the copy paramter from create functions
+- Style selectors and style-based states See [#1832](https://github.com/lvgl/lvgl/issues/1832)
+- Add Object Orianted system [#1919](https://github.com/lvgl/lvgl/issues/1919)
 
 ## v8.1
 - Add radio button widget
@@ -39,8 +41,6 @@ Planned to November/December 2020
 ## v9
 - Simplify `group`s. Discussion is [here](https://forum.lvgl.io/t/lv-group-tabindex/2927/3).
 - Consider direct binary font format support
-- Remove the copy paramter from create functions
-- Style selectors and style-based states See [#1832](https://github.com/lvgl/lvgl/issues/1832)
 - Optimize line and cirle drawing and masking
 - Reconsider color format management for run time color format setting, and custom color format usage. (Also [RGB888](https://github.com/lvgl/lvgl/issues/1722))
 - 9-patch support for `lv_imgbtn`.
