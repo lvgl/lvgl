@@ -31,7 +31,7 @@ extern "C" {
 /** Roller mode. */
 enum {
     LV_ROLLER_MODE_NORMAL, /**< Normal mode (roller ends at the end of the options). */
-    LV_ROLLER_MODE_INIFINITE, /**< Infinite mode (roller can be scrolled forever). */
+    LV_ROLLER_MODE_INFINITE, /**< Infinite mode (roller can be scrolled forever). */
 };
 
 typedef uint8_t lv_roller_mode_t;
