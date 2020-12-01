@@ -44,6 +44,10 @@ Planned to November/December 2020
 - Optimize line and cirle drawing and masking
 - Reconsider color format management for run time color format setting, and custom color format usage. (Also [RGB888](https://github.com/lvgl/lvgl/issues/1722))
 - 9-patch support for `lv_imgbtn`.
+- Handle stride. See [#1858](https://github.com/lvgl/lvgl/issues/1858)
+- Make gradients more versatile
+- Make image transformations more versatile
+- Allow snapshoting object to tranfrom them as images
 
 ## v10
 - Remove property level states
