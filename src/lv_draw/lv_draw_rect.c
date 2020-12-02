@@ -17,7 +17,7 @@
 /*********************
  *      DEFINES
  *********************/
-#define SHADOW_UPSACALE_SHIFT   6
+#define SHADOW_UPSCALE_SHIFT   6
 #define SHADOW_ENHANCE          1
 #define SPLIT_LIMIT             50
 
@@ -1029,10 +1029,10 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
         }
         else {
             int32_t i;
-            sh_ups_tmp_buf[0] = (mask_line[0] << SHADOW_UPSACALE_SHIFT) / sw;
+            sh_ups_tmp_buf[0] = (mask_line[0] << SHADOW_UPSCALE_SHIFT) / sw;
             for(i = 1; i < size; i++) {
                 if(mask_line[i] == mask_line[i - 1]) sh_ups_tmp_buf[i] = sh_ups_tmp_buf[i - 1];
-                else  sh_ups_tmp_buf[i] = (mask_line[i] << SHADOW_UPSACALE_SHIFT) / sw;
+                else  sh_ups_tmp_buf[i] = (mask_line[i] << SHADOW_UPSCALE_SHIFT) / sw;
             }
         }
 
@@ -1044,7 +1044,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
         int32_t i;
         lv_opa_t * res_buf = (lv_opa_t *)sh_buf;
         for(i = 0; i < size * size; i++) {
-            res_buf[i] = (sh_buf[i] >> SHADOW_UPSACALE_SHIFT);
+            res_buf[i] = (sh_buf[i] >> SHADOW_UPSCALE_SHIFT);
         }
         return;
     }
@@ -1062,10 +1062,10 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_draw_corner_buf(const lv_area_t * coord
     sw += sw_ori & 1;
     if(sw > 1) {
         uint32_t i;
-        sh_buf[0] = (sh_buf[0] << SHADOW_UPSACALE_SHIFT) / sw;
+        sh_buf[0] = (sh_buf[0] << SHADOW_UPSCALE_SHIFT) / sw;
         for(i = 1; i < (uint32_t) size * size; i++) {
             if(sh_buf[i] == sh_buf[i - 1]) sh_buf[i] = sh_buf[i - 1];
-            else  sh_buf[i] = (sh_buf[i] << SHADOW_UPSACALE_SHIFT) / sw;
+            else  sh_buf[i] = (sh_buf[i] << SHADOW_UPSCALE_SHIFT) / sw;
         }
 
         shadow_blur_corner(size, sw, sh_buf);
@@ -1125,7 +1125,7 @@ LV_ATTRIBUTE_FAST_MEM static void shadow_blur_corner(lv_coord_t size, lv_coord_t
         sh_ups_tmp_buf = &sh_ups_buf[x];
         int32_t v = sh_ups_tmp_buf[0] * sw;
         for(y = 0; y < size ; y++, sh_ups_tmp_buf += size) {
-            sh_ups_blur_buf[y] = v < 0 ? 0 : (v >> SHADOW_UPSACALE_SHIFT);
+            sh_ups_blur_buf[y] = v < 0 ? 0 : (v >> SHADOW_UPSCALE_SHIFT);
 
             /*Forget the top pixel*/
             uint32_t top_val;

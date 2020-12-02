@@ -168,7 +168,7 @@ void lv_label_set_align(lv_obj_t * label, lv_label_align_t align);
 void lv_label_set_recolor(lv_obj_t * label, bool en);
 
 /**
- * Set the label's animation speed in LV_LABEL_LONG_SROLL/SCROLL_CIRC modes
+ * Set the label's animation speed in LV_LABEL_LONG_SROLL/SROLL_CIRC modes
  * @param label pointer to a label object
  * @param anim_speed speed of animation in px/sec unit
  */

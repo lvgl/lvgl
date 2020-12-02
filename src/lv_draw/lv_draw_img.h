@@ -93,4 +93,4 @@ bool lv_img_cf_has_alpha(lv_img_cf_t cf);
 } /* extern "C" */
 #endif
 
-#endif /*LV_TEMPL_H*/
+#endif /*LV_DRAW_IMG_H*/

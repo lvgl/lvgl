@@ -39,7 +39,7 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 #define LV_STYLE_ATTR_NONE          0
 #define LV_STYLE_ATTR_INHERIT       (1 << 7)
 
-#define _LV_STYLE_CLOSEING_PROP     0xFF
+#define _LV_STYLE_CLOSING_PROP     0xFF
 
 #define LV_STYLE_TRANS_NUM_MAX      6
 

@@ -67,7 +67,7 @@ extern "C" {
 #endif
 
 #ifndef LV_GPU_NXP_VG_LITE_LOG_ERRORS
-/** Enable logging of VG-Lite erors (\see LV_LOG_ERROR) */
+/** Enable logging of VG-Lite errors (\see LV_LOG_ERROR) */
 #define LV_GPU_NXP_VG_LITE_LOG_ERRORS 1
 #endif
 
