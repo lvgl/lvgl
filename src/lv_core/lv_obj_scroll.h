@@ -232,7 +232,7 @@ void lv_obj_scroll_to_y(struct _lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t a
  * @param child pointer to an object to which scrolling should happen
  * @param anim_en LV_ANIM_ON: scroll with animation; LV_ANIM_OFF: scroll immediately
  */
-void lv_obj_scroll_to_obj(struct _lv_obj_t * obj, struct _lv_obj_t * child, lv_anim_enable_t anim_en);
+void lv_obj_scroll_to_child(struct _lv_obj_t * obj, struct _lv_obj_t * child, lv_anim_enable_t anim_en);
 
 /**********************
  *      MACROS

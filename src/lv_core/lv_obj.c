@@ -1935,7 +1935,7 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_obj_t * parent = lv_obj_get_parent(obj);
         lv_obj_t * child = obj;
         while(parent && lv_obj_has_flag(child, LV_OBJ_FLAG_FOCUS_SCROLL)) {
-            lv_obj_scroll_to_obj(parent, child, LV_ANIM_ON);
+            lv_obj_scroll_to_child(parent, child, LV_ANIM_ON);
             child = parent;
             parent = lv_obj_get_parent(parent);
         }

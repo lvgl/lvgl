@@ -330,7 +330,7 @@ void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
     lv_obj_scroll_by(obj, 0,  -y + lv_obj_get_scroll_y(obj), anim_en);
 }
 
-void lv_obj_scroll_to_obj(lv_obj_t * obj, lv_obj_t * child, lv_anim_enable_t anim_en)
+void lv_obj_scroll_to_child(lv_obj_t * obj, lv_obj_t * child, lv_anim_enable_t anim_en)
 {
     lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
     lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
