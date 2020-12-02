@@ -618,7 +618,7 @@ void theme_apply(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
             list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_BG);
             _lv_style_list_add_style(list, &styles->bg);
 
-            list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_BG_SCRLLABLE);
+            list = lv_obj_get_style_list(obj, LV_TABVIEW_PART_BG_SCROLLABLE);
             _lv_style_list_add_style(list, &styles->bg);
             _lv_style_list_add_style(list, &styles->color);
 

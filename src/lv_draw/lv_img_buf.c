@@ -423,14 +423,14 @@ void _lv_img_buf_transform_init(lv_img_transform_dsc_t * dsc)
     dsc->tmp.pivot_y_256 = dsc->cfg.pivot_y * 256;
 
     int32_t angle_low = dsc->cfg.angle / 10;
-    int32_t angle_hight = angle_low + 1;
+    int32_t angle_high = angle_low + 1;
     int32_t angle_rem = dsc->cfg.angle  - (angle_low * 10);
 
     int32_t s1 = _lv_trigo_sin(-angle_low);
-    int32_t s2 = _lv_trigo_sin(-angle_hight);
+    int32_t s2 = _lv_trigo_sin(-angle_high);
 
     int32_t c1 = _lv_trigo_sin(-angle_low + 90);
-    int32_t c2 = _lv_trigo_sin(-angle_hight + 90);
+    int32_t c2 = _lv_trigo_sin(-angle_high + 90);
 
     dsc->tmp.sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
     dsc->tmp.cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
@@ -500,14 +500,14 @@ void _lv_img_buf_get_transformed_area(lv_area_t * res, lv_coord_t w, lv_coord_t 
     }
 
     int32_t angle_low = angle / 10;
-    int32_t angle_hight = angle_low + 1;
+    int32_t angle_high = angle_low + 1;
     int32_t angle_rem = angle  - (angle_low * 10);
 
     int32_t s1 = _lv_trigo_sin(angle_low);
-    int32_t s2 = _lv_trigo_sin(angle_hight);
+    int32_t s2 = _lv_trigo_sin(angle_high);
 
     int32_t c1 = _lv_trigo_sin(angle_low + 90);
-    int32_t c2 = _lv_trigo_sin(angle_hight + 90);
+    int32_t c2 = _lv_trigo_sin(angle_high + 90);
 
     int32_t sinma = (s1 * (10 - angle_rem) + s2 * angle_rem) / 10;
     int32_t cosma = (c1 * (10 - angle_rem) + c2 * angle_rem) / 10;
