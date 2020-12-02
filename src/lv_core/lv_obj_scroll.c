@@ -300,8 +300,10 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
 #endif
     } else {
         /*Remove pending animations*/
+#if LV_USE_ANIMATION
         lv_anim_del(obj, (lv_anim_exec_xcb_t) scroll_anim_y_cb);
         lv_anim_del(obj, (lv_anim_exec_xcb_t) scroll_anim_x_cb);
+#endif
         _lv_obj_scroll_by_raw(obj, x, y);
     }
 }
@@ -314,13 +316,17 @@ void lv_obj_scroll_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
 
 void lv_obj_scroll_to_x(lv_obj_t * obj, lv_coord_t x, lv_anim_enable_t anim_en)
 {
+#if LV_USE_ANIMATION
     lv_anim_del(obj, (lv_anim_exec_xcb_t) scroll_anim_x_cb);
+#endif
     lv_obj_scroll_by(obj, -x + lv_obj_get_scroll_x(obj), 0, anim_en);
 }
 
 void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
 {
+#if LV_USE_ANIMATION
     lv_anim_del(obj, (lv_anim_exec_xcb_t) scroll_anim_y_cb);
+#endif
     lv_obj_scroll_by(obj, 0,  -y + lv_obj_get_scroll_y(obj), anim_en);
 }
 
