@@ -17,7 +17,8 @@ extern "C" {
 #include <stdbool.h>
 #include "lv_mem.h"
 #include "lv_ll.h"
-#include <lvgl/src/lv_misc/lv_timer.h>
+#include "lv_timer.h"
+
 #include "../lv_draw/lv_img_cache.h"
 #include "../lv_draw/lv_draw_mask.h"
 

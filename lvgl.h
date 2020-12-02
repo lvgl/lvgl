@@ -24,7 +24,7 @@ extern "C" {
  *********************/
 
 #include "src/lv_misc/lv_log.h"
-#include <lvgl/src/lv_misc/lv_timer.h>
+#include "src/lv_misc/lv_timer.h"
 #include "src/lv_misc/lv_math.h"
 #include "src/lv_misc/lv_async.h"
 
