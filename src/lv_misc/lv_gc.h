@@ -18,7 +18,6 @@ extern "C" {
 #include "lv_mem.h"
 #include "lv_ll.h"
 #include "lv_timer.h"
-
 #include "../lv_draw/lv_img_cache.h"
 #include "../lv_draw/lv_draw_mask.h"
 
