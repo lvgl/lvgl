@@ -27,9 +27,6 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-<<<<<<< HEAD
-static inline LV_ATTRIBUTE_TIMER_HANDLER uint32_t lv_task_handler(void)
-=======
 /*---------------------
  * V6.0 COMPATIBILITY
  *--------------------*/
@@ -229,10 +226,10 @@ static inline void lv_obj_align_origo_x(lv_obj_t * obj, const lv_obj_t * base, l
 }
 
 static inline void lv_obj_align_origo_y(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_coord_t y_ofs)
->>>>>>> master
 {
     return lv_timer_handler();
 }
+#endif /*LV_USE_API_EXTENSION_V7*/
 
 /**********************
  *      MACROS
