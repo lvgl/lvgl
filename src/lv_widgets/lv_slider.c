@@ -387,7 +387,8 @@ static lv_res_t lv_slider_signal(lv_obj_t * slider, lv_signal_t sign, void * par
                         ext->left_knob_focus = 0;
                         lv_group_set_editing(g, false);
                     }
-                } else {
+                }
+                else {
                     lv_group_set_editing(g, false);
                 }
             }

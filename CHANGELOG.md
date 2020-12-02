@@ -22,6 +22,7 @@
 - fix(polygon draw) join adjacent points if they are on the same coordinate
 - fix(linemeter) fix invalidation when setting new value 
 - fix(table) add missing invalidation when changeing cell type
+- refactor(roller) rename LV_ROLLER_MODE_INIFINITE -> LV_ROLLER_MODE_INFINITE
 
 ## v7.7.2 (17.11.2020)
 ### Bugfixes
