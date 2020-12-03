@@ -159,7 +159,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color);
  * @param ser   pointer to a data series on 'chart'
  * @return true: successfully deleted
  */
-bool lv_chart_remove_series(lv_obj_t * chart, lv_chart_series_t * ser)
+bool lv_chart_remove_series(lv_obj_t * chart, lv_chart_series_t * ser);
 
 /**
  * Add a cursor with a given color
