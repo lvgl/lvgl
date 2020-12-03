@@ -218,7 +218,7 @@ bool lv_chart_remove_series(lv_obj_t * chart, lv_chart_series_t * ser)
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
     LV_ASSERT_NULL(ser);
     
-    if(chart == NULL || ser == NULL) return;
+    if(chart == NULL || ser == NULL) return false;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
     if(!ser->ext_buf_assigned && ser->points) lv_mem_free(ser->points);
 

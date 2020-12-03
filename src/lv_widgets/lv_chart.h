@@ -154,6 +154,14 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy);
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color);
 
 /**
+ * Deallocate and remove a data series from a chart
+ * @param chart pointer to a chart object
+ * @param ser   pointer to a data series on 'chart'
+ * @return true: successfully deleted
+ */
+bool lv_chart_remove_series(lv_obj_t * chart, lv_chart_series_t * ser)
+
+/**
  * Add a cursor with a given color
  * @param chart pointer to chart object
  * @param color color of the cursor
