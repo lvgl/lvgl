@@ -207,6 +207,27 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     return ser;
 }
 
+/**
+ * Deallocate and remove a data series from a chart
+ * @param chart pointer to a chart object
+ * @param ser   pointer to a data series on 'chart'
+ * @return true: successfully deleted
+ */
+bool lv_chart_remove_series(lv_obj_t * chart, lv_chart_series_t * ser)
+{
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(ser);
+    
+    if(chart == NULL || ser == NULL) return;
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    if(!ser->ext_buf_assigned && ser->points) lv_mem_free(ser->points);
+
+    _lv_ll_remove(&ext->series_ll, ser);
+    lv_mem_free(ser);
+
+    return true;
+}
+
 lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * chart, lv_color_t color, lv_cursor_direction_t axes)
 {
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
