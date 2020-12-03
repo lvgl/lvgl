@@ -16,6 +16,7 @@ extern "C" {
 #include "../lv_conf_internal.h"
 
 #include <stdbool.h>
+#include <stdarg.h>
 #include "lv_area.h"
 #include "lv_area.h"
 #include "../lv_font/lv_font.h"
