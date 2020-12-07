@@ -74,6 +74,7 @@ typedef struct {
     lv_color_t color;
     uint16_t start_point;
     uint8_t ext_buf_assigned : 1;
+    uint8_t hidden : 1;
     lv_chart_axis_t y_axis  : 1;
 } lv_chart_series_t;
 
@@ -154,6 +155,14 @@ lv_obj_t * lv_chart_create(lv_obj_t * par, const lv_obj_t * copy);
 lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color);
 
 /**
+ * Deallocate and remove a data series from a chart
+ * @param chart pointer to a chart object
+ * @param ser   pointer to a data series on 'chart'
+ * @return true: successfully deleted
+ */
+bool lv_chart_remove_series(lv_obj_t * chart, lv_chart_series_t * ser);
+
+/**
  * Add a cursor with a given color
  * @param chart pointer to chart object
  * @param color color of the cursor
@@ -168,6 +177,15 @@ lv_chart_cursor_t * lv_chart_add_cursor(lv_obj_t * chart, lv_color_t color, lv_c
  * @param series pointer to the chart's series to clear
  */
 void lv_chart_clear_series(lv_obj_t * chart, lv_chart_series_t * series);
+
+/**
+ * Hide/Unhide a single series of a chart.
+ * @param chart pointer to a chart object.
+ * @param ser pointer to a series object
+ * @param hide: true: hide the series
+ */
+void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * ser, bool hide);
+
 
 /*=====================
  * Setter functions

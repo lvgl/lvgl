@@ -195,6 +195,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 
     ser->start_point = 0;
     ser->ext_buf_assigned = false;
+    ser->hidden = 0;
     ser->y_axis = LV_CHART_AXIS_PRIMARY_Y;
 
     uint16_t i;
@@ -207,6 +208,34 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
     return ser;
 }
 
+/**
+ * Deallocate and remove a data series from a chart
+ * @param chart pointer to a chart object
+ * @param ser   pointer to a data series on 'chart'
+ * @return true: successfully deleted
+ */
+bool lv_chart_remove_series(lv_obj_t * chart, lv_chart_series_t * ser)
+{
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(ser);
+    
+    if(chart == NULL || ser == NULL) return false;
+    lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
+    if(!ser->ext_buf_assigned && ser->points) lv_mem_free(ser->points);
+
+    _lv_ll_remove(&ext->series_ll, ser);
+    lv_mem_free(ser);
+
+    return true;
+}
+
+/**
+ * Add a cursor with a given color
+ * @param chart pointer to chart object
+ * @param color color of the cursor
+ * @param dir direction of the cursor. `LV_CHART_CURSOR_RIGHT/LEFT/TOP/DOWN`. OR-ed values are possible
+ * @return pointer to the created cursor
+ */
 lv_chart_cursor_t  * lv_chart_add_cursor(lv_obj_t * chart, lv_color_t color, lv_cursor_direction_t axes)
 {
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
@@ -245,6 +274,22 @@ void lv_chart_clear_series(lv_obj_t * chart, lv_chart_series_t * series)
 
     series->start_point = 0;
 }
+
+/**
+ * Hide/Unhide a single series of a chart.
+ * @param chart pointer to a chart object.
+ * @param ser pointer to a series object
+ * @param hide: true: hide the series
+ */
+void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * ser, bool hide)
+{
+    LV_ASSERT_OBJ(ser, LV_OBJX_NAME);
+    LV_ASSERT_NULL(ser);
+
+    ser->hidden = hide ? 1 : 0;
+    lv_chart_refresh(chart);
+}
+
 
 /*=====================
  * Setter functions
@@ -665,6 +710,7 @@ void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_
     cursor->point.y = point->y;
     lv_chart_refresh(chart);
 }
+
 
 /*=====================
  * Getter functions
@@ -1135,6 +1181,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
 
     /*Go through all data lines*/
     _LV_LL_READ_BACK(ext->series_ll, ser) {
+    	if (ser->hidden) continue;
         line_dsc.color = ser->color;
         point_dsc.bg_color = ser->color;
         area_dsc.bg_color = ser->color;
@@ -1271,6 +1318,7 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
 
         /*Draw the current point of all data line*/
         _LV_LL_READ_BACK(ext->series_ll, ser) {
+        	if (ser->hidden) continue;
             lv_coord_t start_point = ext->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
             col_a.x1 = x_act;
