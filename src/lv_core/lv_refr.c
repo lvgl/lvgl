@@ -11,7 +11,7 @@
 #include "lv_disp.h"
 #include "../lv_hal/lv_hal_tick.h"
 #include "../lv_hal/lv_hal_disp.h"
-#include "../lv_misc/lv_task.h"
+#include "../lv_misc/lv_timer.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_math.h"
 #include "../lv_misc/lv_gc.h"
@@ -148,7 +148,7 @@ void _lv_inv_area(lv_disp_t * disp, const lv_area_t * area_p)
             lv_area_copy(&disp->inv_areas[disp->inv_p], &scr_area);
         }
         disp->inv_p++;
-        lv_task_set_prio(disp->refr_task, LV_REFR_TASK_PRIO);
+        lv_timer_pause(disp->refr_task, false);
     }
 }
 
@@ -176,20 +176,20 @@ void _lv_refr_set_disp_refreshing(lv_disp_t * disp)
  * Called periodically to handle the refreshing
  * @param task pointer to the task itself
  */
-void _lv_disp_refr_task(lv_task_t * task)
+void _lv_disp_refr_task(lv_timer_t * tmr)
 {
     LV_LOG_TRACE("lv_refr_task: started");
 
     uint32_t start = lv_tick_get();
     uint32_t elaps = 0;
 
-    disp_refr = task->user_data;
+    disp_refr = tmr->user_data;
 
 #if LV_USE_PERF_MONITOR == 0
     /* Ensure the task does not run again automatically.
      * This is done before refreshing in case refreshing invalidates something else.
      */
-    lv_task_set_prio(task, LV_TASK_PRIO_OFF);
+    lv_timer_pause(tmr, true);
 #endif
 
     /*Do nothing if there is no active screen*/
@@ -593,7 +593,7 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
     lv_obj_t * found_p = NULL;
 
     /*If this object is fully cover the draw area check the children too */
-    if(_lv_area_is_in(area_p, &obj->coords, 0) && obj->hidden == 0) {
+    if(_lv_area_is_in(area_p, &obj->coords, 0) && lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN) == false) {
         lv_design_res_t design_res = obj->design_cb(obj, area_p, LV_DESIGN_COVER_CHK);
         if(design_res == LV_DESIGN_RES_MASKED) return NULL;
 
@@ -604,7 +604,8 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
 #endif
 
         lv_obj_t * i;
-        _LV_LL_READ(obj->child_ll, i) {
+        lv_ll_t * ll = _lv_obj_get_child_ll(obj);
+        _LV_LL_READ(ll, i) {
             found_p = lv_refr_get_top_obj(area_p, i);
 
             /*If a children is ok then break*/
@@ -648,13 +649,14 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
 
     /*Do until not reach the screen*/
     while(par != NULL) {
+        lv_ll_t * ll = _lv_obj_get_child_ll(par);
         /*object before border_p has to be redrawn*/
-        lv_obj_t * i = _lv_ll_get_prev(&(par->child_ll), border_p);
+        lv_obj_t * i = _lv_ll_get_prev(ll, border_p);
 
         while(i != NULL) {
             /*Refresh the objects*/
             lv_refr_obj(i, mask_p);
-            i = _lv_ll_get_prev(&(par->child_ll), i);
+            i = _lv_ll_get_prev(ll, i);
         }
 
         /*Call the post draw design function of the parents of the to object*/
@@ -676,7 +678,7 @@ static void lv_refr_obj_and_children(lv_obj_t * top_p, const lv_area_t * mask_p)
 static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
 {
     /*Do not refresh hidden objects*/
-    if(obj->hidden != 0) return;
+    if(lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) return;
 
     bool union_ok; /* Store the return value of area_union */
     /* Truncate the original mask to the coordinates of the parent
@@ -684,7 +686,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
     lv_area_t obj_mask;
     lv_area_t obj_ext_mask;
     lv_area_t obj_area;
-    lv_coord_t ext_size = obj->ext_draw_pad;
+    lv_coord_t ext_size = _lv_obj_get_ext_draw_pad(obj);
     lv_obj_get_coords(obj, &obj_area);
     obj_area.x1 -= ext_size;
     obj_area.y1 -= ext_size;
@@ -705,7 +707,7 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
         draw_dsc.bg_color.full = debug_color.full;
         draw_dsc.bg_opa = LV_OPA_20;
         draw_dsc.border_width = 2;
-        draw_dsc.border_opa = LV_OPA_50;
+        draw_dsc.border_opa = LV_OPA_70;
         draw_dsc.border_color.full = (debug_color.full + 0x13) * 9;
 
         lv_draw_rect(&obj_ext_mask, &obj_ext_mask, &draw_dsc);
@@ -722,9 +724,10 @@ static void lv_refr_obj(lv_obj_t * obj, const lv_area_t * mask_ori_p)
             lv_area_t mask_child; /*Mask from obj and its child*/
             lv_obj_t * child_p;
             lv_area_t child_area;
-            _LV_LL_READ_BACK(obj->child_ll, child_p) {
+            lv_ll_t * ll = _lv_obj_get_child_ll(obj);
+            _LV_LL_READ_BACK(ll, child_p) {
                 lv_obj_get_coords(child_p, &child_area);
-                ext_size = child_p->ext_draw_pad;
+                ext_size = _lv_obj_get_ext_draw_pad(child_p);
                 child_area.x1 -= ext_size;
                 child_area.y1 -= ext_size;
                 child_area.x2 += ext_size;

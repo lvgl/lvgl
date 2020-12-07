@@ -40,8 +40,9 @@ enum {
     LV_BTNMATRIX_CTRL_NO_REPEAT  = 0x0010, /**< Do not repeat press this button. */
     LV_BTNMATRIX_CTRL_DISABLED   = 0x0020, /**< Disable this button. */
     LV_BTNMATRIX_CTRL_CHECKABLE  = 0x0040, /**< Button *can* be toggled. */
-    LV_BTNMATRIX_CTRL_CHECK_STATE  = 0x0080, /**< Button is currently toggled (e.g. checked). */
-    LV_BTNMATRIX_CTRL_CLICK_TRIG = 0x0100, /**< 1: Send LV_EVENT_SELECTED on CLICK, 0: Send LV_EVENT_SELECTED on PRESS*/
+    LV_BTNMATRIX_CTRL_CHECKED    = 0x0080, /**< Button is currently toggled (e.g. checked). */
+    LV_BTNMATRIX_CTRL_CLICK_TRIG = 0x0100, /**< 1: Send LV_EVENT_VALUE_CHANGE on CLICK, 0: Send LV_EVENT_VALUE_CHANGE on PRESS*/
+    LV_BTNMATRIX_CTRL_TYPE_2 =     0x0200, /**< Render the button with `LV_BTNMATRIX_PART_BTN2` style*/
 };
 typedef uint16_t lv_btnmatrix_ctrl_t;
 
@@ -52,7 +53,8 @@ typedef struct {
     const char ** map_p;                              /*Pointer to the current map*/
     lv_area_t * button_areas;                         /*Array of areas of buttons*/
     lv_btnmatrix_ctrl_t * ctrl_bits;                       /*Array of control bytes*/
-    lv_style_list_t style_btn;                     /*Styles of buttons in each state*/
+    lv_style_list_t style_btn;                        /*Styles of buttons in each state*/
+    lv_style_list_t style_btn2;                       /*Styles of buttons in each state with LV_BTNMATRIX_CTRL_TYPE_2 control*/
     uint16_t btn_cnt;                                 /*Number of button in 'map_p'(Handled by the library)*/
     uint16_t btn_id_pr;                               /*Index of the currently pressed button or LV_BTNMATRIX_BTN_NONE*/
     uint16_t btn_id_focused;                          /*Index of the currently focused button or LV_BTNMATRIX_BTN_NONE*/
@@ -63,8 +65,9 @@ typedef struct {
 } lv_btnmatrix_ext_t;
 
 enum {
-    LV_BTNMATRIX_PART_BG,
+    LV_BTNMATRIX_PART_MAIN,
     LV_BTNMATRIX_PART_BTN,
+    LV_BTNMATRIX_PART_BTN_2,
 };
 typedef uint8_t lv_btnmatrix_part_t;
 
@@ -163,20 +166,20 @@ void lv_btnmatrix_clear_btn_ctrl_all(lv_obj_t * btnm, lv_btnmatrix_ctrl_t ctrl);
 void lv_btnmatrix_set_btn_width(lv_obj_t * btnm, uint16_t btn_id, uint8_t width);
 
 /**
- * Make the button matrix like a selector widget (only one button may be toggled at a time).
+ * Make the button matrix like a selector widget (only one button may be checked at a time).
  * `Checkable` must be enabled on the buttons you want to be selected with `lv_btnmatrix_set_ctrl` or
  * `lv_btnmatrix_set_btn_ctrl_all`.
- * @param btnm Button matrix object
- * @param one_chk Whether "one check" mode is enabled
+ * @param btnm pointer to a button matrix object
+ * @param one_chk whether "one check" mode is enabled
  */
-void lv_btnmatrix_set_one_check(lv_obj_t * btnm, bool one_chk);
+void lv_btnmatrix_set_one_checked(lv_obj_t * btnm, bool one_chk);
 
 /**
- * Set the align of the map text (left, right or center)
+ * Set the align of the texts (left, right or center)
  * @param btnm pointer to a btnmatrix object
  * @param align LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
  */
-void lv_btnmatrix_set_align(lv_obj_t * btnm, lv_label_align_t align);
+void lv_btnmatrix_set_text_align(lv_obj_t * btnm, lv_label_align_t align);
 
 /*=====================
  * Getter functions
@@ -232,18 +235,18 @@ const char * lv_btnmatrix_get_btn_text(const lv_obj_t * btnm, uint16_t btn_id);
  * Get the whether a control value is enabled or disabled for button of a button matrix
  * @param btnm pointer to a button matrix object
  * @param btn_id the index a button not counting new line characters. (E.g. the return value of
- * lv_btnmatrix_get_pressed/released)
+ * lv_btnmatrix_get_active)
  * @param ctrl control values to check (ORed value can be used)
  * @return true: long press repeat is disabled; false: long press repeat enabled
  */
 bool lv_btnmatrix_get_btn_ctrl(lv_obj_t * btnm, uint16_t btn_id, lv_btnmatrix_ctrl_t ctrl);
 
 /**
- * Find whether "one toggle" mode is enabled.
+ * Find whether "one checked" mode is enabled.
  * @param btnm Button matrix object
- * @return whether "one toggle" mode is enabled
+ * @return whether "one checked" mode is enabled
  */
-bool lv_btnmatrix_get_one_check(const lv_obj_t * btnm);
+bool lv_btnmatrix_get_one_checked(const lv_obj_t * btnm);
 
 /**
  * Get the align attribute

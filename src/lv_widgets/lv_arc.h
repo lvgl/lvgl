@@ -63,7 +63,6 @@ enum {
     LV_ARC_PART_INDIC,
     LV_ARC_PART_KNOB,
     _LV_ARC_PART_VIRTUAL_LAST,
-    _LV_ARC_PART_REAL_LAST = _LV_OBJ_PART_REAL_LAST,
 };
 typedef uint8_t lv_arc_part_t;
 

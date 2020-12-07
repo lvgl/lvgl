@@ -137,7 +137,7 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp_def                 = disp; /*Temporarily change the default screen to create the default screens on the
                                         new display*/
     /*Create a refresh task*/
-    disp->refr_task = lv_task_create(_lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, LV_REFR_TASK_PRIO, disp);
+    disp->refr_task = lv_timer_create(_lv_disp_refr_task, LV_DISP_DEF_REFR_PERIOD, disp);
     LV_ASSERT_MEM(disp->refr_task);
     if(disp->refr_task == NULL) return NULL;
 
@@ -158,14 +158,17 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     disp->sys_layer = lv_obj_create(NULL, NULL); /*Create sys layer on the display*/
     lv_obj_reset_style_list(disp->top_layer, LV_OBJ_PART_MAIN);
     lv_obj_reset_style_list(disp->sys_layer, LV_OBJ_PART_MAIN);
-    lv_obj_set_click(disp->top_layer, false);
-    lv_obj_set_click(disp->sys_layer, false);
+    lv_obj_clear_flag(disp->top_layer, LV_OBJ_FLAG_CLICKABLE);
+    lv_obj_clear_flag(disp->sys_layer, LV_OBJ_FLAG_CLICKABLE);
+
+    lv_obj_set_scrollbar_mode(disp->top_layer, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_scrollbar_mode(disp->sys_layer, LV_SCROLLBAR_MODE_OFF);
 
     lv_obj_invalidate(disp->act_scr);
 
     disp_def = disp_def_tmp; /*Revert the default display*/
 
-    lv_task_ready(disp->refr_task); /*Be sure the screen will be refreshed immediately on start up*/
+    lv_timer_ready(disp->refr_task); /*Be sure the screen will be refreshed immediately on start up*/
 
     /*Can't handle this case later so add an error*/
     if(lv_disp_is_true_double_buf(disp) && disp->driver.set_px_cb) {
@@ -185,7 +188,7 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
     memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
 
     lv_obj_t * scr;
-    _LV_LL_READ(disp->scr_ll, scr) {
+    _LV_LL_READ(&disp->scr_ll, scr) {
         lv_obj_set_size(scr, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
     }
 }

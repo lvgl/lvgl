@@ -1,6 +1,10 @@
 /**
  * @file lv_conf.h
+<<<<<<< HEAD
+ * Configuration file for v8.0.0-dev
+=======
  * Configuration file for v7.8.1-dev
+>>>>>>> master
  */
 
 /*
@@ -20,8 +24,8 @@
  *====================*/
 
 /* Maximal horizontal and vertical resolution to support by the library.*/
-#define LV_HOR_RES_MAX          (480)
-#define LV_VER_RES_MAX          (320)
+#define LV_HOR_RES_DEF          (480)
+#define LV_VER_RES_DEF          (320)
 
 /* Color depth:
  * - 1:  1 byte per pixel
@@ -257,7 +261,7 @@ typedef void * lv_img_decoder_user_data_t;
 #define LV_ATTRIBUTE_TICK_INC
 
 /* Define a custom attribute to `lv_task_handler` function */
-#define LV_ATTRIBUTE_TASK_HANDLER
+#define LV_ATTRIBUTE_TIMER_HANDLER
 
 /* Define a custom attribute to `lv_disp_flush_ready` function */
 #define LV_ATTRIBUTE_FLUSH_READY
@@ -453,10 +457,6 @@ typedef void * lv_font_user_data_t;
  * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
 #define LV_USE_THEME_EMPTY       1
 
-/*Simple to the create your theme based on it
- * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
-#define LV_USE_THEME_TEMPLATE    1
-
 /* A fast and impressive theme.
  * Flags:
  * LV_THEME_MATERIAL_FLAG_LIGHT: light theme
@@ -540,6 +540,18 @@ typedef void * lv_font_user_data_t;
 #  define LV_SPRINTF_DISABLE_FLOAT 1
 #endif  /*LV_SPRINTF_CUSTOM*/
 
+/*=================
+ * STYLE SETTINGS
+ *================*/
+
+/* Enable/Disable caching some information about the most common style properties.
+ * Results in faster drawing but has some memory cost per object per part.
+ * LEVEL 0: no caching
+ * LEVEL 1: mark if a property is different from its default value (uses 4 extra byte)
+ * LEVEL 2: LEVEL 1 + cache the value of some common properties (uses 8 extra bytes)
+ */
+#define LV_STYLE_CACHE_LEVEL   0   /*Cache level*/
+
 /*===================
  *  LV_OBJ SETTINGS
  *==================*/
@@ -555,9 +567,6 @@ typedef void * lv_obj_user_data_t;
 #  define LV_USER_DATA_FREE  (user_data_free)       /*Invoking for user data free function*/
 #endif
 #endif
-
-/*1: enable `lv_obj_realign()` based on `lv_obj_align()` parameters*/
-#define LV_USE_OBJ_REALIGN          1
 
 /* Enable to make the object clickable on a larger area.
  * LV_EXT_CLICK_AREA_OFF or 0: Disable this feature
@@ -585,12 +594,6 @@ typedef void * lv_obj_user_data_t;
 /*Button matrix (dependencies: -)*/
 #define LV_USE_BTNMATRIX     1
 
-/*Calendar (dependencies: -)*/
-#define LV_USE_CALENDAR 1
-#if LV_USE_CALENDAR
-#  define LV_CALENDAR_WEEK_STARTS_MONDAY    0
-#endif
-
 /*Canvas (dependencies: lv_img)*/
 #define LV_USE_CANVAS   1
 
@@ -602,12 +605,6 @@ typedef void * lv_obj_user_data_t;
 #if LV_USE_CHART
 #  define LV_CHART_AXIS_TICK_LABEL_MAX_LEN    256
 #endif
-
-/*Container (dependencies: -*/
-#define LV_USE_CONT     1
-
-/*Color picker (dependencies: -*/
-#define LV_USE_CPICKER   1
 
 /*Drop down list (dependencies: lv_page, lv_label, lv_symbol_def.h)*/
 #define LV_USE_DROPDOWN    1
@@ -629,9 +626,6 @@ typedef void * lv_obj_user_data_t;
 #  define LV_IMGBTN_TILED 0
 #endif
 
-/*Keyboard (dependencies: lv_btnm)*/
-#define LV_USE_KEYBOARD       1
-
 /*Label (dependencies: -*/
 #define LV_USE_LABEL    1
 #if LV_USE_LABEL != 0
@@ -648,55 +642,23 @@ typedef void * lv_obj_user_data_t;
 #  define LV_LABEL_LONG_TXT_HINT          0
 #endif
 
-/*LED (dependencies: -)*/
-#define LV_USE_LED      1
-#if LV_USE_LED
-#  define LV_LED_BRIGHT_MIN  120      /*Minimal brightness*/
-#  define LV_LED_BRIGHT_MAX  255     /*Maximal brightness*/
-#endif
-
 /*Line (dependencies: -*/
 #define LV_USE_LINE     1
 
-/*List (dependencies: lv_page, lv_btn, lv_label, (lv_img optionally for icons ))*/
-#define LV_USE_LIST     1
-#if LV_USE_LIST != 0
-/*Default animation time of focusing to a list element [ms] (0: no animation)  */
-#  define LV_LIST_DEF_ANIM_TIME  100
-#endif
-
-/*Line meter (dependencies: *;)*/
-#define LV_USE_LINEMETER   1
+/*Linemeter (dependencies: -*/
+#define LV_USE_LINEMETER     1
 #if LV_USE_LINEMETER
-/* Draw line more precisely at cost of performance.
- * Useful if there are lot of lines any minor are visible
- * 0: No extra precision
- * 1: Some extra precision
- * 2: Best precision
- */
-#  define LV_LINEMETER_PRECISE    1
-#endif
 
+/* Set how precisely should the lines of the line meter be calculated.
+ * Higher precision means slower rendering.
+ * 0: normal
+ * 1: extra precision in the inner ring
+ * 2. extra precision on the outer ring too
+ */
+#  define LV_LINEMETER_PRECISE  1
+#endif
 /*Mask (dependencies: -)*/
 #define LV_USE_OBJMASK  1
-
-/*Message box (dependencies: lv_rect, lv_btnm, lv_label)*/
-#define LV_USE_MSGBOX     1
-
-/*Page (dependencies: lv_cont)*/
-#define LV_USE_PAGE     1
-#if LV_USE_PAGE != 0
-/*Focus default animation time [ms] (0: no animation)*/
-#  define LV_PAGE_DEF_ANIM_TIME     400
-#endif
-
-/*Preload (dependencies: lv_arc, lv_anim)*/
-#define LV_USE_SPINNER      1
-#if LV_USE_SPINNER != 0
-#  define LV_SPINNER_DEF_ARC_LENGTH   60      /*[deg]*/
-#  define LV_SPINNER_DEF_SPIN_TIME    1000    /*[ms]*/
-#  define LV_SPINNER_DEF_ANIM         LV_SPINNER_TYPE_SPINNING_ARC
-#endif
 
 /*Roller (dependencies: lv_ddlist)*/
 #define LV_USE_ROLLER    1
@@ -710,9 +672,6 @@ typedef void * lv_obj_user_data_t;
 
 /*Slider (dependencies: lv_bar)*/
 #define LV_USE_SLIDER    1
-
-/*Spinbox (dependencies: lv_ta)*/
-#define LV_USE_SPINBOX       1
 
 /*Switch (dependencies: lv_slider)*/
 #define LV_USE_SWITCH       1
@@ -730,24 +689,6 @@ typedef void * lv_obj_user_data_t;
 #  define LV_TABLE_COL_MAX    12
 #  define LV_TABLE_CELL_STYLE_CNT 4
 #endif
-
-
-/*Tab (dependencies: lv_page, lv_btnm)*/
-#define LV_USE_TABVIEW      1
-#  if LV_USE_TABVIEW != 0
-/*Time of slide animation [ms] (0: no animation)*/
-#  define LV_TABVIEW_DEF_ANIM_TIME    300
-#endif
-
-/*Tileview (dependencies: lv_page) */
-#define LV_USE_TILEVIEW     1
-#if LV_USE_TILEVIEW
-/*Time of slide animation [ms] (0: no animation)*/
-#  define LV_TILEVIEW_DEF_ANIM_TIME   300
-#endif
-
-/*Window (dependencies: lv_cont, lv_btn, lv_label, lv_img, lv_page)*/
-#define LV_USE_WIN      1
 
 /*==================
  * Non-user section

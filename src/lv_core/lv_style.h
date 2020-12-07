@@ -45,6 +45,10 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
 #define LV_STYLE_PROP_ALL 0xFF
 
+#if LV_STYLE_CACHE_LEVEL >= 2
+#define _LV_STLYE_CAHCE_INT_MAX 63
+#endif
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -106,11 +110,10 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_BOTTOM,         0x1, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_LEFT,           0x1, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_PAD_RIGHT,          0x1, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_PAD_INNER,          0x1, LV_STYLE_ID_VALUE + 4, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_MARGIN_TOP,         0x1, LV_STYLE_ID_VALUE + 5, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_MARGIN_BOTTOM,      0x1, LV_STYLE_ID_VALUE + 6, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_MARGIN_LEFT,        0x1, LV_STYLE_ID_VALUE + 7, LV_STYLE_ATTR_NONE),
-    LV_STYLE_PROP_INIT(LV_STYLE_MARGIN_RIGHT,       0x1, LV_STYLE_ID_VALUE + 8, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_MARGIN_TOP,         0x1, LV_STYLE_ID_VALUE + 4, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_MARGIN_BOTTOM,      0x1, LV_STYLE_ID_VALUE + 5, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_MARGIN_LEFT,        0x1, LV_STYLE_ID_VALUE + 6, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_MARGIN_RIGHT,       0x1, LV_STYLE_ID_VALUE + 7, LV_STYLE_ATTR_NONE),
 
     LV_STYLE_PROP_INIT(LV_STYLE_BG_BLEND_MODE,      0x2, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_BG_MAIN_STOP,       0x2, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
@@ -198,6 +201,16 @@ enum {
     LV_STYLE_PROP_INIT(LV_STYLE_SCALE_END_LINE_WIDTH,   0xC, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_SCALE_GRAD_COLOR,       0xC, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
     LV_STYLE_PROP_INIT(LV_STYLE_SCALE_END_COLOR,        0xC, LV_STYLE_ID_COLOR + 1, LV_STYLE_ATTR_NONE),
+
+    LV_STYLE_PROP_INIT(LV_STYLE_SCROLLBAR_TICKNESS,            0xD, LV_STYLE_ID_VALUE + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCROLLBAR_SPACE_SIDE,       0xD, LV_STYLE_ID_VALUE + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCROLLBAR_SPACE_END,        0xD, LV_STYLE_ID_VALUE + 2, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCROLLBAR_RADIUS,           0xD, LV_STYLE_ID_VALUE + 3, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCROLLBAR_BORDER_WIDTH,     0xD, LV_STYLE_ID_VALUE + 4, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCROLLBAR_BG_COLOR,         0xD, LV_STYLE_ID_COLOR + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCROLLBAR_BORDER_COLOR,     0xD, LV_STYLE_ID_COLOR + 1, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCROLLBAR_BG_OPA,           0xD, LV_STYLE_ID_OPA + 0, LV_STYLE_ATTR_NONE),
+    LV_STYLE_PROP_INIT(LV_STYLE_SCROLLBAR_BORDER_OPA,       0xD, LV_STYLE_ID_OPA + 1, LV_STYLE_ATTR_NONE),
 };
 
 typedef uint16_t lv_style_property_t;
@@ -222,14 +235,17 @@ typedef struct {
 #if LV_USE_ASSERT_STYLE
     uint32_t sentinel;
 #endif
-    uint32_t style_cnt     : 6;
+    uint32_t style_cnt     : 5;
     uint32_t has_local     : 1;
     uint32_t has_trans     : 1;
     uint32_t skip_trans    : 1;      /*1: Temporally skip the transition style if any*/
     uint32_t ignore_trans  : 1;      /*1: Mark that this style list shouldn't receive transitions at all*/
+
+#if LV_STYLE_CACHE_LEVEL >= 1
     uint32_t valid_cache   : 1;      /*1: The cache is valid and can be used*/
     uint32_t ignore_cache  : 1;      /*1: Ignore cache while getting value of properties*/
 
+    /*32 properties*/
     uint32_t radius_zero : 1;
     uint32_t opa_scale_cover      : 1;
     uint32_t clip_corner_off       : 1;
@@ -253,6 +269,13 @@ typedef struct {
     uint32_t text_space_zero : 1;
     uint32_t text_decor_none : 1;
     uint32_t text_font_normal : 1;
+#endif
+
+#if LV_STYLE_CACHE_LEVEL >= 2
+    uint32_t pad_top :6;
+    uint32_t pad_left :6;
+#endif
+
 } lv_style_list_t;
 
 /**********************

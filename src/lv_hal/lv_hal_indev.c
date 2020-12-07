@@ -54,8 +54,8 @@ void lv_indev_drv_init(lv_indev_drv_t * driver)
     _lv_memset_00(driver, sizeof(lv_indev_drv_t));
 
     driver->type                 = LV_INDEV_TYPE_NONE;
-    driver->drag_limit           = LV_INDEV_DEF_DRAG_LIMIT;
-    driver->drag_throw           = LV_INDEV_DEF_DRAG_THROW;
+    driver->scroll_limit           = LV_INDEV_DEF_DRAG_LIMIT;
+    driver->scroll_throw           = LV_INDEV_DEF_DRAG_THROW;
     driver->long_press_time      = LV_INDEV_DEF_LONG_PRESS_TIME;
     driver->long_press_rep_time  = LV_INDEV_DEF_LONG_PRESS_REP_TIME;
     driver->gesture_limit        = LV_INDEV_DEF_GESTURE_LIMIT;
@@ -92,7 +92,7 @@ lv_indev_t * lv_indev_drv_register(lv_indev_drv_t * driver)
     indev->group            = NULL;
     indev->btn_points       = NULL;
 
-    indev->driver.read_task = lv_task_create(_lv_indev_read_task, LV_INDEV_DEF_READ_PERIOD, LV_TASK_PRIO_HIGH, indev);
+    indev->driver.read_task = lv_timer_create(_lv_indev_read_task, LV_INDEV_DEF_READ_PERIOD, indev);
 
     return indev;
 }

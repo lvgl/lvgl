@@ -15,7 +15,7 @@ extern "C" {
  *********************/
 #include "lv_obj.h"
 #include "../lv_hal/lv_hal_indev.h"
-#include "../lv_core/lv_group.h"
+#include "lv_group.h"
 
 /*********************
  *      DEFINES
@@ -38,7 +38,7 @@ void _lv_indev_init(void);
  * Called periodically to read the input devices
  * @param task pointer to the task itself
  */
-void _lv_indev_read_task(lv_task_t * task);
+void _lv_indev_read_task(lv_timer_t * task);
 
 /**
  * Get the currently processed input device. Can be used in action functions too.
@@ -120,35 +120,35 @@ lv_gesture_dir_t lv_indev_get_gesture_dir(const lv_indev_t * indev);
 uint32_t lv_indev_get_key(const lv_indev_t * indev);
 
 /**
- * Check if there is dragging with an input device or not (for LV_INDEV_TYPE_POINTER and
+ * Check the current scroll direction of an input device (for LV_INDEV_TYPE_POINTER and
  * LV_INDEV_TYPE_BUTTON)
  * @param indev pointer to an input device
- * @return true: drag is in progress
+ * @return LV_SCROLL_DIR_NONE: no scrolling now
+ *         LV_SCROLL_DIR_HOR/VER
  */
-bool lv_indev_is_dragging(const lv_indev_t * indev);
+lv_scroll_dir_t lv_indev_get_scroll_dir(const lv_indev_t * indev);
 
 /**
- * Get the vector of dragging of an input device (for LV_INDEV_TYPE_POINTER and
+ * Get the currently scrolled object (for LV_INDEV_TYPE_POINTER and
  * LV_INDEV_TYPE_BUTTON)
  * @param indev pointer to an input device
- * @param point pointer to a point to store the vector
+ * @return pointer to the currently scrolled object or NULL if no scrolling by this indev
+ */
+lv_obj_t * lv_indev_get_scroll_obj(const lv_indev_t * indev);
+
+/**
+ * Get the movement vector of an input device (for LV_INDEV_TYPE_POINTER and
+ * LV_INDEV_TYPE_BUTTON)
+ * @param indev pointer to an input device
+ * @param point pointer to a point to store the types.pointer.vector
  */
 void lv_indev_get_vect(const lv_indev_t * indev, lv_point_t * point);
-
-/**
- * Manually finish dragging.
- * `LV_SIGNAL_DRAG_END` and `LV_EVENT_DRAG_END` will be sent.
- * @param indev pointer to an input device
- * @return `LV_RES_INV` if the object being dragged was deleted. Else `LV_RES_OK`.
- */
-lv_res_t lv_indev_finish_drag(lv_indev_t * indev);
 
 /**
  * Do nothing until the next release
  * @param indev pointer to an input device
  */
 void lv_indev_wait_release(lv_indev_t * indev);
-
 
 /**
  * Gets a pointer to the currently active object in indev proc functions.
@@ -171,7 +171,7 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point);
  * @param indev pointer to an inout device
  * @return pointer to the indev read refresher task. (NULL on error)
  */
-lv_task_t * lv_indev_get_read_task(lv_disp_t * indev);
+lv_timer_t * lv_indev_get_read_task(lv_disp_t * indev);
 
 /**********************
  *      MACROS

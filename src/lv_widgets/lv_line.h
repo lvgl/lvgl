@@ -32,7 +32,6 @@ typedef struct {
     /*Inherited from 'base_obj' so no inherited ext.*/ /*Ext. of ancestor*/
     const lv_point_t * point_array;                    /*Pointer to an array with the points of the line*/
     uint16_t point_num;                                /*Number of points in 'point_array' */
-    uint8_t auto_size : 1;                             /*1: set obj. width to x max and obj. height to y max */
     uint8_t y_inv : 1;                                 /*1: y == 0 will be on the bottom*/
 } lv_line_ext_t;
 
@@ -67,14 +66,6 @@ lv_obj_t * lv_line_create(lv_obj_t * par, const lv_obj_t * copy);
 void lv_line_set_points(lv_obj_t * line, const lv_point_t point_a[], uint16_t point_num);
 
 /**
- * Enable (or disable) the auto-size option. The size of the object will fit to its points.
- * (set width to x max and height to y max)
- * @param line pointer to a line object
- * @param en true: auto size is enabled, false: auto size is disabled
- */
-void lv_line_set_auto_size(lv_obj_t * line, bool en);
-
-/**
  * Enable (or disable) the y coordinate inversion.
  * If enabled then y will be subtracted from the height of the object,
  * therefore the y=0 coordinate will be on the bottom.
@@ -91,13 +82,6 @@ work */
 /*=====================
  * Getter functions
  *====================*/
-
-/**
- * Get the auto size attribute
- * @param line pointer to a line object
- * @return true: auto size is enabled, false: disabled
- */
-bool lv_line_get_auto_size(const lv_obj_t * line);
 
 /**
  * Get the y inversion attribute

@@ -41,7 +41,6 @@ typedef struct {
     lv_point_t pivot;     /*rotation center of the image*/
     uint16_t zoom;         /*256 means no zoom, 512 double size, 128 half size*/
     uint8_t src_type : 2;  /*See: lv_img_src_t*/
-    uint8_t auto_size : 1; /*1: automatically set the object size to the image size*/
     uint8_t cf : 5;        /*Color format from `lv_img_color_format_t`*/
     uint8_t antialias : 1; /*Apply anti-aliasing in transformations (rotate, zoom)*/
 } lv_img_ext_t;
@@ -76,14 +75,6 @@ lv_obj_t * lv_img_create(lv_obj_t * par, const lv_obj_t * copy);
 void lv_img_set_src(lv_obj_t * img, const void * src_img);
 
 /**
- * Enable the auto size feature.
- * If enabled the object size will be same as the picture size.
- * @param img pointer to an image
- * @param en true: auto size enable, false: auto size disable
- */
-void lv_img_set_auto_size(lv_obj_t * img, bool autosize_en);
-
-/**
  * Set an offset for the source of an image.
  * so the image will be displayed from the new origin.
  * @param img pointer to an image
@@ -103,10 +94,10 @@ void lv_img_set_offset_y(lv_obj_t * img, lv_coord_t y);
  * Set the rotation center of the image.
  * The image will be rotated around this point
  * @param img pointer to an image object
- * @param pivot_x rotation center x of the image
- * @param pivot_y rotation center y of the image
+ * @param x rotation center x of the image
+ * @param y rotation center y of the image
  */
-void lv_img_set_pivot(lv_obj_t * img, lv_coord_t pivot_x, lv_coord_t pivot_y);
+void lv_img_set_pivot(lv_obj_t * img, lv_coord_t x, lv_coord_t y);
 
 /**
  * Set the rotation angle of the image.
@@ -145,20 +136,6 @@ void lv_img_set_antialias(lv_obj_t * img, bool antialias);
  * @return the image source (symbol, file name or C array)
  */
 const void * lv_img_get_src(lv_obj_t * img);
-
-/**
- * Get the name of the file set for an image
- * @param img pointer to an image
- * @return file name
- */
-const char * lv_img_get_file_name(const lv_obj_t * img);
-
-/**
- * Get the auto size enable attribute
- * @param img pointer to an image
- * @return true: auto size is enabled, false: auto size is disabled
- */
-bool lv_img_get_auto_size(const lv_obj_t * img);
 
 /**
  * Get the offset.x attribute of the img object.
