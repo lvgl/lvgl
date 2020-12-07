@@ -74,6 +74,7 @@ typedef struct {
     lv_color_t color;
     uint16_t start_point;
     uint8_t ext_buf_assigned : 1;
+    uint8_t hidden : 1;
     lv_chart_axis_t y_axis  : 1;
 } lv_chart_series_t;
 
@@ -349,6 +350,14 @@ void lv_chart_set_series_axis(lv_obj_t * chart, lv_chart_series_t * ser, lv_char
  * @param point the new coordinate of cursor relative to the series area
  */
 void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_point_t * point);
+
+/**
+ * Hide/Unhide a single series of a chart.
+ * @param chart pointer to a chart object.
+ * @param ser pointer to a series object
+ * @param hide: true: hide the series
+ */
+void lv_chart_set_series_hidden(lv_obj_t * chart, lv_chart_series_t * ser, bool hide);
 
 
 /*=====================

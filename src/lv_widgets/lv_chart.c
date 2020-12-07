@@ -195,6 +195,7 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 
     ser->start_point = 0;
     ser->ext_buf_assigned = false;
+    ser->hidden = 0;
     ser->y_axis = LV_CHART_AXIS_PRIMARY_Y;
 
     uint16_t i;
@@ -694,6 +695,22 @@ void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_
     lv_chart_refresh(chart);
 }
 
+/**
+ * Hide/Unhide a single series of a chart.
+ * @param chart pointer to a chart object.
+ * @param ser pointer to a series object
+ * @param hide: true: hide the series
+ */
+void lv_chart_set_series_hidden(lv_obj_t * chart, lv_chart_series_t * ser, bool hide)
+{
+    LV_ASSERT_OBJ(ser, LV_OBJX_NAME);
+    LV_ASSERT_NULL(ser);
+
+    ser->hidden = hide ? 1 : 0;
+    lv_chart_refresh(chart);
+}
+
+
 /*=====================
  * Getter functions
  *====================*/
@@ -1163,6 +1180,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
 
     /*Go through all data lines*/
     _LV_LL_READ_BACK(ext->series_ll, ser) {
+    	if (ser->hidden) continue;
         line_dsc.color = ser->color;
         point_dsc.bg_color = ser->color;
         area_dsc.bg_color = ser->color;
@@ -1299,6 +1317,7 @@ static void draw_series_column(lv_obj_t * chart, const lv_area_t * series_area, 
 
         /*Draw the current point of all data line*/
         _LV_LL_READ_BACK(ext->series_ll, ser) {
+        	if (ser->hidden) continue;
             lv_coord_t start_point = ext->update_mode == LV_CHART_UPDATE_MODE_SHIFT ? ser->start_point : 0;
 
             col_a.x1 = x_act;
