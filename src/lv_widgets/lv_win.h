@@ -57,6 +57,7 @@ typedef struct {
     lv_obj_t * header;                /*Pointer to the header container of the window*/
     char * title_txt;                 /*Pointer to the title label of the window*/
     lv_coord_t btn_w;                 /*Width of the control buttons*/
+    uint8_t title_txt_align;          //Control the alignment of the header text
 } lv_win_ext_t;
 
 /** Window parts. */
