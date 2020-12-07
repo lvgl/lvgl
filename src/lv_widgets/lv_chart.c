@@ -211,22 +211,21 @@ lv_chart_series_t * lv_chart_add_series(lv_obj_t * chart, lv_color_t color)
 /**
  * Deallocate and remove a data series from a chart
  * @param chart pointer to a chart object
- * @param ser   pointer to a data series on 'chart'
- * @return true: successfully deleted
+ * @param series pointer to a data series on 'chart'
  */
-bool lv_chart_remove_series(lv_obj_t * chart, lv_chart_series_t * ser)
+void lv_chart_remove_series(lv_obj_t * chart, lv_chart_series_t * series)
 {
     LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_NULL(series);
     
-    if(chart == NULL || ser == NULL) return false;
+    if(chart == NULL || series == NULL) return;
     lv_chart_ext_t * ext = lv_obj_get_ext_attr(chart);
-    if(!ser->ext_buf_assigned && ser->points) lv_mem_free(ser->points);
+    if(!series->ext_buf_assigned && series->points) lv_mem_free(series->points);
 
-    _lv_ll_remove(&ext->series_ll, ser);
-    lv_mem_free(ser);
+    _lv_ll_remove(&ext->series_ll, series);
+    lv_mem_free(series);
 
-    return true;
+    return;
 }
 
 /**
@@ -279,7 +278,7 @@ void lv_chart_clear_series(lv_obj_t * chart, lv_chart_series_t * series)
  * Hide/Unhide a single series of a chart.
  * @param chart pointer to a chart object.
  * @param series pointer to a series object
- * @param hide: true: hide the series
+ * @param hide true: hide the series
  */
 void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hide)
 {
