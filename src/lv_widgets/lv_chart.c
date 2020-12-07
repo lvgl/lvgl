@@ -275,6 +275,22 @@ void lv_chart_clear_series(lv_obj_t * chart, lv_chart_series_t * series)
     series->start_point = 0;
 }
 
+/**
+ * Hide/Unhide a single series of a chart.
+ * @param chart pointer to a chart object.
+ * @param series pointer to a series object
+ * @param hide: true: hide the series
+ */
+void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hide)
+{
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(series);
+
+    series->hidden = hide ? 1 : 0;
+    lv_chart_refresh(chart);
+}
+
+
 /*=====================
  * Setter functions
  *====================*/
@@ -692,21 +708,6 @@ void lv_chart_set_cursor_point(lv_obj_t * chart, lv_chart_cursor_t * cursor, lv_
 
     cursor->point.x = point->x;
     cursor->point.y = point->y;
-    lv_chart_refresh(chart);
-}
-
-/**
- * Hide/Unhide a single series of a chart.
- * @param chart pointer to a chart object.
- * @param ser pointer to a series object
- * @param hide: true: hide the series
- */
-void lv_chart_set_series_hidden(lv_obj_t * chart, lv_chart_series_t * ser, bool hide)
-{
-    LV_ASSERT_OBJ(ser, LV_OBJX_NAME);
-    LV_ASSERT_NULL(ser);
-
-    ser->hidden = hide ? 1 : 0;
     lv_chart_refresh(chart);
 }
 
