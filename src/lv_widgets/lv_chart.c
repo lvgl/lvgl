@@ -278,15 +278,15 @@ void lv_chart_clear_series(lv_obj_t * chart, lv_chart_series_t * series)
 /**
  * Hide/Unhide a single series of a chart.
  * @param chart pointer to a chart object.
- * @param ser pointer to a series object
+ * @param series pointer to a series object
  * @param hide: true: hide the series
  */
-void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * ser, bool hide)
+void lv_chart_hide_series(lv_obj_t * chart, lv_chart_series_t * series, bool hide)
 {
-    LV_ASSERT_OBJ(ser, LV_OBJX_NAME);
-    LV_ASSERT_NULL(ser);
+    LV_ASSERT_OBJ(chart, LV_OBJX_NAME);
+    LV_ASSERT_NULL(series);
 
-    ser->hidden = hide ? 1 : 0;
+    series->hidden = hide ? 1 : 0;
     lv_chart_refresh(chart);
 }
 
