@@ -32,6 +32,7 @@
  *********************/
 
 #include "../lv_conf_internal.h"
+#include "../misc/lv_log.h"
 
 #if LV_USE_GPU_NXP_PXP && LV_USE_GPU_NXP_PXP_AUTO_INIT
 
