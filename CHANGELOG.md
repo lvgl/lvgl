@@ -4,6 +4,7 @@
 
 ### Bugfixes
 - fix(lv_scr_load_anim) fix when multiple screen are loaded at tsame time with delay
+- fix(page) fix LV_SCOLLBAR_MODE_DRAG
 
 ## v7.8.0 (01.12.2020)
 
