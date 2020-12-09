@@ -364,6 +364,14 @@ void lv_win_set_drag(lv_obj_t * win, bool en)
     lv_obj_set_drag(win, en);
 }
 
+void lv_win_title_set_alignment(lv_obj_t * win, uint8_t alignment)
+{
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+
+    ext->title_txt_align = alignment;
+
+}
+
 /*=====================
  * Getter functions
  *====================*/
@@ -491,6 +499,14 @@ lv_coord_t lv_win_get_width(lv_obj_t * win)
 
     return lv_obj_get_width_fit(scrl) - left - right;
 }
+
+uint8_t lv_win_title_get_alignment(lv_obj_t * win)
+{
+    lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
+
+    return ext->title_txt_align;
+}
+
 
 /*=====================
  * Other functions
