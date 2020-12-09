@@ -3,6 +3,7 @@
 ## v7.9.0 
 
 ### New features
+- feat(chart) add lv_chart_remove_series and lv_chart_hide_series
 
 ### Bugfixes
 
