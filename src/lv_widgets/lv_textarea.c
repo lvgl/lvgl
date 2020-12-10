@@ -106,7 +106,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
     ext->pwd_mode          = 0;
     ext->pwd_tmp           = NULL;
     ext->pwd_show_time     = LV_TEXTAREA_DEF_PWD_SHOW_TIME;
-    ext->accapted_chars    = NULL;
+    ext->accepted_chars    = NULL;
     ext->max_length        = 0;
     ext->cursor.state      = 1;
     ext->cursor.hidden     = 0;
@@ -146,7 +146,7 @@ lv_obj_t * lv_textarea_create(lv_obj_t * par, const lv_obj_t * copy)
         lv_textarea_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
         ext->label             = lv_label_create(ta, copy_ext->label);
         ext->pwd_mode          = copy_ext->pwd_mode;
-        ext->accapted_chars    = copy_ext->accapted_chars;
+        ext->accepted_chars    = copy_ext->accepted_chars;
         ext->max_length        = copy_ext->max_length;
         ext->cursor.pos        = copy_ext->cursor.pos;
         ext->cursor.valid_x    = copy_ext->cursor.valid_x;
@@ -764,7 +764,7 @@ void lv_textarea_set_accepted_chars(lv_obj_t * ta, const char * list)
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    ext->accapted_chars = list;
+    ext->accepted_chars = list;
 }
 
 /**
@@ -1006,7 +1006,7 @@ const char * lv_textarea_get_accepted_chars(lv_obj_t * ta)
 
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
 
-    return ext->accapted_chars;
+    return ext->accepted_chars;
 }
 
 /**
@@ -1472,7 +1472,7 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
     lv_textarea_ext_t * ext = lv_obj_get_ext_attr(ta);
 
     /*If no restriction accept it*/
-    if(ext->accapted_chars == NULL && ext->max_length == 0) return true;
+    if(ext->accepted_chars == NULL && ext->max_length == 0) return true;
 
     /*Too many characters?*/
     if(ext->max_length > 0 && _lv_txt_get_encoded_length(lv_textarea_get_text(ta)) >= ext->max_length) {
@@ -1480,11 +1480,11 @@ static bool char_is_accepted(lv_obj_t * ta, uint32_t c)
     }
 
     /*Accepted character?*/
-    if(ext->accapted_chars) {
+    if(ext->accepted_chars) {
         uint32_t i = 0;
 
-        while(ext->accapted_chars[i] != '\0') {
-            uint32_t a = _lv_txt_encoded_next(ext->accapted_chars, &i);
+        while(ext->accepted_chars[i] != '\0') {
+            uint32_t a = _lv_txt_encoded_next(ext->accepted_chars, &i);
             if(a == c) return true; /*Accepted*/
         }
 

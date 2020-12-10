@@ -94,7 +94,7 @@ void lv_roller_set_align(lv_obj_t * roller, lv_label_align_t align);
  * Set the selected option
  * @param roller pointer to a roller object
  * @param sel_opt id of the selected option (0 ... number of option - 1);
- * @param anim LV_ANOM_ON: set with animation; LV_ANIM_OFF set immediately
+ * @param anim LV_ANIM_ON: set with animation; LV_ANIM_OFF set immediately
  */
 void lv_roller_set_selected(lv_obj_t * roller, uint16_t sel_opt, lv_anim_enable_t anim);
 

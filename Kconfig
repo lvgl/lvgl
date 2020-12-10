@@ -856,7 +856,7 @@ menu "LVGL configuration"
             bool "Support bidirectional texts"
             help 
                 Allows mixing Left-to-Right and Right-to-Left texts.
-                The direction will be processed according to the Unicode Bidirectioanl Algorithm:
+                The direction will be processed according to the Unicode Bidirectional Algorithm:
                 https://www.w3.org/International/articles/inline-bidi-markup/uba-basics
         
         choice

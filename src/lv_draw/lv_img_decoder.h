@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef LV_IMG_DEOCER_H
-#define LV_IMG_DEOCER_H
+#ifndef LV_IMG_DECODER_H
+#define LV_IMG_DECODER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -267,4 +267,4 @@ void lv_img_decoder_built_in_close(lv_img_decoder_t * decoder, lv_img_decoder_ds
 } /* extern "C" */
 #endif
 
-#endif /*LV_TEMPL_H*/
+#endif /*LV_IMG_DECODER_H*/

@@ -522,7 +522,7 @@ static void indev_keypad_proc(lv_indev_t * i, lv_indev_data_t * data)
                 lv_group_focus_prev(g);
                 if(indev_reset_check(&i->proc)) return;
             }
-            /*Just send other keys again to the object (e.g. 'A' or `LV_GORUP_KEY_RIGHT)*/
+            /*Just send other keys again to the object (e.g. 'A' or `LV_GROUP_KEY_RIGHT)*/
             else {
                 lv_group_send_data(g, data->key);
                 if(indev_reset_check(&i->proc)) return;
@@ -815,7 +815,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
 }
 
 /**
- * Process the pressed state of LV_INDEV_TYPE_POINER input devices
+ * Process the pressed state of LV_INDEV_TYPE_POINTER input devices
  * @param indev pointer to an input device 'proc'
  * @return LV_RES_OK: no indev reset required; LV_RES_INV: indev reset is required
  */
@@ -961,7 +961,7 @@ static void indev_proc_press(lv_indev_proc_t * proc)
 }
 
 /**
- * Process the released state of LV_INDEV_TYPE_POINER input devices
+ * Process the released state of LV_INDEV_TYPE_POINTER input devices
  * @param proc pointer to an input device 'proc'
  */
 static void indev_proc_release(lv_indev_proc_t * proc)
