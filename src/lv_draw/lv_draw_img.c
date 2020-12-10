@@ -40,6 +40,7 @@ LV_ATTRIBUTE_FAST_MEM static void lv_draw_map(const lv_area_t * map_area, const 
                                               bool chroma_key, bool alpha_byte);
 
 static void show_error(const lv_area_t * coords, const lv_area_t * clip_area, const char * msg);
+static void draw_cleanup(lv_img_cache_entry_t * cache);
 
 /**********************
  *  STATIC VARIABLES
@@ -267,9 +268,10 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
         lv_area_t mask_com; /*Common area of mask and coords*/
         bool union_ok;
         union_ok = _lv_area_intersect(&mask_com, clip_area, &map_area_rot);
+        /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
         if(union_ok == false) {
-            return LV_RES_OK; /*Out of mask. There is nothing to draw so the image is drawn
-                                 successfully.*/
+            draw_cleanup(cdsc);
+            return LV_RES_OK;
         }
 
         lv_draw_map(coords, &mask_com, cdsc->dec_dsc.img_data, draw_dsc, chroma_keyed, alpha_byte);
@@ -279,9 +281,10 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
         lv_area_t mask_com; /*Common area of mask and coords*/
         bool union_ok;
         union_ok = _lv_area_intersect(&mask_com, clip_area, coords);
+        /*Out of mask. There is nothing to draw so the image is drawn successfully.*/
         if(union_ok == false) {
-            return LV_RES_OK; /*Out of mask. There is nothing to draw so the image is drawn
-                                 successfully.*/
+            draw_cleanup(cdsc);
+            return LV_RES_OK;
         }
 
         int32_t width = lv_area_get_width(&mask_com);
@@ -306,6 +309,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
                 lv_img_decoder_close(&cdsc->dec_dsc);
                 LV_LOG_WARN("Image draw can't read the line");
                 _lv_mem_buf_release(buf);
+                draw_cleanup(cdsc);
                 return LV_RES_INV;
             }
 
@@ -318,6 +322,7 @@ LV_ATTRIBUTE_FAST_MEM static lv_res_t lv_img_draw_core(const lv_area_t * coords,
         _lv_mem_buf_release(buf);
     }
 
+    draw_cleanup(cdsc);
     return LV_RES_OK;
 }
 
@@ -647,5 +652,13 @@ static void show_error(const lv_area_t * coords, const lv_area_t * clip_area, co
     lv_draw_label_dsc_t label_dsc;
     lv_draw_label_dsc_init(&label_dsc);
     lv_draw_label(coords, clip_area, &label_dsc, msg, NULL);
+}
+
+static void draw_cleanup(lv_img_cache_entry_t * cache)
+{
+/*Automatically close images with no caching*/
+#if LV_IMG_CACHE_DEF_SIZE == 0
+    lv_img_decoder_close(&cache->dec_dsc);
+#endif
 }
 
