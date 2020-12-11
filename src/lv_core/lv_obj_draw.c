@@ -386,7 +386,7 @@ void _lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     lv_coord_t s = 0;
-    obj->signal_cb(obj, LV_SIGNAL_REFR_EXT_DRAW_PAD, &s);
+    lv_signal_send(obj, LV_SIGNAL_REFR_EXT_DRAW_PAD, &s);
 
     /*Store the result if the special attrs already allocated*/
     if(obj->spec_attr) {

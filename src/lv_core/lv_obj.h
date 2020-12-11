@@ -24,6 +24,7 @@ extern "C" {
 #include "../lv_misc/lv_area.h"
 #include "../lv_misc/lv_color.h"
 #include "../lv_misc/lv_debug.h"
+#include "../lv_misc/lv_class.h"
 #include "../lv_hal/lv_hal.h"
 #include "../lv_draw/lv_draw_rect.h"
 #include "../lv_draw/lv_draw_label.h"
@@ -120,13 +121,11 @@ typedef void (*lv_event_cb_t)(struct _lv_obj_t * obj, lv_event_t event);
   * on the object. */
 enum {
     /*General signals*/
-    LV_SIGNAL_CLEANUP,           /**< Object is being deleted */
     LV_SIGNAL_CHILD_CHG,         /**< Child was removed/added */
     LV_SIGNAL_COORD_CHG,         /**< Object coordinates/size have changed */
     LV_SIGNAL_STYLE_CHG,         /**< Object's style has changed */
     LV_SIGNAL_BASE_DIR_CHG,      /**< The base dir has changed*/
     LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
-    LV_SIGNAL_GET_TYPE,          /**< LVGL needs to retrieve the object's type */
     LV_SIGNAL_GET_STYLE,         /**< Get the style of an object*/
     LV_SIGNAL_GET_SELF_SIZE,     /**< Get the internal size of a widget*/
 
@@ -176,7 +175,7 @@ enum {
     LV_OBJ_FLAG_SCROLL_ELASTIC  = (1 << 5),
     LV_OBJ_FLAG_SCROLL_MOMENTUM = (1 << 6),
     LV_OBJ_FLAG_SCROLL_STOP     = (1 << 7),
-    LV_OBJ_FLAG_SCROLL_FREEZE   = (1 << 8), /** Do not allow scrolling on this object and do not propagate the scroll to parent */
+    LV_OBJ_FLAG_SCROLL_CHAIN    = (1 << 8), /** Allow propagating the scroll to a parent */
     LV_OBJ_FLAG_SNAPABLE        = (1 << 9),
     LV_OBJ_FLAG_PRESS_LOCK      = (1 << 10),
     LV_OBJ_FLAG_EVENT_BUBBLE    = (1 << 11),
@@ -195,8 +194,8 @@ typedef uint16_t lv_obj_flag_t;
 
 
 typedef struct {
-    lv_ll_t child_ll;       /**< Linked list to store the children objects*/
-
+    lv_obj_t ** children;       /**< Store the pointer of the children.*/
+    uint32_t child_cnt;
 #if LV_USE_GROUP != 0
     void * group_p;
 #endif
@@ -223,32 +222,30 @@ typedef struct {
 }lv_obj_spec_attr_t;
 
 
-struct _lv_obj_t {
-    lv_obj_spec_attr_t * spec_attr;
-    struct _lv_obj_t * parent; /**< Pointer to the parent object*/
+LV_CLASS_DECLARE_START(lv_obj, lv_base)
 
+#define _lv_obj_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
 
-    lv_signal_cb_t signal_cb; /**< Object type specific signal function*/
-    lv_design_cb_t design_cb; /**< Object type specific design function*/
+#define _lv_obj_data                 \
+  _lv_base_data                      \
+  struct _lv_obj_t * parent;         \
+  lv_obj_spec_attr_t * spec_attr;    \
+  lv_style_list_t  style_list;       \
+  lv_area_t coords;                  \
+  lv_coord_t x_set;                  \
+  lv_coord_t y_set;                  \
+  lv_coord_t w_set;                  \
+  lv_coord_t h_set;                  \
+  lv_obj_flag_t flags;               \
+  lv_state_t state;
 
-    void * ext_attr;            /**< Object type specific extended data*/
+#define _lv_obj_class_dsc        \
+  _lv_base_class_dsc             \
+  lv_signal_cb_t signal_cb; /**< Object type specific signal function*/ \
+  lv_design_cb_t design_cb; /**< Object type specific design function*/
 
-#if LV_USE_USER_DATA
-    lv_obj_user_data_t user_data; /**< Custom user data for object. */
-#endif
-
-    lv_style_list_t  style_list;
-
-    /*Attributes and states*/
-    lv_obj_flag_t flags;
-    lv_state_t state;
-
-    lv_area_t coords; /**< Coordinates of the object (x1, y1, x2, y2)*/
-    lv_coord_t x_set;
-    lv_coord_t y_set;
-    lv_coord_t w_set;
-    lv_coord_t h_set;
-};
+LV_CLASS_DECLARE_END(lv_obj, lv_base)
+extern lv_obj_class_t lv_obj;
 
 enum {
     LV_OBJ_PART_MAIN,
@@ -574,30 +571,14 @@ lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj);
 lv_obj_t * lv_obj_get_parent(const lv_obj_t * obj);
 
 /**
- * Iterate through the children of an object (start from the "youngest, lastly created")
- * @param obj pointer to an object
- * @param child NULL at first call to get the next children
- *                  and the previous return value later
- * @return the child after 'act_child' or NULL if no more child
- */
-lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, const lv_obj_t * child);
-
-/**
- * Iterate through the children of an object (start from the "oldest", firstly created)
- * @param obj pointer to an object
- * @param child NULL at first call to get the next children
- *                  and the previous return value later
- * @return the child after 'act_child' or NULL if no more child
- */
-lv_obj_t * lv_obj_get_child_back(const lv_obj_t * obj, const lv_obj_t * child);
-
-/**
  * Get the Nth child of a an object. 0th is the lastly created.
  * @param obj pointer to an object whose children should be get
  * @param id of a child
  * @return the child or `NULL` if `id` was greater then the `number of children - 1`
  */
-lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, uint32_t id);
+lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, uint32_t id);
+
+uint32_t lv_obj_get_child_cnt(const lv_obj_t * obj);
 
 /**
  * Get the child index of an object.
@@ -748,16 +729,7 @@ void * lv_obj_get_group(const lv_obj_t * obj);
  */
 bool lv_obj_is_focused(const lv_obj_t * obj);
 
-/**
- * Tell if an object is an instance of a certain widget type or not
- * @param obj pointer to an object
- * @param type_str the type to check. The name of the widget's type, g.g. "lv_label", "lv_btn", etc
- * @return true: `obj` has the given type
- * @note Not only the "final" type matters. Therefore every widget has "lv_obj" type and "lv_slider" is an "lv_bar" too.
- */
-bool lv_obj_is_instance_of(lv_obj_t * obj, const char * type_str);
-
-lv_ll_t * _lv_obj_get_child_ll(const lv_obj_t * obj) ;
+lv_obj_t ** lv_obj_get_children(const lv_obj_t * obj);
 
 /**
  * Get the really focused object by taking `focus_parent` into account.
@@ -769,15 +741,6 @@ lv_obj_t * _lv_obj_get_focused_obj(const lv_obj_t * obj);
 /*-------------------
  * OTHER FUNCTIONS
  *------------------*/
-
-/**
- * Used in the signal callback to handle `LV_SIGNAL_GET_TYPE` signal
- * @param buf pointer to `lv_obj_type_t`. (`param` in the signal callback)
- * @param name name of the object. E.g. "lv_btn". (Only the pointer is saved)
- * @return LV_RES_OK
- */
-lv_res_t _lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name);
-
 
 /**
  * Check if any object has a given type

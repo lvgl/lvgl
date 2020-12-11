@@ -115,9 +115,9 @@ void lv_obj_report_grid_change(const lv_grid_t * grid)
     lv_disp_t * d = lv_disp_get_next(NULL);
 
     while(d) {
-        lv_obj_t * i;
-        _LV_LL_READ(&d->scr_ll, i) {
-            report_grid_change_core(grid, i);
+        uint32_t i;
+        for(i = 0; i < d->screen_cnt; i++) {
+            report_grid_change_core(grid, d->screens[i]);
         }
         d = lv_disp_get_next(d);
     }
@@ -136,11 +136,10 @@ void _lv_grid_calc(struct _lv_obj_t * cont, _lv_grid_calc_t * calc_out)
     if(g->col_dsc == NULL || g->row_dsc == NULL) return;
     if(g->col_dsc_len == 0 || g->row_dsc_len == 0) return;
 
-    if(lv_obj_get_child(cont, NULL) == NULL) {
+    if(lv_obj_get_child(cont, 0) == NULL) {
         _lv_memset_00(calc_out, sizeof(_lv_grid_calc_t));
         return;
     }
-//    printf("calc: %d, %d\n", obj->grid->col_dsc_len, obj->grid->row_dsc_len);
 
     calc_rows(cont, calc_out);
     calc_cols(cont, calc_out);
@@ -228,12 +227,12 @@ void _lv_grid_full_refresh(lv_obj_t * cont)
     hint.grid_abs.x = pad_left + cont->coords.x1 - lv_obj_get_scroll_x(cont);
     hint.grid_abs.y = pad_top + cont->coords.y1 - lv_obj_get_scroll_y(cont);
 
-    lv_obj_t * item = lv_obj_get_child_back(cont, NULL);
-    while(item) {
+    uint32_t i;
+    for(i = 0; i < cont->spec_attr->child_cnt; i++) {
+        lv_obj_t * item = cont->spec_attr->children[i];
         if(LV_COORD_IS_GRID(item->x_set) && LV_COORD_IS_GRID(item->y_set)) {
             item_repos(item, &calc, &hint);
         }
-        item = lv_obj_get_child_back(cont, item);
     }
     _lv_grid_calc_free(&calc);
 
@@ -430,7 +429,7 @@ static void item_repos(lv_obj_t * item, _lv_grid_calc_t * calc, item_repos_hint_
         lv_area_set_width(&item->coords, item_w);
         lv_area_set_height(&item->coords, item_h);
         lv_obj_invalidate(item);
-        item->signal_cb(item, LV_SIGNAL_COORD_CHG, &old_coords);
+        lv_signal_send(item, LV_SIGNAL_COORD_CHG, &old_coords);
 
     }
     bool moved = true;
@@ -530,10 +529,9 @@ static void report_grid_change_core(const lv_grid_t * grid, lv_obj_t * obj)
         if(obj->spec_attr->grid == grid || (obj->spec_attr->grid && grid == NULL)) _lv_grid_full_refresh(obj);
     }
 
-    lv_obj_t * child = lv_obj_get_child(obj, NULL);
-    while(child) {
-        report_grid_change_core(grid, child);
-        child = lv_obj_get_child(obj, child);
+    uint32_t i;
+    for(i = 0; i < obj->spec_attr->child_cnt; i++) {
+        report_grid_change_core(grid, obj->spec_attr->children[i]);
     }
 
 }

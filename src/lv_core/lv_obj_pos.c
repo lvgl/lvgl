@@ -660,10 +660,10 @@ void _lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_par
     _lv_obj_move_children_by(obj, diff.x, diff.y);
 
     /*Inform the object about its new coordinates*/
-    obj->signal_cb(obj, LV_SIGNAL_COORD_CHG, &ori);
+    lv_signal_send(obj, LV_SIGNAL_COORD_CHG, &ori);
 
     /*Send a signal to the parent too*/
-    if(parent && notify_parent) parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
+    if(parent && notify_parent) lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);
@@ -678,15 +678,15 @@ void _lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_par
  */
 void _lv_obj_move_children_by(lv_obj_t * obj, lv_coord_t x_diff, lv_coord_t y_diff)
 {
-    lv_obj_t * i;
-    lv_ll_t * ll = _lv_obj_get_child_ll(obj);
-    _LV_LL_READ(ll, i) {
-        i->coords.x1 += x_diff;
-        i->coords.y1 += y_diff;
-        i->coords.x2 += x_diff;
-        i->coords.y2 += y_diff;
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
+        child->coords.x1 += x_diff;
+        child->coords.y1 += y_diff;
+        child->coords.x2 += x_diff;
+        child->coords.y2 += y_diff;
 
-        _lv_obj_move_children_by(i, x_diff, y_diff);
+        _lv_obj_move_children_by(child, x_diff, y_diff);
     }
 }
 
@@ -770,11 +770,11 @@ static bool refr_size(lv_obj_t * obj, lv_coord_t w, lv_coord_t h)
     }
 
     /*Send a signal to the object with its new coordinates*/
-    obj->signal_cb(obj, LV_SIGNAL_COORD_CHG, &ori);
+    lv_signal_send(obj, LV_SIGNAL_COORD_CHG, &ori);
 
     /*Send a signal to the parent too*/
     lv_obj_t * par = lv_obj_get_parent(obj);
-    if(par != NULL) par->signal_cb(par, LV_SIGNAL_CHILD_CHG, obj);
+    if(par != NULL) lv_signal_send(par, LV_SIGNAL_CHILD_CHG, obj);
 
     /*Invalidate the new area*/
     lv_obj_invalidate(obj);

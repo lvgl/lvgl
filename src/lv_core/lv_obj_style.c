@@ -190,9 +190,9 @@ void lv_obj_report_style_change(lv_style_t * style)
     lv_disp_t * d = lv_disp_get_next(NULL);
 
     while(d) {
-        lv_obj_t * i;
-        _LV_LL_READ(&d->scr_ll, i) {
-            report_style_change_core(style, i);
+        uint32_t i;
+        for(i = 0; i < d->screen_cnt; i++) {
+            report_style_change_core(style, d->screens[i]);
         }
         d = lv_disp_get_next(d);
     }
@@ -318,10 +318,10 @@ void _lv_obj_invalidate_style_cache(lv_obj_t * obj, uint8_t part, lv_style_prope
         list->valid_cache = 0;
     }
 
-    lv_obj_t * child = lv_obj_get_child(obj, NULL);
-    while(child) {
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
         update_style_cache_children(child);
-        child = lv_obj_get_child(obj, child);
     }
 }
 #endif /*LV_STYLE_CACHE_LEVEL >= 1*/
@@ -871,7 +871,7 @@ void _lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t pro
 
     if(real_refr) {
         lv_obj_invalidate(obj);
-        obj->signal_cb(obj, LV_SIGNAL_STYLE_CHG, NULL);
+        lv_signal_send(obj, LV_SIGNAL_STYLE_CHG, NULL);
 
         switch(prop) {
             case LV_STYLE_PROP_ALL:
@@ -879,7 +879,7 @@ void _lv_obj_refresh_style(lv_obj_t * obj, uint8_t part, lv_style_property_t pro
             case LV_STYLE_MARGIN_BOTTOM:
             case LV_STYLE_MARGIN_LEFT:
             case LV_STYLE_MARGIN_RIGHT:
-                if(obj->parent) obj->parent->signal_cb(obj->parent, LV_SIGNAL_CHILD_CHG, obj);
+                if(obj->parent) lv_signal_send(obj->parent, LV_SIGNAL_CHILD_CHG, obj);
                 break;
         }
 
@@ -1099,12 +1099,11 @@ static void report_style_change_core(void * style, lv_obj_t * obj)
         }
     }
 
-    lv_obj_t * child = lv_obj_get_child(obj, NULL);
-    while(child) {
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
         report_style_change_core(style, child);
-        child = lv_obj_get_child(obj, child);
     }
-
 }
 
 /**
@@ -1114,14 +1113,14 @@ static void report_style_change_core(void * style, lv_obj_t * obj)
  */
 static void refresh_children_style(lv_obj_t * obj)
 {
-    lv_obj_t * child = lv_obj_get_child(obj, NULL);
-    while(child != NULL) {
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
         lv_obj_invalidate(child);
-        child->signal_cb(child, LV_SIGNAL_STYLE_CHG, NULL);
+        lv_signal_send(child, LV_SIGNAL_STYLE_CHG, NULL);
         lv_obj_invalidate(child);
 
         refresh_children_style(child); /*Check children too*/
-        child = lv_obj_get_child(obj, child);
     }
 }
 
@@ -1514,10 +1513,10 @@ static void update_style_cache_children(lv_obj_t * obj)
         list->ignore_cache = ignore_cache_ori;
     }
 
-    lv_obj_t * child = lv_obj_get_child(obj, NULL);
-    while(child) {
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
         update_style_cache_children(child);
-        child = lv_obj_get_child(obj, child);
     }
 
 }

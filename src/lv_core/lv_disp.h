@@ -79,14 +79,6 @@ lv_obj_t * lv_disp_get_layer_top(lv_disp_t * disp);
 lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp);
 
 /**
- * Assign a screen to a display.
- * @param disp pointer to a display where to assign the screen
- * @param scr pointer to a screen object to assign
- */
-void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr);
-
-
-/**
  * Set the background color of a display
  * @param disp pointer to a display
  * @param color color of the background

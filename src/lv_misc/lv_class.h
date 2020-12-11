@@ -10,6 +10,32 @@
 extern "C" {
 #endif
 
+
+/* EXAMPLE CLASS DECLARATION
+
+LV_CLASS_DECLARE_START(person, lv_base)
+
+#define _person_create struct _person_t * (*create)(struct _person_t * father, struct _person_t * mother)
+#define _person_create_static struct _person_t * (*create_static)(struct _person_t * p, struct _person_t * father, struct _person_t * mother)
+
+#define _person_data             \
+  _lv_base_data                  \
+  bool male;                    \
+  char name[64];                \
+  uint32_t age;                 \
+  struct _person_t * mother;    \
+  struct _person_t * father;    \
+
+#define _person_class_dsc        \
+  _lv_base_class_dsc             \
+  uint32_t max_age;              \
+  void (*set_name)(struct _person_t * p, const char * name);
+
+LV_CLASS_DECLARE_END(person, lv_base)
+
+ */
+
+
 /*********************
  *      INCLUDES
  *********************/
@@ -18,27 +44,22 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
-#define LV_CLASS_MIXIN_EMPTY
-
 #define _lv_base_class_dsc          \
-   void(*constructor_cb)(void * inst);    \
-   void(*descructor_cb)(void * inst);    \
+   void(*destructor)(void * inst);    \
    uint32_t _instance_size;    \
    uint32_t _class_size;       \
    uint32_t _inited :1;
 
-#define _lv_base_data   \
-   uint32_t _dynamic :1;
+#define _lv_base_data
 
 /**********************
  *      TYPEDEFS
  **********************/
-/*Just to have a type that can be referenced later*/
+
 typedef struct _lv_base_class_t
 {
     struct _lv_base_class_t * base_p;
-    void * (*create)(void);
-    void (*create_static)(void *);
+    void (*constructor)(void *);
     _lv_base_class_dsc
 }lv_base_class_t;
 
@@ -65,8 +86,9 @@ void _lv_class_init(void * class_p, uint32_t class_size, uint32_t instance_size,
  * @param class pointer to a class to create
  * @return the created instance
  */
-void * _lv_class_new(void * class_p);
-
+void * lv_class_new(void * class_p);
+void lv_class_base_construct(void * inst);
+void lv_class_destroy(void * instance);
 
 void lv_class_construct(void * inst, lv_base_class_t * dsc);
 
@@ -89,15 +111,31 @@ struct _##classname##_class_t;                          \
 #define LV_CLASS_DECLARE_END(classname, basename)        \
 typedef struct _##classname##_class_t {                  \
   basename##_class_t * base_p;                           \
-  _##classname##_create;                                    \
-  _##classname##_create_static;                             \
-  _##classname##_class_dsc                                  \
+  _##classname##_constructor;                            \
+  _##classname##_class_dsc                               \
 }classname##_class_t;                                    \
                                                          \
 typedef struct _##classname##_t {                        \
   classname##_class_t * class_p;                         \
-  _##classname##_data                                       \
+  _##classname##_data                                    \
 } classname##_t;
+
+
+/**
+ * Start the constructor
+ * Makes the instance look like to instance of the class where the constructor is called.
+ * It's important because the virtual functions should be called from the level of the constructor.
+ */
+#define LV_CLASS_CONSTRUCTOR_BEGIN(inst, classname)        \
+  void * _original_class_p = ((lv_base_t*)inst)->class_p;  \
+  obj->class_p = (void*)&classname;
+
+/**
+ * Finish the constructor.
+ * It reverts the original base class (changed by LV_CLASS_CONSTRUCTOR_BEGIN).
+ */
+#define LV_CLASS_CONSTRUCTOR_END(inst, classname)        \
+  ((lv_base_t*)inst)->class_p = _original_class_p;
 
 /**
  * Initialize a class. Need to be called only once for every class

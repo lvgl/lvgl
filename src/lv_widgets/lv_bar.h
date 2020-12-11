@@ -58,24 +58,37 @@ typedef struct {
 } lv_bar_anim_t;
 #endif
 
-/** Data of bar*/
-typedef struct {
-    /*No inherited ext, derived from the base object */
 
-    /*New data for this type */
-    int16_t cur_value; /*Current value of the bar*/
-    int16_t min_value; /*Minimum value of the bar*/
-    int16_t max_value; /*Maximum value of the bar*/
-    int16_t start_value; /*Start value of the bar*/
-    lv_area_t indic_area;   /*Save the indicator area. MIght be used by derived types*/
+LV_CLASS_DECLARE_START(lv_bar, lv_obj);
+
+#define _lv_bar_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
+
 #if LV_USE_ANIMATION
-    lv_anim_value_t anim_time;
-    lv_bar_anim_t cur_value_anim;
+#define _lv_bar_anim_data \
+    lv_anim_value_t anim_time; \
+    lv_bar_anim_t cur_value_anim; \
     lv_bar_anim_t start_value_anim;
+#else
+#define _lv_bar_anim_data
 #endif
-    uint8_t type : 2;           /*Type of bar*/
-    lv_style_list_t style_indic; /*Style of the indicator*/
-} lv_bar_ext_t;
+
+#define _lv_bar_data             \
+  _lv_obj_data                  \
+  int16_t cur_value; /*Current value of the bar*/ \
+  int16_t min_value; /*Minimum value of the bar*/ \
+  int16_t max_value; /*Maximum value of the bar*/ \
+  int16_t start_value; /*Start value of the bar*/ \
+  lv_area_t indic_area;   /*Save the indicator area. Might be used by derived types*/ \
+  _lv_bar_anim_data \
+  uint8_t type : 2;           /*Type of bar*/                     \
+  lv_style_list_t style_indic; /*Style of the indicator*/
+
+#define _lv_bar_class_dsc        \
+  _lv_obj_class_dsc              \
+
+LV_CLASS_DECLARE_END(lv_bar, lv_obj);
+
+extern lv_bar_class_t lv_bar;
 
 /** Bar parts */
 enum {

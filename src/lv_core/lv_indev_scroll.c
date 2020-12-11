@@ -258,10 +258,11 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
      *  5. Use the last candidate. Always the "deepest" parent or the object from point 3 */
     lv_obj_t * obj_act = proc->types.pointer.act_obj;
     while(obj_act) {
-        /*Halt search on a scroll freeze object*/
-        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_FREEZE)) return NULL;
+
 
         if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLLABLE) == false) {
+            /*If this object don't want to chain the scroll ot the parent stop searching*/
+            if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN) == false) break;
             obj_act = lv_obj_get_parent(obj_act);
             continue;
         }
@@ -329,6 +330,9 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
             proc->types.pointer.scroll_dir = hor_en ? LV_SCROLL_DIR_HOR : LV_SCROLL_DIR_VER;
             break;
         }
+
+        /*If this object don't want to chain the scroll ot the parent stop searching*/
+        if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN) == false) break;
 
         /*Try the parent */
         obj_act = lv_obj_get_parent(obj_act);
@@ -411,8 +415,9 @@ static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coo
 
     lv_coord_t dist = LV_COORD_MAX;
 
-    lv_obj_t * child = lv_obj_get_child_back(obj, NULL);
-    while(child) {
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
         if(lv_obj_has_flag(child, LV_OBJ_FLAG_SNAPABLE)) {
             lv_coord_t x_child = 0;
             lv_coord_t x_parent = 0;
@@ -436,8 +441,6 @@ static lv_coord_t find_snap_point_x(const lv_obj_t * obj, lv_coord_t min, lv_coo
                 if(LV_MATH_ABS(x) < LV_MATH_ABS(dist)) dist = x;
             }
         }
-
-        child = lv_obj_get_child_back(obj, child);
     }
 
     return dist == LV_COORD_MAX ? 0: -dist;
@@ -459,8 +462,9 @@ static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coo
 
     lv_coord_t dist = LV_COORD_MAX;
 
-    lv_obj_t * child = lv_obj_get_child_back(obj, NULL);
-    while(child) {
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
         if(lv_obj_has_flag(child, LV_OBJ_FLAG_SNAPABLE)) {
             lv_coord_t y_child = 0;
             lv_coord_t y_parent = 0;
@@ -484,8 +488,6 @@ static lv_coord_t find_snap_point_y(const lv_obj_t * obj, lv_coord_t min, lv_coo
                 if(LV_MATH_ABS(y) < LV_MATH_ABS(dist)) dist = y;
             }
         }
-
-        child = lv_obj_get_child_back(obj, child);
     }
 
     return dist == LV_COORD_MAX ? 0 : -dist;

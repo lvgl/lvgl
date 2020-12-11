@@ -1050,16 +1050,13 @@ lv_obj_t * lv_indev_search_obj(lv_obj_t * obj, lv_point_t * point)
 
     /*If the point is on this object check its children too*/
     if(lv_obj_hit_test(obj, point)) {
-        lv_obj_t * i;
-
-        lv_ll_t * ll = _lv_obj_get_child_ll(obj);
-        _LV_LL_READ(ll, i) {
-            found_p = lv_indev_search_obj(i, point);
+        int32_t i;
+        for(i = lv_obj_get_child_cnt(obj) - 1; i >= 0; i--) {
+            lv_obj_t * child = lv_obj_get_child(obj, i);
+            found_p = lv_indev_search_obj(child, point);
 
             /*If a child was found then break*/
-            if(found_p != NULL) {
-                break;
-            }
+            if(found_p != NULL) break;
         }
 
         /*If then the children was not ok, and this obj is clickable
@@ -1222,7 +1219,7 @@ void indev_gesture(lv_indev_proc_t * proc)
                 proc->types.pointer.gesture_dir = LV_GESTURE_DIR_TOP;
         }
 
-        gesture_obj->signal_cb(gesture_obj, LV_SIGNAL_GESTURE, indev_act);
+        lv_signal_send(gesture_obj, LV_SIGNAL_GESTURE, indev_act);
         if(indev_reset_check(proc)) return;
         lv_event_send(gesture_obj, LV_EVENT_GESTURE, NULL);
         if(indev_reset_check(proc)) return;

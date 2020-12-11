@@ -121,25 +121,6 @@ lv_obj_t * lv_disp_get_layer_sys(lv_disp_t * disp)
 }
 
 /**
- * Assign a screen to a display.
- * @param disp pointer to a display where to assign the screen
- * @param scr pointer to a screen object to assign
- */
-void lv_disp_assign_screen(lv_disp_t * disp, lv_obj_t * scr)
-{
-    if(lv_obj_get_parent(scr) != NULL) {
-        LV_LOG_WARN("lv_disp_assign_screen: try to assign a non-screen object");
-        return;
-    }
-
-    lv_disp_t * old_disp = lv_obj_get_disp(scr);
-
-    if(old_disp == disp) return;
-
-    _lv_ll_chg_list(&old_disp->scr_ll, &disp->scr_ll, scr, true);
-}
-
-/**
  * Set the background color of a display
  * @param disp pointer to a display
  * @param color color of the background

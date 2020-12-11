@@ -152,12 +152,12 @@ typedef struct _disp_t {
     lv_timer_t * refr_task;
 
     /** Screens of the display*/
-    lv_ll_t scr_ll;
+    struct _lv_obj_t ** screens;          /**< Array of screen objects. `NULL` terminated*/
     struct _lv_obj_t * act_scr;   /**< Currently active screen on this display */
     struct _lv_obj_t * prev_scr;  /**< Previous screen. Used during screen animations */
     struct _lv_obj_t * top_layer; /**< @see lv_disp_get_layer_top */
     struct _lv_obj_t * sys_layer; /**< @see lv_disp_get_layer_sys */
-
+    uint32_t screen_cnt;
 uint8_t del_prev  :
     1;        /**< 1: Automatically delete the previous screen when the screen load animation is ready */
 

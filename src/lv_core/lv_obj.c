@@ -67,6 +67,8 @@ static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_fin
 static void lv_obj_del_async_cb(void * obj);
 static void obj_del_core(lv_obj_t * obj);
 static void base_dir_refr_children(lv_obj_t * obj);
+static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_obj_destructor(void * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -74,6 +76,7 @@ static void base_dir_refr_children(lv_obj_t * obj);
 static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
 static const void * event_act_data;
+lv_obj_class_t lv_obj;
 
 /**********************
  *      MACROS
@@ -116,6 +119,13 @@ void lv_init(void)
     /*Initialize DMA2D GPU*/
     lv_gpu_stm32_dma2d_init();
 #endif
+
+    LV_CLASS_INIT(lv_obj, lv_base);
+    lv_obj.constructor = lv_obj_constructor;
+    lv_obj.destructor = lv_obj_destructor;
+    lv_obj.signal_cb = lv_obj_signal;
+    lv_obj.design_cb = lv_obj_design;
+
 
     _lv_obj_style_init();
 
@@ -185,127 +195,16 @@ void lv_deinit(void)
  */
 lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    lv_obj_t * new_obj = NULL;
-
-    /*Create a screen*/
-    if(parent == NULL) {
-        LV_LOG_TRACE("Screen create started");
-        lv_disp_t * disp = lv_disp_get_default();
-        if(!disp) {
-            LV_LOG_WARN("lv_obj_create: not display created to so far. No place to assign the new screen");
-            return NULL;
-        }
-
-        new_obj = _lv_ll_ins_head(&disp->scr_ll);
-        LV_ASSERT_MEM(new_obj);
-        if(new_obj == NULL) return NULL;
-
-        _lv_memset_00(new_obj, sizeof(lv_obj_t));
-
-        /*Set the callbacks*/
-        new_obj->signal_cb = lv_obj_signal;
-        new_obj->design_cb = lv_obj_design;
-
-        /*Set coordinates to full screen size*/
-        new_obj->coords.x1    = 0;
-        new_obj->coords.y1    = 0;
-        new_obj->coords.x2    = lv_disp_get_hor_res(NULL) - 1;
-        new_obj->coords.y2    = lv_disp_get_ver_res(NULL) - 1;
-    }
-    /*Create a normal object*/
-    else {
-        LV_LOG_TRACE("Object create started");
-        LV_ASSERT_OBJ(parent, LV_OBJX_NAME);
-        if(parent->spec_attr == NULL) {
-            parent->spec_attr = lv_obj_allocate_spec_attr(parent);
-        }
-        new_obj = _lv_ll_ins_head(&parent->spec_attr->child_ll);
-        LV_ASSERT_MEM(new_obj);
-        if(new_obj == NULL) return NULL;
-
-        _lv_memset_00(new_obj, sizeof(lv_obj_t));
-
-        new_obj->parent = parent;
-
-        /*Set the callbacks (signal:cb is required in `lv_obj_get_base_dir` if `LV_USE_ASSERT_OBJ` is enabled)*/
-        new_obj->signal_cb = lv_obj_signal;
-        new_obj->design_cb = lv_obj_design;
-
-        new_obj->coords.y1    = parent->coords.y1;
-        new_obj->coords.y2    = parent->coords.y1 + LV_OBJ_DEF_HEIGHT;
-        if(lv_obj_get_base_dir(new_obj) == LV_BIDI_DIR_RTL) {
-            new_obj->coords.x2    = parent->coords.x2;
-            new_obj->coords.x1    = parent->coords.x2 - LV_OBJ_DEF_WIDTH;
-        }
-        else {
-            new_obj->coords.x1    = parent->coords.x1;
-            new_obj->coords.x2    = parent->coords.x1 + LV_OBJ_DEF_WIDTH;
-        }
-        new_obj->w_set = lv_area_get_width(&new_obj->coords);
-        new_obj->h_set = lv_area_get_height(&new_obj->coords);
-    }
-
-    /*Set attributes*/
-    new_obj->flags = LV_OBJ_FLAG_CLICKABLE;
-    new_obj->flags |= LV_OBJ_FLAG_SNAPABLE;
-    new_obj->flags |= LV_OBJ_FLAG_PRESS_LOCK;
-    new_obj->flags |= LV_OBJ_FLAG_CLICK_FOCUSABLE;
-    new_obj->flags |= LV_OBJ_FLAG_SCROLLABLE;
-    new_obj->flags |= LV_OBJ_FLAG_SCROLL_ELASTIC;
-    new_obj->flags |= LV_OBJ_FLAG_SCROLL_MOMENTUM;
-    new_obj->flags |= LV_OBJ_FLAG_FOCUS_SCROLL;
-    if(parent) new_obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
-    new_obj->state = LV_STATE_DEFAULT;
-
-    new_obj->ext_attr = NULL;
-
-    lv_style_list_init(&new_obj->style_list);
-    lv_style_list_init(&new_obj->style_list);
+    lv_obj_t * obj = lv_class_new(&lv_obj);
+    lv_obj.constructor(obj, parent, copy);
     if(copy == NULL) {
-        if(parent != NULL) lv_theme_apply(new_obj, LV_THEME_OBJ);
-        else  lv_theme_apply(new_obj, LV_THEME_SCR);
-    }
-    else {
-        lv_style_list_copy(&new_obj->style_list, &copy->style_list);
-    }
-    /*Copy the attributes if required*/
-    if(copy != NULL) {
-        lv_area_copy(&new_obj->coords, &copy->coords);
-
-        new_obj->flags  = copy->flags;
-        if(copy->spec_attr) {
-            lv_obj_allocate_spec_attr(new_obj);
-            _lv_memcpy_small(new_obj->spec_attr, copy->spec_attr, sizeof(lv_obj_spec_attr_t));
-            _lv_ll_init(&new_obj->spec_attr->child_ll, sizeof(lv_obj_t)); /*Make the child list empty*/
-        }
-#if LV_USE_GROUP
-        /*Add to the same group*/
-        if(copy->spec_attr && copy->spec_attr->group_p) {
-            new_obj->spec_attr->group_p = NULL; /*It was simply copied */
-            lv_group_add_obj(copy->spec_attr->group_p, new_obj);
-        }
-#endif
-
-        /*Set the same coordinates for non screen objects*/
-        if(lv_obj_get_parent(copy) != NULL && parent != NULL) {
-            lv_obj_set_pos(new_obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
-            lv_obj_set_size(new_obj, lv_obj_get_width(copy), lv_obj_get_height(copy));
-
-        }
-    } else {
-        lv_obj_set_pos(new_obj, 0, 0);
-    }
-    /*Send a signal to the parent to notify it about the new child*/
-    if(parent != NULL) {
-        parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, new_obj);
-
-        /*Invalidate the area if not screen created*/
-        lv_obj_invalidate(new_obj);
-    }
-
-    LV_LOG_INFO("Object create ready");
-
-    return new_obj;
+          if(parent != NULL) lv_theme_apply(obj, LV_THEME_OBJ);
+          else  lv_theme_apply(obj, LV_THEME_SCR);
+      }
+      else {
+          lv_style_list_copy(&obj->style_list, &copy->style_list);
+      }
+    return obj;
 }
 
 /**
@@ -327,12 +226,11 @@ lv_res_t lv_obj_del(lv_obj_t * obj)
         if(disp->act_scr == obj) act_scr_del = true;
     }
 
-
     obj_del_core(obj);
 
     /*Send a signal to the parent to notify it about the child delete*/
     if(par) {
-        par->signal_cb(par, LV_SIGNAL_CHILD_CHG, NULL);
+        lv_signal_send(par, LV_SIGNAL_CHILD_CHG, NULL);
     }
 
     /*Handle if the active screen was deleted*/
@@ -373,10 +271,10 @@ void lv_obj_del_async(lv_obj_t * obj)
 void lv_obj_clean(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    lv_obj_t * child = lv_obj_get_child(obj, NULL);
-    while(child) {
-        lv_obj_del(child);
-        child = lv_obj_get_child(obj, NULL);    /*Get the new first child*/
+
+    while(1) {
+        lv_obj_t * child = lv_obj_get_child(obj, 0);
+        obj_del_core(child);
     }
 }
 
@@ -500,58 +398,59 @@ bool lv_obj_is_visible(const lv_obj_t * obj)
  */
 void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    LV_ASSERT_OBJ(parent, LV_OBJX_NAME);
-
-    if(obj->parent == NULL) {
-        LV_LOG_WARN("Can't set the parent of a screen");
-        return;
-    }
-
-    if(parent == NULL) {
-        LV_LOG_WARN("Can't set parent == NULL to an object");
-        return;
-    }
-
-    lv_obj_invalidate(obj);
-
-    if(parent->spec_attr == NULL) {
-        parent->spec_attr = lv_obj_allocate_spec_attr(parent);
-    }
-
-    lv_obj_t * old_par = obj->parent;
-    lv_point_t old_pos;
-    old_pos.y = lv_obj_get_y(obj);
-
-    lv_bidi_dir_t new_base_dir = lv_obj_get_base_dir(parent);
-
-    if(new_base_dir != LV_BIDI_DIR_RTL) {
-        old_pos.x = lv_obj_get_x(obj);
-    }
-    else {
-        old_pos.x = old_par->coords.x2 - obj->coords.x2;
-    }
-
-    _lv_ll_chg_list(_lv_obj_get_child_ll(obj->parent), _lv_obj_get_child_ll(parent), obj, true);
-    obj->parent = parent;
-
-
-    if(new_base_dir != LV_BIDI_DIR_RTL) {
-        lv_obj_set_pos(obj, old_pos.x, old_pos.y);
-    }
-    else {
-        /*Align to the right in case of RTL base dir*/
-        lv_coord_t new_x = lv_obj_get_width(parent) - old_pos.x - lv_obj_get_width(obj);
-        lv_obj_set_pos(obj, new_x, old_pos.y);
-    }
-
-    /*Notify the original parent because one of its children is lost*/
-    old_par->signal_cb(old_par, LV_SIGNAL_CHILD_CHG, obj);
-
-    /*Notify the new parent about the child*/
-    parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
-
-    lv_obj_invalidate(obj);
+    while(1);
+//    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+//    LV_ASSERT_OBJ(parent, LV_OBJX_NAME);
+//
+//    if(obj->parent == NULL) {
+//        LV_LOG_WARN("Can't set the parent of a screen");
+//        return;
+//    }
+//
+//    if(parent == NULL) {
+//        LV_LOG_WARN("Can't set parent == NULL to an object");
+//        return;
+//    }
+//
+//    lv_obj_invalidate(obj);
+//
+//    if(parent->spec_attr == NULL) {
+//        parent->spec_attr = lv_obj_allocate_spec_attr(parent);
+//    }
+//
+//    lv_obj_t * old_par = obj->parent;
+//    lv_point_t old_pos;
+//    old_pos.y = lv_obj_get_y(obj);
+//
+//    lv_bidi_dir_t new_base_dir = lv_obj_get_base_dir(parent);
+//
+//    if(new_base_dir != LV_BIDI_DIR_RTL) {
+//        old_pos.x = lv_obj_get_x(obj);
+//    }
+//    else {
+//        old_pos.x = old_par->coords.x2 - obj->coords.x2;
+//    }
+//
+//    _lv_ll_chg_list(_lv_obj_get_child_ll(obj->parent), _lv_obj_get_child_ll(parent), obj, true);
+//    obj->parent = parent;
+//
+//
+//    if(new_base_dir != LV_BIDI_DIR_RTL) {
+//        lv_obj_set_pos(obj, old_pos.x, old_pos.y);
+//    }
+//    else {
+//        /*Align to the right in case of RTL base dir*/
+//        lv_coord_t new_x = lv_obj_get_width(parent) - old_pos.x - lv_obj_get_width(obj);
+//        lv_obj_set_pos(obj, new_x, old_pos.y);
+//    }
+//
+//    /*Notify the original parent because one of its children is lost*/
+//    lv_signal_send(old_par, LV_SIGNAL_CHILD_CHG, obj);
+//
+//    /*Notify the new parent about the child*/
+//    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+//
+//    lv_obj_invalidate(obj);
 }
 
 /**
@@ -560,22 +459,22 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
  */
 void lv_obj_move_foreground(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_ll_t * ll = _lv_obj_get_child_ll(parent);
-
-    /*Do nothing of already in the foreground*/
-    if(_lv_ll_get_head(ll) == obj) return;
-
-    lv_obj_invalidate(parent);
-
-    _lv_ll_chg_list(ll, ll, obj, true);
-
-    /*Notify the new parent about the child*/
-    parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
-
-    lv_obj_invalidate(parent);
+//    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+//
+//    lv_obj_t * parent = lv_obj_get_parent(obj);
+//    lv_ll_t * ll = _lv_obj_get_child_ll(parent);
+//
+//    /*Do nothing of already in the foreground*/
+//    if(_lv_ll_get_head(ll) == obj) return;
+//
+//    lv_obj_invalidate(parent);
+//
+//    _lv_ll_chg_list(ll, ll, obj, true);
+//
+//    /*Notify the new parent about the child*/
+//    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+//
+//    lv_obj_invalidate(parent);
 }
 
 /**
@@ -584,22 +483,22 @@ void lv_obj_move_foreground(lv_obj_t * obj)
  */
 void lv_obj_move_background(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_ll_t * ll = _lv_obj_get_child_ll(parent);
-
-    /*Do nothing of already in the background*/
-    if(_lv_ll_get_tail(ll) == obj) return;
-
-    lv_obj_invalidate(parent);
-
-    _lv_ll_chg_list(ll, ll, obj, false);
-
-    /*Notify the new parent about the child*/
-    parent->signal_cb(parent, LV_SIGNAL_CHILD_CHG, obj);
-
-    lv_obj_invalidate(parent);
+//    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+//
+//    lv_obj_t * parent = lv_obj_get_parent(obj);
+//    lv_ll_t * ll = _lv_obj_get_child_ll(parent);
+//
+//    /*Do nothing of already in the background*/
+//    if(_lv_ll_get_tail(ll) == obj) return;
+//
+//    lv_obj_invalidate(parent);
+//
+//    _lv_ll_chg_list(ll, ll, obj, false);
+//
+//    /*Notify the new parent about the child*/
+//    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+//
+//    lv_obj_invalidate(parent);
 }
 
 /*--------------------
@@ -855,10 +754,9 @@ void lv_event_send_refresh_recursive(lv_obj_t * obj)
         /*If no obj specified refresh all screen of all displays */
         lv_disp_t * d = lv_disp_get_next(NULL);
         while(d) {
-            lv_obj_t * scr = _lv_ll_get_head(&d->scr_ll);
-            while(scr) {
-                lv_event_send_refresh_recursive(scr);
-                scr = _lv_ll_get_next(&d->scr_ll, scr);
+            uint32_t i;
+            for(i = 0; i < d->screen_cnt; i++) {
+                lv_event_send_refresh_recursive(d->screens[i]);
             }
             lv_event_send_refresh_recursive(d->top_layer);
             lv_event_send_refresh_recursive(d->sys_layer);
@@ -871,10 +769,9 @@ void lv_event_send_refresh_recursive(lv_obj_t * obj)
         lv_res_t res = lv_event_send_refresh(obj);
         if(res != LV_RES_OK) return; /*If invalid returned do not check the children*/
 
-        lv_obj_t * child;
-        lv_ll_t * ll = _lv_obj_get_child_ll(obj);
-        _LV_LL_READ(ll, child) {
-            lv_event_send_refresh_recursive(child);
+        uint32_t i;
+        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+            lv_event_send_refresh_recursive(lv_obj_get_child(obj, i));
         }
     }
 }
@@ -952,20 +849,6 @@ const void * lv_event_get_data(void)
 {
     return event_act_data;
 }
-
-/**
- * Set the a signal function of an object. Used internally by the library.
- * Always call the previous signal function in the new.
- * @param obj pointer to an object
- * @param cb the new signal function
- */
-void lv_obj_set_signal_cb(lv_obj_t * obj, lv_signal_cb_t signal_cb)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    obj->signal_cb = signal_cb;
-}
-
 /**
  * Send an event to the object
  * @param obj pointer to an object
@@ -977,21 +860,9 @@ lv_res_t lv_signal_send(lv_obj_t * obj, lv_signal_t signal, void * param)
     if(obj == NULL) return LV_RES_OK;
 
     lv_res_t res = LV_RES_OK;
-    if(obj->signal_cb) res = obj->signal_cb(obj, signal, param);
+    if(obj->class_p->signal_cb) res = obj->class_p->signal_cb(obj, signal, param);
 
     return res;
-}
-
-/**
- * Set a new design function for an object
- * @param obj pointer to an object
- * @param design_cb the new design function
- */
-void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    obj->design_cb = design_cb;
 }
 
 /*----------------
@@ -1005,29 +876,9 @@ void lv_obj_set_design_cb(lv_obj_t * obj, lv_design_cb_t design_cb)
  * @return pointer to the allocated ext.
  * If out of memory NULL is returned and the original ext is preserved
  */
-void * lv_obj_allocate_ext_attr(lv_obj_t * obj, uint16_t ext_size)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    void * new_ext = lv_mem_realloc(obj->ext_attr, ext_size);
-    LV_ASSERT_MEM(new_ext);
-    if(new_ext == NULL) return NULL;
-
-    obj->ext_attr = new_ext;
-    return (void *)obj->ext_attr;
-}
-
-/**
- * Allocate a new ext. data for an object
- * @param obj pointer to an object
- * @param ext_size the size of the new ext. data
- * @return pointer to the allocated ext.
- * If out of memory NULL is returned and the original ext is preserved
- */
 lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
 
     if(obj->spec_attr == NULL) {
         static uint32_t x = 0;
@@ -1037,7 +888,6 @@ lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
         if(obj->spec_attr == NULL) return NULL;
 
         _lv_memset_00(obj->spec_attr, sizeof(lv_obj_spec_attr_t));
-        _lv_ll_init(&(obj->spec_attr->child_ll), sizeof(lv_obj_t));
 
         obj->spec_attr->scroll_dir = LV_DIR_ALL;
         obj->spec_attr->base_dir = LV_BIDI_DIR_INHERIT;
@@ -1046,8 +896,6 @@ lv_obj_spec_attr_t * lv_obj_allocate_spec_attr(lv_obj_t * obj)
     }
     return obj->spec_attr;
 }
-
-
 
 /*=======================
  * Getter functions
@@ -1084,20 +932,18 @@ lv_disp_t * lv_obj_get_disp(const lv_obj_t * obj)
 
     const lv_obj_t * scr;
 
-    if(obj->parent == NULL)
-        scr = obj; /*`obj` is a screen*/
-    else
-        scr = lv_obj_get_screen(obj); /*get the screen of `obj`*/
+    if(obj->parent == NULL) scr = obj; /*`obj` is a screen*/
+    else scr = lv_obj_get_screen(obj); /*get the screen of `obj`*/
 
     lv_disp_t * d;
     _LV_LL_READ(&LV_GC_ROOT(_lv_disp_ll), d) {
-        lv_obj_t * s;
-        _LV_LL_READ(&d->scr_ll, s) {
-            if(s == scr) return d;
+        uint32_t i;
+        for(i = 0; i < d->screen_cnt; i++) {
+            if(d->screens[i] == scr) return d;
         }
     }
 
-    LV_LOG_WARN("lv_scr_get_disp: screen not found")
+    LV_LOG_WARN("No screen found")
     return NULL;
 }
 
@@ -1118,54 +964,26 @@ lv_obj_t * lv_obj_get_parent(const lv_obj_t * obj)
 }
 
 /**
- * Iterate through the children of an object (start from the "youngest")
- * @param obj pointer to an object
- * @param child NULL at first call to get the next children
- *                  and the previous return value later
- * @return the child after 'act_child' or NULL if no more child
- */
-lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, const lv_obj_t * child)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_ll_t * ll = _lv_obj_get_child_ll(obj);
-    if (child) return _lv_ll_get_next(ll, child);
-    else return _lv_ll_get_head(ll);
-}
-
-/**
- * Iterate through the children of an object (start from the "oldest")
- * @param obj pointer to an object
- * @param child NULL at first call to get the next children
- *                  and the previous return value later
- * @return the child after 'act_child' or NULL if no more child
- */
-lv_obj_t * lv_obj_get_child_back(const lv_obj_t * obj, const lv_obj_t * child)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_ll_t * ll = _lv_obj_get_child_ll(obj);
-    if(child) return _lv_ll_get_prev(ll, child);
-    else return _lv_ll_get_tail(ll);
-}
-
-/**
  * Get the Nth child of an object. 0th is the lastly created.
  * @param obj pointer to an object whose children should be get
  * @param id of a child
  * @return the child or `NULL` if `id` was greater then the `number of children - 1`
  */
-lv_obj_t * lv_obj_get_child_by_id(const lv_obj_t * obj, uint32_t id)
+lv_obj_t * lv_obj_get_child(const lv_obj_t * obj, uint32_t id)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_t * child = lv_obj_get_child_back(obj, NULL);
-    uint32_t i;
-    for(i = 0; i < id; i++) {
-        child = lv_obj_get_child_back(obj, child);
-    }
+    if(obj->spec_attr == NULL) return NULL;
 
-    return child;
+    if(id >= obj->spec_attr->child_cnt) return NULL;
+    else return obj->spec_attr->children[id];
+}
+
+uint32_t lv_obj_get_child_cnt(const lv_obj_t * obj)
+{
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    if(obj->spec_attr == NULL) return 0;
+    return obj->spec_attr->child_cnt;
 }
 
 /**
@@ -1182,33 +1000,12 @@ uint32_t lv_obj_get_child_id(const lv_obj_t * obj)
     lv_obj_t * parent = lv_obj_get_parent(obj);
     if(parent == NULL) return 0;
 
-    uint32_t id = 0;
-    lv_obj_t * child;
-
-    lv_ll_t * ll = _lv_obj_get_child_ll(obj);
-    _LV_LL_READ_BACK(ll, child) {
-        if(child == obj) return id;
-        id++;
+    uint32_t i = 0;
+    for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {
+        if(lv_obj_get_child(parent, i) == obj) return i;
     }
-    return id;
-}
 
-/**
- * Count the children of an object (only children directly on 'obj')
- * @param obj pointer to an object
- * @return children number of 'obj'
- */
-uint32_t lv_obj_count_children(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_obj_t * i;
-    uint16_t cnt = 0;
-
-    lv_ll_t * ll = _lv_obj_get_child_ll(obj);
-    _LV_LL_READ(ll, i) cnt++;
-
-    return cnt;
+    return 0xFFFFFFFF;
 }
 
 /** Recursively count the children of an object
@@ -1219,13 +1016,12 @@ uint32_t lv_obj_count_children_recursive(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_obj_t * i;
     uint16_t cnt = 0;
 
-    lv_ll_t * ll = _lv_obj_get_child_ll(obj);
-    _LV_LL_READ(ll, i) {
-        cnt++;                                     /*Count the child*/
-        cnt += lv_obj_count_children_recursive(i); /*recursively count children's children*/
+    uint32_t i = 0;
+    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        cnt++;
+        cnt += lv_obj_count_children_recursive(lv_obj_get_child(obj, i));
     }
 
     return cnt;
@@ -1303,7 +1099,7 @@ bool lv_obj_hit_test(lv_obj_t * obj, lv_point_t * point)
         lv_hit_test_info_t hit_info;
         hit_info.point = point;
         hit_info.result = true;
-        obj->signal_cb(obj, LV_SIGNAL_HIT_TEST, &hit_info);
+        lv_signal_send(obj, LV_SIGNAL_HIT_TEST, &hit_info);
         return hit_info.result;
     }
     else {
@@ -1358,30 +1154,6 @@ lv_state_t lv_obj_get_state(const lv_obj_t * obj)
 }
 
 /**
- * Get the signal function of an object
- * @param obj pointer to an object
- * @return the signal function
- */
-lv_signal_cb_t lv_obj_get_signal_cb(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return obj->signal_cb;
-}
-
-/**
- * Get the design function of an object
- * @param obj pointer to an object
- * @return the design function
- */
-lv_design_cb_t lv_obj_get_design_cb(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return obj->design_cb;
-}
-
-/**
  * Get the event function of an object
  * @param obj pointer to an object
  * @return the event function
@@ -1397,85 +1169,6 @@ lv_event_cb_t lv_obj_get_event_cb(const lv_obj_t * obj)
 /*------------------
  * Other get
  *-----------------*/
-
-/**
- * Get the ext pointer
- * @param obj pointer to an object
- * @return the ext pointer but not the dynamic version
- *         Use it as ext->data1, and NOT da(ext)->data1
- */
-void * lv_obj_get_ext_attr(const lv_obj_t * obj)
-{
-    return obj->ext_attr;
-}
-
-/**
- * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
- * E.g. buf.type[0]="lv_btn", buf.type[1]="lv_cont", buf.type[2]="lv_obj"
- * @param obj pointer to an object which type should be get
- * @param buf pointer to an `lv_obj_type_t` buffer to store the types
- */
-void lv_obj_get_type(const lv_obj_t * obj, lv_obj_type_t * buf)
-{
-    LV_ASSERT_NULL(buf);
-    LV_ASSERT_NULL(obj);
-
-    lv_obj_type_t tmp;
-
-    _lv_memset_00(buf, sizeof(lv_obj_type_t));
-    _lv_memset_00(&tmp, sizeof(lv_obj_type_t));
-
-    obj->signal_cb((lv_obj_t *)obj, LV_SIGNAL_GET_TYPE, &tmp);
-
-    uint8_t cnt;
-    for(cnt = 0; cnt < LV_MAX_ANCESTOR_NUM; cnt++) {
-        if(tmp.type[cnt] == NULL) break;
-    }
-
-    /*Swap the order. The real type comes first*/
-    uint8_t i;
-    for(i = 0; i < cnt; i++) {
-        buf->type[i] = tmp.type[cnt - 1 - i];
-    }
-}
-
-#if LV_USE_USER_DATA
-
-/**
- * Get the object's user data
- * @param obj pointer to an object
- * @return user data
- */
-lv_obj_user_data_t lv_obj_get_user_data(const lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-    return obj->user_data;
-}
-
-/**
- * Get a pointer to the object's user data
- * @param obj pointer to an object
- * @return pointer to the user data
- */
-lv_obj_user_data_t * lv_obj_get_user_data_ptr(lv_obj_t * obj)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    return &obj->user_data;
-}
-
-/**
- * Set the object's user data. The data will be copied.
- * @param obj pointer to an object
- * @param data user data
- */
-void lv_obj_set_user_data(lv_obj_t * obj, lv_obj_user_data_t data)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    _lv_memcpy(&obj->user_data, &data, sizeof(lv_obj_user_data_t));
-}
-#endif
 
 /**
  * Get the group of the object
@@ -1516,29 +1209,11 @@ bool lv_obj_is_focused(const lv_obj_t * obj)
 #endif
 }
 
-/**
- * Tell if an object is an instance of a certain widget type or not
- * @param obj pointer to an object
- * @param type_str the type to check. The name of the widget's type, g.g. "lv_label", "lv_btn", etc
- * @return true: `obj` has the given type
- * @note Not only the "final" type matters. Therefore every widget has "lv_obj" type and "lv_slider" is an "lv_bar" too.
- */
-bool lv_obj_is_instance_of(lv_obj_t * obj, const char * type_str)
+lv_obj_t ** lv_obj_get_children(const lv_obj_t * obj)
 {
-    lv_obj_type_t type;
-    lv_obj_get_type(obj, &type);
-    uint8_t cnt;
-    for(cnt = 0; cnt < LV_MAX_ANCESTOR_NUM; cnt++) {
-        if(type.type[cnt] == NULL) break;
-        if(!strcmp(type.type[cnt], type_str)) return true;
-    }
-    return false;
-}
-
-lv_ll_t * _lv_obj_get_child_ll(const lv_obj_t * obj)
-{
-    if(obj->spec_attr) return &obj->spec_attr->child_ll;
-    else return NULL;
+    static lv_obj_t * empty[1] = {NULL};
+    if(obj->spec_attr) return obj->spec_attr->children;
+    else return empty;
 }
 
 /*-------------------
@@ -1589,18 +1264,7 @@ lv_res_t _lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name)
  */
 bool _lv_debug_check_obj_type(const lv_obj_t * obj, const char * obj_type)
 {
-    if(obj_type[0] == '\0') return true;
-
-    lv_obj_type_t types;
-    lv_obj_get_type((lv_obj_t *)obj, &types);
-
-    uint8_t i;
-    for(i = 0; i < LV_MAX_ANCESTOR_NUM; i++) {
-        if(types.type[i] == NULL) break;
-        if(strcmp(types.type[i], obj_type) == 0) return true;
-    }
-
-    return false;
+    return true;
 }
 
 /**
@@ -1613,11 +1277,10 @@ bool _lv_debug_check_obj_valid(const lv_obj_t * obj)
 {
     lv_disp_t * disp = lv_disp_get_next(NULL);
     while(disp) {
-        lv_obj_t * scr;
-        _LV_LL_READ(&disp->scr_ll, scr) {
-
-            if(scr == obj) return true;
-            bool found = obj_valid_child(scr, obj);
+        uint32_t i;
+        for(i = 0; i < disp->screen_cnt; i++) {
+            if(disp->screens[i] == obj) return true;
+            bool found = obj_valid_child(disp->screens[i], obj);
             if(found) return true;
         }
 
@@ -1664,15 +1327,9 @@ static void obj_del_core(lv_obj_t * obj)
 #endif
 
     /*Recursively delete the children*/
-    lv_ll_t * ll = _lv_obj_get_child_ll(obj);
-    lv_obj_t * i;
-    i = _lv_ll_get_head(ll);
-    while(i != NULL) {
-        /*Call the recursive delete to the child too*/
-        obj_del_core(i);
-
-        /*Set i to the new head node*/
-        i = _lv_ll_get_head(ll);
+    while(1) {
+        lv_obj_t * child = lv_obj_get_child(obj, 0);
+        obj_del_core(child);
     }
 
     lv_event_mark_deleted(obj);
@@ -1697,21 +1354,135 @@ static void obj_del_core(lv_obj_t * obj)
 
     /* All children deleted.
      * Now clean up the object specific data*/
-    obj->signal_cb(obj, LV_SIGNAL_CLEANUP, NULL);
+    obj->class_p->destructor(obj);
+}
 
-    /*Remove the object from parent's children list*/
-    lv_obj_t * par = lv_obj_get_parent(obj);
-    if(par == NULL) { /*It is a screen*/
-        lv_disp_t * d = lv_obj_get_disp(obj);
-        _lv_ll_remove(&d->scr_ll, obj);
+static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+{
+    LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_obj)
+    lv_obj.base_p->constructor(obj);
+
+    /*Create a screen*/
+    if(parent == NULL) {
+        LV_LOG_TRACE("Screen create started");
+        lv_disp_t * disp = lv_disp_get_default();
+        if(!disp) {
+            LV_LOG_WARN("No display created to so far. No place to assign the new screen");
+            return;
+        }
+
+        if(disp->screens == NULL) {
+            disp->screens = lv_mem_alloc(sizeof(lv_obj_t *));
+            disp->screens[0] = obj;
+            disp->screen_cnt = 1;
+        } else {
+            disp->screen_cnt++;
+            disp->screens = lv_mem_realloc(disp->screens, sizeof(lv_obj_t *) * disp->screen_cnt);
+            disp->screens[disp->screen_cnt - 1] = obj;
+        }
+
+        /*Set coordinates to full screen size*/
+        obj->coords.x1 = 0;
+        obj->coords.y1 = 0;
+        obj->coords.x2 = lv_disp_get_hor_res(NULL) - 1;
+        obj->coords.y2 = lv_disp_get_ver_res(NULL) - 1;
     }
+    /*Create a normal object*/
     else {
-        _lv_ll_remove(_lv_obj_get_child_ll(par), obj);
+        LV_LOG_TRACE("Object create started");
+        LV_ASSERT_OBJ(parent, LV_OBJX_NAME);
+        if(parent->spec_attr == NULL) {
+            parent->spec_attr = lv_obj_allocate_spec_attr(parent);
+        }
+
+        if(parent->spec_attr->children == NULL) {
+            parent->spec_attr->children = lv_mem_alloc(sizeof(lv_obj_t *) * 2);
+            parent->spec_attr->children[0] = obj;
+            parent->spec_attr->child_cnt = 1;
+        } else {
+            parent->spec_attr->child_cnt++;
+            parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children, sizeof(lv_obj_t *) * parent->spec_attr->child_cnt);
+            parent->spec_attr->children[parent->spec_attr->child_cnt - 1] = obj;
+        }
+
+        obj->parent = parent;
+
+        obj->coords.y1 = parent->coords.y1;
+        obj->coords.y2 = parent->coords.y1 + LV_OBJ_DEF_HEIGHT;
+        if(lv_obj_get_base_dir(obj) == LV_BIDI_DIR_RTL) {
+            obj->coords.x2    = parent->coords.x2;
+            obj->coords.x1    = parent->coords.x2 - LV_OBJ_DEF_WIDTH;
+        }
+        else {
+            obj->coords.x1    = parent->coords.x1;
+            obj->coords.x2    = parent->coords.x1 + LV_OBJ_DEF_WIDTH;
+        }
+        obj->w_set = lv_area_get_width(&obj->coords);
+        obj->h_set = lv_area_get_height(&obj->coords);
     }
 
-    /*Delete the base objects*/
-    if(obj->ext_attr != NULL) lv_mem_free(obj->ext_attr);
-    lv_mem_free(obj); /*Free the object itself*/
+    /*Set attributes*/
+    obj->flags = LV_OBJ_FLAG_CLICKABLE;
+    obj->flags |= LV_OBJ_FLAG_SNAPABLE;
+    if(parent) obj->flags |= LV_OBJ_FLAG_PRESS_LOCK;
+    if(parent) obj->flags |= LV_OBJ_FLAG_SCROLL_CHAIN;
+    obj->flags |= LV_OBJ_FLAG_CLICK_FOCUSABLE;
+    obj->flags |= LV_OBJ_FLAG_SCROLLABLE;
+    obj->flags |= LV_OBJ_FLAG_SCROLL_ELASTIC;
+    obj->flags |= LV_OBJ_FLAG_SCROLL_MOMENTUM;
+    obj->flags |= LV_OBJ_FLAG_FOCUS_SCROLL;
+    if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
+    obj->state = LV_STATE_DEFAULT;
+
+    lv_style_list_init(&obj->style_list);
+
+    /*Copy the attributes if required*/
+    if(copy != NULL) {
+        lv_area_copy(&obj->coords, &copy->coords);
+
+        obj->flags  = copy->flags;
+        if(copy->spec_attr) {
+            lv_obj_allocate_spec_attr(obj);
+            _lv_memcpy_small(obj->spec_attr, copy->spec_attr, sizeof(lv_obj_spec_attr_t));
+            obj->spec_attr->children = NULL;    /*Make the child list empty*/
+        }
+#if LV_USE_GROUP
+        /*Add to the same group*/
+        if(copy->spec_attr && copy->spec_attr->group_p) {
+            obj->spec_attr->group_p = NULL; /*It was simply copied */
+            lv_group_add_obj(copy->spec_attr->group_p, obj);
+        }
+#endif
+
+        /*Set the same coordinates for non screen objects*/
+        if(lv_obj_get_parent(copy) != NULL && parent != NULL) {
+            lv_obj_set_pos(obj, lv_obj_get_x(copy), lv_obj_get_y(copy));
+            lv_obj_set_size(obj, lv_obj_get_width(copy), lv_obj_get_height(copy));
+
+        }
+    } else {
+        lv_obj_set_pos(obj, 0, 0);
+    }
+    /*Send a signal to the parent to notify it about the new child*/
+    if(parent != NULL) {
+        lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+
+        /*Invalidate the area if not screen created*/
+        lv_obj_invalidate(obj);
+    }
+
+    LV_CLASS_CONSTRUCTOR_END(obj, lv_obj)
+
+    LV_LOG_INFO("Object create ready");
+}
+
+static void lv_obj_destructor(void * p)
+{
+    lv_obj_t * obj = p;
+    _lv_obj_reset_style_list_no_refr(obj, LV_OBJ_PART_MAIN);
+    if(obj->spec_attr) lv_mem_free(obj->spec_attr);
+
+    lv_class_destroy(obj);
 }
 
 /**
@@ -1859,8 +1630,9 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 
 static void base_dir_refr_children(lv_obj_t * obj)
 {
-    lv_obj_t * child;
-    _LV_LL_READ(_lv_obj_get_child_ll(obj), child) {
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+        lv_obj_t * child = lv_obj_get_child(obj, i);
         if(lv_obj_get_base_dir(child) == LV_BIDI_DIR_INHERIT) {
             lv_signal_send(child, LV_SIGNAL_BASE_DIR_CHG, NULL);
             base_dir_refr_children(child);
@@ -1884,9 +1656,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(info->part == LV_OBJ_PART_MAIN) info->result = &obj->style_list;
         else info->result = NULL;
         return LV_RES_OK;
-    }
-    else if(sign == LV_SIGNAL_GET_TYPE) {
-        return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
     }
     else if(sign == LV_SIGNAL_PRESSED) {
         lv_obj_add_state(obj, LV_STATE_PRESSED);
@@ -1977,11 +1746,11 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
 
         if(w_new || h_new) {
-            lv_ll_t * ll = _lv_obj_get_child_ll(obj);
-            lv_obj_t * child;
-            _LV_LL_READ(ll, child) {
+            uint32_t i = 0;
+            for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+                lv_obj_t * child = lv_obj_get_child(obj, i);
                 if((LV_COORD_IS_PCT(child->w_set) && w_new) ||
-                        (LV_COORD_IS_PCT(child->h_set) && h_new))
+                   (LV_COORD_IS_PCT(child->h_set) && h_new))
                 {
                     lv_obj_set_size(child, child->w_set, child->h_set);
                 }
@@ -2021,10 +1790,9 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         if(lv_obj_get_flex_dir(obj)) _lv_flex_refresh(obj);
 
         /*Reposition non grid objects on by one*/
-        lv_obj_t * child;
-
-        lv_ll_t * ll = _lv_obj_get_child_ll(obj);
-        _LV_LL_READ(ll, child) {
+        uint32_t i;
+        for(i = 0; i < lv_obj_get_child_cnt(obj); i++) {
+           lv_obj_t * child = lv_obj_get_child(obj, i);
             if(LV_COORD_IS_PX(child->x_set) || LV_COORD_IS_PX(child->y_set)) {
                 lv_obj_set_pos(child, child->x_set, child->y_set);
             }
@@ -2035,10 +1803,6 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         }
         _lv_obj_refresh_ext_draw_pad(obj);
     }
-    else if(sign == LV_SIGNAL_CLEANUP) {
-        _lv_obj_reset_style_list_no_refr(obj, LV_OBJ_PART_MAIN);
-    }
-
     return res;
 }
 
@@ -2056,9 +1820,9 @@ static void lv_event_mark_deleted(lv_obj_t * obj)
 static bool obj_valid_child(const lv_obj_t * parent, const lv_obj_t * obj_to_find)
 {
     /*Check all children of `parent`*/
-    lv_obj_t * child;
-    lv_ll_t * ll = _lv_obj_get_child_ll(parent);
-    _LV_LL_READ(ll, child) {
+    uint32_t i;
+    for(i = 0; i < lv_obj_get_child_cnt(parent); i++) {
+        lv_obj_t * child = lv_obj_get_child(parent, i);
         if(child == obj_to_find) return true;
 
         /*Check the children*/

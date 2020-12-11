@@ -128,7 +128,6 @@ lv_disp_t * lv_disp_drv_register(lv_disp_drv_t * driver)
     _lv_memset_00(disp, sizeof(lv_disp_t));
     _lv_memcpy(&disp->driver, driver, sizeof(lv_disp_drv_t));
 
-    _lv_ll_init(&disp->scr_ll, sizeof(lv_obj_t));
     disp->last_activity_time = 0;
 
     if(disp_def == NULL) disp_def = disp;
@@ -187,9 +186,9 @@ void lv_disp_drv_update(lv_disp_t * disp, lv_disp_drv_t * new_drv)
 {
     memcpy(&disp->driver, new_drv, sizeof(lv_disp_drv_t));
 
-    lv_obj_t * scr;
-    _LV_LL_READ(&disp->scr_ll, scr) {
-        lv_obj_set_size(scr, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
+    uint32_t i;
+    for(i = 0; disp->screens[i]; i++) {
+        lv_obj_set_size(disp->screens[i], lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
     }
 }
 
