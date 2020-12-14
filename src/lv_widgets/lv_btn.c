@@ -31,12 +31,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param);
+static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
+static void lv_btn_destructor(void * obj);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_cb_t ancestor_signal;
+lv_btn_class_t lv_btn;
+
 
 /**********************
  *      MACROS
@@ -55,31 +57,21 @@ static lv_signal_cb_t ancestor_signal;
  */
 lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("button create started");
 
-    lv_obj_t * btn;
 
-    btn = lv_obj_create(parent, copy);
-    LV_ASSERT_MEM(btn);
-    if(btn == NULL) return NULL;
+    if(!lv_btn._inited) {
+         LV_CLASS_INIT(lv_btn, lv_obj);
+         lv_btn.constructor = lv_btn_constructor;
+         lv_btn.destructor = lv_btn_destructor;
+     }
 
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(btn);
+     lv_obj_t * obj = lv_class_new(&lv_btn);
+     lv_btn.constructor(obj, parent, copy);
 
-    lv_obj_set_signal_cb(btn, lv_btn_signal);
+     if(!copy) lv_theme_apply(obj, LV_THEME_BTN);
 
-    if(copy == NULL) {
-        /*Set layout if the button is not a screen*/
-        if(parent) {
-            lv_obj_set_size(btn, LV_DPI, LV_DPI / 3);
-            lv_obj_clear_flag(btn, LV_OBJ_FLAG_SCROLLABLE);
-        }
-
-        lv_theme_apply(btn, LV_THEME_BTN);
-    }
-
-    LV_LOG_INFO("button created");
-
-    return btn;
+     LV_LOG_TRACE("button create started");
+     return obj;
 }
 
 /*=====================
@@ -94,26 +86,32 @@ lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
  *   STATIC FUNCTIONS
  **********************/
 
-/**
- * Signal function of the button
- * @param btn pointer to a button object
- * @param sign a signal type from lv_signal_t enum
- * @param param pointer to a signal specific variable
- * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
- */
-static lv_res_t lv_btn_signal(lv_obj_t * btn, lv_signal_t sign, void * param)
+static void lv_btn_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
 {
-    lv_res_t res;
+    LV_LOG_TRACE("lv_btn create started");
 
-    /* Include the ancient signal function */
-    res = ancestor_signal(btn, sign, param);
-    if(res != LV_RES_OK) return res;
+    LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_btn)
+    lv_btn.base_p->constructor(obj, parent, copy);
 
-    if(sign == LV_SIGNAL_GET_TYPE) {
-        return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
-    }
+    lv_obj_set_size(obj, LV_DPI, LV_DPI / 3);
+    lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
 
-    return res;
+
+    LV_CLASS_CONSTRUCTOR_END(obj, lv_btn)
+    LV_LOG_INFO("btn created");
+}
+
+static void lv_btn_destructor(void * obj)
+{
+//    lv_bar_t * bar = obj;
+//
+//    _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_INDIC);
+//#if LV_USE_ANIMATION
+//    lv_anim_del(&bar->cur_value_anim, NULL);
+//    lv_anim_del(&bar->start_value_anim, NULL);
+//#endif
+
+    lv_btn.base_p->destructor(obj);
 }
 
 #endif

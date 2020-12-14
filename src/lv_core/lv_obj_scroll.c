@@ -320,29 +320,33 @@ void lv_obj_scroll_to_y(lv_obj_t * obj, lv_coord_t y, lv_anim_enable_t anim_en)
     lv_obj_scroll_by(obj, 0,  -y + lv_obj_get_scroll_y(obj), anim_en);
 }
 
-void lv_obj_scroll_to_child(lv_obj_t * obj, lv_obj_t * child, lv_anim_enable_t anim_en)
+void lv_obj_scroll_to_view(lv_obj_t * obj, lv_anim_enable_t anim_en)
 {
-    lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
-    lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
-    lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN);
-    lv_coord_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
+    lv_obj_t * parent = lv_obj_get_parent(obj);
 
-    lv_coord_t left_diff = obj->coords.x1 + pleft - child->coords.x1;
-    lv_coord_t right_diff = -(obj->coords.x2 - pright - child->coords.x2);
-    lv_coord_t top_diff = obj->coords.y1 + ptop - child->coords.y1;
-    lv_coord_t bottom_diff = -(obj->coords.y2 - pbottom - child->coords.y2);
+    lv_coord_t pleft = lv_obj_get_style_pad_left(parent, LV_OBJ_PART_MAIN);
+    lv_coord_t pright = lv_obj_get_style_pad_right(parent, LV_OBJ_PART_MAIN);
+    lv_coord_t ptop = lv_obj_get_style_pad_top(parent, LV_OBJ_PART_MAIN);
+    lv_coord_t pbottom = lv_obj_get_style_pad_bottom(parent, LV_OBJ_PART_MAIN);
+
+    lv_coord_t left_diff = parent->coords.x1 + pleft - obj->coords.x1;
+    lv_coord_t right_diff = -(parent->coords.x2 - pright - obj->coords.x2);
+    lv_coord_t top_diff = parent->coords.y1 + ptop - obj->coords.y1;
+    lv_coord_t bottom_diff = -(parent->coords.y2 - pbottom - obj->coords.y2);
 
     lv_coord_t y_scroll = 0;
-    if(top_diff > 0 && bottom_diff > 0) y_scroll = 0;
-    if(top_diff > 0) y_scroll = top_diff;
-    else if(bottom_diff > 0) y_scroll = -bottom_diff;
+    if((top_diff > 0 || bottom_diff > 0)) {
+        if(LV_MATH_ABS(top_diff) < LV_MATH_ABS(bottom_diff)) y_scroll = top_diff;
+        else y_scroll = -bottom_diff;
+    }
 
     lv_coord_t x_scroll = 0;
-    if(left_diff > 0 && right_diff > 0) x_scroll = 0;
-    if(left_diff > 0) y_scroll = left_diff;
-    else if(right_diff > 0) x_scroll = -right_diff;
+    if((left_diff > 0 || right_diff > 0)) {
+        if(LV_MATH_ABS(left_diff) < LV_MATH_ABS(right_diff)) x_scroll = left_diff;
+        else x_scroll = -right_diff;
+    }
 
-    lv_obj_scroll_by(obj, x_scroll, y_scroll, anim_en);
+    lv_obj_scroll_by(parent, x_scroll, y_scroll, anim_en);
 }
 
 
