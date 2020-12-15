@@ -201,7 +201,7 @@
 #  endif
 #endif
 
-/* Complier prefix for a big array declaration */
+/* Compiler prefix for a big array declaration */
 #ifndef LV_MEM_ATTR
 #  ifdef CONFIG_LV_MEM_ATTR
 #    define LV_MEM_ATTR CONFIG_LV_MEM_ATTR
@@ -330,7 +330,7 @@
 #endif
 
 /* Long press time in milliseconds.
- * Time to send `LV_EVENT_LONG_PRESSSED`) */
+ * Time to send `LV_EVENT_LONG_PRESSED`) */
 #ifndef LV_INDEV_DEF_LONG_PRESS_TIME
 #  ifdef CONFIG_LV_INDEV_DEF_LONG_PRESS_TIME
 #    define LV_INDEV_DEF_LONG_PRESS_TIME CONFIG_LV_INDEV_DEF_LONG_PRESS_TIME
@@ -1322,7 +1322,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 
 /* Support bidirectional texts.
  * Allows mixing Left-to-Right and Right-to-Left texts.
- * The direction will be processed according to the Unicode Bidirectioanl Algorithm:
+ * The direction will be processed according to the Unicode Bidirectional Algorithm:
  * https://www.w3.org/International/articles/inline-bidi-markup/uba-basics*/
 #ifndef LV_USE_BIDI
 #  ifdef CONFIG_LV_USE_BIDI
