@@ -59,4 +59,4 @@ lv_res_t lv_async_call(lv_async_cb_t async_xcb, void * user_data);
 } /* extern "C" */
 #endif
 
-#endif /*LV_TEMPL_H*/
+#endif /*LV_ASYNC_H*/

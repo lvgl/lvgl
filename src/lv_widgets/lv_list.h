@@ -294,7 +294,7 @@ void lv_list_down(const lv_obj_t * list);
 /**
  * Focus on a list button. It ensures that the button will be visible on the list.
  * @param btn pointer to a list button to focus
- * @param anim LV_ANOM_ON: scroll with animation, LV_ANIM_OFF: without animation
+ * @param anim LV_ANIM_ON: scroll with animation, LV_ANIM_OFF: without animation
  */
 void lv_list_focus(const lv_obj_t * btn, lv_anim_enable_t anim);
 

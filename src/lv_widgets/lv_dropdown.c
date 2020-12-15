@@ -45,7 +45,7 @@ typedef struct {
  *  STATIC PROTOTYPES
  **********************/
 static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_design_res_t lv_dropdown_page_design(lv_obj_t * ddlist, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_design_res_t lv_dropdown_page_design(lv_obj_t * page, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param);
 static lv_res_t lv_dropdown_page_signal(lv_obj_t * page, lv_signal_t sign, void * param);
 static lv_res_t lv_dropdown_page_scrl_signal(lv_obj_t * scrl, lv_signal_t sign, void * param);
@@ -356,10 +356,8 @@ void lv_dropdown_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
 
     ext->sel_opt_id      = sel_opt < ext->option_cnt ? sel_opt : ext->option_cnt - 1;
     ext->sel_opt_id_orig = ext->sel_opt_id;
-    /*Move the list to show the current option*/
-    if(ext->page != NULL) {
-        lv_obj_invalidate(ddlist);
-    }
+
+    lv_obj_invalidate(ddlist);
 }
 
 /**

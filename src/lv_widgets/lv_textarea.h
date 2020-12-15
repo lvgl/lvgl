@@ -49,7 +49,7 @@ typedef struct {
     char * placeholder_txt;      /*Place holder label. only visible if text is an empty string*/
     lv_style_list_t style_placeholder;
     char * pwd_tmp;              /*Used to store the original text in password mode*/
-    const char * accapted_chars; /*Only these characters will be accepted. NULL: accept all*/
+    const char * accepted_chars; /*Only these characters will be accepted. NULL: accept all*/
     uint32_t max_length;         /*The max. number of characters. 0: no limit*/
     uint16_t pwd_show_time;      /*Time to show characters in password mode before change them to '*' */
     struct {

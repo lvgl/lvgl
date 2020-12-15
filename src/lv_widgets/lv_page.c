@@ -1250,8 +1250,22 @@ static void scrlbar_refresh(lv_obj_t * page)
                          (scrl_w + bg_left + bg_right - obj_w),
                          obj_h - sb_width - sb_bottom);
 
-        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO ||
-           ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.hor_draw = 1;
+        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO) ext->scrlbar.hor_draw = 1;
+        else if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) {
+            lv_indev_t * indev = lv_indev_get_next(NULL);
+            while(indev) {
+                if(indev->driver.type == LV_INDEV_TYPE_POINTER && (indev->proc.types.pointer.drag_dir & LV_DRAG_DIR_HOR)) {
+                    lv_obj_t * drag_obj = indev->proc.types.pointer.act_obj;
+                    while(drag_obj && drag_obj->drag_parent) drag_obj = lv_obj_get_parent(drag_obj);
+
+                    if(drag_obj && drag_obj == scrl) {
+                        ext->scrlbar.hor_draw = 1;
+                        break;
+                    }
+                }
+                indev = lv_indev_get_next(indev);
+            }
+        }
     }
 
     /*Full sized vertical scroll bar*/
@@ -1275,8 +1289,22 @@ static void scrlbar_refresh(lv_obj_t * page)
                                        (obj_h - size_tmp - 2 * sb_ver_pad)) /
                          (scrl_h + bg_top + bg_bottom - obj_h));
 
-        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO ||
-           ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) ext->scrlbar.ver_draw = 1;
+        if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_AUTO) ext->scrlbar.ver_draw = 1;
+        else if(ext->scrlbar.mode == LV_SCROLLBAR_MODE_DRAG) {
+            lv_indev_t * indev = lv_indev_get_next(NULL);
+            while(indev) {
+                if(indev->driver.type == LV_INDEV_TYPE_POINTER && (indev->proc.types.pointer.drag_dir & LV_DRAG_DIR_VER)) {
+                    lv_obj_t * drag_obj = indev->proc.types.pointer.act_obj;
+                    while(drag_obj && drag_obj->drag_parent) drag_obj = lv_obj_get_parent(drag_obj);
+
+                    if(drag_obj && drag_obj == scrl) {
+                        ext->scrlbar.ver_draw = 1;
+                        break;
+                    }
+                }
+                indev = lv_indev_get_next(indev);
+            }
+        }
     }
 
     /*Invalidate the new scrollbar areas*/

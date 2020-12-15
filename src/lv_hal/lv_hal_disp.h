@@ -153,8 +153,11 @@ typedef struct _disp_t {
 
     /** Screens of the display*/
     lv_ll_t scr_ll;
-    struct _lv_obj_t * act_scr;   /**< Currently active screen on this display */
-    struct _lv_obj_t * prev_scr;  /**< Previous screen. Used during screen animations */
+    struct _lv_obj_t * act_scr;         /**< Currently active screen on this display */
+    struct _lv_obj_t * prev_scr;        /**< Previous screen. Used during screen animations */
+#if LV_USE_ANIMATION
+    struct _lv_obj_t * scr_to_load;     /**< The screen prepared to load in lv_scr_load_anim*/
+#endif
     struct _lv_obj_t * top_layer; /**< @see lv_disp_get_layer_top */
     struct _lv_obj_t * sys_layer; /**< @see lv_disp_get_layer_sys */
 

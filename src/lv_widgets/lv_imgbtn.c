@@ -532,7 +532,7 @@ static void refr_img(lv_obj_t * imgbtn)
 }
 
 /**
- * If `src` is not defined for the current state try to get a state which is related to the curent but has `src`.
+ * If `src` is not defined for the current state try to get a state which is related to the current but has `src`.
  * E.g. if the PRESSED src is not set but the RELEASED does, use the RELEASED.
  * @param imgbtn pointer to an image button
  * @param state the state to convert

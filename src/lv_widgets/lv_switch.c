@@ -37,7 +37,6 @@
 static lv_res_t lv_switch_signal(lv_obj_t * sw, lv_signal_t sign, void * param);
 static lv_design_res_t lv_switch_design(lv_obj_t * sw, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_style_list_t * lv_switch_get_style(lv_obj_t * sw, uint8_t part);
-static lv_style_list_t * lv_switch_get_style(lv_obj_t * sw, uint8_t part);
 
 /**********************
  *  STATIC VARIABLES
@@ -117,7 +116,7 @@ lv_obj_t * lv_switch_create(lv_obj_t * par, const lv_obj_t * copy)
 /**
  * Turn ON the switch
  * @param sw pointer to a switch object
- * @param anim LV_ANOM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
+ * @param anim LV_ANIM_ON: set the value with an animation; LV_ANIM_OFF: change the value immediately
  */
 void lv_switch_on(lv_obj_t * sw, lv_anim_enable_t anim)
 {

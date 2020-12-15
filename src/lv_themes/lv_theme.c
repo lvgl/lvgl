@@ -337,7 +337,7 @@ static void clear_styles(lv_obj_t * obj, lv_theme_style_t name)
 #if LV_USE_TABVIEW
         case LV_THEME_TABVIEW:
             lv_obj_clean_style_list(obj, LV_TABVIEW_PART_BG);
-            lv_obj_clean_style_list(obj, LV_TABVIEW_PART_BG_SCRLLABLE);
+            lv_obj_clean_style_list(obj, LV_TABVIEW_PART_BG_SCROLLABLE);
             lv_obj_clean_style_list(obj, LV_TABVIEW_PART_TAB_BG);
             lv_obj_clean_style_list(obj, LV_TABVIEW_PART_INDIC);
             lv_obj_clean_style_list(obj, LV_TABVIEW_PART_TAB_BTN);

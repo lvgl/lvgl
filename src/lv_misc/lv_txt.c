@@ -8,6 +8,7 @@
  *********************/
 #include <stdarg.h>
 #include "lv_txt.h"
+#include "lv_txt_ap.h"
 #include "lv_math.h"
 #include "lv_log.h"
 #include "lv_debug.h"
@@ -391,7 +392,7 @@ lv_coord_t _lv_txt_get_width(const char * txt, uint32_t length, const lv_font_t 
 /**
  * Check next character in a string and decide if the character is part of the command or not
  * @param state pointer to a txt_cmd_state_t variable which stores the current state of command
- * processing (Initied. to TXT_CMD_STATE_WAIT )
+ * processing (Inited to TXT_CMD_STATE_WAIT )
  * @param c the current character
  * @return true: the character is part of a command and should not be written,
  *         false: the character should be written
@@ -525,7 +526,7 @@ char * _lv_txt_set_text_vfmt(const char * fmt, va_list ap)
 
 #if LV_TXT_ENC == LV_TXT_ENC_UTF8
 /*******************************
- *   UTF-8 ENCODER/DECOER
+ *   UTF-8 ENCODER/DECODER
  ******************************/
 
 /**

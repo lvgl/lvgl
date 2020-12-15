@@ -325,9 +325,9 @@ static lv_fs_res_t fs_free (lv_fs_drv_t * drv, uint32_t * total_p, uint32_t * fr
 }
 
 /**
- * Initialize a 'fs_read_dir_t' variable for directory reading
+ * Initialize a 'lv_fs_dir_t' variable for directory reading
  * @param drv pointer to a driver where this function belongs
- * @param rddir_p pointer to a 'fs_read_dir_t' variable
+ * @param rddir_p pointer to a 'lv_fs_dir_t' variable
  * @param path path to a directory
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
@@ -344,7 +344,7 @@ static lv_fs_res_t fs_dir_open (lv_fs_drv_t * drv, void * rddir_p, const char *p
  * Read the next filename form a directory.
  * The name of the directories will begin with '/'
  * @param drv pointer to a driver where this function belongs
- * @param rddir_p pointer to an initialized 'fs_read_dir_t' variable
+ * @param rddir_p pointer to an initialized 'lv_fs_dir_t' variable
  * @param fn pointer to a buffer to store the filename
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
@@ -360,7 +360,7 @@ static lv_fs_res_t fs_dir_read (lv_fs_drv_t * drv, void * rddir_p, char *fn)
 /**
  * Close the directory reading
  * @param drv pointer to a driver where this function belongs
- * @param rddir_p pointer to an initialized 'fs_read_dir_t' variable
+ * @param rddir_p pointer to an initialized 'lv_fs_dir_t' variable
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
 static lv_fs_res_t fs_dir_close (lv_fs_drv_t * drv, void * rddir_p)

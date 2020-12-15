@@ -1,6 +1,12 @@
 # Changelog
 
-## v7.8.0 (Planned to 01.12.2020)
+## v7.8.1 (Plannad at 15.12.2020)
+
+### Bugfixes
+- fix(lv_scr_load_anim) fix when multiple screen are loaded at tsame time with delay
+- fix(page) fix LV_SCOLLBAR_MODE_DRAG
+
+## v7.8.0 (01.12.2020)
 
 ### New features
 - make DMA2D non blocking 
