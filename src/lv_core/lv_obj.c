@@ -630,10 +630,9 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     _lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
 #else
     lv_state_t prev_state = obj->state;
+    obj->state = new_state;
 
     _lv_style_state_cmp_t cmp_res = _lv_obj_style_state_compare(obj, prev_state, new_state);
-
-    obj->state = new_state;
 
     /*If there is no difference in styles there is nothing else to do*/
     if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
@@ -660,8 +659,11 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
             }
         }
     }
-    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF) _lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
-    else if(cmp_res == _LV_STYLE_STATE_CMP_VISUAL_DIFF) lv_obj_invalidate(obj);
+
+    if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) _lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
+    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) _lv_obj_refresh_ext_draw_pad(obj);
+    else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_REDRAW) lv_obj_invalidate(obj);
+
 #endif
 }
 

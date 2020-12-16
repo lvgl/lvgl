@@ -475,7 +475,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
      case LV_STYLE_CONTENT_SRC:
          _alloc_ext(style);
          style->ext->content_text = value._ptr;
-         style->ext->has_content_text = 1;
+         style->ext->has_content_src = 1;
          break;
      case LV_STYLE_CONTENT_ALIGN:
          _alloc_ext(style);
@@ -732,7 +732,7 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           break;
 
       case LV_STYLE_CONTENT_SRC:
-             if(style->ext && style->ext->has_content_text) { value->_ptr = style->ext->content_text; return true; }
+             if(style->ext && style->ext->has_content_src) { value->_ptr = style->ext->content_text; return true; }
              break;
       case LV_STYLE_CONTENT_ALIGN:
              if(style->ext && style->ext->has_content_align) { value->_int = style->ext->content_align; return true; }
@@ -978,7 +978,7 @@ static bool remove_prop(lv_style_t * style, lv_style_prop_t prop)
         if(style->ext) style->ext->has_content_ofs_y = 0;
         break;
     case LV_STYLE_CONTENT_SRC:
-        if(style->ext) style->ext->has_content_text = 0;
+        if(style->ext) style->ext->has_content_src = 0;
         break;
 
     case LV_STYLE_TRANSITION_TIME:

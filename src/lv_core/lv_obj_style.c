@@ -35,32 +35,25 @@ typedef struct {
 
 typedef struct {
     lv_draw_rect_dsc_t rect;
-//    lv_draw_label_dsc_t label;
-//    lv_draw_line_dsc_t line;
-//    lv_draw_img_dsc_t img;
-//    lv_style_int_t pad_top;
-//    lv_style_int_t pad_bottom;
-//    lv_style_int_t pad_right;
-//    lv_style_int_t pad_left;
-//    lv_style_int_t pad_inner;
-//    lv_style_int_t margin_top;
-//    lv_style_int_t margin_bottom;
-//    lv_style_int_t margin_left;
-//    lv_style_int_t margin_right;
-//    lv_style_int_t size;
-//    lv_style_int_t transform_width;
-//    lv_style_int_t transform_height;
-//    lv_style_int_t transform_angle;
-//    lv_style_int_t transform_zoom;
-//    lv_style_int_t scale_width;
-//    lv_style_int_t scale_border_width;
-//    lv_style_int_t scale_end_border_width;
-//    lv_style_int_t scale_end_line_width;
-//    lv_color_t scale_grad_color;
-//    lv_color_t scale_end_color;
-//    lv_opa_t opa_scale;
-//    uint32_t clip_corder :1;
-//    uint32_t border_post :1;
+    lv_draw_label_dsc_t label;
+    lv_draw_line_dsc_t line;
+    lv_draw_img_dsc_t img;
+    lv_coord_t pad_top;
+    lv_coord_t pad_bottom;
+    lv_coord_t pad_right;
+    lv_coord_t pad_left;
+    lv_coord_t pad_inner;
+    lv_coord_t margin_top;
+    lv_coord_t margin_bottom;
+    lv_coord_t margin_left;
+    lv_coord_t margin_right;
+    lv_coord_t transform_width;
+    lv_coord_t transform_height;
+    lv_coord_t transform_angle;
+    lv_coord_t transform_zoom;
+    lv_opa_t opa_scale;
+    uint32_t clip_corder :1;
+    uint32_t border_post :1;
 }style_snapshot_t;
 
 
@@ -558,27 +551,56 @@ void _lv_obj_create_style_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8
  */
 _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2)
 {
-    return _LV_STYLE_STATE_CMP_DIFF;
-//    _lv_style_state_cmp_t res = _LV_STYLE_STATE_CMP_SAME;
-//    uint8_t part;
-//    for(part = 0; part < _LV_OBJ_PART_MAX; part++) {
-//        lv_style_list_t * style_list = _lv_obj_get_style_list(obj, part);
-//        if(style_list == NULL) break;   /*No more style lists*/
-//
-//        style_snapshot_t shot1;
-//        style_snapshot_t shot2;
-//
-//        obj->state = state1;
-//        style_snapshot(obj, part, &shot1);
-//
-//        obj->state = state2;
-//        style_snapshot(obj, part, &shot2);
-//
-//        _lv_style_state_cmp_t res_part = style_snapshot_compare(&shot1, &shot2);
-//        if(res_part == _LV_STYLE_STATE_CMP_DIFF) return _LV_STYLE_STATE_CMP_DIFF;
-//        if(res_part == _LV_STYLE_STATE_CMP_VISUAL_DIFF) res = _LV_STYLE_STATE_CMP_VISUAL_DIFF;
-//    }
-//    return res;
+    lv_obj_style_list_t * list = &obj->style_list;
+    _lv_style_state_cmp_t res = _LV_STYLE_STATE_CMP_SAME;
+
+    /*Are there any new styles for the new state?*/
+    uint32_t i;
+    for(i = 0; i < list->style_cnt; i++) {
+        if(list->styles[i].is_trans) continue;
+
+        /*The style is valid for a stat but not the other*/
+        bool valid1 = list->styles[i].state & (~state1) ? false : true;
+        bool valid2 = list->styles[i].state & (~state2) ? false : true;
+        if(valid1 != valid2) {
+            lv_style_t * style = list->styles[i].style;
+
+            /*If there is layout difference, return immediately. There is no more serious difference*/
+            if(list->styles[i].part == LV_PART_MAIN) {
+                if(style->has_pad_bottom) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+                if(style->has_pad_top) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+                if(style->has_pad_left) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+                if(style->has_pad_right) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+                if(style->ext && style->ext->has_margin_bottom) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+                if(style->ext && style->ext->has_margin_top) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+                if(style->ext && style->ext->has_margin_left) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+                if(style->ext && style->ext->has_margin_right) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            }
+
+            /*Check for draw pad changes*/
+            if(style->ext && style->ext->has_transform_width) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_transform_height) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_transform_angle) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_transform_zoom) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_outline_opa) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_outline_pad) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_shadow_width) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_shadow_opa) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_shadow_ofs_x) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_shadow_ofs_y) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_shadow_spread) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_line_width) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_content_src) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_content_ofs_x) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_content_ofs_y) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has_content_align) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else {
+                res = _LV_STYLE_STATE_CMP_DIFF_REDRAW;
+            }
+        }
+    }
+
+    return res;
 }
 
 /**********************
@@ -780,79 +802,3 @@ static void fade_in_anim_ready(lv_anim_t * a)
 
 #endif
 
-static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot)
-{
-//    _lv_obj_disable_style_caching(obj, true);
-//    _lv_memset_00(shot, sizeof(style_snapshot_t));
-//    lv_draw_rect_dsc_init(&shot->rect);
-//    lv_draw_label_dsc_init(&shot->label);
-//    lv_draw_img_dsc_init(&shot->img);
-//    lv_draw_line_dsc_init(&shot->line);
-//
-//    lv_obj_init_draw_rect_dsc(obj, part, &shot->rect);
-//    lv_obj_init_draw_label_dsc(obj, part, &shot->label);
-//    lv_obj_init_draw_img_dsc(obj, part, &shot->img);
-//    lv_obj_init_draw_line_dsc(obj, part, &shot->line);
-//
-//
-//    shot->pad_top = lv_obj_get_style_pad_top(obj, part);
-//    shot->pad_bottom = lv_obj_get_style_pad_bottom(obj, part);
-//    shot->pad_right = lv_obj_get_style_pad_right(obj, part);
-//    shot->pad_left = lv_obj_get_style_pad_left(obj, part);
-//    shot->margin_top = lv_obj_get_style_margin_top(obj, part);
-//    shot->margin_bottom = lv_obj_get_style_margin_bottom(obj, part);
-//    shot->margin_left = lv_obj_get_style_margin_left(obj, part);
-//    shot->margin_right = lv_obj_get_style_margin_right(obj, part);
-//    shot->size = lv_obj_get_style_size(obj, part);
-//    shot->transform_width = lv_obj_get_style_transform_width(obj, part);
-//    shot->transform_height = lv_obj_get_style_transform_height(obj, part);
-//    shot->transform_angle = lv_obj_get_style_transform_angle(obj, part);
-//    shot->transform_zoom = lv_obj_get_style_transform_zoom(obj, part);
-//    shot->scale_width = lv_obj_get_style_scale_width(obj, part);
-//    shot->scale_border_width = lv_obj_get_style_scale_border_width(obj, part);
-//    shot->scale_end_border_width = lv_obj_get_style_scale_end_border_width(obj, part);
-//    shot->scale_end_line_width = lv_obj_get_style_scale_end_line_width(obj, part);
-//    shot->scale_grad_color = lv_obj_get_style_scale_grad_color(obj, part);
-//    shot->scale_end_color = lv_obj_get_style_scale_end_color(obj, part);
-//    shot->opa_scale = lv_obj_get_style_opa_scale(obj, part);
-//    shot->clip_corder = lv_obj_get_style_clip_corner(obj, part);
-//    shot->border_post  = lv_obj_get_style_border_post(obj, part);
-//
-//    _lv_obj_disable_style_caching(obj, false);
-}
-
-static _lv_style_state_cmp_t style_snapshot_compare(style_snapshot_t * shot1, style_snapshot_t * shot2)
-{
-    return _LV_STYLE_STATE_CMP_DIFF;
-
-//    if(memcmp(shot1, shot2, sizeof(style_snapshot_t)) == 0) return _LV_STYLE_STATE_CMP_SAME;
-//
-//
-//    if(shot1->pad_top != shot2->pad_top) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->pad_bottom != shot2->pad_bottom) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->pad_left != shot2->pad_right) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->pad_right != shot2->pad_right) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->pad_top != shot2->pad_top) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->margin_top != shot2->margin_top) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->margin_bottom != shot2->margin_bottom) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->margin_left != shot2->margin_left) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->margin_right != shot2->margin_right) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->margin_top != shot2->margin_top) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->transform_width != shot2->transform_width) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->transform_height != shot2->transform_height) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->transform_angle != shot2->transform_angle) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->transform_zoom != shot2->transform_zoom) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->rect.outline_width != shot2->rect.outline_width) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->rect.outline_pad != shot2->rect.outline_pad) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->rect.outline_opa != shot2->rect.outline_opa) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->rect.value_font != shot2->rect.value_font) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->rect.value_align != shot2->rect.value_align) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->rect.value_font != shot2->rect.value_font) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->rect.shadow_spread != shot2->rect.shadow_spread) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->rect.shadow_width != shot2->rect.shadow_width) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->rect.shadow_ofs_x != shot2->rect.shadow_ofs_x) return _LV_STYLE_STATE_CMP_DIFF;
-//    if(shot1->rect.shadow_ofs_y != shot2->rect.shadow_ofs_y) return _LV_STYLE_STATE_CMP_DIFF;
-//
-//    /*If not returned earlier its just a visual difference, a simple redraw is enough*/
-//    return _LV_STYLE_STATE_CMP_VISUAL_DIFF;
-}

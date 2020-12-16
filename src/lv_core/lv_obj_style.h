@@ -29,8 +29,9 @@ struct _lv_obj_t;
 
 typedef enum {
     _LV_STYLE_STATE_CMP_SAME,           /*The style properties in the 2 states are identical*/
-    _LV_STYLE_STATE_CMP_VISUAL_DIFF,    /*The differences can be shown with a simple redraw*/
-    _LV_STYLE_STATE_CMP_DIFF,           /*There are larger differences, the objects need to ne notfied*/
+    _LV_STYLE_STATE_CMP_DIFF_REDRAW,    /*The differences can be shown with a simple redraw*/
+    _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD,  /*The differences can be shown with a simple redraw*/
+    _LV_STYLE_STATE_CMP_DIFF_LAYOUT,    /*The differences can be shown with a simple redraw*/
 } _lv_style_state_cmp_t;
 
 typedef struct {
