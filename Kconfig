@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v7.7.1
+# Kconfig file for LVGL v7.8.1
 
 menu "LVGL configuration"
     
@@ -108,7 +108,6 @@ menu "LVGL configuration"
     config LV_MEM_CUSTOM
 	    bool
 	    prompt "If true use custom malloc/free, otherwise use the built-in `lv_mem_alloc` and `lv_mem_free`"
-	    default false
 
     config LV_MEM_CUSTOM_INCLUDE
         string
@@ -138,7 +137,6 @@ menu "LVGL configuration"
     config LV_MEMCPY_MEMSET_STD
         bool
         prompt "Use the standard memcpy and memset instead of LVGL's own functions"
-        default false 
     endmenu
     
     menu "Indev device settings"
@@ -273,7 +271,6 @@ menu "LVGL configuration"
         config LV_TICK_CUSTOM
             bool 
             prompt "Use a custom tick source"
-            default false
 
         config LV_TICK_CUSTOM_INCLUDE
             string
