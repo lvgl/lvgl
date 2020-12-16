@@ -154,13 +154,14 @@ typedef lv_res_t (*lv_signal_cb_t)(struct _lv_obj_t * obj, lv_signal_t sign, voi
 
 
 enum {
-    LV_STATE_DEFAULT   =  0x00,
+    LV_STATE_DEFAULT  =  0x00,
     LV_STATE_CHECKED  =  0x01,
     LV_STATE_FOCUSED  =  0x02,
     LV_STATE_EDITED   =  0x04,
     LV_STATE_HOVERED  =  0x08,
     LV_STATE_PRESSED  =  0x10,
-    LV_STATE_DISABLED =  0x20,
+    LV_STATE_SCROLLED =  0x20,
+    LV_STATE_DISABLED =  0x40,
 };
 
 typedef uint8_t lv_state_t;

@@ -56,7 +56,6 @@ void * lv_class_new(void * class_p)
   lv_base_t * instance = lv_mem_alloc(base_class_p->_instance_size);
   _lv_memset_00(instance, base_class_p->_instance_size);
   instance->class_p = class_p;
-//  instance->_dynamic = 1;
   return instance;
 }
 

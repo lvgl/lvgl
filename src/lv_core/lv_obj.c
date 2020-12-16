@@ -120,12 +120,13 @@ void lv_init(void)
     lv_gpu_stm32_dma2d_init();
 #endif
 
+    _lv_style_system_init();
+
     LV_CLASS_INIT(lv_obj, lv_base);
     lv_obj.constructor = lv_obj_constructor;
     lv_obj.destructor = lv_obj_destructor;
     lv_obj.signal_cb = lv_obj_signal;
     lv_obj.design_cb = lv_obj_design;
-
 
     _lv_obj_style_init();
 
@@ -398,59 +399,73 @@ bool lv_obj_is_visible(const lv_obj_t * obj)
  */
 void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
 {
-    while(1);
-//    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-//    LV_ASSERT_OBJ(parent, LV_OBJX_NAME);
-//
-//    if(obj->parent == NULL) {
-//        LV_LOG_WARN("Can't set the parent of a screen");
-//        return;
-//    }
-//
-//    if(parent == NULL) {
-//        LV_LOG_WARN("Can't set parent == NULL to an object");
-//        return;
-//    }
-//
-//    lv_obj_invalidate(obj);
-//
-//    if(parent->spec_attr == NULL) {
-//        parent->spec_attr = lv_obj_allocate_spec_attr(parent);
-//    }
-//
-//    lv_obj_t * old_par = obj->parent;
-//    lv_point_t old_pos;
-//    old_pos.y = lv_obj_get_y(obj);
-//
-//    lv_bidi_dir_t new_base_dir = lv_obj_get_base_dir(parent);
-//
-//    if(new_base_dir != LV_BIDI_DIR_RTL) {
-//        old_pos.x = lv_obj_get_x(obj);
-//    }
-//    else {
-//        old_pos.x = old_par->coords.x2 - obj->coords.x2;
-//    }
-//
-//    _lv_ll_chg_list(_lv_obj_get_child_ll(obj->parent), _lv_obj_get_child_ll(parent), obj, true);
-//    obj->parent = parent;
-//
-//
-//    if(new_base_dir != LV_BIDI_DIR_RTL) {
-//        lv_obj_set_pos(obj, old_pos.x, old_pos.y);
-//    }
-//    else {
-//        /*Align to the right in case of RTL base dir*/
-//        lv_coord_t new_x = lv_obj_get_width(parent) - old_pos.x - lv_obj_get_width(obj);
-//        lv_obj_set_pos(obj, new_x, old_pos.y);
-//    }
-//
-//    /*Notify the original parent because one of its children is lost*/
-//    lv_signal_send(old_par, LV_SIGNAL_CHILD_CHG, obj);
-//
-//    /*Notify the new parent about the child*/
-//    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
-//
-//    lv_obj_invalidate(obj);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(parent, LV_OBJX_NAME);
+
+    if(obj->parent == NULL) {
+        LV_LOG_WARN("Can't set the parent of a screen");
+        return;
+    }
+
+    if(parent == NULL) {
+        LV_LOG_WARN("Can't set parent == NULL to an object");
+        return;
+    }
+
+    lv_obj_invalidate(obj);
+
+    if(parent->spec_attr == NULL) {
+        parent->spec_attr = lv_obj_allocate_spec_attr(parent);
+    }
+
+    lv_obj_t * old_parent = obj->parent;
+    lv_point_t old_pos;
+    old_pos.y = lv_obj_get_y(obj);
+
+    lv_bidi_dir_t new_base_dir = lv_obj_get_base_dir(parent);
+
+    if(new_base_dir != LV_BIDI_DIR_RTL) old_pos.x = lv_obj_get_x(obj);
+    else  old_pos.x = old_parent->coords.x2 - obj->coords.x2;
+
+    /*Remove the object from the old parent's child list*/
+    uint32_t i;
+    for(i = lv_obj_get_child_id(obj); i < lv_obj_get_child_cnt(old_parent) - 2; i++) {
+        old_parent->spec_attr->children[i] = old_parent->spec_attr->children[i+1];
+    }
+    old_parent->spec_attr->child_cnt--;
+    if(old_parent->spec_attr->child_cnt) {
+        old_parent->spec_attr->children = lv_mem_realloc(old_parent->spec_attr->children, old_parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
+    } else {
+        lv_mem_free(old_parent->spec_attr->children);
+        old_parent->spec_attr->children = NULL;
+    }
+
+    /*Add the child to the new parent*/
+    parent->spec_attr->child_cnt++;
+    parent->spec_attr->children = lv_mem_realloc(parent->spec_attr->children, parent->spec_attr->child_cnt * (sizeof(lv_obj_t *)));
+    for(i = lv_obj_get_child_cnt(parent) - 1; i > 0 ; i--) {
+        parent->spec_attr->children[i] = parent->spec_attr->children[i - 1];
+    }
+    parent->spec_attr->children[0] = obj;
+
+    obj->parent = parent;
+
+    if(new_base_dir != LV_BIDI_DIR_RTL) {
+        lv_obj_set_pos(obj, old_pos.x, old_pos.y);
+    }
+    else {
+        /*Align to the right in case of RTL base dir*/
+        lv_coord_t new_x = lv_obj_get_width(parent) - old_pos.x - lv_obj_get_width(obj);
+        lv_obj_set_pos(obj, new_x, old_pos.y);
+    }
+
+    /*Notify the original parent because one of its children is lost*/
+    lv_signal_send(old_parent, LV_SIGNAL_CHILD_CHG, obj);
+
+    /*Notify the new parent about the child*/
+    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+
+    lv_obj_invalidate(obj);
 }
 
 /**
@@ -459,22 +474,22 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
  */
 void lv_obj_move_foreground(lv_obj_t * obj)
 {
-//    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-//
-//    lv_obj_t * parent = lv_obj_get_parent(obj);
-//    lv_ll_t * ll = _lv_obj_get_child_ll(parent);
-//
-//    /*Do nothing of already in the foreground*/
-//    if(_lv_ll_get_head(ll) == obj) return;
-//
-//    lv_obj_invalidate(parent);
-//
-//    _lv_ll_chg_list(ll, ll, obj, true);
-//
-//    /*Notify the new parent about the child*/
-//    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
-//
-//    lv_obj_invalidate(parent);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    lv_obj_invalidate(parent);
+
+    uint32_t i;
+    for(i = lv_obj_get_child_id(obj) - 1; i > 0; i--) {
+        parent->spec_attr->children[i] = parent->spec_attr->children[i-1];
+    }
+    parent->spec_attr->children[0] = obj;
+
+    /*Notify the new parent about the child*/
+    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+
+    lv_obj_invalidate(parent);
 }
 
 /**
@@ -483,29 +498,27 @@ void lv_obj_move_foreground(lv_obj_t * obj)
  */
 void lv_obj_move_background(lv_obj_t * obj)
 {
-//    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-//
-//    lv_obj_t * parent = lv_obj_get_parent(obj);
-//    lv_ll_t * ll = _lv_obj_get_child_ll(parent);
-//
-//    /*Do nothing of already in the background*/
-//    if(_lv_ll_get_tail(ll) == obj) return;
-//
-//    lv_obj_invalidate(parent);
-//
-//    _lv_ll_chg_list(ll, ll, obj, false);
-//
-//    /*Notify the new parent about the child*/
-//    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
-//
-//    lv_obj_invalidate(parent);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+
+    lv_obj_t * parent = lv_obj_get_parent(obj);
+
+    lv_obj_invalidate(parent);
+
+    uint32_t i;
+    for(i = lv_obj_get_child_id(obj); i < lv_obj_get_child_cnt(parent) - 2; i++) {
+        parent->spec_attr->children[i] = parent->spec_attr->children[i + 1];
+    }
+    parent->spec_attr->children[ lv_obj_get_child_cnt(parent) - 1] = obj;
+
+    /*Notify the new parent about the child*/
+    lv_signal_send(parent, LV_SIGNAL_CHILD_CHG, obj);
+
+    lv_obj_invalidate(parent);
 }
 
 /*--------------------
  * Coordinate set
  * ------------------*/
-
-
 
 /**
  * Set the size of an extended clickable area
@@ -628,6 +641,8 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     uint8_t part;
     for(part = 0; part < _LV_OBJ_PART_MAX; part++) {
         uint16_t time = lv_obj_get_style_transition_time(obj, part);
+        if(time == 0) continue;
+
         lv_style_prop_t props[LV_STYLE_TRANS_NUM_MAX];
         uint16_t delay = lv_obj_get_style_transition_delay(obj, part);
         const lv_anim_path_t * path = lv_obj_get_style_transition_path(obj, part);
@@ -1513,8 +1528,8 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 
         lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
-        lv_coord_t w = 0;//lv_obj_get_style_transform_width(obj, LV_OBJ_PART_MAIN);
-        lv_coord_t h = 0;//lv_obj_get_style_transform_height(obj, LV_OBJ_PART_MAIN);
+        lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+        lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
         lv_area_t coords;
         lv_area_copy(&coords, &obj->coords);
         coords.x1 -= w;
@@ -1524,11 +1539,19 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 
         lv_draw_rect(&coords, clip_area, &draw_dsc);
 
+
+        /*Draw the content*/
+        lv_draw_rect_dsc_init(&draw_dsc);
+        draw_dsc.bg_opa = LV_OPA_TRANSP;
+        draw_dsc.border_opa = LV_OPA_TRANSP;
+        draw_dsc.outline_opa = LV_OPA_TRANSP;
+        draw_dsc.shadow_opa = LV_OPA_TRANSP;
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_CONTENT, &draw_dsc);
+        lv_draw_rect(&coords, clip_area, &draw_dsc);
+
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
             lv_draw_mask_radius_param_t * mp = _lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));
-
             lv_coord_t r = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-
             lv_draw_mask_radius_init(mp, &obj->coords, r, false);
             /*Add the mask and use `obj+8` as custom id. Don't use `obj` directly because it might be used by the user*/
             lv_draw_mask_add(mp, obj + 8);
@@ -1547,13 +1570,13 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
             lv_draw_rect_dsc_t draw_dsc;
             lv_draw_rect_dsc_init(&draw_dsc);
             draw_dsc.bg_opa = LV_OPA_TRANSP;
-//            draw_dsc.pattern_opa = LV_OPA_TRANSP;
+            draw_dsc.outline_opa = LV_OPA_TRANSP;
             draw_dsc.shadow_opa = LV_OPA_TRANSP;
-            draw_dsc.value_opa = LV_OPA_TRANSP;
+            draw_dsc.content_opa = LV_OPA_TRANSP;
             lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
 
-            lv_coord_t w = 0;//lv_obj_get_style_transform_width(obj, LV_OBJ_PART_MAIN);
-            lv_coord_t h = 0;//lv_obj_get_style_transform_height(obj, LV_OBJ_PART_MAIN);
+            lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+            lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
             lv_area_t coords;
             lv_area_copy(&coords, &obj->coords);
             coords.x1 -= w;
@@ -1756,6 +1779,8 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         lv_coord_t * s = param;
         lv_coord_t d = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_MAIN);
+        *s = LV_MATH_MAX(*s, d);
+        d = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_CONTENT);
         *s = LV_MATH_MAX(*s, d);
     }
     else if(sign == LV_SIGNAL_STYLE_CHG) {

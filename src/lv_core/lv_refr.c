@@ -598,9 +598,9 @@ static lv_obj_t * lv_refr_get_top_obj(const lv_area_t * area_p, lv_obj_t * obj)
         if(design_res == LV_DESIGN_RES_MASKED) return NULL;
 
 #if LV_USE_OPA_SCALE
-//        if(design_res == LV_DESIGN_RES_COVER && lv_obj_get_style_opa_scale(obj, LV_PART_MAIN) != LV_OPA_COVER) {
-//            design_res = LV_DESIGN_RES_NOT_COVER;
-//        }
+        if(design_res == LV_DESIGN_RES_COVER && lv_obj_get_style_opa(obj, LV_PART_MAIN) != LV_OPA_COVER) {
+            design_res = LV_DESIGN_RES_NOT_COVER;
+        }
 #endif
 
         uint32_t i;

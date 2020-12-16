@@ -146,77 +146,77 @@ lv_flex_place_t lv_obj_get_flex_self_place(lv_obj_t * obj)
 void _lv_flex_refresh(lv_obj_t * cont)
 {
     lv_flex_dir_t dir = get_dir(cont);
-//
-//    if(dir == LV_FLEX_DIR_NONE) return;
-//
-//    bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
-//    bool row = dir == LV_FLEX_DIR_ROW ? true : false;
-//    /*Count the grow units and free space*/
-//    lv_coord_t max_main_size = (row ? lv_obj_get_width_fit(cont) : lv_obj_get_height_fit(cont));
-//    lv_coord_t abs_y = cont->coords.y1 + lv_obj_get_style_pad_top(cont, LV_OBJ_PART_MAIN) - lv_obj_get_scroll_y(cont);
-//    lv_coord_t abs_x = cont->coords.x1 + lv_obj_get_style_pad_left(cont, LV_OBJ_PART_MAIN) - lv_obj_get_scroll_x(cont);
-//
-//    lv_flex_place_t cross_place = lv_obj_get_flex_track_place(cont);
-//    lv_flex_place_t main_place = cont->spec_attr->flex_cont.main_place;
-//    lv_coord_t * cross_pos = (row ? &abs_y : &abs_x);
-//
-//    if((row && cont->h_set == LV_SIZE_AUTO) ||
-//       (!row && cont->w_set == LV_SIZE_AUTO))
-//    {
-//        cross_place = LV_FLEX_PLACE_START;
-//    }
-//
-//    if(rtl && !row) {
-//        if(cross_place == LV_FLEX_PLACE_START) cross_place = LV_FLEX_PLACE_END;
-//        else if(cross_place == LV_FLEX_PLACE_END) cross_place = LV_FLEX_PLACE_START;
-//    }
-//
-//    lv_coord_t total_track_cross_size = 0;
-//    lv_coord_t gap = 0;
-//    uint32_t track_cnt = 0;
-//    uint32_t track_first_item;
-//    uint32_t next_track_first_item;
-//    bool rev = get_rev(cont);
-//
-//    if(cross_place != LV_FLEX_PLACE_START) {
-//        track_first_item =  rev ? cont->spec_attr->child_cnt - 1 : 0;
-//        track_t t;
-//        while(track_first_item ) {
-//            /*Search the first item of the next row */
-//            next_track_first_item = find_track_end(cont, track_first_item, max_main_size, &t);
-//            total_track_cross_size += t.track_cross_size;
-//            track_cnt++;
-//            track_first_item = next_track_first_item;
-//        }
-//
-//        lv_coord_t max_cross_size = (row ? lv_obj_get_height_fit(cont) : lv_obj_get_width_fit(cont));
-//        place_content(cross_place, max_cross_size, total_track_cross_size, track_cnt, cross_pos, &gap);
-//    }
-//
-//    track_first_item =  rev ? cont->spec_attr->child_cnt - 1 : 0;
-//
-//    if(rtl && !row) {
-//         *cross_pos += total_track_cross_size;
-//    }
-//
-//    while(track_first_item) {
-//        track_t t;
-//        /*Search the first item of the next row */
-//        next_track_first_item = find_track_end(cont, track_first_item, max_main_size, &t);
-//
-//        if(rtl && !row) {
-//            *cross_pos -= t.track_cross_size;
-//        }
-//        children_repos(cont, track_first_item, next_track_first_item, abs_x, abs_y, max_main_size, main_place, &t);
-//        track_first_item = next_track_first_item;
-//
-//        if(rtl && !row) {
-//            *cross_pos -=  gap;
-//        } else {
-//            *cross_pos += t.track_cross_size + gap;
-//        }
-//    }
-//    LV_ASSERT_MEM_INTEGRITY();
+
+    if(dir == LV_FLEX_DIR_NONE) return;
+
+    bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
+    bool row = dir == LV_FLEX_DIR_ROW ? true : false;
+    /*Count the grow units and free space*/
+    lv_coord_t max_main_size = (row ? lv_obj_get_width_fit(cont) : lv_obj_get_height_fit(cont));
+    lv_coord_t abs_y = cont->coords.y1 + lv_obj_get_style_pad_top(cont, LV_PART_MAIN) - lv_obj_get_scroll_y(cont);
+    lv_coord_t abs_x = cont->coords.x1 + lv_obj_get_style_pad_left(cont, LV_PART_MAIN) - lv_obj_get_scroll_x(cont);
+
+    lv_flex_place_t cross_place = lv_obj_get_flex_track_place(cont);
+    lv_flex_place_t main_place = cont->spec_attr->flex_cont.main_place;
+    lv_coord_t * cross_pos = (row ? &abs_y : &abs_x);
+
+    if((row && cont->h_set == LV_SIZE_AUTO) ||
+       (!row && cont->w_set == LV_SIZE_AUTO))
+    {
+        cross_place = LV_FLEX_PLACE_START;
+    }
+
+    if(rtl && !row) {
+        if(cross_place == LV_FLEX_PLACE_START) cross_place = LV_FLEX_PLACE_END;
+        else if(cross_place == LV_FLEX_PLACE_END) cross_place = LV_FLEX_PLACE_START;
+    }
+
+    lv_coord_t total_track_cross_size = 0;
+    lv_coord_t gap = 0;
+    uint32_t track_cnt = 0;
+    uint32_t track_first_item;
+    uint32_t next_track_first_item;
+    bool rev = get_rev(cont);
+
+    if(cross_place != LV_FLEX_PLACE_START) {
+        track_first_item =  rev ? cont->spec_attr->child_cnt - 1 : 0;
+        track_t t;
+        while(track_first_item ) {
+            /*Search the first item of the next row */
+            next_track_first_item = find_track_end(cont, track_first_item, max_main_size, &t);
+            total_track_cross_size += t.track_cross_size;
+            track_cnt++;
+            track_first_item = next_track_first_item;
+        }
+
+        lv_coord_t max_cross_size = (row ? lv_obj_get_height_fit(cont) : lv_obj_get_width_fit(cont));
+        place_content(cross_place, max_cross_size, total_track_cross_size, track_cnt, cross_pos, &gap);
+    }
+
+    track_first_item =  rev ? cont->spec_attr->child_cnt - 1 : 0;
+
+    if(rtl && !row) {
+         *cross_pos += total_track_cross_size;
+    }
+
+    while(track_first_item) {
+        track_t t;
+        /*Search the first item of the next row */
+        next_track_first_item = find_track_end(cont, track_first_item, max_main_size, &t);
+
+        if(rtl && !row) {
+            *cross_pos -= t.track_cross_size;
+        }
+        children_repos(cont, track_first_item, next_track_first_item, abs_x, abs_y, max_main_size, main_place, &t);
+        track_first_item = next_track_first_item;
+
+        if(rtl && !row) {
+            *cross_pos -=  gap;
+        } else {
+            *cross_pos += t.track_cross_size + gap;
+        }
+    }
+    LV_ASSERT_MEM_INTEGRITY();
 }
 
 /**********************
@@ -293,92 +293,91 @@ static uint32_t find_track_end(lv_obj_t * cont, uint32_t item_start_id, lv_coord
 
 static void children_repos(lv_obj_t * cont, uint32_t item_first_id, uint32_t item_last_id, lv_coord_t abs_x, lv_coord_t abs_y, lv_coord_t max_main_size, lv_flex_place_t main_place, track_t * t)
 {
-    return;
-//    bool rev = get_rev(cont);
-//    lv_coord_t gap = lv_obj_get_flex_gap(cont);
-//    bool row = get_dir(cont) == LV_FLEX_DIR_ROW ? true : false;
-//
-//    lv_coord_t(*obj_get_main_size)(const lv_obj_t *) = (row ? lv_obj_get_width_margin : lv_obj_get_height_margin);
-//    lv_coord_t(*obj_get_cross_size)(const lv_obj_t *) = (!row ? lv_obj_get_width_margin : lv_obj_get_height_margin);
-//    void (*area_set_main_size)(lv_area_t *, lv_coord_t) = (row ? lv_area_set_width : lv_area_set_height);
-//    void (*area_set_cross_size)(lv_area_t *, lv_coord_t) = (!row ? lv_area_set_width : lv_area_set_height);
-//    lv_coord_t (*area_get_main_size)(const lv_area_t *) = (!row ? lv_area_get_width : lv_area_get_height);
-//    lv_coord_t (*get_margin_start)(const lv_obj_t *, uint8_t part) = (row ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);
-//    lv_coord_t (*get_margin_end)(const lv_obj_t *, uint8_t part) = (row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
-//
-//    bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
-//
-//    if(row && rtl) abs_x += lv_obj_get_width_fit(cont);
-//
-//    lv_coord_t main_pos = 0;
-//
-//    lv_coord_t place_gap = 0;
-//    place_content(main_place, max_main_size, t->track_main_size, t->item_cnt, &main_pos, &place_gap);
-//
-//    lv_obj_t * item = get_next_item(cont, rev, &item_first_id);
-//    /*Reposition the children*/
-//    while(item && item_first_id != item_last_id) {
-//        /*Ignore non-flex items*/
-//        lv_coord_t main_set = (row ? item->x_set : item->y_set);
-//        if(LV_COORD_IS_FLEX(main_set) == false) {
-//            item = get_next_item(cont, rev, &item_first_id);
-//            continue;
-//        }
-//
-//        lv_coord_t main_size = (row ? item->w_set : item->h_set);
-//        if(_LV_FLEX_GET_GROW(main_size) || LV_COORD_GET_FLEX(main_set) == LV_FLEX_PLACE_STRETCH) {
-//            lv_area_t old_coords;
-//            lv_area_copy(&old_coords, &item->coords);
-//
-//            if(_LV_FLEX_GET_GROW(main_size)) {
-//                lv_coord_t s = _LV_FLEX_GET_GROW(main_size) * t->grow_unit;
-//                s -= get_margin_start(item, LV_OBJ_PART_MAIN) + get_margin_end(item, LV_OBJ_PART_MAIN);
-//                area_set_main_size(&item->coords, s);
-//            }
-//            if(LV_COORD_GET_FLEX(main_set) == LV_FLEX_PLACE_STRETCH) {
-//                area_set_cross_size(&item->coords, t->track_cross_size);
-//            }
-//
-//            if(lv_area_get_height(&old_coords) != area_get_main_size(&item->coords)) {
-//                lv_obj_invalidate(item);
-//               lv_signal_send(item, LV_SIGNAL_COORD_CHG, &old_coords);
-//                lv_obj_invalidate(item);
-//            }
-//        }
-//
-//        lv_coord_t cross_pos = 0;
-//        lv_coord_t cross_set = (row ? item->y_set : item->x_set);
-//        switch(LV_COORD_GET_FLEX(cross_set)) {
-//        case LV_FLEX_PLACE_CENTER:
-//            cross_pos = (t->track_cross_size - obj_get_cross_size(item)) / 2;
-//            break;
-//        case LV_FLEX_PLACE_END:
-//            cross_pos = t->track_cross_size - obj_get_cross_size(item);
-//            break;
-//        }
-//
-//        if(row && rtl) {
-//            main_pos -= obj_get_main_size(item) + gap + place_gap;
-//        }
-//
-//        lv_coord_t diff_x = abs_x - item->coords.x1 + lv_obj_get_style_margin_left(item, LV_OBJ_PART_MAIN);
-//        lv_coord_t diff_y = abs_y - item->coords.y1 + lv_obj_get_style_margin_top(item, LV_OBJ_PART_MAIN);
-//        diff_x += row ? main_pos : cross_pos;
-//        diff_y += row ? cross_pos : main_pos;
-//
-//        if(diff_x || diff_y) {
-//            item->coords.x1 += diff_x;
-//            item->coords.x2 += diff_x;
-//            item->coords.y1 += diff_y;
-//            item->coords.y2 += diff_y;
-//            _lv_obj_move_children_by(item, diff_x, diff_y);
-//        }
-//
-//        if(!(row && rtl)) {
-//            main_pos += obj_get_main_size(item) + gap + place_gap;
-//        }
-//        item = get_next_item(cont, rev, &item_first_id);
-//    }
+    bool rev = get_rev(cont);
+    lv_coord_t gap = lv_obj_get_flex_gap(cont);
+    bool row = get_dir(cont) == LV_FLEX_DIR_ROW ? true : false;
+
+    lv_coord_t(*obj_get_main_size)(const lv_obj_t *) = (row ? lv_obj_get_width_margin : lv_obj_get_height_margin);
+    lv_coord_t(*obj_get_cross_size)(const lv_obj_t *) = (!row ? lv_obj_get_width_margin : lv_obj_get_height_margin);
+    void (*area_set_main_size)(lv_area_t *, lv_coord_t) = (row ? lv_area_set_width : lv_area_set_height);
+    void (*area_set_cross_size)(lv_area_t *, lv_coord_t) = (!row ? lv_area_set_width : lv_area_set_height);
+    lv_coord_t (*area_get_main_size)(const lv_area_t *) = (!row ? lv_area_get_width : lv_area_get_height);
+    lv_coord_t (*get_margin_start)(const lv_obj_t *, uint8_t part) = (row ? lv_obj_get_style_margin_left : lv_obj_get_style_margin_top);
+    lv_coord_t (*get_margin_end)(const lv_obj_t *, uint8_t part) = (row ? lv_obj_get_style_margin_right : lv_obj_get_style_margin_bottom);
+
+    bool rtl = lv_obj_get_base_dir(cont) == LV_BIDI_DIR_RTL ? true : false;
+
+    if(row && rtl) abs_x += lv_obj_get_width_fit(cont);
+
+    lv_coord_t main_pos = 0;
+
+    lv_coord_t place_gap = 0;
+    place_content(main_place, max_main_size, t->track_main_size, t->item_cnt, &main_pos, &place_gap);
+
+    lv_obj_t * item = get_next_item(cont, rev, &item_first_id);
+    /*Reposition the children*/
+    while(item && item_first_id != item_last_id) {
+        /*Ignore non-flex items*/
+        lv_coord_t main_set = (row ? item->x_set : item->y_set);
+        if(LV_COORD_IS_FLEX(main_set) == false) {
+            item = get_next_item(cont, rev, &item_first_id);
+            continue;
+        }
+
+        lv_coord_t main_size = (row ? item->w_set : item->h_set);
+        if(_LV_FLEX_GET_GROW(main_size) || LV_COORD_GET_FLEX(main_set) == LV_FLEX_PLACE_STRETCH) {
+            lv_area_t old_coords;
+            lv_area_copy(&old_coords, &item->coords);
+
+            if(_LV_FLEX_GET_GROW(main_size)) {
+                lv_coord_t s = _LV_FLEX_GET_GROW(main_size) * t->grow_unit;
+                s -= get_margin_start(item, LV_PART_MAIN) + get_margin_end(item, LV_PART_MAIN);
+                area_set_main_size(&item->coords, s);
+            }
+            if(LV_COORD_GET_FLEX(main_set) == LV_FLEX_PLACE_STRETCH) {
+                area_set_cross_size(&item->coords, t->track_cross_size);
+            }
+
+            if(lv_area_get_height(&old_coords) != area_get_main_size(&item->coords)) {
+                lv_obj_invalidate(item);
+               lv_signal_send(item, LV_SIGNAL_COORD_CHG, &old_coords);
+                lv_obj_invalidate(item);
+            }
+        }
+
+        lv_coord_t cross_pos = 0;
+        lv_coord_t cross_set = (row ? item->y_set : item->x_set);
+        switch(LV_COORD_GET_FLEX(cross_set)) {
+        case LV_FLEX_PLACE_CENTER:
+            cross_pos = (t->track_cross_size - obj_get_cross_size(item)) / 2;
+            break;
+        case LV_FLEX_PLACE_END:
+            cross_pos = t->track_cross_size - obj_get_cross_size(item);
+            break;
+        }
+
+        if(row && rtl) {
+            main_pos -= obj_get_main_size(item) + gap + place_gap;
+        }
+
+        lv_coord_t diff_x = abs_x - item->coords.x1 + lv_obj_get_style_margin_left(item, LV_PART_MAIN);
+        lv_coord_t diff_y = abs_y - item->coords.y1 + lv_obj_get_style_margin_top(item, LV_PART_MAIN);
+        diff_x += row ? main_pos : cross_pos;
+        diff_y += row ? cross_pos : main_pos;
+
+        if(diff_x || diff_y) {
+            item->coords.x1 += diff_x;
+            item->coords.x2 += diff_x;
+            item->coords.y1 += diff_y;
+            item->coords.y2 += diff_y;
+            _lv_obj_move_children_by(item, diff_x, diff_y);
+        }
+
+        if(!(row && rtl)) {
+            main_pos += obj_get_main_size(item) + gap + place_gap;
+        }
+        item = get_next_item(cont, rev, &item_first_id);
+    }
 }
 
 static void place_content(lv_coord_t place, lv_coord_t max_size, lv_coord_t track_size, lv_coord_t item_cnt, lv_coord_t * start_pos, lv_coord_t * gap)

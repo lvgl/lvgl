@@ -122,6 +122,7 @@ lv_style_value_t lv_obj_get_style_prop(const struct _lv_obj_t * obj, uint8_t par
  */
 void _lv_obj_refresh_style(struct _lv_obj_t * obj, lv_style_prop_t prop);
 
+lv_style_t * lv_obj_get_local_style(lv_obj_t * obj, uint32_t part, uint32_t state);
 /**
  * Remove all transitions from an object
  * @param obj pointer to an object
@@ -158,20 +159,6 @@ void _lv_obj_create_style_transition(struct _lv_obj_t * obj, lv_style_prop_t pro
  */
 _lv_style_state_cmp_t _lv_obj_style_state_compare(struct _lv_obj_t * obj, lv_state_t state1, lv_state_t state2);
 
-
-static inline void lv_obj_set_style_bg_color(struct _lv_obj_t * obj,  uint32_t part, uint32_t state, lv_color_t value)
-{
-    lv_style_value_t v;
-    v._color = value;
-    lv_obj_set_style_prop(obj, part, state, LV_STYLE_BG_COLOR, v);
-}
-
-static inline void lv_obj_set_style_bg_opa(struct _lv_obj_t * obj,  uint32_t part, uint32_t state, lv_opa_t value)
-{
-    lv_style_value_t v;
-    v._int = value;
-    lv_obj_set_style_prop(obj, part, state, LV_STYLE_BG_OPA, v);
-}
 
 /*********************
  * OBJ STYLE GET
@@ -351,7 +338,7 @@ static inline lv_opa_t lv_obj_get_style_line_opa(const struct _lv_obj_t * obj, u
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_LINE_OPA); return v._int; }
 
 static inline const char * lv_obj_get_style_content_text(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_CONTENT_TEXT); return v._ptr; }
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_CONTENT_SRC); return v._ptr; }
 
 static inline lv_align_t lv_obj_get_style_content_align(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_CONTENT_ALIGN); return v._int; }

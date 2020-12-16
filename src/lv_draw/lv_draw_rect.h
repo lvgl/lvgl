@@ -59,24 +59,19 @@ typedef struct {
     lv_opa_t shadow_opa;
     lv_blend_mode_t shadow_blend_mode;
 
-    /*Pattern*/
-    const void * bg_img_src;
-    const lv_font_t * pattern_font;
-    lv_opa_t bg_img_opa;
-    uint8_t bg_img_mosaic : 1;
-    lv_blend_mode_t pattern_blend_mode;
-
-    /*Value*/
-    const char * value_str;
-    const lv_font_t * value_font;
-    lv_opa_t value_opa;
-    lv_color_t value_color;
-    lv_coord_t value_ofs_x;
-    lv_coord_t value_ofs_y;
-    lv_coord_t value_letter_space;
-    lv_coord_t value_line_space;
-    lv_align_t value_align;
-    lv_blend_mode_t value_blend_mode;
+    /*Content*/
+    const void * content_src;
+    const void * content_img;
+    lv_align_t content_align;
+    lv_coord_t content_ofs_x;
+    lv_coord_t content_ofs_y;
+    lv_opa_t content_opa;
+    const lv_font_t * content_font;
+    lv_opa_t content_recolor_opa;
+    lv_blend_mode_t content_blend_mode;
+    lv_color_t content_color;
+    lv_coord_t content_letter_space;
+    lv_coord_t content_line_space;
 } lv_draw_rect_dsc_t;
 
 /**********************

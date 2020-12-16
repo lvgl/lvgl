@@ -57,6 +57,8 @@ void _lv_scroll_handler(lv_indev_proc_t * proc)
         scroll_obj = find_scroll_obj(proc);
         if(scroll_obj == NULL) return;
 
+        lv_obj_add_state(scroll_obj, LV_STATE_SCROLLED);
+
         init_scroll_limits(proc);
 
         lv_indev_t * indev_act = lv_indev_get_act();
@@ -202,6 +204,8 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
         lv_event_send(scroll_obj, LV_EVENT_SCROLL_END, indev_act);
         if(proc->reset_query) return;
 
+        lv_obj_clear_state(proc->types.pointer.scroll_obj, LV_STATE_SCROLLED);
+
         proc->types.pointer.scroll_dir = LV_SCROLL_DIR_NONE;
         proc->types.pointer.scroll_obj = NULL;
     }
@@ -258,8 +262,6 @@ static lv_obj_t * find_scroll_obj(lv_indev_proc_t * proc)
      *  5. Use the last candidate. Always the "deepest" parent or the object from point 3 */
     lv_obj_t * obj_act = proc->types.pointer.act_obj;
     while(obj_act) {
-
-
         if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLLABLE) == false) {
             /*If this object don't want to chain the scroll ot the parent stop searching*/
             if(lv_obj_has_flag(obj_act, LV_OBJ_FLAG_SCROLL_CHAIN) == false) break;

@@ -230,8 +230,8 @@ void lv_obj_set_content_height(lv_obj_t * obj, lv_coord_t h)
  */
 void lv_obj_set_width_margin(lv_obj_t * obj, lv_coord_t w)
 {
-    lv_coord_t mleft = 0;//lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
-    lv_coord_t mright = 0;//lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
+    lv_coord_t mleft = lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
+    lv_coord_t mright = lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
 
     lv_obj_set_width(obj, w - mleft - mright);
 }
@@ -244,8 +244,8 @@ void lv_obj_set_width_margin(lv_obj_t * obj, lv_coord_t w)
  */
 void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h)
 {
-    lv_coord_t mtop = 0;//lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
-    lv_coord_t mbottom = 0;//lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
+    lv_coord_t mtop = lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
+    lv_coord_t mbottom = lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
 
     lv_obj_set_height(obj, h - mtop - mbottom);
 }

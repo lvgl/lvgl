@@ -13,19 +13,6 @@
 /*********************
  *      DEFINES
  *********************/
-#define STYLE_MIX_MAX 256
-#define STYLE_MIX_SHIFT 8 /*log2(STYLE_MIX_MAX)*/
-
-#define VAL_PROP(v1, v2, r) v1 + (((v2 - v1) * r) >> STYLE_MIX_SHIFT)
-#define STYLE_ATTR_MIX(attr, r)                                                                                        \
-    if(start->attr != end->attr) {                                                                                     \
-        res->attr = VAL_PROP(start->attr, end->attr, r);                                                               \
-    } else {                                                                                                           \
-        res->attr = start->attr;                                                                                       \
-    }
-
-#define LV_STYLE_PROP_TO_ID(prop) (prop & 0xFF);
-#define LV_STYLE_PROP_GET_TYPE(prop) ((prop >> 8) & 0xFF);
 
 /**********************
  *      TYPEDEFS
@@ -34,10 +21,14 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
+static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value);
+static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
+static bool remove_prop(lv_style_t * style, lv_style_prop_t prop);
 
 /**********************
  *  GLOBAL VARIABLES
  **********************/
+lv_style_class_t lv_style;
 
 /**********************
  *  STATIC VARIABLES
@@ -51,6 +42,15 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
+void _lv_style_system_init(void)
+{
+    LV_CLASS_INIT(lv_style, lv_base);
+    lv_style.constructor = NULL;
+    lv_style.remove_prop = remove_prop;
+    lv_style.set_prop = set_prop;
+    lv_style.get_prop = get_prop;
+}
+
 /**
  * Initialize a style
  * @param style pointer to a style to initialize
@@ -58,28 +58,19 @@
 void lv_style_init(lv_style_t * style)
 {
     _lv_memset_00(style, sizeof(lv_style_t));
+    style->class_p = &lv_style;
 #if LV_USE_ASSERT_STYLE
     style->sentinel = LV_DEBUG_STYLE_SENTINEL_VALUE;
 #endif
+
 }
 
-/**
- * Copy a style with all its properties
- * @param style_dest pointer to the destination style. (Should be initialized with `lv_style_init()`)
- * @param style_src pointer to the source (to copy )style
- */
-void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
+uint16_t lv_style_register_prop(bool inherit)
 {
-//    if(style_src == NULL) return;
-//
-//    LV_ASSERT_STYLE(style_dest);
-//    LV_ASSERT_STYLE(style_src);
-//
-//    if(style_src->map == NULL) return;
-//
-//    uint16_t size = _lv_style_get_mem_size(style_src);
-//    style_dest->map = lv_mem_alloc(size);
-//    _lv_memcpy(style_dest->map, style_src->map, size);
+    static uint16_t act_id = (uint16_t)_LV_STYLE_LAST_BUIL_IN_PROP;
+    act_id++;
+    if(inherit) return act_id | LV_STYLE_PROP_INHERIT;
+    else return act_id;
 }
 
 /**
@@ -91,244 +82,7 @@ void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
  */
 bool lv_style_remove_prop(lv_style_t * style, lv_style_prop_t prop)
 {
-    if(style == NULL) return false;
-    LV_ASSERT_STYLE(style);
-
-    switch(prop) {
-
-    case LV_STYLE_RADIUS:
-        style->has_radius = 0;
-        break;
-    case LV_STYLE_CLIP_CORNER:
-        if(style->ext) style->ext->has_clip_corner = 0;
-        break;
-    case LV_STYLE_TRANSFORM_WIDTH:
-        if(style->ext) style->ext->has_transform_width = 0;
-        break;
-    case LV_STYLE_TRANSFORM_HEIGHT:
-        if(style->ext) style->ext->has_transform_height = 0;
-        break;
-    case LV_STYLE_TRANSFORM_ZOOM:
-        if(style->ext) style->ext->has_transform_zoom = 0;
-        break;
-    case LV_STYLE_TRANSFORM_ANGLE:
-        if(style->ext) style->ext->has_transform_angle = 0;
-        break;
-
-    case LV_STYLE_PAD_TOP:
-        style->has_pad_top = 0;
-        break;
-    case LV_STYLE_PAD_BOTTOM:
-        style->has_pad_bottom = 0;
-        break;
-    case LV_STYLE_PAD_LEFT:
-        style->has_pad_left = 0;
-        break;
-    case LV_STYLE_PAD_RIGHT:
-        style->has_pad_right = 0;
-        break;
-    case LV_STYLE_MARGIN_TOP:
-        if(style->ext) style->ext->has_margin_top = 0;
-        break;
-    case LV_STYLE_MARGIN_BOTTOM:
-        if(style->ext) style->ext->has_margin_bottom = 0;
-        break;
-    case LV_STYLE_MARGIN_LEFT:
-        if(style->ext) style->ext->has_margin_left = 0;
-        break;
-    case LV_STYLE_MARGIN_RIGHT:
-        if(style->ext) style->ext->has_margin_right = 0;
-        break;
-
-    case LV_STYLE_BG_COLOR:
-        style->has_bg_color = 0;
-        break;
-    case LV_STYLE_BG_OPA:
-        style->has_bg_opa = 0;
-        break;
-    case LV_STYLE_BG_GRAD_COLOR:
-        if(style->ext) style->ext->has_bg_grad_color = 0;
-        break;
-    case LV_STYLE_BG_GRAD_DIR:
-        if(style->ext) style->ext->has_bg_grad_dir = 0;
-        break;
-    case LV_STYLE_BG_BLEND_MODE:
-        if(style->ext) style->ext->has_bg_blend_mode = 0;
-        break;
-    case LV_STYLE_BG_MAIN_STOP:
-        if(style->ext) style->ext->has_bg_main_stop = 0;
-        break;
-    case LV_STYLE_BG_GRAD_STOP:
-        if(style->ext) style->ext->has_bg_grad_stop = 0;
-        break;
-    case LV_STYLE_BG_IMG_SRC:
-        if(style->ext) style->ext->has_bg_img_src = 0;
-        break;
-    case LV_STYLE_BG_IMG_MOSAIC:
-        if(style->ext) style->ext->has_bg_img_mosaic = 0;
-        break;
-
-
-    case LV_STYLE_BORDER_COLOR:
-        style->has_border_color = 0;
-        break;
-    case LV_STYLE_BORDER_OPA:
-        style->has_border_opa = 0;
-        break;
-    case LV_STYLE_BORDER_WIDTH:
-        style->has_border_width = 0;
-        break;
-    case LV_STYLE_BORDER_SIDE:
-        style->has_border_side = 0;
-        break;
-    case LV_STYLE_BORDER_POST:
-        style->has_border_post = 0;
-        break;
-    case LV_STYLE_BORDER_BLEND_MODE:
-        if(style->ext) style->ext->has_border_blend_mode = 0;
-        break;
-
-    case LV_STYLE_TEXT_COLOR:
-        style->has_text_color = 0;
-        break;
-    case LV_STYLE_TEXT_OPA:
-        style->has_text_opa = 0;
-        break;
-    case LV_STYLE_TEXT_FONT:
-        style->has_text_font = 0;
-        break;
-    case LV_STYLE_TEXT_LETTER_SPACE:
-        if(style->ext) style->ext->has_text_letter_space = 0;
-        break;
-    case LV_STYLE_TEXT_LINE_SPACE:
-        if(style->ext) style->ext->has_text_line_space = 0;
-        break;
-    case LV_STYLE_TEXT_DECOR:
-        if(style->ext) style->ext->has_text_decor = 0;
-        break;
-    case LV_STYLE_TEXT_BLEND_MODE:
-        if(style->ext) style->ext->has_text_blend_mode = 0;
-        break;
-
-    case LV_STYLE_IMG_OPA:
-        style->has_img_opa = 0;
-        break;
-    case LV_STYLE_IMG_BLEND_MODE:
-        style->ext->has_img_blend_mode = 0;
-        break;
-    case LV_STYLE_IMG_RECOLOR:
-        if(style->ext) style->ext->has_img_recolor = 0;
-        break;
-    case LV_STYLE_IMG_RECOLOR_OPA:
-        if(style->ext) style->ext->has_img_recolor_opa = 0;
-        break;
-
-    case LV_STYLE_OUTLINE_OPA:
-        if(style->ext) style->ext->has_outline_opa = 0;
-        break;
-    case LV_STYLE_OUTLINE_COLOR:
-        if(style->ext) style->ext->has_outline_color = 0;
-        break;
-    case LV_STYLE_OUTLINE_WIDTH:
-        if(style->ext) style->ext->has_outline_width = 0;
-        break;
-    case LV_STYLE_OUTLINE_PAD:
-        if(style->ext) style->ext->has_outline_pad = 0;
-        break;
-    case LV_STYLE_OUTLINE_BLEND_MODE:
-        if(style->ext) style->ext->has_outline_blend_mode = 0;
-        break;
-
-    case LV_STYLE_SHADOW_WIDTH:
-        if(style->ext) style->ext->has_shadow_width = 0;
-        break;
-    case LV_STYLE_SHADOW_OFS_X:
-        if(style->ext) style->ext->has_shadow_ofs_x = 0;
-        break;
-    case LV_STYLE_SHADOW_OFS_Y:
-        if(style->ext) style->ext->has_shadow_ofs_y = 0;
-        break;
-    case LV_STYLE_SHADOW_SPREAD:
-        if(style->ext) style->ext->has_shadow_spread = 0;
-        break;
-    case LV_STYLE_SHADOW_BLEND_MODE:
-        if(style->ext) style->ext->has_shadow_blend_mode = 0;
-        break;
-    case LV_STYLE_SHADOW_COLOR:
-        if(style->ext) style->ext->has_shadow_color = 0;
-        break;
-    case LV_STYLE_SHADOW_OPA:
-        if(style->ext) style->ext->has_shadow_opa = 0;
-        break;
-
-    case LV_STYLE_LINE_WIDTH:
-        if(style->ext) style->ext->has_line_width = 0;
-        break;
-    case LV_STYLE_LINE_BLEND_MODE:
-        if(style->ext) style->ext->has_line_blend_mode = 0;
-        break;
-    case LV_STYLE_LINE_DASH_GAP:
-        if(style->ext) style->ext->has_line_dash_gap = 0;
-        break;
-    case LV_STYLE_LINE_DASH_WIDTH:
-        if(style->ext) style->ext->has_line_dash_width = 0;
-        break;
-    case LV_STYLE_LINE_ROUNDED:
-        if(style->ext) style->ext->has_line_rounded = 0;
-        break;
-    case LV_STYLE_LINE_COLOR:
-        if(style->ext) style->ext->has_line_color = 0;
-        break;
-    case LV_STYLE_LINE_OPA:
-        if(style->ext) style->ext->has_line_opa = 0;
-        break;
-
-    case LV_STYLE_CONTENT_ALIGN:
-        if(style->ext) style->ext->has_content_align = 0;
-        break;
-    case LV_STYLE_CONTENT_OFS_X:
-        if(style->ext) style->ext->has_content_ofs_x = 0;
-        break;
-    case LV_STYLE_CONTENT_OFS_Y:
-        if(style->ext) style->ext->has_content_ofs_y = 0;
-        break;
-    case LV_STYLE_CONTENT_TEXT:
-        if(style->ext) style->ext->has_content_text = 0;
-        break;
-
-    case LV_STYLE_TRANSITION_TIME:
-        if(style->ext) style->ext->has_transition_time = 0;
-        break;
-    case LV_STYLE_TRANSITION_DELAY:
-        if(style->ext) style->ext->has_transition_delay = 0;
-        break;
-    case LV_STYLE_TRANSITION_PATH:
-        if(style->ext) style->ext->has_transition_path = 0;
-        break;
-    case LV_STYLE_TRANSITION_PROP_1:
-        if(style->ext) style->ext->has_transition_prop_1 = 0;
-        break;
-    case LV_STYLE_TRANSITION_PROP_2:
-        if(style->ext) style->ext->has_transition_prop_2 = 0;
-        break;
-    case LV_STYLE_TRANSITION_PROP_3:
-        if(style->ext) style->ext->has_transition_prop_3 = 0;
-        break;
-    case LV_STYLE_TRANSITION_PROP_4:
-        if(style->ext) style->ext->has_transition_prop_4 = 0;
-        break;
-    case LV_STYLE_TRANSITION_PROP_5:
-        if(style->ext) style->ext->has_transition_prop_5 = 0;
-        break;
-    case LV_STYLE_TRANSITION_PROP_6:
-        if(style->ext) style->ext->has_transition_prop_6 = 0;
-        break;
-
-    default:
-        return false;
-    }
-
-    return true;
+    return style->class_p->remove_prop(style, prop);
 }
 
 /**
@@ -349,6 +103,90 @@ void _alloc_ext(lv_style_t * style)
 }
 
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
+{
+    style->class_p->set_prop(style, prop, value);
+}
+
+bool lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
+{
+    return style->class_p->get_prop(style, prop, value);
+}
+
+lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
+{
+    lv_style_value_t value;
+    switch(prop) {
+            break;
+        case LV_STYLE_TRANSFORM_ZOOM:
+            value._int = LV_IMG_ZOOM_NONE;
+            break;
+        case LV_STYLE_BG_COLOR:
+            value._color = LV_COLOR_WHITE;
+            break;
+        case LV_STYLE_OPA:
+        case LV_STYLE_BORDER_OPA:
+        case LV_STYLE_TEXT_OPA:
+        case LV_STYLE_IMG_OPA:
+        case LV_STYLE_OUTLINE_OPA:
+        case LV_STYLE_SHADOW_OPA:
+            value._int = LV_OPA_COVER;
+            break;
+        case LV_STYLE_BG_GRAD_STOP:
+            value._int = 255;
+            break;
+        case LV_STYLE_BORDER_SIDE:
+            value._int = LV_BORDER_SIDE_FULL;
+            break;
+        case LV_STYLE_TEXT_FONT:
+            value._ptr = LV_THEME_DEFAULT_FONT_NORMAL;
+            break;
+        case LV_STYLE_TRANSITION_PATH:
+            value._ptr = &lv_anim_path_def;
+            break;
+        default:
+            value._ptr = NULL;
+            value._int = 0;
+            break;
+    }
+
+    return value;
+
+}
+
+/**
+ * Check whether a style is valid (initialized correctly)
+ * @param style pointer to a style
+ * @return true: valid
+ */
+bool lv_debug_check_style(const lv_style_t * style)
+{
+    if(style == NULL) return true;  /*NULL style is still valid*/
+
+#if LV_USE_ASSERT_STYLE
+    if(style->sentinel != LV_DEBUG_STYLE_SENTINEL_VALUE) {
+        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
+        return false;
+    }
+#endif
+
+    return true;
+}
+
+/**
+ * Check whether a style list is valid (initialized correctly)
+ * @param style pointer to a style
+ * @return true: valid
+ */
+bool lv_debug_check_style_list(const void * list)
+{
+    return true;
+}
+
+/**********************
+ *   STATIC FUNCTIONS
+ **********************/
+
+static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
 {
     if(style == NULL) return;
      LV_ASSERT_STYLE(style);
@@ -375,12 +213,19 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
          style->ext->has_transform_height = 1;
          break;
      case LV_STYLE_TRANSFORM_ANGLE:
+         _alloc_ext(style);
          style->ext->transform_angle = value._int;
          style->ext->has_transform_angle = 1;
          break;
      case LV_STYLE_TRANSFORM_ZOOM:
+         _alloc_ext(style);
          style->ext->transform_zoom = value._int;
          style->ext->has_transform_zoom = 1;
+         break;
+     case LV_STYLE_OPA:
+         _alloc_ext(style);
+         style->ext->opa = value._int;
+         style->ext->has_opa = 1;
          break;
 
      case LV_STYLE_PAD_TOP:
@@ -452,17 +297,6 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
          _alloc_ext(style);
          style->ext->bg_grad_stop = value._int;
          style->ext->has_bg_grad_stop = 1;
-         break;
-     case LV_STYLE_BG_IMG_SRC:
-         _alloc_ext(style);
-         style->ext->bg_img_src = value._ptr;
-         style->ext->has_bg_img_src = 1;
-         break;
-
-     case LV_STYLE_BG_IMG_MOSAIC:
-         _alloc_ext(style);
-         style->ext->bg_img_mosaic = value._int;
-         style->ext->has_bg_img_mosaic = 1;
          break;
 
      case LV_STYLE_BORDER_COLOR:
@@ -638,7 +472,7 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
          style->ext->has_line_opa = 1;
          break;
 
-     case LV_STYLE_CONTENT_TEXT:
+     case LV_STYLE_CONTENT_SRC:
          _alloc_ext(style);
          style->ext->content_text = value._ptr;
          style->ext->has_content_text = 1;
@@ -709,312 +543,475 @@ void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
      }
 }
 
-bool lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
+
+static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value)
 {
     switch(prop) {
+      case LV_STYLE_RADIUS:
+          if(style->has_radius) { value->_int = style->radius; return true; }
+          break;
+      case LV_STYLE_CLIP_CORNER:
+          if(style->ext && style->ext->has_clip_corner) { value->_int = style->ext->clip_corner; return true; }
+          break;
+      case LV_STYLE_TRANSFORM_WIDTH:
+          if(style->ext && style->ext->has_transform_width) { value->_int = style->ext->transform_width; return true; }
+          break;
+      case LV_STYLE_TRANSFORM_HEIGHT:
+          if(style->ext && style->ext->has_transform_height) { value->_int = style->ext->transform_height; return true; }
+          break;
+      case LV_STYLE_TRANSFORM_ZOOM:
+          if(style->ext && style->ext->has_transform_zoom) { value->_int = style->ext->transform_zoom; return true; }
+          break;
+      case LV_STYLE_TRANSFORM_ANGLE:
+          if(style->ext && style->ext->has_transform_angle) { value->_int = style->ext->transform_angle; return true; }
+          break;
+      case LV_STYLE_OPA:
+          if(style->ext && style->ext->has_opa) { value->_int = style->ext->opa; return true; }
+          break;
+
+      case LV_STYLE_PAD_TOP:
+          if(style->has_pad_top) { value->_int = style->pad_top; return true; }
+          break;
+      case LV_STYLE_PAD_BOTTOM:
+          if(style->has_pad_bottom) { value->_int = style->pad_bottom; return true; }
+          break;
+      case LV_STYLE_PAD_LEFT:
+          if(style->has_pad_left) { value->_int = style->pad_left; return true; }
+          break;
+      case LV_STYLE_PAD_RIGHT:
+          if(style->has_pad_right) { value->_int = style->pad_right; return true; }
+          break;
+      case LV_STYLE_MARGIN_TOP:
+          if(style->ext && style->ext->has_margin_top) { value->_int = style->ext->margin_top; return true; }
+          break;
+      case LV_STYLE_MARGIN_BOTTOM:
+          if(style->ext && style->ext->has_margin_bottom) { value->_int = style->ext->margin_left; return true; }
+          break;
+      case LV_STYLE_MARGIN_LEFT:
+          if(style->ext && style->ext->has_margin_left) { value->_int = style->ext->margin_left; return true; }
+          break;
+      case LV_STYLE_MARGIN_RIGHT:
+          if(style->ext && style->ext->has_margin_right) { value->_int = style->ext->margin_right; return true; }
+          break;
+
+      case LV_STYLE_BG_COLOR:
+          if(style->has_bg_color) { value->_color = style->bg_color; return true; }
+          break;
+      case LV_STYLE_BG_OPA:
+          if(style->has_bg_opa) { value->_int = style->bg_opa; return true; }
+          break;
+      case LV_STYLE_BG_GRAD_COLOR:
+          if(style->ext && style->ext->has_bg_grad_color) { value->_color = style->ext->bg_grad_color; return true; }
+          break;
+      case LV_STYLE_BG_GRAD_DIR:
+          if(style->ext && style->ext->has_bg_grad_dir) { value->_int = style->ext->bg_grad_dir; return true; }
+          break;
+      case LV_STYLE_BG_BLEND_MODE:
+          if(style->ext && style->ext->has_bg_blend_mode) { value->_int = style->ext->bg_blend_mode; return true; }
+          break;
+      case LV_STYLE_BG_MAIN_STOP:
+          if(style->ext && style->ext->has_bg_main_stop) { value->_int = style->ext->bg_main_stop; return true; }
+          break;
+      case LV_STYLE_BG_GRAD_STOP:
+          if(style->ext && style->ext->has_bg_grad_stop) { value->_int = style->ext->bg_grad_stop; return true; }
+          break;
+
+      case LV_STYLE_BORDER_COLOR:
+          if(style->has_border_color) { value->_color = style->border_color; return true; }
+          break;
+      case LV_STYLE_BORDER_OPA:
+          if(style->has_border_opa) { value->_int = style->border_opa; return true; }
+          break;
+      case LV_STYLE_BORDER_WIDTH:
+          if(style->has_border_width) { value->_int = style->border_width; return true; }
+          break;
+      case LV_STYLE_BORDER_SIDE:
+          if(style->has_border_side) { value->_int = style->border_side; return true; }
+          break;
+      case LV_STYLE_BORDER_POST:
+          if(style->has_border_post) { value->_int = style->border_post; return true; }
+          break;
+      case LV_STYLE_BORDER_BLEND_MODE:
+          if(style->ext && style->ext->has_border_blend_mode) { value->_int = style->ext->border_blend_mode; return true; }
+          break;
+
+      case LV_STYLE_TEXT_COLOR:
+          if(style->has_text_color) { value->_color = style->text_color; return true; }
+          break;
+      case LV_STYLE_TEXT_OPA:
+          if(style->has_text_opa) { value->_int = style->text_opa; return true; }
+          break;
+      case LV_STYLE_TEXT_FONT:
+          if(style->has_text_font) { value->_ptr = style->text_font; return true; }
+          break;
+      case LV_STYLE_TEXT_LETTER_SPACE:
+          if(style->ext && style->ext->has_text_letter_space) { value->_int = style->ext->text_letter_space; return true; }
+          break;
+      case LV_STYLE_TEXT_LINE_SPACE:
+          if(style->ext && style->ext->has_text_letter_space) { value->_int = style->ext->text_line_space; return true; }
+          break;
+      case LV_STYLE_TEXT_DECOR:
+          if(style->ext && style->ext->has_text_letter_space) { value->_int = style->ext->text_decor; return true; }
+          break;
+      case LV_STYLE_TEXT_BLEND_MODE:
+          if(style->ext && style->ext->has_text_blend_mode) { value->_int = style->ext->text_blend_mode; return true; }
+          break;
+
+      case LV_STYLE_IMG_OPA:
+          if(style->has_img_opa) { value->_int = style->img_opa; return true; }
+          break;
+      case LV_STYLE_IMG_BLEND_MODE:
+          if(style->ext && style->ext->has_img_blend_mode) { value->_int = style->ext->img_blend_mode; return true; }
+          break;
+      case LV_STYLE_IMG_RECOLOR:
+          if(style->ext && style->ext->has_img_recolor) { value->_color = style->ext->img_recolor; return true; }
+          break;
+      case LV_STYLE_IMG_RECOLOR_OPA:
+          if(style->ext && style->ext->has_img_recolor_opa) { value->_int = style->ext->img_recolor_opa; return true; }
+          break;
+
+
+      case LV_STYLE_OUTLINE_WIDTH:
+          if(style->ext && style->ext->has_outline_width) { value->_int = style->ext->outline_width; return true; }
+          break;
+      case LV_STYLE_OUTLINE_COLOR:
+          if(style->ext && style->ext->has_outline_color) { value->_color = style->ext->outline_color; return true; }
+          break;
+      case LV_STYLE_OUTLINE_OPA:
+          if(style->ext && style->ext->has_outline_opa) { value->_int = style->ext->outline_opa; return true; }
+          break;
+      case LV_STYLE_OUTLINE_PAD:
+          if(style->ext && style->ext->has_outline_pad) { value->_int = style->ext->outline_pad; return true; }
+          break;
+      case LV_STYLE_OUTLINE_BLEND_MODE:
+          if(style->ext && style->ext->has_outline_blend_mode) { value->_int = style->ext->outline_blend_mode; return true; }
+          break;
+
+      case LV_STYLE_SHADOW_WIDTH:
+          if(style->ext && style->ext->has_shadow_width) { value->_int = style->ext->shadow_width; return true; }
+          break;
+      case LV_STYLE_SHADOW_OFS_X:
+          if(style->ext && style->ext->has_shadow_ofs_x) { value->_int = style->ext->shadow_ofs_x; return true; }
+          break;
+      case LV_STYLE_SHADOW_OFS_Y:
+          if(style->ext && style->ext->has_shadow_ofs_y) { value->_int = style->ext->shadow_ofs_y; return true; }
+          break;
+      case LV_STYLE_SHADOW_SPREAD:
+          if(style->ext && style->ext->has_shadow_spread) { value->_int = style->ext->shadow_spread; return true; }
+          break;
+      case LV_STYLE_SHADOW_BLEND_MODE:
+          if(style->ext && style->ext->has_shadow_blend_mode) { value->_int = style->ext->shadow_blend_mode; return true; }
+          break;
+      case LV_STYLE_SHADOW_COLOR:
+          if(style->ext && style->ext->has_shadow_color) { value->_color = style->ext->shadow_color; return true; }
+          break;
+      case LV_STYLE_SHADOW_OPA:
+          if(style->ext && style->ext->has_shadow_opa) { value->_int = style->ext->shadow_opa; return true; }
+          break;
+
+      case LV_STYLE_LINE_WIDTH:
+          if(style->ext && style->ext->has_line_width) { value->_int = style->ext->line_width; return true; }
+          break;
+      case LV_STYLE_LINE_BLEND_MODE:
+          if(style->ext && style->ext->has_line_blend_mode) { value->_int = style->ext->line_blend_mode; return true; }
+          break;
+      case LV_STYLE_LINE_DASH_GAP:
+          if(style->ext && style->ext->has_line_dash_gap) { value->_int = style->ext->line_dash_gap; return true; }
+          break;
+      case LV_STYLE_LINE_DASH_WIDTH:
+          if(style->ext && style->ext->has_line_dash_width) { value->_int = style->ext->line_dash_width; return true; }
+          break;
+      case LV_STYLE_LINE_ROUNDED:
+          if(style->ext && style->ext->has_line_rounded) { value->_int = style->ext->line_rounded; return true; }
+          break;
+      case LV_STYLE_LINE_COLOR:
+          if(style->ext && style->ext->has_line_color) { value->_color = style->ext->line_color; return true; }
+          break;
+      case LV_STYLE_LINE_OPA:
+          if(style->ext && style->ext->has_line_opa) { value->_int = style->ext->line_opa; return true; }
+          break;
+
+      case LV_STYLE_CONTENT_SRC:
+             if(style->ext && style->ext->has_content_text) { value->_ptr = style->ext->content_text; return true; }
+             break;
+      case LV_STYLE_CONTENT_ALIGN:
+             if(style->ext && style->ext->has_content_align) { value->_int = style->ext->content_align; return true; }
+             break;
+      case LV_STYLE_CONTENT_OFS_X:
+             if(style->ext && style->ext->has_content_ofs_x) { value->_int = style->ext->content_ofs_x; return true; }
+             break;
+      case LV_STYLE_CONTENT_OFS_Y:
+             if(style->ext && style->ext->has_content_ofs_y) { value->_int = style->ext->content_ofs_x; return true; }
+             break;
+
+      case LV_STYLE_TRANSITION_TIME:
+             if(style->ext && style->ext->has_transition_time) { value->_int = style->ext->transition_time; return true; }
+             break;
+      case LV_STYLE_TRANSITION_DELAY:
+             if(style->ext && style->ext->has_transition_delay) { value->_int = style->ext->transition_delay; return true; }
+             break;
+      case LV_STYLE_TRANSITION_PATH:
+             if(style->ext && style->ext->has_transition_path) { value->_ptr = style->ext->transition_path; return true; }
+             break;
+      case LV_STYLE_TRANSITION_PROP_1:
+             if(style->ext && style->ext->has_transition_prop_1) { value->_int = style->ext->transition_prop_1; return true; }
+             break;
+      case LV_STYLE_TRANSITION_PROP_2:
+             if(style->ext && style->ext->has_transition_prop_2) { value->_int = style->ext->transition_prop_2; return true; }
+             break;
+      case LV_STYLE_TRANSITION_PROP_3:
+             if(style->ext && style->ext->has_transition_prop_3) { value->_int = style->ext->transition_prop_3; return true; }
+             break;
+      case LV_STYLE_TRANSITION_PROP_4:
+             if(style->ext && style->ext->has_transition_prop_4) { value->_int = style->ext->transition_prop_4; return true; }
+             break;
+      case LV_STYLE_TRANSITION_PROP_5:
+             if(style->ext && style->ext->has_transition_prop_5) { value->_int = style->ext->transition_prop_5; return true; }
+             break;
+      case LV_STYLE_TRANSITION_PROP_6:
+             if(style->ext && style->ext->has_transition_prop_6) { value->_int = style->ext->transition_prop_6; return true; }
+             break;
+      default:
+          break;
+      }
+
+      return false;
+}
+
+static bool remove_prop(lv_style_t * style, lv_style_prop_t prop)
+{
+    if(style == NULL) return false;
+    LV_ASSERT_STYLE(style);
+
+    switch(prop) {
+
     case LV_STYLE_RADIUS:
-        if(style->has_radius) { value->_int = style->radius; return true; }
+        style->has_radius = 0;
         break;
     case LV_STYLE_CLIP_CORNER:
-        if(style->ext && style->ext->has_clip_corner) { value->_int = style->ext->clip_corner; return true; }
+        if(style->ext) style->ext->has_clip_corner = 0;
         break;
     case LV_STYLE_TRANSFORM_WIDTH:
-        if(style->ext && style->ext->has_transform_width) { value->_int = style->ext->transform_width; return true; }
+        if(style->ext) style->ext->has_transform_width = 0;
         break;
     case LV_STYLE_TRANSFORM_HEIGHT:
-        if(style->ext && style->ext->has_transform_height) { value->_int = style->ext->transform_height; return true; }
+        if(style->ext) style->ext->has_transform_height = 0;
         break;
     case LV_STYLE_TRANSFORM_ZOOM:
-        if(style->ext && style->ext->has_transform_zoom) { value->_int = style->ext->transform_zoom; return true; }
+        if(style->ext) style->ext->has_transform_zoom = 0;
         break;
     case LV_STYLE_TRANSFORM_ANGLE:
-        if(style->ext && style->ext->has_transform_angle) { value->_int = style->ext->transform_angle; return true; }
-        break;
-    case LV_STYLE_OPA:
-        if(style->ext && style->ext->has_opa) { value->_int = style->ext->opa; return true; }
+        if(style->ext) style->ext->has_transform_angle = 0;
         break;
 
+    case LV_STYLE_OPA:
+        if(style->ext) style->ext->has_opa = 0;
+        break;
     case LV_STYLE_PAD_TOP:
-        if(style->has_pad_top) { value->_int = style->pad_top; return true; }
+        style->has_pad_top = 0;
         break;
     case LV_STYLE_PAD_BOTTOM:
-        if(style->has_pad_bottom) { value->_int = style->pad_bottom; return true; }
+        style->has_pad_bottom = 0;
         break;
     case LV_STYLE_PAD_LEFT:
-        if(style->has_pad_left) { value->_int = style->pad_left; return true; }
+        style->has_pad_left = 0;
         break;
     case LV_STYLE_PAD_RIGHT:
-        if(style->has_pad_right) { value->_int = style->pad_right; return true; }
+        style->has_pad_right = 0;
         break;
     case LV_STYLE_MARGIN_TOP:
-        if(style->ext && style->ext->has_margin_top) { value->_int = style->ext->margin_top; return true; }
+        if(style->ext) style->ext->has_margin_top = 0;
         break;
     case LV_STYLE_MARGIN_BOTTOM:
-        if(style->ext && style->ext->has_margin_bottom) { value->_int = style->ext->margin_left; return true; }
+        if(style->ext) style->ext->has_margin_bottom = 0;
         break;
     case LV_STYLE_MARGIN_LEFT:
-        if(style->ext && style->ext->has_margin_left) { value->_int = style->ext->margin_left; return true; }
+        if(style->ext) style->ext->has_margin_left = 0;
         break;
     case LV_STYLE_MARGIN_RIGHT:
-        if(style->ext && style->ext->has_margin_right) { value->_int = style->ext->margin_right; return true; }
+        if(style->ext) style->ext->has_margin_right = 0;
         break;
 
     case LV_STYLE_BG_COLOR:
-        if(style->has_bg_color) { value->_color = style->bg_color; return true; }
+        style->has_bg_color = 0;
         break;
     case LV_STYLE_BG_OPA:
-        if(style->has_bg_opa) { value->_int = style->bg_opa; return true; }
+        style->has_bg_opa = 0;
         break;
     case LV_STYLE_BG_GRAD_COLOR:
-        if(style->ext && style->ext->has_bg_grad_color) { value->_color = style->ext->bg_grad_color; return true; }
+        if(style->ext) style->ext->has_bg_grad_color = 0;
         break;
     case LV_STYLE_BG_GRAD_DIR:
-        if(style->ext && style->ext->has_bg_grad_dir) { value->_int = style->ext->bg_grad_dir; return true; }
+        if(style->ext) style->ext->has_bg_grad_dir = 0;
         break;
     case LV_STYLE_BG_BLEND_MODE:
-        if(style->ext && style->ext->has_bg_blend_mode) { value->_int = style->ext->bg_blend_mode; return true; }
+        if(style->ext) style->ext->has_bg_blend_mode = 0;
         break;
     case LV_STYLE_BG_MAIN_STOP:
-        if(style->ext && style->ext->has_bg_main_stop) { value->_int = style->ext->bg_main_stop; return true; }
+        if(style->ext) style->ext->has_bg_main_stop = 0;
         break;
     case LV_STYLE_BG_GRAD_STOP:
-        if(style->ext && style->ext->has_bg_grad_stop) { value->_int = style->ext->bg_grad_stop; return true; }
-        break;
-    case LV_STYLE_BG_IMG_SRC:
-        if(style->ext && style->ext->has_bg_img_src) { value->_ptr = style->ext->bg_img_src; return true; }
-        break;
-    case LV_STYLE_BG_IMG_MOSAIC:
-        if(style->ext && style->ext->has_bg_img_mosaic) { value->_int = style->ext->bg_img_mosaic; return true; }
+        if(style->ext) style->ext->has_bg_grad_stop = 0;
         break;
 
     case LV_STYLE_BORDER_COLOR:
-        if(style->has_border_color) { value->_color = style->border_color; return true; }
+        style->has_border_color = 0;
         break;
     case LV_STYLE_BORDER_OPA:
-        if(style->has_border_opa) { value->_int = style->border_opa; return true; }
+        style->has_border_opa = 0;
         break;
     case LV_STYLE_BORDER_WIDTH:
-        if(style->has_border_width) { value->_int = style->border_width; return true; }
+        style->has_border_width = 0;
         break;
     case LV_STYLE_BORDER_SIDE:
-        if(style->has_border_side) { value->_int = style->border_side; return true; }
+        style->has_border_side = 0;
         break;
     case LV_STYLE_BORDER_POST:
-        if(style->has_border_post) { value->_int = style->border_post; return true; }
+        style->has_border_post = 0;
         break;
     case LV_STYLE_BORDER_BLEND_MODE:
-        if(style->ext && style->ext->has_border_blend_mode) { value->_int = style->ext->border_blend_mode; return true; }
+        if(style->ext) style->ext->has_border_blend_mode = 0;
         break;
 
     case LV_STYLE_TEXT_COLOR:
-        if(style->has_text_color) { value->_color = style->text_color; return true; }
+        style->has_text_color = 0;
         break;
     case LV_STYLE_TEXT_OPA:
-        if(style->has_text_opa) { value->_int = style->text_opa; return true; }
+        style->has_text_opa = 0;
         break;
     case LV_STYLE_TEXT_FONT:
-        if(style->has_text_font) { value->_ptr = style->text_font; return true; }
+        style->has_text_font = 0;
         break;
     case LV_STYLE_TEXT_LETTER_SPACE:
-        if(style->ext && style->ext->has_text_letter_space) { value->_int = style->ext->text_letter_space; return true; }
+        if(style->ext) style->ext->has_text_letter_space = 0;
         break;
     case LV_STYLE_TEXT_LINE_SPACE:
-        if(style->ext && style->ext->has_text_letter_space) { value->_int = style->ext->text_line_space; return true; }
+        if(style->ext) style->ext->has_text_line_space = 0;
         break;
     case LV_STYLE_TEXT_DECOR:
-        if(style->ext && style->ext->has_text_letter_space) { value->_int = style->ext->text_decor; return true; }
+        if(style->ext) style->ext->has_text_decor = 0;
         break;
     case LV_STYLE_TEXT_BLEND_MODE:
-        if(style->ext && style->ext->has_text_blend_mode) { value->_int = style->ext->text_blend_mode; return true; }
+        if(style->ext) style->ext->has_text_blend_mode = 0;
         break;
 
     case LV_STYLE_IMG_OPA:
-        if(style->has_img_opa) { value->_int = style->img_opa; return true; }
+        style->has_img_opa = 0;
         break;
     case LV_STYLE_IMG_BLEND_MODE:
-        if(style->ext && style->ext->has_img_blend_mode) { value->_int = style->ext->img_blend_mode; return true; }
+        style->ext->has_img_blend_mode = 0;
         break;
     case LV_STYLE_IMG_RECOLOR:
-        if(style->ext && style->ext->has_img_recolor) { value->_color = style->ext->img_recolor; return true; }
+        if(style->ext) style->ext->has_img_recolor = 0;
         break;
     case LV_STYLE_IMG_RECOLOR_OPA:
-        if(style->ext && style->ext->has_img_recolor_opa) { value->_int = style->ext->img_recolor_opa; return true; }
+        if(style->ext) style->ext->has_img_recolor_opa = 0;
         break;
 
-
-    case LV_STYLE_OUTLINE_WIDTH:
-        if(style->ext && style->ext->has_outline_width) { value->_int = style->ext->outline_width; return true; }
+    case LV_STYLE_OUTLINE_OPA:
+        if(style->ext) style->ext->has_outline_opa = 0;
         break;
     case LV_STYLE_OUTLINE_COLOR:
-        if(style->ext && style->ext->has_outline_color) { value->_color = style->ext->outline_color; return true; }
+        if(style->ext) style->ext->has_outline_color = 0;
         break;
-    case LV_STYLE_OUTLINE_OPA:
-        if(style->ext && style->ext->has_outline_opa) { value->_int = style->ext->outline_opa; return true; }
+    case LV_STYLE_OUTLINE_WIDTH:
+        if(style->ext) style->ext->has_outline_width = 0;
         break;
     case LV_STYLE_OUTLINE_PAD:
-        if(style->ext && style->ext->has_outline_pad) { value->_int = style->ext->outline_pad; return true; }
+        if(style->ext) style->ext->has_outline_pad = 0;
         break;
     case LV_STYLE_OUTLINE_BLEND_MODE:
-        if(style->ext && style->ext->has_outline_blend_mode) { value->_int = style->ext->outline_blend_mode; return true; }
+        if(style->ext) style->ext->has_outline_blend_mode = 0;
         break;
 
     case LV_STYLE_SHADOW_WIDTH:
-        if(style->ext && style->ext->has_shadow_width) { value->_int = style->ext->shadow_width; return true; }
+        if(style->ext) style->ext->has_shadow_width = 0;
         break;
     case LV_STYLE_SHADOW_OFS_X:
-        if(style->ext && style->ext->has_shadow_ofs_x) { value->_int = style->ext->shadow_ofs_x; return true; }
+        if(style->ext) style->ext->has_shadow_ofs_x = 0;
         break;
     case LV_STYLE_SHADOW_OFS_Y:
-        if(style->ext && style->ext->has_shadow_ofs_y) { value->_int = style->ext->shadow_ofs_y; return true; }
+        if(style->ext) style->ext->has_shadow_ofs_y = 0;
         break;
     case LV_STYLE_SHADOW_SPREAD:
-        if(style->ext && style->ext->has_shadow_spread) { value->_int = style->ext->shadow_spread; return true; }
+        if(style->ext) style->ext->has_shadow_spread = 0;
         break;
     case LV_STYLE_SHADOW_BLEND_MODE:
-        if(style->ext && style->ext->has_shadow_blend_mode) { value->_int = style->ext->shadow_blend_mode; return true; }
+        if(style->ext) style->ext->has_shadow_blend_mode = 0;
         break;
     case LV_STYLE_SHADOW_COLOR:
-        if(style->ext && style->ext->has_shadow_color) { value->_color = style->ext->shadow_color; return true; }
+        if(style->ext) style->ext->has_shadow_color = 0;
         break;
     case LV_STYLE_SHADOW_OPA:
-        if(style->ext && style->ext->has_shadow_opa) { value->_int = style->ext->shadow_opa; return true; }
+        if(style->ext) style->ext->has_shadow_opa = 0;
         break;
 
     case LV_STYLE_LINE_WIDTH:
-        if(style->ext && style->ext->has_line_width) { value->_int = style->ext->line_width; return true; }
+        if(style->ext) style->ext->has_line_width = 0;
         break;
     case LV_STYLE_LINE_BLEND_MODE:
-        if(style->ext && style->ext->has_line_blend_mode) { value->_int = style->ext->line_blend_mode; return true; }
+        if(style->ext) style->ext->has_line_blend_mode = 0;
         break;
     case LV_STYLE_LINE_DASH_GAP:
-        if(style->ext && style->ext->has_line_dash_gap) { value->_int = style->ext->line_dash_gap; return true; }
+        if(style->ext) style->ext->has_line_dash_gap = 0;
         break;
     case LV_STYLE_LINE_DASH_WIDTH:
-        if(style->ext && style->ext->has_line_dash_width) { value->_int = style->ext->line_dash_width; return true; }
+        if(style->ext) style->ext->has_line_dash_width = 0;
         break;
     case LV_STYLE_LINE_ROUNDED:
-        if(style->ext && style->ext->has_line_rounded) { value->_int = style->ext->line_rounded; return true; }
+        if(style->ext) style->ext->has_line_rounded = 0;
         break;
     case LV_STYLE_LINE_COLOR:
-        if(style->ext && style->ext->has_line_color) { value->_color = style->ext->line_color; return true; }
+        if(style->ext) style->ext->has_line_color = 0;
         break;
     case LV_STYLE_LINE_OPA:
-        if(style->ext && style->ext->has_line_opa) { value->_int = style->ext->line_opa; return true; }
+        if(style->ext) style->ext->has_line_opa = 0;
         break;
 
-    case LV_STYLE_CONTENT_TEXT:
-           if(style->ext && style->ext->has_content_text) { value->_ptr = style->ext->content_text; return true; }
-           break;
     case LV_STYLE_CONTENT_ALIGN:
-           if(style->ext && style->ext->has_content_align) { value->_int = style->ext->content_align; return true; }
-           break;
+        if(style->ext) style->ext->has_content_align = 0;
+        break;
     case LV_STYLE_CONTENT_OFS_X:
-           if(style->ext && style->ext->has_content_ofs_x) { value->_int = style->ext->content_ofs_x; return true; }
-           break;
+        if(style->ext) style->ext->has_content_ofs_x = 0;
+        break;
     case LV_STYLE_CONTENT_OFS_Y:
-           if(style->ext && style->ext->has_content_ofs_y) { value->_int = style->ext->content_ofs_x; return true; }
-           break;
+        if(style->ext) style->ext->has_content_ofs_y = 0;
+        break;
+    case LV_STYLE_CONTENT_SRC:
+        if(style->ext) style->ext->has_content_text = 0;
+        break;
 
     case LV_STYLE_TRANSITION_TIME:
-           if(style->ext && style->ext->has_transition_time) { value->_int = style->ext->transition_time; return true; }
-           break;
-    case LV_STYLE_TRANSITION_DELAY:
-           if(style->ext && style->ext->has_transition_delay) { value->_int = style->ext->transition_delay; return true; }
-           break;
-    case LV_STYLE_TRANSITION_PATH:
-           if(style->ext && style->ext->has_transition_path) { value->_int = style->ext->transition_path; return true; }
-           break;
-    case LV_STYLE_TRANSITION_PROP_1:
-           if(style->ext && style->ext->has_transition_prop_1) { value->_int = style->ext->transition_prop_1; return true; }
-           break;
-    case LV_STYLE_TRANSITION_PROP_2:
-           if(style->ext && style->ext->has_transition_prop_2) { value->_int = style->ext->transition_prop_2; return true; }
-           break;
-    case LV_STYLE_TRANSITION_PROP_3:
-           if(style->ext && style->ext->has_transition_prop_3) { value->_int = style->ext->transition_prop_3; return true; }
-           break;
-    case LV_STYLE_TRANSITION_PROP_4:
-           if(style->ext && style->ext->has_transition_prop_4) { value->_int = style->ext->transition_prop_4; return true; }
-           break;
-    case LV_STYLE_TRANSITION_PROP_5:
-           if(style->ext && style->ext->has_transition_prop_5) { value->_int = style->ext->transition_prop_5; return true; }
-           break;
-    case LV_STYLE_TRANSITION_PROP_6:
-           if(style->ext && style->ext->has_transition_prop_6) { value->_int = style->ext->transition_prop_6; return true; }
-           break;
-    default:
+        if(style->ext) style->ext->has_transition_time = 0;
         break;
-    }
+    case LV_STYLE_TRANSITION_DELAY:
+        if(style->ext) style->ext->has_transition_delay = 0;
+        break;
+    case LV_STYLE_TRANSITION_PATH:
+        if(style->ext) style->ext->has_transition_path = 0;
+        break;
+    case LV_STYLE_TRANSITION_PROP_1:
+        if(style->ext) style->ext->has_transition_prop_1 = 0;
+        break;
+    case LV_STYLE_TRANSITION_PROP_2:
+        if(style->ext) style->ext->has_transition_prop_2 = 0;
+        break;
+    case LV_STYLE_TRANSITION_PROP_3:
+        if(style->ext) style->ext->has_transition_prop_3 = 0;
+        break;
+    case LV_STYLE_TRANSITION_PROP_4:
+        if(style->ext) style->ext->has_transition_prop_4 = 0;
+        break;
+    case LV_STYLE_TRANSITION_PROP_5:
+        if(style->ext) style->ext->has_transition_prop_5 = 0;
+        break;
+    case LV_STYLE_TRANSITION_PROP_6:
+        if(style->ext) style->ext->has_transition_prop_6 = 0;
+        break;
 
-    return false;
-}
-
-lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
-{
-    lv_style_value_t value;
-    switch(prop) {
-            break;
-        case LV_STYLE_TRANSFORM_ZOOM:
-            value._int = LV_IMG_ZOOM_NONE;
-            break;
-        case LV_STYLE_BG_COLOR:
-            value._color = LV_COLOR_WHITE;
-            break;
-        case LV_STYLE_OPA:
-        case LV_STYLE_BORDER_OPA:
-        case LV_STYLE_TEXT_OPA:
-        case LV_STYLE_IMG_OPA:
-        case LV_STYLE_OUTLINE_OPA:
-        case LV_STYLE_SHADOW_OPA:
-            value._int = LV_OPA_COVER;
-            break;
-        case LV_STYLE_BORDER_SIDE:
-            value._int = LV_BORDER_SIDE_FULL;
-            break;
-        case LV_STYLE_TEXT_FONT:
-            value._ptr = lv_theme_get_font_normal();
-            break;
-        case LV_STYLE_TRANSITION_PATH:
-            value._ptr = &lv_anim_path_def;
-            break;
-        default:
-            value._ptr = NULL;  //Clear only the biggest member of the union
-            break;
-    }
-
-    return value;
-
-}
-
-/**
- * Check whether a style is valid (initialized correctly)
- * @param style pointer to a style
- * @return true: valid
- */
-bool lv_debug_check_style(const lv_style_t * style)
-{
-    if(style == NULL) return true;  /*NULL style is still valid*/
-
-#if LV_USE_ASSERT_STYLE
-    if(style->sentinel != LV_DEBUG_STYLE_SENTINEL_VALUE) {
-        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
+    default:
         return false;
     }
-#endif
 
     return true;
 }
-
-/**
- * Check whether a style list is valid (initialized correctly)
- * @param style pointer to a style
- * @return true: valid
- */
-bool lv_debug_check_style_list(const void * list)
-{
-    return true;
-}
-
-/**********************
- *   STATIC FUNCTIONS
- **********************/
