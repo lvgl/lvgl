@@ -173,7 +173,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
         fill_area.y1 = draw_area.y1 + disp_area->y1;
         fill_area.y2 = fill_area.y1;
 
-        lv_style_int_t dash_start = 0;
+        lv_coord_t dash_start = 0;
         if(dashed) {
             dash_start = (vdb->area.x1 + draw_area.x1) % (dsc->dash_gap + dsc->dash_width);
         }
@@ -186,7 +186,7 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_hor(const lv_point_t * point1, const
 
             if(dashed) {
                 if(mask_res != LV_DRAW_MASK_RES_TRANSP) {
-                    lv_style_int_t dash_cnt = dash_start;
+                    lv_coord_t dash_cnt = dash_start;
                     lv_coord_t i;
                     for(i = 0; i < draw_area_w; i++, dash_cnt++) {
                         if(dash_cnt <= dsc->dash_width) {
@@ -276,12 +276,12 @@ LV_ATTRIBUTE_FAST_MEM static void draw_line_ver(const lv_point_t * point1, const
 
         lv_opa_t * mask_buf = _lv_mem_buf_get(draw_area_w);
 
-        lv_style_int_t dash_start = 0;
+        lv_coord_t dash_start = 0;
         if(dashed) {
             dash_start = (vdb->area.y1 + draw_area.y1) % (dsc->dash_gap + dsc->dash_width);
         }
 
-        lv_style_int_t dash_cnt = dash_start;
+        lv_coord_t dash_cnt = dash_start;
 
         int32_t h;
         for(h = draw_area.y1; h <= draw_area.y2; h++) {

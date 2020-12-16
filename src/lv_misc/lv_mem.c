@@ -161,8 +161,6 @@ void * lv_mem_alloc(size_t size)
         return &zero_mem;
     }
 
-    printf("alloc:%d\n", size);
-
 #ifdef LV_ARCH_64
     /*Round the size up to 8*/
     size = (size + 7) & (~0x7);

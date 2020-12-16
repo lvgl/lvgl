@@ -20,7 +20,6 @@
  *  STATIC PROTOTYPES
  **********************/
 static void apply_theme(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name);
-static void clear_styles(lv_obj_t * obj, lv_theme_style_t name);
 
 /**********************
  *  STATIC VARIABLES
@@ -62,7 +61,7 @@ lv_theme_t * lv_theme_get_act(void)
 void lv_theme_apply(lv_obj_t * obj, lv_theme_style_t name)
 {
     /* Remove the existing styles from all part of the object. */
-    clear_styles(obj, name);
+    lv_obj_remove_all_styles(obj);
 
     /*Apply the theme including the base theme(s)*/
 
@@ -197,156 +196,4 @@ static void apply_theme(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
     else if(th->apply_cb) {
         th->apply_cb(act_theme, obj, name);
     }
-}
-
-static void clear_styles(lv_obj_t * obj, lv_theme_style_t name)
-{
-    switch(name) {
-        case LV_THEME_NONE:
-            break;
-
-        case LV_THEME_SCR:
-            _lv_obj_reset_style_list_no_refr(obj, LV_OBJ_PART_MAIN);
-            break;
-        case LV_THEME_OBJ:
-            _lv_obj_reset_style_list_no_refr(obj, LV_OBJ_PART_MAIN);
-            break;
-
-#if LV_USE_BTN
-        case LV_THEME_BTN:
-            _lv_obj_reset_style_list_no_refr(obj, LV_BTN_PART_MAIN);
-            break;
-#endif
-
-#if LV_USE_BTNMATRIX
-        case LV_THEME_BTNMATRIX:
-            _lv_obj_reset_style_list_no_refr(obj, LV_BTNMATRIX_PART_MAIN);
-            _lv_obj_reset_style_list_no_refr(obj, LV_BTNMATRIX_PART_BTN);
-            break;
-#endif
-
-#if LV_USE_BAR
-        case LV_THEME_BAR:
-            _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_MAIN);
-            _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_INDIC);
-            break;
-#endif
-
-#if LV_USE_SWITCH
-        case LV_THEME_SWITCH:
-            _lv_obj_reset_style_list_no_refr(obj, LV_SWITCH_PART_MAIN);
-            _lv_obj_reset_style_list_no_refr(obj, LV_SWITCH_PART_INDIC);
-            _lv_obj_reset_style_list_no_refr(obj, LV_SWITCH_PART_KNOB);
-            break;
-#endif
-
-#if LV_USE_IMG
-        case LV_THEME_IMAGE:
-            _lv_obj_reset_style_list_no_refr(obj, LV_IMG_PART_MAIN);
-            break;
-#endif
-
-#if LV_USE_IMGBTN
-        case LV_THEME_IMGBTN:
-            _lv_obj_reset_style_list_no_refr(obj, LV_IMG_PART_MAIN);
-            break;
-#endif
-
-#if LV_USE_LABEL
-        case LV_THEME_LABEL:
-            _lv_obj_reset_style_list_no_refr(obj, LV_LABEL_PART_MAIN);
-            break;
-#endif
-
-#if LV_USE_LINE
-        case LV_THEME_LINE:
-            _lv_obj_reset_style_list_no_refr(obj, LV_LABEL_PART_MAIN);
-            break;
-#endif
-
-#if LV_USE_ARC
-        case LV_THEME_ARC:
-            _lv_obj_reset_style_list_no_refr(obj, LV_ARC_PART_BG);
-            _lv_obj_reset_style_list_no_refr(obj, LV_ARC_PART_INDIC);
-            break;
-#endif
-
-#if LV_USE_SLIDER
-        case LV_THEME_SLIDER:
-            _lv_obj_reset_style_list_no_refr(obj, LV_SLIDER_PART_MAIN);
-            _lv_obj_reset_style_list_no_refr(obj, LV_SLIDER_PART_INDIC);
-            _lv_obj_reset_style_list_no_refr(obj, LV_SLIDER_PART_KNOB);
-            break;
-#endif
-
-#if LV_USE_CHECKBOX
-        case LV_THEME_CHECKBOX:
-            _lv_obj_reset_style_list_no_refr(obj, LV_CHECKBOX_PART_MAIN);
-            _lv_obj_reset_style_list_no_refr(obj, LV_CHECKBOX_PART_BULLET);
-            break;
-#endif
-
-#if LV_USE_ROLLER
-        case LV_THEME_ROLLER:
-            _lv_obj_reset_style_list_no_refr(obj, LV_ROLLER_PART_BG);
-            _lv_obj_reset_style_list_no_refr(obj, LV_ROLLER_PART_SELECTED);
-            break;
-#endif
-
-
-#if LV_USE_OBJMASK
-        case LV_THEME_OBJMASK:
-            _lv_obj_reset_style_list_no_refr(obj, LV_OBJMASK_PART_MAIN);
-            break;
-#endif
-
-#if LV_USE_DROPDOWN
-        case LV_THEME_DROPDOWN:
-            _lv_obj_reset_style_list_no_refr(obj, LV_DROPDOWN_PART_MAIN);
-            _lv_obj_reset_style_list_no_refr(obj, LV_DROPDOWN_PART_LIST);
-            _lv_obj_reset_style_list_no_refr(obj, LV_DROPDOWN_PART_SELECTED);
-            break;
-#endif
-
-#if LV_USE_CHART
-        case LV_THEME_CHART:
-            _lv_obj_reset_style_list_no_refr(obj, LV_CHART_PART_BG);
-            _lv_obj_reset_style_list_no_refr(obj, LV_CHART_PART_SERIES_BG);
-            _lv_obj_reset_style_list_no_refr(obj, LV_CHART_PART_SERIES);
-            break;
-#endif
-#if LV_USE_TABLE
-        case LV_THEME_TABLE:
-            _lv_obj_reset_style_list_no_refr(obj, LV_TABLE_PART_BG);
-            _lv_obj_reset_style_list_no_refr(obj, LV_TABLE_PART_CELL1);
-            _lv_obj_reset_style_list_no_refr(obj, LV_TABLE_PART_CELL2);
-            _lv_obj_reset_style_list_no_refr(obj, LV_TABLE_PART_CELL3);
-            _lv_obj_reset_style_list_no_refr(obj, LV_TABLE_PART_CELL4);
-            break;
-#endif
-
-#if LV_USE_TEXTAREA
-        case LV_THEME_TEXTAREA:
-            _lv_obj_reset_style_list_no_refr(obj, LV_TEXTAREA_PART_MAIN);
-            _lv_obj_reset_style_list_no_refr(obj, LV_TEXTAREA_PART_PLACEHOLDER);
-            _lv_obj_reset_style_list_no_refr(obj, LV_TEXTAREA_PART_CURSOR);
-            break;
-#endif
-
-#if LV_USE_LINEMETER
-        case LV_THEME_LINEMETER:
-            _lv_obj_reset_style_list_no_refr(obj, LV_LINEMETER_PART_MAIN);
-            break;
-#endif
-#if LV_USE_GAUGE
-        case LV_THEME_GAUGE:
-            _lv_obj_reset_style_list_no_refr(obj, LV_GAUGE_PART_MAIN);
-            _lv_obj_reset_style_list_no_refr(obj, LV_GAUGE_PART_MAJOR);
-            _lv_obj_reset_style_list_no_refr(obj, LV_GAUGE_PART_NEEDLE);
-            break;
-#endif
-        default:
-            break;
-    }
-
 }

@@ -78,14 +78,12 @@ LV_ATTRIBUTE_FAST_MEM void lv_draw_rect_dsc_init(lv_draw_rect_dsc_t * dsc)
     dsc->bg_color = LV_COLOR_WHITE;
     dsc->bg_grad_color = LV_COLOR_BLACK;
     dsc->border_color = LV_COLOR_BLACK;
-    dsc->pattern_recolor = LV_COLOR_BLACK;
     dsc->value_color = LV_COLOR_BLACK;
     dsc->shadow_color = LV_COLOR_BLACK;
     dsc->bg_grad_color_stop = 0xFF;
     dsc->bg_opa = LV_OPA_COVER;
     dsc->outline_opa = LV_OPA_COVER;
     dsc->border_opa = LV_OPA_COVER;
-    dsc->pattern_opa = LV_OPA_COVER;
     dsc->pattern_font = LV_THEME_DEFAULT_FONT_NORMAL;
     dsc->value_opa = LV_OPA_COVER;
     dsc->value_font = LV_THEME_DEFAULT_FONT_NORMAL;
@@ -1186,10 +1184,9 @@ static void draw_outline(const lv_area_t * coords, const lv_area_t * clip, const
 #if LV_USE_PATTERN
 static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, const lv_draw_rect_dsc_t * dsc)
 {
-    if(dsc->pattern_image == NULL) return;
-    if(dsc->pattern_opa <= LV_OPA_MIN) return;
+    if(dsc->bg_img_src == NULL) return;
 
-    lv_img_src_t src_type = lv_img_src_get_type(dsc->pattern_image);
+    lv_img_src_t src_type = lv_img_src_get_type(dsc->bg_img_src);
 
     lv_draw_img_dsc_t img_dsc;
     lv_draw_label_dsc_t label_dsc;
@@ -1198,7 +1195,7 @@ static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, const
 
     if(src_type == LV_IMG_SRC_FILE || src_type == LV_IMG_SRC_VARIABLE) {
         lv_img_header_t header;
-        lv_res_t res = lv_img_decoder_get_info(dsc->pattern_image, &header);
+        lv_res_t res = lv_img_decoder_get_info(dsc->bg_img_src, &header);
         if(res != LV_RES_OK) {
             LV_LOG_WARN("draw_img: can't get image info");
             return;
@@ -1208,17 +1205,15 @@ static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, const
         img_h = header.h;
 
         lv_draw_img_dsc_init(&img_dsc);
-        img_dsc.opa = dsc->pattern_opa;
-        img_dsc.recolor_opa = dsc->pattern_recolor_opa;
-        img_dsc.recolor = dsc->pattern_recolor;
+//        img_dsc.opa = dsc->pattern_opa;
     }
     else if(src_type == LV_IMG_SRC_SYMBOL) {
         lv_draw_label_dsc_init(&label_dsc);
-        label_dsc.color = dsc->pattern_recolor;
+//        label_dsc.color = dsc->pattern_recolor;
         label_dsc.font = dsc->pattern_font;
-        label_dsc.opa = dsc->pattern_opa;
+//        label_dsc.opa = dsc->pattern_opa;
         lv_point_t s;
-        _lv_txt_get_size(&s, dsc->pattern_image, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
+        _lv_txt_get_size(&s, dsc->bg_img_src, label_dsc.font, label_dsc.letter_space, label_dsc.line_space, LV_COORD_MAX,
                          LV_TXT_FLAG_NONE);
         img_w = s.x;
         img_h = s.y;
@@ -1236,7 +1231,7 @@ static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, const
 
     lv_area_t coords_tmp;
 
-    if(dsc->pattern_repeat) {
+    if(dsc->bg_img_mosaic) {
         lv_draw_mask_radius_param_t radius_mask_param;
         lv_draw_mask_radius_init(&radius_mask_param, coords, dsc->radius, false);
         int16_t radius_mask_id = lv_draw_mask_add(&radius_mask_param, NULL);
@@ -1251,8 +1246,8 @@ static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, const
             coords_tmp.x1 = coords->x1 - ofs_x;
             coords_tmp.x2 = coords_tmp.x1 + img_w - 1;
             for(; coords_tmp.x1 <= coords->x2; coords_tmp.x1 += img_w, coords_tmp.x2 += img_w) {
-                if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->pattern_image, NULL);
-                else lv_draw_img(&coords_tmp, clip, dsc->pattern_image, &img_dsc);
+                if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->bg_img_src, NULL);
+                else lv_draw_img(&coords_tmp, clip, dsc->bg_img_src, &img_dsc);
             }
         }
         lv_draw_mask_remove_id(radius_mask_id);
@@ -1281,8 +1276,8 @@ static void draw_pattern(const lv_area_t * coords, const lv_area_t * clip, const
             radius_mask_id = lv_draw_mask_add(&radius_mask_param, NULL);
         }
 
-        if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->pattern_image, NULL);
-        else lv_draw_img(&coords_tmp, clip, dsc->pattern_image, &img_dsc);
+        if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->bg_img_src, NULL);
+        else lv_draw_img(&coords_tmp, clip, dsc->bg_img_src, &img_dsc);
 
         lv_draw_mask_remove_id(radius_mask_id);
     }

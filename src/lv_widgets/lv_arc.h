@@ -47,8 +47,6 @@ LV_CLASS_DECLARE_START(lv_arc, lv_obj);
     uint16_t indic_angle_end;     \
     uint16_t bg_angle_start;    \
     uint16_t bg_angle_end;      \
-    lv_style_list_t style_arc;  \
-    lv_style_list_t style_knob; /* Style of the knob */     \
     int16_t value; /*Current value of the arc*/ \
     int16_t min_value; /*Minimum value of the arc*/ \
     int16_t max_value; /*Maximum value of the arc*/ \

@@ -553,16 +553,16 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
         lv_opa_t bg_opa = draw_indic_dsc.bg_opa;
         lv_opa_t border_opa = draw_indic_dsc.border_opa;
         lv_opa_t value_opa = draw_indic_dsc.value_opa;
-        const void * pattern_src = draw_indic_dsc.pattern_image;
+        const void * pattern_src = draw_indic_dsc.bg_img_src;
         draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
         draw_indic_dsc.border_opa = LV_OPA_TRANSP;
         draw_indic_dsc.value_opa = LV_OPA_TRANSP;
-        draw_indic_dsc.pattern_image = NULL;
+        draw_indic_dsc.bg_img_src = NULL;
         lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
         draw_indic_dsc.bg_opa = bg_opa;
         draw_indic_dsc.border_opa = border_opa;
         draw_indic_dsc.value_opa = value_opa;
-        draw_indic_dsc.pattern_image = pattern_src;
+        draw_indic_dsc.bg_img_src = pattern_src;
 
     }
 
@@ -608,7 +608,7 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
     draw_indic_dsc.shadow_opa = LV_OPA_TRANSP;
     draw_indic_dsc.value_opa = LV_OPA_TRANSP;
-    draw_indic_dsc.pattern_image = NULL;
+    draw_indic_dsc.bg_img_src = NULL;
     lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
 
     lv_draw_mask_remove_id(mask_indic_id);

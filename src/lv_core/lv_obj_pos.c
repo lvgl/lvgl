@@ -203,8 +203,8 @@ void lv_obj_set_height(lv_obj_t * obj, lv_coord_t h)
  */
 void lv_obj_set_content_width(lv_obj_t * obj, lv_coord_t w)
 {
-    lv_style_int_t pleft = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
-    lv_style_int_t pright = lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
+    lv_coord_t pleft = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    lv_coord_t pright = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
 
     lv_obj_set_width(obj, w + pleft + pright);
 }
@@ -216,8 +216,8 @@ void lv_obj_set_content_width(lv_obj_t * obj, lv_coord_t w)
  */
 void lv_obj_set_content_height(lv_obj_t * obj, lv_coord_t h)
 {
-    lv_style_int_t ptop = lv_obj_get_style_pad_top(obj, LV_OBJ_PART_MAIN);
-    lv_style_int_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_OBJ_PART_MAIN);
+    lv_coord_t ptop = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
+    lv_coord_t pbottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
     lv_obj_set_height(obj, h + ptop + pbottom);
 }
@@ -230,8 +230,8 @@ void lv_obj_set_content_height(lv_obj_t * obj, lv_coord_t h)
  */
 void lv_obj_set_width_margin(lv_obj_t * obj, lv_coord_t w)
 {
-    lv_style_int_t mleft = lv_obj_get_style_margin_left(obj, LV_OBJ_PART_MAIN);
-    lv_style_int_t mright = lv_obj_get_style_margin_right(obj, LV_OBJ_PART_MAIN);
+    lv_coord_t mleft = 0;//lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
+    lv_coord_t mright = 0;//lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
 
     lv_obj_set_width(obj, w - mleft - mright);
 }
@@ -244,8 +244,8 @@ void lv_obj_set_width_margin(lv_obj_t * obj, lv_coord_t w)
  */
 void lv_obj_set_height_margin(lv_obj_t * obj, lv_coord_t h)
 {
-    lv_style_int_t mtop = lv_obj_get_style_margin_top(obj, LV_OBJ_PART_MAIN);
-    lv_style_int_t mbottom = lv_obj_get_style_margin_bottom(obj, LV_OBJ_PART_MAIN);
+    lv_coord_t mtop = 0;//lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
+    lv_coord_t mbottom = 0;//lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
 
     lv_obj_set_height(obj, h - mtop - mbottom);
 }
@@ -269,8 +269,8 @@ void lv_obj_align(lv_obj_t * obj, const lv_obj_t * base, lv_align_t align, lv_co
     lv_coord_t x = 0;
     lv_coord_t y = 0;
     lv_obj_t * parent = lv_obj_get_parent(obj);
-    lv_coord_t pleft = lv_obj_get_style_pad_left(parent, LV_OBJ_PART_MAIN);
-    lv_coord_t ptop = lv_obj_get_style_pad_top(parent, LV_OBJ_PART_MAIN);
+    lv_coord_t pleft = lv_obj_get_style_pad_left(parent, LV_PART_MAIN);
+    lv_coord_t ptop = lv_obj_get_style_pad_top(parent, LV_PART_MAIN);
     switch(align) {
     case LV_ALIGN_CENTER:
         x = lv_obj_get_width_fit(base) / 2 - lv_obj_get_width(obj) / 2;
@@ -403,8 +403,8 @@ void lv_obj_get_inner_coords(const lv_obj_t * obj, lv_area_t * coords_out)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_border_side_t part = lv_obj_get_style_border_side(obj, LV_OBJ_PART_MAIN);
-    lv_coord_t w = lv_obj_get_style_border_width(obj, LV_OBJ_PART_MAIN);
+    lv_border_side_t part = lv_obj_get_style_border_side(obj, LV_PART_MAIN);
+    lv_coord_t w = lv_obj_get_style_border_width(obj, LV_PART_MAIN);
 
     if(part & LV_BORDER_SIDE_LEFT) coords_out->x1 += w;
     if(part & LV_BORDER_SIDE_RIGHT) coords_out->x2 -= w;
@@ -429,7 +429,7 @@ lv_coord_t lv_obj_get_x(const lv_obj_t * obj)
     if(parent) {
         rel_x   = obj->coords.x1 - parent->coords.x1;
         rel_x += lv_obj_get_scroll_x(parent);
-        rel_x -= lv_obj_get_style_pad_left(parent, LV_OBJ_PART_MAIN);
+        rel_x -= lv_obj_get_style_pad_left(parent, LV_PART_MAIN);
     }
     else {
         rel_x = obj->coords.x1;
@@ -454,7 +454,7 @@ lv_coord_t lv_obj_get_y(const lv_obj_t * obj)
     if(parent) {
         rel_y = obj->coords.y1 - parent->coords.y1;
         rel_y += lv_obj_get_scroll_y(parent);
-        rel_y -= lv_obj_get_style_pad_top(parent, LV_OBJ_PART_MAIN);
+        rel_y -= lv_obj_get_style_pad_top(parent, LV_PART_MAIN);
     }
     else {
         rel_y = obj->coords.y1;
@@ -497,8 +497,8 @@ lv_coord_t lv_obj_get_width_fit(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_style_int_t left = lv_obj_get_style_pad_left(obj, LV_OBJ_PART_MAIN);
-    lv_style_int_t right = lv_obj_get_style_pad_right(obj, LV_OBJ_PART_MAIN);
+    lv_coord_t left = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
+    lv_coord_t right = lv_obj_get_style_pad_right(obj, LV_PART_MAIN);
 
     return lv_obj_get_width(obj) - left - right;
 }
@@ -512,8 +512,8 @@ lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_style_int_t top = lv_obj_get_style_pad_top((lv_obj_t *)obj, LV_OBJ_PART_MAIN);
-    lv_style_int_t bottom =  lv_obj_get_style_pad_bottom((lv_obj_t *)obj, LV_OBJ_PART_MAIN);
+    lv_coord_t top = lv_obj_get_style_pad_top((lv_obj_t *)obj, LV_PART_MAIN);
+    lv_coord_t bottom =  lv_obj_get_style_pad_bottom((lv_obj_t *)obj, LV_PART_MAIN);
 
     return lv_obj_get_height(obj) - top - bottom;
 }
@@ -526,8 +526,8 @@ lv_coord_t lv_obj_get_height_fit(const lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_height_margin(const lv_obj_t * obj)
 {
-    lv_style_int_t mtop = lv_obj_get_style_margin_top(obj, LV_OBJ_PART_MAIN);
-    lv_style_int_t mbottom = lv_obj_get_style_margin_bottom(obj, LV_OBJ_PART_MAIN);
+    lv_coord_t mtop = lv_obj_get_style_margin_top(obj, LV_PART_MAIN);
+    lv_coord_t mbottom = lv_obj_get_style_margin_bottom(obj, LV_PART_MAIN);
 
     return lv_obj_get_height(obj) + mtop + mbottom;
 }
@@ -540,8 +540,8 @@ lv_coord_t lv_obj_get_height_margin(const lv_obj_t * obj)
  */
 lv_coord_t lv_obj_get_width_margin(const lv_obj_t * obj)
 {
-    lv_style_int_t mleft = lv_obj_get_style_margin_left(obj, LV_OBJ_PART_MAIN);
-    lv_style_int_t mright = lv_obj_get_style_margin_right(obj, LV_OBJ_PART_MAIN);
+    lv_coord_t mleft = lv_obj_get_style_margin_left(obj, LV_PART_MAIN);
+    lv_coord_t mright = lv_obj_get_style_margin_right(obj, LV_PART_MAIN);
 
     return lv_obj_get_width(obj) + mleft + mright;
 }
@@ -620,8 +620,8 @@ void _lv_obj_move_to(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, bool notify_par
     lv_obj_t * parent = obj->parent;
 
     if(parent) {
-        lv_coord_t pad_left = lv_obj_get_style_pad_left(parent, LV_OBJ_PART_MAIN);
-        lv_coord_t pad_top = lv_obj_get_style_pad_top(parent, LV_OBJ_PART_MAIN);
+        lv_coord_t pad_left = lv_obj_get_style_pad_left(parent, LV_PART_MAIN);
+        lv_coord_t pad_top = lv_obj_get_style_pad_top(parent, LV_PART_MAIN);
 
         x += pad_left + parent->coords.x1 - lv_obj_get_scroll_x(parent);
         y += pad_top + parent->coords.y1 - lv_obj_get_scroll_y(parent);

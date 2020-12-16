@@ -45,7 +45,7 @@ extern "C" {
 #endif
 
 #define LV_MAX_ANCESTOR_NUM 8
-#define _LV_OBJ_PART_MAX    128
+#define _LV_OBJ_PART_MAX    32
 
 #define LV_EXT_CLICK_AREA_OFF   0
 #define LV_EXT_CLICK_AREA_TINY  1
@@ -126,7 +126,6 @@ enum {
     LV_SIGNAL_STYLE_CHG,         /**< Object's style has changed */
     LV_SIGNAL_BASE_DIR_CHG,      /**< The base dir has changed*/
     LV_SIGNAL_REFR_EXT_DRAW_PAD, /**< Object's extra padding has changed */
-    LV_SIGNAL_GET_STYLE,         /**< Get the style of an object*/
     LV_SIGNAL_GET_SELF_SIZE,     /**< Get the internal size of a widget*/
 
     /*Input device related*/
@@ -230,7 +229,7 @@ LV_CLASS_DECLARE_START(lv_obj, lv_base)
   _lv_base_data                      \
   struct _lv_obj_t * parent;         \
   lv_obj_spec_attr_t * spec_attr;    \
-  lv_style_list_t  style_list;       \
+  lv_obj_style_list_t  style_list;   \
   lv_area_t coords;                  \
   lv_coord_t x_set;                  \
   lv_coord_t y_set;                  \
@@ -248,11 +247,14 @@ LV_CLASS_DECLARE_END(lv_obj, lv_base)
 extern lv_obj_class_t lv_obj;
 
 enum {
-    LV_OBJ_PART_MAIN,
-    LV_OBJ_PART_ALL = 0xFF,
+    LV_PART_MAIN,
+    LV_PART_SCROLLBAR,
+    LV_PART_CONTENT,
+    LV_PART_INDICATOR,
+    LV_PART_KNOB,
+    LV_PART_PLACEHOLDER,
+    LV_PART_HIGHLIGHT,
 };
-
-typedef uint8_t lv_obj_part_t;
 
 /** Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
 typedef struct {
@@ -264,11 +266,6 @@ typedef struct {
     lv_point_t * point;
     bool result;
 } lv_hit_test_info_t;
-
-typedef struct {
-    uint8_t part;
-    lv_style_list_t * result;
-} lv_get_style_info_t;
 
 /**********************
  * GLOBAL PROTOTYPES
