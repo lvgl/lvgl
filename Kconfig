@@ -105,11 +105,40 @@ menu "LVGL configuration"
             displays.
     
     menu "Memory manager settings"
+    config LV_MEM_CUSTOM
+	    bool
+	    prompt "If true use custom malloc/free, otherwise use the built-in `lv_mem_alloc` and `lv_mem_free`"
+	    default false
+
+    config LV_MEM_CUSTOM_INCLUDE
+        string
+        prompt "Header to include for the custom memory function"
+        default stdlib.h
+        depends on LV_MEM_CUSTOM
+
+    config LV_MEM_CUSTOM_ALLOC
+        string
+        prompt "Wrapper to malloc"
+        default malloc 
+        depends on LV_MEM_CUSTOM
+
+    config LV_MEM_CUSTOM_FREE
+        string
+        prompt "Wrapper to free"
+        default free 
+        depends on LV_MEM_CUSTOM
+
 	config LV_MEM_SIZE_BYTES
 	    int
 	    prompt "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
 	    range 2 128
-	    default 32
+        default 32
+        depends on !LV_MEM_CUSTOM
+
+    config LV_MEMCPY_MEMSET_STD
+        bool
+        prompt "Use the standard memcpy and memset instead of LVGL's own functions"
+        default false 
     endmenu
     
     menu "Indev device settings"
@@ -235,9 +264,28 @@ menu "LVGL configuration"
                 LV_IMG_CACHE_DEF_SIZE must be >= 1
     endmenu
 
-    menu "Compiler settings"
+    menu "Compiler Settings"
         config LV_BIG_ENDIAN_SYSTEM
             bool "For big endian systems set to 1"
+    endmenu
+
+    menu "HAL Settings"
+        config LV_TICK_CUSTOM
+            bool 
+            prompt "Use a custom tick source"
+            default false
+
+        config LV_TICK_CUSTOM_INCLUDE
+            string
+            prompt "Header for the system time function"
+            default Arduino.h
+            depends on LV_TICK_CUSTOM
+
+        config LV_TICK_CUSTOM_SYS_TIME_EXPR
+            string
+            prompt "Expression evaluating to current system time in ms"
+            default "(millis())"
+            depends on LV_TICK_CUSTOM
     endmenu
 
     menu "Log Settings"
