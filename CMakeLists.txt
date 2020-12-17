@@ -24,6 +24,10 @@ if (CONFIG_LV_TICK_CUSTOM)
     endif()
 endif()
 
+if (CONFIG_LV_USER_DATA_FREE)
+    target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_USER_DATA_FREE=${CONFIG_LV_USER_DATA_FREE}")
+endif()
+
 if (CONFIG_LV_ATTRIBUTE_FAST_MEM_USE_IRAM)
     target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_ATTRIBUTE_FAST_MEM=IRAM_ATTR")
 endif()
