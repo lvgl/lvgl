@@ -54,8 +54,9 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
     draw_dsc->radius = lv_obj_get_style_radius(obj, part);
 
 #if LV_USE_OPA_SCALE
+    lv_opa_t main_opa = part != LV_PART_MAIN ? lv_obj_get_style_opa(obj, part) : LV_OPA_COVER;
     lv_opa_t opa = lv_obj_get_style_opa(obj, part);
-    if(opa <= LV_OPA_MIN) {
+    if(opa <= LV_OPA_MIN || main_opa <= LV_OPA_MIN) {
         draw_dsc->bg_opa = LV_OPA_TRANSP;
         draw_dsc->border_opa = LV_OPA_TRANSP;
         draw_dsc->shadow_opa = LV_OPA_TRANSP;
@@ -169,6 +170,10 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
 #endif
 
 #if LV_USE_OPA_SCALE
+    if(main_opa < LV_OPA_MAX) {
+        opa = (uint16_t)((uint16_t) main_opa * opa) >> 8;
+    }
+
     if(opa < LV_OPA_MAX) {
         draw_dsc->bg_opa = (uint16_t)((uint16_t)draw_dsc->bg_opa * opa) >> 8;
         draw_dsc->border_opa = (uint16_t)((uint16_t)draw_dsc->border_opa * opa) >> 8;

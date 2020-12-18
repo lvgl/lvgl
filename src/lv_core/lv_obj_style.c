@@ -134,6 +134,7 @@ void lv_obj_add_style(struct _lv_obj_t * obj, uint32_t part, uint32_t state, lv_
         obj->style_list.styles[j] = obj->style_list.styles[j - 1];
     }
 
+    _lv_memset_00(&obj->style_list.styles[i], sizeof(lv_obj_style_t));
     obj->style_list.styles[i].style = style;
     obj->style_list.styles[i].part = part;
     obj->style_list.styles[i].state = state;
@@ -172,7 +173,7 @@ void lv_obj_remove_style(lv_obj_t * obj, uint32_t part, uint32_t state, lv_style
 
 
     obj->style_list.style_cnt--;
-    obj->style_list.styles = lv_mem_realloc(obj->style_list.styles, obj->style_list.style_cnt * sizeof(lv_style_t));
+    obj->style_list.styles = lv_mem_realloc(obj->style_list.styles, obj->style_list.style_cnt * sizeof(lv_obj_style_t));
 
 
 #if LV_USE_ANIMATION
@@ -551,6 +552,7 @@ void _lv_obj_create_style_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8
  */
 _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2)
 {
+    return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
     lv_obj_style_list_t * list = &obj->style_list;
     _lv_style_state_cmp_t res = _LV_STYLE_STATE_CMP_SAME;
 

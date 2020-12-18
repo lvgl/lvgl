@@ -27,7 +27,7 @@ extern "C" {
  *      DEFINES
  *********************/
 
-#define LV_RADIUS_CIRCLE (0x7FFF) /**< A very big radius to always draw as circle*/
+#define LV_RADIUS_CIRCLE (0x7F) /**< A very big radius to always draw as circle*/
 LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 
 #define LV_DEBUG_STYLE_SENTINEL_VALUE       0xAABBCCDD
@@ -605,6 +605,26 @@ static inline void lv_style_set_transition_prop_6(lv_style_t * style, lv_style_p
 
 
 
+
+static inline void lv_style_set_pad_ver(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_set_pad_top(style, value);
+    lv_style_set_pad_bottom(style, value);
+}
+
+static inline void lv_style_set_pad_hor(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_set_pad_left(style, value);
+    lv_style_set_pad_right(style, value);
+}
+
+static inline void lv_style_set_pad_all(lv_style_t * style, lv_coord_t value)
+{
+    lv_style_set_pad_top(style, value);
+    lv_style_set_pad_bottom(style, value);
+    lv_style_set_pad_left(style, value);
+    lv_style_set_pad_right(style, value);
+}
 
 //static inline void lv_style_set_pad_ver(lv_style_t * style, lv_style_int_t value)
 //{

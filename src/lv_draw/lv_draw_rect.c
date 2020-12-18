@@ -1226,8 +1226,6 @@ static void draw_content(const lv_area_t * coords, const lv_area_t * clip, const
 
     lv_area_t coords_tmp;
 
-    int32_t obj_w = lv_area_get_width(coords);
-    int32_t obj_h = lv_area_get_height(coords);
     coords_tmp.x1 = 0;
     coords_tmp.y1 = 0;
     coords_tmp.x2 = img_w - 1;

@@ -27,14 +27,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/**Styles*/
-enum {
-    LV_BTN_PART_MAIN = LV_OBJ_PART_MAIN,
-};
-typedef uint8_t lv_btn_part_t;
-
-
-
 LV_CLASS_DECLARE_START(lv_btn, lv_obj);
 
 #define _lv_btn_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)

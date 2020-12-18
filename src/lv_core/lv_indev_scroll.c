@@ -57,8 +57,6 @@ void _lv_scroll_handler(lv_indev_proc_t * proc)
         scroll_obj = find_scroll_obj(proc);
         if(scroll_obj == NULL) return;
 
-        lv_obj_add_state(scroll_obj, LV_STATE_SCROLLED);
-
         init_scroll_limits(proc);
 
         lv_indev_t * indev_act = lv_indev_get_act();
@@ -203,8 +201,6 @@ void _lv_scroll_throw_handler(lv_indev_proc_t * proc)
         if(proc->reset_query) return;
         lv_event_send(scroll_obj, LV_EVENT_SCROLL_END, indev_act);
         if(proc->reset_query) return;
-
-        lv_obj_clear_state(proc->types.pointer.scroll_obj, LV_STATE_SCROLLED);
 
         proc->types.pointer.scroll_dir = LV_SCROLL_DIR_NONE;
         proc->types.pointer.scroll_obj = NULL;

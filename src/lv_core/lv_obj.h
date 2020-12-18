@@ -681,13 +681,7 @@ bool lv_obj_hit_test(lv_obj_t * obj, lv_point_t * point);
  */
 void * lv_obj_get_ext_attr(const lv_obj_t * obj);
 
-/**
- * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
- * E.g. buf.type[0]="lv_btn", buf.type[1]="lv_cont", buf.type[2]="lv_obj"
- * @param obj pointer to an object which type should be get
- * @param buf pointer to an `lv_obj_type_t` buffer to store the types
- */
-void lv_obj_get_type(const lv_obj_t * obj, lv_obj_type_t * buf);
+void * lv_obj_check_type(const lv_obj_t * obj, void * class_p);
 
 #if LV_USE_USER_DATA
 /**

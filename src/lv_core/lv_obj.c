@@ -11,8 +11,8 @@
 #include "lv_refr.h"
 #include "lv_group.h"
 #include "lv_disp.h"
-#include "../lv_misc/lv_debug.h"
 #include "../lv_themes/lv_theme.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_draw/lv_draw.h"
 #include "../lv_misc/lv_anim.h"
 #include "../lv_misc/lv_timer.h"
@@ -198,13 +198,9 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     lv_obj_t * obj = lv_class_new(&lv_obj);
     lv_obj.constructor(obj, parent, copy);
-    if(copy == NULL) {
-          if(parent != NULL) lv_theme_apply(obj, LV_THEME_OBJ);
-          else  lv_theme_apply(obj, LV_THEME_SCR);
-      }
-      else {
-//          lv_style_list_copy(&obj->style_list, &copy->style_list);
-      }
+    if(copy == NULL) lv_theme_apply(obj);
+//    else   lv_style_list_copy(&obj->style_list, &copy->style_list);
+
     return obj;
 }
 
@@ -1258,6 +1254,16 @@ lv_res_t _lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name)
 
 
 /**
+ * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
+ * E.g. buf.type[0]="lv_btn", buf.type[1]="lv_cont", buf.type[2]="lv_obj"
+ * @param obj pointer to an object which type should be get
+ * @param buf pointer to an `lv_obj_type_t` buffer to store the types
+ */
+void * lv_obj_check_type(const lv_obj_t * obj, void * class_p)
+{
+    return obj->class_p == class_p ? true : false;
+}
+/**
  * Check if any object has a given type
  * @param obj pointer to an object
  * @param obj_type type of the object. (e.g. "lv_btn")
@@ -1731,6 +1737,12 @@ static lv_res_t lv_obj_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
             lv_obj_add_state(obj, LV_STATE_FOCUSED);
             lv_obj_clear_state(obj, LV_STATE_EDITED);
         }
+    }
+    else if(sign == LV_SIGNAL_SCROLL_BEGIN) {
+        lv_obj_add_state(obj, LV_STATE_SCROLLED);
+    }
+    else if(sign == LV_SIGNAL_SCROLL_END) {
+        lv_obj_clear_state(obj, LV_STATE_SCROLLED);
     }
     else if(sign == LV_SIGNAL_DEFOCUS) {
         /*if using focus mode, change target to parent*/

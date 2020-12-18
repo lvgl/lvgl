@@ -100,6 +100,7 @@ void _alloc_ext(lv_style_t * style)
     if(style->ext) return;
     style->ext = lv_mem_alloc(sizeof(lv_style_ext_t));
     LV_ASSERT_MEM(style->ext);
+    _lv_memset_00(style->ext, sizeof(lv_style_ext_t));
 }
 
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)

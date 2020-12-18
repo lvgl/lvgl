@@ -13,8 +13,8 @@
  *      DEFINES
  *********************/
 #define LV_OBJX_NAME "lv_obj"
-#define SCROLL_ANIM_TIME_MIN 100    /*ms*/
-#define SCROLL_ANIM_TIME_MAX 300    /*ms*/
+#define SCROLL_ANIM_TIME_MIN 200    /*ms*/
+#define SCROLL_ANIM_TIME_MAX 400    /*ms*/
 
 /**********************
  *      TYPEDEFS
@@ -265,7 +265,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
         lv_anim_path_set_cb(&path, lv_anim_path_ease_out);
 
         if(x) {
-            uint32_t t = lv_anim_speed_to_time((lv_disp_get_hor_res(d) * 3) >> 2, 0, x);
+            uint32_t t = lv_anim_speed_to_time((lv_disp_get_hor_res(d) * 2) >> 2, 0, x);
             if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
             if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
             lv_anim_set_time(&a, t);
@@ -277,7 +277,7 @@ void lv_obj_scroll_by(lv_obj_t * obj, lv_coord_t x, lv_coord_t y, lv_anim_enable
         }
 
         if(y) {
-            uint32_t t = lv_anim_speed_to_time((lv_disp_get_ver_res(d) * 3) >> 2, 0, y);
+            uint32_t t = lv_anim_speed_to_time((lv_disp_get_ver_res(d) * 2) >> 2, 0, y);
             if(t < SCROLL_ANIM_TIME_MIN) t = SCROLL_ANIM_TIME_MIN;
             if(t > SCROLL_ANIM_TIME_MAX) t = SCROLL_ANIM_TIME_MAX;
             lv_anim_set_time(&a, t);

@@ -19,7 +19,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void apply_theme(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name);
+static void apply_theme(lv_theme_t * th, lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
@@ -58,14 +58,12 @@ lv_theme_t * lv_theme_get_act(void)
  * @param obj pointer to an object
  * @param name the name of the theme element to apply. E.g. `LV_THEME_BTN`
  */
-void lv_theme_apply(lv_obj_t * obj, lv_theme_style_t name)
+void lv_theme_apply(lv_obj_t * obj)
 {
-    /* Remove the existing styles from all part of the object. */
     lv_obj_remove_all_styles(obj);
 
     /*Apply the theme including the base theme(s)*/
-
-    apply_theme(act_theme, obj, name);
+    apply_theme(act_theme, obj);
 }
 
 /**
@@ -88,7 +86,6 @@ void lv_theme_copy(lv_theme_t * theme, const lv_theme_t * copy)
         theme->flags = copy->flags;
         theme->base = copy->base;
         theme->apply_cb = copy->apply_cb;
-        theme->apply_xcb = copy->apply_xcb;
     }
 
 }
@@ -183,17 +180,9 @@ uint32_t lv_theme_get_flags(void)
  *   STATIC FUNCTIONS
  **********************/
 
-static void apply_theme(lv_theme_t * th, lv_obj_t * obj, lv_theme_style_t name)
+static void apply_theme(lv_theme_t * th, lv_obj_t * obj)
 {
-    if(th->base) {
-        apply_theme(th->base, obj, name);
-    }
+    if(th->base) apply_theme(th->base, obj);
 
-    /*apply_xcb is deprecated, use apply_cb instead*/
-    if(th->apply_xcb) {
-        th->apply_xcb(obj, name);
-    }
-    else if(th->apply_cb) {
-        th->apply_cb(act_theme, obj, name);
-    }
+    if(th->apply_cb) th->apply_cb(act_theme, obj);
 }

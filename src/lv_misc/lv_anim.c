@@ -259,7 +259,7 @@ lv_anim_value_t lv_anim_path_ease_in(const lv_anim_path_t * path, const lv_anim_
     else
         t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
-    int32_t step = _lv_bezier3(t, 0, 0, 1024 * 1 / 3, 1024);
+    int32_t step = _lv_bezier3(t, 0, 0, 580, 1024);
 
     int32_t new_value;
     new_value = (int32_t)step * (a->end - a->start);
@@ -286,7 +286,7 @@ lv_anim_value_t lv_anim_path_ease_out(const lv_anim_path_t * path, const lv_anim
     else
         t = (uint32_t)((uint32_t)a->act_time * 1024) / a->time;
 
-    int32_t step = _lv_bezier3(t, 0, 1024 * 2 / 3, 1024, 1024);
+    int32_t step = _lv_bezier3(t, 0, 420, 1000, 1024);
 
     int32_t new_value;
     new_value = (int32_t)step * (a->end - a->start);

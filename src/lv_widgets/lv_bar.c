@@ -42,8 +42,6 @@ static void lv_bar_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 static void lv_bar_destructor(void * obj);
 static lv_design_res_t lv_bar_design(lv_obj_t * bar, const lv_area_t * clip_area, lv_design_mode_t mode);
 static lv_res_t lv_bar_signal(lv_obj_t * bar, lv_signal_t sign, void * param);
-static lv_style_list_t * lv_bar_get_style(lv_bar_t * bar, uint8_t part);
-
 static void draw_indic(lv_obj_t * bar, const lv_area_t * clip_area);
 
 #if LV_USE_ANIMATION
@@ -89,11 +87,8 @@ lv_obj_t * lv_bar_create(lv_obj_t * parent, const lv_obj_t * copy)
 
     lv_bar_t * bar = (lv_bar_t *) obj;
     const lv_bar_t * bar_copy = (const lv_bar_t *) copy;
-    if(!copy) lv_theme_apply(obj, LV_THEME_BAR);
-    else {
-        lv_style_list_copy(&bar->style_indic, &bar_copy->style_indic);
-        _lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
-    }
+    if(!copy) lv_theme_apply(obj);
+//    else lv_style_list_copy(&bar->style_indic, &bar_copy->style_indic);
 
     return obj;
 }
@@ -398,7 +393,7 @@ static lv_design_res_t lv_bar_design(lv_obj_t * obj, const lv_area_t * clip_area
         draw_dsc.bg_opa = LV_OPA_TRANSP;
         draw_dsc.border_opa = LV_OPA_TRANSP;
         draw_dsc.shadow_opa = LV_OPA_TRANSP;
-        draw_dsc.pattern_opa = LV_OPA_TRANSP;
+        draw_dsc.content_opa = LV_OPA_TRANSP;
         draw_dsc.outline_opa = LV_OPA_TRANSP;
         lv_obj_init_draw_rect_dsc(obj, LV_BAR_PART_MAIN, &draw_dsc);
         lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
@@ -424,10 +419,10 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
        bar->start_value == bar->min_value) sym = true;
 
     /*Calculate the indicator area*/
-    lv_style_int_t bg_left = lv_obj_get_style_pad_left(obj,     LV_BAR_PART_MAIN);
-    lv_style_int_t bg_right = lv_obj_get_style_pad_right(obj,   LV_BAR_PART_MAIN);
-    lv_style_int_t bg_top = lv_obj_get_style_pad_top(obj,       LV_BAR_PART_MAIN);
-    lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_BAR_PART_MAIN);
+    lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_BAR_PART_MAIN);
+    lv_coord_t bg_right = lv_obj_get_style_pad_right(obj,   LV_BAR_PART_MAIN);
+    lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,       LV_BAR_PART_MAIN);
+    lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_BAR_PART_MAIN);
 
     /*Respect padding and minimum width/height too*/
     lv_area_copy(&bar->indic_area, &bar->coords);
@@ -552,18 +547,14 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
        (!hor && lv_area_get_height(&bar->indic_area) > bg_radius * 2)) {
         lv_opa_t bg_opa = draw_indic_dsc.bg_opa;
         lv_opa_t border_opa = draw_indic_dsc.border_opa;
-        lv_opa_t value_opa = draw_indic_dsc.value_opa;
-        const void * pattern_src = draw_indic_dsc.bg_img_src;
+        lv_opa_t content_opa = draw_indic_dsc.content_opa;
         draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
         draw_indic_dsc.border_opa = LV_OPA_TRANSP;
-        draw_indic_dsc.value_opa = LV_OPA_TRANSP;
-        draw_indic_dsc.bg_img_src = NULL;
+        draw_indic_dsc.content_opa = LV_OPA_TRANSP;
         lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
         draw_indic_dsc.bg_opa = bg_opa;
         draw_indic_dsc.border_opa = border_opa;
-        draw_indic_dsc.value_opa = value_opa;
-        draw_indic_dsc.bg_img_src = pattern_src;
-
+        draw_indic_dsc.content_opa = content_opa;
     }
 
     lv_draw_mask_radius_param_t mask_bg_param;
@@ -573,10 +564,10 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     /*Draw_only the background and the pattern*/
     lv_opa_t shadow_opa = draw_indic_dsc.shadow_opa;
     lv_opa_t border_opa = draw_indic_dsc.border_opa;
-    lv_opa_t value_opa = draw_indic_dsc.value_opa;
+    lv_opa_t content_opa = draw_indic_dsc.content_opa;
     draw_indic_dsc.border_opa = LV_OPA_TRANSP;
     draw_indic_dsc.shadow_opa = LV_OPA_TRANSP;
-    draw_indic_dsc.value_opa = LV_OPA_TRANSP;
+    draw_indic_dsc.content_opa = LV_OPA_TRANSP;
 
     /*Get the max possible indicator area. The gradient should be applied on this*/
     lv_area_t mask_indic_max_area;
@@ -602,20 +593,19 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_draw_rect(&mask_indic_max_area, clip_area, &draw_indic_dsc);
     draw_indic_dsc.border_opa = border_opa;
     draw_indic_dsc.shadow_opa = shadow_opa;
-    draw_indic_dsc.value_opa = value_opa;
+    draw_indic_dsc.content_opa = content_opa;
 
     /*Draw the border*/
     draw_indic_dsc.bg_opa = LV_OPA_TRANSP;
     draw_indic_dsc.shadow_opa = LV_OPA_TRANSP;
-    draw_indic_dsc.value_opa = LV_OPA_TRANSP;
-    draw_indic_dsc.bg_img_src = NULL;
+    draw_indic_dsc.content_opa = LV_OPA_TRANSP;
     lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
 
     lv_draw_mask_remove_id(mask_indic_id);
     lv_draw_mask_remove_id(mask_bg_id);
 
     /*When not masks draw the value*/
-    draw_indic_dsc.value_opa = value_opa;
+    draw_indic_dsc.content_opa = content_opa;
     draw_indic_dsc.border_opa = LV_OPA_TRANSP;
     lv_draw_rect(&bar->indic_area, clip_area, &draw_indic_dsc);
 
@@ -639,13 +629,7 @@ static lv_res_t lv_bar_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     res = lv_bar.base_p->signal_cb(obj, sign, param);
     if(res != LV_RES_OK) return res;
 
-    if(sign == LV_SIGNAL_GET_STYLE) {
-        lv_get_style_info_t * info = param;
-        info->result = lv_bar_get_style(bar, info->part);
-        if(info->result != NULL) return LV_RES_OK;
-        else return lv_bar.base_p->signal_cb(obj, sign, param);
-    }
-    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+    if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         lv_coord_t indic_size;
         indic_size = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_BAR_PART_INDIC);
 
@@ -655,24 +639,6 @@ static lv_res_t lv_bar_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     }
 
     return res;
-}
-
-static lv_style_list_t * lv_bar_get_style(lv_bar_t * bar, uint8_t part)
-{
-    lv_style_list_t * list;
-
-    switch(part) {
-        case LV_BAR_PART_MAIN:
-            list = &bar->style_list;
-            break;
-        case LV_BAR_PART_INDIC:
-            list = &bar->style_indic;
-            break;
-        default:
-            list = NULL;
-    }
-
-    return list;
 }
 
 #if LV_USE_ANIMATION
