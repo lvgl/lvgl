@@ -324,7 +324,6 @@ static void lv_bar_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     bar->start_value = 0;
     bar->cur_value = 0;
     bar->type         = LV_BAR_TYPE_NORMAL;
-    lv_style_list_init(&bar->style_indic);
 
 #if LV_USE_ANIMATION
     bar->anim_time  = 200;
@@ -353,15 +352,15 @@ static void lv_bar_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
 
 static void lv_bar_destructor(void * obj)
 {
-    lv_bar_t * bar = obj;
+//    lv_bar_t * bar = obj;
+//
+//    _lv_obj_reset_style_list_no_refr(obj, LV_PART_INDICATOR);
+//#if LV_USE_ANIMATION
+//    lv_anim_del(&bar->cur_value_anim, NULL);
+//    lv_anim_del(&bar->start_value_anim, NULL);
+//#endif
 
-    _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_INDIC);
-#if LV_USE_ANIMATION
-    lv_anim_del(&bar->cur_value_anim, NULL);
-    lv_anim_del(&bar->start_value_anim, NULL);
-#endif
-
-    bar->class_p->base_p->destructor(obj);
+//    bar->class_p->base_p->destructor(obj);
 }
 
 /**
@@ -395,7 +394,7 @@ static lv_design_res_t lv_bar_design(lv_obj_t * obj, const lv_area_t * clip_area
         draw_dsc.shadow_opa = LV_OPA_TRANSP;
         draw_dsc.content_opa = LV_OPA_TRANSP;
         draw_dsc.outline_opa = LV_OPA_TRANSP;
-        lv_obj_init_draw_rect_dsc(obj, LV_BAR_PART_MAIN, &draw_dsc);
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_dsc);
         lv_draw_rect(&bar->coords, clip_area, &draw_dsc);
     }
     else if(mode == LV_DESIGN_DRAW_POST) {
@@ -419,10 +418,10 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
        bar->start_value == bar->min_value) sym = true;
 
     /*Calculate the indicator area*/
-    lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_BAR_PART_MAIN);
-    lv_coord_t bg_right = lv_obj_get_style_pad_right(obj,   LV_BAR_PART_MAIN);
-    lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,       LV_BAR_PART_MAIN);
-    lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_BAR_PART_MAIN);
+    lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
+    lv_coord_t bg_right = lv_obj_get_style_pad_right(obj,   LV_PART_MAIN);
+    lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
+    lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
     /*Respect padding and minimum width/height too*/
     lv_area_copy(&bar->indic_area, &bar->coords);
@@ -532,13 +531,13 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     /*Do not draw a zero length indicator*/
     if(!sym && indic_length_calc(&bar->indic_area) <= 1) return;
 
-    uint16_t bg_radius = lv_obj_get_style_radius(obj, LV_BAR_PART_MAIN);
+    uint16_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
     lv_coord_t short_side = LV_MATH_MIN(objw, objh);
     if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
 
     lv_draw_rect_dsc_t draw_indic_dsc;
     lv_draw_rect_dsc_init(&draw_indic_dsc);
-    lv_obj_init_draw_rect_dsc(obj, LV_BAR_PART_INDIC, &draw_indic_dsc);
+    lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_indic_dsc);
 
     /* Draw only the shadow if the indicator is long enough.
      * The radius of the bg and the indicator can make a strange shape where
@@ -631,7 +630,7 @@ static lv_res_t lv_bar_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 
     if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
         lv_coord_t indic_size;
-        indic_size = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_BAR_PART_INDIC);
+        indic_size = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_INDICATOR);
 
         /*Bg size is handled by lv_obj*/
         lv_coord_t * s = param;

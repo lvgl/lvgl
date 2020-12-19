@@ -70,14 +70,6 @@ static void trans_anim_ready_cb(lv_anim_t * a);
 static void fade_anim_cb(lv_obj_t * obj, lv_anim_value_t v);
 static void fade_in_anim_ready(lv_anim_t * a);
 #endif
-static void style_snapshot(lv_obj_t * obj, uint8_t part, style_snapshot_t * shot);
-static _lv_style_state_cmp_t style_snapshot_compare(style_snapshot_t * shot1, style_snapshot_t * shot2);
-
-#if LV_STYLE_CACHE_LEVEL >= 1
-static bool style_prop_is_cacheable(lv_style_property_t prop);
-static void update_style_cache(lv_obj_t * obj, uint8_t part, uint16_t prop);
-static void update_style_cache_children(lv_obj_t * obj);
-#endif
 
 /**********************
  *  STATIC VARIABLES
@@ -290,6 +282,16 @@ void lv_obj_fade_out(lv_obj_t * obj, uint32_t time, uint32_t delay)
 }
 #endif
 
+static lv_style_value_t apply_color_filter(const lv_obj_t * obj, uint32_t part, lv_style_value_t v)
+{
+    if(obj == NULL) return v;
+    lv_color_filter_cb_t f = lv_obj_get_style_color_filter_cb(obj, part);
+    if(f) {
+        lv_opa_t f_opa = lv_obj_get_style_color_filter_opa(obj, part);
+        if(f_opa != 0) v._color = f(v._color, f_opa);
+    }
+    return v;
+}
 
 /**
  * Get a style property of a part of an object in the object's current state.
@@ -311,6 +313,7 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, uint8_t part, lv_st
     lv_style_value_t value_final;
     bool found = false;
     bool inherit = prop & LV_STYLE_PROP_INHERIT ? true : false;
+    bool filter = prop & LV_STYLE_PROP_FILTER ? true : false;
     const lv_obj_t * parent = obj;
     while(parent) {
         int32_t weight = -1;
@@ -324,7 +327,10 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, uint8_t part, lv_st
             if(skip_trans) continue;
             if(obj_style->part != part) continue;
             found = lv_style_get_prop(obj_style->style, prop, &value_act);
-            if(found) return value_act;
+            if(found) {
+                if(filter) value_act = apply_color_filter(parent, part, value_act);
+                return value_act;
+            }
         }
 
         for(; i < parent->style_list.style_cnt; i++) {
@@ -341,14 +347,20 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, uint8_t part, lv_st
             found = lv_style_get_prop(obj_style->style, prop, &value_act);
 
             if(found) {
-                if(obj_style->state == state) return value_act;
+                if(obj_style->state == state) {
+                    if(filter) value_act = apply_color_filter(parent, part, value_act);
+                    return value_act;
+                }
                 if(weight < obj_style->state) {
                     weight = obj_style->state;
                     value_final = value_act;
                 }
             }
         }
-        if(weight >= 0) return value_final;
+        if(weight >= 0) {
+            if(filter) value_final = apply_color_filter(parent, part, value_final);
+            return value_final;
+        }
         if(!inherit) break;
 
         /*If not found, check the `MAIN` style first*/
@@ -361,7 +373,9 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, uint8_t part, lv_st
         parent = lv_obj_get_parent(parent);
     }
 
-    return lv_style_prop_get_default(prop);
+    value_act = lv_style_prop_get_default(prop);
+    if(filter) value_act = apply_color_filter(parent, part, value_act);
+    return value_act;
 }
 
 /**
@@ -712,11 +726,12 @@ static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
             case LV_STYLE_SHADOW_BLEND_MODE:
             case LV_STYLE_TEXT_BLEND_MODE:
             case LV_STYLE_LINE_BLEND_MODE:
-                if(v < 128) value_final._int = tr->start_value._int;
+                if(v < 255) value_final._int = tr->start_value._int;
                 else value_final._int = tr->end_value._int;
                 break;
             case LV_STYLE_TEXT_FONT:
-                if(v < 128) value_final._ptr = tr->start_value._ptr;
+            case LV_STYLE_COLOR_FILTER_CB:
+                if(v < 255) value_final._ptr = tr->start_value._ptr;
                 else value_final._ptr = tr->end_value._ptr;
                 break;
 

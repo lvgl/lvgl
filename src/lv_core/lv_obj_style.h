@@ -164,6 +164,7 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(struct _lv_obj_t * obj, lv_sta
 /*********************
  * OBJ STYLE GET
  *********************/
+
 static inline lv_coord_t lv_obj_get_style_radius(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_RADIUS); return v._int; }
 
@@ -184,6 +185,12 @@ static inline lv_coord_t lv_obj_get_style_transform_angle(const struct _lv_obj_t
 
 static inline lv_opa_t lv_obj_get_style_opa(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_OPA); return v._int; }
+
+static inline lv_color_filter_cb_t lv_obj_get_style_color_filter_cb(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_COLOR_FILTER_CB); return (lv_color_filter_cb_t)v._func; }
+
+static inline lv_opa_t lv_obj_get_style_color_filter_opa(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_COLOR_FILTER_OPA); return v._int; }
 
 static inline lv_coord_t lv_obj_get_style_pad_top(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_PAD_TOP); return v._int; }
@@ -212,11 +219,17 @@ static inline lv_coord_t lv_obj_get_style_margin_right(const struct _lv_obj_t * 
 static inline lv_color_t lv_obj_get_style_bg_color(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BG_COLOR); return v._color; }
 
+static inline lv_color_t lv_obj_get_style_bg_color_filtered(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BG_COLOR_FILTERED); return v._color; }
+
 static inline lv_opa_t lv_obj_get_style_bg_opa(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BG_OPA); return v._int; }
 
 static inline lv_color_t lv_obj_get_style_bg_grad_color(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BG_GRAD_COLOR); return v._color; }
+
+static inline lv_color_t lv_obj_get_style_bg_grad_color_filtered(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BG_GRAD_COLOR_FILTERED); return v._color; }
 
 static inline lv_grad_dir_t lv_obj_get_style_bg_grad_dir(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BG_GRAD_DIR); return v._int; }
@@ -232,6 +245,9 @@ static inline lv_coord_t lv_obj_get_style_bg_grad_stop(const struct _lv_obj_t * 
 
 static inline lv_color_t lv_obj_get_style_border_color(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BORDER_COLOR); return v._color; }
+
+static inline lv_color_t lv_obj_get_style_border_color_filtered(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BORDER_COLOR_FILTERED); return v._color; }
 
 static inline lv_opa_t lv_obj_get_style_border_opa(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_BORDER_OPA); return v._int; }
@@ -250,6 +266,9 @@ static inline lv_blend_mode_t lv_obj_get_style_border_blend_mode(const struct _l
 
 static inline lv_color_t lv_obj_get_style_text_color(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_COLOR); return v._color; }
+
+static inline lv_color_t lv_obj_get_style_text_color_filtered(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_COLOR_FILTERED); return v._color; }
 
 static inline lv_opa_t lv_obj_get_style_text_opa(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TEXT_OPA); return v._int; }
@@ -277,6 +296,9 @@ static inline lv_blend_mode_t lv_obj_get_style_img_blend_mode(const struct _lv_o
 
 static inline lv_color_t lv_obj_get_style_img_recolor(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_IMG_RECOLOR); return v._color; }
+
+static inline lv_color_t lv_obj_get_style_img_recolor_filtered(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_IMG_RECOLOR_FILTERED); return v._color; }
 
 static inline lv_opa_t lv_obj_get_style_img_recolor_opa(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_IMG_RECOLOR_OPA); return v._int; }
@@ -314,6 +336,9 @@ static inline lv_blend_mode_t lv_obj_get_style_shadow_blend_mode(const struct _l
 static inline lv_color_t lv_obj_get_style_shadow_color(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_SHADOW_COLOR); return v._color; }
 
+static inline lv_color_t lv_obj_get_style_shadow_color_filtered(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_SHADOW_COLOR_FILTERED); return v._color; }
+
 static inline lv_opa_t lv_obj_get_style_shadow_opa(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_SHADOW_OPA); return v._int; }
 
@@ -335,10 +360,13 @@ static inline lv_coord_t lv_obj_get_style_line_rounded(const struct _lv_obj_t * 
 static inline lv_color_t lv_obj_get_style_line_color(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_LINE_COLOR); return v._color; }
 
+static inline lv_color_t lv_obj_get_style_line_color_filtered(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_LINE_COLOR_FILTERED); return v._color; }
+
 static inline lv_opa_t lv_obj_get_style_line_opa(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_LINE_OPA); return v._int; }
 
-static inline const char * lv_obj_get_style_content_text(const struct _lv_obj_t * obj, uint32_t part) {
+static inline const char * lv_obj_get_style_content_src(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_CONTENT_SRC); return v._ptr; }
 
 static inline lv_align_t lv_obj_get_style_content_align(const struct _lv_obj_t * obj, uint32_t part) {
@@ -376,7 +404,6 @@ static inline lv_style_prop_t lv_obj_get_style_transition_prop_5(const struct _l
 
 static inline lv_style_prop_t lv_obj_get_style_transition_prop_6(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION_PROP_6); return v._int; }
-
 
 
 /**********************

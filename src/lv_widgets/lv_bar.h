@@ -81,7 +81,6 @@ LV_CLASS_DECLARE_START(lv_bar, lv_obj);
   lv_area_t indic_area;   /*Save the indicator area. Might be used by derived types*/ \
   _lv_bar_anim_data \
   uint8_t type : 2;           /*Type of bar*/                     \
-  lv_style_list_t style_indic; /*Style of the indicator*/
 
 #define _lv_bar_class_dsc        \
   _lv_obj_class_dsc              \
@@ -89,14 +88,6 @@ LV_CLASS_DECLARE_START(lv_bar, lv_obj);
 LV_CLASS_DECLARE_END(lv_bar, lv_obj);
 
 extern lv_bar_class_t lv_bar;
-
-/** Bar parts */
-enum {
-    LV_BAR_PART_MAIN, /** Bar background style. */
-    LV_BAR_PART_INDIC, /** Bar fill area style. */
-    _LV_BAR_PART_VIRTUAL_LAST
-};
-typedef uint8_t lv_bar_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES

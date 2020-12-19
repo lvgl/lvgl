@@ -228,6 +228,16 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
          style->ext->opa = value._int;
          style->ext->has_opa = 1;
          break;
+     case LV_STYLE_COLOR_FILTER_CB:
+         _alloc_ext(style);
+         style->ext->color_filter_cb = (lv_color_filter_cb_t)value._func;
+         style->ext->has_color_filter_cb = 1;
+         break;
+     case LV_STYLE_COLOR_FILTER_OPA:
+         _alloc_ext(style);
+         style->ext->color_filter_opa = value._int;
+         style->ext->has_color_filter_opa = 1;
+         break;
 
      case LV_STYLE_PAD_TOP:
          style->pad_top = value._int;
@@ -569,6 +579,12 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
       case LV_STYLE_OPA:
           if(style->ext && style->ext->has_opa) { value->_int = style->ext->opa; return true; }
           break;
+      case LV_STYLE_COLOR_FILTER_CB:
+          if(style->ext && style->ext->has_color_filter_cb) { value->_func = (void(*)(void)) style->ext->color_filter_cb; return true; }
+          break;
+      case LV_STYLE_COLOR_FILTER_OPA:
+          if(style->ext && style->ext->has_color_filter_opa) { value->_int = style->ext->color_filter_opa; return true; }
+          break;
 
       case LV_STYLE_PAD_TOP:
           if(style->has_pad_top) { value->_int = style->pad_top; return true; }
@@ -596,12 +612,14 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           break;
 
       case LV_STYLE_BG_COLOR:
+      case LV_STYLE_BG_COLOR_FILTERED:
           if(style->has_bg_color) { value->_color = style->bg_color; return true; }
           break;
       case LV_STYLE_BG_OPA:
           if(style->has_bg_opa) { value->_int = style->bg_opa; return true; }
           break;
       case LV_STYLE_BG_GRAD_COLOR:
+      case LV_STYLE_BG_GRAD_COLOR_FILTERED:
           if(style->ext && style->ext->has_bg_grad_color) { value->_color = style->ext->bg_grad_color; return true; }
           break;
       case LV_STYLE_BG_GRAD_DIR:
@@ -618,6 +636,7 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           break;
 
       case LV_STYLE_BORDER_COLOR:
+      case LV_STYLE_BORDER_COLOR_FILTERED:
           if(style->has_border_color) { value->_color = style->border_color; return true; }
           break;
       case LV_STYLE_BORDER_OPA:
@@ -637,6 +656,7 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           break;
 
       case LV_STYLE_TEXT_COLOR:
+      case LV_STYLE_TEXT_COLOR_FILTERED:
           if(style->has_text_color) { value->_color = style->text_color; return true; }
           break;
       case LV_STYLE_TEXT_OPA:
@@ -665,6 +685,7 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           if(style->ext && style->ext->has_img_blend_mode) { value->_int = style->ext->img_blend_mode; return true; }
           break;
       case LV_STYLE_IMG_RECOLOR:
+      case LV_STYLE_IMG_RECOLOR_FILTERED:
           if(style->ext && style->ext->has_img_recolor) { value->_color = style->ext->img_recolor; return true; }
           break;
       case LV_STYLE_IMG_RECOLOR_OPA:
@@ -676,6 +697,7 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           if(style->ext && style->ext->has_outline_width) { value->_int = style->ext->outline_width; return true; }
           break;
       case LV_STYLE_OUTLINE_COLOR:
+      case LV_STYLE_OUTLINE_COLOR_FILTERED:
           if(style->ext && style->ext->has_outline_color) { value->_color = style->ext->outline_color; return true; }
           break;
       case LV_STYLE_OUTLINE_OPA:
@@ -704,6 +726,7 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           if(style->ext && style->ext->has_shadow_blend_mode) { value->_int = style->ext->shadow_blend_mode; return true; }
           break;
       case LV_STYLE_SHADOW_COLOR:
+      case LV_STYLE_SHADOW_COLOR_FILTERED:
           if(style->ext && style->ext->has_shadow_color) { value->_color = style->ext->shadow_color; return true; }
           break;
       case LV_STYLE_SHADOW_OPA:
@@ -726,6 +749,7 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           if(style->ext && style->ext->has_line_rounded) { value->_int = style->ext->line_rounded; return true; }
           break;
       case LV_STYLE_LINE_COLOR:
+      case LV_STYLE_LINE_COLOR_FILTERED:
           if(style->ext && style->ext->has_line_color) { value->_color = style->ext->line_color; return true; }
           break;
       case LV_STYLE_LINE_OPA:
@@ -804,10 +828,16 @@ static bool remove_prop(lv_style_t * style, lv_style_prop_t prop)
     case LV_STYLE_TRANSFORM_ANGLE:
         if(style->ext) style->ext->has_transform_angle = 0;
         break;
-
     case LV_STYLE_OPA:
         if(style->ext) style->ext->has_opa = 0;
         break;
+    case LV_STYLE_COLOR_FILTER_CB:
+        if(style->ext) style->ext->has_color_filter_cb = 0;
+        break;
+    case LV_STYLE_COLOR_FILTER_OPA:
+        if(style->ext) style->ext->has_color_filter_opa = 0;
+        break;
+
     case LV_STYLE_PAD_TOP:
         style->has_pad_top = 0;
         break;

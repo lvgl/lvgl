@@ -68,7 +68,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
     if(draw_dsc->bg_opa != LV_OPA_TRANSP) {
         draw_dsc->bg_opa = lv_obj_get_style_bg_opa(obj, part);
         if(draw_dsc->bg_opa > LV_OPA_MIN) {
-            draw_dsc->bg_color = lv_obj_get_style_bg_color(obj, part);
+            draw_dsc->bg_color = lv_obj_get_style_bg_color_filtered(obj, part);
             draw_dsc->bg_grad_dir =  lv_obj_get_style_bg_grad_dir(obj, part);
             if(draw_dsc->bg_grad_dir != LV_GRAD_DIR_NONE) {
                 draw_dsc->bg_grad_color = lv_obj_get_style_bg_grad_color(obj, part);
@@ -115,7 +115,7 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
 
 #if LV_USE_PATTERN
     if(draw_dsc->content_opa != LV_OPA_TRANSP) {
-        draw_dsc->content_src = lv_obj_get_style_content_text(obj, part);
+        draw_dsc->content_src = lv_obj_get_style_content_src(obj, part);
         if(draw_dsc->content_src) {
             draw_dsc->content_ofs_y = lv_obj_get_style_content_ofs_y(obj, part);
             draw_dsc->content_ofs_x = lv_obj_get_style_content_ofs_x(obj, part);
@@ -331,7 +331,7 @@ lv_coord_t _lv_obj_get_draw_rect_ext_pad_size(lv_obj_t * obj, uint8_t part)
         }
     }
 
-    const void * content_src = lv_obj_get_style_content_text(obj, part);
+    const void * content_src = lv_obj_get_style_content_src(obj, part);
     if(content_src) {
         lv_opa_t content_opa;
         lv_point_t content_size;

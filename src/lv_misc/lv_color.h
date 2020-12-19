@@ -292,6 +292,9 @@ typedef struct {
 typedef uint8_t lv_opa_t;
 //! @endcond
 
+
+typedef lv_color_t (*lv_color_filter_cb_t)(lv_color_t, lv_opa_t);
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
@@ -672,6 +675,8 @@ LV_ATTRIBUTE_FAST_MEM void lv_color_fill(lv_color_t * buf, lv_color_t color, uin
 lv_color_t lv_color_lighten(lv_color_t c, lv_opa_t lvl);
 
 lv_color_t lv_color_darken(lv_color_t c, lv_opa_t lvl);
+
+lv_color_t lv_color_change_lightness(lv_color_t c, lv_opa_t lvl);
 
 /**
  * Convert a HSV color to RGB

@@ -46,7 +46,6 @@ LV_CLASS_DECLARE_START(lv_slider, lv_bar)
 
 #define _lv_slider_data                                       \
   _lv_bar_data                                                \
-  lv_style_list_t style_knob; /*Style of the knob*/           \
   lv_area_t left_knob_area;                                   \
   lv_area_t right_knob_area;                                  \
   int16_t * value_to_set; /* Which bar value to set */        \
@@ -58,13 +57,7 @@ LV_CLASS_DECLARE_START(lv_slider, lv_bar)
 
 LV_CLASS_DECLARE_END(lv_slider, lv_bar)
 
-/** Built-in styles of slider*/
-enum {
-    LV_SLIDER_PART_MAIN = LV_BAR_PART_MAIN, /** Slider background style. */
-    LV_SLIDER_PART_INDIC = LV_BAR_PART_INDIC, /** Slider indicator (filled area) style. */
-    LV_SLIDER_PART_KNOB = _LV_BAR_PART_VIRTUAL_LAST, /** Slider knob style. */
-    _LV_SLIDER_PART_VIRTUAL_LAST
-};
+extern lv_slider_class_t lv_slider;
 
 /**********************
  * GLOBAL PROTOTYPES
