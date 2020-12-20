@@ -365,6 +365,27 @@ const char ** lv_calendar_get_month_names(const lv_obj_t * calendar)
     return ext->month_names;
 }
 
+/**
+ * Get the day of the week
+ * @param year a year
+ * @param month a  month (1..12)
+ * @param day a day (1..31)
+ * @return [0..6] which means [Sun..Sat] or [Mon..Sun] depending on LV_CALENDAR_WEEK_STARTS_MONDAY
+ */
+uint8_t lv_calendar_get_day_of_week(uint32_t year, uint32_t month, uint32_t day)
+{
+    uint32_t a = month < 3 ? 1 : 0;
+    uint32_t b = year - a;
+
+#if LV_CALENDAR_WEEK_STARTS_MONDAY
+    uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400) - 1) % 7;
+#else
+    uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400)) % 7;
+#endif
+
+    return day_of_week;
+}
+
 /*=====================
  * Other functions
  *====================*/
@@ -1065,27 +1086,6 @@ static uint8_t get_month_length(int32_t year, int32_t month)
 static uint8_t is_leap_year(uint32_t year)
 {
     return (year % 4) || ((year % 100 == 0) && (year % 400)) ? 0 : 1;
-}
-
-/**
- * Get the day of the week
- * @param year a year
- * @param month a  month
- * @param day a day
- * @return [0..6] which means [Sun..Sat] or [Mon..Sun] depending on LV_CALENDAR_WEEK_STARTS_MONDAY
- */
-static uint8_t get_day_of_week(uint32_t year, uint32_t month, uint32_t day)
-{
-    uint32_t a = month < 3 ? 1 : 0;
-    uint32_t b = year - a;
-
-#if LV_CALENDAR_WEEK_STARTS_MONDAY
-    uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400) - 1) % 7;
-#else
-    uint32_t day_of_week = (day + (31 * (month - 2 + 12 * a) / 12) + b + (b / 4) - (b / 100) + (b / 400)) % 7;
-#endif
-
-    return day_of_week;
 }
 
 #endif

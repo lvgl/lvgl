@@ -182,6 +182,15 @@ const char ** lv_calendar_get_day_names(const lv_obj_t * calendar);
  */
 const char ** lv_calendar_get_month_names(const lv_obj_t * calendar);
 
+/**
+ * Get the day of the week
+ * @param year a year
+ * @param month a  month (1..12)
+ * @param day a day (1..31)
+ * @return [0..6] which means [Sun..Sat] or [Mon..Sun] depending on LV_CALENDAR_WEEK_STARTS_MONDAY
+ */
+uint8_t lv_calendar_get_day_of_week(uint32_t year, uint32_t month, uint32_t day);
+
 /*=====================
  * Other functions
  *====================*/
