@@ -1331,6 +1331,10 @@ static void draw_value_str(const lv_area_t * coords, const lv_area_t * clip, con
     label_dsc.opa = dsc->value_opa;
 
     lv_draw_label(&value_area, clip, &label_dsc, str, NULL);
+
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    _lv_mem_buf_release(str);
+#endif
 }
 #endif
 

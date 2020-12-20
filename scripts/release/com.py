@@ -85,10 +85,10 @@ def update_version(ver):
     
     templ = fnmatch.filter(os.listdir('.'), '*_templ*.h')
     
-    if len(templ) > 0 and templ[0]:    
+    if len(templ) > 0 and templ[0]:
         print("Updating version in " + templ[0])
-        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+/"+ "v" + ver_num + "/' " + templ[0])
-    
+        cmd("sed -i -r 's/v[0-9]+\.[0-9]+\.[0-9]+.*/"+ "v" + ver_num + "/' " + templ[0])
+
     if os.path.exists("library.json"):  
         print("Updating version in library.json")
         cmd("sed -i -r 's/[0-9]+\.[0-9]+\.[0-9]+/"+ ver_num +"/' library.json")
@@ -100,6 +100,9 @@ def update_version(ver):
     if path.exists("conf.py"):  
         cmd("sed -i -r \"s/'v[0-9]+\.[0-9]+\.[0-9]+.*'/\'" + ver_str + "'/\" conf.py")   
         
+    if path.exists("Kconfig"):
+        cmd("sed -i -r \"s/'v[0-9]+\.[0-9]+\.[0-9]+.*'/\'" + ver_str + "'/\" Kconfig")
+
     if path.exists("lvgl.h"):  
         define_set("./lvgl.h", "LVGL_VERSION_MAJOR", str(ver[0]))
         define_set("./lvgl.h", "LVGL_VERSION_MINOR", str(ver[1]))
