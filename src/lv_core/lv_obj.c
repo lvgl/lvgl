@@ -47,6 +47,7 @@
 #define LV_OBJ_DEF_WIDTH    (LV_DPX(100))
 #define LV_OBJ_DEF_HEIGHT   (LV_DPX(50))
 #define GRID_DEBUG          0   /*Draw rectangles on grid cells*/
+#define STYLE_TRANSITION_MAX 32
 
 /**********************
  *      TYPEDEFS
@@ -73,6 +74,22 @@ static void lv_obj_destructor(void * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
+static const uint16_t trans_prop_def[] =
+{
+        LV_STYLE_RADIUS, LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT, LV_STYLE_TRANSFORM_ZOOM, LV_STYLE_TRANSFORM_ANGLE, LV_STYLE_OPA,
+        LV_STYLE_COLOR_FILTER_CB, LV_STYLE_COLOR_FILTER_OPA,
+        LV_STYLE_PAD_TOP, LV_STYLE_PAD_BOTTOM, LV_STYLE_PAD_LEFT, LV_STYLE_PAD_RIGHT,
+        LV_STYLE_MARGIN_TOP, LV_STYLE_MARGIN_BOTTOM, LV_STYLE_MARGIN_LEFT, LV_STYLE_MARGIN_RIGHT,
+        LV_STYLE_BG_COLOR, LV_STYLE_BG_OPA, LV_STYLE_BG_GRAD_COLOR, LV_STYLE_BG_MAIN_STOP, LV_STYLE_BG_GRAD_STOP,
+        LV_STYLE_BORDER_COLOR, LV_STYLE_BORDER_OPA, LV_STYLE_BORDER_WIDTH,
+        LV_STYLE_TEXT_COLOR, LV_STYLE_TEXT_OPA, LV_STYLE_TEXT_FONT, LV_STYLE_TEXT_LETTER_SPACE, LV_STYLE_TEXT_LINE_SPACE,
+        LV_STYLE_IMG_OPA, LV_STYLE_IMG_RECOLOR, LV_STYLE_IMG_RECOLOR_OPA,
+        LV_STYLE_OUTLINE_WIDTH, LV_STYLE_OUTLINE_COLOR, LV_STYLE_OUTLINE_OPA, LV_STYLE_OUTLINE_PAD,
+        LV_STYLE_SHADOW_WIDTH, LV_STYLE_SHADOW_OFS_X, LV_STYLE_SHADOW_OFS_Y, LV_STYLE_SHADOW_SPREAD, LV_STYLE_SHADOW_COLOR, LV_STYLE_SHADOW_OPA,
+        LV_STYLE_LINE_WIDTH, LV_STYLE_LINE_COLOR, LV_STYLE_LINE_OPA,
+        LV_STYLE_CONTENT_OFS_X, LV_STYLE_CONTENT_OFS_Y,
+        0
+};
 static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
 static const void * event_act_data;
@@ -633,28 +650,54 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
     /*If there is no difference in styles there is nothing else to do*/
     if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
 
-    uint8_t part;
-    for(part = 0; part < _LV_OBJ_PART_MAX; part++) {
-        uint16_t time = lv_obj_get_style_transition_time(obj, part);
-        if(time == 0) continue;
+    typedef struct {
+        uint16_t time;
+        uint16_t delay;
+        lv_part_t part;
+        lv_state_t state;
+        lv_style_prop_t prop;
+        const lv_anim_path_t * path;
+    }trans_set_t;
 
-        lv_style_prop_t props[LV_STYLE_TRANS_NUM_MAX];
-        uint16_t delay = lv_obj_get_style_transition_delay(obj, part);
-        const lv_anim_path_t * path = lv_obj_get_style_transition_path(obj, part);
-        props[0] = lv_obj_get_style_transition_prop_1(obj, part);
-        props[1] = lv_obj_get_style_transition_prop_2(obj, part);
-        props[2] = lv_obj_get_style_transition_prop_3(obj, part);
-        props[3] = lv_obj_get_style_transition_prop_4(obj, part);
-        props[4] = lv_obj_get_style_transition_prop_5(obj, part);
-        props[5] = lv_obj_get_style_transition_prop_6(obj, part);
+    trans_set_t * ts = _lv_mem_buf_get(sizeof(trans_set_t) * STYLE_TRANSITION_MAX);
+    _lv_memset_00(ts, sizeof(sizeof(trans_set_t) * 64));
+    uint32_t tsi = 0;
+    uint32_t i;
+    for(i = 0; i < obj->style_list.style_cnt && tsi < STYLE_TRANSITION_MAX; i++) {
+        lv_obj_style_t * obj_style = &obj->style_list.styles[i];
+        if(obj_style->state & (~new_state)) continue; /*Skip unrelated styles*/
+        if(obj_style->is_trans) continue;
 
-        uint8_t i;
-        for(i = 0; i < LV_STYLE_TRANS_NUM_MAX; i++) {
-            if(props[i] != _LV_STYLE_PROP_INV) {
-                _lv_obj_create_style_transition(obj, props[i], part, prev_state, new_state, time, delay, path);
+        lv_style_value_t v;
+        if(lv_style_get_prop(obj_style->style, LV_STYLE_TRANSITION, &v) == false) continue;
+        const lv_style_transiton_t * tr = v._ptr;
+
+        /*Add the props t the set is not added yet or added but with smaller weight*/
+        uint32_t j;
+        for(j = 0; tr->props[j] != 0 && tsi < STYLE_TRANSITION_MAX; j++) {
+            uint32_t t;
+            for(t = 0; t < tsi; t++) {
+                if(ts[t].prop == tr->props[j] && ts[t].state > obj_style->state) break;
+            }
+
+            /*If not found  add it*/
+            if(t == tsi) {
+                ts[tsi].time = tr->time;
+                ts[tsi].delay = tr->delay;
+                ts[tsi].path = tr->path;
+                ts[tsi].prop = tr->props[j];
+                ts[tsi].part = obj_style->part;
+                ts[tsi].state = obj_style->state;
+                tsi++;
             }
         }
     }
+
+    for(i = 0;i < tsi; i++) {
+        _lv_obj_create_style_transition(obj, ts[i].prop, ts[i].part, prev_state, new_state, ts[i].time, ts[i].delay, ts[i].path);
+    }
+
+    _lv_mem_buf_release(ts);
 
     if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) _lv_obj_refresh_style(obj, LV_STYLE_PROP_ALL);
     else if(cmp_res == _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) _lv_obj_refresh_ext_draw_pad(obj);
@@ -1259,7 +1302,7 @@ lv_res_t _lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name)
  * @param obj pointer to an object which type should be get
  * @param buf pointer to an `lv_obj_type_t` buffer to store the types
  */
-void * lv_obj_check_type(const lv_obj_t * obj, void * class_p)
+bool lv_obj_check_type(const lv_obj_t * obj, void * class_p)
 {
     return obj->class_p == class_p ? true : false;
 }

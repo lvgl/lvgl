@@ -257,6 +257,8 @@ enum {
     LV_PART_HIGHLIGHT,
 };
 
+typedef uint8_t lv_part_t;
+
 /** Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
 typedef struct {
     const char * type[LV_MAX_ANCESTOR_NUM]; /**< [0]: the actual type, [1]: ancestor, [2] #1's ancestor
@@ -681,7 +683,7 @@ bool lv_obj_hit_test(lv_obj_t * obj, lv_point_t * point);
  */
 void * lv_obj_get_ext_attr(const lv_obj_t * obj);
 
-void * lv_obj_check_type(const lv_obj_t * obj, void * class_p);
+bool lv_obj_check_type(const lv_obj_t * obj, void * class_p);
 
 #if LV_USE_USER_DATA
 /**

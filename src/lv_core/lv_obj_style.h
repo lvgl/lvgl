@@ -378,32 +378,8 @@ static inline lv_coord_t lv_obj_get_style_content_ofs_x(const struct _lv_obj_t *
 static inline lv_coord_t lv_obj_get_style_content_ofs_y(const struct _lv_obj_t * obj, uint32_t part) {
   lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_CONTENT_OFS_Y); return v._int; }
 
-static inline uint16_t lv_obj_get_style_transition_time(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION_TIME); return v._int; }
-
-static inline uint16_t lv_obj_get_style_transition_delay(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION_DELAY); return v._int; }
-
-static inline const lv_anim_path_t * lv_obj_get_style_transition_path(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION_PATH); return v._ptr; }
-
-static inline lv_style_prop_t lv_obj_get_style_transition_prop_1(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION_PROP_1); return v._int; }
-
-static inline lv_style_prop_t lv_obj_get_style_transition_prop_2(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION_PROP_2); return v._int; }
-
-static inline lv_style_prop_t lv_obj_get_style_transition_prop_3(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION_PROP_3); return v._int; }
-
-static inline lv_style_prop_t lv_obj_get_style_transition_prop_4(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION_PROP_4); return v._int; }
-
-static inline lv_style_prop_t lv_obj_get_style_transition_prop_5(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION_PROP_5); return v._int; }
-
-static inline lv_style_prop_t lv_obj_get_style_transition_prop_6(const struct _lv_obj_t * obj, uint32_t part) {
-  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION_PROP_6); return v._int; }
+static inline const lv_style_transiton_t * lv_obj_get_style_transition(const struct _lv_obj_t * obj, uint32_t part) {
+  lv_style_value_t v = lv_obj_get_style_prop(obj, part, LV_STYLE_TRANSITION); return v._ptr; }
 
 
 /**********************

@@ -32,7 +32,6 @@ typedef struct {
     lv_style_value_t end_value;
 } lv_style_trans_t;
 
-
 typedef struct {
     lv_draw_rect_dsc_t rect;
     lv_draw_label_dsc_t label;
@@ -513,7 +512,7 @@ void _lv_obj_create_style_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8
     obj->state = new_state;
     lv_style_value_t v2 = lv_obj_get_style_prop(obj, part, prop);
     obj->style_list.skip_trans = 0;
-//    if(memcmp(&v1, &v2, sizeof(lv_style_value_t) == 0))  return;
+
     if(v1._ptr == v2._ptr && v1._int == v2._int && v1._color.full == v2._color.full)  return;
     obj->state = prev_state;
     v1 = lv_obj_get_style_prop(obj, part, prop);
@@ -581,16 +580,23 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
         if(valid1 != valid2) {
             lv_style_t * style = list->styles[i].style;
 
-            /*If there is layout difference, return immediately. There is no more serious difference*/
-            if(list->styles[i].part == LV_PART_MAIN) {
-                if(style->has_pad_bottom) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-                if(style->has_pad_top) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-                if(style->has_pad_left) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-                if(style->has_pad_right) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-                if(style->ext && style->ext->has_margin_bottom) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-                if(style->ext && style->ext->has_margin_top) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-                if(style->ext && style->ext->has_margin_left) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-                if(style->ext && style->ext->has_margin_right) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            /*If there is layout difference on the main part, return immediately. There is no more serious difference*/
+            _lv_style_state_cmp_t res_tmp = res;
+            if(style->has_pad_bottom) res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->has_pad_top)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->has_pad_left)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->has_pad_right)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->ext && style->ext->has_margin_bottom)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->ext && style->ext->has_margin_top)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->ext && style->ext->has_margin_left)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->ext && style->ext->has_margin_right)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+
+            if(res_tmp == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
+                if(list->styles[i].part == LV_PART_MAIN) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+                else {
+                    res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+                    continue;
+                }
             }
 
             /*Check for draw pad changes*/
@@ -611,7 +617,7 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
             else if(style->ext && style->ext->has_content_ofs_y) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else if(style->ext && style->ext->has_content_align) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
             else {
-                res = _LV_STYLE_STATE_CMP_DIFF_REDRAW;
+                if(res != _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) res = _LV_STYLE_STATE_CMP_DIFF_REDRAW;
             }
         }
     }
@@ -712,14 +718,9 @@ static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
 
         lv_style_value_t value_final;
         switch (tr->prop) {
+
             case LV_STYLE_BORDER_SIDE:
             case LV_STYLE_BORDER_POST:
-            case LV_STYLE_TRANSITION_PROP_1:
-            case LV_STYLE_TRANSITION_PROP_2:
-            case LV_STYLE_TRANSITION_PROP_3:
-            case LV_STYLE_TRANSITION_PROP_4:
-            case LV_STYLE_TRANSITION_PROP_5:
-            case LV_STYLE_TRANSITION_PROP_6:
             case LV_STYLE_BG_BLEND_MODE:
             case LV_STYLE_BORDER_BLEND_MODE:
             case LV_STYLE_OUTLINE_BLEND_MODE:
@@ -729,12 +730,17 @@ static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
                 if(v < 255) value_final._int = tr->start_value._int;
                 else value_final._int = tr->end_value._int;
                 break;
+            case LV_STYLE_TRANSITION:
             case LV_STYLE_TEXT_FONT:
-            case LV_STYLE_COLOR_FILTER_CB:
                 if(v < 255) value_final._ptr = tr->start_value._ptr;
                 else value_final._ptr = tr->end_value._ptr;
                 break;
-
+            case LV_STYLE_COLOR_FILTER_CB:
+                if(tr->start_value._func == NULL) value_final._ptr = tr->end_value._func;
+                else if(tr->end_value._func == NULL) value_final._ptr = tr->start_value._func;
+                else if(v < 128) value_final._ptr = tr->start_value._ptr;
+                else value_final._ptr = tr->end_value._ptr;
+                break;
             case LV_STYLE_BG_COLOR:
             case LV_STYLE_BORDER_COLOR:
             case LV_STYLE_TEXT_COLOR:

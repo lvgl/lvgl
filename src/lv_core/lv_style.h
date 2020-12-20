@@ -37,8 +37,6 @@ LV_EXPORT_CONST_INT(LV_RADIUS_CIRCLE);
 #define LV_STYLE_PROP_LAYOUT_REFR   (1 << 12)
 #define LV_STYLE_PROP_FILTER        (1 << 13)
 
-#define LV_STYLE_TRANS_NUM_MAX      6
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -167,34 +165,22 @@ typedef enum {
     LV_STYLE_CONTENT_OFS_X = 92 | LV_STYLE_PROP_EXT_DRAW,
     LV_STYLE_CONTENT_OFS_Y = 93 | LV_STYLE_PROP_EXT_DRAW,
 
-    LV_STYLE_TRANSITION_TIME = 100,
-    LV_STYLE_TRANSITION_DELAY = 101,
-    LV_STYLE_TRANSITION_PATH = 102,
-    LV_STYLE_TRANSITION_PROP_1 = 103,
-    LV_STYLE_TRANSITION_PROP_2 = 104,
-    LV_STYLE_TRANSITION_PROP_3 = 105,
-    LV_STYLE_TRANSITION_PROP_4 = 106,
-    LV_STYLE_TRANSITION_PROP_5 = 107,
-    LV_STYLE_TRANSITION_PROP_6 = 108,
+    LV_STYLE_TRANSITION = 100,
 
     _LV_STYLE_LAST_BUIL_IN_PROP,
 
     LV_STYLE_PROP_ALL = 0xFFFF
 }lv_style_prop_t;
 
+struct _lv_style_transiton_t;
+
 typedef struct {
     lv_color_filter_cb_t color_filter_cb;
-    const lv_anim_path_t * transition_path;
+    const struct _lv_style_transiton_t * transition;
     const char * content_text;
 
     uint16_t transition_time;
     uint16_t transition_delay;
-    uint16_t transition_prop_1;
-    uint16_t transition_prop_2;
-    uint16_t transition_prop_3;
-    uint16_t transition_prop_4;
-    uint16_t transition_prop_5;
-    uint16_t transition_prop_6;
 
     lv_color_t bg_grad_color;
     lv_color_t outline_color;
@@ -307,17 +293,16 @@ typedef struct {
     uint32_t has_content_ofs_x :1;
     uint32_t has_content_ofs_y :1;
 
-    uint32_t has_transition_time :1;
-    uint32_t has_transition_delay :1;
-    uint32_t has_transition_path :1;
-    uint32_t has_transition_prop_1 :1;
-    uint32_t has_transition_prop_2 :1;
-    uint32_t has_transition_prop_3 :1;
-    uint32_t has_transition_prop_4 :1;
-    uint32_t has_transition_prop_5 :1;
-    uint32_t has_transition_prop_6 :1;
+    uint32_t has_transition :1;
 }lv_style_ext_t;
 
+
+typedef struct _lv_style_transiton_t{
+    const lv_style_prop_t * props;
+    const lv_anim_path_t * path;
+    uint32_t time;
+    uint32_t delay;
+}lv_style_transiton_t;
 
 LV_CLASS_DECLARE_START(lv_style, lv_base);
 
@@ -398,6 +383,9 @@ void lv_style_reset(lv_style_t * style);
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value);
 
 bool lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t * value);
+
+void lv_style_transition_init(lv_style_transiton_t * tr, const lv_style_prop_t * props, const lv_anim_path_t * path, uint32_t time, uint32_t delay);
+
 /**
  * Remove a property from a style
  * @param style pointer to a style
@@ -620,33 +608,8 @@ static inline void lv_style_set_content_ofs_x(lv_style_t * style, lv_coord_t val
 static inline void lv_style_set_content_ofs_y(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {._int = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_OFS_Y, v); }
 
-static inline void lv_style_set_transition_time(lv_style_t * style, uint16_t value) {
-  lv_style_value_t v = {._int = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION_TIME, v); }
-
-static inline void lv_style_set_transition_delay(lv_style_t * style, uint16_t value) {
-  lv_style_value_t v = {._int = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION_DELAY, v); }
-
-static inline void lv_style_set_transition_path(lv_style_t * style, const lv_anim_path_t * value) {
-  lv_style_value_t v = {._ptr = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION_PATH, v); }
-
-static inline void lv_style_set_transition_prop_1(lv_style_t * style, lv_style_prop_t value) {
-  lv_style_value_t v = {._int = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION_PROP_1, v); }
-
-static inline void lv_style_set_transition_prop_2(lv_style_t * style, lv_style_prop_t value) {
-  lv_style_value_t v = {._int = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION_PROP_2, v); }
-
-static inline void lv_style_set_transition_prop_3(lv_style_t * style, lv_style_prop_t value) {
-  lv_style_value_t v = {._int = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION_PROP_3, v); }
-
-static inline void lv_style_set_transition_prop_4(lv_style_t * style, lv_style_prop_t value) {
-  lv_style_value_t v = {._int = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION_PROP_4, v); }
-
-static inline void lv_style_set_transition_prop_5(lv_style_t * style, lv_style_prop_t value) {
-  lv_style_value_t v = {._int = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION_PROP_5, v); }
-
-static inline void lv_style_set_transition_prop_6(lv_style_t * style, lv_style_prop_t value) {
-  lv_style_value_t v = {._int = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION_PROP_6, v); }
-
+static inline void lv_style_set_transition(lv_style_t * style, const lv_style_transiton_t * value) {
+  lv_style_value_t v = {._ptr = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION, v); }
 
 
 static inline void lv_style_set_pad_ver(lv_style_t * style, lv_coord_t value)

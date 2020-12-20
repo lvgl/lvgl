@@ -113,6 +113,15 @@ bool lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
     return style->class_p->get_prop(style, prop, value);
 }
 
+void lv_style_transition_init(lv_style_transiton_t * tr, const lv_style_prop_t * props, const lv_anim_path_t * path, uint32_t time, uint32_t delay)
+{
+    _lv_memset_00(tr, sizeof(lv_style_transiton_t));
+    tr->props = props;
+    tr->path = path;
+    tr->time = time;
+    tr->delay = delay;
+}
+
 lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
 {
     lv_style_value_t value;
@@ -140,9 +149,6 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             break;
         case LV_STYLE_TEXT_FONT:
             value._ptr = LV_THEME_DEFAULT_FONT_NORMAL;
-            break;
-        case LV_STYLE_TRANSITION_PATH:
-            value._ptr = &lv_anim_path_def;
             break;
         default:
             value._ptr = NULL;
@@ -504,50 +510,10 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
          style->ext->has_content_ofs_y = 1;
          break;
 
-     case LV_STYLE_TRANSITION_TIME:
+     case LV_STYLE_TRANSITION:
          _alloc_ext(style);
-         style->ext->transition_time = value._int;
-         style->ext->has_transition_time = 1;
-         break;
-     case LV_STYLE_TRANSITION_DELAY:
-         _alloc_ext(style);
-         style->ext->transition_delay = value._int;
-         style->ext->has_transition_delay = 1;
-         break;
-     case LV_STYLE_TRANSITION_PATH:
-         _alloc_ext(style);
-         style->ext->transition_path = value._ptr;
-         style->ext->has_transition_path = 1;
-         break;
-     case LV_STYLE_TRANSITION_PROP_1:
-         _alloc_ext(style);
-         style->ext->transition_prop_1 = value._int;
-         style->ext->has_transition_prop_1 = 1;
-         break;
-     case LV_STYLE_TRANSITION_PROP_2:
-         _alloc_ext(style);
-         style->ext->transition_prop_2 = value._int;
-         style->ext->has_transition_prop_2 = 1;
-         break;
-     case LV_STYLE_TRANSITION_PROP_3:
-         _alloc_ext(style);
-         style->ext->transition_prop_3 = value._int;
-         style->ext->has_transition_prop_3 = 1;
-         break;
-     case LV_STYLE_TRANSITION_PROP_4:
-         _alloc_ext(style);
-         style->ext->transition_prop_4 = value._int;
-         style->ext->has_transition_prop_4 = 1;
-         break;
-     case LV_STYLE_TRANSITION_PROP_5:
-         _alloc_ext(style);
-         style->ext->transition_prop_5 = value._int;
-         style->ext->has_transition_prop_5 = 1;
-         break;
-     case LV_STYLE_TRANSITION_PROP_6:
-         _alloc_ext(style);
-         style->ext->transition_prop_6 = value._int;
-         style->ext->has_transition_prop_6 = 1;
+         style->ext->transition = value._ptr;
+         style->ext->has_transition = 1;
          break;
      default:
          break;
@@ -769,32 +735,8 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
              if(style->ext && style->ext->has_content_ofs_y) { value->_int = style->ext->content_ofs_x; return true; }
              break;
 
-      case LV_STYLE_TRANSITION_TIME:
-             if(style->ext && style->ext->has_transition_time) { value->_int = style->ext->transition_time; return true; }
-             break;
-      case LV_STYLE_TRANSITION_DELAY:
-             if(style->ext && style->ext->has_transition_delay) { value->_int = style->ext->transition_delay; return true; }
-             break;
-      case LV_STYLE_TRANSITION_PATH:
-             if(style->ext && style->ext->has_transition_path) { value->_ptr = style->ext->transition_path; return true; }
-             break;
-      case LV_STYLE_TRANSITION_PROP_1:
-             if(style->ext && style->ext->has_transition_prop_1) { value->_int = style->ext->transition_prop_1; return true; }
-             break;
-      case LV_STYLE_TRANSITION_PROP_2:
-             if(style->ext && style->ext->has_transition_prop_2) { value->_int = style->ext->transition_prop_2; return true; }
-             break;
-      case LV_STYLE_TRANSITION_PROP_3:
-             if(style->ext && style->ext->has_transition_prop_3) { value->_int = style->ext->transition_prop_3; return true; }
-             break;
-      case LV_STYLE_TRANSITION_PROP_4:
-             if(style->ext && style->ext->has_transition_prop_4) { value->_int = style->ext->transition_prop_4; return true; }
-             break;
-      case LV_STYLE_TRANSITION_PROP_5:
-             if(style->ext && style->ext->has_transition_prop_5) { value->_int = style->ext->transition_prop_5; return true; }
-             break;
-      case LV_STYLE_TRANSITION_PROP_6:
-             if(style->ext && style->ext->has_transition_prop_6) { value->_int = style->ext->transition_prop_6; return true; }
+      case LV_STYLE_TRANSITION:
+             if(style->ext && style->ext->has_transition) { value->_ptr = style->ext->transition; return true; }
              break;
       default:
           break;
@@ -1012,32 +954,8 @@ static bool remove_prop(lv_style_t * style, lv_style_prop_t prop)
         if(style->ext) style->ext->has_content_src = 0;
         break;
 
-    case LV_STYLE_TRANSITION_TIME:
-        if(style->ext) style->ext->has_transition_time = 0;
-        break;
-    case LV_STYLE_TRANSITION_DELAY:
-        if(style->ext) style->ext->has_transition_delay = 0;
-        break;
-    case LV_STYLE_TRANSITION_PATH:
-        if(style->ext) style->ext->has_transition_path = 0;
-        break;
-    case LV_STYLE_TRANSITION_PROP_1:
-        if(style->ext) style->ext->has_transition_prop_1 = 0;
-        break;
-    case LV_STYLE_TRANSITION_PROP_2:
-        if(style->ext) style->ext->has_transition_prop_2 = 0;
-        break;
-    case LV_STYLE_TRANSITION_PROP_3:
-        if(style->ext) style->ext->has_transition_prop_3 = 0;
-        break;
-    case LV_STYLE_TRANSITION_PROP_4:
-        if(style->ext) style->ext->has_transition_prop_4 = 0;
-        break;
-    case LV_STYLE_TRANSITION_PROP_5:
-        if(style->ext) style->ext->has_transition_prop_5 = 0;
-        break;
-    case LV_STYLE_TRANSITION_PROP_6:
-        if(style->ext) style->ext->has_transition_prop_6 = 0;
+    case LV_STYLE_TRANSITION:
+        if(style->ext) style->ext->has_transition = 0;
         break;
 
     default:

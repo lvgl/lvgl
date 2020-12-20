@@ -100,6 +100,7 @@ typedef struct {
     lv_style_t circle;
     lv_style_t no_radius;
     lv_style_t clip_corner;
+    lv_style_t grow;
 
     /*Parts*/
     lv_style_t knob;
@@ -187,6 +188,19 @@ static bool inited;
 
 static void basic_init(void)
 {
+    const static lv_style_prop_t trans_props[] = {
+            LV_STYLE_BG_OPA, LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT, LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_CB, 0
+    };
+
+    static lv_style_transiton_t trans_delayed;
+    lv_style_transition_init(&trans_delayed, trans_props, &lv_anim_path_def, TRANSITION_TIME, TRANSITION_TIME / 2);
+
+    static lv_style_transiton_t trans_slow;
+    lv_style_transition_init(&trans_slow, trans_props, &lv_anim_path_def, TRANSITION_TIME * 2, 0);
+
+    static lv_style_transiton_t trans_normal;
+    lv_style_transition_init(&trans_normal, trans_props, &lv_anim_path_def, TRANSITION_TIME, 0);
+
     style_init_reset(&styles->scrollbar);
     lv_style_set_bg_opa(&styles->scrollbar, LV_OPA_COVER);
     lv_style_set_bg_color(&styles->scrollbar, (IS_LIGHT ? lv_color_hex(0xcccfd1) : lv_color_hex(0x777f85)));
@@ -195,12 +209,10 @@ static void basic_init(void)
     lv_style_set_margin_right(&styles->scrollbar,  LV_DPX(7));
     lv_style_set_margin_top(&styles->scrollbar,  LV_DPX(7));
     lv_style_set_bg_opa(&styles->scrollbar,  LV_OPA_50);
-    lv_style_set_transition_prop_6(&styles->scrollbar,  LV_STYLE_BG_OPA);
-    lv_style_set_transition_time(&styles->scrollbar, TRANSITION_TIME * 2);
+    lv_style_set_transition(&styles->scrollbar, &trans_slow);
 
     style_init_reset(&styles->scrollbar_scrolled);
     lv_style_set_bg_opa(&styles->scrollbar_scrolled,  LV_OPA_COVER);
-    lv_style_set_transition_time(&styles->scrollbar_scrolled, TRANSITION_TIME);
 
     style_init_reset(&styles->scr);
     lv_style_set_bg_opa(&styles->scr, LV_OPA_COVER);
@@ -216,10 +228,7 @@ static void basic_init(void)
     lv_style_set_border_post(&styles->card, true);
     lv_style_set_text_color(&styles->card, CARD_TEXT_COLOR);
     lv_style_set_img_recolor(&styles->card, CARD_TEXT_COLOR);
-
     lv_style_set_pad_all(&styles->card, PAD_DEF);
-    lv_style_set_transition_time(&styles->card, TRANSITION_TIME);
-    lv_style_set_transition_prop_6(&styles->card, LV_STYLE_BORDER_COLOR);
 
     style_init_reset(&styles->focus_border);
     lv_style_set_border_color(&styles->focus_border, theme.color_primary);
@@ -246,11 +255,7 @@ static void basic_init(void)
     lv_style_set_img_recolor(&styles->btn, CARD_TEXT_COLOR);
     lv_style_set_pad_hor(&styles->btn, LV_DPX(40));
     lv_style_set_pad_ver(&styles->btn, LV_DPX(15));
-    lv_style_set_transition_prop_5(&styles->btn, LV_STYLE_COLOR_FILTER_OPA);
-    lv_style_set_transition_time(&styles->btn, TRANSITION_TIME);
-    lv_style_set_transition_delay(&styles->btn, TRANSITION_TIME);
-    lv_style_set_color_filter_cb(&styles->btn, lv_color_change_lightness);
-    lv_style_set_color_filter_opa(&styles->btn, LV_OPA_50);
+    lv_style_set_transition(&styles->btn, &trans_delayed); /*Go back to default state with delay*/
 
 
     style_init_reset(&styles->btn_color);
@@ -263,13 +268,14 @@ static void basic_init(void)
     lv_style_set_bg_color(&styles->btn_color_checked, BTN_CHK_PR_COLOR);
 
     style_init_reset(&styles->pressed);
-    lv_style_set_color_filter_opa(&styles->pressed, LV_OPA_40);
-    lv_style_set_transition_delay(&styles->pressed, 0);
+    lv_style_set_color_filter_cb(&styles->pressed, lv_color_darken);
+    lv_style_set_color_filter_opa(&styles->pressed, LV_OPA_20);
+    lv_style_set_transition(&styles->pressed, &trans_normal);
 
     style_init_reset(&styles->disabled);
-    lv_style_set_color_filter_opa(&styles->disabled, LV_OPA_70);
-    lv_style_set_transition_time(&styles->disabled, 0);
-    lv_style_set_transition_delay(&styles->disabled, 0);
+    lv_style_set_color_filter_cb(&styles->disabled, lv_color_lighten);
+    lv_style_set_color_filter_opa(&styles->disabled, LV_OPA_40);
+    lv_style_set_transition(&styles->disabled, &trans_normal);
 
     style_init_reset(&styles->clip_corner);
     lv_style_set_clip_corner(&styles->clip_corner, true);
@@ -291,6 +297,10 @@ static void basic_init(void)
 
     style_init_reset(&styles->circle);
     lv_style_set_radius(&styles->circle, LV_RADIUS_CIRCLE);
+
+    style_init_reset(&styles->grow);
+    lv_style_set_transform_width(&styles->grow, LV_DPX(5));
+    lv_style_set_transform_height(&styles->grow, LV_DPX(5));
 
     style_init_reset(&styles->knob);
     lv_style_set_bg_color(&styles->knob, IS_LIGHT ? theme.color_primary : LV_COLOR_WHITE);
@@ -698,6 +708,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->btn);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->btn_color);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->pressed);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->grow);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_CHECKED, &styles->btn_color_checked);
     }
 #endif
