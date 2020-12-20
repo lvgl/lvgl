@@ -337,7 +337,7 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint32_t pos
     LV_ASSERT_MEM(ins_buf);
     if(ins_buf == NULL) return;
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    strcpy(ins_buf, options);
+    strcpy(ins_buf, option);
 #else
     _lv_txt_ap_proc(option, ins_buf);
 #endif
