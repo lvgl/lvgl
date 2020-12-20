@@ -258,11 +258,20 @@ void lv_win_set_title(lv_obj_t * win, const char * title)
 
     lv_win_ext_t * ext = lv_obj_get_ext_attr(win);
 
-    ext->title_txt    = lv_mem_realloc(ext->title_txt, strlen(title) + 1);
+#if LV_USE_ARABIC_PERSIAN_CHARS == 0
+    size_t len = strlen(title) + 1;
+#else
+    size_t len = _lv_txt_ap_calc_bytes_cnt(title) + 1;
+#endif
+
+    ext->title_txt    = lv_mem_realloc(ext->title_txt, len + 1);
     LV_ASSERT_MEM(ext->title_txt);
     if(ext->title_txt == NULL) return;
-
+#if LV_USE_ARABIC_PERSIAN_CHARS == 0
     strcpy(ext->title_txt, title);
+#else
+    _lv_txt_ap_proc(title, ext->title_txt);
+#endif
     lv_obj_invalidate(ext->header);
 }
 
