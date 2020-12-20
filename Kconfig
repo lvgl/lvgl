@@ -1,4 +1,4 @@
-# Kconfig file for LVGL v7.7.1
+# Kconfig file for LVGL v7.8.1
 
 menu "LVGL configuration"
     
@@ -105,11 +105,38 @@ menu "LVGL configuration"
             displays.
     
     menu "Memory manager settings"
+    config LV_MEM_CUSTOM
+	    bool
+	    prompt "If true use custom malloc/free, otherwise use the built-in `lv_mem_alloc` and `lv_mem_free`"
+
+    config LV_MEM_CUSTOM_INCLUDE
+        string
+        prompt "Header to include for the custom memory function"
+        default stdlib.h
+        depends on LV_MEM_CUSTOM
+
+    config LV_MEM_CUSTOM_ALLOC
+        string
+        prompt "Wrapper to malloc"
+        default malloc 
+        depends on LV_MEM_CUSTOM
+
+    config LV_MEM_CUSTOM_FREE
+        string
+        prompt "Wrapper to free"
+        default free 
+        depends on LV_MEM_CUSTOM
+
 	config LV_MEM_SIZE_BYTES
 	    int
 	    prompt "Size of the memory used by `lv_mem_alloc` in kilobytes (>= 2kB)"
 	    range 2 128
-	    default 32
+        default 32
+        depends on !LV_MEM_CUSTOM
+
+    config LV_MEMCPY_MEMSET_STD
+        bool
+        prompt "Use the standard memcpy and memset instead of LVGL's own functions"
     endmenu
     
     menu "Indev device settings"
@@ -204,6 +231,17 @@ menu "LVGL configuration"
             default y if !LV_CONF_MINIMAL
         config LV_USE_USER_DATA
             bool "Add a 'user_data' to drivers and objects."
+        config LV_USE_USER_DATA_FREE
+            bool "Free the user data field upon object deletion"
+            depends on LV_USE_USER_DATA
+        config LV_USER_DATA_FREE_INCLUDE
+            string "Header for user data free function"
+            default "something.h"
+            depends on LV_USE_USER_DATA_FREE
+        config LV_USER_DATA_FREE
+            string "Invoking for user data free function. It has the lv_obj_t pointer as single parameter."
+            default "(user_data_free)"
+            depends on LV_USE_USER_DATA_FREE
         config LV_USE_PERF_MONITOR
             bool "Show CPU usage and FPS count in the right bottom corner."
         config LV_USE_API_EXTENSION_V6
@@ -235,9 +273,27 @@ menu "LVGL configuration"
                 LV_IMG_CACHE_DEF_SIZE must be >= 1
     endmenu
 
-    menu "Compiler settings"
+    menu "Compiler Settings"
         config LV_BIG_ENDIAN_SYSTEM
             bool "For big endian systems set to 1"
+    endmenu
+
+    menu "HAL Settings"
+        config LV_TICK_CUSTOM
+            bool 
+            prompt "Use a custom tick source"
+
+        config LV_TICK_CUSTOM_INCLUDE
+            string
+            prompt "Header for the system time function"
+            default Arduino.h
+            depends on LV_TICK_CUSTOM
+
+        config LV_TICK_CUSTOM_SYS_TIME_EXPR
+            string
+            prompt "Expression evaluating to current system time in ms"
+            default "(millis())"
+            depends on LV_TICK_CUSTOM
     endmenu
 
     menu "Log Settings"
