@@ -5,8 +5,10 @@
 ### New features
 - feat(chart) add lv_chart_remove_series and lv_chart_hide_series
 - feat(img_cahce) allow disabling image cacheing
-
+- calendar: make get_day_of_week() public
+ 
 ### Bugfixes
+- fix(draw_rect) free buffer used for arabic processing
 
 ## v7.8.1 (Plannad at 15.12.2020)
 
