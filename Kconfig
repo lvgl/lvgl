@@ -292,7 +292,7 @@ menu "LVGL configuration"
         config LV_TICK_CUSTOM_SYS_TIME_EXPR
             string
             prompt "Expression evaluating to current system time in ms"
-            default "millis\(\)"
+            default "millis()"
             depends on LV_TICK_CUSTOM
     endmenu
 
