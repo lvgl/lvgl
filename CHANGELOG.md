@@ -1,5 +1,13 @@
 # Changelog
 
+## v7.9.0 
+
+### New features
+- feat(chart) add lv_chart_remove_series and lv_chart_hide_series
+- feat(img_cahce) allow disabling image cacheing
+
+### Bugfixes
+
 ## v7.8.1 (Plannad at 15.12.2020)
 
 ### Bugfixes

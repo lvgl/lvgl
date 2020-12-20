@@ -188,7 +188,7 @@ static inline lv_obj_t * lv_page_get_scrl(lv_obj_t * page)
 #if LV_USE_API_EXTENSION_V7
 
 #if LV_USE_ROLLER
-#define LV_ROLLER_MODE_INIFINITE LV_ROLLER_MODE_INFINITE 
+#define LV_ROLLER_MODE_INIFINITE LV_ROLLER_MODE_INFINITE
 #endif
 
 #if LV_USE_WIN

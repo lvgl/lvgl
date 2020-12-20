@@ -356,7 +356,7 @@ void lv_dropdown_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
 
     ext->sel_opt_id      = sel_opt < ext->option_cnt ? sel_opt : ext->option_cnt - 1;
     ext->sel_opt_id_orig = ext->sel_opt_id;
-    
+
     lv_obj_invalidate(ddlist);
 }
 
