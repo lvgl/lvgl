@@ -276,8 +276,7 @@ void lv_textarea_add_char(lv_obj_t * ta, uint32_t c)
     lv_textarea_clear_selection(ta);                                                /*Clear selection*/
 
     if(ext->pwd_mode != 0) {
-
-        ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + 2); /*+2: the new char + \0 */
+        ext->pwd_tmp = lv_mem_realloc(ext->pwd_tmp, strlen(ext->pwd_tmp) + strlen(letter_buf) + 1); /*+2: the new char + \0 */
         LV_ASSERT_MEM(ext->pwd_tmp);
         if(ext->pwd_tmp == NULL) return;
 

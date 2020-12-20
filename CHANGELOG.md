@@ -11,6 +11,7 @@
 - fix(draw_rect) free buffer used for arabic processing
 - fix(win) arabic process the title of the window
 - fix(dropdown) arabic process the option in lv_dropdown_add_option
+- fix(textarea) buffer overflow in password mode with UTF-8 characters
 
 ## v7.8.1 (Plannad at 15.12.2020)
 
