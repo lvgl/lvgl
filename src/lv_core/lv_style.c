@@ -142,6 +142,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
         case LV_STYLE_BORDER_OPA:
         case LV_STYLE_TEXT_OPA:
         case LV_STYLE_IMG_OPA:
+        case LV_STYLE_LINE_OPA:
         case LV_STYLE_OUTLINE_OPA:
         case LV_STYLE_SHADOW_OPA:
             value._int = LV_OPA_COVER;
@@ -779,7 +780,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
          style->has_line_rounded = 1;
          break;
      case LV_STYLE_LINE_COLOR:
-         id= style->dont_index ? 0 : get_index_num(value);
+         id= style->dont_index ? 0 : get_index_color(value);
          if(id > 0) {
              style->line_color = id;
          } else {

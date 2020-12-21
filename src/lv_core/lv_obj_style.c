@@ -542,64 +542,63 @@ void _lv_obj_create_style_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8
  */
 _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2)
 {
-    return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-//    lv_obj_style_list_t * list = &obj->style_list;
-//    _lv_style_state_cmp_t res = _LV_STYLE_STATE_CMP_SAME;
-//
-//    /*Are there any new styles for the new state?*/
-//    uint32_t i;
-//    for(i = 0; i < list->style_cnt; i++) {
-//        if(list->styles[i].is_trans) continue;
-//
-//        /*The style is valid for a stat but not the other*/
-//        bool valid1 = list->styles[i].state & (~state1) ? false : true;
-//        bool valid2 = list->styles[i].state & (~state2) ? false : true;
-//        if(valid1 != valid2) {
-//            lv_style_t * style = list->styles[i].style;
-//
-//            /*If there is layout difference on the main part, return immediately. There is no more serious difference*/
-//            _lv_style_state_cmp_t res_tmp = res;
-//            if(style->has_pad_bottom) res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-//            else if(style->has_pad_top)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-//            else if(style->has_pad_left)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-//            else if(style->has_pad_right)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-//            else if(style->ext && style->ext->has_margin_bottom)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-//            else if(style->ext && style->ext->has_margin_top)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-//            else if(style->ext && style->ext->has_margin_left)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-//            else if(style->ext && style->ext->has_margin_right)  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-//
-//            if(res_tmp == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
-//                if(list->styles[i].part == LV_PART_MAIN) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
-//                else {
-//                    res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//                    continue;
-//                }
-//            }
-//
-//            /*Check for draw pad changes*/
-//            if(style->ext && style->ext->has_transform_width) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_transform_height) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_transform_angle) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_transform_zoom) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_outline_opa) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_outline_pad) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_shadow_width) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_shadow_opa) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_shadow_ofs_x) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_shadow_ofs_y) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_shadow_spread) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_line_width) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_content_src) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_content_ofs_x) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_content_ofs_y) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else if(style->ext && style->ext->has_content_align) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
-//            else {
-//                if(res != _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) res = _LV_STYLE_STATE_CMP_DIFF_REDRAW;
-//            }
-//        }
-//    }
-//
-//    return res;
+    lv_obj_style_list_t * list = &obj->style_list;
+    _lv_style_state_cmp_t res = _LV_STYLE_STATE_CMP_SAME;
+
+    /*Are there any new styles for the new state?*/
+    uint32_t i;
+    for(i = 0; i < list->style_cnt; i++) {
+        if(list->styles[i].is_trans) continue;
+
+        /*The style is valid for a stat but not the other*/
+        bool valid1 = list->styles[i].state & (~state1) ? false : true;
+        bool valid2 = list->styles[i].state & (~state2) ? false : true;
+        if(valid1 != valid2) {
+            lv_style_t * style = list->styles[i].style;
+
+            /*If there is layout difference on the main part, return immediately. There is no more serious difference*/
+            _lv_style_state_cmp_t res_tmp = res;
+            if(style->pad_bottom || (style->ext && style->ext->has.pad_bottom)) res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->pad_top || (style->ext && style->ext->has.pad_bottom))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->pad_left || (style->ext && style->ext->has.pad_bottom))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->pad_right || (style->ext && style->ext->has.pad_bottom))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->margin_bottom || (style->ext && style->ext->has.margin_bottom))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->margin_top || (style->ext && style->ext->has.margin_top)) res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->margin_left || (style->ext && style->ext->has.margin_left))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+            else if(style->margin_right || (style->ext && style->ext->has.margin_right))  res_tmp = _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+
+            if(res_tmp == _LV_STYLE_STATE_CMP_DIFF_LAYOUT) {
+                if(list->styles[i].part == LV_PART_MAIN) return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
+                else {
+                    res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+                    continue;
+                }
+            }
+
+            /*Check for draw pad changes*/
+            if(style->ext && style->ext->has.transform_width) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->transform_width || (style->ext && style->ext->has.transform_height)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has.transform_angle) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has.transform_zoom) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->outline_opa || (style->ext && style->ext->has.outline_opa)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->outline_pad || (style->ext && style->ext->has.outline_pad)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->shadow_width|| (style->ext && style->ext->has.shadow_width)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->shadow_opa|| (style->ext && style->ext->has.shadow_opa)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->shadow_ofs_x|| (style->ext && style->ext->has.shadow_ofs_x)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->shadow_ofs_y|| (style->ext && style->ext->has.shadow_ofs_y)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->shadow_spread|| (style->ext && style->ext->has.shadow_spread)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->line_width || (style->ext && style->ext->has.line_width)) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has.content_src) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has.content_ofs_x) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has.content_ofs_y) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else if(style->ext && style->ext->has.content_align) res = _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD;
+            else {
+                if(res != _LV_STYLE_STATE_CMP_DIFF_DRAW_PAD) res = _LV_STYLE_STATE_CMP_DIFF_REDRAW;
+            }
+        }
+    }
+
+    return res;
 }
 
 /**********************

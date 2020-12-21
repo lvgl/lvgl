@@ -207,23 +207,32 @@ static lv_design_res_t lv_checkbox_design(lv_obj_t * obj, const lv_area_t * clip
         lv_coord_t bg_topp = lv_obj_get_style_pad_top(obj, LV_PART_MAIN);
         lv_coord_t bg_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MAIN);
 
-        lv_coord_t bullet_rightm = lv_obj_get_style_margin_right(obj, LV_PART_MARKER);
+        lv_coord_t marker_rightm = lv_obj_get_style_margin_right(obj, LV_PART_MARKER);
 
-        lv_coord_t bullet_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MARKER);
-        lv_coord_t bullet_rightp = lv_obj_get_style_pad_right(obj, LV_PART_MARKER);
-        lv_coord_t bullet_topp = lv_obj_get_style_pad_top(obj, LV_PART_MARKER);
-        lv_coord_t bullet_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_MARKER);
+        lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MARKER);
+        lv_coord_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_MARKER);
+        lv_coord_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_MARKER);
+        lv_coord_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_MARKER);
 
-        lv_draw_rect_dsc_t bullet_dsc;
-        lv_draw_rect_dsc_init(&bullet_dsc);
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_MARKER, &bullet_dsc);
-        lv_area_t bullet_area;
-        bullet_area.x1 = cb->coords.x1 + bg_leftp;
-        bullet_area.x2 = bullet_area.x1 + font_h + bullet_leftp + bullet_rightp - 1;
-        bullet_area.y1 = cb->coords.y1 + bg_topp;
-        bullet_area.y2 = bullet_area.y1 + font_h + bullet_topp + bullet_bottomp - 1;
+        lv_coord_t tranf_w = lv_obj_get_style_transform_width(obj, LV_PART_MARKER);
+        lv_coord_t tranf_h = lv_obj_get_style_transform_height(obj, LV_PART_MARKER);
 
-        lv_draw_rect(&bullet_area, clip_area, &bullet_dsc);
+        lv_draw_rect_dsc_t marker_dsc;
+        lv_draw_rect_dsc_init(&marker_dsc);
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_MARKER, &marker_dsc);
+        lv_area_t marker_area;
+        marker_area.x1 = cb->coords.x1 + bg_leftp;
+        marker_area.x2 = marker_area.x1 + font_h + marker_leftp + marker_rightp - 1;
+        marker_area.y1 = cb->coords.y1 + bg_topp;
+        marker_area.y2 = marker_area.y1 + font_h + marker_topp + marker_bottomp - 1;
+
+        lv_area_t marker_area_transf;
+        lv_area_copy(&marker_area_transf, &marker_area);
+        marker_area_transf.x1 -= tranf_w;
+        marker_area_transf.x2 += tranf_w;
+        marker_area_transf.y1 -= tranf_h;
+        marker_area_transf.y2 += tranf_h;
+        lv_draw_rect(&marker_area_transf, clip_area, &marker_dsc);
 
         lv_coord_t line_space = lv_obj_get_style_text_line_space(obj, LV_PART_MAIN);
         lv_coord_t letter_space = lv_obj_get_style_text_letter_space(obj, LV_PART_MAIN);
@@ -235,9 +244,9 @@ static lv_design_res_t lv_checkbox_design(lv_obj_t * obj, const lv_area_t * clip
         lv_draw_label_dsc_init(&txt_dsc);
         lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &txt_dsc);
 
-        lv_coord_t y_ofs = (lv_area_get_height(&bullet_area) - font_h) / 2;
+        lv_coord_t y_ofs = (lv_area_get_height(&marker_area) - font_h) / 2;
         lv_area_t txt_area;
-        txt_area.x1 = bullet_area.x2 + bullet_rightm;
+        txt_area.x1 = marker_area.x2 + marker_rightm;
         txt_area.x2 = txt_area.x1 + txt_size.x;
         txt_area.y1 = cb->coords.y1 + bg_topp + y_ofs;
         txt_area.y2 = txt_area.y1 + txt_size.y;
@@ -264,7 +273,7 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
     res = lv_checkbox.base_p->signal_cb(obj, sign, param);
     if(res != LV_RES_OK) return res;
 
-    else if (sign == LV_SIGNAL_GET_SELF_SIZE) {
+    if (sign == LV_SIGNAL_GET_SELF_SIZE) {
         lv_point_t * p = param;
         lv_checkbox_t * cb = (lv_checkbox_t *) obj;
 
@@ -276,19 +285,23 @@ static lv_res_t lv_checkbox_signal(lv_obj_t * obj, lv_signal_t sign, void * para
         lv_point_t txt_size;
         _lv_txt_get_size(&txt_size, cb->txt, font, letter_space, line_space, LV_COORD_MAX, LV_TXT_FLAG_NONE);
 
-        lv_coord_t bullet_rightm = lv_obj_get_style_margin_right(obj, LV_PART_MARKER);
-        lv_coord_t bullet_bottomm = lv_obj_get_style_margin_bottom(obj, LV_PART_MARKER);
-        lv_coord_t bullet_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MARKER);
-        lv_coord_t bullet_rightp = lv_obj_get_style_pad_right(obj, LV_PART_MARKER);
-        lv_coord_t bullet_topp = lv_obj_get_style_pad_top(obj, LV_PART_MARKER);
-        lv_coord_t bullet_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_MARKER);
-        lv_point_t bullet_size;
-        bullet_size.x = font_h + bullet_rightm + bullet_leftp + bullet_rightp;
-        bullet_size.y = font_h + bullet_bottomm + bullet_topp + bullet_bottomp;
+        lv_coord_t marker_rightm = lv_obj_get_style_margin_right(obj, LV_PART_MARKER);
+        lv_coord_t marker_bottomm = lv_obj_get_style_margin_bottom(obj, LV_PART_MARKER);
+        lv_coord_t marker_leftp = lv_obj_get_style_pad_left(obj, LV_PART_MARKER);
+        lv_coord_t marker_rightp = lv_obj_get_style_pad_right(obj, LV_PART_MARKER);
+        lv_coord_t marker_topp = lv_obj_get_style_pad_top(obj, LV_PART_MARKER);
+        lv_coord_t marker_bottomp = lv_obj_get_style_pad_bottom(obj, LV_PART_MARKER);
+        lv_point_t marker_size;
+        marker_size.x = font_h + marker_rightm + marker_leftp + marker_rightp;
+        marker_size.y = font_h + marker_bottomm + marker_topp + marker_bottomp;
 
-        p->x = bullet_size.x + txt_size.x;
-        p->y = LV_MATH_MAX(bullet_size.y, txt_size.y);
-
+        p->x = marker_size.x + txt_size.x;
+        p->y = LV_MATH_MAX(marker_size.y, txt_size.y);
+    }
+    else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
+        lv_coord_t *s = param;
+        lv_coord_t m = _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_MARKER);
+        *s = LV_MATH_MAX(*s, m);
     }
 
     return res;

@@ -194,34 +194,34 @@ void lv_obj_init_draw_rect_dsc(lv_obj_t * obj, uint8_t part, lv_draw_rect_dsc_t 
  */
 void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_t * draw_dsc)
 {
-//    draw_dsc->opa = lv_obj_get_style_text_opa(obj, part);
-//    if(draw_dsc->opa <= LV_OPA_MIN) return;
-//
-//#if LV_USE_OPA_SCALE
-//    lv_opa_t opa_scale = lv_obj_get_style_opa_scale(obj, part);
-//    if(opa_scale < LV_OPA_MAX) {
-//        draw_dsc->opa = (uint16_t)((uint16_t)draw_dsc->opa * opa_scale) >> 8;
-//    }
-//    if(draw_dsc->opa <= LV_OPA_MIN) return;
-//#endif
-//
-//    draw_dsc->color = lv_obj_get_style_text_color(obj, part);
-//    draw_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, part);
-//    draw_dsc->line_space = lv_obj_get_style_text_line_space(obj, part);
-//    draw_dsc->decor = lv_obj_get_style_text_decor(obj, part);
-//#if LV_USE_BLEND_MODES
-//    draw_dsc->blend_mode = lv_obj_get_style_text_blend_mode(obj, part);
-//#endif
-//
-//    draw_dsc->font = lv_obj_get_style_text_font(obj, part);
-//
+    draw_dsc->opa = lv_obj_get_style_text_opa(obj, part);
+    if(draw_dsc->opa <= LV_OPA_MIN) return;
+
+#if LV_USE_OPA_SCALE
+    lv_opa_t opa = lv_obj_get_style_opa(obj, part);
+    if(opa < LV_OPA_MAX) {
+        draw_dsc->opa = (uint16_t)((uint16_t)draw_dsc->opa * opa) >> 8;
+    }
+    if(draw_dsc->opa <= LV_OPA_MIN) return;
+#endif
+
+    draw_dsc->color = lv_obj_get_style_text_color(obj, part);
+    draw_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, part);
+    draw_dsc->line_space = lv_obj_get_style_text_line_space(obj, part);
+    draw_dsc->decor = lv_obj_get_style_text_decor(obj, part);
+#if LV_USE_BLEND_MODES
+    draw_dsc->blend_mode = lv_obj_get_style_text_blend_mode(obj, part);
+#endif
+
+    draw_dsc->font = lv_obj_get_style_text_font(obj, part);
+
 //    if(draw_dsc->sel_start != LV_DRAW_LABEL_NO_TXT_SEL && draw_dsc->sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
 //        draw_dsc->color = lv_obj_get_style_text_sel_color(obj, part);
 //    }
-//
-//#if LV_USE_BIDI
-//    draw_dsc->bidi_dir = lv_obj_get_base_dir(obj);
-//#endif
+
+#if LV_USE_BIDI
+    draw_dsc->bidi_dir = lv_obj_get_base_dir(obj);
+#endif
 }
 
 /**
@@ -270,33 +270,33 @@ void lv_obj_init_draw_img_dsc(lv_obj_t * obj, uint8_t part, lv_draw_img_dsc_t * 
  */
 void lv_obj_init_draw_line_dsc(lv_obj_t * obj, uint8_t part, lv_draw_line_dsc_t * draw_dsc)
 {
-//    draw_dsc->width = lv_obj_get_style_line_width(obj, part);
-//    if(draw_dsc->width == 0) return;
-//
-//    draw_dsc->opa = lv_obj_get_style_line_opa(obj, part);
-//    if(draw_dsc->opa <= LV_OPA_MIN)  return;
-//
-//#if LV_USE_OPA_SCALE
-//    lv_opa_t opa_scale = lv_obj_get_style_opa_scale(obj, part);
-//    if(opa_scale < LV_OPA_MAX) {
-//        draw_dsc->opa = (uint16_t)((uint16_t)draw_dsc->opa * opa_scale) >> 8;
-//    }
-//    if(draw_dsc->opa <= LV_OPA_MIN)  return;
-//#endif
-//
-//    draw_dsc->color = lv_obj_get_style_line_color(obj, part);
-//
-//    draw_dsc->dash_width = lv_obj_get_style_line_dash_width(obj, part);
-//    if(draw_dsc->dash_width) {
-//        draw_dsc->dash_gap = lv_obj_get_style_line_dash_gap(obj, part);
-//    }
-//
-//    draw_dsc->round_start = lv_obj_get_style_line_rounded(obj, part);
-//    draw_dsc->round_end = draw_dsc->round_start;
-//
-//#if LV_USE_BLEND_MODES
-//    draw_dsc->blend_mode = lv_obj_get_style_line_blend_mode(obj, part);
-//#endif
+    draw_dsc->width = lv_obj_get_style_line_width(obj, part);
+    if(draw_dsc->width == 0) return;
+
+    draw_dsc->opa = lv_obj_get_style_line_opa(obj, part);
+    if(draw_dsc->opa <= LV_OPA_MIN)  return;
+
+#if LV_USE_OPA_SCALE
+    lv_opa_t opa = lv_obj_get_style_opa(obj, part);
+    if(opa < LV_OPA_MAX) {
+        draw_dsc->opa = (uint16_t)((uint16_t)draw_dsc->opa * opa) >> 8;
+    }
+    if(draw_dsc->opa <= LV_OPA_MIN)  return;
+#endif
+
+    draw_dsc->color = lv_obj_get_style_line_color(obj, part);
+
+    draw_dsc->dash_width = lv_obj_get_style_line_dash_width(obj, part);
+    if(draw_dsc->dash_width) {
+        draw_dsc->dash_gap = lv_obj_get_style_line_dash_gap(obj, part);
+    }
+
+    draw_dsc->round_start = lv_obj_get_style_line_rounded(obj, part);
+    draw_dsc->round_end = draw_dsc->round_start;
+
+#if LV_USE_BLEND_MODES
+    draw_dsc->blend_mode = lv_obj_get_style_line_blend_mode(obj, part);
+#endif
 }
 
 /**

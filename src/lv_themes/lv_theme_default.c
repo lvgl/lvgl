@@ -66,7 +66,7 @@
 #define COLOR_BG_SEC_TEXT       (IS_LIGHT ? lv_color_hex(0x31404f) : lv_color_hex(0xa5a8ad))
 #define COLOR_BG_SEC_TEXT_DIS   (IS_LIGHT ? lv_color_hex(0xaaaaaa) : lv_color_hex(0xa5a8ad))
 
-#define TRANSITION_TIME         ((theme.flags & LV_THEME_MATERIAL_FLAG_NO_TRANSITION) ? 0 : 150)
+#define TRANSITION_TIME         ((theme.flags & LV_THEME_MATERIAL_FLAG_NO_TRANSITION) ? 0 : 85)
 #define BORDER_WIDTH            LV_DPX(2)
 #define OUTLINE_WIDTH           ((theme.flags & LV_THEME_MATERIAL_FLAG_NO_FOCUS) ? 0 : LV_DPX(2))
 #define IS_LIGHT (theme.flags & LV_THEME_MATERIAL_FLAG_LIGHT)
@@ -89,6 +89,7 @@ typedef struct {
     /*Utility*/
     lv_style_t bg_color_primary;
     lv_style_t bg_color_gray;
+    lv_style_t bg_color_white;
     lv_style_t pressed;
     lv_style_t disabled;
     lv_style_t pad_zero;
@@ -122,11 +123,11 @@ typedef struct {
 #endif
 
 #if LV_USE_CHART
-    lv_style_t chart_bg, chart_series_bg, chart_series;
+    lv_style_t chart_bg, chart_series;
 #endif
 
 #if LV_USE_CHECKBOX
-    lv_style_t cb_marker;
+    lv_style_t cb_marker, cb_marker_checked;
 #endif
 
 #if LV_USE_DROPDOWN
@@ -185,11 +186,13 @@ static bool inited;
 static void basic_init(void)
 {
     const static lv_style_prop_t trans_props[] = {
-            LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR, LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT, LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_CB, 0
+            LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,
+            LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT,
+            LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_CB, 0
     };
 
     static lv_style_transiton_t trans_delayed;
-    lv_style_transition_init(&trans_delayed, trans_props, &lv_anim_path_def, TRANSITION_TIME, TRANSITION_TIME / 2);
+    lv_style_transition_init(&trans_delayed, trans_props, &lv_anim_path_def, TRANSITION_TIME, 70);
 
     static lv_style_transiton_t trans_slow;
     lv_style_transition_init(&trans_slow, trans_props, &lv_anim_path_def, TRANSITION_TIME * 2, 0);
@@ -282,10 +285,10 @@ static void basic_init(void)
     lv_style_set_pad_all(&styles->pad_small,  pad_small_value);
 
     style_init_reset(&styles->pad_small_negative);
-    lv_style_set_pad_all(&styles->pad_small_negative, - LV_DPX(2));
+    lv_style_set_pad_all(&styles->pad_small_negative, - LV_DPX(4));
 
     style_init_reset(&styles->pad_zero);
-    lv_style_set_pad_all(&styles->pad_zero, LV_DPX(2));
+    lv_style_set_pad_all(&styles->pad_zero, 0);
 
     style_init_reset(&styles->bg_color_primary);
     lv_style_set_bg_color(&styles->bg_color_primary, theme.color_primary);
@@ -295,12 +298,16 @@ static void basic_init(void)
     lv_style_set_bg_color(&styles->bg_color_gray, COLOR_GRAY);
     lv_style_set_bg_opa(&styles->bg_color_gray, LV_OPA_COVER);
 
+    style_init_reset(&styles->bg_color_white);
+    lv_style_set_bg_color(&styles->bg_color_white, LV_COLOR_WHITE);
+    lv_style_set_bg_opa(&styles->bg_color_white, LV_OPA_COVER);
+
     style_init_reset(&styles->circle);
     lv_style_set_radius(&styles->circle, LV_RADIUS_CIRCLE);
 
     style_init_reset(&styles->grow);
-    lv_style_set_transform_width(&styles->grow, LV_DPX(5));
-    lv_style_set_transform_height(&styles->grow, LV_DPX(5));
+    lv_style_set_transform_width(&styles->grow, LV_DPX(3));
+    lv_style_set_transform_height(&styles->grow, LV_DPX(3));
 
     style_init_reset(&styles->knob);
     lv_style_set_bg_color(&styles->knob, IS_LIGHT ? theme.color_primary : LV_COLOR_WHITE);
@@ -308,38 +315,35 @@ static void basic_init(void)
     lv_style_set_pad_all(&styles->knob, LV_DPX(5));
     lv_style_set_radius(&styles->knob, LV_RADIUS_CIRCLE);
 
-
     style_init_reset(&styles->cb_marker);
+    lv_style_set_pad_all(&styles->cb_marker, LV_DPX(3));
+    lv_style_set_border_width(&styles->cb_marker, BORDER_WIDTH);
+    lv_style_set_border_color(&styles->cb_marker, theme.color_primary);
+    lv_style_set_bg_color(&styles->cb_marker, LV_COLOR_WHITE);
+    lv_style_set_bg_opa(&styles->cb_marker, LV_OPA_COVER);
+    lv_style_set_margin_right(&styles->cb_marker,  LV_DPX(6));
+    lv_style_set_radius(&styles->cb_marker, RADIUS_DEFAULT / 2);
 
-    //static void checkbox_init(void)
-    //{
-    //#if LV_USE_CHECKBOX != 0
-    //    style_init_reset(&styles->cb_bg);
-    //    lv_style_set_radius(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(4));
-    //    lv_style_set_outline_color(&styles->cb_bg, LV_STATE_DEFAULT, theme.color_primary);
-    //    lv_style_set_outline_opa(&styles->cb_bg, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-    //    lv_style_set_outline_opa(&styles->cb_bg, LV_STATE_FOCUSED, LV_OPA_50);
-    //    lv_style_set_outline_width(&styles->cb_bg, LV_STATE_DEFAULT, OUTLINE_WIDTH);
-    //    lv_style_set_outline_pad(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(6));
-    //    lv_style_set_transition_time(&styles->cb_bg, LV_STATE_DEFAULT, TRANSITION_TIME);
-    //    lv_style_set_transition_prop_6(&styles->cb_bg, LV_STATE_DEFAULT, LV_STYLE_OUTLINE_OPA);
-    //
-    //    style_init_reset(&styles->cb_bullet);
-    //    lv_style_set_outline_opa(&styles->cb_bullet, LV_STATE_FOCUSED, LV_OPA_TRANSP);
-    //    lv_style_set_radius(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(4));
-    //    lv_style_set_pattern_image(&styles->cb_bullet, LV_STATE_CHECKED, LV_SYMBOL_OK);
-    //    lv_style_set_pattern_recolor(&styles->cb_bullet, LV_STATE_CHECKED, LV_COLOR_WHITE);
-    //    lv_style_set_pattern_opa(&styles->cb_bullet, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-    //    lv_style_set_pattern_opa(&styles->cb_bullet, LV_STATE_CHECKED, LV_OPA_COVER);
-    //    lv_style_set_transition_prop_3(&styles->cb_bullet, LV_STATE_DEFAULT, LV_STYLE_PATTERN_OPA);
-    //    lv_style_set_text_font(&styles->cb_bullet, LV_STATE_CHECKED, theme.font_small);
-    //    lv_style_set_pad_left(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
-    //    lv_style_set_pad_right(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
-    //    lv_style_set_pad_top(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
-    //    lv_style_set_pad_bottom(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
-    //    lv_style_set_margin_right(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(6));
-    //#endif
-    //}
+    style_init_reset(&styles->cb_marker_checked);
+    lv_style_set_content_src(&styles->cb_marker_checked, LV_SYMBOL_OK);
+    lv_style_set_text_color(&styles->cb_marker_checked, LV_COLOR_WHITE);
+    lv_style_set_text_font(&styles->cb_marker_checked, theme.font_small);
+
+
+    style_init_reset(&styles->chart_bg);
+    lv_style_set_line_width(&styles->chart_bg, LV_DPX(1));
+    lv_style_set_line_dash_width(&styles->chart_bg, LV_DPX(10));
+    lv_style_set_line_dash_gap(&styles->chart_bg, LV_DPX(10));
+    lv_style_set_line_color(&styles->chart_bg, LV_COLOR_RED);//CARD_BORDER_COLOR);
+    lv_style_set_text_color(&styles->chart_bg, LV_COLOR_RED);//CARD_BORDER_COLOR);
+
+    style_init_reset(&styles->chart_series);
+    lv_style_set_line_width(&styles->chart_series, LV_DPX(3));
+//    lv_style_set_size(&styles->chart_series, LV_DPX(4));
+    lv_style_set_pad_all(&styles->chart_series, LV_DPX(2));     /*Space between columns*/
+    lv_style_set_radius(&styles->chart_series, LV_DPX(1));
+
+
 
 
 }
@@ -356,20 +360,6 @@ static void line_init(void)
 {
 #if LV_USE_LINE != 0
 
-#endif
-}
-
-static void switch_init(void)
-{
-#if LV_USE_SWITCH != 0
-    style_init_reset(&styles->sw_knob);
-    lv_style_set_bg_opa(&styles->sw_knob, LV_STATE_DEFAULT, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->sw_knob, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_radius(&styles->sw_knob, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-    lv_style_set_pad_top(&styles->sw_knob, LV_STATE_DEFAULT,    - LV_DPX(4));
-    lv_style_set_pad_bottom(&styles->sw_knob, LV_STATE_DEFAULT, - LV_DPX(4));
-    lv_style_set_pad_left(&styles->sw_knob, LV_STATE_DEFAULT,   - LV_DPX(4));
-    lv_style_set_pad_right(&styles->sw_knob, LV_STATE_DEFAULT,  - LV_DPX(4));
 #endif
 }
 
@@ -458,23 +448,7 @@ static void spinner_init(void)
 
 static void chart_init(void)
 {
-#if LV_USE_CHART
-    style_init_reset(&styles->chart_bg);
-    lv_style_set_text_color(&styles->chart_bg, LV_STATE_DEFAULT, IS_LIGHT ? COLOR_BG_TEXT_DIS : lv_color_hex(0xa1adbd));
 
-    style_init_reset(&styles->chart_series_bg);
-    lv_style_set_line_width(&styles->chart_series_bg, LV_STATE_DEFAULT, LV_DPX(1));
-    lv_style_set_line_dash_width(&styles->chart_series_bg, LV_STATE_DEFAULT, LV_DPX(10));
-    lv_style_set_line_dash_gap(&styles->chart_series_bg, LV_STATE_DEFAULT, LV_DPX(10));
-    lv_style_set_line_color(&styles->chart_series_bg, LV_STATE_DEFAULT, CARD_BORDER_COLOR);
-
-    style_init_reset(&styles->chart_series);
-    lv_style_set_line_width(&styles->chart_series, LV_STATE_DEFAULT, LV_DPX(3));
-    lv_style_set_size(&styles->chart_series, LV_STATE_DEFAULT, LV_DPX(4));
-    lv_style_set_pad_all(&styles->chart_series, LV_STATE_DEFAULT, LV_DPX(2));     /*Space between columns*/
-    lv_style_set_radius(&styles->chart_series, LV_STATE_DEFAULT, LV_DPX(1));
-
-#endif
 }
 
 static void textarea_init(void)
@@ -594,7 +568,6 @@ lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_se
     basic_init();
     btnmatrix_init();
     line_init();
-    switch_init();
     linemeter_init();
     gauge_init();
     arc_init();
@@ -642,7 +615,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->pressed);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->grow);
-//        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_BORN, &styles->grow);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_CHECKED, &styles->btn_color_checked);
     }
 #endif
@@ -659,7 +631,6 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 #if LV_USE_SLIDER
     else if(lv_obj_check_type(obj, &lv_slider)) {
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->grow);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_delayed);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
@@ -674,15 +645,44 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 
 #if LV_USE_CHECKBOX
     else if(lv_obj_check_type(obj, &lv_checkbox)) {
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->card);
-        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->pad_zero);
+        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->cb_marker);
         lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->bg_color_primary);
+        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->cb_marker_checked);
         lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->pressed);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
+        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->grow);
+        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->transition_normal);
         lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->transition_delayed);
     }
 #endif
 
+#if LV_USE_SWITCH
+    else if(lv_obj_check_type(obj, &lv_switch)) {
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_white);
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->pad_small_negative);
+    }
+#endif
+
+#if LV_USE_SWITCH
+    else if(lv_obj_check_type(obj, &lv_chart)) {
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->chart_bg);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_zero);
+        lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
+        lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
+        lv_obj_add_style(obj, LV_PART_SERIES, LV_STATE_DEFAULT, &styles->chart_series);
+//        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
+//        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
+//        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
+//        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
+//        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_white);
+//        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->pad_small_negative);
+    }
+#endif
 #if LV_USE_BTNMATRIX
 case LV_THEME_BTNMATRIX:
     list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_MAIN);
@@ -698,20 +698,6 @@ case LV_THEME_BTNMATRIX:
     _lv_style_list_add_style(list, &styles->card);
     _lv_style_list_add_style(list, &styles->bg_click);
     _lv_style_list_add_style(list, &styles->btnmatrix_btn);
-    break;
-#endif
-
-
-#if LV_USE_SWITCH
-case LV_THEME_SWITCH:
-    list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_MAIN);
-    _lv_style_list_add_style(list, &styles->bar_bg);
-
-    list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_INDIC);
-    _lv_style_list_add_style(list, &styles->bar_indic);
-
-    list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_KNOB);
-    _lv_style_list_add_style(list, &styles->sw_knob);
     break;
 #endif
 
@@ -782,24 +768,24 @@ case LV_THEME_DROPDOWN:
     break;
 #endif
 
-#if LV_USE_CHART
-case LV_THEME_CHART:
-    list = _lv_obj_get_style_list(obj, LV_CHART_PART_BG);
-    _lv_style_list_add_style(list, &styles->card);
-    _lv_style_list_add_style(list, &styles->chart_bg);
-    _lv_style_list_add_style(list, &styles->pad_small);
-
-    list = _lv_obj_get_style_list(obj, LV_CHART_PART_SERIES_BG);
-    _lv_style_list_add_style(list, &styles->pad_small);
-    _lv_style_list_add_style(list, &styles->chart_series_bg);
-
-    list = _lv_obj_get_style_list(obj, LV_CHART_PART_CURSOR);
-    _lv_style_list_add_style(list, &styles->chart_series_bg);
-
-    list = _lv_obj_get_style_list(obj, LV_CHART_PART_SERIES);
-    _lv_style_list_add_style(list, &styles->chart_series);
-    break;
-#endif
+//#if LV_USE_CHART
+//case LV_THEME_CHART:
+//    list = _lv_obj_get_style_list(obj, LV_CHART_PART_BG);
+//    _lv_style_list_add_style(list, &styles->card);
+//    _lv_style_list_add_style(list, &styles->chart_bg);
+//    _lv_style_list_add_style(list, &styles->pad_small);
+//
+//    list = _lv_obj_get_style_list(obj, LV_CHART_PART_SERIES_BG);
+//    _lv_style_list_add_style(list, &styles->pad_small);
+//    _lv_style_list_add_style(list, &styles->chart_series_bg);
+//
+//    list = _lv_obj_get_style_list(obj, LV_CHART_PART_CURSOR);
+//    _lv_style_list_add_style(list, &styles->chart_series_bg);
+//
+//    list = _lv_obj_get_style_list(obj, LV_CHART_PART_SERIES);
+//    _lv_style_list_add_style(list, &styles->chart_series);
+//    break;
+//#endif
 #if LV_USE_TABLE
 case LV_THEME_TABLE: {
     list = _lv_obj_get_style_list(obj, LV_TABLE_PART_BG);

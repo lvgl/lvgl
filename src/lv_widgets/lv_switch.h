@@ -38,9 +38,7 @@ LV_CLASS_DECLARE_START(lv_switch, lv_obj);
 #define _lv_switch_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
 
 #define _lv_switch_data             \
-  _lv_obj_data                  \
-  lv_style_list_t style_indic;  \
-  lv_style_list_t style_knob;
+  _lv_obj_data
 
 #define _lv_switch_class_dsc        \
   _lv_obj_class_dsc              \
@@ -48,18 +46,6 @@ LV_CLASS_DECLARE_START(lv_switch, lv_obj);
 LV_CLASS_DECLARE_END(lv_switch, lv_obj);
 
 extern lv_switch_class_t lv_switch;
-
-/**
- * Switch parts.
- */
-enum {
-    LV_SWITCH_PART_MAIN = LV_OBJ_PART_MAIN,                 /**< Switch background. */
-    LV_SWITCH_PART_INDIC,           /**< Switch fill area. */
-    LV_SWITCH_PART_KNOB,    /**< Switch knob. */
-    _LV_SWITCH_PART_VIRTUAL_LAST
-};
-
-typedef uint8_t lv_switch_part_t;
 
 /**********************
  * GLOBAL PROTOTYPES

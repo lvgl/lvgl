@@ -27,9 +27,6 @@ extern "C" {
 /**Default value of points. Can be used to not draw a point*/
 #define LV_CHART_POINT_DEF (LV_COORD_MIN)
 
-/**Automatically calculate the tick length*/
-#define LV_CHART_TICK_LENGTH_AUTO 255
-
 LV_EXPORT_CONST_INT(LV_CHART_POINT_DEF);
 LV_EXPORT_CONST_INT(LV_CHART_TICK_LENGTH_AUTO);
 
@@ -99,34 +96,36 @@ typedef struct {
     uint8_t minor_tick_len;
 } lv_chart_axis_cfg_t;
 
-/*Data of chart */
-typedef struct {
-    /*No inherited ext*/ /*Ext. of ancestor*/
-    /*New data for this type */
-    lv_ll_t series_ll;    /*Linked list for the data line pointers (stores lv_chart_series_t)*/
-    lv_ll_t cursors_ll;    /*Linked list for the cursor pointers (stores lv_chart_cursor_t)*/
-    lv_coord_t ymin[_LV_CHART_AXIS_LAST];      /*y min values for both axis (used to scale the data)*/
-    lv_coord_t ymax[_LV_CHART_AXIS_LAST];      /*y max values for both axis  (used to scale the data)*/
-    uint8_t hdiv_cnt;     /*Number of horizontal division lines*/
-    uint8_t vdiv_cnt;     /*Number of vertical division lines*/
-    uint16_t point_cnt;   /*Point number in a data line*/
-    lv_style_list_t style_series_bg;
-    lv_style_list_t style_series;
-    lv_style_list_t style_cursors;
-    lv_chart_type_t type; /*Line, column or point chart (from 'lv_chart_type_t')*/
-    lv_chart_axis_cfg_t y_axis;
-    lv_chart_axis_cfg_t x_axis;
-    lv_chart_axis_cfg_t secondary_y_axis;
-    uint8_t update_mode : 1;
-} lv_chart_ext_t;
 
-/*Parts of the chart*/
-enum {
-    LV_CHART_PART_BG = LV_OBJ_PART_MAIN,
-    LV_CHART_PART_SERIES_BG,
-    LV_CHART_PART_SERIES,
-    LV_CHART_PART_CURSOR
-};
+LV_CLASS_DECLARE_START(lv_chart, lv_obj);
+
+#define _lv_chart_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
+
+#define _lv_chart_data             \
+     _lv_obj_data                     \
+     lv_ll_t series_ll;    /*Linked list for the data line pointers (stores lv_chart_series_t)*/   \
+    lv_ll_t cursors_ll;    /*Linked list for the cursor pointers (stores lv_chart_cursor_t)*/       \
+    lv_coord_t ymin[_LV_CHART_AXIS_LAST];      /*y min values for both axis (used to scale the data)*/ \
+    lv_coord_t ymax[_LV_CHART_AXIS_LAST];      /*y max values for both axis  (used to scale the data)*/ \
+    uint8_t hdiv_cnt;     /*Number of horizontal division lines*/  \
+    uint8_t vdiv_cnt;     /*Number of vertical division lines*/ \
+    uint16_t point_cnt;   /*Point number in a data line*/ \
+    lv_chart_type_t type; /*Line, column or point chart (from 'lv_chart_type_t')*/ \
+    lv_chart_axis_cfg_t y_axis;    \
+    lv_chart_axis_cfg_t x_axis;     \
+    lv_chart_axis_cfg_t secondary_y_axis; \
+    uint16_t x_zoom; \
+    uint16_t y_zoom; \
+    uint8_t update_mode : 1;
+
+#define _lv_chart_class_dsc        \
+  _lv_obj_class_dsc
+
+LV_CLASS_DECLARE_END(lv_chart, lv_obj);
+
+extern lv_chart_class_t lv_chart;
+
+#define LV_PART_SERIES  20
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -384,13 +383,6 @@ lv_coord_t lv_chart_get_point_id(lv_obj_t * chart, lv_chart_series_t * ser, uint
  * @return `LV_CHART_AXIS_PRIMARY_Y` or `LV_CHART_AXIS_SECONDARY_Y`
  */
 lv_chart_axis_t lv_chart_get_series_axis(lv_obj_t * chart, lv_chart_series_t * ser);
-
-/**
- * Get an individual point y value in the chart series directly based on index
- * @param chart             pointer to a chart object
- * @param series_area       pointer to an area variable that the result will put in.
- */
-void lv_chart_get_series_area(lv_obj_t * chart, lv_area_t * series_area);
 
 /**
  * Get the coordinate of the cursor with respect

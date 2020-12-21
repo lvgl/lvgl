@@ -38,7 +38,6 @@ static void lv_switch_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
 static void lv_switch_destructor(void * obj);
 static lv_res_t lv_switch_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
 static lv_design_res_t lv_switch_design(lv_obj_t * sw, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_style_list_t * lv_switch_get_style(lv_obj_t * sw, uint8_t part);
 
 /**********************
  *  STATIC VARIABLES
@@ -73,14 +72,7 @@ lv_obj_t * lv_switch_create(lv_obj_t * parent, const lv_obj_t * copy)
     lv_obj_t * obj = lv_class_new(&lv_switch);
     lv_switch.constructor(obj, parent, copy);
 
-    lv_switch_t * sw = (lv_switch_t *) obj;
-    const lv_switch_t * sw_copy = (const lv_switch_t *) copy;
-    if(!copy) lv_theme_apply(obj, LV_THEME_SWITCH);
-    else {
-        lv_style_list_copy(&sw->style_indic, &sw_copy->style_indic);
-        lv_style_list_copy(&sw->style_knob, &sw_copy->style_knob);
-        _lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
-    }
+    lv_obj_create_finish(obj, parent, copy);
 
     return obj;
 }
@@ -98,9 +90,6 @@ static void lv_switch_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_ob
     lv_switch.base_p->constructor(obj, parent, copy);
 
     lv_switch_t * sw = (lv_switch_t *) obj;
-    lv_style_list_init(&sw->style_indic);
-    lv_style_list_init(&sw->style_knob);
-
 
    if(copy == NULL) {
        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
@@ -117,7 +106,7 @@ static void lv_switch_destructor(void * obj)
 //    lv_bar_t * bar = obj;
 //
 //    _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_INDIC);
-//    _lv_obj_reset_style_list_no_refr(sw, LV_SWITCH_PART_KNOB);
+//    _lv_obj_reset_style_list_no_refr(sw, LV_PART_KNOB);
 //
 //    bar->class_p->base_p->destructor(obj);
 }
@@ -149,10 +138,10 @@ static lv_design_res_t lv_switch_design(lv_obj_t * obj, const lv_area_t * clip_a
         lv_switch_t * sw = (lv_switch_t *)obj;
 
         /*Calculate the indicator area*/
-        lv_style_int_t bg_left = lv_obj_get_style_pad_left(obj,     LV_SWITCH_PART_MAIN);
-        lv_style_int_t bg_right = lv_obj_get_style_pad_right(obj,   LV_SWITCH_PART_MAIN);
-        lv_style_int_t bg_top = lv_obj_get_style_pad_top(obj,       LV_SWITCH_PART_MAIN);
-        lv_style_int_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_SWITCH_PART_MAIN);
+        lv_coord_t bg_left = lv_obj_get_style_pad_left(obj,     LV_PART_MAIN);
+        lv_coord_t bg_right = lv_obj_get_style_pad_right(obj,   LV_PART_MAIN);
+        lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
+        lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
 
         bool chk = lv_obj_get_state(obj) & LV_STATE_CHECKED;
         /*Draw the indicator in checked state*/
@@ -167,7 +156,7 @@ static lv_design_res_t lv_switch_design(lv_obj_t * obj, const lv_area_t * clip_a
 
             lv_draw_rect_dsc_t draw_indic_dsc;
             lv_draw_rect_dsc_init(&draw_indic_dsc);
-            lv_obj_init_draw_rect_dsc(obj, LV_SWITCH_PART_INDIC, &draw_indic_dsc);
+            lv_obj_init_draw_rect_dsc(obj, LV_PART_INDICATOR, &draw_indic_dsc);
             lv_draw_rect(&indic_area, clip_area, &draw_indic_dsc);
         }
 
@@ -189,10 +178,10 @@ static lv_design_res_t lv_switch_design(lv_obj_t * obj, const lv_area_t * clip_a
         knob_area.y1 = sw->coords.y1 + bg_top;
         knob_area.y2 = sw->coords.y2 - bg_bottom;
 
-        lv_style_int_t knob_left = lv_obj_get_style_pad_left(obj, LV_SWITCH_PART_KNOB);
-        lv_style_int_t knob_right = lv_obj_get_style_pad_right(obj, LV_SWITCH_PART_KNOB);
-        lv_style_int_t knob_top = lv_obj_get_style_pad_top(obj, LV_SWITCH_PART_KNOB);
-        lv_style_int_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_SWITCH_PART_KNOB);
+        lv_coord_t knob_left = lv_obj_get_style_pad_left(obj, LV_PART_KNOB);
+        lv_coord_t knob_right = lv_obj_get_style_pad_right(obj, LV_PART_KNOB);
+        lv_coord_t knob_top = lv_obj_get_style_pad_top(obj, LV_PART_KNOB);
+        lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
         /*Apply the paddings on the knob area*/
         knob_area.x1 -= knob_left;
@@ -202,7 +191,7 @@ static lv_design_res_t lv_switch_design(lv_obj_t * obj, const lv_area_t * clip_a
 
         lv_draw_rect_dsc_t knob_rect_dsc;
         lv_draw_rect_dsc_init(&knob_rect_dsc);
-        lv_obj_init_draw_rect_dsc(obj, LV_SWITCH_PART_KNOB, &knob_rect_dsc);
+        lv_obj_init_draw_rect_dsc(obj, LV_PART_KNOB, &knob_rect_dsc);
 
         lv_draw_rect(&knob_area, clip_area, &knob_rect_dsc);
 
@@ -231,28 +220,23 @@ static lv_res_t lv_switch_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     res = lv_switch.base_p->signal_cb(obj, sign, param);
     if(res != LV_RES_OK) return res;
 
-    if(sign == LV_SIGNAL_GET_STYLE) {
-        lv_get_style_info_t * info = param;
-        info->result = lv_switch_get_style(obj, info->part);
-        if(info->result != NULL) return LV_RES_OK;
-        else return lv_switch.base_p->signal_cb(obj, sign, param);
-    }
+
     else if(sign == LV_SIGNAL_REFR_EXT_DRAW_PAD) {
-        lv_style_int_t knob_left = lv_obj_get_style_pad_left(obj,   LV_SWITCH_PART_KNOB);
-        lv_style_int_t knob_right = lv_obj_get_style_pad_right(obj,  LV_SWITCH_PART_KNOB);
-        lv_style_int_t knob_top = lv_obj_get_style_pad_top(obj,    LV_SWITCH_PART_KNOB);
-        lv_style_int_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_SWITCH_PART_KNOB);
+        lv_coord_t knob_left = lv_obj_get_style_pad_left(obj,   LV_PART_KNOB);
+        lv_coord_t knob_right = lv_obj_get_style_pad_right(obj,  LV_PART_KNOB);
+        lv_coord_t knob_top = lv_obj_get_style_pad_top(obj,    LV_PART_KNOB);
+        lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
         /* The smaller size is the knob diameter*/
         lv_coord_t knob_size = LV_MATH_MIN(lv_obj_get_width(obj), lv_obj_get_height(obj)) >> 1;
         knob_size += LV_MATH_MAX(LV_MATH_MAX(knob_left, knob_right), LV_MATH_MAX(knob_bottom, knob_top));
         knob_size += 2;         /*For rounding error*/
 
-        knob_size += _lv_obj_get_draw_rect_ext_pad_size(obj, LV_SWITCH_PART_KNOB);
+        knob_size += _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_KNOB);
 
         lv_coord_t * s = param;
         *s = LV_MATH_MAX(*s, knob_size);
-        *s = LV_MATH_MAX(*s, _lv_obj_get_draw_rect_ext_pad_size(obj, LV_SWITCH_PART_INDIC));
+        *s = LV_MATH_MAX(*s, _lv_obj_get_draw_rect_ext_pad_size(obj, LV_PART_INDICATOR));
     }
     else if(sign == LV_SIGNAL_RELEASED) {
         lv_obj_invalidate(obj);
@@ -267,27 +251,4 @@ static lv_res_t lv_switch_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
     return res;
 }
 
-static lv_style_list_t * lv_switch_get_style(lv_obj_t * obj, uint8_t part)
-{
-    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
-
-    lv_switch_t * sw = (lv_switch_t *) obj;
-    lv_style_list_t * style_dsc_p;
-
-    switch(part) {
-        case LV_SWITCH_PART_MAIN:
-            style_dsc_p = &sw->style_list;
-            break;
-        case LV_SWITCH_PART_INDIC:
-            style_dsc_p = &sw->style_indic;
-            break;
-        case LV_SWITCH_PART_KNOB:
-            style_dsc_p = &sw->style_knob;
-            break;
-        default:
-            style_dsc_p = NULL;
-    }
-
-    return style_dsc_p;
-}
 #endif
