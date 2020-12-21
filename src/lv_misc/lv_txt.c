@@ -794,7 +794,7 @@ static uint8_t lv_txt_iso8859_1_size(const char * str)
  */
 static uint32_t lv_txt_unicode_to_iso8859_1(uint32_t letter_uni)
 {
-    if(letter_uni < 128)
+    if(letter_uni < 256)
         return letter_uni;
     else
         return ' ';
