@@ -47,6 +47,7 @@ props = [
 {'name': 'IMG_RECOLOR_OPA', 					'style_type': '_int', 	'var_type': 'lv_opa_t' },
 {'name': 'OUTLINE_WIDTH', 						'style_type': '_int', 	'var_type': 'lv_coord_t' },
 {'name': 'OUTLINE_COLOR', 						'style_type': '_color', 'var_type': 'lv_color_t' },
+{'name': 'OUTLINE_COLOR_FILTERED', 						'style_type': '_color', 'var_type': 'lv_color_t' },
 {'name': 'OUTLINE_OPA', 							'style_type': '_int', 	'var_type': 'lv_opa_t' },
 {'name': 'OUTLINE_PAD', 							'style_type': '_int', 	'var_type': 'lv_coord_t' },
 {'name': 'OUTLINE_BLEND_MODE',				'style_type': '_int', 	'var_type': 'lv_blend_mode_t' },

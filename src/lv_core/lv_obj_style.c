@@ -32,30 +32,6 @@ typedef struct {
     lv_style_value_t end_value;
 } lv_style_trans_t;
 
-typedef struct {
-    lv_draw_rect_dsc_t rect;
-    lv_draw_label_dsc_t label;
-    lv_draw_line_dsc_t line;
-    lv_draw_img_dsc_t img;
-    lv_coord_t pad_top;
-    lv_coord_t pad_bottom;
-    lv_coord_t pad_right;
-    lv_coord_t pad_left;
-    lv_coord_t pad_inner;
-    lv_coord_t margin_top;
-    lv_coord_t margin_bottom;
-    lv_coord_t margin_left;
-    lv_coord_t margin_right;
-    lv_coord_t transform_width;
-    lv_coord_t transform_height;
-    lv_coord_t transform_angle;
-    lv_coord_t transform_zoom;
-    lv_opa_t opa_scale;
-    uint32_t clip_corder :1;
-    uint32_t border_post :1;
-}style_snapshot_t;
-
-
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -756,12 +732,19 @@ static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
                 if(v == 0) value_final._int = tr->start_value._int;
                 else if(v == 255) value_final._int = tr->end_value._int;
                 else value_final._int = tr->start_value._int + ((int32_t)((int32_t)(tr->end_value._int - tr->start_value._int) * v) >> 8);
-
                 break;
         }
 
+        lv_style_value_t old_value;
+        bool refr = true;
+        if(lv_style_get_prop(list->styles[i].style, tr->prop, &old_value)) {
+            if(value_final._ptr == old_value._ptr && value_final._func == old_value._ptr && value_final._color.full == old_value._color.full && value_final._int == old_value._int) {
+                refr = false;
+            }
+        }
+
         lv_style_set_prop(list->styles[i].style, tr->prop, value_final);
-        _lv_obj_refresh_style(tr->obj, tr->prop);
+        if (refr)_lv_obj_refresh_style(tr->obj, tr->prop);
         break;
 
     }

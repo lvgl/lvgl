@@ -68,7 +68,7 @@ lv_obj_t * lv_btn_create(lv_obj_t * parent, const lv_obj_t * copy)
      lv_obj_t * obj = lv_class_new(&lv_btn);
      lv_btn.constructor(obj, parent, copy);
 
-     if(!copy) lv_theme_apply(obj);
+     lv_obj_create_finish(obj, parent, copy);
 
      LV_LOG_TRACE("button create started");
      return obj;

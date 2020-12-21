@@ -1,5 +1,3 @@
-
-
 /**
  * @file lv_bar.c
  *
@@ -85,10 +83,7 @@ lv_obj_t * lv_bar_create(lv_obj_t * parent, const lv_obj_t * copy)
     lv_obj_t * obj = lv_class_new(&lv_bar);
     lv_bar.constructor(obj, parent, copy);
 
-    lv_bar_t * bar = (lv_bar_t *) obj;
-    const lv_bar_t * bar_copy = (const lv_bar_t *) copy;
-    if(!copy) lv_theme_apply(obj);
-//    else lv_style_list_copy(&bar->style_indic, &bar_copy->style_indic);
+    lv_obj_create_finish(obj, parent, copy);
 
     return obj;
 }
@@ -409,10 +404,19 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
 
     lv_bidi_dir_t base_dir = lv_obj_get_base_dir(obj);
 
-    lv_coord_t objw = lv_obj_get_width(obj);
-    lv_coord_t objh = lv_obj_get_height(obj);
+    lv_area_t bar_coords;
+    lv_obj_get_coords(obj, &bar_coords);
+
+    lv_coord_t transf_w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+    lv_coord_t transf_h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+    bar_coords.x1 -= transf_w;
+    bar_coords.x2 += transf_w;
+    bar_coords.y1 -= transf_h;
+    bar_coords.y2 += transf_h;
+    lv_coord_t barw = lv_area_get_width(&bar_coords);
+    lv_coord_t barh = lv_area_get_height(&bar_coords);
     int32_t range = bar->max_value - bar->min_value;
-    bool hor = objw >= objh ? true : false;
+    bool hor = barw >= barh ? true : false;
     bool sym = false;
     if(bar->type == LV_BAR_TYPE_SYMMETRICAL && bar->min_value < 0 && bar->max_value > 0 &&
        bar->start_value == bar->min_value) sym = true;
@@ -422,20 +426,19 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     lv_coord_t bg_right = lv_obj_get_style_pad_right(obj,   LV_PART_MAIN);
     lv_coord_t bg_top = lv_obj_get_style_pad_top(obj,       LV_PART_MAIN);
     lv_coord_t bg_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_MAIN);
-
     /*Respect padding and minimum width/height too*/
-    lv_area_copy(&bar->indic_area, &bar->coords);
+    lv_area_copy(&bar->indic_area, &bar_coords);
     bar->indic_area.x1 += bg_left;
     bar->indic_area.x2 -= bg_right;
     bar->indic_area.y1 += bg_top;
     bar->indic_area.y2 -= bg_bottom;
 
     if(hor && lv_area_get_height(&bar->indic_area) < LV_BAR_SIZE_MIN) {
-        bar->indic_area.y1 = bar->coords.y1 + (objh / 2) - (LV_BAR_SIZE_MIN / 2);
+        bar->indic_area.y1 = bar->coords.y1 + (barh / 2) - (LV_BAR_SIZE_MIN / 2);
         bar->indic_area.y2 = bar->indic_area.y1 + LV_BAR_SIZE_MIN;
     }
     else if(!hor && lv_area_get_width(&bar->indic_area) < LV_BAR_SIZE_MIN) {
-        bar->indic_area.x1 = bar->coords.x1 + (objw / 2) - (LV_BAR_SIZE_MIN / 2);
+        bar->indic_area.x1 = bar->coords.x1 + (barw / 2) - (LV_BAR_SIZE_MIN / 2);
         bar->indic_area.x2 = bar->indic_area.x1 + LV_BAR_SIZE_MIN;
     }
 
@@ -532,7 +535,7 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     if(!sym && indic_length_calc(&bar->indic_area) <= 1) return;
 
     uint16_t bg_radius = lv_obj_get_style_radius(obj, LV_PART_MAIN);
-    lv_coord_t short_side = LV_MATH_MIN(objw, objh);
+    lv_coord_t short_side = LV_MATH_MIN(barw, barh);
     if(bg_radius > short_side >> 1) bg_radius = short_side >> 1;
 
     lv_draw_rect_dsc_t draw_indic_dsc;
@@ -557,7 +560,7 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
     }
 
     lv_draw_mask_radius_param_t mask_bg_param;
-    lv_draw_mask_radius_init(&mask_bg_param, &bar->coords, bg_radius, false);
+    lv_draw_mask_radius_init(&mask_bg_param, &bar_coords, bg_radius, false);
     int16_t mask_bg_id = lv_draw_mask_add(&mask_bg_param, NULL);
 
     /*Draw_only the background and the pattern*/
@@ -570,17 +573,17 @@ static void draw_indic(lv_obj_t * obj, const lv_area_t * clip_area)
 
     /*Get the max possible indicator area. The gradient should be applied on this*/
     lv_area_t mask_indic_max_area;
-    lv_area_copy(&mask_indic_max_area, &bar->coords);
+    lv_area_copy(&mask_indic_max_area, &bar_coords);
     mask_indic_max_area.x1 += bg_left;
     mask_indic_max_area.y1 += bg_top;
     mask_indic_max_area.x2 -= bg_right;
     mask_indic_max_area.y2 -= bg_bottom;
     if(hor && lv_area_get_height(&mask_indic_max_area) < LV_BAR_SIZE_MIN) {
-        mask_indic_max_area.y1 = bar->coords.y1 + (objh / 2) - (LV_BAR_SIZE_MIN / 2);
+        mask_indic_max_area.y1 = bar->coords.y1 + (barh / 2) - (LV_BAR_SIZE_MIN / 2);
         mask_indic_max_area.y2 = mask_indic_max_area.y1 + LV_BAR_SIZE_MIN;
     }
     else if(!hor && lv_area_get_width(&mask_indic_max_area) < LV_BAR_SIZE_MIN) {
-        mask_indic_max_area.x1 = bar->coords.x1 + (objw / 2) - (LV_BAR_SIZE_MIN / 2);
+        mask_indic_max_area.x1 = bar->coords.x1 + (barw / 2) - (LV_BAR_SIZE_MIN / 2);
         mask_indic_max_area.x2 = mask_indic_max_area.x1 + LV_BAR_SIZE_MIN;
     }
 

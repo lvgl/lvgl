@@ -72,21 +72,10 @@ lv_obj_t * lv_slider_create(lv_obj_t * parent, const lv_obj_t * copy)
         lv_slider.design_cb = lv_slider_design;
     }
 
-
     lv_obj_t * obj = lv_class_new(&lv_slider);
     lv_slider.constructor(obj, parent, copy);
 
-    lv_slider_t * slider = (lv_slider_t *) obj;
-
-    /*Init the new slider slider*/
-       if(copy == NULL) {
-           lv_theme_apply(obj);
-       } else {
-//           lv_slider_t * copy_slider = (lv_slider_t *) copy;
-//           lv_style_list_copy(&slider->style_knob, &copy_slider->style_knob);
-//
-//           _lv_obj_refresh_style(obj, LV_OBJ_PART_ALL, LV_STYLE_PROP_ALL);
-       }
+    lv_obj_create_finish(obj, parent, copy);
 
     LV_LOG_INFO("slider created");
 
@@ -426,7 +415,9 @@ static lv_res_t lv_slider_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
         lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(obj, LV_PART_KNOB);
 
         /* The smaller size is the knob diameter*/
-        lv_coord_t knob_size = LV_MATH_MIN(lv_obj_get_width(obj), lv_obj_get_height(obj)) >> 1;
+        lv_coord_t trans_w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
+        lv_coord_t trans_h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
+        lv_coord_t knob_size = LV_MATH_MIN(lv_obj_get_width(obj) + 2 * trans_w, lv_obj_get_height(obj) + 2 * trans_h) >> 1;
         knob_size += LV_MATH_MAX(LV_MATH_MAX(knob_left, knob_right), LV_MATH_MAX(knob_bottom, knob_top));
         knob_size += 2;         /*For rounding error*/
 
@@ -488,11 +479,14 @@ static void lv_slider_position_knob(lv_obj_t * slider, lv_area_t * knob_area, lv
     lv_coord_t knob_top = lv_obj_get_style_pad_top(slider,    LV_PART_KNOB);
     lv_coord_t knob_bottom = lv_obj_get_style_pad_bottom(slider, LV_PART_KNOB);
 
+    lv_coord_t transf_w = lv_obj_get_style_transform_width(slider, LV_PART_KNOB);
+    lv_coord_t transf_h = lv_obj_get_style_transform_height(slider, LV_PART_KNOB);
+
     /*Apply the paddings on the knob area*/
-    knob_area->x1 -= knob_left;
-    knob_area->x2 += knob_right;
-    knob_area->y1 -= knob_top;
-    knob_area->y2 += knob_bottom;
+    knob_area->x1 -= knob_left + transf_w;
+    knob_area->x2 += knob_right + transf_w;
+    knob_area->y1 -= knob_top + transf_h;
+    knob_area->y2 += knob_bottom + transf_h;
 }
 
 static void lv_slider_draw_knob(lv_obj_t * slider, const lv_area_t * knob_area, const lv_area_t * clip_area)

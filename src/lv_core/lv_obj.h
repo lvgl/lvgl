@@ -162,6 +162,7 @@ enum {
     LV_STATE_PRESSED  =  0x10,
     LV_STATE_SCROLLED =  0x20,
     LV_STATE_DISABLED =  0x40,
+    LV_STATE_BORN     =  0x80,
 };
 
 typedef uint8_t lv_state_t;
@@ -255,15 +256,10 @@ enum {
     LV_PART_KNOB,
     LV_PART_PLACEHOLDER,
     LV_PART_HIGHLIGHT,
+    LV_PART_MARKER,
 };
 
 typedef uint8_t lv_part_t;
-
-/** Used by `lv_obj_get_type()`. The object's and its ancestor types are stored here*/
-typedef struct {
-    const char * type[LV_MAX_ANCESTOR_NUM]; /**< [0]: the actual type, [1]: ancestor, [2] #1's ancestor
-                                               ... [x]: "lv_obj" */
-} lv_obj_type_t;
 
 typedef struct {
     lv_point_t * point;
@@ -303,6 +299,7 @@ void lv_deinit(void);
  */
 lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy);
 
+void lv_obj_create_finish(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy);
 /**
  * Delete 'obj' and all of its children
  * @param obj pointer to an object to delete

@@ -13,7 +13,7 @@
 #include "../lv_misc/lv_gc.h"
 
 #if defined(LV_GC_INCLUDE)
-    #include LV_GC_INCLUDE
+#include LV_GC_INCLUDE
 #endif /* LV_ENABLE_GC */
 
 /*********************
@@ -91,6 +91,7 @@ typedef struct {
     lv_style_t bg_color_gray;
     lv_style_t pressed;
     lv_style_t disabled;
+    lv_style_t pad_zero;
     lv_style_t pad_small;
     lv_style_t pad_small_negative;
     lv_style_t focus_border;
@@ -101,6 +102,8 @@ typedef struct {
     lv_style_t no_radius;
     lv_style_t clip_corner;
     lv_style_t grow;
+    lv_style_t transition_delayed;
+    lv_style_t transition_normal;
 
     /*Parts*/
     lv_style_t knob;
@@ -113,10 +116,6 @@ typedef struct {
     lv_style_t arc_knob;
 #endif
 
-#if LV_USE_BAR
-    lv_style_t bar_bg;
-    lv_style_t bar_indic;
-#endif
 
 #if LV_USE_BTNMATRIX
     lv_style_t btnmatrix_btn;
@@ -127,7 +126,7 @@ typedef struct {
 #endif
 
 #if LV_USE_CHECKBOX
-    lv_style_t cb_bg, cb_bullet;
+    lv_style_t cb_marker;
 #endif
 
 #if LV_USE_DROPDOWN
@@ -146,9 +145,6 @@ typedef struct {
     lv_style_t roller_bg, roller_sel;
 #endif
 
-#if LV_USE_SLIDER
-    lv_style_t slider_knob, slider_bg;
-#endif
 
 #if LV_USE_SWITCH
     lv_style_t sw_knob;
@@ -189,7 +185,7 @@ static bool inited;
 static void basic_init(void)
 {
     const static lv_style_prop_t trans_props[] = {
-            LV_STYLE_BG_OPA, LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT, LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_CB, 0
+            LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR, LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT, LV_STYLE_COLOR_FILTER_OPA, LV_STYLE_COLOR_FILTER_CB, 0
     };
 
     static lv_style_transiton_t trans_delayed;
@@ -200,6 +196,13 @@ static void basic_init(void)
 
     static lv_style_transiton_t trans_normal;
     lv_style_transition_init(&trans_normal, trans_props, &lv_anim_path_def, TRANSITION_TIME, 0);
+
+    style_init_reset(&styles->transition_delayed);
+    lv_style_set_transition(&styles->transition_delayed, &trans_delayed); /*Go back to default state with delay*/
+
+    style_init_reset(&styles->transition_normal);
+    lv_style_set_transition(&styles->transition_normal, &trans_normal); /*Go back to default state with delay*/
+
 
     style_init_reset(&styles->scrollbar);
     lv_style_set_bg_opa(&styles->scrollbar, LV_OPA_COVER);
@@ -255,7 +258,6 @@ static void basic_init(void)
     lv_style_set_img_recolor(&styles->btn, CARD_TEXT_COLOR);
     lv_style_set_pad_hor(&styles->btn, LV_DPX(40));
     lv_style_set_pad_ver(&styles->btn, LV_DPX(15));
-    lv_style_set_transition(&styles->btn, &trans_delayed); /*Go back to default state with delay*/
 
 
     style_init_reset(&styles->btn_color);
@@ -270,22 +272,23 @@ static void basic_init(void)
     style_init_reset(&styles->pressed);
     lv_style_set_color_filter_cb(&styles->pressed, lv_color_darken);
     lv_style_set_color_filter_opa(&styles->pressed, LV_OPA_20);
-    lv_style_set_transition(&styles->pressed, &trans_normal);
 
     style_init_reset(&styles->disabled);
     lv_style_set_color_filter_cb(&styles->disabled, lv_color_lighten);
     lv_style_set_color_filter_opa(&styles->disabled, LV_OPA_40);
-    lv_style_set_transition(&styles->disabled, &trans_normal);
 
     style_init_reset(&styles->clip_corner);
     lv_style_set_clip_corner(&styles->clip_corner, true);
 
     style_init_reset(&styles->pad_small);
-    lv_coord_t pad_small_value = lv_disp_get_size_category(NULL) <= LV_DISP_MEDIUM_LIMIT ? LV_DPX(10) : LV_DPX(20);
+    lv_coord_t pad_small_value = LV_DPX(10);
     lv_style_set_pad_all(&styles->pad_small,  pad_small_value);
 
     style_init_reset(&styles->pad_small_negative);
     lv_style_set_pad_all(&styles->pad_small_negative, - LV_DPX(2));
+
+    style_init_reset(&styles->pad_zero);
+    lv_style_set_pad_all(&styles->pad_zero, LV_DPX(2));
 
     style_init_reset(&styles->bg_color_primary);
     lv_style_set_bg_color(&styles->bg_color_primary, theme.color_primary);
@@ -307,13 +310,41 @@ static void basic_init(void)
     lv_style_set_bg_opa(&styles->knob, LV_OPA_COVER);
     lv_style_set_pad_all(&styles->knob, LV_DPX(5));
     lv_style_set_radius(&styles->knob, LV_RADIUS_CIRCLE);
-}
 
-static void btn_init(void)
-{
-#if LV_USE_BTN != 0
 
-#endif
+    style_init_reset(&styles->cb_marker);
+
+    //static void checkbox_init(void)
+    //{
+    //#if LV_USE_CHECKBOX != 0
+    //    style_init_reset(&styles->cb_bg);
+    //    lv_style_set_radius(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(4));
+    //    lv_style_set_outline_color(&styles->cb_bg, LV_STATE_DEFAULT, theme.color_primary);
+    //    lv_style_set_outline_opa(&styles->cb_bg, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+    //    lv_style_set_outline_opa(&styles->cb_bg, LV_STATE_FOCUSED, LV_OPA_50);
+    //    lv_style_set_outline_width(&styles->cb_bg, LV_STATE_DEFAULT, OUTLINE_WIDTH);
+    //    lv_style_set_outline_pad(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(6));
+    //    lv_style_set_transition_time(&styles->cb_bg, LV_STATE_DEFAULT, TRANSITION_TIME);
+    //    lv_style_set_transition_prop_6(&styles->cb_bg, LV_STATE_DEFAULT, LV_STYLE_OUTLINE_OPA);
+    //
+    //    style_init_reset(&styles->cb_bullet);
+    //    lv_style_set_outline_opa(&styles->cb_bullet, LV_STATE_FOCUSED, LV_OPA_TRANSP);
+    //    lv_style_set_radius(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(4));
+    //    lv_style_set_pattern_image(&styles->cb_bullet, LV_STATE_CHECKED, LV_SYMBOL_OK);
+    //    lv_style_set_pattern_recolor(&styles->cb_bullet, LV_STATE_CHECKED, LV_COLOR_WHITE);
+    //    lv_style_set_pattern_opa(&styles->cb_bullet, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+    //    lv_style_set_pattern_opa(&styles->cb_bullet, LV_STATE_CHECKED, LV_OPA_COVER);
+    //    lv_style_set_transition_prop_3(&styles->cb_bullet, LV_STATE_DEFAULT, LV_STYLE_PATTERN_OPA);
+    //    lv_style_set_text_font(&styles->cb_bullet, LV_STATE_CHECKED, theme.font_small);
+    //    lv_style_set_pad_left(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
+    //    lv_style_set_pad_right(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
+    //    lv_style_set_pad_top(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
+    //    lv_style_set_pad_bottom(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
+    //    lv_style_set_margin_right(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(6));
+    //#endif
+    //}
+
+
 }
 
 static void btnmatrix_init(void)
@@ -324,70 +355,9 @@ static void btnmatrix_init(void)
 #endif
 }
 
-static void label_init(void)
-{
-#if LV_USE_LABEL != 0
-
-#endif
-}
-
-static void bar_init(void)
-{
-#if LV_USE_BAR
-//    style_init_reset(&styles->bar_bg);
-//    lv_style_set_radius(&styles->bar_bg, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-//    lv_style_set_bg_opa(&styles->bar_bg, LV_STATE_DEFAULT, LV_OPA_COVER);
-//    lv_style_set_bg_color(&styles->bar_bg, LV_STATE_DEFAULT, COLOR_BG_SEC);
-//    lv_style_set_value_color(&styles->bar_bg, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x31404f) : LV_COLOR_WHITE);
-//    lv_style_set_outline_color(&styles->bar_bg, LV_STATE_DEFAULT, theme.color_primary);
-//    lv_style_set_outline_color(&styles->bar_bg, LV_STATE_EDITED, theme.color_secondary);
-//    lv_style_set_outline_opa(&styles->bar_bg, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-//    lv_style_set_outline_opa(&styles->bar_bg, LV_STATE_FOCUSED, LV_OPA_50);
-//    lv_style_set_outline_width(&styles->bar_bg, LV_STATE_DEFAULT, OUTLINE_WIDTH);
-//    lv_style_set_transition_time(&styles->bar_bg, LV_STATE_DEFAULT, TRANSITION_TIME);
-//    lv_style_set_transition_prop_6(&styles->bar_bg, LV_STATE_DEFAULT, LV_STYLE_OUTLINE_OPA);
-//
-//    style_init_reset(&styles->bar_indic);
-//    lv_style_set_bg_opa(&styles->bar_indic, LV_STATE_DEFAULT, LV_OPA_COVER);
-//    lv_style_set_radius(&styles->bar_indic, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-//    lv_style_set_bg_color(&styles->bar_indic, LV_STATE_DEFAULT, theme.color_primary);
-//    lv_style_set_bg_color(&styles->bar_indic, LV_STATE_DISABLED, lv_color_hex3(0x888));
-//    lv_style_set_value_color(&styles->bar_indic, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x41404f) : LV_COLOR_WHITE);
-#endif
-}
-
-static void img_init(void)
-{
-#if LV_USE_IMG != 0
-
-#endif
-}
-
 static void line_init(void)
 {
 #if LV_USE_LINE != 0
-
-#endif
-}
-
-static void slider_init(void)
-{
-#if LV_USE_SLIDER != 0
-//    style_init_reset(&styles->slider_knob);
-//    lv_style_set_bg_opa(&styles->slider_knob, LV_STATE_DEFAULT, LV_OPA_COVER);
-//    lv_style_set_bg_color(&styles->slider_knob, LV_STATE_DEFAULT, IS_LIGHT ? theme.color_primary : LV_COLOR_WHITE);
-//    lv_style_set_value_color(&styles->slider_knob, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex(0x31404f) : LV_COLOR_WHITE);
-//    lv_style_set_radius(&styles->slider_knob, LV_STATE_DEFAULT, LV_RADIUS_CIRCLE);
-//    lv_style_set_pad_left(&styles->slider_knob, LV_STATE_DEFAULT, LV_DPX(7));
-//    lv_style_set_pad_right(&styles->slider_knob, LV_STATE_DEFAULT, LV_DPX(7));
-//    lv_style_set_pad_top(&styles->slider_knob, LV_STATE_DEFAULT, LV_DPX(7));
-//    lv_style_set_pad_bottom(&styles->slider_knob, LV_STATE_DEFAULT, LV_DPX(7));
-//
-//    style_init_reset(&styles->slider_bg);
-//    lv_style_set_margin_left(&styles->slider_bg, LV_STATE_DEFAULT, LV_DPX(10));
-//    lv_style_set_margin_right(&styles->slider_bg, LV_STATE_DEFAULT, LV_DPX(10));
-//    lv_style_set_margin_top(&styles->slider_bg, LV_STATE_DEFAULT, LV_DPX(10));
-//    lv_style_set_margin_bottom(&styles->slider_bg, LV_STATE_DEFAULT, LV_DPX(10));
 
 #endif
 }
@@ -510,36 +480,6 @@ static void chart_init(void)
 #endif
 }
 
-static void checkbox_init(void)
-{
-#if LV_USE_CHECKBOX != 0
-    style_init_reset(&styles->cb_bg);
-    lv_style_set_radius(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(4));
-    lv_style_set_outline_color(&styles->cb_bg, LV_STATE_DEFAULT, theme.color_primary);
-    lv_style_set_outline_opa(&styles->cb_bg, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-    lv_style_set_outline_opa(&styles->cb_bg, LV_STATE_FOCUSED, LV_OPA_50);
-    lv_style_set_outline_width(&styles->cb_bg, LV_STATE_DEFAULT, OUTLINE_WIDTH);
-    lv_style_set_outline_pad(&styles->cb_bg, LV_STATE_DEFAULT, LV_DPX(6));
-    lv_style_set_transition_time(&styles->cb_bg, LV_STATE_DEFAULT, TRANSITION_TIME);
-    lv_style_set_transition_prop_6(&styles->cb_bg, LV_STATE_DEFAULT, LV_STYLE_OUTLINE_OPA);
-
-    style_init_reset(&styles->cb_bullet);
-    lv_style_set_outline_opa(&styles->cb_bullet, LV_STATE_FOCUSED, LV_OPA_TRANSP);
-    lv_style_set_radius(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(4));
-    lv_style_set_pattern_image(&styles->cb_bullet, LV_STATE_CHECKED, LV_SYMBOL_OK);
-    lv_style_set_pattern_recolor(&styles->cb_bullet, LV_STATE_CHECKED, LV_COLOR_WHITE);
-    lv_style_set_pattern_opa(&styles->cb_bullet, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-    lv_style_set_pattern_opa(&styles->cb_bullet, LV_STATE_CHECKED, LV_OPA_COVER);
-    lv_style_set_transition_prop_3(&styles->cb_bullet, LV_STATE_DEFAULT, LV_STYLE_PATTERN_OPA);
-    lv_style_set_text_font(&styles->cb_bullet, LV_STATE_CHECKED, theme.font_small);
-    lv_style_set_pad_left(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
-    lv_style_set_pad_right(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
-    lv_style_set_pad_top(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
-    lv_style_set_pad_bottom(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(3));
-    lv_style_set_margin_right(&styles->cb_bullet, LV_STATE_DEFAULT, LV_DPX(6));
-#endif
-}
-
 static void textarea_init(void)
 {
 #if LV_USE_TEXTAREA
@@ -551,7 +491,7 @@ static void textarea_init(void)
 
     style_init_reset(&styles->ta_placeholder);
     lv_style_set_text_color(&styles->ta_placeholder, LV_STATE_DEFAULT,
-                            IS_LIGHT ? COLOR_BG_TEXT_DIS : lv_color_hex(0xa1adbd));
+            IS_LIGHT ? COLOR_BG_TEXT_DIS : lv_color_hex(0xa1adbd));
 #endif
 }
 
@@ -634,8 +574,8 @@ static void win_init(void)
  * @return a pointer to reference this theme later
  */
 lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_secondary, uint32_t flags,
-                                    const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle,
-                                    const lv_font_t * font_title)
+        const lv_font_t * font_small, const lv_font_t * font_normal, const lv_font_t * font_subtitle,
+        const lv_font_t * font_title)
 {
 
     /* This trick is required only to avoid the garbage collection of
@@ -655,20 +595,14 @@ lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_se
     theme.flags = flags;
 
     basic_init();
-    btn_init();
     btnmatrix_init();
-    label_init();
-    bar_init();
-    img_init();
     line_init();
-    slider_init();
     switch_init();
     linemeter_init();
     gauge_init();
     arc_init();
     spinner_init();
     chart_init();
-    checkbox_init();
     textarea_init();
     ddlist_init();
     roller_init();
@@ -707,229 +641,220 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
     else if(lv_obj_check_type(obj, &lv_btn)) {
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->btn);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->btn_color);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_delayed);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->pressed);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->grow);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_BORN, &styles->grow);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_CHECKED, &styles->btn_color_checked);
     }
 #endif
 
 #if LV_USE_BAR
     else if(lv_obj_check_type(obj, &lv_bar)) {
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
-            lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
-            lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
     }
+#endif
 
+#if LV_USE_SLIDER
     else if(lv_obj_check_type(obj, &lv_slider)) {
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
-            lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
-            lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
-            lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
-            lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->bg_color_gray);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->grow);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->transition_delayed);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
+        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_PRESSED, &styles->grow);
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->transition_delayed);
+        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_PRESSED, &styles->transition_normal);
+    }
+#endif
+
+#if LV_USE_CHECKBOX
+    else if(lv_obj_check_type(obj, &lv_checkbox)) {
+        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->pad_zero);
+        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_CHECKED, &styles->bg_color_primary);
+        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_PRESSED, &styles->pressed);
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
+        lv_obj_add_style(obj, LV_PART_MARKER, LV_STATE_DEFAULT, &styles->transition_delayed);
     }
 #endif
 
 #if LV_USE_BTNMATRIX
-        case LV_THEME_BTNMATRIX:
-            list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_MAIN);
-            _lv_style_list_add_style(list, &styles->card);
-            _lv_style_list_add_style(list, &styles->pad_small);
+case LV_THEME_BTNMATRIX:
+    list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_MAIN);
+    _lv_style_list_add_style(list, &styles->card);
+    _lv_style_list_add_style(list, &styles->pad_small);
 
-            list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BTN);
-            _lv_style_list_add_style(list, &styles->card);
-            _lv_style_list_add_style(list, &styles->bg_click);
-            _lv_style_list_add_style(list, &styles->btnmatrix_btn);
+    list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BTN);
+    _lv_style_list_add_style(list, &styles->card);
+    _lv_style_list_add_style(list, &styles->bg_click);
+    _lv_style_list_add_style(list, &styles->btnmatrix_btn);
 
-            list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BTN_2);
-            _lv_style_list_add_style(list, &styles->card);
-            _lv_style_list_add_style(list, &styles->bg_click);
-            _lv_style_list_add_style(list, &styles->btnmatrix_btn);
-            break;
+    list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_BTN_2);
+    _lv_style_list_add_style(list, &styles->card);
+    _lv_style_list_add_style(list, &styles->bg_click);
+    _lv_style_list_add_style(list, &styles->btnmatrix_btn);
+    break;
 #endif
 
 
 #if LV_USE_SWITCH
-        case LV_THEME_SWITCH:
-            list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_MAIN);
-            _lv_style_list_add_style(list, &styles->bar_bg);
+case LV_THEME_SWITCH:
+    list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_MAIN);
+    _lv_style_list_add_style(list, &styles->bar_bg);
 
-            list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_INDIC);
-            _lv_style_list_add_style(list, &styles->bar_indic);
+    list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_INDIC);
+    _lv_style_list_add_style(list, &styles->bar_indic);
 
-            list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_KNOB);
-            _lv_style_list_add_style(list, &styles->sw_knob);
-            break;
+    list = _lv_obj_get_style_list(obj, LV_SWITCH_PART_KNOB);
+    _lv_style_list_add_style(list, &styles->sw_knob);
+    break;
 #endif
 
 #if LV_USE_IMG
-        case LV_THEME_IMAGE:
-            break;
+case LV_THEME_IMAGE:
+    break;
 #endif
 
 #if LV_USE_IMGBTN
-        case LV_THEME_IMGBTN:
-            break;
-#endif
-
-#if LV_USE_LABEL
-        case LV_THEME_LABEL:
-            break;
+case LV_THEME_IMGBTN:
+    break;
 #endif
 
 #if LV_USE_LINE
-        case LV_THEME_LINE:
-            break;
+case LV_THEME_LINE:
+    break;
 #endif
 
 #if LV_USE_ARC
-        case LV_THEME_ARC:
-            list = _lv_obj_get_style_list(obj, LV_ARC_PART_BG);
-            _lv_style_list_add_style(list, &styles->card);
-            _lv_style_list_add_style(list, &styles->arc_bg);
-            _lv_style_list_add_style(list, &styles->sb);
+case LV_THEME_ARC:
+    list = _lv_obj_get_style_list(obj, LV_ARC_PART_BG);
+    _lv_style_list_add_style(list, &styles->card);
+    _lv_style_list_add_style(list, &styles->arc_bg);
+    _lv_style_list_add_style(list, &styles->sb);
 
-            list = _lv_obj_get_style_list(obj, LV_ARC_PART_INDIC);
-            _lv_style_list_add_style(list, &styles->arc_indic);
+    list = _lv_obj_get_style_list(obj, LV_ARC_PART_INDIC);
+    _lv_style_list_add_style(list, &styles->arc_indic);
 
-            list = _lv_obj_get_style_list(obj, LV_ARC_PART_KNOB);
-            _lv_style_list_add_style(list, &styles->card);
-            _lv_style_list_add_style(list, &styles->bg_click);
-            _lv_style_list_add_style(list, &styles->arc_knob);
-            break;
-#endif
-
-#if LV_USE_SLIDER
-//        case LV_THEME_SLIDER:
-//            list = _lv_obj_get_style_list(obj, LV_SLIDER_PART_MAIN);
-//            _lv_style_list_add_style(list, &styles->bar_bg);
-//            _lv_style_list_add_style(list, &styles->slider_bg);
-//
-//            list = _lv_obj_get_style_list(obj, LV_SLIDER_PART_INDIC);
-//            _lv_style_list_add_style(list, &styles->bar_indic);
-//
-//            list = _lv_obj_get_style_list(obj, LV_SLIDER_PART_KNOB);
-//            _lv_style_list_add_style(list, &styles->slider_knob);
-//            break;
-#endif
-
-#if LV_USE_CHECKBOX
-        case LV_THEME_CHECKBOX:
-            list = _lv_obj_get_style_list(obj, LV_CHECKBOX_PART_MAIN);
-            _lv_style_list_add_style(list, &styles->cb_bg);
-            _lv_style_list_add_style(list, &styles->sb);
-
-            list = _lv_obj_get_style_list(obj, LV_CHECKBOX_PART_BULLET);
-            _lv_style_list_add_style(list, &styles->btn);
-            _lv_style_list_add_style(list, &styles->cb_bullet);
-            break;
+    list = _lv_obj_get_style_list(obj, LV_ARC_PART_KNOB);
+    _lv_style_list_add_style(list, &styles->card);
+    _lv_style_list_add_style(list, &styles->bg_click);
+    _lv_style_list_add_style(list, &styles->arc_knob);
+    break;
 #endif
 
 #if LV_USE_ROLLER
-        case LV_THEME_ROLLER:
-            list = _lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
-            _lv_style_list_add_style(list, &styles->card);
-            _lv_style_list_add_style(list, &styles->roller_bg);
-            _lv_style_list_add_style(list, &styles->sb);
+case LV_THEME_ROLLER:
+    list = _lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
+    _lv_style_list_add_style(list, &styles->card);
+    _lv_style_list_add_style(list, &styles->roller_bg);
+    _lv_style_list_add_style(list, &styles->sb);
 
-            list = _lv_obj_get_style_list(obj, LV_ROLLER_PART_SELECTED);
-            _lv_style_list_add_style(list, &styles->roller_sel);
-            break;
+    list = _lv_obj_get_style_list(obj, LV_ROLLER_PART_SELECTED);
+    _lv_style_list_add_style(list, &styles->roller_sel);
+    break;
 #endif
 
 #if LV_USE_OBJMASK
-        case LV_THEME_OBJMASK:
-            list = _lv_obj_get_style_list(obj, LV_OBJMASK_PART_MAIN);
-            break;
+case LV_THEME_OBJMASK:
+    list = _lv_obj_get_style_list(obj, LV_OBJMASK_PART_MAIN);
+    break;
 #endif
 
 #if LV_USE_DROPDOWN
-        case LV_THEME_DROPDOWN:
-            list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_MAIN);
-            _lv_style_list_add_style(list, &styles->card);
-            _lv_style_list_add_style(list, &styles->bg_click);
-            _lv_style_list_add_style(list, &styles->pad_small);
+case LV_THEME_DROPDOWN:
+    list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_MAIN);
+    _lv_style_list_add_style(list, &styles->card);
+    _lv_style_list_add_style(list, &styles->bg_click);
+    _lv_style_list_add_style(list, &styles->pad_small);
 
-            list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_LIST);
-            _lv_style_list_add_style(list, &styles->card);
-            _lv_style_list_add_style(list, &styles->ddlist_page);
-            _lv_style_list_add_style(list, &styles->sb);
+    list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_LIST);
+    _lv_style_list_add_style(list, &styles->card);
+    _lv_style_list_add_style(list, &styles->ddlist_page);
+    _lv_style_list_add_style(list, &styles->sb);
 
-            list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_SELECTED);
-            _lv_style_list_add_style(list, &styles->ddlist_sel);
-            break;
+    list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_SELECTED);
+    _lv_style_list_add_style(list, &styles->ddlist_sel);
+    break;
 #endif
 
 #if LV_USE_CHART
-        case LV_THEME_CHART:
-            list = _lv_obj_get_style_list(obj, LV_CHART_PART_BG);
-            _lv_style_list_add_style(list, &styles->card);
-            _lv_style_list_add_style(list, &styles->chart_bg);
-            _lv_style_list_add_style(list, &styles->pad_small);
+case LV_THEME_CHART:
+    list = _lv_obj_get_style_list(obj, LV_CHART_PART_BG);
+    _lv_style_list_add_style(list, &styles->card);
+    _lv_style_list_add_style(list, &styles->chart_bg);
+    _lv_style_list_add_style(list, &styles->pad_small);
 
-            list = _lv_obj_get_style_list(obj, LV_CHART_PART_SERIES_BG);
-            _lv_style_list_add_style(list, &styles->pad_small);
-            _lv_style_list_add_style(list, &styles->chart_series_bg);
+    list = _lv_obj_get_style_list(obj, LV_CHART_PART_SERIES_BG);
+    _lv_style_list_add_style(list, &styles->pad_small);
+    _lv_style_list_add_style(list, &styles->chart_series_bg);
 
-            list = _lv_obj_get_style_list(obj, LV_CHART_PART_CURSOR);
-            _lv_style_list_add_style(list, &styles->chart_series_bg);
+    list = _lv_obj_get_style_list(obj, LV_CHART_PART_CURSOR);
+    _lv_style_list_add_style(list, &styles->chart_series_bg);
 
-            list = _lv_obj_get_style_list(obj, LV_CHART_PART_SERIES);
-            _lv_style_list_add_style(list, &styles->chart_series);
-            break;
+    list = _lv_obj_get_style_list(obj, LV_CHART_PART_SERIES);
+    _lv_style_list_add_style(list, &styles->chart_series);
+    break;
 #endif
 #if LV_USE_TABLE
-        case LV_THEME_TABLE: {
-                list = _lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
-                _lv_style_list_add_style(list, &styles->card);
+case LV_THEME_TABLE: {
+    list = _lv_obj_get_style_list(obj, LV_TABLE_PART_BG);
+    _lv_style_list_add_style(list, &styles->card);
 
-                int idx = 1; /* start value should be 1, not zero, since cell styles
+    int idx = 1; /* start value should be 1, not zero, since cell styles
                             start at 1 due to presence of LV_TABLE_PART_BG=0
                             in the enum (lv_table.h) */
-                /* declaring idx outside loop to work with older compilers */
-                for(; idx <= LV_TABLE_CELL_STYLE_CNT; idx ++) {
-                    list = _lv_obj_get_style_list(obj, idx);
-                    _lv_style_list_add_style(list, &styles->table_cell);
-                }
-                break;
-            }
+    /* declaring idx outside loop to work with older compilers */
+    for(; idx <= LV_TABLE_CELL_STYLE_CNT; idx ++) {
+        list = _lv_obj_get_style_list(obj, idx);
+        _lv_style_list_add_style(list, &styles->table_cell);
+    }
+    break;
+}
 #endif
 
 #if LV_USE_TEXTAREA
-        case LV_THEME_TEXTAREA:
-            list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_MAIN);
-            _lv_style_list_add_style(list, &styles->card);
-            _lv_style_list_add_style(list, &styles->pad_small);
-            _lv_style_list_add_style(list, &styles->sb);
+case LV_THEME_TEXTAREA:
+    list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_MAIN);
+    _lv_style_list_add_style(list, &styles->card);
+    _lv_style_list_add_style(list, &styles->pad_small);
+    _lv_style_list_add_style(list, &styles->sb);
 
-            list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_PLACEHOLDER);
-            _lv_style_list_add_style(list, &styles->ta_placeholder);
+    list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_PLACEHOLDER);
+    _lv_style_list_add_style(list, &styles->ta_placeholder);
 
-            list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_CURSOR);
-            _lv_style_list_add_style(list, &styles->ta_cursor);
-            break;
+    list = _lv_obj_get_style_list(obj, LV_TEXTAREA_PART_CURSOR);
+    _lv_style_list_add_style(list, &styles->ta_cursor);
+    break;
 
 #endif
 
 #if LV_USE_LINEMETER
-        case LV_THEME_LINEMETER:
-            list = _lv_obj_get_style_list(obj, LV_LINEMETER_PART_MAIN);
-            _lv_style_list_add_style(list, &styles->card);
-            _lv_style_list_add_style(list, &styles->lmeter);
-            break;
+case LV_THEME_LINEMETER:
+    list = _lv_obj_get_style_list(obj, LV_LINEMETER_PART_MAIN);
+    _lv_style_list_add_style(list, &styles->card);
+    _lv_style_list_add_style(list, &styles->lmeter);
+    break;
 #endif
 #if LV_USE_GAUGE
-        case LV_THEME_GAUGE:
-            list = _lv_obj_get_style_list(obj, LV_GAUGE_PART_MAIN);
-            _lv_style_list_add_style(list, &styles->card);
-            _lv_style_list_add_style(list, &styles->gauge_main);
+case LV_THEME_GAUGE:
+    list = _lv_obj_get_style_list(obj, LV_GAUGE_PART_MAIN);
+    _lv_style_list_add_style(list, &styles->card);
+    _lv_style_list_add_style(list, &styles->gauge_main);
 
-            list = _lv_obj_get_style_list(obj, LV_GAUGE_PART_MAJOR);
-            _lv_style_list_add_style(list, &styles->gauge_strong);
+    list = _lv_obj_get_style_list(obj, LV_GAUGE_PART_MAJOR);
+    _lv_style_list_add_style(list, &styles->gauge_strong);
 
-            list = _lv_obj_get_style_list(obj, LV_GAUGE_PART_NEEDLE);
-            _lv_style_list_add_style(list, &styles->gauge_needle);
-            break;
+    list = _lv_obj_get_style_list(obj, LV_GAUGE_PART_NEEDLE);
+    _lv_style_list_add_style(list, &styles->gauge_needle);
+    break;
 #endif
 }
 

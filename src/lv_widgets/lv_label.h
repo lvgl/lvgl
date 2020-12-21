@@ -41,13 +41,12 @@ LV_EXPORT_CONST_INT(LV_LABEL_TEXT_SEL_OFF);
 
 /** Long mode behaviors. Used in 'lv_label_ext_t' */
 enum {
-    LV_LABEL_LONG_EXPAND,    /**< Expand the object size to the text size*/
-    LV_LABEL_LONG_BREAK,     /**< Keep the object width, break the too long lines and expand the object
-                                height*/
-    LV_LABEL_LONG_DOT,       /**< Keep the size and write dots at the end if the text is too long*/
-    LV_LABEL_LONG_SROLL,      /**< Keep the size and roll the text back and forth*/
-    LV_LABEL_LONG_SROLL_CIRC, /**< Keep the size and roll the text circularly*/
-    LV_LABEL_LONG_CROP,      /**< Keep the size and crop the text out of it*/
+    LV_LABEL_LONG_EXPAND,      /**< Expand the object size to the text size*/
+    LV_LABEL_LONG_WRAP,        /**< Keep the object width, wrap the too long lines and expand the object height*/
+    LV_LABEL_LONG_DOT,         /**< Keep the size and write dots at the end if the text is too long*/
+    LV_LABEL_LONG_SROLL,       /**< Keep the size and roll the text back and forth*/
+    LV_LABEL_LONG_SROLL_CIRC,  /**< Keep the size and roll the text circularly*/
+    LV_LABEL_LONG_CLIP,        /**< Keep the size and clip the text out of it*/
 };
 typedef uint8_t lv_label_long_mode_t;
 
@@ -60,50 +59,55 @@ enum {
 };
 typedef uint8_t lv_label_align_t;
 
-/** Data of label*/
-typedef struct {
-    /*Inherited from 'base_obj' so no inherited ext.*/ /*Ext. of ancestor*/
-    /*New data for this type */
-    char * text;        /*Text of the label*/
 
-    union {
-        char * tmp_ptr; /* Pointer to the allocated memory containing the character which are replaced by dots (Handled
-                           by the library)*/
-        char tmp[LV_LABEL_DOT_NUM + 1]; /* Directly store the characters if <=4 characters */
-    } dot;
+LV_CLASS_DECLARE_START(lv_label, lv_obj);
 
-    uint32_t dot_end;  /*The text end position in dot mode (Handled by the library)*/
+#define _lv_label_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
 
 #if LV_USE_ANIMATION
-    uint16_t anim_speed; /*Speed of scroll and roll animation in px/sec unit*/
+#define LV_LABEL_ANIM_DATA uint32_t anim_speed;
+#else
+#define LV_LABEL_ANIM_DATA
 #endif
 
-    lv_point_t offset; /*Text draw position offset*/
-
 #if LV_LABEL_LONG_TXT_HINT
-    lv_draw_label_hint_t hint; /*Used to buffer info about large text*/
+#define LV_LABEL_HINT_DATA lv_draw_label_hint_t hint;
+#else
+#define LV_LABEL_HINT_DATA
 #endif
 
 #if LV_LABEL_TEXT_SEL
-    uint32_t sel_start;
-    uint32_t sel_end;
+#define LV_LABEL_TEXT_SEL_DATA  uint32_t sel_start; uint32_t sel_end;
+#else
+#define LV_LABEL_TEXT_SEL_DATA
 #endif
 
-    lv_label_long_mode_t long_mode : 3; /*Determinate what to do with the long texts*/
-    uint8_t static_txt : 1;             /*Flag to indicate the text is static*/
-    uint8_t align : 2;                  /*Align type from 'lv_label_align_t'*/
-    uint8_t recolor : 1;                /*Enable in-line letter re-coloring*/
-    uint8_t expand : 1;                 /*Ignore real width (used by the library with LV_LABEL_LONG_SROLL)*/
-    uint8_t dot_tmp_alloc : 1; /*True if dot_tmp has been allocated. False if dot_tmp directly holds up to 4 bytes of
-                                  characters */
-} lv_label_ext_t;
 
-/** Label styles*/
-enum {
-    LV_LABEL_PART_MAIN,
-};
+#define _lv_label_data             \
+  _lv_obj_data                     \
+    char * text;                   \
+    union {                        \
+        char * tmp_ptr; /* Pointer to the allocated memory containing the character replaced by dots*/ \
+        char tmp[LV_LABEL_DOT_NUM + 1]; /* Directly store the characters if <=4 characters */          \
+    } dot;                                                                                             \
+    uint32_t dot_end;  /*The real text length, used in dot mode*/               \
+    LV_LABEL_ANIM_DATA /*Speed of scroll and roll animation in px/sec unit*/  \
+    LV_LABEL_HINT_DATA /*Used to buffer info about large text*/ \
+    LV_LABEL_TEXT_SEL_DATA                                        \
+    lv_point_t offset; /*Text draw position offset*/            \
+    lv_label_long_mode_t long_mode : 3; /*Determinate what to do with the long texts*/  \
+    uint8_t static_txt : 1;             /*Flag to indicate the text is static*/         \
+    uint8_t align : 2;                  /*Align type from 'lv_label_align_t'*/          \
+    uint8_t recolor : 1;                /*Enable in-line letter re-coloring*/           \
+    uint8_t expand : 1;                 /*Ignore real width (used by the library with LV_LABEL_LONG_SROLL)*/    \
+    uint8_t dot_tmp_alloc : 1; /*1: dot_tmp has been allocated;.0: dot_tmp directly holds up to 4 bytes of characters */               \
 
-typedef uint8_t lv_label_part_t;
+#define _lv_label_class_dsc        \
+  _lv_obj_class_dsc
+
+LV_CLASS_DECLARE_END(lv_label, lv_obj);
+
+extern lv_label_class_t lv_label;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -187,6 +191,7 @@ void lv_label_set_text_sel_start(lv_obj_t * label, uint32_t index);
  * @param index index to set. `LV_LABEL_TXT_SEL_OFF` to select nothing.
  */
 void lv_label_set_text_sel_end(lv_obj_t * label, uint32_t index);
+
 /*=====================
  * Getter functions
  *====================*/
@@ -265,9 +270,6 @@ uint32_t lv_label_get_text_sel_start(const lv_obj_t * label);
  * @return selection end index. `LV_LABEL_TXT_SEL_OFF` if nothing is selected.
  */
 uint32_t lv_label_get_text_sel_end(const lv_obj_t * label);
-
-
-lv_style_list_t * lv_label_get_style(lv_obj_t * label, uint8_t type);
 
 /*=====================
  * Other functions

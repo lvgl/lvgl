@@ -31,21 +31,22 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Data of check box*/
-typedef struct {
-    /*New data for this widget */
-    lv_style_list_t style_bullet;
-    char * txt;
-    uint32_t static_txt :1;
-} lv_checkbox_ext_t;
 
-/** Checkbox styles. */
-enum {
-    LV_CHECKBOX_PART_MAIN = LV_OBJ_PART_MAIN,  /**< Style of object background. */
-    LV_CHECKBOX_PART_BULLET,                   /**< Style of the bullet */
-    _LV_CHECKBOX_PART_VIRTUAL_LAST,
-};
-typedef uint8_t lv_checkbox_style_t;
+LV_CLASS_DECLARE_START(lv_checkbox, lv_obj);
+
+#define _lv_checkbox_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
+
+#define _lv_checkbox_data             \
+  _lv_obj_data                        \
+    char * txt;                       \
+    uint32_t static_txt :1;
+
+#define _lv_checkbox_class_dsc        \
+  _lv_obj_class_dsc
+
+LV_CLASS_DECLARE_END(lv_checkbox, lv_obj);
+
+extern lv_checkbox_class_t lv_checkbox;
 
 /**********************
  * GLOBAL PROTOTYPES

@@ -58,6 +58,15 @@ typedef struct _lv_event_temp_data {
     struct _lv_event_temp_data * prev;
 } lv_event_temp_data_t;
 
+typedef struct {
+    uint16_t time;
+    uint16_t delay;
+    lv_part_t part;
+    lv_state_t state;
+    lv_style_prop_t prop;
+    const lv_anim_path_t * path;
+}trans_set_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -74,22 +83,6 @@ static void lv_obj_destructor(void * obj);
 /**********************
  *  STATIC VARIABLES
  **********************/
-static const uint16_t trans_prop_def[] =
-{
-        LV_STYLE_RADIUS, LV_STYLE_TRANSFORM_WIDTH, LV_STYLE_TRANSFORM_HEIGHT, LV_STYLE_TRANSFORM_ZOOM, LV_STYLE_TRANSFORM_ANGLE, LV_STYLE_OPA,
-        LV_STYLE_COLOR_FILTER_CB, LV_STYLE_COLOR_FILTER_OPA,
-        LV_STYLE_PAD_TOP, LV_STYLE_PAD_BOTTOM, LV_STYLE_PAD_LEFT, LV_STYLE_PAD_RIGHT,
-        LV_STYLE_MARGIN_TOP, LV_STYLE_MARGIN_BOTTOM, LV_STYLE_MARGIN_LEFT, LV_STYLE_MARGIN_RIGHT,
-        LV_STYLE_BG_COLOR, LV_STYLE_BG_OPA, LV_STYLE_BG_GRAD_COLOR, LV_STYLE_BG_MAIN_STOP, LV_STYLE_BG_GRAD_STOP,
-        LV_STYLE_BORDER_COLOR, LV_STYLE_BORDER_OPA, LV_STYLE_BORDER_WIDTH,
-        LV_STYLE_TEXT_COLOR, LV_STYLE_TEXT_OPA, LV_STYLE_TEXT_FONT, LV_STYLE_TEXT_LETTER_SPACE, LV_STYLE_TEXT_LINE_SPACE,
-        LV_STYLE_IMG_OPA, LV_STYLE_IMG_RECOLOR, LV_STYLE_IMG_RECOLOR_OPA,
-        LV_STYLE_OUTLINE_WIDTH, LV_STYLE_OUTLINE_COLOR, LV_STYLE_OUTLINE_OPA, LV_STYLE_OUTLINE_PAD,
-        LV_STYLE_SHADOW_WIDTH, LV_STYLE_SHADOW_OFS_X, LV_STYLE_SHADOW_OFS_Y, LV_STYLE_SHADOW_SPREAD, LV_STYLE_SHADOW_COLOR, LV_STYLE_SHADOW_OPA,
-        LV_STYLE_LINE_WIDTH, LV_STYLE_LINE_COLOR, LV_STYLE_LINE_OPA,
-        LV_STYLE_CONTENT_OFS_X, LV_STYLE_CONTENT_OFS_Y,
-        0
-};
 static bool lv_initialized = false;
 static lv_event_temp_data_t * event_temp_data_head;
 static const void * event_act_data;
@@ -149,10 +142,20 @@ void lv_init(void)
 
     _lv_ll_init(&LV_GC_ROOT(_lv_disp_ll), sizeof(lv_disp_t));
     _lv_ll_init(&LV_GC_ROOT(_lv_indev_ll), sizeof(lv_indev_t));
-
+    lv_mem_monitor_t mon;
+    lv_mem_monitor(&mon);
+    printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
+           (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
+           (int)mon.free_biggest_size);
     lv_theme_t * th = LV_THEME_DEFAULT_INIT(LV_THEME_DEFAULT_COLOR_PRIMARY, LV_THEME_DEFAULT_COLOR_SECONDARY,
                                             LV_THEME_DEFAULT_FLAG,
                                             LV_THEME_DEFAULT_FONT_SMALL, LV_THEME_DEFAULT_FONT_NORMAL, LV_THEME_DEFAULT_FONT_SUBTITLE, LV_THEME_DEFAULT_FONT_TITLE);
+
+    lv_mem_monitor(&mon);
+    printf("used: %6d (%3d %%), frag: %3d %%, biggest free: %6d\n",
+           (int)mon.total_size - mon.free_size, mon.used_pct, mon.frag_pct,
+           (int)mon.free_biggest_size);
+
     lv_theme_set_act(th);
 
     /*Initialize the screen refresh system*/
@@ -215,10 +218,19 @@ lv_obj_t * lv_obj_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
     lv_obj_t * obj = lv_class_new(&lv_obj);
     lv_obj.constructor(obj, parent, copy);
-    if(copy == NULL) lv_theme_apply(obj);
-//    else   lv_style_list_copy(&obj->style_list, &copy->style_list);
+
+    lv_obj_create_finish(obj, parent, copy);
 
     return obj;
+}
+
+
+void lv_obj_create_finish(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+{
+    if(!copy) lv_theme_apply(obj);
+//    else lv_style_list_copy(&checkbox->style_indic, &checkbox_copy->style_indic);
+
+    lv_obj_clear_state(obj, LV_STATE_BORN);
 }
 
 /**
@@ -649,15 +661,6 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
     /*If there is no difference in styles there is nothing else to do*/
     if(cmp_res == _LV_STYLE_STATE_CMP_SAME) return;
-
-    typedef struct {
-        uint16_t time;
-        uint16_t delay;
-        lv_part_t part;
-        lv_state_t state;
-        lv_style_prop_t prop;
-        const lv_anim_path_t * path;
-    }trans_set_t;
 
     trans_set_t * ts = _lv_mem_buf_get(sizeof(trans_set_t) * STYLE_TRANSITION_MAX);
     _lv_memset_00(ts, sizeof(sizeof(trans_set_t) * 64));
@@ -1278,25 +1281,6 @@ lv_obj_t * _lv_obj_get_focused_obj(const lv_obj_t * obj)
 }
 
 /**
- * Used in the signal callback to handle `LV_SIGNAL_GET_TYPE` signal
- * @param obj pointer to an object
- * @param buf pointer to `lv_obj_type_t`. (`param` in the signal callback)
- * @param name name of the object. E.g. "lv_btn". (Only the pointer is saved)
- * @return LV_RES_OK
- */
-lv_res_t _lv_obj_handle_get_type_signal(lv_obj_type_t * buf, const char * name)
-{
-    uint8_t i;
-    for(i = 0; i < LV_MAX_ANCESTOR_NUM - 1; i++) { /*Find the last set data*/
-        if(buf->type[i] == NULL) break;
-    }
-    buf->type[i] = name;
-
-    return LV_RES_OK;
-}
-
-
-/**
  * Get object's and its ancestors type. Put their name in `type_buf` starting with the current type.
  * E.g. buf.type[0]="lv_btn", buf.type[1]="lv_cont", buf.type[2]="lv_obj"
  * @param obj pointer to an object which type should be get
@@ -1482,7 +1466,8 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     obj->flags |= LV_OBJ_FLAG_SCROLL_MOMENTUM;
     obj->flags |= LV_OBJ_FLAG_FOCUS_SCROLL;
     if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
-    obj->state = LV_STATE_DEFAULT;
+
+    obj->state = LV_STATE_BORN;
 
     /*Copy the attributes if required*/
     if(copy != NULL) {
