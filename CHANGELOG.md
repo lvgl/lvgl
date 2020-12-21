@@ -12,6 +12,7 @@
 - fix(win) arabic process the title of the window
 - fix(dropdown) arabic process the option in lv_dropdown_add_option
 - fix(textarea) buffer overflow in password mode with UTF-8 characters
+- fix(textarea) cursor position after hiding character in password mode
 
 ## v7.8.1 (Plannad at 15.12.2020)
 

@@ -1670,6 +1670,7 @@ static void pwd_char_hider(lv_obj_t * ta)
 
         lv_label_set_text(ext->label, txt_tmp);
         _lv_mem_buf_release(txt_tmp);
+        refr_cursor_area(ta);
     }
 }
 
