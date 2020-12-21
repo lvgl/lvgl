@@ -230,7 +230,6 @@ static void basic_init(void)
     lv_style_set_border_width(&styles->card, BORDER_WIDTH);
     lv_style_set_border_post(&styles->card, true);
     lv_style_set_text_color(&styles->card, CARD_TEXT_COLOR);
-    lv_style_set_img_recolor(&styles->card, CARD_TEXT_COLOR);
     lv_style_set_pad_all(&styles->card, PAD_DEF);
 
     style_init_reset(&styles->focus_border);
@@ -255,7 +254,6 @@ static void basic_init(void)
     lv_style_set_border_color(&styles->btn, CARD_BORDER_COLOR);
     lv_style_set_border_width(&styles->btn, BORDER_WIDTH);
     lv_style_set_text_color(&styles->btn, CARD_TEXT_COLOR);
-    lv_style_set_img_recolor(&styles->btn, CARD_TEXT_COLOR);
     lv_style_set_pad_hor(&styles->btn, LV_DPX(40));
     lv_style_set_pad_ver(&styles->btn, LV_DPX(15));
 
@@ -264,7 +262,6 @@ static void basic_init(void)
     lv_style_set_border_width(&styles->btn_color, 0);
     lv_style_set_bg_color(&styles->btn_color, BTN_COLOR);
     lv_style_set_text_color(&styles->btn_color, LV_COLOR_WHITE);
-    lv_style_set_img_recolor(&styles->btn_color, LV_COLOR_WHITE);
 
     style_init_reset(&styles->btn_color_checked);
     lv_style_set_bg_color(&styles->btn_color_checked, BTN_CHK_PR_COLOR);
@@ -645,7 +642,7 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->pressed);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->transition_normal);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_PRESSED, &styles->grow);
-        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_BORN, &styles->grow);
+//        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_BORN, &styles->grow);
         lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_CHECKED, &styles->btn_color_checked);
     }
 #endif
