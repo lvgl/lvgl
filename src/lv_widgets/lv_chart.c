@@ -333,7 +333,7 @@ void lv_chart_set_y_range(lv_obj_t * chart, lv_chart_axis_t axis, lv_coord_t ymi
     if(ext->ymin[axis] == ymin && ext->ymax[axis] == ymax) return;
 
     ext->ymin[axis] = ymin;
-    ext->ymax[axis] = ymax;
+    ext->ymax[axis] = (ymax == ymin ? ymax + 1 : ymax);
 
     lv_chart_refresh(chart);
 }
@@ -1194,7 +1194,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
         lv_coord_t p_act = start_point;
         lv_coord_t p_prev = start_point;
         int32_t y_tmp = (int32_t)((int32_t)ser->points[p_prev] - ext->ymin[ser->y_axis]) * h;
-        y_tmp  = y_tmp / (ext->ymax[ser->y_axis] - ext->ymin[ser->y_axis]);
+        y_tmp = y_tmp / (ext->ymax[ser->y_axis] - ext->ymin[ser->y_axis]);
         p2.y   = h - y_tmp + y_ofs;
 
         for(i = 0; i < ext->point_cnt; i++) {
