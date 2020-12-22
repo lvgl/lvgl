@@ -1206,7 +1206,7 @@ static void draw_series_line(lv_obj_t * chart, const lv_area_t * series_area, co
             p_act = (start_point + i) % ext->point_cnt;
 
             y_tmp = (int32_t)((int32_t)ser->points[p_act] - ext->ymin[ser->y_axis]) * h;
-            y_tmp = (ext->ymax[ser->y_axis] - ext->ymin[ser->y_axis]);
+            y_tmp = y_tmp / (ext->ymax[ser->y_axis] - ext->ymin[ser->y_axis]);
             p2.y  = h - y_tmp + y_ofs;
 
             /*Don't draw the first point. A second point is also required to draw the line*/
