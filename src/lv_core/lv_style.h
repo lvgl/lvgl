@@ -418,6 +418,8 @@ bool lv_style_get_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_
 
 void lv_style_transition_init(lv_style_transiton_t * tr, const lv_style_prop_t * props, const lv_anim_path_t * path, uint32_t time, uint32_t delay);
 
+uint32_t find_index_num(lv_style_value_t v);
+
 /**
  * Remove a property from a style
  * @param style pointer to a style

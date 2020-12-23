@@ -44,8 +44,43 @@ typedef struct {
 
 typedef struct {
     lv_obj_style_t * styles;
-    uint8_t style_cnt;
-    uint8_t skip_trans :1;
+    uint32_t style_cnt  :8;
+    uint32_t skip_trans :1;
+    uint32_t cache_state :10;
+
+    /*Unset or Needs check*/
+    uint32_t cache_opa_set :1;
+    uint32_t cache_letter_space_set :1;
+    uint32_t cache_line_space_set:1;
+    uint32_t cache_text_font:1;
+    uint32_t cache_text_opa_set:1;
+    uint32_t cache_text_decor_set:1;
+    uint32_t cache_text_blend_mode_set:1;
+
+    /*Indexed*/
+    uint32_t cache_radius:5;
+    uint32_t cache_pad_hor:5;
+    uint32_t cache_pad_ver:5;
+    uint32_t cache_border_width:5;
+
+    /*Zero or Needs check*/
+    uint32_t cache_transform_zero:1;
+    uint32_t cache_bg_blend_mode_zero:1;
+    uint32_t cache_bg_grad_dir_zero:1;
+    uint32_t cache_border_blend_mode_zero:1;
+    uint32_t cache_outline_width_zero:1;
+    uint32_t cache_shadow_width_zero:1;
+    uint32_t cache_img_recolor_opa_zero:1;
+    uint32_t cache_content_src_zero:1;
+
+    /*1 or 0*/
+    uint32_t cache_border_post_enable:1;
+    uint32_t cache_clip_corner_enable:1;
+
+    /*255 or Needs check*/
+    uint32_t cache_bg_opa_cover:1;
+    uint32_t cache_border_opa_cover:1;
+    uint32_t cache_img_opa_cover:1;
 }lv_obj_style_list_t;
 
 /**********************

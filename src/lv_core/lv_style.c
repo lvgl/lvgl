@@ -218,21 +218,32 @@ bool lv_style_is_empty(const lv_style_t * style)
  *   STATIC FUNCTIONS
  **********************/
 
-static int16_t buf_num[32];
+int16_t buf_num[32];
+static uint32_t buf_num_p = 1;
 static int32_t get_index_num(lv_style_value_t v)
 {
-    static uint32_t p = 1;
     uint32_t i;
-    for(i = 1; i < p; i++) {
+    for(i = 1; i < buf_num_p; i++) {
         if(v._int == buf_num[i])  return i;
     }
-    if(p < 32) {
-        buf_num[p] = v._int;
-        p++;
-        return p - 1;
+    if(buf_num_p < 32) {
+        buf_num[buf_num_p] = v._int;
+        buf_num_p++;
+        return buf_num_p - 1;
     }
     return 0;
 }
+
+uint32_t find_index_num(lv_style_value_t v)
+{
+    uint32_t i;
+    for(i = 1; i < buf_num_p; i++) {
+        if(v._int == buf_num[i])  return i;
+    }
+    return 0;
+}
+
+
 
 static const void * buf_ptr[16];
 static int32_t get_index_ptr(lv_style_value_t v)

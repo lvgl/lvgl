@@ -32,6 +32,15 @@ typedef struct {
     lv_style_value_t end_value;
 } lv_style_trans_t;
 
+typedef enum {
+    CACHE_ZERO = 0,
+    CACHE_TRUE = 1,
+    CACHE_UNSET = 2,
+    CACHE_255 = 3,
+    CACHE_NEED_CHECK = 4,
+    CACHE_INDEX = 5,
+}cache_t;
+
 /**********************
  *  STATIC PROTOTYPES
  **********************/
@@ -45,6 +54,8 @@ static void trans_anim_ready_cb(lv_anim_t * a);
 static void fade_anim_cb(lv_obj_t * obj, lv_anim_value_t v);
 static void fade_in_anim_ready(lv_anim_t * a);
 #endif
+static cache_t read_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop);
+static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop);
 
 /**********************
  *  STATIC VARIABLES
@@ -267,6 +278,85 @@ static lv_style_value_t apply_color_filter(const lv_obj_t * obj, uint32_t part, 
     }
     return v;
 }
+extern int16_t buf_num[];
+static bool get_prop_core(const lv_obj_t * obj, uint8_t part, lv_style_prop_t prop, lv_style_value_t * v)
+{
+    cache_t cache_res = read_cache(obj, part, prop);
+    switch(cache_res) {
+    case CACHE_ZERO:
+        v->_int = 0;
+        return true;
+    case CACHE_TRUE:
+        v->_int = 1;
+        return true;
+    case CACHE_255:
+        v->_int = 255;
+        return true;
+    case CACHE_UNSET:
+        return false;
+    case CACHE_NEED_CHECK:
+        break;
+
+    default: /*CACHE_INDEX*/
+        cache_res -= CACHE_INDEX;
+        if(cache_res) {
+            v->_int = buf_num[cache_res];
+            return true;
+        }
+        break;
+    }
+
+
+    int32_t weight = -1;
+    lv_state_t state = obj->state;
+    lv_state_t state_inv = ~state;
+    lv_style_value_t value_tmp;
+    bool skip_trans = obj->style_list.skip_trans;
+    uint32_t i;
+    bool found;
+    for(i = 0; i < obj->style_list.style_cnt; i++) {
+        lv_obj_style_t * obj_style = &obj->style_list.styles[i];
+        if(obj_style->is_trans == false) break;
+        if(skip_trans) continue;
+        if(obj_style->part != part) continue;
+        found = lv_style_get_prop(obj_style->style, prop, &value_tmp);
+        if(found) {
+            *v = value_tmp;
+            return true;
+        }
+    }
+
+    for(; i < obj->style_list.style_cnt; i++) {
+        lv_obj_style_t * obj_style = &obj->style_list.styles[i];
+        if(obj_style->part != part) continue;
+
+        /* Be sure the style not specifies other state than the requested.
+         * E.g. For HOVER+PRESS object state, HOVER style only is OK, but HOVER+FOCUS style is not*/
+        if((obj_style->state & state_inv)) continue;
+
+        /*Check only better candidates*/
+        if(obj_style->state <= weight) continue;
+
+        found = lv_style_get_prop(obj_style->style, prop, &value_tmp);
+
+        if(found) {
+            if(obj_style->state == state) {
+                *v = value_tmp;
+                return true;
+            }
+            if(weight < obj_style->state) {
+                weight = obj_style->state;
+                *v = value_tmp;
+            }
+        }
+    }
+
+    if(weight >= 0) {
+        *v = value_tmp;
+        return true;
+    }
+    else return false;
+}
 
 /**
  * Get a style property of a part of an object in the object's current state.
@@ -285,57 +375,12 @@ static lv_style_value_t apply_color_filter(const lv_obj_t * obj, uint32_t part, 
 lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, uint8_t part, lv_style_prop_t prop)
 {
     lv_style_value_t value_act;
-    lv_style_value_t value_final;
-    bool found = false;
     bool inherit = prop & LV_STYLE_PROP_INHERIT ? true : false;
     bool filter = prop & LV_STYLE_PROP_FILTER ? true : false;
-    const lv_obj_t * parent = obj;
-    while(parent) {
-        int32_t weight = -1;
-        lv_state_t state = parent->state;
-        lv_state_t state_inv = ~state;
-        bool skip_trans = parent->style_list.skip_trans;
-        uint32_t i;
-        for(i = 0; i < parent->style_list.style_cnt; i++) {
-            lv_obj_style_t * obj_style = &parent->style_list.styles[i];
-            if(obj_style->is_trans == false) break;
-            if(skip_trans) continue;
-            if(obj_style->part != part) continue;
-            found = lv_style_get_prop(obj_style->style, prop, &value_act);
-            if(found) {
-                if(filter) value_act = apply_color_filter(parent, part, value_act);
-                return value_act;
-            }
-        }
-
-        for(; i < parent->style_list.style_cnt; i++) {
-            lv_obj_style_t * obj_style = &parent->style_list.styles[i];
-            if(obj_style->part != part) continue;
-
-            /* Be sure the style not specifies other state than the requested.
-             * E.g. For HOVER+PRESS object state, HOVER style only is OK, but HOVER+FOCUS style is not*/
-            if((obj_style->state & state_inv)) continue;
-
-            /*Check only better candidates*/
-            if(obj_style->state <= weight) continue;
-
-            found = lv_style_get_prop(obj_style->style, prop, &value_act);
-
-            if(found) {
-                if(obj_style->state == state) {
-                    if(filter) value_act = apply_color_filter(parent, part, value_act);
-                    return value_act;
-                }
-                if(weight < obj_style->state) {
-                    weight = obj_style->state;
-                    value_final = value_act;
-                }
-            }
-        }
-        if(weight >= 0) {
-            if(filter) value_final = apply_color_filter(parent, part, value_final);
-            return value_final;
-        }
+    bool found = false;
+    while(obj) {
+        found = get_prop_core(obj, part, prop, &value_act);
+        if(found) break;
         if(!inherit) break;
 
         /*If not found, check the `MAIN` style first*/
@@ -345,11 +390,11 @@ lv_style_value_t lv_obj_get_style_prop(const lv_obj_t * obj, uint8_t part, lv_st
         }
 
         /*Check the parent too.*/
-        parent = lv_obj_get_parent(parent);
+        obj = lv_obj_get_parent(obj);
     }
 
-    value_act = lv_style_prop_get_default(prop);
-    if(filter) value_act = apply_color_filter(parent, part, value_act);
+    if(!found) value_act = lv_style_prop_get_default(prop);
+    if(filter) value_act = apply_color_filter(obj, part, value_act);
     return value_act;
 }
 
@@ -378,6 +423,8 @@ void _lv_obj_refresh_style(lv_obj_t * obj,lv_style_prop_t prop)
     {
         refresh_children_style(obj);
     }
+
+    update_cache(obj, LV_PART_MAIN, prop);
 
 }
 
@@ -542,6 +589,7 @@ void _lv_obj_create_style_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8
  */
 _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2)
 {
+    return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
     lv_obj_style_list_t * list = &obj->style_list;
     _lv_style_state_cmp_t res = _LV_STYLE_STATE_CMP_SAME;
 
@@ -604,6 +652,276 @@ _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t sta
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+
+static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
+{
+    lv_obj_style_list_t * list = &obj->style_list;
+    if(part != LV_PART_MAIN) return;
+    list->cache_state = 0x3ff; /*Set an invalid state to disable cache reading*/
+
+    lv_style_value_t v;
+    /*Unset or Set*/
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_OPA) {
+        if(get_prop_core(obj, part, LV_STYLE_OPA, &v)) list->cache_opa_set = 1;
+        else list->cache_opa_set = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_LETTER_SPACE) {
+        if(get_prop_core(obj, part, LV_STYLE_TEXT_LETTER_SPACE, &v)) list->cache_letter_space_set = 1;
+        else list->cache_letter_space_set = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_LINE_SPACE) {
+        if(get_prop_core(obj, part, LV_STYLE_TEXT_LINE_SPACE, &v)) list->cache_line_space_set = 1;
+        else list->cache_line_space_set = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_OPA) {
+        if(get_prop_core(obj, part, LV_STYLE_TEXT_OPA, &v)) list->cache_text_opa_set = 1;
+        else list->cache_text_opa_set = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_DECOR) {
+        if(get_prop_core(obj, part, LV_STYLE_TEXT_DECOR, &v)) list->cache_text_decor_set = 1;
+        else list->cache_text_decor_set = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TEXT_BLEND_MODE) {
+        if(get_prop_core(obj, part, LV_STYLE_TEXT_BLEND_MODE, &v)) list->cache_text_blend_mode_set = 1;
+        else list->cache_text_decor_set = 0;
+    }
+
+    /*Indexed*/
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_RADIUS) {
+        if(get_prop_core(obj, part, LV_STYLE_RADIUS, &v) == 0) v._int = 0;
+        uint32_t id = find_index_num(v);
+        list->cache_radius = id;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_PAD_LEFT || prop == LV_STYLE_PAD_RIGHT) {
+        lv_style_value_t vl;
+        lv_style_value_t vr;
+        if(get_prop_core(obj, part, LV_STYLE_PAD_LEFT, &vl) == 0) vl._int = 0;
+        if(get_prop_core(obj, part, LV_STYLE_PAD_RIGHT, &vr) == 0) vr._int = 0;
+
+        if(vl._int == vr._int) {
+            uint32_t id = find_index_num(vl);
+            list->cache_pad_hor = id;
+        } else {
+            list->cache_pad_hor = 0;
+        }
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_PAD_TOP || prop == LV_STYLE_PAD_BOTTOM) {
+        lv_style_value_t vt;
+        lv_style_value_t vb;
+        if(get_prop_core(obj, part, LV_STYLE_PAD_TOP, &vt) == 0) vt._int = 0;
+        if(get_prop_core(obj, part, LV_STYLE_PAD_BOTTOM, &vb) == 0) vb._int = 0;
+
+        if(vt._int == vb._int) {
+            uint32_t id = find_index_num(vt);
+            list->cache_pad_ver = id;
+        } else {
+            list->cache_pad_ver = 0;
+        }
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BORDER_WIDTH) {
+        if(get_prop_core(obj, part, LV_STYLE_BORDER_WIDTH, &v) == 0) v._int = 0;
+        uint32_t id = find_index_num(v);
+        list->cache_border_width = id;
+    }
+
+    /*Zero or Needs check*/
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_TRANSFORM_ANGLE || prop == LV_STYLE_TRANSFORM_ZOOM ||
+            prop == LV_STYLE_TRANSFORM_HEIGHT || prop == LV_STYLE_TRANSFORM_WIDTH) {
+        lv_style_value_t vt[4];
+        if(get_prop_core(obj, part, LV_STYLE_TRANSFORM_ANGLE, &vt[0]) == false) vt[0]._int = 0;
+        if(get_prop_core(obj, part, LV_STYLE_TRANSFORM_ZOOM, &vt[1]) == false) vt[1]._int = 0;
+        if(get_prop_core(obj, part, LV_STYLE_TRANSFORM_WIDTH, &vt[2]) == false) vt[2]._int = 0;
+        if(get_prop_core(obj, part, LV_STYLE_TRANSFORM_HEIGHT, &vt[3]) == false) vt[3]._int = 0;
+
+        if(vt[0]._int == 0 && vt[1]._int == 0 && vt[2]._int == 0 && vt[3]._int == 0) {
+            list->cache_transform_zero = 0;
+        } else {
+            list->cache_transform_zero = 1;
+        }
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BG_BLEND_MODE) {
+        if(get_prop_core(obj, part, LV_STYLE_BG_BLEND_MODE, &v) == false) v._int = 0;
+        if(v._int == 0) list->cache_bg_blend_mode_zero = 1;
+        else list->cache_bg_blend_mode_zero = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BG_GRAD_DIR) {
+        if(get_prop_core(obj, part, LV_STYLE_BG_GRAD_DIR, &v) == false) v._int = 0;
+        if(v._int == 0) list->cache_bg_grad_dir_zero = 1;
+        else list->cache_bg_grad_dir_zero = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BORDER_BLEND_MODE) {
+        if(get_prop_core(obj, part, LV_STYLE_BORDER_BLEND_MODE, &v) == false) v._int = 0;
+        if(v._int == 0) list->cache_border_blend_mode_zero = 1;
+        else list->cache_border_blend_mode_zero = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_OUTLINE_WIDTH) {
+        if(get_prop_core(obj, part, LV_STYLE_OUTLINE_WIDTH, &v) == false) v._int = 0;
+        if(v._int == 0) list->cache_outline_width_zero = 1;
+        else list->cache_outline_width_zero = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_SHADOW_WIDTH) {
+        if(get_prop_core(obj, part, LV_STYLE_OUTLINE_WIDTH, &v) == false) v._int = 0;
+        if(v._int == 0) list->cache_shadow_width_zero = 1;
+        else list->cache_shadow_width_zero = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_IMG_RECOLOR_OPA) {
+        if(get_prop_core(obj, part, LV_STYLE_IMG_RECOLOR_OPA, &v) == false) v._int = 0;
+        if(v._int == 0) list->cache_img_recolor_opa_zero = 1;
+        else list->cache_img_recolor_opa_zero = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_CONTENT_SRC) {
+        if(get_prop_core(obj, part, LV_STYLE_CONTENT_SRC, &v) == false) v._int = 0;
+        if(v._int == 0) list->cache_content_src_zero = 1;
+        else list->cache_content_src_zero = 0;
+    }
+
+    /*1 or 0*/
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BORDER_POST) {
+        if(get_prop_core(obj, part, LV_STYLE_BORDER_POST, &v) == false) v._int = 0;
+        if(v._int == 0) list->cache_border_post_enable = 1;
+        else list->cache_border_post_enable = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_CLIP_CORNER) {
+        if(get_prop_core(obj, part, LV_STYLE_CLIP_CORNER, &v) == false) v._int = 0;
+        if(v._int == 0) list->cache_clip_corner_enable = 1;
+        else list->cache_clip_corner_enable = 0;
+    }
+
+    /*255 or Needs check*/
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BG_OPA) {
+        if(get_prop_core(obj, part, LV_STYLE_BG_OPA, &v) == false) v._int = LV_OPA_TRANSP;
+        if(v._int == LV_OPA_COVER) list->cache_bg_opa_cover = 1;
+        else list->cache_bg_opa_cover = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BORDER_OPA) {
+        if(get_prop_core(obj, part, LV_STYLE_BORDER_OPA, &v) == false) v._int = LV_OPA_COVER;
+        if(v._int == LV_OPA_COVER) list->cache_border_opa_cover = 1;
+        else list->cache_border_opa_cover = 0;
+    }
+    if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_IMG_OPA) {
+        if(get_prop_core(obj, part, LV_STYLE_IMG_OPA, &v) == false) v._int = LV_OPA_COVER;
+        if(v._int == LV_OPA_COVER) list->cache_img_opa_cover = 1;
+        else list->cache_img_opa_cover = 0;
+    }
+
+    list->cache_state = obj->state;
+}
+
+
+static cache_t read_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
+{
+    lv_obj_style_list_t * list = &obj->style_list;
+    if(part != LV_PART_MAIN) return CACHE_NEED_CHECK;
+    if(obj->state != list->cache_state) return CACHE_NEED_CHECK;
+    if(obj->style_list.skip_trans) return CACHE_NEED_CHECK;
+
+    switch(prop) {
+    /*Unset or Needs check*/
+    case LV_STYLE_OPA:
+        if(list->cache_opa_set) return CACHE_NEED_CHECK;
+        else return CACHE_UNSET;
+        break;
+    case LV_STYLE_TEXT_LETTER_SPACE:
+        if(list->cache_letter_space_set) return CACHE_NEED_CHECK;
+        else return CACHE_UNSET;
+        break;
+    case LV_STYLE_TEXT_LINE_SPACE:
+        if(list->cache_line_space_set) return CACHE_NEED_CHECK;
+        else return CACHE_UNSET;
+        break;
+    case LV_STYLE_TEXT_OPA:
+        if(list->cache_text_opa_set) return CACHE_NEED_CHECK;
+        else return CACHE_UNSET;
+        break;
+    case LV_STYLE_TEXT_DECOR:
+        if(list->cache_text_decor_set) return CACHE_NEED_CHECK;
+        else return CACHE_UNSET;
+        break;
+    case LV_STYLE_TEXT_BLEND_MODE:
+        if(list->cache_text_blend_mode_set) return CACHE_NEED_CHECK;
+        else return CACHE_UNSET;
+        break;
+
+    /*Indexed*/
+    case LV_STYLE_RADIUS:
+        return CACHE_INDEX + list->cache_radius;
+        break;
+    case LV_STYLE_PAD_LEFT:
+    case LV_STYLE_PAD_RIGHT:
+        return CACHE_INDEX + list->cache_pad_hor;
+        break;
+    case LV_STYLE_PAD_TOP:
+    case LV_STYLE_PAD_BOTTOM:
+        return CACHE_INDEX + list->cache_pad_ver;
+        break;
+    case LV_STYLE_BORDER_WIDTH:
+        return CACHE_INDEX + list->cache_border_width;
+        break;
+
+    /*Zero or Needs check*/
+    case LV_STYLE_TRANSFORM_ANGLE:
+    case LV_STYLE_TRANSFORM_ZOOM:
+    case LV_STYLE_TRANSFORM_HEIGHT:
+    case LV_STYLE_TRANSFORM_WIDTH:
+        if(list->cache_transform_zero) return CACHE_NEED_CHECK;
+        else return CACHE_ZERO;
+        break;
+    case LV_STYLE_BG_BLEND_MODE:
+        if(list->cache_bg_blend_mode_zero) return CACHE_NEED_CHECK;
+        else return CACHE_ZERO;
+        break;
+    case LV_STYLE_BG_GRAD_DIR:
+        if(list->cache_bg_grad_dir_zero) return CACHE_NEED_CHECK;
+        else return CACHE_ZERO;
+        break;
+    case LV_STYLE_BORDER_BLEND_MODE:
+        if(list->cache_border_blend_mode_zero) return CACHE_NEED_CHECK;
+        else return CACHE_ZERO;
+        break;
+    case LV_STYLE_OUTLINE_WIDTH:
+        if(list->cache_outline_width_zero) return CACHE_NEED_CHECK;
+        else return CACHE_ZERO;
+        break;
+    case LV_STYLE_SHADOW_WIDTH:
+        if(list->cache_shadow_width_zero) return CACHE_NEED_CHECK;
+        else return CACHE_ZERO;
+        break;
+    case LV_STYLE_IMG_RECOLOR_OPA:
+        if(list->cache_shadow_width_zero) return CACHE_NEED_CHECK;
+        else return CACHE_ZERO;
+        break;
+    case LV_STYLE_CONTENT_SRC:
+        if(list->cache_shadow_width_zero) return CACHE_NEED_CHECK;
+        else return CACHE_ZERO;
+        break;
+
+    /*1 or 0*/
+    case LV_STYLE_BORDER_POST:
+        if(list->cache_border_post_enable) return CACHE_TRUE;
+        else return CACHE_ZERO;
+        break;
+    case LV_STYLE_CLIP_CORNER:
+        if(list->cache_clip_corner_enable) return CACHE_TRUE;
+        else return CACHE_ZERO;
+        break;
+
+    /*255 or Needs check*/
+    case LV_STYLE_BG_OPA:
+        if(list->cache_bg_opa_cover) return CACHE_255;
+        else return CACHE_ZERO;
+        break;
+    case LV_STYLE_BORDER_OPA:
+        if(list->cache_border_opa_cover) return CACHE_255;
+        else return CACHE_ZERO;
+        break;
+    case LV_STYLE_IMG_OPA:
+        if(list->cache_img_opa_cover) return CACHE_255;
+        else return CACHE_ZERO;
+        break;
+    default:
+        return CACHE_NEED_CHECK;
+    }
+}
 
 /**
  * Refresh the style of all children of an object. (Called recursively)
