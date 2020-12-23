@@ -9,6 +9,7 @@
 #include "lv_math.h"
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*********************
  *      DEFINES
@@ -31,7 +32,10 @@ static const int16_t sin0_90_table[] = {
     17364, 17846, 18323, 18794, 19260, 19720, 20173, 20621, 21062, 21497, 21925, 22347, 22762, 23170, 23571, 23964,
     24351, 24730, 25101, 25465, 25821, 26169, 26509, 26841, 27165, 27481, 27788, 28087, 28377, 28659, 28932, 29196,
     29451, 29697, 29934, 30162, 30381, 30591, 30791, 30982, 31163, 31335, 31498, 31650, 31794, 31927, 32051, 32165,
-    32269, 32364, 32448, 32523, 32587, 32642, 32687, 32722, 32747, 32762, 32767};
+    32269, 32364, 32448, 32523, 32587, 32642, 32687, 32722, 32747, 32762, 32767
+};
+
+
 
 /**********************
  *      MACROS
@@ -46,7 +50,7 @@ static const int16_t sin0_90_table[] = {
  * @param angle
  * @return sinus of 'angle'. sin(-90) = -32767, sin(90) = 32767
  */
-int16_t lv_trigo_sin(int16_t angle)
+LV_ATTRIBUTE_FAST_MEM int16_t _lv_trigo_sin(int16_t angle)
 {
     int16_t ret = 0;
     angle       = angle % 360;
@@ -55,13 +59,16 @@ int16_t lv_trigo_sin(int16_t angle)
 
     if(angle < 90) {
         ret = sin0_90_table[angle];
-    } else if(angle >= 90 && angle < 180) {
+    }
+    else if(angle >= 90 && angle < 180) {
         angle = 180 - angle;
         ret   = sin0_90_table[angle];
-    } else if(angle >= 180 && angle < 270) {
+    }
+    else if(angle >= 180 && angle < 270) {
         angle = angle - 180;
         ret   = -sin0_90_table[angle];
-    } else { /*angle >=270*/
+    }
+    else {   /*angle >=270*/
         angle = 360 - angle;
         ret   = -sin0_90_table[angle];
     }
@@ -78,7 +85,7 @@ int16_t lv_trigo_sin(int16_t angle)
  * @param u3 end values in range of [0..LV_BEZIER_VAL_MAX]
  * @return the value calculated from the given parameters in range of [0..LV_BEZIER_VAL_MAX]
  */
-int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
+int32_t _lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
 {
     uint32_t t_rem  = 1024 - t;
     uint32_t t_rem2 = (t_rem * t_rem) >> 10;
@@ -95,12 +102,39 @@ int32_t lv_bezier3(uint32_t t, int32_t u0, int32_t u1, int32_t u2, int32_t u3)
 }
 
 /**
+ * Get the square root of a number
+ * @param x integer which square root should be calculated
+ * @param q store the result here. q->i: integer part, q->f: fractional part in 1/256 unit
+ * @param mask: optional to skip some iterations if the magnitude of the root is known.
+ * Set to 0x8000 by default.
+ * If root < 16: mask = 0x80
+ * If root < 256: mask = 0x800
+ * Else: mask = 0x8000
+ */
+LV_ATTRIBUTE_FAST_MEM void _lv_sqrt(uint32_t x, lv_sqrt_res_t * q, uint32_t mask)
+{
+    x = x << 8; /*To get 4 bit precision. (sqrt(256) = 16 = 4 bit)*/
+
+    uint32_t root = 0;
+    uint32_t trial;
+    // http://ww1.microchip.com/...en/AppNotes/91040a.pdf
+    do {
+        trial = root + mask;
+        if((uint32_t)trial * trial <= x) root = trial;
+        mask = mask >> 1;
+    } while(mask);
+
+    q->i = (uint32_t) root >> 4;
+    q->f = (uint32_t)(root & 0xf) << 4;
+}
+
+/**
  * Calculate the atan2 of a vector.
  * @param x
  * @param y
  * @return the angle in degree calculated from the given parameters in range of [0..360]
  */
-uint16_t lv_atan2(int x, int y)
+uint16_t _lv_atan2(int x, int y)
 {
     // Fast XY vector to integer degree algorithm - Jan 2011 www.RomanBlack.com
     // Converts any XY values including 0 to a degree value that should be
@@ -138,7 +172,8 @@ uint16_t lv_atan2(int x, int y)
     if(ux > uy) {
         degree = (uy * 45) / ux;   // degree result will be 0-45 range
         negflag += 0x10;    // octant flag bit
-    } else {
+    }
+    else {
         degree = (ux * 45) / uy;   // degree result will be 0-45 range
     }
 
@@ -150,7 +185,8 @@ uint16_t lv_atan2(int x, int y)
         if(tempdegree <= 41) comp++;
         if(tempdegree <= 37) comp++;
         if(tempdegree <= 32) comp++;  // max is 4 degrees compensated
-    } else { // else is lower half of range
+    }
+    else {   // else is lower half of range
         if(tempdegree >= 2) comp++;
         if(tempdegree >= 6) comp++;
         if(tempdegree >= 10) comp++;
@@ -168,7 +204,8 @@ uint16_t lv_atan2(int x, int y)
             degree = (180 + degree);
         else        // else is -Y +X
             degree = (180 - degree);
-    } else { // else is +Y
+    }
+    else {   // else is +Y
         if(negflag & 0x01)   // if +Y -X
             degree = (360 - degree);
     }
@@ -176,26 +213,48 @@ uint16_t lv_atan2(int x, int y)
 }
 
 /**
- * Calculate the integer square root of a number.
- * @param num
- * @return square root of 'num'
+ * Calculate the integer exponents.
+ * @param base
+ * @param power
+ * @return base raised to the power exponent
  */
-uint32_t lv_sqrt(uint32_t num)
+int64_t _lv_pow(int64_t base, int8_t exp)
 {
-    // http://www.codecodex.com/wiki/Calculate_an_integer_square_root#C
-    uint32_t root  = 0;
-    uint32_t place = 0x40000000;
-
-    while(place > num) place >>= 2;
-    while(place) {
-        if(num >= root + place) {
-            num -= root + place;
-            root += (place << 1);
-        }
-        root >>= 1;
-        place >>= 2;
+    int64_t result = 1;
+    while(exp) {
+        if(exp & 1)
+            result *= base;
+        exp >>= 1;
+        base *= base;
     }
-    return root;
+
+    return result;
+}
+
+/**
+ * Get the mapped of a number given an input and output range
+ * @param x integer which mapped value should be calculated
+ * @param min_in min input range
+ * @param max_in max input range
+ * @param min_out max output range
+ * @param max_out max output range
+ * @return the mapped number
+ */
+int16_t _lv_map(int32_t x, int32_t min_in, int32_t max_in, int32_t min_out, int32_t max_out)
+{
+    if(x <= min_in) return min_out;
+    if(x >= max_in) return max_out;
+
+    /* The equation should be:
+     *   ((x - min_in) / delta in) * delta_out + min_out
+     * To avoid rounding error reorder the operations:
+     *   (((x - min_in) * delta_out) / delta in) + min_out
+     */
+
+    int32_t delta_in = max_in - min_in;
+    int32_t delta_out = max_out - min_out;
+
+    return ((x - min_in) * delta_out) / delta_in + min_out;
 }
 
 /**********************

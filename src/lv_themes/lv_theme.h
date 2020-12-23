@@ -13,14 +13,9 @@ extern "C" {
 /*********************
  *    INCLUDES
  *********************/
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
-
+#include "../lv_conf_internal.h"
 #include "../lv_core/lv_style.h"
-#include "../lv_core/lv_group.h"
+#include "../lv_core/lv_obj.h"
 
 /*********************
  *    DEFINES
@@ -31,312 +26,143 @@ extern "C" {
  **********************/
 
 /**
- * A theme in LittlevGL consists of many styles bound together.
- * 
+ * A theme in LVGL consists of many styles bound together.
+ *
  * There is a style for each object type, as well as a generic style for
  * backgrounds and panels.
  */
-typedef struct
-{
-    struct
-    {
-        lv_style_t * scr;
-        lv_style_t * bg;
-        lv_style_t * panel;
-
-#if LV_USE_CONT != 0
-        lv_style_t * cont;
+typedef enum {
+    LV_THEME_NONE = 0,
+    LV_THEME_SCR,
+    LV_THEME_OBJ,
+#if LV_USE_ARC
+    LV_THEME_ARC,
 #endif
-
-#if LV_USE_BTN != 0
-        struct
-        {
-            lv_style_t * rel;
-            lv_style_t * pr;
-            lv_style_t * tgl_rel;
-            lv_style_t * tgl_pr;
-            lv_style_t * ina;
-        } btn;
+#if LV_USE_BAR
+    LV_THEME_BAR,
 #endif
-
-#if LV_USE_IMGBTN != 0
-        struct
-        {
-            lv_style_t * rel;
-            lv_style_t * pr;
-            lv_style_t * tgl_rel;
-            lv_style_t * tgl_pr;
-            lv_style_t * ina;
-        } imgbtn;
+#if LV_USE_BTN
+    LV_THEME_BTN,
 #endif
-
-#if LV_USE_LABEL != 0
-        struct
-        {
-            lv_style_t * prim;
-            lv_style_t * sec;
-            lv_style_t * hint;
-        } label;
+#if LV_USE_BTNMATRIX
+    LV_THEME_BTNMATRIX,
 #endif
-
-#if LV_USE_IMG != 0
-        struct
-        {
-            lv_style_t * light;
-            lv_style_t * dark;
-        } img;
+#if LV_USE_CALENDAR
+    LV_THEME_CALENDAR,
 #endif
-
-#if LV_USE_LINE != 0
-        struct
-        {
-            lv_style_t * decor;
-        } line;
+#if LV_USE_CANVAS
+    LV_THEME_CANVAS,
 #endif
-
-#if LV_USE_LED != 0
-        lv_style_t * led;
+#if LV_USE_CHECKBOX
+    LV_THEME_CHECKBOX,
 #endif
-
-#if LV_USE_BAR != 0
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * indic;
-        } bar;
+#if LV_USE_CHART
+    LV_THEME_CHART,
 #endif
-
-#if LV_USE_SLIDER != 0
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * indic;
-            lv_style_t * knob;
-        } slider;
+#if LV_USE_CONT
+    LV_THEME_CONT,
 #endif
-
-#if LV_USE_LMETER != 0
-        lv_style_t * lmeter;
+#if LV_USE_CPICKER
+    LV_THEME_CPICKER,
 #endif
-
-#if LV_USE_GAUGE != 0
-        lv_style_t * gauge;
+#if LV_USE_DROPDOWN
+    LV_THEME_DROPDOWN,
 #endif
-
-#if LV_USE_ARC != 0
-        lv_style_t * arc;
+#if LV_USE_GAUGE
+    LV_THEME_GAUGE,
 #endif
-
-#if LV_USE_PRELOAD != 0
-        lv_style_t * preload;
+#if LV_USE_IMG
+    LV_THEME_IMAGE,
 #endif
-
-#if LV_USE_SW != 0
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * indic;
-            lv_style_t * knob_off;
-            lv_style_t * knob_on;
-        } sw;
+#if LV_USE_IMGBTN
+    LV_THEME_IMGBTN,
 #endif
-
-#if LV_USE_CHART != 0
-        lv_style_t * chart;
+#if LV_USE_KEYBOARD
+    LV_THEME_KEYBOARD,
 #endif
-
-#if LV_USE_CALENDAR != 0
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * header;
-            lv_style_t * header_pr;
-            lv_style_t * day_names;
-            lv_style_t * highlighted_days;
-            lv_style_t * inactive_days;
-            lv_style_t * week_box;
-            lv_style_t * today_box;
-        } calendar;
+#if LV_USE_LABEL
+    LV_THEME_LABEL,
 #endif
-
-#if LV_USE_CB != 0
-        struct
-        {
-            lv_style_t * bg;
-            struct
-            {
-                lv_style_t * rel;
-                lv_style_t * pr;
-                lv_style_t * tgl_rel;
-                lv_style_t * tgl_pr;
-                lv_style_t * ina;
-            } box;
-        } cb;
+#if LV_USE_LED
+    LV_THEME_LED,
 #endif
-
-#if LV_USE_BTNM != 0
-        struct
-        {
-            lv_style_t * bg;
-            struct
-            {
-                lv_style_t * rel;
-                lv_style_t * pr;
-                lv_style_t * tgl_rel;
-                lv_style_t * tgl_pr;
-                lv_style_t * ina;
-            } btn;
-        } btnm;
+#if LV_USE_LINE
+    LV_THEME_LINE,
 #endif
-
-#if LV_USE_KB != 0
-        struct
-        {
-            lv_style_t * bg;
-            struct
-            {
-                lv_style_t * rel;
-                lv_style_t * pr;
-                lv_style_t * tgl_rel;
-                lv_style_t * tgl_pr;
-                lv_style_t * ina;
-            } btn;
-        } kb;
-#endif
-
-#if LV_USE_MBOX != 0
-        struct
-        {
-            lv_style_t * bg;
-            struct
-            {
-                lv_style_t * bg;
-                lv_style_t * rel;
-                lv_style_t * pr;
-            } btn;
-        } mbox;
-#endif
-
-#if LV_USE_PAGE != 0
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * scrl;
-            lv_style_t * sb;
-        } page;
-#endif
-
-#if LV_USE_TA != 0
-        struct
-        {
-            lv_style_t * area;
-            lv_style_t * oneline;
-            lv_style_t * cursor;
-            lv_style_t * sb;
-        } ta;
-#endif
-
-#if LV_USE_SPINBOX != 0
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * cursor;
-            lv_style_t * sb;
-        } spinbox;
-#endif
-
 #if LV_USE_LIST
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * scrl;
-            lv_style_t * sb;
-            struct
-            {
-                lv_style_t * rel;
-                lv_style_t * pr;
-                lv_style_t * tgl_rel;
-                lv_style_t * tgl_pr;
-                lv_style_t * ina;
-            } btn;
-        } list;
+    LV_THEME_LIST,
+    LV_THEME_LIST_BTN,
+#endif
+#if LV_USE_LINEMETER
+    LV_THEME_LINEMETER,
+#endif
+#if LV_USE_MSGBOX
+    LV_THEME_MSGBOX,
+    LV_THEME_MSGBOX_BTNS,   /*The button matrix of the buttons are initialized separately*/
+#endif
+#if LV_USE_OBJMASK
+    LV_THEME_OBJMASK,
+#endif
+#if LV_USE_PAGE
+    LV_THEME_PAGE,
+#endif
+#if LV_USE_ROLLER
+    LV_THEME_ROLLER,
+#endif
+#if LV_USE_SLIDER
+    LV_THEME_SLIDER,
+#endif
+#if LV_USE_SPINBOX
+    LV_THEME_SPINBOX,
+    LV_THEME_SPINBOX_BTN,   /*Control button for the spinbox*/
+#endif
+#if LV_USE_SPINNER
+    LV_THEME_SPINNER,
+#endif
+#if LV_USE_SWITCH
+    LV_THEME_SWITCH,
+#endif
+#if LV_USE_TABLE
+    LV_THEME_TABLE,
+#endif
+#if LV_USE_TABVIEW
+    LV_THEME_TABVIEW,
+    LV_THEME_TABVIEW_PAGE,  /*The tab pages are initialized separately*/
+#endif
+#if LV_USE_TEXTAREA
+    LV_THEME_TEXTAREA,
+#endif
+#if LV_USE_TILEVIEW
+    LV_THEME_TILEVIEW,
+#endif
+#if LV_USE_WIN
+    LV_THEME_WIN,
+    LV_THEME_WIN_BTN,   /*The buttons are initialized separately*/
 #endif
 
-#if LV_USE_DDLIST != 0
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * sel;
-            lv_style_t * sb;
-        } ddlist;
-#endif
+    _LV_THEME_BUILTIN_LAST,
+    LV_THEME_CUSTOM_START = _LV_THEME_BUILTIN_LAST,
+    _LV_THEME_CUSTOM_LAST = 0xFFFF,
 
-#if LV_USE_ROLLER != 0
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * sel;
-        } roller;
-#endif
+} lv_theme_style_t;
 
-#if LV_USE_TABVIEW != 0
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * indic;
-            struct
-            {
-                lv_style_t * bg;
-                lv_style_t * rel;
-                lv_style_t * pr;
-                lv_style_t * tgl_rel;
-                lv_style_t * tgl_pr;
-            } btn;
-        } tabview;
-#endif
+struct _lv_theme_t;
 
-#if LV_USE_TILEVIEW != 0
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * scrl;
-            lv_style_t * sb;
-        } tileview;
-#endif
+typedef void (*lv_theme_apply_cb_t)(struct _lv_theme_t *, lv_obj_t *, lv_theme_style_t);
+typedef void (*lv_theme_apply_xcb_t)(lv_obj_t *, lv_theme_style_t); /*Deprecated: use `apply_cb` instead*/
 
-#if LV_USE_TABLE != 0
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * cell;
-        } table;
-#endif
-
-#if LV_USE_WIN != 0
-        struct
-        {
-            lv_style_t * bg;
-            lv_style_t * sb;
-            lv_style_t * header;
-            lv_style_t * content;
-            struct
-            {
-                lv_style_t * rel;
-                lv_style_t * pr;
-            } btn;
-        } win;
-#endif
-    } style;
-
-#if LV_USE_GROUP
-    struct
-    {
-        /* The `x` in the names inidicates that inconsistence becasue
-         * the group related function are stored in the theme.*/
-        lv_group_style_mod_cb_t style_mod_xcb;
-        lv_group_style_mod_cb_t style_mod_edit_xcb;
-    } group;
-#endif
+typedef struct _lv_theme_t {
+    lv_theme_apply_cb_t apply_cb;
+    lv_theme_apply_xcb_t apply_xcb; /*Deprecated: use `apply_cb` instead*/
+    struct _lv_theme_t * base;    /**< Apply the current theme's style on top of this theme.*/
+    lv_color_t color_primary;
+    lv_color_t color_secondary;
+    const lv_font_t * font_small;
+    const lv_font_t * font_normal;
+    const lv_font_t * font_subtitle;
+    const lv_font_t * font_title;
+    uint32_t flags;
+    void * user_data;
 } lv_theme_t;
 
 /**********************
@@ -348,32 +174,99 @@ typedef struct
  * From now, all the created objects will use styles from this theme by default
  * @param th pointer to theme (return value of: 'lv_theme_init_xxx()')
  */
-void lv_theme_set_current(lv_theme_t * th);
+void lv_theme_set_act(lv_theme_t * th);
 
 /**
  * Get the current system theme.
  * @return pointer to the current system theme. NULL if not set.
  */
-lv_theme_t * lv_theme_get_current(void);
+lv_theme_t * lv_theme_get_act(void);
+
+/**
+ * Apply the active theme on an object
+ * @param obj pointer to an object
+ * @param name the name of the theme element to apply. E.g. `LV_THEME_BTN`
+ */
+void lv_theme_apply(lv_obj_t * obj, lv_theme_style_t name);
+
+/**
+ * Copy a theme to an other or initialize a theme
+ * @param theme pointer to a theme to initialize
+ * @param copy pointer to a theme to copy
+ *             or `NULL` to initialize `theme` to empty
+ */
+void lv_theme_copy(lv_theme_t * theme, const lv_theme_t * copy);
+
+/**
+ * Set a base theme for a theme.
+ * The styles from the base them will be added before the styles of the current theme.
+ * Arbitrary long chain of themes can be created by setting base themes.
+ * @param new_theme pointer to theme which base should be set
+ * @param base pointer to the base theme
+ */
+void lv_theme_set_base(lv_theme_t * new_theme, lv_theme_t * base);
+
+/**
+ * Set an apply callback for a theme.
+ * The apply callback is used to add styles to different objects
+ * @param theme pointer to theme which callback should be set
+ * @param apply_cb pointer to the callback
+ */
+void lv_theme_set_apply_cb(lv_theme_t * theme, lv_theme_apply_cb_t apply_cb);
+
+/**
+ * Get the small font of the theme
+ * @return pointer to the font
+ */
+const lv_font_t * lv_theme_get_font_small(void);
+
+/**
+ * Get the normal font of the theme
+ * @return pointer to the font
+ */
+const lv_font_t * lv_theme_get_font_normal(void);
+
+/**
+ * Get the subtitle font of the theme
+ * @return pointer to the font
+ */
+const lv_font_t * lv_theme_get_font_subtitle(void);
+
+/**
+ * Get the title font of the theme
+ * @return pointer to the font
+ */
+const lv_font_t * lv_theme_get_font_title(void);
+
+/**
+ * Get the primary color of the theme
+ * @return the color
+ */
+lv_color_t lv_theme_get_color_primary(void);
+
+/**
+ * Get the secondary color of the theme
+ * @return the color
+ */
+lv_color_t lv_theme_get_color_secondary(void);
+
+/**
+ * Get the flags of the theme
+ * @return the flags
+ */
+uint32_t lv_theme_get_flags(void);
 
 /**********************
  *    MACROS
  **********************/
 
-/* Returns number of styles within the `lv_theme_t` structure. */
-#define LV_THEME_STYLE_COUNT (sizeof(((lv_theme_t *)0)->style) / sizeof(lv_style_t *))
-
 /**********************
  *     POST INCLUDE
  *********************/
-#include "lv_theme_templ.h"
-#include "lv_theme_default.h"
-#include "lv_theme_alien.h"
-#include "lv_theme_night.h"
-#include "lv_theme_zen.h"
-#include "lv_theme_mono.h"
-#include "lv_theme_nemo.h"
+#include "lv_theme_empty.h"
+#include "lv_theme_template.h"
 #include "lv_theme_material.h"
+#include "lv_theme_mono.h"
 
 #ifdef __cplusplus
 } /* extern "C" */

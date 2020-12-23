@@ -10,6 +10,8 @@
 
 #include "lv_utils.h"
 #include "lv_math.h"
+#include "lv_printf.h"
+#include "lv_txt.h"
 
 /*********************
  *      DEFINES
@@ -41,7 +43,7 @@
  * @param buf pointer to a `char` buffer. The result will be stored here (max 10 elements)
  * @return same as `buf` (just for convenience)
  */
-char * lv_utils_num_to_str(int32_t num, char * buf)
+char * _lv_utils_num_to_str(int32_t num, char * buf)
 {
     if(num == 0) {
         buf[0] = '0';
@@ -89,8 +91,8 @@ char * lv_utils_num_to_str(int32_t num, char * buf)
  *
  * @return a pointer to a matching item, or NULL if none exists.
  */
-void * lv_utils_bsearch(const void * key, const void * base, uint32_t n, uint32_t size,
-                        int32_t (*cmp)(const void * pRef, const void * pElement))
+void * _lv_utils_bsearch(const void * key, const void * base, uint32_t n, uint32_t size,
+                         int32_t (*cmp)(const void * pRef, const void * pElement))
 {
     const char * middle;
     int32_t c;
@@ -100,10 +102,12 @@ void * lv_utils_bsearch(const void * key, const void * base, uint32_t n, uint32_
         if((c = (*cmp)(key, middle)) > 0) {
             n    = (n / 2) - ((n & 1) == 0);
             base = (middle += size);
-        } else if(c < 0) {
+        }
+        else if(c < 0) {
             n /= 2;
             middle = base;
-        } else {
+        }
+        else {
             return (char *)middle;
         }
     }

@@ -13,18 +13,13 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
-
 #include <stdint.h>
 #include <stdbool.h>
 #include "lv_mem.h"
 #include "lv_ll.h"
+#include "lv_task.h"
 #include "../lv_draw/lv_img_cache.h"
+#include "../lv_draw/lv_draw_mask.h"
 
 /*********************
  *      DEFINES
@@ -39,9 +34,17 @@ extern "C" {
     f(lv_ll_t, _lv_anim_ll)                                        \
     f(lv_ll_t, _lv_group_ll)                                       \
     f(lv_ll_t, _lv_img_defoder_ll)                                 \
+    f(lv_ll_t, _lv_obj_style_trans_ll)                             \
     f(lv_img_cache_entry_t*, _lv_img_cache_array)                  \
-    f(void*, _lv_task_act)                                         \
-    f(void*, _lv_draw_buf)
+    f(lv_task_t*, _lv_task_act)                                    \
+    f(lv_mem_buf_arr_t , _lv_mem_buf)                              \
+    f(_lv_draw_mask_saved_arr_t , _lv_draw_mask_list)              \
+    f(void * , _lv_theme_material_styles)                          \
+    f(void * , _lv_theme_template_styles)                          \
+    f(void * , _lv_theme_mono_styles)                              \
+    f(void * , _lv_theme_empty_styles)                             \
+    f(uint8_t *, _lv_font_decompr_buf)                             \
+
 
 #define LV_DEFINE_ROOT(root_type, root_name) root_type root_name;
 #define LV_ROOTS LV_ITERATE_ROOTS(LV_DEFINE_ROOT)
@@ -64,7 +67,7 @@ LV_ITERATE_ROOTS(LV_EXTERN_ROOT)
  * GLOBAL PROTOTYPES
  **********************/
 
-void lv_gc_clear_roots(void);
+void _lv_gc_clear_roots(void);
 
 /**********************
  *      MACROS

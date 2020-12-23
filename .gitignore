@@ -1,5 +1,9 @@
+scripts/release/__pycache__
 **/*.o
+**/*bin
 **/*.swp
 **/*.swo
 tags
 docs/api_doc
+scripts/cppcheck_res.txt
+scripts/built_in_font/lv_font_*

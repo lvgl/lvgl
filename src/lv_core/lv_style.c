@@ -7,7 +7,6 @@
  *      INCLUDES
  *********************/
 #include "lv_obj.h"
-#include "../lv_core/lv_debug.h"
 #include "../lv_misc/lv_mem.h"
 #include "../lv_misc/lv_anim.h"
 
@@ -25,6 +24,9 @@
         res->attr = start->attr;                                                                                       \
     }
 
+#define LV_STYLE_PROP_TO_ID(prop) (prop & 0xFF);
+#define LV_STYLE_PROP_GET_TYPE(prop) ((prop >> 8) & 0xFF);
+
 /**********************
  *      TYPEDEFS
  **********************/
@@ -32,27 +34,22 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-#if LV_USE_ANIMATION
-static void style_animator(lv_style_anim_dsc_t * dsc, lv_anim_value_t val);
-static void style_animation_common_end_cb(lv_anim_t * a);
-#endif
+LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop);
+static lv_style_t * get_alloc_local_style(lv_style_list_t * list);
+static inline void style_resize(lv_style_t * style, size_t sz);
+static inline lv_style_property_t get_style_prop(const lv_style_t * style, size_t idx);
+static inline uint8_t get_style_prop_id(const lv_style_t * style, size_t idx);
+static inline uint8_t get_style_prop_attr(const lv_style_t * style, size_t idx);
+static inline size_t get_prop_size(uint8_t prop_id);
+static inline size_t get_next_prop_index(uint8_t prop_id, size_t id);
+
+/**********************
+ *  GLOBAL VARIABLES
+ **********************/
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-lv_style_t lv_style_scr;
-lv_style_t lv_style_transp;
-lv_style_t lv_style_transp_fit;
-lv_style_t lv_style_transp_tight;
-lv_style_t lv_style_plain;
-lv_style_t lv_style_plain_color;
-lv_style_t lv_style_pretty;
-lv_style_t lv_style_pretty_color;
-lv_style_t lv_style_btn_rel;
-lv_style_t lv_style_btn_pr;
-lv_style_t lv_style_btn_tgl_rel;
-lv_style_t lv_style_btn_tgl_pr;
-lv_style_t lv_style_btn_ina;
 
 /**********************
  *      MACROS
@@ -63,291 +60,1140 @@ lv_style_t lv_style_btn_ina;
  **********************/
 
 /**
- *  Init the basic styles
+ * Initialize a style
+ * @param style pointer to a style to initialize
  */
-void lv_style_init(void)
+void lv_style_init(lv_style_t * style)
 {
-    /* Not White/Black/Gray colors are created by HSV model with
-     * HUE = 210*/
-
-    /*Screen style*/
-    lv_style_scr.glass               = 0;
-    lv_style_scr.body.opa            = LV_OPA_COVER;
-    lv_style_scr.body.main_color     = LV_COLOR_WHITE;
-    lv_style_scr.body.grad_color     = LV_COLOR_WHITE;
-    lv_style_scr.body.radius         = 0;
-    lv_style_scr.body.padding.left   = 0;
-    lv_style_scr.body.padding.right  = 0;
-    lv_style_scr.body.padding.top    = 0;
-    lv_style_scr.body.padding.bottom = 0;
-    lv_style_scr.body.padding.inner  = LV_DPI / 20;
-
-    lv_style_scr.body.border.color = LV_COLOR_BLACK;
-    lv_style_scr.body.border.opa   = LV_OPA_COVER;
-    lv_style_scr.body.border.width = 0;
-    lv_style_scr.body.border.part  = LV_BORDER_FULL;
-
-    lv_style_scr.body.shadow.color = LV_COLOR_GRAY;
-    lv_style_scr.body.shadow.type  = LV_SHADOW_FULL;
-    lv_style_scr.body.shadow.width = 0;
-
-    lv_style_scr.text.opa          = LV_OPA_COVER;
-    lv_style_scr.text.color        = lv_color_make(0x30, 0x30, 0x30);
-    lv_style_scr.text.sel_color    = lv_color_make(0x55, 0x96, 0xd8);
-    lv_style_scr.text.font         = LV_FONT_DEFAULT;
-    lv_style_scr.text.letter_space = 0;
-    lv_style_scr.text.line_space   = 2;
-
-    lv_style_scr.image.opa     = LV_OPA_COVER;
-    lv_style_scr.image.color   = lv_color_make(0x20, 0x20, 0x20);
-    lv_style_scr.image.intense = LV_OPA_TRANSP;
-
-    lv_style_scr.line.opa     = LV_OPA_COVER;
-    lv_style_scr.line.color   = lv_color_make(0x20, 0x20, 0x20);
-    lv_style_scr.line.width   = 2;
-    lv_style_scr.line.rounded = 0;
-
-#if LV_USE_DEBUG
+    _lv_memset_00(style, sizeof(lv_style_t));
 #if LV_USE_ASSERT_STYLE
-    lv_style_scr.debug_sentinel = LV_STYLE_DEGUG_SENTINEL_VALUE;
+    style->sentinel = LV_DEBUG_STYLE_SENTINEL_VALUE;
 #endif
-#endif
-
-    /*Plain style (by default near the same as the screen style)*/
-    lv_style_copy(&lv_style_plain, &lv_style_scr);
-    lv_style_plain.body.padding.left   = LV_DPI / 20;
-    lv_style_plain.body.padding.right  = LV_DPI / 20;
-    lv_style_plain.body.padding.top    = LV_DPI / 20;
-    lv_style_plain.body.padding.bottom = LV_DPI / 20;
-
-    /*Plain color style*/
-    lv_style_copy(&lv_style_plain_color, &lv_style_plain);
-    lv_style_plain_color.text.color      = lv_color_make(0xf0, 0xf0, 0xf0);
-    lv_style_plain_color.image.color     = lv_color_make(0xf0, 0xf0, 0xf0);
-    lv_style_plain_color.line.color      = lv_color_make(0xf0, 0xf0, 0xf0);
-    lv_style_plain_color.body.main_color = lv_color_make(0x55, 0x96, 0xd8);
-    lv_style_plain_color.body.grad_color = lv_style_plain_color.body.main_color;
-
-    /*Pretty style */
-    lv_style_copy(&lv_style_pretty, &lv_style_plain);
-    lv_style_pretty.text.color        = lv_color_make(0x20, 0x20, 0x20);
-    lv_style_pretty.image.color       = lv_color_make(0x20, 0x20, 0x20);
-    lv_style_pretty.line.color        = lv_color_make(0x20, 0x20, 0x20);
-    lv_style_pretty.body.main_color   = LV_COLOR_WHITE;
-    lv_style_pretty.body.grad_color   = LV_COLOR_SILVER;
-    lv_style_pretty.body.radius       = LV_DPI / 15;
-    lv_style_pretty.body.border.color = lv_color_make(0x40, 0x40, 0x40);
-    lv_style_pretty.body.border.width = LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
-    lv_style_pretty.body.border.opa   = LV_OPA_30;
-
-    /*Pretty color style*/
-    lv_style_copy(&lv_style_pretty_color, &lv_style_pretty);
-    lv_style_pretty_color.text.color        = lv_color_make(0xe0, 0xe0, 0xe0);
-    lv_style_pretty_color.image.color       = lv_color_make(0xe0, 0xe0, 0xe0);
-    lv_style_pretty_color.line.color        = lv_color_make(0xc0, 0xc0, 0xc0);
-    lv_style_pretty_color.body.main_color   = lv_color_make(0x6b, 0x9a, 0xc7);
-    lv_style_pretty_color.body.grad_color   = lv_color_make(0x2b, 0x59, 0x8b);
-    lv_style_pretty_color.body.border.color = lv_color_make(0x15, 0x2c, 0x42);
-
-    /*Transparent style*/
-    lv_style_copy(&lv_style_transp, &lv_style_plain);
-    lv_style_transp.glass             = 1;
-    lv_style_transp.body.border.width = 0;
-    lv_style_transp.body.opa          = LV_OPA_TRANSP;
-
-    /*Transparent fitting size*/
-    lv_style_copy(&lv_style_transp_fit, &lv_style_transp);
-    lv_style_transp_fit.body.padding.left   = 0;
-    lv_style_transp_fit.body.padding.right  = 0;
-    lv_style_transp_fit.body.padding.top    = 0;
-    lv_style_transp_fit.body.padding.bottom = 0;
-
-    /*Transparent tight style*/
-    lv_style_copy(&lv_style_transp_tight, &lv_style_transp_fit);
-    lv_style_transp_tight.body.padding.inner = 0;
-
-    /*Button released style*/
-    lv_style_copy(&lv_style_btn_rel, &lv_style_plain);
-    lv_style_btn_rel.body.main_color     = lv_color_make(0x76, 0xa2, 0xd0);
-    lv_style_btn_rel.body.grad_color     = lv_color_make(0x19, 0x3a, 0x5d);
-    lv_style_btn_rel.body.radius         = LV_DPI / 15;
-    lv_style_btn_rel.body.padding.left   = LV_DPI / 4;
-    lv_style_btn_rel.body.padding.right  = LV_DPI / 4;
-    lv_style_btn_rel.body.padding.top    = LV_DPI / 6;
-    lv_style_btn_rel.body.padding.bottom = LV_DPI / 6;
-    lv_style_btn_rel.body.padding.inner  = LV_DPI / 10;
-    lv_style_btn_rel.body.border.color   = lv_color_make(0x0b, 0x19, 0x28);
-    lv_style_btn_rel.body.border.width   = LV_DPI / 50 >= 1 ? LV_DPI / 50 : 1;
-    lv_style_btn_rel.body.border.opa     = LV_OPA_70;
-    lv_style_btn_rel.body.shadow.color   = LV_COLOR_GRAY;
-    lv_style_btn_rel.body.shadow.width   = 0;
-    lv_style_btn_rel.text.color          = lv_color_make(0xff, 0xff, 0xff);
-    lv_style_btn_rel.image.color         = lv_color_make(0xff, 0xff, 0xff);
-
-    /*Button pressed style*/
-    lv_style_copy(&lv_style_btn_pr, &lv_style_btn_rel);
-    lv_style_btn_pr.body.main_color = lv_color_make(0x33, 0x62, 0x94);
-    lv_style_btn_pr.body.grad_color = lv_color_make(0x10, 0x26, 0x3c);
-    lv_style_btn_pr.text.color      = lv_color_make(0xa4, 0xb5, 0xc6);
-    lv_style_btn_pr.image.color     = lv_color_make(0xa4, 0xb5, 0xc6);
-    lv_style_btn_pr.line.color      = lv_color_make(0xa4, 0xb5, 0xc6);
-
-    /*Button toggle released style*/
-    lv_style_copy(&lv_style_btn_tgl_rel, &lv_style_btn_rel);
-    lv_style_btn_tgl_rel.body.main_color   = lv_color_make(0x0a, 0x11, 0x22);
-    lv_style_btn_tgl_rel.body.grad_color   = lv_color_make(0x37, 0x62, 0x90);
-    lv_style_btn_tgl_rel.body.border.color = lv_color_make(0x01, 0x07, 0x0d);
-    lv_style_btn_tgl_rel.text.color        = lv_color_make(0xc8, 0xdd, 0xf4);
-    lv_style_btn_tgl_rel.image.color       = lv_color_make(0xc8, 0xdd, 0xf4);
-    lv_style_btn_tgl_rel.line.color        = lv_color_make(0xc8, 0xdd, 0xf4);
-
-    /*Button toggle pressed style*/
-    lv_style_copy(&lv_style_btn_tgl_pr, &lv_style_btn_tgl_rel);
-    lv_style_btn_tgl_pr.body.main_color = lv_color_make(0x02, 0x14, 0x27);
-    lv_style_btn_tgl_pr.body.grad_color = lv_color_make(0x2b, 0x4c, 0x70);
-    lv_style_btn_tgl_pr.text.color      = lv_color_make(0xa4, 0xb5, 0xc6);
-    lv_style_btn_tgl_pr.image.color     = lv_color_make(0xa4, 0xb5, 0xc6);
-    lv_style_btn_tgl_pr.line.color      = lv_color_make(0xa4, 0xb5, 0xc6);
-
-    /*Button inactive style*/
-    lv_style_copy(&lv_style_btn_ina, &lv_style_btn_rel);
-    lv_style_btn_ina.body.main_color   = lv_color_make(0xd8, 0xd8, 0xd8);
-    lv_style_btn_ina.body.grad_color   = lv_color_make(0xd8, 0xd8, 0xd8);
-    lv_style_btn_ina.body.border.color = lv_color_make(0x90, 0x90, 0x90);
-    lv_style_btn_ina.text.color        = lv_color_make(0x70, 0x70, 0x70);
-    lv_style_btn_ina.image.color       = lv_color_make(0x70, 0x70, 0x70);
-    lv_style_btn_ina.line.color        = lv_color_make(0x70, 0x70, 0x70);
 }
 
 /**
- * Copy a style to an other
- * @param dest pointer to the destination style
- * @param src pointer to the source style
+ * Copy a style with all its properties
+ * @param style_dest pointer to the destination style. (Should be initialized with `lv_style_init()`)
+ * @param style_src pointer to the source (to copy )style
  */
-void lv_style_copy(lv_style_t * dest, const lv_style_t * src)
+void lv_style_copy(lv_style_t * style_dest, const lv_style_t * style_src)
 {
-    memcpy(dest, src, sizeof(lv_style_t));
+    if(style_src == NULL) return;
+
+    LV_ASSERT_STYLE(style_dest);
+    LV_ASSERT_STYLE(style_src);
+
+    if(style_src->map == NULL) return;
+
+    uint16_t size = _lv_style_get_mem_size(style_src);
+    style_dest->map = lv_mem_alloc(size);
+    _lv_memcpy(style_dest->map, style_src->map, size);
 }
 
 /**
- * Mix two styles according to a given ratio
- * @param start start style
- * @param end end style
- * @param res store the result style here
- * @param ratio the ratio of mix [0..256]; 0: `start` style; 256: `end` style
+ * Remove a property from a style
+ * @param style pointer to a style
+ * @param prop  a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @return true: the property was found and removed; false: the property wasn't found
  */
-void lv_style_mix(const lv_style_t * start, const lv_style_t * end, lv_style_t * res, uint16_t ratio)
+bool lv_style_remove_prop(lv_style_t * style, lv_style_property_t prop)
 {
-    STYLE_ATTR_MIX(body.opa, ratio);
-    STYLE_ATTR_MIX(body.radius, ratio);
-    STYLE_ATTR_MIX(body.border.width, ratio);
-    STYLE_ATTR_MIX(body.border.opa, ratio);
-    STYLE_ATTR_MIX(body.shadow.width, ratio);
-    STYLE_ATTR_MIX(body.padding.left, ratio);
-    STYLE_ATTR_MIX(body.padding.right, ratio);
-    STYLE_ATTR_MIX(body.padding.top, ratio);
-    STYLE_ATTR_MIX(body.padding.bottom, ratio);
-    STYLE_ATTR_MIX(body.padding.inner, ratio);
-    STYLE_ATTR_MIX(text.line_space, ratio);
-    STYLE_ATTR_MIX(text.letter_space, ratio);
-    STYLE_ATTR_MIX(text.opa, ratio);
-    STYLE_ATTR_MIX(line.width, ratio);
-    STYLE_ATTR_MIX(line.opa, ratio);
-    STYLE_ATTR_MIX(image.intense, ratio);
-    STYLE_ATTR_MIX(image.opa, ratio);
+    if(style == NULL) return false;
+    LV_ASSERT_STYLE(style);
 
-    lv_opa_t opa = ratio == STYLE_MIX_MAX ? LV_OPA_COVER : ratio;
+    int32_t id = get_property_index(style, prop);
+    /*The property exists but not sure it's state is the same*/
+    if(id >= 0) {
+        lv_style_attr_t attr_found;
+        lv_style_attr_t attr_goal;
 
-    res->body.main_color   = lv_color_mix(end->body.main_color, start->body.main_color, opa);
-    res->body.grad_color   = lv_color_mix(end->body.grad_color, start->body.grad_color, opa);
-    res->body.border.color = lv_color_mix(end->body.border.color, start->body.border.color, opa);
-    res->body.shadow.color = lv_color_mix(end->body.shadow.color, start->body.shadow.color, opa);
-    res->text.color        = lv_color_mix(end->text.color, start->text.color, opa);
-    res->image.color       = lv_color_mix(end->image.color, start->image.color, opa);
-    res->line.color        = lv_color_mix(end->line.color, start->line.color, opa);
+        attr_found = get_style_prop_attr(style, id);
+        attr_goal = (prop >> 8) & 0xFFU;
 
-    if(ratio < (STYLE_MIX_MAX >> 1)) {
-        res->body.border.part = start->body.border.part;
-        res->glass            = start->glass;
-        res->text.font        = start->text.font;
-        res->body.shadow.type = start->body.shadow.type;
-        res->line.rounded     = start->line.rounded;
-    } else {
-        res->body.border.part = end->body.border.part;
-        res->glass            = end->glass;
-        res->text.font        = end->text.font;
-        res->body.shadow.type = end->body.shadow.type;
-        res->line.rounded     = end->line.rounded;
+        if(LV_STYLE_ATTR_GET_STATE(attr_found) == LV_STYLE_ATTR_GET_STATE(attr_goal)) {
+            uint32_t map_size = _lv_style_get_mem_size(style);
+            uint8_t prop_size = get_prop_size(prop);
+
+            /*Move the props to fill the space of the property to delete*/
+            uint32_t i;
+            for(i = id; i < map_size - prop_size; i++) {
+                style->map[i] = style->map[i + prop_size];
+            }
+
+            style_resize(style, map_size - prop_size);
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Initialize a style list
+ * @param list a style list to initialize
+ */
+void lv_style_list_init(lv_style_list_t * list)
+{
+    _lv_memset_00(list, sizeof(lv_style_list_t));
+#if LV_USE_ASSERT_STYLE
+    list->sentinel = LV_DEBUG_STYLE_LIST_SENTINEL_VALUE;
+#endif
+}
+
+/**
+ * Copy a style list with all its styles and local style properties
+ * @param list_dest pointer to the destination style list. (should be initialized with `lv_style_list_init()`)
+ * @param list_src pointer to the source (to copy) style list.
+ */
+void lv_style_list_copy(lv_style_list_t * list_dest, const lv_style_list_t * list_src)
+{
+    LV_ASSERT_STYLE_LIST(list_dest);
+    LV_ASSERT_STYLE_LIST(list_src);
+
+    _lv_style_list_reset(list_dest);
+
+    if(list_src->style_list == NULL) return;
+
+    /*Copy the styles but skip the transitions*/
+    if(list_src->has_local == 0) {
+        if(list_src->has_trans) {
+            list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 1) * sizeof(lv_style_t *));
+            _lv_memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
+            list_dest->style_cnt = list_src->style_cnt - 1;
+        }
+        else {
+            list_dest->style_list = lv_mem_alloc(list_src->style_cnt * sizeof(lv_style_t *));
+            _lv_memcpy(list_dest->style_list, list_src->style_list, list_src->style_cnt * sizeof(lv_style_t *));
+            list_dest->style_cnt = list_src->style_cnt;
+        }
+    }
+    else {
+        if(list_src->has_trans) {
+            list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 2) * sizeof(lv_style_t *));
+            _lv_memcpy(list_dest->style_list, list_src->style_list + 2, (list_src->style_cnt - 2) * sizeof(lv_style_t *));
+            list_dest->style_cnt = list_src->style_cnt - 2;
+        }
+        else {
+            list_dest->style_list = lv_mem_alloc((list_src->style_cnt - 1) * sizeof(lv_style_t *));
+            _lv_memcpy(list_dest->style_list, list_src->style_list + 1, (list_src->style_cnt - 1) * sizeof(lv_style_t *));
+            list_dest->style_cnt = list_src->style_cnt - 1;
+        }
+
+        lv_style_t * local_style = get_alloc_local_style(list_dest);
+        lv_style_copy(local_style, get_alloc_local_style((lv_style_list_t *)list_src));
     }
 }
 
-#if LV_USE_ANIMATION
-
-void lv_style_anim_init(lv_anim_t * a)
+/**
+ * Add a style to a style list.
+ * Only the the style pointer will be saved so the shouldn't be a local variable.
+ * (It should be static, global or dynamically allocated)
+ * @param list pointer to a style list
+ * @param style pointer to a style to add
+ */
+void _lv_style_list_add_style(lv_style_list_t * list, lv_style_t * style)
 {
-    lv_anim_init(a);
-    a->start    = 0;
-    a->end      = STYLE_MIX_MAX;
-    a->exec_cb  = (lv_anim_exec_xcb_t)style_animator;
-    a->path_cb  = lv_anim_path_linear;
-    a->ready_cb = style_animation_common_end_cb;
+    LV_ASSERT_STYLE_LIST(list);
+    LV_ASSERT_STYLE(style);
 
-    lv_style_anim_dsc_t * dsc;
-    dsc = lv_mem_alloc(sizeof(lv_style_anim_dsc_t));
-    LV_ASSERT_MEM(dsc);
-    if(dsc == NULL) return;
-    dsc->ready_cb   = NULL;
-    dsc->style_anim = NULL;
-    lv_style_copy(&dsc->style_start, &lv_style_plain);
-    lv_style_copy(&dsc->style_end, &lv_style_plain);
+    if(list == NULL) return;
 
-    a->var = (void *)dsc;
+    /*Remove the style first if already exists*/
+    _lv_style_list_remove_style(list, style);
+
+    lv_style_t ** new_classes;
+    if(list->style_cnt == 0) new_classes = lv_mem_alloc(sizeof(lv_style_t *));
+    else new_classes = lv_mem_realloc(list->style_list, sizeof(lv_style_t *) * (list->style_cnt + 1));
+    LV_ASSERT_MEM(new_classes);
+    if(new_classes == NULL) {
+        LV_LOG_WARN("lv_style_list_add_style: couldn't add the class");
+        return;
+    }
+
+    /*Make space for the new style at the beginning. Leave local and trans style if exists*/
+    uint8_t i;
+    uint8_t first_style = 0;
+    if(list->has_trans) first_style++;
+    if(list->has_local) first_style++;
+    for(i = list->style_cnt; i > first_style; i--) {
+        new_classes[i] = new_classes[i - 1];
+    }
+
+    new_classes[first_style] = style;
+    list->style_cnt++;
+    list->style_list = new_classes;
 }
 
-void lv_style_anim_set_styles(lv_anim_t * a, lv_style_t * to_anim, const lv_style_t * start, const lv_style_t * end)
+/**
+ * Remove a style from a style list
+ * @param style_list pointer to a style list
+ * @param style pointer to a style to remove
+ */
+void _lv_style_list_remove_style(lv_style_list_t * list, lv_style_t * style)
 {
+    LV_ASSERT_STYLE_LIST(list);
+    LV_ASSERT_STYLE(style);
 
-    lv_style_anim_dsc_t * dsc = a->var;
-    dsc->style_anim           = to_anim;
-    memcpy(&dsc->style_start, start, sizeof(lv_style_t));
-    memcpy(&dsc->style_end, end, sizeof(lv_style_t));
-    memcpy(dsc->style_anim, start, sizeof(lv_style_t));
+    if(list->style_cnt == 0) return;
+
+    /*Check if the style really exists here*/
+    uint8_t i;
+    bool found = false;
+    for(i = 0; i < list->style_cnt; i++) {
+        if(list->style_list[i] == style) {
+            found = true;
+            break;
+        }
+    }
+    if(found == false) return;
+
+    if(list->style_cnt == 1) {
+        lv_mem_free(list->style_list);
+        list->style_list = NULL;
+        list->style_cnt = 0;
+        list->has_local = 0;
+        return;
+    }
+
+    lv_style_t ** new_classes = lv_mem_alloc(sizeof(lv_style_t *) * (list->style_cnt - 1));
+    LV_ASSERT_MEM(new_classes);
+    if(new_classes == NULL) {
+        LV_LOG_WARN("lv_style_list_remove_style: couldn't reallocate class list");
+        return;
+    }
+    uint8_t j;
+    for(i = 0, j = 0; i < list->style_cnt; i++) {
+        if(list->style_list[i] == style) continue;
+        new_classes[j] = list->style_list[i];
+        j++;
+
+    }
+
+    lv_mem_free(list->style_list);
+
+    list->style_cnt--;
+    list->style_list = new_classes;
 }
+
+/**
+ * Remove all styles added from style list, clear the local style, transition style and free all allocated memories.
+ * Leave `ignore_trans` flag as it is.
+ * @param list pointer to a style list.
+ */
+void _lv_style_list_reset(lv_style_list_t * list)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    if(list == NULL) return;
+
+    if(list->has_local) {
+        lv_style_t * local = lv_style_list_get_local_style(list);
+        if(local) {
+            lv_style_reset(local);
+            lv_mem_free(local);
+        }
+    }
+
+    if(list->has_trans) {
+        lv_style_t * trans = _lv_style_list_get_transition_style(list);
+        if(trans) {
+            lv_style_reset(trans);
+            lv_mem_free(trans);
+        }
+    }
+
+    if(list->style_cnt > 0) lv_mem_free(list->style_list);
+    list->style_list = NULL;
+    list->style_cnt = 0;
+    list->has_local = 0;
+    list->has_trans = 0;
+    list->skip_trans = 0;
+
+    /* Intentionally leave `ignore_trans` as it is,
+     * because it's independent from the styles in the list*/
+}
+
+/**
+ * Clear all properties from a style and all allocated memories.
+ * @param style pointer to a style
+ */
+void lv_style_reset(lv_style_t * style)
+{
+    LV_ASSERT_STYLE(style);
+
+    lv_mem_free(style->map);
+    style->map = NULL;
+}
+
+/**
+ * Get the size of the properties in a style in bytes
+ * @param style pointer to a style
+ * @return size of the properties in bytes
+ */
+uint16_t _lv_style_get_mem_size(const lv_style_t * style)
+{
+    LV_ASSERT_STYLE(style);
+
+    if(style->map == NULL) return 0;
+
+    size_t i = 0;
+    uint8_t prop_id;
+    while((prop_id = get_style_prop_id(style, i)) != _LV_STYLE_CLOSING_PROP) {
+        i = get_next_prop_index(prop_id, i);
+    }
+
+    return i + sizeof(lv_style_property_t);
+}
+
+/**
+ * Set an integer typed property in a style.
+ * @param style pointer to a style where the property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note shouldn't be used directly. Use the specific property set functions instead.
+ *       For example: `lv_style_set_border_width()`
+ * @note for performance reasons it's not checked if the property really has integer type
+ */
+void _lv_style_set_int(lv_style_t * style, lv_style_property_t prop, lv_style_int_t value)
+{
+    LV_ASSERT_STYLE(style);
+
+    int32_t id = get_property_index(style, prop);
+    /*The property already exists but not sure it's state is the same*/
+    if(id >= 0) {
+        lv_style_attr_t attr_found;
+        lv_style_attr_t attr_goal;
+
+        attr_found = get_style_prop_attr(style, id);
+        attr_goal = (prop >> 8) & 0xFFU;
+
+        if(LV_STYLE_ATTR_GET_STATE(attr_found) == LV_STYLE_ATTR_GET_STATE(attr_goal)) {
+            _lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &value, sizeof(lv_style_int_t));
+            return;
+        }
+    }
+
+    /*Add new property if not exists yet*/
+    uint8_t new_prop_size = (sizeof(lv_style_property_t) + sizeof(lv_style_int_t));
+    lv_style_property_t end_mark = _LV_STYLE_CLOSING_PROP;
+    uint8_t end_mark_size = sizeof(end_mark);
+
+    uint16_t size = _lv_style_get_mem_size(style);
+    if(size == 0) size += end_mark_size;
+    size += sizeof(lv_style_property_t) + sizeof(lv_style_int_t);
+    style_resize(style, size);
+    LV_ASSERT_MEM(style->map);
+    if(style == NULL) return;
+
+    _lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
+    _lv_memcpy_small(style->map + size - sizeof(lv_style_int_t) - end_mark_size, &value, sizeof(lv_style_int_t));
+    _lv_memcpy_small(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
+}
+
+/**
+ * Set a color typed property in a style.
+ * @param style pointer to a style where the property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_COLOR | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note shouldn't be used directly. Use the specific property set functions instead.
+ *       For example: `lv_style_set_border_color()`
+ * @note for performance reasons it's not checked if the property really has color type
+ */
+void _lv_style_set_color(lv_style_t * style, lv_style_property_t prop, lv_color_t color)
+{
+    LV_ASSERT_STYLE(style);
+
+    int32_t id = get_property_index(style, prop);
+    /*The property already exists but not sure it's state is the same*/
+    if(id >= 0) {
+        lv_style_attr_t attr_found;
+        lv_style_attr_t attr_goal;
+
+        attr_found = get_style_prop_attr(style, id);
+        attr_goal = (prop >> 8) & 0xFFU;
+
+        if(LV_STYLE_ATTR_GET_STATE(attr_found) == LV_STYLE_ATTR_GET_STATE(attr_goal)) {
+            _lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &color, sizeof(lv_color_t));
+            return;
+        }
+    }
+
+    /*Add new property if not exists yet*/
+    uint8_t new_prop_size = (sizeof(lv_style_property_t) + sizeof(lv_color_t));
+    lv_style_property_t end_mark = _LV_STYLE_CLOSING_PROP;
+    uint8_t end_mark_size = sizeof(end_mark);
+
+    uint16_t size = _lv_style_get_mem_size(style);
+    if(size == 0) size += end_mark_size;
+
+    size += sizeof(lv_style_property_t) + sizeof(lv_color_t);
+    style_resize(style, size);
+    LV_ASSERT_MEM(style->map);
+    if(style == NULL) return;
+
+    _lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
+    _lv_memcpy_small(style->map + size - sizeof(lv_color_t) - end_mark_size, &color, sizeof(lv_color_t));
+    _lv_memcpy_small(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
+}
+
+/**
+ * Set an opacity typed property in a style.
+ * @param style pointer to a style where the property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_OPA | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note shouldn't be used directly. Use the specific property set functions instead.
+ *       For example: `lv_style_set_border_opa()`
+ * @note for performance reasons it's not checked if the property really has opacity type
+ */
+void _lv_style_set_opa(lv_style_t * style, lv_style_property_t prop, lv_opa_t opa)
+{
+    LV_ASSERT_STYLE(style);
+
+    int32_t id = get_property_index(style, prop);
+    /*The property already exists but not sure it's state is the same*/
+    if(id >= 0) {
+        lv_style_attr_t attr_found;
+        lv_style_attr_t attr_goal;
+
+        attr_found = get_style_prop_attr(style, id);
+        attr_goal = (prop >> 8) & 0xFFU;
+
+        if(LV_STYLE_ATTR_GET_STATE(attr_found) == LV_STYLE_ATTR_GET_STATE(attr_goal)) {
+            _lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &opa, sizeof(lv_opa_t));
+            return;
+        }
+    }
+
+    /*Add new property if not exists yet*/
+    uint8_t new_prop_size = (sizeof(lv_style_property_t) + sizeof(lv_opa_t));
+    lv_style_property_t end_mark = _LV_STYLE_CLOSING_PROP;
+    uint8_t end_mark_size = sizeof(end_mark);
+
+    uint16_t size = _lv_style_get_mem_size(style);
+    if(size == 0) size += end_mark_size;
+
+    size += sizeof(lv_style_property_t) + sizeof(lv_opa_t);
+    style_resize(style, size);
+    LV_ASSERT_MEM(style->map);
+    if(style == NULL) return;
+
+    _lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
+    _lv_memcpy_small(style->map + size - sizeof(lv_opa_t) - end_mark_size, &opa, sizeof(lv_opa_t));
+    _lv_memcpy_small(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
+}
+
+/**
+ * Set a pointer typed property in a style.
+ * @param style pointer to a style where the property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_POINTER | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note shouldn't be used directly. Use the specific property set functions instead.
+ *       For example: `lv_style_set_border_width()`
+ * @note for performance reasons it's not checked if the property is really has pointer type
+ */
+void _lv_style_set_ptr(lv_style_t * style, lv_style_property_t prop, const void * p)
+{
+    LV_ASSERT_STYLE(style);
+
+    int32_t id = get_property_index(style, prop);
+    /*The property already exists but not sure it's state is the same*/
+    if(id >= 0) {
+        lv_style_attr_t attr_found;
+        lv_style_attr_t attr_goal;
+
+        attr_found = get_style_prop_attr(style, id);
+        attr_goal = (prop >> 8) & 0xFFU;
+
+        if(LV_STYLE_ATTR_GET_STATE(attr_found) == LV_STYLE_ATTR_GET_STATE(attr_goal)) {
+            _lv_memcpy_small(style->map + id + sizeof(lv_style_property_t), &p, sizeof(const void *));
+            return;
+        }
+    }
+
+    /*Add new property if not exists yet*/
+    uint8_t new_prop_size = (sizeof(lv_style_property_t) + sizeof(const void *));
+    lv_style_property_t end_mark = _LV_STYLE_CLOSING_PROP;
+    uint8_t end_mark_size = sizeof(end_mark);
+
+    uint16_t size = _lv_style_get_mem_size(style);
+    if(size == 0) size += end_mark_size;
+
+    size += sizeof(lv_style_property_t) + sizeof(const void *);
+    style_resize(style, size);
+    LV_ASSERT_MEM(style->map);
+    if(style == NULL) return;
+
+    _lv_memcpy_small(style->map + size - new_prop_size - end_mark_size, &prop, sizeof(lv_style_property_t));
+    _lv_memcpy_small(style->map + size - sizeof(const void *) - end_mark_size, &p, sizeof(const void *));
+    _lv_memcpy_small(style->map + size - end_mark_size, &end_mark, sizeof(end_mark));
+}
+
+/**
+ * Get the a property from a style.
+ * Take into account the style state and return the property which matches the best.
+ * @param style pointer to a style where to search
+ * @param prop the property, might contain ORed style states too
+ * @param res buffer to store the result
+ * @return the weight of the found property (how well it fits to the style state).
+ *         Higher number is means better fit
+ *         -1 if the not found (`res` will be undefined)
+ */
+int16_t _lv_style_get_int(const lv_style_t * style, lv_style_property_t prop, void * v_res)
+{
+    lv_style_int_t * res = (lv_style_int_t *)v_res;
+    LV_ASSERT_STYLE(style);
+
+    if(style == NULL) return -1;
+    if(style->map == NULL) return -1;
+
+    int32_t id = get_property_index(style, prop);
+    if(id < 0) {
+        return -1;
+    }
+    else {
+        _lv_memcpy_small(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(lv_style_int_t));
+        lv_style_attr_t attr_act;
+        attr_act = get_style_prop_attr(style, id);
+
+        lv_style_attr_t attr_goal;
+        attr_goal = (prop >> 8) & 0xFF;
+
+        return LV_STYLE_ATTR_GET_STATE(attr_act) & LV_STYLE_ATTR_GET_STATE(attr_goal);
+    }
+}
+
+/**
+ * Get an opacity typed property from a style.
+ * @param style pointer to a style from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_OPA | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result value
+ * @return -1: the property wasn't found in the style.
+ *         The matching state bits of the desired state (in `prop`) and the best matching property's state
+ *         Higher value means match in higher precedence state.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_style_get_border_opa()`
+ * @note for performance reasons it's not checked if the property really has opacity type
+ */
+int16_t _lv_style_get_opa(const lv_style_t * style, lv_style_property_t prop, void * v_res)
+{
+    lv_opa_t * res = (lv_opa_t *)v_res;
+    LV_ASSERT_STYLE(style);
+
+    if(style == NULL) return -1;
+    if(style->map == NULL) return -1;
+
+    int32_t id = get_property_index(style, prop);
+    if(id < 0) {
+        return -1;
+    }
+    else {
+        _lv_memcpy_small(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(lv_opa_t));
+        lv_style_attr_t attr_act;
+        attr_act = get_style_prop_attr(style, id);
+
+        lv_style_attr_t attr_goal;
+        attr_goal = (prop >> 8) & 0xFF;
+
+        return LV_STYLE_ATTR_GET_STATE(attr_act) & LV_STYLE_ATTR_GET_STATE(attr_goal);
+    }
+}
+
+/**
+ * Get a color typed property from a style.
+ * @param style pointer to a style from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_COLOR | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result value
+ * @return -1: the property wasn't found in the style.
+ *         The matching state bits of the desired state (in `prop`) and the best matching property's state
+ *         Higher value means match in higher precedence state.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_style_get_border_color()`
+ * @note for performance reasons it's not checked if the property really has color type
+ */
+int16_t _lv_style_get_color(const lv_style_t * style, lv_style_property_t prop, void * v_res)
+{
+    lv_color_t * res = (lv_color_t *)v_res;
+    if(style == NULL) return -1;
+    if(style->map == NULL) return -1;
+    int32_t id = get_property_index(style, prop);
+    if(id < 0) {
+        return -1;
+    }
+    else {
+        _lv_memcpy_small(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(lv_color_t));
+        lv_style_attr_t attr_act;
+        attr_act = get_style_prop_attr(style, id);
+
+        lv_style_attr_t attr_goal;
+        attr_goal = (prop >> 8) & 0xFF;
+
+        return LV_STYLE_ATTR_GET_STATE(attr_act) & LV_STYLE_ATTR_GET_STATE(attr_goal);
+    }
+}
+
+/**
+ * Get a pointer typed property from a style.
+ * @param style pointer to a style from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result value
+ * @return -1: the property wasn't found in the style.
+ *         The matching state bits of the desired state (in `prop`) and the best matching property's state
+ *         Higher value means match in higher precedence state.
+ * @note shouldn't be used directly. Use the specific property get functions instead.
+ *       For example: `lv_style_get_text_font()`
+ * @note for performance reasons it's not checked if the property really has pointer type
+ */
+int16_t _lv_style_get_ptr(const lv_style_t * style, lv_style_property_t prop, void * v_res)
+{
+    const void ** res = (const void **)v_res;
+    if(style == NULL) return -1;
+    if(style->map == NULL) return -1;
+
+    int32_t id = get_property_index(style, prop);
+    if(id < 0) {
+        return -1;
+    }
+    else {
+        _lv_memcpy_small(res, &style->map[id + sizeof(lv_style_property_t)], sizeof(const void *));
+        lv_style_attr_t attr_act;
+        attr_act = get_style_prop_attr(style, id);
+
+        lv_style_attr_t attr_goal;
+        attr_goal = (prop >> 8) & 0xFF;
+
+        return LV_STYLE_ATTR_GET_STATE(attr_act) & LV_STYLE_ATTR_GET_STATE(attr_goal);
+    }
+}
+
+/**
+ * Get the local style of a style list
+ * @param list pointer to a style list where the local property should be set
+ * @return pointer to the local style if exists else `NULL`.
+ */
+lv_style_t * lv_style_list_get_local_style(lv_style_list_t * list)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    if(!list->has_local) return NULL;
+    if(list->has_trans) return list->style_list[1];
+    else return list->style_list[0];
+}
+
+/**
+ * Get the transition style of a style list
+ * @param list pointer to a style list where the local property should be set
+ * @return pointer to the transition style if exists else `NULL`.
+ */
+lv_style_t * _lv_style_list_get_transition_style(lv_style_list_t * list)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    if(!list->has_trans) return NULL;
+    return list->style_list[0];
+}
+
+/**
+ * Allocate the transition style in a style list. If already exists simply return it.
+ * @param list pointer to a style list
+ * @return the transition style of a style list
+ */
+lv_style_t * _lv_style_list_add_trans_style(lv_style_list_t * list)
+{
+    LV_ASSERT_STYLE_LIST(list);
+    if(list->has_trans) return _lv_style_list_get_transition_style(list);
+
+    lv_style_t * trans_style = lv_mem_alloc(sizeof(lv_style_t));
+    LV_ASSERT_MEM(trans_style);
+    if(trans_style == NULL) {
+        LV_LOG_WARN("lv_style_list_add_trans_style: couldn't create transition style");
+        return NULL;
+    }
+
+    lv_style_init(trans_style);
+
+    _lv_style_list_add_style(list, trans_style);
+    list->has_trans = 1;
+
+    /*If the list has local style trans was added after it. But trans should be the first so swap them*/
+    if(list->has_local) {
+        lv_style_t * tmp = list->style_list[0];
+        list->style_list[0] = list->style_list[1];
+        list->style_list[1] = tmp;
+    }
+    return trans_style;
+}
+
+
+/**
+ * Set a local integer typed property in a style list.
+ * @param list pointer to a style list where the local property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note for performance reasons it's not checked if the property really has integer type
+ */
+void _lv_style_list_set_local_int(lv_style_list_t * list, lv_style_property_t prop, lv_style_int_t value)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    lv_style_t * local = get_alloc_local_style(list);
+    _lv_style_set_int(local, prop, value);
+}
+
+/**
+ * Set a local opacity typed property in a style list.
+ * @param list pointer to a style list where the local property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_OPA | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note for performance reasons it's not checked if the property really has opacity type
+ */
+void _lv_style_list_set_local_opa(lv_style_list_t * list, lv_style_property_t prop, lv_opa_t value)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    lv_style_t * local = get_alloc_local_style(list);
+    _lv_style_set_opa(local, prop, value);
+}
+
+/**
+ * Set a local color typed property in a style list.
+ * @param list pointer to a style list where the local property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_COLOR | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note for performance reasons it's not checked if the property really has color type
+ */
+void _lv_style_list_set_local_color(lv_style_list_t * list, lv_style_property_t prop, lv_color_t value)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    lv_style_t * local = get_alloc_local_style(list);
+    _lv_style_set_color(local, prop, value);
+}
+
+/**
+ * Set a local pointer typed property in a style list.
+ * @param list pointer to a style list where the local property should be set
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param value the value to set
+ * @note for performance reasons it's not checked if the property really has pointer type
+ */
+void _lv_style_list_set_local_ptr(lv_style_list_t * list, lv_style_property_t prop, const void * value)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    lv_style_t * local = get_alloc_local_style(list);
+    _lv_style_set_ptr(local, prop, value);
+}
+
+
+
+/**
+ * Get an integer typed property from a style list.
+ * It will return the property which match best with given state.
+ * @param list pointer to a style list from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_WIDTH | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result
+ * @return LV_RES_OK: there was a matching property in the list
+ *         LV_RES_INV: there was NO matching property in the list
+ * @note for performance reasons it's not checked if the property really has integer type
+ */
+lv_res_t _lv_style_list_get_int(lv_style_list_t * list, lv_style_property_t prop, lv_style_int_t * res)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    if(list == NULL) return LV_RES_INV;
+    if(list->style_list == NULL) return LV_RES_INV;
+
+    lv_style_attr_t attr;
+    attr = prop >> 8;
+    int16_t weight_goal = attr;
+
+    int16_t weight = -1;
+
+    lv_style_int_t value_act = 0;
+
+    int16_t ci;
+    for(ci = 0; ci < list->style_cnt; ci++) {
+        /* changed class to _class to allow compilation as c++ */
+        lv_style_t * _class = lv_style_list_get_style(list, ci);
+        int16_t weight_act = _lv_style_get_int(_class, prop, &value_act);
+
+        /*On perfect match return the value immediately*/
+        if(weight_act == weight_goal) {
+            *res = value_act;
+            return LV_RES_OK;
+        }
+        else if(list->has_trans && weight_act >= 0 && ci == 0 && !list->skip_trans) {
+            *res = value_act;
+            return LV_RES_OK;
+        }
+        /*If the found ID is better the current candidate then use it*/
+        else if(weight_act > weight) {
+            weight =  weight_act;
+            *res = value_act;
+        }
+    }
+
+    if(weight >= 0) return LV_RES_OK;
+    else return LV_RES_INV;
+
+}
+
+/**
+ * Get a color typed property from a style list.
+ * It will return the property which match best with given state.
+ * @param list pointer to a style list from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_COLOR | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result
+ * @return LV_RES_OK: there was a matching property in the list
+ *         LV_RES_INV: there was NO matching property in the list
+ * @note for performance reasons it's not checked if the property really has color type
+ */
+lv_res_t _lv_style_list_get_color(lv_style_list_t * list, lv_style_property_t prop, lv_color_t * res)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    if(list == NULL) return LV_RES_INV;
+    if(list->style_list == NULL) return LV_RES_INV;
+
+    lv_style_attr_t attr;
+    attr = prop >> 8;
+    int16_t weight_goal = attr;
+
+    int16_t weight = -1;
+
+    lv_color_t value_act;
+    value_act.full = 0;
+
+    int16_t ci;
+    for(ci = 0; ci < list->style_cnt; ci++) {
+        lv_style_t * _class = lv_style_list_get_style(list, ci);
+        int16_t weight_act = _lv_style_get_color(_class, prop, &value_act);
+        /*On perfect match return the value immediately*/
+        if(weight_act == weight_goal) {
+            *res = value_act;
+            return LV_RES_OK;
+        }
+        else if(list->has_trans && weight_act >= 0 && ci == 0 && !list->skip_trans) {
+            *res = value_act;
+            return LV_RES_OK;
+        }
+        /*If the found ID is better the current candidate then use it*/
+        else if(weight_act > weight) {
+            weight =  weight_act;
+            *res = value_act;
+        }
+    }
+
+    if(weight >= 0)  return LV_RES_OK;
+    else return LV_RES_INV;
+}
+
+/**
+ * Get an opacity typed property from a style list.
+ * It will return the property which match best with given state.
+ * @param list pointer to a style list from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_BORDER_OPA| (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result
+ * @return LV_RES_OK: there was a matching property in the list
+ *         LV_RES_INV: there was NO matching property in the list
+ * @note for performance reasons it's not checked if the property really has opacity type
+ */
+lv_res_t _lv_style_list_get_opa(lv_style_list_t * list, lv_style_property_t prop, lv_opa_t * res)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    if(list == NULL) return LV_RES_INV;
+    if(list->style_list == NULL) return LV_RES_INV;
+
+    lv_style_attr_t attr;
+    attr = prop >> 8;
+    int16_t weight_goal = attr;
+
+    int16_t weight = -1;
+
+    lv_opa_t value_act = LV_OPA_TRANSP;
+
+    int16_t ci;
+    for(ci = 0; ci < list->style_cnt; ci++) {
+        lv_style_t * _class = lv_style_list_get_style(list, ci);
+        int16_t weight_act = _lv_style_get_opa(_class, prop, &value_act);
+        /*On perfect match return the value immediately*/
+        if(weight_act == weight_goal) {
+            *res = value_act;
+            return LV_RES_OK;
+        }
+        else if(list->has_trans && weight_act >= 0 && ci == 0 && !list->skip_trans) {
+            *res = value_act;
+            return LV_RES_OK;
+        }
+        /*If the found ID is better the current candidate then use it*/
+        else if(weight_act > weight) {
+            weight =  weight_act;
+            *res = value_act;
+        }
+    }
+
+    if(weight >= 0)  return LV_RES_OK;
+    else return LV_RES_INV;
+}
+
+/**
+ * Get a pointer typed property from a style list.
+ * It will return the property which match best with given state.
+ * @param list pointer to a style list from where the property should be get
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @param res pointer to a buffer to store the result
+ * @return LV_RES_OK: there was a matching property in the list
+ *         LV_RES_INV: there was NO matching property in the list
+ * @note for performance reasons it's not checked if the property really has pointer type
+ */
+lv_res_t _lv_style_list_get_ptr(lv_style_list_t * list, lv_style_property_t prop, const void ** res)
+{
+    LV_ASSERT_STYLE_LIST(list);
+
+    if(list == NULL) return LV_RES_INV;
+    if(list->style_list == NULL) return LV_RES_INV;
+
+    lv_style_attr_t attr;
+    attr = prop >> 8;
+    int16_t weight_goal = attr;
+
+    int16_t weight = -1;
+
+    const void * value_act;
+
+    int16_t ci;
+    for(ci = 0; ci < list->style_cnt; ci++) {
+        lv_style_t * _class = lv_style_list_get_style(list, ci);
+        int16_t weight_act = _lv_style_get_ptr(_class, prop, &value_act);
+        /*On perfect match return the value immediately*/
+        if(weight_act == weight_goal) {
+            *res = value_act;
+            return LV_RES_OK;
+        }
+        else if(list->has_trans && weight_act >= 0 && ci == 0 && !list->skip_trans) {
+            *res = value_act;
+            return LV_RES_OK;
+        }
+        /*If the found ID is better the current candidate then use it*/
+        else if(weight_act > weight) {
+            weight =  weight_act;
+            *res = value_act;
+        }
+    }
+
+    if(weight >= 0)  return LV_RES_OK;
+    else return LV_RES_INV;
+}
+
+/**
+ * Check whether a style is valid (initialized correctly)
+ * @param style pointer to a style
+ * @return true: valid
+ */
+bool lv_debug_check_style(const lv_style_t * style)
+{
+    if(style == NULL) return true;  /*NULL style is still valid*/
+
+#if LV_USE_ASSERT_STYLE
+    if(style->sentinel != LV_DEBUG_STYLE_SENTINEL_VALUE) {
+        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
+        return false;
+    }
 #endif
+
+    return true;
+}
+
+/**
+ * Check whether a style list is valid (initialized correctly)
+ * @param style pointer to a style
+ * @return true: valid
+ */
+bool lv_debug_check_style_list(const lv_style_list_t * list)
+{
+    if(list == NULL) return true;  /*NULL list is still valid*/
+
+#if LV_USE_ASSERT_STYLE
+    if(list->sentinel != LV_DEBUG_STYLE_LIST_SENTINEL_VALUE) {
+        LV_LOG_WARN("Invalid style (local variable or not initialized?)");
+        return false;
+    }
+#endif
+
+    return true;
+}
+
 /**********************
  *   STATIC FUNCTIONS
  **********************/
-#if LV_USE_ANIMATION
+
 /**
- * Used by the style animations to set the values of a style according to start and end style.
- * @param dsc the 'animated variable' set by lv_style_anim_create()
- * @param val the current state of the animation between 0 and LV_ANIM_RESOLUTION
+ * Get a property's index (byte index in `style->map`) from a style.
+ * Return best matching property's index considering the state of `prop`
+ * @param style pointer to a style
+ * @param prop a style property ORed with a state.
+ * E.g. `LV_STYLE_TEXT_FONT | (LV_STATE_PRESSED << LV_STYLE_STATE_POS)`
+ * @return
  */
-static void style_animator(lv_style_anim_dsc_t * dsc, lv_anim_value_t val)
+LV_ATTRIBUTE_FAST_MEM static inline int32_t get_property_index(const lv_style_t * style, lv_style_property_t prop)
 {
-    const lv_style_t * start = &dsc->style_start;
-    const lv_style_t * end   = &dsc->style_end;
-    lv_style_t * act         = dsc->style_anim;
+    LV_ASSERT_STYLE(style);
 
-    lv_style_mix(start, end, act, val);
+    if(style->map == NULL) return -1;
 
-    lv_obj_report_style_mod(dsc->style_anim);
+    uint8_t id_to_find = prop & 0xFF;
+    lv_style_attr_t attr;
+    attr = (prop >> 8) & 0xFF;
+
+    int16_t weight = -1;
+    int16_t id_guess = -1;
+
+    size_t i = 0;
+
+    uint8_t prop_id;
+    while((prop_id = get_style_prop_id(style, i)) != _LV_STYLE_CLOSING_PROP) {
+        if(prop_id == id_to_find) {
+            lv_style_attr_t attr_i;
+            attr_i = get_style_prop_attr(style, i);
+
+            /*If the state perfectly matches return this property*/
+            if(LV_STYLE_ATTR_GET_STATE(attr_i) == LV_STYLE_ATTR_GET_STATE(attr)) {
+                return i;
+            }
+            /* Be sure the property not specifies other state than the requested.
+             * E.g. For HOVER+PRESS, HOVER only is OK, but HOVER+FOCUS not*/
+            else if((LV_STYLE_ATTR_GET_STATE(attr_i) & (~LV_STYLE_ATTR_GET_STATE(attr))) == 0) {
+                /* Use this property if it describes better the requested state than the current candidate.
+                 * E.g. for HOVER+FOCUS+PRESS prefer HOVER+FOCUS over FOCUS*/
+                if(LV_STYLE_ATTR_GET_STATE(attr_i) > weight) {
+                    weight = LV_STYLE_ATTR_GET_STATE(attr_i);
+                    id_guess = i;
+                }
+            }
+        }
+
+        i = get_next_prop_index(prop_id, i);
+    }
+
+    return id_guess;
 }
 
 /**
- * Called when a style animation is ready
- * It called the user defined call back and free the allocated memories
- * @param a pointer to the animation
+ * Get he local style from a style list. Allocate it if not exists yet.
+ * @param list pointer to a style list
+ * @return pointer to the local style
  */
-static void style_animation_common_end_cb(lv_anim_t * a)
+static lv_style_t * get_alloc_local_style(lv_style_list_t * list)
 {
+    LV_ASSERT_STYLE_LIST(list);
 
-    (void)a;                            /*Unused*/
-    lv_style_anim_dsc_t * dsc = a->var; /*To avoid casting*/
+    if(list->has_local) return lv_style_list_get_style(list, list->has_trans ? 1 : 0);
 
-    if(dsc->ready_cb) dsc->ready_cb(a);
+    lv_style_t * local_style = lv_mem_alloc(sizeof(lv_style_t));
+    LV_ASSERT_MEM(local_style);
+    if(local_style == NULL) {
+        LV_LOG_WARN("get_local_style: couldn't create local style");
+        return NULL;
+    }
+    lv_style_init(local_style);
 
-    lv_mem_free(dsc);
+    /*Add the local style to the first place*/
+    _lv_style_list_add_style(list, local_style);
+    list->has_local = 1;
+
+    return local_style;
 }
 
-#endif
+/**
+ * Resizes a style map. Useful entry point for debugging.
+ * @param style pointer to the style to be resized.
+ * @param size new size
+ */
+static inline void style_resize(lv_style_t * style, size_t sz)
+{
+    style->map = lv_mem_realloc(style->map, sz);
+}
+
+/**
+ * Get style property in index.
+ * @param style pointer to style.
+ * @param idx index of the style in style->map
+ * @return property in style->map + idx
+ */
+static inline lv_style_property_t get_style_prop(const lv_style_t * style, size_t idx)
+{
+    lv_style_property_t prop;
+    uint8_t * prop_p = (uint8_t *)&prop;
+    prop_p[0] = style->map[idx];
+    prop_p[1] = style->map[idx + 1];
+    return prop;
+}
+
+/**
+ * Get style property id in index.
+ * @param style pointer to style.
+ * @param idx index of the style in style->map
+ * @return id of property in style->map + idx
+ */
+static inline uint8_t get_style_prop_id(const lv_style_t * style, size_t idx)
+{
+    return get_style_prop(style, idx) & 0xFF;
+}
+
+/**
+ * Get style property attributes for index.
+ * @param style pointer to style.
+ * @param idx index of the style in style->map
+ * @return attribute of property in style->map + idx
+ */
+static inline uint8_t get_style_prop_attr(const lv_style_t * style, size_t idx)
+{
+    return ((get_style_prop(style, idx) >> 8) & 0xFFU);
+}
+
+
+/**
+ * Get property size.
+ * @param prop_id property id.
+ * @param idx index of the style in style->map
+ * @return attribute of property in style->map + idx
+ */
+static inline size_t get_prop_size(uint8_t prop_id)
+{
+    prop_id &= 0xF;
+    size_t size = sizeof(lv_style_property_t);
+    if(prop_id < LV_STYLE_ID_COLOR) size += sizeof(lv_style_int_t);
+    else if(prop_id < LV_STYLE_ID_OPA) size += sizeof(lv_color_t);
+    else if(prop_id < LV_STYLE_ID_PTR) size += sizeof(lv_opa_t);
+    else size += sizeof(const void *);
+    return size;
+}
+
+/**
+ * Get next property index, given current property and index.
+ * @param prop_id property id.
+ * @param idx index of the style in style->map
+ * @return index of next property in style->map
+ */
+static inline size_t get_next_prop_index(uint8_t prop_id, size_t idx)
+{
+    return idx + get_prop_size(prop_id);
+}

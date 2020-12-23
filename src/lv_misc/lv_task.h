@@ -14,11 +14,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+#include "../lv_conf_internal.h"
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -31,6 +27,8 @@ extern "C" {
 #ifndef LV_ATTRIBUTE_TASK_HANDLER
 #define LV_ATTRIBUTE_TASK_HANDLER
 #endif
+
+#define LV_NO_TASK_READY 0xFFFFFFFF
 /**********************
  *      TYPEDEFS
  **********************/
@@ -59,16 +57,15 @@ typedef uint8_t lv_task_prio_t;
 /**
  * Descriptor of a lv_task
  */
-typedef struct _lv_task_t
-{
+typedef struct _lv_task_t {
     uint32_t period; /**< How often the task should run */
     uint32_t last_run; /**< Last time the task ran */
     lv_task_cb_t task_cb; /**< Task function */
 
     void * user_data; /**< Custom user data */
 
+    int32_t repeat_count; /**< 1: Task times;  -1 : infinity;  0 : stop ;  n>0: residual times */
     uint8_t prio : 3; /**< Task priority */
-    uint8_t once : 1; /**< 1: one shot task */
 } lv_task_t;
 
 /**********************
@@ -78,21 +75,22 @@ typedef struct _lv_task_t
 /**
  * Init the lv_task module
  */
-void lv_task_core_init(void);
+void _lv_task_core_init(void);
 
 //! @cond Doxygen_Suppress
 
 /**
  * Call it  periodically to handle lv_tasks.
+ * @return time till it needs to be run next (in ms)
  */
-LV_ATTRIBUTE_TASK_HANDLER void lv_task_handler(void);
+LV_ATTRIBUTE_TASK_HANDLER uint32_t lv_task_handler(void);
 
 //! @endcond
 
 /**
- * Create an "empty" task. It needs to initialzed with at least
+ * Create an "empty" task. It needs to initialized with at least
  * `lv_task_set_cb` and `lv_task_set_period`
- * @return pointer to the craeted task
+ * @return pointer to the created task
  */
 lv_task_t * lv_task_create_basic(void);
 
@@ -142,10 +140,11 @@ void lv_task_set_period(lv_task_t * task, uint32_t period);
 void lv_task_ready(lv_task_t * task);
 
 /**
- * Delete the lv_task after one call
+ * Set the number of times a task will repeat.
  * @param task pointer to a lv_task.
+ * @param repeat_count -1 : infinity;  0 : stop ;  n>0: residual times
  */
-void lv_task_once(lv_task_t * task);
+void lv_task_set_repeat_count(lv_task_t * task, int32_t repeat_count);
 
 /**
  * Reset a lv_task.
@@ -165,6 +164,13 @@ void lv_task_enable(bool en);
  * @return the lv_task idle in percentage
  */
 uint8_t lv_task_get_idle(void);
+
+/**
+ * Iterate through the tasks
+ * @param task NULL to start iteration or the previous return value to get the next task
+ * @return the next task or NULL if there is no more task
+ */
+lv_task_t * lv_task_get_next(lv_task_t * task);
 
 /**********************
  *      MACROS

@@ -13,8 +13,9 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#include "lv_draw.h"
 #include "../lv_misc/lv_bidi.h"
+#include "../lv_misc/lv_txt.h"
+#include "../lv_core/lv_style.h"
 
 /*********************
  *      DEFINES
@@ -25,12 +26,23 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-typedef struct
-{
-    uint16_t start;
-    uint16_t end;
-}lv_draw_label_txt_sel_t;
-
+typedef struct {
+    lv_color_t color;
+    lv_color_t sel_color;
+    lv_color_t sel_bg_color;
+    const lv_font_t * font;
+    lv_opa_t opa;
+    lv_style_int_t line_space;
+    lv_style_int_t letter_space;
+    uint32_t sel_start;
+    uint32_t sel_end;
+    lv_coord_t ofs_x;
+    lv_coord_t ofs_y;
+    lv_bidi_dir_t bidi_dir;
+    lv_txt_flag_t flag;
+    lv_text_decor_t decor;
+    lv_blend_mode_t blend_mode;
+} lv_draw_label_dsc_t;
 
 /** Store some info to speed up drawing of very large texts
  * It takes a lot of time to get the first visible character because
@@ -47,27 +59,38 @@ typedef struct {
     /** The 'y1' coordinate of the label when the hint was saved.
      * Used to invalidate the hint if the label has moved too much. */
     int32_t coord_y;
-}lv_draw_label_hint_t;
+} lv_draw_label_hint_t;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
+//! @cond Doxygen_Suppress
+
+LV_ATTRIBUTE_FAST_MEM void lv_draw_label_dsc_init(lv_draw_label_dsc_t * dsc);
+
 /**
  * Write a text
  * @param coords coordinates of the label
  * @param mask the label will be drawn only in this area
- * @param style pointer to a style
- * @param opa_scale scale down all opacities by the factor
- * @param txt 0 terminated text to write
- * @param flag settings for the text from 'txt_flag_t' enum
- * @param offset text offset in x and y direction (NULL if unused)
- * @param sel_start start index of selected area (`LV_LABEL_TXT_SEL_OFF` if none)
- * @param bidi_dir base direction of the text
+ * @param dsc pointer to draw descriptor
+ * @param txt `\0` terminated text to write
+ * @param hint pointer to a `lv_draw_label_hint_t` variable.
+ * It is managed by the drawer to speed up the drawing of very long texts (thousands of lines).
  */
-void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask, const lv_style_t * style, lv_opa_t opa_scale,
-                   const char * txt, lv_txt_flag_t flag, lv_point_t * offset, lv_draw_label_txt_sel_t * sel,
-                   lv_draw_label_hint_t * hint, lv_bidi_dir_t bidi_dir);
+LV_ATTRIBUTE_FAST_MEM void lv_draw_label(const lv_area_t * coords, const lv_area_t * mask,
+                                         const lv_draw_label_dsc_t * dsc,
+                                         const char * txt, lv_draw_label_hint_t * hint);
+
+//! @endcond
+/***********************
+ * GLOBAL VARIABLES
+ ***********************/
+extern const uint8_t _lv_bpp2_opa_table[];
+extern const uint8_t _lv_bpp3_opa_table[];
+extern const uint8_t _lv_bpp1_opa_table[];
+extern const uint8_t _lv_bpp4_opa_table[];
+extern const uint8_t _lv_bpp8_opa_table[];
 
 /**********************
  *      MACROS

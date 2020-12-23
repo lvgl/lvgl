@@ -15,11 +15,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+#include "../lv_conf_internal.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -54,9 +50,26 @@ typedef uint8_t lv_indev_type_t;
 enum { LV_INDEV_STATE_REL = 0, LV_INDEV_STATE_PR };
 typedef uint8_t lv_indev_state_t;
 
+
+enum {
+    LV_DRAG_DIR_HOR = 0x1, /**< Object can be dragged horizontally. */
+    LV_DRAG_DIR_VER = 0x2, /**< Object can be dragged vertically. */
+    LV_DRAG_DIR_BOTH = 0x3, /**< Object can be dragged in all directions. */
+    LV_DRAG_DIR_ONE = 0x4, /**< Object can be dragged only one direction (the first move). */
+};
+
+typedef uint8_t lv_drag_dir_t;
+
+enum {
+    LV_GESTURE_DIR_TOP,     /**< Gesture dir up. */
+    LV_GESTURE_DIR_BOTTOM,  /**< Gesture dir down. */
+    LV_GESTURE_DIR_LEFT,    /**< Gesture dir left. */
+    LV_GESTURE_DIR_RIGHT,   /**< Gesture dir right. */
+};
+typedef uint8_t lv_gesture_dir_t;
+
 /** Data structure passed to an input driver to fill */
-typedef struct
-{
+typedef struct {
     lv_point_t point; /**< For LV_INDEV_TYPE_POINTER the currently pressed point*/
     uint32_t key;     /**< For LV_INDEV_TYPE_KEYPAD the currently pressed key*/
     uint32_t btn_id;  /**< For LV_INDEV_TYPE_BUTTON the currently pressed button*/
@@ -65,9 +78,9 @@ typedef struct
     lv_indev_state_t state; /**< LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/
 } lv_indev_data_t;
 
+
 /** Initialized by the user and registered by 'lv_indev_add()'*/
-typedef struct _lv_indev_drv_t
-{
+typedef struct _lv_indev_drv_t {
 
     /**< Input device type*/
     lv_indev_type_t type;
@@ -97,6 +110,12 @@ typedef struct _lv_indev_drv_t
     /**< Drag throw slow-down in [%]. Greater value means faster slow-down */
     uint8_t drag_throw;
 
+    /**< At least this difference should between two points to evaluate as gesture */
+    uint8_t gesture_min_velocity;
+
+    /**< At least this difference should be to send a gesture */
+    uint8_t gesture_limit;
+
     /**< Long press time in milliseconds*/
     uint16_t long_press_time;
 
@@ -107,29 +126,31 @@ typedef struct _lv_indev_drv_t
 /** Run time data of input devices
  * Internally used by the library, you should not need to touch it.
  */
-typedef struct _lv_indev_proc_t
-{
+typedef struct _lv_indev_proc_t {
     lv_indev_state_t state; /**< Current state of the input device. */
-    union
-    {
-        struct
-        { /*Pointer and button data*/
+    union {
+        struct {
+            /*Pointer and button data*/
             lv_point_t act_point; /**< Current point of input device. */
             lv_point_t last_point; /**< Last point of input device. */
             lv_point_t vect; /**< Difference between `act_point` and `last_point`. */
             lv_point_t drag_sum; /*Count the dragged pixels to check LV_INDEV_DEF_DRAG_LIMIT*/
             lv_point_t drag_throw_vect;
             struct _lv_obj_t * act_obj;      /*The object being pressed*/
-            struct _lv_obj_t * last_obj;     /*The last obejct which was pressed (used by dragthrow and
+            struct _lv_obj_t * last_obj;     /*The last object which was pressed (used by drag_throw and
                                                 other post-release event)*/
             struct _lv_obj_t * last_pressed; /*The lastly pressed object*/
 
+            lv_gesture_dir_t gesture_dir;
+            lv_point_t gesture_sum; /*Count the gesture pixels to check LV_INDEV_DEF_GESTURE_LIMIT*/
             /*Flags*/
             uint8_t drag_limit_out : 1;
             uint8_t drag_in_prog : 1;
+            lv_drag_dir_t drag_dir  : 3;
+            uint8_t gesture_sent : 1;
         } pointer;
-        struct
-        { /*Keypad data*/
+        struct {
+            /*Keypad data*/
             lv_indev_state_t last_state;
             uint32_t last_key;
         } keypad;
@@ -150,8 +171,7 @@ struct _lv_group_t;
 
 /** The main input device descriptor with driver, runtime data ('proc') and some additional
  * information*/
-typedef struct _lv_indev_t
-{
+typedef struct _lv_indev_t {
     lv_indev_drv_t driver;
     lv_indev_proc_t proc;
     struct _lv_obj_t * cursor;     /**< Cursor for LV_INPUT_TYPE_POINTER*/
@@ -200,7 +220,7 @@ lv_indev_t * lv_indev_get_next(lv_indev_t * indev);
  * @param data input device will write its data here
  * @return false: no more data; true: there more data to read (buffered)
  */
-bool lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data);
+bool _lv_indev_read(lv_indev_t * indev, lv_indev_data_t * data);
 
 /**********************
  *      MACROS

@@ -13,11 +13,7 @@ extern "C" {
 /*********************
  *      INCLUDES
  *********************/
-#ifdef LV_CONF_INCLUDE_SIMPLE
-#include "lv_conf.h"
-#else
-#include "../../../lv_conf.h"
-#endif
+#include "../lv_conf_internal.h"
 
 #if LV_USE_FILESYSTEM
 
@@ -34,8 +30,9 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+
 /**
- * Errors in the filesystem module.
+ * Errors in the file system module.
  */
 enum {
     LV_FS_RES_OK = 0,
@@ -63,8 +60,7 @@ enum {
 };
 typedef uint8_t lv_fs_mode_t;
 
-typedef struct _lv_fs_drv_t
-{
+typedef struct _lv_fs_drv_t {
     char letter;
     uint16_t file_size;
     uint16_t rddir_size;
@@ -91,14 +87,12 @@ typedef struct _lv_fs_drv_t
 #endif
 } lv_fs_drv_t;
 
-typedef struct
-{
+typedef struct {
     void * file_d;
     lv_fs_drv_t * drv;
 } lv_fs_file_t;
 
-typedef struct
-{
+typedef struct {
     void * dir_d;
     lv_fs_drv_t * drv;
 } lv_fs_dir_t;
@@ -110,7 +104,7 @@ typedef struct
 /**
  * Initialize the File system interface
  */
-void lv_fs_init(void);
+void _lv_fs_init(void);
 
 /**
  * Initialize a file system driver with default values.
@@ -135,7 +129,7 @@ void lv_fs_drv_register(lv_fs_drv_t * drv_p);
 lv_fs_drv_t * lv_fs_get_drv(char letter);
 
 /**
- * Test if a drive is rady or not. If the `ready` function was not initialized `true` will be
+ * Test if a drive is ready or not. If the `ready` function was not initialized `true` will be
  * returned.
  * @param letter letter of the drive
  * @return true: drive is ready; false: drive is not ready
@@ -227,7 +221,7 @@ lv_fs_res_t lv_fs_rename(const char * oldname, const char * newname);
 
 /**
  * Initialize a 'fs_dir_t' variable for directory reading
- * @param rddir_p pointer to a 'fs_read_dir_t' variable
+ * @param rddir_p pointer to a 'lv_fs_dir_t' variable
  * @param path path to a directory
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
@@ -236,7 +230,7 @@ lv_fs_res_t lv_fs_dir_open(lv_fs_dir_t * rddir_p, const char * path);
 /**
  * Read the next filename form a directory.
  * The name of the directories will begin with '/'
- * @param rddir_p pointer to an initialized 'fs_rdir_t' variable
+ * @param rddir_p pointer to an initialized 'fs_dir_t' variable
  * @param fn pointer to a buffer to store the filename
  * @return LV_FS_RES_OK or any error from lv_fs_res_t enum
  */
