@@ -1,8 +1,8 @@
-### Description of the feature of fix
+### Description of the feature or fix
 
-A clear and concise description of what the bug is.
+A clear and concise description of what the bug or new feature is.
 
-### Chekpoints
+### Checkpoints
 - [ ] Follow the [styling guide](https://github.com/lvgl/lvgl/blob/master/docs/CODING_STYLE.md)
 - [ ] Update CHANGELOG.md
-- [ ] Update the docsumentation 
+- [ ] Update the documentation 
