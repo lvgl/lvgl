@@ -62,6 +62,8 @@ typedef struct {
     uint32_t cache_pad_hor:5;
     uint32_t cache_pad_ver:5;
     uint32_t cache_border_width:5;
+    uint32_t cache_text_color_filtered:4;
+    uint32_t cache_bg_color_filtered:4;
 
     /*Zero or Needs check*/
     uint32_t cache_transform_zero:1;
@@ -72,6 +74,7 @@ typedef struct {
     uint32_t cache_shadow_width_zero:1;
     uint32_t cache_img_recolor_opa_zero:1;
     uint32_t cache_content_src_zero:1;
+    uint32_t cache_filter_zero:1;
 
     /*1 or 0*/
     uint32_t cache_border_post_enable:1;

@@ -1468,6 +1468,7 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
 
     obj->state = LV_STATE_BORN;
+    obj->style_list.cache_state = 0x3f;
 
     /*Copy the attributes if required*/
     if(copy != NULL) {
@@ -1577,13 +1578,13 @@ static lv_design_res_t lv_obj_design(lv_obj_t * obj, const lv_area_t * clip_area
 
 
         /*Draw the content*/
-        lv_draw_rect_dsc_init(&draw_dsc);
-        draw_dsc.bg_opa = LV_OPA_TRANSP;
-        draw_dsc.border_opa = LV_OPA_TRANSP;
-        draw_dsc.outline_opa = LV_OPA_TRANSP;
-        draw_dsc.shadow_opa = LV_OPA_TRANSP;
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_CONTENT, &draw_dsc);
-        lv_draw_rect(&coords, clip_area, &draw_dsc);
+//        lv_draw_rect_dsc_init(&draw_dsc);
+//        draw_dsc.bg_opa = LV_OPA_TRANSP;
+//        draw_dsc.border_opa = LV_OPA_TRANSP;
+//        draw_dsc.outline_opa = LV_OPA_TRANSP;
+//        draw_dsc.shadow_opa = LV_OPA_TRANSP;
+//        lv_obj_init_draw_rect_dsc(obj, LV_PART_CONTENT, &draw_dsc);
+//        lv_draw_rect(&coords, clip_area, &draw_dsc);
 
         if(lv_obj_get_style_clip_corner(obj, LV_PART_MAIN)) {
             lv_draw_mask_radius_param_t * mp = _lv_mem_buf_get(sizeof(lv_draw_mask_radius_param_t));

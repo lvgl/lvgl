@@ -315,6 +315,7 @@ static void basic_init(void)
     lv_style_set_pad_all(&styles->knob, LV_DPX(5));
     lv_style_set_radius(&styles->knob, LV_RADIUS_CIRCLE);
 
+#if LV_USE_CHECKBOX
     style_init_reset(&styles->cb_marker);
     lv_style_set_pad_all(&styles->cb_marker, LV_DPX(3));
     lv_style_set_border_width(&styles->cb_marker, BORDER_WIDTH);
@@ -328,8 +329,9 @@ static void basic_init(void)
     lv_style_set_content_src(&styles->cb_marker_checked, LV_SYMBOL_OK);
     lv_style_set_text_color(&styles->cb_marker_checked, LV_COLOR_WHITE);
     lv_style_set_text_font(&styles->cb_marker_checked, theme.font_small);
+#endif
 
-
+#if LV_USE_CHART
     style_init_reset(&styles->chart_bg);
     lv_style_set_line_width(&styles->chart_bg, LV_DPX(1));
     lv_style_set_line_dash_width(&styles->chart_bg, LV_DPX(10));
@@ -342,7 +344,7 @@ static void basic_init(void)
 //    lv_style_set_size(&styles->chart_series, LV_DPX(4));
     lv_style_set_pad_all(&styles->chart_series, LV_DPX(2));     /*Space between columns*/
     lv_style_set_radius(&styles->chart_series, LV_DPX(1));
-
+#endif
 
 
 

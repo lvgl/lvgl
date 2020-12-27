@@ -205,7 +205,7 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
     if(draw_dsc->opa <= LV_OPA_MIN) return;
 #endif
 
-    draw_dsc->color = lv_obj_get_style_text_color(obj, part);
+    draw_dsc->color = lv_obj_get_style_text_color_filtered(obj, part);
     draw_dsc->letter_space = lv_obj_get_style_text_letter_space(obj, part);
     draw_dsc->line_space = lv_obj_get_style_text_line_space(obj, part);
     draw_dsc->decor = lv_obj_get_style_text_decor(obj, part);
@@ -417,6 +417,7 @@ void _lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
  */
 void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
 {
+    return;
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE) == false) return;
 
     lv_scroll_dir_t sm = lv_obj_get_scrollbar_mode(obj);

@@ -261,21 +261,31 @@ static int32_t get_index_ptr(lv_style_value_t v)
     return 0;
 }
 
-static lv_color_t buf_color[16];
+lv_color_t buf_color[16];
+static uint32_t buf_color_p = 1;
 static int32_t get_index_color(lv_style_value_t v)
 {
-    static uint32_t p = 1;
     uint32_t i;
-    for(i = 1; i < p; i++) {
+    for(i = 1; i < buf_color_p; i++) {
         if(v._color.full == buf_color[i].full)  return i;
     }
-    if(p < 16) {
-        buf_color[p].full = v._color.full;
-        p++;
-        return p - 1;
+    if(buf_color_p) {
+        buf_color[buf_color_p].full = v._color.full;
+        buf_color_p++;
+        return buf_color_p - 1;
     }
     return 0;
 }
+
+uint32_t find_index_color(lv_style_value_t v)
+{
+    uint32_t i;
+    for(i = 1; i < buf_color_p; i++) {
+        if(v._color.full == buf_color[i].full)  return i;
+    }
+    return 0;
+}
+
 
 static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
 {
