@@ -34,36 +34,46 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-/*Data of drop down list*/
-typedef struct {
-    /*New data for this type */
-    lv_obj_t * list;             /*The dropped down list*/
-    const char * text;           /*Text to display on the ddlist's button*/
-    const char * symbol;         /*Arrow or other icon when the drop-down list is closed*/
-    char * options;
-    lv_coord_t max_height;        /*Height of the ddlist when opened. (0: auto-size)*/
-    uint16_t option_cnt;          /*Number of options*/
-    uint16_t sel_opt_id;          /*Index of the currently selected option*/
-    uint16_t sel_opt_id_orig;     /*Store the original index on focus*/
-    uint16_t pr_opt_id;             /*Index of the currently pressed option*/
-    lv_dir_t dir         : 4;
-    uint8_t static_txt : 1;
-} lv_dropdown_ext_t;
-
-
 LV_CLASS_DECLARE_START(lv_dropdown, lv_obj);
 
-#define _lv_roller_label_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
+#define _lv_dropdown_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
 
-#define _lv_roller_label_data             \
-  _lv_label_data                  \
+#define _lv_dropdown_data             \
+  _lv_obj_data                  \
+  lv_obj_t * list;             /*The dropped down list*/    \
+  const char * text;           /*Text to display on the ddlist's button*/   \
+  const char * symbol;         /*Arrow or other icon when the drop-down list is closed*/    \
+  char * options;                                       \
+  lv_coord_t max_height;        /*Height of the ddlist when opened. (0: auto-size)*/    \
+  uint16_t option_cnt;          /*Number of options*/   \
+  uint16_t sel_opt_id;          /*Index of the currently selected option*/  \
+  uint16_t sel_opt_id_orig;     /*Store the original index on focus*/       \
+  uint16_t pr_opt_id;             /*Index of the currently pressed option*/ \
+  lv_dir_t dir         : 4;             \
+  uint8_t static_txt : 1;
 
-#define _lv_roller_label_class_dsc        \
-  _lv_label_class_dsc              \
+#define _lv_dropdown_class_dsc        \
+  _lv_obj_class_dsc              \
 
-LV_CLASS_DECLARE_END(lv_roller_label, lv_label);
+LV_CLASS_DECLARE_END(lv_dropdown, lv_obj);
 
-extern lv_roller_label_class_t lv_roller_label;
+extern lv_dropdown_class_t lv_dropdown;
+
+LV_CLASS_DECLARE_START(lv_dropdown_list, lv_obj);
+
+#define _lv_dropdown_list_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
+
+#define _lv_dropdown_list_data             \
+  _lv_obj_data                  \
+  lv_obj_t * dropdown;
+
+#define _lv_dropdown_list_class_dsc        \
+  _lv_obj_class_dsc              \
+
+LV_CLASS_DECLARE_END(lv_dropdown_list, lv_obj);
+
+extern lv_dropdown_list_class_t lv_dropdown_list;
+
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

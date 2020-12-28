@@ -36,34 +36,28 @@
 /**********************
  *      TYPEDEFS
  **********************/
-typedef struct {
-    /*No inherited ext*/
-    lv_obj_t * ddlist;      /*Pointer to the ddlist where the page belongs*/
-} lv_dropdown_list_ext_t;
 
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_design_res_t lv_dropdown_list_design(lv_obj_t * ddlist, const lv_area_t * clip_area, lv_design_mode_t mode);
-static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param);
-static lv_res_t lv_dropdown_page_signal(lv_obj_t * list, lv_signal_t sign, void * param);
-static lv_style_list_t * lv_dropdown_get_style(lv_obj_t * ddlist, uint8_t part);
-static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
-static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
+static lv_design_res_t lv_dropdown_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_design_res_t lv_dropdown_list_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode);
+static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * param);
+static lv_res_t lv_dropdown_list_signal(lv_obj_t * list, lv_signal_t sign, void * param);
+static void draw_box(lv_obj_t * obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
+static void draw_box_label(lv_obj_t * obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state);
 static lv_res_t list_release_handler(lv_obj_t * page);
 static void page_press_handler(lv_obj_t * page);
-static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t y);
-static void position_to_selected(lv_obj_t * ddlist);
-static lv_obj_t * get_label(const lv_obj_t * ddlist);
+static uint16_t get_id_on_point(lv_obj_t * obj, lv_coord_t y);
+static void position_to_selected(lv_obj_t * obj);
+static lv_obj_t * get_label(const lv_obj_t * obj);
 
 /**********************
  *  STATIC VARIABLES
  **********************/
-static lv_signal_cb_t ancestor_signal;
-static lv_signal_cb_t ancestor_list_signal;
-static lv_design_cb_t ancestor_design;
-static lv_design_cb_t ancestor_list_design;
+lv_dropdown_class_t lv_dropdown;
+lv_dropdown_list_class_t lv_dropdown_list;
+
 
 /**********************
  *      MACROS
@@ -80,72 +74,22 @@ static lv_design_cb_t ancestor_list_design;
  * from it
  * @return pointer to the created drop down list
  */
-lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
+lv_obj_t * lv_dropdown_create(lv_obj_t * parent, const lv_obj_t * copy)
 {
-    LV_LOG_TRACE("drop down list create started");
-
-    /*Create the ancestor drop down list*/
-    lv_obj_t * ddlist = lv_obj_create(par, copy);
-    LV_ASSERT_MEM(ddlist);
-    if(ddlist == NULL) return NULL;
-
-    if(ancestor_signal == NULL) ancestor_signal = lv_obj_get_signal_cb(ddlist);
-    if(ancestor_design == NULL) ancestor_design = lv_obj_get_design_cb(ddlist);
-
-    /*Allocate the drop down list type specific extended data*/
-    lv_dropdown_ext_t * ext = lv_obj_allocate_ext_attr(ddlist, sizeof(lv_dropdown_ext_t));
-    LV_ASSERT_MEM(ext);
-    if(ext == NULL) {
-        lv_obj_del(ddlist);
-        return NULL;
+    if(!lv_dropdown._inited) {
+        LV_CLASS_INIT(lv_dropdown, lv_obj);
+        lv_dropdown.constructor = lv_dropdown_constructor;
+        lv_dropdown.destructor = lv_dropdown_destructor;
+        lv_dropdown.design_cb = lv_dropdown_design;
+        lv_dropdown.signal_cb = lv_dropdown_signal;
     }
 
-    /*Initialize the allocated 'ext' */
-    ext->list          = NULL;
-    ext->options     = NULL;
-    ext->symbol         = LV_SYMBOL_DOWN;
-    ext->text         = NULL;
-    ext->static_txt = 1;
-    ext->sel_opt_id      = 0;
-    ext->sel_opt_id_orig = 0;
-    ext->pr_opt_id = LV_DROPDOWN_PR_NONE;
-    ext->option_cnt      = 0;
-    ext->dir = LV_DIR_BOTTOM;
-    ext->max_height = (3 * lv_disp_get_ver_res(NULL)) / 4;
-    lv_style_list_init(&ext->style_list);
-    lv_style_list_init(&ext->style_selected);
+    lv_obj_t * obj = lv_class_new(&lv_dropdown);
+    lv_dropdown.constructor(obj, parent, copy);
 
-    /*The signal and design functions are not copied so set them here*/
-    lv_obj_set_signal_cb(ddlist, lv_dropdown_signal);
-    lv_obj_set_design_cb(ddlist, lv_dropdown_design);
+    lv_obj_create_finish(obj, parent, copy);
 
-    /*Init the new drop down list drop down list*/
-    if(copy == NULL) {
-        lv_obj_set_width(ddlist, LV_DPX(150));
-        lv_dropdown_set_options_static(ddlist, "Option 1\nOption 2\nOption 3");
-        lv_theme_apply(ddlist, LV_THEME_DROPDOWN);
-    }
-    /*Copy an existing drop down list*/
-    else {
-        lv_dropdown_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
-        if(copy_ext->static_txt == 0)
-            lv_dropdown_set_options(ddlist, lv_dropdown_get_options(copy));
-        else
-            lv_dropdown_set_options_static(ddlist, lv_dropdown_get_options(copy));
-        ext->option_cnt        = copy_ext->option_cnt;
-        ext->sel_opt_id     = copy_ext->sel_opt_id;
-        ext->sel_opt_id_orig = copy_ext->sel_opt_id;
-        ext->symbol           = copy_ext->symbol;
-        ext->max_height      = copy_ext->max_height;
-        ext->text      = copy_ext->text;
-        ext->dir      = copy_ext->dir;
-        lv_style_list_copy(&ext->style_list, &copy_ext->style_list);
-        lv_style_list_copy(&ext->style_selected, &copy_ext->style_selected);
-    }
-
-    LV_LOG_INFO("drop down list created");
-
-    return ddlist;
+    return obj;
 }
 
 /*=====================
@@ -157,10 +101,10 @@ lv_obj_t * lv_dropdown_create(lv_obj_t * par, const lv_obj_t * copy)
  * @param ddlist pointer to a drop down list object
  * @param txt the text as a string (Only it's pointer is saved)
  */
-void lv_dropdown_set_text(lv_obj_t * ddlist, const char * txt)
+void lv_dropdown_set_text(lv_obj_t * obj, const char * txt)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     if(ext->text == txt) return;
 
     ext->text = txt;
@@ -172,20 +116,20 @@ void lv_dropdown_set_text(lv_obj_t * ddlist, const char * txt)
  * Clear all options in a drop down list.  Static or dynamic.
  * @param ddlist pointer to drop down list object
  */
-void lv_dropdown_clear_options(lv_obj_t * ddlist)
+void lv_dropdown_clear_options(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
-    if(ext->options == NULL) return;
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
+    if(dropdown->options == NULL) return;
 
-    if(ext->static_txt == 0)
-        lv_mem_free(ext->options);
+    if(dropdown->static_txt == 0)
+        lv_mem_free(dropdown->options);
 
-    ext->options = NULL;
-    ext->static_txt = 0;
-    ext->option_cnt = 0;
+    dropdown->options = NULL;
+    dropdown->static_txt = 0;
+    dropdown->option_cnt = 0;
 
-    lv_obj_invalidate(ddlist);
+    lv_obj_invalidate(obj);
 }
 
 /**
@@ -194,22 +138,22 @@ void lv_dropdown_clear_options(lv_obj_t * ddlist)
  * @param options a string with '\n' separated options. E.g. "One\nTwo\nThree"
  * The options string can be destroyed after calling this function
  */
-void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options)
+void lv_dropdown_set_options(lv_obj_t * obj, const char * options)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
     LV_ASSERT_STR(options);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     /*Count the '\n'-s to determine the number of options*/
-    ext->option_cnt = 0;
+    dropdown->option_cnt = 0;
     uint32_t i;
     for(i = 0; options[i] != '\0'; i++) {
-        if(options[i] == '\n') ext->option_cnt++;
+        if(options[i] == '\n') dropdown->option_cnt++;
     }
-    ext->option_cnt++;   /*Last option has no `\n`*/
-    ext->sel_opt_id      = 0;
-    ext->sel_opt_id_orig = 0;
+    dropdown->option_cnt++;   /*Last option has no `\n`*/
+    dropdown->sel_opt_id      = 0;
+    dropdown->sel_opt_id_orig = 0;
 
     /*Allocate space for the new text*/
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
@@ -218,24 +162,24 @@ void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options)
     size_t len = _lv_txt_ap_calc_bytes_cnt(options) + 1;
 #endif
 
-    if(ext->options != NULL && ext->static_txt == 0) {
-        lv_mem_free(ext->options);
-        ext->options = NULL;
+    if(dropdown->options != NULL && dropdown->static_txt == 0) {
+        lv_mem_free(dropdown->options);
+        dropdown->options = NULL;
     }
 
-    ext->options = lv_mem_alloc(len);
+    dropdown->options = lv_mem_alloc(len);
 
-    LV_ASSERT_MEM(ext->options);
-    if(ext->options == NULL) return;
+    LV_ASSERT_MEM(dropdown->options);
+    if(dropdown->options == NULL) return;
 
 #if LV_USE_ARABIC_PERSIAN_CHARS == 0
-    strcpy(ext->options, options);
+    strcpy(dropdown->options, options);
 #else
     _lv_txt_ap_proc(options, ext->options);
 #endif
 
     /*Now the text is dynamically allocated*/
-    ext->static_txt = 0;
+    dropdown->static_txt = 0;
 }
 
 /**
@@ -243,15 +187,15 @@ void lv_dropdown_set_options(lv_obj_t * ddlist, const char * options)
  * @param ddlist pointer to drop down list object
  * @param options a static string with '\n' separated options. E.g. "One\nTwo\nThree"
  */
-void lv_dropdown_set_options_static(lv_obj_t * ddlist, const char * options)
+void lv_dropdown_set_options_static(lv_obj_t * obj, const char * options)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
     LV_ASSERT_STR(options);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     /*Count the '\n'-s to determine the number of options*/
-    ext->option_cnt = 0;
+    dropdown->option_cnt = 0;
     uint32_t i;
     for(i = 0; options[i] != '\0'; i++) {
         if(options[i] == '\n') ext->option_cnt++;
@@ -275,12 +219,12 @@ void lv_dropdown_set_options_static(lv_obj_t * ddlist, const char * options)
  * @param option a string without '\n'. E.g. "Four"
  * @param pos the insert position, indexed from 0, LV_DROPDOWN_POS_LAST = end of string
  */
-void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint32_t pos)
+void lv_dropdown_add_option(lv_obj_t * obj, const char * option, uint32_t pos)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
     LV_ASSERT_STR(option);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     /*Convert static options to dynamic*/
     if(ext->static_txt != 0) {
@@ -341,11 +285,11 @@ void lv_dropdown_add_option(lv_obj_t * ddlist, const char * option, uint32_t pos
  * @param ddlist pointer to drop down list object
  * @param sel_opt id of the selected option (0 ... number of option - 1);
  */
-void lv_dropdown_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
+void lv_dropdown_set_selected(lv_obj_t * obj, uint16_t sel_opt)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     if(ext->sel_opt_id == sel_opt) return;
 
     ext->sel_opt_id      = sel_opt < ext->option_cnt ? sel_opt : ext->option_cnt - 1;
@@ -361,11 +305,11 @@ void lv_dropdown_set_selected(lv_obj_t * ddlist, uint16_t sel_opt)
  * @param ddlist pointer to a drop down list object
  * @param dir LV_DIR_LEFT/RIGHT/TOP/BOTTOM
  */
-void lv_dropdown_set_dir(lv_obj_t * ddlist, lv_dir_t dir)
+void lv_dropdown_set_dir(lv_obj_t * obj, lv_dir_t dir)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     if(ext->dir == dir) return;
 
     ext->dir = dir;
@@ -378,11 +322,11 @@ void lv_dropdown_set_dir(lv_obj_t * ddlist, lv_dir_t dir)
  * @param ddlist pointer to a drop down list
  * @param h the maximal height
  */
-void lv_dropdown_set_max_height(lv_obj_t * ddlist, lv_coord_t h)
+void lv_dropdown_set_max_height(lv_obj_t * obj, lv_coord_t h)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     if(ext->max_height == h) return;
 
     ext->max_height = h;
@@ -393,11 +337,11 @@ void lv_dropdown_set_max_height(lv_obj_t * ddlist, lv_coord_t h)
  * @param ddlist pointer to drop down list object
  * @param symbol a text like `LV_SYMBOL_DOWN` or NULL to not draw icon
  */
-void lv_dropdown_set_symbol(lv_obj_t * ddlist, const char * symbol)
+void lv_dropdown_set_symbol(lv_obj_t * obj, const char * symbol)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     ext->symbol = symbol;
     lv_obj_invalidate(ddlist);
 }
@@ -411,10 +355,10 @@ void lv_dropdown_set_symbol(lv_obj_t * ddlist, const char * symbol)
  * @param ddlist pointer to a drop down list object
  * @return the text string
  */
-const char * lv_dropdown_get_text(lv_obj_t * ddlist)
+const char * lv_dropdown_get_text(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     return ext->text;
 }
@@ -424,11 +368,11 @@ const char * lv_dropdown_get_text(lv_obj_t * ddlist)
  * @param ddlist pointer to drop down list object
  * @return the options separated by '\n'-s (E.g. "Option1\nOption2\nOption3")
  */
-const char * lv_dropdown_get_options(const lv_obj_t * ddlist)
+const char * lv_dropdown_get_options(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     return ext->options;
 }
 
@@ -437,11 +381,11 @@ const char * lv_dropdown_get_options(const lv_obj_t * ddlist)
  * @param ddlist pointer to drop down list object
  * @return id of the selected option (0 ... number of option - 1);
  */
-uint16_t lv_dropdown_get_selected(const lv_obj_t * ddlist)
+uint16_t lv_dropdown_get_selected(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     return ext->sel_opt_id;
 }
@@ -451,11 +395,11 @@ uint16_t lv_dropdown_get_selected(const lv_obj_t * ddlist)
  * @param ddlist pointer to drop down list object
  * @return the total number of options in the list
  */
-uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * ddlist)
+uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     return ext->option_cnt;
 }
@@ -466,11 +410,11 @@ uint16_t lv_dropdown_get_option_cnt(const lv_obj_t * ddlist)
  * @param buf pointer to an array to store the string
  * @param buf_size size of `buf` in bytes. 0: to ignore it.
  */
-void lv_dropdown_get_selected_str(const lv_obj_t * ddlist, char * buf, uint32_t buf_size)
+void lv_dropdown_get_selected_str(const lv_obj_t * obj, char * buf, uint32_t buf_size)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     uint32_t i;
     uint32_t line        = 0;
@@ -497,11 +441,11 @@ void lv_dropdown_get_selected_str(const lv_obj_t * ddlist, char * buf, uint32_t 
  * @param ddlist pointer to a drop down list object
  * @return the height if the ddlist is opened (0: auto size)
  */
-lv_coord_t lv_dropdown_get_max_height(const lv_obj_t * ddlist)
+lv_coord_t lv_dropdown_get_max_height(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     return ext->max_height;
 }
 
@@ -510,11 +454,11 @@ lv_coord_t lv_dropdown_get_max_height(const lv_obj_t * ddlist)
  * @param ddlist pointer to drop down list object
  * @return the symbol or NULL if not enabled
  */
-const char * lv_dropdown_get_symbol(lv_obj_t * ddlist)
+const char * lv_dropdown_get_symbol(lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     return ext->symbol;
 }
@@ -524,11 +468,11 @@ const char * lv_dropdown_get_symbol(lv_obj_t * ddlist)
  * @param ddlist pointer to a drop down list object
  * @return LV_DIR_LEF/RIGHT/TOP/BOTTOM
  */
-lv_dir_t lv_dropdown_get_dir(const lv_obj_t * ddlist)
+lv_dir_t lv_dropdown_get_dir(const lv_obj_t * obj)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     return ext->dir;
 }
@@ -541,9 +485,9 @@ lv_dir_t lv_dropdown_get_dir(const lv_obj_t * ddlist)
  * Open the drop down list with or without animation
  * @param ddlist pointer to drop down list object
  */
-void lv_dropdown_open(lv_obj_t * ddlist)
+void lv_dropdown_open(lv_obj_t * obj)
 {
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     if(ext->list) return;
 
     ext->list = lv_obj_create(lv_obj_get_screen(ddlist), NULL);
@@ -562,7 +506,7 @@ void lv_dropdown_open(lv_obj_t * ddlist)
     list_ext->ddlist = ddlist;
 
     lv_obj_set_design_cb(ext->list, lv_dropdown_list_design);
-    lv_obj_set_signal_cb(ext->list, lv_dropdown_page_signal);
+    lv_obj_set_signal_cb(ext->list, lv_dropdown_list_signal);
 
     lv_style_list_copy(_lv_obj_get_style_list(ext->list, LV_OBJ_PART_MAIN), &ext->style_list);
     _lv_obj_refresh_style(ext->list, LV_OBJ_PART_MAIN, LV_STYLE_PROP_ALL);
@@ -640,9 +584,9 @@ void lv_dropdown_open(lv_obj_t * ddlist)
  * Close (Collapse) the drop down list
  * @param ddlist pointer to drop down list object
  */
-void lv_dropdown_close(lv_obj_t * ddlist)
+void lv_dropdown_close(lv_obj_t * obj)
 {
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     if(ext->list == NULL) return;
 
     ext->pr_opt_id = LV_DROPDOWN_PR_NONE;
@@ -655,6 +599,89 @@ void lv_dropdown_close(lv_obj_t * ddlist)
  **********************/
 
 /**
+ * Create a switch objects
+ * @param parent pointer to an object, it will be the parent of the new switch
+ * @param copy DEPRECATED, will be removed in v9.
+ *             Pointer to an other switch to copy.
+ * @return pointer to the created switch
+ */
+lv_obj_t * lv_dropdown_list_create(lv_obj_t * parent, const lv_obj_t * copy)
+{
+    if(!lv_dropdown_list._inited) {
+        LV_CLASS_INIT(lv_dropdown_list, lv_obj);
+        lv_dropdown_list.design_cb = lv_dropdown_list_design;
+        lv_dropdown_list.signal_cb = lv_dropdown_list_signal;
+    }
+
+    lv_obj_t * obj = lv_class_new(&lv_switch);
+    lv_dropdown_list.constructor(obj, parent, copy);
+
+    lv_obj_create_finish(obj, parent, copy);
+
+    return obj;
+}
+static void lv_dropdown_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * copy)
+{
+    LV_LOG_TRACE("dropdown create started");
+
+    LV_CLASS_CONSTRUCTOR_BEGIN(obj, lv_dropdown)
+    lv_dropdown.base_p->constructor(obj, parent, copy);
+
+    lv_dropdown_t * dropdown = (lv_switch_t *) obj;
+
+
+    /*Initialize the allocated 'ext' */
+    dropdown->list          = NULL;
+    dropdown->options     = NULL;
+    dropdown->symbol         = LV_SYMBOL_DOWN;
+    dropdown->text         = NULL;
+    dropdown->static_txt = 1;
+    dropdown->sel_opt_id      = 0;
+    dropdown->sel_opt_id_orig = 0;
+    dropdown->pr_opt_id = LV_DROPDOWN_PR_NONE;
+    dropdown->option_cnt      = 0;
+    dropdown->dir = LV_DIR_BOTTOM;
+    dropdown->max_height = (3 * lv_disp_get_ver_res(NULL)) / 4;
+
+    lv_obj_t * list_obj = lv_dropdown_list_create(parent, copy);
+    ((lv_dropdown_list_t*)list_obj)->dropdown = (lv_obj_t *) dropdown;
+
+    /*Init the new drop down list drop down list*/
+    if(copy == NULL) {
+        lv_obj_set_width(dropdown, LV_DPX(150));
+        lv_dropdown_set_options_static(dropdown, "Option 1\nOption 2\nOption 3");
+    }
+    /*Copy an existing drop down list*/
+    else {
+//        lv_dropdown_ext_t * copy_ext = lv_obj_get_ext_attr(copy);
+//        if(copy_ext->static_txt == 0)
+//            lv_dropdown_set_options(ddlist, lv_dropdown_get_options(copy));
+//        else
+//            lv_dropdown_set_options_static(ddlist, lv_dropdown_get_options(copy));
+//        ext->option_cnt        = copy_ext->option_cnt;
+//        ext->sel_opt_id     = copy_ext->sel_opt_id;
+//        ext->sel_opt_id_orig = copy_ext->sel_opt_id;
+//        ext->symbol           = copy_ext->symbol;
+//        ext->max_height      = copy_ext->max_height;
+//        ext->text      = copy_ext->text;
+//        ext->dir      = copy_ext->dir;
+    }
+
+   LV_CLASS_CONSTRUCTOR_END(obj, lv_switch)
+   LV_LOG_INFO("dropdown created");
+}
+
+static void lv_dropdown_destructor(void * obj)
+{
+//    lv_bar_t * bar = obj;
+//
+//    _lv_obj_reset_style_list_no_refr(obj, LV_BAR_PART_INDIC);
+//    _lv_obj_reset_style_list_no_refr(sw, LV_PART_KNOB);
+//
+//    bar->class_p->base_p->destructor(obj);
+}
+
+/**
  * Handle the drawing related tasks of the drop down list
  * @param ddlist pointer to an object
  * @param clip_area the object will be drawn only in this area
@@ -664,7 +691,7 @@ void lv_dropdown_close(lv_obj_t * ddlist)
  *             LV_DESIGN_DRAW_POST: drawing after every children are drawn
  * @param return an element of `lv_design_res_t`
  */
-static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * clip_area, lv_design_mode_t mode)
+static lv_design_res_t lv_dropdown_design(lv_obj_t * obj, const lv_area_t * clip_area, lv_design_mode_t mode)
 {
     /*Return false if the object is not covers the mask_p area*/
     if(mode == LV_DESIGN_COVER_CHK) {
@@ -674,7 +701,7 @@ static lv_design_res_t lv_dropdown_design(lv_obj_t * ddlist, const lv_area_t * c
     else if(mode == LV_DESIGN_DRAW_MAIN) {
         ancestor_design(ddlist, clip_area, mode);
 
-        lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+        lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
         lv_style_int_t left = lv_obj_get_style_pad_left(ddlist, LV_DROPDOWN_PART_MAIN);
         lv_style_int_t right = lv_obj_get_style_pad_right(ddlist, LV_DROPDOWN_PART_MAIN);
@@ -775,8 +802,8 @@ static lv_design_res_t lv_dropdown_list_design(lv_obj_t * page, const lv_area_t 
         ancestor_list_design(page, clip_area, mode);
 
         lv_dropdown_list_ext_t * page_ext = lv_obj_get_ext_attr(page);
-        lv_obj_t * ddlist = page_ext->ddlist;
-        lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+        lv_obj_t * obj = page_ext->ddlist;
+        lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
         /*Draw the boxes if the page is not being deleted*/
         if(ext->list) {
@@ -801,8 +828,8 @@ static lv_design_res_t lv_dropdown_list_design(lv_obj_t * page, const lv_area_t 
 
         /*Redraw the text on the selected area with a different color*/
         lv_dropdown_list_ext_t * page_ext = lv_obj_get_ext_attr(page);
-        lv_obj_t * ddlist = page_ext->ddlist;
-        lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+        lv_obj_t * obj = page_ext->ddlist;
+        lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
         /*Draw the box labels if the list is not being deleted*/
         if(ext->list) {
@@ -831,7 +858,7 @@ static lv_design_res_t lv_dropdown_list_design(lv_obj_t * page, const lv_area_t 
  * @param param pointer to a signal specific variable
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * param)
+static lv_res_t lv_dropdown_signal(lv_obj_t * obj, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
@@ -840,7 +867,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
     if(res != LV_RES_OK) return res;
     if(sign == LV_SIGNAL_GET_TYPE) return _lv_obj_handle_get_type_signal(param, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     if(sign == LV_SIGNAL_GET_STYLE) {
         lv_get_style_info_t * info = param;
@@ -964,7 +991,7 @@ static lv_res_t lv_dropdown_signal(lv_obj_t * ddlist, lv_signal_t sign, void * p
  * @param param pointer to a signal specific variable
  * @return LV_RES_OK: the object is not deleted in the function; LV_RES_INV: the object is deleted
  */
-static lv_res_t lv_dropdown_page_signal(lv_obj_t * list, lv_signal_t sign, void * param)
+static lv_res_t lv_dropdown_list_signal(lv_obj_t * list, lv_signal_t sign, void * param)
 {
     lv_res_t res;
 
@@ -973,7 +1000,7 @@ static lv_res_t lv_dropdown_page_signal(lv_obj_t * list, lv_signal_t sign, void 
     if(res != LV_RES_OK) return res;
 
     lv_dropdown_list_ext_t * list_ext = lv_obj_get_ext_attr(list);
-    lv_obj_t * ddlist = list_ext->ddlist;
+    lv_obj_t * obj = list_ext->ddlist;
 
     if(sign == LV_SIGNAL_RELEASED) {
         if(lv_indev_get_scroll_obj(lv_indev_get_act()) == NULL) {
@@ -984,11 +1011,11 @@ static lv_res_t lv_dropdown_page_signal(lv_obj_t * list, lv_signal_t sign, void 
         page_press_handler(list);
     }
     else if(sign == LV_SIGNAL_CLEANUP) {
-        lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+        lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
         ext->list  = NULL; /*The list is just being deleted*/
     }
     else if(sign == LV_SIGNAL_SCROLL_BEGIN) {
-        lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+        lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
         ext->pr_opt_id = LV_DROPDOWN_PR_NONE;
         lv_obj_invalidate(list);
     }
@@ -1001,11 +1028,11 @@ static lv_res_t lv_dropdown_page_signal(lv_obj_t * list, lv_signal_t sign, void 
  * @param part the part from `lv_dropdown_part_t`. (LV_DROPDOWN_PART_...)
  * @return pointer to the style descriptor of the specified part
  */
-static lv_style_list_t * lv_dropdown_get_style(lv_obj_t * ddlist, uint8_t part)
+static lv_style_list_t * lv_dropdown_get_style(lv_obj_t * obj, uint8_t part)
 {
-    LV_ASSERT_OBJ(ddlist, LV_OBJX_NAME);
+    LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     lv_style_list_t * style_dsc_p;
 
     switch(part) {
@@ -1025,9 +1052,9 @@ static lv_style_list_t * lv_dropdown_get_style(lv_obj_t * ddlist, uint8_t part)
     return style_dsc_p;
 }
 
-static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_state_t state)
+static void draw_box(lv_obj_t * obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state)
 {
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     lv_obj_t * list = ext->list;
     lv_state_t state_orig = list->state;
 
@@ -1063,9 +1090,9 @@ static void draw_box(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id
 
 
 
-static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint16_t id, lv_state_t state)
+static void draw_box_label(lv_obj_t * obj, const lv_area_t * clip_area, uint16_t id, lv_state_t state)
 {
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     lv_obj_t * page = ext->list;
     lv_state_t state_orig = page->state;
 
@@ -1117,9 +1144,9 @@ static void draw_box_label(lv_obj_t * ddlist, const lv_area_t * clip_area, uint1
 static lv_res_t list_release_handler(lv_obj_t * page)
 {
     lv_dropdown_list_ext_t * page_ext = lv_obj_get_ext_attr(page);
-    lv_obj_t * ddlist = page_ext->ddlist;
+    lv_obj_t * obj = page_ext->ddlist;
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     lv_indev_t * indev = lv_indev_get_act();
 #if LV_USE_GROUP
@@ -1157,9 +1184,9 @@ static lv_res_t list_release_handler(lv_obj_t * page)
 static void page_press_handler(lv_obj_t * page)
 {
     lv_dropdown_list_ext_t * page_ext = lv_obj_get_ext_attr(page);
-    lv_obj_t * ddlist = page_ext->ddlist;
+    lv_obj_t * obj = page_ext->ddlist;
 
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
 
     lv_indev_t * indev = lv_indev_get_act();
     if(indev && (lv_indev_get_type(indev) == LV_INDEV_TYPE_POINTER || lv_indev_get_type(indev) == LV_INDEV_TYPE_BUTTON)) {
@@ -1170,7 +1197,7 @@ static void page_press_handler(lv_obj_t * page)
     }
 }
 
-static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t y)
+static uint16_t get_id_on_point(lv_obj_t * obj, lv_coord_t y)
 {
     lv_obj_t * label = get_label(ddlist);
     if(label == NULL) return 0;
@@ -1192,7 +1219,7 @@ static uint16_t get_id_on_point(lv_obj_t * ddlist, lv_coord_t y)
  * Set the position of list when it is closed to show the selected item
  * @param ddlist pointer to a drop down list
  */
-static void position_to_selected(lv_obj_t * ddlist)
+static void position_to_selected(lv_obj_t * obj)
 {
     lv_dropdown_ext_t * ext          = lv_obj_get_ext_attr(ddlist);
 
@@ -1216,9 +1243,9 @@ static void position_to_selected(lv_obj_t * ddlist)
     lv_obj_invalidate(ext->list);
 }
 
-static lv_obj_t * get_label(const lv_obj_t * ddlist)
+static lv_obj_t * get_label(const lv_obj_t * obj)
 {
-    lv_dropdown_ext_t * ext = lv_obj_get_ext_attr(ddlist);
+    lv_dropdown_t * dropdown = (lv_dropdown_t *) obj;
     if(ext->list == NULL) return NULL;
 
     return lv_obj_get_child(ext->list, NULL);
