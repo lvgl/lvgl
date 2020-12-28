@@ -413,6 +413,8 @@ void _lv_obj_refresh_style(lv_obj_t * obj,lv_style_prop_t prop)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
+    update_cache(obj, LV_PART_MAIN, prop);
+
     lv_obj_invalidate(obj);
     if(prop == LV_STYLE_PROP_ALL || (prop & LV_STYLE_PROP_LAYOUT_REFR)) {
         lv_signal_send(obj, LV_SIGNAL_STYLE_CHG, NULL);
@@ -428,9 +430,6 @@ void _lv_obj_refresh_style(lv_obj_t * obj,lv_style_prop_t prop)
     {
         refresh_children_style(obj);
     }
-
-    update_cache(obj, LV_PART_MAIN, prop);
-
 }
 
 /**
@@ -594,7 +593,6 @@ void _lv_obj_create_style_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8
  */
 _lv_style_state_cmp_t _lv_obj_style_state_compare(lv_obj_t * obj, lv_state_t state1, lv_state_t state2)
 {
-    return _LV_STYLE_STATE_CMP_DIFF_LAYOUT;
     lv_obj_style_list_t * list = &obj->style_list;
     _lv_style_state_cmp_t res = _LV_STYLE_STATE_CMP_SAME;
 
@@ -662,7 +660,7 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
 {
     lv_obj_style_list_t * list = &obj->style_list;
     if(part != LV_PART_MAIN) return;
-    list->cache_state = 0x3ff; /*Set an invalid state to disable cache reading*/
+    list->cache_state = LV_OBJ_STYLE_CACHE_STATE_INVALID; /*Set an invalid state to disable cache reading*/
 
     lv_style_value_t v;
     /*Unset or Set*/
@@ -758,6 +756,19 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
             list->cache_transform_zero = 1;
         } else {
             list->cache_transform_zero = 0;
+        }
+    }   if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_MARGIN_TOP || prop == LV_STYLE_MARGIN_BOTTOM ||
+            prop == LV_STYLE_MARGIN_LEFT || prop == LV_STYLE_MARGIN_RIGHT) {
+        lv_style_value_t vt[4];
+        if(get_prop_core(obj, part, LV_STYLE_MARGIN_TOP, &vt[0]) == false) vt[0]._int = 0;
+        if(get_prop_core(obj, part, LV_STYLE_MARGIN_BOTTOM, &vt[1]) == false) vt[1]._int = 0;
+        if(get_prop_core(obj, part, LV_STYLE_MARGIN_LEFT, &vt[2]) == false) vt[2]._int = 0;
+        if(get_prop_core(obj, part, LV_STYLE_MARGIN_RIGHT, &vt[3]) == false) vt[3]._int = 0;
+
+        if(vt[0]._int == 0 && vt[1]._int == 0 && vt[2]._int == 0 && vt[3]._int == 0) {
+            list->cache_margin_zero = 1;
+        } else {
+            list->cache_margin_zero = 0;
         }
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_BG_BLEND_MODE) {
@@ -898,6 +909,13 @@ static cache_t read_cache(const lv_obj_t * obj, lv_part_t part, lv_style_prop_t 
     case LV_STYLE_TRANSFORM_HEIGHT:
     case LV_STYLE_TRANSFORM_WIDTH:
         if(list->cache_transform_zero ) return CACHE_ZERO;
+        else return CACHE_NEED_CHECK;
+        break;
+    case LV_STYLE_MARGIN_TOP:
+    case LV_STYLE_MARGIN_BOTTOM:
+    case LV_STYLE_MARGIN_LEFT:
+    case LV_STYLE_MARGIN_RIGHT:
+        if(list->cache_margin_zero) return CACHE_ZERO;
         else return CACHE_NEED_CHECK;
         break;
     case LV_STYLE_BG_BLEND_MODE:

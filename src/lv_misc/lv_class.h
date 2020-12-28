@@ -10,32 +10,6 @@
 extern "C" {
 #endif
 
-
-/* EXAMPLE CLASS DECLARATION
-
-LV_CLASS_DECLARE_START(person, lv_base)
-
-#define _person_create struct _person_t * (*create)(struct _person_t * father, struct _person_t * mother)
-#define _person_create_static struct _person_t * (*create_static)(struct _person_t * p, struct _person_t * father, struct _person_t * mother)
-
-#define _person_data             \
-  _lv_base_data                  \
-  bool male;                    \
-  char name[64];                \
-  uint32_t age;                 \
-  struct _person_t * mother;    \
-  struct _person_t * father;    \
-
-#define _person_class_dsc        \
-  _lv_base_class_dsc             \
-  uint32_t max_age;              \
-  void (*set_name)(struct _person_t * p, const char * name);
-
-LV_CLASS_DECLARE_END(person, lv_base)
-
- */
-
-
 /*********************
  *      INCLUDES
  *********************/
@@ -138,7 +112,7 @@ typedef struct _##classname##_t {                        \
   ((lv_base_t*)inst)->class_p = _original_class_p;
 
 /**
- * Initialize a class. Need to be called only once for every class
+ * Initialize a class. Need to be called only once per class
  */
 #define LV_CLASS_INIT(classname, basename)   _lv_class_init(&(classname), sizeof(classname##_class_t), sizeof(classname##_t), &(basename));
 

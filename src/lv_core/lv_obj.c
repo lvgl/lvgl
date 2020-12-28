@@ -1468,7 +1468,7 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
 
     obj->state = LV_STATE_BORN;
-    obj->style_list.cache_state = 0x3f;
+    obj->style_list.cache_state = LV_OBJ_STYLE_CACHE_STATE_INVALID;
 
     /*Copy the attributes if required*/
     if(copy != NULL) {

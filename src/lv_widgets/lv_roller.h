@@ -36,28 +36,40 @@ enum {
 
 typedef uint8_t lv_roller_mode_t;
 
+LV_CLASS_DECLARE_START(lv_roller, lv_obj);
+
+#define _lv_roller_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
+
+#define _lv_roller_data             \
+  _lv_obj_data                  \
+  uint16_t option_cnt;          /*Number of options*/       \
+  uint16_t sel_opt_id;          /*Index of the current option*/ \
+  uint16_t sel_opt_id_ori;      /*Store the original index on focus*/   \
+  uint32_t anim_time;           \
+  lv_roller_mode_t mode : 1;    \
+  uint32_t moved : 1;   \
+
+#define _lv_roller_class_dsc        \
+  _lv_obj_class_dsc              \
+
+LV_CLASS_DECLARE_END(lv_roller, lv_obj);
+
+extern lv_roller_class_t lv_roller;
 
 
-/*Data of roller*/
-typedef struct {
-    /*No inherited ext.*/ /*Ext. of ancestor*/
+LV_CLASS_DECLARE_START(lv_roller_label, lv_label);
 
-    /*New data for this type */
-    lv_style_list_t style_sel; /*Style of the selected option*/
-    uint16_t option_cnt;          /*Number of options*/
-    uint16_t sel_opt_id;          /*Index of the current option*/
-    uint16_t sel_opt_id_ori;      /*Store the original index on focus*/
-    uint32_t anim_time;
-    lv_roller_mode_t mode : 1;
-    uint32_t moved : 1;
-} lv_roller_ext_t;
+#define _lv_roller_label_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
 
-enum {
-    LV_ROLLER_PART_BG = LV_OBJ_PART_MAIN,
-    LV_ROLLER_PART_SELECTED,
-    _LV_ROLLER_PART_VIRTUAL_LAST,
-};
-typedef uint8_t lv_roller_part_t;
+#define _lv_roller_label_data             \
+  _lv_label_data                  \
+
+#define _lv_roller_label_class_dsc        \
+  _lv_label_class_dsc              \
+
+LV_CLASS_DECLARE_END(lv_roller_label, lv_label);
+
+extern lv_roller_label_class_t lv_roller_label;
 
 /**********************
  * GLOBAL PROTOTYPES
@@ -88,7 +100,7 @@ void lv_roller_set_options(lv_obj_t * roller, const char * options, lv_roller_mo
  * @param roller - pointer to a roller object
  * @param align - one of lv_label_align_t values (left, right, center)
  */
-void lv_roller_set_align(lv_obj_t * roller, lv_label_align_t align);
+void lv_roller_set_label_align(lv_obj_t * roller, lv_label_align_t align);
 
 /**
  * Set the selected option
@@ -142,7 +154,7 @@ void lv_roller_get_selected_str(const lv_obj_t * roller, char * buf, uint32_t bu
  * @param roller pointer to a roller object
  * @return LV_LABEL_ALIGN_LEFT, LV_LABEL_ALIGN_RIGHT or LV_LABEL_ALIGN_CENTER
  */
-lv_label_align_t lv_roller_get_align(const lv_obj_t * roller);
+lv_label_align_t lv_roller_get_label_align(const lv_obj_t * roller);
 
 /**
  * Get the options of a roller

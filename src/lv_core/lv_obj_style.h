@@ -20,6 +20,7 @@ extern "C" {
 /*********************
  *      DEFINES
  *********************/
+#define LV_OBJ_STYLE_CACHE_STATE_INVALID    0x3ff
 
 /**********************
  *      TYPEDEFS
@@ -44,7 +45,7 @@ typedef struct {
 
 typedef struct {
     lv_obj_style_t * styles;
-    uint32_t style_cnt  :8;
+    uint32_t style_cnt  :6;
     uint32_t skip_trans :1;
     uint32_t cache_state :10;
 
@@ -67,6 +68,7 @@ typedef struct {
 
     /*Zero or Needs check*/
     uint32_t cache_transform_zero:1;
+    uint32_t cache_margin_zero:1;
     uint32_t cache_bg_blend_mode_zero:1;
     uint32_t cache_bg_grad_dir_zero:1;
     uint32_t cache_border_blend_mode_zero:1;

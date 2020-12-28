@@ -215,10 +215,6 @@ void lv_obj_init_draw_label_dsc(lv_obj_t * obj, uint8_t part, lv_draw_label_dsc_
 
     draw_dsc->font = lv_obj_get_style_text_font(obj, part);
 
-//    if(draw_dsc->sel_start != LV_DRAW_LABEL_NO_TXT_SEL && draw_dsc->sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
-//        draw_dsc->color = lv_obj_get_style_text_sel_color(obj, part);
-//    }
-
 #if LV_USE_BIDI
     draw_dsc->bidi_dir = lv_obj_get_base_dir(obj);
 #endif
@@ -417,7 +413,6 @@ void _lv_obj_refresh_ext_draw_pad(lv_obj_t * obj)
  */
 void _lv_obj_draw_scrollbar(lv_obj_t * obj, const lv_area_t * clip_area)
 {
-    return;
     if(lv_obj_has_flag(obj, LV_OBJ_FLAG_SCROLLABLE) == false) return;
 
     lv_scroll_dir_t sm = lv_obj_get_scrollbar_mode(obj);

@@ -142,9 +142,9 @@ typedef struct {
     lv_style_t lmeter;
 #endif
 
-#if LV_USE_ROLLER
-    lv_style_t roller_bg, roller_sel;
-#endif
+//#if LV_USE_ROLLER
+//    lv_style_t roller_bg, roller_sel;
+//#endif
 
 
 #if LV_USE_SWITCH
@@ -292,6 +292,7 @@ static void basic_init(void)
 
     style_init_reset(&styles->bg_color_primary);
     lv_style_set_bg_color(&styles->bg_color_primary, theme.color_primary);
+    lv_style_set_text_color(&styles->bg_color_primary, LV_COLOR_WHITE);
     lv_style_set_bg_opa(&styles->bg_color_primary, LV_OPA_COVER);
 
     style_init_reset(&styles->bg_color_gray);
@@ -485,18 +486,18 @@ static void ddlist_init(void)
 #endif
 }
 
-static void roller_init(void)
-{
-#if LV_USE_ROLLER != 0
-    style_init_reset(&styles->roller_bg);
-    lv_style_set_text_line_space(&styles->roller_bg, LV_STATE_DEFAULT, LV_DPX(25));
-
-    style_init_reset(&styles->roller_sel);
-    lv_style_set_bg_opa(&styles->roller_sel, LV_STATE_DEFAULT, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->roller_sel, LV_STATE_DEFAULT, theme.color_primary);
-    lv_style_set_text_color(&styles->roller_sel, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-#endif
-}
+//static void roller_init(void)
+//{
+//#if LV_USE_ROLLER != 0
+//    style_init_reset(&styles->roller_bg);
+//    lv_style_set_text_line_space(&styles->roller_bg, LV_STATE_DEFAULT, LV_DPX(25));
+//
+//    style_init_reset(&styles->roller_sel);
+//    lv_style_set_bg_opa(&styles->roller_sel, LV_STATE_DEFAULT, LV_OPA_COVER);
+//    lv_style_set_bg_color(&styles->roller_sel, LV_STATE_DEFAULT, theme.color_primary);
+//    lv_style_set_text_color(&styles->roller_sel, LV_STATE_DEFAULT, LV_COLOR_WHITE);
+//#endif
+//}
 
 static void tabview_init(void)
 {
@@ -577,7 +578,6 @@ lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_se
     chart_init();
     textarea_init();
     ddlist_init();
-    roller_init();
     tabview_init();
     tileview_init();
     table_init();
@@ -677,12 +677,16 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
         lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
         lv_obj_add_style(obj, LV_PART_SERIES, LV_STATE_DEFAULT, &styles->chart_series);
-//        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->circle);
-//        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->bg_color_primary);
-//        lv_obj_add_style(obj, LV_PART_INDICATOR, LV_STATE_DEFAULT, &styles->circle);
-//        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->knob);
-//        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->bg_color_white);
-//        lv_obj_add_style(obj, LV_PART_KNOB, LV_STATE_DEFAULT, &styles->pad_small_negative);
+    }
+#endif
+#if LV_USE_ROLLER
+    else if(lv_obj_check_type(obj, &lv_roller)) {
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+//        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->pad_zero);
+        lv_obj_add_style(obj, LV_PART_HIGHLIGHT, LV_STATE_DEFAULT, &styles->bg_color_primary);
+//        lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_DEFAULT, &styles->scrollbar);
+//        lv_obj_add_style(obj, LV_PART_SCROLLBAR, LV_STATE_SCROLLED, &styles->scrollbar_scrolled);
+//        lv_obj_add_style(obj, LV_PART_SERIES, LV_STATE_DEFAULT, &styles->chart_series);
     }
 #endif
 #if LV_USE_BTNMATRIX
@@ -732,18 +736,6 @@ case LV_THEME_ARC:
     _lv_style_list_add_style(list, &styles->card);
     _lv_style_list_add_style(list, &styles->bg_click);
     _lv_style_list_add_style(list, &styles->arc_knob);
-    break;
-#endif
-
-#if LV_USE_ROLLER
-case LV_THEME_ROLLER:
-    list = _lv_obj_get_style_list(obj, LV_ROLLER_PART_BG);
-    _lv_style_list_add_style(list, &styles->card);
-    _lv_style_list_add_style(list, &styles->roller_bg);
-    _lv_style_list_add_style(list, &styles->sb);
-
-    list = _lv_obj_get_style_list(obj, LV_ROLLER_PART_SELECTED);
-    _lv_style_list_add_style(list, &styles->roller_sel);
     break;
 #endif
 

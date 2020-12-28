@@ -41,8 +41,6 @@ typedef struct {
     const char * text;           /*Text to display on the ddlist's button*/
     const char * symbol;         /*Arrow or other icon when the drop-down list is closed*/
     char * options;
-    lv_style_list_t style_selected; /*Style of the selected option*/
-    lv_style_list_t style_list;     /*Style of the dropped down list*/
     lv_coord_t max_height;        /*Height of the ddlist when opened. (0: auto-size)*/
     uint16_t option_cnt;          /*Number of options*/
     uint16_t sel_opt_id;          /*Index of the currently selected option*/
@@ -52,14 +50,20 @@ typedef struct {
     uint8_t static_txt : 1;
 } lv_dropdown_ext_t;
 
-enum {
-    LV_DROPDOWN_PART_MAIN = LV_OBJ_PART_MAIN,
-    LV_DROPDOWN_PART_LIST,
-    LV_DROPDOWN_PART_SELECTED,
-    _LV_DROPDOWN_PART_LAST
-};
-typedef uint8_t lv_dropdown_part_t;
 
+LV_CLASS_DECLARE_START(lv_dropdown, lv_obj);
+
+#define _lv_roller_label_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
+
+#define _lv_roller_label_data             \
+  _lv_label_data                  \
+
+#define _lv_roller_label_class_dsc        \
+  _lv_label_class_dsc              \
+
+LV_CLASS_DECLARE_END(lv_roller_label, lv_label);
+
+extern lv_roller_label_class_t lv_roller_label;
 /**********************
  * GLOBAL PROTOTYPES
  **********************/

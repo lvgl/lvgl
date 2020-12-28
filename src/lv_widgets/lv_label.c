@@ -1209,23 +1209,9 @@ static lv_design_res_t lv_label_design(lv_obj_t * obj, const lv_area_t * clip_ar
         return LV_DESIGN_RES_NOT_COVER;
     else if(mode == LV_DESIGN_DRAW_MAIN) {
 
+        lv_obj.design_cb(obj, clip_area, mode);
+
         lv_label_t * label = (lv_label_t *) obj;
-
-        lv_coord_t w = lv_obj_get_style_transform_width(obj, LV_PART_MAIN);
-        lv_coord_t h = lv_obj_get_style_transform_height(obj, LV_PART_MAIN);
-        lv_area_t bg_coords;
-        lv_area_copy(&bg_coords, &label->coords);
-        bg_coords.x1 -= w;
-        bg_coords.x2 += w;
-        bg_coords.y1 -= h;
-        bg_coords.y2 += h;
-
-        lv_draw_rect_dsc_t draw_rect_dsc;
-        lv_draw_rect_dsc_init(&draw_rect_dsc);
-        lv_obj_init_draw_rect_dsc(obj, LV_PART_MAIN, &draw_rect_dsc);
-
-        lv_draw_rect(&bg_coords, clip_area, &draw_rect_dsc);
-
         lv_area_t txt_coords;
         get_txt_coords(obj, &txt_coords);
 
@@ -1245,12 +1231,17 @@ static lv_design_res_t lv_label_design(lv_obj_t * obj, const lv_area_t * clip_ar
         lv_draw_label_dsc_t label_draw_dsc;
         lv_draw_label_dsc_init(&label_draw_dsc);
 
-        label_draw_dsc.sel_start = lv_label_get_text_sel_start(obj);
-        label_draw_dsc.sel_end = lv_label_get_text_sel_end(obj);
         label_draw_dsc.ofs_x = label->offset.x;
         label_draw_dsc.ofs_y = label->offset.y;
         label_draw_dsc.flag = flag;
         lv_obj_init_draw_label_dsc(obj, LV_PART_MAIN, &label_draw_dsc);
+
+        label_draw_dsc.sel_start = lv_label_get_text_sel_start(obj);
+        label_draw_dsc.sel_end = lv_label_get_text_sel_end(obj);
+        if(label_draw_dsc.sel_start != LV_DRAW_LABEL_NO_TXT_SEL && label_draw_dsc.sel_end != LV_DRAW_LABEL_NO_TXT_SEL) {
+            label_draw_dsc.sel_color = lv_obj_get_style_text_color_filtered(obj, LV_PART_HIGHLIGHT);
+            label_draw_dsc.sel_bg_color = lv_obj_get_style_bg_color(obj, LV_PART_HIGHLIGHT);
+        }
 
         /* In SROLL and SROLL_CIRC mode the CENTER and RIGHT are pointless so remove them.
          * (In addition they will result misalignment is this case)*/
@@ -1298,6 +1289,8 @@ static lv_design_res_t lv_label_design(lv_obj_t * obj, const lv_area_t * clip_ar
                 lv_draw_label(&txt_coords, &txt_clip, &label_draw_dsc, label->text, hint);
             }
         }
+    } else if(mode == LV_DESIGN_DRAW_POST) {
+        lv_obj.design_cb(obj, clip_area, mode);
     }
 
     return LV_DESIGN_RES_OK;

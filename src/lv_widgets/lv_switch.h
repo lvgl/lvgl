@@ -32,7 +32,6 @@ extern "C" {
  *      TYPEDEFS
  **********************/
 
-
 LV_CLASS_DECLARE_START(lv_switch, lv_obj);
 
 #define _lv_switch_constructor   void (*constructor)(struct _lv_obj_t * obj, struct _lv_obj_t * parent, const struct _lv_obj_t * copy)
