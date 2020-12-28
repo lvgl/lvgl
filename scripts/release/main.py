@@ -55,7 +55,7 @@ if __name__ == '__main__':
         print("Invalid argument. Usage ./release.py bugfix | minor | major") 
         exit(1)
      
-    os.chdir(workdir)
+    #os.chdir(workdir)
     clone_repos()
     release.make()
     for p in proj_list:

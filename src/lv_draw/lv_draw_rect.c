@@ -1241,6 +1241,10 @@ static void draw_content(const lv_area_t * coords, const lv_area_t * clip, const
 
     if(src_type == LV_IMG_SRC_SYMBOL)  lv_draw_label(&coords_tmp, clip, &label_dsc, dsc->content_src, NULL);
     else lv_draw_img(&coords_tmp, clip, dsc->content_src, &img_dsc);
+
+#if LV_USE_ARABIC_PERSIAN_CHARS
+    _lv_mem_buf_release(str);
+#endif
 }
 #endif
 

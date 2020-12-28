@@ -165,8 +165,9 @@ void lv_init(void)
     _lv_indev_init();
 
     _lv_img_decoder_init();
+#if LV_IMG_CACHE_DEF_SIZE
     lv_img_cache_set_size(LV_IMG_CACHE_DEF_SIZE);
-
+#endif
     /*Test if the IDE has UTF-8 encoding*/
     char * txt = "Á";
 

@@ -9,13 +9,13 @@
 #include "lv_table.h"
 #if LV_USE_TABLE != 0
 
-#include "../lv_misc/lv_debug.h"
 #include "../lv_core/lv_indev.h"
+#include "../lv_misc/lv_debug.h"
 #include "../lv_misc/lv_txt.h"
 #include "../lv_misc/lv_txt_ap.h"
 #include "../lv_misc/lv_math.h"
-#include "../lv_draw/lv_draw_label.h"
 #include "../lv_misc/lv_printf.h"
+#include "../lv_draw/lv_draw_label.h"
 #include "../lv_themes/lv_theme.h"
 
 /*********************
