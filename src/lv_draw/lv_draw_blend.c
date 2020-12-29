@@ -25,7 +25,6 @@
  *********************/
 #define GPU_SIZE_LIMIT      240
 
-
 /**********************
  *      TYPEDEFS
  **********************/
@@ -757,11 +756,10 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
 
         if(opa > LV_OPA_MAX) {
 #if LV_USE_GPU_NXP_PXP
-<<<<<<< HEAD
-        if (lv_area_get_size(draw_area) >= GPU_NXP_PXP_BLIT_SIZE_LIMIT) {
-            lv_gpu_nxp_pxp_blit(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h, opa);
-            return;
-        }
+            if(lv_area_get_size(draw_area) >= LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT) {
+                lv_gpu_nxp_pxp_blit(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h, opa);
+                return;
+            }
 #elif (LV_USE_GPU_NXP_VG_LITE)
             if(lv_area_get_size(draw_area) >= LV_GPU_NXP_VG_LITE_BLIT_SIZE_LIMIT) {
 
@@ -792,17 +790,12 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                     return;
                 }
                 /* Fall down to SW render in case of error */
-=======
-            if(lv_area_get_size(draw_area) >= LV_GPU_NXP_PXP_BLIT_SIZE_LIMIT) {
-                lv_gpu_nxp_pxp_blit(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h, opa);
-                return;
->>>>>>> 4c7a2ae0b7d8f564b22e7774039f6cbe5385926c
             }
 #elif LV_USE_GPU_STM32_DMA2D
-        if(lv_area_get_size(draw_area) >= 240) {
-            lv_gpu_stm32_dma2d_copy(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h);
-            return;
-        }
+            if(lv_area_get_size(draw_area) >= 240) {
+                lv_gpu_stm32_dma2d_copy(disp_buf_first, disp_w, map_buf_first, map_w, draw_area_w, draw_area_h);
+                return;
+            }
 #endif
 
             /*Software rendering*/
