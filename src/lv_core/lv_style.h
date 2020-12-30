@@ -728,11 +728,11 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop);
 
 
 uint32_t lv_style_find_index_num(lv_style_value_t v);
-int32_t lv_style_get_indexed_num(uint32_t id);
 uint32_t lv_style_find_index_color(lv_style_value_t v);
-lv_color_t lv_style_get_indexed_color(uint32_t id);
 uint32_t lv_style_find_index_ptr(lv_style_value_t v);
-int32_t lv_style_get_indexed_ptr(uint32_t id);
+int32_t lv_style_get_indexed_num(uint32_t id);
+lv_color_t lv_style_get_indexed_color(uint32_t id);
+const void * lv_style_get_indexed_ptr(uint32_t id);
 
 /**
  * Check whether a style is valid (initialized correctly)

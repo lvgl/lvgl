@@ -179,12 +179,6 @@ uint32_t lv_style_find_index_num(lv_style_value_t v)
     return 0;
 }
 
-int32_t lv_style_get_indexed_num(uint32_t id)
-{
-    return buf_num[id];
-}
-
-
 uint32_t lv_style_find_index_color(lv_style_value_t v)
 {
     uint32_t i;
@@ -193,12 +187,6 @@ uint32_t lv_style_find_index_color(lv_style_value_t v)
     }
     return 0;
 }
-
-lv_color_t lv_style_get_indexed_color(uint32_t id)
-{
-    return buf_color[id];
-}
-
 
 uint32_t lv_style_find_index_ptr(lv_style_value_t v)
 {
@@ -209,25 +197,22 @@ uint32_t lv_style_find_index_ptr(lv_style_value_t v)
     return 0;
 }
 
-int32_t lv_style_get_indexed_ptr(uint32_t id)
+int32_t lv_style_get_indexed_num(uint32_t id)
 {
-    return buf_ptr[id];
+    return buf_num[id];
 }
 
-
-uint32_t lv_style_find_index_color(lv_style_value_t v)
-{
-    uint32_t i;
-    for(i = 1; i < buf_color_p; i++) {
-        if(v._color.full == buf_color[i].full)  return i;
-    }
-    return 0;
-}
 
 lv_color_t lv_style_get_indexed_color(uint32_t id)
 {
     return buf_color[id];
 }
+
+const void * lv_style_get_indexed_ptr(uint32_t id)
+{
+    return buf_ptr[id];
+}
+
 
 
 /**
