@@ -38,6 +38,7 @@ static const void * buf_ptr[16];
 static lv_color_t buf_color[16];
 static uint32_t buf_num_p = 1;
 static uint32_t buf_color_p = 1;
+static uint32_t buf_ptr_p = 1;
 
 /**********************
  *      MACROS
@@ -107,10 +108,6 @@ void _alloc_ext(lv_style_t * style)
     style->ext = lv_mem_alloc(sizeof(lv_style_ext_t));
     LV_ASSERT_MEM(style->ext);
     _lv_memset_00(style->ext, sizeof(lv_style_ext_t));
-
-    static uint32_t c = 0;
-    printf("alloc: %d\n", c);
-    c++;
 }
 
 void lv_style_set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t value)
@@ -191,7 +188,7 @@ uint32_t lv_style_find_index_color(lv_style_value_t v)
 uint32_t lv_style_find_index_ptr(lv_style_value_t v)
 {
     uint32_t i;
-    for(i = 1; i < buf_ptr; i++) {
+    for(i = 1; i < buf_ptr_p; i++) {
         if(v.ptr == buf_ptr[i])  return i;
     }
     return 0;
@@ -283,15 +280,14 @@ static int32_t alloc_index_num(lv_style_value_t v)
 
 static int32_t alloc_index_ptr(lv_style_value_t v)
 {
-    static uint32_t p = 1;
     uint32_t i;
-    for(i = 1; i < p; i++) {
+    for(i = 1; i < buf_ptr_p; i++) {
         if(v.ptr == buf_ptr[i])  return i;
     }
-    if(p < 16) {
-        buf_ptr[p] = v.ptr;
-        p++;
-        return p - 1;
+    if(buf_ptr_p < 16) {
+        buf_ptr[buf_ptr_p] = v.ptr;
+        buf_ptr_p++;
+        return buf_ptr_p - 1;
     }
     return 0;
 }
