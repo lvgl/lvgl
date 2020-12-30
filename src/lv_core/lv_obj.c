@@ -230,8 +230,6 @@ void lv_obj_create_finish(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t * co
 {
     if(!copy) lv_theme_apply(obj);
 //    else lv_style_list_copy(&checkbox->style_indic, &checkbox_copy->style_indic);
-
-    lv_obj_clear_state(obj, LV_STATE_BORN);
 }
 
 /**
@@ -1476,7 +1474,6 @@ static void lv_obj_constructor(lv_obj_t * obj, lv_obj_t * parent, const lv_obj_t
     obj->flags |= LV_OBJ_FLAG_FOCUS_SCROLL;
     if(parent) obj->flags |= LV_OBJ_FLAG_GESTURE_BUBBLE;
 
-    obj->state = LV_STATE_BORN;
     obj->style_list.cache_state = LV_OBJ_STYLE_CACHE_STATE_INVALID;
 
     /*Copy the attributes if required*/

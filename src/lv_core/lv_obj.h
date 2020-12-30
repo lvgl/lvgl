@@ -162,7 +162,6 @@ enum {
     LV_STATE_PRESSED  =  0x10,
     LV_STATE_SCROLLED =  0x20,
     LV_STATE_DISABLED =  0x40,
-    LV_STATE_BORN     =  0x80,
 };
 
 typedef uint8_t lv_state_t;
