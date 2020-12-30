@@ -454,8 +454,8 @@ void lv_obj_set_parent(lv_obj_t * obj, lv_obj_t * parent)
     else  old_pos.x = old_parent->coords.x2 - obj->coords.x2;
 
     /*Remove the object from the old parent's child list*/
-    uint32_t i;
-    for(i = lv_obj_get_child_id(obj); i < lv_obj_get_child_cnt(old_parent) - 2; i++) {
+    int32_t i;
+    for(i = lv_obj_get_child_id(obj); i <= (int32_t)lv_obj_get_child_cnt(old_parent) - 2; i++) {
         old_parent->spec_attr->children[i] = old_parent->spec_attr->children[i+1];
     }
     old_parent->spec_attr->child_cnt--;
@@ -624,7 +624,12 @@ void lv_obj_add_flag(lv_obj_t * obj, lv_obj_flag_t f)
 {
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
+    if(f & LV_OBJ_FLAG_HIDDEN) {
+        lv_obj_invalidate(obj);
+    }
+
     obj->flags |= f;
+
 }
 
 
@@ -634,6 +639,9 @@ void lv_obj_clear_flag(lv_obj_t * obj, lv_obj_flag_t f)
     LV_ASSERT_OBJ(obj, LV_OBJX_NAME);
 
     obj->flags &= (~f);
+    if(f & LV_OBJ_FLAG_HIDDEN) {
+        lv_obj_invalidate(obj);
+    }
 }
 
 

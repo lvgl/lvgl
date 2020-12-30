@@ -203,7 +203,7 @@ void lv_scr_load_anim(lv_obj_t * new_scr, lv_scr_load_anim_t anim_type, uint32_t
         lv_disp_load_scr(d->scr_to_load);
         lv_anim_del(d->scr_to_load, NULL);
         lv_obj_set_pos(d->scr_to_load, 0, 0);
-        lv_style_remove_prop(lv_obj_get_local_style(d->scr_to_load, LV_OBJ_PART_MAIN), LV_STYLE_OPA_SCALE);
+        lv_style_remove_prop(lv_obj_get_local_style(d->scr_to_load, LV_PART_MAIN, LV_STATE_DEFAULT), LV_STYLE_OPA);
 
         act_scr = d->scr_to_load;
     }

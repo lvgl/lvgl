@@ -298,6 +298,7 @@ static void basic_init(void)
     style_init_reset(&styles->bg_color_gray);
     lv_style_set_bg_color(&styles->bg_color_gray, COLOR_GRAY);
     lv_style_set_bg_opa(&styles->bg_color_gray, LV_OPA_COVER);
+    lv_style_set_text_color(&styles->bg_color_gray, CARD_TEXT_COLOR);
 
     style_init_reset(&styles->bg_color_white);
     lv_style_set_bg_color(&styles->bg_color_white, LV_COLOR_WHITE);
@@ -468,23 +469,23 @@ static void textarea_init(void)
             IS_LIGHT ? COLOR_BG_TEXT_DIS : lv_color_hex(0xa1adbd));
 #endif
 }
-
-static void ddlist_init(void)
-{
-#if LV_USE_DROPDOWN != 0
-
-    style_init_reset(&styles->ddlist_page);
-    lv_style_set_text_line_space(&styles->ddlist_page, LV_STATE_DEFAULT, LV_DPX(20));
-    lv_style_set_clip_corner(&styles->ddlist_page, LV_STATE_DEFAULT, true);
-
-    style_init_reset(&styles->ddlist_sel);
-    lv_style_set_bg_opa(&styles->ddlist_sel, LV_STATE_DEFAULT, LV_OPA_COVER);
-    lv_style_set_bg_color(&styles->ddlist_sel, LV_STATE_DEFAULT, theme.color_primary);
-    lv_style_set_text_color(&styles->ddlist_sel, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex3(0xfff) : lv_color_hex3(0xfff));
-    lv_style_set_bg_color(&styles->ddlist_sel, LV_STATE_PRESSED, CARD_PR_COLOR);
-    lv_style_set_text_color(&styles->ddlist_sel, LV_STATE_PRESSED, CARD_TEXT_PR_COLOR);
-#endif
-}
+//
+//static void ddlist_init(void)
+//{
+//#if LV_USE_DROPDOWN != 0
+//
+//    style_init_reset(&styles->ddlist_page);
+//    lv_style_set_text_line_space(&styles->ddlist_page, LV_STATE_DEFAULT, LV_DPX(20));
+//    lv_style_set_clip_corner(&styles->ddlist_page, LV_STATE_DEFAULT, true);
+//
+//    style_init_reset(&styles->ddlist_sel);
+//    lv_style_set_bg_opa(&styles->ddlist_sel, LV_STATE_DEFAULT, LV_OPA_COVER);
+//    lv_style_set_bg_color(&styles->ddlist_sel, LV_STATE_DEFAULT, theme.color_primary);
+//    lv_style_set_text_color(&styles->ddlist_sel, LV_STATE_DEFAULT, IS_LIGHT ? lv_color_hex3(0xfff) : lv_color_hex3(0xfff));
+//    lv_style_set_bg_color(&styles->ddlist_sel, LV_STATE_PRESSED, CARD_PR_COLOR);
+//    lv_style_set_text_color(&styles->ddlist_sel, LV_STATE_PRESSED, CARD_TEXT_PR_COLOR);
+//#endif
+//}
 
 //static void roller_init(void)
 //{
@@ -577,11 +578,7 @@ lv_theme_t * lv_theme_default_init(lv_color_t color_primary, lv_color_t color_se
     spinner_init();
     chart_init();
     textarea_init();
-    ddlist_init();
-    tabview_init();
-    tileview_init();
     table_init();
-    win_init();
 
     theme.apply_cb = theme_apply;
 
@@ -689,6 +686,18 @@ static void theme_apply(lv_theme_t * th, lv_obj_t * obj)
 //        lv_obj_add_style(obj, LV_PART_SERIES, LV_STATE_DEFAULT, &styles->chart_series);
     }
 #endif
+
+#if LV_USE_DROPDOWN
+    else if(lv_obj_check_type(obj, &lv_dropdown)) {
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+    }
+    else if(lv_obj_check_type(obj, &lv_dropdown_list)) {
+        lv_obj_add_style(obj, LV_PART_MAIN, LV_STATE_DEFAULT, &styles->card);
+        lv_obj_add_style(obj, LV_PART_HIGHLIGHT, LV_STATE_DEFAULT, &styles->bg_color_primary);
+        lv_obj_add_style(obj, LV_PART_HIGHLIGHT, LV_STATE_PRESSED, &styles->bg_color_gray);
+    }
+#endif
+
 #if LV_USE_BTNMATRIX
 case LV_THEME_BTNMATRIX:
     list = _lv_obj_get_style_list(obj, LV_BTNMATRIX_PART_MAIN);
@@ -745,22 +754,22 @@ case LV_THEME_OBJMASK:
     break;
 #endif
 
-#if LV_USE_DROPDOWN
-case LV_THEME_DROPDOWN:
-    list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_MAIN);
-    _lv_style_list_add_style(list, &styles->card);
-    _lv_style_list_add_style(list, &styles->bg_click);
-    _lv_style_list_add_style(list, &styles->pad_small);
-
-    list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_LIST);
-    _lv_style_list_add_style(list, &styles->card);
-    _lv_style_list_add_style(list, &styles->ddlist_page);
-    _lv_style_list_add_style(list, &styles->sb);
-
-    list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_SELECTED);
-    _lv_style_list_add_style(list, &styles->ddlist_sel);
-    break;
-#endif
+//#if LV_USE_DROPDOWN
+//case LV_THEME_DROPDOWN:
+//    list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_MAIN);
+//    _lv_style_list_add_style(list, &styles->card);
+//    _lv_style_list_add_style(list, &styles->bg_click);
+//    _lv_style_list_add_style(list, &styles->pad_small);
+//
+//    list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_LIST);
+//    _lv_style_list_add_style(list, &styles->card);
+//    _lv_style_list_add_style(list, &styles->ddlist_page);
+//    _lv_style_list_add_style(list, &styles->sb);
+//
+//    list = _lv_obj_get_style_list(obj, LV_DROPDOWN_PART_SELECTED);
+//    _lv_style_list_add_style(list, &styles->ddlist_sel);
+//    break;
+//#endif
 
 //#if LV_USE_CHART
 //case LV_THEME_CHART:
