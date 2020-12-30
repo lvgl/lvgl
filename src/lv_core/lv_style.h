@@ -76,9 +76,9 @@ typedef uint8_t lv_text_decor_t;
 
 typedef union {
     int32_t num;
-    const void * _ptr;
-    void (* _func)(void);
-    lv_color_t _color;
+    const void * ptr;
+    void (* func)(void);
+    lv_color_t color;
 }lv_style_value_t;
 
 typedef enum {
@@ -452,7 +452,7 @@ static inline void lv_style_set_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_OPA, v); }
 
 static inline void lv_style_set_color_filter_cb(lv_style_t * style, lv_color_filter_cb_t value) {
-  lv_style_value_t v = {._func = (void(*)(void))value}; lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_CB, v); }
+  lv_style_value_t v = {.func = (void(*)(void))value}; lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_CB, v); }
 
 static inline void lv_style_set_color_filter_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_COLOR_FILTER_OPA, v); }
@@ -482,19 +482,19 @@ static inline void lv_style_set_margin_right(lv_style_t * style, lv_coord_t valu
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_MARGIN_RIGHT, v); }
 
 static inline void lv_style_set_bg_color(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_BG_COLOR, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_BG_COLOR, v); }
 
 static inline void lv_style_set_bg_color_filtered(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_BG_COLOR_FILTERED, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_BG_COLOR_FILTERED, v); }
 
 static inline void lv_style_set_bg_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BG_OPA, v); }
 
 static inline void lv_style_set_bg_grad_color(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_BG_GRAD_COLOR, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_BG_GRAD_COLOR, v); }
 
 static inline void lv_style_set_bg_grad_color_filtered(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_BG_GRAD_COLOR_FILTERED, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_BG_GRAD_COLOR_FILTERED, v); }
 
 static inline void lv_style_set_bg_grad_dir(lv_style_t * style, lv_grad_dir_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BG_GRAD_DIR, v); }
@@ -509,10 +509,10 @@ static inline void lv_style_set_bg_grad_stop(lv_style_t * style, lv_coord_t valu
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BG_GRAD_STOP, v); }
 
 static inline void lv_style_set_border_color(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_BORDER_COLOR, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_BORDER_COLOR, v); }
 
 static inline void lv_style_set_border_color_filtered(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_BORDER_COLOR_FILTERED, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_BORDER_COLOR_FILTERED, v); }
 
 static inline void lv_style_set_border_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BORDER_OPA, v); }
@@ -530,16 +530,16 @@ static inline void lv_style_set_border_blend_mode(lv_style_t * style, lv_blend_m
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_BORDER_BLEND_MODE, v); }
 
 static inline void lv_style_set_text_color(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_TEXT_COLOR, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_TEXT_COLOR, v); }
 
 static inline void lv_style_set_text_color_filtered(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_TEXT_COLOR_FILTERED, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_TEXT_COLOR_FILTERED, v); }
 
 static inline void lv_style_set_text_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_TEXT_OPA, v); }
 
 static inline void lv_style_set_text_font(lv_style_t * style, const lv_font_t * value) {
-  lv_style_value_t v = {._ptr = value}; lv_style_set_prop(style, LV_STYLE_TEXT_FONT, v); }
+  lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_TEXT_FONT, v); }
 
 static inline void lv_style_set_text_letter_space(lv_style_t * style, lv_coord_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_TEXT_LETTER_SPACE, v); }
@@ -560,10 +560,10 @@ static inline void lv_style_set_img_blend_mode(lv_style_t * style, lv_blend_mode
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_IMG_BLEND_MODE, v); }
 
 static inline void lv_style_set_img_recolor(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR, v); }
 
 static inline void lv_style_set_img_recolor_filtered(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR_FILTERED, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR_FILTERED, v); }
 
 static inline void lv_style_set_img_recolor_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_IMG_RECOLOR_OPA, v); }
@@ -572,7 +572,7 @@ static inline void lv_style_set_outline_width(lv_style_t * style, lv_coord_t val
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_OUTLINE_WIDTH, v); }
 
 static inline void lv_style_set_outline_color(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_OUTLINE_COLOR, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_OUTLINE_COLOR, v); }
 
 static inline void lv_style_set_outline_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_OUTLINE_OPA, v); }
@@ -599,10 +599,10 @@ static inline void lv_style_set_shadow_blend_mode(lv_style_t * style, lv_blend_m
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_SHADOW_BLEND_MODE, v); }
 
 static inline void lv_style_set_shadow_color(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_SHADOW_COLOR, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_SHADOW_COLOR, v); }
 
 static inline void lv_style_set_shadow_color_filtered(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_SHADOW_COLOR_FILTERED, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_SHADOW_COLOR_FILTERED, v); }
 
 static inline void lv_style_set_shadow_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_SHADOW_OPA, v); }
@@ -623,16 +623,16 @@ static inline void lv_style_set_line_rounded(lv_style_t * style, lv_coord_t valu
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_LINE_ROUNDED, v); }
 
 static inline void lv_style_set_line_color(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_LINE_COLOR, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_LINE_COLOR, v); }
 
 static inline void lv_style_set_line_color_filtered(lv_style_t * style, lv_color_t value) {
-  lv_style_value_t v = {._color = value}; lv_style_set_prop(style, LV_STYLE_LINE_COLOR_FILTERED, v); }
+  lv_style_value_t v = {.color = value}; lv_style_set_prop(style, LV_STYLE_LINE_COLOR_FILTERED, v); }
 
 static inline void lv_style_set_line_opa(lv_style_t * style, lv_opa_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_LINE_OPA, v); }
 
 static inline void lv_style_set_content_src(lv_style_t * style, const char * value) {
-  lv_style_value_t v = {._ptr = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_SRC, v); }
+  lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_SRC, v); }
 
 static inline void lv_style_set_content_align(lv_style_t * style, lv_align_t value) {
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_ALIGN, v); }
@@ -644,7 +644,7 @@ static inline void lv_style_set_content_ofs_y(lv_style_t * style, lv_coord_t val
   lv_style_value_t v = {.num = value}; lv_style_set_prop(style, LV_STYLE_CONTENT_OFS_Y, v); }
 
 static inline void lv_style_set_transition(lv_style_t * style, const lv_style_transiton_t * value) {
-  lv_style_value_t v = {._ptr = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION, v); }
+  lv_style_value_t v = {.ptr = value}; lv_style_set_prop(style, LV_STYLE_TRANSITION, v); }
 
 
 static inline void lv_style_set_pad_ver(lv_style_t * style, lv_coord_t value)

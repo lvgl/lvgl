@@ -274,7 +274,7 @@ static lv_style_value_t apply_color_filter(const lv_obj_t * obj, uint32_t part, 
     lv_color_filter_cb_t f = lv_obj_get_style_color_filter_cb(obj, part);
     if(f) {
         lv_opa_t f_opa = lv_obj_get_style_color_filter_opa(obj, part);
-        if(f_opa != 0) v._color = f(v._color, f_opa);
+        if(f_opa != 0) v.color = f(v.color, f_opa);
     }
     return v;
 }
@@ -283,7 +283,7 @@ static bool get_prop_core(const lv_obj_t * obj, uint8_t part, lv_style_prop_t pr
     cache_t cache_res = read_cache(obj, part, prop);
     switch(cache_res) {
     case CACHE_ZERO:
-        v->_ptr = 0;
+        v->ptr = 0;
         return true;
     case CACHE_TRUE:
         v->num = 1;
@@ -300,7 +300,7 @@ static bool get_prop_core(const lv_obj_t * obj, uint8_t part, lv_style_prop_t pr
         cache_res -= CACHE_INDEX;
         if(cache_res) {
             if(prop == LV_STYLE_BG_COLOR_FILTERED || prop == LV_STYLE_TEXT_COLOR_FILTERED) {
-                v->_color = lv_style_get_indexed_color(cache_res);
+                v->color = lv_style_get_indexed_color(cache_res);
             } else {
                 v->num = lv_style_get_indexed_num(cache_res);
             }
@@ -539,7 +539,7 @@ void _lv_obj_create_style_transition(lv_obj_t * obj, lv_style_prop_t prop, uint8
     lv_style_value_t v2 = lv_obj_get_style_prop(obj, part, prop);
     obj->style_list.skip_trans = 0;
 
-    if(v1._ptr == v2._ptr && v1.num == v2.num && v1._color.full == v2._color.full)  return;
+    if(v1.ptr == v2.ptr && v1.num == v2.num && v1.color.full == v2.color.full)  return;
     obj->state = prev_state;
     v1 = lv_obj_get_style_prop(obj, part, prop);
     obj->state = new_state;
@@ -806,9 +806,9 @@ static void update_cache(lv_obj_t * obj, lv_part_t part, lv_style_prop_t prop)
     }
     if(prop == LV_STYLE_PROP_ALL || prop == LV_STYLE_COLOR_FILTER_CB || prop == LV_STYLE_COLOR_FILTER_OPA) {
         lv_style_value_t vf[2];
-        if(get_prop_core(obj, part, LV_STYLE_COLOR_FILTER_CB, &vf[0]) == false) vf[0]._func = 0;
+        if(get_prop_core(obj, part, LV_STYLE_COLOR_FILTER_CB, &vf[0]) == false) vf[0].func = 0;
         if(get_prop_core(obj, part, LV_STYLE_COLOR_FILTER_OPA, &vf[1]) == false) vf[1].num = 0;
-        if(vf[0]._func == NULL || vf[1].num == 0) list->cache_filter_zero = 1;
+        if(vf[0].func == NULL || vf[1].num == 0) list->cache_filter_zero = 1;
         else list->cache_filter_zero = 0;
     }
 
@@ -1081,14 +1081,14 @@ static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
                 break;
             case LV_STYLE_TRANSITION:
             case LV_STYLE_TEXT_FONT:
-                if(v < 255) value_final._ptr = tr->start_value._ptr;
-                else value_final._ptr = tr->end_value._ptr;
+                if(v < 255) value_final.ptr = tr->start_value.ptr;
+                else value_final.ptr = tr->end_value.ptr;
                 break;
             case LV_STYLE_COLOR_FILTER_CB:
-                if(tr->start_value._func == NULL) value_final._ptr = tr->end_value._func;
-                else if(tr->end_value._func == NULL) value_final._ptr = tr->start_value._func;
-                else if(v < 128) value_final._ptr = tr->start_value._ptr;
-                else value_final._ptr = tr->end_value._ptr;
+                if(tr->start_value.func == NULL) value_final.ptr = tr->end_value.func;
+                else if(tr->end_value.func == NULL) value_final.ptr = tr->start_value.func;
+                else if(v < 128) value_final.ptr = tr->start_value.ptr;
+                else value_final.ptr = tr->end_value.ptr;
                 break;
             case LV_STYLE_BG_COLOR:
             case LV_STYLE_BORDER_COLOR:
@@ -1096,9 +1096,9 @@ static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
             case LV_STYLE_SHADOW_COLOR:
             case LV_STYLE_OUTLINE_COLOR:
             case LV_STYLE_IMG_RECOLOR:
-                if(v <= 0) value_final._color = tr->start_value._color;
-                else if(v >= 255) value_final._color = tr->end_value._color;
-                else value_final._color = lv_color_mix(tr->end_value._color, tr->start_value._color, v);
+                if(v <= 0) value_final.color = tr->start_value.color;
+                else if(v >= 255) value_final.color = tr->end_value.color;
+                else value_final.color = lv_color_mix(tr->end_value.color, tr->start_value.color, v);
                 break;
 
             default:
@@ -1111,7 +1111,7 @@ static void trans_anim_cb(lv_style_trans_t * tr, lv_anim_value_t v)
         lv_style_value_t old_value;
         bool refr = true;
         if(lv_style_get_prop(list->styles[i].style, tr->prop, &old_value)) {
-            if(value_final._ptr == old_value._ptr && value_final._func == old_value._ptr && value_final._color.full == old_value._color.full && value_final.num == old_value.num) {
+            if(value_final.ptr == old_value.ptr && value_final.func == old_value.ptr && value_final.color.full == old_value.color.full && value_final.num == old_value.num) {
                 refr = false;
             }
         }

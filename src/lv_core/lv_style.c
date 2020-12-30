@@ -141,7 +141,7 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             value.num = LV_IMG_ZOOM_NONE;
             break;
         case LV_STYLE_BG_COLOR:
-            value._color = LV_COLOR_WHITE;
+            value.color = LV_COLOR_WHITE;
             break;
         case LV_STYLE_OPA:
         case LV_STYLE_BORDER_OPA:
@@ -159,10 +159,10 @@ lv_style_value_t lv_style_prop_get_default(lv_style_prop_t prop)
             value.num = LV_BORDER_SIDE_FULL;
             break;
         case LV_STYLE_TEXT_FONT:
-            value._ptr = LV_THEME_DEFAULT_FONT_NORMAL;
+            value.ptr = LV_THEME_DEFAULT_FONT_NORMAL;
             break;
         default:
-            value._ptr = NULL;
+            value.ptr = NULL;
             value.num = 0;
             break;
     }
@@ -183,7 +183,7 @@ uint32_t lv_style_find_index_color(lv_style_value_t v)
 {
     uint32_t i;
     for(i = 1; i < buf_color_p; i++) {
-        if(v._color.full == buf_color[i].full)  return i;
+        if(v.color.full == buf_color[i].full)  return i;
     }
     return 0;
 }
@@ -192,7 +192,7 @@ uint32_t lv_style_find_index_ptr(lv_style_value_t v)
 {
     uint32_t i;
     for(i = 1; i < buf_ptr; i++) {
-        if(v.num == buf_ptr[i])  return i;
+        if(v.ptr == buf_ptr[i])  return i;
     }
     return 0;
 }
@@ -286,10 +286,10 @@ static int32_t alloc_index_ptr(lv_style_value_t v)
     static uint32_t p = 1;
     uint32_t i;
     for(i = 1; i < p; i++) {
-        if(v._ptr == buf_ptr[i])  return i;
+        if(v.ptr == buf_ptr[i])  return i;
     }
     if(p < 16) {
-        buf_ptr[p] = v._ptr;
+        buf_ptr[p] = v.ptr;
         p++;
         return p - 1;
     }
@@ -300,10 +300,10 @@ static int32_t alloc_index_color(lv_style_value_t v)
 {
     uint32_t i;
     for(i = 1; i < buf_color_p; i++) {
-        if(v._color.full == buf_color[i].full)  return i;
+        if(v.color.full == buf_color[i].full)  return i;
     }
     if(buf_color_p) {
-        buf_color[buf_color_p].full = v._color.full;
+        buf_color[buf_color_p].full = v.color.full;
         buf_color_p++;
         return buf_color_p - 1;
     }
@@ -371,7 +371,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
              style->transition = id;
          } else {
              _alloc_ext(style);
-             style->ext->transition = value._ptr;
+             style->ext->transition = value.ptr;
              style->ext->has.transition = 1;
              style->transition = 0;
          }
@@ -393,7 +393,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
              style->color_filter_cb = id;
          } else {
              _alloc_ext(style);
-             style->ext->color_filter_cb = (lv_color_filter_cb_t)value._func;
+             style->ext->color_filter_cb = (lv_color_filter_cb_t)value.func;
              style->ext->has.color_filter_cb = 1;
              style->color_filter_cb = 0;
          }
@@ -505,7 +505,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
              style->bg_color = id;
          } else {
              _alloc_ext(style);
-             style->ext->bg_color = value._color;
+             style->ext->bg_color = value.color;
              style->ext->has.bg_color = 1;
              style->bg_color = 0;
          }
@@ -527,7 +527,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
              style->bg_grad_color = id;
          } else {
              _alloc_ext(style);
-             style->ext->bg_grad_color = value._color;
+             style->ext->bg_grad_color = value.color;
              style->ext->has.bg_grad_color = 1;
              style->bg_grad_color = 0;
          }
@@ -558,7 +558,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
              style->border_color = id;
          } else {
              _alloc_ext(style);
-             style->ext->border_color = value._color;
+             style->ext->border_color = value.color;
              style->ext->has.border_color = 1;
              style->border_color = 0;
          }
@@ -606,7 +606,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
              style->text_color = id;
          } else {
              _alloc_ext(style);
-             style->ext->text_color = value._color;
+             style->ext->text_color = value.color;
              style->ext->has.text_color = 1;
              style->text_color = 0;
          }
@@ -662,7 +662,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
          break;
      case LV_STYLE_IMG_RECOLOR:
          _alloc_ext(style);
-         style->ext->img_recolor = value._color;
+         style->ext->img_recolor = value.color;
          style->ext->has.img_recolor = 1;
          break;
      case LV_STYLE_IMG_RECOLOR_OPA:
@@ -688,7 +688,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
              style->outline_color = id;
          } else {
              _alloc_ext(style);
-             style->ext->outline_color = value._color;
+             style->ext->outline_color = value.color;
              style->ext->has.outline_color = 1;
              style->outline_color = 0;
          }
@@ -776,7 +776,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
              style->shadow_color = id;
          } else {
              _alloc_ext(style);
-             style->ext->shadow_color = value._color;
+             style->ext->shadow_color = value.color;
              style->ext->has.shadow_color = 1;
              style->shadow_color = 0;
          }
@@ -830,7 +830,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
              style->line_color = id;
          } else {
              _alloc_ext(style);
-             style->ext->line_color = value._color;
+             style->ext->line_color = value.color;
              style->ext->has.line_color = 1;
              style->line_color = 0;
          }
@@ -849,7 +849,7 @@ static void set_prop(lv_style_t * style, lv_style_prop_t prop, lv_style_value_t 
 
      case LV_STYLE_CONTENT_SRC:
          _alloc_ext(style);
-         style->ext->content_src = value._ptr;
+         style->ext->content_src = value.ptr;
          style->ext->has.content_src = 1;
          break;
      case LV_STYLE_CONTENT_ALIGN:
@@ -902,16 +902,16 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           if(style->ext && style->ext->has.opa) { value->num = style->ext->opa; return true; }
           break;
       case LV_STYLE_COLOR_FILTER_CB:
-          if(style->color_filter_cb) { value->_func = buf_ptr[style->color_filter_cb]; return true; }
-          if(style->ext && style->ext->has.color_filter_cb) { value->_func = (void(*)(void)) style->ext->color_filter_cb; return true; }
+          if(style->color_filter_cb) { value->func = buf_ptr[style->color_filter_cb]; return true; }
+          if(style->ext && style->ext->has.color_filter_cb) { value->func = (void(*)(void)) style->ext->color_filter_cb; return true; }
           break;
       case LV_STYLE_COLOR_FILTER_OPA:
           if(style->color_filter_opa) { value->num = buf_num[style->color_filter_opa]; return true; }
           if(style->ext && style->ext->has.color_filter_opa) { value->num = style->ext->color_filter_opa; return true; }
           break;
       case LV_STYLE_TRANSITION:
-          if(style->transition) { value->_ptr = buf_ptr[style->transition]; return true; }
-          if(style->ext && style->ext->has.transition) { value->_ptr = style->ext->transition; return true; }
+          if(style->transition) { value->ptr = buf_ptr[style->transition]; return true; }
+          if(style->ext && style->ext->has.transition) { value->ptr = style->ext->transition; return true; }
              break;
 
       case LV_STYLE_PAD_TOP:
@@ -949,8 +949,8 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
 
       case LV_STYLE_BG_COLOR:
       case LV_STYLE_BG_COLOR_FILTERED:
-          if(style->bg_color) { value->_color = buf_color[style->bg_color]; return true; }
-          if(style->ext && style->ext->has.bg_color) { value->_color = style->ext->bg_color; return true; }
+          if(style->bg_color) { value->color = buf_color[style->bg_color]; return true; }
+          if(style->ext && style->ext->has.bg_color) { value->color = style->ext->bg_color; return true; }
           break;
       case LV_STYLE_BG_OPA:
           if(style->bg_opa) { value->num = buf_num[style->bg_opa]; return true; }
@@ -958,8 +958,8 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           break;
       case LV_STYLE_BG_GRAD_COLOR:
       case LV_STYLE_BG_GRAD_COLOR_FILTERED:
-          if(style->bg_grad_color) { value->_color = buf_color[style->bg_grad_color]; return true; }
-          if(style->ext && style->ext->has.bg_grad_color) { value->_color = style->ext->bg_grad_color; return true; }
+          if(style->bg_grad_color) { value->color = buf_color[style->bg_grad_color]; return true; }
+          if(style->ext && style->ext->has.bg_grad_color) { value->color = style->ext->bg_grad_color; return true; }
           break;
       case LV_STYLE_BG_GRAD_DIR:
           if(style->has_bg_grad_dir) { value->num = style->bg_grad_dir; return true; }
@@ -976,8 +976,8 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
 
       case LV_STYLE_BORDER_COLOR:
       case LV_STYLE_BORDER_COLOR_FILTERED:
-          if(style->border_color) { value->_color = buf_color[style->border_color]; return true; }
-          if(style->ext && style->ext->has.border_color) { value->_color = style->ext->border_color; return true; }
+          if(style->border_color) { value->color = buf_color[style->border_color]; return true; }
+          if(style->ext && style->ext->has.border_color) { value->color = style->ext->border_color; return true; }
           break;
       case LV_STYLE_BORDER_OPA:
           if(style->border_opa) { value->num = buf_num[style->border_opa]; return true; }
@@ -999,16 +999,16 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
 
       case LV_STYLE_TEXT_COLOR:
       case LV_STYLE_TEXT_COLOR_FILTERED:
-          if(style->text_color) { value->_color = buf_color[style->text_color]; return true; }
-          if(style->ext && style->ext->has.text_color) { value->_color = style->ext->text_color; return true; }
+          if(style->text_color) { value->color = buf_color[style->text_color]; return true; }
+          if(style->ext && style->ext->has.text_color) { value->color = style->ext->text_color; return true; }
           break;
       case LV_STYLE_TEXT_OPA:
           if(style->text_opa) { value->num = buf_num[style->text_opa]; return true; }
           if(style->ext && style->ext->has.text_opa) { value->num = style->ext->text_opa; return true; }
           break;
       case LV_STYLE_TEXT_FONT:
-          if(style->text_font) { value->_ptr = buf_ptr[style->text_font]; return true; }
-          if(style->ext && style->ext->has.text_font) { value->_ptr = style->ext->text_font; return true; }
+          if(style->text_font) { value->ptr = buf_ptr[style->text_font]; return true; }
+          if(style->ext && style->ext->has.text_font) { value->ptr = style->ext->text_font; return true; }
           break;
       case LV_STYLE_TEXT_LETTER_SPACE:
           if(style->ext && style->ext->has.text_letter_space) { value->num = style->ext->text_letter_space; return true; }
@@ -1032,7 +1032,7 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           break;
       case LV_STYLE_IMG_RECOLOR:
       case LV_STYLE_IMG_RECOLOR_FILTERED:
-          if(style->ext && style->ext->has.img_recolor) { value->_color = style->ext->img_recolor; return true; }
+          if(style->ext && style->ext->has.img_recolor) { value->color = style->ext->img_recolor; return true; }
           break;
       case LV_STYLE_IMG_RECOLOR_OPA:
           if(style->ext && style->ext->has.img_recolor_opa) { value->num = style->ext->img_recolor_opa; return true; }
@@ -1045,8 +1045,8 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           break;
       case LV_STYLE_OUTLINE_COLOR:
       case LV_STYLE_OUTLINE_COLOR_FILTERED:
-          if(style->outline_color) { value->_color = buf_color[style->outline_color]; return true; }
-          if(style->ext && style->ext->has.outline_color) { value->_color = style->ext->outline_color; return true; }
+          if(style->outline_color) { value->color = buf_color[style->outline_color]; return true; }
+          if(style->ext && style->ext->has.outline_color) { value->color = style->ext->outline_color; return true; }
           break;
       case LV_STYLE_OUTLINE_OPA:
           if(style->outline_opa) { value->num = buf_num[style->outline_opa]; return true; }
@@ -1081,8 +1081,8 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           break;
       case LV_STYLE_SHADOW_COLOR:
       case LV_STYLE_SHADOW_COLOR_FILTERED:
-          if(style->shadow_color) { value->_color = buf_color[style->shadow_color]; return true; }
-          if(style->ext && style->ext->has.shadow_color) { value->_color = style->ext->shadow_color; return true; }
+          if(style->shadow_color) { value->color = buf_color[style->shadow_color]; return true; }
+          if(style->ext && style->ext->has.shadow_color) { value->color = style->ext->shadow_color; return true; }
           break;
       case LV_STYLE_SHADOW_OPA:
           if(style->shadow_opa) { value->num = buf_num[style->shadow_opa]; return true; }
@@ -1107,8 +1107,8 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           break;
       case LV_STYLE_LINE_COLOR:
       case LV_STYLE_LINE_COLOR_FILTERED:
-          if(style->line_color) { value->_color = buf_color[style->line_color]; return true; }
-          if(style->ext && style->ext->has.line_color) { value->_color = style->ext->line_color; return true; }
+          if(style->line_color) { value->color = buf_color[style->line_color]; return true; }
+          if(style->ext && style->ext->has.line_color) { value->color = style->ext->line_color; return true; }
           break;
       case LV_STYLE_LINE_OPA:
           if(style->line_opa) { value->num = buf_num[style->line_opa]; return true; }
@@ -1116,7 +1116,7 @@ static bool get_prop(const lv_style_t * style, lv_style_prop_t prop, lv_style_va
           break;
 
       case LV_STYLE_CONTENT_SRC:
-             if(style->ext && style->ext->has.content_src) { value->_ptr = style->ext->content_src; return true; }
+             if(style->ext && style->ext->has.content_src) { value->ptr = style->ext->content_src; return true; }
              break;
       case LV_STYLE_CONTENT_ALIGN:
              if(style->ext && style->ext->has.content_align) { value->num = style->ext->content_align; return true; }

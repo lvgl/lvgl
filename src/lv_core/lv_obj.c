@@ -682,7 +682,7 @@ void lv_obj_set_state(lv_obj_t * obj, lv_state_t new_state)
 
         lv_style_value_t v;
         if(lv_style_get_prop(obj_style->style, LV_STYLE_TRANSITION, &v) == false) continue;
-        const lv_style_transiton_t * tr = v._ptr;
+        const lv_style_transiton_t * tr = v.ptr;
 
         /*Add the props t the set is not added yet or added but with smaller weight*/
         uint32_t j;
